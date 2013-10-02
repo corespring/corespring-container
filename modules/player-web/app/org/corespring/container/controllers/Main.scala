@@ -79,7 +79,12 @@ trait Main extends Controller {
   def playerServices(id: String) = builder.playerAction(id) {
     request: PlayerRequest[AnyContent] =>
       log.debug(s"load player services: $id")
-      Ok(s"angular.module('$namespace', []).factory('PlayerServices', [function(){ return {} }]);")
+
+      import org.corespring.container.views.txt._
+      val loadSession = org.corespring.container.controllers.routes.Session.load(id)
+      val saveSession = org.corespring.container.controllers.routes.Session.save(id)
+      Ok(PlayerServices(namespace, loadSession, saveSession)).as("text/javascript")
+      //Ok(s"angular.module('$namespace', []).factory('PlayerServices', [function(){ return {} }]);")
   }
 
 }

@@ -1,0 +1,17 @@
+@(namespace : String, loadSession : Call, saveSession:Call)
+
+angular.module('@namespace', []);
+
+angular.module('@namespace').factory('PlayerServices', ['$http', function($http){
+
+var def = {
+    saveSession: function(session, onSuccess, onFailure){
+      $http['@saveSession.method.toLowerCase']('@saveSession.url', onSuccess, onFailure);
+    },
+    loadSession: function(onSuccess, onFailure) {
+      $http['@loadSession.method.toLowerCase']('@loadSession.url', onSuccess, onFailure);
+    }
+  }
+  return def
+}]);
+

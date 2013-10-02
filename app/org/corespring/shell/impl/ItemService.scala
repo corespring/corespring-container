@@ -6,7 +6,7 @@ import com.mongodb.util.JSON
 import org.bson.types.ObjectId
 import play.api.libs.json.{Json, JsValue}
 
-class ItemService(collection: MongoCollection) {
+class MongoService(collection: MongoCollection) {
 
   def load(id: String): Option[JsValue] = withOid(id) {
     oid =>

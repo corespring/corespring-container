@@ -2,12 +2,11 @@ package org.corespring.shell.impl
 
 import org.corespring.container.controllers.Main
 import org.corespring.container.player.actions.{PlayerRequest, PlayerActionBuilder}
-import play.api.libs.json.{JsString, Json, JsObject}
 import play.api.mvc.{Action, AnyContent, Result, BodyParser}
 
 trait PlayerMain extends Main {
 
-  def itemService : ItemService
+  def itemService : MongoService
 
 
   val xhtml = """<html><body><h1>Butterflies!</h1></body></html>"""

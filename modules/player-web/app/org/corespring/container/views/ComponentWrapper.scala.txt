@@ -1,6 +1,7 @@
 @(moduleName: String, directiveName : String, jsBody : String)
-//TODO: Once we move to 2.2.0 - we should be able to name this file .scala.js
-//Wrapper for: @moduleName / @directiveName
+// --------
+// -------- Wrapper for: @moduleName / @directiveName
+// --------
 (function(){
 
     // A stop gap until we think about namespacing config + preview defs.

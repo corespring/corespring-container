@@ -37,6 +37,10 @@ trait ControllerInstanceResolver extends GlobalSettings {
     def matches(c: Class[_]) : Boolean = {
       logger.info(s"matches ${c.getName}")
 
+      if(c == null){
+        return false
+      }
+
       if(c.getName == "java.lang.Object"){
         return false
       }
