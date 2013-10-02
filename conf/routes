@@ -1,1 +1,6 @@
--> /client   playerWeb.Routes
+GET        /        @org.corespring.shell.impl.controllers.Main.index
+
+GET        /:id/create-session @org.corespring.shell.impl.controllers.Main.createSessionPage(id)
+POST       /create-session     @org.corespring.shell.impl.controllers.Main.createSession
+
+->         /client        playerWeb.Routes

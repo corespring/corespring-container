@@ -1,4 +1,4 @@
-package org.corespring.shell.impl.controllers
+package org.corespring.shell.impl.controllers.player
 
 import org.corespring.container.components.model.Component
 import org.corespring.shell.impl.services.MongoService

@@ -1,0 +1,34 @@
+@(itemId: String, url : String)
+<html>
+  <head>
+
+  </head>
+  <body>
+    <h1>Create session for item: @itemId </h1>
+    <label>Max number of attempts?</label><input type="text" id="maxNoOfAttempts" ><br>
+    <label>Show Feedback?</label><input type="checkbox" id="showFeedback"><br>
+    <label>Show Correct Response?</label><input type="checkbox" id="showCorrectResponse"><br>
+    <label>Show User Response?</label><input type="checkbox" id="showUserResponse"><br>
+    <button id="button"> Create Session</button>
+  </body>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+  <script type="text/javascript">
+  $(document).ready(function(){
+
+    $("#button" ).click(function(){
+      var data = {}
+      data.itemId = "@itemId";
+      data.maxNoAttempts = $("#maxNoOfAttempts" ).val();
+      data.showFeedback = $("#showFeedback").is(":checked");
+      data.showCorrectResponse = $("#showCorrectResponse").is(":checked");
+      data.showUserResponse = $("#showUserResponse").is(":checked");
+      $.post( "@url" , data, function(result) {
+        window.location = result.url;
+      });
+    });
+  })
+  </script>
+</html>
+
+
+

@@ -1,10 +1,10 @@
-package org.corespring.shell.impl.controllers
+package org.corespring.shell.impl.controllers.player
 
 import org.corespring.container.controllers.Session
 import org.corespring.container.player.actions.{SessionRequest, SessionActionBuilder}
+import org.corespring.shell.impl.services.MongoService
 import play.api.Logger
 import play.api.mvc.{Action, Result, AnyContent}
-import org.corespring.shell.impl.services.MongoService
 
 trait PlayerSession extends Session {
 

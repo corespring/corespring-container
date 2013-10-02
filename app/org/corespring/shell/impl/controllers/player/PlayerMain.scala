@@ -1,9 +1,9 @@
-package org.corespring.shell.impl.controllers
+package org.corespring.shell.impl.controllers.player
 
-import org.corespring.container.controllers.Main
 import org.corespring.container.player.actions.{PlayerRequest, PlayerActionBuilder}
-import play.api.mvc.{Action, AnyContent, Result, BodyParser}
 import org.corespring.shell.impl.services.MongoService
+import play.api.mvc.{Action, AnyContent, Result, BodyParser}
+import org.corespring.container.controllers.Main
 
 trait PlayerMain extends Main {
 

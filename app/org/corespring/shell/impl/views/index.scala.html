@@ -1,0 +1,15 @@
+@(items:Seq[(String, String, String)])
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Corespring Container Shell</title>
+</head>
+<body>
+  <h1>I'm the corespring container shell</h1>
+
+  @items.map{ i =>
+      @i._1 : <a href="@i._3">Run</a> <a href="#">Edit</a>
+      <br/>
+  }
+</body>
+</html>

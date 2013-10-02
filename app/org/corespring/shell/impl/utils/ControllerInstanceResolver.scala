@@ -2,8 +2,11 @@ package org.corespring.shell.impl.utils
 
 import play.api.mvc.Controller
 import play.api.{Logger, GlobalSettings}
+import scala.collection._
 
 trait ControllerInstanceResolver extends GlobalSettings {
+
+  private val mappedTypes : mutable.Map[String, Controller] = new mutable.HashMap()
 
   def controllers : Seq[Controller]
 
@@ -13,7 +16,6 @@ trait ControllerInstanceResolver extends GlobalSettings {
 
     def isSuper(test: Class[_], target: Class[A]): Boolean = {
 
-      println(s"issuper: ${test.getName}")
       if (test == null) {
         return false
       }
@@ -64,19 +66,30 @@ trait ControllerInstanceResolver extends GlobalSettings {
       false
     }
 
-    controllers.find {
-      (c: Controller) => {
-        val cType = c.asInstanceOf[Object].getClass
-        val m = matches(cType)
-        println(m)
-        m
+    def searchTypeHierarchy = {
+      controllers.find {
+        (c: Controller) => {
+          val cType = c.asInstanceOf[Object].getClass
+          val m = matches(cType)
+          m
+        }
+      } match {
+        case Some(c) => {
+          Logger.debug("Found an implementation for " + controllerClass + ": " + c)
+          mappedTypes.put(controllerClass.getCanonicalName, c)
+          c.asInstanceOf[A]
+        }
+        case _ => throw new RuntimeException("Can't find controller for: " + controllerClass)
       }
-    } match {
-      case Some(c) => {
-        Logger.debug("Found an implementation for " + controllerClass + ": " + c)
-        c.asInstanceOf[A]
-      }
-      case _ => throw new RuntimeException("Can't find controller for: " + controllerClass)
+
+    }
+
+    mappedTypes.get(controllerClass.getCanonicalName).map{ c =>
+      logger.debug(s"Already have a controller mapped for ${controllerClass.getCanonicalName}")
+      c.asInstanceOf[A]
+    }.getOrElse{
+      logger.debug(s"Search type hierarchy for ${controllerClass.getCanonicalName}")
+      searchTypeHierarchy
     }
   }
 }
