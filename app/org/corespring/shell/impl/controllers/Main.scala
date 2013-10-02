@@ -2,7 +2,7 @@ package org.corespring.shell.impl.controllers
 
 import org.corespring.shell.impl.services.MongoService
 import play.api.Logger
-import play.api.libs.json.{JsString, JsObject, JsValue}
+import play.api.libs.json.{Json, JsString, JsObject, JsValue}
 import play.api.mvc.{Action, Controller}
 
 trait Main extends Controller {
@@ -37,13 +37,22 @@ trait Main extends Controller {
 
   def createSession = Action {
     request =>
-      (for {
+
+      logger.debug("create session....")
+      val result = for {
         json <- request.body.asJson
         saved <- sessionService.create(json)
-      } yield saved).map {
-        session =>
-          val sessionId = (session \ "_id" \ "$oid").as[String]
-          Ok(JsObject(Seq("url" -> JsString(s"/client/${sessionId}/player.html"))))
-      }.getOrElse(NotFound)
+      } yield {
+        logger.debug(Json.stringify(json))
+        saved
+      }
+
+      result.map {
+        oid =>
+          Ok(JsObject(Seq("url" -> JsString(s"/client/${oid.toString}/player.html"))))
+      }.getOrElse {
+        logger.debug("Can't create the session")
+        BadRequest("Create session - where's the body?")
+      }
   }
 }

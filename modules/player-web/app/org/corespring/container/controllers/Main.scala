@@ -7,7 +7,7 @@ import play.api.mvc.{AnyContent, Action, Controller}
 
 trait Main extends Controller {
 
-  def builder: PlayerActionBuilder[AnyContent]
+  def builder : PlayerActionBuilder[AnyContent]
 
   def components: Seq[Component]
 
@@ -28,9 +28,9 @@ trait Main extends Controller {
     """.stripMargin
 
 
-  def loadConfig(id: String): Action[AnyContent] = builder.playerAction(id) {
+  def loadConfig(sessionId: String): Action[AnyContent] = builder.playAction(sessionId) {
     request: PlayerRequest[AnyContent] =>
-      log.debug(s"load config: $id")
+      log.debug(s"load config: $sessionId")
       log.debug(Json.stringify(request.item))
       val xhtml = processXhtml((request.item \ "xhtml").as[String])
       val components: Seq[String] = componentTypes(request.item)
@@ -43,8 +43,10 @@ trait Main extends Controller {
   def componentTypes(json: JsValue): Seq[String] = (json \ "components" \\ "componentType").map(_.as[String]).distinct
 
 
-  def componentJs(id: String): Action[AnyContent] = builder.playerAction(id) {
+  def componentJs(sessionId: String): Action[AnyContent] = builder.playAction(sessionId) {
     request: PlayerRequest[AnyContent] =>
+
+      log.debug(s"load js for session $sessionId")
 
       def wrapJs(c: Component) = {
         import org.corespring.container.views.txt._
@@ -76,15 +78,13 @@ trait Main extends Controller {
 
   private def hyphenatedToTitleCase(s: String): String = s.split("-").map(_.capitalize).mkString("")
 
-  def playerServices(id: String) = builder.playerAction(id) {
+  def playerServices(sessionId: String) = builder.playAction(sessionId) {
     request: PlayerRequest[AnyContent] =>
-      log.debug(s"load player services: $id")
-
+      log.debug(s"load player services: $sessionId")
       import org.corespring.container.views.txt._
-      val loadSession = org.corespring.container.controllers.routes.Session.load(id)
-      val saveSession = org.corespring.container.controllers.routes.Session.save(id)
+      val loadSession = org.corespring.container.controllers.routes.Session.loadEverything(sessionId)
+      val saveSession = org.corespring.container.controllers.routes.Session.save(sessionId)
       Ok(PlayerServices(namespace, loadSession, saveSession)).as("text/javascript")
-      //Ok(s"angular.module('$namespace', []).factory('PlayerServices', [function(){ return {} }]);")
   }
 
 }

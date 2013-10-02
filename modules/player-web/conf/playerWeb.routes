@@ -1,6 +1,6 @@
 # Note: The order is important - there are some asset calls that we want to intercept before they hit the *file
 
-GET        /session/:id.json  @org.corespring.container.controllers.Session.load(id:String)
+GET        /session/everything/:id.json  @org.corespring.container.controllers.Session.loadEverything(id:String)
 PUT        /session/:id.json  @org.corespring.container.controllers.Session.save(id:String)
 
 # Intercept the config.json request from the client

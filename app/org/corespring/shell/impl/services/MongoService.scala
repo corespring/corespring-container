@@ -33,11 +33,17 @@ class MongoService(collection: MongoCollection) {
       }
   }
 
-  def create(data:JsValue) : Option[JsValue] = {
-    val dbo = JSON.parse(Json.stringify(data)).asInstanceOf[DBObject]
+  def create(data:JsValue) : Option[ObjectId] = {
+
+    val oid = ObjectId.get
+    val jsonString = Json.stringify(data)
+    logger.debug(s"[create] $jsonString")
+    val dbo = JSON.parse(jsonString).asInstanceOf[DBObject]
+    dbo.put("_id", oid)
+
     val result = collection.insert(dbo)
     if(result.getLastError.ok){
-      Some(data)
+      Some(oid)
     } else {
       None
     }

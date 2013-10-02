@@ -18,13 +18,22 @@
     $("#button" ).click(function(){
       var data = {}
       data.itemId = "@itemId";
-      data.maxNoAttempts = $("#maxNoOfAttempts" ).val();
+      data.maxNoAttempts = parseInt($("#maxNoOfAttempts" ).val());
       data.showFeedback = $("#showFeedback").is(":checked");
       data.showCorrectResponse = $("#showCorrectResponse").is(":checked");
       data.showUserResponse = $("#showUserResponse").is(":checked");
-      $.post( "@url" , data, function(result) {
-        window.location = result.url;
+
+
+      $.ajax({
+        type: 'POST',
+        url: '@url',
+        contentType: 'application/json; charset=utf-8',
+        dataType: 'json',
+        data: JSON.stringify(data)
+      }).done(function(result){
+          window.location = result.url;
       });
+
     });
   })
   </script>

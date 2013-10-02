@@ -1,9 +1,10 @@
 package org.corespring.shell.impl.controllers.player
 
 import org.corespring.container.controllers.Session
-import org.corespring.container.player.actions.{SessionRequest, SessionActionBuilder}
+import org.corespring.container.player.actions.{FullSessionRequest, SessionRequest, SessionActionBuilder}
 import org.corespring.shell.impl.services.MongoService
 import play.api.Logger
+import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Action, Result, AnyContent}
 
 trait PlayerSession extends Session {
@@ -11,6 +12,8 @@ trait PlayerSession extends Session {
   private lazy val logger = Logger("player.session")
 
   def sessionService: MongoService
+
+  def itemService: MongoService
 
   def sessionActions: SessionActionBuilder[AnyContent] = new SessionActionBuilder[AnyContent] {
     def load(id: String)(block: (SessionRequest[AnyContent]) => Result): Action[AnyContent] = Action {
@@ -37,6 +40,22 @@ trait PlayerSession extends Session {
             block(SessionRequest(savedJson, request))
         }.getOrElse(NotFound(s"Can't save $id"))
 
+    }
+
+    def loadEverything(id: String)(block: (FullSessionRequest[AnyContent]) => Result): Action[AnyContent] = Action {
+      request =>
+        val result = for {
+          session <- sessionService.load(id)
+          itemId <- (session \ "itemId").asOpt[String]
+          item <- itemService.load(itemId)
+        } yield {
+          val out: JsValue = Json.obj("item" -> item, "session" -> session)
+          FullSessionRequest(out, request)
+        }
+        result.map {
+          r =>
+            block(r)
+        }.getOrElse(BadRequest("??"))
     }
   }
 
