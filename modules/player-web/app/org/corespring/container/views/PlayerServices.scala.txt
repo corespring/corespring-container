@@ -6,10 +6,32 @@ angular.module('@namespace').factory('PlayerServices', ['$http', function($http)
 
 var def = {
     saveSession: function(session, onSuccess, onFailure){
-      $http['@saveSession.method.toLowerCase']('@saveSession.url', onSuccess, onFailure);
+      $http['@saveSession.method.toLowerCase']('@saveSession.url')
+       .success(
+         function(data, status, headers, config) {
+           console.log("data loaded succesfully")
+           onSuccess(data)
+         })
+       .error(
+         function(data, status, headers, config) {
+           console.log("error");
+           if( onFailure ) {
+            onFailure(data);
+           }
+         }
+       );
     },
     loadSession: function(onSuccess, onFailure) {
-      $http['@loadSession.method.toLowerCase']('@loadSession.url', onSuccess, onFailure);
+      $http['@loadSession.method.toLowerCase']('@loadSession.url')
+        .success(function(data, status, headers, config){
+          console.log("[player-services] load session successful");
+          onSuccess(data);
+        })
+        .error(function(data, status, headers, config){
+          if(onFailure){
+            onFailure(data);
+          }
+        })
     }
   }
   return def
