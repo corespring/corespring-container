@@ -25,7 +25,7 @@ trait PlayerSession extends Session {
         }.getOrElse(NotFound(s"Can't find a session with id: $id"))
     }
 
-    def save(id: String)(block: (SessionRequest[AnyContent]) => Result): Action[AnyContent] = Action {
+    def submitAnswers(id: String)(block: (SessionRequest[AnyContent]) => Result): Action[AnyContent] = Action {
       request =>
 
         logger.debug(s"save $id")

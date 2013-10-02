@@ -1,12 +1,12 @@
-@(namespace : String, loadSession : Call, saveSession:Call)
+@(namespace : String, loadSession : Call, submitAnswers:Call)
 
 angular.module('@namespace', []);
 
 angular.module('@namespace').factory('PlayerServices', ['$http', function($http){
 
 var def = {
-    saveSession: function(session, onSuccess, onFailure){
-      $http['@saveSession.method.toLowerCase']('@saveSession.url')
+    submitAnswers: function(session, onSuccess, onFailure){
+      $http['@submitAnswers.method.toLowerCase']('@submitAnswers.url', session)
        .success(
          function(data, status, headers, config) {
            console.log("data loaded succesfully")

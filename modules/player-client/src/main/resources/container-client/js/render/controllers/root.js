@@ -3,7 +3,7 @@
 
   controller = function($scope, $compile, $http, $timeout, PlayerServices, CorespringContainer) {
     $scope.submit = function() {
-      return PlayerServices.saveSession({
+      return PlayerServices.submitAnswers({
         answers: CorespringContainer.getAnswers()
       }, $scope.onSessionSaved, $scope.onSessionSaveError);
     };

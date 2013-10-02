@@ -11,5 +11,5 @@ case class FullSessionRequest[A]( everything : JsValue, r: Request[A]) extends W
 trait SessionActionBuilder[A]{
     def loadEverything(id:String)(block: FullSessionRequest[A] => Result) : Action[AnyContent]
     def load(id:String)(block: SessionRequest[A] => Result) : Action[AnyContent]
-    def save(id:String)(block: SessionRequest[A] => Result) : Action[AnyContent]
+    def submitAnswers(id:String)(block: SessionRequest[A] => Result) : Action[AnyContent]
 }

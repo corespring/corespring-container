@@ -83,8 +83,8 @@ trait Main extends Controller {
       log.debug(s"load player services: $sessionId")
       import org.corespring.container.views.txt._
       val loadSession = org.corespring.container.controllers.routes.Session.loadEverything(sessionId)
-      val saveSession = org.corespring.container.controllers.routes.Session.save(sessionId)
-      Ok(PlayerServices(namespace, loadSession, saveSession)).as("text/javascript")
+      val submitAnswers = org.corespring.container.controllers.routes.Session.submitAnswers(sessionId)
+      Ok(PlayerServices(namespace, loadSession, submitAnswers)).as("text/javascript")
   }
 
 }

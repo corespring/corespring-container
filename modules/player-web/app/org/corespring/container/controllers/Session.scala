@@ -9,5 +9,5 @@ trait Session extends Controller {
 
   def load(id: String) = sessionActions.load(id)(request => Ok(request.sessionJson))
   def loadEverything(id: String) = sessionActions.loadEverything(id)(request => Ok(request.everything))
-  def save(id: String) = sessionActions.save(id)(request => Ok(request.sessionJson))
+  def submitAnswers(id: String) = sessionActions.submitAnswers(id)(request => Ok(request.sessionJson))
 }
