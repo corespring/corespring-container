@@ -22,7 +22,9 @@
       // hey Angular, we're bootstrapping manually!
       window.name = "NG_DEFER_BOOTSTRAP!";
     </script>
+
     <script src="bower_components/jquery/jquery.min.js"></script>
+    <script src="bower_components/jquery-ui/ui/minified/jquery-ui.min.js"></script>
     <script src="bower_components/angular/angular.js"></script>
     <script src="bower_components/lodash/dist/lodash.js"></script>
     <script src="bower_components/headjs/dist/head.js"></script>
@@ -32,6 +34,11 @@
     <script src="js/render/controllers/root.js"></script>
     <script src="js/corespring/container/render.js"></script>
     <script src="js/render/directives/_declaration.js"></script>
+    <!-- endbuild -->
+
+    <!-- build:js js/extras.js -->
+    <script src="bower_components/angular-ui/build/angular-ui.js"></script>
+    <script src="bower_components/angular-dragdrop/src/angular-dragdrop.js"></script>
     <!-- endbuild -->
 
     <script type="text/javascript">
@@ -51,7 +58,8 @@
             var playerDeps = [
               'corespring-player.controllers',
               'corespring-player.directives',
-              'corespring.container'
+              'corespring.container',
+              'ngDragDrop'
             ].concat(data.angular.dependencies);
 
             angular.module("corespring-player", playerDeps );
