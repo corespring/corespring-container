@@ -1,0 +1,96 @@
+{
+  "metadata" : {
+    "title" : "Item One"
+  },
+  "xhtml" : "<%- helper.read('../xml/1.xhtml') %>",
+  "components" : {
+
+    "2" : {
+      "componentType" : "corespring-drag-and-drop",
+       "correctResponse": [
+        { "landingPlace" : "1", "choiceId" : "larva"}
+        ],
+        "feedback" : [
+          {
+            "landingPlace" : "1",
+            "feedback" :
+              [
+                { "larva" : "Great"},
+                { "other" : "Not great" }
+              ]
+          }
+        ],
+        "model" : {
+          "config" : {
+            "shuffle" : true
+          },
+          "prompt": "Drag the 2nd stage of the butterfly's lifecycle on to the the pod",
+          "answerArea" : "<div>Drop your answer here: <landingPlace id='1'></landingPlace></div>",
+          "choices" : [
+            { "id" : "pupa", "fixed" : true, "content" : "Pupa"},
+            { "id" : "egg", "content" : "Egg"},
+            { "id" : "larva","content" : "Larva"},
+            { "id" : "adult", "content" : "Adult" }
+          ]
+        }
+      },
+
+    "3" : {
+      "componentType" : "corespring-single-choice",
+      "correctResponse" : { "value" : "2" },
+      "feedback" : [
+        { "value" : "1", "feedback" : "Huh?"},
+        { "value" : "2", "feedback" : "Great Job", "notChosenFeedback" : "It was this one silly!"},
+        { "value" : "3", "feedback" : "its a magic number" },
+        { "value" : "4", "feedback" : "4 to the floor" }
+      ],
+      "model" : {
+        "prompt": "What is 1 + 1?",
+        "config": {
+          "orientation": "vertical",
+          "shuffle": true
+        },
+        "choices": [
+          {"label": "1", "value": "1"},
+          {"label": "2", "value": "2"},
+          {"label": "3", "value": "3"},
+          {"label": "4", "value": "4"}
+        ]
+      }
+    },
+
+    "4" : {
+      "componentType" : "corespring-multiple-choice",
+      "correctResponse" : { "value" : ["carrot", "turnip", "potato"] },
+      "feedback" : [
+        { "value" : "banana", "feedback" : "it's a fruit"},
+        { "value" : "carrot", "feedback" : "yup", "notChosenFeedback" : "This is a veg"},
+        { "value" : "apple", "feedback" : "it's a fruit" },
+        { "value" : "turnip", "feedback" : "yup", "notChosenFeedback" : "Turnips are veg" },
+        { "value" : "potato", "feedback" : "yup", "notChosenFeedback" : "Potatoes are veg" },
+        { "value" : "wheat", "feedback" : "wheat is a grain" }
+      ],
+      "model" : {
+        "prompt": "Which of these is a vegetable?",
+        "config": {
+          "orientation": "vertical",
+          "shuffle": true
+        },
+        "choices": [
+          {"label": "Banana", "value": "banana"},
+          {"label": "Carrot", "value": "carrot"},
+          {"label": "Apple", "value": "apple"},
+          {"label": "Turnip", "value": "turnip"},
+          {"label": "Potato", "value": "potato"},
+          {"label": "Wheat", "value": "wheat"}
+        ]
+      }
+    }
+  },
+  "_id" : "522267c2554f43f858000001",
+  "org": {
+    "components": [
+      "corespring/*"
+    ]
+  }
+}

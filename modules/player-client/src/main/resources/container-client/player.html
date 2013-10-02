@@ -1,0 +1,69 @@
+<!doctype html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Player?</title>
+
+    <!-- build:css css/all.css -->
+    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css"></lin>
+    <link rel="stylesheet" href="css/player.css"></lin>
+    <link rel="stylesheet" href="css/app.css"></lin>
+    <!-- endbuild -->
+</head>
+  <body>
+    <div id="root" ng-controller="Root">
+      <div id="player-body">
+
+      </div>
+      <button ng-click="submit()">Submit</button>
+    </div>
+
+    <script type="text/javascript">
+      // hey Angular, we're bootstrapping manually!
+      window.name = "NG_DEFER_BOOTSTRAP!";
+    </script>
+    <script src="bower_components/jquery/jquery.min.js"></script>
+    <script src="bower_components/angular/angular.js"></script>
+    <script src="bower_components/lodash/dist/lodash.js"></script>
+    <script src="bower_components/headjs/dist/head.js"></script>
+
+    <!-- build:js js/player.js -->
+    <script src="js/render/controllers/_declaration.js"></script>
+    <script src="js/render/controllers/root.js"></script>
+    <script src="js/corespring/container/render.js"></script>
+    <script src="js/render/directives/_declaration.js"></script>
+    <!-- endbuild -->
+
+    <script type="text/javascript">
+      $(document).ready(function(){
+        console.log("load config", document.location);
+
+        var path = document.location.pathname.replace("/", "");
+
+        var configPath = 'config.json'; //path == "" ? "config.json" : path + "/config.json";
+
+        $.get( configPath, function(data){
+          console.log("data", data);
+
+          var allScriptsAreLoaded = function(){
+            $("#player-body").html(data.xhtml);
+
+            var playerDeps = [
+              'corespring-player.controllers',
+              'corespring-player.directives',
+              'corespring.container'
+            ].concat(data.angular.dependencies);
+
+            angular.module("corespring-player", playerDeps );
+            angular.bootstrap(document, ["corespring-player"]);
+            angular.resumeBootstrap();
+          };
+
+          var args = data.scripts.concat([allScriptsAreLoaded]);
+          console.log(args);
+          head.js.apply(null, args);
+        });
+      });
+    </script>
+</body>
+</html>

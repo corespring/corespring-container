@@ -1,0 +1,45 @@
+2013-10-02 13:56:00,349 - [INFO] - from play in pool-6-thread-1 
+Listening for HTTP on /0:0:0:0:0:0:0:0:9000
+
+2013-10-02 13:56:02,169 - [INFO] - from application in play-internal-execution-context-1 
+Shell app started
+
+2013-10-02 13:56:02,175 - [INFO] - from play in play-internal-execution-context-1 
+Application started (Dev)
+
+2013-10-02 13:56:03,087 - [DEBUG] - from components.loader in New I/O worker #3 
+Loading components from paths: List(../author-dock/app/new_components)
+
+2013-10-02 13:56:03,090 - [DEBUG] - from components.loader in New I/O worker #3 
+loadOrgComponents: ../author-dock/app/new_components/corespring
+
+2013-10-02 13:56:03,092 - [DEBUG] - from components.loader in New I/O worker #3 
+loadComponent: corespring : ../author-dock/app/new_components/corespring/drag-and-drop
+
+2013-10-02 13:56:10,707 - [DEBUG] - from components.loader in New I/O worker #3 
+loadComponent: corespring : ../author-dock/app/new_components/corespring/multiple-choice
+
+2013-10-02 13:56:17,037 - [DEBUG] - from components.loader in New I/O worker #3 
+loadComponent: corespring : ../author-dock/app/new_components/corespring/single-choice
+
+2013-10-02 13:56:20,495 - [INFO] - from components.loader in New I/O worker #3 
+component loading completed
+
+2013-10-02 13:56:20,508 - [DEBUG] - from application in New I/O worker #3 
+Found an implementation for interface org.corespring.container.controllers.Main: org.corespring.shell.impl.PlayerMainImpl@5913d8b4
+
+2013-10-02 13:56:20,546 - [DEBUG] - from player.web in play-akka.actor.default-dispatcher-4 
+load config: 522267c2554f43f858000001
+
+2013-10-02 13:56:20,562 - [DEBUG] - from player.web in play-akka.actor.default-dispatcher-4 
+{"metadata":{"title":"Item One"},"xhtml":"<div>\n  <h1> Butterflies! </h1>\n  <h5> here's some intro text about butterflies...</h5>\n  <corespring-drag-and-drop id='2'></corespring-drag-and-drop>\n  <br/>\n  <corespring-single-choice id='3'></corespring-single-choice>\n  <br/>\n  <corespring-multiple-choice id='4'></corespring-multiple-choice>\n</div>\n","components":{"2":{"componentType":"corespring-drag-and-drop","correctResponse":[{"landingPlace":"1","choiceId":"larva"}],"feedback":[{"landingPlace":"1","feedback":[{"larva":"Great"},{"other":"Not great"}]}],"model":{"config":{"shuffle":true},"prompt":"Drag the 2nd stage of the butterfly's lifecycle on to the the pod","answerArea":"<div>Drop your answer here: <landingPlace id='1'></landingPlace></div>","choices":[{"id":"pupa","fixed":true,"content":"Pupa"},{"id":"egg","content":"Egg"},{"id":"larva","content":"Larva"},{"id":"adult","content":"Adult"}]}},"3":{"componentType":"corespring-single-choice","correctResponse":{"value":"2"},"feedback":[{"value":"1","feedback":"Huh?"},{"value":"2","feedback":"Great Job","notChosenFeedback":"It was this one silly!"},{"value":"3","feedback":"its a magic number"},{"value":"4","feedback":"4 to the floor"}],"model":{"prompt":"What is 1 + 1?","config":{"orientation":"vertical","shuffle":true},"choices":[{"label":"1","value":"1"},{"label":"2","value":"2"},{"label":"3","value":"3"},{"label":"4","value":"4"}]}},"4":{"componentType":"corespring-multiple-choice","correctResponse":{"value":["carrot","turnip","potato"]},"feedback":[{"value":"banana","feedback":"it's a fruit"},{"value":"carrot","feedback":"yup","notChosenFeedback":"This is a veg"},{"value":"apple","feedback":"it's a fruit"},{"value":"turnip","feedback":"yup","notChosenFeedback":"Turnips are veg"},{"value":"potato","feedback":"yup","notChosenFeedback":"Potatoes are veg"},{"value":"wheat","feedback":"wheat is a grain"}],"model":{"prompt":"Which of these is a vegetable?","config":{"orientation":"vertical","shuffle":true},"choices":[{"label":"Banana","value":"banana"},{"label":"Carrot","value":"carrot"},{"label":"Apple","value":"apple"},{"label":"Turnip","value":"turnip"},{"label":"Potato","value":"potato"},{"label":"Wheat","value":"wheat"}]}}},"_id":{"$oid":"522267c2554f43f858000001"},"org":{"components":["corespring/*"]}}
+
+2013-10-02 13:57:38,715 - [DEBUG] - from application in New I/O worker #3 
+Found an implementation for interface org.corespring.container.controllers.Main: org.corespring.shell.impl.PlayerMainImpl@5913d8b4
+
+2013-10-02 13:57:38,716 - [DEBUG] - from application in New I/O worker #2 
+Found an implementation for interface org.corespring.container.controllers.Main: org.corespring.shell.impl.PlayerMainImpl@5913d8b4
+
+2013-10-02 13:57:38,732 - [DEBUG] - from player.web in play-akka.actor.default-dispatcher-7 
+load player services: 522267c2554f43f858000001
+

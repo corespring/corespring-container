@@ -1,0 +1,9 @@
+#!/bin/bash
+
+ROOT=$(dirname $(dirname $0))
+PATH="node_modules/.bin:$PATH"
+
+echo "seeding the DB!"
+./bin/prepare_json
+./bin/seed-db
+./bin/remove_generated_json

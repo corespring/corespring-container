@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+exec mocha $@ --compilers coffee:coffee-script test/**/*-test.coffee

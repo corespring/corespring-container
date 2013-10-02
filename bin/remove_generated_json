@@ -1,0 +1,21 @@
+#!/usr/bin/env coffee
+
+###
+For every json file - if there is a sibling ejs file - remove the json file
+###
+ejs = require('ejs')
+wrench = require('wrench')
+path = require('path')
+fs = require('fs')
+_ = require('lodash')
+
+files = wrench.readdirSyncRecursive 'mock-data'
+files = _.map(files, (f) -> "mock-data/#{f}")
+
+ejsFiles =  _.filter files, (p) -> path.extname(p) == ".ejs"
+jsonFiles = _.filter files, (p) -> path.extname(p) == ".json"
+
+_.forEach jsonFiles, (f) ->
+  deleteFile = _.contains(ejsFiles, "#{f}.ejs")
+  console.log "delete: #{f}" if deleteFile
+  fs.unlinkSync(f) if deleteFile

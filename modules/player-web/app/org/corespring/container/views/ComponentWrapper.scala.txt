@@ -1,0 +1,43 @@
+@(moduleName: String, directiveName : String, jsBody : String)
+//TODO: Once we move to 2.2.0 - we should be able to name this file .scala.js
+//Wrapper for: @moduleName / @directiveName
+(function(){
+
+    // A stop gap until we think about namespacing config + preview defs.
+    var loadAngular = function(n){
+      try{
+        return angular.module(n);
+      }
+      catch(e){
+        console.warn("error instantiating module: ", n);
+        return angular.module(n, []);
+      }
+    }
+
+    @jsBody;
+
+    var moduleName = '@moduleName';
+    var ngModule = loadAngular(moduleName);
+
+    if( componentDefinition.directive ){
+      ngModule.directive( '@directiveName', componentDefinition.directive);
+    } else if( componentDefinition.directives ){
+
+      var hasDefault = false;
+
+      for( var i = 0; i < componentDefinition.directives.length; i++ ){
+        var innerDef = componentDefinition.directives[i];
+        var name = innerDef.name ? innerDef.name : '@directiveName';
+
+        if(!hasDefault){
+          hasDefault = innerDef.name == undefined;
+        };
+
+        console.log("registering directive: ", moduleName, name);
+        ngModule.directive( name, innerDef.directive);
+        if(!hasDefault){
+          throw "No default directive defined"
+        }
+      }
+    }
+  })();
