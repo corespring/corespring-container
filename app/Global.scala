@@ -1,6 +1,8 @@
 import com.mongodb.casbah.MongoClient
 import org.corespring.container.components.loader.FileComponentLoader
-import org.corespring.shell.impl.{PlayerSession, MongoService, ControllerInstanceResolver, PlayerMainImpl}
+import org.corespring.shell.impl.controllers.{PlayerSession, PlayerMainImpl}
+import org.corespring.shell.impl.services.MongoService
+import org.corespring.shell.impl.utils.ControllerInstanceResolver
 import play.api.mvc.Controller
 import play.api.{Play, Logger}
 

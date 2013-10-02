@@ -1,7 +1,7 @@
-package org.corespring.shell.impl
+package org.corespring.shell.impl.utils
 
-import play.api.{Logger, GlobalSettings}
 import play.api.mvc.Controller
+import play.api.{Logger, GlobalSettings}
 
 trait ControllerInstanceResolver extends GlobalSettings {
 
