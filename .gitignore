@@ -1,3 +1,5 @@
 target
 bower_components
-.idea**.log
+.idea*
+*.log
+.idea*
