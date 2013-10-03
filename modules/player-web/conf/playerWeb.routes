@@ -5,8 +5,10 @@ PUT        /session/submit-answers/:id.json  @org.corespring.container.controlle
 
 # Intercept the config.json request from the client
 GET        /:id/config.json        @org.corespring.container.controllers.Main.loadConfig(id:String)
+GET        /:id/editor-config.json        @org.corespring.container.controllers.Main.loadEditorConfig(id:String)
 # Our services impl
 GET        /:id/player-services.js        @org.corespring.container.controllers.Main.playerServices(id:String)
+GET        /:id/editor-services.js        @org.corespring.container.controllers.Main.editorServices(id:String)
 # Serve the component js for the item
 GET        /:id/components.js        @org.corespring.container.controllers.Main.componentJs(id:String)
 # Otherwise just serve up the client assets

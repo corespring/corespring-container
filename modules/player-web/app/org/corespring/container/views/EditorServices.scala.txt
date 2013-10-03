@@ -1,0 +1,11 @@
+@(namespace : String)
+
+angular.module('@namespace', []);
+
+angular.module('@namespace').factory('EditorServices', ['$http', function($http){
+
+var def = {
+  }
+  return def
+}]);
+

@@ -14,7 +14,9 @@ trait Main extends Controller {
   private val log = play.api.Logger("player.web")
 
   val playerServices = "player-services.js"
-  val namespace = "player-web.services"
+  val editorServices = "editor-services.js"
+  val playerNamespace = "player-web.services"
+  val editorNamespace = "editor-web.services"
 
   private def testJson(xhtml: String, dependencies: Seq[String], scriptPaths: Seq[String]): String =
     s"""
@@ -30,12 +32,21 @@ trait Main extends Controller {
 
   def loadConfig(sessionId: String): Action[AnyContent] = builder.playAction(sessionId) {
     request: PlayerRequest[AnyContent] =>
-      log.debug(s"load config: $sessionId")
-      log.debug(Json.stringify(request.item))
       val xhtml = processXhtml((request.item \ "xhtml").as[String])
       val components: Seq[String] = componentTypes(request.item)
       val moduleNames = components.map(makeModuleName)
-      val out: String = testJson(xhtml, Seq(namespace) ++ moduleNames, Seq(playerServices, "components.js"))
+      val out: String = testJson(xhtml, Seq(playerNamespace) ++ moduleNames, Seq(playerServices, "components.js"))
+      val jsonOut = Json.parse(out)
+      Ok(jsonOut)
+  }
+
+  // TODO: remove duplication
+  def loadEditorConfig(sessionId: String): Action[AnyContent] = builder.playAction(sessionId) {
+    request: PlayerRequest[AnyContent] =>
+      val xhtml = processXhtml((request.item \ "xhtml").as[String])
+      val components: Seq[String] = componentTypes(request.item)
+      val moduleNames = components.map(makeModuleName)
+      val out: String = testJson(xhtml, Seq(editorNamespace) ++ moduleNames, Seq(editorServices, "components.js"))
       val jsonOut = Json.parse(out)
       Ok(jsonOut)
   }
@@ -84,7 +95,14 @@ trait Main extends Controller {
       import org.corespring.container.views.txt._
       val loadSession = org.corespring.container.controllers.routes.Session.loadEverything(sessionId)
       val submitAnswers = org.corespring.container.controllers.routes.Session.submitAnswers(sessionId)
-      Ok(PlayerServices(namespace, loadSession, submitAnswers)).as("text/javascript")
+      Ok(PlayerServices(playerNamespace, loadSession, submitAnswers)).as("text/javascript")
+  }
+
+  def editorServices(sessionId: String) = builder.playAction(sessionId) {
+    request: PlayerRequest[AnyContent] =>
+      log.debug(s"load editor services: $sessionId")
+      import org.corespring.container.views.txt._
+      Ok(EditorServices(editorNamespace)).as("text/javascript")
   }
 
 }
