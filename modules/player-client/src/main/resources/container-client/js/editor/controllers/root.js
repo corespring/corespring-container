@@ -16,10 +16,6 @@ var controller = function ($scope, $compile, $http, $timeout, EditorServices, Co
     console.warn("Error loading item");
   };
 
-  $scope.onSessionSaveError = function (error) {
-    console.warn("Error saving session");
-  };
-
   $scope.onItemLoaded = function (data) {
     $scope.model = data;
     CorespringContainer.initialize(data);
