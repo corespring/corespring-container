@@ -59,6 +59,7 @@ class ResponseGenerator(definition: String, question: JsValue, answer: JsValue, 
     def jsObject(json:JsValue) : ScriptableObject = {
 
       val jsonString = Json.stringify(json)
+      logger.debug(s"[jsObject] jsonString: $jsonString")
       toObject.call(ctx, scope, scope, Array(jsonString)).asInstanceOf[ScriptableObject]
     }
 

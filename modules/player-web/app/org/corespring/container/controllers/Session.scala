@@ -38,7 +38,7 @@ trait Session extends Controller {
           val itemJson: JsObject = (request.everything \ "item").as[JsObject]
           val isFinished: Boolean = (sessionJson \ "isFinished").asOpt[Boolean].getOrElse(false)
           val currentRemainingAttempts: Int = (sessionJson \ "remainingAttempts").asOpt[Int].getOrElse(
-            (sessionJson \ "maxNoAttempts").as[Int]
+            (sessionJson \ "maxNoOfAttempts").as[Int]
           )
 
           if (isFinished) {
@@ -50,16 +50,18 @@ trait Session extends Controller {
             )
           } else {
             logger.debug(s"current remaining attempts for $id: $currentRemainingAttempts")
+
             def updateJson = {
               val newRemainingAttempts: Number = Math.max(0, currentRemainingAttempts - 1)
-              Json.obj(
-                "itemId" -> JsString((sessionJson \ "itemId").as[String]),
-                "maxNoAttempts" -> JsNumber((sessionJson \ "maxNoAttempts").as[Int]),
+              val out = sessionJson ++ Json.obj(
                 "remainingAttempts" -> JsNumber(newRemainingAttempts.intValue()),
                 "answers" -> (answers \ "answers").as[JsObject],
                 "isFinished" -> JsBoolean(newRemainingAttempts == 0)
               )
+              logger.debug( s"update json: ${Json.stringify(out)}")
+              out
             }
+
             sessionService.save(id, updateJson).map {
               update =>
                 val responsesJson = if ((update \ "isFinished").as[Boolean]) {
