@@ -25,7 +25,7 @@ trait Session extends Controller {
    * @param id
    * @return
    */
-  def submitAnswers(id: String) = sessionActions.load(id) {
+  def submitAnswers(id: String) = sessionActions.loadEverything(id) {
     request =>
 
       request.body.asJson.map {
@@ -33,7 +33,9 @@ trait Session extends Controller {
 
           val sessionJson: JsObject = (request.everything \ "session").as[JsObject]
           val itemJson: JsObject = (request.everything \ "item").as[JsObject]
-          val currentRemainingAttempts : Int = (sessionJson \ "remainingAttempts").as[Int]
+          val currentRemainingAttempts : Int = (sessionJson \ "remainingAttempts").asOpt[Int].getOrElse(
+            (sessionJson \ "maxNoAttempts").as[Int]
+          )
 
           def updateJson = {
             val newRemainingAttempts: Number = currentRemainingAttempts - 1
