@@ -12,10 +12,9 @@
 </head>
   <body>
     <div id="root" ng-controller="Root">
+      Editor
       <div id="player-body">
-
       </div>
-      <button ng-click="submit()">Submit</button>
     </div>
 
     <script type="text/javascript">
@@ -31,7 +30,7 @@
 
     <!-- build:js js/player.js -->
     <script src="js/render/controllers/_declaration.js"></script>
-    <script src="js/render/controllers/player_root.js"></script>
+    <script src="js/render/controllers/editor_root.js"></script>
     <script src="js/corespring/container/render.js"></script>
     <script src="js/render/directives/_declaration.js"></script>
     <!-- endbuild -->
@@ -45,25 +44,25 @@
       $(document).ready(function(){
         console.log("load config", document.location);
 
-        var path = document.location.pathname.replace("/", "");
-
-        var configPath = 'config.json'; //path == "" ? "config.json" : path + "/config.json";
+        var configPath = 'editor-config.json';
 
         $.get( configPath, function(data){
           console.log("data", data);
 
+
           var allScriptsAreLoaded = function(){
+
             $("#player-body").html(data.xhtml);
 
             var playerDeps = [
-              'corespring-player.controllers',
+              'corespring-editor.controllers',
               'corespring-player.directives',
               'corespring.container',
               'ngDragDrop'
             ].concat(data.angular.dependencies);
 
-            angular.module("corespring-player", playerDeps );
-            angular.bootstrap(document, ["corespring-player"]);
+            angular.module("corespring-editor", playerDeps );
+            angular.bootstrap(document, ["corespring-editor"]);
             angular.resumeBootstrap();
           };
 

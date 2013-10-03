@@ -1,4 +1,2 @@
-(function() {
-  angular.module('corespring-player.controllers', []);
-
-}).call(this);
+angular.module('corespring-player.controllers', []);
+angular.module('corespring-editor.controllers', []);
