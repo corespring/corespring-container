@@ -1,11 +1,40 @@
-@(namespace : String)
+@(namespace : String, load : Call, save : Call)
 
-angular.module('@namespace', []);
+(function(){
+  "use strict";
 
-angular.module('@namespace').factory('EditorServices', ['$http', function($http){
+  angular.module('@namespace', []);
 
-var def = {
-  }
-  return def
-}]);
+  angular.module('@namespace').factory('EditorServices', ['$http', function($http){
+
+    var def = {
+      load: function(onSuccess, onFailure){
+        $http['@load.method.toLowerCase']('@load.url')
+          .success(function(data, status, headers, config){
+            console.log("[player-services] load item successful");
+            onSuccess(data);
+          })
+          .error(function(data, status, headers, config){
+            if(onFailure){
+              onFailure(data);
+            }
+          });
+      },
+      save: function(item, onSuccess, onFailure){
+        $http['@save.method.toLowerCase']('@save.url', item)
+          .success(function(data, status, headers, config) {
+            console.log("item saved succesfully")
+            onSuccess(data)
+          })
+          .error(function(data, status, headers, config) {
+            console.warn("error");
+            if( onFailure ) {
+              onFailure(data);
+            }
+          });
+      }
+    };
+    return def;
+  }]);
+})();
 

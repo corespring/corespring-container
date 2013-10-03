@@ -9,6 +9,7 @@ case class PlayerRequest[A](item: JsValue, r: Request[A], itemSession: Option[Js
 trait PlayerActionBuilder[A] {
 
   def playAction(sessionId:String)(block: PlayerRequest[A] => Result ) : Action[AnyContent]
+  def editorAction(itemId:String)(block: PlayerRequest[A] => Result ) : Action[AnyContent]
   def playerAction(id:String)(block: PlayerRequest[A] => Result) : Action[AnyContent]
   def playerAction(p : BodyParser[A])(id:String)(block: PlayerRequest[A] => Result) : Action[AnyContent]
 

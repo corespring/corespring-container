@@ -1,16 +1,21 @@
 # Note: The order is important - there are some asset calls that we want to intercept before they hit the *file
 
-GET        /session/everything/:id.json  @org.corespring.container.controllers.Session.loadEverything(id:String)
-PUT        /session/submit-answers/:id.json  @org.corespring.container.controllers.Session.submitAnswers(id:String)
+GET        /session/everything/:id.json        @org.corespring.container.controllers.Session.loadEverything(id:String)
+PUT        /session/submit-answers/:id.json        @org.corespring.container.controllers.Session.submitAnswers(id:String)
+
+GET        /item/:itemId.json        @org.corespring.container.controllers.Item.load(itemId:String)
+PUT        /item/:itemId.json        @org.corespring.container.controllers.Item.save(itemId:String)
 
 # Intercept the config.json request from the client
 GET        /:id/config.json        @org.corespring.container.controllers.Main.loadConfig(id:String)
 GET        /:id/editor-config.json        @org.corespring.container.controllers.Main.loadEditorConfig(id:String)
 # Our services impl
-GET        /:id/player-services.js        @org.corespring.container.controllers.Main.playerServices(id:String)
-GET        /:id/editor-services.js        @org.corespring.container.controllers.Main.editorServices(id:String)
+GET        /:sessionId/player-services.js        @org.corespring.container.controllers.Main.playerServices(sessionId:String)
+GET        /:itemId/editor-services.js        @org.corespring.container.controllers.Main.editorServices(itemId:String)
 # Serve the component js for the item
-GET        /:id/components.js        @org.corespring.container.controllers.Main.componentJs(id:String)
+GET        /:sessionId/components.js        @org.corespring.container.controllers.Main.componentJs(sessionId:String)
+# Serve the component js for the item
+GET        /:itemId/editor-components.js        @org.corespring.container.controllers.Main.editorComponentsJs(itemId:String)
 # Otherwise just serve up the client assets
 GET        /:id/*file        org.corespring.container.controllers.Assets.at(id:String, path="/container-client", file)
 

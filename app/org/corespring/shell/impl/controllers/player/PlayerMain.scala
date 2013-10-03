@@ -42,5 +42,13 @@ trait PlayerMain extends Main {
             block(PlayerRequest(json, request))
         }.getOrElse(NotFound(s"No item with $id found"))
     }
+
+    def editorAction(itemId: String)(block: (PlayerRequest[AnyContent]) => Result): Action[AnyContent] = Action {
+      request =>
+        itemService.load(itemId).map {
+          i =>
+            block(PlayerRequest(i, request, None))
+        }.getOrElse(NotFound(s"No item with $itemId found"))
+    }
   }
 }

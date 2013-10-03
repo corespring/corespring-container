@@ -41,34 +41,37 @@ trait Main extends Controller {
   }
 
   // TODO: remove duplication
-  def loadEditorConfig(sessionId: String): Action[AnyContent] = builder.playAction(sessionId) {
+  def loadEditorConfig(itemId: String): Action[AnyContent] = builder.editorAction(itemId) {
     request: PlayerRequest[AnyContent] =>
       val xhtml = processXhtml((request.item \ "xhtml").as[String])
       val components: Seq[String] = componentTypes(request.item)
       val moduleNames = components.map(makeModuleName)
-      val out: String = testJson(xhtml, Seq(editorNamespace) ++ moduleNames, Seq(editorServices, "components.js"))
+      val out: String = testJson(xhtml, Seq(editorNamespace) ++ moduleNames, Seq(editorServices, "editor-components.js"))
       val jsonOut = Json.parse(out)
       Ok(jsonOut)
   }
 
   def componentTypes(json: JsValue): Seq[String] = (json \ "components" \\ "componentType").map(_.as[String]).distinct
 
-
   def componentJs(sessionId: String): Action[AnyContent] = builder.playAction(sessionId) {
     request: PlayerRequest[AnyContent] =>
-
       log.debug(s"load js for session $sessionId")
-
-      def wrapJs(c: Component) = {
-        import org.corespring.container.views.txt._
-        ComponentWrapper(moduleName(c.org, c.name), directiveName(c.org, c.name), c.client.render)
-      }
       val typesUsed = componentTypes(request.item)
       val usedComponents = components.filter(c => typesUsed.exists(t => c.matchesType(t)))
       val js = usedComponents.map(c => wrapJs(c)).mkString("\n")
       Ok(js).as("text/javascript")
   }
 
+  def editorComponentsJs(itemId:String) : Action[AnyContent] = builder.editorAction(itemId) {
+    request : PlayerRequest[AnyContent] =>
+      val js = components.map(c => wrapJs(c)).mkString("\n")
+      Ok(js).as("text/javascript")
+  }
+
+  private def wrapJs(c: Component) = {
+    import org.corespring.container.views.txt._
+    ComponentWrapper(moduleName(c.org, c.name), directiveName(c.org, c.name), c.client.render)
+  }
 
   private def processXhtml(s: String): String = {
     s.trim
@@ -93,16 +96,16 @@ trait Main extends Controller {
     request: PlayerRequest[AnyContent] =>
       log.debug(s"load player services: $sessionId")
       import org.corespring.container.views.txt._
-      val loadSession = org.corespring.container.controllers.routes.Session.loadEverything(sessionId)
-      val submitAnswers = org.corespring.container.controllers.routes.Session.submitAnswers(sessionId)
-      Ok(PlayerServices(playerNamespace, loadSession, submitAnswers)).as("text/javascript")
+      import org.corespring.container.controllers.routes._
+      Ok(PlayerServices(playerNamespace, Session.loadEverything(sessionId), Session.submitAnswers(sessionId))).as("text/javascript")
   }
 
-  def editorServices(sessionId: String) = builder.playAction(sessionId) {
+  def editorServices(itemId: String) = builder.editorAction(itemId) {
     request: PlayerRequest[AnyContent] =>
-      log.debug(s"load editor services: $sessionId")
+      log.debug(s"load editor services: $itemId")
       import org.corespring.container.views.txt._
-      Ok(EditorServices(editorNamespace)).as("text/javascript")
+      import org.corespring.container.controllers.routes._
+      Ok(EditorServices(editorNamespace, Item.load(itemId), Item.save(itemId))).as("text/javascript")
   }
 
 }

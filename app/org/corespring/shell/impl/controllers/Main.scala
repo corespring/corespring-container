@@ -18,12 +18,13 @@ trait Main extends Controller {
   def index = Action {
     request =>
 
-      val items: Seq[(String, String, String)] = itemService.list("metadata.title").map {
+      val items: Seq[(String, String, String, String)] = itemService.list("metadata.title").map {
         json: JsValue =>
           val name = (json \ "metadata" \ "title").as[String]
           val id = (json \ "_id" \ "$oid").as[String]
-          val url = routes.Main.createSessionPage(id).url
-          (name, id, url)
+          val playerUrl = routes.Main.createSessionPage(id).url
+          val editorUrl = s"/client/${id}/editor.html"
+          (name, id, playerUrl, editorUrl)
       }
       logger.debug(items.mkString(","))
       Ok(html.index(items))
