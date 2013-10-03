@@ -4,6 +4,8 @@ import org.mozilla.javascript.tools.shell.Global
 import org.mozilla.javascript.{NativeJavaObject, ScriptableObject, Scriptable, Context}
 import play.api.libs.json.{Json, JsObject, JsValue}
 import org.slf4j.LoggerFactory
+import java.io.{InputStreamReader, Reader}
+import java.net.URL
 
 class ResponseGenerator(definition: String, question: JsValue, answer: JsValue, settings: JsValue) {
 
@@ -11,7 +13,25 @@ class ResponseGenerator(definition: String, question: JsValue, answer: JsValue, 
 
   def wrapper(definition:String) =
     s"""
+      |var require = function(id){
+      |  if(id == "lodash" || id == "underscore" ){
+      |    if( _ ){
+      |       return _;
+      |    } else {
+      |       systemOut.println("Can't find underscore or lodash");
+      |       throw "Can't find underscore/lodash";
+      |    }
+      |  } else {
+      |    systemOut.println("Unsupported library: " + id);
+      |    throw "Unsupported library: " + id;
+      |  }
+      |}
+      |systemOut.println("require" + require);
+      |
+      |
+      |var module = {};
       |var exports = {};
+      |module.exports = exports;
       |
       |exports.__internal__toObject = function(jsonString){ return JSON.parse(jsonString); };
       |exports.__internal__toJsonString = function(obj){ return JSON.stringify(obj); };
@@ -65,12 +85,31 @@ class ResponseGenerator(definition: String, question: JsValue, answer: JsValue, 
     global.init(ctx)
     val scope = ctx.initStandardObjects(global)
 
+    loadJsLib("/js-libs/lodash.min.js").map{ reader =>
+      ctx.evaluateReader(scope, reader, "lodash.min.js", 1, null)
+    }.getOrElse(logger.debug("Couldn't load lodash"))
+
+    // Add a global variable out that is a JavaScript reflection of the System.out variable:
+    val wrappedOut: Any = Context.javaToJS(System.out, scope)
+    ScriptableObject.putProperty(scope, "systemOut", wrappedOut)
+
     try {
       f(ctx, scope)
     } catch {
       case e: Exception => throw e;
     } finally {
       Context.exit
+    }
+  }
+
+  private def loadJsLib(path:String) : Option[Reader] = {
+    logger.debug(s"loadJsLib: $path")
+    val stream  = getClass.getResourceAsStream(path)
+    if(stream == null){
+      None
+    } else {
+      logger.debug(stream.toString)
+      Some(new InputStreamReader((stream)))
     }
   }
 }
