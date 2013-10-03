@@ -8,8 +8,19 @@ This will allow integration points into the main corespring-api project.
 
 Play 2.2
 
+
 ## Run
-    ./bin/run # seed the db if you need to
+
+## Seed the db if you need to...
+Install npm packages
+
+    cd bin
+    npm install
+    cd ..
+    ./bin/run
+
+## Run play app
+
     play run
     curl http://localhost:9000/client/522267c2554f43f858000001/player.html
     
