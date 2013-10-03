@@ -6,7 +6,7 @@ import com.mongodb.casbah.commons.MongoDBObject
 import com.mongodb.util.JSON
 import org.bson.types.ObjectId
 import play.api.Logger
-import play.api.libs.json.{Json, JsValue}
+import play.api.libs.json.{JsObject, Json, JsValue}
 
 class MongoService(collection: MongoCollection) {
 
@@ -51,7 +51,15 @@ class MongoService(collection: MongoCollection) {
 
   def save(id: String, data: JsValue): Option[JsValue] = withOid(id) {
     oid =>
-      val dbo = JSON.parse(Json.stringify(data)).asInstanceOf[DBObject]
+      logger.debug(s"save $id : ${Json.stringify(data)}")
+
+      val idObject = Json.obj("_id" ->
+        Json.obj("$oid" -> id)
+      )
+
+      val updateObject = data.as[JsObject] ++ idObject
+
+      val dbo = JSON.parse(Json.stringify(updateObject)).asInstanceOf[DBObject]
       val result = collection.save(dbo)
 
       if (result.getLastError.ok()) {

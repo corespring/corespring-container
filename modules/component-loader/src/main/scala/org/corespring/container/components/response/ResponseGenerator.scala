@@ -26,8 +26,6 @@ class ResponseGenerator(definition: String, question: JsValue, answer: JsValue, 
       |    throw "Unsupported library: " + id;
       |  }
       |}
-      |systemOut.println("require" + require);
-      |
       |
       |var module = {};
       |var exports = {};

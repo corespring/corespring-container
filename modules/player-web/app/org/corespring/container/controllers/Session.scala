@@ -1,14 +1,17 @@
 package org.corespring.container.controllers
 
+import org.corespring.container.components.response.ResponseProcessor
 import org.corespring.container.player.actions.SessionActionBuilder
-import org.corespring.container.services.{SessionService}
+import org.corespring.container.services.SessionService
+import play.api.Logger
+import play.api.libs.json.JsBoolean
+import play.api.libs.json.JsObject
 import play.api.libs.json._
 import play.api.mvc.{AnyContent, Controller}
-import org.corespring.container.components.response.ResponseProcessor
-import play.api.libs.json.JsObject
-import play.api.libs.json.JsBoolean
 
 trait Session extends Controller {
+
+  private val logger = Logger("session")
 
   def sessionService: SessionService
 
@@ -33,26 +36,39 @@ trait Session extends Controller {
 
           val sessionJson: JsObject = (request.everything \ "session").as[JsObject]
           val itemJson: JsObject = (request.everything \ "item").as[JsObject]
-          val currentRemainingAttempts : Int = (sessionJson \ "remainingAttempts").asOpt[Int].getOrElse(
+          val isFinished: Boolean = (sessionJson \ "isFinished").asOpt[Boolean].getOrElse(false)
+          val currentRemainingAttempts: Int = (sessionJson \ "remainingAttempts").asOpt[Int].getOrElse(
             (sessionJson \ "maxNoAttempts").as[Int]
           )
 
-          def updateJson = {
-            val newRemainingAttempts: Number = currentRemainingAttempts - 1
-            Json.obj(
-              "remainingAttempts" -> JsNumber(newRemainingAttempts.intValue()),
-              "answers" -> (answers \ "answers").as[JsObject],
-              "isFinished" -> JsBoolean(newRemainingAttempts == 0)
+          if (isFinished) {
+            Ok(
+              Json.obj(
+                "session" -> sessionJson,
+                "responses" -> responseProcessor.respond(itemJson, sessionJson)
+              )
             )
-          }
-
-          sessionService.save(id,updateJson).map {
-            update =>
-              val responses = responseProcessor.respond(itemJson, update)
-              Ok(Json.obj(
-                "session" -> update,
-                "responses" -> responses
-              ))
+          } else {
+            logger.debug(s"current remaining attempts for $id: $currentRemainingAttempts")
+            def updateJson = {
+              val newRemainingAttempts: Number = Math.max(0, currentRemainingAttempts - 1)
+              Json.obj(
+                "itemId" -> JsString((sessionJson \ "itemId").as[String]),
+                "maxNoAttempts" -> JsNumber((sessionJson \ "maxNoAttempts").as[Int]),
+                "remainingAttempts" -> JsNumber(newRemainingAttempts.intValue()),
+                "answers" -> (answers \ "answers").as[JsObject],
+                "isFinished" -> JsBoolean(newRemainingAttempts == 0)
+              )
+            }
+            sessionService.save(id, updateJson).map {
+              update =>
+                val responsesJson = if ((update \ "isFinished").as[Boolean]) {
+                  Json.obj("responses" -> responseProcessor.respond(itemJson, update))
+                } else {
+                  JsObject(Seq.empty)
+                }
+                Ok(Json.obj("session" -> update) ++ responsesJson)
+            }
           }.getOrElse(BadRequest("Error updading"))
 
       }.getOrElse(BadRequest("no json body"))
