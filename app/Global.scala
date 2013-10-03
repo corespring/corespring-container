@@ -1,14 +1,16 @@
 import com.mongodb.casbah.MongoClient
 import org.corespring.container.components.loader.FileComponentLoader
+import org.corespring.container.components.response.{ResponseProcessorImpl, ResponseProcessor}
+import org.corespring.container.services.{SessionService}
+import org.corespring.shell.impl.controllers.Main
 import org.corespring.shell.impl.controllers.player.{PlayerSession, PlayerMainImpl}
-import org.corespring.shell.impl.controllers.{Main}
 import org.corespring.shell.impl.services.MongoService
 import org.corespring.shell.impl.utils.ControllerInstanceResolver
+import play.api.libs.json.JsValue
 import play.api.mvc.Controller
 import play.api.{Play, Logger}
 
 object Global extends ControllerInstanceResolver {
-
 
   lazy val controllers: Seq[Controller] = Seq(mainPlayer, sessions, home)
 
@@ -24,8 +26,15 @@ object Global extends ControllerInstanceResolver {
   }
 
   private lazy val sessions = new PlayerSession {
-    def sessionService: MongoService = new MongoService(db("sessions"))
     def itemService: MongoService = new MongoService(db("items"))
+
+    def responseProcessor: ResponseProcessor = new ResponseProcessorImpl(componentLoader.all)
+
+    def sessionDbService: MongoService = new MongoService(db("sessions"))
+
+    def sessionService: SessionService = new SessionService {
+      def save(id: String, session: JsValue): Option[JsValue] = sessionDbService.save(id,session)
+    }
   }
 
   private lazy val componentLoader = new FileComponentLoader(Play.current.configuration.getString("components.path").toSeq)
