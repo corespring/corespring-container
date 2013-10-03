@@ -66,7 +66,7 @@ class ResponseGenerator(definition: String, question: JsValue, answer: JsValue, 
     if (respond.isInstanceOf[RhinoFunction]) {
       val fn : RhinoFunction = respond.asInstanceOf[RhinoFunction]
       val args : Array[AnyRef] = Array(jsObject(question), jsObject(answer), jsObject(settings))
-      val result = fn.call(ctx, scope, scope, args)
+      val result = fn.call(ctx, scope, exports, args)
       logger.debug(s"result: ${result.toString}")
       val jsonString : Any = toJsonString.call(ctx, scope, scope, Array(result))
       logger.debug(s" json string : ${jsonString.toString}")
