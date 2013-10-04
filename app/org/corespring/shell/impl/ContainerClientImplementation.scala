@@ -13,11 +13,11 @@ class ContainerClientImplementation(itemServiceIn : MongoService, sessionService
 
   private lazy val playerHooks = new PlayerHooksImpl {
 
-    def itemService: MongoService = itemServiceIn //new MongoService(db("items"))
+    def itemService: MongoService = itemServiceIn
 
     def loadedComponents: Seq[Component] = comps
 
-    def sessionService: MongoService = sessionServiceIn //new MongoService(db("sessions"))
+    def sessionService: MongoService = sessionServiceIn
   }
 
   private lazy val editorHooks = new EditorHooksImpl {
@@ -27,15 +27,14 @@ class ContainerClientImplementation(itemServiceIn : MongoService, sessionService
   }
 
   private lazy val items = new ClientItemImpl {
-    def itemService: MongoService = itemServiceIn //new MongoService(db("items"))
+    def itemService: MongoService = itemServiceIn
   }
 
   private lazy val sessions = new ClientSessionImpl {
-    def itemService: MongoService = itemServiceIn //new MongoService(db("items"))
+    def itemService: MongoService = itemServiceIn
 
     def responseProcessor: ResponseProcessor = new ResponseProcessorImpl(comps)
 
-    def sessionService: MongoService = sessionServiceIn // MongoService(db("sessions"))
-
+    def sessionService: MongoService = sessionServiceIn
   }
 }
