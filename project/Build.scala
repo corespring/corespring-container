@@ -1,6 +1,7 @@
 import sbt.Keys._
 import sbt._
 import scala.Some
+import play.Project._
 
 object Build extends sbt.Build {
 
@@ -42,16 +43,31 @@ object Build extends sbt.Build {
       libraryDependencies ++= Seq(logback, specs2)
   ).dependsOn(componentModel, coffeescriptCompiler)
 
-  lazy val playerClient = builder.lib("player-client")
+  lazy val containerClient = builder.lib("container-client")
 
-  val playerWeb = builder.playApp("player-web")
-    .dependsOn(componentModel, playerClient)
+  val containerClientWeb = builder.playApp("container-client-web")
+    .dependsOn(componentModel, containerClient)
 
   val shell = builder.playApp("shell", Some(".")).settings(
     resolvers ++= Resolvers.all,
-    libraryDependencies ++= Seq(casbah)
-  )
-    .dependsOn(playerWeb, componentLoader)
-    .aggregate(playerWeb, componentLoader)
+    libraryDependencies ++= Seq(casbah),
+    //Add the grunt runner to play shell
+    playRunHooks <+= baseDirectory.map(base => Grunt(base / "modules" / "container-client")),
+    //Add npm/bower/grunt commands
+    commands <++= baseDirectory { base =>
+      Seq(
+        "grunt",
+        "bower",
+        "npm"
+      ).map(cmd(_, (base / "modules" / "container-client")))
+    }
+  ).dependsOn(containerClientWeb, componentLoader)
+    .aggregate(containerClientWeb, componentLoader)
 
+  private def cmd(name: String, base: File): Command = {
+    Command.args(name, "<" + name + "-command>") { (state, args) =>
+      Process(name :: args.toList, base) !;
+      state
+    }
+  }
 }

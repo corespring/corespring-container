@@ -1,5 +1,5 @@
 {
-  "name": "player-client",
+  "name": "container-client",
   "version": "0.0.1",
   "dependencies": {
     "angular": "1.2.0-rc.2",
