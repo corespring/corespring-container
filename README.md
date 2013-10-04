@@ -18,6 +18,9 @@ These tools should be on your `PATH`:
 
 ## Run
 
+You'll need to have access to the corespring components library. Place this on your file system and you can then point to it using: 
+`CONTAINER_COMPONENTS_PATH` env var.
+
 ## Seed the db if you need to...
 Install npm packages
 
