@@ -73,9 +73,9 @@ trait BaseHooks extends Controller{
 
   protected def wrapJs(c: Component) =  ComponentWrapper(moduleName(c.org, c.name), directiveName(c.org, c.name), c.client.render)
 
-  private def moduleName(org: String, comp: String) = s"$org.$comp"
+  protected def moduleName(org: String, comp: String) = s"$org.$comp"
 
-  private def directiveName(org: String, comp: String) = s"$org${hyphenatedToTitleCase(comp)}"
+  protected def directiveName(org: String, comp: String) = s"$org${hyphenatedToTitleCase(comp)}"
 
   private def hyphenatedToTitleCase(s: String): String = s.split("-").map(_.capitalize).mkString("")
 }

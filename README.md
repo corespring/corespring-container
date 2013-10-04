@@ -6,8 +6,15 @@ This will allow integration points into the main corespring-api project.
 
 ## Requirements 
 
-Play 2.2
+These tools should be on your `PATH`:
 
+[Play 2.2](http://www.playframework.com/)
+
+[Grunt](http://gruntjs.com/)
+
+[Node and Npm](http://nodejs.org/)
+
+[Bower](http://bower.io/)
 
 ## Run
 
@@ -19,13 +26,20 @@ Install npm packages
     cd ..
     ./bin/run
 
+
 ## Run play app
 
-    play run
-    curl http://localhost:9000/client/522267c2554f43f858000001/player.html
+    play
+    [shell] npm install # installs the dependencies for the container-client
+    [shell] bower install # installs the ui dependenceis for the container-client
+    [shell] run # start the server
     
     
-#### TODO
+Then go to [http://localhost:9000](http://localhost:9000)
+    
+## Grunt integration with Play
 
-* Look at http://leon.radley.se/2013/02/play21-grunt-angular-prototype/
-* https://github.com/leon/play-grunt-angular-prototype
+* `grunt` `npm` and `bower` are all available as commands within the play console. 
+* When you start the play server you trigger the grunt run task. This will set up a watch on the container-client's client side resources.
+
+
