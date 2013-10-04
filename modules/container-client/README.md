@@ -4,6 +4,8 @@ The client side app for the corespring container.
 
 This app is client-side only project. **There is no server side logic in this project.**
 
+Note: the layout is *under trial* - we may move it to a more conventional play format
+
 ## Using
 
 ### Player
@@ -51,4 +53,9 @@ in and out of the player. Its api looks like so:
     }
     ```
 
+### Editor
+
+This is very similar to the player except that it uses `GET editor-config.json` instead.
+
+TODO - Flesh this out...
 
