@@ -60,7 +60,7 @@ object CoffeescriptCompiler {
     }
   }
 
-  private def executeNativeCompiler(in: String, source: File): String = {
+  private def executeNativeCompiler(in: String): String = {
     import scala.sys.process._
     val qb = Process(in)
     var out = List[String]()
@@ -75,9 +75,19 @@ object CoffeescriptCompiler {
     out.reverse.mkString("\n")
   }
 
+  private def hasNativeCoffee: Boolean = {
+    import scala.sys.process._
+    "which coffee".! == 0
+  }
+
   def compile(source: File, options: Seq[String]): String = {
     try {
+      if (hasNativeCoffee) {
+        val bare = if( options.contains("bare") ) "-b" else ""
+        executeNativeCompiler( s"coffee -c -p $bare " + source.getAbsolutePath)
+      } else {
         compiler(source, options.contains("bare"))
+      }
     } catch {
       case e: JavaScriptException => {
 
