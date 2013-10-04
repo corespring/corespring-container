@@ -1,11 +1,11 @@
 package org.corespring.shell.impl.controllers.editor
 
-import org.corespring.container.controllers.Item
-import org.corespring.container.player.actions.{ItemRequest, SaveItemRequest, ItemActionBuilder}
 import org.corespring.shell.impl.services.MongoService
 import play.api.mvc.{Action, Result, AnyContent}
+import org.corespring.container.client.actions.{ItemActionBuilder, SaveItemRequest, ItemRequest}
+import org.corespring.container.client.controllers.resources.Item
 
-trait ItemImpl extends Item{
+trait ClientItemImpl extends Item{
 
   def itemService : MongoService
 

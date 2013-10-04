@@ -1,11 +1,8 @@
-package org.corespring.container.controllers
+package org.corespring.container.client.controllers.resources
 
+import org.corespring.container.client.actions.{SubmitAnswersRequest, SessionActionBuilder}
 import org.corespring.container.components.response.ResponseProcessor
-import org.corespring.container.player.actions.SessionActionBuilder
-import org.corespring.container.services.SessionService
 import play.api.Logger
-import play.api.libs.json.JsBoolean
-import play.api.libs.json.JsObject
 import play.api.libs.json._
 import play.api.mvc.{AnyContent, Controller}
 
@@ -13,23 +10,21 @@ trait Session extends Controller {
 
   private val logger = Logger("session")
 
-  def sessionService: SessionService
-
   def responseProcessor: ResponseProcessor
 
-  def sessionActions: SessionActionBuilder[AnyContent]
+  def builder: SessionActionBuilder[AnyContent]
 
-  def load(id: String) = sessionActions.load(id)(request => Ok((request.everything \ "session").as[JsValue]))
+  def load(id: String) = builder.load(id)(request => Ok((request.everything \ "session").as[JsValue]))
 
-  def loadEverything(id: String) = sessionActions.loadEverything(id)(request => Ok(request.everything))
+  def loadEverything(id: String) = builder.loadEverything(id)(request => Ok(request.everything))
 
   /**
    * Ok(request.sessionJson)
    * @param id
    * @return
    */
-  def submitAnswers(id: String) = sessionActions.loadEverything(id) {
-    request =>
+  def submitAnswers(id: String) = builder.submitAnswers(id) {
+    request : SubmitAnswersRequest[AnyContent] =>
 
       request.body.asJson.map {
         answers =>
@@ -62,7 +57,7 @@ trait Session extends Controller {
               out
             }
 
-            sessionService.save(id, updateJson).map {
+            request.saveSession(id, updateJson).map {
               update =>
                 val responsesJson = if ((update \ "isFinished").as[Boolean]) {
                   Json.obj("responses" -> responseProcessor.respond(itemJson, update))

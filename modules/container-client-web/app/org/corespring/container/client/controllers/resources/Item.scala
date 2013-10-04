@@ -1,8 +1,8 @@
-package org.corespring.container.controllers
+package org.corespring.container.client.controllers.resources
 
-import play.api.mvc.{AnyContent, Controller}
-import org.corespring.container.player.actions.{SaveItemRequest, ItemRequest, ItemActionBuilder}
+import org.corespring.container.client.actions.{ItemActionBuilder, SaveItemRequest, ItemRequest}
 import play.api.libs.json.Json
+import play.api.mvc.{AnyContent, Controller}
 
 trait Item extends Controller {
 
