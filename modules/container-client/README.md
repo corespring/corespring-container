@@ -15,7 +15,7 @@ To configure the player, the server needs to implement the 'GET config.json' cal
 
 In this call you need to return the following:
 
-    ```json
+```javascript
     {
       "xhtml" : "some html",
       "angular" : {
@@ -25,7 +25,7 @@ In this call you need to return the following:
       // an array of scripts that the page should load
       "scripts" : []
     }
-    ```
+```
 
 On receipt of this the player will add the xhtml to the dom, load the scripts and once all the scripts are loaded
 initialize the angular app with the dependencies that you declared (plus its own default dependencies).
@@ -35,7 +35,7 @@ initialize the angular app with the dependencies that you declared (plus its own
 The player depends on an angular service called 'PlayerServices'. This service provides the api to load and save data
 in and out of the player. Its api looks like so:
 
-    ```javascript
+```javascript
     {
       /**
        * Submit answers to the server
@@ -51,7 +51,7 @@ in and out of the player. Its api looks like so:
        */
       loadSession: function(onSuccess, onFailure){...}
     }
-    ```
+```
 
 ### Editor
 
