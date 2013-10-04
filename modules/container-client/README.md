@@ -13,7 +13,7 @@ To configure the player, the server needs to implement the 'GET config.json' cal
 
 In this call you need to return the following:
 
-    ```json
+```json
     {
       "xhtml" : "some html",
       "angular" : {
@@ -23,7 +23,7 @@ In this call you need to return the following:
       // an array of scripts that the page should load
       "scripts" : []
     }
-    ```
+```
 
 On receipt of this the player will add the xhtml to the dom, load the scripts and once all the scripts are loaded
 initialize the angular app with the dependencies that you declared (plus its own default dependencies).
