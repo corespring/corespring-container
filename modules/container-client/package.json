@@ -1,5 +1,7 @@
 {
   "name": "container-client",
+  "description" : "The client side of the corespring container",
+  "repository" : "https://github.com/corespring/corespring-container/tree/master/modules/container-client",
   "version": "0.0.1",
   "devDependencies": {
     "grunt": "~0.4.1",
