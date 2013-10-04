@@ -1,0 +1,97 @@
+<!doctype html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Editor</title>
+
+  <!-- build:css css/all.css -->
+  <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css">
+  </lin>
+  <link rel="stylesheet" href="css/editor.css">
+  </lin>
+  <link rel="stylesheet" href="css/app.css">
+  </lin>
+  <!-- endbuild -->
+</head>
+<body>
+<div class="root" ng-controller="Root">
+
+  <div>
+    <div class="nav navbar navbar-inverse navbar-static-top" role="navigation">
+      <div class="navbar-header">
+        <a class="navbar-brand">Editor</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex-box">
+    <structure-view class="structure-view"></structure-view>
+
+    <div class="config">
+    </div>
+
+    <inline-preview class="inline-preview" ng-model="selectedComponent"></inline-preview>
+  </div>
+
+</div>
+
+
+</div>
+
+<script type="text/javascript">
+  // hey Angular, we're bootstrapping manually!
+  window.name = "NG_DEFER_BOOTSTRAP!";
+</script>
+
+<script src="bower_components/jquery/jquery.min.js"></script>
+<script src="bower_components/jquery-ui/ui/minified/jquery-ui.min.js"></script>
+<script src="bower_components/angular/angular.js"></script>
+<script src="bower_components/lodash/dist/lodash.js"></script>
+<script src="bower_components/headjs/dist/head.js"></script>
+
+<!-- build:js js/player.js -->
+<script src="js/editor/controllers/_declaration.js"></script>
+<script src="js/editor/controllers/root.js"></script>
+<script src="js/editor/directives/_declaration.js"></script>
+<script src="js/editor/directives/structure-view.js"></script>
+<script src="js/corespring/container/render.js"></script>
+<script src="js/render/directives/_declaration.js"></script>
+<!-- endbuild -->
+
+<!-- build:js js/extras.js -->
+<script src="bower_components/angular-ui/build/angular-ui.js"></script>
+<script src="bower_components/angular-dragdrop/src/angular-dragdrop.js"></script>
+<!-- endbuild -->
+
+<script type="text/javascript">
+  $(document).ready(function () {
+    console.log("load config", document.location);
+
+    var configPath = 'editor-config.json';
+
+    $.get(configPath, function (data) {
+      console.log("data", data);
+
+
+      var allScriptsAreLoaded = function () {
+
+        var playerDeps = [
+          'corespring-editor.controllers',
+          'corespring-editor.directives',
+          'corespring.container',
+          'ngDragDrop'
+        ].concat(data.angular.dependencies);
+
+        angular.module("corespring-editor", playerDeps);
+        angular.bootstrap(document, ["corespring-editor"]);
+        angular.resumeBootstrap();
+      };
+
+      var args = data.scripts.concat([allScriptsAreLoaded]);
+      console.log(args);
+      head.js.apply(null, args);
+    });
+  });
+</script>
+</body>
+</html>

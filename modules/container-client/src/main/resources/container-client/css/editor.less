@@ -1,3 +1,248 @@
-body{
-  font-size: 30px;
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font: 14px 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  line-height: 1.4em;
+  color: #4d4d4d;
+  -webkit-font-smoothing: antialiased;
+  -moz-font-smoothing: antialiased;
+  -ms-font-smoothing: antialiased;
+  -o-font-smoothing: antialiased;
+  font-smoothing: antialiased;
+}
+
+body > header {
+  padding-top: 22px;
+  margin-bottom: -5px;
+}
+
+h1 {
+  /*  position: absolute;
+  top: -120px;*/
+  width: 100%;
+  font-size: 20px;
+  font-weight: bold;
+  color: #b3b3b3;
+  color: rgba(255, 255, 255, 0.3);
+  text-shadow: -1px -1px rgba(0, 0, 0, 0.2);
+  -webkit-text-rendering: optimizeLegibility;
+  -moz-text-rendering: optimizeLegibility;
+  -ms-text-rendering: optimizeLegibility;
+  -o-text-rendering: optimizeLegibility;
+  text-rendering: optimizeLegibility;
+  padding-left: 10px;
+  padding-top: 10px;
+  margin: 0px;
+}
+
+
+
+body {
+  font-family: sans-serif;
+}
+.edit {
+  width: 100%;
+}
+.edit td {
+  vertical-align: top;
+}
+
+@yellow: #FFEC13;
+@green: #7DE811;
+@blue: #9CD2FF;
+
+.content {
+  background-color: #ffff;
+  border-radius: 3px;
+  margin-left: 10px;
+  margin-right: 10px;
+  display: inline-block;
+  float: left;
+}
+
+.mixin-cr(@radius: 5px){
+  -webkit-border-top-left-radius: @radius;
+  -webkit-border-top-right-radius: @radius;
+  -moz-border-radius-topleft: @radius;
+  -moz-border-radius-topright: @radius;
+  border-top-left-radius: @radius;
+  border-top-right-radius: @radius;
+}
+.mixin-bs(@opacity: 0.15){
+  -webkit-box-shadow: 4px 4px 5px rgba(50, 50, 50, @opacity );
+  -moz-box-shadow:    4px 4px 5px rgba(50, 50, 50, @opacity );
+  box-shadow:         4px 4px 5px rgba(50, 50, 50, @opacity );
+}
+
+.component {
+
+  .mixin-cr;
+  .mixin-bs;
+
+  margin-bottom: 10px;
+
+
+  .contents{
+    background-color: lighten(@blue, 20%);
+    margin-top: 0px;
+    padding-top: 5px;
+    padding-left: 5px;
+    padding-right: 5px;
+    padding-bottom: 5px;
+  }
+
+
+  margin-left: 5px;
+  margin-right: 5px;
+  border: 1px solid darken(@blue, 10%);
+
+  .header-bar{
+    width: 100%;
+    height: 20px;
+    display: inline-table;
+    padding: 5px;
+    font-weight: bold;
+    background-color: lighten(@blue, 5%);
+
+    .title{
+      display: block;
+      float: left;
+    }
+    .buttons{
+      float: right;
+      .remove, .info{
+        padding-left: 5px;
+        float: right;
+        display: block;
+        cursor: pointer;
+        &:hover{
+          opacity: 0.6;
+        }
+      }
+    }
+  }
+}
+
+@cs-grey: #dbd9db;
+@cs-green: #80b312;
+@cs-blue: #00acce;
+@cs-dark-grey: #1B1B1B;
+
+.ace_editor {
+  width: 100%;
+  float: left;
+  min-width: 400px;
+  min-height: 700px;
+  height: 100%;
+}
+
+.root{
+  position: absolute;
+  width: 100%;
+  height: 100%;
+
+  .flex-box{
+    display: flex;
+    height: 100%;
+
+    .float-button {
+      position: absolute;
+      right: 20px;
+      z-index: 100;
+    }
+  }
+
+  .navbar{
+    margin-bottom: 0px;
+  }
+  .structure-view, .xml-view, .json-view, .config, .inline-preview {
+    flex: 0;
+    height: 100%;
+    position:relative;
+    float:left;
+  }
+
+  .structure-view {
+    flex: 1;
+    width: 200px;
+
+    .component-thumbnail:hover {
+      color: slateblue;
+      cursor: hand; cursor: pointer;
+    }
+
+    .component-thumbnail.active {
+      color: red;
+    }
+  }
+
+  .xml-view{
+    flex: 2;
+  }
+
+  .inline-preview{
+    width: 100%;
+    height: 100%;
+    flex: 2;
+    padding: 5px;
+  }
+
+
+  .config{
+    flex: 2;
+    border-left: solid 1px darken(white, 10%);
+    background-color: darken(white, 5%);
+
+
+    .config-chrome{
+      background-color: darken(white, 4%);
+      .title{
+        background-color: darken(white, 40%);
+        padding: 5px;
+      }
+      .holder{
+        padding: 5px;
+      }
+    }
+  }
+}
+
+
+.palette {
+
+  border: solid 1px #00f000;
+  width: 50px;
+
+  .palette-button {
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+    line-height: 40px;
+    margin: 5px;
+    text-align: center;
+    border: solid 1px #99ff00;
+  }
+
+  .palette-button:hover {
+    background-color: blueviolet;
+  }
+
+  .palette-button > img {
+    vertical-align: middle;
+  }
+
+  .submit-button {
+    @color: #995599;
+    background-color: @color;
+    border: solid 2px darken(@color, 20%);
+  }
+}
+
+.modelView {
+  background-color: #333;
+  color: #eee;
 }
