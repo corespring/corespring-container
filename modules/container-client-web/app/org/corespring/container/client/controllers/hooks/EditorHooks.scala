@@ -10,6 +10,7 @@ trait EditorHooks extends BaseHooks {
 
   val log = Logger("editor.hooks")
 
+  //TODO: just have name = "editor" ?
   override def names: AssetNames = new AssetNames {
     def namespace = "editor-web.services"
 
