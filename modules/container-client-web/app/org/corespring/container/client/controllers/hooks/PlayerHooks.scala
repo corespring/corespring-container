@@ -26,7 +26,7 @@ trait PlayerHooks extends BaseHooks {
       log.debug(s"load js for session $sessionId")
       val typesUsed = componentTypes(request.item)
       val usedComponents = loadedComponents.filter(c => typesUsed.exists(t => c.matchesType(t)))
-      val js = usedComponents.map(c => wrapJs(c)).mkString("\n")
+      val js = usedComponents.map(c => wrapJs(c.org, c.name, c.client.render)).mkString("\n")
       Ok(js).as("text/javascript")
   }
 

@@ -71,7 +71,7 @@ trait BaseHooks extends Controller{
     moduleName(org, comp)
   }
 
-  protected def wrapJs(c: Component) =  ComponentWrapper(moduleName(c.org, c.name), directiveName(c.org, c.name), c.client.render)
+  protected def wrapJs(org: String, name: String, src: String, directive : Option[String] = None) = ComponentWrapper(moduleName(org, name), directiveName(org, name), src)
 
   protected def moduleName(org: String, comp: String) = s"$org.$comp"
 

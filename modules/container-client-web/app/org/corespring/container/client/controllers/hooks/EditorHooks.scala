@@ -2,7 +2,6 @@ package org.corespring.container.client.controllers.hooks
 
 import org.corespring.container.client.actions.PlayerRequest
 import org.corespring.container.client.views.txt.js.{ComponentWrapper, EditorServices}
-import org.corespring.container.components.model.Component
 import play.api.Logger
 import play.api.mvc.{AnyContent, Action}
 
@@ -28,11 +27,15 @@ trait EditorHooks extends BaseHooks {
 
   override def components(itemId:String) : Action[AnyContent] = builder.loadComponents(itemId) {
     request : PlayerRequest[AnyContent] =>
-      val js = loadedComponents.map(c => wrapJs(c)).mkString("\n")
-      Ok(js).as("text/javascript")
+      val configJs = loadedComponents.map(c => wrapJs(c.org, c.name, c.client.configure)).mkString("\n")
+      //Add the render directives as previews
+      val previewJs = loadedComponents.map( c => wrapJs(c.org, c.name, c.client.render, Some(s"${directiveName(c.org, c.name)}Preview"))).mkString("\n")
+      Ok(configJs + previewJs).as("text/javascript")
   }
 
-  override def wrapJs(c: Component) =
-    ComponentWrapper(moduleName(c.org, c.name), directiveName(c.org, c.name), c.client.configure)
+  override def wrapJs(org:String, name:String, src:String, directive: Option[String] = None) = {
+    val d = directive.getOrElse(directiveName(org, name))
+    ComponentWrapper(moduleName(org, name), d, src )
+  }
 
 }
