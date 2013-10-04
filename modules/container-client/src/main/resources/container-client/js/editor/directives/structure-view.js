@@ -1,3 +1,6 @@
+(function() {
+
+
 var link;
 
 link = function($compile) {
@@ -19,3 +22,4 @@ angular.module('corespring-editor.directives').directive('structureView', [
 ]);
 
 
+}).call(this);

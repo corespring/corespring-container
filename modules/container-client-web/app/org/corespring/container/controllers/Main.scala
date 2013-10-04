@@ -64,14 +64,15 @@ trait Main extends Controller {
 
   def editorComponentsJs(itemId:String) : Action[AnyContent] = builder.editorAction(itemId) {
     request : PlayerRequest[AnyContent] =>
-      val js = components.map(c => wrapJs(c)).mkString("\n")
+      val js = components.map(c => wrapJsForEditor(c)).mkString("\n")
       Ok(js).as("text/javascript")
   }
 
-  private def wrapJs(c: Component) = {
-    import org.corespring.container.views.txt._
-    ComponentWrapper(moduleName(c.org, c.name), directiveName(c.org, c.name), c.client.render)
-  }
+  private def wrapJs(c: Component) =
+    org.corespring.container.views.txt.ComponentWrapper(moduleName(c.org, c.name), directiveName(c.org, c.name), c.client.render)
+
+  private def wrapJsForEditor(c: Component) =
+    org.corespring.container.views.txt.ComponentWrapper(moduleName(c.org, c.name), directiveName(c.org, c.name), c.client.configure)
 
   private def processXhtml(s: String): String = {
     s.trim

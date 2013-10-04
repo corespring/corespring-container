@@ -1,3 +1,5 @@
+(function() {
+
 var link;
 
 link = function ($compile) {
@@ -28,3 +30,5 @@ angular.module('corespring-editor.directives').directive('configPane', [
     return def;
   }
 ]);
+
+}).call(this);
