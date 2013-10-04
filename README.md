@@ -9,8 +9,11 @@ This will allow integration points into the main corespring-api project.
 These tools should be on your `PATH`:
 
 [Play 2.2](http://www.playframework.com/)
+
 [Grunt](http://gruntjs.com/)
+
 [Node and Npm](http://nodejs.org/)
+
 [Bower](http://bower.io/)
 
 ## Run
