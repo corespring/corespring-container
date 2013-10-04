@@ -11,7 +11,7 @@ Note: the layout is *under trial* - we may move it to a more conventional play f
 ### Player
 
 #### config.json
-To configure the player, the server needs to implement the 'GET config.json' call.
+To configure the player, the server needs to implement the `GET config.json` call.
 
 In this call you need to return the following:
 
