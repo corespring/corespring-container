@@ -2,6 +2,10 @@ package org.corespring.container.client.actions
 
 import play.api.mvc._
 
+/**
+ * Client side calls - each will call for config, services and components
+ * @tparam A
+ */
 trait ClientHooksActionBuilder[A] {
   def loadComponents(id:String)(block: PlayerRequest[A] => Result ) : Action[AnyContent]
   def loadServices(id:String)(block: PlayerRequest[A] => Result ) : Action[AnyContent]
