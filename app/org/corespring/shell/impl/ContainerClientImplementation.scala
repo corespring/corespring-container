@@ -1,6 +1,7 @@
 package org.corespring.shell.impl
 
 import org.corespring.container.components.model.Component
+import org.corespring.container.components.outcome.{DefaultOutcomeProcessor, OutcomeProcessor}
 import org.corespring.container.components.response.{ResponseProcessorImpl, ResponseProcessor}
 import org.corespring.shell.impl.controllers.editor.{ClientItemImpl, EditorHooksImpl}
 import org.corespring.shell.impl.controllers.player.{ClientSessionImpl, PlayerHooksImpl}
@@ -36,5 +37,8 @@ class ContainerClientImplementation(itemServiceIn : MongoService, sessionService
     def responseProcessor: ResponseProcessor = new ResponseProcessorImpl(comps)
 
     def sessionService: MongoService = sessionServiceIn
+
+    def outcomeProcessor: OutcomeProcessor = DefaultOutcomeProcessor
+
   }
 }

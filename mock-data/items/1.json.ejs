@@ -4,12 +4,10 @@
   },
   "xhtml" : "<%- helper.read('../xml/1.xhtml') %>",
   "components" : {
-
     "2" : {
       "componentType" : "corespring-drag-and-drop",
-       "correctResponse": [
-        { "landingPlace" : "1", "choiceId" : "larva"}
-        ],
+      "weight" : 1,
+       "correctResponse": [ { "landingPlace" : "1", "choiceId" : "larva"} ],
         "feedback" : [
           {
             "landingPlace" : "1",
@@ -37,6 +35,7 @@
 
     "3" : {
       "componentType" : "corespring-single-choice",
+      "weight" : 4,
       "correctResponse" : { "value" : "2" },
       "feedback" : [
         { "value" : "1", "feedback" : "Huh?"},
@@ -61,6 +60,7 @@
 
     "4" : {
       "componentType" : "corespring-multiple-choice",
+      "weight" : 10,
       "correctResponse" : { "value" : ["carrot", "turnip", "potato"] },
       "feedback" : [
         { "value" : "banana", "feedback" : "it's a fruit"},

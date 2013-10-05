@@ -1,6 +1,7 @@
 package org.corespring.container.client.controllers.resources
 
 import org.corespring.container.client.actions.{SubmitAnswersRequest, SessionActionBuilder}
+import org.corespring.container.components.outcome.OutcomeProcessor
 import org.corespring.container.components.response.ResponseProcessor
 import play.api.Logger
 import play.api.libs.json._
@@ -11,6 +12,8 @@ trait Session extends Controller {
   private val logger = Logger("session")
 
   def responseProcessor: ResponseProcessor
+
+  def outcomeProcessor: OutcomeProcessor
 
   def builder: SessionActionBuilder[AnyContent]
 
@@ -23,6 +26,7 @@ trait Session extends Controller {
    * @param id
    * @return
    */
+
   def submitAnswers(id: String) = builder.submitAnswers(id) {
     request : SubmitAnswersRequest[AnyContent] =>
 
@@ -36,13 +40,19 @@ trait Session extends Controller {
             (sessionJson \ "maxNoOfAttempts").as[Int]
           )
 
+          def output(session: JsValue, isFinished: Boolean) = {
+            val base = Json.obj("session" -> session)
+            if (isFinished) {
+              val responses = responseProcessor.respond(itemJson, session)
+              val outcome = outcomeProcessor.outcome(itemJson, responses)
+              base ++ Json.obj("responses" -> responses) ++ Json.obj("outcome" -> outcome)
+            } else {
+              base
+            }
+          }
+
           if (isFinished) {
-            Ok(
-              Json.obj(
-                "session" -> sessionJson,
-                "responses" -> responseProcessor.respond(itemJson, sessionJson)
-              )
-            )
+            Ok(output(sessionJson, true))
           } else {
             logger.debug(s"current remaining attempts for $id: $currentRemainingAttempts")
 
@@ -59,12 +69,11 @@ trait Session extends Controller {
 
             request.saveSession(id, updateJson).map {
               update =>
-                val responsesJson = if ((update \ "isFinished").as[Boolean]) {
-                  Json.obj("responses" -> responseProcessor.respond(itemJson, update))
+                if ((update \ "isFinished").as[Boolean]) {
+                  Ok(output(update, true))
                 } else {
-                  JsObject(Seq.empty)
+                  Ok(output(update, false))
                 }
-                Ok(Json.obj("session" -> update) ++ responsesJson)
             }
           }.getOrElse(BadRequest("Error updading"))
 
