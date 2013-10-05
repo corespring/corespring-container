@@ -9,33 +9,34 @@ trait EditorHooks extends BaseHooks {
 
   val log = Logger("editor.hooks")
 
-  //TODO: just have name = "editor" ?
-  override def names: AssetNames = new AssetNames {
-    def namespace = "editor-web.services"
-
-    def components = "editor-components.js"
-
-    def services = "editor-services.js"
-  }
+  override def name = "editor"
 
   override def services(itemId: String): Action[AnyContent] = builder.loadServices(itemId){
     request: PlayerRequest[AnyContent] =>
       log.debug(s"load editor services: $itemId")
       import org.corespring.container.client.controllers.resources.routes._
-      Ok(EditorServices(names.namespace, Item.load(itemId), Item.save(itemId))).as("text/javascript")
+      Ok(EditorServices(ngModule, Item.load(itemId), Item.save(itemId))).as("text/javascript")
   }
 
-  override def components(itemId:String) : Action[AnyContent] = builder.loadComponents(itemId) {
+  override def componentsJs(itemId:String) : Action[AnyContent] = builder.loadComponents(itemId) {
     request : PlayerRequest[AnyContent] =>
-      val configJs = loadedComponents.map(c => wrapJs(c.org, c.name, c.client.configure)).mkString("\n")
-      //Add the render directives as previews
-      val previewJs = loadedComponents.map( c => wrapJs(c.org, c.name, c.client.render, Some(s"${directiveName(c.org, c.name)}Preview"))).mkString("\n")
-      Ok(configJs + previewJs).as("text/javascript")
+      componentsToResource(loadedComponents, (c) => {
+        val configJs = wrapJs(c.org, c.name, c.client.configure)
+        //Add the render directives as previews
+        val previewJs = wrapJs(c.org, c.name, c.client.render, Some(s"${directiveName(c.org, c.name)}Preview"))
+        s"$configJs\n$previewJs"
+      }, "text/javascript")
+  }
+
+  override def componentsCss(sessionId: String):  Action[AnyContent] = builder.loadComponents(sessionId) {
+    request =>
+      log.debug(s"load css for session $sessionId")
+      componentsToResource(loadedComponents, _.client.css.getOrElse(""), "text/css")
   }
 
   override def wrapJs(org:String, name:String, src:String, directive: Option[String] = None) = {
     val d = directive.getOrElse(directiveName(org, name))
-    ComponentWrapper(moduleName(org, name), d, src )
+    ComponentWrapper(moduleName(org, name), d, src ).toString
   }
 
 }

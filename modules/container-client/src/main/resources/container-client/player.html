@@ -3,19 +3,23 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>Player</title>
-
     <!-- build:css css/all.css -->
-    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css"/>
+    <link href='http://fonts.googleapis.com/css?family=Ubuntu' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" href="css/app.css"/>
     <link rel="stylesheet" href="css/player.css"/>
     <!-- endbuild -->
 </head>
-  <body>
-    <div id="root" ng-controller="Root">
+  <body class="hide-body">
+    <div id="root" class="container" ng-controller="Root">
       <div id="player-body">
 
       </div>
-      <button ng-click="submit()">Submit</button>
+      <div id="outcome" ng-show="outcome">
+          <h4>You scored: {{outcome.summary.percentage}}%</h4>
+      </div>
+      <hr/>
+      <button ng-click="submit()" ng-disabled="session.isFinished" class="btn btn-success">Submit</button>
+      <label>Attempts left: {{session.remainingAttempts !== undefined ? session.remainingAttempts : session.maxNoOfAttempts}}</label>
     </div>
 
     <script type="text/javascript">
@@ -45,14 +49,14 @@
       $(document).ready(function(){
         console.log("load config", document.location);
 
-        var path = document.location.pathname.replace("/", "");
-
-        var configPath = 'config.json'; //path == "" ? "config.json" : path + "/config.json";
+        var configPath = 'player-config.json';
 
         $.get( configPath, function(data){
           console.log("data", data);
 
           var allScriptsAreLoaded = function(){
+
+            console.log("all scripts are loaded");
             $("#player-body").html(data.xhtml);
 
             var playerDeps = [
@@ -65,11 +69,16 @@
             angular.module("corespring-player", playerDeps );
             angular.bootstrap(document, ["corespring-player"]);
             angular.resumeBootstrap();
+            $("body").addClass('blend');
           };
 
-          var args = data.scripts.concat([allScriptsAreLoaded]);
-          console.log(args);
-          head.js.apply(null, args);
+          var allScripts = data.scripts.concat(data.css);
+          console.log(allScripts);
+          head.js.apply(null, allScripts);
+
+          head.ready(function(){
+              allScriptsAreLoaded();
+          });
         });
       });
     </script>

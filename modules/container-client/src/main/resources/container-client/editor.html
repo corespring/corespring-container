@@ -5,15 +5,12 @@
   <title>Editor</title>
 
   <!-- build:css css/all.css -->
-  <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css">
-  </lin>
-  <link rel="stylesheet" href="css/editor.css">
-  </lin>
-  <link rel="stylesheet" href="css/app.css">
-  </lin>
+  <link href='http://fonts.googleapis.com/css?family=Ubuntu' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="css/app.css"> </link>
+  <link rel="stylesheet" href="css/editor.css"> </link>
   <!-- endbuild -->
 </head>
-<body>
+<body class="hide-body">
 <div class="root" ng-controller="Root">
 
   <div>
@@ -21,6 +18,7 @@
       <div class="navbar-header">
         <a class="navbar-brand">Editor</a>
       </div>
+        <span class="btn btn-primary" ng-click="save()">Save</span>
     </div>
   </div>
 
@@ -72,8 +70,6 @@
     var configPath = 'editor-config.json';
 
     $.get(configPath, function (data) {
-      console.log("data", data);
-
 
       var allScriptsAreLoaded = function () {
 
@@ -87,11 +83,16 @@
         angular.module("corespring-editor", playerDeps);
         angular.bootstrap(document, ["corespring-editor"]);
         angular.resumeBootstrap();
+        $("body").addClass('blend')
       };
 
-      var args = data.scripts.concat([allScriptsAreLoaded]);
+      var args = data.scripts.concat(data.css);
       console.log(args);
       head.js.apply(null, args);
+
+      head.ready(function(){
+        allScriptsAreLoaded();
+      });
     });
   });
 </script>

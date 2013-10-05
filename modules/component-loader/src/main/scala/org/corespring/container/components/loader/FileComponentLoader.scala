@@ -68,7 +68,8 @@ class FileComponentLoader(paths: Seq[String]) extends ComponentLoader {
   } else {
     val renderJs = getJsFromFile(client.getPath + "/render")
     val configureJs = getJsFromFile(client.getPath + "/configure")
-    Client(renderJs, configureJs)
+    val styleCss = readMaybeFile( new File(client.getPath + "/styles.css"))
+    Client(renderJs, configureJs, styleCss)
   }
 
   private def getJsFromFile(path: String): String = {
@@ -90,11 +91,15 @@ class FileComponentLoader(paths: Seq[String]) extends ComponentLoader {
     Server(indexJs)
   }
 
-  private def readFile(f: File): String = {
+  private def readMaybeFile(f: File): Option[String] = {
     if (!f.exists()) {
-      throw new ComponentLoaderException(s"Can't find client file: ${f.getAbsolutePath}")
+      None
     } else {
-      scala.io.Source.fromFile(f).getLines().mkString("\n")
+      Some(scala.io.Source.fromFile(f).getLines().mkString("\n"))
     }
+  }
+
+  private def readFile(f: File): String = readMaybeFile(f).getOrElse{
+    throw new ComponentLoaderException(s"Can't find client file: ${f.getAbsolutePath}")
   }
 }
