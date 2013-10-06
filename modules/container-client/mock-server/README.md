@@ -1,6 +1,6 @@
 # Mock Server
 
-This server provides a client side only version of the editor or player.
+This server provides a client side only version of the player (editor to come).
 
 ## Running
 

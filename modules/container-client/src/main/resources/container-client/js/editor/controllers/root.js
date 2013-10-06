@@ -1,8 +1,8 @@
 var controller = function ($scope, $compile, $http, $timeout, EditorServices, CorespringContainer) {
 
   $scope.save = function () {
-    //TODO: updateItem - get the update ready
-    EditorServices.save(updatedItem, $scope.onItemSaved, $scope.onItemSaveError);
+    var cleaned = angular.copy($scope.model);
+    EditorServices.save(cleaned, $scope.onItemSaved, $scope.onItemSaveError);
   };
 
   $scope.onItemSaved = function (data) {
