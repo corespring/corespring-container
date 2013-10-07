@@ -128,11 +128,15 @@ module.factory('CorespringContainer', function () {
       $.each(container.components, _updateResponse);
     };
 
-    container.serialize = function () {
-      var _serialize = function (component) {
-        if (component.buildModel) component.buildModel();
-      }
-      _.each(container.configPanels, _serialize);
+    container.serialize = function (itemModel) {
+      var newModel = _.cloneDeep(itemModel);
+      _.each(newModel.components, function(value, key) {
+        var component = container.configPanels[key];
+        if (component && component.getModel) {
+          newModel.components[key] = component.getModel();
+        }
+      });
+      return newModel;
     };
 
     return container;

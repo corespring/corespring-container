@@ -3,8 +3,8 @@ var controller = function ($scope, $compile, $http, $timeout, EditorServices, Co
   $scope.save = function () {
     console.log("Saving: ");
     console.log($scope.model);
-    CorespringContainer.serialize();
-    var cleaned = angular.copy($scope.model);
+    var cleaned = CorespringContainer.serialize($scope.model);
+    console.log(cleaned);
     EditorServices.save(cleaned, $scope.onItemSaved, $scope.onItemSaveError);
   };
 
