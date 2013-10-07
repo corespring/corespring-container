@@ -2,12 +2,13 @@ import com.mongodb.casbah.MongoClient
 import org.corespring.container.components.loader.FileComponentLoader
 import org.corespring.shell.impl.ContainerClientImplementation
 import org.corespring.shell.impl.controllers.Main
+import org.corespring.shell.impl.filters.ReloadComponentsFilter
 import org.corespring.shell.impl.services.MongoService
 import org.corespring.shell.impl.utils.ControllerInstanceResolver
 import play.api.Play
-import play.api.mvc.Controller
+import play.api.mvc.{WithFilters, Controller}
 
-object Global extends ControllerInstanceResolver {
+object Global extends WithFilters(ReloadComponentsFilter) with ControllerInstanceResolver {
 
   lazy val controllers: Seq[Controller] = containerClient.controllers :+ home
 
@@ -24,6 +25,14 @@ object Global extends ControllerInstanceResolver {
     def itemService: MongoService = new MongoService(db("items"))
   }
 
-  private lazy val componentLoader = new FileComponentLoader(Play.current.configuration.getString("components.path").toSeq)
+  override def onStart(app:play.api.Application) : Unit = {
+    ReloadComponentsFilter.components = componentLoader
+  }
+
+  private lazy val componentLoader = {
+    val out = new FileComponentLoader(Play.current.configuration.getString("components.path").toSeq)
+    out.reload
+    out
+  }
 
 }

@@ -11,13 +11,14 @@ class FileComponentLoader(paths: Seq[String]) extends ComponentLoader {
 
   private val logger = LoggerFactory.getLogger("components.loader")
 
-  lazy val all: Seq[Component] = {
-    logger.debug(s"Loading components from paths: $paths")
-    val out = loadAllComponents(paths)
-    logger.info("component loading completed")
-    out
+  private var loadedComponents : Seq[Component] = Seq.empty
+
+  override def reload: Unit = {
+    logger.debug(s"Re-Loading components from paths: $paths")
+    loadedComponents = loadAllComponents(paths)
   }
 
+  def all: Seq[Component] = loadedComponents
 
   private def loadAllComponents(paths: Seq[String]): Seq[Component] = {
     paths.map {
@@ -102,4 +103,5 @@ class FileComponentLoader(paths: Seq[String]) extends ComponentLoader {
   private def readFile(f: File): String = readMaybeFile(f).getOrElse{
     throw new ComponentLoaderException(s"Can't find client file: ${f.getAbsolutePath}")
   }
+
 }

@@ -8,7 +8,7 @@ import org.corespring.shell.impl.controllers.player.{ClientSessionImpl, PlayerHo
 import org.corespring.shell.impl.services.MongoService
 import play.api.mvc.Controller
 
-class ContainerClientImplementation(itemServiceIn : MongoService, sessionServiceIn : MongoService, comps : Seq[Component]) {
+class ContainerClientImplementation(itemServiceIn : MongoService, sessionServiceIn : MongoService, comps : => Seq[Component]) {
 
   lazy val controllers: Seq[Controller] = Seq(playerHooks, editorHooks, items, sessions)
 
