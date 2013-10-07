@@ -9,6 +9,7 @@ PUT        /session/submit-answers/:id.json        @org.corespring.container.cli
 GET        /item/:itemId.json                      @org.corespring.container.client.controllers.resources.Item.load(itemId:String)
 PUT        /item/:itemId.json                      @org.corespring.container.client.controllers.resources.Item.save(itemId:String)
 
+GET        /item/:itemId/player                    @org.corespring.container.client.controllers.hooks.PlayerHooks.createSessionForItem(itemId:String)
 # Hooks for the player: config, services + components
 GET        /:sessionId/player-:resource.:suffix     @org.corespring.container.client.controllers.hooks.PlayerHooks.resource(resource:String, suffix:String, sessionId:String)
 

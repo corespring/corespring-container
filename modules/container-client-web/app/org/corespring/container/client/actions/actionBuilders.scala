@@ -10,6 +10,7 @@ trait ClientHooksActionBuilder[A] {
   def loadComponents(id:String)(block: PlayerRequest[A] => Result ) : Action[AnyContent]
   def loadServices(id:String)(block: PlayerRequest[A] => Result ) : Action[AnyContent]
   def loadConfig(id:String)(block: PlayerRequest[A] => Result ) : Action[AnyContent]
+  def createSessionForItem(itemId:String)(block: SessionIdRequest[A] => Result) : Action[AnyContent]
 }
 
 

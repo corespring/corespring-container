@@ -33,4 +33,12 @@ trait PlayerHooks extends BaseHooks {
       componentsToResource(usedComponents, _.client.css.getOrElse(""), "text/css")
   }
 
+  def createSessionForItem(itemId: String): Action[AnyContent] = builder.createSessionForItem(itemId) {
+    request =>
+      //TODO: How to get this path accurately - atm will only support one level of nesting of the routes file?
+      val PathRegex = s"""/(.*?)/.*/$itemId.*""".r
+      val PathRegex(root) = request.path
+      val url = s"/$root/${request.sessionId}/player.html"
+      SeeOther(url)
+  }
 }

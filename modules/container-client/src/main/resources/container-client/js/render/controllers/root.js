@@ -49,7 +49,6 @@ var controller = function ($scope, $compile, $http, $timeout, PlayerServices, Co
       $scope.session = data.session;
     }
   };
-
   PlayerServices.loadSession($scope.onSessionLoaded, $scope.onSessionLoadError);
 };
 

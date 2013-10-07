@@ -1,10 +1,13 @@
 package org.corespring.shell.impl.controllers.player
 
-import org.corespring.container.client.actions.{PlayerRequest, ClientHooksActionBuilder}
-import org.corespring.shell.impl.services.MongoService
-import play.api.libs.json.JsValue
-import play.api.mvc.{Action, Result, AnyContent}
+import org.corespring.container.client.actions.ClientHooksActionBuilder
+import org.corespring.container.client.actions.PlayerRequest
+import org.corespring.container.client.actions.SessionIdRequest
 import org.corespring.container.client.controllers.hooks.PlayerHooks
+import org.corespring.shell.impl.services.MongoService
+import play.api.libs.json._
+import play.api.mvc.{Action, Result, AnyContent}
+import scala.Some
 
 trait PlayerHooksImpl extends PlayerHooks {
 
@@ -31,6 +34,22 @@ trait PlayerHooksImpl extends PlayerHooks {
     def loadServices(id: String)(block: (PlayerRequest[AnyContent]) => Result): Action[AnyContent] = load(id)(block)
 
     def loadConfig(id: String)(block: (PlayerRequest[AnyContent]) => Result): Action[AnyContent] = load(id)(block)
+
+    def createSessionForItem(itemId: String)(block: (SessionIdRequest[AnyContent]) => Result): Action[AnyContent] = Action{ request =>
+
+      val session = Json.obj(
+        "itemId" -> JsString(itemId),
+        "maxNoOfAttempts" -> JsNumber(2),
+        "showFeedback" -> JsBoolean(true),
+        "showCorrectResponse" -> JsBoolean(true),
+        "showUserResponse" -> JsBoolean(true),
+        "isFinished" -> JsBoolean(false)
+      )
+
+      sessionService.create(session).map{ oid =>
+        block(SessionIdRequest(oid.toString, request))
+      }.getOrElse(BadRequest("Error creating session"))
+    }
   }
 
 }
