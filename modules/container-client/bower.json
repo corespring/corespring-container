@@ -11,7 +11,8 @@
     "jquery": "latest",
     "bootstrap" : "latest",
     "lodash" : "latest",
-    "headjs" : "latest"
+    "headjs" : "latest",
+    "ckeditor": "https://github.com/eymengunay/ckeditor.git"
   },
   "devDependencies": {
     "angular-mocks": "1.2.0-rc.2",
