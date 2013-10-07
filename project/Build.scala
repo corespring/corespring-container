@@ -1,3 +1,4 @@
+import java.net.InetSocketAddress
 import sbt.Keys._
 import sbt._
 import scala.Some
@@ -10,7 +11,6 @@ object Build extends sbt.Build {
   val ScalaVersion = "2.10.2"
 
   object Dependencies {
-    val playJson = "com.typesafe.play" %% "play-json" % "2.2.0"
     val specs2 = "org.specs2" %% "specs2" % "2.2.2" % "test"
     val logback = "ch.qos.logback" % "logback-classic" % "1.0.13"
     val rhinoJs = "org.mozilla" % "rhino" % "1.7R4"
@@ -28,13 +28,14 @@ object Build extends sbt.Build {
 
   val builder = new Builders(org, appVersion, ScalaVersion)
 
-
   lazy val coffeescriptCompiler = builder.lib("coffeescript-compiler").settings(
       libraryDependencies ++= Seq(rhinoJs, specs2)
   )
 
-  lazy val componentModel = builder.lib("component-model").settings(
-    libraryDependencies ++= Seq(playJson, specs2),
+  //Note: This should be a lib - but I'm having an issue with conflicting play-json libs
+  //So making it a play app for now
+  lazy val componentModel = builder.playApp("component-model").settings(
+    libraryDependencies ++= Seq(specs2),
     resolvers ++= Resolvers.all
   )
 
@@ -51,23 +52,38 @@ object Build extends sbt.Build {
   val shell = builder.playApp("shell", Some(".")).settings(
     resolvers ++= Resolvers.all,
     libraryDependencies ++= Seq(casbah),
-    //Add the grunt runner to play shell
-    playRunHooks <+= baseDirectory.map(base => Grunt(base / "modules" / "container-client")),
-    //Add npm/bower/grunt commands
+    // Start grunt on play run
+    playOnStarted <+= baseDirectory { base =>
+      (address: InetSocketAddress) => {
+        Grunt.process = Some(Process("grunt run", (base/ "modules"/"container-client")).run)
+      }: Unit
+    },
+
+    // Stop grunt when play run stops
+    playOnStopped += {
+      () => {
+        Grunt.process.map(p => p.destroy())
+        Grunt.process = None
+      }: Unit
+    },
     commands <++= baseDirectory { base =>
       Seq(
         "grunt",
         "bower",
         "npm"
-      ).map(cmd(_, (base / "modules" / "container-client")))
+      ).map(cmd(_, (base/"modules"/"container-client")))
     }
   ).dependsOn(containerClientWeb, componentLoader)
-    .aggregate(containerClientWeb, componentLoader)
+    .aggregate(containerClientWeb, componentLoader, coffeescriptCompiler, componentModel, containerClient)
 
   private def cmd(name: String, base: File): Command = {
     Command.args(name, "<" + name + "-command>") { (state, args) =>
       Process(name :: args.toList, base) !;
       state
     }
+  }
+
+  object Grunt {
+    var process: Option[Process] = None
   }
 }

@@ -6,13 +6,14 @@ class Builders(org:String, appVersion:String, rootScalaVersion:String) {
 
   def lib(name: String, folder:String = "lib", deps: Seq[sbt.ClasspathDep[sbt.ProjectReference]] = Seq.empty) =
 
-  //++ intellijCommandSettings("SCALA")
+    //Needed for play 2.1.x
+    //++ intellijCommandSettings("SCALA")
 
     sbt.Project(
       name,
       file("modules/" + name),
       dependencies = deps)
-      .settings( Defaults.defaultSettings  : _* )
+      .settings( Defaults.defaultSettings  ++ intellijCommandSettings("SCALA") : _* )
       .settings(
       organization := org,
       version := appVersion,

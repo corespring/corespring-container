@@ -4,6 +4,8 @@ import org.corespring.shell.impl.services.MongoService
 import play.api.Logger
 import play.api.libs.json.{Json, JsString, JsObject, JsValue}
 import play.api.mvc.{Action, Controller}
+import com.mongodb.casbah.MongoClient
+
 
 trait Main extends Controller {
 
