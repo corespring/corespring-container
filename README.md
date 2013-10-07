@@ -8,7 +8,7 @@ This will allow integration points into the main corespring-api project.
 
 These tools should be on your `PATH`:
 
-[Play 2.2](http://www.playframework.com/)
+[Play 2.1.3](http://www.playframework.com/)
 
 [Grunt](http://gruntjs.com/)
 
