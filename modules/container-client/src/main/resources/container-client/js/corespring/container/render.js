@@ -1,10 +1,15 @@
-angular.module('corespring.container', []);
+var loadAngular = function(n){
+  try{
+    return angular.module(n);
+  }
+  catch(e){
+    return angular.module(n, []);
+  }
+}
 
-/**
-TODO: We need to split this out - some of these functions are called by the player
-and shouldn't be available to the components (and vice versa...)
-*/
-angular.module('corespring.container', []).factory('CorespringContainer', function () {
+var module = loadAngular('corespring.container');
+
+module.factory('CorespringContainer', function () {
     var container = {};
     var dataLoaded = false;
 
