@@ -1,6 +1,39 @@
-@color: #a31a40;
+@import "../bower_components/bootstrap/less/bootstrap";
 
+@bg-color: #ffffff;
+@text-color: #555555;
+@navbar-inverse-bg : #1c2a1f;
+@font-family-sans-serif: "Ubuntu", sans-serif;
 
-body{
-  background-color:  lighten(@color, 50%);
+body{}
+
+.hide-body{
+  opacity: 0;
+}
+.blend {
+  opacity: 1;
+  transition: opacity 300ms;
+}
+
+/*.animate-enter {
+  -webkit-transition: 1s linear all;
+  transition: 1s linear all;
+  opacity: 0;
+}
+
+.animate-enter.animate-enter-active {
+  opacity: 1;
+}*/
+
+.cs-feedback{
+  border: solid 1px white;
+  border-radius: 3px;
+  padding: 3px;
+}
+
+.cs-feedback.correct{
+  border: solid 1px #74A50D;
+}
+.cs-feedback.incorrect{
+  border: solid 1px #AF1700;
 }

@@ -2,7 +2,7 @@
   "metadata" : {
     "title" : "Item One"
   },
-  "xhtml" : "<%- helper.read('../xml/1.xhtml') %>",
+  "xhtml" : "<corespring-single-choice id='3'></corespring-single-choice>",
   "components" : {
     "2" : {
       "componentType" : "corespring-drag-and-drop",

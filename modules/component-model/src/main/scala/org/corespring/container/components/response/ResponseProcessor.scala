@@ -6,4 +6,6 @@ trait ResponseProcessor {
 
   /** Respond to question */
   def respond(item:JsValue, session: JsValue ) : JsValue
+
 }
+

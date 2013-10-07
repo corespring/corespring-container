@@ -10,14 +10,10 @@ GET        /item/:itemId.json                      @org.corespring.container.cli
 PUT        /item/:itemId.json                      @org.corespring.container.client.controllers.resources.Item.save(itemId:String)
 
 # Hooks for the player: config, services + components
-GET        /:sessionId/config.json                 @org.corespring.container.client.controllers.hooks.PlayerHooks.config(sessionId:String)
-GET        /:sessionId/player-services.js          @org.corespring.container.client.controllers.hooks.PlayerHooks.services(sessionId:String)
-GET        /:sessionId/player-components.js        @org.corespring.container.client.controllers.hooks.PlayerHooks.components(sessionId:String)
+GET        /:sessionId/player-:resource.:suffix     @org.corespring.container.client.controllers.hooks.PlayerHooks.resource(resource:String, suffix:String, sessionId:String)
 
 # Hooks for the editor: config, services + components
-GET        /:itemId/editor-config.json             @org.corespring.container.client.controllers.hooks.EditorHooks.config(itemId:String)
-GET        /:itemId/editor-services.js             @org.corespring.container.client.controllers.hooks.EditorHooks.services(itemId:String)
-GET        /:itemId/editor-components.js           @org.corespring.container.client.controllers.hooks.EditorHooks.components(itemId:String)
+GET        /:itemId/editor-:resource.:suffix       @org.corespring.container.client.controllers.hooks.EditorHooks.resource(resource:String, suffix:String,itemId:String)
 
 # Otherwise just serve up the client assets
 GET        /:id/*file                              org.corespring.container.client.controllers.Assets.at(id:String, path="/container-client", file)

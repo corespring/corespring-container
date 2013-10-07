@@ -20,7 +20,7 @@ case class Component(
   }
 }
 
-case class Client( render : String, configure : String )
+case class Client( render : String, configure : String, css : Option[String] )
 
 case class Server( definition : String)
 

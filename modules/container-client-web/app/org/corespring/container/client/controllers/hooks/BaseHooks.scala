@@ -5,17 +5,19 @@ import org.corespring.container.client.actions.PlayerRequest
 import org.corespring.container.client.views.txt.js.ComponentWrapper
 import org.corespring.container.components.model.Component
 import play.api.libs.json.{Json, JsValue}
-import play.api.mvc.{Controller, Action, AnyContent}
+import play.api.mvc.{Result, Controller, Action, AnyContent}
 
 trait BaseHooks extends Controller{
 
-  trait AssetNames{
-    def namespace : String
-    def services  : String
-    def components : String
-  }
+  protected def name : String
 
-  def names : AssetNames
+  def ngModule = s"$name.services"
+
+  def ngJs = s"$name-services.js"
+
+  def componentCss = s"$name-components.css"
+
+  def componentJs = s"$name-components.js"
 
   def loadedComponents: Seq[Component]
 
@@ -26,7 +28,12 @@ trait BaseHooks extends Controller{
       val xhtml = processXhtml((request.item \ "xhtml").as[String])
       val itemComponentTypes: Seq[String] = componentTypes(request.item)
       val moduleNames = itemComponentTypes.map(makeModuleName)
-      val out: String = configJson(xhtml, Seq(names.namespace) ++ moduleNames, Seq(names.services, names.components))
+      val out: String = configJson(
+         xhtml,
+        Seq(ngModule) ++ moduleNames,
+        Seq(ngJs, componentJs),
+        Seq(componentCss)
+      )
       val jsonOut = Json.parse(out)
       Ok(jsonOut)
   }
@@ -43,16 +50,40 @@ trait BaseHooks extends Controller{
    * @param id
    * @return
    */
-  def components(id:String) : Action[AnyContent]
+  def componentsJs(id:String) : Action[AnyContent]
 
-   protected def configJson(xhtml: String, dependencies: Seq[String], scriptPaths: Seq[String]): String =
+  def resource(resource:String,suffix:String, id:String) : Action[AnyContent] = {
+    resource match {
+      case ("config") => config(id)
+      case("services") => services(id)
+      case ("components") => suffix match {
+        case ("js") => componentsJs(id)
+        case ("css") => componentsCss(id)
+      }
+      case _ => Action(NotFound(s"$resource, $suffix, $id"))
+    }
+  }
+
+  /**
+   * Load the component css
+   * @param id
+   * @return
+   */
+  def componentsCss(id:String) : Action[AnyContent]
+
+
+   protected def configJson( xhtml: String,
+                            dependencies: Seq[String],
+                            scriptPaths: Seq[String],
+                            cssPaths : Seq[String]): String =
     s"""
       |{
       |  "xhtml" : "$xhtml",
       |  "angular" : {
       |    "dependencies" : [ "${dependencies.mkString("\",\"")}" ]
       |  },
-      |  "scripts" : [ "${scriptPaths.mkString("\",\"")}" ]
+      |  "scripts" : [ "${scriptPaths.mkString("\",\"")}" ],
+      |  "css" : [ "${cssPaths.mkString("\",\"")}"]
       |}
     """.stripMargin
 
@@ -71,7 +102,12 @@ trait BaseHooks extends Controller{
     moduleName(org, comp)
   }
 
-  protected def wrapJs(org: String, name: String, src: String, directive : Option[String] = None) = ComponentWrapper(moduleName(org, name), directiveName(org, name), src)
+  protected def componentsToResource(components: Seq[Component], componentToString : Component => String, contentType : String) : Result = {
+    Ok(components.map(componentToString).mkString("\n")).as(contentType)
+  }
+
+
+  protected def wrapJs(org: String, name: String, src: String, directive : Option[String] = None) = ComponentWrapper(moduleName(org, name), directiveName(org, name), src).toString
 
   protected def moduleName(org: String, comp: String) = s"$org.$comp"
 

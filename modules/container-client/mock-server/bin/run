@@ -1,0 +1,10 @@
+#!/bin/bash
+
+ROOT=$(dirname $(dirname $0))
+PATH="node_modules/.bin:$PATH"
+
+if [ "${NODE_ENV}" == "production" ]; then
+  exec coffee server.coffee
+else
+  exec nodemon $@ -w . mock-server/server.coffee
+fi
