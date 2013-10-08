@@ -23,6 +23,17 @@ trait BaseHooks extends Controller{
 
   def builder : ClientHooksActionBuilder[AnyContent]
 
+    /**
+     * TODO: The hooks service 4 requests:
+     * - config.json
+     * - services.js
+     * - components.js
+     * - components.css
+     *
+     * However we currently load the db resource each time.
+     * Instead we should load it once and build the resources and serve them.
+     */
+
   def config(id: String): Action[AnyContent] = builder.loadConfig(id) {
     request: PlayerRequest[AnyContent] =>
       val xhtml = processXhtml((request.item \ "xhtml").as[String])
