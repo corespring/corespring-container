@@ -28,7 +28,8 @@
     <config-pane class="config" id="config" ng-model="selectedComponent">
     </config-pane>
 
-    <inline-preview class="inline-preview" ng-model="selectedComponent"></inline-preview>
+    <!--<inline-preview class="inline-preview" ng-model="selectedComponent"></inline-preview>-->
+    <div id="player-body" class="inline-preview"></div>
   </div>
 
 </div>
@@ -74,6 +75,8 @@
     $.get(configPath, function (data) {
 
       var allScriptsAreLoaded = function () {
+
+        $("#player-body").html(data.xhtml);
 
         var playerDeps = [
           'corespring-editor.controllers',

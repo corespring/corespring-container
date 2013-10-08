@@ -11,7 +11,7 @@ link = function ($compile) {
         return;
       }
       console.log("[config pane] model loaded.");
-      tmpl = "<div class='config-chrome'>\n  <div class='title'>Configure " + data.component.componentType + " :: " + data.id + "</div>\n  <div class='holder'><" + data.component.componentType + " id='" + data.id + "'/></div>\n</div>";
+      tmpl = "<div class='config-chrome'>\n  <div class='title'>Configure " + data.component.componentType + " :: " + data.id + "</div>\n  <div class='holder'><" + data.component.componentType + "-config id='" + data.id + "'/></div>\n</div>";
       $div = $(tmpl);
       $elem.html($div);
       return $compile($div)($scope.$new());

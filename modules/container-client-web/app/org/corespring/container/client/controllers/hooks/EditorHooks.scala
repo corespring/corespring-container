@@ -21,9 +21,9 @@ trait EditorHooks extends BaseHooks {
   override def componentsJs(itemId:String) : Action[AnyContent] = builder.loadComponents(itemId) {
     request : PlayerRequest[AnyContent] =>
       componentsToResource(loadedComponents, (c) => {
-        val configJs = wrapJs(c.org, c.name, c.client.configure)
+        val configJs = wrapJs(c.org, c.name, c.client.configure, Some(s"${directiveName(c.org, c.name)}Config"))
         //Add the render directives as previews
-        val previewJs = wrapJs(c.org, c.name, c.client.render, Some(s"${directiveName(c.org, c.name)}Preview"))
+        val previewJs = wrapJs(c.org, c.name, c.client.render, Some(s"${directiveName(c.org, c.name)}"))
         s"$configJs\n$previewJs"
       }, "text/javascript")
   }
