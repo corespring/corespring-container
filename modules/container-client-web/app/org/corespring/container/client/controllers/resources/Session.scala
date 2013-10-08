@@ -3,6 +3,7 @@ package org.corespring.container.client.controllers.resources
 import org.corespring.container.client.actions.{SubmitAnswersRequest, SessionActionBuilder}
 import org.corespring.container.components.outcome.OutcomeProcessor
 import org.corespring.container.components.response.ResponseProcessor
+import org.joda.time.DateTime
 import play.api.Logger
 import play.api.libs.json._
 import play.api.mvc.{AnyContent, Controller}
@@ -33,7 +34,14 @@ trait Session extends Controller {
       request.body.asJson.map {
         answers =>
 
-          val sessionJson: JsObject = (request.everything \ "session").as[JsObject]
+          val sessionJson: JsObject = {
+            val session = (request.everything \ "session").as[JsObject]
+            (session \ "start").asOpt[JsNumber].map {
+              s =>
+                session
+            }.getOrElse(session ++ Json.obj("start" -> JsNumber(DateTime.now.getMillis)))
+          }
+
           val itemJson: JsObject = (request.everything \ "item").as[JsObject]
           val isFinished: Boolean = (sessionJson \ "isFinished").asOpt[Boolean].getOrElse(false)
           val currentRemainingAttempts: Int = (sessionJson \ "remainingAttempts").asOpt[Int].getOrElse(
@@ -57,12 +65,21 @@ trait Session extends Controller {
             logger.debug(s"current remaining attempts for $id: $currentRemainingAttempts")
 
             def updateJson = {
+
               val newRemainingAttempts: Number = Math.max(0, currentRemainingAttempts - 1)
-              val out = sessionJson ++ Json.obj(
+              val finished = newRemainingAttempts == 0
+
+              val updates: Seq[(String, JsValue)] = Seq(
                 "remainingAttempts" -> JsNumber(newRemainingAttempts.intValue()),
                 "answers" -> (answers \ "answers").as[JsObject],
-                "isFinished" -> JsBoolean(newRemainingAttempts == 0)
-              )
+                "isFinished" -> JsBoolean(finished))
+
+              val maybes: Seq[(String, JsValue)] = Seq(
+                if (finished) Some(("finish" -> JsNumber(DateTime.now.getMillis))) else None
+              ).flatten
+
+              val out: JsObject = sessionJson ++ JsObject(updates ++ maybes)
+
               logger.debug( s"update json: ${Json.stringify(out)}")
               out
             }
