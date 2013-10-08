@@ -34,9 +34,9 @@
       },
 
     "3" : {
-      "componentType" : "corespring-single-choice",
+      "componentType" : "corespring-multiple-choice",
       "weight" : 4,
-      "correctResponse" : { "value" : "2" },
+      "correctResponse" : { "value" : ["2"] },
       "feedback" : [
         { "value" : "1", "feedback" : "Huh?"},
         { "value" : "2", "feedback" : "Great Job", "notChosenFeedback" : "It was this one silly!"},
@@ -47,7 +47,8 @@
         "prompt": "What is 1 + 1?",
         "config": {
           "orientation": "vertical",
-          "shuffle": true
+          "shuffle": true,
+          "singleChoice": true
         },
         "choices": [
           {"label": "1", "value": "1"},
@@ -57,7 +58,6 @@
         ]
       }
     },
-
     "4" : {
       "componentType" : "corespring-multiple-choice",
       "weight" : 10,
