@@ -20,7 +20,21 @@ trait Session extends Controller {
 
   def load(id: String) = builder.load(id)(request => Ok((request.everything \ "session").as[JsValue]))
 
-  def loadEverything(id: String) = builder.loadEverything(id)(request => Ok(request.everything))
+  def loadEverything(id: String) = builder.loadEverything(id){ request =>
+
+    val itemJson = (request.everything \ "item").as[JsObject]
+    val sessionJson = (request.everything \ "session").as[JsObject]
+    val isFinished = (sessionJson \ "isFinished").asOpt[Boolean].getOrElse(false)
+
+    if(!isFinished) {
+      Ok(request.everything)
+    } else {
+      val responses = responseProcessor.respond(itemJson, sessionJson)
+      val outcome = outcomeProcessor.outcome(itemJson, responses)
+      val out = request.everything.as[JsObject] ++ Json.obj("responses" -> responses, "outcome" -> outcome)
+      Ok(out)
+    }
+  }
 
   /**
    * Ok(request.sessionJson)
