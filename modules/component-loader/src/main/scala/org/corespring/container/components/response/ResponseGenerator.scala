@@ -1,11 +1,12 @@
 package org.corespring.container.components.response
 
 import org.mozilla.javascript.tools.shell.Global
-import org.mozilla.javascript.{NativeJavaObject, ScriptableObject, Scriptable, Context}
+import org.mozilla.javascript._
 import play.api.libs.json.{Json, JsObject, JsValue}
 import org.slf4j.LoggerFactory
 import java.io.{InputStreamReader, Reader}
 import java.net.URL
+import scala.Some
 
 class ResponseGenerator(definition: String, question: JsValue, answer: JsValue, settings: JsValue) {
 
@@ -64,14 +65,30 @@ class ResponseGenerator(definition: String, question: JsValue, answer: JsValue, 
     }
 
     if (respond.isInstanceOf[RhinoFunction]) {
-      val fn : RhinoFunction = respond.asInstanceOf[RhinoFunction]
-      val args : Array[AnyRef] = Array(jsObject(question), jsObject(answer), jsObject(settings))
-      val result = fn.call(ctx, scope, exports, args)
-      logger.debug(s"result: ${result.toString}")
-      val jsonString : Any = toJsonString.call(ctx, scope, scope, Array(result))
-      logger.debug(s" json string : ${jsonString.toString}")
-      val jsonOut = Json.parse(jsonString.toString)
-      jsonOut
+
+      try{
+        val fn : RhinoFunction = respond.asInstanceOf[RhinoFunction]
+        val args : Array[AnyRef] = Array(jsObject(question), jsObject(answer), jsObject(settings))
+        val result = fn.call(ctx, scope, exports, args)
+        logger.debug(s"result: ${result.toString}")
+        val jsonString : Any = toJsonString.call(ctx, scope, scope, Array(result))
+        logger.debug(s" json string : ${jsonString.toString}")
+        val jsonOut = Json.parse(jsonString.toString)
+        jsonOut
+      } catch {
+        case e: EcmaError => {
+          logger.warn("Ecmascript error")
+          logger.info(e.getErrorMessage)
+          val srcError : String = js.lines.toSeq.zipWithIndex.map{ zipped : (String,Int) =>
+             val (index, line) = zipped
+             if(index == e.lineNumber) s"!!!! > $line" else line
+          }.mkString("\n")
+          logger.warn(srcError)
+          logger.debug( s">> line: ${e.lineNumber}, column: ${e.columnNumber} " )
+          throw new RuntimeException("Error processing js", e)
+        }
+        case e : Throwable => throw new RuntimeException("Error processing js", e)
+      }
     } else {
       throw new RuntimeException("??")
     }
