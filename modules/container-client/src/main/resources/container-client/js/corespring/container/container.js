@@ -63,8 +63,8 @@ module.factory('CorespringContainer', function () {
       container.data = data;
       dataLoaded = true;
 
-      _.each(container.components, initializeComponent);
-      _.each(container.configPanels, initializeComponent);
+      if (container.components) $.each(container.components, initializeComponent);
+      if (container.configPanels) $.each(container.configPanels, initializeComponent);
     };
 
     container.getAnswers = function () {
