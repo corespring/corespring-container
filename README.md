@@ -23,6 +23,8 @@ These tools should be on your `PATH`:
 *  CONTAINER_S3_KEY - mandatory - Amazon s3 key
 *  CONTAINER_S3_SECRET - mandatory - Amazon s3 secret
 *  CONTAINER_COMPONENTS_PATH - optional - the path to the components library
+  
+The s3 bucket is set to: corespring-container-test-bucket
 
 ## Seed the db if you need to...
 Install npm packages
