@@ -19,6 +19,7 @@
         <a class="navbar-brand">Editor</a>
       </div>
         <span class="btn btn-primary" ng-click="save()">Save</span>
+        <span class="btn btn-primary" file-uploader fu-url="getUploadUrl()" fu-mode="raw">Upload image</span>
     </div>
   </div>
 
@@ -48,6 +49,7 @@
 <script src="bower_components/lodash/dist/lodash.js"></script>
 <script src="bower_components/headjs/dist/head.js"></script>
 <script src="bower_components/angular-ui-sortable/src/sortable.js"></script>
+<script src="bower_components/corespring-ng-components/build/corespring-ng-components.js"></script>
 
 <!-- build:js js/player.js -->
 <script src="js/common/directives/_declaration.js"></script>
@@ -85,7 +87,8 @@
           'corespring-editor.directives',
           'corespring.container',
           'ui.sortable',
-          'ngDragDrop'
+          'ngDragDrop',
+          'cs.directives'
         ].concat(data.angular.dependencies);
 
         angular.module("corespring-editor", playerDeps);

@@ -15,6 +15,7 @@ object Build extends sbt.Build {
     val logback = "ch.qos.logback" % "logback-classic" % "1.0.13"
     val rhinoJs = "org.mozilla" % "rhino" % "1.7R4"
     val casbah = "org.mongodb" %% "casbah" % "2.6.3"
+    val playS3 = "org.corespring" %% "play-s3" % "0.1-bea81d9"
   }
 
   object Resolvers {
@@ -51,7 +52,7 @@ object Build extends sbt.Build {
 
   val shell = builder.playApp("shell", Some(".")).settings(
     resolvers ++= Resolvers.all,
-    libraryDependencies ++= Seq(casbah),
+    libraryDependencies ++= Seq(casbah, playS3),
     // Start grunt on play run
     playOnStarted <+= baseDirectory { base =>
       (address: InetSocketAddress) => {

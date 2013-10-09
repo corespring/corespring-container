@@ -16,6 +16,7 @@ GET        /:sessionId/player-:resource.:suffix     @org.corespring.container.cl
 # Hooks for the editor: config, services + components
 GET        /:itemId/editor-:resource.:suffix       @org.corespring.container.client.controllers.hooks.EditorHooks.resource(resource:String, suffix:String,itemId:String)
 
+POST       /:itemId/*file                          @org.corespring.container.client.controllers.Assets.upload(itemId, file)
 # Otherwise just serve up the client assets
-GET        /:id/*file                              org.corespring.container.client.controllers.Assets.at(id:String, path="/container-client", file)
+GET        /:id/*file                              @org.corespring.container.client.controllers.Assets.at(id:String, path="/container-client", file)
 

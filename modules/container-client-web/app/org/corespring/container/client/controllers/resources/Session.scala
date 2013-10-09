@@ -59,7 +59,7 @@ trait Session extends Controller {
           val itemJson: JsObject = (request.everything \ "item").as[JsObject]
           val isFinished: Boolean = (sessionJson \ "isFinished").asOpt[Boolean].getOrElse(false)
           val currentRemainingAttempts: Int = (sessionJson \ "remainingAttempts").asOpt[Int].getOrElse(
-            (sessionJson \ "maxNoOfAttempts").as[Int]
+            (sessionJson \ "settings" \ "maxNoOfAttempts").as[Int]
           )
 
           def output(session: JsValue, isFinished: Boolean) = {

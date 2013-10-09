@@ -24,6 +24,15 @@ var controller = function ($scope, $compile, $http, $timeout, EditorServices, Co
     CorespringContainer.initialize(data);
   };
 
+  $scope.getUploadUrl = function(file){
+    console.log(arguments);
+    return file.name;
+    //return "??";
+  };
+
+  $scope.$on('fileSizeGreaterThanMax', function(event){
+     console.warn("file too big");
+  });
 
   $scope.selectComponent = function (id) {
     var key, value, _ref, _results;
