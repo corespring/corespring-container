@@ -79,7 +79,8 @@ object Build extends sbt.Build {
       val clientRoot : File = baseDir/ "modules" / "container-client"
       s.log.info("[running bower install] on " + clientRoot )
       sbt.Process("bower install", clientRoot) !;
-      //sbt.Process("grunt build", clientRoot) !;
+      s.log.info("[compile less w/ grunt] on " + clientRoot )
+      sbt.Process("grunt less", clientRoot) !;
   }
 
   val shell = builder.playApp("shell", Some(".")).settings(
