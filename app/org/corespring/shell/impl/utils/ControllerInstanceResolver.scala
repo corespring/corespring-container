@@ -10,7 +10,7 @@ trait ControllerInstanceResolver extends GlobalSettings {
 
   def controllers : Seq[Controller]
 
-  lazy val logger = Logger("instance-resolver")
+  private lazy val logger = Logger("instance-resolver")
 
   override def getControllerInstance[A](controllerClass: Class[A]): A = {
 
