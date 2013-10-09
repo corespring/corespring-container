@@ -37,14 +37,16 @@ trait PlayerHooksImpl extends PlayerHooks {
 
     def createSessionForItem(itemId: String)(block: (SessionIdRequest[AnyContent]) => Result): Action[AnyContent] = Action{ request =>
 
-      val session = Json.obj(
+      val settings = Json.obj(
         "itemId" -> JsString(itemId),
         "maxNoOfAttempts" -> JsNumber(2),
         "showFeedback" -> JsBoolean(true),
-        "showCorrectResponse" -> JsBoolean(true),
-        "showUserResponse" -> JsBoolean(true),
+        "highlightCorrectResponse" -> JsBoolean(true),
+        "highlightUserResponse" -> JsBoolean(true),
         "isFinished" -> JsBoolean(false)
       )
+
+      val session = Json.obj("settings" -> settings)
 
       sessionService.create(session).map{ oid =>
         block(SessionIdRequest(oid.toString, request))

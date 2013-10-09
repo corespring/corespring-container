@@ -1,15 +1,26 @@
 @(itemId: String, url : String)
 <html>
   <head>
-
+          <!--
+    "maxNoOfAttempts").asOpt[Int].getOrElse(default.maxNoOfAttempts),
+    "highlightUserResponse").asOpt[Boolean].getOrElse(default.highlightUserResponse),
+    "highlightCorrectResponse").asOpt[Boolean].getOrElse(default.highlightCorrectResponse),
+    "showFeedback").asOpt[Boolean].getOrElse(default.showFeedback),
+    "allowEmptyResponses").asOpt[Boolean].getOrElse(default.allowEmptyResponses),
+    "submitCompleteMessage").asOpt[String].getOrElse(default.submitCompleteMessage),
+    "submitIncorrectMessage").asOpt[String].getOrElse(default.submitIncorrectMessage)))
+  -->
   </head>
   <body>
     <h1>Create session for item: @itemId </h1>
     <label>Max number of attempts?</label><input type="text" id="maxNoOfAttempts" value="2"><br>
     <label>Show Feedback?</label><input type="checkbox" id="showFeedback" checked><br>
-    <label>Show Correct Response?</label><input type="checkbox" id="showCorrectResponse" checked><br>
-    <label>Show User Response?</label><input type="checkbox" id="showUserResponse" checked><br>
-    <button id="button"> Create Session</button>
+      <label>Show Correct Response?</label><input type="checkbox" id="highlightCorrectResponse" checked><br>
+      <label>Show User Response?</label><input type="checkbox" id="highlightUserResponse" checked><br>
+      <label>Allow Empty Response?</label><input type="checkbox" id="allowEmptyResponses" checked><br>
+      <label>Submit Complete Message</label><input type="text" id="submitCompleteMessage"><br>
+      <label>Submit Incorrect Message</label><input type="text" id="submitIncorrectMessage"><br>
+      <button id="button"> Create Session</button>
   </body>
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
   <script type="text/javascript">
@@ -18,13 +29,15 @@
     $("#button" ).click(function(){
       var data = {}
       data.itemId = "@itemId";
-      data.maxNoOfAttempts = parseInt($("#maxNoOfAttempts" ).val());
-      data.showFeedback = $("#showFeedback").is(":checked");
-      data.showCorrectResponse = $("#showCorrectResponse").is(":checked");
-      data.showUserResponse = $("#showUserResponse").is(":checked");
+      data.settings = {
+        maxNoOfAttempts : parseInt( $("#maxNoOfAttempts").val ()),
+        showFeedback : $("#showFeedback").is(":checked"),
+        highlightCorrectResponse : $("#highlightCorrectResponse").is(":checked"),
+        highlightUserResponse : $("#highlightUserResponse").is (":checked"),
+        allowEmptyResponses : $("#allowEmptyResponses").is (":checked")
+      };
 
-
-      $.ajax({
+  $.ajax({
         type: 'POST',
         url: '@url',
         contentType: 'application/json; charset=utf-8',
