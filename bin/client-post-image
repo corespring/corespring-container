@@ -1,0 +1,15 @@
+#!/usr/bin/env ruby
+
+filepath = ARGV[0]
+raise "You need to specify a path" if filepath.nil?
+filename = File.basename(filepath)
+itemId = "522267c2554f43f858000001"
+
+raise "Can't find file" unless File.exists? filepath
+
+cmd = "curl -X POST --data-binary @#{filepath} http://localhost:9000/client/#{itemId}/#{filename}"
+puts "cmd:"
+puts cmd
+
+#`cmd`
+

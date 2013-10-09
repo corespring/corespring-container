@@ -12,7 +12,8 @@
     "bootstrap" : "latest",
     "lodash" : "latest",
     "headjs" : "latest",
-    "ckeditor": "https://github.com/eymengunay/ckeditor.git"
+    "ckeditor": "https://github.com/eymengunay/ckeditor.git",
+    "corespring-ng-components" : "https://github.com/corespring/corespring-ng-components.git"
   },
   "devDependencies": {
     "angular-mocks": "1.2.0-rc.2",

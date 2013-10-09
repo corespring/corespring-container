@@ -18,7 +18,8 @@ object Global extends WithFilters(ReloadComponentsFilter) with ControllerInstanc
   private lazy val containerClient = new ContainerClientImplementation(
     new MongoService(db("items")),
     new MongoService(db("sessions")),
-    componentLoader.all)
+    componentLoader.all,
+    Play.current.configuration)
 
   private lazy val home = new Main {
     def sessionService: MongoService = new MongoService(db("sessions"))
