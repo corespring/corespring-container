@@ -1,8 +1,11 @@
 import java.net.InetSocketAddress
+import sbt.inc.Analysis
 import sbt.Keys._
 import sbt._
+import sbt.ScalaVersion
 import scala.Some
 import play.Project._
+import scala.Some
 
 object Build extends sbt.Build {
 
@@ -69,6 +72,16 @@ object Build extends sbt.Build {
   val containerClientWeb = builder.playApp("container-client-web")
     .dependsOn(componentModel, containerClient)
 
+  val buildClient = TaskKey[Unit]("build-client", "runs client installation commands")
+
+  val buildClientTask = buildClient <<= (baseDirectory, streams) map {
+    (baseDir, s) =>
+      val clientRoot : File = baseDir/ "modules" / "container-client"
+      s.log.info("[running bower install] on " + clientRoot )
+      sbt.Process("bower install", clientRoot) !;
+      //sbt.Process("grunt build", clientRoot) !;
+  }
+
   val shell = builder.playApp("shell", Some(".")).settings(
     resolvers ++= Resolvers.all,
     libraryDependencies ++= Seq(casbah, playS3),
@@ -93,7 +106,9 @@ object Build extends sbt.Build {
         "bower",
         "npm"
       ).map(cmd(_, (base/"modules"/"container-client")))
-    }
+    },
+    playStage <<= playStageTask.dependsOn(buildClient),
+    buildClientTask
   ).dependsOn(containerClientWeb, componentLoader)
     .aggregate(containerClientWeb, componentLoader, coffeescriptCompiler, componentModel, containerClient)
 
