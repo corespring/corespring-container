@@ -24,16 +24,21 @@
           aparent.insertBefore(b, asibling);
         }
 
+        var nodeMap = {};
         node.find("*[id]").each(function (n) {
-          console.log();
+          var nid = $(this).attr('id');
+          nodeMap[nid] = $(this).clone();
+        });
+
+        var idx = 0;
+        node.find("*[id]").each(function (n) {
           var nid = $(this).attr('id');
           if (nid != $scope.nodeSeq[idx]) {
-            var otherNode = node.find("[id='" + $scope.nodeSeq[idx] + "']").first();
-            swapNodes($(this)[0], otherNode[0]);
-            return false;
+            $(this).replaceWith(nodeMap[$scope.nodeSeq[idx]]);
           }
           idx++;
         });
+
         $scope.model.xhtml = "<div>" + node.html() + "</div>";
       }, true);
       return;

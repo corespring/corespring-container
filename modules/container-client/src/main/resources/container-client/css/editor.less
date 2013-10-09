@@ -1,3 +1,5 @@
+@editor-height: 500px;
+
 html,
 body {
   margin: 0;
@@ -34,6 +36,7 @@ h1 {
 .edit {
   width: 100%;
 }
+
 .edit td {
   vertical-align: top;
 }
@@ -51,7 +54,7 @@ h1 {
   float: left;
 }
 
-.mixin-cr(@radius: 5px){
+.mixin-cr(@radius: 5px) {
   -webkit-border-top-left-radius: @radius;
   -webkit-border-top-right-radius: @radius;
   -moz-border-radius-topleft: @radius;
@@ -59,10 +62,11 @@ h1 {
   border-top-left-radius: @radius;
   border-top-right-radius: @radius;
 }
-.mixin-bs(@opacity: 0.15){
-  -webkit-box-shadow: 4px 4px 5px rgba(50, 50, 50, @opacity );
-  -moz-box-shadow:    4px 4px 5px rgba(50, 50, 50, @opacity );
-  box-shadow:         4px 4px 5px rgba(50, 50, 50, @opacity );
+
+.mixin-bs(@opacity: 0.15) {
+  -webkit-box-shadow: 4px 4px 5px rgba(50, 50, 50, @opacity);
+  -moz-box-shadow: 4px 4px 5px rgba(50, 50, 50, @opacity);
+  box-shadow: 4px 4px 5px rgba(50, 50, 50, @opacity);
 }
 
 .component {
@@ -72,8 +76,7 @@ h1 {
 
   margin-bottom: 10px;
 
-
-  .contents{
+  .contents {
     background-color: lighten(@blue, 20%);
     margin-top: 0px;
     padding-top: 5px;
@@ -82,12 +85,11 @@ h1 {
     padding-bottom: 5px;
   }
 
-
   margin-left: 5px;
   margin-right: 5px;
   border: 1px solid darken(@blue, 10%);
 
-  .header-bar{
+  .header-bar {
     width: 100%;
     height: 20px;
     display: inline-table;
@@ -95,18 +97,18 @@ h1 {
     font-weight: bold;
     background-color: lighten(@blue, 5%);
 
-    .title{
+    .title {
       display: block;
       float: left;
     }
-    .buttons{
+    .buttons {
       float: right;
-      .remove, .info{
+      .remove, .info {
         padding-left: 5px;
         float: right;
         display: block;
         cursor: pointer;
-        &:hover{
+        &:hover {
           opacity: 0.6;
         }
       }
@@ -127,14 +129,14 @@ h1 {
   height: 100%;
 }
 
-.root{
-  position: absolute;
+.root {
   width: 100%;
-  height: 100%;
+  height: @editor-height;
+  overflow: hidden;
 
-  .flex-box{
+  .flex-box {
     display: flex;
-    height: 100%;
+    overflow: auto;
 
     .float-button {
       position: absolute;
@@ -143,23 +145,42 @@ h1 {
     }
   }
 
-  .navbar{
+  .navbar {
     margin-bottom: 0px;
   }
   .structure-view, .xml-view, .json-view, .config, .inline-preview {
     flex: 0;
-    height: 100%;
-    position:relative;
-    float:left;
+    position: relative;
+    height: @editor-height;
+    float: left;
   }
 
   .structure-view {
     flex: 1;
     width: 200px;
+    overflow: scroll;
+
+    ul {
+      list-style: none;
+      padding-left: 5px;
+      padding-right: 5px;
+    }
+
+    li {
+      list-style: none;
+      margin-bottom: 5px;
+    }
+
+    .component-thumbnail {
+      padding: 10px;
+      border: 1px solid #000000;
+      border-radius: 4px;
+    }
 
     .component-thumbnail:hover {
       color: slateblue;
-      cursor: hand; cursor: pointer;
+      cursor: hand;
+      cursor: pointer;
     }
 
     .component-thumbnail.active {
@@ -167,37 +188,35 @@ h1 {
     }
   }
 
-  .xml-view{
+  .xml-view {
     flex: 2;
   }
 
-  .inline-preview{
+  .inline-preview {
     width: 100%;
-    height: 100%;
+    overflow: scroll;
     flex: 2;
     padding: 5px;
   }
 
-
-  .config{
+  .config {
     flex: 2;
     border-left: solid 1px darken(white, 10%);
     background-color: darken(white, 5%);
+    overflow: scroll;
 
-
-    .config-chrome{
+    .config-chrome {
       background-color: darken(white, 4%);
-      .title{
+      .title {
         background-color: darken(white, 40%);
         padding: 5px;
       }
-      .holder{
+      .holder {
         padding: 5px;
       }
     }
   }
 }
-
 
 .palette {
 
