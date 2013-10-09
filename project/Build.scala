@@ -80,9 +80,11 @@ object Build extends sbt.Build {
       sbt.Process("grunt less", clientRoot) !;
   }
 
-  lazy val containerClient = builder.lib("container-client").settings(
+  lazy val containerClient = builder.lib("container-client")
+    .settings(
     buildClientTask,
-    (compile in Compile) <<= (compile in Compile) dependsOn buildClient
+    //This task is called by the play stage task
+    (packagedArtifacts) <<= (packagedArtifacts) dependsOn buildClient
   )
 
   val containerClientWeb = builder.playApp("container-client-web")
@@ -98,7 +100,6 @@ object Build extends sbt.Build {
         Grunt.process = Some(Process("grunt run", (base/ "modules"/"container-client")).run)
       }: Unit
     },
-
     // Stop grunt when play run stops
     playOnStopped += {
       () => {
