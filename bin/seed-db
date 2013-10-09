@@ -7,6 +7,8 @@ _ = require('lodash')
 ObjectID = require('mongodb').ObjectID
 path = require('path')
 
+mongoUri = process.env["CONTAINER_MONGO_URI"] || "mongodb://localhost/corespring-container"
+
 seed = (collection, folder, next) ->
   collection.remove {}, ->
 
@@ -28,7 +30,7 @@ seed = (collection, folder, next) ->
           console.dir(results)
           next(err)
 
-MongoClient.connect "mongodb://localhost/corespring-container", (err, db) ->
+MongoClient.connect mongoUri, (err, db) ->
 
   if err
     throw err

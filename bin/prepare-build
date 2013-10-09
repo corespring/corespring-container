@@ -1,0 +1,15 @@
+#!/usr/bin/env ruby
+
+base_dir = Dir.pwd
+
+Dir.chdir "modules/container-client"
+`bower install`
+
+Dir.chdir base_dir
+
+Dir.chdir "bin"
+`npm install`
+
+Dir.chdir base_dir
+
+`./bin/run`
