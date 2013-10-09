@@ -20,9 +20,11 @@ object Build extends sbt.Build {
 
   object Resolvers {
 
+    val corespringSnapshots = "Corespring Artifactory Snapshots" at "http://repository.corespring.org/artifactory/ivy-snapshots"
+    val corespringReleases = "Corespring Artifactory Releases" at "http://repository.corespring.org/artifactory/ivy-releases"
     val typesafeReleases = "typesafe releases" at "http://repo.typesafe.com/typesafe/releases/"
     val typesafeSnapshots = "typesafe snapshots" at "http://repo.typesafe.com/typesafe/snapshots/"
-    val all = Seq(typesafeReleases, typesafeSnapshots)
+    val all = Seq(corespringSnapshots, corespringReleases, typesafeReleases, typesafeSnapshots)
   }
 
 
