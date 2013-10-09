@@ -1,4 +1,4 @@
-angular.module('corespring-editor.directives').directive('ngBindHtmlUnsafe', ['$sce', function($sce){
+angular.module('corespring-common.directives').directive('ngBindHtmlUnsafe', ['$sce', function($sce){
   return {
     scope: {
       ngBindHtmlUnsafe: '=',

@@ -34,6 +34,8 @@
     <script src="bower_components/headjs/dist/head.js"></script>
 
     <!-- build:js js/player.js -->
+    <script src="js/common/directives/_declaration.js"></script>
+    <script src="js/common/directives/ng-bind-html-unsafe.js"></script>
     <script src="js/render/controllers/_declaration.js"></script>
     <script src="js/render/controllers/root.js"></script>
     <script src="js/corespring/container/container.js"></script>
@@ -60,6 +62,7 @@
             $("#player-body").html(data.xhtml);
 
             var playerDeps = [
+              'corespring-common.directives',
               'corespring-player.controllers',
               'corespring-player.directives',
               'corespring.container',
