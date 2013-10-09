@@ -67,22 +67,26 @@ object Build extends sbt.Build {
       libraryDependencies ++= Seq(logback, specs2)
   ).dependsOn(componentModel, coffeescriptCompiler)
 
-  lazy val containerClient = builder.lib("container-client")
-
-  val containerClientWeb = builder.playApp("container-client-web")
-    .dependsOn(componentModel, containerClient)
 
   val buildClient = TaskKey[Unit]("build-client", "runs client installation commands")
 
   val buildClientTask = buildClient <<= (baseDirectory, streams) map {
     (baseDir, s) =>
-      val clientRoot : File = baseDir/ "modules" / "container-client"
+      val clientRoot : File = baseDir
       s.log.info("[running bower install] on " + clientRoot )
       sbt.Process("bower install", clientRoot) !;
       s.log.info("[compile less w/ grunt] on " + clientRoot )
       sbt.Process("npm install", clientRoot) !;
       sbt.Process("grunt less", clientRoot) !;
   }
+
+  lazy val containerClient = builder.lib("container-client").settings(
+    buildClientTask,
+    (compile in Compile) <<= (compile in Compile) dependsOn buildClient
+  )
+
+  val containerClientWeb = builder.playApp("container-client-web")
+    .dependsOn(componentModel, containerClient)
 
   val shell = builder.playApp("shell", Some(".")).settings(
     resolvers ++= Resolvers.all,
@@ -108,9 +112,7 @@ object Build extends sbt.Build {
         "bower",
         "npm"
       ).map(cmd(_, (base/"modules"/"container-client")))
-    },
-    playStage <<= playStageTask.dependsOn(buildClient),
-    buildClientTask
+    }
   ).dependsOn(containerClientWeb, componentLoader)
     .aggregate(containerClientWeb, componentLoader, coffeescriptCompiler, componentModel, containerClient)
 
