@@ -9,6 +9,8 @@ path = require('path')
 
 mongoUri = process.env["CONTAINER_MONGO_URI"] || "mongodb://localhost/corespring-container"
 
+console.log "mongoUri: #{mongoUri}"
+
 seed = (collection, folder, next) ->
   collection.remove {}, ->
 
