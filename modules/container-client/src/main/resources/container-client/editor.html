@@ -30,7 +30,7 @@
     </config-pane>
 
     <!--<inline-preview class="inline-preview" ng-model="selectedComponent"></inline-preview>-->
-    <div id="player-body" class="inline-preview"></div>
+    <div inline-preview class="inline-preview"></div>
   </div>
 
 </div>
@@ -48,16 +48,19 @@
 <script src="bower_components/angular/angular.js"></script>
 <script src="bower_components/lodash/dist/lodash.js"></script>
 <script src="bower_components/headjs/dist/head.js"></script>
+<script src="bower_components/angular-ui-sortable/src/sortable.js"></script>
 <script src="bower_components/corespring-ng-components/build/corespring-ng-components.js"></script>
 
 <!-- build:js js/player.js -->
+<script src="js/common/directives/_declaration.js"></script>
+<script src="js/common/directives/ng-bind-html-unsafe.js"></script>
+
 <script src="js/editor/controllers/_declaration.js"></script>
 <script src="js/editor/controllers/root.js"></script>
 <script src="js/editor/directives/_declaration.js"></script>
 <script src="js/editor/directives/structure-view.js"></script>
 <script src="js/editor/directives/config-pane.js"></script>
 <script src="js/editor/directives/inline-preview.js"></script>
-<script src="js/editor/directives/ng-bind-html-unsafe.js"></script>
 <script src="js/corespring/container/container.js"></script>
 <script src="js/render/directives/_declaration.js"></script>
 <!-- endbuild -->
@@ -78,12 +81,12 @@
 
       var allScriptsAreLoaded = function () {
 
-        $("#player-body").html(data.xhtml);
-
         var playerDeps = [
+          'corespring-common.directives',
           'corespring-editor.controllers',
           'corespring-editor.directives',
           'corespring.container',
+          'ui.sortable',
           'ngDragDrop',
           'cs.directives'
         ].concat(data.angular.dependencies);
