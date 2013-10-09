@@ -18,8 +18,11 @@ These tools should be on your `PATH`:
 
 ## Run
 
-You'll need to have access to the corespring components library. Place this on your file system and you can then point to it using: 
-`CONTAINER_COMPONENTS_PATH` env var.
+### ENV VARS
+
+*  CONTAINER_S3_KEY - mandatory - Amazon s3 key
+*  CONTAINER_S3_SECRET - mandatory - Amazon s3 secret
+*  CONTAINER_COMPONENTS_PATH - optional - the path to the components library
 
 ## Seed the db if you need to...
 Install npm packages
