@@ -25,6 +25,23 @@ object Build extends sbt.Build {
     val all = Seq(typesafeReleases, typesafeSnapshots)
   }
 
+
+  val cred = {
+    val envCredentialsPath = System.getenv("CREDENTIALS_PATH")
+    val path = if (envCredentialsPath != null) envCredentialsPath else Seq(Path.userHome / ".ivy2" / ".credentials").mkString
+    val f: File = file(path)
+    if (f.exists()) {
+      println("[credentials] using credentials file")
+      Credentials(f)
+    } else {
+      //https://devcenter.heroku.com/articles/labs-user-env-compile
+      def repoVar(s: String) = System.getenv("ARTIFACTORY_" + s)
+      val args = Seq("REALM", "HOST", "USER", "PASS").map(repoVar)
+      println("[credentials] args: " + args)
+      Credentials(args(0), args(1), args(2), args(3))
+    }
+  }
+
   import Dependencies._
 
   val builder = new Builders(org, appVersion, ScalaVersion)
@@ -53,6 +70,7 @@ object Build extends sbt.Build {
   val shell = builder.playApp("shell", Some(".")).settings(
     resolvers ++= Resolvers.all,
     libraryDependencies ++= Seq(casbah, playS3),
+    credentials += cred,
     // Start grunt on play run
     playOnStarted <+= baseDirectory { base =>
       (address: InetSocketAddress) => {
