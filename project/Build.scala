@@ -80,6 +80,7 @@ object Build extends sbt.Build {
       s.log.info("[running bower install] on " + clientRoot )
       sbt.Process("bower install", clientRoot) !;
       s.log.info("[compile less w/ grunt] on " + clientRoot )
+      sbt.Process("npm install", clientRoot) !;
       sbt.Process("grunt less", clientRoot) !;
   }
 
