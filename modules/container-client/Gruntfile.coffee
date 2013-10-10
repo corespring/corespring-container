@@ -2,7 +2,7 @@ module.exports = (grunt) ->
 
   commonConfig =
     app: 'src/main/resources/container-client'
-    dist: 'src/main/resources/container-client'
+    dist: 'target/scala-2.10/classes/container-client'
 
   config =
     pkg: grunt.file.readJSON('package.json')
@@ -14,7 +14,7 @@ module.exports = (grunt) ->
     less:
       development:
         expand: true
-        cwd: '<%= common.dist %>/css'
+        cwd: '<%= common.app %>/css'
         src: '*.less'
         dest: '<%= common.dist %>/css/'
         ext: '.css'

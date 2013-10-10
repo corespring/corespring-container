@@ -19,7 +19,7 @@ Utils.run_cmd "rm -fr target/staged/container-client_2.10-0.0.1.jar"
 Utils.run_cmd "rm -fr container-client"
 Utils.run_cmd "rm -fr modules/container-client/src/main/resources/container-client/bower_components"
 Utils.run_cmd "rm -fr modules/container-client/src/main/resources/container-client/css/*.css"
-Utils.run_cmd "play clean grunt stage"
+Utils.run_cmd "play clean stage"
 Utils.run_cmd "unzip target/staged/container-client_2.10-0.0.1.jar"
 
 raise "No bower componenents" unless File.exists?("container-client/bower_components")

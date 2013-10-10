@@ -82,7 +82,6 @@ object Build extends sbt.Build {
 
   lazy val containerClient = builder.lib("container-client")
     .settings(
-    sbt.Keys.fork in packagedArtifacts := false,
     buildClientTask,
     //This task is called by the play stage task
     (packagedArtifacts) <<= (packagedArtifacts) dependsOn buildClient
@@ -96,7 +95,6 @@ object Build extends sbt.Build {
     resolvers ++= Resolvers.all,
     libraryDependencies ++= Seq(casbah, playS3),
     credentials += cred,
-    sbt.Keys.fork in packagedArtifacts := false,
     // Start grunt on play run
     playOnStarted <+= baseDirectory { base =>
       (address: InetSocketAddress) => {
