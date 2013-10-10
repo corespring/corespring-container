@@ -30,7 +30,7 @@
           nodeMap[nid] = $(this).clone();
         });
 
-        var idx = 0;
+        idx = 0;
         node.find("*[id]").each(function (n) {
           var nid = $(this).attr('id');
           if (nid != $scope.nodeSeq[idx]) {

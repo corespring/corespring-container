@@ -11,6 +11,9 @@ module.exports = (grunt) ->
       less:
         files: ['<%= common.app %>/**/*.less']
         tasks: ['less']
+      js:
+        files: ['<%= common.app %>/js/**/*.js']
+        tasks: ['jshint:main']
     less:
       development:
         expand: true
@@ -27,6 +30,11 @@ module.exports = (grunt) ->
       bower:
         command: 'bower install'
 
+    jshint:
+      jshintrc: '.jshintrc'
+      main: ['<%= common.app %>/js/**/*.js']
+
+
 
   grunt.initConfig(config)
 
@@ -37,7 +45,8 @@ module.exports = (grunt) ->
     'grunt-contrib-concat',
     'grunt-contrib-clean',
     'grunt-contrib-less',
-    'grunt-contrib-watch'
+    'grunt-contrib-watch',
+    'grunt-contrib-jshint'
   ]
 
   grunt.loadNpmTasks(t) for t in npmTasks

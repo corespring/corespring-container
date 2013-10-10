@@ -5,7 +5,7 @@ var loadAngular = function (n) {
   catch (e) {
     return angular.module(n, []);
   }
-}
+};
 
 var module = loadAngular('corespring.container');
 
@@ -124,7 +124,7 @@ module.factory('CorespringContainer', function () {
         } else {
           console.warn("couldn't set a response for id: ", id);
         }
-      }
+      };
       $.each(container.components, _updateResponse);
     };
 

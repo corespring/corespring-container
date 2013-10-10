@@ -7,11 +7,11 @@ var controller = function ($scope, $compile, $http, $timeout, PlayerServices, Co
 
   $scope.onSessionSaved = function (data) {
 
-    if (data.responses != null) {
+    if (data.responses !== null) {
       CorespringContainer.updateResponses(data.responses);
     }
 
-    if (data.session != null) {
+    if (data.session !== null) {
       CorespringContainer.updateSession(data.session);
     }
 
@@ -39,13 +39,13 @@ var controller = function ($scope, $compile, $http, $timeout, PlayerServices, Co
   $scope.onSessionLoaded = function (data) {
     $scope.model = data;
     CorespringContainer.initialize(data);
-    if (data.responses != null) {
+    if (data.responses !== null) {
       CorespringContainer.updateResponses(data.responses);
     }
-    if (data.session != null) {
+    if (data.session !== null) {
       CorespringContainer.updateSession(data.session);
     }
-    if (data.session != null) {
+    if (data.session !== null) {
       $scope.session = data.session;
     }
   };

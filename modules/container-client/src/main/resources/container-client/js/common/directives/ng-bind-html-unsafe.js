@@ -7,7 +7,7 @@ angular.module('corespring-common.directives').directive('ngBindHtmlUnsafe', ['$
     link: function($scope, iElm, iAttrs, controller) {
       $scope.updateView = function() {
         $scope.trustedHtml = $sce.trustAsHtml($scope.ngBindHtmlUnsafe);
-      }
+      };
 
       $scope.$watch('ngBindHtmlUnsafe', function(newVal, oldVal) {
         $scope.updateView(newVal);

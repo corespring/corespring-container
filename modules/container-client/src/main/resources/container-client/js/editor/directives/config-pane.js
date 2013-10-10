@@ -5,7 +5,7 @@ var link;
 link = function ($compile) {
   return function ($scope, $elem, attrs) {
     console.log("config pane....");
-    return $scope.$watch(attrs['ngModel'], function (data) {
+    $scope.$watch(attrs.ngModel, function (data) {
       var $div, tmpl;
       if (!data) {
         return;
