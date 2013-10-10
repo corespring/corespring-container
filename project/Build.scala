@@ -82,18 +82,21 @@ object Build extends sbt.Build {
 
   lazy val containerClient = builder.lib("container-client")
     .settings(
+    sbt.Keys.fork in packagedArtifacts := false,
     buildClientTask,
     //This task is called by the play stage task
     (packagedArtifacts) <<= (packagedArtifacts) dependsOn buildClient
   )
 
-  val containerClientWeb = builder.playApp("container-client-web")
-    .dependsOn(componentModel, containerClient)
+  val containerClientWeb = builder.playApp("container-client-web").settings(
+    sources in doc in Compile := List()
+  ).dependsOn(componentModel, containerClient )
 
   val shell = builder.playApp("shell", Some(".")).settings(
     resolvers ++= Resolvers.all,
     libraryDependencies ++= Seq(casbah, playS3),
     credentials += cred,
+    sbt.Keys.fork in packagedArtifacts := false,
     // Start grunt on play run
     playOnStarted <+= baseDirectory { base =>
       (address: InetSocketAddress) => {
@@ -115,7 +118,7 @@ object Build extends sbt.Build {
       ).map(cmd(_, (base/"modules"/"container-client")))
     }
   ).dependsOn(containerClientWeb, componentLoader)
-    .aggregate(containerClientWeb, componentLoader, coffeescriptCompiler, componentModel, containerClient)
+    .aggregate(containerClientWeb, componentLoader, containerClient, coffeescriptCompiler, componentModel)
 
   private def cmd(name: String, base: File): Command = {
     Command.args(name, "<" + name + "-command>") { (state, args) =>

@@ -23,9 +23,15 @@ module.exports = (grunt) ->
     clean:
       main: ["<%= common.dist %>/css/*.css"]
 
+    shell:
+      bower:
+        command: 'bower install'
+
+
   grunt.initConfig(config)
 
   npmTasks = [
+    'grunt-shell',
     'grunt-contrib-copy',
     'grunt-contrib-uglify',
     'grunt-contrib-concat',
@@ -36,3 +42,5 @@ module.exports = (grunt) ->
 
   grunt.loadNpmTasks(t) for t in npmTasks
   grunt.registerTask('run', ['less', 'watch'])
+
+  grunt.registerTask('default', ['shell:bower','less'])

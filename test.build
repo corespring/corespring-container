@@ -1,0 +1,29 @@
+#!/usr/bin/env ruby
+
+class Utils
+
+  def self.run_cmd(cmd)
+    IO.popen(cmd) do |io|
+      while line = io.gets
+        # the heroku-helper adds this to reset the ansi command - strip it
+        cleaned = line.chomp! #.gsub("[0m", "")
+        puts "#{cleaned}" unless cleaned == nil or cleaned.empty?
+      end
+        io.close
+        raise "An error occured" if $?.to_i != 0
+    end
+  end
+end
+
+Utils.run_cmd "rm -fr target/staged/container-client_2.10-0.0.1.jar"
+Utils.run_cmd "rm -fr container-client"
+Utils.run_cmd "rm -fr modules/container-client/src/main/resources/container-client/bower_components"
+Utils.run_cmd "rm -fr modules/container-client/src/main/resources/container-client/css/*.css"
+Utils.run_cmd "play clean grunt stage"
+Utils.run_cmd "unzip target/staged/container-client_2.10-0.0.1.jar"
+
+raise "No bower componenents" unless File.exists?("container-client/bower_components")
+
+raise "No css" unless File.exists? "container-client/css/app.css"
+
+
