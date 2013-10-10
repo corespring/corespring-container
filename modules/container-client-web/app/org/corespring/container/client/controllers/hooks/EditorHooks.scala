@@ -4,6 +4,7 @@ import org.corespring.container.client.actions.PlayerRequest
 import org.corespring.container.client.views.txt.js.{ComponentWrapper, EditorServices}
 import play.api.Logger
 import play.api.mvc.{AnyContent, Action}
+import play.api.libs.json.Json
 
 trait EditorHooks extends BaseHooks {
 
@@ -15,7 +16,12 @@ trait EditorHooks extends BaseHooks {
     request: PlayerRequest[AnyContent] =>
       log.debug(s"load editor services: $itemId")
       import org.corespring.container.client.controllers.resources.routes._
-      Ok(EditorServices(ngModule, Item.load(itemId), Item.save(itemId))).as("text/javascript")
+
+      val componentSet = Json.arr(
+        Json.obj("name" -> "one", "icon" -> "icon/iconOne.png", "componentType" -> "corespring-single-choice")
+      )
+
+      Ok(EditorServices(ngModule, Item.load(itemId), Item.save(itemId), componentSet)).as("text/javascript")
   }
 
   override def componentsJs(itemId:String) : Action[AnyContent] = builder.loadComponents(itemId) {

@@ -19,6 +19,14 @@ var controller = function ($scope, $compile, $http, $timeout, EditorServices, Co
     console.warn("Error loading item");
   };
 
+  $scope.onComponentsLoaded = function(componentSet){
+    $scope.componentSet = componentSet;
+  };
+
+  $scope.onComponentsLoadError = function(error){
+    console.warn("Error loading components");
+  };
+
   $scope.onItemLoaded = function (data) {
     $scope.model = data.item;
     CorespringContainer.initialize(data);
@@ -54,6 +62,7 @@ var controller = function ($scope, $compile, $http, $timeout, EditorServices, Co
   };
 
   EditorServices.load($scope.onItemLoaded, $scope.onItemLoadError);
+  EditorServices.loadComponents($scope.onComponentsLoaded, $scope.onComponentsLoadError);
 };
 
 angular.module('corespring-editor.controllers').controller('Root', ['$scope', '$compile', '$http', '$timeout', 'EditorServices', 'CorespringContainer', controller]);

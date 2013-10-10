@@ -1,4 +1,4 @@
-@editor-height: 500px;
+@editor-height: 100%;
 
 html,
 body {
@@ -7,6 +7,11 @@ body {
 }
 
 body {
+  position: absolute;
+  top: 0px;
+  bottom: 0px;
+  left: 0px;
+  right: 0px;
 }
 
 body > header {
@@ -131,11 +136,12 @@ h1 {
 
 .root {
   width: 100%;
-  height: @editor-height;
+  height: 100%;
   overflow: hidden;
 
   .flex-box {
     display: flex;
+    height: 100%;
     overflow: auto;
 
     .float-button {
