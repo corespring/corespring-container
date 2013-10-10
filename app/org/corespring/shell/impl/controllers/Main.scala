@@ -25,7 +25,7 @@ trait Main extends Controller {
           val name = (json \ "metadata" \ "title").as[String]
           val id = (json \ "_id" \ "$oid").as[String]
           val playerUrl = routes.Main.createSessionPage(id).url
-          val editorUrl = s"/client/${id}/editor.html"
+          val editorUrl = s"/client/editor/${id}/index.html"
           (name, id, playerUrl, editorUrl)
       }
       logger.debug(items.mkString(","))
@@ -52,7 +52,7 @@ trait Main extends Controller {
 
       result.map {
         oid =>
-          Ok(JsObject(Seq("url" -> JsString(s"/client/${oid.toString}/player.html"))))
+          Ok(JsObject(Seq("url" -> JsString(s"/client/player/${oid.toString}/index.html"))))
       }.getOrElse {
         logger.debug("Can't create the session")
         BadRequest("Create session - where's the body?")

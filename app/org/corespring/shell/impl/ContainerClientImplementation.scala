@@ -43,6 +43,8 @@ class ContainerClientImplementation(
 
     //TODO: Need to look at a way of pre-validating before we upload - look at the predicate?
     def uploadBodyParser(id: String, file: String): BodyParser[Int] = playS3.upload(bucket, s"$id/$file", (rh) => None)
+
+    def getItemId(sessionId: String): Option[String] = sessionServiceIn.load(sessionId).map{ json => (json \ "itemId").as[String] }
   }
 
   private lazy val playerHooks = new PlayerHooksImpl {

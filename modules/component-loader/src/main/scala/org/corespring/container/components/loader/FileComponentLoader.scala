@@ -12,6 +12,7 @@ class FileComponentLoader(paths: Seq[String]) extends ComponentLoader {
 
   private var loadedComponents : Seq[Component] = Seq.empty
 
+  //TODO: This is only to support dev mode - better name for this // alternatives?
   override def reload: Unit = {
     logger.debug(s"Re-Loading components from paths: $paths")
     loadedComponents = loadAllComponents(paths)

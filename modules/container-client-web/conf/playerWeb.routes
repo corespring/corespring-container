@@ -10,13 +10,15 @@ GET        /item/:itemId.json                      @org.corespring.container.cli
 PUT        /item/:itemId.json                      @org.corespring.container.client.controllers.resources.Item.save(itemId:String)
 
 GET        /item/:itemId/player                    @org.corespring.container.client.controllers.hooks.PlayerHooks.createSessionForItem(itemId:String)
+
 # Hooks for the player: config, services + components
-GET        /:sessionId/player-:resource.:suffix     @org.corespring.container.client.controllers.hooks.PlayerHooks.resource(resource:String, suffix:String, sessionId:String)
+GET        /player/:sessionId/index.html                   @org.corespring.container.client.controllers.Assets.session(sessionId, file = "player.html")
+GET        /player/:sessionId/player-:resource.:suffix     @org.corespring.container.client.controllers.hooks.PlayerHooks.resource(resource:String, suffix:String, sessionId:String)
+GET        /player/:sessionId/*file                        @org.corespring.container.client.controllers.Assets.session(sessionId:String, file)
 
 # Hooks for the editor: config, services + components
-GET        /:itemId/editor-:resource.:suffix       @org.corespring.container.client.controllers.hooks.EditorHooks.resource(resource:String, suffix:String,itemId:String)
-
-POST       /:itemId/*file                          @org.corespring.container.client.controllers.Assets.upload(itemId, file)
-# Otherwise just serve up the client assets
-GET        /:id/*file                              @org.corespring.container.client.controllers.Assets.at(id:String, path="/container-client", file)
+GET        /editor/:itemId/index.html                     @org.corespring.container.client.controllers.Assets.item(itemId:String, file = "editor.html")
+GET        /editor/:itemId/editor-:resource.:suffix       @org.corespring.container.client.controllers.hooks.EditorHooks.resource(resource:String, suffix:String,itemId:String)
+GET        /editor/:itemId/*file                          @org.corespring.container.client.controllers.Assets.item(itemId:String, file)
+POST       /editor/:itemId/*file                          @org.corespring.container.client.controllers.Assets.upload(itemId, file)
 
