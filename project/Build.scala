@@ -15,7 +15,8 @@ object Build extends sbt.Build {
 
   object Dependencies {
     val specs2 = "org.specs2" %% "specs2" % "2.2.2" % "test"
-    val logback = "ch.qos.logback" % "logback-classic" % "1.0.13"
+    val logbackClassic = "ch.qos.logback" % "logback-classic" % "1.0.7"
+    val logbackCore = "ch.qos.logback" % "logback-core" % "1.0.7"
     val rhinoJs = "org.mozilla" % "rhino" % "1.7R4"
     val casbah = "org.mongodb" %% "casbah" % "2.6.3"
     val playS3 = "org.corespring" %% "play-s3" % "0.1-bea81d9"
@@ -51,10 +52,6 @@ object Build extends sbt.Build {
 
   val builder = new Builders(org, appVersion, ScalaVersion)
 
-  lazy val coffeescriptCompiler = builder.lib("coffeescript-compiler").settings(
-      libraryDependencies ++= Seq(rhinoJs, specs2)
-  )
-
   //Note: This should be a lib - but I'm having an issue with conflicting play-json libs
   //So making it a play app for now
   lazy val componentModel = builder.playApp("component-model").settings(
@@ -64,8 +61,8 @@ object Build extends sbt.Build {
 
   lazy val componentLoader = builder.lib("component-loader")
     .settings(
-      libraryDependencies ++= Seq(logback, specs2)
-  ).dependsOn(componentModel, coffeescriptCompiler)
+      libraryDependencies ++= Seq(logbackClassic, specs2, rhinoJs)
+  ).dependsOn(componentModel)
 
 
   val buildClient = TaskKey[Unit]("build-client", "runs client installation commands")
@@ -116,7 +113,7 @@ object Build extends sbt.Build {
       ).map(cmd(_, (base/"modules"/"container-client")))
     }
   ).dependsOn(containerClientWeb, componentLoader)
-    .aggregate(containerClientWeb, componentLoader, containerClient, coffeescriptCompiler, componentModel)
+    .aggregate(containerClientWeb, componentLoader, containerClient, componentModel)
 
   private def cmd(name: String, base: File): Command = {
     Command.args(name, "<" + name + "-command>") { (state, args) =>

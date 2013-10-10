@@ -20,7 +20,7 @@ class ResponseProcessorImplTest extends Specification{
       val component = Component(
         "org",
         "name",
-        client = Client("", ""),
+        client = Client("", "", None),
         server = Server(respondJs),
         JsObject(Seq.empty),
         None
@@ -50,7 +50,7 @@ class ResponseProcessorImplTest extends Specification{
 
       val result = processor.respond(item, session)
 
-      (result \ "responses" \ "1" \ "correctness").as[String] === "incorrect"
+      (result \ "1" \ "correctness").as[String] === "incorrect"
 
     }
   }

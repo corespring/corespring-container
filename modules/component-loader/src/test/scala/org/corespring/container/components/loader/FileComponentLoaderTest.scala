@@ -9,14 +9,16 @@ class FileComponentLoaderTest extends Specification {
     "load all the components from the given file path" in {
       val path = "modules/component-loader/src/test/resources/org/corespring/container/components/loader/one"
       val loader = new FileComponentLoader(Seq(path))
+      loader.reload
       loader.all.length === 1
     }
 
     "load js from coffeescript the components from the given file path" in {
       val path = "modules/component-loader/src/test/resources/org/corespring/container/components/loader/two"
       val loader = new FileComponentLoader(Seq(path))
+      loader.reload
       loader.all.length === 1
-      loader.all(0).client.render.contains("console.log(\"render.coffee\")") === true
+      loader.all(0).client.render.contains("console.log(\"hello\")") === true
     }
   }
 

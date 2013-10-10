@@ -1,7 +1,6 @@
 package org.corespring.container.components.loader
 
 import java.io.File
-import org.corepsring.compilers.coffeescript.CoffeescriptCompiler
 import org.corespring.container.components.loader.exceptions.ComponentLoaderException
 import org.corespring.container.components.model.{Server, Client, Component}
 import org.slf4j.LoggerFactory
@@ -76,13 +75,12 @@ class FileComponentLoader(paths: Seq[String]) extends ComponentLoader {
   private def getJsFromFile(path: String): String = {
 
     def getJs(p: String) = load(p, (f) => scala.io.Source.fromFile(f).getLines.mkString("\n"))
-    def getJsFromCoffee(p: String) = load(p, (f) => CoffeescriptCompiler.compile(f, Seq("bare")) )
 
     def load(p: String, block: File => String) = {
       val f = new File(p)
       if (f.exists()) Some(block(f)) else None
     }
-    (getJs(path + ".js") orElse getJsFromCoffee(path + ".coffee")).getOrElse(throw new ComponentLoaderException(s"Can't find js or coffee here: $path"))
+    getJs(path + ".js").getOrElse(throw new ComponentLoaderException(s"Can't find js here: $path"))
   }
 
   private def loadServer(server: File): Server = if (!server.exists()) {

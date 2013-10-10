@@ -13,15 +13,15 @@ class DefaultOutcomeProcessorTest extends Specification{
 
       ("""{"components":{"3":{"weight":4}}}""", """{"3":{"score":1.0}}""") must GenerateOutcome("""
          {
-           "summary" : { "maxPoints" : 4, "points" : 4, "percentage" : 100 },
+           "summary" : { "maxPoints" : 4, "points" : 4.0, "percentage" : 100.0 },
            "components" : {
-             "3" : { "weight" : 4, "score" : 1, "weightedScore" : 4}
+             "3" : { "weight" : 4, "score" : 1.0, "weightedScore" : 4.0}
            }
          }
       """)
     }
 
-    "generate an outcome for one component" in {
+    "generate an outcome for two component" in {
 
       val item = """{
              "components": {

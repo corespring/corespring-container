@@ -2,15 +2,14 @@ package org.corespring.container.components.response
 
 import org.mozilla.javascript.tools.shell.Global
 import org.mozilla.javascript._
-import play.api.libs.json.{Json, JsObject, JsValue}
+import play.api.libs.json.{Json, JsValue}
 import org.slf4j.LoggerFactory
 import java.io.{InputStreamReader, Reader}
-import java.net.URL
 import scala.Some
 
 class ResponseGenerator(definition: String, question: JsValue, answer: JsValue, settings: JsValue) {
 
-  private val logger = LoggerFactory.getLogger("components.response")
+  private val logger =  LoggerFactory.getLogger("components.response")
 
   def wrapper(definition:String) =
     s"""
