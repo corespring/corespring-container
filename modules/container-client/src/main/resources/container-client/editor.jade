@@ -1,0 +1,73 @@
+extends layout
+
+block head
+  link(rel="stylesheet", href="css/editor.css")
+
+block content
+  .root(ng-controller="Root")
+    div
+      .nav.navbar.navbar-inverse.navbar-static-top(role="navigation")
+        .navbar-header
+          .navbar-brand Editor
+        span.btn.btn-primary(ng-click="save()") Save
+        span.btn.btn-primary(file-uploader, fu-url="getUploadUrl()", fu-mode="raw") Upload image
+
+    .flex-box
+      structure-view.structure-view
+      config-pane.config#config(ng-model="selectedComponent")
+      inline-preview.inline-preview
+
+block scripts
+
+  //build:js js/player.js
+  script(src="js/editor/controllers/_declaration.js")
+  script(src="js/editor/controllers/root.js")
+  script(src="js/editor/directives/_declaration.js")
+  script(src="js/editor/directives/structure-view.js")
+  script(src="js/editor/directives/config-pane.js")
+  script(src="js/editor/directives/inline-preview.js")
+  script(src="js/corespring/container/container.js")
+  script(src="js/render/directives/_declaration.js")
+  //endbuild
+
+  //build:js js/extras.js
+  script(src="bower_components/angular-ui/build/angular-ui.js")
+  script(src="bower_components/angular-dragdrop/src/angular-dragdrop.js")
+  script(src="bower_components/ckeditor/ckeditor.js")
+
+  //endbuild
+
+  script.
+
+    $(document).ready(function () {
+      var configPath = 'editor-config.json';
+
+      $.get(configPath, function (data) {
+
+        var allScriptsAreLoaded = function () {
+          var playerDeps = [
+            'corespring-common.directives',
+            'corespring-editor.controllers',
+            'corespring-editor.directives',
+            'corespring.container',
+            'ui.sortable',
+            'ngDragDrop',
+            'cs.directives'
+          ].concat(data.angular.dependencies);
+
+          angular.module("corespring-editor", playerDeps);
+          angular.bootstrap(document, ["corespring-editor"]);
+          angular.resumeBootstrap();
+          $("body").addClass('blend')
+        };
+
+        var args = data.scripts.concat(data.css);
+        console.log(args);
+        head.js.apply(null, args);
+
+        head.ready(function(){
+          allScriptsAreLoaded();
+        });
+      });
+    });
+
