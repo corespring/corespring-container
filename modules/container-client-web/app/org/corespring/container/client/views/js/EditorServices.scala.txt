@@ -1,4 +1,4 @@
-@(namespace : String, load : Call, save : Call)
+@(namespace : String, load : Call, save : Call, componentSet : JsValue)
 
 (function(){
   "use strict";
@@ -32,6 +32,11 @@
               onFailure(data);
             }
           });
+      },
+      loadComponents: function(onSuccess, onFailure){
+        //onSuccess({});
+        var components = @{Json.stringify(componentSet)};
+        onSuccess(components);
       }
     };
     return def;

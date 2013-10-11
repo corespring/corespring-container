@@ -11,6 +11,8 @@ PUT        /item/:itemId.json                      @org.corespring.container.cli
 
 GET        /item/:itemId/player                    @org.corespring.container.client.controllers.hooks.PlayerHooks.createSessionForItem(itemId:String)
 
+
+GET        /icon/:icon                             @org.corespring.container.client.controllers.Icons.icon(icon)
 # Hooks for the player: config, services + components
 GET        /player/:sessionId/index.html                   @org.corespring.container.client.controllers.Assets.session(sessionId, file = "player.html")
 GET        /player/:sessionId/player-:resource.:suffix     @org.corespring.container.client.controllers.hooks.PlayerHooks.resource(resource:String, suffix:String, sessionId:String)

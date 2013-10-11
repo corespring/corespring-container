@@ -46,6 +46,7 @@ class FileComponentLoader(paths: Seq[String]) extends ComponentLoader {
     val clientFolder = new File(compRoot.getPath + "/src/client")
     val serverFolder = new File(compRoot.getPath + "/src/server")
     val packageJson = new File(compRoot.getPath + "/package.json")
+    val icon = new File(compRoot.getPath + "/icon.png")
 
     Some(
       Component(
@@ -54,10 +55,18 @@ class FileComponentLoader(paths: Seq[String]) extends ComponentLoader {
         loadClient(clientFolder),
         loadServer(serverFolder),
         loadPackageInfo(packageJson),
-        None
+        loadIcon(icon)
       )
     )
   }
+
+  private def loadIcon(iconFile: File): Option[Array[Byte]] = if (iconFile.exists) {
+    val source = scala.io.Source.fromFile(iconFile)(scala.io.Codec.ISO8859)
+    val byteArray = source.map(_.toByte).toArray
+    source.close()
+    Some(byteArray)
+  } else None
+
 
   private def loadPackageInfo(packageJson: File): JsValue = {
     val s = readFile(packageJson)

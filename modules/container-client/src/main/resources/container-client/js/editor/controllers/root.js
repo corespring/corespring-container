@@ -1,5 +1,10 @@
 var controller = function ($scope, $compile, $http, $timeout, EditorServices, CorespringContainer) {
 
+
+  var getUid = function(){
+    return Math.random().toString(36).substring(2,9);
+  };
+
   $scope.save = function () {
     console.log("Saving: ");
     console.log($scope.model);
@@ -19,6 +24,14 @@ var controller = function ($scope, $compile, $http, $timeout, EditorServices, Co
     console.warn("Error loading item");
   };
 
+  $scope.onComponentsLoaded = function(componentSet){
+    $scope.componentSet = componentSet;
+  };
+
+  $scope.onComponentsLoadError = function(error){
+    console.warn("Error loading components");
+  };
+
   $scope.onItemLoaded = function (data) {
     $scope.model = data.item;
     CorespringContainer.initialize(data);
@@ -30,30 +43,21 @@ var controller = function ($scope, $compile, $http, $timeout, EditorServices, Co
     //return "??";
   };
 
+
+  $scope.addComponent = function(componentType) {
+    console.log("add component" + componentType);
+    $scope.model.components[getUid()] = {
+      componentType: componentType,
+      empty: true
+    };
+  };
+
   $scope.$on('fileSizeGreaterThanMax', function(event){
      console.warn("file too big");
   });
 
-  $scope.selectComponent = function (id) {
-    var key, value, _ref, _results;
-    _ref = $scope.model.components;
-    _results = [];
-    for (key in _ref) {
-      value = _ref[key];
-      if (key === id) {
-        $scope.selectedComponent = {
-          id: key,
-          component: value
-        };
-        break;
-      } else {
-        _results.push(void 0);
-      }
-    }
-    return _results;
-  };
-
   EditorServices.load($scope.onItemLoaded, $scope.onItemLoadError);
+  EditorServices.loadComponents($scope.onComponentsLoaded, $scope.onComponentsLoadError);
 };
 
 angular.module('corespring-editor.controllers').controller('Root', ['$scope', '$compile', '$http', '$timeout', 'EditorServices', 'CorespringContainer', controller]);

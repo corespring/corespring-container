@@ -4,6 +4,7 @@ import org.corespring.container.client.actions.PlayerRequest
 import org.corespring.container.client.views.txt.js.{ComponentWrapper, EditorServices}
 import play.api.Logger
 import play.api.mvc.{AnyContent, Action}
+import play.api.libs.json.{JsArray, JsValue, Json}
 
 trait EditorHooks extends BaseHooks {
 
@@ -11,11 +12,24 @@ trait EditorHooks extends BaseHooks {
 
   override def name = "editor"
 
+  lazy val basePath = {
+    val url = org.corespring.container.client.controllers.routes.Assets.item("..", "..").url
+    val Split = """/(.*?)/.*""".r
+    val Split(base) = url
+    base
+  }
+
   override def services(itemId: String): Action[AnyContent] = builder.loadServices(itemId){
     request: PlayerRequest[AnyContent] =>
       log.debug(s"load editor services: $itemId")
       import org.corespring.container.client.controllers.resources.routes._
-      Ok(EditorServices(ngModule, Item.load(itemId), Item.save(itemId))).as("text/javascript")
+
+      val componentJson : Seq[JsValue] = loadedComponents.map{ c =>
+        val tag = tagName(c.org, c.name)
+        Json.obj( "name" -> c.name, "icon" -> s"/$basePath/icon/$tag", "componentType" -> tag )
+      }
+
+      Ok(EditorServices(ngModule, Item.load(itemId), Item.save(itemId), JsArray(componentJson))).as("text/javascript")
   }
 
   override def componentsJs(itemId:String) : Action[AnyContent] = builder.loadComponents(itemId) {
