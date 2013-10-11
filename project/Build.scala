@@ -82,6 +82,7 @@ object Build extends sbt.Build {
   val runClientTestsTask = runClientTests <<= (baseDirectory, streams) map {
     (baseDir, s) =>
       s.log.info("run client tests")
+      sbt.Process("npm install", baseDir) !;
       val result = sbt.Process("grunt jasmine", baseDir) !;
       if(result != 0){
         throw new RuntimeException("Tests Failed")
