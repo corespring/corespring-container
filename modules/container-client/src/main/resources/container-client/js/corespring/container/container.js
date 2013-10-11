@@ -129,6 +129,9 @@ module.factory('CorespringContainer', function () {
     };
 
     container.serialize = function (itemModel) {
+
+      if (!container.configPanels) return itemModel;
+
       var newModel = _.cloneDeep(itemModel);
       _.each(newModel.components, function(value, key) {
         var component = container.configPanels[key];

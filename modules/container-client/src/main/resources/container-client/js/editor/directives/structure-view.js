@@ -9,20 +9,32 @@
 
       $scope.$watch('model.components', function (newValue) {
         if (!newValue) return;
-        $scope.nodeSeq = _.map($scope.model.components, function (v, k) {
-          return k;
-        });
       });
 
-      $scope.selectComponent = function(id, comp) {
+      $scope.selectComponent = function(comp) {
          $scope.selectedComponent = {
-          id: id,
+          id: comp.id,
           component: comp
         };
       };
 
+      $scope.$watch('model.xhtml', function(newValue) {
+        if (!newValue) return;
+        var node = $($scope.model.xhtml);
 
-      $scope.$watch('nodeSeq', function (newValue) {
+        var orderedComponents = [];
+
+        node.find("*[id]").each(function (idx, n) {
+          var nid = $(this).attr('id');
+          var clonedComponent = _.cloneDeep($scope.model.components[nid]);
+          clonedComponent.id = nid;
+          orderedComponents.push(clonedComponent);
+        });
+
+        $scope.orderedComponents = orderedComponents;
+      });
+
+      $scope.$watch('orderedComponents', function (newValue) {
         if (!$scope.model || !$scope.model.xhtml) return;
         console.log("Structure has changed");
         var node = $($scope.model.xhtml);
@@ -44,9 +56,10 @@
 
         idx = 0;
         node.find("*[id]").each(function (n) {
-          var nid = $(this).attr('id');
-          if (nid != $scope.nodeSeq[idx]) {
-            $(this).replaceWith(nodeMap[$scope.nodeSeq[idx]]);
+          var leftId = $(this).attr('id');
+          var rightId = $scope.orderedComponents[idx].id;
+          if (leftId != rightId) {
+            $(this).replaceWith(nodeMap[rightId]);
           }
           idx++;
         });
@@ -81,11 +94,11 @@
               '</li>',
             '</ul>',
           '</div>',
-          '<ul ui-sortable ng-model="nodeSeq">',
+          '<ul ui-sortable ng-model="orderedComponents">',
           '<li class="component-thumbnail "',
-          ' ng-class="{active: selectedComponent.id==id}"',
-          ' ng-click="selectComponent(id,component)" ',
-          ' ng-repeat="(id, component) in model.components">{{component.componentType}} [{{id}}]</li>',
+          ' ng-class="{active: selectedComponent.id==component.id}"',
+          ' ng-click="selectComponent(component)" ',
+          ' ng-repeat="component in orderedComponents">{{component.componentType}} [{{component.id}}]</li>',
           '</ul>',
         ].join('')
       };
