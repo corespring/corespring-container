@@ -34,9 +34,10 @@
           });
       },
       loadComponents: function(onSuccess, onFailure){
+        //onSuccess({});
         var components = @{Json.stringify(componentSet)};
-        onSuccess(componentSet);
-      };
+        onSuccess(components);
+      }
     };
     return def;
   }]);

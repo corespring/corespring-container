@@ -65,6 +65,6 @@ module.exports = (grunt) ->
   ]
 
   grunt.loadNpmTasks(t) for t in npmTasks
-  grunt.registerTask('run', ['less', 'watch'])
+  grunt.registerTask('run', ['jade', 'less', 'watch'])
 
   grunt.registerTask('default', ['shell:bower','less', 'jade'])

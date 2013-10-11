@@ -13,7 +13,10 @@ block content
         span.btn.btn-primary(file-uploader, fu-url="getUploadUrl()", fu-mode="raw") Upload image
 
     .flex-box
-      structure-view.structure-view
+      structure-view.structure-view(
+        ng-model="model",
+        selected-component="selectedComponent",
+        component-set="componentSet")
       config-pane.config#config(ng-model="selectedComponent")
       inline-preview.inline-preview
 
@@ -34,6 +37,7 @@ block scripts
   script(src="bower_components/angular-ui/build/angular-ui.js")
   script(src="bower_components/angular-dragdrop/src/angular-dragdrop.js")
   script(src="bower_components/ckeditor/ckeditor.js")
+  script(src="bower_components/bootstrap/js/dropdown.js")
 
   //endbuild
 

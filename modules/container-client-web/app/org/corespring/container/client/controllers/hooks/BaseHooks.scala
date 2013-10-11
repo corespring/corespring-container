@@ -113,6 +113,7 @@ trait BaseHooks extends Controller{
     moduleName(org, comp)
   }
 
+
   protected def componentsToResource(components: Seq[Component], componentToString : Component => String, contentType : String) : Result = {
     Ok(components.map(componentToString).mkString("\n")).as(contentType)
   }
@@ -121,6 +122,8 @@ trait BaseHooks extends Controller{
   protected def wrapJs(org: String, name: String, src: String, directive : Option[String] = None) = ComponentWrapper(moduleName(org, name), directiveName(org, name), src).toString
 
   protected def moduleName(org: String, comp: String) = s"$org.$comp"
+
+  protected def tagName(org:String, comp:String) = s"$org-$comp"
 
   protected def directiveName(org: String, comp: String) = s"$org${hyphenatedToTitleCase(comp)}"
 

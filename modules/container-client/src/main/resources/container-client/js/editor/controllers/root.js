@@ -42,25 +42,6 @@ var controller = function ($scope, $compile, $http, $timeout, EditorServices, Co
      console.warn("file too big");
   });
 
-  $scope.selectComponent = function (id) {
-    var key, value, _ref, _results;
-    _ref = $scope.model.components;
-    _results = [];
-    for (key in _ref) {
-      value = _ref[key];
-      if (key === id) {
-        $scope.selectedComponent = {
-          id: key,
-          component: value
-        };
-        break;
-      } else {
-        _results.push(void 0);
-      }
-    }
-    return _results;
-  };
-
   EditorServices.load($scope.onItemLoaded, $scope.onItemLoadError);
   EditorServices.loadComponents($scope.onComponentsLoaded, $scope.onComponentsLoadError);
 };
