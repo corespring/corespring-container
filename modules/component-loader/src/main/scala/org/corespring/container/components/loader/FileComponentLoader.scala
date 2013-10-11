@@ -47,6 +47,7 @@ class FileComponentLoader(paths: Seq[String]) extends ComponentLoader {
     val serverFolder = new File(compRoot.getPath + "/src/server")
     val packageJson = new File(compRoot.getPath + "/package.json")
     val icon = new File(compRoot.getPath + "/icon.png")
+    val defaultDataJson = new File(clientFolder.getPath + "/defaultData.json")
 
     Some(
       Component(
@@ -55,10 +56,23 @@ class FileComponentLoader(paths: Seq[String]) extends ComponentLoader {
         loadClient(clientFolder),
         loadServer(serverFolder),
         loadPackageInfo(packageJson),
+        loadDefaultData(defaultDataJson),
         loadIcon(icon)
       )
     )
   }
+
+  private def loadDefaultData(dataJson : File) : JsValue = if(dataJson.exists){
+    try {
+      Json.parse(readFile(dataJson))
+    } catch {
+      case e : Throwable => {
+        logger.warn( s"Error parsing json ${dataJson.getPath}")
+        Json.obj()
+      }
+    }
+  } else Json.obj()
+
 
   private def loadIcon(iconFile: File): Option[Array[Byte]] = if (iconFile.exists) {
     val source = scala.io.Source.fromFile(iconFile)(scala.io.Codec.ISO8859)

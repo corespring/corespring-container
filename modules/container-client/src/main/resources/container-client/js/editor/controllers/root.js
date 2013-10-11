@@ -43,13 +43,13 @@ var controller = function ($scope, $compile, $http, $timeout, EditorServices, Co
     //return "??";
   };
 
-
-  $scope.addComponent = function(componentType) {
-    console.log("add component" + componentType);
-    $scope.model.components[getUid()] = {
-      componentType: componentType,
-      empty: true
-    };
+  $scope.addComponent = function(descriptor) {
+    console.log("add component" + descriptor.componentType);
+    var uid = getUid();
+    $scope.model.components[uid] = _.cloneDeep(descriptor.defaultData);
+    var node = $($scope.model.xhtml);
+    node.append("<" + descriptor.componentType + " id='" +uid+"'></" + descriptor.componentType + ">");
+    $scope.model.xhtml = "<div>" + node.html() + "</div>";
   };
 
   $scope.$on('fileSizeGreaterThanMax', function(event){

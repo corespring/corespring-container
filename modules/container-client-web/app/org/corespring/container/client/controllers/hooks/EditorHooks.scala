@@ -26,7 +26,12 @@ trait EditorHooks extends BaseHooks {
 
       val componentJson : Seq[JsValue] = loadedComponents.map{ c =>
         val tag = tagName(c.org, c.name)
-        Json.obj( "name" -> c.name, "icon" -> s"/$basePath/icon/$tag", "componentType" -> tag )
+        Json.obj(
+          "name" -> c.name,
+          "icon" -> s"/$basePath/icon/$tag",
+          "componentType" -> tag,
+          "defaultData" -> c.defaultData
+        )
       }
 
       Ok(EditorServices(ngModule, Item.load(itemId), Item.save(itemId), JsArray(componentJson))).as("text/javascript")
