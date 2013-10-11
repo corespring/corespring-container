@@ -1,0 +1,33 @@
+doctype 5
+html(xmlns="http://www.w3.org/1999/html")
+  head
+    meta(charset="utf-8")
+    meta(http-equiv="X-UA-Compatible", content="IE=edge")
+
+    //build:css css/all.css
+    link(href='http://fonts.googleapis.com/css?family=Ubuntu', rel='stylesheet', type='text/css')
+    link(rel="stylesheet", href="css/app.css")
+    //endbuild
+
+    title= title
+    link(rel="stylesheet", type="text/css", href="/bootstrap/css/bootstrap.css")
+    block head
+  body.hide-body
+    block content
+
+    script.
+      // hey Angular, we're bootstrapping manually!
+      window.name = "NG_DEFER_BOOTSTRAP!";
+
+    script(src="bower_components/jquery/jquery.min.js")
+    script(src="bower_components/jquery-ui/ui/minified/jquery-ui.min.js")
+    script(src="bower_components/angular/angular.js")
+    script(src="bower_components/lodash/dist/lodash.js")
+    script(src="bower_components/headjs/dist/head.js")
+    script(src="bower_components/angular-ui-sortable/src/sortable.js")
+    script(src="bower_components/corespring-ng-components/build/corespring-ng-components.js")
+
+    script(src="js/common/directives/_declaration.js")
+    script(src="js/common/directives/ng-bind-html-unsafe.js")
+
+    block scripts

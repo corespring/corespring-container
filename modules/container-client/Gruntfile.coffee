@@ -14,6 +14,10 @@ module.exports = (grunt) ->
       js:
         files: ['<%= common.app %>/js/**/*.js']
         tasks: ['jshint:main']
+      jade:
+        files: ['<%= common.app %>/*.jade']
+        tasks: ['jade']
+
     less:
       development:
         expand: true
@@ -34,12 +38,23 @@ module.exports = (grunt) ->
       jshintrc: '.jshintrc'
       main: ['<%= common.app %>/js/**/*.js']
 
+    jade:
+      compile:
+        options:
+          pretty: true
+          data:
+            debug: false
+        files:
+          "<%= common.dist %>/player.html": ["<%= common.app %>/player.jade" ]
+          "<%= common.dist %>/editor.html": ["<%= common.app %>/editor.jade" ]
+
 
 
   grunt.initConfig(config)
 
   npmTasks = [
     'grunt-shell',
+    'grunt-contrib-jade',
     'grunt-contrib-copy',
     'grunt-contrib-uglify',
     'grunt-contrib-concat',
@@ -52,4 +67,4 @@ module.exports = (grunt) ->
   grunt.loadNpmTasks(t) for t in npmTasks
   grunt.registerTask('run', ['less', 'watch'])
 
-  grunt.registerTask('default', ['shell:bower','less'])
+  grunt.registerTask('default', ['shell:bower','less', 'jade'])

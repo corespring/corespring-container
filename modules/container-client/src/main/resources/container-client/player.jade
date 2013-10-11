@@ -1,0 +1,70 @@
+extends layout
+
+block head
+
+block content
+  div#root.container(ng-controller="Root")
+    #player-body
+    #outcome(ng-show="outcome")
+      h4 You scored: {{outcome.summary.percentage}}%
+    hr
+    button.btn.btn-success( ng-click="submit()", ng-disabled="session.isFinished") Submit
+    label
+      | Attempts left: {{session.remainingAttempts !== undefined ? session.remainingAttempts : session.maxNoOfAttempts}}
+
+
+block scripts
+
+  //build:js js/player.js
+  script(src="js/common/directives/_declaration.js")
+  script(src="js/common/directives/ng-bind-html-unsafe.js")
+  script(src="js/render/controllers/_declaration.js")
+  script(src="js/render/controllers/root.js")
+  script(src="js/corespring/container/container.js")
+  script(src="js/render/directives/_declaration.js")
+  //endbuild
+
+  //build:js js/extras.js
+  script(src="bower_components/angular-ui/build/angular-ui.js")
+  script(src="bower_components/angular-dragdrop/src/angular-dragdrop.js")
+  //endbuild
+
+  script.
+    $(document).ready(function(){
+      console.log("load config", document.location);
+
+      var configPath = 'player-config.json';
+
+      $.get( configPath, function(data){
+        console.log("data", data);
+
+        var allScriptsAreLoaded = function(){
+
+          console.log("all scripts are loaded");
+          $("#player-body").html(data.xhtml);
+
+          var playerDeps = [
+            'corespring-common.directives',
+            'corespring-player.controllers',
+            'corespring-player.directives',
+            'corespring.container',
+            'ngDragDrop'
+          ].concat(data.angular.dependencies);
+
+          angular.module("corespring-player", playerDeps );
+          angular.bootstrap(document, ["corespring-player"]);
+          angular.resumeBootstrap();
+          $("body").addClass('blend');
+        };
+
+        var allScripts = data.scripts.concat(data.css);
+        console.log(allScripts);
+        head.js.apply(null, allScripts);
+
+        head.ready(function(){
+            allScriptsAreLoaded();
+        });
+      });
+    });
+
+
