@@ -2,7 +2,7 @@ package org.corespring.container.components.response
 
 import org.specs2.mutable.Specification
 import org.corespring.container.components.model.{Server, Client, Component}
-import play.api.libs.json.{Json, JsObject}
+import play.api.libs.json.Json
 
 class ResponseProcessorImplTest extends Specification{
 
@@ -22,7 +22,8 @@ class ResponseProcessorImplTest extends Specification{
         "name",
         client = Client("", "", None),
         server = Server(respondJs),
-        JsObject(Seq.empty),
+        Json.obj(),
+        Json.obj(),
         None
       )
 
