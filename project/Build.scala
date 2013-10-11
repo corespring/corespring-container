@@ -83,7 +83,7 @@ object Build extends sbt.Build {
     (baseDir, s) =>
       s.log.info("run client tests")
       sbt.Process("npm install", baseDir) !;
-      val result = sbt.Process("grunt jasmine", baseDir) !;
+      val result = sbt.Process("grunt test", baseDir) !;
       if(result != 0){
         throw new RuntimeException("Tests Failed")
       }

@@ -118,8 +118,8 @@ module.factory('CorespringContainer', function () {
     container.updateResponses = function (responses) {
       container.data.responses = responses;
       var _updateResponse = function (id, comp) {
-        var response = container.data.responses[id];
-        if (comp && comp.setResponse && response) {
+        if (comp && comp.setResponse && container.data.responses) {
+          var response = container.data.responses[id];
           comp.setResponse(response);
         } else {
           console.warn("couldn't set a response for id: ", id);
