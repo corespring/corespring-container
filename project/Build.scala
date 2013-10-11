@@ -77,9 +77,22 @@ object Build extends sbt.Build {
       sbt.Process("grunt", clientRoot) !;
   }
 
+  val runClientTests = TaskKey[Unit]("client-tests", "")
+
+  val runClientTestsTask = runClientTests <<= (baseDirectory, streams) map {
+    (baseDir, s) =>
+      s.log.info("run client tests")
+      val result = sbt.Process("grunt jasmine", baseDir) !;
+      if(result != 0){
+        throw new RuntimeException("Tests Failed")
+      }
+  }
+
   lazy val containerClient = builder.lib("container-client")
     .settings(
     buildClientTask,
+    runClientTestsTask,
+    (test in Test) <<= (test in Test) dependsOn runClientTests,
     //This task is called by the play stage task
     (packagedArtifacts) <<= (packagedArtifacts) dependsOn buildClient
   )
