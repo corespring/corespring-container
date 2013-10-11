@@ -1,5 +1,10 @@
 var controller = function ($scope, $compile, $http, $timeout, EditorServices, CorespringContainer) {
 
+
+  var getUid = function(){
+    return Math.random().toString(36).substring(2,9);
+  };
+
   $scope.save = function () {
     console.log("Saving: ");
     console.log($scope.model);
@@ -36,6 +41,15 @@ var controller = function ($scope, $compile, $http, $timeout, EditorServices, Co
     console.log(arguments);
     return file.name;
     //return "??";
+  };
+
+
+  $scope.addComponent = function(componentType) {
+    console.log("add component" + componentType);
+    $scope.model.components[getUid()] = {
+      componentType: componentType,
+      empty: true
+    };
   };
 
   $scope.$on('fileSizeGreaterThanMax', function(event){

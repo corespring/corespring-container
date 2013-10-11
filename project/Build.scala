@@ -74,7 +74,7 @@ object Build extends sbt.Build {
       sbt.Process("bower install", clientRoot) !;
       s.log.info("[compile less w/ grunt] on " + clientRoot )
       sbt.Process("npm install", clientRoot) !;
-      sbt.Process("grunt less", clientRoot) !;
+      sbt.Process("grunt", clientRoot) !;
   }
 
   lazy val containerClient = builder.lib("container-client")

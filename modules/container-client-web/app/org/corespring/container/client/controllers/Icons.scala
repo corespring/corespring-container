@@ -24,7 +24,6 @@ trait Icons extends Controller {
 
       val bytes: Option[Array[Byte]] = loadedComponents.find(matchingComponent).map(_.icon).flatten
 
-
       bytes.map {
         b =>
           Ok(b).as("image/png")

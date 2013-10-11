@@ -21,6 +21,7 @@
         };
       };
 
+
       $scope.$watch('nodeSeq', function (newValue) {
         if (!$scope.model || !$scope.model.xhtml) return;
         console.log("Structure has changed");
@@ -62,18 +63,18 @@
       def = {
         link: link($compile),
         restrict: 'E',
-        scope: {
+        /*scope: {
           model: '=ngModel',
           selectedComponent: '=',
           componentSet: '='
-        },
+        },*/
         template: [
           '<h1>Structure View</h1>',
           '<div class="btn-group">',
             '<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">Add...<span class="caret"></span></button>',
             '<ul class="dropdown-menu" role="menu" >',
               '<li ng-repeat="c in componentSet">',
-              '  <a ng-click="addComponent(c)">',
+              '  <a ng-click="addComponent(c.componentType)">',
               '    <img ng-src="{{c.icon}}"/>',
               '    {{c.name}}',
               '</a>',
