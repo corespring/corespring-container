@@ -48,6 +48,7 @@ module.exports = (grunt) ->
         files:
           "<%= common.dist %>/player.html": ["<%= common.app %>/player.jade" ]
           "<%= common.dist %>/editor.html": ["<%= common.app %>/editor.jade" ]
+          "<%= common.dist %>/rig.html": ["<%= common.app %>/rig.jade" ]
 
     jasmine:
       unit:

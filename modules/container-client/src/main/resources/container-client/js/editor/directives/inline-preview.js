@@ -3,10 +3,11 @@
 
   link = function ($compile) {
     return function ($scope, $elem, attrs) {
-      $scope.$watch('model.xhtml', function (newXml) {
+      var name = attrs.ngModel || 'model.xhtml';
+      $scope.$watch(name, function (newXml) {
         console.log(newXml);
         $elem.html($compile(newXml)($scope));
-      });
+      }, true);
     };
   };
 

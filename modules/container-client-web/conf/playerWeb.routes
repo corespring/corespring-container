@@ -1,7 +1,7 @@
 # Note: The order is important - there are some asset calls that we want to intercept before they hit the *file
 
 #TODO: add this import to routesImport - but only once we have a local build file for the module - don't add it at root
-#import org.corespring.container.client.controllers._
+
 
 GET        /session/everything/:id.json            @org.corespring.container.client.controllers.resources.Session.loadEverything(id:String)
 PUT        /session/submit-answers/:id.json        @org.corespring.container.client.controllers.resources.Session.submitAnswers(id:String)
@@ -11,8 +11,15 @@ PUT        /item/:itemId.json                      @org.corespring.container.cli
 
 GET        /item/:itemId/player                    @org.corespring.container.client.controllers.hooks.PlayerHooks.createSessionForItem(itemId:String)
 
-
 GET        /icon/:icon                             @org.corespring.container.client.controllers.Icons.icon(icon)
+
+GET        /rig/:orgName/:compName/index.html      @org.corespring.container.client.controllers.Rig.index(orgName:String, compName:String, data: Option[String] ?= None)
+GET        /rig/:orgName/:compName/config.json     @org.corespring.container.client.controllers.Rig.config(orgName:String, compName:String)
+GET        /rig/:orgName/:compName/:dataName.json  @org.corespring.container.client.controllers.Rig.data(orgName:String, compName:String, dataName:String)
+GET        /rig/:orgName/:compName/components.js   @org.corespring.container.client.controllers.Rig.componentsJs(orgName, compName)
+GET        /rig/:orgName/:compName/components.css  @org.corespring.container.client.controllers.Rig.componentsCss(orgName, compName)
+GET        /rig/:orgName/:compName/*file           @org.corespring.container.client.controllers.Rig.asset(orgName, compName, file)
+
 # Hooks for the player: config, services + components
 GET        /player/:sessionId/index.html                   @org.corespring.container.client.controllers.Assets.session(sessionId, file = "player.html")
 GET        /player/:sessionId/player-:resource.:suffix     @org.corespring.container.client.controllers.hooks.PlayerHooks.resource(resource:String, suffix:String, sessionId:String)

@@ -2,7 +2,7 @@
 
 @bg-color: #fffff4;
 @text-color: #555555;
-@navbar-inverse-bg : #1c2a1f;
+@navbar-inverse-bg : #000A10;
 @font-family-sans-serif: "Ubuntu", sans-serif;
 
 
@@ -12,6 +12,11 @@
 .blend {
   opacity: 1;
   transition: opacity 300ms;
+}
+
+.navbar-inverse {
+  background-color: lighten(@navbar-inverse-bg, 20%);
+  border-color: @navbar-inverse-bg;
 }
 
 /*.animate-enter {
