@@ -1,0 +1,99 @@
+extends layout
+
+block head
+  title Rig
+  link(rel="stylesheet", href="css/rig.css")
+
+block content
+  div#root(ng-controller="Root")
+    nav.navbar.navbar-inverse.navbar-static-top(role="navigation")
+      .nav-bar-header
+        a.navbar-brand Rig
+      ul.nav.navbar-nav
+        li
+          a(ng-click='updatePreview()') Update Preview (Ctrl+S)
+    .flex-box.main-pane
+      div(ui-ace,
+        ng-model="componentJson",
+        ui-ace="{useWrapMode : true, onLoad: aceLoaded, onChange: aceChanged }")
+      #preview-pane(inline-preview, ng-model="model.item.xhtml")
+
+
+
+block scripts
+
+  //build:js js/rig.js
+  script(src="js/rig/controllers/_declaration.js")
+  script(src="js/rig/controllers/root.js")
+  script(src="js/rig/directives/_declaration.js")
+  script(src="js/editor/directives/_declaration.js")
+  script(src="js/editor/directives/inline-preview.js")
+  script(src="js/corespring/container/container.js")
+  //endbuild
+
+  //build:js js/extras.js
+  script(src="bower_components/angular-ui/build/angular-ui.js")
+  script(src="bower_components/angular-dragdrop/src/angular-dragdrop.js")
+  script(src="bower_components/angular-ui-ace/ui-ace.js")
+  script(src="bower_components/ace-builds/src-min-noconflict/ace.js")
+  script(src="bower_components/ace-builds/src-min-noconflict/theme-twilight.js")
+  script(src="bower_components/ace-builds/src-min-noconflict/mode-xml.js")
+  script(src="bower_components/ace-builds/src-min-noconflict/worker-json.js")
+  script(src="bower_components/ace-builds/src-min-noconflict/mode-json.js")
+  //endbuild
+
+  script.
+    $(document).ready(function(){
+      console.log("load config", document.location);
+
+      var configPath = 'config.json';
+
+      console.log(document.location);
+
+      var queryMatch = document.location.search.match(/\?data=(.*)/)
+      console.log(queryMatch);
+
+      if(queryMatch[1].indexOf(".json") == -1){
+        throw "You need to specify a json file using '?data=xxx.json'";
+        return;
+      }
+
+      var jsonFile = queryMatch[1];
+
+      $.get( configPath, function(data){
+
+        var allScriptsAreLoaded = function(){
+
+          console.log("all scripts are loaded");
+          //$("#player-body").html(data.xhtml);
+
+          var playerDeps = [
+            'corespring-common.directives',
+            'corespring-rig.controllers',
+            'corespring-rig.directives',
+            'corespring.container',
+            'corespring-editor.directives',
+            'ngDragDrop',
+            'ui.ace'
+          ].concat(data.angular.dependencies);
+
+          angular.module("corespring-rig", playerDeps )
+            .config(['$locationProvider', function($locationProvider){
+              $locationProvider.html5Mode(true).hashPrefix('!');
+            }]);
+
+          angular.bootstrap(document, ["corespring-rig"]);
+          angular.resumeBootstrap();
+          $("body").addClass('blend');
+        };
+
+        var allScripts = data.scripts.concat(data.css);
+        head.js.apply(null, allScripts);
+
+        head.ready(function(){
+          allScriptsAreLoaded();
+        });
+      });
+    });
+
+
