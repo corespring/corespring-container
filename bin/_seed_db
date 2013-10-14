@@ -1,0 +1,43 @@
+#!/usr/bin/env coffee
+
+MongoClient = require('mongodb').MongoClient
+format = require('util').format
+fs = require('fs')
+_ = require('lodash')
+ObjectID = require('mongodb').ObjectID
+path = require('path')
+
+mongoUri = process.env["CONTAINER_MONGO_URI"] || "mongodb://localhost/corespring-container"
+
+console.log "mongoUri: #{mongoUri}"
+
+seed = (collection, folder, next) ->
+  collection.remove {}, ->
+
+    files = fs.readdirSync( folder )
+    files = _.filter files, (f) -> path.extname(f) == ".json"
+    _.each files, (f) ->
+
+      console.log "seeding: #{f}"
+      contents = fs.readFileSync("#{folder}/#{f}", "utf8")
+      json = JSON.parse(contents)
+      json._id = new ObjectID(json._id)
+
+      collection.insert json, (err, docs) ->
+
+        collection.count (err, count) ->
+          console.log format("count = %s", count)
+
+        collection.find().toArray (err, results) ->
+          console.dir(results)
+          next(err)
+
+MongoClient.connect mongoUri, (err, db) ->
+
+  if err
+    throw err
+
+  collection = db.collection('items')
+
+  seed db.collection('items'), "mock-data/items", (err) ->
+    db.close()
