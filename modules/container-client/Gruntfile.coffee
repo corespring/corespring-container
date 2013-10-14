@@ -22,7 +22,7 @@ module.exports = (grunt) ->
     less:
       development:
         expand: true
-        cwd: '<%= common.app %>/css'
+        cwd: '<%= common.dist %>/css'
         src: '*.less'
         dest: '<%= common.dist %>/css/'
         ext: '.css'
@@ -56,9 +56,9 @@ module.exports = (grunt) ->
         options:
           keepRunner: true
           vendor: [
-            '<%= common.app %>/bower_components/angular/angular.js',
-            '<%= common.app %>/bower_components/angular-mocks/angular-mocks.js',
-            '<%= common.app %>/bower_components/jquery/jquery.js',
+            '<%= common.dist %>/bower_components/angular/angular.js',
+            '<%= common.dist %>/bower_components/angular-mocks/angular-mocks.js',
+            '<%= common.dist %>/bower_components/jquery/jquery.js',
           ]
           specs: '<%= common.test %>/js/**/*-test.js'
 
