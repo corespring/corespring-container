@@ -24,7 +24,8 @@ class ResponseProcessorImplTest extends Specification{
         server = Server(respondJs),
         Json.obj(),
         Json.obj(),
-        None
+        None,
+        Map()
       )
 
 
