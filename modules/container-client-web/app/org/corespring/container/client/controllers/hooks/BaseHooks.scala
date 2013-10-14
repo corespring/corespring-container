@@ -37,7 +37,8 @@ trait BaseHooks extends Controller with Helpers{
 
   def config(id: String): Action[AnyContent] = builder.loadConfig(id) {
     request: PlayerRequest[AnyContent] =>
-      val xhtml = processXhtml((request.item \ "xhtml").as[String])
+      val xhtml = (request.item \ "xhtml").as[String]
+
       val itemComponentTypes: Seq[String] = componentTypes(request.item)
       val moduleNames = itemComponentTypes.map(makeModuleName)
       val out: JsValue = configJson(
