@@ -1,6 +1,6 @@
 package org.corespring.container.client.controllers.hooks
 
-import org.corespring.container.client.actions.{ClientHooksActionBuilder, EditorClientHooksActionBuilder, PlayerRequest}
+import org.corespring.container.client.actions.{EditorClientHooksActionBuilder, PlayerRequest}
 import org.corespring.container.client.views.txt.js.{ComponentWrapper, EditorServices}
 import play.api.Logger
 import play.api.mvc.{AnyContent, Action}
