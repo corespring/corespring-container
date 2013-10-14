@@ -1,12 +1,12 @@
 package org.corespring.container.client.controllers.hooks
 
-import org.corespring.container.client.actions.PlayerRequest
+import org.corespring.container.client.actions.{ClientHooksActionBuilder, EditorClientHooksActionBuilder, PlayerRequest}
 import org.corespring.container.client.views.txt.js.{ComponentWrapper, EditorServices}
 import play.api.Logger
 import play.api.mvc.{AnyContent, Action}
 import play.api.libs.json.{JsArray, JsValue, Json}
 
-trait EditorHooks extends BaseHooks {
+trait EditorHooks extends BaseHooks[EditorClientHooksActionBuilder[AnyContent]] {
 
   val log = Logger("editor.hooks")
 
@@ -17,6 +17,10 @@ trait EditorHooks extends BaseHooks {
     val Split = """/(.*?)/.*""".r
     val Split(base) = url
     base
+  }
+
+  override protected def componentTypes(json: JsValue): Seq[String] = {
+    loadedComponents.map{ c => tagName(c.org, c.name)}
   }
 
   override def services(itemId: String): Action[AnyContent] = builder.loadServices(itemId){
@@ -56,6 +60,14 @@ trait EditorHooks extends BaseHooks {
   override def wrapJs(org:String, name:String, src:String, directive: Option[String] = None) = {
     val d = directive.getOrElse(directiveName(org, name))
     ComponentWrapper(moduleName(org, name), d, src ).toString
+  }
+
+
+  def createItem = builder.createItem {
+    request: PlayerRequest[AnyContent] =>
+      val itemId = (request.item \ "_id" \ "$oid").as[String]
+      val url = org.corespring.container.client.controllers.routes.Assets.item(itemId, "editor.html").url
+      SeeOther(url)
   }
 
 }

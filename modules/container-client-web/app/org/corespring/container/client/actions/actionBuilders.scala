@@ -13,6 +13,10 @@ trait ClientHooksActionBuilder[A] {
   def createSessionForItem(itemId:String)(block: SessionIdRequest[A] => Result) : Action[AnyContent]
 }
 
+trait EditorClientHooksActionBuilder[A] extends ClientHooksActionBuilder[A]{
+  def createItem(block:PlayerRequest[A] => Result) : Action[AnyContent]
+}
+
 
 trait ItemActionBuilder[A] {
   def load(itemId:String)(block: ItemRequest[A] => Result ) : Action[AnyContent]

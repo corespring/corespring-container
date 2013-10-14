@@ -10,8 +10,15 @@ link = function ($compile) {
       if (!data) {
         return;
       }
+      var configName = data.component.componentType + '-config';
       console.log("[config pane] model loaded.");
-      tmpl = "<div class='config-chrome'>\n  <div class='title'>Configure " + data.component.componentType + " :: " + data.id + "</div>\n  <div class='holder'><" + data.component.componentType + "-config id='" + data.id + "'/></div>\n</div>";
+      tmpl = ['<div class="config-chrome">',
+              '<div class="title">Configure ' + data.component.componentType + ' :: ' + data.id + '</div>',
+              '<div class="holder">',
+              '<' + configName + ' id="' + data.id + '"></' + configName + '>',
+              '</div>',
+              '</div>'].join("\n");
+
       $div = $(tmpl);
       $elem.html($div);
       return $compile($div)($scope.$new());

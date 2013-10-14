@@ -8,7 +8,7 @@ import play.api.libs.json.{Json, JsValue}
 import play.api.mvc.{Result, Controller, Action, AnyContent}
 import org.corespring.container.client.controllers.helpers.Helpers
 
-trait BaseHooks extends Controller with Helpers{
+trait BaseHooks[T <: ClientHooksActionBuilder[AnyContent]] extends Controller with Helpers{
 
   protected def name : String
 
@@ -22,7 +22,7 @@ trait BaseHooks extends Controller with Helpers{
 
   def loadedComponents: Seq[Component]
 
-  def builder : ClientHooksActionBuilder[AnyContent]
+  def builder : T
 
     /**
      * TODO: The hooks service 4 requests:
@@ -37,7 +37,7 @@ trait BaseHooks extends Controller with Helpers{
 
   def config(id: String): Action[AnyContent] = builder.loadConfig(id) {
     request: PlayerRequest[AnyContent] =>
-      val xhtml = (request.item \ "xhtml").as[String]
+      val xhtml = (request.item \ "xhtml").asOpt[String].getOrElse("<div><h1>New Item</h1></div>")
 
       val itemComponentTypes: Seq[String] = componentTypes(request.item)
       val moduleNames = itemComponentTypes.map(makeModuleName)

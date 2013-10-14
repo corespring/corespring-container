@@ -1,12 +1,12 @@
 package org.corespring.container.client.controllers.hooks
 
-import org.corespring.container.client.actions.PlayerRequest
+import org.corespring.container.client.actions.{ClientHooksActionBuilder, PlayerRequest}
 import org.corespring.container.client.views.txt.js.PlayerServices
 import play.api.Logger
 import play.api.mvc.{AnyContent, Action}
 
 
-trait PlayerHooks extends BaseHooks {
+trait PlayerHooks extends BaseHooks[ClientHooksActionBuilder[AnyContent]] {
 
   val log = Logger("player.hooks")
 

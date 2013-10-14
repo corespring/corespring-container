@@ -26,6 +26,7 @@ GET        /player/:sessionId/player-:resource.:suffix     @org.corespring.conta
 GET        /player/:sessionId/*file                        @org.corespring.container.client.controllers.Assets.session(sessionId:String, file)
 
 # Hooks for the editor: config, services + components
+GET        /editor/create-item                            @org.corespring.container.client.controllers.hooks.EditorHooks.createItem
 GET        /editor/:itemId/index.html                     @org.corespring.container.client.controllers.Assets.item(itemId:String, file = "editor.html")
 GET        /editor/:itemId/editor-:resource.:suffix       @org.corespring.container.client.controllers.hooks.EditorHooks.resource(resource:String, suffix:String,itemId:String)
 GET        /editor/:itemId/*file                          @org.corespring.container.client.controllers.Assets.item(itemId:String, file)
