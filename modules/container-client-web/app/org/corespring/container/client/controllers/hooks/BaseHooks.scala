@@ -6,8 +6,9 @@ import org.corespring.container.client.views.txt.js.ComponentWrapper
 import org.corespring.container.components.model.Component
 import play.api.libs.json.{Json, JsValue}
 import play.api.mvc.{Result, Controller, Action, AnyContent}
+import org.corespring.container.client.controllers.helpers.Helpers
 
-trait BaseHooks extends Controller{
+trait BaseHooks extends Controller with Helpers{
 
   protected def name : String
 
@@ -39,14 +40,13 @@ trait BaseHooks extends Controller{
       val xhtml = processXhtml((request.item \ "xhtml").as[String])
       val itemComponentTypes: Seq[String] = componentTypes(request.item)
       val moduleNames = itemComponentTypes.map(makeModuleName)
-      val out: String = configJson(
+      val out: JsValue = configJson(
          xhtml,
         Seq(ngModule) ++ moduleNames,
         Seq(ngJs, componentJs),
         Seq(componentCss)
       )
-      val jsonOut = Json.parse(out)
-      Ok(jsonOut)
+      Ok(out)
   }
 
   /**
@@ -83,21 +83,6 @@ trait BaseHooks extends Controller{
   def componentsCss(id:String) : Action[AnyContent]
 
 
-   protected def configJson( xhtml: String,
-                            dependencies: Seq[String],
-                            scriptPaths: Seq[String],
-                            cssPaths : Seq[String]): String =
-    s"""
-      |{
-      |  "xhtml" : "$xhtml",
-      |  "angular" : {
-      |    "dependencies" : [ "${dependencies.mkString("\",\"")}" ]
-      |  },
-      |  "scripts" : [ "${scriptPaths.mkString("\",\"")}" ],
-      |  "css" : [ "${cssPaths.mkString("\",\"")}"]
-      |}
-    """.stripMargin
-
   protected def processXhtml(s: String): String = {
     s.trim
       .replace("\"", "\\\"")
@@ -113,19 +98,4 @@ trait BaseHooks extends Controller{
     moduleName(org, comp)
   }
 
-
-  protected def componentsToResource(components: Seq[Component], componentToString : Component => String, contentType : String) : Result = {
-    Ok(components.map(componentToString).mkString("\n")).as(contentType)
-  }
-
-
-  protected def wrapJs(org: String, name: String, src: String, directive : Option[String] = None) = ComponentWrapper(moduleName(org, name), directiveName(org, name), src).toString
-
-  protected def moduleName(org: String, comp: String) = s"$org.$comp"
-
-  protected def tagName(org:String, comp:String) = s"$org-$comp"
-
-  protected def directiveName(org: String, comp: String) = s"$org${hyphenatedToTitleCase(comp)}"
-
-  private def hyphenatedToTitleCase(s: String): String = s.split("-").map(_.capitalize).mkString("")
 }

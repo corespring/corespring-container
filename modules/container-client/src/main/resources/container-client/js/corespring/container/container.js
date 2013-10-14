@@ -108,6 +108,10 @@ module.factory('CorespringContainer', function () {
     container.updateSession = function (sessionInfo) {
       container.session = sessionInfo;
 
+      if(!container.components){
+        return;
+      }
+
       $.each(container.components, function (id, comp) {
         if (comp && comp.setSession && sessionInfo) {
           comp.setSession(sessionInfo);
@@ -125,6 +129,10 @@ module.factory('CorespringContainer', function () {
           console.warn("couldn't set a response for id: ", id);
         }
       };
+
+      if(!container.components){
+        return;
+      }
       $.each(container.components, _updateResponse);
     };
 

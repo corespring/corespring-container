@@ -6,7 +6,7 @@ import org.corespring.shell.impl.controllers.editor.{ClientItemImpl, EditorHooks
 import org.corespring.shell.impl.controllers.player.{ClientSessionImpl, PlayerHooksImpl}
 import org.corespring.shell.impl.services.MongoService
 import play.api.mvc._
-import org.corespring.container.client.controllers.{Icons, Assets}
+import org.corespring.container.client.controllers.{Rig, Icons, Assets}
 import org.corespring.container.components.model.Component
 import org.corespring.amazon.s3.ConcreteS3Service
 import play.api.{Configuration, Play}
@@ -19,11 +19,16 @@ class ContainerClientImplementation(
                                      config : Configuration
                                      ) {
 
-  lazy val controllers: Seq[Controller] = Seq(playerHooks, editorHooks, items, sessions, assets, icons)
+  lazy val controllers: Seq[Controller] = Seq(playerHooks, editorHooks, items, sessions, assets, icons, rig)
 
   private lazy val icons = new Icons {
     def loadedComponents: Seq[Component] = comps
   }
+
+  private lazy val rig = new Rig{
+    def components: Seq[Component] = comps
+  }
+
 
   private lazy val assets = new Assets {
 

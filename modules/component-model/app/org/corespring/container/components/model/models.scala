@@ -11,7 +11,8 @@ case class Component(
   server : Server,
   packageInfo : JsValue,
   defaultData : JsValue,
-  icon : Option[Array[Byte]] = None
+  icon : Option[Array[Byte]] = None,
+  sampleData : Map[String,JsValue] = Map.empty
 ){
   val SnakeCase = """(.*?)-(.*)""".r
 

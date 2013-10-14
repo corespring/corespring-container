@@ -1,0 +1,40 @@
+@import "../bower_components/less-elements/elements";
+
+@base: #4f494c;
+
+#root{
+  position: absolute;
+  width: 100%;
+  height: 100%;
+
+  .navbar{
+    margin-bottom: 0px;
+    .gradient(@base, @base, lighten(@base, 5%));
+    .drop-shadow(0, 2px, 3px, 0.2);
+  }
+
+  .ace_editor {
+    width: 50%;
+    float: left;
+    flex: 1;
+    min-width: 400px;
+    min-height: 700px;
+    height: 100%;
+  }
+
+  #preview-pane{
+    float: left;
+    width: 100%;
+    height: 100%;
+    padding: 20px;
+    flex: 1;
+  }
+  .main-pane{
+    width: 100%;
+    position: fixed;
+  }
+  .flex-box{
+    display: flex;
+    height: 100%;
+  }
+}
