@@ -4,23 +4,26 @@
   "dependencies": {
     "angular": "1.2.0-rc.2",
     "angular-resource": "1.2.0-rc.2",
-    "angular-sanitize" : "1.2.0-rc.2",
-    "angular-animate" : "1.2.0-rc.2",
-    "angular-dragdrop" : "latest",
+    "angular-sanitize": "1.2.0-rc.2",
+    "angular-animate": "1.2.0-rc.2",
+    "angular-dragdrop": "latest",
     "angular-ui": "latest",
-    "angular-ui-sortable" : "latest",
+    "angular-ui-sortable": "latest",
     "jquery": "latest",
-    "bootstrap" : "latest",
-    "lodash" : "latest",
-    "headjs" : "latest",
+    "bootstrap": "latest",
+    "lodash": "latest",
+    "headjs": "latest",
     "ckeditor": "https://github.com/eymengunay/ckeditor.git",
-    "corespring-ng-components" : "https://github.com/corespring/corespring-ng-components.git",
-    "ace-builds" : "1.1.1",
-    "angular-ui-ace" : "latest",
-    "less-elements" : "https://github.com/dmitryf/elements.git"
+    "corespring-ng-components": "https://github.com/corespring/corespring-ng-components.git",
+    "ace-builds": "1.1.1",
+    "angular-ui-ace": "latest",
+    "less-elements": "https://github.com/dmitryf/elements.git"
   },
   "devDependencies": {
     "angular-mocks": "1.2.0-rc.2",
     "angular-scenario": "1.2.0-rc.2"
+  },
+  "resolutions": {
+    "angular": "1.2.0-rc.2"
   }
 }
