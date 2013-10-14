@@ -46,7 +46,16 @@ Install npm packages
     
     
 Then go to [http://localhost:9000](http://localhost:9000)
+
+## Running the Rig
+
+    http://localhost:9000/client/rig/:org/:component/index.html?data=:component-json-file
     
+    Eg: 
+    http://localhost:9000/client/rig/corespring/multiple-choice/index.html?data=one.json
+    
+    
+
 ## Grunt integration with Play
 
 * `grunt` `npm` and `bower` are all available as commands within the play console. 
