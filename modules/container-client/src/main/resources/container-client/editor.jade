@@ -13,11 +13,16 @@ block content
         span.btn.btn-primary(file-uploader, fu-url="getUploadUrl()", fu-mode="raw") Upload image
 
     .flex-box
-      structure-view.structure-view(
-        ng-model="model",
-        selected-component="selectedComponent",
-        component-set="componentSet")
-      config-pane.config#config(ng-model="selectedComponent")
+      .vertical
+        structure-view.structure-view(
+          ng-model="model",
+          selected-component="selectedComponent",
+          component-set="componentSet")
+        file-list(ng-model="model.files", select-file="selectFile(file)")
+      config-pane.config#config(ng-model="selectedComponent", ng-show="selectedComponent != null")
+      //TODO: in ng-show below 'selectedFile' is bound to the file-preview selectedFile - not the outer one
+      //Should be bound to the outer property.
+      div.selected-text-editor(ui-ace, ng-model="selectedFile.content", ui-ace="{useWrapMode: true}", ng-show="selectedFile.content != null")
       inline-preview.inline-preview
 
 block scripts
@@ -27,6 +32,8 @@ block scripts
   script(src="js/editor/controllers/root.js")
   script(src="js/editor/directives/_declaration.js")
   script(src="js/editor/directives/structure-view.js")
+  script(src="js/editor/directives/file-list.js")
+  script(src="js/editor/directives/file-preview.js")
   script(src="js/editor/directives/config-pane.js")
   script(src="js/editor/directives/inline-preview.js")
   script(src="js/corespring/container/container.js")
@@ -38,6 +45,12 @@ block scripts
   script(src="bower_components/angular-dragdrop/src/angular-dragdrop.js")
   script(src="bower_components/ckeditor/ckeditor.js")
   script(src="bower_components/bootstrap/js/dropdown.js")
+  script(src="bower_components/angular-ui-ace/ui-ace.js")
+  script(src="bower_components/ace-builds/src-min-noconflict/ace.js")
+  script(src="bower_components/ace-builds/src-min-noconflict/theme-twilight.js")
+  script(src="bower_components/ace-builds/src-min-noconflict/mode-xml.js")
+  script(src="bower_components/ace-builds/src-min-noconflict/worker-json.js")
+  script(src="bower_components/ace-builds/src-min-noconflict/mode-json.js")
 
   //endbuild
 
@@ -56,7 +69,8 @@ block scripts
             'corespring.container',
             'ui.sortable',
             'ngDragDrop',
-            'cs.directives'
+            'cs.directives',
+            'ui.ace'
           ].concat(data.angular.dependencies);
 
           angular.module("corespring-editor", playerDeps);

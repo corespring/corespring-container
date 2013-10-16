@@ -43,6 +43,13 @@ var controller = function ($scope, $compile, $http, $timeout, EditorServices, Co
     //return "??";
   };
 
+  $scope.selectFile = function(file){
+    console.log("root select file...");
+    $scope.selectedFile = file;
+    $scope.selectedComponent = null;
+    console.log($scope.selectedFile);
+  };
+
   $scope.addComponent = function(descriptor) {
     console.log("add component" + descriptor.componentType);
     var uid = getUid();
