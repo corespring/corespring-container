@@ -187,32 +187,28 @@ h1 {
       border-radius: 4px;
       position: relative;
 
-    }
+      &.active {
+        color: red;
+      }
 
+      .component-remove-button {
+        width: 10px;
+        height: 10px;
+        display: inline-block;
+        position: absolute;
+        right: 5px;
+        top: 2px;
+        &:hover {
+          color: slateblue;
+        }
+      }
+    }
 
     .component-thumbnail-label:hover {
       color: slateblue;
       cursor: hand;
       cursor: pointer;
     }
-
-    .component-thumbnail.active {
-      color: red;
-    }
-
-    .component-thumbnail .component-remove-button {
-      width: 10px;
-      height: 10px;
-      display: inline-block;
-      position: absolute;
-      right: 5px;
-      top: 2px;
-    }
-
-    .component-remove-button:hover {
-      color: slateblue;
-    }
-
   }
 
   .xml-view {
