@@ -1,8 +1,6 @@
 package org.corespring.container.components.response
 
-import java.util
-import org.corespring.container.components.rhino.ScriptableMap
-import org.mozilla.javascript.{Function => RhinoFunction, Context}
+import org.mozilla.javascript.{Function => RhinoFunction}
 import org.specs2.matcher.Matcher
 import org.specs2.mutable.Specification
 import play.api.libs.json.{JsValue, Json, JsObject}
@@ -47,7 +45,6 @@ class ResponseGeneratorTest extends Specification {
     /**
      * An example of sending a map object in to Rhino.
      * For a more robust solution than json serialization we could look at this.
-     */
     "work with maps" in {
       val src: util.HashMap[String, Any] = new util.HashMap()
       val child: util.HashMap[String, Any] = new util.HashMap()
@@ -62,12 +59,13 @@ class ResponseGeneratorTest extends Specification {
       val a: Any = c.evaluateString(scope, source, "TEST", 1, null);
       a.toString === "103.0"
     }
+     */
 
     val beRightResponse: Matcher[(String, String, String)] = (set: (String, String, String)) => {
       val (value, expectedCorrectness, expectedFeedback) = set
       val answer = Json.obj("value" -> value)
       val generator = new ResponseGenerator(respondJs, question, answer, JsObject(Seq.empty))
-      val response = generator.response
+      val response = generator.respond
       (response \ "correctness").as[String] === expectedCorrectness
       val feedback: Seq[JsValue] = (response \ "feedback").as[Seq[JsValue]]
       (feedback(0) \ "feedback").as[String] === expectedFeedback
@@ -75,7 +73,7 @@ class ResponseGeneratorTest extends Specification {
 
     "generate" in {
       ("2", "incorrect", "not super") must beRightResponse
-      //("1", "correct", "super") must beRightResponse
+      ("1", "correct", "super") must beRightResponse
     }
 
   }

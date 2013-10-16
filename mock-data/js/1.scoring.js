@@ -5,8 +5,8 @@
  */
 exports.process = function(answers){
   var correctAnswers = 0;
-  if (answers["1"].indexOf('3') != -1) correctAnswers += 1;
-  if (answers["1"].indexOf('4') != -1) correctAnswers += 1;
+  if (answers["3"].indexOf('3') != -1) correctAnswers += 1;
+  if (answers["3"].indexOf('4') != -1) correctAnswers += 1;
 
   var score = 0;
   if (correctAnswers == 1) score = 0.5

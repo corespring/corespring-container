@@ -1,16 +1,15 @@
 package org.corespring.shell.impl
 
-import org.corespring.container.components.outcome.{DefaultOutcomeProcessor, OutcomeProcessor}
+import org.corespring.amazon.s3.ConcreteS3Service
+import org.corespring.container.client.controllers.{Rig, Icons, Assets}
+import org.corespring.container.components.model.Component
+import org.corespring.container.components.outcome.{ItemJsOutcomeProcessor, OutcomeProcessorSequence, DefaultOutcomeProcessor, OutcomeProcessor}
 import org.corespring.container.components.response.{ResponseProcessorImpl, ResponseProcessor}
 import org.corespring.shell.impl.controllers.editor.{ClientItemImpl, EditorHooksImpl}
 import org.corespring.shell.impl.controllers.player.{ClientSessionImpl, PlayerHooksImpl}
 import org.corespring.shell.impl.services.MongoService
+import play.api.Configuration
 import play.api.mvc._
-import org.corespring.container.client.controllers.{Rig, Icons, Assets}
-import org.corespring.container.components.model.Component
-import org.corespring.amazon.s3.ConcreteS3Service
-import play.api.{Configuration, Play}
-import play.api.libs.iteratee.Iteratee
 
 class ContainerClientImplementation(
                                      itemServiceIn : MongoService,
@@ -82,7 +81,7 @@ class ContainerClientImplementation(
 
     def sessionService: MongoService = sessionServiceIn
 
-    def outcomeProcessor: OutcomeProcessor = DefaultOutcomeProcessor
+    def outcomeProcessor: OutcomeProcessor = new OutcomeProcessorSequence(DefaultOutcomeProcessor, ItemJsOutcomeProcessor)
 
   }
 }
