@@ -11,14 +11,21 @@
         if (!newValue) return;
       });
 
-      $scope.selectComponent = function(comp) {
-         $scope.selectedComponent = {
+      $scope.selectComponent = function (comp) {
+        $scope.selectedComponent = {
           id: comp.id,
           component: comp
         };
       };
 
-      $scope.$watch('model.xhtml', function(newValue) {
+      $scope.removeComponent = function (comp) {
+        delete $scope.model.components[comp.id];
+        var node = $($scope.model.xhtml);
+        node.find("[id='" + comp.id + "']").remove();
+        $scope.model.xhtml = "<div>" + node.html() + "</div>";
+      };
+
+      $scope.$watch('model.xhtml', function (newValue) {
         if (!newValue) return;
         var node = $($scope.model.xhtml);
 
@@ -77,28 +84,28 @@
         link: link($compile),
         restrict: 'E',
         /*scope: {
-          model: '=ngModel',
-          selectedComponent: '=',
-          componentSet: '='
-        },*/
+         model: '=ngModel',
+         selectedComponent: '=',
+         componentSet: '='
+         },*/
         template: [
           '<h1>Structure View</h1>',
           '<div class="btn-group">',
-            '<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">Add...<span class="caret"></span></button>',
-            '<ul class="dropdown-menu" role="menu" >',
-              '<li ng-repeat="descriptor in componentSet">',
-              '  <a ng-click="addComponent(descriptor)">',
-              '    <img ng-src="{{descriptor.icon}}"/>',
-              '    {{descriptor.name}}',
-              '</a>',
-              '</li>',
-            '</ul>',
+          '<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">Add...<span class="caret"></span></button>',
+          '<ul class="dropdown-menu" role="menu" >',
+          '<li ng-repeat="descriptor in componentSet">',
+          '  <a ng-click="addComponent(descriptor)">',
+          '    <img ng-src="{{descriptor.icon}}"/>',
+          '    {{descriptor.name}}',
+          '</a>',
+          '</li>',
+          '</ul>',
           '</div>',
           '<ul ui-sortable ng-model="orderedComponents">',
           '<li class="component-thumbnail "',
-          ' ng-class="{active: selectedComponent.id==component.id}"',
-          ' ng-click="selectComponent(component)" ',
-          ' ng-repeat="component in orderedComponents">{{component.componentType}} [{{component.id}}]</li>',
+          ' ng-repeat="component in orderedComponents">',
+          ' <span class="component-remove-button"><i ng-click="removeComponent(component)" class="glyphicon glyphicon-remove" ></i></span>',
+          ' <span  ng-click="selectComponent(component)" ng-class="{active: selectedComponent.id==component.id}" class="component-thumbnail-label" >{{component.componentType}} [{{component.id}}]</span></li>',
           '</ul>',
         ].join('')
       };

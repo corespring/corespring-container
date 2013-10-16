@@ -185,9 +185,12 @@ h1 {
       padding: 10px;
       border: 1px solid #000000;
       border-radius: 4px;
+      position: relative;
+
     }
 
-    .component-thumbnail:hover {
+
+    .component-thumbnail-label:hover {
       color: slateblue;
       cursor: hand;
       cursor: pointer;
@@ -196,6 +199,20 @@ h1 {
     .component-thumbnail.active {
       color: red;
     }
+
+    .component-thumbnail .component-remove-button {
+      width: 10px;
+      height: 10px;
+      display: inline-block;
+      position: absolute;
+      right: 5px;
+      top: 2px;
+    }
+
+    .component-remove-button:hover {
+      color: slateblue;
+    }
+
   }
 
   .xml-view {
