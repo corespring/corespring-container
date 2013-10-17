@@ -6,9 +6,26 @@ import org.mozilla.javascript.tools.shell.Global
 import java.io.{InputStreamReader, Reader}
 import play.api.Logger
 
+trait JsConsole{
+  def log(msg : String)
+  def warn(msg : String)
+  def info(msg : String)
+  def debug(msg : String)
+}
+
+class DefaultLogger(log:Logger) extends JsConsole{
+  def log(msg : String) = log.info(msg)
+  def warn(msg : String) = log.warn(msg)
+  def info(msg : String) = log.info(msg)
+  def debug(msg : String) = log.debug(msg)
+}
+
+
 trait JsContext{
 
   lazy val logger = Logger("js.processing")
+
+  def console : Option[JsConsole] = Some(new DefaultLogger(Logger("js.console")))
 
   def withJsContext( libs : Seq[String] )( f: (Context, Scriptable) => JsValue ): JsValue = {
     val ctx = Context.enter
@@ -23,9 +40,11 @@ trait JsContext{
       }.getOrElse(logger.debug(s"Couldn't load $l"))
     }
 
-    // Add a global variable out that is a JavaScript reflection of the System.out variable:
-    val wrappedOut: Any = Context.javaToJS(System.out, scope)
-    ScriptableObject.putProperty(scope, "systemOut", wrappedOut)
+    console.foreach{ c =>
+      // Add a global variable out that is a JavaScript reflection of the System.out variable:
+      val wrappedConsole : Any = Context.javaToJS(c, scope)
+      ScriptableObject.putProperty(scope, "console", wrappedConsole)
+    }
 
     try {
       f(ctx, scope)
@@ -58,16 +77,18 @@ trait ModuleWrapperImpl extends ModuleWrapper with JsContext{
 
   private def wrap(d:String) =
     s"""
+      |console.log("Init mock require function");
+
       |var require = function(id){
       |  if(id == "lodash" || id == "underscore" ){
       |    if( _ ){
       |       return _;
       |    } else {
-      |       systemOut.println("Can't find underscore or lodash");
+      |       console.log("Can't find underscore or lodash");
       |       throw "Can't find underscore/lodash";
       |    }
       |  } else {
-      |    systemOut.println("Unsupported library: " + id);
+      |    console.log("Unsupported library: " + id);
       |    throw "Unsupported library: " + id;
       |  }
       |}
@@ -106,7 +127,7 @@ trait ModuleWrapperImpl extends ModuleWrapper with JsContext{
 
       try{
         val fn : RhinoFunction = functionDef.asInstanceOf[RhinoFunction]
-        val jsArgs : Array[AnyRef] = args.toArray.map(jsObject(_)) //Array(jsObject(question), jsObject(answer), jsObject(settings))
+        val jsArgs : Array[AnyRef] = args.toArray.map(jsObject(_))
         val result = fn.call(ctx, scope, exports, jsArgs)
         logger.debug(s"result: ${result.toString}")
         val jsonString : Any = toJsonString.call(ctx, scope, scope, Array(result))
