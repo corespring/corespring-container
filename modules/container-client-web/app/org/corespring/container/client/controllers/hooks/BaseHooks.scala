@@ -84,12 +84,6 @@ trait BaseHooks[T <: ClientHooksActionBuilder[AnyContent]] extends Controller wi
   def componentsCss(id:String) : Action[AnyContent]
 
 
-  protected def processXhtml(s: String): String = {
-    s.trim
-      .replace("\"", "\\\"")
-      .replace("\n", "\\n")
-      .replace("/", "\\/")
-  }
 
   protected def componentTypes(json: JsValue): Seq[String] = (json \ "components" \\ "componentType").map(_.as[String]).distinct
 
