@@ -23,6 +23,9 @@ trait Helpers {
       "css" -> cssPaths
     )
 
+
+
+
   protected def componentsToResource(components: Seq[Component], componentToString : Component => String, contentType : String) : Result = {
     Results.Ok(components.map(componentToString).mkString("\n")).as(contentType)
   }

@@ -30,7 +30,7 @@ trait Session extends Controller {
       Ok(request.everything)
     } else {
       val responses = responseProcessor.respond(itemJson, sessionJson)
-      val outcome = outcomeProcessor.outcome(itemJson, responses)
+      val outcome = outcomeProcessor.outcome(itemJson, sessionJson, responses)
       val out = request.everything.as[JsObject] ++ Json.obj("responses" -> responses, "outcome" -> outcome)
       Ok(out)
     }
@@ -66,7 +66,7 @@ trait Session extends Controller {
             val base = Json.obj("session" -> session)
             if (isFinished) {
               val responses = responseProcessor.respond(itemJson, session)
-              val outcome = outcomeProcessor.outcome(itemJson, responses)
+              val outcome = outcomeProcessor.outcome(itemJson, session, responses)
               base ++ Json.obj("responses" -> responses) ++ Json.obj("outcome" -> outcome)
             } else {
               base

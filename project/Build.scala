@@ -52,17 +52,32 @@ object Build extends sbt.Build {
 
   val builder = new Builders(org, appVersion, ScalaVersion)
 
-  //Note: This should be a lib - but I'm having an issue with conflicting play-json libs
-  //So making it a play app for now
-  lazy val componentModel = builder.playApp("component-model").settings(
+  lazy val utils = builder.lib("container-utils")
+
+  val playAppToSbtLibSettings = Seq(
+    scalaSource in Compile <<= (baseDirectory in Compile)(_ / "src"/ "main"/ "scala"),
+    scalaSource in Test <<= (baseDirectory in Test)(_ / "src" / "test"/ "scala"),
+    resourceDirectory in Compile <<= (baseDirectory in Compile)(_ / "src" / "main" / "resources"),
+    resourceDirectory in Test <<= (baseDirectory in Test)(_ / "src" / "test" / "resources"),
+    lessEntryPoints := Nil,
+    javascriptEntryPoints := Nil
+  )
+
+  //Note: this is a play app for now until we move to play 2.2.0
+  lazy val jsProcessing = builder.playApp("js-processing").settings( playAppToSbtLibSettings : _* ).settings(
+    libraryDependencies ++= Seq(rhinoJs)
+  )
+
+  //Note: As above...
+  lazy val componentModel = builder.playApp("component-model").settings(playAppToSbtLibSettings: _*).settings(
     libraryDependencies ++= Seq(specs2),
     resolvers ++= Resolvers.all
-  )
+  ).dependsOn(utils % "test->compile;compile->compile", jsProcessing)
 
   lazy val componentLoader = builder.lib("component-loader")
     .settings(
       libraryDependencies ++= Seq(logbackClassic, specs2, rhinoJs)
-  ).dependsOn(componentModel)
+  ).dependsOn(componentModel, jsProcessing)
 
 
   val buildClient = TaskKey[Unit]("build-client", "runs client installation commands")
@@ -90,6 +105,9 @@ object Build extends sbt.Build {
       }
   }
 
+
+
+
   lazy val containerClient = builder.lib("container-client")
     .settings(
     buildClientTask,
@@ -102,12 +120,13 @@ object Build extends sbt.Build {
   val containerClientWeb = builder.playApp("container-client-web").settings(
     sources in doc in Compile := List(),
     templatesImport ++= Seq( "play.api.libs.json.JsValue", "play.api.libs.json.Json" )
-  ).dependsOn(componentModel, containerClient )
+  ).dependsOn(componentModel, containerClient, utils, jsProcessing )
 
   val shell = builder.playApp("shell", Some(".")).settings(
     resolvers ++= Resolvers.all,
     libraryDependencies ++= Seq(casbah, playS3),
     credentials += cred,
+    sbt.Keys.fork in Test := false,
     // Start grunt on play run
     playOnStarted <+= baseDirectory { base =>
       (address: InetSocketAddress) => {
@@ -129,7 +148,7 @@ object Build extends sbt.Build {
       ).map(cmd(_, (base/"modules"/"container-client")))
     }
   ).dependsOn(containerClientWeb, componentLoader)
-    .aggregate(containerClientWeb, componentLoader, containerClient, componentModel)
+    .aggregate(containerClientWeb, componentLoader, containerClient, componentModel, utils, jsProcessing)
 
   private def cmd(name: String, base: File): Command = {
     Command.args(name, "<" + name + "-command>") { (state, args) =>
