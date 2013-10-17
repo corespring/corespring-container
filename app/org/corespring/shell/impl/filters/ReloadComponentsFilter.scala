@@ -18,7 +18,7 @@ object ReloadComponentsFilter extends EssentialFilter {
     def apply(request: RequestHeader) = {
       play.api.Play.current.mode match {
         case Mode.Dev => {
-          if (request.path.contains("index.html")  && components != null) {
+          if (request.path.contains(".html")  && components != null) {
             components.reload
           }
           next(request)

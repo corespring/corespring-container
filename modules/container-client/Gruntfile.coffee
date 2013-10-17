@@ -4,20 +4,24 @@ module.exports = (grunt) ->
     app: 'src/main/resources/container-client'
     dist: 'target/scala-2.10/classes/container-client'
     test: 'src/test/resources/container-client'
+    components: '../../corespring-components/components/corespring'
 
   config =
     pkg: grunt.file.readJSON('package.json')
     common: commonConfig
     watch:
+      options:
+        livereload: true
       less:
         files: ['<%= common.app %>/**/*.less']
         tasks: ['less']
       js:
-        files: ['<%= common.app %>/js/**/*.js']
+        files: ['<%= common.app %>/js/**/*.js', '<%= common.components %>/**/*.js']
         tasks: ['jshint:main']
       jade:
         files: ['<%= common.app %>/*.jade']
         tasks: ['jade']
+
 
     less:
       development:

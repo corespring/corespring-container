@@ -3,15 +3,23 @@ extends layout
 block head
 
 block content
-  h1 Corespring Player
+  h1 Corespring Player - Test Rig
+  p This is a test of isolating the player as its own directive!
   div#root.container(ng-controller="Root")
-    #player-body
-    #outcome(ng-show="outcome")
-      h4 You scored: {{outcome.summary.percentage}}%
-    hr
-    button.btn.btn-success( ng-click="submit()", ng-disabled="session.isFinished") Submit
-    label
-      | Attempts left: {{session.remainingAttempts !== undefined ? session.remainingAttempts : session.maxNoOfAttempts}}
+
+    corespring-player(
+      player-xhtml="xhtml",
+      player-model="components",
+      player-session="session",
+      player-responses="responses")
+
+    //#player-body
+    //#outcome(ng-show="outcome")
+    //  h4 You scored: {{outcome.summary.percentage}}%
+    //hr
+    //button.btn.btn-success( ng-click="submit()", ng-disabled="session.isFinished") Submit
+    //label
+    //  | Attempts left: {{session.remainingAttempts !== undefined ? session.remainingAttempts : session.maxNoOfAttempts}}
 
 
 block scripts
@@ -20,9 +28,11 @@ block scripts
   script(src="js/common/directives/_declaration.js")
   script(src="js/common/directives/ng-bind-html-unsafe.js")
   script(src="js/render/controllers/_declaration.js")
-  script(src="js/render/controllers/root.js")
+  script(src="js/render/services/_declaration.js")
+  script(src="js/render/services/component-register.js")
   script(src="js/corespring/container/container.js")
   script(src="js/render/directives/_declaration.js")
+  script(src="js/render/directives/corespring-player.js")
   //endbuild
 
   //build:js js/extras.js
@@ -31,12 +41,11 @@ block scripts
   //endbuild
 
   script.
+
     $(document).ready(function(){
       console.log("load config", document.location);
-      $("body").addClass('blend');
 
-
-      /*var configPath = 'player-config.json';
+      var configPath = 'editor-config.json';
 
       $.get( configPath, function(data){
         console.log("data", data);
@@ -48,6 +57,7 @@ block scripts
 
           var playerDeps = [
             'corespring-common.directives',
+            'corespring-player.services',
             'corespring-player.controllers',
             'corespring-player.directives',
             'corespring.container',
@@ -55,8 +65,73 @@ block scripts
           ].concat(data.angular.dependencies);
 
           angular.module("corespring-player", playerDeps );
+
           angular.bootstrap(document, ["corespring-player"]);
+
+          angular.module("corespring-player").controller('Root', ['$scope', function($scope){
+              $scope.xhtml = "<h3>xhtml here...</h3><corespring-multiple-choice id='blah'></corespring-multiple-choice>";
+              $scope.session = {
+                remainingAttempts : 3,
+                isFinished:false,
+                answers: {
+                  blah: ["3"]
+                }
+              };
+
+              $scope.responses = {
+                blah:  {
+                  "correctness": "correct",
+                  "feedback": [
+                    {
+                      "correct": true,
+                      "feedback": "Great Job",
+                      "value": "3"
+                    }
+                  ],
+                  "score": 1
+                }
+              };
+
+              $scope.components = {
+                blah:
+                {
+                  "componentType" : "corespring-multiple-choice",
+                  "weight" : 4,
+                  "correctResponse" : { "value" : ["2"] },
+                  "scoreMapping" : {
+                    "1": 0.5,
+                    "2": 1,
+                    "3": -1,
+                    "4": -1
+                  },
+                  "feedback" : [
+                    { "value" : "1", "feedback" : "Huh?"},
+                    { "value" : "2", "feedback" : "Great Job", "notChosenFeedback" : "It was this one silly!"},
+                    { "value" : "3", "feedback" : "its a magic number" },
+                    { "value" : "4", "feedback" : "4 to the floor" }
+                  ],
+                  "model" : {
+                    "prompt": "What is 1 + 1?",
+                    "config": {
+                      "orientation": "vertical",
+                      "shuffle": true,
+                      "singleChoice": true
+                    },
+                    "choices": [
+                      {"label": "1", "value": "1"},
+                      {"label": "2", "value": "2"},
+                      {"label": "3", "value": "3"},
+                      {"label": "4", "value": "4"}
+                    ]
+                  }
+                }
+              }
+
+          }]);
+
           angular.resumeBootstrap();
+
+
           $("body").addClass('blend');
         };
 
@@ -67,7 +142,9 @@ block scripts
         head.ready(function(){
             allScriptsAreLoaded();
         });
-      });*/
+      });
     });
+
+
 
 
