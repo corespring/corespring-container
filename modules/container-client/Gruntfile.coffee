@@ -41,14 +41,15 @@ module.exports = (grunt) ->
 
     jade:
       compile:
+        expand: true
+        cwd: '<%= common.app %>'
+        src: ['*.jade', '!layout.jade']
+        ext: '.html'
+        dest: '<%= common.dist %>'
         options:
           pretty: true
           data:
             debug: false
-        files:
-          "<%= common.dist %>/player.html": ["<%= common.app %>/player.jade" ]
-          "<%= common.dist %>/editor.html": ["<%= common.app %>/editor.jade" ]
-          "<%= common.dist %>/rig.html": ["<%= common.app %>/rig.jade" ]
 
     jasmine:
       unit:
