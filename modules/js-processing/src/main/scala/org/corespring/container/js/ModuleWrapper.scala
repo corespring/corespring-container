@@ -97,9 +97,6 @@ trait ModuleWrapperImpl extends ModuleWrapper with JsContext{
       |var exports = {};
       |module.exports = exports;
       |
-      |exports.__internal__toObject = function(jsonString){ return JSON.parse(jsonString); };
-      |exports.__internal__toJsonString = function(obj){ return JSON.stringify(obj); };
-      |
       |$d
       |
     """.stripMargin
@@ -114,8 +111,9 @@ trait ModuleWrapperImpl extends ModuleWrapper with JsContext{
 
     val exports : Scriptable = scope.get("exports", scope).asInstanceOf[Scriptable]
     val functionDef : Any = exports.get(functionName, exports)
-    val toObject : RhinoFunction = exports.get("__internal__toObject", exports).asInstanceOf[RhinoFunction]
-    val toJsonString : RhinoFunction = exports.get("__internal__toJsonString", exports).asInstanceOf[RhinoFunction]
+    val jsJson =  scope.get("JSON", scope).asInstanceOf[ScriptableObject]
+    val toObject : RhinoFunction = jsJson.get("parse", jsJson).asInstanceOf[RhinoFunction]
+    val toJsonString : RhinoFunction = jsJson.get("stringify", jsJson).asInstanceOf[RhinoFunction]
 
     def jsObject(json:JsValue) : ScriptableObject = {
       val jsonString = Json.stringify(json)
