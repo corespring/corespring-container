@@ -13,8 +13,6 @@ class ResponseGeneratorTest extends Specification {
     """
       |var _ = require("underscore");
       |
-      |systemOut.println("underscore: " + _ );
-      |
       |exports.respond = function(question, answer, settings){
       |  var correct = question.correctResponse.value == answer.value;
       |  var feedback = [];
