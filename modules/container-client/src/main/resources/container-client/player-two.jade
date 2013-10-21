@@ -1,17 +1,21 @@
 extends layout
 
 block head
+  link(rel="stylesheet", href="css/editor.css")
+
 
 block content
   h1 Corespring Player - Test Rig
   p This is a test of isolating the player as its own directive!
   div#root.container(ng-controller="Root")
 
+    player-control-panel(player-session="session")
     corespring-player(
       player-xhtml="xhtml",
       player-model="components",
       player-session="session",
       player-responses="responses")
+    button.btn.btn-primary(ng-click="submit()") Submit!
 
     //#player-body
     //#outcome(ng-show="outcome")
@@ -32,6 +36,7 @@ block scripts
   script(src="js/render/services/component-register.js")
   script(src="js/corespring/container/container.js")
   script(src="js/render/directives/_declaration.js")
+  script(src="js/render/directives/control-panel.js")
   script(src="js/render/directives/corespring-player.js")
   //endbuild
 

@@ -1,6 +1,5 @@
 (function() {
 
-
   angular.module('corespring-player.directives').directive('corespringPlayer', [ '$compile',
       'ComponentRegister',
       function($compile, ComponentRegister){
@@ -53,11 +52,7 @@
             responses: '=playerResponses'
           },
           template: [ '<div>',
-                      '  <div id="control-panel"></div>',
                       '  <div id="body"></div>',
-                      '  <div id="submit-panel">',
-                      '    <button class="btn btn-success" ng-click="submit()", ng-disabled="session.isFinished"> Submit </button>',
-                      '  </div>',
                       '</div>'].join("\n")
         };
         return def;

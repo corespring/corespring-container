@@ -42,7 +42,9 @@ angular.module('corespring-player.services').factory('ComponentRegister', ['$log
 
        if(typeof(cb) == "string"){
          var functionName = cb;
-         cb = function(comp, value){ comp[functionName](value) }
+         cb = function(comp, value){
+          comp[functionName](value);
+        };
        }
 
        if(!value){ throw "No answers";}
@@ -65,7 +67,7 @@ angular.module('corespring-player.services').factory('ComponentRegister', ['$log
         if (componentData) {
           applyFn(component, componentData);
         }
-      }
+      };
     };
 
   };
