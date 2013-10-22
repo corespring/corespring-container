@@ -1,5 +1,16 @@
 var controller = function ($scope, ComponentRegister, PlayerServices) {
 
+  $scope.responses = {};
+  $scope.session = {
+    remainingAttempts: 1,
+    settings: {
+      maxNoOfAttempts: 1,
+      highlightUserResponse: true,
+      highlightCorrectResponse: true,
+      showFeedback: true
+    }
+  };
+
   var getUid = function(){
     return Math.random().toString(36).substring(2,9);
   };
@@ -20,47 +31,13 @@ var controller = function ($scope, ComponentRegister, PlayerServices) {
   };
 
   $scope.$watch('session.settings', function(newSettings){
-    var cleaned = {};
     for(var x in $scope.responses ){
-        cleaned[x] = {};
+        $scope.responses[x] = {};
     }
     $scope.session.isFinished = false;
-    $scope.responses = cleaned;
+    $scope.session.remainingAttempts = $scope.session.settings.maxNoOfAttempts;
     PlayerServices.updateSessionSettings(newSettings);
   }, true);
-
-  /*$scope.getQuestionForComponentId = function(id){
-    return $scope.components[id];
-  };*/
-
-  $scope.session = {
-    settings: {
-      maxNoOfAttempts: 1,
-      showFeedback: true
-    },
-    remainingAttempts : 2,
-    isFinished:false,
-    answers: {
-      blah: ["3"]
-    }
-  };
-
-  $scope.responses = {
-    blah:  {
-      "correctness": "correct",
-      "feedback": [
-        {
-          "correct": true,
-          "feedback": "Great Job",
-          "value": "3"
-        }
-      ],
-      "score": 1
-    }
-  };
-
-  //PlayerServices.setQuestionLookup($scope.getQuestionForComponentId);
-
 };
 
 angular.module('corespring-editor.controllers')

@@ -38,7 +38,7 @@
               return;
             }
             ComponentRegister.setResponses(r);
-          });
+          }, true);
 
         };
 

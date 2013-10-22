@@ -24,11 +24,11 @@
       };
 
       var out = { session: _.extend(_.cloneDeep(answers))};
+      out.session.settings = settings;
 
       if(attemptsCountdown <= 0){
         out.session.isFinished = true;
         out.session.remainingAttempts = 0;
-        out.session.settings = settings;
         out.responses = process(answers.answers, settings);
       }
       return out;
