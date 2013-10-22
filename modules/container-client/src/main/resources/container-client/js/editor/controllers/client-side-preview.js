@@ -5,7 +5,6 @@ var controller = function ($scope, ComponentRegister, PlayerServices) {
   };
 
   $scope.submit = function(){
-    console.log("client side preview :: submit");
     var answers = ComponentRegister.getAnswers();
     PlayerServices.submitAnswers({answers: answers}, $scope.onSessionSaved, $scope.onSessionSaveError);
   };
