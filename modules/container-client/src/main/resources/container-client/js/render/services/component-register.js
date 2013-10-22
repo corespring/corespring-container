@@ -30,6 +30,18 @@ angular.module('corespring-player.services').factory('ComponentRegister', ['$log
       setAndApplyToComponents(responses, "responses", "setResponse");
     };
 
+    this.getAnswers = function () {
+      var answers = {};
+
+      for (var x in components) {
+        var answer = components[x].getAnswer();
+        if (answer) {
+          answers[x] = answer;
+        }
+      }
+      return answers;
+    };
+
     /**
      * set the value to the 'loaded' object and apply sub objects out to
      * the respective components using their uid.

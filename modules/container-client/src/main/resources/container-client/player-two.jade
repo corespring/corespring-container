@@ -8,35 +8,41 @@ block content
   h1 Corespring Player - Test Rig
   p This is a test of isolating the player as its own directive!
   div#root.container(ng-controller="Root")
+    div(ng-controller="ClientSidePreview")
 
-    player-control-panel(player-session="session")
-    corespring-player(
-      player-xhtml="xhtml",
-      player-model="components",
-      player-session="session",
-      player-responses="responses")
-    button.btn.btn-primary(ng-click="submit()") Submit!
-
-    //#player-body
-    //#outcome(ng-show="outcome")
-    //  h4 You scored: {{outcome.summary.percentage}}%
-    //hr
-    //button.btn.btn-success( ng-click="submit()", ng-disabled="session.isFinished") Submit
-    //label
-    //  | Attempts left: {{session.remainingAttempts !== undefined ? session.remainingAttempts : session.maxNoOfAttempts}}
-
+      player-control-panel(player-settings="session.settings")
+      corespring-player(
+        player-xhtml="xhtml",
+        player-model="components",
+        player-session="session",
+        player-responses="responses")
+      button.btn.btn-primary(ng-click="submit()") Submit!
+      label
+        | Attempts left: {{session.remainingAttempts !== undefined ? session.remainingAttempts : session.maxNoOfAttempts}}
 
 block scripts
 
-  //build:js js/player.js
+  //build:js js/editor.js
+  script(src="js/corespring/core.js")
+
   script(src="js/common/directives/_declaration.js")
   script(src="js/common/directives/ng-bind-html-unsafe.js")
-  script(src="js/render/controllers/_declaration.js")
+
+  script(src="js/editor/directives/_declaration.js")
+  script(src="js/editor/directives/control-panel.js")
+
+  script(src="js/editor/controllers/_declaration.js")
+  script(src="js/editor/controllers/root.js")
+  script(src="js/editor/controllers/client-side-preview.js")
+
+  script(src="js/editor/services/_declaration.js")
+  script(src="js/editor/services/client-side-player-services.js")
+
+
   script(src="js/render/services/_declaration.js")
   script(src="js/render/services/component-register.js")
-  script(src="js/corespring/container/container.js")
+
   script(src="js/render/directives/_declaration.js")
-  script(src="js/render/directives/control-panel.js")
   script(src="js/render/directives/corespring-player.js")
   //endbuild
 
@@ -62,10 +68,11 @@ block scripts
 
           var playerDeps = [
             'corespring-common.directives',
+            'corespring-editor.services',
+            'corespring-editor.controllers',
+            'corespring-editor.directives',
             'corespring-player.services',
-            'corespring-player.controllers',
             'corespring-player.directives',
-            'corespring.container',
             'ngDragDrop'
           ].concat(data.angular.dependencies);
 
@@ -75,27 +82,9 @@ block scripts
 
           angular.module("corespring-player").controller('Root', ['$scope', function($scope){
               $scope.xhtml = "<h3>xhtml here...</h3><corespring-multiple-choice id='blah'></corespring-multiple-choice>";
-              $scope.session = {
-                remainingAttempts : 3,
-                isFinished:false,
-                answers: {
-                  blah: ["3"]
-                }
-              };
 
-              $scope.responses = {
-                blah:  {
-                  "correctness": "correct",
-                  "feedback": [
-                    {
-                      "correct": true,
-                      "feedback": "Great Job",
-                      "value": "3"
-                    }
-                  ],
-                  "score": 1
-                }
-              };
+
+
 
               $scope.components = {
                 blah:
