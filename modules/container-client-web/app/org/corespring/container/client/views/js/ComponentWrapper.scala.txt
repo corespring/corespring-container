@@ -1,44 +1,7 @@
 @(moduleName: String, directiveName : String, jsBody : String)
-// --------
-// -------- Wrapper for: @moduleName / @directiveName
-// --------
 (function(){
-
-    // A stop gap until we think about namespacing config + preview defs.
-    var loadAngular = function(n){
-      try{
-        return angular.module(n);
-      }
-      catch(e){
-        console.warn("error instantiating module: ", n);
-        return angular.module(n, []);
-      }
-    }
-
+    //TODO: Move to the module pattern see: https://www.pivotaltracker.com/s/projects/926438/stories/59322058
     @jsBody;
-
     var moduleName = '@moduleName';
-    var ngModule = loadAngular(moduleName);
-
-    if( componentDefinition.directive ){
-      ngModule.directive( '@directiveName', componentDefinition.directive);
-    } else if( componentDefinition.directives ){
-
-      var hasDefault = false;
-
-      for( var i = 0; i < componentDefinition.directives.length; i++ ){
-        var innerDef = componentDefinition.directives[i];
-        var name = innerDef.name ? innerDef.name : '@directiveName';
-
-        if(!hasDefault){
-          hasDefault = innerDef.name == undefined;
-        };
-
-        console.log("registering directive: ", moduleName, name);
-        ngModule.directive( name, innerDef.directive);
-        if(!hasDefault){
-          throw "No default directive defined"
-        }
-      }
-    }
-  })();
+    corespring.loadClientSideComponent( componentDefinition, '@directiveName', '@moduleName');
+})();

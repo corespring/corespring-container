@@ -44,9 +44,6 @@
                             radioOrCheckbox("showFeedback", "Show feedback"),
                             radioOrCheckbox("allowEmptyResponses", "Allow empty responses"),
                       '   </div>',
-                      '   <div class="footer">',
-                      '     <button class="btn btn-primary">Update Settings</button>',
-                      '   </div>',
                       '  </div>',
                       '</div>'].join("\n")
         };

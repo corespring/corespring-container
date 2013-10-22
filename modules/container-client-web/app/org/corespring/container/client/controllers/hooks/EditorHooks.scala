@@ -1,10 +1,11 @@
 package org.corespring.container.client.controllers.hooks
 
 import org.corespring.container.client.actions.{EditorClientHooksActionBuilder, PlayerRequest}
-import org.corespring.container.client.views.txt.js.{ComponentWrapper, EditorServices}
+import org.corespring.container.client.views.txt.js.{ComponentServerWrapper, ComponentWrapper, EditorServices}
 import play.api.Logger
 import play.api.mvc.{AnyContent, Action}
 import play.api.libs.json.{JsArray, JsValue, Json}
+import org.corespring.container.components.model.Component
 
 trait EditorHooks extends BaseHooks[EditorClientHooksActionBuilder[AnyContent]] {
 
@@ -47,9 +48,24 @@ trait EditorHooks extends BaseHooks[EditorClientHooksActionBuilder[AnyContent]] 
         val configJs = wrapJs(c.org, c.name, c.client.configure, Some(s"${directiveName(c.org, c.name)}Config"))
         //Add the render directives as previews
         val previewJs = wrapJs(c.org, c.name, c.client.render, Some(s"${directiveName(c.org, c.name)}"))
-        s"$configJs\n$previewJs"
+        val serverJs = wrapServerJs(tagName(c.org, c.name), c.server.definition)
+
+        s"""
+          ${header(c, "Client Config")}
+          $configJs
+          ${header(c, "Client Preview")}
+          $previewJs
+          ${header(c, "Server")}
+          $serverJs
+          """
       }, "text/javascript")
   }
+
+  private def header(c:Component, msg:String) = s"""
+      // -----------------------------------------
+      // ${c.org} ${c.name} | $msg
+      // -----------------------------------------
+  """
 
   override def componentsCss(sessionId: String):  Action[AnyContent] = builder.loadComponents(sessionId) {
     request =>
@@ -62,6 +78,7 @@ trait EditorHooks extends BaseHooks[EditorClientHooksActionBuilder[AnyContent]] 
     ComponentWrapper(moduleName(org, name), d, src ).toString
   }
 
+  def wrapServerJs(componentType:String, definition:String) : String =  ComponentServerWrapper(componentType, definition).toString
 
   def createItem = builder.createItem {
     request: PlayerRequest[AnyContent] =>

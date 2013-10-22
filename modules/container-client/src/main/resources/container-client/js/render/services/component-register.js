@@ -77,7 +77,7 @@ angular.module('corespring-player.services').factory('ComponentRegister', ['$log
         }
         var componentData = dataHolder[id];
         if (componentData) {
-          applyFn(component, componentData);
+          applyFn(component, angular.copy(componentData));
         }
       };
     };

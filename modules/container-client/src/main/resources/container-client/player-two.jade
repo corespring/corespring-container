@@ -16,7 +16,7 @@ block content
         player-model="components",
         player-session="session",
         player-responses="responses")
-      button.btn.btn-primary(ng-click="submit()") Submit!
+      button.btn.btn-primary(ng-click="submit()", ng-disabled="session.isFinished") Submit!
       label
         | Attempts left: {{session.remainingAttempts !== undefined ? session.remainingAttempts : session.maxNoOfAttempts}}
 

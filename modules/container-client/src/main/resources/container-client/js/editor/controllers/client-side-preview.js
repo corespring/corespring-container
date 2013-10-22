@@ -20,6 +20,20 @@ var controller = function ($scope, ComponentRegister, PlayerServices) {
     console.warn("Error saving session");
   };
 
+  $scope.$watch('session.settings', function(newSettings){
+    var cleaned = {};
+    for(var x in $scope.responses ){
+        cleaned[x] = {};
+    }
+    $scope.session.isFinished = false;
+    $scope.responses = cleaned;
+    PlayerServices.updateSessionSettings(newSettings);
+  }, true);
+
+  $scope.getQuestionForComponentId = function(id){
+    return $scope.components[id];
+  };
+
   $scope.session = {
     settings: {
       maxNoOfAttempts: 1,
@@ -45,6 +59,8 @@ var controller = function ($scope, ComponentRegister, PlayerServices) {
       "score": 1
     }
   };
+
+  PlayerServices.setQuestionLookup($scope.getQuestionForComponentId);
 
 };
 
