@@ -22,7 +22,7 @@
               return;
             }
             ComponentRegister.setData(comps);
-          });
+          }, true);
 
           $scope.$watch('session', function(s){
             if(!s){

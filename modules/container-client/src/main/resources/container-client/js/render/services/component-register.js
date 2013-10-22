@@ -55,7 +55,10 @@ angular.module('corespring-player.services').factory('ComponentRegister', ['$log
        if(typeof(cb) == "string"){
          var functionName = cb;
          cb = function(comp, value){
-          comp[functionName](value);
+
+          if(comp[functionName]){
+            comp[functionName](value);
+          }
         };
        }
 

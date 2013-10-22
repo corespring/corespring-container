@@ -25,21 +25,46 @@ block content
       //TODO: in ng-show below 'selectedFile' is bound to the file-preview selectedFile - not the outer one
       //Should be bound to the outer property.
       div.selected-text-editor(ui-ace, ng-model="selectedFile.content", ui-ace="{useWrapMode: true}", ng-show="selectedFile.content != null")
-      inline-preview.inline-preview
+
+      div(ng-controller="ClientSidePreview")
+
+        player-control-panel(player-settings="session.settings")
+        corespring-player(
+          player-xhtml="model.xhtml",
+          player-model="model.components",
+          player-session="session",
+          player-responses="responses")
+        button.btn.btn-primary(ng-click="submit()", ng-disabled="session.isFinished") Submit
+        label
+          | Attempts left: {{session.remainingAttempts !== undefined ? session.remainingAttempts : session.maxNoOfAttempts}}
+
 
 block scripts
 
   //build:js js/player.js
+  script(src="js/corespring/core.js")
+
   script(src="js/editor/controllers/_declaration.js")
   script(src="js/editor/controllers/root.js")
+  script(src="js/editor/controllers/client-side-preview.js")
+
+  script(src="js/editor/services/_declaration.js")
+  script(src="js/editor/services/client-side-player-services.js")
+
   script(src="js/editor/directives/_declaration.js")
   script(src="js/editor/directives/structure-view.js")
   script(src="js/editor/directives/file-list.js")
   script(src="js/editor/directives/file-preview.js")
   script(src="js/editor/directives/config-pane.js")
   script(src="js/editor/directives/inline-preview.js")
-  script(src="js/corespring/container/container.js")
+  script(src="js/editor/directives/control-panel.js")
+
+
+  script(src="js/render/services/_declaration.js")
+  script(src="js/render/services/component-register.js")
+
   script(src="js/render/directives/_declaration.js")
+  script(src="js/render/directives/corespring-player.js")
   //endbuild
 
   //build:js js/extras.js
@@ -66,11 +91,12 @@ block scripts
         var allScriptsAreLoaded = function () {
           var playerDeps = [
             'corespring-common.directives',
+            'corespring-editor.services',
             'corespring-editor.controllers',
             'corespring-editor.directives',
-            'corespring.container',
+            'corespring-player.services',
+            'corespring-player.directives',
             'ui.sortable',
-            'ngDragDrop',
             'cs.directives',
             'ui.ace'
           ].concat(data.angular.dependencies);

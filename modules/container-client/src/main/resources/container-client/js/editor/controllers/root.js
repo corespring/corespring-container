@@ -1,4 +1,4 @@
-var controller = function ($scope, $compile, $http, $timeout, EditorServices, CorespringContainer) {
+var controller = function ($scope, $compile, $http, $timeout, EditorServices, PlayerServices) {
 
 
   var getUid = function(){
@@ -34,7 +34,7 @@ var controller = function ($scope, $compile, $http, $timeout, EditorServices, Co
 
   $scope.onItemLoaded = function (data) {
     $scope.model = data.item;
-    CorespringContainer.initialize(data);
+    //CorespringContainer.initialize(data);
   };
 
   $scope.getUploadUrl = function(file){
@@ -63,8 +63,27 @@ var controller = function ($scope, $compile, $http, $timeout, EditorServices, Co
      console.warn("file too big");
   });
 
+  $scope.getQuestionForComponentId = function(id){
+    return $scope.model.components[id];
+  };
+
+  $scope.registerConfigPanel = function(id, component){
+    console.log("registerConfigPanel:", id);
+    component.setModel($scope.model.components[id]);
+  };
+
+  PlayerServices.setQuestionLookup($scope.getQuestionForComponentId);
+
   EditorServices.load($scope.onItemLoaded, $scope.onItemLoadError);
   EditorServices.loadComponents($scope.onComponentsLoaded, $scope.onComponentsLoadError);
 };
 
-angular.module('corespring-editor.controllers').controller('Root', ['$scope', '$compile', '$http', '$timeout', 'EditorServices', 'CorespringContainer', controller]);
+angular.module('corespring-editor.controllers')
+  .controller('Root',
+    ['$scope',
+    '$compile',
+    '$http',
+    '$timeout',
+    'EditorServices',
+    'PlayerServices',
+    controller]);

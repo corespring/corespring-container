@@ -29,9 +29,9 @@ var controller = function ($scope, ComponentRegister, PlayerServices) {
     PlayerServices.updateSessionSettings(newSettings);
   }, true);
 
-  $scope.getQuestionForComponentId = function(id){
+  /*$scope.getQuestionForComponentId = function(id){
     return $scope.components[id];
-  };
+  };*/
 
   $scope.session = {
     settings: {
@@ -59,7 +59,7 @@ var controller = function ($scope, ComponentRegister, PlayerServices) {
     }
   };
 
-  PlayerServices.setQuestionLookup($scope.getQuestionForComponentId);
+  //PlayerServices.setQuestionLookup($scope.getQuestionForComponentId);
 
 };
 
