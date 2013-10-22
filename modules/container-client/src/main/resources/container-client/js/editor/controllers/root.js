@@ -1,5 +1,6 @@
 var controller = function ($scope, $compile, $http, $timeout, EditorServices, PlayerServices) {
 
+  var configPanels = {};
 
   var getUid = function(){
     return Math.random().toString(36).substring(2,9);
@@ -8,7 +9,7 @@ var controller = function ($scope, $compile, $http, $timeout, EditorServices, Pl
   $scope.save = function () {
     console.log("Saving: ");
     console.log($scope.model);
-    var cleaned = CorespringContainer.serialize($scope.model);
+    var cleaned = $scope.serialize($scope.model);
     console.log(cleaned);
     EditorServices.save(cleaned, $scope.onItemSaved, $scope.onItemSaveError);
   };
@@ -67,9 +68,25 @@ var controller = function ($scope, $compile, $http, $timeout, EditorServices, Pl
     return $scope.model.components[id];
   };
 
+
   $scope.registerConfigPanel = function(id, component){
     console.log("registerConfigPanel:", id);
+    configPanels[id] = component;
     component.setModel($scope.model.components[id]);
+  };
+
+  $scope.serialize = function (itemModel) {
+
+    if (!configPanels) return itemModel;
+
+    var newModel = _.cloneDeep(itemModel);
+    _.each(newModel.components, function(value, key) {
+      var component = configPanels[key];
+      if (component && component.getModel) {
+        newModel.components[key] = component.getModel();
+      }
+    });
+    return newModel;
   };
 
   PlayerServices.setQuestionLookup($scope.getQuestionForComponentId);
