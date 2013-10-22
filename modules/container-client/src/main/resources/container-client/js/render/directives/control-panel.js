@@ -27,8 +27,8 @@
             session: '=playerSession'
           },
           template: [ '<div class="control-panel panel panel-info">',
-                      '  <div class="panel-heading">',
-                      '   <span class="glyphicon glyphicon-cog" ng-click="showSettings = !showSettings"></span>',
+                      '  <div class="panel-heading" ng-click="showSettings = !showSettings">',
+                      '   <span class="glyphicon glyphicon-cog"></span>',
                       '    Session Settings',
                       '   </div>',
                       '   <div class="panel-body" ng-show="showSettings">',

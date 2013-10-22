@@ -1,3 +1,5 @@
+@import "../bower_components/less-elements/elements";
+
 @editor-height: 90%;
 
 html,
@@ -278,8 +280,12 @@ h1 {
 
 .control-panel{
 
-  .panel-body{
+  .panel-heading{
+    cursor: pointer;
+    .user-select(none);
+  }
 
+  .panel-body{
     .span2, .span4{
       float: left;
       padding: 10px;
