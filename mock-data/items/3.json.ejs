@@ -1,0 +1,47 @@
+{
+  "metadata" : {
+    "title" : "Inline choice only"
+  },
+  "files" : [
+    { "name" : "cute-puppy.jpg", "contentType" : "image/jpeg" },
+    { "name" : "cute-kitten.jpg", "contentType" : "image/jpeg" },
+    { "name" : "style.css", "contentType" : "text/css", "content" : "body{ color: #99ff99; }" }
+   ],
+  "xhtml" : "<%- helper.read('../xml/3.xhtml') %>",
+  "components" : {
+    "5" : {
+      "componentType" : "corespring-inline-choice",
+      "weight" : 10,
+      "correctResponse" : "banana",
+      "feedback" : [
+        { "value" : "banana", "feedback" : "yes it is"},
+        { "value" : "carrot", "feedback" : "nopes"},
+        { "value" : "apple", "feedback" : "nopes" },
+        { "value" : "turnip", "feedback" : "nopes" },
+        { "value" : "potato", "feedback" : "nopes" },
+        { "value" : "wheat", "feedback" : "nopes" }
+      ],
+
+      "model" : {
+        "prompt": "Which of these is yellow?",
+        "config": {
+          "shuffle": true
+        },
+        "choices": [
+          {"label": "Banana", "value": "banana"},
+          {"label": "Carrot", "value": "carrot"},
+          {"label": "Apple", "value": "apple"},
+          {"label": "Turnip", "value": "turnip"},
+          {"label": "Potato", "value": "potato"},
+          {"label": "Wheat", "value": "wheat"}
+        ]
+      }
+    }
+  },
+  "_id" : "522267c2554f43f858000009",
+  "org": {
+    "components": [
+      "corespring/*"
+    ]
+  }
+}
