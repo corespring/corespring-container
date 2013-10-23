@@ -19,7 +19,9 @@ angular.module('corespring-player.services').factory('ComponentRegister', ['$log
 
     this.setSession = function(session){
       $.each(components, function(id, comp){
-        comp.setSession(session);
+        if(comp.setSession){
+          comp.setSession(session);
+        }
       });
     };
 

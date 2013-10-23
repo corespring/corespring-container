@@ -32,16 +32,16 @@
           percentage: percentage
         },
         components : componentScores
-      }
-    }
+      };
+    };
 
     var scoreForComponent = function(comp, response){
       return {
         weight : comp.weight,
         score: response.score,
         weightedScore: comp.weight * response.score
-      }
-    }
+      };
+    };
   };
 
   root.corespring.outcomeProcessor = new OutcomeProcessor();
