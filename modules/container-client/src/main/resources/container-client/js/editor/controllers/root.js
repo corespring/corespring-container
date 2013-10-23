@@ -96,8 +96,10 @@ var controller = function ($scope, $compile, $http, $timeout, EditorServices, Pl
     return newModel;
   };
 
+  $scope.getItem = function(){ return $scope.model; };
 
   PlayerServices.setQuestionLookup($scope.getQuestionForComponentId);
+  PlayerServices.setItemLookup($scope.getItem);
 
   EditorServices.load($scope.onItemLoaded, $scope.onItemLoadError);
   EditorServices.loadComponents($scope.onComponentsLoaded, $scope.onComponentsLoadError);

@@ -59,3 +59,22 @@ This is very similar to the player except that it uses `GET editor-config.json` 
 
 TODO - Flesh this out...
 
+
+Scoring Override js Impl - from Client side Player Services.js
+
+      //Note: This is not required in the first iteration.
+      /*if(scoringJsFile){
+        var def = new Function("exports", scoringJsFile.content);
+        def(corespring.server.itemOverride());
+        //TODO: Explore this option:
+
+          //var s = document.createElement('script');
+          //s.src = 'data:text/javascript,' + encodeURIComponent('alert("lorem ipsum")')
+          //document.body.appendChild(s);
+        //TODO: Load item
+        out.outcome = corespring.server.itemOverride().process({}, answers.answers);
+      }
+      */
+
+
+

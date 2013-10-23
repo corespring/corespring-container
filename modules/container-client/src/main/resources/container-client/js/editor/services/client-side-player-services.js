@@ -10,6 +10,10 @@
       throw new Error("Not defined");
     };
 
+    var getItem = function(){
+      throw new Error("Not defined");
+    };
+
     var createResponse = function(answers){
 
       if( !answers ) {
@@ -30,20 +34,9 @@
       if(attemptsCountdown <= 0){
         out.session.isFinished = true;
         out.session.remainingAttempts = 0;
-        out.responses = process(answers.answers, settings);
-      }
-      //Note: This is not required in the first iteration.
-      if(scoringJsFile){
-        var def = new Function("exports", scoringJsFile.content);
-        def(corespring.server.itemOverride());
-        //TODO: Explore this option:
-        /*
-          var s = document.createElement('script');
-          s.src = 'data:text/javascript,' + encodeURIComponent('alert("lorem ipsum")')
-          document.body.appendChild(s);
-        */
-        //TODO: Load item
-        out.outcome = corespring.server.itemOverride().process({}, answers.answers);
+        var responses = process(answers.answers, settings);
+        out.responses = responses;
+        out.outcome = corespring.outcomeProcessor.outcome(getItem(), {}, responses);
       }
 
       return out;
@@ -77,6 +70,10 @@
 
     this.setQuestionLookup = function(cb){
       getQuestionFor = cb;
+    };
+
+    this.setItemLookup = function(cb){
+      getItem = cb;
     };
 
     this.setScoringJs = function(scoringJs){
