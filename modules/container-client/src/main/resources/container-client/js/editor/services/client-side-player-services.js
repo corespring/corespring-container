@@ -6,14 +6,6 @@
     var attemptsCountdown = 0;
     var scoringJsFile = {};
 
-    var wrap = function(content){
-      return [
-        '(function(exports){',
-        content,
-        '})(corespring.server.itemOverride());'
-      ].join("\n");
-    };
-
     var getQuestionFor = function(id){
       throw new Error("Not defined");
     };
