@@ -10,6 +10,9 @@ var loadAngular = function (n) {
 var module = loadAngular('corespring.container');
 
 module.factory('CorespringContainer', function () {
+
+    console.warn("CorespringContainer is deprecated!! use scope.registerComponent and scope.registerConfigPanel instead");
+
     var container = {};
     var dataLoaded = false;
 
