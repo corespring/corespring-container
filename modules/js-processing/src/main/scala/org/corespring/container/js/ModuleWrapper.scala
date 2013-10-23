@@ -1,6 +1,6 @@
 package org.corespring.container.js
 
-import play.api.libs.json.{Json, JsValue}
+import play.api.libs.json.{JsString, Json, JsValue}
 import org.mozilla.javascript.{EcmaError, ScriptableObject, Scriptable, Context}
 import org.mozilla.javascript.tools.shell.Global
 import java.io.{InputStreamReader, Reader}
@@ -115,10 +115,13 @@ trait ModuleWrapperImpl extends ModuleWrapper with JsContext{
     val toObject : RhinoFunction = jsJson.get("parse", jsJson).asInstanceOf[RhinoFunction]
     val toJsonString : RhinoFunction = jsJson.get("stringify", jsJson).asInstanceOf[RhinoFunction]
 
-    def jsObject(json:JsValue) : ScriptableObject = {
+    def jsObject(json:JsValue) : AnyRef = {
       val jsonString = Json.stringify(json)
       logger.debug(s"[jsObject] jsonString: $jsonString")
-      toObject.call(ctx, scope, scope, Array(jsonString)).asInstanceOf[ScriptableObject]
+      json match {
+        case s: JsString => Context.javaToJS(s.value, scope)
+        case _ => toObject.call(ctx, scope, scope, Array(jsonString))
+      }
     }
 
     if (functionDef.isInstanceOf[RhinoFunction]) {
@@ -126,6 +129,7 @@ trait ModuleWrapperImpl extends ModuleWrapper with JsContext{
       try{
         val fn : RhinoFunction = functionDef.asInstanceOf[RhinoFunction]
         val jsArgs : Array[AnyRef] = args.toArray.map(jsObject(_))
+
         val result = fn.call(ctx, scope, exports, jsArgs)
         logger.debug(s"result: ${result.toString}")
         val jsonString : Any = toJsonString.call(ctx, scope, scope, Array(result))
@@ -144,7 +148,7 @@ trait ModuleWrapperImpl extends ModuleWrapper with JsContext{
           logger.debug( s">> line: ${e.lineNumber}, column: ${e.columnNumber} " )
           throw new RuntimeException("Error processing js", e)
         }
-        case e : Throwable => throw new RuntimeException("Error processing js", e)
+        case e : Throwable => throw new RuntimeException("General error while processing js", e)
       }
     } else {
       throw new RuntimeException(s"$functionName is not defined as a function in \n $js")

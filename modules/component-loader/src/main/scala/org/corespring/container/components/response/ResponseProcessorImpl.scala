@@ -38,6 +38,6 @@ class ResponseProcessorImpl(components: Seq[Component]) extends ResponseProcesso
 
   private def getAnswer(session: JsValue, id: String): Option[JsValue] = {
     val value = (session \ "answers" \ id)
-    value.asOpt[JsObject] orElse value.asOpt[JsArray]
+    value.asOpt[JsObject] orElse value.asOpt[JsArray] orElse Some(value)
   }
 }
