@@ -4,24 +4,32 @@ block head
 
 block content
   div#root.container(ng-controller="Root")
-    #player-body
-    #outcome(ng-show="outcome")
-      h4 You scored: {{outcome.summary.percentage}}%
-    hr
-    button.btn.btn-success( ng-click="submit()", ng-disabled="session.isFinished") Submit
+
+    corespring-player(
+      player-xhtml="model.xhtml",
+      player-model="model.components",
+      player-session="session",
+      player-responses="responses")
+    button.btn.btn-primary(
+      ng-click="submit()",
+      ng-disabled="session.isFinished") Submit
     label
       | Attempts left: {{session.remainingAttempts !== undefined ? session.remainingAttempts : session.maxNoOfAttempts}}
-
 
 block scripts
 
   //build:js js/player.js
   script(src="js/common/directives/_declaration.js")
   script(src="js/common/directives/ng-bind-html-unsafe.js")
+
   script(src="js/render/controllers/_declaration.js")
   script(src="js/render/controllers/root.js")
-  script(src="js/corespring/container/container.js")
+
+  script(src="js/render/services/_declaration.js")
+  script(src="js/render/services/component-register.js")
+
   script(src="js/render/directives/_declaration.js")
+  script(src="js/render/directives/corespring-player.js")
   //endbuild
 
   //build:js js/extras.js
@@ -47,7 +55,7 @@ block scripts
             'corespring-common.directives',
             'corespring-player.controllers',
             'corespring-player.directives',
-            'corespring.container',
+            'corespring-player.services',
             'ngDragDrop'
           ].concat(data.angular.dependencies);
 
