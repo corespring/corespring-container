@@ -64,6 +64,7 @@ module.exports = (grunt) ->
             '<%= common.dist %>/bower_components/angular/angular.js',
             '<%= common.dist %>/bower_components/angular-mocks/angular-mocks.js',
             '<%= common.dist %>/bower_components/jquery/jquery.js',
+            '<%= common.dist %>/bower_components/lodash/dist/lodash.js'
           ]
           specs: '<%= common.test %>/js/**/*-test.js'
 

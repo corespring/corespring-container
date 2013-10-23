@@ -32,7 +32,7 @@
         out.session.remainingAttempts = 0;
         out.responses = process(answers.answers, settings);
       }
-
+      //Note: This is not required in the first iteration.
       if(scoringJsFile){
         var def = new Function("exports", scoringJsFile.content);
         def(corespring.server.itemOverride());
