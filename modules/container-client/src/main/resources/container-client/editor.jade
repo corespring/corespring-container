@@ -37,7 +37,9 @@ block content
         button.btn.btn-primary(ng-click="submit()", ng-disabled="session.isFinished") Submit
         label
           | Attempts left: {{session.remainingAttempts !== undefined ? session.remainingAttempts : session.maxNoOfAttempts}}
-
+        hr
+        #outcome(ng-show="outcome")
+          h4 You scored: {{outcome.summary.percentage}}%
 
 block scripts
 

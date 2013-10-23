@@ -1,4 +1,4 @@
-var controller = function ($scope, $compile, $http, $timeout, PlayerServices, ComponentRegister) {
+var controller = function ($scope, ComponentRegister, PlayerServices) {
 
   $scope.submit = function () {
     PlayerServices.submitAnswers({
@@ -45,10 +45,7 @@ angular.module('corespring-player.controllers')
     'Root',
     [
     '$scope',
-    '$compile',
-    '$http',
-    '$timeout',
-    'PlayerServices',
     'ComponentRegister',
+    'PlayerServices',
      controller
     ]);

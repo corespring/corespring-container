@@ -4,6 +4,15 @@
 
     var settings = {};
     var attemptsCountdown = 0;
+    var scoringJsFile = {};
+
+    var wrap = function(content){
+      return [
+        '(function(exports){',
+        content,
+        '})(corespring.server.itemOverride());'
+      ].join("\n");
+    };
 
     var getQuestionFor = function(id){
       throw new Error("Not defined");
@@ -31,6 +40,20 @@
         out.session.remainingAttempts = 0;
         out.responses = process(answers.answers, settings);
       }
+
+      if(scoringJsFile){
+        var def = new Function("exports", scoringJsFile.content);
+        def(corespring.server.itemOverride());
+        //TODO: Explore this option:
+        /*
+          var s = document.createElement('script');
+          s.src = 'data:text/javascript,' + encodeURIComponent('alert("lorem ipsum")')
+          document.body.appendChild(s);
+        */
+        //TODO: Load item
+        out.outcome = corespring.server.itemOverride().process({}, answers.answers);
+      }
+
       return out;
     };
 
@@ -63,6 +86,11 @@
     this.setQuestionLookup = function(cb){
       getQuestionFor = cb;
     };
+
+    this.setScoringJs = function(scoringJs){
+      scoringJsFile = scoringJs;
+    };
+
   };
 
   angular.module('corespring-editor.services')

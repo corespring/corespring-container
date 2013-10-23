@@ -59,6 +59,8 @@
 
     var serverLogic = {};
 
+    var override = {};
+
     /** Provide an object to which a commonjs module can attach behaviour
       exports.process = function(x,y,z){}
       //Wrapped like so:
@@ -68,6 +70,10 @@
     this.logic = function(componentType){
       serverLogic[componentType] = serverLogic[componentType] || {};
       return serverLogic[componentType];
+    };
+
+    this.itemOverride = function(){
+        return override;
     };
   };
 

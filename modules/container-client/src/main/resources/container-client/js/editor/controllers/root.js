@@ -35,7 +35,14 @@ var controller = function ($scope, $compile, $http, $timeout, EditorServices, Pl
 
   $scope.onItemLoaded = function (data) {
     $scope.model = data.item;
-    //CorespringContainer.initialize(data);
+
+    var scoringJs = _.find($scope.model.files, function(f){
+      return f.name === "scoring.js";
+    });
+
+    if(scoringJs){
+      PlayerServices.setScoringJs(scoringJs);
+    }
   };
 
   $scope.getUploadUrl = function(file){
@@ -88,6 +95,7 @@ var controller = function ($scope, $compile, $http, $timeout, EditorServices, Pl
     });
     return newModel;
   };
+
 
   PlayerServices.setQuestionLookup($scope.getQuestionForComponentId);
 

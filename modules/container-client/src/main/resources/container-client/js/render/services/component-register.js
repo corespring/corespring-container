@@ -52,21 +52,25 @@ angular.module('corespring-player.services').factory('ComponentRegister', ['$log
      */
     var setAndApplyToComponents = function(value, name, cb){
 
-       if(typeof(cb) == "string"){
-         var functionName = cb;
-         cb = function(comp, value){
+      if(typeof(cb) == "string"){
+        var functionName = cb;
+        cb = function(comp, value){
 
           if(comp[functionName]){
             comp[functionName](value);
           }
         };
-       }
+      }
 
-       if(!value){ throw "No answers";}
-        loaded[name] = value;
-        if(components){
-          $.each(components, setData(loaded[name], cb ));
-        }
+      if(!value){
+        throw new Error("No answers for: " + name);
+      }
+
+      loaded[name] = value;
+
+      if(components){
+        $.each(components, setData(loaded[name], cb ));
+      }
     };
 
     var setData = function(data, cb){

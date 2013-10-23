@@ -11,10 +11,6 @@ var controller = function ($scope, ComponentRegister, PlayerServices) {
     }
   };
 
-  var getUid = function(){
-    return Math.random().toString(36).substring(2,9);
-  };
-
   $scope.submit = function(){
     var answers = ComponentRegister.getAnswers();
     PlayerServices.submitAnswers({answers: answers}, $scope.onSessionSaved, $scope.onSessionSaveError);
@@ -43,5 +39,10 @@ var controller = function ($scope, ComponentRegister, PlayerServices) {
 angular.module('corespring-editor.controllers')
   .controller(
     'ClientSidePreview',
-    ['$scope', 'ComponentRegister', 'PlayerServices', controller]
+    [
+      '$scope',
+      'ComponentRegister',
+      'PlayerServices',
+      controller
+    ]
   );

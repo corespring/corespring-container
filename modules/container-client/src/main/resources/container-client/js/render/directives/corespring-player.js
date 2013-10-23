@@ -30,7 +30,9 @@
             }
             $scope.session = s;
             ComponentRegister.setSession(s);
-            ComponentRegister.setAnswers(s.answers);
+            if(s.answers){
+              ComponentRegister.setAnswers(s.answers);
+            }
           });
 
           $scope.$watch('responses', function(r){
