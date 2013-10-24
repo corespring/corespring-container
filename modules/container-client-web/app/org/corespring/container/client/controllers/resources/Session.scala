@@ -1,6 +1,7 @@
 package org.corespring.container.client.controllers.resources
 
 import org.corespring.container.client.actions.{SubmitAnswersRequest, SessionActionBuilder}
+import org.corespring.container.client.controllers.resources.session.ItemPruner
 import org.corespring.container.components.outcome.OutcomeProcessor
 import org.corespring.container.components.response.ResponseProcessor
 import org.joda.time.DateTime
@@ -8,9 +9,9 @@ import play.api.Logger
 import play.api.libs.json._
 import play.api.mvc.{AnyContent, Controller}
 
-trait Session extends Controller {
+trait Session extends Controller with ItemPruner {
 
-  private val logger = Logger("session")
+  val logger = Logger("session")
 
   def responseProcessor: ResponseProcessor
 
@@ -22,16 +23,27 @@ trait Session extends Controller {
 
   def loadEverything(id: String) = builder.loadEverything(id){ request =>
 
+
+
     val itemJson = (request.everything \ "item").as[JsObject]
+    val prunedItem = pruneItem(itemJson)
     val sessionJson = (request.everything \ "session").as[JsObject]
     val isFinished = (sessionJson \ "isFinished").asOpt[Boolean].getOrElse(false)
 
     if(!isFinished) {
-      Ok(request.everything)
+      Ok(
+        Json.obj(
+          "item" -> prunedItem,
+          "session" -> sessionJson)
+      )
     } else {
       val responses = responseProcessor.respond(itemJson, sessionJson)
       val outcome = outcomeProcessor.outcome(itemJson, sessionJson, responses)
-      val out = request.everything.as[JsObject] ++ Json.obj("responses" -> responses, "outcome" -> outcome)
+      val out = Json.obj(
+        "item" -> prunedItem,
+        "responses" -> responses,
+        "outcome" -> outcome,
+        "session" -> sessionJson)
       Ok(out)
     }
   }

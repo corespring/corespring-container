@@ -9,8 +9,6 @@ import org.corespring.container.client.controllers.resources.Session
 
 trait ClientSessionImpl extends Session {
 
-  private lazy val logger = Logger("player.session")
-
   def sessionService: MongoService
 
   def itemService: MongoService

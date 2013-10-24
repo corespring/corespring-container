@@ -120,7 +120,7 @@ object Build extends sbt.Build {
   val containerClientWeb = builder.playApp("container-client-web").settings(
     sources in doc in Compile := List(),
     templatesImport ++= Seq( "play.api.libs.json.JsValue", "play.api.libs.json.Json" )
-  ).dependsOn(componentModel, containerClient, utils, jsProcessing )
+  ).dependsOn(componentModel % "compile->compile;test->test", containerClient, utils, jsProcessing )
 
   val shell = builder.playApp("shell", Some(".")).settings(
     resolvers ++= Resolvers.all,
