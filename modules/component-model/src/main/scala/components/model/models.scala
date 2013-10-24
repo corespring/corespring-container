@@ -20,6 +20,8 @@ case class Component(
     val SnakeCase(org,name) = snakeCase
     this.org == org && this.name == name
   }
+
+  def componentType : String = s"$org-$name"
 }
 
 case class Client( render : String, configure : String, css : Option[String] )
