@@ -1,10 +1,9 @@
 package org.corespring.container.client.controllers.resources.session
 
-import org.specs2.mutable.Specification
-import play.api.libs.json.Json
 import org.corespring.test.utils.JsonCompare
-import scala.Unit
+import org.specs2.mutable.Specification
 import play.api.Logger
+import play.api.libs.json.Json
 
 class ItemPrunerTest extends Specification with ItemPruner{
 
