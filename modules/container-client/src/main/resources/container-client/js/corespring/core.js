@@ -17,43 +17,55 @@
     }
   };
 
- var loadAngularModule = function (n) {
-    try {
-      return angular.module(n);
-    }
-    catch (e) {
-      return angular.module(n, []);
-    }
-  };
+  var ComponentDefinition = function(angular, directiveName, moduleName){
 
-
-  var loadClientSideComponent = function(componentDefinition, directiveName, moduleName){
-
-    var ngModule = loadAngularModule(moduleName);
-
-    if( componentDefinition.directive ){
-      ngModule.directive( directiveName, componentDefinition.directive);
-    } else if( componentDefinition.directives ){
-
-      var hasDefault = false;
-
-      for( var i = 0; i < componentDefinition.directives.length; i++ ){
-        var innerDef = componentDefinition.directives[i];
-        var name = innerDef.name ? innerDef.name : directiveName;
-
-        if(!hasDefault){
-          hasDefault = innerDef.name === undefined;
+    var loadAngularModule = function(moduleName){
+        try {
+          return angular.module(moduleName);
         }
+        catch (e) {
+          return angular.module(moduleName, []);
+        }
+    };
 
-        console.log("registering directive: ", moduleName, name);
-        ngModule.directive( name, innerDef.directive);
-        if(!hasDefault){
-          throw "No default directive defined";
+    /**
+     * Initialize the component
+     * @private
+     */
+    this.initializeComponent = function(){
+      var ngModule = loadAngularModule(moduleName);
+
+      if( this.directive ){
+        ngModule.directive( directiveName, this.directive);
+      } else if( this.directives ){
+
+        var hasDefault = false;
+
+        for( var i = 0; i < this.directives.length; i++ ){
+          var innerDef = this.directives[i];
+          var name = innerDef.name ? innerDef.name : directiveName;
+
+          if(!hasDefault){
+            hasDefault = innerDef.name === undefined;
+          }
+          console.log("registering directive: ", moduleName, name);
+          ngModule.directive( name, innerDef.directive);
+          if(!hasDefault){
+            throw "No default directive defined";
+          }
         }
       }
-    }
+    };
   };
 
+  var Client = function(angular){
+    var definitions = {};
+
+    this.component = function(directiveName, moduleName){
+      definitions[directiveName] = definitions[directiveName] || new ComponentDefinition(angular, directiveName, moduleName);
+      return definitions[directiveName];
+    };
+  };
 
   var Server = function(){
 
@@ -77,13 +89,19 @@
     };
   };
 
-  var CorespringCore = function(){
-    this.server = new Server();
+  var Corespring = function(){
+
     this.require = mockRequire;
-    this.loadClientSideComponent = loadClientSideComponent;
+    this.server = new Server();
+    this.client = new Client(root.angular);
+
+    //Override angular if you need to here.
+    this.bootstrap = function(angular){
+      this.client = new Client(angular);
+    }
   };
 
   if(!root.corespring) {
-    root.corespring = new CorespringCore();
+    root.corespring = new Corespring();
   }
 })(this);

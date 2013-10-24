@@ -1,6 +1,8 @@
 /** This is a port of DefaultOutcomeProcessor.scala */
 describe('outcome-processor', function(){
 
+  corespring.bootstrap(angular);
+
   it('should process', function(){
     expect(true).toBe(true);
 
