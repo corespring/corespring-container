@@ -149,7 +149,6 @@ h1 {
     margin-bottom: 0px;
   }
   .structure-view, .xml-view, .json-view, .config, .inline-preview {
-    flex: 0;
     position: relative;
     height: @editor-height;
     float: left;
@@ -168,9 +167,9 @@ h1 {
   }
 
   .structure-view {
-    flex: 1;
-    width: 200px;
     overflow: scroll;
+    width: 100%;
+
 
     ul {
       list-style: none;
@@ -243,6 +242,7 @@ h1 {
   }
 }
 
+
 .palette {
 
   border: solid 1px #00f000;
@@ -295,4 +295,16 @@ h1 {
   .footer{
     clear: both;
   }
+}
+
+.flex-1 {
+  flex: 1
+}
+
+.flex-2 {
+  flex: 2
+}
+
+.flex-3 {
+  flex: 2
 }

@@ -15,18 +15,20 @@ block content
         span.btn.btn-primary(file-uploader, fu-url="getUploadUrl()", fu-mode="raw") Upload image
 
     .flex-box
-      .vertical
+
+      .vertical.flex-1
         structure-view.structure-view(
           ng-model="model",
           selected-component="selectedComponent",
           component-set="componentSet")
         file-list(ng-model="model.files", select-file="selectFile(file)")
-      config-pane.config#config(ng-model="selectedComponent", ng-show="selectedComponent != null")
+
+      config-pane.flex-3.config#config(ng-model="selectedComponent", ng-show="selectedComponent != null")
       //TODO: in ng-show below 'selectedFile' is bound to the file-preview selectedFile - not the outer one
       //Should be bound to the outer property.
       div.selected-text-editor(ui-ace, ng-model="selectedFile.content", ui-ace="{useWrapMode: true}", ng-show="selectedFile.content != null")
 
-      div(ng-controller="ClientSidePreview")
+      div.flex-2(ng-controller="ClientSidePreview")
 
         player-control-panel(player-settings="session.settings")
         corespring-player(
