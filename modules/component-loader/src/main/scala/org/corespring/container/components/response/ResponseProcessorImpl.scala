@@ -25,8 +25,8 @@ class ResponseProcessorImpl(components: Seq[Component]) extends ResponseProcesso
 
             answer.map {
               a =>
-                val generator = new ResponseGenerator(component.server.definition, question, a, session \ "settings")
-                (id, generator.respond)
+                val generator = new ResponseGenerator(component.componentType, component.server.definition)
+                (id, generator.respond(question, a, session \ "settings"))
             }.getOrElse {
               logger.debug(s"no answer provided for: $id")
               (id, JsObject(Seq.empty))

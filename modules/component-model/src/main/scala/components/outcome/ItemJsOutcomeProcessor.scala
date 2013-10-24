@@ -1,8 +1,8 @@
 package org.corespring.container.components.outcome
 
-import play.api.libs.json.{Json, JsValue}
-import org.corespring.container.js.ModuleWrapperImpl
+import org.corespring.container.js.ItemAuthorOverride
 import play.api.Logger
+import play.api.libs.json.{Json, JsValue}
 
 object ItemJsOutcomeProcessor extends OutcomeProcessor {
 
@@ -11,11 +11,11 @@ object ItemJsOutcomeProcessor extends OutcomeProcessor {
   def outcome(item: JsValue, session: JsValue, responses: JsValue): JsValue = {
     getScoringJs(item).map {
       jsDef =>
-        val jsModuleWrapper = new ModuleWrapperImpl{
+        val jsModuleWrapper = new ItemAuthorOverride {
           def js: String = jsDef
         }
         try{
-          val result = jsModuleWrapper.run("process", item, (session \ "answers").as[JsValue])
+          val result = jsModuleWrapper.process(item, (session \ "answers"))
           logger.debug(Json.stringify(result))
           result
         } catch {

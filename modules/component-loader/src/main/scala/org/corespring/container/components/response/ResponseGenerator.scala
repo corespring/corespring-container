@@ -1,11 +1,9 @@
 package org.corespring.container.components.response
 
-import org.corespring.container.js.ModuleWrapperImpl
-import play.api.libs.json.JsValue
+import org.corespring.container.js.ComponentServerLogic
 
-class ResponseGenerator(definition: String, question: JsValue, answer: JsValue, settings: JsValue) extends ModuleWrapperImpl {
+class ResponseGenerator(override val componentType : String, definition: String) extends ComponentServerLogic {
 
   override def js: String = definition
 
-  def respond: JsValue = run("respond", question, answer, settings)
 }
