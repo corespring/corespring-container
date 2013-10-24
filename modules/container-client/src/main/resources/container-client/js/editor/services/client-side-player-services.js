@@ -36,7 +36,7 @@
         out.session.remainingAttempts = 0;
         var responses = process(answers.answers, settings);
         out.responses = responses;
-        out.outcome = corespring.outcomeProcessor.outcome(getItem(), {}, responses);
+        out.outcome = corespring.outcomeProcessor.outcome(angular.copy(getItem()), {}, responses);
       }
 
       return out;
@@ -48,7 +48,7 @@
 
       for(var id in answers){
         var answer = answers[id];
-        var question = getQuestionFor(id);
+        var question = angular.copy(getQuestionFor(id));
         var serverLogic = corespring.server.logic(question.componentType);
         out[id] = serverLogic.respond(question, answer, settings);
       }
