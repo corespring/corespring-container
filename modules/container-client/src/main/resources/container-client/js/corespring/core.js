@@ -98,7 +98,7 @@
     //Override angular if you need to here.
     this.bootstrap = function(angular){
       this.client = new Client(angular);
-    }
+    };
   };
 
   if(!root.corespring) {
