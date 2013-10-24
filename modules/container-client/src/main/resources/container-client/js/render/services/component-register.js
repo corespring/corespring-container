@@ -20,7 +20,7 @@ angular.module('corespring-player.services').factory('ComponentRegister', ['$log
     this.setSession = function(session){
       $.each(components, function(id, comp){
         if(comp.setSession){
-          comp.setSession(session);
+          comp.setSession(angular.copy(session));
         }
       });
     };
