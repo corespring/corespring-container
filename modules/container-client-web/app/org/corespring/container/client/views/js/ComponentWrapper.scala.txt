@@ -1,7 +1,11 @@
 @(moduleName: String, directiveName : String, jsBody : String)
+
 (function(){
-    //TODO: Move to the module pattern see: https://www.pivotaltracker.com/s/projects/926438/stories/59322058
-    @jsBody;
-    var moduleName = '@moduleName';
-    corespring.loadClientSideComponent( componentDefinition, '@directiveName', '@moduleName');
+  var definition = (function(exports, require){
+      @jsBody;
+      return exports;
+  })(corespring.client.component("@directiveName", "@moduleName"), corespring.require);
+
+  definition.initializeComponent();
 })();
+
