@@ -1,8 +1,8 @@
 var controller = function ($scope, ComponentRegister, PlayerServices) {
 
   $scope.submit = function () {
-    PlayerServices.submitAnswers({
-      answers: ComponentRegister.getAnswers()
+    PlayerServices.submitSession({
+      answers: ComponentRegister.getSession()
     }, $scope.onSessionSaved, $scope.onSessionSaveError);
   };
 

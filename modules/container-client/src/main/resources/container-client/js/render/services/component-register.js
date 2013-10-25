@@ -17,32 +17,35 @@ angular.module('corespring-player.services').factory('ComponentRegister', ['$log
       });
     };
 
-    this.setSession = function(session){
+    /**
+     * Global Session: contains info like: isFinished, startDate, finishDate..
+     */
+    this.setGlobalSession = function(session){
       $.each(components, function(id, comp){
-        if(comp.setSession){
-          comp.setSession(angular.copy(session));
+        if(comp.setGlobalSession){
+          comp.setGlobalSession(angular.copy(session));
         }
       });
     };
 
-    this.setAnswers = function(answers){
-      setAndApplyToComponents(answers, "answers", "setAnswer");
+    this.setComponentSessions = function(sessions){
+      setAndApplyToComponents(sessions, "sessions", "setSession");
     };
 
     this.setResponses = function(responses){
       setAndApplyToComponents(responses, "responses", "setResponse");
     };
 
-    this.getAnswers = function () {
-      var answers = {};
+    this.getComponentSessions = function () {
+      var sessions = {};
 
       for (var x in components) {
-        var answer = components[x].getAnswer();
-        if (answer) {
-          answers[x] = answer;
+        var s = components[x].getSession();
+        if (s) {
+          sessions[x] = s;
         }
       }
-      return answers;
+      return sessions;
     };
 
     /**
