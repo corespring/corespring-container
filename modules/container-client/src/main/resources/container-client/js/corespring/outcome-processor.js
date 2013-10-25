@@ -10,8 +10,12 @@
 
     this.outcome = function(item, session, responses){
 
-      var maxPoints = _.reduce(item.components, function(result, value, key){
-        var total = result + value.weight;
+      var maxPoints = _.reduce(item.components, function(result, component, key){
+        var weight = component.weight || 1;
+        if(!component.weight){
+          console.warn("no weight specified for component", component);
+        }
+        var total = result + weight;
         return total;
       }, 0);
 
@@ -36,10 +40,16 @@
     };
 
     var scoreForComponent = function(comp, response){
+      var weight = comp.weight || 1;
+
+      if(!comp.weight){
+        console.warn("no weight for comp", comp);
+      }
+
       return {
-        weight : comp.weight,
+        weight : weight,
         score: response.score,
-        weightedScore: comp.weight * response.score
+        weightedScore: weight * response.score
       };
     };
   };
