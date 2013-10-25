@@ -31,9 +31,9 @@ block content
         span.btn.btn-info.btn-xs(file-uploader, fu-url="getUploadUrl()", fu-mode="raw") Upload image
         span.btn.btn-success.btn-xs(ng-click="openChooser()") Add Component
 
-    .flex-box
+    .flex-box.main-content
 
-      .vertical.flex-1
+      .vertical.flex-1.left-column
         structure-view.structure-view(
           ng-model="model",
           selected-component="selectedComponent",
@@ -45,7 +45,7 @@ block content
       //Should be bound to the outer property.
       div.selected-text-editor(ui-ace, ng-model="selectedFile.content", ui-ace="{useWrapMode: true}", ng-show="selectedFile.content != null")
 
-      div.flex-2(ng-controller="ClientSidePreview")
+      div.flex-2.client-side-preview(ng-controller="ClientSidePreview")
 
         player-control-panel(player-settings="session.settings")
         corespring-player(

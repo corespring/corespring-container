@@ -1,12 +1,15 @@
 @import "../bower_components/less-elements/elements";
 
-@editor-height: 90%;
+@editor-height: 100%;
+@left-column-width: 300px;
 
 html,
 body {
   margin: 0;
   padding: 0;
 }
+
+
 .modal{
   display: block;
 
@@ -166,6 +169,20 @@ h1 {
   height: 100%;
   overflow: hidden;
 
+
+  .main-content{
+    .left-column{
+      @left-column-bg: lighten(@cs-green, 55%);
+      border-right: solid 1px darken(@left-column-bg, 30%);
+      background-color: @left-column-bg;
+      max-width: @left-column-width;
+    }
+    .client-side-preview{
+      padding-left: 10px;
+    }
+  }
+
+
   .flex-box {
     display: flex;
     height: 100%;
@@ -202,7 +219,7 @@ h1 {
   .structure-view {
     overflow: scroll;
     width: 100%;
-
+    padding-top: 10px;
 
     ul {
       list-style: none;
