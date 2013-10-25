@@ -1,14 +1,36 @@
 @import "../bower_components/bootstrap/less/bootstrap";
 @import "../bower_components/less-elements/elements";
 
+@cs-green: #92d200;
 @bg-color: #fffff4;
 @text-color: #555555;
-@navbar-inverse-bg : #000A10;
+@navbar-inverse-bg : #ffffff;
 @font-family-sans-serif: "Ubuntu", sans-serif;
 
 @icon-font-path: "../bower_components/bootstrap/fonts/";
 
+.nav{
+  .drop-shadow(0, 2px, 3px, 0.2);
+  padding-top: 6px;
+  padding-left: 6px;
+  margin: 0px;
+  border-bottom: solid 1px @cs-green;
 
+  .btn{
+    margin: 0px;
+    margin-left: 4px;
+  }
+
+  .navbar-header{
+    padding: 0px;
+    .navbar-brand{
+      background-image: url('../images/logo-new-100.png');
+      width: 100px;
+      height: 37px;
+      margin-right: 10px;
+    }
+  }
+}
 
 .hide-body{
   opacity: 0;

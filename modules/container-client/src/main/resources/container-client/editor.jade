@@ -1,18 +1,18 @@
 extends layout
 
 block head
-  link(rel="stylesheet", href="bower_components/bootstrap/dist/css/bootstrap.min.css")
   link(rel="stylesheet", href="css/editor.css")
 
 
 block content
   .root(ng-controller="Root")
     div
-      .nav.navbar.navbar-inverse.navbar-static-top(role="navigation")
+      .nav.navbar.navbar-static-top(role="navigation")
         .navbar-header
-          .navbar-brand Editor
-        span.btn.btn-primary(ng-click="save()") Save
-        span.btn.btn-primary(file-uploader, fu-url="getUploadUrl()", fu-mode="raw") Upload image
+          .navbar-brand
+        span.btn.btn-primary.btn-xs(ng-click="save()") Save
+        span.btn.btn-info.btn-xs(file-uploader, fu-url="getUploadUrl()", fu-mode="raw") Upload image
+        span.btn.btn-info.btn-xs(ng-click="showComponentChooser=true") Add Component
 
     .flex-box
 
