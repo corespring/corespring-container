@@ -1,9 +1,59 @@
-var controller = function ($scope, $compile, $http, $timeout, EditorServices, PlayerServices) {
+var controller = function (
+  $scope,
+  $compile,
+  $http,
+  $timeout,
+  $modal,
+  $log,
+  EditorServices,
+  PlayerServices) {
+
 
   var configPanels = {};
 
   var getUid = function(){
     return Math.random().toString(36).substring(2,9);
+  };
+
+  var ModalInstanceCtrl = function ($scope, $modalInstance, componentSet) {
+    $scope.componentSet = componentSet;
+
+    var rows = [];
+    for (var i = 0; i < componentSet.length; i++ ) {
+        if (i % 4 === 0) rows.push([]);
+        rows[rows.length-1].push(componentSet[i]);
+    }
+    $scope.componentSetGrid = rows;
+
+    $scope.selectComponent = function(component){
+      $modalInstance.close(component);
+    };
+
+    $scope.cancel = function () {
+      $modalInstance.dismiss('cancel');
+    };
+  };
+
+  $scope.openChooser = function () {
+
+    var modalInstance = $modal.open({
+      templateUrl: 'myModalContent.html',
+      controller: ModalInstanceCtrl,
+      backdrop: true,
+      resolve: {
+        componentSet: function () {
+          return $scope.componentSet;
+        }
+      }
+    });
+
+    modalInstance.result.then(
+      function (component) {
+        $scope.addComponent(component);
+      },
+      function () {
+        $log.info('Modal dismissed at: ' + new Date());
+    });
   };
 
   $scope.save = function () {
@@ -111,6 +161,8 @@ angular.module('corespring-editor.controllers')
     '$compile',
     '$http',
     '$timeout',
+    '$modal',
+    '$log',
     'EditorServices',
     'PlayerServices',
     controller]);

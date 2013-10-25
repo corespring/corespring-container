@@ -3,16 +3,33 @@ extends layout
 block head
   link(rel="stylesheet", href="css/editor.css")
 
+  script(type="text/ng-template", id="myModalContent.html")
+
+    .modal-content
+      .modal-header
+        h5
+          | Choose a component
+      .modal-body
+        table
+          tr(ng-repeat="row in componentSetGrid")
+            td(ng-click="selectComponent(comp)", ng-repeat="comp in row")
+              img.component-icon(ng-src="{{comp.icon}}")
+              br/
+              a {{comp.name}}
+        .modal-footer
+          button.btn.btn-warning(ng-click="cancel()") Cancel
 
 block content
   .root(ng-controller="Root")
+
+
     div
       .nav.navbar.navbar-static-top(role="navigation")
         .navbar-header
           .navbar-brand
         span.btn.btn-primary.btn-xs(ng-click="save()") Save
         span.btn.btn-info.btn-xs(file-uploader, fu-url="getUploadUrl()", fu-mode="raw") Upload image
-        span.btn.btn-info.btn-xs(ng-click="showComponentChooser=true") Add Component
+        span.btn.btn-success.btn-xs(ng-click="openChooser()") Add Component
 
     .flex-box
 
@@ -72,9 +89,11 @@ block scripts
 
   //build:js js/extras.js
   script(src="bower_components/angular-ui/build/angular-ui.js")
+  script(src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js")
   script(src="bower_components/angular-dragdrop/src/angular-dragdrop.js")
   script(src="bower_components/ckeditor/ckeditor.js")
   script(src="bower_components/bootstrap/js/dropdown.js")
+  script(src="bower_components/bootstrap/js/modal.js")
   script(src="bower_components/angular-ui-ace/ui-ace.js")
   script(src="bower_components/ace-builds/src-min-noconflict/ace.js")
   script(src="bower_components/ace-builds/src-min-noconflict/theme-twilight.js")
@@ -99,13 +118,15 @@ block scripts
             'corespring-player.services',
             'corespring-player.directives',
             'ui.sortable',
-            'cs.directives',
-            'ui.ace'
+            'ui.bootstrap',
+            'ui.ace',
+            'cs.directives'
           ].concat(data.angular.dependencies);
 
           angular.module("corespring-editor", playerDeps);
           angular.bootstrap(document, ["corespring-editor"]);
           angular.resumeBootstrap();
+
           $("body").addClass('blend')
         };
 

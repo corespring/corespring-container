@@ -89,18 +89,6 @@
          componentSet: '='
          },*/
         template: [
-          '<h1>Structure View</h1>',
-          '<div class="btn-group">',
-          '<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">Add...<span class="caret"></span></button>',
-          '<ul class="dropdown-menu" role="menu" >',
-          '<li ng-repeat="descriptor in componentSet">',
-          '  <a ng-click="addComponent(descriptor)">',
-          '    <img ng-src="{{descriptor.icon}}"/>',
-          '    {{descriptor.name}}',
-          '</a>',
-          '</li>',
-          '</ul>',
-          '</div>',
           '<ul ui-sortable ng-model="orderedComponents">',
           '<li class="component-thumbnail "',
           ' ng-repeat="component in orderedComponents">',
