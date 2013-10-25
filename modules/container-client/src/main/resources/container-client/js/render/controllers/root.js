@@ -2,7 +2,7 @@ var controller = function ($scope, ComponentRegister, PlayerServices) {
 
   $scope.submit = function () {
     PlayerServices.submitSession({
-      answers: ComponentRegister.getSession()
+      components: ComponentRegister.getComponentSessions()
     }, $scope.onSessionSaved, $scope.onSessionSaveError);
   };
 

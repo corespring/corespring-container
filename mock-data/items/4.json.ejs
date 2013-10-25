@@ -1,0 +1,35 @@
+{
+  "metadata" : {
+    "title" : "Simple multiple choice"
+  },
+  "xhtml" : "<%- helper.read('../xml/2.xhtml') %>",
+  "components" : {
+    "4" : {
+      "componentType" : "corespring-multiple-choice",
+      "weight" : 1,
+      "correctResponse" : { "value" : ["carrot"] },
+      "feedback" : [
+        { "value" : "banana", "feedback" : "it's a fruit"},
+        { "value" : "carrot", "feedback" : "yup", "notChosenFeedback" : "This is a veg"}
+      ],
+      "model" : {
+        "prompt": "Which of these is a carrot?",
+        "config": {
+          "orientation": "vertical",
+          "shuffle": true
+        },
+        "choices": [
+          {"label": "Banana", "value": "banana"},
+          {"label": "Carrot", "value": "carrot"},
+          {"label": "Apple", "value": "apple"}
+        ]
+      }
+    }
+  },
+  "_id" : "522267c2554f43f858000004",
+  "org": {
+    "components": [
+      "corespring/*"
+    ]
+  }
+}

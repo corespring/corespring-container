@@ -1,0 +1,18 @@
+{
+  "_id" : "522267c2554f43f858000004",
+  "components": {
+    "4": {
+      "answers": [
+        "carrot"
+      ]
+    }
+  },
+  "itemId": "522267c2554f43f858000004",
+  "settings": {
+    "allowEmptyResponses": true,
+    "highlightCorrectResponse": true,
+    "highlightUserResponse": true,
+    "maxNoOfAttempts": 2,
+    "showFeedback": true
+  }
+}

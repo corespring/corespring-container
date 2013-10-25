@@ -1,13 +1,18 @@
 (function() {
 
-  angular.module('corespring-player.directives').directive('corespringPlayer', [ '$compile',
+  angular.module('corespring-player.directives').directive('corespringPlayer', [
+      '$compile',
+      '$log',
       'ComponentRegister',
-      function($compile, ComponentRegister){
+      function($compile, $log, ComponentRegister){
 
         var link = function($scope, $elem, $attrs){
           console.log("corespring-player");
 
-          $scope.registerComponent = ComponentRegister.registerComponent;
+          $scope.$on('registerComponent', function(event, id, obj){
+            $log.info("registerComponent: ", id);
+            ComponentRegister.registerComponent(id, obj);
+          });
 
           $scope.$watch('xhtml', function(newXhtml){
             if(!newXhtml){
@@ -29,9 +34,9 @@
               return;
             }
             $scope.session = s;
-            ComponentRegister.setSession(s);
-            if(s.answers){
-              ComponentRegister.setAnswers(s.answers);
+            ComponentRegister.setGlobalSession(s);
+            if(s.components){
+              ComponentRegister.setComponentSessions(s.components);
             }
           });
 

@@ -26,14 +26,13 @@ xmlreader = (currentPath) ->
 
     xml = fs.readFileSync(resolvedPath).toString()
     xml = xml.replace(/\n/g, '\\n').replace(/"/g, "\\\"")
-    console.log xml
     xml
 
 
 processEjs = (p) ->
   cwd = process.cwd()
   contents = fs.readFileSync(p).toString()
-  console.log "contents: #{contents}, type: #{typeof(contents)}"
+  #console.log "contents: #{contents}, type: #{typeof(contents)}"
   rendered = ejs.render(contents, { helper: xmlreader(p)})
   savePath = p.replace(".ejs", "")
   fs.writeFileSync( savePath, rendered)
@@ -48,3 +47,4 @@ prepare = (root) ->
   _.each ejsFiles, (p) -> processEjs(p)
 
 prepare("mock-data/items")
+prepare("mock-data/sessions")

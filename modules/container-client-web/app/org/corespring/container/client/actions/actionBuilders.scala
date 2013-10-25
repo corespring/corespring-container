@@ -34,5 +34,5 @@ trait SessionActionBuilder[A]{
    * @param block
    * @return
    */
-  def submitAnswers(id: String)(block: SubmitAnswersRequest[A] => Result): Action[AnyContent]
+  def submitAnswers(id: String)(block: SubmitSessionRequest[A] => Result): Action[AnyContent]
 }

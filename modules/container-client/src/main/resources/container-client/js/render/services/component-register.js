@@ -32,10 +32,6 @@ angular.module('corespring-player.services').factory('ComponentRegister', ['$log
       setAndApplyToComponents(sessions, "sessions", "setSession");
     };
 
-    this.setResponses = function(responses){
-      setAndApplyToComponents(responses, "responses", "setResponse");
-    };
-
     this.getComponentSessions = function () {
       var sessions = {};
 
@@ -47,6 +43,11 @@ angular.module('corespring-player.services').factory('ComponentRegister', ['$log
       }
       return sessions;
     };
+
+    this.setResponses = function(responses){
+      setAndApplyToComponents(responses, "responses", "setResponse");
+    };
+
 
     /**
      * set the value to the 'loaded' object and apply sub objects out to

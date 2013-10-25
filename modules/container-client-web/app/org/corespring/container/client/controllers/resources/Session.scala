@@ -1,6 +1,6 @@
 package org.corespring.container.client.controllers.resources
 
-import org.corespring.container.client.actions.{SubmitAnswersRequest, SessionActionBuilder}
+import org.corespring.container.client.actions.{SubmitSessionRequest, SessionActionBuilder}
 import org.corespring.container.client.controllers.resources.session.ItemPruner
 import org.corespring.container.components.outcome.OutcomeProcessor
 import org.corespring.container.components.response.ResponseProcessor
@@ -54,11 +54,11 @@ trait Session extends Controller with ItemPruner {
    * @return
    */
 
-  def submitAnswers(id: String) = builder.submitAnswers(id) {
-    request : SubmitAnswersRequest[AnyContent] =>
+  def submitSession(id: String) = builder.submitAnswers(id) {
+    request : SubmitSessionRequest[AnyContent] =>
 
       request.body.asJson.map {
-        answers =>
+        session =>
 
           val sessionJson: JsObject = {
             val session = (request.everything \ "session").as[JsObject]
@@ -97,7 +97,7 @@ trait Session extends Controller with ItemPruner {
 
               val updates: Seq[(String, JsValue)] = Seq(
                 "remainingAttempts" -> JsNumber(newRemainingAttempts.intValue()),
-                "answers" -> (answers \ "answers").as[JsObject],
+                "components" -> (session \ "components").as[JsObject],
                 "isFinished" -> JsBoolean(finished))
 
               val maybes: Seq[(String, JsValue)] = Seq(
@@ -118,7 +118,7 @@ trait Session extends Controller with ItemPruner {
                   Ok(output(update, false))
                 }
             }
-          }.getOrElse(BadRequest("Error updading"))
+          }.getOrElse(BadRequest("Error updating"))
 
       }.getOrElse(BadRequest("no json body"))
   }

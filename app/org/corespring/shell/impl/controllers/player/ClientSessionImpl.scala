@@ -1,6 +1,6 @@
 package org.corespring.shell.impl.controllers.player
 
-import org.corespring.container.client.actions.{SubmitAnswersRequest, FullSessionRequest, SessionActionBuilder}
+import org.corespring.container.client.actions.{SubmitSessionRequest, FullSessionRequest, SessionActionBuilder}
 import org.corespring.shell.impl.services.MongoService
 import play.api.Logger
 import play.api.libs.json.{JsValue, Json}
@@ -23,7 +23,7 @@ trait ClientSessionImpl extends Session {
         }.getOrElse(NotFound(s"Can't find a session with id: $id"))
     }
 
-    def submitAnswers(id: String)(block: (SubmitAnswersRequest[AnyContent]) => Result): Action[AnyContent] = Action {
+    def submitAnswers(id: String)(block: (SubmitSessionRequest[AnyContent]) => Result): Action[AnyContent] = Action {
       request =>
 
         logger.debug(s"submit answers for: $id")
@@ -34,7 +34,7 @@ trait ClientSessionImpl extends Session {
           item <- itemService.load(itemId)
         } yield {
           val out: JsValue = Json.obj("item" -> item, "session" -> session)
-          SubmitAnswersRequest(out, sessionService.save, request)
+          SubmitSessionRequest(out, sessionService.save, request)
         }
         result.map {
           r =>
