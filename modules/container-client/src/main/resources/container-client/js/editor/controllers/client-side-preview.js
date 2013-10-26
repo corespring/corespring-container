@@ -12,8 +12,8 @@ var controller = function ($scope, ComponentRegister, PlayerServices) {
   };
 
   $scope.submit = function(){
-    var answers = ComponentRegister.getAnswers();
-    PlayerServices.submitAnswers({answers: answers}, $scope.onSessionSaved, $scope.onSessionSaveError);
+    var components = ComponentRegister.getComponentSessions();
+    PlayerServices.submitSession({components: components}, $scope.onSessionSaved, $scope.onSessionSaveError);
   };
 
   $scope.onSessionSaved = function (data) {
