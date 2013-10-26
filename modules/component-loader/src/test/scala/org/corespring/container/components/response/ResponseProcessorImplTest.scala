@@ -43,9 +43,10 @@ class ResponseProcessorImplTest extends Specification{
       )
 
       val session = Json.obj(
-        "answers" -> Json.obj(
+        "components" -> Json.obj(
           "1" -> Json.obj(
-            "value" -> "2"
+            "answers" -> Json.obj( "value" -> "2"),
+            "stash" -> Json.obj()
           )
         )
       )

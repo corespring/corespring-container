@@ -84,6 +84,7 @@ var controller = function (
   };
 
   $scope.onItemLoaded = function (data) {
+    $scope.rootModel = data;
     $scope.model = data.item;
 
     var scoringJs = _.find($scope.model.files, function(f){

@@ -2,7 +2,7 @@ package org.corespring.container.components.response
 
 import org.corespring.container.components.model.Component
 import org.slf4j.LoggerFactory
-import play.api.libs.json.{JsArray, JsObject, JsValue}
+import play.api.libs.json.{JsObject, JsValue}
 
 class ResponseProcessorImpl(components: Seq[Component]) extends ResponseProcessor {
 
@@ -36,8 +36,9 @@ class ResponseProcessorImpl(components: Seq[Component]) extends ResponseProcesso
     JsObject(responses)
   }
 
-  private def getAnswer(session: JsValue, id: String): Option[JsValue] = {
-    val value = (session \ "answers" \ id)
-    value.asOpt[JsObject] orElse value.asOpt[JsArray] orElse Some(value)
-  }
+  private def getAnswer(session: JsValue, id: String): Option[JsValue] = for {
+    componentSession <- (session \ "components" \ id).asOpt[JsObject]
+    answer <- (componentSession \ "answers").asOpt[JsValue]
+  } yield answer
+
 }

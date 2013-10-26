@@ -14,31 +14,38 @@
             ComponentRegister.registerComponent(id, obj);
           });
 
-          $scope.$watch('xhtml', function(newXhtml){
-            if(!newXhtml){
+          $scope.$on('saveStash', function(event, id, stash){
+            if(!$scope.rootData){
               return;
             }
-            var $body = $elem.find("#body").html(newXhtml);
+
+            var extension = { session: { components: {} } };
+            extension.session.components[id] = {stash: stash};
+
+            $scope.rootData= _.extend($scope.rootData, extension);
+          });
+
+          /** Data contains: components + session */
+          $scope.$watch('rootData', function(root){
+            $log.debug("!! root updated");
+            $log.debug(root);
+            if(!root){
+              return;
+            }
+
+            var $body = $elem.find("#body").html(root.item.xhtml);
             $compile($body)($scope);
-          });
 
-          $scope.$watch('components', function(comps){
-            if(!comps){
-              return;
-            }
-            ComponentRegister.setData(comps);
+            var keys = _.keys(root.item.components);
+
+            var zipped = _.map(keys, function(k){
+              var session = (root.session && root.session.components) ? root.session.components[k] : null;
+              return { data: root.item.components[k], session: session};
+            });
+
+            var allData = _.zipObject(keys, zipped);
+            ComponentRegister.setDataAndSession(allData);
           }, true);
-
-          $scope.$watch('session', function(s){
-            if(!s){
-              return;
-            }
-            $scope.session = s;
-            ComponentRegister.setGlobalSession(s);
-            if(s.components){
-              ComponentRegister.setComponentSessions(s.components);
-            }
-          });
 
           $scope.$watch('responses', function(r){
             if(!r){
@@ -54,8 +61,7 @@
           link: link,
           scope: {
             xhtml: '=playerXhtml',
-            components: '=playerModel',
-            session: '=playerSession',
+            rootData: '=playerData',
             responses: '=playerResponses'
           },
           template: [ '<div>',

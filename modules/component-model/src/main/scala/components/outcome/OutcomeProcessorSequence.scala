@@ -10,7 +10,7 @@ import play.api.Logger
 class OutcomeProcessorSequence(processors : OutcomeProcessor*) extends OutcomeProcessor{
   lazy val logger = Logger("outcome.processor")
 
-  def outcome(item: JsValue, session: JsValue, responses: JsValue): JsValue = {
+  def outcome(item: JsValue, session : JsValue, responses: JsValue): JsValue = {
 
     val outcomes = processors.map{ _.outcome(item, session, responses)}
 

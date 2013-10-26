@@ -11,6 +11,10 @@ angular.module('corespring-player.services').factory('ComponentRegister', ['$log
       components[id] = component;
     };
 
+    this.setDataAndSession = function(allData){
+      setAndApplyToComponents(allData, "dataAndSession", "setDataAndSession");
+    };
+
     this.setData = function(data){
       setAndApplyToComponents(data, "data", function(component, data){
         component.setModel(data.model);

@@ -30,8 +30,11 @@ var controller = function ($scope, ComponentRegister, PlayerServices) {
   };
 
   $scope.onSessionLoaded = function (data) {
+    $scope.rootModel = data;
+    /*
     $scope.model = data.item;
     $scope.session = data.session;
+    */
     $scope.outcome = data.outcome;
     $scope.responses = data.responses;
   };
