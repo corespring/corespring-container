@@ -7,7 +7,6 @@
       function($compile, $log, ComponentRegister){
 
         var link = function($scope, $elem, $attrs){
-          console.log("corespring-player");
 
           $scope.$on('registerComponent', function(event, id, obj){
             $log.info("registerComponent: ", id);
@@ -18,11 +17,9 @@
             if(!$scope.rootData){
               return;
             }
-
             var extension = { session: { components: {} } };
             extension.session.components[id] = {stash: stash};
-
-            $scope.rootData= _.extend($scope.rootData, extension);
+            $scope.rootData = _.merge($scope.rootData, extension);
           });
 
           /** Data contains: components + session */
@@ -45,6 +42,8 @@
 
             var allData = _.zipObject(keys, zipped);
             ComponentRegister.setDataAndSession(allData);
+
+            ComponentRegister.setGlobalSession(root.session);
           }, true);
 
           $scope.$watch('responses', function(r){
@@ -62,7 +61,8 @@
           scope: {
             xhtml: '=playerXhtml',
             rootData: '=playerData',
-            responses: '=playerResponses'
+            responses: '=playerResponses',
+            session: '=playerSession'
           },
           template: [ '<div>',
                       '  <div id="body"></div>',

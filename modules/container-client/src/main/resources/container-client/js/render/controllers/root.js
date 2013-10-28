@@ -7,7 +7,7 @@ var controller = function ($scope, ComponentRegister, PlayerServices) {
   };
 
   $scope.onSessionSaved = function (data) {
-    $scope.session = data.session;
+    $scope.rootModel.session = data.session;
     $scope.outcome = data.outcome;
     $scope.responses = data.responses;
   };
@@ -16,8 +16,8 @@ var controller = function ($scope, ComponentRegister, PlayerServices) {
     if (!$scope.model || !$scope.model.session) {
       return;
     }
-    $scope.model.session.remainingAttempts = data.session.remainingAttempts;
-    $scope.model.session.isFinished = data.session.isFinished;
+    $scope.rootModel.session.remainingAttempts = data.session.remainingAttempts;
+    $scope.rootModel.session.isFinished = data.session.isFinished;
     $scope.$broadcast('session-finished', $scope.model.session.isFinished);
   };
 
@@ -33,8 +33,8 @@ var controller = function ($scope, ComponentRegister, PlayerServices) {
     $scope.rootModel = data;
     /*
     $scope.model = data.item;
-    $scope.session = data.session;
     */
+    $scope.session = data.session;
     $scope.outcome = data.outcome;
     $scope.responses = data.responses;
   };
