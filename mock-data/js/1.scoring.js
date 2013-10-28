@@ -11,6 +11,7 @@ exports.process = function(item, answers){
   var correctAnswers = 0;
 
   var answersThree = answers["3"];
+  answersThree = answersThree.answers;
 
   if(!answersThree){
     console.log("no answers for 3 - return 0");

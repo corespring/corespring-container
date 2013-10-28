@@ -23,6 +23,7 @@
           });
 
           /** Data contains: components + session */
+          //TODO - need a more fine grained watcher here.
           $scope.$watch('rootData', function(root){
             $log.debug("!! root updated");
             $log.debug(root);

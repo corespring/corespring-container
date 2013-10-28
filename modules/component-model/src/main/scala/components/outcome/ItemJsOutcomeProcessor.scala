@@ -15,7 +15,7 @@ object ItemJsOutcomeProcessor extends OutcomeProcessor {
           def js: String = jsDef
         }
         try{
-          val result = jsModuleWrapper.process(item, (session \ "answers"))
+          val result = jsModuleWrapper.process(item, (session \ "components"))
           logger.debug(Json.stringify(result))
           result
         } catch {
