@@ -4,7 +4,7 @@
 
 
 GET        /session/everything/:id.json            @org.corespring.container.client.controllers.resources.Session.loadEverything(id:String)
-PUT        /session/submit-answers/:id.json        @org.corespring.container.client.controllers.resources.Session.submitAnswers(id:String)
+PUT        /session/submit-answers/:id.json        @org.corespring.container.client.controllers.resources.Session.submitSession(id:String)
 
 GET        /item/:itemId.json                      @org.corespring.container.client.controllers.resources.Item.load(itemId:String)
 PUT        /item/:itemId.json                      @org.corespring.container.client.controllers.resources.Item.save(itemId:String)
