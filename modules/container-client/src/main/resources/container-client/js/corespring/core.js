@@ -48,7 +48,6 @@
           if(!hasDefault){
             hasDefault = innerDef.name === undefined;
           }
-          console.log("registering directive: ", moduleName, name);
           ngModule.directive( name, innerDef.directive);
           if(!hasDefault){
             throw "No default directive defined";

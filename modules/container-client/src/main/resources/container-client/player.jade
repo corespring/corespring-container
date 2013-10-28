@@ -6,14 +6,19 @@ block content
   div#root.container(ng-controller="Root")
 
     corespring-player(
-      player-xhtml="model.xhtml",
-      player-data="rootModel",
+      player-mode="player",
+      player-markup="rootModel.item.xhtml",
+      player-item="rootModel.item",
+      player-session="rootModel.session",
       player-responses="responses")
+
     button.btn.btn-primary(
       ng-click="submit()",
       ng-disabled="session.isFinished") Submit
+
     label
       | Attempts left: {{session.remainingAttempts !== undefined ? session.remainingAttempts : session.maxNoOfAttempts}}
+
     hr
     #outcome(ng-show="outcome")
       h4 You scored: {{outcome.summary.percentage}}%
