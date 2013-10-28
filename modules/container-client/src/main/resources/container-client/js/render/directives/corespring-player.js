@@ -15,6 +15,13 @@
             }
             var $body = $elem.find("#body").html(newXhtml);
             $compile($body)($scope);
+
+            _.defer(function() {
+              if (!_.isUndefined(MathJax)) {
+                MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+              }
+            });
+
           });
 
           $scope.$watch('components', function(comps){
