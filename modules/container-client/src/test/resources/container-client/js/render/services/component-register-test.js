@@ -4,23 +4,15 @@ describe('component-register', function(){
 
   var MockBridge = function(){
 
-    this.setModel = function(data){
-      this.model = data;
-    };
-
-    this.setSession = function(s){
-      this.session = s;
-    };
-
-    this.setAnswer = function(a){
-      this.answer = a;
+    this.setDataAndSession = function(s){
+      this.dataAndSession = s;
     };
 
     this.setResponse = function(r){
       this.response = r;
     };
 
-    this.getAnswer = function(){
+    this.getSession = function(){
       return defaultAnswer;
     };
   };
@@ -45,14 +37,14 @@ describe('component-register', function(){
     }
   };
 
-  it('should setSession', setValue("setSession", "session", function(id,v) { return v; } ) );
-  it('should setData', setValue("setData", "model", function(id,v){ return v[id].model;}) );
-  it('should setAnswers', setValue("setAnswers", "answer") );
   it('should setResponses', setValue("setResponses", "response") );
 
+
+  it('should setDataAndSession', setValue("setDataAndSession", "dataAndSession") );
+
   it('should getAnswers', function(){
-    register.setData(defaultData);
-    var answers = register.getAnswers();
+    register.setDataAndSession( { data : defaultData } );
+    var answers = register.getComponentSessions();
     var expectedAnswers = { "1" :  defaultAnswer };
     expect(expectedAnswers).toEqual(answers);
   });
