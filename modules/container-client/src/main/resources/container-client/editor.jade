@@ -26,7 +26,7 @@ block content
     div
       .nav.navbar.navbar-static-top(role="navigation")
         .navbar-header
-          .navbar-brand
+          a.navbar-brand(href="/")
         span.btn.btn-primary.btn-xs(ng-click="save()") Save
         span.btn.btn-info.btn-xs(file-uploader, fu-url="getUploadUrl()", fu-mode="raw") Upload image
         span.btn.btn-success.btn-xs(ng-click="openChooser()") Add Component
