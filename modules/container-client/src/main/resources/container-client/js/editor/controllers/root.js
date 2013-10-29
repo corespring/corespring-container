@@ -6,7 +6,8 @@ var controller = function (
   $modal,
   $log,
   EditorServices,
-  PlayerServices) {
+  PlayerServices,
+  MathJaxService) {
 
 
   var configPanels = {};
@@ -148,12 +149,7 @@ var controller = function (
   };
 
   $scope.$on('mathJaxUpdateRequest', function () {
-    console.log('udpating mathjax in root');
-    _.defer(function () {
-      if (!_.isUndefined(MathJax)) {
-        MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
-      }
-    });
+    MathJaxService.parseDomForMath();
   });
 
   $scope.getItem = function(){ return $scope.model; };
@@ -175,4 +171,5 @@ angular.module('corespring-editor.controllers')
     '$log',
     'EditorServices',
     'PlayerServices',
+    'MathJaxService',
     controller]);

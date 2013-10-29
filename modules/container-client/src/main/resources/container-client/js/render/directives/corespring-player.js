@@ -4,7 +4,8 @@
       '$compile',
       '$log',
       'ComponentRegister',
-      function($compile, $log, ComponentRegister){
+      'MathJaxService',
+      function($compile, $log, ComponentRegister, MathJaxService){
 
         var link = function($scope, $elem, $attrs){
 
@@ -13,85 +14,81 @@
           var renderMarkup = function(xhtml){
             var $body = $elem.find("#body").html(xhtml);
             $compile($body)($scope);
+            MathJaxService.parseDomForMath();
+          };
 
-            _.defer(function() {
-              if (!_.isUndefined(MathJax)) {
-                MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
-              }
+
+          var setDataAndSession = function(){
+
+            if (!$scope.item || !$scope.session) {
+              return;
+            }
+
+            if (rendered && $scope.mode == "player") {
+              $log.debug("not re-rendering because we are in player mode");
+              return;
+            }
+
+            var keys = _.keys($scope.item.components);
+
+            var zipped = _.map(keys, function(k){
+              var session = ($scope.session.components) ? $scope.session.components[k] : null;
+              return { data: $scope.item.components[k], session: session};
             });
-        };
 
-        var setDataAndSession = function(){
+            var allData = _.zipObject(keys, zipped);
+            ComponentRegister.setDataAndSession(allData);
+            rendered = true;
+          };
 
-          if (!$scope.item || !$scope.session) {
-            return;
-          }
+          var setGlobalSession = function(){
+            if(!$scope.session){
+              return;
+            }
+            ComponentRegister.setGlobalSession($scope.session);
+          };
 
-          if (rendered && $scope.mode == "player") {
-            $log.debug("not re-rendering because we are in player mode");
-            return;
-          }
-
-          var keys = _.keys($scope.item.components);
-
-          var zipped = _.map(keys, function(k){
-            var session = ($scope.session.components) ? $scope.session.components[k] : null;
-            return { data: $scope.item.components[k], session: session};
+          $scope.$on('registerComponent', function(event, id, obj){
+            $log.info("registerComponent: ", id);
+            ComponentRegister.registerComponent(id, obj);
           });
 
-          var allData = _.zipObject(keys, zipped);
-          ComponentRegister.setDataAndSession(allData);
-          rendered = true;
-        };
+          /*
+            stash the component data (TODO: persist it?)
+          */
+          $scope.$on('saveStash', function(event, id, stash){
+            if(!$scope.session){
+              return;
+            }
+            var extension = { components: {} };
+            extension.components[id] = {stash: stash};
+            $scope.session = _.merge($scope.session, extension);
+          });
 
-        var setGlobalSession = function(){
-          if(!$scope.session){
-            return;
-          }
-          ComponentRegister.setGlobalSession($scope.session);
-        };
+          $scope.$watch('xhtml', function(xhtml){
+            renderMarkup(xhtml);
+          });
 
-        $scope.$on('registerComponent', function(event, id, obj){
-          $log.info("registerComponent: ", id);
-          ComponentRegister.registerComponent(id, obj);
-        });
+          $scope.$watch('item', function(item){
+            setDataAndSession();
+          }, true);
 
-        /*
-          stash the component data (TODO: persist it?)
-        */
-        $scope.$on('saveStash', function(event, id, stash){
-          if(!$scope.session){
-            return;
-          }
-          var extension = { components: {} };
-          extension.components[id] = {stash: stash};
-          $scope.session = _.merge($scope.session, extension);
-        });
+          $scope.$watch('session', function(session, oldSession){
+            $log.debug("new session: ", session);
+            $log.debug("old session: ", oldSession);
+            if ($scope.mode != "player" && !session) {
+              $scope.session = {};
+            }
+            setDataAndSession();
+            setGlobalSession();
+          }, true);
 
-        $scope.$watch('xhtml', function(xhtml){
-          renderMarkup(xhtml);
-        });
-
-        $scope.$watch('item', function(item){
-          setDataAndSession();
-        }, true);
-
-        $scope.$watch('session', function(session, oldSession){
-          $log.debug("new session: ", session);
-          $log.debug("old session: ", oldSession);
-          if ($scope.mode != "player" && !session) {
-            $scope.session = {};
-          }
-          setDataAndSession();
-          setGlobalSession();
-        }, true);
-
-        $scope.$watch('responses', function(r){
-          if(!r){
-            return;
-          }
-          ComponentRegister.setResponses(r);
-        }, true);
+          $scope.$watch('responses', function(r){
+            if(!r){
+              return;
+            }
+            ComponentRegister.setResponses(r);
+          }, true);
 
       };
 

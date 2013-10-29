@@ -17,7 +17,7 @@ block content
       ng-disabled="session.isFinished") Submit
 
     label
-      | Attempts left: {{session.remainingAttempts !== undefined ? session.remainingAttempts : session.maxNoOfAttempts}}
+      | Attempts left: {{rootModel.session.remainingAttempts !== undefined ? rootModel.session.remainingAttempts : session.settings.maxNoOfAttempts}}
 
     hr
     #outcome(ng-show="outcome")
@@ -61,6 +61,7 @@ block scripts
           $("#player-body").html(data.xhtml);
 
           var playerDeps = [
+            'corespring-common.services',
             'corespring-common.directives',
             'corespring-player.controllers',
             'corespring-player.directives',
