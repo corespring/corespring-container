@@ -147,6 +147,15 @@ var controller = function (
     return newModel;
   };
 
+  $scope.$on('mathJaxUpdateRequest', function () {
+    console.log('udpating mathjax in root');
+    _.defer(function () {
+      if (!_.isUndefined(MathJax)) {
+        MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+      }
+    });
+  });
+
   $scope.getItem = function(){ return $scope.model; };
 
   PlayerServices.setQuestionLookup($scope.getQuestionForComponentId);
