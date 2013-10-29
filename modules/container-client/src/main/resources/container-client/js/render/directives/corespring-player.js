@@ -19,7 +19,6 @@
                 MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
               }
             });
-          });
         };
 
         var setDataAndSession = function(){
@@ -57,7 +56,6 @@
           ComponentRegister.registerComponent(id, obj);
         });
 
-
         /*
           stash the component data (TODO: persist it?)
         */
@@ -69,7 +67,6 @@
           extension.components[id] = {stash: stash};
           $scope.session = _.merge($scope.session, extension);
         });
-
 
         $scope.$watch('xhtml', function(xhtml){
           renderMarkup(xhtml);
