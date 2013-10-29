@@ -1,8 +1,8 @@
 (function() {
 
   angular.module('corespring-player.directives').directive('corespringPlayer', [ '$compile',
-      'ComponentRegister',
-      function($compile, ComponentRegister){
+      'ComponentRegister', 'MathJaxService',
+      function($compile, ComponentRegister, MathJaxService){
 
         var link = function($scope, $elem, $attrs){
           console.log("corespring-player");
@@ -16,11 +16,7 @@
             var $body = $elem.find("#body").html(newXhtml);
             $compile($body)($scope);
 
-            _.defer(function() {
-              if (!_.isUndefined(MathJax)) {
-                MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
-              }
-            });
+            MathJaxService.parseDomForMath();
 
           });
 
