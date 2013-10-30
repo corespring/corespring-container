@@ -2,13 +2,21 @@
 
 @editor-height: 100%;
 @left-column-width: 300px;
+@cs-grey: #dbd9db;
+@cs-green: #80b312;
+@cs-blue: #00acce;
+@cs-dark-grey: #1B1B1B;
+@header-font-size: 24px;
+@header-color: #ff00ee;
+@yellow: #FFEC13;
+@green: #7DE811;
+@blue: #9CD2FF;
 
 html,
 body {
   margin: 0;
   padding: 0;
 }
-
 
 .modal{
   display: block;
@@ -57,25 +65,6 @@ body > header {
   margin-bottom: -5px;
 }
 
-h1 {
-  /*  position: absolute;
-  top: -120px;*/
-  width: 100%;
-  font-size: 20px;
-  font-weight: bold;
-  color: #b3b3b3;
-  color: rgba(255, 255, 255, 0.3);
-  text-shadow: -1px -1px rgba(0, 0, 0, 0.2);
-  -webkit-text-rendering: optimizeLegibility;
-  -moz-text-rendering: optimizeLegibility;
-  -ms-text-rendering: optimizeLegibility;
-  -o-text-rendering: optimizeLegibility;
-  text-rendering: optimizeLegibility;
-  padding-left: 10px;
-  padding-top: 10px;
-  margin: 0px;
-}
-
 .edit {
   width: 100%;
 }
@@ -84,9 +73,6 @@ h1 {
   vertical-align: top;
 }
 
-@yellow: #FFEC13;
-@green: #7DE811;
-@blue: #9CD2FF;
 
 .content {
   background-color: #ffff;
@@ -97,25 +83,10 @@ h1 {
   float: left;
 }
 
-.mixin-cr(@radius: 5px) {
-  -webkit-border-top-left-radius: @radius;
-  -webkit-border-top-right-radius: @radius;
-  -moz-border-radius-topleft: @radius;
-  -moz-border-radius-topright: @radius;
-  border-top-left-radius: @radius;
-  border-top-right-radius: @radius;
-}
-
-.mixin-bs(@opacity: 0.15) {
-  -webkit-box-shadow: 4px 4px 5px rgba(50, 50, 50, @opacity);
-  -moz-box-shadow: 4px 4px 5px rgba(50, 50, 50, @opacity);
-  box-shadow: 4px 4px 5px rgba(50, 50, 50, @opacity);
-}
-
 .component {
 
-  .mixin-cr;
-  .mixin-bs;
+  .rounded(5px);
+  .drop-shadow(0, 1px, 2px, 0.2);
 
   margin-bottom: 10px;
 
@@ -159,11 +130,6 @@ h1 {
   }
 }
 
-@cs-grey: #dbd9db;
-@cs-green: #80b312;
-@cs-blue: #00acce;
-@cs-dark-grey: #1B1B1B;
-
 .root {
   width: 100%;
   height: 100%;
@@ -179,9 +145,21 @@ h1 {
     }
     .client-side-preview{
       padding-left: 10px;
+      padding-right: 10px;
       overflow: scroll;
+
+      .header{
+
+        font-size: @header-font-size;
+        color: @header-color;
+
+        .title{
+          float: right;
+        }
+      }
     }
   }
+
 
 
   .flex-box {

@@ -20,19 +20,26 @@ var controller = function ($scope, ComponentRegister, PlayerServices) {
     $scope.responses = data.responses;
     $scope.session = data.session;
     $scope.outcome = data.outcome;
+    ComponentRegister.setGlobalSession($scope.session);
   };
 
   $scope.onSessionSaveError = function (error) {
     console.warn("Error saving session");
   };
 
-  $scope.$watch('session.settings', function(newSettings){
+  $scope.resetPreview = function(){
     for(var x in $scope.responses ){
         $scope.responses[x] = {};
     }
     $scope.session.isFinished = false;
     $scope.session.remainingAttempts = $scope.session.settings.maxNoOfAttempts;
-    PlayerServices.updateSessionSettings(newSettings);
+    PlayerServices.updateSessionSettings($scope.session.settings);
+    $scope.outcome = null;
+    ComponentRegister.setGlobalSession($scope.session);
+  };
+
+  $scope.$watch('session.settings', function(newSettings){
+    $scope.resetPreview();
   }, true);
 };
 

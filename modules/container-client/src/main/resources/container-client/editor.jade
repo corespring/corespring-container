@@ -47,6 +47,12 @@ block content
 
       div.flex-2.client-side-preview(ng-controller="ClientSidePreview")
 
+        .header
+          button.btn-xs.btn.btn-primary(ng-click="resetPreview()") Reset
+          .title
+            | Item Preview
+
+
         player-control-panel(player-settings="session.settings")
 
         corespring-player(
