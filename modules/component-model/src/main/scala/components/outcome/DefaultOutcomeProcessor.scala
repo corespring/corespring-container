@@ -4,7 +4,7 @@ import play.api.libs.json.{JsValue, JsObject, JsNumber, Json}
 
 object DefaultOutcomeProcessor extends OutcomeProcessor {
 
-  private def decimalize(v: BigDecimal, scale: Int = 2): Double = v.setScale(scale, BigDecimal.RoundingMode.HALF_UP).toDouble
+  private def decimalize(v: BigDecimal, scale: Int = 2): Double =  v.setScale(scale, BigDecimal.RoundingMode.HALF_UP).toDouble
 
   def outcome(item: JsValue, session : JsValue, responses: JsValue): JsValue = {
 
@@ -22,7 +22,7 @@ object DefaultOutcomeProcessor extends OutcomeProcessor {
       (key: String, acc: JsObject) =>
 
         val weight = weights.find(_._1 == key).map(_._2).getOrElse(-1)
-        val score = decimalize((responses \ key \ "score").as[BigDecimal])
+        val score = (responses \ key \ "score").asOpt[BigDecimal].map(v => decimalize(v)).getOrElse(0.0)
         val weightedScore = decimalize(weight * score)
 
         acc ++ Json.obj(key -> Json.obj(
