@@ -1,34 +1,63 @@
 {
-  "metadata" : {
-    "title" : "Drag and drop example"
-    },
-    "elements": [
-    {
-      "_uid": "2",
-      "type": "corespring-drag-and-drop",
-      "configuration" : {
-        "shuffle" : true
-        },
-        "prompt" : "Match the Country to the city",
-        "answerArea": "<table border='0' cellpadding='10' cellspacing='10'><tr><td>London</td><td><div>Hint - starts with an G</div><span landing-place id='london'></span></td></tr><tr><td>New York</td><td><span landing-place id='new_york'></span></td></tr><tr><td>Paris</td><td><span landing-place id='paris'></span><label>surrender monkeys live here</label></td></tr><tr><td>Dublin</td><td><span landing-place id='dublin'></span></td></tr></table>",
-         "options" : [
-             { "id" : "1", "content" : "Great Britain"},
-          { "id" : "2", "content" : "United States"},
-          { "id" : "3", "content" : "France"},
-          { "id" : "4", "content" : "Ireland"}
-        ],
-        "correctAnswers": [
-        { "id": "1", "landingPlaceId": "london"},
-        { "id": "2", "landingPlaceId": "new_york"},
-        { "id": "3", "landingPlaceId": "paris"},
-        { "id": "4", "landingPlaceId": "dublin"}
-        ]
-      }
+  "_id": "522267c2554f43f858000003",
+  "components": {
+    "1": {
+      "componentType": "corespring-drag-and-drop",
+      "correctResponse": [
+        {
+          "choiceId": "larva",
+          "landingPlace": "1"
+        }
       ],
-      "_id" : "522267c2554f43f858000003",
-      "org": {
-        "components": [
-        "corespring/*"
-        ]
-      }
+      "feedback": [
+        {
+          "feedback": [
+            {
+              "larva": "Great"
+            },
+            {
+              "other": "Not great"
+            }
+          ],
+          "landingPlace": "1"
+        }
+      ],
+      "model": {
+        "answerArea": "<div>Drop your answer here: <landingPlace id='1'></landingPlace></div>",
+        "choices": [
+          {
+            "content": "Pupa",
+            "fixed": true,
+            "id": "pupa"
+          },
+          {
+            "content": "Egg",
+            "id": "egg"
+          },
+          {
+            "content": "Larva",
+            "id": "larva"
+          },
+          {
+            "content": "Adult",
+            "id": "adult"
+          }
+        ],
+        "config": {
+          "shuffle": true
+        },
+        "prompt": "Drag the 2nd stage of the butterfly's lifecycle on to the the pod"
+      },
+      "weight": 1
     }
+  },
+  "metadata": {
+    "title": "Drag and drop example"
+  },
+  "org": {
+    "components": [
+      "corespring/*"
+    ]
+  },
+  "xhtml": "<div><corespring-drag-and-drop id='1'></corespring-drag-and-drop>"
+}
