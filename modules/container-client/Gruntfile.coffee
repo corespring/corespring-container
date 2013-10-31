@@ -12,9 +12,11 @@ module.exports = (grunt) ->
     watch:
       options:
         livereload: true
+        debounceDelay: 5000
+        files: ['<%= common.dest %>/**/*']
       less:
         files: ['<%= common.app %>/**/*.less']
-        tasks: ['less']
+        tasks: ['copy:main', 'less:development']
       js:
         files: ['<%= common.app %>/js/**/*.js', '<%= common.components %>/**/*.js']
         tasks: ['jshint:main']
@@ -22,6 +24,10 @@ module.exports = (grunt) ->
         files: ['<%= common.app %>/*.jade']
         tasks: ['jade']
 
+
+    copy:
+      main:
+        files: [{expand: true, cwd: '<%= common.app %>', src: ['./**/*.less'], dest: '<%= common.dist %>/'}]
 
     less:
       development:
@@ -31,7 +37,6 @@ module.exports = (grunt) ->
         dest: '<%= common.dist %>/css/'
         ext: '.css'
         flatten: false
-        filter: 'isFile'
     clean:
       main: ["<%= common.dist %>/css/*.css"]
 
@@ -84,7 +89,8 @@ module.exports = (grunt) ->
     'grunt-contrib-less',
     'grunt-contrib-watch',
     'grunt-contrib-jshint',
-    'grunt-contrib-jasmine'
+    'grunt-contrib-jasmine',
+    'grunt-contrib-copy'
   ]
 
   grunt.loadNpmTasks(t) for t in npmTasks

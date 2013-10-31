@@ -29,11 +29,11 @@ block content
           a.navbar-brand(href="/")
 
         .main-btn Design your Item
-        //span.btn.btn-primary.btn-xs(ng-click="save()") Save
-        //span.btn.btn-info.btn-xs(file-uploader, fu-url="getUploadUrl()", fu-mode="raw") Upload image
-        //  span.btn.btn-success.btn-xs(ng-click="openChooser()") Add Component
+        span.btn.btn-primary.btn-xs(ng-click="save()") Save
+        span.btn.btn-info.btn-xs(file-uploader, fu-url="getUploadUrl()", fu-mode="raw") Upload image
+        span.btn.btn-success.btn-xs(ng-click="openChooser()") Add Component
 
-    fly-out-panel(is-open="showComponentsPanel")
+    fly-out-panel
       structure-view.structure-view(
         ng-model="model",
         selected-component="selectedComponent",
@@ -51,6 +51,7 @@ block content
       div.flex-2.client-side-preview(ng-controller="ClientSidePreview")
         .header
           button.btn-xs.btn.btn-primary(ng-click="resetPreview()") Reset
+          .down-arrow
           .title
             | Item Preview
 
