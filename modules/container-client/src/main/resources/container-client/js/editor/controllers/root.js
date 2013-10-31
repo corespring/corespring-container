@@ -10,6 +10,9 @@ var controller = function (
   MathJaxService) {
 
 
+
+  $scope.showComponentsPanel = false;
+
   var configPanels = {};
 
   var getUid = function(){

@@ -24,21 +24,24 @@ block content
 
 
     div
-      .nav.navbar.navbar-static-top(role="navigation")
+      .nav.navbar-static-top(role="navigation")
         .navbar-header
           a.navbar-brand(href="/")
-        span.btn.btn-primary.btn-xs(ng-click="save()") Save
-        span.btn.btn-info.btn-xs(file-uploader, fu-url="getUploadUrl()", fu-mode="raw") Upload image
-        span.btn.btn-success.btn-xs(ng-click="openChooser()") Add Component
+
+        .main-btn Design your Item
+        //span.btn.btn-primary.btn-xs(ng-click="save()") Save
+        //span.btn.btn-info.btn-xs(file-uploader, fu-url="getUploadUrl()", fu-mode="raw") Upload image
+        //  span.btn.btn-success.btn-xs(ng-click="openChooser()") Add Component
+
+    fly-out-panel(is-open="showComponentsPanel")
+      structure-view.structure-view(
+        ng-model="model",
+        selected-component="selectedComponent",
+        component-set="componentSet")
 
     .flex-box.main-content
 
-      .flex-1.left-column
-        structure-view.structure-view(
-          ng-model="model",
-          selected-component="selectedComponent",
-          component-set="componentSet")
-        file-list(ng-model="model.files", select-file="selectFile(file)")
+      //file-list(ng-model="model.files", select-file="selectFile(file)")
 
       config-pane.flex-3.config#config(ng-model="selectedComponent", ng-show="selectedComponent != null")
       //TODO: in ng-show below 'selectedFile' is bound to the file-preview selectedFile - not the outer one
@@ -46,12 +49,10 @@ block content
       div.selected-text-editor(ui-ace, ng-model="selectedFile.content", ui-ace="{useWrapMode: true}", ng-show="selectedFile.content != null")
 
       div.flex-2.client-side-preview(ng-controller="ClientSidePreview")
-
         .header
           button.btn-xs.btn.btn-primary(ng-click="resetPreview()") Reset
           .title
             | Item Preview
-
 
         player-control-panel(player-settings="session.settings")
 
@@ -83,6 +84,7 @@ block scripts
 
   script(src="js/editor/directives/_declaration.js")
   script(src="js/editor/directives/structure-view.js")
+  script(src="js/editor/directives/fly-out-panel.js")
   script(src="js/editor/directives/file-list.js")
   script(src="js/editor/directives/file-preview.js")
   script(src="js/editor/directives/config-pane.js")

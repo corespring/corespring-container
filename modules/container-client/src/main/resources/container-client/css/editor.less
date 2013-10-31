@@ -1,4 +1,6 @@
 @import "../bower_components/less-elements/elements";
+@import "../bower_components/bootstrap/less/bootstrap";
+@import "app";
 
 @editor-height: 100%;
 @left-column-width: 300px;
@@ -11,6 +13,9 @@
 @yellow: #FFEC13;
 @green: #7DE811;
 @blue: #9CD2FF;
+@navbar-bg : #e5e5e3;
+
+@header-height : 60px;
 
 html,
 body {
@@ -135,6 +140,50 @@ body > header {
   height: 100%;
   overflow: hidden;
 
+  .nav{
+    //.drop-shadow(0, 2px, 3px, 0.2);
+    padding-top: 0px;
+    padding-left: 10px;
+    margin: 0px;
+    background-color: @navbar-bg;
+    height: @header-height;
+
+    .btn{
+      margin: 0px;
+      margin-left: 4px;
+    }
+
+    .main-btn{
+      background-image: url('../images/grey-button-small.png');
+      background-repeat: no-repeat;
+      padding-left: 25px;
+      padding-top: 10px;
+      height: 42px;
+      display: inline-table;
+      margin-left: 20px;
+    }
+
+    .navbar-header{
+      padding: 0px;
+      max-width: 140px;
+
+      &:before, &:after{
+        content: none;
+      };
+
+      .navbar-brand{
+        @brand-padding: 10px;
+        height: @header-height;
+        background-image: url('../images/logo-new-100.png');
+        background-position: 17px 15px;
+        background-repeat: no-repeat;
+        width: 140px;
+        background-color: white;
+      }
+    }
+  }
+
+
 
   .main-content{
     .left-column{
@@ -164,9 +213,8 @@ body > header {
 
   .flex-box {
     display: flex;
-    height: 90%;
+    height: @editor-height;
     overflow: auto;
-
     .float-button {
       position: absolute;
       right: 20px;
@@ -177,7 +225,7 @@ body > header {
   .navbar {
     margin-bottom: 0px;
   }
-  .structure-view, .xml-view, .json-view, .config, .inline-preview {
+  .xml-view, .json-view, .config, .inline-preview {
     position: relative;
     height: @editor-height;
     float: left;
@@ -195,9 +243,53 @@ body > header {
     background-color: lighten(@cs-green, 45%);
   }
 
+  .transition-left(@duration){
+    -webkit-transition: left @duration ease-in-out;
+    -moz-transition: left @duration ease-in-out;
+    -o-transition: left @duration ease-in-out;
+    transition: left @duration ease-in-out;
+  }
+
+  @fly-out-panel-width: 300px;
+
+  .fly-out-panel.closed{
+    left: (@fly-out-panel-width - 20px) * -1;
+  }
+
+  .fly-out-panel{
+    width: @fly-out-panel-width;
+    min-height: 300px;
+    z-index: 100;
+    @bottom-color: #e5e4cf;
+    @top-color: #f7f8ef;
+    .gradient(@bottom-color, @bottom-color, @top-color);
+    .drop-shadow(0, 2px, 3px, 0.3);
+    .transition-left(500ms);
+
+    position: absolute;
+    left: 0px;
+
+
+    .close-button, .open-button{
+      width: 20px;
+      height: 20px;
+      background-image: url('../images/arrow-right.png');
+    }
+
+    .close-button{
+      .rotation(180deg);
+    }
+  }
+
+
+  .structure-view.open{
+    left: 30px;
+  }
+
   .structure-view {
+
     overflow: scroll;
-    width: 100%;
+    width: 300px;
     padding-top: 10px;
 
     ul {

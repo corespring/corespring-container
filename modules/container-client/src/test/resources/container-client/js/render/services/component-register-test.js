@@ -10,7 +10,7 @@ describe('component-register', function(){
 
     this.setResponse = function(r){
       this.response = r;
-    };
+    i};
 
     this.getSession = function(){
       return defaultAnswer;
