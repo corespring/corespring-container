@@ -16,7 +16,7 @@
           '<div class="fly-out-panel" ng-class="{true:\'\', false:\'closed\'}[isOpen]">',
           '  <table style="width: 100%"><tr>',
           '  <td>$content</td>',
-          '  <td style="width: 20px; vertical-align: top;"><div ng-click="togglePanel()" ng-class="{true:\'close-button\', false:\'open-button\'}[isOpen]"></div></td>',
+          '  <td style="width: 20px; vertical-align: top; padding-top: 10px;"><div ng-click="togglePanel()" ng-class="{true:\'close-button\', false:\'open-button\'}[isOpen]"></div></td>',
           '  </tr></table>',
           '</div>'
         ].join('');

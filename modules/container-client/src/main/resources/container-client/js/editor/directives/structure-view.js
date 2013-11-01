@@ -4,7 +4,7 @@
 
   var link;
 
-  link = function ($compile) {
+  link = function ($compile, $log) {
     return function ($scope, $elem, attrs) {
 
       $scope.$watch('model.components', function (newValue) {
@@ -73,27 +73,55 @@
 
         $scope.model.xhtml = "<div>" + node.html() + "</div>";
       }, true);
-      return;
+
+      $scope.loadIcon = function(type){
+        return $scope.getIconUrl({ type: type });
+      };
+
     };
   };
 
-  angular.module('corespring-editor.directives').directive('structureView', [
-    '$compile', function ($compile) {
-      var def;
-      def = {
-        link: link($compile),
-        restrict: 'E',
-        /*scope: {
-         model: '=ngModel',
-         selectedComponent: '=',
-         componentSet: '='
-         },*/
-        template: [
+/*        template: [
           '<ul ui-sortable ng-model="orderedComponents">',
           '<li class="component-thumbnail "',
           ' ng-repeat="component in orderedComponents">',
           ' <span class="component-remove-button"><i ng-click="removeComponent(component)" class="glyphicon glyphicon-remove" ></i></span>',
           ' <span  ng-click="selectComponent(component)" ng-class="{active: selectedComponent.id==component.id}" class="component-thumbnail-label" >{{component.componentType}} [{{component.id}}]</span></li>',
+          '</ul>',
+        ].join('')
+        */
+
+
+  angular.module('corespring-editor.directives').directive('structureView', [
+    '$compile', '$log', function ($compile, $log) {
+      var def;
+      def = {
+        link: link($compile, $log),
+        restrict: 'E',
+        scope: {
+           getIconUrl: '&',
+           model : '=ngModel',
+           selectedComponent: '='
+        },
+        template: [
+          '<ul ui-sortable ng-model="orderedComponents">',
+          '<li class="component-thumbnail"',
+          ' ng-click="selectComponent(component)"',
+          ' ng-class="{true: \'last\', false: \'\'}[$last]"',
+          ' ng-repeat="component in orderedComponents">',
+          '  <table >',
+          '    <tr>',
+          '      <td>',
+          '        <img ng-src="{{loadIcon(component.componentType)}}"/>',
+          '      </td>',
+          '      <td class="right">',
+          '        <div class="type-label" ng-class="{active: selectedComponent.id==component.id}">{{component.componentType}}</div>',
+          '        <div class="label">Name of component</div>',
+          '        <div class="delete"><i ng-click="removeComponent(component)" class="glyphicon glyphicon-remove"></i>delete</div>',
+          '      </td>',
+          '    </tr>',
+          '   </table>',
+          '</li>',
           '</ul>',
         ].join('')
       };

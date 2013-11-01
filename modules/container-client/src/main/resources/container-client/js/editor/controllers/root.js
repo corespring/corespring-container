@@ -9,8 +9,6 @@ var controller = function (
   PlayerServices,
   MathJaxService) {
 
-
-
   $scope.showComponentsPanel = false;
 
   var configPanels = {};
@@ -81,6 +79,17 @@ var controller = function (
 
   $scope.onComponentsLoaded = function(componentSet){
     $scope.componentSet = componentSet;
+  };
+
+  $scope.getIconUrl = function(type){
+    $log.debug("getIconUrl", type);
+    var comp = _.find($scope.componentSet, function(c){
+      return c.componentType == type;
+    });
+
+    if(comp){
+      return comp.icon;
+    }
   };
 
   $scope.onComponentsLoadError = function(error){

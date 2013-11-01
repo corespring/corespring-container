@@ -273,20 +273,28 @@ body > header {
     @top-color: #f7f8ef;
     .gradient(@bottom-color, @bottom-color, @top-color);
     .drop-shadow(0, 2px, 3px, 0.3);
-    .transition-left(500ms);
-
+    .transition-left(300ms);
     position: absolute;
     left: 0px;
-
-
     .close-button, .open-button{
       width: 20px;
       height: 20px;
       background-image: url('../images/arrow-right.png');
     }
-
     .close-button{
       .rotation(180deg);
+    }
+    .header{
+      font-size: 19px;
+      text-align: center;
+      padding: 5px;
+    }
+
+    .info{
+      text-align: center;
+      font-size: 11px;
+      padding: 5px;
+      padding-bottom: 10px;
     }
   }
 
@@ -314,26 +322,61 @@ body > header {
 
     .component-thumbnail {
       padding: 10px;
-      border: 1px solid #000000;
-      border-radius: 4px;
+      border-bottom: 1px solid #b8c9cf;
       position: relative;
+
+      *{
+        cursor: pointer;
+      }
 
       &.active {
         color: red;
       }
 
-      .component-remove-button {
-        width: 10px;
-        height: 10px;
-        display: inline-block;
-        position: absolute;
-        right: 5px;
-        top: 2px;
-        &:hover {
-          color: slateblue;
+      img{
+        .drop-shadow(0, 2px, 3px, 0.3);
+      }
+
+      td{
+        vertical-align: top;
+      }
+
+      .right{
+        padding-left: 10px;
+      }
+
+      .label{
+        @label-color: #81a81f;
+        color: @label-color;
+        font-size: 13px;
+        padding-left: 0px;
+
+        &:hover{
+          color: darken(@label-color, 10%);
+        }
+      }
+
+      .type-label{
+        font-size: 11px;
+      }
+
+      .delete{
+        padding-left: 10px;
+        font-size: 11px;
+        color:#7d715b;
+
+        i{
+          color: #b4b0b4;
+          padding-right: 4px;
         }
       }
     }
+
+    .component-thumbnail.last{
+      border-bottom: 0px solid #b8c9cf;
+    }
+
+
 
     .component-thumbnail-label:hover {
       color: slateblue;

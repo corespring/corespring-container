@@ -1,7 +1,7 @@
 extends layout
 
 block head
-  link(rel="stylesheet", href="css/editor.css")
+    link(rel="stylesheet", href="css/editor.css")
 
   script(type="text/ng-template", id="myModalContent.html")
 
@@ -34,9 +34,18 @@ block content
         span.btn.btn-success.btn-xs(ng-click="openChooser()") Add Component
 
     fly-out-panel
+      .header
+        | Item Composition
+      .info
+        | Click a Question Type below to configure it.
+        br/
+        | Drag or use up and down arrows to re-order composition.
+        br/
+        | Click the "x" to delete a Question Type.
       structure-view.structure-view(
         ng-model="model",
         selected-component="selectedComponent",
+        get-icon-url="getIconUrl(type)"
         component-set="componentSet")
 
     .flex-box.main-content
