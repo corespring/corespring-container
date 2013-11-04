@@ -1,0 +1,46 @@
+.nav{
+  //.drop-shadow(0, 2px, 3px, 0.2);
+  padding-top: 0px;
+  padding-left: 10px;
+  margin: 0px;
+  background-color: @navbar-bg;
+  height: @header-height;
+
+  .btn{
+    margin: 0px;
+    margin-left: 4px;
+  }
+
+  .main-btn{
+    background-image: url('../images/grey-button-small.png');
+    background-repeat: no-repeat;
+    padding-left: 25px;
+    padding-top: 10px;
+    height: 42px;
+    display: inline-table;
+    margin-left: 20px;
+  }
+
+  .navbar-header{
+    padding: 0px;
+    max-width: 140px;
+
+    &:before, &:after{
+      content: none;
+    };
+
+    .navbar-brand{
+      @brand-padding: 10px;
+      height: @header-height;
+      background-image: url('../images/logo-new-100.png');
+      background-position: 17px 15px;
+      background-repeat: no-repeat;
+      width: 140px;
+      background-color: white;
+    }
+  }
+}
+
+.navbar {
+  margin-bottom: 0px;
+}

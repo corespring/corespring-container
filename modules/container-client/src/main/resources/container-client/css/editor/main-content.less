@@ -1,0 +1,35 @@
+.main-content{
+
+  padding-left: @fly-out-panel-closed-width + 10;
+
+  .left-column{
+    @left-column-bg: lighten(@cs-green, 55%);
+    border-right: solid 1px darken(@left-column-bg, 30%);
+    background-color: @left-column-bg;
+    max-width: @left-column-width;
+  }
+  .client-side-preview{
+    padding-left: 10px;
+    padding-right: 10px;
+    overflow: scroll;
+
+    .header{
+
+      font-size: @header-font-size;
+      color: @header-color;
+
+      .down-arrow{
+        background-image: url('../images/down-arrow.png');
+        background-repeat: no-repeat;
+        width: 20px;
+        height: 20px;
+
+        float: right;
+      }
+
+      .title{
+        float: right;
+      }
+    }
+  }
+}

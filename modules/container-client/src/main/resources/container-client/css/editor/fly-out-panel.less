@@ -1,0 +1,46 @@
+@import "../bower_components/less-elements/elements";
+@import "mixins";
+@import "variables";
+
+@fly-out-panel-width: 300px;
+@fly-out-panel-closed-width: 20px;
+
+.fly-out-panel.closed{
+  left: (@fly-out-panel-width - 20px) * -1;
+}
+
+.fly-out-panel{
+  width: @fly-out-panel-width;
+  min-height: 300px;
+  z-index: 100;
+  @bottom-color: #e5e4cf;
+  @top-color: #f7f8ef;
+  .gradient(@bottom-color, @bottom-color, @top-color);
+  .drop-shadow(0, 2px, 3px, 0.3);
+  .transition-left(300ms);
+  position: absolute;
+  left: 0px;
+
+  .close-button, .open-button{
+    width: 20px;
+    height: 20px;
+    background-image: url('../images/arrow-right.png');
+  }
+
+  .close-button{
+    .rotation(180deg);
+  }
+
+  .header{
+    font-size: 19px;
+    text-align: center;
+    padding: 5px;
+  }
+
+  .info{
+    text-align: center;
+    font-size: 11px;
+    padding: 5px;
+    padding-bottom: 10px;
+  }
+}

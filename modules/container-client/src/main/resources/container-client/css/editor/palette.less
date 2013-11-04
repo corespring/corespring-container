@@ -1,0 +1,29 @@
+.palette {
+
+  border: solid 1px #00f000;
+  width: 50px;
+
+  .palette-button {
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+    line-height: 40px;
+    margin: 5px;
+    text-align: center;
+    border: solid 1px #99ff00;
+  }
+
+  .palette-button:hover {
+    background-color: blueviolet;
+  }
+
+  .palette-button > img {
+    vertical-align: middle;
+  }
+
+  .submit-button {
+    @color: #995599;
+    background-color: @color;
+    border: solid 2px darken(@color, 20%);
+  }
+}
