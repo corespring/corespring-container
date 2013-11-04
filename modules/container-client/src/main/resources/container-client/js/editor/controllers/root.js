@@ -40,7 +40,7 @@ var controller = function (
   $scope.openChooser = function () {
 
     var modalInstance = $modal.open({
-      templateUrl: 'myModalContent.html',
+      templateUrl: 'add-component.html',
       controller: ModalInstanceCtrl,
       backdrop: true,
       resolve: {
