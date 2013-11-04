@@ -7,7 +7,8 @@ var controller = function (
   $log,
   EditorServices,
   PlayerServices,
-  MathJaxService) {
+  MathJaxService,
+  ComponentRegister) {
 
   $scope.showComponentsPanel = false;
 
@@ -184,4 +185,5 @@ angular.module('corespring-editor.controllers')
     'EditorServices',
     'PlayerServices',
     'MathJaxService',
+    'ComponentRegister',
     controller]);

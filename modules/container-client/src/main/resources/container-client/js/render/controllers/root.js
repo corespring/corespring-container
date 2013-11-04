@@ -1,5 +1,10 @@
 var controller = function ($scope, ComponentRegister, PlayerServices) {
 
+  $scope.canSubmit = function() {
+    if (!$scope.session || !$scope.session.settings) return false;
+    return $scope.session.settings.allowEmptyResponses || !ComponentRegister.hasEmptyAnswers();
+  };
+
   $scope.submit = function () {
     PlayerServices.submitSession({
       components: ComponentRegister.getComponentSessions()
