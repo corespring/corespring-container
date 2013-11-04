@@ -27,6 +27,11 @@ var controller = function ($scope, ComponentRegister, PlayerServices) {
     console.warn("Error saving session");
   };
 
+  $scope.canSubmit = function() {
+    return $scope.session.settings.allowEmptyResponses || !ComponentRegister.hasEmptyAnswers();
+  };
+
+
   $scope.resetPreview = function(){
     for(var x in $scope.responses ){
         $scope.responses[x] = {};

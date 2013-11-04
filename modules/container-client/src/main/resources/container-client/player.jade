@@ -16,7 +16,7 @@ block content
 
     button.btn.btn-primary(
       ng-click="submit()",
-      ng-disabled="session.isFinished") Submit
+      ng-disabled="!canSubmit()") Submit
 
     label
       | Attempts left: {{rootModel.session.remainingAttempts !== undefined ? rootModel.session.remainingAttempts : session.settings.maxNoOfAttempts}}

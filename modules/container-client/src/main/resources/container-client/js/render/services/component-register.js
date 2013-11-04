@@ -48,6 +48,12 @@ angular.module('corespring-player.services').factory('ComponentRegister', ['$log
       return sessions;
     };
 
+    this.hasEmptyAnswers = function() {
+      return _(this.getComponentSessions()).some(function(comp) {
+        return _.isEmpty(comp.answers);
+      });
+    };
+
     this.setResponses = function(responses){
       setAndApplyToComponents(responses, "responses", "setResponse");
     };

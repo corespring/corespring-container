@@ -13,7 +13,9 @@ describe('component-register', function(){
     };
 
     this.getSession = function(){
-      return defaultAnswer;
+      return {
+        answers: defaultAnswer
+      };
     };
   };
 
@@ -45,7 +47,20 @@ describe('component-register', function(){
   it('should getAnswers', function(){
     register.setDataAndSession( { data : defaultData } );
     var answers = register.getComponentSessions();
-    var expectedAnswers = { "1" :  defaultAnswer };
+    var expectedAnswers = { "1" :  { answers: defaultAnswer } };
     expect(expectedAnswers).toEqual(answers);
+  });
+
+  it('has Empty is correct ', function(){
+    register.setDataAndSession( { data : defaultData } );
+    expect(register.hasEmptyAnswers()).toEqual(false);
+
+    // simulate empty session
+    bridge.getSession = function() {
+      return {
+        answers: []
+      };
+    };
+    expect(register.hasEmptyAnswers()).toEqual(true);
   });
 });
