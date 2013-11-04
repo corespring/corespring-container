@@ -1,4 +1,11 @@
 .main-content{
+  overflow: scroll;
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
+  left: 0px;
+  top: 60px;
+  display: flex;
 
   padding-left: @fly-out-panel-closed-width + 10;
 
@@ -8,6 +15,7 @@
     background-color: @left-column-bg;
     max-width: @left-column-width;
   }
+
   .client-side-preview{
     padding-left: 10px;
     padding-right: 10px;
