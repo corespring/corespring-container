@@ -13,9 +13,8 @@
   width: @fly-out-panel-width;
   min-height: 300px;
   z-index: 100;
-  @bottom-color: #e5e4cf;
-  @top-color: #f7f8ef;
-  .gradient(@bottom-color, @bottom-color, @top-color);
+
+  .gradient(@bg-bottom-color, @bg-bottom-color, @bg-top-color);
   .drop-shadow(0, 2px, 3px, 0.3);
   .transition-left(300ms);
   position: absolute;
