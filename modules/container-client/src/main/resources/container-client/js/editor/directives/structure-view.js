@@ -7,10 +7,6 @@
   link = function ($compile, $log) {
     return function ($scope, $elem, attrs) {
 
-      $scope.$watch('model.components', function (newValue) {
-        if (!newValue) return;
-      });
-
       $scope.selectComponent = function (comp) {
         $scope.selectedComponent = {
           id: comp.id,
@@ -47,14 +43,6 @@
         var node = $($scope.model.xhtml);
         var idx = 0;
 
-        function swapNodes(a, b) {
-          console.log("Swapping ", a, b);
-          var aparent = a.parentNode;
-          var asibling = a.nextSibling === b ? a : a.nextSibling;
-          b.parentNode.insertBefore(a, b);
-          aparent.insertBefore(b, asibling);
-        }
-
         var nodeMap = {};
         node.find("*[id]").each(function (n) {
           var nid = $(this).attr('id');
@@ -80,17 +68,6 @@
 
     };
   };
-
-/*        template: [
-          '<ul ui-sortable ng-model="orderedComponents">',
-          '<li class="component-thumbnail "',
-          ' ng-repeat="component in orderedComponents">',
-          ' <span class="component-remove-button"><i ng-click="removeComponent(component)" class="glyphicon glyphicon-remove" ></i></span>',
-          ' <span  ng-click="selectComponent(component)" ng-class="{active: selectedComponent.id==component.id}" class="component-thumbnail-label" >{{component.componentType}} [{{component.id}}]</span></li>',
-          '</ul>',
-        ].join('')
-        */
-
 
   angular.module('corespring-editor.directives').directive('structureView', [
     '$compile', '$log', function ($compile, $log) {
