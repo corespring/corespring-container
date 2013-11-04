@@ -116,7 +116,7 @@
           '      </td>',
           '      <td class="right">',
           '        <div class="type-label" ng-class="{active: selectedComponent.id==component.id}">{{component.componentType}}</div>',
-          '        <div class="label">Name of component</div>',
+          '        <div class="label">{{component.title}}</div>',
           '        <div class="delete"><i ng-click="removeComponent(component)" class="glyphicon glyphicon-remove"></i>delete</div>',
           '      </td>',
           '    </tr>',

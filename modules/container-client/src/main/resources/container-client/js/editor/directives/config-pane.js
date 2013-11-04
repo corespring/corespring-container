@@ -13,15 +13,25 @@ link = function ($compile) {
       var configName = data.component.componentType + '-config';
       console.log("[config pane] model loaded.");
       tmpl = ['<div class="config-chrome">',
-              '<div class="title">Configure ' + data.component.componentType + ' :: ' + data.id + '</div>',
               '<div class="holder">',
+              '<input type="text" class="title-input" placeholder="Unnamed Component" ng-model="title"></input>',
               '<' + configName + ' id="' + data.id + '"></' + configName + '>',
               '</div>',
               '</div>'].join("\n");
 
       $div = $(tmpl);
       $elem.html($div);
-      return $compile($div)($scope.$new());
+
+      var newScope = $scope.$new();
+
+      newScope.title = data.component.title;
+      newScope.$watch('title', function(newTitle) {
+        data.component.title = newTitle;
+      });
+
+      return $compile($div)(newScope);
+
+
     });
   };
 };
