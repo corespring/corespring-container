@@ -1,0 +1,7 @@
+{
+  "name" : "single-choice",
+  "organization" : "corespring",
+  "libraries" : [
+    { "name" : "lib-name", "organization" : "org-name"}
+  ]
+}

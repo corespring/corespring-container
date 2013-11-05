@@ -25,7 +25,8 @@ class ResponseProcessorImplTest extends Specification{
         Json.obj(),
         Json.obj(),
         None,
-        Map()
+        Map(),
+        Seq.empty
       )
 
 

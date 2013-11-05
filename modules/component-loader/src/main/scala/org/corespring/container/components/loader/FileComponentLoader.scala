@@ -4,7 +4,7 @@ import java.io.File
 import org.corespring.container.components.loader.exceptions.ComponentLoaderException
 import org.corespring.container.components.model._
 import org.slf4j.LoggerFactory
-import play.api.libs.json.{Json, JsValue}
+import play.api.libs.json.{JsObject, Json, JsValue}
 import scala.Some
 
 class FileComponentLoader(paths: Seq[String]) extends ComponentLoader {
@@ -88,7 +88,21 @@ val clientFolder = new File(compRoot.getPath + "/src/client")
     val defaultDataJson = new File(clientFolder.getPath + "/defaultData.json")
     val sampleDataFolder = new File(compRoot.getPath + "/sample-data")
 
-    Some(
+  def loadLibraries: Seq[Id] = {
+    (packageJson \ "libraries").asOpt[Seq[JsObject]].map {
+      seq =>
+        seq.map {
+          o =>
+            val organization = (o \ "organization").asOpt[String]
+            val name = (o \ "name").asOpt[String]
+            assert(organization.isDefined)
+            assert(name.isDefined)
+            Id(organization.get, name.get)
+        }
+    }.getOrElse(Seq.empty)
+  }
+
+  Some(
       UiComponent (
         org,
         compRoot.getName,
@@ -97,7 +111,8 @@ val clientFolder = new File(compRoot.getPath + "/src/client")
         packageJson,
         loadDefaultData(defaultDataJson),
         loadIcon(icon),
-        loadSampleData(sampleDataFolder)
+        loadSampleData(sampleDataFolder),
+        loadLibraries
       )
     )
   }
