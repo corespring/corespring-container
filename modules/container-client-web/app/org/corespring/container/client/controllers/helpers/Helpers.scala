@@ -1,7 +1,7 @@
 package org.corespring.container.client.controllers.helpers
 
 import play.api.libs.json.{JsValue, JsArray, JsString, Json}
-import org.corespring.container.components.model.Component
+import org.corespring.container.components.model.{UiComponent, Component}
 import play.api.mvc.{Results, Result}
 import org.corespring.container.client.views.txt.js.ComponentWrapper
 
@@ -24,9 +24,7 @@ trait Helpers {
     )
 
 
-
-
-  protected def componentsToResource(components: Seq[Component], componentToString : Component => String, contentType : String) : Result = {
+  protected def componentsToResource(components: Seq[UiComponent], componentToString : UiComponent => String, contentType : String) : Result = {
     Results.Ok(components.map(componentToString).mkString("\n")).as(contentType)
   }
 

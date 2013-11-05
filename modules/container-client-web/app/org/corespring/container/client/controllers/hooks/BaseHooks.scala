@@ -3,7 +3,7 @@ package org.corespring.container.client.controllers.hooks
 import org.corespring.container.client.actions.ClientHooksActionBuilder
 import org.corespring.container.client.actions.PlayerRequest
 import org.corespring.container.client.views.txt.js.ComponentWrapper
-import org.corespring.container.components.model.Component
+import org.corespring.container.components.model.{Library, UiComponent, Component}
 import play.api.libs.json.{Json, JsValue}
 import play.api.mvc.{Result, Controller, Action, AnyContent}
 import org.corespring.container.client.controllers.helpers.Helpers
@@ -21,6 +21,9 @@ trait BaseHooks[T <: ClientHooksActionBuilder[AnyContent]] extends Controller wi
   def componentJs = s"$name-components.js"
 
   def loadedComponents: Seq[Component]
+
+  def uiComponents : Seq[UiComponent] = loadedComponents.filter( c => c.isInstanceOf[UiComponent]).map(_.asInstanceOf[UiComponent])
+  def libraries : Seq[Library] = loadedComponents.filter( c => c.isInstanceOf[Library]).map(_.asInstanceOf[Library])
 
   def builder : T
 

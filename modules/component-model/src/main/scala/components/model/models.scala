@@ -2,11 +2,11 @@ package org.corespring.container.components.model
 
 import play.api.libs.json.JsValue
 
-class Component(id: Id, packageInfo: JsValue)
+class Component(val id: Id, val packageInfo: JsValue)
 
 case class Id(org: String, name: String)
 
-case class Library(org: String, name: String, packageInfo: JsValue, client: Seq[LibrarySource] = Seq.empty, server: Seq[LibrarySource] = Seq.empty)
+case class Library(org: String, name: String, override val packageInfo: JsValue, client: Seq[LibrarySource] = Seq.empty, server: Seq[LibrarySource] = Seq.empty)
   extends Component(Id(org, name), packageInfo)
 
 case class LibrarySource(name: String, source: String)
@@ -17,7 +17,7 @@ case class UiComponent(
   name : String,
   client: Client,
   server : Server,
-  packageInfo : JsValue,
+  override val packageInfo : JsValue,
   defaultData : JsValue,
   icon : Option[Array[Byte]] = None,
   sampleData: Map[String, JsValue] = Map.empty,

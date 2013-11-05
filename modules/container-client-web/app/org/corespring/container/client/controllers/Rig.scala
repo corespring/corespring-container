@@ -1,7 +1,7 @@
 package org.corespring.container.client.controllers
 
 import play.api.mvc.{Action, Controller}
-import org.corespring.container.components.model.Component
+import org.corespring.container.components.model.{UiComponent, Component}
 import org.corespring.container.client.controllers.helpers.Helpers
 import org.corespring.container.client.views.txt.js.RigServices
 import play.api.libs.json.Json
@@ -11,7 +11,7 @@ trait Rig extends Controller with Helpers {
 
   val rigServiceName = "rig.services"
 
-  def components: Seq[Component]
+  def uiComponents: Seq[UiComponent]
 
   def index(orgName: String, compName: String, data: Option[String] = None) = {
     val params = data.map(d => s"?data=$data").getOrElse("")
@@ -20,7 +20,7 @@ trait Rig extends Controller with Helpers {
 
   def asset(orgName: String, compName: String, file: String) = controllers.Assets.at("/container-client", file)
 
-  def component(orgName: String, compName: String): Option[Component] = components.find(c => c.org == orgName && c.name == compName)
+  def component(orgName: String, compName: String): Option[UiComponent] = uiComponents.find(c => c.org == orgName && c.name == compName)
 
   def config(orgName: String, compName: String) = Action {
     request =>

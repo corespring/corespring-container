@@ -21,7 +21,7 @@ trait PlayerHooks extends BaseHooks[ClientHooksActionBuilder[AnyContent]] {
     request: PlayerRequest[AnyContent] =>
       log.debug(s"load js for session $sessionId")
       val typesUsed = componentTypes(request.item)
-      val usedComponents = loadedComponents.filter(c => typesUsed.exists(t => c.matchesType(t)))
+      val usedComponents = uiComponents.filter(c => typesUsed.exists(t => c.matchesType(t)))
       componentsToResource(usedComponents, (c) => wrapJs(c.org, c.name, c.client.render), "text/javascript")
   }
 
@@ -29,7 +29,7 @@ trait PlayerHooks extends BaseHooks[ClientHooksActionBuilder[AnyContent]] {
     request =>
       log.debug(s"load css for session $sessionId")
       val typesUsed = componentTypes(request.item)
-      val usedComponents = loadedComponents.filter(c => typesUsed.exists(t => c.matchesType(t)))
+      val usedComponents = uiComponents.filter(c => typesUsed.exists(t => c.matchesType(t)))
       componentsToResource(usedComponents, _.client.css.getOrElse(""), "text/css")
   }
 

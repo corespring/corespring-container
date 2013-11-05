@@ -1,11 +1,11 @@
 package org.corespring.container.client.controllers.hooks
 
 import org.corespring.container.client.actions.{EditorClientHooksActionBuilder, PlayerRequest}
-import org.corespring.container.client.views.txt.js.{ComponentServerWrapper, ComponentWrapper, EditorServices}
+import org.corespring.container.client.views.txt.js.{ComponentServerWrapper, ComponentWrapper, EditorServices, LibraryWrapper}
+import org.corespring.container.components.model.{LibrarySource, Library, UiComponent, Component}
 import play.api.Logger
-import play.api.mvc.{AnyContent, Action}
 import play.api.libs.json.{JsArray, JsValue, Json}
-import org.corespring.container.components.model.Component
+import play.api.mvc.{AnyContent, Action}
 
 trait EditorHooks extends BaseHooks[EditorClientHooksActionBuilder[AnyContent]] {
 
@@ -21,7 +21,7 @@ trait EditorHooks extends BaseHooks[EditorClientHooksActionBuilder[AnyContent]] 
   }
 
   override protected def componentTypes(json: JsValue): Seq[String] = {
-    loadedComponents.map{ c => tagName(c.org, c.name)}
+    loadedComponents.map{ c => tagName(c.id.org, c.id.name)}
   }
 
   override def services(itemId: String): Action[AnyContent] = builder.loadServices(itemId){
@@ -29,10 +29,10 @@ trait EditorHooks extends BaseHooks[EditorClientHooksActionBuilder[AnyContent]] 
       log.debug(s"load editor services: $itemId")
       import org.corespring.container.client.controllers.resources.routes._
 
-      val componentJson : Seq[JsValue] = loadedComponents.map{ c =>
-        val tag = tagName(c.org, c.name)
+      val componentJson : Seq[JsValue] = uiComponents.map{ c =>
+        val tag = tagName(c.id.org, c.id.name)
         Json.obj(
-          "name" -> c.name,
+          "name" -> c.id.name,
           "icon" -> s"/$basePath/icon/$tag",
           "componentType" -> tag,
           "defaultData" -> c.defaultData
@@ -42,35 +42,62 @@ trait EditorHooks extends BaseHooks[EditorClientHooksActionBuilder[AnyContent]] 
       Ok(EditorServices(ngModule, Item.load(itemId), Item.save(itemId), JsArray(componentJson))).as("text/javascript")
   }
 
-  override def componentsJs(itemId:String) : Action[AnyContent] = builder.loadComponents(itemId) {
-    request : PlayerRequest[AnyContent] =>
-      componentsToResource(loadedComponents, (c) => {
-        val configJs = wrapJs(c.org, c.name, c.client.configure, Some(s"${directiveName(c.org, c.name)}Config"))
-        //Add the render directives as previews
-        val previewJs = wrapJs(c.org, c.name, c.client.render, Some(s"${directiveName(c.org, c.name)}"))
-        val serverJs = wrapServerJs(tagName(c.org, c.name), c.server.definition)
 
-        s"""
-          ${header(c, "Client Config")}
+  private def uiComponentToJs(ui:UiComponent) : String = {
+    val configJs = wrapJs(ui.org, ui.name, ui.client.configure, Some(s"${directiveName(ui.org, ui.name)}Config"))
+    //Add the render directives as previews
+    val previewJs = wrapJs(ui.org, ui.name, ui.client.render, Some(s"${directiveName(ui.org, ui.name)}"))
+    val serverJs = wrapServerJs(tagName(ui.org, ui.name), ui.server.definition)
+
+    s"""
+          ${header(ui, "Client Config")}
           $configJs
-          ${header(c, "Client Preview")}
+          ${header(ui, "Client Preview")}
           $previewJs
-          ${header(c, "Server")}
+          ${header(ui, "Server")}
           $serverJs
           """
-      }, "text/javascript")
+  }
+
+  private def libraryToJs(l:Library) : String = {
+
+    def wrapLibraryJs(target:String)(src:LibrarySource) = {
+      val fullName = s"${l.org}/${l.name}/${src.name}"
+      LibraryWrapper(target, fullName, src.source)
+    }
+
+    val clientLibs = l.client.map( wrapLibraryJs("client") ).mkString("\n")
+    val serverLibs = l.server.map( wrapLibraryJs("server") ).mkString("\n")
+
+    s"""
+    $clientLibs
+    // -------------------------------------
+    $serverLibs
+    """
+  }
+
+  override def componentsJs(itemId:String) : Action[AnyContent] = builder.loadComponents(itemId) {
+    request : PlayerRequest[AnyContent] =>
+      val uiJs = uiComponents.map(uiComponentToJs).mkString("\n")
+      val libJs = libraries.map(libraryToJs).mkString("\n")
+      Ok(s"$uiJs\n$libJs")
   }
 
   private def header(c:Component, msg:String) = s"""
       // -----------------------------------------
-      // ${c.org} ${c.name} | $msg
+      // ${c.id.org} ${c.id.name} | $msg
       // -----------------------------------------
   """
 
   override def componentsCss(sessionId: String):  Action[AnyContent] = builder.loadComponents(sessionId) {
     request =>
       log.debug(s"load css for session $sessionId")
-      componentsToResource(loadedComponents, _.client.css.getOrElse(""), "text/css")
+      componentsToResource(uiComponents, { c =>
+        c match{
+          case ui : UiComponent => ui.client.css.getOrElse("")
+          case _ => ""
+        }
+      }, "text/css")
   }
 
   override def wrapJs(org:String, name:String, src:String, directive: Option[String] = None) = {
