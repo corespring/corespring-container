@@ -1,10 +1,10 @@
 package org.corespring.container.components.response
 
-import org.corespring.container.components.model.Component
+import org.corespring.container.components.model.UiComponent
 import org.slf4j.LoggerFactory
 import play.api.libs.json.{JsObject, JsValue}
 
-class ResponseProcessorImpl(components: Seq[Component]) extends ResponseProcessor {
+class ResponseProcessorImpl(components: Seq[UiComponent]) extends ResponseProcessor {
 
   private lazy val logger = LoggerFactory.getLogger("components.response")
 

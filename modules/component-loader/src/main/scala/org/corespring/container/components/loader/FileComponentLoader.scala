@@ -2,9 +2,10 @@ package org.corespring.container.components.loader
 
 import java.io.File
 import org.corespring.container.components.loader.exceptions.ComponentLoaderException
-import org.corespring.container.components.model.{Server, Client, Component}
+import org.corespring.container.components.model._
 import org.slf4j.LoggerFactory
 import play.api.libs.json.{Json, JsValue}
+import scala.Some
 
 class FileComponentLoader(paths: Seq[String]) extends ComponentLoader {
 
@@ -43,20 +44,57 @@ class FileComponentLoader(paths: Seq[String]) extends ComponentLoader {
 
     logger.debug(s"loadComponent: $org : ${compRoot.getPath}")
 
-    val clientFolder = new File(compRoot.getPath + "/src/client")
+    val packageFile = new File(compRoot.getPath + "/package.json")
+    val packageJson = loadPackageInfo(packageFile)
+    val isLibrary = (packageJson \ "isLibrary").asOpt[Boolean].getOrElse(false)
+
+    if (isLibrary) {
+      loadLibrary(org, packageJson)(compRoot)
+    } else {
+      loadUiComponent(org, packageJson)(compRoot)
+    }
+
+  }
+
+  private def loadLibrary(org: String, packageJson: JsValue)(compRoot: File): Option[Component] = {
+
+    def loadLibrarySources(folder: String): Seq[LibrarySource] = {
+      val child = new File(s"${compRoot.getPath}/src/$folder")
+      val children = child.listFiles()
+      if (children == null) {
+        Seq.empty
+      } else {
+        children.filter(_.getName.endsWith(".js")).map(  f => LibrarySource(f.getName, readFile(f)) ).toSeq
+      }
+    }
+
+    Some(
+      Library(
+        org,
+        compRoot.getName,
+        packageJson,
+        loadLibrarySources("client"),
+        loadLibrarySources("server")
+      )
+    )
+  }
+
+
+private def loadUiComponent (org: String, packageJson: JsValue) (compRoot: File): Option[Component] = {
+
+val clientFolder = new File(compRoot.getPath + "/src/client")
     val serverFolder = new File(compRoot.getPath + "/src/server")
-    val packageJson = new File(compRoot.getPath + "/package.json")
     val icon = new File(compRoot.getPath + "/icon.png")
     val defaultDataJson = new File(clientFolder.getPath + "/defaultData.json")
     val sampleDataFolder = new File(compRoot.getPath + "/sample-data")
 
     Some(
-      Component(
+      UiComponent (
         org,
         compRoot.getName,
         loadClient(clientFolder),
         loadServer(serverFolder),
-        loadPackageInfo(packageJson),
+        packageJson,
         loadDefaultData(defaultDataJson),
         loadIcon(icon),
         loadSampleData(sampleDataFolder)

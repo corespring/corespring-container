@@ -2,9 +2,15 @@ package org.corespring.container.components.model
 
 import play.api.libs.json.JsValue
 
+class Component(org: String, name: String, packageInfo: JsValue)
+
+case class Library(org: String, name: String, packageInfo: JsValue, client: Seq[LibrarySource] = Seq.empty, server: Seq[LibrarySource] = Seq.empty)
+  extends Component(org, name, packageInfo)
+
+case class LibrarySource(name: String, source: String)
 
 /** A component implementation */
-case class Component(
+case class UiComponent(
   org : String,
   name : String,
   client: Client,
@@ -13,7 +19,7 @@ case class Component(
   defaultData : JsValue,
   icon : Option[Array[Byte]] = None,
   sampleData : Map[String,JsValue] = Map.empty
-){
+                      ) extends Component(org, name, packageInfo) {
   val SnakeCase = """(.*?)-(.*)""".r
 
   def matchesType(snakeCase:String) : Boolean = {

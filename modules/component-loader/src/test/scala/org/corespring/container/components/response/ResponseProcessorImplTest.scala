@@ -1,7 +1,7 @@
 package org.corespring.container.components.response
 
+import org.corespring.container.components.model.{UiComponent, Server, Client}
 import org.specs2.mutable.Specification
-import org.corespring.container.components.model.{Server, Client, Component}
 import play.api.libs.json.Json
 
 class ResponseProcessorImplTest extends Specification{
@@ -17,7 +17,7 @@ class ResponseProcessorImplTest extends Specification{
   "ResponseProcessor" should {
     "respond" in {
 
-      val component = Component(
+      val component = UiComponent(
         "org",
         "name",
         client = Client("", "", None),
