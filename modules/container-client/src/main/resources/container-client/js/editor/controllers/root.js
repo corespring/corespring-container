@@ -83,7 +83,6 @@ var controller = function (
   };
 
   $scope.getIconUrl = function(type){
-    $log.debug("getIconUrl", type);
     var comp = _.find($scope.componentSet, function(c){
       return c.componentType == type;
     });

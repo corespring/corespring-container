@@ -3,6 +3,7 @@
   "components": {
     "1": {
       "componentType": "corespring-drag-and-drop",
+      "title": "Butterfly D&D",
       "correctResponse": [
         {
           "choiceId": "larva",
@@ -23,7 +24,7 @@
         }
       ],
       "model": {
-        "answerArea": "<div>Drop your answer here: <landingPlace id='1'></landingPlace></div>",
+        "answerArea": "<div>A butterfly is first a <landingPlace id='1' class='inline'></landingPlace> then a <landingPlace id='2' class='inline'></landingPlace> and then a <landingPlace id='3' class='inline'></landingPlace> and then a <landingPlace id='4' class='inline'></landingPlace> </div>",
         "choices": [
           {
             "content": "Pupa",

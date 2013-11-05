@@ -13,6 +13,7 @@ var controller = function ($scope, ComponentRegister, PlayerServices) {
 
   $scope.submit = function(){
     var components = ComponentRegister.getComponentSessions();
+    console.log("Submitting: ", components);
     PlayerServices.submitSession({components: components}, $scope.onSessionSaved, $scope.onSessionSaveError);
   };
 
