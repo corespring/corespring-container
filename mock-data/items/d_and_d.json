@@ -4,12 +4,12 @@
     "1": {
       "componentType": "corespring-drag-and-drop",
       "title": "Butterfly D&D",
-      "correctResponse": [
-        {
-          "choiceId": "larva",
-          "landingPlace": "1"
-        }
-      ],
+      "correctResponse": {
+        "1": "egg",
+        "2": "pupa",
+        "3": "larva",
+        "4": "adult"
+      },
       "feedback": [
         {
           "feedback": [
