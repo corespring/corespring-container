@@ -40,6 +40,18 @@ var controller = function ($scope, ComponentRegister, PlayerServices) {
     $scope.session.remainingAttempts = $scope.session.settings.maxNoOfAttempts;
     PlayerServices.updateSessionSettings($scope.session.settings);
     $scope.outcome = null;
+    if($scope.rootModel){
+      $scope.rootModel.session = {};
+    }
+
+    /*for(var key in $scope.rootModel.session.components){
+
+      var s = $scope.rootModel.session.components[key];
+      if(s){
+        s.answers = null;
+      }
+    }*/
+
     ComponentRegister.setGlobalSession($scope.session);
   };
 
