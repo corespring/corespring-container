@@ -1,10 +1,10 @@
 package org.corespring.container.components.response
 
-import org.corespring.container.components.model.UiComponent
+import org.corespring.container.components.model.{Library, UiComponent}
 import org.slf4j.LoggerFactory
 import play.api.libs.json.{JsObject, JsValue}
 
-class ResponseProcessorImpl(components: Seq[UiComponent]) extends ResponseProcessor {
+class ResponseProcessorImpl(components: Seq[UiComponent], libraries : Seq[Library]) extends ResponseProcessor {
 
   private lazy val logger = LoggerFactory.getLogger("components.response")
 
@@ -25,7 +25,8 @@ class ResponseProcessorImpl(components: Seq[UiComponent]) extends ResponseProces
 
             answer.map {
               a =>
-                val generator = new ResponseGenerator(component.componentType, component.server.definition)
+                val componentLibraries : Seq[Library] = component.libraries.map( id => libraries.find(l => l.id == id )).flatten
+                val generator = new ResponseGenerator(component.componentType, component.server.definition, componentLibraries)
                 (id, generator.respond(question, a, session \ "settings"))
             }.getOrElse {
               logger.debug(s"no answer provided for: $id")

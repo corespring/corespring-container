@@ -1,4 +1,4 @@
-@(target:String, fullName:String, src:String)
+@(fullName:String, src:String)
 (function(exports, require){
   @src;
-})(corespring.library["@target"]["@fullName"], corespring.require);
+})(corespring.library("@fullName"), corespring.require);

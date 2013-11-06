@@ -7,7 +7,7 @@ import play.api.libs.json.JsValue
 trait CorespringJs {
 
   //TODO: How to share corespring-core.js with client and server
-  protected val libs = Seq("/js-libs/lodash.min.js", "/js-libs/corespring-core.js")
+  protected val libs = Seq("/js-libs/lodash.min.js", "/container-client/js/corespring/core.js")
 
   def js : String
 
@@ -56,6 +56,17 @@ trait ComponentServerLogic
 
   def componentType:String
 
+  def componentLibs:Seq[(String,String)]
+
+  def wrappedComponentLibs = componentLibs.map{ tuple =>
+    val (fullName, src) = tuple
+    s"""
+    (function(exports, require){
+    $src;
+    })(corespring.library("$fullName"), corespring.require);
+    """
+  }
+
   override def exports = s"corespring.server.logic('$componentType')"
 
   private def serverLogic(ctx: Context, scope: Scriptable): Scriptable = {
@@ -66,7 +77,7 @@ trait ComponentServerLogic
     serverLogic.asInstanceOf[Scriptable]
   }
 
-  def respond(question: JsValue, answer: JsValue, settings: JsValue): JsValue = withJsContext(libs) {
+  def respond(question: JsValue, answer: JsValue, settings: JsValue): JsValue = withJsContext(libs, wrappedComponentLibs) {
     (ctx: Context, scope: Scriptable) =>
       implicit val rootScope = scope
       implicit val rootContext = ctx

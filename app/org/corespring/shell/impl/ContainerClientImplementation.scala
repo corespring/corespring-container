@@ -2,7 +2,7 @@ package org.corespring.shell.impl
 
 import org.corespring.amazon.s3.ConcreteS3Service
 import org.corespring.container.client.controllers.{Rig, Icons, Assets}
-import org.corespring.container.components.model.{UiComponent, Component}
+import org.corespring.container.components.model.{Library, UiComponent, Component}
 import org.corespring.container.components.outcome.{ItemJsOutcomeProcessor, OutcomeProcessorSequence, DefaultOutcomeProcessor, OutcomeProcessor}
 import org.corespring.container.components.response.{ResponseProcessorImpl, ResponseProcessor}
 import org.corespring.shell.impl.controllers.editor.{ClientItemImpl, EditorHooksImpl}
@@ -21,6 +21,7 @@ class ContainerClientImplementation(
   lazy val controllers: Seq[Controller] = Seq(playerHooks, editorHooks, items, sessions, assets, icons, rig)
 
   def rootUiComponents = comps.filter(_.isInstanceOf[UiComponent]).map(_.asInstanceOf[UiComponent])
+  def rootLibs = comps.filter(_.isInstanceOf[Library]).map(_.asInstanceOf[Library])
 
   private lazy val icons = new Icons {
     def loadedComponents: Seq[Component] = comps
@@ -78,7 +79,7 @@ class ContainerClientImplementation(
   private lazy val sessions = new ClientSessionImpl {
     def itemService: MongoService = itemServiceIn
 
-    def responseProcessor: ResponseProcessor = new ResponseProcessorImpl(rootUiComponents)
+    def responseProcessor: ResponseProcessor = new ResponseProcessorImpl(rootUiComponents, rootLibs)
 
     def sessionService: MongoService = sessionServiceIn
 

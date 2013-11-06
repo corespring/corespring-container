@@ -22,4 +22,17 @@ describe('core', function () {
     exports.initializeComponent();
     expect(mockModule.registered["testComp"]).toEqual(exports.directive);
   });
+
+
+  it('should allow modules to require libraries', function(){
+
+     corespring.bootstrap(mockAngular);
+
+     var exports = corespring.library("test-lib");
+     exports.ping = function(msg){
+       return "!" + msg;
+     };
+     var result = corespring.require("test-lib").ping('hello');
+     expect(result).toEqual('!hello');
+  });
 });

@@ -30,7 +30,7 @@ class ResponseProcessorImplTest extends Specification{
       )
 
 
-      val processor = new ResponseProcessorImpl(Seq(component))
+      val processor = new ResponseProcessorImpl(Seq(component), Seq.empty)
 
       val item = Json.obj(
         "components" -> Json.obj(

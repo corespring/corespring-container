@@ -62,7 +62,7 @@ class ResponseGeneratorTest extends Specification {
     val beRightResponse: Matcher[(String, String, String)] = (set: (String, String, String)) => {
       val (value, expectedCorrectness, expectedFeedback) = set
       val answer = Json.obj("value" -> value)
-      val generator = new ResponseGenerator("comp", respondJs)
+      val generator = new ResponseGenerator("comp", respondJs, Seq.empty)
       val response = generator.respond(question, answer, JsObject(Seq.empty))
       (response \ "correctness").as[String] === expectedCorrectness
       val feedback: Seq[JsValue] = (response \ "feedback").as[Seq[JsValue]]

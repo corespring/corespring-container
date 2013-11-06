@@ -29,7 +29,7 @@ trait JsContext extends JsLogging {
 
   def console : Option[JsConsole] = Some(new DefaultLogger(Logger("js.console")))
 
-  def withJsContext( libs : Seq[String] )( f: (Context, Scriptable) => JsValue ): JsValue = {
+  def withJsContext( libs : Seq[String], srcs:Seq[String] = Seq.empty)( f: (Context, Scriptable) => JsValue ): JsValue = {
     val ctx = Context.enter
     ctx.setOptimizationLevel(-1)
     val global = new Global
@@ -42,6 +42,9 @@ trait JsContext extends JsLogging {
     }.getOrElse(logger.debug(s"Couldn't load $libPath"))
 
     libs.foreach(addToContext)
+
+    def addSrcToContext(src:String) = ctx.evaluateString(scope, src, "?", 1, null)
+    srcs.foreach(addSrcToContext)
 
     def addToScope(name: String)(thing: Any) = ScriptableObject.putProperty(scope, name, thing)
 

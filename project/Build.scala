@@ -63,23 +63,6 @@ object Build extends sbt.Build {
     javascriptEntryPoints := Nil
   )
 
-  //Note: this is a play app for now until we move to play 2.2.0
-  lazy val jsProcessing = builder.playApp("js-processing").settings( playAppToSbtLibSettings : _* ).settings(
-    libraryDependencies ++= Seq(rhinoJs)
-  )
-
-  //Note: As above...
-  lazy val componentModel = builder.playApp("component-model").settings(playAppToSbtLibSettings: _*).settings(
-    libraryDependencies ++= Seq(specs2),
-    resolvers ++= Resolvers.all
-  ).dependsOn(utils % "test->compile;compile->compile", jsProcessing)
-
-  lazy val componentLoader = builder.lib("component-loader")
-    .settings(
-      libraryDependencies ++= Seq(logbackClassic, specs2, rhinoJs)
-  ).dependsOn(componentModel, jsProcessing)
-
-
   val buildClient = TaskKey[Unit]("build-client", "runs client installation commands")
 
   val buildClientTask = buildClient <<= (baseDirectory, streams) map {
@@ -105,9 +88,6 @@ object Build extends sbt.Build {
       }
   }
 
-
-
-
   lazy val containerClient = builder.lib("container-client")
     .settings(
     buildClientTask,
@@ -117,10 +97,31 @@ object Build extends sbt.Build {
     (packagedArtifacts) <<= (packagedArtifacts) dependsOn buildClient
   )
 
+  //Note: this is a play app for now until we move to play 2.2.0
+  lazy val jsProcessing = builder.playApp("js-processing").settings( playAppToSbtLibSettings : _* ).settings(
+    libraryDependencies ++= Seq(rhinoJs)
+  ).dependsOn(containerClient)
+
+  //Note: As above...
+  lazy val componentModel = builder.playApp("component-model").settings(playAppToSbtLibSettings: _*).settings(
+    libraryDependencies ++= Seq(specs2),
+    resolvers ++= Resolvers.all
+  ).dependsOn(utils % "test->compile;compile->compile", jsProcessing)
+
+  lazy val componentLoader = builder.lib("component-loader")
+    .settings(
+    libraryDependencies ++= Seq(logbackClassic, specs2, rhinoJs)
+  ).dependsOn(componentModel, jsProcessing)
+
+
   val containerClientWeb = builder.playApp("container-client-web").settings(
     sources in doc in Compile := List(),
     templatesImport ++= Seq( "play.api.libs.json.JsValue", "play.api.libs.json.Json" )
-  ).dependsOn(componentModel % "compile->compile;test->test", containerClient, utils, jsProcessing )
+  ).dependsOn(
+    componentModel % "compile->compile;test->test",
+    containerClient,
+    utils,
+    jsProcessing)
 
   val shell = builder.playApp("shell", Some(".")).settings(
     resolvers ++= Resolvers.all,

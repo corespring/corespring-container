@@ -6,7 +6,12 @@ class Component(val id: Id, val packageInfo: JsValue)
 
 case class Id(org: String, name: String)
 
-case class Library(org: String, name: String, override val packageInfo: JsValue, client: Seq[LibrarySource] = Seq.empty, server: Seq[LibrarySource] = Seq.empty)
+case class Library(
+                    org: String,
+                    name: String,
+                    override val packageInfo: JsValue,
+                    client: Seq[LibrarySource] = Seq.empty,
+                    server: Seq[LibrarySource] = Seq.empty)
   extends Component(Id(org, name), packageInfo)
 
 case class LibrarySource(name: String, source: String)

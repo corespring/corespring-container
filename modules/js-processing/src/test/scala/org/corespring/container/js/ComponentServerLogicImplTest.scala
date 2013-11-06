@@ -13,6 +13,8 @@ class ComponentServerLogicImplTest extends Specification{
         |}
       """.stripMargin
 
+    def componentLibs: Seq[(String, String)] = Seq.empty
+
     def componentType: String = "test-comp"
   }
 

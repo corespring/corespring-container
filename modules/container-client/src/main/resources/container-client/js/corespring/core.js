@@ -1,20 +1,34 @@
 (function(root){
 
-  /**
-   * Mock Require only underscore or lodash allowed for now.
-   */
-  var mockRequire = function(id){
-    if(id == "lodash" ||  id == "underscore" ){
-      if( _ ){
-         return _;
-      } else {
-         console.log("Can't find underscore or lodash");
-         throw "Can't find underscore/lodash";
+  var Library = function(){
+
+    var libraries = {
+      lodash: _,
+      underscore: _
+    };
+
+    this.require = function(uid){
+
+      if(!uid){
+        throw new Error("you must specify a uid");
       }
-    } else {
-      console.log("Unsupported library: " + id);
-      throw "Unsupported library: " + id;
-    }
+
+      if(libraries[uid]){
+        return libraries[uid];
+      } else {
+        throw new Error("can't find library : " + uid);
+      }
+    };
+
+    this.library = function(uid){
+
+      if(!uid){
+        throw new Error("you must specify a uid");
+      }
+
+      libraries[uid] = libraries[uid] || {};
+      return libraries[uid];
+    };
   };
 
   var ComponentDefinition = function(angular, directiveName, moduleName){
@@ -89,8 +103,9 @@
   };
 
   var Corespring = function(){
-
-    this.require = mockRequire;
+    var _library = new Library();
+    this.library = _library.library;
+    this.require = _library.require;
     this.server = new Server();
     this.client = new Client(root.angular);
 

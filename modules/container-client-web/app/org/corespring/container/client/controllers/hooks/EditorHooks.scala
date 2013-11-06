@@ -1,8 +1,8 @@
 package org.corespring.container.client.controllers.hooks
 
 import org.corespring.container.client.actions.{EditorClientHooksActionBuilder, PlayerRequest}
-import org.corespring.container.client.views.txt.js.{ComponentServerWrapper, ComponentWrapper, EditorServices, LibraryWrapper}
-import org.corespring.container.components.model.{LibrarySource, Library, UiComponent, Component}
+import org.corespring.container.client.views.txt.js.{ComponentServerWrapper, ComponentWrapper, EditorServices}
+import org.corespring.container.components.model.{UiComponent, Component}
 import play.api.Logger
 import play.api.libs.json.{JsArray, JsValue, Json}
 import play.api.mvc.{AnyContent, Action}
@@ -21,7 +21,7 @@ trait EditorHooks extends BaseHooks[EditorClientHooksActionBuilder[AnyContent]] 
   }
 
   override protected def componentTypes(json: JsValue): Seq[String] = {
-    loadedComponents.map{ c => tagName(c.id.org, c.id.name)}
+    uiComponents.map{ c => tagName(c.id.org, c.id.name)}
   }
 
   override def services(itemId: String): Action[AnyContent] = builder.loadServices(itemId){
@@ -59,28 +59,13 @@ trait EditorHooks extends BaseHooks[EditorClientHooksActionBuilder[AnyContent]] 
           """
   }
 
-  private def libraryToJs(l:Library) : String = {
 
-    def wrapLibraryJs(target:String)(src:LibrarySource) = {
-      val fullName = s"${l.org}/${l.name}/${src.name}"
-      LibraryWrapper(target, fullName, src.source)
-    }
-
-    val clientLibs = l.client.map( wrapLibraryJs("client") ).mkString("\n")
-    val serverLibs = l.server.map( wrapLibraryJs("server") ).mkString("\n")
-
-    s"""
-    $clientLibs
-    // -------------------------------------
-    $serverLibs
-    """
-  }
 
   override def componentsJs(itemId:String) : Action[AnyContent] = builder.loadComponents(itemId) {
     request : PlayerRequest[AnyContent] =>
       val uiJs = uiComponents.map(uiComponentToJs).mkString("\n")
-      val libJs = libraries.map(libraryToJs).mkString("\n")
-      Ok(s"$uiJs\n$libJs")
+      val libJs = libraries.map(libraryToJs(_, true)).mkString("\n")
+      Ok(s"$libJs\n$uiJs").as("text/javascript")
   }
 
   private def header(c:Component, msg:String) = s"""

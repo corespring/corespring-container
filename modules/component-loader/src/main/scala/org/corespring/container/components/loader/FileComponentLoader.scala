@@ -58,13 +58,18 @@ class FileComponentLoader(paths: Seq[String]) extends ComponentLoader {
 
   private def loadLibrary(org: String, packageJson: JsValue)(compRoot: File): Option[Component] = {
 
-    def loadLibrarySources(folder: String): Seq[LibrarySource] = {
-      val child = new File(s"${compRoot.getPath}/src/$folder")
+    def loadLibrarySources(target:String) : Seq[LibrarySource] = {
+      val child = new File(s"${compRoot.getPath}/src/$target")
       val children = child.listFiles()
       if (children == null) {
         Seq.empty
       } else {
-        children.filter(_.getName.endsWith(".js")).map(  f => LibrarySource(f.getName, readFile(f)) ).toSeq
+        children.toSeq.filter(_.getName.endsWith(".js")).map{  f =>
+          val sourceName = f.getName.replace(".js", "")
+          val component = compRoot.getName
+          val name = s"$org.$component.$target${ if(sourceName == "index") "" else s".$sourceName"}"
+          LibrarySource(name, readFile(f))
+        }
       }
     }
 

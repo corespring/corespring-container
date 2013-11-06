@@ -2,8 +2,8 @@ package org.corespring.container.client.controllers.hooks
 
 import org.corespring.container.client.actions.ClientHooksActionBuilder
 import org.corespring.container.client.actions.PlayerRequest
-import org.corespring.container.client.views.txt.js.ComponentWrapper
-import org.corespring.container.components.model.{Library, UiComponent, Component}
+import org.corespring.container.client.views.txt.js.{LibraryWrapper, ComponentWrapper}
+import org.corespring.container.components.model.{LibrarySource, Library, UiComponent, Component}
 import play.api.libs.json.{Json, JsValue}
 import play.api.mvc.{Result, Controller, Action, AnyContent}
 import org.corespring.container.client.controllers.helpers.Helpers
@@ -77,6 +77,25 @@ trait BaseHooks[T <: ClientHooksActionBuilder[AnyContent]] extends Controller wi
       }
       case _ => Action(NotFound(s"$resource, $suffix, $id"))
     }
+  }
+
+  protected def libraryToJs(l:Library, addServer:Boolean = false) : String = {
+
+    def wrapLibraryJs(src:LibrarySource) = {
+      s"""
+      // ----------------- ${src.name} ---------------------
+      ${LibraryWrapper(src.name, src.source)}
+      """
+    }
+
+    val libs = l.client.map( wrapLibraryJs ).mkString("\n")
+    val server = if(addServer) l.server.map(wrapLibraryJs).mkString("\n") else ""
+    s"""
+    // -------------------- Libraries -----------------------
+    $libs
+
+    $server
+    """
   }
 
   /**
