@@ -27,8 +27,8 @@ class FileComponentLoaderTest extends Specification {
       loader.all(0).isInstanceOf[Library] === true
       val lib = loader.all(0).asInstanceOf[Library]
       lib.client.length == 2
-      lib.client.map(_.name).contains("corespring.my-lib.client") === true
-      lib.client.map(_.name).contains("corespring.my-lib.client.other") === true
+      lib.client.map(_.name).contains("MyLib") === true
+      lib.client.map(_.name).contains("Other") === true
       lib.server.length == 2
       lib.server.map(_.name).contains("corespring.my-lib.server") === true
       lib.server.map(_.name).contains("corespring.my-lib.server.other") === true
