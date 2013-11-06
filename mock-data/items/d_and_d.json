@@ -13,12 +13,6 @@
       "feedback": [
         {
           "feedback": [
-            {
-              "larva": "Great"
-            },
-            {
-              "other": "Not great"
-            }
           ],
           "landingPlace": "1"
         }
@@ -47,7 +41,7 @@
         "config": {
           "shuffle": true
         },
-        "prompt": "Drag the 2nd stage of the butterfly's lifecycle on to the the pod"
+        "prompt": "Drag the stages of the butterfly's lifecycle on to the the pods"
       },
       "weight": 1
     }

@@ -10,12 +10,12 @@
       "weight" : 1,
       "correctResponse" : { "value" : ["carrot"] },
       "feedback" : [
-        { "value" : "banana", "feedback" : "it's a fruit"},
-        { "value" : "carrot", "feedback" : "yup", "notChosenFeedback" : "This is a veg"},
-        { "value" : "apple", "feedback" : "it's a fruit"}
+        { "value" : "banana", "feedback" : "Incorrect"},
+        { "value" : "carrot", "feedback" : "Correct", "notChosenFeedback" : "This was the correct one."},
+        { "value" : "apple", "feedback" : "Incorrect"}
       ],
       "model" : {
-        "prompt": "Which of these is a carrot?",
+        "prompt": "Which of these is a vegetable?",
         "config": {
           "orientation": "vertical",
           "shuffle": true
