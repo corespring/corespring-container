@@ -21,7 +21,7 @@ trait EditorHooks extends BaseHooks[EditorClientHooksActionBuilder[AnyContent]] 
   }
 
   override protected def componentTypes(json: JsValue): Seq[String] = {
-    uiComponents.map{ c => tagName(c.id.org, c.id.name)}
+    loadedComponents.map{ c => tagName(c.id.org, c.id.name)}
   }
 
   override def services(itemId: String): Action[AnyContent] = builder.loadServices(itemId){
@@ -60,11 +60,10 @@ trait EditorHooks extends BaseHooks[EditorClientHooksActionBuilder[AnyContent]] 
   }
 
 
-
   override def componentsJs(itemId:String) : Action[AnyContent] = builder.loadComponents(itemId) {
     request : PlayerRequest[AnyContent] =>
       val uiJs = uiComponents.map(uiComponentToJs).mkString("\n")
-      val libJs = libraries.map(libraryToJs(_, true)).mkString("\n")
+      val libJs = libraries.map(libraryToJs(true, true)).mkString("\n")
       Ok(s"$libJs\n$uiJs").as("text/javascript")
   }
 

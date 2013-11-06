@@ -53,12 +53,11 @@ class FileComponentLoader(paths: Seq[String]) extends ComponentLoader {
     } else {
       loadUiComponent(org, packageJson)(compRoot)
     }
-
   }
 
   private def loadLibrary(org: String, packageJson: JsValue)(compRoot: File): Option[Component] = {
 
-    def loadLibrarySources(target:String) : Seq[LibrarySource] = {
+    def loadLibrarySources(target:String, nameFn : String => String) : Seq[LibrarySource] = {
       val child = new File(s"${compRoot.getPath}/src/$target")
       val children = child.listFiles()
       if (children == null) {
@@ -66,20 +65,28 @@ class FileComponentLoader(paths: Seq[String]) extends ComponentLoader {
       } else {
         children.toSeq.filter(_.getName.endsWith(".js")).map{  f =>
           val sourceName = f.getName.replace(".js", "")
-          val component = compRoot.getName
-          val name = s"$org.$component.$target${ if(sourceName == "index") "" else s".$sourceName"}"
+          val name = nameFn(sourceName)
           LibrarySource(name, readFile(f))
         }
       }
     }
+
+    def hyphenatedToTitleCase(s:String) =   s.split("-").map(_.capitalize).mkString("")
+
+    def createClientName(n:String) = {
+      val name = (if(n == "index" ) compRoot.getName else n)
+      hyphenatedToTitleCase(name)
+    }
+
+    def createServerName(n:String) = s"$org.${compRoot.getName}.server${ if(n == "index") "" else s".$n"}"
 
     Some(
       Library(
         org,
         compRoot.getName,
         packageJson,
-        loadLibrarySources("client"),
-        loadLibrarySources("server")
+        loadLibrarySources("client", createClientName),
+        loadLibrarySources("server", createServerName)
       )
     )
   }

@@ -2,11 +2,11 @@ package org.corespring.container.client.controllers.hooks
 
 import org.corespring.container.client.actions.ClientHooksActionBuilder
 import org.corespring.container.client.actions.PlayerRequest
-import org.corespring.container.client.views.txt.js.{LibraryWrapper, ComponentWrapper}
-import org.corespring.container.components.model.{LibrarySource, Library, UiComponent, Component}
-import play.api.libs.json.{Json, JsValue}
-import play.api.mvc.{Result, Controller, Action, AnyContent}
 import org.corespring.container.client.controllers.helpers.Helpers
+import org.corespring.container.client.views.txt.js.{ServerLibraryWrapper, ComponentWrapper}
+import org.corespring.container.components.model.{LibrarySource, Library, UiComponent, Component}
+import play.api.libs.json.JsValue
+import play.api.mvc.{Controller, Action, AnyContent}
 
 trait BaseHooks[T <: ClientHooksActionBuilder[AnyContent]] extends Controller with Helpers{
 
@@ -79,17 +79,25 @@ trait BaseHooks[T <: ClientHooksActionBuilder[AnyContent]] extends Controller wi
     }
   }
 
-  protected def libraryToJs(l:Library, addServer:Boolean = false) : String = {
+  protected def libraryToJs(addClient:Boolean, addServer:Boolean)(l:Library) : String = {
 
-    def wrapLibraryJs(src:LibrarySource) = {
+    def wrapServerLibraryJs(src:LibrarySource) = {
       s"""
       // ----------------- ${src.name} ---------------------
-      ${LibraryWrapper(src.name, src.source)}
+      ${ServerLibraryWrapper(src.name, src.source)}
       """
     }
 
-    val libs = l.client.map( wrapLibraryJs ).mkString("\n")
-    val server = if(addServer) l.server.map(wrapLibraryJs).mkString("\n") else ""
+    def wrapClientLibraryJs(src:LibrarySource) = {
+      s"""
+      // ----------------- ${src.name} ---------------------
+      ${ComponentWrapper( moduleName(l.org, l.name), src.name, src.source)}
+      """
+    }
+
+    val libs = if(addClient) l.client.map( wrapClientLibraryJs ).mkString("\n") else ""
+    val server = if(addServer) l.server.map(wrapServerLibraryJs).mkString("\n") else ""
+
     s"""
     // -------------------- Libraries -----------------------
     $libs

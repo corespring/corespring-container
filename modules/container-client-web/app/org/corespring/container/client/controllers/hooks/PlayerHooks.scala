@@ -28,7 +28,7 @@ trait PlayerHooks extends BaseHooks[ClientHooksActionBuilder[AnyContent]] {
       }
 
       val uiJs = uiComponents.map((c) => wrapJs(c.org, c.name, c.client.render)).mkString("\n")
-      val libJs = usedLibs.map(libraryToJs(_)).mkString("\n")
+      val libJs = usedLibs.map(libraryToJs(addClient = true, addServer = false)).mkString("\n")
       Ok(s"$libJs\n$uiJs").as("text/javascript")
   }
 
