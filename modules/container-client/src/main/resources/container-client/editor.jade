@@ -41,15 +41,23 @@ block content
         span.btn.btn-info.btn-xs(file-uploader, fu-url="getUploadUrl()", fu-mode="raw") Upload image
         span.btn.btn-success.btn-xs(ng-click="openChooser()") Add content
 
-    fly-out-panel
-      .header
-        | Item Composition
-      .info
-        | Click a Question Type below to configure it.
-        br/
-        | Drag or use up and down arrows to re-order composition.
-        br/
-        | Click the "x" to delete a Question Type.
+    fly-out-panel(is-new-item="{{isNewItem()}}")
+      div(ng-switch="isNewItem()")
+        div(ng-switch-when="true")
+          h5 Your Item
+          br/
+          div Content you have added will be listed here. Click on a question type or content section to edit and design it.
+          span.btn.btn-success.btn-xs(ng-click="openChooser()") Add content
+
+        div(ng-switch-when="false")
+          .header
+            | Item Composition
+          .info
+            | Click a Question Type below to configure it.
+            br/
+            | Drag or use up and down arrows to re-order composition.
+            br/
+            | Click the "x" to delete a Question Type.
       structure-view.structure-view(
         ng-model="model",
         selected-component="selectedComponent",
@@ -65,7 +73,7 @@ block content
       //Should be bound to the outer property.
       div.selected-text-editor(ui-ace, ng-model="selectedFile.content", ui-ace="{useWrapMode: true}", ng-show="selectedFile.content != null")
 
-      div.flex-2.client-side-preview(ng-controller="ClientSidePreview")
+      div.flex-2.client-side-preview(ng-controller="ClientSidePreview",ng-show="hasComponents()")
         .header
           button.btn-xs.btn.btn-primary(ng-click="resetPreview()") Reset
           .title

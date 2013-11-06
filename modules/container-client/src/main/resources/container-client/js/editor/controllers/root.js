@@ -68,6 +68,14 @@ var controller = function ($scope, $compile, $http, $timeout, $modal, $log, Edit
     }
   };
 
+  $scope.hasComponents = function(){
+    return $scope.model && _.size($scope.model.components) > 0;
+  }
+
+  $scope.isNewItem = function(){
+    return $scope.model && !$scope.hasComponents();
+  }
+
   $scope.onComponentsLoadError = function (error) {
     console.warn("Error loading components");
   };
@@ -75,6 +83,11 @@ var controller = function ($scope, $compile, $http, $timeout, $modal, $log, Edit
   $scope.onItemLoaded = function (data) {
     $scope.rootModel = data;
     $scope.model = data.item;
+
+    for (var c in $scope.model.components) {
+      $scope.selectedComponent = {id: c, component: $scope.model.components[c]};
+      break;
+    }
 
     var scoringJs = _.find($scope.model.files, function (f) {
       return f.name === "scoring.js";
