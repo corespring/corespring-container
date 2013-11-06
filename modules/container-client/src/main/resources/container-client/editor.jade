@@ -4,6 +4,7 @@ block head
   link(rel="stylesheet", href="css/editor.css")
 
   script(type="text/ng-template", id="add-component.html")
+
     .modal-content
       .modal-header
         h5
@@ -11,11 +12,19 @@ block head
       .modal-body
         table
           tr(ng-repeat="row in componentSetGrid")
-            td(ng-click="selectComponent(comp)", ng-repeat="comp in row")
-              img.component-icon(ng-src="{{comp.icon}}")
-              br/
-              a {{comp.name}}
+            td(ng-repeat="comp in row")
+              div(ng-click="$parent.addComponentMap[comp.name].include = !$parent.addComponentMap[comp.name].include")
+                  img.component-icon(ng-src="{{comp.icon}}")
+                  br/
+                  a {{comp.name}}
+              label Add
+              input(type='checkbox',ng-model='$parent.addComponentMap[comp.name].include')
+              span(ng-show='$parent.addComponentMap[comp.name].include')
+                  label Quantity
+                  input(type='text',style='width: 30px',ng-disabled='!$parent.addComponentMap[comp.name].include',ng-model='$parent.addComponentMap[comp.name].amount')
+
         .modal-footer
+          button.btn.btn-primary(ng-click="ok()") Ok
           button.btn.btn-warning(ng-click="cancel()") Cancel
 
 block content
@@ -87,6 +96,7 @@ block scripts
 
   script(src="js/editor/controllers/_declaration.js")
   script(src="js/editor/controllers/root.js")
+  script(src="js/editor/controllers/add-content-modal.js")
   script(src="js/editor/controllers/client-side-preview.js")
 
   script(src="js/editor/services/_declaration.js")
