@@ -31,15 +31,15 @@
     };
   };
 
-  var ComponentDefinition = function(angular, directiveName, moduleName){
+  var ComponentDefinition = function(angular, compName, moduleName){
 
     var loadAngularModule = function(moduleName){
-        try {
-          return angular.module(moduleName);
-        }
-        catch (e) {
-          return angular.module(moduleName, []);
-        }
+      try {
+        return angular.module(moduleName);
+      }
+      catch (e) {
+        return angular.module(moduleName, []);
+      }
     };
 
     /**
@@ -50,14 +50,14 @@
       var ngModule = loadAngularModule(moduleName);
 
       if( this.directive ){
-        ngModule.directive( directiveName, this.directive);
+        ngModule.directive( compName, this.directive);
       } else if( this.directives ){
 
         var hasDefault = false;
 
         for( var i = 0; i < this.directives.length; i++ ){
           var innerDef = this.directives[i];
-          var name = innerDef.name ? innerDef.name : directiveName;
+          var name = innerDef.name ? innerDef.name : compName;
 
           if(!hasDefault){
             hasDefault = innerDef.name === undefined;
@@ -67,6 +67,8 @@
             throw "No default directive defined";
           }
         }
+      } else if( this.service ){
+        ngModule.factory( compName, this.service);
       }
     };
   };
