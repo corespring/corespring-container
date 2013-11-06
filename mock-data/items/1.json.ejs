@@ -20,8 +20,8 @@
             "landingPlace" : "1",
             "feedback" :
               [
-                { "larva" : "Great"},
-                { "other" : "Not great" }
+                { "larva" : "Correct"},
+                { "other" : "Incorrect" }
               ]
           }
         ],
@@ -52,10 +52,10 @@
         "4": -1
       },
       "feedback" : [
-        { "value" : "1", "feedback" : "Huh?"},
-        { "value" : "2", "feedback" : "Great Job", "notChosenFeedback" : "It was this one silly!"},
-        { "value" : "3", "feedback" : "its a magic number" },
-        { "value" : "4", "feedback" : "4 to the floor" }
+        { "value" : "1", "feedback" : "Incorrect"},
+        { "value" : "2", "feedback" : "Correct", "notChosenFeedback" : "This would have been the correct one."},
+        { "value" : "3", "feedback" : "Incorrect" },
+        { "value" : "4", "feedback" : "Incorrect" }
       ],
       "model" : {
         "prompt": "What is 1 + 1?",
@@ -78,12 +78,12 @@
       "weight" : 10,
       "correctResponse" : { "value" : ["carrot", "turnip", "potato"] },
       "feedback" : [
-        { "value" : "banana", "feedback" : "it's a fruit"},
-        { "value" : "carrot", "feedback" : "yup", "notChosenFeedback" : "This is a veg"},
+        { "value" : "banana", "feedback" : "Incorrect"},
+        { "value" : "carrot", "feedback" : "Correct", "notChosenFeedback" : "This is a vegetable"},
         { "value" : "apple", "feedback" : "it's a fruit" },
-        { "value" : "turnip", "feedback" : "yup", "notChosenFeedback" : "Turnips are veg" },
-        { "value" : "potato", "feedback" : "yup", "notChosenFeedback" : "Potatoes are veg" },
-        { "value" : "wheat", "feedback" : "wheat is a grain" }
+        { "value" : "turnip", "feedback" : "Correct", "notChosenFeedback" : "This is a vegetable" },
+        { "value" : "potato", "feedback" : "Correct", "notChosenFeedback" : "This is a vegetable" },
+        { "value" : "wheat", "feedback" : "Incorrect" }
       ],
       "model" : {
         "prompt": "Which of these is a vegetable?",

@@ -1,0 +1,58 @@
+{
+  "_id": "522267c2554f43f858000003",
+  "components": {
+    "1": {
+      "componentType": "corespring-drag-and-drop",
+      "title": "Butterfly D&D",
+      "correctResponse": {
+        "1": "egg",
+        "2": "pupa",
+        "3": "larva",
+        "4": "adult"
+      },
+      "feedback": [
+        {
+          "feedback": [
+          ],
+          "landingPlace": "1"
+        }
+      ],
+      "model": {
+        "answerArea": "<div>A butterfly is first a <landingPlace id='1' class='inline'></landingPlace> then a <landingPlace id='2' class='inline'></landingPlace> and then a <landingPlace id='3' class='inline'></landingPlace> and then a <landingPlace id='4' class='inline'></landingPlace> </div>",
+        "choices": [
+          {
+            "content": "Pupa",
+            "fixed": true,
+            "id": "pupa"
+          },
+          {
+            "content": "Egg",
+            "id": "egg"
+          },
+          {
+            "content": "Larva",
+            "id": "larva"
+          },
+          {
+            "content": "Adult",
+            "id": "adult"
+          }
+        ],
+        "config": {
+          "shuffle": true
+        },
+        "prompt": "Drag the stages of the butterfly's lifecycle on to the the pods"
+      },
+      "weight": 1
+    }
+  },
+  "metadata": {
+    "title": "Drag and drop example"
+  },
+  "org": {
+    "components": [
+      "corespring/*"
+    ]
+  },
+  "xhtml": "<div><corespring-drag-and-drop id='1'></corespring-drag-and-drop>"
+}

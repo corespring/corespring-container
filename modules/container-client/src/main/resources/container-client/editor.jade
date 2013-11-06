@@ -4,6 +4,7 @@ block head
   link(rel="stylesheet", href="css/editor.css")
 
   script(type="text/ng-template", id="add-component.html")
+
     .modal-content
       .modal-header
         h5
@@ -11,11 +12,19 @@ block head
       .modal-body
         table
           tr(ng-repeat="row in componentSetGrid")
-            td(ng-click="selectComponent(comp)", ng-repeat="comp in row")
-              img.component-icon(ng-src="{{comp.icon}}")
-              br/
-              a {{comp.name}}
+            td(ng-repeat="comp in row")
+              div(ng-click="$parent.addComponentMap[comp.name].include = !$parent.addComponentMap[comp.name].include")
+                  img.component-icon(ng-src="{{comp.icon}}")
+                  br/
+                  a {{comp.name}}
+              label Add
+              input(type='checkbox',ng-model='$parent.addComponentMap[comp.name].include')
+              span(ng-show='$parent.addComponentMap[comp.name].include')
+                  label Quantity
+                  input(type='text',style='width: 30px',ng-disabled='!$parent.addComponentMap[comp.name].include',ng-model='$parent.addComponentMap[comp.name].amount')
+
         .modal-footer
+          button.btn.btn-primary(ng-click="ok()") Ok
           button.btn.btn-warning(ng-click="cancel()") Cancel
 
 block content
@@ -30,17 +39,25 @@ block content
         .main-btn Design your Item
         span.btn.btn-primary.btn-xs(ng-click="save()") Save
         span.btn.btn-info.btn-xs(file-uploader, fu-url="getUploadUrl()", fu-mode="raw") Upload image
-        span.btn.btn-success.btn-xs(ng-click="openChooser()") Add Component
+        span.btn.btn-success.btn-xs(ng-click="openChooser()") Add content
 
-    fly-out-panel
-      .header
-        | Item Composition
-      .info
-        | Click a Question Type below to configure it.
-        br/
-        | Drag or use up and down arrows to re-order composition.
-        br/
-        | Click the "x" to delete a Question Type.
+    fly-out-panel(is-new-item="{{isNewItem()}}")
+      div(ng-switch="isNewItem()")
+        div(ng-switch-when="true")
+          h5 Your Item
+          br/
+          div Content you have added will be listed here. Click on a question type or content section to edit and design it.
+          span.btn.btn-success.btn-xs(ng-click="openChooser()") Add content
+
+        div(ng-switch-when="false")
+          .header
+            | Item Composition
+          .info
+            | Click a Question Type below to configure it.
+            br/
+            | Drag or use up and down arrows to re-order composition.
+            br/
+            | Click the "x" to delete a Question Type.
       structure-view.structure-view(
         ng-model="model",
         selected-component="selectedComponent",
@@ -56,7 +73,7 @@ block content
       //Should be bound to the outer property.
       div.selected-text-editor(ui-ace, ng-model="selectedFile.content", ui-ace="{useWrapMode: true}", ng-show="selectedFile.content != null")
 
-      div.flex-2.client-side-preview(ng-controller="ClientSidePreview")
+      div.flex-2.client-side-preview(ng-controller="ClientSidePreview",ng-show="hasComponents()")
         .header
           button.btn-xs.btn.btn-primary(ng-click="resetPreview()") Reset
           .title
@@ -87,6 +104,7 @@ block scripts
 
   script(src="js/editor/controllers/_declaration.js")
   script(src="js/editor/controllers/root.js")
+  script(src="js/editor/controllers/add-content-modal.js")
   script(src="js/editor/controllers/client-side-preview.js")
 
   script(src="js/editor/services/_declaration.js")
@@ -140,6 +158,7 @@ block scripts
             'corespring-editor.directives',
             'corespring-player.services',
             'corespring-player.directives',
+            'ngDragDrop',
             'ui.sortable',
             'ui.bootstrap',
             'ui.ace',

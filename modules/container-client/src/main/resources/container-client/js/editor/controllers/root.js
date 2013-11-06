@@ -1,47 +1,18 @@
-var controller = function (
-  $scope,
-  $compile,
-  $http,
-  $timeout,
-  $modal,
-  $log,
-  EditorServices,
-  PlayerServices,
-  MathJaxService,
-  ComponentRegister) {
+var controller = function ($scope, $compile, $http, $timeout, $modal, $log, EditorServices, PlayerServices, MathJaxService, ComponentRegister) {
 
   $scope.showComponentsPanel = false;
 
   var configPanels = {};
 
-  var getUid = function(){
-    return Math.random().toString(36).substring(2,9);
-  };
-
-  var ModalInstanceCtrl = function ($scope, $modalInstance, componentSet) {
-    $scope.componentSet = componentSet;
-
-    var rows = [];
-    for (var i = 0; i < componentSet.length; i++ ) {
-        if (i % 4 === 0) rows.push([]);
-        rows[rows.length-1].push(componentSet[i]);
-    }
-    $scope.componentSetGrid = rows;
-
-    $scope.selectComponent = function(component){
-      $modalInstance.close(component);
-    };
-
-    $scope.cancel = function () {
-      $modalInstance.dismiss('cancel');
-    };
+  var getUid = function () {
+    return Math.random().toString(36).substring(2, 9);
   };
 
   $scope.openChooser = function () {
 
     var modalInstance = $modal.open({
       templateUrl: 'add-component.html',
-      controller: ModalInstanceCtrl,
+      controller: AddContentModalController,
       backdrop: true,
       resolve: {
         componentSet: function () {
@@ -51,12 +22,17 @@ var controller = function (
     });
 
     modalInstance.result.then(
-      function (component) {
-        $scope.addComponent(component);
+      function (componentMap) {
+        _.each(componentMap, function (v, k) {
+          _(v.amount).times(function () {
+            $scope.addComponent(v.component);
+          });
+        });
+
       },
       function () {
         $log.info('Modal dismissed at: ' + new Date());
-    });
+      });
   };
 
   $scope.save = function () {
@@ -78,22 +54,29 @@ var controller = function (
     console.warn("Error loading item");
   };
 
-  $scope.onComponentsLoaded = function(componentSet){
+  $scope.onComponentsLoaded = function (componentSet) {
     $scope.componentSet = componentSet;
   };
 
-  $scope.getIconUrl = function(type){
-    $log.debug("getIconUrl", type);
-    var comp = _.find($scope.componentSet, function(c){
+  $scope.getIconUrl = function (type) {
+    var comp = _.find($scope.componentSet, function (c) {
       return c.componentType == type;
     });
 
-    if(comp){
+    if (comp) {
       return comp.icon;
     }
   };
 
-  $scope.onComponentsLoadError = function(error){
+  $scope.hasComponents = function(){
+    return $scope.model && _.size($scope.model.components) > 0;
+  }
+
+  $scope.isNewItem = function(){
+    return $scope.model && !$scope.hasComponents();
+  }
+
+  $scope.onComponentsLoadError = function (error) {
     console.warn("Error loading components");
   };
 
@@ -101,47 +84,52 @@ var controller = function (
     $scope.rootModel = data;
     $scope.model = data.item;
 
-    var scoringJs = _.find($scope.model.files, function(f){
+    for (var c in $scope.model.components) {
+      $scope.selectedComponent = {id: c, component: $scope.model.components[c]};
+      break;
+    }
+
+    var scoringJs = _.find($scope.model.files, function (f) {
       return f.name === "scoring.js";
     });
 
-    if(scoringJs){
+    if (scoringJs) {
       PlayerServices.setScoringJs(scoringJs);
     }
   };
 
-  $scope.getUploadUrl = function(file){
+  $scope.getUploadUrl = function (file) {
     console.log(arguments);
     return file.name;
     //return "??";
   };
 
-  $scope.selectFile = function(file){
+  $scope.selectFile = function (file) {
     console.log("root select file...");
     $scope.selectedFile = file;
     $scope.selectedComponent = null;
     console.log($scope.selectedFile);
   };
 
-  $scope.addComponent = function(descriptor) {
+  $scope.addComponent = function (descriptor) {
     console.log("add component" + descriptor.componentType);
     var uid = getUid();
     $scope.model.components[uid] = _.cloneDeep(descriptor.defaultData);
     var node = $($scope.model.xhtml);
-    node.append("<" + descriptor.componentType + " id='" +uid+"'></" + descriptor.componentType + ">");
+    node.append("<" + descriptor.componentType + " id='" + uid + "'></" + descriptor.componentType + ">");
     $scope.model.xhtml = "<div>" + node.html() + "</div>";
   };
 
-  $scope.$on('fileSizeGreaterThanMax', function(event){
-     console.warn("file too big");
+  $scope.$on('fileSizeGreaterThanMax', function (event) {
+    console.warn("file too big");
   });
 
-  $scope.getQuestionForComponentId = function(id){
+  $scope.getQuestionForComponentId = function (id) {
     return $scope.model.components[id];
   };
 
 
-  $scope.registerConfigPanel = function(id, component){
+  $scope.registerConfigPanel = function (id, component) {
     console.log("registerConfigPanel:", id);
     configPanels[id] = component;
     component.setModel($scope.model.components[id]);
@@ -152,7 +140,7 @@ var controller = function (
     if (!configPanels) return itemModel;
 
     var newModel = _.cloneDeep(itemModel);
-    _.each(newModel.components, function(value, key) {
+    _.each(newModel.components, function (value, key) {
       var component = configPanels[key];
       if (component && component.getModel) {
         newModel.components[key] = component.getModel();
@@ -165,7 +153,9 @@ var controller = function (
     MathJaxService.parseDomForMath();
   });
 
-  $scope.getItem = function(){ return $scope.model; };
+  $scope.getItem = function () {
+    return $scope.model;
+  };
 
   PlayerServices.setQuestionLookup($scope.getQuestionForComponentId);
   PlayerServices.setItemLookup($scope.getItem);
@@ -177,13 +167,13 @@ var controller = function (
 angular.module('corespring-editor.controllers')
   .controller('Root',
     ['$scope',
-    '$compile',
-    '$http',
-    '$timeout',
-    '$modal',
-    '$log',
-    'EditorServices',
-    'PlayerServices',
-    'MathJaxService',
-    'ComponentRegister',
-    controller]);
+      '$compile',
+      '$http',
+      '$timeout',
+      '$modal',
+      '$log',
+      'EditorServices',
+      'PlayerServices',
+      'MathJaxService',
+      'ComponentRegister',
+      controller]);
