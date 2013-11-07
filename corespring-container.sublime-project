@@ -1,0 +1,10 @@
+{
+	"folders":
+	[
+		{
+			"follow_symlinks": true,
+			"path": "/Users/edeustace/dev/github/corespring/corespring-container",
+			"file_exclude_patterns": ["**/node_modules/**", "**/bower_components/**"]
+		}
+	]
+}

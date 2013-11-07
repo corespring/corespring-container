@@ -43,6 +43,9 @@ trait BaseHooks[T <: ClientHooksActionBuilder[AnyContent]] extends Controller wi
       val xhtml = (request.item \ "xhtml").asOpt[String].getOrElse("<div><h1>New Item</h1></div>")
 
       val itemComponentTypes: Seq[String] = componentTypes(request.item)
+      val usedComponents = loadedComponents.filter(c => itemComponentTypes.exists( rawName => rawName == s"${c.id.org}-${c.id.name}"))
+
+
       val moduleNames = itemComponentTypes.map(makeModuleName)
       val out: JsValue = configJson(
          xhtml,
