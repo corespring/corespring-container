@@ -4,7 +4,7 @@ module.exports = (grunt) ->
     app: 'src/main/resources/container-client'
     dist: 'target/scala-2.10/classes/container-client'
     test: 'src/test/resources/container-client'
-    components: '../../corespring-components/components/corespring'
+    components: '../../corespring-components/components'
 
   config =
     pkg: grunt.file.readJSON('package.json')
