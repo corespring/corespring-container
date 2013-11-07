@@ -43,10 +43,11 @@ trait BaseHooks[T <: ClientHooksActionBuilder[AnyContent]] extends Controller wi
       val xhtml = (request.item \ "xhtml").asOpt[String].getOrElse("<div><h1>New Item</h1></div>")
 
       val itemComponentTypes: Seq[String] = componentTypes(request.item)
-      val usedComponents = loadedComponents.filter(c => itemComponentTypes.exists( rawName => rawName == s"${c.id.org}-${c.id.name}"))
+      val usedComponents = uiComponents.filter(c => itemComponentTypes.exists( rawName => rawName == tagName(c.id.org, c.id.name)))
+      val dependencies = usedComponents.map(_.libraries).flatten.distinct
+      val dependencyTagNames = dependencies.map(d => tagName(d.org, d.name))
 
-
-      val moduleNames = itemComponentTypes.map(makeModuleName)
+      val moduleNames = (itemComponentTypes ++ dependencyTagNames).distinct.map(makeModuleName)
       val out: JsValue = configJson(
          xhtml,
         Seq(ngModule) ++ moduleNames,
@@ -116,9 +117,7 @@ trait BaseHooks[T <: ClientHooksActionBuilder[AnyContent]] extends Controller wi
    */
   def componentsCss(id:String) : Action[AnyContent]
 
-
-
-  protected def componentTypes(json: JsValue): Seq[String] = (json \ "components" \\ "componentType").map(_.as[String]).distinct
+  protected def componentTypes(json: JsValue): Seq[String]
 
   protected def makeModuleName(componentType: String): String = {
     val Regex = """(.*?)-(.*)""".r

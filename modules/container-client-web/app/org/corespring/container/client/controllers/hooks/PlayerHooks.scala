@@ -4,6 +4,7 @@ import org.corespring.container.client.actions.{ClientHooksActionBuilder, Player
 import org.corespring.container.client.views.txt.js.PlayerServices
 import play.api.Logger
 import play.api.mvc.{AnyContent, Action}
+import play.api.libs.json.JsValue
 
 
 trait PlayerHooks extends BaseHooks[ClientHooksActionBuilder[AnyContent]] {
@@ -48,4 +49,6 @@ trait PlayerHooks extends BaseHooks[ClientHooksActionBuilder[AnyContent]] {
       val url = s"/$root/${request.sessionId}/player.html"
       SeeOther(url)
   }
+
+  override protected def componentTypes(json: JsValue): Seq[String] = (json \ "components" \\ "componentType").map(_.as[String]).distinct
 }
