@@ -50,8 +50,15 @@
       var ngModule = loadAngularModule(moduleName);
 
       if( this.directive ){
-        ngModule.directive( compName, this.directive);
-      } else if( this.directives ){
+
+        if(_.isArray(this.directive) ){
+          ngModule.directive( compName, this.directive);
+        } else if( _.isObject(this.directive)){
+          ngModule.directive( this.directive.name, this.directive.directive);
+        }
+      }
+
+      if( this.directives ){
 
         var hasDefault = false;
 
@@ -67,7 +74,9 @@
             throw "No default directive defined";
           }
         }
-      } else if( this.service ){
+      }
+
+      if( this.service ){
         ngModule.factory( compName, this.service);
       }
     };

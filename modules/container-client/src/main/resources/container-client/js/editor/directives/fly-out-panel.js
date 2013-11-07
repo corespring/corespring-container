@@ -31,7 +31,7 @@
         $scope.isOpen = false;
         $attrs.$observe('isNewItem', function (v) {
           if (_.isUndefined(v)) return;
-          if (v == "true" || v == true) $scope.isOpen = true;
+          if (v == "true" || v === true) $scope.isOpen = true;
         });
         $scope.togglePanel = function () {
           $scope.isOpen = !$scope.isOpen;
