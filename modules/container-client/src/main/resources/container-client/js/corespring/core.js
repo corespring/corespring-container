@@ -86,8 +86,9 @@
     var definitions = {};
 
     this.component = function(directiveName, moduleName){
-      definitions[directiveName] = definitions[directiveName] || new ComponentDefinition(angular, directiveName, moduleName);
-      return definitions[directiveName];
+      var fullyQualifiedName = moduleName + "-" + directiveName;
+      definitions[fullyQualifiedName] = definitions[fullyQualifiedName] || new ComponentDefinition(angular, directiveName, moduleName);
+      return definitions[fullyQualifiedName];
     };
   };
 
