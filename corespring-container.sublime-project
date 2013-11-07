@@ -3,7 +3,7 @@
 	[
 		{
 			"follow_symlinks": true,
-			"path": "/Users/edeustace/dev/github/corespring/corespring-container",
+			"path": ".",
 			"file_exclude_patterns": ["**/node_modules/**", "**/bower_components/**"]
 		}
 	]
