@@ -100,16 +100,17 @@ val clientFolder = new File(compRoot.getPath + "/src/client")
     val defaultDataJson = new File(clientFolder.getPath + "/defaultData.json")
     val sampleDataFolder = new File(compRoot.getPath + "/sample-data")
 
-  def loadLibraries: Seq[Id] = {
+  def loadLibraries: Seq[LibraryId] = {
     (packageJson \ "libraries").asOpt[Seq[JsObject]].map {
       seq =>
         seq.map {
           o =>
             val organization = (o \ "organization").asOpt[String]
             val name = (o \ "name").asOpt[String]
+            val scope = (o \ "scope").asOpt[String]
             assert(organization.isDefined)
             assert(name.isDefined)
-            Id(organization.get, name.get)
+            LibraryId(organization.get, name.get, scope)
         }
     }.getOrElse(Seq.empty)
   }

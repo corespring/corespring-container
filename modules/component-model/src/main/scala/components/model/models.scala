@@ -4,7 +4,12 @@ import play.api.libs.json.JsValue
 
 class Component(val id: Id, val packageInfo: JsValue)
 
-case class Id(org: String, name: String)
+class Id(val org: String, val name: String){
+  def matches(other:Id) = org == other.org && name == other.name
+}
+
+case class LibraryId(override val org:String, override val name:String, scope:Option[String]) extends Id(org, name)
+
 
 case class Library(
                     org: String,
@@ -12,7 +17,7 @@ case class Library(
                     override val packageInfo: JsValue,
                     client: Seq[LibrarySource] = Seq.empty,
                     server: Seq[LibrarySource] = Seq.empty)
-  extends Component(Id(org, name), packageInfo)
+  extends Component(new Id(org, name), packageInfo)
 
 case class LibrarySource(name: String, source: String)
 
@@ -26,7 +31,7 @@ case class UiComponent(
   defaultData : JsValue,
   icon : Option[Array[Byte]] = None,
   sampleData: Map[String, JsValue] = Map.empty,
-  libraries : Seq[Id] = Seq.empty) extends Component(Id(org, name), packageInfo) {
+  libraries : Seq[LibraryId] = Seq.empty) extends Component(new Id(org, name), packageInfo) {
   val SnakeCase = """(.*?)-(.*)""".r
 
   def matchesType(snakeCase:String) : Boolean = {

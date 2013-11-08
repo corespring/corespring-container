@@ -22,14 +22,10 @@ trait PlayerHooks extends BaseHooks[ClientHooksActionBuilder[AnyContent]] {
     request: PlayerRequest[AnyContent] =>
       log.debug(s"load js for session $sessionId")
       val typesUsed = componentTypes(request.item)
-      val usedComponents = uiComponents.filter(c => typesUsed.exists(t => c.matchesType(t)))
-      def usedLibs = {
-       val deps = usedComponents.map(_.libraries).flatten.distinct
-       libraries.filter( l => deps.exists( depId => depId == l.id ) )
-      }
-
-      val uiJs = uiComponents.map((c) => wrapJs(c.org, c.name, c.client.render)).mkString("\n")
-      val libJs = usedLibs.map(libraryToJs(addClient = true, addServer = false)).mkString("\n")
+      val usedComponents = getAllComponentsForTags(typesUsed)
+      val (libs, uiComps) = splitComponents(usedComponents)
+      val uiJs = uiComps.map((c) => wrapJs(c.org, c.name, c.client.render)).mkString("\n")
+      val libJs = libs.map(libraryToJs(addClient = true, addServer = false)).mkString("\n")
       Ok(s"$libJs\n$uiJs").as("text/javascript")
   }
 

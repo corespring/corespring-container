@@ -4,9 +4,15 @@ import org.corespring.container.client.actions.ClientHooksActionBuilder
 import org.corespring.container.client.actions.PlayerRequest
 import org.corespring.container.client.controllers.helpers.Helpers
 import org.corespring.container.client.views.txt.js.{ServerLibraryWrapper, ComponentWrapper}
-import org.corespring.container.components.model.{LibrarySource, Library, UiComponent, Component}
-import play.api.libs.json.JsValue
+import org.corespring.container.components.model._
+import play.api.libs.json.{JsObject, JsValue}
 import play.api.mvc.{Controller, Action, AnyContent}
+import org.corespring.container.components.model.packaging.{ClientSideDependency, ClientDependencies}
+import org.corespring.container.client.actions.PlayerRequest
+import org.corespring.container.components.model.UiComponent
+import org.corespring.container.components.model.LibrarySource
+import play.api.libs.json.JsObject
+import org.corespring.container.components.model.Library
 
 trait BaseHooks[T <: ClientHooksActionBuilder[AnyContent]] extends Controller with Helpers{
 
@@ -42,19 +48,49 @@ trait BaseHooks[T <: ClientHooksActionBuilder[AnyContent]] extends Controller wi
     request: PlayerRequest[AnyContent] =>
       val xhtml = (request.item \ "xhtml").asOpt[String].getOrElse("<div><h1>New Item</h1></div>")
 
-      val itemComponentTypes: Seq[String] = componentTypes(request.item)
-      val usedComponents = uiComponents.filter(c => itemComponentTypes.exists( rawName => rawName == tagName(c.id.org, c.id.name)))
-      val dependencies = usedComponents.map(_.libraries).flatten.distinct
-      val dependencyTagNames = dependencies.map(d => tagName(d.org, d.name))
-
-      val moduleNames = (itemComponentTypes ++ dependencyTagNames).distinct.map(makeModuleName)
+      val itemTagNames: Seq[String] = componentTypes(request.item)
+      val usedComponents = getAllComponentsForTags(itemTagNames)
+      val allModuleNames = usedComponents.map(c => idToModuleName(c.id))
+      val clientSideScripts = get3rdPartyScripts(usedComponents)
       val out: JsValue = configJson(
          xhtml,
-        Seq(ngModule) ++ moduleNames,
-        Seq(ngJs, componentJs),
+        Seq(ngModule) ++ allModuleNames,
+        clientSideScripts ++ Seq(ngJs, componentJs),
         Seq(componentCss)
       )
       Ok(out)
+  }
+
+  protected def getAllComponentsForTags(tags:Seq[String]) : Seq[Component] = {
+
+    def withinScope(id:LibraryId) = id.scope.map{ s =>
+      s == name
+    }.getOrElse(true)
+
+    val uiComps = uiComponents.filter(c => tags.exists( tag => tag == tagName(c.id.org, c.id.name)))
+    val libraryIds = uiComps.map(_.libraries).flatten.distinct.filter(withinScope)
+    val libs = libraries.filter( l => libraryIds.exists( used => l.id.matches(used) ))
+    (libs ++ uiComps).distinct
+  }
+
+  protected def splitComponents(comps:Seq[Component]) : (Seq[Library], Seq[UiComponent]) =
+    (
+      comps.filter(_.isInstanceOf[Library]).map(_.asInstanceOf[Library]),
+      comps.filter(_.isInstanceOf[UiComponent]).map(_.asInstanceOf[UiComponent])
+    )
+
+  
+  private def get3rdPartyScripts(comps:Seq[Component]) : Seq[String] = {
+    val packages = comps.map(_.packageInfo)
+    val deps = packages.flatMap( p => (p \ "dependencies").asOpt[JsObject] )
+    val out : Seq[ClientSideDependency] = deps.map( ClientDependencies(_)).flatten
+    val scripts = out.map{ d =>
+      d.files match {
+        case Seq(p) => Some(s"bower_components/${d.name}/${d.files(0)}")
+        case _ => None
+      }
+    }.flatten
+    scripts
   }
 
   /**
@@ -124,5 +160,7 @@ trait BaseHooks[T <: ClientHooksActionBuilder[AnyContent]] extends Controller wi
     val Regex(org, comp) = componentType
     moduleName(org, comp)
   }
+
+  protected def idToModuleName(id:Id) : String = moduleName(id.org, id.name)
 
 }

@@ -131,9 +131,6 @@ block scripts
   //build:js js/extras.js
   script(src="bower_components/angular-ui/build/angular-ui.js")
   script(src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js")
-  script(src="bower_components/angular-dragdrop/src/angular-dragdrop.js")
-  script(src="bower_components/ckeditor/ckeditor.js")
-  script(src="bower_components/markitup/markitup/jquery.markitup.js")
   script(src="bower_components/bootstrap/js/dropdown.js")
   script(src="bower_components/bootstrap/js/modal.js")
   script(src="bower_components/angular-ui-ace/ui-ace.js")
@@ -161,7 +158,6 @@ block scripts
             'corespring-editor.directives',
             'corespring-player.services',
             'corespring-player.directives',
-            'ngDragDrop',
             'ui.sortable',
             'ui.bootstrap',
             'ui.ace',
@@ -170,9 +166,14 @@ block scripts
 
           angular.module("corespring-editor", playerDeps);
           angular.bootstrap(document, ["corespring-editor"]);
-          angular.resumeBootstrap();
 
-          $("body").addClass('blend')
+          //Note - doing this to see if it'll help with ckeditor
+          //Which seems to be doing its own script loading
+          setTimeout(function(){
+            angular.resumeBootstrap();
+            $("body").addClass('blend')
+          }, 1000);
+
         };
 
         var args = data.scripts.concat(data.css);
