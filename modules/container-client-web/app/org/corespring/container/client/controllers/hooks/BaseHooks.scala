@@ -86,7 +86,7 @@ trait BaseHooks[T <: ClientHooksActionBuilder[AnyContent]] extends Controller wi
     val out : Seq[ClientSideDependency] = deps.map( ClientDependencies(_)).flatten
     val scripts = out.map{ d =>
       d.files match {
-        case Seq(p) => Some(s"bower_components/${d.name}/${d.files(0)}")
+        case Seq(p) => Some(s"/client/components/${d.name}/${d.files(0)}")
         case _ => None
       }
     }.flatten
