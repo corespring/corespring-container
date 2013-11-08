@@ -21,32 +21,18 @@ pluckClient = (obj) ->
   else 
     {}
 
-runCmd = (cmd, args, end) ->
-
-  console.log("#{cmd} #{args.join(" ")}")
-
-  spawn = require('child_process').spawn
-  child = spawn(cmd, args)
-  response = ""
-  child.stdout.on 'data', (buffer) -> response += buffer
-  child.stderr.on 'data', (buffer) -> response += buffer
-  child.stdout.on 'end', () -> end(response.toString())
-
-
 mergeItems = (accumulator, obj) -> _.merge(accumulator, obj)
 
 module.exports = (grunt) ->
   ->
 
-
     bowerInstall = (name, target, done) ->
-
-      args = if target == "latest" then "-F #{name}" else "-F #{name}=#{target}"
-
-      runCmd "bower", ["install",  args], (response) ->
-        grunt.log.writeln(response)
+      args = if target == "latest" then "-F -V #{name}" else "-F -V #{name}=#{target}"
+      exec = require('child_process').exec
+      exec "bower install #{args}", {cwd: '.'}, (err, stdout, stderr) ->
+        grunt.log.writeln(stdout)
+        grunt.log.writeln("-------------> done")
         done()
-
 
     done = @async()
 

@@ -25,7 +25,7 @@ class ResponseProcessorImpl(components: Seq[UiComponent], libraries : Seq[Librar
 
             answer.map {
               a =>
-                val componentLibraries : Seq[Library] = component.libraries.map( id => libraries.find(l => l.id == id )).flatten
+                val componentLibraries : Seq[Library] = component.libraries.map( id => libraries.find(l => l.id.matches(id) )).flatten
                 val generator = new ResponseGenerator(component.componentType, component.server.definition, componentLibraries)
                 (id, generator.respond(question, a, session \ "settings"))
             }.getOrElse {

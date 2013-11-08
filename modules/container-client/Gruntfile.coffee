@@ -99,5 +99,5 @@ module.exports = (grunt) ->
   grunt.registerTask('loadComponentDependencies', 'Load client side dependencies for the components', componentDependencies(grunt))
 
   grunt.registerTask('run', ['jade', 'less', 'watch'])
-  grunt.registerTask('test', ['shell:bower', 'jasmine:unit'])
-  grunt.registerTask('default', ['shell:bower','less', 'jade', 'jasmine:unit'])
+  grunt.registerTask('test', ['shell:bower', 'loadComponentDependencies', 'jasmine:unit'])
+  grunt.registerTask('default', ['shell:bower', 'loadComponentDependencies', 'less', 'jade', 'jasmine:unit'])
