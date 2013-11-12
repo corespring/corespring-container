@@ -18,7 +18,6 @@
         }
       ],
       "model": {
-        "answerArea": "<div>A butterfly is first a <landingPlace id='1' class='inline'></landingPlace> then a <landingPlace id='2' class='inline'></landingPlace> and then a <landingPlace id='3' class='inline'></landingPlace> and then a <landingPlace id='4' class='inline'></landingPlace> </div>",
         "answers": [
           {
             "id": "1",
@@ -48,7 +47,6 @@
         "choices": [
           {
             "content": "Pupa",
-            "fixed": true,
             "id": "pupa"
           },
           {
