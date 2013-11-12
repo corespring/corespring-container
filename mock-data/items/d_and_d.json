@@ -19,6 +19,32 @@
       ],
       "model": {
         "answerArea": "<div>A butterfly is first a <landingPlace id='1' class='inline'></landingPlace> then a <landingPlace id='2' class='inline'></landingPlace> and then a <landingPlace id='3' class='inline'></landingPlace> and then a <landingPlace id='4' class='inline'></landingPlace> </div>",
+        "answers": [
+          {
+            "id": "1",
+            "textBefore": "A butterfly first is a",
+            "textAfter": ".",
+            "inline": true
+          },
+          {
+            "id": "2",
+            "textBefore": "It is then a ",
+            "textAfter": ".",
+            "inline": true
+          },
+          {
+            "id": "3",
+            "textBefore": "And then a ",
+            "textAfter": ".",
+            "inline": true
+          },
+          {
+            "id": "4",
+            "textBefore": "And finally a ",
+            "textAfter": ".",
+            "inline": true
+          }
+        ],
         "choices": [
           {
             "content": "Pupa",
