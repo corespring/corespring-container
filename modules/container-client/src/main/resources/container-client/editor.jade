@@ -42,7 +42,10 @@ block content
         .main-btn.active Item Design
         span.btn.btn-primary.btn-xs(ng-click="save()") Save
         span.btn.btn-info.btn-xs(file-uploader, fu-url="getUploadUrl()", fu-mode="raw") Upload image
-
+        span.header
+          .title
+            | Item preview
+          .down-arrow
 
     .main-content
       .item-list(is-new-item="{{isNewItem()}}")
@@ -88,10 +91,7 @@ block content
       div.flex-2.client-side-preview(ng-controller="ClientSidePreview",ng-show="hasComponents()")
         .header
           button.btn-xs.btn.btn-primary(ng-click="resetPreview()") Reset
-          .title
-            | Item Preview
-          .down-arrow
-
+        
         player-control-panel(player-settings="session.settings")
 
         corespring-player(
