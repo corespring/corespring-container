@@ -11,14 +11,23 @@
 
   ul {
     list-style: none;
-    padding-left: 5px;
-    padding-right: 5px;
+    padding-left: 0px;
+    padding-right: 0px;
   }
 
   li {
     list-style: none;
-    margin-bottom: 5px;
+    margin-bottom: 0px;
   }
+  .component-thumbnail.active{
+    background-color: @cs-sandy-yellow;
+
+    img{
+      .drop-shadow(0, 2px, 3px, 0.3);
+      opacity: 1;
+    }
+  }
+
 
   .component-thumbnail {
     padding: 10px;
@@ -29,20 +38,48 @@
       cursor: pointer;
     }
 
-    &.active {
-      color: red;
-    }
-
     img{
-      .drop-shadow(0, 2px, 3px, 0.3);
+      opacity: 0.5;
+    }
+   
+    table{
+      width: 100%;
     }
 
     td{
       vertical-align: top;
     }
 
+    .glyphicon-remove{
+      font-size: 16px;
+    }
+    
+    .counter{
+      font-size: 22px;
+    }
+
+    .score-label{
+
+    }
+
+    .grip-tape{
+
+      @grip-tape-height: 20px;
+      background-image: url('../images/griptape-d.png');
+      width: @grip-tape-height - 4px;
+      height: @grip-tape-height;
+      background-position: 5px 5px;
+      cursor: move;
+    }
+
+    .score{
+      float: right;
+      padding-right: 5px;
+    }
+
     .right{
-      padding-left: 10px;
+
+      vertical-align: bottom;
     }
 
     .label{
@@ -61,7 +98,7 @@
     }
 
     .delete{
-      padding-left: 10px;
+      padding-top: 10px; 
       font-size: 11px;
       color:#7d715b;
 
