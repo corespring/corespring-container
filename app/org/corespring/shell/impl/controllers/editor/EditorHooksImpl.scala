@@ -39,7 +39,7 @@ trait EditorHooksImpl extends EditorHooks {
         "metadata" -> Json.obj(
           "title" -> JsString("New title")
         ),
-        "xhtml" -> "<div><h1>I'm a new item</h1></div>"
+        "xhtml" -> "<div></div>"
       )
 
       itemService.create( newItem ).map{ oid =>
