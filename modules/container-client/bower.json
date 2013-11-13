@@ -12,7 +12,6 @@
     "jquery": "latest",
     "bootstrap": "latest",
     "lodash": "latest",
-    "headjs": "latest",
     "corespring-ng-components": "https://github.com/corespring/corespring-ng-components.git",
     "ace-builds": "1.1.1",
     "angular-ui-ace": "latest",
@@ -23,6 +22,6 @@
     "angular-scenario": "1.2.0-rc.3"
   },
   "resolutions": {
-    "angular": "1.2.0-rc.3"
+    "angular": ">=1"
   }
 }
