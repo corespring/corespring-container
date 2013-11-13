@@ -7,28 +7,28 @@ block head
 
   script(type="text/ng-template", id="add-component.html")
     .modal
-        .modal-dialog
-            .modal-content
-              .modal-header
-                h5
-                  | Choose a component
-              .modal-body
-                table
-                  tr(ng-repeat="row in componentSetGrid")
-                    td(ng-repeat="comp in row")
-                      div(ng-click="$parent.addComponentMap[comp.name].include = !$parent.addComponentMap[comp.name].include")
-                          img.component-icon(ng-src="{{comp.icon}}")
-                          br/
-                          a {{comp.name}}
-                      label Add
-                      input(type='checkbox',ng-model='$parent.addComponentMap[comp.name].include')
-                      span(ng-show='$parent.addComponentMap[comp.name].include')
-                          label Quantity
-                          input(type='text',style='width: 30px',ng-disabled='!$parent.addComponentMap[comp.name].include',ng-model='$parent.addComponentMap[comp.name].amount')
+        .modal-dailog
+    .modal-content
+      .modal-header
+        h5
+          | Choose a component
+      .modal-body
+        table
+          tr(ng-repeat="row in componentSetGrid")
+            td(ng-repeat="comp in row")
+              div(ng-click="$parent.addComponentMap[comp.name].include = !$parent.addComponentMap[comp.name].include")
+                  img.component-icon(ng-src="{{comp.icon}}")
+                  br/
+                  a {{comp.name}}
+              label Add
+              input(type='checkbox',ng-model='$parent.addComponentMap[comp.name].include')
+              span(ng-show='$parent.addComponentMap[comp.name].include')
+                  label Quantity
+                  input(type='text',style='width: 30px',ng-disabled='!$parent.addComponentMap[comp.name].include',ng-model='$parent.addComponentMap[comp.name].amount')
 
-                .modal-footer
-                  button.btn.btn-primary(ng-click="ok()") Ok
-                  button.btn.btn-warning(ng-click="cancel()") Cancel
+        .modal-footer
+          button.btn.btn-primary(ng-click="ok()") Ok
+          button.btn.btn-warning(ng-click="cancel()") Cancel
 
 block content
   .root(ng-controller="Root")
@@ -40,8 +40,8 @@ block content
           a.navbar-brand(href="/")
 
         .main-btn.active Item Design
-        span.btn.btn-primary.btn-xs(ng-click="save()") Save
-        span.btn.btn-info.btn-xs(file-uploader, fu-url="getUploadUrl()", fu-mode="raw") Upload image
+        //TODO: will need to add this back
+        //span.btn.btn-info.btn-xs(file-uploader, fu-url="getUploadUrl()", fu-mode="raw") Upload image
         span.header
           .title
             | Item preview
