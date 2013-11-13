@@ -142,6 +142,8 @@ block scripts
   script(src="/client/components/angular-bootstrap/ui-bootstrap-tpls.js")
   script(src="/client/components/bootstrap/js/dropdown.js")
   script(src="/client/components/bootstrap/js/modal.js")
+  script(src="/client/components/bootstrap/js/tooltip.js")
+  script(src="/client/components/bootstrap/js/popover.js")
   script(src="/client/components/angular-ui-ace/ui-ace.js")
   script(src="/client/components/ace-builds/src-min-noconflict/ace.js")
   script(src="/client/components/ace-builds/src-min-noconflict/theme-twilight.js")
@@ -170,7 +172,8 @@ block scripts
             'ui.sortable',
             'ui.bootstrap',
             'ui.ace',
-            'cs.directives'
+            'cs.directives',
+            'ngDragDrop'
           ].concat(data.angular.dependencies);
 
           angular.module("corespring-editor", playerDeps);
