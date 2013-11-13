@@ -16,6 +16,7 @@ link = function ($compile) {
               '<div class="holder">',
               '<input type="text" class="title-input" placeholder="Unnamed Component" ng-model="title"></input>',
               '<' + configName + ' id="' + data.id + '"></' + configName + '>',
+              '<span class="btn btn-primary btn-xs" ng-click="save()">Save</span>',
               '</div>',
               '</div>'].join("\n");
 
