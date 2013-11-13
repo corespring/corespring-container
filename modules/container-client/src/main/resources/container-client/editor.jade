@@ -38,35 +38,44 @@ block content
         .navbar-header
           a.navbar-brand(href="/")
 
-        .main-btn Design your Item
+        .main-btn.active Item Design
         span.btn.btn-primary.btn-xs(ng-click="save()") Save
         span.btn.btn-info.btn-xs(file-uploader, fu-url="getUploadUrl()", fu-mode="raw") Upload image
-        span.btn.btn-success.btn-xs(ng-click="openChooser()") Add content
 
-    fly-out-panel(is-new-item="{{isNewItem()}}")
-      div(ng-switch="isNewItem()")
-        div(ng-switch-when="true")
-          h5 Your Item
-          br/
-          div Content you have added will be listed here. Click on a question type or content section to edit and design it.
-          span.btn.btn-success.btn-xs(ng-click="openChooser()") Add content
-
-        div(ng-switch-when="false")
-          .header
-            | Item Composition
-          .info
-            | Click a Question Type below to configure it.
-            br/
-            | Drag or use up and down arrows to re-order composition.
-            br/
-            | Click the "x" to delete a Question Type.
-      structure-view.structure-view(
-        ng-model="model",
-        selected-component="selectedComponent",
-        get-icon-url="getIconUrl(type)"
-        component-set="componentSet")
 
     .main-content
+      .item-list(is-new-item="{{isNewItem()}}")
+        .main-header 
+          span.header-label My Items
+          span.left-arrow
+        
+        .item-body(ng-switch="isNewItem()")
+          .header
+            div(ng-switch-when="true")
+              h5 Your Item
+              br/
+              div Content you have added will be listed here. Click on a question type or content section to edit and design it.
+              span.btn.btn-success.btn-xs(ng-click="openChooser()") Add content
+
+            div(ng-switch-when="false")
+              .title
+                | Item Details
+                span.dotted-arrow
+              .info
+                | Click a Question Type below to begin editing it.
+                br/
+                br/
+                | You can drag question types below into any order.
+                br/
+                br/
+                .cs-btn(ng-click="openChooser()") Add content
+
+
+          structure-view.structure-view(
+            ng-model="model",
+            selected-component="selectedComponent",
+            get-icon-url="getIconUrl(type)"
+            component-set="componentSet")
 
       //file-list(ng-model="model.files", select-file="selectFile(file)")
 
