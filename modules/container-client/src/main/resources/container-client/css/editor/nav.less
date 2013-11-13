@@ -6,6 +6,36 @@
   background-color: @navbar-bg;
   height: @header-height;
 
+
+
+  .header{
+    @arrow-height: 30px;
+    font-size: @header-font-size;
+    color: @header-color;
+    position: relative;
+    top: @header-height - @arrow-height; 
+    float: right;
+    right: 20px;
+
+    .down-arrow{
+      background-image: url('../images/down-arrow.png');
+      background-repeat: no-repeat;
+      width: @arrow-height;
+      height: @arrow-height;
+      padding: 8px;
+      float: right;
+      background-color: white;
+      background-position: 5px 5px;
+    }
+
+    .title{
+      float: right;
+      padding-left: 10px;
+      padding-top: 5px;
+    }
+  }
+
+
   .btn{
     margin: 0px;
     margin-left: 4px;
