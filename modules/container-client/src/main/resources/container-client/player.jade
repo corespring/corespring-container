@@ -45,6 +45,8 @@ block scripts
   script(src="bower_components/angular-ui/build/angular-ui.js")
   //endbuild
 
+  script(src="bower_components/angular-dragdrop/src/angular-dragdrop.js")
+
   script.
     $(document).ready(function(){
       console.log("load config", document.location);
@@ -64,7 +66,8 @@ block scripts
             'corespring-common.directives',
             'corespring-player.controllers',
             'corespring-player.directives',
-            'corespring-player.services'
+            'corespring-player.services',
+            'ngDragDrop'
           ].concat(data.angular.dependencies);
 
           angular.module("corespring-player", playerDeps );
