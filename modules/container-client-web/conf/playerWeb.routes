@@ -5,6 +5,7 @@
 GET        /js/*file            controllers.Assets.at(path="/container-client/js", file)
 GET        /css/*file           controllers.Assets.at(path="/container-client/css", file)
 GET        /components/*file    controllers.Assets.at(path="/container-client/bower_components", file)
+GET        /libs/*file          @org.corespring.container.client.controllers.File.at(file)
 
 GET        /session/everything/:id.json            @org.corespring.container.client.controllers.resources.Session.loadEverything(id:String)
 PUT        /session/submit-answers/:id.json        @org.corespring.container.client.controllers.resources.Session.submitSession(id:String)
