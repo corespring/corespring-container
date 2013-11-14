@@ -153,6 +153,8 @@ block scripts
   script(src="/client/components/ace-builds/src-min-noconflict/mode-json.js")
   //endbuild
 
+  script(src="bower_components/angular-dragdrop/src/angular-dragdrop.js")
+
 
   script.
 
@@ -173,7 +175,8 @@ block scripts
             'ui.sortable',
             'ui.bootstrap',
             'ui.ace',
-            'cs.directives'
+            'cs.directives',
+            'ngDragDrop'
           ].concat(data.angular.dependencies);
 
           angular.module("corespring-editor", playerDeps);
