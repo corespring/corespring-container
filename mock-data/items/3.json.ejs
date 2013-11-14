@@ -14,15 +14,32 @@
       "title": "More Fruits",
       "weight" : 10,
       "correctResponse" : "banana",
-      "feedback" : [
-        { "value" : "banana", "feedback" : "Correct"},
-        { "value" : "carrot", "feedback" : "Incorrect"},
-        { "value" : "apple", "feedback" : "Incorrect" },
-        { "value" : "turnip", "feedback" : "Incorrect" },
-        { "value" : "potato", "feedback" : "Incorrect" },
-        { "value" : "wheat", "feedback" : "Incorrect" }
-      ],
-
+      "feedback" :  {
+        "banana": {
+          "feedback" : "Correct",
+          "feedbackType" : "custom"
+         },
+        "carrot": {
+          "feedback" : "Incorrect",
+          "feedbackType" : "custom"
+        },
+        "apple": {
+          "feedback" : "Incorrect",
+          "feedbackType" : "custom"
+        },
+        "turnip": {
+          "feedback" : "Incorrect",
+          "feedbackType" : "custom"
+        },
+        "potato": {
+          "feedback" : "Incorrect",
+          "feedbackType" : "custom"
+        },
+        "wheat": {
+          "feedback" : "Incorrect",
+          "feedbackType" : "custom"
+        }
+      },
       "model" : {
         "prompt": "Which of these is yellow?",
         "config": {
