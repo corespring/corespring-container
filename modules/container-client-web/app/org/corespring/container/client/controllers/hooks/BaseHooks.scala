@@ -51,10 +51,12 @@ trait BaseHooks[T <: ClientHooksActionBuilder[AnyContent]] extends Controller wi
       val itemTagNames: Seq[String] = componentTypes(request.item)
       val usedComponents = getAllComponentsForTags(itemTagNames)
       val allModuleNames = usedComponents.map(c => idToModuleName(c.id))
-      val clientSideScripts = get3rdPartyScripts(usedComponents)
+      val clientSideDependencies = getClientSideDependencies(usedComponents)
+      val dependencyModules : Seq[String] = clientSideDependencies.map(_.angularModule).flatten
+      val clientSideScripts = get3rdPartyScripts(clientSideDependencies)
       val out: JsValue = configJson(
          xhtml,
-        Seq(ngModule) ++ allModuleNames,
+        Seq(ngModule) ++ allModuleNames ++ dependencyModules,
         clientSideScripts ++ Seq(ngJs, componentJs),
         Seq(componentCss)
       )
@@ -79,12 +81,15 @@ trait BaseHooks[T <: ClientHooksActionBuilder[AnyContent]] extends Controller wi
       comps.filter(_.isInstanceOf[UiComponent]).map(_.asInstanceOf[UiComponent])
     )
 
-  
-  private def get3rdPartyScripts(comps:Seq[Component]) : Seq[String] = {
+
+  private def getClientSideDependencies(comps:Seq[Component]) : Seq[ClientSideDependency] = {
     val packages = comps.map(_.packageInfo)
     val deps = packages.flatMap( p => (p \ "dependencies").asOpt[JsObject] )
-    val out : Seq[ClientSideDependency] = deps.map( ClientDependencies(_)).flatten
-    val scripts = out.map{ d =>
+    deps.map( ClientDependencies(_)).flatten
+  }
+  
+  private def get3rdPartyScripts(deps:Seq[ClientSideDependency]) : Seq[String] = {
+    val scripts = deps.map{ d =>
       d.files match {
         case Seq(p) => Some(s"/client/components/${d.name}/${d.files(0)}")
         case _ => None
