@@ -60,7 +60,7 @@ module.exports = (grunt) ->
         options:
           pretty: true
           data:
-            debug: false
+            devMode: grunt.option("devMode") != false  
 
     jasmine:
       unit:
@@ -75,6 +75,60 @@ module.exports = (grunt) ->
           ]
           specs: '<%= common.test %>/js/**/*-test.js'
 
+    concat:
+      generated:
+        files: [
+          { 
+            dest: '.tmp/concat/js/core.js'
+            src: [
+              '<%= common.dist %>/js/common/**/*.js', 
+              '<%= common.dist %>/js/corespring/**/*.js']
+          }
+          { 
+            dest: '.tmp/concat/js/editor.js'
+            src: [
+              '<%= common.dist %>/js/editor/**/*.js', 
+              '<%= common.dist %>/js/render/services/**/*.js',
+              '<%= common.dist %>/js/render/directives/**/*.js',
+              '<%= common.dist %>/js/corespring/outcome-processor.js'
+            ]
+          }
+
+          {
+            dest: '.tmp/concat/js/editor-extras.js'
+            src: [
+              '<%= common.dist %>/bower_components/angular-ui/build/angular-ui.js',
+              '<%= common.dist %>/bower_components/angular-bootstrap/ui-bootstrap-tpls.js',
+              '<%= common.dist %>/bower_components/bootstrap/js/dropdown.js',
+              '<%= common.dist %>/bower_components/bootstrap/js/modal.js',
+              '<%= common.dist %>/bower_components/bootstrap/js/tooltip.js',
+              '<%= common.dist %>/bower_components/bootstrap/js/popover.js',
+              '<%= common.dist %>/bower_components/angular-ui-ace/ui-ace.js',
+              '<%= common.dist %>/bower_components/ace-builds/src-min-noconflict/ace.js',
+              '<%= common.dist %>/bower_components/ace-builds/src-min-noconflict/theme-twilight.js',
+              '<%= common.dist %>/bower_components/ace-builds/src-min-noconflict/mode-xml.js',
+              '<%= common.dist %>/bower_components/ace-builds/src-min-noconflict/worker-json.js',
+              '<%= common.dist %>/bower_components/ace-builds/src-min-noconflict/mode-json.js'
+            ]
+          }
+        ]    
+
+    uglify:
+      generated:
+        files: [ 
+          { 
+            dest: '<%= common.dist %>/js/core.js',
+            src: [ '.tmp/concat/js/core.js' ] 
+          }
+          { 
+            dest: '<%= common.dist %>/js/editor.js',
+            src: [ '.tmp/concat/js/editor.js' ] 
+          } 
+          { 
+            dest: '<%= common.dist %>/js/editor-extras.js',
+            src: [ '.tmp/concat/js/editor-extras.js' ] 
+          } 
+        ] 
 
 
 
@@ -92,7 +146,8 @@ module.exports = (grunt) ->
     'grunt-contrib-watch',
     'grunt-contrib-jshint',
     'grunt-contrib-jasmine',
-    'grunt-contrib-copy'
+    'grunt-contrib-copy',
+    'grunt-usemin'
   ]
 
   grunt.loadNpmTasks(t) for t in npmTasks
@@ -100,4 +155,5 @@ module.exports = (grunt) ->
 
   grunt.registerTask('run', ['jade', 'less', 'watch'])
   grunt.registerTask('test', ['shell:bower', 'loadComponentDependencies', 'jasmine:unit'])
-  grunt.registerTask('default', ['shell:bower', 'loadComponentDependencies', 'less', 'jade', 'jasmine:unit'])
+  grunt.registerTask('default', ['shell:bower', 'loadComponentDependencies', 'concat', 'uglify', 'less', 'jade', 'jasmine:unit'])
+  grunt.registerTask('minify-test', ['concat', 'uglify'])

@@ -73,7 +73,7 @@ object Build extends sbt.Build {
       s.log.info("[>> bower install] on " + clientRoot )
       sbt.Process("bower install", clientRoot) !;
       s.log.info("[>> grunt] on " + clientRoot )
-      sbt.Process("grunt", clientRoot) !;
+      sbt.Process("grunt --devMode=false", clientRoot) !;
   }
 
   val runClientTests = TaskKey[Unit]("client-tests", "")

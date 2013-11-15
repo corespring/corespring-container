@@ -4,6 +4,7 @@
 
 GET        /js/*file            controllers.Assets.at(path="/container-client/js", file)
 GET        /css/*file           controllers.Assets.at(path="/container-client/css", file)
+GET        /images/*file           controllers.Assets.at(path="/container-client/images", file)
 GET        /components/*file    controllers.Assets.at(path="/container-client/bower_components", file)
 GET        /libs/:orgName/:componentName/*file     @org.corespring.container.client.controllers.ComponentsFileController.at(orgName, componentName, file)
 

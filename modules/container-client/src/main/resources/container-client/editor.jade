@@ -1,9 +1,10 @@
 extends layout
 
 block head
-  link(rel="stylesheet", href="css/editor.css")
-  link(rel="stylesheet", type="text/css", href="bower_components/markitup/markitup/skins/markitup/style.css")
-  link(rel="stylesheet", type="text/css", href="bower_components/markitup/markitup/sets/default/style.css")
+
+  link(rel="stylesheet", href="/client/css/editor.css")
+  link(rel="stylesheet", type="text/css", href="/client/components/markitup/markitup/skins/markitup/style.css")
+  link(rel="stylesheet", type="text/css", href="/client/components/markitup/markitup/sets/default/style.css")
 
   script(type="text/ng-template", id="add-component.html")
     .modal
@@ -111,50 +112,44 @@ block content
 
 block scripts
 
-  //build:js js/editor.js
-  script(src="/client/js/corespring/outcome-processor.js")
 
-  script(src="/client/js/editor/controllers/_declaration.js")
-  script(src="/client/js/editor/controllers/root.js")
-  script(src="/client/js/editor/controllers/add-content-modal.js")
-  script(src="/client/js/editor/controllers/client-side-preview.js")
-
-  script(src="/client/js/editor/services/_declaration.js")
-  script(src="/client/js/editor/services/client-side-player-services.js")
-
-  script(src="/client/js/editor/directives/_declaration.js")
-  script(src="/client/js/editor/directives/structure-view.js")
-  script(src="/client/js/editor/directives/fly-out-panel.js")
-  script(src="/client/js/editor/directives/file-list.js")
-  script(src="/client/js/editor/directives/file-preview.js")
-  script(src="/client/js/editor/directives/config-pane.js")
-  script(src="/client/js/editor/directives/control-panel.js")
-
-
-  script(src="/client/js/render/services/_declaration.js")
-  script(src="/client/js/render/services/component-register.js")
-
-  script(src="/client/js/render/directives/_declaration.js")
-  script(src="/client/js/render/directives/corespring-player.js")
-  //endbuild
-
-  //build:js js/extras.js
-  script(src="/client/components/angular-ui/build/angular-ui.js")
-  script(src="/client/components/angular-bootstrap/ui-bootstrap-tpls.js")
-  script(src="/client/components/bootstrap/js/dropdown.js")
-  script(src="/client/components/bootstrap/js/modal.js")
-  script(src="/client/components/bootstrap/js/tooltip.js")
-  script(src="/client/components/bootstrap/js/popover.js")
-  script(src="/client/components/angular-ui-ace/ui-ace.js")
-  script(src="/client/components/ace-builds/src-min-noconflict/ace.js")
-  script(src="/client/components/ace-builds/src-min-noconflict/theme-twilight.js")
-  script(src="/client/components/ace-builds/src-min-noconflict/mode-xml.js")
-  script(src="/client/components/ace-builds/src-min-noconflict/worker-json.js")
-  script(src="/client/components/ace-builds/src-min-noconflict/mode-json.js")
-  //endbuild
-
-  script(src="bower_components/angular-dragdrop/src/angular-dragdrop.js")
-
+  if devMode
+    script(src="/client/js/corespring/outcome-processor.js")
+    script(src="/client/js/editor/controllers/_declaration.js")
+    script(src="/client/js/editor/controllers/root.js")
+    script(src="/client/js/editor/controllers/add-content-modal.js")
+    script(src="/client/js/editor/controllers/client-side-preview.js")
+    script(src="/client/js/editor/services/_declaration.js")
+    script(src="/client/js/editor/services/client-side-player-services.js")
+    script(src="/client/js/editor/directives/_declaration.js")
+    script(src="/client/js/editor/directives/structure-view.js")
+    script(src="/client/js/editor/directives/fly-out-panel.js")
+    script(src="/client/js/editor/directives/file-list.js")
+    script(src="/client/js/editor/directives/file-preview.js")
+    script(src="/client/js/editor/directives/config-pane.js")
+    script(src="/client/js/editor/directives/control-panel.js")
+    script(src="/client/js/render/services/_declaration.js")
+    script(src="/client/js/render/services/component-register.js")
+    script(src="/client/js/render/directives/_declaration.js")
+    script(src="/client/js/render/directives/corespring-player.js")
+  else
+    script(src="/client/js/editor.js")
+  
+  if devMode
+    script(src="/client/components/angular-ui/build/angular-ui.js")
+    script(src="/client/components/angular-bootstrap/ui-bootstrap-tpls.js")
+    script(src="/client/components/bootstrap/js/dropdown.js")
+    script(src="/client/components/bootstrap/js/modal.js")
+    script(src="/client/components/bootstrap/js/tooltip.js")
+    script(src="/client/components/bootstrap/js/popover.js")
+    script(src="/client/components/angular-ui-ace/ui-ace.js")
+    script(src="/client/components/ace-builds/src-min-noconflict/ace.js")
+    script(src="/client/components/ace-builds/src-min-noconflict/theme-twilight.js")
+    script(src="/client/components/ace-builds/src-min-noconflict/mode-xml.js")
+    script(src="/client/components/ace-builds/src-min-noconflict/worker-json.js")
+    script(src="/client/components/ace-builds/src-min-noconflict/mode-json.js")
+  else
+    script(src="/client/js/editor-extras.js")
 
   script.
 
