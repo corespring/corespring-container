@@ -9,7 +9,7 @@ import play.api.libs.iteratee.Enumerator
 import play.api.mvc._
 
 /** A very simple file asset loader for now */
-trait FileController extends Controller {
+trait ComponentsFileController extends Controller {
 
   val log : Logger = Logger("FileController")
 

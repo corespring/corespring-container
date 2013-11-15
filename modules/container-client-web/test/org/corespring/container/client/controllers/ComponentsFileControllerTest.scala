@@ -5,7 +5,7 @@ import play.api.mvc.AnyContentAsEmpty
 import play.api.test.Helpers._
 import play.api.test.{FakeHeaders, FakeRequest}
 
-class FileControllerTest extends Specification {
+class ComponentsFileControllerTest extends Specification {
 
   val rootPath = s"modules/container-client-web/test/${this.getClass.getName.replaceAll("\\.", "/")}"
 
@@ -13,7 +13,7 @@ class FileControllerTest extends Specification {
 
     "return assets" in {
 
-      val controller = new FileController {
+      val controller = new ComponentsFileController {
         def componentsPath: String = s"$rootPath/one"
         def defaultCharSet : String = "utf-8"
       }

@@ -1,7 +1,7 @@
 package org.corespring.shell.impl
 
 import org.corespring.amazon.s3.ConcreteS3Service
-import org.corespring.container.client.controllers.{FileController, Rig, Icons, Assets}
+import org.corespring.container.client.controllers.{ComponentsFileController, Rig, Icons, Assets}
 import org.corespring.container.components.model.{Library, UiComponent, Component}
 import org.corespring.container.components.outcome.{ItemJsOutcomeProcessor, OutcomeProcessorSequence, DefaultOutcomeProcessor, OutcomeProcessor}
 import org.corespring.container.components.response.{ResponseProcessorImpl, ResponseProcessor}
@@ -27,7 +27,7 @@ class ContainerClientImplementation(
     def loadedComponents: Seq[Component] = comps
   }
 
-  private lazy val libs = new FileController {
+  private lazy val libs = new ComponentsFileController {
     def componentsPath: String = config.getString("components.path").getOrElse("components")
     def defaultCharSet: String = config.getString("default.charset").getOrElse("utf-8")
 }
