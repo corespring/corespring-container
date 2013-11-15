@@ -5,14 +5,10 @@ import org.corespring.container.client.actions.PlayerRequest
 import org.corespring.container.client.controllers.helpers.Helpers
 import org.corespring.container.client.views.txt.js.{ServerLibraryWrapper, ComponentWrapper}
 import org.corespring.container.components.model._
-import play.api.libs.json.{JsObject, JsValue}
-import play.api.mvc.{Controller, Action, AnyContent}
 import org.corespring.container.components.model.packaging.{ClientSideDependency, ClientDependencies}
-import org.corespring.container.client.actions.PlayerRequest
-import org.corespring.container.components.model.UiComponent
-import org.corespring.container.components.model.LibrarySource
 import play.api.libs.json.JsObject
-import org.corespring.container.components.model.Library
+import play.api.libs.json.JsValue
+import play.api.mvc.{Controller, Action, AnyContent}
 
 trait BaseHooks[T <: ClientHooksActionBuilder[AnyContent]] extends Controller with Helpers{
 
@@ -52,12 +48,12 @@ trait BaseHooks[T <: ClientHooksActionBuilder[AnyContent]] extends Controller wi
       val usedComponents = getAllComponentsForTags(itemTagNames)
       val allModuleNames = usedComponents.map(c => idToModuleName(c.id))
       val clientSideDependencies = getClientSideDependencies(usedComponents)
-      val dependencyModules : Seq[String] = clientSideDependencies.map(_.angularModule).flatten
       val clientSideScripts = get3rdPartyScripts(clientSideDependencies)
+      val localScripts = getLocalScripts(usedComponents)
       val out: JsValue = configJson(
          xhtml,
-        Seq(ngModule) ++ allModuleNames ++ dependencyModules,
-        clientSideScripts ++ Seq(ngJs, componentJs),
+        Seq(ngModule) ++ allModuleNames,
+        clientSideScripts ++ localScripts ++ Seq(ngJs, componentJs),
         Seq(componentCss)
       )
       Ok(out)
@@ -97,6 +93,25 @@ trait BaseHooks[T <: ClientHooksActionBuilder[AnyContent]] extends Controller wi
     }.flatten
     scripts
   }
+
+
+  private def getLocalScripts(comps: Seq[Component]): Seq[String] = {
+
+    def assetPath(compAndPath: (Component, Seq[String]), acc : Seq[String]) = {
+      val (c, filenames) = compAndPath
+      acc ++ filenames.map(f => s"/client/libs/${c.id.org}/${c.id.name}/$f" )
+    }
+
+    val out = for{
+      comp <- comps
+      lib <- (comp.packageInfo \ "libs").asOpt[JsObject]
+      client <- (lib \ "client").asOpt[JsObject]
+    } yield (comp, client.fields.map(_._2.as[Seq[String]]).flatten)
+
+    val assetPaths = out.foldRight[Seq[String]](Seq.empty)(assetPath)
+    assetPaths
+  }
+
 
   /**
    * Load the angular service js implemenation
