@@ -84,12 +84,12 @@ block content
 
       //file-list(ng-model="model.files", select-file="selectFile(file)")
 
-      config-pane.flex-3.config#config(ng-model="selectedComponent", ng-show="selectedComponent != null")
+      config-pane.config#config(ng-model="selectedComponent", ng-show="selectedComponent != null")
       //TODO: in ng-show below 'selectedFile' is bound to the file-preview selectedFile - not the outer one
       //Should be bound to the outer property.
       div.selected-text-editor(ui-ace, ng-model="selectedFile.content", ui-ace="{useWrapMode: true}", ng-show="selectedFile.content != null")
 
-      div.flex-2.client-side-preview(ng-controller="ClientSidePreview",ng-show="hasComponents()")
+      div.client-side-preview(ng-controller="ClientSidePreview",ng-show="hasComponents()")
         .header
           button.btn-xs.btn.btn-primary(ng-click="resetPreview()") Reset
         
