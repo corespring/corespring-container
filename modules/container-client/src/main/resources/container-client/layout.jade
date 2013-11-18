@@ -27,16 +27,8 @@ html(xmlns="http://www.w3.org/1999/html")
     script(src="/client/components/angular-ui-sortable/src/sortable.js")
     script(src="/client/components/corespring-ng-components/build/corespring-ng-components.js")
     script(src="/client/components/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML")
-
-    if devMode
-      script(src="/client/js/common/directives/_declaration.js")
-      script(src="/client/js/common/directives/ng-bind-html-unsafe.js")
-      script(src="/client/js/common/services/_declaration.js")
-      script(src="/client/js/common/services/math-service.js")
-      script(src="/client/js/corespring/core.js")
-      script(src="/client/js/corespring/lodash-mixins.js")
-    else
-      script(src="/client/js/core.js")
-
+    
+    for p in core
+      script(src="#{p}", type="text/javascript")
 
     block scripts

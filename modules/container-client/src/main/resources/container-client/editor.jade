@@ -112,44 +112,11 @@ block content
 
 block scripts
 
+  for p in editor 
+    script(src="#{p}", type="text/javascript")
 
-  if devMode
-    script(src="/client/js/corespring/outcome-processor.js")
-    script(src="/client/js/editor/controllers/_declaration.js")
-    script(src="/client/js/editor/controllers/root.js")
-    script(src="/client/js/editor/controllers/add-content-modal.js")
-    script(src="/client/js/editor/controllers/client-side-preview.js")
-    script(src="/client/js/editor/services/_declaration.js")
-    script(src="/client/js/editor/services/client-side-player-services.js")
-    script(src="/client/js/editor/directives/_declaration.js")
-    script(src="/client/js/editor/directives/structure-view.js")
-    script(src="/client/js/editor/directives/fly-out-panel.js")
-    script(src="/client/js/editor/directives/file-list.js")
-    script(src="/client/js/editor/directives/file-preview.js")
-    script(src="/client/js/editor/directives/config-pane.js")
-    script(src="/client/js/editor/directives/control-panel.js")
-    script(src="/client/js/render/services/_declaration.js")
-    script(src="/client/js/render/services/component-register.js")
-    script(src="/client/js/render/directives/_declaration.js")
-    script(src="/client/js/render/directives/corespring-player.js")
-  else
-    script(src="/client/js/editor.js")
-  
-  if devMode
-    script(src="/client/components/angular-ui/build/angular-ui.js")
-    script(src="/client/components/angular-bootstrap/ui-bootstrap-tpls.js")
-    script(src="/client/components/bootstrap/js/dropdown.js")
-    script(src="/client/components/bootstrap/js/modal.js")
-    script(src="/client/components/bootstrap/js/tooltip.js")
-    script(src="/client/components/bootstrap/js/popover.js")
-    script(src="/client/components/angular-ui-ace/ui-ace.js")
-    script(src="/client/components/ace-builds/src-min-noconflict/ace.js")
-    script(src="/client/components/ace-builds/src-min-noconflict/theme-twilight.js")
-    script(src="/client/components/ace-builds/src-min-noconflict/mode-xml.js")
-    script(src="/client/components/ace-builds/src-min-noconflict/worker-json.js")
-    script(src="/client/components/ace-builds/src-min-noconflict/mode-json.js")
-  else
-    script(src="/client/js/editor-extras.js")
+  for p in editorExtras
+    script(src="#{p}", type="text/javascript")
 
   script.
 
@@ -182,7 +149,6 @@ block scripts
             angular.resumeBootstrap();
             $("body").addClass('blend')
           }, 2000);
-
         };
 
         var args = data.scripts.concat(data.css);

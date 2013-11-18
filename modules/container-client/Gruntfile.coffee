@@ -1,16 +1,66 @@
 componentDependencies = require "./lib/component-dependencies"
+expander = require "./lib/expander"
+_ = require "lodash"
 
 module.exports = (grunt) ->
 
-  commonConfig =
+  devMode = grunt.option("devMode") != false 
+
+  common = 
     app: 'src/main/resources/container-client'
     dist: 'target/scala-2.10/classes/container-client'
     test: 'src/test/resources/container-client'
     components: '../../corespring-components/components'
+    core: 
+      dest: '<%= common.dist %>/js/prod-core.js'
+      concatDest: '.tmp/concat/js/core.js'
+      src: [
+        '<%= common.dist %>/js/common/**/*.js', 
+        '<%= common.dist %>/js/corespring/**/*.js']
 
+    editor:
+      dest: '<%= common.dist %>/js/prod-editor.js'
+      concatDest: '.tmp/concat/js/editor.js'
+      src: [
+        '<%= common.dist %>/js/editor/**/*.js', 
+        '<%= common.dist %>/js/render/services/**/*.js',
+        '<%= common.dist %>/js/render/directives/**/*.js',
+        '<%= common.dist %>/js/corespring/outcome-processor.js'
+      ]
+
+    editorExtras:
+      dest: '<%= common.dist %>/js/prod-editor-extras.js'
+      concatDest: '.tmp/concat/js/editor-extras.js'
+      src: [
+        '<%= common.dist %>/bower_components/angular-ui/build/angular-ui.js',
+              '<%= common.dist %>/bower_components/angular-bootstrap/ui-bootstrap-tpls.js',
+              '<%= common.dist %>/bower_components/bootstrap/js/dropdown.js',
+              '<%= common.dist %>/bower_components/bootstrap/js/modal.js',
+              '<%= common.dist %>/bower_components/bootstrap/js/tooltip.js',
+              '<%= common.dist %>/bower_components/bootstrap/js/popover.js',
+              '<%= common.dist %>/bower_components/angular-ui-ace/ui-ace.js',
+              '<%= common.dist %>/bower_components/ace-builds/src-min-noconflict/ace.js',
+              '<%= common.dist %>/bower_components/ace-builds/src-min-noconflict/theme-twilight.js',
+              '<%= common.dist %>/bower_components/ace-builds/src-min-noconflict/mode-xml.js',
+              '<%= common.dist %>/bower_components/ace-builds/src-min-noconflict/worker-json.js',
+              '<%= common.dist %>/bower_components/ace-builds/src-min-noconflict/mode-json.js' ]
+
+  toUrl = (p) -> 
+    fileRoot = common.dist
+    p
+      .replace("#{fileRoot}/bower_components" , "/client/components")
+      .replace(fileRoot, "/client")
+
+  pathsFor = (obj) ->
+    filePaths =  [obj["dest"]] # if devMode then obj["src"] else [obj["dest"]] 
+    grunt.log.writeln(filePaths)
+    expanded = expander(grunt)(filePaths, {common: common})
+    _.map( expanded, toUrl )
+
+ 
   config =
     pkg: grunt.file.readJSON('package.json')
-    common: commonConfig
+    common: common
     watch:
       options:
         livereload: true
@@ -61,6 +111,9 @@ module.exports = (grunt) ->
           pretty: true
           data:
             devMode: grunt.option("devMode") != false  
+            core: pathsFor(common.core) 
+            editor: pathsFor(common.editor) 
+            editorExtras: pathsFor(common.editorExtras) 
 
     jasmine:
       unit:
@@ -79,37 +132,17 @@ module.exports = (grunt) ->
       generated:
         files: [
           { 
-            dest: '.tmp/concat/js/core.js'
-            src: [
-              '<%= common.dist %>/js/common/**/*.js', 
-              '<%= common.dist %>/js/corespring/**/*.js']
+            dest: common.core.concatDest 
+            src: common.core.src 
           }
           { 
-            dest: '.tmp/concat/js/editor.js'
-            src: [
-              '<%= common.dist %>/js/editor/**/*.js', 
-              '<%= common.dist %>/js/render/services/**/*.js',
-              '<%= common.dist %>/js/render/directives/**/*.js',
-              '<%= common.dist %>/js/corespring/outcome-processor.js'
-            ]
+            dest: common.editor.concatDest
+            src: common.editor.src
           }
 
           {
-            dest: '.tmp/concat/js/editor-extras.js'
-            src: [
-              '<%= common.dist %>/bower_components/angular-ui/build/angular-ui.js',
-              '<%= common.dist %>/bower_components/angular-bootstrap/ui-bootstrap-tpls.js',
-              '<%= common.dist %>/bower_components/bootstrap/js/dropdown.js',
-              '<%= common.dist %>/bower_components/bootstrap/js/modal.js',
-              '<%= common.dist %>/bower_components/bootstrap/js/tooltip.js',
-              '<%= common.dist %>/bower_components/bootstrap/js/popover.js',
-              '<%= common.dist %>/bower_components/angular-ui-ace/ui-ace.js',
-              '<%= common.dist %>/bower_components/ace-builds/src-min-noconflict/ace.js',
-              '<%= common.dist %>/bower_components/ace-builds/src-min-noconflict/theme-twilight.js',
-              '<%= common.dist %>/bower_components/ace-builds/src-min-noconflict/mode-xml.js',
-              '<%= common.dist %>/bower_components/ace-builds/src-min-noconflict/worker-json.js',
-              '<%= common.dist %>/bower_components/ace-builds/src-min-noconflict/mode-json.js'
-            ]
+            dest: common.editorExtras.concatDest
+            src: common.editorExtras.src
           }
         ]    
 
@@ -117,20 +150,18 @@ module.exports = (grunt) ->
       generated:
         files: [ 
           { 
-            dest: '<%= common.dist %>/js/core.js',
-            src: [ '.tmp/concat/js/core.js' ] 
+            dest:  common.core.dest,
+            src: [ common.core.concatDest ] 
           }
           { 
-            dest: '<%= common.dist %>/js/editor.js',
-            src: [ '.tmp/concat/js/editor.js' ] 
+            dest: common.editor.dest
+            src: [ common.editor.concatDest ] 
           } 
           { 
-            dest: '<%= common.dist %>/js/editor-extras.js',
-            src: [ '.tmp/concat/js/editor-extras.js' ] 
+            dest: common.editorExtras.dest
+            src: [ common.editorExtras.concatDest ] 
           } 
         ] 
-
-
 
 
   grunt.initConfig(config)
@@ -152,7 +183,7 @@ module.exports = (grunt) ->
 
   grunt.loadNpmTasks(t) for t in npmTasks
   grunt.registerTask('loadComponentDependencies', 'Load client side dependencies for the components', componentDependencies(grunt))
-
+  
   grunt.registerTask('run', ['jade', 'less', 'watch'])
   grunt.registerTask('test', ['shell:bower', 'loadComponentDependencies', 'jasmine:unit'])
   grunt.registerTask('default', ['shell:bower', 'loadComponentDependencies', 'concat', 'uglify', 'less', 'jade', 'jasmine:unit'])
