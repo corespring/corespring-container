@@ -199,6 +199,25 @@ module.exports = (grunt) ->
           } 
         ] 
 
+    compress: 
+      generated: 
+        options: 
+          mode: 'gzip'
+        files: [
+          # Each of the files in the src/ folder will be output to
+          # the dist/ folder each with the extension .gz.js
+          { 
+            expand: true 
+            src: [ 
+              common.core.dest, 
+              common.editor.dest, 
+              common.editorExtras.dest, 
+              common.player.dest,
+              common.coreLibs.concatDest ]
+            ext: '.js.gz'
+          }
+        ]
+
 
   grunt.initConfig(config)
 
@@ -214,6 +233,7 @@ module.exports = (grunt) ->
     'grunt-contrib-jshint',
     'grunt-contrib-jasmine',
     'grunt-contrib-copy',
+    'grunt-contrib-compress',
     'grunt-usemin'
   ]
 
@@ -222,5 +242,5 @@ module.exports = (grunt) ->
   
   grunt.registerTask('run', ['jade', 'less', 'watch'])
   grunt.registerTask('test', ['shell:bower', 'loadComponentDependencies', 'jasmine:unit'])
-  grunt.registerTask('default', ['shell:bower', 'loadComponentDependencies', 'concat', 'uglify', 'less', 'jade', 'jasmine:unit'])
+  grunt.registerTask('default', ['shell:bower', 'loadComponentDependencies', 'concat', 'uglify', 'less', 'jade', 'compress', 'jasmine:unit'])
   grunt.registerTask('minify-test', ['concat', 'uglify'])

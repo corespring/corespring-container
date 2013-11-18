@@ -22,17 +22,29 @@ trait ComponentsFileController extends Controller {
   private val df: DateTimeFormatter =
     DateTimeFormat.forPattern("EEE, dd MMM yyyy HH:mm:ss '" + timeZoneCode + "'").withLocale(java.util.Locale.ENGLISH).withZone(DateTimeZone.forID(timeZoneCode))
 
+  private def loadFile(p: String): Option[(File, Map[String, String])] = {
+    val gzipped = new File(s"$p.gz")
+
+    if (gzipped.exists)
+      Some((gzipped, Map(CONTENT_ENCODING -> "gzip")))
+    else {
+      val file = new File(p)
+      if (file.exists)
+        Some((file, Map()))
+      else
+        None
+    }
+  }
 
   def at(org:String, component:String, filename:String) : Action[AnyContent] = Action{ request =>
 
     val fullPath = s"$componentsPath/$org/$component/libs/$filename"
     log.debug( s"fullPath: $fullPath")
-    val file = new File(fullPath)
-    if(!file.exists) {
-      NotFound
-    } else {
+    loadFile(fullPath).map {
+      tuple =>
 
-      val url = file.toURI().toURL()
+        val (file, headers) = tuple
+        val url = file.toURI().toURL()
 
       lazy val (length, resourceData) = {
         val stream = url.openStream()
@@ -48,14 +60,15 @@ trait ComponentsFileController extends Controller {
       else ""
 
       val response = SimpleResult(
-        header = ResponseHeader(OK, Map(
+        header = ResponseHeader(OK, headers ++ Map(
           CONTENT_LENGTH -> length.toString,
           CONTENT_TYPE -> MimeTypes.forFileName(filename).map(m => m + addCharsetIfNeeded(m)).getOrElse(BINARY),
           DATE -> df.print({ new java.util.Date }.getTime))),
         resourceData)
 
       response
-    }
+
+    }.getOrElse(NotFound)
   }
 
 }
