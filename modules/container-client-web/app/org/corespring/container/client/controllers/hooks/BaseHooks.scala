@@ -48,11 +48,12 @@ trait BaseHooks[T <: ClientHooksActionBuilder[AnyContent]] extends Controller wi
       val usedComponents = getAllComponentsForTags(itemTagNames)
       val allModuleNames = usedComponents.map(c => idToModuleName(c.id))
       val clientSideDependencies = getClientSideDependencies(usedComponents)
+      val dependencyModules : Seq[String] = clientSideDependencies.map(_.angularModule).flatten
       val clientSideScripts = get3rdPartyScripts(clientSideDependencies)
       val localScripts = getLocalScripts(usedComponents)
       val out: JsValue = configJson(
          xhtml,
-        Seq(ngModule) ++ allModuleNames,
+        Seq(ngModule) ++ allModuleNames ++ dependencyModules,
         clientSideScripts ++ localScripts ++ Seq(ngJs, componentJs),
         Seq(componentCss)
       )
