@@ -11,6 +11,23 @@ module.exports = (grunt) ->
     dist: 'target/scala-2.10/classes/container-client'
     test: 'src/test/resources/container-client'
     components: '../../corespring-components/components'
+    player: 
+      src:  ['<%= common.dist %>/js/common/directives/_declaration.js',
+        '<%= common.dist %>/js/common/directives/ng-bind-html-unsafe.js',
+        '<%= common.dist %>/js/render/**/*.js' ]
+      concatDest: '.tmp/concat/js/player.js'
+      dest: '<%= common.dist %>/js/prod-player.js'
+
+    coreLibs: 
+      src: [
+        '<%= common.dist %>/bower_components/jquery/jquery.min.js',
+        '<%= common.dist %>/bower_components/jquery-ui/ui/minified/jquery-ui.min.js',
+        '<%= common.dist %>/bower_components/angular/angular.min.js',
+        '<%= common.dist %>/bower_components/lodash/dist/lodash.min.js',
+        '<%= common.dist %>/bower_components/angular-ui-sortable/src/sortable.js',
+        '<%= common.dist %>/bower_components/corespring-ng-components/build/corespring-ng-components.min.js' ]
+      concatDest: '<%= common.dist %>/js/core-libs.js'
+
     core: 
       dest: '<%= common.dist %>/js/prod-core.js'
       concatDest: '.tmp/concat/js/core.js'
@@ -51,11 +68,16 @@ module.exports = (grunt) ->
       .replace("#{fileRoot}/bower_components" , "/client/components")
       .replace(fileRoot, "/client")
 
-  pathsFor = (obj) ->
-    filePaths =  [obj["dest"]] # if devMode then obj["src"] else [obj["dest"]] 
+  pathsFor = (obj, name) ->
+    name = "dest" unless name?
+    filePaths =  if devMode then obj["src"] else [obj[name]] 
+    grunt.log.writeln("[pathsFor] : ", filePaths)
     grunt.log.writeln(filePaths)
     expanded = expander(grunt)(filePaths, {common: common})
-    _.map( expanded, toUrl )
+    grunt.log.writeln("[pathsFor] : expanded: ", expanded)
+    mapped = _.map( expanded, toUrl )
+    grunt.log.writeln("[pathsFor] : mapped: ", mapped)
+    mapped
 
  
   config =
@@ -112,8 +134,10 @@ module.exports = (grunt) ->
           data:
             devMode: grunt.option("devMode") != false  
             core: pathsFor(common.core) 
+            coreLibs: pathsFor(common.coreLibs, "concatDest")
             editor: pathsFor(common.editor) 
             editorExtras: pathsFor(common.editorExtras) 
+            player: pathsFor(common.player) 
 
     jasmine:
       unit:
@@ -144,6 +168,14 @@ module.exports = (grunt) ->
             dest: common.editorExtras.concatDest
             src: common.editorExtras.src
           }
+          {
+            dest: common.coreLibs.concatDest
+            src: common.coreLibs.src
+          }
+          {
+            dest: common.player.concatDest
+            src: common.player.src
+          }
         ]    
 
     uglify:
@@ -160,6 +192,10 @@ module.exports = (grunt) ->
           { 
             dest: common.editorExtras.dest
             src: [ common.editorExtras.concatDest ] 
+          } 
+          { 
+            dest: common.player.dest
+            src: [ common.player.concatDest ] 
           } 
         ] 
 

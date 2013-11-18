@@ -27,20 +27,10 @@ block content
 
 block scripts
 
-  //build:js js/player.js
-  script(src="/client/js/common/directives/_declaration.js")
-  script(src="/client/js/common/directives/ng-bind-html-unsafe.js")
-  script(src="/client/js/render/controllers/_declaration.js")
-  script(src="/client/js/render/controllers/root.js")
-  script(src="/client/js/render/services/_declaration.js")
-  script(src="/client/js/render/services/component-register.js")
-  script(src="/client/js/render/directives/_declaration.js")
-  script(src="/client/js/render/directives/corespring-player.js")
-  //endbuild
+  for p in player 
+    script(src="#{p}", type="text/javascript")
 
-  //build:js js/extras.js
-  script(src="bower_components/angular-ui/build/angular-ui.js")
-  //endbuild
+  script(src="/client/components/angular-ui/build/angular-ui.js")
 
   script.
     $(document).ready(function(){
