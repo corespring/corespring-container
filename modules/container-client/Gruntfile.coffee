@@ -12,7 +12,8 @@ module.exports = (grunt) ->
     test: 'src/test/resources/container-client'
     components: '../../corespring-components/components'
     player: 
-      src:  ['<%= common.dist %>/js/common/directives/_declaration.js',
+      src:  [
+        '<%= common.dist %>/js/common/directives/_declaration.js',
         '<%= common.dist %>/js/common/directives/ng-bind-html-unsafe.js',
         '<%= common.dist %>/js/render/**/*.js' ]
       concatDest: '.tmp/concat/js/player.js'
@@ -47,10 +48,10 @@ module.exports = (grunt) ->
 
     editorExtras:
       dest: '<%= common.dist %>/js/prod-editor-extras.js'
-      concatDest: '.tmp/concat/js/editor-extras.js'
+      concatDest: '<%= common.dist %>/js/editor-extras.js'
       src: [
-        '<%= common.dist %>/bower_components/angular-ui/build/angular-ui.js',
-              '<%= common.dist %>/bower_components/angular-bootstrap/ui-bootstrap-tpls.js',
+              '<%= common.dist %>/bower_components/angular-ui/build/angular-ui.min.js',
+              '<%= common.dist %>/bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js',
               '<%= common.dist %>/bower_components/bootstrap/js/dropdown.js',
               '<%= common.dist %>/bower_components/bootstrap/js/modal.js',
               '<%= common.dist %>/bower_components/bootstrap/js/tooltip.js',
@@ -61,6 +62,17 @@ module.exports = (grunt) ->
               '<%= common.dist %>/bower_components/ace-builds/src-min-noconflict/mode-xml.js',
               '<%= common.dist %>/bower_components/ace-builds/src-min-noconflict/worker-json.js',
               '<%= common.dist %>/bower_components/ace-builds/src-min-noconflict/mode-json.js' ]
+  
+  expandSrc = (arr) ->
+    expanded = expand(arr)
+    grunt.log.writeln("[expandSrc]: ", expanded)
+    urls = _.map(expanded, toUrl)
+    grunt.log.writeln("[expandSrc]: ", urls)
+    urls
+
+  expand = (paths) ->
+    out = expander(grunt)(paths, {common: common})
+    out 
 
   toUrl = (p) -> 
     fileRoot = common.dist
@@ -73,7 +85,7 @@ module.exports = (grunt) ->
     filePaths =  if devMode then obj["src"] else [obj[name]] 
     grunt.log.writeln("[pathsFor] : ", filePaths)
     grunt.log.writeln(filePaths)
-    expanded = expander(grunt)(filePaths, {common: common})
+    expanded = expand(filePaths) 
     grunt.log.writeln("[pathsFor] : expanded: ", expanded)
     mapped = _.map( expanded, toUrl )
     grunt.log.writeln("[pathsFor] : mapped: ", mapped)
@@ -136,7 +148,7 @@ module.exports = (grunt) ->
             core: pathsFor(common.core) 
             coreLibs: pathsFor(common.coreLibs, "concatDest")
             editor: pathsFor(common.editor) 
-            editorExtras: pathsFor(common.editorExtras) 
+            editorExtras: pathsFor(common.editorExtras, "concatDest") 
             player: pathsFor(common.player) 
 
     jasmine:
@@ -190,10 +202,6 @@ module.exports = (grunt) ->
             src: [ common.editor.concatDest ] 
           } 
           { 
-            dest: common.editorExtras.dest
-            src: [ common.editorExtras.concatDest ] 
-          } 
-          { 
             dest: common.player.dest
             src: [ common.player.concatDest ] 
           } 
@@ -211,7 +219,7 @@ module.exports = (grunt) ->
             src: [ 
               common.core.dest, 
               common.editor.dest, 
-              common.editorExtras.dest, 
+              common.editorExtras.concatDest, 
               common.player.dest,
               common.coreLibs.concatDest ]
             ext: '.js.gz'

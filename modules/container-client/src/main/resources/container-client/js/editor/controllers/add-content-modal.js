@@ -30,3 +30,5 @@ var AddContentModalController = function ($scope, $modalInstance, componentSet) 
     $modalInstance.dismiss('cancel');
   };
 };
+
+AddContentModalController.$inject = ['$scope', '$modalInstance', 'componentSet'];
