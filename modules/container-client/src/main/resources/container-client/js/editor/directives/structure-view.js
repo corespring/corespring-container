@@ -72,17 +72,14 @@
         switch(type){
           case "corespring-drag-and-drop" : 
             return "Drag and Drop";
-            break;
           case "corespring-multiple-choice" : 
             return "Multiple Choice";
-            break;
           case "corespring-inline-choice" : 
             return "Inline Choice";
-            break;
           default: 
             return type;
         }
-      }
+      };
 
     };
   };
