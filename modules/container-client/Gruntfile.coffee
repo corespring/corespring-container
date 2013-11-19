@@ -132,7 +132,7 @@ module.exports = (grunt) ->
 
     jshint:
       jshintrc: '.jshintrc'
-      main: ['<%= common.app %>/js/**/*.js']
+      main: ['<%= common.app %>/js/**/*.js', '!<%= common.app %>/**/*.min.js']
 
     jade:
       compile:

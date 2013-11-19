@@ -66,6 +66,25 @@
         return $scope.getIconUrl({ type: type });
       };
 
+
+      $scope.getComponentTypeLabel = function(type){
+
+        switch(type){
+
+          case "corespring-drag-and-drop" : 
+            return "Drag and Drop"
+            break;
+          case "corespring-multiple-choice" : 
+            return "Multiple Choice"
+            break;
+          case "corespring-inline-choice" : 
+            return "Inline Choice"
+            break;
+          default: 
+            return type;
+        }
+      }
+
     };
   };
 
@@ -85,7 +104,8 @@
           '<li class="component-thumbnail"',
           ' ng-click="selectComponent(component)"',
           ' ng-class="{last:$last, active: selectedComponent.id==component.id}"',
-            ' ng-repeat="component in orderedComponents">',
+          '  tooltip="{{ getComponentTypeLabel(component.componentType)}}"',
+          '  ng-repeat="component in orderedComponents">',
           '  <table >',
           '    <tr>',
           '      <td>',

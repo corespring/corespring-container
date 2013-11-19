@@ -1,1 +1,1 @@
-angular.module('corespring-editor.directives', []);
+angular.module('corespring-editor.directives', ['ui.bootstrap']);
