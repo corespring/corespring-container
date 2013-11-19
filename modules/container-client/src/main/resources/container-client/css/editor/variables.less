@@ -23,3 +23,17 @@
 @state-info-bg: @bg-bottom-color;
 @state-info-border: @bg-bottom-color;
 @btn-primary-color: darken(@bg-bottom-color, 50%);
+
+@input-color-placeholder: #666666;
+@input-font-style-placeholder: italic;
+
+.placeholder-font-style(@style: @input-font-style-placeholder) {
+  &:-moz-placeholder            { font-style: @style } // Firefox 4-18
+  &::-moz-placeholder           { font-style: @style } // Firefox 19+
+  &:-ms-input-placeholder       { font-style: @style } // Internet Explorer 10+
+  &::-webkit-input-placeholder  { font-style: @style } // Safari and Chrome
+}
+
+.form-control {
+  .placeholder-font-style();
+}
