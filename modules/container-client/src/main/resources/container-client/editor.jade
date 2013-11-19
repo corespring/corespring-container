@@ -56,25 +56,24 @@ block content
         
         .item-body(ng-switch="isNewItem()")
           .header
-            div(ng-switch-when="true")
-              h5 Your Item
-              br/
-              div Content you have added will be listed here. Click on a question type or content section to edit and design it.
-              span.btn.btn-success.btn-xs(ng-click="openChooser()") Add content
+            .title
+              | Item Details
+              span.dotted-arrow
 
-            div(ng-switch-when="false")
-              .title
-                | Item Details
-                span.dotted-arrow
-              .info
-                | Click a Question Type below to begin editing it.
-                br/
-                br/
-                | You can drag question types below into any order.
-                br/
+            div
+              .info 
+                div(ng-switch-when="true")
+                  | Content you have added will be listed here. 
+                  br/
+                  br/
+                  | Click on a question type or content section to edit and design it.
+                div(ng-switch-when="false")
+                  | Click a Question Type below to begin editing it.
+                  br/
+                  br/
+                  | You can drag question types below into any order.
                 br/
                 .cs-btn(ng-click="openChooser()") Add content
-
 
           structure-view.structure-view(
             ng-model="model",
