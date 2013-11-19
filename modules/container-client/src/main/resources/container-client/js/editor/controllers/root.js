@@ -118,6 +118,10 @@ var controller = function ($scope, $compile, $http, $timeout, $modal, $log, Edit
     var node = $($scope.model.xhtml);
     node.append("<" + descriptor.componentType + " id='" + uid + "'></" + descriptor.componentType + ">");
     $scope.model.xhtml = "<div>" + node.html() + "</div>";
+
+    if (!$scope.selectedComponent) {
+      $scope.selectedComponent = {id: uid, component: $scope.model.components[uid]};
+    }
   };
 
   $scope.$on('fileSizeGreaterThanMax', function (event) {
