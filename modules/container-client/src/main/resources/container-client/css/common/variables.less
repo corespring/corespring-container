@@ -1,0 +1,51 @@
+@editor-height: 100%;
+@left-column-width: 300px;
+@cs-grey: #dbd9db;
+@cs-green: #94d228; 
+@cs-brown: #86855c;
+@cs-blue: #00acce;
+@cs-dark-grey: #1B1B1B;
+@cs-sandy-yellow: #f3f3d7;
+@header-font-size: 16px;
+@header-color: #bdc0b3;
+@yellow: #FFEC13;
+@green: #7DE811;
+@blue: #9CD2FF;
+
+@header-height : 60px;
+@bg-bottom-color: #e5e4cf;
+@bg-top-color: #f7f8ef;
+
+// Bootstrap overrides
+@navbar-bg : lighten(@cs-green, 40%);
+@brand-primary: @bg-bottom-color;
+
+@state-info-text: darken(@bg-bottom-color, 40%);
+@state-info-bg: @bg-bottom-color;
+@state-info-border: @bg-bottom-color;
+@btn-primary-color: @cs-brown;
+@btn-primary-bg: @cs-green;
+@btn-warning-bg: @cs-grey;
+@btn-warning-color: @cs-brown;
+
+@input-color-placeholder: #666666;
+@input-font-style-placeholder: italic;
+
+.placeholder-font-style(@style: @input-font-style-placeholder) {
+  &:-moz-placeholder            { font-style: @style } // Firefox 4-18
+  &::-moz-placeholder           { font-style: @style } // Firefox 19+
+  &:-ms-input-placeholder       { font-style: @style } // Internet Explorer 10+
+  &::-webkit-input-placeholder  { font-style: @style } // Safari and Chrome
+}
+
+.form-control {
+  .placeholder-font-style();
+}
+
+.btn {
+  border-radius: 0px;
+}
+
+label {
+  font-weight: normal;
+}
