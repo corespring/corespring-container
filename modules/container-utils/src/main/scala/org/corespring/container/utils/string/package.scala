@@ -9,4 +9,8 @@ package object string {
       .replace("/", "\\/")
   }
 
+  def hyphenatedToTitleCase(s:String) =   s.split("-").map(_.capitalize).mkString("")
+
+  def join(delimiter:String, s:String*) = s.mkString(delimiter)
+
 }

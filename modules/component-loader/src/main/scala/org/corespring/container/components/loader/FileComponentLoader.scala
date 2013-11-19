@@ -3,9 +3,11 @@ package org.corespring.container.components.loader
 import java.io.File
 import org.corespring.container.components.loader.exceptions.ComponentLoaderException
 import org.corespring.container.components.model._
+import org.corespring.container.utils.string.hyphenatedToTitleCase
 import org.slf4j.LoggerFactory
 import play.api.libs.json.{JsObject, Json, JsValue}
 import scala.Some
+
 
 class FileComponentLoader(paths: Seq[String]) extends ComponentLoader {
 
@@ -71,7 +73,7 @@ class FileComponentLoader(paths: Seq[String]) extends ComponentLoader {
       }
     }
 
-    def hyphenatedToTitleCase(s:String) =   s.split("-").map(_.capitalize).mkString("")
+
 
     def createClientName(n:String) = {
       val name = (if(n == "index" ) compRoot.getName else n)

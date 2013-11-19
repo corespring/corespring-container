@@ -1,9 +1,10 @@
 package org.corespring.container.client.controllers.helpers
 
-import play.api.libs.json.{JsValue, JsArray, JsString, Json}
-import org.corespring.container.components.model.{UiComponent, Component}
-import play.api.mvc.{Results, Result}
+import org.corespring.container.utils.string
 import org.corespring.container.client.views.txt.js.ComponentWrapper
+import org.corespring.container.components.model.UiComponent
+import play.api.libs.json.{JsValue, JsArray, JsString, Json}
+import play.api.mvc.{Results, Result}
 
 trait Helpers {
 
@@ -32,11 +33,10 @@ trait Helpers {
     ComponentWrapper(moduleName(org, name), directiveName(org, name), src).toString
   }
 
-  protected def moduleName(org: String, comp: String) = s"$org.$comp"
+  protected def moduleName(org: String, comp: String) = string.join(".", org, comp)
 
-  protected def tagName(org:String, comp:String) = s"$org-$comp"
+  protected def tagName(org:String, comp:String) = string.join("-", org, comp)
 
-  protected def directiveName(org: String, comp: String) = s"$org${hyphenatedToTitleCase(comp)}"
-
-  private def hyphenatedToTitleCase(s: String): String = s.split("-").map(_.capitalize).mkString("")
+  protected def directiveName(org: String, comp: String) = s"$org${string.hyphenatedToTitleCase(comp)}"
 }
+
