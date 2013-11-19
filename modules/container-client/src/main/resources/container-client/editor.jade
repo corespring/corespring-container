@@ -82,6 +82,12 @@ block content
             get-icon-url="getIconUrl(type)"
             component-set="componentSet")
 
+        .button-holder
+          button.btn.btn-primary(ng-click="save()") Save 
+          button.btn.btn-warning(ng-click="cancel()") Cancel 
+
+
+
       //file-list(ng-model="model.files", select-file="selectFile(file)")
 
       config-pane.config#config(ng-model="selectedComponent", ng-show="selectedComponent != null")
@@ -90,8 +96,6 @@ block content
       div.selected-text-editor(ui-ace, ng-model="selectedFile.content", ui-ace="{useWrapMode: true}", ng-show="selectedFile.content != null")
 
       div.client-side-preview(ng-controller="ClientSidePreview",ng-show="hasComponents()")
-        .header
-          button.btn-xs.btn.btn-primary(ng-click="resetPreview()") Reset
         
         player-control-panel(player-settings="session.settings")
 
@@ -102,10 +106,11 @@ block content
           player-session="rootModel.session",
           player-responses="responses")
 
-        button.btn.btn-primary(ng-click="submit()", ng-disabled="!canSubmit()") Submit
-
-        label
-          | Attempts left: {{session.remainingAttempts !== undefined ? session.remainingAttempts : session.maxNoOfAttempts}}
+        .button-holder
+          button.btn.btn-primary(ng-click="submit()", ng-disabled="!canSubmit()") Submit
+          button.btn.btn-warning(ng-click="resetPreview()") Reset
+          label
+            | Attempts left: {{session.remainingAttempts !== undefined ? session.remainingAttempts : session.maxNoOfAttempts}}
         hr
         #outcome(ng-show="outcome")
           h4 You scored: {{outcome.summary.percentage}}%
