@@ -1,0 +1,15 @@
+{
+  "author": "CoreSpring",
+  "name": "third-party-simulator",
+  "version": "0.0.1",
+  "dependencies": {
+    "express": "*",
+    "jade": "*",
+    "less": "*",
+    "coffee-script": "*",
+    "lodash": "*"
+  },
+  "engines": {
+    "node": ">= 0.10.9"
+  }
+}

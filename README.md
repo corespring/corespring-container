@@ -17,6 +17,11 @@ These tools should be on your `PATH`:
 
 [Bower](http://bower.io/)
 
+
+## Installing
+
+    git clone --recursive git@github.com:corespring/corespring-container.git
+
 ## Run
 
 ### ENV VARS
