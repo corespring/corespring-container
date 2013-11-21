@@ -10,6 +10,10 @@ var controller = function ($scope, $log, $timeout, MessageBridge) {
   $timeout( function(){
     $scope.$broadcast('begin');
   });
+
+  $scope.$on("session-loaded", function(event, session){
+    MessageBridge.sendMessage('parent', { message: "session-loaded", sessionId: session._id.$oid}, true);
+  });
 };
 
 angular.module('corespring-player.controllers')

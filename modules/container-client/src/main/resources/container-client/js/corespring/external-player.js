@@ -38,6 +38,8 @@ console.log("external player");
 
   /** The root listener implementation - forward event to all player listeners */
   var rootLevelListener = function (e) {
+    console.debug("rootLevelListener", e);
+    
     for (var i = 0; i < playerListeners.length; i++) {
       playerListeners[i](e);
     }

@@ -39,6 +39,7 @@ var controller = function ($scope, $log, ComponentRegister, PlayerServices) {
     $scope.session = data.session;
     $scope.outcome = data.outcome;
     $scope.responses = data.responses;
+    $scope.$emit("session-loaded", data.session);
   };
 
   $scope.$on('begin', function(){
