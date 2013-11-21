@@ -102,25 +102,6 @@ console.log("external player");
   };
 
 
-  var extend = function(obj) {
-
-    var args = Array.prototype.slice.call(arguments, 1);
-    
-    var updateSource = function(source) {
-      if (source) {
-        for (var prop in source) {
-          obj[prop] = source[prop];
-        }
-      }
-    };
-
-    for(var x in args){
-      updateSource(args[x]);
-    }
-
-    return obj;
-  };
-
   org.corespring.players.ItemPlayer = function (elementSelector, options) {
 
     var defaultOptions = {
@@ -128,7 +109,7 @@ console.log("external player");
       mode: "gather"
     };
 
-    options = extend(defaultOptions, options);
+    options = $.extend(defaultOptions, options);
 
     var result = validateOptions(options);
 

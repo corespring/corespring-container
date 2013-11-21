@@ -12,7 +12,13 @@ angular.module("simulator").controller('Root', ['$scope', '$log', function($scop
   };
 
   $scope.add = function() { 
-    var options = {};
+    var options = {
+      mode: $scope.mode
+    };
+    var idName = $scope.mode === "gather" ? "itemId" : "sessionId";
+
+    options[idName] = $scope.id;
+
     $scope.player = new org.corespring.players.ItemPlayer('#player-holder', options);
   };
 
