@@ -14,28 +14,67 @@
       "componentType" : "corespring-drag-and-drop",
       "title": "Butterfly Lifecycle",
       "weight" : 1,
-       "correctResponse": [ { "landingPlace" : "1", "choiceId" : "larva"} ],
-        "feedback" : [
-          {
-            "landingPlace" : "1",
-            "feedback" :
-              [
-                { "larva" : "Correct"},
-                { "other" : "Incorrect" }
-              ]
-          }
-        ],
-        "model" : {
+      "correctResponse": {
+        "1": "egg",
+        "2": "pupa",
+        "3": "larva",
+        "4": "adult"
+      },
+      "feedback": [
+        {
+          "feedback": [
+          ],
+          "landingPlace": "1"
+        }
+      ],
+      "model" : {
           "config" : {
             "shuffle" : true
           },
           "prompt": "Drag the 2nd stage of the butterfly's lifecycle on to the the pod",
-          "answerArea" : "<div>Drop your answer here: <landingPlace id='1'></landingPlace></div>",
-          "choices" : [
-            { "id" : "pupa", "fixed" : true, "content" : "Pupa"},
-            { "id" : "egg", "content" : "Egg"},
-            { "id" : "larva","content" : "Larva"},
-            { "id" : "adult", "content" : "Adult" }
+          "answers": [
+            {
+              "id": "1",
+              "textBefore": "A butterfly first is a",
+              "textAfter": ".",
+              "inline": true
+            },
+            {
+              "id": "2",
+              "textBefore": "It is then a ",
+              "textAfter": ".",
+              "inline": true
+            },
+            {
+              "id": "3",
+              "textBefore": "And then a ",
+              "textAfter": ".",
+              "inline": true
+            },
+            {
+              "id": "4",
+              "textBefore": "And finally a ",
+              "textAfter": ".",
+              "inline": true
+            }
+          ],
+          "choices": [
+            {
+              "content": "Pupa",
+              "id": "pupa"
+            },
+            {
+              "content": "Egg",
+              "id": "egg"
+            },
+            {
+              "content": "Larva",
+              "id": "larva"
+            },
+            {
+              "content": "Adult",
+              "id": "adult"
+            }
           ]
         }
       },
