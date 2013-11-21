@@ -13,7 +13,7 @@ angular.module("simulator").controller('Root', ['$scope', '$log', function($scop
 
   $scope.add = function() { 
     var options = {};
-    $scope.player = new org.corespring.players.ItemPlayer('#player', options);
+    $scope.player = new org.corespring.players.ItemPlayer('#player-holder', options);
   };
 
   $scope.remove = function() {

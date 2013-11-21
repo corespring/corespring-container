@@ -7,8 +7,8 @@ console.log("external player");
   org.corespring.players = org.corespring.players || {};
 
   var rootListener = null;
-  var eventName = function() { return window.addEventListener ? "message" : "onmessage";}
-  var addEventFunctionName = function(){ return window.addEventListener ? "addEventListener" : "attachEvent"; }
+  var eventName = function() { return window.addEventListener ? "message" : "onmessage";};
+  var addEventFunctionName = function(){ return window.addEventListener ? "addEventListener" : "attachEvent"; };
 
   /** A cache of existing player listeners - gets overrwritten when a new ItemPlayer is instantiated */
   var playerListeners = [];
@@ -29,7 +29,7 @@ console.log("external player");
 
   /** only add one listener to the window, this function is expected to then delegate out to player listeners */
   var addRootLevelMessageListener = function (newListener) {
-    if (rootListener != null) {
+    if (rootListener !== null) {
       throw "A root level listener is already registered!";
     }
     rootListener = newListener;
@@ -52,9 +52,12 @@ console.log("external player");
   };
 
   var renderPlayer = function (e, options) {
-    var url = options.corespringUrl;
-    if (options.omitSubmitButton)
-      url += "?omitSubmitButton=true";
+    var resourceType = options.mode == "gather" ? "item" : "session";
+    var id = options.mode === "gather" ? options.itemId : options.sessionId;
+    var url = options.corespringUrl
+      .replace("{resourceType}", resourceType)
+      .replace("{id}", id);
+
 
     e.html("<iframe id='iframe-player' src='" + url + "' style='width: 100%; height: 100%; border: none'></iframe>");
     e.width(options.width ? options.width : "600px");
@@ -80,7 +83,62 @@ console.log("external player");
     });
   };
 
+  var validateOptions = function(options){
+
+    var out = [];
+    if(!options.mode){
+      out.push("No mode");
+    }
+
+    if(!options.itemId && options.mode === "gather"){
+      out.push("No itemId");
+    }
+
+    if(!options.sessionId && options.mode !== "gather"){
+      out.push("No sessionId");
+    }
+
+    return out;
+  };
+
+
+  var extend = function(obj) {
+
+    var args = Array.prototype.slice.call(arguments, 1);
+    
+    var updateSource = function(source) {
+      if (source) {
+        for (var prop in source) {
+          obj[prop] = source[prop];
+        }
+      }
+    };
+
+    for(var x in args){
+      updateSource(args[x]);
+    }
+
+    return obj;
+  };
+
   org.corespring.players.ItemPlayer = function (elementSelector, options) {
+
+    var defaultOptions = {
+      corespringUrl : "http://localhost:9000/player/{resourceType}/{id}",
+      mode: "gather"
+    };
+
+    options = extend(defaultOptions, options);
+
+    var result = validateOptions(options);
+
+    if(result.length > 0){
+      for (var i = 0; i < result.length; i++) {
+        logError(result[i]);
+      }
+      return;
+    }
+
 
     var postMessage = function(message, data) {
       console.debug("Posting Message: ",message, data);
