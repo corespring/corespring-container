@@ -12,7 +12,7 @@ var controller = function ($scope, $log, $timeout, MessageBridge) {
   });
 
   $scope.$on("session-loaded", function(event, session){
-    MessageBridge.sendMessage('parent', { message: "session-loaded", sessionId: session._id.$oid}, true);
+    MessageBridge.sendMessage('parent', { message: "sessionCreated", session: session}, true);
   });
 };
 

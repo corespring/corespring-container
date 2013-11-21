@@ -13,10 +13,22 @@ angular.module("simulator").controller('Root', ['$scope', '$log', function($scop
     return $scope.mode === "gather" ? "Item Id" : "Session Id";   
   };
 
+  $scope.onSessionCreated = function(sessionId){
+
+    $log.debug("session created: ", sessionId);
+
+    $scope.$apply(function(){
+      $scope.sessionId = sessionId;
+    });
+  };
+
+
   $scope.add = function() { 
     var options = {
-      mode: $scope.mode
+      mode: $scope.mode,
+      onSessionCreated : $scope.onSessionCreated
     };
+
     var idName = $scope.mode === "gather" ? "itemId" : "sessionId";
 
     options[idName] = $scope.id;
@@ -25,7 +37,8 @@ angular.module("simulator").controller('Root', ['$scope', '$log', function($scop
   };
 
   $scope.remove = function() {
-
+    delete $scope.player;
+    $("#player-holder").html('');
   };
 
 }]);

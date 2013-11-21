@@ -39,7 +39,7 @@ console.log("external player");
   /** The root listener implementation - forward event to all player listeners */
   var rootLevelListener = function (e) {
     console.debug("rootLevelListener", e);
-    
+
     for (var i = 0; i < playerListeners.length; i++) {
       playerListeners[i](e);
     }
@@ -104,8 +104,31 @@ console.log("external player");
   };
 
 
+  var addSessionListener = function (message, callback, dataHandler) {
+
+    dataHandler = (dataHandler || function (s) {
+      return s._id.$oid;
+    });
+
+    addPlayerListener(function (event) {
+      try {
+        
+        var data = typeof(event.data) == "string" ? JSON.parse(event.data) : event.data;
+
+        if (data.message == message && data.session) {
+          callback(dataHandler(data.session));
+        }
+      }
+      catch (e) {
+          logError("Exception in ItemPlayer.addSessionListener: "+e);
+      }
+    });
+  };
+
   org.corespring.players.ItemPlayer = function (elementSelector, options) {
 
+    playerListeners = [];
+    
     var defaultOptions = {
       corespringUrl : "http://localhost:9000/client/{resourceType}/{id}/player",
       mode: "gather"
@@ -121,7 +144,6 @@ console.log("external player");
       }
       return;
     }
-
 
     var postMessage = function(message, data) {
       console.debug("Posting Message: ",message, data);
@@ -145,6 +167,10 @@ console.log("external player");
       };
       expectResult(argObj.message+"Result", argObj.callback, extractPropertyFromMessage);
     };
+
+    if (options.onSessionCreated ) {
+      addSessionListener("sessionCreated", options.onSessionCreated);
+    }
 
     /* API methods */
     this.setMode = function (mode) {
