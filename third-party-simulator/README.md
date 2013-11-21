@@ -3,6 +3,7 @@
 ## installing
 
     npm install
+    bower install
 
 ## running
 
