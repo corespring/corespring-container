@@ -1,6 +1,6 @@
 package org.corespring.container.client.controllers.resources
 
-import org.corespring.container.client.actions.{SubmitSessionRequest, SessionActionBuilder}
+import org.corespring.container.client.actions.{SaveSessionRequest, SubmitSessionRequest, SessionActionBuilder}
 import org.corespring.container.client.controllers.resources.session.ItemPruner
 import org.corespring.container.components.outcome.OutcomeProcessor
 import org.corespring.container.components.response.ResponseProcessor
@@ -23,8 +23,6 @@ trait Session extends Controller with ItemPruner {
 
   def loadEverything(id: String) = builder.loadEverything(id){ request =>
 
-
-
     val itemJson = (request.everything \ "item").as[JsObject]
     val prunedItem = pruneItem(itemJson)
     val sessionJson = (request.everything \ "session").as[JsObject]
@@ -46,6 +44,19 @@ trait Session extends Controller with ItemPruner {
         "session" -> sessionJson)
       Ok(out)
     }
+  }
+
+
+  def saveSession(id:String) = builder.save(id) {
+    request : SaveSessionRequest[AnyContent] =>
+      request.body.asJson.map{
+        componentsJson =>
+          val update = request.itemSession.as[JsObject] ++ Json.obj("components" -> componentsJson)
+          request.saveSession(id, update).map{
+            savedSession =>
+              Ok(savedSession)
+          }.getOrElse(BadRequest("Error saving"))
+      }.getOrElse(BadRequest("No session in the request body"))
   }
 
   /**

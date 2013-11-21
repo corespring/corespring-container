@@ -1,10 +1,10 @@
 package org.corespring.shell.impl.controllers.player
 
-import org.corespring.container.client.actions.{SubmitSessionRequest, FullSessionRequest, SessionActionBuilder}
+import org.corespring.container.client.actions.{SaveSessionRequest, SubmitSessionRequest, FullSessionRequest, SessionActionBuilder}
 import org.corespring.shell.impl.services.MongoService
 import play.api.Logger
 import play.api.libs.json.{JsValue, Json}
-import play.api.mvc.{Action, Result, AnyContent}
+import play.api.mvc.{Request, Action, Result, AnyContent}
 import org.corespring.container.client.controllers.resources.Session
 
 trait ClientSessionImpl extends Session {
@@ -40,6 +40,21 @@ trait ClientSessionImpl extends Session {
           r =>
             block(r)
         }.getOrElse(BadRequest("??"))
+    }
+
+    def save(id: String)(block: (SaveSessionRequest[AnyContent]) => Result): Action[AnyContent] = Action{
+      request : Request[AnyContent] =>
+      logger.debug(s"save session: $id")
+
+      val result = for {
+        session <- sessionService.load(id)
+      } yield {
+        SaveSessionRequest(session, sessionService.save, request)
+      }
+      result.map {
+        r =>
+          block(r)
+      }.getOrElse(BadRequest("??"))
     }
 
     def loadEverything(id: String)(block: (FullSessionRequest[AnyContent]) => Result): Action[AnyContent] = Action {

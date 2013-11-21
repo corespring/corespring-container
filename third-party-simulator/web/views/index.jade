@@ -38,7 +38,13 @@ block content
 
     hr/
     
-    #player-holder(style="height: 100%; width: 100%;")
+    .player(ng-show="player")    
+      #player-holder(style="height: 100%;")
+      .btn.btn-default( type="button", ng-click="submit()") Submit 
+      .btn.btn-default( type="button", ng-click="save()") Save 
+
+
+
 
 block scripts
   script(src="/components/jquery/jquery.min.js")

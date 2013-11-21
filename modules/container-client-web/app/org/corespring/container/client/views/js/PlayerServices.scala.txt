@@ -1,12 +1,14 @@
-@(namespace : String, loadSession : Call, submitSession:Call)
+@(namespace : String, loadSession : Call, submitSession:Call, saveSession: Call)
 
 angular.module('@namespace', []);
 
 angular.module('@namespace').factory('PlayerServices', ['$http', function($http){
 
-var def = {
-    submitSession: function(session, onSuccess, onFailure){
-      $http['@submitSession.method.toLowerCase']('@submitSession.url', session)
+  var persist = function(method, url){
+
+    return function(session, onSuccess, onFailure){
+
+      $http[method](url, session)
        .success(
          function(data, status, headers, config) {
            onSuccess(data)
@@ -19,7 +21,12 @@ var def = {
            }
          }
        );
-    },
+    };
+ };
+
+var def = {
+    submitSession: persist('@submitSession.method.toLowerCase', '@submitSession.url'),
+    saveSession: persist('@saveSession.method.toLowerCase', '@saveSession.url'),
     loadSession: function(onSuccess, onFailure) {
       $http['@loadSession.method.toLowerCase']('@loadSession.url')
         .success(function(data, status, headers, config){

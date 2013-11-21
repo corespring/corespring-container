@@ -11,6 +11,12 @@ var controller = function ($scope, $log, ComponentRegister, PlayerServices) {
     }, $scope.onSessionSaved, $scope.onSessionSaveError);
   };
 
+  $scope.save = function () {
+    PlayerServices.saveSession({
+      components: ComponentRegister.getComponentSessions()
+    }, $scope.onSessionSaved, $scope.onSessionSaveError);
+  };
+
   $scope.onSessionSaved = function (data) {
     $scope.rootModel.session = data.session;
     $scope.outcome = data.outcome;
@@ -45,6 +51,11 @@ var controller = function ($scope, $log, ComponentRegister, PlayerServices) {
   $scope.$on('begin', function(){
     PlayerServices.loadSession($scope.onSessionLoaded, $scope.onSessionLoadError);
   });
+
+  $scope.$on('saveResponses', function(){
+    $scope.save();
+  });
+
 };
 
 

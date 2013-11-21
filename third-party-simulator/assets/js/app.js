@@ -22,7 +22,6 @@ angular.module("simulator").controller('Root', ['$scope', '$log', function($scop
     });
   };
 
-
   $scope.add = function() { 
     var options = {
       mode: $scope.mode,
@@ -39,6 +38,17 @@ angular.module("simulator").controller('Root', ['$scope', '$log', function($scop
   $scope.remove = function() {
     delete $scope.player;
     $("#player-holder").html('');
+  };
+
+  $scope.save = function(){
+    $scope.player.saveResponses(false);
+  };
+
+  $scope.submit = function(){
+    $scope.player.saveResponses(true);
+    //only needed for secure mode
+    //$scope.player.completeResponse();
+    $scope.player.setMode("view");
   };
 
 }]);

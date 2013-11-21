@@ -61,7 +61,7 @@ console.log("external player");
       .replace("{id}", id);
 
 
-    e.html("<iframe id='iframe-player' src='" + url + "' style='width: 100%; height: 100%; border: none'></iframe>");
+    e.html("<iframe id='iframe-player' src='" + url + "' style='width: 100%; min-height: 700px; border: none'></iframe>");
     e.width(options.width ? options.width : "600px");
 
   };
@@ -128,7 +128,7 @@ console.log("external player");
   org.corespring.players.ItemPlayer = function (elementSelector, options) {
 
     playerListeners = [];
-    
+
     var defaultOptions = {
       corespringUrl : "http://localhost:9000/client/{resourceType}/{id}/player",
       mode: "gather"

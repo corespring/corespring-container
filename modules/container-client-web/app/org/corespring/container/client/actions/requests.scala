@@ -20,3 +20,4 @@ case class SaveItemRequest[A](item: JsValue, save: (String,JsValue) => Option[Js
  * @tparam A
  */
 case class SubmitSessionRequest[A](everything: JsValue, saveSession: (String, JsValue) => Option[JsValue], r: Request[A]) extends WrappedRequest(r)
+case class SaveSessionRequest[A](itemSession: JsValue, saveSession: (String, JsValue) => Option[JsValue], r: Request[A]) extends WrappedRequest(r)

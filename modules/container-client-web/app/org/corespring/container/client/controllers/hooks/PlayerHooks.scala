@@ -15,7 +15,15 @@ trait PlayerHooks extends BaseHooks[ClientHooksActionBuilder[AnyContent]] {
 
   override def services(sessionId:String) : Action[AnyContent] = builder.loadServices(sessionId) { request : PlayerRequest[AnyContent] =>
     import org.corespring.container.client.controllers.resources.routes._
-    Ok(PlayerServices(ngModule, Session.loadEverything(sessionId), Session.submitSession(sessionId))).as("text/javascript")
+
+    val jsServices = PlayerServices(
+      ngModule,
+      Session.loadEverything(sessionId),
+      Session.submitSession(sessionId),
+      Session.saveSession(sessionId)
+    )
+
+    Ok(jsServices).as("text/javascript")
   }
 
   override def componentsJs(sessionId: String): Action[AnyContent] = builder.loadComponents(sessionId) {
