@@ -1,59 +1,23 @@
-var controller = function ($scope, ComponentRegister, PlayerServices) {
+var controller = function ($scope, $log, $timeout, MessageBridge) {
 
-  $scope.canSubmit = function() {
-    if (!$scope.session || !$scope.session.settings) return false;
-    return $scope.session.settings.allowEmptyResponses || !ComponentRegister.hasEmptyAnswers();
+  $scope.messageBridgeListener = function(event){
+    $log.debug("[player:Root] message received: ", event);
   };
 
-  $scope.submit = function () {
-    PlayerServices.submitSession({
-      components: ComponentRegister.getComponentSessions()
-    }, $scope.onSessionSaved, $scope.onSessionSaveError);
-  };
+  MessageBridge.addMessageListener($scope.messageBridgeListener);
+  MessageBridge.sendMessage('parent', 'ready', true);
 
-  $scope.onSessionSaved = function (data) {
-    $scope.rootModel.session = data.session;
-    $scope.outcome = data.outcome;
-    $scope.responses = data.responses;
-  };
-
-  $scope.updateSession = function (data) {
-    if (!$scope.model || !$scope.model.session) {
-      return;
-    }
-    $scope.rootModel.session.remainingAttempts = data.session.remainingAttempts;
-    $scope.rootModel.session.isFinished = data.session.isFinished;
-    $scope.$broadcast('session-finished', $scope.model.session.isFinished);
-  };
-
-  $scope.onSessionLoadError = function (error) {
-    console.warn("Error loading session");
-  };
-
-  $scope.onSessionSaveError = function (error) {
-    console.warn("Error saving session");
-  };
-
-  $scope.onSessionLoaded = function (data) {
-    $scope.rootModel = data;
-    /*
-    $scope.model = data.item;
-    */
-    $scope.session = data.session;
-    $scope.outcome = data.outcome;
-    $scope.responses = data.responses;
-  };
-
-  PlayerServices.loadSession($scope.onSessionLoaded, $scope.onSessionLoadError);
+  $timeout( function(){
+    $scope.$broadcast('begin');
+  });
 };
-
 
 angular.module('corespring-player.controllers')
   .controller(
     'Root',
-    [
-    '$scope',
-    'ComponentRegister',
-    'PlayerServices',
+    ['$scope',
+    '$log',
+    '$timeout',
+    'MessageBridge',
      controller
     ]);

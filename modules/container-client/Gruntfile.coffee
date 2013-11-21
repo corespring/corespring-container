@@ -13,8 +13,6 @@ module.exports = (grunt) ->
     components: '../../corespring-components/components'
     player: 
       src:  [
-        '<%= common.dist %>/js/common/directives/_declaration.js',
-        '<%= common.dist %>/js/common/directives/ng-bind-html-unsafe.js',
         '<%= common.dist %>/js/render/**/*.js' ]
       concatDest: '.tmp/concat/js/player.js'
       dest: '<%= common.dist %>/js/prod-player.js'
