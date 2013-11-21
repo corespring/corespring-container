@@ -7,6 +7,8 @@ angular.module("simulator").controller('Root', ['$scope', '$log', function($scop
 
   $scope.mode = "gather";
 
+  $scope.id = "522267c2554f43f858000001";
+
   $scope.idLabel = function(){
     return $scope.mode === "gather" ? "Item Id" : "Session Id";   
   };
