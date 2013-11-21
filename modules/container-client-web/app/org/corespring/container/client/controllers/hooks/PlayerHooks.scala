@@ -42,7 +42,8 @@ trait PlayerHooks extends BaseHooks[ClientHooksActionBuilder[AnyContent]] {
       //TODO: How to get this path accurately - atm will only support one level of nesting of the routes file?
       val PathRegex = s"""/(.*?)/.*/$itemId.*""".r
       val PathRegex(root) = request.path
-      val url = s"/$root/${request.sessionId}/player.html"
+      //val url = s"/$root/${request.sessionId}/player.html"
+      val url = org.corespring.container.client.controllers.routes.Assets.session(request.sessionId, "index.html").url
       SeeOther(url)
   }
 

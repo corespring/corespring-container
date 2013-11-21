@@ -26,7 +26,9 @@ trait PlayerHooksImpl extends PlayerHooks {
         } yield {
           PlayerRequest(i, request, Some(s))
         }
-        playerRequest.map(block(_)).getOrElse(BadRequest("Error loading play action"))
+        playerRequest.map(block(_)).getOrElse{
+          BadRequest("PlayerHooksImpl: Error loading player")
+        }
     }
 
     def loadComponents(id: String)(block: (PlayerRequest[AnyContent]) => Result): Action[AnyContent] = load(id)(block)
@@ -38,7 +40,6 @@ trait PlayerHooksImpl extends PlayerHooks {
     def createSessionForItem(itemId: String)(block: (SessionIdRequest[AnyContent]) => Result): Action[AnyContent] = Action{ request =>
 
       val settings = Json.obj(
-        "itemId" -> JsString(itemId),
         "maxNoOfAttempts" -> JsNumber(2),
         "showFeedback" -> JsBoolean(true),
         "highlightCorrectResponse" -> JsBoolean(true),
@@ -46,7 +47,7 @@ trait PlayerHooksImpl extends PlayerHooks {
         "isFinished" -> JsBoolean(false)
       )
 
-      val session = Json.obj("settings" -> settings)
+      val session = Json.obj("settings" -> settings, "itemId" -> JsString(itemId))
 
       sessionService.create(session).map{ oid =>
         block(SessionIdRequest(oid.toString, request))

@@ -105,7 +105,7 @@ console.log("external player");
   org.corespring.players.ItemPlayer = function (elementSelector, options) {
 
     var defaultOptions = {
-      corespringUrl : "http://localhost:9000/player/{resourceType}/{id}",
+      corespringUrl : "http://localhost:9000/client/{resourceType}/{id}/player",
       mode: "gather"
     };
 
