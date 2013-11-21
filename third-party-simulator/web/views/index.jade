@@ -3,7 +3,43 @@ extends layout
 block head
 
 block content
-  h1 simulator
-  
+  .container(ng-app="simulator", ng-controller="Root")
+    h1 Simulator
+    hr/
+
+    form.form-horizontal
+      .form-group
+        label.control-label.col-sm-2 Mode
+        .col-sm-10
+          label.radio-inline
+            input(type="radio", value="gather", ng-model="mode")
+            | gather
+          label.radio-inline
+            input(type="radio", value="view", ng-model="mode")
+            | view 
+          label.radio-inline
+            input(type="radio", value="evaluate", ng-model="mode")
+            | evaluate 
+      .form-group
+        label.control-label.col-sm-2 {{idLabel()}} 
+        .col-sm-10
+          input.form-control(type="text", placeholder="Id...")
+
+    hr/
+
+
+
+    .btn.btn-default( type="button") Add  
+    .btn.btn-default( type="button") Remove 
+
+    hr/
+    
+    #player-holder
+
 block scripts
+  script(src="/components/jquery/jquery.min.js")
+  script(src="/components/lodash/dist/lodash.min.js")
+  script(src="/components/angular/angular.min.js")
+  script(src="/assets/js/app.js")
+  script(src="http://localhost:9000/player.js")
 

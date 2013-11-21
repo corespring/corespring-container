@@ -30,15 +30,14 @@
           data.component.title = newTitle;
         });
         newScope.clickOutside = function (e) {
-          var inPopover = $(e.target).closest('.popover').length > 0
+          
+          var inPopover = $(e.target).closest('.popover').length > 0;
           if (!inPopover) {
             newScope.$broadcast('clickOutsidePopover');
           }
         };
 
         return $compile($div)(newScope);
-
-
       });
     };
   };

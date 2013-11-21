@@ -11,6 +11,8 @@ app = express()
 app.set('views', __dirname + '/web/views')
 app.set('view engine', 'jade')
 app.use(express.bodyParser())
+app.use('/components', express.static('bower_components'))
+app.use('/assets', express.static('assets'))
 
 routes.init(app, packageJson)
 
