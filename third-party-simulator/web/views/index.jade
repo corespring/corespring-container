@@ -34,6 +34,12 @@ block content
           | {{attemptCount}}
           | &nbsp;
           button.btn.btn-default(ng-click="updateAttemptCount()") Update
+      .form-group
+        label.control-label.col-sm-2 Score 
+        .col-sm-10
+          | {{score}}
+          | &nbsp;
+          button.btn.btn-default(ng-click="getScore()") Update
 
     hr/
 

@@ -59,6 +59,16 @@ angular.module("simulator").controller('Root', ['$scope', '$log', function($scop
         $scope.attemptCount = result;
       });
     });
-  }
+  };
+
+  $scope.getScore = function(){
+    $scope.player.getScore(null, function(outcome){
+      $log.debug("get score: ", outcome);
+
+      $scope.$apply(function(){
+        $scope.score = outcome;
+      });
+    });
+  };
 
 }]);

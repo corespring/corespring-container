@@ -70,6 +70,7 @@ trait Session extends Controller with ItemPruner {
       }.getOrElse(BadRequest("No session in the request body"))
   }
 
+
   /**
    * Ok(request.sessionJson)
    * @param id

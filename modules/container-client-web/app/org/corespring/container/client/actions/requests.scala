@@ -12,6 +12,7 @@ case class FullSessionRequest[A]( everything : JsValue, r: Request[A]) extends W
 case class ItemRequest[A](item: JsValue, r : Request[A]) extends WrappedRequest(r)
 
 case class SaveItemRequest[A](item: JsValue, save: (String,JsValue) => Option[JsValue], r : Request[A]) extends WrappedRequest(r)
+case class ScoreItemRequest[A](item : JsValue, r : Request[A]) extends WrappedRequest(r)
 
 /**
  * @param everything - should contain "item" -> item json, "session" - session json

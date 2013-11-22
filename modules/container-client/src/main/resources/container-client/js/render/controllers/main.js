@@ -21,6 +21,16 @@ var controller = function ($scope, $log, ComponentRegister, PlayerServices) {
       $scope.onSessionSaveError);
   };
 
+  $scope.getScore = function(onSuccess, onError){
+    PlayerServices.getScore(
+        {
+          components: ComponentRegister.getComponentSessions()
+        },
+        onSuccess, 
+        onError
+      );
+  };
+
   $scope.onSessionSaved = function (session) {
     $scope.rootModel.session = session;
     $scope.session = session;
@@ -61,6 +71,14 @@ var controller = function ($scope, $log, ComponentRegister, PlayerServices) {
 
   $scope.$on('countAttempts', function(event, data, callback){
     callback({ count : $scope.session.attempts });
+  });
+
+  $scope.$on('getScore', function(event, data, callback){
+
+    var onScoreReceived = function(outcome){
+      callback({ score: outcome.summary.percentage} );
+    };
+    $scope.getScore(onScoreReceived);
   });
 
 };

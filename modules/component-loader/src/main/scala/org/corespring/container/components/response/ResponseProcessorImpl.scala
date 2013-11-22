@@ -8,7 +8,9 @@ class ResponseProcessorImpl(components: Seq[UiComponent], libraries : Seq[Librar
 
   private lazy val logger = LoggerFactory.getLogger("components.response")
 
-  def respond(item: JsValue, session: JsValue): JsValue = {
+  def respond(item: JsValue, session: JsValue): JsValue = respond(item, session \ "components", session \ "settings")
+
+  def respond(item: JsValue, answers: JsValue, settings: JsValue): JsValue = {
 
     val componentQuestions = (item \ "components").as[JsObject]
 
@@ -18,7 +20,7 @@ class ResponseProcessorImpl(components: Seq[UiComponent], libraries : Seq[Librar
         val question = (componentQuestions \ id).as[JsObject]
         val componentType = (question \ "componentType").as[String]
 
-        val answer = getAnswer(session, id)
+        val answer = getAnswer(answers, id)
 
         components.find(_.matchesType(componentType)).map {
           component =>
@@ -27,7 +29,7 @@ class ResponseProcessorImpl(components: Seq[UiComponent], libraries : Seq[Librar
               a =>
                 val componentLibraries : Seq[Library] = component.libraries.map( id => libraries.find(l => l.id.matches(id) )).flatten
                 val generator = new ResponseGenerator(component.componentType, component.server.definition, componentLibraries)
-                (id, generator.respond(question, a, session \ "settings"))
+                (id, generator.respond(question, a, settings))
             }.getOrElse {
               logger.debug(s"no answer provided for: $id")
               (id, JsObject(Seq.empty))
@@ -37,9 +39,8 @@ class ResponseProcessorImpl(components: Seq[UiComponent], libraries : Seq[Librar
     JsObject(responses)
   }
 
-  private def getAnswer(session: JsValue, id: String): Option[JsValue] = for {
-    componentSession <- (session \ "components" \ id).asOpt[JsObject]
+  private def getAnswer(answers: JsValue, id: String): Option[JsValue] = for {
+    componentSession <- (answers \ "components" \ id).asOpt[JsObject]
     answer <- (componentSession \ "answers").asOpt[JsValue]
   } yield answer
-
 }
