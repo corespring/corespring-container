@@ -7,7 +7,7 @@ angular.module("simulator").controller('Root', ['$scope', '$log', function($scop
 
   $scope.mode = "gather";
 
-  $scope.id = "522267c2554f43f858000001";
+  $scope.itemId = "522267c2554f43f858000001";
 
   $scope.idLabel = function(){
     return $scope.mode === "gather" ? "Item Id" : "Session Id";   
@@ -30,7 +30,7 @@ angular.module("simulator").controller('Root', ['$scope', '$log', function($scop
 
     var idName = $scope.mode === "gather" ? "itemId" : "sessionId";
 
-    options[idName] = $scope.id;
+    options[idName] = $scope[idName];
 
     $scope.player = new org.corespring.players.ItemPlayer('#player-holder', options);
   };

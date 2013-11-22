@@ -51,7 +51,7 @@ trait Session extends Controller with ItemPruner {
     request : SaveSessionRequest[AnyContent] =>
       request.body.asJson.map{
         componentsJson =>
-          val update = request.itemSession.as[JsObject] ++ Json.obj("components" -> componentsJson)
+          val update = request.itemSession.as[JsObject] ++ componentsJson.as[JsObject]
           request.saveSession(id, update).map{
             savedSession =>
               Ok(savedSession)

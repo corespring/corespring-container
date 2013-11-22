@@ -56,10 +56,8 @@ console.log("external player");
   var renderPlayer = function (e, options) {
     var resourceType = options.mode == "gather" ? "item" : "session";
     var id = options.mode === "gather" ? options.itemId : options.sessionId;
-    var url = options.corespringUrl
-      .replace("{resourceType}", resourceType)
-      .replace("{id}", id);
-
+    var path = options.mode === "gather" ? options.itemPath : options.sessionPath;
+    var url = (options.corespringUrl + path).replace(":id", id);
 
     e.html("<iframe id='iframe-player' src='" + url + "' style='width: 100%; min-height: 700px; border: none'></iframe>");
     e.width(options.width ? options.width : "600px");
@@ -129,8 +127,11 @@ console.log("external player");
 
     playerListeners = [];
 
+
     var defaultOptions = {
-      corespringUrl : "http://localhost:9000/client/{resourceType}/{id}/player",
+      corespringUrl : "http://localhost:9000",
+      itemPath: "/client/item/:id/player",
+      sessionPath: "/client/player/:id/index.html",
       mode: "gather"
     };
 
