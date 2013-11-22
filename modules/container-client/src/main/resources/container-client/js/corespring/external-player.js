@@ -7,8 +7,12 @@ console.log("external player");
   org.corespring.players = org.corespring.players || {};
 
   var rootListener = null;
-  var eventName = function() { return window.addEventListener ? "message" : "onmessage";};
-  var addEventFunctionName = function(){ return window.addEventListener ? "addEventListener" : "attachEvent"; };
+  var eventName = function () {
+    return window.addEventListener ? "message" : "onmessage";
+  };
+  var addEventFunctionName = function () {
+    return window.addEventListener ? "addEventListener" : "attachEvent";
+  };
 
   /** A cache of existing player listeners - gets overrwritten when a new ItemPlayer is instantiated */
   var playerListeners = [];
@@ -50,11 +54,10 @@ console.log("external player");
   var isValidMode = function (m) {
     if (!m) return false;
 
-    return ["preview", "administer", "render", "aggregate"].indexOf(m) !== -1;
+    return ["gather", "view", "evaluate"].indexOf(m) !== -1;
   };
 
   var renderPlayer = function (e, options) {
-    var resourceType = options.mode == "gather" ? "item" : "session";
     var id = options.mode === "gather" ? options.itemId : options.sessionId;
     var path = options.mode === "gather" ? options.itemPath : options.sessionPath;
     var url = (options.corespringUrl + path).replace(":id", id);
@@ -86,16 +89,13 @@ console.log("external player");
   var validateOptions = function (options) {
 
     var out = [];
-    if (!options.mode) {
-      out.push("No mode");
-    }
 
     if (!options.itemId && options.mode === "gather") {
-      out.push("No itemId");
+      out.push(errors.NO_ITEM_ID);
     }
 
     if (!options.sessionId && options.mode !== "gather") {
-      out.push("No sessionId");
+      out.push(errors.NO_SESSION_ID);
     }
 
     return out;
@@ -123,13 +123,16 @@ console.log("external player");
     });
   };
 
-  org.corespring.players.ItemPlayer = function (elementSelector, options) {
+  org.corespring.players.ItemPlayer = function (elementSelector, options, errorCallback) {
 
-    playerListeners = [];
+    errorCallback = errorCallback || function (error) {
+      throw "error occurred, code: " + error.code + ", message: " + error.message;
+    };
 
+    clearPlayerListeners();
 
     var defaultOptions = {
-      corespringUrl : "http://localhost:9000",
+      corespringUrl: "http://localhost:9000",
       itemPath: "/client/item/:id/player",
       sessionPath: "/client/player/:id/index.html",
       mode: "gather"
@@ -141,7 +144,7 @@ console.log("external player");
 
     if (result.length > 0) {
       for (var i = 0; i < result.length; i++) {
-        logError(result[i]);
+        errorCallback(result[i]);
       }
       return;
     }
@@ -175,7 +178,11 @@ console.log("external player");
 
     /* API methods */
     this.setMode = function (mode) {
-      postMessage("setMode", {mode: mode});
+      if (isValidMode(mode)) {
+        postMessage("setMode", {mode: mode});
+      } else {
+        errorCallback(errors.INVALID_MODE);
+      }
     };
 
     this.saveResponses = function (isAttempt) {
@@ -224,6 +231,12 @@ console.log("external player");
     };
 
     renderPlayer($(elementSelector), options);
+  };
+
+  var errors = {
+    INVALID_MODE: {code: 101, message: "setMode was called with an invalid mode"},
+    NO_ITEM_ID: {code: 102, message: "itemId is missing from options"},
+    NO_SESSION_ID: {code: 103, message: "sessionId is missing from options"}
   };
 
 })(this);
