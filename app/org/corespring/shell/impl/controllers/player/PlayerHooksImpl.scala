@@ -47,7 +47,7 @@ trait PlayerHooksImpl extends PlayerHooks {
         "isFinished" -> JsBoolean(false)
       )
 
-      val session = Json.obj("settings" -> settings, "itemId" -> JsString(itemId))
+      val session = Json.obj("settings" -> settings, "itemId" -> JsString(itemId), "attempts" -> JsNumber(0))
 
       sessionService.create(session).map{ oid =>
         block(SessionIdRequest(oid.toString, request))

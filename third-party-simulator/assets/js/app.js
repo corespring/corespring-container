@@ -40,8 +40,8 @@ angular.module("simulator").controller('Root', ['$scope', '$log', function($scop
     $("#player-holder").html('');
   };
 
-  $scope.save = function(){
-    $scope.player.saveResponses(false);
+  $scope.save = function(isAttempt){
+    $scope.player.saveResponses(isAttempt);
   };
 
   $scope.submit = function(){
@@ -50,5 +50,15 @@ angular.module("simulator").controller('Root', ['$scope', '$log', function($scop
     //$scope.player.completeResponse();
     $scope.player.setMode("view");
   };
+
+  $scope.updateAttemptCount = function(){
+    $scope.player.countAttempts(function(result){
+      $log.debug("result: ", result);
+
+      $scope.$apply(function(){
+        $scope.attemptCount = result;
+      });
+    });
+  }
 
 }]);

@@ -71,7 +71,7 @@ console.log("external player");
     addPlayerListener(function (event) {
       try {
         var dataString = event.data;
-        var data = JSON.parse(dataString);
+        var data = typeof(event.data) == "string" ? JSON.parse(event.data) : event.data;
         if (data.message == message) {
           callback(dataProcessor(data));
         }

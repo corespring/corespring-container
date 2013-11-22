@@ -28,8 +28,12 @@ block content
         label.control-label.col-sm-2 Session Id 
         .col-sm-10
           .form-control {{sessionId}}
-
-
+      .form-group
+        label.control-label.col-sm-2 Attempt Count 
+        .col-sm-10
+          | {{attemptCount}}
+          | &nbsp;
+          button.btn.btn-default(ng-click="updateAttemptCount()") Update
 
     hr/
 
@@ -41,10 +45,8 @@ block content
     .player(ng-show="player")    
       #player-holder(style="height: 100%;")
       .btn.btn-default( type="button", ng-click="submit()") Submit 
-      .btn.btn-default( type="button", ng-click="save()") Save 
-
-
-
+      .btn.btn-default( type="button", ng-click="save(true)") Save (as attempt) 
+      .btn.btn-default( type="button", ng-click="save(false)") Save 
 
 block scripts
   script(src="/components/jquery/jquery.min.js")

@@ -50,8 +50,19 @@ trait Session extends Controller with ItemPruner {
   def saveSession(id:String) = builder.save(id) {
     request : SaveSessionRequest[AnyContent] =>
       request.body.asJson.map{
-        componentsJson =>
-          val update = request.itemSession.as[JsObject] ++ componentsJson.as[JsObject]
+        requestJson =>
+
+          val isAttempt : Boolean = (requestJson \ "isAttempt").asOpt[Boolean].getOrElse(false)
+
+          val attemptUpdate = if(isAttempt){
+            val currentCount = (request.itemSession \ "attempts").asOpt[Int].getOrElse(0)
+            Json.obj("attempts" -> JsNumber(currentCount + 1))
+          } else Json.obj()
+
+          val update = request.itemSession.as[JsObject]  ++
+            Json.obj("components" -> requestJson \ "components") ++
+            attemptUpdate
+
           request.saveSession(id, update).map{
             savedSession =>
               Ok(savedSession)

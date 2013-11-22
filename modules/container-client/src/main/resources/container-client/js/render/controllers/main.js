@@ -11,16 +11,19 @@ var controller = function ($scope, $log, ComponentRegister, PlayerServices) {
     }, $scope.onSessionSaved, $scope.onSessionSaveError);
   };
 
-  $scope.save = function () {
-    PlayerServices.saveSession({
-      components: ComponentRegister.getComponentSessions()
-    }, $scope.onSessionSaved, $scope.onSessionSaveError);
+  $scope.save = function (isAttempt) {
+    PlayerServices.saveSession(
+      {
+        isAttempt: isAttempt, 
+        components: ComponentRegister.getComponentSessions()
+      }, 
+      $scope.onSessionSaved, 
+      $scope.onSessionSaveError);
   };
 
-  $scope.onSessionSaved = function (data) {
-    $scope.rootModel.session = data.session;
-    $scope.outcome = data.outcome;
-    $scope.responses = data.responses;
+  $scope.onSessionSaved = function (session) {
+    $scope.rootModel.session = session;
+    $scope.session = session;
   };
 
   $scope.updateSession = function (data) {
@@ -40,7 +43,7 @@ var controller = function ($scope, $log, ComponentRegister, PlayerServices) {
     $log.warn("Error saving session");
   };
 
-  $scope.onSessionLoaded = function (data) {
+  $scope.onEverythingLoaded = function (data) {
     $scope.rootModel = data;
     $scope.session = data.session;
     $scope.outcome = data.outcome;
@@ -49,11 +52,15 @@ var controller = function ($scope, $log, ComponentRegister, PlayerServices) {
   };
 
   $scope.$on('begin', function(){
-    PlayerServices.loadSession($scope.onSessionLoaded, $scope.onSessionLoadError);
+    PlayerServices.loadSession($scope.onEverythingLoaded, $scope.onSessionLoadError);
   });
 
-  $scope.$on('saveResponses', function(){
-    $scope.save();
+  $scope.$on('saveResponses', function(event, data){
+    $scope.save(data.isAttempt);
+  });
+
+  $scope.$on('countAttempts', function(event, data, callback){
+    callback({ count : $scope.session.attempts });
   });
 
 };
