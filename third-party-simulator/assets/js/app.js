@@ -62,13 +62,17 @@ angular.module("simulator").controller('Root', ['$scope', '$log', function($scop
   };
 
   $scope.getScore = function(){
-    $scope.player.getScore(null, function(outcome){
+    $scope.player.getScore(percent, function(outcome){
       $log.debug("get score: ", outcome);
 
       $scope.$apply(function(){
         $scope.score = outcome;
       });
     });
+  };
+
+  $scope.complete = function(){
+    $scope.player.completeResponse();
   };
 
 }]);

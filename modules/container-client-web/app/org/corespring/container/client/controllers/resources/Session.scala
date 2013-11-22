@@ -70,6 +70,15 @@ trait Session extends Controller with ItemPruner {
       }.getOrElse(BadRequest("No session in the request body"))
   }
 
+  def completeResponse(id: String) = builder.save(id) {
+    request: SaveSessionRequest[AnyContent] =>
+      val sessionJson = request.itemSession.as[JsObject] ++ Json.obj("isComplete" -> JsBoolean(true))
+      request.saveSession(id, sessionJson).map {
+        savedSession =>
+          Ok(savedSession)
+      }.getOrElse(BadRequest("Error completing"))
+  }
+
 
   /**
    * Ok(request.sessionJson)

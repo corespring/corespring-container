@@ -22,7 +22,8 @@ trait PlayerHooks extends BaseHooks[ClientHooksActionBuilder[AnyContent]] {
       Session.loadEverything(sessionId),
       Session.submitSession(sessionId),
       Session.saveSession(sessionId),
-      Item.getScore(itemId)
+      Item.getScore(itemId),
+      Session.completeResponse(sessionId)
     )
 
     Ok(jsServices).as("text/javascript")

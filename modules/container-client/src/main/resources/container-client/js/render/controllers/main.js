@@ -31,6 +31,17 @@ var controller = function ($scope, $log, ComponentRegister, PlayerServices) {
       );
   };
 
+  $scope.completeResponse = function(){
+    PlayerServices.completeResponse(
+      function(){
+        $log.debug("ok")
+      },
+      function(err){
+        $log.error(err);
+      }
+    );
+  };
+
   $scope.onSessionSaved = function (session) {
     $scope.rootModel.session = session;
     $scope.session = session;
@@ -79,6 +90,10 @@ var controller = function ($scope, $log, ComponentRegister, PlayerServices) {
       callback({ score: outcome.summary.percentage} );
     };
     $scope.getScore(onScoreReceived);
+  });
+
+  $scope.$on('completeResponse', function(){
+    $scope.completeResponse();
   });
 
 };

@@ -12,6 +12,7 @@ GET        /session/:sessionId/player              @org.corespring.container.cli
 GET        /session/everything/:id.json            @org.corespring.container.client.controllers.resources.Session.loadEverything(id:String)
 PUT        /session/submit-answers/:id.json        @org.corespring.container.client.controllers.resources.Session.submitSession(id:String)
 PUT        /session/save/:id.json                  @org.corespring.container.client.controllers.resources.Session.saveSession(id:String)
+PUT        /session/complete/:id.json                  @org.corespring.container.client.controllers.resources.Session.completeResponse(id:String)
 
 PUT        /item/score/:id.json                    @org.corespring.container.client.controllers.resources.Item.getScore(id:String)
 GET        /item/:itemId.json                      @org.corespring.container.client.controllers.resources.Item.load(itemId:String)

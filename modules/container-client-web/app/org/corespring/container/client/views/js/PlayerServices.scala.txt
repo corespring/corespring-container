@@ -1,14 +1,15 @@
-@(namespace : String, loadSession : Call, submitSession:Call, saveSession: Call, getScore: Call)
+@(namespace : String, loadSession : Call, submitSession:Call, saveSession: Call, getScore: Call, completeResponse:Call)
 
 angular.module('@namespace', []);
 
 angular.module('@namespace').factory('PlayerServices', ['$http', function($http){
 
-  var callWithData = function(method, url){
+  var _call = function(method, url, data){
 
-    return function(session, onSuccess, onFailure){
+    return function(onSuccess, onFailure){
 
-      $http[method](url, session)
+      var args = data ? [url, data] : [url];
+      $http[method].call(null, args)
        .success(
          function(data, status, headers, config) {
            onSuccess(data)
@@ -22,24 +23,26 @@ angular.module('@namespace').factory('PlayerServices', ['$http', function($http)
          }
        );
     };
+  };
+
+  var callWithData = function(method, url){
+    return function(data, onSuccess, onFailure){
+      _call(method, url, data)(onSuccess, onFailure);
+    };
+ };
+
+ var callWithNoData = function(method, url){
+  return function(onSuccess, onFailure){
+    _call(method, url, null)(onSuccess, onFailure);
+  }
  };
 
 var def = {
     submitSession: callWithData('@submitSession.method.toLowerCase', '@submitSession.url'),
     saveSession: callWithData('@saveSession.method.toLowerCase', '@saveSession.url'),
     getScore: callWithData('@getScore.method.toLowerCase', '@getScore.url'),
-    loadSession: function(onSuccess, onFailure) {
-      $http['@loadSession.method.toLowerCase']('@loadSession.url')
-        .success(function(data, status, headers, config){
-          console.log("[player-services] load session successful");
-          onSuccess(data);
-        })
-        .error(function(data, status, headers, config){
-          if(onFailure){
-            onFailure(data);
-          }
-        })
-    }
+    completeResponse: callWithNoData('@completeResponse.method.toLowerCase', '@completeResponse.url'),
+    loadSession: callWithNoData('@loadSession.method.toLowerCase', '@loadSession.url')
   }
   return def
 }]);

@@ -40,6 +40,12 @@ block content
           | {{score}}
           | &nbsp;
           button.btn.btn-default(ng-click="getScore()") Update
+      .form-group
+        label.control-label.col-sm-2 Is Complete 
+        .col-sm-10
+          | {{isComplete}}
+          | &nbsp;
+          button.btn.btn-default(ng-click="isComplete()") Update
 
     hr/
 
@@ -53,6 +59,7 @@ block content
       .btn.btn-default( type="button", ng-click="submit()") Submit 
       .btn.btn-default( type="button", ng-click="save(true)") Save (as attempt) 
       .btn.btn-default( type="button", ng-click="save(false)") Save 
+      .btn.btn-default( type="button", ng-click="complete()") Complete 
 
 block scripts
   script(src="/components/jquery/jquery.min.js")
