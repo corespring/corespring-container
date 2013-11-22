@@ -13,7 +13,7 @@ console.log("external player");
   /** A cache of existing player listeners - gets overrwritten when a new ItemPlayer is instantiated */
   var playerListeners = [];
 
-  var logError = function(error) {
+  var logError = function (error) {
     console.error(error);
   };
 
@@ -64,11 +64,11 @@ console.log("external player");
 
   };
 
-  var expectResult = function(message, callback, dataProcessor) {
-    dataProcessor = dataProcessor || (function(data) {
+  var expectResult = function (message, callback, dataProcessor) {
+    dataProcessor = dataProcessor || (function (data) {
       return data;
     });
-    addPlayerListener(function(event) {
+    addPlayerListener(function (event) {
       try {
         var dataString = event.data;
         var data = JSON.parse(dataString);
@@ -77,24 +77,24 @@ console.log("external player");
         }
       }
       catch (e) {
-        logError("Exception in ItemPlayer.addSessionListener: "+e);
+        logError("Exception in ItemPlayer.addSessionListener: " + e);
       }
 
     });
   };
 
-  var validateOptions = function(options){
+  var validateOptions = function (options) {
 
     var out = [];
-    if(!options.mode){
+    if (!options.mode) {
       out.push("No mode");
     }
 
-    if(!options.itemId && options.mode === "gather"){
+    if (!options.itemId && options.mode === "gather") {
       out.push("No itemId");
     }
 
-    if(!options.sessionId && options.mode !== "gather"){
+    if (!options.sessionId && options.mode !== "gather") {
       out.push("No sessionId");
     }
 
@@ -110,7 +110,7 @@ console.log("external player");
 
     addPlayerListener(function (event) {
       try {
-        
+
         var data = typeof(event.data) == "string" ? JSON.parse(event.data) : event.data;
 
         if (data.message == message && data.session) {
@@ -118,7 +118,7 @@ console.log("external player");
         }
       }
       catch (e) {
-          logError("Exception in ItemPlayer.addSessionListener: "+e);
+        logError("Exception in ItemPlayer.addSessionListener: " + e);
       }
     });
   };
@@ -139,15 +139,15 @@ console.log("external player");
 
     var result = validateOptions(options);
 
-    if(result.length > 0){
+    if (result.length > 0) {
       for (var i = 0; i < result.length; i++) {
         logError(result[i]);
       }
       return;
     }
 
-    var postMessage = function(message, data) {
-      console.debug("Posting Message: ",message, data);
+    var postMessage = function (message, data) {
+      console.debug("Posting Message: ", message, data);
       try {
         var iframe = $(elementSelector).find('iframe')[0];
         if (!iframe) throw "iframe not found";
@@ -161,36 +161,36 @@ console.log("external player");
       }
     };
 
-    var asyncRequest = function(argObj) {
+    var asyncRequest = function (argObj) {
       postMessage(argObj.message, argObj.data);
-      var extractPropertyFromMessage = function(message) {
+      var extractPropertyFromMessage = function (message) {
         return message[argObj.property];
       };
-      expectResult(argObj.message+"Result", argObj.callback, extractPropertyFromMessage);
+      expectResult(argObj.message + "Result", argObj.callback, extractPropertyFromMessage);
     };
 
-    if (options.onSessionCreated ) {
+    if (options.onSessionCreated) {
       addSessionListener("sessionCreated", options.onSessionCreated);
     }
 
     /* API methods */
     this.setMode = function (mode) {
-      postMessage("setMode", {mode : mode});
+      postMessage("setMode", {mode: mode});
     };
 
     this.saveResponses = function (isAttempt) {
-      postMessage("saveResponses", {isAttempt : isAttempt});
+      postMessage("saveResponses", {isAttempt: isAttempt});
     };
 
-    this.completeResponse = function() {
+    this.completeResponse = function () {
       postMessage("completeResponse");
     };
 
-    this.resetItem = function() {
+    this.resetItem = function () {
       postMessage("resetItem");
     };
 
-    this.countAttempts = function(callback) {
+    this.countAttempts = function (callback) {
       asyncRequest({
         message: "countAttempts",
         property: "count",
@@ -198,7 +198,7 @@ console.log("external player");
       });
     };
 
-    this.getScore = function(format, callback) {
+    this.getScore = function (format, callback) {
       asyncRequest({
         message: "getScore",
         data: {format: format},
@@ -207,12 +207,20 @@ console.log("external player");
       });
     };
 
-    this.isComplete = function(callback) {
-      asyncRequest("isComplete", "isComplete", callback);
+    this.isComplete = function (callback) {
+      asyncRequest({
+        message: "isComplete",
+        property: "isComplete",
+        callback: callback
+      });
     };
 
-    this.getSessionStatus = function(callback) {
-      asyncRequest("getSessionStatus", "sessionStatus", callback);
+    this.getSessionStatus = function (callback) {
+      asyncRequest({
+        message: "getSessionStatus",
+        property: "sessionStatus",
+        callback: callback
+      });
     };
 
     renderPlayer($(elementSelector), options);
