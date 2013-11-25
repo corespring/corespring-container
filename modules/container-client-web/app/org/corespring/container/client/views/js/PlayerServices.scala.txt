@@ -9,7 +9,7 @@ angular.module('@namespace').factory('PlayerServices', ['$http', function($http)
     return function(onSuccess, onFailure){
 
       var args = data ? [url, data] : [url];
-      $http[method].call(null, args)
+      $http[method].apply(null, args)
        .success(
          function(data, status, headers, config) {
            onSuccess(data)
