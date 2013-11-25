@@ -34,9 +34,10 @@ var controller = function ($scope, $log, ComponentRegister, PlayerServices) {
   $scope.completeResponse = function(){
     PlayerServices.completeResponse(
       function(){
-        $log.debug("ok")
+        $scope.isComplete = true;
       },
       function(err){
+        $scope.isComplete = false;
         $log.error(err);
       }
     );
@@ -72,6 +73,10 @@ var controller = function ($scope, $log, ComponentRegister, PlayerServices) {
     $scope.$emit("session-loaded", data.session);
   };
 
+  $scope.resetPreview = function(){
+    ComponentRegister.reset();
+  };
+
   $scope.$on('begin', function(){
     PlayerServices.loadSession($scope.onEverythingLoaded, $scope.onSessionLoadError);
   });
@@ -94,6 +99,26 @@ var controller = function ($scope, $log, ComponentRegister, PlayerServices) {
 
   $scope.$on('completeResponse', function(){
     $scope.completeResponse();
+  });
+
+  $scope.$on('isComplete', function(event, data, callback){
+    callback({isComplete: $scope.isComplete || false});
+  });
+
+  $scope.$on('reset', function(){
+    $scope.$apply(function(){
+      $scope.resetPreview();
+    });
+  });
+
+  $scope.$on('getSessionStatus', function(event, data, callback){
+
+    var sessionStatus = {
+      allInteractionsHaveResponse: !ComponentRegister.hasEmptyAnswers(),
+      interactionCount: ComponentRegister.interactionCount(),
+      interactionsWithResponseCount: ComponentRegister.interactionsWithResponseCount()
+    };
+    callback({ sessionStatus : sessionStatus});
   });
 
 };

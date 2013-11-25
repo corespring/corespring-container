@@ -49,15 +49,31 @@ angular.module('corespring-player.services').factory('ComponentRegister', ['$log
     };
 
     this.hasEmptyAnswers = function() {
-      return _(this.getComponentSessions()).some(function(comp) {
-        return _.isEmpty(comp.answers);
-      });
+      return this.interactionCount() > this.interactionsWithResponseCount();
     };
 
     this.setResponses = function(responses){
       setAndApplyToComponents(responses, "responses", "setResponse");
     };
 
+    this.reset = function(){
+      $.each(components, function(id, comp){
+        if (comp.reset) {
+          comp.reset();
+        }
+      });
+    };
+
+    this.interactionCount = function(){
+      return _.keys(components).length;
+    };
+
+    this.interactionsWithResponseCount = function(){
+      var answered = _.filter(components, function(c){
+        return !c.isAnswerEmpty();
+      });
+      return answered.length;
+    };
 
     /**
      * set the value to the 'loaded' object and apply sub objects out to

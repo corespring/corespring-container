@@ -45,7 +45,13 @@ block content
         .col-sm-10
           | {{isComplete}}
           | &nbsp;
-          button.btn.btn-default(ng-click="isComplete()") Update
+          button.btn.btn-default(ng-click="updateIsComplete()") Update
+      .form-group
+        label.control-label.col-sm-2 Session status 
+        .col-sm-10
+          | {{sessionStatus}}
+          | &nbsp;
+          button.btn.btn-default(ng-click="updateSessionStatus()") Update
 
     hr/
 
@@ -60,6 +66,7 @@ block content
       .btn.btn-default( type="button", ng-click="save(true)") Save (as attempt) 
       .btn.btn-default( type="button", ng-click="save(false)") Save 
       .btn.btn-default( type="button", ng-click="complete()") Complete 
+      .btn.btn-default( type="button", ng-click="reset()") Reset 
 
 block scripts
   script(src="/components/jquery/jquery.min.js")

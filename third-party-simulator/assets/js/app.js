@@ -75,4 +75,25 @@ angular.module("simulator").controller('Root', ['$scope', '$log', function($scop
     $scope.player.completeResponse();
   };
 
+  $scope.updateIsComplete = function(){
+    $scope.player.isComplete(function(isComplete){
+      $scope.$apply(function(){
+        $scope.isComplete = isComplete;
+      });
+
+    });
+  };
+
+  $scope.reset = function(){
+    $scope.player.reset();
+  };
+
+  $scope.updateSessionStatus = function(){
+    $scope.player.getSessionStatus(function(status){
+        $scope.$apply(function(){
+          $scope.sessionStatus = status;
+        });
+    });
+  };
+
 }]);

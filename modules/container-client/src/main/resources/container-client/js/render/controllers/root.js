@@ -10,7 +10,7 @@ var controller = function ($scope, $log, $timeout, MessageBridge) {
   };
 
   MessageBridge.addMessageListener($scope.messageBridgeListener);
-  MessageBridge.sendMessage('parent', 'ready', true);
+  MessageBridge.sendMessage('parent', {message: 'ready'}, true);
 
   $timeout( function(){
     $scope.$broadcast('begin');

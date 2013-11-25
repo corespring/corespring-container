@@ -34,16 +34,18 @@ var controller = function ($scope, ComponentRegister, PlayerServices) {
 
 
   $scope.resetPreview = function(){
-    for(var x in $scope.responses ){
+
+    ComponentRegister.reset();
+
+    /*for(var x in $scope.responses ){
         $scope.responses[x] = {};
     }
-    $scope.session.isFinished = false;
     $scope.session.remainingAttempts = $scope.session.settings.maxNoOfAttempts;
     PlayerServices.updateSessionSettings($scope.session.settings);
     $scope.outcome = null;
     if($scope.rootModel){
       $scope.rootModel.session = {};
-    }
+    }*/
 
     /*for(var key in $scope.rootModel.session.components){
 
@@ -53,6 +55,7 @@ var controller = function ($scope, ComponentRegister, PlayerServices) {
       }
     }*/
 
+    $scope.session.isFinished = false;
     ComponentRegister.setGlobalSession($scope.session);
   };
 

@@ -230,6 +230,18 @@ console.log("external player");
       });
     };
 
+    this.isComplete = function(callback){
+      asyncRequest({
+        message: "isComplete",
+        property: "isComplete",
+        callback: callback
+      });
+    };
+
+    this.reset = function(){
+      postMessage("reset");
+    };
+
     renderPlayer($(elementSelector), options);
   };
 
