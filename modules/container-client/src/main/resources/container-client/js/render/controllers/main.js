@@ -1,5 +1,11 @@
 var controller = function ($scope, $log, ComponentRegister, PlayerServices) {
 
+  $scope.onAnswerChanged = function(){
+    $scope.$emit("inputReceived", {sessionStatus: getSessionStatus()});
+  };
+
+  ComponentRegister.setAnswerChangedHandler($scope.onAnswerChanged);
+
   $scope.canSubmit = function() {
     if (!$scope.session || !$scope.session.settings) return false;
     return $scope.session.settings.allowEmptyResponses || !ComponentRegister.hasEmptyAnswers();
@@ -71,10 +77,19 @@ var controller = function ($scope, $log, ComponentRegister, PlayerServices) {
     $scope.outcome = data.outcome;
     $scope.responses = data.responses;
     $scope.$emit("session-loaded", data.session);
+
   };
 
   $scope.resetPreview = function(){
     ComponentRegister.reset();
+  };
+
+  var getSessionStatus = function(){
+    return {
+      allInteractionsHaveResponse: !ComponentRegister.hasEmptyAnswers(),
+      interactionCount: ComponentRegister.interactionCount(),
+      interactionsWithResponseCount: ComponentRegister.interactionsWithResponseCount()
+    };
   };
 
   $scope.$on('begin', function(){
@@ -112,13 +127,7 @@ var controller = function ($scope, $log, ComponentRegister, PlayerServices) {
   });
 
   $scope.$on('getSessionStatus', function(event, data, callback){
-
-    var sessionStatus = {
-      allInteractionsHaveResponse: !ComponentRegister.hasEmptyAnswers(),
-      interactionCount: ComponentRegister.interactionCount(),
-      interactionsWithResponseCount: ComponentRegister.interactionsWithResponseCount()
-    };
-    callback({ sessionStatus : sessionStatus});
+    callback({ sessionStatus : getSessionStatus()});
   });
 
 };

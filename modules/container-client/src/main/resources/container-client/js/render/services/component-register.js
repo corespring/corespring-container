@@ -5,10 +5,20 @@ angular.module('corespring-player.services').factory('ComponentRegister', ['$log
     var loaded = {};
 
     var components = {};
+    
+    var answerChangedHandler = function(){};
+
+    this.setAnswerChangedHandler = function(cb){
+      answerChangedHandler = cb;
+    };
 
     this.registerComponent = function(id, component){
       $log.info("register component: ", id, " ", component);
       components[id] = component;
+
+      if(component.answerChangedHandler && answerChangedHandler){
+        component.answerChangedHandler(answerChangedHandler);
+      }
     };
 
     this.setDataAndSession = function(allData){

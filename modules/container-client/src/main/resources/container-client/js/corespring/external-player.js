@@ -110,11 +110,25 @@ console.log("external player");
 
     addPlayerListener(function (event) {
       try {
-
         var data = typeof(event.data) == "string" ? JSON.parse(event.data) : event.data;
 
         if (data.message == message && data.session) {
           callback(dataHandler(data.session));
+        }
+      }
+      catch (e) {
+        logError("Exception in ItemPlayer.addSessionListener: " + e);
+      }
+    });
+  };
+
+  var addInputReceivedListener = function(callback){
+    addPlayerListener(function (event) {
+      try {
+        var data = typeof(event.data) == "string" ? JSON.parse(event.data) : event.data;
+
+        if (data.message == "inputReceived" && data.sessionStatus) {
+          callback(data.sessionStatus);
         }
       }
       catch (e) {
@@ -174,6 +188,10 @@ console.log("external player");
 
     if (options.onSessionCreated) {
       addSessionListener("sessionCreated", options.onSessionCreated);
+    }
+
+    if(options.onInputReceived){
+      addInputReceivedListener(options.onInputReceived);
     }
 
     /* API methods */

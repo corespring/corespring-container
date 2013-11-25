@@ -22,10 +22,18 @@ angular.module("simulator").controller('Root', ['$scope', '$log', function($scop
     });
   };
 
+  $scope.onInputReceived = function(sessionStatus){
+    $log.debug("on input received: ", sessionStatus );
+    $scope.$apply(function(){
+      $scope.sessionStatus = sessionStatus;
+    });
+  };
+
   $scope.add = function() { 
     var options = {
       mode: $scope.mode,
-      onSessionCreated : $scope.onSessionCreated
+      onSessionCreated : $scope.onSessionCreated,
+      onInputReceived: $scope.onInputReceived
     };
 
     var idName = $scope.mode === "gather" ? "itemId" : "sessionId";
