@@ -85,6 +85,25 @@ angular.module('corespring-player.services').factory('ComponentRegister', ['$log
       return answered.length;
     };
 
+    this.setEditable = function(editable){
+      $.each(components, function(id, c){
+
+        if(!c.editable){
+          throw "editable isn't supported";
+        }
+        
+        c.editable(editable);
+      });
+    };
+
+    this.setMode = function(mode){
+      $.each(components, function(id, c){
+        if(c.setMode){
+          c.setMode(mode);
+        }
+      });
+    }
+
     /**
      * set the value to the 'loaded' object and apply sub objects out to
      * the respective components using their uid.

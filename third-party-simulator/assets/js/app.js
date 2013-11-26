@@ -13,6 +13,12 @@ angular.module("simulator").controller('Root', ['$scope', '$log', function($scop
     return $scope.mode === "gather" ? "Item Id" : "Session Id";   
   };
 
+  $scope.$watch('mode', function(newMode){
+    if($scope.player){
+      $scope.player.setMode(newMode);
+    }
+  });
+
   $scope.onSessionCreated = function(sessionId){
 
     $log.debug("session created: ", sessionId);
@@ -26,7 +32,7 @@ angular.module("simulator").controller('Root', ['$scope', '$log', function($scop
     $log.debug("on input received: ", sessionStatus );
     $scope.$apply(function(){
       $scope.sessionStatus = sessionStatus;
-    });
+      });
   };
 
   $scope.add = function() { 

@@ -39,13 +39,6 @@ angular.module('corespring-player.directives').directive('corespringPlayer', [
           rendered = true;
         };
 
-        var setGlobalSession = function(){
-          if(!$scope.session){
-            return;
-          }
-          ComponentRegister.setGlobalSession($scope.session);
-        };
-
         $scope.$on('registerComponent', function(event, id, obj){
           $log.info("registerComponent: ", id);
           ComponentRegister.registerComponent(id, obj);
@@ -76,7 +69,6 @@ angular.module('corespring-player.directives').directive('corespringPlayer', [
             $scope.session = {};
           }
           setDataAndSession();
-          setGlobalSession();
         }, true);
 
         $scope.$watch('responses', function(r){

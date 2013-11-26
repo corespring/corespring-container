@@ -77,7 +77,6 @@ var controller = function ($scope, $log, ComponentRegister, PlayerServices) {
     $scope.outcome = data.outcome;
     $scope.responses = data.responses;
     $scope.$emit("session-loaded", data.session);
-
   };
 
   $scope.resetPreview = function(){
@@ -128,6 +127,16 @@ var controller = function ($scope, $log, ComponentRegister, PlayerServices) {
 
   $scope.$on('getSessionStatus', function(event, data, callback){
     callback({ sessionStatus : getSessionStatus()});
+  });
+
+  $scope.$on('editable', function(event, data){
+    ComponentRegister.setEditable(data.editable);
+  });
+
+  $scope.$on('setMode', function(event, data){
+    var editable = (data.mode == 'gather');
+    ComponentRegister.setEditable(editable);
+    ComponentRegister.setMode(data.mode);
   });
 
 };
