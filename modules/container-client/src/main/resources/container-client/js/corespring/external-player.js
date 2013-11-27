@@ -197,7 +197,8 @@ console.log("external player");
     /* API methods */
     this.setMode = function (mode) {
       if (isValidMode(mode)) {
-        postMessage("setMode", {mode: mode});
+        var modeOptions = options[mode] || {};
+        postMessage("setMode", {mode: mode, options: modeOptions});
       } else {
         errorCallback(errors.INVALID_MODE);
       }

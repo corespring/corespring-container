@@ -39,7 +39,16 @@ angular.module("simulator").controller('Root', ['$scope', '$log', function($scop
     var options = {
       mode: $scope.mode,
       onSessionCreated : $scope.onSessionCreated,
-      onInputReceived: $scope.onInputReceived
+      onInputReceived: $scope.onInputReceived,
+      evaluate: {
+        showFeedback: true,
+        allowEmptyResponses: true,
+        highlightCorrectResponse: true,
+        highlightUserResponse: true,
+        "corespsring-drag-and-drop" : {
+          "blah" : "blah"
+        }
+      }
     };
 
     var idName = $scope.mode === "gather" ? "itemId" : "sessionId";

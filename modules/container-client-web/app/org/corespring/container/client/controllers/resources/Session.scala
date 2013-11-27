@@ -73,9 +73,9 @@ trait Session extends Controller with ItemPruner {
   def loadOutcome(id: String) = builder.loadOutcome(id) {
     request: SessionOutcomeRequest[AnyContent] =>
       val options = request.body.asJson.getOrElse(Json.obj())
-      val outcome = outcomeProcessor.createOutcome(request.item, request.itemSession \ "components", options)
+      val outcome = outcomeProcessor.createOutcome(request.item, request.itemSession, options)
       val score = scoreProcessor.score(request.item, request.itemSession, outcome)
-      Ok(Json.obj("score" -> outcome) ++ Json.obj("score" -> score))
+      Ok(Json.obj("outcome" -> outcome) ++ Json.obj("score" -> score))
   }
 
   def completeSession(id: String) = builder.save(id) {
