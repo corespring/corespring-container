@@ -2,11 +2,11 @@ package org.corespring.container.components.outcome
 
 import play.api.libs.json.{JsValue, JsObject, JsNumber, Json}
 
-object DefaultOutcomeProcessor extends OutcomeProcessor {
+object DefaultScoreProcessor extends ScoreProcessor {
 
   private def decimalize(v: BigDecimal, scale: Int = 2): Double =  v.setScale(scale, BigDecimal.RoundingMode.HALF_UP).toDouble
 
-  def outcome(item: JsValue, session : JsValue, responses: JsValue): JsValue = {
+  def score(item: JsValue, session : JsValue, responses: JsValue): JsValue = {
 
     val components = (item \ "components").as[JsObject]
 

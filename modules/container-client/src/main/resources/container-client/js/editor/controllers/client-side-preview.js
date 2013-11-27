@@ -42,7 +42,7 @@ var controller = function ($scope, ComponentRegister, PlayerServices) {
     }
     $scope.session.remainingAttempts = $scope.session.settings.maxNoOfAttempts;
     PlayerServices.updateSessionSettings($scope.session.settings);
-    $scope.outcome = null;
+    $scope.score = null;
     if($scope.rootModel){
       $scope.rootModel.session = {};
     }*/

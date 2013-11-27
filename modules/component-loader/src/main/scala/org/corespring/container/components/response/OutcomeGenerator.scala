@@ -3,7 +3,7 @@ package org.corespring.container.components.response
 import org.corespring.container.js.ComponentServerLogic
 import org.corespring.container.components.model.Library
 
-class ResponseGenerator(override val componentType : String, definition: String, libraries : Seq[Library]) extends ComponentServerLogic {
+class OutcomeGenerator(override val componentType : String, definition: String, libraries : Seq[Library]) extends ComponentServerLogic {
 
   override def js: String = definition
 

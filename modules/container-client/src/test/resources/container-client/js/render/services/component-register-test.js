@@ -43,7 +43,7 @@ describe('component-register', function(){
     }
   };
 
-  it('should setResponses', setValue("setResponses", "response") );
+  it('should setOutcomes', setValue("setOutcomes", "response") );
 
 
   it('should setDataAndSession', setValue("setDataAndSession", "dataAndSession") );

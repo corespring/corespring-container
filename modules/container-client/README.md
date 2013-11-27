@@ -72,7 +72,7 @@ Scoring Override js Impl - from Client side Player Services.js
           //s.src = 'data:text/javascript,' + encodeURIComponent('alert("lorem ipsum")')
           //document.body.appendChild(s);
         //TODO: Load item
-        out.outcome = corespring.server.itemOverride().process({}, answers.answers);
+        out.score = corespring.server.itemOverride().process({}, answers.answers);
       }
       */
 

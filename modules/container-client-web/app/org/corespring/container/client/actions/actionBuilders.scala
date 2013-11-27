@@ -28,6 +28,7 @@ trait ItemActionBuilder[A] {
 trait SessionActionBuilder[A]{
   def loadEverything(id:String)(block: FullSessionRequest[A] => Result) : Action[AnyContent]
   def load(id:String)(block: FullSessionRequest[A] => Result) : Action[AnyContent]
+  def loadOutcome(id:String)(block: SessionOutcomeRequest[A] => Result) : Action[AnyContent]
 
   /**
    * Load the item and the session return these to the `block` in a SubmitAnswersRequest

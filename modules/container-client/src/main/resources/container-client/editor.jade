@@ -114,8 +114,8 @@ block content
           label
             | Attempts left: {{session.remainingAttempts !== undefined ? session.remainingAttempts : session.maxNoOfAttempts}}
         hr
-        #outcome(ng-show="outcome")
-          h4 You scored: {{outcome.summary.percentage}}%
+        #score(ng-show="score")
+          h4 You scored: {{score.summary.percentage}}%
 
 block scripts
 

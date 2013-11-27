@@ -4,7 +4,7 @@ import org.corespring.container.components.model.{UiComponent, Server, Client}
 import org.specs2.mutable.Specification
 import play.api.libs.json.Json
 
-class ResponseProcessorImplTest extends Specification{
+class OutcomeProcessorImplTest extends Specification{
 
   val respondJs =
   """
@@ -14,7 +14,7 @@ class ResponseProcessorImplTest extends Specification{
     |}
   """.stripMargin
 
-  "ResponseProcessor" should {
+  "OutcomeProcessor" should {
     "respond" in {
 
       val component = UiComponent(
@@ -30,7 +30,7 @@ class ResponseProcessorImplTest extends Specification{
       )
 
 
-      val processor = new ResponseProcessorImpl(Seq(component), Seq.empty)
+      val processor = new OutcomeProcessorImpl(Seq(component), Seq.empty)
 
       val item = Json.obj(
         "components" -> Json.obj(
@@ -52,7 +52,7 @@ class ResponseProcessorImplTest extends Specification{
         )
       )
 
-      val result = processor.respond(item, session)
+      val result = processor.createOutcome(item, session, Json.obj())
 
       (result \ "1" \ "correctness").as[String] === "incorrect"
 

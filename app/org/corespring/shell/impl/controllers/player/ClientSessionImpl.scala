@@ -1,11 +1,10 @@
 package org.corespring.shell.impl.controllers.player
 
-import org.corespring.container.client.actions.{SaveSessionRequest, SubmitSessionRequest, FullSessionRequest, SessionActionBuilder}
+import org.corespring.container.client.actions._
+import org.corespring.container.client.controllers.resources.Session
 import org.corespring.shell.impl.services.MongoService
-import play.api.Logger
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Request, Action, Result, AnyContent}
-import org.corespring.container.client.controllers.resources.Session
 
 trait ClientSessionImpl extends Session {
 
@@ -73,6 +72,20 @@ trait ClientSessionImpl extends Session {
         }.getOrElse(BadRequest("??"))
     }
 
+    def loadOutcome(id: String)(block: (SessionOutcomeRequest[AnyContent]) => Result): Action[AnyContent] = Action {
+      request =>
+        val result = for {
+          session <- sessionService.load(id)
+          itemId <- (session \ "itemId").asOpt[String]
+          item <- itemService.load(itemId)
+        } yield {
+          SessionOutcomeRequest(item, session, request)
+        }
+
+        result.map{ r =>
+          block(r)
+        }.getOrElse(BadRequest("Error loading outcome"))
+    }
   }
 
 

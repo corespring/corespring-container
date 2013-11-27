@@ -17,14 +17,33 @@ var controller = function ($scope, $log, ComponentRegister, PlayerServices) {
     }, $scope.onSessionSaved, $scope.onSessionSaveError);
   };
 
-  $scope.save = function (isAttempt) {
+  $scope.save = function (isAttempt, cb) {
     PlayerServices.saveSession(
       {
         isAttempt: isAttempt, 
         components: ComponentRegister.getComponentSessions()
       }, 
-      $scope.onSessionSaved, 
+      function(s){ 
+        $scope.onSessionSaved(s); 
+        if(cb){
+          cb(s);
+        }
+      }, 
       $scope.onSessionSaveError);
+  };
+
+  $scope.loadOutcome = function (cb){
+    //TODO - need to fetch the player options
+    //Passed in to the launcher
+    PlayerServices.loadOutcome({
+      options: {}
+    }, 
+    cb 
+    );
+  };
+  
+  $scope.loadOutcomeError = function(err){
+    $log.error(err); 
   };
 
   $scope.getScore = function(onSuccess, onError){
@@ -49,17 +68,18 @@ var controller = function ($scope, $log, ComponentRegister, PlayerServices) {
     );
   };
 
-  $scope.onSessionSaved = function (session) {
-    $scope.rootModel.session = session;
-    $scope.session = session;
+  $scope.onSessionSaved = function (data) {
+    $scope.session = data.session;
+    $scope.outcome = data.outcome;
+    $scope.score = data.score;
   };
 
   $scope.updateSession = function (data) {
     if (!$scope.model || !$scope.model.session) {
       return;
     }
-    $scope.rootModel.session.remainingAttempts = data.session.remainingAttempts;
-    $scope.rootModel.session.isFinished = data.session.isFinished;
+    $scope.session.remainingAttempts = data.session.remainingAttempts;
+    $scope.session.isFinished = data.session.isFinished;
     $scope.$broadcast('session-finished', $scope.model.session.isFinished);
   };
 
@@ -73,9 +93,10 @@ var controller = function ($scope, $log, ComponentRegister, PlayerServices) {
 
   $scope.onEverythingLoaded = function (data) {
     $scope.rootModel = data;
+    $scope.item = data.item;
     $scope.session = data.session;
     $scope.outcome = data.outcome;
-    $scope.responses = data.responses;
+    $scope.score = data.score;
     $scope.$emit("session-loaded", data.session);
   };
 
@@ -137,6 +158,12 @@ var controller = function ($scope, $log, ComponentRegister, PlayerServices) {
     var editable = (data.mode == 'gather');
     ComponentRegister.setEditable(editable);
     ComponentRegister.setMode(data.mode);
+
+    $scope.save(false, function(){
+      $scope.loadOutcome(function(){
+        $log.debug("score received");
+      });
+    });
   });
 
 };

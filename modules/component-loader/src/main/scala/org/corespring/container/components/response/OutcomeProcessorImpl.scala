@@ -4,13 +4,11 @@ import org.corespring.container.components.model.{Library, UiComponent}
 import org.slf4j.LoggerFactory
 import play.api.libs.json.{JsObject, JsValue}
 
-class ResponseProcessorImpl(components: Seq[UiComponent], libraries : Seq[Library]) extends ResponseProcessor {
+class OutcomeProcessorImpl(components: Seq[UiComponent], libraries : Seq[Library]) extends OutcomeProcessor {
 
-  private lazy val logger = LoggerFactory.getLogger("components.response")
+  private lazy val logger = LoggerFactory.getLogger("components.outcome")
 
-  def respond(item: JsValue, session: JsValue): JsValue = respond(item, session \ "components", session \ "settings")
-
-  def respond(item: JsValue, answers: JsValue, settings: JsValue): JsValue = {
+  def createOutcome(item: JsValue, answers: JsValue, settings: JsValue): JsValue = {
 
     val componentQuestions = (item \ "components").as[JsObject]
 
@@ -28,8 +26,8 @@ class ResponseProcessorImpl(components: Seq[UiComponent], libraries : Seq[Librar
             answer.map {
               a =>
                 val componentLibraries : Seq[Library] = component.libraries.map( id => libraries.find(l => l.id.matches(id) )).flatten
-                val generator = new ResponseGenerator(component.componentType, component.server.definition, componentLibraries)
-                (id, generator.respond(question, a, settings))
+                val generator = new OutcomeGenerator(component.componentType, component.server.definition, componentLibraries)
+                (id, generator.createOutcome(question, a, settings))
             }.getOrElse {
               logger.debug(s"no answer provided for: $id")
               (id, JsObject(Seq.empty))

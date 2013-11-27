@@ -3,15 +3,15 @@ package org.corespring.container.client.controllers.resources
 import org.corespring.container.client.actions.{ScoreItemRequest, ItemActionBuilder, SaveItemRequest, ItemRequest}
 import play.api.libs.json.{JsNumber, JsBoolean, Json}
 import play.api.mvc.{AnyContent, Controller}
-import org.corespring.container.components.outcome.OutcomeProcessor
-import org.corespring.container.components.response.ResponseProcessor
+import org.corespring.container.components.outcome.ScoreProcessor
+import org.corespring.container.components.response.OutcomeProcessor
 
 trait Item extends Controller {
 
   def builder : ItemActionBuilder[AnyContent]
 
-  def outcomeProcessor: OutcomeProcessor
-  def responseProcessor : ResponseProcessor
+  def outcomeProcessor: ScoreProcessor
+  def responseProcessor : OutcomeProcessor
 
 
   def settings = Json.obj(
@@ -37,8 +37,8 @@ trait Item extends Controller {
   def getScore(id:String) = builder.getScore(id) {
     request : ScoreItemRequest[AnyContent] =>
       request.body.asJson.map{ answers =>
-        val responses = responseProcessor.respond(request.item, answers, settings)
-        val outcome = outcomeProcessor.outcome(request.item, Json.obj(), responses)
+        val responses = responseProcessor.createOutcome(request.item, answers, settings)
+        val outcome = outcomeProcessor.score(request.item, Json.obj(), responses)
         Ok(outcome)
       }.getOrElse(BadRequest("No Json in request body"))
   }

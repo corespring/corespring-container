@@ -3,8 +3,8 @@ package org.corespring.shell.impl
 import org.corespring.amazon.s3.ConcreteS3Service
 import org.corespring.container.client.controllers.{ComponentsFileController, Rig, Icons, Assets}
 import org.corespring.container.components.model.{Library, UiComponent, Component}
-import org.corespring.container.components.outcome.{ItemJsOutcomeProcessor, OutcomeProcessorSequence, DefaultOutcomeProcessor, OutcomeProcessor}
-import org.corespring.container.components.response.{ResponseProcessorImpl, ResponseProcessor}
+import org.corespring.container.components.outcome.{ItemJsScoreProcessor, ScoreProcessorSequence, DefaultScoreProcessor, ScoreProcessor}
+import org.corespring.container.components.response.{OutcomeProcessorImpl, OutcomeProcessor}
 import org.corespring.shell.impl.controllers.editor.{ClientItemImpl, EditorHooksImpl}
 import org.corespring.shell.impl.controllers.player.{ClientSessionImpl, PlayerHooksImpl}
 import org.corespring.shell.impl.services.MongoService
@@ -81,18 +81,18 @@ class ContainerClientImplementation(
     def itemService: MongoService = itemServiceIn
 
     //TODO: Item level scoring isn't active at the moment, once it is we'll need to add ItemJsOutcomProcessor
-    def outcomeProcessor: OutcomeProcessor = DefaultOutcomeProcessor //new OutcomeProcessorSequence(DefaultOutcomeProcessor, ItemJsOutcomeProcessor)
-    def responseProcessor: ResponseProcessor = new ResponseProcessorImpl(rootUiComponents, rootLibs)
+    def outcomeProcessor: ScoreProcessor = DefaultScoreProcessor //new OutcomeProcessorSequence(DefaultOutcomeProcessor, ItemJsOutcomeProcessor)
+    def responseProcessor: OutcomeProcessor = new OutcomeProcessorImpl(rootUiComponents, rootLibs)
   }
 
   private lazy val sessions = new ClientSessionImpl {
     def itemService: MongoService = itemServiceIn
 
-    def responseProcessor: ResponseProcessor = new ResponseProcessorImpl(rootUiComponents, rootLibs)
+    def outcomeProcessor: OutcomeProcessor = new OutcomeProcessorImpl(rootUiComponents, rootLibs)
 
     def sessionService: MongoService = sessionServiceIn
 
-    def outcomeProcessor: OutcomeProcessor = new OutcomeProcessorSequence(DefaultOutcomeProcessor, ItemJsOutcomeProcessor)
+    def scoreProcessor: ScoreProcessor = new ScoreProcessorSequence(DefaultScoreProcessor, ItemJsScoreProcessor)
 
   }
 }

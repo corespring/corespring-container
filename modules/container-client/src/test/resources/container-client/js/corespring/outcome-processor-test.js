@@ -1,5 +1,5 @@
 /** This is a port of DefaultOutcomeProcessor.scala */
-describe('outcome-processor', function(){
+describe('score-processor', function(){
 
   corespring.bootstrap(angular);
 
@@ -20,7 +20,7 @@ describe('outcome-processor', function(){
 
   });
 
-  it('should generate an outcome for two components', function(){
+  it('should generate an score for two components', function(){
     var item = {components: {"3" : {weight:4}, "4" : {weight:5} } };
     var responses = {"3" : {score:0.1}, "4" : {score:0.6} };
     var expected = {

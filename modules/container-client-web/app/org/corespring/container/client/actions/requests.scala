@@ -8,6 +8,7 @@ case class PlayerRequest[A](item: JsValue, r: Request[A], itemSession: Option[Js
 case class SessionIdRequest[A](sessionId: String, r: Request[A]) extends WrappedRequest(r)
 
 case class FullSessionRequest[A]( everything : JsValue, r: Request[A]) extends WrappedRequest(r)
+case class SessionOutcomeRequest[A]( item : JsValue, itemSession : JsValue, r : Request[A]) extends WrappedRequest(r)
 
 case class ItemRequest[A](item: JsValue, r : Request[A]) extends WrappedRequest(r)
 

@@ -7,12 +7,12 @@ import play.api.Logger
  * Run process on a seq of processers and fold the result..
  * @param processors
  */
-class OutcomeProcessorSequence(processors : OutcomeProcessor*) extends OutcomeProcessor{
-  lazy val logger = Logger("outcome.processor")
+class ScoreProcessorSequence(processors : ScoreProcessor*) extends ScoreProcessor{
+  lazy val logger = Logger("score.processor")
 
-  def outcome(item: JsValue, session : JsValue, responses: JsValue): JsValue = {
+  def score(item: JsValue, session : JsValue, responses: JsValue): JsValue = {
 
-    val outcomes = processors.map{ _.outcome(item, session, responses)}
+    val outcomes = processors.map{ _.score(item, session, responses)}
 
     outcomes.foldLeft(JsObject(Seq.empty)){ (acc: JsObject, o : JsValue) =>
       o match {

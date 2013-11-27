@@ -1,10 +1,11 @@
-package org.corespring.container.components.outcome
+package org.corespring.container.components.response
 
 import play.api.libs.json.JsValue
 
 
 trait OutcomeProcessor {
-  def outcome(item: JsValue, session:JsValue, responses: JsValue): JsValue
-}
 
+  /**  Create an score for an item given the responses and settings */
+  def createOutcome(item:JsValue, responses: JsValue, settings: JsValue ) : JsValue
+}
 

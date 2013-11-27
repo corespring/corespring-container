@@ -7,9 +7,9 @@ import org.specs2.matcher.{Expectable, Matcher}
 
 class DefaultOutcomeProcessorTest extends Specification{
 
-  "default outcome processor" should {
+  "default score processor" should {
 
-    "generate an outcome for one component" in {
+    "generate an score for one component" in {
 
       ("""{"components":{"3":{"weight":4}}}""", """{"3":{"score":1.0}}""") must GenerateOutcome("""
          {
@@ -21,7 +21,7 @@ class DefaultOutcomeProcessorTest extends Specification{
       """)
     }
 
-    "generate an outcome for two component" in {
+    "generate an score for two component" in {
 
       val item = """{
              "components": {
@@ -51,13 +51,13 @@ class DefaultOutcomeProcessorTest extends Specification{
 
     def apply[S <: (String,String)](s: Expectable[S]) = {
       result( matchesOutcome(s.value._1, s.value._2),
-        s"${s.description} generates expected outcome",
-        s"${s.description} does not generate expected outcome",
+        s"${s.description} generates expected score",
+        s"${s.description} does not generate expected score",
         s)
     }
 
     private def matchesOutcome(itemDefinition:String,responses:String) : Boolean = {
-      val outcome = DefaultOutcomeProcessor.outcome(Json.parse(itemDefinition), Json.obj(), Json.parse(responses))
+      val outcome = DefaultScoreProcessor.score(Json.parse(itemDefinition), Json.obj(), Json.parse(responses))
       JsonCompare.caseInsensitiveSubTree(Json.stringify(outcome), expectedOutcome) match{
         case Right(_) => true
         case Left(diffs) => {

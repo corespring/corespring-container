@@ -71,11 +71,11 @@ angular.module('corespring-player.directives').directive('corespringPlayer', [
           setDataAndSession();
         }, true);
 
-        $scope.$watch('responses', function(r){
+        $scope.$watch('outcomes', function(r){
           if(!r){
             return;
           }
-          ComponentRegister.setResponses(r);
+          ComponentRegister.setOutcomes(r);
         }, true);
 
     };
@@ -88,7 +88,7 @@ angular.module('corespring-player.directives').directive('corespringPlayer', [
         mode: '@playerMode',
         xhtml: '=playerMarkup',
         item: '=playerItem',
-        responses: '=playerResponses',
+        outcomes: '=playerOutcomes',
         session: '=playerSession'
       },
       template: [ '<div class="corespring-player">',

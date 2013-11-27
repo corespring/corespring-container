@@ -62,8 +62,9 @@ angular.module('corespring-player.services').factory('ComponentRegister', ['$log
       return this.interactionCount() > this.interactionsWithResponseCount();
     };
 
-    this.setResponses = function(responses){
-      setAndApplyToComponents(responses, "responses", "setResponse");
+    this.setOutcomes = function(outcomes){
+      //TODO: https://www.pivotaltracker.com/s/projects/926438/stories/61558258
+      setAndApplyToComponents(outcomes, "outcomes", "setResponse");
     };
 
     this.reset = function(){

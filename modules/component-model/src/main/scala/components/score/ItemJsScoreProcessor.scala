@@ -4,11 +4,11 @@ import org.corespring.container.js.ItemAuthorOverride
 import play.api.Logger
 import play.api.libs.json.{Json, JsValue}
 
-object ItemJsOutcomeProcessor extends OutcomeProcessor {
+object ItemJsScoreProcessor extends ScoreProcessor {
 
   lazy val logger = Logger("js.processing")
 
-  def outcome(item: JsValue, session: JsValue, responses: JsValue): JsValue = {
+  def score(item: JsValue, session: JsValue, responses: JsValue): JsValue = {
     getScoringJs(item).map {
       jsDef =>
         val jsModuleWrapper = new ItemAuthorOverride {

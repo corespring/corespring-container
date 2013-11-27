@@ -1,4 +1,4 @@
-@(namespace : String, loadSession : Call, submitSession:Call, saveSession: Call, getScore: Call, completeResponse:Call)
+@(namespace : String, loadSession : Call, submitSession:Call, saveSession: Call, getScore: Call, completeResponse:Call, loadOutcome: Call)
 
 angular.module('@namespace', []);
 
@@ -42,7 +42,8 @@ var def = {
     saveSession: callWithData('@saveSession.method.toLowerCase', '@saveSession.url'),
     getScore: callWithData('@getScore.method.toLowerCase', '@getScore.url'),
     completeResponse: callWithNoData('@completeResponse.method.toLowerCase', '@completeResponse.url'),
-    loadSession: callWithNoData('@loadSession.method.toLowerCase', '@loadSession.url')
+    loadSession: callWithNoData('@loadSession.method.toLowerCase', '@loadSession.url'),
+    loadOutcome: callWithData('@loadOutcome.method.toLowerCase', '@loadOutcome.url')
   }
   return def
 }]);

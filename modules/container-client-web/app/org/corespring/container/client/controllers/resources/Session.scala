@@ -1,9 +1,9 @@
 package org.corespring.container.client.controllers.resources
 
-import org.corespring.container.client.actions.{SaveSessionRequest, SubmitSessionRequest, SessionActionBuilder}
+import org.corespring.container.client.actions.{SessionOutcomeRequest, SaveSessionRequest, SubmitSessionRequest, SessionActionBuilder}
 import org.corespring.container.client.controllers.resources.session.ItemPruner
-import org.corespring.container.components.outcome.OutcomeProcessor
-import org.corespring.container.components.response.ResponseProcessor
+import org.corespring.container.components.outcome.ScoreProcessor
+import org.corespring.container.components.response.OutcomeProcessor
 import org.joda.time.DateTime
 import play.api.Logger
 import play.api.libs.json._
@@ -13,9 +13,9 @@ trait Session extends Controller with ItemPruner {
 
   val logger = Logger("session")
 
-  def responseProcessor: ResponseProcessor
-
   def outcomeProcessor: OutcomeProcessor
+
+  def scoreProcessor: ScoreProcessor
 
   def builder: SessionActionBuilder[AnyContent]
 
@@ -35,12 +35,12 @@ trait Session extends Controller with ItemPruner {
           "session" -> sessionJson)
       )
     } else {
-      val responses = responseProcessor.respond(itemJson, sessionJson)
-      val outcome = outcomeProcessor.outcome(itemJson, sessionJson, responses)
+      val outcome = outcomeProcessor.createOutcome(itemJson, sessionJson, sessionJson \ "settings")
+      val score = scoreProcessor.score(itemJson, sessionJson, outcome)
       val out = Json.obj(
         "item" -> prunedItem,
-        "responses" -> responses,
         "outcome" -> outcome,
+        "score" -> score,
         "session" -> sessionJson)
       Ok(out)
     }
@@ -70,7 +70,15 @@ trait Session extends Controller with ItemPruner {
       }.getOrElse(BadRequest("No session in the request body"))
   }
 
-  def completeResponse(id: String) = builder.save(id) {
+  def loadOutcome(id: String) = builder.loadOutcome(id) {
+    request: SessionOutcomeRequest[AnyContent] =>
+      val options = request.body.asJson.getOrElse(Json.obj())
+      val outcome = outcomeProcessor.createOutcome(request.item, request.itemSession \ "components", options)
+      val score = scoreProcessor.score(request.item, request.itemSession, outcome)
+      Ok(Json.obj("score" -> outcome) ++ Json.obj("score" -> score))
+  }
+
+  def completeSession(id: String) = builder.save(id) {
     request: SaveSessionRequest[AnyContent] =>
       val sessionJson = request.itemSession.as[JsObject] ++ Json.obj("isComplete" -> JsBoolean(true))
       request.saveSession(id, sessionJson).map {
@@ -79,9 +87,7 @@ trait Session extends Controller with ItemPruner {
       }.getOrElse(BadRequest("Error completing"))
   }
 
-
   /**
-   * Ok(request.sessionJson)
    * @param id
    * @return
    */
@@ -109,9 +115,9 @@ trait Session extends Controller with ItemPruner {
           def output(session: JsValue, isFinished: Boolean) = {
             val base = Json.obj("session" -> session)
             if (isFinished) {
-              val responses = responseProcessor.respond(itemJson, session)
-              val outcome = outcomeProcessor.outcome(itemJson, session, responses)
-              base ++ Json.obj("responses" -> responses) ++ Json.obj("outcome" -> outcome)
+              val outcome = outcomeProcessor.createOutcome(itemJson, session, session \ "settings")
+              val score = scoreProcessor.score(itemJson, session, outcome)
+              base ++ Json.obj("outcome" -> outcome) ++ Json.obj("score" -> score)
             } else {
               base
             }

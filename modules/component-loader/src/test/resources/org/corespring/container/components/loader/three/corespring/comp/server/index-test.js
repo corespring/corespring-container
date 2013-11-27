@@ -47,7 +47,7 @@ describe 'single-choice server logic',  ->
         ]
       response.should.eql expected
 
-    it 'should respond to an incorrect response (show correct too)', ->
+    it 'should respond to an incorrect outcome (show correct too)', ->
       response = server.respond(_.cloneDeep(component), answer("1"), settings(true, true, true))
       expected =
         correctness: "incorrect"
@@ -57,7 +57,7 @@ describe 'single-choice server logic',  ->
         ]
       response.should.eql expected
 
-    it 'should respond to an incorrect response (do not show correct)', ->
+    it 'should respond to an incorrect outcome (do not show correct)', ->
       response = server.respond(_.cloneDeep(component), answer("1"), settings(true, true, false))
       expected =
         correctness: "incorrect"

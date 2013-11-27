@@ -43,7 +43,7 @@ class ItemJsOutcomeProcessorTest extends Specification {
     implicit def stringToJsValue(s: String): JsValue = Json.parse(s)
 
     "process using the js defined by the item" in {
-      val out = ItemJsOutcomeProcessor.outcome(item, session, responses)
+      val out = ItemJsScoreProcessor.score(item, session, responses)
       (out \ "score").asOpt[Double] === Some(0.39)
     }
   }

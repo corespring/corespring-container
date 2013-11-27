@@ -10,10 +10,11 @@ block content
 
       corespring-player(
         player-mode="player",
-        player-markup="rootModel.item.xhtml",
-        player-item="rootModel.item",
-        player-session="rootModel.session",
-        player-responses="responses")
+        player-markup="item.xhtml",
+        player-item="item",
+        player-session="session",
+        player-outcomes="outcome")
+
 
       button.btn.btn-primary(
         ng-click="submit()",
@@ -23,8 +24,8 @@ block content
         | Attempts left: {{rootModel.session.remainingAttempts !== undefined ? rootModel.session.remainingAttempts : session.settings.maxNoOfAttempts}}
 
       hr
-      #outcome(ng-show="outcome")
-        h4 You scored: {{outcome.summary.percentage}}%
+      #score(ng-show="score")
+        h4 You scored: {{score.summary.percentage}}%
 
 block scripts
 
