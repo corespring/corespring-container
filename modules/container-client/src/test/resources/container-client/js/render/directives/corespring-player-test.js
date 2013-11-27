@@ -6,9 +6,6 @@ describe('component-register', function(){
     this.setDataAndSession = function(ds){
       this.dataAndSession = ds;
     }
-    this.setGlobalSession = function(){
-
-    }
   };
 
   var MockMathService = function(){
