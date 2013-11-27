@@ -17,6 +17,10 @@ describe('component-register', function(){
         answers: defaultAnswer
       };
     };
+
+    this.isAnswerEmpty = function(){
+      return _.isEmpty(this.getSession().answers);
+    };
   };
 
   beforeEach(angular.mock.module('corespring-player.services'));
