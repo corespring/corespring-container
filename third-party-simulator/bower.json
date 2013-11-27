@@ -11,10 +11,15 @@
     "angular-ui-sortable": "latest",
     "jquery": "latest",
     "bootstrap": "latest",
-    "lodash": "latest"
+    "lodash": "latest",
+    "ace-builds": "1.1.1",
+    "angular-ui-ace": "latest"
   },
   "devDependencies": {
     "angular-mocks": "1.2.1",
     "angular-scenario": "1.2.1"
+  },
+  "resolutions": {
+    "angular": "1.2.1"
   }
 }

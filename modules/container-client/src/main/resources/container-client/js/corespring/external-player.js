@@ -1,8 +1,8 @@
-console.log("external player");
-
 (function (root) {
 
-  this.org = this.org || {};
+  root.console = root.console || { log: function(){}, error: function(){} };
+
+  root.org = root.org || {};
   org.corespring = org.corespring || {};
   org.corespring.players = org.corespring.players || {};
 
@@ -10,6 +10,7 @@ console.log("external player");
   var eventName = function () {
     return window.addEventListener ? "message" : "onmessage";
   };
+  
   var addEventFunctionName = function () {
     return window.addEventListener ? "addEventListener" : "attachEvent";
   };
@@ -42,8 +43,6 @@ console.log("external player");
 
   /** The root listener implementation - forward event to all player listeners */
   var rootLevelListener = function (e) {
-    console.debug("rootLevelListener", e);
-
     for (var i = 0; i < playerListeners.length; i++) {
       playerListeners[i](e);
     }
@@ -64,7 +63,6 @@ console.log("external player");
 
     e.html("<iframe id='iframe-player' src='" + url + "' style='width: 100%; min-height: 700px; border: none'></iframe>");
     e.width(options.width ? options.width : "600px");
-
   };
 
   var expectResult = function (message, callback, dataProcessor) {

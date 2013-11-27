@@ -31,6 +31,10 @@ block content
               .col-sm-10
                 .form-control {{sessionId}}
             .form-group
+              label.control-label.col-sm-2 Evaluate Settings
+              .col-sm-10
+                div.form-control(ng-model="settingsString", ui-ace="{useWrapMode:true,showGutter:false,mode:'json',onLoad:aceLoaded,onChange:aceChanged}", style="width: 300px; height: 200px;")
+            .form-group
               label.control-label.col-sm-2 Attempt Count 
               .col-sm-10
                 | {{attemptCount}}
@@ -75,6 +79,12 @@ block scripts
   script(src="/components/jquery/jquery.min.js")
   script(src="/components/lodash/dist/lodash.min.js")
   script(src="/components/angular/angular.min.js")
+  script(src="/components/angular-ui-ace/ui-ace.js")
+  script(src="/components/ace-builds/src-min-noconflict/ace.js")
+  script(src="/components/ace-builds/src-min-noconflict/theme-twilight.js")
+  script(src="/components/ace-builds/src-min-noconflict/mode-xml.js")
+  script(src="/components/ace-builds/src-min-noconflict/worker-json.js")
+  script(src="/components/ace-builds/src-min-noconflict/mode-json.js")
   script(src="/assets/js/app.js")
   script(src="http://localhost:9000/player.js")
 
