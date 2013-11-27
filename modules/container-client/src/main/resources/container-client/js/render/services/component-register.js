@@ -31,17 +31,6 @@ angular.module('corespring-player.services').factory('ComponentRegister', ['$log
       });
     };
 
-    /**
-     * Global Session: contains info like: isFinished, startDate, finishDate..
-     */
-    this.setGlobalSession = function(session){
-      $.each(components, function(id, comp){
-        if(comp.setGlobalSession){
-          comp.setGlobalSession(angular.copy(session));
-        }
-      });
-    };
-
     this.setComponentSessions = function(sessions){
       setAndApplyToComponents(sessions, "sessions", "setSession");
     };

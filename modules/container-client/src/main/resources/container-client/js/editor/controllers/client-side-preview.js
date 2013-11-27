@@ -21,7 +21,6 @@ var controller = function ($scope, ComponentRegister, PlayerServices) {
     $scope.responses = data.responses;
     $scope.session = data.session;
     $scope.outcome = data.outcome;
-    ComponentRegister.setGlobalSession($scope.session);
   };
 
   $scope.onSessionSaveError = function (error) {
