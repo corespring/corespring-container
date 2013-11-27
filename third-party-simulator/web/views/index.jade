@@ -6,67 +6,70 @@ block content
   .container(ng-app="simulator", ng-controller="Root")
     h1 Simulator
     hr/
-
-    form.form-horizontal
-      .form-group
-        label.control-label.col-sm-2 Mode
-        .col-sm-10
-          label.radio-inline
-            input(type="radio", value="gather", ng-model="mode")
-            | gather
-          label.radio-inline
-            input(type="radio", value="view", ng-model="mode")
-            | view 
-          label.radio-inline
-            input(type="radio", value="evaluate", ng-model="mode")
-            | evaluate 
-      .form-group
-        label.control-label.col-sm-2 Item Id 
-        .col-sm-10
-          input.form-control(type="text", placeholder="Id...", ng-model="itemId")
-      .form-group
-        label.control-label.col-sm-2 Session Id 
-        .col-sm-10
-          .form-control {{sessionId}}
-      .form-group
-        label.control-label.col-sm-2 Attempt Count 
-        .col-sm-10
-          | {{attemptCount}}
-          | &nbsp;
-          button.btn.btn-default(ng-click="updateAttemptCount()") Update
-      .form-group
-        label.control-label.col-sm-2 Score 
-        .col-sm-10
-          | {{score}}
-          | &nbsp;
-          button.btn.btn-default(ng-click="getScore()") Update
-      .form-group
-        label.control-label.col-sm-2 Is Complete 
-        .col-sm-10
-          | {{isComplete}}
-          | &nbsp;
-          button.btn.btn-default(ng-click="updateIsComplete()") Update
-      .form-group
-        label.control-label.col-sm-2 Session status 
-        .col-sm-10
-          | {{sessionStatus}}
-          | &nbsp;
-          button.btn.btn-default(ng-click="updateSessionStatus()") Update
-
-    hr/
-
-    .btn.btn-default( type="button", ng-click="add()") Add  
-    .btn.btn-default( type="button", ng-click="remove()") Remove 
-
-    hr/
-    
-    .player(ng-show="player")    
-      #player-holder(style="height: 100%;")
-      .btn.btn-default( type="button", ng-click="submit()") Submit 
-      .btn.btn-default( type="button", ng-click="save(true)") Save (as attempt) 
-      .btn.btn-default( type="button", ng-click="save(false)") Save 
-      .btn.btn-default( type="button", ng-click="complete()") Complete 
-      .btn.btn-default( type="button", ng-click="reset()") Reset 
+    table(style='width: 100%')
+      tr
+        td(style='width: 50%; vertical-align: top;')
+          form.form-horizontal
+            .form-group
+              label.control-label.col-sm-2 Mode
+              .col-sm-10
+                label.radio-inline
+                  input(type="radio", value="gather", ng-model="mode")
+                  | gather
+                label.radio-inline
+                  input(type="radio", value="view", ng-model="mode")
+                  | view 
+                label.radio-inline
+                  input(type="radio", value="evaluate", ng-model="mode")
+                  | evaluate 
+            .form-group
+              label.control-label.col-sm-2 Item Id 
+              .col-sm-10
+                input.form-control(type="text", placeholder="Id...", ng-model="itemId")
+            .form-group
+              label.control-label.col-sm-2 Session Id 
+              .col-sm-10
+                .form-control {{sessionId}}
+            .form-group
+              label.control-label.col-sm-2 Attempt Count 
+              .col-sm-10
+                | {{attemptCount}}
+                | &nbsp;
+                button.btn.btn-default(ng-click="updateAttemptCount()") Update
+            .form-group
+              label.control-label.col-sm-2 Score 
+              .col-sm-10
+                | {{score}}
+                | &nbsp;
+                button.btn.btn-default(ng-click="getScore()") Update
+            .form-group
+              label.control-label.col-sm-2 Is Complete 
+              .col-sm-10
+                | {{isComplete}}
+                | &nbsp;
+                button.btn.btn-default(ng-click="updateIsComplete()") Update
+            .form-group
+              label.control-label.col-sm-2 Session status 
+              .col-sm-10
+                | all? : {{sessionStatus.allInteractionsHaveResponse}} 
+                br/
+                | count: {{sessionStatus.interactionCount}}
+                br/
+                | with response count: {{sessionStatus.interactionsWithResponseCount}}
+                br/
+                | &nbsp;
+                button.btn.btn-default(ng-click="updateSessionStatus()") Update
+          hr/
+          .btn.btn-default( type="button", ng-click="add()") Add  
+          .btn.btn-default( type="button", ng-click="remove()") Remove 
+        td
+          .player(ng-show="player")    
+            #player-holder(style="height: 100%;")
+            .btn.btn-default( type="button", ng-click="submit()") Submit 
+            .btn.btn-default( type="button", ng-click="save(true)") Save (as attempt) 
+            .btn.btn-default( type="button", ng-click="save(false)") Save 
+            .btn.btn-default( type="button", ng-click="complete()") Complete 
+            .btn.btn-default( type="button", ng-click="reset()") Reset 
 
 block scripts
   script(src="/components/jquery/jquery.min.js")

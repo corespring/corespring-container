@@ -11,12 +11,6 @@ var controller = function ($scope, $log, ComponentRegister, PlayerServices) {
     return $scope.session.settings.allowEmptyResponses || !ComponentRegister.hasEmptyAnswers();
   };
 
-  $scope.submit = function () {
-    PlayerServices.submitSession({
-      components: ComponentRegister.getComponentSessions()
-    }, $scope.onSessionSaved, $scope.onSessionSaveError);
-  };
-
   $scope.save = function (isAttempt, cb) {
     PlayerServices.saveSession(
       {
@@ -76,10 +70,8 @@ var controller = function ($scope, $log, ComponentRegister, PlayerServices) {
     );
   };
 
-  $scope.onSessionSaved = function (data) {
-    $scope.session = data.session;
-    $scope.outcome = data.outcome;
-    $scope.score = data.score;
+  $scope.onSessionSaved = function (session) {
+    $scope.session = session;
   };
 
   $scope.updateSession = function (data) {

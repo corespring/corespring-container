@@ -71,7 +71,8 @@ angular.module("simulator").controller('Root', ['$scope', '$log', function($scop
     $scope.player.saveResponses(true);
     //only needed for secure mode
     //$scope.player.completeResponse();
-    $scope.player.setMode("view");
+    $scope.mode = "view";
+    $scope.player.setMode($scope.mode);
   };
 
   $scope.updateAttemptCount = function(){
