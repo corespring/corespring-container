@@ -102,7 +102,7 @@ angular.module('corespring-player.services').factory('ComponentRegister', ['$log
           c.setMode(mode);
         }
       });
-    }
+    };
 
     /**
      * set the value to the 'loaded' object and apply sub objects out to
