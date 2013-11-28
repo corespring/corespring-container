@@ -23,7 +23,6 @@ class OutcomeProcessorImpl(components: Seq[UiComponent], libraries : Seq[Library
       val componentType = (question \ "componentType").as[String]
 
       val answer = getAnswer(answers, id)
-      println("answer " +answer)
 
       components.find(_.matchesType(componentType)).map {
         component =>
@@ -51,10 +50,6 @@ class OutcomeProcessorImpl(components: Seq[UiComponent], libraries : Seq[Library
         val existingOutcome = responsesWithoutTarget.find(_._1 == targetId).map(_._2).getOrElse(JsObject(Seq.empty))
         createOutcomeForComponent(id, existingOutcome)
     }
-
-    println("--")
-    println(responsesWithoutTarget)
-    println(responsesWithTarget)
 
     JsObject(responsesWithoutTarget ++ responsesWithTarget)
   }
