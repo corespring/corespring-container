@@ -1,13 +1,14 @@
 package org.corespring.container.client.controllers.resources
 
-import org.corespring.container.client.actions.{SessionOutcomeRequest, SaveSessionRequest, SubmitSessionRequest, SessionActionBuilder}
+import org.corespring.container.client.actions._
 import org.corespring.container.client.controllers.resources.session.ItemPruner
 import org.corespring.container.components.outcome.ScoreProcessor
 import org.corespring.container.components.response.OutcomeProcessor
 import org.joda.time.DateTime
 import play.api.Logger
 import play.api.libs.json._
-import play.api.mvc.{AnyContent, Controller}
+import play.api.mvc.{Result, AnyContent, Controller}
+import scala.Some
 
 trait Session extends Controller with ItemPruner {
 
@@ -23,12 +24,16 @@ trait Session extends Controller with ItemPruner {
 
   def loadEverything(id: String) = builder.loadEverything(id){ request =>
 
+    def includeOutcome = {
+      val requested = request.getQueryString("includeOutcome").map{ _ == "true"}.getOrElse(false)
+      requested && (request.isSecure && request.isComplete)
+    }
+
     val itemJson = (request.everything \ "item").as[JsObject]
     val prunedItem = pruneItem(itemJson)
     val sessionJson = (request.everything \ "session").as[JsObject]
-    val isFinished = (sessionJson \ "isFinished").asOpt[Boolean].getOrElse(false)
 
-    if(!isFinished) {
+    if(!includeOutcome) {
       Ok(
         Json.obj(
           "item" -> prunedItem,
@@ -46,36 +51,53 @@ trait Session extends Controller with ItemPruner {
     }
   }
 
-
   def saveSession(id:String) = builder.save(id) {
-    request : SaveSessionRequest[AnyContent] =>
-      request.body.asJson.map{
-        requestJson =>
+    request =>
+      secureMode(request) {
+        request: SaveSessionRequest[AnyContent] =>
 
-          val isAttempt : Boolean = (requestJson \ "isAttempt").asOpt[Boolean].getOrElse(false)
+          request.body.asJson.map {
+            requestJson =>
 
-          val attemptUpdate = if(isAttempt){
-            val currentCount = (request.itemSession \ "attempts").asOpt[Int].getOrElse(0)
-            Json.obj("attempts" -> JsNumber(currentCount + 1))
-          } else Json.obj()
+            val isAttempt : Boolean = (requestJson \ "isAttempt").asOpt[Boolean].getOrElse(false)
 
-          val update = request.itemSession.as[JsObject]  ++
-            Json.obj("components" -> requestJson \ "components") ++
-            attemptUpdate
+            val attemptUpdate = if(isAttempt){
+              val currentCount = (request.itemSession \ "attempts").asOpt[Int].getOrElse(0)
+              Json.obj("attempts" -> JsNumber(currentCount + 1))
+            } else Json.obj()
 
-          request.saveSession(id, update).map{
-            savedSession =>
-              Ok(savedSession)
-          }.getOrElse(BadRequest("Error saving"))
-      }.getOrElse(BadRequest("No session in the request body"))
+            val update = request.itemSession.as[JsObject]  ++
+              Json.obj("components" -> requestJson \ "components") ++
+              attemptUpdate
+
+            request.saveSession(id, update).map{
+              savedSession =>
+                Ok(savedSession)
+            }.getOrElse(BadRequest("Error saving"))
+        }.getOrElse(BadRequest("No session in the request body"))
+      }
   }
+
+  private def secureMode[SR <: SecureModeRequest[AnyContent]](request: SR)(block: SR => Result): Result =
+    if (request.isSecure && request.isComplete)
+      BadRequest(Json.obj("error" -> JsString("secure mode")))
+    else
+      block(request)
+
 
   def loadOutcome(id: String) = builder.loadOutcome(id) {
     request: SessionOutcomeRequest[AnyContent] =>
-      val options = request.body.asJson.getOrElse(Json.obj())
-      val outcome = outcomeProcessor.createOutcome(request.item, request.itemSession, options)
-      val score = scoreProcessor.score(request.item, request.itemSession, outcome)
-      Ok(Json.obj("outcome" -> outcome) ++ Json.obj("score" -> score))
+      secureMode(request) {
+        request: SessionOutcomeRequest[AnyContent] =>
+          if (request.isSecure && (request.itemSession \ "isComplete").asOpt[Boolean].getOrElse(false)) {
+            BadRequest(Json.obj("error" -> JsString("secure mode")))
+          } else {
+            val options = request.body.asJson.getOrElse(Json.obj())
+            val outcome = outcomeProcessor.createOutcome(request.item, request.itemSession, options)
+            val score = scoreProcessor.score(request.item, request.itemSession, outcome)
+            Ok(Json.obj("outcome" -> outcome) ++ Json.obj("score" -> score))
+          }
+      }
   }
 
   def completeSession(id: String) = builder.save(id) {
