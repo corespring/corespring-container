@@ -1,12 +1,14 @@
 package org.corespring.shell.impl.controllers
 
+import org.corespring.container.client.views.txt.js.PlayerLauncherWrapper
 import org.corespring.shell.impl.services.MongoService
-import play.api.Logger
-import play.api.libs.json.{Json, JsString, JsObject, JsValue}
-import play.api.mvc._
+import play.api.Play.current
+import play.api.http.ContentTypes
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsString
-
+import play.api.libs.json.{Json, JsValue}
+import play.api.mvc._
+import play.api.{Play, Logger}
 
 trait Main extends Controller {
 
@@ -65,7 +67,13 @@ trait Main extends Controller {
   def isSecure(r:Request[AnyContent]) = r.getQueryString("secure").map{ _ == "true"}.getOrElse(false)
 
   def playerJs = Action{ request =>
-    val result : Result = controllers.Assets.at(path="/container-client", file="js/corespring/external-player.js")(request)
-    result.withSession((SecureMode, isSecure(request).toString))
+
+
+    Play.resourceAsStream("/container-client/js/corespring/external-player.js").map{ is =>
+      val content = scala.io.Source.fromInputStream(is).getLines.mkString("\n")
+      val out = PlayerLauncherWrapper(content, isSecure(request)).toString
+      Ok(out).as(ContentTypes.JAVASCRIPT).withSession((SecureMode, isSecure(request).toString))
+    }.getOrElse(NotFound)
+
   }
 }

@@ -53,7 +53,6 @@ trait ClientSessionImpl extends Session {
       val result = for {
         session <- sessionService.load(id)
       } yield {
-        //TODO: Plugin secure mode
         SaveSessionRequest(session, isSecure(request), isComplete(session) ,sessionService.save, request)
       }
       result.map {
