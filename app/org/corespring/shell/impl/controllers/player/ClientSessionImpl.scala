@@ -16,6 +16,8 @@ trait ClientSessionImpl extends Session {
 
     private def isSecure(request:Request[AnyContent]) : Boolean  = request.session.get("corespring.player.secure").map(_ == "true").getOrElse(false)
 
+    private def isComplete(session:JsValue) : Boolean = (session \ "isComplete").asOpt[Boolean].getOrElse(false)
+
     def load(id: String)(block: (FullSessionRequest[AnyContent]) => Result): Action[AnyContent] = Action {
       request =>
         logger.debug(s"load $id")
@@ -52,7 +54,7 @@ trait ClientSessionImpl extends Session {
         session <- sessionService.load(id)
       } yield {
         //TODO: Plugin secure mode
-        SaveSessionRequest(session, isSecure(request), sessionService.save, request)
+        SaveSessionRequest(session, isSecure(request), isComplete(session) ,sessionService.save, request)
       }
       result.map {
         r =>
@@ -83,7 +85,7 @@ trait ClientSessionImpl extends Session {
           itemId <- (session \ "itemId").asOpt[String]
           item <- itemService.load(itemId)
         } yield {
-          SessionOutcomeRequest(item, session, isSecure(request), request)
+          SessionOutcomeRequest(item, session, isSecure(request), isComplete(session), request)
         }
 
         result.map{ r =>
