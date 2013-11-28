@@ -17,7 +17,7 @@ case class SessionIdRequest[A](sessionId: String, r: Request[A]) extends Wrapped
 
 case class FullSessionRequest[A]( everything : JsValue, override val isSecure: Boolean, r: Request[A]) extends SecureModeRequest(isSecure, requests.isCompleteFromSession(everything \ "session"), r)
 
-case class SessionOutcomeRequest[A](item: JsValue, itemSession: JsValue, override val isSecure: Boolean, r: Request[A]) extends SecureModeRequest(isSecure, requests.isCompleteFromSession(itemSession), r)
+case class SessionOutcomeRequest[A](item: JsValue, itemSession: JsValue, override val isSecure: Boolean, override val isComplete: Boolean, r: Request[A]) extends SecureModeRequest(isSecure, isComplete, r)
 
 case class ItemRequest[A](item: JsValue, r : Request[A]) extends WrappedRequest(r)
 
@@ -31,4 +31,4 @@ case class ScoreItemRequest[A](item : JsValue, r : Request[A]) extends WrappedRe
  * @tparam A
  */
 case class SubmitSessionRequest[A](everything: JsValue, saveSession: (String, JsValue) => Option[JsValue], r: Request[A]) extends WrappedRequest(r)
-case class SaveSessionRequest[A](itemSession: JsValue, override val isSecure: Boolean, saveSession: (String, JsValue) => Option[JsValue], r: Request[A]) extends SecureModeRequest(isSecure, (itemSession \ "isComplete").asOpt[Boolean].getOrElse(false),  r)
+case class SaveSessionRequest[A](itemSession: JsValue, override val isSecure: Boolean, override val isComplete : Boolean, saveSession: (String, JsValue) => Option[JsValue], r: Request[A]) extends SecureModeRequest(isSecure, isComplete,  r)

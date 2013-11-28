@@ -11,6 +11,11 @@ block content
         td(style='width: 50%; vertical-align: top;')
           form.form-horizontal
             .form-group
+              label.control-label.col-sm-2 Secure
+              .col-sm-10
+                label.radio-inline
+                  input(type="checkbox", ng-model="isSecure")
+            .form-group
               label.control-label.col-sm-2 Mode
               .col-sm-10
                 label.radio-inline

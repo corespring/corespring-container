@@ -7,7 +7,7 @@ import org.corespring.container.components.response.OutcomeProcessor
 import org.joda.time.DateTime
 import play.api.Logger
 import play.api.libs.json._
-import play.api.mvc.{Result, AnyContent, Controller}
+import play.api.mvc.{AnyContent, Controller}
 import scala.Some
 
 trait Session extends Controller with ItemPruner {
@@ -53,10 +53,11 @@ trait Session extends Controller with ItemPruner {
 
   def saveSession(id:String) = builder.save(id) {
     request =>
-      secureMode(request) {
-        request: SaveSessionRequest[AnyContent] =>
 
-          request.body.asJson.map {
+      if (request.isSecure && request.isComplete)
+        BadRequest(Json.obj("error" -> JsString("secure mode: can't save when session is complete")))
+      else {
+        request.body.asJson.map {
             requestJson =>
 
             val isAttempt : Boolean = (requestJson \ "isAttempt").asOpt[Boolean].getOrElse(false)
@@ -78,25 +79,15 @@ trait Session extends Controller with ItemPruner {
       }
   }
 
-  private def secureMode[SR <: SecureModeRequest[AnyContent]](request: SR)(block: SR => Result): Result =
-    if (request.isSecure && request.isComplete)
-      BadRequest(Json.obj("error" -> JsString("secure mode")))
-    else
-      block(request)
-
-
   def loadOutcome(id: String) = builder.loadOutcome(id) {
     request: SessionOutcomeRequest[AnyContent] =>
-      secureMode(request) {
-        request: SessionOutcomeRequest[AnyContent] =>
-          if (request.isSecure && (request.itemSession \ "isComplete").asOpt[Boolean].getOrElse(false)) {
-            BadRequest(Json.obj("error" -> JsString("secure mode")))
-          } else {
-            val options = request.body.asJson.getOrElse(Json.obj())
-            val outcome = outcomeProcessor.createOutcome(request.item, request.itemSession, options)
-            val score = scoreProcessor.score(request.item, request.itemSession, outcome)
-            Ok(Json.obj("outcome" -> outcome) ++ Json.obj("score" -> score))
-          }
+      if (request.isSecure && !request.isComplete) {
+        BadRequest(Json.obj("error" -> JsString("secure mode: can't load outcome - session isn't complete")))
+      } else {
+        val options = request.body.asJson.getOrElse(Json.obj())
+        val outcome = outcomeProcessor.createOutcome(request.item, request.itemSession, options)
+        val score = scoreProcessor.score(request.item, request.itemSession, outcome)
+        Ok(Json.obj("outcome" -> outcome) ++ Json.obj("score" -> score))
       }
   }
 
@@ -113,7 +104,7 @@ trait Session extends Controller with ItemPruner {
    * @param id
    * @return
    */
-
+  @deprecated("will be removed shortly", "")
   def submitSession(id: String) = builder.submitAnswers(id) {
     request : SubmitSessionRequest[AnyContent] =>
 

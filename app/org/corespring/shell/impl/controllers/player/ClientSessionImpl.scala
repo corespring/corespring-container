@@ -13,12 +13,15 @@ trait ClientSessionImpl extends Session {
   def itemService: MongoService
 
   def builder: SessionActionBuilder[AnyContent] = new SessionActionBuilder[AnyContent] {
+
+    private def isSecure(request:Request[AnyContent]) : Boolean  = request.session.get("corespring.player.secure").map(_ == "true").getOrElse(false)
+
     def load(id: String)(block: (FullSessionRequest[AnyContent]) => Result): Action[AnyContent] = Action {
       request =>
         logger.debug(s"load $id")
         sessionService.load(id).map {
           json =>
-            block(FullSessionRequest(json, false, request))
+            block(FullSessionRequest(json, isSecure(request), request))
         }.getOrElse(NotFound(s"Can't find a session with id: $id"))
     }
 
@@ -49,7 +52,7 @@ trait ClientSessionImpl extends Session {
         session <- sessionService.load(id)
       } yield {
         //TODO: Plugin secure mode
-        SaveSessionRequest(session, false, sessionService.save, request)
+        SaveSessionRequest(session, isSecure(request), sessionService.save, request)
       }
       result.map {
         r =>
@@ -65,7 +68,7 @@ trait ClientSessionImpl extends Session {
           item <- itemService.load(itemId)
         } yield {
           val out: JsValue = Json.obj("item" -> item, "session" -> session)
-          FullSessionRequest(out, false, request)
+          FullSessionRequest(out, isSecure(request), request)
         }
         result.map {
           r =>
@@ -80,8 +83,7 @@ trait ClientSessionImpl extends Session {
           itemId <- (session \ "itemId").asOpt[String]
           item <- itemService.load(itemId)
         } yield {
-          //TODO: Plugin secure mode
-          SessionOutcomeRequest(item, session, false, request)
+          SessionOutcomeRequest(item, session, isSecure(request), request)
         }
 
         result.map{ r =>

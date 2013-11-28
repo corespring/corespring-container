@@ -20,6 +20,7 @@ object Build extends sbt.Build {
     val rhinoJs = "org.mozilla" % "rhino" % "1.7R4"
     val casbah = "org.mongodb" %% "casbah" % "2.6.3"
     val playS3 = "org.corespring" %% "play-s3" % "0.1-bea81d9"
+    val mockito = "org.mockito" % "mockito-all" % "1.9.5" % "test"
   }
 
   object Resolvers {
@@ -116,6 +117,7 @@ object Build extends sbt.Build {
 
   val containerClientWeb = builder.playApp("container-client-web").settings(
     sources in doc in Compile := List(),
+    libraryDependencies ++= Seq(mockito),
     templatesImport ++= Seq( "play.api.libs.json.JsValue", "play.api.libs.json.Json" )
   ).dependsOn(
     componentModel % "compile->compile;test->test",

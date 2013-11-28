@@ -1,7 +1,7 @@
 angular.module("simulator", ['ui.ace']);
 
 
-angular.module("simulator").controller('Root', ['$scope', '$log', function($scope, $log){
+angular.module("simulator").controller('Root', ['$scope', '$log', '$http', function($scope, $log, $http){
 
   $log.debug("Root controller");
 
@@ -16,28 +16,29 @@ angular.module("simulator").controller('Root', ['$scope', '$log', function($scop
     highlightUserResponse: true,
     "corespsring-drag-and-drop" : {
       "blah" : "blah"
-    }
+      }
   };
+
+  $scope.isSecure = false;
+
+  $scope.$watch('isSecure', function(newValue){
+    var scriptTag = "<script src='http://localhost:9000/player.js?secure="+newValue+"'></script>";
+    $("head").append(scriptTag);
+  });
 
   $scope.settingsString = JSON.stringify($scope.modeSettings, null, "  ")
 
   $scope.aceLoaded = function(_editor) {
-    $log.info("..");
     $scope.editor = _editor;
   };
 
   $scope.aceChanged = function(e) {
-    $log.info("......");
-
     try{
       var text = $scope.editor.getValue();
       $scope.modeSettings = JSON.parse(text);
     } catch (e){
-
     }
   };
-
-
 
   $scope.idLabel = function(){
     return $scope.mode === "gather" ? "Item Id" : "Session Id";   

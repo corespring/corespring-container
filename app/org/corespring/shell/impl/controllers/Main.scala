@@ -3,7 +3,9 @@ package org.corespring.shell.impl.controllers
 import org.corespring.shell.impl.services.MongoService
 import play.api.Logger
 import play.api.libs.json.{Json, JsString, JsObject, JsValue}
-import play.api.mvc.{Action, Controller}
+import play.api.mvc._
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsString
 
 
 trait Main extends Controller {
@@ -56,5 +58,14 @@ trait Main extends Controller {
         logger.debug("Can't create the session")
         BadRequest("Create session - where's the body?")
       }
+  }
+
+  val SecureMode = "corespring.player.secure"
+
+  def isSecure(r:Request[AnyContent]) = r.getQueryString("secure").map{ _ == "true"}.getOrElse(false)
+
+  def playerJs = Action{ request =>
+    val result : Result = controllers.Assets.at(path="/container-client", file="js/corespring/external-player.js")(request)
+    result.withSession((SecureMode, isSecure(request).toString))
   }
 }
