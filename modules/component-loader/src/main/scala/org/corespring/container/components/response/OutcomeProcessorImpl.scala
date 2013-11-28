@@ -10,18 +10,20 @@ class OutcomeProcessorImpl(components: Seq[UiComponent], libraries : Seq[Library
 
   def createOutcome(item: JsValue, answers: JsValue, settings: JsValue): JsValue = {
 
-    def createOutcomeForComponent(id:String):(String, JsValue) = {
+    def getTargetIdFor(id:String) = {
+      val componentQuestions = (item \ "components").as[JsObject]
+      val question = (componentQuestions \ id).as[JsObject]
+      val targetId = (question \ "target" \ "id").asOpt[String]
+      targetId
+    }
+
+    def createOutcomeForComponent(id:String, targetOutcome:JsValue):(String, JsValue) = {
       val componentQuestions = (item \ "components").as[JsObject]
       val question = (componentQuestions \ id).as[JsObject]
       val componentType = (question \ "componentType").as[String]
-      val targetId = (question \ "target" \ "id").asOpt[String]
-
-      val targetOutcome = targetId.map {
-        tId =>
-          createOutcomeForComponent(tId)._2
-      }.getOrElse(JsObject(Seq.empty))
 
       val answer = getAnswer(answers, id)
+      println("answer " +answer)
 
       components.find(_.matchesType(componentType)).map {
         component =>
@@ -30,6 +32,7 @@ class OutcomeProcessorImpl(components: Seq[UiComponent], libraries : Seq[Library
             a =>
               val componentLibraries : Seq[Library] = component.libraries.map( id => libraries.find(l => l.id.matches(id) )).flatten
               val generator = new OutcomeGenerator(component.componentType, component.server.definition, componentLibraries)
+
               (id, generator.createOutcome(question, a, settings, targetOutcome))
           }.getOrElse {
             logger.debug(s"no answer provided for: $id")
@@ -41,9 +44,19 @@ class OutcomeProcessorImpl(components: Seq[UiComponent], libraries : Seq[Library
 
     val componentQuestions = (item \ "components").as[JsObject]
 
-    val responses: Seq[(String, JsValue)] = componentQuestions.keys.toSeq.map(createOutcomeForComponent(_))
+    val responsesWithoutTarget: Seq[(String, JsValue)] = componentQuestions.keys.toSeq.filter(getTargetIdFor(_).isEmpty).map(createOutcomeForComponent(_, JsObject(Seq.empty)))
+    val responsesWithTarget: Seq[(String, JsValue)] = componentQuestions.keys.toSeq.filter(!getTargetIdFor(_).isEmpty).map {
+      id=>
+        val targetId = getTargetIdFor(id).get
+        val existingOutcome = responsesWithoutTarget.find(_._1 == targetId).map(_._2).getOrElse(JsObject(Seq.empty))
+        createOutcomeForComponent(id, existingOutcome)
+    }
 
-    JsObject(responses)
+    println("--")
+    println(responsesWithoutTarget)
+    println(responsesWithTarget)
+
+    JsObject(responsesWithoutTarget ++ responsesWithTarget)
   }
 
   private def getAnswer(answers: JsValue, id: String): Option[JsValue] = for {
