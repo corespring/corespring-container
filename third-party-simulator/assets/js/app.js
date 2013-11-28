@@ -1,74 +1,75 @@
-angular.module("simulator", ['ui.ace']);
+angular.module("simulator", ['ui.ace']).config(function ($locationProvider) {
+  $locationProvider.html5Mode(true);
+});
 
-
-angular.module("simulator").controller('Root', ['$scope', '$log', function($scope, $log){
+angular.module("simulator").controller('Root', ['$scope', '$log', '$location', function ($scope, $log, $location) {
 
   $log.debug("Root controller");
 
   $scope.mode = "gather";
 
-  $scope.itemId = "522267c2554f43f858000001";
+  $scope.itemId = $location.search()['sessionId'] ? "" : ($location.search()['itemId'] || "522267c2554f43f858000005");
+  $scope.sessionId = $location.search()['sessionId'] || "";
 
   $scope.modeSettings = {
     showFeedback: true,
     allowEmptyResponses: true,
     highlightCorrectResponse: true,
     highlightUserResponse: true,
-    "corespsring-drag-and-drop" : {
-      "blah" : "blah"
+    "corespsring-drag-and-drop": {
+      "blah": "blah"
     }
   };
 
   $scope.settingsString = JSON.stringify($scope.modeSettings, null, "  ")
 
-  $scope.aceLoaded = function(_editor) {
+  $scope.aceLoaded = function (_editor) {
     $log.info("..");
     $scope.editor = _editor;
   };
 
-  $scope.aceChanged = function(e) {
+  $scope.aceChanged = function (e) {
     $log.info("......");
 
-    try{
+    try {
       var text = $scope.editor.getValue();
       $scope.modeSettings = JSON.parse(text);
-    } catch (e){
+    } catch (e) {
 
     }
   };
 
 
-
-  $scope.idLabel = function(){
-    return $scope.mode === "gather" ? "Item Id" : "Session Id";   
+  $scope.idLabel = function () {
+    return $scope.mode === "gather" ? "Item Id" : "Session Id";
   };
 
-  $scope.$watch('mode', function(newMode){
-    if($scope.player){
+  $scope.$watch('mode', function (newMode) {
+    if ($scope.player) {
       $scope.player.setMode(newMode);
     }
   });
 
-  $scope.onSessionCreated = function(sessionId){
+  $scope.onSessionCreated = function (sessionId) {
 
     $log.debug("session created: ", sessionId);
 
-    $scope.$apply(function(){
+    $scope.$apply(function () {
       $scope.sessionId = sessionId;
     });
   };
 
-  $scope.onInputReceived = function(sessionStatus){
-    $log.debug("on input received: ", sessionStatus );
-    $scope.$apply(function(){
+  $scope.onInputReceived = function (sessionStatus) {
+    $log.debug("on input received: ", sessionStatus);
+    $scope.$apply(function () {
       $scope.sessionStatus = sessionStatus;
-      });
+    });
   };
 
-  $scope.add = function() { 
+  $scope.add = function () {
     var options = {
       mode: $scope.mode,
-      onSessionCreated : $scope.onSessionCreated,
+      onSessionCreated: $scope.onSessionCreated,
       onInputReceived: $scope.onInputReceived,
       evaluate: $scope.modeSettings,
     };
@@ -80,16 +81,16 @@ angular.module("simulator").controller('Root', ['$scope', '$log', function($scop
     $scope.player = new org.corespring.players.ItemPlayer('#player-holder', options);
   };
 
-  $scope.remove = function() {
+  $scope.remove = function () {
     delete $scope.player;
     $("#player-holder").html('');
   };
 
-  $scope.save = function(isAttempt){
+  $scope.save = function (isAttempt) {
     $scope.player.saveResponses(isAttempt);
   };
 
-  $scope.submit = function(){
+  $scope.submit = function () {
     $scope.player.saveResponses(true);
     //only needed for secure mode
     //$scope.player.completeResponse();
@@ -97,48 +98,48 @@ angular.module("simulator").controller('Root', ['$scope', '$log', function($scop
     $scope.player.setMode($scope.mode);
   };
 
-  $scope.updateAttemptCount = function(){
-    $scope.player.countAttempts(function(result){
+  $scope.updateAttemptCount = function () {
+    $scope.player.countAttempts(function (result) {
       $log.debug("result: ", result);
 
-      $scope.$apply(function(){
+      $scope.$apply(function () {
         $scope.attemptCount = result;
       });
     });
   };
 
-  $scope.getScore = function(){
-    $scope.player.getScore('percent', function(outcome){
+  $scope.getScore = function () {
+    $scope.player.getScore('percent', function (outcome) {
       $log.debug("get score: ", outcome);
 
-      $scope.$apply(function(){
+      $scope.$apply(function () {
         $scope.score = outcome;
       });
     });
   };
 
-  $scope.complete = function(){
+  $scope.complete = function () {
     $scope.player.completeResponse();
   };
 
-  $scope.updateIsComplete = function(){
-    $scope.player.isComplete(function(isComplete){
-      $scope.$apply(function(){
+  $scope.updateIsComplete = function () {
+    $scope.player.isComplete(function (isComplete) {
+      $scope.$apply(function () {
         $scope.isComplete = isComplete;
       });
 
     });
   };
 
-  $scope.reset = function(){
+  $scope.reset = function () {
     $scope.player.reset();
   };
 
-  $scope.updateSessionStatus = function(){
-    $scope.player.getSessionStatus(function(status){
-        $scope.$apply(function(){
-          $scope.sessionStatus = status;
-        });
+  $scope.updateSessionStatus = function () {
+    $scope.player.getSessionStatus(function (status) {
+      $scope.$apply(function () {
+        $scope.sessionStatus = status;
+      });
     });
   };
 
