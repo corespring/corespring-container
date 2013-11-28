@@ -77,7 +77,7 @@ trait ComponentServerLogic
     serverLogic.asInstanceOf[Scriptable]
   }
 
-  def createOutcome(question: JsValue, response: JsValue, settings: JsValue): JsValue = withJsContext(libs, wrappedComponentLibs) {
+  def createOutcome(question: JsValue, response: JsValue, settings: JsValue, targetOutcome: JsValue): JsValue = withJsContext(libs, wrappedComponentLibs) {
     (ctx: Context, scope: Scriptable) =>
       implicit val rootScope = scope
       implicit val rootContext = ctx
@@ -85,7 +85,7 @@ trait ComponentServerLogic
       val server = serverLogic(ctx, scope)
       //TODO: rename 'respond' => 'createOutcome' in the components
       val respondFunction = server.get("respond", server).asInstanceOf[RhinoFunction]
-      val jsonResult = callJsFunction(wrapped, respondFunction, server, Array(question, response, settings))
+      val jsonResult = callJsFunction(wrapped, respondFunction, server, Array(question, response, settings, targetOutcome))
       jsonResult
   }
 }
