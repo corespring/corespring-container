@@ -1,4 +1,4 @@
-angular.module("simulator", []);
+angular.module("simulator", ['ui.ace']);
 
 
 angular.module("simulator").controller('Root', ['$scope', '$log', function($scope, $log){
@@ -8,6 +8,36 @@ angular.module("simulator").controller('Root', ['$scope', '$log', function($scop
   $scope.mode = "gather";
 
   $scope.itemId = "522267c2554f43f858000001";
+
+  $scope.modeSettings = {
+    showFeedback: true,
+    allowEmptyResponses: true,
+    highlightCorrectResponse: true,
+    highlightUserResponse: true,
+    "corespsring-drag-and-drop" : {
+      "blah" : "blah"
+    }
+  };
+
+  $scope.settingsString = JSON.stringify($scope.modeSettings, null, "  ")
+
+  $scope.aceLoaded = function(_editor) {
+    $log.info("..");
+    $scope.editor = _editor;
+  };
+
+  $scope.aceChanged = function(e) {
+    $log.info("......");
+
+    try{
+      var text = $scope.editor.getValue();
+      $scope.modeSettings = JSON.parse(text);
+    } catch (e){
+
+    }
+  };
+
+
 
   $scope.idLabel = function(){
     return $scope.mode === "gather" ? "Item Id" : "Session Id";   
@@ -39,7 +69,8 @@ angular.module("simulator").controller('Root', ['$scope', '$log', function($scop
     var options = {
       mode: $scope.mode,
       onSessionCreated : $scope.onSessionCreated,
-      onInputReceived: $scope.onInputReceived
+      onInputReceived: $scope.onInputReceived,
+      evaluate: $scope.modeSettings,
     };
 
     var idName = $scope.mode === "gather" ? "itemId" : "sessionId";
@@ -62,7 +93,8 @@ angular.module("simulator").controller('Root', ['$scope', '$log', function($scop
     $scope.player.saveResponses(true);
     //only needed for secure mode
     //$scope.player.completeResponse();
-    $scope.player.setMode("view");
+    $scope.mode = "view";
+    $scope.player.setMode($scope.mode);
   };
 
   $scope.updateAttemptCount = function(){

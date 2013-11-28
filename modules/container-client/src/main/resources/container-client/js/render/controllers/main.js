@@ -11,12 +11,6 @@ var controller = function ($scope, $log, ComponentRegister, PlayerServices) {
     return $scope.session.settings.allowEmptyResponses || !ComponentRegister.hasEmptyAnswers();
   };
 
-  $scope.submit = function () {
-    PlayerServices.submitSession({
-      components: ComponentRegister.getComponentSessions()
-    }, $scope.onSessionSaved, $scope.onSessionSaveError);
-  };
-
   $scope.save = function (isAttempt, cb) {
     PlayerServices.saveSession(
       {
@@ -32,14 +26,22 @@ var controller = function ($scope, $log, ComponentRegister, PlayerServices) {
       $scope.onSessionSaveError);
   };
 
-  $scope.loadOutcome = function (cb){
+  $scope.loadOutcome = function (options, cb){
     //TODO - need to fetch the player options
     //Passed in to the launcher
-    PlayerServices.loadOutcome({
-      options: {}
-    }, 
-    cb 
+    PlayerServices.loadOutcome(options,
+      function(data){
+        $scope.onOutcomeLoaded(data);
+        if(cb) {
+          cb(data); 
+        }
+      }
     );
+  };
+
+  $scope.onOutcomeLoaded = function(data){
+    $scope.outcome = data.outcome;
+    $scope.score = data.score;
   };
   
   $scope.loadOutcomeError = function(err){
@@ -68,10 +70,8 @@ var controller = function ($scope, $log, ComponentRegister, PlayerServices) {
     );
   };
 
-  $scope.onSessionSaved = function (data) {
-    $scope.session = data.session;
-    $scope.outcome = data.outcome;
-    $scope.score = data.score;
+  $scope.onSessionSaved = function (session) {
+    $scope.session = session;
   };
 
   $scope.updateSession = function (data) {
@@ -159,11 +159,21 @@ var controller = function ($scope, $log, ComponentRegister, PlayerServices) {
     ComponentRegister.setEditable(editable);
     ComponentRegister.setMode(data.mode);
 
-    $scope.save(false, function(){
-      $scope.loadOutcome(function(){
-        $log.debug("score received");
+    if(data.mode == 'evaluate'){
+      $scope.save(false, function(){
+        $scope.loadOutcome(data.options, function(){
+          $log.debug("score received");
+        });
       });
-    });
+    } else {
+
+      $scope.$apply(function(){
+        _.forIn($scope.outcome, function(value, key){
+          $scope.outcome[key] = {};
+        });
+      });
+      $scope.score = {};
+    }
   });
 
 };

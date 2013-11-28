@@ -18,7 +18,7 @@ trait ClientSessionImpl extends Session {
         logger.debug(s"load $id")
         sessionService.load(id).map {
           json =>
-            block(FullSessionRequest(json, request))
+            block(FullSessionRequest(json, false, request))
         }.getOrElse(NotFound(s"Can't find a session with id: $id"))
     }
 
@@ -48,7 +48,8 @@ trait ClientSessionImpl extends Session {
       val result = for {
         session <- sessionService.load(id)
       } yield {
-        SaveSessionRequest(session, sessionService.save, request)
+        //TODO: Plugin secure mode
+        SaveSessionRequest(session, false, sessionService.save, request)
       }
       result.map {
         r =>
@@ -64,7 +65,7 @@ trait ClientSessionImpl extends Session {
           item <- itemService.load(itemId)
         } yield {
           val out: JsValue = Json.obj("item" -> item, "session" -> session)
-          FullSessionRequest(out, request)
+          FullSessionRequest(out, false, request)
         }
         result.map {
           r =>
@@ -79,7 +80,8 @@ trait ClientSessionImpl extends Session {
           itemId <- (session \ "itemId").asOpt[String]
           item <- itemService.load(itemId)
         } yield {
-          SessionOutcomeRequest(item, session, request)
+          //TODO: Plugin secure mode
+          SessionOutcomeRequest(item, session, false, request)
         }
 
         result.map{ r =>
