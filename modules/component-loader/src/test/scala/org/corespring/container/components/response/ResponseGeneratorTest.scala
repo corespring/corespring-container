@@ -43,7 +43,7 @@ class ResponseGeneratorTest extends Specification {
       val (value, expectedCorrectness, expectedFeedback) = set
       val answer = Json.obj("value" -> value)
       val generator = new OutcomeGenerator("comp", respondJs, Seq.empty)
-      val response = generator.createOutcome(question, answer, JsObject(Seq.empty))
+      val response = generator.createOutcome(question, answer, JsObject(Seq.empty), JsObject(Seq.empty))
       (response \ "correctness").as[String] === expectedCorrectness
       val feedback: Seq[JsValue] = (response \ "feedback").as[Seq[JsValue]]
       (feedback(0) \ "feedback").as[String] === expectedFeedback

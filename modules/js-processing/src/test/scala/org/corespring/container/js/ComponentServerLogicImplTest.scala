@@ -21,7 +21,7 @@ class ComponentServerLogicImplTest extends Specification{
 
   "server logic" should {
     "work" in {
-      val result = impl.createOutcome(Json.obj(), Json.obj(), Json.obj())
+      val result = impl.createOutcome(Json.obj(), Json.obj(), Json.obj(), Json.obj())
       (result \ "correctness").as[String] === "correct"
     }
   }
