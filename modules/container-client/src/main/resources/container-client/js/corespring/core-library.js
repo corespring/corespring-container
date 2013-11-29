@@ -20,13 +20,17 @@
       }
     };
 
-    this.library = function(uid){
+    this.library = function(uid, obj){
 
       if(!uid){
         throw new Error("you must specify a uid");
       }
 
-      libraries[uid] = libraries[uid] || {};
+      if(obj){
+        libraries[uid] = obj;
+      } else {
+        libraries[uid] = libraries[uid] || {};
+      }
       return libraries[uid];
     };
   };

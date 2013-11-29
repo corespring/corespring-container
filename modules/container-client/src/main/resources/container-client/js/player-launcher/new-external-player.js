@@ -1,5 +1,5 @@
 exports.define = function(isSecure) {
-  return function(element, options, errorCallback){
+  var PlayerDefinition = function(element, options, errorCallback){
 
     var instanceFactory = require("player-instance");
 
@@ -7,9 +7,21 @@ exports.define = function(isSecure) {
 
     options = $.extend(defaultOptions, options);
 
+    var errors = {
+      INVALID_MODE: {code: 101, message: "setMode was called with an invalid mode"},
+      NO_ITEM_ID: {code: 102, message: "itemId is missing from options"},
+      NO_SESSION_ID: {code: 103, message: "sessionId is missing from options"},
+      NOT_ALLOWED: {code: 104, message: "Not allowed perform this action"}
+    };
 
     var validateOptions = function (options) {
       var out = [];
+
+      if(!options.mode){
+        out.push(errors.INVALID_MODE);
+        return out;
+      }
+
       if (!options.itemId && options.mode === "gather") {
         out.push(errors.NO_ITEM_ID);
       }
@@ -35,17 +47,30 @@ exports.define = function(isSecure) {
       return ["gather", "view", "evaluate"].indexOf(m) !== -1;
     };
 
-    var isAllowed = function(mode){
-      return true;
+    var _isComplete = function(callback){
+      instance.sendMessage({
+        message: "isComplete",
+        property: "isComplete",
+        callback: callback
+      });
     };
 
-  
-    var errors = {
-      INVALID_MODE: {code: 101, message: "setMode was called with an invalid mode"},
-      NO_ITEM_ID: {code: 102, message: "itemId is missing from options"},
-      NO_SESSION_ID: {code: 103, message: "sessionId is missing from options"},
-      NOT_ALLOWED: {code: 104, message: "Not allowed perform this action"}
+    var isAllowed = function(mode, cb){
+      if(isSecure){
+        _isComplete(function(c){
+          if(mode == "evaluate" && !c){
+            cb(false);
+          } else if(mode == "gather" && c){
+            cb(false);
+          } else {
+            cb(true);
+          }
+        });
+      } else {
+        cb(true);
+      }
     };
+
 
     errorCallback = errorCallback || function (error) {
       throw "error occurred, code: " + error.code + ", message: " + error.message;
@@ -67,13 +92,14 @@ exports.define = function(isSecure) {
     /* API methods */
     this.setMode = function (mode) {
       if (isValidMode(mode)) {
-
-        if(isAllowed(mode)){
-          var modeOptions = options[mode] || {};
-          instance.sendMessage( { message: "setMode", data: {mode: mode, options: modeOptions}});
-        } else {
-          errorCallback(errors.NOT_ALLOWED);
-        }
+        isAllowed(mode, function(allowed){
+          if(allowed){
+            var modeOptions = options[mode] || {};
+            instance.sendMessage( { message: "setMode", data: {mode: mode, options: modeOptions}});
+          } else {
+            errorCallback(errors.NOT_ALLOWED);
+          }
+        });
       } else {
         errorCallback(errors.INVALID_MODE);
       }
@@ -124,18 +150,14 @@ exports.define = function(isSecure) {
       });
     };
 
-    this.isComplete = function(callback){
-      instance.sendMessage({
-        message: "isComplete",
-        property: "isComplete",
-        callback: callback
-      });
-    };
+    this.isComplete = _isComplete;
 
     this.reset = function(){
       instance.sendMessage({ message: "reset" });
     };
   };
+
+  return PlayerDefinition;
 };
 
 
