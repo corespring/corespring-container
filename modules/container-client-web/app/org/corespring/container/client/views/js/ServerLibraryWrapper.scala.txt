@@ -1,4 +1,8 @@
 @(fullName:String, src:String)
+//---------------------
+// @fullName
+//---------------------
+
 (function(exports, require){
-  @src;
+  @src
 })(corespring.library("@fullName"), corespring.require);

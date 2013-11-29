@@ -14,7 +14,7 @@ angular.module("simulator").controller('Root', ['$scope', '$log', '$http', funct
     allowEmptyResponses: true,
     highlightCorrectResponse: true,
     highlightUserResponse: true,
-    "corespsring-drag-and-drop" : {
+    "corespring-drag-and-drop" : {
       "blah" : "blah"
       }
   };

@@ -40,8 +40,7 @@ module.exports = (grunt) ->
       src: [
         '<%= common.dist %>/js/editor/**/*.js', 
         '<%= common.dist %>/js/render/services/**/*.js',
-        '<%= common.dist %>/js/render/directives/**/*.js',
-        '<%= common.dist %>/js/corespring/outcome-processor.js'
+        '<%= common.dist %>/js/render/directives/**/*.js'
       ]
 
     editorExtras:
