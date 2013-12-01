@@ -83,6 +83,7 @@ trait Main extends Controller {
     val rawJs = Seq("container-client/js/corespring/core-library.js")
     val wrappedJs = Seq(
       "container-client/js/player-launcher/new-external-player.js",
+      "container-client/js/player-launcher/error-codes.js",
       "container-client/js/player-launcher/player-instance.js",
       "container-client/js/player-launcher/root-level-listener.js"
     )
