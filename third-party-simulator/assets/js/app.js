@@ -46,9 +46,16 @@ angular.module("simulator").controller('Root', ['$scope', '$log', '$http', '$loc
     return $scope.mode === "gather" ? "Item Id" : "Session Id";   
   };
 
-  $scope.$watch('mode', function (newMode) {
+  $scope.$watch('mode', function (newMode, oldMode) {
     if ($scope.player) {
-      $scope.player.setMode(newMode);
+      $scope.player.setMode(newMode, function(err){
+        if(err){
+          $scope.mode = oldMode;
+          if ($scope.$root.$$phase != '$apply' && $scope.$root.$$phase != '$digest') {
+            $scope.$apply();
+          }
+        }
+      });
     }
   });
 
@@ -80,7 +87,15 @@ angular.module("simulator").controller('Root', ['$scope', '$log', '$http', '$loc
 
     options[idName] = $scope[idName];
 
-    $scope.player = new org.corespring.players.ItemPlayer('#player-holder', options);
+    $scope.player = new org.corespring.players.ItemPlayer('#player-holder', options, $scope.handlePlayerError);
+  };
+
+  $scope.handlePlayerError = function(e){
+    $log.debug("An error occured", e);
+
+    $scope.$apply(function(){
+      $scope.playerError = e;
+    });
   };
 
   $scope.remove = function () {

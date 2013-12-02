@@ -22,8 +22,14 @@ var controller = function ($scope, $log, ComponentRegister, PlayerServices) {
         if(cb){
           cb(s);
         }
-      }, 
-      $scope.onSessionSaveError);
+      },
+      function(e){
+        $scope.onSessionSaveError(e);
+        if(cb){
+          cb();
+        }
+      } 
+      );
   };
 
   $scope.loadOutcome = function (options, cb){

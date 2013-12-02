@@ -1,9 +1,11 @@
 exports.define = function(isSecure) {
   var PlayerDefinition = function(element, options, errorCallback){
 
-    var _definition = this;
+    var definition = this;
 
-    var _ready = false;
+    var isReady = false;
+
+    var currentMode = null;
 
     var instanceFactory = require("player-instance");
 
@@ -92,12 +94,14 @@ exports.define = function(isSecure) {
     var sendSetModeMessage = function(mode){
       var modeOptions = options[mode] || {};
       instance.sendMessage( { message: "setMode", data: {mode: mode, options: modeOptions}});
+
+      currentMode = mode;
     };
 
     /* API methods */
-    this.setMode = function (mode) {
+    this.setMode = function (mode, callback) {
 
-      if(!_ready){
+      if(!isReady){
         return;
       }
 
@@ -105,8 +109,12 @@ exports.define = function(isSecure) {
         isAllowed(mode, function(allowed){
           if(allowed){
             sendSetModeMessage(mode);
+            callback(null);
           } else {
             errorCallback(errors.NOT_ALLOWED);
+            if(callback){
+              callback(errors.NOT_ALLOWED);
+            }
           }
         });
       } else {
@@ -167,7 +175,7 @@ exports.define = function(isSecure) {
 
 
     instance.addListener("ready", function(data){
-      _ready = true; 
+      isReady = true; 
       sendSetModeMessage(options.mode);
     });
 

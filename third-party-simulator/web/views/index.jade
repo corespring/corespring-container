@@ -68,10 +68,17 @@ block content
                 br/
                 | &nbsp;
                 button.btn.btn-default(ng-click="updateSessionStatus()") Update
+
+          .player-error(ng-show="playerError", style='color: red;')
+            {{playerError.code}}
+            br/
+            {{playerError.message}}
+            br/
+            button.btn(ng-click="playerError = null") Ok
           hr/
           .btn.btn-default( type="button", ng-click="add()") Add  
           .btn.btn-default( type="button", ng-click="remove()") Remove 
-        td
+        td(style='width: 50%; vertical-align: top;')
           .player(ng-show="player")    
             #player-holder(style="height: 100%;")
             .btn.btn-default( type="button", ng-click="submit()") Submit 

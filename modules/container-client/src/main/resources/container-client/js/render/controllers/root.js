@@ -11,7 +11,7 @@ var controller = function ($scope, $log, $timeout, MessageBridge) {
       });
     };
 
-    $timeout(broadcastToChildren);
+    $timeout(broadcastToChildren, 200);
   };
 
   MessageBridge.addMessageListener($scope.messageBridgeListener);

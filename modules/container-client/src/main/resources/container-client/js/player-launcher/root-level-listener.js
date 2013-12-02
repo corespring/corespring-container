@@ -32,7 +32,8 @@ var Listener = function(log){
   /** The root listener implementation - forward event to all player listeners */
   var rootLevelListenerImpl = function (e) {
     for (var i = 0; i < listeners.length; i++) {
-      listeners[i](e);
+      //invoke the listener within its own context.
+      listeners[i].apply(listeners[i], [e]);
     }
   };
 
@@ -43,20 +44,31 @@ var Listener = function(log){
   };
 
   this.addListener = function(callback){
-     if (listeners.indexOf(callback) == -1) {
+    if (listeners.indexOf(callback) == -1) {
       listeners.push(callback);
     }
   };
+
+  this.removeListener = function(callback){
+    var index = listeners.indexOf(callback);
+    if(index == -1){
+      throw "Can't find callback in listeners";
+    }
+    listeners.splice(index, 1);
+  };
+
+  this.listenerLength = function(){
+    return listeners.length;
+  };
 };
 
-//new require('listener')(x)
 exports.init = function(log){
 
   if(!log){
 
     log = {
-      debug: function(){ console.debug(arguments);}
-    }
+      debug: function(){ console.debug(arguments); }
+    };
   }
 
   if(!instance){

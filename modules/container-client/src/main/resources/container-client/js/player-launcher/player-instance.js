@@ -38,7 +38,10 @@ var Instance = function(element, options, log){
       return data;
     });
 
-    listener.addListener(function (event) {
+    var resultHandler = function(){
+
+      var uid = new Date().getTime();
+
       try {
         var dataString = event.data;
         var data = typeof(event.data) == "string" ? JSON.parse(event.data) : event.data;
@@ -47,10 +50,12 @@ var Instance = function(element, options, log){
         }
       }
       catch (e) {
-        log.error("Exception in ItemPlayer.addSessionListener: " + e);
+        log.error("Exception in [player-instance] : " + e);
       }
+      listener.removeListener(this);
+    };
 
-    });
+    listener.addListener(resultHandler);
   };
 
 
