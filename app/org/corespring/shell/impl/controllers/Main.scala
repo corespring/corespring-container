@@ -1,6 +1,7 @@
 package org.corespring.shell.impl.controllers
 
-import org.corespring.container.client.views.txt.js.PlayerLauncherWrapper
+import java.io.File
+import org.corespring.container.client.views.txt.js.ServerLibraryWrapper
 import org.corespring.shell.impl.services.MongoService
 import play.api.Play.current
 import play.api.http.ContentTypes
@@ -66,14 +67,51 @@ trait Main extends Controller {
 
   def isSecure(r:Request[AnyContent]) = r.getQueryString("secure").map{ _ == "true"}.getOrElse(false)
 
+
+  //TODO: Move to container-client-web or its own module - as we'll be reusing this
   def playerJs = Action{ request =>
 
+    val defaultOptions =
+      """
+        |exports.corespringUrl = "http://localhost:9000";
+        |exports.itemPath = "/client/item/:id/player";
+        |exports.sessionPath = "/client/player/:id/index.html";
+        |exports.mode = "gather";
+        |
+      """.stripMargin
 
-    Play.resourceAsStream("/container-client/js/corespring/external-player.js").map{ is =>
-      val content = scala.io.Source.fromInputStream(is).getLines.mkString("\n")
-      val out = PlayerLauncherWrapper(content, isSecure(request)).toString
-      Ok(out).as(ContentTypes.JAVASCRIPT).withSession((SecureMode, isSecure(request).toString))
-    }.getOrElse(NotFound)
+    val rawJs = Seq("container-client/js/corespring/core-library.js")
+    val wrappedJs = Seq(
+      "container-client/js/player-launcher/player.js",
+      "container-client/js/player-launcher/player-errors.js",
+      "container-client/js/player-launcher/player-instance.js",
+      "container-client/js/player-launcher/root-level-listener.js"
+    )
 
+    def pathToNameAndContents(p: String) = {
+      import grizzled.file.GrizzledFile._
+      Play.resource(p).map {
+        r =>
+          val name = new File(r.getFile).basename.getName.replace(".js", "")
+          val contents = scala.io.Source.fromFile(r.getFile).getLines.mkString("\n")
+          (name, contents)
+      }.getOrElse((p, ""))
+    }
+
+    val contents = rawJs.map(pathToNameAndContents(_)).map(_._2)
+    val wrappedNameAndContents = wrappedJs.map(pathToNameAndContents) :+ ("default-options", defaultOptions)
+    val wrappedContents = wrappedNameAndContents.map(tuple => ServerLibraryWrapper(tuple._1, tuple._2))
+
+    val bootstrap =
+      s"""
+        |window.org = window.org || {};
+        |org.corespring = org.corespring || {};
+        |org.corespring.players = org.corespring.players || {};
+        |org.corespring.players.ItemPlayer = corespring.require("player").define(${isSecure(request)});
+        |
+      """.stripMargin
+    Ok(
+      (contents ++ wrappedContents :+ bootstrap).mkString("\n")
+    ).as(ContentTypes.JAVASCRIPT).withSession((SecureMode, isSecure(request).toString))
   }
 }

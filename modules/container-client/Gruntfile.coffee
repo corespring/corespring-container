@@ -1,4 +1,5 @@
 componentDependencies = require "./lib/component-dependencies"
+prepPlayerLauncher = require "./lib/prep-player-launcher"
 expander = require "./lib/expander"
 _ = require "lodash"
 
@@ -10,6 +11,7 @@ module.exports = (grunt) ->
     app: 'src/main/resources/container-client'
     dist: 'target/scala-2.10/classes/container-client'
     test: 'src/test/resources/container-client'
+    tmp: '.tmp'
     components: '../../corespring-components/components'
     player: 
       src:  [
@@ -40,8 +42,7 @@ module.exports = (grunt) ->
       src: [
         '<%= common.dist %>/js/editor/**/*.js', 
         '<%= common.dist %>/js/render/services/**/*.js',
-        '<%= common.dist %>/js/render/directives/**/*.js',
-        '<%= common.dist %>/js/corespring/outcome-processor.js'
+        '<%= common.dist %>/js/render/directives/**/*.js'
       ]
 
     editorExtras:
@@ -63,9 +64,7 @@ module.exports = (grunt) ->
   
   expandSrc = (arr) ->
     expanded = expand(arr)
-    grunt.log.writeln("[expandSrc]: ", expanded)
     urls = _.map(expanded, toUrl)
-    grunt.log.writeln("[expandSrc]: ", urls)
     urls
 
   expand = (paths) ->
@@ -81,12 +80,8 @@ module.exports = (grunt) ->
   pathsFor = (obj, name) ->
     name = "dest" unless name?
     filePaths =  if devMode then obj["src"] else [obj[name]] 
-    grunt.log.writeln("[pathsFor] : ", filePaths)
-    grunt.log.writeln(filePaths)
     expanded = expand(filePaths) 
-    grunt.log.writeln("[pathsFor] : expanded: ", expanded)
     mapped = _.map( expanded, toUrl )
-    grunt.log.writeln("[pathsFor] : mapped: ", mapped)
     mapped
 
  
@@ -151,7 +146,10 @@ module.exports = (grunt) ->
 
     jasmine:
       unit:
-        src: '<%= common.app %>/js/**/*.js',
+        src: [
+          '<%= common.app %>/js/**/*.js', 
+          '!<%= common.app %>/js/**/player-launcher/*.js',
+          '<%= common.tmp %>/wrapped/**/*.js']
         options:
           keepRunner: true
           vendor: [
@@ -245,8 +243,8 @@ module.exports = (grunt) ->
 
   grunt.loadNpmTasks(t) for t in npmTasks
   grunt.registerTask('loadComponentDependencies', 'Load client side dependencies for the components', componentDependencies(grunt))
-  
+  grunt.registerTask('prepPlayerLauncher', 'prep the player launcher js', prepPlayerLauncher(grunt))
   grunt.registerTask('run', ['jade', 'less', 'watch'])
-  grunt.registerTask('test', ['shell:bower', 'loadComponentDependencies', 'jasmine:unit'])
-  grunt.registerTask('default', ['shell:bower', 'loadComponentDependencies', 'concat', 'uglify', 'less', 'jade', 'compress', 'jasmine:unit'])
+  grunt.registerTask('test', ['shell:bower', 'loadComponentDependencies', 'prepPlayerLauncher', 'jasmine:unit'])
+  grunt.registerTask('default', ['shell:bower', 'loadComponentDependencies', 'concat', 'uglify', 'less', 'jade', 'compress', 'prepPlayerLauncher','jasmine:unit'])
   grunt.registerTask('minify-test', ['concat', 'uglify'])

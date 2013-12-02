@@ -21,6 +21,8 @@ object Build extends sbt.Build {
     val casbah = "org.mongodb" %% "casbah" % "2.6.3"
     val playS3 = "org.corespring" %% "play-s3" % "0.1-bea81d9"
     val mockito = "org.mockito" % "mockito-all" % "1.9.5" % "test"
+    val grizzled = "org.clapper" %% "grizzled-scala" % "1.1.4"
+    val scalaz = "org.scalaz" %% "scalaz-core" % "7.0.5"
   }
 
   object Resolvers {
@@ -117,7 +119,7 @@ object Build extends sbt.Build {
 
   val containerClientWeb = builder.playApp("container-client-web").settings(
     sources in doc in Compile := List(),
-    libraryDependencies ++= Seq(mockito),
+    libraryDependencies ++= Seq(mockito, grizzled),
     templatesImport ++= Seq( "play.api.libs.json.JsValue", "play.api.libs.json.Json" )
   ).dependsOn(
     componentModel % "compile->compile;test->test",
@@ -127,7 +129,7 @@ object Build extends sbt.Build {
 
   val shell = builder.playApp("shell", Some(".")).settings(
     resolvers ++= Resolvers.all,
-    libraryDependencies ++= Seq(casbah, playS3),
+    libraryDependencies ++= Seq(casbah, playS3, scalaz),
     credentials += cred,
     sbt.Keys.fork in Test := false,
     // Start grunt on play run

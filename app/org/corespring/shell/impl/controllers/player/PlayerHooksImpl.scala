@@ -8,6 +8,8 @@ import org.corespring.shell.impl.services.MongoService
 import play.api.libs.json._
 import play.api.mvc.{Action, Result, AnyContent}
 import scala.Some
+import scalaz.Scalaz._
+import scalaz._
 
 trait PlayerHooksImpl extends PlayerHooks {
 
@@ -19,16 +21,18 @@ trait PlayerHooksImpl extends PlayerHooks {
     private def toItemId(json: JsValue): Option[String] = (json \ "itemId").asOpt[String]
 
     private def load(id:String)(block: (PlayerRequest[AnyContent] => Result)) : Action[AnyContent] = Action{ request =>
-        val playerRequest: Option[PlayerRequest[AnyContent]] = for {
-          s <- sessionService.load(id)
-          itemId <- toItemId(s)
-          i <- itemService.load(itemId)
-        } yield {
+      val playerRequest: Validation[String, PlayerRequest[AnyContent]] = for {
+        s <- sessionService.load(id).toSuccess(s"can't find session with id: $id")
+        itemId <- toItemId(s).toSuccess(s"error converting string to item id: $s")
+        i <- itemService.load(itemId).toSuccess(s"can't load item with id: $itemId")
+      } yield {
           PlayerRequest(i, request, Some(s))
         }
-        playerRequest.map(block(_)).getOrElse{
-          BadRequest("PlayerHooksImpl: Error loading player")
-        }
+
+      playerRequest match {
+        case Failure(msg) => BadRequest(Json.obj("error" -> JsString(msg)))
+        case Success(r) => block(r)
+      }
     }
 
     def loadComponents(id: String)(block: (PlayerRequest[AnyContent]) => Result): Action[AnyContent] = load(id)(block)

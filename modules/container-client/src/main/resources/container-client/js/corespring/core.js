@@ -1,36 +1,5 @@
 (function(root){
 
-  var Library = function(){
-
-    var libraries = {
-      lodash: _,
-      underscore: _
-    };
-
-    this.require = function(uid){
-
-      if(!uid){
-        throw new Error("you must specify a uid");
-      }
-
-      if(libraries[uid]){
-        return libraries[uid];
-      } else {
-        throw new Error("can't find library : " + uid);
-      }
-    };
-
-    this.library = function(uid){
-
-      if(!uid){
-        throw new Error("you must specify a uid");
-      }
-
-      libraries[uid] = libraries[uid] || {};
-      return libraries[uid];
-    };
-  };
-
   var ComponentDefinition = function(angular, compName, moduleName){
 
     var loadAngularModule = function(moduleName){
@@ -115,9 +84,6 @@
   };
 
   var Corespring = function(){
-    var _library = new Library();
-    this.library = _library.library;
-    this.require = _library.require;
     this.server = new Server();
     this.client = new Client(root.angular);
 
@@ -128,6 +94,12 @@
   };
 
   if(!root.corespring) {
-    root.corespring = new Corespring();
+    root.corespring = {};
+  }
+
+  var extension = new Corespring();
+
+  for(var x in extension){
+    root.corespring[x] = extension[x];
   }
 })(this);

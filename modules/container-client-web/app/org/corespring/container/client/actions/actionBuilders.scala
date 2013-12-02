@@ -19,16 +19,6 @@ trait EditorClientHooksActionBuilder[A] extends ClientHooksActionBuilder[A]{
   def createItem(block:PlayerRequest[A] => Result) : Action[AnyContent]
 }
 
-
-trait SecureActionBuilder {
-
-  def loadOutcome[A](isSecure: Boolean, isComplete: Boolean)(request: Request[A], block: Request[A] => Result): Result = if (isSecure && !isComplete) {
-    BadRequest(Json.obj("error" -> JsString("Not allowed in secure mode")))
-  } else {
-    block(request)
-  }
-}
-
 trait ItemActionBuilder[A] {
   def load(itemId:String)(block: ItemRequest[A] => Result ) : Action[AnyContent]
   def save(itemId:String)(block: SaveItemRequest[A] => Result ) : Action[AnyContent]

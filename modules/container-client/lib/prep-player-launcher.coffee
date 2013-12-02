@@ -1,0 +1,38 @@
+_ = require "lodash"
+path = require "path"
+fs = require "fs"
+
+module.exports = (grunt) ->
+  
+  template = (name, contents) ->
+    """
+    (function(exports, require){
+      #{contents}
+    })(corespring.library("#{name}"), corespring.require);
+    """
+  
+  ->
+
+    grunt.log.writeln("prep player launcher")
+    common = grunt.config("common")
+    
+    processed = grunt.template.process(
+      "<%= common.app %>/**/player-launcher/*.js",
+      data:
+        common: common
+    )
+
+    filesToWrap = grunt.file.expand({ nonull: true }, processed)
+
+    _.map filesToWrap, (p) ->
+      grunt.log.writeln(p)
+      name = path.basename(p, ".js") 
+      contents = fs.readFileSync(p)
+      wrapped = template(name, contents)
+      basePath = "#{common.tmp}/wrapped"
+      fs.mkdirSync(basePath) unless fs.existsSync(basePath)
+      fs.writeFileSync("#{basePath}/#{name}-wrapped.js", wrapped)
+
+
+
+

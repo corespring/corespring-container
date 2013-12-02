@@ -8,7 +8,7 @@ angular.module("simulator").controller('Root', ['$scope', '$log', '$http', '$loc
 
   $scope.mode = "gather";
 
-  $scope.itemId = $location.search()['sessionId'] ? "" : ($location.search()['itemId'] || "522267c2554f43f858000005");
+  $scope.itemId = $location.search()['sessionId'] ? "" : ($location.search()['itemId'] || "522267c2554f43f858000001");
   $scope.sessionId = $location.search()['sessionId'] || "";
 
   $scope.modeSettings = {
@@ -16,9 +16,9 @@ angular.module("simulator").controller('Root', ['$scope', '$log', '$http', '$loc
     allowEmptyResponses: true,
     highlightCorrectResponse: true,
     highlightUserResponse: true,
-    "corespsring-drag-and-drop": {
-      "blah": "blah"
-    }
+    "corespring-drag-and-drop" : {
+      "blah" : "blah"
+      }
   };
 
   $scope.isSecure = false;
