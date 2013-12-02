@@ -25,7 +25,7 @@ describe('player launcher', function(){
   beforeEach(function(){
     var mockInstance = corespring.library("player-instance");
 
-    launcher = corespring.require("new-external-player");
+    launcher = corespring.require("player");
   });
 
   var lastError = null;
