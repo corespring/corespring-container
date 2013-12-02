@@ -4,6 +4,7 @@
   "repository": "https://github.com/corespring/corespring-container/tree/master/modules/container-client",
   "version": "0.0.1",
   "devDependencies": {
+    "mkdirp" : "*",
     "grunt": "~0.4.1",
     "grunt-contrib-copy": "~0.4.1",
     "grunt-contrib-concat": "~0.3.0",

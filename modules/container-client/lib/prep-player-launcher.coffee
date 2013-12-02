@@ -1,6 +1,8 @@
 _ = require "lodash"
 path = require "path"
 fs = require "fs"
+mkdirp = require 'mkdirp'
+
 
 module.exports = (grunt) ->
   
@@ -30,7 +32,7 @@ module.exports = (grunt) ->
       contents = fs.readFileSync(p)
       wrapped = template(name, contents)
       basePath = "#{common.tmp}/wrapped"
-      fs.mkdirSync(basePath) unless fs.existsSync(basePath)
+      mkdirp.sync basePath
       fs.writeFileSync("#{basePath}/#{name}-wrapped.js", wrapped)
 
 
