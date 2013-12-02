@@ -2,9 +2,12 @@
 
 var instance = null;
 
-var Listener = function(){
+var rootListener = null;
 
-  var rootListener = null;
+var Listener = function(log){
+
+  var uid = new Date().getTime();
+
 
   var eventName = function () {
     return window.addEventListener ? "message" : "onmessage";
@@ -16,11 +19,6 @@ var Listener = function(){
 
   /** A cache of existing player listeners - gets overrwritten when a new ItemPlayer is instantiated */
   var listeners = [];
-
-  var logError = function (error) {
-    //TODO
-    //console.error(error);
-  };
 
   /** only add one listener to the window, this function is expected to then delegate out to player listeners */
   var addRootLevelMessageListener = function (newListener) {
@@ -49,17 +47,22 @@ var Listener = function(){
       listeners.push(callback);
     }
   };
-
 };
 
 //new require('listener')(x)
-exports.init = function(){
+exports.init = function(log){
 
-  if(instance){
-    return instance;
-  } else {
-    return new Listener();
+  if(!log){
+
+    log = {
+      debug: function(){ console.debug(arguments);}
+    }
   }
+
+  if(!instance){
+    instance = new Listener(log);
+  } 
+  return instance;
 };
 
  
