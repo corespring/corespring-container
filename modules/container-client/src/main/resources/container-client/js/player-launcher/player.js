@@ -3,7 +3,7 @@ exports.define = function(isSecure) {
 
     var instanceFactory = require("player-instance");
 
-    var defaultOptions = require("defaultOptions");
+    var defaultOptions = require("default-options");
 
     var errors = require("player-errors");
 

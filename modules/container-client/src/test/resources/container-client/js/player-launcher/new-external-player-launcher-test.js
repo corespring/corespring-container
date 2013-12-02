@@ -20,7 +20,7 @@ describe('player launcher', function(){
 
   var mockInstance = corespring.library("player-instance", new MockInstance());
 
-  var defaultOptions = corespring.library("defaultOptions");
+  var defaultOptions = corespring.library("default-options");
 
   beforeEach(function(){
     var mockInstance = corespring.library("player-instance");
@@ -39,7 +39,7 @@ describe('player launcher', function(){
       defaultOptions[x] = options[x];
     }
 
-    var Player = launcher.define(true);
+    var Player = launcher.define(secureMode);
     
     var player = new Player("blah", {}, function(err){ 
       lastError = err;

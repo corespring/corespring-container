@@ -82,7 +82,7 @@ trait Main extends Controller {
 
     val rawJs = Seq("container-client/js/corespring/core-library.js")
     val wrappedJs = Seq(
-      "container-client/js/player-launcher/new-external-player.js",
+      "container-client/js/player-launcher/player.js",
       "container-client/js/player-launcher/player-errors.js",
       "container-client/js/player-launcher/player-instance.js",
       "container-client/js/player-launcher/root-level-listener.js"
@@ -99,7 +99,7 @@ trait Main extends Controller {
     }
 
     val contents = rawJs.map(pathToNameAndContents(_)).map(_._2)
-    val wrappedNameAndContents = wrappedJs.map(pathToNameAndContents) :+("defaultOptions", defaultOptions)
+    val wrappedNameAndContents = wrappedJs.map(pathToNameAndContents) :+ ("default-options", defaultOptions)
     val wrappedContents = wrappedNameAndContents.map(tuple => ServerLibraryWrapper(tuple._1, tuple._2))
 
     val bootstrap =
@@ -107,7 +107,7 @@ trait Main extends Controller {
         |window.org = window.org || {};
         |org.corespring = org.corespring || {};
         |org.corespring.players = org.corespring.players || {};
-        |org.corespring.players.ItemPlayer = corespring.require("new-external-player").define(${isSecure(request)});
+        |org.corespring.players.ItemPlayer = corespring.require("player").define(${isSecure(request)});
         |
       """.stripMargin
     Ok(
