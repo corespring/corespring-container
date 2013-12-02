@@ -166,11 +166,8 @@ var controller = function ($scope, $log, ComponentRegister, PlayerServices) {
         });
       });
     } else {
-
-      $scope.$apply(function(){
-        _.forIn($scope.outcome, function(value, key){
-          $scope.outcome[key] = {};
-        });
+      _.forIn($scope.outcome, function(value, key){
+        $scope.outcome[key] = {};
       });
       $scope.score = {};
     }

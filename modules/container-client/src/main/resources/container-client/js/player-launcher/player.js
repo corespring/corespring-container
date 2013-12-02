@@ -1,6 +1,10 @@
 exports.define = function(isSecure) {
   var PlayerDefinition = function(element, options, errorCallback){
 
+    var _definition = this;
+
+    var _ready = false;
+
     var instanceFactory = require("player-instance");
 
     var defaultOptions = require("default-options");
@@ -8,8 +12,7 @@ exports.define = function(isSecure) {
     var errors = require("player-errors");
 
     options = $.extend(defaultOptions, options);
-
-
+    
     var validateOptions = function (options) {
       var out = [];
 
@@ -72,11 +75,15 @@ exports.define = function(isSecure) {
       throw "error occurred, code: " + error.code + ", message: " + error.message;
     };
 
-    
+    instance.addListener("ready", function(data){
+      _ready = true; 
+      _definition.setMode(options.mode);
+    });
+
     if (options.onSessionCreated) {
       instance.addListener("sessionCreated", function(data){
         options.onSessionCreated(data.session._id.$oid);
-      });
+      }); 
     }
 
     if(options.onInputReceived){
@@ -87,6 +94,11 @@ exports.define = function(isSecure) {
 
     /* API methods */
     this.setMode = function (mode) {
+
+      if(!_ready){
+        return;
+      }
+
       if (isValidMode(mode)) {
         isAllowed(mode, function(allowed){
           if(allowed){

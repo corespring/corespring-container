@@ -3,10 +3,15 @@ var controller = function ($scope, $log, $timeout, MessageBridge) {
   $scope.messageBridgeListener = function(event){
     $log.debug("[player:Root] message received: ", event);
     var data = typeof(event.data) == "string" ? JSON.parse(event.data) : event.data;
-    $scope.$broadcast(data.message, data, function(result){
-      var response = _.extend(result, {message: data.message + 'Result'});
-      MessageBridge.sendMessage('parent', response, true);
-    });
+
+    var broadcastToChildren = function(){
+      $scope.$broadcast(data.message, data, function(result){
+        var response = _.extend(result, {message: data.message + 'Result'});
+        MessageBridge.sendMessage('parent', response, true);
+      });
+    };
+
+    $timeout(broadcastToChildren);
   };
 
   MessageBridge.addMessageListener($scope.messageBridgeListener);
