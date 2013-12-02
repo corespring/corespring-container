@@ -5,8 +5,6 @@ exports.define = function(isSecure) {
 
     var isReady = false;
 
-    var currentMode = null;
-
     var instanceFactory = require("player-instance");
 
     var defaultOptions = require("default-options");
@@ -94,8 +92,6 @@ exports.define = function(isSecure) {
     var sendSetModeMessage = function(mode){
       var modeOptions = options[mode] || {};
       instance.sendMessage( { message: "setMode", data: {mode: mode, options: modeOptions}});
-
-      currentMode = mode;
     };
 
     /* API methods */
