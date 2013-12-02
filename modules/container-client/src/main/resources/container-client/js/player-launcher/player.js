@@ -75,10 +75,7 @@ exports.define = function(isSecure) {
       throw "error occurred, code: " + error.code + ", message: " + error.message;
     };
 
-    instance.addListener("ready", function(data){
-      _ready = true; 
-      _definition.setMode(options.mode);
-    });
+   
 
     if (options.onSessionCreated) {
       instance.addListener("sessionCreated", function(data){
@@ -92,6 +89,11 @@ exports.define = function(isSecure) {
       });
     }
 
+    var sendSetModeMessage = function(mode){
+      var modeOptions = options[mode] || {};
+      instance.sendMessage( { message: "setMode", data: {mode: mode, options: modeOptions}});
+    };
+
     /* API methods */
     this.setMode = function (mode) {
 
@@ -102,8 +104,7 @@ exports.define = function(isSecure) {
       if (isValidMode(mode)) {
         isAllowed(mode, function(allowed){
           if(allowed){
-            var modeOptions = options[mode] || {};
-            instance.sendMessage( { message: "setMode", data: {mode: mode, options: modeOptions}});
+            sendSetModeMessage(mode);
           } else {
             errorCallback(errors.NOT_ALLOWED);
           }
@@ -163,6 +164,13 @@ exports.define = function(isSecure) {
     this.reset = function(){
       instance.sendMessage({ message: "reset" });
     };
+
+
+    instance.addListener("ready", function(data){
+      _ready = true; 
+      sendSetModeMessage(options.mode);
+    });
+
   };
 
   return PlayerDefinition;
