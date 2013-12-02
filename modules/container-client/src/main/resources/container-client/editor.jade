@@ -4,8 +4,6 @@ extends layout
 block head
 
   link(rel="stylesheet", href="/client/css/editor.css")
-  link(rel="stylesheet", type="text/css", href="/client/components/markitup/markitup/skins/markitup/style.css")
-  link(rel="stylesheet", type="text/css", href="/client/components/markitup/markitup/sets/default/style.css")
 
   script(type="text/ng-template", id="add-component.html")
     .modal
@@ -42,7 +40,7 @@ block content
 
         .main-btn.active Item Design
         //TODO: will need to add this back
-        //span.btn.btn-info.btn-xs(file-uploader, fu-url="getUploadUrl()", fu-mode="raw") Upload image
+        span.btn.btn-info.btn-xs(file-uploader, fu-url="getUploadUrl()", fu-mode="raw", fu-max-size="1000") Upload image
         span.header
           .title
             | Item preview

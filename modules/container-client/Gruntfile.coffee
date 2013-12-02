@@ -26,7 +26,7 @@ module.exports = (grunt) ->
         '<%= common.dist %>/bower_components/angular/angular.min.js',
         '<%= common.dist %>/bower_components/lodash/dist/lodash.min.js',
         '<%= common.dist %>/bower_components/angular-ui-sortable/src/sortable.js',
-        '<%= common.dist %>/bower_components/corespring-ng-components/build/corespring-ng-components.min.js' ]
+        '<%= common.dist %>/bower_components/corespring-ng-components/build/corespring-ng-components.js' ]
       concatDest: '<%= common.dist %>/js/core-libs.js'
 
     core: 
