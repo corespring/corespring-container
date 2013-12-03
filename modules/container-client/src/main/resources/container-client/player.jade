@@ -19,12 +19,6 @@ block content
         ng-click="submit()",
         ng-disabled="!canSubmit()") Submit
 
-      label
-        | Attempts left: {{rootModel.session.remainingAttempts !== undefined ? rootModel.session.remainingAttempts : session.settings.maxNoOfAttempts}}
-
-      hr
-      #score(ng-show="score")
-        h4 You scored: {{score.summary.percentage}}%
 
 block scripts
 

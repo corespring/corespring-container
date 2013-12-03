@@ -127,7 +127,7 @@ exports.define = function(isSecure) {
     };
 
     this.resetItem = function () {
-      instance.sendMessage( { messaget: "resetItem" });
+      instance.sendMessage( { message: "resetItem" });
     };
 
     this.countAttempts = function (callback) {
