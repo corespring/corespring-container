@@ -21,6 +21,7 @@ module.exports = (grunt) ->
 
     coreLibs: 
       src: [
+        '<%= common.dist %>/bower_components/console-polyfill/index.js',
         '<%= common.dist %>/bower_components/jquery/jquery.min.js',
         '<%= common.dist %>/bower_components/jquery-ui/ui/minified/jquery-ui.min.js',
         '<%= common.dist %>/bower_components/angular/angular.min.js',

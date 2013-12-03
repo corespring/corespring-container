@@ -1,7 +1,6 @@
 var controller = function ($scope, $log, $timeout, MessageBridge) {
 
   $scope.messageBridgeListener = function(event){
-    $log.debug("[player:Root] message received: ", event);
     var data = typeof(event.data) == "string" ? JSON.parse(event.data) : event.data;
 
     var broadcastToChildren = function(){
