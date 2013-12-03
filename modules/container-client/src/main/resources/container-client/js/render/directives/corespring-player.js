@@ -48,27 +48,31 @@ angular.module('corespring-player.directives').directive('corespringPlayer', [
           stash the component data (TODO: persist it?)
         */
         $scope.$on('saveStash', function(event, id, stash){
+          /*
           if(!$scope.session){
             return;
           }
           var extension = { components: {} };
           extension.components[id] = {stash: stash};
           $scope.session = _.merge($scope.session, extension);
+          */
         });
 
         $scope.$watch('xhtml', function(xhtml){
-          renderMarkup(xhtml);
+          //renderMarkup(xhtml);
         });
 
         $scope.$watch('item', function(item){
-          setDataAndSession();
+          //setDataAndSession();
         }, true);
 
         $scope.$watch('session', function(session, oldSession){
+          /*
           if ($scope.mode != "player" && !session) {
             $scope.session = {};
           }
           setDataAndSession();
+          */
         }, true);
 
         $scope.$watch('outcomes', function(r){
@@ -92,6 +96,7 @@ angular.module('corespring-player.directives').directive('corespringPlayer', [
         session: '=playerSession'
       },
       template: [ '<div class="corespring-player">',
+                   '!!!!',
                   '  <div id="body"></div>',
                   '</div>'].join("\n")
     };

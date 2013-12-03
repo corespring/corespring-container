@@ -7,7 +7,7 @@ block content
   div#root.container(ng-controller="Root")
     div(ng-controller="Main")
 
-      corespring-player(
+      div(corespring-player,
         player-mode="player",
         player-markup="item.xhtml",
         player-item="item",
@@ -17,9 +17,6 @@ block content
       button.btn.btn-primary(
         ng-click="submit()",
         ng-disabled="!canSubmit()") Submit
-
-      label
-        | Attempts left: {{rootModel.session.remainingAttempts !== undefined ? rootModel.session.remainingAttempts : session.settings.maxNoOfAttempts}}
 
       hr
       #score(ng-show="score")
