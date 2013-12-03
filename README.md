@@ -46,6 +46,7 @@ Install npm packages
     play
     [shell] npm install # installs the dependencies for the container-client
     [shell] bower install # installs the ui dependenceis for the container-client
+    [shell] grunt loadComponentDependencies # loads any 3rd party libs defined by the components
     [shell] run # start the server
     
     
