@@ -27,6 +27,18 @@ module.exports = (grunt) ->
   ->
 
     bowerInstall = (name, target, done) ->
+
+      args = if target == "latest" then "-F -V #{name}" else "-F -V #{name}=#{target}"
+      exec = require('child_process').exec
+      cmd = "bower install #{args}"
+      grunt.log.writeln("running: #{cmd}")
+      exec cmd, {cwd: '.'}, (err, stdout, stderr) ->
+        grunt.log.writeln(stdout)
+        grunt.log.writeln(stderr)
+        grunt.log.writeln("-------------> done: #{name}")
+        done()
+
+      ###
       finalName = if target == "latest" then name else "#{name}=#{target}"
 
       bower.config.verbose = true
@@ -38,7 +50,8 @@ module.exports = (grunt) ->
       )
       .on( 'log', (log) ->  grunt.log.writeln( "---- #{log.level}: #{log.message}" ) )
       .on( 'error', (err) -> grunt.fail.fatal(err) )
-
+      ###
+      
     done = @async()
 
     if !grunt.config("common.components")
