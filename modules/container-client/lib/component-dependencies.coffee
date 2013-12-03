@@ -29,9 +29,12 @@ module.exports = (grunt) ->
     bowerInstall = (name, target, done) ->
       args = if target == "latest" then "-F -V #{name}" else "-F -V #{name}=#{target}"
       exec = require('child_process').exec
-      exec "bower install #{args}", {cwd: '.'}, (err, stdout, stderr) ->
+      cmd = "bower install #{args}"
+      grunt.log.writeln("running: #{cmd}")
+      exec cmd, {cwd: '.'}, (err, stdout, stderr) ->
         grunt.log.writeln(stdout)
-        grunt.log.writeln("-------------> done")
+        grunt.log.writeln(stderr)
+        grunt.log.writeln("-------------> done: #{name}")
         done()
 
     done = @async()

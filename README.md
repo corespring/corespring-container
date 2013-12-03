@@ -22,6 +22,14 @@ These tools should be on your `PATH`:
 
     git clone --recursive git@github.com:corespring/corespring-container.git
 
+#### Important !!
+
+The command above *should* add the [corespring-components](http://github.com/corespring/corespring-components) as a submodule. If it doesn't you'll need to add this repo.
+
+    git submodule init
+    git submodule update
+
+
 ## Run
 
 ### ENV VARS
@@ -41,7 +49,7 @@ Install npm packages
     ./bin/run
 
 
-## Run play app
+## Run play app and install client side dependencies
 
     play
     [shell] npm install # installs the dependencies for the container-client
