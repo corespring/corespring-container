@@ -3,7 +3,6 @@ extends layout
 block head
   link(rel="stylesheet", href="css/player.css")
 
-
 block content
   div#root.container(ng-controller="Root")
     div(ng-controller="Main")
@@ -34,6 +33,12 @@ block scripts
   script(src="/client/components/angular-ui/build/angular-ui.js")
 
   script.
+    var bootstrapResumeTimeout = 0;
+  //[if lt IE 9]> <script>console.log("ie8 delay!!!"); bootstrapResumeTimeout = 4000;</script> <![endif]
+  //[if lt IE 9]> <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script> <![endif]
+  //[if lt IE 9]> <script src="//cdnjs.cloudflare.com/ajax/libs/json3/3.2.6/json3.min.js"></script> <![endif]
+
+  script.
     $(document).ready(function(){
       console.log("load config", document.location);
 
@@ -57,8 +62,11 @@ block scripts
 
           angular.module("corespring-player", playerDeps );
           angular.bootstrap(document, ["corespring-player"]);
-          angular.resumeBootstrap();
-          $("body").addClass('blend');
+
+          setTimeout(function(){
+            angular.resumeBootstrap();
+            $("body").addClass('blend');
+          }, bootstrapResumeTimeout);
         };
 
         var allScripts = data.scripts.concat(data.css);
