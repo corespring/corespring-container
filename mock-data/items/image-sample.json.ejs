@@ -1,0 +1,54 @@
+{
+  "metadata" : {
+    "title" : "Image component"
+  },
+  "xhtml" : "<%- helper.read('../xml/image-sample.xhtml') %>",
+  "components" : {
+    "1" : {
+      "componentType" : "corespring-image",
+      "imageUrl": "cute-puppy.jpg"
+    },
+    "2" : {
+      "componentType" : "corespring-multiple-choice",
+      "title": "Fruits",
+      "weight" : 10,
+      "correctResponse" : { "value" : ["carrot", "turnip", "potato"] },
+      "feedback" : [
+        { "value" : "banana", "feedback" : "Incorrect"},
+        { "value" : "carrot", "feedback" : "Correct", "notChosenFeedback" : "This is a vegetable"},
+        { "value" : "apple", "feedback" : "it's a fruit" },
+        { "value" : "turnip", "feedback" : "Correct", "notChosenFeedback" : "This is a vegetable" },
+        { "value" : "potato", "feedback" : "Correct", "notChosenFeedback" : "This is a vegetable" },
+        { "value" : "wheat", "feedback" : "Incorrect" }
+      ],
+      "scoreMapping" : {
+        "banana": 0.5,
+        "carrot": 1,
+        "apple": 1,
+        "wheat": -1
+      },
+
+      "model" : {
+        "prompt": "Which of these is a vegetable?",
+        "config": {
+          "orientation": "vertical",
+          "shuffle": true
+        },
+        "choices": [
+          {"label": "Banana", "value": "banana"},
+          {"labelType": "image", "imageId": "1", "value": "carrot"},
+          {"label": "Apple", "value": "apple"},
+          {"label": "Turnip", "value": "turnip"},
+          {"label": "Potato", "value": "potato"},
+          {"label": "Wheat", "value": "wheat"}
+        ]
+      }
+    }
+  },
+  "_id" : "522267c2554f43f858000006",
+  "org": {
+    "components": [
+      "corespring/*"
+    ]
+  }
+}
