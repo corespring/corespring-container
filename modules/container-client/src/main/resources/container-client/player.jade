@@ -14,9 +14,10 @@ block content
         player-session="session",
         player-outcomes="outcome")
 
-      button.btn.btn-primary(
-        ng-click="submit()",
-        ng-disabled="!canSubmit()") Submit
+      //button.btn.btn-primary(
+      //  ng-click="submit()",
+      //  ng-disabled="!canSubmit()") Submit
+
 
       hr
       #score(ng-show="score")
@@ -24,16 +25,18 @@ block content
 
 block scripts
 
+  script.
+    var bootstrapResumeTimeout = 0;
+
+  //[if lt IE 9]> <script>console.log("ie8 delay!!!"); bootstrapResumeTimeout = 4000;</script> <![endif]
+  //[if lt IE 9]> <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script> <![endif]
+  //[if lt IE 9]> <script src="//cdnjs.cloudflare.com/ajax/libs/json3/3.2.6/json3.min.js"></script> <![endif]
+
   for p in player 
     script(src="#{p}", type="text/javascript")
 
   script(src="/client/components/angular-ui/build/angular-ui.js")
 
-  script.
-    var bootstrapResumeTimeout = 0;
-  //[if lt IE 9]> <script>console.log("ie8 delay!!!"); bootstrapResumeTimeout = 4000;</script> <![endif]
-  //[if lt IE 9]> <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script> <![endif]
-  //[if lt IE 9]> <script src="//cdnjs.cloudflare.com/ajax/libs/json3/3.2.6/json3.min.js"></script> <![endif]
 
   script.
     $(document).ready(function(){
@@ -71,7 +74,8 @@ block scripts
         head.js.apply(null, allScripts);
 
         head.ready(function(){
-            allScriptsAreLoaded();
+          console.log("!!! head.js.ready !!!");
+          allScriptsAreLoaded();
         });
       });
     });
