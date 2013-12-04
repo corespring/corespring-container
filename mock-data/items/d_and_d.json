@@ -18,7 +18,7 @@
         }
       ],
       "model": {
-        "answerArea": "A butterfly first is a <landingPlace id='1' class='inline' />. It is then a <landingPlace id='2' class='inline'/>. And then a <landingPlace id='3' class='inline'/>. Finally a <landingPlace id='4' class='inline'/>",
+        "answerArea": "A butterfly first is a <span landing-place id='1' class='inline' />. It is then a <span landing-place id='2' class='inline'/>. And then a <span landing-place id='3' class='inline'/>. Finally a <span landing-place id='4' class='inline'/>",
         "choices": [
           {
             "content": "<b>Pupa</b>",

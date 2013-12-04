@@ -55,7 +55,7 @@ var controller = function ($scope, ComponentRegister, PlayerServices) {
     }*/
 
     $scope.session.isFinished = false;
-    ComponentRegister.setGlobalSession($scope.session);
+//    ComponentRegister.setGlobalSession($scope.session);
   };
 
   $scope.$watch('session.settings', function(newSettings){
