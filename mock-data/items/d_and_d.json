@@ -53,5 +53,5 @@
       "corespring/*"
     ]
   },
-  "xhtml": "<div><corespring-drag-and-drop id='1'></corespring-drag-and-drop>"
+  "xhtml": "<div><div corespring-drag-and-drop id='1'></div>"
 }

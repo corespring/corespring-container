@@ -11,6 +11,8 @@ angular.module("simulator").controller('Root', ['$scope', '$log', '$http', '$loc
   $scope.itemId = $location.search()['sessionId'] ? "" : ($location.search()['itemId'] || "522267c2554f43f858000001");
   $scope.sessionId = $location.search()['sessionId'] || "";
 
+  var server = ($location.search()['server'] || "localhost:9000");
+
   $scope.modeSettings = {
     showFeedback: true,
     allowEmptyResponses: true,
@@ -24,7 +26,7 @@ angular.module("simulator").controller('Root', ['$scope', '$log', '$http', '$loc
   $scope.isSecure = false;
 
   $scope.$watch('isSecure', function(newValue){
-    var scriptTag = "<script src='http://localhost:9000/player.js?secure="+newValue+"'></script>";
+    var scriptTag = "<script src='http://"+server+"/player.js?secure="+newValue+"'></script>";
     $("head").append(scriptTag);
   });
 
@@ -81,6 +83,7 @@ angular.module("simulator").controller('Root', ['$scope', '$log', '$http', '$loc
       onSessionCreated: $scope.onSessionCreated,
       onInputReceived: $scope.onInputReceived,
       evaluate: $scope.modeSettings,
+      corespringUrl: "http://" + server
     };
 
     var idName = $scope.mode === "gather" ? "itemId" : "sessionId";
