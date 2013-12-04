@@ -82,7 +82,7 @@ var Instance = function(element, options, log){
           }
         }
         catch (e) {
-          log.error("Exception in [player-instance] addListener: ", name, e);
+          log.error("Exception in [player-instance] addListener: " + e.message);
         }
       });
   };

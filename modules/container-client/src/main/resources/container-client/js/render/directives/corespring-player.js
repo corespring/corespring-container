@@ -59,11 +59,13 @@ angular.module('corespring-player.directives').directive('corespringPlayer', [
         });
 
         $scope.$watch('xhtml', function(xhtml){
-          renderMarkup(xhtml);
+          if(xhtml){
+            renderMarkup(xhtml);
+          }
         });
 
         $scope.$watch('item', function(item){
-          //setDataAndSession();
+          setDataAndSession();
         }, true);
 
         $scope.$watch('session', function(session, oldSession){
