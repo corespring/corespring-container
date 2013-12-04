@@ -13,7 +13,7 @@ var Instance = function(element, options, log){
     var path = options.mode === "gather" ? options.itemPath : options.sessionPath;
     var url = (options.corespringUrl + path).replace(":id", id);
 
-    $(e).html("<iframe id='iframe-player' src='" + url + "' style='width: 100%; min-height: 700px; border: none'></iframe>");
+    $(e).html("<iframe id='iframe-player' frameborder='0' src='" + url + "' style='width: 100%; min-height: 700px; border: none'></iframe>");
     $(e).width(options.width ? options.width : "600px");
   };
 
