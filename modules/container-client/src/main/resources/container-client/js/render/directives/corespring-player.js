@@ -96,7 +96,6 @@ angular.module('corespring-player.directives').directive('corespringPlayer', [
         session: '=playerSession'
       },
       template: [ '<div class="corespring-player">',
-                   '!!!!',
                   '  <div id="body"></div>',
                   '</div>'].join("\n")
     };

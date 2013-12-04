@@ -4,6 +4,8 @@ block head
   link(rel="stylesheet", href="css/player.css")
 
 block content
+
+  //[if IE]><div style='clear: both; height: 112px; padding:0; position: relative;'><a href="http://www.theie9countdown.com/ie-users-info"><img src="http://www.theie9countdown.com/assets/badge_iecountdown.png" border="0" height="112" width="348" alt="" /></a></div><![endif]
   div#root.container(ng-controller="Root")
     div(ng-controller="Main")
 
@@ -16,9 +18,11 @@ block content
 
 block scripts
 
+  //[if lte IE 8]> <script src="/client/js/common/ie-support/Function.bind.js"></script> <![endif]
+  //[if lte IE 8]> <script src="/client/js/common/ie-support/Array.map.js"></script> <![endif]
   script.
     var bootstrapResumeTimeout = 0;
-  //[if lte IE 9]> <script>console.log("ie8/9 delay!!!"); bootstrapResumeTimeout = 500;</script> <![endif]
+  //[if lte IE 9]> <script>bootstrapResumeTimeout = 500;</script> <![endif]
   //[if lte IE 9]> <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script> <![endif]
   //[if lte IE 9]> <script src="//cdnjs.cloudflare.com/ajax/libs/json3/3.2.6/json3.min.js"></script> <![endif]
 
