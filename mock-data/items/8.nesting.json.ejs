@@ -2,10 +2,24 @@
   "metadata" : {
     "title" : "Nesting Example"
   },
-  "xhtml" : "<%- helper.read('../xml/7.xhtml') %>",
+  "xhtml" : "<corespring-tabs id='1'></corespring-tabs>",
   "components" : {
-
     "1" : {
+      "componentType" : "corespring-tabs",
+      "model" : {
+        "tabs" : [
+          {
+            "title" : "Tab 1",
+            "xhtml" : "<div corespring-multiple-choice id='2'></div>"
+          },
+          {
+            "title" : "Tab 2",
+            "xhtml" : "<h1> I'm the other tab</h1>"
+          }
+        ]
+      }
+   },
+   "2" : {
       "componentType" : "corespring-multiple-choice",
       "title": "Get a Job",
       "weight" : 1,
@@ -37,6 +51,7 @@
         ]
       } 
     }
+
   },
   "_id" : "522267c2554f43f858000007"
 }

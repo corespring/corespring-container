@@ -23,6 +23,7 @@ object Build extends sbt.Build {
     val mockito = "org.mockito" % "mockito-all" % "1.9.5" % "test"
     val grizzled = "org.clapper" %% "grizzled-scala" % "1.1.4"
     val scalaz = "org.scalaz" %% "scalaz-core" % "7.0.5"
+    val htmlCleaner = "net.sourceforge.htmlcleaner" % "htmlcleaner" % "2.6.1"
   }
 
   object Resolvers {
@@ -119,7 +120,7 @@ object Build extends sbt.Build {
 
   val containerClientWeb = builder.playApp("container-client-web").settings(
     sources in doc in Compile := List(),
-    libraryDependencies ++= Seq(mockito, grizzled),
+    libraryDependencies ++= Seq(mockito, grizzled, htmlCleaner),
     templatesImport ++= Seq( "play.api.libs.json.JsValue", "play.api.libs.json.Json" )
   ).dependsOn(
     componentModel % "compile->compile;test->test",
