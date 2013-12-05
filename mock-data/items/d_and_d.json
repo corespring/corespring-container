@@ -5,10 +5,10 @@
       "componentType": "corespring-drag-and-drop",
       "title": "Butterfly D&D",
       "correctResponse": {
-        "1": "egg",
-        "2": "pupa",
-        "3": "larva",
-        "4": "adult"
+        "1": ["egg","pupa"],
+        "2": [],
+        "3": ["larva"],
+        "4": ["adult"]
       },
       "feedback": [
         {
@@ -18,7 +18,7 @@
         }
       ],
       "model": {
-        "answerArea": "A butterfly first is a <span landing-place id='1' class='inline' />. It is then a <span landing-place id='2' class='inline'/>. And then a <span landing-place id='3' class='inline'/>. Finally a <span landing-place id='4' class='inline'/>",
+        "answerArea": "A butterfly first is a <span landing-place id='1' cardinality='multiple' class='inline' />. It is then a <span landing-place id='2' class='inline'/>. And then a <span landing-place id='3' class='inline'/>. Finally a <span landing-place id='4' class='inline'/>",
         "choices": [
           {
             "content": "<b>Pupa</b>",
@@ -26,10 +26,11 @@
           },
           {
             "content": "Egg",
-            "id": "egg"
+            "id": "egg",
+            "copyOnDrag": true
           },
           {
-            "content": "Larva",
+            "content": "Larva In The Shell",
             "id": "larva"
           },
           {
@@ -38,7 +39,8 @@
           }
         ],
         "config": {
-          "shuffle": true
+          "shuffle": true,
+          "expandHorizontal": false
         },
         "prompt": "Drag the stages of the butterfly's lifecycle on to the the pods"
       },
