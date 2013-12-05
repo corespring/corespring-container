@@ -13,13 +13,13 @@ class LayoutComponentReadingTest extends Specification with Helpers with LayoutC
       val xml =
         """
           |<div>
-          |  <div corespring-comp=""></div>
+          |  <corespring-comp></corespring-comp>
           |</div>
         """.stripMargin
 
 
       val comps = Seq(
-         LayoutComponent("corespring", "comp", Seq(), Json.obj())
+         LayoutComponent("corespring", "comp", Seq(), None, Json.obj())
       )
 
       layoutTypesInXml(xml, comps) === Seq("corespring-comp")

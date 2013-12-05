@@ -48,10 +48,14 @@ trait BaseHooks[T <: ClientHooksActionBuilder[AnyContent]] extends Controller wi
     request: PlayerRequest[AnyContent] =>
 
 
-      /** Preprocess the xml so that it'll work in all browsers */
+      /** Preprocess the xml so that it'll work in all browsers
+        * aka: convert tagNames -> attributes for ie 8 support
+        * TODO: A layout component may have multiple elements
+        * So we need a way to get all potential component names from
+        * each component, not just assume its the top level.
+        */
       val xhtml = (request.item \ "xhtml").asOpt[String].map{ xhtml =>
-        val names = loadedComponents.map(c => tagName(c.id.org, c.id.name)).map((_, "div"))
-        tagNamesToAttributes(names,xhtml)
+        tagNamesToAttributes(xhtml)
       }.getOrElse("<div><h1>New Item</h1></div>")
 
       val itemTagNames: Seq[String] = componentTypes(request.item)

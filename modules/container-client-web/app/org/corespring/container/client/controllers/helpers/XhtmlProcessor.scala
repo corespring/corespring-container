@@ -1,33 +1,57 @@
 package org.corespring.container.client.controllers.helpers
 
-import scala.xml.transform.{RuleTransformer, RewriteRule}
-import scala.xml._
 import org.htmlcleaner._
+import scala.xml.transform.{RewriteRule, RuleTransformer}
+import scala.xml.{UnprefixedAttribute, Elem, Node, MinimizeMode}
+import scala.util.matching.Regex
 
 trait XhtmlProcessor {
 
   /**
    * Converts xhtml by moving custom tag names to attributes instead
    */
-  def tagNamesToAttributes(tagNames: Seq[(String,String)], xhtml : String) : String = {
+  def tagNamesToAttributes(xhtml : String) : String = {
+
+      val renamed = rename(xhtml)
+
+      val opened = "<div (.*?)corespring-(.*?)/>".r.replaceAllIn(renamed, {
+        m : Regex.Match  =>
+          s"<div ${m.group(1)}corespring-${m.group(2)}></div>"
+      })
 
       val cleaner : HtmlCleaner  = new HtmlCleaner()
       val transformations : CleanerTransformations = new CleanerTransformations()
-
-      tagNames.foreach{ tuple =>
-        val (from, to) = tuple
-        val tt = new TagTransformation(from, to, true )
-        tt.addAttributeTransformation(from, "")
-        transformations.addTransformation(tt)
-      }
 
       cleaner.getProperties.setUseEmptyElementTags(false)
       cleaner.getProperties.setOmitXmlDeclaration(true)
       cleaner.getProperties.setOmitHtmlEnvelope(true)
       cleaner.getProperties.setCleanerTransformations(transformations)
-      val n : TagNode = cleaner.clean(xhtml)
+      val n : TagNode = cleaner.clean(opened)
       val serializer = new PrettyXmlSerializer(cleaner.getProperties, "")
       serializer.getAsString(n)
+  }
+
+  private def rename(xhtml: String) = {
+    val xml = scala.xml.XML.loadString(xhtml)
+    val rt = new RuleTransformer(ReplaceTag)
+    val processed = rt.transform(xml)
+    val sb = scala.xml.Utility.serialize(processed(0), minimizeTags = MinimizeMode.Never)
+    sb.toString()
+  }
+}
+
+
+object ReplaceTag extends RewriteRule{
+
+  override def transform(n:Node) = n match {
+    case e : Elem if(n.label.startsWith("corespring")) => {
+      val m = new UnprefixedAttribute(e.label, "", e.attributes)
+      val all = e.attributes.append(m)
+      e.copy(label = "div", attributes = all)
+    }
+    case _ => {
+      n
+    }
   }
 }
 

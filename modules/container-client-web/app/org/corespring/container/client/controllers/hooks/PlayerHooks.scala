@@ -3,11 +3,11 @@ package org.corespring.container.client.controllers.hooks
 import org.corespring.container.client.actions.{ClientHooksActionBuilder, PlayerRequest}
 import org.corespring.container.client.controllers.helpers.LayoutComponentReading
 import org.corespring.container.client.views.txt.js.PlayerServices
-import play.api.Logger
-import play.api.libs.json.JsValue
-import play.api.mvc.{Results, AnyContent, Action}
-import play.api.http.ContentTypes
 import org.corespring.container.components.model.Component
+import play.api.Logger
+import play.api.http.ContentTypes
+import play.api.libs.json.JsValue
+import play.api.mvc.{AnyContent, Action}
 
 
 trait PlayerHooks extends BaseHooks[ClientHooksActionBuilder[AnyContent]] with LayoutComponentReading {
@@ -72,8 +72,6 @@ trait PlayerHooks extends BaseHooks[ClientHooksActionBuilder[AnyContent]] with L
     val interactiveComponents = (json \ "components" \\ "componentType").map(_.as[String]).distinct
 
     def layoutComponentsInItem: Seq[String] = {
-
-
       val out: Seq[String] = (json \ "xhtml").asOpt[String].map { l =>
         layoutTypesInXml(l, layoutComponents)
       }.getOrElse(Seq())
