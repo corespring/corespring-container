@@ -36,6 +36,31 @@
           {"label": "4", "value": "4"}
         ]
       } 
+    },
+     "2" : {
+      "componentType" : "corespring-multiple-choice",
+      "weight" : 1,
+      "correctResponse" : { "value" : ["b"] },
+      "feedback" : [
+        { "value" : "a", "feedback" : "Incorrect"},
+        { "value" : "b", "feedback" : "Correct", "notChosenFeedback" : "This would have been the correct one."},
+        { "value" : "c", "feedback" : "Incorrect" },
+        { "value" : "d", "feedback" : "Incorrect" }
+      ],
+      "model" : {
+        "prompt": "What is the second letter of the alphabet?",
+        "config": {
+          "orientation": "horizontal",
+          "shuffle": true,
+          "singleChoice": true
+        },
+        "choices": [
+          {"label": "a", "value": "a"},
+          {"label": "b", "value": "b"},
+          {"label": "c", "value": "c"},
+          {"label": "d", "value": "d"}
+        ]
+      } 
     }
   },
   "_id" : "522267c2554f43f858000007"
