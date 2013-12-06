@@ -21,6 +21,7 @@ var controller = function ($scope, ComponentRegister, PlayerServices) {
     $scope.responses = data.responses;
     $scope.session = data.session;
     $scope.outcome = data.outcome;
+    $scope.score = data.score;
   };
 
   $scope.onSessionSaveError = function (error) {
@@ -28,39 +29,13 @@ var controller = function ($scope, ComponentRegister, PlayerServices) {
   };
 
   $scope.canSubmit = function() {
-    return $scope.session.settings.allowEmptyResponses || !ComponentRegister.hasEmptyAnswers();
+    return !ComponentRegister.hasEmptyAnswers();
   };
-
 
   $scope.resetPreview = function(){
-
     ComponentRegister.reset();
-
-    /*for(var x in $scope.responses ){
-        $scope.responses[x] = {};
-    }
-    $scope.session.remainingAttempts = $scope.session.settings.maxNoOfAttempts;
-    PlayerServices.updateSessionSettings($scope.session.settings);
-    $scope.score = null;
-    if($scope.rootModel){
-      $scope.rootModel.session = {};
-    }*/
-
-    /*for(var key in $scope.rootModel.session.components){
-
-      var s = $scope.rootModel.session.components[key];
-      if(s){
-        s.answers = null;
-      }
-    }*/
-
-    $scope.session.isFinished = false;
-    ComponentRegister.setGlobalSession($scope.session);
+    $scope.session.isComplete = false;
   };
-
-  $scope.$watch('session.settings', function(newSettings){
-    $scope.resetPreview();
-  }, true);
 };
 
 angular.module('corespring-editor.controllers')

@@ -2,7 +2,14 @@
 
   var PlayerServices = function($timeout){
 
-    var settings = {};
+    //TODO: Need to make a decision on how this is controlled within the editor
+    var settings = {
+      maxNoOfAttempts: 1,
+      highlightUserResponse: true,
+      highlightCorrectResponse: true,
+      showFeedback: true
+    };
+
     var attemptsCountdown = 0;
     var scoringJsFile = {};
 
@@ -20,29 +27,16 @@
         throw "Sessions is empty";
       }
 
-      attemptsCountdown -= 1;
-
-      var sessionData = {
-        isFinished: false,
-        remainingAttempts: attemptsCountdown,
-        settings: settings
-      };
-
       var out = { session: _.extend(_.cloneDeep(session))};
-      out.session.settings = settings;
-
-      if(attemptsCountdown <= 0){
-        out.session.isFinished = true;
-        out.session.remainingAttempts = 0;
-        var responses = process(session.components, settings);
-        out.responses = responses;
-        out.outcome = corespring.outcomeProcessor.outcome(angular.copy(getItem()), {}, responses);
-      }
-
+      out.session.isComplete = true;
+      out.session.attempts = 1;
+      var outcomes = getOutcomes(session.components, settings);
+      out.outcome = outcomes;
+      out.score = corespring.scoreProcessor.score(angular.copy(getItem()), {}, outcomes);
       return out;
     };
 
-    var process = function(components, settings){
+    var getOutcomes = function(components, settings){
 
       var out = {};
 

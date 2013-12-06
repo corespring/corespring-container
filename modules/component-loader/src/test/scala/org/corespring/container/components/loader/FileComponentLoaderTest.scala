@@ -1,7 +1,7 @@
 package org.corespring.container.components.loader
 
 import org.specs2.mutable.Specification
-import org.corespring.container.components.model.{UiComponent, Library}
+import org.corespring.container.components.model.{LayoutComponent, UiComponent, Library}
 
 class FileComponentLoaderTest extends Specification {
 
@@ -42,10 +42,24 @@ class FileComponentLoaderTest extends Specification {
           libs.length === 1
           libs(0).org === "org-name"
           libs(0).name === "lib-name"
-          println(libs)
           success
         }
         case _ => failure("not a Ui component")
+      }
+    }
+
+    "load a layout component" in {
+      val loader = getLoader("four")
+      val comp = loader.all(0)
+
+      comp match {
+        case LayoutComponent(org,name,client,_,_) => {
+          org === "corespring"
+          name === "layout-comp"
+          client.length === 1
+          success
+        }
+        case _ => failure("not a layout component")
       }
     }
   }

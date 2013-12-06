@@ -88,7 +88,7 @@ class FileComponentLoader(paths: Seq[String]) extends ComponentLoader {
         org,
         compRoot.getName,
         packageJson,
-        loadLibrarySources(compRoot.getPath, "client", createClientName(compRoot.getPath)),
+        loadLibrarySources(compRoot.getPath, "client", createClientName(compRoot.getName)),
         loadLibrarySources(compRoot.getPath, "server", createServerName)
       )
     )

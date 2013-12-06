@@ -8,7 +8,7 @@
     return [
     '<div class="'+mode+'">',
       '<label>',
-        '<input type="'+mode+'" ng-model="settings[\''+prop+'\']" '+valueAttr+' >',
+        '<input type="'+mode+'" disabled ng-model="settings[\''+prop+'\']" '+valueAttr+' >',
         label,
       '</label>',
       '</div>'].join("\n");
@@ -32,6 +32,7 @@
                       '    Session Settings',
                       '   </div>',
                       '   <div class="panel-body" ng-show="showSettings">',
+                      '    <div class="alert alert-warning">TODO: What are we going to do with this now that we have a new player api?</div>',
                       '    <div class="span2 admin-col">',
                       '     <div>Attempts</div>',
                             radioOrCheckbox("maxNoOfAttempts", "Multiple Attempts", "radio", 0),
