@@ -2,7 +2,7 @@ package org.corespring.container.client.controllers.hooks
 
 import org.corespring.container.client.actions.ClientHooksActionBuilder
 import org.corespring.container.client.actions.PlayerRequest
-import org.corespring.container.client.controllers.helpers.Helpers
+import org.corespring.container.client.controllers.helpers.{XhtmlProcessor, Helpers}
 import org.corespring.container.client.views.txt.js.{ServerLibraryWrapper, ComponentWrapper}
 import org.corespring.container.components.model._
 import org.corespring.container.components.model.packaging.{ClientSideDependency, ClientDependencies}
@@ -10,7 +10,7 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsValue
 import play.api.mvc.{Controller, Action, AnyContent}
 
-trait BaseHooks[T <: ClientHooksActionBuilder[AnyContent]] extends Controller with Helpers{
+trait BaseHooks[T <: ClientHooksActionBuilder[AnyContent]] extends Controller with Helpers with XhtmlProcessor{
 
   protected def name : String
 
@@ -24,8 +24,12 @@ trait BaseHooks[T <: ClientHooksActionBuilder[AnyContent]] extends Controller wi
 
   def loadedComponents: Seq[Component]
 
-  def uiComponents : Seq[UiComponent] = loadedComponents.filter( c => c.isInstanceOf[UiComponent]).map(_.asInstanceOf[UiComponent])
-  def libraries : Seq[Library] = loadedComponents.filter( c => c.isInstanceOf[Library]).map(_.asInstanceOf[Library])
+  private def filterByType[T](comps:Seq[Component])(implicit m:scala.reflect.Manifest[T]) : Seq[T] = comps.filter(c => m.runtimeClass.isInstance(c)).map(_.asInstanceOf[T])
+
+
+  def uiComponents : Seq[UiComponent] = filterByType[UiComponent](loadedComponents)
+  def libraries : Seq[Library] = filterByType[Library](loadedComponents)
+  def layoutComponents : Seq[LayoutComponent] = filterByType[LayoutComponent](loadedComponents)
 
   def builder : T
 
@@ -42,7 +46,17 @@ trait BaseHooks[T <: ClientHooksActionBuilder[AnyContent]] extends Controller wi
 
   def config(id: String): Action[AnyContent] = builder.loadConfig(id) {
     request: PlayerRequest[AnyContent] =>
-      val xhtml = (request.item \ "xhtml").asOpt[String].getOrElse("<div><h1>New Item</h1></div>")
+
+
+      /** Preprocess the xml so that it'll work in all browsers
+        * aka: convert tagNames -> attributes for ie 8 support
+        * TODO: A layout component may have multiple elements
+        * So we need a way to get all potential component names from
+        * each component, not just assume its the top level.
+        */
+      val xhtml = (request.item \ "xhtml").asOpt[String].map{ xhtml =>
+        tagNamesToAttributes(xhtml)
+      }.getOrElse("<div><h1>New Item</h1></div>")
 
       val itemTagNames: Seq[String] = componentTypes(request.item)
       val usedComponents = getAllComponentsForTags(itemTagNames)
@@ -66,16 +80,20 @@ trait BaseHooks[T <: ClientHooksActionBuilder[AnyContent]] extends Controller wi
       s == name
     }.getOrElse(true)
 
-    val uiComps = uiComponents.filter(c => tags.exists( tag => tag == tagName(c.id.org, c.id.name)))
+    def compMatchesTag(c:Component) = tags.exists(tag => tag == tagName(c.id.org, c.id.name))
+
+    val uiComps = uiComponents.filter(compMatchesTag)
     val libraryIds = uiComps.map(_.libraries).flatten.distinct.filter(withinScope)
     val libs = libraries.filter( l => libraryIds.exists( used => l.id.matches(used) ))
-    (libs ++ uiComps).distinct
+    val layoutComps = layoutComponents.filter(compMatchesTag)
+    (libs ++ uiComps ++ layoutComps).distinct
   }
 
-  protected def splitComponents(comps:Seq[Component]) : (Seq[Library], Seq[UiComponent]) =
+  protected def splitComponents(comps:Seq[Component]) : (Seq[Library], Seq[UiComponent], Seq[LayoutComponent]) =
     (
-      comps.filter(_.isInstanceOf[Library]).map(_.asInstanceOf[Library]),
-      comps.filter(_.isInstanceOf[UiComponent]).map(_.asInstanceOf[UiComponent])
+      filterByType[Library](comps),
+      filterByType[UiComponent](comps),
+      filterByType[LayoutComponent](comps)
     )
 
 
@@ -140,6 +158,17 @@ trait BaseHooks[T <: ClientHooksActionBuilder[AnyContent]] extends Controller wi
     }
   }
 
+  private def wrapClientLibraryJs(moduleName:String)(src:LibrarySource) = {
+    s"""
+      // ----------------- ${src.name} ---------------------
+      ${ComponentWrapper( moduleName, src.name, src.source)}
+      """
+  }
+
+  protected def layoutToJs(layout:LayoutComponent) : String = {
+    layout.client.map( wrapClientLibraryJs(moduleName(layout.org, layout.name)) ).mkString("\n")
+  }
+
   protected def libraryToJs(addClient:Boolean, addServer:Boolean)(l:Library) : String = {
 
     def wrapServerLibraryJs(src:LibrarySource) = {
@@ -149,14 +178,7 @@ trait BaseHooks[T <: ClientHooksActionBuilder[AnyContent]] extends Controller wi
       """
     }
 
-    def wrapClientLibraryJs(src:LibrarySource) = {
-      s"""
-      // ----------------- ${src.name} ---------------------
-      ${ComponentWrapper( moduleName(l.org, l.name), src.name, src.source)}
-      """
-    }
-
-    val libs = if(addClient) l.client.map( wrapClientLibraryJs ).mkString("\n") else ""
+    val libs = if(addClient) l.client.map( wrapClientLibraryJs(moduleName(l.org, l.name)) ).mkString("\n") else ""
     val server = if(addServer) l.server.map(wrapServerLibraryJs).mkString("\n") else ""
 
     s"""

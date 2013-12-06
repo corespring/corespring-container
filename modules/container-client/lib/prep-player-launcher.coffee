@@ -8,9 +8,9 @@ module.exports = (grunt) ->
   
   template = (name, contents) ->
     """
-    (function(exports, require){
+    (function(exports, require, module){
       #{contents}
-    })(corespring.library("#{name}"), corespring.require);
+    })(corespring.module("#{name}").exports, corespring.require, corespring.module("#{name}"));
     """
   
   ->

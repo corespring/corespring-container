@@ -6,6 +6,7 @@ import org.corespring.container.components.model.{UiComponent, Component}
 import play.api.Logger
 import play.api.libs.json.{JsArray, JsValue, Json}
 import play.api.mvc.{AnyContent, Action}
+import play.api.http.ContentTypes
 
 trait EditorHooks extends BaseHooks[EditorClientHooksActionBuilder[AnyContent]] {
 
@@ -64,7 +65,8 @@ trait EditorHooks extends BaseHooks[EditorClientHooksActionBuilder[AnyContent]] 
     request : PlayerRequest[AnyContent] =>
       val uiJs = uiComponents.map(uiComponentToJs).mkString("\n")
       val libJs = libraries.map(libraryToJs(true, true)).mkString("\n")
-      Ok(s"$libJs\n$uiJs").as("text/javascript")
+      val layoutJs = layoutComponents.map(layoutToJs).mkString("\n")
+      Ok(s"$libJs\n$uiJs\n$layoutJs").as("text/javascript")
   }
 
   private def header(c:Component, msg:String) = s"""
@@ -75,13 +77,10 @@ trait EditorHooks extends BaseHooks[EditorClientHooksActionBuilder[AnyContent]] 
 
   override def componentsCss(sessionId: String):  Action[AnyContent] = builder.loadComponents(sessionId) {
     request =>
-      log.debug(s"load css for session $sessionId")
-      componentsToResource(uiComponents, { c =>
-        c match{
-          case ui : UiComponent => ui.client.css.getOrElse("")
-          case _ => ""
-        }
-      }, "text/css")
+     log.debug(s"load css for session $sessionId")
+      val uiCss = uiComponents.map(_.client.css.getOrElse("")).mkString("\n")
+      val layoutCss = layoutComponents.map(_.css.getOrElse("")).mkString("\n")
+      Ok(s"$uiCss\n$layoutCss").as(ContentTypes.CSS)
   }
 
   override def wrapJs(org:String, name:String, src:String, directive: Option[String] = None) = {

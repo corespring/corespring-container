@@ -3,6 +3,6 @@
 // @fullName
 //---------------------
 
-(function(exports, require){
+(function(exports, require, module){
   @src
-})(corespring.library("@fullName"), corespring.require);
+})(corespring.module("@fullName").exports, corespring.require, corespring.module("@fullName") );

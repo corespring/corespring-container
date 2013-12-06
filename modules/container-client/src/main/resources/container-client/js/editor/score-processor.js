@@ -6,9 +6,9 @@
 
   var _ = root.corespring.require("lodash");
 
-  var OutcomeProcessor = function(){
+  var ScoreProcessor = function(){
 
-    this.outcome = function(item, session, responses){
+    this.score = function(item, session, responses){
 
       var maxPoints = _.reduce(item.components, function(result, component, key){
         var weight = component.weight || 1;
@@ -54,6 +54,7 @@
     };
   };
 
-  root.corespring.outcomeProcessor = new OutcomeProcessor();
+  root.corespring.scoreProcessor = new ScoreProcessor();
+
 
 })(this);

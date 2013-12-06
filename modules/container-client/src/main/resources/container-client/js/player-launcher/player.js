@@ -5,8 +5,6 @@ exports.define = function(isSecure) {
 
     var isReady = false;
 
-    var instanceFactory = require("player-instance");
-
     var defaultOptions = require("default-options");
 
     var errors = require("player-errors");
@@ -39,7 +37,7 @@ exports.define = function(isSecure) {
       return;
     }
 
-    var instance = instanceFactory.make(element, options);
+    var instance = require("player-instance")(element, options);
 
     var isValidMode = function (m) {
       if (!m) return false;
@@ -91,7 +89,8 @@ exports.define = function(isSecure) {
 
     var sendSetModeMessage = function(mode){
       var modeOptions = options[mode] || {};
-      instance.sendMessage( { message: "setMode", data: {mode: mode, options: modeOptions}});
+      var saveResponseOptions = mode == "evaluate" ?  {isAttempt: false, isComplete: false} : null;
+      instance.sendMessage( { message: "setMode", data: {mode: mode, options: modeOptions, saveResponses: saveResponseOptions} });
     };
 
     /* API methods */

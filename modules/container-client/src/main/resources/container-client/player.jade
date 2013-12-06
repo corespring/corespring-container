@@ -16,6 +16,8 @@ block content
         player-session="session",
         player-outcomes="outcome")
 
+      block player-child 
+
 block scripts
 
   //[if lte IE 8]> <script src="/client/js/common/ie-support/Function.bind.js"></script> <![endif]
@@ -30,6 +32,8 @@ block scripts
     script(src="#{p}", type="text/javascript")
 
   script(src="/client/components/angular-ui/build/angular-ui.js")
+
+  block extra-scripts
 
 
   script.

@@ -104,14 +104,12 @@ block content
           player-markup="model.xhtml",
           player-item="model",
           player-session="rootModel.session",
-          player-responses="responses")
+          player-outcomes="outcome")
 
         .button-holder
           button.btn.btn-primary(ng-click="submit()", ng-disabled="!canSubmit()") Submit
           button.btn.btn-warning(ng-click="resetPreview()") Reset
-          label
-            | Attempts left: {{session.remainingAttempts !== undefined ? session.remainingAttempts : session.maxNoOfAttempts}}
-        hr
+        hr/
         #score(ng-show="score")
           h4 You scored: {{score.summary.percentage}}%
 

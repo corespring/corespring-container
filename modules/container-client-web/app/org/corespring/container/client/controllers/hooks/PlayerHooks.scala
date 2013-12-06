@@ -1,13 +1,16 @@
 package org.corespring.container.client.controllers.hooks
 
 import org.corespring.container.client.actions.{ClientHooksActionBuilder, PlayerRequest}
+import org.corespring.container.client.controllers.helpers.LayoutComponentReading
 import org.corespring.container.client.views.txt.js.PlayerServices
+import org.corespring.container.components.model.Component
 import play.api.Logger
-import play.api.mvc.{AnyContent, Action}
+import play.api.http.ContentTypes
 import play.api.libs.json.JsValue
+import play.api.mvc.{AnyContent, Action}
 
 
-trait PlayerHooks extends BaseHooks[ClientHooksActionBuilder[AnyContent]] {
+trait PlayerHooks extends BaseHooks[ClientHooksActionBuilder[AnyContent]] with LayoutComponentReading {
 
   val log = Logger("player.hooks")
 
@@ -35,18 +38,23 @@ trait PlayerHooks extends BaseHooks[ClientHooksActionBuilder[AnyContent]] {
       log.debug(s"load js for session $sessionId")
       val typesUsed = componentTypes(request.item)
       val usedComponents = getAllComponentsForTags(typesUsed)
-      val (libs, uiComps) = splitComponents(usedComponents)
+      val (libs, uiComps, layoutComps) = splitComponents(usedComponents)
       val uiJs = uiComps.map((c) => wrapJs(c.org, c.name, c.client.render)).mkString("\n")
       val libJs = libs.map(libraryToJs(addClient = true, addServer = false)).mkString("\n")
-      Ok(s"$libJs\n$uiJs").as("text/javascript")
+      val layoutJs = layoutComps.map(layoutToJs).mkString("\n")
+      Ok(s"$libJs\n$uiJs\n$layoutJs").as("text/javascript")
   }
 
   override def componentsCss(sessionId: String):  Action[AnyContent] = builder.loadComponents(sessionId) {
     request =>
       log.debug(s"load css for session $sessionId")
       val typesUsed = componentTypes(request.item)
-      val usedComponents = uiComponents.filter(c => typesUsed.exists(t => c.matchesType(t)))
-      componentsToResource(usedComponents, _.client.css.getOrElse(""), "text/css")
+      def isUsed(c:Component) = typesUsed.exists(t => c.matchesType(t))
+      val usedComponents = uiComponents.filter(isUsed)
+      val uiCss = usedComponents.map(_.client.css.getOrElse("")).mkString("\n")
+      val layoutCompsUsed = layoutComponents.filter(isUsed)
+      val layoutCss = layoutCompsUsed.map(_.css.getOrElse("")).mkString("\n")
+      Ok(s"$uiCss\n$layoutCss").as(ContentTypes.CSS)
   }
 
   def createSessionForItem(itemId: String): Action[AnyContent] = builder.createSessionForItem(itemId) {
@@ -59,5 +67,17 @@ trait PlayerHooks extends BaseHooks[ClientHooksActionBuilder[AnyContent]] {
       SeeOther(url)
   }
 
-  override protected def componentTypes(json: JsValue): Seq[String] = (json \ "components" \\ "componentType").map(_.as[String]).distinct
+  override protected def componentTypes(json: JsValue): Seq[String] = {
+
+    val interactiveComponents = (json \ "components" \\ "componentType").map(_.as[String]).distinct
+
+    def layoutComponentsInItem: Seq[String] = {
+      val out: Seq[String] = (json \ "xhtml").asOpt[String].map { l =>
+        layoutTypesInXml(l, layoutComponents)
+      }.getOrElse(Seq())
+      out
+    }
+
+    interactiveComponents ++ layoutComponentsInItem
+  }
 }

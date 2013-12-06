@@ -21,8 +21,10 @@
       if( this.directive ){
 
         if(_.isArray(this.directive) ){
+          console.debug("[ComponentDefinition] initializeComponent ", moduleName, " - directive: " + compName);
           ngModule.directive( compName, this.directive);
         } else if( _.isObject(this.directive)){
+          console.debug("[ComponentDefinition] initializeComponent ", moduleName, " - directive: " + this.directive.name);
           ngModule.directive( this.directive.name, this.directive.directive);
         }
       }
@@ -38,6 +40,7 @@
           if(!hasDefault){
             hasDefault = innerDef.name === undefined;
           }
+          console.debug("[ComponentDefinition] initializeComponent ", moduleName, " - directive: " + name);
           ngModule.directive( name, innerDef.directive);
           if(!hasDefault){
             throw "No default directive defined";
@@ -46,6 +49,7 @@
       }
 
       if( this.service ){
+        console.debug("[ComponentDefinition] initializeComponent ", moduleName, " - service: " + compName);
         ngModule.factory( compName, this.service);
       }
     };

@@ -62,7 +62,7 @@ var Listener = function(log){
   };
 };
 
-exports.init = function(log){
+module.exports = function(log){
 
   if(!log){
 

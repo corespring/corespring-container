@@ -48,37 +48,38 @@ class FileComponentLoader(paths: Seq[String]) extends ComponentLoader {
 
     val packageFile = new File(compRoot.getPath + "/package.json")
     val packageJson = loadPackageInfo(packageFile)
-    val isLibrary = (packageJson \ "isLibrary").asOpt[Boolean].getOrElse(false)
+    val purpose = (packageJson \ "purpose").asOpt[String].getOrElse("interaction")
 
-    if (isLibrary) {
-      loadLibrary(org, packageJson)(compRoot)
-    } else {
-      loadUiComponent(org, packageJson)(compRoot)
+    purpose match {
+      case "interaction" => loadUiComponent(org, packageJson)(compRoot)
+      case "library" => loadLibrary(org, packageJson)(compRoot)
+      case "layout" => loadLayout(org, packageJson)(compRoot)
+      case _ => throw new RuntimeException(s"Unknown purpose: [$purpose] for component: ${compRoot.getPath}")
     }
+  }
+
+  private def loadLibrarySources(path: String, target: String, nameFn: String => String): Seq[LibrarySource] = {
+    val child = new File(s"$path/src/$target")
+    val children = child.listFiles()
+    if (children == null) {
+      Seq.empty
+    } else {
+      children.toSeq.filter(_.getName.endsWith(".js")).map {
+        f =>
+          val sourceName = f.getName.replace(".js", "")
+          val name = nameFn(sourceName)
+          LibrarySource(name, readFile(f))
+      }
+    }
+  }
+
+  private def createClientName(path: String)(n: String) = {
+    val name = (if (n == "index") path else n)
+    hyphenatedToTitleCase(name)
   }
 
   private def loadLibrary(org: String, packageJson: JsValue)(compRoot: File): Option[Component] = {
 
-    def loadLibrarySources(target:String, nameFn : String => String) : Seq[LibrarySource] = {
-      val child = new File(s"${compRoot.getPath}/src/$target")
-      val children = child.listFiles()
-      if (children == null) {
-        Seq.empty
-      } else {
-        children.toSeq.filter(_.getName.endsWith(".js")).map{  f =>
-          val sourceName = f.getName.replace(".js", "")
-          val name = nameFn(sourceName)
-          LibrarySource(name, readFile(f))
-        }
-      }
-    }
-
-
-
-    def createClientName(n:String) = {
-      val name = (if(n == "index" ) compRoot.getName else n)
-      hyphenatedToTitleCase(name)
-    }
 
     def createServerName(n:String) = s"$org.${compRoot.getName}.server${ if(n == "index") "" else s".$n"}"
 
@@ -87,49 +88,61 @@ class FileComponentLoader(paths: Seq[String]) extends ComponentLoader {
         org,
         compRoot.getName,
         packageJson,
-        loadLibrarySources("client", createClientName),
-        loadLibrarySources("server", createServerName)
+        loadLibrarySources(compRoot.getPath, "client", createClientName(compRoot.getName)),
+        loadLibrarySources(compRoot.getPath, "server", createServerName)
       )
     )
   }
 
+  private def loadLayout(org: String, packageJson: JsValue)(compRoot: File): Option[Component] = {
+    logger.debug(s"load layout component: ${compRoot.getPath}")
+    Some(
+      LayoutComponent(
+        org,
+        compRoot.getName,
+        loadLibrarySources(compRoot.getPath, "client", createClientName(compRoot.getPath)),
+        readMaybeFile( new File(compRoot.getPath + "/src/client/styles.css")),
+        packageJson
+      )
+    )
+  }
 
-private def loadUiComponent (org: String, packageJson: JsValue) (compRoot: File): Option[Component] = {
+  private def loadUiComponent (org: String, packageJson: JsValue) (compRoot: File): Option[Component] = {
 
-val clientFolder = new File(compRoot.getPath + "/src/client")
+    val clientFolder = new File(compRoot.getPath + "/src/client")
     val serverFolder = new File(compRoot.getPath + "/src/server")
     val icon = new File(compRoot.getPath + "/icon.png")
     val defaultDataJson = new File(clientFolder.getPath + "/defaultData.json")
     val sampleDataFolder = new File(compRoot.getPath + "/sample-data")
 
-  def loadLibraries: Seq[LibraryId] = {
-    (packageJson \ "libraries").asOpt[Seq[JsObject]].map {
-      seq =>
-        seq.map {
-          o =>
-            val organization = (o \ "organization").asOpt[String]
-            val name = (o \ "name").asOpt[String]
-            val scope = (o \ "scope").asOpt[String]
-            assert(organization.isDefined)
-            assert(name.isDefined)
-            LibraryId(organization.get, name.get, scope)
-        }
-    }.getOrElse(Seq.empty)
-  }
+    def loadLibraries: Seq[LibraryId] = {
+      (packageJson \ "libraries").asOpt[Seq[JsObject]].map {
+        seq =>
+          seq.map {
+            o =>
+              val organization = (o \ "organization").asOpt[String]
+              val name = (o \ "name").asOpt[String]
+              val scope = (o \ "scope").asOpt[String]
+              assert(organization.isDefined)
+              assert(name.isDefined)
+              LibraryId(organization.get, name.get, scope)
+          }
+      }.getOrElse(Seq.empty)
+    }
 
-  Some(
-      UiComponent (
-        org,
-        compRoot.getName,
-        loadClient(clientFolder),
-        loadServer(serverFolder),
-        packageJson,
-        loadDefaultData(defaultDataJson),
-        loadIcon(icon),
-        loadSampleData(sampleDataFolder),
-        loadLibraries
+    Some(
+        UiComponent (
+          org,
+          compRoot.getName,
+          loadClient(clientFolder),
+          loadServer(serverFolder),
+          packageJson,
+          loadDefaultData(defaultDataJson),
+          loadIcon(icon),
+          loadSampleData(sampleDataFolder),
+          loadLibraries
+        )
       )
-    )
   }
 
   private def loadDefaultData(dataJson : File) : JsValue = if(dataJson.exists){
@@ -206,6 +219,7 @@ val clientFolder = new File(compRoot.getPath + "/src/client")
 
   private def readMaybeFile(f: File): Option[String] = {
     if (!f.exists()) {
+      logger.debug(s"${f.getPath} does not exist")
       None
     } else {
       Some(scala.io.Source.fromFile(f).getLines().mkString("\n"))

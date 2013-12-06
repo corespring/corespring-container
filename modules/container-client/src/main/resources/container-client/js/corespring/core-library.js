@@ -1,10 +1,12 @@
 (function(root){
 
+  //# Library 
+  //A simple library to aid in the use of the common js module pattern.
   var Library = function(){
 
-    var libraries = {
-      lodash: _,
-      underscore: _
+    var modules = {
+      lodash: { exports: _},
+      underscore: { exports: _},
     };
 
     this.require = function(uid){
@@ -13,25 +15,25 @@
         throw new Error("you must specify a uid");
       }
 
-      if(libraries[uid]){
-        return libraries[uid];
+      if(modules[uid]){
+        return modules[uid].exports;
       } else {
         throw new Error("can't find library : " + uid);
       }
     };
 
-    this.library = function(uid, obj){
-
+    this.module = function(uid, obj){
+      
       if(!uid){
         throw new Error("you must specify a uid");
       }
 
       if(obj){
-        libraries[uid] = obj;
+        modules[uid] = { exports: obj };
       } else {
-        libraries[uid] = libraries[uid] || {};
+        modules[uid] = modules[uid] || { exports: {} };
       }
-      return libraries[uid];
+      return modules[uid];
     };
   };
 
@@ -40,7 +42,7 @@
   }
   
   var lib = new Library();
-  root.corespring.library = lib.library;
+  root.corespring.module = lib.module;
   root.corespring.require = lib.require;
   
 })(this);
