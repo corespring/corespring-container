@@ -2,7 +2,7 @@ describe('root level listener', function(){
 
 
   it('should clear any listeners', function(){
-    var listenerOne = corespring.require("root-level-listener").init();
+    var listenerOne = corespring.require("root-level-listener")();
 
     var receivedEvents = [];
 
@@ -36,7 +36,7 @@ describe('root level listener', function(){
   });
 
   it('should remove listeners', function(){
-    var listener = corespring.require("root-level-listener").init();
+    var listener = corespring.require("root-level-listener")();
     listener.clearListeners();
     var cb = function(){};
     listener.addListener(cb);
@@ -47,7 +47,7 @@ describe('root level listener', function(){
 
   it('should remove listeners that remove themselves using the "this" keyword', function(){
 
-    var listener = corespring.require("root-level-listener").init();
+    var listener = corespring.require("root-level-listener")();
     runs( function(){
       listener.clearListeners();
       var cb = function(){

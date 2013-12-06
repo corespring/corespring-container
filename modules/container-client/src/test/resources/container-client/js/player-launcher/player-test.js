@@ -8,10 +8,6 @@ describe('player launcher', function(){
 
     this.isComplete = false;
 
-    this.make = function(){
-      return this;
-    };
-
     this.sendMessage = function(props){
       if(props.message == "isComplete"){
         props.callback(true);
@@ -23,22 +19,24 @@ describe('player launcher', function(){
         cb();
       }
     };
+
+    return this;
   };
 
   var mockInstance = null;  
   var originalInstance = null;
   var lastError = null;
 
-  var defaultOptions = corespring.library("default-options");
+  var defaultOptions = corespring.module("default-options").exports;
 
   beforeEach(function(){
     originalInstance = corespring.require("player-instance");
-    mockInstance = corespring.library("player-instance", new MockInstance());
+    mockInstance = corespring.module("player-instance", MockInstance);
     launcher = corespring.require("player");
   });
 
   afterEach(function(){
-    corespring.library("player-instance", originalInstance);
+    corespring.module("player-instance", originalInstance);
   });
 
   var create = function(options, secureMode){

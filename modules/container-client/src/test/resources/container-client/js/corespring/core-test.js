@@ -28,8 +28,8 @@ describe('core', function () {
 
      corespring.bootstrap(mockAngular);
 
-     var exports = corespring.library("test-lib");
-     exports.ping = function(msg){
+     var module = corespring.module("test-lib");
+     module.exports.ping = function(msg){
        return "!" + msg;
      };
      var result = corespring.require("test-lib").ping('hello');

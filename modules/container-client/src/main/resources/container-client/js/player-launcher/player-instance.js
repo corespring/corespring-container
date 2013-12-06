@@ -3,7 +3,7 @@ var Instance = function(element, options, log){
 
   log = log || { error: function(s){ console.error(s); }, debug: function(s){ console.debug(s); } };
 
-  var listener = require("root-level-listener").init();
+  var listener = require("root-level-listener")();
 
   listener.clearListeners();
 
@@ -92,7 +92,7 @@ var Instance = function(element, options, log){
 
 var instance = null;
 
-exports.make = function(element, options){
+module.exports = function(element, options){
   instance = new Instance(element, options);
   return instance;
 };
