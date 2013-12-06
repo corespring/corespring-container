@@ -1,3 +1,4 @@
+//# Main player controller
 var controller = function ($scope, $log, ComponentRegister, PlayerServices) {
 
   $scope.onAnswerChanged = function(){
@@ -161,6 +162,14 @@ var controller = function ($scope, $log, ComponentRegister, PlayerServices) {
     ComponentRegister.setEditable(data.editable);
   });
 
+  // #### Set mode to view, gather or evaluate
+  // Optionally save the responses too.
+  // The data object contains: 
+  //```
+  //mode : view|gather|evaluate //required
+  //saveResponses : { isAttempt : true|false, isComplete: true|false} 
+  //```
+  //saveResponses will save the client side data. Its optional - if not present nothing will be saved.
   $scope.$on('setMode', function(event, data){
     var editable = (data.mode == 'gather');
     ComponentRegister.setEditable(editable);

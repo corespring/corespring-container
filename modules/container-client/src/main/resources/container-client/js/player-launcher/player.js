@@ -91,7 +91,8 @@ exports.define = function(isSecure) {
 
     var sendSetModeMessage = function(mode){
       var modeOptions = options[mode] || {};
-      instance.sendMessage( { message: "setMode", data: {mode: mode, options: modeOptions}});
+      var saveResponseOptions = mode == "evaluate" ?  {isAttempt: false, isComplete: false} : null;
+      instance.sendMessage( { message: "setMode", data: {mode: mode, options: modeOptions, saveResponses: saveResponseOptions} });
     };
 
     /* API methods */
