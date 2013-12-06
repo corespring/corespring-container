@@ -21,7 +21,9 @@ var controller = function ($scope, $rootScope, $log) {
   };
 
   $scope.reset = function(){
-    $scope.$emit('reset');
+    if($scope.session && !$scope.session.isComplete){
+      $scope.$emit('reset');
+    }
   };
 
   $scope.$watch('session', function(newValue){

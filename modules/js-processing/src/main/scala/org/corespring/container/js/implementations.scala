@@ -65,9 +65,9 @@ trait ComponentServerLogic
   def wrappedComponentLibs = componentLibs.map{ tuple =>
     val (fullName, src) = tuple
     s"""
-    (function(exports, require){
+    (function(exports, require, module){
     $src;
-    })(corespring.library("$fullName"), corespring.require);
+    })(corespring.module("$fullName").exports, corespring.require, corespring.module("$fullName"));
     """
   }
 
