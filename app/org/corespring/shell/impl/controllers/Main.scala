@@ -56,7 +56,7 @@ trait Main extends Controller {
 
       result.map {
         oid =>
-          Ok(JsObject(Seq("url" -> JsString(s"/client/player/${oid.toString}/index.html"))))
+          Ok(JsObject(Seq("url" -> JsString(s"/client/player/${oid.toString}/container-player.html"))))
       }.getOrElse {
         logger.debug("Can't create the session")
         BadRequest("Create session - where's the body?")

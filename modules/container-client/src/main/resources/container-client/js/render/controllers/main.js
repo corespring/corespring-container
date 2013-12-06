@@ -11,10 +11,11 @@ var controller = function ($scope, $log, ComponentRegister, PlayerServices) {
     return $scope.session.settings.allowEmptyResponses || !ComponentRegister.hasEmptyAnswers();
   };
 
-  $scope.save = function (isAttempt, cb) {
+  $scope.save = function (isAttempt, isComplete, cb) {
     PlayerServices.saveSession(
       {
         isAttempt: isAttempt, 
+        isComplete: isComplete,
         components: ComponentRegister.getComponentSessions()
       }, 
       function(s){ 
@@ -123,7 +124,7 @@ var controller = function ($scope, $log, ComponentRegister, PlayerServices) {
   });
 
   $scope.$on('saveResponses', function(event, data){
-    $scope.save(data.isAttempt);
+    $scope.save(data.isAttempt, data.isComplete);
   });
 
   $scope.$on('countAttempts', function(event, data, callback){
@@ -165,17 +166,25 @@ var controller = function ($scope, $log, ComponentRegister, PlayerServices) {
     ComponentRegister.setEditable(editable);
     ComponentRegister.setMode(data.mode);
 
-    if(data.mode == 'evaluate'){
-      $scope.save(false, function(){
+    var afterMaybeSave = function(){
+      if(data.mode == 'evaluate'){
         $scope.loadOutcome(data.options, function(){
           $log.debug("score received");
         });
+      } else {
+        _.forIn($scope.outcome, function(value, key){
+          $scope.outcome[key] = {};
+        });
+        $scope.score = {};
+      }
+    };
+
+    if(data.saveResponses){
+      $scope.save(data.saveResponses.isAttempt, data.saveResponses.isComplete, function(){
+        afterMaybeSave();
       });
     } else {
-      _.forIn($scope.outcome, function(value, key){
-        $scope.outcome[key] = {};
-      });
-      $scope.score = {};
+      afterMaybeSave();
     }
   });
 

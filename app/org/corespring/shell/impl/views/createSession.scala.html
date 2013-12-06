@@ -1,7 +1,9 @@
 @(itemId: String, url : String)
 <html>
   <head>
-          <!--
+
+    <link rel="stylesheet" href="/assets/css/homepage.css">
+    <!--
     "maxNoOfAttempts").asOpt[Int].getOrElse(default.maxNoOfAttempts),
     "highlightUserResponse").asOpt[Boolean].getOrElse(default.highlightUserResponse),
     "highlightCorrectResponse").asOpt[Boolean].getOrElse(default.highlightCorrectResponse),
@@ -20,15 +22,25 @@
 
   </head>
   <body>
-    <h1>Create session for item: @itemId </h1>
-    <label>Max number of attempts?</label><input type="text" id="maxNoOfAttempts" value="2"><br>
-    <label>Show Feedback?</label><input type="checkbox" id="showFeedback" checked><br>
-      <label>Show Correct Response?</label><input type="checkbox" id="highlightCorrectResponse" checked><br>
-      <label>Show User Response?</label><input type="checkbox" id="highlightUserResponse" checked><br>
-      <label>Allow Empty Response?</label><input type="checkbox" id="allowEmptyResponses" checked><br>
-      <label>Submit Complete Message</label><input type="text" id="submitCompleteMessage"><br>
-      <label>Submit Incorrect Message</label><input type="text" id="submitIncorrectMessage"><br>
-      <button id="button"> Create Session</button>
+    <div class="container">
+
+      <h3>Create session for item: @itemId </h3>
+
+      <div class="alert alert-warning">
+        <strong>Note:</strong>
+        These settings don't work at the moment as we need to decide on how the container will run the player.
+        For now just click 'create session' - the settings are in the container-player-controls.js
+      </div>
+
+      <label>Max number of attempts?</label><input type="text" disabled id="maxNoOfAttempts" value="2"><br>
+      <label>Show Feedback?</label><input type="checkbox" disabled id="showFeedback" checked><br>
+      <label>Show Correct Response?</label><input type="checkbox" disabled id="highlightCorrectResponse" checked><br>
+      <label>Show User Response?</label><input type="checkbox" disabled id="highlightUserResponse" checked><br>
+      <label>Allow Empty Response?</label><input type="checkbox" disabled id="allowEmptyResponses" checked><br>
+      <label>Submit Complete Message</label><input type="text" disabled id="submitCompleteMessage"><br>
+      <label>Submit Incorrect Message</label><input type="text" disabled id="submitIncorrectMessage"><br>
+      <button class="btn-primary" id="button"> Create Session</button>
+    </div>
   </body>
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
   <script type="text/javascript">

@@ -61,15 +61,18 @@ trait Session extends Controller with ItemPruner {
             requestJson =>
 
             val isAttempt : Boolean = (requestJson \ "isAttempt").asOpt[Boolean].getOrElse(false)
+            val isComplete : Boolean = (requestJson \ "isComplete").asOpt[Boolean].getOrElse(false)
 
             val attemptUpdate = if(isAttempt){
               val currentCount = (request.itemSession \ "attempts").asOpt[Int].getOrElse(0)
               Json.obj("attempts" -> JsNumber(currentCount + 1))
             } else Json.obj()
 
+            val completeUpdate = if(isComplete) Json.obj("isComplete"-> JsBoolean(true)) else Json.obj()
+
             val update = request.itemSession.as[JsObject]  ++
               Json.obj("components" -> requestJson \ "components") ++
-              attemptUpdate
+              attemptUpdate ++ completeUpdate
 
             request.saveSession(id, update).map{
               savedSession =>
