@@ -26,31 +26,29 @@ mergeItems = (accumulator, obj) -> _.merge(accumulator, obj)
 module.exports = (grunt) ->
   ->
 
-    bowerInstall = (name, target, done) ->
+    # target - may be undefined (if so ues the bower default target)
+    # version - may be undefined (if so use the bower default version)
+    bowerInstall = (name, target, version, done) ->
 
-      args = if target == "latest" then "-F -V #{name}" else "-F -V #{name}=#{target}"
+      bowerName = ->
+        out = "#{name}"
+        out += "=#{target}" if target
+        out += "\##{version}" if version and version != "latest"
+        out
+
+      args = [] 
+      args.push("-F")
+      args.push("-V")
+      args.push(bowerName())
+
       exec = require('child_process').exec
-      cmd = "bower install #{args}"
+      cmd = "bower install #{args.join(" ")}"
       grunt.log.writeln("running: #{cmd}")
       exec cmd, {cwd: '.'}, (err, stdout, stderr) ->
         grunt.log.writeln(stdout)
         grunt.log.writeln(stderr)
         grunt.log.writeln("-------------> done: #{name}")
         done()
-
-      ###
-      finalName = if target == "latest" then name else "#{name}=#{target}"
-
-      bower.config.verbose = true
-      bower.commands
-      .install([finalName], { save: false, force: true })
-      .on( 'end', (installed) -> 
-        grunt.log.writeln("done: #{name}")
-        done() 
-      )
-      .on( 'log', (log) ->  grunt.log.writeln( "---- #{log.level}: #{log.message}" ) )
-      .on( 'error', (err) -> grunt.fail.fatal(err) )
-      ###
       
     done = @async()
 
@@ -77,7 +75,8 @@ module.exports = (grunt) ->
 
     _.forIn defs, (v,name) -> 
       target = v.bower_target
-      bowerInstall(name, target, installationDone)
+      version = v.version
+      bowerInstall(name, target, version, installationDone)
 
 
 
