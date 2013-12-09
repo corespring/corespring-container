@@ -57,6 +57,8 @@ trait PlayerHooks extends BaseHooks[ClientHooksActionBuilder[AnyContent]] with L
       Ok(s"$uiCss\n$layoutCss").as(ContentTypes.CSS)
   }
 
+
+  @deprecated("not in use", "")
   def createSessionForItem(itemId: String): Action[AnyContent] = builder.createSessionForItem(itemId) {
     request =>
       //TODO: How to get this path accurately - atm will only support one level of nesting of the routes file?
