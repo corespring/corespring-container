@@ -81,8 +81,8 @@ class ContainerClientImplementation(
     def itemService: MongoService = itemServiceIn
 
     //TODO: Item level scoring isn't active at the moment, once it is we'll need to add ItemJsOutcomProcessor
-    def outcomeProcessor: ScoreProcessor = DefaultScoreProcessor //new OutcomeProcessorSequence(DefaultOutcomeProcessor, ItemJsOutcomeProcessor)
-    def responseProcessor: OutcomeProcessor = new OutcomeProcessorImpl(rootUiComponents, rootLibs)
+    def scoreProcessor: ScoreProcessor = DefaultScoreProcessor //new OutcomeProcessorSequence(DefaultOutcomeProcessor, ItemJsOutcomeProcessor)
+    def outcomeProcessor: OutcomeProcessor = new OutcomeProcessorImpl(rootUiComponents, rootLibs)
   }
 
   private lazy val sessions = new ClientSessionImpl {

@@ -9,7 +9,7 @@ import scala.Some
 
 object Build extends sbt.Build {
 
-  val appVersion = "0.0.1"
+  val appVersion = "0.0.2"
   val org = "org.corespring"
   val ScalaVersion = "2.10.2"
 
