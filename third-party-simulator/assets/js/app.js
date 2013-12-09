@@ -12,6 +12,7 @@ angular.module("simulator").controller('Root', ['$scope', '$log', '$http', '$loc
   $scope.sessionId = $location.search()['sessionId'] || "";
 
   var server = ($location.search()['server'] || "localhost:9000");
+  var rootPath = ($location.search()['rootPath'] || "/client")
 
   $scope.modeSettings = {
     showFeedback: true,
@@ -26,7 +27,7 @@ angular.module("simulator").controller('Root', ['$scope', '$log', '$http', '$loc
   $scope.isSecure = false;
 
   $scope.$watch('isSecure', function(newValue){
-    var scriptTag = "<script src='http://"+server+"/player.js?secure="+newValue+"'></script>";
+    var scriptTag = "<script src='http://"+server+""+rootPath+"/player.js?secure="+newValue+"'></script>";
     $("head").append(scriptTag);
   });
 

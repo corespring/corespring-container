@@ -24,6 +24,8 @@ trait BaseHooks[T <: ClientHooksActionBuilder[AnyContent]] extends Controller wi
 
   def loadedComponents: Seq[Component]
 
+  def modulePath = playerWeb.Routes.prefix
+
   private def filterByType[T](comps:Seq[Component])(implicit m:scala.reflect.Manifest[T]) : Seq[T] = comps.filter(c => m.runtimeClass.isInstance(c)).map(_.asInstanceOf[T])
 
 
@@ -106,7 +108,7 @@ trait BaseHooks[T <: ClientHooksActionBuilder[AnyContent]] extends Controller wi
   private def get3rdPartyScripts(deps:Seq[ClientSideDependency]) : Seq[String] = {
     val scripts = deps.map{ d =>
       d.files match {
-        case Seq(p) => Some(s"/client/components/${d.name}/${d.files(0)}")
+        case Seq(p) => Some(s"$modulePath/components/${d.name}/${d.files(0)}")
         case _ => None
       }
     }.flatten
@@ -118,7 +120,7 @@ trait BaseHooks[T <: ClientHooksActionBuilder[AnyContent]] extends Controller wi
 
     def assetPath(compAndPath: (Component, Seq[String]), acc : Seq[String]) = {
       val (c, filenames) = compAndPath
-      acc ++ filenames.map(f => s"/client/libs/${c.id.org}/${c.id.name}/$f" )
+      acc ++ filenames.map(f => s"$modulePath/libs/${c.id.org}/${c.id.name}/$f" )
     }
 
     val out = for{

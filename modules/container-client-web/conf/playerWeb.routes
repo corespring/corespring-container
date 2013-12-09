@@ -2,6 +2,9 @@
 
 #TODO: add this import to routesImport - but only once we have a local build file for the module - don't add it at root
 
+GET        /player.js           @org.corespring.container.client.controllers.PlayerLauncher.playerJs
+
+
 GET        /js/*file            controllers.Assets.at(path="/container-client/js", file)
 GET        /css/*file           controllers.Assets.at(path="/container-client/css", file)
 GET        /images/*file        controllers.Assets.at(path="/container-client/images", file)
@@ -9,7 +12,6 @@ GET        /components/*file    controllers.Assets.at(path="/container-client/bo
 GET        /libs/:orgName/:componentName/*file     @org.corespring.container.client.controllers.ComponentsFileController.at(orgName, componentName, file)
 
 GET        /session/:sessionId/player              @org.corespring.container.client.controllers.Assets.session(sessionId:String, file = "player.html")
-GET        /session/:sessionId/container-player    @org.corespring.container.client.controllers.Assets.session(sessionId:String, file = "container-player.html")
 GET        /session/everything/:id.json            @org.corespring.container.client.controllers.resources.Session.loadEverything(id:String)
 PUT        /session/submit-answers/:id.json        @org.corespring.container.client.controllers.resources.Session.submitSession(id:String)
 PUT        /session/save/:id.json                  @org.corespring.container.client.controllers.resources.Session.saveSession(id:String)

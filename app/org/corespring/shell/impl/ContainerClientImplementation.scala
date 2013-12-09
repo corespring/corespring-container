@@ -1,8 +1,10 @@
 package org.corespring.shell.impl
 
 import org.corespring.amazon.s3.ConcreteS3Service
-import org.corespring.container.client.controllers.{ComponentsFileController, Rig, Icons, Assets}
-import org.corespring.container.components.model.{Library, UiComponent, Component}
+import org.corespring.container.client.controllers._
+import org.corespring.container.components.model.Component
+import org.corespring.container.components.model.Library
+import org.corespring.container.components.model.UiComponent
 import org.corespring.container.components.outcome.{ItemJsScoreProcessor, ScoreProcessorSequence, DefaultScoreProcessor, ScoreProcessor}
 import org.corespring.container.components.response.{OutcomeProcessorImpl, OutcomeProcessor}
 import org.corespring.shell.impl.controllers.editor.{ClientItemImpl, EditorHooksImpl}
@@ -10,6 +12,7 @@ import org.corespring.shell.impl.controllers.player.{ClientSessionImpl, PlayerHo
 import org.corespring.shell.impl.services.MongoService
 import play.api.Configuration
 import play.api.mvc._
+import scala.Some
 
 class ContainerClientImplementation(
                                      itemServiceIn : MongoService,
@@ -18,10 +21,14 @@ class ContainerClientImplementation(
                                      config : Configuration
                                      ) {
 
-  lazy val controllers: Seq[Controller] = Seq(playerHooks, editorHooks, items, sessions, assets, icons, rig, libs)
+  lazy val controllers: Seq[Controller] = Seq(playerHooks, editorHooks, items, sessions, assets, icons, rig, libs, playerLauncher)
 
   def rootUiComponents = comps.filter(_.isInstanceOf[UiComponent]).map(_.asInstanceOf[UiComponent])
   def rootLibs = comps.filter(_.isInstanceOf[Library]).map(_.asInstanceOf[Library])
+
+  private lazy val playerLauncher = new PlayerLauncher {
+    override def isSecure(r:Request[AnyContent]) = r.getQueryString("secure").map{ _ == "true"}.getOrElse(false)
+  }
 
   private lazy val icons = new Icons {
     def loadedComponents: Seq[Component] = comps
