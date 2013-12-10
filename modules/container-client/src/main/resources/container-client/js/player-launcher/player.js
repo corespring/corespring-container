@@ -104,10 +104,12 @@ exports.define = function(isSecure) {
         isAllowed(mode, function(allowed){
           if(allowed){
             sendSetModeMessage(mode);
-            callback(null);
+            if (callback) {
+              callback(null);
+            }
           } else {
             errorCallback(errors.NOT_ALLOWED);
-            if(callback){
+            if (callback) {
               callback(errors.NOT_ALLOWED);
             }
           }
