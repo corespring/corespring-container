@@ -10,6 +10,7 @@
     "angular-ui-sortable": "https://github.com/angular-ui/ui-sortable/archive/angular1.2.zip",
     "angular-bootstrap": "0.6.0",
     "jquery": "1.10.2",
+    "saxjs": "https://github.com/isaacs/sax-js.git",
     "bootstrap": "latest",
     "lodash": "latest",
     "corespring-ng-components": "https://github.com/corespring/corespring-ng-components.git",
@@ -23,6 +24,7 @@
     "angular-scenario": "1.2.3"
   },
   "resolutions": {
-    "angular": "1.2.3"
+    "angular": "~1.2.x",
+    "angular-bootstrap": "~0.7.0"
   }
 }

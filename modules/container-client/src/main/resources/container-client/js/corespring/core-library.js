@@ -5,8 +5,9 @@
   var Library = function(){
 
     var modules = {
-      lodash: { exports: _},
+      lodash: { exports: _ },
       underscore: { exports: _},
+      sax: { exports:  sax }
     };
 
     this.require = function(uid){
