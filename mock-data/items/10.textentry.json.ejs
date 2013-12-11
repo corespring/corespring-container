@@ -1,0 +1,43 @@
+{
+  "metadata" : {
+    "title" : "Short text entry"
+  },
+  "xhtml" : "<div>English city: <corespring-text-entry id='1'></corespring-text-entry><br/><corespring-feedback-block id='2'></corespring-feedback-block></div>",
+  "components" : {
+    "1" : {
+      "componentType" : "corespring-text-entry",
+      "title": "Text Entry",
+      "weight" : 1,
+      "correctResponse" : "York",
+      "feedback" :  {
+        "york": "Almost, but not",
+        "York": "yes, that's right"
+      },
+      "incorrectFeedback": "Nopes",
+      "model" : {
+      }
+    },
+    "2" : {
+      "componentType" : "corespring-feedback-block",
+      "target" : {
+        "id": "1"
+      },
+      "feedback" : {
+        "correct": {
+          "york" : "Almost good, but should be capital",
+          "York" : "very good"
+        },
+        "incorrect": {
+          "bork": "Bork is not York!",
+          "*": "Not goood."
+        }
+      }
+    }
+  },
+  "_id" : "522267c2554f43f858000009",
+  "org": {
+    "components": [
+      "corespring/*"
+    ]
+  }
+}
