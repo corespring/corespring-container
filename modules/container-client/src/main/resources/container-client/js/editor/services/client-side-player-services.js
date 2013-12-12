@@ -46,6 +46,7 @@
           var answer = components[id].answers;
           var serverLogic = corespring.server.logic(question.componentType);
           out[id] = serverLogic.respond(question, answer, settings);
+          out[id]['studentResponse'] = answer;
         }
       }
 
