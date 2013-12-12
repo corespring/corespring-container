@@ -2,7 +2,7 @@ package org.corespring.container.js
 
 import org.mozilla.javascript.{Function => RhinoFunction}
 import org.mozilla.javascript.{Scriptable, Context}
-import play.api.libs.json.JsValue
+import play.api.libs.json._
 
 trait CorespringJs {
 
@@ -14,7 +14,7 @@ trait CorespringJs {
     "/container-client/js/corespring/core.js"
   )
 
-  def js : String
+  def js: String
 
   def exports: String
 
@@ -59,13 +59,14 @@ trait ComponentServerLogic
   with JsFunctionCalling
   with CorespringJs {
 
-  def componentType:String
+  def componentType: String
 
-  def componentLibs:Seq[(String,String)]
+  def componentLibs: Seq[(String, String)]
 
-  def wrappedComponentLibs = componentLibs.map{ tuple =>
-    val (fullName, src) = tuple
-    s"""
+  def wrappedComponentLibs = componentLibs.map {
+    tuple =>
+      val (fullName, src) = tuple
+      s"""
     (function(exports, require, module){
     $src;
     })(corespring.module("$fullName").exports, corespring.require, corespring.module("$fullName"));
@@ -91,6 +92,12 @@ trait ComponentServerLogic
       //TODO: rename 'respond' => 'createOutcome' in the components
       val respondFunction = server.get("respond", server).asInstanceOf[RhinoFunction]
       val jsonResult = callJsFunction(wrapped, respondFunction, server, Array(question, response, settings, targetOutcome))
-      jsonResult
+      val addStudentResponseTransformer = (__).json.update(__.read[JsObject].map {
+        o => o ++ Json.obj("studentResponse" -> response)
+      })
+      jsonResult.transform(addStudentResponseTransformer) match {
+        case okJson: JsSuccess[JsValue] => okJson.get
+        case _ => jsonResult
+      }
   }
 }

@@ -45,8 +45,10 @@ class ResponseGeneratorTest extends Specification {
       val generator = new OutcomeGenerator("comp", respondJs, Seq.empty)
       val response = generator.createOutcome(question, answer, JsObject(Seq.empty), JsObject(Seq.empty))
       (response \ "correctness").as[String] === expectedCorrectness
+      (response \ "studentResponse" \ "value").as[String] === value.toString
       val feedback: Seq[JsValue] = (response \ "feedback").as[Seq[JsValue]]
       (feedback(0) \ "feedback").as[String] === expectedFeedback
+
     }
 
     "generate" in {
