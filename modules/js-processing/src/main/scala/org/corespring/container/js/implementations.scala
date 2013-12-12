@@ -92,11 +92,8 @@ trait ComponentServerLogic
       //TODO: rename 'respond' => 'createOutcome' in the components
       val respondFunction = server.get("respond", server).asInstanceOf[RhinoFunction]
       val jsonResult = callJsFunction(wrapped, respondFunction, server, Array(question, response, settings, targetOutcome))
-      val addStudentResponseTransformer = (__).json.update(__.read[JsObject].map {
-        o => o ++ Json.obj("studentResponse" -> response)
-      })
-      jsonResult.transform(addStudentResponseTransformer) match {
-        case okJson: JsSuccess[JsValue] => okJson.get
+      jsonResult.asOpt[JsObject] match {
+        case Some(jsObj) => jsObj ++ Json.obj("studentResponse" -> response)
         case _ => jsonResult
       }
   }
