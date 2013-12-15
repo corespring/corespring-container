@@ -128,6 +128,11 @@ object Build extends sbt.Build {
     utils,
     jsProcessing)
 
+
+  val mongoJsonService = builder.playApp("mongo-json-service").settings(playAppToSbtLibSettings: _*).settings(
+    libraryDependencies ++= Seq(casbah)
+  )
+
   val shell = builder.playApp("shell", Some(".")).settings(
     resolvers ++= Resolvers.all,
     libraryDependencies ++= Seq(casbah, playS3, scalaz),
@@ -153,8 +158,8 @@ object Build extends sbt.Build {
         "npm"
       ).map(cmd(_, (base/"modules"/"container-client")))
     }
-  ).dependsOn(containerClientWeb, componentLoader)
-    .aggregate(containerClientWeb, componentLoader, containerClient, componentModel, utils, jsProcessing)
+  ).dependsOn(containerClientWeb, componentLoader, mongoJsonService)
+    .aggregate(containerClientWeb, componentLoader, containerClient, componentModel, utils, jsProcessing, mongoJsonService)
 
   private def cmd(name: String, base: File): Command = {
     Command.args(name, "<" + name + "-command>") { (state, args) =>

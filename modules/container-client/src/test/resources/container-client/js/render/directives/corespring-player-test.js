@@ -39,8 +39,7 @@ describe('component-register', function(){
     expect(elem).toNotBe(null);
   });
 
-
-  it('should with data', function(){
+  it('should work with data', function(){
 
     rootScope.item = {
       components: {
@@ -74,3 +73,4 @@ describe('component-register', function(){
     expect(mockRegister.dataAndSession).toEqual(expected);
   });
 });
+

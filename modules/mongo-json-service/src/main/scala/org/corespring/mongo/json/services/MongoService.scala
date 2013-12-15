@@ -1,4 +1,4 @@
-package org.corespring.shell.impl.services
+package org.corespring.mongo.json.services
 
 import com.mongodb.DBObject
 import com.mongodb.casbah.MongoCollection

@@ -1,9 +1,9 @@
 import com.mongodb.casbah.{MongoDB, MongoClientURI, MongoClient}
 import org.corespring.container.components.loader.FileComponentLoader
+import org.corespring.mongo.json.services.MongoService
 import org.corespring.shell.impl.ContainerClientImplementation
 import org.corespring.shell.impl.controllers.Main
 import org.corespring.shell.impl.filters.{AccessControlFilter, ReloadComponentsFilter}
-import org.corespring.shell.impl.services.MongoService
 import org.corespring.shell.impl.utils.ControllerInstanceResolver
 import play.api.{Logger, Play}
 import play.api.mvc.{WithFilters, Controller}

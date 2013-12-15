@@ -1,9 +1,9 @@
 package org.corespring.shell.impl.controllers.editor
 
-import org.corespring.shell.impl.services.MongoService
 import play.api.mvc.{Action, Result, AnyContent}
 import org.corespring.container.client.actions.{ScoreItemRequest, ItemActionBuilder, SaveItemRequest, ItemRequest}
 import org.corespring.container.client.controllers.resources.Item
+import org.corespring.mongo.json.services.MongoService
 
 trait ClientItemImpl extends Item{
 

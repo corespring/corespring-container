@@ -1,11 +1,11 @@
 package org.corespring.shell.impl.controllers.editor
 
 import org.corespring.container.client.actions.{EditorClientHooksActionBuilder, SessionIdRequest, PlayerRequest}
-import org.corespring.shell.impl.services.MongoService
 import play.api.mvc.{Request, Action, Result, AnyContent}
 import org.corespring.container.client.controllers.hooks.EditorHooks
 import play.api.libs.json.{JsString, Json}
 import org.bson.types.ObjectId
+import org.corespring.mongo.json.services.MongoService
 
 trait EditorHooksImpl extends EditorHooks {
 

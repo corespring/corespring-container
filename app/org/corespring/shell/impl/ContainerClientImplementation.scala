@@ -9,10 +9,10 @@ import org.corespring.container.components.outcome.{ItemJsScoreProcessor, ScoreP
 import org.corespring.container.components.response.{OutcomeProcessorImpl, OutcomeProcessor}
 import org.corespring.shell.impl.controllers.editor.{ClientItemImpl, EditorHooksImpl}
 import org.corespring.shell.impl.controllers.player.{ClientSessionImpl, PlayerHooksImpl}
-import org.corespring.shell.impl.services.MongoService
 import play.api.Configuration
 import play.api.mvc._
 import scala.Some
+import org.corespring.mongo.json.services.MongoService
 
 class ContainerClientImplementation(
                                      itemServiceIn : MongoService,

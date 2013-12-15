@@ -1,11 +1,11 @@
 package org.corespring.shell.impl.controllers
 
-import org.corespring.shell.impl.services.MongoService
 import play.api.Logger
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsString
 import play.api.libs.json.{Json, JsValue}
 import play.api.mvc._
+import org.corespring.mongo.json.services.MongoService
 
 trait Main extends Controller {
 

@@ -57,15 +57,13 @@ trait PlayerHooks extends BaseHooks[ClientHooksActionBuilder[AnyContent]] with L
       Ok(s"$uiCss\n$layoutCss").as(ContentTypes.CSS)
   }
 
-
-  @deprecated("not in use", "")
   def createSessionForItem(itemId: String): Action[AnyContent] = builder.createSessionForItem(itemId) {
     request =>
       //TODO: How to get this path accurately - atm will only support one level of nesting of the routes file?
       val PathRegex = s"""/(.*?)/.*/$itemId.*""".r
       val PathRegex(root) = request.path
-      //val url = s"/$root/${request.sessionId}/player.html"
-      val url = org.corespring.container.client.controllers.routes.Assets.session(request.sessionId, "index.html").url
+      val file = request.queryString.get("file").map(_(0)).getOrElse("index.html")
+      val url = org.corespring.container.client.controllers.routes.Assets.session(request.sessionId, file).url
       SeeOther(url)
   }
 

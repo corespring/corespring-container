@@ -5,6 +5,4 @@ POST        /create-session       @org.corespring.shell.impl.controllers.Main.cr
 
 GET         /assets/*file        controllers.Assets.at(path="/container-client", file)
 
-#GET         /player.js           @org.corespring.container.client.controllers.PlayerLauncher.playerJs
-
 ->          /client              playerWeb.Routes

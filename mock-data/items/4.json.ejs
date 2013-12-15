@@ -1,6 +1,6 @@
 {
   "metadata" : {
-    "title" : "Simple multiple choice"
+    "title" : "Simple multiple choice (radio)"
   },
   "xhtml" : "<%- helper.read('../xml/2.xhtml') %>",
   "components" : {
@@ -18,7 +18,8 @@
         "prompt": "Which of these is a vegetable?",
         "config": {
           "orientation": "vertical",
-          "shuffle": true
+          "shuffle": true,
+          "singleChoice" : true
         },
         "choices": [
           {"label": "Banana", "value": "banana"},

@@ -4,12 +4,12 @@ import org.corespring.container.client.actions.ClientHooksActionBuilder
 import org.corespring.container.client.actions.PlayerRequest
 import org.corespring.container.client.actions.SessionIdRequest
 import org.corespring.container.client.controllers.hooks.PlayerHooks
-import org.corespring.shell.impl.services.MongoService
 import play.api.libs.json._
 import play.api.mvc.{Action, Result, AnyContent}
 import scala.Some
 import scalaz.Scalaz._
 import scalaz._
+import org.corespring.mongo.json.services.MongoService
 
 trait PlayerHooksImpl extends PlayerHooks {
 

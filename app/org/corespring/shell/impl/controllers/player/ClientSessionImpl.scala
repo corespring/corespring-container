@@ -2,9 +2,9 @@ package org.corespring.shell.impl.controllers.player
 
 import org.corespring.container.client.actions._
 import org.corespring.container.client.controllers.resources.Session
-import org.corespring.shell.impl.services.MongoService
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Request, Action, Result, AnyContent}
+import org.corespring.mongo.json.services.MongoService
 
 trait ClientSessionImpl extends Session {
 
