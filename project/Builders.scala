@@ -13,7 +13,7 @@ class Builders(org:String, appVersion:String, rootScalaVersion:String) {
       name,
       file("modules/" + name),
       dependencies = deps)
-      .settings( Defaults.defaultSettings  ++ intellijCommandSettings("SCALA") : _* )
+      //.settings( Defaults.defaultSettings )
       .settings(
       organization := org,
       version := appVersion,

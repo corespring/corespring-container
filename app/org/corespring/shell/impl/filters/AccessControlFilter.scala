@@ -2,8 +2,11 @@ package org.corespring.shell.impl.filters
 
 
 import play.api.mvc.{ RequestHeader, EssentialAction, EssentialFilter }
+import scala.concurrent.ExecutionContext
 
 object AccessControlFilter extends EssentialFilter {
+
+  import ExecutionContext.Implicits.global
 
   val AccessControlAllowEverything = ("Access-Control-Allow-Origin", "*")
 
