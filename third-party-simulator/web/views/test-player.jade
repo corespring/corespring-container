@@ -1,0 +1,20 @@
+extends layout
+
+block head
+
+block content
+  .container(ng-app="simulator", ng-controller="Test", style="padding: 0px;")
+    h1 Test
+    .player(style='width: 100%, height: 100%')
+      #player-holder(style="height: 100%;")
+
+block scripts
+  script(src="/components/saxjs/lib/sax.js")
+  script(src="/components/jquery/jquery.min.js")
+  script(src="/components/lodash/dist/lodash.min.js")
+  script(src="/components/angular/angular.min.js")
+  script(src="/components/angular-bootstrap/ui-bootstrap-tpls.js")
+  script(src='http://localhost:9000/client/player.js?secure=false')
+  script(src="/assets/js/test-player.js")
+
+
