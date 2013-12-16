@@ -1,36 +1,45 @@
 import sbt._
 import Keys._
 import play.Project._
+import sbtrelease.ReleasePlugin._
 
-class Builders(org:String, appVersion:String, rootScalaVersion:String) {
+class Builders(org:String, rootScalaVersion:String) {
 
-  def lib(name: String, folder:String = "lib", deps: Seq[sbt.ClasspathDep[sbt.ProjectReference]] = Seq.empty) =
-
-    //Needed for play 2.1.x
-    //++ intellijCommandSettings("SCALA")
-
-    sbt.Project(
-      name,
-      file("modules/" + name),
-      dependencies = deps)
-      //.settings( Defaults.defaultSettings )
-      .settings(
-      organization := org,
-      version := appVersion,
-      scalaVersion := rootScalaVersion)
-
-  def testLib(name:String) = lib(name, "test-lib")
-
-  def playApp(name:String, appPath : Option[String] = None, deps: Seq[ClasspathDep[ProjectReference]] = Seq.empty) = {
-
-    val projectFile = file(appPath.getOrElse( "modules/" + name) )
-    play.Project(
-      name,
-      appVersion,
-      path = projectFile
-    ).settings( play.Project.defaultScalaSettings : _* ).settings(
-      organization := org,
-      scalaVersion := rootScalaVersion )
+  val cred = {
+    val envCredentialsPath = System.getenv("CREDENTIALS_PATH")
+    val path = if (envCredentialsPath != null) envCredentialsPath else Seq(Path.userHome / ".ivy2" / ".credentials").mkString
+    val f: File = file(path)
+    if (f.exists()) {
+      println("[credentials] using credentials file")
+      Credentials(f)
+    } else {
+      //https://devcenter.heroku.com/articles/labs-user-env-compile
+      def repoVar(s: String) = System.getenv("ARTIFACTORY_" + s)
+      val args = Seq("REALM", "HOST", "USER", "PASS").map(repoVar)
+      println("[credentials] args: " + args)
+      Credentials(args(0), args(1), args(2), args(3))
+    }
   }
+
+   val sharedSettings = releaseSettings ++ Seq(
+    credentials += cred,
+    publishTo <<= version {
+        (v: String) =>
+          def isSnapshot = v.trim.contains("-")
+          val base = "http://repository.corespring.org/artifactory"
+          val repoType = if (isSnapshot) "snapshot" else "release"
+          val finalPath = base + "/ivy-" + repoType + "s"
+          Some( "Artifactory Realm" at finalPath )
+      }
+  )
+
+  def lib(name: String, rootFile : Option[String] = None) = {
+    val root = file(rootFile.getOrElse(s"modules/$name"))
+    sbt.Project(name, root )
+      .settings(organization := org, scalaVersion := rootScalaVersion)
+      .settings(sharedSettings : _*)
+  }
+
+  def playApp(name:String, rootFile : Option[String] = None) = lib(name, rootFile).settings(playScalaSettings : _*) 
 
 }
