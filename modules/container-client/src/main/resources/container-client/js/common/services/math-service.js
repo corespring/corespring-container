@@ -3,11 +3,11 @@
   var MathJaxService = function ($timeout) {
 
     this.parseDomForMath = function (delay) {
-      if (!_.isUndefined(MathJax)) {
-        $timeout(function () {
+      $timeout(function () {
+        if (typeof MathJax == 'function') {
           MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
-        }, delay || 0);
-      }
+        }
+      }, delay || 0);
     };
   };
 
