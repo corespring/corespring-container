@@ -149,9 +149,7 @@ var controller = function ($scope, $log, ComponentRegister, PlayerServices) {
   });
 
   $scope.$on('reset', function(){
-    $scope.$apply(function(){
-      $scope.resetPreview();
-    });
+    $scope.resetPreview();
   });
 
   $scope.$on('getSessionStatus', function(event, data, callback){
