@@ -41,6 +41,9 @@ The command above *should* add the [corespring-components](http://github.com/cor
 The s3 bucket is set to: corespring-container-test-bucket
 
 ## Seed the db if you need to...
+
+you'll need coffee-script installed as a global to run these scripts: `npm install -g coffee-script`
+
 Install npm packages
 
     cd bin
