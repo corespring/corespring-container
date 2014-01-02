@@ -1,0 +1,29 @@
+{
+  "metadata" : {
+    "title" : "Ordering Interaction Example"
+  },
+  "xhtml" : "<div><corespring-ordering id='1' /></div>",
+  "components" : {
+    "1" : {
+      "componentType" : "corespring-ordering",
+      "title": "Ordering Sample",
+      "weight" : 1,
+      "correctResponse" : ["a", "g", "q", "s"],
+      "feedback" : [
+      ],
+      "model" : {
+        "prompt": "What is the correct order of the letters below?",
+        "config": {
+          "shuffle": true
+        },
+        "choices": [
+          {"label": "Q", "value": "q"},
+          {"label": "A", "value": "a"},
+          {"label": "G", "value": "g"},
+          {"label": "S", "value": "s"}
+        ]
+      }
+    }
+  },
+  "_id" : "522267c2554f43f858000010"
+}

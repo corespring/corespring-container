@@ -1,0 +1,37 @@
+{
+  "metadata" : {
+    "title" : "Inline choice"
+  },
+  "xhtml" : "<%- helper.read('../xml/3.xhtml') %>",
+  "components" : {
+    "1" : {
+      "componentType" : "corespring-inline-choice",
+      "title": "Less Fruits",
+      "weight" : 1,
+      "correctResponse" : "carrot",
+      "feedback" : {
+        "banana": {"feedback": "Incorrect", "correct": false},
+        "carrot" : {"feedback" : "Correct", "correct": true},
+        "apple" : {"feedback": "Incorrect", "correct": false}
+      },
+      "model" : {
+        "prompt": "Which of these is a vegetable?",
+        "config": {
+          "orientation": "vertical",
+          "shuffle": true
+        },
+        "choices": [
+          {"label": "Banana", "value": "banana"},
+          {"label": "Carrot", "value": "carrot"},
+          {"label": "Apple", "value": "apple"}
+        ]
+      }
+    }
+  },
+  "_id" : "522267c2554f43f858000004",
+  "org": {
+    "components": [
+      "corespring/*"
+    ]
+  }
+}

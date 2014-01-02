@@ -1,6 +1,7 @@
 package org.corespring.container.client.controllers.helpers
 
 import org.corespring.container.components.model.LayoutComponent
+import scala.xml._
 
 trait LayoutComponentReading { self : Helpers =>
 
@@ -10,7 +11,10 @@ trait LayoutComponentReading { self : Helpers =>
 
     val usedInXml = components.filter{ lc =>
       val name = tagName(lc.org, lc.name)
-      (xml \\ name).length > 0
+
+      val hasComponentAsAttribute = xml.child.exists(!_.attribute(name).isEmpty)
+
+      (xml \\ name).length > 0 || hasComponentAsAttribute
     }
 
     usedInXml.map(lc => tagName(lc.org, lc.name))

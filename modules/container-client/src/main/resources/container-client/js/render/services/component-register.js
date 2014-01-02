@@ -47,6 +47,10 @@ angular.module('corespring-player.services').factory('ComponentRegister', ['$log
       return sessions;
     };
 
+    this.isAnswerEmpty = function(id) {
+      return !components[id] || components[id].isAnswerEmpty();
+    };
+
     this.hasEmptyAnswers = function() {
       return this.interactionCount() > this.interactionsWithResponseCount();
     };
