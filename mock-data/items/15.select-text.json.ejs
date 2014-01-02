@@ -1,0 +1,35 @@
+{
+  "metadata" : {
+    "title" : "Select Text Interaction Example"
+  },
+  "xhtml" : "<div><corespring-select-text id='1'></corespring-select-text><br/>Bikk<corespring-select-text id='2'></corespring-select-text>Ftty</div>",
+  "components" : {
+    "1" : {
+      "componentType" : "corespring-select-text",
+      "title": "Select Text Sample, word",
+      "weight" : 1,
+      "model" : {
+        "prompt": "Select the fruits from the text",
+        "config": {
+          "shuffle": true,
+          "selectionUnit": "word"
+        },
+        "text": "<p>But I'm going to have to explain to you how all this&acute; mistaken |apple of denouncing pleasure and <b>|raisin</b> pain was <u><i>born</i></u> and I will give you a complete account of the system, </p>and expound the |banana teachings of the great explorer of the truth, the master-builder of human happiness. No one rejects, dislikes, or avoids pleasure itself, because it is pleasure, but because those who do not know how to pursue pleasure rationally encounter consequences that are extremely painful."
+      }
+    },
+    "2" : {
+      "componentType" : "corespring-select-text",
+      "title": "Select Text Sample, sentence",
+      "weight" : 1,
+      "model" : {
+        "prompt": "Select the nice sentences",
+        "config": {
+          "shuffle": true,
+          "selectionUnit": "sentence"
+        },
+        "text": "|This is a good sentence. This is a bad sentence. |This is a good one. <b>This is a bad one.</b>"
+      }
+    }
+  },
+  "_id" : "522267c2554f43f85800001f"
+}
