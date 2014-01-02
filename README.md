@@ -24,7 +24,8 @@ These tools should be on your `PATH`:
 
 #### Important !!
 
-The command above *should* add the [corespring-components](http://github.com/corespring/corespring-components) as a submodule. If it doesn't you'll need to add this repo.
+The command above *should* add the [corespring-components](http://github.com/corespring/corespring-components) as a
+submodule. If it doesn't you'll need to add this repo.
 
     git submodule init
     git submodule update
@@ -40,11 +41,24 @@ The command above *should* add the [corespring-components](http://github.com/cor
   
 The s3 bucket is set to: corespring-container-test-bucket
 
-## Seed the db if you need to...
+The most straightforward way to obtain these keys if you do not have them is to get them from Heroku:
 
-you'll need coffee-script installed as a global to run these scripts: `npm install -g coffee-script`
+    heroku config --app corespring-container-devt | grep S3
 
-Install npm packages
+If you do not have access to the Heroku application, please get in touch with someone to give you access.
+
+## Seeding the Database
+
+Ensure that you have Coffeescript installed:
+
+    which coffee
+
+If this returns nothing, you'll need to install it globally with NPM:
+
+    sudo npm install -g coffee-script
+
+
+Afterwards, install the project modules:
 
     cd bin
     npm install
@@ -75,6 +89,7 @@ Then go to [http://localhost:9000](http://localhost:9000)
 ## Grunt integration with Play
 
 * `grunt` `npm` and `bower` are all available as commands within the play console. 
-* When you start the play server you trigger the grunt run task. This will set up a watch on the container-client's client side resources.
+* When you start the play server you trigger the grunt run task. This will set up a watch on the container-client's
+client side resources.
 
 
