@@ -46,7 +46,7 @@ Install npm packages
     cd bin
     npm install
     cd ..
-    ./bin/run
+    ./bin/seed-db
 
 
 ## Run play app and install client side dependencies
