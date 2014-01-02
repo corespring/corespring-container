@@ -7,6 +7,7 @@ import play.api.Logger
 import play.api.libs.MimeTypes
 import play.api.libs.iteratee.Enumerator
 import play.api.mvc._
+import scala.concurrent.ExecutionContext
 
 /** A very simple file asset loader for now */
 trait ComponentsFileController extends Controller {
@@ -38,6 +39,9 @@ trait ComponentsFileController extends Controller {
 
   def at(org:String, component:String, filename:String) : Action[AnyContent] = Action{ request =>
 
+
+    import ExecutionContext.Implicits.global
+
     val fullPath = s"$componentsPath/$org/$component/libs/$filename"
     log.debug( s"fullPath: $fullPath")
     loadFile(fullPath).map {
@@ -51,7 +55,7 @@ trait ComponentsFileController extends Controller {
         try {
           (stream.available, Enumerator.fromStream(stream))
         } catch {
-          case _ => (-1, Enumerator[Array[Byte]]())
+          case e : Throwable => (-1, Enumerator[Array[Byte]]())
         }
       }
 
@@ -64,7 +68,8 @@ trait ComponentsFileController extends Controller {
           CONTENT_LENGTH -> length.toString,
           CONTENT_TYPE -> MimeTypes.forFileName(filename).map(m => m + addCharsetIfNeeded(m)).getOrElse(BINARY),
           DATE -> df.print({ new java.util.Date }.getTime))),
-        resourceData)
+        resourceData,
+        HttpConnection.KeepAlive)
 
       response
 
