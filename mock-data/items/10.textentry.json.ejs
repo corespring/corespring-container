@@ -8,17 +8,13 @@
       "componentType" : "corespring-text-entry",
       "title": "Text Entry",
       "weight" : 1,
-      "correctResponse" : "York",
-      "feedback" :  {
-        "york": "Almost, but not",
-        "York": "yes, that's right"
-      },
-      "incorrectFeedback": "Nopes",
+      "correctResponse" : ["york", "York"],
       "model" : {
       }
     },
     "2" : {
       "componentType" : "corespring-feedback-block",
+      "weight" : 0,
       "target" : {
         "id": "1"
       },
