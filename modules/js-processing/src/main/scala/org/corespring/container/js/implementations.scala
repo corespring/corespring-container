@@ -97,4 +97,15 @@ trait ComponentServerLogic
         case _ => jsonResult
       }
   }
+
+  def preProcessItem(question: JsValue, settings: JsValue): JsValue = withJsContext(libs, wrappedComponentLibs) {
+    (ctx: Context, scope: Scriptable) =>
+      implicit val rootScope = scope
+      implicit val rootContext = ctx
+      ctx.evaluateString(scope, wrapped, "<cmd>", 1, null)
+      val server = serverLogic(ctx, scope)
+      val renderFunction = server.get("render", server).asInstanceOf[RhinoFunction]
+      val jsonResult = callJsFunction(wrapped, renderFunction, server, Array(question))
+      jsonResult
+  }
 }
