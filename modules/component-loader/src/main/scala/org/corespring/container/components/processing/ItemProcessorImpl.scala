@@ -2,8 +2,9 @@ package org.corespring.container.components.processing
 
 import org.corespring.container.components.model.{Library, UiComponent}
 import org.slf4j.LoggerFactory
-import play.api.libs.json.{JsObject, JsValue}
 import components.processing.ItemProcessor
+import play.api.libs.json._
+
 
 class ItemProcessorImpl(components: Seq[UiComponent], libraries: Seq[Library]) extends ItemProcessor {
 
@@ -29,8 +30,18 @@ class ItemProcessorImpl(components: Seq[UiComponent], libraries: Seq[Library]) e
     val componentQuestions = (item \ "components").as[JsObject]
 
     val processedItem: Seq[(String, JsValue)] = componentQuestions.keys.toSeq.map(processComponent(_))
+    val processedJson = JsObject(processedItem)
 
-    JsObject(processedItem)
+    val jsonTransformer = (__ \ 'components).json.update(
+      __.read[JsObject].map{ o => processedJson }
+    )
+
+    item.transform(jsonTransformer) match {
+      case succ:JsSuccess[JsObject] => succ.get
+      case _ => item
+    }
+
+
   }
 
 }

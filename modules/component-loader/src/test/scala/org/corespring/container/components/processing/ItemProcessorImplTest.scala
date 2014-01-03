@@ -30,6 +30,7 @@ class ItemProcessorImplTest extends Specification{
       )
 
       val item = Json.obj(
+        "weight" -> "1",
         "components" -> Json.obj(
             "1" -> Json.obj(
               "componentType" -> "org-name",
@@ -52,8 +53,9 @@ class ItemProcessorImplTest extends Specification{
 
       val processor = new ItemProcessorImpl(Seq(component), Seq.empty)
       val result = processor.processItem(item, session)
-      (result \ "1" \ "dummy").as[String] === "something"
-      (result \ "1" \ "model").as[String] === "someModel"
+      (result \ "components" \ "1" \ "dummy").as[String] === "something"
+      (result \ "components" \ "1" \ "model").as[String] === "someModel"
+      (result \ "weight").as[String] === "1"
     }
   }
 
