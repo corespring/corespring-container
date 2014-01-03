@@ -165,6 +165,8 @@ module.exports = (grunt) ->
 
     concat:
       generated:
+        options: 
+          separator: ";\n"
         files: [
           { 
             dest: common.core.concatDest 
