@@ -9,6 +9,7 @@ import play.api.libs.json.Json
 import play.api.mvc.{Request, Action, Result, AnyContent}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import components.processing.ItemProcessor
 
 class SessionTest extends Specification with Mockito{
 
@@ -58,6 +59,8 @@ class SessionTest extends Specification with Mockito{
       def outcomeProcessor: OutcomeProcessor = mock[OutcomeProcessor]
 
       def scoreProcessor: ScoreProcessor = mock[ScoreProcessor]
+
+      def itemProcessor: ItemProcessor = mock[ItemProcessor]
 
       def builder: SessionActionBuilder[AnyContent] = new MockBuilder(request)
     }
