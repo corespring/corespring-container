@@ -19,10 +19,14 @@ class ItemProcessorImpl(components: Seq[UiComponent], libraries: Seq[Library]) e
 
       components.find(_.matchesType(componentType)).map {
         component =>
-
+          val renderFunctionRegexp = "(?s)exports(\\.|\\[\")render[^;]*?=[^;]*function".r
+          if (renderFunctionRegexp.findFirstIn(component.server.definition).isEmpty) {
+            (id, question)
+          } else {
             val componentLibraries: Seq[Library] = component.libraries.map(id => libraries.find(l => l.id.matches(id))).flatten
             val processorServerLogic = new ItemProcessorServerLogic(component.componentType, component.server.definition, componentLibraries)
             (id, processorServerLogic.preProcessItem(question, settings))
+          }
       }.getOrElse((id, JsObject(Seq.empty)))
 
     }
@@ -33,11 +37,13 @@ class ItemProcessorImpl(components: Seq[UiComponent], libraries: Seq[Library]) e
     val processedJson = JsObject(processedItem)
 
     val jsonTransformer = (__ \ 'components).json.update(
-      __.read[JsObject].map{ o => processedJson }
+      __.read[JsObject].map {
+        o => processedJson
+      }
     )
 
     item.transform(jsonTransformer) match {
-      case succ:JsSuccess[JsObject] => succ.get
+      case succ: JsSuccess[JsObject] => succ.get
       case _ => item
     }
 
