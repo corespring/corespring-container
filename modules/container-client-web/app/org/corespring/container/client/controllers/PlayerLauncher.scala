@@ -1,6 +1,6 @@
 package org.corespring.container.client.controllers
 
-import java.io.File
+import java.io.{InputStream, File}
 import org.corespring.container.client.views.txt.js.ServerLibraryWrapper
 import play.api.Play
 import play.api.Play.current
@@ -41,8 +41,7 @@ trait PlayerLauncher extends Controller {
         r =>
           val name = new File(r.getFile).basename.getName.replace(".js", "")
           val file = Play.getFile(r.getPath)
-          require(file.exists, "This file must exist")
-          val contents = scala.io.Source.fromFile(file).getLines.mkString("\n")
+          val contents = scala.io.Source.fromInputStream(r.getContent().asInstanceOf[InputStream]).getLines.mkString("\n")
           (name, contents)
       }.getOrElse((p, ""))
     }
