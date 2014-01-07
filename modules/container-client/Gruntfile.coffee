@@ -36,12 +36,15 @@ module.exports = (grunt) ->
       concatDest: '.tmp/concat/js/core.js'
       src: [
         '<%= common.dist %>/js/common/**/*.js', 
-        '<%= common.dist %>/js/corespring/**/*.js']
+        '<%= common.dist %>/js/corespring/core.js',
+        '<%= common.dist %>/js/corespring/lodash-mixins.js']
 
     editor:
       dest: '<%= common.dist %>/js/prod-editor.js'
       concatDest: '.tmp/concat/js/editor.js'
       src: [
+        '<%= common.dist %>/js/corespring/core-library.js',
+        '<%= common.dist %>/js/corespring/server/init-core-library.js',
         '<%= common.dist %>/js/editor/**/*.js', 
         '<%= common.dist %>/js/render/services/**/*.js',
         '<%= common.dist %>/js/render/directives/**/*.js'

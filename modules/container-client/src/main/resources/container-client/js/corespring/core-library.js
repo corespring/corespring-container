@@ -4,12 +4,8 @@
   //A simple library to aid in the use of the common js module pattern.
   var Library = function(){
 
-    var modules = {
-      lodash: { exports: _ },
-      underscore: { exports: _},
-      sax: { exports:  sax }
-    };
-
+    var modules = { };
+ 
     this.require = function(uid){
 
       if(!uid){

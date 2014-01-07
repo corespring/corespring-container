@@ -6,11 +6,11 @@ import play.api.libs.json._
 
 trait CorespringJs {
 
-  //TODO: How to share corespring-core.js with client and server
   protected val libs = Seq(
     "/js-libs/lodash.min.js",
     "/js-libs/sax.js",
     "/container-client/js/corespring/core-library.js",
+    "/container-client/js/corespring/server/init-core-library.js",
     "/container-client/js/corespring/core.js"
   )
 
