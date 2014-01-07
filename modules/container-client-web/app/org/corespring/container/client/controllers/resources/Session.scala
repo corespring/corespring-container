@@ -9,7 +9,7 @@ import play.api.Logger
 import play.api.libs.json._
 import play.api.mvc.{AnyContent, Controller}
 import scala.Some
-import components.processing.ItemProcessor
+import components.processing.PlayerItemPreProcessor
 
 trait Session extends Controller with ItemPruner {
 
@@ -17,7 +17,7 @@ trait Session extends Controller with ItemPruner {
 
   def outcomeProcessor: OutcomeProcessor
 
-  def itemProcessor: ItemProcessor
+  def itemPreProcessor: PlayerItemPreProcessor
 
   def scoreProcessor: ScoreProcessor
 
@@ -37,7 +37,7 @@ trait Session extends Controller with ItemPruner {
 
     val sessionJson = (request.everything \ "session").as[JsObject]
 
-    val processedItem = itemProcessor.processItem(prunedItem, sessionJson \ "settings")
+    val processedItem = itemPreProcessor.preProcessItemForPlayer(prunedItem, sessionJson \ "settings")
 
     if(!includeOutcome) {
       Ok(

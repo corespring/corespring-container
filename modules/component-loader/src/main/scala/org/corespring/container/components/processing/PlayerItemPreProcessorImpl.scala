@@ -2,15 +2,15 @@ package org.corespring.container.components.processing
 
 import org.corespring.container.components.model.{Library, UiComponent}
 import org.slf4j.LoggerFactory
-import components.processing.ItemProcessor
+import components.processing.PlayerItemPreProcessor
 import play.api.libs.json._
 
 
-class ItemProcessorImpl(components: Seq[UiComponent], libraries: Seq[Library]) extends ItemProcessor {
+class PlayerItemPreProcessorImpl(components: Seq[UiComponent], libraries: Seq[Library]) extends PlayerItemPreProcessor {
 
   private lazy val logger = LoggerFactory.getLogger("components.processing")
 
-  def processItem(item: JsValue, settings: JsValue): JsValue = {
+  def preProcessItemForPlayer(item: JsValue, settings: JsValue): JsValue = {
 
     def processComponent(id: String): (String, JsValue) = {
       val componentQuestions = (item \ "components").as[JsObject]
@@ -19,8 +19,13 @@ class ItemProcessorImpl(components: Seq[UiComponent], libraries: Seq[Library]) e
 
       components.find(_.matchesType(componentType)).map {
         component =>
-          val renderFunctionRegexp = "(?s)exports(\\.|\\[\")render[^;]*?=[^;]*function".r
-          if (renderFunctionRegexp.findFirstIn(component.server.definition).isEmpty) {
+
+          def hasRenderFunction : Boolean = {
+            val renderFunctionRegexp = "(?s)exports(\\.|\\[\")render[^;]*?=[^;]*function".r
+            renderFunctionRegexp.findFirstIn(component.server.definition).isDefined
+          }
+
+          if (!hasRenderFunction) {
             (id, question)
           } else {
             val componentLibraries: Seq[Library] = component.libraries.map(id => libraries.find(l => l.id.matches(id))).flatten

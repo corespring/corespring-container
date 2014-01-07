@@ -5,6 +5,8 @@ import org.corespring.container.client.controllers.resources.Session
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Request, Action, Result, AnyContent}
 import org.corespring.mongo.json.services.MongoService
+import components.processing.PlayerItemPreProcessor
+import org.corespring.container.components.processing.PlayerItemPreProcessorImpl
 
 trait ClientSessionImpl extends Session {
 

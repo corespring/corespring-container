@@ -52,8 +52,8 @@ class ItemProcessorImplTest extends Specification {
         )
       )
 
-      val processor = new ItemProcessorImpl(Seq(component), Seq.empty)
-      val result = processor.processItem(item, session)
+      val processor = new PlayerItemPreProcessorImpl(Seq(component), Seq.empty)
+      val result = processor.preProcessItemForPlayer(item, session)
       (result \ "components" \ "1" \ "dummy").as[String] === "something"
       (result \ "components" \ "1" \ "model").as[String] === "someModel"
       (result \ "weight").as[String] === "1"
@@ -86,10 +86,10 @@ class ItemProcessorImplTest extends Specification {
         )
       )
 
-      val processor = new ItemProcessorImpl(Seq(component), Seq.empty)
+      val processor = new PlayerItemPreProcessorImpl(Seq(component), Seq.empty)
 
       try {
-        processor.processItem(item, Json.obj())
+        processor.preProcessItemForPlayer(item, Json.obj())
         success
       } catch {
         case x:Throwable => failure

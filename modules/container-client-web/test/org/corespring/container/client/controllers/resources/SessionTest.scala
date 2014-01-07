@@ -9,7 +9,7 @@ import play.api.libs.json.Json
 import play.api.mvc.{Request, Action, Result, AnyContent}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import components.processing.ItemProcessor
+import components.processing.PlayerItemPreProcessor
 
 class SessionTest extends Specification with Mockito{
 
@@ -60,7 +60,7 @@ class SessionTest extends Specification with Mockito{
 
       def scoreProcessor: ScoreProcessor = mock[ScoreProcessor]
 
-      def itemProcessor: ItemProcessor = mock[ItemProcessor]
+      def itemPreProcessor: PlayerItemPreProcessor = mock[PlayerItemPreProcessor]
 
       def builder: SessionActionBuilder[AnyContent] = new MockBuilder(request)
     }

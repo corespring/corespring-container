@@ -40,7 +40,9 @@ trait PlayerLauncher extends Controller {
       Play.resource(p).map {
         r =>
           val name = new File(r.getFile).basename.getName.replace(".js", "")
-          val contents = scala.io.Source.fromFile(r.getFile).getLines.mkString("\n")
+          val file = Play.getFile(r.getPath)
+          require(file.exists, "This file must exist")
+          val contents = scala.io.Source.fromFile(file).getLines.mkString("\n")
           (name, contents)
       }.getOrElse((p, ""))
     }

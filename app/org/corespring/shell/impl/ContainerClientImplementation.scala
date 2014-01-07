@@ -13,8 +13,8 @@ import play.api.Configuration
 import play.api.mvc._
 import scala.Some
 import org.corespring.mongo.json.services.MongoService
-import components.processing.ItemProcessor
-import org.corespring.container.components.processing.ItemProcessorImpl
+import components.processing.PlayerItemPreProcessor
+import org.corespring.container.components.processing.PlayerItemPreProcessorImpl
 
 class ContainerClientImplementation(
                                      itemServiceIn : MongoService,
@@ -99,7 +99,7 @@ class ContainerClientImplementation(
 
     def outcomeProcessor: OutcomeProcessor = new OutcomeProcessorImpl(rootUiComponents, rootLibs)
 
-    def itemProcessor: ItemProcessor = new ItemProcessorImpl(rootUiComponents, rootLibs)
+    def itemPreProcessor: PlayerItemPreProcessor = new PlayerItemPreProcessorImpl(rootUiComponents, rootLibs)
 
     def sessionService: MongoService = sessionServiceIn
 
