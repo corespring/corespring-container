@@ -6,8 +6,8 @@ angular.module('corespring-player.services').factory('PlayerUtils', ['$log', fun
       var keys = _.keys(item.components);
 
       var zipped = _.map(keys, function(k){
-        var session = (session && session.components) ? session.components[k] : null;
-        return { data: item.components[k], session: session};
+        var s = (session && session.components) ? session.components[k] : null;
+        return { data: item.components[k], session: s};
       });
 
       return _.zipObject(keys, zipped); 

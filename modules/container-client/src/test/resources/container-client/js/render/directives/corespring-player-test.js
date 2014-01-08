@@ -17,6 +17,7 @@ describe('component-register', function(){
 
 
   beforeEach(angular.mock.module('corespring-player.directives'));
+  beforeEach(angular.mock.module('corespring-player.services'));
 
   beforeEach(function () {
     module(function ($provide) {
