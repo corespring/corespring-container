@@ -26,9 +26,11 @@ block scripts
   script(src="js/rig/controllers/_declaration.js")
   script(src="js/rig/controllers/root.js")
   script(src="js/rig/directives/_declaration.js")
+  script(src="js/rig/directives/inline-preview.js")
   script(src="js/editor/directives/_declaration.js")
-  script(src="js/editor/directives/inline-preview.js")
-  script(src="js/corespring/container/container.js")
+  script(src="js/render/services/_declaration.js")
+  script(src="js/render/services/component-register.js")
+  script(src="js/render/services/player-utils.js")
   //endbuild
 
   //build:js js/extras.js
@@ -68,11 +70,10 @@ block scripts
           //$("#player-body").html(data.xhtml);
 
           var playerDeps = [
-            'corespring-common.directives',
             'corespring-rig.controllers',
+            'corespring-player.services',
+            'corespring-common.directives',
             'corespring-rig.directives',
-            'corespring.container',
-            'corespring-editor.directives',
             'ngDragDrop',
             'ui.ace'
           ].concat(data.angular.dependencies);

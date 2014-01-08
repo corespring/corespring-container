@@ -2,8 +2,9 @@ angular.module('corespring-player.directives').directive('corespringPlayer', [
     '$compile',
     '$log',
     'ComponentRegister',
+    'PlayerUtils',
     'MathJaxService',
-    function($compile, $log, ComponentRegister, MathJaxService){
+    function($compile, $log, ComponentRegister, PlayerUtils, MathJaxService){
 
       var link = function($scope, $elem, $attrs){
 
@@ -27,14 +28,7 @@ angular.module('corespring-player.directives').directive('corespringPlayer', [
             return;
           }
 
-          var keys = _.keys($scope.item.components);
-
-          var zipped = _.map(keys, function(k){
-            var session = ($scope.session.components) ? $scope.session.components[k] : null;
-            return { data: $scope.item.components[k], session: session};
-          });
-
-          var allData = _.zipObject(keys, zipped);
+          var allData = PlayerUtils.zipDataAndSession($scope.item, $scope.session);
           ComponentRegister.setDataAndSession(allData);
           rendered = true;
         };

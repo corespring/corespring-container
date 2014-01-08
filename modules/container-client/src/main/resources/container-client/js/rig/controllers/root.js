@@ -1,4 +1,4 @@
-var controller = function ($scope, $location, $http, $timeout, CorespringContainer ) {
+var controller = function ($scope, $location, $http, $timeout, $log, ComponentRegister, PlayerUtils ) {
 
  $scope.aceLoaded = function(_editor){
     _editor.setTheme("ace/theme/twilight");
@@ -33,19 +33,21 @@ var controller = function ($scope, $location, $http, $timeout, CorespringContain
     }
   };
 
+   $scope.$on('registerComponent', function(event, id, obj){
+     $log.info("registerComponent: ", id);
+      ComponentRegister.registerComponent(id, obj);
+    });
+
+
   $scope.$watch('model', function(m){
     if(!m) {
       return;
     }
     var cleanJson = angular.copy($scope.model);
     $scope.componentJson = JSON.stringify(cleanJson, undefined, 2 );
-
-    CorespringContainer.initialize($scope.model);
+    var zipped = PlayerUtils.zipDataAndSession($scope.model.item, $scope.model.session);
     $timeout(function(){
-      $scope.$apply(function(){
-        CorespringContainer.updateResponses($scope.model.responses);
-        CorespringContainer.updateSession($scope.model.session);
-      });
+      ComponentRegister.setDataAndSession(zipped);
     });
   }, true);
 
@@ -57,5 +59,5 @@ var controller = function ($scope, $location, $http, $timeout, CorespringContain
 angular.module('corespring-rig.controllers')
   .controller(
     'Root',
-    ['$scope', '$location', '$http', '$timeout', 'CorespringContainer', controller]
+    ['$scope', '$location', '$http', '$timeout', '$log', 'ComponentRegister', 'PlayerUtils', controller]
   );
