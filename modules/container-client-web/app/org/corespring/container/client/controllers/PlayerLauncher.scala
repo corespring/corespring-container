@@ -60,6 +60,6 @@ trait PlayerLauncher extends Controller {
       """.stripMargin
     Ok(
       (contents ++ wrappedContents :+ bootstrap).mkString("\n")
-    ).as(ContentTypes.JAVASCRIPT).withSession((SecureMode, isSecure(request).toString))
+    ).as(ContentTypes.JAVASCRIPT).withSession( request.session + (SecureMode, isSecure(request).toString))
   }
 }
