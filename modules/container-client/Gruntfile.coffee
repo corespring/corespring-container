@@ -21,7 +21,6 @@ module.exports = (grunt) ->
 
     coreLibs: 
       src: [
-        '<%= common.dist %>/bower_components/saxjs/lib/sax.js',
         '<%= common.dist %>/bower_components/console-polyfill/index.js',
         '<%= common.dist %>/bower_components/jquery/jquery.min.js',
         '<%= common.dist %>/bower_components/jquery-ui/ui/jquery-ui.js',
@@ -43,6 +42,7 @@ module.exports = (grunt) ->
       dest: '<%= common.dist %>/js/prod-editor.js'
       concatDest: '.tmp/concat/js/editor.js'
       src: [
+        '<%= common.dist %>/bower_components/saxjs/lib/sax.js',
         '<%= common.dist %>/js/corespring/core-library.js',
         '<%= common.dist %>/js/corespring/server/init-core-library.js',
         '<%= common.dist %>/js/editor/**/*.js', 
