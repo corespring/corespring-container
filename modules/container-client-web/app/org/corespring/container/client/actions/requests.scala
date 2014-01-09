@@ -32,3 +32,8 @@ case class ScoreItemRequest[A](item : JsValue, r : Request[A]) extends WrappedRe
  */
 case class SubmitSessionRequest[A](everything: JsValue, saveSession: (String, JsValue) => Option[JsValue], r: Request[A]) extends WrappedRequest(r)
 case class SaveSessionRequest[A](itemSession: JsValue, override val isSecure: Boolean, override val isComplete : Boolean, saveSession: (String, JsValue) => Option[JsValue], r: Request[A]) extends SecureModeRequest(isSecure, isComplete,  r)
+
+/**
+ * @param isSecure - whether the player will run in secureMode - ake some capabilities will be locked down.
+ */
+case class PlayerJsRequest[A](isSecure: Boolean, r : Request[A]) extends WrappedRequest(r)

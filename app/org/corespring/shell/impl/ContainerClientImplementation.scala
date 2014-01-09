@@ -15,6 +15,7 @@ import scala.Some
 import org.corespring.mongo.json.services.MongoService
 import components.processing.PlayerItemPreProcessor
 import org.corespring.container.components.processing.PlayerItemPreProcessorImpl
+import org.corespring.container.client.actions.{PlayerJsRequest, PlayerLauncherActionBuilder}
 
 class ContainerClientImplementation(
                                      itemServiceIn : MongoService,
@@ -29,7 +30,12 @@ class ContainerClientImplementation(
   def rootLibs = comps.filter(_.isInstanceOf[Library]).map(_.asInstanceOf[Library])
 
   private lazy val playerLauncher = new PlayerLauncher {
-    override def isSecure(r:Request[AnyContent]) = r.getQueryString("secure").map{ _ == "true"}.getOrElse(false)
+    def builder: PlayerLauncherActionBuilder[AnyContent] = new PlayerLauncherActionBuilder[AnyContent] {
+      def playerJs(block: (PlayerJsRequest[AnyContent]) => Result): Action[AnyContent] = Action{ request =>
+        def isSecure = request.getQueryString("secure").map{ _ == "true"}.getOrElse(false)
+        block(PlayerJsRequest(isSecure, request))
+      }
+    }
   }
 
   private lazy val icons = new Icons {

@@ -6,6 +6,7 @@ import play.api.Play
 import play.api.Play.current
 import play.api.http.ContentTypes
 import play.api.mvc.{AnyContent, Request, Action, Controller}
+import org.corespring.container.client.actions.PlayerLauncherActionBuilder
 
 
 trait PlayerLauncher extends Controller {
@@ -34,12 +35,11 @@ trait PlayerLauncher extends Controller {
 
   val SecureMode = "corespring.player.secure"
 
-  def isSecure(r:Request[AnyContent]) : Boolean
-
+  def builder : PlayerLauncherActionBuilder[AnyContent]
   /**
    * query: playerPage the player page to load (default: index.html), for a simple player you can pass in container-player.html
    */
-  def playerJs = Action{ request =>
+  def playerJs = builder.playerJs{ request =>
 
     val playerPage = request.getQueryString("playerPage").getOrElse("index.html")
 
@@ -83,11 +83,11 @@ trait PlayerLauncher extends Controller {
         |window.org = window.org || {};
         |org.corespring = org.corespring || {};
         |org.corespring.players = org.corespring.players || {};
-        |org.corespring.players.ItemPlayer = corespring.require("player").define(${isSecure(request)});
+        |org.corespring.players.ItemPlayer = corespring.require("player").define(${request.isSecure});
         |
       """.stripMargin
     Ok(
       (contents ++ wrappedContents :+ bootstrap).mkString("\n")
-    ).as(ContentTypes.JAVASCRIPT).withSession( request.session + (SecureMode, isSecure(request).toString))
+    ).as(ContentTypes.JAVASCRIPT).withSession( request.session + (SecureMode, request.isSecure.toString))
   }
 }

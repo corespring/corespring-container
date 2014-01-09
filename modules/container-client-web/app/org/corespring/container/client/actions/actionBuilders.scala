@@ -40,3 +40,12 @@ trait SessionActionBuilder[A]{
   def submitAnswers(id: String)(block: SubmitSessionRequest[A] => Result): Action[AnyContent]
   def save(id: String)(block: SaveSessionRequest[A] => Result): Action[AnyContent]
 }
+
+trait PlayerLauncherActionBuilder[A]{
+  /**
+   * Serve the player js that allows 3rd parties to run the player.
+   * @param block
+   * @return
+   */
+  def playerJs(block: PlayerJsRequest[A] => Result) : Action[AnyContent]
+}

@@ -2,7 +2,7 @@ angular.module("simulator", ['ui.ace']).config(function ($locationProvider) {
   $locationProvider.html5Mode(true);
 });
 
-angular.module("simulator").controller('Root', ['$scope', '$log', '$http', '$location', function ($scope, $log, $http, $location) {
+angular.module("simulator").controller('Root', ['$scope', '$timeout', '$log', '$http', '$location', function ($scope, $timeout, $log, $http, $location) {
 
   $log.debug("Root controller");
 
@@ -25,11 +25,7 @@ angular.module("simulator").controller('Root', ['$scope', '$log', '$http', '$loc
   };
 
   $scope.isSecure = false;
-
-  $scope.$watch('isSecure', function(newValue){
-    var scriptTag = "<script src='http://"+server+""+rootPath+"/player.js?secure="+newValue+"'></script>";
-    $("head").append(scriptTag);
-  });
+  
 
   $scope.settingsString = JSON.stringify($scope.modeSettings, null, "  ")
 
@@ -78,20 +74,28 @@ angular.module("simulator").controller('Root', ['$scope', '$log', '$http', '$loc
     });
   };
 
+  $scope.loadPlayerJs = function(loaded){
+    var scriptTag = "<script src='http://"+server+""+rootPath+"/player.js?secure="+$scope.isSecure+"'></script>";
+    $("head").append(scriptTag);
+    $timeout(loaded, 500);
+  };
+
   $scope.add = function () {
-    var options = {
-      mode: $scope.mode,
-      onSessionCreated: $scope.onSessionCreated,
-      onInputReceived: $scope.onInputReceived,
-      evaluate: $scope.modeSettings,
-      corespringUrl: "http://" + server
+    var onLoaded = function(){
+      var options = {
+        mode: $scope.mode,
+        onSessionCreated: $scope.onSessionCreated,
+        onInputReceived: $scope.onInputReceived,
+        evaluate: $scope.modeSettings,
+        corespringUrl: "http://" + server
+      };
+
+      var idName = $scope.mode === "gather" ? "itemId" : "sessionId";
+      options[idName] = $scope[idName];
+      $scope.player = new org.corespring.players.ItemPlayer('#player-holder', options, $scope.handlePlayerError);
     };
 
-    var idName = $scope.mode === "gather" ? "itemId" : "sessionId";
-
-    options[idName] = $scope[idName];
-
-    $scope.player = new org.corespring.players.ItemPlayer('#player-holder', options, $scope.handlePlayerError);
+    $scope.loadPlayerJs(onLoaded);
   };
 
   $scope.handlePlayerError = function(e){
