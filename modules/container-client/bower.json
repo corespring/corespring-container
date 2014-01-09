@@ -2,10 +2,10 @@
   "name": "container-client",
   "version": "0.0.1",
   "dependencies": {
-    "angular": "1.2.3",
-    "angular-resource": "1.2.3",
-    "angular-sanitize": "1.2.3",
-    "angular-animate": "1.2.3",
+    "angular": "1.2.7",
+    "angular-resource": "1.2.7",
+    "angular-sanitize": "1.2.7",
+    "angular-animate": "1.2.7",
     "angular-ui": "latest",
     "angular-ui-sortable": "https://github.com/angular-ui/ui-sortable/archive/angular1.2.zip",
     "angular-bootstrap": "0.6.0",
@@ -20,7 +20,14 @@
     "less-elements": "https://github.com/dmitryf/elements.git"
   },
   "devDependencies": {
-    "angular-mocks": "1.2.3",
-    "angular-scenario": "1.2.3"
+    "angular-mocks": "1.2.7",
+    "angular-scenario": "1.2.7"
+  },
+  "resolutions": {
+    "angular-bootstrap": "~0.9.0",
+    "angular" : "1.2.7",
+    "jquery" : "1.10.2"
   }
+
+
 }
