@@ -5,8 +5,9 @@ import org.corespring.container.components.model.{UiComponent, Component}
 import org.corespring.container.client.controllers.helpers.Helpers
 import org.corespring.container.client.views.txt.js.RigServices
 import play.api.libs.json.Json
+import org.corespring.container.client.controllers.hooks.BaseHooks
 
-trait Rig extends Controller with Helpers {
+trait Rig extends BaseHooks with Helpers {
 
 
   val rigServiceName = "rig.services"
@@ -22,14 +23,7 @@ trait Rig extends Controller with Helpers {
 
   def component(orgName: String, compName: String): Option[UiComponent] = uiComponents.find(c => c.org == orgName && c.name == compName)
 
-  def config(orgName: String, compName: String) = Action {
-    request =>
-      component(orgName, compName).map {
-        c =>
-          val json = configJson("", Seq(s"$orgName.$compName"), Seq("components.js"), Seq("components.css"))
-          Ok(json)
-      }.getOrElse(NotFound(""))
-  }
+  def config(orgName: String, compName: String) = Action( configForTags(Seq.empty, Seq.empty, "", s"$orgName-$compName") )
 
   def componentsJs(orgName: String, compName: String) = Action {
     request =>
@@ -47,6 +41,6 @@ trait Rig extends Controller with Helpers {
         c <- component(orgName, compName)
         d <- c.sampleData.get(s"$dataName.json")
       } yield d
-    Ok(data.getOrElse(Json.obj()))
+      Ok(data.getOrElse(Json.obj()))
   }
 }

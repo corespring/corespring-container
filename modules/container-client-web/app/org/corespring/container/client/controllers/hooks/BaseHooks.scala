@@ -10,13 +10,12 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsValue
 import play.api.mvc.{Controller, Action, AnyContent}
 
-trait BaseHooks[T <: ClientHooksActionBuilder[AnyContent]] extends Controller with Helpers with XhtmlProcessor{
+
+trait BaseHooks extends Controller with Helpers with XhtmlProcessor{
 
   protected def name : String
 
-  def ngModule = s"$name.services"
 
-  def ngJs = s"$name-services.js"
 
   def componentCss = s"$name-components.css"
 
@@ -33,47 +32,20 @@ trait BaseHooks[T <: ClientHooksActionBuilder[AnyContent]] extends Controller wi
   def libraries : Seq[Library] = filterByType[Library](loadedComponents)
   def layoutComponents : Seq[LayoutComponent] = filterByType[LayoutComponent](loadedComponents)
 
-  def builder : T
-
-    /**
-     * TODO: The hooks service 4 requests:
-     * - config.json
-     * - services.js
-     * - components.js
-     * - components.css
-     *
-     * However we currently load the db resource each time.
-     * Instead we should load it once and build the resources and serve them.
-     */
-
-  def config(id: String): Action[AnyContent] = builder.loadConfig(id) {
-    request: PlayerRequest[AnyContent] =>
-
-
-      /** Preprocess the xml so that it'll work in all browsers
-        * aka: convert tagNames -> attributes for ie 8 support
-        * TODO: A layout component may have multiple elements
-        * So we need a way to get all potential component names from
-        * each component, not just assume its the top level.
-        */
-      val xhtml = (request.item \ "xhtml").asOpt[String].map{ xhtml =>
-        tagNamesToAttributes(xhtml)
-      }.getOrElse("<div><h1>New Item</h1></div>")
-
-      val itemTagNames: Seq[String] = componentTypes(request.item)
-      val usedComponents = getAllComponentsForTags(itemTagNames)
-      val allModuleNames = usedComponents.map(c => idToModuleName(c.id))
-      val clientSideDependencies = getClientSideDependencies(usedComponents)
-      val dependencyModules : Seq[String] = clientSideDependencies.map(_.angularModule).flatten
-      val clientSideScripts = get3rdPartyScripts(clientSideDependencies)
-      val localScripts = getLocalScripts(usedComponents)
-      val out: JsValue = configJson(
-         xhtml,
-        Seq(ngModule) ++ allModuleNames ++ dependencyModules,
-        clientSideScripts ++ localScripts ++ Seq(ngJs, componentJs),
-        Seq(componentCss)
-      )
-      Ok(out)
+  protected def configForTags(defaultNgModules : Seq[String], defaultScripts : Seq[String], xhtml : String, tagNames : String* ) = {
+    val usedComponents = getAllComponentsForTags(tagNames)
+    val allModuleNames = usedComponents.map(c => idToModuleName(c.id))
+    val clientSideDependencies = getClientSideDependencies(usedComponents)
+    val dependencyModules : Seq[String] = clientSideDependencies.map(_.angularModule).flatten
+    val clientSideScripts = get3rdPartyScripts(clientSideDependencies)
+    val localScripts = getLocalScripts(usedComponents)
+    val out: JsValue = configJson(
+      xhtml,
+      defaultNgModules ++ allModuleNames ++ dependencyModules,
+      clientSideScripts ++ localScripts ++ defaultScripts ++  Seq(componentJs),
+      Seq(componentCss)
+    )
+    Ok(out)
   }
 
   protected def getAllComponentsForTags(tags:Seq[String]) : Seq[Component] = {
@@ -134,31 +106,6 @@ trait BaseHooks[T <: ClientHooksActionBuilder[AnyContent]] extends Controller wi
   }
 
 
-  /**
-   * Load the angular service js implemenation
-   * @param id
-   * @return
-   */
-  def services(id:String) : Action[AnyContent]
-
-  /**
-   * Load the components js
-   * @param id
-   * @return
-   */
-  def componentsJs(id:String) : Action[AnyContent]
-
-  def resource(resource:String,suffix:String, id:String) : Action[AnyContent] = {
-    resource match {
-      case ("config") => config(id)
-      case("services") => services(id)
-      case ("components") => suffix match {
-        case ("js") => componentsJs(id)
-        case ("css") => componentsCss(id)
-      }
-      case _ => Action(NotFound(s"$resource, $suffix, $id"))
-    }
-  }
 
   private def wrapClientLibraryJs(moduleName:String)(src:LibrarySource) = {
     s"""
@@ -191,14 +138,6 @@ trait BaseHooks[T <: ClientHooksActionBuilder[AnyContent]] extends Controller wi
     """
   }
 
-  /**
-   * Load the component css
-   * @param id
-   * @return
-   */
-  def componentsCss(id:String) : Action[AnyContent]
-
-  protected def componentTypes(json: JsValue): Seq[String]
 
   protected def makeModuleName(componentType: String): String = {
     val Regex = """(.*?)-(.*)""".r
@@ -208,4 +147,78 @@ trait BaseHooks[T <: ClientHooksActionBuilder[AnyContent]] extends Controller wi
 
   protected def idToModuleName(id:Id) : String = moduleName(id.org, id.name)
 
+}
+
+
+trait BaseHooksWithBuilder[T <: ClientHooksActionBuilder[AnyContent]] extends BaseHooks{
+
+  def ngModule = s"$name.services"
+
+  def ngJs = s"$name-services.js"
+
+  def builder : T
+
+  /**
+   * Load the angular service js implemenation
+   * @param id
+   * @return
+   */
+  def services(id:String) : Action[AnyContent]
+
+  /**
+   * Load the components js
+   * @param id
+   * @return
+   */
+  def componentsJs(id:String) : Action[AnyContent]
+
+
+  /**
+   * Load the component css
+   * @param id
+   * @return
+   */
+  def componentsCss(id:String) : Action[AnyContent]
+
+  protected def componentTypes(json: JsValue): Seq[String]
+
+  def resource(resource:String,suffix:String, id:String) : Action[AnyContent] = {
+    resource match {
+      case ("config") => config(id)
+      case("services") => services(id)
+      case ("components") => suffix match {
+        case ("js") => componentsJs(id)
+        case ("css") => componentsCss(id)
+      }
+      case _ => Action(NotFound(s"$resource, $suffix, $id"))
+    }
+  }
+
+  /**
+   * TODO: The hooks service 4 requests:
+   * - config.json
+   * - services.js
+   * - components.js
+   * - components.css
+   *
+   * However we currently load the db resource each time.
+   * Instead we should load it once and build the resources and serve them.
+   */
+
+  def config(id: String): Action[AnyContent] = builder.loadConfig(id) {
+    request: PlayerRequest[AnyContent] =>
+
+    /** Preprocess the xml so that it'll work in all browsers
+      * aka: convert tagNames -> attributes for ie 8 support
+      * TODO: A layout component may have multiple elements
+      * So we need a way to get all potential component names from
+      * each component, not just assume its the top level.
+      */
+      val xhtml = (request.item \ "xhtml").asOpt[String].map{ xhtml =>
+        tagNamesToAttributes(xhtml)
+      }.getOrElse("<div><h1>New Item</h1></div>")
+
+      val itemTagNames: Seq[String] = componentTypes(request.item)
+      configForTags(Seq(ngModule), Seq(ngJs), xhtml, itemTagNames : _*)
+  }
 }

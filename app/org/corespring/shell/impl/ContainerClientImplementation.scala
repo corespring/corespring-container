@@ -48,7 +48,11 @@ class ContainerClientImplementation(
 }
 
   private lazy val rig = new Rig{
-    def uiComponents: Seq[UiComponent] = rootUiComponents
+
+    override def name = "rig"
+    override def loadedComponents = comps
+
+    override def uiComponents: Seq[UiComponent] = rootUiComponents
   }
 
   private lazy val assets = new Assets {

@@ -10,7 +10,7 @@ import play.api.libs.json.JsValue
 import play.api.mvc.{AnyContent, Action}
 
 
-trait PlayerHooks extends BaseHooks[ClientHooksActionBuilder[AnyContent]] with LayoutComponentReading {
+trait PlayerHooks extends BaseHooksWithBuilder[ClientHooksActionBuilder[AnyContent]] with LayoutComponentReading {
 
   val log = Logger("player.hooks")
 

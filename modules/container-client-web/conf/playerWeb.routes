@@ -28,8 +28,8 @@ GET        /icon/:icon                                     @org.corespring.conta
 GET        /rig/:orgName/:compName/index.html              @org.corespring.container.client.controllers.Rig.index(orgName:String, compName:String, data: Option[String] ?= None)
 GET        /rig/:orgName/:compName/config.json             @org.corespring.container.client.controllers.Rig.config(orgName:String, compName:String)
 GET        /rig/:orgName/:compName/:dataName.json          @org.corespring.container.client.controllers.Rig.data(orgName:String, compName:String, dataName:String)
-GET        /rig/:orgName/:compName/components.js           @org.corespring.container.client.controllers.Rig.componentsJs(orgName, compName)
-GET        /rig/:orgName/:compName/components.css          @org.corespring.container.client.controllers.Rig.componentsCss(orgName, compName)
+GET        /rig/:orgName/:compName/rig-components.js       @org.corespring.container.client.controllers.Rig.componentsJs(orgName, compName)
+GET        /rig/:orgName/:compName/rig-components.css      @org.corespring.container.client.controllers.Rig.componentsCss(orgName, compName)
 GET        /rig/:orgName/:compName/*file                   @org.corespring.container.client.controllers.Rig.asset(orgName, compName, file)
 
 # Hooks for the player: config, services + components

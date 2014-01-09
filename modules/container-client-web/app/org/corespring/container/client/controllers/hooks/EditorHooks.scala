@@ -8,7 +8,7 @@ import play.api.libs.json.{JsArray, JsValue, Json}
 import play.api.mvc.{AnyContent, Action}
 import play.api.http.ContentTypes
 
-trait EditorHooks extends BaseHooks[EditorClientHooksActionBuilder[AnyContent]] {
+trait EditorHooks extends BaseHooksWithBuilder[EditorClientHooksActionBuilder[AnyContent]] {
 
   val log = Logger("editor.hooks")
 
