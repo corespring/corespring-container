@@ -55,12 +55,16 @@ object Build extends sbt.Build {
   val buildClientTask = buildClient <<= (baseDirectory, streams) map {
     (baseDir, s) =>
       val clientRoot : File = baseDir
-      s.log.info("[>> npm install] on " + clientRoot )
-      sbt.Process("npm install", clientRoot) !;
-      s.log.info("[>> bower install] on " + clientRoot )
-      sbt.Process("bower install", clientRoot) !;
-      s.log.info("[>> grunt] on " + clientRoot )
-      sbt.Process("grunt --devMode=false", clientRoot) !;
+      val commands = Seq("npm install", "bower install", "grunt --devMode=false")
+
+      commands.foreach{ c =>
+        s.log.info(s"[>> $c] on " + clientRoot )
+        val exitCode = sbt.Process(c, clientRoot).!
+        if(exitCode != 0) {
+            throw new RuntimeException(s"The following commands failed: $c")
+        }
+      }
+
   }
 
   val runClientTests = TaskKey[Unit]("client-tests", "")
@@ -153,7 +157,10 @@ object Build extends sbt.Build {
 
   private def cmd(name: String, base: File): Command = {
     Command.args(name, "<" + name + "-command>") { (state, args) =>
-      Process(name :: args.toList, base) !;
+      val exitCode = Process(name :: args.toList, base) !;
+      if(exitCode != 0){
+        throw new RuntimeException(s"$name, ${base.getPath} returned a non zero exit code")
+      }
       state
     }
   }

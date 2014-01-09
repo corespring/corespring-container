@@ -249,7 +249,11 @@ module.exports = (grunt) ->
     'grunt-usemin'
   ]
 
+  throwError = ->
+    throw new Error("An error occured!")
+
   grunt.loadNpmTasks(t) for t in npmTasks
+  grunt.registerTask('throwError', '', throwError )
   grunt.registerTask('loadComponentDependencies', 'Load client side dependencies for the components', componentDependencies(grunt))
   grunt.registerTask('prepPlayerLauncher', 'prep the player launcher js', prepPlayerLauncher(grunt))
   grunt.registerTask('run', ['jade', 'less', 'watch'])
