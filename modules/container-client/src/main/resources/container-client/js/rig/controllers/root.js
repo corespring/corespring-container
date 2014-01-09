@@ -40,15 +40,15 @@ var controller = function ($scope, $location, $http, $timeout, $log, ComponentRe
 
 
   $scope.$watch('model', function(m){
-    if(!m) {
+    if(!m || !m.item) {
       return;
     }
     var cleanJson = angular.copy($scope.model);
     $scope.componentJson = JSON.stringify(cleanJson, undefined, 2 );
     var zipped = PlayerUtils.zipDataAndSession($scope.model.item, $scope.model.session);
-    $timeout(function(){
-      ComponentRegister.setDataAndSession(zipped);
-    });
+    //$timeout(function(){
+      //ComponentRegister.setDataAndSession(zipped);
+    //}, 200);
   }, true);
 
   var jsonFile = $location.search().data;

@@ -16,7 +16,13 @@ block content
       div(ui-ace,
         ng-model="componentJson",
         ui-ace="{useWrapMode : true, onLoad: aceLoaded, onChange: aceChanged }")
-      #preview-pane(inline-preview, ng-model="model.item.xhtml")
+      //#preview-pane(inline-preview, ng-model="model.item.xhtml")
+
+      #preview-pane(corespring-player,
+        player-markup="model.item.xhtml",
+        player-item="model.item",
+        player-session="model.session",
+        player-outcomes="modul.outcome")
 
 
 
@@ -27,7 +33,10 @@ block scripts
   script(src="js/rig/controllers/root.js")
   script(src="js/rig/directives/_declaration.js")
   script(src="js/rig/directives/inline-preview.js")
-  script(src="js/editor/directives/_declaration.js")
+  script(src="js/common/services/_declaration.js")
+  script(src="js/common/services/math-service.js")
+  script(src="js/render/directives/_declaration.js")
+  script(src="js/render/directives/corespring-player.js")
   script(src="js/render/services/_declaration.js")
   script(src="js/render/services/component-register.js")
   script(src="js/render/services/player-utils.js")
@@ -72,6 +81,8 @@ block scripts
           var playerDeps = [
             'corespring-rig.controllers',
             'corespring-player.services',
+            'corespring-player.directives',
+            'corespring-common.services',
             'corespring-common.directives',
             'corespring-rig.directives',
             'ngDragDrop',
