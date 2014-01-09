@@ -31,8 +31,6 @@ block scripts
   //build:js js/rig.js
   script(src="js/rig/controllers/_declaration.js")
   script(src="js/rig/controllers/root.js")
-  script(src="js/rig/directives/_declaration.js")
-  script(src="js/rig/directives/inline-preview.js")
   script(src="js/common/services/_declaration.js")
   script(src="js/common/services/math-service.js")
   script(src="js/render/directives/_declaration.js")
@@ -43,6 +41,7 @@ block scripts
   //endbuild
 
   //build:js js/extras.js
+  script(src="bower_components/mathjax/MathJax.js")
   script(src="bower_components/angular-ui/build/angular-ui.js")
   script(src="bower_components/angular-dragdrop/src/angular-dragdrop.js")
   script(src="bower_components/angular-ui-ace/ui-ace.js")
@@ -84,7 +83,6 @@ block scripts
             'corespring-player.directives',
             'corespring-common.services',
             'corespring-common.directives',
-            'corespring-rig.directives',
             'ngDragDrop',
             'ui.ace'
           ].concat(data.angular.dependencies);
