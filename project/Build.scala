@@ -55,7 +55,9 @@ object Build extends sbt.Build {
   val buildClientTask = buildClient <<= (baseDirectory, streams) map {
     (baseDir, s) =>
       val clientRoot : File = baseDir
-      val commands = Seq("npm install", "bower install", "grunt --devMode=false")
+      //Note: Adding a bower cache clean to workaround this issue: https://github.com/bower/bower/issues/991
+      //Once this is fixed we can remove this
+      val commands = Seq("npm install", "bower cache clean", "bower install", "grunt --devMode=false")
 
       commands.foreach{ c =>
         s.log.info(s"[>> $c] on " + clientRoot )
