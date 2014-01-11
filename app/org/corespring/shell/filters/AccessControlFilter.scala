@@ -1,4 +1,4 @@
-package org.corespring.shell.impl.filters
+package org.corespring.shell.filters
 
 
 import play.api.mvc.{ RequestHeader, EssentialAction, EssentialFilter }

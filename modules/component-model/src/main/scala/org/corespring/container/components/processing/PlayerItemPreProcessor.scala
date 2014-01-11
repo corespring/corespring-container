@@ -1,4 +1,4 @@
-package components.processing
+package org.corespring.container.components.processing
 
 import play.api.libs.json.JsValue
 

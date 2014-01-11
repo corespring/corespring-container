@@ -1,10 +1,10 @@
-package org.corespring.container.components.processing
+package org.corespring.container.components.processing.rhino
 
 import org.corespring.container.components.model.{UiComponent, Server, Client}
 import org.specs2.mutable.Specification
 import play.api.libs.json.Json
 
-class ItemProcessorImplTest extends Specification {
+class PlayerItemPreProcessorTest extends Specification {
 
   val interactionProcessJs =
     """
@@ -52,7 +52,7 @@ class ItemProcessorImplTest extends Specification {
         )
       )
 
-      val processor = new PlayerItemPreProcessorImpl(Seq(component), Seq.empty)
+      val processor = new PlayerItemPreProcessor(Seq(component), Seq.empty)
       val result = processor.preProcessItemForPlayer(item, session)
       (result \ "components" \ "1" \ "dummy").as[String] === "something"
       (result \ "components" \ "1" \ "model").as[String] === "someModel"
@@ -86,7 +86,7 @@ class ItemProcessorImplTest extends Specification {
         )
       )
 
-      val processor = new PlayerItemPreProcessorImpl(Seq(component), Seq.empty)
+      val processor = new PlayerItemPreProcessor(Seq(component), Seq.empty)
 
       try {
         processor.preProcessItemForPlayer(item, Json.obj())

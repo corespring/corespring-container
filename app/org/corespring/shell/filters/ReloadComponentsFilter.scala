@@ -1,4 +1,4 @@
-package org.corespring.shell.impl.filters
+package org.corespring.shell.filters
 
 
 import org.corespring.container.components.loader.ComponentLoader

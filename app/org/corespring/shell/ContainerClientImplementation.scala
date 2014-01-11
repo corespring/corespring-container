@@ -1,21 +1,20 @@
-package org.corespring.shell.impl
+package org.corespring.shell
 
 import org.corespring.amazon.s3.ConcreteS3Service
+import org.corespring.container.client.actions.{PlayerJsRequest, PlayerLauncherActionBuilder}
 import org.corespring.container.client.controllers._
 import org.corespring.container.components.model.Component
 import org.corespring.container.components.model.Library
 import org.corespring.container.components.model.UiComponent
 import org.corespring.container.components.outcome.{ItemJsScoreProcessor, ScoreProcessorSequence, DefaultScoreProcessor, ScoreProcessor}
-import org.corespring.container.components.response.{OutcomeProcessorImpl, OutcomeProcessor}
-import org.corespring.shell.impl.controllers.editor.{ClientItemImpl, EditorHooksImpl}
-import org.corespring.shell.impl.controllers.player.{ClientSessionImpl, PlayerHooksImpl}
+import org.corespring.container.components.processing.rhino.PlayerItemPreProcessor
+import org.corespring.container.components.response.rhino.OutcomeProcessor
+import org.corespring.mongo.json.services.MongoService
+import org.corespring.shell.controllers.editor.{Item, EditorHooks}
+import org.corespring.shell.controllers.player.{Session, PlayerHooks}
 import play.api.Configuration
 import play.api.mvc._
 import scala.Some
-import org.corespring.mongo.json.services.MongoService
-import components.processing.PlayerItemPreProcessor
-import org.corespring.container.components.processing.PlayerItemPreProcessorImpl
-import org.corespring.container.client.actions.{PlayerJsRequest, PlayerLauncherActionBuilder}
 
 class ContainerClientImplementation(
                                      itemServiceIn : MongoService,
@@ -81,7 +80,7 @@ class ContainerClientImplementation(
     def getItemId(sessionId: String): Option[String] = sessionServiceIn.load(sessionId).map{ json => (json \ "itemId").as[String] }
   }
 
-  private lazy val playerHooks = new PlayerHooksImpl {
+  private lazy val playerHooks = new PlayerHooks {
 
     def itemService: MongoService = itemServiceIn
 
@@ -90,26 +89,26 @@ class ContainerClientImplementation(
     def sessionService: MongoService = sessionServiceIn
   }
 
-  private lazy val editorHooks = new EditorHooksImpl {
+  private lazy val editorHooks = new EditorHooks {
     def itemService: MongoService = itemServiceIn
 
     def loadedComponents: Seq[Component] = comps
   }
 
-  private lazy val items = new ClientItemImpl {
+  private lazy val items = new Item {
     def itemService: MongoService = itemServiceIn
 
     //TODO: Item level scoring isn't active at the moment, once it is we'll need to add ItemJsOutcomProcessor
     def scoreProcessor: ScoreProcessor = DefaultScoreProcessor //new OutcomeProcessorSequence(DefaultOutcomeProcessor, ItemJsOutcomeProcessor)
-    def outcomeProcessor: OutcomeProcessor = new OutcomeProcessorImpl(rootUiComponents, rootLibs)
+    def outcomeProcessor = new OutcomeProcessor(rootUiComponents, rootLibs)
   }
 
-  private lazy val sessions = new ClientSessionImpl {
+  private lazy val sessions = new Session {
     def itemService: MongoService = itemServiceIn
 
-    def outcomeProcessor: OutcomeProcessor = new OutcomeProcessorImpl(rootUiComponents, rootLibs)
+    def outcomeProcessor = new OutcomeProcessor(rootUiComponents, rootLibs)
 
-    def itemPreProcessor: PlayerItemPreProcessor = new PlayerItemPreProcessorImpl(rootUiComponents, rootLibs)
+    def itemPreProcessor: PlayerItemPreProcessor = new PlayerItemPreProcessor(rootUiComponents, rootLibs)
 
     def sessionService: MongoService = sessionServiceIn
 

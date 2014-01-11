@@ -8,7 +8,7 @@ import org.corespring.mongo.json.services.MongoService
 import components.processing.PlayerItemPreProcessor
 import org.corespring.container.components.processing.PlayerItemPreProcessorImpl
 
-trait ClientSessionImpl extends Session {
+trait SessionWithMongoService extends Session {
 
   def sessionService: MongoService
 

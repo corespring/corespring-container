@@ -5,7 +5,7 @@ import org.corespring.container.client.actions.{ScoreItemRequest, ItemActionBuil
 import org.corespring.container.client.controllers.resources.Item
 import org.corespring.mongo.json.services.MongoService
 
-trait ClientItemImpl extends Item{
+trait ItemWithMongoService extends Item{
 
   def itemService : MongoService
 

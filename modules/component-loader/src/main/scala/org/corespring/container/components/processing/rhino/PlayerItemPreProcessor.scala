@@ -1,12 +1,12 @@
-package org.corespring.container.components.processing
+package org.corespring.container.components.processing.rhino
 
 import org.corespring.container.components.model.{Library, UiComponent}
+import org.corespring.container.components.processing.ItemProcessorServerLogic
+import org.corespring.container.components.processing.{PlayerItemPreProcessor => PreProcessor}
 import org.slf4j.LoggerFactory
-import components.processing.PlayerItemPreProcessor
 import play.api.libs.json._
 
-
-class PlayerItemPreProcessorImpl(components: Seq[UiComponent], libraries: Seq[Library]) extends PlayerItemPreProcessor {
+class PlayerItemPreProcessor(components: Seq[UiComponent], libraries: Seq[Library]) extends PreProcessor {
 
   private lazy val logger = LoggerFactory.getLogger("components.processing")
 

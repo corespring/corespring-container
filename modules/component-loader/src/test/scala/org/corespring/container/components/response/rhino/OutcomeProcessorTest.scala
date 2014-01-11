@@ -1,10 +1,10 @@
-package org.corespring.container.components.response
+package org.corespring.container.components.response.rhino
 
 import org.corespring.container.components.model.{UiComponent, Server, Client}
 import org.specs2.mutable.Specification
-import play.api.libs.json.{JsString, Json}
+import play.api.libs.json.Json
 
-class OutcomeProcessorImplTest extends Specification{
+class OutcomeProcessorTest extends Specification{
 
   val interactionRespondJs =
   """
@@ -77,7 +77,7 @@ class OutcomeProcessorImplTest extends Specification{
         )
       )
 
-      val processor = new OutcomeProcessorImpl(Seq(component, feedback), Seq.empty)
+      val processor = new OutcomeProcessor(Seq(component, feedback), Seq.empty)
       val result = processor.createOutcome(item, session, Json.obj())
       (result \ "1" \ "correctness").as[String] === "incorrect"
       (result \ "2" \ "targetOutcome" \ "correctness").as[String] === "incorrect"

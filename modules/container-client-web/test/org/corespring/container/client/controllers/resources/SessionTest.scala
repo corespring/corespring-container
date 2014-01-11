@@ -2,6 +2,7 @@ package org.corespring.container.client.controllers.resources
 
 import org.corespring.container.client.actions._
 import org.corespring.container.components.outcome.ScoreProcessor
+import org.corespring.container.components.processing.PlayerItemPreProcessor
 import org.corespring.container.components.response.OutcomeProcessor
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
@@ -9,7 +10,6 @@ import play.api.libs.json.Json
 import play.api.mvc.{Request, Action, Result, AnyContent}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import components.processing.PlayerItemPreProcessor
 
 class SessionTest extends Specification with Mockito{
 
