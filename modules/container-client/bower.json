@@ -7,7 +7,6 @@
     "angular-sanitize": "1.2.7",
     "angular-animate": "1.2.7",
     "angular-ui": "latest",
-    "angular-ui-sortable": "https://github.com/angular-ui/ui-sortable/archive/angular1.2.zip",
     "angular-bootstrap": "0.6.0",
     "jquery": "1.10.2",
     "saxjs": "https://github.com/isaacs/sax-js.git",
