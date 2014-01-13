@@ -1,14 +1,14 @@
 import com.mongodb.casbah.{MongoDB, MongoClientURI, MongoClient}
 import org.corespring.container.components.loader.FileComponentLoader
 import org.corespring.mongo.json.services.MongoService
-import org.corespring.shell.impl.ContainerClientImplementation
-import org.corespring.shell.impl.controllers.Main
-import org.corespring.shell.impl.filters.{AccessControlFilter, ReloadComponentsFilter}
-import org.corespring.shell.impl.utils.ControllerInstanceResolver
-import play.api.{Logger, Play}
+import org.corespring.shell.ContainerClientImplementation
+import org.corespring.shell.controllers.Main
+import org.corespring.shell.filters.{AccessControlFilter, ReloadComponentsFilter}
+import org.corespring.shell.utils.ControllerInstanceResolver
 import play.api.mvc.{WithFilters, Controller}
+import play.api.{GlobalSettings, Logger, Play}
 
-object Global extends WithFilters(AccessControlFilter, ReloadComponentsFilter) with ControllerInstanceResolver {
+object Global extends WithFilters(AccessControlFilter, ReloadComponentsFilter) with ControllerInstanceResolver with GlobalSettings{
 
   private lazy val logger = Logger("global")
 

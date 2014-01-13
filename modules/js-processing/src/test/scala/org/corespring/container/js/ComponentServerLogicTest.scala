@@ -3,9 +3,9 @@ package org.corespring.container.js
 import org.specs2.mutable.Specification
 import play.api.libs.json.Json
 
-class ComponentServerLogicImplTest extends Specification{
+class ComponentServerLogicTest extends Specification{
 
-  val impl = new ComponentServerLogic {
+  val serverLogic = new ComponentServerLogic {
     def js: String =
       """
         |exports.respond = function(question, answer, settings){
@@ -21,7 +21,7 @@ class ComponentServerLogicImplTest extends Specification{
 
   "server logic" should {
     "work" in {
-      val result = impl.createOutcome(Json.obj(), Json.obj(), Json.obj(), Json.obj())
+      val result = serverLogic.createOutcome(Json.obj(), Json.obj(), Json.obj(), Json.obj())
       (result \ "correctness").as[String] === "correct"
     }
   }

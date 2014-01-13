@@ -1,4 +1,4 @@
-package org.corespring.shell.impl.utils
+package org.corespring.shell.utils
 
 import play.api.mvc.Controller
 import play.api.{Logger, GlobalSettings}

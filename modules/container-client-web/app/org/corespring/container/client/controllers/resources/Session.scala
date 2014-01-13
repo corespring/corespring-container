@@ -3,13 +3,13 @@ package org.corespring.container.client.controllers.resources
 import org.corespring.container.client.actions._
 import org.corespring.container.client.controllers.resources.session.ItemPruner
 import org.corespring.container.components.outcome.ScoreProcessor
+import org.corespring.container.components.processing.PlayerItemPreProcessor
 import org.corespring.container.components.response.OutcomeProcessor
 import org.joda.time.DateTime
 import play.api.Logger
 import play.api.libs.json._
 import play.api.mvc.{AnyContent, Controller}
 import scala.Some
-import components.processing.PlayerItemPreProcessor
 
 trait Session extends Controller with ItemPruner {
 

@@ -1,10 +1,11 @@
-package org.corespring.container.components.response
+package org.corespring.container.components.response.rhino
 
 import org.corespring.container.components.model.{Library, UiComponent}
+import org.corespring.container.components.response.{OutcomeGenerator, OutcomeProcessor => ContainerOutcomeProcessor}
 import org.slf4j.LoggerFactory
 import play.api.libs.json.{JsObject, JsValue}
 
-class OutcomeProcessorImpl(components: Seq[UiComponent], libraries: Seq[Library]) extends OutcomeProcessor {
+class OutcomeProcessor(components: Seq[UiComponent], libraries: Seq[Library]) extends ContainerOutcomeProcessor {
 
   private lazy val logger = LoggerFactory.getLogger("components.outcome")
 

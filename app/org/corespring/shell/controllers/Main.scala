@@ -1,4 +1,4 @@
-package org.corespring.shell.impl.controllers
+package org.corespring.shell.controllers
 
 import play.api.Logger
 import play.api.libs.json.JsObject
@@ -9,7 +9,8 @@ import org.corespring.mongo.json.services.MongoService
 
 trait Main extends Controller {
 
-  import org.corespring.shell.impl.views._
+  import org.corespring.shell.views._
+  import org.corespring.shell.controllers._
 
   val logger = Logger("shell.home")
 

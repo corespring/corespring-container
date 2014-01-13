@@ -7,7 +7,7 @@ import play.api.libs.json.{JsString, Json}
 import org.bson.types.ObjectId
 import org.corespring.mongo.json.services.MongoService
 
-trait EditorHooksImpl extends EditorHooks {
+trait EditorHooksWithMongoService extends EditorHooks {
 
   def itemService : MongoService
 
