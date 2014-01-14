@@ -27,7 +27,7 @@ trait Rig extends BaseHooks with Helpers {
 
   def componentsJs(orgName: String, compName: String) = Action {
     request =>
-      componentsToResource(component(orgName, compName).toSeq, (c) => wrapJs(c.org, c.name, c.client.render), "text/javascript")
+      jsForComponents(Seq(s"$orgName-$compName"))
   }
 
   def componentsCss(orgName: String, compName: String) = Action {

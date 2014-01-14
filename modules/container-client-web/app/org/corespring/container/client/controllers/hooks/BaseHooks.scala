@@ -63,6 +63,15 @@ trait BaseHooks extends Controller with Helpers with XhtmlProcessor{
     (libs ++ uiComps ++ layoutComps).distinct
   }
 
+  protected def jsForComponents(types:Seq[String]) = {
+    val usedComponents = getAllComponentsForTags(types)
+    val (libs, uiComps, layoutComps) = splitComponents(usedComponents)
+    val uiJs = uiComps.map((c) => wrapJs(c.org, c.name, c.client.render)).mkString("\n")
+    val libJs = libs.map(libraryToJs(addClient = true, addServer = false)).mkString("\n")
+    val layoutJs = layoutComps.map(layoutToJs).mkString("\n")
+    Ok(s"$libJs\n$uiJs\n$layoutJs").as("text/javascript")
+  }
+
   protected def splitComponents(comps:Seq[Component]) : (Seq[Library], Seq[UiComponent], Seq[LayoutComponent]) =
     (
       filterByType[Library](comps),

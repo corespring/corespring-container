@@ -3,6 +3,7 @@ package org.corespring.container.client.actions
 import play.api.libs.json.{JsString, Json}
 import play.api.mvc.Results.BadRequest
 import play.api.mvc._
+import scala.concurrent.Future
 
 /**
  * Client side calls - each will call for config, services and components
@@ -12,7 +13,11 @@ trait ClientHooksActionBuilder[A] {
   def loadComponents(id:String)(block: PlayerRequest[A] => Result ) : Action[AnyContent]
   def loadServices(id:String)(block: PlayerRequest[A] => Result ) : Action[AnyContent]
   def loadConfig(id:String)(block: PlayerRequest[A] => Result ) : Action[AnyContent]
+}
+
+trait PlayerHooksActionBuilder[A] extends ClientHooksActionBuilder[A]{
   def createSessionForItem(itemId:String)(block: SessionIdRequest[A] => Result) : Action[AnyContent]
+  def loadPlayerForSession(sessionId:String)(block: Request[A] => Result) : Action[AnyContent]
 }
 
 trait EditorClientHooksActionBuilder[A] extends ClientHooksActionBuilder[A]{

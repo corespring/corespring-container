@@ -29,27 +29,26 @@ block content
 block scripts
 
   //build:js js/rig.js
-  script(src="js/rig/controllers/_declaration.js")
-  script(src="js/rig/controllers/root.js")
-  script(src="js/common/services/_declaration.js")
-  script(src="js/common/services/math-service.js")
-  script(src="js/render/directives/_declaration.js")
-  script(src="js/render/directives/corespring-player.js")
-  script(src="js/render/services/_declaration.js")
-  script(src="js/render/services/component-register.js")
-  script(src="js/render/services/player-utils.js")
+  script(src="../../js/rig/controllers/_declaration.js")
+  script(src="../../js/rig/controllers/root.js")
+  script(src="../../js/common/services/_declaration.js")
+  script(src="../../js/common/services/math-service.js")
+  script(src="../../js/render/directives/_declaration.js")
+  script(src="../../js/render/directives/corespring-player.js")
+  script(src="../../js/render/services/_declaration.js")
+  script(src="../../js/render/services/component-register.js")
+  script(src="../../js/render/services/player-utils.js")
   //endbuild
 
   //build:js js/extras.js
-  script(src="bower_components/mathjax/MathJax.js")
-  script(src="bower_components/angular-ui/build/angular-ui.js")
-  script(src="bower_components/angular-dragdrop/src/angular-dragdrop.js")
-  script(src="bower_components/angular-ui-ace/ui-ace.js")
-  script(src="bower_components/ace-builds/src-min-noconflict/ace.js")
-  script(src="bower_components/ace-builds/src-min-noconflict/theme-twilight.js")
-  script(src="bower_components/ace-builds/src-min-noconflict/mode-xml.js")
-  script(src="bower_components/ace-builds/src-min-noconflict/worker-json.js")
-  script(src="bower_components/ace-builds/src-min-noconflict/mode-json.js")
+
+  script(src="../../components/angular-ui/build/angular-ui.js")
+  script(src="../../components/angular-ui-ace/ui-ace.js")
+  script(src="../../components/ace-builds/src-min-noconflict/ace.js")
+  script(src="../../components/ace-builds/src-min-noconflict/theme-twilight.js")
+  script(src="../../components/ace-builds/src-min-noconflict/mode-xml.js")
+  script(src="../../components/ace-builds/src-min-noconflict/worker-json.js")
+  script(src="../../components/ace-builds/src-min-noconflict/mode-json.js")
   //endbuild
 
   script.
@@ -83,7 +82,6 @@ block scripts
             'corespring-player.directives',
             'corespring-common.services',
             'corespring-common.directives',
-            'ngDragDrop',
             'ui.ace'
           ].concat(data.angular.dependencies);
 

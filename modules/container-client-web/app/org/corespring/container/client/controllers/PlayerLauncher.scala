@@ -54,6 +54,12 @@ trait PlayerLauncher extends Controller {
         |exports.itemPath = "$itemUrl";
         |exports.sessionPath = "$sessionUrl";
         |exports.mode = "gather";
+        |exports.paths = {
+        |  gather: "$itemUrl",
+        |  view: "$sessionUrl?mode=view",
+        |  evaluate: "$sessionUrl?mode=evaluate"
+        |};
+
       """.stripMargin
 
     val rawJs = Seq("container-client/js/corespring/core-library.js")
