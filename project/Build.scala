@@ -13,6 +13,9 @@ object Build extends sbt.Build {
   val org = "org.corespring"
   val ScalaVersion = "2.10.3"
 
+
+  def isWindows = System.getProperty("os.name").toLowerCase().contains("windows")
+
   object Dependencies {
     val specs2 = "org.specs2" %% "specs2" % "2.2.2" % "test"
     val logbackClassic = "ch.qos.logback" % "logback-classic" % "1.0.7"
@@ -55,13 +58,27 @@ object Build extends sbt.Build {
   val buildClientTask = buildClient <<= (baseDirectory, streams) map {
     (baseDir, s) =>
       val clientRoot : File = baseDir
-      //Note: Adding a bower cache clean to workaround this issue: https://github.com/bower/bower/issues/991
-      //Once this is fixed we can remove this
-      val commands = Seq("npm install", "bower cache clean", "bower install", "grunt --devMode=false")
+
+      val osName = System.getProperty("os.name")
+
+      s.log.info(s"os: $osName")
+      val commands = Seq(
+        ("npm", "install"),
+        /**
+         * Note: Adding a bower cache clean to workaround this issue:
+         * https://github.com/bower/bower/issues/991
+         * Once this is fixed we can remove this
+         */
+        ("bower", "cache clean"),
+        ("bower", "install"),
+        ("grunt",  "--devMode=false")
+      )
 
       commands.foreach{ c =>
         s.log.info(s"[>> $c] on " + clientRoot )
-        val exitCode = sbt.Process(c, clientRoot).!
+        val (name, args) = c
+        val cmd = if(isWindows) s"$name.cmd" else name
+        val exitCode = sbt.Process(s"$cmd $args", clientRoot).!
         if(exitCode != 0) {
             throw new RuntimeException(s"The following commands failed: $c")
         }
@@ -159,7 +176,9 @@ object Build extends sbt.Build {
 
   private def cmd(name: String, base: File): Command = {
     Command.args(name, "<" + name + "-command>") { (state, args) =>
-      val exitCode = Process(name :: args.toList, base) !;
+
+      val cmd = if(isWindows) s"$name.cmd" else name
+      val exitCode = Process(cmd :: args.toList, base) !;
       if(exitCode != 0){
         throw new RuntimeException(s"$name, ${base.getPath} returned a non zero exit code")
       }
