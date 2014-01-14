@@ -79,8 +79,8 @@ module.exports = (grunt) ->
   toUrl = (p) -> 
     fileRoot = common.dist
     p
-      .replace("#{fileRoot}/bower_components" , "/client/components")
-      .replace(fileRoot, "/client")
+      .replace("#{fileRoot}/bower_components" , "../../components")
+      .replace(fileRoot, "../..")
 
   pathsFor = (obj, name) ->
     name = "dest" unless name?
@@ -255,6 +255,8 @@ module.exports = (grunt) ->
   grunt.loadNpmTasks(t) for t in npmTasks
   grunt.registerTask('throwError', '', throwError )
   grunt.registerTask('loadComponentDependencies', 'Load client side dependencies for the components', componentDependencies(grunt))
+  # short cut
+  grunt.registerTask('lcd', 'Load client side dependencies for the components', componentDependencies(grunt))
   grunt.registerTask('prepPlayerLauncher', 'prep the player launcher js', prepPlayerLauncher(grunt))
   grunt.registerTask('run', ['jade', 'less', 'watch'])
   grunt.registerTask('test', ['shell:bower', 'loadComponentDependencies', 'prepPlayerLauncher', 'jasmine:unit'])

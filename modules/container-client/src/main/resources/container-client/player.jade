@@ -1,7 +1,7 @@
 extends layout
 
 block head
-  link(rel="stylesheet", href="css/player.css")
+  link(rel="stylesheet", href="../../css/player.css")
 
 block content
 
@@ -20,8 +20,8 @@ block content
 
 block scripts
 
-  //[if lte IE 8]> <script src="/client/js/common/ie-support/Function.bind.js"></script> <![endif]
-  //[if lte IE 8]> <script src="/client/js/common/ie-support/Array.map.js"></script> <![endif]
+  //[if lte IE 8]> <script src="../../js/common/ie-support/Function.bind.js"></script> <![endif]
+  //[if lte IE 8]> <script src="../../js/common/ie-support/Array.map.js"></script> <![endif]
   script.
     var bootstrapResumeTimeout = 0;
   //[if lte IE 9]> <script>bootstrapResumeTimeout = 500;</script> <![endif]
@@ -31,7 +31,7 @@ block scripts
   for p in player 
     script(src="#{p}", type="text/javascript")
 
-  script(src="/client/components/angular-ui/build/angular-ui.js")
+  script(src="../../components/angular-ui/build/angular-ui.js")
 
   block extra-scripts
 
