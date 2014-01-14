@@ -2,7 +2,7 @@
   "metadata" : {
     "title" : "Point Interaction Example"
   },
-  "xhtml" : "<div><corespring-point-intercept id='1'></corespring-point-intercept></div>",
+  "xhtml" : "<div><corespring-point-intercept id='1'></corespring-point-intercept><br/><corespring-feedback-block id='2'></corespring-feedback-block></div>",
   "components" : {
     "1" : {
       "componentType" : "corespring-point-intercept",
@@ -18,6 +18,21 @@
           "additionalText": "More instructions about what is required for this taks. This text can run the width of this space, then wrap and push down any content below it",
           "maxPoints": 2,
           "pointLabels": "y-intercept,x-intercept"
+        }
+      }
+    },
+    "2" : {
+      "componentType" : "corespring-feedback-block",
+      "weight" : 0,
+      "target" : {
+        "id": "1"
+      },
+      "feedback" : {
+        "correct": {
+          "*" : "very good"
+        },
+        "incorrect": {
+          "*": "Not goood."
         }
       }
     }

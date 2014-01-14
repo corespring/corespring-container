@@ -10,7 +10,7 @@ block head
         .modal-content
           .modal-header
             h5
-              | Choose Question Types 
+              | Choose Question Types
           .modal-body
             table
               tr(ng-repeat="row in componentSetGrid")
@@ -47,10 +47,10 @@ block content
 
     .main-content
       .item-list(is-new-item="{{isNewItem()}}")
-        .main-header 
+        .main-header
           span.header-label My Items
           span.left-arrow
-        
+
         .item-body(ng-switch="isNewItem()")
           .header
             .title
@@ -58,9 +58,9 @@ block content
               span.dotted-arrow
 
             div
-              .info 
+              .info
                 div(ng-switch-when="true")
-                  | Content you have added will be listed here. 
+                  | Content you have added will be listed here.
                   br/
                   br/
                   | Click on a question type or content section to edit and design it.
@@ -79,7 +79,7 @@ block content
             component-set="componentSet")
 
         .button-holder
-          button.btn.btn-primary(ng-click="save()") Save 
+          button.btn.btn-primary(ng-click="save()") Save
 
       //file-list(ng-model="model.files", select-file="selectFile(file)")
 
@@ -95,7 +95,7 @@ block content
       div.selected-text-editor(ui-ace, ng-model="selectedFile.content", ui-ace="{useWrapMode: true}", ng-show="selectedFile.content != null")
 
       div.client-side-preview(ng-controller="ClientSidePreview",ng-show="hasComponents()")
-        
+
         player-control-panel(player-settings="session.settings")
 
         corespring-player(
@@ -114,11 +114,14 @@ block content
 
 block scripts
 
-  for p in editor 
+  script(type="text/javascript",src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML")
+
+  for p in editor
     script(src="#{p}", type="text/javascript")
 
   for p in editorExtras
     script(src="#{p}", type="text/javascript")
+
 
   script.
 
