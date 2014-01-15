@@ -2,7 +2,6 @@ globule = require "globule"
 _ = require "lodash"
 fs = require "fs"
 sys = require('sys')
-bower = require('bower')
 
 
 puts = (error, stdout, stderr) -> 
