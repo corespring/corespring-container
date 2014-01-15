@@ -32,8 +32,6 @@ module.exports = (grunt) ->
 
 
       grunt.log.writeln(" bowerInstall > #{name}, #{target}, #{version}")
-      #done()
-      #return
 
       bowerName = ->
         out = "#{name}"
@@ -42,7 +40,6 @@ module.exports = (grunt) ->
         out
 
       args = [] 
-      #args.push("-F")
       args.push("-V")
       args.push(bowerName())
 
