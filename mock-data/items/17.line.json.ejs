@@ -1,0 +1,43 @@
+{
+  "metadata" : {
+    "title" : "Line Interaction Example"
+  },
+  "xhtml" : "<div><corespring-line id='1'></corespring-line><br/><corespring-feedback-block id='2'></corespring-feedback-block></div>",
+  "components" : {
+    "1" : {
+      "componentType" : "corespring-line",
+      "title": "Line interaction sample",
+      "weight" : 1,
+      "correctResponse": "y=2x+7",
+      "model" : {
+        "prompt": "Line interaction prompt",
+        "config": {
+          "domain": "10",
+          "range": "10",
+          "scale": "1",
+          "domainLabel": "x",
+          "rangeLabel": "y",
+          "tickLabelFrequency": "5",
+          "sigfigs": "-1"
+
+}
+      }
+    },
+    "2" : {
+      "componentType" : "corespring-feedback-block",
+      "weight" : 0,
+      "target" : {
+        "id": "1"
+      },
+      "feedback" : {
+        "correct": {
+          "*" : "very good"
+        },
+        "incorrect": {
+          "*": "Not goood."
+        }
+      }
+    }
+  },
+  "_id" : "522267c2554f43f858000021"
+}
