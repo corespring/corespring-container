@@ -125,6 +125,8 @@ module.exports = (grunt) ->
       main: ["<%= common.dist %>/css/*.css"]
 
     shell:
+      bowerCacheClean:
+        command: 'bower cache clean'
       bower:
         command: 'bower install'
 
@@ -256,9 +258,9 @@ module.exports = (grunt) ->
   grunt.registerTask('throwError', '', throwError )
   grunt.registerTask('loadComponentDependencies', 'Load client side dependencies for the components', componentDependencies(grunt))
   # short cut
-  grunt.registerTask('lcd', 'Load client side dependencies for the components', componentDependencies(grunt))
+  grunt.registerTask('lcd', 'shortcut for loadComponentDependencies', componentDependencies(grunt))
   grunt.registerTask('prepPlayerLauncher', 'prep the player launcher js', prepPlayerLauncher(grunt))
   grunt.registerTask('run', ['jade', 'less', 'watch'])
-  grunt.registerTask('test', ['shell:bower', 'loadComponentDependencies', 'prepPlayerLauncher', 'jasmine:unit'])
-  grunt.registerTask('default', ['shell:bower', 'loadComponentDependencies', 'concat', 'uglify', 'less', 'jade', 'compress', 'prepPlayerLauncher','jasmine:unit'])
+  grunt.registerTask('test', ['shell:bower', 'shell:bowerCacheClean', 'lcd', 'prepPlayerLauncher', 'jasmine:unit'])
+  grunt.registerTask('default', ['shell:bower', 'shell:bowerCacheClean', 'lcd', 'concat', 'uglify', 'less', 'jade', 'compress', 'prepPlayerLauncher','jasmine:unit'])
   grunt.registerTask('minify-test', ['concat', 'uglify'])
