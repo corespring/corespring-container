@@ -5,7 +5,7 @@
   "version": "0.0.1",
   "devDependencies": {
     "mkdirp" : "*",
-    "bower" : "*",
+    "bower" : "1.2.6",
     "grunt": "~0.4.1",
     "grunt-cli" : "~0.1.11",
     "grunt-contrib-copy": "~0.4.1",
