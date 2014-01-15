@@ -30,6 +30,11 @@ module.exports = (grunt) ->
     # version - may be undefined (if so use the bower default version)
     bowerInstall = (name, target, version, done) ->
 
+
+      grunt.log.writeln(" bowerInstall > #{name}, #{target}, #{version}")
+      #done()
+      #return
+
       bowerName = ->
         out = "#{name}"
         out += "=#{target}" if target
@@ -37,17 +42,20 @@ module.exports = (grunt) ->
         out
 
       args = [] 
-      args.push("-F")
+      #args.push("-F")
       args.push("-V")
       args.push(bowerName())
 
       exec = require('child_process').exec
       cmd = "bower install #{args.join(" ")}"
-      grunt.log.writeln("running: #{cmd}")
+      grunt.log.debug("  bowerInstall cmd: #{cmd}")
       exec cmd, {cwd: '.'}, (err, stdout, stderr) ->
-        grunt.log.writeln(stdout)
-        grunt.log.writeln(stderr)
-        grunt.log.writeln("-------------> done: #{name}")
+        grunt.log.debug(stdout)
+        grunt.log.writeln("bowerInstall > done: #{name}")
+        
+        if err?
+          grunt.fail.warn( "#{name} \n #{err}")
+
         done()
       
     done = @async()
@@ -57,26 +65,38 @@ module.exports = (grunt) ->
       return
 
     compPath = grunt.config("common.components")
-    grunt.log.writeln(compPath)
+    grunt.log.debug(compPath)
+    
     filepaths = globule.find "#{compPath}/**/package.json"
 
-    defs = _.chain(filepaths)
+    defsObject = _.chain(filepaths)
       .map(fileToJson)
       .map(pluckClient)
       .reduce( mergeItems, {})
       .value()
 
+    defs = _.pairs(defsObject)
 
-    grunt.log.writeln(JSON.stringify(defs))
+    grunt.log.debug(JSON.stringify(defs, null, "  "))
 
+    ###
+    Recursively call bower for each definition so they are executed serially.
+    ###
+    runInstall = (defs, installationDone) ->
 
-    installationDone = _.after _.keys(defs).length,  ->
-      done()
+      if defs? && defs[0]?
+        d = defs.shift()
+        name = d[0]
+        target = d[1].bower_target
+        version = d[1].version
+        grunt.log.writeln("|| runInstall :: #{name} --> #{target} --> #{version}")
+        bowerInstall name, target, version, ->
+          grunt.log.writeln("|| Finished > runInstall :: #{name} --> #{target} --> #{version}")
+          grunt.log.writeln("")
+          runInstall(defs, installationDone)
+      else
+        installationDone()
 
-    _.forIn defs, (v,name) -> 
-      target = v.bower_target
-      version = v.version
-      bowerInstall(name, target, version, installationDone)
-
+    runInstall(defs, done)
 
 
