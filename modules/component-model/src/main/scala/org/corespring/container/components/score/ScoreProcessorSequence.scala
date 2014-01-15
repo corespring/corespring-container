@@ -10,11 +10,11 @@ import play.api.Logger
 class ScoreProcessorSequence(processors : ScoreProcessor*) extends ScoreProcessor{
   lazy val logger = Logger("score.processor")
 
-  def score(item: JsValue, session : JsValue, responses: JsValue): JsValue = {
+  def score(item: JsValue, session : JsValue, outcomes: JsValue): JsValue = {
 
-    val outcomes = processors.map{ _.score(item, session, responses)}
+    val scores = processors.map{ _.score(item, session, outcomes)}
 
-    outcomes.foldLeft(JsObject(Seq.empty)){ (acc: JsObject, o : JsValue) =>
+    scores.foldLeft(JsObject(Seq.empty)){ (acc: JsObject, o : JsValue) =>
       o match {
         case obj : JsObject => {
           acc ++ obj

@@ -5,7 +5,7 @@ import play.api.libs.json.JsValue
 
 trait OutcomeProcessor {
 
-  /**  Create an score for an item given the responses and settings */
+  /**  Create an score for an item given the outcomes and settings */
   def createOutcome(item:JsValue, responses: JsValue, settings: JsValue ) : JsValue
 }
 

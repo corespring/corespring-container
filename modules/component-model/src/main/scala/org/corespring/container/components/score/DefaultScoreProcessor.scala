@@ -6,7 +6,7 @@ object DefaultScoreProcessor extends ScoreProcessor {
 
   private def decimalize(v: BigDecimal, scale: Int = 2): Double =  v.setScale(scale, BigDecimal.RoundingMode.HALF_UP).toDouble
 
-  def score(item: JsValue, session : JsValue, responses: JsValue): JsValue = {
+  def score(item: JsValue, session : JsValue, outcomes: JsValue): JsValue = {
 
     val components = (item \ "components").as[JsObject]
 
@@ -22,7 +22,7 @@ object DefaultScoreProcessor extends ScoreProcessor {
       (key: String, acc: JsObject) =>
 
         val weight = weights.find(_._1 == key).map(_._2).getOrElse(-1)
-        val score = (responses \ key \ "score").asOpt[BigDecimal].map(v => decimalize(v)).getOrElse(0.0)
+        val score = (outcomes \ key \ "score").asOpt[BigDecimal].map(v => decimalize(v)).getOrElse(0.0)
         val weightedScore = decimalize(weight * score)
 
         acc ++ Json.obj(key -> Json.obj(

@@ -8,14 +8,14 @@ object ItemJsScoreProcessor extends ScoreProcessor {
 
   lazy val logger = Logger("js.processing")
 
-  def score(item: JsValue, session: JsValue, responses: JsValue): JsValue = {
+  def score(item: JsValue, session: JsValue, outcomes: JsValue): JsValue = {
     getScoringJs(item).map {
       jsDef =>
         val jsModuleWrapper = new ItemAuthorOverride {
           def js: String = jsDef
         }
         try{
-          val result = jsModuleWrapper.process(item, (session \ "components"))
+          val result = jsModuleWrapper.process(item, outcomes)
           logger.debug(Json.stringify(result))
           result
         } catch {
