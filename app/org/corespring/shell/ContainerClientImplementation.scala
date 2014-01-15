@@ -99,7 +99,7 @@ class ContainerClientImplementation(
     def itemService: MongoService = itemServiceIn
 
     //TODO: Item level scoring isn't active at the moment, once it is we'll need to add ItemJsOutcomProcessor
-    def scoreProcessor: ScoreProcessor = DefaultScoreProcessor //new OutcomeProcessorSequence(DefaultOutcomeProcessor, ItemJsOutcomeProcessor)
+    def scoreProcessor: ScoreProcessor = new ScoreProcessorSequence(DefaultScoreProcessor, ItemJsScoreProcessor)
     def outcomeProcessor = new OutcomeProcessor(rootUiComponents, rootLibs)
   }
 

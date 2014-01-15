@@ -4,7 +4,7 @@ import org.corespring.container.utils.string._
 import org.specs2.mutable.Specification
 import play.api.libs.json.{JsValue, Json}
 
-class ItemJsOutcomeProcessorTest extends Specification {
+class ItemJsScoreProcessorTest extends Specification {
 
   "ItemJsOutcomeProcessor" should {
 
