@@ -154,7 +154,8 @@ object Build extends sbt.Build {
       // Start grunt on play run
       playOnStarted <+= baseDirectory { base =>
         (address: InetSocketAddress) => {
-          Grunt.process = Some(Process("grunt run", (base/ "modules"/"container-client")).run)
+          val cmd = if(isWindows) "grunt.cmd" else "grunt"
+          Grunt.process = Some(Process(s"$cmd run", (base/ "modules"/"container-client")).run)
         }: Unit
       },
       // Stop grunt when play run stops
