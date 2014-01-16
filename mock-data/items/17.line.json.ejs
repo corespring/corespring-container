@@ -8,7 +8,12 @@
       "componentType" : "corespring-line",
       "title": "Line interaction sample",
       "weight" : 1,
-      "correctResponse": "y=2x+7",
+      "correctResponse": {
+        "equation": "y=2x+7",
+        "range": "10",
+        "vars": "x,y",
+        "sigfigs": 3
+      },
       "model" : {
         "prompt": "Line interaction prompt",
         "config": {
@@ -19,8 +24,7 @@
           "rangeLabel": "y",
           "tickLabelFrequency": "5",
           "sigfigs": "-1"
-
-}
+        }
       }
     },
     "2" : {
