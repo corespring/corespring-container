@@ -118,7 +118,6 @@ object Build extends sbt.Build {
   lazy val componentModel = builder.playApp("component-model")
   .settings(playAppToSbtLibSettings: _*)
   .settings(
-    libraryDependencies ++= Seq(specs2),
     resolvers ++= Resolvers.all
   ).dependsOn(utils % "test->compile;compile->compile", jsProcessing)
 

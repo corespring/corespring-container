@@ -6,7 +6,7 @@ import org.corespring.container.components.processing.PlayerItemPreProcessor
 import org.corespring.container.components.response.OutcomeProcessor
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
-import play.api.libs.json.Json
+import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Request, Action, Result, AnyContent}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -56,9 +56,17 @@ class SessionTest extends Specification with Mockito{
   class ActionBody(request: SecureModeRequest[AnyContent]) extends org.specs2.specification.Before{
 
     val session = new Session{
-      def outcomeProcessor: OutcomeProcessor = mock[OutcomeProcessor]
+      def outcomeProcessor: OutcomeProcessor = {
+        val mocked = mock[OutcomeProcessor]
+        mocked.createOutcome(any[JsValue], any[JsValue], any[JsValue]) returns Json.obj()
+        mocked
+      }
 
-      def scoreProcessor: ScoreProcessor = mock[ScoreProcessor]
+      def scoreProcessor: ScoreProcessor = {
+        val mocked = mock[ScoreProcessor]
+        mocked.score(any[JsValue], any[JsValue], any[JsValue]) returns Json.obj()
+        mocked
+      }
 
       def itemPreProcessor: PlayerItemPreProcessor = mock[PlayerItemPreProcessor]
 

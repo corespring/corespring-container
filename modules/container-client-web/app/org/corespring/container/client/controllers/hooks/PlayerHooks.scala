@@ -27,7 +27,6 @@ trait PlayerHooks extends BaseHooksWithBuilder[PlayerHooksActionBuilder[AnyConte
       val jsServices = PlayerServices(
         ngModule,
         Session.loadEverything(sessionId),
-        Session.submitSession(sessionId),
         Session.saveSession(sessionId),
         Item.getScore(itemId),
         Session.completeSession(sessionId),

@@ -25,62 +25,65 @@ trait Session extends Controller with ItemPruner {
 
   def load(id: String) = builder.load(id)(request => Ok((request.everything \ "session").as[JsValue]))
 
-  def loadEverything(id: String) = builder.loadEverything(id){ request =>
+  def loadEverything(id: String) = builder.loadEverything(id) {
+    request =>
 
-    def includeOutcome = {
-      val requested = request.getQueryString("includeOutcome").map{ _ == "true"}.getOrElse(false)
-      requested && (request.isSecure && request.isComplete)
-    }
+      def includeOutcome = {
+        val requested = request.getQueryString("includeOutcome").map {
+          _ == "true"
+        }.getOrElse(false)
+        requested && (request.isSecure && request.isComplete)
+      }
 
-    val itemJson = (request.everything \ "item").as[JsObject]
-    val prunedItem = pruneItem(itemJson)
+      val itemJson = (request.everything \ "item").as[JsObject]
+      val prunedItem = pruneItem(itemJson)
 
-    val sessionJson = (request.everything \ "session").as[JsObject]
+      val sessionJson = (request.everything \ "session").as[JsObject]
 
-    val processedItem = itemPreProcessor.preProcessItemForPlayer(prunedItem, sessionJson \ "settings")
+      val processedItem = itemPreProcessor.preProcessItemForPlayer(prunedItem, sessionJson \ "settings")
 
-    if(!includeOutcome) {
-      Ok(
-        Json.obj(
+      if (!includeOutcome) {
+        Ok(
+          Json.obj(
+            "item" -> processedItem,
+            "session" -> sessionJson)
+        )
+      } else {
+        val outcome = outcomeProcessor.createOutcome(itemJson, sessionJson, sessionJson \ "settings")
+        val score = scoreProcessor.score(itemJson, sessionJson, outcome)
+        val out = Json.obj(
           "item" -> processedItem,
+          "outcome" -> outcome,
+          "score" -> score,
           "session" -> sessionJson)
-      )
-    } else {
-      val outcome = outcomeProcessor.createOutcome(itemJson, sessionJson, sessionJson \ "settings")
-      val score = scoreProcessor.score(itemJson, sessionJson, outcome)
-      val out = Json.obj(
-        "item" -> processedItem,
-        "outcome" -> outcome,
-        "score" -> score,
-        "session" -> sessionJson)
-      Ok(out)
-    }
+        Ok(out)
+      }
   }
 
-  def saveSession(id:String) = builder.save(id) {
+  def saveSession(id: String) = builder.save(id) {
     request =>
 
       if (request.isSecure && request.isComplete)
         BadRequest(Json.obj("error" -> JsString("secure mode: can't save when session is complete")))
       else {
         request.body.asJson.map {
-            requestJson =>
+          requestJson =>
 
-            val isAttempt : Boolean = (requestJson \ "isAttempt").asOpt[Boolean].getOrElse(false)
-            val isComplete : Boolean = (requestJson \ "isComplete").asOpt[Boolean].getOrElse(false)
+            val isAttempt: Boolean = (requestJson \ "isAttempt").asOpt[Boolean].getOrElse(false)
+            val isComplete: Boolean = (requestJson \ "isComplete").asOpt[Boolean].getOrElse(false)
 
-            val attemptUpdate = if(isAttempt){
+            val attemptUpdate = if (isAttempt) {
               val currentCount = (request.itemSession \ "attempts").asOpt[Int].getOrElse(0)
               Json.obj("attempts" -> JsNumber(currentCount + 1))
             } else Json.obj()
 
-            val completeUpdate = if(isComplete) Json.obj("isComplete"-> JsBoolean(true)) else Json.obj()
+            val completeUpdate = if (isComplete) Json.obj("isComplete" -> JsBoolean(true)) else Json.obj()
 
-            val update = request.itemSession.as[JsObject]  ++
+            val update = request.itemSession.as[JsObject] ++
               Json.obj("components" -> requestJson \ "components") ++
               attemptUpdate ++ completeUpdate
 
-            request.saveSession(id, update).map{
+            request.saveSession(id, update).map {
               savedSession =>
                 Ok(savedSession)
             }.getOrElse(BadRequest("Error saving"))
@@ -109,77 +112,4 @@ trait Session extends Controller with ItemPruner {
       }.getOrElse(BadRequest("Error completing"))
   }
 
-  /**
-   * @param id
-   * @return
-   */
-  @deprecated("will be removed shortly", "")
-  def submitSession(id: String) = builder.submitAnswers(id) {
-    request : SubmitSessionRequest[AnyContent] =>
-
-      request.body.asJson.map {
-        session =>
-
-          val sessionJson: JsObject = {
-            val session = (request.everything \ "session").as[JsObject]
-            (session \ "start").asOpt[JsNumber].map {
-              s =>
-                session
-            }.getOrElse(session ++ Json.obj("start" -> JsNumber(DateTime.now.getMillis)))
-          }
-
-          val itemJson: JsObject = (request.everything \ "item").as[JsObject]
-          val isFinished: Boolean = (sessionJson \ "isFinished").asOpt[Boolean].getOrElse(false)
-          val currentRemainingAttempts: Int = (sessionJson \ "remainingAttempts").asOpt[Int].getOrElse(
-            (sessionJson \ "settings" \ "maxNoOfAttempts").as[Int]
-          )
-
-          def output(session: JsValue, isFinished: Boolean) = {
-            val base = Json.obj("session" -> session)
-            if (isFinished) {
-              val outcome = outcomeProcessor.createOutcome(itemJson, session, session \ "settings")
-              val score = scoreProcessor.score(itemJson, session, outcome)
-              base ++ Json.obj("outcome" -> outcome) ++ Json.obj("score" -> score)
-            } else {
-              base
-            }
-          }
-
-          if (isFinished) {
-            Ok(output(sessionJson, true))
-          } else {
-            logger.debug(s"current remaining attempts for $id: $currentRemainingAttempts")
-
-            def updateJson = {
-
-              val newRemainingAttempts: Number = Math.max(0, currentRemainingAttempts - 1)
-              val finished = newRemainingAttempts == 0
-
-              val updates: Seq[(String, JsValue)] = Seq(
-                "remainingAttempts" -> JsNumber(newRemainingAttempts.intValue()),
-                "components" -> (session \ "components").as[JsObject],
-                "isFinished" -> JsBoolean(finished))
-
-              val maybes: Seq[(String, JsValue)] = Seq(
-                if (finished) Some(("finish" -> JsNumber(DateTime.now.getMillis))) else None
-              ).flatten
-
-              val out: JsObject = sessionJson ++ JsObject(updates ++ maybes)
-
-              logger.debug( s"update json: ${Json.stringify(out)}")
-              out
-            }
-
-            request.saveSession(id, updateJson).map {
-              update =>
-                if ((update \ "isFinished").as[Boolean]) {
-                  Ok(output(update, true))
-                } else {
-                  Ok(output(update, false))
-                }
-            }
-          }.getOrElse(BadRequest("Error updating"))
-
-      }.getOrElse(BadRequest("no json body"))
-  }
 }

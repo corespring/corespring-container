@@ -5,7 +5,14 @@ import org.corespring.container.components.outcome.ScoreProcessor
 import org.corespring.container.components.response.OutcomeProcessor
 import play.api.libs.json.{JsNumber, JsBoolean, Json}
 import play.api.mvc.{AnyContent, Controller}
+import org.corespring.container.client.controllers.resources.Item.Errors
 
+object Item{
+  object Errors{
+    val noJson =  "No json in request body"
+    val errorSaving = "Error Saving"
+  }
+}
 trait Item extends Controller {
 
   def builder : ItemActionBuilder[AnyContent]
@@ -30,8 +37,8 @@ trait Item extends Controller {
     request.body.asJson.map { json =>
       request.save(itemId, json).map{ updatedItem =>
         Ok(updatedItem)
-      }.getOrElse(BadRequest("Error saving"))
-    }.getOrElse(BadRequest("No json in request body"))
+      }.getOrElse(BadRequest(Errors.errorSaving))
+    }.getOrElse(BadRequest(Errors.noJson))
   }
 
   def getScore(id:String) = builder.getScore(id) {
@@ -40,7 +47,7 @@ trait Item extends Controller {
         val responses = outcomeProcessor.createOutcome(request.item, answers, settings)
         val outcome = scoreProcessor.score(request.item, Json.obj(), responses)
         Ok(outcome)
-      }.getOrElse(BadRequest("No Json in request body"))
+      }.getOrElse(BadRequest(Errors.noJson))
   }
 
 }

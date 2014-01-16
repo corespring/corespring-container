@@ -46,7 +46,6 @@ trait ComponentsFileController extends Controller {
     log.debug( s"fullPath: $fullPath")
     loadFile(fullPath).map {
       tuple =>
-
         val (file, headers) = tuple
         val url = file.toURI().toURL()
 
