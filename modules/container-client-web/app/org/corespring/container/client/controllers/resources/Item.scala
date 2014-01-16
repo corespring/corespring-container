@@ -1,11 +1,11 @@
 package org.corespring.container.client.controllers.resources
 
 import org.corespring.container.client.actions.{ScoreItemRequest, ItemActionBuilder, SaveItemRequest, ItemRequest}
+import org.corespring.container.client.controllers.resources.Item.Errors
 import org.corespring.container.components.outcome.ScoreProcessor
 import org.corespring.container.components.response.OutcomeProcessor
 import play.api.libs.json.{JsNumber, JsBoolean, Json}
 import play.api.mvc.{AnyContent, Controller}
-import org.corespring.container.client.controllers.resources.Item.Errors
 
 object Item{
   object Errors{
@@ -13,6 +13,7 @@ object Item{
     val errorSaving = "Error Saving"
   }
 }
+
 trait Item extends Controller {
 
   def builder : ItemActionBuilder[AnyContent]
