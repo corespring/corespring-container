@@ -10,7 +10,7 @@ var Instance = function(element, options, log){
   //TODO: move this elsewhere?
   var renderPlayer = function (e, options) {
     var id = options.mode === "gather" ? options.itemId : options.sessionId;
-    var path = options.paths[mode];
+    var path = options.paths[options.mode];
     var url = (options.corespringUrl + path).replace(":id", id);
 
     $(e).html("<iframe id='iframe-player' frameborder='0' src='" + url + "' style='width: 100%; min-height: 700px; border: none'></iframe>");
