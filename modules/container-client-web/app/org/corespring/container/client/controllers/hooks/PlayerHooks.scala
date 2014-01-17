@@ -59,8 +59,8 @@ trait PlayerHooks extends BaseHooksWithBuilder[PlayerHooksActionBuilder[AnyConte
   def createSessionForItem(itemId: String): Action[AnyContent] = builder.createSessionForItem(itemId) {
     request =>
       val file = request.queryString.get("file").map(_(0)).getOrElse("index.html")
-      import org.corespring.container.client.controllers.routes.Assets
-      val url = s"${Assets.session(request.sessionId, file).url}?mode=gather"
+      import org.corespring.container.client.controllers.hooks.routes.{PlayerHooks => Routes}
+      val url = s"${Routes.loadPlayerForSession(request.sessionId).url}?file=$file&mode=gather"
       SeeOther(url)
   }
 

@@ -31,7 +31,7 @@ trait Assets extends Controller {
         getItemId(s).map {
           itemId =>
             loadAsset(itemId, file)(request)
-        }.getOrElse(NotFound("Can't find session or item id"))
+        }.getOrElse(NotFound(s"Can't find session id: $sessionId, path: ${request.path}"))
       })(request)
   }
 
