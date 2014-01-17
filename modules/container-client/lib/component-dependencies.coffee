@@ -28,8 +28,6 @@ module.exports = (grunt) ->
     # target - may be undefined (if so ues the bower default target)
     # version - may be undefined (if so use the bower default version)
     bowerInstall = (name, target, version, done) ->
-
-
       grunt.log.writeln(" bowerInstall > #{name}, #{target}, #{version}")
 
       bowerName = ->
@@ -55,6 +53,12 @@ module.exports = (grunt) ->
         done()
       
     done = @async()
+
+    distFolder = grunt.config("common.dist")
+
+    grunt.fail.warn("no 'dist' folder specified") if !distFolder?
+
+    bowerDist = "#{distFolder}/bower_components"
 
     if !grunt.config("common.components")
       grunt.fail.warn("No 'components' path specified!")
@@ -85,11 +89,16 @@ module.exports = (grunt) ->
         name = d[0]
         target = d[1].bower_target
         version = d[1].version
-        grunt.log.writeln("|| runInstall :: #{name} --> #{target} --> #{version}")
-        bowerInstall name, target, version, ->
-          grunt.log.writeln("|| Finished > runInstall :: #{name} --> #{target} --> #{version}")
-          grunt.log.writeln("")
+
+        if fs.existsSync("#{bowerDist}/#{name}")?
+          grunt.log.writeln("#{name} already exists - skipping" )
           runInstall(defs, installationDone)
+        else
+          grunt.log.writeln("|| runInstall :: #{name} --> #{target} --> #{version}")
+          bowerInstall name, target, version, ->
+            grunt.log.writeln("|| Finished > runInstall :: #{name} --> #{target} --> #{version}")
+            grunt.log.writeln("")
+            runInstall(defs, installationDone)
       else
         installationDone()
 
