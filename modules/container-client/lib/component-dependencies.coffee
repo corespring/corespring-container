@@ -90,7 +90,9 @@ module.exports = (grunt) ->
         target = d[1].bower_target
         version = d[1].version
 
-        if fs.existsSync("#{bowerDist}/#{name}")?
+        folder_exists = fs.existsSync("#{bowerDist}/#{name}")
+
+        if folder_exists
           grunt.log.writeln("#{name} already exists - skipping" )
           runInstall(defs, installationDone)
         else
