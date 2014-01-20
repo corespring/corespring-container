@@ -1,13 +1,22 @@
 exports.define = function(isSecure) {
   var PlayerDefinition = function(element, options, errorCallback){
 
+    var errors = require("player-errors");
+    var launcherErrors = require("launcher-errors");
+
+    if(launcherErrors.hasErrors){
+      for(var i = 0; i < launcherErrors.errors.length; i++){
+        errorCallback( errors.EXTERNAL_ERROR(launcherErrors.errors[i]) );
+      }
+      return;
+    };
+
     var definition = this;
 
     var isReady = false;
 
     var defaultOptions = require("default-options");
 
-    var errors = require("player-errors");
 
     options = $.extend(defaultOptions, options);
     

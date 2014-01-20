@@ -23,6 +23,11 @@ describe('player launcher', function(){
     return this;
   };
 
+  var MockErrors = {
+    hasErrors: false,
+    errors : []
+  };
+
   var mockInstance = null;  
   var originalInstance = null;
   var lastError = null;
@@ -32,6 +37,7 @@ describe('player launcher', function(){
   beforeEach(function(){
     originalInstance = corespring.require("player-instance");
     mockInstance = corespring.module("player-instance", MockInstance);
+    launchErrors = corespring.module("launcher-errors", MockErrors);
     launcher = corespring.require("player");
   });
 

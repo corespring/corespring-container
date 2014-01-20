@@ -23,7 +23,17 @@
     "angular-mocks": "~1.2.8",
     "angular-scenario": "~1.2.8"
   },
-  "resolutions" : {
-    "angular" : "~1.2.8"
+  "dependenciesIgnore": {
+    "ace-builds": [
+      "**/*.html",
+      "*.txt",
+      "**/!(src-min-noconflict)/**"
+    ],
+    "jsxgraph": [
+      "**/!(distrib)/**"
+    ],
+    "corespring-ng-components" : [ "**/!(build)/**"],
+    "angular-ui" : ["**/!(build)**"],
+    "mathjax" : [  "**/docs/**", "**/test/**", "**/unpacked/**", "**/*.md", "*/**/png/**"]
   }
 }

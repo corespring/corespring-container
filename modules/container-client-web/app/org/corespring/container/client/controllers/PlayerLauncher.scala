@@ -36,6 +36,8 @@ trait PlayerLauncher extends Controller {
   val SecureMode = "corespring.player.secure"
 
   def builder : PlayerLauncherActionBuilder[AnyContent]
+
+
   /**
    * query: playerPage the player page to load (default: index.html), for a simple player you can pass in container-player.html
    */
@@ -48,7 +50,7 @@ trait PlayerLauncher extends Controller {
     val itemUrl = s"${PlayerHooks.createSessionForItem(":id").url}?file=$playerPage"
     val sessionUrl = s"${Assets.session(":id", playerPage)}"
 
-    val defaultOptions =
+    val defaultOptions = ("default-options",
       s"""
         |exports.corespringUrl = "$rootUrl";
         |exports.itemPath = "$itemUrl";
@@ -60,9 +62,12 @@ trait PlayerLauncher extends Controller {
         |  evaluate: "$sessionUrl?mode=evaluate"
         |};
 
-      """.stripMargin
+      """.stripMargin)
+
+    val launchErrors = ("launcher-errors", errorsToModule(request.errors))
 
     val rawJs = Seq("container-client/js/corespring/core-library.js")
+
     val wrappedJs = Seq(
       "container-client/js/player-launcher/player.js",
       "container-client/js/player-launcher/player-errors.js",
@@ -81,7 +86,7 @@ trait PlayerLauncher extends Controller {
     }
 
     val contents = rawJs.map(pathToNameAndContents(_)).map(_._2)
-    val wrappedNameAndContents = wrappedJs.map(pathToNameAndContents) :+ ("default-options", defaultOptions)
+    val wrappedNameAndContents = wrappedJs.map(pathToNameAndContents) :+ defaultOptions :+ launchErrors
     val wrappedContents = wrappedNameAndContents.map(tuple => ServerLibraryWrapper(tuple._1, tuple._2))
 
     val bootstrap =
@@ -96,4 +101,9 @@ trait PlayerLauncher extends Controller {
       (contents ++ wrappedContents :+ bootstrap).mkString("\n")
     ).as(ContentTypes.JAVASCRIPT).withSession( request.session + (SecureMode, request.isSecure.toString))
   }
+
+  private def errorsToModule(errors:Seq[String]) : String = s"""
+   |exports.hasErrors = ${errors.length > 0};
+   |exports.errors = ${if(errors.length == 0) "[];" else s"['${errors.mkString("','")}'];"}
+  """.stripMargin
 }

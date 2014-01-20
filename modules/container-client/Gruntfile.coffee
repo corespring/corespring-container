@@ -129,6 +129,9 @@ module.exports = (grunt) ->
         command: 'bower cache clean'
       bower:
         command: 'bower install'
+      mathjax_rm_pngs:
+        command: 'rm -fr <%= common.dist %>/bower_components/mathjax/fonts/HTML-CSS/TeX/png'
+
 
     jshint:
       jshintrc: '.jshintrc'
@@ -248,7 +251,8 @@ module.exports = (grunt) ->
     'grunt-contrib-jasmine',
     'grunt-contrib-copy',
     'grunt-contrib-compress',
-    'grunt-usemin'
+    'grunt-usemin',
+    'grunt-bower-clean'
   ]
 
   throwError = ->
@@ -257,10 +261,12 @@ module.exports = (grunt) ->
   grunt.loadNpmTasks(t) for t in npmTasks
   grunt.registerTask('throwError', '', throwError )
   grunt.registerTask('loadComponentDependencies', 'Load client side dependencies for the components', componentDependencies(grunt))
+  
+  grunt.registerTask('clean_bower', 'bower_clean', 'shell:mathjax_rm_pngs')  
   # short cut
   grunt.registerTask('lcd', 'shortcut for loadComponentDependencies', componentDependencies(grunt))
   grunt.registerTask('prepPlayerLauncher', 'prep the player launcher js', prepPlayerLauncher(grunt))
   grunt.registerTask('run', ['jade', 'less', 'watch'])
   grunt.registerTask('test', ['shell:bower', 'shell:bowerCacheClean', 'lcd', 'prepPlayerLauncher', 'jasmine:unit'])
-  grunt.registerTask('default', ['shell:bower', 'shell:bowerCacheClean', 'lcd', 'concat', 'uglify', 'less', 'jade', 'compress', 'prepPlayerLauncher','jasmine:unit'])
+  grunt.registerTask('default', ['shell:bower', 'shell:bowerCacheClean', 'lcd', 'clean_bower', 'concat', 'uglify', 'less', 'jade', 'compress', 'prepPlayerLauncher','jasmine:unit'])
   grunt.registerTask('minify-test', ['concat', 'uglify'])

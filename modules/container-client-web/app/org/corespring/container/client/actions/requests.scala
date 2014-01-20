@@ -35,5 +35,6 @@ case class SaveSessionRequest[A](itemSession: JsValue, override val isSecure: Bo
 
 /**
  * @param isSecure - whether the player will run in secureMode - ake some capabilities will be locked down.
+ * @param errors - if there were any errors loading the player js
  */
-case class PlayerJsRequest[A](isSecure: Boolean, r : Request[A]) extends WrappedRequest(r)
+case class PlayerJsRequest[A](isSecure: Boolean, r : Request[A], errors : Seq[String] = Seq.empty) extends WrappedRequest(r)
