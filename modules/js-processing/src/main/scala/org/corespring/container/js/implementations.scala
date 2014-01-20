@@ -9,6 +9,7 @@ trait CorespringJs {
   protected val libs = Seq(
     "/js-libs/lodash.min.js",
     "/js-libs/sax.js",
+    "/js-libs/math.min.js",
     "/container-client/js/corespring/core-library.js",
     "/container-client/js/corespring/server/init-core-library.js",
     "/container-client/js/corespring/core.js"
