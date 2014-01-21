@@ -18,6 +18,7 @@ object Build extends sbt.Build {
 
   object Dependencies {
     val specs2 = "org.specs2" %% "specs2" % "2.2.2" % "test"
+    val commonsLang = "org.apache.commons" % "commons-lang3" % "3.2.1" % "test"
     val logbackClassic = "ch.qos.logback" % "logback-classic" % "1.0.7"
     val logbackCore = "ch.qos.logback" % "logback-core" % "1.0.7"
     val rhinoJs = "org.mozilla" % "rhino" % "1.7R4"
@@ -30,7 +31,6 @@ object Build extends sbt.Build {
   }
 
   object Resolvers {
-
     val corespringSnapshots = "Corespring Artifactory Snapshots" at "http://repository.corespring.org/artifactory/ivy-snapshots"
     val corespringReleases = "Corespring Artifactory Releases" at "http://repository.corespring.org/artifactory/ivy-releases"
     val typesafeReleases = "typesafe releases" at "http://repo.typesafe.com/typesafe/releases/"
@@ -123,7 +123,7 @@ object Build extends sbt.Build {
 
   lazy val componentLoader = builder.lib("component-loader")
     .settings(
-      libraryDependencies ++= Seq(logbackClassic, specs2, rhinoJs)
+      libraryDependencies ++= Seq(logbackClassic, specs2, rhinoJs, commonsLang)
     ).dependsOn(componentModel, jsProcessing)
 
 

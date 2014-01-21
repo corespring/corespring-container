@@ -1,10 +1,12 @@
 package org.corespring.container.components.outcome
 
-import org.corespring.container.utils.string._
 import org.specs2.mutable.Specification
 import play.api.libs.json.{JsValue, Json}
+import org.apache.commons.lang3.StringEscapeUtils
 
 class ItemJsScoreProcessorTest extends Specification {
+
+  import StringEscapeUtils._
 
   "ItemJsOutcomeProcessor" should {
 
@@ -32,7 +34,7 @@ class ItemJsScoreProcessorTest extends Specification {
             }
           },
           "files" : [
-            {"name" : "scoring.js", "contentType" : "text/javascript", "content" : "${jsonSafe(js)}"}
+            {"name" : "scoring.js", "contentType" : "text/javascript", "content" : "${escapeEcmaScript(js)}"}
           ]
          }"""
 
