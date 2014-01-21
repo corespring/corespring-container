@@ -2,6 +2,7 @@ package org.corespring.container.utils
 
 package object string {
 
+  @deprecated("Use StringEscapeUtils#escapeJavascript instead")
   def jsonSafe(s: String): String = {
     s.trim
       .replace("\"", "\\\"")
