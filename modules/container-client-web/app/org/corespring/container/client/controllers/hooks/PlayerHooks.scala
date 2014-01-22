@@ -64,7 +64,9 @@ trait PlayerHooks extends BaseHooksWithBuilder[PlayerHooksActionBuilder[AnyConte
       SeeOther(url)
   }
 
-  def loadPlayerForSession(sessionId: String) = builder.loadPlayerForSession(sessionId) {
+  def loadPlayerForSession(sessionId: String) = builder.loadPlayerForSession(sessionId){ (code: Int, msg: String ) =>
+    Ok(org.corespring.container.client.views.html.error.main(code, msg))
+  } {
     request =>
       val validPlayers = Seq("player.html", "container-player.html")
       val page = request.getQueryString("file").filter(validPlayers.contains).getOrElse(validPlayers.head)
