@@ -8,9 +8,12 @@ import play.api.http.ContentTypes
 import play.api.mvc.{AnyContent, Request, Action, Controller}
 import org.corespring.container.client.actions.PlayerLauncherActionBuilder
 import org.apache.commons.lang3.{StringEscapeUtils, StringUtils}
+import org.corespring.container.client.V2PlayerConfig
 
 
 trait PlayerLauncher extends Controller {
+
+  def playerConfig : V2PlayerConfig
 
   //TODO: This is lifted from corespring-api -> move to a library
   object BaseUrl {
@@ -46,7 +49,7 @@ trait PlayerLauncher extends Controller {
 
     val playerPage = request.getQueryString("playerPage").getOrElse("index.html")
 
-    val rootUrl = play.api.Play.current.configuration.getString("APP_ROOT_URL").getOrElse( BaseUrl(request) )
+    val rootUrl = playerConfig.rootUrl.getOrElse( BaseUrl(request) )
 
     val itemUrl = s"${PlayerHooks.createSessionForItem(":id").url}?file=$playerPage"
     val sessionUrl = s"${Assets.session(":id", playerPage)}"

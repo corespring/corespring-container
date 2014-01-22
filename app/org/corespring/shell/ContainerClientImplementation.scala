@@ -15,12 +15,13 @@ import org.corespring.shell.controllers.player.{Session, PlayerHooks}
 import play.api.Configuration
 import play.api.mvc._
 import scala.Some
+import org.corespring.container.client.V2PlayerConfig
 
 class ContainerClientImplementation(
                                      itemServiceIn : MongoService,
                                      sessionServiceIn : MongoService,
                                      comps : => Seq[Component],
-                                     config : Configuration
+                                     rootConfig : Configuration
                                      ) {
 
   lazy val controllers: Seq[Controller] = Seq(playerHooks, editorHooks, items, sessions, assets, icons, rig, libs, playerLauncher)
@@ -29,6 +30,9 @@ class ContainerClientImplementation(
   def rootLibs = comps.filter(_.isInstanceOf[Library]).map(_.asInstanceOf[Library])
 
   private lazy val playerLauncher = new PlayerLauncher {
+
+    override def playerConfig: V2PlayerConfig = V2PlayerConfig(rootConfig)
+
     def builder: PlayerLauncherActionBuilder[AnyContent] = new PlayerLauncherActionBuilder[AnyContent] {
 
       /**
@@ -55,8 +59,8 @@ class ContainerClientImplementation(
   }
 
   private lazy val libs = new ComponentsFileController {
-    def componentsPath: String = config.getString("components.path").getOrElse("components")
-    def defaultCharSet: String = config.getString("default.charset").getOrElse("utf-8")
+    def componentsPath: String = rootConfig.getString("components.path").getOrElse("components")
+    def defaultCharSet: String = rootConfig.getString("default.charset").getOrElse("utf-8")
 }
 
   private lazy val rig = new Rig{
@@ -69,9 +73,9 @@ class ContainerClientImplementation(
 
   private lazy val assets = new Assets {
 
-    private lazy val key = config.getString("amazon.s3.key")
-    private lazy val secret = config.getString("amazon.s3.secret")
-    private lazy val bucket = config.getString("amazon.s3.bucket").getOrElse(throw new RuntimeException("No bucket specified"))
+    private lazy val key = rootConfig.getString("amazon.s3.key")
+    private lazy val secret = rootConfig.getString("amazon.s3.secret")
+    private lazy val bucket = rootConfig.getString("amazon.s3.bucket").getOrElse(throw new RuntimeException("No bucket specified"))
 
     lazy val playS3 = {
       val out = for{
