@@ -1,4 +1,5 @@
 componentDependencies = require "./lib/component-dependencies"
+restoreResolutions = require "./lib/restore-resolutions"
 prepPlayerLauncher = require "./lib/prep-player-launcher"
 expander = require "./lib/expander"
 _ = require "lodash"
@@ -262,9 +263,11 @@ module.exports = (grunt) ->
   grunt.registerTask('throwError', '', throwError )
   grunt.registerTask('loadComponentDependencies', 'Load client side dependencies for the components', componentDependencies(grunt))
   
+  grunt.registerTask('restoreResolutions', 'Add "resolutions" back to bower.json', restoreResolutions(grunt))
+  
   grunt.registerTask('clean_bower', 'bower_clean', 'shell:mathjax_rm_pngs')  
   # short cut
-  grunt.registerTask('lcd', 'shortcut for loadComponentDependencies', componentDependencies(grunt))
+  grunt.registerTask('lcd', ['restoreResolutions', 'loadComponentDependencies'])
   grunt.registerTask('prepPlayerLauncher', 'prep the player launcher js', prepPlayerLauncher(grunt))
   grunt.registerTask('run', ['jade', 'less', 'watch'])
   grunt.registerTask('test', ['shell:bower', 'shell:bowerCacheClean', 'lcd', 'prepPlayerLauncher', 'jasmine:unit'])

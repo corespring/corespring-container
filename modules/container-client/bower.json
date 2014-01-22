@@ -32,8 +32,21 @@
     "jsxgraph": [
       "**/!(distrib)/**"
     ],
-    "corespring-ng-components" : [ "**/!(build)/**"],
-    "angular-ui" : ["**/!(build)**"],
-    "mathjax" : [  "**/docs/**", "**/test/**", "**/unpacked/**", "**/*.md", "*/**/png/**"]
+    "corespring-ng-components": [
+      "**/!(build)/**"
+    ],
+    "angular-ui": [
+      "**/!(build)**"
+    ],
+    "mathjax": [
+      "**/docs/**",
+      "**/test/**",
+      "**/unpacked/**",
+      "**/*.md",
+      "*/**/png/**"
+    ]
+  },
+  "resolutions": {
+    "angular": "~1.2.8"
   }
 }
