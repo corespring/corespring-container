@@ -1,7 +1,14 @@
 
 var Instance = function(element, options, log){
 
-  log = log || { error: function(s){ console.error(s); }, debug: function(s){ console.debug(s); } };
+
+  var that = this;
+
+  log = log || { 
+    error: function(s){ console.error(s); }, 
+    debug: function(s){ console.debug(s); },
+    warn: function(s){ console.warn(s); }
+  };
 
   var listener = require("root-level-listener")();
 
@@ -71,20 +78,31 @@ var Instance = function(element, options, log){
     }
   };
 
+  this.parseEvent = function(event){
+     if(typeof(event.data) == "string"){
+        try {
+          return JSON.parse(event.data);
+        }
+        catch(e){
+          log.warn( "[player-instance] Can't parse: ", event.data, " as json");
+          return {};
+        }
+     } else {
+        return event.data;
+     }
+  };
+
   this.addListener = function(name, callback){
 
-     listener.addListener(function (event) {
-        try {
-          var data = typeof(event.data) == "string" ? JSON.parse(event.data) : event.data;
+    listener.addListener(function (event) {
+      var data = that.parseEvent(event);
 
-          if (data.message === name) {
-            callback(data);
-          }
-        }
-        catch (e) {
-          log.error("Exception in [player-instance] addListener: " + e.message);
-        }
-      });
+      log.debug("message: " + data.message);
+
+      if (data.message === name) {
+        callback(data);
+      }
+    });
   };
 
   renderPlayer(element, options);
