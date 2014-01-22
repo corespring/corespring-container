@@ -77,11 +77,14 @@ exports.define = function(isSecure) {
       }
     };
 
-
     errorCallback = errorCallback || function (error) {
       throw "error occurred, code: " + error.code + ", message: " + error.message;
     };
 
+    instance.addListener("launch-error", function(data){
+      var error = errors.EXTERNAL_ERROR(data.code + ": " + data.detailedMessage);
+      errorCallback(error);
+    });
    
 
     if (options.onSessionCreated) {
