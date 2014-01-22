@@ -45,7 +45,9 @@ describe('player launcher', function(){
     corespring.module("player-instance", originalInstance);
   });
 
-  var create = function(options, secureMode){
+  var create = function(options, secureMode, playerErrors){
+
+    corespring.module("launcher-errors", playerErrors || MockErrors);
     
     secureMode = secureMode !== undefined ? secureMode : true; 
     lastError = null;
@@ -62,6 +64,12 @@ describe('player launcher', function(){
 
     return player;
   };
+
+  it('should invoke error callback if there are launcher-errors', function(){
+    var player = create({mode:null}, false, { hasErrors: true, errors: ["error one"]});
+    expect(lastError.code).toEqual(errors.EXTERNAL_ERROR("error one").code);
+    expect(lastError.message).toEqual(errors.EXTERNAL_ERROR("error one").message);
+  });
 
   it('should invoke error callback with invalid mode', function(){
     var player = create({mode:null});
