@@ -1,8 +1,8 @@
 package org.corespring.container.components.outcome
 
+import org.apache.commons.lang3.StringEscapeUtils
 import org.specs2.mutable.Specification
 import play.api.libs.json.{JsValue, Json}
-import org.apache.commons.lang3.StringEscapeUtils
 
 class ItemJsScoreProcessorTest extends Specification {
 
