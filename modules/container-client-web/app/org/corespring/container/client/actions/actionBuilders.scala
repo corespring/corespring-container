@@ -17,7 +17,7 @@ trait ClientHooksActionBuilder[A] {
 
 trait PlayerHooksActionBuilder[A] extends ClientHooksActionBuilder[A]{
   def createSessionForItem(itemId:String)(block: SessionIdRequest[A] => Result) : Action[AnyContent]
-  def loadPlayerForSession(sessionId:String)(block: Request[A] => Result) : Action[AnyContent]
+  def loadPlayerForSession(sessionId:String)(error: (Int,String) => Result)(block: Request[A] => Result) : Action[AnyContent]
 }
 
 trait EditorClientHooksActionBuilder[A] extends ClientHooksActionBuilder[A]{
