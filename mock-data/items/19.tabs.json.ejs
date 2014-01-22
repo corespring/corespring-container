@@ -1,0 +1,69 @@
+{
+  "metadata" : {
+    "title" : "Tabs"
+  },
+  "xhtml" : "<%- helper.read('../xml/19.tabs.xhtml') %>",
+  "components" : {
+    "1" : {
+      "componentType" : "corespring-multiple-choice",
+      "title": "Fruits",
+      "weight" : 10,
+      "correctResponse" : { "value" : ["carrot", "turnip", "potato"] },
+      "feedback" : [
+        { "value" : "banana", "feedback" : "Incorrect"},
+        { "value" : "carrot", "feedback" : "Correct", "notChosenFeedback" : "This is a vegetable"},
+        { "value" : "apple", "feedback" : "it's a fruit" },
+        { "value" : "turnip", "feedback" : "Correct", "notChosenFeedback" : "This is a vegetable" },
+        { "value" : "potato", "feedback" : "Correct", "notChosenFeedback" : "This is a vegetable" },
+        { "value" : "wheat", "feedback" : "Incorrect" }
+      ],
+      "model" : {
+        "prompt": "Which of these is a vegetable?",
+        "config": {
+          "orientation": "vertical",
+          "choiceStyle": "rightAlign",
+          "shuffle": true
+        },
+        "choices": [
+          {"label": "Banana", "value": "banana"},
+          {"label": "Carrot In the Woods", "value": "carrot"},
+          {"label": "Apple", "value": "apple"},
+          {"label": "Turnip", "value": "turnip"},
+          {"label": "Potato", "value": "potato"},
+          {"label": "Wheat", "value": "wheat"}
+        ]
+      }
+    },
+    "2" : {
+      "componentType" : "corespring-multiple-choice",
+      "title": "Less Fruits",
+      "weight" : 1,
+      "correctResponse" : { "value" : ["carrot"] },
+      "feedback" : [
+        { "value" : "banana", "feedback" : "Incorrect"},
+        { "value" : "carrot", "feedback" : "Correct", "notChosenFeedback" : "This was the correct one."},
+        { "value" : "apple", "feedback" : "Incorrect"}
+      ],
+      "model" : {
+        "prompt": "Which of these is a vegetable?",
+        "config": {
+          "orientation": "vertical",
+          "shuffle": true,
+          "singleChoice" : true
+        },
+        "choices": [
+          {"label": "Banana", "value": "banana"},
+          {"label": "Carrot", "value": "carrot"},
+          {"label": "Apple", "value": "apple"}
+        ]
+      }
+    }
+
+  },
+  "_id" : "522267c2554f43f858000023",
+  "org": {
+    "components": [
+      "corespring/*"
+    ]
+  }
+}
