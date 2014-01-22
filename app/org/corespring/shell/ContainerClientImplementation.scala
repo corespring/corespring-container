@@ -30,9 +30,22 @@ class ContainerClientImplementation(
 
   private lazy val playerLauncher = new PlayerLauncher {
     def builder: PlayerLauncherActionBuilder[AnyContent] = new PlayerLauncherActionBuilder[AnyContent] {
+
+      /**
+       * Provides a few hooks so that you can simulate scenarios when loading player:
+       * ?secure - a secure request
+       * ?jsErrors  - throw errors when loading the player js
+       * ?pageErrors - throw errors when loading the player page
+       * @param block
+       * @return
+       */
       def playerJs(block: (PlayerJsRequest[AnyContent]) => Result): Action[AnyContent] = Action{ request =>
         def isSecure = request.getQueryString("secure").map{ _ == "true"}.getOrElse(false)
-        block(PlayerJsRequest(isSecure, request))
+        def errors = request.getQueryString("jsErrors").map{s => s.split(",").toSeq}.getOrElse(Seq())
+        val r = block(PlayerJsRequest(isSecure, request, errors))
+        request.getQueryString("pageErrors").map{ s =>
+          r.withSession(SessionKeys.failLoadPlayer -> s)
+        }.getOrElse(r.withNewSession)
       }
     }
   }

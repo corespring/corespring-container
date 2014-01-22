@@ -6,6 +6,7 @@ import play.api.libs.json.JsString
 import play.api.libs.json.{Json, JsValue}
 import play.api.mvc._
 import org.corespring.mongo.json.services.MongoService
+import org.corespring.shell.SessionKeys
 
 trait Main extends Controller {
 
@@ -21,6 +22,8 @@ trait Main extends Controller {
   def index = Action {
     request =>
 
+      def failLoadPlayerForSession = request.getQueryString(SessionKeys.failLoadPlayer).isDefined
+
       val items: Seq[(String, String, String, String)] = itemService.list("metadata.title").map {
         json: JsValue =>
           val name = (json \ "metadata" \ "title").as[String]
@@ -29,8 +32,14 @@ trait Main extends Controller {
           val editorUrl = s"/client/editor/${id}/index.html"
           (name, id, playerUrl, editorUrl)
       }
+
       logger.debug(items.mkString(","))
-      Ok(html.index(items))
+      val r: Result = Ok(html.index(items))
+
+      if (failLoadPlayerForSession)
+        r.withSession(SessionKeys.failLoadPlayer -> "true")
+      else
+        r.withNewSession
   }
 
   def createSessionPage(itemId: String) = Action {

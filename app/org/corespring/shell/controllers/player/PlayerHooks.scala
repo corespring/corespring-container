@@ -1,22 +1,16 @@
 package org.corespring.shell.controllers.player
 
-import org.corespring.container.client.actions.{PlayerHooksActionBuilder, ClientHooksActionBuilder, PlayerRequest, SessionIdRequest}
+import org.corespring.container.client.actions.PlayerHooksActionBuilder
+import org.corespring.container.client.actions.PlayerRequest
+import org.corespring.container.client.actions.SessionIdRequest
 import org.corespring.container.client.controllers.hooks.{PlayerHooks => ContainerPlayerHooks}
 import org.corespring.mongo.json.services.MongoService
+import org.corespring.shell.SessionKeys
 import play.api.libs.json._
 import play.api.mvc._
 import scala.Some
 import scalaz.Scalaz._
 import scalaz._
-import org.corespring.container.client.actions.PlayerRequest
-import org.corespring.container.client.actions.SessionIdRequest
-import scalaz.Success
-import scalaz.Failure
-import play.api.libs.json.JsString
-import play.api.libs.json.JsBoolean
-import scala.Some
-import play.api.libs.json.JsNumber
-import scala.concurrent.Future
 
 trait PlayerHooks extends ContainerPlayerHooks {
 
@@ -72,8 +66,11 @@ trait PlayerHooks extends ContainerPlayerHooks {
     /**
      * For the shell we just pass through - anyone can load it
      */
-    override def loadPlayerForSession(sessionId: String)(block: (Request[AnyContent]) => Result): Action[AnyContent] = Action {
-      request => block(request)
+    override def loadPlayerForSession(sessionId: String)(error: (Int,String) => Result)(block: (Request[AnyContent]) => Result): Action[AnyContent] = Action {
+      request =>
+        request.session.get(SessionKeys.failLoadPlayer).map{ fail =>
+          error(1001, "Some error occured")
+        }.getOrElse(block(request))
     }
   }
 
