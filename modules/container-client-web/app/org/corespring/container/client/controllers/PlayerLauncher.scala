@@ -7,6 +7,7 @@ import play.api.Play.current
 import play.api.http.ContentTypes
 import play.api.mvc.{AnyContent, Request, Action, Controller}
 import org.corespring.container.client.actions.PlayerLauncherActionBuilder
+import org.apache.commons.lang3.{StringEscapeUtils, StringUtils}
 
 
 trait PlayerLauncher extends Controller {
@@ -102,8 +103,13 @@ trait PlayerLauncher extends Controller {
     ).as(ContentTypes.JAVASCRIPT).withSession( request.session + (SecureMode, request.isSecure.toString))
   }
 
-  private def errorsToModule(errors:Seq[String]) : String = s"""
-   |exports.hasErrors = ${errors.length > 0};
-   |exports.errors = ${if(errors.length == 0) "[];" else s"['${errors.mkString("','")}'];"}
-  """.stripMargin
+  private def errorsToModule(errors:Seq[String]) : String = {
+
+    val cleaned = errors.map(StringEscapeUtils.escapeEcmaScript)
+
+    s"""
+     |exports.hasErrors = ${errors.length > 0};
+     |exports.errors = ${if(errors.length == 0) "[];" else s"['${cleaned.mkString("','")}'];"}
+     """.stripMargin
+  }
 }
