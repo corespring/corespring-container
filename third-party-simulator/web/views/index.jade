@@ -15,6 +15,19 @@ block content
               .col-sm-10
                 label.radio-inline
                   input(type="checkbox", ng-model="isSecure")
+
+            .form-group
+              label.control-label.col-sm-2 JS Errors?
+              .col-sm-10
+                label.radio-inline
+                  input(type="text", ng-model="jsErrors")
+
+            .form-group
+              label.control-label.col-sm-2 Page Errors?
+              .col-sm-10
+                label.radio-inline
+                  input(type="text", ng-model="pageErrors")
+
             .form-group
               label.control-label.col-sm-2 Mode
               .col-sm-10

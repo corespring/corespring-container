@@ -75,7 +75,17 @@ angular.module("simulator").controller('Root', ['$scope', '$timeout', '$log', '$
   };
 
   $scope.loadPlayerJs = function(loaded){
-    var scriptTag = "<script src='http://"+server+""+rootPath+"/player.js?secure="+$scope.isSecure+"'></script>";
+    var url = "http://"+server+rootPath+"/player.js?secure="+$scope.isSecure;
+    
+    if($scope.jsErrors){
+      url += "&jsErrors=" + $scope.jsErrors;
+    }
+    
+    if($scope.pageErrors){
+      url += "&pageErrors=" + $scope.pageErrors;
+    }
+
+    var scriptTag = "<script src='"+url+"'></script>";
     $("head").append(scriptTag);
     $timeout(loaded, 500);
   };
