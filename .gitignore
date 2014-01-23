@@ -1,5 +1,6 @@
 target
 bower_components
+node_modules
 .idea*
 *.log
 .idea*
