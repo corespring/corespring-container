@@ -71,6 +71,6 @@ class OutcomeProcessor(components: Seq[UiComponent], libraries: Seq[Library]) ex
 
   private def getAnswer(answers: JsValue, id: String): Option[JsValue] = for {
     componentSession <- (answers \ "components" \ id).asOpt[JsObject]
-    answer <- (componentSession \ "itemSession").asOpt[JsValue]
+    answer <- (componentSession \ "answers").asOpt[JsValue]
   } yield answer
 }
