@@ -29,7 +29,9 @@ class MongoService(collection: MongoCollection) {
       maybeDbo.map {
         dbo =>
           val s = JSON.serialize(dbo)
-          Json.parse(s)
+          val json = Json.parse(s)
+          logger.trace(s"[load: $id]: ${Json.stringify(json)}")
+          json
       }
   }
 

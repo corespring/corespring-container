@@ -84,6 +84,7 @@ trait Session extends ContainerSession {
           itemId <- (session \ "itemId").asOpt[String]
           item <- itemService.load(itemId)
         } yield {
+          logger.trace(s"[loadOutcome] session: $session")
           SessionOutcomeRequest(item, session, isSecure(request), isComplete(session), request)
         }
 

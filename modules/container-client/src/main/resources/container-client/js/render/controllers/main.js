@@ -1,5 +1,7 @@
 //# Main player controller
-var controller = function ($scope, $log, ComponentRegister, PlayerServices) {
+var controller = function ($scope, $log, $timeout, ComponentRegister, PlayerServices) {
+
+  var currentMode = null;
 
   $scope.onAnswerChanged = function(){
     $scope.$emit("inputReceived", {sessionStatus: getSessionStatus()});
@@ -169,9 +171,20 @@ var controller = function ($scope, $log, ComponentRegister, PlayerServices) {
   //```
   //saveResponses will save the client side data. Its optional - if not present nothing will be saved.
   $scope.$on('setMode', function(event, data){
+
+    $log.debug("setMode");
+
+    if(data.mode && data.mode == currentMode ){
+      $log.warn("mode is already set to: ", data.mode);
+      return;
+    }
+    currentMode = data.mode;
     var editable = (data.mode == 'gather');
-    ComponentRegister.setEditable(editable);
-    ComponentRegister.setMode(data.mode);
+
+    $timeout(function() {
+      ComponentRegister.setEditable(editable);
+      ComponentRegister.setMode(data.mode);
+    });
 
     var afterMaybeSave = function(){
       if(data.mode == 'evaluate'){
@@ -203,6 +216,7 @@ angular.module('corespring-player.controllers')
     'Main',
     ['$scope',
     '$log',
+    '$timeout',
     'ComponentRegister',
     'PlayerServices',
      controller
