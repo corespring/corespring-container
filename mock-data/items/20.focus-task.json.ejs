@@ -1,0 +1,35 @@
+{
+  "metadata" : {
+    "title" : "Focus Task"
+  },
+  "xhtml" : "<div><corespring-focus-task id='1' /></div>",
+  "components" : {
+    "1" : {
+      "componentType" : "corespring-focus-task",
+      "title": "Fruits",
+      "weight" : 10,
+      "correctResponse" : { "value" : ["carrot", "turnip", "potato"] },
+      "model" : {
+        "prompt": "Which of these is a vegetable?",
+        "config": {
+          "shuffle": true,
+          "itemShape": "circle"
+        },
+        "choices": [
+          {"label": "Banana", "value": "banana"},
+          {"label": "Carrot", "value": "carrot"},
+          {"label": "Apple", "value": "apple"},
+          {"label": "Turnip", "value": "turnip"},
+          {"label": "Potato", "value": "potato"},
+          {"label": "Wheat", "value": "wheat"}
+        ]
+      }
+    }
+  },
+  "_id" : "522267c2554f43f858000024",
+  "org": {
+    "components": [
+      "corespring/*"
+    ]
+  }
+}

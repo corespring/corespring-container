@@ -4,7 +4,7 @@
 
     this.parseDomForMath = function (delay) {
       $timeout(function () {
-        if (!_.isUndefined(MathJax)) {
+        if (typeof MathJax != 'undefined' && !_.isUndefined(MathJax)) {
           MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
         }
       }, delay || 100);
