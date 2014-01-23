@@ -68,8 +68,8 @@ trait PlayerHooks extends BaseHooksWithBuilder[PlayerHooksActionBuilder[AnyConte
     Ok(org.corespring.container.client.views.html.error.main(code, msg))
   } {
     request =>
-      val validPlayers = Seq("player.html", "container-player.html")
-      val page = request.getQueryString("file").filter(validPlayers.contains).getOrElse(validPlayers.head)
+
+      val page = if(request.path.contains("container-player.html")) "container-player.html" else "player.html"
       //TODO: We should be running all requests inside futures
       import scala.concurrent.duration._
       val f : Future[SimpleResult]= controllers.Assets.at("/container-client", page)(request)
