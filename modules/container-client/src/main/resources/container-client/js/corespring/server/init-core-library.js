@@ -15,6 +15,6 @@ corespring.module("underscore", _);
 corespring.module("lodash", _);
 corespring.module("sax", sax);
 
-if(this["mathjs"]){
+if(mathjs){
   corespring.module("mathjs", mathjs);
 }

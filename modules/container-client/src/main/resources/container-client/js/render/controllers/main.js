@@ -15,6 +15,9 @@ var controller = function ($scope, $log, $timeout, ComponentRegister, PlayerServ
   };
 
   $scope.save = function (isAttempt, isComplete, cb) {
+
+    $log.debug('[save] -> attempt: ', isAttempt, ' complete:', isComplete, 'callback:', cb);
+
     PlayerServices.saveSession(
       {
         isAttempt: isAttempt, 
@@ -22,15 +25,17 @@ var controller = function ($scope, $log, $timeout, ComponentRegister, PlayerServ
         components: ComponentRegister.getComponentSessions()
       }, 
       function(s){ 
+        $log.debug('[save] successful')
         $scope.onSessionSaved(s); 
         if(cb){
-          cb(s);
+          cb(null, s);
         }
       },
       function(e){
+        $log.debug('[save] error')
         $scope.onSessionSaveError(e);
         if(cb){
-          cb();
+          cb(e);
         }
       } 
       );
@@ -127,7 +132,8 @@ var controller = function ($scope, $log, $timeout, ComponentRegister, PlayerServ
   });
 
   $scope.$on('saveResponses', function(event, data){
-    $scope.save(data.isAttempt, data.isComplete);
+    $log.debug('[onSaveResponses] -> ', data);
+    $scope.save(data.isAttempt, data.isComplete, data.onSaveSuccess);
   });
 
   $scope.$on('countAttempts', function(event, data, callback){
@@ -188,8 +194,12 @@ var controller = function ($scope, $log, $timeout, ComponentRegister, PlayerServ
 
     var afterMaybeSave = function(){
       if(data.mode == 'evaluate'){
-        $scope.loadOutcome(data.options, function(){
-          $log.debug("score received");
+        $timeout(function(){
+
+          $log.debug("load outcome!!!")
+          $scope.loadOutcome(data.options, function(){
+            $log.debug("score received");
+          });
         });
       } else {
         _.forIn($scope.outcome, function(value, key){
@@ -201,9 +211,11 @@ var controller = function ($scope, $log, $timeout, ComponentRegister, PlayerServ
 
     if(data.saveResponses){
       $scope.save(data.saveResponses.isAttempt, data.saveResponses.isComplete, function(){
+        $log.debug("session save successful - call maybeSave");
         afterMaybeSave();
       });
     } else {
+      $log.debug("no need to save responses - call maybeSave")
       afterMaybeSave();
     }
   });

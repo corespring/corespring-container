@@ -13,7 +13,7 @@ import scala.Some
 
 trait Session extends Controller with ItemPruner {
 
-  val logger = Logger("session")
+  val logger = Logger("session.controller")
 
   def outcomeProcessor: OutcomeProcessor
 
@@ -63,6 +63,8 @@ trait Session extends Controller with ItemPruner {
   def saveSession(id: String) = builder.save(id) {
     request =>
 
+      logger.trace(s"[saveSession] : $id")
+
       if (request.isSecure && request.isComplete)
         BadRequest(Json.obj("error" -> JsString("secure mode: can't save when session is complete")))
       else {
@@ -85,6 +87,7 @@ trait Session extends Controller with ItemPruner {
 
             request.saveSession(id, update).map {
               savedSession =>
+                logger.trace(s"session has been saved as: $savedSession")
                 Ok(savedSession)
             }.getOrElse(BadRequest("Error saving"))
         }.getOrElse(BadRequest("No session in the request body"))
@@ -93,6 +96,8 @@ trait Session extends Controller with ItemPruner {
 
   def loadOutcome(id: String) = builder.loadOutcome(id) {
     request: SessionOutcomeRequest[AnyContent] =>
+      logger.trace(s"[loadOutcome]: $id : ${Json.stringify(request.itemSession)}")
+
       if (request.isSecure && !request.isComplete) {
         BadRequest(Json.obj("error" -> JsString("secure mode: can't load outcome - session isn't complete")))
       } else {
