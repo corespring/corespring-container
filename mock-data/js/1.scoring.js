@@ -32,7 +32,7 @@ var summary = function(score){
   return {
     summary: {
       percentage : Math.min( 100, Math.round(score * 100)),
-      note: "overriden score"
+      note: "overridden score"
     }
   };
 };

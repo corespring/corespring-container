@@ -5,6 +5,7 @@ import org.corespring.container.client.controllers.resources.{Session => Contain
 import org.corespring.mongo.json.services.MongoService
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Request, Action, Result, AnyContent}
+import play.api.Logger
 
 trait Session extends ContainerSession {
 
@@ -13,6 +14,8 @@ trait Session extends ContainerSession {
   def itemService: MongoService
 
   def builder: SessionActionBuilder[AnyContent] = new SessionActionBuilder[AnyContent] {
+
+    val logger = Logger("session.builder")
 
     private def isSecure(request:Request[AnyContent]) : Boolean  = request.session.get("corespring.player.secure").map(_ == "true").getOrElse(false)
 
@@ -84,6 +87,7 @@ trait Session extends ContainerSession {
           itemId <- (session \ "itemId").asOpt[String]
           item <- itemService.load(itemId)
         } yield {
+          logger.trace(s"[loadOutcome] session: $session")
           SessionOutcomeRequest(item, session, isSecure(request), isComplete(session), request)
         }
 

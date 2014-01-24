@@ -1,5 +1,7 @@
 //# Main player controller
-var controller = function ($scope, $log, ComponentRegister, PlayerServices) {
+var controller = function ($scope, $log, $timeout, ComponentRegister, PlayerServices) {
+
+  var currentMode = null;
 
   $scope.onAnswerChanged = function(){
     $scope.$emit("inputReceived", {sessionStatus: getSessionStatus()});
@@ -13,6 +15,9 @@ var controller = function ($scope, $log, ComponentRegister, PlayerServices) {
   };
 
   $scope.save = function (isAttempt, isComplete, cb) {
+
+    $log.debug('[save] -> attempt: ', isAttempt, ' complete:', isComplete, 'callback:', cb);
+
     PlayerServices.saveSession(
       {
         isAttempt: isAttempt, 
@@ -20,15 +25,17 @@ var controller = function ($scope, $log, ComponentRegister, PlayerServices) {
         components: ComponentRegister.getComponentSessions()
       }, 
       function(s){ 
+        $log.debug('[save] successful')
         $scope.onSessionSaved(s); 
         if(cb){
-          cb(s);
+          cb(null, s);
         }
       },
       function(e){
+        $log.debug('[save] error')
         $scope.onSessionSaveError(e);
         if(cb){
-          cb();
+          cb(e);
         }
       } 
       );
@@ -41,8 +48,11 @@ var controller = function ($scope, $log, ComponentRegister, PlayerServices) {
       function(data){
         $scope.onOutcomeLoaded(data);
         if(cb) {
-          cb(data); 
+          cb(null, data); 
         }
+      }, function(err){
+        $log.error(err);
+        if(cb){ cb(err); }
       }
     );
   };
@@ -125,7 +135,8 @@ var controller = function ($scope, $log, ComponentRegister, PlayerServices) {
   });
 
   $scope.$on('saveResponses', function(event, data){
-    $scope.save(data.isAttempt, data.isComplete);
+    $log.debug('[onSaveResponses] -> ', data);
+    $scope.save(data.isAttempt, data.isComplete, data.onSaveSuccess);
   });
 
   $scope.$on('countAttempts', function(event, data, callback){
@@ -169,14 +180,29 @@ var controller = function ($scope, $log, ComponentRegister, PlayerServices) {
   //```
   //saveResponses will save the client side data. Its optional - if not present nothing will be saved.
   $scope.$on('setMode', function(event, data){
+
+    $log.debug("setMode");
+
+    if(data.mode && data.mode == currentMode ){
+      $log.warn("mode is already set to: ", data.mode);
+      return;
+    }
+    currentMode = data.mode;
     var editable = (data.mode == 'gather');
-    ComponentRegister.setEditable(editable);
-    ComponentRegister.setMode(data.mode);
+
+    $timeout(function() {
+      ComponentRegister.setEditable(editable);
+      ComponentRegister.setMode(data.mode);
+    });
 
     var afterMaybeSave = function(){
       if(data.mode == 'evaluate'){
-        $scope.loadOutcome(data.options, function(){
-          $log.debug("score received");
+        $timeout(function(){
+
+          $log.debug("load outcome!!!")
+          $scope.loadOutcome(data.options, function(){
+            $log.debug("score received");
+          });
         });
       } else {
         _.forIn($scope.outcome, function(value, key){
@@ -188,9 +214,11 @@ var controller = function ($scope, $log, ComponentRegister, PlayerServices) {
 
     if(data.saveResponses){
       $scope.save(data.saveResponses.isAttempt, data.saveResponses.isComplete, function(){
+        $log.debug("session save successful - call maybeSave");
         afterMaybeSave();
       });
     } else {
+      $log.debug("no need to save responses - call maybeSave")
       afterMaybeSave();
     }
   });
@@ -203,6 +231,7 @@ angular.module('corespring-player.controllers')
     'Main',
     ['$scope',
     '$log',
+    '$timeout',
     'ComponentRegister',
     'PlayerServices',
      controller

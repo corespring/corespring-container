@@ -3,7 +3,7 @@ package org.corespring.container.components.outcome
 import org.specs2.mutable.Specification
 import play.api.libs.json.{JsString, JsValue, JsNumber, Json}
 
-class OutcomeProcessorSequenceTest extends Specification{
+class ScoreProcessorSequenceTest extends Specification{
 
   "processor sequence" should {
     "process last score will overwrite earlier" in {

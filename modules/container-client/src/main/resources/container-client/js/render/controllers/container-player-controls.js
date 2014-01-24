@@ -14,9 +14,12 @@ var controller = function ($scope, $rootScope, $log) {
 
 
   $scope.submit = function(){
-    $scope.$emit('saveResponses', { isAttempt: true, isComplete: true } );
-    //$scope.$emit('completeResponse');
-    $scope.$emit('setMode', { mode: 'evaluate', options: evaluateOptions, saveResponses: null } );
+
+    var onSaveSuccess = function(err){
+      $scope.$emit('setMode', { mode: 'evaluate', options: evaluateOptions, saveResponses: null } );
+    };
+
+    $scope.$emit('saveResponses', { isAttempt: true, isComplete: true, onSaveSuccess: onSaveSuccess } );
 
   };
 

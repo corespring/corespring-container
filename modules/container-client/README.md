@@ -38,12 +38,12 @@ in and out of the player. Its api looks like so:
 ```javascript
     {
       /**
-       * Submit answers to the server
-       * @param answers - the answers object
+       * Submit itemSession to the server
+       * @param itemSession - the itemSession object
        * @param onSuccess - a callback that takes the answer response object as its first parameter
        * @param onFailure - a callback that takes the error object as its first parameter
        */
-      submitAnswers: function(answers, onSuccess, onFailure){...},
+      submitAnswers: function(itemSession, onSuccess, onFailure){...},
       /**
        * Load the session for the player
        * @param onSuccess - a callback that takes the session object as its first parameter
@@ -72,7 +72,7 @@ Scoring Override js Impl - from Client side Player Services.js
           //s.src = 'data:text/javascript,' + encodeURIComponent('alert("lorem ipsum")')
           //document.body.appendChild(s);
         //TODO: Load item
-        out.score = corespring.server.itemOverride().process({}, answers.answers);
+        out.score = corespring.server.itemOverride().process({}, itemSession.itemSession);
       }
       */
 
