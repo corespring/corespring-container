@@ -48,8 +48,11 @@ var controller = function ($scope, $log, $timeout, ComponentRegister, PlayerServ
       function(data){
         $scope.onOutcomeLoaded(data);
         if(cb) {
-          cb(data); 
+          cb(null, data); 
         }
+      }, function(err){
+        $log.error(err);
+        if(cb){ cb(err); }
       }
     );
   };

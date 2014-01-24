@@ -98,8 +98,12 @@ trait Session extends Controller with ItemPruner {
     request: SessionOutcomeRequest[AnyContent] =>
       logger.trace(s"[loadOutcome]: $id : ${Json.stringify(request.itemSession)}")
 
+      def hasAnswers = (request.itemSession \ "components").asOpt[JsObject].isDefined
+
       if (request.isSecure && !request.isComplete) {
         BadRequest(Json.obj("error" -> JsString("secure mode: can't load outcome - session isn't complete")))
+      } else if (!hasAnswers) {
+        BadRequest(Json.obj("error" -> JsString("Can't create an outcome if no answers have been saved")))
       } else {
         val options = request.body.asJson.getOrElse(Json.obj())
         val outcome = outcomeProcessor.createOutcome(request.item, request.itemSession, options)
