@@ -8,16 +8,39 @@
       "componentType" : "corespring-inline-choice",
       "title": "Less Fruits",
       "weight" : 1,
-      "correctResponse" : "carrot",
-      "feedback" : {
-        "banana": {"feedback": "Incorrect", "correct": false},
-        "carrot" : {"feedback" : "Correct", "correct": true},
-        "apple" : {"feedback": "Incorrect", "correct": false}
+      "correctResponse" : {
+        "value": "carrot"
       },
+      "feedback" : [
+        { "value" : "banana", "feedback" : "Incorrect"},
+        { "value" : "carrot", "feedback" : "Correct"},
+        { "value" : "apple", "feedback" : "Incorrect" }
+      ],
       "model" : {
-        "prompt": "Which of these is a vegetable?",
         "config": {
-          "orientation": "vertical",
+          "shuffle": true
+        },
+        "choices": [
+          {"label": "$$\\left( \\sum_{k=1}^n a_k b_k \\right)^2 \\leq \\left( \\sum_{k=1}^n a_k^2 \\right) \\left( \\sum_{k=1}^n b_k^2 \\right)$$", "value": "banana"},
+          {"label": "Carrot", "value": "carrot"},
+          {"label": "Apple", "value": "apple"}
+        ]
+      }
+    },
+    "2" : {
+      "componentType" : "corespring-inline-choice",
+      "title": "Less Fruits",
+      "weight" : 1,
+      "correctResponse" : {
+        "value": "carrot"
+      },
+      "feedback" : [
+        { "value" : "banana", "feedback" : "Incorrect"},
+        { "value" : "carrot", "feedback" : "Correct"},
+        { "value" : "apple", "feedback" : "Incorrect" }
+      ],
+      "model" : {
+        "config": {
           "shuffle": true
         },
         "choices": [
