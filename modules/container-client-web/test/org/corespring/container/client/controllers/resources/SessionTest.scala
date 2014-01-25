@@ -11,51 +11,56 @@ import play.api.mvc.{Request, Action, Result, AnyContent}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 
-class SessionTest extends Specification with Mockito{
+class SessionTest extends Specification with Mockito {
 
   "secure mode" should {
 
-    def saveRequest(isComplete:Boolean) = SaveSessionRequest[AnyContent](
-      Json.obj() ,
-      true,
-      isComplete,
-      (a,b) => Some(Json.obj()),
-      FakeRequest().withJsonBody(Json.obj())
-    )
-
-    def outcomeRequest(isComplete:Boolean) = SessionOutcomeRequest[AnyContent] (
-      Json.obj(),
+    def saveRequest(isComplete: Boolean) = SaveSessionRequest[AnyContent](
       Json.obj(),
       true,
       isComplete,
+      (a, b) => Some(Json.obj()),
       FakeRequest().withJsonBody(Json.obj())
     )
 
-    "allow save when session is not complete" in new ActionBody( saveRequest(false) ) {
+    def outcomeRequest(itemSession: JsValue = Json.obj(), isComplete: Boolean) = SessionOutcomeRequest[AnyContent](
+      Json.obj(),
+      itemSession,
+      true,
+      isComplete,
+      FakeRequest().withJsonBody(Json.obj())
+    )
+
+    "allow save when session is not complete" in new ActionBody(saveRequest(false)) {
       val result = session.saveSession("id")(FakeRequest())
       status(result) === OK
     }
 
-    "not allow save when session is complete" in new ActionBody( saveRequest(true) ) {
+    "not allow save when session is complete" in new ActionBody(saveRequest(true)) {
       val result = session.saveSession("id")(FakeRequest())
       status(result) === BAD_REQUEST
     }
 
-    "allow load outcome when session is complete" in new ActionBody( outcomeRequest(true) ){
+    "not allow load outcome when session is complete, but there are no answers" in new ActionBody(outcomeRequest(isComplete = true)) {
+      val result = session.loadOutcome("id")(FakeRequest())
+      status(result) === BAD_REQUEST
+    }
+
+    "allow load outcome when session is complete" in new ActionBody(outcomeRequest(itemSession = Json.obj("components" -> Json.obj()), isComplete = true)) {
       val result = session.loadOutcome("id")(FakeRequest())
       status(result) === OK
     }
 
-    "not allow load outcome when session is not complete" in new ActionBody( outcomeRequest(false) ){
+    "not allow load outcome when session is not complete" in new ActionBody(outcomeRequest(isComplete = false)) {
       val result = session.loadOutcome("id")(FakeRequest())
       status(result) === BAD_REQUEST
     }
 
   }
 
-  class ActionBody(request: SecureModeRequest[AnyContent]) extends org.specs2.specification.Before{
+  class ActionBody(request: SecureModeRequest[AnyContent]) extends org.specs2.specification.Before {
 
-    val session = new Session{
+    val session = new Session {
       def outcomeProcessor: OutcomeProcessor = {
         val mocked = mock[OutcomeProcessor]
         mocked.createOutcome(any[JsValue], any[JsValue], any[JsValue]) returns Json.obj()
@@ -76,19 +81,21 @@ class SessionTest extends Specification with Mockito{
     def before = {}
   }
 
-  class MockBuilder(r:Request[AnyContent]) extends SessionActionBuilder[AnyContent] {
+  class MockBuilder(r: Request[AnyContent]) extends SessionActionBuilder[AnyContent] {
     def loadEverything(id: String)(block: (FullSessionRequest[AnyContent]) => Result): Action[AnyContent] = ???
 
     def load(id: String)(block: (FullSessionRequest[AnyContent]) => Result): Action[AnyContent] = ???
 
-    def loadOutcome(id: String)(block: (SessionOutcomeRequest[AnyContent]) => Result): Action[AnyContent] = Action { request =>
-      block(r.asInstanceOf[SessionOutcomeRequest[AnyContent]])
+    def loadOutcome(id: String)(block: (SessionOutcomeRequest[AnyContent]) => Result): Action[AnyContent] = Action {
+      request =>
+        block(r.asInstanceOf[SessionOutcomeRequest[AnyContent]])
     }
 
     def submitAnswers(id: String)(block: (SubmitSessionRequest[AnyContent]) => Result): Action[AnyContent] = ???
 
-    def save(id: String)(block: (SaveSessionRequest[AnyContent]) => Result): Action[AnyContent] = Action{ request =>
-      block(r.asInstanceOf[SaveSessionRequest[AnyContent]])
+    def save(id: String)(block: (SaveSessionRequest[AnyContent]) => Result): Action[AnyContent] = Action {
+      request =>
+        block(r.asInstanceOf[SaveSessionRequest[AnyContent]])
     }
   }
 

@@ -68,11 +68,11 @@ class OutcomeProcessorTest extends Specification{
       val session = Json.obj(
         "components" -> Json.obj(
           "1" -> Json.obj(
-            "itemSession" -> Json.obj( "value" -> "2"),
+            "answers" -> Json.obj( "value" -> "2"),
             "stash" -> Json.obj()
           ),
           "2" -> Json.obj(
-            "itemSession" -> Json.obj()
+            "answers" -> Json.obj()
           )
         )
       )

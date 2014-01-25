@@ -42,28 +42,35 @@ class OutcomeProcessor(components: Seq[UiComponent], libraries: Seq[Library]) ex
 
     def getTargetId(json:JsValue) = (json \ "target" \ "id").asOpt[String]
 
-    def questionTargets(key:String)  = { questions.exists{ kv =>
+    def aQuestionTargetKey(key:String)  = { questions.exists{ kv =>
       val (_,json) = kv
-      getTargetId(json).isDefined
+
+      getTargetId(json).map{ t =>
+        t == key
+      }.getOrElse(false)
     }}
 
 
-    val (noTargets, withTargets) = questions.partition{
-      case kv : (String,JsValue) if !questionTargets(kv._1) => true
-      case _ => false
+    val (targetedByOthers, targetsOther) = questions.partition{ kv =>
+      aQuestionTargetKey(kv._1)
     }
 
-    val outcomesNoTarget = noTargets.map{ (kv) =>
+    val outcomesNoTarget = targetedByOthers.map{ (kv) =>
       val (key, _) = kv
       createOutcomeForComponent(key, Json.obj())
     }
 
-    val outcomesWithTarget = withTargets.map{ (kv) =>
-      val (key, json) = kv
-      val targetId = getTargetId(json)
-      require(targetId.isDefined, "targetId must be defined")
-      val existingOutcome = outcomesNoTarget.find(_._1 == targetId.get).map(_._2).getOrElse(JsObject(Seq.empty))
-      createOutcomeForComponent(key,existingOutcome)
+    val outcomesWithTarget = targetsOther.map{ (kv) =>
+      val (key, _) = kv
+      questions.find( _._1 == key).map{ q =>
+
+        val targetId = getTargetId(q._2)
+        require(targetId.isDefined, "targetId must be defined")
+        val existingOutcome = outcomesNoTarget.find(_._1 == targetId.get).map(_._2).getOrElse(JsObject(Seq.empty))
+        createOutcomeForComponent(key,existingOutcome)
+
+      }.getOrElse(throw new RuntimeException(s"Can't find a question with key: $key"))
+
     }
 
     JsObject((outcomesNoTarget ++ outcomesWithTarget).toSeq)
