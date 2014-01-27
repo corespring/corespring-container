@@ -1,9 +1,12 @@
-package org.corespring.shell.utils
+package org.corespring.play.utils
 
-import play.api.mvc.Controller
-import play.api.{Logger, GlobalSettings}
+import play.api.{GlobalSettings, Logger}
 import scala.collection._
+import play.api.mvc.Controller
 
+/**
+ * Finds implementations of traits from a given Seq[Controller]
+ */
 trait ControllerInstanceResolver extends GlobalSettings {
 
   private val mappedTypes : mutable.Map[String, Controller] = new mutable.HashMap()
