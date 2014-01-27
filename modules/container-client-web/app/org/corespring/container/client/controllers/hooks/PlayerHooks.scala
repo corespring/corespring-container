@@ -67,8 +67,8 @@ trait PlayerHooks extends BaseHooksWithBuilder[PlayerHooksActionBuilder[AnyConte
   }
 
   private def playerPage(request:Request[AnyContent]) = {
-    def has(n:String) =  request.path.contains(n) || request.getQueryString(n) == Some(n)
-    if(has("container-player.html")) "container-player.html" else "index.html"
+    def has(n:String) =  request.path.contains(n) || request.getQueryString("file") == Some(n)
+    if(has("container-player.html")) "container-player.html" else "player.html"
   }
 
   def loadPlayerForSession(sessionId: String) = builder.loadPlayerForSession(sessionId){ (code: Int, msg: String ) =>

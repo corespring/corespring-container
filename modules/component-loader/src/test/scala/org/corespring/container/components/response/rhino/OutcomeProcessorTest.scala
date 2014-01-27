@@ -2,7 +2,7 @@ package org.corespring.container.components.response.rhino
 
 import org.corespring.container.components.model.{UiComponent, Server, Client}
 import org.specs2.mutable.Specification
-import play.api.libs.json.Json
+import play.api.libs.json.{JsString, Json}
 
 class OutcomeProcessorTest extends Specification{
 
@@ -20,6 +20,18 @@ class OutcomeProcessorTest extends Specification{
     |  return { targetOutcome: targetOutcome };
     |}
   """.stripMargin
+
+  "Target" should  {
+    "work" in {
+      val t = new Target{}
+      t.hasTarget(Json.obj("target" -> Json.obj("id" -> JsString("1")))) === true
+      t.hasTarget(Json.obj("target" -> Json.obj("otherId" -> JsString("1")))) === false
+      t.hasTarget(Json.obj()) === false
+    }
+
+  }
+
+
 
   "OutcomeProcessor" should {
     "respond" in {

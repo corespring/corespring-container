@@ -5,7 +5,15 @@ import org.corespring.container.components.response.{OutcomeGenerator, OutcomePr
 import org.slf4j.LoggerFactory
 import play.api.libs.json.{Json, JsObject, JsValue}
 
-class OutcomeProcessor(components: Seq[UiComponent], libraries: Seq[Library]) extends ContainerOutcomeProcessor {
+
+trait Target{
+
+  def targetId(question:JsValue) = (question \ "target" \ "id").asOpt[String]
+  def hasTarget(question:JsValue) = targetId(question).isDefined
+}
+
+
+class OutcomeProcessor(components: Seq[UiComponent], libraries: Seq[Library]) extends ContainerOutcomeProcessor with Target{
 
   private lazy val logger = LoggerFactory.getLogger("components.outcome")
 
@@ -40,40 +48,34 @@ class OutcomeProcessor(components: Seq[UiComponent], libraries: Seq[Library]) ex
 
     val questions : Seq[(String,JsValue)] = (item \ "components").as[JsObject].fields
 
-    def getTargetId(json:JsValue) = (json \ "target" \ "id").asOpt[String]
-
-    def aQuestionTargetKey(key:String)  = { questions.exists{ kv =>
-      val (_,json) = kv
-
-      getTargetId(json).map{ t =>
-        t == key
-      }.getOrElse(false)
-    }}
-
-
-    val (targetedByOthers, targetsOther) = questions.partition{ kv =>
-      aQuestionTargetKey(kv._1)
+    val (normalQuestions, questionsThatNeedOutcomes) = questions.partition{ kv =>
+      !hasTarget(kv._2)
     }
 
-    val outcomesNoTarget = targetedByOthers.map{ (kv) =>
+    val outcomes : Seq[(String,JsValue)] = normalQuestions.map{ (kv) =>
       val (key, _) = kv
       createOutcomeForComponent(key, Json.obj())
     }
 
-    val outcomesWithTarget = targetsOther.map{ (kv) =>
+    val outcomesWithTarget : Seq[(String, JsValue)] = questionsThatNeedOutcomes.map{ (kv) =>
       val (key, _) = kv
       questions.find( _._1 == key).map{ q =>
 
-        val targetId = getTargetId(q._2)
-        require(targetId.isDefined, "targetId must be defined")
-        val existingOutcome = outcomesNoTarget.find(_._1 == targetId.get).map(_._2).getOrElse(JsObject(Seq.empty))
+        val id = targetId(q._2)
+
+        if(id.isEmpty){
+          logger.trace(Json.stringify(q._2))
+        }
+        require(id.isDefined, "targetId must be defined")
+        val existingOutcome = outcomes.find(_._1 == id.get).map(_._2).getOrElse(JsObject(Seq.empty))
         createOutcomeForComponent(key,existingOutcome)
 
       }.getOrElse(throw new RuntimeException(s"Can't find a question with key: $key"))
 
     }
 
-    JsObject((outcomesNoTarget ++ outcomesWithTarget).toSeq)
+    val out : Seq[(String,JsValue)] = outcomes ++ outcomesWithTarget
+    JsObject(out)
   }
 
   private def getAnswer(answers: JsValue, id: String): Option[JsValue] = for {
