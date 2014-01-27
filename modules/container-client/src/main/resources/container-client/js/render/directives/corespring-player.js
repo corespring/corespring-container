@@ -38,6 +38,10 @@ angular.module('corespring-player.directives').directive('corespringPlayer', [
           ComponentRegister.registerComponent(id, obj);
         });
 
+        $scope.$on('rerender-math', function(event, delay){
+          MathJaxService.parseDomForMath(delay);
+        });
+
         /*
           stash the component data (TODO: persist it?)
         */

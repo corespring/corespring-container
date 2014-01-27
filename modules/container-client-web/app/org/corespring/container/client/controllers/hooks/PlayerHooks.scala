@@ -7,8 +7,10 @@ import org.corespring.container.components.model.Component
 import play.api.Logger
 import play.api.http.ContentTypes
 import play.api.libs.json.JsValue
-import play.api.mvc.{SimpleResult, Result, AnyContent, Action}
+import play.api.mvc._
 import scala.concurrent.{Future, Await}
+import org.corespring.container.client.actions.PlayerRequest
+import play.api.mvc.SimpleResult
 
 
 trait PlayerHooks extends BaseHooksWithBuilder[PlayerHooksActionBuilder[AnyContent]] with LayoutComponentReading {
@@ -64,13 +66,16 @@ trait PlayerHooks extends BaseHooksWithBuilder[PlayerHooksActionBuilder[AnyConte
       SeeOther(url)
   }
 
+  private def playerPage(request:Request[AnyContent]) = {
+    def has(n:String) =  request.path.contains(n) || request.getQueryString(n) == Some(n)
+    if(has("container-player.html")) "container-player.html" else "index.html"
+  }
+
   def loadPlayerForSession(sessionId: String) = builder.loadPlayerForSession(sessionId){ (code: Int, msg: String ) =>
     Ok(org.corespring.container.client.views.html.error.main(code, msg))
   } {
     request =>
-
-      val page = if(request.path.contains("container-player.html")) "container-player.html" else "player.html"
-      //TODO: We should be running all requests inside futures
+      val page = playerPage(request)
       import scala.concurrent.duration._
       val f : Future[SimpleResult]= controllers.Assets.at("/container-client", page)(request)
       Await.result( f, 3.seconds)
