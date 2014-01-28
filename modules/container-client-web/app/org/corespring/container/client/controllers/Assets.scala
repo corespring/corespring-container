@@ -2,8 +2,11 @@ package org.corespring.container.client.controllers
 
 import play.api.mvc._
 import scala.concurrent.{ExecutionContext, Future}
+import play.api.Logger
 
 trait Assets extends Controller {
+
+  lazy val logger = Logger("v2player.assets")
 
   import ExecutionContext.Implicits.global
 
@@ -21,16 +24,21 @@ trait Assets extends Controller {
 
       result.map{ r => r match {
         case s : SimpleResult if Seq(OK,NOT_MODIFIED).contains(s.header.status) => s
-        case _ => notFoundLocally(id)
+        case _ => {
+          logger.trace(s"[at] itemId: $id - Can't find file locally")
+          notFoundLocally(id)
+        }
       }}
   }
 
   def session(sessionId: String, file: String) = Action.async {
     request =>
       at(sessionId, file, (s) => {
+        logger.trace(s"[session] sessionId: $sessionId -> $file")
         getItemId(s).map {
           itemId =>
-            loadAsset(itemId, file)(request)
+              logger.trace(s"[session] sessionId: $sessionId, itemId: $itemId -> $file")
+              loadAsset(itemId, file)(request)
         }.getOrElse(NotFound(s"Can't find session id: $sessionId, path: ${request.path}"))
       })(request)
   }
