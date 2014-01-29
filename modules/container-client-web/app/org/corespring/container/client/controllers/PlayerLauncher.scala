@@ -47,7 +47,7 @@ trait PlayerLauncher extends Controller {
    */
   def playerJs = builder.playerJs{ request =>
 
-    val playerPage = request.getQueryString("playerPage").getOrElse("index.html")
+    val playerPage = request.getQueryString("playerPage").getOrElse("player.html")
 
     val rootUrl = playerConfig.rootUrl.getOrElse( BaseUrl(request) )
 
