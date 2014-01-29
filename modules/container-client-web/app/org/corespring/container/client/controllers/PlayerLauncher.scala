@@ -57,8 +57,6 @@ trait PlayerLauncher extends Controller {
     val defaultOptions = ("default-options",
       s"""
         |exports.corespringUrl = "$rootUrl";
-        |exports.itemPath = "$itemUrl";
-        |exports.sessionPath = "$sessionUrl";
         |exports.mode = "gather";
         |exports.paths = {
         |  gather: "$itemUrl",
