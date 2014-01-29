@@ -45,7 +45,7 @@ var Instance = function(element, options, log){
       return data;
     });
 
-    var resultHandler = function(){
+    var resultHandler = function(event){
 
       var uid = new Date().getTime();
 
