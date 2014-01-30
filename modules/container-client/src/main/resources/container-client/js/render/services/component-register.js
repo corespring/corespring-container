@@ -2,6 +2,8 @@ angular.module('corespring-player.services').factory('ComponentRegister', ['$log
 
   var ComponentRegister = function(){
 
+    var editable = null;
+
     var loaded = {};
 
     var components = {};
@@ -19,6 +21,11 @@ angular.module('corespring-player.services').factory('ComponentRegister', ['$log
       if(component.answerChangedHandler && answerChangedHandler){
         component.answerChangedHandler(answerChangedHandler);
       }
+
+      if(editable !== undefined && component.editable){
+        component.editable(editable);
+      }
+
     };
 
     /**
@@ -83,7 +90,10 @@ angular.module('corespring-player.services').factory('ComponentRegister', ['$log
       return answered.length;
     };
 
-    this.setEditable = function(editable){
+    this.setEditable = function(e){
+
+      editable = e;
+
       $.each(components, function(id, c){
 
         if(!c.editable){

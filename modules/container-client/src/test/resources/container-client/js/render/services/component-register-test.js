@@ -4,6 +4,8 @@ describe('component-register', function(){
 
   var MockBridge = function(){
 
+    var isEditable = undefined;
+
     this.setDataAndSession = function(s){
       this.dataAndSession = s;
     };
@@ -21,6 +23,14 @@ describe('component-register', function(){
     this.isAnswerEmpty = function(){
       return _.isEmpty(this.getSession().answers);
     };
+
+    this.editable = function(e){
+      if(e !== undefined){
+        isEditable = e;
+      } else {
+        return isEditable;
+      } 
+    }
   };
 
   beforeEach(angular.mock.module('corespring-player.services'));
@@ -45,6 +55,22 @@ describe('component-register', function(){
 
   it('should setOutcomes', setValue("setOutcomes", "response") );
 
+
+  it('should set editable', function(){
+    register.setEditable(true);
+    expect(bridge.editable()).toEqual(true);
+    register.setEditable(false);
+    expect(bridge.editable()).toEqual(false);
+  });
+
+  it('should set editable on newly registered components', function(){
+    var newBridge = new MockBridge();
+    register.setEditable(true);
+    register.registerComponent("2", newBridge);
+    expect(newBridge.editable()).toEqual(true);
+    register.setEditable(false);
+    expect(newBridge.editable()).toEqual(false);
+  });
 
   it('should setDataAndSession', setValue("setDataAndSession", "dataAndSession") );
 
