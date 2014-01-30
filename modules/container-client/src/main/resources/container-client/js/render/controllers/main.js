@@ -181,7 +181,7 @@ var controller = function ($scope, $log, $timeout, ComponentRegister, PlayerServ
   //saveResponses will save the client side data. Its optional - if not present nothing will be saved.
   $scope.$on('setMode', function(event, data){
 
-    $log.debug("setMode");
+    $log.debug("[Main] setMode: ", data);
 
     if(data.mode && data.mode == currentMode ){
       $log.warn("mode is already set to: ", data.mode);
@@ -191,6 +191,7 @@ var controller = function ($scope, $log, $timeout, ComponentRegister, PlayerServ
     var editable = (data.mode == 'gather');
 
     $timeout(function() {
+      $log.debug("[Main] $timeout: set mode: ", data.mode);
       ComponentRegister.setEditable(editable);
       ComponentRegister.setMode(data.mode);
     });
@@ -199,9 +200,9 @@ var controller = function ($scope, $log, $timeout, ComponentRegister, PlayerServ
       if(data.mode == 'evaluate'){
         $timeout(function(){
 
-          $log.debug("load outcome!!!")
+          $log.debug("[Main] load outcome!!!")
           $scope.loadOutcome(data.options, function(){
-            $log.debug("score received");
+            $log.debug("[Main] score received");
           });
         });
       } else {
@@ -214,11 +215,11 @@ var controller = function ($scope, $log, $timeout, ComponentRegister, PlayerServ
 
     if(data.saveResponses){
       $scope.save(data.saveResponses.isAttempt, data.saveResponses.isComplete, function(){
-        $log.debug("session save successful - call maybeSave");
+        $log.debug("[Main] session save successful - call maybeSave");
         afterMaybeSave();
       });
     } else {
-      $log.debug("no need to save responses - call maybeSave")
+      $log.debug("[Main] no need to save responses - call maybeSave")
       afterMaybeSave();
     }
   });

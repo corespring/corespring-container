@@ -3,15 +3,16 @@ var controller = function ($scope, $log, $timeout, MessageBridge) {
   $scope.messageBridgeListener = function(event){
     var data = typeof(event.data) == "string" ? JSON.parse(event.data) : event.data;
 
-    console.log("[MessageBridge] event received: " + event.data + " : " + typeof(event.data) );
+    $log.info("[MessageBridge] event received: " + event.data + " : " + typeof(event.data) );
     var broadcastToChildren = function(){
+      $log.info("[broadcastToChildren] " + data.message );
       $scope.$broadcast(data.message, data, function(result){
         var response = _.extend(result, {message: data.message + 'Result'});
         MessageBridge.sendMessage('parent', response, false);
       });
     };
 
-    $timeout(broadcastToChildren, 200);
+    $timeout(broadcastToChildren, 400);
   };
 
   MessageBridge.addMessageListener($scope.messageBridgeListener);
