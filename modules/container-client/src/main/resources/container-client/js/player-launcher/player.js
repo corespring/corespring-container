@@ -183,7 +183,10 @@ exports.define = function(isSecure) {
     };
 
 
+    console.log("add ready event listener");
     instance.addListener("ready", function(data){
+
+      console.log(" --> received ready event -> set mode")
       isReady = true; 
       sendSetModeMessage(options.mode);
     });
