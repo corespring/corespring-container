@@ -1,14 +1,14 @@
 import com.mongodb.casbah.{MongoDB, MongoClientURI, MongoClient}
 import org.corespring.container.components.loader.FileComponentLoader
 import org.corespring.mongo.json.services.MongoService
-import org.corespring.play.utils.ControllerInstanceResolver
+import org.corespring.play.utils.{CallBlockOnHeaderFilter, ControllerInstanceResolver}
 import org.corespring.shell.ContainerClientImplementation
 import org.corespring.shell.controllers.Main
-import org.corespring.shell.filters.{AccessControlFilter, ReloadComponentsFilter}
-import play.api.mvc.{WithFilters, Controller}
+import org.corespring.shell.filters.AccessControlFilter
+import play.api.mvc.{RequestHeader, WithFilters, Controller}
 import play.api.{GlobalSettings, Logger, Play}
 
-object Global extends WithFilters(AccessControlFilter, ReloadComponentsFilter) with ControllerInstanceResolver with GlobalSettings{
+object Global extends WithFilters(AccessControlFilter, CallBlockOnHeaderFilter) with ControllerInstanceResolver with GlobalSettings {
 
   private lazy val logger = Logger("global")
 
@@ -22,9 +22,9 @@ object Global extends WithFilters(AccessControlFilter, ReloadComponentsFilter) w
 
   private lazy val mongoClient = MongoClient(mongoUri)
 
-  private lazy val db : MongoDB = {
+  private lazy val db: MongoDB = {
     logger.debug(s"u: ${mongoUri.username}, p: ${mongoUri.password}")
-    mongoClient( mongoUri.database.getOrElse("corespring-container-devt"))
+    mongoClient(mongoUri.database.getOrElse("corespring-container-devt"))
   }
 
   private lazy val containerClient = new ContainerClientImplementation(
@@ -35,11 +35,17 @@ object Global extends WithFilters(AccessControlFilter, ReloadComponentsFilter) w
 
   private lazy val home = new Main {
     def sessionService: MongoService = new MongoService(db("sessions"))
+
     def itemService: MongoService = new MongoService(db("items"))
   }
 
-  override def onStart(app:play.api.Application) : Unit = {
-    ReloadComponentsFilter.components = componentLoader
+  override def onStart(app: play.api.Application): Unit = {
+    CallBlockOnHeaderFilter.block = (rh: RequestHeader) => {
+      if (rh.path.contains(".html") && componentLoader != null) {
+        logger.info("reload components!")
+        componentLoader.reload
+      }
+    }
   }
 
   private lazy val componentLoader = {
