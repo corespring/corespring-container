@@ -1,14 +1,14 @@
 import com.mongodb.casbah.{MongoDB, MongoClientURI, MongoClient}
 import org.corespring.container.components.loader.FileComponentLoader
 import org.corespring.mongo.json.services.MongoService
-import org.corespring.play.utils.ControllerInstanceResolver
+import org.corespring.play.utils.{CallBlockOnHtmlFilter, ControllerInstanceResolver}
 import org.corespring.shell.ContainerClientImplementation
 import org.corespring.shell.controllers.Main
-import org.corespring.shell.filters.{AccessControlFilter, ReloadComponentsFilter}
+import org.corespring.shell.filters.AccessControlFilter
 import play.api.mvc.{WithFilters, Controller}
 import play.api.{GlobalSettings, Logger, Play}
 
-object Global extends WithFilters(AccessControlFilter, ReloadComponentsFilter) with ControllerInstanceResolver with GlobalSettings{
+object Global extends WithFilters(AccessControlFilter, CallBlockOnHtmlFilter) with ControllerInstanceResolver with GlobalSettings{
 
   private lazy val logger = Logger("global")
 
@@ -39,7 +39,10 @@ object Global extends WithFilters(AccessControlFilter, ReloadComponentsFilter) w
   }
 
   override def onStart(app:play.api.Application) : Unit = {
-    ReloadComponentsFilter.components = componentLoader
+    CallBlockOnHtmlFilter.block = () => {
+      logger.info("reload components!")
+      if(componentLoader != null) componentLoader.reload
+    }
   }
 
   private lazy val componentLoader = {
