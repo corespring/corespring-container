@@ -1,0 +1,8 @@
+GET         /                     @org.corespring.shell.controllers.Main.index
+
+GET         /:id/create-session   @org.corespring.shell.controllers.Main.createSessionPage(id)
+POST        /create-session       @org.corespring.shell.controllers.Main.createSession
+
+GET         /assets/*file        controllers.Assets.at(path="/container-client", file)
+
+->          /client              v2Player.Routes

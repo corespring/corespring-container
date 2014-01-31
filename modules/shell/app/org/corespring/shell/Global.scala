@@ -1,8 +1,9 @@
+package org.corespring.shell
+
 import com.mongodb.casbah.{MongoDB, MongoClientURI, MongoClient}
 import org.corespring.container.components.loader.FileComponentLoader
 import org.corespring.mongo.json.services.MongoService
 import org.corespring.play.utils.{CallBlockOnHeaderFilter, ControllerInstanceResolver}
-import org.corespring.shell.ContainerClientImplementation
 import org.corespring.shell.controllers.Main
 import org.corespring.shell.filters.AccessControlFilter
 import play.api.mvc.{RequestHeader, WithFilters, Controller}
@@ -10,7 +11,7 @@ import play.api.{GlobalSettings, Logger, Play}
 
 object Global extends WithFilters(AccessControlFilter, CallBlockOnHeaderFilter) with ControllerInstanceResolver with GlobalSettings {
 
-  private lazy val logger = Logger("global")
+  private lazy val logger = Logger("shell.global")
 
   lazy val controllers: Seq[Controller] = containerClient.controllers :+ home
 
