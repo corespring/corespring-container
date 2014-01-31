@@ -1,0 +1,76 @@
+@(itemId: String, url : String)
+<html>
+  <head>
+
+    <link rel="stylesheet" href="/assets/css/homepage.css">
+    <!--
+    "maxNoOfAttempts").asOpt[Int].getOrElse(default.maxNoOfAttempts),
+    "highlightUserResponse").asOpt[Boolean].getOrElse(default.highlightUserResponse),
+    "highlightCorrectResponse").asOpt[Boolean].getOrElse(default.highlightCorrectResponse),
+    "showFeedback").asOpt[Boolean].getOrElse(default.showFeedback),
+    "allowEmptyResponses").asOpt[Boolean].getOrElse(default.allowEmptyResponses),
+    "submitCompleteMessage").asOpt[String].getOrElse(default.submitCompleteMessage),
+    "submitIncorrectMessage").asOpt[String].getOrElse(default.submitIncorrectMessage)))
+  -->
+
+
+  <!--[if lte IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/json3/3.2.6/json3.min.js"></script>
+  <![endif]-->
+
+
+  </head>
+  <body>
+    <div class="container">
+
+      <h3>Create session for item: @itemId </h3>
+
+      <div class="alert alert-warning">
+        <strong>Note:</strong>
+        These settings don't work at the moment as we need to decide on how the container will run the player.
+        For now just click 'create session' - the settings are in the container-player-controls.js
+      </div>
+
+      <label>Max number of attempts?</label><input type="text" disabled id="maxNoOfAttempts" value="2"><br>
+      <label>Show Feedback?</label><input type="checkbox" disabled id="showFeedback" checked><br>
+      <label>Show Correct Response?</label><input type="checkbox" disabled id="highlightCorrectResponse" checked><br>
+      <label>Show User Response?</label><input type="checkbox" disabled id="highlightUserResponse" checked><br>
+      <label>Allow Empty Response?</label><input type="checkbox" disabled id="allowEmptyResponses" checked><br>
+      <label>Submit Complete Message</label><input type="text" disabled id="submitCompleteMessage"><br>
+      <label>Submit Incorrect Message</label><input type="text" disabled id="submitIncorrectMessage"><br>
+      <button class="btn-primary" id="button"> Create Session</button>
+    </div>
+  </body>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+  <script type="text/javascript">
+  $(document).ready(function(){
+
+    $("#button" ).click(function(){
+      var data = {}
+      data.itemId = "@itemId";
+      data.settings = {
+        maxNoOfAttempts : parseInt( $("#maxNoOfAttempts").val ()),
+        showFeedback : $("#showFeedback").is(":checked"),
+        highlightCorrectResponse : $("#highlightCorrectResponse").is(":checked"),
+        highlightUserResponse : $("#highlightUserResponse").is (":checked"),
+        allowEmptyResponses : $("#allowEmptyResponses").is (":checked")
+      };
+
+  $.ajax({
+        type: 'POST',
+        url: '@url',
+        contentType: 'application/json; charset=utf-8',
+        dataType: 'json',
+        data: JSON.stringify(data)
+      }).done(function(result){
+          window.location = result.url;
+      });
+
+    });
+  })
+  </script>
+</html>
+
+
+

@@ -145,10 +145,15 @@ object Build extends sbt.Build {
     )
 
 
-  val shell = builder.playApp("shell", Some("."))
+  val shell = builder.playApp("shell")
     .settings(
       resolvers ++= Resolvers.all,
-      libraryDependencies ++= Seq(casbah, playS3, scalaz),
+      libraryDependencies ++= Seq(casbah, playS3, scalaz)
+  ).dependsOn(containerClientWeb, componentLoader, mongoJsonService)
+    .aggregate(containerClientWeb, componentLoader, containerClient, componentModel, utils, jsProcessing, mongoJsonService)
+
+  val root = builder.playApp("root", Some("."))
+    .settings(
       sbt.Keys.fork in Test := false,
       // Start grunt on play run
       playOnStarted <+= baseDirectory { base =>
@@ -171,8 +176,11 @@ object Build extends sbt.Build {
           "npm"
         ).map(cmd(_, (base/"modules"/"container-client")))
       }
-  ).dependsOn(containerClientWeb, componentLoader, mongoJsonService)
-    .aggregate(containerClientWeb, componentLoader, containerClient, componentModel, utils, jsProcessing, mongoJsonService)
+
+
+    )
+    .dependsOn(shell)
+    .aggregate(shell)
 
   private def cmd(name: String, base: File): Command = {
     Command.args(name, "<" + name + "-command>") { (state, args) =>
