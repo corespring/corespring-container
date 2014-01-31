@@ -1,14 +1,14 @@
 package org.corespring.container.client.controllers
 
 import java.io.{InputStream, File}
+import org.apache.commons.lang3.StringEscapeUtils
+import org.corespring.container.client.V2PlayerConfig
+import org.corespring.container.client.actions.PlayerLauncherActionBuilder
 import org.corespring.container.client.views.txt.js.ServerLibraryWrapper
 import play.api.Play
 import play.api.Play.current
 import play.api.http.ContentTypes
-import play.api.mvc.{AnyContent, Request, Action, Controller}
-import org.corespring.container.client.actions.PlayerLauncherActionBuilder
-import org.apache.commons.lang3.{StringEscapeUtils, StringUtils}
-import org.corespring.container.client.V2PlayerConfig
+import play.api.mvc.{AnyContent, Request, Controller}
 
 
 trait PlayerLauncher extends Controller {
@@ -41,6 +41,9 @@ trait PlayerLauncher extends Controller {
 
   def builder : PlayerLauncherActionBuilder[AnyContent]
 
+  def editorJs = builder.editorJs{ request =>
+    Ok("alert('coming soon')").as(ContentTypes.JAVASCRIPT)
+  }
 
   /**
    * query: playerPage the player page to load (default: index.html), for a simple player you can pass in container-player.html

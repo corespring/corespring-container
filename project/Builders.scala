@@ -27,6 +27,7 @@ class Builders(org: String, rootScalaVersion: String) {
     credentials += cred,
     Keys.fork in Test := false,
     Keys.parallelExecution in Test := false,
+    scalaVersion := rootScalaVersion,
     publishTo <<= version {
       (v: String) =>
         def isSnapshot = v.trim.contains("-")

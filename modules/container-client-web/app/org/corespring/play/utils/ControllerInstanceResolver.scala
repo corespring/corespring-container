@@ -78,20 +78,19 @@ trait ControllerInstanceResolver extends GlobalSettings {
         }
       } match {
         case Some(c) => {
-          Logger.debug("Found an implementation for " + controllerClass + ": " + c)
+          Logger.trace("Found an implementation for " + controllerClass + ": " + c)
           mappedTypes.put(controllerClass.getCanonicalName, c)
           c.asInstanceOf[A]
         }
         case _ => throw new RuntimeException("Can't find controller for: " + controllerClass)
       }
-
     }
 
     mappedTypes.get(controllerClass.getCanonicalName).map{ c =>
-      logger.debug(s"Already have a controller mapped for ${controllerClass.getCanonicalName}")
+      logger.trace(s"Already have a controller mapped for ${controllerClass.getCanonicalName}")
       c.asInstanceOf[A]
     }.getOrElse{
-      logger.debug(s"Search type hierarchy for ${controllerClass.getCanonicalName}")
+      logger.trace(s"Search type hierarchy for ${controllerClass.getCanonicalName}")
       searchTypeHierarchy
     }
   }

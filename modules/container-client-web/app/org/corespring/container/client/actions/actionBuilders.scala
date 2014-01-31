@@ -22,6 +22,7 @@ trait PlayerHooksActionBuilder[A] extends ClientHooksActionBuilder[A]{
 
 trait EditorClientHooksActionBuilder[A] extends ClientHooksActionBuilder[A]{
   def createItem(block:PlayerRequest[A] => Result) : Action[AnyContent]
+  def editItem(itemId:String)(block:PlayerRequest[A] => Future[SimpleResult]) : Action[AnyContent]
 }
 
 trait ItemActionBuilder[A] {
@@ -53,4 +54,5 @@ trait PlayerLauncherActionBuilder[A]{
    * @return
    */
   def playerJs(block: PlayerJsRequest[A] => Result) : Action[AnyContent]
+  def editorJs(block: PlayerJsRequest[A] => Result) : Action[AnyContent]
 }

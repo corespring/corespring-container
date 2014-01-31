@@ -7,10 +7,11 @@ import play.api.Logger
 import play.api.libs.json.{JsArray, JsValue, Json}
 import play.api.mvc.{AnyContent, Action}
 import play.api.http.ContentTypes
+import controllers.Assets
 
 trait EditorHooks extends BaseHooksWithBuilder[EditorClientHooksActionBuilder[AnyContent]] {
 
-  val log = Logger("editor.hooks")
+  val logger = Logger("editor.hooks")
 
   override def name = "editor"
 
@@ -25,9 +26,21 @@ trait EditorHooks extends BaseHooksWithBuilder[EditorClientHooksActionBuilder[An
     loadedComponents.map{ c => tagName(c.id.org, c.id.name)}
   }
 
+  def editItem(itemId:String) = builder.editItem(itemId){ request =>
+    logger.trace(s"[editItem]: $itemId")
+    Assets.at("/container-client", "editor.html")(request)
+  }
+
+  def createItem = builder.createItem {
+    request: PlayerRequest[AnyContent] =>
+      val itemId = (request.item \ "_id" \ "$oid").as[String]
+      val url = org.corespring.container.client.controllers.routes.Assets.item(itemId, "editor.html").url
+      SeeOther(url)
+  }
+
   override def services(itemId: String): Action[AnyContent] = builder.loadServices(itemId){
     request: PlayerRequest[AnyContent] =>
-      log.debug(s"load editor services: $itemId")
+      logger.debug(s"load editor services: $itemId")
       import org.corespring.container.client.controllers.resources.routes._
 
       val componentJson : Seq[JsValue] = uiComponents.map{ c =>
@@ -77,7 +90,7 @@ trait EditorHooks extends BaseHooksWithBuilder[EditorClientHooksActionBuilder[An
 
   override def componentsCss(sessionId: String):  Action[AnyContent] = builder.loadComponents(sessionId) {
     request =>
-     log.debug(s"load css for session $sessionId")
+     logger.debug(s"load css for session $sessionId")
       val uiCss = uiComponents.map(_.client.css.getOrElse("")).mkString("\n")
       val layoutCss = layoutComponents.map(_.css.getOrElse("")).mkString("\n")
       Ok(s"$uiCss\n$layoutCss").as(ContentTypes.CSS)
@@ -88,13 +101,7 @@ trait EditorHooks extends BaseHooksWithBuilder[EditorClientHooksActionBuilder[An
     ComponentWrapper(moduleName(org, name), d, src ).toString
   }
 
-  def wrapServerJs(componentType:String, definition:String) : String =  ComponentServerWrapper(componentType, definition).toString
+  private def wrapServerJs(componentType:String, definition:String) : String =  ComponentServerWrapper(componentType, definition).toString
 
-  def createItem = builder.createItem {
-    request: PlayerRequest[AnyContent] =>
-      val itemId = (request.item \ "_id" \ "$oid").as[String]
-      val url = org.corespring.container.client.controllers.routes.Assets.item(itemId, "editor.html").url
-      SeeOther(url)
-  }
 
 }

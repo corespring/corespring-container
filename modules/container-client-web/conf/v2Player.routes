@@ -1,6 +1,7 @@
 # Note: The order is important - there are some asset calls that we want to intercept before they hit the *file
 
 GET        /player.js                                      @org.corespring.container.client.controllers.PlayerLauncher.playerJs
+GET        /editor.js                                      @org.corespring.container.client.controllers.PlayerLauncher.editorJs
 
 
 GET        /js/*file                                       controllers.Assets.at(path="/container-client/js", file)
@@ -11,7 +12,7 @@ GET        /libs/:orgName/:componentName/*file             @org.corespring.conta
 
 # Hooks for the player: config, services + components
 GET        /session/:sessionId/player                      @org.corespring.container.client.controllers.hooks.PlayerHooks.loadPlayerForSession(sessionId:String)
-GET        /session/:sessionId/container-player.html       @org.corespring.container.client.controllers.hooks.PlayerHooks.loadPlayerForSession(sessionId:String)
+#GET        /session/:sessionId/container-player.html       @org.corespring.container.client.controllers.hooks.PlayerHooks.loadPlayerForSession(sessionId:String)
 GET        /session/:sessionId/player-:resource.:suffix    @org.corespring.container.client.controllers.hooks.PlayerHooks.resource(resource:String, suffix:String, sessionId:String)
 GET        /session/everything/:id.json                    @org.corespring.container.client.controllers.resources.Session.loadEverything(id:String)
 GET        /session/:sessionId/*file                       @org.corespring.container.client.controllers.Assets.session(sessionId:String, file)
@@ -37,7 +38,7 @@ GET        /rig/:orgName.:compName/*file                   @org.corespring.conta
 
 # Hooks for the editor: config, services + components
 GET        /editor/create-item                             @org.corespring.container.client.controllers.hooks.EditorHooks.createItem
-GET        /editor/:itemId/index.html                      @org.corespring.container.client.controllers.Assets.item(itemId:String, file = "editor.html")
+GET        /editor/:itemId/index.html                      @org.corespring.container.client.controllers.hooks.EditorHooks.editItem(itemId:String)
 GET        /editor/:itemId/editor-:resource.:suffix        @org.corespring.container.client.controllers.hooks.EditorHooks.resource(resource:String, suffix:String,itemId:String)
 GET        /editor/:itemId/*file                           @org.corespring.container.client.controllers.Assets.item(itemId:String, file)
 POST       /editor/:itemId/*file                           @org.corespring.container.client.controllers.Assets.upload(itemId, file)
