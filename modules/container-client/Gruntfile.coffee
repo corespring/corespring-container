@@ -43,6 +43,7 @@ module.exports = (grunt) ->
       dest: '<%= common.dist %>/js/prod-editor.js'
       concatDest: '.tmp/concat/js/editor.js'
       src: [
+        '<%= common.dist %>/bower_components/mathjs/dist/math.min.js',
         '<%= common.dist %>/bower_components/saxjs/lib/sax.js',
         '<%= common.dist %>/js/corespring/core-library.js',
         '<%= common.dist %>/js/corespring/server/init-core-library.js',
