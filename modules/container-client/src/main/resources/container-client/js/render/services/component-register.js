@@ -22,7 +22,8 @@ angular.module('corespring-player.services').factory('ComponentRegister', ['$log
         component.answerChangedHandler(answerChangedHandler);
       }
 
-      if(editable !== undefined && component.editable){
+      if(editable !== undefined && editable !== null && component.editable){
+        $log.debug("init ", id, "to editable: ", editable);
         component.editable(editable);
       }
 
