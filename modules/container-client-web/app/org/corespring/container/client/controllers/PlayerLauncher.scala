@@ -35,6 +35,7 @@ trait PlayerLauncher extends Controller {
   }
 
   import org.corespring.container.client.controllers.hooks.routes.PlayerHooks
+  import org.corespring.container.client.controllers.hooks.routes.EditorHooks
   import org.corespring.container.client.controllers.routes.Assets
 
   val SecureMode = "corespring.player.secure"
@@ -42,7 +43,59 @@ trait PlayerLauncher extends Controller {
   def builder : PlayerLauncherActionBuilder[AnyContent]
 
   def editorJs = builder.editorJs{ request =>
-    Ok("alert('coming soon')").as(ContentTypes.JAVASCRIPT)
+
+    val rootUrl = playerConfig.rootUrl.getOrElse(BaseUrl(request))
+
+    val itemEditorUrl = s"${EditorHooks.editItem(":itemId")}"
+
+    val defaultOptions : JsValue = Json.obj(
+      "corespringUrl"  ->  rootUrl,
+      "path"  ->   itemEditorUrl )
+
+    val jsPath = "container-client/js/player-launcher/editor.js"
+
+    val bootstrap = "org.corespring.players.ItemEditor = corespring.require('editor');"
+
+    make(jsPath, defaultOptions, bootstrap)
+  }
+
+
+  private def pathToNameAndContents(p: String) = {
+    import grizzled.file.GrizzledFile._
+    Play.resource(p).map {
+      r =>
+        val name = new File(r.getFile).basename.getName.replace(".js", "")
+        val contents = scala.io.Source.fromInputStream(r.getContent().asInstanceOf[InputStream]).getLines.mkString("\n")
+        (name, contents)
+    }.getOrElse((p, ""))
+  }
+
+  private def make( jsPath : String, options : JsValue, bootstrapLine:String)(implicit request :Request[AnyContent]) : Result = {
+
+    val defaultOptions = ("default-options" , s"module.exports = ${Json.stringify(options)}" )
+    val launchErrors = ("launcher-errors", errorsToModule(request.errors))
+    val rawJs = Seq("container-client/js/corespring/core-library.js")
+    val wrappedJs = jsPath +: Seq(
+      "container-client/js/player-launcher/player-errors.js",
+      "container-client/js/player-launcher/player-instance.js",
+      "container-client/js/player-launcher/root-level-listener.js"
+    )
+
+    val contents = rawJs.map(pathToNameAndContents(_)).map(_._2)
+    val wrappedNameAndContents = wrappedJs.map(pathToNameAndContents) :+ defaultOptions :+ launchErrors
+    val wrappedContents = wrappedNameAndContents.map(tuple => ServerLibraryWrapper(tuple._1, tuple._2))
+
+    val bootstrap =
+      s"""
+        |window.org = window.org || {};
+        |org.corespring = org.corespring || {};
+        |org.corespring.players = org.corespring.players || {};
+        |$bootstrapLine
+        |
+      """.stripMargin
+    Ok(
+      (contents ++ wrappedContents :+ bootstrap).mkString("\n")
+    ).as(ContentTypes.JAVASCRIPT).withSession( session + (SecureMode, request.isSecure.toString))
   }
 
   /**
@@ -80,15 +133,6 @@ trait PlayerLauncher extends Controller {
       "container-client/js/player-launcher/root-level-listener.js"
     )
 
-    def pathToNameAndContents(p: String) = {
-      import grizzled.file.GrizzledFile._
-      Play.resource(p).map {
-        r =>
-          val name = new File(r.getFile).basename.getName.replace(".js", "")
-          val contents = scala.io.Source.fromInputStream(r.getContent().asInstanceOf[InputStream]).getLines.mkString("\n")
-          (name, contents)
-      }.getOrElse((p, ""))
-    }
 
     val contents = rawJs.map(pathToNameAndContents(_)).map(_._2)
     val wrappedNameAndContents = wrappedJs.map(pathToNameAndContents) :+ defaultOptions :+ launchErrors
