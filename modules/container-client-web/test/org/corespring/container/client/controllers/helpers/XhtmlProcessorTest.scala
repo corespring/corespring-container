@@ -10,7 +10,7 @@ class XhtmlProcessorTest extends Specification with XhtmlProcessor {
 
       val xhtml = "<div><corespring-apple id='1'></corespring-apple><corespring-banana id='2'></corespring-banana></div>"
 
-      tagNamesToAttributes(xhtml).trim ===
+      tagNamesToAttributes(xhtml).get.trim ===
         """<div>
           |<div id="1" corespring-apple=""></div>
           |<div id="2" corespring-banana=""></div>

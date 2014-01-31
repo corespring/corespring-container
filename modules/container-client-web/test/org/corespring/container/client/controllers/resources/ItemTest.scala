@@ -8,7 +8,7 @@ import org.corespring.container.components.outcome.ScoreProcessor
 import play.api.test.{FakeHeaders, FakeRequest}
 import play.api.test.Helpers._
 import org.specs2.mock.Mockito
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.{JsString, JsValue, Json}
 import org.specs2.specification.Scope
 import org.corespring.container.client.controllers.resources.Item.Errors
 
@@ -59,13 +59,13 @@ class ItemTest extends Specification with Mockito {
     }
 
     "fail to save if save failed" in new item(saveResult = None) {
-      val result = item.save("x")(FakeRequest("", "", FakeHeaders(), AnyContentAsJson(Json.obj())))
+      val result = item.save("x")(FakeRequest("", "", FakeHeaders(), AnyContentAsJson(Json.obj("xhtml" -> JsString("<root/>")))))
       status(result) === BAD_REQUEST
       contentAsString(result) === Errors.errorSaving
     }
 
     "save if save worked" in new item {
-      val result = item.save("x")(FakeRequest("", "", FakeHeaders(), AnyContentAsJson(Json.obj())))
+      val result = item.save("x")(FakeRequest("", "", FakeHeaders(), AnyContentAsJson(Json.obj("xhtml" -> JsString("<root/>")))))
       status(result) === OK
       contentAsString(result) === "{}"
     }
