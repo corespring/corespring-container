@@ -88,7 +88,9 @@ trait PlayerLauncher extends Controller {
         val name = new File(r.getFile).basename.getName.replace(".js", "")
         val contents = scala.io.Source.fromInputStream(r.getContent().asInstanceOf[InputStream]).getLines.mkString("\n")
         (name, contents)
-    }.getOrElse((p, ""))
+    }.getOrElse{
+      throw new RuntimeException(s"Can't find resource for path: $p")
+    }
   }
 
   private def make(jsPath: String, options: JsValue, bootstrapLine: String)(implicit request: PlayerJsRequest[AnyContent]): Result = {

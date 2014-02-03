@@ -35,8 +35,8 @@ describe('player launcher', function(){
   defaultOptions.corespringUrl = "http://blah.com";
 
   beforeEach(function(){
-    originalInstance = corespring.require("player-instance");
-    mockInstance = corespring.module("player-instance", MockInstance);
+    originalInstance = corespring.require("instance");
+    mockInstance = corespring.module("instance", MockInstance);
     launchErrors = corespring.module("launcher-errors", MockErrors);
     launcher = corespring.require("player");
   });
@@ -58,6 +58,7 @@ describe('player launcher', function(){
 
     var Player = launcher.define(secureMode);
     
+    //$("body").append("<div id='blah'></div>") 
     var player = new Player("blah", {}, function(err){ 
       lastError = err;
     });
