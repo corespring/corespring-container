@@ -11,6 +11,7 @@ import play.api.libs.json.Json
 import play.api.mvc._
 import scala.concurrent.{ExecutionContext, Future}
 import play.api.Logger
+import org.corespring.shell.SessionKeys
 
 
 trait EditorHooks extends ContainerEditorHooks {
@@ -63,17 +64,22 @@ trait EditorHooks extends ContainerEditorHooks {
         }.getOrElse(BadRequest("Error creating item"))
     }
 
-    override def editItem(itemId: String)(block: (PlayerRequest[AnyContent]) => Future[SimpleResult]): Action[AnyContent] = Action.async {
+    override def editItem(itemId: String)(error: (Int, String) => Future[SimpleResult])(block: (PlayerRequest[AnyContent]) => Future[SimpleResult]): Action[AnyContent] = Action.async {
       r =>
-
-        logger.debug(s"[editItem] $itemId")
-
-        itemService.load(itemId).map {
-          item =>
-            block(PlayerRequest(item, r))
+        r.session.get(SessionKeys.failLoadPlayer).map {
+          fail =>
+            error(1001, "Some error occurred")
         }.getOrElse {
-          import ExecutionContext.Implicits.global
-          Future(NotFound(s"Can't find item with id: $itemId"))
+          logger.debug(s"[editItem] $itemId")
+          itemService.load(itemId).map {
+            item =>
+              block(PlayerRequest(item, r))
+          }.getOrElse {
+            import ExecutionContext.Implicits.global
+            Future(NotFound(s"Can't find item with id: $itemId"))
+          }
+
+
         }
     }
   }

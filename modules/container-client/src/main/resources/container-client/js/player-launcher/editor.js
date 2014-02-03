@@ -1,6 +1,6 @@
 var EditorDefinition = function(element, options, errorCallback){
 
-  var errors = require("player-errors");
+  var errors = require("errors");
   var launcherErrors = require("launcher-errors");
 
   if(launcherErrors.hasErrors){
@@ -31,20 +31,24 @@ var EditorDefinition = function(element, options, errorCallback){
     return;
   }
 
-  var instance = require("player-instance")(element, options);
+  options.url = (options.corespringUrl + options.path).replace(":itemId", options.itemId);
 
   errorCallback = errorCallback || function (error) {
     throw "error occurred, code: " + error.code + ", message: " + error.message;
   };
+
+  var InstanceDef = require("instance")
+  var instance = new InstanceDef(element, options, errorCallback);
 
   instance.addListener("launch-error", function(data){
     var error = errors.EXTERNAL_ERROR(data.code + ": " + data.detailedMessage);
     errorCallback(error);
   });
 
+
 };
 
-module.exports = new EditorDefinition();
+module.exports = EditorDefinition;
 
 
 

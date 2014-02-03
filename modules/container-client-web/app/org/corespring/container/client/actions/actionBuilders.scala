@@ -22,7 +22,7 @@ trait PlayerHooksActionBuilder[A] extends ClientHooksActionBuilder[A]{
 
 trait EditorClientHooksActionBuilder[A] extends ClientHooksActionBuilder[A]{
   def createItem(block:PlayerRequest[A] => Result) : Action[AnyContent]
-  def editItem(itemId:String)(block:PlayerRequest[A] => Future[SimpleResult]) : Action[AnyContent]
+  def editItem(itemId:String)(error:(Int, String) => Future[SimpleResult])(block:PlayerRequest[A] => Future[SimpleResult]) : Action[AnyContent]
 }
 
 trait ItemActionBuilder[A] {

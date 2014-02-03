@@ -1,7 +1,7 @@
 exports.define = function(isSecure) {
   var PlayerDefinition = function(element, options, errorCallback){
 
-    var errors = require("player-errors");
+    var errors = require("errors");
     var launcherErrors = require("launcher-errors");
 
     if(launcherErrors.hasErrors){
@@ -10,8 +10,6 @@ exports.define = function(isSecure) {
       }
       return;
     };
-
-    var definition = this;
 
     var isReady = false;
 
@@ -46,7 +44,17 @@ exports.define = function(isSecure) {
       return;
     }
 
-    var instance = require("player-instance")(element, options);
+    var InstanceDef = require("instance");
+
+    var prepareUrl = function(){
+      var id = options.mode === "gather" ? options.itemId : options.sessionId;
+      var path = options.paths[options.mode];
+      return (options.corespringUrl + path).replace(":id", id);
+    };
+
+    options.url = prepareUrl();
+
+    var instance = new InstanceDef(element, options, errorCallback);
 
     var isValidMode = function (m) {
       if (!m) return false;
@@ -183,10 +191,7 @@ exports.define = function(isSecure) {
     };
 
 
-    console.log("add ready event listener");
     instance.addListener("ready", function(data){
-
-      console.log(" --> received ready event -> set mode")
       isReady = true; 
       sendSetModeMessage(options.mode);
     });
@@ -195,6 +200,3 @@ exports.define = function(isSecure) {
 
   return PlayerDefinition;
 };
-
-
-
