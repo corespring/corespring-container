@@ -54,5 +54,4 @@ trait PlayerLauncherActionBuilder[A]{
    * @return
    */
   def playerJs(block: PlayerJsRequest[A] => Result) : Action[AnyContent]
-  def editorJs(block: PlayerJsRequest[A] => Result) : Action[AnyContent]
 }
