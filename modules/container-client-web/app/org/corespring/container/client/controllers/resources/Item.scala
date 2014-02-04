@@ -1,6 +1,6 @@
 package org.corespring.container.client.controllers.resources
 
-import org.corespring.container.client.actions.{ScoreItemRequest, ItemActionBuilder, SaveItemRequest, ItemRequest}
+import org.corespring.container.client.actions.{ScoreItemRequest, ItemActions, SaveItemRequest, ItemRequest}
 import org.corespring.container.client.controllers.resources.Item.Errors
 import org.corespring.container.components.outcome.ScoreProcessor
 import org.corespring.container.components.response.OutcomeProcessor
@@ -22,7 +22,7 @@ trait Item extends Controller {
 
   private lazy val logger = Logger("container.item")
 
-  def builder: ItemActionBuilder[AnyContent]
+  def actions: ItemActions[AnyContent]
 
   def scoreProcessor: ScoreProcessor
 
@@ -37,12 +37,12 @@ trait Item extends Controller {
     "allowEmptyResponses" -> JsBoolean(true)
   )
 
-  def load(itemId: String) = builder.load(itemId) {
+  def load(itemId: String) = actions.load(itemId) {
     request: ItemRequest[AnyContent] =>
       Ok(Json.obj("item" -> request.item))
   }
 
-  def save(itemId: String) = builder.save(itemId) {
+  def save(itemId: String) = actions.save(itemId) {
     request: SaveItemRequest[AnyContent] =>
       request.body.asJson.map {
 
@@ -71,7 +71,7 @@ trait Item extends Controller {
       }.getOrElse(BadRequest(Errors.noJson))
   }
 
-  def getScore(id: String) = builder.getScore(id) {
+  def getScore(id: String) = actions.getScore(id) {
     request: ScoreItemRequest[AnyContent] =>
       request.body.asJson.map {
         answers =>

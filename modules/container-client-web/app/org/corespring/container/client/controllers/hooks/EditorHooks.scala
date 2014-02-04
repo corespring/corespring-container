@@ -1,16 +1,16 @@
 package org.corespring.container.client.controllers.hooks
 
-import org.corespring.container.client.actions.{EditorClientHooksActionBuilder, PlayerRequest}
+import controllers.Assets
+import org.corespring.container.client.actions.{EditorActions, PlayerRequest}
 import org.corespring.container.client.views.txt.js.{ComponentServerWrapper, ComponentWrapper, EditorServices}
 import org.corespring.container.components.model.{UiComponent, Component}
 import play.api.Logger
+import play.api.http.ContentTypes
 import play.api.libs.json.{JsArray, JsValue, Json}
 import play.api.mvc.{AnyContent, Action}
-import play.api.http.ContentTypes
-import controllers.Assets
 import scala.concurrent.{ExecutionContext, Future}
 
-trait EditorHooks extends BaseHooksWithBuilder[EditorClientHooksActionBuilder[AnyContent]] {
+trait EditorHooks extends BaseHooksWithActions[EditorActions[AnyContent]] {
 
   val logger = Logger("editor.hooks")
 
@@ -29,24 +29,24 @@ trait EditorHooks extends BaseHooksWithBuilder[EditorClientHooksActionBuilder[An
     }
   }
 
-  def editItem(itemId: String) = builder.editItem(itemId) {
+  def editItem(itemId: String) = actions.editItem(itemId) {
     (code, msg) =>
       import ExecutionContext.Implicits.global
-      Future(Ok(org.corespring.container.client.views.html.error.main(code, msg)))
+      Future(Status(code)(org.corespring.container.client.views.html.error.main(code, msg)))
   } {
     request =>
       logger.trace(s"[editItem]: $itemId")
       Assets.at("/container-client", "editor.html")(request)
   }
 
-  def createItem = builder.createItem {
+  def createItem = actions.createItem {
     request: PlayerRequest[AnyContent] =>
       val itemId = (request.item \ "_id" \ "$oid").as[String]
       val url = org.corespring.container.client.controllers.routes.Assets.item(itemId, "editor.html").url
       SeeOther(url)
   }
 
-  override def services(itemId: String): Action[AnyContent] = builder.loadServices(itemId) {
+  override def services(itemId: String): Action[AnyContent] = actions.loadServices(itemId) {
     request: PlayerRequest[AnyContent] =>
       logger.debug(s"load editor services: $itemId")
       import org.corespring.container.client.controllers.resources.routes._
@@ -83,7 +83,7 @@ trait EditorHooks extends BaseHooksWithBuilder[EditorClientHooksActionBuilder[An
   }
 
 
-  override def componentsJs(itemId: String): Action[AnyContent] = builder.loadComponents(itemId) {
+  override def componentsJs(itemId: String): Action[AnyContent] = actions.loadComponents(itemId) {
     request: PlayerRequest[AnyContent] =>
       val uiJs = uiComponents.map(uiComponentToJs).mkString("\n")
       val libJs = libraries.map(libraryToJs(true, true)).mkString("\n")
@@ -97,7 +97,7 @@ trait EditorHooks extends BaseHooksWithBuilder[EditorClientHooksActionBuilder[An
       // -----------------------------------------
   """
 
-  override def componentsCss(sessionId: String): Action[AnyContent] = builder.loadComponents(sessionId) {
+  override def componentsCss(sessionId: String): Action[AnyContent] = actions.loadComponents(sessionId) {
     request =>
       logger.debug(s"load css for session $sessionId")
       val uiCss = uiComponents.map(_.client.css.getOrElse("")).mkString("\n")

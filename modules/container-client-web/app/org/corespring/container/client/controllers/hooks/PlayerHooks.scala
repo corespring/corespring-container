@@ -1,6 +1,7 @@
 package org.corespring.container.client.controllers.hooks
 
-import org.corespring.container.client.actions.{PlayerHooksActionBuilder, PlayerRequest}
+import org.corespring.container.client.actions.PlayerActions
+import org.corespring.container.client.actions.PlayerRequest
 import org.corespring.container.client.controllers.helpers.LayoutComponentReading
 import org.corespring.container.client.views.txt.js.PlayerServices
 import org.corespring.container.components.model.Component
@@ -9,17 +10,15 @@ import play.api.http.ContentTypes
 import play.api.libs.json.JsValue
 import play.api.mvc._
 import scala.concurrent.{Future, Await}
-import org.corespring.container.client.actions.PlayerRequest
-import play.api.mvc.SimpleResult
 
 
-trait PlayerHooks extends BaseHooksWithBuilder[PlayerHooksActionBuilder[AnyContent]] with LayoutComponentReading {
+trait PlayerHooks extends BaseHooksWithActions[PlayerActions[AnyContent]] with LayoutComponentReading {
 
   val log = Logger("player.hooks")
 
   def name = "player"
 
-  override def services(sessionId: String): Action[AnyContent] = builder.loadServices(sessionId) {
+  override def services(sessionId: String): Action[AnyContent] = actions.loadServices(sessionId) {
     request: PlayerRequest[AnyContent] =>
       import org.corespring.container.client.controllers.resources.routes._
 
@@ -38,7 +37,7 @@ trait PlayerHooks extends BaseHooksWithBuilder[PlayerHooksActionBuilder[AnyConte
       Ok(jsServices).as("text/javascript")
   }
 
-  override def componentsJs(sessionId: String): Action[AnyContent] = builder.loadComponents(sessionId) {
+  override def componentsJs(sessionId: String): Action[AnyContent] = actions.loadComponents(sessionId) {
     request: PlayerRequest[AnyContent] =>
       log.debug(s"load js for session $sessionId")
       val typesUsed = componentTypes(request.item)
@@ -46,7 +45,7 @@ trait PlayerHooks extends BaseHooksWithBuilder[PlayerHooksActionBuilder[AnyConte
   }
 
 
-  override def componentsCss(sessionId: String): Action[AnyContent] = builder.loadComponents(sessionId) {
+  override def componentsCss(sessionId: String): Action[AnyContent] = actions.loadComponents(sessionId) {
     request =>
       log.debug(s"load css for session $sessionId")
       val typesUsed = componentTypes(request.item)
@@ -58,7 +57,7 @@ trait PlayerHooks extends BaseHooksWithBuilder[PlayerHooksActionBuilder[AnyConte
       Ok(s"$uiCss\n$layoutCss").as(ContentTypes.CSS)
   }
 
-  def createSessionForItem(itemId: String): Action[AnyContent] = builder.createSessionForItem(itemId) {
+  def createSessionForItem(itemId: String): Action[AnyContent] = actions.createSessionForItem(itemId) {
     request =>
       val file = request.queryString.get("file").map(_(0)).getOrElse("index.html")
       import org.corespring.container.client.controllers.hooks.routes.{PlayerHooks => Routes}
@@ -71,7 +70,7 @@ trait PlayerHooks extends BaseHooksWithBuilder[PlayerHooksActionBuilder[AnyConte
     if(has("container-player.html")) "container-player.html" else "player.html"
   }
 
-  def loadPlayerForSession(sessionId: String) = builder.loadPlayerForSession(sessionId){ (code: Int, msg: String ) =>
+  def loadPlayerForSession(sessionId: String) = actions.loadPlayerForSession(sessionId){ (code: Int, msg: String ) =>
     Ok(org.corespring.container.client.views.html.error.main(code, msg))
   } {
     request =>

@@ -3,7 +3,7 @@ package org.corespring.container.client.controllers
 import java.io.{InputStream, File}
 import org.apache.commons.lang3.StringEscapeUtils
 import org.corespring.container.client.V2PlayerConfig
-import org.corespring.container.client.actions.{PlayerJsRequest, PlayerLauncherActionBuilder}
+import org.corespring.container.client.actions.{PlayerJsRequest, PlayerLauncherActions}
 import org.corespring.container.client.views.txt.js.ServerLibraryWrapper
 import play.api.Play
 import play.api.Play.current
@@ -41,7 +41,7 @@ trait PlayerLauncher extends Controller {
 
   val SecureMode = "corespring.player.secure"
 
-  def builder: PlayerLauncherActionBuilder[AnyContent]
+  def builder: PlayerLauncherActions[AnyContent]
 
   def editorJs = builder.editorJs {
     implicit request =>

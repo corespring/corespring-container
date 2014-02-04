@@ -2,7 +2,7 @@ package org.corespring.shell
 
 import org.corespring.amazon.s3.ConcreteS3Service
 import org.corespring.container.client.V2PlayerConfig
-import org.corespring.container.client.actions.{PlayerJsRequest, PlayerLauncherActionBuilder}
+import org.corespring.container.client.actions.{PlayerJsRequest, PlayerLauncherActions}
 import org.corespring.container.client.controllers._
 import org.corespring.container.components.model.Component
 import org.corespring.container.components.model.Library
@@ -34,7 +34,7 @@ class ContainerClientImplementation(
 
     override def playerConfig: V2PlayerConfig = V2PlayerConfig(rootConfig)
 
-    def builder: PlayerLauncherActionBuilder[AnyContent] = new PlayerLauncherActionBuilder[AnyContent] {
+    def builder: PlayerLauncherActions[AnyContent] = new PlayerLauncherActions[AnyContent] {
 
       /**
        * Provides a few hooks so that you can simulate scenarios when loading player:

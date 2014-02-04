@@ -1,7 +1,6 @@
 package org.corespring.shell.controllers.editor
 
-import org.bson.types.ObjectId
-import org.corespring.container.client.actions.EditorClientHooksActionBuilder
+import org.corespring.container.client.actions.EditorActions
 import org.corespring.container.client.actions.PlayerRequest
 import org.corespring.container.client.actions.SessionIdRequest
 import org.corespring.container.client.controllers.hooks.{EditorHooks => ContainerEditorHooks}
@@ -19,7 +18,7 @@ trait EditorHooks extends ContainerEditorHooks {
   def itemService: MongoService
 
 
-  def builder: EditorClientHooksActionBuilder[AnyContent] = new EditorClientHooksActionBuilder[AnyContent] {
+  override def actions: EditorActions[AnyContent] = new EditorActions[AnyContent] {
 
     lazy val logger = Logger("editor.hooks.action.builder")
 
@@ -46,8 +45,6 @@ trait EditorHooks extends ContainerEditorHooks {
       request: Request[AnyContent] =>
 
         logger.debug("[createItem]")
-
-        val id = ObjectId.get
 
         val newItem = Json.obj(
           "components" -> Json.obj(),

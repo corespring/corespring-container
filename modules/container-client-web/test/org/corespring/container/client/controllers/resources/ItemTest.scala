@@ -2,7 +2,7 @@ package org.corespring.container.client.controllers.resources
 
 import org.specs2.mutable.Specification
 import org.corespring.container.components.response.OutcomeProcessor
-import org.corespring.container.client.actions.{SaveItemRequest, ItemRequest, ScoreItemRequest, ItemActionBuilder}
+import org.corespring.container.client.actions.{SaveItemRequest, ItemRequest, ScoreItemRequest, ItemActions}
 import play.api.mvc.{AnyContentAsJson, Action, Result, AnyContent}
 import org.corespring.container.components.outcome.ScoreProcessor
 import play.api.test.{FakeHeaders, FakeRequest}
@@ -18,7 +18,7 @@ class ItemTest extends Specification with Mockito {
   class item(saveResult: Option[JsValue] = Some(Json.obj())) extends Scope {
     val item = new Item {
 
-      def builder: ItemActionBuilder[AnyContent] = new ItemActionBuilder[AnyContent] {
+      def actions: ItemActions[AnyContent] = new ItemActions[AnyContent] {
 
         def save(itemId: String)(block: (SaveItemRequest[AnyContent]) => Result): Action[AnyContent] = Action {
           request => block(SaveItemRequest(Json.obj(), (s, j) => saveResult, request))
