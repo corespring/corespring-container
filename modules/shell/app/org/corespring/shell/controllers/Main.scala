@@ -24,7 +24,7 @@ trait Main extends Controller {
 
       def failLoadPlayerForSession = request.getQueryString(SessionKeys.failLoadPlayer).isDefined
 
-      val items: Seq[(String, String, String, String)] = itemService.list("metadata.title").map {
+      val items: Seq[(String, String, String, String)] = itemService.list("metadata.title").sortBy(_.toString).map {
         json: JsValue =>
           val name = (json \ "metadata" \ "title").as[String]
           val id = (json \ "_id" \ "$oid").as[String]
