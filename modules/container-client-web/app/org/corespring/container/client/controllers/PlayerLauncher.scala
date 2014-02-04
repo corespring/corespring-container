@@ -47,9 +47,24 @@ trait PlayerLauncher extends Controller {
     implicit request =>
       val rootUrl = playerConfig.rootUrl.getOrElse(BaseUrl(request))
       val itemEditorUrl = s"${EditorHooks.editItem(":itemId")}"
+
+      val create = org.corespring.container.client.controllers.resources.routes.Item.create()
+
       val defaultOptions: JsValue = Json.obj(
         "corespringUrl" -> rootUrl,
-        "path" -> itemEditorUrl)
+        "paths" -> Json.obj(
+
+          "editor" -> Json.obj(
+            "method" -> EditorHooks.editItem(":itemId").method,
+            "url" -> itemEditorUrl
+          ),
+
+          "create" -> Json.obj(
+            "method" -> create.method,
+            "url" -> create.url
+          )
+        )
+      )
       val jsPath = "container-client/js/player-launcher/editor.js"
       val bootstrap = "org.corespring.players.ItemEditor = corespring.require('editor');"
       make(jsPath, defaultOptions, bootstrap)
@@ -88,7 +103,7 @@ trait PlayerLauncher extends Controller {
         val name = new File(r.getFile).basename.getName.replace(".js", "")
         val contents = scala.io.Source.fromInputStream(r.getContent().asInstanceOf[InputStream]).getLines.mkString("\n")
         (name, contents)
-    }.getOrElse{
+    }.getOrElse {
       throw new RuntimeException(s"Can't find resource for path: $p")
     }
   }

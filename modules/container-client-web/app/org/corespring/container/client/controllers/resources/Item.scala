@@ -37,6 +37,14 @@ trait Item extends Controller {
     "allowEmptyResponses" -> JsBoolean(true)
   )
 
+  def create = actions.create {
+    request =>
+      (request.item \ "_id" \ "$oid").asOpt[String].map {
+        itemId =>
+          Ok(Json.obj("itemId" -> itemId))
+      }.getOrElse(BadRequest(Json.obj("error" -> "No item id found")))
+  }
+
   def load(itemId: String) = actions.load(itemId) {
     request: ItemRequest[AnyContent] =>
       Ok(Json.obj("item" -> request.item))

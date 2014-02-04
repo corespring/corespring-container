@@ -29,6 +29,7 @@ trait ItemActions[A] {
   def load(itemId:String)(block: ItemRequest[A] => Result ) : Action[AnyContent]
   def save(itemId:String)(block: SaveItemRequest[A] => Result ) : Action[AnyContent]
   def getScore(itemId: String)(block: ScoreItemRequest[A] => Result): Action[AnyContent]
+  def create(block:ItemRequest[A] => Result) : Action[AnyContent]
 }
 
 trait SessionActions[A]{

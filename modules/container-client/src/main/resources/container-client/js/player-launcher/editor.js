@@ -10,8 +10,6 @@ var EditorDefinition = function(element, options, errorCallback){
     return;
   };
 
-  var definition = this;
-
   var isReady = false;
 
   var defaultOptions = require("default-options");
@@ -31,21 +29,56 @@ var EditorDefinition = function(element, options, errorCallback){
     return;
   }
 
-  options.url = (options.corespringUrl + options.path).replace(":itemId", options.itemId);
-
+  var InstanceDef = require("instance")
+  
   errorCallback = errorCallback || function (error) {
     throw "error occurred, code: " + error.code + ", message: " + error.message;
   };
+  
+  var loadPaths = function(options, name){
+    if(!options.paths || !options.paths[name]){
+      errorCallback({code: -1, message: name + " not part of options"});
+      return; 
+    } 
+    return options.paths[name];
+  };
 
-  var InstanceDef = require("instance")
-  var instance = new InstanceDef(element, options, errorCallback);
+  var createItem = function(options, onSuccess, onError){
+    var createCall = loadPaths(options, "create");
 
-  instance.addListener("launch-error", function(data){
-    var error = errors.EXTERNAL_ERROR(data.code + ": " + data.detailedMessage);
-    errorCallback(error);
-  });
+    $.ajax({
+      type: createCall.method,
+      url: options.corespringUrl + createCall.url,
+      data: options,
+      success: onSuccess,
+      error: onError,
+      dataType: "json" 
+    });
+  }
 
+  var loadItem = function(itemId, options){
+    var editorPaths = loadPaths(options, "editor");
+    options.url = (options.corespringUrl + editorPaths.url).replace(":itemId", itemId);
+    var instance = new InstanceDef(element, options, errorCallback);
 
+    instance.addListener("launch-error", function(data){
+      var error = errors.EXTERNAL_ERROR(data.code + ": " + data.detailedMessage);
+      errorCallback(error);
+    });
+  }
+
+  if(!options.itemId){
+    createItem(options, 
+      function(data){
+        console.log("item created");
+        loadItem(data.itemId, options);
+      }, 
+      function(err){
+        console.log(err);
+      });
+  } else {
+    loadItem(options.itemId, options)
+  }
 };
 
 module.exports = EditorDefinition;
