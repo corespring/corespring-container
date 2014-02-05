@@ -1,0 +1,48 @@
+{
+  "metadata" : {
+    "title" : "Multiple choice horizontal"
+  },
+  "files" : [
+    { "name" : "cute-puppy.jpg", "contentType" : "image/jpeg" },
+    { "name" : "cute-kitten.jpg", "contentType" : "image/jpeg" },
+    { "name" : "style.css", "contentType" : "text/css", "content" : "body{ color: #99ff99; }" }
+   ],
+  "xhtml" : "<div><corespring-multiple-choice id='4'></corespring-multiple-choice></div>",
+  "components" : {
+    "4" : {
+      "componentType" : "corespring-multiple-choice",
+      "title": "Fruits",
+      "weight" : 10,
+      "correctResponse" : { "value" : ["carrot", "turnip", "potato"] },
+      "feedback" : [
+        { "value" : "banana", "feedback" : "Incorrect"},
+        { "value" : "carrot", "feedback" : "Correct", "notChosenFeedback" : "This is a vegetable"},
+        { "value" : "apple", "feedback" : "it's a fruit" },
+        { "value" : "turnip", "feedback" : "Correct", "notChosenFeedback" : "This is a vegetable" },
+        { "value" : "potato", "feedback" : "Correct", "notChosenFeedback" : "This is a vegetable" },
+        { "value" : "wheat", "feedback" : "Incorrect" }
+      ],
+      "model" : {
+        "prompt": "Which of these is a vegetable?",
+        "config": {
+          "orientation": "horizontal",
+          "shuffle": true
+        },
+        "choices": [
+          {"label": "Banana", "value": "banana"},
+          {"label": "Carrot In the Woods", "value": "carrot"},
+          {"label": "Apple", "value": "apple"},
+          {"label": "Turnip", "value": "turnip"},
+          {"label": "Potato", "value": "potato"},
+          {"label": "Wheat", "value": "wheat"}
+        ]
+      }
+    }
+  },
+  "_id" : "522267c2554f43f858000028",
+  "org": {
+    "components": [
+      "corespring/*"
+    ]
+  }
+}
