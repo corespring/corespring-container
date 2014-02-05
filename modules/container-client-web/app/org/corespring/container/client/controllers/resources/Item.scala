@@ -38,11 +38,10 @@ trait Item extends Controller {
   )
 
   def create = actions.create {
-    request =>
-      (request.item \ "_id" \ "$oid").asOpt[String].map {
-        itemId =>
-          Ok(Json.obj("itemId" -> itemId))
-      }.getOrElse(BadRequest(Json.obj("error" -> "No item id found")))
+    (code, msg) =>
+      Status(code)(Json.obj("error" -> msg))
+  } {
+    request => Ok(Json.obj("itemId" -> request.itemId))
   }
 
   def load(itemId: String) = actions.load(itemId) {

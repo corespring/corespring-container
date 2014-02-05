@@ -20,6 +20,7 @@ case class FullSessionRequest[A]( everything : JsValue, override val isSecure: B
 case class SessionOutcomeRequest[A](item: JsValue, itemSession: JsValue, override val isSecure: Boolean, override val isComplete: Boolean, r: Request[A]) extends SecureModeRequest(isSecure, isComplete, r)
 
 case class ItemRequest[A](item: JsValue, r : Request[A]) extends WrappedRequest(r)
+case class NewItemRequest[A](itemId: String, r : Request[A]) extends WrappedRequest(r)
 
 case class SaveItemRequest[A](item: JsValue, save: (String,JsValue) => Option[JsValue], r : Request[A]) extends WrappedRequest(r)
 case class ScoreItemRequest[A](item : JsValue, r : Request[A]) extends WrappedRequest(r)

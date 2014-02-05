@@ -1,10 +1,14 @@
 package org.corespring.shell.controllers.editor
 
-import org.corespring.container.client.actions.{ScoreItemRequest, ItemActions, SaveItemRequest, ItemRequest}
+import org.corespring.container.client.actions._
 import org.corespring.container.client.controllers.resources.{Item => ContainerItem}
 import org.corespring.mongo.json.services.MongoService
 import play.api.mvc.{Action, Result, AnyContent}
 import play.api.libs.json.{JsString, Json}
+import org.corespring.container.client.actions.SaveItemRequest
+import play.api.libs.json.JsString
+import org.corespring.container.client.actions.ItemRequest
+import org.corespring.container.client.actions.ScoreItemRequest
 
 trait Item extends ContainerItem {
 
@@ -36,7 +40,7 @@ trait Item extends ContainerItem {
         }.getOrElse(NotFound(s"Can't find item with id $itemId"))
     }
 
-    override def create(block: (ItemRequest[AnyContent]) => Result): Action[AnyContent] = Action {
+    override def create(error: (Int, String) => Result)(block: (NewItemRequest[AnyContent]) => Result): Action[AnyContent] = Action {
       request =>
 
         val newItem = Json.obj(
@@ -49,9 +53,8 @@ trait Item extends ContainerItem {
 
         itemService.create(newItem).map {
           oid =>
-            val item = newItem ++ Json.obj("_id" -> Json.obj("$oid" -> oid.toString))
-            block(ItemRequest(item, request))
-        }.getOrElse(BadRequest("Error creating item"))
+            block(NewItemRequest(oid.toString, request))
+        }.getOrElse(error(BAD_REQUEST,"Error creating item"))
     }
   }
 }
