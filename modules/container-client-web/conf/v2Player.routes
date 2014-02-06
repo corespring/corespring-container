@@ -24,7 +24,8 @@ GET        /item/:itemId/player                            @org.corespring.conta
 PUT        /item/score/:id.json                            @org.corespring.container.client.controllers.resources.Item.getScore(id:String)
 GET        /item/:itemId.json                              @org.corespring.container.client.controllers.resources.Item.load(itemId:String)
 PUT        /item/:itemId.json                              @org.corespring.container.client.controllers.resources.Item.save(itemId:String)
-        
+POST       /item/create                                    @org.corespring.container.client.controllers.resources.Item.create()
+
 
 GET        /icon/:icon                                     @org.corespring.container.client.controllers.Icons.icon(icon)
         

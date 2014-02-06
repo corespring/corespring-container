@@ -19,7 +19,6 @@ describe('player launcher', function(){
         cb();
       }
     };
-
     return this;
   };
 
@@ -33,10 +32,11 @@ describe('player launcher', function(){
   var lastError = null;
 
   var defaultOptions = corespring.module("default-options").exports;
+  defaultOptions.corespringUrl = "http://blah.com";
 
   beforeEach(function(){
-    originalInstance = corespring.require("player-instance");
-    mockInstance = corespring.module("player-instance", MockInstance);
+    originalInstance = corespring.require("instance");
+    mockInstance = corespring.module("instance", MockInstance);
     launchErrors = corespring.module("launcher-errors", MockErrors);
     launcher = corespring.require("player");
   });
@@ -58,6 +58,7 @@ describe('player launcher', function(){
 
     var Player = launcher.define(secureMode);
     
+    //$("body").append("<div id='blah'></div>") 
     var player = new Player("blah", {}, function(err){ 
       lastError = err;
     });
@@ -83,13 +84,13 @@ describe('player launcher', function(){
   });
 
   it('should construct', function(){
-    var player = create( { mode: "gather", itemId : "1" } );
+    var player = create( { mode: "gather", itemId : "1", paths: {} } );
     expect(player).toNotBe(null);
     expect(lastError).toBe(null);
   });
 
   it('should invoke error callback when changing mode from view => gather and sesion is complete', function(){
-    var player = create({sessionId: "1", mode: "view"});
+    var player = create({sessionId: "1", mode: "view", paths: {} });
     mockInstance.isComplete = true;
     player.setMode("gather");
     expect(lastError.code).toEqual(errors.NOT_ALLOWED.code);
