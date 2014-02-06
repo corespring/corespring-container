@@ -21,11 +21,11 @@ trait Session extends Controller with ItemPruner {
 
   def scoreProcessor: ScoreProcessor
 
-  def builder: SessionActionBuilder[AnyContent]
+  def actions: SessionActions[AnyContent]
 
-  def load(id: String) = builder.load(id)(request => Ok((request.everything \ "session").as[JsValue]))
+  def load(id: String) = actions.load(id)(request => Ok((request.everything \ "session").as[JsValue]))
 
-  def loadEverything(id: String) = builder.loadEverything(id) {
+  def loadEverything(id: String) = actions.loadEverything(id) {
     request =>
 
       def includeOutcome = {
@@ -60,7 +60,7 @@ trait Session extends Controller with ItemPruner {
       }
   }
 
-  def saveSession(id: String) = builder.save(id) {
+  def saveSession(id: String) = actions.save(id) {
     request =>
 
       logger.trace(s"[saveSession] : $id")
@@ -94,7 +94,7 @@ trait Session extends Controller with ItemPruner {
       }
   }
 
-  def loadOutcome(id: String) = builder.loadOutcome(id) {
+  def loadOutcome(id: String) = actions.loadOutcome(id) {
     request: SessionOutcomeRequest[AnyContent] =>
       logger.trace(s"[loadOutcome]: $id : ${Json.stringify(request.itemSession)}")
 
@@ -112,7 +112,7 @@ trait Session extends Controller with ItemPruner {
       }
   }
 
-  def completeSession(id: String) = builder.save(id) {
+  def completeSession(id: String) = actions.save(id) {
     request: SaveSessionRequest[AnyContent] =>
       val sessionJson = request.itemSession.as[JsObject] ++ Json.obj("isComplete" -> JsBoolean(true))
       request.saveSession(id, sessionJson).map {

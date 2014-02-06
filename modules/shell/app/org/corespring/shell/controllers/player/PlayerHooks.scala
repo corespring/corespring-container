@@ -1,6 +1,6 @@
 package org.corespring.shell.controllers.player
 
-import org.corespring.container.client.actions.PlayerHooksActionBuilder
+import org.corespring.container.client.actions.PlayerActions
 import org.corespring.container.client.actions.PlayerRequest
 import org.corespring.container.client.actions.SessionIdRequest
 import org.corespring.container.client.controllers.hooks.{PlayerHooks => ContainerPlayerHooks}
@@ -18,7 +18,7 @@ trait PlayerHooks extends ContainerPlayerHooks {
 
   def sessionService: MongoService
 
-  def builder: PlayerHooksActionBuilder[AnyContent] = new PlayerHooksActionBuilder[AnyContent] {
+  override def actions: PlayerActions[AnyContent] = new PlayerActions[AnyContent] {
 
     private def toItemId(json: JsValue): Option[String] = (json \ "itemId").asOpt[String]
 

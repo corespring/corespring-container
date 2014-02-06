@@ -2,7 +2,7 @@ package org.corespring.container.client.controllers.resources
 
 import org.specs2.mutable.Specification
 import org.corespring.container.components.response.OutcomeProcessor
-import org.corespring.container.client.actions.{SaveItemRequest, ItemRequest, ScoreItemRequest, ItemActionBuilder}
+import org.corespring.container.client.actions._
 import play.api.mvc.{AnyContentAsJson, Action, Result, AnyContent}
 import org.corespring.container.components.outcome.ScoreProcessor
 import play.api.test.{FakeHeaders, FakeRequest}
@@ -11,14 +11,21 @@ import org.specs2.mock.Mockito
 import play.api.libs.json.{JsString, JsValue, Json}
 import org.specs2.specification.Scope
 import org.corespring.container.client.controllers.resources.Item.Errors
+import play.api.test.FakeHeaders
+import org.corespring.container.client.actions.SaveItemRequest
+import play.api.mvc.AnyContentAsJson
+import org.corespring.container.client.actions.ScoreItemRequest
+import play.api.libs.json.JsString
+import scala.Some
+import org.corespring.container.client.actions.ItemRequest
 
 class ItemTest extends Specification with Mockito {
 
 
-  class item(saveResult: Option[JsValue] = Some(Json.obj())) extends Scope {
+  class item(saveResult: Option[JsValue] = Some(Json.obj()), createError: Option[(Int, String)] = None) extends Scope {
     val item = new Item {
 
-      def builder: ItemActionBuilder[AnyContent] = new ItemActionBuilder[AnyContent] {
+      def actions: ItemActions[AnyContent] = new ItemActions[AnyContent] {
 
         def save(itemId: String)(block: (SaveItemRequest[AnyContent]) => Result): Action[AnyContent] = Action {
           request => block(SaveItemRequest(Json.obj(), (s, j) => saveResult, request))
@@ -34,6 +41,16 @@ class ItemTest extends Specification with Mockito {
             block(ScoreItemRequest(Json.obj(), request))
         }
 
+        override def create(error: (Int, String) => Result)(block: (NewItemRequest[AnyContent]) => Result): Action[AnyContent] = Action {
+          request =>
+
+            createError.map {
+              e =>
+                error(e._1, e._2)
+            }.getOrElse {
+              block(NewItemRequest("new_id", request))
+            }
+        }
       }
 
       def scoreProcessor: ScoreProcessor = {
@@ -70,16 +87,28 @@ class ItemTest extends Specification with Mockito {
       contentAsString(result) === "{}"
     }
 
-    "fail to getScore if no json in body" in new item{
+    "fail to getScore if no json in body" in new item {
       val result = item.getScore("x")(FakeRequest())
       status(result) === BAD_REQUEST
       contentAsString(result) === Errors.noJson
     }
 
-    "getScore if no json in body" in new item{
-      val result = item.getScore("x")(FakeRequest("","",FakeHeaders(),AnyContentAsJson(Json.obj())))
+    "getScore if no json in body" in new item {
+      val result = item.getScore("x")(FakeRequest("", "", FakeHeaders(), AnyContentAsJson(Json.obj())))
       status(result) === OK
       contentAsString(result) === "{}"
+    }
+
+    "create returns error" in new item(createError = Some(UNAUTHORIZED -> "Error")) {
+      val result = item.create(FakeRequest("", ""))
+      status(result) === UNAUTHORIZED
+      contentAsJson(result) === Json.obj("error" -> "Error")
+    }
+
+    "create" in new item {
+      val result = item.create(FakeRequest("", ""))
+      status(result) === OK
+      contentAsJson(result) === Json.obj("itemId" -> "new_id")
     }
   }
 }

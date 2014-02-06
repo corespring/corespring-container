@@ -1,7 +1,6 @@
 package org.corespring.shell.controllers.editor
 
-import org.bson.types.ObjectId
-import org.corespring.container.client.actions.EditorClientHooksActionBuilder
+import org.corespring.container.client.actions.EditorActions
 import org.corespring.container.client.actions.PlayerRequest
 import org.corespring.container.client.actions.SessionIdRequest
 import org.corespring.container.client.controllers.hooks.{EditorHooks => ContainerEditorHooks}
@@ -11,6 +10,7 @@ import play.api.libs.json.Json
 import play.api.mvc._
 import scala.concurrent.{ExecutionContext, Future}
 import play.api.Logger
+import org.corespring.shell.SessionKeys
 
 
 trait EditorHooks extends ContainerEditorHooks {
@@ -18,7 +18,7 @@ trait EditorHooks extends ContainerEditorHooks {
   def itemService: MongoService
 
 
-  def builder: EditorClientHooksActionBuilder[AnyContent] = new EditorClientHooksActionBuilder[AnyContent] {
+  override def actions: EditorActions[AnyContent] = new EditorActions[AnyContent] {
 
     lazy val logger = Logger("editor.hooks.action.builder")
 
@@ -46,8 +46,6 @@ trait EditorHooks extends ContainerEditorHooks {
 
         logger.debug("[createItem]")
 
-        val id = ObjectId.get
-
         val newItem = Json.obj(
           "components" -> Json.obj(),
           "metadata" -> Json.obj(
@@ -63,17 +61,22 @@ trait EditorHooks extends ContainerEditorHooks {
         }.getOrElse(BadRequest("Error creating item"))
     }
 
-    override def editItem(itemId: String)(block: (PlayerRequest[AnyContent]) => Future[SimpleResult]): Action[AnyContent] = Action.async {
+    override def editItem(itemId: String)(error: (Int, String) => Future[SimpleResult])(block: (PlayerRequest[AnyContent]) => Future[SimpleResult]): Action[AnyContent] = Action.async {
       r =>
-
-        logger.debug(s"[editItem] $itemId")
-
-        itemService.load(itemId).map {
-          item =>
-            block(PlayerRequest(item, r))
+        r.session.get(SessionKeys.failLoadPlayer).map {
+          fail =>
+            error(1001, "Some error occurred")
         }.getOrElse {
-          import ExecutionContext.Implicits.global
-          Future(NotFound(s"Can't find item with id: $itemId"))
+          logger.debug(s"[editItem] $itemId")
+          itemService.load(itemId).map {
+            item =>
+              block(PlayerRequest(item, r))
+          }.getOrElse {
+            import ExecutionContext.Implicits.global
+            Future(NotFound(s"Can't find item with id: $itemId"))
+          }
+
+
         }
     }
   }

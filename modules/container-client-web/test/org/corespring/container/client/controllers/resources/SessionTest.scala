@@ -75,13 +75,13 @@ class SessionTest extends Specification with Mockito {
 
       def itemPreProcessor: PlayerItemPreProcessor = mock[PlayerItemPreProcessor]
 
-      def builder: SessionActionBuilder[AnyContent] = new MockBuilder(request)
+      def actions: SessionActions[AnyContent] = new MockBuilder(request)
     }
 
     def before = {}
   }
 
-  class MockBuilder(r: Request[AnyContent]) extends SessionActionBuilder[AnyContent] {
+  class MockBuilder(r: Request[AnyContent]) extends SessionActions[AnyContent] {
     def loadEverything(id: String)(block: (FullSessionRequest[AnyContent]) => Result): Action[AnyContent] = ???
 
     def load(id: String)(block: (FullSessionRequest[AnyContent]) => Result): Action[AnyContent] = ???

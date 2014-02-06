@@ -1,6 +1,7 @@
 
-var Instance = function(element, options, log){
+var Instance = function(element, options, errorCallback, log){
 
+  var errors = require("errors");
 
   var that = this;
 
@@ -14,13 +15,19 @@ var Instance = function(element, options, log){
 
   listener.clearListeners();
 
-  //TODO: move this elsewhere?
-  var renderPlayer = function (e, options) {
-    var id = options.mode === "gather" ? options.itemId : options.sessionId;
-    var path = options.paths[options.mode];
-    var url = (options.corespringUrl + path).replace(":id", id);
+  var initialize = function (e, options) {
 
-    $(e).html("<iframe id='iframe-player' frameborder='0' src='" + url + "' style='width: 100%; min-height: 700px; border: none'></iframe>");
+    if(!options || !options.url){
+      errorCallback( { code: 999, message: "No url specified" })
+      return;
+    }
+
+    if($(e).length == 0){
+      errorCallback( errors.CANT_FIND_IFRAME);
+      return;
+    }
+
+    $(e).html("<iframe id='iframe-player' frameborder='0' src='" + options.url + "' style='width: 100%; min-height: 700px; border: none'></iframe>");
     $(e).width(options.width ? options.width : "600px");
   };
 
@@ -105,12 +112,7 @@ var Instance = function(element, options, log){
     });
   };
 
-  renderPlayer(element, options);
+  initialize(element, options);
 };
 
-var instance = null;
-
-module.exports = function(element, options){
-  instance = new Instance(element, options);
-  return instance;
-};
+module.exports = Instance;
