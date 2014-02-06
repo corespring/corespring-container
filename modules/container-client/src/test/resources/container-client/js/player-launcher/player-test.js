@@ -1,6 +1,6 @@
 describe('player launcher', function(){
 
-  var errors = corespring.require("player-errors");
+  var errors = corespring.require("errors");
 
   var launcher = null;
 
