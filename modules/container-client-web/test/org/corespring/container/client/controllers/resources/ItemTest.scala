@@ -2,7 +2,7 @@ package org.corespring.container.client.controllers.resources
 
 import org.specs2.mutable.Specification
 import org.corespring.container.components.response.OutcomeProcessor
-import org.corespring.container.client.actions.{SaveItemRequest, ItemRequest, ScoreItemRequest, ItemActions}
+import org.corespring.container.client.actions._
 import play.api.mvc.{AnyContentAsJson, Action, Result, AnyContent}
 import org.corespring.container.components.outcome.ScoreProcessor
 import play.api.test.{FakeHeaders, FakeRequest}
@@ -11,6 +11,13 @@ import org.specs2.mock.Mockito
 import play.api.libs.json.{JsString, JsValue, Json}
 import org.specs2.specification.Scope
 import org.corespring.container.client.controllers.resources.Item.Errors
+import play.api.test.FakeHeaders
+import org.corespring.container.client.actions.SaveItemRequest
+import play.api.mvc.AnyContentAsJson
+import org.corespring.container.client.actions.ScoreItemRequest
+import play.api.libs.json.JsString
+import scala.Some
+import org.corespring.container.client.actions.ItemRequest
 
 class ItemTest extends Specification with Mockito {
 
@@ -34,6 +41,9 @@ class ItemTest extends Specification with Mockito {
             block(ScoreItemRequest(Json.obj(), request))
         }
 
+        override def create(error: (Int, String) => Result)(block: (NewItemRequest[AnyContent]) => Result): Action[AnyContent] = Action{ request =>
+          block(NewItemRequest("new_id", request))
+        }
       }
 
       def scoreProcessor: ScoreProcessor = {
