@@ -4,8 +4,8 @@
 
   link = function ($compile) {
     return function ($scope, $elem, attrs) {
-      console.log("config pane....");
-      $scope.$watch(attrs.ngModel, function (data) {
+      $scope.$watch('selectedComponent.id', function () {
+        var data = $scope.selectedComponent;
         var $div, tmpl;
         if (!data) {
           return;
@@ -30,7 +30,7 @@
           data.component.title = newTitle;
         });
         newScope.clickOutside = function (e) {
-          
+
           var inPopover = $(e.target).closest('.popover').length > 0;
           if (!inPopover) {
             newScope.$broadcast('clickOutsidePopover');
@@ -39,6 +39,8 @@
 
         return $compile($div)(newScope);
       });
+
+
     };
   };
 

@@ -8,10 +8,9 @@
     return function ($scope, $elem, attrs) {
 
       $scope.selectComponent = function (comp) {
-        $scope.selectedComponent = {
-          id: comp.id,
-          component: comp
-        };
+        var selected = $scope.model.components[comp.id];
+        $scope.selectedComponent.id = comp.id;
+        $scope.selectedComponent.component = selected;
       };
 
       $scope.removeComponent = function (comp) {

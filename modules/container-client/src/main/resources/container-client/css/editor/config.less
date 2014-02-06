@@ -1,13 +1,19 @@
- .config {
-  .flex();
+config-pane {
+  display: block;
   overflow: scroll;
+}
+
+.config {
+  .flex();
+  overflow: visible;
+  height: 100%;
   padding-left: 200px;
   padding-right: 20px;
 
   .config-chrome {
     padding: 10px;
     background-color: white;
-    
+
     .title {
       background-color: white;
       padding: 5px;
@@ -19,7 +25,7 @@
       border: solid 1px @bg-bottom-color;
       width: 100%;
       padding: 5px;
-     font-size: 21px;
+      font-size: 21px;
     }
 
     .holder {
@@ -27,3 +33,4 @@
     }
   }
 }
+
