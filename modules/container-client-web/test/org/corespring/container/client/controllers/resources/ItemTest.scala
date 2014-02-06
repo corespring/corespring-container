@@ -22,7 +22,7 @@ import org.corespring.container.client.actions.ItemRequest
 class ItemTest extends Specification with Mockito {
 
 
-  class item(saveResult: Option[JsValue] = Some(Json.obj())) extends Scope {
+  class item(saveResult: Option[JsValue] = Some(Json.obj()), createError: Option[(Int, String)] = None) extends Scope {
     val item = new Item {
 
       def actions: ItemActions[AnyContent] = new ItemActions[AnyContent] {
@@ -41,8 +41,15 @@ class ItemTest extends Specification with Mockito {
             block(ScoreItemRequest(Json.obj(), request))
         }
 
-        override def create(error: (Int, String) => Result)(block: (NewItemRequest[AnyContent]) => Result): Action[AnyContent] = Action{ request =>
-          block(NewItemRequest("new_id", request))
+        override def create(error: (Int, String) => Result)(block: (NewItemRequest[AnyContent]) => Result): Action[AnyContent] = Action {
+          request =>
+
+            createError.map {
+              e =>
+                error(e._1, e._2)
+            }.getOrElse {
+              block(NewItemRequest("new_id", request))
+            }
         }
       }
 
@@ -80,16 +87,28 @@ class ItemTest extends Specification with Mockito {
       contentAsString(result) === "{}"
     }
 
-    "fail to getScore if no json in body" in new item{
+    "fail to getScore if no json in body" in new item {
       val result = item.getScore("x")(FakeRequest())
       status(result) === BAD_REQUEST
       contentAsString(result) === Errors.noJson
     }
 
-    "getScore if no json in body" in new item{
-      val result = item.getScore("x")(FakeRequest("","",FakeHeaders(),AnyContentAsJson(Json.obj())))
+    "getScore if no json in body" in new item {
+      val result = item.getScore("x")(FakeRequest("", "", FakeHeaders(), AnyContentAsJson(Json.obj())))
       status(result) === OK
       contentAsString(result) === "{}"
+    }
+
+    "create returns error" in new item(createError = Some(UNAUTHORIZED -> "Error")) {
+      val result = item.create(FakeRequest("", ""))
+      status(result) === UNAUTHORIZED
+      contentAsJson(result) === Json.obj("error" -> "Error")
+    }
+
+    "create" in new item {
+      val result = item.create(FakeRequest("", ""))
+      status(result) === OK
+      contentAsJson(result) === Json.obj("itemId" -> "new_id")
     }
   }
 }
