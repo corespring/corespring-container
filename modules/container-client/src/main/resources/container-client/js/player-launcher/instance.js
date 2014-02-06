@@ -15,6 +15,34 @@ var Instance = function(element, options, errorCallback, log){
 
   listener.clearListeners();
 
+
+  var dimensionChangeListener = function (element) {
+    var listenerFunction = function (data, event) {
+      try {
+        var json = JSON.parse(data);
+        if (json.message == 'dimensionsUpdate') {
+          var frames = document.getElementsByTagName('iframe');
+          var found = false;
+          for (var i = 0; i < frames.length; i++) {
+            if (frames[i].contentWindow == event.source) {
+              $(frames[i]).height(json.h + 30);
+              found = true;
+              break;
+            }
+          }
+          if (!found) $(element).height(json.h + 30);
+        }
+      } catch (e) {
+        logError("Exception in addDimensionChangeListener: " + e);
+      }
+    };
+
+    listener.addListener(function(e) {
+      listenerFunction(e.data, e)
+    });
+  };
+
+
   var initialize = function (e, options) {
 
     if(!options || !options.url){
@@ -27,8 +55,11 @@ var Instance = function(element, options, errorCallback, log){
       return;
     }
 
-    $(e).html("<iframe id='iframe-player' frameborder='0' src='" + options.url + "' style='width: 100%; min-height: 700px; border: none'></iframe>");
+    $(e).html("<iframe id='iframe-player' frameborder='0' src='" + options.url + "' style='width: 100%; border: none'></iframe>");
     $(e).width(options.width ? options.width : "600px");
+
+    dimensionChangeListener(e);
+
   };
 
   var postMessage = function (message, data) {
