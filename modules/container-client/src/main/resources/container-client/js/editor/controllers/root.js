@@ -8,6 +8,8 @@ var controller = function ($scope, $compile, $http, $timeout, $modal, $log, Edit
     return Math.random().toString(36).substring(2, 9);
   };
 
+  $scope.editorMode = "visual";
+
   $scope.openChooser = function () {
 
     var modalInstance = $modal.open({
@@ -153,9 +155,35 @@ var controller = function ($scope, $compile, $http, $timeout, $modal, $log, Edit
     return newModel;
   };
 
+
   $scope.$on('mathJaxUpdateRequest', function () {
     MathJaxService.parseDomForMath();
   });
+
+  $scope.switchToJsonView = function() {
+    $scope.selectedComponentJson = JSON.stringify($scope.selectedComponent.component, null, 2);
+    $scope.editorMode = 'json';
+  };
+
+  $scope.$watch('selectedComponent.id', function (newValue) {
+     if (newValue) {
+       $scope.selectedComponentJson = JSON.stringify($scope.selectedComponent.component, null, 2);
+     }
+  });
+
+  $scope.jsonEditorLoaded = function(_editor) {
+    var _session = _editor.getSession();
+    _session.setUseWrapMode(true);
+    _session.setWrapLimitRange(70, 80);
+  };
+
+
+  $scope.jsonEditorChanged = function(val) {
+    var newObject = JSON.parse($scope.selectedComponentJson);
+    for (var key in $scope.selectedComponent.component) {
+      $scope.selectedComponent.component[key] = newObject[key];
+    }
+  };
 
   $scope.getItem = function () {
     return $scope.model;
