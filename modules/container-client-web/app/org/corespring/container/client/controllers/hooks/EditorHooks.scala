@@ -39,12 +39,13 @@ trait EditorHooks extends BaseHooksWithActions[EditorActions[AnyContent]] {
       Assets.at("/container-client", "editor.html")(request)
   }
 
-  def createItem = actions.createItem {
+  def createItem = Action(BadRequest("This route is not implemented yet.. instead see: Item.create()"))
+  /*actions.createItem {
     request: PlayerRequest[AnyContent] =>
       val itemId = (request.item \ "_id" \ "$oid").as[String]
       val url = org.corespring.container.client.controllers.routes.Assets.item(itemId, "editor.html").url
       SeeOther(url)
-  }
+  }*/
 
   override def services(itemId: String): Action[AnyContent] = actions.loadServices(itemId) {
     request: PlayerRequest[AnyContent] =>
