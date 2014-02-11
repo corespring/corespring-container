@@ -2,16 +2,16 @@
   "name": "container-client",
   "version": "0.0.1",
   "dependencies": {
-    "angular": "~1.2.8",
-    "angular-resource": "~1.2.8",
-    "angular-sanitize": "~1.2.8",
-    "angular-animate": "~1.2.8",
+    "angular": "~1.2.12",
+    "angular-resource": "~1.2.12",
+    "angular-sanitize": "~1.2.12",
+    "angular-animate": "~1.2.12",
     "angular-ui": "~0.4.0",
     "angular-ui-sortable": "https://github.com/angular-ui/ui-sortable/archive/angular1.2.zip",
     "angular-bootstrap": "~0.10.0",
     "jquery": "1.10.2",
     "saxjs": "https://github.com/isaacs/sax-js.git",
-    "bootstrap": "~3.0.3",
+    "bootstrap": "~3.1.0",
     "lodash": "~2.4.1",
     "corespring-ng-components": "https://github.com/corespring/corespring-ng-components.git",
     "ace-builds": "~1.1.1",
@@ -21,8 +21,8 @@
     "mathjs": "~0.18.0"
   },
   "devDependencies": {
-    "angular-mocks": "~1.2.8",
-    "angular-scenario": "~1.2.8"
+    "angular-mocks": "~1.2.12",
+    "angular-scenario": "~1.2.12"
   },
   "dependenciesIgnore": {
     "mathjs": [
@@ -51,6 +51,6 @@
     ]
   },
   "resolutions": {
-    "angular": "~1.2.8"
+    "angular": "~1.2.12"
   }
 }
