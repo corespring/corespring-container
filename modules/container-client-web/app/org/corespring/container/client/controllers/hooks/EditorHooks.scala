@@ -16,7 +16,7 @@ trait EditorHooks extends BaseHooksWithActions[EditorActions[AnyContent]] {
 
   override def name = "editor"
 
-  lazy val basePath =  v2Player.Routes.prefix
+  lazy val basePath = v2Player.Routes.prefix
 
   override protected def componentTypes(json: JsValue): Seq[String] = {
     loadedComponents.map {
