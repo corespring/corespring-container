@@ -7,6 +7,13 @@
   link = function ($compile, $log) {
     return function ($scope, $elem, attrs) {
 
+      $scope.sortableOptions = {
+        start:  function() {
+          // we need to manually destroy any tooltips cause ui-sortable doesn't work together nicely with bootstrap tooltip
+          $($elem).find('li').tooltip('destroy');
+        }
+      };
+
       $scope.selectComponent = function (comp) {
         var selected = $scope.model.components[comp.id];
         $scope.selectedComponent.id = comp.id;
@@ -95,11 +102,11 @@
            selectedComponent: '='
         },
         template: [
-          '<ul ui-sortable ng-model="orderedComponents">',
+          '<ul ui-sortable="sortableOptions" ng-model="orderedComponents">',
           '<li class="component-thumbnail"',
           ' ng-click="selectComponent(component)"',
           ' ng-class="{last:$last, active: selectedComponent.id==component.id}"',
-          '  tooltip="{{ getComponentTypeLabel(component.componentType)}}"',
+          '  corespring-tooltip="{{ getComponentTypeLabel(component.componentType) }}"',
           '  ng-repeat="component in orderedComponents">',
           '  <table >',
           '    <tr>',
