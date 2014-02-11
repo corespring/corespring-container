@@ -16,12 +16,7 @@ trait EditorHooks extends BaseHooksWithActions[EditorActions[AnyContent]] {
 
   override def name = "editor"
 
-  lazy val basePath = {
-    val url = org.corespring.container.client.controllers.routes.Assets.item("..", "..").url
-    val Split = """/(.*?)/.*""".r
-    val Split(base) = url
-    base
-  }
+  lazy val basePath =  v2Player.Routes.prefix
 
   override protected def componentTypes(json: JsValue): Seq[String] = {
     loadedComponents.map {
@@ -57,7 +52,7 @@ trait EditorHooks extends BaseHooksWithActions[EditorActions[AnyContent]] {
           val tag = tagName(c.id.org, c.id.name)
           Json.obj(
             "name" -> c.id.name,
-            "icon" -> s"/$basePath/icon/$tag",
+            "icon" -> s"$basePath/icon/$tag",
             "componentType" -> tag,
             "defaultData" -> c.defaultData
           )
