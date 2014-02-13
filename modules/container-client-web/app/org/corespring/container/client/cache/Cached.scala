@@ -23,32 +23,10 @@ object Cached {
   }
 }
 
-/**
- * Precache a result for later retrieval
- */
-object PreCache {
-
-  lazy val logger = Logger("container.precache")
-
-  def etagKey(key:String) = s"$key-etag"
-
-  def apply(key: String, result: SimpleResult)(implicit cache: ContainerCache) = {
-    logger.debug(s"key: $key")
-    logger.debug(s"etagKey: ${etagKey(key)}")
-    val durationMilliseconds = 1000 * 60 * 60 * 24 * 365 //else duration * 1000 // Set client cache expiration to one year for “eternity” duration
-    val expirationDate = http.dateFormat.print(System.currentTimeMillis() + durationMilliseconds)
-    // Generate a fresh ETAG for it
-    val etag = expirationDate // Use the expiration date as ETAG
-    // Add cache information to the response, so clients can cache its content
-    val resultWithHeaders = result.withHeaders(ETAG -> etag, EXPIRES -> expirationDate)
-    cache.set(etagKey(key), etag) // Cache the new ETAG of the resource
-    cache.set(key, resultWithHeaders) // Cache the new SimpleResult of the resource
-  }
-}
 
 /**
  * Lifted from the play framework but not using the object Cache.
- * Instead working with a trait.
+ * This saves us from requiring play-cache as a dependency and defines the contract with a trait.
  */
 case class Cached(key: RequestHeader => String, duration: Int)(action: EssentialAction)(implicit app: Application, cache: ContainerCache) extends EssentialAction {
 
