@@ -9,11 +9,11 @@ class DependencyResolverTest extends Specification with ComponentMaker{
   "components for types" should {
 
     "work" in new withResolver() {
-      resolver.componentsForTypes(Seq.empty, "player") === Seq.empty
+      resolver.resolveComponents(Seq.empty, "player") === Seq.empty
     }
 
     "work for comps with no libs" in new withResolver(uiComp("org", "ui-comp-1", Seq.empty)) {
-      val out = resolver.componentsForTypes(Seq(id("org", "ui-comp-1")), "player")
+      val out = resolver.resolveComponents(Seq(id("org", "ui-comp-1")), "player")
       out.length === 1
     }
 
@@ -21,7 +21,7 @@ class DependencyResolverTest extends Specification with ComponentMaker{
       uiComp("org", "ui-comp-1", Seq(libId("org", "lib-1"))),
       lib("org", "lib-1")
     ) {
-      val out = resolver.componentsForTypes(Seq(id("org", "ui-comp-1")), "player")
+      val out = resolver.resolveComponents(Seq(id("org", "ui-comp-1")), "player")
       out.length === 2
     }
 
@@ -29,7 +29,7 @@ class DependencyResolverTest extends Specification with ComponentMaker{
       uiComp("org", "ui-comp-1", Seq(libId("org", "lib-1"))),
       layout("org", "layout-1")
     ) {
-      val out = resolver.componentsForTypes(Seq(id("org", "ui-comp-1"), id("org", "layout-1")), "player")
+      val out = resolver.resolveComponents(Seq(id("org", "ui-comp-1"), id("org", "layout-1")), "player")
       out.length === 2
     }
 
@@ -43,11 +43,11 @@ class DependencyResolverTest extends Specification with ComponentMaker{
       lib("org", "server-lib1")
     ) {
 
-      val playerComps = resolver.componentsForTypes(Seq(id("org", "ui-comp1")), "player")
+      val playerComps = resolver.resolveComponents(Seq(id("org", "ui-comp1")), "player")
       playerComps.length === 2
       playerComps.find(_.id.name == "player-lib1") must beSome[Component]
 
-      val editorComps = resolver.componentsForTypes(Seq(id("org", "ui-comp1")), "editor")
+      val editorComps = resolver.resolveComponents(Seq(id("org", "ui-comp1")), "editor")
       editorComps.length === 2
       editorComps.find(_.id.name == "server-lib1") must beSome[Component]
     }

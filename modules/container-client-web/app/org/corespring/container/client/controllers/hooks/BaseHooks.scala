@@ -40,8 +40,8 @@ trait BaseHooks extends Controller with Helpers with XhtmlProcessor {
     val localScripts = getLocalScripts(usedComponents)
     val out: JsValue = configJson(
       xhtml,
-      defaultNgModules ++ allModuleNames ++ dependencyModules,
-      clientSideScripts ++ localScripts ++ defaultScripts ++ Seq(componentJs),
+      (defaultNgModules ++ allModuleNames ++ dependencyModules).sorted.distinct,
+      (clientSideScripts ++ localScripts ++ defaultScripts ++ Seq(componentJs)).sorted.distinct,
       Seq(componentCss)
     )
     Ok(out)
@@ -116,7 +116,9 @@ trait BaseHooks extends Controller with Helpers with XhtmlProcessor {
   }
 
 
+
   private def wrapClientLibraryJs(moduleName: String)(src: LibrarySource) = {
+
     s"""
       // ----------------- ${src.name} ---------------------
       ${ComponentWrapper(moduleName, src.name, src.source)}
