@@ -22,6 +22,7 @@ import play.api.Configuration
 import play.api.mvc._
 import scala.Some
 import org.corespring.container.client.cache.ContainerCache
+import scala.concurrent.duration.Duration
 
 class ContainerClientImplementation(
                                      itemServiceIn: MongoService,
@@ -122,15 +123,21 @@ class ContainerClientImplementation(
 
     import scala.collection.mutable
 
-    private val data: mutable.Map[String, String] = mutable.Map()
-
-    override def has(key: String): Boolean = data.contains(key)
+    private val data: mutable.Map[String, Any] = mutable.Map()
 
     override def remove(key: String): Unit = data.remove(key)
 
-    override def get(key: String): Option[String] = data.get(key)
+    override def get(key: String): Option[String] = data.get(key).map(_.asInstanceOf[String])
 
-    override def set(key: String, value: String): Unit = data.put(key, value)
+    override def getAs[T](key: String): Option[T] = data.get(key).map(_.asInstanceOf[T])
+
+    override def getOrElse[A](key: String, expiration: Int)(orElse: => A): A = data.get(key).map(_.asInstanceOf[A]).getOrElse(orElse)
+
+    override def set(key: String, value: Any, expiration: Duration): Unit = data.put(key, value)
+
+    override def set(key: String, value: Any, expiration: Int): Unit = data.put(key, value)
+
+    override def has(key: String): Boolean = data.contains(key)
   }
 
   private lazy val componentSets = new ComponentSets {

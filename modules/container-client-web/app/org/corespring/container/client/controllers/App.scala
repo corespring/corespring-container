@@ -8,15 +8,17 @@ import org.corespring.container.components.model.packaging.{ClientSideDependency
 import org.corespring.container.components.model.{Component, Id}
 import play.api.libs.json.JsObject
 import play.api.mvc.{Action, AnyContent, Controller}
-import org.corespring.container.client.cache.ContainerCache
+import org.corespring.container.client.cache.{Cached, ContainerCache}
+import play.api.http.ContentTypes
 
 trait App
   extends Controller
   with DependencyResolver
   with XhtmlProcessor
-  with Helpers { self : ItemTypeReader =>
+  with Helpers {
+  self: ItemTypeReader =>
 
-  def context : String
+  def context: String
 
   def modulePath = v2Player.Routes.prefix
 
@@ -30,7 +32,7 @@ trait App
 
   def actions: ClientActions[AnyContent]
 
-  def additionalScripts : Seq[String]
+  def additionalScripts: Seq[String]
 
   def config(id: String) = actions.loadConfig(id) {
     request =>
@@ -110,20 +112,18 @@ trait App
   }
 }
 
-trait AppWithServices extends App { self : ItemTypeReader =>
+trait AppWithServices extends App {
+  self: ItemTypeReader =>
 
-  def cache : ContainerCache
+  import play.api.Play.current
 
-  def services = {
-    val key = s"$context.services"
-    Action{
-      if(!cache.has(key)){
-        cache.set(key, servicesJs.toString )
-      }
+  implicit def cache: ContainerCache
 
-      cache.get(key).map(Ok(_)).getOrElse(NotFound(""))
+  def services = Cached(s"$context.services") {
+    Action {
+      Ok(servicesJs.toString).as(ContentTypes.JAVASCRIPT)
     }
   }
 
-  def servicesJs : String
+  def servicesJs: String
 }

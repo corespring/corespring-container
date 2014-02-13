@@ -1,10 +1,11 @@
 package org.corespring.container.client.component
 
-import org.corespring.container.client.cache.ContainerCache
+import org.corespring.container.client.cache.{PreCache, ContainerCache}
+import play.api.http.ContentTypes
 
 trait ComponentUrls {
 
-  def cache: ContainerCache
+  implicit def cache: ContainerCache
 
   /** return a url where this hashed asset is available */
   protected def jsPath(hash: String): String
@@ -14,16 +15,19 @@ trait ComponentUrls {
 
   private def typesHash(types: Seq[String]) = types.sorted.mkString(",").hashCode
 
-  def jsUrl(context:String, types: Seq[String], make: => String): String = url(s"$context-js", jsPath, types, make)
+  def jsUrl(context: String, types: Seq[String], make: => String): String = url(s"$context-js", ContentTypes.JAVASCRIPT, jsPath, types, make)
 
-  def cssUrl(context:String, types: Seq[String], make: => String): String = url(s"$context-css", cssPath, types, make)
+  def cssUrl(context: String, types: Seq[String], make: => String): String = url(s"$context-css", ContentTypes.CSS, cssPath, types, make)
 
-  private def url(prefix: String, pathFn : String => String, types: Seq[String], make: => String): String = {
+  private def url(prefix: String, contentType : String, pathFn: String => String, types: Seq[String], make: => String): String = {
 
     val hash = s"$prefix-${typesHash(types)}"
 
     if (!cache.has(hash)) {
-      cache.set(hash, make)
+      PreCache(
+        hash,
+        play.api.mvc.Results.Ok(make).as(contentType)
+      )
     }
     pathFn(hash)
   }
