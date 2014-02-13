@@ -1,4 +1,4 @@
-package org.corespring.container.client.controllers
+package org.corespring.container.client.cache
 
 trait ContainerCache {
 

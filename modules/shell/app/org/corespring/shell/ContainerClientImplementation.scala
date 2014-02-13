@@ -3,7 +3,7 @@ package org.corespring.shell
 import org.corespring.amazon.s3.ConcreteS3Service
 import org.corespring.container.client.V2PlayerConfig
 import org.corespring.container.client.actions.{ClientActions, PlayerActions, EditorActions => ContainerEditorActions, PlayerJsRequest, PlayerLauncherActions}
-import org.corespring.container.client.component.{EditorGenerator, SourceGenerator, PlayerGenerator}
+import org.corespring.container.client.component.{ComponentUrls, EditorGenerator, SourceGenerator, PlayerGenerator}
 import org.corespring.container.client.controllers._
 import org.corespring.container.client.controllers.angular.AngularModules
 import org.corespring.container.client.controllers.hooks.PlayerHooks
@@ -21,6 +21,7 @@ import org.corespring.shell.controllers.player.actions.{PlayerActions => ShellPl
 import play.api.Configuration
 import play.api.mvc._
 import scala.Some
+import org.corespring.container.client.cache.ContainerCache
 
 class ContainerClientImplementation(
                                      itemServiceIn: MongoService,

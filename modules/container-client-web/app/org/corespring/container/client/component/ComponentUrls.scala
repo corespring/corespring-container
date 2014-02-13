@@ -1,4 +1,6 @@
-package org.corespring.container.client.controllers
+package org.corespring.container.client.component
+
+import org.corespring.container.client.cache.ContainerCache
 
 trait ComponentUrls {
 

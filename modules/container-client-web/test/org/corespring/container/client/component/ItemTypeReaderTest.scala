@@ -37,31 +37,8 @@ class ItemTypeReaderTest extends Specification with ComponentMaker {
 
 
   class withReader(comps: Component*) extends Scope {
-    val reader = new ItemTypeReader {
+    val reader = new PlayerItemTypeReader {
       override def components: Seq[Component] = comps
     }
   }
-
-  /*
-  "read the comps" in {
-
-      val xml =
-        """
-          |<div>
-          |  <corespring-comp></corespring-comp>
-          |  <div corespring-comp2=""></div>
-          |</div>
-        """.stripMargin
-
-
-      val comps = Seq(
-         LayoutComponent("corespring", "comp", Seq(), None, Json.obj()),
-         LayoutComponent("corespring", "comp2", Seq(), None, Json.obj())
-      )
-
-      layoutTypesInXml(xml, comps) === Seq("corespring-comp", "corespring-comp2")
-
-    }
-   */
-
 }

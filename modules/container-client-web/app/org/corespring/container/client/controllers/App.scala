@@ -1,7 +1,7 @@
 package org.corespring.container.client.controllers
 
 import org.corespring.container.client.actions.ClientActions
-import org.corespring.container.client.component.{ItemTypeReader, DependencyResolver, SourceGenerator}
+import org.corespring.container.client.component.{ComponentUrls, ItemTypeReader, DependencyResolver, SourceGenerator}
 import org.corespring.container.client.controllers.angular.AngularModules
 import org.corespring.container.client.controllers.helpers.{Helpers, XhtmlProcessor}
 import org.corespring.container.components.model.packaging.{ClientSideDependency, ClientDependencies}

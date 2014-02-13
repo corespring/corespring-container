@@ -2,6 +2,7 @@ package org.corespring.container.client.controllers
 
 import play.api.http.ContentTypes
 import play.api.mvc.{Action, Controller}
+import org.corespring.container.client.cache.ContainerCache
 
 trait ComponentSets extends Controller {
 
