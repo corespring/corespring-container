@@ -12,6 +12,8 @@ GET        /libs/:orgName/:componentName/*file             @org.corespring.conta
 
 GET        /component-sets/:hash.:suffix                   @org.corespring.container.client.controllers.ComponentSets.resource(hash:String, suffix:String)
 GET        /session/:sessionId/new-player-config.json      @org.corespring.container.client.controllers.Player.config(sessionId:String)
+GET        /session/player-services.js                     @org.corespring.container.client.controllers.Player.services
+GET        /editor/editor-services.js                      @org.corespring.container.client.controllers.Editor.services
 GET        /editor/:itemId/new-editor-config.json          @org.corespring.container.client.controllers.Editor.config(itemId:String)
 
 # Hooks for the player: config, services + components

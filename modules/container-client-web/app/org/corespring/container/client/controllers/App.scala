@@ -29,6 +29,8 @@ trait App
 
   def actions: ClientActions[AnyContent]
 
+  def servicesPath : String
+
   def config(id: String) = actions.loadConfig(id) {
     request =>
 
@@ -47,7 +49,7 @@ trait App
       val dependencies = ngModules.createAngularModules(components, clientSideDependencies)
       val clientSideScripts = get3rdPartyScripts(clientSideDependencies)
       val localScripts = getLocalScripts(components)
-      val js = (clientSideScripts ++ localScripts ++ Seq(s"$context-services.js") ++ Seq(jsUrl)).distinct.sorted
+      val js = (clientSideScripts ++ localScripts ++ Seq(servicesPath, jsUrl)).distinct.sorted
       val css = Seq(cssUrl)
 
       val json = configJson(

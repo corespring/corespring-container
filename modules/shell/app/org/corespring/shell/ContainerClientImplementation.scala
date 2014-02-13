@@ -164,6 +164,8 @@ class ContainerClientImplementation(
     override def ngModules: AngularModules = new AngularModules("player.services")
 
     override def generator: PlayerGenerator = new PlayerGenerator
+
+    override def cache: ContainerCache = appCache
   }
 
 
