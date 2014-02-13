@@ -8,7 +8,7 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsValue
 import play.api.mvc.Controller
 
-
+@deprecated("use org.corespring.container.client.controllers.App instead", "0.2.8")
 trait BaseHooks extends Controller with Helpers with XhtmlProcessor {
 
   protected def name: String
