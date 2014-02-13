@@ -85,11 +85,9 @@ class ContainerClientImplementation(
 
   private lazy val rig = new Rig {
 
-    override def name = "rig"
+    override def components = comps
 
-    override def loadedComponents = comps
-
-    override def uiComponents: Seq[UiComponent] = rootUiComponents
+    override def urls: ComponentUrls = componentUrls
   }
 
   private lazy val assets = new Assets {
@@ -139,7 +137,7 @@ class ContainerClientImplementation(
     override def cache: ContainerCache = appCache
   }
 
-  private lazy val typeRouter = new ComponentUrls {
+  private lazy val componentUrls = new ComponentUrls {
     override def cache: ContainerCache = appCache
 
     /** return a url where this hashed asset is available */
@@ -151,7 +149,7 @@ class ContainerClientImplementation(
 
   private lazy val newPlayer = new Player {
 
-    override def urls: ComponentUrls = typeRouter
+    override def urls: ComponentUrls = componentUrls
 
     override def components: Seq[Component] = comps
 
@@ -184,7 +182,7 @@ class ContainerClientImplementation(
 
     override def generator: SourceGenerator = new EditorGenerator
 
-    override def urls: ComponentUrls = typeRouter
+    override def urls: ComponentUrls = componentUrls
 
     override def components: Seq[Component] = comps
 

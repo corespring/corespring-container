@@ -35,7 +35,7 @@ trait App
   def config(id: String) = actions.loadConfig(id) {
     request =>
 
-      val typeIds = componentTypes(request.item).map {
+      val typeIds = componentTypes(id, request.item).map {
         t =>
           val typeRegex(org, name) = t
           new Id(org, name)
