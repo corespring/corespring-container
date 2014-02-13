@@ -193,6 +193,8 @@ class ContainerClientImplementation(
     override def actions: ClientActions[AnyContent] = new EditorActions {
       override def itemService: MongoService = itemServiceIn
     }
+
+    override def cache: ContainerCache = appCache
   }
 
   private lazy val editorHooks = new EditorHooks {

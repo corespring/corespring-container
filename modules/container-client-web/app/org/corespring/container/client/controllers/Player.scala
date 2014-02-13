@@ -1,26 +1,12 @@
 package org.corespring.container.client.controllers
 
-import org.corespring.container.client.cache.ContainerCache
 import org.corespring.container.client.component._
 import org.corespring.container.client.views.txt.js.PlayerServices
-import play.api.mvc.Action
 
-trait Player extends PlayerItemTypeReader with App{
+trait Player extends PlayerItemTypeReader with AppWithServices{
   override def context: String = "player"
 
-  def cache : ContainerCache
-
-  def services = {
-    Action{
-      if(!cache.has("player.services")){
-        cache.set("player.services", js.toString )
-      }
-
-      cache.get("player.services").map(Ok(_)).getOrElse(NotFound(""))
-    }
-  }
-
-  private def js = {
+  override def servicesJs = {
     import org.corespring.container.client.controllers.resources.routes._
     PlayerServices(
       "player.services",
@@ -29,10 +15,10 @@ trait Player extends PlayerItemTypeReader with App{
       Item.getScore(":id"),
       Session.completeSession(":id"),
       Session.loadOutcome(":id")
-    )
+    ).toString
   }
 
-  override def servicesPath: String = org.corespring.container.client.controllers.routes.Player.services().url
+  override def additionalScripts : Seq[String] = Seq(org.corespring.container.client.controllers.routes.Player.services().url)
 }
 
 

@@ -7,7 +7,8 @@ import org.corespring.container.client.controllers.helpers.{Helpers, XhtmlProces
 import org.corespring.container.components.model.packaging.{ClientSideDependency, ClientDependencies}
 import org.corespring.container.components.model.{Component, Id}
 import play.api.libs.json.JsObject
-import play.api.mvc.{AnyContent, Controller}
+import play.api.mvc.{Action, AnyContent, Controller}
+import org.corespring.container.client.cache.ContainerCache
 
 trait App
   extends Controller
@@ -29,7 +30,7 @@ trait App
 
   def actions: ClientActions[AnyContent]
 
-  def servicesPath : String
+  def additionalScripts : Seq[String]
 
   def config(id: String) = actions.loadConfig(id) {
     request =>
@@ -49,7 +50,7 @@ trait App
       val dependencies = ngModules.createAngularModules(components, clientSideDependencies)
       val clientSideScripts = get3rdPartyScripts(clientSideDependencies)
       val localScripts = getLocalScripts(components)
-      val js = (clientSideScripts ++ localScripts ++ Seq(servicesPath, jsUrl)).distinct.sorted
+      val js = (clientSideScripts ++ localScripts ++ additionalScripts :+ jsUrl).distinct.sorted
       val css = Seq(cssUrl)
 
       val json = configJson(
@@ -107,4 +108,22 @@ trait App
     val assetPaths = out.foldRight[Seq[String]](Seq.empty)(assetPath)
     assetPaths
   }
+}
+
+trait AppWithServices extends App { self : ItemTypeReader =>
+
+  def cache : ContainerCache
+
+  def services = {
+    val key = s"$context.services"
+    Action{
+      if(!cache.has(key)){
+        cache.set(key, servicesJs.toString )
+      }
+
+      cache.get(key).map(Ok(_)).getOrElse(NotFound(""))
+    }
+  }
+
+  def servicesJs : String
 }
