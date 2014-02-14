@@ -8,8 +8,8 @@ import org.corespring.container.client.views.txt.js.ServerLibraryWrapper
 import play.api.Play
 import play.api.Play.current
 import play.api.http.ContentTypes
-import play.api.mvc.{Result, AnyContent, Request, Controller}
 import play.api.libs.json.{Json, JsValue}
+import play.api.mvc.{Result, AnyContent, Request, Controller}
 
 
 trait PlayerLauncher extends Controller {
@@ -35,9 +35,10 @@ trait PlayerLauncher extends Controller {
     }
   }
 
-  import org.corespring.container.client.controllers.hooks.routes.PlayerHooks
-  import org.corespring.container.client.controllers.hooks.routes.EditorHooks
   import org.corespring.container.client.controllers.routes.Assets
+  import org.corespring.container.client.controllers.routes.Editor
+  import org.corespring.container.client.controllers.routes.Player
+
 
   val SecureMode = "corespring.player.secure"
 
@@ -46,7 +47,7 @@ trait PlayerLauncher extends Controller {
   def editorJs = builder.editorJs {
     implicit request =>
       val rootUrl = playerConfig.rootUrl.getOrElse(BaseUrl(request))
-      val itemEditorUrl = s"${EditorHooks.editItem(":itemId")}"
+      val itemEditorUrl = s"${Editor.editItem(":itemId")}"
 
       val create = org.corespring.container.client.controllers.resources.routes.Item.create()
 
@@ -55,7 +56,7 @@ trait PlayerLauncher extends Controller {
         "paths" -> Json.obj(
 
           "editor" -> Json.obj(
-            "method" -> EditorHooks.editItem(":itemId").method,
+            "method" -> Editor.editItem(":itemId").method,
             "url" -> itemEditorUrl
           ),
 
@@ -78,7 +79,7 @@ trait PlayerLauncher extends Controller {
 
       val playerPage = request.getQueryString("playerPage").getOrElse("player.html")
       val rootUrl = playerConfig.rootUrl.getOrElse(BaseUrl(request))
-      val itemUrl = s"${PlayerHooks.createSessionForItem(":id").url}?file=$playerPage"
+      val itemUrl = s"${Player.createSessionForItem(":id").url}?file=$playerPage"
       val sessionUrl = s"${Assets.session(":id", playerPage)}"
 
       val defaultOptions: JsValue = Json.obj(

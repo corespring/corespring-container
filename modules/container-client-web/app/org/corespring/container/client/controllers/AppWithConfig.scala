@@ -1,6 +1,7 @@
 package org.corespring.container.client.controllers
 
 import org.corespring.container.client.actions.ClientActions
+import org.corespring.container.client.cache.ContainerCache
 import org.corespring.container.client.component.{ComponentUrls, ItemTypeReader, DependencyResolver, SourceGenerator}
 import org.corespring.container.client.controllers.angular.AngularModules
 import org.corespring.container.client.controllers.helpers.{Helpers, XhtmlProcessor}
@@ -8,9 +9,8 @@ import org.corespring.container.components.model.packaging.{ClientSideDependency
 import org.corespring.container.components.model.{Component, Id}
 import play.api.libs.json.JsObject
 import play.api.mvc.{Action, AnyContent, Controller}
-import org.corespring.container.client.cache.ContainerCache
 
-trait App
+trait AppWithConfig[T <: ClientActions[AnyContent]]
   extends Controller
   with DependencyResolver
   with XhtmlProcessor
@@ -28,7 +28,7 @@ trait App
 
   val typeRegex = "(.*?)-(.*)".r
 
-  def actions: ClientActions[AnyContent]
+  def actions: T
 
   def additionalScripts : Seq[String]
 
@@ -110,7 +110,7 @@ trait App
   }
 }
 
-trait AppWithServices extends App { self : ItemTypeReader =>
+trait AppWithServices[T <: ClientActions[AnyContent]] extends AppWithConfig[T] { self : ItemTypeReader =>
 
   def cache : ContainerCache
 

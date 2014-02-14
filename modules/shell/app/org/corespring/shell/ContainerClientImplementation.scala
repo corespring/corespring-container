@@ -2,11 +2,11 @@ package org.corespring.shell
 
 import org.corespring.amazon.s3.ConcreteS3Service
 import org.corespring.container.client.V2PlayerConfig
-import org.corespring.container.client.actions.{ClientActions, PlayerActions, EditorActions => ContainerEditorActions, PlayerJsRequest, PlayerLauncherActions}
+import org.corespring.container.client.actions.{PlayerActions,PlayerJsRequest, PlayerLauncherActions}
+import org.corespring.container.client.cache.ContainerCache
 import org.corespring.container.client.component.{ComponentUrls, EditorGenerator, SourceGenerator, PlayerGenerator}
 import org.corespring.container.client.controllers._
 import org.corespring.container.client.controllers.angular.AngularModules
-import org.corespring.container.client.controllers.hooks.PlayerHooks
 import org.corespring.container.components.model.Component
 import org.corespring.container.components.model.Library
 import org.corespring.container.components.model.UiComponent
@@ -14,14 +14,13 @@ import org.corespring.container.components.outcome.{ItemJsScoreProcessor, ScoreP
 import org.corespring.container.components.processing.rhino.PlayerItemPreProcessor
 import org.corespring.container.components.response.rhino.OutcomeProcessor
 import org.corespring.mongo.json.services.MongoService
-import org.corespring.shell.controllers.editor.actions.EditorActions
-import org.corespring.shell.controllers.editor.{Item, EditorHooks}
+import org.corespring.shell.controllers.editor.Item
+import org.corespring.shell.controllers.editor.actions.{EditorActions => ShellEditorActions}
 import org.corespring.shell.controllers.player.Session
 import org.corespring.shell.controllers.player.actions.{PlayerActions => ShellPlayerActions}
 import play.api.Configuration
 import play.api.mvc._
 import scala.Some
-import org.corespring.container.client.cache.ContainerCache
 
 class ContainerClientImplementation(
                                      itemServiceIn: MongoService,
@@ -30,7 +29,7 @@ class ContainerClientImplementation(
                                      rootConfig: Configuration
                                      ) {
 
-  lazy val controllers: Seq[Controller] = Seq(newEditor, newPlayer, componentSets, playerHooks, editorHooks, items, sessions, assets, icons, rig, libs, playerLauncher)
+  lazy val controllers: Seq[Controller] = Seq(newEditor, newPlayer, componentSets, items, sessions, assets, icons, rig, libs, playerLauncher)
 
   def rootUiComponents = comps.filter(_.isInstanceOf[UiComponent]).map(_.asInstanceOf[UiComponent])
 
@@ -167,17 +166,6 @@ class ContainerClientImplementation(
   }
 
 
-  private lazy val playerHooks = new PlayerHooks {
-
-    def loadedComponents: Seq[Component] = comps
-
-    override def actions: PlayerActions[AnyContent] = new ShellPlayerActions {
-      override def sessionService: MongoService = sessionServiceIn
-
-      override def itemService: MongoService = itemServiceIn
-    }
-  }
-
   private lazy val newEditor = new Editor {
 
     override def generator: SourceGenerator = new EditorGenerator
@@ -188,21 +176,11 @@ class ContainerClientImplementation(
 
     override def ngModules: AngularModules = new AngularModules("editor.services")
 
-    override def actions: ClientActions[AnyContent] = new EditorActions {
+    override def actions = new ShellEditorActions {
       override def itemService: MongoService = itemServiceIn
     }
 
     override def cache: ContainerCache = appCache
-  }
-
-  private lazy val editorHooks = new EditorHooks {
-    def itemService: MongoService = itemServiceIn
-
-    def loadedComponents: Seq[Component] = comps
-
-    override def actions: ContainerEditorActions[AnyContent] = new EditorActions {
-      override def itemService: MongoService = itemServiceIn
-    }
   }
 
   private lazy val items = new Item {
