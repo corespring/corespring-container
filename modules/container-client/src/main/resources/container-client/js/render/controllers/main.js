@@ -80,7 +80,7 @@ var controller = function ($scope, $log, $timeout, $location, ComponentRegister,
         },
         onSuccess, 
         onError,
-        $scope.sessionId
+        $scope.session.itemId
       );
   };
 
