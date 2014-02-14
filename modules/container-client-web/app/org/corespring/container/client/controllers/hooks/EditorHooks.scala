@@ -10,6 +10,7 @@ import play.api.libs.json.{JsArray, JsValue, Json}
 import play.api.mvc.{AnyContent, Action}
 import scala.concurrent.{ExecutionContext, Future}
 
+@deprecated("use org.corespring.container.client.controllers.Editor instead", "0.2.8" )
 trait EditorHooks extends BaseHooksWithActions[EditorActions[AnyContent]] {
 
   val logger = Logger("editor.hooks")

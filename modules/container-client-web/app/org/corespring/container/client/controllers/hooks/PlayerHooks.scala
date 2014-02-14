@@ -12,6 +12,7 @@ import play.api.mvc._
 import scala.concurrent.{Future, Await}
 
 
+@deprecated("use org.corespring.container.client.controllers.Editor instead", "0.2.8" )
 trait PlayerHooks extends BaseHooksWithActions[PlayerActions[AnyContent]] with LayoutComponentReading {
 
   val log = Logger("player.hooks")
