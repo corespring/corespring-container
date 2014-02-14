@@ -14,7 +14,7 @@ trait RigItemTypeReader extends ItemTypeReader {
   }
 }
 
-trait Rig extends App with RigItemTypeReader {
+trait Rig extends AppWithConfig[ClientActions[AnyContent]] with RigItemTypeReader {
 
   def index(componentType: String, data: Option[String] = None) = {
     controllers.Assets.at("/container-client", s"rig.html")
