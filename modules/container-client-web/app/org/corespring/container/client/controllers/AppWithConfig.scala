@@ -1,16 +1,15 @@
 package org.corespring.container.client.controllers
 
 import org.corespring.container.client.actions.ClientActions
-import org.corespring.container.client.cache.ContainerCache
-import org.corespring.container.client.component.{ComponentUrls, ItemTypeReader, DependencyResolver, SourceGenerator}
+import org.corespring.container.client.cache.{Cached, ContainerCache}
+import org.corespring.container.client.component.{ComponentUrls, ItemTypeReader, DependencyResolver}
 import org.corespring.container.client.controllers.angular.AngularModules
 import org.corespring.container.client.controllers.helpers.{Helpers, XhtmlProcessor}
 import org.corespring.container.components.model.packaging.{ClientSideDependency, ClientDependencies}
 import org.corespring.container.components.model.{Component, Id}
+import play.api.http.ContentTypes
 import play.api.libs.json.JsObject
 import play.api.mvc.{Action, AnyContent, Controller}
-import org.corespring.container.client.cache.{Cached, ContainerCache}
-import play.api.http.ContentTypes
 
 trait AppWithConfig[T <: ClientActions[AnyContent]]
   extends Controller
@@ -26,8 +25,6 @@ trait AppWithConfig[T <: ClientActions[AnyContent]]
   def urls: ComponentUrls
 
   def ngModules: AngularModules
-
-  def generator: SourceGenerator
 
   val typeRegex = "(.*?)-(.*)".r
 
@@ -45,9 +42,8 @@ trait AppWithConfig[T <: ClientActions[AnyContent]]
       }
 
       val components = resolveComponents(typeIds, context)
-      val names = components.map(_.componentType)
-      val jsUrl = urls.jsUrl(context, names, generator.js(components))
-      val cssUrl = urls.cssUrl(context, names, generator.css(components))
+      val jsUrl = urls.jsUrl(context, components)
+      val cssUrl = urls.cssUrl(context,components)
 
       val clientSideDependencies = getClientSideDependencies(components)
       val dependencies = ngModules.createAngularModules(components, clientSideDependencies)
@@ -118,6 +114,8 @@ trait AppWithServices[T <: ClientActions[AnyContent]] extends AppWithConfig[T] {
   import play.api.Play.current
 
   implicit def cache: ContainerCache
+
+  override def ngModules: AngularModules = new AngularModules(s"$context.services")
 
   def services = Cached(s"$context.services") {
     Action {

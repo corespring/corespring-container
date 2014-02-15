@@ -9,7 +9,7 @@ import play.api.{http, Logger}
  */
 object PreCache {
 
-  lazy val logger = Logger("container.precache")
+  lazy val logger = Logger("container.cache.precache")
 
   def etagKey(key: String) = s"$key-etag"
 

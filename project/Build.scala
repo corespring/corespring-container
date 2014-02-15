@@ -149,7 +149,7 @@ object Build extends sbt.Build {
   val shell = builder.playApp("shell")
     .settings(
       resolvers ++= Resolvers.all,
-      libraryDependencies ++= Seq(casbah, playS3, scalaz)
+      libraryDependencies ++= Seq(casbah, playS3, scalaz, play.Keys.cache)
   ).dependsOn(containerClientWeb, componentLoader, mongoJsonService)
     .aggregate(containerClientWeb, componentLoader, containerClient, componentModel, utils, jsProcessing, mongoJsonService)
 

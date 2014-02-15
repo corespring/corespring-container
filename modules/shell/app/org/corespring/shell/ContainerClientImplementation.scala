@@ -3,7 +3,7 @@ package org.corespring.shell
 import org.corespring.amazon.s3.ConcreteS3Service
 import org.corespring.container.client.V2PlayerConfig
 import org.corespring.container.client.actions.{PlayerActions,PlayerJsRequest, PlayerLauncherActions}
-import org.corespring.container.client.cache.ContainerCache
+import org.corespring.container.client.cache.{MapCache, ContainerCache}
 import org.corespring.container.client.component.{ComponentUrls, EditorGenerator, SourceGenerator, PlayerGenerator}
 import org.corespring.container.client.controllers._
 import org.corespring.container.client.controllers.angular.AngularModules
@@ -22,6 +22,8 @@ import play.api.Configuration
 import play.api.mvc._
 import scala.Some
 import scala.concurrent.duration.Duration
+import scala.reflect.ClassTag
+import org.corespring.shell.cache.PlayCacheProxy
 
 class ContainerClientImplementation(
                                      itemServiceIn: MongoService,
@@ -87,7 +89,7 @@ class ContainerClientImplementation(
 
     override def components = comps
 
-    override def urls: ComponentUrls = componentUrls
+    override def urls: ComponentUrls = componentSets
   }
 
   private lazy val assets = new Assets {
@@ -118,32 +120,14 @@ class ContainerClientImplementation(
     }
   }
 
-  private lazy val appCache = new ContainerCache {
+  //private lazy val appCache = new MapCache
+  private lazy val appCache = new PlayCacheProxy
 
-    import scala.collection.mutable
-
-    private val data: mutable.Map[String, Any] = mutable.Map()
-
-    override def remove(key: String): Unit = data.remove(key)
-
-    override def get(key: String): Option[String] = data.get(key).map(_.asInstanceOf[String])
-
-    override def getAs[T](key: String): Option[T] = data.get(key).map(_.asInstanceOf[T])
-
-    override def getOrElse[A](key: String, expiration: Int)(orElse: => A): A = data.get(key).map(_.asInstanceOf[A]).getOrElse(orElse)
-
-    override def set(key: String, value: Any, expiration: Duration): Unit = data.put(key, value)
-
-    override def set(key: String, value: Any, expiration: Int): Unit = data.put(key, value)
-
-    override def has(key: String): Boolean = data.contains(key)
+  private lazy val componentSets = new DevComponentSets{
+    override def components: Seq[Component] = comps
   }
 
-  private lazy val componentSets = new ComponentSets {
-    override def cache: ContainerCache = appCache
-  }
-
-  private lazy val componentUrls = new ComponentUrls {
+  /*private lazy val cachingComponentUrls = new ComponentUrls {
     override def cache: ContainerCache = appCache
 
     /** return a url where this hashed asset is available */
@@ -151,11 +135,11 @@ class ContainerClientImplementation(
 
     /** return a url where this hashed asset is available */
     override protected def jsPath(hash: String): String = org.corespring.container.client.controllers.routes.ComponentSets.resource(hash, "js").url
-  }
+  }*/
 
   private lazy val newPlayer = new Player {
 
-    override def urls: ComponentUrls = componentUrls
+    override def urls: ComponentUrls = componentSets
 
     override def components: Seq[Component] = comps
 
@@ -165,23 +149,15 @@ class ContainerClientImplementation(
       override def itemService: MongoService = itemServiceIn
     }
 
-    override def ngModules: AngularModules = new AngularModules("player.services")
-
-    override def generator: PlayerGenerator = new PlayerGenerator
-
     override def cache: ContainerCache = appCache
   }
 
 
   private lazy val newEditor = new Editor {
 
-    override def generator: SourceGenerator = new EditorGenerator
-
-    override def urls: ComponentUrls = componentUrls
+    override def urls: ComponentUrls = componentSets
 
     override def components: Seq[Component] = comps
-
-    override def ngModules: AngularModules = new AngularModules("editor.services")
 
     override def actions = new ShellEditorActions {
       override def itemService: MongoService = itemServiceIn
