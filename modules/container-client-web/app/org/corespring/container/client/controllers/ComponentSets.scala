@@ -16,14 +16,13 @@ trait ComponentSets extends Controller with ComponentUrls {
 
   def editorGenerator: SourceGenerator
 
-  def resource(context: String, directive: String, suffix: String): Action[AnyContent] = {
-
+  def resource[A >: EssentialAction](context: String, directive: String, suffix: String) : A = {
     logger.debug(s"[resource] : $directive")
     val types: Seq[String] = ComponentUrlDirective(directive, allComponents)
     generate(context, types.map(t => allComponents.find(_.componentType == t)).flatten, suffix)
   }
 
-  protected def generate(context: String, components: Seq[Component], suffix: String): Action[AnyContent] = Action {
+  protected def generate[A >: EssentialAction](context: String, components: Seq[Component], suffix: String): A = Action {
     request =>
 
       logger.trace(s"context: $context, comps: ${components.map(_.componentType).mkString(",")}")
