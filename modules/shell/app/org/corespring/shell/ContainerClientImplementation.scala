@@ -12,12 +12,12 @@ import org.corespring.container.components.outcome.{ItemJsScoreProcessor, ScoreP
 import org.corespring.container.components.processing.rhino.PlayerItemPreProcessor
 import org.corespring.container.components.response.rhino.OutcomeProcessor
 import org.corespring.mongo.json.services.MongoService
+import org.corespring.shell.controllers.CachedComponentSets
 import org.corespring.shell.controllers.editor.Item
 import org.corespring.shell.controllers.editor.actions.{EditorActions => ShellEditorActions}
 import org.corespring.shell.controllers.player.Session
 import org.corespring.shell.controllers.player.actions.{PlayerActions => ShellPlayerActions}
 import play.api.Configuration
-import play.api.cache.Cached
 import play.api.mvc._
 import scala.Some
 
@@ -116,25 +116,11 @@ class ContainerClientImplementation(
     }
   }
 
-  /**
-   * An example of component sets with caching.
-   */
-  trait ProdComponentSets extends ComponentSets with ComponentUrls {
-
-    import play.api.Play.current
-
-    override def resource(context: String, directive: String, suffix: String): EssentialAction = {
-      Cached(s"$context-$directive-$suffix") {
-        super.resource(context, directive, suffix)
-      }
-    }
-  }
-
   /*private lazy val componentSets = new DevComponentSets{
     override def allComponents: Seq[Component] = comps
   }*/
 
-  private lazy val componentSets = new ProdComponentSets {
+  private lazy val componentSets = new CachedComponentSets {
     override def allComponents: Seq[Component] = comps
   }
 
