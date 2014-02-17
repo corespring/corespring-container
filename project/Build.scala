@@ -148,7 +148,12 @@ object Build extends sbt.Build {
   val docs = builder.playApp("docs")
     .settings(LaikaPlugin.defaults: _*)
     .settings(
-        unmanagedResourceDirectories in Compile += target.value / "docs"
+      unmanagedResourceDirectories in Compile += target.value / "docs",
+      compile in Compile := {
+        import laika.sbt.LaikaSbtPlugin.LaikaKeys._
+        (site in Laika).value
+        (compile in Compile).value
+      } //(compile in Compile).dependsOn(laika.sbt.LaikaSbtPlugin.LaikaKeys.site)
     )
 
   val shell = builder.playApp("shell")

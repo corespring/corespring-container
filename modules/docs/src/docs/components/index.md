@@ -1,13 +1,18 @@
 # Component Spec
 
-There are 3 types of component: UiComponent, Layout and Library
+There are 3 types of component: [UiComponent], [Layout] and [Library]
 
-## UiComponent ----------------
+* UiComponents - Interactive elements that are part of the test, and so consist of client side logic and server side logic.
+* Layout - Ui elements that can contain other elements, they are not part of the test and are client side only.
+* Library - for sharing either client or server side logic amongst components use Libraries.
+
+## UiComponent
+
 //TODO - UiComponent rename to Interaction
 
 ### How to depend on a library
 
-## Layout Component -------------------
+## Layout Component
 
 A layout component is a component that only has logic that
 provides layouts within an item. For example: Tabs, Carousel, Expanders etc.
@@ -18,9 +23,10 @@ provides layouts within an item. For example: Tabs, Carousel, Expanders etc.
 The container decides to include the components by inspecting the Item.xhtml property for usage.
 
 ### Defining
+
 ### Adding multiple items
 
-## Library ----------------
+## Library
 
 This spec defines how to create a component that can run within a corespring container.
 
@@ -33,6 +39,20 @@ On the client side the component must support the following modes:
 On the server side the component must define 1 method `respond` that takes the model, the answer and some settings.
 
 ## Folder Structure
+
+The basic folder structure for all components is like so:
+
+    ```bash
+        org/
+          comp/
+            package.json
+            src/
+              client/
+              server/
+            test/
+              client/
+              server/
+    ```
 
 ## Client
 
