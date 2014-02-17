@@ -4,15 +4,15 @@ describe('player launcher', function () {
 
   var launcher = null;
 
-  var MockInstanceIsCompleteReturnValue;
-
   var MockInstance = function () {
 
     this.isComplete = false;
 
     this.sendMessage = function (props) {
       if (props.message == "isComplete") {
-        props.callback(MockInstanceIsCompleteReturnValue);
+        props.callback(this.isComplete);
+      } else if(props.message == "completeResponse") {
+        this.isComplete = true;
       }
     };
 
@@ -37,7 +37,6 @@ describe('player launcher', function () {
   defaultOptions.corespringUrl = "http://blah.com";
 
   beforeEach(function () {
-    MockInstanceIsCompleteReturnValue = true;
     originalInstance = corespring.require("instance");
     mockInstance = corespring.module("instance", MockInstance);
     launchErrors = corespring.module("launcher-errors", MockErrors);
@@ -94,19 +93,38 @@ describe('player launcher', function () {
 
   it('should invoke error callback when changing mode from view => gather and session is complete', function () {
     var player = create({sessionId: "1", mode: "view", paths: {} });
+    player.completeResponse();
     player.setMode("gather");
     expect(lastError.code).toEqual(errors.NOT_ALLOWED.code);
   });
 
   describe('setMode', function () {
 
-    var complete = false, secure = false;
-
-    function modeChange(fromMode, toMode, complete, secure) {
-      MockInstanceIsCompleteReturnValue = complete;
-      var player = create({sessionId: "1", mode: fromMode, paths: {} }, secure);
-      player.setMode(toMode);
-      return {fromMode: fromMode, toMode: toMode, complete: complete, secure: secure, lastError: lastError}
+    function ModeChangeTest(){
+      this.lastError = {};
+      this.from = function(value){
+        this.fromMode = value;
+        return this;
+      };
+      this.to = function(value){
+        this.toMode = value;
+        return this;
+      };
+      this.withComplete = function(value){
+        this.complete = value;
+        return this;
+      };
+      this.andSecure = function(value){
+        this.secure = value;
+        return this;
+      };
+      this.do = function(){
+        var player = create({sessionId: "1", mode: this.fromMode, paths: {} }, this.secure);
+        this.complete && player.completeResponse();
+        player.setMode(this.toMode);
+        this.lastError = lastError;
+        return this;
+      }
     }
 
     function createModeChangeResultMessage(modeChangeResult) {
@@ -120,8 +138,9 @@ describe('player launcher', function () {
     beforeEach(function () {
       this.addMatchers({
         toSucceed: function () {
-          var pass = !this.actual.lastError;
-          var message = createModeChangeResultMessage(this.actual)
+          var testResult = this.actual.do();
+          var pass = !testResult.lastError;
+          var message = createModeChangeResultMessage(testResult)
             + " " + (pass ? "succeeded" : "failed");
           this.message = function () {
             return message
@@ -129,8 +148,9 @@ describe('player launcher', function () {
           return pass;
         },
         toFail: function () {
-          var pass = this.actual.lastError;
-          var message = createModeChangeResultMessage(this.actual)
+          var testResult = this.actual.do();
+          var pass = testResult.lastError;
+          var message = createModeChangeResultMessage(testResult)
             + " " + (pass ? "should have failed" : "did not fail as expected.");
           this.message = function () {
             return message
@@ -141,43 +161,43 @@ describe('player launcher', function () {
     });
 
     it("should work as expected when complete is false and secure is false", function () {
-      var complete = false, secure = false;
-      expect(modeChange("gather", "view", complete, secure)).toSucceed();
-      expect(modeChange("gather", "evaluate", complete, secure)).toSucceed();
-      expect(modeChange("view", "gather", complete, secure)).toSucceed();
-      expect(modeChange("view", "evaluate", complete, secure)).toSucceed();
-      expect(modeChange("evaluate", "gather", complete, secure)).toSucceed();
-      expect(modeChange("evaluate", "view", complete, secure)).toSucceed();
+      var modeChange = new ModeChangeTest().withComplete(false).andSecure(false);
+      expect(modeChange.from("gather").to("view")).toSucceed();
+      expect(modeChange.from("gather").to("evaluate")).toSucceed();
+      expect(modeChange.from("view").to("gather")).toSucceed();
+      expect(modeChange.from("view").to("evaluate")).toSucceed();
+      expect(modeChange.from("evaluate").to("gather")).toSucceed();
+      expect(modeChange.from("evaluate").to("view")).toSucceed();
     });
 
     it("should work as expected when complete is true and secure is false", function () {
-      var complete = true, secure = false;
-      expect(modeChange("gather", "view", complete, secure)).toSucceed();
-      expect(modeChange("gather", "evaluate", complete, secure)).toSucceed();
-      expect(modeChange("view", "gather", complete, secure)).toSucceed();
-      expect(modeChange("view", "evaluate", complete, secure)).toSucceed();
-      expect(modeChange("evaluate", "gather", complete, secure)).toSucceed();
-      expect(modeChange("evaluate", "view", complete, secure)).toSucceed();
+      var modeChange = new ModeChangeTest().withComplete(true).andSecure(false);
+      expect(modeChange.from("gather").to("view")).toSucceed();
+      expect(modeChange.from("gather").to("evaluate")).toSucceed();
+      expect(modeChange.from("view").to("gather")).toSucceed();
+      expect(modeChange.from("view").to("evaluate")).toSucceed();
+      expect(modeChange.from("evaluate").to("gather")).toSucceed();
+      expect(modeChange.from("evaluate").to("view")).toSucceed();
     });
 
     it("should work as expected when complete is false and secure is true", function () {
-      var complete = false, secure = true;
-      expect(modeChange("gather", "view", complete, secure)).toSucceed();
-      expect(modeChange("gather", "evaluate", complete, secure)).toFail();
-      expect(modeChange("view", "gather", complete, secure)).toSucceed();
-      expect(modeChange("view", "evaluate", complete, secure)).toFail();
-      expect(modeChange("evaluate", "gather", complete, secure)).toSucceed();
-      expect(modeChange("evaluate", "view", complete, secure)).toSucceed();
+      var modeChange = new ModeChangeTest().withComplete(false).andSecure(true);
+      expect(modeChange.from("gather").to("view")).toSucceed();
+      expect(modeChange.from("gather").to("evaluate")).toFail();
+      expect(modeChange.from("view").to("gather")).toSucceed();
+      expect(modeChange.from("view").to("evaluate")).toFail();
+      expect(modeChange.from("evaluate").to("gather")).toSucceed();
+      expect(modeChange.from("evaluate").to("view")).toSucceed();
     });
 
     it("should work as expected when complete is true and secure is true", function () {
-      var complete = true, secure = true;
-      expect(modeChange("gather", "view", complete, secure)).toSucceed();
-      expect(modeChange("gather", "evaluate", complete, secure)).toSucceed();
-      expect(modeChange("view", "gather", complete, secure)).toFail();
-      expect(modeChange("view", "evaluate", complete, secure)).toSucceed();
-      expect(modeChange("evaluate", "gather", complete, secure)).toFail();
-      expect(modeChange("evaluate", "view", complete, secure)).toSucceed();
+      var modeChange = new ModeChangeTest().withComplete(true).andSecure(true);
+      expect(modeChange.from("gather").to("view")).toSucceed();
+      expect(modeChange.from("gather").to("evaluate")).toSucceed();
+      expect(modeChange.from("view").to("gather")).toFail();
+      expect(modeChange.from("view").to("evaluate")).toSucceed();
+      expect(modeChange.from("evaluate").to("gather")).toFail();
+      expect(modeChange.from("evaluate").to("view")).toSucceed();
     });
   });
 });
