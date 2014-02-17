@@ -1,7 +1,6 @@
 package org.corespring.container.client.controllers
 
 import org.corespring.container.client.actions.ClientActions
-import org.corespring.container.client.cache.{Cached, ContainerCache}
 import org.corespring.container.client.component.{ComponentUrls, ItemTypeReader, DependencyResolver}
 import org.corespring.container.client.controllers.angular.AngularModules
 import org.corespring.container.client.controllers.helpers.{Helpers, XhtmlProcessor}
@@ -111,17 +110,12 @@ trait AppWithConfig[T <: ClientActions[AnyContent]]
 
 trait AppWithServices[T <: ClientActions[AnyContent]] extends AppWithConfig[T] { self : ItemTypeReader =>
 
-  import play.api.Play.current
-
-  implicit def cache: ContainerCache
 
   override def ngModules: AngularModules = new AngularModules(s"$context.services")
 
-  def services = Cached(s"$context.services") {
-    Action {
+  def services = Action {
       Ok(servicesJs.toString).as(ContentTypes.JAVASCRIPT)
     }
-  }
 
   def servicesJs: String
 }

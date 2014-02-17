@@ -2,11 +2,9 @@ package org.corespring.shell
 
 import org.corespring.amazon.s3.ConcreteS3Service
 import org.corespring.container.client.V2PlayerConfig
-import org.corespring.container.client.actions.{PlayerActions,PlayerJsRequest, PlayerLauncherActions}
-import org.corespring.container.client.cache.{MapCache, ContainerCache}
-import org.corespring.container.client.component.{ComponentUrls, EditorGenerator, SourceGenerator, PlayerGenerator}
+import org.corespring.container.client.actions.{PlayerActions, PlayerJsRequest, PlayerLauncherActions}
+import org.corespring.container.client.component.ComponentUrls
 import org.corespring.container.client.controllers._
-import org.corespring.container.client.controllers.angular.AngularModules
 import org.corespring.container.components.model.Component
 import org.corespring.container.components.model.Library
 import org.corespring.container.components.model.UiComponent
@@ -19,11 +17,9 @@ import org.corespring.shell.controllers.editor.actions.{EditorActions => ShellEd
 import org.corespring.shell.controllers.player.Session
 import org.corespring.shell.controllers.player.actions.{PlayerActions => ShellPlayerActions}
 import play.api.Configuration
+import play.api.cache.Cached
 import play.api.mvc._
 import scala.Some
-import scala.concurrent.duration.Duration
-import scala.reflect.ClassTag
-import org.corespring.shell.cache.PlayCacheProxy
 
 class ContainerClientImplementation(
                                      itemServiceIn: MongoService,
@@ -120,22 +116,27 @@ class ContainerClientImplementation(
     }
   }
 
-  //private lazy val appCache = new MapCache
-  private lazy val appCache = new PlayCacheProxy
+  /**
+   * An example of component sets with caching.
+   */
+  trait ProdComponentSets extends ComponentSets with ComponentUrls {
 
-  private lazy val componentSets = new DevComponentSets{
-    override def components: Seq[Component] = comps
+    import play.api.Play.current
+
+    override def resource(context: String, directive: String, suffix: String): EssentialAction = {
+      Cached(s"$context-$directive-$suffix") {
+        super.resource(context, directive, suffix)
+      }
+    }
   }
 
-  /*private lazy val cachingComponentUrls = new ComponentUrls {
-    override def cache: ContainerCache = appCache
-
-    /** return a url where this hashed asset is available */
-    override protected def cssPath(hash: String): String = org.corespring.container.client.controllers.routes.ComponentSets.resource(hash, "css").url
-
-    /** return a url where this hashed asset is available */
-    override protected def jsPath(hash: String): String = org.corespring.container.client.controllers.routes.ComponentSets.resource(hash, "js").url
+  /*private lazy val componentSets = new DevComponentSets{
+    override def allComponents: Seq[Component] = comps
   }*/
+
+  private lazy val componentSets = new ProdComponentSets {
+    override def allComponents: Seq[Component] = comps
+  }
 
   private lazy val newPlayer = new Player {
 
@@ -148,8 +149,6 @@ class ContainerClientImplementation(
 
       override def itemService: MongoService = itemServiceIn
     }
-
-    override def cache: ContainerCache = appCache
   }
 
 
@@ -162,8 +161,6 @@ class ContainerClientImplementation(
     override def actions = new ShellEditorActions {
       override def itemService: MongoService = itemServiceIn
     }
-
-    override def cache: ContainerCache = appCache
   }
 
   private lazy val items = new Item {
