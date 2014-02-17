@@ -57,7 +57,3 @@ trait ComponentSets extends Controller with ComponentUrls {
     }
   }
 }
-
-trait DevComponentSets extends ComponentSets{
-}
-
