@@ -12,14 +12,18 @@ trait ComponentSets extends Controller with ComponentUrls {
 
   def allComponents: Seq[Component]
 
-  def resource(context: String, directive: String, suffix: String): EssentialAction = {
+  def playerGenerator: SourceGenerator
+
+  def editorGenerator: SourceGenerator
+
+  def resource(context: String, directive: String, suffix: String): Action[AnyContent] = {
 
     logger.debug(s"[resource] : $directive")
     val types: Seq[String] = ComponentUrlDirective(directive, allComponents)
     generate(context, types.map(t => allComponents.find(_.componentType == t)).flatten, suffix)
   }
 
-  def generate(context: String, components: Seq[Component], suffix: String): Action[AnyContent] = Action {
+  protected def generate(context: String, components: Seq[Component], suffix: String): Action[AnyContent] = Action {
     request =>
 
       logger.trace(s"context: $context, comps: ${components.map(_.componentType).mkString(",")}")
@@ -31,10 +35,10 @@ trait ComponentSets extends Controller with ComponentUrls {
       }
 
       val out = context match {
-        case "editor" => gen(new EditorGenerator())
-        case "player" => gen(new PlayerGenerator())
-        case "rig" => gen(new PlayerGenerator())
-        case _ => throw new RuntimeException("Error")
+        case "editor" => gen(editorGenerator)
+        case "player" => gen(playerGenerator)
+        case "rig" => gen(playerGenerator)
+        case _ => throw new RuntimeException(s"Error: unknown context: $context")
       }
 
       val contentType = suffix match {
@@ -56,4 +60,10 @@ trait ComponentSets extends Controller with ComponentUrls {
       case _ => "?"
     }
   }
+}
+
+trait DefaultComponentSets extends ComponentSets{
+  val editorGenerator: SourceGenerator = new EditorGenerator()
+
+  val playerGenerator: SourceGenerator = new PlayerGenerator()
 }

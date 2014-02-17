@@ -116,10 +116,6 @@ class ContainerClientImplementation(
     }
   }
 
-  /*private lazy val componentSets = new DevComponentSets{
-    override def allComponents: Seq[Component] = comps
-  }*/
-
   private lazy val componentSets = new CachedComponentSets {
     override def allComponents: Seq[Component] = comps
   }
