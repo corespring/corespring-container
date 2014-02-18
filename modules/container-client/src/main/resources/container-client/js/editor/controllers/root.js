@@ -83,6 +83,13 @@ var controller = function ($scope, $compile, $http, $timeout, $modal, $log, Edit
   };
 
   $scope.onItemLoaded = function (data) {
+    _.each(data.item.components, function(c, key) {
+      var serverLogic = corespring.server.logic(c.componentType);
+      if (serverLogic.render) {
+        data.item.components[key] = serverLogic.render(c);
+      }
+    });
+
     $scope.rootModel = data;
     $scope.model = data.item;
 
