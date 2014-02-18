@@ -26,6 +26,18 @@ object Build extends sbt.Build {
     val grizzled = "org.clapper" %% "grizzled-scala" % "1.1.4"
     val scalaz = "org.scalaz" %% "scalaz-core" % "7.0.5"
     val htmlCleaner = "net.sourceforge.htmlcleaner" % "htmlcleaner" % "2.6.1"
+
+    //The closure compiler that play uses - we expect this to be provided by the play app.
+    val closureCompiler = ("com.google.javascript" % "closure-compiler" % "rr2079.1" )
+      .exclude("args4j", "args4j")
+      .exclude("org.json", "json")
+      .exclude("com.google.protobuf", "protobuf-java")
+      .exclude("org.apache.ant", "ant")
+      .exclude("com.google.code.findbugs", "jsr305")
+      .exclude("com.googlecode.jarjar", "jarjar")
+      .exclude("junit", "junit")
+
+    val yuiCompressor = "com.yahoo.platform.yui" % "yuicompressor" % "2.4.7"
   }
 
   object Resolvers {
@@ -160,7 +172,7 @@ object Build extends sbt.Build {
   val shell = builder.playApp("shell")
     .settings(
       resolvers ++= Resolvers.all,
-      libraryDependencies ++= Seq(casbah, playS3, scalaz, play.Keys.cache)
+      libraryDependencies ++= Seq(casbah, playS3, scalaz, play.Keys.cache, yuiCompressor, closureCompiler)
     ).dependsOn(containerClientWeb, componentLoader, mongoJsonService, docs)
     .aggregate(containerClientWeb, componentLoader, containerClient, componentModel, utils, jsProcessing, mongoJsonService, docs)
 

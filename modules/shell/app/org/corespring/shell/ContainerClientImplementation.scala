@@ -12,7 +12,7 @@ import org.corespring.container.components.outcome.{ItemJsScoreProcessor, ScoreP
 import org.corespring.container.components.processing.rhino.PlayerItemPreProcessor
 import org.corespring.container.components.response.rhino.OutcomeProcessor
 import org.corespring.mongo.json.services.MongoService
-import org.corespring.shell.controllers.CachedComponentSets
+import org.corespring.shell.controllers.CachedAndMinifiedComponentSets
 import org.corespring.shell.controllers.editor.Item
 import org.corespring.shell.controllers.editor.actions.{EditorActions => ShellEditorActions}
 import org.corespring.shell.controllers.player.Session
@@ -116,7 +116,7 @@ class ContainerClientImplementation(
     }
   }
 
-  private lazy val componentSets = new CachedComponentSets {
+  private lazy val componentSets = new CachedAndMinifiedComponentSets {
     override def allComponents: Seq[Component] = comps
   }
 

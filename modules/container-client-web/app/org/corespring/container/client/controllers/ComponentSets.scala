@@ -4,7 +4,8 @@ import org.corespring.container.client.component._
 import org.corespring.container.components.model.Component
 import play.api.Logger
 import play.api.http.ContentTypes
-import play.api.mvc.{EssentialAction, AnyContent, Action, Controller}
+import play.api.mvc._
+import scala.Some
 
 trait ComponentSets extends Controller with ComponentUrls {
 
@@ -16,7 +17,12 @@ trait ComponentSets extends Controller with ComponentUrls {
 
   def editorGenerator: SourceGenerator
 
-  def resource[A >: EssentialAction](context: String, directive: String, suffix: String) : A = {
+  /**
+   * Take a source + contentType and return a Result
+   */
+  protected def process(s: String, contentType: String): Result = Ok(s).as(contentType)
+
+  def resource[A >: EssentialAction](context: String, directive: String, suffix: String): A = {
     logger.debug(s"[resource] : $directive")
     val types: Seq[String] = ComponentUrlDirective(directive, allComponents)
     generate(context, types.map(t => allComponents.find(_.componentType == t)).flatten, suffix)
@@ -45,8 +51,7 @@ trait ComponentSets extends Controller with ComponentUrls {
         case "css" => ContentTypes.CSS
         case _ => throw new RuntimeException(s"Unknown suffix: $suffix")
       }
-
-      Ok(out).as(contentType)
+      process(out, contentType)
   }
 
   override def cssUrl(context: String, components: Seq[Component]): String = url(context, components, "css")
@@ -61,7 +66,7 @@ trait ComponentSets extends Controller with ComponentUrls {
   }
 }
 
-trait DefaultComponentSets extends ComponentSets{
+trait DefaultComponentSets extends ComponentSets {
   val editorGenerator: SourceGenerator = new EditorGenerator()
 
   val playerGenerator: SourceGenerator = new PlayerGenerator()
