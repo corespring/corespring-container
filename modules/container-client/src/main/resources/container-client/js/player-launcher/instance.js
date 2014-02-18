@@ -87,6 +87,8 @@ var Instance = function(element, options, errorCallback, log){
 
       var uid = new Date().getTime();
 
+      log.debug("[instance] [expectResult] [resultHandler] :", event);
+
       try {
         var dataString = event.data;
         var data = typeof(event.data) == "string" ? JSON.parse(event.data) : event.data;
@@ -105,15 +107,17 @@ var Instance = function(element, options, errorCallback, log){
 
 
   this.sendMessage = function(props){
+
+    if(props.callback){
+      expectResult(props.message + "Result", props.callback, extractPropertyFromMessage);
+    }
+
     postMessage(props.message, props.data);
 
     var extractPropertyFromMessage = function (message) {
       return message[props.property];
     };
 
-    if(props.callback){
-      expectResult(props.message + "Result", props.callback, extractPropertyFromMessage);
-    }
   };
 
   this.parseEvent = function(event){
@@ -135,8 +139,9 @@ var Instance = function(element, options, errorCallback, log){
     listener.addListener(function (event) {
       var data = that.parseEvent(event);
 
-      log.debug("message: " + data.message);
-
+      log.debug("[addListener] [handler] message: " + data.message);
+      log.debug("[addListener] [handler]", data.message, "===", name, data.message === name)
+      log.debug("[addListener] [handler] name: ", name)
       if (data.message === name) {
         callback(data);
       }

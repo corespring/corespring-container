@@ -129,6 +129,7 @@ object Build extends sbt.Build {
 
   val containerClientWeb = builder.playApp("container-client-web")
     .settings(
+      sbt.Keys.fork in Test := false ,
       sources in doc in Compile := List(),
       libraryDependencies ++= Seq(mockito, grizzled, htmlCleaner),
       templatesImport ++= Seq("play.api.libs.json.JsValue", "play.api.libs.json.Json")
