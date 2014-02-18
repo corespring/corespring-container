@@ -1,5 +1,8 @@
-//Listener - requires the global window variable
-
+/**
+ * Proxies calls to window message events.
+ * This prevents multiple listeners from different clients from being added to the window,
+ * which can't be removed properly if the client is removed.
+ */
 var instance = null;
 
 var rootListener = null;

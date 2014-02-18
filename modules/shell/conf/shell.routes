@@ -6,3 +6,5 @@ POST        /create-session       @org.corespring.shell.controllers.Main.createS
 GET         /assets/*file        controllers.Assets.at(path="/container-client", file)
 
 ->          /client              v2Player.Routes
+
+->          /docs                docs.Routes

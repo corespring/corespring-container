@@ -2,8 +2,11 @@ package org.corespring.shell
 
 import org.corespring.amazon.s3.ConcreteS3Service
 import org.corespring.container.client.V2PlayerConfig
-import org.corespring.container.client.actions.{PlayerJsRequest, PlayerLauncherActions}
+import org.corespring.container.client.actions.{PlayerActions,PlayerJsRequest, PlayerLauncherActions}
+import org.corespring.container.client.cache.ContainerCache
+import org.corespring.container.client.component.{ComponentUrls, EditorGenerator, SourceGenerator, PlayerGenerator}
 import org.corespring.container.client.controllers._
+import org.corespring.container.client.controllers.angular.AngularModules
 import org.corespring.container.components.model.Component
 import org.corespring.container.components.model.Library
 import org.corespring.container.components.model.UiComponent
@@ -11,8 +14,10 @@ import org.corespring.container.components.outcome.{ItemJsScoreProcessor, ScoreP
 import org.corespring.container.components.processing.rhino.PlayerItemPreProcessor
 import org.corespring.container.components.response.rhino.OutcomeProcessor
 import org.corespring.mongo.json.services.MongoService
-import org.corespring.shell.controllers.editor.{Item, EditorHooks}
-import org.corespring.shell.controllers.player.{Session, PlayerHooks}
+import org.corespring.shell.controllers.editor.Item
+import org.corespring.shell.controllers.editor.actions.{EditorActions => ShellEditorActions}
+import org.corespring.shell.controllers.player.Session
+import org.corespring.shell.controllers.player.actions.{PlayerActions => ShellPlayerActions}
 import play.api.Configuration
 import play.api.mvc._
 import scala.Some
@@ -24,11 +29,12 @@ class ContainerClientImplementation(
                                      rootConfig: Configuration
                                      ) {
 
-  lazy val controllers: Seq[Controller] = Seq(playerHooks, editorHooks, items, sessions, assets, icons, rig, libs, playerLauncher)
+  lazy val controllers: Seq[Controller] = Seq(newEditor, newPlayer, componentSets, items, sessions, assets, icons, rig, libs, playerLauncher)
 
   def rootUiComponents = comps.filter(_.isInstanceOf[UiComponent]).map(_.asInstanceOf[UiComponent])
 
   def rootLibs = comps.filter(_.isInstanceOf[Library]).map(_.asInstanceOf[Library])
+
 
   private lazy val playerLauncher = new PlayerLauncher {
 
@@ -78,11 +84,9 @@ class ContainerClientImplementation(
 
   private lazy val rig = new Rig {
 
-    override def name = "rig"
+    override def components = comps
 
-    override def loadedComponents = comps
-
-    override def uiComponents: Seq[UiComponent] = rootUiComponents
+    override def urls: ComponentUrls = componentUrls
   }
 
   private lazy val assets = new Assets {
@@ -113,19 +117,70 @@ class ContainerClientImplementation(
     }
   }
 
-  private lazy val playerHooks = new PlayerHooks {
+  private lazy val appCache = new ContainerCache {
 
-    def itemService: MongoService = itemServiceIn
+    import scala.collection.mutable
 
-    def loadedComponents: Seq[Component] = comps
+    private val data: mutable.Map[String, String] = mutable.Map()
 
-    def sessionService: MongoService = sessionServiceIn
+    override def has(key: String): Boolean = data.contains(key)
+
+    override def remove(key: String): Unit = data.remove(key)
+
+    override def get(key: String): Option[String] = data.get(key)
+
+    override def set(key: String, value: String): Unit = data.put(key, value)
   }
 
-  private lazy val editorHooks = new EditorHooks {
-    def itemService: MongoService = itemServiceIn
+  private lazy val componentSets = new ComponentSets {
+    override def cache: ContainerCache = appCache
+  }
 
-    def loadedComponents: Seq[Component] = comps
+  private lazy val componentUrls = new ComponentUrls {
+    override def cache: ContainerCache = appCache
+
+    /** return a url where this hashed asset is available */
+    override protected def cssPath(hash: String): String = org.corespring.container.client.controllers.routes.ComponentSets.resource(hash, "css").url
+
+    /** return a url where this hashed asset is available */
+    override protected def jsPath(hash: String): String = org.corespring.container.client.controllers.routes.ComponentSets.resource(hash, "js").url
+  }
+
+  private lazy val newPlayer = new Player {
+
+    override def urls: ComponentUrls = componentUrls
+
+    override def components: Seq[Component] = comps
+
+    override def actions: PlayerActions[AnyContent] = new ShellPlayerActions {
+      override def sessionService: MongoService = sessionServiceIn
+
+      override def itemService: MongoService = itemServiceIn
+    }
+
+    override def ngModules: AngularModules = new AngularModules("player.services")
+
+    override def generator: PlayerGenerator = new PlayerGenerator
+
+    override def cache: ContainerCache = appCache
+  }
+
+
+  private lazy val newEditor = new Editor {
+
+    override def generator: SourceGenerator = new EditorGenerator
+
+    override def urls: ComponentUrls = componentUrls
+
+    override def components: Seq[Component] = comps
+
+    override def ngModules: AngularModules = new AngularModules("editor.services")
+
+    override def actions = new ShellEditorActions {
+      override def itemService: MongoService = itemServiceIn
+    }
+
+    override def cache: ContainerCache = appCache
   }
 
   private lazy val items = new Item {

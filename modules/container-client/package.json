@@ -4,6 +4,7 @@
   "repository": "https://github.com/corespring/corespring-container/tree/master/modules/container-client",
   "version": "0.0.1",
   "devDependencies": {
+    "bower" : "git://github.com/neoziro/bower.git#v1.2.8-patched",
     "mkdirp" : "*",
     "grunt": "~0.4.1",
     "grunt-cli" : "~0.1.11",

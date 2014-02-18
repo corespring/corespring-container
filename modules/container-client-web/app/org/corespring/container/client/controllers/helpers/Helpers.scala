@@ -1,12 +1,21 @@
 package org.corespring.container.client.controllers.helpers
 
-import org.corespring.container.utils.string
 import org.corespring.container.client.views.txt.js.ComponentWrapper
 import org.corespring.container.components.model.UiComponent
+import org.corespring.container.utils.string
 import play.api.libs.json.{JsValue, JsArray, JsString, Json}
 import play.api.mvc.{Results, Result}
 
-trait Helpers {
+trait NameHelper{
+
+  protected def moduleName(org: String, comp: String) = string.join(".", org, comp)
+
+  protected def tagName(org:String, comp:String) = string.join("-", org, comp)
+
+  protected def directiveName(org: String, comp: String) = s"$org${string.hyphenatedToTitleCase(comp)}"
+}
+
+trait Helpers extends NameHelper{
 
   implicit def toSeqJsValue(s: Seq[String]): JsValue = JsArray(s.map(JsString(_)))
 
@@ -33,10 +42,5 @@ trait Helpers {
     ComponentWrapper(moduleName(org, name), directiveName(org, name), src).toString
   }
 
-  protected def moduleName(org: String, comp: String) = string.join(".", org, comp)
-
-  protected def tagName(org:String, comp:String) = string.join("-", org, comp)
-
-  protected def directiveName(org: String, comp: String) = s"$org${string.hyphenatedToTitleCase(comp)}"
 }
 

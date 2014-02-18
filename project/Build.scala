@@ -1,9 +1,7 @@
 import java.net.InetSocketAddress
-import sbt.inc.Analysis
+import laika.sbt.LaikaSbtPlugin.{Tasks, LaikaKeys, LaikaPlugin}
 import sbt.Keys._
 import sbt._
-import sbt.ScalaVersion
-import sbtrelease.ReleasePlugin._
 import scala.Some
 import play.Project._
 
@@ -45,8 +43,8 @@ object Build extends sbt.Build {
   lazy val utils = builder.lib("container-utils")
 
   val playAppToSbtLibSettings = Seq(
-    scalaSource in Compile <<= (baseDirectory in Compile)(_ / "src"/ "main"/ "scala"),
-    scalaSource in Test <<= (baseDirectory in Test)(_ / "src" / "test"/ "scala"),
+    scalaSource in Compile <<= (baseDirectory in Compile)(_ / "src" / "main" / "scala"),
+    scalaSource in Test <<= (baseDirectory in Test)(_ / "src" / "test" / "scala"),
     resourceDirectory in Compile <<= (baseDirectory in Compile)(_ / "src" / "main" / "resources"),
     resourceDirectory in Test <<= (baseDirectory in Test)(_ / "src" / "test" / "resources"),
     lessEntryPoints := Nil,
@@ -57,13 +55,14 @@ object Build extends sbt.Build {
 
   val buildClientTask = buildClient <<= (baseDirectory, streams) map {
     (baseDir, s) =>
-      val clientRoot : File = baseDir
+      val clientRoot: File = baseDir
 
       val osName = System.getProperty("os.name")
 
       s.log.info(s"os: $osName")
       val commands = Seq(
         ("npm", "install"),
+
         /**
          * Note: Adding a bower cache clean to workaround this issue:
          * https://github.com/bower/bower/issues/991
@@ -71,17 +70,18 @@ object Build extends sbt.Build {
          */
         ("bower", "cache clean"),
         ("bower", "install"),
-        ("grunt",  "--devMode=false")
+        ("grunt", "--devMode=false")
       )
 
-      commands.foreach{ c =>
-        s.log.info(s"[>> $c] on " + clientRoot )
-        val (name, args) = c
-        val cmd = if(isWindows) s"$name.cmd" else name
-        val exitCode = sbt.Process(s"$cmd $args", clientRoot).!
-        if(exitCode != 0) {
+      commands.foreach {
+        c =>
+          s.log.info(s"[>> $c] on " + clientRoot)
+          val (name, args) = c
+          val cmd = if (isWindows) s"$name.cmd" else name
+          val exitCode = sbt.Process(s"$cmd $args", clientRoot).!
+          if (exitCode != 0) {
             throw new RuntimeException(s"The following commands failed: $c")
-        }
+          }
       }
 
   }
@@ -93,7 +93,7 @@ object Build extends sbt.Build {
       s.log.info("run client tests")
       sbt.Process("npm install", baseDir) !;
       val result = sbt.Process("grunt test", baseDir) !;
-      if(result != 0){
+      if (result != 0) {
         throw new RuntimeException("Tests Failed")
       }
   }
@@ -105,21 +105,21 @@ object Build extends sbt.Build {
       (test in Test) <<= (test in Test) dependsOn runClientTests,
       //This task is called by the play stage task
       (packagedArtifacts) <<= (packagedArtifacts) dependsOn buildClient
-  )
+    )
 
   //Note: this is a play app for now until we move to play 2.2.0
   lazy val jsProcessing = builder.playApp("js-processing")
-  .settings(playAppToSbtLibSettings : _*)
-  .settings(
-    libraryDependencies ++= Seq(rhinoJs)
-  ).dependsOn(containerClient)
+    .settings(playAppToSbtLibSettings: _*)
+    .settings(
+      libraryDependencies ++= Seq(rhinoJs)
+    ).dependsOn(containerClient)
 
   //Note: As above...
   lazy val componentModel = builder.playApp("component-model")
-  .settings(playAppToSbtLibSettings: _*)
-  .settings(
-    resolvers ++= Resolvers.all
-  ).dependsOn(utils % "test->compile;compile->compile", jsProcessing)
+    .settings(playAppToSbtLibSettings: _*)
+    .settings(
+      resolvers ++= Resolvers.all
+    ).dependsOn(utils % "test->compile;compile->compile", jsProcessing)
 
   lazy val componentLoader = builder.lib("component-loader")
     .settings(
@@ -129,9 +129,10 @@ object Build extends sbt.Build {
 
   val containerClientWeb = builder.playApp("container-client-web")
     .settings(
+      sbt.Keys.fork in Test := false ,
       sources in doc in Compile := List(),
       libraryDependencies ++= Seq(mockito, grizzled, htmlCleaner),
-      templatesImport ++= Seq( "play.api.libs.json.JsValue", "play.api.libs.json.Json" )
+      templatesImport ++= Seq("play.api.libs.json.JsValue", "play.api.libs.json.Json")
     ).dependsOn(
       componentModel % "compile->compile;test->test",
       containerClient,
@@ -145,22 +146,34 @@ object Build extends sbt.Build {
     )
 
 
+  val docs = builder.playApp("docs")
+    .settings(LaikaPlugin.defaults: _*)
+    .settings(
+      unmanagedResourceDirectories in Compile += target.value / "docs",
+      compile in Compile := {
+        import laika.sbt.LaikaSbtPlugin.LaikaKeys._
+        (site in Laika).value
+        (compile in Compile).value
+      } //(compile in Compile).dependsOn(laika.sbt.LaikaSbtPlugin.LaikaKeys.site)
+    )
+
   val shell = builder.playApp("shell")
     .settings(
       resolvers ++= Resolvers.all,
       libraryDependencies ++= Seq(casbah, playS3, scalaz)
-  ).dependsOn(containerClientWeb, componentLoader, mongoJsonService)
-    .aggregate(containerClientWeb, componentLoader, containerClient, componentModel, utils, jsProcessing, mongoJsonService)
+    ).dependsOn(containerClientWeb, componentLoader, mongoJsonService, docs)
+    .aggregate(containerClientWeb, componentLoader, containerClient, componentModel, utils, jsProcessing, mongoJsonService, docs)
 
   val root = builder.playApp("root", Some("."))
     .settings(
       sbt.Keys.fork in Test := false,
       // Start grunt on play run
-      playOnStarted <+= baseDirectory { base =>
-        (address: InetSocketAddress) => {
-          val cmd = if(isWindows) "grunt.cmd" else "grunt"
-          Grunt.process = Some(Process(s"$cmd run", (base/ "modules"/"container-client")).run)
-        }: Unit
+      playOnStarted <+= baseDirectory {
+        base =>
+          (address: InetSocketAddress) => {
+            val cmd = if (isWindows) "grunt.cmd" else "grunt"
+            Grunt.process = Some(Process(s"$cmd run", (base / "modules" / "container-client")).run)
+          }: Unit
       },
       // Stop grunt when play run stops
       playOnStopped += {
@@ -169,12 +182,13 @@ object Build extends sbt.Build {
           Grunt.process = None
         }: Unit
       },
-      commands <++= baseDirectory { base =>
-        Seq(
-          "grunt",
-          "bower",
-          "npm"
-        ).map(cmd(_, (base/"modules"/"container-client")))
+      commands <++= baseDirectory {
+        base =>
+          Seq(
+            "grunt",
+            "bower",
+            "npm"
+          ).map(cmd(_, (base / "modules" / "container-client")))
       }
 
 
@@ -183,18 +197,20 @@ object Build extends sbt.Build {
     .aggregate(shell)
 
   private def cmd(name: String, base: File): Command = {
-    Command.args(name, "<" + name + "-command>") { (state, args) =>
+    Command.args(name, "<" + name + "-command>") {
+      (state, args) =>
 
-      val cmd = if(isWindows) s"$name.cmd" else name
-      val exitCode = Process(cmd :: args.toList, base) !;
-      if(exitCode != 0){
-        throw new RuntimeException(s"$name, ${base.getPath} returned a non zero exit code")
-      }
-      state
+        val cmd = if (isWindows) s"$name.cmd" else name
+        val exitCode = Process(cmd :: args.toList, base) !;
+        if (exitCode != 0) {
+          throw new RuntimeException(s"$name, ${base.getPath} returned a non zero exit code")
+        }
+        state
     }
   }
 
   object Grunt {
     var process: Option[Process] = None
   }
+
 }
