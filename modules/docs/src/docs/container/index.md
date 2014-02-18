@@ -61,15 +61,21 @@ By implementing `ItemActions` the containing app can plugin any integration poin
         }
     }
 
-This implementation will the be used by the controller implementation:
+This implementation will then be used by the controller implementation:
 
     class AppItemController extends ItemController{
         override def actions = new AppItemActions()
     }
 
-Finally the implementation needs to be returned in play's `GlobalSettings#getControllerInstance` method. This is done by
-providing an implementation of this method. In the container-client-web we provide an implementation: `ControllerInstanceResolver`.
-You only need to specify the controllers fo look for.
+Finally the implementation needs to be returned by implementing play's `GlobalSettings#getControllerInstance` method.
+In the `container-client-web` we provide a trait that implements this: `ControllerInstanceResolver`.
+Your implementation of this trait only needs to specify:
+
+    def controllers: Seq[Controller]
+
+The trait will use this seq to look up implementations.
+
+Here's an example:
 
     object Global extends ControllerInstanceResolver with GlobalSettings {
       //controllers that will be used to lookup implementations
