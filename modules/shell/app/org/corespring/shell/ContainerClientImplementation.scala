@@ -2,11 +2,9 @@ package org.corespring.shell
 
 import org.corespring.amazon.s3.ConcreteS3Service
 import org.corespring.container.client.V2PlayerConfig
-import org.corespring.container.client.actions.{PlayerActions,PlayerJsRequest, PlayerLauncherActions}
-import org.corespring.container.client.cache.ContainerCache
-import org.corespring.container.client.component.{ComponentUrls, EditorGenerator, SourceGenerator, PlayerGenerator}
+import org.corespring.container.client.actions.{PlayerActions, PlayerJsRequest, PlayerLauncherActions}
+import org.corespring.container.client.component.ComponentUrls
 import org.corespring.container.client.controllers._
-import org.corespring.container.client.controllers.angular.AngularModules
 import org.corespring.container.components.model.Component
 import org.corespring.container.components.model.Library
 import org.corespring.container.components.model.UiComponent
@@ -14,6 +12,7 @@ import org.corespring.container.components.outcome.{ItemJsScoreProcessor, ScoreP
 import org.corespring.container.components.processing.rhino.PlayerItemPreProcessor
 import org.corespring.container.components.response.rhino.OutcomeProcessor
 import org.corespring.mongo.json.services.MongoService
+import org.corespring.shell.controllers.CachedComponentSets
 import org.corespring.shell.controllers.editor.Item
 import org.corespring.shell.controllers.editor.actions.{EditorActions => ShellEditorActions}
 import org.corespring.shell.controllers.player.Session
@@ -86,7 +85,7 @@ class ContainerClientImplementation(
 
     override def components = comps
 
-    override def urls: ComponentUrls = componentUrls
+    override def urls: ComponentUrls = componentSets
   }
 
   private lazy val assets = new Assets {
@@ -117,38 +116,13 @@ class ContainerClientImplementation(
     }
   }
 
-  private lazy val appCache = new ContainerCache {
-
-    import scala.collection.mutable
-
-    private val data: mutable.Map[String, String] = mutable.Map()
-
-    override def has(key: String): Boolean = data.contains(key)
-
-    override def remove(key: String): Unit = data.remove(key)
-
-    override def get(key: String): Option[String] = data.get(key)
-
-    override def set(key: String, value: String): Unit = data.put(key, value)
-  }
-
-  private lazy val componentSets = new ComponentSets {
-    override def cache: ContainerCache = appCache
-  }
-
-  private lazy val componentUrls = new ComponentUrls {
-    override def cache: ContainerCache = appCache
-
-    /** return a url where this hashed asset is available */
-    override protected def cssPath(hash: String): String = org.corespring.container.client.controllers.routes.ComponentSets.resource(hash, "css").url
-
-    /** return a url where this hashed asset is available */
-    override protected def jsPath(hash: String): String = org.corespring.container.client.controllers.routes.ComponentSets.resource(hash, "js").url
+  private lazy val componentSets = new CachedComponentSets {
+    override def allComponents: Seq[Component] = comps
   }
 
   private lazy val newPlayer = new Player {
 
-    override def urls: ComponentUrls = componentUrls
+    override def urls: ComponentUrls = componentSets
 
     override def components: Seq[Component] = comps
 
@@ -157,30 +131,18 @@ class ContainerClientImplementation(
 
       override def itemService: MongoService = itemServiceIn
     }
-
-    override def ngModules: AngularModules = new AngularModules("player.services")
-
-    override def generator: PlayerGenerator = new PlayerGenerator
-
-    override def cache: ContainerCache = appCache
   }
 
 
   private lazy val newEditor = new Editor {
 
-    override def generator: SourceGenerator = new EditorGenerator
-
-    override def urls: ComponentUrls = componentUrls
+    override def urls: ComponentUrls = componentSets
 
     override def components: Seq[Component] = comps
-
-    override def ngModules: AngularModules = new AngularModules("editor.services")
 
     override def actions = new ShellEditorActions {
       override def itemService: MongoService = itemServiceIn
     }
-
-    override def cache: ContainerCache = appCache
   }
 
   private lazy val items = new Item {

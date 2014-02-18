@@ -1,12 +1,12 @@
 package org.corespring.container.client.controllers
 
 import org.corespring.container.client.actions.ClientActions
-import org.corespring.container.client.cache.ContainerCache
-import org.corespring.container.client.component.{ComponentUrls, ItemTypeReader, DependencyResolver, SourceGenerator}
+import org.corespring.container.client.component.{ComponentUrls, ItemTypeReader, DependencyResolver}
 import org.corespring.container.client.controllers.angular.AngularModules
 import org.corespring.container.client.controllers.helpers.{Helpers, XhtmlProcessor}
 import org.corespring.container.components.model.packaging.{ClientSideDependency, ClientDependencies}
 import org.corespring.container.components.model.{Component, Id}
+import play.api.http.ContentTypes
 import play.api.libs.json.JsObject
 import play.api.mvc.{Action, AnyContent, Controller}
 
@@ -14,9 +14,10 @@ trait AppWithConfig[T <: ClientActions[AnyContent]]
   extends Controller
   with DependencyResolver
   with XhtmlProcessor
-  with Helpers { self : ItemTypeReader =>
+  with Helpers {
+  self: ItemTypeReader =>
 
-  def context : String
+  def context: String
 
   def modulePath = v2Player.Routes.prefix
 
@@ -24,13 +25,11 @@ trait AppWithConfig[T <: ClientActions[AnyContent]]
 
   def ngModules: AngularModules
 
-  def generator: SourceGenerator
-
   val typeRegex = "(.*?)-(.*)".r
 
   def actions: T
 
-  def additionalScripts : Seq[String]
+  def additionalScripts: Seq[String]
 
   def config(id: String) = actions.loadConfig(id) {
     request =>
@@ -42,9 +41,8 @@ trait AppWithConfig[T <: ClientActions[AnyContent]]
       }
 
       val components = resolveComponents(typeIds, context)
-      val names = components.map(_.componentType)
-      val jsUrl = urls.jsUrl(context, names, generator.js(components))
-      val cssUrl = urls.cssUrl(context, names, generator.css(components))
+      val jsUrl = urls.jsUrl(context, components)
+      val cssUrl = urls.cssUrl(context,components)
 
       val clientSideDependencies = getClientSideDependencies(components)
       val dependencies = ngModules.createAngularModules(components, clientSideDependencies)
@@ -112,18 +110,12 @@ trait AppWithConfig[T <: ClientActions[AnyContent]]
 
 trait AppWithServices[T <: ClientActions[AnyContent]] extends AppWithConfig[T] { self : ItemTypeReader =>
 
-  def cache : ContainerCache
 
-  def services = {
-    val key = s"$context.services"
-    Action{
-      if(!cache.has(key)){
-        cache.set(key, servicesJs.toString )
-      }
+  override def ngModules: AngularModules = new AngularModules(s"$context.services")
 
-      cache.get(key).map(Ok(_)).getOrElse(NotFound(""))
+  def services = Action {
+      Ok(servicesJs.toString).as(ContentTypes.JAVASCRIPT)
     }
-  }
 
-  def servicesJs : String
+  def servicesJs: String
 }

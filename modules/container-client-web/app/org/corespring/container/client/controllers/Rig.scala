@@ -51,7 +51,5 @@ trait Rig extends AppWithConfig[ClientActions[AnyContent]] with RigItemTypeReade
     override def loadComponents(id: String)(block: (PlayerRequest[AnyContent]) => Result): Action[AnyContent] = passThrough(block)
   }
 
-  override def generator: SourceGenerator = new PlayerGenerator
-
   override def ngModules: AngularModules = new AngularModules()
 }

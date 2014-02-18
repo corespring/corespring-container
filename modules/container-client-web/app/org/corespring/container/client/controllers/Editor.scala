@@ -1,7 +1,7 @@
 package org.corespring.container.client.controllers
 
 import org.corespring.container.client.actions.EditorActions
-import org.corespring.container.client.component.AllItemTypesReader
+import org.corespring.container.client.component.{EditorGenerator, SourceGenerator, AllItemTypesReader}
 import org.corespring.container.client.views.txt.js.EditorServices
 import play.api.Logger
 import play.api.libs.json.{Json, JsValue, JsArray}

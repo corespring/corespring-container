@@ -10,7 +10,8 @@ GET        /images/*file                                   controllers.Assets.at
 GET        /components/*file                               controllers.Assets.at(path="/container-client/bower_components", file)
 GET        /libs/:orgName/:componentName/*file             @org.corespring.container.client.controllers.ComponentsFileController.at(orgName, componentName, file)
 
-GET        /component-sets/:hash.:suffix                   @org.corespring.container.client.controllers.ComponentSets.resource(hash:String, suffix:String)
+GET        /component-sets/:context/:directive.:suffix     @org.corespring.container.client.controllers.ComponentSets.resource(context:String, directive:String, suffix:String)
+
 
 # Hooks for the player: config, services + components
 GET        /session/:sessionId/player-config.json          @org.corespring.container.client.controllers.Player.config(sessionId:String)

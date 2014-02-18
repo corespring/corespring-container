@@ -61,12 +61,13 @@ By implementing `ItemActions` the containing app can plugin any integration poin
         }
     }
 
-This implementation will then be used by the controller implementation:
+This implementation will the be used by the controller implementation:
 
     class AppItemController extends ItemController{
         override def actions = new AppItemActions()
     }
 
+### component-sets controller
 Finally the implementation needs to be returned by implementing play's `GlobalSettings#getControllerInstance` method.
 In the `container-client-web` we provide a trait that implements this: `ControllerInstanceResolver`.
 Your implementation of this trait only needs to specify:
