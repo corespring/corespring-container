@@ -168,14 +168,6 @@ exports.define = function(isSecure) {
       });
     };
 
-    this.isComplete = function (callback) {
-      instance.sendMessage({
-        message: "isComplete",
-        property: "isComplete",
-        callback: callback
-      });
-    };
-
     this.getSessionStatus = function (callback) {
       instance.sendMessage({
         message: "getSessionStatus",
