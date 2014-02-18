@@ -1,9 +1,11 @@
 extends player
-  
+
+block player-header
+
 block player-child
   .container-player(ng-controller="ContainerPlayerControls")
     br/
-    button.btn.btn-primary(ng-click="submit()") Submit
+    button.btn.btn-primary(ng-click="submit()",ng-disabled="!canSubmit()") Submit
     button.btn.btn-warning(ng-click="reset()") Reset
     hr/
     .score(ng-show="score")

@@ -3,6 +3,13 @@ var controller = function ($scope, $log, $timeout, ComponentRegister, PlayerServ
 
   var currentMode = null;
 
+  $scope.evaluateOptions = {
+    showFeedback: true,
+    allowEmptyResponses: true,
+    highlightCorrectResponse: true,
+    highlightUserResponse: true
+  };
+
   $scope.onAnswerChanged = function(){
     $scope.$emit("inputReceived", {sessionStatus: getSessionStatus()});
   };
@@ -11,7 +18,7 @@ var controller = function ($scope, $log, $timeout, ComponentRegister, PlayerServ
 
   $scope.canSubmit = function() {
     if (!$scope.session || !$scope.session.settings) return false;
-    return $scope.session.settings.allowEmptyResponses || !ComponentRegister.hasEmptyAnswers();
+    return $scope.evaluateOptions.allowEmptyResponses || !ComponentRegister.hasEmptyAnswers();
   };
 
   $scope.save = function (isAttempt, isComplete, cb) {
