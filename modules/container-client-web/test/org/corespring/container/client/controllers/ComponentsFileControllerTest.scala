@@ -7,7 +7,7 @@ import play.api.test.{FakeHeaders, FakeRequest}
 
 class ComponentsFileControllerTest extends Specification {
 
-  val rootPath = s"test/${this.getClass.getPackage.getName.replaceAll("\\.", "/")}"
+  val rootPath = s"modules/container-client-web/test/${this.getClass.getPackage.getName.replaceAll("\\.", "/")}"
 
   "file controller" should {
 

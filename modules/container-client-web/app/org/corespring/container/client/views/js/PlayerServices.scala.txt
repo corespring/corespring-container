@@ -26,14 +26,16 @@ angular.module('@namespace').factory('PlayerServices', ['$http', function($http)
   };
 
   var callWithData = function(method, url){
-    return function(data, onSuccess, onFailure){
-      _call(method, url, data)(onSuccess, onFailure);
+    return function(data, onSuccess, onFailure, id){
+      var finalUrl = id ? url.replace(":id", id) : url;
+      _call(method, finalUrl, data)(onSuccess, onFailure);
     };
  };
 
  var callWithNoData = function(method, url){
-  return function(onSuccess, onFailure){
-    _call(method, url, null)(onSuccess, onFailure);
+  return function(onSuccess, onFailure, id){
+      var finalUrl = id ? url.replace(":id", id) : url;
+    _call(method, finalUrl, null)(onSuccess, onFailure);
   }
  };
 
