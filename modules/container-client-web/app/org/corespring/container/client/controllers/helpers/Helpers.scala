@@ -1,9 +1,10 @@
 package org.corespring.container.client.controllers.helpers
 
+import org.corespring.container.client.VersionInfo
 import org.corespring.container.client.views.txt.js.ComponentWrapper
 import org.corespring.container.components.model.UiComponent
 import org.corespring.container.utils.string
-import play.api.libs.json.{JsValue, JsArray, JsString, Json}
+import play.api.libs.json._
 import play.api.mvc.{Results, Result}
 
 trait NameHelper{
@@ -21,6 +22,8 @@ trait Helpers extends NameHelper{
 
   implicit def toJsString(s: String): JsValue = JsString(s)
 
+  implicit val versionInfoToJson : Writes[VersionInfo] = Json.writes[VersionInfo]
+
   def configJson(xhtml: String,
                  dependencies: Seq[String],
                  scriptPaths: Seq[String],
@@ -30,7 +33,8 @@ trait Helpers extends NameHelper{
       "xhtml" -> xhtml,
       "angular" -> Json.obj("dependencies" -> dependencies),
       "scripts" -> scriptPaths,
-      "css" -> cssPaths
+      "css" -> cssPaths,
+      "versionInfo" -> Json.toJson(VersionInfo.make)
     )
 
 
