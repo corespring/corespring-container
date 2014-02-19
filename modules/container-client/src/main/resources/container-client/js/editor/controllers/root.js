@@ -2,6 +2,11 @@ var controller = function ($scope, $compile, $http, $timeout, $modal, $log, Edit
 
   $scope.showComponentsPanel = false;
 
+  $scope.itemId = (function(){
+    //TODO: This is a temporary means of extracting the session id
+    return document.location.pathname.match(/.*\/(.*)\/.*/)[1];
+  })();
+
   var configPanels = {};
 
   var getUid = function () {
@@ -42,7 +47,7 @@ var controller = function ($scope, $compile, $http, $timeout, $modal, $log, Edit
     console.log($scope.model);
     var cleaned = $scope.serialize($scope.model);
     console.log(cleaned);
-    EditorServices.save(cleaned, $scope.onItemSaved, $scope.onItemSaveError);
+    EditorServices.save(cleaned, $scope.onItemSaved, $scope.onItemSaveError, $scope.itemId);
   };
 
   $scope.onItemSaved = function (data) {
@@ -83,6 +88,13 @@ var controller = function ($scope, $compile, $http, $timeout, $modal, $log, Edit
   };
 
   $scope.onItemLoaded = function (data) {
+    _.each(data.item.components, function(c, key) {
+      var serverLogic = corespring.server.logic(c.componentType);
+      if (serverLogic.render) {
+        data.item.components[key] = serverLogic.render(c);
+      }
+    });
+
     $scope.rootModel = data;
     $scope.model = data.item;
 
@@ -192,7 +204,7 @@ var controller = function ($scope, $compile, $http, $timeout, $modal, $log, Edit
   PlayerServices.setQuestionLookup($scope.getQuestionForComponentId);
   PlayerServices.setItemLookup($scope.getItem);
 
-  EditorServices.load($scope.onItemLoaded, $scope.onItemLoadError);
+  EditorServices.load($scope.onItemLoaded, $scope.onItemLoadError, $scope.itemId);
   EditorServices.loadComponents($scope.onComponentsLoaded, $scope.onComponentsLoadError);
 };
 

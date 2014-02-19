@@ -2,21 +2,10 @@ var controller = function ($scope, $rootScope, $log) {
 
   var mode = null;
 
-  var evaluateOptions = {
-    showFeedback: true,
-    allowEmptyResponses: true,
-    highlightCorrectResponse: true,
-    highlightUserResponse: true,
-    "corespring-drag-and-drop" : {
-      "blah" : "blah"
-    }
-  };
-
-
   $scope.submit = function(){
 
     var onSaveSuccess = function(err){
-      $scope.$emit('setMode', { mode: 'evaluate', options: evaluateOptions, saveResponses: null } );
+      $scope.$emit('setMode', { mode: 'evaluate', options: $scope.evaluateOptions, saveResponses: null } );
     };
 
     $scope.$emit('saveResponses', { isAttempt: true, isComplete: true, onSaveSuccess: onSaveSuccess } );
@@ -33,7 +22,7 @@ var controller = function ($scope, $rootScope, $log) {
     if(newValue){
       $log.debug("Session loaded: " + newValue);
       if(newValue.isComplete && mode !== 'evaluate'){
-        $scope.$emit('setMode', { mode: 'evaluate', options: evaluateOptions, saveResponses: null } );
+        $scope.$emit('setMode', { mode: 'evaluate', options: $scope.evaluateOptions, saveResponses: null } );
         mode = 'evaluate';
       }
     }

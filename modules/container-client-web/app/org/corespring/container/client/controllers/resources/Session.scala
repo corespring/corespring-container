@@ -94,6 +94,12 @@ trait Session extends Controller with ItemPruner {
       }
   }
 
+  /**
+   * Load outcome for a session.
+   * @param id
+   * request body : json - a set of evaluation options to be passed in to the outcome processors
+   * @return
+   */
   def loadOutcome(id: String) = actions.loadOutcome(id) {
     request: SessionOutcomeRequest[AnyContent] =>
       logger.trace(s"[loadOutcome]: $id : ${Json.stringify(request.itemSession)}")

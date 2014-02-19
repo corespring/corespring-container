@@ -7,3 +7,4 @@ package object string {
   def join(delimiter:String, s:String*) = s.mkString(delimiter)
 
 }
+

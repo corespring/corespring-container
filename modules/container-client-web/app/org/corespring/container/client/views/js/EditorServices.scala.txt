@@ -8,8 +8,11 @@
   angular.module('@namespace').factory('EditorServices', ['$http', function($http){
 
     var def = {
-      load: function(onSuccess, onFailure){
-        $http['@load.method.toLowerCase']('@load.url')
+      load: function(onSuccess, onFailure, id){
+
+        var finalUrl = id ? '@load.url'.replace(":id", id) : '@load.url';
+
+        $http['@load.method.toLowerCase'](finalUrl)
           .success(function(data, status, headers, config){
             console.log("[player-services] load item successful");
             onSuccess(data);
@@ -20,8 +23,9 @@
             }
           });
       },
-      save: function(item, onSuccess, onFailure){
-        $http['@save.method.toLowerCase']('@save.url', item)
+      save: function(item, onSuccess, onFailure, id){
+        var finalUrl = id ? '@save.url'.replace(":id", id) : '@save.url';
+        $http['@save.method.toLowerCase'](finalUrl, item)
           .success(function(data, status, headers, config) {
             console.log("item saved succesfully")
             onSuccess(data)
@@ -34,7 +38,6 @@
           });
       },
       loadComponents: function(onSuccess, onFailure){
-        //onSuccess({});
         var components = @{Json.stringify(componentSet)};
         onSuccess(components);
       }

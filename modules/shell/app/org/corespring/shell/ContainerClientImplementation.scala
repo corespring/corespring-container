@@ -2,7 +2,8 @@ package org.corespring.shell
 
 import org.corespring.amazon.s3.ConcreteS3Service
 import org.corespring.container.client.V2PlayerConfig
-import org.corespring.container.client.actions.{PlayerJsRequest, PlayerLauncherActions}
+import org.corespring.container.client.actions.{PlayerActions, PlayerJsRequest, PlayerLauncherActions}
+import org.corespring.container.client.component.ComponentUrls
 import org.corespring.container.client.controllers._
 import org.corespring.container.components.model.Component
 import org.corespring.container.components.model.Library
@@ -11,8 +12,11 @@ import org.corespring.container.components.outcome.{ItemJsScoreProcessor, ScoreP
 import org.corespring.container.components.processing.rhino.PlayerItemPreProcessor
 import org.corespring.container.components.response.rhino.OutcomeProcessor
 import org.corespring.mongo.json.services.MongoService
-import org.corespring.shell.controllers.editor.{Item, EditorHooks}
-import org.corespring.shell.controllers.player.{Session, PlayerHooks}
+import org.corespring.shell.controllers.CachedAndMinifiedComponentSets
+import org.corespring.shell.controllers.editor.Item
+import org.corespring.shell.controllers.editor.actions.{EditorActions => ShellEditorActions}
+import org.corespring.shell.controllers.player.Session
+import org.corespring.shell.controllers.player.actions.{PlayerActions => ShellPlayerActions}
 import play.api.Configuration
 import play.api.mvc._
 import scala.Some
@@ -24,11 +28,12 @@ class ContainerClientImplementation(
                                      rootConfig: Configuration
                                      ) {
 
-  lazy val controllers: Seq[Controller] = Seq(playerHooks, editorHooks, items, sessions, assets, icons, rig, libs, playerLauncher)
+  lazy val controllers: Seq[Controller] = Seq(newEditor, newPlayer, componentSets, items, sessions, assets, icons, rig, libs, playerLauncher)
 
   def rootUiComponents = comps.filter(_.isInstanceOf[UiComponent]).map(_.asInstanceOf[UiComponent])
 
   def rootLibs = comps.filter(_.isInstanceOf[Library]).map(_.asInstanceOf[Library])
+
 
   private lazy val playerLauncher = new PlayerLauncher {
 
@@ -78,11 +83,9 @@ class ContainerClientImplementation(
 
   private lazy val rig = new Rig {
 
-    override def name = "rig"
+    override def components = comps
 
-    override def loadedComponents = comps
-
-    override def uiComponents: Seq[UiComponent] = rootUiComponents
+    override def urls: ComponentUrls = componentSets
   }
 
   private lazy val assets = new Assets {
@@ -113,19 +116,33 @@ class ContainerClientImplementation(
     }
   }
 
-  private lazy val playerHooks = new PlayerHooks {
-
-    def itemService: MongoService = itemServiceIn
-
-    def loadedComponents: Seq[Component] = comps
-
-    def sessionService: MongoService = sessionServiceIn
+  private lazy val componentSets = new CachedAndMinifiedComponentSets {
+    override def allComponents: Seq[Component] = comps
   }
 
-  private lazy val editorHooks = new EditorHooks {
-    def itemService: MongoService = itemServiceIn
+  private lazy val newPlayer = new Player {
 
-    def loadedComponents: Seq[Component] = comps
+    override def urls: ComponentUrls = componentSets
+
+    override def components: Seq[Component] = comps
+
+    override def actions: PlayerActions[AnyContent] = new ShellPlayerActions {
+      override def sessionService: MongoService = sessionServiceIn
+
+      override def itemService: MongoService = itemServiceIn
+    }
+  }
+
+
+  private lazy val newEditor = new Editor {
+
+    override def urls: ComponentUrls = componentSets
+
+    override def components: Seq[Component] = comps
+
+    override def actions = new ShellEditorActions {
+      override def itemService: MongoService = itemServiceIn
+    }
   }
 
   private lazy val items = new Item {

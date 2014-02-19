@@ -1,7 +1,19 @@
 //# Main player controller
-var controller = function ($scope, $log, $timeout, ComponentRegister, PlayerServices) {
+var controller = function ($scope, $log, $timeout, $location, ComponentRegister, PlayerServices) {
 
   var currentMode = null;
+
+  $scope.evaluateOptions = {
+    showFeedback: true,
+    allowEmptyResponses: true,
+    highlightCorrectResponse: true,
+    highlightUserResponse: true
+  };
+
+  $scope.sessionId = (function(){
+    //TODO: This is a temporary means of extracting the session id
+    return document.location.pathname.match(/.*\/(.*)\/.*/)[1];
+  })();
 
   $scope.onAnswerChanged = function(){
     $scope.$emit("inputReceived", {sessionStatus: getSessionStatus()});
@@ -11,7 +23,7 @@ var controller = function ($scope, $log, $timeout, ComponentRegister, PlayerServ
 
   $scope.canSubmit = function() {
     if (!$scope.session || !$scope.session.settings) return false;
-    return $scope.session.settings.allowEmptyResponses || !ComponentRegister.hasEmptyAnswers();
+    return $scope.evaluateOptions.allowEmptyResponses || !ComponentRegister.hasEmptyAnswers();
   };
 
   $scope.save = function (isAttempt, isComplete, cb) {
@@ -37,7 +49,8 @@ var controller = function ($scope, $log, $timeout, ComponentRegister, PlayerServ
         if(cb){
           cb(e);
         }
-      } 
+      },
+      $scope.sessionId
       );
   };
 
@@ -53,7 +66,8 @@ var controller = function ($scope, $log, $timeout, ComponentRegister, PlayerServ
       }, function(err){
         $log.error(err);
         if(cb){ cb(err); }
-      }
+      },
+      $scope.sessionId
     );
   };
 
@@ -72,7 +86,8 @@ var controller = function ($scope, $log, $timeout, ComponentRegister, PlayerServ
           components: ComponentRegister.getComponentSessions()
         },
         onSuccess, 
-        onError
+        onError,
+        $scope.session.itemId
       );
   };
 
@@ -84,7 +99,8 @@ var controller = function ($scope, $log, $timeout, ComponentRegister, PlayerServ
       function(err){
         $scope.isComplete = false;
         $log.error(err);
-      }
+      },
+      $scope.sessionId
     );
   };
 
@@ -131,7 +147,7 @@ var controller = function ($scope, $log, $timeout, ComponentRegister, PlayerServ
   };
 
   $scope.$on('begin', function(){
-    PlayerServices.loadSession($scope.onEverythingLoaded, $scope.onSessionLoadError);
+    PlayerServices.loadSession($scope.onEverythingLoaded, $scope.onSessionLoadError, $scope.sessionId);
   });
 
   $scope.$on('saveResponses', function(event, data){
@@ -233,6 +249,7 @@ angular.module('corespring-player.controllers')
     ['$scope',
     '$log',
     '$timeout',
+    '$location',
     'ComponentRegister',
     'PlayerServices',
      controller
