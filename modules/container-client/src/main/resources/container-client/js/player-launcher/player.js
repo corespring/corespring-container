@@ -117,6 +117,9 @@ exports.define = function(isSecure) {
     this.setMode = function (mode, callback) {
 
       if(!isReady){
+        if (callback) {
+          callback(errors.PLAYER_NOT_READY);
+        }
         return;
       }
 
