@@ -39,24 +39,25 @@
     var getOutcomes = function (components, settings) {
 
       var out = {};
+      var serverLogic, answer, id, question;
 
-      for (var id in components) {
-        var question = angular.copy(getQuestionFor(id));
+      for (id in components) {
+        question = angular.copy(getQuestionFor(id));
         if (!question.target) {
-          var answer = components[id].answers;
-          var serverLogic = corespring.server.logic(question.componentType);
+          answer = components[id].answers;
+          serverLogic = corespring.server.logic(question.componentType);
           out[id] = serverLogic.respond(question, answer, settings);
-          out[id]['studentResponse'] = answer;
+          out[id].studentResponse = answer;
         }
       }
 
-      for (var id in components) {
-        var question = angular.copy(getQuestionFor(id));
+      for (id in components) {
+        question = angular.copy(getQuestionFor(id));
         if (question.target) {
-          var answer = components[id].answers;
+          answer = components[id].answers;
           var targetId = question.target.id;
           var targetOutcome = out[targetId];
-          var serverLogic = corespring.server.logic(question.componentType);
+          serverLogic = corespring.server.logic(question.componentType);
           out[id] = serverLogic.respond(question, answer, settings, targetOutcome);
         }
       }

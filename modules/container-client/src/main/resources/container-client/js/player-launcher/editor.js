@@ -2,13 +2,14 @@ var EditorDefinition = function(element, options, errorCallback){
 
   var errors = require("errors");
   var launcherErrors = require("launcher-errors");
+  var i;
 
   if(launcherErrors.hasErrors){
-    for(var i = 0; i < launcherErrors.errors.length; i++){
+    for(i = 0; i < launcherErrors.errors.length; i++){
       errorCallback( errors.EXTERNAL_ERROR(launcherErrors.errors[i]) );
     }
     return;
-  };
+  }
 
   var isReady = false;
 
@@ -23,13 +24,13 @@ var EditorDefinition = function(element, options, errorCallback){
   var result = validateOptions(options);
 
   if (result.length > 0) {
-    for (var i = 0; i < result.length; i++) {
+    for (i = 0; i < result.length; i++) {
       errorCallback(result[i]);
     }
     return;
   }
 
-  var InstanceDef = require("instance")
+  var InstanceDef = require("instance");
   
   errorCallback = errorCallback || function (error) {
     throw "error occurred, code: " + error.code + ", message: " + error.message;
@@ -54,7 +55,7 @@ var EditorDefinition = function(element, options, errorCallback){
       error: onError,
       dataType: "json" 
     });
-  }
+  };
 
   var loadItem = function(itemId, options){
     var editorPaths = loadPaths(options, "editor");
@@ -65,7 +66,7 @@ var EditorDefinition = function(element, options, errorCallback){
       var error = errors.EXTERNAL_ERROR(data.code + ": " + data.detailedMessage);
       errorCallback(error);
     });
-  }
+  };
 
   if(!options.itemId){
     createItem(options, 
@@ -77,7 +78,7 @@ var EditorDefinition = function(element, options, errorCallback){
         console.log(err);
       });
   } else {
-    loadItem(options.itemId, options)
+    loadItem(options.itemId, options);
   }
 };
 

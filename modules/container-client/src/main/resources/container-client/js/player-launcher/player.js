@@ -3,13 +3,14 @@ exports.define = function(isSecure) {
 
     var errors = require("errors");
     var launcherErrors = require("launcher-errors");
+    var i;
 
     if(launcherErrors.hasErrors){
-      for(var i = 0; i < launcherErrors.errors.length; i++){
+      for(i = 0; i < launcherErrors.errors.length; i++){
         errorCallback( errors.EXTERNAL_ERROR(launcherErrors.errors[i]) );
       }
       return;
-    };
+    }
 
     var isReady = false;
 
@@ -38,7 +39,7 @@ exports.define = function(isSecure) {
     var result = validateOptions(options);
 
     if (result.length > 0) {
-      for (var i = 0; i < result.length; i++) {
+      for (i = 0; i < result.length; i++) {
         errorCallback(result[i]);
       }
       return;

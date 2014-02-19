@@ -20,11 +20,11 @@ var Instance = function(element, options, errorCallback, log){
     var listenerFunction = function (data, event) {
       try {
         var json = JSON.parse(data);
-        if (json.message == 'dimensionsUpdate') {
+        if (json.message === 'dimensionsUpdate') {
           var frames = document.getElementsByTagName('iframe');
           var found = false;
           for (var i = 0; i < frames.length; i++) {
-            if (frames[i].contentWindow == event.source) {
+            if (frames[i].contentWindow === event.source) {
               $(frames[i]).height(json.h + 30);
               found = true;
               break;
@@ -38,7 +38,7 @@ var Instance = function(element, options, errorCallback, log){
     };
 
     listener.addListener(function(e) {
-      listenerFunction(e.data, e)
+      listenerFunction(e.data, e);
     });
   };
 
@@ -46,11 +46,11 @@ var Instance = function(element, options, errorCallback, log){
   var initialize = function (e, options) {
 
     if(!options || !options.url){
-      errorCallback( { code: 999, message: "No url specified" })
+      errorCallback( { code: 999, message: "No url specified" });
       return;
     }
 
-    if($(e).length == 0){
+    if($(e).length === 0){
       errorCallback( errors.CANT_FIND_IFRAME);
       return;
     }
@@ -140,8 +140,8 @@ var Instance = function(element, options, errorCallback, log){
       var data = that.parseEvent(event);
 
       log.debug("[addListener] [handler] message: " + data.message);
-      log.debug("[addListener] [handler]", data.message, "===", name, data.message === name)
-      log.debug("[addListener] [handler] name: ", name)
+      log.debug("[addListener] [handler]", data.message, "===", name, data.message === name);
+      log.debug("[addListener] [handler] name: ", name);
       if (data.message === name) {
         callback(data);
       }
