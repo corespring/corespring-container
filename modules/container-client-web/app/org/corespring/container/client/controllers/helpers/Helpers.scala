@@ -1,14 +1,13 @@
 package org.corespring.container.client.controllers.helpers
 
+import org.corespring.container.client.VersionInfo
 import org.corespring.container.client.views.txt.js.ComponentWrapper
 import org.corespring.container.components.model.UiComponent
 import org.corespring.container.utils.string
+import play.api.libs.json.JsArray
+import play.api.libs.json.JsString
 import play.api.libs.json._
 import play.api.mvc.{Results, Result}
-import org.corespring.container.client.VersionInfo
-import play.api.libs.json.JsArray
-import org.corespring.container.components.model.UiComponent
-import play.api.libs.json.JsString
 
 trait NameHelper{
 
