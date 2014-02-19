@@ -20,6 +20,7 @@ import org.corespring.shell.controllers.player.actions.{PlayerActions => ShellPl
 import play.api.Configuration
 import play.api.mvc._
 import scala.Some
+import com.typesafe.config.Config
 
 class ContainerClientImplementation(
                                      itemServiceIn: MongoService,
@@ -118,6 +119,10 @@ class ContainerClientImplementation(
 
   private lazy val componentSets = new CachedAndMinifiedComponentSets {
     override def allComponents: Seq[Component] = comps
+
+    override def configuration = {
+      rootConfig.getConfig("components").getOrElse(Configuration.empty)
+    }
   }
 
   private lazy val newPlayer = new Player {

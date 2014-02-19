@@ -6,7 +6,8 @@ import org.corespring.container.client.controllers.DefaultComponentSets
 import play.api.cache.Cached
 import play.api.http.ContentTypes
 import play.api.mvc.{Result, EssentialAction}
-import play.api.Play
+import play.api.{Configuration, Play}
+import com.typesafe.config.Config
 
 /**
  * An example of component sets with caching.
@@ -15,6 +16,7 @@ trait CachedAndMinifiedComponentSets extends DefaultComponentSets {
 
   import play.api.Play.current
 
+  def configuration: Configuration
 
   def minifyJs(source: String, compilerOptions: Option[CompilerOptions] = None): Either[String, String] = {
 
@@ -26,7 +28,7 @@ trait CachedAndMinifiedComponentSets extends DefaultComponentSets {
     compiler.compile(extern, input, options).success match {
       case true => Right(compiler.toSource())
       case false => {
-        Left(s"JS Errors: \n${compiler.getErrors.map(e => s"${e.description}: ${compiler.getSourceLine("generated", e.lineNumber)}" ).mkString("\n")}\n")
+        Left(s"JS Errors: \n${compiler.getErrors.map(e => s"${e.description}: ${compiler.getSourceLine("generated", e.lineNumber)}").mkString("\n")}\n")
       }
     }
   }
@@ -38,12 +40,14 @@ trait CachedAndMinifiedComponentSets extends DefaultComponentSets {
     Right(writer.toString)
   }
 
-  def minifyEnabled = { Play.current.configuration.getBoolean("components.minify").getOrElse(false)}
+  def minifyEnabled = configuration.getBoolean("minify").getOrElse(false)
+
+  def cachingEnabled = configuration.getBoolean("cache").getOrElse(false)
 
   override def process(s: String, contentType: String): Result = {
     val out: Either[String, String] = contentType match {
-      case ss: String if ss == ContentTypes.JAVASCRIPT => if(minifyEnabled ) minifyJs(s) else Right(s)
-      case ss: String if ss == ContentTypes.CSS => if(minifyEnabled) minifyCss(s) else Right(s)
+      case ss: String if ss == ContentTypes.JAVASCRIPT => if (minifyEnabled) minifyJs(s) else Right(s)
+      case ss: String if ss == ContentTypes.CSS => if (minifyEnabled) minifyCss(s) else Right(s)
       case _ => Left(s"unknown content type: $contentType")
     }
     out match {
@@ -52,9 +56,13 @@ trait CachedAndMinifiedComponentSets extends DefaultComponentSets {
     }
   }
 
-  override def resource[A >: EssentialAction](context: String, directive: String, suffix: String) = {
+  override def resource[A >: EssentialAction](context: String, directive: String, suffix: String) = if (cachingEnabled) {
     Cached(s"$context-$directive-$suffix") {
       super.resource(context, directive, suffix)
     }
+  } else {
+    super.resource(context, directive, suffix)
   }
+
+
 }
