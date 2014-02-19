@@ -1,5 +1,7 @@
 import java.net.InetSocketAddress
 import laika.sbt.LaikaSbtPlugin.{Tasks, LaikaKeys, LaikaPlugin}
+import org.joda.time.DateTime
+import org.joda.time.format.DateTimeFormat
 import sbt.Keys._
 import sbt._
 import scala.Some
@@ -98,6 +100,27 @@ object Build extends sbt.Build {
 
   }
 
+  val buildInfo = TaskKey[Unit]("build-client", "runs client installation commands")
+
+
+  val buildInfoTask = buildInfo <<= (classDirectory in Compile, name, version, streams) map {
+    (base, n, v, s) =>
+
+      s.log.info("[buildInfo] ---> write build properties file] on " + base.getAbsolutePath)
+      val file = base / "buildInfo.properties"
+      val commitHash: String = Process("git rev-parse --short HEAD").!!.trim
+      val branch: String = Process("git rev-parse --abbrev-ref HEAD").!!.trim
+      val formatter = DateTimeFormat.forPattern("HH:mm dd MMMM yyyy");
+      val date = formatter.print(DateTime.now)
+      val contents = s"""
+      commit.hash=$commitHash
+      branch=$branch
+      version=$v
+      date=$date
+      s""""
+      IO.write(file, contents)
+  }
+
   val runClientTests = TaskKey[Unit]("client-tests", "")
 
   val runClientTestsTask = runClientTests <<= (baseDirectory, streams) map {
@@ -141,6 +164,8 @@ object Build extends sbt.Build {
 
   val containerClientWeb = builder.playApp("container-client-web")
     .settings(
+      buildInfoTask,
+      (packagedArtifacts) <<= (packagedArtifacts) dependsOn buildInfo,
       sbt.Keys.fork in Test := false ,
       sources in doc in Compile := List(),
       libraryDependencies ++= Seq(mockito, grizzled, htmlCleaner),
