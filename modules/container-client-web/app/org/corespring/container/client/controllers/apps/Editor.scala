@@ -1,12 +1,13 @@
-package org.corespring.container.client.controllers
+package org.corespring.container.client.controllers.apps
 
 import org.corespring.container.client.actions.EditorActions
-import org.corespring.container.client.component.{EditorGenerator, SourceGenerator, AllItemTypesReader}
+import org.corespring.container.client.component.AllItemTypesReader
 import org.corespring.container.client.views.txt.js.EditorServices
 import play.api.Logger
-import play.api.libs.json.{Json, JsValue, JsArray}
-import play.api.mvc.{AnyContent, Action}
+import play.api.libs.json.{JsArray, Json, JsValue}
+import play.api.mvc.AnyContent
 import scala.concurrent.{Future, ExecutionContext}
+import org.corespring.container.client.controllers.apps.AppWithServices
 
 trait Editor extends AllItemTypesReader with AppWithServices[EditorActions[AnyContent]] {
 
@@ -45,5 +46,3 @@ trait Editor extends AllItemTypesReader with AppWithServices[EditorActions[AnyCo
       controllers.Assets.at("/container-client", "editor.html")(request)
   }
 }
-
-

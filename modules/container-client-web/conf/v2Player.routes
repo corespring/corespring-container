@@ -14,16 +14,16 @@ GET        /component-sets/:context/:directive.:suffix     @org.corespring.conta
 
 
 # Hooks for the player: config, services + components
-GET        /session/:sessionId/player-config.json          @org.corespring.container.client.controllers.Player.config(sessionId:String)
-GET        /session/player-services.js                     @org.corespring.container.client.controllers.Player.services
-GET        /session/:sessionId/player                      @org.corespring.container.client.controllers.Player.loadPlayerForSession(sessionId:String)
+GET        /session/:sessionId/player-config.json          @org.corespring.container.client.controllers.apps.Player.config(sessionId:String)
+GET        /session/player-services.js                     @org.corespring.container.client.controllers.apps.Player.services
+GET        /session/:sessionId/player                      @org.corespring.container.client.controllers.apps.Player.loadPlayerForSession(sessionId:String)
 GET        /session/everything/:id.json                    @org.corespring.container.client.controllers.resources.Session.loadEverything(id:String)
 GET        /session/:sessionId/*file                       @org.corespring.container.client.controllers.Assets.session(sessionId:String, file)
 PUT        /session/save/:id.json                          @org.corespring.container.client.controllers.resources.Session.saveSession(id:String)
 PUT        /session/complete/:id.json                      @org.corespring.container.client.controllers.resources.Session.completeSession(id:String)
 PUT        /session/load-outcome/:id.json                  @org.corespring.container.client.controllers.resources.Session.loadOutcome(id:String)
         
-GET        /item/:itemId/player                            @org.corespring.container.client.controllers.Player.createSessionForItem(itemId:String)
+GET        /item/:itemId/player                            @org.corespring.container.client.controllers.apps.Player.createSessionForItem(itemId:String)
 PUT        /item/score/:id.json                            @org.corespring.container.client.controllers.resources.Item.getScore(id:String)
 GET        /item/:itemId.json                              @org.corespring.container.client.controllers.resources.Item.load(itemId:String)
 PUT        /item/:itemId.json                              @org.corespring.container.client.controllers.resources.Item.save(itemId:String)
@@ -32,12 +32,12 @@ POST       /item/create                                    @org.corespring.conta
 
 GET        /icon/:icon                                     @org.corespring.container.client.controllers.Icons.icon(icon)
         
-GET        /rig/:componentType/index.html                  @org.corespring.container.client.controllers.Rig.index(componentType:String, data: Option[String] ?= None)
-GET        /rig/:componentType/config.json                 @org.corespring.container.client.controllers.Rig.config(componentType:String)
-GET        /rig/:componentType/:dataName.json              @org.corespring.container.client.controllers.Rig.data(componentType:String, dataName:String)
-#GET        /rig/:componentType/rig-components.js          @org.corespring.container.client.controllers.Rig.componentsJs(orgName, compName)
-#GET        /rig/:componentType/rig-components.css         @org.corespring.container.client.controllers.Rig.componentsCss(orgName, compName)
-GET        /rig/:componentType/*file                       @org.corespring.container.client.controllers.Rig.asset(componentType, file)
+GET        /rig/:componentType/index.html                  @org.corespring.container.client.controllers.apps.Rig.index(componentType:String, data: Option[String] ?= None)
+GET        /rig/:componentType/config.json                 @org.corespring.container.client.controllers.apps.Rig.config(componentType:String)
+GET        /rig/:componentType/:dataName.json              @org.corespring.container.client.controllers.apps.Rig.data(componentType:String, dataName:String)
+#GET        /rig/:componentType/rig-components.js          @org.corespring.container.client.controllers.apps.Rig.componentsJs(orgName, compName)
+#GET        /rig/:componentType/rig-components.css         @org.corespring.container.client.controllers.apps.Rig.componentsCss(orgName, compName)
+GET        /rig/:componentType/*file                       @org.corespring.container.client.controllers.apps.Rig.asset(componentType, file)
 
 
 # Hooks for the editor: config, services + components

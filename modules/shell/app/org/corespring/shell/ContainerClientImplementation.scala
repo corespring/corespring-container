@@ -5,9 +5,9 @@ import org.corespring.container.client.V2PlayerConfig
 import org.corespring.container.client.actions.{PlayerActions, PlayerJsRequest, PlayerLauncherActions}
 import org.corespring.container.client.component.ComponentUrls
 import org.corespring.container.client.controllers._
+import org.corespring.container.client.controllers.apps.{Rig, Player, Editor}
+import org.corespring.container.client.integration.ContainerControllers
 import org.corespring.container.components.model.Component
-import org.corespring.container.components.model.Library
-import org.corespring.container.components.model.UiComponent
 import org.corespring.container.components.outcome.{ItemJsScoreProcessor, ScoreProcessorSequence, DefaultScoreProcessor, ScoreProcessor}
 import org.corespring.container.components.processing.rhino.PlayerItemPreProcessor
 import org.corespring.container.components.response.rhino.OutcomeProcessor
@@ -20,21 +20,40 @@ import org.corespring.shell.controllers.player.actions.{PlayerActions => ShellPl
 import play.api.Configuration
 import play.api.mvc._
 import scala.Some
-import com.typesafe.config.Config
+
+
+trait DefaultIntegration extends ContainerControllers{
+
+  def controllers: Seq[Controller] = Seq(rig, icons, libs, editor, player, componentUrls, item, session, assets, playerLauncher)
+
+  private lazy val rig = new Rig {
+
+    override def components = comps
+
+    override def urls: ComponentUrls = componentUrls
+  }
+
+  private lazy val icons = new Icons {
+    def loadedComponents: Seq[Component] = comps
+  }
+
+  private lazy val libs = new ComponentsFileController {
+    def componentsPath: String = rootConfig.getString("components.path").getOrElse("components")
+
+    def defaultCharSet: String = rootConfig.getString("default.charset").getOrElse("utf-8")
+  }
+}
 
 class ContainerClientImplementation(
                                      itemServiceIn: MongoService,
                                      sessionServiceIn: MongoService,
                                      comps: => Seq[Component],
                                      rootConfig: Configuration
-                                     ) {
+                                     ) extends DefaultIntegration {
 
-  lazy val controllers: Seq[Controller] = Seq(newEditor, newPlayer, componentSets, items, sessions, assets, icons, rig, libs, playerLauncher)
-
-  def rootUiComponents = comps.filter(_.isInstanceOf[UiComponent]).map(_.asInstanceOf[UiComponent])
-
-  def rootLibs = comps.filter(_.isInstanceOf[Library]).map(_.asInstanceOf[Library])
-
+  override lazy val controllers: Seq[Controller] = {
+    super.controllers ++ Seq(newEditor, newPlayer, componentSets, items, sessions, assets, playerLauncher)
+  }
 
   private lazy val playerLauncher = new PlayerLauncher {
 
@@ -72,22 +91,6 @@ class ContainerClientImplementation(
     }
   }
 
-  private lazy val icons = new Icons {
-    def loadedComponents: Seq[Component] = comps
-  }
-
-  private lazy val libs = new ComponentsFileController {
-    def componentsPath: String = rootConfig.getString("components.path").getOrElse("components")
-
-    def defaultCharSet: String = rootConfig.getString("default.charset").getOrElse("utf-8")
-  }
-
-  private lazy val rig = new Rig {
-
-    override def components = comps
-
-    override def urls: ComponentUrls = componentSets
-  }
 
   private lazy val assets = new Assets {
 

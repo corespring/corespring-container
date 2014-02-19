@@ -1,11 +1,11 @@
-package org.corespring.container.client.controllers
+package org.corespring.container.client.controllers.apps
 
 import org.corespring.container.client.actions.PlayerActions
-import org.corespring.container.client.component._
+import org.corespring.container.client.component.PlayerItemTypeReader
 import org.corespring.container.client.views.txt.js.PlayerServices
-import play.api.mvc.{SimpleResult, Request, AnyContent, Action}
+import play.api.mvc.{SimpleResult, Request, Action, AnyContent}
 import scala.concurrent.{Await, Future}
-import org.corespring.container.client.controllers.angular.AngularModules
+import org.corespring.container.client.controllers.apps.AppWithServices
 
 trait Player extends PlayerItemTypeReader with AppWithServices[PlayerActions[AnyContent]] {
   override def context: String = "player"
@@ -51,5 +51,3 @@ trait Player extends PlayerItemTypeReader with AppWithServices[PlayerActions[Any
   override def additionalScripts: Seq[String] = Seq(org.corespring.container.client.controllers.routes.Player.services().url)
 
 }
-
-
