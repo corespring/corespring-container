@@ -4,8 +4,6 @@ import org.corespring.container.client.VersionInfo
 import org.corespring.container.client.views.txt.js.ComponentWrapper
 import org.corespring.container.components.model.UiComponent
 import org.corespring.container.utils.string
-import play.api.libs.json.JsArray
-import play.api.libs.json.JsString
 import play.api.libs.json._
 import play.api.mvc.{Results, Result}
 
