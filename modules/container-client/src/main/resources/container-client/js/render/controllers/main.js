@@ -22,7 +22,6 @@ var controller = function ($scope, $log, $timeout, $location, ComponentRegister,
   ComponentRegister.setAnswerChangedHandler($scope.onAnswerChanged);
 
   $scope.canSubmit = function() {
-    if (!$scope.session || !$scope.session.settings) return false;
     return $scope.evaluateOptions.allowEmptyResponses || !ComponentRegister.hasEmptyAnswers();
   };
 
