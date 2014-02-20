@@ -4,8 +4,7 @@
 
   link = function () {
     return function ($scope, $elem, attrs) {
-      console.log("Linking Tooltip");
-      $($elem).tooltip({title: attrs['corespringTooltip']});
+      $($elem).tooltip({title: attrs.corespringTooltip});
     };
   };
 

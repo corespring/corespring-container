@@ -197,6 +197,7 @@ var controller = function ($scope, $compile, $http, $timeout, $modal, $log, Edit
     }
   };
 
+
   $scope.getItem = function () {
     return $scope.model;
   };

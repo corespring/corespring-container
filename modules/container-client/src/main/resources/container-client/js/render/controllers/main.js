@@ -37,14 +37,14 @@ var controller = function ($scope, $log, $timeout, $location, ComponentRegister,
         components: ComponentRegister.getComponentSessions()
       }, 
       function(s){ 
-        $log.debug('[save] successful')
+        $log.debug('[save] successful');
         $scope.onSessionSaved(s); 
         if(cb){
           cb(null, s);
         }
       },
       function(e){
-        $log.debug('[save] error')
+        $log.debug('[save] error');
         $scope.onSessionSaveError(e);
         if(cb){
           cb(e);
@@ -216,7 +216,7 @@ var controller = function ($scope, $log, $timeout, $location, ComponentRegister,
       if(data.mode == 'evaluate'){
         $timeout(function(){
 
-          $log.debug("[Main] load outcome!!!")
+          $log.debug("[Main] load outcome!!!");
           $scope.loadOutcome(data.options, function(){
             $log.debug("[Main] score received");
           });
@@ -235,7 +235,7 @@ var controller = function ($scope, $log, $timeout, $location, ComponentRegister,
         afterMaybeSave();
       });
     } else {
-      $log.debug("[Main] no need to save responses - call maybeSave")
+      $log.debug("[Main] no need to save responses - call maybeSave");
       afterMaybeSave();
     }
   });
