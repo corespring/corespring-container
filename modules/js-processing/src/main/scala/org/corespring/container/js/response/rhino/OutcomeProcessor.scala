@@ -1,7 +1,7 @@
-package org.corespring.container.components.response.rhino
+package org.corespring.container.js.response.rhino
 
-import org.corespring.container.components.model.{Library, UiComponent}
-import org.corespring.container.components.response.{OutcomeGenerator, OutcomeProcessor => ContainerOutcomeProcessor}
+import org.corespring.container.components.model.{UiComponent, Library}
+import org.corespring.container.components.response.{OutcomeProcessor => ContainerOutcomeProcessor}
 import org.slf4j.LoggerFactory
 import play.api.libs.json.{Json, JsObject, JsValue}
 

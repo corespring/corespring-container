@@ -142,19 +142,20 @@ object Build extends sbt.Build {
       (packagedArtifacts) <<= (packagedArtifacts) dependsOn buildClient
     )
 
-  //Note: this is a play app for now until we move to play 2.2.0
-  lazy val jsProcessing = builder.playApp("js-processing")
-    .settings(playAppToSbtLibSettings: _*)
-    .settings(
-      libraryDependencies ++= Seq(rhinoJs)
-    ).dependsOn(containerClient)
 
   //Note: As above...
   lazy val componentModel = builder.playApp("component-model")
     .settings(playAppToSbtLibSettings: _*)
     .settings(
       resolvers ++= Resolvers.all
-    ).dependsOn(utils % "test->compile;compile->compile", jsProcessing)
+    ).dependsOn(utils % "test->compile;compile->compile")
+
+  //Note: this is a play app for now until we move to play 2.2.0
+  lazy val jsProcessing = builder.playApp("js-processing")
+    .settings(playAppToSbtLibSettings: _*)
+    .settings(
+      libraryDependencies ++= Seq(rhinoJs)
+    ).dependsOn(containerClient, componentModel)
 
   lazy val componentLoader = builder.lib("component-loader")
     .settings(

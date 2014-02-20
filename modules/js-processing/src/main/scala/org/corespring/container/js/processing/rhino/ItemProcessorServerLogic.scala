@@ -1,4 +1,4 @@
-package org.corespring.container.components.processing
+package org.corespring.container.js.processing.rhino
 
 import org.corespring.container.js.ComponentServerLogic
 import org.corespring.container.components.model.Library

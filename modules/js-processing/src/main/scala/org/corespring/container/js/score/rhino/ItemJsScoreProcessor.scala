@@ -1,5 +1,6 @@
-package org.corespring.container.components.outcome
+package org.corespring.container.js.score.rhino
 
+import org.corespring.container.components.outcome.ScoreProcessor
 import org.corespring.container.js.ItemAuthorOverride
 import play.api.Logger
 import play.api.libs.json.{Json, JsValue}

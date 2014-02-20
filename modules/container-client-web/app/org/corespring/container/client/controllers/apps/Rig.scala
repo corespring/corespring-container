@@ -1,12 +1,11 @@
 package org.corespring.container.client.controllers.apps
 
 import org.corespring.container.client.actions.{PlayerRequest, ClientActions}
+import org.corespring.container.client.component.RigItemTypeReader
 import org.corespring.container.client.controllers.angular.AngularModules
 import org.corespring.container.components.model.UiComponent
 import play.api.libs.json.Json
 import play.api.mvc.{Action, Result, AnyContent}
-import org.corespring.container.client.controllers.apps.AppWithConfig
-import org.corespring.container.client.component.RigItemTypeReader
 
 trait Rig extends AppWithConfig[ClientActions[AnyContent]] with RigItemTypeReader {
 

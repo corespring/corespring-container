@@ -36,15 +36,15 @@ trait PlayerLauncher extends Controller {
   }
 
   import org.corespring.container.client.controllers.routes.Assets
-  import org.corespring.container.client.controllers.routes.Editor
-  import org.corespring.container.client.controllers.routes.Player
+  import org.corespring.container.client.controllers.apps.routes.Editor
+  import org.corespring.container.client.controllers.apps.routes.Player
 
 
   val SecureMode = "corespring.player.secure"
 
-  def builder: PlayerLauncherActions[AnyContent]
+  def actions: PlayerLauncherActions[AnyContent]
 
-  def editorJs = builder.editorJs {
+  def editorJs = actions.editorJs {
     implicit request =>
       val rootUrl = playerConfig.rootUrl.getOrElse(BaseUrl(request))
       val itemEditorUrl = s"${Editor.editItem(":itemId")}"
@@ -74,7 +74,7 @@ trait PlayerLauncher extends Controller {
   /**
    * query: playerPage the player page to load (default: index.html), for a simple player you can pass in container-player.html
    */
-  def playerJs = builder.playerJs {
+  def playerJs = actions.playerJs {
     implicit request =>
 
       val playerPage = request.getQueryString("playerPage").getOrElse("player.html")

@@ -41,10 +41,10 @@ GET        /rig/:componentType/*file                       @org.corespring.conta
 
 
 # Hooks for the editor: config, services + components
-GET        /editor/editor-services.js                      @org.corespring.container.client.controllers.Editor.services
-GET        /editor/:itemId/editor-config.json              @org.corespring.container.client.controllers.Editor.config(itemId:String)
-GET        /editor/create-item                             @org.corespring.container.client.controllers.Editor.createItem
-GET        /editor/:itemId/index.html                      @org.corespring.container.client.controllers.Editor.editItem(itemId:String)
+GET        /editor/editor-services.js                      @org.corespring.container.client.controllers.apps.Editor.services
+GET        /editor/:itemId/editor-config.json              @org.corespring.container.client.controllers.apps.Editor.config(itemId:String)
+GET        /editor/create-item                             @org.corespring.container.client.controllers.apps.Editor.createItem
+GET        /editor/:itemId/index.html                      @org.corespring.container.client.controllers.apps.Editor.editItem(itemId:String)
 GET        /editor/:itemId/*file                           @org.corespring.container.client.controllers.Assets.item(itemId:String, file)
 POST       /editor/:itemId/*file                           @org.corespring.container.client.controllers.Assets.upload(itemId, file)
 

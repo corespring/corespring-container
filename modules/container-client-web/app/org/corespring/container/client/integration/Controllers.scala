@@ -50,7 +50,7 @@ trait EditorControllers extends CommonControllers with ResourceControllers {
 
 trait ContainerControllers extends RigControllers with PlayerControllers with EditorControllers {
   def controllers: Seq[Controller] = Seq(
-    componentUrls/*,
+    componentUrls,
     assets,
     playerLauncher,
     libs,
@@ -59,5 +59,5 @@ trait ContainerControllers extends RigControllers with PlayerControllers with Ed
     rig,
     player,
     editor,
-    icons*/)
+    icons)
 }
