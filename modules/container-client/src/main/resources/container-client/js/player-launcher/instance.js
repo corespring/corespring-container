@@ -1,23 +1,27 @@
-
-var Instance = function(element, options, errorCallback, log){
+var Instance = function (element, options, errorCallback, log) {
 
   var errors = require("errors");
 
   var that = this;
 
-  log = log || { 
-    error: function(s){ console.error(s); }, 
-    debug: function(s){ console.debug(s); },
-    warn: function(s){ console.warn(s); }
+  log = log || {
+    error: function (s) {
+      console.error(s);
+    },
+    debug: function (s) {
+      console.debug(s);
+    },
+    warn: function (s) {
+      console.warn(s);
+    }
   };
 
   var listener = require("root-level-listener")();
-
   listener.clearListeners();
 
 
-  var dimensionChangeListener = function (element) {
-    var listenerFunction = function (data, event) {
+  function dimensionChangeListener(element) {
+    function listenerFunction(data, event) {
       try {
         var json = JSON.parse(data);
         if (json.message === 'dimensionsUpdate') {
@@ -37,21 +41,20 @@ var Instance = function(element, options, errorCallback, log){
       }
     };
 
-    listener.addListener(function(e) {
+    listener.addListener(function (e) {
       listenerFunction(e.data, e);
     });
   };
 
 
-  var initialize = function (e, options) {
-
-    if(!options || !options.url){
-      errorCallback( { code: 999, message: "No url specified" });
+  function initialize(e, options) {
+    if (!options || !options.url) {
+      errorCallback({ code: 999, message: "No url specified" });
       return;
     }
 
-    if($(e).length === 0){
-      errorCallback( errors.CANT_FIND_IFRAME);
+    if ($(e).length === 0) {
+      errorCallback(errors.CANT_FIND_IFRAME);
       return;
     }
 
@@ -62,37 +65,28 @@ var Instance = function(element, options, errorCallback, log){
 
   };
 
-  var postMessage = function (message, data) {
-    log.debug("Posting Message: ", message, data);
-    try {
-      var iframe = $(element).find('iframe')[0];
-      if (!iframe) throw "iframe not found";
+  function postMessage(message, data) {
+    require("post-message")(message, data);
+  }
 
-      var messageObject = {"message": message};
-      iframe.contentWindow.postMessage(JSON.stringify($.extend(messageObject, data)), "*");
-      return true;
-    } catch (e) {
-      log.error( "[player-instance]", message, data, e);
-      return false;
-    }
-  };
-
-  var expectResult = function (message, callback, dataProcessor) {
-    
+  function expectResult(message, callback, dataProcessor) {
+    //log.debug("expectResult " + message + " callback " + callback + " dataProcessor " + dataProcessor)
     dataProcessor = dataProcessor || (function (data) {
       return data;
     });
 
-    var resultHandler = function(event){
+    function resultHandler(event) {
 
       var uid = new Date().getTime();
 
-      log.debug("[instance] [expectResult] [resultHandler] :", event);
+      log.debug("[instance] [expectResult] [resultHandler] :" + JSON.stringify(event));
 
       try {
         var dataString = event.data;
         var data = typeof(event.data) == "string" ? JSON.parse(event.data) : event.data;
+        //log.debug("resultHandler data.message <" + data.message + "> message <" + message + "> equals " + (data.message == message));
         if (data.message == message) {
+          //log.debug("resultHandler calling callback");
           callback(dataProcessor(data));
         }
       }
@@ -100,41 +94,44 @@ var Instance = function(element, options, errorCallback, log){
         log.error("Exception in [player-instance] : " + e);
       }
       listener.removeListener(this);
-    };
+    }
 
     listener.addListener(resultHandler);
   };
 
 
-  this.sendMessage = function(props){
+  this.sendMessage = function (props) {
 
-    if(props.callback){
+    if (props.callback) {
       expectResult(props.message + "Result", props.callback, extractPropertyFromMessage);
     }
 
+    //log.debug("sendMessage props " + JSON.stringify(props) + " callback <" + props.callback + ">");
+
     postMessage(props.message, props.data);
 
-    var extractPropertyFromMessage = function (message) {
+    function extractPropertyFromMessage(message) {
+      //log.debug("extractPropertyFromMessage " + JSON.stringify(message) + " property <" + props.property + "> value <" +  message[props.property] + ">");
       return message[props.property];
-    };
+    }
 
   };
 
-  this.parseEvent = function(event){
-     if(typeof(event.data) == "string"){
-        try {
-          return JSON.parse(event.data);
-        }
-        catch(e){
-          log.warn( "[player-instance] Can't parse: ", event.data, " as json");
-          return {};
-        }
-     } else {
-        return event.data;
-     }
+  this.parseEvent = function (event) {
+    if (typeof(event.data) == "string") {
+      try {
+        return JSON.parse(event.data);
+      }
+      catch (e) {
+        log.warn("[player-instance] Can't parse: ", event.data, " as json");
+        return {};
+      }
+    } else {
+      return event.data;
+    }
   };
 
-  this.addListener = function(name, callback){
+  this.addListener = function (name, callback) {
 
     listener.addListener(function (event) {
       var data = that.parseEvent(event);
