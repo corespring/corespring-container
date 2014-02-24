@@ -108,16 +108,15 @@ var Instance = function(element, options, errorCallback, log){
 
   this.sendMessage = function(props){
 
+    function extractPropertyFromMessage(message) {
+      return message[props.property];
+    }
+
     if(props.callback){
       expectResult(props.message + "Result", props.callback, extractPropertyFromMessage);
     }
 
     postMessage(props.message, props.data);
-
-    var extractPropertyFromMessage = function (message) {
-      return message[props.property];
-    };
-
   };
 
   this.parseEvent = function(event){
