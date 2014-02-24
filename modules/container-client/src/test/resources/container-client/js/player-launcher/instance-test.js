@@ -41,7 +41,7 @@ describe('instance', function () {
 
     return {
       addListener: function(callback){
-        log.debug("addListener " + callback);
+        //log.debug("addListener " + callback);
         listeners.push(callback);
       },
       removeListener: function(callback){

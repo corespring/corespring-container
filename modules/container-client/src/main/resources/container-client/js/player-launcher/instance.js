@@ -65,7 +65,14 @@ var Instance = function(element, options, errorCallback, log){
   }
 
   function postMessage(message, data) {
-    require("post-message")(message, data);
+    var postMessageFunc = require("post-message");
+    try {
+      postMessageFunc(element, message, data);
+    } catch (e) {
+      log.error( "[player-instance]", message, data, e);
+      return false;
+    }
+    return true;
   }
 
   function expectResult(message, callback, dataProcessor) {
