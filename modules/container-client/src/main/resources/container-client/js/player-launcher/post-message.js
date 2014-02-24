@@ -1,4 +1,4 @@
-function postMessage(element, message, data) {
+function postMessage(message, data, element) {
     var iframe = $(element).find('iframe')[0];
     if (!iframe) throw "iframe not found";
 

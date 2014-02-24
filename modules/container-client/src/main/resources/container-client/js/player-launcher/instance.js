@@ -67,7 +67,7 @@ var Instance = function(element, options, errorCallback, log){
   function postMessage(message, data) {
     var postMessageFunc = require("post-message");
     try {
-      postMessageFunc(element, message, data);
+      postMessageFunc(message, data, element);
     } catch (e) {
       log.error( "[player-instance]", message, data, e);
       return false;

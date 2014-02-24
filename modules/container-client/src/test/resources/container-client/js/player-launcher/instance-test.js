@@ -1,6 +1,6 @@
 describe('instance', function () {
 
-  var InstanceDef, instance, receivedErrors, listeners, expectedResult;
+  var InstanceDef, instance, receivedErrors, listeners, mockResult;
   var originalRootLevelListenerDef, originalPostMessage;
 
   var log = {
@@ -17,7 +17,7 @@ describe('instance', function () {
     return receivedErrors.length > 0
   }
 
-  function mockPostMessage(message, data){
+  function mockPostMessage(message, data, element){
     //log.debug("postMessage <" + message + "> data <" + data + "> listeners.length <" + listeners.length + ">");
 
     function createResultEvent(){
@@ -26,7 +26,7 @@ describe('instance', function () {
         data: $.extend ({
           message: message + "Result",
           data: data},
-          expectedResult)
+          mockResult)
       }
     }
 
@@ -105,15 +105,17 @@ describe('instance', function () {
   });
 
   it('should have a sendMessage method', function () {
+    instance = new InstanceDef("element-id", {}, onError);
     expect(instance.hasOwnProperty('sendMessage')).toBeTruthy();
   });
 
   it('should be able to send a message', function () {
+    instance = new InstanceDef("element-id", {}, onError);
     var resultFromCallback = null;
     var callback = function(result){
       resultFromCallback = result;
     }
-    expectedResult = {"isComplete": true};
+    mockResult = {"isComplete": true};
 
     instance.sendMessage({
       message: "isComplete",
