@@ -20,7 +20,6 @@ var Instance = function(element, options, errorCallback, log){
   var listener = require("root-level-listener")();
   listener.clearListeners();
 
-
   function dimensionChangeListener(element) {
     function listenerFunction(data, event) {
       try {
@@ -40,7 +39,7 @@ var Instance = function(element, options, errorCallback, log){
       } catch (e) {
         logError("Exception in addDimensionChangeListener: " + e);
       }
-    };
+    }
 
     listener.addListener(function (e) {
       listenerFunction(e.data, e);
@@ -63,8 +62,7 @@ var Instance = function(element, options, errorCallback, log){
     $(e).width(options.width ? options.width : "600px");
 
     dimensionChangeListener(e);
-
-  };
+  }
 
   function postMessage(message, data) {
     require("post-message")(message, data);
@@ -95,11 +93,10 @@ var Instance = function(element, options, errorCallback, log){
     }
 
     listener.addListener(resultHandler);
-  };
+  }
 
 
   this.sendMessage = function (props) {
-
     if (props.callback) {
       expectResult(props.message + "Result", props.callback, extractPropertyFromMessage);
     }
@@ -109,7 +106,6 @@ var Instance = function(element, options, errorCallback, log){
     function extractPropertyFromMessage(message) {
       return message[props.property];
     }
-
   }
 
   this.parseEvent = function (event) {
@@ -127,7 +123,6 @@ var Instance = function(element, options, errorCallback, log){
   };
 
   this.addListener = function(name, callback){
-
     listener.addListener(function (event) {
       var data = that.parseEvent(event);
 
