@@ -70,7 +70,6 @@ var Instance = function (element, options, errorCallback, log) {
   }
 
   function expectResult(message, callback, dataProcessor) {
-    //log.debug("expectResult " + message + " callback " + callback + " dataProcessor " + dataProcessor)
     dataProcessor = dataProcessor || (function (data) {
       return data;
     });
@@ -84,9 +83,7 @@ var Instance = function (element, options, errorCallback, log) {
       try {
         var dataString = event.data;
         var data = typeof(event.data) == "string" ? JSON.parse(event.data) : event.data;
-        //log.debug("resultHandler data.message <" + data.message + "> message <" + message + "> equals " + (data.message == message));
         if (data.message == message) {
-          //log.debug("resultHandler calling callback");
           callback(dataProcessor(data));
         }
       }
@@ -106,12 +103,9 @@ var Instance = function (element, options, errorCallback, log) {
       expectResult(props.message + "Result", props.callback, extractPropertyFromMessage);
     }
 
-    //log.debug("sendMessage props " + JSON.stringify(props) + " callback <" + props.callback + ">");
-
     postMessage(props.message, props.data);
 
     function extractPropertyFromMessage(message) {
-      //log.debug("extractPropertyFromMessage " + JSON.stringify(message) + " property <" + props.property + "> value <" +  message[props.property] + ">");
       return message[props.property];
     }
 
