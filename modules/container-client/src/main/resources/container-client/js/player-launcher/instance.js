@@ -44,7 +44,7 @@ var Instance = function(element, options, errorCallback, log){
     listener.addListener(function (e) {
       listenerFunction(e.data, e);
     });
-  };
+  }
 
 
   function initialize(e, options) {
@@ -84,8 +84,6 @@ var Instance = function(element, options, errorCallback, log){
 
       var uid = new Date().getTime();
 
-      log.debug("[instance] [expectResult] [resultHandler] :" + JSON.stringify(event));
-
       try {
         var dataString = event.data;
         var data = typeof(event.data) == "string" ? JSON.parse(event.data) : event.data;
@@ -113,7 +111,7 @@ var Instance = function(element, options, errorCallback, log){
     function extractPropertyFromMessage(message) {
       return message[props.property];
     }
-  }
+  };
 
   this.parseEvent = function (event) {
     if (typeof(event.data) == "string") {
