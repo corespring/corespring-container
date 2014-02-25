@@ -42,7 +42,9 @@ trait ComponentsFileController extends Controller {
 
     import ExecutionContext.Implicits.global
 
-    def absolutePathInProdMode = componentsPath.startsWith("/") && Play.current.mode == Mode.Prod
+    def absolutePathInProdMode = if(Play.current.mode == Mode.Prod){
+      componentsPath.startsWith("/")
+    } else true
 
     require(absolutePathInProdMode, s"The component path ($componentsPath) is relative - this can cause unpredictable behaviour when running in Prod Mode. see: https://github.com/playframework/playframework/issues/2411")
 
