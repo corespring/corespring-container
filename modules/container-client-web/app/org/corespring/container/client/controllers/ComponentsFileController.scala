@@ -3,16 +3,17 @@ package org.corespring.container.client.controllers
 import java.io.File
 import org.joda.time.DateTimeZone
 import org.joda.time.format.{DateTimeFormatter, DateTimeFormat}
-import play.api.Logger
+import play.api.{Play, Mode, Logger}
 import play.api.libs.MimeTypes
 import play.api.libs.iteratee.Enumerator
 import play.api.mvc._
 import scala.concurrent.ExecutionContext
+import org.corespring.container.client.integration.validation.Validator
 
 /** A very simple file asset loader for now */
 trait ComponentsFileController extends Controller {
 
-  val log : Logger = Logger("FileController")
+  val log : Logger = Logger("container.components.file.controller")
 
   def componentsPath : String
   def defaultCharSet : String
@@ -41,6 +42,8 @@ trait ComponentsFileController extends Controller {
 
 
     import ExecutionContext.Implicits.global
+
+    require(Validator.absolutePathInProdMode(componentsPath).isRight, s"The component path ($componentsPath) is relative - this can cause unpredictable behaviour when running in Prod Mode. see: https://github.com/playframework/playframework/issues/2411")
 
     val fullPath = s"$componentsPath/$org/$component/libs/$filename"
     log.debug( s"fullPath: $fullPath")

@@ -47,6 +47,12 @@ object Global extends WithFilters(AccessControlFilter, CallBlockOnHeaderFilter) 
     logger.info("info")
     logger.warn("warn")
     logger.error("error")
+
+    containerClient.validate match {
+      case Left(err) => throw new RuntimeException(err)
+      case Right(_) => Unit
+    }
+
     CallBlockOnHeaderFilter.block = (rh: RequestHeader) => {
       if (rh.path.contains(".html") && componentLoader != null) {
         logger.info("reload components!")

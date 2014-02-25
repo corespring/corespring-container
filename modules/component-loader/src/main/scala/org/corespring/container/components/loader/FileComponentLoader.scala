@@ -27,8 +27,11 @@ class FileComponentLoader(paths: Seq[String]) extends ComponentLoader {
     paths.map {
       p =>
         val root = new File(p)
+
+        def isOrgFolder(f:File) = f.isDirectory && !f.getName.startsWith(".")
+
         if (root.exists()) {
-          val c: Seq[Component] = root.listFiles.toSeq.filter(_.isDirectory).map(loadOrgComponents).flatten
+          val c: Seq[Component] = root.listFiles.toSeq.filter(isOrgFolder).map(loadOrgComponents).flatten
           c
         } else {
           Seq()

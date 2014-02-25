@@ -14,7 +14,10 @@ Once you have the `container-client-web` on your classpath, you'll need to integ
 
 The simplest example of an integration is the `shell` module within the app. Have a look at `ContainerClientImplementation`.
 
-*Note:* I hope to simplify how one can integrate by providing more sensible defaults.
+This class extends `DefaultIntegration`, which is a trait that provides as many default implementations for you.
+
+For most cases, you can extend this trait and implement its methods.
+
 
 Integration uses a decorator pattern, to allow clients to decorate the libraries core action logic.
 
