@@ -1,13 +1,15 @@
-package org.corespring.container.client.controllers
+package org.corespring.container.client.controllers.apps
 
 import org.corespring.container.client.actions.PlayerActions
-import org.corespring.container.client.component._
+import org.corespring.container.client.component.PlayerItemTypeReader
 import org.corespring.container.client.views.txt.js.PlayerServices
-import play.api.mvc.{SimpleResult, Request, AnyContent, Action}
+import play.api.mvc.{SimpleResult, Request, Action, AnyContent}
 import scala.concurrent.{Await, Future}
-import org.corespring.container.client.controllers.angular.AngularModules
 
 trait Player extends PlayerItemTypeReader with AppWithServices[PlayerActions[AnyContent]] {
+
+  import org.corespring.container.client.controllers.apps.routes.{Player => PlayerRoutes}
+
   override def context: String = "player"
 
   override def servicesJs = {
@@ -26,8 +28,7 @@ trait Player extends PlayerItemTypeReader with AppWithServices[PlayerActions[Any
   def createSessionForItem(itemId: String): Action[AnyContent] = actions.createSessionForItem(itemId) {
     request =>
       val file = request.queryString.get("file").map(_(0)).getOrElse("index.html")
-      import org.corespring.container.client.controllers.routes.{Player => Routes}
-      val url = s"${Routes.loadPlayerForSession(request.sessionId).url}?file=$file&mode=gather"
+      val url = s"${PlayerRoutes.loadPlayerForSession(request.sessionId).url}?file=$file&mode=gather"
       SeeOther(url)
   }
 
@@ -48,8 +49,6 @@ trait Player extends PlayerItemTypeReader with AppWithServices[PlayerActions[Any
       Await.result(f, 3.seconds)
   }
 
-  override def additionalScripts: Seq[String] = Seq(org.corespring.container.client.controllers.routes.Player.services().url)
+  override def additionalScripts: Seq[String] = Seq(PlayerRoutes.services().url)
 
 }
-
-

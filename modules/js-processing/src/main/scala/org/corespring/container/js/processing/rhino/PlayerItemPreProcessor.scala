@@ -1,7 +1,6 @@
-package org.corespring.container.components.processing.rhino
+package org.corespring.container.js.processing.rhino
 
 import org.corespring.container.components.model.{Library, UiComponent}
-import org.corespring.container.components.processing.ItemProcessorServerLogic
 import org.corespring.container.components.processing.{PlayerItemPreProcessor => PreProcessor}
 import org.slf4j.LoggerFactory
 import play.api.libs.json._

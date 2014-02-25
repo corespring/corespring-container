@@ -1,4 +1,4 @@
-package org.corespring.container.components.response
+package org.corespring.container.js.response.rhino
 
 import org.corespring.container.js.ComponentServerLogic
 import org.corespring.container.components.model.Library

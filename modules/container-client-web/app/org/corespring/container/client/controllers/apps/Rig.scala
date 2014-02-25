@@ -1,18 +1,11 @@
-package org.corespring.container.client.controllers
+package org.corespring.container.client.controllers.apps
 
 import org.corespring.container.client.actions.{PlayerRequest, ClientActions}
-import org.corespring.container.client.component.{PlayerGenerator, SourceGenerator, ItemTypeReader}
+import org.corespring.container.client.component.RigItemTypeReader
 import org.corespring.container.client.controllers.angular.AngularModules
 import org.corespring.container.components.model.UiComponent
-import play.api.libs.json.{JsValue, Json}
-import play.api.mvc.{Result, AnyContent, Action}
-
-trait RigItemTypeReader extends ItemTypeReader {
-  /** for an item - return all the components in use */
-  override def componentTypes(id: String, json: JsValue): Seq[String] = {
-    Seq(id)
-  }
-}
+import play.api.libs.json.Json
+import play.api.mvc.{Action, Result, AnyContent}
 
 trait Rig extends AppWithConfig[ClientActions[AnyContent]] with RigItemTypeReader {
 

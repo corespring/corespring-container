@@ -1,11 +1,11 @@
-package org.corespring.container.client.controllers
+package org.corespring.container.client.controllers.apps
 
 import org.corespring.container.client.actions.EditorActions
-import org.corespring.container.client.component.{EditorGenerator, SourceGenerator, AllItemTypesReader}
+import org.corespring.container.client.component.AllItemTypesReader
 import org.corespring.container.client.views.txt.js.EditorServices
 import play.api.Logger
-import play.api.libs.json.{Json, JsValue, JsArray}
-import play.api.mvc.{AnyContent, Action}
+import play.api.libs.json.{JsArray, Json, JsValue}
+import play.api.mvc.{Action, AnyContent}
 import scala.concurrent.{Future, ExecutionContext}
 
 trait Editor extends AllItemTypesReader with AppWithServices[EditorActions[AnyContent]] {
@@ -31,7 +31,7 @@ trait Editor extends AllItemTypesReader with AppWithServices[EditorActions[AnyCo
     EditorServices("editor.services", Item.load(":id"), Item.save(":id"), JsArray(componentJson)).toString
   }
 
-  override def additionalScripts: Seq[String] = Seq(org.corespring.container.client.controllers.routes.Editor.services().url)
+  override def additionalScripts: Seq[String] = Seq(org.corespring.container.client.controllers.apps.routes.Editor.services().url)
 
   def createItem = Action(BadRequest("This route is not implemented yet.. instead see: Item.create()"))
 
@@ -45,5 +45,3 @@ trait Editor extends AllItemTypesReader with AppWithServices[EditorActions[AnyCo
       controllers.Assets.at("/container-client", "editor.html")(request)
   }
 }
-
-

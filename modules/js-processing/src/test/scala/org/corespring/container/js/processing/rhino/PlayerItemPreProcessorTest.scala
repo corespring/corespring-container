@@ -1,6 +1,6 @@
-package org.corespring.container.components.processing.rhino
+package org.corespring.container.js.processing.rhino
 
-import org.corespring.container.components.model.{UiComponent, Server, Client}
+import org.corespring.container.components.model.{Server, UiComponent, Client}
 import org.specs2.mutable.Specification
 import play.api.libs.json.Json
 
