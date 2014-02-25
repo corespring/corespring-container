@@ -58,7 +58,7 @@ exports.define = function(isSecure) {
     var instance = new InstanceDef(element, options, errorCallback);
 
     var isValidMode = function (m) {
-      if (!m) return false;
+      if (!m) {return false;}
       return ["gather", "view", "evaluate"].indexOf(m) !== -1;
     };
 
@@ -73,9 +73,9 @@ exports.define = function(isSecure) {
     var isAllowed = function(mode, cb){
       if(isSecure){
         _isComplete(function(c){
-          if(mode == "evaluate" && !c){
+          if(mode === "evaluate" && !c){
             cb(false);
-          } else if(mode == "gather" && c){
+          } else if(mode === "gather" && c){
             cb(false);
           } else {
             cb(true);
@@ -110,7 +110,7 @@ exports.define = function(isSecure) {
 
     var sendSetModeMessage = function(mode){
       var modeOptions = options[mode] || {};
-      var saveResponseOptions = mode == "evaluate" ?  {isAttempt: false, isComplete: false} : null;
+      var saveResponseOptions = mode === "evaluate" ?  {isAttempt: false, isComplete: false} : null;
       instance.sendMessage( { message: "setMode", data: {mode: mode, options: modeOptions, saveResponses: saveResponseOptions} });
     };
 

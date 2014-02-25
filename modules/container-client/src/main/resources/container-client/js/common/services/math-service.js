@@ -1,10 +1,11 @@
+/* global MathJax */
 (function () {
 
   var MathJaxService = function ($timeout) {
 
     this.parseDomForMath = function (delay) {
       $timeout(function () {
-        if (typeof MathJax != 'undefined' && !_.isUndefined(MathJax)) {
+        if (typeof MathJax !== 'undefined' && !_.isUndefined(MathJax)) {
           MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
         }
       }, delay || 100);

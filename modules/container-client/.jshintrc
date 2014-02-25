@@ -3,7 +3,17 @@
   "eqnull": true,
   "eqeqeq": true,
   "undef": true,
+  "browser" : true,
   "globals": {
-    "jQuery": true
+    "jQuery": true,
+    "_" : true,
+    "angular" : true,
+    "$" : true,
+    "console" : true,
+    "ace" : true,
+    "module" : true,
+    "exports" : true,
+    "require" : true,
+    "corespring" : true
   }
 }

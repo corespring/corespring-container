@@ -8,7 +8,7 @@ var AddContentModalController = function ($scope, $modalInstance, componentSet) 
 
   var rows = [];
   for (var i = 0; i < componentSet.length; i++) {
-    if (i % 4 === 0) rows.push([]);
+    if (i % 4 === 0) {rows.push([]);}
     rows[rows.length - 1].push(componentSet[i]);
   }
   $scope.componentSetGrid = rows;
@@ -17,7 +17,7 @@ var AddContentModalController = function ($scope, $modalInstance, componentSet) 
     _.each($scope.addComponentMap, function (comp, compKey) {
       if (comp.include) {
         $scope.addComponentMap[compKey] = {amount: comp.amount, component: _.find($scope.componentSet, function (setComp) {
-          return setComp.name == compKey;
+          return setComp.name === compKey;
         })};
       } else {
         delete $scope.addComponentMap[compKey];

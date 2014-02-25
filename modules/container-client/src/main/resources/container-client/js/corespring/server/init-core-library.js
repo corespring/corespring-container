@@ -1,3 +1,4 @@
+/* global sax, mathjs */
 /**
  The core library starts life with no modules defined.
  Add the base set of libraries here.

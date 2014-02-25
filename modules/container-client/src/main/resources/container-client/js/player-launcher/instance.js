@@ -34,10 +34,10 @@ var Instance = function(element, options, errorCallback, log){
               break;
             }
           }
-          if (!found) $(element).height(json.h + 30);
+          if (!found) {$(element).height(json.h + 30);}
         }
       } catch (e) {
-        logError("Exception in addDimensionChangeListener: " + e);
+        log.error("Exception in addDimensionChangeListener: " + e);
       }
     }
 
@@ -86,8 +86,8 @@ var Instance = function(element, options, errorCallback, log){
 
       try {
         var dataString = event.data;
-        var data = typeof(event.data) == "string" ? JSON.parse(event.data) : event.data;
-        if (data.message == message) {
+        var data = typeof(event.data) === "string" ? JSON.parse(event.data) : event.data;
+        if (data.message === message) {
           callback(dataProcessor(data));
         }
       }
@@ -114,7 +114,7 @@ var Instance = function(element, options, errorCallback, log){
   };
 
   this.parseEvent = function (event) {
-    if (typeof(event.data) == "string") {
+    if (typeof(event.data) === "string") {
       try {
         return JSON.parse(event.data);
       }

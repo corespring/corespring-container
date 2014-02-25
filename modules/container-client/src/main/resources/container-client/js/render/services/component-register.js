@@ -123,7 +123,7 @@ angular.module('corespring-player.services').factory('ComponentRegister', ['$log
      */
     var setAndApplyToComponents = function(value, name, cb){
 
-      if(typeof(cb) == "string"){
+      if(typeof(cb) === "string"){
         var functionName = cb;
         cb = function(comp, value){
 

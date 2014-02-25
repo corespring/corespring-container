@@ -23,7 +23,7 @@ angular.module('corespring-player.directives').directive('corespringPlayer', [
             return;
           }
 
-          if (rendered && $scope.mode == "player") {
+          if (rendered && $scope.mode === "player") {
             $log.debug("not re-rendering because we are in player mode");
             return;
           }
@@ -68,7 +68,7 @@ angular.module('corespring-player.directives').directive('corespringPlayer', [
 
         $scope.$watch('session', function(session, oldSession){
           
-          if ($scope.mode != "player" && !session) {
+          if ($scope.mode !== "player" && !session) {
             $scope.session = {};
           }
           setDataAndSession();

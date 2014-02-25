@@ -28,7 +28,7 @@
       };
 
       $scope.$watch('model.xhtml', function (newValue) {
-        if (!newValue) return;
+        if (!newValue) {return;}
         var node = $($scope.model.xhtml);
 
         var orderedComponents = [];
@@ -44,7 +44,7 @@
       });
 
       $scope.$watch('orderedComponents', function (newValue) {
-        if (!$scope.model || !$scope.model.xhtml) return;
+        if (!$scope.model || !$scope.model.xhtml) {return;}
         console.log("Structure has changed");
         var node = $($scope.model.xhtml);
         var idx = 0;
@@ -59,7 +59,7 @@
         node.find("*[id]").each(function (n) {
           var leftId = $(this).attr('id');
           var rightId = $scope.orderedComponents[idx].id;
-          if (leftId != rightId) {
+          if (leftId !== rightId) {
             $(this).replaceWith(nodeMap[rightId]);
           }
           idx++;

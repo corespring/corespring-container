@@ -1,3 +1,4 @@
+/* global AddContentModalController */
 var controller = function ($scope, $compile, $http, $timeout, $modal, $log, EditorServices, PlayerServices, MathJaxService, ComponentRegister) {
 
   $scope.showComponentsPanel = false;
@@ -67,7 +68,7 @@ var controller = function ($scope, $compile, $http, $timeout, $modal, $log, Edit
 
   $scope.getIconUrl = function (type) {
     var comp = _.find($scope.componentSet, function (c) {
-      return c.componentType == type;
+      return c.componentType === type;
     });
 
     if (comp) {
@@ -155,7 +156,7 @@ var controller = function ($scope, $compile, $http, $timeout, $modal, $log, Edit
 
   $scope.serialize = function (itemModel) {
 
-    if (!configPanels) return itemModel;
+    if (!configPanels){ return itemModel;}
 
     var newModel = _.cloneDeep(itemModel);
     _.each(newModel.components, function (value, key) {

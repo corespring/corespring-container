@@ -17,7 +17,7 @@
           }
 
           var newElem;
-          if(newFile.contentType == "text/javascript"){
+          if(newFile.contentType === "text/javascript"){
             newElem = $elem.find("#contents").html( uiAce("selectedFile.content") );
           } else {
             newElem = $elem.find("#contents").html('<img ng-src="{{selectedFile.name}}"></img>');

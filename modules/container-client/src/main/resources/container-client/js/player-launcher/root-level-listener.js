@@ -47,14 +47,14 @@ var Listener = function(log){
   };
 
   this.addListener = function(callback){
-    if (listeners.indexOf(callback) == -1) {
+    if (listeners.indexOf(callback) === -1) {
       listeners.push(callback);
     }
   };
 
   this.removeListener = function(callback){
     var index = listeners.indexOf(callback);
-    if(index == -1){
+    if(index === -1){
       throw "Can't find callback in listeners";
     }
     listeners.splice(index, 1);

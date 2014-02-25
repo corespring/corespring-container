@@ -136,7 +136,8 @@ module.exports = (grunt) ->
 
 
     jshint:
-      jshintrc: '.jshintrc'
+      options: 
+        jshintrc: '.jshintrc'
       main: ['<%= common.app %>/js/**/*.js', '!<%= common.app %>/**/*.min.js']
 
     jade:
@@ -272,5 +273,5 @@ module.exports = (grunt) ->
   grunt.registerTask('prepPlayerLauncher', 'prep the player launcher js', prepPlayerLauncher(grunt))
   grunt.registerTask('run', ['jade', 'less', 'watch'])
   grunt.registerTask('test', ['shell:bower', 'shell:bowerCacheClean', 'lcd', 'prepPlayerLauncher', 'jasmine:unit'])
-  grunt.registerTask('default', ['shell:bower', 'shell:bowerCacheClean', 'lcd', 'clean_bower', 'concat', 'uglify', 'less', 'jade', 'compress', 'prepPlayerLauncher','jasmine:unit'])
+  grunt.registerTask('default', ['shell:bower', 'shell:bowerCacheClean', 'lcd', 'clean_bower', 'jshint', 'concat', 'uglify', 'less', 'jade', 'compress', 'prepPlayerLauncher','jasmine:unit'])
   grunt.registerTask('minify-test', ['concat', 'uglify'])

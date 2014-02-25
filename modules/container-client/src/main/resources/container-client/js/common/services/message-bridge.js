@@ -7,14 +7,14 @@
   this.addMessageListener = function (fn) {
     var eventMethod = window.addEventListener ? "addEventListener" : "attachEvent";
     var eventer = window[eventMethod];
-    var messageEvent = eventMethod == "attachEvent" ? "onmessage" : "message";
+    var messageEvent = eventMethod === "attachEvent" ? "onmessage" : "message";
 
     eventer(messageEvent,function(e) {
       fn(e);
     },false);
   };
 
-  var getParent = function(){ return (parent && parent != window) ? parent : null; };
+  var getParent = function(){ return (parent && parent !== window) ? parent : null; };
   
   var getIframe = function(id){
     try{

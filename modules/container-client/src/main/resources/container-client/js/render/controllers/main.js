@@ -198,12 +198,12 @@ var controller = function ($scope, $log, $timeout, $location, ComponentRegister,
 
     $log.debug("[Main] setMode: ", data);
 
-    if(data.mode && data.mode == currentMode ){
+    if(data.mode && data.mode === currentMode ){
       $log.warn("mode is already set to: ", data.mode);
       return;
     }
     currentMode = data.mode;
-    var editable = (data.mode == 'gather');
+    var editable = (data.mode === 'gather');
 
     $timeout(function() {
       $log.debug("[Main] $timeout: set mode: ", data.mode);
@@ -212,7 +212,7 @@ var controller = function ($scope, $log, $timeout, $location, ComponentRegister,
     });
 
     var afterMaybeSave = function(){
-      if(data.mode == 'evaluate'){
+      if(data.mode === 'evaluate'){
         $timeout(function(){
 
           $log.debug("[Main] load outcome!!!");
