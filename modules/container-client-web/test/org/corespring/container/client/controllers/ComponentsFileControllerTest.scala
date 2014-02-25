@@ -3,7 +3,8 @@ package org.corespring.container.client.controllers
 import org.specs2.mutable.Specification
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.Helpers._
-import play.api.test.{FakeHeaders, FakeRequest}
+import play.api.test.{FakeApplication, FakeHeaders, FakeRequest}
+import play.api.GlobalSettings
 
 class ComponentsFileControllerTest extends Specification {
 
@@ -11,8 +12,9 @@ class ComponentsFileControllerTest extends Specification {
 
   "file controller" should {
 
-    "return assets" in {
-
+    "return assets" in running(FakeApplication(
+      withGlobal = Some(new GlobalSettings {})
+    )){
       val controller = new ComponentsFileController {
         def componentsPath: String = s"$rootPath/one"
         def defaultCharSet : String = "utf-8"

@@ -3,15 +3,11 @@ package org.corespring.container.client.controllers
 import org.corespring.container.client.component.{ComponentMaker, SourceGenerator}
 import org.corespring.container.components.model.Component
 import org.specs2.mutable.Specification
-import play.api.test.{WithApplication, FakeApplication, FakeRequest}
-import play.api.test.Helpers._
-import org.specs2.specification.Scope
-import play.api.mvc.{Content, SimpleResult, Action, AnyContent}
-import scala.concurrent.{Await, Future}
-import java.nio.charset.Charset
-import play.api.libs.iteratee.Iteratee
-import play.libs.F.Promise
 import play.api.GlobalSettings
+import play.api.mvc.SimpleResult
+import play.api.test.Helpers._
+import play.api.test.{FakeApplication, FakeRequest}
+import scala.concurrent.Future
 
 class ComponentSetsTest extends Specification with ComponentMaker {
 
