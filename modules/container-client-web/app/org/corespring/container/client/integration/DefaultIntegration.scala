@@ -14,6 +14,7 @@ import org.corespring.container.js.processing.rhino.{PlayerItemPreProcessor => R
 import org.corespring.container.js.response.rhino.{OutcomeProcessor => RhinoOutcomeProcessor}
 import org.corespring.container.js.score.rhino.ItemJsScoreProcessor
 import play.api.mvc.AnyContent
+import org.corespring.container.client.integration.validation.Validator
 
 
 trait DefaultIntegration
@@ -22,6 +23,12 @@ trait DefaultIntegration
   with HasActions
   with HasConfig
   with HasProcessors {
+
+
+  def validate: Either[String, Boolean] = {
+    val componentsPath = configuration.getString("components.path").getOrElse("components")
+    Validator.absolutePathInProdMode(componentsPath)
+  }
 
   override def playerItemPreProcessor: PlayerItemPreProcessor = new RhinoPreProcessor(uiComponents, libraries)
 

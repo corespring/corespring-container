@@ -24,12 +24,6 @@ class ContainerClientImplementation(
                                      val configuration: Configuration
                                      ) extends DefaultIntegration {
 
-
-  def valid : Either[String, Boolean] = {
-    val componentsPath =  configuration.getString("components.path").getOrElse("?")
-    Validator.absolutePathInProdMode(componentsPath)
-  }
-
   override def components: Seq[Component] = componentsIn
 
   override def playerLauncherActions: PlayerLauncherActions[AnyContent] = new PlayerLauncherActions[AnyContent] {

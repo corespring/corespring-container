@@ -48,7 +48,7 @@ object Global extends WithFilters(AccessControlFilter, CallBlockOnHeaderFilter) 
     logger.warn("warn")
     logger.error("error")
 
-    containerClient.valid match {
+    containerClient.validate match {
       case Left(err) => throw new RuntimeException(err)
       case Right(_) => Unit
     }
