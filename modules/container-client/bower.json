@@ -21,6 +21,7 @@
     "mathjs": "~0.18.0"
   },
   "devDependencies": {
+<<<<<<< Updated upstream
     "angular-mocks": "~1.2.12",
     "angular-scenario": "~1.2.12"
   },
@@ -52,5 +53,12 @@
   },
   "resolutions": {
     "angular": "~1.2.8"
+=======
+    "angular-mocks": "1.2.3",
+    "angular-scenario": "1.2.3"
+  },
+  "resolutions": {
+    "angular-bootstrap": "~0.7.0"
+>>>>>>> Stashed changes
   }
 }
