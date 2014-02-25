@@ -1,11 +1,11 @@
 package org.corespring.container.client.controllers.resources
 
-import org.corespring.container.client.actions.{ScoreItemRequest, ItemActions, SaveItemRequest, ItemRequest}
+import org.corespring.container.client.actions.{ ScoreItemRequest, ItemActions, SaveItemRequest, ItemRequest }
 import org.corespring.container.client.controllers.resources.Item.Errors
 import org.corespring.container.components.outcome.ScoreProcessor
 import org.corespring.container.components.response.OutcomeProcessor
-import play.api.libs.json.{JsNumber, JsBoolean, Json}
-import play.api.mvc.{AnyContent, Controller}
+import play.api.libs.json.{ JsNumber, JsBoolean, Json }
+import play.api.mvc.{ AnyContent, Controller }
 import play.api.Logger
 
 object Item {
@@ -28,14 +28,12 @@ trait Item extends Controller {
 
   def outcomeProcessor: OutcomeProcessor
 
-
   def settings = Json.obj(
     "maxNoOfAttempts" -> JsNumber(2),
     "showFeedback" -> JsBoolean(true),
     "highlightCorrectResponse" -> JsBoolean(true),
     "highlightUserResponse" -> JsBoolean(true),
-    "allowEmptyResponses" -> JsBoolean(true)
-  )
+    "allowEmptyResponses" -> JsBoolean(true))
 
   def create = actions.create {
     (code, msg) =>

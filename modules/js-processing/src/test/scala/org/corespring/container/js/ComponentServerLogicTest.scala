@@ -3,7 +3,7 @@ package org.corespring.container.js
 import org.specs2.mutable.Specification
 import play.api.libs.json.Json
 
-class ComponentServerLogicTest extends Specification{
+class ComponentServerLogicTest extends Specification {
 
   val serverLogic = new ComponentServerLogic {
     def js: String =
@@ -17,7 +17,6 @@ class ComponentServerLogicTest extends Specification{
 
     def componentType: String = "test-comp"
   }
-
 
   "server logic" should {
     "work" in {

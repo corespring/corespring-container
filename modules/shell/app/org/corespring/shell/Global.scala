@@ -1,13 +1,13 @@
 package org.corespring.shell
 
-import com.mongodb.casbah.{MongoDB, MongoClientURI, MongoClient}
+import com.mongodb.casbah.{ MongoDB, MongoClientURI, MongoClient }
 import org.corespring.container.components.loader.FileComponentLoader
 import org.corespring.mongo.json.services.MongoService
-import org.corespring.play.utils.{CallBlockOnHeaderFilter, ControllerInstanceResolver}
+import org.corespring.play.utils.{ CallBlockOnHeaderFilter, ControllerInstanceResolver }
 import org.corespring.shell.controllers.Main
 import org.corespring.shell.filters.AccessControlFilter
-import play.api.mvc.{RequestHeader, WithFilters, Controller}
-import play.api.{GlobalSettings, Logger, Play}
+import play.api.mvc.{ RequestHeader, WithFilters, Controller }
+import play.api.{ GlobalSettings, Logger, Play }
 
 object Global extends WithFilters(AccessControlFilter, CallBlockOnHeaderFilter) with ControllerInstanceResolver with GlobalSettings {
 

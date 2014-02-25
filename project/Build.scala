@@ -1,5 +1,5 @@
 import java.net.InetSocketAddress
-import laika.sbt.LaikaSbtPlugin.{Tasks, LaikaKeys, LaikaPlugin}
+import laika.sbt.LaikaSbtPlugin.{ Tasks, LaikaKeys, LaikaPlugin }
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
 import sbt.Keys._
@@ -7,12 +7,10 @@ import sbt._
 import scala.Some
 import play.Project._
 
-
 object Build extends sbt.Build {
 
   val org = "org.corespring"
   val ScalaVersion = "2.10.3"
-
 
   def isWindows = System.getProperty("os.name").toLowerCase().contains("windows")
 
@@ -30,7 +28,7 @@ object Build extends sbt.Build {
     val htmlCleaner = "net.sourceforge.htmlcleaner" % "htmlcleaner" % "2.6.1"
 
     //The closure compiler that play uses - we expect this to be provided by the play app.
-    val closureCompiler = ("com.google.javascript" % "closure-compiler" % "rr2079.1" )
+    val closureCompiler = ("com.google.javascript" % "closure-compiler" % "rr2079.1")
       .exclude("args4j", "args4j")
       .exclude("org.json", "json")
       .exclude("com.google.protobuf", "protobuf-java")
@@ -62,8 +60,7 @@ object Build extends sbt.Build {
     resourceDirectory in Compile <<= (baseDirectory in Compile)(_ / "src" / "main" / "resources"),
     resourceDirectory in Test <<= (baseDirectory in Test)(_ / "src" / "test" / "resources"),
     lessEntryPoints := Nil,
-    javascriptEntryPoints := Nil
-  )
+    javascriptEntryPoints := Nil)
 
   val buildClient = TaskKey[Unit]("build-client", "runs client installation commands")
 
@@ -84,8 +81,7 @@ object Build extends sbt.Build {
          */
         ("bower", "cache clean"),
         ("bower", "install"),
-        ("grunt", "--devMode=false")
-      )
+        ("grunt", "--devMode=false"))
 
       commands.foreach {
         c =>
@@ -101,7 +97,6 @@ object Build extends sbt.Build {
   }
 
   val buildInfo = TaskKey[Unit]("build-client", "runs client installation commands")
-
 
   val buildInfoTask = buildInfo <<= (classDirectory in Compile, name, version, streams) map {
     (base, n, v, s) =>
@@ -139,50 +134,40 @@ object Build extends sbt.Build {
       runClientTestsTask,
       (test in Test) <<= (test in Test) dependsOn runClientTests,
       //This task is called by the play stage task
-      (packagedArtifacts) <<= (packagedArtifacts) dependsOn buildClient
-    )
-
+      (packagedArtifacts) <<= (packagedArtifacts) dependsOn buildClient)
 
   //Note: As above...
   lazy val componentModel = builder.playApp("component-model")
     .settings(playAppToSbtLibSettings: _*)
     .settings(
-      resolvers ++= Resolvers.all
-    ).dependsOn(utils % "test->compile;compile->compile")
+      resolvers ++= Resolvers.all).dependsOn(utils % "test->compile;compile->compile")
 
   //Note: this is a play app for now until we move to play 2.2.0
   lazy val jsProcessing = builder.playApp("js-processing")
     .settings(playAppToSbtLibSettings: _*)
     .settings(
-      libraryDependencies ++= Seq(rhinoJs)
-    ).dependsOn(containerClient, componentModel)
+      libraryDependencies ++= Seq(rhinoJs)).dependsOn(containerClient, componentModel)
 
   lazy val componentLoader = builder.lib("component-loader")
     .settings(
-      libraryDependencies ++= Seq(logbackClassic, specs2, rhinoJs, commonsLang)
-    ).dependsOn(componentModel, jsProcessing)
-
+      libraryDependencies ++= Seq(logbackClassic, specs2, rhinoJs, commonsLang)).dependsOn(componentModel, jsProcessing)
 
   val containerClientWeb = builder.playApp("container-client-web")
     .settings(
       buildInfoTask,
       (packagedArtifacts) <<= (packagedArtifacts) dependsOn buildInfo,
-      sbt.Keys.fork in Test := false ,
+      sbt.Keys.fork in Test := false,
       sources in doc in Compile := List(),
       libraryDependencies ++= Seq(mockito, grizzled, htmlCleaner),
-      templatesImport ++= Seq("play.api.libs.json.JsValue", "play.api.libs.json.Json")
-    ).dependsOn(
-      componentModel % "compile->compile;test->test",
-      containerClient,
-      utils,
-      jsProcessing)
-
+      templatesImport ++= Seq("play.api.libs.json.JsValue", "play.api.libs.json.Json")).dependsOn(
+        componentModel % "compile->compile;test->test",
+        containerClient,
+        utils,
+        jsProcessing)
 
   val mongoJsonService = builder.playApp("mongo-json-service")
     .settings(playAppToSbtLibSettings: _*).settings(
-      libraryDependencies ++= Seq(casbah)
-    )
-
+      libraryDependencies ++= Seq(casbah))
 
   val docs = builder.playApp("docs")
     .settings(LaikaPlugin.defaults: _*)
@@ -193,13 +178,12 @@ object Build extends sbt.Build {
         (site in Laika).value
         (compile in Compile).value
       } //(compile in Compile).dependsOn(laika.sbt.LaikaSbtPlugin.LaikaKeys.site)
-    )
+      )
 
   val shell = builder.playApp("shell")
     .settings(
       resolvers ++= Resolvers.all,
-      libraryDependencies ++= Seq(casbah, playS3, scalaz, play.Keys.cache, yuiCompressor, closureCompiler)
-    ).dependsOn(containerClientWeb, componentLoader, mongoJsonService, docs)
+      libraryDependencies ++= Seq(casbah, playS3, scalaz, play.Keys.cache, yuiCompressor, closureCompiler)).dependsOn(containerClientWeb, componentLoader, mongoJsonService, docs)
     .aggregate(containerClientWeb, componentLoader, containerClient, componentModel, utils, jsProcessing, mongoJsonService, docs)
 
   val root = builder.playApp("root", Some("."))
@@ -215,22 +199,19 @@ object Build extends sbt.Build {
       },
       // Stop grunt when play run stops
       playOnStopped += {
-        () => {
-          Grunt.process.map(p => p.destroy())
-          Grunt.process = None
-        }: Unit
+        () =>
+          {
+            Grunt.process.map(p => p.destroy())
+            Grunt.process = None
+          }: Unit
       },
       commands <++= baseDirectory {
         base =>
           Seq(
             "grunt",
             "bower",
-            "npm"
-          ).map(cmd(_, (base / "modules" / "container-client")))
-      }
-
-
-    )
+            "npm").map(cmd(_, (base / "modules" / "container-client")))
+      })
     .dependsOn(shell)
     .aggregate(shell)
 

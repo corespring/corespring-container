@@ -3,7 +3,7 @@ package org.corespring.container.components.outcome
 import org.specs2.mutable.Specification
 import play.api.libs.json.Json
 import org.corespring.test.utils.JsonCompare
-import org.specs2.matcher.{Expectable, Matcher}
+import org.specs2.matcher.{ Expectable, Matcher }
 
 class DefaultScoreProcessorTest extends Specification {
 
@@ -11,7 +11,7 @@ class DefaultScoreProcessorTest extends Specification {
 
     "generate an score for one component" in {
 
-      ( """{"components":{"3":{"weight":4}}}""", """{"3":{"score":1.0}}""") must GenerateOutcome( """
+      ("""{"components":{"3":{"weight":4}}}""", """{"3":{"score":1.0}}""") must GenerateOutcome("""
          {
            "summary" : { "maxPoints" : 4, "points" : 4.0, "percentage" : 100.0 },
            "components" : {
@@ -72,34 +72,31 @@ class DefaultScoreProcessorTest extends Specification {
     "calculate the proper sum" in {
       DefaultScoreProcessor.getSumOfWeightedScores(
         Json.obj(
-              "1" -> Json.obj("weightedScore" -> 1.0),
-              "2" -> Json.obj("weightedScore" -> 1.0)
-            )
-    ) must be equalTo 2.0
+          "1" -> Json.obj("weightedScore" -> 1.0),
+          "2" -> Json.obj("weightedScore" -> 1.0))) must be equalTo 2.0
 
-  }
-}
-
-
-case class GenerateOutcome(expectedOutcome: String) extends Matcher[(String, String)] {
-
-  def apply[S <: (String, String)](s: Expectable[S]) = {
-    result(matchesOutcome(s.value._1, s.value._2),
-      s"${s.description} generates expected score",
-      s"${s.description} does not generate expected score",
-      s)
+    }
   }
 
-  private def matchesOutcome(itemDefinition: String, responses: String): Boolean = {
-    val outcome = DefaultScoreProcessor.score(Json.parse(itemDefinition), Json.obj(), Json.parse(responses))
-    JsonCompare.caseInsensitiveSubTree(Json.stringify(outcome), expectedOutcome) match {
-      case Right(_) => true
-      case Left(diffs) => {
-        println(diffs.mkString("\n"))
-        false
+  case class GenerateOutcome(expectedOutcome: String) extends Matcher[(String, String)] {
+
+    def apply[S <: (String, String)](s: Expectable[S]) = {
+      result(matchesOutcome(s.value._1, s.value._2),
+        s"${s.description} generates expected score",
+        s"${s.description} does not generate expected score",
+        s)
+    }
+
+    private def matchesOutcome(itemDefinition: String, responses: String): Boolean = {
+      val outcome = DefaultScoreProcessor.score(Json.parse(itemDefinition), Json.obj(), Json.parse(responses))
+      JsonCompare.caseInsensitiveSubTree(Json.stringify(outcome), expectedOutcome) match {
+        case Right(_) => true
+        case Left(diffs) => {
+          println(diffs.mkString("\n"))
+          false
+        }
       }
     }
   }
-}
 
 }

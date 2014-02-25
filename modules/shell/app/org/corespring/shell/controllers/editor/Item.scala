@@ -1,12 +1,12 @@
 package org.corespring.shell.controllers.editor
 
-import org.corespring.container.client.actions.{ItemActions => ContainerItemActions, NewItemRequest, SaveItemRequest, ItemRequest, ScoreItemRequest}
+import org.corespring.container.client.actions.{ ItemActions => ContainerItemActions, NewItemRequest, SaveItemRequest, ItemRequest, ScoreItemRequest }
 import org.corespring.mongo.json.services.MongoService
 import play.api.http.Status.BAD_REQUEST
 import play.api.libs.json.JsString
 import play.api.libs.json.Json
 import play.api.mvc.Results._
-import play.api.mvc.{Action, Result, AnyContent}
+import play.api.mvc.{ Action, Result, AnyContent }
 
 trait ItemActions extends ContainerItemActions[AnyContent] {
   def itemService: MongoService
@@ -41,10 +41,8 @@ trait ItemActions extends ContainerItemActions[AnyContent] {
       val newItem = Json.obj(
         "components" -> Json.obj(),
         "metadata" -> Json.obj(
-          "title" -> JsString("New title")
-        ),
-        "xhtml" -> "<div></div>"
-      )
+          "title" -> JsString("New title")),
+        "xhtml" -> "<div></div>")
 
       itemService.create(newItem).map {
         oid =>

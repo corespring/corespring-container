@@ -7,7 +7,7 @@ import org.corespring.container.components.processing.PlayerItemPreProcessor
 import org.corespring.container.components.response.OutcomeProcessor
 import play.api.Logger
 import play.api.libs.json._
-import play.api.mvc.{AnyContent, Controller}
+import play.api.mvc.{ AnyContent, Controller }
 
 trait Session extends Controller with ItemPruner {
 
@@ -44,8 +44,7 @@ trait Session extends Controller with ItemPruner {
         Ok(
           Json.obj(
             "item" -> processedItem,
-            "session" -> sessionJson)
-        )
+            "session" -> sessionJson))
       } else {
         val outcome = outcomeProcessor.createOutcome(itemJson, sessionJson, sessionJson \ "settings")
         val score = scoreProcessor.score(itemJson, sessionJson, outcome)

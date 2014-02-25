@@ -1,7 +1,7 @@
 package org.corespring.container.js
 
-import org.mozilla.javascript.{Function => RhinoFunction}
-import org.mozilla.javascript.{Scriptable, Context}
+import org.mozilla.javascript.{ Function => RhinoFunction }
+import org.mozilla.javascript.{ Scriptable, Context }
 import play.api.libs.json._
 
 trait CorespringJs {
@@ -12,8 +12,7 @@ trait CorespringJs {
     "/js-libs/math.min.js",
     "/container-client/js/corespring/core-library.js",
     "/container-client/js/corespring/server/init-core-library.js",
-    "/container-client/js/corespring/core.js"
-  )
+    "/container-client/js/corespring/core.js")
 
   def js: String
 
@@ -32,7 +31,6 @@ trait ItemAuthorOverride
   with CorespringJs {
 
   override def exports = "corespring.server.itemOverride()"
-
 
   private def getOverrideObject(ctx: Context, scope: Scriptable): Scriptable = {
     val corespring = scope.get("corespring", scope).asInstanceOf[Scriptable]
@@ -53,7 +51,6 @@ trait ItemAuthorOverride
       jsonResult
   }
 }
-
 
 trait ComponentServerLogic
   extends JsContext

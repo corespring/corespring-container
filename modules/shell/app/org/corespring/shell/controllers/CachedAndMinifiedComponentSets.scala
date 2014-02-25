@@ -1,12 +1,12 @@
 package org.corespring.shell.controllers
 
-import com.google.javascript.jscomp.{JSSourceFile, CompilerOptions}
-import java.io.{StringWriter, StringReader}
+import com.google.javascript.jscomp.{ JSSourceFile, CompilerOptions }
+import java.io.{ StringWriter, StringReader }
 import org.corespring.container.client.controllers.DefaultComponentSets
 import play.api.cache.Cached
 import play.api.http.ContentTypes
-import play.api.mvc.{Result, EssentialAction}
-import play.api.{Configuration, Play}
+import play.api.mvc.{ Result, EssentialAction }
+import play.api.{ Configuration, Play }
 import com.typesafe.config.Config
 
 /**
@@ -63,6 +63,5 @@ trait CachedAndMinifiedComponentSets extends DefaultComponentSets {
   } else {
     super.resource(context, directive, suffix)
   }
-
 
 }

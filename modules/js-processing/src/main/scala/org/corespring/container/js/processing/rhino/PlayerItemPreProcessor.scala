@@ -1,7 +1,7 @@
 package org.corespring.container.js.processing.rhino
 
-import org.corespring.container.components.model.{Library, UiComponent}
-import org.corespring.container.components.processing.{PlayerItemPreProcessor => PreProcessor}
+import org.corespring.container.components.model.{ Library, UiComponent }
+import org.corespring.container.components.processing.{ PlayerItemPreProcessor => PreProcessor }
 import org.slf4j.LoggerFactory
 import play.api.libs.json._
 
@@ -19,7 +19,7 @@ class PlayerItemPreProcessor(components: Seq[UiComponent], libraries: Seq[Librar
       components.find(_.matchesType(componentType)).map {
         component =>
 
-          def hasRenderFunction : Boolean = {
+          def hasRenderFunction: Boolean = {
             val renderFunctionRegexp = "(?s)exports(\\.|\\[\")render[^;]*?=[^;]*function".r
             renderFunctionRegexp.findFirstIn(component.server.definition).isDefined
           }
@@ -43,14 +43,12 @@ class PlayerItemPreProcessor(components: Seq[UiComponent], libraries: Seq[Librar
     val jsonTransformer = (__ \ 'components).json.update(
       __.read[JsObject].map {
         o => processedJson
-      }
-    )
+      })
 
     item.transform(jsonTransformer) match {
       case succ: JsSuccess[JsObject] => succ.get
       case _ => item
     }
-
 
   }
 

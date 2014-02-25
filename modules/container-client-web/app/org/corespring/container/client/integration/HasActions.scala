@@ -14,19 +14,18 @@ trait HasActions {
 
   def itemActions: ItemActions[AnyContent]
 
-  def sessionActions : SessionActions[AnyContent]
+  def sessionActions: SessionActions[AnyContent]
 
   def playerLauncherActions: PlayerLauncherActions[AnyContent]
 }
 
-
-trait HasConfig{
-  def configuration : Configuration
+trait HasConfig {
+  def configuration: Configuration
 }
 
-trait HasProcessors{
+trait HasProcessors {
 
-  def outcomeProcessor : OutcomeProcessor
-  def playerItemPreProcessor : PlayerItemPreProcessor
-  def scoreProcessor :ScoreProcessor
+  def outcomeProcessor: OutcomeProcessor
+  def playerItemPreProcessor: PlayerItemPreProcessor
+  def scoreProcessor: ScoreProcessor
 }

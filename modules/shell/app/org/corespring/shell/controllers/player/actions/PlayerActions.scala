@@ -2,12 +2,12 @@ package org.corespring.shell.controllers.player.actions
 
 import org.corespring.container.client.actions.PlayerRequest
 import org.corespring.container.client.actions.SessionIdRequest
-import org.corespring.container.client.actions.{PlayerActions => ContainerPlayerActions}
+import org.corespring.container.client.actions.{ PlayerActions => ContainerPlayerActions }
 import org.corespring.mongo.json.services.MongoService
 import org.corespring.shell.SessionKeys
 import play.api.libs.json._
 import play.api.mvc.Results._
-import play.api.mvc.{Request, Action, Result, AnyContent}
+import play.api.mvc.{ Request, Action, Result, AnyContent }
 import scala.Some
 import scalaz.Failure
 import scalaz.Success
@@ -53,8 +53,7 @@ trait PlayerActions extends ContainerPlayerActions[AnyContent] {
         "showFeedback" -> JsBoolean(true),
         "highlightCorrectResponse" -> JsBoolean(true),
         "highlightUserResponse" -> JsBoolean(true),
-        "isFinished" -> JsBoolean(false)
-      )
+        "isFinished" -> JsBoolean(false))
 
       val session = Json.obj("settings" -> settings, "itemId" -> JsString(itemId), "attempts" -> JsNumber(0))
 

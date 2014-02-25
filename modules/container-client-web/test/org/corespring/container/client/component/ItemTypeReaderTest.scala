@@ -10,31 +10,25 @@ class ItemTypeReaderTest extends Specification with ComponentMaker {
   val item = Json.obj(
     "components" -> Json.obj(
       "1" -> Json.obj(
-        "componentType" -> "org-ui-1"
-      )
-    ),
-    "xhtml" -> "<org-layout-1></org-layout-1>"
-  )
+        "componentType" -> "org-ui-1")),
+    "xhtml" -> "<org-layout-1></org-layout-1>")
 
   "type reader" should {
 
     "work" in new withReader() {
-      reader.componentTypes("",item) === Seq.empty
+      reader.componentTypes("", item) === Seq.empty
     }
 
     "work with comps" in new withReader(
-      uiComp("org", "ui-1", Seq.empty)
-    ) {
-      reader.componentTypes("",item) === Seq("org-ui-1")
+      uiComp("org", "ui-1", Seq.empty)) {
+      reader.componentTypes("", item) === Seq("org-ui-1")
     }
 
     "work with comps declared in layout" in new withReader(
-      layout("org", "layout-1")
-    ) {
-      reader.componentTypes("",item) === Seq("org-layout-1")
+      layout("org", "layout-1")) {
+      reader.componentTypes("", item) === Seq("org-layout-1")
     }
   }
-
 
   class withReader(comps: Component*) extends Scope {
     val reader = new PlayerItemTypeReader {

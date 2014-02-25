@@ -6,8 +6,8 @@ import org.corespring.container.components.processing.PlayerItemPreProcessor
 import org.corespring.container.components.response.OutcomeProcessor
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
-import play.api.libs.json.{JsValue, Json}
-import play.api.mvc.{Request, Action, Result, AnyContent}
+import play.api.libs.json.{ JsValue, Json }
+import play.api.mvc.{ Request, Action, Result, AnyContent }
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 
@@ -20,16 +20,14 @@ class SessionTest extends Specification with Mockito {
       true,
       isComplete,
       (a, b) => Some(Json.obj()),
-      FakeRequest().withJsonBody(Json.obj())
-    )
+      FakeRequest().withJsonBody(Json.obj()))
 
     def outcomeRequest(itemSession: JsValue = Json.obj(), isComplete: Boolean) = SessionOutcomeRequest[AnyContent](
       Json.obj(),
       itemSession,
       true,
       isComplete,
-      FakeRequest().withJsonBody(Json.obj())
-    )
+      FakeRequest().withJsonBody(Json.obj()))
 
     "allow save when session is not complete" in new ActionBody(saveRequest(false)) {
       val result = session.saveSession("id")(FakeRequest())

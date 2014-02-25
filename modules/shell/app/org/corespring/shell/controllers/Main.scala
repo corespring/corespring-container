@@ -3,7 +3,7 @@ package org.corespring.shell.controllers
 import play.api.Logger
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsString
-import play.api.libs.json.{Json, JsValue}
+import play.api.libs.json.{ Json, JsValue }
 import play.api.mvc._
 import org.corespring.mongo.json.services.MongoService
 import org.corespring.shell.SessionKeys

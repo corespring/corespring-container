@@ -2,7 +2,7 @@ package org.corespring.shell.controllers.editor.actions
 
 import org.corespring.container.client.actions.PlayerRequest
 import org.corespring.container.client.actions.SessionIdRequest
-import org.corespring.container.client.actions.{EditorActions => ContainerEditorActions}
+import org.corespring.container.client.actions.{ EditorActions => ContainerEditorActions }
 import org.corespring.mongo.json.services.MongoService
 import org.corespring.shell.SessionKeys
 import play.api.Logger
@@ -10,7 +10,7 @@ import play.api.libs.json.JsString
 import play.api.libs.json.Json
 import play.api.mvc.Results._
 import play.api.mvc._
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ ExecutionContext, Future }
 
 trait EditorActions extends ContainerEditorActions[AnyContent] {
 
@@ -47,10 +47,8 @@ trait EditorActions extends ContainerEditorActions[AnyContent] {
       val newItem = Json.obj(
         "components" -> Json.obj(),
         "metadata" -> Json.obj(
-          "title" -> JsString("New title")
-        ),
-        "xhtml" -> "<div></div>"
-      )
+          "title" -> JsString("New title")),
+        "xhtml" -> "<div></div>")
 
       itemService.create(newItem).map {
         oid =>

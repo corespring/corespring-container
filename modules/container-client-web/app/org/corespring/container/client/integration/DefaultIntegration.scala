@@ -1,21 +1,20 @@
 package org.corespring.container.client.integration
 
 import org.corespring.container.client.V2PlayerConfig
-import org.corespring.container.client.actions.{PlayerLauncherActions, SessionActions, ItemActions, PlayerActions}
-import org.corespring.container.client.component.{ComponentUrls, ComponentSplitter}
-import org.corespring.container.client.controllers.apps.{Player, Editor, Rig}
-import org.corespring.container.client.controllers.resources.{Session, Item}
-import org.corespring.container.client.controllers.{PlayerLauncher, ComponentsFileController, Icons}
+import org.corespring.container.client.actions.{ PlayerLauncherActions, SessionActions, ItemActions, PlayerActions }
+import org.corespring.container.client.component.{ ComponentUrls, ComponentSplitter }
+import org.corespring.container.client.controllers.apps.{ Player, Editor, Rig }
+import org.corespring.container.client.controllers.resources.{ Session, Item }
+import org.corespring.container.client.controllers.{ PlayerLauncher, ComponentsFileController, Icons }
 import org.corespring.container.components.model.Component
-import org.corespring.container.components.outcome.{DefaultScoreProcessor, ScoreProcessorSequence, ScoreProcessor}
+import org.corespring.container.components.outcome.{ DefaultScoreProcessor, ScoreProcessorSequence, ScoreProcessor }
 import org.corespring.container.components.processing.PlayerItemPreProcessor
 import org.corespring.container.components.response.OutcomeProcessor
-import org.corespring.container.js.processing.rhino.{PlayerItemPreProcessor => RhinoPreProcessor}
-import org.corespring.container.js.response.rhino.{OutcomeProcessor => RhinoOutcomeProcessor}
+import org.corespring.container.js.processing.rhino.{ PlayerItemPreProcessor => RhinoPreProcessor }
+import org.corespring.container.js.response.rhino.{ OutcomeProcessor => RhinoOutcomeProcessor }
 import org.corespring.container.js.score.rhino.ItemJsScoreProcessor
 import play.api.mvc.AnyContent
 import org.corespring.container.client.integration.validation.Validator
-
 
 trait DefaultIntegration
   extends ContainerControllers
@@ -24,14 +23,12 @@ trait DefaultIntegration
   with HasConfig
   with HasProcessors {
 
-
   def validate: Either[String, Boolean] = {
     val componentsPath = configuration.getString("components.path").getOrElse("components")
     Validator.absolutePathInProdMode(componentsPath)
   }
 
   override def playerItemPreProcessor: PlayerItemPreProcessor = new RhinoPreProcessor(uiComponents, libraries)
-
 
   override def scoreProcessor: ScoreProcessor = new ScoreProcessorSequence(DefaultScoreProcessor, ItemJsScoreProcessor)
 
@@ -54,7 +51,6 @@ trait DefaultIntegration
     def defaultCharSet: String = configuration.getString("default.charset").getOrElse("utf-8")
   }
 
-
   lazy val editor = new Editor {
 
     override def urls: ComponentUrls = componentUrls
@@ -64,7 +60,6 @@ trait DefaultIntegration
     override def actions = editorActions
   }
 
-
   lazy val player = new Player {
 
     override def urls: ComponentUrls = componentUrls
@@ -73,7 +68,6 @@ trait DefaultIntegration
 
     override def actions: PlayerActions[AnyContent] = playerActions
   }
-
 
   lazy val item = new Item {
     def scoreProcessor: ScoreProcessor = DefaultIntegration.this.scoreProcessor
@@ -101,5 +95,4 @@ trait DefaultIntegration
   }
 
 }
-
 

@@ -1,16 +1,15 @@
 package org.corespring.container.client.controllers
 
-import java.io.{InputStream, File}
+import java.io.{ InputStream, File }
 import org.apache.commons.lang3.StringEscapeUtils
 import org.corespring.container.client.V2PlayerConfig
-import org.corespring.container.client.actions.{PlayerJsRequest, PlayerLauncherActions}
+import org.corespring.container.client.actions.{ PlayerJsRequest, PlayerLauncherActions }
 import org.corespring.container.client.views.txt.js.ServerLibraryWrapper
 import play.api.Play
 import play.api.Play.current
 import play.api.http.ContentTypes
-import play.api.libs.json.{Json, JsValue}
-import play.api.mvc.{Result, AnyContent, Request, Controller}
-
+import play.api.libs.json.{ Json, JsValue }
+import play.api.mvc.{ Result, AnyContent, Request, Controller }
 
 trait PlayerLauncher extends Controller {
 
@@ -39,7 +38,6 @@ trait PlayerLauncher extends Controller {
   import org.corespring.container.client.controllers.apps.routes.Editor
   import org.corespring.container.client.controllers.apps.routes.Player
 
-
   val SecureMode = "corespring.player.secure"
 
   def actions: PlayerLauncherActions[AnyContent]
@@ -57,15 +55,11 @@ trait PlayerLauncher extends Controller {
 
           "editor" -> Json.obj(
             "method" -> Editor.editItem(":itemId").method,
-            "url" -> itemEditorUrl
-          ),
+            "url" -> itemEditorUrl),
 
           "create" -> Json.obj(
             "method" -> create.method,
-            "url" -> create.url
-          )
-        )
-      )
+            "url" -> create.url)))
       val jsPath = "container-client/js/player-launcher/editor.js"
       val bootstrap = "org.corespring.players.ItemEditor = corespring.require('editor');"
       make(jsPath, defaultOptions, bootstrap)
@@ -88,14 +82,11 @@ trait PlayerLauncher extends Controller {
         "paths" -> Json.obj(
           "gather" -> itemUrl,
           "view" -> s"$sessionUrl?mode=view",
-          "evaluate" -> s"$sessionUrl?mode=evaluate"
-        )
-      )
+          "evaluate" -> s"$sessionUrl?mode=evaluate"))
       val jsPath = "container-client/js/player-launcher/player.js"
       val bootstrap = s"org.corespring.players.ItemPlayer = corespring.require('player').define(${request.isSecure});"
       make(jsPath, defaultOptions, bootstrap)
   }
-
 
   private def pathToNameAndContents(p: String) = {
     import grizzled.file.GrizzledFile._
@@ -118,8 +109,7 @@ trait PlayerLauncher extends Controller {
       "container-client/js/player-launcher/errors.js",
       "container-client/js/player-launcher/post-message.js",
       "container-client/js/player-launcher/instance.js",
-      "container-client/js/player-launcher/root-level-listener.js"
-    )
+      "container-client/js/player-launcher/root-level-listener.js")
 
     val contents = rawJs.map(pathToNameAndContents(_)).map(_._2)
     val wrappedNameAndContents = wrappedJs.map(pathToNameAndContents) :+ defaultOptions :+ launchErrors
@@ -134,8 +124,7 @@ trait PlayerLauncher extends Controller {
         |
       """.stripMargin
     Ok(
-      (contents ++ wrappedContents :+ bootstrap).mkString("\n")
-    ).as(ContentTypes.JAVASCRIPT).withSession(session +(SecureMode, request.isSecure.toString))
+      (contents ++ wrappedContents :+ bootstrap).mkString("\n")).as(ContentTypes.JAVASCRIPT).withSession(session + (SecureMode, request.isSecure.toString))
   }
 
   private def errorsToModule(errors: Seq[String]): String = {

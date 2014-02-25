@@ -1,13 +1,12 @@
 package org.corespring.container.js.response.rhino
 
-import org.mozilla.javascript.{Function => RhinoFunction}
+import org.mozilla.javascript.{ Function => RhinoFunction }
 import org.specs2.matcher.Matcher
 import org.specs2.mutable.Specification
-import play.api.libs.json.{JsValue, Json, JsObject}
+import play.api.libs.json.{ JsValue, Json, JsObject }
 import scala.language.dynamics
 
 class ResponseGeneratorTest extends Specification {
-
 
   val respondJs =
     """
@@ -27,15 +26,12 @@ class ResponseGeneratorTest extends Specification {
       |}
     """.stripMargin
 
-
   val question = Json.obj(
     "componentType" -> "org-name",
     "correctResponse" -> Json.obj("value" -> "1"),
     "feedback" -> Json.arr(
       Json.obj("value" -> "1", "feedback" -> "super"),
-      Json.obj("value" -> "2", "feedback" -> "not super")
-    )
-  )
+      Json.obj("value" -> "2", "feedback" -> "not super")))
 
   "ResponseGenerator" should {
 

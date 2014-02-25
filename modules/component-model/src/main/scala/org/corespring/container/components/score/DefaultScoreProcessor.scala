@@ -1,12 +1,12 @@
 package org.corespring.container.components.outcome
 
-import play.api.libs.json.{JsValue, JsObject, JsNumber, Json}
+import play.api.libs.json.{ JsValue, JsObject, JsNumber, Json }
 
 object DefaultScoreProcessor extends ScoreProcessor {
 
-  private def decimalize(v: BigDecimal, scale: Int = 2): Double =  v.setScale(scale, BigDecimal.RoundingMode.HALF_UP).toDouble
+  private def decimalize(v: BigDecimal, scale: Int = 2): Double = v.setScale(scale, BigDecimal.RoundingMode.HALF_UP).toDouble
 
-  def score(item: JsValue, session : JsValue, outcomes: JsValue): JsValue = {
+  def score(item: JsValue, session: JsValue, outcomes: JsValue): JsValue = {
 
     val components = (item \ "components").as[JsObject]
 
@@ -28,8 +28,7 @@ object DefaultScoreProcessor extends ScoreProcessor {
         acc ++ Json.obj(key -> Json.obj(
           "weight" -> JsNumber(weight),
           "score" -> JsNumber(score),
-          "weightedScore" -> JsNumber(weightedScore)
-        ))
+          "weightedScore" -> JsNumber(weightedScore)))
     }
 
     val points = getSumOfWeightedScores(componentScores)
@@ -39,13 +38,12 @@ object DefaultScoreProcessor extends ScoreProcessor {
     val summary = Json.obj(
       "maxPoints" -> JsNumber(maxPoints),
       "points" -> JsNumber(points),
-      "percentage" -> JsNumber(percentage)
-    )
+      "percentage" -> JsNumber(percentage))
 
     Json.obj("summary" -> summary, "components" -> componentScores)
   }
 
-  def getSumOfWeightedScores(componentScores:JsObject) = {
+  def getSumOfWeightedScores(componentScores: JsObject) = {
     componentScores.fields.map(fs => (fs._2 \ "weightedScore").as[BigDecimal]).foldRight[BigDecimal](0)(_ + _)
   }
 }

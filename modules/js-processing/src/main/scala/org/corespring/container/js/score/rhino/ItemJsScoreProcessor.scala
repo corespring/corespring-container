@@ -3,7 +3,7 @@ package org.corespring.container.js.score.rhino
 import org.corespring.container.components.outcome.ScoreProcessor
 import org.corespring.container.js.ItemAuthorOverride
 import play.api.Logger
-import play.api.libs.json.{Json, JsValue}
+import play.api.libs.json.{ Json, JsValue }
 
 object ItemJsScoreProcessor extends ScoreProcessor {
 
@@ -15,12 +15,12 @@ object ItemJsScoreProcessor extends ScoreProcessor {
         val jsModuleWrapper = new ItemAuthorOverride {
           def js: String = jsDef
         }
-        try{
+        try {
           val result = jsModuleWrapper.process(item, outcomes)
           logger.debug(Json.stringify(result))
           result
         } catch {
-          case e : Throwable => {
+          case e: Throwable => {
             logger.warn("Error running js", e)
             Json.obj()
           }

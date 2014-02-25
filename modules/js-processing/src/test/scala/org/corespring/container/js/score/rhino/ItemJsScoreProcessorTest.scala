@@ -2,7 +2,7 @@ package org.corespring.container.js.score.rhino
 
 import org.apache.commons.lang3.StringEscapeUtils
 import org.specs2.mutable.Specification
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.{ JsValue, Json }
 
 class ItemJsScoreProcessorTest extends Specification {
 

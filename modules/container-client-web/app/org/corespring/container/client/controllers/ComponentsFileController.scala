@@ -2,8 +2,8 @@ package org.corespring.container.client.controllers
 
 import java.io.File
 import org.joda.time.DateTimeZone
-import org.joda.time.format.{DateTimeFormatter, DateTimeFormat}
-import play.api.{Play, Mode, Logger}
+import org.joda.time.format.{ DateTimeFormatter, DateTimeFormat }
+import play.api.{ Play, Mode, Logger }
 import play.api.libs.MimeTypes
 import play.api.libs.iteratee.Enumerator
 import play.api.mvc._
@@ -13,10 +13,10 @@ import org.corespring.container.client.integration.validation.Validator
 /** A very simple file asset loader for now */
 trait ComponentsFileController extends Controller {
 
-  val log : Logger = Logger("container.components.file.controller")
+  val log: Logger = Logger("container.components.file.controller")
 
-  def componentsPath : String
-  def defaultCharSet : String
+  def componentsPath: String
+  def defaultCharSet: String
 
   private val timeZoneCode = "GMT"
 
@@ -38,42 +38,41 @@ trait ComponentsFileController extends Controller {
     }
   }
 
-  def at(org:String, component:String, filename:String) : Action[AnyContent] = Action{ request =>
-
+  def at(org: String, component: String, filename: String): Action[AnyContent] = Action { request =>
 
     import ExecutionContext.Implicits.global
 
     require(Validator.absolutePathInProdMode(componentsPath).isRight, s"The component path ($componentsPath) is relative - this can cause unpredictable behaviour when running in Prod Mode. see: https://github.com/playframework/playframework/issues/2411")
 
     val fullPath = s"$componentsPath/$org/$component/libs/$filename"
-    log.debug( s"fullPath: $fullPath")
+    log.debug(s"fullPath: $fullPath")
     loadFile(fullPath).map {
       tuple =>
         val (file, headers) = tuple
         val url = file.toURI().toURL()
 
-      lazy val (length, resourceData) = {
-        val stream = url.openStream()
-        try {
-          (stream.available, Enumerator.fromStream(stream))
-        } catch {
-          case e : Throwable => (-1, Enumerator[Array[Byte]]())
+        lazy val (length, resourceData) = {
+          val stream = url.openStream()
+          try {
+            (stream.available, Enumerator.fromStream(stream))
+          } catch {
+            case e: Throwable => (-1, Enumerator[Array[Byte]]())
+          }
         }
-      }
 
-      def addCharsetIfNeeded(mimeType: String): String = if (MimeTypes.isText(mimeType))
-        "; charset=" + defaultCharSet
-      else ""
+        def addCharsetIfNeeded(mimeType: String): String = if (MimeTypes.isText(mimeType))
+          "; charset=" + defaultCharSet
+        else ""
 
-      val response = SimpleResult(
-        header = ResponseHeader(OK, headers ++ Map(
-          CONTENT_LENGTH -> length.toString,
-          CONTENT_TYPE -> MimeTypes.forFileName(filename).map(m => m + addCharsetIfNeeded(m)).getOrElse(BINARY),
-          DATE -> df.print({ new java.util.Date }.getTime))),
-        resourceData,
-        HttpConnection.KeepAlive)
+        val response = SimpleResult(
+          header = ResponseHeader(OK, headers ++ Map(
+            CONTENT_LENGTH -> length.toString,
+            CONTENT_TYPE -> MimeTypes.forFileName(filename).map(m => m + addCharsetIfNeeded(m)).getOrElse(BINARY),
+            DATE -> df.print({ new java.util.Date }.getTime))),
+          resourceData,
+          HttpConnection.KeepAlive)
 
-      response
+        response
 
     }.getOrElse(NotFound)
   }

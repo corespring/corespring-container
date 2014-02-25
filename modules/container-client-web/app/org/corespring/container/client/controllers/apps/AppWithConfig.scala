@@ -1,14 +1,14 @@
 package org.corespring.container.client.controllers.apps
 
 import org.corespring.container.client.actions.ClientActions
-import org.corespring.container.client.component.{ComponentUrls, ItemTypeReader, DependencyResolver}
+import org.corespring.container.client.component.{ ComponentUrls, ItemTypeReader, DependencyResolver }
 import org.corespring.container.client.controllers.angular.AngularModules
-import org.corespring.container.client.controllers.helpers.{Helpers, XhtmlProcessor}
-import org.corespring.container.components.model.packaging.{ClientSideDependency, ClientDependencies}
-import org.corespring.container.components.model.{Component, Id}
+import org.corespring.container.client.controllers.helpers.{ Helpers, XhtmlProcessor }
+import org.corespring.container.components.model.packaging.{ ClientSideDependency, ClientDependencies }
+import org.corespring.container.components.model.{ Component, Id }
 import play.api.http.ContentTypes
 import play.api.libs.json.JsObject
-import play.api.mvc.{Action, AnyContent, Controller}
+import play.api.mvc.{ Action, AnyContent, Controller }
 
 trait AppWithConfig[T <: ClientActions[AnyContent]]
   extends Controller
@@ -42,7 +42,7 @@ trait AppWithConfig[T <: ClientActions[AnyContent]]
 
       val components = resolveComponents(typeIds, context)
       val jsUrl = urls.jsUrl(context, components)
-      val cssUrl = urls.cssUrl(context,components)
+      val cssUrl = urls.cssUrl(context, components)
 
       val clientSideDependencies = getClientSideDependencies(components)
       val dependencies = ngModules.createAngularModules(components, clientSideDependencies)
@@ -55,17 +55,17 @@ trait AppWithConfig[T <: ClientActions[AnyContent]]
         processXhtml((request.item \ "xhtml").asOpt[String]),
         dependencies,
         js,
-        css
-      )
+        css)
       Ok(json)
   }
 
-  /** Preprocess the xml so that it'll work in all browsers
-    * aka: convert tagNames -> attributes for ie 8 support
-    * TODO: A layout component may have multiple elements
-    * So we need a way to get all potential component names from
-    * each component, not just assume its the top level.
-    */
+  /**
+   * Preprocess the xml so that it'll work in all browsers
+   * aka: convert tagNames -> attributes for ie 8 support
+   * TODO: A layout component may have multiple elements
+   * So we need a way to get all potential component names from
+   * each component, not just assume its the top level.
+   */
   def processXhtml(maybeXhtml: Option[String]) = maybeXhtml.map {
     xhtml =>
       tagNamesToAttributes(xhtml).getOrElse {
@@ -108,14 +108,13 @@ trait AppWithConfig[T <: ClientActions[AnyContent]]
   }
 }
 
-trait AppWithServices[T <: ClientActions[AnyContent]] extends AppWithConfig[T] { self : ItemTypeReader =>
-
+trait AppWithServices[T <: ClientActions[AnyContent]] extends AppWithConfig[T] { self: ItemTypeReader =>
 
   override def ngModules: AngularModules = new AngularModules(s"$context.services")
 
   def services = Action {
-      Ok(servicesJs.toString).as(ContentTypes.JAVASCRIPT)
-    }
+    Ok(servicesJs.toString).as(ContentTypes.JAVASCRIPT)
+  }
 
   def servicesJs: String
 }

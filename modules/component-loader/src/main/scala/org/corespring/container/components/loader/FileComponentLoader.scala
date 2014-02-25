@@ -5,15 +5,14 @@ import org.corespring.container.components.loader.exceptions.ComponentLoaderExce
 import org.corespring.container.components.model._
 import org.corespring.container.utils.string.hyphenatedToTitleCase
 import org.slf4j.LoggerFactory
-import play.api.libs.json.{JsObject, Json, JsValue}
+import play.api.libs.json.{ JsObject, Json, JsValue }
 import scala.Some
-
 
 class FileComponentLoader(paths: Seq[String]) extends ComponentLoader {
 
   private val logger = LoggerFactory.getLogger("components.loader")
 
-  private var loadedComponents : Seq[Component] = Seq.empty
+  private var loadedComponents: Seq[Component] = Seq.empty
 
   //TODO: This is only to support dev mode - better name for this // alternatives?
   override def reload: Unit = {
@@ -28,7 +27,7 @@ class FileComponentLoader(paths: Seq[String]) extends ComponentLoader {
       p =>
         val root = new File(p)
 
-        def isOrgFolder(f:File) = f.isDirectory && !f.getName.startsWith(".")
+        def isOrgFolder(f: File) = f.isDirectory && !f.getName.startsWith(".")
 
         if (root.exists()) {
           val c: Seq[Component] = root.listFiles.toSeq.filter(isOrgFolder).map(loadOrgComponents).flatten
@@ -83,8 +82,7 @@ class FileComponentLoader(paths: Seq[String]) extends ComponentLoader {
 
   private def loadLibrary(org: String, packageJson: JsValue)(compRoot: File): Option[Component] = {
 
-
-    def createServerName(n:String) = s"$org.${compRoot.getName}.server${ if(n == "index") "" else s".$n"}"
+    def createServerName(n: String) = s"$org.${compRoot.getName}.server${if (n == "index") "" else s".$n"}"
 
     Some(
       Library(
@@ -92,9 +90,7 @@ class FileComponentLoader(paths: Seq[String]) extends ComponentLoader {
         compRoot.getName,
         packageJson,
         loadLibrarySources(compRoot.getPath, "client", createClientName(compRoot.getName)),
-        loadLibrarySources(compRoot.getPath, "server", createServerName)
-      )
-    )
+        loadLibrarySources(compRoot.getPath, "server", createServerName)))
   }
 
   private def loadLayout(org: String, packageJson: JsValue)(compRoot: File): Option[Component] = {
@@ -104,13 +100,11 @@ class FileComponentLoader(paths: Seq[String]) extends ComponentLoader {
         org,
         compRoot.getName,
         loadLibrarySources(compRoot.getPath, "client", createClientName(compRoot.getPath)),
-        readMaybeFile( new File(compRoot.getPath + "/src/client/styles.css")),
-        packageJson
-      )
-    )
+        readMaybeFile(new File(compRoot.getPath + "/src/client/styles.css")),
+        packageJson))
   }
 
-  private def loadUiComponent (org: String, packageJson: JsValue) (compRoot: File): Option[Component] = {
+  private def loadUiComponent(org: String, packageJson: JsValue)(compRoot: File): Option[Component] = {
 
     val clientFolder = new File(compRoot.getPath + "/src/client")
     val serverFolder = new File(compRoot.getPath + "/src/server")
@@ -134,31 +128,28 @@ class FileComponentLoader(paths: Seq[String]) extends ComponentLoader {
     }
 
     Some(
-        UiComponent (
-          org,
-          compRoot.getName,
-          loadClient(clientFolder),
-          loadServer(serverFolder),
-          packageJson,
-          loadDefaultData(defaultDataJson),
-          loadIcon(icon),
-          loadSampleData(sampleDataFolder),
-          loadLibraries
-        )
-      )
+      UiComponent(
+        org,
+        compRoot.getName,
+        loadClient(clientFolder),
+        loadServer(serverFolder),
+        packageJson,
+        loadDefaultData(defaultDataJson),
+        loadIcon(icon),
+        loadSampleData(sampleDataFolder),
+        loadLibraries))
   }
 
-  private def loadDefaultData(dataJson : File) : JsValue = if(dataJson.exists){
+  private def loadDefaultData(dataJson: File): JsValue = if (dataJson.exists) {
     try {
       Json.parse(readFile(dataJson))
     } catch {
-      case e : Throwable => {
-        logger.warn( s"Error parsing json ${dataJson.getPath}")
+      case e: Throwable => {
+        logger.warn(s"Error parsing json ${dataJson.getPath}")
         Json.obj()
       }
     }
   } else Json.obj()
-
 
   private def loadSampleData(sampleDataFolder: File): Map[String, JsValue] = if (sampleDataFolder.exists) {
 
@@ -187,7 +178,6 @@ class FileComponentLoader(paths: Seq[String]) extends ComponentLoader {
     Some(byteArray)
   } else None
 
-
   private def loadPackageInfo(packageJson: File): JsValue = {
     val s = readFile(packageJson)
     Json.parse(s)
@@ -198,7 +188,7 @@ class FileComponentLoader(paths: Seq[String]) extends ComponentLoader {
   } else {
     val renderJs = getJsFromFile(client.getPath + "/render")
     val configureJs = getJsFromFile(client.getPath + "/configure")
-    val styleCss = readMaybeFile( new File(client.getPath + "/styles.css"))
+    val styleCss = readMaybeFile(new File(client.getPath + "/styles.css"))
     Client(renderJs, configureJs, styleCss)
   }
 
@@ -229,7 +219,7 @@ class FileComponentLoader(paths: Seq[String]) extends ComponentLoader {
     }
   }
 
-  private def readFile(f: File): String = readMaybeFile(f).getOrElse{
+  private def readFile(f: File): String = readMaybeFile(f).getOrElse {
     throw new ComponentLoaderException(s"Can't find client file: ${f.getAbsolutePath}")
   }
 

@@ -1,8 +1,8 @@
 package org.corespring.container.components.model.packaging
 
-import play.api.libs.json.{Json, JsObject, JsValue}
+import play.api.libs.json.{ Json, JsObject, JsValue }
 
-case class ClientSideDependency(name: String, files: Seq[String], angularModule:Option[String])
+case class ClientSideDependency(name: String, files: Seq[String], angularModule: Option[String])
 
 object ClientSideDependency {
 

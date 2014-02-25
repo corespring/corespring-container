@@ -35,8 +35,7 @@ class Builders(org: String, rootScalaVersion: String) {
         val repoType = if (isSnapshot) "snapshot" else "release"
         val finalPath = base + "/ivy-" + repoType + "s"
         Some("Artifactory Realm" at finalPath)
-    }
-  )
+    })
 
   def lib(name: String, rootFile: Option[String] = None) = {
     val root = file(rootFile.getOrElse(s"modules/$name"))

@@ -3,12 +3,12 @@ package org.corespring.container.client.controllers.apps
 import org.corespring.container.client.actions.PlayerActions
 import org.corespring.container.client.component.PlayerItemTypeReader
 import org.corespring.container.client.views.txt.js.PlayerServices
-import play.api.mvc.{SimpleResult, Request, Action, AnyContent}
-import scala.concurrent.{Await, Future}
+import play.api.mvc.{ SimpleResult, Request, Action, AnyContent }
+import scala.concurrent.{ Await, Future }
 
 trait Player extends PlayerItemTypeReader with AppWithServices[PlayerActions[AnyContent]] {
 
-  import org.corespring.container.client.controllers.apps.routes.{Player => PlayerRoutes}
+  import org.corespring.container.client.controllers.apps.routes.{ Player => PlayerRoutes }
 
   override def context: String = "player"
 
@@ -20,10 +20,8 @@ trait Player extends PlayerItemTypeReader with AppWithServices[PlayerActions[Any
       Session.saveSession(":id"),
       Item.getScore(":id"),
       Session.completeSession(":id"),
-      Session.loadOutcome(":id")
-    ).toString
+      Session.loadOutcome(":id")).toString
   }
-
 
   def createSessionForItem(itemId: String): Action[AnyContent] = actions.createSessionForItem(itemId) {
     request =>
@@ -31,7 +29,6 @@ trait Player extends PlayerItemTypeReader with AppWithServices[PlayerActions[Any
       val url = s"${PlayerRoutes.loadPlayerForSession(request.sessionId).url}?file=$file&mode=gather"
       SeeOther(url)
   }
-
 
   def loadPlayerForSession(sessionId: String) = actions.loadPlayerForSession(sessionId) {
     (code: Int, msg: String) =>

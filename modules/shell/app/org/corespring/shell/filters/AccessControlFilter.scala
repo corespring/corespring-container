@@ -1,6 +1,5 @@
 package org.corespring.shell.filters
 
-
 import play.api.mvc.{ RequestHeader, EssentialAction, EssentialFilter }
 import scala.concurrent.ExecutionContext
 

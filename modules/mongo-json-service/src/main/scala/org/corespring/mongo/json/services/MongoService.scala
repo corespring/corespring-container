@@ -1,12 +1,12 @@
 package org.corespring.mongo.json.services
 
 import com.mongodb.DBObject
-import com.mongodb.casbah.{WriteConcern, MongoCollection}
+import com.mongodb.casbah.{ WriteConcern, MongoCollection }
 import com.mongodb.casbah.commons.MongoDBObject
 import com.mongodb.util.JSON
 import org.bson.types.ObjectId
 import play.api.Logger
-import play.api.libs.json.{JsObject, Json, JsValue}
+import play.api.libs.json.{ JsObject, Json, JsValue }
 
 class MongoService(collection: MongoCollection) {
 
@@ -38,7 +38,7 @@ class MongoService(collection: MongoCollection) {
       }
   }
 
-  def create(data:JsValue) : Option[ObjectId] = {
+  def create(data: JsValue): Option[ObjectId] = {
 
     logger.debug("[create]")
     val oid = ObjectId.get
@@ -48,7 +48,7 @@ class MongoService(collection: MongoCollection) {
     dbo.put("_id", oid)
 
     val result = collection.insert(dbo)
-    if(result.getLastError.ok){
+    if (result.getLastError.ok) {
       Some(oid)
     } else {
       None
@@ -61,8 +61,7 @@ class MongoService(collection: MongoCollection) {
       logger.trace(s"[save]: ${Json.stringify(data)}")
 
       val idObject = Json.obj("_id" ->
-        Json.obj("$oid" -> id)
-      )
+        Json.obj("$oid" -> id))
 
       val updateObject = data.as[JsObject] ++ idObject
 
@@ -83,6 +82,4 @@ class MongoService(collection: MongoCollection) {
   } else None
 
 }
-
-
 

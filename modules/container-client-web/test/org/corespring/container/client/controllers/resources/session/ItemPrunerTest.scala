@@ -5,11 +5,10 @@ import org.specs2.mutable.Specification
 import play.api.Logger
 import play.api.libs.json.Json
 
-class ItemPrunerTest extends Specification with ItemPruner{
+class ItemPrunerTest extends Specification with ItemPruner {
 
   "item pruner" should {
     "prune" in {
-
 
       val jsonString =
         """
@@ -36,7 +35,6 @@ class ItemPrunerTest extends Specification with ItemPruner{
           |  }
           |}
         """.stripMargin
-
 
       val json = Json.parse(jsonString)
 

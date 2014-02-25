@@ -1,24 +1,24 @@
 package org.corespring.container.js
 
-import java.io.{InputStreamReader, Reader}
+import java.io.{ InputStreamReader, Reader }
 import org.mozilla.javascript.tools.shell.Global
-import org.mozilla.javascript.{EcmaError, ScriptableObject, Scriptable, Context}
-import org.mozilla.javascript.{Function => RhinoFunction}
+import org.mozilla.javascript.{ EcmaError, ScriptableObject, Scriptable, Context }
+import org.mozilla.javascript.{ Function => RhinoFunction }
 import play.api.Logger
-import play.api.libs.json.{JsString, Json, JsValue}
+import play.api.libs.json.{ JsString, Json, JsValue }
 
-trait JsConsole{
-  def log(msg : String)
-  def warn(msg : String)
-  def info(msg : String)
-  def debug(msg : String)
+trait JsConsole {
+  def log(msg: String)
+  def warn(msg: String)
+  def info(msg: String)
+  def debug(msg: String)
 }
 
-class DefaultLogger(log:Logger) extends JsConsole{
-  def log(msg : String) = log.info(msg)
-  def warn(msg : String) = log.warn(msg)
-  def info(msg : String) = log.info(msg)
-  def debug(msg : String) = log.debug(msg)
+class DefaultLogger(log: Logger) extends JsConsole {
+  def log(msg: String) = log.info(msg)
+  def warn(msg: String) = log.warn(msg)
+  def info(msg: String) = log.info(msg)
+  def debug(msg: String) = log.debug(msg)
 }
 
 trait JsLogging {
@@ -27,9 +27,9 @@ trait JsLogging {
 
 trait JsContext extends JsLogging {
 
-  def console : Option[JsConsole] = Some(new DefaultLogger(Logger("js.console")))
+  def console: Option[JsConsole] = Some(new DefaultLogger(Logger("js.console")))
 
-  def withJsContext( libs : Seq[String], srcs:Seq[String] = Seq.empty)( f: (Context, Scriptable) => JsValue ): JsValue = {
+  def withJsContext(libs: Seq[String], srcs: Seq[String] = Seq.empty)(f: (Context, Scriptable) => JsValue): JsValue = {
     val ctx = Context.enter
     ctx.setOptimizationLevel(-1)
     val global = new Global
@@ -43,7 +43,7 @@ trait JsContext extends JsLogging {
 
     libs.foreach(addToContext)
 
-    def addSrcToContext(src:String) = ctx.evaluateString(scope, src, "?", 1, null)
+    def addSrcToContext(src: String) = ctx.evaluateString(scope, src, "?", 1, null)
     srcs.foreach(addSrcToContext)
 
     def addToScope(name: String)(thing: Any) = ScriptableObject.putProperty(scope, name, thing)
@@ -59,9 +59,9 @@ trait JsContext extends JsLogging {
     }
   }
 
-  private def loadJsLib(path:String) : Option[Reader] = {
-    val stream  = getClass.getResourceAsStream(path)
-    if(stream == null){
+  private def loadJsLib(path: String): Option[Reader] = {
+    val stream = getClass.getResourceAsStream(path)
+    if (stream == null) {
       None
     } else {
       Some(new InputStreamReader((stream)))

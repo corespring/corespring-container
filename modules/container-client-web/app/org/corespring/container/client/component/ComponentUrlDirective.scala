@@ -28,14 +28,14 @@ object ComponentUrlDirective {
         }.getOrElse("unknown_org")
     }
 
-    val directives: Seq[String] = groupedTypes.toSeq.map( kv => OrgDirective.unapply(kv._1, kv._2, comps.filter(_.id.org == kv._1))).flatten
+    val directives: Seq[String] = groupedTypes.toSeq.map(kv => OrgDirective.unapply(kv._1, kv._2, comps.filter(_.id.org == kv._1))).flatten
     Some(directives.mkString("+"))
   }
 }
 
 object OrgDirective {
 
-  def apply(org : String, directive: String, comps: Seq[Component]) : Seq[String] = {
+  def apply(org: String, directive: String, comps: Seq[Component]): Seq[String] = {
     val filteredComps = directive match {
       case "all" => comps
       case _ => {
@@ -47,13 +47,13 @@ object OrgDirective {
     filteredComps.map(_.componentType)
   }
 
-  def unapply(org:String, types: Seq[String], comps: Seq[Component]): Option[String] = {
+  def unapply(org: String, types: Seq[String], comps: Seq[Component]): Option[String] = {
 
     val componentTypes: Seq[String] = comps.map(_.componentType)
 
     val validComps = types.filter(kc => componentTypes.exists(_ == kc))
 
-    if(validComps.length == 0) {
+    if (validComps.length == 0) {
       None
     } else {
 
@@ -61,11 +61,10 @@ object OrgDirective {
       if (diff.length == 0) {
         Some(s"$org[all]")
       } else {
-        val trimmed = validComps.map( _.replace(s"$org-", ""))
+        val trimmed = validComps.map(_.replace(s"$org-", ""))
         Some(s"$org[${trimmed.sorted.distinct.mkString(",")}]")
       }
     }
   }
 }
-
 

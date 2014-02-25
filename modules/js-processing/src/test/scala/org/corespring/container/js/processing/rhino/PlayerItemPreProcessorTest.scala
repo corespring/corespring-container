@@ -1,6 +1,6 @@
 package org.corespring.container.js.processing.rhino
 
-import org.corespring.container.components.model.{Server, UiComponent, Client}
+import org.corespring.container.components.model.{ Server, UiComponent, Client }
 import org.specs2.mutable.Specification
 import play.api.libs.json.Json
 
@@ -13,7 +13,7 @@ class PlayerItemPreProcessorTest extends Specification {
       |  return json;
       |}
     """.stripMargin
-  
+
   "ItemProcessor" should {
 
     "process" in {
@@ -27,30 +27,22 @@ class PlayerItemPreProcessorTest extends Specification {
         Json.obj(),
         None,
         Map(),
-        Seq.empty
-      )
+        Seq.empty)
 
       val item = Json.obj(
         "weight" -> "1",
         "components" -> Json.obj(
-            "1" -> Json.obj(
-              "componentType" -> "org-name",
-              "model" -> "someModel",
-              "correctResponse" -> Json.obj(
-                 "value" -> "1"
-              )
-            )
-        )
-      )
+          "1" -> Json.obj(
+            "componentType" -> "org-name",
+            "model" -> "someModel",
+            "correctResponse" -> Json.obj(
+              "value" -> "1"))))
 
       val session = Json.obj(
         "components" -> Json.obj(
           "1" -> Json.obj(
-            "itemSession" -> Json.obj( "value" -> "2"),
-            "stash" -> Json.obj()
-          )
-        )
-      )
+            "itemSession" -> Json.obj("value" -> "2"),
+            "stash" -> Json.obj())))
 
       val processor = new PlayerItemPreProcessor(Seq(component), Seq.empty)
       val result = processor.preProcessItemForPlayer(item, session)
@@ -70,21 +62,16 @@ class PlayerItemPreProcessorTest extends Specification {
         Json.obj(),
         None,
         Map(),
-        Seq.empty
-      )
+        Seq.empty)
 
       val item = Json.obj(
         "weight" -> "1",
         "components" -> Json.obj(
-            "1" -> Json.obj(
-              "componentType" -> "org-name",
-              "model" -> "someModel",
-              "correctResponse" -> Json.obj(
-                 "value" -> "1"
-              )
-            )
-        )
-      )
+          "1" -> Json.obj(
+            "componentType" -> "org-name",
+            "model" -> "someModel",
+            "correctResponse" -> Json.obj(
+              "value" -> "1"))))
 
       val processor = new PlayerItemPreProcessor(Seq(component), Seq.empty)
 
@@ -92,7 +79,7 @@ class PlayerItemPreProcessorTest extends Specification {
         processor.preProcessItemForPlayer(item, Json.obj())
         success
       } catch {
-        case x:Throwable => failure
+        case x: Throwable => failure
       }
     }
   }

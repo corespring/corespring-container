@@ -1,7 +1,7 @@
 package org.corespring.container.client.component
 
 import org.corespring.container.client.controllers.helpers.NameHelper
-import org.corespring.container.client.views.txt.js.{ComponentServerWrapper, ServerLibraryWrapper, ComponentWrapper}
+import org.corespring.container.client.views.txt.js.{ ComponentServerWrapper, ServerLibraryWrapper, ComponentWrapper }
 import org.corespring.container.components.model._
 
 class EditorGenerator extends SourceGenerator {
@@ -115,7 +115,6 @@ trait SourceGenerator
   protected def splitComponents(comps: Seq[Component]): (Seq[Library], Seq[UiComponent], Seq[LayoutComponent]) = (
     filterByType[Library](comps),
     filterByType[UiComponent](comps),
-    filterByType[LayoutComponent](comps)
-    )
+    filterByType[LayoutComponent](comps))
 
 }

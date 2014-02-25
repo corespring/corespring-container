@@ -1,12 +1,12 @@
 package org.corespring.container.client.controllers
 
-import org.corespring.container.client.component.{ComponentMaker, SourceGenerator}
+import org.corespring.container.client.component.{ ComponentMaker, SourceGenerator }
 import org.corespring.container.components.model.Component
 import org.specs2.mutable.Specification
 import play.api.GlobalSettings
 import play.api.mvc.SimpleResult
 import play.api.test.Helpers._
-import play.api.test.{FakeApplication, FakeRequest}
+import play.api.test.{ FakeApplication, FakeRequest }
 import scala.concurrent.Future
 
 class ComponentSetsTest extends Specification with ComponentMaker {
@@ -37,8 +37,7 @@ class ComponentSetsTest extends Specification with ComponentMaker {
     //@see: https://github.com/playframework/playframework/issues/2011
 
     "return data" in running(FakeApplication(
-      withGlobal = Some(mockGlobal)
-    )) {
+      withGlobal = Some(mockGlobal))) {
 
       val result: Future[SimpleResult] = sets.resource("editor", "org[all]", "js")(FakeRequest("", "")).run
       contentAsString(result) === "editor - js - org-name"

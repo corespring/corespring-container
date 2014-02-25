@@ -4,7 +4,7 @@ import org.corespring.container.components.model.Component
 
 trait ComponentLoader {
 
-  def all : Seq[Component]
+  def all: Seq[Component]
 
-  def reload : Unit
+  def reload: Unit
 }

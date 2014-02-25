@@ -3,12 +3,12 @@ package org.corespring.container.client.controllers.resources
 import org.specs2.mutable.Specification
 import org.corespring.container.components.response.OutcomeProcessor
 import org.corespring.container.client.actions._
-import play.api.mvc.{AnyContentAsJson, Action, Result, AnyContent}
+import play.api.mvc.{ AnyContentAsJson, Action, Result, AnyContent }
 import org.corespring.container.components.outcome.ScoreProcessor
-import play.api.test.{FakeHeaders, FakeRequest}
+import play.api.test.{ FakeHeaders, FakeRequest }
 import play.api.test.Helpers._
 import org.specs2.mock.Mockito
-import play.api.libs.json.{JsString, JsValue, Json}
+import play.api.libs.json.{ JsString, JsValue, Json }
 import org.specs2.specification.Scope
 import org.corespring.container.client.controllers.resources.Item.Errors
 import play.api.test.FakeHeaders
@@ -20,7 +20,6 @@ import scala.Some
 import org.corespring.container.client.actions.ItemRequest
 
 class ItemTest extends Specification with Mockito {
-
 
   class item(saveResult: Option[JsValue] = Some(Json.obj()), createError: Option[(Int, String)] = None) extends Scope {
     val item = new Item {

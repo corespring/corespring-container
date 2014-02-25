@@ -7,22 +7,20 @@ import org.corespring.container.client.integration.DefaultIntegration
 import org.corespring.container.components.model.Component
 import org.corespring.mongo.json.services.MongoService
 import org.corespring.shell.controllers.CachedAndMinifiedComponentSets
-import org.corespring.shell.controllers.editor.actions.{EditorActions => ShellEditorActions}
-import org.corespring.shell.controllers.editor.{ItemActions => ShellItemActions}
-import org.corespring.shell.controllers.player.actions.{PlayerActions => ShellPlayerActions}
-import org.corespring.shell.controllers.player.{SessionActions => ShellSessionActions}
+import org.corespring.shell.controllers.editor.actions.{ EditorActions => ShellEditorActions }
+import org.corespring.shell.controllers.editor.{ ItemActions => ShellItemActions }
+import org.corespring.shell.controllers.player.actions.{ PlayerActions => ShellPlayerActions }
+import org.corespring.shell.controllers.player.{ SessionActions => ShellSessionActions }
 import play.api.Configuration
 import play.api.mvc._
 import scala.Some
 import org.corespring.container.client.integration.validation.Validator
 
-
 class ContainerClientImplementation(
-                                     val itemService: MongoService,
-                                     val sessionService: MongoService,
-                                     componentsIn: => Seq[Component],
-                                     val configuration: Configuration
-                                     ) extends DefaultIntegration {
+  val itemService: MongoService,
+  val sessionService: MongoService,
+  componentsIn: => Seq[Component],
+  val configuration: Configuration) extends DefaultIntegration {
 
   override def components: Seq[Component] = componentsIn
 
@@ -55,7 +53,6 @@ class ContainerClientImplementation(
         }.getOrElse(r.withNewSession)
     }
   }
-
 
   lazy val assets = new Assets {
 
@@ -95,7 +92,6 @@ class ContainerClientImplementation(
   override def editorActions: EditorActions[AnyContent] = new ShellEditorActions {
     override def itemService: MongoService = ContainerClientImplementation.this.itemService
   }
-
 
   override def sessionActions: SessionActions[AnyContent] = new ShellSessionActions {
     override def itemService: MongoService = ContainerClientImplementation.this.itemService

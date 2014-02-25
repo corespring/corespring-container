@@ -1,8 +1,8 @@
 package org.corespring.container.client.controllers.helpers
 
 import org.htmlcleaner._
-import scala.xml.transform.{RewriteRule, RuleTransformer}
-import scala.xml.{UnprefixedAttribute, Elem, Node, MinimizeMode}
+import scala.xml.transform.{ RewriteRule, RuleTransformer }
+import scala.xml.{ UnprefixedAttribute, Elem, Node, MinimizeMode }
 import scala.util.matching.Regex
 import play.api.Logger
 
@@ -33,7 +33,6 @@ trait XhtmlProcessor {
       serializer.getAsString(n)
   }
 
-
   private def rename(xhtml: String) = read(xhtml).map {
     xml =>
       val xml = scala.xml.XML.loadString(xhtml)
@@ -42,7 +41,6 @@ trait XhtmlProcessor {
       val sb = scala.xml.Utility.serialize(processed(0), minimizeTags = MinimizeMode.Never)
       sb.toString()
   }
-
 
   private def read(xml: String) = try {
     Some(scala.xml.XML.loadString(xml))
@@ -53,7 +51,6 @@ trait XhtmlProcessor {
     }
   }
 }
-
 
 object ReplaceTag extends RewriteRule {
 
@@ -68,5 +65,4 @@ object ReplaceTag extends RewriteRule {
     }
   }
 }
-
 

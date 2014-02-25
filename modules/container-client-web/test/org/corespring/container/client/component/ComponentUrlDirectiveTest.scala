@@ -10,7 +10,7 @@ class ComponentUrlDirectiveTest extends Specification with ComponentMaker {
     ComponentUrlDirective(d, comps) === names and ComponentUrlDirective.unapply(names, comps) === Some(d)
   }
 
-  def orgApplyAndUnapply(org:String, d:String, names: Seq[String]) = {
+  def orgApplyAndUnapply(org: String, d: String, names: Seq[String]) = {
     val orgComps = comps.filter(_.id.org == org)
     OrgDirective(org, d, orgComps) === names and OrgDirective.unapply(org, names, orgComps) === Some(s"$org[$d]")
   }

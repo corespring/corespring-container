@@ -1,7 +1,7 @@
 package org.corespring.container.components.loader
 
 import org.specs2.mutable.Specification
-import org.corespring.container.components.model.{LayoutComponent, UiComponent, Library}
+import org.corespring.container.components.model.{ LayoutComponent, UiComponent, Library }
 
 class FileComponentLoaderTest extends Specification {
 
@@ -9,7 +9,7 @@ class FileComponentLoaderTest extends Specification {
 
   "FileComponentLoader" should {
 
-    def getLoader(p:String) = {
+    def getLoader(p: String) = {
       val path = s"$rootPath/$p"
       val loader = new FileComponentLoader(Seq(path))
       loader.reload
@@ -38,7 +38,7 @@ class FileComponentLoaderTest extends Specification {
       val loader = getLoader("three")
       val lib = loader.all(0)
       lib match {
-        case UiComponent(_,_,_,_,_,_,_,_,libs) => {
+        case UiComponent(_, _, _, _, _, _, _, _, libs) => {
           libs.length === 1
           libs(0).org === "org-name"
           libs(0).name === "lib-name"
@@ -53,7 +53,7 @@ class FileComponentLoaderTest extends Specification {
       val comp = loader.all(0)
 
       comp match {
-        case LayoutComponent(org,name,client,_,_) => {
+        case LayoutComponent(org, name, client, _, _) => {
           org === "corespring"
           name === "layout-comp"
           client.length === 1

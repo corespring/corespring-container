@@ -1,10 +1,8 @@
 package org.corespring.shell.filters
 
-
 import org.corespring.container.components.loader.ComponentLoader
 import play.api.Mode
-import play.api.mvc.{RequestHeader, EssentialAction, EssentialFilter}
-
+import play.api.mvc.{ RequestHeader, EssentialAction, EssentialFilter }
 
 /**
  * Dev mode support for re-loading components if the player or editor is loaded.
@@ -18,7 +16,7 @@ object ReloadComponentsFilter extends EssentialFilter {
     def apply(request: RequestHeader) = {
       play.api.Play.current.mode match {
         case Mode.Dev => {
-          if (request.path.contains(".html")  && components != null) {
+          if (request.path.contains(".html") && components != null) {
             components.reload
           }
           next(request)
