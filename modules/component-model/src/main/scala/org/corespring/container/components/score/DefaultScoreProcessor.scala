@@ -32,7 +32,7 @@ object DefaultScoreProcessor extends ScoreProcessor {
         ))
     }
 
-    val points = componentScores.fieldSet.map(fs => (fs._2 \ "weightedScore").as[BigDecimal]).foldRight[BigDecimal](0)(_ + _)
+    val points = getSumOfWeightedScores(componentScores)
     val rawPercentage = (points / maxPoints) * 100
     val percentage = decimalize(rawPercentage, 1)
 
@@ -43,5 +43,9 @@ object DefaultScoreProcessor extends ScoreProcessor {
     )
 
     Json.obj("summary" -> summary, "components" -> componentScores)
+  }
+
+  def getSumOfWeightedScores(componentScores:JsObject) = {
+    componentScores.fields.map(fs => (fs._2 \ "weightedScore").as[BigDecimal]).foldRight[BigDecimal](0)(_ + _)
   }
 }
