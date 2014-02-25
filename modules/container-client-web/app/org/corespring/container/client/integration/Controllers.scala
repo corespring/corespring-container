@@ -7,6 +7,7 @@ import org.corespring.container.client.controllers.{ComponentsFileController, Ic
 import play.api.mvc.Controller
 
 trait CommonControllers {
+  
 
   /** urls for component sets eg one or more components */
   def componentUrls: ComponentUrls
