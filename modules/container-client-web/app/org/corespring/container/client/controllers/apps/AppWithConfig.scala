@@ -1,4 +1,4 @@
-package org.corespring.container.client.controllers
+package org.corespring.container.client.controllers.apps
 
 import org.corespring.container.client.actions.ClientActions
 import org.corespring.container.client.component.{ComponentUrls, ItemTypeReader, DependencyResolver}

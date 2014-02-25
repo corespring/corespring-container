@@ -1,4 +1,4 @@
-package org.corespring.container.components.response
+package org.corespring.container.js.response.rhino
 
 import org.mozilla.javascript.{Function => RhinoFunction}
 import org.specs2.matcher.Matcher
