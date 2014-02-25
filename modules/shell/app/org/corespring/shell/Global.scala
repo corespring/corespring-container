@@ -41,6 +41,12 @@ object Global extends WithFilters(AccessControlFilter, CallBlockOnHeaderFilter) 
   }
 
   override def onStart(app: play.api.Application): Unit = {
+
+    logger.trace("trace")
+    logger.debug("debug")
+    logger.info("info")
+    logger.warn("warn")
+    logger.error("error")
     CallBlockOnHeaderFilter.block = (rh: RequestHeader) => {
       if (rh.path.contains(".html") && componentLoader != null) {
         logger.info("reload components!")

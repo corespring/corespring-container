@@ -116,6 +116,7 @@ trait PlayerLauncher extends Controller {
     val rawJs = Seq("container-client/js/corespring/core-library.js")
     val wrappedJs = jsPath +: Seq(
       "container-client/js/player-launcher/errors.js",
+      "container-client/js/player-launcher/post-message.js",
       "container-client/js/player-launcher/instance.js",
       "container-client/js/player-launcher/root-level-listener.js"
     )

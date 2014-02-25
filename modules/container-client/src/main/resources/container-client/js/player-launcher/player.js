@@ -118,9 +118,7 @@ exports.define = function(isSecure) {
     this.setMode = function (mode, callback) {
 
       if(!isReady){
-        if (callback) {
-          callback(errors.PLAYER_NOT_READY);
-        }
+        //no callback bc it results in a stack overflow
         return;
       }
 

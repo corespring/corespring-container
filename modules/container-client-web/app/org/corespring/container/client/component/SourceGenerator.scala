@@ -55,8 +55,9 @@ class PlayerGenerator extends SourceGenerator {
 
   override def css(components: Seq[Component]): String = {
     val (libs, uiComps, layoutComps) = splitComponents(components)
-    val css = uiComps.map(_.client.css.getOrElse("")).mkString("\n")
-    s"$css\n"
+    val uiCss = uiComps.map(_.client.css.getOrElse("")).mkString("\n")
+    val layoutCss = layoutComps.map(_.css.getOrElse("")).mkString("\n")
+    s"$uiCss\n$layoutCss"
   }
 
   override def js(components: Seq[Component]): String = {
