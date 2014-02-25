@@ -14,6 +14,7 @@ import org.corespring.shell.controllers.player.{SessionActions => ShellSessionAc
 import play.api.Configuration
 import play.api.mvc._
 import scala.Some
+import org.corespring.container.client.integration.validation.Validator
 
 
 class ContainerClientImplementation(
@@ -23,6 +24,11 @@ class ContainerClientImplementation(
                                      val configuration: Configuration
                                      ) extends DefaultIntegration {
 
+
+  def valid : Either[String, Boolean] = {
+    val componentsPath =  configuration.getString("components.path").getOrElse("?")
+    Validator.absolutePathInProdMode(componentsPath)
+  }
 
   override def components: Seq[Component] = componentsIn
 

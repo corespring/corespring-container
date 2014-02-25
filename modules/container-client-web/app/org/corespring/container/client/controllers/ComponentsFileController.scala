@@ -8,6 +8,7 @@ import play.api.libs.MimeTypes
 import play.api.libs.iteratee.Enumerator
 import play.api.mvc._
 import scala.concurrent.ExecutionContext
+import org.corespring.container.client.integration.validation.Validator
 
 /** A very simple file asset loader for now */
 trait ComponentsFileController extends Controller {
@@ -42,11 +43,7 @@ trait ComponentsFileController extends Controller {
 
     import ExecutionContext.Implicits.global
 
-    def absolutePathInProdMode = if(Play.current.mode == Mode.Prod){
-      componentsPath.startsWith("/")
-    } else true
-
-    require(absolutePathInProdMode, s"The component path ($componentsPath) is relative - this can cause unpredictable behaviour when running in Prod Mode. see: https://github.com/playframework/playframework/issues/2411")
+    require(Validator.absolutePathInProdMode(componentsPath).isRight, s"The component path ($componentsPath) is relative - this can cause unpredictable behaviour when running in Prod Mode. see: https://github.com/playframework/playframework/issues/2411")
 
     val fullPath = s"$componentsPath/$org/$component/libs/$filename"
     log.debug( s"fullPath: $fullPath")
