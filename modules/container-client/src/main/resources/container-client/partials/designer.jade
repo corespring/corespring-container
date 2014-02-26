@@ -1,0 +1,69 @@
+.item-list(is-new-item="{{isNewItem()}}")
+  .main-header
+    span.header-label My Items {{selectedComponent.id}}
+    span.left-arrow
+
+  .item-body(ng-switch="isNewItem()")
+    .header
+      .title
+        | Item Details
+        span.dotted-arrow
+
+      div
+        .info
+          div(ng-switch-when="true")
+            | Content you have added will be listed here.
+            br/
+            br/
+            | Click on a question type or content section to edit and design it.
+          div(ng-switch-when="false")
+            | Click a Question Type below to begin editing it.
+            br/
+            br/
+            | You can drag question types below into any order.
+          br/
+          .cs-btn(ng-click="openChooser()") Add content
+
+    structure-view.structure-view(
+      ng-model="model",
+      selected-component="selectedComponent",
+      get-icon-url="getIconUrl(type)"
+      component-set="componentSet")
+
+  .button-holder
+    button.btn.btn-primary(ng-click="save()") Save
+
+//file-list(ng-model="model.files", select-file="selectFile(file)")
+.config(ng-class="editorMode")
+  div
+    .btn.btn-link.btn-sm(ng-click="editorMode='visual'",ng-class="{active: editorMode=='visual'}") Visual
+    .btn.btn-link.btn-sm(ng-click="switchToJsonView()",ng-class="{active: editorMode=='json'}") Json
+  div(ng-if="editorMode == 'json'", ng-model="$parent.selectedComponentJson", ui-ace="{useWrapMode: true, mode: 'json', onChange: jsonEditorChanged, onLoad: jsonEditorLoaded}", style="height: 100%; width: 100%")
+  config-pane#config(ng-if="editorMode == 'visual'",style="height: 100%; width: 100%")
+
+.welcome(ng-show="isNewItem()")
+  .header
+    | Welcome
+  .cs-btn(ng-click="openChooser()") Add content
+
+//TODO: in ng-show below 'selectedFile' is bound to the file-preview selectedFile - not the outer one
+//Should be bound to the outer property.
+div.selected-text-editor(ui-ace, ng-model="selectedFile.content", ui-ace="{useWrapMode: true}", ng-show="selectedFile.content != null")
+
+div.client-side-preview(ng-controller="ClientSidePreview",ng-show="hasComponents()")
+
+  player-control-panel(player-settings="session.settings")
+
+  corespring-player(
+    player-mode="editor",
+    player-markup="model.xhtml",
+    player-item="model",
+    player-session="rootModel.session",
+    player-outcomes="outcome")
+
+  .button-holder
+    button.btn.btn-primary(ng-click="submit()", ng-disabled="!canSubmit()") Submit
+    button.btn.btn-warning(ng-click="resetPreview()") Reset
+  hr/
+  #score(ng-show="score")
+    h4 You scored: {{score.summary.percentage}}%

@@ -60,7 +60,7 @@ module.exports = (grunt) ->
       concatDest: '<%= common.dist %>/js/editor-extras.js'
       src: [
               '<%= common.dist %>/bower_components/angular-ui/build/angular-ui.min.js',
-              '<%= common.dist %>/bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js',
+              '<%= common.dist %>/bower_components/angular-bootstrap/ui-bootstrap-tpls.js',
               '<%= common.dist %>/bower_components/bootstrap/js/dropdown.js',
               '<%= common.dist %>/bower_components/bootstrap/js/modal.js',
               '<%= common.dist %>/bower_components/bootstrap/js/tooltip.js',
@@ -110,7 +110,7 @@ module.exports = (grunt) ->
         files: ['<%= common.app %>/js/**/*.js', '<%= common.components %>/**/*.js']
         tasks: ['jshint:main']
       jade:
-        files: ['<%= common.app %>/*.jade']
+        files: ['<%= common.app %>/**/*.jade']
         tasks: ['jade']
 
 
@@ -147,7 +147,7 @@ module.exports = (grunt) ->
       compile:
         expand: true
         cwd: '<%= common.app %>'
-        src: ['*.jade', '!layout.jade']
+        src: ['**/*.jade', '!layout.jade']
         ext: '.html'
         dest: '<%= common.dist %>'
         options:

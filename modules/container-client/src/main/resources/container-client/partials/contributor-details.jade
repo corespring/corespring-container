@@ -1,0 +1,71 @@
+form.form-horizontal
+  .control-group
+    label.control-label(for='contributor') Contributor
+    .controls
+      input#contributor.form-control(type='text', ng-model='itemData.contributor')
+  .control-group
+    label.control-label(for='copyrightOwner') Copyright Owner
+    .controls
+      input#copyrightOwner.form-control(type='text', ng-model='itemData.copyrightOwner')
+  .control-group
+    label.control-label(for='author') Author
+    .controls
+      input#author.form-control(type='text', ng-model='itemData.author')
+  .control-group
+    label.control-label Credentials
+    .controls
+      select.form-control(ng-model='itemData.credentials', ng-options='c for c in itemData.$credentialsDataProvider')
+  .control-group
+    label.control-label(for='sourceUrl') Source URL
+    .controls
+      input#sourceUrl.input.form-control(size='16', type='text', ng-model='itemData.sourceUrl')
+  .control-group
+    label.control-label License Type
+    .controls
+      select.form-control(ng-model='itemData.licenseType', ng-options='c for c in itemData.$licenseTypeDataProvider')
+  .control-group
+    label.control-label Copyright Year
+    .controls.form-inline
+      input.form-control(type='text', ng-model='itemData.copyrightYear')
+      &nbsp;
+      label Copyright Expiration Date
+      input.form-control(type='text', ng-model='itemData.copyrightExpirationDate')
+  .control-group
+    label.control-label(for='costForResource') Cost for Resource
+    .controls
+      .input-group
+        span.input-group-addon $
+        input(type="text", class="form-control")
+        span.input-group-addon .00
+
+form.form-horizontal
+
+  .control-group
+    label.control-label(for='priorUse') Prior Use
+    .controls
+      select.form-control(name='itemData.priorUse', ng-model='itemData.priorUse', ng-options='c for c in itemData.$priorUseDataProvider')
+  
+  .control-group
+    label.control-label(for='priorGradeLevel') Grade Level
+    #priorGradeLevel.controls
+      .btn-group
+        button.btn.tight(ng-repeat='gl in itemData.$priorGradeLevelDataProvider', button-toggle='active', title='Prekindergarten', ng-model='gl.state.selected')
+  
+  .control-group
+    label.control-label Reviews Passed
+    .span3
+      label(ng-repeat='rp in itemData.$reviewsPassedDataProvider')
+        input(type='checkbox', ng-model='rp.state.selected')
+        | {{rp.name}} 
+
+  .control-group
+    label.control-label(for='pValue') Difficulty Level
+    .controls
+      input#pValue.form-control(type='text', ng-model='itemData.pValue')
+
+  .control-group
+    label.control-label(for='pValue') Lexile Score
+    .controls
+      .input-group
+        input.form-control(type='text', ng-model='itemData.lexile')
+        span.input-group-addon L

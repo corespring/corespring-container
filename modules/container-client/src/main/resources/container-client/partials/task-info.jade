@@ -1,0 +1,20 @@
+form.form-horizontal
+
+  .control-group
+    label.control-label Primary Subject
+
+  .control-group
+    label.control-label Related Subject
+
+  .control-group
+    label.control-label(for='gradeLevel') Grade Level
+    grade-level(ng-model="data.gradeLevel", data-provider="gradeLevelDataProvider")
+  
+  .control-group
+    label.control-label Title
+    .controls
+      textarea.form-control(ng-model='itemData.title', rows='3')
+  
+  .control-group
+    label.control-label Item Type
+    item-type(ng-model="data.itemType", data-provider="itemTypeDataProvider")

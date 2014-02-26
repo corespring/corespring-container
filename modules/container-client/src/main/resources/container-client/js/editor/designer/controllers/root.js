@@ -211,7 +211,7 @@ var controller = function ($scope, $compile, $http, $timeout, $modal, $log, Edit
 };
 
 angular.module('corespring-editor.controllers')
-  .controller('Root',
+  .controller('Designer',
     ['$scope',
       '$compile',
       '$http',

@@ -31,19 +31,16 @@ block head
 
 block content
   .root(ng-controller="Root")
-
-    div
-      .nav.navbar-static-top(role="navigation")
-        .navbar-header
-          a.navbar-brand(href="/")
-
-        .main-btn.btn.active Item Design
-        //TODO: will need to add this back
-        span.btn.btn-info.btn-xs(file-uploader, fu-url="getUploadUrl()", fu-mode="raw", fu-max-size="1000") Upload image
-        span.header
-          .title
-            | Item preview
-          .down-arrow
+    .main-nav
+      a.navbar-brand(href="/")
+        
+      tabset
+        tab(
+          ng-repeat="tab in tabs", 
+          select="choose(tab)", 
+          heading="{{tab.title}}", 
+          active="tab.active", 
+          disabled="tab.disabled")
 
     .main-content(ng-view)
 
@@ -101,6 +98,7 @@ block scripts
         head.ready(function(){
           allScriptsAreLoaded();
         });
+
       });
     });
 

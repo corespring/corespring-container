@@ -2,15 +2,17 @@
 
 var config = [
   '$routeProvider', 
-  function($routeProvider){
+  '$locationProvider',
+  function($routeProvider, $locationProvider){
+    $locationProvider.html5Mode(false);
     $routeProvider.
       when('/profile', {
         templateUrl: '../../partials/profile.html',
-        controller: 'ProfileController'
+        controller: 'Profile'
       }).
       when('/designer', {
         templateUrl: '../../partials/designer.html',
-        controller: 'DesignerController'
+        controller: 'Designer'
       }).
       otherwise({
         redirectTo: '/profile'
