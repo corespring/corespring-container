@@ -4,17 +4,7 @@
   //A simple library to aid in the use of the common js module pattern.
   var Library = function(){
 
-<<<<<<< Updated upstream
-    var modules = { };
- 
-=======
-    //TODO: Move out of Library
     var modules = {};
-    /*var modules = {
-      lodash: { exports: _ },
-      underscore: { exports: _},
-      sax: { exports:  sax }
-    };*/
 
     this.initialize = function(m){
       for(var x in m){
@@ -22,7 +12,6 @@
       }
     };
 
->>>>>>> Stashed changes
     this.require = function(uid){
 
       if(!uid){
