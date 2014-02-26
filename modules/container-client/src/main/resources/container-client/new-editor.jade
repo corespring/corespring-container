@@ -2,6 +2,8 @@ extends layout
 
 block head
 
+  link(rel="stylesheet", href="../../components/select2/select2.css")
+
   link(rel="stylesheet", href="../../css/new-editor.css")
 
   script(type="text/ng-template", id="add-component.html")
@@ -76,7 +78,8 @@ block scripts
             'ui.bootstrap',
             'ui.ace',
             'cs.directives',
-            'ngRoute'
+            'ngRoute',
+            'ui.select2'
           ].concat(data.angular.dependencies);
 
           angular.module("corespring-editor", playerDeps)

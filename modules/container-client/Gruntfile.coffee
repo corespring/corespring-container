@@ -59,6 +59,8 @@ module.exports = (grunt) ->
       dest: '<%= common.dist %>/js/prod-editor-extras.js'
       concatDest: '<%= common.dist %>/js/editor-extras.js'
       src: [
+              '<%= common.dist %>/bower_components/select2/select2.js',
+              '<%= common.dist %>/bower_components/angular-ui-select2/src/select2.js',
               '<%= common.dist %>/bower_components/angular-ui/build/angular-ui.min.js',
               '<%= common.dist %>/bower_components/angular-bootstrap/ui-bootstrap-tpls.js',
               '<%= common.dist %>/bower_components/bootstrap/js/dropdown.js',

@@ -2,13 +2,34 @@ form.form-horizontal
 
   .control-group
     label.control-label Primary Subject
+    
+    .controls 
+
+      
+      select(ui-select2,
+        ng-model="select2",
+        data-placeholder="Pick a number")
+        option(value="")
+        option(value="one") First
+        option(value="two") Second
+        option(value="three") Third
 
   .control-group
     label.control-label Related Subject
 
+    .controls
+      select(ui-select2,
+        ng-model="select2",
+        data-placeholder="Pick a number")
+        option(value="")
+        option(value="one") First
+        option(value="two") Second
+        option(value="three") Third
+
   .control-group
     label.control-label(for='gradeLevel') Grade Level
-    grade-level(ng-model="data.gradeLevel", data-provider="gradeLevelDataProvider")
+    .controls
+      button-bar(ng-model="data.gradeLevel", button-provider="gradeLevelDataProvider")
   
   .control-group
     label.control-label Title

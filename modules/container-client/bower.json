@@ -9,6 +9,8 @@
     "angular-animate": "~1.2.12",
     "angular-ui": "~0.4.0",
     "angular-ui-sortable": "https://github.com/angular-ui/ui-sortable/archive/angular1.2.zip",
+    "select2" : "~3.4.5",
+    "angular-ui-select2" : "~0.0.5",
     "angular-bootstrap": "~0.10.0",
     "jquery": "1.10.2",
     "saxjs": "https://github.com/isaacs/sax-js.git",
@@ -52,6 +54,7 @@
     ]
   },
   "resolutions": {
-    "angular": "~1.2.12"
+    "angular": "~1.2.12",
+    "bootstrap": "~3.1.0"
   }
 }
