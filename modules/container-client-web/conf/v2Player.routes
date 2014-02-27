@@ -53,4 +53,5 @@ POST       /editor/:itemId/*file                           @org.corespring.conta
 
 
 GET        /profile/:topic                                 @org.corespring.container.client.controllers.Profile.list(topic, query : Option[String] ?= None)
+GET        /profile/:topic/:id                             @org.corespring.container.client.controllers.Profile.findOne(topic, id)
 

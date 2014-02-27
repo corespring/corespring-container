@@ -1,5 +1,14 @@
 {
   "_id": "522267c2554f43f858000003",
+  "profile" : {
+    "taskInfo" : {
+      "title": "Drag and drop example",
+      "gradeLevel" : ["01", "03"],
+      "primarySubject" : "4ffb535f6bb41e469c0bf2a8",
+      "relatedSubject" : "4ffb535f6bb41e469c0bf2a9",
+      "itemType" : "arstConstructed Response - Short Answer"
+    }
+  },
   "components": {
     "1": {
       "componentType": "corespring-drag-and-drop",
@@ -47,9 +56,7 @@
       "weight": 1
     }
   },
-  "metadata": {
-    "title": "Drag and drop example"
-  },
+ 
   "org": {
     "components": [
       "corespring/*"

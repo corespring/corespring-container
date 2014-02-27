@@ -36,6 +36,15 @@
  
       _call(topic, query, onSuccess, onFailure);
     };
+
+    this.findOne = function(topic, id, onSuccess, onError){
+
+      var url = "../../profile/" + topic + "/" + id;
+
+      $http({method: 'GET', url: url})
+        .success(onSuccess)
+        .error(onError);
+    };
   }
 
   angular.module('corespring-editor.services')
