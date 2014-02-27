@@ -48,7 +48,7 @@ trait AppWithConfig[T <: ClientActions[AnyContent]]
       val dependencies = ngModules.createAngularModules(components, clientSideDependencies)
       val clientSideScripts = get3rdPartyScripts(clientSideDependencies)
       val localScripts = getLocalScripts(components)
-      val js = (clientSideScripts ++ localScripts ++ additionalScripts :+ jsUrl).distinct.sorted
+      val js = (clientSideScripts ++ localScripts ++ additionalScripts :+ jsUrl).distinct
       val css = Seq(cssUrl)
 
       val json = configJson(
