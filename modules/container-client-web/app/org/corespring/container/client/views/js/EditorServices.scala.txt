@@ -5,7 +5,31 @@
 
   angular.module('@namespace', []);
 
-  angular.module('@namespace').factory('EditorServices', ['$http', function($http){
+  angular.module('@namespace').factory('ProfileService', ['BaseService', function(BaseService){
+
+    return {
+        save: function(profile, onSuccess, onFailure, id){
+            BaseService.save( "profile", profile, onSuccess, onFailure, id);
+        }
+    }
+  }]);
+
+  angular.module('@namespace').factory('DesignerService', ['$http', function($http){
+
+    return {
+        save: function(components, onSuccess, onFailure, id){
+            BaseService.save( "components", components, onSuccess, onFailure, id);
+        }
+    }
+
+  }]);
+
+
+  angular.module('@namespace').factory('ItemService', ['BaseService', function(BaseService){
+    return BaseService;
+  }]);
+
+  angular.module('@namespace').factory('BaseService', ['$http', function($http){
 
     var def = {
       load: function(onSuccess, onFailure, id){
@@ -23,7 +47,7 @@
             }
           });
       },
-      save: function(item, onSuccess, onFailure, id){
+      save: function(name, data, onSuccess, onFailure, id){
         var finalUrl = id ? '@save.url'.replace(":id", id) : '@save.url';
         $http['@save.method.toLowerCase'](finalUrl, item)
           .success(function(data, status, headers, config) {

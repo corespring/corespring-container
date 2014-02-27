@@ -1,12 +1,9 @@
 /* global AddContentModalController */
-var controller = function ($scope, $compile, $http, $timeout, $modal, $log, EditorServices, PlayerServices, MathJaxService, ComponentRegister) {
+var controller = function (
+  $scope, $compile, $http, $timeout, $modal, $log,
+  DesignerService, PlayerService, MathJaxService, ComponentRegister) {
 
   $scope.showComponentsPanel = false;
-
-  $scope.itemId = (function(){
-    //TODO: This is a temporary means of extracting the session id
-    return document.location.pathname.match(/.*\/(.*)\/.*/)[1];
-  })();
 
   var configPanels = {};
 
@@ -43,24 +40,6 @@ var controller = function ($scope, $compile, $http, $timeout, $modal, $log, Edit
       });
   };
 
-  $scope.save = function () {
-    console.log("Saving: ");
-    console.log($scope.model);
-    var cleaned = $scope.serialize($scope.model);
-    console.log(cleaned);
-    EditorServices.save(cleaned, $scope.onItemSaved, $scope.onItemSaveError, $scope.itemId);
-  };
-
-  $scope.onItemSaved = function (data) {
-  };
-
-  $scope.onItemSaveError = function (error) {
-    console.warn("Error saving item");
-  };
-
-  $scope.onItemLoadError = function (error) {
-    console.warn("Error loading item");
-  };
 
   $scope.onComponentsLoaded = function (componentSet) {
     $scope.componentSet = componentSet;
@@ -88,30 +67,6 @@ var controller = function ($scope, $compile, $http, $timeout, $modal, $log, Edit
     console.warn("Error loading components");
   };
 
-  $scope.onItemLoaded = function (data) {
-    _.each(data.item.components, function(c, key) {
-      var serverLogic = corespring.server.logic(c.componentType);
-      if (serverLogic.render) {
-        data.item.components[key] = serverLogic.render(c);
-      }
-    });
-
-    $scope.rootModel = data;
-    $scope.model = data.item;
-
-    for (var c in $scope.model.components) {
-      $scope.selectedComponent = {id: c, component: $scope.model.components[c]};
-      break;
-    }
-
-    var scoringJs = _.find($scope.model.files, function (f) {
-      return f.name === "scoring.js";
-    });
-
-    if (scoringJs) {
-      PlayerServices.setScoringJs(scoringJs);
-    }
-  };
 
   $scope.getUploadUrl = function (file) {
     console.log(arguments);
@@ -147,25 +102,32 @@ var controller = function ($scope, $compile, $http, $timeout, $modal, $log, Edit
     return $scope.model.components[id];
   };
 
-
   $scope.registerConfigPanel = function (id, component) {
     console.log("registerConfigPanel:", id);
     configPanels[id] = component;
     component.setModel($scope.model.components[id]);
   };
 
-  $scope.serialize = function (itemModel) {
+  $scope.save = function () {
+    console.log("Saving: ");
+    console.log($scope.item.components);
+    var cleaned = $scope.serialize($scope.item.components);
+    console.log(cleaned);
+    DesignerService.save(cleaned, $scope.onItemSaved, $scope.onItemSaveError, $scope.itemId);
+  };
 
-    if (!configPanels){ return itemModel;}
+  $scope.serialize = function (comps) {
 
-    var newModel = _.cloneDeep(itemModel);
-    _.each(newModel.components, function (value, key) {
+    if (!configPanels){ return comps;}
+
+    var newModel = _.cloneDeep(comps);
+    _.each(comps, function (value, key) {
       var component = configPanels[key];
       if (component && component.getModel) {
-        newModel.components[key] = component.getModel();
+        comps[key] = component.getModel();
       }
     });
-    return newModel;
+    return comps;
   };
 
 
@@ -203,11 +165,40 @@ var controller = function ($scope, $compile, $http, $timeout, $modal, $log, Edit
     return $scope.model;
   };
 
-  PlayerServices.setQuestionLookup($scope.getQuestionForComponentId);
-  PlayerServices.setItemLookup($scope.getItem);
+  PlayerService.setQuestionLookup($scope.getQuestionForComponentId);
+  PlayerService.setItemLookup($scope.getItem);
 
-  EditorServices.load($scope.onItemLoaded, $scope.onItemLoadError, $scope.itemId);
-  EditorServices.loadComponents($scope.onComponentsLoaded, $scope.onComponentsLoadError);
+  function initDesigner(item){
+    _.each(item.components, function(c, key) {
+      var serverLogic = corespring.server.logic(c.componentType);
+      if (serverLogic.render) {
+        item.components[key] = serverLogic.render(c);
+      }
+    });
+
+    $scope.model = item;
+
+    for (var c in item.components) {
+      $scope.selectedComponent = {id: c, component: item.components[c]};
+      break;
+    }
+
+    var scoringJs = _.find($scope.item.files, function (f) {
+      return f.name === "scoring.js";
+    });
+
+    if (scoringJs) {
+      PlayerService.setScoringJs(scoringJs);
+    }
+  }
+
+  $scope.$watch('item', function(newItem){
+    if(newItem){
+      initDesigner(newItem);
+    }
+  });
+
+  DesignerService.loadComponents($scope.onComponentsLoaded, $scope.onComponentsLoadError);
 };
 
 angular.module('corespring-editor.controllers')
@@ -218,8 +209,8 @@ angular.module('corespring-editor.controllers')
       '$timeout',
       '$modal',
       '$log',
-      'EditorServices',
-      'PlayerServices',
+      'DesignerService',
+      'PlayerService',
       'MathJaxService',
       'ComponentRegister',
       controller]);

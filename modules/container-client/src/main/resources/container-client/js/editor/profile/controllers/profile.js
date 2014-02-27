@@ -1,24 +1,32 @@
-var controller = function ($scope, $log, ProfileService) {
+var controller = function ($scope, $log, ProfileService, DataQueryService) {
 
-  $scope.data = {};
-
-  function findSubject(topic, id){
+  function findSubject(topic, id, callback){
     var local = _.find($scope.queryResults[topic], function(r){ return r.id === id;});
     if(local){
-      return local;
+
+      callback(local);
     } else {
-      return { id: id, text: "todo"};
+
+      DataQueryService.findOne(topic, id, function success(data){
+        callback({ id: data._id.$oid, text: data.subject });
+      });
     }
   }
 
   $scope.queryResults = {};
+
+  $scope.save = function(){
+    ProfileService.save($scope.item.profile, function(savedProfile){
+      $scope.item.profile = savedProfile;
+    });
+  };
 
   $scope.subjectAsync = function(topic){ 
     return {
       query: function (query) {
         $log.debug("query: ", query);
 
-        ProfileService.query( topic, query.term, function(result){
+        DataQueryService.query( topic, query.term, function(result){
 
           var formatted = _.map(result, function(r){
             return { id: r._id.$oid, text: r.category + ": " + r.subject};
@@ -32,7 +40,10 @@ var controller = function ($scope, $log, ProfileService) {
         $log.debug("init selection: ", element, callback);
         var val = $(element).select2('val');
         $log.debug("val: ", val);
-        return callback(findSubject(topic, val));
+
+        findSubject(topic, val, function(s){
+          return callback(s);
+        });
       }
     };
   };
@@ -41,23 +52,43 @@ var controller = function ($scope, $log, ProfileService) {
   $scope.primarySubjectAsync = $scope.subjectAsync("primarySubject");
 
 
- $scope.updateItemType = function () {
-    $scope.data.itemType = $scope.otherItemType;
-  };
+ $scope.$watch("otherItemType",  function (n) {
+    if(n && n !== ""){
+      $scope.taskInfo.itemType = $scope.otherItemType;
+    }
+  }, true);
 
-  $scope.$watch("data.itemType", function (newValue) {
-    if (newValue !== $scope.otherItemType) {
-      $scope.otherItemType = "";
+  function updateOtherItemType(){
+
+    function isRecognisedType(){
+      var recognised = _.find($scope.itemTypeValues, function(it){
+        return it === $scope.taskInfo.itemType;
+      });
+      return recognised  !== undefined;
+    }
+
+    if($scope.itemTypeDataProvider && $scope.taskInfo){
+      
+      if(isRecognisedType()){
+        $scope.otherItemType = "";
+      } else {
+        $scope.otherItemType = $scope.taskInfo.itemType;
+      }
+    }
+  }
+
+
+  $scope.$watch("taskInfo.itemType", function (newValue) {
+    updateOtherItemType();
+  }, true);
+
+  $scope.$watch('item', function(newItem){
+    if(newItem){
+      $scope.taskInfo = newItem.profile.taskInfo; 
+      $log.debug("task info: ", $scope.taskInfo);
     }
   });
-
-  ProfileService.list("gradeLevel", function(result){
-    $scope.gradeLevelDataProvider = result;
-  });
-
-  ProfileService.list("itemType", function(result){
-    $scope.itemTypeDataProvider  = result;
-  });
+  
 };
 
 angular.module('corespring-editor.controllers')
@@ -65,4 +96,5 @@ angular.module('corespring-editor.controllers')
     ['$scope',
     '$log',
     'ProfileService',
+    'DataQueryService',
       controller]);
