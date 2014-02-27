@@ -14,7 +14,6 @@ import org.corespring.shell.controllers.player.{ SessionActions => ShellSessionA
 import play.api.Configuration
 import play.api.mvc._
 import scala.Some
-import org.corespring.container.client.integration.validation.Validator
 
 class ContainerClientImplementation(
   val itemService: MongoService,
@@ -34,24 +33,10 @@ class ContainerClientImplementation(
      * @param block
      * @return
      */
-    override def playerJs(block: (PlayerJsRequest[AnyContent]) => Result): Action[AnyContent] = loadJs(block)
+    override def playerJs(block: (PlayerJsRequest[AnyContent]) => Result): Action[AnyContent] = ContainerClientImplementation.loadJs(block)
 
-    override def editorJs(block: (PlayerJsRequest[AnyContent]) => Result) = loadJs(block)
+    override def editorJs(block: (PlayerJsRequest[AnyContent]) => Result) = ContainerClientImplementation.loadJs(block)
 
-    private def loadJs(block: PlayerJsRequest[AnyContent] => Result): Action[AnyContent] = Action {
-      request =>
-        def isSecure = request.getQueryString("secure").map {
-          _ == "true"
-        }.getOrElse(false)
-        def errors = request.getQueryString("jsErrors").map {
-          s => s.split(",").toSeq
-        }.getOrElse(Seq())
-        val r = block(PlayerJsRequest(isSecure, request, errors))
-        request.getQueryString("pageErrors").map {
-          s =>
-            r.withSession(SessionKeys.failLoadPlayer -> s)
-        }.getOrElse(r.withNewSession)
-    }
   }
 
   lazy val assets = new Assets {
@@ -109,3 +94,30 @@ class ContainerClientImplementation(
     override def itemService: MongoService = ContainerClientImplementation.this.itemService
   }
 }
+
+object ContainerClientImplementation {
+
+  def loadJs(block: PlayerJsRequest[AnyContent] => Result): Action[AnyContent] = Action {
+    request =>
+      def isSecure = request.getQueryString("secure").map {
+        _ == "true"
+      }.getOrElse(false)
+      def errors = request.getQueryString("jsErrors").map {
+        s => s.split(",").toSeq
+      }.getOrElse(Seq())
+
+      val updatedSession = request.getQueryString("pageErrors").map {
+        s =>
+          request.session + (SessionKeys.failLoadPlayer -> s)
+      }.getOrElse {
+        request.session - SessionKeys.failLoadPlayer
+      }
+
+      val updatedRequest = new WrappedRequest[AnyContent](request) {
+        override lazy val session = updatedSession
+      }
+
+      block(PlayerJsRequest(isSecure, updatedRequest, errors))
+  }
+}
+
