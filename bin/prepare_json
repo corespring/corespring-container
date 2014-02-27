@@ -9,7 +9,9 @@ wrench = require('wrench')
 path = require('path')
 fs = require('fs')
 _ = require('lodash')
+EOL = require('os').EOL
 
+reEOL = new RegExp EOL, 'g'	
 files = wrench.readdirSyncRecursive 'mock-data'
 ejsFiles = _.filter files, (p) -> path.extname(p) == ".ejs"
 
@@ -25,7 +27,7 @@ xmlreader = (currentPath) ->
     console.log "resolved to: #{resolvedPath}"
 
     xml = fs.readFileSync(resolvedPath).toString()
-    xml = xml.replace(/\n/g, '\\n').replace(/"/g, "\\\"")
+    xml = xml.replace(reEOL, '\\n').replace(/"/g, "\\\"")
     xml
 
 
