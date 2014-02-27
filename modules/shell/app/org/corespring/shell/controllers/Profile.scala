@@ -145,9 +145,9 @@ class Profile extends ContainerProfile {
     Ok(out)
   }
 
-  override def findOne(topic: String, id: String): Action[AnyContent] = Action{ request =>
+  override def findOne(topic: String, id: String): Action[AnyContent] = Action { request =>
 
-    def filter(o: JsObject) = (o \ "_id" \ "$oid").asOpt[String].map( _ == id).getOrElse(false)
+    def filter(o: JsObject) = (o \ "_id" \ "$oid").asOpt[String].map(_ == id).getOrElse(false)
 
     val out = topic match {
       case "primarySubject" => subjects.filter(filter).headOption.map(Json.toJson(_)).getOrElse(JsObject(Seq()))

@@ -1,6 +1,6 @@
 package org.corespring.container.client.controllers
 
-import play.api.mvc.{Action, AnyContent, Controller}
+import play.api.mvc.{ Action, AnyContent, Controller }
 
 trait Profile extends Controller {
 
