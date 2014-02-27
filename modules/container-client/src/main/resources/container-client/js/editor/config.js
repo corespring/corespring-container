@@ -14,6 +14,10 @@ var config = [
         templateUrl: '../../partials/designer.html',
         controller: 'Designer'
       }).
+      when('/supporting-materials', {
+        templateUrl: '../../partials/supporting-materials.html',
+        controller: 'SupportingMaterials'
+      }).
       otherwise({
         redirectTo: '/profile'
       });

@@ -51,3 +51,6 @@ GET        /editor/:itemId/run                             @org.corespring.conta
 GET        /editor/:itemId/*file                           @org.corespring.container.client.controllers.Assets.item(itemId:String, file)
 POST       /editor/:itemId/*file                           @org.corespring.container.client.controllers.Assets.upload(itemId, file)
 
+
+GET        /profile/:topic                                 @org.corespring.container.client.controllers.Profile.list(topic, query : Option[String] ?= None)
+

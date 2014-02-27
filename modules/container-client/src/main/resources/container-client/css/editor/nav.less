@@ -1,5 +1,6 @@
 @header-width: 220px;
 
+
 .no-select{
   -webkit-touch-callout: none;
   -webkit-user-select: none;
@@ -10,14 +11,21 @@
   cursor: pointer;
 }
 
+.navbar-brand{
+  width: 120px; //@header-width;
+  height: @header-height;
+  background-image: url('../images/cs-grey-logo-11px.png');
+  background-position: center center;
+  background-repeat: no-repeat;
+}
 
 
 .main-nav{
-  background: url('../images/title-wrap-bg-tile-bw.png');
-  height: 45px;
+  height: @header-height;
+  border-bottom: solid 1px #dddddd;
 
   ul.nav.nav-tabs{
-    padding-top: 5px;
+    padding-top: 9px;
     border-bottom: solid 0px #333333;
   }
 
@@ -27,36 +35,23 @@
 
       &.active{
         > a {
-          background-color: white;
           &:hover {
-            background-color: white;
           }
         }  
       } 
 
       > a {
         .no-select;
-        padding-bottom: 8px;
-        background-color: darken(white, 30%);
 
         &:hover{
-          background-color: darken(white, 20%);
-          color: grey;
-          border-color: transparent;
         }
       }
     }
   }
-
 }
 
-.navbar-brand{
-  width: @header-width;
-  height: @header-height;
-  background-image: url('../images/cs-white-logo-11px.png');
-  background-position: center center;
-  background-repeat: no-repeat;
-}
+/*
+
 
 .nav{
   padding-top: 0;
@@ -128,4 +123,4 @@
 
 .navbar {
   margin-bottom: 0px;
-}
+}*/

@@ -1,41 +1,84 @@
-form.form-horizontal
+form
+
+  br/
 
   .control-group
-    label.control-label Primary Subject
-    
-    .controls 
-
-      
-      select(ui-select2,
-        ng-model="select2",
-        data-placeholder="Pick a number")
-        option(value="")
-        option(value="one") First
-        option(value="two") Second
-        option(value="three") Third
-
-  .control-group
-    label.control-label Related Subject
-
+    label.control-label(for="title") Title
     .controls
-      select(ui-select2,
-        ng-model="select2",
-        data-placeholder="Pick a number")
-        option(value="")
-        option(value="one") First
-        option(value="two") Second
-        option(value="three") Third
+      textarea#title.form-control(
+        ng-model='data.title', 
+        placeholder="Enter a title...",
+        rows='3')
+  
+  br/
+  
+  .row
+    .col-xs-6
+      .form-group
+        label(for="primarySubject") Primary Subject
+        br/
+        input#primarySubject(
+          style="width:300px",
+          ng-model="data.primarySubject",
+          type="text",
+          ui-select2="primarySubjectAsync",
+          data-placeholder="Choose a subject...")
+
+    .col-xs-6
+      .form-group
+        label(for="relatedSubject") Related Subject
+        br/
+
+        input#relatedSubject(
+          style="width:300px",
+          ui-select2="arrayAsync",
+          ng-model="data.relatedSubject",
+          ui-select2="relatedSubjectAsync",
+          data-placeholder="Choose a subject...")
 
   .control-group
     label.control-label(for='gradeLevel') Grade Level
     .controls
-      button-bar(ng-model="data.gradeLevel", button-provider="gradeLevelDataProvider")
+      button-bar#gradeLevel(ng-model="data.gradeLevel", button-provider="gradeLevelDataProvider")
   
-  .control-group
-    label.control-label Title
-    .controls
-      textarea.form-control(ng-model='itemData.title', rows='3')
+  br/
+
   
+  br/
+
   .control-group
+    
     label.control-label Item Type
-    item-type(ng-model="data.itemType", data-provider="itemTypeDataProvider")
+    
+    //item-type(ng-model="data.itemType", data-provider="itemTypeDataProvider")
+    
+    table.itemTypes
+      tr
+        td(valign='top')
+          ul
+            li(ng-repeat='t in itemTypeDataProvider', ng-show='$index < 2')
+              h5 {{t.key}}
+              label.radio(ng-repeat='k in t.value')
+                  input(type='radio', ng-model='data.itemType', value='{{k}}')
+                  | {{k}}
+
+        td(valign='top')
+          ul
+            li(ng-repeat='t in itemTypeDataProvider', ng-show='$index >= 2 && $index < 4')
+              h5 {{t.key}}
+              label.radio(ng-repeat='k in t.value')
+                input(type='radio', ng-model='data.itemType', value='{{k}}')
+                | {{k}}
+
+        td(valign='top')
+          ul
+            li(ng-repeat='t in itemTypeDataProvider', ng-show='$index >= 4')
+              h5 {{t.key}}
+              label.radio(ng-repeat='k in t.value')
+                input(type='radio', ng-model='data.itemType', value='{{k}}')
+                | {{k}}
+            li
+              h5 Other
+              label.radio
+                input(type='radio', ng-model='data.itemType', value='{{otherItemType}}')
+                input.form-control(type='text', ng-model='otherItemType', ng-change='updateItemType()')

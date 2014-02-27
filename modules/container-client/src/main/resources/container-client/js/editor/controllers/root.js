@@ -10,6 +10,11 @@ var controller = function ($scope, $log, $location) {
       title: "Designer",
       path: "/designer",
       active: false 
+    },
+     {
+      title: "Supporting Materials",
+      path: "/supporting-materials",
+      active: false 
     }
   ];
 
