@@ -35,7 +35,7 @@ var controller = function ($scope, $log, $location, ItemService, DataQueryServic
       t.active = false;
     });
 
-    var newCurrent = _.find($scope.tabs, function(tab){return tab.path === t;});
+    var newCurrent = _.find($scope.tabs, function(tab){return tab.path === t;}) || $scope.tabs[0];
     $scope.currentTab = newCurrent;
     $scope.currentTab.active = true;
     $location.path($scope.currentTab.path);
