@@ -1,21 +1,22 @@
 (function(){
 
-var config = [
+  var config = [
+/*
   '$routeProvider', 
   '$locationProvider',
   function($routeProvider, $locationProvider){
     $locationProvider.html5Mode(false);
     $routeProvider.
       when('/profile', {
-        templateUrl: '../../partials/profile.html',
+        //templateUrl: 'profile.html',
         controller: 'Profile'
       }).
       when('/designer', {
-        templateUrl: '../../partials/designer.html',
+        //templateUrl: 'designer.html',
         controller: 'Designer'
       }).
       when('/supporting-materials', {
-        templateUrl: '../../partials/supporting-materials.html',
+        //templateUrl: 'supporting-materials.html',
         controller: 'SupportingMaterials'
       }).
       otherwise({
@@ -23,7 +24,8 @@ var config = [
       });
 
   }
-]; 
+ */
+];
 
 corespring.module("corespring-editor-config", config);
 

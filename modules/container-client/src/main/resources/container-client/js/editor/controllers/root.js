@@ -10,7 +10,7 @@ var controller = function ($scope, $log, $location, ItemService, DataQueryServic
     {
       title: "Profile",
       path: "/profile",
-      active: true
+      active: false
     },
     {
       title: "Designer",
@@ -24,16 +24,20 @@ var controller = function ($scope, $log, $location, ItemService, DataQueryServic
     }
   ];
 
+  $scope.show = function(name){
+    return $location.path() === "/" + name;
+  };
+
   $scope.choose = function(t) {
 
     $log.debug("!! choose -> ", t);
     _.forEach($scope.tabs, function(t){
       t.active = false;
     });
-    $scope.currentTab = t;
-    $scope.currentTab.active = true;
-    $log.debug("!! choose -> ", $scope.tabs);
 
+    var newCurrent = _.find($scope.tabs, function(tab){return tab.path === t;});
+    $scope.currentTab = newCurrent;
+    $scope.currentTab.active = true;
     $location.path($scope.currentTab.path);
   };
 
@@ -67,7 +71,7 @@ var controller = function ($scope, $log, $location, ItemService, DataQueryServic
 
   });
 
-
+  $scope.choose( $location.path() );
   ItemService.load($scope.onItemLoaded, $scope.onItemLoadError, $scope.itemId);
 };
 

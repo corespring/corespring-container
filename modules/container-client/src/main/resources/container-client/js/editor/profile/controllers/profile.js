@@ -1,5 +1,6 @@
 var controller = function ($scope, $log, ProfileService, DataQueryService) {
 
+  $log.debug("#############");
   function findSubject(topic, id, callback){
     var local = _.find($scope.queryResults[topic], function(r){ return r.id === id;});
     if(local){

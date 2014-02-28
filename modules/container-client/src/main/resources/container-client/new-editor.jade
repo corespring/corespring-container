@@ -43,13 +43,16 @@ block content
           tabset
             tab(
               ng-repeat="tab in tabs", 
-              select="choose(tab)", 
+              select="choose(tab.path)", 
               heading="{{tab.title}}", 
               active="tab.active", 
               disabled="tab.disabled")
 
     .container
-      .main-content(ng-view)
+      .main-content
+        include partials/designer
+        include partials/profile
+        include partials/supporting-materials
 
 
 block scripts
@@ -88,7 +91,7 @@ block scripts
           ].concat(data.angular.dependencies);
 
           angular.module("corespring-editor", playerDeps)
-            .config(corespring.require("corespring-editor-config"));
+            //.config(corespring.require("corespring-editor-config"));
           angular.bootstrap(document, ["corespring-editor"]);
 
           //Note - doing this to see if it'll help with ckeditor
