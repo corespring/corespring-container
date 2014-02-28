@@ -2,7 +2,7 @@
 
 angular.module('@namespace', []);
 
-angular.module('@namespace').factory('PlayerServices', ['$http', function($http){
+angular.module('@namespace').factory('PlayerService', ['$http', function($http){
 
   var _call = function(method, url, data){
 
