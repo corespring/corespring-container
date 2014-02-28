@@ -71,7 +71,12 @@ var controller = function ($scope, $log, $location, ItemService, DataQueryServic
 
   });
 
+
+  $scope.$on('$locationChangeSuccess', function(){
+    $scope.choose( $location.path() );
+  });
   $scope.choose( $location.path() );
+
   ItemService.load($scope.onItemLoaded, $scope.onItemLoadError, $scope.itemId);
 };
 
