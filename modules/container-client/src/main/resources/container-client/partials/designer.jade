@@ -39,7 +39,10 @@
     div
       .btn.btn-link.btn-sm(ng-click="editorMode='visual'",ng-class="{active: editorMode=='visual'}") Visual
       .btn.btn-link.btn-sm(ng-click="switchToJsonView()",ng-class="{active: editorMode=='json'}") Json
-    div(ng-if="editorMode == 'json'", ng-model="$parent.selectedComponentJson", ui-ace="{useWrapMode: true, mode: 'json', onChange: jsonEditorChanged, onLoad: jsonEditorLoaded}", style="height: 100%; width: 100%")
+    div( ng-if="editorMode == 'json'", 
+      ng-model="$parent.selectedComponentJson", 
+      ui-ace="{useWrapMode: true, mode: 'json', onChange: jsonEditorChanged, onLoad: jsonEditorLoaded}", 
+      style="height: 100%; width: 100%")
     config-pane#config(ng-if="editorMode == 'visual'",style="height: 100%; width: 100%")
 
   .welcome(ng-show="isNewItem()")
