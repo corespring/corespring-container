@@ -1,4 +1,4 @@
-var controller = function ($scope, ComponentRegister, PlayerServices) {
+var controller = function ($scope, ComponentRegister, PlayerService) {
 
   $scope.responses = {};
   $scope.session = {
@@ -14,7 +14,7 @@ var controller = function ($scope, ComponentRegister, PlayerServices) {
   $scope.submit = function(){
     var components = ComponentRegister.getComponentSessions();
     console.log("Submitting: ", components);
-    PlayerServices.submitSession({components: components}, $scope.onSessionSaved, $scope.onSessionSaveError);
+    PlayerService.submitSession({components: components}, $scope.onSessionSaved, $scope.onSessionSaveError);
   };
 
   $scope.onSessionSaved = function (data) {
@@ -44,7 +44,7 @@ angular.module('corespring-editor.controllers')
     [
       '$scope',
       'ComponentRegister',
-      'PlayerServices',
+      'PlayerService',
       controller
     ]
   );

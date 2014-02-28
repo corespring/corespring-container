@@ -113,7 +113,7 @@ var controller = function (
     console.log($scope.item.components);
     var cleaned = $scope.serialize($scope.item.components);
     console.log(cleaned);
-    DesignerService.save(cleaned, $scope.onItemSaved, $scope.onItemSaveError, $scope.itemId);
+    DesignerService.save($scope.itemId, cleaned, $scope.onItemSaved, $scope.onItemSaveError, $scope.itemId);
   };
 
   $scope.serialize = function (comps) {
@@ -192,13 +192,11 @@ var controller = function (
     }
   }
 
-  $scope.$watch('item', function(newItem){
-    if(newItem){
-      initDesigner(newItem);
-    }
+  DesignerService.loadItem($scope.itemId, function(item){
+    initDesigner(item);
   });
 
-  DesignerService.loadComponents($scope.onComponentsLoaded, $scope.onComponentsLoadError);
+  DesignerService.loadAvailableComponents($scope.onComponentsLoaded, $scope.onComponentsLoadError);
 };
 
 angular.module('corespring-editor.controllers')

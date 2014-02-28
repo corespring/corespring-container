@@ -28,7 +28,7 @@ PUT        /session/load-outcome/:id.json                  @org.corespring.conta
 GET        /item/:itemId/player                            @org.corespring.container.client.controllers.apps.Player.createSessionForItem(itemId:String)
 PUT        /item/score/:id.json                            @org.corespring.container.client.controllers.resources.Item.getScore(id:String)
 GET        /item/:itemId.json                              @org.corespring.container.client.controllers.resources.Item.load(itemId:String)
-PUT        /item/:itemId.json                              @org.corespring.container.client.controllers.resources.Item.save(itemId:String)
+PUT        /item/:itemId.json                              @org.corespring.container.client.controllers.resources.Item.save(itemId:String, property: Option[String] ?= None)
 POST       /item/create                                    @org.corespring.container.client.controllers.resources.Item.create()
 
 

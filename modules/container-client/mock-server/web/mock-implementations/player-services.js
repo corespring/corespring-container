@@ -1,6 +1,7 @@
+/* global org */
 angular.module('mock.player.services', []);
 
-angular.module('mock.player.services').factory('PlayerServices', ['$timeout', 'ResponseProcessor', function($timeout, ResponseProcessor){
+angular.module('mock.player.services').factory('PlayerService', ['$timeout', 'ResponseProcessor', function($timeout, ResponseProcessor){
 
   var attemptsCountdown = 2;
 
@@ -12,7 +13,7 @@ angular.module('mock.player.services').factory('PlayerServices', ['$timeout', 'R
     showFeedback: true,
     showUserResponse: true,
     showCorrectResponse: true
-  }
+  };
 
   var createResponse = function(answers){
 
@@ -32,14 +33,12 @@ angular.module('mock.player.services').factory('PlayerServices', ['$timeout', 'R
     if(attemptsCountdown <= 0){
       out.session.isFinished = true;
       out.session.remainingAttempts = 0;
-      out.responses = ResponseProcessor.process(mockData.components, answers.answers, settings)
+      out.responses = ResponseProcessor.process(mockData.components, answers.answers, settings);
     }
     return out;
   };
 
   var def = {
-
-
     submitAnswers: function(answerHolder, onSuccess, onFailure){
       $timeout(function(){
         onSuccess(createResponse(answerHolder));
@@ -47,12 +46,12 @@ angular.module('mock.player.services').factory('PlayerServices', ['$timeout', 'R
     },
     loadSession: function(onSuccess, onFailure) {
       $timeout(function(){
-        onSuccess({ item: mockData })
+        onSuccess({ item: mockData });
       }, waitValue );
     }
-  }
+  };
 
-  return def
+  return def;
 }]);
 
 angular.module('mock.player.services').factory('ResponseProcessor', [function(){
@@ -78,6 +77,6 @@ angular.module('mock.player.services').factory('ResponseProcessor', [function(){
 
       return result;
     }
-  }
+  };
 }]);
 

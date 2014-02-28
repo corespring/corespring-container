@@ -40,7 +40,7 @@ trait SessionActions extends ContainerSessionActions[AnyContent] {
         item <- itemService.load(itemId)
       } yield {
         val out: JsValue = Json.obj("item" -> item, "session" -> session)
-        SubmitSessionRequest(out, sessionService.save, request)
+        SubmitSessionRequest(out, sessionService.save(_, _, None), request)
       }
       result.map {
         r =>
@@ -55,7 +55,7 @@ trait SessionActions extends ContainerSessionActions[AnyContent] {
       val result = for {
         session <- sessionService.load(id)
       } yield {
-        SaveSessionRequest(session, isSecure(request), isComplete(session), sessionService.save, request)
+        SaveSessionRequest(session, isSecure(request), isComplete(session), sessionService.save(_, _, None), request)
       }
       result.map {
         r =>

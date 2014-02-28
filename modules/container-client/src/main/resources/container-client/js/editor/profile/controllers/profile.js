@@ -77,16 +77,30 @@ var controller = function ($scope, $log, ProfileService, DataQueryService) {
     }
   }
 
+  $scope.save = function(){
+    ProfileService.save($scope.itemId, $scope.profile, $scope.onSaveSuccess, $scope.onSaveError);
+  };
+
+  $scope.onSaveSuccess = function(updated){
+    $log.debug("profile saved");
+  };
+
+  $scope.onSaveError = function(err){
+    $log.debug("error saving profile", err);
+  };
 
   $scope.$watch("taskInfo.itemType", function (newValue) {
     updateOtherItemType();
   }, true);
 
-  $scope.$watch('item', function(newItem){
-    if(newItem){
-      $scope.taskInfo = newItem.profile.taskInfo; 
+  ProfileService.load($scope.itemId, function(profile){
+      $scope.profile = profile;
+      $scope.taskInfo = profile.taskInfo; 
       $log.debug("task info: ", $scope.taskInfo);
-    }
+
+  },
+  function error(err){
+    $log.warn('Error loading profile', err);
   });
   
 };
