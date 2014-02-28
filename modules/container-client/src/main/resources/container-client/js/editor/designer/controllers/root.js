@@ -56,11 +56,11 @@ var controller = function (
   };
 
   $scope.hasComponents = function(){
-    return $scope.model && _.size($scope.model.components) > 0;
+    return $scope.item && _.size($scope.item.components) > 0;
   };
 
   $scope.isNewItem = function(){
-    return $scope.model && !$scope.hasComponents();
+    return $scope.item && !$scope.hasComponents();
   };
 
   $scope.onComponentsLoadError = function (error) {
@@ -84,13 +84,13 @@ var controller = function (
   $scope.addComponent = function (descriptor) {
     console.log("add component" + descriptor.componentType);
     var uid = getUid();
-    $scope.model.components[uid] = _.cloneDeep(descriptor.defaultData);
-    var node = $($scope.model.xhtml);
+    $scope.item.components[uid] = _.cloneDeep(descriptor.defaultData);
+    var node = $($scope.item.xhtml);
     node.append("<" + descriptor.componentType + " id='" + uid + "'></" + descriptor.componentType + ">");
-    $scope.model.xhtml = "<div>" + node.html() + "</div>";
+    $scope.item.xhtml = "<div>" + node.html() + "</div>";
 
     if (!$scope.selectedComponent) {
-      $scope.selectedComponent = {id: uid, component: $scope.model.components[uid]};
+      $scope.selectedComponent = {id: uid, component: $scope.item.components[uid]};
     }
   };
 
@@ -99,13 +99,13 @@ var controller = function (
   });
 
   $scope.getQuestionForComponentId = function (id) {
-    return $scope.model.components[id];
+    return $scope.item.components[id];
   };
 
   $scope.registerConfigPanel = function (id, component) {
     console.log("registerConfigPanel:", id);
     configPanels[id] = component;
-    component.setModel($scope.model.components[id]);
+    component.setModel($scope.item.components[id]);
   };
 
   $scope.save = function () {
@@ -162,21 +162,24 @@ var controller = function (
 
 
   $scope.getItem = function () {
-    return $scope.model;
+    return $scope.item;
   };
 
   PlayerService.setQuestionLookup($scope.getQuestionForComponentId);
   PlayerService.setItemLookup($scope.getItem);
 
   function initDesigner(item){
+
     _.each(item.components, function(c, key) {
       var serverLogic = corespring.server.logic(c.componentType);
-      if (serverLogic.render) {
-        item.components[key] = serverLogic.render(c);
+      if (serverLogic.preprocess) {
+        //TODO: This is part of a larger task to add preprocess to the container
+        //@see: https://thesib.atlassian.net/browse/CA-842
+        item.components[key] = serverLogic.preprocess(c);
       }
     });
 
-    $scope.model = item;
+    $scope.item = item;
 
     for (var c in item.components) {
       $scope.selectedComponent = {id: c, component: item.components[c]};

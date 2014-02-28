@@ -37,16 +37,14 @@ var controller = function ($scope, $log, $location, ItemService, DataQueryServic
     $location.path($scope.currentTab.path);
   };
 
-   $scope.onItemLoaded = function (data) {
-    $scope.item = data.item;
-    $log.debug("item loaded: " + $scope.item);
+  $scope.onItemLoaded = function (data) {
+    $scope.allData = data;
+    $log.debug("item loaded: " + $scope.allData);
   };
 
-   $scope.onItemLoadError = function (error) {
+  $scope.onItemLoadError = function (error) {
     $log.warn("Error loading item", error);
   };
-
-  
 
   $scope.onItemSaved = function (data) {
   };
