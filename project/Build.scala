@@ -13,9 +13,9 @@ object Build extends sbt.Build {
   val ScalaVersion = "2.10.3"
 
   def isWindows = System.getProperty("os.name").toLowerCase().contains("windows")
-  val gruntCmd = if (isWindows) "grunt.cmd" else "grunt"
+  val gruntCmd = "node ./node_modules/grunt-cli/bin/grunt"
   val npmCmd = if (isWindows) "npm.cmd" else "npm"
-  val bowerCmd = if (isWindows) "bower.cmd" else "bower"
+  val bowerCmd = "node ./node_modules/bower/bin/bower"
 
 
   object Dependencies {
@@ -209,20 +209,20 @@ object Build extends sbt.Build {
       commands <++= baseDirectory {
         base =>
           Seq(
-            "grunt",
-            "bower",
-            "npm").map(cmd(_, (base / "modules" / "container-client")))
+            ("./node_modules/grunt-cli/bin/", "grunt",""),
+            ("./node_modules/bower/bin/", "bower",""),
+            ("", "npm",".cmd")).map(cmd(_, (base / "modules" / "container-client")))
       })
     .dependsOn(shell)
     .aggregate(shell)
 
-  private def cmd(name: String, base: File): Command = {
-    Command.args(name, "<" + name + "-command>") {
+  private def cmd(name: Tuple3[String,String,String], base: File): Command = {
+    Command.args(name._2, "<" + name._2 + "-command>") {
       (state, args) =>
-        val cmd = if (isWindows) s"${name}.cmd" else name
+        val cmd = if (isWindows) s"${name._1}${name._2}${name._3}" else "${name._1}${name._2}"
         val exitCode = Process(cmd :: args.toList, base) !;
         if (exitCode != 0) {
-          throw new RuntimeException(s"$name, ${base.getPath} returned a non zero exit code")
+          throw new RuntimeException(s"$name._2, ${base.getPath} returned a non zero exit code")
         }
         state
     }
