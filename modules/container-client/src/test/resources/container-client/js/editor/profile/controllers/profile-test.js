@@ -28,8 +28,17 @@ describe('designer controller', function(){
     };
   }
 
-  function mockDataQueryService(){}
+   function MockDataQueryService(){
+
+    this.results = [];
+
+    this.query = function(topic, term, callback){
+      callback(this.results);
+    };
+  }
   
+  var mockDataQueryService = new MockDataQueryService();
+
   function mockComponentRegister(){}
 
   beforeEach(angular.mock.module('corespring-editor.controllers'));
@@ -37,12 +46,7 @@ describe('designer controller', function(){
   beforeEach(function () {
     module(function ($provide) {
       $provide.value('ProfileService', new mockProfileService());
-      $provide.value('DataQueryService', new mockDataQueryService());
-      /*
-      $provide.value('$modal', new mockModal());
-      $provide.value('MathJaxService', new mockMathJaxService());
-      $provide.value('ComponentRegister', new mockComponentRegister());
-      */
+      $provide.value('DataQueryService', mockDataQueryService);
     });
   });
 
@@ -70,11 +74,38 @@ describe('designer controller', function(){
       }
     };
     
-    ctrl.primarySubjectAsync.query(query);
+    mockDataQueryService.results = [
+      { _id: { $oid: "1" }, category: "category", subject: "blah"}
+    ]; 
+
+    scope.primarySubjectAsync.query(query);
     expect(queryResult).toNotBe(null); 
+    expect(queryResult.length).toEqual(1); 
+    expect(queryResult[0]).toEqual({id: "1", text: "category: blah"}); 
   });
 
+  it("should init selection with a local result", function(){
 
+    var foundSubject;
+
+    //override element to val...
+    scope.primarySubjectAsync.elementToVal = function(e){
+      return "1";
+    };
+
+    scope.queryResults.primarySubject = [
+      {id: "1"}
+    ];
+
+    var element = {};
+    
+    function initCallback(s){
+      foundSubject = s;
+    } 
+    scope.primarySubjectAsync.initSelection(element, initCallback);
+    expect(foundSubject).toNotBe(undefined);
+    expect(foundSubject).toEqual({id: "1"});
+  });
 
 });
 

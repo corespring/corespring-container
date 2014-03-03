@@ -36,9 +36,13 @@ var controller = function ($scope, $log, ProfileService, DataQueryService) {
           query.callback({ results: formatted });
         });
       },
+
+      elementToVal: function(element){
+        return $(element).select2('val');
+      },
       initSelection: function(element, callback) {
         $log.debug("init selection: ", element, callback);
-        var val = $(element).select2('val');
+        var val = this.elementToVal(element); 
         $log.debug("val: ", val);
 
         findSubject(topic, val, function(s){
