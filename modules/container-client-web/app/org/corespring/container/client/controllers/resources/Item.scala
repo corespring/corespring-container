@@ -24,17 +24,6 @@ trait Item extends Controller {
 
   def actions: ItemActions[AnyContent]
 
-  def scoreProcessor: ScoreProcessor
-
-  def outcomeProcessor: OutcomeProcessor
-
-  def settings = Json.obj(
-    "maxNoOfAttempts" -> JsNumber(2),
-    "showFeedback" -> JsBoolean(true),
-    "highlightCorrectResponse" -> JsBoolean(true),
-    "highlightUserResponse" -> JsBoolean(true),
-    "allowEmptyResponses" -> JsBoolean(true))
-
   def create = actions.create {
     (code, msg) =>
       Status(code)(Json.obj("error" -> msg))
@@ -73,16 +62,6 @@ trait Item extends Controller {
           } else {
             BadRequest(Errors.invalidXhtml)
           }
-      }.getOrElse(BadRequest(Errors.noJson))
-  }
-
-  def getScore(id: String) = actions.getScore(id) {
-    request: ScoreItemRequest[AnyContent] =>
-      request.body.asJson.map {
-        answers =>
-          val responses = outcomeProcessor.createOutcome(request.item, answers, settings)
-          val outcome = scoreProcessor.score(request.item, Json.obj(), responses)
-          Ok(outcome)
       }.getOrElse(BadRequest(Errors.noJson))
   }
 

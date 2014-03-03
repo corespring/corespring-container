@@ -18,7 +18,7 @@ trait Player extends PlayerItemTypeReader with AppWithServices[PlayerActions[Any
       "player.services",
       Session.loadEverything(":id"),
       Session.saveSession(":id"),
-      Item.getScore(":id"),
+      Session.getScore(":id"),
       Session.completeSession(":id"),
       Session.loadOutcome(":id")).toString
   }

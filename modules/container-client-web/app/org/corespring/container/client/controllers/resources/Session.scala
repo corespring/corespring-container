@@ -115,6 +115,46 @@ trait Session extends Controller with ItemPruner {
       }
   }
 
+  def getScore(id: String) = actions.getScore(id) {
+    request: SessionOutcomeRequest[AnyContent] =>
+      logger.trace(s"[getScore]: $id : ${Json.stringify(request.itemSession)}")
+
+      if (request.isSecure) {
+        def hasAnswers = (request.itemSession \ "components").asOpt[JsObject].isDefined
+        if (!request.isComplete) {
+          BadRequest(Json.obj("error" -> JsString("Can't get score if session has not been completed")))
+        } else if (!hasAnswers) {
+          BadRequest(Json.obj("error" -> JsString("Can't get score if no answers have been saved")))
+        } else {
+          val options = request.body.asJson.getOrElse(Json.obj())
+          val outcome = outcomeProcessor.createOutcome(request.item, request.itemSession, options)
+          val score = scoreProcessor.score(request.item, request.itemSession, outcome)
+          Ok(score)
+        }
+      } else {
+        def settings = Json.obj(
+          "maxNoOfAttempts" -> JsNumber(2),
+          "showFeedback" -> JsBoolean(true),
+          "highlightCorrectResponse" -> JsBoolean(true),
+          "highlightUserResponse" -> JsBoolean(true),
+          "allowEmptyResponses" -> JsBoolean(true))
+
+        request.body.asJson.map {
+          answers =>
+            val responses = outcomeProcessor.createOutcome(request.item, answers, settings)
+            val score = scoreProcessor.score(request.item, Json.obj(), responses)
+            Ok(score)
+        }.getOrElse(BadRequest("No json in request body"))
+      }
+  }
+
+  def checkScore(id: String) = actions.getScore(id) {
+    request: SessionOutcomeRequest[AnyContent] =>
+      logger.trace(s"[checkScore]: $id : ${Json.stringify(request.itemSession)}")
+
+      BadRequest(Json.obj("error" -> JsString("checkScore not implemented")))
+  }
+
   def completeSession(id: String) = actions.save(id) {
     request: SaveSessionRequest[AnyContent] =>
       val sessionJson = request.itemSession.as[JsObject] ++ Json.obj("isComplete" -> JsBoolean(true))

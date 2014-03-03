@@ -54,6 +54,21 @@ class SessionTest extends Specification with Mockito {
       status(result) === BAD_REQUEST
     }
 
+    "not allow load getScore when session is complete, but there are no answers" in new ActionBody(outcomeRequest(isComplete = true)) {
+      val result = session.getScore("id")(FakeRequest())
+      status(result) === BAD_REQUEST
+    }
+
+    "allow load getScore when session is complete" in new ActionBody(outcomeRequest(itemSession = Json.obj("components" -> Json.obj()), isComplete = true)) {
+      val result = session.getScore("id")(FakeRequest())
+      status(result) === OK
+    }
+
+    "not allow getScore when session is not complete" in new ActionBody(outcomeRequest(isComplete = false)) {
+      val result = session.getScore("id")(FakeRequest())
+      status(result) === BAD_REQUEST
+    }
+
   }
 
   class ActionBody(request: SecureModeRequest[AnyContent]) extends org.specs2.specification.Before {
@@ -85,6 +100,16 @@ class SessionTest extends Specification with Mockito {
     def load(id: String)(block: (FullSessionRequest[AnyContent]) => Result): Action[AnyContent] = ???
 
     def loadOutcome(id: String)(block: (SessionOutcomeRequest[AnyContent]) => Result): Action[AnyContent] = Action {
+      request =>
+        block(r.asInstanceOf[SessionOutcomeRequest[AnyContent]])
+    }
+
+    def getScore(id: String)(block: (SessionOutcomeRequest[AnyContent]) => Result): Action[AnyContent] = Action {
+      request =>
+        block(r.asInstanceOf[SessionOutcomeRequest[AnyContent]])
+    }
+
+    def checkScore(id: String)(block: (SessionOutcomeRequest[AnyContent]) => Result): Action[AnyContent] = Action {
       request =>
         block(r.asInstanceOf[SessionOutcomeRequest[AnyContent]])
     }

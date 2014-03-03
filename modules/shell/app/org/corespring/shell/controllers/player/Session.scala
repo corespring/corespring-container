@@ -1,12 +1,16 @@
 package org.corespring.shell.controllers.player
 
-import org.corespring.container.client.actions.{ SessionActions => ContainerSessionActions, SessionOutcomeRequest, SaveSessionRequest, SubmitSessionRequest, FullSessionRequest }
+import org.corespring.container.client.actions.{ SessionActions => ContainerSessionActions, _ }
 import org.corespring.container.client.controllers.resources.{ Session => ContainerSession }
 import org.corespring.mongo.json.services.MongoService
 import play.api.Logger
 import play.api.libs.json.{ JsValue, Json }
 import play.api.mvc.Results._
 import play.api.mvc.{ Request, Action, Result, AnyContent }
+import org.corespring.container.client.actions.FullSessionRequest
+import org.corespring.container.client.actions.SaveSessionRequest
+import org.corespring.container.client.actions.SessionOutcomeRequest
+import org.corespring.container.client.actions.SubmitSessionRequest
 
 trait SessionActions extends ContainerSessionActions[AnyContent] {
 
@@ -79,21 +83,32 @@ trait SessionActions extends ContainerSessionActions[AnyContent] {
       }.getOrElse(BadRequest("??"))
   }
 
-  override def loadOutcome(id: String)(block: (SessionOutcomeRequest[AnyContent]) => Result): Action[AnyContent] = Action {
+  private def handleSessionOutcomeRequest(id: String)(block: (SessionOutcomeRequest[AnyContent]) => Result): Action[AnyContent] = Action {
     request =>
       val result = for {
         session <- sessionService.load(id)
         itemId <- (session \ "itemId").asOpt[String]
         item <- itemService.load(itemId)
       } yield {
-        logger.trace(s"[loadOutcome] session: $session")
+        logger.trace(s"[handleSessionOutcomeRequest] session: $session")
         SessionOutcomeRequest(item, session, isSecure(request), isComplete(session), request)
       }
 
       result.map { r =>
         block(r)
-      }.getOrElse(BadRequest("Error loading outcome"))
+      }.getOrElse(BadRequest("Error handling outcome request"))
   }
 
+  override def loadOutcome(id: String)(block: (SessionOutcomeRequest[AnyContent]) => Result): Action[AnyContent] = {
+    handleSessionOutcomeRequest(id)(block)
+  }
+
+  override def getScore(id: String)(block: (SessionOutcomeRequest[AnyContent]) => Result): Action[AnyContent] = {
+    handleSessionOutcomeRequest(id)(block)
+  }
+
+  override def checkScore(id: String)(block: (SessionOutcomeRequest[AnyContent]) => Result): Action[AnyContent] = {
+    handleSessionOutcomeRequest(id)(block)
+  }
 }
 

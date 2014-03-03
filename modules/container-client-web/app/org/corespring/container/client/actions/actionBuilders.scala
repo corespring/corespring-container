@@ -32,8 +32,6 @@ trait ItemActions[A] {
 
   def save(itemId: String)(block: SaveItemRequest[A] => Result): Action[AnyContent]
 
-  def getScore(itemId: String)(block: ScoreItemRequest[A] => Result): Action[AnyContent]
-
   def create(error: (Int, String) => Result)(block: NewItemRequest[A] => Result): Action[AnyContent]
 }
 
@@ -43,6 +41,10 @@ trait SessionActions[A] {
   def load(id: String)(block: FullSessionRequest[A] => Result): Action[AnyContent]
 
   def loadOutcome(id: String)(block: SessionOutcomeRequest[A] => Result): Action[AnyContent]
+
+  def getScore(id: String)(block: SessionOutcomeRequest[A] => Result): Action[AnyContent]
+
+  def checkScore(id: String)(block: SessionOutcomeRequest[A] => Result): Action[AnyContent]
 
   /**
    * Load the item and the session return these to the `block` in a SubmitAnswersRequest

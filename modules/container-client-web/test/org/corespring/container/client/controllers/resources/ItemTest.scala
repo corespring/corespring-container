@@ -35,11 +35,6 @@ class ItemTest extends Specification with Mockito {
             block(ItemRequest(Json.obj(), request))
         }
 
-        def getScore(itemId: String)(block: (ScoreItemRequest[AnyContent]) => Result): Action[AnyContent] = Action {
-          request =>
-            block(ScoreItemRequest(Json.obj(), request))
-        }
-
         override def create(error: (Int, String) => Result)(block: (NewItemRequest[AnyContent]) => Result): Action[AnyContent] = Action {
           request =>
 
@@ -50,14 +45,6 @@ class ItemTest extends Specification with Mockito {
               block(NewItemRequest("new_id", request))
             }
         }
-      }
-
-      def scoreProcessor: ScoreProcessor = {
-        mock[ScoreProcessor].score(any[JsValue], any[JsValue], any[JsValue]) returns Json.obj()
-      }
-
-      def outcomeProcessor: OutcomeProcessor = {
-        mock[OutcomeProcessor].createOutcome(any[JsValue], any[JsValue], any[JsValue]) returns Json.obj()
       }
 
     }
@@ -82,18 +69,6 @@ class ItemTest extends Specification with Mockito {
 
     "save if save worked" in new item {
       val result = item.save("x")(FakeRequest("", "", FakeHeaders(), AnyContentAsJson(Json.obj("xhtml" -> JsString("<root/>")))))
-      status(result) === OK
-      contentAsString(result) === "{}"
-    }
-
-    "fail to getScore if no json in body" in new item {
-      val result = item.getScore("x")(FakeRequest())
-      status(result) === BAD_REQUEST
-      contentAsString(result) === Errors.noJson
-    }
-
-    "getScore if no json in body" in new item {
-      val result = item.getScore("x")(FakeRequest("", "", FakeHeaders(), AnyContentAsJson(Json.obj())))
       status(result) === OK
       contentAsString(result) === "{}"
     }
