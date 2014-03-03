@@ -164,7 +164,7 @@ exports.define = function(isSecure) {
     this.getScore = function (format, callback) {
       instance.sendMessage({
         message: "getScore",
-        data: {format: format},
+        data: {format: format || 'percent'},
         property: "score",
         callback: callback
       });
