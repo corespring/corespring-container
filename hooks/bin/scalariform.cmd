@@ -1,0 +1,1 @@
+java -jar hooks/libs/scalariform.jar ""%*""
