@@ -1,6 +1,5 @@
 var controller = function ($scope, $log, ProfileService, DataQueryService) {
 
-  $log.debug("#############");
   function findSubject(topic, id, callback){
     var local = _.find($scope.queryResults[topic], function(r){ return r.id === id;});
     if(local){
@@ -98,7 +97,6 @@ var controller = function ($scope, $log, ProfileService, DataQueryService) {
       $scope.profile = profile;
       $scope.taskInfo = profile.taskInfo; 
       $log.debug("task info: ", $scope.taskInfo);
-
   },
   function error(err){
     $log.warn('Error loading profile', err);

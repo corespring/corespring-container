@@ -165,6 +165,13 @@ var controller = function (
     return $scope.item;
   };
 
+  $scope.selectFirstComponent = function(){
+    for (var c in $scope.item.components) {
+      $scope.selectedComponent = {id: c, component: $scope.item.components[c]};
+      break;
+    }
+  };
+  
   PlayerService.setQuestionLookup($scope.getQuestionForComponentId);
   PlayerService.setItemLookup($scope.getItem);
 
@@ -181,10 +188,7 @@ var controller = function (
 
     $scope.item = item;
 
-    for (var c in item.components) {
-      $scope.selectedComponent = {id: c, component: item.components[c]};
-      break;
-    }
+    $scope.selectFirstComponent();
 
     var scoringJs = _.find($scope.item.files, function (f) {
       return f.name === "scoring.js";
