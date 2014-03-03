@@ -41,7 +41,7 @@ module.exports = (grunt) ->
       args.push(bowerName())
 
       exec = require('child_process').exec
-      cmd = "bower install #{args.join(" ")}"
+      cmd = "./node_modules/bower/bin/bower install #{args.join(" ")}"
       grunt.log.debug("  bowerInstall cmd: #{cmd}")
       exec cmd, {cwd: '.'}, (err, stdout, stderr) ->
         grunt.log.debug(stdout)
