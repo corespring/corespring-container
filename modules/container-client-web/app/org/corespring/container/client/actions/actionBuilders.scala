@@ -44,8 +44,6 @@ trait SessionActions[A] {
 
   def getScore(id: String)(block: SessionOutcomeRequest[A] => Result): Action[AnyContent]
 
-  def checkScore(id: String)(block: SessionOutcomeRequest[A] => Result): Action[AnyContent]
-
   /**
    * Load the item and the session return these to the `block` in a SubmitAnswersRequest
    * @param id

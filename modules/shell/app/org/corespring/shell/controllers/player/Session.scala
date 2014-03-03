@@ -107,8 +107,5 @@ trait SessionActions extends ContainerSessionActions[AnyContent] {
     handleSessionOutcomeRequest(id)(block)
   }
 
-  override def checkScore(id: String)(block: (SessionOutcomeRequest[AnyContent]) => Result): Action[AnyContent] = {
-    handleSessionOutcomeRequest(id)(block)
-  }
 }
 

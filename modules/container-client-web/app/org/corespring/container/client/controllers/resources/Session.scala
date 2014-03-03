@@ -148,13 +148,6 @@ trait Session extends Controller with ItemPruner {
       }
   }
 
-  def checkScore(id: String) = actions.getScore(id) {
-    request: SessionOutcomeRequest[AnyContent] =>
-      logger.trace(s"[checkScore]: $id : ${Json.stringify(request.itemSession)}")
-
-      BadRequest(Json.obj("error" -> JsString("checkScore not implemented")))
-  }
-
   def completeSession(id: String) = actions.save(id) {
     request: SaveSessionRequest[AnyContent] =>
       val sessionJson = request.itemSession.as[JsObject] ++ Json.obj("isComplete" -> JsBoolean(true))
