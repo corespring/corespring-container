@@ -5,15 +5,15 @@ describe('component-register', function(){
   var MockRegister = function(){
     this.setDataAndSession = function(ds){
       this.dataAndSession = ds;
-    }
+    };
   };
 
   var MockMathService = function(){
 
     this.parseDomForMath = function(){
 
-    }
-  }
+    };
+  };
 
 
   beforeEach(angular.mock.module('corespring-player.directives'));
