@@ -1,4 +1,4 @@
-describe('designer controller', function(){
+describe('profile controller', function(){
 
   var rootScope, ctrl;
 
