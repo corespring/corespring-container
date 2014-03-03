@@ -23,6 +23,7 @@ module.exports = (grunt) ->
     
     res = 
       angular: "~1.2.8"
+      bootstrap: "~3.1.1"
 
     logJson(bowerJson.resolutions, "writeln")
 

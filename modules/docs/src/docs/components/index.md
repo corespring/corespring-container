@@ -76,9 +76,23 @@ The basic folder structure for all components is like so:
 
 * underscore/lodash
 
+
+### [Draft] preprocess
+
+
+    /**
+     * Add any extra data to the component model to allow the component to function.
+     * As ever - be careful not to supply any data that may give a clue as to what the correct solution might be.
+     *  @param the component model
+     *  @return a new object with the preprocessed data. This data will be available to the player component under the 'tmp' property.
+     */
+    preprocess( model ){
+      return { blah: "Blah" };
+    }
+
+
 ### respond method
 
-    ```javascript
     /**
      * @return an object with the following properties:
      *   - correctness: "correct|incorrect|unknown"
@@ -86,8 +100,7 @@ The basic folder structure for all components is like so:
      *   - score: a value from 0.0 - 1.0
      */
     response(question, answer, settings)
-    ```
-
+    
 ### Respond Function
 
 #### Scoring

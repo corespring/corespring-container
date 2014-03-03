@@ -91,8 +91,10 @@ var controller = function ($scope, $compile, $http, $timeout, $modal, $log, Edit
   $scope.onItemLoaded = function (data) {
     _.each(data.item.components, function(c, key) {
       var serverLogic = corespring.server.logic(c.componentType);
-      if (serverLogic.render) {
-        data.item.components[key] = serverLogic.render(c);
+      if (serverLogic.preprocess) {
+        //TODO: This is part of a larger task to add preprocess to the container
+        //@see: https://thesib.atlassian.net/browse/CA-842
+        data.item.components[key] = serverLogic.preprocess(c);
       }
     });
 
