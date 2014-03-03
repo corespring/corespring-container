@@ -115,6 +115,14 @@ trait Session extends Controller with ItemPruner {
       }
   }
 
+  /**
+   * Be aware that this is two different implementations melted into one api.
+   * The http route for it is a PUT which allows the user to pass in the answers.
+   * When secure=false these answers are used to calculate the result
+   * When secure=true the answers are ignored and the answers from the session are used instead.
+   * @param id
+   * @return
+   */
   def getScore(id: String) = actions.getScore(id) {
     request: SessionOutcomeRequest[AnyContent] =>
       logger.trace(s"[getScore]: $id : ${Json.stringify(request.itemSession)}")
