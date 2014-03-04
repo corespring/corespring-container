@@ -6,11 +6,10 @@
   "components" : {
     "1" : {
       "componentType" : "corespring-box-and-whiskers",
-      "title": "Fruits",
-      "weight" : 10,
-      "correctResponse" : { "value" : ["carrot", "turnip", "potato"] },
+      "title": "Plots",
+      "weight" : 1,
+      "correctResponse" : {},
       "model" : {
-        "prompt": "Which of these is a vegetable?",
         "graphs": [
           {
             "orientation": "horizontal",
@@ -36,7 +35,7 @@
           {
             "orientation": "vertical",
             "domain": {
-              "label": "verticalio libratio domintant di tur domain label"
+              "label": "a very very long vertical domain label"
             },
             "range": {
               "label": "ver range label"
@@ -44,7 +43,8 @@
             "plots": [
               {
                 "dataSet": [1, 2, 3, 4, 5],
-                "label": "labello"
+                "label": "vertical label",
+                "adjustable": true
               }
             ]
           }
