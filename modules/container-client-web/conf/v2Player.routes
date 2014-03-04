@@ -20,13 +20,13 @@ GET        /session/:sessionId/player-config.json          @org.corespring.conta
 GET        /session/player-services.js                     @org.corespring.container.client.controllers.apps.Player.services
 GET        /session/:sessionId/player                      @org.corespring.container.client.controllers.apps.Player.loadPlayerForSession(sessionId:String)
 GET        /session/everything/:id.json                    @org.corespring.container.client.controllers.resources.Session.loadEverything(id:String)
-GET        /session/:sessionId/*file                       @org.corespring.container.client.controllers.Assets.session(sessionId:String, file)
 PUT        /session/save/:id.json                          @org.corespring.container.client.controllers.resources.Session.saveSession(id:String)
 PUT        /session/complete/:id.json                      @org.corespring.container.client.controllers.resources.Session.completeSession(id:String)
 PUT        /session/load-outcome/:id.json                  @org.corespring.container.client.controllers.resources.Session.loadOutcome(id:String)
-        
+PUT        /session/:id/score.json                         @org.corespring.container.client.controllers.resources.Session.getScore(id:String)
+GET        /session/:sessionId/*file                       @org.corespring.container.client.controllers.Assets.session(sessionId:String, file)
+
 GET        /item/:itemId/player                            @org.corespring.container.client.controllers.apps.Player.createSessionForItem(itemId:String)
-PUT        /item/score/:id.json                            @org.corespring.container.client.controllers.resources.Item.getScore(id:String)
 GET        /item/:itemId.json                              @org.corespring.container.client.controllers.resources.Item.load(itemId:String)
 PUT        /item/:itemId.json                              @org.corespring.container.client.controllers.resources.Item.save(itemId:String, property: Option[String] ?= None)
 POST       /item/create                                    @org.corespring.container.client.controllers.resources.Item.create()

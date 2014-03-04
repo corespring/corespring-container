@@ -8,31 +8,50 @@
   "components" : {
     "1" : {
       "componentType" : "corespring-box-and-whiskers",
-      "title": "Fruits",
-      "weight" : 10,
-      "correctResponse" : { "value" : ["carrot", "turnip", "potato"] },
-      "feedback" : [
-        { "value" : "banana", "feedback" : "Incorrect"},
-        { "value" : "carrot", "feedback" : "Correct", "notChosenFeedback" : "This is a vegetable"},
-        { "value" : "apple", "feedback" : "it's a fruit" },
-        { "value" : "turnip", "feedback" : "Correct", "notChosenFeedback" : "This is a vegetable" },
-        { "value" : "potato", "feedback" : "Correct", "notChosenFeedback" : "This is a vegetable" },
-        { "value" : "wheat", "feedback" : "Incorrect" }
-      ],
+      "title": "Plots",
+      "weight" : 1,
+      "correctResponse" : {},
       "model" : {
-        "prompt": "Which of these is a vegetable?",
-        "config": {
-          "orientation": "horizontal",
-          "shuffle": true
-        },
-        "choices": [
-          {"label": "Banana", "value": "banana"},
-          {"label": "Carrot In the Woods", "value": "carrot"},
-          {"label": "Apple", "value": "apple"},
-          {"label": "Turnip", "value": "turnip"},
-          {"label": "Potato", "value": "potato"},
-          {"label": "Wheat", "value": "wheat"}
+        "graphs": [
+          {
+            "orientation": "horizontal",
+            "domain": {
+              "label": "domain label"
+            },
+            "range": {
+              "label": "range label"
+            },
+            "plots": [
+              {
+                "dataSet": [14, 6, 3, 2, 4, 15, 11, 8, 1, 7, 2, 1, 3, 4, 10, 22, 20],
+                "label": "plot 1 long",
+                "adjustable": false
+              },
+              {
+                "dataSet": [44, 6, 3, 2, 4, 30, 11, 8, 1, 7, 2, 9, 3, 4, 10, 22, 20],
+                "label": "plot 2",
+                "adjustable": true
+              }
+            ]
+          },
+          {
+            "orientation": "vertical",
+            "domain": {
+              "label": "a very very long vertical domain label"
+            },
+            "range": {
+              "label": "ver range label"
+            },
+            "plots": [
+              {
+                "dataSet": [1, 2, 3, 4, 5],
+                "label": "vertical label",
+                "adjustable": true
+              }
+            ]
+          }
         ]
+
       }
     }
   },

@@ -27,14 +27,6 @@ trait ItemActions extends ContainerItemActions[AnyContent] {
       }.getOrElse(NotFound(s"Can't find item with id $itemId"))
   }
 
-  override def getScore(itemId: String)(block: (ScoreItemRequest[AnyContent]) => Result): Action[AnyContent] = Action {
-    request =>
-      itemService.load(itemId).map {
-        item =>
-          block(ScoreItemRequest(item, request))
-      }.getOrElse(NotFound(s"Can't find item with id $itemId"))
-  }
-
   override def create(error: (Int, String) => Result)(block: (NewItemRequest[AnyContent]) => Result): Action[AnyContent] = Action {
     request =>
 

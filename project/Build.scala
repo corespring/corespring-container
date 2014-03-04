@@ -13,6 +13,10 @@ object Build extends sbt.Build {
   val ScalaVersion = "2.10.3"
 
   def isWindows = System.getProperty("os.name").toLowerCase().contains("windows")
+  val gruntCmd = "node ./node_modules/grunt-cli/bin/grunt"
+  val npmCmd = if (isWindows) "npm.cmd" else "npm"
+  val bowerCmd = "node ./node_modules/bower/bin/bower"
+
 
   object Dependencies {
     val specs2 = "org.specs2" %% "specs2" % "2.2.2" % "test"
@@ -54,6 +58,7 @@ object Build extends sbt.Build {
 
   lazy val utils = builder.lib("container-utils")
 
+
   val playAppToSbtLibSettings = Seq(
     scalaSource in Compile <<= (baseDirectory in Compile)(_ / "src" / "main" / "scala"),
     scalaSource in Test <<= (baseDirectory in Test)(_ / "src" / "test" / "scala"),
@@ -68,26 +73,22 @@ object Build extends sbt.Build {
     (baseDir, s) =>
       val clientRoot: File = baseDir
 
-      val osName = System.getProperty("os.name")
-
-      s.log.info(s"os: $osName")
       val commands = Seq(
-        ("npm", "install"),
+        (npmCmd, "install"),
 
         /**
          * Note: Adding a bower cache clean to workaround this issue:
          * https://github.com/bower/bower/issues/991
          * Once this is fixed we can remove this
          */
-        ("bower", "cache clean"),
-        ("bower", "install"),
-        ("grunt", "--devMode=false"))
+        (bowerCmd, "cache clean"),
+        (bowerCmd, "install"),
+        (gruntCmd, "--devMode=false"))
 
       commands.foreach {
         c =>
           s.log.info(s"[>> $c] on " + clientRoot)
-          val (name, args) = c
-          val cmd = if (isWindows) s"$name.cmd" else name
+          val (cmd, args) = c
           val exitCode = sbt.Process(s"$cmd $args", clientRoot).!
           if (exitCode != 0) {
             throw new RuntimeException(s"The following commands failed: $c")
@@ -121,8 +122,9 @@ object Build extends sbt.Build {
   val runClientTestsTask = runClientTests <<= (baseDirectory, streams) map {
     (baseDir, s) =>
       s.log.info("run client tests")
-      sbt.Process("npm install", baseDir) !;
-      val result = sbt.Process("grunt test", baseDir) !;
+
+      sbt.Process(s"$npmCmd install", baseDir) !;
+      val result = sbt.Process(s"$gruntCmd test", baseDir) !;
       if (result != 0) {
         throw new RuntimeException("Tests Failed")
       }
@@ -183,7 +185,7 @@ object Build extends sbt.Build {
   val shell = builder.playApp("shell")
     .settings(
       resolvers ++= Resolvers.all,
-      libraryDependencies ++= Seq(casbah, playS3, scalaz, play.Keys.cache, yuiCompressor, closureCompiler)).dependsOn(containerClientWeb, componentLoader, mongoJsonService, docs)
+      libraryDependencies ++= Seq(logbackClassic,casbah, playS3, scalaz, play.Keys.cache, yuiCompressor, closureCompiler)).dependsOn(containerClientWeb, componentLoader, mongoJsonService, docs)
     .aggregate(containerClientWeb, componentLoader, containerClient, componentModel, utils, jsProcessing, mongoJsonService, docs)
 
   val root = builder.playApp("root", Some("."))
@@ -193,8 +195,7 @@ object Build extends sbt.Build {
       playOnStarted <+= baseDirectory {
         base =>
           (address: InetSocketAddress) => {
-            val cmd = if (isWindows) "grunt.cmd" else "grunt"
-            Grunt.process = Some(Process(s"$cmd run", (base / "modules" / "container-client")).run)
+            Grunt.process = Some(Process(s"$gruntCmd run", (base / "modules" / "container-client")).run)
           }: Unit
       },
       // Stop grunt when play run stops
@@ -208,21 +209,20 @@ object Build extends sbt.Build {
       commands <++= baseDirectory {
         base =>
           Seq(
-            "grunt",
-            "bower",
-            "npm").map(cmd(_, (base / "modules" / "container-client")))
+            ("./node_modules/grunt-cli/bin/", "grunt",""),
+            ("./node_modules/bower/bin/", "bower",""),
+            ("", "npm",".cmd")).map(cmd(_, (base / "modules" / "container-client")))
       })
     .dependsOn(shell)
     .aggregate(shell)
 
-  private def cmd(name: String, base: File): Command = {
-    Command.args(name, "<" + name + "-command>") {
+  private def cmd(name: Tuple3[String,String,String], base: File): Command = {
+    Command.args(name._2, "<" + name._2 + "-command>") {
       (state, args) =>
-
-        val cmd = if (isWindows) s"$name.cmd" else name
+        val cmd = if (isWindows) s"${name._1}${name._2}${name._3}" else "${name._1}${name._2}"
         val exitCode = Process(cmd :: args.toList, base) !;
         if (exitCode != 0) {
-          throw new RuntimeException(s"$name, ${base.getPath} returned a non zero exit code")
+          throw new RuntimeException(s"$name._2, ${base.getPath} returned a non zero exit code")
         }
         state
     }

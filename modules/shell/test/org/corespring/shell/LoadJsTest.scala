@@ -7,11 +7,15 @@ import org.specs2.mutable.Specification
 import play.api.test.Helpers._
 import scala.concurrent.{ ExecutionContext, Future }
 
-class ContainerClientImplementationTest extends Specification with Results {
+/**
+ * LoadJs is a trait defined in ContainerClientImplementation
+ * It is defined as a trait to make test setup easier
+ */
+class LoadJsTest extends Specification with Results with LoadJs {
 
   import ExecutionContext.Implicits.global
 
-  val sut = ContainerClientImplementation
+  val sut = this
 
   def noOp(request: PlayerJsRequest[AnyContent]): SimpleResult = {
     Ok("noOp").withSession("isSecure" -> request.isSecure.toString)

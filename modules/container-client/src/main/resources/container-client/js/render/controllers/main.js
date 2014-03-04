@@ -86,7 +86,7 @@ var controller = function ($scope, $log, $timeout, $location, ComponentRegister,
         },
         onSuccess, 
         onError,
-        $scope.session.itemId
+        $scope.sessionId
       );
   };
 
@@ -161,7 +161,8 @@ var controller = function ($scope, $log, $timeout, $location, ComponentRegister,
   $scope.$on('getScore', function(event, data, callback){
 
     var onScoreReceived = function(outcome){
-      callback({ score: outcome.summary.percentage} );
+      var percentage =  outcome.summary.percentage;
+      callback({ score: data.format === 'scaled' ? (percentage / 100) : percentage} );
     };
     $scope.getScore(onScoreReceived);
   });

@@ -20,7 +20,7 @@ class ContainerClientImplementation(
   val itemService: MongoService,
   val sessionService: MongoService,
   componentsIn: => Seq[Component],
-  val configuration: Configuration) extends DefaultIntegration {
+  val configuration: Configuration) extends DefaultIntegration with LoadJs {
 
   override def components: Seq[Component] = componentsIn
 
@@ -34,9 +34,9 @@ class ContainerClientImplementation(
      * @param block
      * @return
      */
-    override def playerJs(block: (PlayerJsRequest[AnyContent]) => Result): Action[AnyContent] = ContainerClientImplementation.loadJs(block)
+    override def playerJs(block: (PlayerJsRequest[AnyContent]) => Result): Action[AnyContent] = loadJs(block)
 
-    override def editorJs(block: (PlayerJsRequest[AnyContent]) => Result) = ContainerClientImplementation.loadJs(block)
+    override def editorJs(block: (PlayerJsRequest[AnyContent]) => Result) = loadJs(block)
 
   }
 
@@ -98,8 +98,9 @@ class ContainerClientImplementation(
   override def profile: Profile = new ShellProfile()
 }
 
-object ContainerClientImplementation {
+trait LoadJs {
 
+  //Implemented as trait so it can be tested without setup
   def loadJs(block: PlayerJsRequest[AnyContent] => Result): Action[AnyContent] = Action {
     request =>
       def isSecure = request.getQueryString("secure").map {
