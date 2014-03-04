@@ -21,39 +21,42 @@ var controller = function ($scope, $log, ProfileService, DataQueryService) {
     });
   };
 
-  $scope.subjectAsync = function(topic){ 
-    return {
-      query: function (query) {
-        $log.debug("query: ", query);
+  function Async(topic){
 
-        DataQueryService.query( topic, query.term, function(result){
-
-          var formatted = _.map(result, function(r){
-            return { id: r._id.$oid, text: r.category + ": " + r.subject};
-          });
-
-          $scope.queryResults[topic] = formatted;
-          query.callback({ results: formatted });
-        });
-      },
-
-      elementToVal: function(element){
-        return $(element).select2('val');
-      },
-      initSelection: function(element, callback) {
-        $log.debug("init selection: ", element, callback);
-        var val = this.elementToVal(element); 
-        $log.debug("val: ", val);
-
-        findSubject(topic, val, function(s){
-          return callback(s);
-        });
-      }
+    var that = this;
+    
+    this.elementToVal = function (element){
+      return $(element).select2('val');
     };
-  };
 
-  $scope.relatedSubjectAsync = $scope.subjectAsync("relatedSubject");
-  $scope.primarySubjectAsync = $scope.subjectAsync("primarySubject");
+    this.query = function (query) {
+      $log.debug("query: ", query);
+
+      DataQueryService.query( topic, query.term, function(result){
+
+        var formatted = _.map(result, function(r){
+          return { id: r._id.$oid, text: r.category + ": " + r.subject};
+        });
+
+        $scope.queryResults[topic] = formatted;
+        query.callback({ results: formatted });
+      });
+    };
+
+
+    this.initSelection = function(element, callback) {
+      $log.debug("init selection: ", element, callback);
+      var val = that.elementToVal(element); 
+      $log.debug("val: ", val);
+
+      findSubject(topic, val, function(s){
+        return callback(s);
+      });
+    };
+  }
+
+  $scope.relatedSubjectAsync = new Async("relatedSubject");
+  $scope.primarySubjectAsync = new Async("primarySubject");
 
 
  $scope.$watch("otherItemType",  function (n) {
