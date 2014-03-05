@@ -81,7 +81,7 @@ describe('profile controller', function(){
     scope.primarySubjectAsync.query(query);
     expect(queryResult).toNotBe(null); 
     expect(queryResult.length).toEqual(1); 
-    expect(queryResult[0]).toEqual({id: "1", text: "category: blah"}); 
+    expect(queryResult[0]).toEqual(mockDataQueryService.results[0]); 
   });
 
   it("should init selection with a local result", function(){
