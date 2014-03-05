@@ -1,4 +1,7 @@
-form.form-horizontal
+div
+  h3 Coming Soon...
+  
+form.form-horizontal(disabled="true", style="opacity: 0.2;")
   .control-group
     label.control-label(for='contributor') Contributor
     .controls
@@ -38,7 +41,7 @@ form.form-horizontal
         input(type="text", class="form-control")
         span.input-group-addon .00
 
-form.form-horizontal
+form.form-horizontal(style="opacity: 0.2;", disabled="true")
 
   .control-group
     label.control-label(for='priorUse') Prior Use
@@ -49,7 +52,7 @@ form.form-horizontal
     label.control-label(for='priorGradeLevel') Grade Level
     #priorGradeLevel.controls
       .btn-group
-        button.btn.tight(ng-repeat='gl in itemData.$priorGradeLevelDataProvider', button-toggle='active', title='Prekindergarten', ng-model='gl.state.selected')
+        button.btn.tight(ng-repeat='gl in itemData.$priorGradeLevelDataProvider', button-toggle='active', ng-model='gl.state.selected')
   
   .control-group
     label.control-label Reviews Passed
