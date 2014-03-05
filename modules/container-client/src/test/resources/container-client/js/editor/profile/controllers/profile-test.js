@@ -75,7 +75,7 @@ describe('profile controller', function(){
     };
     
     mockDataQueryService.results = [
-      { _id: { $oid: "1" }, category: "category", subject: "blah"}
+      { id: "1", category: "category", subject: "blah"}
     ]; 
 
     scope.primarySubjectAsync.query(query);
