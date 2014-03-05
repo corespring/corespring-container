@@ -27,7 +27,7 @@ class ItemTest extends Specification with Mockito {
       def actions: ItemActions[AnyContent] = new ItemActions[AnyContent] {
 
         def save(itemId: String)(block: (SaveItemRequest[AnyContent]) => Result): Action[AnyContent] = Action {
-          request => block(SaveItemRequest(Json.obj(), (s, j) => saveResult, request))
+          request => block(SaveItemRequest(Json.obj(), (s, j, property) => saveResult, request))
         }
 
         def load(itemId: String)(block: (ItemRequest[AnyContent]) => Result): Action[AnyContent] = Action {
