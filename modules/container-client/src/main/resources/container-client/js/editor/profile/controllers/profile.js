@@ -3,12 +3,10 @@ var controller = function ($scope, $log, ProfileService, DataQueryService) {
   function findSubject(topic, id, callback){
     var local = _.find($scope.queryResults[topic], function(r){ return r.id === id;});
     if(local){
-
       callback(local);
     } else {
-
       DataQueryService.findOne(topic, id, function success(data){
-        callback({ id: data._id.$oid, text: data.subject });
+        callback({ id: data.id, text: subjectText(data)} );
       });
     }
   }
@@ -20,6 +18,10 @@ var controller = function ($scope, $log, ProfileService, DataQueryService) {
       $scope.item.profile = savedProfile;
     });
   };
+
+  function subjectText(s) {
+    return s.category + ": " + s.subject;
+  }
 
   function Async(topic){
 
@@ -35,7 +37,7 @@ var controller = function ($scope, $log, ProfileService, DataQueryService) {
       DataQueryService.query( topic, query.term, function(result){
 
         var formatted = _.map(result, function(r){
-          return { id: r._id.$oid, text: r.category + ": " + r.subject};
+          return { id: r.id, text: subjectText(r) };
         });
 
         $scope.queryResults[topic] = formatted;

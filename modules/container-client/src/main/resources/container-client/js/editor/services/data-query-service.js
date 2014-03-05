@@ -1,8 +1,10 @@
 (function(){
   function DataQueryService ($http, $log) {
 
+    var baseUrl = "../../data-query/";
+
     function _call(topic, query, onSuccess, onFailure){
-      var url = "../../data-query/" + topic;
+      var url = baseUrl + topic;
 
       if(query){
        url += "?query=" + query;
@@ -39,7 +41,7 @@
 
     this.findOne = function(topic, id, onSuccess, onError){
 
-      var url = "../../profile/" + topic + "/" + id;
+      var url = baseUrl + topic + "/" + id;
 
       $http({method: 'GET', url: url})
         .success(onSuccess)

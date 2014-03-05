@@ -12,65 +12,47 @@ class ShellDataQuery extends ContainerDataQuery {
     """
       |[
       |   {
-      |      "_id":{
-      |         "$oid":"4ffb535f6bb41e469c0bf2a7"
-      |      },
+      |      "id":"4ffb535f6bb41e469c0bf2a7",
       |      "subject":"",
       |      "category":"Art"
       |   },
       |   {
-      |      "_id":{
-      |         "$oid":"4ffb535f6bb41e469c0bf2a8"
-      |      },
+      |      "id":"4ffb535f6bb41e469c0bf2a8",
       |      "subject":"Performing Arts",
       |      "category":"Art"
       |   },
       |   {
-      |      "_id":{
-      |         "$oid":"4ffb535f6bb41e469c0bf2a9"
-      |      },
+      |      "id":"4ffb535f6bb41e469c0bf2a9",
       |      "subject":"AP Music Theory,Visual Arts",
       |      "category":"Art"
       |   },
       |   {
-      |      "_id":{
-      |         "$oid":"4ffb535f6bb41e469c0bf2aa"
-      |      },
+      |      "id":"4ffb535f6bb41e469c0bf2aa",
       |      "subject":"AP Art History",
       |      "category":"Art"
       |   },
       |   {
-      |      "_id":{
-      |         "$oid":"4ffb535f6bb41e469c0bf2ab"
-      |      },
+      |      "id":"4ffb535f6bb41e469c0bf2ab",
       |      "subject":"Other",
       |      "category":"Art"
       |   },
       |   {
-      |      "_id":{
-      |         "$oid":"4ffb535f6bb41e469c0bf2ac"
-      |      },
+      |      "id":"4ffb535f6bb41e469c0bf2ac",
       |      "subject":"",
       |      "category":"English Language Arts"
       |   },
       |   {
-      |      "_id":{
-      |         "$oid":"4ffb535f6bb41e469c0bf2ad"
-      |      },
+      |      "id":"4ffb535f6bb41e469c0bf2ad",
       |      "subject":"English Language Arts",
       |      "category":"English Language Arts"
       |   },
       |   {
-      |      "_id":{
-      |         "$oid":"4ffb535f6bb41e469c0bf2ae"
-      |      },
+      |      "id":"4ffb535f6bb41e469c0bf2ae",
       |      "subject":"AP English Literature",
       |      "category":"English Language Arts"
       |   },
       |   {
-      |      "_id":{
-      |         "$oid":"4ffb535f6bb41e469c0bf2af"
-      |      },
+      |      "id":"4ffb535f6bb41e469c0bf2af",
       |      "subject":"Writing",
       |      "category":"English Language Arts"
       |   }
@@ -97,7 +79,7 @@ class ShellDataQuery extends ContainerDataQuery {
 
   override def findOne(topic: String, id: String): Action[AnyContent] = Action { request =>
 
-    def filter(o: JsObject) = (o \ "_id" \ "$oid").asOpt[String].map(_ == id).getOrElse(false)
+    def filter(o: JsObject) = (o \ "id").asOpt[String].map(_ == id).getOrElse(false)
 
     val out = topic match {
       case "primarySubject" => subjects.filter(filter).headOption.map(Json.toJson(_)).getOrElse(JsObject(Seq()))
