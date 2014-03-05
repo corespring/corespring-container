@@ -3,9 +3,6 @@
 GET        /player.js                                      @org.corespring.container.client.controllers.PlayerLauncher.playerJs
 GET        /editor.js                                      @org.corespring.container.client.controllers.PlayerLauncher.editorJs
 
-
-GET        /partials/*file                                 controllers.Assets.at(path="/container-client/partials", file)
-
 GET        /js/*file                                       controllers.Assets.at(path="/container-client/js", file)
 GET        /css/*file                                      controllers.Assets.at(path="/container-client/css", file)
 GET        /images/*file                                   controllers.Assets.at(path="/container-client/images", file)
