@@ -149,7 +149,7 @@ module.exports = (grunt) ->
       compile:
         expand: true
         cwd: '<%= common.app %>'
-        src: ['**/*.jade', '!layout.jade']
+        src: ['**/*.jade', '!bower_components/*','!layout.jade']
         ext: '.html'
         dest: '<%= common.dist %>'
         options:
