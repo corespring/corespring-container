@@ -1,5 +1,5 @@
 //# Main player controller
-var controller = function ($scope, $log, $timeout, $location, ComponentRegister, PlayerServices) {
+var controller = function ($scope, $log, $timeout, $location, ComponentRegister, PlayerService) {
 
   var currentMode = null;
 
@@ -29,7 +29,7 @@ var controller = function ($scope, $log, $timeout, $location, ComponentRegister,
 
     $log.debug('[save] -> attempt: ', isAttempt, ' complete:', isComplete, 'callback:', cb);
 
-    PlayerServices.saveSession(
+    PlayerService.saveSession(
       {
         isAttempt: isAttempt, 
         isComplete: isComplete,
@@ -56,7 +56,7 @@ var controller = function ($scope, $log, $timeout, $location, ComponentRegister,
   $scope.loadOutcome = function (options, cb){
     //TODO - need to fetch the player options
     //Passed in to the launcher
-    PlayerServices.loadOutcome(options,
+    PlayerService.loadOutcome(options,
       function(data){
         $scope.onOutcomeLoaded(data);
         if(cb) {
@@ -80,7 +80,7 @@ var controller = function ($scope, $log, $timeout, $location, ComponentRegister,
   };
 
   $scope.getScore = function(onSuccess, onError){
-    PlayerServices.getScore(
+    PlayerService.getScore(
         {
           components: ComponentRegister.getComponentSessions()
         },
@@ -91,7 +91,7 @@ var controller = function ($scope, $log, $timeout, $location, ComponentRegister,
   };
 
   $scope.completeResponse = function(){
-    PlayerServices.completeResponse(
+    PlayerService.completeResponse(
       function(){
         $scope.isComplete = true;
       },
@@ -146,7 +146,7 @@ var controller = function ($scope, $log, $timeout, $location, ComponentRegister,
   };
 
   $scope.$on('begin', function(){
-    PlayerServices.loadSession($scope.onEverythingLoaded, $scope.onSessionLoadError, $scope.sessionId);
+    PlayerService.loadSession($scope.onEverythingLoaded, $scope.onSessionLoadError, $scope.sessionId);
   });
 
   $scope.$on('saveResponses', function(event, data){
@@ -251,6 +251,6 @@ angular.module('corespring-player.controllers')
     '$timeout',
     '$location',
     'ComponentRegister',
-    'PlayerServices',
+    'PlayerService',
      controller
     ]);

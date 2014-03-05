@@ -124,15 +124,15 @@ describe('player launcher', function () {
         player.setMode(this.toMode);
         this.lastError = lastError;
         return this;
-      }
+      };
     }
 
     function createModeChangeResultMessage(modeChangeResult) {
-      return "Change mode"
-        + " from " + modeChangeResult.fromMode
-        + " to " + modeChangeResult.toMode
-        + " with complete = " + modeChangeResult.complete
-        + " and secure = " + modeChangeResult.secure;
+      return "Change mode" + 
+        " from " + modeChangeResult.fromMode + 
+        " to " + modeChangeResult.toMode + 
+        " with complete = " + modeChangeResult.complete +
+        " and secure = " + modeChangeResult.secure;
     }
 
     beforeEach(function () {
@@ -140,21 +140,21 @@ describe('player launcher', function () {
         toSucceed: function () {
           var testResult = this.actual.do();
           var pass = !testResult.lastError;
-          var message = createModeChangeResultMessage(testResult)
-            + " " + (pass ? "succeeded" : "failed");
+          var message = createModeChangeResultMessage(testResult) +
+           " " + (pass ? "succeeded" : "failed");
           this.message = function () {
-            return message
-          }
+            return message;
+          };
           return pass;
         },
         toFail: function () {
           var testResult = this.actual.do();
           var pass = testResult.lastError;
-          var message = createModeChangeResultMessage(testResult)
-            + " " + (pass ? "should have failed" : "did not fail as expected.");
+          var message = createModeChangeResultMessage(testResult) +
+           " " + (pass ? "should have failed" : "did not fail as expected.");
           this.message = function () {
-            return message
-          }
+            return message;
+          };
           return pass;
         }
       });

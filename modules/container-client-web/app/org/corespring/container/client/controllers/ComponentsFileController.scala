@@ -45,7 +45,7 @@ trait ComponentsFileController extends Controller {
     require(Validator.absolutePathInProdMode(componentsPath).isRight, s"The component path ($componentsPath) is relative - this can cause unpredictable behaviour when running in Prod Mode. see: https://github.com/playframework/playframework/issues/2411")
 
     val fullPath = s"$componentsPath/$org/$component/libs/$filename"
-    log.debug(s"fullPath: $fullPath")
+    log.trace(s"fullPath: $fullPath")
     loadFile(fullPath).map {
       tuple =>
         val (file, headers) = tuple

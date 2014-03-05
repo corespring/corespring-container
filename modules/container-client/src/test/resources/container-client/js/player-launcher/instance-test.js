@@ -11,10 +11,10 @@ describe('instance', function () {
 
   function onError (err) {
     receivedErrors.push(err);
-  };
+  }
 
   function hasError() {
-    return receivedErrors.length > 0
+    return receivedErrors.length > 0;
   }
 
   function mockPostMessage(message, data, element){
@@ -27,7 +27,7 @@ describe('instance', function () {
           message: message + "Result",
           data: data},
           mockResult)
-      }
+      };
     }
 
     for (var i = 0; i < listeners.length; i++) {
@@ -56,7 +56,7 @@ describe('instance', function () {
       listenerLength: function(){
         return listeners.length;
       }
-    }
+    };
   }
 
   function clearRootLevelListeners(){
@@ -78,7 +78,7 @@ describe('instance', function () {
   afterEach(function(){
     corespring.module("post-message", originalPostMessage);
     corespring.module("root-level-listener", originalRootLevelListenerDef);
-  })
+  });
 
   it('should have a InstanceDef', function () {
     expect(InstanceDef).toBeTruthy();
@@ -114,7 +114,7 @@ describe('instance', function () {
     var resultFromCallback = null;
     var callback = function(result){
       resultFromCallback = result;
-    }
+    };
     mockResult = {"isComplete": true};
 
     instance.sendMessage({

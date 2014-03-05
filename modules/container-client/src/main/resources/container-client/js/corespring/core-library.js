@@ -4,8 +4,14 @@
   //A simple library to aid in the use of the common js module pattern.
   var Library = function(){
 
-    var modules = { };
- 
+    var modules = {};
+
+    this.initialize = function(m){
+      for(var x in m){
+        modules[x] = m[x];
+      }
+    };
+
     this.require = function(uid){
 
       if(!uid){

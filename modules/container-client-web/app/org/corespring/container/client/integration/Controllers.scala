@@ -3,7 +3,7 @@ package org.corespring.container.client.integration
 import org.corespring.container.client.controllers.apps.{ Rig, Editor, Player }
 import org.corespring.container.client.component.ComponentUrls
 import org.corespring.container.client.controllers.resources.{ Session, Item }
-import org.corespring.container.client.controllers.{ ComponentsFileController, Icons, PlayerLauncher, Assets }
+import org.corespring.container.client.controllers._
 import play.api.mvc.Controller
 
 trait CommonControllers {
@@ -48,7 +48,11 @@ trait EditorControllers extends CommonControllers with ResourceControllers {
   def icons: Icons
 }
 
-trait ContainerControllers extends RigControllers with PlayerControllers with EditorControllers {
+trait ProfileControllers {
+  def dataQuery: DataQuery
+}
+
+trait ContainerControllers extends RigControllers with PlayerControllers with EditorControllers with ProfileControllers {
   def controllers: Seq[Controller] = Seq(
     componentUrls,
     assets,
@@ -59,5 +63,6 @@ trait ContainerControllers extends RigControllers with PlayerControllers with Ed
     rig,
     player,
     editor,
-    icons)
+    icons,
+    dataQuery)
 }

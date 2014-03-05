@@ -18,9 +18,9 @@ describe('core', function () {
   it('should allow a client component to register', function () {
     corespring.bootstrap(mockAngular);
     var exports = corespring.client.component("testComp", "testModule");
-    exports.directive = ['dep', function(dep){ console.log("blah")}];
+    exports.directive = ['dep', function(dep){ console.log("blah");}];
     exports.initializeComponent();
-    expect(mockModule.registered["testComp"]).toEqual(exports.directive);
+    expect(mockModule.registered.testComp).toEqual(exports.directive);
   });
 
 

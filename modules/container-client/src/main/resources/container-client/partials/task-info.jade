@@ -1,0 +1,81 @@
+form
+
+  br/
+
+  .control-group
+    label.control-label(for="title") Title
+    .controls
+      textarea#title.form-control(
+        ng-model='taskInfo.title', 
+        placeholder="Enter a title...",
+        rows='3')
+  
+  br/
+  
+  .row
+    .col-xs-6
+      .form-group
+        label(for="primarySubject") Primary Subject
+        br/
+        input#primarySubject(
+          style="width:300px",
+          ng-model="taskInfo.primarySubject",
+          type="text",
+          ui-select2="primarySubjectAsync",
+          data-placeholder="Choose a subject...")
+
+    .col-xs-6
+      .form-group
+        label(for="relatedSubject") Related Subject
+        br/
+
+        input#relatedSubject(
+          style="width:300px",
+          ng-model="taskInfo.relatedSubject",
+          ui-select2="relatedSubjectAsync",
+          data-placeholder="Choose a subject...")
+
+  .control-group
+    label.control-label(for='gradeLevel') Grade Level
+    .controls
+      button-bar#gradeLevel(ng-model="taskInfo.gradeLevel", button-provider="gradeLevelDataProvider", key="key")
+  
+  br/
+
+  
+  br/
+
+  .control-group
+    
+    label.control-label Item Type
+    
+    table.itemTypes
+      tr
+        td(valign='top')
+          ul
+            li(ng-repeat='t in itemTypeDataProvider', ng-show='$index < 2')
+              h5 {{t.key}}
+              label.radio(ng-repeat='k in t.value')
+                  input(type='radio', ng-model='taskInfo.itemType', value='{{k}}')
+                  | {{k}}
+
+        td(valign='top')
+          ul
+            li(ng-repeat='t in itemTypeDataProvider', ng-show='$index >= 2 && $index < 4')
+              h5 {{t.key}}
+              label.radio(ng-repeat='k in t.value')
+                input(type='radio', ng-model='taskInfo.itemType', value='{{k}}')
+                | {{k}}
+
+        td(valign='top')
+          ul
+            li(ng-repeat='t in itemTypeDataProvider', ng-show='$index >= 4')
+              h5 {{t.key}}
+              label.radio(ng-repeat='k in t.value')
+                input(type='radio', ng-model='taskInfo.itemType', value='{{k}}')
+                | {{k}}
+            li
+              h5 Other
+              label.radio
+                input(type='radio', ng-model='taskInfo.itemType', value='{{otherItemType}}')
+                input.form-control(type='text', ng-model='$parent.otherItemType')

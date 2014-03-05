@@ -4,9 +4,9 @@ import org.specs2.mutable.Specification
 
 class XhtmlProcessorTest extends Specification with XhtmlProcessor {
 
-  implicit def PlattformString( s: String ) = new {
+  implicit def PlattformString(s: String) = new {
     def toUnix = {
-      s.replaceAll("\r\n", "\n").replaceAll("\r","")
+      s.replaceAll("\r\n", "\n").replaceAll("\r", "")
     }
   }
 
@@ -23,6 +23,5 @@ class XhtmlProcessorTest extends Specification with XhtmlProcessor {
           |</div>""".stripMargin.toUnix
     }
   }
-
 
 }

@@ -1,6 +1,6 @@
 (function () {
 
-  var PlayerServices = function ($timeout) {
+  var PlayerService = function ($timeout) {
 
     //TODO: Need to make a decision on how this is controlled within the editor
     var settings = {
@@ -92,10 +92,10 @@
   };
 
   angular.module('corespring-editor.services')
-    .service('PlayerServices',
+    .service('PlayerService',
       [
         '$timeout',
-        PlayerServices
+        PlayerService
       ]
     );
 

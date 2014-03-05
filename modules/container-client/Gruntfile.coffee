@@ -28,7 +28,9 @@ module.exports = (grunt) ->
         '<%= common.dist %>/bower_components/angular/angular.min.js',
         '<%= common.dist %>/bower_components/lodash/dist/lodash.min.js',
         '<%= common.dist %>/bower_components/angular-ui-sortable/src/sortable.js',
-        '<%= common.dist %>/bower_components/corespring-ng-components/build/corespring-ng-components.js' ]
+        '<%= common.dist %>/bower_components/corespring-ng-components/build/corespring-ng-components.js',
+        '<%= common.dist %>/bower_components/mathjax/MathJax.js' 
+      ]
       concatDest: '<%= common.dist %>/js/core-libs.js'
 
     core: 
@@ -43,6 +45,7 @@ module.exports = (grunt) ->
       dest: '<%= common.dist %>/js/prod-editor.js'
       concatDest: '.tmp/concat/js/editor.js'
       src: [
+        '<%= common.dist %>/bower_components/angular-route/angular-route.min.js',
         '<%= common.dist %>/bower_components/mathjs/dist/math.min.js',
         '<%= common.dist %>/bower_components/saxjs/lib/sax.js',
         '<%= common.dist %>/js/corespring/core-library.js',
@@ -56,8 +59,10 @@ module.exports = (grunt) ->
       dest: '<%= common.dist %>/js/prod-editor-extras.js'
       concatDest: '<%= common.dist %>/js/editor-extras.js'
       src: [
+              '<%= common.dist %>/bower_components/select2/select2.js',
+              '<%= common.dist %>/bower_components/angular-ui-select2/src/select2.js',
               '<%= common.dist %>/bower_components/angular-ui/build/angular-ui.min.js',
-              '<%= common.dist %>/bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js',
+              '<%= common.dist %>/bower_components/angular-bootstrap/ui-bootstrap-tpls.js',
               '<%= common.dist %>/bower_components/bootstrap/js/dropdown.js',
               '<%= common.dist %>/bower_components/bootstrap/js/modal.js',
               '<%= common.dist %>/bower_components/bootstrap/js/tooltip.js',
@@ -107,7 +112,7 @@ module.exports = (grunt) ->
         files: ['<%= common.app %>/js/**/*.js', '<%= common.components %>/**/*.js']
         tasks: ['jshint:main']
       jade:
-        files: ['<%= common.app %>/*.jade']
+        files: ['<%= common.app %>/**/*.jade']
         tasks: ['jade']
 
 
@@ -144,7 +149,7 @@ module.exports = (grunt) ->
       compile:
         expand: true
         cwd: '<%= common.app %>'
-        src: ['*.jade', '!layout.jade']
+        src: ['**/*.jade', '!layout.jade']
         ext: '.html'
         dest: '<%= common.dist %>'
         options:

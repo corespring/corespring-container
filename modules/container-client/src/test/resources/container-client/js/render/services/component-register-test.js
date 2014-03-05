@@ -1,10 +1,10 @@
 describe('component-register', function(){
 
-  var register, bridge, defaultData;
+  var register, bridge, defaultData, defaultAnswer;
 
   var MockBridge = function(){
 
-    var isEditable = undefined;
+    var isEditable; 
 
     this.setDataAndSession = function(s){
       this.dataAndSession = s;
@@ -30,7 +30,7 @@ describe('component-register', function(){
       } else {
         return isEditable;
       } 
-    }
+    };
   };
 
   beforeEach(angular.mock.module('corespring-player.services'));
@@ -50,7 +50,7 @@ describe('component-register', function(){
       register[functionName](defaultData);
       var expected = bridge[bridgeName];
       expect(expected).toEqual(extractValue("1",defaultData));
-    }
+    };
   };
 
   it('should setOutcomes', setValue("setOutcomes", "response") );

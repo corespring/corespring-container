@@ -3,7 +3,6 @@
 GET        /player.js                                      @org.corespring.container.client.controllers.PlayerLauncher.playerJs
 GET        /editor.js                                      @org.corespring.container.client.controllers.PlayerLauncher.editorJs
 
-
 GET        /js/*file                                       controllers.Assets.at(path="/container-client/js", file)
 GET        /css/*file                                      controllers.Assets.at(path="/container-client/css", file)
 GET        /images/*file                                   controllers.Assets.at(path="/container-client/images", file)
@@ -26,7 +25,7 @@ GET        /session/:sessionId/*file                       @org.corespring.conta
 
 GET        /item/:itemId/player                            @org.corespring.container.client.controllers.apps.Player.createSessionForItem(itemId:String)
 GET        /item/:itemId.json                              @org.corespring.container.client.controllers.resources.Item.load(itemId:String)
-PUT        /item/:itemId.json                              @org.corespring.container.client.controllers.resources.Item.save(itemId:String)
+PUT        /item/:itemId.json                              @org.corespring.container.client.controllers.resources.Item.save(itemId:String, property: Option[String] ?= None)
 POST       /item/create                                    @org.corespring.container.client.controllers.resources.Item.create()
 
 
@@ -35,8 +34,6 @@ GET        /icon/:icon                                     @org.corespring.conta
 GET        /rig/:componentType/index.html                  @org.corespring.container.client.controllers.apps.Rig.index(componentType:String, data: Option[String] ?= None)
 GET        /rig/:componentType/config.json                 @org.corespring.container.client.controllers.apps.Rig.config(componentType:String)
 GET        /rig/:componentType/:dataName.json              @org.corespring.container.client.controllers.apps.Rig.data(componentType:String, dataName:String)
-#GET        /rig/:componentType/rig-components.js          @org.corespring.container.client.controllers.apps.Rig.componentsJs(orgName, compName)
-#GET        /rig/:componentType/rig-components.css         @org.corespring.container.client.controllers.apps.Rig.componentsCss(orgName, compName)
 GET        /rig/:componentType/*file                       @org.corespring.container.client.controllers.apps.Rig.asset(componentType, file)
 
 
@@ -45,6 +42,10 @@ GET        /editor/editor-services.js                      @org.corespring.conta
 GET        /editor/:itemId/editor-config.json              @org.corespring.container.client.controllers.apps.Editor.config(itemId:String)
 GET        /editor/create-item                             @org.corespring.container.client.controllers.apps.Editor.createItem
 GET        /editor/:itemId/index.html                      @org.corespring.container.client.controllers.apps.Editor.editItem(itemId:String)
+GET        /editor/:itemId/run                             @org.corespring.container.client.controllers.Assets.item(itemId:String, file="new-editor.html")
 GET        /editor/:itemId/*file                           @org.corespring.container.client.controllers.Assets.item(itemId:String, file)
 POST       /editor/:itemId/*file                           @org.corespring.container.client.controllers.Assets.upload(itemId, file)
+
+GET        /data-query/:topic                              @org.corespring.container.client.controllers.DataQuery.list(topic, query : Option[String] ?= None)
+GET        /data-query/:topic/:id                          @org.corespring.container.client.controllers.DataQuery.findOne(topic, id)
 

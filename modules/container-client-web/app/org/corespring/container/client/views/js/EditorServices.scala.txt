@@ -1,45 +1,102 @@
-@(namespace : String, load : Call, save : Call, componentSet : JsValue)
+@(namespace : String, load : Call, saveProfile : Call, saveComponents:Call, componentSet : JsValue)
 
 (function(){
   "use strict";
 
+  var loadedData = null;
+
   angular.module('@namespace', []);
 
-  angular.module('@namespace').factory('EditorServices', ['$http', function($http){
+  angular.module('@namespace').factory('ProfileService', ['BaseService', function(BaseService){
+
+    return {
+        save: function(id, profile, onSuccess, onFailure){
+          BaseService.saveProfile( profile, onSuccess, onFailure, id);
+        },
+        load: function(id, onSuccess, onFailure){
+          BaseService.load(function(d){
+            onSuccess(d.item.profile);
+          }, onFailure, id);
+        }
+    };
+  }]);
+
+  angular.module('@namespace').factory('DesignerService', ['$http', 'BaseService',function($http, BaseService){
+
+    return {
+        save: function(id, components, onSuccess, onFailure){
+          BaseService.saveComponents( components, onSuccess, onFailure, id);
+        },
+        loadItem: function(id, onSuccess, onFailure){
+          BaseService.load(function(d){
+            onSuccess(d.item);
+          }, onFailure, id);
+        },
+        loadAvailableComponents: function(onSuccess, onFailure){
+          var components = @{Json.stringify(componentSet)};
+          onSuccess(components);
+        }
+    };
+
+  }]);
+
+
+  angular.module('@namespace').factory('ItemService', ['BaseService', function(BaseService){
+    return {
+      load: function(onSuccess, onFailure, id){
+        BaseService.load(onSuccess, onFailure, id);
+      }
+    };
+  }]);
+
+  angular.module('@namespace').factory('BaseService', ['$http', function($http){
 
     var def = {
+      /**
+       * Load the item, check to see if its already loaded.
+       */
       load: function(onSuccess, onFailure, id){
+        if(loadedData){
+          onSuccess(loadedData);
+        } else {
+          var finalUrl = id ? '@load.url'.replace(":id", id) : '@load.url';
 
-        var finalUrl = id ? '@load.url'.replace(":id", id) : '@load.url';
-
-        $http['@load.method.toLowerCase'](finalUrl)
-          .success(function(data, status, headers, config){
-            console.log("[player-services] load item successful");
+          $http['@load.method.toLowerCase'](finalUrl)
+            .success(function(data, status, headers, config){
+              console.log("[player-services] load item successful");
+              loadedData = data;
+              onSuccess(data);
+            })
+            .error(function(data, status, headers, config){
+              if(onFailure){
+                onFailure(data);
+              }
+            });
+        }
+      },
+      saveProfile: function(data, onSuccess, onFailure, id) {
+         var url = '@saveProfile.url.toLowerCase';
+         var finalUrl = id ? url.replace(":id", id) : url;
+         var method = '@saveProfile.method.toLowerCase';
+         this._save( method, finalUrl, data, onSuccess, onFailure );
+      },
+      saveComponents: function(data, onSuccess, onFailure, id){
+         var url = '@saveComponents.url.toLowerCase';
+         var finalUrl = id ? url.replace(":id", id) : url;
+         var method = '@saveComponents.method.toLowerCase';
+         this._save( method, finalUrl, data, onSuccess, onFailure );
+      },
+      _save: function(method, url, data, onSuccess, onFailure, id){
+        $http[method](url, data)
+          .success(function(data, status, headers, config) {
+            loadedData = data;
             onSuccess(data);
           })
-          .error(function(data, status, headers, config){
-            if(onFailure){
-              onFailure(data);
-            }
-          });
-      },
-      save: function(item, onSuccess, onFailure, id){
-        var finalUrl = id ? '@save.url'.replace(":id", id) : '@save.url';
-        $http['@save.method.toLowerCase'](finalUrl, item)
-          .success(function(data, status, headers, config) {
-            console.log("item saved succesfully")
-            onSuccess(data)
-          })
           .error(function(data, status, headers, config) {
-            console.warn("error");
             if( onFailure ) {
               onFailure(data);
             }
           });
-      },
-      loadComponents: function(onSuccess, onFailure){
-        var components = @{Json.stringify(componentSet)};
-        onSuccess(components);
       }
     };
     return def;

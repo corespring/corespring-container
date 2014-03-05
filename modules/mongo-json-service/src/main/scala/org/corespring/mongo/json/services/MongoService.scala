@@ -3,10 +3,10 @@ package org.corespring.mongo.json.services
 import com.mongodb.DBObject
 import com.mongodb.casbah.{ WriteConcern, MongoCollection }
 import com.mongodb.casbah.commons.MongoDBObject
-import com.mongodb.util.JSON
+import com.mongodb.util.{JSON => MongoPlayJson}
 import org.bson.types.ObjectId
 import play.api.Logger
-import play.api.libs.json.{ JsObject, Json, JsValue }
+import play.api.libs.json.{ JsObject, Json => PlayJson, JsValue }
 
 class MongoService(collection: MongoCollection) {
 
@@ -19,9 +19,9 @@ class MongoService(collection: MongoCollection) {
     val fieldsDbo = MongoDBObject(fields.toList.map(s => (s, 1)))
     collection.find(MongoDBObject(), fieldsDbo).toSeq.map {
       dbo =>
-        val jsonString = JSON.serialize(dbo)
+        val jsonString = MongoPlayJson.serialize(dbo)
         logger.trace(s"found: $jsonString")
-        Json.parse(jsonString)
+        PlayJson.parse(jsonString)
     }
   }
 
@@ -31,9 +31,9 @@ class MongoService(collection: MongoCollection) {
       val maybeDbo: Option[DBObject] = collection.findOneByID(oid)
       maybeDbo.map {
         dbo =>
-          val s = JSON.serialize(dbo)
-          val json = Json.parse(s)
-          logger.trace(s"[load]: $id : ${Json.stringify(json)}")
+          val s = MongoPlayJson.serialize(dbo)
+          val json = PlayJson.parse(s)
+          logger.trace(s"[load]: $id : ${PlayJson.stringify(json)}")
           json
       }
   }
@@ -42,9 +42,9 @@ class MongoService(collection: MongoCollection) {
 
     logger.debug("[create]")
     val oid = ObjectId.get
-    val jsonString = Json.stringify(data)
+    val jsonString = PlayJson.stringify(data)
     logger.trace(s"[create]: $jsonString")
-    val dbo = JSON.parse(jsonString).asInstanceOf[DBObject]
+    val dbo = MongoPlayJson.parse(jsonString).asInstanceOf[DBObject]
     dbo.put("_id", oid)
 
     val result = collection.insert(dbo)
@@ -55,18 +55,28 @@ class MongoService(collection: MongoCollection) {
     }
   }
 
-  def save(id: String, data: JsValue): Option[JsValue] = withOid(id) {
+  def save(id: String,  data: JsValue, property : Option[String]): Option[JsValue] = withOid(id) {
     oid =>
       logger.debug(s"[save]: $id")
-      logger.trace(s"[save]: ${Json.stringify(data)}")
+      logger.trace(s"[save]: ${PlayJson.stringify(data)}")
 
-      val idObject = Json.obj("_id" ->
-        Json.obj("$oid" -> id))
+      val idObject = PlayJson.obj("_id" ->
+        PlayJson.obj("$oid" -> id))
+
+
+      def toDbo(json:JsValue) : DBObject = MongoPlayJson.parse(PlayJson.stringify(json)).asInstanceOf[DBObject]
 
       val updateObject = data.as[JsObject] ++ idObject
 
-      val dbo = JSON.parse(Json.stringify(updateObject)).asInstanceOf[DBObject]
-      val result = collection.save(dbo, WriteConcern.Safe)
+      def saveEverything = {
+        collection.save( toDbo(updateObject), WriteConcern.Safe)
+      }
+
+      val result = property.map{ p =>
+        val q = MongoDBObject("_id" -> new ObjectId(id))
+        val d = MongoDBObject("$set" -> MongoDBObject(p -> toDbo(data)))
+        collection.update(q, d, false, false, WriteConcern.Safe)
+      }.getOrElse(saveEverything)
 
       if (result.getLastError(WriteConcern.Safe).ok()) {
         Some(data)
