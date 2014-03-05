@@ -36,7 +36,7 @@ trait Item extends Controller {
       Ok(Json.obj("item" -> request.item))
   }
 
-  def save(itemId: String, property : Option[String] = None) = actions.save(itemId) {
+  def save(itemId: String, property: Option[String] = None) = actions.save(itemId) {
     request: SaveItemRequest[AnyContent] =>
       request.body.asJson.map {
 
@@ -55,18 +55,18 @@ trait Item extends Controller {
           }
 
           def saveResult = request.save(itemId, json, property).map {
-              updatedItem =>
-                Ok(updatedItem)
-            }.getOrElse(BadRequest(Errors.errorSaving))
+            updatedItem =>
+              Ok(updatedItem)
+          }.getOrElse(BadRequest(Errors.errorSaving))
 
-          if(property.isEmpty){
-            if(validXhtml){
+          if (property.isEmpty) {
+            if (validXhtml) {
               saveResult
-            } else{
+            } else {
               BadRequest(Errors.invalidXhtml)
             }
           } else {
-             saveResult
+            saveResult
           }
 
       }.getOrElse(BadRequest(Errors.noJson))
