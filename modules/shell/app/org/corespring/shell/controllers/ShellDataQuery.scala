@@ -1,10 +1,12 @@
 package org.corespring.shell.controllers
 
-import org.corespring.container.client.controllers.{ Profile => ContainerProfile }
-import play.api.libs.json.{ JsObject, Json, JsArray }
+import org.corespring.container.client.controllers.{ DataQuery => ContainerDataQuery }
+import play.api.libs.json.{ JsValue, JsObject, Json, JsArray }
 import play.api.mvc.{ AnyContent, Action }
 
-class Profile extends ContainerProfile {
+class ShellDataQuery extends ContainerDataQuery {
+
+  lazy val fieldValueJson: JsValue = FieldValueJson()
 
   val subjectString =
     """
@@ -75,61 +77,9 @@ class Profile extends ContainerProfile {
       |]
     """.stripMargin
 
-  val itemTypesString =
-    """
-      |[
-      |  {
-      |    "key": "Fixed Choice",
-      |    "value": [
-      |      "Multiple Choice",
-      |      "Multi-Multi Choice",
-      |      "Visual Multi Choice",
-      |      "Inline Choice",
-      |      "Ordering",
-      |      "Drag & Drop"
-      |    ]
-      |  },
-      |  {
-      |    "key": "Constructed Response",
-      |    "value": [
-      |      "Constructed Response - Short Answer",
-      |      "Constructed Response - Open Ended"
-      |    ]
-      |  },
-      |  {
-      |    "key": "Evidence",
-      |    "value": [
-      |      "Select Evidence in Text",
-      |      "Document Based Question",
-      |      "Passage With Questions"
-      |    ]
-      |  },
-      |  {
-      |    "key": "Composite",
-      |    "value": [
-      |      "Composite - Multiple MC",
-      |      "Composite - MC and SA",
-      |      "Composite - MC, SA, OE",
-      |      "Composite - Project",
-      |      "Composite - Performance",
-      |      "Composite - Activity",
-      |      "Composite - Algebra"
-      |    ]
-      |  },
-      |  {
-      |    "key": "Algebra",
-      |    "value": [
-      |      "Plot Lines",
-      |      "Plot Points",
-      |      "Evaluate an Equation"
-      |    ]
-      |  }
-      |]
-    """.stripMargin
+  lazy val itemTypes = fieldValueJson \ "itemTypes"
 
-  lazy val itemTypes = Json.parse(itemTypesString)
-
-  lazy val gradeLevels: Seq[String] = Seq("PK", "KG", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "PS", "AP", "UG")
+  lazy val gradeLevels: Seq[JsValue] = (fieldValueJson \ "gradeLevels").as[Seq[JsValue]]
 
   lazy val subjects = Json.parse(subjectString).as[Seq[JsObject]]
 

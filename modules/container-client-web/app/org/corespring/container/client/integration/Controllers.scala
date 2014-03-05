@@ -49,7 +49,7 @@ trait EditorControllers extends CommonControllers with ResourceControllers {
 }
 
 trait ProfileControllers {
-  def profile: Profile
+  def dataQuery: DataQuery
 }
 
 trait ContainerControllers extends RigControllers with PlayerControllers with EditorControllers with ProfileControllers {
@@ -64,5 +64,5 @@ trait ContainerControllers extends RigControllers with PlayerControllers with Ed
     player,
     editor,
     icons,
-    profile)
+    dataQuery)
 }

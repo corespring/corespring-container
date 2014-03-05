@@ -11,7 +11,7 @@ import org.corespring.shell.controllers.editor.actions.{ EditorActions => ShellE
 import org.corespring.shell.controllers.editor.{ ItemActions => ShellItemActions }
 import org.corespring.shell.controllers.player.actions.{ PlayerActions => ShellPlayerActions }
 import org.corespring.shell.controllers.player.{ SessionActions => ShellSessionActions }
-import org.corespring.shell.controllers.{ Profile => ShellProfile }
+import org.corespring.shell.controllers.{ ShellDataQuery => ShellProfile }
 import play.api.Configuration
 import play.api.mvc._
 import scala.Some
@@ -95,7 +95,7 @@ class ContainerClientImplementation(
     override def itemService: MongoService = ContainerClientImplementation.this.itemService
   }
 
-  override def profile: Profile = new ShellProfile()
+  override def dataQuery: DataQuery = new ShellProfile()
 }
 
 trait LoadJs {

@@ -2,7 +2,7 @@
   function DataQueryService ($http, $log) {
 
     function _call(topic, query, onSuccess, onFailure){
-      var url = "../../profile/" + topic;
+      var url = "../../data-query/" + topic;
 
       if(query){
        url += "?query=" + query;
