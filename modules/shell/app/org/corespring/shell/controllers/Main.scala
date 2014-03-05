@@ -29,7 +29,7 @@ trait Main extends Controller {
           val name = (json \ "profile" \ "taskInfo" \ "title").asOpt[String].getOrElse("?")
           val id = (json \ "_id" \ "$oid").as[String]
           val playerUrl = routes.Main.createSessionPage(id).url
-          val editorUrl = s"/client/editor/${id}/run"
+          val editorUrl = s"/client/editor/${id}/index.html"
           (name, id, playerUrl, editorUrl)
       }
 
