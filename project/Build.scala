@@ -219,7 +219,7 @@ object Build extends sbt.Build {
   private def cmd(name: Tuple3[String,String,String], base: File): Command = {
     Command.args(name._2, "<" + name._2 + "-command>") {
       (state, args) =>
-        val cmd = if (isWindows) s"${name._1}${name._2}${name._3}" else "${name._1}${name._2}"
+        val cmd = if (isWindows) s"${name._1}${name._2}${name._3}" else s"${name._1}${name._2}"
         val exitCode = Process(cmd :: args.toList, base) !;
         if (exitCode != 0) {
           throw new RuntimeException(s"$name._2, ${base.getPath} returned a non zero exit code")
