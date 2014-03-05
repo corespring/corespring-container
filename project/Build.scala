@@ -17,7 +17,6 @@ object Build extends sbt.Build {
   val npmCmd = if (isWindows) "npm.cmd" else "npm"
   val bowerCmd = "node ./node_modules/bower/bin/bower"
 
-
   object Dependencies {
     val specs2 = "org.specs2" %% "specs2" % "2.2.2" % "test"
     val commonsLang = "org.apache.commons" % "commons-lang3" % "3.2.1" % "test"
@@ -57,7 +56,6 @@ object Build extends sbt.Build {
   val builder = new Builders(org, ScalaVersion)
 
   lazy val utils = builder.lib("container-utils")
-
 
   val playAppToSbtLibSettings = Seq(
     scalaSource in Compile <<= (baseDirectory in Compile)(_ / "src" / "main" / "scala"),
@@ -185,7 +183,7 @@ object Build extends sbt.Build {
   val shell = builder.playApp("shell")
     .settings(
       resolvers ++= Resolvers.all,
-      libraryDependencies ++= Seq(logbackClassic,casbah, playS3, scalaz, play.Keys.cache, yuiCompressor, closureCompiler)).dependsOn(containerClientWeb, componentLoader, mongoJsonService, docs)
+      libraryDependencies ++= Seq(logbackClassic, casbah, playS3, scalaz, play.Keys.cache, yuiCompressor, closureCompiler)).dependsOn(containerClientWeb, componentLoader, mongoJsonService, docs)
     .aggregate(containerClientWeb, componentLoader, containerClient, componentModel, utils, jsProcessing, mongoJsonService, docs)
 
   val root = builder.playApp("root", Some("."))
@@ -209,17 +207,17 @@ object Build extends sbt.Build {
       commands <++= baseDirectory {
         base =>
           Seq(
-            ("./node_modules/grunt-cli/bin/", "grunt",""),
-            ("./node_modules/bower/bin/", "bower",""),
-            ("", "npm",".cmd")).map(cmd(_, (base / "modules" / "container-client")))
+            ("./node_modules/grunt-cli/bin/", "grunt", ""),
+            ("./node_modules/bower/bin/", "bower", ""),
+            ("", "npm", ".cmd")).map(cmd(_, (base / "modules" / "container-client")))
       })
     .dependsOn(shell)
     .aggregate(shell)
 
-  private def cmd(name: Tuple3[String,String,String], base: File): Command = {
+  private def cmd(name: Tuple3[String, String, String], base: File): Command = {
     Command.args(name._2, "<" + name._2 + "-command>") {
       (state, args) =>
-        val cmd = if (isWindows) s"${name._1}${name._2}${name._3}" else "${name._1}${name._2}"
+        val cmd = if (isWindows) s"${name._1}${name._2}${name._3}" else s"${name._1}${name._2}"
         val exitCode = Process(cmd :: args.toList, base) !;
         if (exitCode != 0) {
           throw new RuntimeException(s"$name._2, ${base.getPath} returned a non zero exit code")

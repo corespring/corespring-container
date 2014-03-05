@@ -4,8 +4,16 @@
     "taskInfo" : {
       "title": "Drag and drop example",
       "gradeLevel" : ["01", "03"],
-      "primarySubject" : "4ffb535f6bb41e469c0bf2a8",
-      "relatedSubject" : "4ffb535f6bb41e469c0bf2a9",
+      "primarySubject" : {
+        "id" : "4ffb535f6bb41e469c0bf2a8",
+        "subject" : "subject",
+        "category" : "category"
+        },
+      "relatedSubject" : {
+        "id" : "4ffb535f6bb41e469c0bf2a9",
+        "subject" : "subject",
+        "category" : "category"
+        },
       "itemType" : "arstConstructed Response - Short Answer"
     }
   },

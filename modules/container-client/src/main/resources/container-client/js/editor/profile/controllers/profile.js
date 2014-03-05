@@ -6,7 +6,7 @@ var controller = function ($scope, $log, ProfileService, DataQueryService) {
       callback(local);
     } else {
       DataQueryService.findOne(topic, id, function success(data){
-        callback({ id: data.id, text: subjectText(data)} );
+        callback(data);
       });
     }
   }
@@ -35,16 +35,18 @@ var controller = function ($scope, $log, ProfileService, DataQueryService) {
       $log.debug("query: ", query);
 
       DataQueryService.query( topic, query.term, function(result){
-
-        var formatted = _.map(result, function(r){
-          return { id: r.id, text: subjectText(r) };
-        });
-
-        $scope.queryResults[topic] = formatted;
-        query.callback({ results: formatted });
+        $scope.queryResults[topic] = result ;
+        query.callback({ results: result });
       });
     };
 
+    this.formatResult = function(e){
+      return subjectText(e);
+    };
+
+    this.formatSelection = function(e){
+      return subjectText(e);
+    };
 
     this.initSelection = function(element, callback) {
       $log.debug("init selection: ", element, callback);
