@@ -16,7 +16,7 @@
     "saxjs": "https://github.com/isaacs/sax-js.git",
     "bootstrap": "~3.1.0",
     "lodash": "~2.4.1",
-    "corespring-ng-components": "https://github.com/corespring/corespring-ng-components.git#v0.0.5",
+    "corespring-ng-components": "https://github.com/corespring/corespring-ng-components.git#v0.0.6",
     "ace-builds": "~1.1.1",
     "angular-ui-ace": "~0.1.0",
     "console-polyfill": "~0.1.0",
