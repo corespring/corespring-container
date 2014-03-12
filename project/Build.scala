@@ -206,21 +206,23 @@ object Build extends sbt.Build {
       },
       commands <++= baseDirectory {
         base =>
+          val clientDir = base / "modules" / "container-client"
           Seq(
-            ("./node_modules/grunt-cli/bin/", "grunt", ""),
-            ("./node_modules/bower/bin/", "bower", ""),
-            ("", "npm", ".cmd")).map(cmd(_, (base / "modules" / "container-client")))
+            ("grunt", "./node_modules/grunt-cli/bin/grunt", s"$clientDir\\lib\\grunt.cmd"),
+            ("bower", "./node_modules/bower/bin/bower", s"$clientDir\\lib\\bower.cmd"),
+            ("npm", "npm", "npm.cmd")
+          ).map((x: Tuple3[String,String,String]) => cmd(x._1, x._2, x._3, clientDir))
       })
     .dependsOn(shell)
     .aggregate(shell)
 
-  private def cmd(name: Tuple3[String, String, String], base: File): Command = {
-    Command.args(name._2, "<" + name._2 + "-command>") {
+  private def cmd(name:String, unixCmd:String, windowsCmd:String, base: File): Command = {
+    Command.args(name, "<" + name + "-command>") {
       (state, args) =>
-        val cmd = if (isWindows) s"${name._1}${name._2}${name._3}" else s"${name._1}${name._2}"
+        val cmd = if (isWindows) windowsCmd else unixCmd
         val exitCode = Process(cmd :: args.toList, base) !;
         if (exitCode != 0) {
-          throw new RuntimeException(s"$name._2, ${base.getPath} returned a non zero exit code")
+          throw new RuntimeException(s"${name}, ${base.getPath} returned a non zero exit code")
         }
         state
     }
