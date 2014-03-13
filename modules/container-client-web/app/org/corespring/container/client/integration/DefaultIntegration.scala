@@ -3,7 +3,7 @@ package org.corespring.container.client.integration
 import org.corespring.container.client.V2PlayerConfig
 import org.corespring.container.client.actions.{ PlayerLauncherActions, SessionActions, ItemActions, PlayerActions }
 import org.corespring.container.client.component.{ ComponentUrls, ComponentSplitter }
-import org.corespring.container.client.controllers.apps.{ Player, Editor, Rig }
+import org.corespring.container.client.controllers.apps.{ Player, Editor, Rig, Jen }
 import org.corespring.container.client.controllers.resources.{ Session, Item }
 import org.corespring.container.client.controllers.{ PlayerLauncher, ComponentsFileController, Icons }
 import org.corespring.container.components.model.Component
@@ -52,6 +52,15 @@ trait DefaultIntegration
   }
 
   lazy val editor = new Editor {
+
+    override def urls: ComponentUrls = componentUrls
+
+    override def components: Seq[Component] = DefaultIntegration.this.components
+
+    override def actions = editorActions
+  }
+
+  lazy val jen = new Jen {
 
     override def urls: ComponentUrls = componentUrls
 

@@ -49,3 +49,4 @@ POST       /editor/:itemId/*file                           @org.corespring.conta
 GET        /data-query/:topic                              @org.corespring.container.client.controllers.DataQuery.list(topic, query : Option[String] ?= None)
 GET        /data-query/:topic/:id                          @org.corespring.container.client.controllers.DataQuery.findOne(topic, id)
 
+GET        /jen/:itemId/index.html                         @org.corespring.container.client.controllers.apps.Jen.editItem(itemId:String)
