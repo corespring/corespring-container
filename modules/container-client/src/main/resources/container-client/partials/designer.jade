@@ -1,16 +1,9 @@
 .designer(ng-controller="Designer", ng-show="nav.isCurrentView('designer')")
   .item-list(is-new-item="{{isNewItem()}}")
 
-  //file-list(ng-model="model.files", select-file="selectFile(file)")
   .config(ng-class="editorMode")
-    div
-      .btn.btn-link.btn-sm(ng-click="editorMode='visual'",ng-class="{active: editorMode=='visual'}") Visual
-      .btn.btn-link.btn-sm(ng-click="switchToJsonView()",ng-class="{active: editorMode=='json'}") Json
-    div( ng-if="editorMode == 'json'", 
-      ng-model="$parent.selectedComponentJson", 
-      ui-ace="{useWrapMode: true, mode: 'json', onChange: jsonEditorChanged, onLoad: jsonEditorLoaded}", 
-      style="height: 100%; width: 100%")
-    config-pane#config(ng-if="editorMode == 'visual'",style="height: 100%; width: 100%")
+    wiggi-wiz(ng-model="$parent.selectedComponentJson",
+      style="position:relative; width: 100%; height; 100%")
 
   .welcome(ng-show="isNewItem()")
     .header
@@ -19,4 +12,7 @@
 
   //TODO: in ng-show below 'selectedFile' is bound to the file-preview selectedFile - not the outer one
   //Should be bound to the outer property.
-  div.selected-text-editor(ui-ace, ng-model="selectedFile.content", ui-ace="{useWrapMode: true}", ng-show="selectedFile.content != null")
+  div.selected-text-editor(ui-ace,
+    ng-model="selectedFile.content",
+    ui-ace="{useWrapMode: true}",
+    ng-show="selectedFile.content != null")

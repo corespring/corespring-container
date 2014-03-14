@@ -38,16 +38,17 @@ block content
           li(ng-repeat="entry in nav.navEntries", ng-class="entry.active")
             a(ng-click="nav.chooseNavEntry(entry.path)") {{entry.title}}
 
-      .col-md-6.container
-        button(ng-click="toggleNav()") toggle nav
-        button(ng-click="togglePreview()") toggle preview
+      .col-md-6
+        .container
+          button(ng-click="toggleNav()") toggle nav
+          button(ng-click="togglePreview()") toggle preview
 
-        .main-content
-          include partials/designer
-          include partials/item-profile
-          include partials/supporting-materials
-          include partials/view-player
-          include partials/overview
+          .main-content
+            include partials/designer
+            include partials/item-profile
+            include partials/supporting-materials
+            include partials/view-player
+            include partials/overview
 
       .col-md-4(ng-class="previewColumnHidden")
         .container
@@ -57,6 +58,7 @@ block content
 block scripts
 
   script(type="text/javascript",src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML")
+  script(type="text/javascript",src="../../components/wiggi-wiz/dist/wiggi-wiz.js")
 
   for p in editor
     script(src="#{p}", type="text/javascript")
@@ -86,7 +88,8 @@ block scripts
             'ui.ace',
             'cs.directives',
             'ngRoute',
-            'ui.select2'
+            'ui.select2',
+            'corespring.wiggi-wiz'
           ].concat(data.angular.dependencies);
 
           angular.module("corespring-editor", playerDeps)
