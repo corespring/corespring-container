@@ -3,7 +3,7 @@ extends layout
 block head
 
   link(rel="stylesheet", href="../../components/select2/select2.css")
-  link(rel="stylesheet", href="../../css/jen.css")
+  link(rel="stylesheet", href="../../css/new-editor.css")
 
   script(type="text/ng-template", id="add-component.html")
     .modal
@@ -39,10 +39,10 @@ block content
             a(ng-click="nav.chooseNavEntry(entry.path)") {{entry.title}}
 
       .col-md-6.container
-        .main-content
-          button(ng-click="toggleNav()") toggle nav
-          button(ng-click="togglePreview()") toggle preview
+        button(ng-click="toggleNav()") toggle nav
+        button(ng-click="togglePreview()") toggle preview
 
+        .main-content
           include partials/designer
           include partials/item-profile
           include partials/supporting-materials
@@ -51,7 +51,7 @@ block content
 
       .col-md-4(ng-class="previewColumnHidden")
         .container
-          p This is where the preview goes
+          include partials/player-preview
 
 
 block scripts
