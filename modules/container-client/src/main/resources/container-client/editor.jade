@@ -3,8 +3,7 @@ extends layout
 block head
 
   link(rel="stylesheet", href="../../components/select2/select2.css")
-
-  link(rel="stylesheet", href="../../css/new-editor.css")
+  link(rel="stylesheet", href="../../css/jen.css")
 
   script(type="text/ng-template", id="add-component.html")
     .modal
@@ -33,26 +32,26 @@ block head
 
 block content
   .root(ng-controller="Root")
-    //.main-nav
-    navbar.main-nav.navbar-default.navbar-fixed-top(role="navigation")
-      .container
-        a.navbar-brand(href="/")
+    .row
+      .col-md-2(ng-class="navColumnHidden")
+        ul.nav.nav-pills.nav-stacked
+          li(ng-repeat="entry in nav.navEntries", ng-class="entry.active")
+            a(ng-click="nav.chooseNavEntry(entry.path)") {{entry.title}}
 
-        //span.save-button.pull-right.btn.btn-sm.btn-primary(ng-click="save()") Save
-        .row  
-          tabset
-            tab(
-              ng-repeat="tab in tabs", 
-              select="choose(tab.path)", 
-              heading="{{tab.title}}", 
-              active="tab.active", 
-              disabled="tab.disabled")
+      .col-md-6.container
+        .main-content
+          button(ng-click="toggleNav()") toggle nav
+          button(ng-click="togglePreview()") toggle preview
 
-    .container
-      .main-content
-        include partials/designer
-        include partials/profile
-        include partials/supporting-materials
+          include partials/designer
+          include partials/item-profile
+          include partials/supporting-materials
+          include partials/view-player
+          include partials/overview
+
+      .col-md-4(ng-class="previewColumnHidden")
+        .container
+          p This is where the preview goes
 
 
 block scripts

@@ -1,4 +1,4 @@
-.designer(ng-controller="Designer", ng-show="show('designer')")
+.designer(ng-controller="Designer", ng-show="nav.isCurrentView('designer')")
   .item-list(is-new-item="{{isNewItem()}}")
     .main-header
       span.header-label My Items {{selectedComponent.id}}
