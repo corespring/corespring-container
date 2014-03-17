@@ -1,3 +1,5 @@
+/*global head:false */
+
 (function(root) {
 
   var ComponentDefinition = function(angular, compName, moduleName) {
@@ -17,20 +19,20 @@
      */
     this.initializeComponent = function() {
       var ngModule = loadAngularModule(moduleName);
-      var IE = (!!window.ActiveXObject && +(/msie\s(\d+)/i.exec(navigator.userAgent)[1])) || NaN;
+      var isIE8 = (head.browser.ie && head.browser.version < 9);
 
       if (this.directive) {
 
         if (_.isArray(this.directive)) {
           console.debug("[ComponentDefinition] initializeComponent ", moduleName, " - directive: " + compName);
-          if (IE < 9) {
+          if (isIE8) {
             document.createElement(_.toSnakeCase(compName));
           }
 
           ngModule.directive(compName, this.directive);
         } else if (_.isObject(this.directive)) {
           console.debug("[ComponentDefinition] initializeComponent ", moduleName, " - directive: " + this.directive.name);
-          if (IE < 9) {
+          if (isIE8) {
             document.createElement(_.toSnakeCase(this.directive.name));
           }
           ngModule.directive(this.directive.name, this.directive.directive);
@@ -50,7 +52,7 @@
             hasDefault = innerDef.name === undefined;
           }
           console.debug("[ComponentDefinition] initializeComponent ", moduleName, " - directive: " + name);
-          if (IE < 9) {
+          if (isIE8) {
             document.createElement(_.toSnakeCase(name));
           }
 
