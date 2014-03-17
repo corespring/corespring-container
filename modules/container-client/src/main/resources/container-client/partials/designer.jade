@@ -10,9 +10,4 @@
       | Welcome
     .cs-btn(ng-click="openChooser()") Add content
 
-  //TODO: in ng-show below 'selectedFile' is bound to the file-preview selectedFile - not the outer one
-  //Should be bound to the outer property.
-  div.selected-text-editor(ui-ace,
-    ng-model="selectedFile.content",
-    ui-ace="{useWrapMode: true}",
-    ng-show="selectedFile.content != null")
+
