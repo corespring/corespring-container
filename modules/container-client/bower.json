@@ -21,7 +21,8 @@
     "angular-ui-ace": "~0.1.0",
     "console-polyfill": "~0.1.0",
     "less-elements": "https://github.com/dmitryf/elements.git",
-    "mathjs": "~0.18.0"
+    "mathjs": "~0.18.0",
+    "es5-shim": "~2.3.0"
   },
   "devDependencies": {
     "angular-mocks": "~1.2.12",

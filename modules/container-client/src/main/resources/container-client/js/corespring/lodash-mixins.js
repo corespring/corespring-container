@@ -1,9 +1,9 @@
 /** Corespring lodash mixins */
 
 _.mixin({
-  "makeArray" : function(obj, keyName){
+  "makeArray": function(obj, keyName) {
 
-    if(_.isArray(obj)){
+    if (_.isArray(obj)) {
       return obj;
     }
 
@@ -11,12 +11,18 @@ _.mixin({
 
     var keys = _.keys(obj);
     var values = _.values(obj);
-    var labelled = _.map(keys, function(k){
+    var labelled = _.map(keys, function(k) {
       var o = {};
       o[keyName] = k;
       return o;
     });
 
     return _.merge(labelled, values);
+  },
+
+  "toSnakeCase": function(name) {
+    return name.replace(/([A-Z])/g, function(a, b) {
+      return "-" + b.toLowerCase();
+    });
   }
 });
