@@ -116,7 +116,7 @@ var controller = function ($scope, $log, ProfileService, DataQueryService) {
 };
 
 angular.module('corespring-editor.controllers')
-  .controller('Profile',
+  .controller('ItemProfile',
     ['$scope',
     '$log',
     'ProfileService',

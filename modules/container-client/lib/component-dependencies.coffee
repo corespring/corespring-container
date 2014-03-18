@@ -2,6 +2,9 @@ globule = require "globule"
 _ = require "lodash"
 fs = require "fs"
 sys = require('sys')
+os = require('os')
+
+
 
 
 puts = (error, stdout, stderr) -> 
@@ -9,8 +12,11 @@ puts = (error, stdout, stderr) ->
   sys.puts(error)
   sys.puts(stdout)
 
+isWindows = ->
+  puts('Platform ' + os.platform())
+  os.platform().indexOf("win") >= 0
 
-fileToJson = (p) -> 
+fileToJson = (p) ->
   contents = fs.readFileSync(p)
   JSON.parse(contents)
 
@@ -28,7 +34,8 @@ module.exports = (grunt) ->
     # target - may be undefined (if so ues the bower default target)
     # version - may be undefined (if so use the bower default version)
     bowerInstall = (name, target, version, done) ->
-      grunt.log.writeln(" bowerInstall > #{name}, #{target}, #{version}")
+      printVersion = version || 'using bower default version'
+      grunt.log.writeln(" bowerInstall > #{name}, #{target}, #{printVersion}")
 
       bowerName = ->
         out = "#{name}"
@@ -40,8 +47,10 @@ module.exports = (grunt) ->
       args.push("-V")
       args.push(bowerName())
 
+      bowerCmd = isWindows() ? ".\node_modules\bower\bin\bower" : "./node_modules/bower/bin/bower"
+
       exec = require('child_process').exec
-      cmd = "./node_modules/bower/bin/bower install #{args.join(" ")}"
+      cmd = bowerCmd + " install #{args.join(" ")}"
       grunt.log.debug("  bowerInstall cmd: #{cmd}")
       exec cmd, {cwd: '.'}, (err, stdout, stderr) ->
         grunt.log.debug(stdout)
@@ -89,6 +98,7 @@ module.exports = (grunt) ->
         name = d[0]
         target = d[1].bower_target
         version = d[1].version
+        printVersion = version || 'using bower default version'
 
         folder_exists = fs.existsSync("#{bowerDist}/#{name}")
 
@@ -96,9 +106,9 @@ module.exports = (grunt) ->
           grunt.log.writeln("#{name} already exists - skipping" )
           runInstall(defs, installationDone)
         else
-          grunt.log.writeln("|| runInstall :: #{name} --> #{target} --> #{version}")
+          grunt.log.writeln("|| runInstall :: #{name} --> #{target} --> #{printVersion}")
           bowerInstall name, target, version, ->
-            grunt.log.writeln("|| Finished > runInstall :: #{name} --> #{target} --> #{version}")
+            grunt.log.writeln("|| Finished > runInstall :: #{name} --> #{target} --> #{printVersion}")
             grunt.log.writeln("")
             runInstall(defs, installationDone)
       else

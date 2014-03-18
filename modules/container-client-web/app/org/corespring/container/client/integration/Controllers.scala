@@ -52,7 +52,12 @@ trait ProfileControllers {
   def dataQuery: DataQuery
 }
 
-trait ContainerControllers extends RigControllers with PlayerControllers with EditorControllers with ProfileControllers {
+trait ContainerControllers
+  extends RigControllers
+  with PlayerControllers
+  with EditorControllers
+  with ProfileControllers
+{
   def controllers: Seq[Controller] = Seq(
     componentUrls,
     assets,

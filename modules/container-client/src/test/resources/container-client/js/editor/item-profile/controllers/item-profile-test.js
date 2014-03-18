@@ -1,4 +1,4 @@
-describe('profile controller', function(){
+describe('item-profile controller', function(){
 
   var rootScope, ctrl;
 
@@ -53,7 +53,7 @@ describe('profile controller', function(){
   beforeEach(inject(function ($rootScope, $controller) {
     scope = $rootScope.$new();
     try {
-      ctrl = $controller('Profile', {$scope: scope});
+      ctrl = $controller('ItemProfile', {$scope: scope});
     } catch (e) {
       throw("Error with the controller: " + e);
     }

@@ -1,45 +1,29 @@
-var controller = function ($scope, $log, $location, ItemService, DataQueryService) {
+var controller = function ($scope, $log, $location, DataQueryService, ItemService, NavModelService) {
 
- 
+  function createToggle( property, initialValue ){
+    $scope[property] = initialValue;
+    return function(){
+      $scope[property] = $scope[property] ? "" : "hidden";
+    };
+  }
+
+  $scope.selectedComponentJson = {hi:"ralf"};
+
+  $scope.toggleNav = createToggle("navColumnHidden", "");
+  $scope.togglePreview = createToggle("previewColumnHidden", "hidden");
+
+  $scope.nav = NavModelService;
+
+  $scope.$on('$locationChangeSuccess', function(){
+    NavModelService.chooseNavEntry( $location.path() );
+  });
+
+  NavModelService.chooseNavEntry( $location.path() );
+
   $scope.itemId = (function(){
     //TODO: This is a temporary means of extracting the session id
     return document.location.pathname.match(/.*\/(.*)\/.*/)[1];
   })();
-
-  $scope.tabs = [
-    {
-      title: "Profile",
-      path: "/profile",
-      active: false
-    },
-    {
-      title: "Designer",
-      path: "/designer",
-      active: false 
-    },
-     {
-      title: "Supporting Materials",
-      path: "/supporting-materials",
-      active: false 
-    }
-  ];
-
-  $scope.show = function(name){
-    return $location.path() === "/" + name;
-  };
-
-  $scope.choose = function(t) {
-
-    $log.debug("!! choose -> ", t);
-    _.forEach($scope.tabs, function(t){
-      t.active = false;
-    });
-
-    var newCurrent = _.find($scope.tabs, function(tab){return tab.path === t;}) || $scope.tabs[0];
-    $scope.currentTab = newCurrent;
-    $scope.currentTab.active = true;
-    $location.path($scope.currentTab.path);
-  };
 
   $scope.onItemLoaded = function (data) {
     $scope.allData = data;
@@ -71,12 +55,6 @@ var controller = function ($scope, $log, $location, ItemService, DataQueryServic
 
   });
 
-
-  $scope.$on('$locationChangeSuccess', function(){
-    $scope.choose( $location.path() );
-  });
-  $scope.choose( $location.path() );
-
   ItemService.load($scope.onItemLoaded, $scope.onItemLoadError, $scope.itemId);
 };
 
@@ -85,6 +63,7 @@ angular.module('corespring-editor.controllers')
     ['$scope',
       '$log',
       '$location',
-      'ItemService',
       'DataQueryService',
+      'ItemService',
+      'NavModelService',
       controller]);
