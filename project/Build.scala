@@ -211,7 +211,7 @@ object Build extends sbt.Build {
             ("grunt", "./node_modules/grunt-cli/bin/grunt", s"$clientDir\\lib\\grunt.cmd"),
             ("bower", "./node_modules/bower/bin/bower", s"$clientDir\\lib\\bower.cmd"),
             ("npm", "npm", "npm.cmd")
-          ).map((x: Tuple3[String,String,String]) => cmd(x._1, x._2, x._3, clientDir))
+          ).map((x: (String,String,String)) => cmd(x._1, x._2, x._3, clientDir))
       })
     .dependsOn(shell)
     .aggregate(shell)
