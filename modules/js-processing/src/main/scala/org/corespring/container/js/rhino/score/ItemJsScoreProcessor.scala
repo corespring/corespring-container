@@ -1,9 +1,9 @@
-package org.corespring.container.js.score.rhino
+package org.corespring.container.js.rhino.score
 
 import org.corespring.container.components.outcome.ScoreProcessor
-import org.corespring.container.js.ItemAuthorOverride
 import play.api.Logger
 import play.api.libs.json.{ Json, JsValue }
+import org.corespring.container.js.rhino.ItemAuthorOverride
 
 object ItemJsScoreProcessor extends ScoreProcessor {
 

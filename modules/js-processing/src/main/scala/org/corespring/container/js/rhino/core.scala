@@ -1,4 +1,4 @@
-package org.corespring.container.js
+package org.corespring.container.js.rhino
 
 import java.io.{ InputStreamReader, Reader }
 import org.mozilla.javascript.tools.shell.Global

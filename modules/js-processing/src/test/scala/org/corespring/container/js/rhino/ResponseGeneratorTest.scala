@@ -1,4 +1,4 @@
-package org.corespring.container.js.response.rhino
+package org.corespring.container.js.rhino
 
 import org.mozilla.javascript.{ Function => RhinoFunction }
 import org.specs2.matcher.Matcher
@@ -38,8 +38,17 @@ class ResponseGeneratorTest extends Specification {
     val beRightResponse: Matcher[(String, String, String)] = (set: (String, String, String)) => {
       val (value, expectedCorrectness, expectedFeedback) = set
       val answer = Json.obj("value" -> value)
-      val generator = new OutcomeGenerator("comp", respondJs, Seq.empty)
-      val response = generator.createOutcome(question, answer, JsObject(Seq.empty), JsObject(Seq.empty))
+
+      val componentServer: ComponentServerLogic = new ComponentServerLogic {
+
+        override def componentType: String = "comp"
+
+        override def js: String = respondJs
+
+        override def componentLibs: Seq[(String, String)] = Seq.empty
+      }
+
+      val response = componentServer.createOutcome(question, answer, JsObject(Seq.empty), JsObject(Seq.empty))
       (response \ "correctness").as[String] === expectedCorrectness
       (response \ "studentResponse" \ "value").as[String] === value.toString
       val feedback: Seq[JsValue] = (response \ "feedback").as[Seq[JsValue]]

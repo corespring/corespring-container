@@ -1,4 +1,4 @@
-package org.corespring.container.js.processing.rhino
+package org.corespring.container.js.rhino
 
 import org.corespring.container.components.model.{ Server, UiComponent, Client }
 import org.specs2.mutable.Specification
@@ -44,7 +44,7 @@ class PlayerItemPreProcessorTest extends Specification {
             "itemSession" -> Json.obj("value" -> "2"),
             "stash" -> Json.obj())))
 
-      val processor = new PlayerItemPreProcessor(Seq(component), Seq.empty)
+      val processor = new RhinoPlayerItemPreProcessor(Seq(component), Seq.empty)
       val result = processor.preProcessItemForPlayer(item, session)
       (result \ "components" \ "1" \ "dummy").as[String] === "something"
       (result \ "components" \ "1" \ "model").as[String] === "someModel"
@@ -73,7 +73,7 @@ class PlayerItemPreProcessorTest extends Specification {
             "correctResponse" -> Json.obj(
               "value" -> "1"))))
 
-      val processor = new PlayerItemPreProcessor(Seq(component), Seq.empty)
+      val processor = new RhinoPlayerItemPreProcessor(Seq(component), Seq.empty)
 
       try {
         processor.preProcessItemForPlayer(item, Json.obj())

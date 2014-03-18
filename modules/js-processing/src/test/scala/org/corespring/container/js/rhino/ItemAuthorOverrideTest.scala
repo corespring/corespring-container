@@ -1,4 +1,4 @@
-package org.corespring.container.js
+package org.corespring.container.js.rhino
 
 import org.specs2.mutable.Specification
 import play.api.libs.json.{ JsString, JsObject, Json }
