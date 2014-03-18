@@ -12,9 +12,6 @@ puts = (error, stdout, stderr) ->
   sys.puts(error)
   sys.puts(stdout)
 
-isWindows = ->
-  puts('Platform ' + os.platform())
-  os.platform().indexOf("win") >= 0
 
 fileToJson = (p) ->
   contents = fs.readFileSync(p)
@@ -30,6 +27,12 @@ mergeItems = (accumulator, obj) -> _.merge(accumulator, obj)
 
 module.exports = (grunt) ->
   ->
+
+    isWindows = ->
+      pltfrm = os.platform()
+      isWin = /^win/.test(pltfrm) 
+      grunt.log.writeln("[isWindows] Platform #{os.platform()} #{isWin}")
+      isWin
 
     # target - may be undefined (if so ues the bower default target)
     # version - may be undefined (if so use the bower default version)
@@ -47,8 +50,9 @@ module.exports = (grunt) ->
       args.push("-V")
       args.push(bowerName())
 
-      bowerCmd = if isWindows() then  ".\node_modules\bower\bin\bower" else "./node_modules/bower/bin/bower"
-
+      bowerCmd = if isWindows() then ".\node_modules\bower\bin\bower" else "./node_modules/bower/bin/bower"
+      grunt.log.debug("is windows? #{isWindows()}")
+      grunt.log.debug("bower command is now: #{bowerCmd}")
       exec = require('child_process').exec
       cmd = bowerCmd + " install #{args.join(" ")}"
       grunt.log.debug("  bowerInstall cmd: #{cmd}")
