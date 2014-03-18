@@ -7,7 +7,7 @@ var controller = function ($scope, $log, $location, DataQueryService, ItemServic
     };
   }
 
-  $scope.selectedComponentJson = {hi:"ralf"};
+  $scope.xhtml = '<div> hello</div><color-box color="00ff00"></color-box>';
 
   $scope.toggleNav = createToggle("navColumnHidden", "");
   $scope.togglePreview = createToggle("previewColumnHidden", "hidden");
