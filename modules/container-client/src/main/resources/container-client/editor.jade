@@ -32,27 +32,24 @@ block head
 
 block content
   .root(ng-controller="Root")
-    .row
-      .col-md-2(ng-class="navColumnHidden")
-        ul.nav.nav-pills.nav-stacked
-          li(ng-repeat="entry in nav.navEntries", ng-class="entry.active")
-            a(ng-click="nav.chooseNavEntry(entry.path)") {{entry.title}}
+    .div(ng-class="navColumnHidden", style="width:200px")
+      ul.nav.nav-pills.nav-stacked
+        li(ng-repeat="entry in nav.navEntries", ng-class="entry.active")
+          a(ng-click="nav.chooseNavEntry(entry.path)") {{entry.title}}
 
-      .col-md-6
-        .container
-          button(ng-click="toggleNav()") toggle nav
-          button(ng-click="togglePreview()") toggle preview
+    .div(style="position:absolute; left: 202px; top: 0; width:800px")
+      button(ng-click="toggleNav()") toggle nav
+      button(ng-click="togglePreview()") toggle preview
 
-          .main-content
-            include partials/designer
-            include partials/item-profile
-            include partials/supporting-materials
-            include partials/view-player
-            include partials/overview
+      .main-content
+        include partials/designer
+        include partials/item-profile
+        include partials/supporting-materials
+        include partials/view-player
+        include partials/overview
 
-      .col-md-4(ng-class="previewColumnHidden")
-        .container
-          include partials/player-preview
+    .div(ng-class="previewColumnHidden", style="position:absolute; left: 1004px; top: 0; width:600px")
+      include partials/player-preview
 
 
 block scripts
