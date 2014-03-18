@@ -47,7 +47,7 @@ module.exports = (grunt) ->
       args.push("-V")
       args.push(bowerName())
 
-      bowerCmd = isWindows() ? ".\node_modules\bower\bin\bower" : "./node_modules/bower/bin/bower"
+      bowerCmd = if isWindows() then  ".\node_modules\bower\bin\bower" else "./node_modules/bower/bin/bower"
 
       exec = require('child_process').exec
       cmd = bowerCmd + " install #{args.join(" ")}"
