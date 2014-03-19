@@ -3,7 +3,7 @@ var controller = function($scope, $compile, $http, $timeout, $modal, $log, Desig
 
   $scope.showComponentsPanel = false;
 
-  $scope.lastId = 0;
+  $scope.lastId = 10;
 
   $scope.extraFeatures = [
 
@@ -14,7 +14,7 @@ var controller = function($scope, $compile, $http, $timeout, $modal, $log, Desig
       //insertMode: 'node', //Insert after node that contains the caret - note: this isn't configured yet
       addToEditor: function() {
         var id = ++$scope.lastId;
-        ComponentRegister.components[id] = {
+        $scope.item.components[id] = {
           "componentType": "corespring-multiple-choice",
           "title": "Fruits",
           "weight": 10,
@@ -62,8 +62,12 @@ var controller = function($scope, $compile, $http, $timeout, $modal, $log, Desig
         );
       },
       getMarkUp: function($node, $scope) {
-        var childScope = $scope.$$childHead;
-        var id = childScope.id || 1;
+        var id;
+        if ($scope && $scope.$$childHead) {
+          id = $scope.$$childHead.id;
+        } else {
+          id = $node.attr('id');
+        }
         return '<corespring-multiple-choice id="' + id + '"></corespring-multiple-choice>';
       }
     }
