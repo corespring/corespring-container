@@ -10,19 +10,34 @@
     flex-direction: row;
 
     .nav-container {
-      width:200px;
+      flex:200;
+      -webkit-flex:200;
       height:100%;
       padding:5px;
       background-color:#fafafa;
+      -webkit-transition: 1s all;
+      -moz-transition: 1s all;
+      -ms-transition: 1s all;
+      transition: 1s all;
+    }
+
+    .nav-container.hiddenX {
+      overflow: hidden;
+      flex:0.1;
+      -webkit-flex:0.1;
     }
 
     .content-container {
-      width:1200px;
+      flex:1200;
+      -webkit-flex:1200;
       height:100%;
       padding:5px;
       background-color:#fafafa;
+      -webkit-transition: 0.7s all;
+      -moz-transition: 0.7s all;
+      -ms-transition: 0.7s all;
+      transition: 0.7s all;
     }
-
   }
 
   .nav-toggle {

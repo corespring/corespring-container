@@ -3,7 +3,7 @@ var controller = function ($scope, $log, $location, DataQueryService, ItemServic
   function createToggle( property, initialValue ){
     $scope[property] = initialValue;
     return function(){
-      $scope[property] = $scope[property] ? "" : "hidden";
+      $scope[property] = $scope[property] ? "" : "hiddenX";
     };
   }
 
