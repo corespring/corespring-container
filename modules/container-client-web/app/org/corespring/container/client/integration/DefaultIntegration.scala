@@ -13,6 +13,7 @@ import org.corespring.container.components.response.OutcomeProcessor
 import play.api.mvc.AnyContent
 import org.corespring.container.client.integration.validation.Validator
 import org.corespring.container.js.rhino.score.ItemJsScoreProcessor
+import org.corespring.container.js.rhino.{ RhinoOutcomeProcessor, RhinoPlayerItemPreProcessor }
 
 trait DefaultIntegration
   extends ContainerControllers
@@ -26,11 +27,11 @@ trait DefaultIntegration
     Validator.absolutePathInProdMode(componentsPath)
   }
 
-  override def playerItemPreProcessor: PlayerItemPreProcessor = new PlayerItemPreProcessor(uiComponents, libraries)
+  override def playerItemPreProcessor: PlayerItemPreProcessor = new RhinoPlayerItemPreProcessor(uiComponents, libraries)
 
   override def scoreProcessor: ScoreProcessor = new ScoreProcessorSequence(DefaultScoreProcessor, ItemJsScoreProcessor)
 
-  override def outcomeProcessor: OutcomeProcessor = new OutcomeProcessor(uiComponents, libraries)
+  override def outcomeProcessor: OutcomeProcessor = new RhinoOutcomeProcessor(uiComponents, libraries)
 
   lazy val rig = new Rig {
 
