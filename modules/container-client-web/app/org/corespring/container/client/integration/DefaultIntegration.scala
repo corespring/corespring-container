@@ -10,11 +10,10 @@ import org.corespring.container.components.model.Component
 import org.corespring.container.components.outcome.{ DefaultScoreProcessor, ScoreProcessorSequence, ScoreProcessor }
 import org.corespring.container.components.processing.PlayerItemPreProcessor
 import org.corespring.container.components.response.OutcomeProcessor
-import org.corespring.container.js.processing.rhino.{ PlayerItemPreProcessor => RhinoPreProcessor }
-import org.corespring.container.js.response.rhino.{ OutcomeProcessor => RhinoOutcomeProcessor }
-import org.corespring.container.js.score.rhino.ItemJsScoreProcessor
 import play.api.mvc.AnyContent
 import org.corespring.container.client.integration.validation.Validator
+import org.corespring.container.js.rhino.score.ItemJsScoreProcessor
+import org.corespring.container.js.rhino.{ RhinoOutcomeProcessor, RhinoPlayerItemPreProcessor }
 
 trait DefaultIntegration
   extends ContainerControllers
@@ -28,7 +27,7 @@ trait DefaultIntegration
     Validator.absolutePathInProdMode(componentsPath)
   }
 
-  override def playerItemPreProcessor: PlayerItemPreProcessor = new RhinoPreProcessor(uiComponents, libraries)
+  override def playerItemPreProcessor: PlayerItemPreProcessor = new RhinoPlayerItemPreProcessor(uiComponents, libraries)
 
   override def scoreProcessor: ScoreProcessor = new ScoreProcessorSequence(DefaultScoreProcessor, ItemJsScoreProcessor)
 

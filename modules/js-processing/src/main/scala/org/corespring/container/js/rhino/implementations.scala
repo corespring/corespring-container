@@ -1,8 +1,12 @@
-package org.corespring.container.js
+package org.corespring.container.js.rhino
 
+import org.corespring.container.js.api.{ ComponentServerLogic => ApiComponentServerLogic, ItemAuthorOverride => ApiItemAuthorOverride, GetServerLogic }
 import org.mozilla.javascript.{ Function => RhinoFunction }
 import org.mozilla.javascript.{ Scriptable, Context }
 import play.api.libs.json._
+import org.corespring.container.js.processing.PlayerItemPreProcessor
+import org.corespring.container.components.model.{ UiComponent, Library }
+import org.corespring.container.js.response.OutcomeProcessor
 
 trait CorespringJs {
 
@@ -26,7 +30,8 @@ trait CorespringJs {
 }
 
 trait ItemAuthorOverride
-  extends JsContext
+  extends ApiItemAuthorOverride
+  with JsContext
   with JsFunctionCalling
   with CorespringJs {
 
@@ -53,7 +58,8 @@ trait ItemAuthorOverride
 }
 
 trait ComponentServerLogic
-  extends JsContext
+  extends ApiComponentServerLogic
+  with JsContext
   with JsFunctionCalling
   with CorespringJs {
 
@@ -107,3 +113,22 @@ trait ComponentServerLogic
       jsonResult
   }
 }
+
+trait RhinoGetServerLogic extends GetServerLogic {
+
+  override def serverLogic(compType: String, definition: String, libraries: Seq[Library]): ApiComponentServerLogic = new ComponentServerLogic {
+
+    override def componentType: String = compType
+
+    override def js: String = definition
+
+    override def componentLibs: Seq[(String, String)] = toNameAndSource(libraries)
+
+    def toNameAndSource(s: Seq[Library]): Seq[(String, String)] = s.map(l => l.server.map(s => (s.name, s.source))).flatten
+  }
+}
+
+class RhinoOutcomeProcessor(val components: Seq[UiComponent], val libraries: Seq[Library]) extends OutcomeProcessor with RhinoGetServerLogic
+
+class RhinoPlayerItemPreProcessor(val components: Seq[UiComponent], val libraries: Seq[Library]) extends PlayerItemPreProcessor with RhinoGetServerLogic
+

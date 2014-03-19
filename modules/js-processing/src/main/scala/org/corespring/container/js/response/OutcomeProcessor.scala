@@ -1,17 +1,24 @@
-package org.corespring.container.js.response.rhino
+package org.corespring.container.js.response
 
 import org.corespring.container.components.model.{ UiComponent, Library }
 import org.corespring.container.components.response.{ OutcomeProcessor => ContainerOutcomeProcessor }
 import org.slf4j.LoggerFactory
 import play.api.libs.json.{ Json, JsObject, JsValue }
+import org.corespring.container.js.api.GetServerLogic
 
 trait Target {
-
   def targetId(question: JsValue) = (question \ "target" \ "id").asOpt[String]
   def hasTarget(question: JsValue) = targetId(question).isDefined
 }
 
-class OutcomeProcessor(components: Seq[UiComponent], libraries: Seq[Library]) extends ContainerOutcomeProcessor with Target {
+trait OutcomeProcessor
+  extends ContainerOutcomeProcessor
+  with Target
+  with GetServerLogic {
+
+  def components: Seq[UiComponent]
+
+  def libraries: Seq[Library]
 
   private lazy val logger = LoggerFactory.getLogger("components.outcome")
 
@@ -32,8 +39,8 @@ class OutcomeProcessor(components: Seq[UiComponent], libraries: Seq[Library]) ex
           answer.map {
             a =>
               val componentLibraries: Seq[Library] = component.libraries.map(id => libraries.find(l => l.id.matches(id))).flatten
-              val generator = new OutcomeGenerator(component.componentType, component.server.definition, componentLibraries)
-              val outcome = generator.createOutcome(question, a, settings, targetOutcome)
+              val serverComponent = serverLogic(component.componentType, component.server.definition, componentLibraries)
+              val outcome = serverComponent.createOutcome(question, a, settings, targetOutcome)
               logger.trace(s"outcome: $outcome")
               (id -> outcome)
           }.getOrElse {

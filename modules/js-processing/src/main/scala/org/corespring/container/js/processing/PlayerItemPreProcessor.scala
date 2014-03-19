@@ -1,13 +1,14 @@
-package org.corespring.container.js.processing.rhino
+package org.corespring.container.js.processing
 
 import org.corespring.container.components.model.{ Library, UiComponent }
 import org.corespring.container.components.processing.{ PlayerItemPreProcessor => PreProcessor }
-import org.slf4j.LoggerFactory
+import org.corespring.container.js.api.GetServerLogic
 import play.api.libs.json._
 
-class PlayerItemPreProcessor(components: Seq[UiComponent], libraries: Seq[Library]) extends PreProcessor {
+trait PlayerItemPreProcessor extends PreProcessor with GetServerLogic {
 
-  private lazy val logger = LoggerFactory.getLogger("components.processing")
+  def components: Seq[UiComponent]
+  def libraries: Seq[Library]
 
   def preProcessItemForPlayer(item: JsValue, settings: JsValue): JsValue = {
 
@@ -28,11 +29,10 @@ class PlayerItemPreProcessor(components: Seq[UiComponent], libraries: Seq[Librar
             (id, question)
           } else {
             val componentLibraries: Seq[Library] = component.libraries.map(id => libraries.find(l => l.id.matches(id))).flatten
-            val processorServerLogic = new ItemProcessorServerLogic(component.componentType, component.server.definition, componentLibraries)
-            (id, processorServerLogic.preProcessItem(question, settings))
+            val serverComponent = serverLogic(component.componentType, component.server.definition, componentLibraries)
+            (id, serverComponent.preProcessItem(question, settings))
           }
       }.getOrElse((id, JsObject(Seq.empty)))
-
     }
 
     val componentQuestions = (item \ "components").as[JsObject]

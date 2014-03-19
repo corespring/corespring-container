@@ -1,6 +1,7 @@
-package org.corespring.container.js.response.rhino
+package org.corespring.container.js.rhino
 
 import org.corespring.container.components.model.{ Client, UiComponent, Server }
+import org.corespring.container.js.response.Target
 import org.specs2.mutable.Specification
 import play.api.libs.json.{ JsString, Json }
 
@@ -75,7 +76,7 @@ class OutcomeProcessorTest extends Specification {
           "2" -> Json.obj(
             "answers" -> Json.obj())))
 
-      val processor = new OutcomeProcessor(Seq(component, feedback), Seq.empty)
+      val processor = new RhinoOutcomeProcessor(Seq(component, feedback), Seq.empty)
       val result = processor.createOutcome(item, session, Json.obj())
       (result \ "1" \ "correctness").as[String] === "incorrect"
       (result \ "2" \ "targetOutcome" \ "correctness").as[String] === "incorrect"

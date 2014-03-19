@@ -1,4 +1,4 @@
-package org.corespring.container.js.score.rhino
+package org.corespring.container.js.rhino.score
 
 import org.apache.commons.lang3.StringEscapeUtils
 import org.specs2.mutable.Specification
