@@ -1,0 +1,48 @@
+.root {
+
+  .row-container {
+    position:relative;
+    height:1000px;
+    width:1500px;
+    display: -webkit-flex;
+    -webkit-flex-direction: row;
+    display: flex;
+    flex-direction: row;
+
+    .nav-container {
+      width:200px;
+      height:100%;
+      padding:5px;
+      background-color:#fafafa;
+    }
+
+    .content-container {
+      width:1200px;
+      height:100%;
+      padding:5px;
+      background-color:#fafafa;
+    }
+
+  }
+
+  .nav-toggle {
+    background: #2693BA;
+    background-image: url('../images/menu-toggle.png');
+    background-repeat: no-repeat;
+    background-position: 13px 9px;
+    height: 40px;
+    max-height: 40px;
+    max-width: 50px;
+    min-width: 50px;
+    border: 0;
+    border-radius: 4px;
+  }
+
+  .nav-pills {
+    li.active {
+      a, a:focus, a:hover {
+        background-color: #2693BA;
+      }
+    }
+  }
+}

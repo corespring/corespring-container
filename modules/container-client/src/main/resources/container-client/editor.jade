@@ -34,26 +34,23 @@ block head
 block content
   .root(ng-controller="Root")
 
-    div(style="position:relative; height:1000px; min-width:1500px;")
+    .row-container
 
-      div(ng-class="navColumnHidden", style="float:left; width:200px; height:100%; padding:5px;")
+      //add animation
+      .nav-container(ng-class="navColumnHidden")
         ul.nav.nav-pills.nav-stacked
           li(ng-repeat="entry in nav.navEntries", ng-class="entry.active")
             a(ng-click="nav.chooseNavEntry(entry.path)") {{entry.title}}
 
-      div(style="float:left; width:800px; padding:5px;")
-        button(ng-click="toggleNav()") toggle nav
+      .content-container
+        //make it a hamburger button
+        button.nav-toggle(ng-click="toggleNav()")
         .main-content(style="padding-top: 10px")
           include partials/designer
           include partials/item-profile
           include partials/supporting-materials
           include partials/view-player
           include partials/overview
-
-      div(style="float:left; width:400px; height: 100%; padding:5px; background-color:#fffffa;")
-        button(ng-click="togglePreview()") toggle preview
-        .container-fluid(ng-class="previewColumnHidden", style="height:100%")
-          include partials/player-preview
 
 block scripts
 
