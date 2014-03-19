@@ -3,8 +3,8 @@ var controller = function($scope, $compile, $http, $timeout, $modal, $log, Desig
 
   $scope.showComponentsPanel = false;
 
-
   $scope.lastId = 0;
+
   $scope.extraFeatures = [
 
     {
@@ -53,17 +53,18 @@ var controller = function($scope, $compile, $http, $timeout, $modal, $log, Desig
         $log.debug('[editInstance]', $node);
 
         var id = $node.attr('id');
+        $log.debug("Id: ", id);
         editor.launchDialog(ComponentRegister.components[id],
           'Edit multi choice!',
-          '<div style="height: 100px;"><multi-choice-dialog></multi-choice-dialog></div>',
+          '<div style="height: 100px;"><corespring-multiple-choice-config id="' + id + '"></corespring-multiple-choice-config></div>',
           function onUpdate(update) {
           }
         );
       },
       getMarkUp: function($node, $scope) {
         var childScope = $scope.$$childHead;
-        var id = childScope.id || 4;
-        return '<corespring-multiple-choice id="'+id+'"></corespring-multiple-choice>';
+        var id = childScope.id || 1;
+        return '<corespring-multiple-choice id="' + id + '"></corespring-multiple-choice>';
       }
     }
   ];
@@ -82,6 +83,7 @@ var controller = function($scope, $compile, $http, $timeout, $modal, $log, Desig
       templateUrl: 'add-component.html',
       controller: AddContentModalController,
       backdrop: true,
+      scope: $scope,
       resolve: {
         componentSet: function() {
           return $scope.componentSet;
@@ -165,11 +167,11 @@ var controller = function($scope, $compile, $http, $timeout, $modal, $log, Desig
     return $scope.item.components[id];
   };
 
-  $scope.registerConfigPanel = function(id, component) {
-    console.log("registerConfigPanel:", id);
+  $scope.$on('registerConfigPanel', function(a, id, component) {
+    console.log("registerConfigPanel:", id, component);
     configPanels[id] = component;
     component.setModel($scope.item.components[id]);
-  };
+  });
 
   $scope.save = function() {
     console.log("Saving: ");
