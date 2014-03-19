@@ -27,7 +27,7 @@ var controller = function ($scope, $log, $location, DataQueryService, ItemServic
 
   $scope.onItemLoaded = function (data) {
     $scope.allData = data;
-    $log.debug("item loaded: " + $scope.allData);
+    $scope.item = data.item;
   };
 
   $scope.onItemLoadError = function (error) {
