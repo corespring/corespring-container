@@ -3,12 +3,11 @@ var controller = function ($scope, $log, $location, DataQueryService, ItemServic
   function createToggle( property, initialValue ){
     $scope[property] = initialValue;
     return function(){
-      $scope[property] = $scope[property] ? "" : "hiddenX";
+      $scope[property] = $scope[property] ? "" : "collapsed";
     };
   }
 
-  $scope.toggleNav = createToggle("navColumnHidden", "");
-  $scope.togglePreview = createToggle("previewColumnHidden", "hidden");
+  $scope.toggleNav = createToggle("navContainerCollapsed", "");
 
   $scope.nav = NavModelService;
 

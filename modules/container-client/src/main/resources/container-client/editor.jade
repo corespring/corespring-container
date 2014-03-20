@@ -36,8 +36,7 @@ block content
 
     .row-container
 
-      //add animation
-      .nav-container(ng-class="navColumnHidden")
+      nav-container(ng-class="navContainerCollapsed")
         ul.nav.nav-pills.nav-stacked
           li(ng-repeat="entry in nav.navEntries", ng-class="entry.active")
             a(ng-click="nav.chooseNavEntry(entry.path)") {{entry.title}}

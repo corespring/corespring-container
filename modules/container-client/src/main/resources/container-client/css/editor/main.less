@@ -1,42 +1,37 @@
 .root {
 
   .row-container {
-    position:relative;
     height:1000px;
     width:1500px;
-    display: -webkit-flex;
-    -webkit-flex-direction: row;
+
     display: flex;
+    display: -webkit-flex;
     flex-direction: row;
+    -webkit-flex-direction: row;
 
     .nav-container {
-      flex:200;
-      -webkit-flex:200;
+      flex:0 0 200px;
+      -webkit-flex:0 0 200px;
+      transition: all .6s;
+      -webkit-transition: all .6s;
       height:100%;
       padding:5px;
       background-color:#fafafa;
-      -webkit-transition: 1s all;
-      -moz-transition: 1s all;
-      -ms-transition: 1s all;
-      transition: 1s all;
+      overflow: hidden;
     }
 
-    .nav-container.hiddenX {
-      overflow: hidden;
-      flex:0.1;
-      -webkit-flex:0.1;
+    .nav-container.collapsed {
+      flex-basis: 0px;
+      -webkit-flex-basis: 0px;
+      padding:5px 0px 5px 0px;
     }
 
     .content-container {
-      flex:1200;
-      -webkit-flex:1200;
+      -webkit-flex:1 0 1200px;
+      flex:1 0 1200px;
       height:100%;
       padding:5px;
       background-color:#fafafa;
-      -webkit-transition: 0.7s all;
-      -moz-transition: 0.7s all;
-      -ms-transition: 0.7s all;
-      transition: 0.7s all;
     }
   }
 
