@@ -1,13 +1,14 @@
 var controller = function ($scope, $log, $location, DataQueryService, ItemService, NavModelService) {
 
   function createToggle( property, initialValue ){
-    $scope[property] = initialValue;
+    $scope[property] = !!initialValue ? 'collapsed' : '';
     return function(){
       $scope[property] = $scope[property] ? "" : "collapsed";
     };
   }
 
-  $scope.toggleNav = createToggle("navContainerCollapsed", "");
+  $scope.toggleNav = createToggle("navContainerCollapsed", false);
+  $scope.togglePreview = createToggle("previewContainerCollapsed", true);
 
   $scope.nav = NavModelService;
 

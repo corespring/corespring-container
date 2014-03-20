@@ -34,15 +34,17 @@ block head
 block content
   .root(ng-controller="Root")
 
+    .logo
+      img(src="/assets/images/logo-retina-200.png")
+
     .row-container
 
-      nav-container(ng-class="navContainerCollapsed")
+      .nav-container(ng-class="navContainerCollapsed")
         ul.nav.nav-pills.nav-stacked
           li(ng-repeat="entry in nav.navEntries", ng-class="entry.active")
             a(ng-click="nav.chooseNavEntry(entry.path)") {{entry.title}}
 
       .content-container
-        //make it a hamburger button
         button.nav-toggle(ng-click="toggleNav()")
         .main-content(style="padding-top: 10px")
           include partials/designer
@@ -50,6 +52,14 @@ block content
           include partials/supporting-materials
           include partials/view-player
           include partials/overview
+
+      .preview-container(ng-show="nav.isCurrentView('designer')")
+        button.preview-toggle(ng-click="togglePreview()") Toggle Preview
+        .container-fluid(ng-class="previewContainerCollapsed", style="height: 100%; padding: 4px 0 0 0;")
+          include partials/client-side-preview
+
+
+
 
 block scripts
 

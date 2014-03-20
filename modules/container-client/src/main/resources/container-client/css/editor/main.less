@@ -2,7 +2,7 @@
 
   .row-container {
     height:1000px;
-    width:1500px;
+    width:1900px;
 
     display: flex;
     display: -webkit-flex;
@@ -16,7 +16,6 @@
       -webkit-transition: all .6s;
       height:100%;
       padding:5px;
-      background-color:#fafafa;
       overflow: hidden;
     }
 
@@ -27,12 +26,31 @@
     }
 
     .content-container {
-      -webkit-flex:1 0 1200px;
-      flex:1 0 1200px;
+      width: 800px;
       height:100%;
       padding:5px;
-      background-color:#fafafa;
     }
+
+    .preview-container {
+      height:100%;
+      width: 600px;
+      padding:5px;
+    }
+
+    .preview-container .collapsed {
+      display: none;
+    }
+
+  }
+
+  .preview-toggle {
+    background: #2693BA;
+    background-position: 13px 9px;
+    color: white;
+    height: 40px;
+    max-height: 40px;
+    border: 0;
+    border-radius: 4px;
   }
 
   .nav-toggle {
