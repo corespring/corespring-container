@@ -4,41 +4,27 @@
     height:1000px;
     width:1900px;
 
-    display: flex;
-    display: -webkit-flex;
-    flex-direction: row;
-    -webkit-flex-direction: row;
-
     .nav-container {
-      flex:0 0 200px;
-      -webkit-flex:0 0 200px;
-      transition: all .6s;
-      -webkit-transition: all .6s;
+      top:0;
+      width: 200px;
       height:100%;
       padding:5px;
       overflow: hidden;
     }
 
-    .nav-container.collapsed {
-      flex-basis: 0px;
-      -webkit-flex-basis: 0px;
-      padding:5px 0px 5px 0px;
-    }
-
     .content-container {
+      position: absolute;
+      top:0;
+      left: 200px;
       width: 800px;
-      height:100%;
-      padding:5px;
+      height: 100%;
+      padding: 5px;
+      background-color: white;
+      transition: left 300ms;
     }
 
-    .preview-container {
-      height:100%;
-      width: 600px;
-      padding:5px;
-    }
-
-    .preview-container .collapsed {
-      display: none;
+    .content-container.collapsed {
+      left: 0px;
     }
 
   }

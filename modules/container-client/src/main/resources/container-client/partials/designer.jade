@@ -1,5 +1,11 @@
 .designer(ng-controller="Designer", ng-show="nav.isCurrentView('designer')")
 
-  .config(ng-class="editorMode")
+  .editor-container(ng-class="editorMode")
     wiggi-wiz(ng-model="item.xhtml",features="extraFeatures")
     textarea(ng-model="item.xhtml", style="width: 100%; height: 300px")
+
+  .preview-container(ng-show="nav.isCurrentView('designer')")
+    button.preview-toggle(ng-click="toggleCollapsed('#preview')") Toggle Preview
+    .preview-mask
+      #preview.preview.container-fluid(style="height: 100%; padding: 4px 0 0 0;")
+        include client-side-preview
