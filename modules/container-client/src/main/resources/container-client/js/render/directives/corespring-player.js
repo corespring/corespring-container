@@ -11,8 +11,12 @@ angular.module('corespring-player.directives').directive('corespringPlayer', [
         var rendered = false;
 
         var renderMarkup = function(xhtml){
+          if ($scope.lastScope) {
+            $scope.lastScope.$destroy();
+          }
+          $scope.lastScope = $scope.$new();
           var $body = $elem.find("#body").html(xhtml);
-          $compile($body)($scope);
+          $compile($body)($scope.lastScope);
           MathJaxService.parseDomForMath();
         };
 

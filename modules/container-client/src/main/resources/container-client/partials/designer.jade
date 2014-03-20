@@ -1,6 +1,5 @@
 .designer(ng-controller="Designer", ng-show="nav.isCurrentView('designer')")
 
   .config(ng-class="editorMode")
-    wiggi-wiz(ng-model="$parent.xhtml",
-      style="position:relative; width: 100%; height; 100%")
-
+    wiggi-wiz(ng-model="item.xhtml",features="extraFeatures")
+    textarea(ng-model="item.xhtml", style="width: 100%; height: 300px")

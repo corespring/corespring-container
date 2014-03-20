@@ -34,15 +34,18 @@ block head
 block content
   .root(ng-controller="Root")
 
-    div(style="position:relative; height:1000px; min-width:1500px;")
+    .logo
+      img(src="/assets/images/logo-retina-200.png")
 
-      div(ng-class="navColumnHidden", style="float:left; width:200px; height:100%; padding:5px;")
+    .row-container
+
+      .nav-container(ng-class="navContainerCollapsed")
         ul.nav.nav-pills.nav-stacked
           li(ng-repeat="entry in nav.navEntries", ng-class="entry.active")
             a(ng-click="nav.chooseNavEntry(entry.path)") {{entry.title}}
 
-      div(style="float:left; width:800px; padding:5px;")
-        button(ng-click="toggleNav()") toggle nav
+      .content-container
+        button.nav-toggle(ng-click="toggleNav()")
         .main-content(style="padding-top: 10px")
           include partials/designer
           include partials/item-profile
@@ -50,10 +53,13 @@ block content
           include partials/view-player
           include partials/overview
 
-      div(style="float:left; width:400px; height: 100%; padding:5px; background-color:#fffffa;")
-        button(ng-click="togglePreview()") toggle preview
-        .container-fluid(ng-class="previewColumnHidden", style="height:100%")
-          include partials/player-preview
+      .preview-container(ng-show="nav.isCurrentView('designer')")
+        button.preview-toggle(ng-click="togglePreview()") Toggle Preview
+        .container-fluid(ng-class="previewContainerCollapsed", style="height: 100%; padding: 4px 0 0 0;")
+          include partials/client-side-preview
+
+
+
 
 block scripts
 

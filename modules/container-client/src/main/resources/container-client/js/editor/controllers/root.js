@@ -1,16 +1,14 @@
 var controller = function ($scope, $log, $location, DataQueryService, ItemService, NavModelService) {
 
   function createToggle( property, initialValue ){
-    $scope[property] = initialValue;
+    $scope[property] = !!initialValue ? 'collapsed' : '';
     return function(){
-      $scope[property] = $scope[property] ? "" : "hidden";
+      $scope[property] = $scope[property] ? "" : "collapsed";
     };
   }
 
-  $scope.xhtml = '<div> hello</div><color-box color="00ff00"></color-box>';
-
-  $scope.toggleNav = createToggle("navColumnHidden", "");
-  $scope.togglePreview = createToggle("previewColumnHidden", "hidden");
+  $scope.toggleNav = createToggle("navContainerCollapsed", false);
+  $scope.togglePreview = createToggle("previewContainerCollapsed", true);
 
   $scope.nav = NavModelService;
 
@@ -27,7 +25,7 @@ var controller = function ($scope, $log, $location, DataQueryService, ItemServic
 
   $scope.onItemLoaded = function (data) {
     $scope.allData = data;
-    $log.debug("item loaded: " + $scope.allData);
+    $scope.item = data.item;
   };
 
   $scope.onItemLoadError = function (error) {

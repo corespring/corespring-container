@@ -1,0 +1,76 @@
+.root {
+
+  .row-container {
+    height:1000px;
+    width:1900px;
+
+    display: flex;
+    display: -webkit-flex;
+    flex-direction: row;
+    -webkit-flex-direction: row;
+
+    .nav-container {
+      flex:0 0 200px;
+      -webkit-flex:0 0 200px;
+      transition: all .6s;
+      -webkit-transition: all .6s;
+      height:100%;
+      padding:5px;
+      overflow: hidden;
+    }
+
+    .nav-container.collapsed {
+      flex-basis: 0px;
+      -webkit-flex-basis: 0px;
+      padding:5px 0px 5px 0px;
+    }
+
+    .content-container {
+      width: 800px;
+      height:100%;
+      padding:5px;
+    }
+
+    .preview-container {
+      height:100%;
+      width: 600px;
+      padding:5px;
+    }
+
+    .preview-container .collapsed {
+      display: none;
+    }
+
+  }
+
+  .preview-toggle {
+    background: #2693BA;
+    background-position: 13px 9px;
+    color: white;
+    height: 40px;
+    max-height: 40px;
+    border: 0;
+    border-radius: 4px;
+  }
+
+  .nav-toggle {
+    background: #2693BA;
+    background-image: url('../images/menu-toggle.png');
+    background-repeat: no-repeat;
+    background-position: 13px 9px;
+    height: 40px;
+    max-height: 40px;
+    max-width: 50px;
+    min-width: 50px;
+    border: 0;
+    border-radius: 4px;
+  }
+
+  .nav-pills {
+    li.active {
+      a, a:focus, a:hover {
+        background-color: #2693BA;
+      }
+    }
+  }
+}

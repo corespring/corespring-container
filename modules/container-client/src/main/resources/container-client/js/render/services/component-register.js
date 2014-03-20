@@ -14,6 +14,8 @@ angular.module('corespring-player.services').factory('ComponentRegister', ['$log
       answerChangedHandler = cb;
     };
 
+    this.components = components;
+
     this.registerComponent = function(id, component){
       $log.info("register component: ", id, " ", component);
       components[id] = component;
