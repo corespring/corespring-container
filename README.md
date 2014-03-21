@@ -79,6 +79,11 @@ Afterwards, install the project modules:
     [shell] bower install # installs the ui dependenceis for the container-client
     [shell] grunt loadComponentDependencies (or grunt lcd - for conciseness) # loads any 3rd party libs defined by the components
     [shell] run # start the server
+
+## Testing
+
+    play
+    
     
     
 Then go to [http://localhost:9000](http://localhost:9000)

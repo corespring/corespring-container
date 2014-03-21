@@ -33,25 +33,33 @@ block head
 
 block content
   .root(ng-controller="Root")
+    .nav-container
+      .top-nav-filler
+        
+      ul.nav.nav-stacked
+        li(ng-repeat="entry in nav.navEntries", ng-class="{ active: entry.active}")
+          a(ng-click="nav.chooseNavEntry(entry.path)") {{entry.title}}
+    
+    .preview-container
+      .contents
+        include partials/previews/designer 
 
-    .logo
-      img(src="/assets/images/logo-retina-200.png")
 
-    .row-container
+    .content-container
+      .top-nav
+        button.btn.btn-sm.btn-default(ng-click="toggleCollapsed('.content-container')")
+          i.fa.fa-bars
+        .cs-logo
+        button.btn.btn-sm.btn-default.pull-right(ng-click="togglePreview('.content-container')")
+          i.fa.fa-eye
+      .main-content
+        include partials/designer
+        include partials/item-profile
+        include partials/supporting-materials
+        include partials/view-player
+        include partials/overview
 
-      .nav-container
-        ul.nav.nav-pills.nav-stacked
-          li(ng-repeat="entry in nav.navEntries", ng-class="entry.active")
-            a(ng-click="nav.chooseNavEntry(entry.path)") {{entry.title}}
 
-      #content-container.content-container
-        button.nav-toggle(ng-click="toggleCollapsed('#content-container')")
-        .main-content(style="padding-top: 10px")
-          include partials/designer
-          include partials/item-profile
-          include partials/supporting-materials
-          include partials/view-player
-          include partials/overview
 
 block scripts
 

@@ -1,33 +1,117 @@
 .root {
 
-  .row-container {
-    height:1000px;
-    width:1900px;
+  @top-nav-bg: lighten(@cs-green, 30%);
+  @preview-width: 600px;
 
-    .nav-container {
-      top:0;
-      width: 200px;
-      height:100%;
-      padding:5px;
-      overflow: hidden;
+  .content-container {
+    position: absolute;
+    top:0px;
+    bottom: 0px;
+    left: 170px;
+    right: 0px;
+    height: 100%;
+    padding: 0px;
+    background-color: white;
+    transition: left 300ms, right 300ms;
+    border-left: solid 0px fade(darken(@cs-grey, 40%), 10%);
+    -webkit-box-shadow: -5px 0px 10px 0px rgba(0, 0, 0, 0.3);
+    -moz-box-shadow:    -5px 0px 10px 0px rgba(0, 0, 0, 0.3);
+    box-shadow:         -5px 0px 10px 0px rgba(0, 0, 0, 0.3);
+  }
+
+  .content-container.collapsed {
+    left: 0px;
+    border-left: solid 0px white; 
+  }
+  
+  .content-container.preview {
+    right: @preview-width;
+    border-right: solid 1px darken(@cs-grey, 20%);
+  }
+
+  .nav-container {
+    position: absolute;
+    top:0px;
+    bottom: 0px;
+    width: 200px;
+    padding:0px;
+    overflow: hidden;
+    background-color: darken(@cs-grey, 63%);
+
+    .top-nav-filler{
+      background-color: none;
+      height: 30px;
     }
 
-    .content-container {
-      position: absolute;
-      top:0;
-      left: 200px;
-      width: 800px;
-      height: 100%;
-      padding: 5px;
-      background-color: white;
-      transition: left 300ms;
-    }
-
-    .content-container.collapsed {
-      left: 0px;
+    .nav {
+      li {
+        a {
+          font-size: 13px;
+          cursor: pointer;
+          color: darken(@cs-grey, 10%);
+          &:hover{
+            color: darken(@cs-grey, 30%);
+          }
+        }
+      }
+      li.active{
+        a {
+          color: @cs-green;
+        }
+      }
     }
 
   }
+
+  .preview-container {
+    position: absolute;
+    top : 0px;
+    right: 0px;
+    width: @preview-width; 
+    bottom: 0px;
+    background-color: white;
+    .contents{
+      padding: 10px;
+    }
+  }
+
+  .top-nav {
+    border-bottom: solid 1px darken(@top-nav-bg, 30%);
+    background-color: darken(@top-nav-bg, 20%);
+    height: 30px;
+
+    .cs-logo{
+      width: 100px;
+      height: 20px;
+      display: inline;
+      position: absolute;
+      background-image: url("../images/cs-white-logo-11px-padded-ds.png");
+
+    }
+
+    button{
+      background-color: darken(@top-nav-bg, 30%);
+      -moz-outline:0 none;
+      outline:0 none;
+
+      &:active{
+        -moz-outline:0 none;
+        outline:0 none;
+      }
+
+      border: none;
+      
+      .fa{
+        color: white;
+      }
+
+      &:hover{
+        background-color: darken(@top-nav-bg, 34%);
+      }
+
+    }
+  }
+
 
   .preview-toggle {
     background: #2693BA;
