@@ -1,14 +1,17 @@
 var controller = function ($scope, $log, $location, DataQueryService, ItemService, NavModelService) {
 
-  function createToggle( property, initialValue ){
-    $scope[property] = !!initialValue ? 'collapsed' : '';
-    return function(){
-      $scope[property] = $scope[property] ? "" : "collapsed";
-    };
+  $scope.toggleCollapsed = function(id){
+    var target = $(id);
+    if(!target){
+      throw new Error("Illegal argument: no dom element found for id <" + id + ">");
+    }
+    var cssClass = 'collapsed';
+    if(target.hasClass(cssClass)){
+      target.removeClass(cssClass);
+    } else {
+      target.addClass(cssClass);
+    }
   }
-
-  $scope.toggleNav = createToggle("navContainerCollapsed", false);
-  $scope.togglePreview = createToggle("previewContainerCollapsed", true);
 
   $scope.nav = NavModelService;
 
