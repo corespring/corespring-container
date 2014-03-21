@@ -10,7 +10,7 @@ var controller = function($scope, $log, $location, DataQueryService, ItemService
     } else {
       $target.addClass(cssClass);
     }
-  }
+  };
 
   $scope.toggleCollapsed = function(id) {
     toggleClass(id, 'collapsed');

@@ -19,7 +19,7 @@
      */
     this.initializeComponent = function() {
       var ngModule = loadAngularModule(moduleName);
-      var isIE8 = (head.browser.ie && head.browser.version < 9);
+      var isIE8 = (typeof head !== 'undefined' && head.browser.ie && head.browser.version < 9);
 
       if (this.directive) {
 
