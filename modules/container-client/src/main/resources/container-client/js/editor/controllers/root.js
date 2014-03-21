@@ -11,7 +11,7 @@ var controller = function ($scope, $log, $location, DataQueryService, ItemServic
     } else {
       target.addClass(cssClass);
     }
-  }
+  };
 
   $scope.nav = NavModelService;
 
