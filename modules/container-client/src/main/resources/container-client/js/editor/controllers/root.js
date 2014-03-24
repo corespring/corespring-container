@@ -1,29 +1,35 @@
 var controller = function($scope, $log, $location, DataQueryService, ItemService, NavModelService) {
 
-  function toggleClass(id, cssClass) {
-    var $target = $(id);
-    if (!$target) {
-      throw new Error("Illegal argument: no dom element found for id <" + id + ">");
-    }
-    if ($target.hasClass(cssClass)) {
-      $target.removeClass(cssClass);
-    } else {
-      $target.addClass(cssClass);
-    }
-  }
+  var previewable = [
+    '/design',
+    '/item-profile'
+  ];
 
-  $scope.toggleCollapsed = function(id) {
-    toggleClass(id, 'collapsed');
+  var search = $location.search();
+  $scope.showLeftNav = search.leftnav === true || search.leftnav === 'true';
+  $scope.showPreview = search.preview === true || search.preview === 'true';
+
+  $scope.toggleLeftNav = function(updateLocation) {
+    //updateLocation = updateLocation || true;
+    $scope.showLeftNav = !$scope.showLeftNav;
+    $location.search('leftnav', $scope.showLeftNav);
   };
 
-  $scope.togglePreview = function(id) {
-    toggleClass(id, 'preview');
+  $scope.togglePreview = function() {
+    $scope.showPreview = !$scope.showPreview;
+    $location.search('preview', $scope.showPreview);
   };
 
   $scope.nav = NavModelService;
 
   $scope.$on('$locationChangeSuccess', function() {
     NavModelService.chooseNavEntry($location.path());
+
+    if (_.contains(previewable, $location.path())) {
+      $scope.showPreview = true;
+    } else {
+      $scope.showPreview = false;
+    }
   });
 
   NavModelService.chooseNavEntry($location.path());

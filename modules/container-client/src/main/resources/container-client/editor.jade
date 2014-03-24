@@ -3,7 +3,7 @@ extends layout
 block head
 
   link(rel="stylesheet", href="../../components/select2/select2.css")
-  link(rel="stylesheet", href="../../css/new-editor.css")
+  link(rel="stylesheet", href="../../css/editor.css")
 
   script(type="text/ng-template", id="add-component.html")
     .modal
@@ -43,14 +43,15 @@ block content
     .preview-container
       .contents
         include partials/previews/designer 
+        include partials/previews/item-profile
 
 
-    .content-container
+    .content-container(ng-class="{leftnav: showLeftNav, preview: showPreview}")
       .top-nav
-        button.btn.btn-sm.btn-default(ng-click="toggleCollapsed('.content-container')")
+        button.btn.btn-sm.btn-default(ng-click="toggleLeftNav()")
           i.fa.fa-bars
         .cs-logo
-        button.btn.btn-sm.btn-default.pull-right(ng-click="togglePreview('.content-container')")
+        button.btn.btn-sm.btn-default.pull-right(ng-click="togglePreview()")
           i.fa.fa-eye
       .main-content
         include partials/designer
