@@ -27,7 +27,7 @@ module.exports = (grunt) ->
 
     logJson(bowerJson.resolutions, "writeln")
 
-    needsUpdate = !bowerJson.resolutions? || !bowerJson.resolutions.angular? || !bower.resolutions.bootstrap?
+    needsUpdate = !bowerJson.resolutions? || !bowerJson.resolutions.angular? || !bowerJson.resolutions.bootstrap?
 
     done = @async()
 
