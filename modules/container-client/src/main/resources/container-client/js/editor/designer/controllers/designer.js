@@ -56,7 +56,7 @@ var controller = function($scope, $compile, $http, $timeout, $modal, $log, Desig
         $log.debug("Id: ", id);
         editor.launchDialog(ComponentRegister.components[id],
           'Edit multi choice!',
-          '<div style="height: 100px;"><corespring-multiple-choice-config id="' + id + '"></corespring-multiple-choice-config></div>',
+          '<corespring-multiple-choice-config id="' + id + '"></corespring-multiple-choice-config>',
           function onUpdate(update) {
           }
         );
