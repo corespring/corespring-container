@@ -22,12 +22,12 @@ module.exports = (grunt) ->
     bowerJson = require "../bower.json"
     
     res = 
-      angular: "~1.2.8"
+      angular: "~1.2.12"
       bootstrap: "~3.1.1"
 
     logJson(bowerJson.resolutions, "writeln")
 
-    needsUpdate = bowerJson.resolutions == null || bowerJson.resolutions == undefined
+    needsUpdate = !bowerJson.resolutions? || !bowerJson.resolutions.angular? || !bower.resolutions.bootstrap?
 
     done = @async()
 
