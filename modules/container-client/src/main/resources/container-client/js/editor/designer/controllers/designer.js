@@ -18,29 +18,56 @@ var controller = function($scope, $compile, $http, $timeout, $modal, $log, Desig
           "componentType": "corespring-multiple-choice",
           "title": "Fruits",
           "weight": 10,
-          "correctResponse": { "value": ["carrot", "turnip", "potato"] },
-          "feedback": [
-            { "value": "banana", "feedback": "Incorrect"},
-            { "value": "carrot", "feedback": "Correct", "notChosenFeedback": "This is a vegetable"},
-            { "value": "apple", "feedback": "it's a fruit" },
-            { "value": "turnip", "feedback": "Correct", "notChosenFeedback": "This is a vegetable" },
-            { "value": "potato", "feedback": "Correct", "notChosenFeedback": "This is a vegetable" },
-            { "value": "wheat", "feedback": "Incorrect" }
-          ],
+          "correctResponse": {
+            "value": ["carrot", "turnip", "potato"]
+          },
+          "feedback": [{
+            "value": "banana",
+            "feedback": "Incorrect"
+          }, {
+            "value": "carrot",
+            "feedback": "Correct",
+            "notChosenFeedback": "This is a vegetable"
+          }, {
+            "value": "apple",
+            "feedback": "it's a fruit"
+          }, {
+            "value": "turnip",
+            "feedback": "Correct",
+            "notChosenFeedback": "This is a vegetable"
+          }, {
+            "value": "potato",
+            "feedback": "Correct",
+            "notChosenFeedback": "This is a vegetable"
+          }, {
+            "value": "wheat",
+            "feedback": "Incorrect"
+          }],
           "model": {
             "prompt": "Which of these is a vegetable?",
             "config": {
               "orientation": "vertical",
               "shuffle": true
             },
-            "choices": [
-              {"label": "Banana", "value": "banana"},
-              {"label": "Carrot", "value": "carrot"},
-              {"label": "Apple", "value": "apple"},
-              {"label": "Turnip", "value": "turnip"},
-              {"label": "Potato", "value": "potato"},
-              {"label": "Wheat", "value": "wheat"}
-            ]
+            "choices": [{
+              "label": "Banana",
+              "value": "banana"
+            }, {
+              "label": "Carrot",
+              "value": "carrot"
+            }, {
+              "label": "Apple",
+              "value": "apple"
+            }, {
+              "label": "Turnip",
+              "value": "turnip"
+            }, {
+              "label": "Potato",
+              "value": "potato"
+            }, {
+              "label": "Wheat",
+              "value": "wheat"
+            }]
           }
         };
         return $('<placeholder id="' + id + '" label="Multi Choice">');
@@ -55,10 +82,9 @@ var controller = function($scope, $compile, $http, $timeout, $modal, $log, Desig
         var id = $node.attr('id');
         $log.debug("Id: ", id);
         editor.launchDialog(ComponentRegister.components[id],
-          'Edit multi choice!',
+          'Configure',
           '<corespring-multiple-choice-config id="' + id + '"></corespring-multiple-choice-config>',
-          function onUpdate(update) {
-          }
+          function onUpdate(update) {}
         );
       },
       getMarkUp: function($node, $scope) {
@@ -159,7 +185,10 @@ var controller = function($scope, $compile, $http, $timeout, $modal, $log, Desig
     $scope.item.xhtml = "<div>" + node.html() + "</div>";
 
     if (!$scope.selectedComponent) {
-      $scope.selectedComponent = {id: uid, component: $scope.item.components[uid]};
+      $scope.selectedComponent = {
+        id: uid,
+        component: $scope.item.components[uid]
+      };
     }
   };
 
@@ -238,7 +267,10 @@ var controller = function($scope, $compile, $http, $timeout, $modal, $log, Desig
 
   $scope.selectFirstComponent = function() {
     for (var c in $scope.item.components) {
-      $scope.selectedComponent = {id: c, component: $scope.item.components[c]};
+      $scope.selectedComponent = {
+        id: c,
+        component: $scope.item.components[c]
+      };
       break;
     }
   };
@@ -270,23 +302,23 @@ var controller = function($scope, $compile, $http, $timeout, $modal, $log, Desig
     }
   }
 
-//  DesignerService.loadItem($scope.itemId, function(item){
-//    initDesigner(item);
-//  });
+  //  DesignerService.loadItem($scope.itemId, function(item){
+  //    initDesigner(item);
+  //  });
 
   DesignerService.loadAvailableComponents($scope.onComponentsLoaded, $scope.onComponentsLoadError);
 };
 
 angular.module('corespring-editor.controllers')
-  .controller('Designer',
-    ['$scope',
-      '$compile',
-      '$http',
-      '$timeout',
-      '$modal',
-      '$log',
-      'DesignerService',
-      'PlayerService',
-      'MathJaxService',
-      'ComponentRegister',
-      controller]);
+  .controller('Designer', ['$scope',
+    '$compile',
+    '$http',
+    '$timeout',
+    '$modal',
+    '$log',
+    'DesignerService',
+    'PlayerService',
+    'MathJaxService',
+    'ComponentRegister',
+    controller
+  ]);

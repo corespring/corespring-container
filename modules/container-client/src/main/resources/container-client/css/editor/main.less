@@ -3,7 +3,7 @@
   @top-nav-bg: lighten(@cs-green, 30%);
   @top-nav-height: 29px;
   @preview-width: 600px;
-
+  @designer-min-width: 500px;
 
   .designer {
     position: relative;
@@ -11,6 +11,8 @@
     right: 0px;
     left: 0px;
     top: 0px;
+    min-width: @designer-min-width;
+    overflow-x: auto;
 
     .editor-container {
       left: 0;

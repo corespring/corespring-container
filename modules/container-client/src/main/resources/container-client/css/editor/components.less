@@ -1,0 +1,25 @@
+@component-bg-color: #eae8db;
+
+.input-holder{
+
+  border: solid 1px @component-bg-color;
+  background-color: saturate( lighten(@component-bg-color, 10%), 50%);
+  margin-top: 10px;
+  .header{
+    border-left: solid 6px @component-bg-color;
+    padding-left: 5px;
+    color: desaturate( darken(@component-bg-color, 35%), 20%);
+    font-size: 16px;
+  }
+
+  .body{
+    padding: 10px;
+  }
+
+}
+
+.component-placeholder {
+  border: 1px solid black;
+  max-width: 200px;
+  padding: 20px;
+}
