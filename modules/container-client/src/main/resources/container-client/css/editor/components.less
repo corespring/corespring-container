@@ -19,7 +19,11 @@
 }
 
 .component-placeholder {
-  border: 1px solid black;
-  max-width: 200px;
+  border: 1px solid darken(@cs-green, 10%);
+  background-color: lighten(@cs-green, 40%);
+  .rounded(4px);
+  .drop-shadow(0, 2px, 3px, 0.2);
+
+  max-width: 400px;
   padding: 20px;
 }

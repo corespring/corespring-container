@@ -11,7 +11,11 @@ var controller = function($scope, $compile, $http, $timeout, $modal, $log, Desig
       name: 'corespring-multiple-choice',
       toolbar: '<button class="btn btn-default btn-sm btn-small">CB</button>',
       clickable: true, //? Is this the best way to set up clickability?
-      //insertMode: 'node', //Insert after node that contains the caret - note: this isn't configured yet
+      compile: true,
+      initialise: function($node, replaceWith) {
+        var id = $node.attr('id');
+        return replaceWith('<placeholder label="multiple-choice:' + id + '" id="' + id + '"></placeholder>');
+      },
       addToEditor: function() {
         var id = ++$scope.lastId;
         $scope.item.components[id] = {
@@ -74,7 +78,7 @@ var controller = function($scope, $compile, $http, $timeout, $modal, $log, Desig
       },
       onClick: function($node, $scope, editor) {
         $log.debug('[onClick]', $node);
-        editor.launchPopover($node, $scope);
+        editor.togglePopover($node, $scope);
       },
       editInstance: function($node, $scope, editor) {
         $log.debug('[editInstance]', $node);
