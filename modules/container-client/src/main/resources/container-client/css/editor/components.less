@@ -21,9 +21,13 @@
 .component-placeholder {
   border: 1px solid darken(@cs-green, 10%);
   background-color: lighten(@cs-green, 40%);
+  transition: background-color 100ms linear;
   .rounded(4px);
+  .user-select(none);
   .drop-shadow(0, 2px, 3px, 0.2);
-
+  &:hover{
+    background-color: lighten(@cs-green, 30%);
+  }
   max-width: 400px;
   padding: 20px;
 }
