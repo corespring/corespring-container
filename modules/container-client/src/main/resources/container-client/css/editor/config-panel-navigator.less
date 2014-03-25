@@ -1,0 +1,47 @@
+/* Navigator CSS */
+/* TODO: move this to the navigator library */
+
+.navigator {
+  position: relative;
+  min-height: 300px;
+}
+
+.navigator .nav-container {
+  transition: width 300ms;
+  position: absolute;
+  top: 0px;
+  bottom: 0px;
+  width: 200px;
+  overflow: hidden;
+  background-color: #3b383b;
+}
+
+.navigator .nav-left-panel {
+  padding-top: 30px;
+}
+
+.navigator.nav-closed .nav-container {
+  width: 30px;
+}
+
+.navigator .config-panel-body {
+  padding-left: 200px;
+  transition: padding-left 300ms;
+}
+
+.navigator.nav-closed .config-panel-body {
+  padding-left: 30px;
+}
+
+.navigator .nav li a {
+  font-size: 13px;
+  cursor: pointer;
+  color: #c2bfc2;
+}
+
+.navigator .btn-nav-toggle {
+  padding: 2px 5px;
+  font-size: 12px;
+  line-height: 1.5;
+  border-radius: 3px;
+}
