@@ -1,5 +1,7 @@
 .designer(ng-controller="Designer", ng-show="nav.isCurrentView('designer')")
 
   .editor-container(ng-class="editorMode")
-    wiggi-wiz(ng-model="item.xhtml",features="extraFeatures")
+    wiggi-wiz(ng-model="item.xhtml", features="extraFeatures")
+      toolbar(basic="bold italic", formatting="h1 h2 p")
+
     textarea(ng-model="item.xhtml", style="width: 100%; height: 300px")
