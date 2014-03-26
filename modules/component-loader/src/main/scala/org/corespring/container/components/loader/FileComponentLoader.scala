@@ -90,7 +90,8 @@ class FileComponentLoader(paths: Seq[String]) extends ComponentLoader {
         compRoot.getName,
         packageJson,
         loadLibrarySources(compRoot.getPath, "client", createClientName(compRoot.getName)),
-        loadLibrarySources(compRoot.getPath, "server", createServerName)))
+        loadLibrarySources(compRoot.getPath, "server", createServerName),
+        readMaybeFile(new File(compRoot.getPath + "/src/client/styles.css"))))
   }
 
   private def loadLayout(org: String, packageJson: JsValue)(compRoot: File): Option[Component] = {

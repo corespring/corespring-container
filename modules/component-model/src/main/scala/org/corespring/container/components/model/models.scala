@@ -24,7 +24,8 @@ case class Library(
   name: String,
   override val packageInfo: JsValue,
   client: Seq[LibrarySource] = Seq.empty,
-  server: Seq[LibrarySource] = Seq.empty)
+  server: Seq[LibrarySource] = Seq.empty,
+  css: Option[String])
   extends Component(new Id(org, name), packageInfo)
 
 case class LibrarySource(name: String, source: String)

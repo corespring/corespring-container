@@ -10,7 +10,7 @@ trait ComponentMaker {
   }
 
   def lib(org: String, name: String): Library = {
-    Library(org, name, Json.obj("name" -> name), Seq.empty, Seq.empty)
+    Library(org, name, Json.obj("name" -> name), Seq.empty, Seq.empty, None)
   }
 
   def libId(org: String, name: String, scope: Option[String] = None) = LibraryId(org, name, scope)

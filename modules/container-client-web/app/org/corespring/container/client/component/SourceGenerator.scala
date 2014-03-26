@@ -7,10 +7,11 @@ import org.corespring.container.components.model._
 class EditorGenerator extends SourceGenerator {
 
   override def css(components: Seq[Component]): String = {
-    val (_, uiComps, layoutComps) = splitComponents(components)
+    val (libraries, uiComps, layoutComps) = splitComponents(components)
     val uiCss = uiComps.map(_.client.css.getOrElse("")).mkString("\n")
     val layoutCss = layoutComps.map(_.css.getOrElse("")).mkString("\n")
-    s"$uiCss\n$layoutCss"
+    val libraryCss = libraries.map(_.css.getOrElse("")).mkString("\n")
+    s"$uiCss\n$layoutCss\n$libraryCss"
   }
 
   override def js(components: Seq[Component]): String = {
