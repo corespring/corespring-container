@@ -32,6 +32,7 @@ class FileComponentLoaderTest extends Specification {
       lib.server.length == 2
       lib.server.map(_.name).contains("corespring.my-lib.server") === true
       lib.server.map(_.name).contains("corespring.my-lib.server.other") === true
+      lib.css.get.startsWith("body") mustEqual true
     }
 
     "a ui component can specify a library" in {
