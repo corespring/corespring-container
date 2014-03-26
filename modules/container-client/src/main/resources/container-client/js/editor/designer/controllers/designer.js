@@ -3,14 +3,15 @@ var controller = function($scope, $compile, $http, $timeout, $modal, $log, Desig
 
   $scope.showComponentsPanel = false;
 
+  // TODO: find last id from markup
   $scope.lastId = 10;
 
   $scope.extraFeatures = [
 
-
     {
-      type: 'group',
       name: 'external',
+      type: 'dropdown',
+      dropdownTitle: 'Components',
       buttons: [
 
         {
