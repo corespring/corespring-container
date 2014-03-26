@@ -3,103 +3,125 @@ var controller = function($scope, $compile, $http, $timeout, $modal, $log, Desig
 
   $scope.showComponentsPanel = false;
 
+  // TODO: find last id from markup
   $scope.lastId = 10;
 
   $scope.extraFeatures = [
-
     {
-      name: 'corespring-multiple-choice',
-      toolbar: '<button class="btn btn-default btn-sm btn-small">CB</button>',
-      clickable: true, //? Is this the best way to set up clickability?
-      compile: true,
-      initialise: function($node, replaceWith) {
-        var id = $node.attr('id');
-        return replaceWith('<placeholder label="multiple-choice:' + id + '" id="' + id + '"></placeholder>');
-      },
-      addToEditor: function() {
-        var id = ++$scope.lastId;
-        $scope.item.components[id] = {
-          "componentType": "corespring-multiple-choice",
-          "title": "Fruits",
-          "weight": 10,
-          "correctResponse": {
-            "value": ["carrot", "turnip", "potato"]
-          },
-          "feedback": [{
-            "value": "banana",
-            "feedback": "Incorrect"
-          }, {
-            "value": "carrot",
-            "feedback": "Correct",
-            "notChosenFeedback": "This is a vegetable"
-          }, {
-            "value": "apple",
-            "feedback": "it's a fruit"
-          }, {
-            "value": "turnip",
-            "feedback": "Correct",
-            "notChosenFeedback": "This is a vegetable"
-          }, {
-            "value": "potato",
-            "feedback": "Correct",
-            "notChosenFeedback": "This is a vegetable"
-          }, {
-            "value": "wheat",
-            "feedback": "Incorrect"
-          }],
-          "model": {
-            "prompt": "Which of these is a vegetable?",
-            "config": {
-              "orientation": "vertical",
-              "shuffle": true
-            },
-            "choices": [{
-              "label": "Banana",
-              "value": "banana"
-            }, {
-              "label": "Carrot",
-              "value": "carrot"
-            }, {
-              "label": "Apple",
-              "value": "apple"
-            }, {
-              "label": "Turnip",
-              "value": "turnip"
-            }, {
-              "label": "Potato",
-              "value": "potato"
-            }, {
-              "label": "Wheat",
-              "value": "wheat"
-            }]
-          }
-        };
-        return $('<placeholder id="' + id + '" label="Multi Choice">');
-      },
-      onClick: function($node, $scope, editor) {
-        $log.debug('[onClick]', $node);
-        editor.togglePopover($node, $scope);
-      },
-      editInstance: function($node, $scope, editor) {
-        $log.debug('[editInstance]', $node);
+      type: 'dropdown',
+      dropdownTitle: 'Components',
+      buttons: [
 
-        var id = $node.attr('id');
-        $log.debug("Id: ", id);
-        editor.launchDialog(ComponentRegister.components[id],
-          'Configure',
-          '<corespring-multiple-choice-config id="' + id + '"></corespring-multiple-choice-config>',
-          function onUpdate(update) {}
-        );
-      },
-      getMarkUp: function($node, $scope) {
-        var id;
-        if ($scope && $scope.$$childHead) {
-          id = $scope.$$childHead.id;
-        } else {
-          id = $node.attr('id');
+        {
+          name: 'corespring-multiple-choice',
+          toolbar: '<button class="btn btn-default btn-sm btn-small">CB</button>',
+          clickable: true, //? Is this the best way to set up clickability?
+          compile: true,
+          initialise: function($node, replaceWith) {
+            var id = $node.attr('id');
+            return replaceWith('<placeholder label="multiple-choice:' + id + '" id="' + id + '"></placeholder>');
+          },
+          addToEditor: function() {
+            var id = ++$scope.lastId;
+            $scope.item.components[id] = {
+              "componentType": "corespring-multiple-choice",
+              "title": "Fruits",
+              "weight": 10,
+              "correctResponse": {
+                "value": ["carrot", "turnip", "potato"]
+              },
+              "feedback": [
+                {
+                  "value": "banana",
+                  "feedback": "Incorrect"
+                },
+                {
+                  "value": "carrot",
+                  "feedback": "Correct",
+                  "notChosenFeedback": "This is a vegetable"
+                },
+                {
+                  "value": "apple",
+                  "feedback": "it's a fruit"
+                },
+                {
+                  "value": "turnip",
+                  "feedback": "Correct",
+                  "notChosenFeedback": "This is a vegetable"
+                },
+                {
+                  "value": "potato",
+                  "feedback": "Correct",
+                  "notChosenFeedback": "This is a vegetable"
+                },
+                {
+                  "value": "wheat",
+                  "feedback": "Incorrect"
+                }
+              ],
+              "model": {
+                "prompt": "Which of these is a vegetable?",
+                "config": {
+                  "orientation": "vertical",
+                  "shuffle": true
+                },
+                "choices": [
+                  {
+                    "label": "Banana",
+                    "value": "banana"
+                  },
+                  {
+                    "label": "Carrot",
+                    "value": "carrot"
+                  },
+                  {
+                    "label": "Apple",
+                    "value": "apple"
+                  },
+                  {
+                    "label": "Turnip",
+                    "value": "turnip"
+                  },
+                  {
+                    "label": "Potato",
+                    "value": "potato"
+                  },
+                  {
+                    "label": "Wheat",
+                    "value": "wheat"
+                  }
+                ]
+              }
+            };
+            return $('<placeholder id="' + id + '" label="Multi Choice">');
+          },
+          onClick: function($node, $scope, editor) {
+            $log.debug('[onClick]', $node);
+            editor.togglePopover($node, $scope);
+          },
+          editInstance: function($node, $scope, editor) {
+            $log.debug('[editInstance]', $node);
+
+            var id = $node.attr('id');
+            $log.debug("Id: ", id);
+            editor.launchDialog(ComponentRegister.components[id],
+              'Configure',
+              '<corespring-multiple-choice-config id="' + id + '"></corespring-multiple-choice-config>',
+              function onUpdate(update) {
+              }
+            );
+          },
+          getMarkUp: function($node, $scope) {
+            var id;
+            if ($scope && $scope.$$childHead) {
+              id = $scope.$$childHead.id;
+            } else {
+              id = $node.attr('id');
+            }
+            return '<corespring-multiple-choice id="' + id + '"></corespring-multiple-choice>';
+          }
         }
-        return '<corespring-multiple-choice id="' + id + '"></corespring-multiple-choice>';
-      }
+      ]
     }
   ];
 
