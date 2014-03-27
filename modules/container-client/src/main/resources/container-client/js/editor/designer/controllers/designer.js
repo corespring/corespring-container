@@ -20,7 +20,9 @@ var controller = function($scope, $compile, $http, $timeout, $modal, $log, Desig
   };
 
   $scope.extraFeatures = [
+
     {
+      name: 'external',
       type: 'dropdown',
       dropdownTitle: 'Components',
       buttons: [
@@ -43,67 +45,53 @@ var controller = function($scope, $compile, $http, $timeout, $modal, $log, Desig
               "correctResponse": {
                 "value": ["carrot", "turnip", "potato"]
               },
-              "feedback": [
-                {
-                  "value": "banana",
-                  "feedback": "Incorrect"
-                },
-                {
-                  "value": "carrot",
-                  "feedback": "Correct",
-                  "notChosenFeedback": "This is a vegetable"
-                },
-                {
-                  "value": "apple",
-                  "feedback": "it's a fruit"
-                },
-                {
-                  "value": "turnip",
-                  "feedback": "Correct",
-                  "notChosenFeedback": "This is a vegetable"
-                },
-                {
-                  "value": "potato",
-                  "feedback": "Correct",
-                  "notChosenFeedback": "This is a vegetable"
-                },
-                {
-                  "value": "wheat",
-                  "feedback": "Incorrect"
-                }
-              ],
+              "feedback": [{
+                "value": "banana",
+                "feedback": "Incorrect"
+              }, {
+                "value": "carrot",
+                "feedback": "Correct",
+                "notChosenFeedback": "This is a vegetable"
+              }, {
+                "value": "apple",
+                "feedback": "it's a fruit"
+              }, {
+                "value": "turnip",
+                "feedback": "Correct",
+                "notChosenFeedback": "This is a vegetable"
+              }, {
+                "value": "potato",
+                "feedback": "Correct",
+                "notChosenFeedback": "This is a vegetable"
+              }, {
+                "value": "wheat",
+                "feedback": "Incorrect"
+              }],
               "model": {
                 "prompt": "Which of these is a vegetable?",
                 "config": {
                   "orientation": "vertical",
                   "shuffle": true
                 },
-                "choices": [
-                  {
-                    "label": "Banana",
-                    "value": "banana"
-                  },
-                  {
-                    "label": "Carrot",
-                    "value": "carrot"
-                  },
-                  {
-                    "label": "Apple",
-                    "value": "apple"
-                  },
-                  {
-                    "label": "Turnip",
-                    "value": "turnip"
-                  },
-                  {
-                    "label": "Potato",
-                    "value": "potato"
-                  },
-                  {
-                    "label": "Wheat",
-                    "value": "wheat"
-                  }
-                ]
+                "choices": [{
+                  "label": "Banana",
+                  "value": "banana"
+                }, {
+                  "label": "Carrot",
+                  "value": "carrot"
+                }, {
+                  "label": "Apple",
+                  "value": "apple"
+                }, {
+                  "label": "Turnip",
+                  "value": "turnip"
+                }, {
+                  "label": "Potato",
+                  "value": "potato"
+                }, {
+                  "label": "Wheat",
+                  "value": "wheat"
+                }]
               }
             };
             return $('<placeholder id="' + id + '" label="Multi Choice">');
