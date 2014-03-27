@@ -1,5 +1,6 @@
 .designer(ng-controller="Designer", ng-show="nav.isCurrentView('designer')")
 
   .editor-container(ng-class="editorMode")
-    wiggi-wiz(ng-model="item.xhtml",features="extraFeatures")
-    textarea(ng-model="item.xhtml", style="width: 100%; height: 300px")
+    wiggi-wiz(ng-model="item.xhtml",features="extraFeatures",ng-show="editorMode=='visual'")
+    textarea(ng-model="item.xhtml", style="width: 100%; height: 300px",ng-show="editorMode=='visual'")
+    .config-container(ng-class="editorMode", embedded-config-panel="true", config-panel-model="configPanelModel", close-panel="closeConfigPanel()")

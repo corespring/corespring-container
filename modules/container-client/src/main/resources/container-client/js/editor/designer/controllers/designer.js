@@ -6,6 +6,19 @@ var controller = function($scope, $compile, $http, $timeout, $modal, $log, Desig
   // TODO: find last id from markup
   $scope.lastId = 10;
 
+
+  $scope.openConfigPanel = function(componentName, id) {
+    $scope.configPanelModel = {
+      type: componentName,
+      id: id
+    };
+    $scope.editorMode = "config";
+  };
+
+  $scope.closeConfigPanel = function() {
+    $scope.editorMode = "visual";
+  };
+
   $scope.extraFeatures = [
     {
       type: 'dropdown',
@@ -99,17 +112,10 @@ var controller = function($scope, $compile, $http, $timeout, $modal, $log, Desig
             $log.debug('[onClick]', $node);
             editor.togglePopover($node, $scope);
           },
-          editInstance: function($node, $scope, editor) {
+          editInstance: function($node, instanceScope, editor) {
             $log.debug('[editInstance]', $node);
-
-            var id = $node.attr('id');
-            $log.debug("Id: ", id);
-            editor.launchDialog(ComponentRegister.components[id],
-              'Configure',
-              '<corespring-multiple-choice-config id="' + id + '"></corespring-multiple-choice-config>',
-              function onUpdate(update) {
-              }
-            );
+            $scope.openConfigPanel("corespring-multiple-choice", $node.attr('id'));
+            $scope.$apply();
           },
           getMarkUp: function($node, $scope) {
             var id;
