@@ -115,7 +115,7 @@ var controller = function($scope, $compile, $http, $timeout, $modal, $log, Desig
             } else {
               id = $node.attr('id');
             }
-            return ' < corespring - multiple - choice id = "' + id + '" > < /corespring-multiple-choice>';
+            return '<corespring-multiple-choice id="' + id + '"></corespring-multiple-choice>';
           }
         }
       ]
