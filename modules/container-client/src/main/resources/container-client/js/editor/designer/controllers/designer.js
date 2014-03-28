@@ -96,12 +96,15 @@ var controller = function($scope, $compile, $http, $timeout, $modal, $log, Desig
             };
             return $('<placeholder id="' + id + '" label="Multi Choice">');
           },
-          onClick: function($node, $scope, editor) {
-            $log.debug('[onClick]', $node);
-            editor.togglePopover($node, $scope);
+          onDblClick: function($node, $scope, editor) {
+            var data = {};
+            var content = '<corespring-multiple-choice-config id="' + $node.attr('id') + '"></corespring-multiple-choice-config>';
+            editor.showEditPane(data, 'Edit multiple-choice (' + $node.attr('id') + ')', content, function() {
+              $log.debug('on update...');
+            }, {});
           },
           editInstance: function($node, instanceScope, editor) {
-            $log.debug('[editInstance]', $node);
+            $log.debug(' [editInstance] ', $node);
             $scope.openConfigPanel("corespring-multiple-choice", $node.attr('id'));
             $scope.$apply();
           },
@@ -112,7 +115,7 @@ var controller = function($scope, $compile, $http, $timeout, $modal, $log, Desig
             } else {
               id = $node.attr('id');
             }
-            return '<corespring-multiple-choice id="' + id + '"></corespring-multiple-choice>';
+            return ' < corespring - multiple - choice id = "' + id + '" > < /corespring-multiple-choice>';
           }
         }
       ]
@@ -186,7 +189,6 @@ var controller = function($scope, $compile, $http, $timeout, $modal, $log, Desig
   $scope.getUploadUrl = function(file) {
     console.log(arguments);
     return file.name;
-    //return "??";
   };
 
   $scope.selectFile = function(file) {
