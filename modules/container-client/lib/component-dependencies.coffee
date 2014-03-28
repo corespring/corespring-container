@@ -5,13 +5,10 @@ sys = require('sys')
 os = require('os')
 
 
-
-
 puts = (error, stdout, stderr) -> 
   sys.puts(stderr)
   sys.puts(error)
   sys.puts(stdout)
-
 
 fileToJson = (p) ->
   contents = fs.readFileSync(p)
@@ -34,7 +31,7 @@ module.exports = (grunt) ->
       grunt.log.writeln("[isWindows] Platform #{os.platform()} #{isWin}")
       isWin
 
-    # target - may be undefined (if so ues the bower default target)
+    # target - may be undefined (if so uses the bower default target)
     # version - may be undefined (if so use the bower default version)
     bowerInstall = (name, target, version, done) ->
       printVersion = version || 'using bower default version'
@@ -50,7 +47,7 @@ module.exports = (grunt) ->
       args.push("-V")
       args.push(bowerName())
 
-      bowerCmd = if isWindows() then ".\node_modules\bower\bin\bower" else "./node_modules/bower/bin/bower"
+      bowerCmd = if isWindows() then "node ./node_modules/bower/bin/bower" else "./node_modules/bower/bin/bower"
       grunt.log.debug("is windows? #{isWindows()}")
       grunt.log.debug("bower command is now: #{bowerCmd}")
       exec = require('child_process').exec
