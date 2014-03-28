@@ -6,19 +6,6 @@ var controller = function($scope, $compile, $http, $timeout, $modal, $log, Desig
   // TODO: find last id from markup
   $scope.lastId = 10;
 
-
-  $scope.openConfigPanel = function(componentName, id) {
-    $scope.configPanelModel = {
-      type: componentName,
-      id: id
-    };
-    $scope.editorMode = "config";
-  };
-
-  $scope.closeConfigPanel = function() {
-    $scope.editorMode = "visual";
-  };
-
   $scope.extraFeatures = [
 
     {
@@ -36,7 +23,7 @@ var controller = function($scope, $compile, $http, $timeout, $modal, $log, Desig
             var id = $node.attr('id');
             return replaceWith('<placeholder label="multiple-choice:' + id + '" id="' + id + '"></placeholder>');
           },
-          addToEditor: function() {
+          addToEditor: function(editor, addContent) {
             var id = ++$scope.lastId;
             $scope.item.components[id] = {
               "componentType": "corespring-multiple-choice",
@@ -94,7 +81,7 @@ var controller = function($scope, $compile, $http, $timeout, $modal, $log, Desig
                 }]
               }
             };
-            return $('<placeholder id="' + id + '" label="Multi Choice">');
+            addContent($('<placeholder id="' + id + '" label="Multi Choice">'));
           },
           onDblClick: function($node, $scope, editor) {
             var data = {};
@@ -103,11 +90,6 @@ var controller = function($scope, $compile, $http, $timeout, $modal, $log, Desig
               $log.debug('on update...');
             }, {});
           },
-          editInstance: function($node, instanceScope, editor) {
-            $log.debug(' [editInstance] ', $node);
-            $scope.openConfigPanel("corespring-multiple-choice", $node.attr('id'));
-            $scope.$apply();
-          },
           getMarkUp: function($node, $scope) {
             var id;
             if ($scope && $scope.$$childHead) {
@@ -115,7 +97,7 @@ var controller = function($scope, $compile, $http, $timeout, $modal, $log, Desig
             } else {
               id = $node.attr('id');
             }
-            return '<corespring-multiple-choice id="' + id + '"></corespring-multiple-choice>';
+            return '<corespring-multiple-choice id = "' + id + '"></corespring-multiple-choice>';
           }
         }
       ]

@@ -38,6 +38,12 @@ submodule. If it doesn't you'll need to add this repo.
 *  CONTAINER_S3_KEY - mandatory - Amazon s3 key
 *  CONTAINER_S3_SECRET - mandatory - Amazon s3 secret
 *  CONTAINER_COMPONENTS_PATH - optional - the path to the components library
+
+#### CONTAINER_COMPONENTS_PATH + Prod mode play apps
+
+Production mode: When setting this path in a Prod mode play application, you must use 
+an absolute path. This is because play doesn't guarantee the use of relative paths for
+files relative to the application working dir. see: https://github.com/playframework/playframework/issues/2411 for more information.
   
 The s3 bucket is set to: corespring-container-test-bucket
 
