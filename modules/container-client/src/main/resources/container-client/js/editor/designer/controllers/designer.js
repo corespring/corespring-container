@@ -30,55 +30,22 @@ var controller = function($scope, $compile, $http, $timeout, $modal, $log, Desig
               "title": "Fruits",
               "weight": 10,
               "correctResponse": {
-                "value": ["carrot", "turnip", "potato"]
               },
-              "feedback": [{
-                "value": "banana",
-                "feedback": "Incorrect"
-              }, {
-                "value": "carrot",
-                "feedback": "Correct",
-                "notChosenFeedback": "This is a vegetable"
-              }, {
-                "value": "apple",
-                "feedback": "it's a fruit"
-              }, {
-                "value": "turnip",
-                "feedback": "Correct",
-                "notChosenFeedback": "This is a vegetable"
-              }, {
-                "value": "potato",
-                "feedback": "Correct",
-                "notChosenFeedback": "This is a vegetable"
-              }, {
-                "value": "wheat",
-                "feedback": "Incorrect"
-              }],
               "model": {
-                "prompt": "Which of these is a vegetable?",
                 "config": {
                   "orientation": "vertical",
-                  "shuffle": true
+                  "shuffle": false
                 },
-                "choices": [{
-                  "label": "Banana",
-                  "value": "banana"
-                }, {
-                  "label": "Carrot",
-                  "value": "carrot"
-                }, {
-                  "label": "Apple",
-                  "value": "apple"
-                }, {
-                  "label": "Turnip",
-                  "value": "turnip"
-                }, {
-                  "label": "Potato",
-                  "value": "potato"
-                }, {
-                  "label": "Wheat",
-                  "value": "wheat"
-                }]
+                "choices": [
+                  {
+                    "label": "Choice 1",
+                    "value": "choice1"
+                  },
+                  {
+                    "label": "Choice 2",
+                    "value": "choice2"
+                  }
+                ]
               }
             };
             addContent($('<placeholder id="' + id + '" label="Multi Choice">'));
@@ -106,53 +73,10 @@ var controller = function($scope, $compile, $http, $timeout, $modal, $log, Desig
 
   var configPanels = {};
 
-  var getUid = function() {
-    return Math.random().toString(36).substring(2, 9);
-  };
-
   $scope.editorMode = "visual";
-
-  $scope.openChooser = function() {
-
-    var modalInstance = $modal.open({
-      templateUrl: 'add-component.html',
-      controller: AddContentModalController,
-      backdrop: true,
-      scope: $scope,
-      resolve: {
-        componentSet: function() {
-          return $scope.componentSet;
-        }
-      }
-    });
-
-    modalInstance.result.then(
-      function(componentMap) {
-        _.each(componentMap, function(v, k) {
-          _(v.amount).times(function() {
-            $scope.addComponent(v.component);
-          });
-        });
-
-      },
-      function() {
-        $log.info('Modal dismissed at: ' + new Date());
-      });
-  };
-
 
   $scope.onComponentsLoaded = function(componentSet) {
     $scope.componentSet = componentSet;
-  };
-
-  $scope.getIconUrl = function(type) {
-    var comp = _.find($scope.componentSet, function(c) {
-      return c.componentType === type;
-    });
-
-    if (comp) {
-      return comp.icon;
-    }
   };
 
   $scope.hasComponents = function() {
@@ -167,7 +91,6 @@ var controller = function($scope, $compile, $http, $timeout, $modal, $log, Desig
     console.warn("Error loading components");
   };
 
-
   $scope.getUploadUrl = function(file) {
     console.log(arguments);
     return file.name;
@@ -176,24 +99,7 @@ var controller = function($scope, $compile, $http, $timeout, $modal, $log, Desig
   $scope.selectFile = function(file) {
     console.log("root select file...");
     $scope.selectedFile = file;
-    $scope.selectedComponent = null;
     console.log($scope.selectedFile);
-  };
-
-  $scope.addComponent = function(descriptor) {
-    console.log("add component" + descriptor.componentType);
-    var uid = getUid();
-    $scope.item.components[uid] = _.cloneDeep(descriptor.defaultData);
-    var node = $($scope.item.xhtml);
-    node.append("<" + descriptor.componentType + " id='" + uid + "'></" + descriptor.componentType + ">");
-    $scope.item.xhtml = "<div>" + node.html() + "</div>";
-
-    if (!$scope.selectedComponent) {
-      $scope.selectedComponent = {
-        id: uid,
-        component: $scope.item.components[uid]
-      };
-    }
   };
 
   $scope.$on('fileSizeGreaterThanMax', function(event) {
@@ -231,7 +137,8 @@ var controller = function($scope, $compile, $http, $timeout, $modal, $log, Desig
         comps[key] = component.getModel();
       }
     });
-    return comps;
+
+    return newModel;
   };
 
 
@@ -239,51 +146,14 @@ var controller = function($scope, $compile, $http, $timeout, $modal, $log, Desig
     MathJaxService.parseDomForMath();
   });
 
-  $scope.switchToJsonView = function() {
-    $scope.selectedComponentJson = JSON.stringify($scope.selectedComponent.component, null, 2);
-    $scope.editorMode = 'json';
-  };
-
-  $scope.$watch('selectedComponent.id', function(newValue) {
-    if (newValue) {
-      $scope.selectedComponentJson = JSON.stringify($scope.selectedComponent.component, null, 2);
-    }
-  });
-
-  $scope.jsonEditorLoaded = function(_editor) {
-    var _session = _editor.getSession();
-    _session.setUseWrapMode(true);
-    _session.setWrapLimitRange(70, 80);
-  };
-
-
-  $scope.jsonEditorChanged = function(val) {
-    var newObject = JSON.parse($scope.selectedComponentJson);
-    for (var key in $scope.selectedComponent.component) {
-      $scope.selectedComponent.component[key] = newObject[key];
-    }
-  };
-
-
   $scope.getItem = function() {
     return $scope.item;
-  };
-
-  $scope.selectFirstComponent = function() {
-    for (var c in $scope.item.components) {
-      $scope.selectedComponent = {
-        id: c,
-        component: $scope.item.components[c]
-      };
-      break;
-    }
   };
 
   PlayerService.setQuestionLookup($scope.getQuestionForComponentId);
   PlayerService.setItemLookup($scope.getItem);
 
-  function initDesigner(item) {
-
+  $scope.$on('itemLoaded', function(ev, item) {
     _.each(item.components, function(c, key) {
       var serverLogic = corespring.server.logic(c.componentType);
       if (serverLogic.preprocess) {
@@ -295,8 +165,6 @@ var controller = function($scope, $compile, $http, $timeout, $modal, $log, Desig
 
     $scope.item = item;
 
-    $scope.selectFirstComponent();
-
     var scoringJs = _.find($scope.item.files, function(f) {
       return f.name === "scoring.js";
     });
@@ -304,11 +172,7 @@ var controller = function($scope, $compile, $http, $timeout, $modal, $log, Desig
     if (scoringJs) {
       PlayerService.setScoringJs(scoringJs);
     }
-  }
-
-  //  DesignerService.loadItem($scope.itemId, function(item){
-  //    initDesigner(item);
-  //  });
+  });
 
   DesignerService.loadAvailableComponents($scope.onComponentsLoaded, $scope.onComponentsLoadError);
 };

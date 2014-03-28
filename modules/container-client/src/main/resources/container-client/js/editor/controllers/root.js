@@ -57,6 +57,7 @@ var controller = function($scope, $log, $location, $timeout, DataQueryService, I
   $scope.onItemLoaded = function(data) {
     $scope.allData = data;
     $scope.item = data.item;
+    $scope.$broadcast('itemLoaded', data.item);
   };
 
   $scope.onItemLoadError = function(error) {
