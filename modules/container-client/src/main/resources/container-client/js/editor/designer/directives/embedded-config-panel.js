@@ -29,7 +29,14 @@
       def = {
         link: link($compile),
         restrict: 'AE',
-        template: "<div><div><a ng-click='closeConfigPanel()'>Close</a></div><div class='panel'></div></div>",
+        template: [
+          "<div class='embedded-config-panel'>",
+          "  <div class='pull-right close-button-container'>",
+          "    <a class='close-button' ng-click='closeConfigPanel()'>Close</a>",
+          "  </div>",
+          "  <div class='panel'></div>",
+          "</div>"
+        ].join(''),
         scope: {
           configPanelModel: "=",
           closePanel: "&"
