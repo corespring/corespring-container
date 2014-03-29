@@ -10,8 +10,9 @@ class JsContextTest extends Specification {
   "JsContext" should {
     "throw an error" in {
 
-      val out = client.withJsContext[String](Seq.empty, Seq.empty) { (ctx: Context, scriptable: Scriptable) =>
-        Right("hello")
+      val out = client.withJsContext[String](Seq.empty, Seq.empty) { (ctx: Context, scope: Scriptable) =>
+        val o = ctx.evaluateString(scope, "asta asoien", "throw_error.js", 1, null)
+        Right(o.asInstanceOf[String])
       }
       out === Right("hello")
     }
