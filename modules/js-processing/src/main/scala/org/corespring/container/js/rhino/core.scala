@@ -2,28 +2,64 @@ package org.corespring.container.js.rhino
 
 import java.io.{ InputStreamReader, Reader }
 import org.mozilla.javascript.tools.shell.Global
-import org.mozilla.javascript.{ EcmaError, ScriptableObject, Scriptable, Context }
-import org.mozilla.javascript.{ Function => RhinoFunction }
+import org.mozilla.javascript.{ Function => RhinoFunction, _ }
 import play.api.Logger
 import play.api.libs.json.{ JsString, Json, JsValue }
 import org.corespring.container.js.api.JsError
+import play.api.libs.json.JsString
+import scala.Some
 
 trait JsConsole {
   def log(msg: String)
+
   def warn(msg: String)
+
   def info(msg: String)
+
   def debug(msg: String)
 }
 
 class DefaultLogger(log: Logger) extends JsConsole {
   def log(msg: String) = log.info(msg)
+
   def warn(msg: String) = log.warn(msg)
+
   def info(msg: String) = log.info(msg)
+
   def debug(msg: String) = log.debug(msg)
 }
 
 trait JsLogging {
   lazy val logger = Logger("js.processing")
+}
+
+case class RhinoJsError(
+  val message: String,
+  val lineNo: Int,
+  val column: Int,
+  val source: String,
+  val name: String) extends JsError
+
+object RhinoJsError {
+  def apply(e: RhinoException): RhinoJsError = {
+    RhinoJsError(e.getMessage, e.lineNumber(), e.columnNumber, e.lineSource, e.sourceName)
+  }
+}
+
+class LocalErrorReporter extends ErrorReporter {
+  override def runtimeError(message: String, sourceName: String, line: Int, lineSource: String, lineOffset: Int): EvaluatorException = {
+    println(s"[LocalErrorReporter:runtimeError] -> $message")
+    new EvaluatorException(message, sourceName, line, lineSource, lineOffset)
+  }
+
+  override def error(message: String, sourceName: String, line: Int, lineSource: String, lineOffset: Int): Unit = {
+    println(s"[LocalErrorReporter:error] -> $message")
+  }
+
+  override def warning(message: String, sourceName: String, line: Int, lineSource: String, lineOffset: Int): Unit = {
+    println(s"[LocalErrorReporter:warning] -> $message")
+  }
+
 }
 
 trait NewJsContext extends JsLogging {
@@ -32,6 +68,7 @@ trait NewJsContext extends JsLogging {
 
   def withJsContext[A](libs: Seq[String], srcs: Seq[String] = Seq.empty)(f: (Context, Scriptable) => Either[JsError, A]): Either[JsError, A] = {
     val ctx = Context.enter
+    ctx.setErrorReporter(new LocalErrorReporter)
     ctx.setOptimizationLevel(-1)
     val global = new Global
     global.init(ctx)
@@ -54,7 +91,11 @@ trait NewJsContext extends JsLogging {
     try {
       f(ctx, scope)
     } catch {
-      case e: Exception => {
+      case e: RhinoException => {
+        println("... js error..")
+        Left(RhinoJsError(e))
+      }
+      case e: Throwable => {
         println("... js error..")
         throw e
       }

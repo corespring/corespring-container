@@ -27,6 +27,7 @@ object api {
     def lineNo: Int
     def column: Int
     def source: String
+    def name: String
   }
 
 }
