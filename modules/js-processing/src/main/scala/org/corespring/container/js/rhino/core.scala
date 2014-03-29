@@ -6,6 +6,7 @@ import org.mozilla.javascript.{ EcmaError, ScriptableObject, Scriptable, Context
 import org.mozilla.javascript.{ Function => RhinoFunction }
 import play.api.Logger
 import play.api.libs.json.{ JsString, Json, JsValue }
+import org.corespring.container.js.api.JsError
 
 trait JsConsole {
   def log(msg: String)
@@ -25,11 +26,11 @@ trait JsLogging {
   lazy val logger = Logger("js.processing")
 }
 
-trait JsContext extends JsLogging {
+trait NewJsContext extends JsLogging {
 
   def console: Option[JsConsole] = Some(new DefaultLogger(Logger("js.console")))
 
-  def withJsContext(libs: Seq[String], srcs: Seq[String] = Seq.empty)(f: (Context, Scriptable) => JsValue): JsValue = {
+  def withJsContext[A](libs: Seq[String], srcs: Seq[String] = Seq.empty)(f: (Context, Scriptable) => Either[JsError, A]): Either[JsError, A] = {
     val ctx = Context.enter
     ctx.setOptimizationLevel(-1)
     val global = new Global
@@ -53,7 +54,57 @@ trait JsContext extends JsLogging {
     try {
       f(ctx, scope)
     } catch {
-      case e: Exception => throw e;
+      case e: Exception => {
+        println("... js error..")
+        throw e
+      }
+    } finally {
+      Context.exit
+    }
+  }
+
+  private def loadJsLib(path: String): Option[Reader] = {
+    val stream = getClass.getResourceAsStream(path)
+    if (stream == null) {
+      None
+    } else {
+      Some(new InputStreamReader((stream)))
+    }
+  }
+}
+
+trait JsContext extends JsLogging {
+
+  def console: Option[JsConsole] = Some(new DefaultLogger(Logger("js.console")))
+
+  def withJsContext[A](libs: Seq[String], srcs: Seq[String] = Seq.empty)(f: (Context, Scriptable) => A): A = {
+    val ctx = Context.enter
+    ctx.setOptimizationLevel(-1)
+    val global = new Global
+    global.init(ctx)
+    val scope = ctx.initStandardObjects(global)
+
+    def addToContext(libPath: String) = loadJsLib(libPath).map {
+      reader =>
+        ctx.evaluateReader(scope, reader, libPath, 1, null)
+    }.getOrElse(logger.debug(s"Couldn't load $libPath"))
+
+    libs.foreach(addToContext)
+
+    def addSrcToContext(src: String) = ctx.evaluateString(scope, src, "?", 1, null)
+    srcs.foreach(addSrcToContext)
+
+    def addToScope(name: String)(thing: Any) = ScriptableObject.putProperty(scope, name, thing)
+
+    console.foreach(addToScope("console"))
+
+    try {
+      f(ctx, scope)
+    } catch {
+      case e: Exception => {
+        println("... js error..")
+        throw e
+      }
     } finally {
       Context.exit
     }

@@ -22,4 +22,11 @@ object api {
 
   }
 
+  trait JsError {
+    def message: String
+    def lineNo: Int
+    def column: Int
+    def source: String
+  }
+
 }
