@@ -32,15 +32,6 @@ var controller = function($scope, $compile, $http, $timeout, $modal, $log, Desig
         buttons: _.map(componentSet, componentToFeature)
       }
     ];
-
-  };
-
-  $scope.hasComponents = function() {
-    return $scope.item && _.size($scope.item.components) > 0;
-  };
-
-  $scope.isNewItem = function() {
-    return $scope.item && !$scope.hasComponents();
   };
 
   $scope.onComponentsLoadError = function(error) {
