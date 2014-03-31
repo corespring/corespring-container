@@ -28,7 +28,7 @@ describe('designer controller', function(){
 
   function mockMathJaxService(){}
   
-  function mockComponentRegister(){}
+  function mockFeatureAdapter(){}
 
   beforeEach(angular.mock.module('corespring-editor.controllers'));
 
@@ -38,7 +38,7 @@ describe('designer controller', function(){
       $provide.value('DesignerService', new mockDesignerService());
       $provide.value('PlayerService', new mockPlayerService());
       $provide.value('MathJaxService', new mockMathJaxService());
-      $provide.value('ComponentRegister', new mockComponentRegister());
+      $provide.value('ComponentToWiggiwizFeatureAdapter', new mockFeatureAdapter());
     });
   });
 
