@@ -3,9 +3,6 @@ var controller = function($scope, $compile, $http, $timeout, $modal, $log, Desig
 
   $scope.showComponentsPanel = false;
 
-  // TODO: find last id from markup
-  $scope.lastId = 10;
-
   var configPanels = {};
 
   $scope.editorMode = "visual";
@@ -58,7 +55,6 @@ var controller = function($scope, $compile, $http, $timeout, $modal, $log, Desig
   };
 
   $scope.$on('registerConfigPanel', function(a, id, component) {
-    console.log("registerConfigPanel:", id, component);
     configPanels[id] = component;
     component.setModel($scope.item.components[id]);
   });
@@ -109,7 +105,14 @@ var controller = function($scope, $compile, $http, $timeout, $modal, $log, Desig
       }
     });
 
-    $scope.item = item;
+    var max = 0;
+    $(item.xhtml).find('[id]').each(function(idx, element) {
+      var id = Number($(element).attr('id'));
+      if (!_.isNaN(id) && id > max) {
+        max = id;
+      }
+    });
+    $scope.lastId = max;
 
     var scoringJs = _.find($scope.item.files, function(f) {
       return f.name === "scoring.js";
