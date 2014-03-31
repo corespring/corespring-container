@@ -1,11 +1,34 @@
-/* global AddContentModalController */
+/* global AddContentModalController, com */
 var controller = function($scope, $compile, $http, $timeout, $modal, $log, DesignerService, PlayerService, MathJaxService, ComponentToWiggiwizFeatureAdapter) {
-
-  $scope.showComponentsPanel = false;
 
   var configPanels = {};
 
   $scope.editorMode = "visual";
+
+  $scope.imageService = {
+    addFile: function(file, callback) {
+      $log.debug('>> file', file);
+
+      var url = '/client/editor/' + $scope.itemId + '/' + file.name;
+
+      var opts = {
+        onUploadComplete: function(body, status) {
+          $log.debug('done: ', body, status);
+          callback(null, url);
+        }
+      };
+
+      var reader = new FileReader();
+
+      reader.onloadend = function() {
+        console.log(reader.result);
+        var uploader = new com.ee.RawFileUploader(file, reader.result, url, name, opts);
+        uploader.beginUpload();
+      };
+
+      reader.readAsBinaryString(file);
+    }
+  };
 
   $scope.onComponentsLoaded = function(componentSet) {
 
@@ -21,14 +44,12 @@ var controller = function($scope, $compile, $http, $timeout, $modal, $log, Desig
       return ComponentToWiggiwizFeatureAdapter.componentToWiggiwizFeature(component, addToEditor);
     };
 
-    $scope.extraFeatures = [
-      {
-        name: 'external',
-        type: 'dropdown',
-        dropdownTitle: 'Components',
-        buttons: _.map(componentSet, componentToFeature)
-      }
-    ];
+    $scope.extraFeatures = [{
+      name: 'external',
+      type: 'dropdown',
+      dropdownTitle: 'Components',
+      buttons: _.map(componentSet, componentToFeature)
+    }];
   };
 
   $scope.onComponentsLoadError = function(error) {
