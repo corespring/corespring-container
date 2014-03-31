@@ -14,14 +14,22 @@ var controller = function($scope, $compile, $http, $timeout, $modal, $log, Desig
 
     $scope.componentSet = componentSet;
 
+    var addToEditor = function(editor, addContent, component) {
+      var id = ++$scope.lastId;
+      $scope.item.components[id] = component.defaultData;
+      addContent($('<placeholder id="' + id + '" label="' + component.name + '">'));
+    };
+
+    var componentToFeature = function(component) {
+      return ComponentToWiggiwizFeatureAdapter.componentToWiggiwizFeature(component, addToEditor);
+    };
+
     $scope.extraFeatures = [
       {
         name: 'external',
         type: 'dropdown',
         dropdownTitle: 'Components',
-        buttons: _.map(componentSet, function(c) {
-          return ComponentToWiggiwizFeatureAdapter.componentToWiggiwizFeature(c, $scope);
-        })
+        buttons: _.map(componentSet, componentToFeature)
       }
     ];
 
