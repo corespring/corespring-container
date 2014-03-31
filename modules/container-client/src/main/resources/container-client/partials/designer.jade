@@ -4,5 +4,5 @@
     wiggi-wiz(ng-model="item.xhtml",features="extraFeatures",ng-show="editorMode=='visual'")
       toolbar(basic="bold italic", formatting="h1 h2 p")
       edit-pane-toolbar(alignment="bottom")
-        button(ng-click="closePane()", class="btn btn-sm btn-success", style="float:right;") OK
-    //textarea(ng-model="item.xhtml", style="width: 100%; height: 300px",ng-show="editorMode=='visual'")
+        .btn-group
+          button(ng-click="closePane()", class="btn btn-sm btn-success", style="float:right;") OK
