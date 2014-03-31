@@ -13,7 +13,7 @@ var controller = function($scope, $compile, $http, $timeout, $modal, $log, Desig
 
     var addToEditor = function(editor, addContent, component) {
       var id = ++$scope.lastId;
-      $scope.item.components[id] = component.defaultData;
+      $scope.item.components[id] = _.cloneDeep(component.defaultData);
       addContent($('<placeholder id="' + id + '" label="' + component.name + '">'));
     };
 
