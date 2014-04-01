@@ -34,7 +34,6 @@ var controller = function($scope, $compile, $http, $timeout, $modal, $log, Desig
       var reader = new FileReader();
 
       reader.onloadend = function() {
-        console.log(reader.result);
         var uploader = new com.ee.RawFileUploader(file, reader.result, url, name, opts);
         uploader.beginUpload();
       };
