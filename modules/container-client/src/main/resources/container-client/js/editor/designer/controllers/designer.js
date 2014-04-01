@@ -6,6 +6,10 @@ var controller = function($scope, $compile, $http, $timeout, $modal, $log, Desig
   $scope.editorMode = "visual";
 
   $scope.imageService = {
+
+    deleteFile: function(url) {
+      throw "TODO: deleteFile";
+    },
     addFile: function(file, callback) {
       $log.debug('>> file', file);
 
