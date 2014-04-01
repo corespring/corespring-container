@@ -1,0 +1,19 @@
+.save-supporting-material
+
+  .field
+    label(for='supporting-material-title') Title
+    input#supporting-material-title(type='text', ng-model="data.title")
+
+  .field
+    label(for='supporting-material-type') Type
+    select(ng-model='data.materialType', ng-options="materialType for materialType in materialTypes")
+
+  .field.other(ng-show='displayOther')
+    label(for='supporting-material-type-text') Other
+    input#supporting-material-type-text(type='text', ng-model='data.textMaterialType')
+
+  ul.buttons
+    li
+      button.btn.btn-sm(ng-click='cancel()') Cancel
+    li
+      button.btn.btn-sm.btn-success(ng-click='ok()') OK

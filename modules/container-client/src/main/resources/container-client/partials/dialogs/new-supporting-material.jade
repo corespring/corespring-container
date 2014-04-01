@@ -1,0 +1,19 @@
+.new-supporting-material
+
+  p.prompt Select source:
+
+  .options
+    .option
+      input(type='radio', id='new-supporting-material-input', name='option', checked)
+      label(for='new-supporting-material-input') Create new
+    p Begin typing below. You may also add images inline selecting the image icon from the toolbar.
+
+    .option
+      input(type='radio', id='upload-pdf-supporting-material-input', name='option')
+      label(for='upload-pdf-supporting-material-input') Upload PDF
+    p Select a file from your computer to upload
+
+    wiggi-wiz(ng-model="item.xhtml")
+      toolbar(basic="bold italic", formatting="h1 h2 p")
+
+    button.save.btn.btn-success.btn-sm Save
