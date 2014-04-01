@@ -1,7 +1,11 @@
 .designer(ng-controller="Designer", ng-show="nav.isCurrentView('designer')")
 
   .editor-container(ng-class="editorMode")
-    wiggi-wiz(ng-model="item.xhtml",features="extraFeatures",ng-show="editorMode=='visual'")
+    wiggi-wiz(
+      ng-model="item.xhtml",
+      features="extraFeatures",
+      image-service="imageService"
+      ng-show="editorMode=='visual'")
       toolbar(basic="bold italic", formatting="h1 h2 p")
       edit-pane-toolbar(alignment="bottom")
         .btn-group

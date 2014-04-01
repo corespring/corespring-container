@@ -1,11 +1,46 @@
-/* global AddContentModalController */
+/* global AddContentModalController, com */
 var controller = function($scope, $compile, $http, $timeout, $modal, $log, DesignerService, PlayerService, MathJaxService, ComponentToWiggiwizFeatureAdapter) {
-
-  $scope.showComponentsPanel = false;
 
   var configPanels = {};
 
   $scope.editorMode = "visual";
+
+  $scope.imageService = {
+
+    deleteFile: function(url) {
+      $http['delete'](url);
+    },
+    addFile: function(file, onComplete, onProgress) {
+      var url = '' + file.name;
+
+      var opts = {
+        onUploadComplete: function(body, status) {
+          $log.debug('done: ', body, status);
+          onComplete(null, url);
+        },
+        onUploadProgress: function() {
+          $log.debug('progress', arguments);
+          onProgress(null, 'started');
+        },
+        onUploadFailed: function() {
+          $log.debug('failed', arguments);
+          onComplete({
+            code: 'UPLOAD_FAILED',
+            message: 'upload failed!'
+          });
+        }
+      };
+
+      var reader = new FileReader();
+
+      reader.onloadend = function() {
+        var uploader = new com.ee.RawFileUploader(file, reader.result, url, name, opts);
+        uploader.beginUpload();
+      };
+
+      reader.readAsBinaryString(file);
+    }
+  };
 
   $scope.onComponentsLoaded = function(componentSet) {
 
@@ -21,14 +56,12 @@ var controller = function($scope, $compile, $http, $timeout, $modal, $log, Desig
       return ComponentToWiggiwizFeatureAdapter.componentToWiggiwizFeature(component, addToEditor);
     };
 
-    $scope.extraFeatures = [
-      {
-        name: 'external',
-        type: 'dropdown',
-        dropdownTitle: 'Components',
-        buttons: _.map(componentSet, componentToFeature)
-      }
-    ];
+    $scope.extraFeatures = [{
+      name: 'external',
+      type: 'dropdown',
+      dropdownTitle: 'Components',
+      buttons: _.map(componentSet, componentToFeature)
+    }];
   };
 
   $scope.onComponentsLoadError = function(error) {
