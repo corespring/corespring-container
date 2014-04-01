@@ -45,6 +45,7 @@ GET        /editor/:itemId/index.html                      @org.corespring.conta
 GET        /editor/:itemId/run                             @org.corespring.container.client.controllers.Assets.item(itemId, file="new-editor.html")
 GET        /editor/:itemId/*file                           @org.corespring.container.client.controllers.Assets.item(itemId, file)
 POST       /editor/:itemId/*file                           @org.corespring.container.client.controllers.Assets.upload(itemId, file)
+DELETE     /editor/:itemId/*file                           @org.corespring.container.client.controllers.Assets.delete(itemId, file)
 
 GET        /data-query/:topic                              @org.corespring.container.client.controllers.DataQuery.list(topic, query : Option[String] ?= None)
 GET        /data-query/:topic/:id                          @org.corespring.container.client.controllers.DataQuery.findOne(topic, id)

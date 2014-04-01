@@ -8,17 +8,26 @@ var controller = function($scope, $compile, $http, $timeout, $modal, $log, Desig
   $scope.imageService = {
 
     deleteFile: function(url) {
-      throw "TODO: deleteFile";
+      $http['delete'](url);
     },
-    addFile: function(file, callback) {
-      $log.debug('>> file', file);
-
-      var url = '/client/editor/' + $scope.itemId + '/' + file.name;
+    addFile: function(file, onComplete, onProgress) {
+      var url = '' + file.name;
 
       var opts = {
         onUploadComplete: function(body, status) {
           $log.debug('done: ', body, status);
-          callback(null, url);
+          onComplete(null, url);
+        },
+        onUploadProgress: function() {
+          $log.debug('progress', arguments);
+          onProgress(null, 'started');
+        },
+        onUploadFailed: function() {
+          $log.debug('failed', arguments);
+          onComplete({
+            code: 'UPLOAD_FAILED',
+            message: 'upload failed!'
+          });
         }
       };
 

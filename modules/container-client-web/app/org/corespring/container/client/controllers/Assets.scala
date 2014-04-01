@@ -3,6 +3,8 @@ package org.corespring.container.client.controllers
 import play.api.mvc._
 import scala.concurrent.{ ExecutionContext, Future }
 import play.api.Logger
+import play.api.libs.json.{ JsString, Json }
+import org.corespring.container.client.actions.AssetActions
 
 trait Assets extends Controller {
 
@@ -17,6 +19,8 @@ trait Assets extends Controller {
   def resourcePath: String = "/container-client"
 
   def uploadBodyParser(id: String, file: String): BodyParser[Int]
+
+  def actions: AssetActions[AnyContent]
 
   private def at(id: String, file: String, notFoundLocally: String => SimpleResult) = Action.async {
     request =>
@@ -54,5 +58,12 @@ trait Assets extends Controller {
 
   def upload(id: String, file: String) = Action(uploadBodyParser(id, file)) { request =>
     Ok("Done")
+  }
+
+  def delete(itemId: String, file: String) = actions.delete(itemId, file) {
+    request =>
+      request.error.map { e =>
+        Ok(Json.obj("error" -> JsString(e)))
+      }.getOrElse(Ok)
   }
 }
