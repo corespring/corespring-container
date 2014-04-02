@@ -13,7 +13,7 @@
       label(for='upload-pdf-supporting-material-input') Upload PDF
     p Select a file from your computer to upload
 
-    wiggi-wiz(ng-model="item.xhtml")
+    wiggi-wiz(ng-model="content")
       toolbar(basic="bold italic", formatting="h1 h2 p")
 
-    button.save.btn.btn-success.btn-sm Save
+  button.save.btn.btn-success(ng-click='confirm()') Save

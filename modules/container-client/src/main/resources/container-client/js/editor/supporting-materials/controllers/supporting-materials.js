@@ -9,6 +9,9 @@ var controller = function ($scope, $modal, Overlay) {
         console.log(update);
       }
     });
+
+    // TODO: Remove this workaround if/when overlay works officially outsize wiggiwiz
+    $('#overlay-holder').appendTo($('.supporting-materials'));
   };
 
   $scope.confirm = function() {
@@ -54,7 +57,7 @@ var controller = function ($scope, $modal, Overlay) {
     });
   };
 
-//  $scope.createNew();
+  $scope.createNew();
 
 };
 
