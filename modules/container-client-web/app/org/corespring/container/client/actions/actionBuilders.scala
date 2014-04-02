@@ -35,6 +35,10 @@ trait ItemActions[A] {
   def create(error: (Int, String) => Result)(block: NewItemRequest[A] => Result): Action[AnyContent]
 }
 
+trait SupportingMaterialActions[A] {
+  def create(itemId: String)(block: NewSupportingMaterialRequest[A] => Result): Action[AnyContent]
+}
+
 trait SessionActions[A] {
   def loadEverything(id: String)(block: FullSessionRequest[A] => Result): Action[AnyContent]
 

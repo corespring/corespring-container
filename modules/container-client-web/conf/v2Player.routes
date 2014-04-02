@@ -28,6 +28,8 @@ GET        /item/:itemId.json                              @org.corespring.conta
 PUT        /item/:itemId.json                              @org.corespring.container.client.controllers.resources.Item.save(itemId, property: Option[String] ?= None)
 POST       /item/create                                    @org.corespring.container.client.controllers.resources.Item.create()
 
+POST       /item/:itemId/supporting-materials/create       @org.corespring.container.client.controllers.resources.SupportingMaterial.create(itemId)
+
 
 GET        /icon/:icon                                     @org.corespring.container.client.controllers.Icons.icon(icon)
         

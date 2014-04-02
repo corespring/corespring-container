@@ -25,6 +25,8 @@ case class NewItemRequest[A](itemId: String, r: Request[A]) extends WrappedReque
 case class SaveItemRequest[A](item: JsValue, save: (String, JsValue, Option[String]) => Option[JsValue], r: Request[A]) extends WrappedRequest(r)
 case class ScoreItemRequest[A](item: JsValue, r: Request[A]) extends WrappedRequest(r)
 
+case class NewSupportingMaterialRequest[A](save: (String, JsValue) => Either[JsValue, String], r: Request[A]) extends WrappedRequest(r)
+
 /**
  * @param everything - should contain "item" -> item json, "session" - session json
  * @param saveSession
