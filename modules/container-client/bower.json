@@ -12,6 +12,7 @@
     "select2": "~3.4.5",
     "angular-ui-select2": "~0.0.5",
     "angular-bootstrap": "~0.10.0",
+    "angular-ui-router": "0.2.10",
     "jquery": "1.10.2",
     "saxjs": "https://github.com/isaacs/sax-js.git",
     "bootstrap": "~3.1.0",

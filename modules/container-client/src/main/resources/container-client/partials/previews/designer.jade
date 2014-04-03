@@ -1,17 +1,18 @@
-client-side-preview(ng-controller="ClientSidePreview", ng-show="nav.isCurrentView('designer')")
+script#designer-preview(type='text/ng-template')
+  client-side-preview(ng-controller="ClientSidePreview")
 
-  player-control-panel(player-settings="session.settings")
+    player-control-panel(player-settings="session.settings")
 
-  corespring-player(
-    player-mode="editor",
-    player-markup="item.xhtml",
-    player-item="item",
-    player-session="rootModel.session",
-    player-outcomes="outcome")
+    corespring-player(
+      player-mode="editor",
+      player-markup="item.xhtml",
+      player-item="item",
+      player-session="rootModel.session",
+      player-outcomes="outcome")
 
-  .button-holder
-    button.btn.btn-primary(ng-click="submit()", ng-disabled="!canSubmit()") Submit
-    button.btn.btn-warning(ng-click="resetPreview()") Reset
-  hr/
-  #score(ng-show="score")
-    h4 You scored: {{score.summary.percentage}}%
+    .button-holder
+      button.btn.btn-primary(ng-click="submit()", ng-disabled="!canSubmit()") Submit
+      button.btn.btn-warning(ng-click="resetPreview()") Reset
+    hr/
+    #score(ng-show="score")
+      h4 You scored: {{score.summary.percentage}}%
