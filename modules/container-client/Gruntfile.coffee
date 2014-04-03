@@ -174,6 +174,7 @@ module.exports = (grunt) ->
           vendor: [
             '<%= common.dist %>/bower_components/angular/angular.js',
             '<%= common.dist %>/bower_components/angular-mocks/angular-mocks.js',
+            '<%= common.dist %>/bower_components/wiggi-wiz/dist/wiggi-wiz.js',
             '<%= common.dist %>/bower_components/jquery/jquery.js',
             '<%= common.dist %>/bower_components/lodash/dist/lodash.js'
             '<%= common.dist %>/bower_components/saxjs/lib/sax.js'
