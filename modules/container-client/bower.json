@@ -57,7 +57,6 @@
     ]
   },
   "resolutions": {
-    "angular": "~1.2.12",
     "bootstrap": "~3.1.1"
   }
 }
