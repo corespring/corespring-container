@@ -19,6 +19,7 @@
 }
 
 .component-placeholder {
+  position:relative; 
   border: 1px solid darken(@cs-green, 10%);
   background-color: lighten(@cs-green, 40%);
   transition: background-color 100ms linear;
@@ -30,4 +31,26 @@
   }
   max-width: 400px;
   padding: 20px;
+
+
+  .delete-icon{
+    width: 20px;
+    height: 20px;
+    .drop-shadow(2px, 2px, 2px, 0.3);
+    i{
+      position: absolute;
+      font-size: 24px;
+      color: darken(@cs-green, 10%);
+
+      &:hover{
+
+        color: darken(@cs-green, 16%);
+      }
+    }
+    background-color: white;
+    border-radius: 12px;
+    position:absolute; 
+    right: -8px;
+    top: -10px;
+  }
 }
