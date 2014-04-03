@@ -1,5 +1,16 @@
 /* global AddContentModalController, com */
-var controller = function($scope, $compile, $http, $timeout, $modal, $log, DesignerService, PlayerService, MathJaxService, ComponentToWiggiwizFeatureAdapter) {
+var controller = function(
+  $scope,
+  $compile,
+  $http,
+  $timeout,
+  $modal,
+  $log,
+  DesignerService,
+  PlayerService,
+  MathJaxService,
+  ComponentToWiggiwizFeatureAdapter,
+  ImageUtils) {
 
   var configPanels = {};
 
@@ -12,6 +23,11 @@ var controller = function($scope, $compile, $http, $timeout, $modal, $log, Desig
     },
     addFile: function(file, onComplete, onProgress) {
       var url = '' + file.name;
+
+      if (ImageUtils.bytesToKb(file.size) > 500) {
+        onComplete(ImageUtils.fileTooBigError(file.size, 500));
+        return;
+      }
 
       var opts = {
         onUploadComplete: function(body, status) {
@@ -170,5 +186,6 @@ angular.module('corespring-editor.controllers')
     'PlayerService',
     'MathJaxService',
     'ComponentToWiggiwizFeatureAdapter',
+    'ImageUtils',
     controller
   ]);
