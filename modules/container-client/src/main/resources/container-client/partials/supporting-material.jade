@@ -1,0 +1,12 @@
+script#supporting-material(type='text/ng-template')
+  .designer(ng-controller="SupportingMaterial")
+    .editor-container(ng-class="editorMode")
+      wiggi-wiz(
+        ng-model="item.xhtml",
+        features="extraFeatures",
+        image-service="imageService",
+        ng-show="editorMode=='visual'")
+        toolbar(basic="bold italic", formatting="h1 h2 p")
+        edit-pane-toolbar(alignment="bottom")
+          .btn-group
+            button(ng-click="closePane()", class="btn btn-sm btn-success", style="float:right;") OK

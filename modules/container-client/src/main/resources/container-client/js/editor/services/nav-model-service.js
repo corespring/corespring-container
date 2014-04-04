@@ -30,11 +30,6 @@
       $rootScope.$on('$stateChangeStart', function() { this.locationSearch = $location.search(); });
       $rootScope.$on('$stateChangeSuccess', function() { $location.search(this.locationSearch); });
     })();
-
-    this.isCurrentView = function(name){
-      return this.currentNavEntry && this.currentNavEntry.partial === name;
-    };
-
   }
 
   angular.module('corespring-editor.services')
