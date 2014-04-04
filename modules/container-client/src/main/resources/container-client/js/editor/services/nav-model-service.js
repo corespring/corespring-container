@@ -1,62 +1,47 @@
 (function(){
-  function NavModelService ($location, $log) {
+  function NavModelService ($location, $rootScope) {
 
     this.navEntries = [
       {
         title: "Design",
-        path: "/design",
-        partial: "designer",
-        active: "active"
+        path: "design"
       },
       {
         title: "View Player",
-        path: "/view-player",
-        partial: "view-player",
-        active: ""
+        path: "view-player"
       },
       {
         title: "Item Profile",
-        path: "/item-profile",
-        partial: "item-profile",
-        active: ""
+        path: "item-profile"
       },
       {
         title: "Supporting Materials",
-        path: "/supporting-materials",
-        partial: "supporting-materials",
-        active: ""
+        path: "supporting-materials"
       },
       {
         title: "Overview",
-        path: "/overview",
-        partial: "overview",
-        active: ""
+        path: "overview"
       }
     ];
 
-    this.currentNavEntry = this.navEntries[0];
 
-    this.chooseNavEntry = function(path) {
-      $log.debug("!! chooseNavEntry -> ", path);
-      _.forEach(this.navEntries, function(entry){
-        entry.active = "";
-      });
-      var newCurrent = _.find(this.navEntries, function(entry){return entry.path === path;}) || this.navEntries[0];
-      this.currentNavEntry = newCurrent;
-      this.currentNavEntry.active = "active";
-      $location.path(this.currentNavEntry.path);
-    };
+    // TODO Remove when this https://github.com/angular-ui/ui-router/issues/202 is resolved.
+    (function() {
+      $rootScope.$on('$stateChangeStart', function() { this.locationSearch = $location.search(); });
+      $rootScope.$on('$stateChangeSuccess', function() { $location.search(this.locationSearch); });
+    })();
 
     this.isCurrentView = function(name){
       return this.currentNavEntry && this.currentNavEntry.partial === name;
     };
+
   }
 
   angular.module('corespring-editor.services')
     .service('NavModelService',
       [
       '$location',
-      '$log',
+      '$rootScope',
         NavModelService
       ]
     );
