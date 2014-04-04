@@ -11,8 +11,8 @@ block content
       .top-nav-filler
         
       ul.nav.nav-stacked
-        li(ng-repeat="entry in nav.navEntries", ng-class="{ active: entry.active}")
-          a(ui-sref="{{entry.path}}") {{entry.title}}
+        li(ng-repeat="entry in nav.navEntries", ui-sref-active="active" )
+          a(ui-sref="{{entry.path}}" ) {{entry.title}}
     
     .preview-container
       .contents(ui-view="preview")
