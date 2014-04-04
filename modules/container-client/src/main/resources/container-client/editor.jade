@@ -12,13 +12,10 @@ block content
         
       ul.nav.nav-stacked
         li(ng-repeat="entry in nav.navEntries", ng-class="{ active: entry.active}")
-          a(ng-click="nav.chooseNavEntry(entry.path)") {{entry.title}}
+          a(ui-sref="{{entry.path}}") {{entry.title}}
     
     .preview-container
-      .contents
-        include partials/previews/designer 
-        include partials/previews/item-profile
-
+      .contents(ui-view="preview")
 
     .content-container(ng-class="{leftnav: showLeftNav, preview: showPreview}")
       .top-nav
@@ -26,12 +23,16 @@ block content
           i.fa.fa-bars
         .cs-logo
         button.btn.btn-sm.btn-default.pull-right(ng-click="togglePreview()") Preview
-      .main-content
-        include partials/designer
-        include partials/item-profile
-        include partials/supporting-materials
-        include partials/view-player
-        include partials/overview
+      .main-content(ui-view="main")
+
+  include partials/designer
+  include partials/item-profile
+  include partials/supporting-materials
+  include partials/view-player
+  include partials/overview
+
+  include partials/previews/designer
+  include partials/previews/item-profile
 
 block scripts
 
@@ -64,14 +65,67 @@ block scripts
             'ui.sortable',
             'ui.bootstrap',
             'ui.ace',
+            'ui.router',
             'cs.directives',
             'ngRoute',
             'ui.select2',
             'corespring.wiggi-wiz'
           ].concat(data.angular.dependencies);
 
-          angular.module("corespring-editor", playerDeps)
-            //.config(corespring.require("corespring-editor-config"));
+          angular.module("corespring-editor", playerDeps).config(function($stateProvider, $urlRouterProvider) {
+            $urlRouterProvider.otherwise("/design");
+            $stateProvider
+              .state('design', {
+                url: "/design",
+                views: {
+                  main: {
+                    template: $('#designer').html()
+                  },
+                  preview: {
+                    template: $('#designer-preview').html()
+                  }
+                }
+              })
+              .state('view-player', {
+                url: '/view-player',
+                views: {
+                  main: {
+                    template: $('#view-player').html()
+                  }
+                }
+              })
+              .state('item-profile', {
+                url: '/item-profile',
+                views: {
+                  main: {
+                    template: $('#item-profile').html()
+                  },
+                  preview: {
+                    template: $('#item-profile-preview').html()
+                  }
+                }
+              })
+              .state('supporting-materials', {
+                url: '/supporting-materials',
+                views: {
+                  main: {
+                    template: $('#supporting-materials').html()
+                  },
+                  preview: {
+                    template: $('#supporting-materials-preview').html()
+                  }
+                }
+              })
+              .state('overview', {
+                url: '/overview',
+                views: {
+                  main: {
+                    template: $('#overview').html()
+                  }
+                }
+              })
+          });
+
           angular.bootstrap(document, ["corespring-editor"]);
 
           //Note - doing this to see if it'll help with ckeditor
