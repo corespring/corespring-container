@@ -24,7 +24,7 @@ object Build extends sbt.Build {
     val logbackCore = "ch.qos.logback" % "logback-core" % "1.0.7"
     val rhinoJs = "org.mozilla" % "rhino" % "1.7R4"
     val casbah = "org.mongodb" %% "casbah" % "2.6.3"
-    val playS3 = "org.corespring" %% "play-s3" % "0.2-35dbed6"
+    val playS3 = "org.corespring" %% "play-s3" % "0.2-114b7d1"
     val mockito = "org.mockito" % "mockito-all" % "1.9.5" % "test"
     val grizzled = "org.clapper" %% "grizzled-scala" % "1.1.4"
     val scalaz = "org.scalaz" %% "scalaz-core" % "7.0.5"
@@ -210,13 +210,12 @@ object Build extends sbt.Build {
           Seq(
             ("grunt", "./node_modules/grunt-cli/bin/grunt", s"$clientDir\\lib\\grunt.cmd"),
             ("bower", "./node_modules/bower/bin/bower", s"$clientDir\\lib\\bower.cmd"),
-            ("npm", "npm", "npm.cmd")
-          ).map((x: (String,String,String)) => cmd(x._1, x._2, x._3, clientDir))
+            ("npm", "npm", "npm.cmd")).map((x: (String, String, String)) => cmd(x._1, x._2, x._3, clientDir))
       })
     .dependsOn(shell)
     .aggregate(shell)
 
-  private def cmd(name:String, unixCmd:String, windowsCmd:String, base: File): Command = {
+  private def cmd(name: String, unixCmd: String, windowsCmd: String, base: File): Command = {
     Command.args(name, "<" + name + "-command>") {
       (state, args) =>
         val cmd = if (isWindows) windowsCmd else unixCmd
