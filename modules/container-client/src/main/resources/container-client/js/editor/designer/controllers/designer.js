@@ -108,11 +108,13 @@ var controller = function(
     component.setModel($scope.item.components[id]);
   });
 
+  $scope.$on('save-data', function() {
+    $scope.save();
+  });
+
   $scope.save = function() {
-    console.log("Saving: ");
-    console.log($scope.item.components);
+    $log.debug('Saving...');
     var cleaned = $scope.serialize($scope.item.components);
-    console.log(cleaned);
     DesignerService.save($scope.itemId, cleaned, $scope.onItemSaved, $scope.onItemSaveError, $scope.itemId);
   };
 

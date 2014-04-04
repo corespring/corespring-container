@@ -45,6 +45,10 @@ var controller = function($scope, $log, $location, $timeout, DataQueryService, I
     }
   });
 
+  $scope.save = function() {
+    $scope.$broadcast('save-data');
+  };
+
   $scope.itemId = (function() {
     //TODO: This is a temporary means of extracting the session id
     return document.location.pathname.match(/.*\/(.*)\/.*/)[1];

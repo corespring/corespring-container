@@ -128,13 +128,8 @@ block scripts
           });
 
           angular.bootstrap(document, ["corespring-editor"]);
-
-          //Note - doing this to see if it'll help with ckeditor
-          //Which seems to be doing its own script loading
-          setTimeout(function(){
-            angular.resumeBootstrap();
-            $("body").addClass('blend')
-          }, 1000);
+          angular.resumeBootstrap();
+          $("body").addClass('blend')
         };
 
         var args = data.scripts.concat(data.css);
