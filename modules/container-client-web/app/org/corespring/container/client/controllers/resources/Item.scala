@@ -1,12 +1,9 @@
 package org.corespring.container.client.controllers.resources
 
-import org.corespring.container.client.actions.{ ScoreItemRequest, ItemActions, SaveItemRequest, ItemRequest }
-import org.corespring.container.client.controllers.resources.Item.Errors
-import org.corespring.container.components.outcome.ScoreProcessor
-import org.corespring.container.components.response.OutcomeProcessor
-import play.api.libs.json.{ JsNumber, JsBoolean, Json }
-import play.api.mvc.{ AnyContent, Controller }
+import org.corespring.container.client.actions._
 import play.api.Logger
+import play.api.libs.json.{ JsValue, Json }
+import play.api.mvc._
 
 object Item {
 
@@ -24,6 +21,8 @@ trait Item extends Controller {
 
   def actions: ItemActions[AnyContent]
 
+  def hooks: ItemHooks[AnyContent]
+
   def create = actions.create {
     (code, msg) =>
       Status(code)(Json.obj("error" -> msg))
@@ -36,40 +35,37 @@ trait Item extends Controller {
       Ok(Json.obj("item" -> request.item))
   }
 
-  def save(itemId: String, property: Option[String] = None) = actions.save(itemId) {
-    request: SaveItemRequest[AnyContent] =>
-      request.body.asJson.map {
+  def save(itemId: String, property: Option[String] = None) = Action {
+    implicit request: Request[AnyContent] =>
 
-        logger.debug(s"save: $itemId")
+      def validXhtml(s: String) = try {
+        scala.xml.XML.loadString(s)
+        true
+      } catch {
+        case e: Throwable => {
+          logger.error(s"error parsing xhtml: ${e.getMessage}")
+          false
+        }
+      }
 
-        json =>
+      import scalaz.Scalaz._
+      import scalaz._
 
-          def validXhtml = try {
-            scala.xml.XML.loadString((json \ "xhtml").as[String])
-            true
-          } catch {
-            case e: Throwable => {
-              logger.error(s"error parsing xhtml: ${e.getMessage}")
-              false
-            }
-          }
+      val out: Validation[Result, JsValue] = for {
+        json <- request.body.asJson.toSuccess("No json in body")
+        xhtml <- (json \ "xhtml").asOpt[String].toSuccess("No xhtml in json body")
+        //if(validXhtml(xhtml)) Success(json) else Failure("Invalid xhtml")
+        result <- hooks.save(itemId, xhtml, json \ "components")
+      } yield {
+        hooks.save(itemId, xhtml, json \ "components") match {
+          case Left(err) => Failure(err)
+          case Right(json) => Success(Ok(json))
+        }
+      }
 
-          def saveResult = request.save(itemId, json, property).map {
-            updatedItem =>
-              Ok(updatedItem)
-          }.getOrElse(BadRequest(Errors.errorSaving))
+      //out.getOrElse(BadRequest)
 
-          if (property.isEmpty) {
-            if (validXhtml) {
-              saveResult
-            } else {
-              BadRequest(Errors.invalidXhtml)
-            }
-          } else {
-            saveResult
-          }
-
-      }.getOrElse(BadRequest(Errors.noJson))
+      Ok
   }
 
 }

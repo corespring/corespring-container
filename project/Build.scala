@@ -158,7 +158,7 @@ object Build extends sbt.Build {
       (packagedArtifacts) <<= (packagedArtifacts) dependsOn buildInfo,
       sbt.Keys.fork in Test := false,
       sources in doc in Compile := List(),
-      libraryDependencies ++= Seq(mockito, grizzled, htmlCleaner),
+      libraryDependencies ++= Seq(mockito, grizzled, htmlCleaner, scalaz),
       templatesImport ++= Seq("play.api.libs.json.JsValue", "play.api.libs.json.Json")).dependsOn(
         componentModel % "compile->compile;test->test",
         containerClient,

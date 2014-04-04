@@ -115,7 +115,13 @@ var controller = function(
   $scope.save = function() {
     $log.debug('Saving...');
     var cleaned = $scope.serialize($scope.item.components);
-    DesignerService.save($scope.itemId, cleaned, $scope.onItemSaved, $scope.onItemSaveError, $scope.itemId);
+    DesignerService.save($scope.itemId, {
+        components: cleaned,
+        xhtml: $scope.item.xhtml
+      },
+      $scope.onItemSaved,
+      $scope.onItemSaveError,
+      $scope.itemId);
   };
 
   $scope.serialize = function(comps) {

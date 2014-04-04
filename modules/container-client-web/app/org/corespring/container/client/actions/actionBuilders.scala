@@ -2,6 +2,7 @@ package org.corespring.container.client.actions
 
 import play.api.mvc._
 import scala.concurrent.Future
+import play.api.libs.json.JsValue
 
 /**
  * Client side calls - each will call for config, services and components
@@ -25,6 +26,10 @@ trait EditorActions[A] extends ClientActions[A] {
   def createItem(block: PlayerRequest[A] => Result): Action[AnyContent]
 
   def editItem(itemId: String)(error: (Int, String) => Future[SimpleResult])(block: PlayerRequest[A] => Future[SimpleResult]): Action[AnyContent]
+}
+
+trait ItemHooks[A] {
+  def save(itemId: String, xhtml: String, components: JsValue)(implicit header: RequestHeader): Either[Result, JsValue]
 }
 
 trait ItemActions[A] {
