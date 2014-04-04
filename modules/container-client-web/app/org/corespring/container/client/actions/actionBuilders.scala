@@ -68,4 +68,5 @@ trait PlayerLauncherActions[A] {
 
 trait AssetActions[A] {
   def delete(itemId: String, file: String)(block: DeleteAssetRequest[A] => Result): Action[AnyContent]
+  def upload(itemId: String, file: String)(block: Request[Int] => Result): Action[Int]
 }
