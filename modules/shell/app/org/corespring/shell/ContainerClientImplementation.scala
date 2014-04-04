@@ -57,7 +57,7 @@ class ContainerClientImplementation(
     }
 
     override def loadAsset(id: String, file: String)(request: Request[AnyContent]): SimpleResult = {
-      playS3.download(bucket, s"$id/data/$file", Some(request.headers))
+      playS3.download(bucket, s"$id/$file", Some(request.headers))
     }
 
     override def getItemId(sessionId: String): Option[String] = ContainerClientImplementation.this.sessionService.load(sessionId).map {
