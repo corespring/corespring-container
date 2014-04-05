@@ -2,9 +2,13 @@ package org.corespring.container.client.controllers.resources
 
 import org.corespring.container.client.actions._
 import play.api.Logger
-import play.api.libs.json.{ JsValue, Json }
+import play.api.libs.json.{JsObject, JsValue, Json}
 import play.api.mvc._
 import scala.concurrent.{ ExecutionContext, Future }
+import org.htmlcleaner._
+import org.corespring.container.client.actions.ItemRequest
+import play.api.mvc.SimpleResult
+import org.corespring.container.client.controllers.helpers.XhtmlCleaner
 
 object Item {
 
@@ -16,7 +20,7 @@ object Item {
 
 }
 
-trait Item extends Controller {
+trait Item extends Controller with XhtmlCleaner{
 
   private lazy val logger = Logger("container.item")
 
@@ -44,25 +48,29 @@ trait Item extends Controller {
       import scalaz.Scalaz._
       import scalaz._
 
-      def validate(xmlString: Option[String]): Validation[String, Boolean] = xmlString.map {
+      def cleanIncomingXhtml(xmlString: Option[String]): Validation[String, Option[String]] = xmlString.map {
         s =>
-          try {
-            scala.xml.XML.loadString(s)
-            Success(true)
+          try{
+            Success(Some(cleanXhtml(s)))
           } catch {
             case e: Throwable => {
               logger.error(s"error parsing xhtml: ${e.getMessage}")
               Failure(e.getMessage)
             }
           }
-      }.getOrElse(Success(true))
+      }.getOrElse(Success(None))
 
       val out: Validation[String, Future[Either[SimpleResult, JsValue]]] = for {
         json <- request.body.asJson.toSuccess("No json in body")
-        validation <- validate((json \ "xhtml").asOpt[String])
+        validXhtml <- cleanIncomingXhtml((json \ "xhtml").asOpt[String])
       } yield {
         logger.trace("[save] -> call hook")
-        hooks.save(itemId, json)
+
+        val cleanedJson = validXhtml.map{ x =>
+          logger.trace(s"clean xhtml: $x")
+          json.as[JsObject]  ++ Json.obj("xhtml" -> x)
+        }.getOrElse(json)
+        hooks.save(itemId, cleanedJson)
       }
 
       out match {

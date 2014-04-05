@@ -75,10 +75,10 @@
         }
       },
       saveProfile: function(data, onSuccess, onFailure, id) {
-         this._save( data, onSuccess, onFailure );
+         this._save( data, onSuccess, onFailure, id );
       },
       saveComponents: function(data, onSuccess, onFailure, id){
-         this._save( data, onSuccess, onFailure );
+         this._save( data, onSuccess, onFailure, id );
       },
       _save: function(data, onSuccess, onFailure, id){
          var url = '@save.url.toLowerCase';
