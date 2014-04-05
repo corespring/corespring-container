@@ -1,7 +1,7 @@
 package org.corespring.container.client.integration
 
 import org.corespring.container.client.V2PlayerConfig
-import org.corespring.container.client.actions.{ PlayerLauncherActions, SessionActions, ItemActions, PlayerActions }
+import org.corespring.container.client.actions._
 import org.corespring.container.client.component.{ ComponentUrls, ComponentSplitter }
 import org.corespring.container.client.controllers.apps.{ Player, Editor, Rig }
 import org.corespring.container.client.controllers.resources.{ Session, Item }
@@ -19,6 +19,7 @@ trait DefaultIntegration
   extends ContainerControllers
   with ComponentSplitter
   with HasActions
+  with HasHooks
   with HasConfig
   with HasProcessors {
 
@@ -74,6 +75,8 @@ trait DefaultIntegration
     def outcomeProcessor: OutcomeProcessor = DefaultIntegration.this.outcomeProcessor
 
     override def actions: ItemActions[AnyContent] = itemActions
+
+    override def hooks: ItemHooks = itemHooks
   }
 
   lazy val session = new Session {

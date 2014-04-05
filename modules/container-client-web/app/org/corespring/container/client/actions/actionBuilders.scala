@@ -28,13 +28,14 @@ trait EditorActions[A] extends ClientActions[A] {
   def editItem(itemId: String)(error: (Int, String) => Future[SimpleResult])(block: PlayerRequest[A] => Future[SimpleResult]): Action[AnyContent]
 }
 
-trait ItemHooks[A] {
-  def save(itemId: String, xhtml: String, components: JsValue)(implicit header: RequestHeader): Either[Result, JsValue]
+trait ItemHooks {
+  def save(itemId: String, json: JsValue)(implicit header: RequestHeader): Future[Either[SimpleResult, JsValue]]
 }
 
 trait ItemActions[A] {
   def load(itemId: String)(block: ItemRequest[A] => Result): Action[AnyContent]
 
+  @deprecated("Use ItemHooks.save instead", "3.2")
   def save(itemId: String)(block: SaveItemRequest[A] => Result): Action[AnyContent]
 
   def create(error: (Int, String) => Result)(block: NewItemRequest[A] => Result): Action[AnyContent]
