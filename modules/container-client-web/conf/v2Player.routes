@@ -25,7 +25,7 @@ GET        /session/:sessionId/*file                       @org.corespring.conta
 
 GET        /item/:itemId/player                            @org.corespring.container.client.controllers.apps.Player.createSessionForItem(itemId)
 GET        /item/:itemId.json                              @org.corespring.container.client.controllers.resources.Item.load(itemId)
-PUT        /item/:itemId.json                              @org.corespring.container.client.controllers.resources.Item.save(itemId, property: Option[String] ?= None)
+PUT        /item/:itemId.json                              @org.corespring.container.client.controllers.resources.Item.save(itemId)
 POST       /item/create                                    @org.corespring.container.client.controllers.resources.Item.create()
 
 

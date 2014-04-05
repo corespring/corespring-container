@@ -1,4 +1,4 @@
-@(namespace : String, load : Call, saveProfile : Call, saveComponents:Call, componentSet : JsValue)
+@(namespace : String, load : Call, save : Call, componentSet : JsValue)
 
 (function(){
   "use strict";
@@ -75,19 +75,16 @@
         }
       },
       saveProfile: function(data, onSuccess, onFailure, id) {
-         var url = '@saveProfile.url.toLowerCase';
-         var finalUrl = id ? url.replace(":id", id) : url;
-         var method = '@saveProfile.method.toLowerCase';
-         this._save( method, finalUrl, data, onSuccess, onFailure );
+         this._save( data, onSuccess, onFailure );
       },
       saveComponents: function(data, onSuccess, onFailure, id){
-         var url = '@saveComponents.url.toLowerCase';
-         var finalUrl = id ? url.replace(":id", id) : url;
-         var method = '@saveComponents.method.toLowerCase';
-         this._save( method, finalUrl, data, onSuccess, onFailure );
+         this._save( data, onSuccess, onFailure );
       },
-      _save: function(method, url, data, onSuccess, onFailure, id){
-        $http[method](url, data)
+      _save: function(data, onSuccess, onFailure, id){
+         var url = '@save.url.toLowerCase';
+         var finalUrl = id ? url.replace(":id", id) : url;
+         var method = '@save.method.toLowerCase';
+        $http[method](finalUrl, data)
           .success(function(data, status, headers, config) {
             loadedData = data;
             onSuccess(data);

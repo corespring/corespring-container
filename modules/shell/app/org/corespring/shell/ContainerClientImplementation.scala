@@ -8,7 +8,7 @@ import org.corespring.container.components.model.Component
 import org.corespring.mongo.json.services.MongoService
 import org.corespring.shell.controllers.CachedAndMinifiedComponentSets
 import org.corespring.shell.controllers.editor.actions.{ EditorActions => ShellEditorActions }
-import org.corespring.shell.controllers.editor.{ ItemActions => ShellItemActions }
+import org.corespring.shell.controllers.editor.{ ItemActions => ShellItemActions, ItemHooks => ShellItemHooks }
 import org.corespring.shell.controllers.player.actions.{ PlayerActions => ShellPlayerActions }
 import org.corespring.shell.controllers.player.{ SessionActions => ShellSessionActions }
 import org.corespring.shell.controllers.{ ShellDataQuery => ShellProfile }
@@ -102,6 +102,9 @@ class ContainerClientImplementation(
   override def itemActions: ItemActions[AnyContent] = new ShellItemActions {
     override def itemService: MongoService = ContainerClientImplementation.this.itemService
   }
+  override def itemHooks: ItemHooks = new ShellItemHooks{
+    override def itemService: MongoService = ContainerClientImplementation.this.itemService
+  }
 
   override def playerActions: PlayerActions[AnyContent] = new ShellPlayerActions {
     override def sessionService: MongoService = ContainerClientImplementation.this.sessionService
@@ -110,6 +113,7 @@ class ContainerClientImplementation(
   }
 
   override def dataQuery: DataQuery = new ShellProfile()
+
 }
 
 trait LoadJs {

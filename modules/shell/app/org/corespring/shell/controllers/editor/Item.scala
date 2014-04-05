@@ -1,12 +1,33 @@
 package org.corespring.shell.controllers.editor
 
-import org.corespring.container.client.actions.{ ItemActions => ContainerItemActions, NewItemRequest, SaveItemRequest, ItemRequest, ScoreItemRequest }
+import org.corespring.container.client.actions.ItemRequest
+import org.corespring.container.client.actions.NewItemRequest
+import org.corespring.container.client.actions.SaveItemRequest
+import org.corespring.container.client.actions.{ItemActions => ContainerItemActions}
+import org.corespring.container.client.actions.{ItemHooks => ContainerItemHooks}
 import org.corespring.mongo.json.services.MongoService
 import play.api.http.Status.BAD_REQUEST
 import play.api.libs.json.JsString
-import play.api.libs.json.Json
+import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.Results._
-import play.api.mvc.{ Action, Result, AnyContent }
+import play.api.mvc._
+import scala.concurrent.{ExecutionContext, Future}
+
+trait ItemHooks extends ContainerItemHooks {
+
+  def itemService: MongoService
+
+
+  override def save(itemId: String, data: JsValue)(implicit header: RequestHeader): Future[Either[SimpleResult, JsValue]] = {
+    import ExecutionContext.Implicits.global
+    Future {
+      itemService.save(itemId, data).map {
+        json =>
+          Right(json)
+      }.getOrElse(Left(BadRequest("Error saving")))
+    }
+  }
+}
 
 trait ItemActions extends ContainerItemActions[AnyContent] {
   def itemService: MongoService
@@ -21,10 +42,7 @@ trait ItemActions extends ContainerItemActions[AnyContent] {
 
   override def save(itemId: String)(block: (SaveItemRequest[AnyContent]) => Result): Action[AnyContent] = Action {
     request =>
-      itemService.load(itemId).map {
-        item =>
-          block(SaveItemRequest(item, itemService.save, request))
-      }.getOrElse(NotFound(s"Can't find item with id $itemId"))
+      BadRequest("See ItemHooks.save")
   }
 
   override def create(error: (Int, String) => Result)(block: (NewItemRequest[AnyContent]) => Result): Action[AnyContent] = Action {

@@ -24,7 +24,7 @@ object Build extends sbt.Build {
     val logbackCore = "ch.qos.logback" % "logback-core" % "1.0.7"
     val rhinoJs = "org.mozilla" % "rhino" % "1.7R4"
     val casbah = "org.mongodb" %% "casbah" % "2.6.3"
-    val playS3 = "org.corespring" %% "play-s3" % "0.2-114b7d1"
+    val playS3 = "org.corespring" %% "play-s3" % "0.2-ba89003"
     val mockito = "org.mockito" % "mockito-all" % "1.9.5" % "test"
     val grizzled = "org.clapper" %% "grizzled-scala" % "1.1.4"
     val scalaz = "org.scalaz" %% "scalaz-core" % "7.0.5"
