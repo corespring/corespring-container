@@ -15,8 +15,12 @@ var controller = function($scope, $log, ProfileService, DataQueryService) {
 
   $scope.queryResults = {};
 
+  $scope.$on('save-data', function() {
+    $scope.save();
+  });
+
   $scope.save = function() {
-    ProfileService.save($scope.item.profile, function(savedProfile) {
+    ProfileService.save({ profile: $scope.item.profile}, function(savedProfile) {
       $scope.item.profile = savedProfile;
     });
   };
