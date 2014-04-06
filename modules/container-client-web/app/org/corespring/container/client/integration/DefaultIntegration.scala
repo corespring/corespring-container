@@ -74,8 +74,6 @@ trait DefaultIntegration
 
     def outcomeProcessor: OutcomeProcessor = DefaultIntegration.this.outcomeProcessor
 
-    override def actions: ItemActions[AnyContent] = itemActions
-
     override def hooks: ItemHooks = itemHooks
   }
 

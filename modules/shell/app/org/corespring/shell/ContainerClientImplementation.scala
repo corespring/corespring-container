@@ -15,6 +15,8 @@ import org.corespring.shell.controllers.{ ShellDataQuery => ShellProfile }
 import play.api.Configuration
 import play.api.mvc._
 import scala.Some
+import scala.concurrent.Future
+import play.api.libs.json.JsValue
 
 class ContainerClientImplementation(
   val itemService: MongoService,
@@ -102,8 +104,9 @@ class ContainerClientImplementation(
   override def itemActions: ItemActions[AnyContent] = new ShellItemActions {
     override def itemService: MongoService = ContainerClientImplementation.this.itemService
   }
-  override def itemHooks: ItemHooks = new ShellItemHooks{
+  override def itemHooks: ItemHooks = new ShellItemHooks {
     override def itemService: MongoService = ContainerClientImplementation.this.itemService
+
   }
 
   override def playerActions: PlayerActions[AnyContent] = new ShellPlayerActions {
