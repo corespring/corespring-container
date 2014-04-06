@@ -22,7 +22,7 @@ object api {
 
   }
 
-  trait JsError {
+  trait JavascriptError {
     def message: String
     def lineNo: Int
     def column: Int

@@ -22,6 +22,36 @@ class OutcomeProcessorTest extends Specification {
     |}
   """.stripMargin
 
+  val item = Json.obj(
+    "components" -> Json.obj(
+      "1" -> Json.obj(
+        "componentType" -> "org-name",
+        "correctResponse" -> Json.obj(
+          "value" -> "1")),
+      "2" -> Json.obj(
+        "componentType" -> "org-feedback",
+        "target" -> Json.obj(
+          "id" -> "1"))))
+
+  val session = Json.obj(
+    "components" -> Json.obj(
+      "1" -> Json.obj(
+        "answers" -> Json.obj("value" -> "2"),
+        "stash" -> Json.obj()),
+      "2" -> Json.obj(
+        "answers" -> Json.obj())))
+
+  def comp(name: String = "name", serverJs: String) = UiComponent(
+    "org",
+    name,
+    client = Client("", "", None),
+    server = Server(serverJs),
+    Json.obj(),
+    Json.obj(),
+    None,
+    Map(),
+    Seq.empty)
+
   "Target" should {
     "work" in {
       val t = new Target {}
@@ -35,52 +65,28 @@ class OutcomeProcessorTest extends Specification {
   "OutcomeProcessor" should {
     "respond" in {
 
-      val component = UiComponent(
-        "org",
-        "name",
-        client = Client("", "", None),
-        server = Server(interactionRespondJs),
-        Json.obj(),
-        Json.obj(),
-        None,
-        Map(),
-        Seq.empty)
-
-      val feedback = UiComponent(
-        "org",
-        "feedback",
-        client = Client("", "", None),
-        server = Server(feedbackRespondJs),
-        Json.obj(),
-        Json.obj(),
-        None,
-        Map(),
-        Seq.empty)
-
-      val item = Json.obj(
-        "components" -> Json.obj(
-          "1" -> Json.obj(
-            "componentType" -> "org-name",
-            "correctResponse" -> Json.obj(
-              "value" -> "1")),
-          "2" -> Json.obj(
-            "componentType" -> "org-feedback",
-            "target" -> Json.obj(
-              "id" -> "1"))))
-
-      val session = Json.obj(
-        "components" -> Json.obj(
-          "1" -> Json.obj(
-            "answers" -> Json.obj("value" -> "2"),
-            "stash" -> Json.obj()),
-          "2" -> Json.obj(
-            "answers" -> Json.obj())))
+      val component = comp("name", interactionRespondJs)
+      val feedback = comp("feedback", feedbackRespondJs)
 
       val processor = new RhinoOutcomeProcessor(Seq(component, feedback), Seq.empty)
       val result = processor.createOutcome(item, session, Json.obj())
       (result \ "1" \ "correctness").as[String] === "incorrect"
       (result \ "2" \ "targetOutcome" \ "correctness").as[String] === "incorrect"
 
+    }
+
+    "fail - if there is bad js" in {
+
+      val component = comp("name", "arst")
+      val feedback = comp("feedback", feedbackRespondJs)
+      val processor = new RhinoOutcomeProcessor(Seq(component, feedback), Seq.empty)
+      try {
+        processor.createOutcome(item, session, Json.obj())
+
+      } catch {
+        case e: Throwable => println(e)
+      }
+      processor.createOutcome(item, session, Json.obj()) must throwA[RuntimeException]
     }
   }
 
