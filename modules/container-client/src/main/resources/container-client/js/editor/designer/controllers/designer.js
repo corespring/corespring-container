@@ -10,7 +10,8 @@ var controller = function(
   PlayerService,
   MathJaxService,
   ComponentToWiggiwizFeatureAdapter,
-  ImageUtils) {
+  ImageUtils,
+  ComponentRegister) {
 
   var configPanels = {};
 
@@ -68,8 +69,20 @@ var controller = function(
       addContent($('<placeholder id="' + id + '" label="' + component.name + '">'));
     };
 
+    var deleteComponent = function(id) {
+      if ($scope.item && $scope.item.components) {
+        delete $scope.item.components[id];
+        ComponentRegister.deleteComponent(id);
+      } else {
+        throw 'Can\'t delete component with id ' + id;
+      }
+    };
+
     var componentToFeature = function(component) {
-      return ComponentToWiggiwizFeatureAdapter.componentToWiggiwizFeature(component, addToEditor);
+      return ComponentToWiggiwizFeatureAdapter.componentToWiggiwizFeature(
+        component,
+        addToEditor,
+        deleteComponent);
     };
 
     $scope.extraFeatures = [{
@@ -108,12 +121,20 @@ var controller = function(
     component.setModel($scope.item.components[id]);
   });
 
+  $scope.$on('save-data', function() {
+    $scope.save();
+  });
+
   $scope.save = function() {
-    console.log("Saving: ");
-    console.log($scope.item.components);
+    $log.debug('Saving...');
     var cleaned = $scope.serialize($scope.item.components);
-    console.log(cleaned);
-    DesignerService.save($scope.itemId, cleaned, $scope.onItemSaved, $scope.onItemSaveError, $scope.itemId);
+    DesignerService.save($scope.itemId, {
+        components: cleaned,
+        xhtml: $scope.item.xhtml
+      },
+      $scope.onItemSaved,
+      $scope.onItemSaveError,
+      $scope.itemId);
   };
 
   $scope.serialize = function(comps) {
@@ -187,5 +208,6 @@ angular.module('corespring-editor.controllers')
     'MathJaxService',
     'ComponentToWiggiwizFeatureAdapter',
     'ImageUtils',
+    'ComponentRegister',
     controller
   ]);

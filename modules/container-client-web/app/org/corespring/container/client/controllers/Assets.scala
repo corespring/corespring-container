@@ -18,8 +18,6 @@ trait Assets extends Controller {
 
   def resourcePath: String = "/container-client"
 
-  def uploadBodyParser(id: String, file: String): BodyParser[Int]
-
   def actions: AssetActions[AnyContent]
 
   private def at(id: String, file: String, notFoundLocally: String => SimpleResult) = Action.async {
@@ -63,8 +61,8 @@ trait Assets extends Controller {
       })(request)
   }
 
-  def upload(id: String, file: String) = Action(uploadBodyParser(id, file)) { request =>
-    Ok("Done")
+  def upload(id: String, file: String) = actions.upload(id, file) {
+    request => Ok
   }
 
   def delete(itemId: String, file: String) = actions.delete(itemId, file) {

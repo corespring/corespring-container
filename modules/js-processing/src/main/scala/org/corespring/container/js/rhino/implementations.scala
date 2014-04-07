@@ -1,12 +1,12 @@
 package org.corespring.container.js.rhino
 
-import org.corespring.container.js.api.{ ComponentServerLogic => ApiComponentServerLogic, ItemAuthorOverride => ApiItemAuthorOverride, GetServerLogic }
+import org.corespring.container.js.api.{ ComponentServerLogic => ApiComponentServerLogic, ItemAuthorOverride => ApiItemAuthorOverride, JavascriptProcessingException, JavascriptError, GetServerLogic }
 import org.mozilla.javascript.{ Function => RhinoFunction }
 import org.mozilla.javascript.{ Scriptable, Context }
-import play.api.libs.json._
 import org.corespring.container.js.processing.PlayerItemPreProcessor
 import org.corespring.container.components.model.{ UiComponent, Library }
 import org.corespring.container.js.response.OutcomeProcessor
+import play.api.libs.json.{ JsValue, JsObject, Json }
 
 trait CorespringJs {
 
@@ -45,15 +45,21 @@ trait ItemAuthorOverride
     obj.asInstanceOf[Scriptable]
   }
 
-  def process(item: JsValue, answers: JsValue): JsValue = withJsContext(libs) {
-    (ctx: Context, scope: Scriptable) =>
-      implicit val rootScope = scope
-      implicit val rootContext = ctx
-      ctx.evaluateString(scope, wrapped, "<cmd>", 1, null)
-      val overrideObject = getOverrideObject(ctx, scope)
-      val processFn = overrideObject.get("process", overrideObject).asInstanceOf[RhinoFunction]
-      val jsonResult = callJsFunction(wrapped, processFn, overrideObject, Array(item, answers))
-      jsonResult
+  def process(item: JsValue, answers: JsValue): JsValue = {
+    val result = withJsContext[JsValue](libs) {
+      (ctx: Context, scope: Scriptable) =>
+        implicit val rootScope = scope
+        implicit val rootContext = ctx
+        ctx.evaluateString(scope, wrapped, s"itemAuthorOverride.process", 1, null)
+        val overrideObject = getOverrideObject(ctx, scope)
+        val processFn = overrideObject.get("process", overrideObject).asInstanceOf[RhinoFunction]
+        callJsFunction(wrapped, processFn, overrideObject, Array(item, answers))
+    }
+
+    result match {
+      case Left(err) => throw JavascriptProcessingException(err)
+      case Right(json) => json
+    }
   }
 }
 
@@ -67,14 +73,14 @@ trait ComponentServerLogic
 
   def componentLibs: Seq[(String, String)]
 
-  def wrappedComponentLibs = componentLibs.map {
+  def wrappedComponentLibs: Seq[(String, String)] = componentLibs.map {
     tuple =>
       val (fullName, src) = tuple
-      s"""
+      (fullName -> s"""
     (function(exports, require, module){
     $src;
     })(corespring.module("$fullName").exports, corespring.require, corespring.module("$fullName"));
-    """
+    """)
   }
 
   override def exports = s"corespring.server.logic('$componentType')"
@@ -87,30 +93,47 @@ trait ComponentServerLogic
     serverLogic.asInstanceOf[Scriptable]
   }
 
-  def createOutcome(question: JsValue, response: JsValue, settings: JsValue, targetOutcome: JsValue): JsValue = withJsContext(libs, wrappedComponentLibs) {
-    (ctx: Context, scope: Scriptable) =>
-      implicit val rootScope = scope
-      implicit val rootContext = ctx
-      ctx.evaluateString(scope, wrapped, "<cmd>", 1, null)
-      val server = serverLogic(ctx, scope)
-      //TODO: rename 'respond' => 'createOutcome' in the components
-      val respondFunction = server.get("respond", server).asInstanceOf[RhinoFunction]
-      val jsonResult = callJsFunction(wrapped, respondFunction, server, Array(question, response, settings, targetOutcome))
-      jsonResult.asOpt[JsObject] match {
-        case Some(jsObj) => jsObj ++ Json.obj("studentResponse" -> response)
-        case _ => jsonResult
-      }
+  def createOutcome(question: JsValue, response: JsValue, settings: JsValue, targetOutcome: JsValue): JsValue = {
+    val result: Either[JavascriptError, JsValue] = withJsContext[JsValue](libs, wrappedComponentLibs) {
+      (ctx: Context, scope: Scriptable) =>
+        implicit val rootScope = scope
+        implicit val rootContext = ctx
+        ctx.evaluateString(scope, wrapped, s"$componentType.createOutcome", 1, null)
+        val server = serverLogic(ctx, scope)
+        //TODO: rename 'respond' => 'createOutcome' in the components
+        val respondFunction = server.get("respond", server).asInstanceOf[RhinoFunction]
+        callJsFunction(wrapped, respondFunction, server, Array(question, response, settings, targetOutcome)) match {
+          case Left(err) => throw JavascriptProcessingException(err)
+          case Right(json) => {
+            json.asOpt[JsObject] match {
+              case Some(jsObj) => Right(jsObj ++ Json.obj("studentResponse" -> response))
+              case _ => Right(json)
+            }
+          }
+        }
+    }
+
+    result match {
+      case Left(err) => throw JavascriptProcessingException(err)
+      case Right(json) => json
+    }
   }
 
-  def preProcessItem(question: JsValue, settings: JsValue): JsValue = withJsContext(libs, wrappedComponentLibs) {
-    (ctx: Context, scope: Scriptable) =>
-      implicit val rootScope = scope
-      implicit val rootContext = ctx
-      ctx.evaluateString(scope, wrapped, "<cmd>", 1, null)
-      val server = serverLogic(ctx, scope)
-      val renderFunction = server.get("render", server).asInstanceOf[RhinoFunction]
-      val jsonResult = callJsFunction(wrapped, renderFunction, server, Array(question))
-      jsonResult
+  def preProcessItem(question: JsValue, settings: JsValue): JsValue = {
+    val result = withJsContext[JsValue](libs, wrappedComponentLibs) {
+      (ctx: Context, scope: Scriptable) =>
+        implicit val rootScope = scope
+        implicit val rootContext = ctx
+        ctx.evaluateString(scope, wrapped, s"$componentType.preProcessItem", 1, null)
+        val server = serverLogic(ctx, scope)
+        val renderFunction = server.get("render", server).asInstanceOf[RhinoFunction]
+        callJsFunction(wrapped, renderFunction, server, Array(question))
+    }
+
+    result match {
+      case Left(err) => throw JavascriptProcessingException(err)
+      case Right(json) => json
+    }
   }
 }
 

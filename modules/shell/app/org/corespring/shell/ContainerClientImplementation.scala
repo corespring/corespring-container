@@ -8,13 +8,15 @@ import org.corespring.container.components.model.Component
 import org.corespring.mongo.json.services.MongoService
 import org.corespring.shell.controllers.CachedAndMinifiedComponentSets
 import org.corespring.shell.controllers.editor.actions.{ EditorActions => ShellEditorActions }
-import org.corespring.shell.controllers.editor.{ ItemActions => ShellItemActions }
+import org.corespring.shell.controllers.editor.{ ItemActions => ShellItemActions, ItemHooks => ShellItemHooks }
 import org.corespring.shell.controllers.player.actions.{ PlayerActions => ShellPlayerActions }
 import org.corespring.shell.controllers.player.{ SessionActions => ShellSessionActions }
 import org.corespring.shell.controllers.{ ShellDataQuery => ShellProfile }
 import play.api.Configuration
 import play.api.mvc._
 import scala.Some
+import scala.concurrent.Future
+import play.api.libs.json.JsValue
 
 class ContainerClientImplementation(
   val itemService: MongoService,
@@ -60,9 +62,6 @@ class ContainerClientImplementation(
       playS3.download(bucket, s"$id/$file", Some(request.headers))
     }
 
-    //TODO: Need to look at a way of pre-validating before we upload - look at the predicate?
-    override def uploadBodyParser(id: String, file: String): BodyParser[Int] = playS3.upload(bucket, s"$id/$file", (rh) => None)
-
     override def getItemId(sessionId: String): Option[String] = ContainerClientImplementation.this.sessionService.load(sessionId).map {
       json => (json \ "itemId").as[String]
     }
@@ -73,6 +72,15 @@ class ContainerClientImplementation(
         val deleteAssetRequest = DeleteAssetRequest(if (response.success) None else Some(response.msg), request)
         block(deleteAssetRequest)
       }
+
+      override def upload(itemId: String, file: String)(block: (Request[Int]) => Result) =
+        Action(
+          playS3.upload(
+            bucket, s"$itemId/$file",
+            (rh) => None)) {
+            request =>
+              block(request)
+          }
     }
   }
 
@@ -96,6 +104,10 @@ class ContainerClientImplementation(
   override def itemActions: ItemActions[AnyContent] = new ShellItemActions {
     override def itemService: MongoService = ContainerClientImplementation.this.itemService
   }
+  override def itemHooks: ItemHooks = new ShellItemHooks {
+    override def itemService: MongoService = ContainerClientImplementation.this.itemService
+
+  }
 
   override def playerActions: PlayerActions[AnyContent] = new ShellPlayerActions {
     override def sessionService: MongoService = ContainerClientImplementation.this.sessionService
@@ -104,6 +116,7 @@ class ContainerClientImplementation(
   }
 
   override def dataQuery: DataQuery = new ShellProfile()
+
 }
 
 trait LoadJs {

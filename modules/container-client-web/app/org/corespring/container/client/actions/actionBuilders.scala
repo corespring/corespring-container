@@ -2,6 +2,7 @@ package org.corespring.container.client.actions
 
 import play.api.mvc._
 import scala.concurrent.Future
+import play.api.libs.json.JsValue
 
 /**
  * Client side calls - each will call for config, services and components
@@ -27,9 +28,16 @@ trait EditorActions[A] extends ClientActions[A] {
   def editItem(itemId: String)(error: (Int, String) => Future[SimpleResult])(block: PlayerRequest[A] => Future[SimpleResult]): Action[AnyContent]
 }
 
+trait ItemHooks {
+  def load(itemId: String)(implicit header: RequestHeader): Future[Either[SimpleResult, JsValue]]
+  def save(itemId: String, json: JsValue)(implicit header: RequestHeader): Future[Either[SimpleResult, JsValue]]
+  def create(implicit header: RequestHeader): Future[Either[(Int, String), String]]
+}
+
 trait ItemActions[A] {
   def load(itemId: String)(block: ItemRequest[A] => Result): Action[AnyContent]
 
+  @deprecated("Use ItemHooks.save instead", "3.2")
   def save(itemId: String)(block: SaveItemRequest[A] => Result): Action[AnyContent]
 
   def create(error: (Int, String) => Result)(block: NewItemRequest[A] => Result): Action[AnyContent]
@@ -68,4 +76,5 @@ trait PlayerLauncherActions[A] {
 
 trait AssetActions[A] {
   def delete(itemId: String, file: String)(block: DeleteAssetRequest[A] => Result): Action[AnyContent]
+  def upload(itemId: String, file: String)(block: Request[Int] => Result): Action[Int]
 }

@@ -22,4 +22,21 @@ object api {
 
   }
 
+  trait JavascriptError {
+    def message: String
+    def lineNo: Int
+    def column: Int
+    def source: String
+    def name: String
+  }
+
+  case class JavascriptProcessingException(e: JavascriptError) extends RuntimeException(e.message) {
+    s"""
+        message: ${e.message}
+        source : ${e.source}
+        line: ${e.lineNo}
+        column: ${e.column}
+     """
+  }
+
 }

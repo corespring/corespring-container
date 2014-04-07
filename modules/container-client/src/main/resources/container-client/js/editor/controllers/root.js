@@ -106,15 +106,18 @@ var controller = function($scope, $rootScope, $log, $location, $timeout, DataQue
     }
   });
 
+  $scope.save = function() {
+    $scope.$broadcast('save-data');
+  };
+
   $scope.itemId = (function() {
     //TODO: This is a temporary means of extracting the session id
     return document.location.pathname.match(/.*\/(.*)\/.*/)[1];
   })();
 
-  $scope.onItemLoaded = function(data) {
-    $scope.allData = data;
-    $scope.item = data.item;
-    $scope.$broadcast('itemLoaded', data.item);
+  $scope.onItemLoaded = function(item) {
+    $scope.item = item;
+    $scope.$broadcast('itemLoaded', item);
   };
 
   $scope.onItemLoadError = function(error) {

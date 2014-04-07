@@ -11,6 +11,7 @@ block content
       .top-nav-filler
         
       ul.nav.nav-stacked
+<<<<<<< HEAD
         li(ng-class="{ active: isActive('design') }")
           a(ui-sref="design") Design
 
@@ -30,6 +31,10 @@ block content
 
         li(ng-class="{ active: isActive('overview') }")
           a(ui-sref="overview") Overview
+=======
+        li(ng-repeat="entry in nav.navEntries", ui-sref-active="active" )
+          a(ui-sref="{{entry.path}}" ) {{entry.title}}
+>>>>>>> master
     
     .preview-container
       .contents(ui-view="preview")
@@ -40,6 +45,7 @@ block content
           i.fa.fa-bars
         .cs-logo
         button.btn.btn-sm.btn-default.pull-right(ng-click="togglePreview()") Preview
+        button.btn.btn-sm.btn-default.pull-right(ng-click="save()") Save 
       .main-content(ui-view="main")
 
   include partials/designer
@@ -157,13 +163,8 @@ block scripts
           });
 
           angular.bootstrap(document, ["corespring-editor"]);
-
-          //Note - doing this to see if it'll help with ckeditor
-          //Which seems to be doing its own script loading
-          setTimeout(function(){
-            angular.resumeBootstrap();
-            $("body").addClass('blend');
-          }, 1000);
+          angular.resumeBootstrap();
+          $("body").addClass('blend');
         };
 
         var args = data.scripts.concat(data.css);
