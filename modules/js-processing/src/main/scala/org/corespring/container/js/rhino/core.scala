@@ -90,14 +90,8 @@ trait JsContext extends JsLogging {
       console.foreach(addToScope("console"))
       f(ctx, scope)
     } catch {
-      case e: RhinoException => {
-        println("js error:" + e)
-        Left(RhinoJsError(e))
-      }
-      case e: Throwable => {
-        println("js error")
-        throw e
-      }
+      case e: RhinoException => Left(RhinoJsError(e))
+      case e: Throwable => throw e
     } finally {
       Context.exit
     }
