@@ -4,7 +4,7 @@
       "title": "Short text entry"
     }
   },
-  "xhtml": "<div><h1>Header</h1><p>English city:</p><corespring-text-entry id='1'></corespring-text-entry><br/><corespring-feedback-block id='2'></corespring-feedback-block></div>",
+  "xhtml": "<div><h1>Header</h1><p>English city:</p><corespring-text-entry id='1'></corespring-text-entry></div>",
   "components": {
     "1": {
       "componentType": "corespring-text-entry",
@@ -33,24 +33,9 @@
           "partialResponses": {
             "feedback": {
               "type": "default",
-              "value": "Good try but the correct answer is <random selection from correct answers>"
+              "value": "Good try, but the correct answer is <random selection from correct answers>"
             }
           }
-        }
-      }
-    },
-    "2": {
-      "componentType": "corespring-feedback-block",
-      "weight": 0,
-      "target": {
-        "id": "1"
-      },
-      "feedback": {
-        "correct": {
-          "*": "Very good, you are the greatest!"
-        },
-        "incorrect": {
-          "*": "Good try but the correct answer is <random selection from correct answers>"
         }
       }
     }
