@@ -1,10 +1,13 @@
 {
-	"folders":
-	[
-		{
-			"follow_symlinks": true,
-			"path": ".",
-			"file_exclude_patterns": ["**/.tmp/**", "**/node_modules/**", "**/bower_components/**"]
-		}
-	]
+  "folders": [{
+    "file_exclude_patterns": [
+      "**/.tmp/**",
+      "**/*.iml",
+      "**/target/**",
+      "**/node_modules/**",
+      "**/bower_components/**"
+    ],
+    "follow_symlinks": true,
+    "path": "."
+  }]
 }

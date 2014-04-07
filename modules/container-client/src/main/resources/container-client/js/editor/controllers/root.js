@@ -46,7 +46,13 @@ var controller = function($scope, $log, $location, $timeout, DataQueryService, I
   });
 
   $scope.save = function() {
-    $scope.$broadcast('save-data');
+    $scope.$broadcast('save-data', function(err) {
+      $scope.saveInProgress = false;
+      if (err) {
+        $scope.saveError = err;
+      }
+    });
+    $scope.saveInProgress = true;
   };
 
   $scope.itemId = (function() {
@@ -63,10 +69,15 @@ var controller = function($scope, $log, $location, $timeout, DataQueryService, I
     $log.warn("Error loading item", error);
   };
 
-  $scope.onItemSaved = function(data) {};
+  $scope.onItemSaved = function(data) {
+    $scope.saveInProgress = false;
+    $scope.saveError = undefined;
+  };
 
   $scope.onItemSaveError = function(error) {
     console.warn("Error saving item");
+    $scope.saveInProgress = false;
+    $scope.saveError = error;
   };
 
 

@@ -9,11 +9,11 @@ block content
   .root(ng-controller="Root")
     .nav-container
       .top-nav-filler
-        
+
       ul.nav.nav-stacked
         li(ng-repeat="entry in nav.navEntries", ui-sref-active="active" )
           a(ui-sref="{{entry.path}}" ) {{entry.title}}
-    
+
     .preview-container
       .contents(ui-view="preview")
 
@@ -23,7 +23,21 @@ block content
           i.fa.fa-bars
         .cs-logo
         button.btn.btn-sm.btn-default.pull-right(ng-click="togglePreview()") Preview
-        button.btn.btn-sm.btn-default.pull-right(ng-click="save()") Save 
+        button.btn.btn-sm.btn-default.pull-right(ng-click="save()") Save
+
+        span.saver.pull-right
+          model-saver(
+            ng-model="item",
+            save-trigger="save()", 
+            saving="saveInProgress", 
+            save-error="saveError")
+            #saved
+              | All changes saved
+            #save-in-progress
+              | Saving...
+            #save-error
+              | There was an error saving your content
+
       .main-content(ui-view="main")
 
   include partials/designer
@@ -73,7 +87,20 @@ block scripts
             'corespring.wiggi-wiz'
           ].concat(data.angular.dependencies);
 
-          angular.module("corespring-editor", playerDeps).config(function($stateProvider, $urlRouterProvider) {
+          angular.module("corespring-editor", playerDeps).config(function($provide, $stateProvider, $urlRouterProvider) {
+            
+            //Disable logging.. 
+            /*$provide.decorator('$log', function($delegate, $sniffer) {
+                var _log = $delegate.log; //Saving the original behavior
+
+                $delegate.log = function(message) { };
+                $delegate.debug = function(message) { };
+                $delegate.error = function(message) {
+                }
+
+                return $delegate;
+            });*/
+
             $urlRouterProvider.otherwise("/design");
             $stateProvider
               .state('design', {
@@ -142,4 +169,3 @@ block scripts
 
       });
     });
-
