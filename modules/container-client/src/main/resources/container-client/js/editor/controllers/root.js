@@ -1,19 +1,20 @@
-var controller = function($scope, $log, $location, $timeout, DataQueryService, ItemService, NavModelService, SupportingMaterialsService) {
+var controller = function($scope, $rootScope, $log, $location, $timeout, DataQueryService, ItemService, NavModelService, SupportingMaterialsService) {
 
   $scope.nav = NavModelService;
+
+  function supportingMaterialIndex() {
+    var match = $location.path().match(/\/supporting-material\/(\d+)/);
+    return match ? parseInt(match[1], 10) : undefined;
+  }
 
   function previewable() {
     var matchers = [
       /\/design/,
       /\/item-profile/,
       function() {
-        var match = $location.path().match(/\/supporting-material\/(\d+)/);
-        var index;
-        if (match) {
-          index = parseInt(match[1], 10);
-          var returnValue = SupportingMaterialsService.previewable($scope.item, index);
-          console.log(returnValue);
-          return returnValue;
+        var index = supportingMaterialIndex();
+        if (index) {
+          return SupportingMaterialsService.previewable($scope.item, index);
         } else {
           return false;
         }
@@ -36,6 +37,14 @@ var controller = function($scope, $log, $location, $timeout, DataQueryService, I
     return search.preview === true || search.preview === 'true';
   }
 
+  $rootScope.$on('$stateChangeSuccess', function() {
+    if (previewable()) {
+      $scope.showPreview = showPreview();
+    } else {
+      $scope.showPreview = false;
+    }
+  });
+
   function showLeftNav() {
     var search = $location.search();
     return search.leftnav === true || search.leftnav === 'true';
@@ -53,14 +62,22 @@ var controller = function($scope, $log, $location, $timeout, DataQueryService, I
     }
   }
 
+  $scope.isActive = function(tab) {
+    return $location.path().replace(/^\/|\/$/g, '') === tab;
+  };
+
+  $scope.isSupportingMaterialActive = function(supportingMaterial, index) {
+    return supportingMaterialIndex() === index;
+  };
+
   $scope.toggleSupportingMaterials = function() {
     $scope.showSupportingMaterials = !$scope.showSupportingMaterials;
   };
 
+  $scope.showSupportingMaterials = supportingMaterialIndex() !== undefined;
+
   $timeout(function() {
-    var search = $location.search();
     hideShowNav();
-    $scope.showPreview = showPreview();
     $scope.hasSupportingMaterials = hasSupportingMaterials();
   });
 
@@ -75,6 +92,8 @@ var controller = function($scope, $log, $location, $timeout, DataQueryService, I
       var show = showPreview();
       $location.search('preview', !show);
       $scope.showPreview = !show;
+    } else {
+      console.log('not previewable');
     }
   };
 
@@ -127,6 +146,7 @@ var controller = function($scope, $log, $location, $timeout, DataQueryService, I
 
 angular.module('corespring-editor.controllers')
   .controller('Root', ['$scope',
+    '$rootScope',
     '$log',
     '$location',
     '$timeout',

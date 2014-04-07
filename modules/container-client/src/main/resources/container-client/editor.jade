@@ -11,24 +11,24 @@ block content
       .top-nav-filler
         
       ul.nav.nav-stacked
-        li
+        li(ng-class="{ active: isActive('design') }")
           a(ui-sref="design") Design
 
-        li
+        li(ng-class="{ active: isActive('view-player') }")
           a(ui-sref="view-player") View Player
 
-        li
+        li(ng-class="{ active: isActive('item-profile') }")
           a(ui-sref="item-profile") Item Profile
 
-        li.supporting-materials-header
+        li.supporting-materials-header(ng-class="{ active: isActive('supporting-materials') }")
           a(ui-sref="supporting-materials", ng-class="{empty: !hasSupportingMaterials}") Supporting Materials
           a.collapsable(ng-show="hasSupportingMaterials", ng-class="{expanded: showSupportingMaterials}",
             ng-click="toggleSupportingMaterials()")
           ul.nav.supporting-material-items(ng-show="showSupportingMaterials")
-            li.supporting-material-item(ng-repeat="supportingMaterial in item.supportingMaterials")
+            li.supporting-material-item(ng-repeat="supportingMaterial in item.supportingMaterials", ng-class="{ active: isSupportingMaterialActive(supportingMaterial, $index)}")
               a(ui-sref="supporting-material({index: $index})") {{supportingMaterial.name}}
 
-        li
+        li(ng-class="{ active: isActive('overview') }")
           a(ui-sref="overview") Overview
     
     .preview-container

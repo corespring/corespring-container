@@ -4,6 +4,7 @@ var controller = function(
   $http,
   $stateParams,
   $log,
+  $filter,
   SupportingMaterialsService,
   ImageUtils) {
 
@@ -74,17 +75,28 @@ var controller = function(
 
   $scope.formatKB = function(kb, decimalPlaces) {
     var mb;
-    decimalPlaces = decimalPlaces || 2;
-    if (kb < 1024) {
-      return Math.round(kb * Math.pow(10, decimalPlaces)) / Math.pow(10, decimalPlaces) + "kb";
+    if (isNaN(kb)) {
+      return "--";
     } else {
-      mb = kb / 1024;
-      return Math.round(mb * Math.pow(10, decimalPlaces)) / Math.pow(10, decimalPlaces) + "mb";
+      decimalPlaces = decimalPlaces || 2;
+      if (kb < 1024) {
+        return Math.round(kb * Math.pow(10, decimalPlaces)) / Math.pow(10, decimalPlaces) + "kb";
+      } else {
+        mb = kb / 1024;
+        return Math.round(mb * Math.pow(10, decimalPlaces)) / Math.pow(10, decimalPlaces) + "mb";
+      }
     }
   };
 
+  $scope.formatDate = function(date) {
+    if (date instanceof Object && date.$date  ) {
+      date = date.$date;
+    }
+    return $filter('date')(date, 'medium');
+  };
+
   $scope.hasDate = function(supportingMaterial) {
-    return supportingMaterial.dateModified !== undefined;
+    return supportingMaterial && supportingMaterial.dateModified !== undefined;
   };
 
   $scope.getSupportingMaterialMarkup = function() {
@@ -100,10 +112,13 @@ var controller = function(
   };
 
   function getSupportingMaterial() {
-    var supportingMaterial = SupportingMaterialsService.getSupportingMaterial($scope.item, $scope.index);
-    SupportingMaterialsService.getKBFileSize($scope.item, $scope.index, function(size) {
-      supportingMaterial.fileSize = size;
-    });
+    var supportingMaterial;
+    if ($scope.item) {
+      supportingMaterial = SupportingMaterialsService.getSupportingMaterial($scope.item, $scope.index);
+      SupportingMaterialsService.getKBFileSize($scope.item, $scope.index, function(size) {
+        supportingMaterial.fileSize = size;
+      });
+    }
     return supportingMaterial;
   }
 
@@ -112,6 +127,7 @@ var controller = function(
     $scope.supportingMarkup = $scope.getSupportingMaterialMarkup();
   });
 
+  $scope.supportingMaterial = getSupportingMaterial();
   $scope.supportingMarkup = $scope.getSupportingMaterialMarkup();
 
 };
@@ -121,6 +137,7 @@ angular.module('corespring-editor.controllers')
     '$http',
     '$stateParams',
     '$log',
+    '$filter',
     'SupportingMaterialsService',
     'ImageUtils',
     controller

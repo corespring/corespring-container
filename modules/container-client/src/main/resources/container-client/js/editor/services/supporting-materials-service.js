@@ -4,11 +4,15 @@
     var self = this;
 
     function getUrl(item, index) {
-      return item.supportingMaterials[index].name + "/" + self.getSupportingMaterial(item, index).name;
+      if (item) {
+        return item.supportingMaterials[index].name + "/" + self.getSupportingMaterial(item, index).name;
+      } else {
+        return undefined;
+      }
     }
 
     this.getSupportingMaterial = function(item, index) {
-      if (item) {
+      if (item && item.supportingMaterials[index]) {
         var fileIndex = _.findIndex(item.supportingMaterials[index].files, function(file) {
           return file.isMain;
         });
@@ -22,9 +26,13 @@
      * Returns the file size of the supporting material for item at index in KB to the provided callback.
      */
     this.getKBFileSize = function(item, index, callback) {
-      $http({method: 'GET', url: getUrl(item, index)}).success(function(data, status, headers) {
-        callback(headers('content-length') / 1024);
-      });
+      if (item) {
+        $http({method: 'GET', url: getUrl(item, index)}).success(function(data, status, headers) {
+          callback(headers('content-length') / 1024);
+        });
+      } else {
+        callback(undefined);
+      }
     };
 
     this.getSupportingUrl = function(item, index) {
@@ -33,7 +41,7 @@
 
     function isContentType(options) {
       var supportingMaterial = self.getSupportingMaterial(options.item, options.index);
-      return (options.contentType && supportingMaterial) ?
+      return (supportingMaterial && options.contentType) ?
         supportingMaterial.contentType === options.contentType : false;
     }
 
@@ -42,7 +50,7 @@
     };
 
     function isMarkup(item, index) {
-      isContentType({
+      return isContentType({
         item: item,
         index: index,
         contentType: 'text/html'
@@ -50,7 +58,7 @@
     }
 
     function isPdf(item, index) {
-      isContentType({
+      return isContentType({
         item: item,
         index: index,
         contentType: 'application/pdf'

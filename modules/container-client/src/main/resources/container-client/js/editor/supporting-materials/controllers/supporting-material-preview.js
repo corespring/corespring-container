@@ -6,13 +6,16 @@ var controller = function(
 
   $scope.getSupportingUrl = function(index) {
     if ($scope.item) {
-      return SupportingMaterialsService.getSupportingUrl($scope.item, index);
+      return SupportingMaterialsService.getSupportingUrl($scope.item, $scope.index);
     }
   };
 
+  $scope.previewable = SupportingMaterialsService.previewable($scope.item, $scope.index);
   $scope.supportingUrl = $scope.getSupportingUrl($scope.index);
+
   $scope.$on('itemLoaded', function() {
     $scope.supportingUrl = $scope.getSupportingUrl($scope.index);
+    $scope.previewable = SupportingMaterialsService.previewable($scope.item, $scope.index);
   });
 
 };

@@ -3,11 +3,37 @@
     height: 100%;
     overflow: inherit;
   }
+
+  .file-upload-info {
+    padding: 20px;
+
+    h3 {
+      margin: 0 0 15px;
+    }
+
+    dt {
+      display: inline-block;
+      min-width: 100px;
+
+      &:after {
+        content: ":"
+      }
+    }
+
+    dd {
+      display: inline-block;
+      margin-bottom: 5px;
+    }
+  }
+
 }
 
-.nav {
-  li.supporting-material-item a {
-    padding-left: 40px;
+.root .nav-container .nav {
+
+  li.supporting-material-item {
+    a {
+      padding-left: 40px;
+    }
   }
 
   .supporting-materials-header {
@@ -33,6 +59,18 @@
 
         &.expanded {
           background-image: url('../images/disclosure-arrow-down.png');
+        }
+      }
+    }
+
+    &.active {
+      .supporting-material-item {
+        a {
+          color: #c2bfc2;
+        }
+
+        &.active a {
+          color: #94d228;
         }
       }
     }

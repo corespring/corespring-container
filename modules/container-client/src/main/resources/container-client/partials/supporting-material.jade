@@ -10,12 +10,15 @@ script#supporting-material(type='text/ng-template')
           .btn-group
             button(ng-click="closePane()", class="btn btn-sm btn-success", style="float:right;") OK
 
-    div(ng-hide="isContentType('text/html')")
+    .file-upload-info(ng-hide="isContentType('text/html')")
       h3 File Upload Info
       dl
-        dt File Name
-        dd {{supportingMaterial.name}}
-        dt File Size
-        dd {{formatKB(supportingMaterial.fileSize)}}
-        dt(ng-show='hasDate(supportingMaterial)') Date
-        dd(ng-show='hasDate(supportingMaterial)') {{supportingMaterial.dateModified}}
+        div
+          dt File Name
+          dd {{supportingMaterial.name}}
+        div
+          dt File Size
+          dd {{formatKB(supportingMaterial.fileSize)}}
+        div
+          dt(ng-show='hasDate(supportingMaterial)') Date
+          dd(ng-show='hasDate(supportingMaterial)') {{formatDate(supportingMaterial.dateModified)}}
