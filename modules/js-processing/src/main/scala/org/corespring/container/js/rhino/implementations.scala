@@ -1,6 +1,6 @@
 package org.corespring.container.js.rhino
 
-import org.corespring.container.js.api.{ ComponentServerLogic => ApiComponentServerLogic, ItemAuthorOverride => ApiItemAuthorOverride, JavascriptError, GetServerLogic }
+import org.corespring.container.js.api.{ ComponentServerLogic => ApiComponentServerLogic, ItemAuthorOverride => ApiItemAuthorOverride, JavascriptProcessingException, JavascriptError, GetServerLogic }
 import org.mozilla.javascript.{ Function => RhinoFunction }
 import org.mozilla.javascript.{ Scriptable, Context }
 import org.corespring.container.js.processing.PlayerItemPreProcessor
@@ -57,7 +57,7 @@ trait ItemAuthorOverride
     }
 
     result match {
-      case Left(err) => throw new RuntimeException(s"An javascript error occured: ${err.message}")
+      case Left(err) => throw JavascriptProcessingException(err)
       case Right(json) => json
     }
   }
@@ -103,7 +103,7 @@ trait ComponentServerLogic
         //TODO: rename 'respond' => 'createOutcome' in the components
         val respondFunction = server.get("respond", server).asInstanceOf[RhinoFunction]
         callJsFunction(wrapped, respondFunction, server, Array(question, response, settings, targetOutcome)) match {
-          case Left(err) => throw new RuntimeException("A javascript error occured: " + err)
+          case Left(err) => throw JavascriptProcessingException(err)
           case Right(json) => {
             json.asOpt[JsObject] match {
               case Some(jsObj) => Right(jsObj ++ Json.obj("studentResponse" -> response))
@@ -114,7 +114,7 @@ trait ComponentServerLogic
     }
 
     result match {
-      case Left(err) => throw new RuntimeException(err.toString)
+      case Left(err) => throw JavascriptProcessingException(err)
       case Right(json) => json
     }
   }
@@ -131,7 +131,7 @@ trait ComponentServerLogic
     }
 
     result match {
-      case Left(err) => throw new RuntimeException(err.toString)
+      case Left(err) => throw JavascriptProcessingException(err)
       case Right(json) => json
     }
   }

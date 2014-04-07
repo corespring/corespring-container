@@ -30,4 +30,13 @@ object api {
     def name: String
   }
 
+  case class JavascriptProcessingException(e: JavascriptError) extends RuntimeException(e.message) {
+    s"""
+        message: ${e.message}
+        source : ${e.source}
+        line: ${e.lineNo}
+        column: ${e.column}
+     """
+  }
+
 }
