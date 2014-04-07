@@ -31,7 +31,7 @@ trait CorespringJs {
 
 trait ItemAuthorOverride
   extends ApiItemAuthorOverride
-  with NewJsContext
+  with JsContext
   with JsFunctionCalling
   with CorespringJs {
 
@@ -65,7 +65,7 @@ trait ItemAuthorOverride
 
 trait ComponentServerLogic
   extends ApiComponentServerLogic
-  with NewJsContext
+  with JsContext
   with JsFunctionCalling
   with CorespringJs {
 

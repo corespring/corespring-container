@@ -1,12 +1,12 @@
 package org.corespring.container.js.rhino
 
 import java.io.{ InputStreamReader, Reader }
+import org.corespring.container.js.api.JavascriptError
 import org.mozilla.javascript.tools.shell.Global
 import org.mozilla.javascript.{ Function => RhinoFunction, _ }
 import play.api.Logger
-import play.api.libs.json.{ JsString, Json, JsValue }
-import org.corespring.container.js.api.JavascriptError
 import play.api.libs.json.JsString
+import play.api.libs.json.{ Json, JsValue }
 import scala.Some
 
 trait JsConsole {
@@ -59,10 +59,9 @@ class LocalErrorReporter extends ErrorReporter {
   override def warning(message: String, sourceName: String, line: Int, lineSource: String, lineOffset: Int): Unit = {
     println(s"[LocalErrorReporter:warning] -> $message")
   }
-
 }
 
-trait NewJsContext extends JsLogging {
+trait JsContext extends JsLogging {
 
   def console: Option[JsConsole] = Some(new DefaultLogger(Logger("js.console")))
 
@@ -109,54 +108,6 @@ trait NewJsContext extends JsLogging {
     if (stream == null) {
       logger.warn(s"Failed to load js from path: $path")
       throw new java.io.IOException(s"Resource not found: $path")
-    } else {
-      Some(new InputStreamReader((stream)))
-    }
-  }
-}
-
-trait JsContext extends JsLogging {
-
-  def console: Option[JsConsole] = Some(new DefaultLogger(Logger("js.console")))
-
-  def withJsContext[A](libs: Seq[String], srcs: Seq[String] = Seq.empty)(f: (Context, Scriptable) => A): A = {
-    val ctx = Context.enter
-    ctx.setOptimizationLevel(-1)
-    val global = new Global
-    global.init(ctx)
-    val scope = ctx.initStandardObjects(global)
-
-    def addToContext(libPath: String) = loadJsLib(libPath).map {
-      reader =>
-        println(s"-------> evaluating: $libPath")
-        ctx.evaluateReader(scope, reader, libPath, 1, null)
-    }.getOrElse(logger.warn(s"error loading: $libPath"))
-
-    libs.foreach(addToContext)
-
-    def addSrcToContext(src: String) = ctx.evaluateString(scope, src, "?", 1, null)
-    srcs.foreach(addSrcToContext)
-
-    def addToScope(name: String)(thing: Any) = ScriptableObject.putProperty(scope, name, thing)
-
-    console.foreach(addToScope("console"))
-
-    try {
-      f(ctx, scope)
-    } catch {
-      case e: Exception => {
-        println("... js error..")
-        throw e
-      }
-    } finally {
-      Context.exit
-    }
-  }
-
-  private def loadJsLib(path: String): Option[Reader] = {
-    val stream = getClass.getResourceAsStream(path)
-    if (stream == null) {
-      None
     } else {
       Some(new InputStreamReader((stream)))
     }

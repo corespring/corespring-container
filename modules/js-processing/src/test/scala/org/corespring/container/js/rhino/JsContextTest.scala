@@ -10,7 +10,7 @@ trait RhinoTestHelper {
 
 class JsContextTest extends Specification with RhinoTestHelper {
 
-  val client = new NewJsContext {}
+  val client = new JsContext {}
 
   val defaultJs =
     """
