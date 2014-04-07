@@ -41,7 +41,7 @@ class ResponseGeneratorTest extends Specification {
 
       val componentServer: ComponentServerLogic = new ComponentServerLogic {
 
-        override def componentType: String = "comp"
+        override def componentType: String = "comp-type-tester"
 
         override def js: String = respondJs
 
