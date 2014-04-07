@@ -30,7 +30,6 @@
       $rootScope.$on('$stateChangeStart', function() { this.locationSearch = $location.search(); });
       $rootScope.$on('$stateChangeSuccess', function() { $location.search(this.locationSearch); });
     })();
-
   }
 
   angular.module('corespring-editor.services')
