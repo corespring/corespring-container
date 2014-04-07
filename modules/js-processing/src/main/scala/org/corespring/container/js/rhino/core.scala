@@ -191,29 +191,4 @@ trait JsFunctionCalling extends JsLogging {
       case e: Throwable => throw new RuntimeException("General error while processing js", e)
     }
   }
-
-  //@deprecated("Use new function", "3.2")
-  /*def callJsFunction(rawJs: String, fn: RhinoFunction, parentScope: Scriptable, args: Array[JsValue])(implicit ctx: Context, rootScope: Scriptable): JsValue = {
-    try {
-      val jsArgs: Array[AnyRef] = args.toArray.map(jsObject(_))
-      val result = fn.call(ctx, rootScope, parentScope, jsArgs)
-      val jsonString: Any = toJsonString.call(ctx, rootScope, rootScope, Array(result))
-      val jsonOut = Json.parse(jsonString.toString)
-      jsonOut
-    } catch {
-      case e: EcmaError => {
-        logger.warn("Ecmascript error")
-        logger.info(e.getErrorMessage)
-        val srcError: String = rawJs.lines.toSeq.zipWithIndex.map {
-          zipped: (String, Int) =>
-            val (index, line) = zipped
-            if (index == e.lineNumber) s"!!!! > $line" else line
-        }.mkString("\n")
-        logger.warn(srcError)
-        logger.debug(s">> line: ${e.lineNumber}, column: ${e.columnNumber} ")
-        throw new RuntimeException("Error processing js", e)
-      }
-      case e: Throwable => throw new RuntimeException("General error while processing js", e)
-    }
-  }*/
 }
