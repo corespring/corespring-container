@@ -11,7 +11,6 @@ block content
       .top-nav-filler
         
       ul.nav.nav-stacked
-<<<<<<< HEAD
         li(ng-class="{ active: isActive('design') }")
           a(ui-sref="design") Design
 
@@ -31,10 +30,6 @@ block content
 
         li(ng-class="{ active: isActive('overview') }")
           a(ui-sref="overview") Overview
-=======
-        li(ng-repeat="entry in nav.navEntries", ui-sref-active="active" )
-          a(ui-sref="{{entry.path}}" ) {{entry.title}}
->>>>>>> master
     
     .preview-container
       .contents(ui-view="preview")
