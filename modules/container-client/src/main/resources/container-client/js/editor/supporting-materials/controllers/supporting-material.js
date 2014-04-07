@@ -68,11 +68,6 @@ var controller = function(
     console.warn("file too big");
   });
 
-
-  $scope.save = function() {
-    console.log("Saving!");
-  };
-
   $scope.formatKB = function(kb, decimalPlaces) {
     var mb;
     if (isNaN(kb)) {
