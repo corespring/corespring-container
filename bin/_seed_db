@@ -35,8 +35,9 @@ seed = (collection, folder, next) ->
 
 processDates = (obj) ->
   for key of obj
-    obj[key] = new Date(obj[key])  if key is "$date"
-    obj[key] = processDates(obj[key])  if obj[key] instanceof Object
+    if key is "$date"
+      obj = new Date(obj[key])
+    obj[key] = processDates(obj[key]) if obj[key] instanceof Object
     if obj[key] instanceof Array
       obj[key] = _.map(obj[key], (o) ->
         processDates o
