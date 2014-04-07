@@ -10,7 +10,8 @@ var controller = function(
   PlayerService,
   MathJaxService,
   ComponentToWiggiwizFeatureAdapter,
-  ImageUtils) {
+  ImageUtils,
+  ComponentRegister) {
 
   var configPanels = {};
 
@@ -71,6 +72,7 @@ var controller = function(
     var deleteComponent = function(id) {
       if ($scope.item && $scope.item.components) {
         delete $scope.item.components[id];
+        ComponentRegister.deleteComponent(id);
       } else {
         throw 'Can\'t delete component with id ' + id;
       }
@@ -206,5 +208,6 @@ angular.module('corespring-editor.controllers')
     'MathJaxService',
     'ComponentToWiggiwizFeatureAdapter',
     'ImageUtils',
+    'ComponentRegister',
     controller
   ]);
