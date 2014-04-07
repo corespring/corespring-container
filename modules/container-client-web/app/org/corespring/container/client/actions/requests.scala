@@ -39,3 +39,5 @@ case class SaveSessionRequest[A](itemSession: JsValue, override val isSecure: Bo
  * @param errors - if there were any errors loading the player js
  */
 case class PlayerJsRequest[A](isSecure: Boolean, r: Request[A], errors: Seq[String] = Seq.empty) extends WrappedRequest(r)
+
+case class DeleteAssetRequest[A](error: Option[String], r: Request[A]) extends WrappedRequest[A](r)

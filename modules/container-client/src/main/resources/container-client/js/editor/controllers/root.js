@@ -38,16 +38,12 @@ var controller = function($scope, $log, $location, $timeout, DataQueryService, I
   };
 
   $scope.$on('$locationChangeSuccess', function() {
-    NavModelService.chooseNavEntry($location.path());
-
     if (_.contains(previewable, $location.path())) {
       $scope.showPreview = showPreview();
     } else {
       $scope.showPreview = false;
     }
   });
-
-  NavModelService.chooseNavEntry($location.path());
 
   $scope.itemId = (function() {
     //TODO: This is a temporary means of extracting the session id

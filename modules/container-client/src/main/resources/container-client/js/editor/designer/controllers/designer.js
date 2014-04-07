@@ -1,90 +1,83 @@
-/* global AddContentModalController */
-var controller = function($scope, $compile, $http, $timeout, $modal, $log, DesignerService, PlayerService, MathJaxService, ComponentRegister) {
-
-  $scope.showComponentsPanel = false;
-
-  // TODO: find last id from markup
-  $scope.lastId = 10;
-
-  $scope.extraFeatures = [
-
-    {
-      name: 'external',
-      type: 'dropdown',
-      dropdownTitle: 'Components',
-      buttons: [
-
-        {
-          name: 'corespring-multiple-choice',
-          toolbar: '<button class="btn btn-default btn-sm btn-small">CB</button>',
-          clickable: true, //? Is this the best way to set up clickability?
-          compile: true,
-          initialise: function($node, replaceWith) {
-            var id = $node.attr('id');
-            return replaceWith('<placeholder label="multiple-choice:' + id + '" id="' + id + '"></placeholder>');
-          },
-          addToEditor: function(editor, addContent) {
-            var id = ++$scope.lastId;
-            $scope.item.components[id] = {
-              "componentType": "corespring-multiple-choice",
-              "title": "Fruits",
-              "weight": 10,
-              "correctResponse": {
-              },
-              "model": {
-                "config": {
-                  "orientation": "vertical",
-                  "shuffle": false
-                },
-                "choices": [
-                  {
-                    "label": "Choice 1",
-                    "value": "choice1"
-                  },
-                  {
-                    "label": "Choice 2",
-                    "value": "choice2"
-                  }
-                ]
-              }
-            };
-            addContent($('<placeholder id="' + id + '" label="Multi Choice">'));
-          },
-          onDblClick: function($node, $scope, editor) {
-            var data = {};
-            var content = '<corespring-multiple-choice-config id="' + $node.attr('id') + '"></corespring-multiple-choice-config>';
-            editor.showEditPane(data, 'Edit multiple-choice (' + $node.attr('id') + ')', content, function() {
-              $log.debug('on update...');
-            }, {});
-          },
-          getMarkUp: function($node, $scope) {
-            var id;
-            if ($scope && $scope.$$childHead) {
-              id = $scope.$$childHead.id;
-            } else {
-              id = $node.attr('id');
-            }
-            return '<corespring-multiple-choice id = "' + id + '"></corespring-multiple-choice>';
-          }
-        }
-      ]
-    }
-  ];
+/* global AddContentModalController, com */
+var controller = function(
+  $scope,
+  $compile,
+  $http,
+  $timeout,
+  $modal,
+  $log,
+  DesignerService,
+  PlayerService,
+  MathJaxService,
+  ComponentToWiggiwizFeatureAdapter,
+  ImageUtils) {
 
   var configPanels = {};
 
   $scope.editorMode = "visual";
 
+  $scope.imageService = {
+
+    deleteFile: function(url) {
+      $http['delete'](url);
+    },
+    addFile: function(file, onComplete, onProgress) {
+      var url = '' + file.name;
+
+      if (ImageUtils.bytesToKb(file.size) > 500) {
+        onComplete(ImageUtils.fileTooBigError(file.size, 500));
+        return;
+      }
+
+      var opts = {
+        onUploadComplete: function(body, status) {
+          $log.debug('done: ', body, status);
+          onComplete(null, url);
+        },
+        onUploadProgress: function() {
+          $log.debug('progress', arguments);
+          onProgress(null, 'started');
+        },
+        onUploadFailed: function() {
+          $log.debug('failed', arguments);
+          onComplete({
+            code: 'UPLOAD_FAILED',
+            message: 'upload failed!'
+          });
+        }
+      };
+
+      var reader = new FileReader();
+
+      reader.onloadend = function() {
+        var uploader = new com.ee.RawFileUploader(file, reader.result, url, name, opts);
+        uploader.beginUpload();
+      };
+
+      reader.readAsBinaryString(file);
+    }
+  };
+
   $scope.onComponentsLoaded = function(componentSet) {
+
     $scope.componentSet = componentSet;
-  };
 
-  $scope.hasComponents = function() {
-    return $scope.item && _.size($scope.item.components) > 0;
-  };
+    var addToEditor = function(editor, addContent, component) {
+      var id = ++$scope.lastId;
+      $scope.item.components[id] = _.cloneDeep(component.defaultData);
+      addContent($('<placeholder id="' + id + '" label="' + component.name + '">'));
+    };
 
-  $scope.isNewItem = function() {
-    return $scope.item && !$scope.hasComponents();
+    var componentToFeature = function(component) {
+      return ComponentToWiggiwizFeatureAdapter.componentToWiggiwizFeature(component, addToEditor);
+    };
+
+    $scope.extraFeatures = [{
+      name: 'external',
+      type: 'dropdown',
+      dropdownTitle: 'Components',
+      buttons: _.map(componentSet, componentToFeature)
+    }];
   };
 
   $scope.onComponentsLoadError = function(error) {
@@ -111,7 +104,6 @@ var controller = function($scope, $compile, $http, $timeout, $modal, $log, Desig
   };
 
   $scope.$on('registerConfigPanel', function(a, id, component) {
-    console.log("registerConfigPanel:", id, component);
     configPanels[id] = component;
     component.setModel($scope.item.components[id]);
   });
@@ -125,7 +117,6 @@ var controller = function($scope, $compile, $http, $timeout, $modal, $log, Desig
   };
 
   $scope.serialize = function(comps) {
-
     if (!configPanels) {
       return comps;
     }
@@ -163,7 +154,14 @@ var controller = function($scope, $compile, $http, $timeout, $modal, $log, Desig
       }
     });
 
-    $scope.item = item;
+    var max = 0;
+    $(item.xhtml).find('[id]').each(function(idx, element) {
+      var id = Number($(element).attr('id'));
+      if (!_.isNaN(id) && id > max) {
+        max = id;
+      }
+    });
+    $scope.lastId = max;
 
     var scoringJs = _.find($scope.item.files, function(f) {
       return f.name === "scoring.js";
@@ -187,6 +185,7 @@ angular.module('corespring-editor.controllers')
     'DesignerService',
     'PlayerService',
     'MathJaxService',
-    'ComponentRegister',
+    'ComponentToWiggiwizFeatureAdapter',
+    'ImageUtils',
     controller
   ]);

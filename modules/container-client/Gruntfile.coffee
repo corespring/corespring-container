@@ -47,6 +47,7 @@ module.exports = (grunt) ->
       concatDest: '.tmp/concat/js/editor.js'
       src: [
         '<%= common.dist %>/bower_components/angular-route/angular-route.min.js',
+        '<%= common.dist %>/bower_components/angular-ui-router/release/angular-ui-router.min.js',
         '<%= common.dist %>/bower_components/mathjs/dist/math.min.js',
         '<%= common.dist %>/bower_components/saxjs/lib/sax.js',
         '<%= common.dist %>/js/corespring/core-library.js',
@@ -174,6 +175,7 @@ module.exports = (grunt) ->
           vendor: [
             '<%= common.dist %>/bower_components/angular/angular.js',
             '<%= common.dist %>/bower_components/angular-mocks/angular-mocks.js',
+            '<%= common.dist %>/bower_components/wiggi-wiz/dist/wiggi-wiz.js',
             '<%= common.dist %>/bower_components/jquery/jquery.js',
             '<%= common.dist %>/bower_components/lodash/dist/lodash.js'
             '<%= common.dist %>/bower_components/saxjs/lib/sax.js'

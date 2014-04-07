@@ -17,25 +17,22 @@
       "weight" : 10,
       "correctResponse" : { "value" : ["carrot", "turnip", "potato"] },
       "feedback" : [
-        { "value" : "banana", "feedback" : "Incorrect"},
-        { "value" : "carrot", "feedback" : "Correct", "notChosenFeedback" : "This is a vegetable"},
-        { "value" : "apple", "feedback" : "it's a fruit" },
-        { "value" : "turnip", "feedback" : "Correct", "notChosenFeedback" : "This is a vegetable" },
-        { "value" : "potato", "feedback" : "Correct", "notChosenFeedback" : "This is a vegetable" },
+        { "value" : "banana", "feedback" : "Incorrect", "feedbackType": "custom"},
+        { "value" : "carrot", "feedback" : "Correct", "feedbackType": "default", "notChosenFeedback" : "Carrot Was Not Chosen", "notChosenFeedbackType": "custom"},
+        { "value" : "apple", "feedback" : "it's a fruit","feedbackType": "custom" },
+        { "value" : "turnip", "feedback" : "Correct", "feedbackType": "custom","notChosenFeedback" : "Turnip Was Not Chosen", "notChosenFeedbackType": "custom" },
+        { "value" : "potato", "feedback" : "Correct", "feedbackType": "custom","notChosenFeedback" : "Potato Was Not Chosen", "notChosenFeedbackType": "custom" },
         { "value" : "wheat", "feedback" : "Incorrect" }
       ],
 
-      "scoreMapping" : {
-        "banana": 0.5,
-        "carrot": 1,
-        "apple": 1,
-        "wheat": -1
-      },
+      "comment": "Hello little vegetables",
+
+      "allowPartialScoring": true,
 
       "model" : {
         "prompt": "Which of these is a vegetable?",
         "config": {
-          "orientation": "vertical",
+          "orientation": "tile",
           "choiceStyle": "rightAlign",
           "shuffle": true
         },

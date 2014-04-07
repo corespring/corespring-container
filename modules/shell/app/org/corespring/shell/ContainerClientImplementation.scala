@@ -60,11 +60,25 @@ class ContainerClientImplementation(
       playS3.download(bucket, s"$id/$file", Some(request.headers))
     }
 
-    //TODO: Need to look at a way of pre-validating before we upload - look at the predicate?
-    override def uploadBodyParser(id: String, file: String): BodyParser[Int] = playS3.upload(bucket, s"$id/$file", (rh) => None)
-
     override def getItemId(sessionId: String): Option[String] = ContainerClientImplementation.this.sessionService.load(sessionId).map {
       json => (json \ "itemId").as[String]
+    }
+
+    override def actions: AssetActions[AnyContent] = new AssetActions[AnyContent] {
+      override def delete(itemId: String, file: String)(block: (DeleteAssetRequest[AnyContent]) => Result) = Action { request =>
+        val response = playS3.delete(bucket, s"$itemId/$file")
+        val deleteAssetRequest = DeleteAssetRequest(if (response.success) None else Some(response.msg), request)
+        block(deleteAssetRequest)
+      }
+
+      override def upload(itemId: String, file: String)(block: (Request[Int]) => Result) =
+        Action(
+          playS3.upload(
+            bucket, s"$itemId/$file",
+            (rh) => None)) {
+            request =>
+              block(request)
+          }
     }
   }
 

@@ -1,6 +1,13 @@
-.designer(ng-controller="Designer", ng-show="nav.isCurrentView('designer')")
+script#designer(type="text/ng-template")
+  .designer(ng-controller="Designer")
 
-  .editor-container(ng-class="editorMode")
-    wiggi-wiz(ng-model="item.xhtml",features="extraFeatures",ng-show="editorMode=='visual'")
-      toolbar(basic="bold italic", formatting="h1 h2 p")
-    //textarea(ng-model="item.xhtml", style="width: 100%; height: 300px",ng-show="editorMode=='visual'")
+    .editor-container(ng-class="editorMode")
+      wiggi-wiz(
+        ng-model="item.xhtml",
+        features="extraFeatures",
+        image-service="imageService"
+        ng-show="editorMode=='visual'")
+        toolbar(basic="bold italic", formatting="h1 h2 p")
+        edit-pane-toolbar(alignment="bottom")
+          .btn-group
+            button(ng-click="closePane()", class="btn btn-sm btn-success", style="float:right;") OK
