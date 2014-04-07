@@ -34,7 +34,7 @@ angular.module('corespring-editor.directives').directive('modelSaver', [
 
       $scope.triggerSave = function() {
         log('triggering save');
-        $scope.saveTrigger();
+        //$scope.saveTrigger();
       };
 
       var throttled = _.throttle($scope.triggerSave, 500, {
@@ -45,6 +45,8 @@ angular.module('corespring-editor.directives').directive('modelSaver', [
       var lastChange;
 
       $scope.$watch('ngModel', function(newValue, oldValue) {
+
+        log('ngModel changed');
 
         var now = new Date().getTime();
 

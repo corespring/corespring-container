@@ -46,12 +46,7 @@ var controller = function($scope, $log, $location, $timeout, DataQueryService, I
   });
 
   $scope.save = function() {
-    $scope.$broadcast('save-data', function(err) {
-      $scope.saveInProgress = false;
-      if (err) {
-        $scope.saveError = err;
-      }
-    });
+    $scope.$broadcast('save-data');
     $scope.saveInProgress = true;
   };
 
@@ -61,6 +56,10 @@ var controller = function($scope, $log, $location, $timeout, DataQueryService, I
   })();
 
   $scope.onItemLoaded = function(item) {
+
+    $scope.root = {
+      item: item
+    };
     $scope.item = item;
     $scope.$broadcast('itemLoaded', item);
   };
