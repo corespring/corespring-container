@@ -1,12 +1,21 @@
 script#supporting-material(type='text/ng-template')
-  .designer(ng-controller="SupportingMaterial")
-    .editor-container(ng-class="editorMode")
+
+  .supporting-material(ng-controller="SupportingMaterial")
+    .editor-container(ng-class="editorMode", ng-show="isContentType('text/html')")
       wiggi-wiz(
-        ng-model="item.xhtml",
-        features="extraFeatures",
-        image-service="imageService",
-        ng-show="editorMode=='visual'")
+        ng-model="supportingMarkup",
+        image-service="imageService", style="height: 100%")
         toolbar(basic="bold italic", formatting="h1 h2 p")
         edit-pane-toolbar(alignment="bottom")
           .btn-group
             button(ng-click="closePane()", class="btn btn-sm btn-success", style="float:right;") OK
+
+    div(ng-hide="isContentType('text/html')")
+      h3 File Upload Info
+      dl
+        dt File Name
+        dd {{supportingMaterial.name}}
+        dt File Size
+        dd {{formatKB(supportingMaterial.fileSize)}}
+        dt(ng-show='hasDate(supportingMaterial)') Date
+        dd(ng-show='hasDate(supportingMaterial)') {{supportingMaterial.dateModified}}

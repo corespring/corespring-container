@@ -1,26 +1,20 @@
 /* global AddContentModalController, com */
 var controller = function(
   $scope,
-  $compile,
   $http,
-  $timeout,
-  $modal,
+  $stateParams,
   $log,
-  DesignerService,
-  PlayerService,
-  MathJaxService,
-  ComponentToWiggiwizFeatureAdapter,
+  SupportingMaterialsService,
   ImageUtils) {
 
-  var configPanels = {};
-
-  $scope.editorMode = "visual";
+  $scope.index = parseInt($stateParams.index, 10);
 
   $scope.imageService = {
 
     deleteFile: function(url) {
       $http['delete'](url);
     },
+
     addFile: function(file, onComplete, onProgress) {
       var url = '' + file.name;
 
@@ -58,32 +52,6 @@ var controller = function(
     }
   };
 
-  $scope.onComponentsLoaded = function(componentSet) {
-
-    $scope.componentSet = componentSet;
-
-    var addToEditor = function(editor, addContent, component) {
-      var id = ++$scope.lastId;
-      $scope.item.components[id] = _.cloneDeep(component.defaultData);
-      addContent($('<placeholder id="' + id + '" label="' + component.name + '">'));
-    };
-
-    var componentToFeature = function(component) {
-      return ComponentToWiggiwizFeatureAdapter.componentToWiggiwizFeature(component, addToEditor);
-    };
-
-    $scope.extraFeatures = [{
-      name: 'external',
-      type: 'dropdown',
-      dropdownTitle: 'Components',
-      buttons: _.map(componentSet, componentToFeature)
-    }];
-  };
-
-  $scope.onComponentsLoadError = function(error) {
-    console.warn("Error loading components");
-  };
-
   $scope.getUploadUrl = function(file) {
     console.log(arguments);
     return file.name;
@@ -99,93 +67,61 @@ var controller = function(
     console.warn("file too big");
   });
 
-  $scope.getQuestionForComponentId = function(id) {
-    return $scope.item.components[id];
-  };
-
-  $scope.$on('registerConfigPanel', function(a, id, component) {
-    configPanels[id] = component;
-    component.setModel($scope.item.components[id]);
-  });
 
   $scope.save = function() {
-    console.log("Saving: ");
-    console.log($scope.item.components);
-    var cleaned = $scope.serialize($scope.item.components);
-    console.log(cleaned);
-    DesignerService.save($scope.itemId, cleaned, $scope.onItemSaved, $scope.onItemSaveError, $scope.itemId);
+    console.log("Saving!");
   };
 
-  $scope.serialize = function(comps) {
-    if (!configPanels) {
-      return comps;
+  $scope.formatKB = function(kb, decimalPlaces) {
+    var mb;
+    decimalPlaces = decimalPlaces || 2;
+    if (kb < 1024) {
+      return Math.round(kb * Math.pow(10, decimalPlaces)) / Math.pow(10, decimalPlaces) + "kb";
+    } else {
+      mb = kb / 1024;
+      return Math.round(mb * Math.pow(10, decimalPlaces)) / Math.pow(10, decimalPlaces) + "mb";
     }
-
-    var newModel = _.cloneDeep(comps);
-    _.each(comps, function(value, key) {
-      var component = configPanels[key];
-      if (component && component.getModel) {
-        comps[key] = component.getModel();
-      }
-    });
-
-    return newModel;
   };
 
+  $scope.hasDate = function(supportingMaterial) {
+    return supportingMaterial.dateModified !== undefined;
+  };
 
-  $scope.$on('mathJaxUpdateRequest', function() {
-    MathJaxService.parseDomForMath();
+  $scope.getSupportingMaterialMarkup = function() {
+    if ($scope.item) {
+      return SupportingMaterialsService.getSupportingMaterial($scope.item, $scope.index).content;
+    } else {
+      return undefined;
+    }
+  };
+
+  $scope.isContentType = function(contentType) {
+    return ($scope.item) ? contentType === SupportingMaterialsService.getContentType($scope.item, $scope.index) : false;
+  };
+
+  function getSupportingMaterial() {
+    var supportingMaterial = SupportingMaterialsService.getSupportingMaterial($scope.item, $scope.index);
+    SupportingMaterialsService.getKBFileSize($scope.item, $scope.index, function(size) {
+      supportingMaterial.fileSize = size;
+    });
+    return supportingMaterial;
+  }
+
+  $scope.$on('itemLoaded', function() {
+    $scope.supportingMaterial = getSupportingMaterial();
+    $scope.supportingMarkup = $scope.getSupportingMaterialMarkup();
   });
 
-  $scope.getItem = function() {
-    return $scope.item;
-  };
+  $scope.supportingMarkup = $scope.getSupportingMaterialMarkup();
 
-  PlayerService.setQuestionLookup($scope.getQuestionForComponentId);
-  PlayerService.setItemLookup($scope.getItem);
-
-  $scope.$on('itemLoaded', function(ev, item) {
-    _.each(item.components, function(c, key) {
-      var serverLogic = corespring.server.logic(c.componentType);
-      if (serverLogic.preprocess) {
-        //TODO: This is part of a larger task to add preprocess to the container
-        //@see: https://thesib.atlassian.net/browse/CA-842
-        item.components[key] = serverLogic.preprocess(c);
-      }
-    });
-
-    var max = 0;
-    $(item.xhtml).find('[id]').each(function(idx, element) {
-      var id = Number($(element).attr('id'));
-      if (!_.isNaN(id) && id > max) {
-        max = id;
-      }
-    });
-    $scope.lastId = max;
-
-    var scoringJs = _.find($scope.item.files, function(f) {
-      return f.name === "scoring.js";
-    });
-
-    if (scoringJs) {
-      PlayerService.setScoringJs(scoringJs);
-    }
-  });
-
-  DesignerService.loadAvailableComponents($scope.onComponentsLoaded, $scope.onComponentsLoadError);
 };
 
 angular.module('corespring-editor.controllers')
-  .controller('Designer', ['$scope',
-    '$compile',
+  .controller('SupportingMaterial', ['$scope',
     '$http',
-    '$timeout',
-    '$modal',
+    '$stateParams',
     '$log',
-    'DesignerService',
-    'PlayerService',
-    'MathJaxService',
-    'ComponentToWiggiwizFeatureAdapter',
+    'SupportingMaterialsService',
     'ImageUtils',
     controller
   ]);

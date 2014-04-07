@@ -13,23 +13,28 @@ block content
       ul.nav.nav-stacked
         li
           a(ui-sref="design") Design
+
         li
           a(ui-sref="view-player") View Player
+
         li
           a(ui-sref="item-profile") Item Profile
-        li
-          a(ui-sref="Supporting Materials") Supporting Materials
-          ul
-            li(ng-repeat="supportingMaterial in item.supportingMaterials")
+
+        li.supporting-materials-header
+          a(ui-sref="supporting-materials", ng-class="{empty: !hasSupportingMaterials}") Supporting Materials
+          a.collapsable(ng-show="hasSupportingMaterials", ng-class="{expanded: showSupportingMaterials}",
+            ng-click="toggleSupportingMaterials()")
+          ul.nav.supporting-material-items(ng-show="showSupportingMaterials")
+            li.supporting-material-item(ng-repeat="supportingMaterial in item.supportingMaterials")
               a(ui-sref="supporting-material({index: $index})") {{supportingMaterial.name}}
 
         li
-          a(ui-sref="Overview") Overview
+          a(ui-sref="overview") Overview
     
     .preview-container
       .contents(ui-view="preview")
 
-    .content-container(ng-class="{leftnav: showLeftNav, preview: showPreview}")
+    .content-container(ng-class="{preview: showPreview}")
       .top-nav
         button.btn.btn-sm.btn-default(ng-click="toggleLeftNav()")
           i.fa.fa-bars
@@ -46,6 +51,7 @@ block content
 
   include partials/previews/designer
   include partials/previews/item-profile
+  include partials/previews/supporting-material
 
 block scripts
 
@@ -134,6 +140,9 @@ block scripts
                 views: {
                   main: {
                     template: $('#supporting-material').html()
+                  },
+                  preview: {
+                    template: $('#supporting-material-preview').html()
                   }
                 }
               })
@@ -153,7 +162,7 @@ block scripts
           //Which seems to be doing its own script loading
           setTimeout(function(){
             angular.resumeBootstrap();
-            $("body").addClass('blend')
+            $("body").addClass('blend');
           }, 1000);
         };
 

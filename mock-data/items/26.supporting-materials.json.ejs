@@ -1,0 +1,169 @@
+{
+  "profile" : {
+    "taskInfo" : {
+      "title" : "Item One"
+    }
+  },
+  "files" : [
+    { "name" : "cute-puppy.jpg", "contentType" : "image/jpeg" },
+    { "name" : "cute-kitten.jpg", "contentType" : "image/jpeg" },
+    { "name" : "style.css", "contentType" : "text/css", "content" : "body{ color: #99ff99; }" },
+    { "name" : "scoring.js", "contentType" : "text/javascript", "content" : "<%- helper.read('../js/1.scoring.js')  %>" }
+   ],
+  "xhtml" : "<%- helper.read('../xml/1.xhtml') %>",
+  "components" : {
+    "2" : {
+      "componentType" : "corespring-drag-and-drop",
+      "title": "Butterfly Lifecycle",
+      "weight" : 1,
+      "correctResponse": {
+        "1": "egg",
+        "2": "pupa",
+        "3": "larva",
+        "4": "adult"
+      },
+      "feedback": [
+        {
+          "feedback": [
+          ],
+          "landingPlace": "1"
+        }
+      ],
+      "model" : {
+          "config" : {
+            "shuffle" : true
+          },
+          "prompt": "Drag the 2nd stage of the butterfly's lifecycle on to the the pod",
+          "answerArea": "A butterfly first is a <span landing-place id='1' class='inline' />. It is then a <span landing-place id='2' class='inline'/>. And then a <span landing-place id='3' class='inline'/>. Finally a <span landing-place id='4' class='inline'/>",
+          "choices": [
+            {
+              "content": "Pupa",
+              "id": "pupa"
+            },
+            {
+              "content": "Egg",
+              "id": "egg"
+            },
+            {
+              "content": "Larva",
+              "id": "larva"
+            },
+            {
+              "content": "Adult",
+              "id": "adult"
+            }
+          ]
+        }
+      },
+
+    "3" : {
+      "componentType" : "corespring-multiple-choice",
+      "title": "Get a Job",
+      "weight" : 4,
+      "correctResponse" : { "value" : ["2"] },
+      "scoreMapping" : {
+        "1": 0.5,
+        "2": 1,
+        "3": -1,
+        "4": -1
+      },
+      "feedback" : [
+        { "value" : "1", "feedback" : "Incorrect"},
+        { "value" : "2", "feedback" : "Correct", "notChosenFeedback" : "This would have been the correct one."},
+        { "value" : "3", "feedback" : "Incorrect" },
+        { "value" : "4", "feedback" : "Incorrect" }
+      ],
+      "model" : {
+        "prompt": "What is 1 + 1?",
+        "config": {
+          "orientation": "vertical",
+          "shuffle": true,
+          "singleChoice": true
+        },
+        "choices": [
+          {"label": "1", "value": "1"},
+          {"label": "2", "value": "2"},
+          {"label": "3", "value": "3"},
+          {"label": "4", "value": "4"}
+        ]
+      }
+    },
+    "4" : {
+      "componentType" : "corespring-multiple-choice",
+      "title": "Fruits",
+      "weight" : 10,
+      "correctResponse" : { "value" : ["carrot", "turnip", "potato"] },
+      "feedback" : [
+        { "value" : "banana", "feedback" : "Incorrect"},
+        { "value" : "carrot", "feedback" : "Correct", "notChosenFeedback" : "This is a vegetable"},
+        { "value" : "apple", "feedback" : "it's a fruit" },
+        { "value" : "turnip", "feedback" : "Correct", "notChosenFeedback" : "This is a vegetable" },
+        { "value" : "potato", "feedback" : "Correct", "notChosenFeedback" : "This is a vegetable" },
+        { "value" : "wheat", "feedback" : "Incorrect" }
+      ],
+      "model" : {
+        "prompt": "Which of these is a vegetable?",
+        "config": {
+          "orientation": "vertical",
+          "shuffle": true
+        },
+        "choices": [
+          {"label": "Banana", "value": "banana"},
+          {"label": "Carrot", "value": "carrot"},
+          {"label": "Apple", "value": "apple"},
+          {"label": "Turnip", "value": "turnip"},
+          {"label": "Potato", "value": "potato"},
+          {"label": "Wheat", "value": "wheat"}
+        ]
+      }
+    }
+  },
+  "supportingMaterials" : [
+    {
+      "name": "Custom Rubric",
+      "materialType" : "Rubric",
+      "files" : [
+        {
+          "_t" : "org.corespring.platform.core.models.item.resource.VirtualFile",
+          "name" : "index.html",
+          "contentType" : "text/html",
+          "content" : "<h1>Sample Rubric</h1><br/><p>This is a rubric for scoring this item.</p>",
+          "isMain" : true
+        }
+      ]
+    },
+    {
+      "name" : "Student Work Example",
+      "materialType" : "Student Work",
+      "files" : [
+        {
+          "_t" : "org.corespring.platform.core.models.item.resource.VirtualFile",
+          "name" : "index.html",
+          "contentType" : "text/html",
+          "content" : "<h1>Ben's Work</h1><br/><p>1 + 1 = 2</p><p>I like carrots.</p>",
+          "isMain" : true
+        }
+      ]
+    },
+    {
+      "name" : "FunnyPDF",
+      "materialType" : "Student Work",
+      "files" : [
+        {
+          "_t" : "org.corespring.platform.core.models.item.resource.StoredFile",
+          "name" : "student-work.pdf",
+          "contentType" : "application/pdf",
+          "storageKey" : "533eb66423fd754c27208041/FunnyPDF/student-work.pdf",
+          "isMain" : true,
+          "dateModified": {"$date": 1234}
+        }
+      ]
+    }
+  ],
+  "_id" : "533eb66423fd754c27208041",
+  "org": {
+    "components": [
+      "corespring/*"
+    ]
+  }
+}

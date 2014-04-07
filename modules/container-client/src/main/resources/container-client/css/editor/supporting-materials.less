@@ -1,0 +1,42 @@
+.supporting-material {
+  .wiggi-wiz, .wiggi-wiz-editable {
+    height: 100%;
+    overflow: inherit;
+  }
+}
+
+.nav {
+  li.supporting-material-item a {
+    padding-left: 40px;
+  }
+
+  .supporting-materials-header {
+    position: relative;
+
+    a {
+      padding-left: 38px;
+
+      &.empty {
+        padding-left: 15px;
+      }
+
+      &.collapsable {
+        position: absolute;
+        cursor: pointer;
+        left: 0;
+        top: 0;
+        width: 10px;
+        height: 10px;
+        display: block;
+        background: url('../images/disclosure-arrow-right.png') no-repeat center center;
+        padding: 19px;
+
+        &.expanded {
+          background-image: url('../images/disclosure-arrow-down.png');
+        }
+      }
+    }
+
+  }
+
+}

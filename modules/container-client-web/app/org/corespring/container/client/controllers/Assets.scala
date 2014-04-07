@@ -56,6 +56,13 @@ trait Assets extends Controller {
       })(request)
   }
 
+  def supportingMaterial(itemId: String, name: String, file: String) = Action.async {
+    request =>
+      at(itemId, s"$name/$file", (i: String) => {
+        loadAsset(itemId, s"$name/$file")(request)
+      })(request)
+  }
+
   def upload(id: String, file: String) = Action(uploadBodyParser(id, file)) { request =>
     Ok("Done")
   }

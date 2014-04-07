@@ -1,11 +1,35 @@
-var controller = function($scope, $log, $location, $timeout, DataQueryService, ItemService, NavModelService) {
+var controller = function($scope, $log, $location, $timeout, DataQueryService, ItemService, NavModelService, SupportingMaterialsService) {
 
   $scope.nav = NavModelService;
 
-  var previewable = [
-    '/design',
-    '/item-profile'
-  ];
+  function previewable() {
+    var matchers = [
+      /\/design/,
+      /\/item-profile/,
+      function() {
+        var match = $location.path().match(/\/supporting-material\/(\d+)/);
+        var index;
+        if (match) {
+          index = parseInt(match[1], 10);
+          var returnValue = SupportingMaterialsService.previewable($scope.item, index);
+          console.log(returnValue);
+          return returnValue;
+        } else {
+          return false;
+        }
+      }
+    ];
+
+    return _.find(matchers, function(matcher) {
+      if (matcher instanceof RegExp) {
+        return $location.path().match(matcher) !== null;
+      } else if (matcher instanceof Function) {
+        return matcher();
+      } else {
+        return false;
+      }
+    }) !== undefined;
+  }
 
   function showPreview() {
     var search = $location.search();
@@ -17,28 +41,46 @@ var controller = function($scope, $log, $location, $timeout, DataQueryService, I
     return search.leftnav === true || search.leftnav === 'true';
   }
 
+  function hasSupportingMaterials() {
+    return $scope.item ? ($scope.item.supportingMaterials && $scope.item.supportingMaterials.length > 0) : false;
+  }
+
+  function hideShowNav() {
+    if (showLeftNav()) {
+      $('.content-container').css({"left": $('.nav-container').css('width') });
+    } else {
+      $('.content-container').css({"left": "0"});
+    }
+  }
+
+  $scope.toggleSupportingMaterials = function() {
+    $scope.showSupportingMaterials = !$scope.showSupportingMaterials;
+  };
+
   $timeout(function() {
     var search = $location.search();
-    $scope.showLeftNav = showLeftNav();
+    hideShowNav();
     $scope.showPreview = showPreview();
+    $scope.hasSupportingMaterials = hasSupportingMaterials();
   });
 
-  $scope.toggleLeftNav = function(updateLocation) {
-    var show = showLeftNav();
-    $location.search('leftnav', !show);
-    $scope.showLeftNav = !show;
+
+  $scope.toggleLeftNav = function() {
+    $location.search('leftnav', !showLeftNav());
+    hideShowNav();
   };
 
   $scope.togglePreview = function() {
-    if (_.contains(previewable, $location.path())) {
+    if (previewable()) {
       var show = showPreview();
       $location.search('preview', !show);
       $scope.showPreview = !show;
     }
   };
 
-  $scope.$on('$locationChangeSuccess', function() {
-    if (_.contains(previewable, $location.path())) {
+  $scope.$on('itemLoaded', function() {
+    $scope.hasSupportingMaterials = hasSupportingMaterials();
+    if (previewable()) {
       $scope.showPreview = showPreview();
     } else {
       $scope.showPreview = false;
@@ -91,5 +133,6 @@ angular.module('corespring-editor.controllers')
     'DataQueryService',
     'ItemService',
     'NavModelService',
+    'SupportingMaterialsService',
     controller
   ]);
