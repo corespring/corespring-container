@@ -1,52 +1,51 @@
 package org.corespring.container.client.controllers.resources
 
-import org.specs2.mutable.Specification
-import org.corespring.container.components.response.OutcomeProcessor
 import org.corespring.container.client.actions._
-import play.api.mvc.{ AnyContentAsJson, Action, Result, AnyContent }
-import org.corespring.container.components.outcome.ScoreProcessor
-import play.api.test.{ FakeHeaders, FakeRequest }
-import play.api.test.Helpers._
-import org.specs2.mock.Mockito
-import play.api.libs.json.{ JsString, JsValue, Json }
-import org.specs2.specification.Scope
 import org.corespring.container.client.controllers.resources.Item.Errors
-import play.api.test.FakeHeaders
-import org.corespring.container.client.actions.SaveItemRequest
-import play.api.mvc.AnyContentAsJson
-import org.corespring.container.client.actions.ScoreItemRequest
+import org.specs2.mock.Mockito
+import org.specs2.mutable.Specification
+import org.specs2.specification.Scope
 import play.api.libs.json.JsString
+import play.api.libs.json.{ JsValue, Json }
+import play.api.mvc._
+import play.api.test.FakeHeaders
+import play.api.test.FakeRequest
+import play.api.test.Helpers._
 import scala.Some
-import org.corespring.container.client.actions.ItemRequest
+import scala.concurrent.{ ExecutionContext, Future }
 
 class ItemTest extends Specification with Mockito {
+
+  import ExecutionContext.Implicits.global
 
   class item(saveResult: Option[JsValue] = Some(Json.obj()), createError: Option[(Int, String)] = None) extends Scope {
     val item = new Item {
 
-      def actions: ItemActions[AnyContent] = new ItemActions[AnyContent] {
+      override def hooks: ItemHooks = new ItemHooks {
 
-        def save(itemId: String)(block: (SaveItemRequest[AnyContent]) => Result): Action[AnyContent] = Action {
-          request => block(SaveItemRequest(Json.obj(), (s, j, property) => saveResult, request))
-        }
-
-        def load(itemId: String)(block: (ItemRequest[AnyContent]) => Result): Action[AnyContent] = Action {
-          request =>
-            block(ItemRequest(Json.obj(), request))
-        }
-
-        override def create(error: (Int, String) => Result)(block: (NewItemRequest[AnyContent]) => Result): Action[AnyContent] = Action {
-          request =>
-
+        override def create(implicit header: RequestHeader): Future[Either[(Int, String), String]] = {
+          Future {
             createError.map {
               e =>
-                error(e._1, e._2)
-            }.getOrElse {
-              block(NewItemRequest("new_id", request))
-            }
+                Left(e)
+            }.getOrElse(Right("new_id"))
+          }
+        }
+
+        override def save(itemId: String, json: JsValue)(implicit header: RequestHeader): Future[Either[SimpleResult, JsValue]] = {
+          Future {
+            saveResult.map {
+              Right(_)
+            }.getOrElse(Left(BadRequest(Json.obj("error" -> Errors.errorSaving))))
+          }
+        }
+
+        override def load(itemId: String)(implicit header: RequestHeader): Future[Either[SimpleResult, JsValue]] = {
+          Future {
+            Right(Json.obj())
+          }
         }
       }
-
     }
   }
 
@@ -58,13 +57,13 @@ class ItemTest extends Specification with Mockito {
     "fail to save if no json is supplied" in new item {
       val result = item.save("x")(FakeRequest())
       status(result) === BAD_REQUEST
-      contentAsString(result) === Errors.noJson
+      (contentAsJson(result) \ "error").as[String] === Errors.noJson
     }
 
     "fail to save if save failed" in new item(saveResult = None) {
       val result = item.save("x")(FakeRequest("", "", FakeHeaders(), AnyContentAsJson(Json.obj("xhtml" -> JsString("<root/>")))))
       status(result) === BAD_REQUEST
-      contentAsString(result) === Errors.errorSaving
+      (contentAsJson(result) \ "error").as[String] === Errors.errorSaving
     }
 
     "save if save worked" in new item {

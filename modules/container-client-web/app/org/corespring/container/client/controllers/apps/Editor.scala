@@ -27,7 +27,7 @@ trait Editor extends AllItemTypesReader with AppWithServices[EditorActions[AnyCo
           "defaultData" -> c.defaultData)
     }
 
-    EditorServices("editor.services", Item.load(":id"), Item.save(":id", Some("profile")), Item.save(":id", Some("components")), JsArray(componentJson)).toString
+    EditorServices("editor.services", Item.load(":id"), Item.save(":id"), JsArray(componentJson)).toString
   }
 
   override def additionalScripts: Seq[String] = Seq(org.corespring.container.client.controllers.apps.routes.Editor.services().url)

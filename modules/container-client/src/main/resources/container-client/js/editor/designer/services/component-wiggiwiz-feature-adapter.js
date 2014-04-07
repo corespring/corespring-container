@@ -2,13 +2,17 @@
 
   var ComponentToWiggiwizFeatureAdapter = function($log) {
     var service = {};
-    service.componentToWiggiwizFeature = function(component, addToEditorCallback) {
+    service.componentToWiggiwizFeature = function(component, addToEditorCallback, deleteComponentCallback) {
       var componentType = component.componentType;
       return {
         name: componentType,
         toolbar: '<button class="btn btn-default btn-sm btn-small">CB</button>',
         clickable: true,
         compile: true,
+        deleteNode: function($node, services) {
+          deleteComponentCallback($node.attr('id'));
+          $node.remove();
+        },
         initialise: function($node, replaceWith) {
           var id = $node.attr('id');
           return replaceWith('<placeholder label="' + component.name + ': ' + id + '" id="' + id + '"></placeholder>');
@@ -33,8 +37,6 @@
   };
 
   angular.module('corespring-editor.services')
-    .service('ComponentToWiggiwizFeatureAdapter',
-      ['$log', ComponentToWiggiwizFeatureAdapter]
-    );
+    .service('ComponentToWiggiwizFeatureAdapter', ['$log', ComponentToWiggiwizFeatureAdapter]);
 
 })();

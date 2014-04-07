@@ -19,6 +19,10 @@ trait HasActions {
   def playerLauncherActions: PlayerLauncherActions[AnyContent]
 }
 
+trait HasHooks {
+  def itemHooks: ItemHooks
+}
+
 trait HasConfig {
   def configuration: Configuration
 }
