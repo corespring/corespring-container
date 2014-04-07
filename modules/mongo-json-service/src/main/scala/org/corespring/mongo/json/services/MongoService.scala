@@ -1,12 +1,12 @@
 package org.corespring.mongo.json.services
 
 import com.mongodb.DBObject
-import com.mongodb.casbah.{ WriteConcern, MongoCollection }
+import com.mongodb.casbah.{WriteConcern, MongoCollection}
 import com.mongodb.casbah.commons.MongoDBObject
 import com.mongodb.util.{JSON => MongoPlayJson}
 import org.bson.types.ObjectId
 import play.api.Logger
-import play.api.libs.json.{ JsObject, Json => PlayJson, JsValue }
+import play.api.libs.json.{JsObject, Json => PlayJson, JsValue}
 
 class MongoService(collection: MongoCollection) {
 
@@ -55,28 +55,16 @@ class MongoService(collection: MongoCollection) {
     }
   }
 
-  def save(id: String,  data: JsValue, property : Option[String]): Option[JsValue] = withOid(id) {
+  def save(id: String, data: JsValue): Option[JsValue] = withOid(id) {
     oid =>
       logger.debug(s"[save]: $id")
       logger.trace(s"[save]: ${PlayJson.stringify(data)}")
 
-      val idObject = PlayJson.obj("_id" ->
-        PlayJson.obj("$oid" -> id))
+      def toDbo(json: JsValue): DBObject = MongoPlayJson.parse(PlayJson.stringify(json)).asInstanceOf[DBObject]
 
-
-      def toDbo(json:JsValue) : DBObject = MongoPlayJson.parse(PlayJson.stringify(json)).asInstanceOf[DBObject]
-
-      val updateObject = data.as[JsObject] ++ idObject
-
-      def saveEverything = {
-        collection.save( toDbo(updateObject), WriteConcern.Safe)
-      }
-
-      val result = property.map{ p =>
-        val q = MongoDBObject("_id" -> new ObjectId(id))
-        val d = MongoDBObject("$set" -> MongoDBObject(p -> toDbo(data)))
-        collection.update(q, d, false, false, WriteConcern.Safe)
-      }.getOrElse(saveEverything)
+      val q = MongoDBObject("_id" -> new ObjectId(id))
+      val d = MongoDBObject("$set" -> toDbo(data))
+      val result = collection.update(q, d, false, false, WriteConcern.Safe)
 
       if (result.getLastError(WriteConcern.Safe).ok()) {
         Some(data)

@@ -1,11 +1,13 @@
-var controller = function ($scope, $log, ProfileService, DataQueryService) {
+var controller = function($scope, $log, ProfileService, DataQueryService) {
 
-  function findSubject(topic, id, callback){
-    var local = _.find($scope.queryResults[topic], function(r){ return r.id === id;});
-    if(local){
+  function findSubject(topic, id, callback) {
+    var local = _.find($scope.queryResults[topic], function(r) {
+      return r.id === id;
+    });
+    if (local) {
       callback(local);
     } else {
-      DataQueryService.findOne(topic, id, function success(data){
+      DataQueryService.findOne(topic, id, function success(data) {
         callback(data);
       });
     }
@@ -13,8 +15,12 @@ var controller = function ($scope, $log, ProfileService, DataQueryService) {
 
   $scope.queryResults = {};
 
-  $scope.save = function(){
-    ProfileService.save($scope.item.profile, function(savedProfile){
+  $scope.$on('save-data', function() {
+    $scope.save();
+  });
+
+  $scope.save = function() {
+    ProfileService.save({ profile: $scope.item.profile}, function(savedProfile) {
       $scope.item.profile = savedProfile;
     });
   };
@@ -23,37 +29,39 @@ var controller = function ($scope, $log, ProfileService, DataQueryService) {
     return s.category + ": " + s.subject;
   }
 
-  function Async(topic){
+  function Async(topic) {
 
     var that = this;
-    
-    this.elementToVal = function (element){
+
+    this.elementToVal = function(element) {
       return $(element).select2('val');
     };
 
-    this.query = function (query) {
+    this.query = function(query) {
       $log.debug("query: ", query);
 
-      DataQueryService.query( topic, query.term, function(result){
-        $scope.queryResults[topic] = result ;
-        query.callback({ results: result });
+      DataQueryService.query(topic, query.term, function(result) {
+        $scope.queryResults[topic] = result;
+        query.callback({
+          results: result
+        });
       });
     };
 
-    this.formatResult = function(e){
+    this.formatResult = function(e) {
       return subjectText(e);
     };
 
-    this.formatSelection = function(e){
+    this.formatSelection = function(e) {
       return subjectText(e);
     };
 
     this.initSelection = function(element, callback) {
       $log.debug("init selection: ", element, callback);
-      var val = that.elementToVal(element); 
+      var val = that.elementToVal(element);
       $log.debug("val: ", val);
 
-      findSubject(topic, val, function(s){
+      findSubject(topic, val, function(s) {
         return callback(s);
       });
     };
@@ -63,24 +71,24 @@ var controller = function ($scope, $log, ProfileService, DataQueryService) {
   $scope.primarySubjectAsync = new Async("primarySubject");
 
 
- $scope.$watch("otherItemType",  function (n) {
-    if(n && n !== ""){
+  $scope.$watch("otherItemType", function(n) {
+    if (n && n !== "") {
       $scope.taskInfo.itemType = $scope.otherItemType;
     }
   }, true);
 
-  function updateOtherItemType(){
+  function updateOtherItemType() {
 
-    function isRecognisedType(){
-      var recognised = _.find($scope.itemTypeValues, function(it){
+    function isRecognisedType() {
+      var recognised = _.find($scope.itemTypeValues, function(it) {
         return it === $scope.taskInfo.itemType;
       });
-      return recognised  !== undefined;
+      return recognised !== undefined;
     }
 
-    if($scope.itemTypeDataProvider && $scope.taskInfo){
-      
-      if(isRecognisedType()){
+    if ($scope.itemTypeDataProvider && $scope.taskInfo) {
+
+      if (isRecognisedType()) {
         $scope.otherItemType = "";
       } else {
         $scope.otherItemType = $scope.taskInfo.itemType;
@@ -88,37 +96,39 @@ var controller = function ($scope, $log, ProfileService, DataQueryService) {
     }
   }
 
-  $scope.save = function(){
-    ProfileService.save($scope.itemId, $scope.profile, $scope.onSaveSuccess, $scope.onSaveError);
+  $scope.save = function() {
+    ProfileService.save($scope.itemId, {
+      profile: $scope.profile
+    }, $scope.onSaveSuccess, $scope.onSaveError);
   };
 
-  $scope.onSaveSuccess = function(updated){
+  $scope.onSaveSuccess = function(updated) {
     $log.debug("profile saved");
   };
 
-  $scope.onSaveError = function(err){
+  $scope.onSaveError = function(err) {
     $log.debug("error saving profile", err);
   };
 
-  $scope.$watch("taskInfo.itemType", function (newValue) {
+  $scope.$watch("taskInfo.itemType", function(newValue) {
     updateOtherItemType();
   }, true);
 
-  ProfileService.load($scope.itemId, function(profile){
+  ProfileService.load($scope.itemId, function(profile) {
       $scope.profile = profile;
-      $scope.taskInfo = profile.taskInfo; 
+      $scope.taskInfo = profile.taskInfo;
       $log.debug("task info: ", $scope.taskInfo);
-  },
-  function error(err){
-    $log.warn('Error loading profile', err);
-  });
-  
+    },
+    function error(err) {
+      $log.warn('Error loading profile', err);
+    });
+
 };
 
 angular.module('corespring-editor.controllers')
-  .controller('ItemProfile',
-    ['$scope',
+  .controller('ItemProfile', ['$scope',
     '$log',
     'ProfileService',
     'DataQueryService',
-      controller]);
+    controller
+  ]);
