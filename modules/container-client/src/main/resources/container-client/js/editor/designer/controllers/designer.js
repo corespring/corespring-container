@@ -68,8 +68,19 @@ var controller = function(
       addContent($('<placeholder id="' + id + '" label="' + component.name + '">'));
     };
 
+    var deleteComponent = function(id) {
+      if ($scope.item && $scope.item.components) {
+        delete $scope.item.components[id];
+      } else {
+        throw 'Can\'t delete component with id ' + id;
+      }
+    };
+
     var componentToFeature = function(component) {
-      return ComponentToWiggiwizFeatureAdapter.componentToWiggiwizFeature(component, addToEditor);
+      return ComponentToWiggiwizFeatureAdapter.componentToWiggiwizFeature(
+        component,
+        addToEditor,
+        deleteComponent);
     };
 
     $scope.extraFeatures = [{
