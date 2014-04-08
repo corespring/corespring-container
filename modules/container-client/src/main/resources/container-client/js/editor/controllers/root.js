@@ -74,9 +74,7 @@ var controller = function($scope, $rootScope, $log, $location, $timeout, DataQue
     $scope.showSupportingMaterials = !$scope.showSupportingMaterials;
   };
 
-  $scope.showSupportingMaterials = function() {
-    supportingMaterialIndex() !== undefined;
-  };
+  $scope.showSupportingMaterials = supportingMaterialIndex() !== undefined;
 
   $timeout(function() {
     hideShowNav();

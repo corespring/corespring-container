@@ -6,6 +6,7 @@ var controller = function(
   $log,
   $filter,
   SupportingMaterialsService,
+  SupportingMaterialService,
   ImageUtils) {
 
   $scope.index = parseInt($stateParams.index, 10);
@@ -67,6 +68,32 @@ var controller = function(
   $scope.$on('fileSizeGreaterThanMax', function(event) {
     console.warn("file too big");
   });
+
+  $scope.$on('save-data', function() {
+    $scope.save();
+  });
+
+  $scope.onSaveSuccess = function() {
+    $log.info("Saved successfully");
+  }
+
+  $scope.onSaveError = function() {
+    $log.error("There was a problemo");
+  }
+
+  $scope.save = function() {
+    var updatedSupportingMaterials = $scope.item.supportingMaterials;
+    var supportingMaterialFile = SupportingMaterialsService.getSupportingMaterial($scope.item, $scope.index);
+    supportingMaterialFile.content = $scope.supportingMarkup;
+    var fileIndex = _.findIndex($scope.item.supportingMaterials[$scope.index].files, function(file) {
+      return file.isMain;
+    });
+    updatedSupportingMaterials[$scope.index].files[fileIndex] = supportingMaterialFile;
+
+    console.log($scope.supportingMarkup);
+    SupportingMaterialService.save($scope.itemId, { supportingMaterials: updatedSupportingMaterials },
+      $scope.onSaveSuccess, $scope.onSaveError);
+  };
 
   $scope.formatKB = function(kb, decimalPlaces) {
     var mb;
@@ -134,6 +161,7 @@ angular.module('corespring-editor.controllers')
     '$log',
     '$filter',
     'SupportingMaterialsService',
+    'SupportingMaterialService',
     'ImageUtils',
     controller
   ]);
