@@ -1,4 +1,5 @@
 var controller = function ($scope, SupportingMaterialService, $modal, Overlay, $state, $log) {
+
   $scope.createNew = function() {
     Overlay.open({
       template: $('#new-supporting-material-modal').html(),
@@ -36,9 +37,12 @@ var controller = function ($scope, SupportingMaterialService, $modal, Overlay, $
 
         $scope.$watch('data.materialType', function() { $scope.displayOther = isOther(); });
 
-
         $scope.ok = function() {
-          $modalInstance.close({ materialType: getType(), title: $scope.data.title });
+          if ($scope.data.title !== undefined && $scope.data.title !== "") {
+            $modalInstance.close({ materialType: getType(), title: $scope.data.title });
+          } else {
+            window.alert("Please enter a title for the supporting material.");
+          }
         };
 
         $scope.cancel = function() {
@@ -63,7 +67,7 @@ var controller = function ($scope, SupportingMaterialService, $modal, Overlay, $
   };
 
   $scope.onSaveError = function() {
-    $log.error("Oh no!");
+    $log.error("There was a problem saving the supporting material.");
   };
 
   $scope.create = function(data) {
