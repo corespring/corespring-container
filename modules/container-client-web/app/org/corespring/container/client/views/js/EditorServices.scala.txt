@@ -7,26 +7,8 @@
 
   angular.module('@namespace', []);
 
-  angular.module('@namespace').factory('ProfileService', ['BaseService', function(BaseService){
-
-    return {
-        save: function(id, profile, onSuccess, onFailure){
-          BaseService.saveProfile( profile, onSuccess, onFailure, id);
-        },
-        load: function(id, onSuccess, onFailure){
-          BaseService.load(function(item){
-            onSuccess(item.profile);
-          }, onFailure, id);
-        }
-    };
-  }]);
-
   angular.module('@namespace').factory('DesignerService', ['$http', 'BaseService',function($http, BaseService){
-
     return {
-        save: function(id, components, onSuccess, onFailure){
-          BaseService.saveComponents( components, onSuccess, onFailure, id);
-        },
         loadAvailableComponents: function(onSuccess, onFailure){
           var components = @{Json.stringify(componentSet)};
           onSuccess(components);
@@ -40,6 +22,9 @@
     return {
       load: function(onSuccess, onFailure, id){
         BaseService.load(onSuccess, onFailure, id);
+      },
+      save: function(data, onSuccess, onFailure, id){
+        BaseService.save(data, onSuccess, onFailure, id);
       }
     };
   }]);
@@ -69,13 +54,7 @@
             });
         }
       },
-      saveProfile: function(data, onSuccess, onFailure, id) {
-         this._save( data, onSuccess, onFailure, id );
-      },
-      saveComponents: function(data, onSuccess, onFailure, id){
-         this._save( data, onSuccess, onFailure, id );
-      },
-      _save: function(data, onSuccess, onFailure, id){
+      save: function(data, onSuccess, onFailure, id){
          var url = '@save.url.toLowerCase';
          var finalUrl = id ? url.replace(":id", id) : url;
          var method = '@save.method.toLowerCase';

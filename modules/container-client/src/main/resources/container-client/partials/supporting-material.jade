@@ -18,7 +18,7 @@ script#supporting-material(type='text/ng-template')
           dd {{supportingMaterial.name}}
         div
           dt File Size
-          dd {{formatKB(supportingMaterial.fileSize)}}
+          dd {{formatKB(supportingMaterialFileSize)}}
         div
           dt(ng-show='hasDate(supportingMaterial)') Date
           dd(ng-show='hasDate(supportingMaterial)') {{formatDate(supportingMaterial.dateModified)}}
