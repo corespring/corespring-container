@@ -27,10 +27,10 @@ block content
 
         span.saver
           model-saver(
-            ng-model="root.item",
+            ng-model="data.item",
             save-trigger="save()", 
-            saving="saveInProgress", 
-            save-error="saveError")
+            saving="data.saveInProgress", 
+            save-error="data.saveError")
             #saved
               | All changes saved
             #save-in-progress

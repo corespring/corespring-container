@@ -61,13 +61,14 @@ class MongoService(collection: MongoCollection) {
       logger.trace(s"[save]: ${PlayJson.stringify(data)}")
 
       def toDbo(json: JsValue): DBObject = MongoPlayJson.parse(PlayJson.stringify(json)).asInstanceOf[DBObject]
-
+      def toJson(dbo:DBObject) = PlayJson.parse(MongoPlayJson.serialize(dbo))
       val q = MongoDBObject("_id" -> new ObjectId(id))
       val d = MongoDBObject("$set" -> toDbo(data))
       val result = collection.update(q, d, false, false, WriteConcern.Safe)
 
       if (result.getLastError(WriteConcern.Safe).ok()) {
-        Some(data)
+        val dbo = collection.findOneByID(new ObjectId(id))
+        dbo.map( toJson )
       } else {
         logger.warn(s"Error saving: $id")
         None

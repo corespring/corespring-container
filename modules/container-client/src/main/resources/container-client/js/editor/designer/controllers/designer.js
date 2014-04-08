@@ -7,6 +7,7 @@ var controller = function(
   $modal,
   $log,
   DesignerService,
+  ItemService,
   PlayerService,
   MathJaxService,
   ComponentToWiggiwizFeatureAdapter,
@@ -14,6 +15,8 @@ var controller = function(
   ComponentRegister) {
 
   var configPanels = {};
+
+  var log = $log.debug.bind($log, '[designer] - ');
 
   $scope.editorMode = "visual";
 
@@ -32,15 +35,15 @@ var controller = function(
 
       var opts = {
         onUploadComplete: function(body, status) {
-          $log.debug('done: ', body, status);
+          log('done: ', body, status);
           onComplete(null, url);
         },
         onUploadProgress: function() {
-          $log.debug('progress', arguments);
+          log('progress', arguments);
           onProgress(null, 'started');
         },
         onUploadFailed: function() {
-          $log.debug('failed', arguments);
+          log('failed', arguments);
           onComplete({
             code: 'UPLOAD_FAILED',
             message: 'upload failed!'
@@ -65,13 +68,13 @@ var controller = function(
 
     var addToEditor = function(editor, addContent, component) {
       var id = ++$scope.lastId;
-      $scope.item.components[id] = _.cloneDeep(component.defaultData);
+      $scope.data.item.components[id] = _.cloneDeep(component.defaultData);
       addContent($('<placeholder id="' + id + '" label="' + component.name + '">'));
     };
 
     var deleteComponent = function(id) {
-      if ($scope.item && $scope.item.components) {
-        delete $scope.item.components[id];
+      if ($scope.data.item && $scope.data.item.components) {
+        delete $scope.data.item.components[id];
         ComponentRegister.deleteComponent(id);
       } else {
         throw 'Can\'t delete component with id ' + id;
@@ -113,12 +116,12 @@ var controller = function(
   });
 
   $scope.getQuestionForComponentId = function(id) {
-    return $scope.item.components[id];
+    return $scope.data.item.components[id];
   };
 
   $scope.$on('registerConfigPanel', function(a, id, component) {
     configPanels[id] = component;
-    component.setModel($scope.item.components[id]);
+    component.setModel($scope.data.item.components[id]);
   });
 
   $scope.$on('save-data', function(event) {
@@ -126,11 +129,11 @@ var controller = function(
   });
 
   $scope.save = function(callback) {
-    $log.debug('Saving...');
-    var cleaned = $scope.serialize($scope.item.components);
-    DesignerService.save($scope.itemId, {
+    log('Saving...');
+    var cleaned = $scope.serialize($scope.data.item.components);
+    ItemService.save({
         components: cleaned,
-        xhtml: $scope.item.xhtml
+        xhtml: $scope.data.item.xhtml
       },
       $scope.onItemSaved,
       $scope.onItemSaveError,
@@ -160,7 +163,7 @@ var controller = function(
   });
 
   $scope.getItem = function() {
-    return $scope.item;
+    return $scope.data.item;
   };
 
   PlayerService.setQuestionLookup($scope.getQuestionForComponentId);
@@ -185,7 +188,7 @@ var controller = function(
     });
     $scope.lastId = max;
 
-    var scoringJs = _.find($scope.item.files, function(f) {
+    var scoringJs = _.find($scope.data.item.files, function(f) {
       return f.name === "scoring.js";
     });
 
@@ -205,6 +208,7 @@ angular.module('corespring-editor.controllers')
     '$modal',
     '$log',
     'DesignerService',
+    'ItemService',
     'PlayerService',
     'MathJaxService',
     'ComponentToWiggiwizFeatureAdapter',

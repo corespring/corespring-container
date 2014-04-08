@@ -21,11 +21,12 @@ angular.module('corespring-editor.directives').directive('modelSaver', [
       $scope.innerSaveInProgress = true;
 
       var html = $element.html();
-      var $node = $('<div>').append(html);
+      var $node = $('<div style="visibility: hidden">').append(html);
       $node.find('#saved').attr('ng-show', '!innerSaveInProgress && !saveError');
       $node.find('#save-in-progress').attr('ng-show', 'innerSaveInProgress');
       $node.find('#save-error').attr('ng-show', 'saveError');
       $element.replaceWith($node);
+      $element = $node;
       $compile($node)($scope);
 
       var promises = [];
@@ -50,7 +51,7 @@ angular.module('corespring-editor.directives').directive('modelSaver', [
 
         var now = new Date().getTime();
 
-        if (newValue && oldValue) {
+        if (newValue && oldValue && !_.isEmpty(oldValue)) {
           var diff = now - lastChange;
 
           log('diff', diff);
@@ -87,6 +88,10 @@ angular.module('corespring-editor.directives').directive('modelSaver', [
       $scope.$watch('saveError', function(n, o) {
         log('saveError: ', n);
       });
+
+      $timeout(function() {
+        $element.css('visibility', 'visible');
+      }, 400);
     }
 
     function compile($element, $attrs) {

@@ -84,7 +84,7 @@ var controller = function(
   };
 
   $scope.formatDate = function(date) {
-    if (date instanceof Object && date.$date  ) {
+    if (date instanceof Object && date.$date) {
       date = date.$date;
     }
     return $filter('date')(date, 'medium');
@@ -95,22 +95,22 @@ var controller = function(
   };
 
   $scope.getSupportingMaterialMarkup = function() {
-    if ($scope.item) {
-      return SupportingMaterialsService.getSupportingMaterial($scope.item, $scope.index).content;
+    if ($scope.data.item) {
+      return SupportingMaterialsService.getSupportingMaterial($scope.data.item, $scope.index).content;
     } else {
       return undefined;
     }
   };
 
   $scope.isContentType = function(contentType) {
-    return ($scope.item) ? contentType === SupportingMaterialsService.getContentType($scope.item, $scope.index) : false;
+    return ($scope.data.item) ? contentType === SupportingMaterialsService.getContentType($scope.data.item, $scope.index) : false;
   };
 
   function getSupportingMaterial() {
     var supportingMaterial;
-    if ($scope.item) {
-      supportingMaterial = SupportingMaterialsService.getSupportingMaterial($scope.item, $scope.index);
-      SupportingMaterialsService.getKBFileSize($scope.item, $scope.index, function(size) {
+    if ($scope.data.item) {
+      supportingMaterial = SupportingMaterialsService.getSupportingMaterial($scope.data.item, $scope.index);
+      SupportingMaterialsService.getKBFileSize($scope.data.item, $scope.index, function(size) {
         supportingMaterial.fileSize = size;
       });
     }

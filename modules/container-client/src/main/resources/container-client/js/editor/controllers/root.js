@@ -2,6 +2,13 @@ var controller = function($scope, $rootScope, $log, $location, $timeout, DataQue
 
   $scope.nav = NavModelService;
 
+  /** Root data holder for all controllers */
+  $scope.data = {
+    saveInProgress: false,
+    saveError: undefined,
+    item: {}
+  };
+
   function supportingMaterialIndex() {
     var match = $location.path().match(/\/supporting-material\/(\d+)/);
     return match ? parseInt(match[1], 10) : undefined;
@@ -56,9 +63,13 @@ var controller = function($scope, $rootScope, $log, $location, $timeout, DataQue
 
   function hideShowNav() {
     if (showLeftNav()) {
-      $('.content-container').css({"left": $('.nav-container').css('width') });
+      $('.content-container').css({
+        "left": $('.nav-container').css('width')
+      });
     } else {
-      $('.content-container').css({"left": "0"});
+      $('.content-container').css({
+        "left": "0"
+      });
     }
   }
 
@@ -108,7 +119,7 @@ var controller = function($scope, $rootScope, $log, $location, $timeout, DataQue
 
   $scope.save = function() {
     $scope.$broadcast('save-data');
-    $scope.saveInProgress = true;
+    $scope.data.saveInProgress = true;
   };
 
   $scope.itemId = (function() {
@@ -117,11 +128,7 @@ var controller = function($scope, $rootScope, $log, $location, $timeout, DataQue
   })();
 
   $scope.onItemLoaded = function(item) {
-
-    $scope.root = {
-      item: item
-    };
-    $scope.item = item;
+    $scope.data.item = item;
     $scope.$broadcast('itemLoaded', item);
   };
 
@@ -130,14 +137,14 @@ var controller = function($scope, $rootScope, $log, $location, $timeout, DataQue
   };
 
   $scope.onItemSaved = function(data) {
-    $scope.saveInProgress = false;
-    $scope.saveError = undefined;
+    $scope.data.saveInProgress = false;
+    $scope.data.saveError = undefined;
   };
 
   $scope.onItemSaveError = function(error) {
     console.warn("Error saving item");
-    $scope.saveInProgress = false;
-    $scope.saveError = error;
+    $scope.data.saveInProgress = false;
+    $scope.data.saveError = error;
   };
 
 
