@@ -116,7 +116,7 @@ var controller = function(
     if (supportingMaterials()) {
       supportingMaterial = SupportingMaterialsService.getSupportingMaterial(supportingMaterials(), $scope.index);
       SupportingMaterialsService.getKBFileSize(supportingMaterials(), $scope.index, function(size) {
-        supportingMaterial.fileSize = size;
+        $scope.supportingMaterialFileSize = size;
       });
     }
     return supportingMaterial;
