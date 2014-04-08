@@ -21,7 +21,7 @@ var controller = function($scope, $rootScope, $log, $location, $timeout, DataQue
       function() {
         var index = supportingMaterialIndex();
         if (index) {
-          return SupportingMaterialsService.previewable($scope.item, index);
+          return SupportingMaterialsService.previewable($scope.data.item, index);
         } else {
           return false;
         }
@@ -58,7 +58,7 @@ var controller = function($scope, $rootScope, $log, $location, $timeout, DataQue
   }
 
   function hasSupportingMaterials() {
-    return $scope.item ? ($scope.item.supportingMaterials && $scope.item.supportingMaterials.length > 0) : false;
+    return $scope.data.item ? ($scope.data.item.supportingMaterials && $scope.data.item.supportingMaterials.length > 0) : false;
   }
 
   function hideShowNav() {
