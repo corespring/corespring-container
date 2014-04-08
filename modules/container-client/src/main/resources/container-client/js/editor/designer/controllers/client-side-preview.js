@@ -1,4 +1,4 @@
-var controller = function ($scope, ComponentRegister, PlayerService) {
+var controller = function($scope, ComponentRegister, PlayerService) {
 
   $scope.responses = {};
   $scope.session = {
@@ -11,28 +11,27 @@ var controller = function ($scope, ComponentRegister, PlayerService) {
     }
   };
 
-  $scope.submit = function(){
+  $scope.submit = function() {
     var components = ComponentRegister.getComponentSessions();
-    console.log("Submitting: ", components);
-    PlayerService.submitSession({components: components}, $scope.onSessionSaved, $scope.onSessionSaveError);
+    PlayerService.submitSession({
+      components: components
+    }, $scope.onSessionSaved, $scope.onSessionSaveError);
   };
 
-  $scope.onSessionSaved = function (data) {
+  $scope.onSessionSaved = function(data) {
     $scope.responses = data.responses;
     $scope.session = data.session;
     $scope.outcome = data.outcome;
     $scope.score = data.score;
   };
 
-  $scope.onSessionSaveError = function (error) {
-    console.warn("Error saving session");
-  };
+  $scope.onSessionSaveError = function(error) {};
 
   $scope.canSubmit = function() {
     return !ComponentRegister.hasEmptyAnswers();
   };
 
-  $scope.resetPreview = function(){
+  $scope.resetPreview = function() {
     ComponentRegister.reset();
     $scope.session.isComplete = false;
   };
@@ -40,11 +39,10 @@ var controller = function ($scope, ComponentRegister, PlayerService) {
 
 angular.module('corespring-editor.controllers')
   .controller(
-    'ClientSidePreview',
-    [
+    'ClientSidePreview', [
       '$scope',
       'ComponentRegister',
       'PlayerService',
       controller
     ]
-  );
+);

@@ -7,8 +7,7 @@
     var loadAngularModule = function(moduleName) {
       try {
         return angular.module(moduleName);
-      }
-      catch (e) {
+      } catch (e) {
         return angular.module(moduleName, []);
       }
     };
@@ -24,14 +23,12 @@
       if (this.directive) {
 
         if (_.isArray(this.directive)) {
-          console.debug("[ComponentDefinition] initializeComponent ", moduleName, " - directive: " + compName);
           if (isIE8) {
             document.createElement(_.toSnakeCase(compName));
           }
 
           ngModule.directive(compName, this.directive);
         } else if (_.isObject(this.directive)) {
-          console.debug("[ComponentDefinition] initializeComponent ", moduleName, " - directive: " + this.directive.name);
           if (isIE8) {
             document.createElement(_.toSnakeCase(this.directive.name));
           }
@@ -51,7 +48,6 @@
           if (!hasDefault) {
             hasDefault = innerDef.name === undefined;
           }
-          console.debug("[ComponentDefinition] initializeComponent ", moduleName, " - directive: " + name);
           if (isIE8) {
             document.createElement(_.toSnakeCase(name));
           }
@@ -64,7 +60,6 @@
       }
 
       if (this.service) {
-        console.debug("[ComponentDefinition] initializeComponent ", moduleName, " - service: " + compName);
         ngModule.factory(compName, this.service);
       }
     };

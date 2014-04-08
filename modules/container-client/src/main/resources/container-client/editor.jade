@@ -9,8 +9,9 @@ block content
   .root(ng-controller="Root")
     .nav-container
       .top-nav-filler
-        
+
       ul.nav.nav-stacked
+
         li(ng-class="{ active: isActive('design') }")
           a(ui-sref="design") Design
 
@@ -25,12 +26,12 @@ block content
           a.collapsable(ng-show="hasSupportingMaterials", ng-class="{expanded: showSupportingMaterials}",
             ng-click="toggleSupportingMaterials()")
           ul.nav.supporting-material-items(ng-show="showSupportingMaterials")
-            li.supporting-material-item(ng-repeat="supportingMaterial in item.supportingMaterials", ng-class="{ active: isSupportingMaterialActive(supportingMaterial, $index)}")
+            li.supporting-material-item(ng-repeat="supportingMaterial in data.item.supportingMaterials", ng-class="{ active: isSupportingMaterialActive(supportingMaterial, $index)}")
               a(ui-sref="supporting-material({index: $index})") {{supportingMaterial.name}}
 
         li(ng-class="{ active: isActive('overview') }")
           a(ui-sref="overview") Overview
-    
+
     .preview-container
       .contents(ui-view="preview")
 
@@ -40,7 +41,21 @@ block content
           i.fa.fa-bars
         .cs-logo
         button.btn.btn-sm.btn-default.pull-right(ng-click="togglePreview()") Preview
-        button.btn.btn-sm.btn-default.pull-right(ng-click="save()") Save 
+        //button.btn.btn-sm.btn-default.pull-right(ng-click="save()") Save
+
+        span.saver
+          model-saver(
+            ng-model="data.item",
+            save-trigger="save()", 
+            saving="data.saveInProgress", 
+            save-error="data.saveError")
+            #saved
+              | All changes saved
+            #save-in-progress
+              | Saving...
+            #save-error
+              | There was an error saving your content
+
       .main-content(ui-view="main")
 
   include partials/designer
@@ -92,7 +107,20 @@ block scripts
             'corespring.wiggi-wiz'
           ].concat(data.angular.dependencies);
 
-          angular.module("corespring-editor", playerDeps).config(function($stateProvider, $urlRouterProvider) {
+          angular.module("corespring-editor", playerDeps).config(function($provide, $stateProvider, $urlRouterProvider) {
+            
+            //Disable logging.. 
+            /*$provide.decorator('$log', function($delegate, $sniffer) {
+                var _log = $delegate.log; //Saving the original behavior
+
+                $delegate.log = function(message) { };
+                $delegate.debug = function(message) { };
+                $delegate.error = function(message) {
+                }
+
+                return $delegate;
+            });*/
+
             $urlRouterProvider.otherwise("/design");
             $stateProvider
               .state('design', {
@@ -172,4 +200,3 @@ block scripts
 
       });
     });
-

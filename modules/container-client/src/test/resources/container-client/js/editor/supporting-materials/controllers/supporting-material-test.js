@@ -6,27 +6,24 @@ describe('supporting material controller', function() {
 
   var itemMarkup = "<h1>Sample Rubric</h1><br/><p>This is a rubric for scoring this item.</p>";
   var item = {
-    supportingMaterials: [
-      {
-        "name": "Custom Rubric",
-        "materialType" : "Rubric",
-        "files" : [
-          {
-            "_t" : "org.corespring.platform.core.models.item.resource.VirtualFile",
-            "name" : "index.html",
-            "contentType" : contentType,
-            "content" : itemMarkup,
-            "isMain" : true
-          }
-        ]
-      }
-    ]
+    supportingMaterials: [{
+      "name": "Custom Rubric",
+      "materialType": "Rubric",
+      "files": [{
+        "_t": "org.corespring.platform.core.models.item.resource.VirtualFile",
+        "name": "index.html",
+        "contentType": contentType,
+        "content": itemMarkup,
+        "isMain": true
+      }]
+    }]
   };
 
   beforeEach(angular.mock.module('corespring-editor.controllers'));
 
-  beforeEach(inject(function ($rootScope, $controller) {
+  beforeEach(inject(function($rootScope, $controller) {
     scope = $rootScope.$new();
+    scope.data = {};
     stateParams = {
       index: 0
     };
@@ -36,13 +33,20 @@ describe('supporting material controller', function() {
       },
       getContentType: function() {
         return contentType;
+      },
+      getKBFileSize: function(item, index, callback) {
+        callback(100);
       }
     };
 
     try {
-      ctrl = $controller('SupportingMaterial', {$scope: scope, $stateParams: stateParams, SupportingMaterialsService: supportingMaterialsService});
+      ctrl = $controller('SupportingMaterial', {
+        $scope: scope,
+        $stateParams: stateParams,
+        SupportingMaterialsService: supportingMaterialsService
+      });
     } catch (e) {
-      throw("Error with the controller: " + e);
+      throw ("Error with the controller: " + e);
     }
   }));
 
@@ -67,7 +71,9 @@ describe('supporting material controller', function() {
   describe('hasDate', function() {
     it('should return true when supporting material has date', function() {
       expect(scope.hasDate({
-        dateModified: { $date: new Date() }
+        dateModified: {
+          $date: new Date()
+        }
       })).toBe(true);
     });
     it('should return false when supporting material does not have date', function() {
@@ -80,13 +86,13 @@ describe('supporting material controller', function() {
 
   describe('getSupportingMaterialMarkup', function() {
     it('should return undefined when scope has no item', function() {
-      scope.item = undefined;
+      scope.data.item = undefined;
       expect(scope.getSupportingMaterialMarkup()).toBe(undefined);
     });
 
     // TODO Figure out how to inject item into scope properly
     xit('should return content property when scope has item', function() {
-      scope.item = item;
+      scope.data.item = item;
       expect(scope.getSupportingMaterialMarkup()).toEqual(itemMarkup);
     });
   });

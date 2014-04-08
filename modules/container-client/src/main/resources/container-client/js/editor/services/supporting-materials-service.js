@@ -3,20 +3,20 @@
 
     var self = this;
 
-    function getUrl(item, index) {
-      if (item) {
-        return item.supportingMaterials[index].name + "/" + self.getSupportingMaterial(item, index).name;
+    function getUrl(supportingMaterials, index) {
+      if (supportingMaterials) {
+        return supportingMaterials[index].name + "/" + self.getSupportingMaterial(supportingMaterials, index).name;
       } else {
         return undefined;
       }
     }
 
-    this.getSupportingMaterial = function(item, index) {
-      if (item && item.supportingMaterials[index]) {
-        var fileIndex = _.findIndex(item.supportingMaterials[index].files, function(file) {
+    this.getSupportingMaterial = function(supportingMaterials, index) {
+      if (supportingMaterials && supportingMaterials[index]) {
+        var fileIndex = _.findIndex(supportingMaterials[index].files, function(file) {
           return file.isMain;
         });
-        return item.supportingMaterials[index].files[fileIndex];
+        return supportingMaterials[index].files[fileIndex];
       } else {
         return undefined;
       }
@@ -25,9 +25,13 @@
     /**
      * Returns the file size of the supporting material for item at index in KB to the provided callback.
      */
-    this.getKBFileSize = function(item, index, callback) {
-      if (item) {
-        $http({method: 'GET', url: getUrl(item, index)}).success(function(data, status, headers) {
+    this.getKBFileSize = function(supportingMaterials, index, callback) {
+      if (supportingMaterials) {
+        var url = getUrl(supportingMaterials, index);
+        $http({
+          method: 'GET',
+          url: url
+        }).success(function(data, status, headers) {
           callback(headers('content-length') / 1024);
         });
       } else {
@@ -35,54 +39,35 @@
       }
     };
 
-    this.getSupportingUrl = function(item, index) {
-      return $sce.trustAsResourceUrl(getUrl(item, index));
+    this.getSupportingUrl = function(supportingMaterials, index) {
+      return $sce.trustAsResourceUrl(getUrl(supportingMaterials, index));
     };
 
-    function isContentType(options) {
-      var supportingMaterial = self.getSupportingMaterial(options.item, options.index);
-      return (supportingMaterial && options.contentType) ?
-        supportingMaterial.contentType === options.contentType : false;
-    }
-
-    this.getContentType = function(item, index) {
-      return self.getSupportingMaterial(item, index).contentType;
+    this.getContentType = function(supportingMaterials, index) {
+      return self.getSupportingMaterial(supportingMaterials, index).contentType;
     };
-
-    function isMarkup(item, index) {
-      return isContentType({
-        item: item,
-        index: index,
-        contentType: 'text/html'
-      });
-    }
-
-    function isPdf(item, index) {
-      return isContentType({
-        item: item,
-        index: index,
-        contentType: 'application/pdf'
-      });
-    }
 
     /**
      * Return true if we should display a preview for the supporting material.
      */
-    this.previewable = function(item, index) {
-      return !isMarkup(item, index) && isPdf(item, index);
+    this.previewable = function(supportingMaterials, index) {
+      var isType = isContentType.bind(this, supportingMaterials, index);
+      return !isType('text/html') && isType('application/pdf');
     };
+
+    function isContentType(supportingMaterials, index, contentType) {
+      var supportingMaterial = self.getSupportingMaterial(supportingMaterials, index);
+      return (supportingMaterial && contentType) ?
+        supportingMaterial.contentType === contentType : false;
+    }
 
   }
 
   angular.module('corespring-editor.services')
-    .service('SupportingMaterialsService',
-      [
-        '$sce',
-        '$http',
-        SupportingMaterialsService
-      ]
-    );
+    .service('SupportingMaterialsService', [
+      '$sce',
+      '$http',
+      SupportingMaterialsService
+    ]);
 
 })();
-
-
