@@ -12,8 +12,6 @@ trait HasActions {
 
   def playerActions: PlayerActions[AnyContent]
 
-  def itemActions: ItemActions[AnyContent]
-
   def sessionActions: SessionActions[AnyContent]
 
   def playerLauncherActions: PlayerLauncherActions[AnyContent]
