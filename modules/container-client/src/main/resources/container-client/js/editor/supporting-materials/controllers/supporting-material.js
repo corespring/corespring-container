@@ -83,6 +83,11 @@ var controller = function(
     }
   };
 
+
+  function supportingMaterials() {
+    return $scope.data.item ? $scope.data.item.supportingMaterials : undefined;
+  }
+
   $scope.formatDate = function(date) {
     if (date instanceof Object && date.$date) {
       date = date.$date;
@@ -95,22 +100,22 @@ var controller = function(
   };
 
   $scope.getSupportingMaterialMarkup = function() {
-    if ($scope.data.item) {
-      return SupportingMaterialsService.getSupportingMaterial($scope.data.item, $scope.index).content;
+    if (supportingMaterials()) {
+      return SupportingMaterialsService.getSupportingMaterial(supportingMaterials(), $scope.index).content;
     } else {
       return undefined;
     }
   };
 
   $scope.isContentType = function(contentType) {
-    return ($scope.data.item) ? contentType === SupportingMaterialsService.getContentType($scope.data.item, $scope.index) : false;
+    return supportingMaterials() ? contentType === SupportingMaterialsService.getContentType(supportingMaterials(), $scope.index) : false;
   };
 
   function getSupportingMaterial() {
     var supportingMaterial;
-    if ($scope.data.item) {
-      supportingMaterial = SupportingMaterialsService.getSupportingMaterial($scope.data.item, $scope.index);
-      SupportingMaterialsService.getKBFileSize($scope.data.item, $scope.index, function(size) {
+    if (supportingMaterials()) {
+      supportingMaterial = SupportingMaterialsService.getSupportingMaterial(supportingMaterials(), $scope.index);
+      SupportingMaterialsService.getKBFileSize(supportingMaterials(), $scope.index, function(size) {
         supportingMaterial.fileSize = size;
       });
     }

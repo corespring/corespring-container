@@ -2,6 +2,8 @@ var controller = function($scope, $rootScope, $log, $location, $timeout, DataQue
 
   $scope.nav = NavModelService;
 
+  var log = $log.debug.bind($log, '[root] -');
+
   /** Root data holder for all controllers */
   $scope.data = {
     saveInProgress: false,
@@ -21,7 +23,7 @@ var controller = function($scope, $rootScope, $log, $location, $timeout, DataQue
       function() {
         var index = supportingMaterialIndex();
         if (index) {
-          return SupportingMaterialsService.previewable($scope.data.item, index);
+          return SupportingMaterialsService.previewable($scope.data.item.supportingMaterials, index);
         } else {
           return false;
         }
@@ -104,7 +106,7 @@ var controller = function($scope, $rootScope, $log, $location, $timeout, DataQue
       $location.search('preview', !show);
       $scope.showPreview = !show;
     } else {
-      console.log('not previewable');
+      log('not previewable');
     }
   };
 

@@ -23,9 +23,7 @@ describe('supporting material controller', function() {
 
   beforeEach(inject(function($rootScope, $controller) {
     scope = $rootScope.$new();
-    scope.data = {
-      item: item
-    };
+    scope.data = {};
     stateParams = {
       index: 0
     };
@@ -88,13 +86,13 @@ describe('supporting material controller', function() {
 
   describe('getSupportingMaterialMarkup', function() {
     it('should return undefined when scope has no item', function() {
-      scope.item = undefined;
+      scope.data.item = undefined;
       expect(scope.getSupportingMaterialMarkup()).toBe(undefined);
     });
 
     // TODO Figure out how to inject item into scope properly
     xit('should return content property when scope has item', function() {
-      scope.item = item;
+      scope.data.item = item;
       expect(scope.getSupportingMaterialMarkup()).toEqual(itemMarkup);
     });
   });

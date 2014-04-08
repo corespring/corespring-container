@@ -1,21 +1,29 @@
-/* global AddContentModalController, com */
 var controller = function(
-  $scope, $stateParams, SupportingMaterialsService) {
+  $scope, $stateParams, $log, SupportingMaterialsService) {
+
+  var log = $log.debug.bind($log, '[supporting-materials-preview] -');
 
   $scope.index = parseInt($stateParams.index, 10);
 
+  function supportingMaterials() {
+    return $scope.data.item.supportingMaterials;
+  }
+
   $scope.getSupportingUrl = function(index) {
-    if ($scope.item) {
-      return SupportingMaterialsService.getSupportingUrl($scope.item, $scope.index);
+    if ($scope.data.item) {
+      return SupportingMaterialsService.getSupportingUrl(supportingMaterials(), $scope.index);
     }
   };
 
-  $scope.previewable = SupportingMaterialsService.previewable($scope.item, $scope.index);
+  $scope.previewable = SupportingMaterialsService.previewable(supportingMaterials(), $scope.index);
   $scope.supportingUrl = $scope.getSupportingUrl($scope.index);
+
+  log('supporting url', $scope.supportingUrl);
 
   $scope.$on('itemLoaded', function() {
     $scope.supportingUrl = $scope.getSupportingUrl($scope.index);
-    $scope.previewable = SupportingMaterialsService.previewable($scope.item, $scope.index);
+    log('supporting url', $scope.supportingUrl);
+    $scope.previewable = SupportingMaterialsService.previewable(supportingMaterials(), $scope.index);
   });
 
 };
@@ -23,6 +31,7 @@ var controller = function(
 angular.module('corespring-editor.controllers')
   .controller('SupportingMaterialPreview', ['$scope',
     '$stateParams',
+    '$log',
     'SupportingMaterialsService',
     controller
   ]);
