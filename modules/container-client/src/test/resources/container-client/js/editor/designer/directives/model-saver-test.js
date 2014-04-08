@@ -2,11 +2,12 @@ describe('model saver', function() {
 
   beforeEach(angular.mock.module('corespring-editor.directives'));
 
-  var rootScope, compile;
+  var rootScope, compile, timeout;
 
-  beforeEach(inject(function($compile, $rootScope) {
+  beforeEach(inject(function($compile, $rootScope, $timeout) {
     rootScope = $rootScope.$new();
     compile = $compile;
+    timeout = $timeout;
   }));
 
   it('should init', function() {
@@ -17,7 +18,7 @@ describe('model saver', function() {
   it('should init', function() {
 
     var configured = [
-      '<model-saver saving="saving">',
+      '<model-saver saving="saving" save-error="saveError">',
       '  <div id="save-in-progress">Saving!</div>',
       '  <div id="saved">Saved!</div>',
       '  <div id="save-error">Save Error!</div>',
@@ -27,6 +28,7 @@ describe('model saver', function() {
     rootScope.saving = false;
 
     var div = $('<div>');
+
 
     div.html(configured);
     $('body').append(div);
@@ -42,6 +44,7 @@ describe('model saver', function() {
 
     childScope.saving = false;
     childScope.$apply();
+    timeout.flush();
 
     function assertClass(id, val) {
       return $(id).attr('class') === val;
@@ -50,12 +53,12 @@ describe('model saver', function() {
     expect(assertClass('#save-in-progress', 'ng-hide')).toBe(true);
     expect(assertClass('#saved', '')).toBe(true);
     expect(assertClass('#save-error', 'ng-hide')).toBe(true);
-
     childScope.saveError = {};
     childScope.$apply();
 
+    console.log(elem.html());
     expect(assertClass('#save-error', '')).toBe(true);
-
     div.remove();
+
   });
 });

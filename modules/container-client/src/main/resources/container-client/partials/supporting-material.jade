@@ -1,0 +1,24 @@
+script#supporting-material(type='text/ng-template')
+
+  .supporting-material(ng-controller="SupportingMaterial")
+    .editor-container(ng-class="editorMode", ng-show="isContentType('text/html')")
+      wiggi-wiz(
+        ng-model="supportingMarkup",
+        image-service="imageService", style="height: 100%")
+        toolbar(basic="bold italic", formatting="h1 h2 p")
+        edit-pane-toolbar(alignment="bottom")
+          .btn-group
+            button(ng-click="closePane()", class="btn btn-sm btn-success", style="float:right;") OK
+
+    .file-upload-info(ng-hide="isContentType('text/html')")
+      h3 File Upload Info
+      dl
+        div
+          dt File Name
+          dd {{supportingMaterial.name}}
+        div
+          dt File Size
+          dd {{formatKB(supportingMaterial.fileSize)}}
+        div
+          dt(ng-show='hasDate(supportingMaterial)') Date
+          dd(ng-show='hasDate(supportingMaterial)') {{formatDate(supportingMaterial.dateModified)}}

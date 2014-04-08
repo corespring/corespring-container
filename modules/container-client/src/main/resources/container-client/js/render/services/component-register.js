@@ -31,6 +31,18 @@ angular.module('corespring-player.services').factory('ComponentRegister', ['$log
 
       };
 
+      this.deleteComponent = function(id) {
+        delete components[id];
+      };
+
+      /**
+       * @param allData - an object that has the component id as the key and an object
+       *                  that has the following format: { data: {}, session : null || {} }
+       */
+      this.setDataAndSession = function(allData) {
+        setAndApplyToComponents(allData, "dataAndSession", "setDataAndSession");
+      };
+
       /**
        * @param allData - an object that has the component id as the key and an object
        *                  that has the following format: { data: {}, session : null || {} }

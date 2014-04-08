@@ -10,7 +10,8 @@ var controller = function(
   PlayerService,
   MathJaxService,
   ComponentToWiggiwizFeatureAdapter,
-  ImageUtils) {
+  ImageUtils,
+  ComponentRegister) {
 
   var configPanels = {};
 
@@ -71,6 +72,7 @@ var controller = function(
     var deleteComponent = function(id) {
       if ($scope.item && $scope.item.components) {
         delete $scope.item.components[id];
+        ComponentRegister.deleteComponent(id);
       } else {
         throw 'Can\'t delete component with id ' + id;
       }
@@ -141,10 +143,11 @@ var controller = function(
     }
 
     var newModel = _.cloneDeep(comps);
-    _.each(comps, function(value, key) {
+
+    _.each(newModel, function(value, key) {
       var component = configPanels[key];
       if (component && component.getModel) {
-        comps[key] = component.getModel();
+        newModel[key] = component.getModel();
       }
     });
 
@@ -206,5 +209,6 @@ angular.module('corespring-editor.controllers')
     'MathJaxService',
     'ComponentToWiggiwizFeatureAdapter',
     'ImageUtils',
+    'ComponentRegister',
     controller
   ]);

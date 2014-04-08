@@ -1,0 +1,4 @@
+script#supporting-material-preview(type='text/ng-template')
+  .supporting-material-preview(ng-show='previewable', ng-controller='SupportingMaterialPreview')
+    div(style="height: 100%;")
+      iframe(ng-src="{{supportingUrl}}", width="100%", height="100%")

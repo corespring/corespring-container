@@ -21,7 +21,7 @@ seed = (collection, folder, next) ->
 
       console.log "seeding: #{folder}/#{f}"
       contents = fs.readFileSync("#{folder}/#{f}", "utf8")
-      json = JSON.parse(contents)
+      json = processDates(JSON.parse(contents))
       json._id = new ObjectID(json._id)
 
       collection.insert json, (err, docs) ->
@@ -32,6 +32,17 @@ seed = (collection, folder, next) ->
         collection.find().toArray (err, results) ->
           #console.dir(results)
           next(err)
+
+processDates = (obj) ->
+  for key of obj
+    if key is "$date"
+      obj = new Date(obj[key])
+    obj[key] = processDates(obj[key]) if obj[key] instanceof Object
+    if obj[key] instanceof Array
+      obj[key] = _.map(obj[key], (o) ->
+        processDates o
+      )
+  obj
 
 MongoClient.connect mongoUri, (err, db) ->
 

@@ -17,7 +17,7 @@ block content
     .preview-container
       .contents(ui-view="preview")
 
-    .content-container(ng-class="{leftnav: showLeftNav, preview: showPreview}")
+    .content-container(ng-class="{preview: showPreview}")
       .top-nav
         button.btn.btn-sm.btn-default(ng-click="toggleLeftNav()")
           i.fa.fa-bars
@@ -43,11 +43,13 @@ block content
   include partials/designer
   include partials/item-profile
   include partials/supporting-materials
+  include partials/supporting-material
   include partials/view-player
   include partials/overview
 
   include partials/previews/designer
   include partials/previews/item-profile
+  include partials/previews/supporting-material
 
 block scripts
 
@@ -144,6 +146,17 @@ block scripts
                   }
                 }
               })
+              .state('supporting-material', {
+                url: '/supporting-material/:index',
+                views: {
+                  main: {
+                    template: $('#supporting-material').html()
+                  },
+                  preview: {
+                    template: $('#supporting-material-preview').html()
+                  }
+                }
+              })
               .state('overview', {
                 url: '/overview',
                 views: {
@@ -156,7 +169,7 @@ block scripts
 
           angular.bootstrap(document, ["corespring-editor"]);
           angular.resumeBootstrap();
-          $("body").addClass('blend')
+          $("body").addClass('blend');
         };
 
         var args = data.scripts.concat(data.css);
