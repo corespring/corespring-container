@@ -28,19 +28,11 @@ trait EditorActions[A] extends ClientActions[A] {
   def editItem(itemId: String)(error: (Int, String) => Future[SimpleResult])(block: PlayerRequest[A] => Future[SimpleResult]): Action[AnyContent]
 }
 
+//Note: move to this pattern - instead of action decorators
 trait ItemHooks {
   def load(itemId: String)(implicit header: RequestHeader): Future[Either[SimpleResult, JsValue]]
   def save(itemId: String, json: JsValue)(implicit header: RequestHeader): Future[Either[SimpleResult, JsValue]]
   def create(implicit header: RequestHeader): Future[Either[(Int, String), String]]
-}
-
-trait ItemActions[A] {
-  def load(itemId: String)(block: ItemRequest[A] => Result): Action[AnyContent]
-
-  @deprecated("Use ItemHooks.save instead", "3.2")
-  def save(itemId: String)(block: SaveItemRequest[A] => Result): Action[AnyContent]
-
-  def create(error: (Int, String) => Result)(block: NewItemRequest[A] => Result): Action[AnyContent]
 }
 
 trait SessionActions[A] {
