@@ -6,27 +6,26 @@ describe('supporting material controller', function() {
 
   var itemMarkup = "<h1>Sample Rubric</h1><br/><p>This is a rubric for scoring this item.</p>";
   var item = {
-    supportingMaterials: [
-      {
-        "name": "Custom Rubric",
-        "materialType" : "Rubric",
-        "files" : [
-          {
-            "_t" : "org.corespring.platform.core.models.item.resource.VirtualFile",
-            "name" : "index.html",
-            "contentType" : contentType,
-            "content" : itemMarkup,
-            "isMain" : true
-          }
-        ]
-      }
-    ]
+    supportingMaterials: [{
+      "name": "Custom Rubric",
+      "materialType": "Rubric",
+      "files": [{
+        "_t": "org.corespring.platform.core.models.item.resource.VirtualFile",
+        "name": "index.html",
+        "contentType": contentType,
+        "content": itemMarkup,
+        "isMain": true
+      }]
+    }]
   };
 
   beforeEach(angular.mock.module('corespring-editor.controllers'));
 
-  beforeEach(inject(function ($rootScope, $controller) {
+  beforeEach(inject(function($rootScope, $controller) {
     scope = $rootScope.$new();
+    scope.data = {
+      item: item
+    };
     stateParams = {
       index: 0
     };
@@ -36,13 +35,20 @@ describe('supporting material controller', function() {
       },
       getContentType: function() {
         return contentType;
+      },
+      getKBFileSize: function(item, index, callback) {
+        callback(100);
       }
     };
 
     try {
-      ctrl = $controller('SupportingMaterial', {$scope: scope, $stateParams: stateParams, SupportingMaterialsService: supportingMaterialsService});
+      ctrl = $controller('SupportingMaterial', {
+        $scope: scope,
+        $stateParams: stateParams,
+        SupportingMaterialsService: supportingMaterialsService
+      });
     } catch (e) {
-      throw("Error with the controller: " + e);
+      throw ("Error with the controller: " + e);
     }
   }));
 
@@ -67,7 +73,9 @@ describe('supporting material controller', function() {
   describe('hasDate', function() {
     it('should return true when supporting material has date', function() {
       expect(scope.hasDate({
-        dateModified: { $date: new Date() }
+        dateModified: {
+          $date: new Date()
+        }
       })).toBe(true);
     });
     it('should return false when supporting material does not have date', function() {
