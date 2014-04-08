@@ -6,7 +6,7 @@ var controller = function(
   $log,
   $filter,
   SupportingMaterialsService,
-  SupportingMaterialService,
+  ItemService,
   ImageUtils) {
 
   $scope.index = parseInt($stateParams.index, 10);
@@ -70,11 +70,11 @@ var controller = function(
   });
 
   $scope.onSaveSuccess = function() {
-    $log.info("Saved successfully");
+    $scope.data.saveInProgress = false;
   };
 
   $scope.onSaveError = function() {
-    $log.error("There was a problem saving");
+    $scope.data.saveInProgress = false;
   };
 
   $scope.$watch('supportingMarkup', function(newValue) {
@@ -87,11 +87,19 @@ var controller = function(
           return file.isMain;
         });
         updatedSupportingMaterials[$scope.index].files[fileIndex] = supportingMaterialFile;
-
         $scope.data.item.supportingMaterials = updatedSupportingMaterials;
       }
     }
   });
+
+  $scope.$on('save-data', function() {
+    $scope.save();
+  });
+
+  $scope.save = function() {
+    ItemService.save({ supportingMaterials: $scope.data.item.supportingMaterials }, $scope.onSaveSuccess,
+      $scope.onSaveError, $scope.itemId);
+  };
 
   $scope.formatKB = function(kb, decimalPlaces) {
     var mb;
@@ -164,7 +172,7 @@ angular.module('corespring-editor.controllers')
     '$log',
     '$filter',
     'SupportingMaterialsService',
-    'SupportingMaterialService',
+    'ItemService',
     'ImageUtils',
     controller
   ]);

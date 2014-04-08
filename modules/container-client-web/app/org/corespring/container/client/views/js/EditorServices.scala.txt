@@ -7,16 +7,6 @@
 
   angular.module('@namespace', []);
 
-  angular.module('@namespace').factory('SupportingMaterialService', ['BaseService', function(BaseService) {
-
-    return {
-      save: function(id, supportingMaterial, onSuccess, onFailure) {
-        BaseService.saveSupportingMaterial(supportingMaterial, onSuccess, onFailure, id);
-      }
-    };
-
-  }]);
-
   angular.module('@namespace').factory('DesignerService', ['$http', 'BaseService',function($http, BaseService){
     return {
         loadAvailableComponents: function(onSuccess, onFailure){

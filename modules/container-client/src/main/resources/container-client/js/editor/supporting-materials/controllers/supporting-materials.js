@@ -1,4 +1,4 @@
-var controller = function ($scope, SupportingMaterialService, $modal, Overlay, $state, $log) {
+var controller = function ($scope, ItemService, $modal, Overlay, $state, $log) {
 
   $scope.createNew = function() {
     Overlay.open({
@@ -69,8 +69,8 @@ var controller = function ($scope, SupportingMaterialService, $modal, Overlay, $
     $state.transitionTo('supporting-material', {index: result.supportingMaterials.length - 1});
   };
 
-  $scope.onSaveError = function() {
-    $log.error("There was a problem saving the supporting material.");
+  $scope.onSaveError = function(result) {
+    console.log(result);
   };
 
   $scope.create = function(data) {
@@ -90,8 +90,8 @@ var controller = function ($scope, SupportingMaterialService, $modal, Overlay, $
         ]
       };
       supportingMaterials.push(newSupportingMaterial);
-      SupportingMaterialService.save($scope.itemId, { supportingMaterials: supportingMaterials },
-        $scope.onSaveSuccess, $scope.onSaveError);
+      ItemService.save({ supportingMaterials: supportingMaterials }, $scope.onSaveSuccess, $scope.onSaveError,
+        $scope.itemId);
     } else {
       $log.error("Need $scope.item initialized");
     }
@@ -104,7 +104,7 @@ var controller = function ($scope, SupportingMaterialService, $modal, Overlay, $
 angular.module('corespring-editor.controllers')
   .controller('SupportingMaterials',
     ['$scope',
-     'SupportingMaterialService',
+     'ItemService',
      '$modal',
      'Overlay',
      '$state',
