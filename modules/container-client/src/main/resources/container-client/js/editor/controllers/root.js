@@ -2,6 +2,15 @@ var controller = function($scope, $rootScope, $log, $location, $timeout, DataQue
 
   $scope.nav = NavModelService;
 
+  var log = $log.debug.bind($log, '[root] -');
+
+  /** Root data holder for all controllers */
+  $scope.data = {
+    saveInProgress: false,
+    saveError: undefined,
+    item: {}
+  };
+
   function supportingMaterialIndex() {
     var match = $location.path().match(/\/supporting-material\/(\d+)/);
     return match ? parseInt(match[1], 10) : undefined;
@@ -14,7 +23,7 @@ var controller = function($scope, $rootScope, $log, $location, $timeout, DataQue
       function() {
         var index = supportingMaterialIndex();
         if (index) {
-          return SupportingMaterialsService.previewable($scope.item, index);
+          return SupportingMaterialsService.previewable($scope.data.item.supportingMaterials, index);
         } else {
           return false;
         }
@@ -50,15 +59,21 @@ var controller = function($scope, $rootScope, $log, $location, $timeout, DataQue
     return search.leftnav === true || search.leftnav === 'true';
   }
 
+
   $scope.hasSupportingMaterials = function() {
-    return $scope.item ? ($scope.item.supportingMaterials && $scope.item.supportingMaterials.length > 0) : false;
-  };
+    return $scope.data.item ?
+      ($scope.data.item.supportingMaterials && $scope.data.item.supportingMaterials.length > 0) : false;
+  }
 
   function hideShowNav() {
     if (showLeftNav()) {
-      $('.content-container').css({"left": $('.nav-container').css('width') });
+      $('.content-container').css({
+        "left": $('.nav-container').css('width')
+      });
     } else {
-      $('.content-container').css({"left": "0"});
+      $('.content-container').css({
+        "left": "0"
+      });
     }
   }
 
@@ -92,7 +107,7 @@ var controller = function($scope, $rootScope, $log, $location, $timeout, DataQue
       $location.search('preview', !show);
       $scope.showPreview = !show;
     } else {
-      console.log('not previewable');
+      log('not previewable');
     }
   };
 
@@ -106,6 +121,7 @@ var controller = function($scope, $rootScope, $log, $location, $timeout, DataQue
 
   $scope.save = function() {
     $scope.$broadcast('save-data');
+    $scope.data.saveInProgress = true;
   };
 
   $scope.itemId = (function() {
@@ -114,7 +130,7 @@ var controller = function($scope, $rootScope, $log, $location, $timeout, DataQue
   })();
 
   $scope.onItemLoaded = function(item) {
-    $scope.item = item;
+    $scope.data.item = item;
     $scope.$broadcast('itemLoaded', item);
   };
 
@@ -122,10 +138,15 @@ var controller = function($scope, $rootScope, $log, $location, $timeout, DataQue
     $log.warn("Error loading item", error);
   };
 
-  $scope.onItemSaved = function(data) {};
+  $scope.onItemSaved = function(data) {
+    $scope.data.saveInProgress = false;
+    $scope.data.saveError = undefined;
+  };
 
   $scope.onItemSaveError = function(error) {
     console.warn("Error saving item");
+    $scope.data.saveInProgress = false;
+    $scope.data.saveError = error;
   };
 
 

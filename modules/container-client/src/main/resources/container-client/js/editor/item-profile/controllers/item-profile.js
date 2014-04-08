@@ -1,4 +1,4 @@
-var controller = function($scope, $log, ProfileService, DataQueryService) {
+var controller = function($scope, $log, ItemService, DataQueryService) {
 
   function findSubject(topic, id, callback) {
     var local = _.find($scope.queryResults[topic], function(r) {
@@ -20,8 +20,11 @@ var controller = function($scope, $log, ProfileService, DataQueryService) {
   });
 
   $scope.save = function() {
-    ProfileService.save({ profile: $scope.item.profile}, function(savedProfile) {
+    ItemService.save({
+      profile: $scope.item.profile
+    }, function(savedProfile) {
       $scope.item.profile = savedProfile;
+      $scope.saveInProgress = false;
     });
   };
 
@@ -97,38 +100,47 @@ var controller = function($scope, $log, ProfileService, DataQueryService) {
   }
 
   $scope.save = function() {
-    ProfileService.save($scope.itemId, {
-      profile: $scope.profile
-    }, $scope.onSaveSuccess, $scope.onSaveError);
+    ItemService.save({
+        profile: $scope.data.item.profile
+      },
+      $scope.onSaveSuccess,
+      $scope.onSaveError,
+      $scope.itemId);
+    $scope.data.saveInProgress = true;
   };
 
   $scope.onSaveSuccess = function(updated) {
     $log.debug("profile saved");
+    $scope.data.saveInProgress = false;
   };
 
   $scope.onSaveError = function(err) {
     $log.debug("error saving profile", err);
+    $scope.data.saveError = err;
   };
 
   $scope.$watch("taskInfo.itemType", function(newValue) {
     updateOtherItemType();
   }, true);
 
-  ProfileService.load($scope.itemId, function(profile) {
-      $scope.profile = profile;
-      $scope.taskInfo = profile.taskInfo;
+  //TODO: We are loading the data at root and here
+  //Should we only load data at root?
+  ItemService.load(function(item) {
+      $scope.data.item = item;
+      $scope.taskInfo = $scope.data.item.profile.taskInfo;
       $log.debug("task info: ", $scope.taskInfo);
     },
     function error(err) {
       $log.warn('Error loading profile', err);
-    });
+    },
+    $scope.itemId);
 
 };
 
 angular.module('corespring-editor.controllers')
   .controller('ItemProfile', ['$scope',
     '$log',
-    'ProfileService',
+    'ItemService',
     'DataQueryService',
     controller
   ]);

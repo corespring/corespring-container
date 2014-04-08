@@ -3,7 +3,7 @@ script#designer(type="text/ng-template")
 
     .editor-container(ng-class="editorMode")
       wiggi-wiz(
-        ng-model="item.xhtml",
+        ng-model="data.item.xhtml",
         features="extraFeatures",
         image-service="imageService"
         ng-show="editorMode=='visual'")
