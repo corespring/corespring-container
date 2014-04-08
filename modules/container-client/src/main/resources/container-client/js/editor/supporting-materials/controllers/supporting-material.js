@@ -75,11 +75,11 @@ var controller = function(
 
   $scope.onSaveSuccess = function() {
     $log.info("Saved successfully");
-  }
+  };
 
   $scope.onSaveError = function() {
-    $log.error("There was a problemo");
-  }
+    $log.error("There was a problem saving");
+  };
 
   $scope.save = function() {
     var updatedSupportingMaterials = $scope.item.supportingMaterials;

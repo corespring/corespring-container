@@ -8,10 +8,10 @@
       label(for='new-supporting-material-input') Create new
     p Begin typing below. You may also add images inline selecting the image icon from the toolbar.
 
-    .option
-      input(type='radio', id='upload-pdf-supporting-material-input', name='option')
-      label(for='upload-pdf-supporting-material-input') Upload PDF
-    p Select a file from your computer to upload
+    .option.disabled
+      input(type='radio', disabled='disabled', id='upload-pdf-supporting-material-input', name='option')
+      label(for='upload-pdf-supporting-material-input') Upload PDF (coming soon!)
+    p.disabled Select a file from your computer to upload
 
     wiggi-wiz(
       ng-model="content")
