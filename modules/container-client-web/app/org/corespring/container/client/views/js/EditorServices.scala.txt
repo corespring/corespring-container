@@ -14,8 +14,8 @@
           BaseService.saveProfile( profile, onSuccess, onFailure, id);
         },
         load: function(id, onSuccess, onFailure){
-          BaseService.load(function(d){
-            onSuccess(d.item.profile);
+          BaseService.load(function(item){
+            onSuccess(item.profile);
           }, onFailure, id);
         }
     };
@@ -26,11 +26,6 @@
     return {
         save: function(id, components, onSuccess, onFailure){
           BaseService.saveComponents( components, onSuccess, onFailure, id);
-        },
-        loadItem: function(id, onSuccess, onFailure){
-          BaseService.load(function(d){
-            onSuccess(d.item);
-          }, onFailure, id);
         },
         loadAvailableComponents: function(onSuccess, onFailure){
           var components = @{Json.stringify(componentSet)};
