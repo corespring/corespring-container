@@ -1,9 +1,5 @@
 package org.corespring.shell.controllers.editor
 
-import org.corespring.container.client.actions.ItemRequest
-import org.corespring.container.client.actions.NewItemRequest
-import org.corespring.container.client.actions.SaveItemRequest
-import org.corespring.container.client.actions.{ ItemActions => ContainerItemActions }
 import org.corespring.container.client.actions.{ ItemHooks => ContainerItemHooks }
 import org.corespring.mongo.json.services.MongoService
 import play.api.http.Status.BAD_REQUEST
@@ -50,38 +46,5 @@ trait ItemHooks extends ContainerItemHooks {
       }.getOrElse(Left(BAD_REQUEST, "Error creating item"))
     }
   }
-}
-
-trait ItemActions extends ContainerItemActions[AnyContent] {
-  def itemService: MongoService
-
-  override def load(itemId: String)(block: (ItemRequest[AnyContent]) => Result): Action[AnyContent] = Action {
-    request =>
-      itemService.load(itemId).map {
-        item =>
-          block(ItemRequest(item, request))
-      }.getOrElse(NotFound(s"Can't find item with id $itemId"))
-  }
-
-  override def save(itemId: String)(block: (SaveItemRequest[AnyContent]) => Result): Action[AnyContent] = Action {
-    request =>
-      BadRequest("See ItemHooks.save")
-  }
-
-  override def create(error: (Int, String) => Result)(block: (NewItemRequest[AnyContent]) => Result): Action[AnyContent] = Action {
-    request =>
-
-      val newItem = Json.obj(
-        "components" -> Json.obj(),
-        "metadata" -> Json.obj(
-          "title" -> JsString("New title")),
-        "xhtml" -> "<div></div>")
-
-      itemService.create(newItem).map {
-        oid =>
-          block(NewItemRequest(oid.toString, request))
-      }.getOrElse(error(BAD_REQUEST, "Error creating item"))
-  }
-
 }
 
