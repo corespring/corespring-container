@@ -25,6 +25,42 @@
       margin-bottom: 5px;
     }
   }
+}
+
+.supporting-materials {
+  height: 100%;
+}
+
+.new-supporting-material {
+  position: relative;
+
+  .prompt {
+    position: absolute;
+    margin: 0;
+    padding: 0;
+    left: 20px;
+    top: 20px;
+  }
+
+  .options {
+    margin-left: 140px;
+    padding: 20px 0 50px 0;
+
+    label {
+      font-weight: bold;
+    }
+  }
+
+  .wiggi-wiz {
+    margin: 0 20px 20px 0;
+    min-height: 300px;
+  }
+
+  .save {
+    float: right;
+    display: inline-block;
+    margin-right: 20px;
+  }
 
 }
 
@@ -76,5 +112,41 @@
     }
 
   }
+}
 
+
+.save-supporting-material-window .modal-content {
+  width: 400px;
+}
+
+.save-supporting-material {
+  padding: 20px;
+  overflow: auto;
+
+  label {
+    min-width: 50px;
+    display: inline-block;
+  }
+
+  .other {
+    display: inline-block;
+    float: right;
+    margin-bottom: 10px;
+  }
+
+  .buttons {
+    list-style-type: none;
+    float: right;
+    margin: 0;
+
+    li {
+      @button-spacing: 10px;
+      display: inline-block;
+      padding: 0 @button-spacing/2;
+
+      &:last-child {
+        padding: 0 0 0 @button-spacing/2;
+      }
+    }
+  }
 }

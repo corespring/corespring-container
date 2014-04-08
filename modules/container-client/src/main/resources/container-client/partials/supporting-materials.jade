@@ -1,6 +1,8 @@
 script#supporting-materials(type='text/ng-template')
-  .container.supporting-materials(ng-controller="SupportingMaterials")
-    .row
-      .jumbotron
-        h3 Supporting Materials
-        p Coming soon...
+  .supporting-materials(ng-controller="SupportingMaterials", ng-show="nav.isCurrentView('supporting-materials')")
+
+    script#new-supporting-material-modal(type='ng-template')
+      include ../partials/dialogs/new-supporting-material
+
+    script#save-supporting-material-modal(type='ng-template')
+      include ../partials/dialogs/save-supporting-material
