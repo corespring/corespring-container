@@ -12,30 +12,29 @@
       "weight": 1,
       "correctResponses": {
         "values": ["York", "London"],
-        "ignoreWhitespace": true,
-        "ignoreCase": true,
-        "award": 100
+        "ignoreWhitespace": false,
+        "ignoreCase": false,
+        "award": 100,
+        "feedback": {
+          "type": "custom",
+          "value": "Very good, you are the greatest!"
+        }
       },
       "partialResponses": {
         "values": ["Lork"],
-        "ignoreWhitespace": true,
-        "ignoreCase": true,
-        "award": 25
+        "ignoreWhitespace": false,
+        "ignoreCase": false,
+        "award": 25,
+        "feedback": {
+          "type": "default",
+          "value": "Your answer is correct, but a better answer would have been <random selection from correct answers>"
+        }
       },
-      "model": {
-        "config": {
-          "correctResponses": {
-            "feedback": {
-              "type": "custom",
-              "value": "Very good, you are the greatest!"
-            }
-          },
-          "partialResponses": {
-            "feedback": {
-              "type": "default",
-              "value": "Good try, but the correct answer is <random selection from correct answers>"
-            }
-          }
+      "incorrectResponses": {
+        "award": 0,
+        "feedback": {
+          "type": "default",
+          "value": "Good try, but the correct answer is <random selection from correct answers>"
         }
       }
     }

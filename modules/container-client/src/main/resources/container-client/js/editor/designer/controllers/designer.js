@@ -143,10 +143,11 @@ var controller = function(
     }
 
     var newModel = _.cloneDeep(comps);
-    _.each(comps, function(value, key) {
+
+    _.each(newModel, function(value, key) {
       var component = configPanels[key];
       if (component && component.getModel) {
-        comps[key] = component.getModel();
+        newModel[key] = component.getModel();
       }
     });
 
