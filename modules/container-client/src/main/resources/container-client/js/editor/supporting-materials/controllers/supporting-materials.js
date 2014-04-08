@@ -1,10 +1,10 @@
-var controller = function ($scope, $modal, Overlay) {
+var controller = function ($scope, SupportingMaterialService, $modal, Overlay, $state, $log) {
   $scope.createNew = function() {
     Overlay.open({
-      title: "Title",
       template: $('#new-supporting-material-modal').html(),
       target: $('.supporting-materials'),
       scope: $scope,
+      customToolbar: {},
       ok: function(update) {
         console.log(update);
       }
@@ -52,9 +52,42 @@ var controller = function ($scope, $modal, Overlay) {
     });
 
     confirmationModal.result.then(function(data) {
-      $scope.materialType = data.materialType;
-      $scope.title = data.title;
+      data.content = $scope.content;
+      $scope.create(data);
     });
+  };
+
+  $scope.onSaveSuccess = function(result) {
+    $scope.item.supportingMaterials = result.supportingMaterials;
+    $state.transitionTo('supporting-material', {index: result.supportingMaterials.length - 1});
+  };
+
+  $scope.onSaveError = function() {
+    $log.error("Oh no!");
+  };
+
+  $scope.create = function(data) {
+    var newSupportingMaterial, supportingMaterials;
+    if ($scope.item) {
+      supportingMaterials = $scope.item.supportingMaterials || [];
+      newSupportingMaterial = {
+        name: data.title,
+        materialType: data.materialType,
+        files: [
+          {
+            "name": "index.html",
+            "contentType": "text/html",
+            "content": data.content,
+            "isMain": true
+          }
+        ]
+      };
+      supportingMaterials.push(newSupportingMaterial);
+      SupportingMaterialService.save($scope.itemId, { supportingMaterials: supportingMaterials },
+        $scope.onSaveSuccess, $scope.onSaveError);
+    } else {
+      $log.error("Need $scope.item initialized");
+    }
   };
 
   $scope.createNew();
@@ -64,6 +97,9 @@ var controller = function ($scope, $modal, Overlay) {
 angular.module('corespring-editor.controllers')
   .controller('SupportingMaterials',
     ['$scope',
+     'SupportingMaterialService',
      '$modal',
      'Overlay',
+     '$state',
+     '$log',
       controller]);

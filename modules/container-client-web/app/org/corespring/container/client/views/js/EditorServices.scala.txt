@@ -7,6 +7,16 @@
 
   angular.module('@namespace', []);
 
+  angular.module('@namespace').factory('SupportingMaterialService', ['BaseService', function(BaseService) {
+
+    return {
+      save: function(id, supportingMaterial, onSuccess, onFailure) {
+        BaseService.saveSupportingMaterial(supportingMaterial, onSuccess, onFailure, id);
+      }
+    };
+
+  }]);
+
   angular.module('@namespace').factory('ProfileService', ['BaseService', function(BaseService){
 
     return {
@@ -40,7 +50,6 @@
 
   }]);
 
-
   angular.module('@namespace').factory('ItemService', ['BaseService', function(BaseService){
     return {
       load: function(onSuccess, onFailure, id){
@@ -73,6 +82,9 @@
               }
             });
         }
+      },
+      saveSupportingMaterial: function(data, onSuccess, onFailure, id) {
+        this._save(data, onSuccess, onFailure, id);
       },
       saveProfile: function(data, onSuccess, onFailure, id) {
          this._save( data, onSuccess, onFailure, id );

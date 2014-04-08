@@ -50,9 +50,9 @@ var controller = function($scope, $rootScope, $log, $location, $timeout, DataQue
     return search.leftnav === true || search.leftnav === 'true';
   }
 
-  function hasSupportingMaterials() {
+  $scope.hasSupportingMaterials = function() {
     return $scope.item ? ($scope.item.supportingMaterials && $scope.item.supportingMaterials.length > 0) : false;
-  }
+  };
 
   function hideShowNav() {
     if (showLeftNav()) {
@@ -74,11 +74,12 @@ var controller = function($scope, $rootScope, $log, $location, $timeout, DataQue
     $scope.showSupportingMaterials = !$scope.showSupportingMaterials;
   };
 
-  $scope.showSupportingMaterials = supportingMaterialIndex() !== undefined;
+  $scope.showSupportingMaterials = function() {
+    supportingMaterialIndex() !== undefined;
+  };
 
   $timeout(function() {
     hideShowNav();
-    $scope.hasSupportingMaterials = hasSupportingMaterials();
   });
 
 
@@ -98,7 +99,6 @@ var controller = function($scope, $rootScope, $log, $location, $timeout, DataQue
   };
 
   $scope.$on('itemLoaded', function() {
-    $scope.hasSupportingMaterials = hasSupportingMaterials();
     if (previewable()) {
       $scope.showPreview = showPreview();
     } else {
