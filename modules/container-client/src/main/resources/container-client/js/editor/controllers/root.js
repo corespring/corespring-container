@@ -63,7 +63,7 @@ var controller = function($scope, $rootScope, $log, $location, $timeout, DataQue
   $scope.hasSupportingMaterials = function() {
     return $scope.data.item ?
       ($scope.data.item.supportingMaterials && $scope.data.item.supportingMaterials.length > 0) : false;
-  }
+  };
 
   function hideShowNav() {
     if (showLeftNav()) {

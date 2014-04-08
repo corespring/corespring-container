@@ -48,6 +48,9 @@ var controller = function ($scope, SupportingMaterialService, $modal, Overlay, $
         $scope.cancel = function() {
           $modalInstance.dismiss('cancel');
         };
+
+        // TODO: Find a better way to give focus after rendering w/o setTimeout.
+        setTimeout(function() { $('#supporting-material-title').focus(); }, 200);
       },
       resolve: {
         materialType: function() { return $scope.materialType; },
@@ -62,7 +65,7 @@ var controller = function ($scope, SupportingMaterialService, $modal, Overlay, $
   };
 
   $scope.onSaveSuccess = function(result) {
-    $scope.item.supportingMaterials = result.supportingMaterials;
+    $scope.data.item.supportingMaterials = result.supportingMaterials;
     $state.transitionTo('supporting-material', {index: result.supportingMaterials.length - 1});
   };
 
@@ -72,8 +75,8 @@ var controller = function ($scope, SupportingMaterialService, $modal, Overlay, $
 
   $scope.create = function(data) {
     var newSupportingMaterial, supportingMaterials;
-    if ($scope.item) {
-      supportingMaterials = $scope.item.supportingMaterials || [];
+    if ($scope.data.item) {
+      supportingMaterials = $scope.data.item.supportingMaterials || [];
       newSupportingMaterial = {
         name: data.title,
         materialType: data.materialType,

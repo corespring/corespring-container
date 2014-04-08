@@ -64,7 +64,7 @@
         }
       },
       saveSupportingMaterial: function(data, onSuccess, onFailure, id) {
-        this._save(data, onSuccess, onFailure, id);
+        this.save(data, onSuccess, onFailure, id);
       },
       save: function(data, onSuccess, onFailure, id){
          var url = '@save.url.toLowerCase';
