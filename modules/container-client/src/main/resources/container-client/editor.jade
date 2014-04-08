@@ -11,8 +11,26 @@ block content
       .top-nav-filler
 
       ul.nav.nav-stacked
-        li(ng-repeat="entry in nav.navEntries", ui-sref-active="active" )
-          a(ui-sref="{{entry.path}}" ) {{entry.title}}
+
+        li(ng-class="{ active: isActive('design') }")
+          a(ui-sref="design") Design
+
+        li(ng-class="{ active: isActive('view-player') }")
+          a(ui-sref="view-player") View Player
+
+        li(ng-class="{ active: isActive('item-profile') }")
+          a(ui-sref="item-profile") Item Profile
+
+        li.supporting-materials-header(ng-class="{ active: isActive('supporting-materials') }")
+          a(ui-sref="supporting-materials", ng-class="{empty: !hasSupportingMaterials}") Supporting Materials
+          a.collapsable(ng-show="hasSupportingMaterials", ng-class="{expanded: showSupportingMaterials}",
+            ng-click="toggleSupportingMaterials()")
+          ul.nav.supporting-material-items(ng-show="showSupportingMaterials")
+            li.supporting-material-item(ng-repeat="supportingMaterial in data.item.supportingMaterials", ng-class="{ active: isSupportingMaterialActive(supportingMaterial, $index)}")
+              a(ui-sref="supporting-material({index: $index})") {{supportingMaterial.name}}
+
+        li(ng-class="{ active: isActive('overview') }")
+          a(ui-sref="overview") Overview
 
     .preview-container
       .contents(ui-view="preview")
