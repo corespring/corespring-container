@@ -69,10 +69,6 @@ var controller = function(
     console.warn("file too big");
   });
 
-  $scope.$on('save-data', function() {
-    $scope.save();
-  });
-
   $scope.onSaveSuccess = function() {
     $log.info("Saved successfully");
   };
@@ -81,19 +77,21 @@ var controller = function(
     $log.error("There was a problem saving");
   };
 
-  $scope.save = function() {
-    var updatedSupportingMaterials = $scope.item.supportingMaterials;
-    var supportingMaterialFile = SupportingMaterialsService.getSupportingMaterial($scope.item, $scope.index);
-    supportingMaterialFile.content = $scope.supportingMarkup;
-    var fileIndex = _.findIndex($scope.item.supportingMaterials[$scope.index].files, function(file) {
-      return file.isMain;
-    });
-    updatedSupportingMaterials[$scope.index].files[fileIndex] = supportingMaterialFile;
+  $scope.$watch('supportingMarkup', function(newValue) {
+    if ($scope.data.item) {
+      var updatedSupportingMaterials = $scope.data.item.supportingMaterials;
+      var supportingMaterialFile = SupportingMaterialsService.getSupportingMaterial(supportingMaterials(), $scope.index);
+      if (supportingMaterialFile) {
+        supportingMaterialFile.content = newValue;
+        var fileIndex = _.findIndex(supportingMaterials()[$scope.index].files, function(file) {
+          return file.isMain;
+        });
+        updatedSupportingMaterials[$scope.index].files[fileIndex] = supportingMaterialFile;
 
-    console.log($scope.supportingMarkup);
-    SupportingMaterialService.save($scope.itemId, { supportingMaterials: updatedSupportingMaterials },
-      $scope.onSaveSuccess, $scope.onSaveError);
-  };
+        $scope.data.item.supportingMaterials = updatedSupportingMaterials;
+      }
+    }
+  });
 
   $scope.formatKB = function(kb, decimalPlaces) {
     var mb;
