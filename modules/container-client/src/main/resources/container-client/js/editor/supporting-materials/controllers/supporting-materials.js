@@ -1,6 +1,19 @@
 var controller = function ($scope, ItemService, $modal, Overlay, $state, $log) {
 
   $scope.createNew = function() {
+
+    $scope.featuresWithoutImage = [{
+      name: 'no-image',
+      type: 'group',
+      buttons: [{
+        name: 'image',
+        iconclass: 'fa fa-picture-o',
+        action: function() {
+          window.alert('You must save the supporting material before adding images.');
+        }
+      }]
+    }];
+
     Overlay.open({
       template: $('#new-supporting-material-modal').html(),
       target: $('.supporting-materials'),
