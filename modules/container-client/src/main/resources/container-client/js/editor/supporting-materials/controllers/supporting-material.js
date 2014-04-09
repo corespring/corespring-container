@@ -141,6 +141,10 @@ var controller = function(
     }
   };
 
+  function getSupportingMaterialType() {
+    return supportingMaterials() ? supportingMaterials()[$scope.index].materialType : undefined;
+  }
+
   $scope.toggleEdit = function() {
     $scope.editing = !$scope.editing;
   };
@@ -163,10 +167,12 @@ var controller = function(
   $scope.$on('itemLoaded', function() {
     $scope.supportingMaterial = getSupportingMaterial();
     $scope.supportingMarkup = $scope.getSupportingMaterialMarkup();
+    $scope.materialType = getSupportingMaterialType();
   });
 
   $scope.supportingMaterial = getSupportingMaterial();
   $scope.supportingMarkup = $scope.getSupportingMaterialMarkup();
+  $scope.materialType = getSupportingMaterialType();
 
 };
 
