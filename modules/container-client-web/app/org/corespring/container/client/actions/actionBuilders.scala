@@ -32,7 +32,7 @@ trait EditorActions[A] extends ClientActions[A] {
 trait ItemHooks {
   def load(itemId: String)(implicit header: RequestHeader): Future[Either[SimpleResult, JsValue]]
   def save(itemId: String, json: JsValue)(implicit header: RequestHeader): Future[Either[SimpleResult, JsValue]]
-  def create(implicit header: RequestHeader): Future[Either[(Int, String), String]]
+  def create(json: Option[JsValue])(implicit header: RequestHeader): Future[Either[(Int, String), String]]
 }
 
 trait SessionActions[A] {

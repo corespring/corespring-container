@@ -23,7 +23,7 @@ class ItemTest extends Specification with Mockito {
 
       override def hooks: ItemHooks = new ItemHooks {
 
-        override def create(implicit header: RequestHeader): Future[Either[(Int, String), String]] = {
+        override def create(json: Option[JsValue])(implicit header: RequestHeader): Future[Either[(Int, String), String]] = {
           Future {
             createError.map {
               e =>
