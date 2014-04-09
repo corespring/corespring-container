@@ -32,7 +32,7 @@ trait ItemHooks extends ContainerItemHooks {
     }
   }
 
-  override def create(implicit header: RequestHeader): Future[Either[(Int, String), String]] = {
+  override def create(json: Option[JsValue])(implicit header: RequestHeader): Future[Either[(Int, String), String]] = {
     Future {
       val newItem = Json.obj(
         "components" -> Json.obj(),

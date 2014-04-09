@@ -25,7 +25,7 @@ trait Item extends Controller with XhtmlCleaner {
 
   def create = Action.async {
     implicit request =>
-      hooks.create.map {
+      hooks.create(request.body.asJson).map {
         either =>
           either match {
             case Left((code, msg)) => Status(code)(Json.obj("error" -> msg))
