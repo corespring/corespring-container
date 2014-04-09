@@ -51,8 +51,7 @@
      * Return true if we should display a preview for the supporting material.
      */
     this.previewable = function(supportingMaterials, index) {
-      var isType = isContentType.bind(this, supportingMaterials, index);
-      return !isType('text/html') && isType('application/pdf');
+      return true;
     };
 
     function isContentType(supportingMaterials, index, contentType) {
