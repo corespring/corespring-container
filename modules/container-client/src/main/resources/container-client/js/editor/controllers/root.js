@@ -16,18 +16,20 @@ var controller = function($scope, $rootScope, $log, $location, $timeout, DataQue
     return match ? parseInt(match[1], 10) : undefined;
   }
 
+  $scope.supportingMaterialPreviewable = function() {
+    var index = supportingMaterialIndex();
+    if (index) {
+      return SupportingMaterialsService.previewable($scope.data.item.supportingMaterials, index);
+    } else {
+      return false;
+    }
+  };
+
   function previewable() {
     var matchers = [
       /\/design/,
       /\/item-profile/,
-      function() {
-        var index = supportingMaterialIndex();
-        if (index) {
-          return SupportingMaterialsService.previewable($scope.data.item.supportingMaterials, index);
-        } else {
-          return false;
-        }
-      }
+      $scope.supportingMaterialPreviewable
     ];
 
     return _.find(matchers, function(matcher) {
@@ -43,7 +45,7 @@ var controller = function($scope, $rootScope, $log, $location, $timeout, DataQue
 
   function showPreview() {
     var search = $location.search();
-    return search.preview === true || search.preview === 'true';
+    return search.preview === true || search.preview === 'true' || $scope.supportingMaterialPreviewable();
   }
 
   $rootScope.$on('$stateChangeSuccess', function() {
