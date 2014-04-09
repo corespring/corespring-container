@@ -10,6 +10,7 @@ var controller = function(
   ImageUtils) {
 
   $scope.index = parseInt($stateParams.index, 10);
+  $scope.editing = false;
 
   $scope.imageService = {
 
@@ -138,6 +139,10 @@ var controller = function(
     } else {
       return undefined;
     }
+  };
+
+  $scope.toggleEdit = function() {
+    $scope.editing = !$scope.editing;
   };
 
   $scope.isContentType = function(contentType) {
