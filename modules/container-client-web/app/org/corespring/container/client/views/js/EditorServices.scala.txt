@@ -17,7 +17,6 @@
 
   }]);
 
-
   angular.module('@namespace').factory('ItemService', ['BaseService', function(BaseService){
     return {
       load: function(onSuccess, onFailure, id){
@@ -53,6 +52,9 @@
               }
             });
         }
+      },
+      saveSupportingMaterial: function(data, onSuccess, onFailure, id) {
+        this.save(data, onSuccess, onFailure, id);
       },
       save: function(data, onSuccess, onFailure, id){
          var url = '@save.url.toLowerCase';

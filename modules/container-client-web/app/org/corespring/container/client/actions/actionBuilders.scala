@@ -35,6 +35,19 @@ trait ItemHooks {
   def create(json: Option[JsValue])(implicit header: RequestHeader): Future[Either[(Int, String), String]]
 }
 
+trait ItemActions[A] {
+  def load(itemId: String)(block: ItemRequest[A] => Result): Action[AnyContent]
+
+  @deprecated("Use ItemHooks.save instead", "3.2")
+  def save(itemId: String)(block: SaveItemRequest[A] => Result): Action[AnyContent]
+
+  def create(error: (Int, String) => Result)(block: NewItemRequest[A] => Result): Action[AnyContent]
+}
+
+trait SupportingMaterialActions[A] {
+  def create(itemId: String)(block: NewSupportingMaterialRequest[A] => Result): Action[AnyContent]
+}
+
 trait SessionActions[A] {
   def loadEverything(id: String)(block: FullSessionRequest[A] => Result): Action[AnyContent]
 
