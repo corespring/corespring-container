@@ -62,7 +62,6 @@ var controller = function ($scope, ItemService, $modal, Overlay, $state, $log) {
           $modalInstance.dismiss('cancel');
         };
 
-        // TODO: Find a better way to give focus after rendering w/o setTimeout.
         setTimeout(function() { $('#supporting-material-title').focus(); }, 200);
       },
       resolve: {
