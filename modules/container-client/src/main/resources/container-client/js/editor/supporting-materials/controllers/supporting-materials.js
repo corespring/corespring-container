@@ -82,7 +82,7 @@ var controller = function ($scope, ItemService, $modal, Overlay, $state, $log) {
   };
 
   $scope.onSaveError = function(result) {
-    console.log(result);
+    $log.error(result);
   };
 
   $scope.create = function(data) {
