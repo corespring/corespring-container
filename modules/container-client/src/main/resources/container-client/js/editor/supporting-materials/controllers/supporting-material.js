@@ -6,6 +6,7 @@ var controller = function(
   $log,
   $filter,
   SupportingMaterialsService,
+  ItemService,
   ImageUtils) {
 
   $scope.index = parseInt($stateParams.index, 10);
@@ -17,7 +18,7 @@ var controller = function(
     },
 
     addFile: function(file, onComplete, onProgress) {
-      var url = '' + file.name;
+      var url = supportingMaterials()[$scope.index].name + '/' + file.name;
 
       if (ImageUtils.bytesToKb(file.size) > 500) {
         onComplete(ImageUtils.fileTooBigError(file.size, 500));
@@ -67,6 +68,38 @@ var controller = function(
   $scope.$on('fileSizeGreaterThanMax', function(event) {
     console.warn("file too big");
   });
+
+  $scope.onSaveSuccess = function() {
+    $scope.data.saveInProgress = false;
+  };
+
+  $scope.onSaveError = function() {
+    $scope.data.saveInProgress = false;
+  };
+
+  $scope.$watch('supportingMarkup', function(newValue) {
+    if ($scope.data.item) {
+      var updatedSupportingMaterials = $scope.data.item.supportingMaterials;
+      var supportingMaterialFile = SupportingMaterialsService.getSupportingMaterial(supportingMaterials(), $scope.index);
+      if (supportingMaterialFile) {
+        supportingMaterialFile.content = newValue;
+        var fileIndex = _.findIndex(supportingMaterials()[$scope.index].files, function(file) {
+          return file.isMain;
+        });
+        updatedSupportingMaterials[$scope.index].files[fileIndex] = supportingMaterialFile;
+        $scope.data.item.supportingMaterials = updatedSupportingMaterials;
+      }
+    }
+  });
+
+  $scope.$on('save-data', function() {
+    $scope.save();
+  });
+
+  $scope.save = function() {
+    ItemService.save({ supportingMaterials: $scope.data.item.supportingMaterials }, $scope.onSaveSuccess,
+      $scope.onSaveError, $scope.itemId);
+  };
 
   $scope.formatKB = function(kb, decimalPlaces) {
     var mb;
@@ -139,6 +172,7 @@ angular.module('corespring-editor.controllers')
     '$log',
     '$filter',
     'SupportingMaterialsService',
+    'ItemService',
     'ImageUtils',
     controller
   ]);

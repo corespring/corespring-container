@@ -4,7 +4,7 @@ script#supporting-material(type='text/ng-template')
     .editor-container(ng-class="editorMode", ng-show="isContentType('text/html')")
       wiggi-wiz(
         ng-model="supportingMarkup",
-        image-service="imageService", style="height: 100%")
+        image-service="imageService")
         toolbar(basic="bold italic", formatting="h1 h2 p")
         edit-pane-toolbar(alignment="bottom")
           .btn-group

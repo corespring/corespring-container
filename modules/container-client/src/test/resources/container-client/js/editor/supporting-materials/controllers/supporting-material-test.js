@@ -27,6 +27,7 @@ describe('supporting material controller', function() {
     stateParams = {
       index: 0
     };
+    itemService = {};
     supportingMaterialsService = {
       getSupportingMaterial: function() {
         return item.supportingMaterials[0];
@@ -43,7 +44,8 @@ describe('supporting material controller', function() {
       ctrl = $controller('SupportingMaterial', {
         $scope: scope,
         $stateParams: stateParams,
-        SupportingMaterialsService: supportingMaterialsService
+        SupportingMaterialsService: supportingMaterialsService,
+        ItemService: itemService
       });
     } catch (e) {
       throw ("Error with the controller: " + e);

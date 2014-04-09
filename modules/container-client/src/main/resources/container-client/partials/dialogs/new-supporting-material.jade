@@ -1,0 +1,21 @@
+.new-supporting-material
+
+  p.prompt Select source:
+
+  .options
+    .option
+      input(type='radio', id='new-supporting-material-input', name='option', checked)
+      label(for='new-supporting-material-input') Create new
+    p Begin typing below. After saving, you may also add images inline selecting the image icon from the toolbar.
+
+    .option.disabled
+      input(type='radio', disabled='disabled', id='upload-pdf-supporting-material-input', name='option')
+      label(for='upload-pdf-supporting-material-input') Upload PDF (coming soon!)
+    p.disabled Select a file from your computer to upload
+
+    wiggi-wiz(
+      ng-model="content",
+      features="featuresWithoutImage")
+        toolbar(basic="bold italic", formatting="h1 h2 p")
+
+  button.save.btn.btn-success(ng-click='confirm()') Save

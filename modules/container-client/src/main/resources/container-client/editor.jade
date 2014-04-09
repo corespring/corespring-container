@@ -22,8 +22,8 @@ block content
           a(ui-sref="item-profile") Item Profile
 
         li.supporting-materials-header(ng-class="{ active: isActive('supporting-materials') }")
-          a(ui-sref="supporting-materials", ng-class="{empty: !hasSupportingMaterials}") Supporting Materials
-          a.collapsable(ng-show="hasSupportingMaterials", ng-class="{expanded: showSupportingMaterials}",
+          a(ui-sref="supporting-materials", ng-class="{empty: !hasSupportingMaterials()}") Supporting Materials
+          a.collapsable(ng-show="hasSupportingMaterials()", ng-class="{expanded: showSupportingMaterials}",
             ng-click="toggleSupportingMaterials()")
           ul.nav.supporting-material-items(ng-show="showSupportingMaterials")
             li.supporting-material-item(ng-repeat="supportingMaterial in data.item.supportingMaterials", ng-class="{ active: isSupportingMaterialActive(supportingMaterial, $index)}")
