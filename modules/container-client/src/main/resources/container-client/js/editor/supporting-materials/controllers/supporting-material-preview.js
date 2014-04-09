@@ -9,6 +9,11 @@ var controller = function(
     return $scope.data.item.supportingMaterials;
   }
 
+  $scope.getSupportingMarkup = function() {
+    var supportingMaterial = SupportingMaterialsService.getSupportingMaterial(supportingMaterials(), $scope.index);
+    return supportingMaterial ? supportingMaterial.content : undefined;
+  };
+
   $scope.getSupportingUrl = function(index) {
     if ($scope.data.item) {
       return SupportingMaterialsService.getSupportingUrl(supportingMaterials(), $scope.index);
@@ -17,12 +22,15 @@ var controller = function(
 
   $scope.previewable = SupportingMaterialsService.previewable(supportingMaterials(), $scope.index);
   $scope.supportingUrl = $scope.getSupportingUrl($scope.index);
-
-  log('supporting url', $scope.supportingUrl);
+  $scope.supportingMarkup = $scope.getSupportingMarkup();
+  $scope.getContentType = function() {
+    return supportingMaterials() ?
+      SupportingMaterialsService.getContentType(supportingMaterials(), $scope.index) : undefined;
+  };
 
   $scope.$on('itemLoaded', function() {
     $scope.supportingUrl = $scope.getSupportingUrl($scope.index);
-    log('supporting url', $scope.supportingUrl);
+    $scope.supportingMarkup = $scope.getSupportingMarkup();
     $scope.previewable = SupportingMaterialsService.previewable(supportingMaterials(), $scope.index);
   });
 
