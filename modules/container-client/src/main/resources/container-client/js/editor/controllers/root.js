@@ -1,5 +1,7 @@
 var controller = function($scope, $rootScope, $log, $location, $timeout, DataQueryService, ItemService, NavModelService, SupportingMaterialsService) {
 
+  var navSetOnce = false;
+
   $scope.nav = NavModelService;
 
   var log = $log.debug.bind($log, '[root] -');
@@ -49,10 +51,20 @@ var controller = function($scope, $rootScope, $log, $location, $timeout, DataQue
   }
 
   $rootScope.$on('$stateChangeSuccess', function() {
+
+    if (!navSetOnce) {
+      navSetOnce = true;
+      var search = $location.search();
+      $scope.showLeftNav = search.leftnav ? search.leftnav === 'true' : true;
+      $scope.showPreview = search.preview ? search.preview === 'true' : true;
+      $location.search('preview', true);
+      $location.search('leftnav', true);
+    }
+
     if (previewable()) {
       $scope.showPreview = showPreview();
     } else {
-      $scope.showPreview = false;
+      $scope.showPreview = $location.search().preview;
     }
   });
 
@@ -67,7 +79,7 @@ var controller = function($scope, $rootScope, $log, $location, $timeout, DataQue
       ($scope.data.item.supportingMaterials && $scope.data.item.supportingMaterials.length > 0) : false;
   };
 
-  function hideShowNav() {
+  /*function hideShowNav() {
     if (showLeftNav()) {
       $('.content-container').css({
         "left": $('.nav-container').css('width')
@@ -77,7 +89,7 @@ var controller = function($scope, $rootScope, $log, $location, $timeout, DataQue
         "left": "0"
       });
     }
-  }
+  }*/
 
   $scope.isActive = function(tab) {
     return $location.path().replace(/^\/|\/$/g, '') === tab;
@@ -93,14 +105,14 @@ var controller = function($scope, $rootScope, $log, $location, $timeout, DataQue
 
   $scope.showSupportingMaterials = supportingMaterialIndex() !== undefined;
 
-  $timeout(function() {
+  /*$timeout(function() {
     hideShowNav();
-  });
+  });*/
 
 
   $scope.toggleLeftNav = function() {
-    $location.search('leftnav', !showLeftNav());
-    hideShowNav();
+    $scope.showLeftNav = !$scope.showLeftNav;
+    $location.search('leftnav', $scope.showLeftNav);
   };
 
   $scope.togglePreview = function() {
@@ -167,6 +179,7 @@ var controller = function($scope, $rootScope, $log, $location, $timeout, DataQue
   });
 
   ItemService.load($scope.onItemLoaded, $scope.onItemLoadError, $scope.itemId);
+
 };
 
 angular.module('corespring-editor.controllers')

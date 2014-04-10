@@ -36,7 +36,7 @@ block content
     .preview-container
       .contents(ui-view="preview")
 
-    .content-container(ng-class="{preview: showPreview}")
+    .content-container.preview.left-nav(ng-class="{preview: showPreview, 'left-nav': showLeftNav}")
       .top-nav
         button.toggle-left-nav.btn.btn-sm.btn-default(ng-click="toggleLeftNav()")
           i.fa.fa-bars
