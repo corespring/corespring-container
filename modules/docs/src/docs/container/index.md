@@ -18,6 +18,17 @@ This class extends `DefaultIntegration`, which is a trait that provides as many 
 
 For most cases, you can extend this trait and implement its methods.
 
+## Note: Integration pattern is going to change
+
+We are going to deprecate the action decorator pattern. Have a look at ItemHooks for the new api.
+
+Basically it'll look something like:
+
+    def doThing(params:....) : Future[Either[Error,Thing]]
+
+
+This means we can do away with the wrapped requests, and is a simpler model to reason about.
+
 
 Integration uses a decorator pattern, to allow clients to decorate the libraries core action logic.
 

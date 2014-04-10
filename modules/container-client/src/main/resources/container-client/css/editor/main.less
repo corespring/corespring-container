@@ -4,13 +4,13 @@
   @preview-width: 810px;
   @designer-min-width: 500px;
   @main-animation-duration: 300ms;
+  @top-nav-zindex: 1001;
 
   .preview-btn(){
     width: 75px;
     border-radius: 0px;
     position: absolute;
     top: @top-nav-height; 
-    z-index: 1900;
     .drop-shadow(1px, 2px, 2px, 0.3);
   }
 
@@ -79,7 +79,7 @@
     .hang-right-button{
       .preview-btn();
       position: absolute;
-      z-index: 4444444;
+      z-index: @top-nav-zindex - 1;
       right: 0px;
       outline: none;
       transition: right @main-animation-duration;
@@ -181,8 +181,8 @@
     border-bottom: solid 1px darken(@top-nav-bg, 20%);
     background-color: darken(@top-nav-bg, 0%);
     height: @top-nav-height; 
-    z-index: 1001;
-    .drop-shadow(0, 2px, 3px, 0.2);
+    z-index: @top-nav-zindex;
+    .drop-shadow(0, 2px, 3px, 0.35);
 
     .cs-logo{
       width: 100px;
