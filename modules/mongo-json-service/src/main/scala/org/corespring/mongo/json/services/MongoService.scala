@@ -1,12 +1,12 @@
 package org.corespring.mongo.json.services
 
 import com.mongodb.DBObject
-import com.mongodb.casbah.{WriteConcern, MongoCollection}
+import com.mongodb.casbah.{ WriteConcern, MongoCollection }
 import com.mongodb.casbah.commons.MongoDBObject
-import com.mongodb.util.{JSON => MongoPlayJson}
+import com.mongodb.util.{ JSON => MongoPlayJson }
 import org.bson.types.ObjectId
 import play.api.Logger
-import play.api.libs.json.{JsObject, Json => PlayJson, JsValue}
+import play.api.libs.json.{ JsObject, Json => PlayJson, JsValue }
 
 class MongoService(collection: MongoCollection) {
 
@@ -61,14 +61,18 @@ class MongoService(collection: MongoCollection) {
       logger.trace(s"[save]: ${PlayJson.stringify(data)}")
 
       def toDbo(json: JsValue): DBObject = MongoPlayJson.parse(PlayJson.stringify(json)).asInstanceOf[DBObject]
-      def toJson(dbo:DBObject) = PlayJson.parse(MongoPlayJson.serialize(dbo))
+      def toJson(dbo: DBObject) = PlayJson.parse(MongoPlayJson.serialize(dbo))
       val q = MongoDBObject("_id" -> new ObjectId(id))
-      val d = MongoDBObject("$set" -> toDbo(data))
+
+      val setDbo = toDbo(data)
+      setDbo.removeField("_id")
+      logger.trace(s"set dbo: $setDbo")
+      val d = MongoDBObject("$set" -> setDbo)
       val result = collection.update(q, d, false, false, WriteConcern.Safe)
 
       if (result.getLastError(WriteConcern.Safe).ok()) {
         val dbo = collection.findOneByID(new ObjectId(id))
-        dbo.map( toJson )
+        dbo.map(toJson)
       } else {
         logger.warn(s"Error saving: $id")
         None
