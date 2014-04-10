@@ -24,7 +24,7 @@ angular.module('corespring-editor.directives').directive('modelSaver', [
       var $node = $('<div style="visibility: hidden">').append(html);
       $node.find('#saved').attr('ng-show', '!innerSaveInProgress && !saveError');
       $node.find('#save-in-progress').attr('ng-show', 'innerSaveInProgress');
-      $node.find('#save-error').attr('ng-show', 'saveError');
+      $node.find('#save-error').attr('ng-show', 'saveError && !innerSaveInProgress');
       $element.replaceWith($node);
       $element = $node;
       $compile($node)($scope);
