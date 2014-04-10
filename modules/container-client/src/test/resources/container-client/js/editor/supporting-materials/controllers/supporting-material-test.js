@@ -44,6 +44,7 @@ describe('supporting material controller', function() {
       ctrl = $controller('SupportingMaterial', {
         $scope: scope,
         $stateParams: stateParams,
+        $state: {},
         SupportingMaterialsService: supportingMaterialsService,
         ItemService: itemService
       });
