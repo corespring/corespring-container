@@ -11,6 +11,12 @@
       }
     }
 
+    function lengthInUtf8Bytes(str) {
+      // Matches only the 10.. bytes that are non-initial characters in a multi-byte sequence.
+      var m = encodeURIComponent(str).match(/%[89ABab]/g);
+      return str.length + (m ? m.length : 0);
+    }
+
     this.getSupportingMaterial = function(supportingMaterials, index) {
       if (supportingMaterials && supportingMaterials[index]) {
         var fileIndex = _.findIndex(supportingMaterials[index].files, function(file) {
@@ -26,14 +32,21 @@
      * Returns the file size of the supporting material for item at index in KB to the provided callback.
      */
     this.getKBFileSize = function(supportingMaterials, index, callback) {
+      var url;
+      var supportingMaterial;
       if (supportingMaterials) {
-        var url = getUrl(supportingMaterials, index);
-        $http({
-          method: 'GET',
-          url: url
-        }).success(function(data, status, headers) {
-          callback(headers('content-length') / 1024);
-        });
+        supportingMaterial = self.getSupportingMaterial(supportingMaterials, index);
+        if (supportingMaterial && supportingMaterial.contentType === 'text/html') {
+          callback(lengthInUtf8Bytes(supportingMaterial.content) / 1024);
+        } else {
+          url = getUrl(supportingMaterials, index);
+          $http({
+            method: 'GET',
+            url: url
+          }).success(function(data, status, headers) {
+            callback(headers('content-length') / 1024);
+          });
+        }
       } else {
         callback(undefined);
       }
@@ -51,8 +64,7 @@
      * Return true if we should display a preview for the supporting material.
      */
     this.previewable = function(supportingMaterials, index) {
-      var isType = isContentType.bind(this, supportingMaterials, index);
-      return !isType('text/html') && isType('application/pdf');
+      return true;
     };
 
     function isContentType(supportingMaterials, index, contentType) {

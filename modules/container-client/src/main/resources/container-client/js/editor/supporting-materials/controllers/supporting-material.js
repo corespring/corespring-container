@@ -10,6 +10,7 @@ var controller = function(
   ImageUtils) {
 
   $scope.index = parseInt($stateParams.index, 10);
+  $scope.editing = false;
 
   $scope.imageService = {
 
@@ -140,6 +141,14 @@ var controller = function(
     }
   };
 
+  function getSupportingMaterialType() {
+    return supportingMaterials() ? supportingMaterials()[$scope.index].materialType : undefined;
+  }
+
+  $scope.toggleEdit = function() {
+    $scope.editing = !$scope.editing;
+  };
+
   $scope.isContentType = function(contentType) {
     return supportingMaterials() ? contentType === SupportingMaterialsService.getContentType(supportingMaterials(), $scope.index) : false;
   };
@@ -158,10 +167,12 @@ var controller = function(
   $scope.$on('itemLoaded', function() {
     $scope.supportingMaterial = getSupportingMaterial();
     $scope.supportingMarkup = $scope.getSupportingMaterialMarkup();
+    $scope.materialType = getSupportingMaterialType();
   });
 
   $scope.supportingMaterial = getSupportingMaterial();
   $scope.supportingMarkup = $scope.getSupportingMaterialMarkup();
+  $scope.materialType = getSupportingMaterialType();
 
 };
 
