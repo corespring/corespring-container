@@ -10,7 +10,7 @@ var controller = function(
   }
 
   function fileIndex() {
-    if ($scope.data.item && ($scope.index || $scope.index === 0) && supportingMaterials()) {
+    if ($scope.data.item && ($scope.index >= 0) && supportingMaterials()) {
       return _.findIndex(supportingMaterials()[$scope.index].files, function(file) {
         return file.isMain;
       });
