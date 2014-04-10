@@ -67,6 +67,7 @@
           })
           .error(function(data, status, headers, config) {
             if( onFailure ) {
+              data = data || { error: status + ": an unknown error occured" };
               onFailure(data);
             }
           });
