@@ -33,7 +33,7 @@
      */
     this.getKBFileSize = function(supportingMaterials, index, callback) {
       var url;
-      var supprotingMaterial;
+      var supportingMaterial;
       if (supportingMaterials) {
         supportingMaterial = self.getSupportingMaterial(supportingMaterials, index);
         if (supportingMaterial && supportingMaterial.contentType === 'text/html') {
