@@ -3,6 +3,7 @@ var controller = function(
   $scope,
   $http,
   $stateParams,
+  $state,
   $log,
   $filter,
   SupportingMaterialsService,
@@ -149,6 +150,17 @@ var controller = function(
     $scope.editing = !$scope.editing;
   };
 
+  $scope.delete = function() {
+    if (window.confirm("Are you sure?")) {
+      $scope.data.item.supportingMaterials.splice($scope.index, 1);
+      if ($scope.index > 0) {
+        $state.transitionTo('supporting-material', {index: $scope.index - 1});
+      } else {
+        $state.transitionTo('supporting-materials');
+      }
+    }
+  };
+
   $scope.isContentType = function(contentType) {
     return supportingMaterials() ? contentType === SupportingMaterialsService.getContentType(supportingMaterials(), $scope.index) : false;
   };
@@ -180,6 +192,7 @@ angular.module('corespring-editor.controllers')
   .controller('SupportingMaterial', ['$scope',
     '$http',
     '$stateParams',
+    '$state',
     '$log',
     '$filter',
     'SupportingMaterialsService',

@@ -26,4 +26,8 @@ script#supporting-material(type='text/ng-template')
           dt(ng-show='hasDate(supportingMaterial)') Date
           dd(ng-show='hasDate(supportingMaterial)') {{formatDate(supportingMaterial.dateModified)}}
 
-      button.btn(ng-show="isContentType('text/html')", ng-click='toggleEdit()') Edit
+      ul.actions
+        li(ng-show="isContentType('text/html')")
+          button.btn(ng-click='toggleEdit()') Edit
+        li
+          button.btn(ng-click='delete()') Remove
