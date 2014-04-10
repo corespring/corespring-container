@@ -18,7 +18,7 @@ var controller = function($scope, $rootScope, $log, $location, $timeout, DataQue
 
   $scope.supportingMaterialPreviewable = function() {
     var index = supportingMaterialIndex();
-    if (index) {
+    if (index || index === 0) {
       return SupportingMaterialsService.previewable($scope.data.item.supportingMaterials, index);
     } else {
       return false;

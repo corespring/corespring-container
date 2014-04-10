@@ -9,28 +9,42 @@ var controller = function(
     return $scope.data.item.supportingMaterials;
   }
 
+  function fileIndex() {
+    if ($scope.data.item && ($scope.index || $scope.index === 0) && supportingMaterials()) {
+      return _.findIndex(supportingMaterials()[$scope.index].files, function(file) {
+        return file.isMain;
+      });
+    } else {
+      return undefined;
+    }
+  }
+
   $scope.getSupportingMarkup = function() {
     var supportingMaterial = SupportingMaterialsService.getSupportingMaterial(supportingMaterials(), $scope.index);
     return supportingMaterial ? supportingMaterial.content : undefined;
   };
 
-  $scope.getSupportingUrl = function(index) {
+  $scope.getSupportingUrl = function() {
     if ($scope.data.item) {
       return SupportingMaterialsService.getSupportingUrl(supportingMaterials(), $scope.index);
     }
   };
 
   $scope.previewable = SupportingMaterialsService.previewable(supportingMaterials(), $scope.index);
-  $scope.supportingUrl = $scope.getSupportingUrl($scope.index);
+  $scope.supportingUrl = $scope.getSupportingUrl();
   $scope.supportingMarkup = $scope.getSupportingMarkup();
+  $scope.fileIndex = fileIndex();
+  log("fileIndex = " + $scope.fileIndex);
   $scope.getContentType = function() {
     return supportingMaterials() ?
       SupportingMaterialsService.getContentType(supportingMaterials(), $scope.index) : undefined;
   };
 
   $scope.$on('itemLoaded', function() {
-    $scope.supportingUrl = $scope.getSupportingUrl($scope.index);
+    $scope.supportingUrl = $scope.getSupportingUrl();
     $scope.supportingMarkup = $scope.getSupportingMarkup();
+    $scope.fileIndex = fileIndex();
+    log("fileIndex = " + $scope.fileIndex);
     $scope.previewable = SupportingMaterialsService.previewable(supportingMaterials(), $scope.index);
   });
 
