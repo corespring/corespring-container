@@ -18,10 +18,7 @@ var controller = function ($scope, ItemService, $modal, Overlay, $state, $log) {
       template: $('#new-supporting-material-modal').html(),
       target: $('.supporting-materials'),
       scope: $scope,
-      customToolbar: {},
-      ok: function(update) {
-        console.log(update);
-      }
+      customToolbar: {}
     });
 
     // TODO: Remove this workaround if/when overlay works officially outsize wiggiwiz
@@ -33,7 +30,7 @@ var controller = function ($scope, ItemService, $modal, Overlay, $state, $log) {
       template: $('#save-supporting-material-modal').html(),
       windowClass: 'save-supporting-material-window',
       scope: $scope,
-      controller: function($scope, $modalInstance) {
+      controller: ['$scope','$modalInstance', function($scope, $modalInstance) {
         var otherType = 'Other';
         function isOther() { return $scope.data.materialType === otherType; }
         function getType() { return isOther() ? $scope.data.textMaterialType : $scope.data.materialType; }
@@ -63,7 +60,7 @@ var controller = function ($scope, ItemService, $modal, Overlay, $state, $log) {
         };
 
         setTimeout(function() { $('#supporting-material-title').focus(); }, 200);
-      },
+      }],
       resolve: {
         materialType: function() { return $scope.materialType; },
         title: function() { return $scope.title; }
