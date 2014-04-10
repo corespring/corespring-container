@@ -18,14 +18,14 @@
 
 .component-placeholder {
   position:relative; 
-  border: 1px solid darken(@cs-green, 10%);
-  background-color: lighten(@cs-green, 40%);
+  border: 1px solid darken(@cs-primary, 10%);
+  background-color: lighten(@cs-primary, 40%);
   transition: background-color 100ms linear;
   .rounded(4px);
   .user-select(none);
   .drop-shadow(0, 2px, 3px, 0.2);
   &:hover{
-    background-color: lighten(@cs-green, 30%);
+    background-color: lighten(@cs-primary, 30%);
   }
   max-width: 400px;
   padding: 20px;
@@ -38,11 +38,11 @@
     i{
       position: absolute;
       font-size: 24px;
-      color: darken(@cs-green, 10%);
+      color: darken(@cs-primary, 10%);
 
       &:hover{
 
-        color: darken(@cs-green, 16%);
+        color: darken(@cs-primary, 16%);
       }
     }
     background-color: white;

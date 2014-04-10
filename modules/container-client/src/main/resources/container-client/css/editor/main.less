@@ -1,7 +1,6 @@
 .root {
-
-  @top-nav-bg: lighten(@cs-green, 30%);
-  @top-nav-height: 29px;
+  @top-nav-bg: @cs-secondary;
+  @top-nav-height: 43px;
   @preview-width: 600px;
   @designer-min-width: 500px;
 
@@ -70,12 +69,18 @@
     .top-nav{
       .saver{
         float:right;
-        padding-top: 5px;
+        padding-top: @top-nav-height / 4;
         font-size: 12px;
         padding-right: 5px;
         font-style: italic;
         text-align: right;
-        color: darken(@cs-grey, 40%);
+        color: lighten(@top-nav-bg, 40%);
+      }
+
+      .toggle-left-nav{
+        width: @top-nav-height - 1px;
+        font-size: 24px;
+        line-height: 0px;
       }
     }
   }
@@ -92,7 +97,7 @@
     width: 200px;
     padding:0px;
     overflow: hidden;
-    background-color: darken(@cs-grey, 63%);
+    background-color: darken(@cs-grey, 0%);
 
     .top-nav-filler{
       background-color: none;
@@ -101,18 +106,22 @@
 
     .nav {
       li {
+        border-top: solid 1px darken(@cs-grey, 4%);
         a {
           font-size: 13px;
+          text-transform: uppercase;
           cursor: pointer;
-          color: darken(@cs-grey, 10%);
+          letter-spacing: 0.4px;
+          color: lighten(@cs-grey, 50%);
           &:hover{
-            color: darken(@cs-grey, 30%);
+            color: lighten(@cs-grey,30%);
+            background-color: darken(@cs-grey, 4%);
           }
         }
       }
       li.active{
         a {
-          color: @cs-green;
+          color: white;//@cs-primary;
         }
       }
     }
@@ -146,25 +155,33 @@
     left: 0px;
     right: 0px;
     top: 0px;
-    border-bottom: solid 1px darken(@top-nav-bg, 40%);
-    background-color: darken(@top-nav-bg, 20%);
-    height: @top-nav-height; //30px;
+    border-bottom: solid 1px darken(@top-nav-bg, 20%);
+    background-color: darken(@top-nav-bg, 0%);
+    height: @top-nav-height; 
     z-index: 1001;
     .drop-shadow(0, 2px, 3px, 0.2);
 
     .cs-logo{
       width: 100px;
-      height: 20px;
+      height: 35px;
       display: inline;
+      background-repeat: no-repeat;
+      top: 9px;
       position: absolute;
-      background-image: url("../images/cs-white-logo-11px-padded-ds.png");
+      background-image: url("../images/cs-white-logo-11px.png");
 
+    }
+    
+    .btn-default{
+      color: white;
     }
 
     button{
-      background-color: darken(@top-nav-bg, 30%);
+      height: @top-nav-height - 1px;
+      background-color: darken(@top-nav-bg, 10%);
       -moz-outline:0 none;
       outline:0 none;
+      color: white;
 
       &:active{
         -moz-outline:0 none;
