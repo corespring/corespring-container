@@ -1,4 +1,4 @@
-@(items:Seq[(String, String, String, String)])
+@(items:Seq[(String, String, String, String, String)])
 <!DOCTYPE html>
 <html>
 <head>
@@ -21,11 +21,13 @@
     </div>
 
     @items.map{ i =>
-      @i._1 : <a href="@i._3">Run</a> <a href="@i._4">Edit</a>
+      @i._1 : <a href="@i._3">Run</a>
+      <a href="@i._4">Edit</a>
+      <a href="@i._5">Delete</a>
       <br/>
     }
     <br/>
-    <a href="/client/editor/create-item">Create a new item</a>
+    <a href="/create-item">Create a new item</a>
   </div>
 
 </body>
