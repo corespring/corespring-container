@@ -124,6 +124,7 @@ var controller = function($scope, $rootScope, $log, $location, $timeout, DataQue
   $scope.save = function() {
     $scope.$broadcast('save-data');
     $scope.data.saveInProgress = true;
+    $scope.data.saveError = undefined;
   };
 
   $scope.itemId = (function() {
