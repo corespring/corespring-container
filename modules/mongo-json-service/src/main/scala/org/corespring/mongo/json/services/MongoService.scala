@@ -55,6 +55,10 @@ class MongoService(collection: MongoCollection) {
     }
   }
 
+  def delete(id:String) : Unit = {
+    collection.findAndRemove(MongoDBObject("_id" -> new ObjectId(id)))
+  }
+
   def save(id: String, data: JsValue): Option[JsValue] = withOid(id) {
     oid =>
       logger.debug(s"[save]: $id")
