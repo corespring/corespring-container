@@ -66,8 +66,8 @@ describe('supporting materials service', function() {
   });
 
   describe('previewable', function() {
-    it('should return false for text/html', function() {
-      expect(supportingMaterialsService.previewable(supportingMaterials, 0)).toBe(false);
+    it('should return true for text/html', function() {
+      expect(supportingMaterialsService.previewable(supportingMaterials, 0)).toBe(true);
     });
     it('should return true for application/pdf', function() {
       expect(supportingMaterialsService.previewable(supportingMaterials, 1)).toBe(true);
