@@ -1,8 +1,18 @@
 .root {
   @top-nav-bg: @cs-secondary;
   @top-nav-height: 43px;
-  @preview-width: 600px;
+  @preview-width: 810px;
   @designer-min-width: 500px;
+  @main-animation-duration: 300ms;
+
+  .preview-btn(){
+    width: 75px;
+    border-radius: 0px;
+    position: absolute;
+    top: @top-nav-height; 
+    z-index: 1900;
+    .drop-shadow(1px, 2px, 2px, 0.3);
+  }
 
   .designer {
 
@@ -32,7 +42,7 @@
 
     .preview-container {
       position: absolute;
-      left: 810px;
+      left: @preview-width;
       top : -54px;
       width: 600px;
       height: 100%;
@@ -43,7 +53,7 @@
       left:0;
       width: 100%;
       height: 100%;
-      transition: left 300ms;
+      transition: left @main-animation-duration;
     }
 
     .preview.collapsed {
@@ -61,17 +71,30 @@
     height: 100%;
     padding: 0px;
     background-color: white;
-    transition: left 300ms, right 300ms;
+    transition: left @main-animation-duration, right @main-animation-duration;
     border-left: solid 0px fade(darken(@cs-grey, 40%), 10%);
     .drop-shadow(-5px, 10px, 6px, 0.3);
-    
+   
+
+    .hang-right-button{
+      .preview-btn();
+      position: absolute;
+      z-index: 4444444;
+      right: 0px;
+      outline: none;
+      transition: right @main-animation-duration;
+    } 
+
+    .preview-active{
+      right: -76px;
+    }
 
     .top-nav{
       .saver{
         float:right;
         padding-top: @top-nav-height / 4;
         font-size: 12px;
-        padding-right: 5px;
+        padding-right: 10px;
         font-style: italic;
         text-align: right;
         color: lighten(@top-nav-bg, 40%);

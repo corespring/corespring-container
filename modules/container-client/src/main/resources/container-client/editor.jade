@@ -7,6 +7,7 @@ block head
 
 block content
   .root(ng-controller="Root")
+
     .nav-container
       .top-nav-filler
 
@@ -40,8 +41,6 @@ block content
         button.toggle-left-nav.btn.btn-sm.btn-default(ng-click="toggleLeftNav()")
           i.fa.fa-bars
         .cs-logo
-        button.btn.btn-sm.btn-default.pull-right(ng-click="togglePreview()") Preview
-        //button.btn.btn-sm.btn-default.pull-right(ng-click="save()") Save
 
         span.saver
           model-saver(
@@ -57,6 +56,9 @@ block content
               | There was an error saving your content
 
       .main-content(ui-view="main")
+
+      button.btn.btn-xs.btn-info.hang-right-button(ng-click="togglePreview()", ng-class="{'preview-active': showPreview}") Preview 
+
 
   include partials/designer
   include partials/item-profile
