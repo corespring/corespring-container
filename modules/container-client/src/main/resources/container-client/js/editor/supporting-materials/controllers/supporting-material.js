@@ -153,7 +153,7 @@ var controller = function(
   $scope.delete = function() {
     if (window.confirm("Are you sure?")) {
       $scope.data.item.supportingMaterials.splice($scope.index, 1);
-      if ($scope.index !== 0) {
+      if ($scope.index > 0) {
         $state.transitionTo('supporting-material', {index: $scope.index - 1});
       } else {
         $state.transitionTo('supporting-materials');
