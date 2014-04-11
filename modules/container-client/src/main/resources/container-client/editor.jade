@@ -36,7 +36,9 @@ block content
     .preview-container
       .contents(ui-view="preview")
 
-    .content-container.preview.left-nav(ng-class="{preview: showPreview, 'left-nav': showLeftNav}")
+      //ng-class="getContainerStyles(urlParams)")
+    .content-container(
+      ng-class="{preview: showPreview(urlParams.hidePreview), 'left-nav': !urlParams.hideLeftNav}")
       .top-nav
         button.toggle-left-nav.btn.btn-sm.btn-default(ng-click="toggleLeftNav()")
           i.fa.fa-bars
@@ -57,7 +59,7 @@ block content
 
       .main-content(ui-view="main")
 
-      button.btn.btn-xs.btn-info.hang-right-button(ng-click="togglePreview()", ng-class="{'preview-active': showPreview}") Preview 
+      button.btn.btn-xs.btn-info.preview-hang-right-btn(ng-click="togglePreview()", ng-show="showPreviewButton", ng-class="{'preview-active': showPreview(urlParams.hidePreview)}") Preview 
 
 
   include partials/designer

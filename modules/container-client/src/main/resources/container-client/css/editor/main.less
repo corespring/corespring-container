@@ -63,6 +63,10 @@
 
   }
 
+  .cc-transition-left-right{
+    transition: left @main-animation-duration, right @main-animation-duration;
+  }
+
   .content-container {
     position: absolute;
     top:0px;
@@ -72,18 +76,19 @@
     height: 100%;
     padding: 0px;
     background-color: white;
-    transition: left @main-animation-duration, right @main-animation-duration;
     border-left: solid 0px fade(darken(@cs-grey, 40%), 10%);
     .drop-shadow(-5px, 10px, 6px, 0.3);
-   
 
-    .hang-right-button{
+    .cc-transition-right{
+      transition: right @main-animation-duration;
+    }
+
+    .preview-hang-right-btn{
       .preview-btn();
       position: absolute;
       z-index: @top-nav-zindex - 1;
       right: 0px;
       outline: none;
-      transition: right @main-animation-duration;
     } 
 
     .preview-active{
