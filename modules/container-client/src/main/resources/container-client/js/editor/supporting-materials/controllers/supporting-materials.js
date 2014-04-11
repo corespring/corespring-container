@@ -89,7 +89,7 @@ var controller = function ($scope, ItemService, $modal, Overlay, $state, $log) {
 
   $scope.triggerUploadDialog = function() {
     $('.new-supporting-material input[type=file]').trigger('click');
-  }
+  };
 
   function uploadTypeIs(str) {
     return $scope.uploadType === str;
