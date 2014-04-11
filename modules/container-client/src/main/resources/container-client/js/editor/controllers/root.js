@@ -138,7 +138,7 @@ var controller = function($scope, $rootScope, $log, $location, $timeout, DataQue
   $timeout(function() {
     updateNavBindings();
     $scope.$apply();
-  }, 0);
+  });
 
   $timeout(function() {
     // add animation now that the ui is set up
