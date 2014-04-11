@@ -1,3 +1,4 @@
+/* global com */
 var controller = function ($scope, ItemService, $modal, Overlay, $state, $log) {
 
   var log = $log.debug.bind($log, '[supporting-materials] -');
