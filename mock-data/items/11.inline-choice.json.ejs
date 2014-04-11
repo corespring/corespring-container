@@ -10,13 +10,11 @@
       "componentType" : "corespring-inline-choice",
       "title": "Less Fruits",
       "weight" : 1,
-      "correctResponse" : {
-        "value": "carrot"
-      },
+      "correctResponse" : "carrot",
       "feedback" : [
-        { "value" : "banana", "feedback" : "Looking bad buddy"},
-        { "value" : "carrot", "feedback" : "Looking good buddy"},
-        { "value" : "apple", "feedback" : "Looking bad buddy" }
+        { "value" : "banana", "feedback" : "Looking bad buddy", "feedbackType": "custom"},
+        { "value" : "carrot", "feedback" : "Looking good buddy", "feedbackType": "custom"},
+        { "value" : "apple", "feedback" : "Looking bad buddy", "feedbackType": "custom"}
       ],
       "model" : {
         "config": {
@@ -24,29 +22,6 @@
         },
         "choices": [
           {"label": "$$\\left( \\sum_{k=1}^n a_k b_k \\right)^2 \\leq \\left( \\sum_{k=1}^n a_k^2 \\right) \\left( \\sum_{k=1}^n b_k^2 \\right)$$", "value": "banana"},
-          {"label": "Carrot", "value": "carrot"},
-          {"label": "Apple", "value": "apple"}
-        ]
-      }
-    },
-    "2" : {
-      "componentType" : "corespring-inline-choice",
-      "title": "Less Fruits",
-      "weight" : 1,
-      "correctResponse" : {
-        "value": "carrot"
-      },
-      "feedback" : [
-        { "value" : "banana", "feedback" : "Incorrect"},
-        { "value" : "carrot", "feedback" : "Correct"},
-        { "value" : "apple", "feedback" : "Incorrect" }
-      ],
-      "model" : {
-        "config": {
-          "shuffle": true
-        },
-        "choices": [
-          {"label": "Banana", "value": "banana"},
           {"label": "Carrot", "value": "carrot"},
           {"label": "Apple", "value": "apple"}
         ]

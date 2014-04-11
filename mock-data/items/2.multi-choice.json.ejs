@@ -25,16 +25,22 @@
         { "value" : "wheat", "feedback" : "Incorrect" }
       ],
 
-      "comment": "Hello little vegetables",
+      "comments": "Hello little vegetables",
 
       "allowPartialScoring": true,
+
+      "partialScoring" : [
+        {"numberOfCorrect": 1, "scorePercentage": 25},
+        {"numberOfCorrect": 2, "scorePercentage": 50},
+        {"numberOfCorrect": 3, "scorePercentage": 75}
+      ],
 
       "model" : {
         "prompt": "Which of these is a vegetable?",
         "config": {
-          "orientation": "tile",
+          "orientation": "vertical",
           "choiceStyle": "rightAlign",
-          "shuffle": true
+          "shuffle": false
         },
         "choices": [
           {"label": "Banana", "value": "banana"},

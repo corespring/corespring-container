@@ -24,13 +24,14 @@ trait Main extends Controller {
 
       def failLoadPlayerForSession = request.getQueryString(SessionKeys.failLoadPlayer).isDefined
 
-      val items: Seq[(String, String, String, String)] = itemService.list("profile.taskInfo.title").sortBy(_.toString).map {
+      val items: Seq[(String, String, String, String, String)] = itemService.list("profile.taskInfo.title").sortBy(_.toString).map {
         json: JsValue =>
           val name = (json \ "profile" \ "taskInfo" \ "title").asOpt[String].getOrElse("?")
           val id = (json \ "_id" \ "$oid").as[String]
           val playerUrl = routes.Main.createSessionPage(id).url
           val editorUrl = s"/client/editor/${id}/index.html"
-          (name, id, playerUrl, editorUrl)
+          val deleteUrl = s"/delete-item/$id"
+          (name, id, playerUrl, editorUrl, deleteUrl)
       }
 
       logger.debug(items.mkString(","))
@@ -46,6 +47,28 @@ trait Main extends Controller {
     request =>
       val createSessionCall = routes.Main.createSession
       Ok(html.createSession(itemId, createSessionCall.url))
+  }
+
+  def deleteItem(itemId:String) = Action {
+    request =>
+      itemService.delete(itemId)
+      Redirect("/")
+  }
+
+  def createItem = Action{
+    request =>
+      val json = Json.obj(
+        "xhtml" -> "<div><h2>Hello</h2></div>",
+        "components" -> Json.obj(),
+        "profile" -> Json.obj(
+           "taskInfo" -> Json.obj(
+            "title" -> "New item"
+           )
+        )
+      )
+      itemService.create(json).map{ id =>
+        Redirect(org.corespring.container.client.controllers.apps.routes.Editor.editItem(id.toString))
+      }.getOrElse(BadRequest("Error creating an item"))
   }
 
   def createSession = Action {
