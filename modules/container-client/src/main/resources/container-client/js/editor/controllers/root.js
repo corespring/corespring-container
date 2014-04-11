@@ -135,10 +135,7 @@ var controller = function($scope, $rootScope, $log, $location, $timeout, DataQue
 
   ItemService.load($scope.onItemLoaded, $scope.onItemLoadError, $scope.itemId);
 
-  $timeout(function() {
-    updateNavBindings();
-    $scope.$apply();
-  });
+  updateNavBindings();
 
   $timeout(function() {
     // add animation now that the ui is set up
