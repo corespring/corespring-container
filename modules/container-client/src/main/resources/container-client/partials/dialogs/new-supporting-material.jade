@@ -4,18 +4,22 @@
 
   .options
     .option
-      input(type='radio', id='new-supporting-material-input', name='option', checked)
+      input(type='radio', id='new-supporting-material-input', ng-model='uploadType', value='text', name='option')
       label(for='new-supporting-material-input') Create new
     p Begin typing below. After saving, you may also add images inline selecting the image icon from the toolbar.
 
-    .option.disabled
-      input(type='radio', disabled='disabled', id='upload-pdf-supporting-material-input', name='option')
-      label(for='upload-pdf-supporting-material-input') Upload PDF (coming soon!)
-    p.disabled Select a file from your computer to upload
-
     wiggi-wiz(
-      ng-model="content",
-      features="featuresWithoutImage")
-        toolbar(basic="bold italic", formatting="h1 h2 p")
+    ng-show="uploadType == 'text'",
+    ng-model="content",
+    features="featuresWithoutImage")
+      toolbar(basic="bold italic", formatting="h1 h2 p")
+
+    .option
+      input(type='radio', id='upload-pdf-supporting-material-input', ng-change='triggerUploadDialog()', ng-model='uploadType', value='file', name='option')
+      label(for='upload-pdf-supporting-material-input') Upload PDF
+    p Select a file from your computer to upload
+
+    .file-upload(ng-show="uploadType == 'file'")
+      input(type='file')
 
   button.save.btn.btn-success(ng-click='confirm()') Save
