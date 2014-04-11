@@ -25,7 +25,8 @@
     "mathjs": "~0.18.0",
     "wiggi-wiz": "https://github.com/corespring/wiggi-wiz.git#master",
     "es5-shim": "~2.3.0",
-    "font-awesome": "~4.0.3"
+    "font-awesome": "~4.0.3",
+    "mathjax": "https://github.com/mathjax/MathJax.git"
   },
   "devDependencies": {
     "angular-mocks": "~1.2.12",

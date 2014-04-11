@@ -1,5 +1,7 @@
 var controller = function($scope, $rootScope, $log, $location, $timeout, DataQueryService, ItemService, NavModelService, SupportingMaterialsService) {
 
+  var navSetOnce = false;
+
   $scope.nav = NavModelService;
 
   var log = $log.debug.bind($log, '[root] -');
@@ -43,41 +45,36 @@ var controller = function($scope, $rootScope, $log, $location, $timeout, DataQue
     }) !== undefined;
   }
 
-  function showPreview() {
-    var search = $location.search();
-    return search.preview === true || search.preview === 'true' || $scope.supportingMaterialPreviewable();
+  function updateLocation(name) {
+    var update = $location.search()[name] ? undefined : true;
+    $location.search(name, update);
   }
 
-  $rootScope.$on('$stateChangeSuccess', function() {
-    if (previewable()) {
-      $scope.showPreview = showPreview();
-    } else {
-      $scope.showPreview = false;
-    }
+  $scope.toggleLeftNav = updateLocation.bind(null, 'hideLeftNav');
+  $scope.togglePreview = updateLocation.bind(null, 'hidePreview');
+
+  $scope.$on('$locationChangeSuccess', function() {
+    updateNavBindings();
   });
 
-  function showLeftNav() {
-    var search = $location.search();
-    return search.leftnav === true || search.leftnav === 'true';
+  function updateNavBindings() {
+    $scope.urlParams = $location.search();
+    $scope.showPreview($scope.urlParams);
+    log('params', $scope.urlParams);
   }
 
+  $scope.showPreview = function(hidePreview) {
+    return !hidePreview && previewable();
+  };
+
+  $rootScope.$on('$stateChangeSuccess', function() {
+    $scope.showPreviewButton = previewable();
+  });
 
   $scope.hasSupportingMaterials = function() {
     return $scope.data.item ?
       ($scope.data.item.supportingMaterials && $scope.data.item.supportingMaterials.length > 0) : false;
   };
-
-  function hideShowNav() {
-    if (showLeftNav()) {
-      $('.content-container').css({
-        "left": $('.nav-container').css('width')
-      });
-    } else {
-      $('.content-container').css({
-        "left": "0"
-      });
-    }
-  }
 
   $scope.isActive = function(tab) {
     return $location.path().replace(/^\/|\/$/g, '') === tab;
@@ -92,34 +89,6 @@ var controller = function($scope, $rootScope, $log, $location, $timeout, DataQue
   };
 
   $scope.showSupportingMaterials = supportingMaterialIndex() !== undefined;
-
-  $timeout(function() {
-    hideShowNav();
-  });
-
-
-  $scope.toggleLeftNav = function() {
-    $location.search('leftnav', !showLeftNav());
-    hideShowNav();
-  };
-
-  $scope.togglePreview = function() {
-    if (previewable()) {
-      var show = showPreview();
-      $location.search('preview', !show);
-      $scope.showPreview = !show;
-    } else {
-      log('not previewable');
-    }
-  };
-
-  $scope.$on('itemLoaded', function() {
-    if (previewable()) {
-      $scope.showPreview = showPreview();
-    } else {
-      $scope.showPreview = false;
-    }
-  });
 
   $scope.save = function() {
     $scope.$broadcast('save-data');
@@ -147,11 +116,10 @@ var controller = function($scope, $rootScope, $log, $location, $timeout, DataQue
   };
 
   $scope.onItemSaveError = function(error) {
-    console.warn("Error saving item");
+    $log.warn("Error saving item");
     $scope.data.saveInProgress = false;
     $scope.data.saveError = error;
   };
-
 
   DataQueryService.list("gradeLevel", function(result) {
     $scope.gradeLevelDataProvider = result;
@@ -163,10 +131,17 @@ var controller = function($scope, $rootScope, $log, $location, $timeout, DataQue
       .pluck("value")
       .flatten()
       .value();
-
   });
 
   ItemService.load($scope.onItemLoaded, $scope.onItemLoadError, $scope.itemId);
+
+  updateNavBindings();
+
+  $timeout(function() {
+    // add animation now that the ui is set up
+    $('.content-container').addClass('cc-transition-left-right');
+    $('.preview-hang-right-btn').addClass('cc-transition-right');
+  }, 300);
 };
 
 angular.module('corespring-editor.controllers')
