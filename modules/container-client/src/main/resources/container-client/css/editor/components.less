@@ -17,15 +17,16 @@
 }
 
 .component-placeholder {
+  @placeholder-base-color: @grey-purple;
   position:relative; 
-  border: 1px solid darken(@cs-primary, 10%);
-  background-color: lighten(@cs-primary, 40%);
+  border: 1px solid darken(@placeholder-base-color, 10%);
+  background-color: lighten(@placeholder-base-color, 40%);
   transition: background-color 100ms linear;
   .rounded(4px);
   .user-select(none);
   .drop-shadow(0, 2px, 3px, 0.2);
   &:hover{
-    background-color: lighten(@cs-primary, 30%);
+    background-color: lighten(@placeholder-base-color, 50%);
   }
   max-width: 400px;
   padding: 20px;
@@ -38,11 +39,10 @@
     i{
       position: absolute;
       font-size: 24px;
-      color: darken(@cs-primary, 10%);
+      color: darken(@placeholder-base-color, 10%);
 
       &:hover{
-
-        color: darken(@cs-primary, 16%);
+        color: darken(@placeholder-base-color, 16%);
       }
     }
     background-color: white;
