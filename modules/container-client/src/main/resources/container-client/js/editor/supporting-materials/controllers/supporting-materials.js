@@ -3,7 +3,18 @@ var controller = function ($scope, ItemService, $modal, Overlay, $state, $log) {
 
   var log = $log.debug.bind($log, '[supporting-materials] -');
 
+  var otherType = 'Other';
+
+  $scope.materialTypes = ['Rubric', 'Student Work', otherType];
+  $scope.materialType = $scope.materialTypes[0];
+
+  $scope.displayOther = isOther();
+  $scope.$watch('materialType', function() { $scope.displayOther = isOther(); });
+
   $scope.uploadType = null;
+
+  function isOther() { return $scope.materialType === otherType; }
+  function getType() { return isOther() ? $scope.textMaterialType : $scope.materialType; }
 
   $scope.createNew = function() {
 
@@ -30,55 +41,6 @@ var controller = function ($scope, ItemService, $modal, Overlay, $state, $log) {
     $('#overlay-holder').appendTo($('.supporting-materials'));
   };
 
-  $scope.confirm = function() {
-    var confirmationModal = $modal.open({
-      template: $('#save-supporting-material-modal').html(),
-      windowClass: 'save-supporting-material-window',
-      scope: $scope,
-      controller: ['$scope','$modalInstance', function($scope, $modalInstance) {
-
-        var otherType = 'Other';
-        function isOther() { return $scope.data.materialType === otherType; }
-        function getType() { return isOther() ? $scope.data.textMaterialType : $scope.data.materialType; }
-
-        $scope.materialTypes = ['Rubric', 'Student Work', otherType];
-        $scope.data = {
-          materialType: $scope.materialType ?
-            (($scope.materialTypes.indexOf($scope.materialType) > 0) ? $scope.materialType : otherType) :
-            $scope.materialTypes[0],
-          title: $scope.title,
-          textMaterialType: ($scope.materialTypes.indexOf($scope.materialType) > 0) ? '' : $scope.materialType
-        };
-        $scope.displayOther = isOther();
-
-        $scope.$watch('data.materialType', function() { $scope.displayOther = isOther(); });
-
-        $scope.ok = function() {
-          if ($scope.data.title !== undefined && $scope.data.title !== "") {
-            $modalInstance.close({ materialType: getType(), title: $scope.data.title });
-          } else {
-            window.alert("Please enter a title for the supporting material.");
-          }
-        };
-
-        $scope.cancel = function() {
-          $modalInstance.dismiss('cancel');
-        };
-
-        setTimeout(function() { $('#supporting-material-title').focus(); }, 200);
-      }],
-      resolve: {
-        materialType: function() { return $scope.materialType; },
-        title: function() { return $scope.title; }
-      }
-    });
-
-    confirmationModal.result.then(function(data) {
-      data.content = $scope.content;
-      $scope.create(data);
-    });
-  };
-
   $scope.onSaveSuccess = function(result) {
     $scope.data.item.supportingMaterials = result.supportingMaterials;
     $state.transitionTo('supporting-material', {index: result.supportingMaterials.length - 1});
@@ -96,16 +58,16 @@ var controller = function ($scope, ItemService, $modal, Overlay, $state, $log) {
     return $scope.uploadType === str;
   }
 
-  function createSupportingMaterial(data, callback) {
+  function createSupportingMaterial(callback) {
     function handleText() {
       callback({
-        name: data.title,
-        materialType: data.materialType,
+        name: $scope.title,
+        materialType: getType(),
         files: [
           {
             "name": "index.html",
             "contentType": "text/html",
-            "content": data.content,
+            "content": $scope.content,
             "isMain": true
           }
         ]
@@ -115,19 +77,19 @@ var controller = function ($scope, ItemService, $modal, Overlay, $state, $log) {
     function handleFile() {
       var reader = new FileReader();
       var file = $('.new-supporting-material input[type=file]')[0].files[0];
-      var url = data.title + '/' + file.name;
+      var url = $scope.title + '/' + file.name;
 
       var opts = {
         onUploadComplete: function(body, status) {
           log('done: ', body, status);
           callback({
-            name: data.title,
-            materialType: data.materialType,
+            name: $scope.title,
+            materialType: getType(),
             files: [
               {
                 "name": file.name,
                 "contentType": "application/pdf",
-                "storageKey": $scope.itemId + "/" + data.title + "/" + file.name,
+                "storageKey": $scope.itemId + "/" + $scope.title + "/" + file.name,
                 "isMain": true
               }
             ]
@@ -154,15 +116,21 @@ var controller = function ($scope, ItemService, $modal, Overlay, $state, $log) {
 
   $scope.create = function(data) {
     var supportingMaterials;
-    if ($scope.data.item) {
-      supportingMaterials = $scope.data.item.supportingMaterials || [];
-      createSupportingMaterial(data, function(newSupportingMaterial) {
-        supportingMaterials.push(newSupportingMaterial);
-        ItemService.save({ supportingMaterials: supportingMaterials }, $scope.onSaveSuccess, $scope.onSaveError,
-          $scope.itemId);
-      });
+    if (_.isEmpty(getType())) {
+      window.alert("Please select a type for the supporting material.");
+    } else if (_.isEmpty($scope.title)) {
+      window.alert("Please enter a title for the supporting material.");
     } else {
-      log.error("Need $scope.item initialized");
+      if ($scope.data.item) {
+        supportingMaterials = $scope.data.item.supportingMaterials || [];
+        createSupportingMaterial(function(newSupportingMaterial) {
+          supportingMaterials.push(newSupportingMaterial);
+          ItemService.save({ supportingMaterials: supportingMaterials }, $scope.onSaveSuccess, $scope.onSaveError,
+            $scope.itemId);
+        });
+      } else {
+        log.error("Need $scope.item initialized");
+      }
     }
   };
 

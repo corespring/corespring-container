@@ -8,18 +8,25 @@
       label(for='new-supporting-material-input') Create new
     p Begin typing below. After saving, you may also add images inline selecting the image icon from the toolbar.
 
+    div(ng-show="uploadType == 'text'")
+      include supporting-material-metadata
+
     wiggi-wiz(
     ng-show="uploadType == 'text'",
     ng-model="content",
     features="featuresWithoutImage")
       toolbar(basic="bold italic", formatting="h1 h2 p")
 
+
     .option
       input(type='radio', id='upload-pdf-supporting-material-input', ng-change='triggerUploadDialog()', ng-model='uploadType', value='file', name='option')
       label(for='upload-pdf-supporting-material-input') Upload PDF
     p Select a file from your computer to upload
 
+    div(ng-show="uploadType == 'file'")
+      include supporting-material-metadata
+
     .file-upload(ng-show="uploadType == 'file'")
       input(type='file')
 
-  button.save.btn.btn-success(ng-click='confirm()') Save
+  button.save.btn.btn-success(ng-click='create()') Save

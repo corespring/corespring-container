@@ -1,0 +1,13 @@
+.supporting-material-metadata
+
+  .field
+    label(for='supporting-material-title') Title
+    input#supporting-material-title(type='text', ng-model="title")
+
+  .field
+    label(for='supporting-material-type') Select Type
+    select(ng-model='materialType', ng-options="materialType for materialType in materialTypes")
+
+  .field.other(ng-show='displayOther')
+    label(for='supporting-material-type-text') Other
+    input#supporting-material-type-text(type='text', ng-model='textMaterialType')
