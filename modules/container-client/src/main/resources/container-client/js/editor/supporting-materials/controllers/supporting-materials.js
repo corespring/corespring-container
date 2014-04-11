@@ -15,8 +15,6 @@ var controller = function ($scope, ItemService, $modal, Overlay, $state, $log) {
 
   function isOther() { return $scope.materialType === otherType; }
   function getType() { return isOther() ? $scope.textMaterialType : $scope.materialType; }
-  function hasType() { return getType() && getType() !== ''; }
-  function hasTitle() { return $scope.title && $scope.title !== ''; }
 
   $scope.createNew = function() {
 
@@ -118,9 +116,9 @@ var controller = function ($scope, ItemService, $modal, Overlay, $state, $log) {
 
   $scope.create = function(data) {
     var supportingMaterials;
-    if (!hasType()) {
+    if (_.isEmpty(getType())) {
       window.alert("Please select a type for the supporting material.");
-    } else if (!hasTitle()) {
+    } else if (_.isEmpty($scope.title)) {
       window.alert("Please enter a title for the supporting material.");
     } else {
       if ($scope.data.item) {
