@@ -56,14 +56,12 @@ block content
 
       .main-content(ui-view="main")
 
-      button.btn.btn-xs.btn-info.preview-hang-right-btn(ng-click="togglePreview()", ng-show="showPreviewButton", ng-class="{'preview-active': showPreview(urlParams.hidePreview)}") Preview 
-
+      button.btn.btn-xs.btn-info.preview-hang-right-btn(ng-click="togglePreview()", ng-show="showPreviewButton", ng-class="{'preview-active': showPreview(urlParams.hidePreview)}") Preview
 
   include partials/designer
   include partials/item-profile
   include partials/supporting-materials
   include partials/supporting-material
-  include partials/view-player
   include partials/overview
 
   include partials/previews/designer
@@ -131,14 +129,6 @@ block scripts
                   },
                   preview: {
                     template: $('#designer-preview').html()
-                  }
-                }
-              })
-              .state('view-player', {
-                url: '/view-player',
-                views: {
-                  main: {
-                    template: $('#view-player').html()
                   }
                 }
               })
