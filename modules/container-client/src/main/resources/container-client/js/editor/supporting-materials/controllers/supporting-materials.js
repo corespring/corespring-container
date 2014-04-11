@@ -1,5 +1,13 @@
 var controller = function ($scope, ItemService, $modal, Overlay, $state, $log) {
 
+  var log = $log.debug.bind($log, '[supporting-materials] -');
+
+  $scope.uploadType = null;
+
+  $scope.$watch('uploadType', function() {
+    console.log($scope.uploadType);
+  });
+
   $scope.createNew = function() {
 
     $scope.featuresWithoutImage = [{
@@ -31,6 +39,7 @@ var controller = function ($scope, ItemService, $modal, Overlay, $state, $log) {
       windowClass: 'save-supporting-material-window',
       scope: $scope,
       controller: ['$scope','$modalInstance', function($scope, $modalInstance) {
+
         var otherType = 'Other';
         function isOther() { return $scope.data.materialType === otherType; }
         function getType() { return isOther() ? $scope.data.textMaterialType : $scope.data.materialType; }
@@ -82,11 +91,17 @@ var controller = function ($scope, ItemService, $modal, Overlay, $state, $log) {
     $log.error(result);
   };
 
-  $scope.create = function(data) {
-    var newSupportingMaterial, supportingMaterials;
-    if ($scope.data.item) {
-      supportingMaterials = $scope.data.item.supportingMaterials || [];
-      newSupportingMaterial = {
+  $scope.triggerUploadDialog = function() {
+    $('.new-supporting-material input[type=file]').trigger('click');
+  }
+
+  function uploadTypeIs(str) {
+    return $scope.uploadType === str;
+  }
+
+  function createSupportingMaterial(data, callback) {
+    function handleText() {
+      callback({
         name: data.title,
         materialType: data.materialType,
         files: [
@@ -97,12 +112,60 @@ var controller = function ($scope, ItemService, $modal, Overlay, $state, $log) {
             "isMain": true
           }
         ]
+      });
+    }
+
+    function handleFile() {
+      var reader = new FileReader();
+      var file = $('.new-supporting-material input[type=file]')[0].files[0];
+      var url = data.title + '/' + file.name;
+
+      var opts = {
+        onUploadComplete: function(body, status) {
+          log('done: ', body, status);
+          callback({
+            name: data.title,
+            materialType: data.materialType,
+            files: [
+              {
+                "name": file.name,
+                "contentType": "application/pdf",
+                "storageKey": $scope.itemId + "/" + data.title + "/" + file.name,
+                "isMain": true
+              }
+            ]
+          });
+        }
       };
-      supportingMaterials.push(newSupportingMaterial);
-      ItemService.save({ supportingMaterials: supportingMaterials }, $scope.onSaveSuccess, $scope.onSaveError,
-        $scope.itemId);
+
+      reader.onloadend = function() {
+        var uploader = new com.ee.RawFileUploader(file, reader.result, url, name, opts);
+        uploader.beginUpload();
+      };
+
+      reader.readAsBinaryString(file);
+    }
+
+    if (uploadTypeIs('text')) {
+      return handleText();
+    } else if (uploadTypeIs('file')) {
+      return handleFile();
     } else {
-      $log.error("Need $scope.item initialized");
+      log.error("Undefined upload type");
+    }
+  }
+
+  $scope.create = function(data) {
+    var supportingMaterials;
+    if ($scope.data.item) {
+      supportingMaterials = $scope.data.item.supportingMaterials || [];
+      createSupportingMaterial(data, function(newSupportingMaterial) {
+        supportingMaterials.push(newSupportingMaterial);
+        ItemService.save({ supportingMaterials: supportingMaterials }, $scope.onSaveSuccess, $scope.onSaveError,
+          $scope.itemId);
+      });
+    } else {
+      log.error("Need $scope.item initialized");
     }
   };
 
