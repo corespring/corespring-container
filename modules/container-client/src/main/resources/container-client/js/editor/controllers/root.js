@@ -30,7 +30,6 @@ var controller = function($scope, $rootScope, $log, $location, $timeout, DataQue
   function previewable() {
     var matchers = [
       /\/design/,
-      /\/item-profile/,
       $scope.supportingMaterialPreviewable
     ];
 
