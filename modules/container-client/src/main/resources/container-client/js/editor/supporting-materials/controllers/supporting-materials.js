@@ -4,10 +4,6 @@ var controller = function ($scope, ItemService, $modal, Overlay, $state, $log) {
 
   $scope.uploadType = null;
 
-  $scope.$watch('uploadType', function() {
-    console.log($scope.uploadType);
-  });
-
   $scope.createNew = function() {
 
     $scope.featuresWithoutImage = [{
