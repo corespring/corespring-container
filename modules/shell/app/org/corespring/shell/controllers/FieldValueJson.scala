@@ -7,7 +7,7 @@ object FieldValueJson {
   val jsonString =
     """
       |{
-      |    "version" : "0.0.1",
+      |    "version" : "0.0.2",
       |    "bloomsTaxonomy" : [
       |        {
       |            "key" : "Remembering",
@@ -32,6 +32,25 @@ object FieldValueJson {
       |        {
       |            "key" : "Creating",
       |            "value" : "Creating"
+      |        }
+      |    ],
+      |    ,
+      |    "depthOfKnowledge" : [
+      |        {
+      |            "key" : "1 Recall & Reproduction",
+      |            "value" : "1 Recall & Reproduction"
+      |        },
+      |        {
+      |            "key" : "2 Skills & Concepts",
+      |            "value" : "2 Skills & Concepts"
+      |        },
+      |        {
+      |            "key" : "3 Strategic Thinking/Reasoning",
+      |            "value" : "3 Strategic Thinking/Reasoning"
+      |        },
+      |        {
+      |            "key" : "4 Extended Thinking",
+      |            "value" : "4 Extended Thinking"
       |        }
       |    ],
       |    "demonstratedKnowledge" : [
