@@ -126,11 +126,15 @@ var controller = function($scope, $rootScope, $log, $location, $timeout, DataQue
 
   DataQueryService.list("itemType", function(result) {
     $scope.itemTypeDataProvider = result;
-    $scope.itemTypeValues = _.chain($scope.itemTypeDataProvider)
+    $scope.itemTypeValues = toListOfValues($scope.itemTypeDataProvider);
+  });
+
+  function toListOfValues(listOfObjects){
+    return _.chain(listOfObjects)
       .pluck("value")
       .flatten()
       .value();
-  });
+  }
 
   ItemService.load($scope.onItemLoaded, $scope.onItemLoadError, $scope.itemId);
 
