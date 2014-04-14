@@ -4,7 +4,7 @@ import org.corespring.container.client.actions.EditorActions
 import org.corespring.container.client.component.AllItemTypesReader
 import org.corespring.container.client.views.txt.js.EditorServices
 import play.api.Logger
-import play.api.libs.json.{ JsArray, Json, JsValue }
+import play.api.libs.json.{ JsString, JsArray, Json, JsValue }
 import play.api.mvc.AnyContent
 import scala.concurrent.{ Future, ExecutionContext }
 
@@ -22,6 +22,8 @@ trait Editor extends AllItemTypesReader with AppWithServices[EditorActions[AnyCo
         val tag = tagName(c.id.org, c.id.name)
         Json.obj(
           "name" -> c.id.name,
+          "title" -> JsString(c.title.getOrElse("")),
+          "titleGroup" -> JsString(c.titleGroup.getOrElse("")),
           "icon" -> s"$modulePath/icon/$tag",
           "componentType" -> tag,
           "defaultData" -> c.defaultData)

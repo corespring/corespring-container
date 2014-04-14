@@ -91,7 +91,7 @@ var controller = function(
     $scope.extraFeatures = [{
       name: 'external',
       type: 'dropdown',
-      dropdownTitle: 'Components',
+      dropdownTitle: 'Question Type',
       buttons: _.map(componentSet, componentToFeature)
     }];
   };

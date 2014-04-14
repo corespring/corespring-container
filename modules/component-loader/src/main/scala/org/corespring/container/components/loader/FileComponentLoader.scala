@@ -132,6 +132,8 @@ class FileComponentLoader(paths: Seq[String]) extends ComponentLoader {
       UiComponent(
         org,
         compRoot.getName,
+        (packageJson \ "title").asOpt[String],
+        (packageJson \ "titleGroup").asOpt[String],
         loadClient(clientFolder),
         loadServer(serverFolder),
         packageJson,
