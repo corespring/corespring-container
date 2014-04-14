@@ -27,7 +27,7 @@ form(style="padding-left: 10px;")
           textarea#title.form-control(
           ng-model='taskInfo.title',
           placeholder="Enter a title...",
-          rows='3')
+          rows='1')
 
     br/
 
@@ -154,10 +154,9 @@ form(style="padding-left: 10px;")
   .control-group
     label.control-label Depth Of Knowledge
       .controls
-        p.help-block Select the depth of knowledge that best represents the objective
-        label.radio(ng-repeat='dk in depthOfKnowledgeDataProvider')
-          input(type='radio', ng-model='taskInfo.depthOfKnowledge', value='{{dk}}')
-          | {{dk}}
+        select(ng-model='taskInfo.depthOfKnowledge', ng-options='c for c in depthOfKnowledgeDataProvider')
+          option(value='')
+        span.help-inline Select the depth of knowledge that best represents the objective
 
 
   h2 Copyright Information
@@ -171,7 +170,7 @@ form(style="padding-left: 10px;")
         .controls
           input#author.form-control(
           ng-model='taskInfo.author',
-          placeholder="Enter a author...")
+          placeholder="Enter author's name...")
 
     br/
 
@@ -184,7 +183,7 @@ form(style="padding-left: 10px;")
     br/
 
     .control-group
-      label.control-label(for="title") * Source Url
+      label.control-label(for="title") Source Url
         .controls
           input#author.form-control(
           ng-model='taskInfo.sourceUrl',
@@ -204,18 +203,16 @@ form(style="padding-left: 10px;")
     .control-group
       label.control-label(for="copyright-year") * Copyright Year
         .controls
-          input#copyright-year.form-control(
-          ng-model='taskInfo.copyrightYear',
-          placeholder="Enter the copyright year...")
+          select(ng-model='taskInfo.copyrightYear', ng-options='c for c in copyrightYearDataProvider')
+            option(value='')
 
     br/
 
     .control-group
-      label.control-label(for="copyright-expiration-date") * Copyright Expiration Date
+      label.control-label(for="copyright-expiration-date") Copyright Expiration Date
         .controls
-          input#copyright-expiration-date.form-control(
-          ng-model='taskInfo.copyrightExpirationDate',
-          placeholder="Enter the copyright expiration date...")
+          select(ng-model='taskInfo.copyrightExpirationYear', ng-options='c for c in copyrightExpirationYearDataProvider')
+            option(value='')
 
   br/
 
@@ -251,6 +248,7 @@ form(style="padding-left: 10px;")
         | No
 
   .additional-copyright-information(ng-repeat='item in taskInfo.additionalCopyright')
+
     .control-group
       label.control-label(for="owner") Owner
         .controls
@@ -287,9 +285,9 @@ form(style="padding-left: 10px;")
           ng-model='item.url',
           placeholder="Enter a url...")
 
-    a(ng-click='addCopyrightItem()')
-      i(class="fa fa-{{!!expandKeySkills ? 'minus' : 'plus'}}-square-o", style="margin-left: 6px; margin-right: 6px;")
-      span Add more
+  a(ng-click='addCopyrightItem()')
+    i(class="fa fa-{{!!expandKeySkills ? 'minus' : 'plus'}}-square-o", style="margin-left: 6px; margin-right: 6px;")
+    span Add more
 
   br/
 
