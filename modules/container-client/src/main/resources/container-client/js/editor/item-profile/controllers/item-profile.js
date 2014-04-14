@@ -11,6 +11,8 @@
 
   function controller($log, $scope, DataQueryService, ItemService) {
 
+    var isFormActive = false;
+
     function findSubject(topic, id, callback) {
       var local = _.find($scope.queryResults[topic], function (r) {
         return r.id === id;
@@ -25,8 +27,6 @@
     }
 
     $scope.queryResults = {};
-
-    $scope.hasAdditionalCopyrightInformation = "no";
 
     /**
      * Standards is a tree of objects that we allow the user
@@ -54,19 +54,6 @@
       subjectOption: {},
       categoryOption: {},
       subCategoryOption: {}
-    };
-
-    $scope.$on('save-data', function () {
-      $scope.save();
-    });
-
-    $scope.save = function () {
-      ItemService.save({
-        profile: $scope.item.profile
-      }, function (savedProfile) {
-        $scope.item.profile = savedProfile;
-        $scope.saveInProgress = false;
-      });
     };
 
     function subjectText(s) {
@@ -115,8 +102,10 @@
     $scope.primarySubjectAsync = new Async("primarySubject", subjectText);
 
     $scope.$watch("otherItemType", function (n) {
-      if (n && n !== "") {
-        $scope.taskInfo.itemType = $scope.otherItemType;
+      if (isFormActive) {
+        if (n && n !== "") {
+          $scope.taskInfo.itemType = $scope.otherItemType;
+        }
       }
     }, true);
 
@@ -139,46 +128,46 @@
       }
     }
 
-    function toListOfValues(listOfObjects){
+    function toListOfValues(listOfObjects) {
       return _.chain(listOfObjects)
         .pluck("value")
         .flatten()
         .value();
     }
 
-    DataQueryService.list("bloomsTaxonomy", function(result) {
+    DataQueryService.list("bloomsTaxonomy", function (result) {
       $scope.bloomsTaxonomyDataProvider = toListOfValues(result);
     });
 
-    DataQueryService.list("credentials", function(result) {
+    DataQueryService.list("credentials", function (result) {
       $scope.credentialsDataProvider = toListOfValues(result);
     });
 
-    DataQueryService.list("depthOfKnowledge", function(result) {
+    DataQueryService.list("depthOfKnowledge", function (result) {
       $scope.depthOfKnowledgeDataProvider = toListOfValues(result);
     });
 
-    DataQueryService.list("keySkills", function(result) {
+    DataQueryService.list("keySkills", function (result) {
       $scope.keySkillsDataProvider = _.map(result, function (k) {
         return {header: k.key, list: k.value};
       });
     });
 
-    DataQueryService.list("licenseTypes", function(result) {
+    DataQueryService.list("licenseTypes", function (result) {
       $scope.licenseTypeDataProvider = toListOfValues(result);
     });
 
-    DataQueryService.list("priorUses", function(result) {
+    DataQueryService.list("priorUses", function (result) {
       $scope.priorUseDataProvider = toListOfValues(result);
     });
 
-    DataQueryService.list("reviewsPassed", function(result) {
+    DataQueryService.list("reviewsPassed", function (result) {
       $scope.reviewsPassedDataProvider = result;
     });
 
     $scope.getLicenseTypeUrl = function (licenseType) {
       return licenseType ? "/assets/images/licenseTypes/" + licenseType.replace(" ", "-") + ".png" : undefined;
-    }
+    };
 
     $scope.getKeySkillsSummary = function (keySkills) {
       var count = "No";
@@ -197,51 +186,99 @@
       return count + " Key " + skills + " selected";
     };
 
+    $scope.$watch("taskInfo.itemType", function (newValue) {
+      if (isFormActive) {
+        updateOtherItemType();
+      }
+    }, true);
+
+    $scope.addCopyrightItem = function () {
+      $scope.taskInfo.additionalCopyright.push({});
+    };
+
+    $scope.removeCopyrightItem = function () {
+      $scope.taskInfo.additionalCopyright.pop();
+    };
+
+    $scope.clearCopyrightItems = function () {
+      $scope.taskInfo.additionalCopyright.splice(0);
+    };
+
+    $scope.needAdditionalCopyrightInformation = 'init';
+
+    $scope.$watch("needAdditionalCopyrightInformation", function (newValue, oldValue) {
+      if (isFormActive) {
+        $log.debug("needAdditionalCopyrightInformation new: <" + newValue + "> old: <" + oldValue + ">");
+        if (oldValue === 'init') {
+          return;
+        }
+        if (newValue === oldValue) {
+          return;
+        }
+        if (newValue === 'yes') {
+          $scope.addCopyrightItem();
+        } else {
+          $scope.clearCopyrightItems(); //TODO Add "are you sure" modal
+        }
+      }
+    });
+
+    $scope.$on('save-data', function () {
+      $scope.save();
+    });
 
     $scope.save = function () {
       ItemService.save({
           profile: $scope.data.item.profile
         },
-        $scope.onSaveSuccess,
-        $scope.onSaveError,
+        onSaveSuccess,
+        onSaveError,
         $scope.itemId);
       $scope.data.saveInProgress = true;
     };
 
-    $scope.onSaveSuccess = function (updated) {
+    function onSaveSuccess (updated) {
       $log.debug("profile saved");
       $scope.data.saveInProgress = false;
-    };
+    }
 
-    $scope.onSaveError = function (err) {
+    function onSaveError (err) {
       $log.debug("error saving profile", err);
       $scope.data.saveError = err;
-    };
+      $scope.data.saveInProgress = false;
+    }
 
-    $scope.$watch("taskInfo.itemType", function (newValue) {
-      updateOtherItemType();
-    }, true);
+    function loadItem(itemId){
+      isFormActive = false;
+      ItemService.load( onLoadItemSuccess, onLoadItemError, itemId);
+    }
+
+    function onLoadItemSuccess (item) {
+      $scope.data.item = item;
+      $scope.taskInfo = $scope.data.item.profile.taskInfo;
+      $log.debug("task info: ", $scope.taskInfo);
+      if (!$scope.taskInfo.keySkills) {
+        $scope.taskInfo.keySkills = [];
+      }
+      if (!$scope.taskInfo.reviewsPassed) {
+        $scope.taskInfo.reviewsPassed = [];
+      }
+      if (!_.isArray($scope.taskInfo.additionalCopyright)) {
+        $scope.taskInfo.additionalCopyright = [];
+      }
+      $scope.needAdditionalCopyrightInformation =
+          $scope.taskInfo.additionalCopyright.length > 0 ? 'yes' : '';
+
+      isFormActive = true;
+    }
+
+    function onLoadItemError(err) {
+      $log.warn('Error loading profile', err);
+    }
 
     //TODO: We are loading the data at root and here
     //Should we only load data at root?
-    ItemService.load(function (item) {
-        $scope.data.item = item;
-        $scope.taskInfo = $scope.data.item.profile.taskInfo;
-        $log.debug("task info: ", $scope.taskInfo);
-        if(!$scope.taskInfo.keySkills){
-          $scope.taskInfo.keySkills = [];
-        }
-        if(!$scope.taskInfo.reviewsPassed){
-          $scope.taskInfo.reviewsPassed = [];
-        }
-        if(!$scope.taskInfo.additionalCopyright){
-          $scope.taskInfo.additionalCopyright = {};
-        }
-      },
-      function error(err) {
-        $log.warn('Error loading profile', err);
-      },
-      $scope.itemId);
+    loadItem($scope.itemId);
 
   }
 

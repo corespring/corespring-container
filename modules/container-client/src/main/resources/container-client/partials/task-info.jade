@@ -9,48 +9,49 @@ form(style="padding-left: 10px;")
   br/
   br/
 
-  .control-group
-    label.control-label(for="description") * Description
-      .controls
-        textarea#description.form-control(
-        ng-model='taskInfo.description',
-        placeholder="Enter a description...",
-        rows='3')
-        p Describe the activitiy that the student will perform (e.g. Multiply single digit numbers, select evidence in reading passage)
+  .item-information
+    .control-group
+      label.control-label(for="description") * Description
+        .controls
+          textarea#description.form-control(
+          ng-model='taskInfo.description',
+          placeholder="Enter a description...",
+          rows='3')
+          p Describe the activitiy that the student will perform (e.g. Multiply single digit numbers, select evidence in reading passage)
 
-  br/
+    br/
 
-  .control-group
-    label.control-label(for="title") Title
-      .controls
-        textarea#title.form-control(
-        ng-model='taskInfo.title',
-        placeholder="Enter a title...",
-        rows='3')
+    .control-group
+      label.control-label(for="title") Title
+        .controls
+          textarea#title.form-control(
+          ng-model='taskInfo.title',
+          placeholder="Enter a title...",
+          rows='3')
 
-  br/
+    br/
 
-  .control-group
-    .row
-      .col-xs-6
-        .form-group
-          label(for="primarySubject") * Primary Subject
-          br/
-          input#primarySubject(
-          style="width:300px",
-          ng-model="taskInfo.primarySubject",
-          type="text",
-          ui-select2="primarySubjectAsync",
-          data-placeholder="Choose a subject...")
-      .col-xs-6
-        .form-group
-          label(for="relatedSubject") Related Subject
-          br/
-          input#relatedSubject(
-          style="width:300px",
-          ng-model="taskInfo.relatedSubject",
-          ui-select2="relatedSubjectAsync",
-          data-placeholder="Choose a subject...")
+    .control-group
+      .row
+        .col-xs-6
+          .form-group
+            label(for="primarySubject") * Primary Subject
+            br/
+            input#primarySubject(
+            style="width:300px",
+            ng-model="taskInfo.primarySubject",
+            type="text",
+            ui-select2="primarySubjectAsync",
+            data-placeholder="Choose a subject...")
+        .col-xs-6
+          .form-group
+            label(for="relatedSubject") Related Subject
+            br/
+            input#relatedSubject(
+            style="width:300px",
+            ng-model="taskInfo.relatedSubject",
+            ui-select2="relatedSubjectAsync",
+            data-placeholder="Choose a subject...")
 
   br/
   br/
@@ -163,56 +164,58 @@ form(style="padding-left: 10px;")
 
   br/
 
-  .control-group
-    label.control-label(for="title") * Author
-      .controls
-        input#author.form-control(
-        ng-model='taskInfo.author',
-        placeholder="Enter a author...")
+  .copyright-information
 
-  br/
+    .control-group
+      label.control-label(for="title") * Author
+        .controls
+          input#author.form-control(
+          ng-model='taskInfo.author',
+          placeholder="Enter a author...")
 
-  .control-group
-    label.control-label Credentials
-      .controls
-        select(ng-model='taskInfo.credentials', ng-options='c for c in credentialsDataProvider')
-          option(value='')
+    br/
 
-  br/
+    .control-group
+      label.control-label Credentials
+        .controls
+          select(ng-model='taskInfo.credentials', ng-options='c for c in credentialsDataProvider')
+            option(value='')
 
-  .control-group
-    label.control-label(for="title") * Source Url
-      .controls
-        input#author.form-control(
-        ng-model='taskInfo.sourceUrl',
-        placeholder="Enter a source url...")
+    br/
 
-  br/
+    .control-group
+      label.control-label(for="title") * Source Url
+        .controls
+          input#author.form-control(
+          ng-model='taskInfo.sourceUrl',
+          placeholder="Enter a source url...")
 
-  .control-group
-    label.control-label(for="copyright-owner") * Copyright Owner
-      .controls
-        input#copyright-owner.form-control(
-        ng-model='taskInfo.copyrightOwner',
-        placeholder="Enter the copyright owner...")
+    br/
 
-  br/
+    .control-group
+      label.control-label(for="copyright-owner") * Copyright Owner
+        .controls
+          input#copyright-owner.form-control(
+          ng-model='taskInfo.copyrightOwner',
+          placeholder="Enter the copyright owner...")
 
-  .control-group
-    label.control-label(for="copyright-year") * Copyright Year
-      .controls
-        input#copyright-year.form-control(
-        ng-model='taskInfo.copyrightYear',
-        placeholder="Enter the copyright year...")
+    br/
 
-  br/
+    .control-group
+      label.control-label(for="copyright-year") * Copyright Year
+        .controls
+          input#copyright-year.form-control(
+          ng-model='taskInfo.copyrightYear',
+          placeholder="Enter the copyright year...")
 
-  .control-group
-    label.control-label(for="copyright-expiration-date") * Copyright Expiration Date
-      .controls
-        input#copyright-expiration-date.form-control(
-        ng-model='taskInfo.copyrightExpirationDate',
-        placeholder="Enter the copyright expiration date...")
+    br/
+
+    .control-group
+      label.control-label(for="copyright-expiration-date") * Copyright Expiration Date
+        .controls
+          input#copyright-expiration-date.form-control(
+          ng-model='taskInfo.copyrightExpirationDate',
+          placeholder="Enter the copyright expiration date...")
 
   br/
 
@@ -239,50 +242,54 @@ form(style="padding-left: 10px;")
   .control-group
     .controls
       label
-        input(type='radio', ng-model='hasAdditionalCopyrightInformation', value='yes', style='margin-right: 5px;')
+        input(type='radio', ng-model='needAdditionalCopyrightInformation', value='yes', style='margin-right: 5px;')
         | Yes
-        span(style="padding-left:10px") If yes, please complete the following
+        span.help-inline(style="padding-left:10px") If yes, please complete the following
 
       label
-        input(type='radio', ng-model='hasAdditionalCopyrightInformation', value='', style='margin-right: 5px; margin-left: 20px;')
+        input(type='radio', ng-model='needAdditionalCopyrightInformation', value='', style='margin-right: 5px; margin-left: 20px;')
         | No
 
-  .additionalCopyrightInformation(ng-show='hasAdditionalCopyrightInformation')
+  .additional-copyright-information(ng-repeat='item in taskInfo.additionalCopyright')
     .control-group
       label.control-label(for="owner") Owner
         .controls
           input#owner.form-control(
-          ng-model='taskInfo.additionalCopyright.owner',
+          ng-model='item.owner',
           placeholder="Enter a owner...")
     .control-group
       label.control-label(for="author") Author
         .controls
           input#author.form-control(
-          ng-model='taskInfo.additionalCopyright.author',
+          ng-model='item.author',
           placeholder="Enter a author...")
     .control-group
       label.control-label(for="publisher") Publisher
         .controls
           input#publisher.form-control(
-          ng-model='taskInfo.additionalCopyright.publisher',
+          ng-model='item.publisher',
           placeholder="Enter a publisher...")
     .control-group
       label.control-label(for="year") Year
         .controls
           input#year.form-control(
-          ng-model='taskInfo.additionalCopyright.year',
+          ng-model='item.year',
           placeholder="Enter a year...")
     .control-group
       label.control-label(for="license") License
         .controls
-          select(ng-model='taskInfo.additionalCopyright.licenseType', ng-options='c for c in licenseTypeDataProvider')
+          select(ng-model='item.licenseType', ng-options='c for c in licenseTypeDataProvider', style="width: 100%;")
             option(value='')
     .control-group
       label.control-label(for="url") URL
         .controls
           input#url.form-control(
-          ng-model='taskInfo.additionalCopyright.url',
+          ng-model='item.url',
           placeholder="Enter a url...")
+
+    a(ng-click='addCopyrightItem()')
+      i(class="fa fa-{{!!expandKeySkills ? 'minus' : 'plus'}}-square-o", style="margin-left: 6px; margin-right: 6px;")
+      span Add more
 
   br/
 
