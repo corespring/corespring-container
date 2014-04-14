@@ -1,6 +1,11 @@
 (function() {
 
   var ComponentToWiggiwizFeatureAdapter = function($log) {
+
+    function getTitle(component) {
+      return _.isEmpty(component.title) ? component.name : component.title;
+    }
+
     var service = {};
     service.componentToWiggiwizFeature = function(component, addToEditorCallback, deleteComponentCallback) {
       var componentType = component.componentType;
@@ -24,8 +29,13 @@
         },
         onDblClick: function($node, $scope, editor) {
           var data = {};
-          var content = '<' + componentType + '-config id="' + $node.attr('id') + '"></' + componentType + '-config>';
-          editor.showEditPane(data, 'Edit ' + component.name + ' (' + $node.attr('id') + ')', content, function() {
+          var content = [
+            '<div class="navigator-toggle-button-row">',
+            '  <div class="navigator-title">' + getTitle(component) + '</div>',
+            '</div>',
+            '<' + componentType + '-config id="' + $node.attr('id') + '"></' + componentType + '-config>'
+          ].join('\n');
+          editor.showEditPane(data, getTitle(component), content, function() {
             $log.debug('on update...');
           }, {});
         },
