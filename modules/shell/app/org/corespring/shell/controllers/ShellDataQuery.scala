@@ -59,9 +59,23 @@ class ShellDataQuery extends ContainerDataQuery {
       |]
     """.stripMargin
 
-  lazy val itemTypes = fieldValueJson \ "itemTypes"
+  lazy val bloomsTaxonomy: Seq[JsValue] = (fieldValueJson \ "bloomsTaxonomy").as[Seq[JsValue]]
+
+  lazy val credentials: Seq[JsValue] = (fieldValueJson \ "credentials").as[Seq[JsValue]]
+
+  lazy val depthOfKnowledge: Seq[JsValue] = (fieldValueJson \ "depthOfKnowledge").as[Seq[JsValue]]
 
   lazy val gradeLevels: Seq[JsValue] = (fieldValueJson \ "gradeLevels").as[Seq[JsValue]]
+
+  lazy val itemTypes = fieldValueJson \ "itemTypes"
+
+  lazy val keySkills: Seq[JsValue] = (fieldValueJson \ "keySkills").as[Seq[JsValue]]
+
+  lazy val licenseTypes: Seq[JsValue] = (fieldValueJson \ "licenseTypes").as[Seq[JsValue]]
+
+  lazy val priorUses: Seq[JsValue] = (fieldValueJson \ "priorUses").as[Seq[JsValue]]
+
+  lazy val reviewsPassed: Seq[JsValue] = (fieldValueJson \ "reviewsPassed").as[Seq[JsValue]]
 
   lazy val subjects = Json.parse(subjectString).as[Seq[JsObject]]
 
@@ -69,10 +83,17 @@ class ShellDataQuery extends ContainerDataQuery {
 
     def filter(s: JsObject) = query.map { q => (s \ "subject").asOpt[String].map(s => s.contains(q)).getOrElse(true) }.getOrElse(true)
     val out = topic match {
-      case "primarySubject" => Json.toJson(subjects.filter(filter))
-      case "relatedSubject" => Json.toJson(subjects.filter(filter))
+      case "bloomsTaxonomy" => Json.toJson(bloomsTaxonomy)
+      case "credentials" => Json.toJson(credentials)
+      case "depthOfKnowledge" => Json.toJson(depthOfKnowledge)
       case "gradeLevel" => Json.toJson(gradeLevels)
       case "itemType" => itemTypes
+      case "keySkills" => Json.toJson(keySkills)
+      case "licenseTypes" => Json.toJson(licenseTypes)
+      case "primarySubject" => Json.toJson(subjects.filter(filter))
+      case "priorUses" => Json.toJson(priorUses)
+      case "relatedSubject" => Json.toJson(subjects.filter(filter))
+      case "reviewsPassed" => Json.toJson(reviewsPassed)
     }
     Ok(out)
   }

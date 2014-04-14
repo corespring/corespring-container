@@ -1,432 +1,447 @@
 package org.corespring.shell.controllers
 
-import play.api.libs.json.{ Json, JsValue }
+import play.api.libs.json.{Json,JsValue}
 
 object FieldValueJson {
 
-  val jsonString =
-    """
-      |{
-      |    "version" : "0.0.1",
-      |    "bloomsTaxonomy" : [
-      |        {
-      |            "key" : "Remembering",
-      |            "value" : "Remembering"
-      |        },
-      |        {
-      |            "key" : "Understanding",
-      |            "value" : "Understanding"
-      |        },
-      |        {
-      |            "key" : "Applying",
-      |            "value" : "Applying"
-      |        },
-      |        {
-      |            "key" : "Analyzing",
-      |            "value" : "Analyzing"
-      |        },
-      |        {
-      |            "key" : "Evaluating",
-      |            "value" : "Evaluating"
-      |        },
-      |        {
-      |            "key" : "Creating",
-      |            "value" : "Creating"
-      |        }
-      |    ],
-      |    "demonstratedKnowledge" : [
-      |        {
-      |            "key" : "Factual",
-      |            "value" : "Factual"
-      |        },
-      |        {
-      |            "key" : "Conceptual",
-      |            "value" : "Conceptual"
-      |        },
-      |        {
-      |            "key" : "Procedural",
-      |            "value" : "Procedural"
-      |        },
-      |        {
-      |            "key" : "Metacognitive",
-      |            "value" : "Metacognitive"
-      |        }
-      |    ],
-      |    "priorUses" : [
-      |        {
-      |            "key" : "Formative",
-      |            "value" : "Formative"
-      |        },
-      |        {
-      |            "key" : "Interim",
-      |            "value" : "Interim"
-      |        },
-      |        {
-      |            "key" : "Benchmark",
-      |            "value" : "Benchmark"
-      |        },
-      |        {
-      |            "key" : "Summative",
-      |            "value" : "Summative"
-      |        },
-      |        {
-      |            "key" : "Other",
-      |            "value" : "Other"
-      |        },
-      |        {
-      |            "key" : "International Benchmark",
-      |            "value" : "International Benchmark"
-      |        }
-      |    ],
-      |    "credentials" : [
-      |        {
-      |            "key" : "Assessment Developer",
-      |            "value" : "Assessment Developer"
-      |        },
-      |        {
-      |            "key" : "Test Item Writer",
-      |            "value" : "Test Item Writer"
-      |        },
-      |        {
-      |            "key" : "State Department of Education",
-      |            "value" : "State Department of Education"
-      |        },
-      |        {
-      |            "key" : "District Item Writer",
-      |            "value" : "District Item Writer"
-      |        },
-      |        {
-      |            "key" : "Teacher",
-      |            "value" : "Teacher"
-      |        },
-      |        {
-      |            "key" : "Student",
-      |            "value" : "Student"
-      |        },
-      |        {
-      |            "key" : "School Network",
-      |            "value" : "School Network"
-      |        },
-      |        {
-      |            "key" : "CMO",
-      |            "value" : "CMO"
-      |        },
-      |        {
-      |            "key" : "Other",
-      |            "value" : "Other"
-      |        }
-      |    ],
-      |    "licenseTypes" : [
-      |        {
-      |            "key" : "CC BY",
-      |            "value" : "CC BY"
-      |        },
-      |        {
-      |            "key" : "CC BY-SA",
-      |            "value" : "CC BY-SA"
-      |        },
-      |        {
-      |            "key" : "CC BY-NC",
-      |            "value" : "CC BY-NC"
-      |        },
-      |        {
-      |            "key" : "CC BY-ND",
-      |            "value" : "CC BY-ND"
-      |        },
-      |        {
-      |            "key" : "CC BY-NC-SA",
-      |            "value" : "CC BY-NC-SA"
-      |        }
-      |    ],
-      |    "itemTypes" : [
-      |        {
-      |            "key" : "Fixed Choice",
-      |            "value" : [
-      |                "Multiple Choice",
-      |                "Multi-Multi Choice",
-      |                "Visual Multi Choice",
-      |                "Inline Choice",
-      |                "Ordering",
-      |                "Drag & Drop"
-      |            ]
-      |        },
-      |        {
-      |            "key" : "Constructed Response",
-      |            "value" : [
-      |                "Constructed Response - Short Answer",
-      |                "Constructed Response - Open Ended"
-      |            ]
-      |        },
-      |        {
-      |            "key" : "Evidence",
-      |            "value" : [
-      |                "Select Evidence in Text",
-      |                "Document Based Question",
-      |                "Passage With Questions"
-      |            ]
-      |        },
-      |        {
-      |            "key" : "Composite",
-      |            "value" : [
-      |                "Composite - Multiple MC",
-      |                "Composite - MC and SA",
-      |                "Composite - MC, SA, OE",
-      |                "Composite - Project",
-      |                "Composite - Performance",
-      |                "Composite - Activity",
-      |                "Composite - Algebra"
-      |            ]
-      |        },
-      |        {
-      |            "key" : "Algebra",
-      |            "value" : [
-      |                "Plot Lines",
-      |                "Plot Points",
-      |                "Evaluate an Equation"
-      |            ]
-      |        }
-      |    ],
-      |    "gradeLevels" : [
-      |        {
-      |            "key" : "PK",
-      |            "value" : "Prekindergarten"
-      |        },
-      |        {
-      |            "key" : "KG",
-      |            "value" : "Kindergarten"
-      |        },
-      |        {
-      |            "key" : "01",
-      |            "value" : "First grade"
-      |        },
-      |        {
-      |            "key" : "02",
-      |            "value" : "Second grade"
-      |        },
-      |        {
-      |            "key" : "03",
-      |            "value" : "Third grade"
-      |        },
-      |        {
-      |            "key" : "04",
-      |            "value" : "Fourth grade"
-      |        },
-      |        {
-      |            "key" : "05",
-      |            "value" : "Fifth grade"
-      |        },
-      |        {
-      |            "key" : "06",
-      |            "value" : "Sixth grade"
-      |        },
-      |        {
-      |            "key" : "07",
-      |            "value" : "Seventh grade"
-      |        },
-      |        {
-      |            "key" : "08",
-      |            "value" : "Eighth grade"
-      |        },
-      |        {
-      |            "key" : "09",
-      |            "value" : "Ninth grade"
-      |        },
-      |        {
-      |            "key" : "10",
-      |            "value" : "Tenth grade"
-      |        },
-      |        {
-      |            "key" : "11",
-      |            "value" : "Eleventh grade"
-      |        },
-      |        {
-      |            "key" : "12",
-      |            "value" : "Twelfth grade"
-      |        },
-      |        {
-      |            "key" : "13",
-      |            "value" : "Grade 13"
-      |        },
-      |        {
-      |            "key" : "PS",
-      |            "value" : "Postsecondary"
-      |        },
-      |        {
-      |            "key" : "AP",
-      |            "value" : "Advanced Placement"
-      |        },
-      |        {
-      |            "key" : "UG",
-      |            "value" : "Ungraded"
-      |        }
-      |    ],
-      |    "reviewsPassed" : [
-      |        {
-      |            "key" : "Editorial",
-      |            "value" : "Editorial"
-      |        },
-      |        {
-      |            "key" : "Bias",
-      |            "value" : "Bias"
-      |        },
-      |        {
-      |            "key" : "Fairness",
-      |            "value" : "Fairness"
-      |        },
-      |        {
-      |            "key" : "Content",
-      |            "value" : "Content"
-      |        },
-      |        {
-      |            "key" : "Psychometric",
-      |            "value" : "Psychometric"
-      |        },
-      |        {
-      |            "key" : "All",
-      |            "value" : "All"
-      |        },
-      |        {
-      |            "key" : "None",
-      |            "value" : "None"
-      |        },
-      |        {
-      |            "key" : "Other",
-      |            "value" : "Other"
-      |        }
-      |    ],
-      |    "keySkills" : [
-      |        {
-      |            "key" : "Knowledge",
-      |            "value" : [
-      |                "Arrange",
-      |                "Define",
-      |                "Describe",
-      |                "Duplicate",
-      |                "Identify",
-      |                "Label",
-      |                "List",
-      |                "Match",
-      |                "Memorize",
-      |                "Name",
-      |                "Order",
-      |                "Outline",
-      |                "Recall",
-      |                "Recognize",
-      |                "Relate",
-      |                "Repeat",
-      |                "Reproduce",
-      |                "Select",
-      |                "State"
-      |            ]
-      |        },
-      |        {
-      |            "key" : "Understand",
-      |            "value" : [
-      |                "Classify",
-      |                "Convert",
-      |                "Defend",
-      |                "Discuss",
-      |                "Distinguish",
-      |                "Estimate",
-      |                "Example(s)",
-      |                "Explain",
-      |                "Express",
-      |                "Extend",
-      |                "Generalize",
-      |                "Give",
-      |                "Indicate",
-      |                "Infer",
-      |                "Locate",
-      |                "Paraphrase",
-      |                "Predict",
-      |                "Review",
-      |                "Rewrite",
-      |                "Summarize",
-      |                "Translate",
-      |                "Understand"
-      |            ]
-      |        },
-      |        {
-      |            "key" : "Apply",
-      |            "value" : [
-      |                "Apply",
-      |                "Change",
-      |                "Choose",
-      |                "Compute",
-      |                "Demonstrate",
-      |                "Discover",
-      |                "Dramatize",
-      |                "Employ",
-      |                "Illustrate",
-      |                "Interpret",
-      |                "Manipulate",
-      |                "Modify",
-      |                "Operate",
-      |                "Practice",
-      |                "Prepare",
-      |                "Produce",
-      |                "Schedule",
-      |                "Show",
-      |                "Sketch",
-      |                "Solve",
-      |                "Use",
-      |                "Write"
-      |            ]
-      |        },
-      |        {
-      |            "key" : "Analyze",
-      |            "value" : [
-      |                "Analyze",
-      |                "Appraise",
-      |                "Breakdown",
-      |                "Calculate",
-      |                "Categorize",
-      |                "Compare",
-      |                "Contrast",
-      |                "Criticize",
-      |                "Diagram",
-      |                "Differentiate",
-      |                "Discriminate",
-      |                "Examine",
-      |                "Experiment",
-      |                "Infer",
-      |                "Model",
-      |                "Point-Out",
-      |                "Question",
-      |                "Separate",
-      |                "Test"
-      |            ]
-      |        },
-      |        {
-      |            "key" : "Evaluate",
-      |            "value" : [
-      |                "Assemble",
-      |                "Collect",
-      |                "Combine",
-      |                "Comply",
-      |                "Devise",
-      |                "Evaluate",
-      |                "Explain",
-      |                "Formulate",
-      |                "Generate",
-      |                "Plan",
-      |                "Rearrange"
-      |            ]
-      |        },
-      |        {
-      |            "key" : "Create",
-      |            "value" : [
-      |                "Create",
-      |                "Compose",
-      |                "Construct",
-      |                "Create",
-      |                "Design",
-      |                "Develop"
-      |            ]
-      |        }
-      |    ]
-      |}
-    """.stripMargin
+  val fieldValues = Json.obj(
+    "version" -> "0.0.2",
+    "bloomsTaxonomy" -> Json.arr(
+      Json.obj(
+        "key" -> "Remembering",
+        "value" -> "Remembering"
+      ),
+      Json.obj(
+        "key" -> "Understanding",
+        "value" -> "Understanding"
+      ),
+      Json.obj(
+        "key" -> "Applying",
+        "value" -> "Applying"
+      ),
+      Json.obj(
+        "key" -> "Analyzing",
+        "value" -> "Analyzing"
+      ),
+      Json.obj(
+        "key" -> "Evaluating",
+        "value" -> "Evaluating"
+      ),
+      Json.obj(
+        "key" -> "Creating",
+        "value" -> "Creating"
+      )
+    ),
+    "depthOfKnowledge" -> Json.arr(
+      Json.obj(
+        "key" -> "1 Recall & Reproduction",
+        "value" -> "1 Recall & Reproduction"
+      ),
+      Json.obj(
+        "key" -> "2 Skills & Concepts",
+        "value" -> "2 Skills & Concepts"
+      ),
+      Json.obj(
+        "key" -> "3 Strategic Thinking/Reasoning",
+        "value" -> "3 Strategic Thinking/Reasoning"
+      ),
+      Json.obj(
+        "key" -> "4 Extended Thinking",
+        "value" -> "4 Extended Thinking"
+      )
+    ),
+    "demonstratedKnowledge" -> Json.arr(
+      Json.obj(
+        "key" -> "Factual",
+        "value" -> "Factual"
+      ),
+      Json.obj(
+        "key" -> "Conceptual",
+        "value" -> "Conceptual"
+      ),
+      Json.obj(
+        "key" -> "Procedural",
+        "value" -> "Procedural"
+      ),
+      Json.obj(
+        "key" -> "Metacognitive",
+        "value" -> "Metacognitive"
+      )
+    ),
+    "priorUses" -> Json.arr(
+      Json.obj(
+        "key" -> "Formative",
+        "value" -> "Formative"
+      ),
+      Json.obj(
+        "key" -> "Interim",
+        "value" -> "Interim"
+      ),
+      Json.obj(
+        "key" -> "Benchmark",
+        "value" -> "Benchmark"
+      ),
+      Json.obj(
+        "key" -> "Summative",
+        "value" -> "Summative"
+      ),
+      Json.obj(
+        "key" -> "Other",
+        "value" -> "Other"
+      ),
+      Json.obj(
+        "key" -> "International Benchmark",
+        "value" -> "International Benchmark"
+      )
+    ),
+    "credentials" -> Json.arr(
+      Json.obj(
+        "key" -> "Assessment Developer",
+        "value" -> "Assessment Developer"
+      ),
+      Json.obj(
+        "key" -> "Test Item Writer",
+        "value" -> "Test Item Writer"
+      ),
+      Json.obj(
+        "key" -> "State Department of Education",
+        "value" -> "State Department of Education"
+      ),
+      Json.obj(
+        "key" -> "District Item Writer",
+        "value" -> "District Item Writer"
+      ),
+      Json.obj(
+        "key" -> "Teacher",
+        "value" -> "Teacher"
+      ),
+      Json.obj(
+        "key" -> "Student",
+        "value" -> "Student"
+      ),
+      Json.obj(
+        "key" -> "School Network",
+        "value" -> "School Network"
+      ),
+      Json.obj(
+        "key" -> "CMO",
+        "value" -> "CMO"
+      ),
+      Json.obj(
+        "key" -> "Other",
+        "value" -> "Other"
+      )
+    ),
+    "licenseTypes" -> Json.arr(
+      Json.obj(
+        "key" -> "CC BY",
+        "value" -> "CC BY"
+      ),
+      Json.obj(
+        "key" -> "CC BY-SA",
+        "value" -> "CC BY-SA"
+      ),
+      Json.obj(
+        "key" -> "CC BY-NC",
+        "value" -> "CC BY-NC"
+      ),
+      Json.obj(
+        "key" -> "CC BY-ND",
+        "value" -> "CC BY-ND"
+      ),
+      Json.obj(
+        "key" -> "CC BY-NC-SA",
+        "value" -> "CC BY-NC-SA"
+      )
+    ),
+    "itemTypes" -> Json.arr(
+      Json.obj(
+        "key" -> "Fixed Choice",
+        "value" -> Json.arr(
+          "Multiple Choice",
+          "Multi-Multi Choice",
+          "Visual Multi Choice",
+          "Inline Choice",
+          "Ordering",
+          "Drag & Drop"
+        )
+      ),
+      Json.obj(
+        "key" -> "Constructed Response",
+        "value" -> Json.arr(
+          "Constructed Response - Short Answer",
+          "Constructed Response - Open Ended"
+        )
+      ),
+      Json.obj(
+        "key" -> "Evidence",
+        "value" -> Json.arr(
+          "Select Evidence in Text",
+          "Document Based Question",
+          "Passage With Questions"
+        )
+      ),
+      Json.obj(
+        "key" -> "Composite",
+        "value" -> Json.arr(
+          "Composite - Multiple MC",
+          "Composite - MC and SA",
+          "Composite - MC, SA, OE",
+          "Composite - Project",
+          "Composite - Performance",
+          "Composite - Activity",
+          "Composite - Algebra"
+        )
+      ),
+      Json.obj(
+        "key" -> "Algebra",
+        "value" -> Json.arr(
+          "Plot Lines",
+          "Plot Points",
+          "Evaluate an Equation"
+        )
+      )
+    ),
+    "gradeLevels" -> Json.arr(
+      Json.obj(
+        "key" -> "PK",
+        "value" -> "Prekindergarten"
+      ),
+      Json.obj(
+        "key" -> "KG",
+        "value" -> "Kindergarten"
+      ),
+      Json.obj(
+        "key" -> "01",
+        "value" -> "First grade"
+      ),
+      Json.obj(
+        "key" -> "02",
+        "value" -> "Second grade"
+      ),
+      Json.obj(
+        "key" -> "03",
+        "value" -> "Third grade"
+      ),
+      Json.obj(
+        "key" -> "04",
+        "value" -> "Fourth grade"
+      ),
+      Json.obj(
+        "key" -> "05",
+        "value" -> "Fifth grade"
+      ),
+      Json.obj(
+        "key" -> "06",
+        "value" -> "Sixth grade"
+      ),
+      Json.obj(
+        "key" -> "07",
+        "value" -> "Seventh grade"
+      ),
+      Json.obj(
+        "key" -> "08",
+        "value" -> "Eighth grade"
+      ),
+      Json.obj(
+        "key" -> "09",
+        "value" -> "Ninth grade"
+      ),
+      Json.obj(
+        "key" -> "10",
+        "value" -> "Tenth grade"
+      ),
+      Json.obj(
+        "key" -> "11",
+        "value" -> "Eleventh grade"
+      ),
+      Json.obj(
+        "key" -> "12",
+        "value" -> "Twelfth grade"
+      ),
+      Json.obj(
+        "key" -> "13",
+        "value" -> "Grade 13"
+      ),
+      Json.obj(
+        "key" -> "PS",
+        "value" -> "Postsecondary"
+      ),
+      Json.obj(
+        "key" -> "AP",
+        "value" -> "Advanced Placement"
+      ),
+      Json.obj(
+        "key" -> "UG",
+        "value" -> "Ungraded"
+      )
+    ),
+    "reviewsPassed" -> Json.arr(
+      Json.obj(
+        "key" -> "Editorial",
+        "value" -> "Editorial"
+      ),
+      Json.obj(
+        "key" -> "Bias",
+        "value" -> "Bias"
+      ),
+      Json.obj(
+        "key" -> "Fairness",
+        "value" -> "Fairness"
+      ),
+      Json.obj(
+        "key" -> "Content",
+        "value" -> "Content"
+      ),
+      Json.obj(
+        "key" -> "Psychometric",
+        "value" -> "Psychometric"
+      ),
+      Json.obj(
+        "key" -> "All",
+        "value" -> "All"
+      ),
+      Json.obj(
+        "key" -> "None",
+        "value" -> "None"
+      ),
+      Json.obj(
+        "key" -> "Other",
+        "value" -> "Other"
+      )
+    ),
+    "keySkills" -> Json.arr(
+      Json.obj(
+        "key" -> "Knowledge",
+        "value" -> Json.arr(
+          "Arrange",
+          "Define",
+          "Describe",
+          "Duplicate",
+          "Identify",
+          "Label",
+          "List",
+          "Match",
+          "Memorize",
+          "Name",
+          "Order",
+          "Outline",
+          "Recall",
+          "Recognize",
+          "Relate",
+          "Repeat",
+          "Reproduce",
+          "Select",
+          "State"
+        )
+      ),
+      Json.obj(
+        "key" -> "Understand",
+        "value" -> Json.arr(
+          "Classify",
+          "Convert",
+          "Defend",
+          "Discuss",
+          "Distinguish",
+          "Estimate",
+          "Example(s)",
+          "Explain",
+          "Express",
+          "Extend",
+          "Generalize",
+          "Give",
+          "Indicate",
+          "Infer",
+          "Locate",
+          "Paraphrase",
+          "Predict",
+          "Review",
+          "Rewrite",
+          "Summarize",
+          "Translate",
+          "Understand"
+        )
+      ),
+      Json.obj(
+        "key" -> "Apply",
+        "value" -> Json.arr(
+          "Apply",
+          "Change",
+          "Choose",
+          "Compute",
+          "Demonstrate",
+          "Discover",
+          "Dramatize",
+          "Employ",
+          "Illustrate",
+          "Interpret",
+          "Manipulate",
+          "Modify",
+          "Operate",
+          "Practice",
+          "Prepare",
+          "Produce",
+          "Schedule",
+          "Show",
+          "Sketch",
+          "Solve",
+          "Use",
+          "Write"
+        )
+      ),
+      Json.obj(
+        "key" -> "Analyze",
+        "value" -> Json.arr(
+          "Analyze",
+          "Appraise",
+          "Breakdown",
+          "Calculate",
+          "Categorize",
+          "Compare",
+          "Contrast",
+          "Criticize",
+          "Diagram",
+          "Differentiate",
+          "Discriminate",
+          "Examine",
+          "Experiment",
+          "Infer",
+          "Model",
+          "Point-Out",
+          "Question",
+          "Separate",
+          "Test"
+        )
+      ),
+      Json.obj(
+        "key" -> "Evaluate",
+        "value" -> Json.arr(
+          "Assemble",
+          "Collect",
+          "Combine",
+          "Comply",
+          "Devise",
+          "Evaluate",
+          "Explain",
+          "Formulate",
+          "Generate",
+          "Plan",
+          "Rearrange"
+        )
+      ),
+      Json.obj(
+        "key" -> "Create",
+        "value" -> Json.arr(
+          "Create",
+          "Compose",
+          "Construct",
+          "Create",
+          "Design",
+          "Develop"
+        )
+      )
+    )
+  )
 
-  def apply(): JsValue = Json.parse(jsonString)
+  def apply(): JsValue = fieldValues
 }

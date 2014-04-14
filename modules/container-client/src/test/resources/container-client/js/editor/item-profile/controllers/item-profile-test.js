@@ -37,6 +37,10 @@ describe('item-profile controller', function() {
     this.query = function(topic, term, callback) {
       callback(this.results);
     };
+
+    this.list = function(topic, callback) {
+      callback(this.results);
+    };
   }
 
   var mockDataQueryService = new MockDataQueryService();

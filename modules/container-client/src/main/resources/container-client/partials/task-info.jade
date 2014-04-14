@@ -1,81 +1,347 @@
-form
+br/
+
+h2 Item Information
+
+* Required
+
+form(style="padding-left: 10px;")
 
   br/
-
-  .control-group
-    label.control-label(for="title") Title
-    .controls
-      textarea#title.form-control(
-        ng-model='taskInfo.title', 
-        placeholder="Enter a title...",
-        rows='3')
-  
   br/
-  
-  .row
-    .col-xs-6
-      .form-group
-        label(for="primarySubject") Primary Subject
+
+  .item-information
+    .control-group
+      label.control-label(for="description") * Description
+        .controls
+          textarea#description.form-control(
+          ng-model='taskInfo.description',
+          placeholder="Enter a description...",
+          rows='3')
+          p Describe the activitiy that the student will perform (e.g. Multiply single digit numbers, select evidence in reading passage)
+
+    br/
+
+    .control-group
+      label.control-label(for="title") Title
+        .controls
+          textarea#title.form-control(
+          ng-model='taskInfo.title',
+          placeholder="Enter a title...",
+          rows='3')
+
+    br/
+
+    .control-group
+      .row
+        .col-xs-6
+          .form-group
+            label(for="primarySubject") * Primary Subject
+            br/
+            input#primarySubject(
+            style="width:300px",
+            ng-model="taskInfo.primarySubject",
+            type="text",
+            ui-select2="primarySubjectAsync",
+            data-placeholder="Choose a subject...")
+        .col-xs-6
+          .form-group
+            label(for="relatedSubject") Related Subject
+            br/
+            input#relatedSubject(
+            style="width:300px",
+            ng-model="taskInfo.relatedSubject",
+            ui-select2="relatedSubjectAsync",
+            data-placeholder="Choose a subject...")
+
+  br/
+  br/
+
+  h3 CCSS
+
+  .fieldset
+    .control-group
+      label.control-label Standard(s)
         br/
-        input#primarySubject(
-          style="width:300px",
-          ng-model="taskInfo.primarySubject",
-          type="text",
-          ui-select2="primarySubjectAsync",
-          data-placeholder="Choose a subject...")
-
-    .col-xs-6
-      .form-group
-        label(for="relatedSubject") Related Subject
         br/
+        .controls
+          div(style='padding-bottom: 5px; height: 30px;')
+            div(style='float: left; padding-right: 5px;')
+              | * Subject
+              br
+              select(ng-model='standardAdapter.subjectOption', ng-options='c.name for c in standardsOptions', style='vertical-align: top; width: 100px; padding-top: 0px;')
+            div(style='float: left; padding-right: 5px;')
+              | Category
+              br
+              select(ng-model='standardAdapter.categoryOption', ng-options='p.name for p in standardAdapter.subjectOption.items')
+            div(style='float: left;')
+              | Sub-Category
+              br
+              select(ng-model='standardAdapter.subCategoryOption', ng-options='z for z in standardAdapter.categoryOption.items')
+          br
+          input(type='hidden', multiple='', ui-select2='standardAdapter', ng-model='taskInfo.standards', style='width: 500px;')
 
-        input#relatedSubject(
-          style="width:300px",
-          ng-model="taskInfo.relatedSubject",
-          ui-select2="relatedSubjectAsync",
-          data-placeholder="Choose a subject...")
+    br/
 
-  .control-group
-    label.control-label(for='gradeLevel') Grade Level
-    .controls
-      button-bar#gradeLevel(ng-model="taskInfo.gradeLevel", button-provider="gradeLevelDataProvider", key="key")
-  
-  br/
+    .control-group
+      label.control-label(for='gradeLevel') Grade Level
+        .controls(style="width:80%")
+          button-bar#gradeLevel(ng-model="taskInfo.gradeLevel", button-provider="gradeLevelDataProvider", key="key")
 
-  
-  br/
+    br/
+    br/
 
-  .control-group
-    
-    label.control-label Item Type
-    
-    table.itemTypes
-      tr
-        td(valign='top')
-          ul
-            li(ng-repeat='t in itemTypeDataProvider', ng-show='$index < 2')
-              h5 {{t.key}}
-              label.radio(ng-repeat='k in t.value')
+    .control-group
+      label.control-label Item Type
+      table.itemTypes
+        tr
+          td(valign='top')
+            ul
+              li(ng-repeat='t in itemTypeDataProvider', ng-show='$index < 2')
+                h4 {{t.key}}
+                label.radio(ng-repeat='k in t.value')
                   input(type='radio', ng-model='taskInfo.itemType', value='{{k}}')
                   | {{k}}
+          td(valign='top')
+            ul
+              li(ng-repeat='t in itemTypeDataProvider', ng-show='$index >= 2 && $index < 4')
+                h4 {{t.key}}
+                label.radio(ng-repeat='k in t.value')
+                  input(type='radio', ng-model='taskInfo.itemType', value='{{k}}')
+                  | {{k}}
+          td(valign='top')
+            ul
+              li(ng-repeat='t in itemTypeDataProvider', ng-show='$index >= 4')
+                h4 {{t.key}}
+                label.radio(ng-repeat='k in t.value')
+                  input(type='radio', ng-model='taskInfo.itemType', value='{{k}}')
+                  | {{k}}
+              li
+                h4 Other
+                label.radio
+                  input(type='radio', ng-model='taskInfo.itemType', value='{{otherItemType}}')
+                  input.form-control(type='text', ng-model='$parent.otherItemType')
 
-        td(valign='top')
-          ul
-            li(ng-repeat='t in itemTypeDataProvider', ng-show='$index >= 2 && $index < 4')
-              h5 {{t.key}}
-              label.radio(ng-repeat='k in t.value')
-                input(type='radio', ng-model='taskInfo.itemType', value='{{k}}')
-                | {{k}}
+  br/
+  br/
 
-        td(valign='top')
-          ul
-            li(ng-repeat='t in itemTypeDataProvider', ng-show='$index >= 4')
-              h5 {{t.key}}
-              label.radio(ng-repeat='k in t.value')
-                input(type='radio', ng-model='taskInfo.itemType', value='{{k}}')
-                | {{k}}
-            li
-              h5 Other
-              label.radio
-                input(type='radio', ng-model='taskInfo.itemType', value='{{otherItemType}}')
-                input.form-control(type='text', ng-model='$parent.otherItemType')
+  h3 Other Alignments
+
+  .control-group
+    label.control-label Bloom's Taxonomy
+      .controls
+        select(ng-model='taskInfo.bloomsTaxonomy', ng-options='c for c in bloomsTaxonomyDataProvider')
+          option(value='')
+
+  br/
+
+  .control-group
+    label.control-label
+      | Key Skills
+
+      a(ng-click='expandKeySkills=!expandKeySkills')
+        i(class="fa fa-{{!!expandKeySkills ? 'minus' : 'plus'}}-square-o", style="margin-left: 6px")
+      .controls
+        div(ng-show='!expandKeySkills', style='padding-top: 4px;')
+          label {{getKeySkillsSummary(taskInfo.keySkills)}}
+        div(ng-repeat='skills in keySkillsDataProvider', ng-show='expandKeySkills')
+          div(style="width:80%;")
+            span.tag-list-header(style='float: left;') {{skills.header}}
+            span(tag-list='tag-list', tags='skills.list', selected-tags='taskInfo.keySkills')
+          div(style='float: none; clear: both;')
+
+  br/
+
+  .control-group
+    label.control-label Depth Of Knowledge
+      .controls
+        p.help-block Select the depth of knowledge that best represents the objective
+        label.radio(ng-repeat='dk in depthOfKnowledgeDataProvider')
+          input(type='radio', ng-model='taskInfo.depthOfKnowledge', value='{{dk}}')
+          | {{dk}}
+
+
+  h2 Copyright Information
+
+  br/
+
+  .copyright-information
+
+    .control-group
+      label.control-label(for="title") * Author
+        .controls
+          input#author.form-control(
+          ng-model='taskInfo.author',
+          placeholder="Enter a author...")
+
+    br/
+
+    .control-group
+      label.control-label Credentials
+        .controls
+          select(ng-model='taskInfo.credentials', ng-options='c for c in credentialsDataProvider')
+            option(value='')
+
+    br/
+
+    .control-group
+      label.control-label(for="title") * Source Url
+        .controls
+          input#author.form-control(
+          ng-model='taskInfo.sourceUrl',
+          placeholder="Enter a source url...")
+
+    br/
+
+    .control-group
+      label.control-label(for="copyright-owner") * Copyright Owner
+        .controls
+          input#copyright-owner.form-control(
+          ng-model='taskInfo.copyrightOwner',
+          placeholder="Enter the copyright owner...")
+
+    br/
+
+    .control-group
+      label.control-label(for="copyright-year") * Copyright Year
+        .controls
+          input#copyright-year.form-control(
+          ng-model='taskInfo.copyrightYear',
+          placeholder="Enter the copyright year...")
+
+    br/
+
+    .control-group
+      label.control-label(for="copyright-expiration-date") * Copyright Expiration Date
+        .controls
+          input#copyright-expiration-date.form-control(
+          ng-model='taskInfo.copyrightExpirationDate',
+          placeholder="Enter the copyright expiration date...")
+
+  br/
+
+  h3 Permissions
+
+  p This item is made available to the CoreSpring Community via a
+  table
+    tr
+      td(style="padding: 10px; vertical-align: top")
+        select(ng-model='taskInfo.licenseType', ng-options='c for c in licenseTypeDataProvider')
+           option(value='')
+      td(style="padding: 10px; vertical-align: top")
+        span(ng-show='!taskInfo.licenseType', style='color: #888; font-style: italic;') Not Assigned
+        img(ng-show='taskInfo.licenseType', src='{{getLicenseTypeUrl(taskInfo.licenseType)}}')
+        br/
+        a(href="http://creativecommons.org/licenses/", target="_blank") Learn more
+
+  br/
+  br/
+
+  h3 Additional Copyright Information
+  p Does this item contain any other copyrighted materials? E.g. book passage, image, etc. *
+
+  .control-group
+    .controls
+      label
+        input(type='radio', ng-model='needAdditionalCopyrightInformation', value='yes', style='margin-right: 5px;')
+        | Yes
+        span.help-inline(style="padding-left:10px") If yes, please complete the following
+
+      label
+        input(type='radio', ng-model='needAdditionalCopyrightInformation', value='', style='margin-right: 5px; margin-left: 20px;')
+        | No
+
+  .additional-copyright-information(ng-repeat='item in taskInfo.additionalCopyright')
+    .control-group
+      label.control-label(for="owner") Owner
+        .controls
+          input#owner.form-control(
+          ng-model='item.owner',
+          placeholder="Enter a owner...")
+    .control-group
+      label.control-label(for="author") Author
+        .controls
+          input#author.form-control(
+          ng-model='item.author',
+          placeholder="Enter a author...")
+    .control-group
+      label.control-label(for="publisher") Publisher
+        .controls
+          input#publisher.form-control(
+          ng-model='item.publisher',
+          placeholder="Enter a publisher...")
+    .control-group
+      label.control-label(for="year") Year
+        .controls
+          input#year.form-control(
+          ng-model='item.year',
+          placeholder="Enter a year...")
+    .control-group
+      label.control-label(for="license") License
+        .controls
+          select(ng-model='item.licenseType', ng-options='c for c in licenseTypeDataProvider', style="width: 100%;")
+            option(value='')
+    .control-group
+      label.control-label(for="url") URL
+        .controls
+          input#url.form-control(
+          ng-model='item.url',
+          placeholder="Enter a url...")
+
+    a(ng-click='addCopyrightItem()')
+      i(class="fa fa-{{!!expandKeySkills ? 'minus' : 'plus'}}-square-o", style="margin-left: 6px; margin-right: 6px;")
+      span Add more
+
+  br/
+
+  br/
+  br/
+
+  h3 Historical Information
+    h4 Prior Use
+
+    .control-group
+      p.help-block This item was previously used in a
+      label.control-label(for='priorUse') Prior Use
+        .controls
+          select#priorUse(name='taskInfo.priorUse', ng-model='taskInfo.priorUse', ng-options='c for c in priorUseDataProvider')
+            option(value='')
+
+    br/
+
+    .control-group
+      label.control-label(for='priorGradeLevel') Grade Level
+        .controls(style="width:80%")
+          button-bar#gradeLevel(ng-model="taskInfo.priorGradeLevel", button-provider="gradeLevelDataProvider", key="key")
+
+    br/
+    br/
+
+    h4 Reviews Passed
+    .control-group
+      p.help-block This question passed the following reviews
+      label.control-label Reviews Passed
+      .div(style="width:240px;")
+        label(ng-repeat='rp in reviewsPassedDataProvider', style="width:50%;")
+          input(type='checkbox', ng-model='rp.selected', style="margin-right: 3px;")
+          | {{rp.key}}
+
+    br/
+
+    .control-group
+      label.control-label(for='pValue') Difficulty Level
+        .controls
+          input#pValue.input-mini(type='text', ng-model='taskInfo.pValue')
+          span.lead(style='padding-left: 50px;') {{pValueAsString}}
+
+    br/
+
+    .control-group
+      label.control-label(for='lexile') Lexile Score
+        .controls
+          input#lexile.input-mini(type='text', ng-model='taskInfo.lexile')
+          span.lead(style='padding-left: 5px;') L
+
+  br/
+  br/
+
+

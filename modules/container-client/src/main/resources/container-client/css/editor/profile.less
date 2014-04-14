@@ -1,14 +1,17 @@
-.container{
+@profile-input-width: 500px;
 
-  .profile{
+.container {
 
-    .nav{
+  .profile {
+
+    .nav {
       height: 42px;
     }
+
   }
 }
 
-.save-btn{
+.save-btn {
   border: 2px;
   border-radius: 3px;
 }
@@ -19,11 +22,47 @@
     font-weight: bold;
   }
 
-  li{
+  li {
     list-style-type: none;
   }
 
-  td{
+  td {
     vertical-align: top;
   }
 }
+
+a.tag-list-link {
+  padding: 3px;
+  float: left;
+  text-decoration: none;
+}
+
+a.tag-list-link.selected {
+  font-weight: bold;
+}
+
+.tag-list-header {
+  padding: 3px;
+  float: left;
+  font-weight: bold;
+  color: lighten(@cs-green, 5%);
+}
+
+.profile {
+  .control-label {
+    width: 100%;
+  }
+
+  .item-information {
+    width: 80%;
+  }
+
+  .additional-copyright-information {
+    width: @profile-input-width;
+  }
+
+  .copyright-information {
+    width: @profile-input-width;
+  }
+}
+
