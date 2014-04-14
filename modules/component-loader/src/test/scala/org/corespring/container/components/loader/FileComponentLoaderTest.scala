@@ -50,10 +50,10 @@ class FileComponentLoaderTest extends Specification {
       val loader = getLoader("three")
       val lib = loader.all(0)
       lib match {
-        case UiComponent(_, _, _, _, _, _, _, _, _, _, libs) => {
-          libs.length === 1
-          libs(0).org === "org-name"
-          libs(0).name === "lib-name"
+        case u: UiComponent => {
+          u.libraries.length === 1
+          u.libraries(0).org === "org-name"
+          u.libraries(0).name === "lib-name"
           success
         }
         case _ => failure("not a Ui component")
