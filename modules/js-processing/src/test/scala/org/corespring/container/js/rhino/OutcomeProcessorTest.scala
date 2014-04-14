@@ -44,6 +44,8 @@ class OutcomeProcessorTest extends Specification {
   def comp(name: String = "name", serverJs: String) = UiComponent(
     "org",
     name,
+    None,
+    None,
     client = Client("", "", None),
     server = Server(serverJs),
     Json.obj(),

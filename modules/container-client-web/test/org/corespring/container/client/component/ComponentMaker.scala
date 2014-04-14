@@ -5,8 +5,8 @@ import play.api.libs.json.Json
 
 trait ComponentMaker {
 
-  def uiComp(org: String, name: String, libs: Seq[LibraryId]) = {
-    UiComponent(org, name, Client("", "", None), Server(""), Json.obj("name" -> name, "org" -> org), Json.obj(), None, Map(), libs)
+  def uiComp(org: String, name: String, libs: Seq[LibraryId], title: Option[String] = None, titleGroup: Option[String] = None) = {
+    UiComponent(org, name, title, titleGroup, Client("", "", None), Server(""), Json.obj("name" -> name, "org" -> org), Json.obj(), None, Map(), libs)
   }
 
   def lib(org: String, name: String): Library = {

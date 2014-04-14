@@ -21,6 +21,17 @@ class FileComponentLoaderTest extends Specification {
       loader.all.length === 1
     }
 
+    "load a ui component" in {
+      val loader = getLoader("one")
+      val component = loader.all(0)
+
+      component.isInstanceOf[UiComponent] === true
+      val uiComponent = component.asInstanceOf[UiComponent]
+
+      uiComponent.title.get === "Single Choice"
+      uiComponent.titleGroup.get === "Fixed Choice"
+    }
+
     "load a library" in {
       val loader = getLoader("two")
       loader.all.length === 1
@@ -39,7 +50,7 @@ class FileComponentLoaderTest extends Specification {
       val loader = getLoader("three")
       val lib = loader.all(0)
       lib match {
-        case UiComponent(_, _, _, _, _, _, _, _, libs) => {
+        case UiComponent(_, _, _, _, _, _, _, _, _, _, libs) => {
           libs.length === 1
           libs(0).org === "org-name"
           libs(0).name === "lib-name"

@@ -6,6 +6,8 @@
       var componentType = component.componentType;
       return {
         name: componentType,
+        title: component.title,
+        titleGroup: component.titleGroup,
         toolbar: '<button class="btn btn-default btn-sm btn-small">CB</button>',
         clickable: true,
         compile: true,
@@ -15,7 +17,7 @@
         },
         initialise: function($node, replaceWith) {
           var id = $node.attr('id');
-          return replaceWith('<placeholder label="' + component.name + ': ' + id + '" id="' + id + '"></placeholder>');
+          return replaceWith('<placeholder label="' + component.title + ': ' + id + '" id="' + id + '"></placeholder>');
         },
         addToEditor: function(editor, addContent) {
           addToEditorCallback(editor, addContent, component);

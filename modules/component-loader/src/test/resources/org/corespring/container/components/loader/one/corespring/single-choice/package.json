@@ -1,4 +1,6 @@
 {
   "name" : "single-choice",
-  "organization" : "corespring"
+  "organization" : "corespring",
+  "title" : "Single Choice",
+  "titleGroup" : "Fixed Choice"
 }

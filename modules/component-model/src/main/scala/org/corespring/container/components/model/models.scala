@@ -34,6 +34,8 @@ case class LibrarySource(name: String, source: String)
 case class UiComponent(
   org: String,
   name: String,
+  title: Option[String],
+  titleGroup: Option[String],
   client: Client,
   server: Server,
   override val packageInfo: JsValue,
