@@ -21,6 +21,8 @@ class PlayerItemPreProcessorTest extends Specification {
       val component = UiComponent(
         "org",
         "name",
+        None,
+        None,
         client = Client("", "", None),
         server = Server(interactionProcessJs),
         Json.obj(),
@@ -56,6 +58,8 @@ class PlayerItemPreProcessorTest extends Specification {
       val component = UiComponent(
         "org",
         "name",
+        None,
+        None,
         client = Client("", "", None),
         server = Server(""),
         Json.obj(),
