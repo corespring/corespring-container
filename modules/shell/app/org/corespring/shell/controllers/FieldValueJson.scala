@@ -34,19 +34,19 @@ object FieldValueJson {
     ),
     "depthOfKnowledge" -> Json.arr(
       Json.obj(
-        "key" -> "1 Recall & Reproduction",
+        "key" -> "1",
         "value" -> "1 Recall & Reproduction"
       ),
       Json.obj(
-        "key" -> "2 Skills & Concepts",
+        "key" -> "2",
         "value" -> "2 Skills & Concepts"
       ),
       Json.obj(
-        "key" -> "3 Strategic Thinking/Reasoning",
+        "key" -> "3",
         "value" -> "3 Strategic Thinking/Reasoning"
       ),
       Json.obj(
-        "key" -> "4 Extended Thinking",
+        "key" -> "4",
         "value" -> "4 Extended Thinking"
       )
     ),

@@ -98,8 +98,8 @@
       };
     }
 
-    $scope.relatedSubjectAsync = new Async("relatedSubject", subjectText);
-    $scope.primarySubjectAsync = new Async("primarySubject", subjectText);
+    $scope.relatedSubjectAsync = new Async("subjects.related", subjectText);
+    $scope.primarySubjectAsync = new Async("subjects.primary", subjectText);
 
     $scope.$watch("otherItemType", function (n) {
       if (isFormActive) {
@@ -148,7 +148,8 @@
     });
 
     DataQueryService.list("depthOfKnowledge", function (result) {
-      $scope.depthOfKnowledgeDataProvider = toListOfValues(result);
+      $scope.depthOfKnowledgeDataProvider = result;
+      console.log(result);
     });
 
     DataQueryService.list("keySkills", function (result) {
@@ -197,15 +198,15 @@
     }, true);
 
     $scope.addCopyrightItem = function () {
-      $scope.taskInfo.additionalCopyright.push({});
+      $scope.contributorDetails.copyright.additional.push({});
     };
 
     $scope.removeCopyrightItem = function () {
-      $scope.taskInfo.additionalCopyright.pop();
+      $scope.contributorDetails.copyright.additional.pop();
     };
 
     $scope.clearCopyrightItems = function () {
-      $scope.taskInfo.additionalCopyright.splice(0);
+      $scope.contributorDetails.copyright.additional.splice(0);
     };
 
     $scope.needAdditionalCopyrightInformation = 'init';
@@ -257,21 +258,40 @@
       ItemService.load( onLoadItemSuccess, onLoadItemError, itemId);
     }
 
+    function initSubobjects() {
+      if (!($scope.data.item.profile.taskInfo)) {
+        $scope.data.item.profile.taskInfo = {};
+      }
+      if (!($scope.data.item.profile.otherAlignments)) {
+        $scope.data.item.profile.otherAlignments = {};
+      }
+      if (!$($scope.data.item.profile.contributorDetails)) {
+        $scope.data.item.profile.contributorDetails = {};
+      }
+    }
+
     function onLoadItemSuccess (item) {
       $scope.data.item = item;
+      initSubobjects();
       $scope.taskInfo = $scope.data.item.profile.taskInfo;
+      $scope.otherAlignments = $scope.data.item.profile.otherAlignments;
+      $scope.contributorDetails = $scope.data.item.profile.contributorDetails;
+      $scope.profile = $scope.data.item.profile;
+
       $log.debug("task info: ", $scope.taskInfo);
-      if (!$scope.taskInfo.keySkills) {
-        $scope.taskInfo.keySkills = [];
+      $log.debug("other alignments: ", $scope.otherAlignments);
+      $log.debug("contributor details: ", $scope.contributorDetails);
+      if (!$scope.otherAlignments.keySkills) {
+        $scope.otherAlignments.keySkills = [];
       }
       if (!$scope.taskInfo.reviewsPassed) {
         $scope.taskInfo.reviewsPassed = [];
       }
-      if (!_.isArray($scope.taskInfo.additionalCopyright)) {
-        $scope.taskInfo.additionalCopyright = [];
+      if (!_.isArray($scope.contributorDetails.copyright.additional)) {
+        $scope.contributorDetails.copyright.additional = [];
       }
       $scope.needAdditionalCopyrightInformation =
-          $scope.taskInfo.additionalCopyright.length > 0 ? 'yes' : '';
+          $scope.contributorDetails.copyright.additional.length > 0 ? 'yes' : '';
 
       isFormActive = true;
     }

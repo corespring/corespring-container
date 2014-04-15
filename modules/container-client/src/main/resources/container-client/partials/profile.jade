@@ -39,7 +39,7 @@ form(style="padding-left: 10px;")
             br/
             input#primarySubject(
             style="width:300px",
-            ng-model="taskInfo.primarySubject",
+            ng-model="taskInfo.subjects.primary",
             type="text",
             ui-select2="primarySubjectAsync",
             data-placeholder="Choose a subject...")
@@ -49,7 +49,7 @@ form(style="padding-left: 10px;")
             br/
             input#relatedSubject(
             style="width:300px",
-            ng-model="taskInfo.relatedSubject",
+            ng-model="taskInfo.subjects.related",
             ui-select2="relatedSubjectAsync",
             data-placeholder="Choose a subject...")
 
@@ -129,7 +129,7 @@ form(style="padding-left: 10px;")
   .control-group
     label.control-label Bloom's Taxonomy
       .controls
-        select(ng-model='taskInfo.bloomsTaxonomy', ng-options='c for c in bloomsTaxonomyDataProvider')
+        select(ng-model='otherAlignments.bloomsTaxonomy', ng-options='c for c in bloomsTaxonomyDataProvider')
           option(value='')
 
   br/
@@ -142,11 +142,11 @@ form(style="padding-left: 10px;")
         i(class="fa fa-{{!!expandKeySkills ? 'minus' : 'plus'}}-square-o", style="margin-left: 6px")
       .controls
         div(ng-show='!expandKeySkills', style='padding-top: 4px;')
-          label {{getKeySkillsSummary(taskInfo.keySkills)}}
+          label {{getKeySkillsSummary(otherAlignments.keySkills)}}
         div(ng-repeat='skills in keySkillsDataProvider', ng-show='expandKeySkills')
           div(style="width:80%;")
             span.tag-list-header(style='float: left;') {{skills.header}}
-            span(tag-list='tag-list', tags='skills.list', selected-tags='taskInfo.keySkills')
+            span(tag-list='tag-list', tags='skills.list', selected-tags='otherAlignments.keySkills')
           div(style='float: none; clear: both;')
 
   br/
@@ -154,8 +154,7 @@ form(style="padding-left: 10px;")
   .control-group
     label.control-label Depth Of Knowledge
       .controls
-        select(ng-model='taskInfo.depthOfKnowledge', ng-options='c for c in depthOfKnowledgeDataProvider')
-          option(value='')
+        select(ng-model='otherAlignments.depthOfKnowledge', ng-options='c.key as c.value for c in depthOfKnowledgeDataProvider')
         span.help-inline Select the depth of knowledge that best represents the objective
 
 
@@ -169,7 +168,7 @@ form(style="padding-left: 10px;")
       label.control-label(for="title") * Author
         .controls
           input#author.form-control(
-          ng-model='taskInfo.author',
+          ng-model='contributorDetails.author',
           placeholder="Enter author's name...")
 
     br/
@@ -177,16 +176,16 @@ form(style="padding-left: 10px;")
     .control-group
       label.control-label Credentials
         .controls
-          select(ng-model='taskInfo.credentials', ng-options='c for c in credentialsDataProvider')
+          select(ng-model='contributorDetails.credentials', ng-options='c for c in credentialsDataProvider')
             option(value='')
 
     br/
 
     .control-group
-      label.control-label(for="title") Source Url
+      label.control-label(for="title") Source URL
         .controls
           input#author.form-control(
-          ng-model='taskInfo.sourceUrl',
+          ng-model='contributorDetails.sourceUrl',
           placeholder="Enter a source url...")
 
     br/
@@ -195,7 +194,7 @@ form(style="padding-left: 10px;")
       label.control-label(for="copyright-owner") * Copyright Owner
         .controls
           input#copyright-owner.form-control(
-          ng-model='taskInfo.copyrightOwner',
+          ng-model='contributorDetails.copyright.owner',
           placeholder="Enter the copyright owner...")
 
     br/
@@ -203,7 +202,7 @@ form(style="padding-left: 10px;")
     .control-group
       label.control-label(for="copyright-year") * Copyright Year
         .controls
-          select(ng-model='taskInfo.copyrightYear', ng-options='c for c in copyrightYearDataProvider')
+          select(ng-model='contributorDetails.copyright.year', ng-options='c for c in copyrightYearDataProvider')
             option(value='')
 
     br/
@@ -211,7 +210,7 @@ form(style="padding-left: 10px;")
     .control-group
       label.control-label(for="copyright-expiration-date") Copyright Expiration Date
         .controls
-          select(ng-model='taskInfo.copyrightExpirationYear', ng-options='c for c in copyrightExpirationYearDataProvider')
+          select(ng-model='contributorDetails.copyright.expirationDate', ng-options='c for c in copyrightExpirationYearDataProvider')
             option(value='')
 
   br/
@@ -222,11 +221,11 @@ form(style="padding-left: 10px;")
   table
     tr
       td(style="padding: 10px; vertical-align: top")
-        select(ng-model='taskInfo.licenseType', ng-options='c for c in licenseTypeDataProvider')
+        select(ng-model='contributorDetails.licenseType', ng-options='c for c in licenseTypeDataProvider')
            option(value='')
       td(style="padding: 10px; vertical-align: top")
-        span(ng-show='!taskInfo.licenseType', style='color: #888; font-style: italic;') Not Assigned
-        img(ng-show='taskInfo.licenseType', src='{{getLicenseTypeUrl(taskInfo.licenseType)}}')
+        span(ng-show='!contributorDetails.licenseType', style='color: #888; font-style: italic;') Not Assigned
+        img(ng-show='contributorDetails.licenseType', src='{{getLicenseTypeUrl(taskInfo.licenseType)}}')
         br/
         a(href="http://creativecommons.org/licenses/", target="_blank") Learn more
 
@@ -247,7 +246,7 @@ form(style="padding-left: 10px;")
         input(type='radio', ng-model='needAdditionalCopyrightInformation', value='', style='margin-right: 5px; margin-left: 20px;')
         | No
 
-  .additional-copyright-information(ng-repeat='item in taskInfo.additionalCopyright')
+  .additional-copyright-information(ng-repeat='item in contributorDetails.copyright.additional')
 
     .control-group
       label.control-label(for="owner") Owner
@@ -277,12 +276,11 @@ form(style="padding-left: 10px;")
       label.control-label(for="license") License
         .controls
           select(ng-model='item.licenseType', ng-options='c for c in licenseTypeDataProvider', style="width: 100%;")
-            option(value='')
     .control-group
-      label.control-label(for="url") URL
+      label.control-label(for="url") Source URL
         .controls
           input#url.form-control(
-          ng-model='item.url',
+          ng-model='item.sourceUrl',
           placeholder="Enter a url...")
 
   a(ng-click='addCopyrightItem()')
@@ -301,7 +299,7 @@ form(style="padding-left: 10px;")
       p.help-block This item was previously used in a
       label.control-label(for='priorUse') Prior Use
         .controls
-          select#priorUse(name='taskInfo.priorUse', ng-model='taskInfo.priorUse', ng-options='c for c in priorUseDataProvider')
+          select#priorUse(name='profile.priorUse', ng-model='profile.priorUse', ng-options='c for c in priorUseDataProvider')
             option(value='')
 
     br/
@@ -309,7 +307,7 @@ form(style="padding-left: 10px;")
     .control-group
       label.control-label(for='priorGradeLevel') Grade Level
         .controls(style="width:80%")
-          button-bar#gradeLevel(ng-model="taskInfo.priorGradeLevel", button-provider="gradeLevelDataProvider", key="key")
+          button-bar#gradeLevel(ng-model="profile.priorGradeLevel", button-provider="gradeLevelDataProvider", key="key")
 
     br/
     br/
@@ -328,7 +326,7 @@ form(style="padding-left: 10px;")
     .control-group
       label.control-label(for='pValue') Difficulty Level
         .controls
-          input#pValue.input-mini(type='text', ng-model='taskInfo.pValue')
+          input#pValue.input-mini(type='text', ng-model='profile.pValue')
           span.lead(style='padding-left: 50px;') {{pValueAsString}}
 
     br/
@@ -336,7 +334,7 @@ form(style="padding-left: 10px;")
     .control-group
       label.control-label(for='lexile') Lexile Score
         .controls
-          input#lexile.input-mini(type='text', ng-model='taskInfo.lexile')
+          input#lexile.input-mini(type='text', ng-model='profile.lexile')
           span.lead(style='padding-left: 5px;') L
 
   br/

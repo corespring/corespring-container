@@ -4,16 +4,18 @@
     "taskInfo" : {
       "title": "Drag and drop example",
       "gradeLevel" : ["01", "03"],
-      "primarySubject" : {
-        "id" : "4ffb535f6bb41e469c0bf2a8",
-        "subject" : "subject",
-        "category" : "category"
+      "subjects" : {
+        "primary" : {
+          "id" : "4ffb535f6bb41e469c0bf2a8",
+          "subject" : "subject",
+          "category" : "category"
         },
-      "relatedSubject" : {
-        "id" : "4ffb535f6bb41e469c0bf2a9",
-        "subject" : "subject",
-        "category" : "category"
-        },
+        "related" : {
+          "id" : "4ffb535f6bb41e469c0bf2a9",
+          "subject" : "subject",
+          "category" : "category"
+        }
+      },
       "itemType" : "arstConstructed Response - Short Answer"
     }
   },
