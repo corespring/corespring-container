@@ -40,7 +40,11 @@ seed = (collection, folder, isMultipleItems, next) ->
           #console.dir(results)
           next(err)
 
-
+###
+# Assign the oid to the id
+# Without this conversion the item
+# is not inserted into the collection
+###
 processId = (item) ->
  if item._id.$oid
    item._id = item._id.$oid
