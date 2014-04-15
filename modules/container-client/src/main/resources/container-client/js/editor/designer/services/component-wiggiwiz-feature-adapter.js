@@ -1,9 +1,17 @@
 (function() {
 
-  var ComponentToWiggiwizFeatureAdapter = function($log) {
+  var ComponentToWiggiwizFeatureAdapter = function($rootScope, $log) {
 
     function getTitle(component) {
       return _.isEmpty(component.title) ? component.name : component.title;
+    }
+
+    function fireComponentSelection($node) {
+      $rootScope.$broadcast('componentSelected', {id: $node.attr('id')});
+    }
+
+    function fireComponentDeselection($node) {
+      $rootScope.$broadcast('componentDeselected');
     }
 
     var service = {};
@@ -37,7 +45,26 @@
           ].join('\n');
           editor.showEditPane(data, getTitle(component), content, function() {
             $log.debug('on update...');
-          }, {});
+          }, {}, function() {
+            fireComponentDeselection($node);
+          });
+        },
+        onClick: function($node, $scope) {
+
+          /** Use timer trickery to only execute provided function on single click **/
+          function onSingleClick(fn) {
+            if ($scope.clickTimer) {
+              clearTimeout($scope.clickTimer);
+              $scope.clickTimer = undefined;
+            } else {
+              $scope.clickTimer = setTimeout(function() {
+                fn();
+                $scope.clickTimer = undefined;
+              }, 200);
+            }
+          }
+
+          onSingleClick(function() { fireComponentSelection($node); });
         },
         getMarkUp: function($node, $scope) {
           var id = $node.attr('id');
@@ -49,6 +76,6 @@
   };
 
   angular.module('corespring-editor.services')
-    .service('ComponentToWiggiwizFeatureAdapter', ['$log', ComponentToWiggiwizFeatureAdapter]);
+    .service('ComponentToWiggiwizFeatureAdapter', ['$rootScope', '$log', ComponentToWiggiwizFeatureAdapter]);
 
 })();

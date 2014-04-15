@@ -1,10 +1,11 @@
 angular.module('corespring-player.directives').directive('corespringPlayer', [
+  '$rootScope',
   '$compile',
   '$log',
   'ComponentRegister',
   'PlayerUtils',
   'MathJaxService',
-  function($compile, $log, ComponentRegister, PlayerUtils, MathJaxService) {
+  function($rootScope, $compile, $log, ComponentRegister, PlayerUtils, MathJaxService) {
 
     var link = function($scope, $elem, $attrs) {
 
@@ -19,7 +20,6 @@ angular.module('corespring-player.directives').directive('corespringPlayer', [
         $compile($body)($scope.lastScope);
         MathJaxService.parseDomForMath();
       };
-
 
       var setDataAndSession = function() {
 
@@ -88,6 +88,18 @@ angular.module('corespring-player.directives').directive('corespringPlayer', [
         }
         ComponentRegister.setOutcomes(r);
       }, true);
+
+      $rootScope.$on('componentSelected', function(event, data) {
+        if ($('#body .selected').length > 0) {
+          $('#body .selected').removeClass('selected');
+        } else {
+          $('#body #' + data.id).addClass('selected');
+        }
+      });
+
+      $rootScope.$on('componentDeselected', function() {
+        $('#body .selected').removeClass('selected');
+      });
 
     };
 
