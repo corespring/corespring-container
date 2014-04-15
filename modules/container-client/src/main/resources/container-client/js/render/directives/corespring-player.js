@@ -95,7 +95,7 @@ angular.module('corespring-player.directives').directive('corespringPlayer', [
         } else {
           $('#body #' + data.id).addClass('selected');
         }
-      })
+      });
 
       $rootScope.$on('componentSelected', function(event, data) {
         $('#body .selected').removeClass('selected');
