@@ -31,17 +31,17 @@ object Global extends WithFilters(AccessControlFilter, CallBlockOnHeaderFilter) 
   private lazy val containerClient = new ContainerClientImplementation(
     new MongoService(db("items")),
     new MongoService(db("sessions")),
+    new MongoService(db("ccstandards")),
     componentLoader.all,
     Play.current.configuration)
 
   private lazy val home = new Main {
-    def sessionService: MongoService = new MongoService(db("sessions"))
-
     def itemService: MongoService = new MongoService(db("items"))
+    def sessionService: MongoService = new MongoService(db("sessions"))
+    def standardsService: MongoService = new MongoService(db("ccstandards"))
   }
 
   override def onStart(app: play.api.Application): Unit = {
-
     logger.trace("trace")
     logger.debug("debug")
     logger.info("info")

@@ -19,6 +19,7 @@ import scala.Some
 class ContainerClientImplementation(
   val itemService: MongoService,
   val sessionService: MongoService,
+  val standardsService: MongoService,
   componentsIn: => Seq[Component],
   val configuration: Configuration) extends DefaultIntegration with LoadJs {
 
