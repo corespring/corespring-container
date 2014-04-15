@@ -38,6 +38,10 @@ describe('item-profile controller', function() {
       callback(this.results);
     };
 
+    this.findOne = function(topic, id, callback) {
+      callback(this.results[0]);
+    };
+
     this.list = function(topic, callback) {
       callback(this.results);
     };
@@ -113,10 +117,11 @@ describe('item-profile controller', function() {
     function initCallback(s) {
       foundSubject = s;
     }
+
     scope.primarySubjectAsync.initSelection(element, initCallback);
     expect(foundSubject).toNotBe(undefined);
     expect(foundSubject).toEqual({
-      id: "1"
+      id: "1", category: 'category', subject: 'blah'
     });
   });
 
