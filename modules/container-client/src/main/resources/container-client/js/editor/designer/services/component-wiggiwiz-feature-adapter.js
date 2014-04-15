@@ -10,7 +10,11 @@
       $rootScope.$broadcast('componentSelected', {id: $node.attr('id')});
     }
 
-    function fireComponentDeselection($node) {
+    function fireComponentSelectionToggled($node) {
+      $rootScope.$broadcast('componentSelectionToggled', {id: $node.attr('id')});
+    }
+
+    function fireComponentDeselection() {
       $rootScope.$broadcast('componentDeselected');
     }
 
@@ -46,8 +50,11 @@
           editor.showEditPane(data, getTitle(component), content, function() {
             $log.debug('on update...');
           }, {}, function() {
+            /** Deselect component when config dismissed **/
             fireComponentDeselection($node);
           });
+
+          fireComponentSelection($node);
         },
         onClick: function($node, $scope) {
 
@@ -64,7 +71,7 @@
             }
           }
 
-          onSingleClick(function() { fireComponentSelection($node); });
+          onSingleClick(function() { fireComponentSelectionToggled($node); });
         },
         getMarkUp: function($node, $scope) {
           var id = $node.attr('id');

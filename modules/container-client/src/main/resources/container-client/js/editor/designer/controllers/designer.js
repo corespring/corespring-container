@@ -88,11 +88,31 @@ var controller = function(
         deleteComponent);
     };
 
+    var orderList = function(component) {
+
+      var orderedComponents = [
+        "corespring-multiple-choice",
+        "corespring-inline-choice",
+        "corespring-focus-task",
+        "corespring-ordering",
+        "corespring-drag-and-drop",
+        "corespring-text-entry",
+        "corespring-extended-text-entry",
+        "corespring-point-intercept",
+        "corespring-line",
+        "corespring-function-entry",
+        "corespring-select-text"
+      ];
+
+      var idx = _.indexOf(orderedComponents, component.componentType);
+      return idx >= 0 ? idx : 1000;
+    };
+
     $scope.extraFeatures = [{
       name: 'external',
       type: 'dropdown',
       dropdownTitle: 'Question Type',
-      buttons: _.map(componentSet, componentToFeature)
+      buttons: _.map(_.sortBy(componentSet, orderList), componentToFeature)
     }];
   };
 

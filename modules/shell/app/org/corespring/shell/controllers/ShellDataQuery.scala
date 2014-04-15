@@ -90,9 +90,9 @@ class ShellDataQuery extends ContainerDataQuery {
       case "itemType" => itemTypes
       case "keySkills" => Json.toJson(keySkills)
       case "licenseTypes" => Json.toJson(licenseTypes)
-      case "primarySubject" => Json.toJson(subjects.filter(filter))
+      case "subjects.primary" => Json.toJson(subjects.filter(filter))
       case "priorUses" => Json.toJson(priorUses)
-      case "relatedSubject" => Json.toJson(subjects.filter(filter))
+      case "subjects.related" => Json.toJson(subjects.filter(filter))
       case "reviewsPassed" => Json.toJson(reviewsPassed)
     }
     Ok(out)
@@ -103,8 +103,8 @@ class ShellDataQuery extends ContainerDataQuery {
     def filter(o: JsObject) = (o \ "id").asOpt[String].map(_ == id).getOrElse(false)
 
     val out = topic match {
-      case "primarySubject" => subjects.filter(filter).headOption.map(Json.toJson(_)).getOrElse(JsObject(Seq()))
-      case "relatedSubject" => subjects.filter(filter).headOption.map(Json.toJson(_)).getOrElse(JsObject(Seq()))
+      case "subjects.primary" => subjects.filter(filter).headOption.map(Json.toJson(_)).getOrElse(JsObject(Seq()))
+      case "subjects.related" => subjects.filter(filter).headOption.map(Json.toJson(_)).getOrElse(JsObject(Seq()))
       case _ => JsObject(Seq())
     }
     Ok(out)

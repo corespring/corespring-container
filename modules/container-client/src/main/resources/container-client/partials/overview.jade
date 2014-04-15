@@ -1,6 +1,111 @@
 script#overview(type='text/ng-template')
-  .container(ng-controller="Overview")
-    .row
-      .jumbotron
-        h3 Overview
-        p Coming soon...
+  .container.overview(ng-controller="Overview")
+    h3 Item Information
+
+    dl
+      div
+        dt Description
+        dd {{data.item.profile.taskInfo.description}}
+
+      div
+        dt Title
+        dd {{data.item.profile.taskInfo.title}}
+
+      div
+        dt Primary Subject
+        dd {{data.item.profile.taskInfo.subjects.primary.subject}}
+
+      div(ng-show='data.item.profile.taskInfo.subjects.related')
+        dt Related Subject
+        dd {{data.item.profile.taskInfo.subjects.related.subject}}
+
+      div
+        dt Grade Levels
+        dd {{data.item.profile.taskInfo.gradeLevel}}
+
+      div
+        dt Item Type
+        dd {{data.item.profile.taskInfo.itemType}}
+
+      div
+        dt Bloom's Taxonomy
+        dd {{data.item.profile.otherAlignments.bloomsTaxonomy}}
+
+      div
+        dt Key Skills
+        dd {{data.item.profile.otherAlignments.keySkills}}
+
+      div
+        dt Depth of Knowledge
+        dd {{data.item.profile.otherAlignments.depthOfKnowledge}}
+
+    h3 Copyright Information
+    dl
+      div
+        dt Author
+        dd {{data.item.profile.contributorDetails.author}}
+
+      div
+        dt Credentials
+        dd {{data.item.profile.contributorDetails.credentials}}
+
+      div
+        dt Source URL
+        dd
+          a(href='{{data.item.profile.contributorDetails.sourceUrl}}', target='_blank') {{data.item.profile.contributorDetails.sourceUrl}}
+
+      div
+        dt Copyright Owner
+        dd {{data.item.profile.contributorDetails.copyright.owner}}
+
+      div
+        dt Copyright Year
+        dd {{data.item.profile.contributorDetails.copyright.year}}
+
+      div
+        dt Copyright Expiration Date
+        dd {{data.item.profile.contributorDetails.copyright.expirationDate}}
+
+    h3 Permissions
+    dl
+      div
+        dt License Type
+        dd {{data.item.profile.contributorDetails.licenseType}}
+
+    h3 Additional Copyright Information
+    ul
+      li(ng-repeat='copyright in data.item.profile.contributorDetails.copyright.additional')
+        dl
+          div
+            dt Owner
+            dd {{copyright.owner}}
+          div
+            dt Author
+            dd {{copyright.author}}
+          div
+            dt Publisher
+            dd {{copyright.publisher}}
+          div
+            dt Year
+            dd {{copyright.year}}
+          div
+            dt License
+            dd {{copyright.licenseType}}
+          div
+            dt Source URL
+            a(href='{{copyright.sourceUrl}}', target='_blank') {{copyright.sourceUrl}}
+
+    h3 Historical Information
+    dl
+      div
+        dt Prior Use
+        dd {{data.item.profile.priorUse}}
+      div
+        dt Grade Level
+        dd {{data.item.profile.priorGradeLevel}}
+      div
+        dt Difficulty Level
+        dd {{data.item.profile.pValue}}
+      div
+        dt Lexile Score
+        dd {{data.item.profile.lexile}} L
