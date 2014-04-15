@@ -6,12 +6,13 @@ fs = require('fs')
 _ = require('lodash')
 ObjectID = require('mongodb').ObjectID
 path = require('path')
+EOL = require('os').EOL
 
 mongoUri = process.env["CONTAINER_MONGO_URI"] || "mongodb://localhost/corespring-container"
 
 console.log "mongoUri: #{mongoUri}"
 
-seed = (collection, folder, next) ->
+seed = (collection, folder, isMultipleItems, next) ->
 
   collection.remove {}, ->
 
@@ -21,10 +22,16 @@ seed = (collection, folder, next) ->
 
       console.log "seeding: #{folder}/#{f}"
       contents = fs.readFileSync("#{folder}/#{f}", "utf8")
-      json = processDates(JSON.parse(contents))
-      json._id = new ObjectID(json._id)
 
-      collection.insert json, (err, docs) ->
+      if isMultipleItems
+        items = contents.trim().split(EOL).map (item) -> processId(JSON.parse(item.trim()))
+        #console.log "seeding: #{items.length} items into #{collection} example #{JSON.stringify(items[0])}"
+      else
+        json = processDates(JSON.parse(contents))
+        json._id = new ObjectID(json._id)
+        items = [json]
+
+      collection.insert items, (err, docs) ->
 
         collection.count (err, count) ->
           console.log format("count = %s", count)
@@ -32,6 +39,12 @@ seed = (collection, folder, next) ->
         collection.find().toArray (err, results) ->
           #console.dir(results)
           next(err)
+
+
+processId = (item) ->
+ if item._id.$oid
+   item._id = item._id.$oid
+ item
 
 processDates = (obj) ->
   for key of obj
@@ -49,7 +62,7 @@ MongoClient.connect mongoUri, (err, db) ->
   throw err if err?
 
   console.log "------------> items"
-  seed db.collection('items'), "mock-data/items", (err) ->
+  seed db.collection('items'), "mock-data/items", false, (err) ->
     db.close()
 
 
@@ -58,5 +71,14 @@ MongoClient.connect mongoUri, (err, db) ->
   throw err if err?
 
   console.log "------------> sessions"
-  seed db.collection('sessions'), "mock-data/sessions", (err) ->
+  seed db.collection('sessions'), "mock-data/sessions", false, (err) ->
+    db.close()
+
+
+MongoClient.connect mongoUri, (err, db) ->
+
+  throw err if err?
+
+  console.log "------------> ccstandards"
+  seed db.collection('ccstandards'), "mock-data/standards", true, (err) ->
     db.close()
