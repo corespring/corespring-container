@@ -1,5 +1,5 @@
 /* global com */
-var controller = function ($scope, ItemService, $modal, Overlay, $state, $log) {
+var controller = function($scope, ItemService, $modal, Overlay, $state, $log) {
 
   var log = $log.debug.bind($log, '[supporting-materials] -');
 
@@ -9,25 +9,28 @@ var controller = function ($scope, ItemService, $modal, Overlay, $state, $log) {
   $scope.materialType = $scope.materialTypes[0];
 
   $scope.displayOther = isOther();
-  $scope.$watch('materialType', function() { $scope.displayOther = isOther(); });
+  $scope.$watch('materialType', function() {
+    $scope.displayOther = isOther();
+  });
 
   $scope.uploadType = null;
 
-  function isOther() { return $scope.materialType === otherType; }
-  function getType() { return isOther() ? $scope.textMaterialType : $scope.materialType; }
+  function isOther() {
+    return $scope.materialType === otherType;
+  }
+
+  function getType() {
+    return isOther() ? $scope.textMaterialType : $scope.materialType;
+  }
 
   $scope.createNew = function() {
 
-    $scope.featuresWithoutImage = [{
-      name: 'no-image',
-      type: 'group',
-      buttons: [{
-        name: 'image',
-        iconclass: 'fa fa-picture-o',
-        action: function() {
-          window.alert('You must save the supporting material before adding images.');
-        }
-      }]
+    $scope.overrides = [{
+      name: 'image',
+      iconclass: 'fa fa-picture-o',
+      action: function() {
+        window.alert('You must save the supporting material before adding images.');
+      }
     }];
 
     Overlay.open({
@@ -43,7 +46,9 @@ var controller = function ($scope, ItemService, $modal, Overlay, $state, $log) {
 
   $scope.onSaveSuccess = function(result) {
     $scope.data.item.supportingMaterials = result.supportingMaterials;
-    $state.transitionTo('supporting-material', {index: result.supportingMaterials.length - 1});
+    $state.transitionTo('supporting-material', {
+      index: result.supportingMaterials.length - 1
+    });
   };
 
   $scope.onSaveError = function(result) {
@@ -63,14 +68,12 @@ var controller = function ($scope, ItemService, $modal, Overlay, $state, $log) {
       callback({
         name: $scope.title,
         materialType: getType(),
-        files: [
-          {
-            "name": "index.html",
-            "contentType": "text/html",
-            "content": $scope.content,
-            "isMain": true
-          }
-        ]
+        files: [{
+          "name": "index.html",
+          "contentType": "text/html",
+          "content": $scope.content,
+          "isMain": true
+        }]
       });
     }
 
@@ -85,14 +88,12 @@ var controller = function ($scope, ItemService, $modal, Overlay, $state, $log) {
           callback({
             name: $scope.title,
             materialType: getType(),
-            files: [
-              {
-                "name": file.name,
-                "contentType": "application/pdf",
-                "storageKey": $scope.itemId + "/" + $scope.title + "/" + file.name,
-                "isMain": true
-              }
-            ]
+            files: [{
+              "name": file.name,
+              "contentType": "application/pdf",
+              "storageKey": $scope.itemId + "/" + $scope.title + "/" + file.name,
+              "isMain": true
+            }]
           });
         }
       };
@@ -125,7 +126,9 @@ var controller = function ($scope, ItemService, $modal, Overlay, $state, $log) {
         supportingMaterials = $scope.data.item.supportingMaterials || [];
         createSupportingMaterial(function(newSupportingMaterial) {
           supportingMaterials.push(newSupportingMaterial);
-          ItemService.save({ supportingMaterials: supportingMaterials }, $scope.onSaveSuccess, $scope.onSaveError,
+          ItemService.save({
+              supportingMaterials: supportingMaterials
+            }, $scope.onSaveSuccess, $scope.onSaveError,
             $scope.itemId);
         });
       } else {
@@ -139,11 +142,11 @@ var controller = function ($scope, ItemService, $modal, Overlay, $state, $log) {
 };
 
 angular.module('corespring-editor.controllers')
-  .controller('SupportingMaterials',
-    ['$scope',
-     'ItemService',
-     '$modal',
-     'Overlay',
-     '$state',
-     '$log',
-      controller]);
+  .controller('SupportingMaterials', ['$scope',
+    'ItemService',
+    '$modal',
+    'Overlay',
+    '$state',
+    '$log',
+    controller
+  ]);
