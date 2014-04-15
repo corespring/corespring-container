@@ -139,6 +139,10 @@
       $scope.bloomsTaxonomyDataProvider = toListOfValues(result);
     });
 
+    $scope.copyrightExpirationYearDataProvider = _.range(new Date().getFullYear(), 2020).concat(['Never']);
+
+    $scope.copyrightYearDataProvider = _.range(new Date().getFullYear(), 1939, -1);
+
     DataQueryService.list("credentials", function (result) {
       $scope.credentialsDataProvider = toListOfValues(result);
     });

@@ -19,6 +19,8 @@ trait Main extends Controller {
 
   def sessionService: MongoService
 
+  def standardsService: MongoService
+
   def index = Action {
     request =>
 
