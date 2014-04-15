@@ -1,6 +1,111 @@
 script#overview(type='text/ng-template')
-  .container(ng-controller="Overview")
-    .row
-      .jumbotron
-        h3 Overview
-        p Coming soon...
+  .container.overview(ng-controller="Overview")
+    h3 Item Information
+
+    dl
+      div
+        dt Description
+        dd {{data.item.profile.taskInfo.description}}
+
+      div
+        dt Title
+        dd {{data.item.profile.taskInfo.title}}
+
+      div
+        dt Primary Subject
+        dd {{data.item.profile.taskInfo.primarySubject.subject}}
+
+      div(ng-show='data.item.profile.taskInfo.relatedSubject')
+        dt Related Subject
+        dd {{data.item.profile.taskInfo.relatedSubject.subject}}
+
+      div
+        dt Grade Levels
+        dd {{data.item.profile.taskInfo.gradeLevel}}
+
+      div
+        dt Item Type
+        dd {{data.item.profile.taskInfo.itemType}}
+
+      div
+        dt Bloom's Taxonomy
+        dd {{data.item.profile.taskInfo.bloomsTaxonomy}}
+
+      div
+        dt Key Skills
+        dd {{data.item.profile.taskInfo.keySkills}}
+
+      div
+        dt Depth of Knowledge
+        dd {{data.item.profile.taskInfo.depthOfKnowledge}}
+
+    h3 Copyright Information
+    dl
+      div
+        dt Author
+        dd {{data.item.profile.taskInfo.author}}
+
+      div
+        dt Credentials
+        dd {{data.item.profile.taskInfo.credentials}}
+
+      div
+        dt Source URL
+        dd
+          a(href='{{data.item.profile.taskInfo.sourceUrl}}', target='_blank') {{data.item.profile.taskInfo.sourceUrl}}
+
+      div
+        dt Copyright Owner
+        dd {{data.item.profile.taskInfo.copyrightOwner}}
+
+      div
+        dt Copyright Year
+        dd {{data.item.profile.taskInfo.copyrightYear}}
+
+      div
+        dt Copyright Expiration Date
+        dd {{data.item.profile.taskInfo.copyrightExpirationDate}}
+
+    h3 Permissions
+    dl
+      div
+        dt License Type
+        dd {{data.item.profile.taskInfo.licenseType}}
+
+    h3 Additional Copyright Information
+    ul
+      li(ng-repeat='copyright in data.item.profile.taskInfo.additionalCopyright')
+        dl
+          div
+            dt Owner
+            dd {{copyright.owner}}
+          div
+            dt Author
+            dd {{copyright.author}}
+          div
+            dt Publisher
+            dd {{copyright.publisher}}
+          div
+            dt Year
+            dd {{copyright.year}}
+          div
+            dt License
+            dd {{copyright.licenseType}}
+          div
+            dt URL
+            a(href='{{copyright.url}}', target='_blank') {{copyright.url}}
+
+    h3 Historical Information
+    dl
+      div
+        dt Prior Use
+        dd {{data.item.profile.taskInfo.priorUse}}
+      div
+        dt Grade Level
+        dd {{data.item.profile.taskInfo.priorGradeLevel}}
+      div
+        dt Difficulty Level
+        dd {{data.item.profile.taskInfo.pValue}}
+      div
+        dt Lexile Score
+        dd {{data.item.profile.taskInfo.lexile}} L
