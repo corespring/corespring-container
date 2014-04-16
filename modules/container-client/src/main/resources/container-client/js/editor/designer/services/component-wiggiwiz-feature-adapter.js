@@ -7,11 +7,15 @@
     }
 
     function fireComponentSelection($node) {
-      $rootScope.$broadcast('componentSelected', {id: $node.attr('id')});
+      $rootScope.$broadcast('componentSelected', {
+        id: $node.attr('id')
+      });
     }
 
     function fireComponentSelectionToggled($node) {
-      $rootScope.$broadcast('componentSelectionToggled', {id: $node.attr('id')});
+      $rootScope.$broadcast('componentSelectionToggled', {
+        id: $node.attr('id')
+      });
     }
 
     function fireComponentDeselection() {
@@ -26,7 +30,6 @@
         title: component.title,
         titleGroup: component.titleGroup,
         toolbar: '<button class="btn btn-default btn-sm btn-small">CB</button>',
-        clickable: true,
         compile: true,
         deleteNode: function($node, services) {
           deleteComponentCallback($node.attr('id'));
@@ -71,7 +74,9 @@
             }
           }
 
-          onSingleClick(function() { fireComponentSelectionToggled($node); });
+          onSingleClick(function() {
+            fireComponentSelectionToggled($node);
+          });
         },
         getMarkUp: function($node, $scope) {
           var id = $node.attr('id');
