@@ -265,8 +265,11 @@
       if (!($scope.data.item.profile.otherAlignments)) {
         $scope.data.item.profile.otherAlignments = {};
       }
-      if (!$($scope.data.item.profile.contributorDetails)) {
+      if (!($scope.data.item.profile.contributorDetails)) {
         $scope.data.item.profile.contributorDetails = {};
+      }
+      if (!($scope.data.item.profile.contributorDetails.copyright)) {
+        $scope.data.item.profile.contributorDetails.copyright = {};
       }
     }
 

@@ -3,7 +3,6 @@ describe('item-profile controller', function() {
   var rootScope, ctrl;
 
   function mockModal() {
-
   }
 
   function mockDesignerService() {

@@ -1,111 +1,107 @@
 script#overview(type='text/ng-template')
   .container.overview(ng-controller="Overview")
-    h3 Item Information
+    .row
+      .attribute
+        span.label CCSS
+        ul.standards
+          li(ng-repeat='standard in profile.standards')
+            span.standard {{standard}}
+          li(ng-show='!profile.standards || profile.standards.length == 0')
+            span.standard {{unassigned}}
 
-    dl
-      div
-        dt Description
-        dd {{data.item.profile.taskInfo.description}}
+      // TODO: Display organization image here when it exists
+      .attribute.logo(ng-show='false')
+        img(src='nothing.png')
 
-      div
-        dt Title
-        dd {{data.item.profile.taskInfo.title}}
+      // TODO: Calculate times administered
+      .attribute.times-administered
+        span.label Times Administered:
+        | 0
 
-      div
-        dt Primary Subject
-        dd {{data.item.profile.taskInfo.subjects.primary.subject}}
+      // TODO: Display community rating when we've figured that out
+      .attribute.community-rating(ng-show='false')
+        span.label Community Rating:
+        | AVG
 
-      div(ng-show='data.item.profile.taskInfo.subjects.related')
-        dt Related Subject
-        dd {{data.item.profile.taskInfo.subjects.related.subject}}
+    hr
 
-      div
-        dt Grade Levels
-        dd {{data.item.profile.taskInfo.gradeLevel}}
+    .row
+      .attribute.description
+        span.label Description:
+        | {{taskInfo.description || unassigned}}
 
-      div
-        dt Item Type
-        dd {{data.item.profile.taskInfo.itemType}}
+      .attribute.title
+        span.label Title:
+        | {{taskInfo.title || unassigned}}
 
-      div
-        dt Bloom's Taxonomy
-        dd {{data.item.profile.otherAlignments.bloomsTaxonomy}}
+    hr
 
-      div
-        dt Key Skills
-        dd {{data.item.profile.otherAlignments.keySkills}}
+    .row
+      .attribute.subjects
+        ul
+          li.subject.primary {{taskInfo.subjects.primary.subject || unassigned}}
+          li.subject.related {{taskInfo.subjects.related.subject || unassigned}}
 
-      div
-        dt Depth of Knowledge
-        dd {{data.item.profile.otherAlignments.depthOfKnowledge}}
+      .attribute.blooms-taxonomy
+        span.value {{otherAlignments.bloomsTaxonomy || unassigned}}
+        span.label Bloom's
 
-    h3 Copyright Information
-    dl
-      div
-        dt Author
-        dd {{data.item.profile.contributorDetails.author}}
+      .attribute.depth-of-knowledge
+        span.label Depth of Knowledge
+        | {{depthOfKnowledge}}
 
-      div
-        dt Credentials
-        dd {{data.item.profile.contributorDetails.credentials}}
+    .row
+      .attribute.question-types
+        .label Question Type(s)
+        .question-type {{taskInfo.itemType || unassigned}}
 
-      div
-        dt Source URL
-        dd
-          a(href='{{data.item.profile.contributorDetails.sourceUrl}}', target='_blank') {{data.item.profile.contributorDetails.sourceUrl}}
+      .attribute.key-skills
+        .label Key Skills
+        .key-skills {{otherAlignments.keySkills.join(", ") || unassigned}}
 
-      div
-        dt Copyright Owner
-        dd {{data.item.profile.contributorDetails.copyright.owner}}
+    hr
 
-      div
-        dt Copyright Year
-        dd {{data.item.profile.contributorDetails.copyright.year}}
+    .row
+      .attribute.license
+        span.label License
+        img(ng-show='licenseTypeUrl', src='{{licenseTypeUrl}}')
+        .unassigned(ng-show='!licenseTypeUrl') {{unassigned}}
 
-      div
-        dt Copyright Expiration Date
-        dd {{data.item.profile.contributorDetails.copyright.expirationDate}}
+      .attribute.copyright-year
+        span.label Copyright Year
+        span.year {{contributorDetails.copyright.year || unassigned}}
 
-    h3 Permissions
-    dl
-      div
-        dt License Type
-        dd {{data.item.profile.contributorDetails.licenseType}}
+    h3
+      a(ng-click='expandAdditionalInformation=!expandAdditionalInformation')
+        i(class="fa fa-{{!!expandAdditionalInformation ? 'minus' : 'plus'}}-square-o", style="margin-right: 6px")
+      | Additional Information
 
-    h3 Additional Copyright Information
-    ul
-      li(ng-repeat='copyright in data.item.profile.contributorDetails.copyright.additional')
-        dl
-          div
-            dt Owner
-            dd {{copyright.owner}}
-          div
-            dt Author
-            dd {{copyright.author}}
-          div
-            dt Publisher
-            dd {{copyright.publisher}}
-          div
-            dt Year
-            dd {{copyright.year}}
-          div
-            dt License
-            dd {{copyright.licenseType}}
-          div
-            dt Source URL
-            a(href='{{copyright.sourceUrl}}', target='_blank') {{copyright.sourceUrl}}
+    .additional-information(ng-show='expandAdditionalInformation')
+      hr
 
-    h3 Historical Information
-    dl
-      div
-        dt Prior Use
-        dd {{data.item.profile.priorUse}}
-      div
-        dt Grade Level
-        dd {{data.item.profile.priorGradeLevel}}
-      div
-        dt Difficulty Level
-        dd {{data.item.profile.pValue}}
-      div
-        dt Lexile Score
-        dd {{data.item.profile.lexile}} L
+      .row
+        .attribute.prior-use
+          .label Prior Use
+          .prior-use {{priorUse || unassigned}}
+
+        .attribute.reviews-passed
+          .label Reviews Passed
+          .reviews-passed {{profile.reviewsPassed.join(", ") || unassigned}}
+
+      .row
+        .attribute.difficulty-level
+          .label Difficulty Level
+          .difficulty-level {{profile.difficultyLevel || unassigned}}
+
+        .attribute.lexile-score
+          .label Lexile Score
+          .lexile-score {{profile.lexile && profile.lexile + 'L' || unassigned}}
+
+    hr
+
+    .row
+      .attribute.item-id
+        span.label Item ID #
+        span.value {{itemId}}
+
+    a.print(href='#')
