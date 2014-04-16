@@ -108,12 +108,14 @@ var controller = function(
       return idx >= 0 ? idx : 1000;
     };
 
-    $scope.extraFeatures = [{
-      name: 'external',
-      type: 'dropdown',
-      dropdownTitle: 'Question Type',
-      buttons: _.map(_.sortBy(componentSet, orderList), componentToFeature)
-    }];
+    $scope.extraFeatures = {
+      definitions: [{
+        name: 'external',
+        type: 'dropdown',
+        dropdownTitle: 'Question Type',
+        buttons: _.map(_.sortBy(componentSet, orderList), componentToFeature)
+      }]
+    };
   };
 
   $scope.onComponentsLoadError = function(error) {
