@@ -68,7 +68,15 @@ var controller = function(
 
     var addToEditor = function(editor, addContent, component) {
       var id = ++$scope.lastId;
-      $scope.data.item.components[id] = _.cloneDeep(component.defaultData);
+
+      var defaults = {
+        weight: 1
+      };
+
+      var newData = _.extend(defaults, _.cloneDeep(component.defaultData));
+
+      $scope.data.item.components[id] = newData;
+
       addContent($('<placeholder id="' + id + '" label="' + component.name + '">'));
     };
 
