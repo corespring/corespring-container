@@ -1,0 +1,107 @@
+script#overview-profile(type='text/ng-template')
+  .container.overview(ng-controller="Overview")
+    .row
+      .attribute
+        span.label CCSS
+        ul.standards
+          li(ng-repeat='standard in profile.standards')
+            span.standard {{standard}}
+          li(ng-show='!profile.standards || profile.standards.length == 0')
+            span.standard {{unassigned}}
+
+      // TODO: Display organization image here when it exists
+      .attribute.logo(ng-show='false')
+        img(src='nothing.png')
+
+      // TODO: Calculate times administered
+      .attribute.times-administered
+        span.label Times Administered:
+        | 0
+
+      // TODO: Display community rating when we've figured that out
+      .attribute.community-rating(ng-show='false')
+        span.label Community Rating:
+        | AVG
+
+    hr
+
+    .row
+      .attribute.description
+        span.label Description:
+        | {{taskInfo.description || unassigned}}
+
+      .attribute.title
+        span.label Title:
+        | {{taskInfo.title || unassigned}}
+
+    hr
+
+    .row
+      .attribute.subjects
+        ul
+          li.subject.primary {{taskInfo.subjects.primary.subject || unassigned}}
+          li.subject.related {{taskInfo.subjects.related.subject || unassigned}}
+
+      .attribute.blooms-taxonomy
+        span.value {{otherAlignments.bloomsTaxonomy || unassigned}}
+        span.label Bloom's
+
+      .attribute.depth-of-knowledge
+        span.label Depth of Knowledge
+        | {{depthOfKnowledge}}
+
+    .row
+      .attribute.question-types
+        .label Question Type(s)
+        .question-type {{taskInfo.itemType || unassigned}}
+
+      .attribute.key-skills
+        .label Key Skills
+        .key-skills {{otherAlignments.keySkills.join(", ") || unassigned}}
+
+    hr
+
+    .row
+      .attribute.license
+        span.label License
+        img(ng-show='licenseTypeUrl', src='{{licenseTypeUrl}}')
+        .unassigned(ng-show='!licenseTypeUrl') {{unassigned}}
+
+      .attribute.copyright-year
+        span.label Copyright Year
+        span.year {{contributorDetails.copyright.year || unassigned}}
+
+    h3
+      a(ng-click='expandAdditionalInformation=!expandAdditionalInformation')
+        i(class="fa fa-{{!!expandAdditionalInformation ? 'minus' : 'plus'}}-square-o", style="margin-right: 6px")
+      | Additional Information
+
+    .additional-information(ng-show='expandAdditionalInformation')
+      hr
+
+      .row
+        .attribute.prior-use
+          .label Prior Use
+          .prior-use {{priorUse || unassigned}}
+
+        .attribute.reviews-passed
+          .label Reviews Passed
+          .reviews-passed {{profile.reviewsPassed.join(", ") || unassigned}}
+
+      .row
+        .attribute.difficulty-level
+          .label Difficulty Level
+          .difficulty-level {{profile.difficultyLevel || unassigned}}
+
+        .attribute.lexile-score
+          .label Lexile Score
+          .lexile-score {{profile.lexile && profile.lexile + 'L' || unassigned}}
+
+    hr
+
+    .row
+      .attribute.item-id
+        span.label Item ID #
+        span.value {{itemId}}
+
+    a.print(href='#')

@@ -13,8 +13,22 @@ var controller = function($scope, $rootScope, $log, $location, $timeout, DataQue
     item: {}
   };
 
-  function supportingMaterialIndex() {
-    var match = $location.path().match(/\/supporting-material\/(\d+)/);
+  $rootScope.$on('$stateChangeSuccess', function() {
+    function isOverview() {
+      return $scope.isActive('overview') || $scope.isActive('overview-profile') ||
+        supportingMaterialIndex('overview-supporting-material') >= 0;
+    }
+
+    if (isOverview()) {
+      $scope.showOverview = true;
+    } else {
+      $scope.showOverview = false;
+    }
+  });
+
+  function supportingMaterialIndex(prefix) {
+    var re = new RegExp("\\/" + (prefix || 'supporting-material') + "\\/(\\d+)");
+    var match = $location.path().match(re);
     return match ? parseInt(match[1], 10) : undefined;
   }
 
@@ -83,11 +97,21 @@ var controller = function($scope, $rootScope, $log, $location, $timeout, DataQue
     return supportingMaterialIndex() === index;
   };
 
+  $scope.isOverviewActive = function(supportingMaterial, index) {
+    return supportingMaterialIndex('overview-supporting-material') === index;
+  };
+
   $scope.toggleSupportingMaterials = function() {
     $scope.showSupportingMaterials = !$scope.showSupportingMaterials;
   };
 
+  $scope.toggleOverview = function() {
+    $scope.showOverview = !$scope.showOverview;
+  };
+
   $scope.showSupportingMaterials = supportingMaterialIndex() !== undefined;
+
+  $scope.showOverview = true;
 
   $scope.save = function() {
     $scope.$broadcast('save-data');
