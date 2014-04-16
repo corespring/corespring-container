@@ -51,24 +51,21 @@ trait Main extends Controller {
       Ok(html.createSession(itemId, createSessionCall.url))
   }
 
-  def deleteItem(itemId:String) = Action {
+  def deleteItem(itemId: String) = Action {
     request =>
       itemService.delete(itemId)
       Redirect("/")
   }
 
-  def createItem = Action{
+  def createItem = Action {
     request =>
       val json = Json.obj(
-        "xhtml" -> "<div><h2>Hello</h2></div>",
+        "xhtml" -> "<div></div>",
         "components" -> Json.obj(),
         "profile" -> Json.obj(
-           "taskInfo" -> Json.obj(
-            "title" -> "New item"
-           )
-        )
-      )
-      itemService.create(json).map{ id =>
+          "taskInfo" -> Json.obj(
+            "title" -> "New item")))
+      itemService.create(json).map { id =>
         Redirect(org.corespring.container.client.controllers.apps.routes.Editor.editItem(id.toString))
       }.getOrElse(BadRequest("Error creating an item"))
   }
