@@ -27,14 +27,8 @@ block content
             li.nav-subitem(ng-repeat="supportingMaterial in data.item.supportingMaterials", ng-class="{ active: isSupportingMaterialActive(supportingMaterial, $index)}")
               a(ui-sref="supporting-material({index: $index})") {{supportingMaterial.name}}
 
-        li.nav-subheader(ng-class="{ active: isActive('overview') }")
+        li(ng-class="{ active: isActive('overview') }")
           a(ui-sref="overview") Catalog View
-          a.collapsable(ng-class="{expanded: showOverview}", ng-click="toggleOverview()")
-          ul.nav.nav-subitems(ng-show='showOverview')
-            li.nav-subitem(ng-class="{ active: isActive('overview-profile') }")
-              a(ui-sref="overview-profile") Profile Information
-            li.nav-subitem(ng-repeat="supportingMaterial in data.item.supportingMaterials", ng-class="{ active: isOverviewActive(supportingMaterial, $index)}")
-              a(ui-sref="overview-supporting-material({index: $index})") {{supportingMaterial.name}}
 
     .preview-container
       .contents(ui-view="preview")
@@ -177,22 +171,6 @@ block scripts
                 views: {
                   main: {
                     template: $('#overview').html()
-                  }
-                }
-              })
-              .state('overview-profile', {
-                url: '/overview-profile',
-                views: {
-                  main: {
-                    template: $('#overview-profile').html()
-                  }
-                }
-              })
-              .state('overview-supporting-material', {
-                url: '/overview-supporting-material/:index',
-                views: {
-                  main: {
-                    template: $('#overview-supporting-material').html()
                   }
                 }
               })

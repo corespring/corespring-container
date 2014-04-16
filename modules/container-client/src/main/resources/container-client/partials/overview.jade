@@ -1,16 +1,3 @@
 script#overview(type='text/ng-template')
-  .container.overview
-    client-side-preview(ng-controller="ClientSidePreview")
-      player-control-panel(player-settings="session.settings")
-      corespring-player(
-      player-mode="editor",
-      player-markup="data.item.xhtml",
-      player-item="data.item",
-      player-session="rootModel.session",
-      player-outcomes="outcome")
-      .button-holder
-        button.btn.btn-primary(ng-click="submit()", ng-disabled="!canSubmit()") Submit
-        button.btn.btn-warning(ng-click="resetPreview()") Reset
-      hr/
-      #score(ng-show="score")
-        h4 You scored: {{score.summary.percentage}}%
+  .container.overview(ng-controller="Overview")
+    catalogview(item='data.item', selectedTab="")
