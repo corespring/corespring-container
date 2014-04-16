@@ -23,7 +23,7 @@
     }
 
     var service = {};
-    service.componentToWiggiwizFeature = function(component, addToEditorCallback, deleteComponentCallback) {
+    service.componentToWiggiwizFeature = function(component, addToEditorCallback, deleteComponentCallback, isInline) {
       var componentType = component.componentType;
       return {
         name: componentType,
@@ -37,7 +37,7 @@
         },
         initialise: function($node, replaceWith) {
           var id = $node.attr('id');
-          return replaceWith('<placeholder label="' + component.title + ': ' + id + '" id="' + id + '"></placeholder>');
+          return replaceWith('<placeholder label="' + component.title + ': ' + id + '" id="' + id + '" inline="' + isInline + '"></placeholder>');
         },
         addToEditor: function(editor, addContent) {
           addToEditorCallback(editor, addContent, component);

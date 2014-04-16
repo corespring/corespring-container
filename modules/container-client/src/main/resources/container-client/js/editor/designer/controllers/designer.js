@@ -82,10 +82,12 @@ var controller = function(
     };
 
     var componentToFeature = function(component) {
+      var inlineInteractions = [ "corespring-inline-choice" ];
       return ComponentToWiggiwizFeatureAdapter.componentToWiggiwizFeature(
         component,
         addToEditor,
-        deleteComponent);
+        deleteComponent,
+        _.indexOf(inlineInteractions, component.componentType) >= 0);
     };
 
     var orderList = function(component) {
@@ -103,6 +105,7 @@ var controller = function(
         "corespring-function-entry",
         "corespring-select-text"
       ];
+
 
       var idx = _.indexOf(orderedComponents, component.componentType);
       return idx >= 0 ? idx : 1000;
