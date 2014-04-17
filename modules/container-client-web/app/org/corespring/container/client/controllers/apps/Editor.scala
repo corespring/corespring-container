@@ -43,4 +43,5 @@ trait Editor extends AllItemTypesReader with AppWithServices[EditorActions[AnyCo
       logger.trace(s"[editItem]: $itemId")
       controllers.Assets.at("/container-client", "editor.html")(request)
   }
+
 }

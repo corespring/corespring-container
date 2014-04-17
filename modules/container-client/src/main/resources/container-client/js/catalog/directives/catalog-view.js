@@ -1,5 +1,13 @@
 angular.module('corespring-catalog.directives').directive('catalogview', [ '$sce', function($sce) {
 
+  var supportingMaterialsTab = 'supporting-materials';
+
+  var tabs = [
+    'preview',
+    'profile',
+    supportingMaterialsTab
+  ];
+
   function priorUse(profile) {
     var str = "";
     if (profile) {
@@ -19,8 +27,6 @@ angular.module('corespring-catalog.directives').directive('catalogview', [ '$sce
       return undefined;
     }
   }
-
-  // margin-right: 3px;
 
   var css = [
     '<style type="text/css">',
@@ -93,7 +99,7 @@ angular.module('corespring-catalog.directives').directive('catalogview', [ '$sce
     },
     template: [
       css,
-      '<div class="catalog-nav">',
+      '<div class="catalog-nav" ng-show="!printMode">',
       '  <div class="catalog-tabs-container">',
       '    <ul class="catalog-tabs">',
       '      <li class="catalog-tab" ng-class="{ active: isActive(\'preview\') }">',
@@ -115,7 +121,7 @@ angular.module('corespring-catalog.directives').directive('catalogview', [ '$sce
       '</div>',
       '<ul class="catalog-tabbed-content-container">',
       '  <li class="catalog-tabbed-content preview" ng-class="{ active: isActive(\'preview\') }">',
-      '    <div ng-controller="ClientSidePreview">',
+      '    <div>',
       '      <player-control-panel player-settings="session.settings"/>',
       '      <corespring-player player-mode="editor" player-markup="data.item.xhtml" player-item="data.item" player-session="rootModel.session" player-outcomes="outcome">',
       '      </corespring-player>',
@@ -198,7 +204,7 @@ angular.module('corespring-catalog.directives').directive('catalogview', [ '$sce
       '      </div>',
       '    </div>',
       '    <h3>',
-      '      <a ng-click="expandAdditionalInformation=!expandAdditionalInformation">',
+      '      <a ng-click="expandAdditionalInformation=!expandAdditionalInformation" ng-show="!printMode">',
       '        <i class="fa fa-{{!!expandAditionalInformation ? \'minus\' : \'plus\'}}-square-o" style="margin-right: 6px;"></i>',
       '      </a>',
       '      {{i18n.additionalInformation}}',
@@ -242,14 +248,24 @@ angular.module('corespring-catalog.directives').directive('catalogview', [ '$sce
       '  </li>',
       '</ul>'
     ].join('\n'),
-    link: function($scope) {
 
-      $scope.activeTab = 'preview';
-      $scope.supportingMaterialIndex = undefined;
+    link: function($scope, $elem, $attrs) {
+
+      $scope.printMode = $attrs.printmode === 'true';
+      $scope.expandAdditionalInformation = $scope.printMode;
+
+      console.log('happy');
+      console.log($attrs);
+
+      $scope.activeTab = $attrs.selectedtab || 'preview';
+      if ($attrs.supportingmaterialindex) {
+        $scope.activeTab = supportingMaterialsTab;
+        $scope.supportingMaterialIndex = parseInt($attrs.supportingmaterialindex, 10);
+      }
 
       $scope.isActive = function(tab, index) {
         return $scope.activeTab === tab &&
-          ($scope.activeTab === 'supportingMaterials', $scope.supportingMaterialIndex === index);
+          ($scope.activeTab === supportingMaterialsTab, $scope.supportingMaterialIndex === index);
       };
 
       $scope.changeTab = function(tab, index) {
