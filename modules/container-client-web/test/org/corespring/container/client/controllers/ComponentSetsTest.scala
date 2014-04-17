@@ -25,6 +25,8 @@ class ComponentSetsTest extends Specification with ComponentMaker {
 
     override def editorGenerator: SourceGenerator = new MockSourceGenerator("editor")
 
+    override def catalogGenerator: SourceGenerator = new MockSourceGenerator("catalog")
+
     override def allComponents: Seq[Component] = Seq(uiComp("org", "name", Seq.empty))
   }
 

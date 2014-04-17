@@ -1,6 +1,6 @@
-angular.module('corespring-catalog.directives').directive('catalogview', [ '$sce', function($sce) {
+angular.module('corespring-catalog.directives').directive('catalogview', [ '$sce', '$window', function($sce, $window) {
 
-  var supportingMaterialsTab = 'supporting-materials';
+  var supportingMaterialsTab = 'supporting-material';
 
   var tabs = [
     'preview',
@@ -31,63 +31,200 @@ angular.module('corespring-catalog.directives').directive('catalogview', [ '$sce
   var css = [
     '<style type="text/css">',
     '  .catalog-nav {',
-    '      position: relative',
-    '      width: 100%;',
-    '      background-color: #847d84;',
-    '      background-image: -moz-linear-gradient(top, #433f43, #777177);',
-    '      background-image: -ms-linear-gradient(top, #433f43, #777177);',
-    '      background-image: -webkit-linear-gradient(top, #433f43, #777177);',
-    '      border-bottom: 1px solid #433f43 !important;',
-    '      height: 40px;',
-    '      text-shadow: 2px 2px 3px rgba(255, 255, 255, 0.1);',
+    '    position: relative',
+    '    width: 100%;',
+    '    background-color: #847d84;',
+    '    background-image: -moz-linear-gradient(top, #433f43, #777177);',
+    '    background-image: -ms-linear-gradient(top, #433f43, #777177);',
+    '    background-image: -webkit-linear-gradient(top, #433f43, #777177);',
+    '    border-bottom: 1px solid #433f43 !important;',
+    '    height: 40px;',
+    '    text-shadow: 2px 2px 3px rgba(255, 255, 255, 0.1);',
     '  }',
     '  .catalog-tabs-container {',
-    '      padding: 6px;',
+    '    padding: 6px;',
     '  }',
     '  .catalog-tabs-container .catalog-tabs {',
-    '      position: absolute;',
-    '      top: 15px;',
+    '    position: absolute;',
+    '    top: 15px;',
     '  }',
     '  .catalog-tabs .catalog-tab {',
-    '      display: inline-block;',
+    '    display: inline-block;',
     '  }',
     '  .catalog-tabs .catalog-print-preview-tab {',
-    '      display: inline-block;',
-    '      vertical-align: bottom;',
+    '    display: inline-block;',
+    '    vertical-align: bottom;',
     '  }',
     '  .catalog-tabs .catalog-print-preview-tab a {',
-    '      padding: 6px 12px;',
+    '    padding: 6px 12px;',
     '  }',
     '  .catalog-tabs .catalog-tab.supporting-material-tab {',
-    '      margin-right: 3px;',
+    '    margin-right: 3px;',
     '  }',
     '  .catalog-tabs .catalog-tab a {',
-    '      background-color: #e1e1e1;',
-    '      border-radius: 4px 4px 0px 0px;',
-    '      color: rgba(0, 0, 0, 0.6);',
-    '      padding: 6px 12px;',
-    '      font-weight: bold;',
-    '      border-color: #433f43;',
+    '    background-color: #e1e1e1;',
+    '    border-radius: 4px 4px 0px 0px;',
+    '    color: rgba(0, 0, 0, 0.6);',
+    '    padding: 6px 12px;',
+    '    font-weight: bold;',
+    '    border-color: #433f43;',
     '  }',
     '  .catalog-tabs .catalog-tab.active a {',
-    '      color: #000000;',
-    '      cursor: default;',
-    '      background-color: white;',
-    '      text-transform: uppercase;',
-    '      border-color: #433f43 #433f43 #ffffff;',
+    '    color: #000000;',
+    '    cursor: default;',
+    '    background-color: white;',
+    '    text-transform: uppercase;',
+    '    border-color: #433f43 #433f43 #ffffff;',
     '  }',
     '  .catalog-tabs .catalog-tab.active a:hover {',
-    '      text-decoration: none;',
+    '    text-decoration: none;',
     '  }',
     '  .catalog-tabbed-content-container {',
-    '      padding: 0;',
-    '      margin: 20px;',
+    '    padding: 0;',
+    '    margin: 20px;',
     '  }',
     '  .catalog-tabbed-content-container .catalog-tabbed-content {',
-    '      display: none;',
+    '    display: none;',
     '  }',
     '  .catalog-tabbed-content-container .catalog-tabbed-content.active {',
-    '      display: inherit;',
+    '    display: inherit;',
+    '  }',
+    '  .catalog-tabbed-content.profile .row {',
+    '    margin-bottom: 20px;',
+    '  }',
+    '  ',
+    '  .catalog-tabbed-content.profile .attribute {',
+    '    display: inline-block;',
+    '    vertical-align: top;',
+    '    padding: 0 20px;',
+    '  }',
+    '  .catalog-tabbed-content.profile .attribute.title {',
+    '    display: block;',
+    '  }',
+    '  ',
+    '  .catalog-tabbed-content.profile .attribute.description {',
+    '    display: block;',
+    '    margin-bottom: 20px;',
+    '  }',
+    '  ',
+    '  .catalog-tabbed-content.profile .label {',
+    '    font-weight: bold;',
+    '    color: black;',
+    '    padding: 0 5px 0 0;',
+    '    font-size: 14px;',
+    '    text-align: left;',
+    '  }',
+    '  ',
+    '  .catalog-tabbed-content.profile .standards {',
+    '    list-style-type: none;',
+    '    padding: 0;',
+    '  }',
+    '  ',
+    '  .catalog-tabbed-content.profile .standards .standard {',
+    '    color: white;',
+    '    background: #549e25;',
+    '    font-weight: bold;',
+    '    padding: 2px 8px;',
+    '    border-radius: 4px;',
+    '    display: inline-block;',
+    '    text-align: center;',
+    '  }',
+    '  ',
+    '  .catalog-tabbed-content.profile .subjects ul {',
+    '    padding: 0;',
+    '  }',
+    '  ',
+    '  .catalog-tabbed-content.profile .subjects .subject {',
+    '    margin: 2px 0;',
+    '    display: block;',
+    '    font-weight: bold;',
+    '    padding: 2px 8px;',
+    '    border-radius: 4px;',
+    '    display: block;',
+    '    text-align: center;',
+    '  }',
+    '  ',
+    '  .catalog-tabbed-content.profile .subjects .subject.primary {',
+    '    color: black;',
+    '    background: #72a9da;',
+    '  }',
+    '  ',
+    '  .catalog-tabbed-content.profile .subjects .subject.related {',
+    '    color: black;',
+    '    background: #549e25;',
+    '  }',
+    '  ',
+    '  .catalog-tabbed-content.profile .blooms-taxonomy {',
+    '    position: relative;',
+    '    background: url("/client/images/blooms-triangle.png") no-repeat left top;',
+    '    width: 200px;',
+    '    height: 115px;',
+    '    margin: 0 40px 20px 40px;',
+    '  }',
+    '  ',
+    '  .catalog-tabbed-content.profile .blooms-taxonomy .value {',
+    '    font-weight: bold;',
+    '    padding: 2px 8px;',
+    '    border-radius: 4px;',
+    '    display: inline-block;',
+    '    text-align: center;',
+    '    position: absolute;',
+    '    right: 0;',
+    '    top: 30px;',
+    '    color: black;',
+    '    background: #ef9840;',
+    '  }',
+    '  ',
+    '  .catalog-tabbed-content.profile .blooms-taxonomy .label {',
+    '    position: absolute;',
+    '    bottom: 0;',
+    '    width: 100%;',
+    '    left: 40px;',
+    '    text-align: left;',
+    '  }',
+    '  ',
+    '  .catalog-tabbed-content.profile .depth-of-knowledge .label {',
+    '    display: block;',
+    '  }',
+    '  ',
+    '  .catalog-tabbed-content.profile .license img {',
+    '    margin: 10px 0;',
+    '    display: block;',
+    '  }',
+    '  ',
+    '  .catalog-tabbed-content.profile .copyright-year {',
+    '    background: url("/client/images/calendar-icon.png") no-repeat center bottom;',
+    '    height: 120px;',
+    '    margin: 0 40px;',
+    '    text-align: center;',
+    '  }',
+    '  ',
+    '  .catalog-tabbed-content.profile .copyright-year span {',
+    '    display: block;',
+    '    margin: 0 auto;',
+    '  }',
+    '  ',
+    '  .catalog-tabbed-content.profile .copyright-year .year {',
+    '    font-weight: bold;',
+    '    padding: 2px 8px;',
+    '    border-radius: 4px;',
+    '    display: inline-block;',
+    '    text-align: center;',
+    '    margin-top: 5px;',
+    '    background: rgba(0,0,0,0.8);',
+    '    color: white;',
+    '    min-width: inherit;',
+    '  }',
+    '  ',
+    '  .catalog-tabbed-content.profile h3 {',
+    '    font-size: 14px;',
+    '    margin: 0;',
+    '    font-weight: bold;',
+    '  }',
+    '  ',
+    '  .catalog-tabbed-content.profile hr {',
+    '    background-color: black;',
+    '    height: 1px;',
     '  }',
     '</style>'
   ].join('\n');
@@ -108,12 +245,12 @@ angular.module('corespring-catalog.directives').directive('catalogview', [ '$sce
       '      <li class="catalog-tab" ng-class="{ active: isActive(\'profile\') }">',
       '        <a ng-click="changeTab(\'profile\')">Profile</a>',
       '      </li>',
-      '      <li class="catalog-tab supporting-material-tab" ng-class="{ active: isActive(\'supportingMaterial\', $index) }" ng-repeat="supportingMaterial in item.supportingMaterials">',
-      '        <a ng-click="changeTab(\'supportingMaterial\', $index)">{{supportingMaterial.name}}</a>',
+      '      <li class="catalog-tab supporting-material-tab" ng-class="{ active: isActive(\'supporting-material\', $index) }" ng-repeat="supportingMaterial in item.supportingMaterials">',
+      '        <a ng-click="changeTab(\'supporting-material\', $index)">{{supportingMaterial.name}}</a>',
       '      </li>',
       '      <li class="catalog-print-preview-tab">',
       '        <a ng-click="print()">',
-      '          <img src="images/print.png"/>',
+      '          <img src="/client/images/print.png"/>',
       '        </a>',
       '      </li>',
       '    </ul>',
@@ -123,7 +260,7 @@ angular.module('corespring-catalog.directives').directive('catalogview', [ '$sce
       '  <li class="catalog-tabbed-content preview" ng-class="{ active: isActive(\'preview\') }">',
       '    <div>',
       '      <player-control-panel player-settings="session.settings"/>',
-      '      <corespring-player player-mode="editor" player-markup="data.item.xhtml" player-item="data.item" player-session="rootModel.session" player-outcomes="outcome">',
+      '      <corespring-player player-mode="editor" player-markup="item.xhtml" player-item="item" player-session="rootModel.session" player-outcomes="outcome">',
       '      </corespring-player>',
       '      <div class="button-holder">',
       '        <button class="btn btn-primary" ng-click="submit()" ng-disabled="!canSubmit()">Submit</button>',
@@ -240,7 +377,7 @@ angular.module('corespring-catalog.directives').directive('catalogview', [ '$sce
       '      </div>',
       '    </div>',
       '  </li>',
-      '  <li class="catalog-tabbed-content supporting-material" ng-class="{ active: isActive(\'supportingMaterial\', $index) }" ng-repeat="supportingMaterial in item.supportingMaterials">',
+      '  <li class="catalog-tabbed-content supporting-material" ng-class="{ active: isActive(\'supporting-material\', $index) }" ng-repeat="supportingMaterial in item.supportingMaterials">',
       '    <div style="height: 100%;" ng-show="isMarkup($index)" ng-bind-html-unsafe="getMarkup($index)"/>',
       '    <div style="height: 100%;" ng-show="!isMarkup($index)">',
       '      <iframe ng-src="{{supportingUrl($index)}}" width="100%" height="100%"/>',
@@ -250,12 +387,8 @@ angular.module('corespring-catalog.directives').directive('catalogview', [ '$sce
     ].join('\n'),
 
     link: function($scope, $elem, $attrs) {
-
       $scope.printMode = $attrs.printmode === 'true';
       $scope.expandAdditionalInformation = $scope.printMode;
-
-      console.log('happy');
-      console.log($attrs);
 
       $scope.activeTab = $attrs.selectedtab || 'preview';
       if ($attrs.supportingmaterialindex) {
@@ -275,8 +408,23 @@ angular.module('corespring-catalog.directives').directive('catalogview', [ '$sce
         }
       };
 
+      function printUrl() {
+        if ($scope.activeTab === 'supporting-material') {
+          if ($scope.isMarkup($scope.supportingMaterialIndex)) {
+            return 'preview#?printMode=true&tab=' + $scope.activeTab + '&index=' + $scope.supportingMaterialIndex;
+          } else {
+            return getUrl($scope.item.supportingMaterials, $scope.supportingMaterialIndex);
+          }
+
+        }
+        else {
+          return 'preview#?printMode=true&tab=' + $scope.activeTab;
+        }
+      }
+
       $scope.print = function() {
-        window.alert('Coming soon.');
+        console.log(printUrl());
+        $window.open(printUrl(), '_blank');
       };
 
       function fileIndex(index) {
@@ -293,15 +441,15 @@ angular.module('corespring-catalog.directives').directive('catalogview', [ '$sce
         return $scope.item.supportingMaterials[index].files[fileIndex(index)].content;
       };
 
-      $scope.supportingUrl = function(index) {
-        function getUrl(supportingMaterials, index) {
-          if (supportingMaterials) {
-            return supportingMaterials[index].name + "/" + supportingMaterials[index].files[fileIndex(index)].name;
-          } else {
-            return undefined;
-          }
+      function getUrl(supportingMaterials, index) {
+        if (supportingMaterials) {
+          return supportingMaterials[index].name + "/" + supportingMaterials[index].files[fileIndex(index)].name;
+        } else {
+          return undefined;
         }
+      }
 
+      $scope.supportingUrl = function(index) {
         if ($scope.item) {
           return $sce.trustAsResourceUrl(getUrl($scope.item.supportingMaterials, index));
         } else {
@@ -310,10 +458,18 @@ angular.module('corespring-catalog.directives').directive('catalogview', [ '$sce
       };
 
       $scope.$watch('item', function() {
+        $scope.init();
+      });
+
+       $scope.$on('itemLoaded', function(ev, item) {
+         $scope.item = item;
+       });
+
+      $scope.init = function() {
         if ($scope.item && $scope.item._id) {
           $scope.itemId = $scope.item._id.$oid;
         }
-        if ($scope.item.profile) {
+        if ($scope.item && $scope.item.profile) {
           $scope.profile = $scope.item.profile;
           $scope.priorUse = priorUse($scope.profile);
 
@@ -324,7 +480,7 @@ angular.module('corespring-catalog.directives').directive('catalogview', [ '$sce
             $scope.contributorDetails = $scope.profile.contributorDetails;
           }
         }
-      });
+      };
 
       $scope.i18n = {
         additionalInformation: "Additional Information",

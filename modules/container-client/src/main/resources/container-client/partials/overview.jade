@@ -1,3 +1,3 @@
 script#overview(type='text/ng-template')
-  .container.overview(ng-controller="Overview")
-    catalogview(item='data.item', supportingMaterialIndex="0")
+  .overview.container(ng-controller='Overview')
+    iframe(ng-src='{{url}}', frameBorder="0")

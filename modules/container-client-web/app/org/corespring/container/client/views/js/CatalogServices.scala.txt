@@ -1,0 +1,47 @@
+@(namespace : String, load : Call, save : Call, componentSet : JsValue)
+
+(function(){
+  "use strict";
+
+  var loadedData = null;
+
+  angular.module('@namespace', []);
+
+  angular.module('@namespace').factory('ItemService', ['BaseService', function(BaseService){
+    return {
+      load: function(onSuccess, onFailure, id){
+        BaseService.load(onSuccess, onFailure, id);
+      }
+    };
+  }]);
+
+  angular.module('@namespace').factory('BaseService', ['$http', function($http){
+
+    var def = {
+      /**
+       * Load the item, check to see if its already loaded.
+       */
+      load: function(onSuccess, onFailure, id){
+        if(loadedData){
+          onSuccess(loadedData);
+        } else {
+          var finalUrl = id ? '@load.url'.replace(":id", id) : '@load.url';
+
+          $http['@load.method.toLowerCase'](finalUrl)
+            .success(function(data, status, headers, config){
+              console.log("[player-services] load item successful");
+              loadedData = data;
+              onSuccess(data);
+            })
+            .error(function(data, status, headers, config){
+              if(onFailure){
+                onFailure(data);
+              }
+            });
+        }
+      }
+    };
+    return def;
+  }]);
+})();
+
