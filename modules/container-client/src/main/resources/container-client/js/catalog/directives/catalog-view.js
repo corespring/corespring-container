@@ -1,4 +1,4 @@
-angular.module('corespring-common.directives').directive('catalogview', [ '$sce', 'DataQueryService', function($sce, DataQueryService) {
+angular.module('corespring-catalog.directives').directive('catalogview', [ '$sce', 'DataQueryService', function($sce, DataQueryService) {
 
   function priorUse(profile) {
     var str = "";
@@ -115,9 +115,9 @@ angular.module('corespring-common.directives').directive('catalogview', [ '$sce'
       '</div>',
       '<ul class="catalog-tabbed-content-container">',
       '  <li class="catalog-tabbed-content preview" ng-class="{ active: isActive(\'preview\') }">',
-      '    <client-side-preview ng-controller="ClientSidePreview">',
+      '    <div ng-controller="ClientSidePreview">',
       '      <player-control-panel player-settings="session.settings"/>',
-      '      <corespring-player player-mode="editor" player-markup="item.xhtml" player-item="item" player-session="rootModel.session" player-outcomes="outcome">',
+      '      <corespring-player player-mode="editor" player-markup="data.item.xhtml" player-item="data.item" player-session="rootModel.session" player-outcomes="outcome">',
       '      </corespring-player>',
       '      <div class="button-holder">',
       '        <button class="btn btn-primary" ng-click="submit()" ng-disabled="!canSubmit()">Submit</button>',
@@ -127,7 +127,7 @@ angular.module('corespring-common.directives').directive('catalogview', [ '$sce'
       '          <h4>You scored: {{score.summary.percentage}}%</h4>',
       '        </div>',
       '      </div>',
-      '    </client-side-preview>',
+      '    </div>',
       '  </li>',
       '  <li class="catalog-tabbed-content profile" ng-class="{ active: isActive(\'profile\') }">',
       '    <div class="row">',
