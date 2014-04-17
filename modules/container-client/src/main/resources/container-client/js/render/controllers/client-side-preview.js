@@ -37,7 +37,7 @@ var controller = function($scope, ComponentRegister, PlayerService) {
   };
 };
 
-angular.module('corespring-editor.controllers')
+angular.module('corespring-player.controllers')
   .controller(
     'ClientSidePreview', [
       '$scope',

@@ -1,4 +1,4 @@
-angular.module('corespring-catalog.directives').directive('catalogview', [ '$sce', 'DataQueryService', function($sce, DataQueryService) {
+angular.module('corespring-catalog.directives').directive('catalogview', [ '$sce', function($sce) {
 
   function priorUse(profile) {
     var str = "";
