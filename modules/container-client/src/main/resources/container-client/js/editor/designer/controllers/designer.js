@@ -67,7 +67,15 @@ var controller = function(
     $scope.componentSet = componentSet;
 
     var addToEditor = function(editor, addContent, component) {
-      var id = ++$scope.lastId;
+      var max = 0;
+      $($scope.data.item.xhtml).find('[id]').each(function(idx, element) {
+        var id = Number($(element).attr('id'));
+        if (!_.isNaN(id) && id > max) {
+          max = id;
+        }
+      });
+
+      var id = max + 1;
 
       var defaults = {
         weight: 1
@@ -90,7 +98,7 @@ var controller = function(
     };
 
     var componentToFeature = function(component) {
-      var inlineInteractions = [ "corespring-inline-choice" ];
+      var inlineInteractions = [ "corespring-inline-choice", "corespring-text-entry" ];
       return ComponentToWiggiwizFeatureAdapter.componentToWiggiwizFeature(
         component,
         addToEditor,
@@ -212,14 +220,6 @@ var controller = function(
       }
     });
 
-    var max = 0;
-    $(item.xhtml).find('[id]').each(function(idx, element) {
-      var id = Number($(element).attr('id'));
-      if (!_.isNaN(id) && id > max) {
-        max = id;
-      }
-    });
-    $scope.lastId = max;
 
     var scoringJs = _.find($scope.data.item.files, function(f) {
       return f.name === "scoring.js";
