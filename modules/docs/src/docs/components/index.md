@@ -112,4 +112,21 @@ All components must output a score between 0.0 and 1.0
 
 ### Testing
 
+## Styling Components
+
+### Editor styling
+
+You can define the following to define how your component renders in the editor: 
+
+    .component-placeholder.${org}-${name}{
+      display: inline;
+    }
+
+For example: 
+
+    .component-placeholder.corespring-inline-choice{
+      display: inline;
+    }
+
+
 
