@@ -98,7 +98,6 @@ var controller = function(
     };
 
     var componentToFeature = function(component) {
-      var inlineInteractions = ["corespring-inline-choice", "corespring-text-entry"];
       return ComponentToWiggiwizFeatureAdapter.componentToWiggiwizFeature(
         component,
         addToEditor,

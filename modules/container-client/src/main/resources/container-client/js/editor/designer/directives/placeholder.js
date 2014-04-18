@@ -15,7 +15,6 @@ angular.module('corespring-editor.directives').directive('placeholder', function
     link: link,
     scope: {
       label: '@',
-      inline: '@',
       componentType: '@'
     },
     template: [
