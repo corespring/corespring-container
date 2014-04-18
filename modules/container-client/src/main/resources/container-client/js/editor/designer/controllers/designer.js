@@ -12,7 +12,8 @@ var controller = function(
   MathJaxService,
   ComponentToWiggiwizFeatureAdapter,
   ImageUtils,
-  ComponentRegister) {
+  ComponentRegister,
+  WiggiMathMlFeatureDef) {
 
   var configPanels = {};
 
@@ -98,7 +99,7 @@ var controller = function(
     };
 
     var componentToFeature = function(component) {
-      var inlineInteractions = [ "corespring-inline-choice", "corespring-text-entry" ];
+      var inlineInteractions = ["corespring-inline-choice", "corespring-text-entry"];
       return ComponentToWiggiwizFeatureAdapter.componentToWiggiwizFeature(
         component,
         addToEditor,
@@ -133,6 +134,11 @@ var controller = function(
         type: 'dropdown',
         dropdownTitle: 'Question Type',
         buttons: _.map(_.sortBy(componentSet, orderList), componentToFeature)
+      }, {
+        type: 'group',
+        buttons: [
+          new WiggiMathMlFeatureDef()
+        ]
       }]
     };
   };
@@ -247,5 +253,6 @@ angular.module('corespring-editor.controllers')
     'ComponentToWiggiwizFeatureAdapter',
     'ImageUtils',
     'ComponentRegister',
+    'WiggiMathMlFeatureDef',
     controller
   ]);
