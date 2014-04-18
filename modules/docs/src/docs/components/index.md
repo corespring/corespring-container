@@ -116,7 +116,15 @@ All components must output a score between 0.0 and 1.0
 
 ### Editor styling
 
-You can define the following to define how your component renders in the editor: 
+Your component will be viewed in 2 contexts: 
+* Editor
+* Player
+
+To style how your component appears in the editor you are free to add the appropriate class names to you directives.
+
+In the editor you component may be put inside a placeholder. This place holder will have the class name `component-placeholder`. By default it will `display: block`. 
+
+You can override this by specifying your own css: 
 
     .component-placeholder.${org}-${name}{
       display: inline;
