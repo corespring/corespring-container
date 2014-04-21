@@ -387,7 +387,9 @@ angular.module('corespring-catalog.directives').directive('catalogview', [ '$sce
       '        <div class="attribute attribution">',
       '          <div class="license">',
       '            <span class="label">{{i18n.license.label}}</span>',
-      '            <img ng-show="licenseTypeUrl" src="{{licenseTypeUrl}}" />',
+      '            <div ng-if="licenseTypeUrl != undefined">',
+      '              <img ng-src="{{licenseTypeUrl}}" />',
+      '            </div>',
       '            <div class="unassigned" ng-show="!licenseTypeUrl">{{unassigned}}</div>',
       '          </div>',
       '          <div class="copyright-year">',
@@ -405,8 +407,8 @@ angular.module('corespring-catalog.directives').directive('catalogview', [ '$sce
       '    </div>',
       '  </li>',
       '  <li class="catalog-tabbed-content supporting-material" ng-class="{ active: isActive(\'supporting-material\', $index) }" ng-repeat="supportingMaterial in item.supportingMaterials">',
-      '    <div style="height: 100%;" ng-show="isMarkup($index)" ng-bind-html-unsafe="getMarkup($index)"/>',
-      '    <div style="height: 100%;" ng-show="!isMarkup($index)">',
+      '    <div style="height: 100%;" ng-if="isMarkup($index)" ng-bind-html-unsafe="getMarkup($index)"/>',
+      '    <div style="height: 100%;" ng-if="!isMarkup($index)">',
       '      <iframe ng-src="{{supportingUrl($index)}}" width="100%" height="100%"/>',
       '    </div>',
       '  </li>',
@@ -434,6 +436,10 @@ angular.module('corespring-catalog.directives').directive('catalogview', [ '$sce
           $scope.supportingMaterialIndex = index;
         }
       };
+
+      function licenseTypeUrl(licenseType) {
+        return licenseType ? "/assets/images/licenseTypes/" + licenseType.replace(" ", "-") + ".png" : undefined;
+      }
 
       function printUrl() {
         if ($scope.activeTab === 'supporting-material') {
@@ -512,6 +518,10 @@ angular.module('corespring-catalog.directives').directive('catalogview', [ '$sce
           if ($scope.profile.otherAlignments) {
             $scope.otherAlignments = $scope.profile.otherAlignments;
           }
+          if ($scope.contributorDetails) {
+            $scope.licenseTypeUrl = licenseTypeUrl($scope.contributorDetails.licenseType);
+          }
+
         }
 
         DataQueryService.list("depthOfKnowledge", function(result) {
@@ -524,8 +534,6 @@ angular.module('corespring-catalog.directives').directive('catalogview', [ '$sce
           }
         });
       };
-
-      $scope.mockTaskInfo = {};
 
       $scope.i18n = {
         additionalInformation: "Additional Information",
