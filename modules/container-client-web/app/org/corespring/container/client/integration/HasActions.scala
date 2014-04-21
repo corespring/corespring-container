@@ -10,6 +10,8 @@ import org.corespring.container.components.outcome.ScoreProcessor
 trait HasActions {
   def editorActions: EditorActions[AnyContent]
 
+  def catalogActions: CatalogActions[AnyContent]
+
   def playerActions: PlayerActions[AnyContent]
 
   def sessionActions: SessionActions[AnyContent]

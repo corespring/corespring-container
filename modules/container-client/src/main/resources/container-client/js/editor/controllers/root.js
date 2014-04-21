@@ -1,4 +1,4 @@
-var controller = function($scope, $rootScope, $log, $location, $timeout, DataQueryService, ItemService, NavModelService, SupportingMaterialsService) {
+var controller = function($scope, $rootScope, $log, $location, $timeout, DataQueryService, ItemService, ItemIdService, NavModelService, SupportingMaterialsService) {
 
   var navSetOnce = false;
 
@@ -119,10 +119,7 @@ var controller = function($scope, $rootScope, $log, $location, $timeout, DataQue
     $scope.data.saveError = undefined;
   };
 
-  $scope.itemId = (function() {
-    //TODO: This is a temporary means of extracting the session id
-    return document.location.pathname.match(/.*\/(.*)\/.*/)[1];
-  })();
+  $scope.itemId = ItemIdService.itemId();
 
   $scope.onItemLoaded = function(item) {
     $scope.data.item = item;
@@ -179,6 +176,7 @@ angular.module('corespring-editor.controllers')
     '$timeout',
     'DataQueryService',
     'ItemService',
+    'ItemIdService',
     'NavModelService',
     'SupportingMaterialsService',
     controller

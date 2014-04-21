@@ -28,6 +28,10 @@ trait EditorActions[A] extends ClientActions[A] {
   def editItem(itemId: String)(error: (Int, String) => Future[SimpleResult])(block: PlayerRequest[A] => Future[SimpleResult]): Action[AnyContent]
 }
 
+trait CatalogActions[A] extends ClientActions[A] {
+  def showCatalog(itemId: String)(error: (Int, String) => Future[SimpleResult])(block: PlayerRequest[A] => Future[SimpleResult]): Action[AnyContent]
+}
+
 //Note: move to this pattern - instead of action decorators
 trait ItemHooks {
   def load(itemId: String)(implicit header: RequestHeader): Future[Either[SimpleResult, JsValue]]

@@ -17,6 +17,8 @@ trait ComponentSets extends Controller with ComponentUrls {
 
   def editorGenerator: SourceGenerator
 
+  def catalogGenerator: SourceGenerator
+
   /**
    * Take a source + contentType and return a Result
    */
@@ -43,6 +45,7 @@ trait ComponentSets extends Controller with ComponentUrls {
         case "editor" => gen(editorGenerator)
         case "player" => gen(playerGenerator)
         case "rig" => gen(playerGenerator)
+        case "catalog" => gen(catalogGenerator)
         case _ => throw new RuntimeException(s"Error: unknown context: $context")
       }
 
@@ -68,6 +71,6 @@ trait ComponentSets extends Controller with ComponentUrls {
 
 trait DefaultComponentSets extends ComponentSets {
   val editorGenerator: SourceGenerator = new EditorGenerator()
-
   val playerGenerator: SourceGenerator = new PlayerGenerator()
+  val catalogGenerator: SourceGenerator = new CatalogGenerator()
 }
