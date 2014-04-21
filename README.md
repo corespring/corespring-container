@@ -101,7 +101,7 @@ Then go to [http://localhost:9000](http://localhost:9000)
     Eg: 
     http://localhost:9000/client/rig/corespring.multiple-choice/index.html?data=one.json
     
-    
+
 
 ## Grunt integration with Play
 
