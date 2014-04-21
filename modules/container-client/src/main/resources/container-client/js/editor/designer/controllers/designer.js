@@ -85,7 +85,7 @@ var controller = function(
 
       $scope.data.item.components[id] = newData;
 
-      addContent($('<placeholder id="' + id + '" label="' + component.name + '">'));
+      addContent($('<placeholder id="' + id + '" component-type="' + component.componentType + '" label="' + component.name + '">'));
     };
 
     var deleteComponent = function(id) {
@@ -98,12 +98,10 @@ var controller = function(
     };
 
     var componentToFeature = function(component) {
-      var inlineInteractions = [ "corespring-inline-choice", "corespring-text-entry" ];
       return ComponentToWiggiwizFeatureAdapter.componentToWiggiwizFeature(
         component,
         addToEditor,
-        deleteComponent,
-        _.indexOf(inlineInteractions, component.componentType) >= 0);
+        deleteComponent);
     };
 
     var orderList = function(component) {
