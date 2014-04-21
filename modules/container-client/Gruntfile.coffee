@@ -54,7 +54,8 @@ module.exports = (grunt) ->
         '<%= common.dist %>/js/editor/**/*.js',
         '<%= common.dist %>/js/catalog/**/*.js',
         '<%= common.dist %>/js/render/services/**/*.js',
-        '<%= common.dist %>/js/render/directives/**/*.js'
+        '<%= common.dist %>/js/render/directives/**/*.js',
+        '<%= common.dist %>/js/render/controllers/**/*.js'
       ]
 
     editorExtras:
