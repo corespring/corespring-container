@@ -450,7 +450,6 @@ angular.module('corespring-catalog.directives').directive('catalogview', [ '$sce
       }
 
       $scope.print = function() {
-        console.log(printUrl());
         $window.open(printUrl(), '_blank');
       };
 
