@@ -76,6 +76,10 @@ var controller = function($scope, $rootScope, $log, $location, $timeout, DataQue
     log('params', $scope.urlParams);
   }
 
+  $scope.isPreviewHidden = function() {
+    return !_.isUndefined($scope.urlParams.hidePreview);
+  };
+
   $scope.showPreview = function(hidePreview) {
     return !hidePreview && previewable();
   };
