@@ -1,4 +1,4 @@
-var controller = function($scope, $location, $log, ItemService) {
+var controller = function($scope, $location, $log, ItemService, ItemIdService) {
   $scope.selectedTab = $location.search().tab;
 
   if ($scope.selectedTab === 'supporting-material') {
@@ -7,10 +7,7 @@ var controller = function($scope, $location, $log, ItemService) {
 
   $scope.printMode = $location.search().printMode;
 
-  $scope.itemId = (function() {
-    //TODO: This is a temporary means of extracting the session id
-    return document.location.pathname.match(/.*\/(.*)\/.*/)[1];
-  })();
+  $scope.itemId = ItemIdService.itemId();
 
   $scope.onItemLoaded = function(item) {
     $scope.item = item;
@@ -30,5 +27,6 @@ angular.module('corespring-catalog.controllers')
     '$location',
     '$log',
     'ItemService',
+    'ItemIdService',
     controller
   ]);
