@@ -356,7 +356,7 @@ angular.module('corespring-catalog.directives').directive('catalogview', [ '$sce
       '      </div>',
       '      <div class="attribute depth-of-knowledge">',
       '        <span class="label">{{i18n.depthOfKnowledge.label}}</span>',
-      '        <span class="value">{{otherAlignments.depthOfKnowledge || unassigned}}</span>',
+      '        <span class="value">{{depthOfKnowledge || unassigned}}</span>',
       '      </div>',
       '      <div class="attribute key-skills">',
       '        <div>{{otherAlignments.keySkills.join(", ") || unassigned}}</div>',
@@ -476,7 +476,7 @@ angular.module('corespring-catalog.directives').directive('catalogview', [ '$sce
         }
       }
 
-      DataQueryService.list("reviewsPassed", function (result) {
+      DataQueryService.list("reviewsPassed", function(result) {
         $scope.reviewsPassedDataProvider = result;
       });
 
@@ -514,7 +514,16 @@ angular.module('corespring-catalog.directives').directive('catalogview', [ '$sce
             $scope.otherAlignments = $scope.profile.otherAlignments;
           }
         }
-        console.log($scope.item);
+
+        DataQueryService.list("depthOfKnowledge", function(result) {
+          var depthOfKnowledge;
+          if ($scope.otherAlignments && $scope.otherAlignments.depthOfKnowledge) {
+            depthOfKnowledge = _.find(result, function(d) { return $scope.otherAlignments.depthOfKnowledge === d.key; });
+            if (depthOfKnowledge) {
+              $scope.depthOfKnowledge = depthOfKnowledge.value;
+            }
+          }
+        });
       };
 
       $scope.mockTaskInfo = {};
