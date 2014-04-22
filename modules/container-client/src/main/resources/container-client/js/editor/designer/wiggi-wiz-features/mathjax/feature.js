@@ -1,17 +1,19 @@
-angular.module('corespring.wiggi-wiz-features').factory('WiggiMathMlFeatureDef', [
+angular.module('corespring.wiggi-wiz-features').factory('WiggiMathJaxFeatureDef', [
 
   function() {
 
     function FeatureDef() {
-      this.name = 'math-ml';
+      this.name = 'mathjax';
       this.tagName = 'math';
       this.iconclass = 'fa math-sum';
-      this.addToEditor = '<math-ml-holder><msup><mi>r</mi><mn>3</mn></msup></math-ml-holder>';
+      this.addToEditor = '<mathjax-holder><math><msup><mi>r</mi><mn>3</mn></msup><math></mathjax-holder>';
       this.compile = true;
 
       this.initialise = function($node, replaceWith) {
         var content = $node.html();
-        return replaceWith($('<math-ml-holder><math>' + content + '</math></math-ml-holder>'));
+        var newNode = $('<mathjax-holder>');
+        newNode.html(content);
+        return replaceWith(newNode);
       };
 
       this.onDblClick = function($node, $scope, editor) {
@@ -20,7 +22,7 @@ angular.module('corespring.wiggi-wiz-features').factory('WiggiMathMlFeatureDef',
             markup: $scope.originalMarkup
           },
           'Edit the Math',
-          '<math-ml-dialog></math-ml-dialog>',
+          '<mathjax-dialog></mathjax-dialog>',
           function onUpdate(update) {
             $scope.originalMarkup = update.markup;
           }
@@ -28,7 +30,7 @@ angular.module('corespring.wiggi-wiz-features').factory('WiggiMathMlFeatureDef',
       };
 
       this.getMarkUp = function($node, $scope) {
-        return $scope.originalMarkup;
+        return '<math>' + $scope.originalMarkup + '</math>';
       };
     }
     return FeatureDef;

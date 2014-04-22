@@ -1,5 +1,5 @@
 /* global com */
-var controller = function($scope, ItemService, $modal, Overlay, $state, $log, WiggiMathMlFeatureDef) {
+var controller = function($scope, ItemService, $modal, Overlay, $state, $log, WiggiMathJaxFeatureDef) {
 
   var log = $log.debug.bind($log, '[supporting-materials] -');
 
@@ -28,7 +28,7 @@ var controller = function($scope, ItemService, $modal, Overlay, $state, $log, Wi
     $scope.extraFeatures = {
       definitions: [{
         type: 'group',
-        buttons: [new WiggiMathMlFeatureDef()]
+        buttons: [new WiggiMathJaxFeatureDef()]
       }]
     };
     $scope.overrides = [{
@@ -154,6 +154,6 @@ angular.module('corespring-editor.controllers')
     'Overlay',
     '$state',
     '$log',
-    'WiggiMathMlFeatureDef',
+    'WiggiMathJaxFeatureDef',
     controller
   ]);

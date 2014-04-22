@@ -9,7 +9,7 @@ var controller = function(
   SupportingMaterialsService,
   ItemService,
   ImageUtils,
-  WiggiMathMlFeatureDef) {
+  WiggiMathJaxFeatureDef) {
 
   $scope.index = parseInt($stateParams.index, 10);
   $scope.editing = false;
@@ -17,7 +17,7 @@ var controller = function(
   $scope.extraFeatures = {
     definitions: [{
       type: 'group',
-      buttons: [new WiggiMathMlFeatureDef()]
+      buttons: [new WiggiMathJaxFeatureDef()]
     }]
   };
 
@@ -210,6 +210,6 @@ angular.module('corespring-editor.controllers')
     'SupportingMaterialsService',
     'ItemService',
     'ImageUtils',
-    'WiggiMathMlFeatureDef',
+    'WiggiMathJaxFeatureDef',
     controller
   ]);

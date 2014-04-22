@@ -1,5 +1,5 @@
 /* global MathJax */
-angular.module('corespring.wiggi-wiz-features').directive('mathMlDialog', [
+angular.module('corespring.wiggi-wiz-features').directive('mathjaxDialog', [
 
   function() {
     function link($scope, $element) {
@@ -16,7 +16,7 @@ angular.module('corespring.wiggi-wiz-features').directive('mathMlDialog', [
       link: link,
       replace: true,
       template: [
-        '<div class="math-ml-dialog-root">',
+        '<div class="mathjax-dialog-root">',
         '<div class="editor">',
         ' <textarea ng-model="data.markup"></textarea>',
         '</div>',

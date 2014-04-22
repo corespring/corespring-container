@@ -13,7 +13,7 @@ var controller = function(
   ComponentToWiggiwizFeatureAdapter,
   ImageUtils,
   ComponentRegister,
-  WiggiMathMlFeatureDef) {
+  WiggiMathJaxFeatureDef) {
 
   var configPanels = {};
 
@@ -135,7 +135,7 @@ var controller = function(
       }, {
         type: 'group',
         buttons: [
-          new WiggiMathMlFeatureDef()
+          new WiggiMathJaxFeatureDef()
         ]
       }]
     };
@@ -251,6 +251,6 @@ angular.module('corespring-editor.controllers')
     'ComponentToWiggiwizFeatureAdapter',
     'ImageUtils',
     'ComponentRegister',
-    'WiggiMathMlFeatureDef',
+    'WiggiMathJaxFeatureDef',
     controller
   ]);
