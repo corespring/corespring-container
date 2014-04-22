@@ -48,7 +48,9 @@
             '<div class="navigator-toggle-button-row">',
             '  <div class="navigator-title">' + getTitle(component) + '</div>',
             '</div>',
-            '<' + componentType + '-config id="' + $node.attr('id') + '"></' + componentType + '-config>'
+            '<div class="config-panel-container">',
+            '<' + componentType + '-config id="' + $node.attr('id') + '"></' + componentType + '-config>',
+            '</div>'
           ].join('\n');
           editor.showEditPane(data, getTitle(component), content, function() {
             $log.debug('on update...');

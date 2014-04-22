@@ -8,6 +8,7 @@ import org.corespring.container.components.model.Component
 import org.corespring.mongo.json.services.MongoService
 import org.corespring.shell.controllers.CachedAndMinifiedComponentSets
 import org.corespring.shell.controllers.editor.actions.{ EditorActions => ShellEditorActions }
+import org.corespring.shell.controllers.catalog.actions.{ CatalogActions => ShellCatalogActions }
 import org.corespring.shell.controllers.editor.{ ItemHooks => ShellItemHooks }
 import org.corespring.shell.controllers.player.actions.{ PlayerActions => ShellPlayerActions }
 import org.corespring.shell.controllers.player.{ SessionActions => ShellSessionActions }
@@ -15,6 +16,7 @@ import org.corespring.shell.controllers.{ ShellDataQuery => ShellProfile }
 import play.api.Configuration
 import play.api.mvc._
 import scala.Some
+import scala.concurrent.Future
 
 class ContainerClientImplementation(
   val itemService: MongoService,
@@ -91,6 +93,10 @@ class ContainerClientImplementation(
   }
 
   override def editorActions: EditorActions[AnyContent] = new ShellEditorActions {
+    override def itemService: MongoService = ContainerClientImplementation.this.itemService
+  }
+
+  override def catalogActions: CatalogActions[AnyContent] = new ShellCatalogActions {
     override def itemService: MongoService = ContainerClientImplementation.this.itemService
   }
 

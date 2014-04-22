@@ -1,6 +1,6 @@
 package org.corespring.container.client.integration
 
-import org.corespring.container.client.controllers.apps.{ Rig, Editor, Player }
+import org.corespring.container.client.controllers.apps.{Catalog, Rig, Editor, Player}
 import org.corespring.container.client.component.ComponentUrls
 import org.corespring.container.client.controllers.resources.{ Session, Item }
 import org.corespring.container.client.controllers._
@@ -48,6 +48,11 @@ trait EditorControllers extends CommonControllers with ResourceControllers {
   def icons: Icons
 }
 
+trait CatalogControllers extends CommonControllers with ResourceControllers {
+  /** The catalog */
+  def catalog: Catalog
+}
+
 trait ProfileControllers {
   def dataQuery: DataQuery
 }
@@ -57,6 +62,7 @@ trait ContainerControllers
   with PlayerControllers
   with EditorControllers
   with ProfileControllers
+  with CatalogControllers
 {
   def controllers: Seq[Controller] = Seq(
     componentUrls,
@@ -68,6 +74,7 @@ trait ContainerControllers
     rig,
     player,
     editor,
+    catalog,
     icons,
     dataQuery)
 }
