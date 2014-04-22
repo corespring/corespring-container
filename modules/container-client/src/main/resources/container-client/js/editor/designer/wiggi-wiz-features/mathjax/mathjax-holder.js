@@ -1,28 +1,31 @@
 /* global MathJax */
-angular.module('corespring.wiggi-wiz-features').directive('mathjaxHolder', [
+angular.module('corespring.wiggi-wiz-features').directive('mathjaxHolder', ['$log',
 
-  function() {
+  function($log) {
 
+    var log = $log.debug.bind($log, '[mathjax-holder]');
     var html;
 
     function compile($element) {
       html = $element.html();
+      $element.addClass('mathjax-holder');
       return link;
     }
 
     function link($scope, $element) {
+      log(html);
       $scope.originalMarkup = html;
 
       $scope.$watch('originalMarkup', function(n) {
         if (n) {
-          $element.html('<span class="mathjax-holder">' + n + '</span>');
+          $element.html(n);
           MathJax.Hub.Queue(['Typeset', MathJax.Hub, $element[0]]);
         }
       });
     }
 
     return {
-      restrict: 'E',
+      restrict: 'A',
       compile: compile
     };
   }

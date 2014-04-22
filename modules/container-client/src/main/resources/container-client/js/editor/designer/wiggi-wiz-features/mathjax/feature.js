@@ -6,12 +6,12 @@ angular.module('corespring.wiggi-wiz-features').factory('WiggiMathJaxFeatureDef'
       this.name = 'mathjax';
       this.tagName = 'math';
       this.iconclass = 'fa math-sum';
-      this.addToEditor = '<mathjax-holder><math><msup><mi>r</mi><mn>3</mn></msup><math></mathjax-holder>';
+      this.addToEditor = '<div mathjax-holder><math><msup><mi>r</mi><mn>3</mn></msup><math></div>';
       this.compile = true;
 
       this.initialise = function($node, replaceWith) {
         var content = $node.html();
-        var newNode = $('<mathjax-holder>');
+        var newNode = $('<div mathjax-holder>');
         newNode.html(content);
         return replaceWith(newNode);
       };

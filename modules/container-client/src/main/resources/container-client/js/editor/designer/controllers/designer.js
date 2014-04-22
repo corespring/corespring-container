@@ -69,7 +69,7 @@ var controller = function(
 
     var addToEditor = function(editor, addContent, component) {
       var max = 0;
-      $($scope.data.item.xhtml).find('[id]').each(function(idx, element) {
+      $('<div>' + $scope.data.item.xhtml + '</div>').find('[id]').each(function(idx, element) {
         var id = Number($(element).attr('id'));
         if (!_.isNaN(id) && id > max) {
           max = id;
