@@ -1,4 +1,4 @@
-var controller = function($scope, $rootScope, $log, $location, $timeout, DataQueryService, ItemService, NavModelService, SupportingMaterialsService) {
+var controller = function($scope, $rootScope, $log, $location, $timeout, DataQueryService, ItemService, ItemIdService, NavModelService, SupportingMaterialsService) {
 
   var navSetOnce = false;
 
@@ -13,8 +13,22 @@ var controller = function($scope, $rootScope, $log, $location, $timeout, DataQue
     item: {}
   };
 
-  function supportingMaterialIndex() {
-    var match = $location.path().match(/\/supporting-material\/(\d+)/);
+  $rootScope.$on('$stateChangeSuccess', function() {
+    function isOverview() {
+      return $scope.isActive('overview') || $scope.isActive('overview-profile') ||
+        supportingMaterialIndex('overview-supporting-material') >= 0;
+    }
+
+    if (isOverview()) {
+      $scope.showOverview = true;
+    } else {
+      $scope.showOverview = false;
+    }
+  });
+
+  function supportingMaterialIndex(prefix) {
+    var re = new RegExp("\\/" + (prefix || 'supporting-material') + "\\/(\\d+)");
+    var match = $location.path().match(re);
     return match ? parseInt(match[1], 10) : undefined;
   }
 
@@ -62,6 +76,10 @@ var controller = function($scope, $rootScope, $log, $location, $timeout, DataQue
     log('params', $scope.urlParams);
   }
 
+  $scope.isPreviewHidden = function() {
+    return !_.isUndefined($scope.urlParams.hidePreview);
+  };
+
   $scope.showPreview = function(hidePreview) {
     return !hidePreview && previewable();
   };
@@ -83,11 +101,21 @@ var controller = function($scope, $rootScope, $log, $location, $timeout, DataQue
     return supportingMaterialIndex() === index;
   };
 
+  $scope.isOverviewActive = function(supportingMaterial, index) {
+    return supportingMaterialIndex('overview-supporting-material') === index;
+  };
+
   $scope.toggleSupportingMaterials = function() {
     $scope.showSupportingMaterials = !$scope.showSupportingMaterials;
   };
 
+  $scope.toggleOverview = function() {
+    $scope.showOverview = !$scope.showOverview;
+  };
+
   $scope.showSupportingMaterials = supportingMaterialIndex() !== undefined;
+
+  $scope.showOverview = true;
 
   $scope.save = function() {
     $scope.$broadcast('save-data');
@@ -95,10 +123,7 @@ var controller = function($scope, $rootScope, $log, $location, $timeout, DataQue
     $scope.data.saveError = undefined;
   };
 
-  $scope.itemId = (function() {
-    //TODO: This is a temporary means of extracting the session id
-    return document.location.pathname.match(/.*\/(.*)\/.*/)[1];
-  })();
+  $scope.itemId = ItemIdService.itemId();
 
   $scope.onItemLoaded = function(item) {
     $scope.data.item = item;
@@ -155,6 +180,7 @@ angular.module('corespring-editor.controllers')
     '$timeout',
     'DataQueryService',
     'ItemService',
+    'ItemIdService',
     'NavModelService',
     'SupportingMaterialsService',
     controller

@@ -7,10 +7,18 @@
     }
 
     function fireComponentSelection($node) {
-      $rootScope.$broadcast('componentSelected', {id: $node.attr('id')});
+      $rootScope.$broadcast('componentSelected', {
+        id: $node.attr('id')
+      });
     }
 
-    function fireComponentDeselection($node) {
+    function fireComponentSelectionToggled($node) {
+      $rootScope.$broadcast('componentSelectionToggled', {
+        id: $node.attr('id')
+      });
+    }
+
+    function fireComponentDeselection() {
       $rootScope.$broadcast('componentDeselected');
     }
 
@@ -22,7 +30,6 @@
         title: component.title,
         titleGroup: component.titleGroup,
         toolbar: '<button class="btn btn-default btn-sm btn-small">CB</button>',
-        clickable: true,
         compile: true,
         deleteNode: function($node, services) {
           deleteComponentCallback($node.attr('id'));
@@ -30,7 +37,7 @@
         },
         initialise: function($node, replaceWith) {
           var id = $node.attr('id');
-          return replaceWith('<placeholder label="' + component.title + ': ' + id + '" id="' + id + '"></placeholder>');
+          return replaceWith('<placeholder component-type="' + component.componentType + '" label="' + component.title + ': ' + id + '" id="' + id + '"></placeholder>');
         },
         addToEditor: function(editor, addContent) {
           addToEditorCallback(editor, addContent, component);
@@ -41,13 +48,18 @@
             '<div class="navigator-toggle-button-row">',
             '  <div class="navigator-title">' + getTitle(component) + '</div>',
             '</div>',
-            '<' + componentType + '-config id="' + $node.attr('id') + '"></' + componentType + '-config>'
+            '<div class="config-panel-container">',
+            '<' + componentType + '-config id="' + $node.attr('id') + '"></' + componentType + '-config>',
+            '</div>'
           ].join('\n');
           editor.showEditPane(data, getTitle(component), content, function() {
             $log.debug('on update...');
           }, {}, function() {
+            /** Deselect component when config dismissed **/
             fireComponentDeselection($node);
           });
+
+          fireComponentSelection($node);
         },
         onClick: function($node, $scope) {
 
@@ -64,7 +76,9 @@
             }
           }
 
-          onSingleClick(function() { fireComponentSelection($node); });
+          onSingleClick(function() {
+            fireComponentSelectionToggled($node);
+          });
         },
         getMarkUp: function($node, $scope) {
           var id = $node.attr('id');

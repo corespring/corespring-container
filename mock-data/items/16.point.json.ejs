@@ -5,7 +5,7 @@
       "title" : "Point Interaction Example"
     }
   },
-  "xhtml" : "<div><corespring-point-intercept id='1'></corespring-point-intercept><br/><corespring-feedback-block id='2'></corespring-feedback-block></div>",
+  "xhtml" : "<div><corespring-point-intercept id='1'></corespring-point-intercept></div><div></div>",
   "supportingMaterials": [
     {
       "name" : "Ben's Awesome Rubric",
@@ -30,27 +30,21 @@
         "0,6",
         "-3,0"
       ],
-      "model" : {
-        "prompt": "Point interaction prompt",
-        "config": {
-          "additionalText": "More instructions about what is required for this taks. This text can run the width of this space, then wrap and push down any content below it",
-          "maxPoints": 2,
-          "pointLabels": "y-intercept,x-intercept"
-        }
-      }
-    },
-    "2" : {
-      "componentType" : "corespring-feedback-block",
-      "weight" : 0,
-      "target" : {
-        "id": "1"
+      "feedback": {
+        "correctFeedbackType": "default",
+        "incorrectFeedbackType": "default"
       },
-      "feedback" : {
-        "correct": {
-          "*" : "very good"
-        },
-        "incorrect": {
-          "*": "Not goood."
+      "model" : {
+        "config": {
+          "graphWidth": "300px",
+          "graphHeight": "300px",
+          "maxPoints": 2,
+          "pointLabels": [
+            "label1",
+            "label2"
+           ],
+          "domainLabel": "domain",
+          "rangeLabel": "range"
         }
       }
     }

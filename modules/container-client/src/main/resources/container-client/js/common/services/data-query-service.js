@@ -49,7 +49,7 @@
     };
   }
 
-  angular.module('corespring-editor.services')
+  angular.module('corespring-common.services')
     .service('DataQueryService',
       [
       '$http',

@@ -89,12 +89,17 @@ angular.module('corespring-player.directives').directive('corespringPlayer', [
         ComponentRegister.setOutcomes(r);
       }, true);
 
-      $rootScope.$on('componentSelected', function(event, data) {
+      $rootScope.$on('componentSelectionToggled', function(event, data) {
         if ($('#body .selected').length > 0) {
           $('#body .selected').removeClass('selected');
         } else {
           $('#body #' + data.id).addClass('selected');
         }
+      });
+
+      $rootScope.$on('componentSelected', function(event, data) {
+        $('#body .selected').removeClass('selected');
+        $('#body #' + data.id).addClass('selected');
       });
 
       $rootScope.$on('componentDeselected', function() {

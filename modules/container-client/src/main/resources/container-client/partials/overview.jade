@@ -1,6 +1,3 @@
 script#overview(type='text/ng-template')
-  .container(ng-controller="Overview")
-    .row
-      .jumbotron
-        h3 Overview
-        p Coming soon...
+  .overview.container(ng-controller='Overview')
+    iframe(ng-src='{{url}}', frameBorder="0")

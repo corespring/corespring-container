@@ -3,7 +3,6 @@ describe('item-profile controller', function() {
   var rootScope, ctrl;
 
   function mockModal() {
-
   }
 
   function mockDesignerService() {
@@ -36,6 +35,10 @@ describe('item-profile controller', function() {
 
     this.query = function(topic, term, callback) {
       callback(this.results);
+    };
+
+    this.findOne = function(topic, id, callback) {
+      callback(this.results[0]);
     };
 
     this.list = function(topic, callback) {
@@ -113,10 +116,11 @@ describe('item-profile controller', function() {
     function initCallback(s) {
       foundSubject = s;
     }
+
     scope.primarySubjectAsync.initSelection(element, initCallback);
     expect(foundSubject).toNotBe(undefined);
     expect(foundSubject).toEqual({
-      id: "1"
+      id: "1", category: 'category', subject: 'blah'
     });
   });
 

@@ -67,9 +67,25 @@ var controller = function(
     $scope.componentSet = componentSet;
 
     var addToEditor = function(editor, addContent, component) {
-      var id = ++$scope.lastId;
-      $scope.data.item.components[id] = _.cloneDeep(component.defaultData);
-      addContent($('<placeholder id="' + id + '" label="' + component.name + '">'));
+      var max = 0;
+      $($scope.data.item.xhtml).find('[id]').each(function(idx, element) {
+        var id = Number($(element).attr('id'));
+        if (!_.isNaN(id) && id > max) {
+          max = id;
+        }
+      });
+
+      var id = max + 1;
+
+      var defaults = {
+        weight: 1
+      };
+
+      var newData = _.extend(defaults, _.cloneDeep(component.defaultData));
+
+      $scope.data.item.components[id] = newData;
+
+      addContent($('<placeholder id="' + id + '" component-type="' + component.componentType + '" label="' + component.name + '">'));
     };
 
     var deleteComponent = function(id) {
@@ -88,12 +104,35 @@ var controller = function(
         deleteComponent);
     };
 
-    $scope.extraFeatures = [{
-      name: 'external',
-      type: 'dropdown',
-      dropdownTitle: 'Question Type',
-      buttons: _.map(componentSet, componentToFeature)
-    }];
+    var orderList = function(component) {
+
+      var orderedComponents = [
+        "corespring-multiple-choice",
+        "corespring-inline-choice",
+        "corespring-focus-task",
+        "corespring-ordering",
+        "corespring-drag-and-drop",
+        "corespring-text-entry",
+        "corespring-extended-text-entry",
+        "corespring-point-intercept",
+        "corespring-line",
+        "corespring-function-entry",
+        "corespring-select-text"
+      ];
+
+
+      var idx = _.indexOf(orderedComponents, component.componentType);
+      return idx >= 0 ? idx : 1000;
+    };
+
+    $scope.extraFeatures = {
+      definitions: [{
+        name: 'external',
+        type: 'dropdown',
+        dropdownTitle: 'Question Type',
+        buttons: _.map(_.sortBy(componentSet, orderList), componentToFeature)
+      }]
+    };
   };
 
   $scope.onComponentsLoadError = function(error) {
@@ -179,14 +218,6 @@ var controller = function(
       }
     });
 
-    var max = 0;
-    $(item.xhtml).find('[id]').each(function(idx, element) {
-      var id = Number($(element).attr('id'));
-      if (!_.isNaN(id) && id > max) {
-        max = id;
-      }
-    });
-    $scope.lastId = max;
 
     var scoringJs = _.find($scope.data.item.files, function(f) {
       return f.name === "scoring.js";

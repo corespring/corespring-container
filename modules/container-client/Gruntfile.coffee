@@ -51,9 +51,11 @@ module.exports = (grunt) ->
         '<%= common.dist %>/bower_components/saxjs/lib/sax.js',
         '<%= common.dist %>/js/corespring/core-library.js',
         '<%= common.dist %>/js/corespring/server/init-core-library.js',
-        '<%= common.dist %>/js/editor/**/*.js', 
+        '<%= common.dist %>/js/editor/**/*.js',
+        '<%= common.dist %>/js/catalog/**/*.js',
         '<%= common.dist %>/js/render/services/**/*.js',
-        '<%= common.dist %>/js/render/directives/**/*.js'
+        '<%= common.dist %>/js/render/directives/**/*.js',
+        '<%= common.dist %>/js/render/controllers/**/*.js'
       ]
 
     editorExtras:
@@ -74,7 +76,14 @@ module.exports = (grunt) ->
               '<%= common.dist %>/bower_components/ace-builds/src-min-noconflict/mode-xml.js',
               '<%= common.dist %>/bower_components/ace-builds/src-min-noconflict/worker-json.js',
               '<%= common.dist %>/bower_components/ace-builds/src-min-noconflict/mode-json.js' ]
-  
+
+    catalog:
+      dest: '<%= common.dist %>/js/catalog/prod-catalog.js'
+      concatDest: '.tmp/concat/js/catalog.js'
+      src: [
+        '<%= common.dist %>/js/catalog/**/*.js'
+      ]
+
   expandSrc = (arr) ->
     expanded = expand(arr)
     urls = _.map(expanded, toUrl)
@@ -159,9 +168,10 @@ module.exports = (grunt) ->
             devMode: grunt.option("devMode") != false  
             core: pathsFor(common.core) 
             coreLibs: pathsFor(common.coreLibs, "concatDest")
-            editor: pathsFor(common.editor) 
-            editorExtras: pathsFor(common.editorExtras, "concatDest") 
-            player: pathsFor(common.player) 
+            editor: pathsFor(common.editor)
+            editorExtras: pathsFor(common.editorExtras, "concatDest")
+            player: pathsFor(common.player)
+            catalog: pathsFor(common.catalog)
 
     jasmine:
       unit:
@@ -195,7 +205,6 @@ module.exports = (grunt) ->
             dest: common.editor.concatDest
             src: common.editor.src
           }
-
           {
             dest: common.editorExtras.concatDest
             src: common.editorExtras.src
@@ -207,6 +216,10 @@ module.exports = (grunt) ->
           {
             dest: common.player.concatDest
             src: common.player.src
+          }
+          {
+            dest: common.catalog.concatDest
+            src: common.catalog.src
           }
         ]    
 
@@ -224,7 +237,11 @@ module.exports = (grunt) ->
           { 
             dest: common.player.dest
             src: [ common.player.concatDest ] 
-          } 
+          }
+          {
+            dest: common.catalog.dest
+            src: [ common.catalog.concatDest ]
+          }
         ] 
 
     compress: 
@@ -239,9 +256,10 @@ module.exports = (grunt) ->
             src: [ 
               common.core.dest, 
               common.editor.dest, 
-              common.editorExtras.concatDest, 
+              common.editorExtras.concatDest,
               common.player.dest,
-              common.coreLibs.concatDest ]
+              common.coreLibs.concatDest,
+              common.catalog.concatDest ]
             ext: '.js.gz'
           }
         ]

@@ -14,10 +14,11 @@ angular.module('corespring-editor.directives').directive('placeholder', function
     replace: true,
     link: link,
     scope: {
-      label: '@'
+      label: '@',
+      componentType: '@'
     },
     template: [
-      '<div class="component-placeholder">{{label}}',
+      '<div class="component-placeholder" ng-class="[componentType]">{{label}}',
       ' <div class="delete-icon">',
       '   <i ng-click="deleteNode()"',
       '   class="fa fa-times-circle"></i>',
