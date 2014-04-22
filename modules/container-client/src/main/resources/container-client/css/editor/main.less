@@ -1,3 +1,5 @@
+@import "components";
+
 .root {
   @top-nav-bg: @cs-secondary;
   @top-nav-height: 43px;
@@ -21,7 +23,6 @@
   }
 
   .designer {
-
     position: inherit;
     bottom: 0;
     right: 0;
@@ -178,15 +179,17 @@
     width: @preview-width; 
     bottom: 0px;
     background-color: white;
-    .contents{
+
+    .contents {
       padding: 10px;
-      .selected {
-        background: #ffff00 !important;
+      .component-container {
+        .selected-component-container();
       }
     }
+
   }
 
-  .main-content{
+  .main-content {
     overflow-y: auto;
     position: absolute;
     left: 0px;
