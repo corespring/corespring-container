@@ -30,27 +30,30 @@
   }
   max-width: 400px;
   padding: 20px;
+}
 
-  
+.delete-icon, .close-icon {
+  @close-icon-base-color: @grey-purple;
+  width: 20px;
+  height: 20px;
+  background-color: white;
+  border-radius: 12px;
+  position:absolute;
+  right: -8px;
+  top: -10px;
+  .drop-shadow(2px, 2px, 2px, 0.3);
 
+  &:hover {
+    cursor: pointer;
+  }
 
-  .delete-icon{
-    width: 20px;
-    height: 20px;
-    .drop-shadow(2px, 2px, 2px, 0.3);
-    i{
-      position: absolute;
-      font-size: 24px;
-      color: darken(@placeholder-base-color, 10%);
+  i {
+    position: absolute;
+    font-size: 24px;
+    color: darken(@close-icon-base-color, 10%);
 
-      &:hover{
-        color: darken(@placeholder-base-color, 16%);
-      }
+    &:hover {
+      color: darken(@close-icon-base-color, 16%);
     }
-    background-color: white;
-    border-radius: 12px;
-    position:absolute; 
-    right: -8px;
-    top: -10px;
   }
 }
