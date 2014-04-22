@@ -229,7 +229,7 @@ form(style="padding-left: 10px;")
           ng-model='item.sourceUrl',
           placeholder="Enter a url...")
 
-  a.add-additional(ng-click='addCopyrightItem()')
+  a.add-additional(ng-click='addCopyrightItem()', ng-show='needAdditionalCopyrightInformation')
     i(class="fa fa-{{!!expandKeySkills ? 'minus' : 'plus'}}-square-o", style="margin-left: 6px; margin-right: 6px;")
     span Add more
 
