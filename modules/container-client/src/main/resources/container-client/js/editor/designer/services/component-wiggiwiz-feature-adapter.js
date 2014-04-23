@@ -47,9 +47,6 @@
           var content = [
             '<div class="navigator-toggle-button-row">',
             '  <div class="navigator-title">' + getTitle(component) + '</div>',
-            '  <div class="close-icon" ng-click="closePane()">',
-            '    <i href="#" class="fa fa-times-circle" style="font-size: 24px; color: #3f4953;"></i>',
-            '  </div>',
             '</div>',
             '<div class="config-panel-container">',
             '<' + componentType + '-config id="' + $node.attr('id') + '"></' + componentType + '-config>',
