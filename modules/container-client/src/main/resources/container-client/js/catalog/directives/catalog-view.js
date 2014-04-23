@@ -302,7 +302,7 @@ angular.module('corespring-catalog.directives').directive('catalogview', [ '$sce
       '<ul class="catalog-tabbed-content-container">',
       '  <li class="catalog-tabbed-content preview" ng-class="{ active: isActive(\'preview\') }">',
       '    <div ng-controller="ClientSidePreview">',
-      '      <player-control-panel player-settings="session.settings"/>',
+      '      <player-control-panel player-settings="session.settings"></player-control-panel>',
       '      <corespring-player player-mode="editor" player-markup="item.xhtml" player-item="item" player-session="session" player-outcomes="outcome">',
       '      </corespring-player>',
       '      <div class="button-holder">',
