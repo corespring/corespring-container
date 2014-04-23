@@ -1,4 +1,4 @@
-var controller = function($scope, $location, $log, ItemService, ItemIdService) {
+var controller = function($scope, $location, $log, ItemService, ItemIdService, PlayerService) {
   $scope.selectedTab = $location.search().tab;
 
   if ($scope.selectedTab === 'supporting-material') {
@@ -20,6 +20,14 @@ var controller = function($scope, $location, $log, ItemService, ItemIdService) {
 
   ItemService.load($scope.onItemLoaded, $scope.onItemLoadError, $scope.itemId);
 
+  PlayerService.setQuestionLookup(function(id) {
+    return $scope.item.components[id];
+  });
+
+  PlayerService.setItemLookup(function() {
+    return $scope.item;
+  });
+
 };
 
 angular.module('corespring-catalog.controllers')
@@ -28,5 +36,6 @@ angular.module('corespring-catalog.controllers')
     '$log',
     'ItemService',
     'ItemIdService',
+    'PlayerService',
     controller
   ]);
