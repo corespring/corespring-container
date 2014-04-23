@@ -1,63 +1,17 @@
 package org.corespring.shell.controllers
 
-import org.corespring.container.client.controllers.{ DataQuery => ContainerDataQuery }
-import play.api.libs.json.{ JsValue, JsObject, Json, JsArray }
-import play.api.mvc.{ AnyContent, Action }
+import org.corespring.container.client.controllers.{DataQuery => ContainerDataQuery}
+import play.api.libs.json.{JsValue, JsObject, Json}
+import play.api.mvc.{AnyContent, Action}
+import org.corespring.shell.controllers.data._
+import play.api.Logger
+import play.api.libs.json.JsObject
 
 class ShellDataQuery extends ContainerDataQuery {
 
-  lazy val fieldValueJson: JsValue = FieldValueJson()
+  lazy val logger = Logger("shell.home")
 
-  val subjectString =
-    """
-      |[
-      |   {
-      |      "id":"4ffb535f6bb41e469c0bf2a7",
-      |      "subject":"",
-      |      "category":"Art"
-      |   },
-      |   {
-      |      "id":"4ffb535f6bb41e469c0bf2a8",
-      |      "subject":"Performing Arts",
-      |      "category":"Art"
-      |   },
-      |   {
-      |      "id":"4ffb535f6bb41e469c0bf2a9",
-      |      "subject":"AP Music Theory,Visual Arts",
-      |      "category":"Art"
-      |   },
-      |   {
-      |      "id":"4ffb535f6bb41e469c0bf2aa",
-      |      "subject":"AP Art History",
-      |      "category":"Art"
-      |   },
-      |   {
-      |      "id":"4ffb535f6bb41e469c0bf2ab",
-      |      "subject":"Other",
-      |      "category":"Art"
-      |   },
-      |   {
-      |      "id":"4ffb535f6bb41e469c0bf2ac",
-      |      "subject":"",
-      |      "category":"English Language Arts"
-      |   },
-      |   {
-      |      "id":"4ffb535f6bb41e469c0bf2ad",
-      |      "subject":"English Language Arts",
-      |      "category":"English Language Arts"
-      |   },
-      |   {
-      |      "id":"4ffb535f6bb41e469c0bf2ae",
-      |      "subject":"AP English Literature",
-      |      "category":"English Language Arts"
-      |   },
-      |   {
-      |      "id":"4ffb535f6bb41e469c0bf2af",
-      |      "subject":"Writing",
-      |      "category":"English Language Arts"
-      |   }
-      |]
-    """.stripMargin
+  lazy val fieldValueJson: JsValue = FieldValueJson()
 
   lazy val bloomsTaxonomy: Seq[JsValue] = (fieldValueJson \ "bloomsTaxonomy").as[Seq[JsValue]]
 
@@ -77,11 +31,22 @@ class ShellDataQuery extends ContainerDataQuery {
 
   lazy val reviewsPassed: Seq[JsValue] = (fieldValueJson \ "reviewsPassed").as[Seq[JsValue]]
 
-  lazy val subjects = Json.parse(subjectString).as[Seq[JsObject]]
+  lazy val subjects: Seq[JsObject] = SubjectJson()
+
+  lazy val standards: Seq[JsObject] = StandardsJson()
+
+  lazy val standardsTree: Seq[JsObject] = StandardsTreeJson()
 
   override def list(topic: String, query: Option[String]): Action[AnyContent] = Action {
 
-    def filter(s: JsObject) = query.map { q => (s \ "subject").asOpt[String].map(s => s.contains(q)).getOrElse(true) }.getOrElse(true)
+    logger.debug(s"list topic <$topic> query <$query>")
+
+    def filterSubjects(s: JsObject) = query.map {
+      q => (s \ "subject").asOpt[String].map(s => s.contains(q)).getOrElse(true)
+    }.getOrElse(true)
+
+
+
     val out = topic match {
       case "bloomsTaxonomy" => Json.toJson(bloomsTaxonomy)
       case "credentials" => Json.toJson(credentials)
@@ -90,23 +55,26 @@ class ShellDataQuery extends ContainerDataQuery {
       case "itemType" => itemTypes
       case "keySkills" => Json.toJson(keySkills)
       case "licenseTypes" => Json.toJson(licenseTypes)
-      case "subjects.primary" => Json.toJson(subjects.filter(filter))
       case "priorUses" => Json.toJson(priorUses)
-      case "subjects.related" => Json.toJson(subjects.filter(filter))
       case "reviewsPassed" => Json.toJson(reviewsPassed)
+      case "standards" => Json.toJson(StandardsDataQuery.list(standards, query))
+      case "standardsTree" => Json.toJson(standardsTree)
+      case "subjects.primary" => Json.toJson(subjects.filter(filterSubjects))
+      case "subjects.related" => Json.toJson(subjects.filter(filterSubjects))
     }
     Ok(out)
   }
 
-  override def findOne(topic: String, id: String): Action[AnyContent] = Action { request =>
+  override def findOne(topic: String, id: String): Action[AnyContent] = Action {
+    request =>
 
-    def filter(o: JsObject) = (o \ "id").asOpt[String].map(_ == id).getOrElse(false)
+      def filter(o: JsObject) = (o \ "id").asOpt[String].map(_ == id).getOrElse(false)
 
-    val out = topic match {
-      case "subjects.primary" => subjects.filter(filter).headOption.map(Json.toJson(_)).getOrElse(JsObject(Seq()))
-      case "subjects.related" => subjects.filter(filter).headOption.map(Json.toJson(_)).getOrElse(JsObject(Seq()))
-      case _ => JsObject(Seq())
-    }
-    Ok(out)
+      val out = topic match {
+        case "subjects.primary" => subjects.filter(filter).headOption.map(Json.toJson(_)).getOrElse(JsObject(Seq()))
+        case "subjects.related" => subjects.filter(filter).headOption.map(Json.toJson(_)).getOrElse(JsObject(Seq()))
+        case _ => JsObject(Seq())
+      }
+      Ok(out)
   }
 }

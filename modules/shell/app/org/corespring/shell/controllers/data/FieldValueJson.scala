@@ -1,8 +1,10 @@
-package org.corespring.shell.controllers
+package org.corespring.shell.controllers.data
 
 import play.api.libs.json.{Json,JsValue}
 
 object FieldValueJson {
+
+  def apply(): JsValue = fieldValues
 
   val fieldValues = Json.obj(
     "version" -> "0.0.2",
@@ -35,19 +37,19 @@ object FieldValueJson {
     "depthOfKnowledge" -> Json.arr(
       Json.obj(
         "key" -> "1",
-        "value" -> "1 Recall & Reproduction"
+        "value" -> "Level 1 Recall & Reproduction"
       ),
       Json.obj(
         "key" -> "2",
-        "value" -> "2 Skills & Concepts"
+        "value" -> "Level 2 Skills & Concepts"
       ),
       Json.obj(
         "key" -> "3",
-        "value" -> "3 Strategic Thinking/Reasoning"
+        "value" -> "Level 3 Strategic Thinking/Reasoning"
       ),
       Json.obj(
         "key" -> "4",
-        "value" -> "4 Extended Thinking"
+        "value" -> "Level 4 Extended Thinking"
       )
     ),
     "demonstratedKnowledge" -> Json.arr(
@@ -442,6 +444,4 @@ object FieldValueJson {
       )
     )
   )
-
-  def apply(): JsValue = fieldValues
 }

@@ -50,16 +50,17 @@ form(style="padding-left: 10px;")
       label.control-label Standard(s)
       .controls
         div(style='padding-bottom: 5px; height: 30px;')
-          div(style='float: left; padding-right: 5px;')
+          div(style='float: left; padding-right: 5px; width: 200px;')
             label * Subject
-            select(ng-model='standardAdapter.subjectOption', ng-options='c.name for c in standardsOptions', style='vertical-align: top; width: 100px; padding-top: 0px;')
-          div(style='float: left; padding-right: 5px;')
+            select(ng-model='standardAdapter.subjectOption', ng-options='c.name for c in standardsOptions', style='vertical-align: top; width: 100%; padding-top: 0px;')
+          div(style='float: left; padding-right: 5px; width: 380px;')
             label Category
-            select(ng-model='standardAdapter.categoryOption', ng-options='p.name for p in standardAdapter.subjectOption.items')
-          div(style='float: left;')
+            select(ng-model='standardAdapter.categoryOption', ng-options='p.name for p in standardAdapter.subjectOption.items', style='width:100%')
+          div(style='float: left;min-width: 300px;')
             label Sub-Category
-            select(ng-model='standardAdapter.subCategoryOption', ng-options='z for z in standardAdapter.categoryOption.items')
-        input(type='hidden', multiple='', ui-select2='standardAdapter', ng-model='taskInfo.standards', style='width: 500px;')
+            select(ng-model='standardAdapter.subCategoryOption', ng-options='z for z in standardAdapter.categoryOption.items', style='width:100%')
+
+        input(type='text', multiple='', ui-select2='standardAdapter', ng-model='taskInfo.standards', style='width: 500px;')
 
     .control-group
       label.control-label(for='gradeLevel') Grade Level
@@ -100,11 +101,6 @@ form(style="padding-left: 10px;")
   h3 Other Alignments
 
   .control-group
-    label.control-label Bloom's Taxonomy
-      .controls
-        select(ng-model='otherAlignments.bloomsTaxonomy', ng-options='c for c in bloomsTaxonomyDataProvider')
-
-  .control-group
     label.control-label
       | Key Skills
 
@@ -119,11 +115,21 @@ form(style="padding-left: 10px;")
             span(tag-list='tag-list', tags='skills.list', selected-tags='otherAlignments.keySkills')
           div(style='float: none; clear: both;')
 
-  .control-group
-    label.control-label Depth Of Knowledge
-      .controls
-        select(ng-model='otherAlignments.depthOfKnowledge', ng-options='c.key as c.value for c in depthOfKnowledgeDataProvider')
-        span.help-inline Select the depth of knowledge that best represents the objective
+
+  table(style='width: 80%;')
+    tr
+      td(style='vertical-align: top')
+        .control-group
+          label.control-label Depth Of Knowledge
+            .controls
+              select(ng-model='otherAlignments.depthOfKnowledge', ng-options='c.key as c.value for c in depthOfKnowledgeDataProvider')
+              p.help-block Select the depth of knowledge that best represents the objective
+
+      td(style='vertical-align: top')
+        .control-group
+          label.control-label Bloom's Taxonomy
+            .controls
+              select(ng-model='otherAlignments.bloomsTaxonomy', ng-options='c for c in bloomsTaxonomyDataProvider')
 
 
   h2 Copyright Information
@@ -198,26 +204,22 @@ form(style="padding-left: 10px;")
       label.control-label(for="owner") Owner
         .controls
           input#owner.form-control(
-          ng-model='item.owner',
-          placeholder="Enter a owner...")
+          ng-model='item.owner')
     .control-group
       label.control-label(for="author") Author
         .controls
           input#author.form-control(
-          ng-model='item.author',
-          placeholder="Enter a author...")
+          ng-model='item.author')
     .control-group
       label.control-label(for="publisher") Publisher
         .controls
           input#publisher.form-control(
-          ng-model='item.publisher',
-          placeholder="Enter a publisher...")
+          ng-model='item.publisher')
     .control-group
-      label.control-label(for="year") Year
+      label.control-label(for="year") Copyright Year
         .controls
           input#year.form-control(
-          ng-model='item.year',
-          placeholder="Enter a year...")
+          ng-model='item.year')
     .control-group
       label.control-label(for="license") License
         .controls
@@ -226,8 +228,7 @@ form(style="padding-left: 10px;")
       label.control-label(for="url") Source URL
         .controls
           input#url.form-control(
-          ng-model='item.sourceUrl',
-          placeholder="Enter a url...")
+          ng-model='item.sourceUrl')
 
   a.add-additional(ng-click='addCopyrightItem()', ng-show='needAdditionalCopyrightInformation')
     i(class="fa fa-{{!!expandKeySkills ? 'minus' : 'plus'}}-square-o", style="margin-left: 6px; margin-right: 6px;")
