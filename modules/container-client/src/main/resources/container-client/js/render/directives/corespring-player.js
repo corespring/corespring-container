@@ -115,16 +115,20 @@ angular.module('corespring-player.directives').directive('corespringPlayer', [
       function deselectContainer() {
         $('#body .selected').removeClass('selected');
         $scope.selectedComponentId = undefined;
-        $scope.$apply();
       }
 
       $rootScope.$on('componentSelectionToggled', function(event, data) {
+        var phase = $scope.$$phase;
+
         if ($scope.selectedComponentId === data.id) {
           deselectContainer();
         } else {
           selectContainer(data.id);
         }
-        $scope.$apply();
+
+        if (phase !== '$apply' && phase !== '$digest') {
+          $scope.$apply();
+        }
       });
 
       $rootScope.$on('componentSelected', function(event, data) {

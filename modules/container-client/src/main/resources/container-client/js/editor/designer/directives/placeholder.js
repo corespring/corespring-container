@@ -6,6 +6,14 @@ var Placeholder = function($rootScope) {
     $scope.selected = false;
     $scope.id = $scope.id || 2;
 
+
+    $scope.safeApply = function() {
+      var phase = this.$root.$$phase;
+      if (!(phase === '$apply' || phase === '$digest')) {
+        this.$apply();
+      }
+    };
+
     $scope.deleteNode = function() {
       $scope.$emit('wiggi-wiz.delete-node', $element);
     };
@@ -20,7 +28,7 @@ var Placeholder = function($rootScope) {
 
     function setSelected(selected) {
       $scope.selected = selected;
-      $scope.$apply();
+      $scope.safeApply();
     }
 
     $rootScope.$on('componentSelectionToggled', function(event, data) {
