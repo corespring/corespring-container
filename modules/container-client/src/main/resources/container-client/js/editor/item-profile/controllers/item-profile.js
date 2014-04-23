@@ -13,6 +13,8 @@
 
     var isFormActive = false;
 
+    $scope.queryResults = {};
+
     function findSubject(topic, id, callback) {
       var local = _.find($scope.queryResults[topic], function (r) {
         return r.id === id;
@@ -26,12 +28,15 @@
       }
     }
 
-    $scope.queryResults = {};
+    //----------------------------------------------------------------
+    // Standards start
+    //----------------------------------------------------------------
 
     /**
-     * Standards is a tree of objects that we allow the user
-     * to select three levels in.
-     * TODO Connect to data source & store the selected standards in the item
+     * The standards selection consists of three select boxes and a
+     * select2 search & multi select tag field
+     * The three selections are filled from the standardsTree
+     * The selected values are used as filters for the search field
      */
     $scope.standardsOptions = [
       { name: "A1",
@@ -51,14 +56,101 @@
     ];
 
     $scope.standardAdapter = {
-      subjectOption: {},
+      subjectOption: 'All',
       categoryOption: {},
       subCategoryOption: {}
     };
 
-    function subjectText(s) {
-      return s.category + ": " + s.subject;
+    $scope.$watch('taskInfo.standards', function (newValue, oldValue) {
+      $log.debug("taskInfo.standards " + newValue);
+    });
+
+    DataQueryService.list("standardsTree", function (result) {
+      $scope.standardsOptions = result;
+    });
+
+    function createStandardQuery(searchText) {
+      $log.debug("createStandardQuery " + searchText);
+
+      function createQuery(searchTerm, fields) {
+        var result = {
+          searchTerm: searchTerm,
+          fields: fields
+        };
+        return result;
+      }
+
+      /**
+       * Add key/value to filter if item.name is not empty and is not 'all'
+       */
+      function addFieldIfApplicable(item, query, field) {
+        if (!item) {
+          return;
+        }
+        if (item.name && item.name.toLowerCase() === "all") {
+          return;
+        }
+        query.filters = query.filters || [];
+        query.filters.push({field: field, value: item.name});
+      }
+
+      var fields = ['dotNotation', 'category', 'subCategory', 'standard'];
+
+      if ($scope.standardAdapter.subjectOption === 'All') {
+        return JSON.stringify(createQuery(searchText, ['subject'].concat(fields)));
+      }
+
+      var query = createQuery(searchText, fields);
+
+      addFieldIfApplicable($scope.standardAdapter.subjectOption, query, "subject");
+      addFieldIfApplicable($scope.standardAdapter.categoryOption, query, "category");
+      addFieldIfApplicable($scope.standardAdapter.subCategoryOption, query, "subCategory");
+
+      return JSON.stringify(query);
     }
+
+    $scope.standardAdapter = {
+      tags: true,
+      allowClear: true,
+      minimumInputLength: 1,
+      placeholder: "Choose a standard",
+      id: function (item) {
+        $log.debug("standardAdapter id", item._id);
+        return item._id.$oid;
+      },
+      query: function (query) {
+        $log.debug("standardAdapter query", query);
+        DataQueryService.query("standards", createStandardQuery(query.term), function (results) {
+          query.callback({results: results});
+        });
+      }
+    };
+
+    $scope.standardAdapter.valueSetter = function (newItem) {
+      $log.debug("standardAdapter.valueSetter " + newItem);
+      $scope.taskInfo.standards.push(newItem);
+    };
+
+    $scope.standardAdapter.formatSelection = function (standard) {
+      setTimeout(function () {
+        $(".standard-adapter-result").tooltip();
+      }, 500);
+      return "<span class='standard-adapter-result' data-title='" + standard.standard + "'>" + standard.dotNotation + "</span>";
+    };
+
+    $scope.standardAdapter.formatResult = function (standard) {
+      var markup = "<blockquote>";
+      markup += '<p>' + standard.standard + '</p>';
+      markup += '<small>' + standard.dotNotation + ', ' + standard.subject + ', ' + standard.subCategory + '</small>';
+      markup += '<small>' + standard.category + '</small>';
+      markup += '</blockquote>';
+      return markup;
+    };
+
+
+    //----------------------------------------------------------------
+    // Standards end
+    //----------------------------------------------------------------
 
     function Async(topic, formatFunc) {
 
@@ -96,6 +188,10 @@
           return callback(s);
         });
       };
+    }
+
+    function subjectText(s) {
+      return s.category + ": " + s.subject;
     }
 
     $scope.relatedSubjectAsync = new Async("subjects.related", subjectText);
@@ -201,7 +297,7 @@
       $scope.contributorDetails.copyright.additional.push({});
     };
 
-    $scope.removeCopyrightItem = function () {
+    $scope.removeCopyrightItem = function () { //TODO Add ui to trigger removal of specific item
       $scope.contributorDetails.copyright.additional.pop();
     };
 
@@ -213,7 +309,6 @@
 
     $scope.$watch("needAdditionalCopyrightInformation", function (newValue, oldValue) {
       if (isFormActive) {
-        $log.debug("needAdditionalCopyrightInformation new: <" + newValue + "> old: <" + oldValue + ">");
         if (oldValue === 'init') {
           return;
         }
@@ -242,40 +337,55 @@
       $scope.data.saveInProgress = true;
     };
 
-    function onSaveSuccess (updated) {
+    function onSaveSuccess(updated) {
       $log.debug("profile saved");
       $scope.data.saveInProgress = false;
     }
 
-    function onSaveError (err) {
+    function onSaveError(err) {
       $log.debug("error saving profile", err);
       $scope.data.saveError = err;
       $scope.data.saveInProgress = false;
     }
 
-    function loadItem(itemId){
+    function loadItem(itemId) {
       isFormActive = false;
-      ItemService.load( onLoadItemSuccess, onLoadItemError, itemId);
+      ItemService.load(onLoadItemSuccess, onLoadItemError, itemId);
     }
 
     function initSubobjects() {
-      if (!($scope.data.item.profile.taskInfo)) {
-        $scope.data.item.profile.taskInfo = {};
+      var profile = $scope.data.item.profile;
+
+      if (!(profile.taskInfo)) {
+        profile.taskInfo = {};
       }
-      if (!($scope.data.item.profile.otherAlignments)) {
-        $scope.data.item.profile.otherAlignments = {};
+      if (!_.isArray(profile.taskInfo.reviewsPassed)) {
+        profile.taskInfo.reviewsPassed = [];
       }
-      if (!($scope.data.item.profile.contributorDetails)) {
-        $scope.data.item.profile.contributorDetails = {};
+      if (!_.isArray(profile.taskInfo.standards)) {
+        profile.taskInfo.standards = [];
       }
-      if (!($scope.data.item.profile.contributorDetails.copyright)) {
-        $scope.data.item.profile.contributorDetails.copyright = {};
+      if (!(profile.otherAlignments)) {
+        profile.otherAlignments = {};
+      }
+      if (!_.isArray(profile.otherAlignments.keySkills)) {
+        profile.otherAlignments.keySkills = [];
+      }
+      if (!(profile.contributorDetails)) {
+        profile.contributorDetails = {};
+      }
+      if (!(profile.contributorDetails.copyright)) {
+        profile.contributorDetails.copyright = {};
+      }
+      if (!_.isArray(profile.contributorDetails.copyright.additional)) {
+        profile.contributorDetails.copyright.additional = [];
       }
     }
 
-    function onLoadItemSuccess (item) {
+    function onLoadItemSuccess(item) {
       $scope.data.item = item;
       initSubobjects();
+
       $scope.taskInfo = $scope.data.item.profile.taskInfo;
       $scope.otherAlignments = $scope.data.item.profile.otherAlignments;
       $scope.contributorDetails = $scope.data.item.profile.contributorDetails;
@@ -284,15 +394,7 @@
       $log.debug("task info: ", $scope.taskInfo);
       $log.debug("other alignments: ", $scope.otherAlignments);
       $log.debug("contributor details: ", $scope.contributorDetails);
-      if (!$scope.otherAlignments.keySkills) {
-        $scope.otherAlignments.keySkills = [];
-      }
-      if (!$scope.taskInfo.reviewsPassed) {
-        $scope.taskInfo.reviewsPassed = [];
-      }
-      if (!_.isArray($scope.contributorDetails.copyright.additional)) {
-        $scope.contributorDetails.copyright.additional = [];
-      }
+
       $scope.needAdditionalCopyrightInformation =
           $scope.contributorDetails.copyright.additional.length > 0 ? 'yes' : '';
 
