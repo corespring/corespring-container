@@ -7,18 +7,25 @@
     }
 
     function fireComponentSelection($node) {
+      $rootScope.selectedComponentId = parseInt($node.attr('id'), 10);
       $rootScope.$broadcast('componentSelected', {
         id: $node.attr('id')
       });
     }
 
     function fireComponentSelectionToggled($node) {
+      if ($rootScope.selectedComponentId === parseInt($node.attr('id'), 10)) {
+        $rootScope.selectedComponentId = undefined;
+      } else {
+        $rootScope.selectedComponentId = parseInt($node.attr('id'), 10);
+      }
       $rootScope.$broadcast('componentSelectionToggled', {
         id: $node.attr('id')
       });
     }
 
     function fireComponentDeselection() {
+      $rootScope.selectedComponentId = undefined;
       $rootScope.$broadcast('componentDeselected');
     }
 
