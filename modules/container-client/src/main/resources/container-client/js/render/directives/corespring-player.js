@@ -7,9 +7,17 @@ angular.module('corespring-player.directives').directive('corespringPlayer', [
   'MathJaxService',
   function($rootScope, $compile, $log, ComponentRegister, PlayerUtils, MathJaxService) {
 
+    // TODO: Stop using id attributes for this!
+    function getComponentById(id) {
+      return $(_.find($('#body #' + id), function(el) {
+        return !$(el).is('span');
+      }));
+    }
+
     var link = function($scope, $elem, $attrs) {
 
       var rendered = false;
+      $scope.selectedComponentId = undefined;
 
       var renderMarkup = function(xhtml) {
         if ($scope.lastScope) {
@@ -19,6 +27,10 @@ angular.module('corespring-player.directives').directive('corespringPlayer', [
         var $body = $elem.find("#body").html(xhtml);
         $compile($body)($scope.lastScope);
         MathJaxService.parseDomForMath();
+
+        _(ComponentRegister.components).keys().each(function(id) {
+          getComponentById(id).wrap("<div class='component-container'/>");
+        });
       };
 
       var setDataAndSession = function() {
@@ -89,21 +101,42 @@ angular.module('corespring-player.directives').directive('corespringPlayer', [
         ComponentRegister.setOutcomes(r);
       }, true);
 
-      $rootScope.$on('componentSelectionToggled', function(event, data) {
-        if ($('#body .selected').length > 0) {
-          $('#body .selected').removeClass('selected');
+      function selectContainer(id) {
+        $('#body .selected').removeClass('selected');
+        if (getComponentById(id).parent().hasClass('component-container')) {
+          getComponentById(id).parent().addClass('selected');
+          $scope.selectedComponentId = id;
+          $scope.$apply();
         } else {
-          $('#body #' + data.id).addClass('selected');
+          $log.error('Could not find component-container for id = ' + id);
+        }
+      }
+
+      function deselectContainer() {
+        $('#body .selected').removeClass('selected');
+        $scope.selectedComponentId = undefined;
+      }
+
+      $rootScope.$on('componentSelectionToggled', function(event, data) {
+        var phase = $scope.$$phase;
+
+        if ($scope.selectedComponentId === data.id) {
+          deselectContainer();
+        } else {
+          selectContainer(data.id);
+        }
+
+        if (phase !== '$apply' && phase !== '$digest') {
+          $scope.$apply();
         }
       });
 
       $rootScope.$on('componentSelected', function(event, data) {
-        $('#body .selected').removeClass('selected');
-        $('#body #' + data.id).addClass('selected');
+        selectContainer(data.id);
       });
 
       $rootScope.$on('componentDeselected', function() {
-        $('#body .selected').removeClass('selected');
+        deselectContainer();
       });
 
     };

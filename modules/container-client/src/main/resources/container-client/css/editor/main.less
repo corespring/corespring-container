@@ -1,4 +1,4 @@
-
+@import "components";
 
 .root {
   @top-nav-bg: @cs-secondary;
@@ -14,7 +14,7 @@
     opacity: 0;
   }
 
-  .preview-btn(){
+  .preview-btn() {
     width: 75px;
     border-radius: 0px;
     position: absolute;
@@ -23,7 +23,6 @@
   }
 
   .designer {
-
     position: inherit;
     bottom: 0;
     right: 0;
@@ -39,12 +38,16 @@
       left: 0;
       top: 0;
 
-      .wiggi-wiz{
+      .wiggi-wiz {
         position: absolute;
         right: 0;
         top: 0;
         left: 0;
         bottom: 0;
+      }
+
+      .wiggi-wiz-overlay .content-top {
+        overflow: visible;
       }
     }
 
@@ -176,15 +179,17 @@
     width: @preview-width; 
     bottom: 0px;
     background-color: white;
-    .contents{
+
+    .contents {
       padding: 10px;
-      .selected {
-        background: #ffff00 !important;
+      .component-container {
+        .selected-component-container();
       }
     }
+
   }
 
-  .main-content{
+  .main-content {
     overflow-y: auto;
     position: absolute;
     left: 0px;

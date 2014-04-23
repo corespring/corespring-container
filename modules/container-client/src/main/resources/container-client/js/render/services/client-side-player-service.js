@@ -47,7 +47,7 @@
           answer = components[id].answers;
           serverLogic = corespring.server.logic(question.componentType);
           out[id] = serverLogic.respond(question, answer, settings);
-          out[id].studentResponse = answer;
+          out[id].studentResponse = _.cloneDeep(answer);
         }
       }
 
