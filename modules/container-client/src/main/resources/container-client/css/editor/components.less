@@ -1,6 +1,6 @@
 @component-bg-color: #ffffff;
 
-.input-holder{
+.input-holder {
   background-color: @component-bg-color;
   margin-top: 10px;
   .header{
@@ -16,20 +16,38 @@
 
 }
 
-.component-placeholder {
-  @placeholder-base-color: @grey-purple;
-  position:relative;
-  border: 1px solid darken(@placeholder-base-color, 10%);
-  background-color: lighten(@placeholder-base-color, 40%);
-  transition: background-color 100ms linear;
-  .rounded(4px);
-  .user-select(none);
-  .drop-shadow(0, 2px, 3px, 0.2);
-  &:hover{
-    background-color: lighten(@placeholder-base-color, 50%);
+.selected-component-container() {
+  @selected-component-border-color: #eaeaea;
+  padding: 5px;
+  margin: 5px 0;
+  border: 2px dashed transparent;
+
+  &.selected {
+    border: 2px dashed @selected-component-border-color;
   }
+}
+
+.component-placeholder-container {
+  @placeholder-base-color: @grey-purple;
+
   max-width: 400px;
-  padding: 20px;
+  .selected-component-container();
+
+  .component-placeholder {
+    position:relative;
+    border: 1px solid darken(@placeholder-base-color, 10%);
+    background-color: lighten(@placeholder-base-color, 40%);
+    transition: background-color 100ms linear;
+    padding: 20px;
+    width: 100%;
+    .rounded(4px);
+    .user-select(none);
+    .drop-shadow(0, 2px, 3px, 0.2);
+
+    &:hover{
+      background-color: lighten(@placeholder-base-color, 50%);
+    }
+  }
 }
 
 .delete-icon, .close-icon {
