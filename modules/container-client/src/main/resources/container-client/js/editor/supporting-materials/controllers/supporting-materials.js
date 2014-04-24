@@ -113,6 +113,9 @@ var controller = function($scope, ItemService, $modal, Overlay, $state, $log) {
         );
       }
 
+      /**
+       * Given an item and a callback, uploads a file to that item, executing the provided callback when finished.
+       */
       function uploadFile(data, callback) {
         var supportingMaterial = getNewestSupportingMaterial(data);
         var reader = new FileReader();
@@ -134,6 +137,10 @@ var controller = function($scope, ItemService, $modal, Overlay, $state, $log) {
         reader.readAsBinaryString(file);
       }
 
+      /**
+       * Adds the provided filename adds the filename as the sole file for the most recent supporting material in the
+       * provided data.
+       */
       function updateWithFileData(filename, data) {
         var supportingMaterial = getNewestSupportingMaterial(data);
         supportingMaterial.files = [{
@@ -152,6 +159,12 @@ var controller = function($scope, ItemService, $modal, Overlay, $state, $log) {
         );
       }
 
+      /**
+       * Important set of steps:
+       *   1. Persist the initial supporting material's name and type, returning an id.
+       *   2. Using the id, upload the supporting material file to a subdirectory matching the id.
+       *   3. Update the supporting material data with a reference to the file uploaded in the previous step.
+       */
       persistInitial(function(result) {
         uploadFile(result, function(filename, data) {
           updateWithFileData(filename, data);
