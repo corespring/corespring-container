@@ -1,6 +1,7 @@
 /* global AddContentModalController, com */
 var controller = function(
   $scope,
+  $rootScope,
   $http,
   $stateParams,
   $state,
@@ -151,14 +152,7 @@ var controller = function(
   };
 
   $scope.delete = function() {
-    if (window.confirm("Are you sure?")) {
-      $scope.data.item.supportingMaterials.splice($scope.index, 1);
-      if ($scope.index > 0) {
-        $state.transitionTo('supporting-material', {index: $scope.index - 1});
-      } else {
-        $state.transitionTo('supporting-materials');
-      }
-    }
+    $rootScope.$broadcast('deleteSupportingMaterial', { index: $scope.index });
   };
 
   $scope.isContentType = function(contentType) {
@@ -190,6 +184,7 @@ var controller = function(
 
 angular.module('corespring-editor.controllers')
   .controller('SupportingMaterial', ['$scope',
+    '$rootScope',
     '$http',
     '$stateParams',
     '$state',

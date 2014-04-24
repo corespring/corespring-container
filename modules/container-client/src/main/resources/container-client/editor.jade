@@ -25,7 +25,8 @@ block content
             ng-click="toggleSupportingMaterials()")
           ul.nav.nav-subitems(ng-show="showSupportingMaterials")
             li.nav-subitem(ng-repeat="supportingMaterial in data.item.supportingMaterials", ng-class="{ active: isSupportingMaterialActive(supportingMaterial, $index)}")
-              a(ui-sref="supporting-material({index: $index})") {{supportingMaterial.name}}
+              a.subitem-link.supporting-material-link(ui-sref="supporting-material({index: $index})") {{supportingMaterial.name}}
+              a.delete-supporting-material(ng-click="deleteSupportingMaterial($index)")
 
         li(ng-class="{ active: isActive('overview') }")
           a(ui-sref="overview") Catalog View

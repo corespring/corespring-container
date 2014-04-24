@@ -105,8 +105,30 @@
 .root .nav-container .nav {
 
   li.nav-subitem {
-    a {
+
+    .subitem-link {
       padding-left: 40px;
+    }
+
+    .supporting-material-link {
+      padding-right: 32px;
+    }
+
+    .delete-supporting-material {
+      position: absolute;
+      height: 100%;
+      width: 14px;
+      right: 0;
+      top: 0;
+      display: block;
+      padding: 0 16px;
+      background: url('../images/delete-icon.png') no-repeat center center;
+      background-size: 14px 14px;
+      opacity: 0.5;
+
+      &:hover {
+        opacity: 1;
+      }
     }
   }
 
