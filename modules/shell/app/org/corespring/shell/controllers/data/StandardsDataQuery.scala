@@ -31,38 +31,26 @@ object StandardsDataQuery {
       val fields = (jsonQuery \ "fields").asOpt[Seq[String]]
       val filters = (jsonQuery \ "filters").asOpt[Seq[JsValue]]
 
-      def applyFiltersToStandards(): Seq[JsObject] = {
-        filters.map {
-          filterList => {
-            def matchesFilterList(s: JsObject): Boolean = {
-              filterList.forall(filterItem => {
-                (s \ (filterItem \ "field").as[String]).asOpt[String]
-                  .map(s => s == (filterItem \ "value").as[String]).getOrElse(false)
-              })
-            }
-            standards.filter(matchesFilterList)
-          }
-        }.getOrElse(standards)
-      }
+      def applyFilters(s: JsObject): Boolean = filters.map {
+        filterList => {
+          filterList.forall(filterItem => {
+            (s \ (filterItem \ "field").as[String]).asOpt[String]
+              .map(s => s == (filterItem \ "value").as[String])
+              .getOrElse(false)
+          })
+        }
+      }.getOrElse(true)
 
-      def findMatchingStandards(standards: Seq[JsObject]): Seq[JsObject] = {
-        searchTerm.map {
-          term => {
+      def applySearchTerm(s: JsObject): Boolean = searchTerm.map {
+        term => fields.map {
+          fieldList: Seq[String] => fieldList.exists(
+            field => (s \ field).asOpt[String]
+              .map(s => s.contains(term))
+              .getOrElse(false))
+        }.getOrElse(true)
+      }.getOrElse(true)
 
-            def filter(s: JsObject) = fields.map {
-
-              def fieldContainsQueryString(field: String) =
-                (s \ field).asOpt[String].map(s => s.contains(term)).getOrElse(false)
-
-              fieldList: Seq[String] => fieldList.exists(fieldContainsQueryString)
-            }.getOrElse(false)
-
-            standards.filter(filter)
-          }
-        }.getOrElse(standards)
-      }
-
-      findMatchingStandards(applyFiltersToStandards())
+      standards.filter(applyFilters).filter(applySearchTerm)
     }
   }.getOrElse(standards)
 }

@@ -4,7 +4,7 @@ import org.specs2.mutable.Specification
 import play.api.libs.json.{Json, JsObject}
 
 
-class StandardsDataTest extends Specification {
+class StandardsDataQueryTest extends Specification {
 
   val sut = StandardsDataQuery
 
