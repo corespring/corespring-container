@@ -31,7 +31,7 @@ object StandardsDataQuery {
       val fields = (jsonQuery \ "fields").asOpt[Seq[String]]
       val filters = (jsonQuery \ "filters").asOpt[Seq[JsValue]]
 
-      def applyFilters(s: JsObject): Boolean = filters.map {
+      def matchAllFilters(s: JsObject): Boolean = filters.map {
         filterList => {
           filterList.forall(filterItem => {
             (s \ (filterItem \ "field").as[String]).asOpt[String]
@@ -41,16 +41,16 @@ object StandardsDataQuery {
         }
       }.getOrElse(true)
 
-      def applySearchTerm(s: JsObject): Boolean = searchTerm.map {
-        term => fields.map {
-          fieldList: Seq[String] => fieldList.exists(
-            field => (s \ field).asOpt[String]
-              .map(s => s.contains(term))
-              .getOrElse(false))
-        }.getOrElse(true)
-      }.getOrElse(true)
+      def findSearchTermInOneField(s: JsObject): Boolean = (for {
+        term <- searchTerm
+        fieldList <- fields
+      } yield fieldList.exists(
+          field => (s \ field).asOpt[String]
+            .map(s => s.contains(term))
+            .getOrElse(false))
+        ).getOrElse(true)
 
-      standards.filter(applyFilters).filter(applySearchTerm)
+      standards.filter(matchAllFilters).filter(findSearchTermInOneField)
     }
   }.getOrElse(standards)
 }
