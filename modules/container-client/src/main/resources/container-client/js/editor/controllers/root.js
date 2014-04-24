@@ -145,10 +145,12 @@ var controller = function($scope, $rootScope, $log, $location, $state, $timeout,
 
   $scope.itemId = ItemIdService.itemId();
 
-  $scope.onItemLoaded = function(item) {
+  $rootScope.onItemLoaded = function(item) {
     $scope.data.item = item;
     $scope.$broadcast('itemLoaded', item);
   };
+
+  $scope.onItemLoaded = $rootScope.onItemLoaded;
 
   $scope.onItemLoadError = function(error) {
     $log.warn("Error loading item", error);

@@ -72,7 +72,8 @@ var controller = function(
     console.warn("file too big");
   });
 
-  $scope.onSaveSuccess = function() {
+  $scope.onSaveSuccess = function(data) {
+    $rootScope.onItemLoaded(data);
     $scope.data.saveInProgress = false;
   };
 
