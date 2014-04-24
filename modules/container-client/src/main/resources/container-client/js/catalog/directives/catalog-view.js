@@ -475,7 +475,7 @@ angular.module('corespring-catalog.directives').directive('catalogview', [ '$sce
 
       function getUrl(supportingMaterials, index) {
         if (supportingMaterials) {
-          return supportingMaterials[index].name + "/" + supportingMaterials[index].files[fileIndex(index)].name;
+          return supportingMaterials[index].id + "/" + supportingMaterials[index].files[fileIndex(index)].name;
         } else {
           return undefined;
         }

@@ -21,7 +21,7 @@ var controller = function(
     },
 
     addFile: function(file, onComplete, onProgress) {
-      var url = supportingMaterials()[$scope.index].name + '/' + file.name;
+      var url = supportingMaterials()[$scope.index].id + '/' + file.name;
 
       if (ImageUtils.bytesToKb(file.size) > 500) {
         onComplete(ImageUtils.fileTooBigError(file.size, 500));

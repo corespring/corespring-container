@@ -5,7 +5,7 @@
 
     function getUrl(supportingMaterials, index) {
       if (supportingMaterials) {
-        return supportingMaterials[index].name + "/" + self.getSupportingMaterial(supportingMaterials, index).name;
+        return supportingMaterials[index].id + "/" + self.getSupportingMaterial(supportingMaterials, index).name;
       } else {
         return undefined;
       }
