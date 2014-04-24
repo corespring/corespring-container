@@ -14,7 +14,7 @@ angular.module('corespring-player.directives').directive('corespringPlayer', [
       }));
     }
 
-    var link = function($scope, $elem, $attrs) {
+    var link = function($scope, $elem) {
 
       var rendered = false;
       $scope.selectedComponentId = undefined;
@@ -29,7 +29,12 @@ angular.module('corespring-player.directives').directive('corespringPlayer', [
         MathJaxService.parseDomForMath();
 
         _(ComponentRegister.components).keys().each(function(id) {
-          getComponentById(id).wrap("<div class='component-container'/>");
+          var $container = $("<div class='component-container'/>");
+          console.log($rootScope.selectedComponentId);
+          if (parseInt(id, 10) === $rootScope.selectedComponentId) {
+            $container.addClass('selected');
+          }
+          getComponentById(id).wrap($container);
         });
       };
 
