@@ -57,6 +57,7 @@ describe('item-profile controller', function() {
       //$provide.value('ProfileService', new mockProfileService());
       $provide.value('DataQueryService', mockDataQueryService);
       $provide.value('ItemService', new mockItemService());
+      $provide.value('StandardQueryCreator', {});
     });
   });
 
