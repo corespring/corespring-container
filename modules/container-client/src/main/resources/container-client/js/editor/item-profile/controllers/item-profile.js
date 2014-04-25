@@ -302,11 +302,40 @@
       ItemService.load(onLoadItemSuccess, onLoadItemError, itemId);
     }
 
+    /**
+     * Try to identify the item type from the components
+     * TODO This implementation is very primitive. It probably needs to be more dynamic.
+     * @param components
+     * @returns {string}
+     */
+    function getItemTypeForComponents(components) {
+
+      function hasComponent(type) {
+        return _.exists(components, function (component) {
+          return component.componentType === type;
+        });
+      }
+
+      if (hasComponent("corespring-drag-and-drop")) {
+        return "Drag & Drop";
+      } else if (hasComponent("corespring-multiple-choice")) {
+        return "Multiple Choice";
+      } else if (hasComponent("corespring-text-entry")) {
+        return "Constructed Response - Short Answer";
+      } else {
+        return "";
+      }
+    }
+
     function initSubObjects() {
       var profile = $scope.data.item.profile;
 
       if (!(profile.taskInfo)) {
         profile.taskInfo = {};
+      }
+
+      if (!(profile.taskInfo.itemType)) {
+        profile.taskInfo.itemType = getItemTypeForComponents($scope.data.item.components);
       }
       if (!_.isArray(profile.taskInfo.reviewsPassed)) {
         profile.taskInfo.reviewsPassed = [];
@@ -323,9 +352,19 @@
       if (!(profile.contributorDetails)) {
         profile.contributorDetails = {};
       }
+
+      if (!(profile.contributorDetails.licenseTyp)) {
+        profile.contributorDetails.licenseType = "CC BY";
+      }
+
       if (!(profile.contributorDetails.copyright)) {
         profile.contributorDetails.copyright = {};
       }
+
+      if (!(profile.contributorDetails.copyright.year)) {
+        profile.contributorDetails.copyright.year = new Date().getFullYear();
+      }
+
       if (!_.isArray(profile.contributorDetails.copyright.additional)) {
         profile.contributorDetails.copyright.additional = [];
       }
@@ -343,7 +382,7 @@
 
       function itemIsEmpty(item) {
         $log.debug("itemIsEmpty", item);
-        return !item || _.every(item, function(val){
+        return !item || _.every(item, function (val) {
           $log.debug("itemIsEmpty", val);
           return !val;
         });
@@ -356,8 +395,8 @@
             items.splice(i, 1);
           }
         }
-        if(items.length >= 2){
-          if(itemIsEmpty(items[0])){
+        if (items.length >= 2) {
+          if (itemIsEmpty(items[0])) {
             items.splice(0, 1);
           }
         }
