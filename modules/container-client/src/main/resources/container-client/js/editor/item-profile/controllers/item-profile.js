@@ -309,9 +309,6 @@
         profile.taskInfo = {};
       }
 
-      if (!(profile.taskInfo.itemType)) {
-        profile.taskInfo.itemType = getItemTypeForComponents($scope.data.item.components);
-      }
       if (!_.isArray(profile.taskInfo.reviewsPassed)) {
         profile.taskInfo.reviewsPassed = [];
       }
@@ -352,8 +349,6 @@
      * additional copyright item, the item is removed
      */
     function removeEmptyAdditionalCopyrightItems() {
-
-      $log.debug("removeEmptyAdditionalCopyrightItems");
 
       function itemIsEmpty(item) {
         $log.debug("itemIsEmpty", item);
