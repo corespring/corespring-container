@@ -110,6 +110,11 @@ form(style="padding-left: 10px;")
           input#lexile.input-mini(type='text', ng-model='profile.lexile')
           span.lead(style='padding-left: 5px;') L
 
+  .control-group(ng-show='componentTypes.length')
+    label.control-label Question Types
+      ul
+        li(ng-repeat='type in componentTypes') {{type}}
+
   .control-group
     label.control-label Item Type
     table.itemTypes
