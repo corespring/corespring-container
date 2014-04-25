@@ -115,37 +115,6 @@ form(style="padding-left: 10px;")
       ul
         li(ng-repeat='type in componentTypes') {{type}}
 
-  .control-group
-    label.control-label Item Type
-    table.itemTypes
-      tr
-        td(valign='top')
-          ul
-            li(ng-repeat='t in itemTypeDataProvider', ng-show='$index < 2')
-              h4 {{t.key}}
-              label.radio(ng-repeat='k in t.value')
-                input(type='radio', ng-model='taskInfo.itemType', value='{{k}}')
-                | {{k}}
-        td(valign='top')
-          ul
-            li(ng-repeat='t in itemTypeDataProvider', ng-show='$index >= 2 && $index < 4')
-              h4 {{t.key}}
-              label.radio(ng-repeat='k in t.value')
-                input(type='radio', ng-model='taskInfo.itemType', value='{{k}}')
-                | {{k}}
-        td(valign='top')
-          ul
-            li(ng-repeat='t in itemTypeDataProvider', ng-show='$index >= 4')
-              h4 {{t.key}}
-              label.radio(ng-repeat='k in t.value')
-                input(type='radio', ng-model='taskInfo.itemType', value='{{k}}')
-                | {{k}}
-            li
-              h4 Other
-              label.radio
-                input(type='radio', ng-model='taskInfo.itemType', value='{{otherItemType}}')
-                input.form-control(type='text', ng-model='$parent.otherItemType')
-
   h3 Licensing
 
   p This item is made available to the CoreSpring Community via a
