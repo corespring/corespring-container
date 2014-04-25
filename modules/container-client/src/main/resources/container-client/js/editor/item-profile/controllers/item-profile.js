@@ -276,7 +276,6 @@
     });
 
     $scope.save = function () {
-      removeEmptyAdditionalCopyrightItems();
       ItemService.save({
           profile: $scope.data.item.profile
         },
@@ -344,30 +343,19 @@
       removeEmptyAdditionalCopyrightItems();
     }
 
-    /**
-     * When the user empties all the fields of a
-     * additional copyright item, the item is removed
-     */
     function removeEmptyAdditionalCopyrightItems() {
 
       function itemIsEmpty(item) {
-        $log.debug("itemIsEmpty", item);
         return !item || _.every(item, function (val) {
-          $log.debug("itemIsEmpty", val);
           return !val;
         });
       }
 
       var items = $scope.data.item.profile.contributorDetails.copyright.additional;
       if (_.isArray(items)) {
-        for (var i = items.length - 1; i >= 1; i--) {
+        for (var i = items.length - 1; i >= 0; i--) {
           if (itemIsEmpty(items[i])) {
             items.splice(i, 1);
-          }
-        }
-        if (items.length >= 2) {
-          if (itemIsEmpty(items[0])) {
-            items.splice(0, 1);
           }
         }
       }
