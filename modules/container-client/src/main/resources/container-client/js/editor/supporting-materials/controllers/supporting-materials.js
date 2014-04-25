@@ -1,27 +1,10 @@
 /* global com */
-var controller = function($scope, ItemService, $modal, Overlay, $state, $log) {
+var controller = function($scope, ItemService, SupportingMaterialsService, $modal, Overlay, $state, $log) {
 
   var log = $log.debug.bind($log, '[supporting-materials] -');
 
-  var otherType = 'Other';
-
-  $scope.materialTypes = ['Rubric', 'Student Work', otherType];
-  $scope.materialType = $scope.materialTypes[0];
-
-  $scope.displayOther = isOther();
-  $scope.$watch('materialType', function() {
-    $scope.displayOther = isOther();
-  });
-
   $scope.uploadType = null;
-
-  function isOther() {
-    return $scope.materialType === otherType;
-  }
-
-  function getType() {
-    return isOther() ? $scope.textMaterialType : $scope.materialType;
-  }
+  $scope.newMaterial = {};
 
   $scope.createNew = function() {
 
@@ -68,8 +51,8 @@ var controller = function($scope, ItemService, $modal, Overlay, $state, $log) {
     function handleText() {
       var supportingMaterials = $scope.data.item.supportingMaterials || [];
       var newSupportingMaterial = {
-        name: $scope.title,
-        materialType: getType(),
+        name: $scope.newMaterial.name,
+        materialType: $scope.newMaterial.materialType,
         files: [{
           "name": "index.html",
           "contentType": "text/html",
@@ -103,7 +86,7 @@ var controller = function($scope, ItemService, $modal, Overlay, $state, $log) {
        */
       function persistInitial(callback) {
         var supportingMaterials = $scope.data.item.supportingMaterials || [];
-        supportingMaterials.push({ name: $scope.title, materialType: getType() });
+        supportingMaterials.push({ name: $scope.newMaterial.title, materialType: $scope.newMaterial.materialType });
         console.log('about to save...');
         ItemService.save(
           { supportingMaterials: supportingMaterials },
@@ -182,17 +165,10 @@ var controller = function($scope, ItemService, $modal, Overlay, $state, $log) {
     }
   }
 
-  $scope.create = function(data) {
-    if (_.isEmpty(getType())) {
-      window.alert("Please select a type for the supporting material.");
-    } else if (_.isEmpty($scope.title)) {
-      window.alert("Please enter a title for the supporting material.");
-    } else {
-      if ($scope.data.item) {
-        createSupportingMaterial();
-      } else {
-        log.error("Need $scope.item initialized");
-      }
+  $scope.create = function() {
+    if ($scope.data.item &&
+      SupportingMaterialsService.validateMetadata({ title: $scope.newMaterial.name, materialType: $scope.newMaterial.materialType })) {
+      createSupportingMaterial();
     }
   };
 
@@ -203,6 +179,7 @@ var controller = function($scope, ItemService, $modal, Overlay, $state, $log) {
 angular.module('corespring-editor.controllers')
   .controller('SupportingMaterials', ['$scope',
     'ItemService',
+    'SupportingMaterialsService',
     '$modal',
     'Overlay',
     '$state',

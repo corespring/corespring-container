@@ -37,7 +37,7 @@ describe('supporting materials service', function() {
 
   describe('getSupportingMaterial', function() {
     it('should return main file at index', function() {
-      expect(supportingMaterialsService.getSupportingMaterial(supportingMaterials, 0)).toEqual(
+      expect(supportingMaterialsService.getSupportingMaterialFile(supportingMaterials, 0)).toEqual(
         _.find(supportingMaterials[0].files, function(file) {
           return file.isMain === true;
         }));

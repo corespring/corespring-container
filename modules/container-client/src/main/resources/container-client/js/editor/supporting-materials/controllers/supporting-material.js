@@ -21,7 +21,7 @@ var controller = function(
     },
 
     addFile: function(file, onComplete, onProgress) {
-      var url = supportingMaterials()[$scope.index].id + '/' + file.name;
+      var url = $scope.supportingMaterials()[$scope.index].id + '/' + file.name;
 
       if (ImageUtils.bytesToKb(file.size) > 500) {
         onComplete(ImageUtils.fileTooBigError(file.size, 500));
@@ -84,10 +84,10 @@ var controller = function(
   $scope.$watch('supportingMarkup', function(newValue) {
     if ($scope.data.item) {
       var updatedSupportingMaterials = $scope.data.item.supportingMaterials;
-      var supportingMaterialFile = SupportingMaterialsService.getSupportingMaterial(supportingMaterials(), $scope.index);
+      var supportingMaterialFile = SupportingMaterialsService.getSupportingMaterialFile($scope.supportingMaterials(), $scope.index);
       if (supportingMaterialFile) {
         supportingMaterialFile.content = newValue;
-        var fileIndex = _.findIndex(supportingMaterials()[$scope.index].files, function(file) {
+        var fileIndex = _.findIndex($scope.supportingMaterials()[$scope.index].files, function(file) {
           return file.isMain;
         });
         updatedSupportingMaterials[$scope.index].files[fileIndex] = supportingMaterialFile;
@@ -121,9 +121,9 @@ var controller = function(
   };
 
 
-  function supportingMaterials() {
+  $scope.supportingMaterials = function() {
     return $scope.data.item ? $scope.data.item.supportingMaterials : undefined;
-  }
+  };
 
   $scope.formatDate = function(date) {
     if (date instanceof Object && date.$date) {
@@ -137,15 +137,15 @@ var controller = function(
   };
 
   $scope.getSupportingMaterialMarkup = function() {
-    if (supportingMaterials()) {
-      return SupportingMaterialsService.getSupportingMaterial(supportingMaterials(), $scope.index).content;
+    if ($scope.supportingMaterials()) {
+      return SupportingMaterialsService.getSupportingMaterialFile($scope.supportingMaterials(), $scope.index).content;
     } else {
       return undefined;
     }
   };
 
   function getSupportingMaterialType() {
-    return supportingMaterials() ? supportingMaterials()[$scope.index].materialType : undefined;
+    return $scope.supportingMaterials() ? $scope.supportingMaterials()[$scope.index].materialType : undefined;
   }
 
   $scope.toggleEdit = function() {
@@ -157,14 +157,19 @@ var controller = function(
   };
 
   $scope.isContentType = function(contentType) {
-    return supportingMaterials() ? contentType === SupportingMaterialsService.getContentType(supportingMaterials(), $scope.index) : false;
+    return $scope.supportingMaterials() ?
+      contentType === SupportingMaterialsService.getContentType($scope.supportingMaterials(), $scope.index) : false;
   };
 
   function getSupportingMaterial() {
+    return $scope.supportingMaterials() ? $scope.supportingMaterials()[$scope.index] : undefined;
+  }
+
+  function getSupportingMaterialFile() {
     var supportingMaterial;
-    if (supportingMaterials()) {
-      supportingMaterial = SupportingMaterialsService.getSupportingMaterial(supportingMaterials(), $scope.index);
-      SupportingMaterialsService.getKBFileSize(supportingMaterials(), $scope.index, function(size) {
+    if ($scope.supportingMaterials()) {
+      supportingMaterial = SupportingMaterialsService.getSupportingMaterialFile($scope.supportingMaterials(), $scope.index);
+      SupportingMaterialsService.getKBFileSize($scope.supportingMaterials(), $scope.index, function(size) {
         $scope.supportingMaterialFileSize = size;
       });
     }
@@ -172,14 +177,31 @@ var controller = function(
   }
 
   $scope.$on('itemLoaded', function() {
-    $scope.supportingMaterial = getSupportingMaterial();
-    $scope.supportingMarkup = $scope.getSupportingMaterialMarkup();
-    $scope.materialType = getSupportingMaterialType();
+    $scope.init();
   });
 
-  $scope.supportingMaterial = getSupportingMaterial();
-  $scope.supportingMarkup = $scope.getSupportingMaterialMarkup();
-  $scope.materialType = getSupportingMaterialType();
+  $scope.updateMetadata = function(name, materialType) {
+    if ($scope.data.item) {
+      var updatedSupportingMaterials = $scope.data.item.supportingMaterials;
+      var supportingMaterial = $scope.supportingMaterials()[$scope.index];
+      if (supportingMaterial) {
+        supportingMaterial.name = name;
+        supportingMaterial.materialType = materialType;
+        updatedSupportingMaterials[$scope.index] = supportingMaterial;
+        $scope.data.item.supportingMaterials = updatedSupportingMaterials;
+      }
+    }
+  };
+
+
+  $scope.init = function() {
+    $scope.supportingMaterial = getSupportingMaterial();
+    $scope.supportingMaterialFile = getSupportingMaterialFile();
+    $scope.supportingMarkup = $scope.getSupportingMaterialMarkup();
+    $scope.materialType = getSupportingMaterialType();
+  };
+
+  $scope.init();
 
 };
 

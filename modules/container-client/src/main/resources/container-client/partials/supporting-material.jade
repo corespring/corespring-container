@@ -1,7 +1,8 @@
 script#supporting-material(type='text/ng-template')
 
   .supporting-material(ng-controller="SupportingMaterial")
-    .editor-container(ng-class="editorMode", ng-show="editing")
+    supportingmetadata(ng-model='supportingMaterial', persist='updateMetadata')
+    .editor-container(ng-class="editorMode", ng-show="isContentType('text/html')")
       wiggi-wiz(
         ng-model="supportingMarkup",
         image-service="imageService")
@@ -10,7 +11,7 @@ script#supporting-material(type='text/ng-template')
           .btn-group
             button(ng-click="closePane()", class="btn btn-sm btn-success", style="float:right;") OK
 
-    .file-upload-info(ng-hide="editing")
+    .file-upload-info(ng-show="!isContentType('text/html')")
       h3 File Upload Info
       dl
         div
