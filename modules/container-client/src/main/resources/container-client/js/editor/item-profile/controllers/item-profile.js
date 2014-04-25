@@ -302,31 +302,6 @@
       ItemService.load(onLoadItemSuccess, onLoadItemError, itemId);
     }
 
-    /**
-     * Try to identify the item type from the components
-     * TODO This implementation is very primitive. It probably needs to be more dynamic.
-     * @param components
-     * @returns {string}
-     */
-    function getItemTypeForComponents(components) {
-
-      function hasComponent(type) {
-        return _.exists(components, function (component) {
-          return component.componentType === type;
-        });
-      }
-
-      if (hasComponent("corespring-drag-and-drop")) {
-        return "Drag & Drop";
-      } else if (hasComponent("corespring-multiple-choice")) {
-        return "Multiple Choice";
-      } else if (hasComponent("corespring-text-entry")) {
-        return "Constructed Response - Short Answer";
-      } else {
-        return "";
-      }
-    }
-
     function initSubObjects() {
       var profile = $scope.data.item.profile;
 
@@ -416,6 +391,8 @@
       $log.debug("task info:", $scope.taskInfo);
       $log.debug("other alignments:", $scope.otherAlignments);
       $log.debug("contributor details:", $scope.contributorDetails);
+
+      $scope.componentTypes = _.pluck($scope.data.item.components, "title");
 
       $scope.needAdditionalCopyrightInformation =
           $scope.contributorDetails.copyright.additional.length > 0 ? 'yes' : '';
