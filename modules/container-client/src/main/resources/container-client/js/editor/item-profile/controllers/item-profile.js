@@ -218,7 +218,52 @@
 
     DataQueryService.list("reviewsPassed", function (result) {
       $scope.reviewsPassedDataProvider = result;
+      $scope.initReviewsPassedSelection();
     });
+
+    $scope.initReviewsPassedSelection = function () {
+      if ($scope.reviewsPassedDataProvider && $scope.taskInfo && _.isArray($scope.taskInfo.reviewsPassed)) {
+        _.each($scope.reviewsPassedDataProvider, function (item) {
+          item.selected = $scope.taskInfo.reviewsPassed.indexOf(item.key) >= 0;
+        });
+      }
+    };
+
+    $scope.onChangeReviewsPassed = function (changedKey) {
+      function getKeys(predicate) {
+        return _.chain($scope.reviewsPassedDataProvider)
+          .filter(predicate)
+          .pluck("key")
+          .value();
+      }
+
+      function keyIsSelected(key) {
+        return selectedKeys.indexOf(key) >= 0;
+      }
+
+      var selectedKeys = getKeys(function (item) {
+        return item.selected;
+      });
+      if (changedKey === "None") {
+        if (keyIsSelected(changedKey)) {
+          selectedKeys = ["None"];
+        }
+      } else if (changedKey === "All") {
+        if (keyIsSelected(changedKey)) {
+          selectedKeys = getKeys(function (item) {
+            return item.key !== "None" && item.key !== "Other";
+          });
+        }
+      } else {
+        if (keyIsSelected(changedKey)) {
+          selectedKeys = _.without(selectedKeys, "None");
+        } else {
+          selectedKeys = _.without(selectedKeys, "All");
+        }
+      }
+      $scope.data.item.profile.taskInfo.reviewsPassed = selectedKeys;
+      $scope.initReviewsPassedSelection();
+    };
 
     $scope.getLicenseTypeUrl = function (licenseType) {
       return licenseType ? "/assets/images/licenseTypes/" + licenseType.replace(" ", "-") + ".png" : undefined;
@@ -276,6 +321,7 @@
     });
 
     $scope.save = function () {
+
       ItemService.save({
           profile: $scope.data.item.profile
         },
@@ -379,6 +425,8 @@
 
       $scope.needAdditionalCopyrightInformation =
           $scope.contributorDetails.copyright.additional.length > 0 ? 'yes' : '';
+
+      $scope.initReviewsPassedSelection();
 
       isFormActive = true;
     }
