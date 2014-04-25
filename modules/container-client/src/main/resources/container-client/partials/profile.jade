@@ -1,19 +1,24 @@
 
-h2 Item Information
+h2 Item Profile
 
-span.required * Required
+table(style="margin-bottom: 30px;")
+  tr
+    td(style="width: 150px; vertical-align: top;")
+      span.required * Required
+    td The information stored in this profile will help teachers to search and find items to use. The profile      contains information about authorship, tagging information such as Common Core State Standard, Bloom's       Taxonomy assignment, key skills and copyright information. Authors are encouraged to include as much       information as possible.
+
 
 form(style="padding-left: 10px;")
 
   .item-information
     .control-group
       label.control-label(for="description") * Description
+        span.help-inline Enter as short description of this item. (e.g. Multiply single digit numbers, select evidence in reading passage)
         .controls
           textarea#description.form-control(
           ng-model='taskInfo.description',
           placeholder="Enter a description...",
           rows='3')
-          p Describe the activitiy that the student will perform (e.g. Multiply single digit numbers, select evidence in reading passage)
 
     .control-group
       label.control-label(for="title") Title
@@ -43,66 +48,45 @@ form(style="padding-left: 10px;")
             ui-select2="relatedSubjectAsync",
             data-placeholder="Choose a subject...")
 
-  h3 CCSS
+  h3 Standards Alignment
 
   .fieldset
     .control-group.standards
-      label.control-label Standard(s)
+      label.control-label * Standard(s)
       .controls
-        div(style='padding-bottom: 5px; height: 30px;')
-          div(style='float: left; padding-right: 5px;')
-            label * Subject
-            select(ng-model='standardAdapter.subjectOption', ng-options='c.name for c in standardsOptions', style='vertical-align: top; width: 100px; padding-top: 0px;')
-          div(style='float: left; padding-right: 5px;')
+        div(style='padding-bottom: 15px;')
+          div(style='float: left; padding-right: 5px; width: 200px; padding-bottom: 10px;')
+            label Subject
+            select(ng-model='standardAdapter.subjectOption', ng-options='c.name for c in standardsOptions', style='vertical-align: top; width: 100%; padding-top: 0px;')
+          div(style='float: left; padding-right: 5px; width: 380px; padding-bottom: 10px;')
             label Category
-            select(ng-model='standardAdapter.categoryOption', ng-options='p.name for p in standardAdapter.subjectOption.items')
-          div(style='float: left;')
+            select(ng-model='standardAdapter.categoryOption', ng-options='p.name for p in standardAdapter.subjectOption.items', style='width:100%')
+          div(style='float: left; min-width: 300px; padding-bottom: 10px;')
             label Sub-Category
-            select(ng-model='standardAdapter.subCategoryOption', ng-options='z for z in standardAdapter.categoryOption.items')
-        input(type='hidden', multiple='', ui-select2='standardAdapter', ng-model='taskInfo.standards', style='width: 500px;')
+            select(ng-model='standardAdapter.subCategoryOption', ng-options='z for z in standardAdapter.categoryOption.items', style='width:100%')
+
+          input(type='text', multiple='', ui-select2='standardAdapter', ng-model='taskInfo.standards', style='width: 500px;')
 
     .control-group
       label.control-label(for='gradeLevel') Grade Level
         .controls(style="width:80%")
           button-bar#gradeLevel(ng-model="taskInfo.gradeLevel", button-provider="gradeLevelDataProvider", key="key")
 
-    .control-group
-      label.control-label Item Type
-      table.itemTypes
-        tr
-          td(valign='top')
-            ul
-              li(ng-repeat='t in itemTypeDataProvider', ng-show='$index < 2')
-                h4 {{t.key}}
-                label.radio(ng-repeat='k in t.value')
-                  input(type='radio', ng-model='taskInfo.itemType', value='{{k}}')
-                  | {{k}}
-          td(valign='top')
-            ul
-              li(ng-repeat='t in itemTypeDataProvider', ng-show='$index >= 2 && $index < 4')
-                h4 {{t.key}}
-                label.radio(ng-repeat='k in t.value')
-                  input(type='radio', ng-model='taskInfo.itemType', value='{{k}}')
-                  | {{k}}
-          td(valign='top')
-            ul
-              li(ng-repeat='t in itemTypeDataProvider', ng-show='$index >= 4')
-                h4 {{t.key}}
-                label.radio(ng-repeat='k in t.value')
-                  input(type='radio', ng-model='taskInfo.itemType', value='{{k}}')
-                  | {{k}}
-              li
-                h4 Other
-                label.radio
-                  input(type='radio', ng-model='taskInfo.itemType', value='{{otherItemType}}')
-                  input.form-control(type='text', ng-model='$parent.otherItemType')
-
   h3 Other Alignments
 
-  .control-group
-    label.control-label Bloom's Taxonomy
-      .controls
-        select(ng-model='otherAlignments.bloomsTaxonomy', ng-options='c for c in bloomsTaxonomyDataProvider')
+  table(style='width: 80%;')
+    tr
+      td(style='vertical-align: top')
+        .control-group
+          label.control-label Depth Of Knowledge
+            .controls
+              select(ng-model='otherAlignments.depthOfKnowledge', ng-options='c.key as c.value for c in depthOfKnowledgeDataProvider')
+              p.help-block Select the depth of knowledge that best represents the objective
+      td(style='vertical-align: top')
+        .control-group
+          label.control-label Bloom's Taxonomy
+            .controls
+              select(ng-model='otherAlignments.bloomsTaxonomy', ng-options='c for c in bloomsTaxonomyDataProvider')
 
   .control-group
     label.control-label
@@ -120,11 +104,59 @@ form(style="padding-left: 10px;")
           div(style='float: none; clear: both;')
 
   .control-group
-    label.control-label Depth Of Knowledge
-      .controls
-        select(ng-model='otherAlignments.depthOfKnowledge', ng-options='c.key as c.value for c in depthOfKnowledgeDataProvider')
-        span.help-inline Select the depth of knowledge that best represents the objective
+    .control-group
+      label.control-label(for='lexile') Lexile Score
+        .controls
+          input#lexile.input-mini(type='text', ng-model='profile.lexile')
+          span.lead(style='padding-left: 5px;') L
 
+  .control-group(ng-show='componentTypes.length')
+    label.control-label Question Types
+      ul
+        li(ng-repeat='type in componentTypes') {{type}}
+
+  .control-group
+    label.control-label Item Type
+    table.itemTypes
+      tr
+        td(valign='top')
+          ul
+            li(ng-repeat='t in itemTypeDataProvider', ng-show='$index < 2')
+              h4 {{t.key}}
+              label.radio(ng-repeat='k in t.value')
+                input(type='radio', ng-model='taskInfo.itemType', value='{{k}}')
+                | {{k}}
+        td(valign='top')
+          ul
+            li(ng-repeat='t in itemTypeDataProvider', ng-show='$index >= 2 && $index < 4')
+              h4 {{t.key}}
+              label.radio(ng-repeat='k in t.value')
+                input(type='radio', ng-model='taskInfo.itemType', value='{{k}}')
+                | {{k}}
+        td(valign='top')
+          ul
+            li(ng-repeat='t in itemTypeDataProvider', ng-show='$index >= 4')
+              h4 {{t.key}}
+              label.radio(ng-repeat='k in t.value')
+                input(type='radio', ng-model='taskInfo.itemType', value='{{k}}')
+                | {{k}}
+            li
+              h4 Other
+              label.radio
+                input(type='radio', ng-model='taskInfo.itemType', value='{{otherItemType}}')
+                input.form-control(type='text', ng-model='$parent.otherItemType')
+
+  h3 Licensing
+
+  p This item is made available to the CoreSpring Community via a
+  table.permissions
+    tr
+      td(style="padding: 10px; vertical-align: top")
+        select(ng-model='contributorDetails.licenseType', ng-options='c for c in licenseTypeDataProvider')
+      td(style="padding: 10px; vertical-align: top")
+        span(ng-show='!contributorDetails.licenseType', style='color: #888; font-style: italic;') Not Assigned
+        img(ng-show='contributorDetails.licenseType', src='{{getLicenseTypeUrl(contributorDetails.licenseType)}}')
+        a(href="http://creativecommons.org/licenses/", target="_blank") Learn more
 
   h2 Copyright Information
 
@@ -166,18 +198,6 @@ form(style="padding-left: 10px;")
         .controls
           select(ng-model='contributorDetails.copyright.expirationDate', ng-options='c for c in copyrightExpirationYearDataProvider')
 
-  h3 Permissions
-
-  p This item is made available to the CoreSpring Community via a
-  table.permissions
-    tr
-      td(style="padding: 10px; vertical-align: top")
-        select(ng-model='contributorDetails.licenseType', ng-options='c for c in licenseTypeDataProvider')
-      td(style="padding: 10px; vertical-align: top")
-        span(ng-show='!contributorDetails.licenseType', style='color: #888; font-style: italic;') Not Assigned
-        img(ng-show='contributorDetails.licenseType', src='{{getLicenseTypeUrl(contributorDetails.licenseType)}}')
-        a(href="http://creativecommons.org/licenses/", target="_blank") Learn more
-
   h3 Additional Copyright Information
   p Does this item contain any other copyrighted materials? E.g. book passage, image, etc. *
 
@@ -198,26 +218,22 @@ form(style="padding-left: 10px;")
       label.control-label(for="owner") Owner
         .controls
           input#owner.form-control(
-          ng-model='item.owner',
-          placeholder="Enter a owner...")
+          ng-model='item.owner')
     .control-group
       label.control-label(for="author") Author
         .controls
           input#author.form-control(
-          ng-model='item.author',
-          placeholder="Enter a author...")
+          ng-model='item.author')
     .control-group
       label.control-label(for="publisher") Publisher
         .controls
           input#publisher.form-control(
-          ng-model='item.publisher',
-          placeholder="Enter a publisher...")
+          ng-model='item.publisher')
     .control-group
-      label.control-label(for="year") Year
+      label.control-label(for="year") Copyright Year
         .controls
           input#year.form-control(
-          ng-model='item.year',
-          placeholder="Enter a year...")
+          ng-model='item.year')
     .control-group
       label.control-label(for="license") License
         .controls
@@ -226,48 +242,36 @@ form(style="padding-left: 10px;")
       label.control-label(for="url") Source URL
         .controls
           input#url.form-control(
-          ng-model='item.sourceUrl',
-          placeholder="Enter a url...")
+          ng-model='item.sourceUrl')
 
-  a.add-additional(ng-click='addCopyrightItem()')
+  a.add-additional(ng-click='addCopyrightItem()', ng-show='needAdditionalCopyrightInformation')
     i(class="fa fa-{{!!expandKeySkills ? 'minus' : 'plus'}}-square-o", style="margin-left: 6px; margin-right: 6px;")
     span Add more
 
 
   h3 Historical Information
-    h4 Prior Use
 
-    .control-group
-      p.help-block This item was previously used in a
-      label.control-label(for='priorUse') Prior Use
-        .controls
-          select#priorUse(name='profile.priorUse', ng-model='profile.priorUse', ng-options='c for c in priorUseDataProvider')
+  h4 Prior Use
 
-    .control-group
-      label.control-label(for='priorGradeLevel') Grade Level
-        .controls(style="width:80%")
-          button-bar#gradeLevel(ng-model="profile.priorGradeLevel", button-provider="gradeLevelDataProvider", key="key")
+  .control-group
+    p.help-block This item was previously used in a
+    label.control-label(for='priorUse') Prior Use
+      .controls
+        select#priorUse(name='profile.priorUse', ng-model='profile.priorUse', ng-options='c for c in priorUseDataProvider')
 
-    h4 Reviews Passed
-    .control-group
-      p.help-block This question passed the following reviews
-      label.control-label Reviews Passed
-      .div(style="width:240px;")
-        label(ng-repeat='rp in reviewsPassedDataProvider', style="width:50%;")
-          input(type='checkbox', ng-model='rp.selected', style="margin-right: 3px;")
-          | {{rp.key}}
+  .control-group
+    label.control-label(for='priorGradeLevel') Grade Level
+      .controls(style="width:80%")
+        button-bar#gradeLevel(ng-model="profile.priorGradeLevel", button-provider="gradeLevelDataProvider", key="key")
 
-    .control-group
-      label.control-label(for='pValue') Difficulty Level
-        .controls
-          input#pValue.input-mini(type='text', ng-model='profile.pValue')
-          span.lead(style='padding-left: 50px;') {{pValueAsString}}
-
-    .control-group
-      label.control-label(for='lexile') Lexile Score
-        .controls
-          input#lexile.input-mini(type='text', ng-model='profile.lexile')
-          span.lead(style='padding-left: 5px;') L
+  h4 Reviews Passed
+  .control-group
+    p.help-block This question passed the following reviews
+    label.control-label Reviews Passed
+    .div(style="width:240px;")
+      label(ng-repeat='rp in reviewsPassedDataProvider', style="width:50%;")
+        input(type='checkbox', ng-model='rp.selected', style="margin-right: 3px;")
+        | {{rp.key}}
 
 
 

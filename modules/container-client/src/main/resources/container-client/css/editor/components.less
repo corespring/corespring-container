@@ -1,6 +1,6 @@
 @component-bg-color: #ffffff;
 
-.input-holder{
+.input-holder {
   background-color: @component-bg-color;
   margin-top: 10px;
   .header{
@@ -13,44 +13,64 @@
   .body{
     padding: 10px;
   }
-
 }
 
-.component-placeholder {
-  @placeholder-base-color: @grey-purple;
-  position:relative;
-  border: 1px solid darken(@placeholder-base-color, 10%);
-  background-color: lighten(@placeholder-base-color, 40%);
-  transition: background-color 100ms linear;
-  .rounded(4px);
-  .user-select(none);
-  .drop-shadow(0, 2px, 3px, 0.2);
-  &:hover{
-    background-color: lighten(@placeholder-base-color, 50%);
+.selected-component-container() {
+  @selected-component-border-color: #eaeaea;
+  padding: 5px;
+  margin: 5px 0;
+  border: 2px dashed transparent;
+
+  &.selected {
+    border: 2px dashed @selected-component-border-color;
   }
-  max-width: 400px;
-  padding: 20px;
+}
 
-  
+@placeholder-base-color: @grey-purple;
+@selected-component-border-color: #eaeaea;
 
+.component-placeholder {
 
-  .delete-icon{
-    width: 20px;
-    height: 20px;
-    .drop-shadow(2px, 2px, 2px, 0.3);
-    i{
-      position: absolute;
-      font-size: 24px;
-      color: darken(@placeholder-base-color, 10%);
-
+  .inner-placeholder{
+    position:relative;
+    border: 1px solid darken(@placeholder-base-color, 10%);
+    background-color: lighten(@placeholder-base-color, 40%);
+    transition: background-color 100ms linear;
+    padding: 20px;
+    width: 100%;
+    .rounded(4px);
+    .user-select(none);
+    .drop-shadow(0, 2px, 3px, 0.2);
       &:hover{
-        color: darken(@placeholder-base-color, 16%);
-      }
+      background-color: lighten(@placeholder-base-color, 50%);
     }
-    background-color: white;
-    border-radius: 12px;
-    position:absolute; 
-    right: -8px;
-    top: -10px;
+  }
+
+  .selected-component-container();
+}
+
+.delete-icon, .close-icon {
+  @close-icon-base-color: @grey-purple;
+  width: 20px;
+  height: 20px;
+  background-color: white;
+  border-radius: 12px;
+  position:absolute;
+  right: -8px;
+  top: -10px;
+  .drop-shadow(2px, 2px, 2px, 0.3);
+
+  &:hover {
+    cursor: pointer;
+  }
+
+  i {
+    position: absolute;
+    font-size: 24px;
+    color: darken(@close-icon-base-color, 10%);
+
+    &:hover {
+      color: darken(@close-icon-base-color, 16%);
+    }
   }
 }

@@ -6,12 +6,91 @@
       '$scope',
       'DataQueryService',
       'ItemService',
-      controller
+      'StandardQueryCreator',
+      ItemProfileController
     ]);
 
-  function controller($log, $scope, DataQueryService, ItemService) {
+  function ItemProfileController($log, $scope, DataQueryService, ItemService, StandardQueryCreator) {
 
     var isFormActive = false;
+
+    //----------------------------------------------------------------
+    // Standards start
+    //----------------------------------------------------------------
+
+    /**
+     * The standards selection consists of three select boxes and a
+     * select2 search & multi select tag field
+     * The three selections are filled from the standardsTree
+     * The selected values are used as filters for the select2 search field
+     */
+
+    $scope.$watch('taskInfo.standards', function (newValue, oldValue) {
+      $log.debug("taskInfo.standards", newValue);
+    });
+
+    $scope.standardsOptions = [];
+
+    DataQueryService.list("standardsTree", function (result) {
+      $scope.standardsOptions = result;
+    });
+
+    function createStandardQuery(searchText) {
+      return JSON.stringify(
+        StandardQueryCreator.createStandardQuery(
+          searchText,
+          $scope.standardAdapter.subjectOption,
+          $scope.standardAdapter.categoryOption,
+          $scope.standardAdapter.subCategoryOption));
+    }
+
+    $scope.standardAdapter = {
+      subjectOption: {},
+      categoryOption: {},
+      subCategoryOption: {},
+      tags: true,
+      allowClear: true,
+      minimumInputLength: 1,
+      placeholder: "Choose a standard",
+      id: function (item) {
+        $log.debug("standardAdapter id", item._id);
+        return item._id.$oid;
+      },
+      query: function (query) {
+        $log.debug("standardAdapter query", query);
+        DataQueryService.query("standards", createStandardQuery(query.term), function (results) {
+          query.callback({results: results});
+        });
+      }
+    };
+
+    $scope.standardAdapter.valueSetter = function (newItem) {
+      $log.debug("standardAdapter.valueSetter", newItem);
+      $scope.taskInfo.standards.push(newItem);
+    };
+
+    $scope.standardAdapter.formatSelection = function (standard) {
+      setTimeout(function () {
+        $(".standard-adapter-result").tooltip();
+      }, 500);
+      return "<span class='standard-adapter-result' data-title='" + standard.standard + "'>" + standard.dotNotation + "</span>";
+    };
+
+    $scope.standardAdapter.formatResult = function (standard) {
+      var markup = "<blockquote>";
+      markup += '<p>' + standard.standard + '</p>';
+      markup += '<small>' + standard.dotNotation + ', ' + standard.subject + ', ' + standard.subCategory + '</small>';
+      markup += '<small>' + standard.category + '</small>';
+      markup += '</blockquote>';
+      return markup;
+    };
+
+
+    //----------------------------------------------------------------
+    // Standards end
+    //----------------------------------------------------------------
+
+    $scope.queryResults = {};
 
     function findSubject(topic, id, callback) {
       var local = _.find($scope.queryResults[topic], function (r) {
@@ -26,40 +105,6 @@
       }
     }
 
-    $scope.queryResults = {};
-
-    /**
-     * Standards is a tree of objects that we allow the user
-     * to select three levels in.
-     * TODO Connect to data source & store the selected standards in the item
-     */
-    $scope.standardsOptions = [
-      { name: "A1",
-        items: [
-          {
-            name: "B1",
-            items: ["C11", "C12", "C13"]
-          }
-        ]},
-      { name: "A2",
-        items: [
-          {
-            name: "B2",
-            items: ["C21", "C22", "C23"]
-          }
-        ]}
-    ];
-
-    $scope.standardAdapter = {
-      subjectOption: {},
-      categoryOption: {},
-      subCategoryOption: {}
-    };
-
-    function subjectText(s) {
-      return s.category + ": " + s.subject;
-    }
-
     function Async(topic, formatFunc) {
 
       var that = this;
@@ -69,7 +114,7 @@
       };
 
       this.query = function (query) {
-        $log.debug("query: ", query);
+        $log.debug("query", query);
 
         DataQueryService.query(topic, query.term, function (result) {
           $scope.queryResults[topic] = result;
@@ -88,14 +133,19 @@
       };
 
       this.initSelection = function (element, callback) {
-        $log.debug("init selection: ", element, callback);
+
+        $log.debug("init selection:", element, callback);
         var val = that.elementToVal(element);
-        $log.debug("val: ", val);
+        $log.debug("val:", val);
 
         findSubject(topic, val, function (s) {
           return callback(s);
         });
       };
+    }
+
+    function subjectText(s) {
+      return s.category + ": " + s.subject;
     }
 
     $scope.relatedSubjectAsync = new Async("subjects.related", subjectText);
@@ -104,27 +154,27 @@
     $scope.$watch("otherItemType", function (n) {
       if (isFormActive) {
         if (n && n !== "") {
-          $scope.taskInfo.itemType = $scope.otherItemType;
+          $scope.taskInfo.itemType = n;
         }
+      }
+    }, true);
+
+    $scope.$watch("taskInfo.itemType", function (newValue) {
+      if (isFormActive) {
+        updateOtherItemType();
       }
     }, true);
 
     function updateOtherItemType() {
 
       function isRecognisedType() {
-        var recognised = _.find($scope.itemTypeValues, function (it) {
+        return _.some($scope.itemTypeValues, function (it) {
           return it === $scope.taskInfo.itemType;
         });
-        return recognised !== undefined;
       }
 
-      if ($scope.itemTypeDataProvider && $scope.taskInfo) {
-
-        if (isRecognisedType()) {
-          $scope.otherItemType = "";
-        } else {
-          $scope.otherItemType = $scope.taskInfo.itemType;
-        }
+      if ($scope.itemTypeValues && $scope.taskInfo) {
+        $scope.otherItemType = isRecognisedType() ? "" : $scope.taskInfo.itemType;
       }
     }
 
@@ -191,17 +241,11 @@
       return count + " Key " + skills + " selected";
     };
 
-    $scope.$watch("taskInfo.itemType", function (newValue) {
-      if (isFormActive) {
-        updateOtherItemType();
-      }
-    }, true);
-
     $scope.addCopyrightItem = function () {
       $scope.contributorDetails.copyright.additional.push({});
     };
 
-    $scope.removeCopyrightItem = function () {
+    $scope.removeCopyrightItem = function () { //TODO Add ui to trigger removal of specific item
       $scope.contributorDetails.copyright.additional.pop();
     };
 
@@ -213,7 +257,6 @@
 
     $scope.$watch("needAdditionalCopyrightInformation", function (newValue, oldValue) {
       if (isFormActive) {
-        $log.debug("needAdditionalCopyrightInformation new: <" + newValue + "> old: <" + oldValue + ">");
         if (oldValue === 'init') {
           return;
         }
@@ -233,6 +276,7 @@
     });
 
     $scope.save = function () {
+      removeEmptyAdditionalCopyrightItems();
       ItemService.save({
           profile: $scope.data.item.profile
         },
@@ -242,57 +286,109 @@
       $scope.data.saveInProgress = true;
     };
 
-    function onSaveSuccess (updated) {
+    function onSaveSuccess(updated) {
       $log.debug("profile saved");
       $scope.data.saveInProgress = false;
     }
 
-    function onSaveError (err) {
+    function onSaveError(err) {
       $log.debug("error saving profile", err);
       $scope.data.saveError = err;
       $scope.data.saveInProgress = false;
     }
 
-    function loadItem(itemId){
+    function loadItem(itemId) {
       isFormActive = false;
-      ItemService.load( onLoadItemSuccess, onLoadItemError, itemId);
+      ItemService.load(onLoadItemSuccess, onLoadItemError, itemId);
     }
 
-    function initSubobjects() {
-      if (!($scope.data.item.profile.taskInfo)) {
-        $scope.data.item.profile.taskInfo = {};
+    function initSubObjects() {
+      var profile = $scope.data.item.profile;
+
+      if (!(profile.taskInfo)) {
+        profile.taskInfo = {};
       }
-      if (!($scope.data.item.profile.otherAlignments)) {
-        $scope.data.item.profile.otherAlignments = {};
+
+      if (!_.isArray(profile.taskInfo.reviewsPassed)) {
+        profile.taskInfo.reviewsPassed = [];
       }
-      if (!($scope.data.item.profile.contributorDetails)) {
-        $scope.data.item.profile.contributorDetails = {};
+      if (!_.isArray(profile.taskInfo.standards)) {
+        profile.taskInfo.standards = [];
       }
-      if (!($scope.data.item.profile.contributorDetails.copyright)) {
-        $scope.data.item.profile.contributorDetails.copyright = {};
+      if (!(profile.otherAlignments)) {
+        profile.otherAlignments = {};
+      }
+      if (!_.isArray(profile.otherAlignments.keySkills)) {
+        profile.otherAlignments.keySkills = [];
+      }
+      if (!(profile.contributorDetails)) {
+        profile.contributorDetails = {};
+      }
+
+      if (!(profile.contributorDetails.licenseTyp)) {
+        profile.contributorDetails.licenseType = "CC BY";
+      }
+
+      if (!(profile.contributorDetails.copyright)) {
+        profile.contributorDetails.copyright = {};
+      }
+
+      if (!(profile.contributorDetails.copyright.year)) {
+        profile.contributorDetails.copyright.year = new Date().getFullYear();
+      }
+
+      if (!_.isArray(profile.contributorDetails.copyright.additional)) {
+        profile.contributorDetails.copyright.additional = [];
+      }
+
+      removeEmptyAdditionalCopyrightItems();
+    }
+
+    /**
+     * When the user empties all the fields of a
+     * additional copyright item, the item is removed
+     */
+    function removeEmptyAdditionalCopyrightItems() {
+
+      function itemIsEmpty(item) {
+        $log.debug("itemIsEmpty", item);
+        return !item || _.every(item, function (val) {
+          $log.debug("itemIsEmpty", val);
+          return !val;
+        });
+      }
+
+      var items = $scope.data.item.profile.contributorDetails.copyright.additional;
+      if (_.isArray(items)) {
+        for (var i = items.length - 1; i >= 1; i--) {
+          if (itemIsEmpty(items[i])) {
+            items.splice(i, 1);
+          }
+        }
+        if (items.length >= 2) {
+          if (itemIsEmpty(items[0])) {
+            items.splice(0, 1);
+          }
+        }
       }
     }
 
-    function onLoadItemSuccess (item) {
+    function onLoadItemSuccess(item) {
       $scope.data.item = item;
-      initSubobjects();
-      $scope.taskInfo = $scope.data.item.profile.taskInfo;
-      $scope.otherAlignments = $scope.data.item.profile.otherAlignments;
-      $scope.contributorDetails = $scope.data.item.profile.contributorDetails;
-      $scope.profile = $scope.data.item.profile;
+      initSubObjects();
 
-      $log.debug("task info: ", $scope.taskInfo);
-      $log.debug("other alignments: ", $scope.otherAlignments);
-      $log.debug("contributor details: ", $scope.contributorDetails);
-      if (!$scope.otherAlignments.keySkills) {
-        $scope.otherAlignments.keySkills = [];
-      }
-      if (!$scope.taskInfo.reviewsPassed) {
-        $scope.taskInfo.reviewsPassed = [];
-      }
-      if (!_.isArray($scope.contributorDetails.copyright.additional)) {
-        $scope.contributorDetails.copyright.additional = [];
-      }
+      var profile = $scope.data.item.profile;
+      $scope.taskInfo = profile.taskInfo;
+      $scope.otherAlignments = profile.otherAlignments;
+      $scope.contributorDetails = profile.contributorDetails;
+      $scope.profile = profile;
+
+      $log.debug("task info:", $scope.taskInfo);
+      $log.debug("other alignments:", $scope.otherAlignments);
+      $log.debug("contributor details:", $scope.contributorDetails);
+
+      $scope.componentTypes = _.pluck($scope.data.item.components, "title");
+
       $scope.needAdditionalCopyrightInformation =
           $scope.contributorDetails.copyright.additional.length > 0 ? 'yes' : '';
 
