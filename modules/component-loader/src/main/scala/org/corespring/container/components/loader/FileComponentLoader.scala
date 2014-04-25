@@ -7,7 +7,6 @@ import org.corespring.container.utils.string.hyphenatedToTitleCase
 import org.slf4j.LoggerFactory
 import play.api.libs.json.{ JsObject, Json, JsValue }
 import scala.Some
-import play.api.Configuration
 
 class FileComponentLoader(paths: Seq[String]) extends ComponentLoader {
 
@@ -129,28 +128,19 @@ class FileComponentLoader(paths: Seq[String]) extends ComponentLoader {
       }.getOrElse(Seq.empty)
     }
 
-    val inProdMode = play.api.Play.isProd(play.api.Play.current)
-    val released = (packageJson \ "released").asOpt[Boolean].getOrElse(false)
-    val shouldProcess = if(inProdMode) released else true
-
-    if (shouldProcess) {
-      Some(
-        UiComponent(
-          org,
-          compRoot.getName,
-          (packageJson \ "title").asOpt[String],
-          (packageJson \ "titleGroup").asOpt[String],
-          loadClient(clientFolder),
-          loadServer(serverFolder),
-          packageJson,
-          loadDefaultData(defaultDataJson),
-          loadIcon(icon),
-          loadSampleData(sampleDataFolder),
-          loadLibraries))
-    } else {
-      None
-    }
-
+    Some(
+      UiComponent(
+        org,
+        compRoot.getName,
+        (packageJson \ "title").asOpt[String],
+        (packageJson \ "titleGroup").asOpt[String],
+        loadClient(clientFolder),
+        loadServer(serverFolder),
+        packageJson,
+        loadDefaultData(defaultDataJson),
+        loadIcon(icon),
+        loadSampleData(sampleDataFolder),
+        loadLibraries))
   }
 
   private def loadDefaultData(dataJson: File): JsValue = if (dataJson.exists) {
