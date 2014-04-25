@@ -131,9 +131,9 @@ class FileComponentLoader(paths: Seq[String]) extends ComponentLoader {
 
     val inProdMode = play.api.Play.isProd(play.api.Play.current)
     val released = (packageJson \ "released").asOpt[Boolean].getOrElse(false)
-    val process = if(inProdMode) released else true
+    val shouldProcess = if(inProdMode) released else true
 
-    if (process) {
+    if (shouldProcess) {
       Some(
         UiComponent(
           org,
