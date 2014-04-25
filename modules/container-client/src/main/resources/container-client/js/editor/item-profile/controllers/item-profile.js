@@ -226,7 +226,7 @@
           item.selected = $scope.taskInfo.reviewsPassed.indexOf(item.key) >= 0;
         });
       }
-    };
+    }
 
     $scope.onChangeReviewsPassed = function (changedKey) {
       function getKeys(predicate) {
