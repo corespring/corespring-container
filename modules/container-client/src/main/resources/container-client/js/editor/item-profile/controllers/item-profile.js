@@ -323,9 +323,19 @@
       if (!(profile.contributorDetails)) {
         profile.contributorDetails = {};
       }
+
+      if (!(profile.contributorDetails.licenseTyp)) {
+        profile.contributorDetails.licenseType = "CC BY";
+      }
+
       if (!(profile.contributorDetails.copyright)) {
         profile.contributorDetails.copyright = {};
       }
+
+      if (!(profile.contributorDetails.copyright.year)) {
+        profile.contributorDetails.copyright.year = new Date().getFullYear();
+      }
+
       if (!_.isArray(profile.contributorDetails.copyright.additional)) {
         profile.contributorDetails.copyright.additional = [];
       }
