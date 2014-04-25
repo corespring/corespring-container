@@ -13,7 +13,6 @@
   .body{
     padding: 10px;
   }
-
 }
 
 .selected-component-container() {
@@ -27,13 +26,12 @@
   }
 }
 
-.component-placeholder-container {
-  @placeholder-base-color: @grey-purple;
+@placeholder-base-color: @grey-purple;
+@selected-component-border-color: #eaeaea;
 
-  max-width: 400px;
-  .selected-component-container();
+.component-placeholder {
 
-  .component-placeholder {
+  .inner-placeholder{
     position:relative;
     border: 1px solid darken(@placeholder-base-color, 10%);
     background-color: lighten(@placeholder-base-color, 40%);
@@ -43,11 +41,12 @@
     .rounded(4px);
     .user-select(none);
     .drop-shadow(0, 2px, 3px, 0.2);
-
-    &:hover{
+      &:hover{
       background-color: lighten(@placeholder-base-color, 50%);
     }
   }
+
+  .selected-component-container();
 }
 
 .delete-icon, .close-icon {
