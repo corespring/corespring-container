@@ -1,4 +1,3 @@
-
 h2 Item Profile
 
 table(style="margin-bottom: 30px;")
@@ -13,7 +12,7 @@ form(style="padding-left: 10px;")
   .item-information
     .control-group
       label.control-label(for="description") * Description
-        span.help-inline Enter as short description of this item. (e.g. Multiply single digit numbers, select evidence in reading passage)
+        span.help-inline Enter a short description of this item. (e.g. Multiply single digit numbers, select evidence in reading passage)
         .controls
           textarea#description.form-control(
           ng-model='taskInfo.description',
@@ -65,7 +64,7 @@ form(style="padding-left: 10px;")
             label Sub-Category
             select(ng-model='standardAdapter.subCategoryOption', ng-options='z for z in standardAdapter.categoryOption.items', style='width:100%')
 
-          input(type='text', multiple='', ui-select2='standardAdapter', ng-model='taskInfo.standards', style='width: 500px;')
+          input(type='text', multiple='', ui-select2='standardAdapter', ng-model='profile.standards', style='width: 500px;')
 
     .control-group
       label.control-label(for='gradeLevel') Grade Level
@@ -114,37 +113,6 @@ form(style="padding-left: 10px;")
     label.control-label Question Types
       ul
         li(ng-repeat='type in componentTypes') {{type}}
-
-  .control-group
-    label.control-label Item Type
-    table.itemTypes
-      tr
-        td(valign='top')
-          ul
-            li(ng-repeat='t in itemTypeDataProvider', ng-show='$index < 2')
-              h4 {{t.key}}
-              label.radio(ng-repeat='k in t.value')
-                input(type='radio', ng-model='taskInfo.itemType', value='{{k}}')
-                | {{k}}
-        td(valign='top')
-          ul
-            li(ng-repeat='t in itemTypeDataProvider', ng-show='$index >= 2 && $index < 4')
-              h4 {{t.key}}
-              label.radio(ng-repeat='k in t.value')
-                input(type='radio', ng-model='taskInfo.itemType', value='{{k}}')
-                | {{k}}
-        td(valign='top')
-          ul
-            li(ng-repeat='t in itemTypeDataProvider', ng-show='$index >= 4')
-              h4 {{t.key}}
-              label.radio(ng-repeat='k in t.value')
-                input(type='radio', ng-model='taskInfo.itemType', value='{{k}}')
-                | {{k}}
-            li
-              h4 Other
-              label.radio
-                input(type='radio', ng-model='taskInfo.itemType', value='{{otherItemType}}')
-                input.form-control(type='text', ng-model='$parent.otherItemType')
 
   h3 Licensing
 
@@ -270,7 +238,10 @@ form(style="padding-left: 10px;")
     label.control-label Reviews Passed
     .div(style="width:240px;")
       label(ng-repeat='rp in reviewsPassedDataProvider', style="width:50%;")
-        input(type='checkbox', ng-model='rp.selected', style="margin-right: 3px;")
+        input(type='checkbox',
+        ng-model='rp.selected',
+        ng-change="onChangeReviewsPassed(rp.key)",
+        style="margin-right: 3px;")
         | {{rp.key}}
 
 

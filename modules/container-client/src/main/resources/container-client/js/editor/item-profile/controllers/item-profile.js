@@ -218,7 +218,52 @@
 
     DataQueryService.list("reviewsPassed", function (result) {
       $scope.reviewsPassedDataProvider = result;
+      $scope.initReviewsPassedSelection();
     });
+
+    $scope.initReviewsPassedSelection = function () {
+      if ($scope.reviewsPassedDataProvider && $scope.taskInfo && _.isArray($scope.taskInfo.reviewsPassed)) {
+        _.each($scope.reviewsPassedDataProvider, function (item) {
+          item.selected = $scope.taskInfo.reviewsPassed.indexOf(item.key) >= 0;
+        });
+      }
+    };
+
+    $scope.onChangeReviewsPassed = function (changedKey) {
+      function getKeys(predicate) {
+        return _.chain($scope.reviewsPassedDataProvider)
+          .filter(predicate)
+          .pluck("key")
+          .value();
+      }
+
+      function keyIsSelected(key) {
+        return selectedKeys.indexOf(key) >= 0;
+      }
+
+      var selectedKeys = getKeys(function (item) {
+        return item.selected;
+      });
+      if (changedKey === "None") {
+        if (keyIsSelected(changedKey)) {
+          selectedKeys = ["None"];
+        }
+      } else if (changedKey === "All") {
+        if (keyIsSelected(changedKey)) {
+          selectedKeys = getKeys(function (item) {
+            return item.key !== "None" && item.key !== "Other";
+          });
+        }
+      } else {
+        if (keyIsSelected(changedKey)) {
+          selectedKeys = _.without(selectedKeys, "None");
+        } else {
+          selectedKeys = _.without(selectedKeys, "All");
+        }
+      }
+      $scope.data.item.profile.taskInfo.reviewsPassed = selectedKeys;
+      $scope.initReviewsPassedSelection();
+    };
 
     $scope.getLicenseTypeUrl = function (licenseType) {
       return licenseType ? "/assets/images/licenseTypes/" + licenseType.replace(" ", "-") + ".png" : undefined;
@@ -276,7 +321,7 @@
     });
 
     $scope.save = function () {
-      removeEmptyAdditionalCopyrightItems();
+
       ItemService.save({
           profile: $scope.data.item.profile
         },
@@ -309,9 +354,6 @@
         profile.taskInfo = {};
       }
 
-      if (!(profile.taskInfo.itemType)) {
-        profile.taskInfo.itemType = getItemTypeForComponents($scope.data.item.components);
-      }
       if (!_.isArray(profile.taskInfo.reviewsPassed)) {
         profile.taskInfo.reviewsPassed = [];
       }
@@ -347,32 +389,19 @@
       removeEmptyAdditionalCopyrightItems();
     }
 
-    /**
-     * When the user empties all the fields of a
-     * additional copyright item, the item is removed
-     */
     function removeEmptyAdditionalCopyrightItems() {
 
-      $log.debug("removeEmptyAdditionalCopyrightItems");
-
       function itemIsEmpty(item) {
-        $log.debug("itemIsEmpty", item);
         return !item || _.every(item, function (val) {
-          $log.debug("itemIsEmpty", val);
           return !val;
         });
       }
 
       var items = $scope.data.item.profile.contributorDetails.copyright.additional;
       if (_.isArray(items)) {
-        for (var i = items.length - 1; i >= 1; i--) {
+        for (var i = items.length - 1; i >= 0; i--) {
           if (itemIsEmpty(items[i])) {
             items.splice(i, 1);
-          }
-        }
-        if (items.length >= 2) {
-          if (itemIsEmpty(items[0])) {
-            items.splice(0, 1);
           }
         }
       }
@@ -396,6 +425,8 @@
 
       $scope.needAdditionalCopyrightInformation =
           $scope.contributorDetails.copyright.additional.length > 0 ? 'yes' : '';
+
+      $scope.initReviewsPassedSelection();
 
       isFormActive = true;
     }
