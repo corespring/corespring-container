@@ -76,7 +76,7 @@
           if (SupportingMaterialsService.validateMetadata({
             title: $scope.title,
             materialType: getType()
-          })) {
+          }, window.alert)) {
             if ($scope.persist) {
               $scope.persist($scope.title, getType());
             }
@@ -117,7 +117,7 @@
         '    <label for="supporting-material-type-text">Other</label>',
         '    <input type="text" ng-model="textMaterialType"/>',
         '  </div>',
-        '  <button class="btn btn-small btn-primary" ng-show="persist" ng-click="forceUpdate()">Update</button>',
+        '  <button class="btn btn-small" ng-show="persist" ng-click="forceUpdate()">Update</button>',
         '</div>'
       ].join('\n')
     };

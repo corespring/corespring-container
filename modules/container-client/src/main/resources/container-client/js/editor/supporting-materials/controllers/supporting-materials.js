@@ -5,27 +5,42 @@ var controller = function($scope, ItemService, SupportingMaterialsService, $moda
 
   $scope.uploadType = null;
   $scope.newMaterial = {};
+  $scope.showIntro = true;
 
-  $scope.createNew = function() {
-
-    $scope.overrides = [{
-      name: 'image',
-      iconclass: 'fa fa-picture-o',
-      action: function() {
-        window.alert('You must save the supporting material before adding images.');
-      }
-    }];
-
-    Overlay.open({
-      template: $('#new-supporting-material-modal').html(),
-      target: $('.supporting-materials'),
-      scope: $scope,
-      customToolbar: {}
-    });
-
-    // TODO: Remove this workaround if/when overlay works officially outsize wiggiwiz
-    $('#overlay-holder').appendTo($('.supporting-materials'));
+  $scope.hideIntro = function() {
+    $scope.showIntro = false;
   };
+
+  function doIfEnabled(callback) {
+    if ($scope.enableOptions) {
+      callback();
+    }
+  }
+
+  $scope.createText = function() {
+    doIfEnabled(function() {
+      $scope.uploadType = 'text';
+      createSupportingMaterial();
+    });
+  };
+
+  $scope.uploadFile = function() {
+    doIfEnabled(function() {
+      $scope.uploadType = 'file';
+      createSupportingMaterial();
+    });
+  };
+
+  function updateEnabled() {
+    var validated = SupportingMaterialsService.validateMetadata({
+      title: $scope.newMaterial.name,
+      materialType: $scope.newMaterial.materialType
+    });
+    $scope.enableOptions = validated;
+  }
+
+  $scope.$watch('newMaterial.name', updateEnabled);
+  $scope.$watch('newMaterial.materialType', updateEnabled);
 
   $scope.onSaveSuccess = function(result) {
     $scope.data.item.supportingMaterials = result.supportingMaterials;
@@ -36,10 +51,6 @@ var controller = function($scope, ItemService, SupportingMaterialsService, $moda
 
   $scope.onSaveError = function(result) {
     $log.error(result);
-  };
-
-  $scope.triggerUploadDialog = function() {
-    $('.new-supporting-material input[type=file]').trigger('click');
   };
 
   function uploadTypeIs(str) {
@@ -86,8 +97,7 @@ var controller = function($scope, ItemService, SupportingMaterialsService, $moda
        */
       function persistInitial(callback) {
         var supportingMaterials = $scope.data.item.supportingMaterials || [];
-        supportingMaterials.push({ name: $scope.newMaterial.title, materialType: $scope.newMaterial.materialType });
-        console.log('about to save...');
+        supportingMaterials.push({ name: $scope.newMaterial.name, materialType: $scope.newMaterial.materialType });
         ItemService.save(
           { supportingMaterials: supportingMaterials },
           callback,
@@ -171,8 +181,6 @@ var controller = function($scope, ItemService, SupportingMaterialsService, $moda
       createSupportingMaterial();
     }
   };
-
-  $scope.createNew();
 
 };
 

@@ -23,12 +23,13 @@
 
     }
 
-    this.validateMetadata = function(metadata) {
+    this.validateMetadata = function(metadata, log) {
+      log = log || function() {};
       if (_.isEmpty(metadata.title)) {
-        window.alert("Please enter a title for the supporting material.");
+        log("Please enter a title for the supporting material.");
         return false;
       } else if (_.isEmpty(metadata.materialType)) {
-        window.alert("Please select a type for the supporting material.");
+        log("Please select a type for the supporting material.");
         return false;
       } else {
         return true;

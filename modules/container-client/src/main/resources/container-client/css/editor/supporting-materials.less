@@ -1,4 +1,10 @@
 .supporting-material {
+
+  .supporting-material-metadata {
+    background-color: #f5f5f5;
+    border: 1px solid #a9a9a9;
+  }
+
   .wiggi-wiz, .wiggi-wiz-editable {
     height: 100%;
     overflow: inherit;
@@ -56,8 +62,7 @@
 }
 
 .supporting-material-metadata {
-
-  padding: 10px;
+  padding: 15px 15px 5px 15px;
 
   .field {
     display: inline-block;
@@ -65,50 +70,102 @@
   }
 
   label {
+    display: inline-block;
     font-weight: bold;
+    margin-right: 5px;
+  }
+
+}
+
+.supporting-materials {
+
+  .intro {
+    display: block;
+    padding: 40px 20px;
+    max-width: 600px;
+    margin: 0 auto;
+
+    button {
+      margin-top: 20px;
+      float: right;
+    }
   }
 
 }
 
 .new-supporting-material {
-  position: relative;
 
-  .prompt {
-    position: absolute;
-    margin: 0;
-    padding: 0;
-    left: 20px;
-    top: 20px;
-  }
+  .selection {
+    position: relative;
 
-  .options {
-    margin-left: 140px;
-    padding: 20px 0 50px 0;
+    .prompt {
+      position: absolute;
+      margin: 0;
+      padding: 0;
+      left: 20px;
+      top: 9px;
+    }
 
-    label {
+    .or {
+      text-transform: uppercase;
       font-weight: bold;
+      display: inline-block;
+      margin: 5px 0;
     }
 
-    .disabled {
-      color: #c0c0c0;
+    .options {
+      margin-left: 140px;
+      padding: 0 0 50px 0;
+
+      .file-header, .pdf-header {
+        display: inline-block;
+        min-height: 43px;
+        img {
+          display: inline-block;
+          margin-left: 10px;
+        }
+      }
+
+      label {
+        font-weight: bold;
+      }
+
+      a {
+        text-decoration: underline;
+        &:hover {
+          cursor: pointer;
+        }
+      }
+
+      &.disabled {
+        @disabled-color: #c0c0c0;
+        color: @disabled-color;
+
+        .file-header, .pdf-header {
+          img {
+            opacity: 0.2;
+          }
+        }
+
+        a {
+          color: #c0c0c0;
+          text-decoration: none;
+
+          &:hover {
+            text-decoration: none;
+            cursor: default;
+          }
+        }
+      }
     }
+
+    .field {
+      display: inline-block;
+      margin: 0 20px 10px 0;
+    }
+
   }
 
-  .wiggi-wiz {
-    margin: 0 20px 20px 0;
-    min-height: 300px;
-  }
-
-  .save {
-    float: right;
-    display: inline-block;
-    margin-right: 20px;
-  }
-
-  .field {
-    display: inline-block;
-    margin: 0 20px 10px 0;
-  }
 
 }
 
