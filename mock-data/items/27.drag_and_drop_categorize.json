@@ -1,0 +1,87 @@
+{
+  "_id": "533eb66423fd754c27208042",
+  "profile" : {
+    "taskInfo" : {
+      "title": "Drag and drop Categorize example",
+      "gradeLevel" : ["01", "03"],
+      "subjects" : {
+        "primary" : {
+          "id" : "4ffb535f6bb41e469c0bf2a8",
+          "subject" : "subject",
+          "category" : "category"
+        },
+        "related" : {
+          "id" : "4ffb535f6bb41e469c0bf2a9",
+          "subject" : "subject",
+          "category" : "category"
+        }
+      },
+      "itemType" : "Constructed Response - Short Answer"
+    }
+  },
+  "components": {
+    "1": {
+      "componentType": "corespring-drag-and-drop-categorize",
+      "title": "Butterfly D&D",
+      "correctResponse": {
+        "cat_1": ["egg","pupa"],
+        "cat_2": ["larva"]
+      },
+      "feedback": {
+        "correctFeedbackType": "default",
+        "partialFeedbackType": "default",
+        "incorrectFeedbackType": "default"
+      },
+      "model": {
+        "categories": [
+          {
+            "id": "cat_1",
+            "label": "Category 1",
+            "orientation": "horizontal"
+          },
+          {
+            "id": "cat_2",
+            "label": "Category 2",
+            "orientation": "vertical"
+          }
+        ],
+        "choices": [
+          {
+            "label": "<b>Pupa</b>",
+            "labelType": "text",
+            "id": "pupa"
+          },
+          {
+            "label": "Egg",
+            "labelType": "text",
+            "id": "egg",
+            "copyOnDrag": true
+          },
+          {
+            "label": "Larva In The Shell",
+            "labelType": "text",
+            "id": "larva"
+          },
+          {
+            "label": "Adult",
+            "labelType": "text",
+            "id": "adult"
+          }
+        ],
+        "config": {
+          "shuffle": true,
+          "expandHorizontal": false
+        },
+        "prompt": "Drag the stages of the butterfly's lifecycle on to the the pods"
+      },
+      "weight": 1
+    }
+  },
+ 
+  "org": {
+    "components": [
+      "corespring/*"
+    ]
+  },
+  "xhtml": "<div><corespring-drag-and-drop-categorize id='1'></corespring-drag-and-drop-categorize></div>"
+}
