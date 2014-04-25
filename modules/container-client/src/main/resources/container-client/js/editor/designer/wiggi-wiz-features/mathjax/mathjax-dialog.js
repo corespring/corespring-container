@@ -3,7 +3,7 @@ angular.module('corespring.wiggi-wiz-features').directive('mathjaxDialog', [
 
   function() {
     function link($scope, $element) {
-      $scope.$watch('data.markup', function(n) {
+      $scope.$watch('data.originalMarkup', function(n) {
 
         if (n) {
           $element.find('.math-preview').html(n);
@@ -18,7 +18,7 @@ angular.module('corespring.wiggi-wiz-features').directive('mathjaxDialog', [
       template: [
         '<div class="mathjax-dialog-root">',
         '<div class="editor">',
-        ' <textarea ng-model="data.markup"></textarea>',
+        ' <textarea ng-model="data.originalMarkup"></textarea>',
         '</div>',
         '<div class="math-preview">',
         '</div>',

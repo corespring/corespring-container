@@ -4,7 +4,7 @@ angular.module('corespring.wiggi-wiz-features').factory('WiggiMathJaxFeatureDef'
 
     function FeatureDef() {
       this.name = 'mathjax';
-      this.tagName = 'math';
+      this.attributeName = 'mathjax';
       this.iconclass = 'fa math-sum';
       this.addToEditor = '<div mathjax-holder><math><msup><mi>r</mi><mn>3</mn></msup><math></div>';
       this.compile = true;
@@ -18,19 +18,19 @@ angular.module('corespring.wiggi-wiz-features').factory('WiggiMathJaxFeatureDef'
 
       this.onDblClick = function($node, $scope, editor) {
 
-        editor.showEditPane({
-            markup: $scope.originalMarkup
-          },
+        editor.showEditPane($scope,
           'Edit the Math',
           '<mathjax-dialog></mathjax-dialog>',
-          function onUpdate(update) {
-            $scope.originalMarkup = update.markup;
+          function onUpdate() {},
+          null,
+          function onClose() {
+            $scope.$emit('save-data');
           }
         );
       };
 
       this.getMarkUp = function($node, $scope) {
-        return '<math>' + $scope.originalMarkup + '</math>';
+        return '<span mathjax>' + $scope.originalMarkup + '</span>';
       };
     }
     return FeatureDef;
