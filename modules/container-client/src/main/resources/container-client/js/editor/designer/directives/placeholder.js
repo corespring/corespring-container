@@ -1,4 +1,4 @@
-var Placeholder = function($rootScope) {
+var Placeholder = function($rootScope, $compile) {
 
   function link($scope, $element, $attrs) {
     console.log("Linking Placeholder");
@@ -8,6 +8,18 @@ var Placeholder = function($rootScope) {
     $scope.$watch('selected', function(n) {
       $scope.selectedClass = n === true ? 'selected' : '';
     });
+
+    function renderPlayerComponent() {
+
+      if (!$scope.id || !$scope.componentType) {
+        return;
+      }
+      $element.find('.holder').html('<' + $scope.componentType + ' id="' + $scope.id + '"></' + $scope.componentType + '>');
+      $compile($element.find('.holder'))($scope.$new());
+    }
+
+    $scope.$watch('id', renderPlayerComponent);
+    $scope.$watch('componentType', renderPlayerComponent);
 
     $scope.id = $scope.id || 2;
 
@@ -66,17 +78,22 @@ var Placeholder = function($rootScope) {
       id: '@'
     },
     template: [
-      '<div class="component-placeholder" ng-class="[componentType,selectedClass]" data-component-id="{{id}}">',
-      '  <div class="inner-placeholder">{{label}}',
-      '    <div class="delete-icon">',
+      '<div class="component-placeholder"',
+      ' ng-class="[componentType,selectedClass]" ',
+      '  data-component-id="{{id}}">',
+      '  <div class="blocker">',
+      '     <div class="title">Double Click to Edit</div>',
+      '     <div class="delete-icon">',
       '      <i ng-click="deleteNode()" class="fa fa-times-circle"></i>',
       '    </div>',
       '  </div>',
+      '  <div class="holder"></div>',
       '</div>'
     ].join('\n')
   };
 };
 
-angular.module('corespring-editor.directives').directive('placeholder', ['$rootScope',
+angular.module('corespring-editor.directives').directive('placeholder', ['$rootScope', '$compile',
   Placeholder
+
 ]);
