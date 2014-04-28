@@ -224,16 +224,13 @@
       if ($scope.reviewsPassedDataProvider && $scope.taskInfo && _.isArray($scope.taskInfo.reviewsPassed)) {
 
         _.each($scope.reviewsPassedDataProvider, function (item) {
-          item.selected = $scope.taskInfo.reviewsPassed.indexOf(item.key) >= 0;
+          var selected = $scope.taskInfo.reviewsPassed.indexOf(item.key) >= 0;
+          if (selected !== item.selected) {
+            item.selected = selected;
+          }
         });
       }
     }
-
-    $scope.isOtherSelected = function(dataProvider){
-      return _.some(dataProvider, function(item){
-          return item.selected && item.key === 'Other';
-      });
-    };
 
     $scope.onChangeReviewsPassed = function (changedKey) {
       function getKeys(predicate) {
@@ -267,9 +264,19 @@
           selectedKeys = _.without(selectedKeys, "All");
         }
       }
-      $scope.data.item.profile.taskInfo.reviewsPassed = selectedKeys;
+      $scope.taskInfo.reviewsPassed = selectedKeys;
       initReviewsPassedDataProvider();
     };
+
+    $scope.$watch('taskInfo.reviewsPassed', function () {
+      var otherSelected = _.some($scope.reviewsPassedDataProvider, function (item) {
+        return item.selected && item.key === 'Other';
+      });
+      if($scope.isOtherSelected && !otherSelected){
+        $scope.taskInfo.otherReviewsPassed = '';
+      }
+      $scope.isOtherSelected = otherSelected;
+    });
 
     $scope.getLicenseTypeUrl = function (licenseType) {
       return licenseType ? "/assets/images/licenseTypes/" + licenseType.replace(" ", "-") + ".png" : undefined;

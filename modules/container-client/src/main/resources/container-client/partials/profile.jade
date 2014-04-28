@@ -249,7 +249,7 @@ form
         ng-change="onChangeReviewsPassed(rp.key)",
         style="margin-right: 3px;")
         | {{rp.key}}
-      label.control-label(ng-show='isOtherSelected(reviewsPassedDataProvider)') Other
+      label.control-label(ng-show='isOtherSelected') Other
         input(type="text", placeholder='Enter review...', ng-model='taskInfo.otherReviewsPassed')
 
 
