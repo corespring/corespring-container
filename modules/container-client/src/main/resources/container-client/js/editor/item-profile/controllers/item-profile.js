@@ -217,16 +217,23 @@
 
     DataQueryService.list("reviewsPassed", function (result) {
       $scope.reviewsPassedDataProvider = result;
-      initReviewsPassedSelection();
+      initReviewsPassedDataProvider();
     });
 
-    function initReviewsPassedSelection() {
+    function initReviewsPassedDataProvider() {
       if ($scope.reviewsPassedDataProvider && $scope.taskInfo && _.isArray($scope.taskInfo.reviewsPassed)) {
+
         _.each($scope.reviewsPassedDataProvider, function (item) {
           item.selected = $scope.taskInfo.reviewsPassed.indexOf(item.key) >= 0;
         });
       }
     }
+
+    $scope.isOtherSelected = function(dataProvider){
+      return _.some(dataProvider, function(item){
+          return item.selected && item.key === 'Other';
+      });
+    };
 
     $scope.onChangeReviewsPassed = function (changedKey) {
       function getKeys(predicate) {
@@ -261,7 +268,7 @@
         }
       }
       $scope.data.item.profile.taskInfo.reviewsPassed = selectedKeys;
-      initReviewsPassedSelection();
+      initReviewsPassedDataProvider();
     };
 
     $scope.getLicenseTypeUrl = function (licenseType) {
@@ -297,13 +304,10 @@
       $scope.contributorDetails.copyright.additional.splice(0);
     };
 
-    $scope.needAdditionalCopyrightInformation = 'init';
+    $scope.needAdditionalCopyrightInformation = '';
 
     $scope.$watch("needAdditionalCopyrightInformation", function (newValue, oldValue) {
       if (isFormActive) {
-        if (oldValue === 'init') {
-          return;
-        }
         if (newValue === oldValue) {
           return;
         }
@@ -410,7 +414,7 @@
       var result = _.chain(components)
         .countBy("title")
         .map(function (value, key) {
-          return key + (value > 1 ? "(" + value + ")" : "");
+          return key + "(" + value + ")";
         })
         .sort()
         .value();
@@ -436,7 +440,7 @@
       $scope.needAdditionalCopyrightInformation =
           $scope.contributorDetails.copyright.additional.length > 0 ? 'yes' : '';
 
-      initReviewsPassedSelection();
+      initReviewsPassedDataProvider();
 
       isFormActive = true;
     }

@@ -1,26 +1,15 @@
 h2 Item Profile
 
-table(style="margin-bottom: 30px;")
-  tr
-    td(style="width: 150px; vertical-align: top;")
-      span.required * Required
-    td The information stored in this profile will help teachers to search and find items to use. The profile      contains information about authorship, tagging information such as Common Core State Standard, Bloom's       Taxonomy assignment, key skills and copyright information. Authors are encouraged to include as much       information as possible.
+p(style="width: 80%") The information stored in this profile will help teachers to search and find items to use. The profile      contains information about authorship, tagging information such as Common Core State Standard, Bloom's       Taxonomy assignment, key skills and copyright information. Authors are encouraged to include as much       information as possible.
+
+p * Required
 
 
-form(style="padding-left: 10px;")
+form
 
   .item-information
     .control-group
-      label.control-label(for="description") * Description
-        span.help-inline Enter a short description of this item. (e.g. Multiply single digit numbers, select evidence in reading passage)
-        .controls
-          textarea#description.form-control(
-          ng-model='taskInfo.description',
-          placeholder="Enter a description...",
-          rows='3')
-
-    .control-group
-      label.control-label(for="title") Title
+      label.control-label(for="title") * Title
         .controls
           textarea#title.form-control(
           ng-model='taskInfo.title',
@@ -28,6 +17,15 @@ form(style="padding-left: 10px;")
           rows='1')
 
     .control-group
+      label.control-label(for="description") Description
+        span.help-inline Enter a short description of this item. (e.g. Multiply single digit numbers, select evidence in reading passage)
+        .controls
+          textarea#description.form-control(
+          ng-model='taskInfo.description',
+          placeholder="Enter a description...",
+          rows='3')
+
+     .control-group
       .row
         .col-xs-6
           .form-group
@@ -106,7 +104,10 @@ form(style="padding-left: 10px;")
     .control-group
       label.control-label(for='lexile') Lexile Score
         .controls
-          input#lexile.input-mini(type='text', ng-model='profile.lexile')
+          input#lexile.input-mini(
+          type='text',
+          ng-model='profile.lexile',
+          placeholder="Enter a score...",)
           span.lead(style='padding-left: 5px;') L
 
   .control-group(ng-show='componentTypes.length')
@@ -186,22 +187,26 @@ form(style="padding-left: 10px;")
       label.control-label(for="owner") Owner
         .controls
           input#owner.form-control(
-          ng-model='item.owner')
+          ng-model='item.owner',
+          placeholder="Enter a owner...",)
     .control-group
       label.control-label(for="author") Author
         .controls
           input#author.form-control(
-          ng-model='item.author')
+          ng-model='item.author',
+          placeholder="Enter a author...",)
     .control-group
       label.control-label(for="publisher") Publisher
         .controls
           input#publisher.form-control(
-          ng-model='item.publisher')
+          ng-model='item.publisher',
+          placeholder="Enter a publisher...",)
     .control-group
       label.control-label(for="year") Copyright Year
         .controls
           input#year.form-control(
-          ng-model='item.year')
+          ng-model='item.year',
+          placeholder="Enter a year...",)
     .control-group
       label.control-label(for="license") License
         .controls
@@ -210,7 +215,8 @@ form(style="padding-left: 10px;")
       label.control-label(for="url") Source URL
         .controls
           input#url.form-control(
-          ng-model='item.sourceUrl')
+          ng-model='item.sourceUrl',
+          placeholder="Enter a source url...",)
 
   a.add-additional(ng-click='addCopyrightItem()', ng-show='needAdditionalCopyrightInformation')
     i(class="fa fa-{{!!expandKeySkills ? 'minus' : 'plus'}}-square-o", style="margin-left: 6px; margin-right: 6px;")
@@ -243,6 +249,8 @@ form(style="padding-left: 10px;")
         ng-change="onChangeReviewsPassed(rp.key)",
         style="margin-right: 3px;")
         | {{rp.key}}
+      label.control-label(ng-show='isOtherSelected(reviewsPassedDataProvider)') Other
+        input(type="text", placeholder='Enter review...', ng-model='taskInfo.otherReviewsPassed')
 
 
 

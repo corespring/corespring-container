@@ -231,6 +231,9 @@ angular.module('corespring-catalog.directives').directive('catalogview', [ '$sce
     '  .catalog-tabbed-content.profile .reviews-passed-list li {',
     '    line-height: 12px;',
     '  }',
+    '  .catalog-tabbed-content.profile .other-reviews-passed {',
+    '    margin: 0 20px 0 18px;',
+    '  }',
     '  .catalog-tabbed-content.profile .license {',
     '    margin-bottom: 20px;',
     '  }',
@@ -385,6 +388,9 @@ angular.module('corespring-catalog.directives').directive('catalogview', [ '$sce
       '            <label>{{review.value}}</label>',
       '            </li>',
       '          </ul>',
+      '          <div class="other-reviews-passed" ng-show="taskInfo.reviewsPassed.indexOf(\'Other\') >= 0">',
+      '            <span>{{taskInfo.otherReviewsPassed}}</span>',
+      '          </div>',
       '        </div>',
       '        <div class="attribute attribution">',
       '          <div class="license">',
@@ -507,7 +513,7 @@ angular.module('corespring-catalog.directives').directive('catalogview', [ '$sce
         var result = _.chain(components)
           .countBy("title")
           .map(function (value, key) {
-            return key + (value > 1 ? "(" + value + ")" : "");
+            return key + "(" + value + ")";
           })
           .sort()
           .value();
