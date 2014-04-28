@@ -1,11 +1,11 @@
 /* global com */
-var controller = function($scope, ItemService, SupportingMaterialsService, $modal, Overlay, $state, $log) {
+var controller = function($scope, ItemService, SupportingMaterialsService, $modal, Overlay, $state, $stateParams, $log) {
 
   var log = $log.debug.bind($log, '[supporting-materials] -');
 
   $scope.uploadType = null;
   $scope.newMaterial = {};
-  $scope.showIntro = true;
+  $scope.showIntro = $stateParams.intro === 'intro';
 
   $scope.hideIntro = function() {
     $scope.showIntro = false;
@@ -191,6 +191,7 @@ angular.module('corespring-editor.controllers')
     '$modal',
     'Overlay',
     '$state',
+    '$stateParams',
     '$log',
     controller
   ]);

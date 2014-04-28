@@ -100,6 +100,10 @@ var controller = function(
     $scope.save();
   });
 
+  $scope.addNew = function() {
+    $state.transitionTo('supporting-materials', {intro: false});
+  };
+
   $scope.save = function() {
     ItemService.save({ supportingMaterials: $scope.data.item.supportingMaterials }, $scope.onSaveSuccess,
       $scope.onSaveError, $scope.itemId);
