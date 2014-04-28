@@ -330,7 +330,9 @@ angular.module('corespring-catalog.directives').directive('catalogview', [ '$sce
       '      </div>',
       '      <div class="attribute question-types">',
       '        <span class="label">{{i18n.questionTypes.label}}</span>',
-      '        <span class="value">{{taskInfo.itemType || unassigned}}</span>',
+      '        <ul>',
+      '          <li ng-repeat="type in componentTypes">{{type}}</li>',
+      '        </ul>',
       '      </div>',
       '    </div>',
       '    <div class="row" ng-show="profile.lexile">',
@@ -521,7 +523,10 @@ angular.module('corespring-catalog.directives').directive('catalogview', [ '$sce
           if ($scope.contributorDetails) {
             $scope.licenseTypeUrl = licenseTypeUrl($scope.contributorDetails.licenseType);
           }
-
+        }
+        $scope.componentTypes = _.pluck($scope.item.components, "title");
+        if(!_.isArray($scope.componentTypes) || $scope.componentTypes.length === 0){
+          $scope.componentTypes = $scope.unassigned;
         }
 
         DataQueryService.list("depthOfKnowledge", function(result) {

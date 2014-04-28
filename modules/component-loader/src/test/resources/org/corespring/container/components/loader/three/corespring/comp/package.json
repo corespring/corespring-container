@@ -1,6 +1,7 @@
 {
   "name" : "single-choice",
   "organization" : "corespring",
+  "released": true,
   "libraries" : [
     { "name" : "lib-name", "organization" : "org-name"}
   ]
