@@ -199,7 +199,6 @@
 
     DataQueryService.list("depthOfKnowledge", function (result) {
       $scope.depthOfKnowledgeDataProvider = result;
-      console.log(result);
     });
 
     DataQueryService.list("keySkills", function (result) {
@@ -218,16 +217,16 @@
 
     DataQueryService.list("reviewsPassed", function (result) {
       $scope.reviewsPassedDataProvider = result;
-      $scope.initReviewsPassedSelection();
+      initReviewsPassedSelection();
     });
 
-    $scope.initReviewsPassedSelection = function () {
+    function initReviewsPassedSelection () {
       if ($scope.reviewsPassedDataProvider && $scope.taskInfo && _.isArray($scope.taskInfo.reviewsPassed)) {
         _.each($scope.reviewsPassedDataProvider, function (item) {
           item.selected = $scope.taskInfo.reviewsPassed.indexOf(item.key) >= 0;
         });
       }
-    };
+    }
 
     $scope.onChangeReviewsPassed = function (changedKey) {
       function getKeys(predicate) {
@@ -262,7 +261,7 @@
         }
       }
       $scope.data.item.profile.taskInfo.reviewsPassed = selectedKeys;
-      $scope.initReviewsPassedSelection();
+      initReviewsPassedSelection();
     };
 
     $scope.getLicenseTypeUrl = function (licenseType) {
@@ -426,7 +425,7 @@
       $scope.needAdditionalCopyrightInformation =
           $scope.contributorDetails.copyright.additional.length > 0 ? 'yes' : '';
 
-      $scope.initReviewsPassedSelection();
+      initReviewsPassedSelection();
 
       isFormActive = true;
     }

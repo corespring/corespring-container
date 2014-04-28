@@ -128,19 +128,31 @@ class FileComponentLoader(paths: Seq[String]) extends ComponentLoader {
       }.getOrElse(Seq.empty)
     }
 
-    Some(
-      UiComponent(
-        org,
-        compRoot.getName,
-        (packageJson \ "title").asOpt[String],
-        (packageJson \ "titleGroup").asOpt[String],
-        loadClient(clientFolder),
-        loadServer(serverFolder),
-        packageJson,
-        loadDefaultData(defaultDataJson),
-        loadIcon(icon),
-        loadSampleData(sampleDataFolder),
-        loadLibraries))
+    val inProdMode = play.api.Play.maybeApplication match {
+      case Some(app) => play.api.Play.isProd(app)
+      case _ => false
+    }
+    val released = (packageJson \ "released").asOpt[Boolean].getOrElse(false)
+    val process = if(inProdMode) released else true
+
+    if (process) {
+      Some(
+        UiComponent(
+          org,
+          compRoot.getName,
+          (packageJson \ "title").asOpt[String],
+          (packageJson \ "titleGroup").asOpt[String],
+          loadClient(clientFolder),
+          loadServer(serverFolder),
+          packageJson,
+          loadDefaultData(defaultDataJson),
+          loadIcon(icon),
+          loadSampleData(sampleDataFolder),
+          loadLibraries))
+    } else {
+      None
+    }
+
   }
 
   private def loadDefaultData(dataJson: File): JsValue = if (dataJson.exists) {
