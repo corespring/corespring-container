@@ -1,6 +1,8 @@
 angular.module('corespring-player.services').factory('ComponentRegister', ['$log',
   function($log) {
 
+    var log = $log.debug.bind($log, '[component-register]');
+
     var ComponentRegister = function() {
 
       var editable = null;
@@ -16,8 +18,11 @@ angular.module('corespring-player.services').factory('ComponentRegister', ['$log
       };
 
       this.components = components;
+      this.loadedData = {};
 
       this.registerComponent = function(id, component) {
+        log('registerComponent: ', id);
+
         components[id] = component;
 
         if (component.answerChangedHandler && answerChangedHandler) {
@@ -40,22 +45,16 @@ angular.module('corespring-player.services').factory('ComponentRegister', ['$log
        *                  that has the following format: { data: {}, session : null || {} }
        */
       this.setDataAndSession = function(allData) {
+        this.loadedData = allData;
         setAndApplyToComponents(allData, "dataAndSession", "setDataAndSession");
       };
 
-      /**
-       * @param allData - an object that has the component id as the key and an object
-       *                  that has the following format: { data: {}, session : null || {} }
-       */
-      this.setDataAndSession = function(allData) {
-        setAndApplyToComponents(allData, "dataAndSession", "setDataAndSession");
-      };
 
-      this.setData = function(data) {
+      /*this.setData = function(data) {
         setAndApplyToComponents(data, "data", function(component, data) {
           component.setModel(data.model);
         });
-      };
+      };*/
 
       this.setComponentSessions = function(sessions) {
         setAndApplyToComponents(sessions, "sessions", "setSession");

@@ -1,7 +1,31 @@
-var Placeholder = function($rootScope, $compile) {
+var Placeholder = function($rootScope, $compile, $log, ComponentRegister) {
+
+  var log = $log.debug.bind($log, '[placeholder]');
 
   function link($scope, $element, $attrs) {
-    console.log("Linking Placeholder");
+
+    $scope.componentPreview = null;
+
+    function setDataToComponent() {
+      if ($scope.register.loadedData[$scope.id] && $scope.componentPreview) {
+        $scope.componentPreview.setDataAndSession($scope.register.loadedData[$scope.id]);
+      }
+    }
+
+    $scope.$on('registerComponent', function(event, id, component) {
+
+      $scope.componentPreview = component;
+      log('registerComponent', component, id);
+
+      setDataToComponent();
+    });
+
+    $scope.register = ComponentRegister;
+
+    $scope.$watch('register.loadedData', function() {
+      log('data has changed!');
+      setDataToComponent();
+    });
 
     $scope.selected = false;
 
@@ -93,7 +117,7 @@ var Placeholder = function($rootScope, $compile) {
   };
 };
 
-angular.module('corespring-editor.directives').directive('placeholder', ['$rootScope', '$compile',
+angular.module('corespring-editor.directives').directive('placeholder', ['$rootScope', '$compile', '$log', 'ComponentRegister',
   Placeholder
 
 ]);
