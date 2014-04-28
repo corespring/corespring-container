@@ -1,0 +1,11 @@
+{
+  "_id": "522267c2554f43f858000027",
+  "components": {},
+  "files": [],
+  "profile": {
+    "taskInfo": {
+      "title": "Math Jax Example"
+    }
+  },
+  "xhtml": "<h1>This is an example of using math.</h1><h2>Latex</h2>Firstly you can have it inline: \n<span mathjax=\"\">\\(\\sqrt{3x-1}+(1+x)^2\\)</span>​ like this.\n<br /><br />Or as a block (just hit the enter key):\n<br /><br />​\n<span mathjax=\"\">\\[  \\begin{aligned}\n\\nabla \\times \\vec{\\mathbf{B}} -\\, \\frac1c\\, \\frac{\\partial\\vec{\\mathbf{E}}}{\\partial t} &amp; = \\frac{4\\pi}{c}\\vec{\\mathbf{j}} \\\\   \\nabla \\cdot \\vec{\\mathbf{E}} &amp; = 4 \\pi \\rho \\\\\n\\nabla \\times \\vec{\\mathbf{E}}\\, +\\, \\frac1c\\, \\frac{\\partial\\vec{\\mathbf{B}}}{\\partial t} &amp; = \\vec{\\mathbf{0}} \\\\\n\\nabla \\cdot \\vec{\\mathbf{B}} &amp; = 0 \\end{aligned}\n\\]</span>​\n<br /><br /><h2>Math Ml</h2>\n<span mathjax=\"\"><math display=\"block\"><mrow><mi>x</mi><mo>=</mo><mfrac><mrow><mo>−</mo><mi>b</mi><mo>±</mo><msqrt><mrow><msup><mi>b</mi><mn>2</mn></msup><mo>−</mo><mn>4</mn><mi>a</mi><mi>c</mi></mrow></msqrt></mrow><mrow><mn>2</mn><mi>a</mi></mrow></mfrac></mrow></math></span>​"
+}
