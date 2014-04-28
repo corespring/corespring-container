@@ -469,7 +469,7 @@ angular.module('corespring-catalog.directives').directive('catalogview', [ '$sce
 
       function fileIndex(index) {
         return _.findIndex($scope.item.supportingMaterials[index].files, function(file) {
-          return file.isMain;
+          return file.default;
         });
       }
 

@@ -75,7 +75,7 @@ var controller = function($scope, ItemService, SupportingMaterialsService, $moda
           "name": "index.html",
           "contentType": "text/html",
           "content": $scope.content,
-          "isMain": true
+          "default": true
         }]
       };
       supportingMaterials.push(newSupportingMaterial);
@@ -147,7 +147,7 @@ var controller = function($scope, ItemService, SupportingMaterialsService, $moda
           "name": filename,
           "contentType": "application/pdf",
           "storageKey": $scope.itemId + "/" + supportingMaterial.id + "/" + filename,
-          "isMain": true
+          "default": true
         }];
         data.supportingMaterials[data.supportingMaterials.length - 1] = supportingMaterial;
         ItemService.save({

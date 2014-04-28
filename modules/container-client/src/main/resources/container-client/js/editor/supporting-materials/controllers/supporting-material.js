@@ -96,7 +96,7 @@ var controller = function(
       if (supportingMaterialFile) {
         supportingMaterialFile.content = newValue;
         var fileIndex = _.findIndex($scope.supportingMaterials()[$scope.index].files, function(file) {
-          return file.isMain;
+          return file.default;
         });
         updatedSupportingMaterials[$scope.index].files[fileIndex] = supportingMaterialFile;
         $scope.data.item.supportingMaterials = updatedSupportingMaterials;

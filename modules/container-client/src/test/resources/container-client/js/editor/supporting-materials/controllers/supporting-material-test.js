@@ -14,7 +14,7 @@ describe('supporting material controller', function() {
         "name": "index.html",
         "contentType": contentType,
         "content": itemMarkup,
-        "isMain": true
+        "default": true
       }]
     }]
   };

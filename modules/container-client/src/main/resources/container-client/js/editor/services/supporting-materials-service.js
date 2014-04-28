@@ -39,7 +39,7 @@
     this.getSupportingMaterialFile = function(supportingMaterials, index) {
       if (supportingMaterials && supportingMaterials[index]) {
         var fileIndex = _.findIndex(supportingMaterials[index].files, function(file) {
-          return file.isMain;
+          return file.default;
         });
         return supportingMaterials[index].files[fileIndex];
       } else {
