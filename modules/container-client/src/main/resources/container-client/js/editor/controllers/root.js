@@ -1,4 +1,4 @@
-var controller = function($scope, $rootScope, $log, $location, $timeout, DataQueryService, ItemService, ItemIdService, NavModelService, SupportingMaterialsService) {
+var controller = function($scope, $rootScope, $log, $location, $state, $timeout, DataQueryService, ItemService, ItemIdService, NavModelService, SupportingMaterialsService) {
 
   var navSetOnce = false;
 
@@ -23,6 +23,26 @@ var controller = function($scope, $rootScope, $log, $location, $timeout, DataQue
       $scope.showOverview = true;
     } else {
       $scope.showOverview = false;
+    }
+  });
+
+  $rootScope.$on('deleteSupportingMaterial', function(event, data) {
+    function deleteSupportingMaterial(index) {
+      $scope.data.item.supportingMaterials.splice(index, 1);
+      if (index > 0) {
+        $state.transitionTo('supporting-material', {index: index - 1});
+      } else {
+        $state.transitionTo('supporting-materials');
+      }
+    }
+
+    var confirmationMessage = [
+      "You are about to delete this file.",
+      "Are you sure you want to do this?"
+    ].join('\n');
+
+    if (window.confirm(confirmationMessage)) {
+      deleteSupportingMaterial(data.index);
     }
   });
 
@@ -125,10 +145,12 @@ var controller = function($scope, $rootScope, $log, $location, $timeout, DataQue
 
   $scope.itemId = ItemIdService.itemId();
 
-  $scope.onItemLoaded = function(item) {
+  $rootScope.onItemLoaded = function(item) {
     $scope.data.item = item;
     $scope.$broadcast('itemLoaded', item);
   };
+
+  $scope.onItemLoaded = $rootScope.onItemLoaded;
 
   $scope.onItemLoadError = function(error) {
     $log.warn("Error loading item", error);
@@ -143,6 +165,10 @@ var controller = function($scope, $rootScope, $log, $location, $timeout, DataQue
     $log.warn("Error saving item");
     $scope.data.saveInProgress = false;
     $scope.data.saveError = error;
+  };
+
+  $scope.deleteSupportingMaterial = function(index) {
+    $rootScope.$broadcast('deleteSupportingMaterial', { index: index });
   };
 
   DataQueryService.list("gradeLevel", function(result) {
@@ -177,6 +203,7 @@ angular.module('corespring-editor.controllers')
     '$rootScope',
     '$log',
     '$location',
+    '$state',
     '$timeout',
     'DataQueryService',
     'ItemService',

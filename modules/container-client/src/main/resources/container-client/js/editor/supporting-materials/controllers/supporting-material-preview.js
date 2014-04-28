@@ -20,7 +20,7 @@ var controller = function(
   }
 
   $scope.getSupportingMarkup = function() {
-    var supportingMaterial = SupportingMaterialsService.getSupportingMaterial(supportingMaterials(), $scope.index);
+    var supportingMaterial = SupportingMaterialsService.getSupportingMaterialFile(supportingMaterials(), $scope.index);
     return supportingMaterial ? supportingMaterial.content : undefined;
   };
 

@@ -6,7 +6,7 @@ import com.mongodb.casbah.commons.MongoDBObject
 import com.mongodb.util.{ JSON => MongoPlayJson }
 import org.bson.types.ObjectId
 import play.api.Logger
-import play.api.libs.json.{ JsObject, Json => PlayJson, JsValue }
+import play.api.libs.json.{Json => PlayJson, JsUndefined, JsArray, JsObject, JsValue}
 
 class MongoService(collection: MongoCollection) {
 
@@ -59,12 +59,30 @@ class MongoService(collection: MongoCollection) {
     collection.findAndRemove(MongoDBObject("_id" -> new ObjectId(id)))
   }
 
+  implicit class SupportingMaterialJson(jsValue: JsValue) {
+
+    def addSupportingMaterialIds = jsValue match {
+      case json: JsObject => (json \ "supportingMaterials") match {
+        case array: JsArray => json ++ PlayJson.obj("supportingMaterials" ->
+          JsArray(array.as[Seq[JsObject]].map(supportingMaterial => (supportingMaterial \ "id") match {
+            case _: JsUndefined => supportingMaterial ++ PlayJson.obj("id" -> new ObjectId().toString)
+            case _ => supportingMaterial
+          })))
+        case _ => json
+      }
+      case _ => jsValue
+    }
+
+  }
+
   def save(id: String, data: JsValue): Option[JsValue] = withOid(id) {
     oid =>
       logger.debug(s"[save]: $id")
       logger.trace(s"[save]: ${PlayJson.stringify(data)}")
 
-      def toDbo(json: JsValue): DBObject = MongoPlayJson.parse(PlayJson.stringify(json)).asInstanceOf[DBObject]
+      def toDbo(json: JsValue): DBObject = {
+        MongoPlayJson.parse(PlayJson.stringify(json.addSupportingMaterialIds)).asInstanceOf[DBObject]
+      }
       def toJson(dbo: DBObject) = PlayJson.parse(MongoPlayJson.serialize(dbo))
       val q = MongoDBObject("_id" -> new ObjectId(id))
 

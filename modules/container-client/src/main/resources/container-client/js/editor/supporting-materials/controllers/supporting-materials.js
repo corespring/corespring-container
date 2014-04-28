@@ -1,54 +1,53 @@
 /* global com */
-var controller = function($scope, ItemService, $modal, Overlay, $state, $log, WiggiMathJaxFeatureDef) {
+var controller = function($scope, ItemService, SupportingMaterialsService, $modal, Overlay, $state, $stateParams, $log, WiggiMathJaxFeatureDef) {
 
   var log = $log.debug.bind($log, '[supporting-materials] -');
 
-  var otherType = 'Other';
-
-  $scope.materialTypes = ['Rubric', 'Student Work', otherType];
-  $scope.materialType = $scope.materialTypes[0];
-
-  $scope.displayOther = isOther();
-  $scope.$watch('materialType', function() {
-    $scope.displayOther = isOther();
-  });
-
   $scope.uploadType = null;
+  $scope.newMaterial = {};
+  $scope.showIntro = $stateParams.intro === 'intro';
 
-  function isOther() {
-    return $scope.materialType === otherType;
-  }
-
-  function getType() {
-    return isOther() ? $scope.textMaterialType : $scope.materialType;
-  }
-
-  $scope.createNew = function() {
-
-    $scope.extraFeatures = {
-      definitions: [{
-        type: 'group',
-        buttons: [new WiggiMathJaxFeatureDef()]
-      }]
-    };
-    $scope.overrides = [{
-      name: 'image',
-      iconclass: 'fa fa-picture-o',
-      action: function() {
-        window.alert('You must save the supporting material before adding images.');
-      }
-    }];
-
-    Overlay.open({
-      template: $('#new-supporting-material-modal').html(),
-      target: $('.supporting-materials'),
-      scope: $scope,
-      customToolbar: {}
-    });
-
-    // TODO: Remove this workaround if/when overlay works officially outsize wiggiwiz
-    $('#overlay-holder').appendTo($('.supporting-materials'));
+  $scope.hideIntro = function() {
+    $scope.showIntro = false;
   };
+
+  function doIfEnabled(callback) {
+    if ($scope.enableOptions) {
+      callback();
+    }
+  }
+
+  $scope.createText = function() {
+    doIfEnabled(function() {
+      $scope.uploadType = 'text';
+      createSupportingMaterial();
+    });
+  };
+
+  $scope.extraFeatures = {
+    definitions: [{
+      type: 'group',
+      buttons: [new WiggiMathJaxFeatureDef()]
+    }]
+  };
+  $scope.overrides = [{
+    name: 'image',
+    iconclass: 'fa fa-picture-o',
+    action: function() {
+      window.alert('You must save the supporting material before adding images.');
+    }
+  }];
+
+  function updateEnabled() {
+    var validated = SupportingMaterialsService.validateMetadata({
+      title: $scope.newMaterial.name,
+      materialType: $scope.newMaterial.materialType
+    });
+    $scope.enableOptions = validated;
+  }
+
+  $scope.$watch('newMaterial.name', updateEnabled);
+  $scope.$watch('newMaterial.materialType', updateEnabled);
 
   $scope.onSaveSuccess = function(result) {
     $scope.data.item.supportingMaterials = result.supportingMaterials;
@@ -61,55 +60,117 @@ var controller = function($scope, ItemService, $modal, Overlay, $state, $log, Wi
     $log.error(result);
   };
 
-  $scope.triggerUploadDialog = function() {
-    $('.new-supporting-material input[type=file]').trigger('click');
-  };
-
   function uploadTypeIs(str) {
     return $scope.uploadType === str;
   }
 
-  function createSupportingMaterial(callback) {
+  function createSupportingMaterial() {
+
     function handleText() {
-      callback({
-        name: $scope.title,
-        materialType: getType(),
+      var supportingMaterials = $scope.data.item.supportingMaterials || [];
+      var newSupportingMaterial = {
+        name: $scope.newMaterial.name,
+        materialType: $scope.newMaterial.materialType,
         files: [{
           "name": "index.html",
           "contentType": "text/html",
           "content": $scope.content,
           "isMain": true
         }]
-      });
+      };
+      supportingMaterials.push(newSupportingMaterial);
+      ItemService.save({ supportingMaterials: supportingMaterials }, $scope.onSaveSuccess, $scope.onSaveError,
+        $scope.itemId);
     }
 
     function handleFile() {
-      var reader = new FileReader();
-      var file = $('.new-supporting-material input[type=file]')[0].files[0];
-      var url = $scope.title + '/' + file.name;
-
-      var opts = {
-        onUploadComplete: function(body, status) {
-          log('done: ', body, status);
-          callback({
-            name: $scope.title,
-            materialType: getType(),
-            files: [{
-              "name": file.name,
-              "contentType": "application/pdf",
-              "storageKey": $scope.itemId + "/" + $scope.title + "/" + file.name,
-              "isMain": true
-            }]
-          });
+      function getNewestSupportingMaterial(data) {
+        var supportingMaterial;
+        if (data.supportingMaterials) {
+          supportingMaterial = _.last(data.supportingMaterials);
+          if (supportingMaterial && supportingMaterial.id) {
+            return supportingMaterial;
+          } else {
+            throw new Error("Supporing material did not contain an id.");
+          }
+        } else {
+          throw new Error("Response did not contain supporting materials.");
         }
-      };
+      }
 
-      reader.onloadend = function() {
-        var uploader = new com.ee.RawFileUploader(file, reader.result, url, name, opts);
-        uploader.beginUpload();
-      };
+      /**
+       * Persists the name and material type of a supporting material, yielding the fully saved item to a callback
+       * function.
+       */
+      function persistInitial(callback) {
+        var supportingMaterials = $scope.data.item.supportingMaterials || [];
+        supportingMaterials.push({ name: $scope.newMaterial.name, materialType: $scope.newMaterial.materialType });
+        ItemService.save(
+          { supportingMaterials: supportingMaterials },
+          callback,
+          $scope.onSaveError,
+          $scope.itemId
+        );
+      }
 
-      reader.readAsBinaryString(file);
+      /**
+       * Given an item and a callback, uploads a file to that item, executing the provided callback when finished.
+       */
+      function uploadFile(data, callback) {
+        var supportingMaterial = getNewestSupportingMaterial(data);
+        var reader = new FileReader();
+        var file = $('.new-supporting-material input[type=file]')[0].files[0];
+        var url = supportingMaterial.id + '/' + file.name;
+
+        var opts = {
+          onUploadComplete: function(body, status) {
+            log('done: ', body, status);
+            callback(file.name, data);
+          }
+        };
+
+        reader.onloadend = function() {
+          var uploader = new com.ee.RawFileUploader(file, reader.result, url, name, opts);
+          uploader.beginUpload();
+        };
+
+        reader.readAsBinaryString(file);
+      }
+
+      /**
+       * Adds the provided filename adds the filename as the sole file for the most recent supporting material in the
+       * provided data.
+       */
+      function updateWithFileData(filename, data) {
+        var supportingMaterial = getNewestSupportingMaterial(data);
+        supportingMaterial.files = [{
+          "name": filename,
+          "contentType": "application/pdf",
+          "storageKey": $scope.itemId + "/" + supportingMaterial.id + "/" + filename,
+          "isMain": true
+        }];
+        data.supportingMaterials[data.supportingMaterials.length - 1] = supportingMaterial;
+        ItemService.save({
+            supportingMaterials: data.supportingMaterials
+          },
+          $scope.onSaveSuccess,
+          $scope.onSaveError,
+          $scope.itemId
+        );
+      }
+
+      /**
+       * Important set of steps:
+       *   1. Persist the initial supporting material's name and type, returning an id.
+       *   2. Using the id, upload the supporting material file to a subdirectory matching the id.
+       *   3. Update the supporting material data with a reference to the file uploaded in the previous step.
+       */
+      persistInitial(function(result) {
+        uploadFile(result, function(filename, data) {
+          updateWithFileData(filename, data);
+        });
+      });
+
     }
 
     if (uploadTypeIs('text')) {
@@ -121,38 +182,23 @@ var controller = function($scope, ItemService, $modal, Overlay, $state, $log, Wi
     }
   }
 
-  $scope.create = function(data) {
-    var supportingMaterials;
-    if (_.isEmpty(getType())) {
-      window.alert("Please select a type for the supporting material.");
-    } else if (_.isEmpty($scope.title)) {
-      window.alert("Please enter a title for the supporting material.");
-    } else {
-      if ($scope.data.item) {
-        supportingMaterials = $scope.data.item.supportingMaterials || [];
-        createSupportingMaterial(function(newSupportingMaterial) {
-          supportingMaterials.push(newSupportingMaterial);
-          ItemService.save({
-              supportingMaterials: supportingMaterials
-            }, $scope.onSaveSuccess, $scope.onSaveError,
-            $scope.itemId);
-        });
-      } else {
-        log.error("Need $scope.item initialized");
-      }
+  $scope.create = function() {
+    if ($scope.data.item &&
+      SupportingMaterialsService.validateMetadata({ title: $scope.newMaterial.name, materialType: $scope.newMaterial.materialType })) {
+      createSupportingMaterial();
     }
   };
-
-  $scope.createNew();
 
 };
 
 angular.module('corespring-editor.controllers')
   .controller('SupportingMaterials', ['$scope',
     'ItemService',
+    'SupportingMaterialsService',
     '$modal',
     'Overlay',
     '$state',
+    '$stateParams',
     '$log',
     'WiggiMathJaxFeatureDef',
     controller
