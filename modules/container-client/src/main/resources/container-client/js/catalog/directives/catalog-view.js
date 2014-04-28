@@ -503,6 +503,21 @@ angular.module('corespring-catalog.directives').directive('catalogview', [ '$sce
          $scope.item = item;
        });
 
+      function getComponentTypes(components, defaultValue) {
+        var result = _.chain(components)
+          .countBy("title")
+          .map(function (value, key) {
+            return key + (value > 1 ? "(" + value + ")" : "");
+          })
+          .sort()
+          .value();
+
+        if(!_.isArray(result) || result.length === 0){
+          result = defaultValue;
+        }
+        return result;
+      }
+
       $scope.init = function() {
         if ($scope.item && $scope.item._id) {
           $scope.itemId = $scope.item._id.$oid;
@@ -524,10 +539,7 @@ angular.module('corespring-catalog.directives').directive('catalogview', [ '$sce
             $scope.licenseTypeUrl = licenseTypeUrl($scope.contributorDetails.licenseType);
           }
         }
-        $scope.componentTypes = _.pluck($scope.item.components, "title");
-        if(!_.isArray($scope.componentTypes) || $scope.componentTypes.length === 0){
-          $scope.componentTypes = $scope.unassigned;
-        }
+        $scope.componentTypes = getComponentTypes($scope.item.components, [$scope.unassigned]);
 
         DataQueryService.list("depthOfKnowledge", function(result) {
           var depthOfKnowledge;

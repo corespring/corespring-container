@@ -1,5 +1,5 @@
 /* global com */
-var controller = function($scope, ItemService, SupportingMaterialsService, $modal, Overlay, $state, $stateParams, $log) {
+var controller = function($scope, ItemService, SupportingMaterialsService, $modal, Overlay, $state, $stateParams, $log, WiggiMathJaxFeatureDef) {
 
   var log = $log.debug.bind($log, '[supporting-materials] -');
 
@@ -24,12 +24,19 @@ var controller = function($scope, ItemService, SupportingMaterialsService, $moda
     });
   };
 
-  $scope.uploadFile = function() {
-    doIfEnabled(function() {
-      $scope.uploadType = 'file';
-      createSupportingMaterial();
-    });
+  $scope.extraFeatures = {
+    definitions: [{
+      type: 'group',
+      buttons: [new WiggiMathJaxFeatureDef()]
+    }]
   };
+  $scope.overrides = [{
+    name: 'image',
+    iconclass: 'fa fa-picture-o',
+    action: function() {
+      window.alert('You must save the supporting material before adding images.');
+    }
+  }];
 
   function updateEnabled() {
     var validated = SupportingMaterialsService.validateMetadata({
@@ -193,5 +200,6 @@ angular.module('corespring-editor.controllers')
     '$state',
     '$stateParams',
     '$log',
+    'WiggiMathJaxFeatureDef',
     controller
   ]);

@@ -1,0 +1,56 @@
+@preview-width: 180px;
+
+.abs-full(@left: 0, @right: 0, @top: 0, @bottom: 0){
+  position: absolute;
+  left: @left;
+  top: @top;
+  right: @right;
+  bottom: @bottom;
+}
+
+.mathjax-dialog-root{
+  .abs-full();
+  .editor{
+    .abs-full(@right: @preview-width);
+    textarea{
+      width: 100%;
+      height: 100%;
+      border:0 solid #cecaca;
+      background-color: #ffffff;
+      padding: 10px;
+      font-family: monospace;
+      font-size: 11px;
+      overflow:auto;
+      outline:none;
+      resize:none;
+    }
+  }
+
+  .math-preview{
+    .abs-full(@left: none);
+    width: @preview-width;
+    padding-top: 40px;
+    text-align: center;
+    background-color: #e4e4e1;
+  }
+}
+
+.math-sum{
+  font-family: serif;
+  font-weight: bold;
+  &:before{
+    content: "∑";
+  }
+}
+
+.mathjax-holder{
+  display: inline-block;
+  .user-select(none);
+  background-color: #cbebbb;
+  padding: 4px;
+  transition: background-color 200ms;
+  border-radius: 3px;
+  &:hover{
+    background-color: #d9d9c9;
+  }
+}

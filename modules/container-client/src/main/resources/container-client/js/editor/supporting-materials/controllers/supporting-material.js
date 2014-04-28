@@ -9,10 +9,18 @@ var controller = function(
   $filter,
   SupportingMaterialsService,
   ItemService,
-  ImageUtils) {
+  ImageUtils,
+  WiggiMathJaxFeatureDef) {
 
   $scope.index = parseInt($stateParams.index, 10);
   $scope.editing = false;
+
+  $scope.extraFeatures = {
+    definitions: [{
+      type: 'group',
+      buttons: [new WiggiMathJaxFeatureDef()]
+    }]
+  };
 
   $scope.imageService = {
 
@@ -105,7 +113,9 @@ var controller = function(
   };
 
   $scope.save = function() {
-    ItemService.save({ supportingMaterials: $scope.data.item.supportingMaterials }, $scope.onSaveSuccess,
+    ItemService.save({
+        supportingMaterials: $scope.data.item.supportingMaterials
+      }, $scope.onSaveSuccess,
       $scope.onSaveError, $scope.itemId);
   };
 
@@ -220,5 +230,6 @@ angular.module('corespring-editor.controllers')
     'SupportingMaterialsService',
     'ItemService',
     'ImageUtils',
+    'WiggiMathJaxFeatureDef',
     controller
   ]);

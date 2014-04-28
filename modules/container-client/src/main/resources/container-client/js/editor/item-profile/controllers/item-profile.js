@@ -220,7 +220,7 @@
       initReviewsPassedSelection();
     });
 
-    function initReviewsPassedSelection () {
+    function initReviewsPassedSelection() {
       if ($scope.reviewsPassedDataProvider && $scope.taskInfo && _.isArray($scope.taskInfo.reviewsPassed)) {
         _.each($scope.reviewsPassedDataProvider, function (item) {
           item.selected = $scope.taskInfo.reviewsPassed.indexOf(item.key) >= 0;
@@ -406,6 +406,17 @@
       }
     }
 
+    function getComponentTypes(components) {
+      var result = _.chain(components)
+        .countBy("title")
+        .map(function (value, key) {
+          return key + (value > 1 ? "(" + value + ")" : "");
+        })
+        .sort()
+        .value();
+      return result;
+    }
+
     function onLoadItemSuccess(item) {
       $scope.data.item = item;
       initSubObjects();
@@ -420,7 +431,7 @@
       $log.debug("other alignments:", $scope.otherAlignments);
       $log.debug("contributor details:", $scope.contributorDetails);
 
-      $scope.componentTypes = _.pluck($scope.data.item.components, "title");
+      $scope.componentTypes = getComponentTypes($scope.data.item.components);
 
       $scope.needAdditionalCopyrightInformation =
           $scope.contributorDetails.copyright.additional.length > 0 ? 'yes' : '';
@@ -440,4 +451,5 @@
 
   }
 
-})();
+})
+();

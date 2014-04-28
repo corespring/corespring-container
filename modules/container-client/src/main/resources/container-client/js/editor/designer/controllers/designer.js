@@ -12,7 +12,8 @@ var controller = function(
   MathJaxService,
   ComponentToWiggiwizFeatureAdapter,
   ImageUtils,
-  ComponentRegister) {
+  ComponentRegister,
+  WiggiMathJaxFeatureDef) {
 
   var configPanels = {};
 
@@ -68,7 +69,7 @@ var controller = function(
 
     var addToEditor = function(editor, addContent, component) {
       var max = 0;
-      $($scope.data.item.xhtml).find('[id]').each(function(idx, element) {
+      $('<div>' + $scope.data.item.xhtml + '</div>').find('[id]').each(function(idx, element) {
         var id = Number($(element).attr('id'));
         if (!_.isNaN(id) && id > max) {
           max = id;
@@ -131,6 +132,11 @@ var controller = function(
         type: 'dropdown',
         dropdownTitle: 'Answer Type',
         buttons: _.map(_.sortBy(componentSet, orderList), componentToFeature)
+      }, {
+        type: 'group',
+        buttons: [
+          new WiggiMathJaxFeatureDef()
+        ]
       }]
     };
   };
@@ -245,5 +251,6 @@ angular.module('corespring-editor.controllers')
     'ComponentToWiggiwizFeatureAdapter',
     'ImageUtils',
     'ComponentRegister',
+    'WiggiMathJaxFeatureDef',
     controller
   ]);

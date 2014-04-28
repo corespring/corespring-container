@@ -4,6 +4,11 @@ var Placeholder = function($rootScope) {
     console.log("Linking Placeholder");
 
     $scope.selected = false;
+
+    $scope.$watch('selected', function(n) {
+      $scope.selectedClass = n === true ? 'selected' : '';
+    });
+
     $scope.id = $scope.id || 2;
 
 
@@ -61,8 +66,8 @@ var Placeholder = function($rootScope) {
       id: '@'
     },
     template: [
-      '<div class="component-placeholder-container" data-component-id="{{id}}" ng-class="{selected: selected == true}">',
-      '  <div class="component-placeholder" ng-class="[componentType]">{{label}}',
+      '<div class="component-placeholder" ng-class="[componentType,selectedClass]" data-component-id="{{id}}">',
+      '  <div class="inner-placeholder">{{label}}',
       '    <div class="delete-icon">',
       '      <i ng-click="deleteNode()" class="fa fa-times-circle"></i>',
       '    </div>',
@@ -72,8 +77,6 @@ var Placeholder = function($rootScope) {
   };
 };
 
-angular.module('corespring-editor.directives').directive('placeholder',
-  ['$rootScope',
-    Placeholder
-  ]
-);
+angular.module('corespring-editor.directives').directive('placeholder', ['$rootScope',
+  Placeholder
+]);
