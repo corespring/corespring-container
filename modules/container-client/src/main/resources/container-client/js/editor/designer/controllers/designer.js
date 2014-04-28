@@ -130,7 +130,7 @@ var controller = function(
       definitions: [{
         name: 'external',
         type: 'dropdown',
-        dropdownTitle: 'Question Type',
+        dropdownTitle: 'Answer Type',
         buttons: _.map(_.sortBy(componentSet, orderList), componentToFeature)
       }, {
         type: 'group',
