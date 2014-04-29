@@ -26,14 +26,26 @@ var controller = function($scope, $rootScope, $log, $location, $state, $timeout,
     }
   });
 
-  $rootScope.$on('deleteSupportingMaterial', function(event, data) {
+
+  $scope.onSaveError = function(result) {
+    $log.error(result);
+  };
+
+  $scope.$on('deleteSupportingMaterial', function(event, data) {
     function deleteSupportingMaterial(index) {
       $scope.data.item.supportingMaterials.splice(index, 1);
-      if (index > 0) {
-        $state.transitionTo('supporting-material', {index: index - 1});
-      } else {
-        $state.transitionTo('supporting-materials');
-      }
+        ItemService.save({
+          supportingMaterials: $scope.data.item.supportingMaterials
+        },
+        function() {
+          if (index > 0) {
+            $state.transitionTo('supporting-material', {index: index - 1});
+          } else {
+            $state.transitionTo('supporting-materials');
+          }
+        },
+        $scope.onSaveError, $scope.itemId
+      );
     }
 
     var confirmationMessage = [
