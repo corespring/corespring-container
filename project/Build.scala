@@ -111,7 +111,7 @@ object Build extends sbt.Build {
       branch=$branch
       version=$v
       date=$date
-      s""""
+      s"""
       IO.write(file, contents)
   }
 

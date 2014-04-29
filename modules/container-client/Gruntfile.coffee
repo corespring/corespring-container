@@ -192,55 +192,27 @@ module.exports = (grunt) ->
           ]
           specs: '<%= common.test %>/js/**/*-test.js'
 
-    concat:
-      generated:
-        options: 
-          separator: ";\n"
-        files: [
-          { 
-            dest: common.core.concatDest 
-            src: common.core.src 
-          }
-          { 
-            dest: common.editor.concatDest
-            src: common.editor.src
-          }
-          {
-            dest: common.editorExtras.concatDest
-            src: common.editorExtras.src
-          }
-          {
-            dest: common.coreLibs.concatDest
-            src: common.coreLibs.src
-          }
-          {
-            dest: common.player.concatDest
-            src: common.player.src
-          }
-          {
-            dest: common.catalog.concatDest
-            src: common.catalog.src
-          }
-        ]    
 
     uglify:
+      options: 
+        sourceMap: true
       generated:
         files: [ 
           { 
-            dest:  common.core.dest,
-            src: [ common.core.concatDest ] 
+            dest: common.core.dest,
+            src:  common.core.src  
           }
           { 
             dest: common.editor.dest
-            src: [ common.editor.concatDest ] 
+            src:  common.editor.src 
           } 
           { 
             dest: common.player.dest
-            src: [ common.player.concatDest ] 
+            src:  common.player.src  
           }
           {
             dest: common.catalog.dest
-            src: [ common.catalog.concatDest ]
+            src: common.catalog.src
           }
         ] 
 
@@ -299,5 +271,5 @@ module.exports = (grunt) ->
   grunt.registerTask('prepPlayerLauncher', 'prep the player launcher js', prepPlayerLauncher(grunt))
   grunt.registerTask('run', ['jade', 'less', 'watch'])
   grunt.registerTask('test', ['shell:bower', 'shell:bowerCacheClean', 'lcd', 'prepPlayerLauncher', 'jasmine:unit'])
-  grunt.registerTask('default', ['shell:bower', 'lcd', 'clean_bower', 'jshint', 'concat', 'uglify', 'copy', 'less', 'jade', 'compress', 'prepPlayerLauncher','jasmine:unit'])
+  grunt.registerTask('default', ['shell:bower', 'lcd', 'clean_bower', 'jshint', 'uglify', 'copy', 'less', 'jade', 'compress', 'prepPlayerLauncher','jasmine:unit'])
   grunt.registerTask('minify-test', ['concat', 'uglify'])
