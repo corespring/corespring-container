@@ -49,10 +49,6 @@ angular.module('corespring-player.services').factory('ComponentRegister', ['$log
         setAndApplyToComponents(allData, "dataAndSession", "setDataAndSession");
       };
 
-      this.stringertsComponentSessions = function(sessions) {
-        setAndApplyToComponents(sessions, "sessions", "setSession");
-      };
-
       this.getComponentSessions = function() {
         var sessions = {};
 
