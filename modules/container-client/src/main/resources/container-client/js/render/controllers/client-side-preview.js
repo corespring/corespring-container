@@ -34,6 +34,7 @@ var controller = function($scope, ComponentRegister, PlayerService) {
   $scope.resetPreview = function() {
     ComponentRegister.reset();
     $scope.session.isComplete = false;
+    $scope.score = undefined;
   };
 };
 
