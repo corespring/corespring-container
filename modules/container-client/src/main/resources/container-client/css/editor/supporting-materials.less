@@ -1,5 +1,10 @@
 .supporting-material {
 
+  .supporting-material-metadata {
+    background-color: #f5f5f5;
+    border: 1px solid #a9a9a9;
+  }
+
   .editor-container {
     position: absolute;
     left: 0;
@@ -43,6 +48,21 @@
       display: inline-block;
     }
   }
+
+  .button-bar {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    padding: 0 10px;
+    list-style-type: none;
+
+    li {
+      display: inline-block;
+      float: right;
+    }
+
+  }
+
 }
 
 .supporting-materials {
@@ -64,46 +84,111 @@
 
 }
 
-.new-supporting-material {
-  position: relative;
-
-  .prompt {
-    position: absolute;
-    margin: 0;
-    padding: 0;
-    left: 20px;
-    top: 20px;
-  }
-
-  .options {
-    margin-left: 140px;
-    padding: 20px 0 50px 0;
-
-    label {
-      font-weight: bold;
-    }
-
-    .disabled {
-      color: #c0c0c0;
-    }
-
-  }
-
-  .wiggi-wiz {
-    margin: 0 20px 20px 0;
-    min-height: 300px;
-  }
-
-  .save {
-    float: right;
-    display: inline-block;
-    margin-right: 20px;
-  }
+.supporting-material-metadata {
+  padding: 15px 15px 5px 15px;
 
   .field {
     display: inline-block;
     margin: 0 20px 10px 0;
   }
+
+  label {
+    display: inline-block;
+    font-weight: bold;
+    margin-right: 5px;
+  }
+
+}
+
+.supporting-materials {
+
+  .intro {
+    display: block;
+    padding: 40px 20px;
+    max-width: 600px;
+    margin: 0 auto;
+
+    button {
+      margin-top: 20px;
+      float: right;
+    }
+  }
+
+}
+
+.new-supporting-material {
+
+  .selection {
+    position: relative;
+
+    .prompt {
+      position: absolute;
+      margin: 0;
+      padding: 0;
+      left: 20px;
+      top: 9px;
+    }
+
+    .or {
+      text-transform: uppercase;
+      font-weight: bold;
+      display: inline-block;
+      margin: 5px 0;
+    }
+
+    .options {
+      margin-left: 140px;
+      padding: 0 0 50px 0;
+
+      .file-header, .pdf-header {
+        display: inline-block;
+        min-height: 43px;
+        img {
+          display: inline-block;
+          margin-left: 10px;
+        }
+      }
+
+      label {
+        font-weight: bold;
+      }
+
+      a {
+        text-decoration: underline;
+        &:hover {
+          cursor: pointer;
+        }
+      }
+
+      &.disabled {
+        @disabled-color: #c0c0c0;
+        color: @disabled-color;
+
+        .file-header, .pdf-header {
+          img {
+            opacity: 0.2;
+          }
+        }
+
+        a {
+          color: #c0c0c0;
+          text-decoration: none;
+
+          &:hover {
+            text-decoration: none;
+            cursor: default;
+          }
+        }
+      }
+    }
+
+    .field {
+      display: inline-block;
+      margin: 0 20px 10px 0;
+    }
+
+  }
+
 
 }
 
@@ -114,8 +199,30 @@
 .root .nav-container .nav {
 
   li.nav-subitem {
-    a {
+
+    .subitem-link {
       padding-left: 40px;
+    }
+
+    .supporting-material-link {
+      padding-right: 32px;
+    }
+
+    .delete-supporting-material {
+      position: absolute;
+      height: 100%;
+      width: 14px;
+      right: 0;
+      top: 0;
+      display: block;
+      padding: 0 16px;
+      background: url('../images/delete-icon.png') no-repeat center center;
+      background-size: 14px 14px;
+      opacity: 0.5;
+
+      &:hover {
+        opacity: 1;
+      }
     }
   }
 

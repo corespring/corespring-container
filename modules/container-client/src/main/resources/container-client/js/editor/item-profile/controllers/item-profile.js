@@ -217,13 +217,17 @@
 
     DataQueryService.list("reviewsPassed", function (result) {
       $scope.reviewsPassedDataProvider = result;
-      initReviewsPassedSelection();
+      initReviewsPassedDataProvider();
     });
 
-    function initReviewsPassedSelection () {
+    function initReviewsPassedDataProvider() {
       if ($scope.reviewsPassedDataProvider && $scope.taskInfo && _.isArray($scope.taskInfo.reviewsPassed)) {
+
         _.each($scope.reviewsPassedDataProvider, function (item) {
-          item.selected = $scope.taskInfo.reviewsPassed.indexOf(item.key) >= 0;
+          var selected = $scope.taskInfo.reviewsPassed.indexOf(item.key) >= 0;
+          if (selected !== item.selected) {
+            item.selected = selected;
+          }
         });
       }
     }
@@ -260,9 +264,19 @@
           selectedKeys = _.without(selectedKeys, "All");
         }
       }
-      $scope.data.item.profile.taskInfo.reviewsPassed = selectedKeys;
-      initReviewsPassedSelection();
+      $scope.taskInfo.reviewsPassed = selectedKeys;
+      initReviewsPassedDataProvider();
     };
+
+    $scope.$watch('taskInfo.reviewsPassed', function () {
+      var otherSelected = _.some($scope.reviewsPassedDataProvider, function (item) {
+        return item.selected && item.key === 'Other';
+      });
+      if($scope.isOtherSelected && !otherSelected){
+        $scope.taskInfo.otherReviewsPassed = '';
+      }
+      $scope.isOtherSelected = otherSelected;
+    });
 
     $scope.getLicenseTypeUrl = function (licenseType) {
       return licenseType ? "/assets/images/licenseTypes/" + licenseType.replace(" ", "-") + ".png" : undefined;
@@ -297,13 +311,10 @@
       $scope.contributorDetails.copyright.additional.splice(0);
     };
 
-    $scope.needAdditionalCopyrightInformation = 'init';
+    $scope.needAdditionalCopyrightInformation = '';
 
     $scope.$watch("needAdditionalCopyrightInformation", function (newValue, oldValue) {
       if (isFormActive) {
-        if (oldValue === 'init') {
-          return;
-        }
         if (newValue === oldValue) {
           return;
         }
@@ -406,6 +417,17 @@
       }
     }
 
+    function getComponentTypes(components) {
+      var result = _.chain(components)
+        .countBy("title")
+        .map(function (value, key) {
+          return key + "(" + value + ")";
+        })
+        .sort()
+        .value();
+      return result;
+    }
+
     function onLoadItemSuccess(item) {
       $scope.data.item = item;
       initSubObjects();
@@ -420,12 +442,12 @@
       $log.debug("other alignments:", $scope.otherAlignments);
       $log.debug("contributor details:", $scope.contributorDetails);
 
-      $scope.componentTypes = _.pluck($scope.data.item.components, "title");
+      $scope.componentTypes = getComponentTypes($scope.data.item.components);
 
       $scope.needAdditionalCopyrightInformation =
           $scope.contributorDetails.copyright.additional.length > 0 ? 'yes' : '';
 
-      initReviewsPassedSelection();
+      initReviewsPassedDataProvider();
 
       isFormActive = true;
     }
@@ -440,4 +462,5 @@
 
   }
 
-})();
+})
+();

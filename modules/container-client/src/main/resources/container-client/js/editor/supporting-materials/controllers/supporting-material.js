@@ -1,6 +1,7 @@
 /* global AddContentModalController, com */
 var controller = function(
   $scope,
+  $rootScope,
   $http,
   $stateParams,
   $state,
@@ -28,7 +29,7 @@ var controller = function(
     },
 
     addFile: function(file, onComplete, onProgress) {
-      var url = supportingMaterials()[$scope.index].name + '/' + file.name;
+      var url = $scope.supportingMaterials()[$scope.index].id + '/' + file.name;
 
       if (ImageUtils.bytesToKb(file.size) > 500) {
         onComplete(ImageUtils.fileTooBigError(file.size, 500));
@@ -79,7 +80,8 @@ var controller = function(
     console.warn("file too big");
   });
 
-  $scope.onSaveSuccess = function() {
+  $scope.onSaveSuccess = function(data) {
+    $rootScope.onItemLoaded(data);
     $scope.data.saveInProgress = false;
   };
 
@@ -90,11 +92,11 @@ var controller = function(
   $scope.$watch('supportingMarkup', function(newValue) {
     if ($scope.data.item) {
       var updatedSupportingMaterials = $scope.data.item.supportingMaterials;
-      var supportingMaterialFile = SupportingMaterialsService.getSupportingMaterial(supportingMaterials(), $scope.index);
+      var supportingMaterialFile = SupportingMaterialsService.getSupportingMaterialFile($scope.supportingMaterials(), $scope.index);
       if (supportingMaterialFile) {
         supportingMaterialFile.content = newValue;
-        var fileIndex = _.findIndex(supportingMaterials()[$scope.index].files, function(file) {
-          return file.isMain;
+        var fileIndex = _.findIndex($scope.supportingMaterials()[$scope.index].files, function(file) {
+          return file.default;
         });
         updatedSupportingMaterials[$scope.index].files[fileIndex] = supportingMaterialFile;
         $scope.data.item.supportingMaterials = updatedSupportingMaterials;
@@ -105,6 +107,10 @@ var controller = function(
   $scope.$on('save-data', function() {
     $scope.save();
   });
+
+  $scope.addNew = function() {
+    $state.transitionTo('supporting-materials', {intro: false});
+  };
 
   $scope.save = function() {
     ItemService.save({
@@ -129,9 +135,9 @@ var controller = function(
   };
 
 
-  function supportingMaterials() {
+  $scope.supportingMaterials = function() {
     return $scope.data.item ? $scope.data.item.supportingMaterials : undefined;
-  }
+  };
 
   $scope.formatDate = function(date) {
     if (date instanceof Object && date.$date) {
@@ -145,15 +151,15 @@ var controller = function(
   };
 
   $scope.getSupportingMaterialMarkup = function() {
-    if (supportingMaterials()) {
-      return SupportingMaterialsService.getSupportingMaterial(supportingMaterials(), $scope.index).content;
+    if ($scope.supportingMaterials()) {
+      return SupportingMaterialsService.getSupportingMaterialFile($scope.supportingMaterials(), $scope.index).content;
     } else {
       return undefined;
     }
   };
 
   function getSupportingMaterialType() {
-    return supportingMaterials() ? supportingMaterials()[$scope.index].materialType : undefined;
+    return $scope.supportingMaterials() ? $scope.supportingMaterials()[$scope.index].materialType : undefined;
   }
 
   $scope.toggleEdit = function() {
@@ -161,27 +167,23 @@ var controller = function(
   };
 
   $scope.delete = function() {
-    if (window.confirm("Are you sure?")) {
-      $scope.data.item.supportingMaterials.splice($scope.index, 1);
-      if ($scope.index > 0) {
-        $state.transitionTo('supporting-material', {
-          index: $scope.index - 1
-        });
-      } else {
-        $state.transitionTo('supporting-materials');
-      }
-    }
+    $rootScope.$broadcast('deleteSupportingMaterial', { index: $scope.index });
   };
 
   $scope.isContentType = function(contentType) {
-    return supportingMaterials() ? contentType === SupportingMaterialsService.getContentType(supportingMaterials(), $scope.index) : false;
+    return $scope.supportingMaterials() ?
+      contentType === SupportingMaterialsService.getContentType($scope.supportingMaterials(), $scope.index) : false;
   };
 
   function getSupportingMaterial() {
+    return $scope.supportingMaterials() ? $scope.supportingMaterials()[$scope.index] : undefined;
+  }
+
+  function getSupportingMaterialFile() {
     var supportingMaterial;
-    if (supportingMaterials()) {
-      supportingMaterial = SupportingMaterialsService.getSupportingMaterial(supportingMaterials(), $scope.index);
-      SupportingMaterialsService.getKBFileSize(supportingMaterials(), $scope.index, function(size) {
+    if ($scope.supportingMaterials()) {
+      supportingMaterial = SupportingMaterialsService.getSupportingMaterialFile($scope.supportingMaterials(), $scope.index);
+      SupportingMaterialsService.getKBFileSize($scope.supportingMaterials(), $scope.index, function(size) {
         $scope.supportingMaterialFileSize = size;
       });
     }
@@ -189,19 +191,37 @@ var controller = function(
   }
 
   $scope.$on('itemLoaded', function() {
-    $scope.supportingMaterial = getSupportingMaterial();
-    $scope.supportingMarkup = $scope.getSupportingMaterialMarkup();
-    $scope.materialType = getSupportingMaterialType();
+    $scope.init();
   });
 
-  $scope.supportingMaterial = getSupportingMaterial();
-  $scope.supportingMarkup = $scope.getSupportingMaterialMarkup();
-  $scope.materialType = getSupportingMaterialType();
+  $scope.updateMetadata = function(name, materialType) {
+    if ($scope.data.item) {
+      var updatedSupportingMaterials = $scope.data.item.supportingMaterials;
+      var supportingMaterial = $scope.supportingMaterials()[$scope.index];
+      if (supportingMaterial) {
+        supportingMaterial.name = name;
+        supportingMaterial.materialType = materialType;
+        updatedSupportingMaterials[$scope.index] = supportingMaterial;
+        $scope.data.item.supportingMaterials = updatedSupportingMaterials;
+      }
+    }
+  };
+
+
+  $scope.init = function() {
+    $scope.supportingMaterial = getSupportingMaterial();
+    $scope.supportingMaterialFile = getSupportingMaterialFile();
+    $scope.supportingMarkup = $scope.getSupportingMaterialMarkup();
+    $scope.materialType = getSupportingMaterialType();
+  };
+
+  $scope.init();
 
 };
 
 angular.module('corespring-editor.controllers')
   .controller('SupportingMaterial', ['$scope',
+    '$rootScope',
     '$http',
     '$stateParams',
     '$state',

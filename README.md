@@ -15,8 +15,7 @@ These tools should be on your `PATH`:
 
 [Node and Npm](http://nodejs.org/)
 
-[Bower](http://bower.io/) `npm install -g bower@1.2.6` ([there are issues with 1.2.8](https://github.com/bower/bower/issues/933))
-
+[Bower](http://bower.io/) `npm install -g bower`
 
 ## Installing
 

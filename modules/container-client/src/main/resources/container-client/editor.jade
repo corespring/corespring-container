@@ -20,12 +20,13 @@ block content
           a(ui-sref="item-profile") Item Profile
 
         li.nav-subheader(ng-class="{ active: isActive('supporting-materials') }")
-          a(ui-sref="supporting-materials", ng-class="{empty: !hasSupportingMaterials()}") Supporting Materials
+          a(ui-sref="supporting-materials({intro: 'intro'})", ng-class="{empty: !hasSupportingMaterials()}") Supporting Materials
           a.collapsable(ng-show="hasSupportingMaterials()", ng-class="{expanded: showSupportingMaterials}",
             ng-click="toggleSupportingMaterials()")
           ul.nav.nav-subitems(ng-show="showSupportingMaterials")
             li.nav-subitem(ng-repeat="supportingMaterial in data.item.supportingMaterials", ng-class="{ active: isSupportingMaterialActive(supportingMaterial, $index)}")
-              a(ui-sref="supporting-material({index: $index})") {{supportingMaterial.name}}
+              a.subitem-link.supporting-material-link(ui-sref="supporting-material({index: $index})") {{supportingMaterial.name}}
+              a.delete-supporting-material(ng-click="deleteSupportingMaterial($index)")
 
         li(ng-class="{ active: isActive('overview') }")
           a(ui-sref="overview") Catalog View
@@ -146,7 +147,7 @@ block scripts
                 }
               })
               .state('supporting-materials', {
-                url: '/supporting-materials',
+                url: '/supporting-materials/:intro',
                 views: {
                   main: {
                     template: $('#supporting-materials').html()

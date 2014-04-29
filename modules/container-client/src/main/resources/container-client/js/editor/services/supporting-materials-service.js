@@ -5,22 +5,41 @@
 
     function getUrl(supportingMaterials, index) {
       if (supportingMaterials) {
-        return supportingMaterials[index].name + "/" + self.getSupportingMaterial(supportingMaterials, index).name;
+        return supportingMaterials[index].id + "/" + self.getSupportingMaterialFile(supportingMaterials, index).name;
       } else {
         return undefined;
       }
     }
 
     function lengthInUtf8Bytes(str) {
-      // Matches only the 10.. bytes that are non-initial characters in a multi-byte sequence.
-      var m = encodeURIComponent(str).match(/%[89ABab]/g);
-      return str.length + (m ? m.length : 0);
+      var m;
+      if (str) {
+        // Matches only the 10.. bytes that are non-initial characters in a multi-byte sequence.
+        m = encodeURIComponent(str).match(/%[89ABab]/g);
+        return str.length + (m ? m.length : 0);
+      } else {
+        return 0;
+      }
+
     }
 
-    this.getSupportingMaterial = function(supportingMaterials, index) {
+    this.validateMetadata = function(metadata, log) {
+      log = log || function() {};
+      if (_.isEmpty(metadata.title)) {
+        log("Please enter a title for the supporting material.");
+        return false;
+      } else if (_.isEmpty(metadata.materialType)) {
+        log("Please select a type for the supporting material.");
+        return false;
+      } else {
+        return true;
+      }
+    };
+
+    this.getSupportingMaterialFile = function(supportingMaterials, index) {
       if (supportingMaterials && supportingMaterials[index]) {
         var fileIndex = _.findIndex(supportingMaterials[index].files, function(file) {
-          return file.isMain;
+          return file.default;
         });
         return supportingMaterials[index].files[fileIndex];
       } else {
@@ -35,7 +54,7 @@
       var url;
       var supportingMaterial;
       if (supportingMaterials) {
-        supportingMaterial = self.getSupportingMaterial(supportingMaterials, index);
+        supportingMaterial = self.getSupportingMaterialFile(supportingMaterials, index);
         if (supportingMaterial && supportingMaterial.contentType === 'text/html') {
           callback(lengthInUtf8Bytes(supportingMaterial.content) / 1024);
         } else {
@@ -57,7 +76,7 @@
     };
 
     this.getContentType = function(supportingMaterials, index) {
-      return self.getSupportingMaterial(supportingMaterials, index).contentType;
+      return self.getSupportingMaterialFile(supportingMaterials, index).contentType;
     };
 
     /**

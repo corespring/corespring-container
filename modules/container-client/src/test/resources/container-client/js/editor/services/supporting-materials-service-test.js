@@ -17,7 +17,7 @@ describe('supporting materials service', function() {
       "name": "index.html",
       "contentType": "text/html",
       "content": "<h1>Sample Rubric</h1><br/><p>This is a rubric for scoring this item.</p>",
-      "isMain": true
+      "default": true
     }]
   }, {
     "name": "Student Work Example",
@@ -26,7 +26,7 @@ describe('supporting materials service', function() {
       "_t": "org.corespring.platform.core.models.item.resource.VirtualFile",
       "name": "student-work.pdf",
       "contentType": "application/pdf",
-      "isMain": true
+      "default": true
     }]
   }];
 
@@ -37,9 +37,9 @@ describe('supporting materials service', function() {
 
   describe('getSupportingMaterial', function() {
     it('should return main file at index', function() {
-      expect(supportingMaterialsService.getSupportingMaterial(supportingMaterials, 0)).toEqual(
+      expect(supportingMaterialsService.getSupportingMaterialFile(supportingMaterials, 0)).toEqual(
         _.find(supportingMaterials[0].files, function(file) {
-          return file.isMain === true;
+          return file.default === true;
         }));
     });
   });
@@ -48,10 +48,10 @@ describe('supporting materials service', function() {
     it('should return trusted URL for supporting material', function() {
       var supportingMaterial =
         _.find(supportingMaterials[0].files, function(file) {
-          return file.isMain === true;
+          return file.default === true;
         });
       expect(supportingMaterialsService.getSupportingUrl(supportingMaterials, 0).$$unwrapTrustedValue()).toEqual(
-        supportingMaterials[0].name + "/" + supportingMaterial.name);
+        supportingMaterials[0].id + "/" + supportingMaterial.name);
     });
   });
 
@@ -59,7 +59,7 @@ describe('supporting materials service', function() {
     it('should return the contentType for the supporting material', function() {
       var supportingMaterial =
         _.find(supportingMaterials[0].files, function(file) {
-          return file.isMain === true;
+          return file.default === true;
         });
       expect(supportingMaterialsService.getContentType(supportingMaterials, 0)).toEqual(supportingMaterial.contentType);
     });
