@@ -14,6 +14,13 @@
 
     var isFormActive = false;
 
+    var log = $log.debug.bind($log, 'ItemProfileController] -');
+
+    $scope.uiModel = {
+      isOtherReviewsPassedSelected: false,
+      needAdditionalCopyrightInformation: ''
+    };
+
     //----------------------------------------------------------------
     // Standards start
     //----------------------------------------------------------------
@@ -26,7 +33,7 @@
      */
 
     $scope.$watch('taskInfo.standards', function (newValue, oldValue) {
-      $log.debug("taskInfo.standards", newValue);
+      log("taskInfo.standards", newValue);
     });
 
     $scope.standardsOptions = [];
@@ -53,11 +60,11 @@
       minimumInputLength: 1,
       placeholder: "Choose a standard",
       id: function (item) {
-        $log.debug("standardAdapter id", item._id);
+        log("standardAdapter id", item._id);
         return item._id.$oid;
       },
       query: function (query) {
-        $log.debug("standardAdapter query", query);
+        log("standardAdapter query", query);
         DataQueryService.query("standards", createStandardQuery(query.term), function (results) {
           query.callback({results: results});
         });
@@ -65,7 +72,7 @@
     };
 
     $scope.standardAdapter.valueSetter = function (newItem) {
-      $log.debug("standardAdapter.valueSetter", newItem);
+      log("standardAdapter.valueSetter", newItem);
       $scope.taskInfo.standards.push(newItem);
     };
 
@@ -114,7 +121,7 @@
       };
 
       this.query = function (query) {
-        $log.debug("query", query);
+        log("query", query);
 
         DataQueryService.query(topic, query.term, function (result) {
           $scope.queryResults[topic] = result;
@@ -134,9 +141,9 @@
 
       this.initSelection = function (element, callback) {
 
-        $log.debug("init selection:", element, callback);
+        log("init selection:", element, callback);
         var val = that.elementToVal(element);
-        $log.debug("val:", val);
+        log("val:", val);
 
         findSubject(topic, val, function (s) {
           return callback(s);
@@ -218,6 +225,7 @@
     DataQueryService.list("reviewsPassed", function (result) {
       $scope.reviewsPassedDataProvider = result;
       initReviewsPassedDataProvider();
+      updateOtherReviewsPassedSelected();
     });
 
     function initReviewsPassedDataProvider() {
@@ -253,8 +261,9 @@
         }
       } else if (changedKey === "All") {
         if (keyIsSelected(changedKey)) {
+          var isOtherSelected = keyIsSelected("Other");
           selectedKeys = getKeys(function (item) {
-            return item.key !== "None" && item.key !== "Other";
+            return item.key !== "None" && (item.key !== "Other" || isOtherSelected);
           });
         }
       } else {
@@ -269,14 +278,21 @@
     };
 
     $scope.$watch('taskInfo.reviewsPassed', function () {
-      var otherSelected = _.some($scope.reviewsPassedDataProvider, function (item) {
-        return item.selected && item.key === 'Other';
-      });
-      if($scope.isOtherSelected && !otherSelected){
+      updateOtherReviewsPassedSelected();
+    });
+
+    function updateOtherReviewsPassedSelected() {
+      var otherSelected = false;
+      if ($scope.reviewsPassedDataProvider) {
+        otherSelected = _.some($scope.reviewsPassedDataProvider, function (item) {
+          return item.selected && item.key === 'Other';
+        });
+      }
+      if ($scope.uiModel.isOtherReviewsPassedSelected && !otherSelected && $scope.taskInfo) {
         $scope.taskInfo.otherReviewsPassed = '';
       }
-      $scope.isOtherSelected = otherSelected;
-    });
+      $scope.uiModel.isOtherReviewsPassedSelected = otherSelected;
+    }
 
     $scope.getLicenseTypeUrl = function (licenseType) {
       return licenseType ? "/assets/images/licenseTypes/" + licenseType.replace(" ", "-") + ".png" : undefined;
@@ -311,9 +327,7 @@
       $scope.contributorDetails.copyright.additional.splice(0);
     };
 
-    $scope.needAdditionalCopyrightInformation = '';
-
-    $scope.$watch("needAdditionalCopyrightInformation", function (newValue, oldValue) {
+    $scope.$watch("uiModel.needAdditionalCopyrightInformation", function (newValue, oldValue) {
       if (isFormActive) {
         if (newValue === oldValue) {
           return;
@@ -333,7 +347,7 @@
     $scope.save = function () {
 
       ItemService.save({
-          profile: $scope.data.item.profile
+          profile: $scope.profile
         },
         onSaveSuccess,
         onSaveError,
@@ -342,23 +356,18 @@
     };
 
     function onSaveSuccess(updated) {
-      $log.debug("profile saved");
+      log("profile saved");
       $scope.data.saveInProgress = false;
     }
 
     function onSaveError(err) {
-      $log.debug("error saving profile", err);
+      log("error saving profile", err);
       $scope.data.saveError = err;
       $scope.data.saveInProgress = false;
     }
 
-    function loadItem(itemId) {
-      isFormActive = false;
-      ItemService.load(onLoadItemSuccess, onLoadItemError, itemId);
-    }
-
     function initSubObjects() {
-      var profile = $scope.data.item.profile;
+      var profile = $scope.item.profile;
 
       if (!(profile.taskInfo)) {
         profile.taskInfo = {};
@@ -407,7 +416,7 @@
         });
       }
 
-      var items = $scope.data.item.profile.contributorDetails.copyright.additional;
+      var items = $scope.item.profile.contributorDetails.copyright.additional;
       if (_.isArray(items)) {
         for (var i = items.length - 1; i >= 0; i--) {
           if (itemIsEmpty(items[i])) {
@@ -428,39 +437,38 @@
       return result;
     }
 
-    function onLoadItemSuccess(item) {
-      $scope.data.item = item;
+    function onLoadItemSuccess() {
       initSubObjects();
 
-      var profile = $scope.data.item.profile;
+      var profile = $scope.item.profile;
       $scope.taskInfo = profile.taskInfo;
       $scope.otherAlignments = profile.otherAlignments;
       $scope.contributorDetails = profile.contributorDetails;
       $scope.profile = profile;
 
-      $log.debug("task info:", $scope.taskInfo);
-      $log.debug("other alignments:", $scope.otherAlignments);
-      $log.debug("contributor details:", $scope.contributorDetails);
+      log("task info:", $scope.taskInfo);
+      log("other alignments:", $scope.otherAlignments);
+      log("contributor details:", $scope.contributorDetails);
 
-      $scope.componentTypes = getComponentTypes($scope.data.item.components);
+      $scope.componentTypes = getComponentTypes($scope.item.components);
 
-      $scope.needAdditionalCopyrightInformation =
+      $scope.uiModel.needAdditionalCopyrightInformation =
           $scope.contributorDetails.copyright.additional.length > 0 ? 'yes' : '';
 
       initReviewsPassedDataProvider();
+      updateOtherReviewsPassedSelected();
 
       isFormActive = true;
     }
 
-    function onLoadItemError(err) {
-      $log.warn('Error loading profile', err);
-    }
+    $scope.$watch('item', function() {
+      onLoadItemSuccess();
+    });
 
-    //TODO: We are loading the data at root and here
-    //Should we only load data at root?
-    loadItem($scope.itemId);
+    $scope.$on('itemLoaded', function(ev, item) {
+      $scope.item = item;
+    });
 
   }
 
-})
-();
+})();
