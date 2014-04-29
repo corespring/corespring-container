@@ -38,6 +38,11 @@ var controller = function($scope, ItemService, SupportingMaterialsService, $moda
     }
   }];
 
+  $scope.$on('fileChange', function() {
+    $scope.uploadType = 'file';
+    createSupportingMaterial();
+  });
+
   function updateEnabled() {
     var validated = SupportingMaterialsService.validateMetadata({
       title: $scope.newMaterial.name,
@@ -202,4 +207,16 @@ angular.module('corespring-editor.controllers')
     '$log',
     'WiggiMathJaxFeatureDef',
     controller
-  ]);
+  ]).directive('filechange', function () {
+    var linker = function ($scope, element, attributes) {
+      element.bind('change', function (event) {
+        $scope.$emit('fileChange');
+      });
+    };
+
+    return {
+      restrict: 'A',
+      link: linker
+    };
+
+  });

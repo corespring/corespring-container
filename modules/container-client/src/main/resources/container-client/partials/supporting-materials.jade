@@ -21,4 +21,4 @@ script#supporting-materials(type='text/ng-template')
             label.pdf-header
               | Upload PDF
               img(src='../../images/pdf-icon.png')
-            input(type='file', ng-disabled='!enableOptions', onchange="angular.element(this).scope().uploadFile()")
+            input(type='file', ng-disabled='!enableOptions', fileChange)
