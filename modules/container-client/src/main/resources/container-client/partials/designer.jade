@@ -1,7 +1,7 @@
 script#designer(type="text/ng-template")
   .designer(ng-controller="Designer")
 
-    .editor-container(ng-class="editorMode")
+    .editor-container(ng-class="editorMode", ng-show="section == 'main'")
       wiggi-wiz(
         ng-model="data.item.xhtml",
         features="extraFeatures",
@@ -11,3 +11,13 @@ script#designer(type="text/ng-template")
         edit-pane-toolbar(alignment="bottom")
           .btn-group.pull-right
             button(ng-click="closePane()", class="btn btn-sm btn-success", style="float:right;") Done
+
+    .weighting-container(ng-show="section == 'weighting'")
+      h1 weighting-container 
+
+      .title
+        | You can assign specific weights to each part of this item (optional):
+
+      .container(style="max-width: 700px;")
+        component-weights
+          component-weighter(ng-repeat="(compId,comp) in data.item.components", component-id="compId", ng-model="comp") 

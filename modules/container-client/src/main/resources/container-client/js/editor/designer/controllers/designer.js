@@ -6,6 +6,7 @@ var controller = function(
   $timeout,
   $modal,
   $log,
+  $stateParams,
   DesignerService,
   ItemService,
   PlayerService,
@@ -15,9 +16,14 @@ var controller = function(
   ComponentRegister,
   WiggiMathJaxFeatureDef) {
 
+
   var configPanels = {};
 
   var log = $log.debug.bind($log, '[designer] - ');
+
+
+  log($stateParams);
+  $scope.section = $stateParams.section;
 
   $scope.editorMode = "visual";
 
@@ -244,6 +250,7 @@ angular.module('corespring-editor.controllers')
     '$timeout',
     '$modal',
     '$log',
+    '$stateParams',
     'DesignerService',
     'ItemService',
     'PlayerService',

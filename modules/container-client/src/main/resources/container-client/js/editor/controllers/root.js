@@ -34,7 +34,7 @@ var controller = function($scope, $rootScope, $log, $location, $state, $timeout,
   $scope.$on('deleteSupportingMaterial', function(event, data) {
     function deleteSupportingMaterial(index) {
       $scope.data.item.supportingMaterials.splice(index, 1);
-        ItemService.save({
+      ItemService.save({
           supportingMaterials: $scope.data.item.supportingMaterials
         },
         function() {
@@ -152,6 +152,10 @@ var controller = function($scope, $rootScope, $log, $location, $state, $timeout,
 
   $scope.toggleSupportingMaterials = function() {
     $scope.showSupportingMaterials = !$scope.showSupportingMaterials;
+  };
+
+  $scope.toggleDesignOptions = function() {
+    $scope.showDesignOptions = !$scope.showDesignOptions;
   };
 
   $scope.toggleOverview = function() {
