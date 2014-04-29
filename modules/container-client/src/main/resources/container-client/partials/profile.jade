@@ -148,7 +148,7 @@ form
         .controls
           input#author.form-control(
           ng-model='contributorDetails.sourceUrl',
-          placeholder="Enter a source url...")
+          placeholder="Enter the source URL...")
 
     .control-group
       label.control-label(for="copyright-owner") * Copyright Owner
@@ -188,25 +188,25 @@ form
         .controls
           input#owner.form-control(
           ng-model='item.owner',
-          placeholder="Enter a owner...",)
+          placeholder="Enter the copyright owner...",)
     .control-group
       label.control-label(for="author") Author
         .controls
           input#author.form-control(
           ng-model='item.author',
-          placeholder="Enter a author...",)
+          placeholder="Enter author's name...",)
     .control-group
       label.control-label(for="publisher") Publisher
         .controls
           input#publisher.form-control(
           ng-model='item.publisher',
-          placeholder="Enter a publisher...",)
+          placeholder="Enter the publisher's name...",)
     .control-group
       label.control-label(for="year") Copyright Year
         .controls
           input#year.form-control(
           ng-model='item.year',
-          placeholder="Enter a year...",)
+          placeholder="Enter the copyright year...",)
     .control-group
       label.control-label(for="license") License
         .controls
@@ -216,7 +216,7 @@ form
         .controls
           input#url.form-control(
           ng-model='item.sourceUrl',
-          placeholder="Enter a source url...",)
+          placeholder="Enter the source URL...",)
 
   a.add-additional(ng-click='addCopyrightItem()', ng-show='needAdditionalCopyrightInformation')
     i(class="fa fa-{{!!expandKeySkills ? 'minus' : 'plus'}}-square-o", style="margin-left: 6px; margin-right: 6px;")
