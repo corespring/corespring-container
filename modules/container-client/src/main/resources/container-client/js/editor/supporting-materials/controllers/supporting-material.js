@@ -167,7 +167,7 @@ var controller = function(
   };
 
   $scope.delete = function() {
-    $rootScope.$broadcast('deleteSupportingMaterial', { index: $scope.index });
+    $scope.$emit('deleteSupportingMaterial', { index: $scope.index });
   };
 
   $scope.isContentType = function(contentType) {
