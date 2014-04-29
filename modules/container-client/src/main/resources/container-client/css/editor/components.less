@@ -30,23 +30,36 @@
 @selected-component-border-color: #eaeaea;
 
 .component-placeholder {
+  position: relative;
 
-  .inner-placeholder{
-    position:relative;
-    border: 1px solid darken(@placeholder-base-color, 10%);
-    background-color: lighten(@placeholder-base-color, 40%);
-    transition: background-color 100ms linear;
-    padding: 20px;
+  .blocker{
+    background-color: @placeholder-base-color;
+    text-align: center;     
+    vertical-align: middle;     
+    display: inline-flex;     
+    align-items: center;
+    position: absolute;
+    height: 100%;
     width: 100%;
-    .rounded(4px);
-    .user-select(none);
-    .drop-shadow(0, 2px, 3px, 0.2);
-      &:hover{
-      background-color: lighten(@placeholder-base-color, 50%);
+    opacity: 0;
+    z-index: 10;
+    .border-radius(4px, 4px, 4px, 4px);
+    transition: opacity 200ms;
+    .title{
+      width: 100%;
+      margin: 5px;
+      text-align: center;
+      color: white;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow-x: hidden;
+      .user-select(none);
+    }
+
+    &:hover{
+      opacity: 1.0;
     }
   }
-
-  .selected-component-container();
 }
 
 .delete-icon, .close-icon {
@@ -65,7 +78,6 @@
   }
 
   i {
-    position: absolute;
     font-size: 24px;
     color: darken(@close-icon-base-color, 10%);
 

@@ -1,13 +1,49 @@
-var Placeholder = function($rootScope) {
+var Placeholder = function($rootScope, $compile, $log, ComponentRegister) {
+
+  var log = $log.debug.bind($log, '[placeholder]');
 
   function link($scope, $element, $attrs) {
-    console.log("Linking Placeholder");
+
+    $scope.componentPreview = null;
+
+    function setDataToComponent() {
+      if ($scope.register.loadedData[$scope.id] && $scope.componentPreview) {
+        $scope.componentPreview.setDataAndSession($scope.register.loadedData[$scope.id]);
+      }
+    }
+
+    $scope.$on('registerComponent', function(event, id, component) {
+
+      $scope.componentPreview = component;
+      log('registerComponent', component, id);
+
+      setDataToComponent();
+    });
+
+    $scope.register = ComponentRegister;
+
+    $scope.$watch('register.loadedData', function() {
+      log('data has changed!');
+      setDataToComponent();
+    });
 
     $scope.selected = false;
 
     $scope.$watch('selected', function(n) {
       $scope.selectedClass = n === true ? 'selected' : '';
     });
+
+    function renderPlayerComponent() {
+
+      if (!$scope.id || !$scope.componentType) {
+        return;
+      }
+      $element.find('.holder').html('<' + $scope.componentType + ' id="' + $scope.id + '"></' + $scope.componentType + '>');
+      $compile($element.find('.holder'))($scope.$new());
+    }
+
+    $scope.$watch('id', renderPlayerComponent);
+    $scope.$watch('componentType', renderPlayerComponent);
 
     $scope.id = $scope.id || 2;
 
@@ -66,17 +102,22 @@ var Placeholder = function($rootScope) {
       id: '@'
     },
     template: [
-      '<div class="component-placeholder" ng-class="[componentType,selectedClass]" data-component-id="{{id}}">',
-      '  <div class="inner-placeholder">{{label}}',
-      '    <div class="delete-icon">',
+      '<div class="component-placeholder"',
+      ' ng-class="[componentType,selectedClass]" ',
+      '  data-component-id="{{id}}">',
+      '  <div class="blocker">',
+      '     <div class="title">Double Click to Edit</div>',
+      '     <div class="delete-icon">',
       '      <i ng-click="deleteNode()" class="fa fa-times-circle"></i>',
       '    </div>',
       '  </div>',
+      '  <div class="holder"></div>',
       '</div>'
     ].join('\n')
   };
 };
 
-angular.module('corespring-editor.directives').directive('placeholder', ['$rootScope',
+angular.module('corespring-editor.directives').directive('placeholder', ['$rootScope', '$compile', '$log', 'ComponentRegister',
   Placeholder
+
 ]);
