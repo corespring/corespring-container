@@ -58,7 +58,7 @@ trait Main extends Controller {
   def createItem = Action {
     request =>
       val json = Json.obj(
-        "xhtml" -> "<div>Item body goes here...</div>",
+        "xhtml" -> "<div></div>",
         "components" -> Json.obj(),
         "profile" -> Json.obj(
           "taskInfo" -> Json.obj(
