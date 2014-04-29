@@ -23,6 +23,7 @@ var controller = function($scope, ComponentRegister, PlayerService) {
     $scope.session = data.session;
     $scope.outcome = data.outcome;
     $scope.score = data.score;
+    ComponentRegister.setEditable(false);
   };
 
   $scope.onSessionSaveError = function(error) {};
@@ -34,6 +35,8 @@ var controller = function($scope, ComponentRegister, PlayerService) {
   $scope.resetPreview = function() {
     ComponentRegister.reset();
     $scope.session.isComplete = false;
+    $scope.score = undefined;
+    ComponentRegister.setEditable(true);
   };
 };
 
