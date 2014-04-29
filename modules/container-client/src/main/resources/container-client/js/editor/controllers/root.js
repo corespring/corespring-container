@@ -30,7 +30,9 @@ var controller = function($scope, $rootScope, $log, $location, $state, $timeout,
     function deleteSupportingMaterial(index) {
       $scope.data.item.supportingMaterials.splice(index, 1);
       if (index > 0) {
-        $state.transitionTo('supporting-material', {index: index - 1});
+        $state.transitionTo('supporting-material', {
+          index: index - 1
+        });
       } else {
         $state.transitionTo('supporting-materials');
       }
@@ -88,6 +90,17 @@ var controller = function($scope, $rootScope, $log, $location, $state, $timeout,
 
   $scope.$on('$locationChangeSuccess', function() {
     updateNavBindings();
+  });
+
+  $scope.$on('open-config-panel', function() {
+
+    if (!$location.search().hideLeftNav) {
+      $scope.toggleLeftNav();
+    }
+
+    if ($location.search().hidePreview) {
+      $scope.togglePreview();
+    }
   });
 
   function updateNavBindings() {
@@ -168,7 +181,9 @@ var controller = function($scope, $rootScope, $log, $location, $state, $timeout,
   };
 
   $scope.deleteSupportingMaterial = function(index) {
-    $rootScope.$broadcast('deleteSupportingMaterial', { index: index });
+    $rootScope.$broadcast('deleteSupportingMaterial', {
+      index: index
+    });
   };
 
   DataQueryService.list("gradeLevel", function(result) {
@@ -180,7 +195,7 @@ var controller = function($scope, $rootScope, $log, $location, $state, $timeout,
     $scope.itemTypeValues = toListOfValues($scope.itemTypeDataProvider);
   });
 
-  function toListOfValues(listOfObjects){
+  function toListOfValues(listOfObjects) {
     return _.chain(listOfObjects)
       .pluck("value")
       .flatten()
