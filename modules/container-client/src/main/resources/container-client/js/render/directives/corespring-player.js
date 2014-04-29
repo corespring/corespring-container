@@ -112,6 +112,10 @@ angular.module('corespring-player.directives').directive('corespringPlayer', [
           getComponentById(id).parent().addClass('selected');
           $scope.selectedComponentId = id;
           $scope.$apply();
+
+          if ($('.component-container.selected').size() > 0) {
+            $('.component-container.selected')[0].scrollIntoView();
+          }
         } else {
           $log.error('Could not find component-container for id = ' + id);
         }

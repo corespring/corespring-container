@@ -59,6 +59,9 @@
             '<' + componentType + '-config id="' + $node.attr('id') + '"></' + componentType + '-config>',
             '</div>'
           ].join('\n');
+
+          $scope.$emit('open-config-panel');
+
           editor.showEditPane(data, getTitle(component), content, function() {
             $log.debug('on update...');
           }, {}, function() {
