@@ -49,14 +49,7 @@ angular.module('corespring-player.services').factory('ComponentRegister', ['$log
         setAndApplyToComponents(allData, "dataAndSession", "setDataAndSession");
       };
 
-
-      /*this.setData = function(data) {
-        setAndApplyToComponents(data, "data", function(component, data) {
-          component.setModel(data.model);
-        });
-      };*/
-
-      this.setComponentSessions = function(sessions) {
+      this.stringertsComponentSessions = function(sessions) {
         setAndApplyToComponents(sessions, "sessions", "setSession");
       };
 
@@ -136,41 +129,17 @@ angular.module('corespring-player.services').factory('ComponentRegister', ['$log
        */
       var setAndApplyToComponents = function(value, name, cb) {
 
-        if (typeof(cb) === "string") {
-          var functionName = cb;
-          cb = function(comp, value) {
-
-            if (comp[functionName]) {
-              comp[functionName](value);
-            }
-          };
-        }
-
         if (!value) {
-          throw new Error("No answers for: " + name);
+          throw new Error("No data for: " + name);
         }
 
         loaded[name] = value;
 
         if (components) {
-          $.each(components, setData(loaded[name], cb));
+          $.each(components, function(id, component) {
+            component[cb](loaded[name][id]);
+          });
         }
-      };
-
-      var setData = function(data, cb) {
-        return _applyValue(data, cb);
-      };
-
-      var _applyValue = function(dataHolder, applyFn) {
-        return function(id, component) {
-          if (!dataHolder || !components) {
-            return;
-          }
-          var componentData = dataHolder[id];
-          if (componentData) {
-            applyFn(component, angular.copy(componentData));
-          }
-        };
       };
 
     };
