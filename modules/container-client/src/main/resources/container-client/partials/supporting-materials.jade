@@ -15,10 +15,10 @@ script#supporting-materials(type='text/ng-template')
           .option.file
             a.file-header(ng-click='createText()')
               | Compose New Document
-              img(src='/client/images/file-icon.png')
+              img(src='../../images/file-icon.png')
           p.or or
           .option.pdf
             label.pdf-header
               | Upload PDF
-              img(src='/client/images/pdf-icon.png')
-            input(type='file', ng-disabled='!enableOptions', onchange="angular.element(this).scope().uploadFile()")
+              img(src='../../images/pdf-icon.png')
+            input(type='file', ng-disabled='!enableOptions', fileChange)

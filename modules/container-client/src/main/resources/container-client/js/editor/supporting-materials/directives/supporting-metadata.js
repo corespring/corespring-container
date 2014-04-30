@@ -28,7 +28,8 @@
 
       link: function($scope) {
 
-        $scope.materialTypes = ['Rubric', 'Student Work', otherType];
+        $scope.materialTypes = ['Proctor Materials', 'Rubric', 'Scoring Guide', 'Student Materials',
+          'Student Work Examples', otherType];
 
         function isOther() {
           return $scope.materialTypeProxy === otherType;

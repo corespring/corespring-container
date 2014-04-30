@@ -179,7 +179,7 @@ angular.module('corespring-catalog.directives').directive('catalogview', [ '$sce
     '    text-align: center;',
     '  }',
     '  .catalog-tabbed-content.profile .blooms-taxonomy {',
-    '    background-image: url("/client/images/blooms-taxonomy-bg.png");',
+    '    background-image: url("../../images/blooms-taxonomy-bg.png");',
     '  }',
     '  .catalog-tabbed-content.profile .blooms-taxonomy .value, .catalog-tabbed-content.profile .depth-of-knowledge .value {',
     '    font-weight: bold;',
@@ -204,7 +204,7 @@ angular.module('corespring-catalog.directives').directive('catalogview', [ '$sce
     '    margin-left: -26px;',
     '  }',
     '  .catalog-tabbed-content.profile .depth-of-knowledge {',
-    '    background-image: url("/client/images/depth-of-knowledge-bg.png");',
+    '    background-image: url("../../images/depth-of-knowledge-bg.png");',
     '  }',
     '  .catalog-tabbed-content.profile .key-skills {',
     '    max-width: 300px;',
@@ -242,7 +242,7 @@ angular.module('corespring-catalog.directives').directive('catalogview', [ '$sce
     '    display: block;',
     '  }',
     '  .catalog-tabbed-content.profile .copyright-year {',
-    '    background: url("/client/images/calendar-icon.png") no-repeat center bottom;',
+    '    background: url("../../images/calendar-icon.png") no-repeat center bottom;',
     '    height: 120px;',
     '    margin: 0;',
     '    text-align: center;',
@@ -296,7 +296,7 @@ angular.module('corespring-catalog.directives').directive('catalogview', [ '$sce
       '      </li>',
       '      <li class="catalog-print-preview-tab">',
       '        <a ng-click="print()">',
-      '          <img src="/client/images/print.png"/>',
+      '          <img src="../../images/print.png"/>',
       '        </a>',
       '      </li>',
       '    </ul>',
@@ -446,7 +446,7 @@ angular.module('corespring-catalog.directives').directive('catalogview', [ '$sce
       };
 
       function licenseTypeUrl(licenseType) {
-        return licenseType ? "/assets/images/licenseTypes/" + licenseType.replace(" ", "-") + ".png" : undefined;
+        return licenseType ? "../../images/licenseTypes/" + licenseType.replace(" ", "-") + ".png" : undefined;
       }
 
       function printUrl() {
