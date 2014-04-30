@@ -40,7 +40,6 @@ angular.module('corespring-editor.directives').directive('componentWeights', [
           compSize = _.size($scope.components);
         }
       });
-
     }
 
     function addWeights(acc, comp) {
@@ -79,7 +78,6 @@ angular.module('corespring-editor.directives').directive('componentWeights', [
       controller: controller,
       template: [
         '  <form class="form-horizontal">',
-        //'    <span component-id="compId" component="comp" ng-repeat="(compId,comp) in sortedComponents">{{compId}}</span>',
         '    <component-weight-input component-id="idAndComp.id" ng-model="idAndComp.component" ng-repeat="idAndComp in sortedComponents"/>',
         '  </form>'
       ].join('\n'),
@@ -93,10 +91,6 @@ angular.module('corespring-editor.directives').directive('componentWeights', [
 ]);
 
 
-/**
-  component-weighter(ng-model="component")
-*/
-
 angular.module('corespring-editor.directives').directive('componentWeightInput', [
   '$log', '$timeout',
   function($log, $timeout) {
@@ -104,14 +98,7 @@ angular.module('corespring-editor.directives').directive('componentWeightInput',
     function link($scope, $element, $attrs, ComponentWeights) {
       var log = $log.debug.bind($log, '[component-weighter] -');
 
-      log('!', $scope.component);
-
       $scope.uid = 'component-weight-input-id-' + $scope.componentId;
-
-      log('component id: ', $scope.componentId);
-      log('component: ', $scope.component);
-
-      log($scope.uid);
 
       $scope.getPercentage = function(weight) {
         return ComponentWeights.getPercentage(weight);
