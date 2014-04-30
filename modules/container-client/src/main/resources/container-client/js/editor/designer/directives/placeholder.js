@@ -108,7 +108,7 @@ var Placeholder = function($rootScope, $compile, $log, ComponentRegister) {
       '  <div class="blocker">',
       '     <div class="bg"></div>',
       '     <div class="content">',
-      '       <div class="title">Double Click to Edit</div>',
+      '       <div class="title">Double Click to Configure</div>',
       '     </div>',
       '     <div class="delete-icon">',
       '      <i ng-click="deleteNode()" class="fa fa-times-circle"></i>',
