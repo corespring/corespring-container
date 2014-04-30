@@ -461,8 +461,10 @@
       isFormActive = true;
     }
 
-    $scope.$watch('item', function() {
-      onLoadItemSuccess();
+    $scope.$watch('item', function(newValue) {
+      if(newValue && newValue.profile) {
+        onLoadItemSuccess();
+      }
     });
 
     $scope.$on('itemLoaded', function(ev, item) {
