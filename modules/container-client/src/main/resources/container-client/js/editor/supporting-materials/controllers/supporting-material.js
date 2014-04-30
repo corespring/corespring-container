@@ -7,6 +7,7 @@ var controller = function(
   $state,
   $log,
   $filter,
+  $location,
   SupportingMaterialsService,
   ItemService,
   ImageUtils,
@@ -213,6 +214,13 @@ var controller = function(
     $scope.supportingMaterialFile = getSupportingMaterialFile();
     $scope.supportingMarkup = $scope.getSupportingMaterialMarkup();
     $scope.materialType = getSupportingMaterialType();
+
+    if ($scope.isContentType('text/html')) {
+      $location.search('hidePreview', true);
+    } else {
+      $location.search('hidePreview', null);
+    }
+
   };
 
   $scope.init();
@@ -227,6 +235,7 @@ angular.module('corespring-editor.controllers')
     '$state',
     '$log',
     '$filter',
+    '$location',
     'SupportingMaterialsService',
     'ItemService',
     'ImageUtils',
