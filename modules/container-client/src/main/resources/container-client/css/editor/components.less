@@ -33,11 +33,28 @@
   position: relative;
 
   .blocker{
+
+    .content{
+      display: inline-flex;     
+      align-items: center;
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      .title{
+        width: 100%;
+        text-align: center;
+        color: @grey-purple;
+        text-shadow: 2px 1px 2px rgba(255, 255, 255, 1);
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow-x: hidden;
+        .user-select(none);
+      }
+    }
+
     background-color: none;
-    text-align: center;     
-    vertical-align: middle;     
-    display: inline-flex;     
-    align-items: center;
     position: absolute;
     height: 100%;
     width: 100%;
@@ -49,22 +66,12 @@
 
     .bg{
       background-color: white;
-      opacity: 0.7;
+      opacity: 0.65;
       position: absolute;
       left: -2px;
       top: -2px;
       bottom: -2px;
       right: -2px;
-    }
-    .title{
-      width: 100%;
-      text-align: center;
-      color: @grey-purple;
-      text-shadow: 2px 1px 2px rgba(255, 255, 255, 1);
-      white-space: nowrap;
-      text-overflow: ellipsis;
-      overflow-x: hidden;
-      .user-select(none);
     }
 
     &:hover{
