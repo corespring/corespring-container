@@ -1,8 +1,10 @@
-var controller = function($scope, $rootScope, $log, $location, $state, $timeout, DataQueryService, ItemService, ItemIdService, NavModelService, SupportingMaterialsService) {
+var controller = function($scope, $rootScope, $log, $location, $state, $timeout, $stateParams, DataQueryService, ItemService, ItemIdService, NavModelService, SupportingMaterialsService) {
 
   var navSetOnce = false;
 
   $scope.nav = NavModelService;
+
+
 
   var log = $log.debug.bind($log, '[root] -');
 
@@ -13,10 +15,16 @@ var controller = function($scope, $rootScope, $log, $location, $state, $timeout,
     item: {}
   };
 
-  $rootScope.$on('$stateChangeSuccess', function() {
+  $rootScope.$on('$stateChangeSuccess', function(event, state, params) {
     function isOverview() {
       return $scope.isActive('overview') || $scope.isActive('overview-profile') ||
         supportingMaterialIndex('overview-supporting-material') >= 0;
+    }
+
+    log('scs:', arguments);
+
+    if (params.section !== 'main') {
+      $scope.showDesignOptions = true;
     }
 
     if (isOverview()) {
@@ -236,6 +244,7 @@ angular.module('corespring-editor.controllers')
     '$location',
     '$state',
     '$timeout',
+    '$stateParams',
     'DataQueryService',
     'ItemService',
     'ItemIdService',

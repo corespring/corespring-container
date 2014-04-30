@@ -7,14 +7,16 @@ angular.module('corespring-player.directives').directive('corespringPlayer', [
   'MathJaxService',
   function($rootScope, $compile, $log, ComponentRegister, PlayerUtils, MathJaxService) {
 
-    // TODO: Stop using id attributes for this!
-    function getComponentById(id) {
-      return $(_.find($('#body #' + id), function(el) {
-        return !$(el).is('span');
-      }));
-    }
 
     var link = function($scope, $elem) {
+
+      // TODO: Stop using id attributes for this!
+      function getComponentById(id) {
+        return $(_.find($elem.find('#' + id), function(el) {
+          return !$(el).is('span');
+        }));
+      }
+
 
       var rendered = false;
       $scope.selectedComponentId = undefined;
@@ -30,7 +32,6 @@ angular.module('corespring-player.directives').directive('corespringPlayer', [
 
         _(ComponentRegister.components).keys().each(function(id) {
           var $container = $("<div class='component-container'/>");
-          console.log($rootScope.selectedComponentId);
           if (parseInt(id, 10) === $rootScope.selectedComponentId) {
             $container.addClass('selected');
           }

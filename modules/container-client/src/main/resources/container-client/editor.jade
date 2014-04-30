@@ -13,12 +13,12 @@ block content
 
       ul.nav.nav-stacked
 
-        li.nav-subheader(ng-class="{ active: isActive('design') }")
+        li.nav-subheader(ui-sref-active="active")
           a(ui-sref="design({section: 'main'})") Design 
           a.collapsable(ng-click="toggleDesignOptions()", ng-class="{expanded: showDesignOptions}")
           ul.nav.nav-subitems(ng-show="showDesignOptions")
-            li.nav-subitem
-              a.subitem-link.weighting(ui-sref="design({section: 'weighting'})") Weighting 
+            li.nav-subitem(ui-sref-active="active")
+              a.subitem-link.weighting(ui-sref="design({section: 'weighting'})" ) Weighting 
 
         li(ng-class="{ active: isActive('item-profile') }")
           a(ui-sref="item-profile") Item Profile
