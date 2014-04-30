@@ -13,11 +13,14 @@ script#designer(type="text/ng-template")
             button(ng-click="closePane()", class="btn btn-sm btn-success", style="float:right;") Done
 
     .weighting-container(ng-show="section == 'weighting'")
-      h1 weighting-container 
 
-      .title
+      h4.title
         | You can assign specific weights to each part of this item (optional):
 
       .container(style="max-width: 700px;")
-        component-weights
-          component-weighter(ng-repeat="(compId,comp) in data.item.components", component-id="compId", ng-model="comp") 
+        component-weights(
+          ng-model="data.item.components"
+          component-set="componentSet")
+          component-weight-input(
+            ng-repeat="(compId,comp) in data.item.components", 
+            component-id="compId", ng-model="comp") 
