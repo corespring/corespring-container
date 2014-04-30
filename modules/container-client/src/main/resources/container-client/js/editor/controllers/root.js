@@ -24,6 +24,8 @@ var controller = function($scope, $rootScope, $log, $location, $state, $timeout,
     } else {
       $scope.showOverview = false;
     }
+
+    $scope.showSupportingMaterials = supportingMaterialIndex() !== undefined;
   });
 
 
