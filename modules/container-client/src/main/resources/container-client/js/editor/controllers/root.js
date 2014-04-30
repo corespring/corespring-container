@@ -221,13 +221,11 @@ var controller = function($scope, $rootScope, $log, $location, $state, $timeout,
     if($scope.data.item){
       $scope.$broadcast('itemLoaded', $scope.data.item);
     } else {
-      log.warn("item not loaded?")
+      log.warn("item not loaded?");
     }
   });
 
   ItemService.load($scope.onItemLoaded, $scope.onItemLoadError, $scope.itemId);
-
-
 
   updateNavBindings();
 
