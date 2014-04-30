@@ -130,6 +130,9 @@ var controller = function($scope, $rootScope, $log, $location, $state, $timeout,
   };
 
   $rootScope.$on('$stateChangeSuccess', function() {
+    if ($scope.isActive('design')) {
+      $location.search('hidePreview', true);
+    }
     $scope.showPreviewButton = previewable();
   });
 
