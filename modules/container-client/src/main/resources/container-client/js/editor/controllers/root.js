@@ -4,7 +4,7 @@ var controller = function($scope, $rootScope, $log, $location, $state, $timeout,
 
   $scope.nav = NavModelService;
 
-  var log = $log.debug.bind($log, '[root] -');
+  var log = $log.debug.bind($log, '[editor root] -');
 
   /** Root data holder for all controllers */
   $scope.data = {
@@ -217,7 +217,17 @@ var controller = function($scope, $rootScope, $log, $location, $state, $timeout,
       .value();
   }
 
+  $scope.$on('loadItem', function(){
+    if($scope.data.item){
+      $scope.$broadcast('itemLoaded', $scope.data.item);
+    } else {
+      log.warn("item not loaded?")
+    }
+  });
+
   ItemService.load($scope.onItemLoaded, $scope.onItemLoadError, $scope.itemId);
+
+
 
   updateNavBindings();
 
