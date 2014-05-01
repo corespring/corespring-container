@@ -26,7 +26,9 @@
     "wiggi-wiz": "https://github.com/corespring/wiggi-wiz.git#master",
     "es5-shim": "~2.3.0",
     "font-awesome": "~4.0.3",
-    "mathjax": "https://github.com/mathjax/MathJax.git"
+    "mathjax": "https://github.com/mathjax/MathJax.git",
+    "bootstrap-multiselect": "0.9.4",
+    "angular-dragdrop": "https://github.com/corespring/angular-dragdrop.git"
   },
   "devDependencies": {
     "angular-mocks": "~1.2.12",
