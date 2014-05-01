@@ -47,27 +47,5 @@ describe('componentWeights', function() {
       assertPercent(elem, '2', '66%');
       console.log(elem.html());
     });
-
-    it('should', function() {
-
-
-
-    });
-
   });
-
-  /*describe('input', function() {
-
-
-    it('should init', function() {
-
-      var elem = $compile('<component-weight-input></component-weight-input>')($scope);
-      var fooController = elem.controller('componentWeights');
-      spyOn(fooController, 'add').andReturn(3);
-
-      var barElement = angular.element('<bar x="1" y="2"></bar>')
-      fooElement.append(barElement);
-    });
-  });*/
-
 });
