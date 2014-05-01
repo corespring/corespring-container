@@ -13,7 +13,7 @@
     "angular-ui-select2": "~0.0.5",
     "angular-bootstrap": "~0.10.0",
     "angular-ui-router": "0.2.10",
-    "jquery": "1.10.2",
+    "jquery": "1.11.0",
     "saxjs": "https://github.com/isaacs/sax-js.git",
     "bootstrap": "~3.1.0",
     "lodash": "~2.4.1",
@@ -26,7 +26,9 @@
     "wiggi-wiz": "https://github.com/corespring/wiggi-wiz.git#master",
     "es5-shim": "~2.3.0",
     "font-awesome": "~4.0.3",
-    "mathjax": "https://github.com/mathjax/MathJax.git"
+    "mathjax": "https://github.com/mathjax/MathJax.git",
+    "bootstrap-multiselect": "0.9.4",
+    "angular-dragdrop": "https://github.com/corespring/angular-dragdrop.git"
   },
   "devDependencies": {
     "angular-mocks": "~1.2.12",
@@ -60,6 +62,7 @@
   },
   "resolutions": {
     "angular": "~1.2.12",
-    "bootstrap": "~3.1.1"
+    "bootstrap": "~3.1.1",
+    "jquery": "1.11.0"
   }
 }
