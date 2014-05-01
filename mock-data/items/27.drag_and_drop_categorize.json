@@ -42,13 +42,15 @@
         "categories": [
           {
             "id": "cat_1",
+            "hasLabel": true,
             "label": "Category 1",
-            "orientation": "horizontal"
+            "layout": "horizontal"
           },
           {
             "id": "cat_2",
+            "hasLabel": true,
             "label": "Category 2",
-            "orientation": "vertical"
+            "layout": "vertical"
           }
         ],
         "choices": [
