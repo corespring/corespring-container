@@ -6,7 +6,7 @@ angular.module('corespring-editor.directives').directive('componentWeights', [
 
     function link($scope, $element) {
 
-      var compSize = $scope.components ? _.size($scope.components) : 0;
+      var compSize = _.size($scope.components);
 
       function updateSortedComponent() {
 
