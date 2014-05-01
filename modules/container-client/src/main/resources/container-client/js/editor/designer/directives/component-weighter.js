@@ -167,7 +167,7 @@ angular.module('corespring-editor.directives').directive('componentWeightInput',
       replace: true,
       require: '^componentWeights',
       template: [
-        ' <form name="weightForm">',
+        ' <form class="weight-form" name="weightForm">',
         '  <div class="form-group" ng-click="selectComponent()" ng-class="{\'has-error\': weightForm.input.$error.number}">',
         '    <label class="control-label col-sm-5" for="{{uid}}">{{getTitle(component.componentType)}} is worth</label>',
         '    <div class="col-sm-4">',
