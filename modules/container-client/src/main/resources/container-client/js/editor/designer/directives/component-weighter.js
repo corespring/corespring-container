@@ -14,7 +14,7 @@ angular.module('corespring-editor.directives').directive('componentWeights', [
           return;
         }
 
-        var ids = _.map($($scope.markup).filter('[id]'), function(n) {
+        var ids = _.map($($scope.markup).find('[id]'), function(n) {
           return $(n).attr('id');
         });
 
@@ -126,9 +126,9 @@ angular.module('corespring-editor.directives').directive('componentWeightInput',
       template: [
         '  <div class="form-group" ng-click="selectComponent()">',
         '    <label class="control-label col-sm-5" for="{{uid}}">{{getTitle(component.componentType)}} is worth</label>',
-        '    <div class="col-sm-3">',
+        '    <div class="col-sm-4">',
         '      <div class="input-group">',
-        '        <input id="{{uid}}" type="text" class="form-control" ng-model="component.weight"></input>',
+        '        <input id="{{uid}}" ng-focus="selectComponent()" type="number" class="form-control" ng-model="component.weight"></input>',
         '        <span class="input-group-addon">pts</span>',
         '        <span class="input-group-addon" style="width: 52px;">{{getPercentage(component.weight)}}%</span>',
         '    </div>',

@@ -12,7 +12,7 @@ angular.module('corespring-player.directives').directive('corespringPlayer', [
 
       // TODO: Stop using id attributes for this!
       function getComponentById(id) {
-        return $(_.find($elem.find('#' + id), function(el) {
+        return $(_.find($('corespring-player #' + id), function(el) {
           return !$(el).is('span');
         }));
       }

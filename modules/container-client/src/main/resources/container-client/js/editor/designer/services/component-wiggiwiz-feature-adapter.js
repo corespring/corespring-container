@@ -40,6 +40,7 @@
         compile: true,
         deleteNode: function($node, services) {
           deleteComponentCallback($node.attr('id'));
+          console.log('delete node: ', $node.attr('id'));
           $node.remove();
         },
         initialise: function($node, replaceWith) {
