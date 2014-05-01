@@ -4,9 +4,7 @@ var controller = function($scope, $rootScope, $log, $location, $state, $timeout,
 
   $scope.nav = NavModelService;
 
-
-
-  var log = $log.debug.bind($log, '[root] -');
+  var log = $log.debug.bind($log, '[editor root] -');
 
   /** Root data holder for all controllers */
   $scope.data = {
@@ -32,6 +30,8 @@ var controller = function($scope, $rootScope, $log, $location, $state, $timeout,
     } else {
       $scope.showOverview = false;
     }
+
+    $scope.showSupportingMaterials = supportingMaterialIndex() !== undefined;
   });
 
 
@@ -138,6 +138,9 @@ var controller = function($scope, $rootScope, $log, $location, $state, $timeout,
   };
 
   $rootScope.$on('$stateChangeSuccess', function() {
+    if ($scope.isActive('design')) {
+      $location.search('hidePreview', true);
+    }
     $scope.showPreviewButton = previewable();
   });
 
@@ -225,6 +228,14 @@ var controller = function($scope, $rootScope, $log, $location, $state, $timeout,
       .flatten()
       .value();
   }
+
+  $scope.$on('loadItem', function() {
+    if ($scope.data.item) {
+      $scope.$broadcast('itemLoaded', $scope.data.item);
+    } else {
+      log.warn("item not loaded?");
+    }
+  });
 
   ItemService.load($scope.onItemLoaded, $scope.onItemLoadError, $scope.itemId);
 

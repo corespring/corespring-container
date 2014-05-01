@@ -13,12 +13,8 @@ script#supporting-materials(type='text/ng-template')
 
         .options(ng-class="{disabled: !enableOptions}")
           .option.file
-            a.file-header(ng-click='createText()')
-              | Compose New Document
-              img(src='../../images/file-icon.png')
+            a.file-header(ng-click='createText()') Compose New Document
           p.or or
           .option.pdf
-            label.pdf-header
-              | Upload PDF
-              img(src='../../images/pdf-icon.png')
+            label.pdf-header Upload PDF
             input(type='file', ng-disabled='!enableOptions', fileChange)

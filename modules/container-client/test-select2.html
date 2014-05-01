@@ -1,0 +1,75 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>Test Select 2</title>
+
+
+  <style type="text/css" media="screen">
+    body {
+      overflow: hidden;
+    }
+
+    #editor {
+      margin: 0;
+      position: relative;
+      height: 100%;
+    }
+    #wiggi {
+      margin: 0;
+      position: relative;
+      height: 100%;
+      width: 100%;
+    }
+  </style>
+</head>
+
+<body ng-app="example-app" ng-controller="Main">
+
+<row>
+  <div class="col-md-2">
+  </div>
+  <div class="col-md-4">
+    <wiggi-wiz id="wiggi" ng-model="xhtml"/>
+  </div>
+  <div class="col-md-4">
+    <pre id="editor">function foo(items) {
+        var i;
+        for (i = 0; i &lt; items.length; i++) {
+            alert("Ace Rocks " + items[i]);
+        }
+    }</pre>
+  </div>
+  <div class="col-md-2">
+  </div>
+</row>
+
+<script src="target/scala-2.10/classes/container-client/bower_components/jquery/jquery.js"></script>
+<script src="target/scala-2.10/classes/container-client/bower_components/lodash/dist/lodash.js"
+        type="text/javascript" charset="utf-8"></script>
+<script src="target/scala-2.10/classes/container-client/bower_components/angular/angular.js"
+        type="text/javascript" charset="utf-8"></script>
+<script src="target/scala-2.10/classes/container-client/bower_components/angular-bootstrap/ui-bootstrap.js"
+        type="text/javascript" charset="utf-8"></script>
+<script src="target/scala-2.10/classes/container-client/bower_components/bootstrap/dist/js/bootstrap.js"
+        type="text/javascript" charset="utf-8"></script>
+<script src="target/scala-2.10/classes/container-client/bower_components/ace-builds/src-noconflict/ace.js"
+        type="text/javascript" charset="utf-8"></script>
+<script src="target/scala-2.10/classes/container-client/bower_components/wiggi-wiz/dist/wiggi-wiz.js"
+        type="text/javascript"></script>
+
+<script>
+  var editor = ace.edit("editor");
+  editor.getSession().setMode("ace/mode/javascript");
+
+  angular.module('example-app', ['corespring.wiggi-wiz']);
+
+  angular.module('example-app').controller('Main', ['$scope',
+    function($scope) {
+      $scope.xhtml = '<div> hello</div><color-box color="00ff00"></color-box>';
+    }
+  ]);
+</script>
+
+</body>
+</html>
