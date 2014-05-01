@@ -34,11 +34,16 @@ describe('designer controller', function() {
 
   function mockComponentRegister() {}
 
+  function mockStateParams() {
+    this.section = '';
+  }
+
   beforeEach(angular.mock.module('corespring-editor.controllers'));
 
   beforeEach(function() {
     module(function($provide) {
       $provide.value('$modal', new mockModal());
+      $provide.value('$stateParams', new mockStateParams());
       $provide.value('DesignerService', new mockDesignerService());
       $provide.value('ItemService', new mockItemService());
       $provide.value('PlayerService', new mockPlayerService());

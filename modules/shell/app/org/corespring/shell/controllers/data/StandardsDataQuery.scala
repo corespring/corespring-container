@@ -46,7 +46,7 @@ object StandardsDataQuery {
         fieldList <- fields
       } yield fieldList.exists(
           field => (s \ field).asOpt[String]
-            .map(s => s.contains(term))
+            .map(s => s.toLowerCase().contains(term.toLowerCase()))
             .getOrElse(false))
         ).getOrElse(true)
 

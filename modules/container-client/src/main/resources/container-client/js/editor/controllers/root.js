@@ -1,10 +1,10 @@
-var controller = function($scope, $rootScope, $log, $location, $state, $timeout, DataQueryService, ItemService, ItemIdService, NavModelService, SupportingMaterialsService) {
+var controller = function($scope, $rootScope, $log, $location, $state, $timeout, $stateParams, DataQueryService, ItemService, ItemIdService, NavModelService, SupportingMaterialsService) {
 
   var navSetOnce = false;
 
   $scope.nav = NavModelService;
 
-  var log = $log.debug.bind($log, '[root] -');
+  var log = $log.debug.bind($log, '[editor root] -');
 
   /** Root data holder for all controllers */
   $scope.data = {
@@ -13,10 +13,16 @@ var controller = function($scope, $rootScope, $log, $location, $state, $timeout,
     item: {}
   };
 
-  $rootScope.$on('$stateChangeSuccess', function() {
+  $rootScope.$on('$stateChangeSuccess', function(event, state, params) {
     function isOverview() {
       return $scope.isActive('overview') || $scope.isActive('overview-profile') ||
         supportingMaterialIndex('overview-supporting-material') >= 0;
+    }
+
+    log('scs:', arguments);
+
+    if (params.section !== 'main') {
+      $scope.showDesignOptions = true;
     }
 
     if (isOverview()) {
@@ -24,6 +30,8 @@ var controller = function($scope, $rootScope, $log, $location, $state, $timeout,
     } else {
       $scope.showOverview = false;
     }
+
+    $scope.showSupportingMaterials = supportingMaterialIndex() !== undefined;
   });
 
 
@@ -34,7 +42,7 @@ var controller = function($scope, $rootScope, $log, $location, $state, $timeout,
   $scope.$on('deleteSupportingMaterial', function(event, data) {
     function deleteSupportingMaterial(index) {
       $scope.data.item.supportingMaterials.splice(index, 1);
-        ItemService.save({
+      ItemService.save({
           supportingMaterials: $scope.data.item.supportingMaterials
         },
         function() {
@@ -130,6 +138,9 @@ var controller = function($scope, $rootScope, $log, $location, $state, $timeout,
   };
 
   $rootScope.$on('$stateChangeSuccess', function() {
+    if ($scope.isActive('design')) {
+      $location.search('hidePreview', true);
+    }
     $scope.showPreviewButton = previewable();
   });
 
@@ -152,6 +163,10 @@ var controller = function($scope, $rootScope, $log, $location, $state, $timeout,
 
   $scope.toggleSupportingMaterials = function() {
     $scope.showSupportingMaterials = !$scope.showSupportingMaterials;
+  };
+
+  $scope.toggleDesignOptions = function() {
+    $scope.showDesignOptions = !$scope.showDesignOptions;
   };
 
   $scope.toggleOverview = function() {
@@ -214,6 +229,14 @@ var controller = function($scope, $rootScope, $log, $location, $state, $timeout,
       .value();
   }
 
+  $scope.$on('loadItem', function() {
+    if ($scope.data.item) {
+      $scope.$broadcast('itemLoaded', $scope.data.item);
+    } else {
+      log.warn("item not loaded?");
+    }
+  });
+
   ItemService.load($scope.onItemLoaded, $scope.onItemLoadError, $scope.itemId);
 
   updateNavBindings();
@@ -232,6 +255,7 @@ angular.module('corespring-editor.controllers')
     '$location',
     '$state',
     '$timeout',
+    '$stateParams',
     'DataQueryService',
     'ItemService',
     'ItemIdService',

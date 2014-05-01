@@ -13,13 +13,7 @@
   function ItemProfileController($log, $scope, DataQueryService, ItemService, StandardQueryCreator) {
 
     var isFormActive = false;
-
     var log = $log.debug.bind($log, 'ItemProfileController] -');
-
-    $scope.uiModel = {
-      isOtherReviewsPassedSelected: false,
-      needAdditionalCopyrightInformation: ''
-    };
 
     //----------------------------------------------------------------
     // Standards start
@@ -32,10 +26,6 @@
      * The selected values are used as filters for the select2 search field
      */
 
-    $scope.$watch('taskInfo.standards', function (newValue, oldValue) {
-      log("taskInfo.standards", newValue);
-    });
-
     $scope.standardsOptions = [];
 
     DataQueryService.list("standardsTree", function (result) {
@@ -46,50 +36,57 @@
       return JSON.stringify(
         StandardQueryCreator.createStandardQuery(
           searchText,
-          $scope.standardAdapter.subjectOption,
-          $scope.standardAdapter.categoryOption,
-          $scope.standardAdapter.subCategoryOption));
+          $scope.standardsAdapter.subjectOption,
+          $scope.standardsAdapter.categoryOption,
+          $scope.standardsAdapter.subCategoryOption));
     }
 
-    $scope.standardAdapter = {
+    $scope.$watch('profile.standards', function (newValue, oldValue) {
+      log("profile.standards", newValue);
+    });
+
+    $scope.standardsAdapter = {
       subjectOption: {},
       categoryOption: {},
       subCategoryOption: {},
-      tags: true,
+      tags: [],
       allowClear: true,
       minimumInputLength: 1,
       placeholder: "Choose a standard",
       id: function (item) {
-        log("standardAdapter id", item._id);
-        return item._id.$oid;
+        return item.id;
       },
       query: function (query) {
-        log("standardAdapter query", query);
         DataQueryService.query("standards", createStandardQuery(query.term), function (results) {
           query.callback({results: results});
         });
+      },
+      initSelection: function (element, callback) {
+        var val = $(element).val();
+        var ids = val.split(',');
+        var results = [];
+        ids.forEach(function (id) {
+          findItemById("standards", id, function (item) {
+            results.push(item);
+            if (results.length === ids.length) {
+              callback(results);
+            }
+          });
+        });
+      },
+      formatSelection: function (standard) {
+        setTimeout(function () {
+          $(".standard-adapter-result").tooltip();
+        }, 500);
+        return "<span class='standard-adapter-result' data-title='" + standard.standard + "'>" + standard.dotNotation + "</span>";
+      },
+      formatResult: function (standard) {
+        return "<blockquote>" +
+          '<p>' + standard.standard + '</p>' +
+          '<small>' + standard.dotNotation + ', ' + standard.subject + ', ' + standard.subCategory + '</small>' +
+          '<small>' + standard.category + '</small>' +
+          '</blockquote>';
       }
-    };
-
-    $scope.standardAdapter.valueSetter = function (newItem) {
-      log("standardAdapter.valueSetter", newItem);
-      $scope.taskInfo.standards.push(newItem);
-    };
-
-    $scope.standardAdapter.formatSelection = function (standard) {
-      setTimeout(function () {
-        $(".standard-adapter-result").tooltip();
-      }, 500);
-      return "<span class='standard-adapter-result' data-title='" + standard.standard + "'>" + standard.dotNotation + "</span>";
-    };
-
-    $scope.standardAdapter.formatResult = function (standard) {
-      var markup = "<blockquote>";
-      markup += '<p>' + standard.standard + '</p>';
-      markup += '<small>' + standard.dotNotation + ', ' + standard.subject + ', ' + standard.subCategory + '</small>';
-      markup += '<small>' + standard.category + '</small>';
-      markup += '</blockquote>';
-      return markup;
     };
 
 
@@ -99,7 +96,7 @@
 
     $scope.queryResults = {};
 
-    function findSubject(topic, id, callback) {
+    function findItemById(topic, id, callback) {
       var local = _.find($scope.queryResults[topic], function (r) {
         return r.id === id;
       });
@@ -140,12 +137,11 @@
       };
 
       this.initSelection = function (element, callback) {
-
         log("init selection:", element, callback);
         var val = that.elementToVal(element);
         log("val:", val);
 
-        findSubject(topic, val, function (s) {
+        findItemById(topic, val, function (s) {
           return callback(s);
         });
       };
@@ -288,10 +284,10 @@
           return item.selected && item.key === 'Other';
         });
       }
-      if ($scope.uiModel.isOtherReviewsPassedSelected && !otherSelected && $scope.taskInfo) {
+      if ($scope.isOtherReviewsPassedSelected && !otherSelected && $scope.taskInfo) {
         $scope.taskInfo.otherReviewsPassed = '';
       }
-      $scope.uiModel.isOtherReviewsPassedSelected = otherSelected;
+      $scope.isOtherReviewsPassedSelected = otherSelected;
     }
 
     $scope.getLicenseTypeUrl = function (licenseType) {
@@ -327,7 +323,9 @@
       $scope.contributorDetails.copyright.additional.splice(0);
     };
 
-    $scope.$watch("uiModel.needAdditionalCopyrightInformation", function (newValue, oldValue) {
+    $scope.needAdditionalCopyrightInformation = '';
+
+    $scope.$watch("needAdditionalCopyrightInformation", function (newValue, oldValue) {
       if (isFormActive) {
         if (newValue === oldValue) {
           return;
@@ -452,7 +450,7 @@
 
       $scope.componentTypes = getComponentTypes($scope.item.components);
 
-      $scope.uiModel.needAdditionalCopyrightInformation =
+      $scope.needAdditionalCopyrightInformation =
           $scope.contributorDetails.copyright.additional.length > 0 ? 'yes' : '';
 
       initReviewsPassedDataProvider();
@@ -461,13 +459,18 @@
       isFormActive = true;
     }
 
-    $scope.$watch('item', function() {
-      onLoadItemSuccess();
+    $scope.$watch('item', function(newValue) {
+      log("item $watch", newValue);
+      if(newValue && newValue.profile) {
+        onLoadItemSuccess();
+      }
     });
 
-    $scope.$on('itemLoaded', function(ev, item) {
+    $scope.$on('itemLoaded', function (ev, item) {
       $scope.item = item;
     });
+
+    $scope.$emit('loadItem');
 
   }
 

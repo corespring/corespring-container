@@ -62,7 +62,7 @@ form
             label Sub-Category
             select(ng-model='standardAdapter.subCategoryOption', ng-options='z for z in standardAdapter.categoryOption.items', style='width:100%')
 
-          input(type='text', multiple='', ui-select2='standardAdapter', ng-model='profile.standards', style='width: 500px;')
+          input(type='hidden', ui-select2='standardsAdapter', ng-model='profile.standards', style='width: 500px;')
 
     .control-group
       label.control-label(for='gradeLevel') Grade Level
@@ -173,12 +173,12 @@ form
   .control-group
     .controls
       label
-        input(type='radio', ng-model='uiModel.needAdditionalCopyrightInformation', value='yes', style='margin-right: 5px;')
+        input(type='radio', ng-model='needAdditionalCopyrightInformation', value='yes', style='margin-right: 5px;')
         | Yes
         span.help-inline(style="padding-left:10px") If yes, please complete the following
 
       label
-        input(type='radio', ng-model='uiModel.needAdditionalCopyrightInformation', value='', style='margin-right: 5px; margin-left: 20px;')
+        input(type='radio', ng-model='needAdditionalCopyrightInformation', value='', style='margin-right: 5px; margin-left: 20px;')
         | No
 
   .additional-copyright-information(ng-repeat='item in contributorDetails.copyright.additional')
@@ -249,7 +249,7 @@ form
         ng-change="onChangeReviewsPassed(rp.key)",
         style="margin-right: 3px;")
         | {{rp.key}}
-      label.control-label(ng-show='uiModel.isOtherReviewsPassedSelected') Other
+      label.control-label(ng-show='isOtherReviewsPassedSelected') Other
         input(type="text", placeholder='Enter review...', ng-model='taskInfo.otherReviewsPassed')
 
 

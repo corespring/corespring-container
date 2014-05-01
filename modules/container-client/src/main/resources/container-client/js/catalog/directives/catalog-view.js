@@ -1,4 +1,4 @@
-angular.module('corespring-catalog.directives').directive('catalogview', [ '$sce', '$window', 'DataQueryService', function($sce, $window, DataQueryService) {
+angular.module('corespring-catalog.directives').directive('catalogview', [ '$sce', '$window', 'DataQueryService', function ($sce, $window, DataQueryService) {
 
   var supportingMaterialsTab = 'supporting-material';
 
@@ -423,7 +423,7 @@ angular.module('corespring-catalog.directives').directive('catalogview', [ '$sce
       '</ul>'
     ].join('\n'),
 
-    link: function($scope, $elem, $attrs) {
+    link: function ($scope, $elem, $attrs) {
       $scope.printMode = $attrs.printmode === 'true';
       $scope.expandAdditionalInformation = $scope.printMode;
 
@@ -433,12 +433,12 @@ angular.module('corespring-catalog.directives').directive('catalogview', [ '$sce
         $scope.supportingMaterialIndex = parseInt($attrs.supportingmaterialindex, 10);
       }
 
-      $scope.isActive = function(tab, index) {
+      $scope.isActive = function (tab, index) {
         return $scope.activeTab === tab &&
           ($scope.activeTab === supportingMaterialsTab, $scope.supportingMaterialIndex === index);
       };
 
-      $scope.changeTab = function(tab, index) {
+      $scope.changeTab = function (tab, index) {
         if (!$scope.isActive(tab, index)) {
           $scope.activeTab = tab;
           $scope.supportingMaterialIndex = index;
@@ -463,21 +463,21 @@ angular.module('corespring-catalog.directives').directive('catalogview', [ '$sce
         }
       }
 
-      $scope.print = function() {
+      $scope.print = function () {
         $window.open(printUrl(), '_blank');
       };
 
       function fileIndex(index) {
-        return _.findIndex($scope.item.supportingMaterials[index].files, function(file) {
+        return _.findIndex($scope.item.supportingMaterials[index].files, function (file) {
           return file.default;
         });
       }
 
-      $scope.isMarkup = function(index) {
+      $scope.isMarkup = function (index) {
         return $scope.item.supportingMaterials[index].files[fileIndex(index)].contentType === 'text/html';
       };
 
-      $scope.getMarkup = function(index) {
+      $scope.getMarkup = function (index) {
         return $scope.item.supportingMaterials[index].files[fileIndex(index)].content;
       };
 
@@ -489,11 +489,11 @@ angular.module('corespring-catalog.directives').directive('catalogview', [ '$sce
         }
       }
 
-      DataQueryService.list("reviewsPassed", function(result) {
+      DataQueryService.list("reviewsPassed", function (result) {
         $scope.reviewsPassedDataProvider = result;
       });
 
-      $scope.supportingUrl = function(index) {
+      $scope.supportingUrl = function (index) {
         if ($scope.item) {
           return $sce.trustAsResourceUrl(getUrl($scope.item.supportingMaterials, index));
         } else {
@@ -501,13 +501,15 @@ angular.module('corespring-catalog.directives').directive('catalogview', [ '$sce
         }
       };
 
-      $scope.$watch('item', function() {
-        $scope.init();
+      $scope.$watch('item', function (newValue) {
+        if (newValue && newValue.profile) {
+          $scope.init();
+        }
       });
 
-       $scope.$on('itemLoaded', function(ev, item) {
-         $scope.item = item;
-       });
+      $scope.$on('itemLoaded', function (ev, item) {
+        $scope.item = item;
+      });
 
       function getComponentTypes(components, defaultValue) {
         var result = _.chain(components)
@@ -518,17 +520,18 @@ angular.module('corespring-catalog.directives').directive('catalogview', [ '$sce
           .sort()
           .value();
 
-        if(!_.isArray(result) || result.length === 0){
+        if (!_.isArray(result) || result.length === 0) {
           result = defaultValue;
         }
         return result;
       }
 
-      $scope.init = function() {
-        if ($scope.item && $scope.item._id) {
+      $scope.init = function () {
+        if ($scope.item._id) {
           $scope.itemId = $scope.item._id.$oid;
         }
-        if ($scope.item && $scope.item.profile) {
+
+        if ($scope.item.profile) {
           $scope.profile = $scope.item.profile;
           $scope.priorUse = priorUse($scope.profile);
 
@@ -541,16 +544,21 @@ angular.module('corespring-catalog.directives').directive('catalogview', [ '$sce
           if ($scope.profile.otherAlignments) {
             $scope.otherAlignments = $scope.profile.otherAlignments;
           }
-          if ($scope.contributorDetails) {
-            $scope.licenseTypeUrl = licenseTypeUrl($scope.contributorDetails.licenseType);
-          }
         }
-        $scope.componentTypes = getComponentTypes($scope.item.components, [$scope.unassigned]);
 
-        DataQueryService.list("depthOfKnowledge", function(result) {
+        if ($scope.contributorDetails) {
+          $scope.licenseTypeUrl = licenseTypeUrl($scope.contributorDetails.licenseType);
+        }
+        if ($scope.item.components) {
+          $scope.componentTypes = getComponentTypes($scope.item.components, [$scope.unassigned]);
+        }
+
+        DataQueryService.list("depthOfKnowledge", function (result) {
           var depthOfKnowledge;
           if ($scope.otherAlignments && $scope.otherAlignments.depthOfKnowledge) {
-            depthOfKnowledge = _.find(result, function(d) { return $scope.otherAlignments.depthOfKnowledge === d.key; });
+            depthOfKnowledge = _.find(result, function (d) {
+              return $scope.otherAlignments.depthOfKnowledge === d.key;
+            });
             if (depthOfKnowledge) {
               $scope.depthOfKnowledge = depthOfKnowledge.value;
             }

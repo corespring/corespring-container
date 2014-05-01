@@ -42,9 +42,8 @@ class ShellDataQuery extends ContainerDataQuery {
     logger.debug(s"list topic <$topic> query <$query>")
 
     def filterSubjects(s: JsObject) = query.map {
-      q => (s \ "subject").asOpt[String].map(s => s.contains(q)).getOrElse(true)
+      q => (s \ "subject").asOpt[String].map(s => s.toLowerCase().contains(q.toLowerCase)).getOrElse(true)
     }.getOrElse(true)
-
 
 
     val out = topic match {
