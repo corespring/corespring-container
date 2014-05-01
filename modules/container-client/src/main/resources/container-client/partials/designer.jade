@@ -12,13 +12,23 @@ script#designer(type="text/ng-template")
           .btn-group.pull-right
             button(ng-click="closePane()", class="btn btn-sm btn-success", style="float:right;") Done
 
-    .weighting-container(ng-show="section == 'weighting'")
+    .weighting-container(ng-show="section == 'weighting'", ng-switch on="componentSize")
 
-      h4.title
-        | You can assign specific weights to each part of this item (optional):
+      .no-components(ng-switch-when="none")
+        .alert.alert-info.title
+          strong Your item doesn't contain any interactions. 
+          | Add some and come back again.
+      .one-components(ng-switch-when="one")
+        .alert.alert-info.title
+          strong You have 1 item 
+          | - so it's weight will 100% 
 
-      .container(style="max-width: 700px;")
-        component-weights(
-          ng-model="data.item.components",
-          markup="data.item.xhtml",
-          component-set="componentSet")
+      .many-components(ng-switch-when="many")
+        .alert.alert-info.title
+          | You can assign specific weights to each part of this item (optional):
+
+        .container(style="max-width: 700px;")
+          component-weights(
+            ng-model="data.item.components",
+            markup="data.item.xhtml",
+            component-set="componentSet")

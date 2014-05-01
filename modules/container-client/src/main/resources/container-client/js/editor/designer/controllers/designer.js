@@ -240,6 +240,18 @@ var controller = function(
     }
   });
 
+  $scope.componentSize = 'none';
+  $scope.$watch('data.item.components', function(n) {
+    var size = _.size(n);
+    if (size > 1) {
+      $scope.componentSize = 'many';
+    } else if (size === 1) {
+      $scope.componentSize = 'one';
+    } else {
+      $scope.componentSize = 'none';
+    }
+  });
+
   DesignerService.loadAvailableComponents($scope.onComponentsLoaded, $scope.onComponentsLoadError);
 };
 
