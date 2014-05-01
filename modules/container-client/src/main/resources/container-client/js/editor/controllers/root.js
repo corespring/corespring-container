@@ -1,4 +1,4 @@
-var controller = function($scope, $rootScope, $log, $location, $state, $timeout, DataQueryService, ItemService, ItemIdService, NavModelService, SupportingMaterialsService) {
+var controller = function($scope, $rootScope, $log, $location, $state, $timeout, $stateParams, DataQueryService, ItemService, ItemIdService, NavModelService, SupportingMaterialsService) {
 
   var navSetOnce = false;
 
@@ -13,10 +13,16 @@ var controller = function($scope, $rootScope, $log, $location, $state, $timeout,
     item: {}
   };
 
-  $rootScope.$on('$stateChangeSuccess', function() {
+  $rootScope.$on('$stateChangeSuccess', function(event, state, params) {
     function isOverview() {
       return $scope.isActive('overview') || $scope.isActive('overview-profile') ||
         supportingMaterialIndex('overview-supporting-material') >= 0;
+    }
+
+    log('scs:', arguments);
+
+    if (params.section !== 'main') {
+      $scope.showDesignOptions = true;
     }
 
     if (isOverview()) {
@@ -36,7 +42,7 @@ var controller = function($scope, $rootScope, $log, $location, $state, $timeout,
   $scope.$on('deleteSupportingMaterial', function(event, data) {
     function deleteSupportingMaterial(index) {
       $scope.data.item.supportingMaterials.splice(index, 1);
-        ItemService.save({
+      ItemService.save({
           supportingMaterials: $scope.data.item.supportingMaterials
         },
         function() {
@@ -159,6 +165,10 @@ var controller = function($scope, $rootScope, $log, $location, $state, $timeout,
     $scope.showSupportingMaterials = !$scope.showSupportingMaterials;
   };
 
+  $scope.toggleDesignOptions = function() {
+    $scope.showDesignOptions = !$scope.showDesignOptions;
+  };
+
   $scope.toggleOverview = function() {
     $scope.showOverview = !$scope.showOverview;
   };
@@ -219,8 +229,8 @@ var controller = function($scope, $rootScope, $log, $location, $state, $timeout,
       .value();
   }
 
-  $scope.$on('loadItem', function(){
-    if($scope.data.item){
+  $scope.$on('loadItem', function() {
+    if ($scope.data.item) {
       $scope.$broadcast('itemLoaded', $scope.data.item);
     } else {
       log.warn("item not loaded?");
@@ -245,6 +255,7 @@ angular.module('corespring-editor.controllers')
     '$location',
     '$state',
     '$timeout',
+    '$stateParams',
     'DataQueryService',
     'ItemService',
     'ItemIdService',

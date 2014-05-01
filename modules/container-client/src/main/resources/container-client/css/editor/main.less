@@ -31,6 +31,14 @@
     min-width: @designer-min-width;
     overflow-x: auto;
 
+    .weighting-container{
+      padding: 30px;
+
+      .title{
+        margin-bottom: 30px;
+      }
+    }
+
     .editor-container {
       position: inherit;
       bottom: 0;
@@ -163,6 +171,7 @@
     .nav {
       li {
         border-top: solid 1px darken(@cs-grey, 4%);
+        .user-select(none);
         a {
           font-size: 13px;
           text-transform: uppercase;

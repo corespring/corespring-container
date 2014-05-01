@@ -6,6 +6,7 @@ var controller = function(
   $timeout,
   $modal,
   $log,
+  $stateParams,
   DesignerService,
   ItemService,
   PlayerService,
@@ -15,9 +16,14 @@ var controller = function(
   ComponentRegister,
   WiggiMathJaxFeatureDef) {
 
+
   var configPanels = {};
 
   var log = $log.debug.bind($log, '[designer] - ');
+
+
+  log($stateParams);
+  $scope.section = $stateParams.section;
 
   $scope.editorMode = "visual";
 
@@ -234,6 +240,18 @@ var controller = function(
     }
   });
 
+  $scope.componentSize = 'none';
+  $scope.$watch('data.item.components', function(n) {
+    var size = _.size(n);
+    if (size > 1) {
+      $scope.componentSize = 'many';
+    } else if (size === 1) {
+      $scope.componentSize = 'one';
+    } else {
+      $scope.componentSize = 'none';
+    }
+  });
+
   DesignerService.loadAvailableComponents($scope.onComponentsLoaded, $scope.onComponentsLoadError);
 };
 
@@ -244,6 +262,7 @@ angular.module('corespring-editor.controllers')
     '$timeout',
     '$modal',
     '$log',
+    '$stateParams',
     'DesignerService',
     'ItemService',
     'PlayerService',
