@@ -80,7 +80,7 @@ angular.module('corespring-editor.directives').directive('componentWeights', [
       link: link,
 
       replace: true,
-      controller: controller,
+      controller: ['$scope', controller],
       template: [
         '  <div> ',
         '    <component-weight-input component-id="idAndComp.id" ng-model="idAndComp.component" ng-repeat="idAndComp in sortedComponents"/>',

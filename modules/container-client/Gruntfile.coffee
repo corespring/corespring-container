@@ -8,6 +8,28 @@ module.exports = (grunt) ->
 
   devMode = grunt.option("devMode") != false 
 
+
+  jadeConfig = (path, ext, dev) ->
+
+    ext = ".html" unless ext?
+
+    expand: true
+    cwd: '<%= common.app %>'
+    src: path.concat(['!**/bower_components/**', '!layout.jade'])
+    ext: ext 
+    dest: '<%= common.dist %>'
+    options:
+      pretty: true
+      data:
+        devMode: dev
+        core: pathsFor(common.core, dev) 
+        coreLibs: pathsFor(common.coreLibs, dev)
+        editor: pathsFor(common.editor, dev)
+        editorExtras: pathsFor(common.editorExtras, dev)
+        player: pathsFor(common.player, dev)
+        catalog: pathsFor(common.catalog, dev)
+
+
   common = 
     app: 'src/main/resources/container-client'
     dist: 'target/scala-2.10/classes/container-client'
@@ -17,7 +39,6 @@ module.exports = (grunt) ->
     player: 
       src:  [
         '<%= common.dist %>/js/render/**/*.js' ]
-      concatDest: '.tmp/concat/js/player.js'
       dest: '<%= common.dist %>/js/prod-player.js'
 
     coreLibs: 
@@ -30,12 +51,13 @@ module.exports = (grunt) ->
         '<%= common.dist %>/bower_components/lodash/dist/lodash.min.js',
         '<%= common.dist %>/bower_components/angular-ui-sortable/src/sortable.js',
         '<%= common.dist %>/bower_components/corespring-ng-components/build/corespring-ng-components.js',
+        '<%= common.dist %>/bower_components/mathjs/dist/math.min.js',
+        '<%= common.dist %>/bower_components/saxjs/lib/sax.js'
       ]
-      concatDest: '<%= common.dist %>/js/core-libs.js'
+      dest: '<%= common.dist %>/js/core-libs.js'
 
     core: 
       dest: '<%= common.dist %>/js/prod-core.js'
-      concatDest: '.tmp/concat/js/core.js'
       src: [
         '<%= common.dist %>/js/common/**/*.js', 
         '<%= common.dist %>/js/corespring/core.js',
@@ -43,12 +65,7 @@ module.exports = (grunt) ->
 
     editor:
       dest: '<%= common.dist %>/js/prod-editor.js'
-      concatDest: '.tmp/concat/js/editor.js'
       src: [
-        '<%= common.dist %>/bower_components/angular-route/angular-route.min.js',
-        '<%= common.dist %>/bower_components/angular-ui-router/release/angular-ui-router.min.js',
-        '<%= common.dist %>/bower_components/mathjs/dist/math.min.js',
-        '<%= common.dist %>/bower_components/saxjs/lib/sax.js',
         '<%= common.dist %>/js/corespring/core-library.js',
         '<%= common.dist %>/js/corespring/server/init-core-library.js',
         '<%= common.dist %>/js/editor/**/*.js',
@@ -60,8 +77,9 @@ module.exports = (grunt) ->
 
     editorExtras:
       dest: '<%= common.dist %>/js/prod-editor-extras.js'
-      concatDest: '<%= common.dist %>/js/editor-extras.js'
       src: [
+              '<%= common.dist %>/bower_components/angular-route/angular-route.min.js',
+              '<%= common.dist %>/bower_components/angular-ui-router/release/angular-ui-router.min.js',
               '<%= common.dist %>/bower_components/select2/select2.js',
               '<%= common.dist %>/bower_components/angular-ui-select2/src/select2.js',
               '<%= common.dist %>/bower_components/angular-ui/build/angular-ui.min.js',
@@ -79,7 +97,6 @@ module.exports = (grunt) ->
 
     catalog:
       dest: '<%= common.dist %>/js/catalog/prod-catalog.js'
-      concatDest: '.tmp/concat/js/catalog.js'
       src: [
         '<%= common.dist %>/js/catalog/**/*.js'
       ]
@@ -99,9 +116,9 @@ module.exports = (grunt) ->
       .replace("#{fileRoot}/bower_components" , "../../components")
       .replace(fileRoot, "../..")
 
-  pathsFor = (obj, name) ->
-    name = "dest" unless name?
-    filePaths =  if devMode then obj["src"] else [obj[name]] 
+  pathsFor = (obj, dev) ->
+    name = "dest"
+    filePaths =  if dev then obj["src"] else [obj[name]] 
     expanded = expand(filePaths) 
     mapped = _.map( expanded, toUrl )
     mapped
@@ -149,29 +166,15 @@ module.exports = (grunt) ->
       mathjax_rm_pngs:
         command: 'rm -fr <%= common.dist %>/bower_components/mathjax/fonts/HTML-CSS/TeX/png'
 
-
     jshint:
       options: 
         jshintrc: '.jshintrc'
       main: ['<%= common.app %>/js/**/*.js', '!<%= common.app %>/**/*.min.js']
 
     jade:
-      compile:
-        expand: true
-        cwd: '<%= common.app %>'
-        src: ['**/*.jade', '!**/bower_components/**', '!layout.jade']
-        ext: '.html'
-        dest: '<%= common.dist %>'
-        options:
-          pretty: true
-          data:
-            devMode: grunt.option("devMode") != false  
-            core: pathsFor(common.core) 
-            coreLibs: pathsFor(common.coreLibs, "concatDest")
-            editor: pathsFor(common.editor)
-            editorExtras: pathsFor(common.editorExtras, "concatDest")
-            player: pathsFor(common.player)
-            catalog: pathsFor(common.catalog)
+      partials: jadeConfig(["**/*.jade", "!**/editor.jade", "!**/*player.jade"], ".html", false)
+      prod: jadeConfig(["**/editor.jade", "**/*player.jade"], ".prod.html", false )
+      dev: jadeConfig(["**/editor.jade", "**/*player.jade"], ".dev.html", true )
 
     jasmine:
       unit:
@@ -192,57 +195,31 @@ module.exports = (grunt) ->
           ]
           specs: '<%= common.test %>/js/**/*-test.js'
 
-    concat:
-      generated:
-        options: 
-          separator: ";\n"
-        files: [
-          { 
-            dest: common.core.concatDest 
-            src: common.core.src 
-          }
-          { 
-            dest: common.editor.concatDest
-            src: common.editor.src
-          }
-          {
-            dest: common.editorExtras.concatDest
-            src: common.editorExtras.src
-          }
-          {
-            dest: common.coreLibs.concatDest
-            src: common.coreLibs.src
-          }
-          {
-            dest: common.player.concatDest
-            src: common.player.src
-          }
-          {
-            dest: common.catalog.concatDest
-            src: common.catalog.src
-          }
-        ]    
 
     uglify:
-      generated:
-        files: [ 
-          { 
-            dest:  common.core.dest,
-            src: [ common.core.concatDest ] 
-          }
-          { 
-            dest: common.editor.dest
-            src: [ common.editor.concatDest ] 
-          } 
-          { 
-            dest: common.player.dest
-            src: [ common.player.concatDest ] 
-          }
-          {
-            dest: common.catalog.dest
-            src: [ common.catalog.concatDest ]
-          }
-        ] 
+
+      concatOnly: 
+        options: 
+          sourceMap: false
+          mangle: false
+          compress: false
+        files: [
+          common.coreLibs,
+          common.editorExtras
+        ]
+
+      minifyAndConcat: 
+        options:
+          sourceMap:true
+          compress: true
+          mangle: true
+        files: [
+          common.core,
+          common.editor,
+          common.player,
+          common.catalog
+        ]
+
 
     compress: 
       generated: 
@@ -256,10 +233,10 @@ module.exports = (grunt) ->
             src: [ 
               common.core.dest, 
               common.editor.dest, 
-              common.editorExtras.concatDest,
+              common.editorExtras.dest,
               common.player.dest,
-              common.coreLibs.concatDest,
-              common.catalog.concatDest ]
+              common.coreLibs.dest,
+              common.catalog.dest ]
             ext: '.js.gz'
           }
         ]
@@ -297,7 +274,7 @@ module.exports = (grunt) ->
   # short cut
   grunt.registerTask('lcd', ['restoreResolutions', 'loadComponentDependencies'])
   grunt.registerTask('prepPlayerLauncher', 'prep the player launcher js', prepPlayerLauncher(grunt))
-  grunt.registerTask('run', ['jade', 'less', 'watch'])
+  grunt.registerTask('run', ['uglify', 'jade', 'less', 'watch'])
   grunt.registerTask('test', ['shell:bower', 'shell:bowerCacheClean', 'lcd', 'prepPlayerLauncher', 'jasmine:unit'])
-  grunt.registerTask('default', ['shell:bower', 'lcd', 'clean_bower', 'jshint', 'concat', 'uglify', 'copy', 'less', 'jade', 'compress', 'prepPlayerLauncher','jasmine:unit'])
+  grunt.registerTask('default', ['shell:bower', 'lcd', 'clean_bower', 'jshint', 'uglify', 'copy', 'less', 'jade', 'compress', 'prepPlayerLauncher','jasmine:unit'])
   grunt.registerTask('minify-test', ['concat', 'uglify'])

@@ -114,3 +114,14 @@ This provides a simple uri that may be cached by the external app.
 ## JS/Css processing
 
 TODO: how to minify/gzip?
+
+
+## Running the Editor client in dev mode
+
+If you want to run the editor client with all the sources unminified and exploded you can add `mode=dev` to the editor url - for example: 
+
+    http://myapp/cs-editor/editor/3333/index.html?mode=dev
+
+If you are developing the container it defaults to dev mode when you run `play run`. If you wish to see the prod scripts add `mode=prod` to the url - for example:  
+
+    http://myapp/cs-editor/editor/3333/index.html?mode=prod

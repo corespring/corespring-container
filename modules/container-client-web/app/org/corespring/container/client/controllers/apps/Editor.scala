@@ -3,7 +3,7 @@ package org.corespring.container.client.controllers.apps
 import org.corespring.container.client.actions.EditorActions
 import org.corespring.container.client.component.AllItemTypesReader
 import org.corespring.container.client.views.txt.js.EditorServices
-import play.api.Logger
+import play.api.{ Play, Mode, Logger }
 import play.api.libs.json.{ JsString, JsArray, Json, JsValue }
 import play.api.mvc.AnyContent
 import scala.concurrent.{ Future, ExecutionContext }
@@ -34,14 +34,17 @@ trait Editor extends AllItemTypesReader with AppWithServices[EditorActions[AnyCo
 
   override def additionalScripts: Seq[String] = Seq(org.corespring.container.client.controllers.apps.routes.Editor.services().url)
 
-  def editItem(itemId: String) = actions.editItem(itemId) {
+  def editItem(itemId: String, mode: Option[String] = None) = actions.editItem(itemId) {
     (code, msg) =>
       import ExecutionContext.Implicits.global
       Future(Status(code)(org.corespring.container.client.views.html.error.main(code, msg)))
   } {
     request =>
       logger.trace(s"[editItem]: $itemId")
-      controllers.Assets.at("/container-client", "editor.html")(request)
+
+      val pageMode = mode.getOrElse(Play.current.mode.toString.toLowerCase)
+      val page = s"editor.$pageMode.html"
+      controllers.Assets.at("/container-client", page)(request)
   }
 
 }
