@@ -42,7 +42,7 @@ trait Editor extends AllItemTypesReader with AppWithServices[EditorActions[AnyCo
     request =>
       logger.trace(s"[editItem]: $itemId")
 
-      val pageMode = mode.getOrElse(Play.current.mode)
+      val pageMode = mode.getOrElse(Play.current.mode.toString.toLowerCase)
       val page = s"editor.$pageMode.html"
       controllers.Assets.at("/container-client", page)(request)
   }
