@@ -276,5 +276,5 @@ module.exports = (grunt) ->
   grunt.registerTask('prepPlayerLauncher', 'prep the player launcher js', prepPlayerLauncher(grunt))
   grunt.registerTask('run', ['uglify', 'jade', 'less', 'watch'])
   grunt.registerTask('test', ['shell:bower', 'shell:bowerCacheClean', 'lcd', 'prepPlayerLauncher', 'jasmine:unit'])
-  grunt.registerTask('default', ['shell:bower', 'lcd', 'clean_bower', 'jshint', 'uglify', 'copy', 'less', 'jade', 'jade','compress', 'prepPlayerLauncher','jasmine:unit'])
+  grunt.registerTask('default', ['shell:bower', 'lcd', 'clean_bower', 'jshint', 'uglify', 'copy', 'less', 'jade', 'compress', 'prepPlayerLauncher','jasmine:unit'])
   grunt.registerTask('minify-test', ['concat', 'uglify'])
