@@ -24,6 +24,7 @@ module.exports = (grunt) ->
     res = 
       angular: "~1.2.12"
       bootstrap: "~3.1.1"
+      jquery: "1.11.0"
 
     logJson(bowerJson.resolutions, "writeln")
 

@@ -45,7 +45,7 @@ module.exports = (grunt) ->
       src: [
         '<%= common.dist %>/bower_components/es5-shim/es5-shim.min.js',
         '<%= common.dist %>/bower_components/console-polyfill/index.js',
-        '<%= common.dist %>/bower_components/jquery/jquery.min.js',
+        '<%= common.dist %>/bower_components/jquery/dist/jquery.min.js',
         '<%= common.dist %>/bower_components/jquery-ui/ui/jquery-ui.js',
         '<%= common.dist %>/bower_components/angular/angular.min.js',
         '<%= common.dist %>/bower_components/lodash/dist/lodash.min.js',
@@ -188,7 +188,7 @@ module.exports = (grunt) ->
             '<%= common.dist %>/bower_components/angular/angular.js',
             '<%= common.dist %>/bower_components/angular-mocks/angular-mocks.js',
             '<%= common.dist %>/bower_components/wiggi-wiz/dist/wiggi-wiz.js',
-            '<%= common.dist %>/bower_components/jquery/jquery.js',
+            '<%= common.dist %>/bower_components/jquery/dist/jquery.js',
             '<%= common.dist %>/bower_components/lodash/dist/lodash.js'
             '<%= common.dist %>/bower_components/saxjs/lib/sax.js',
             '<%= common.dist %>/bower_components/angular-ui-bootstrap-bower/ui-bootstrap-tpls.js'
