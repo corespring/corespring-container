@@ -62,6 +62,8 @@
 
           $scope.$emit('open-config-panel');
 
+          data.defaultData = component.defaultData;
+
           editor.showEditPane(data, getTitle(component), content, function() {
             $log.debug('on update...');
           }, {}, function() {
