@@ -13,11 +13,11 @@ angular.module('corespring-editor.directives').directive('corespringPreviewPlaye
 
     function postRender() {
       _(ComponentRegister.components).keys().each(function(id) {
-        var $container = $("<div class='component-container'/>");
+        var comp = getComponentById(id);
         if (parseInt(id, 10) === $rootScope.selectedComponentId) {
-          $container.addClass('selected');
+          comp.addClass('selected');
         }
-        getComponentById(id).wrap($container);
+        getComponentById(id).addClass('component-container');
       });
     }
 
@@ -25,13 +25,14 @@ angular.module('corespring-editor.directives').directive('corespringPreviewPlaye
 
       function selectContainer(id) {
         $('.player-body .selected').removeClass('selected');
-        if (getComponentById(id).parent().hasClass('component-container')) {
-          getComponentById(id).parent().addClass('selected');
+        if (getComponentById(id).hasClass('component-container')) {
+          getComponentById(id).addClass('selected');
           $scope.selectedComponentId = id;
           $scope.$apply();
 
           if ($('.component-container.selected').size() > 0) {
-            $('.component-container.selected')[0].scrollIntoView();
+            var target = $('.component-container.selected')[0];
+            target.scrollIntoView();
           }
         } else {
           $log.error('Could not find component-container for id = ' + id);
