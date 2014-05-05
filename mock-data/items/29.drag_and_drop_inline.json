@@ -1,0 +1,91 @@
+{
+  "_id": "533eb66423fd754c27208043",
+  "profile" : {
+    "taskInfo" : {
+      "title": "Drag and drop Inline example",
+      "gradeLevel" : ["01", "03"],
+      "subjects" : {
+        "primary" : {
+          "id" : "4ffb535f6bb41e469c0bf2a8",
+          "subject" : "subject",
+          "category" : "category"
+        },
+        "related" : {
+          "id" : "4ffb535f6bb41e469c0bf2a9",
+          "subject" : "subject",
+          "category" : "category"
+        }
+      },
+      "itemType" : "Constructed Response - Short Answer"
+    }
+  },
+  "components": {
+    "1": {
+      "componentType": "corespring-drag-and-drop-inline",
+      "title": "Butterfly D&D",
+      "correctResponse": {
+        "aa_1": ["dog"],
+        "aa_2": ["cat"]
+      },
+      "feedback": {
+        "correctFeedbackType": "default",
+        "partialFeedbackType": "default",
+        "incorrectFeedbackType": "default"
+      },
+      "allowPartialScoring": true,
+      "partialScoring" : [
+        {"numberOfCorrect": 1, "scorePercentage": 25},
+        {"numberOfCorrect": 2, "scorePercentage": 50},
+        {"numberOfCorrect": 3, "scorePercentage": 75}
+      ],
+      "model": {
+        "answerAreas": [
+          {
+            "id": "aa_1",
+            "textBefore": "",
+            "textAfter": "Apple"
+          },
+          {
+            "id": "aa_2",
+            "textBefore": "The little",
+            "textAfter": "went to the garden."
+          }
+        ],
+        "choices": [
+          {
+            "label": "Dog",
+            "labelType": "text",
+            "id": "dog"
+          },
+          {
+            "label": "Cat",
+            "labelType": "text",
+            "id": "cat"
+          },
+          {
+            "label": "Bird",
+            "labelType": "text",
+            "id": "bird"
+          },
+          {
+            "label": "Adult",
+            "labelType": "text",
+            "id": "adult"
+          }
+        ],
+        "config": {
+          "shuffle": true,
+          "expandHorizontal": false
+        }
+      },
+      "weight": 1
+    }
+  },
+ 
+  "org": {
+    "components": [
+      "corespring/*"
+    ]
+  },
+  "xhtml": "<div><corespring-drag-and-drop-inline id='1'></corespring-drag-and-drop-inline></div>"
+}
