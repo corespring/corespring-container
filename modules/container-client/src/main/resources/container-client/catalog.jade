@@ -2,6 +2,7 @@ extends layout
 
 block head
 
+  script(type="text/javascript", src="../../components/spin.js/spin.js")
   link(rel="stylesheet", href="../../components/select2/select2.css")
   link(rel="stylesheet", href="../../css/editor.css")
 
@@ -36,6 +37,18 @@ block scripts
 
 
   script.
+
+    var opts = {
+      length: 17, // The length of each line
+      width: 8, // The line thickness
+      radius: 20, // The radius of the inner circle
+      color: '#556270', // #rgb or #rrggbb or array of colors
+      shadow: false, // Whether to render a shadow
+      hwaccel: true, // Whether to use hardware acceleration
+    };
+
+    var target = document.getElementById('spinner');
+    var spinner = new Spinner(opts).spin(target);
 
     $(document).ready(function () {
       var configPath = 'catalog-config.json';
@@ -79,7 +92,11 @@ block scripts
 
           angular.bootstrap(document, ["corespring-catalog"]);
           angular.resumeBootstrap();
-          $("body").addClass('blend');
+          setTimeout(function() {
+            spinner.stop();
+            $('.pre-loader').remove();
+            $('.main').addClass('blend');
+          }, 200);
         };
 
         var args = data.scripts.concat(data.css);
