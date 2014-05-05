@@ -6,21 +6,36 @@ angular.module('corespring-player.services').factory('CorespringPlayerDefinition
   'ComponentRegister',
   function($log, $compile, MathJaxService, PlayerUtils, ComponentRegister) {
 
-    function CorespringPlayerDef(mode) {
+    function CorespringPlayerDef(opts) {
+
+      opts = _.extend({
+        mode: 'player',
+        /**
+         * called at the end of renderMarkup
+         */
+        postRender: null,
+        /**
+         * Allows the scope to be extended - called at the end of link
+         */
+        postLink: null
+      }, opts);
 
       var link = function($scope, $elem) {
 
         var rendered = false;
-        $scope.selectedComponentId = undefined;
 
         var renderMarkup = function(xhtml) {
           if ($scope.lastScope) {
             $scope.lastScope.$destroy();
           }
           $scope.lastScope = $scope.$new();
-          var $body = $elem.find("#body").html(xhtml);
+          var $body = $elem.find(".player-body").html(xhtml);
           $compile($body)($scope.lastScope);
           MathJaxService.parseDomForMath();
+
+          if (_.isFunction(opts.postRender)) {
+            opts.postRender();
+          }
         };
 
         var setDataAndSession = function() {
@@ -29,7 +44,7 @@ angular.module('corespring-player.services').factory('CorespringPlayerDefinition
             return;
           }
 
-          if (rendered && mode === "player") {
+          if (rendered && opts.mode === 'player') {
             $log.debug("not re-rendering because we are in player mode");
             return;
           }
@@ -47,7 +62,8 @@ angular.module('corespring-player.services').factory('CorespringPlayerDefinition
           MathJaxService.parseDomForMath(delay);
         });
 
-        /*
+        /**        
+          TODO: is this a core player function? or is it only for the editor?
           stash the component data (TODO: persist it?)
         */
         $scope.$on('saveStash', function(event, id, stash) {
@@ -91,6 +107,10 @@ angular.module('corespring-player.services').factory('CorespringPlayerDefinition
           ComponentRegister.setOutcomes(r);
         }, true);
 
+        if (_.isFunction(opts.postLink)) {
+          opts.postLink($scope, $elem);
+        }
+
       };
 
       this.restrict = 'AE';
@@ -103,7 +123,7 @@ angular.module('corespring-player.services').factory('CorespringPlayerDefinition
         session: '=playerSession'
       };
       this.template = ['<div class="corespring-player">',
-        '  <div id="body"></div>',
+        '  <div class="player-body"></div>',
         '</div>'
       ].join("\n");
     }
