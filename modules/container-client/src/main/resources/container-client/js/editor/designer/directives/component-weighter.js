@@ -16,7 +16,9 @@ angular.module('corespring-editor.directives').directive('componentWeights', [
 
         //Wrap either find or filter - odd inconsistency across platforms here - need to find out why.
         var nodesOnly = (function() {
-          return $($scope.markup).find('[id]').size() > 0 ? $($scope.markup).find('[id]') : $($scope.markup).filter('[id]');
+
+          var $markup = $('<div>').html($scope.markup);
+          return $markup.find('[id]').size() > 0 ? $markup.find('[id]') : $.markup.filter('[id]');
         })();
 
         var ids = _.map(nodesOnly, function(n) {
