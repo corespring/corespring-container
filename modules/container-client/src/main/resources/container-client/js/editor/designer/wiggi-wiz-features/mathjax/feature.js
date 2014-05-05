@@ -5,6 +5,7 @@ angular.module('corespring.wiggi-wiz-features').factory('WiggiMathJaxFeatureDef'
     function FeatureDef() {
       this.name = 'mathjax';
       this.attributeName = 'mathjax';
+      this.draggable = true;
       this.iconclass = 'fa math-sum';
       this.addToEditor = '<div mathjax-holder><math><msup><mi>r</mi><mn>3</mn></msup><math></div>';
       this.compile = true;
