@@ -85,13 +85,14 @@ angular.module('corespring-editor.directives').directive('componentWeights', [
       controller: ['$scope', controller],
       template: [
         '  <div> ',
-        '    <component-weight-input component-id="idAndComp.id" ng-model="idAndComp.component" ng-repeat="idAndComp in sortedComponents"/>',
+        '    <component-weight-input ng-disabled="disabled" component-id="idAndComp.id" ng-model="idAndComp.component" ng-repeat="idAndComp in sortedComponents"/>',
         '  </div>'
       ].join('\n'),
       scope: {
         components: '=ngModel',
         componentSet: '=',
-        markup: '='
+        markup: '=',
+        disabled: '@ngDisabled'
       }
     };
   }
@@ -179,7 +180,7 @@ angular.module('corespring-editor.directives').directive('componentWeightInput',
         '    <label class="control-label col-sm-5" for="{{uid}}">{{getTitle(component.componentType)}} is worth</label>',
         '    <div class="col-sm-4">',
         '      <div class="input-group">',
-        '        <input id="{{uid}}" name="input" min="0" max="100" number-validation ng-focus="selectComponent()" class="form-control" ng-model="component.weight"></input>',
+        '        <input id="{{uid}}" ng-disabled="{{disabled}}" name="input" min="0" max="100" number-validation ng-focus="selectComponent()" class="form-control" ng-model="component.weight"></input>',
         '        <span class="input-group-addon">pts</span>',
         '        <span class="input-group-addon" style="width: 52px;">{{getPercentage(component.weight)}}%</span>',
         '    </div>',
@@ -188,7 +189,8 @@ angular.module('corespring-editor.directives').directive('componentWeightInput',
       ].join('\n'),
       scope: {
         component: '=ngModel',
-        componentId: '=componentId'
+        componentId: '=componentId',
+        disabled: '=ngDisabled'
       }
     };
   }
