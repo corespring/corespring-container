@@ -205,7 +205,15 @@
     .contents {
       padding: 10px;
       .component-container {
-        .selected-component-container();
+        .transition-all();
+        padding: 4px;
+        border-radius: 4px;
+        border: 2px dashed transparent;
+        &.selected{
+          @selected-component-border-color: fade(@grey-purple, 50%);
+          //.nice-shadow(@selected-component-border-color);
+          border: 2px dashed #eaeaea; 
+        }
       }
     }
 
