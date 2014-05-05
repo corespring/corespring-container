@@ -3,10 +3,7 @@ script#designer(type="text/ng-template")
 
     .editor-container(ng-class="editorMode", ng-show="section == 'main'")
       wiggi-wiz(
-        ng-model="data.item.xhtml",
-        features="extraFeatures",
-        image-service="imageService",
-        ng-show="editorMode=='visual'")
+        formatting-display="dropdown")
         toolbar(basic="bold italic", formatting="h1 h2 p")
         edit-pane-toolbar(alignment="bottom")
           .btn-group.pull-right
