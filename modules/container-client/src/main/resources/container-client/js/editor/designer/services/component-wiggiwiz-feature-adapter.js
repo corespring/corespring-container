@@ -38,6 +38,7 @@
         titleGroup: component.titleGroup,
         toolbar: '<button class="btn btn-default btn-sm btn-small">CB</button>',
         compile: true,
+        draggable: true,
         deleteNode: function($node, services) {
           deleteComponentCallback($node.attr('id'));
           $node.remove();

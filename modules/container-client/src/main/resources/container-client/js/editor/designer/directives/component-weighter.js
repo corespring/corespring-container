@@ -18,7 +18,7 @@ angular.module('corespring-editor.directives').directive('componentWeights', [
         var nodesOnly = (function() {
 
           var $markup = $('<div>').html($scope.markup);
-          return $markup.find('[id]').size() > 0 ? $markup.find('[id]') : $.markup.filter('[id]');
+          return $markup.find('[id]').size() > 0 ? $markup.find('[id]') : $markup.filter('[id]');
         })();
 
         var ids = _.map(nodesOnly, function(n) {
