@@ -1,8 +1,3 @@
 {
-  "storage": {
-    "packages": ".bower-cache",
-    "registry": ".bower-registry"
-  },
-  "tmp": ".bower-tmp",
   "directory": "target/scala-2.10/classes/container-client/bower_components"
 }
