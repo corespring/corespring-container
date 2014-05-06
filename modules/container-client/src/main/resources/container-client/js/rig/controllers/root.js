@@ -1,6 +1,6 @@
-var controller = function ($scope, $location, $http, $timeout, $log, ComponentRegister, PlayerUtils ) {
+var controller = function($scope, $location, $http, $timeout, $log, ComponentRegister, PlayerUtils) {
 
- $scope.aceLoaded = function(_editor){
+  $scope.aceLoaded = function(_editor) {
     _editor.setTheme("ace/theme/twilight");
     var JsonMode = ace.require("ace/mode/json").Mode;
     _editor.getSession().setMode(new JsonMode());
@@ -13,19 +13,19 @@ var controller = function ($scope, $location, $http, $timeout, $log, ComponentRe
         sender: 'editor'
       },
       exec: function(env, args, request) {
-        $scope.$apply(function(){
+        $scope.$apply(function() {
           $scope.updatePreview();
         });
       }
     });
   };
 
-  $scope.onSuccess = function(data){
+  $scope.onSuccess = function(data) {
     $scope.model = data;
   };
 
-  $scope.updatePreview = function(){
-    try{
+  $scope.updatePreview = function() {
+    try {
       $scope.model = JSON.parse($scope.componentJson);
     } catch (e) {
       console.warn("invalid json: ", e);
@@ -33,21 +33,21 @@ var controller = function ($scope, $location, $http, $timeout, $log, ComponentRe
     }
   };
 
-   $scope.$on('registerComponent', function(event, id, obj){
-     $log.info("registerComponent: ", id);
-      ComponentRegister.registerComponent(id, obj);
-    });
+  $scope.$on('registerComponent', function(event, id, obj) {
+    $log.info("registerComponent: ", id);
+    ComponentRegister.registerComponent(id, obj);
+  });
 
 
-  $scope.$watch('model', function(m){
-    if(!m || !m.item) {
+  $scope.$watch('model', function(m) {
+    if (!m || !m.item) {
       return;
     }
     var cleanJson = angular.copy($scope.model);
-    $scope.componentJson = JSON.stringify(cleanJson, undefined, 2 );
+    $scope.componentJson = JSON.stringify(cleanJson, undefined, 2);
     var zipped = PlayerUtils.zipDataAndSession($scope.model.item, $scope.model.session);
     //$timeout(function(){
-      //ComponentRegister.setDataAndSession(zipped);
+    //ComponentRegister.setDataAndSession(zipped);
     //}, 200);
   }, true);
 
@@ -58,6 +58,5 @@ var controller = function ($scope, $location, $http, $timeout, $log, ComponentRe
 
 angular.module('corespring-rig.controllers')
   .controller(
-    'Root',
-    ['$scope', '$location', '$http', '$timeout', '$log', 'ComponentRegister', 'PlayerUtils', controller]
-  );
+    'Root', ['$scope', '$location', '$http', '$timeout', '$log', 'ComponentRegister', 'PlayerUtils', controller]
+);
