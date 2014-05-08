@@ -1,0 +1,57 @@
+.control-panel {
+  padding-left: 21px;
+  border-bottom: 1px solid #000000;
+  width: 100%;
+  min-height: 36px;
+
+  .actions {
+    display: block;
+    padding: 0;
+    margin-right: 20px;
+    float: right;
+    list-style-type: none;
+
+    .action {
+      @icon-size: 25px;
+      display: inline-block;
+
+      a {
+        display: block;
+        background-size: @icon-size @icon-size;
+        background-repeat: no-repeat;
+        background-position: center center;
+        width: @icon-size;
+        height: @icon-size;
+        margin: 2px 5px;
+      }
+
+      &.reset a {
+        background-image: url('../images/refresh-icon.png');
+      }
+
+      &.config a {
+        background-image: url('../images/settings-icon.png');
+      }
+    }
+
+    .popover-content {
+      .settings {
+        list-style-type: none;
+        padding: 0;
+
+        .setting {
+          position: relative;
+          input {
+            top: 0;
+            position: absolute;
+          }
+          span {
+            padding-left: 20px;
+            display: block;
+          }
+        }
+      }
+    }
+  }
+
+}
