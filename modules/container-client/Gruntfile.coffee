@@ -160,11 +160,21 @@ module.exports = (grunt) ->
 
     shell:
       bowerCacheClean:
-        command: 'bower cache clean'
+        command: 'node node_modules/bower/bin/bower cache clean'
+        options :
+          failOnError: true
       bower:
-        command: 'bower install'
+        command: 'node node_modules/bower/bin/bower install'
+        options :
+          failOnError: true
+      bowerUpdate:
+        command: 'node node_modules/bower/bin/bower update'
+        options :
+          failOnError: true
       mathjax_rm_pngs:
         command: 'rm -fr <%= common.dist %>/bower_components/mathjax/fonts/HTML-CSS/TeX/png'
+        options :
+          failOnError: true
 
     jshint:
       options: 
@@ -195,10 +205,8 @@ module.exports = (grunt) ->
           ]
           specs: '<%= common.test %>/js/**/*-test.js'
 
-
     uglify:
-
-      concatOnly: 
+      concatOnly:
         options: 
           sourceMap: false
           mangle: false
@@ -219,7 +227,6 @@ module.exports = (grunt) ->
           common.player,
           common.catalog
         ]
-
 
     compress: 
       generated: 
