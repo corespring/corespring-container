@@ -1,21 +1,5 @@
 (function() {
 
-  var radioOrCheckbox = function(prop, label, mode, value) {
-
-    mode = mode || "checkbox";
-    var valueAttr = value !== undefined ? " value=\"" + value + "\"" : "";
-
-    return [
-      '<li class="setting">',
-      '  <label>',
-      '    <input type="' + mode + '" ng-model="evaluateOptions[\'' + prop + '\']" ' + valueAttr + ' >',
-      '    <span>' + label + '</span>',
-      '  </label>',
-      '</li>'
-    ].join("\n");
-
-  };
-
   angular.module('corespring-player.directives').directive('playerControlPanel', [
     function() {
       var link = function($scope, $element) {
@@ -24,6 +8,10 @@
         console.log("player control panel");
 
         $scope.showSettings = false;
+        $scope.evaluateOptions = {
+          highlightUserResponse: true
+        };
+
         $scope.mode = 'gather';
 
         $scope.reset = function() {
@@ -36,23 +24,57 @@
           } else {
             $configLink.popover('disable');
           }
+
+          $scope.$broadcast('setMode', { mode: $scope.mode, options: $scope.evaluateOptions, saveResponses: null } );
         });
 
         $element.on('click', '.dismiss-popover', function() {
           $('.action.config').popover('hide');
         });
 
+        $scope.hasScore = function() {
+          return $scope.score && !_.isNaN($scope.score.summary.percentage);
+        };
+
+        $element.on('hide.bs.popover', function() {
+          _.each($('.settings input', $element), function(input) {
+            var attr = (function() {
+              var match = $(input).attr('name').match(/evaluateOptions\.(.*)/);
+              return (match && match.length > 1) ? match[1] : undefined;
+            }());
+            if (attr) {
+              $scope.evaluateOptions[attr] = $(input).is(':checked');
+            }
+          });
+        });
+
+        function checkbox(prop, label) {
+          return [
+            '<li class="setting">',
+            '  <label>',
+            '    <input type="checkbox" ',
+            '      name="evaluateOptions.' + prop + '"',
+                   ($scope.evaluateOptions[prop] ? " checked='checked'" : ''),
+            '    >',
+            '    <span>' + label + '</span>',
+            '  </label>',
+            '</li>'
+          ].join("\n");
+        }
+
         $configLink.popover({
           html: true,
           placement: 'bottom',
-          content: [
-            '<ul class="settings">',
-               radioOrCheckbox("highlightUserResponse", "Highlight user outcome"),
-               radioOrCheckbox("highlightCorrectResponse", "Highlight correct outcome"),
-               radioOrCheckbox("allowEmptyResponses", "Allow empty responses"),
-            '</ul>',
-            '<a class="btn btn-success btn-small btn-sm dismiss-popover">Done</a>'
-          ].join('\n')
+          content: function() {
+            return [
+              '<ul class="settings">',
+                 checkbox("highlightUserResponse", "Highlight user outcome"),
+                 checkbox("highlightCorrectResponse", "Highlight correct outcome"),
+                 checkbox("allowEmptyResponses", "Allow empty responses"),
+              '</ul>',
+              '<a class="btn btn-success btn-small btn-sm dismiss-popover">Done</a>'
+            ].join('\n');
+          }
         });
 
       };
@@ -66,7 +88,7 @@
           '    <label class="btn btn-success" ng-model="mode" btn-radio="\'gather\'">Gather</label>',
           '    <label class="btn btn-success" ng-model="mode" btn-radio="\'feedback\'">Feedback</label>',
           '  </div>',
-          '  <div class="score" ng-show="score">',
+          '  <div class="score" ng-show="hasScore()">',
           '    <label>Score:</label>',
           '    <span>{{score.summary.percentage}}%</span>',
           '  </div>',

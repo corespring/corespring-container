@@ -39,7 +39,21 @@ var controller = function($scope, ComponentRegister, PlayerService) {
     ComponentRegister.setEditable(true);
   };
 
+  $scope.setMode = function(mode) {
+    ComponentRegister.setMode(mode);
+  };
+
+  $scope.setDataAndSession = function(data) {
+    ComponentRegister.setDataAndSession(data);
+  };
+
   $scope.$on('resetPreview', $scope.resetPreview);
+  $scope.$on('setMode', function(event, message) {
+    if (message.mode) {
+      $scope.setMode(message.mode);
+    }
+  });
+
 };
 
 angular.module('corespring-player.controllers')
