@@ -1,8 +1,7 @@
-(function () {
+(function() {
 
-  var PlayerService = function ($timeout) {
+  var PlayerService = function($timeout) {
 
-    //TODO: Need to make a decision on how this is controlled within the editor
     var settings = {
       maxNoOfAttempts: 1,
       highlightUserResponse: true,
@@ -13,15 +12,15 @@
     var attemptsCountdown = 0;
     var scoringJsFile = {};
 
-    var getQuestionFor = function (id) {
+    var getQuestionFor = function(id) {
       throw new Error("Not defined");
     };
 
-    var getItem = function () {
+    var getItem = function() {
       throw new Error("Not defined");
     };
 
-    var createResponse = function (session) {
+    var createResponse = function(session) {
 
       if (!session) {
         throw "Sessions is empty";
@@ -36,7 +35,7 @@
       return out;
     };
 
-    var getOutcomes = function (components, settings) {
+    var getOutcomes = function(components, settings) {
 
       var out = {};
       var serverLogic, answer, id, question;
@@ -65,27 +64,27 @@
       return out;
     };
 
-    this.submitSession = function (session, onSuccess, onFailure) {
-      $timeout(function () {
+    this.submitSession = function(session, onSuccess, onFailure) {
+      $timeout(function() {
         var response = createResponse(session);
         onSuccess(response);
       });
     };
 
-    this.updateSessionSettings = function (s) {
+    this.updateSessionSettings = function(s) {
       settings = s;
       attemptsCountdown = settings.maxNoOfAttempts;
     };
 
-    this.setQuestionLookup = function (cb) {
+    this.setQuestionLookup = function(cb) {
       getQuestionFor = cb;
     };
 
-    this.setItemLookup = function (cb) {
+    this.setItemLookup = function(cb) {
       getItem = cb;
     };
 
-    this.setScoringJs = function (scoringJs) {
+    this.setScoringJs = function(scoringJs) {
       scoringJsFile = scoringJs;
     };
 
