@@ -82,7 +82,7 @@ trait Main extends Controller {
 
       result.map {
         oid =>
-          val call = org.corespring.container.client.controllers.routes.Assets.session(oid.toString, "container-player.html")
+          val call = org.corespring.container.client.controllers.apps.routes.Player.loadPlayerForSession(oid.toString)
           Ok(JsObject(Seq("url" -> JsString(call.url))))
       }.getOrElse {
         logger.debug("Can't create the session")
