@@ -42,7 +42,7 @@
         };
 
         $element.on('hide.bs.popover', function() {
-          _.each($('.settings input', $element), function(input) {
+          $('.settings input', $element).each(function(index, input) {
             var attr = (function() {
               var match = $(input).attr('name').match(/evaluateOptions\.(.*)/);
               return (match && match.length > 1) ? match[1] : undefined;
