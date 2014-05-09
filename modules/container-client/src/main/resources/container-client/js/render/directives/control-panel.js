@@ -22,7 +22,7 @@
         };
 
         $scope.$watch('mode', function(mode) {
-          if (mode === 'feedback') {
+          if (mode === 'evaluate') {
             $configLink.popover('enable');
           } else {
             $configLink.popover('disable');
@@ -89,7 +89,7 @@
           '<div class="control-panel">',
           '  <div class="btn-group">',
           '    <label class="btn btn-success" ng-model="mode" btn-radio="\'gather\'">Gather</label>',
-          '    <label class="btn btn-success" ng-model="mode" btn-radio="\'feedback\'">Feedback</label>',
+          '    <label class="btn btn-success" ng-model="mode" btn-radio="\'evaluate\'">Feedback</label>',
           '  </div>',
           '  <div class="score" ng-show="hasScore()">',
           '    <label>Score:</label>',
