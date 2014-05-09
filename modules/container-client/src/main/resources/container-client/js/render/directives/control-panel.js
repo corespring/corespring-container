@@ -1,5 +1,12 @@
 (function() {
 
+  var defaultSettings = {
+    maxNoOfAttempts: 1,
+    highlightUserResponse: true,
+    highlightCorrectResponse: true,
+    showFeedback: true
+  };
+
   angular.module('corespring-player.directives').directive('playerControlPanel', [
     function() {
       var link = function($scope, $element) {
@@ -8,9 +15,7 @@
         console.log("player control panel");
 
         $scope.showSettings = false;
-        $scope.evaluateOptions = {
-          highlightUserResponse: true
-        };
+        $scope.evaluateOptions = defaultSettings;
 
         $scope.mode = 'gather';
 
@@ -93,7 +98,11 @@
           '    <span>{{score.summary.percentage}}%</span>',
           '  </div>',
           '  <ul class="actions">',
-          '    <li class="action config"><a ng-class="{disabled: mode == \'gather\'}" title="Settings"><img src="../../images/settings-icon.png"/></a></li>',
+          '    <li class="action config">',
+          '      <a ng-class="{disabled: mode == \'gather\'}" title="Settings">',
+          '        <img src="../../images/settings-icon.png"/>',
+          '      </a>',
+          '    </li>',
           '    <li class="action reset"><a title="Reset" ng-click="reset()" /></li>',
           '  </ul>',
           '</div>'

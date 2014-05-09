@@ -52,6 +52,9 @@ var controller = function($scope, ComponentRegister, PlayerService) {
     if (message.mode) {
       $scope.setMode(message.mode);
     }
+    if (message.options) {
+      PlayerService.updateSessionSettings(message.options);
+    }
   });
 
 };
