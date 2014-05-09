@@ -12,8 +12,6 @@
       var link = function($scope, $element) {
         var $configLink = $element.find('.action.config');
 
-        console.log("player control panel");
-
         $scope.showSettings = false;
         $scope.evaluateOptions = defaultSettings;
 
