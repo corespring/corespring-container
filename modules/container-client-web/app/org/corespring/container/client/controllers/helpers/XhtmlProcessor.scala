@@ -28,5 +28,15 @@ trait XhtmlProcessor {
     val serializer = new CompactXmlSerializer(cleaner.getProperties)
     Some(serializer.getAsString(n))
   }
+
+  def toWellFormedXhtml(html: String): String = {
+    val cleaner: HtmlCleaner = new HtmlCleaner()
+    cleaner.getProperties.setUseEmptyElementTags(false)
+    cleaner.getProperties.setOmitXmlDeclaration(true)
+    cleaner.getProperties.setOmitHtmlEnvelope(false)
+    val n: TagNode = cleaner.clean(html)
+    val serializer = new CompactXmlSerializer(cleaner.getProperties)
+    serializer.getAsString(n)
+  }
 }
 
