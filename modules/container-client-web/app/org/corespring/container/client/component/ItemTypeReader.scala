@@ -1,7 +1,7 @@
 package org.corespring.container.client.component
 
 import play.api.libs.json.JsValue
-import org.corespring.container.client.controllers.helpers.NameHelper
+import org.corespring.container.client.controllers.helpers.{ XhtmlProcessor, NameHelper }
 import org.corespring.container.components.model.LayoutComponent
 
 trait ItemTypeReader {
@@ -13,7 +13,7 @@ trait AllItemTypesReader extends ItemTypeReader with ComponentSplitter {
   override def componentTypes(id: String, json: JsValue): Seq[String] = components.map(_.componentType)
 }
 
-trait PlayerItemTypeReader extends ItemTypeReader with ComponentSplitter with NameHelper {
+trait PlayerItemTypeReader extends ItemTypeReader with ComponentSplitter with NameHelper with XhtmlProcessor {
 
   /** List components used in the model */
   override def componentTypes(id: String, json: JsValue): Seq[String] = {
@@ -33,7 +33,8 @@ trait PlayerItemTypeReader extends ItemTypeReader with ComponentSplitter with Na
 
   private def layoutTypesInXml(xmlString: String, components: Seq[LayoutComponent]): Seq[String] = {
 
-    val xml = scala.xml.XML.loadString(xmlString)
+    //Note: the xhtml may not have a single root - so we wrap it
+    val xml = scala.xml.XML.loadString(toWellFormedXhtml(xmlString))
 
     val usedInXml = components.filter {
       lc =>
