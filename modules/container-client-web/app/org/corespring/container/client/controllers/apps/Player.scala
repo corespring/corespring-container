@@ -5,12 +5,15 @@ import org.corespring.container.client.component.PlayerItemTypeReader
 import org.corespring.container.client.views.txt.js.PlayerServices
 import play.api.mvc.{ SimpleResult, Request, Action, AnyContent }
 import scala.concurrent.{ Await, Future }
+import play.api.Logger
 
 trait Player extends PlayerItemTypeReader with AppWithServices[PlayerActions[AnyContent]] {
 
   import org.corespring.container.client.controllers.apps.routes.{ Player => PlayerRoutes }
 
   override def context: String = "player"
+
+  lazy val logger = Logger("container.player")
 
   override def servicesJs = {
     import org.corespring.container.client.controllers.resources.routes._
@@ -42,6 +45,7 @@ trait Player extends PlayerItemTypeReader with AppWithServices[PlayerActions[Any
       }
       val page = playerPage(request)
       import scala.concurrent.duration._
+      logger.debug(s"[loadPlayerForSession] $sessionId - loading $page from /container-client")
       val f: Future[SimpleResult] = controllers.Assets.at("/container-client", page)(request)
       Await.result(f, 3.seconds)
   }
