@@ -116,7 +116,7 @@ var Placeholder = function(
       '<div class="component-placeholder"',
       ' ng-class="[componentType,selectedClass]" ',
       '  data-component-id="{{id}}">',
-      '  <div class="blocker" tooltip="{{tooltipMsg}}" tooltip-placement="bottom">',
+      '  <div class="blocker" tooltip="{{tooltipMsg}}" tooltip-append-to-body="true" tooltip-placement="bottom">',
       '     <div class="bg"></div>',
       '     <div class="content">',
       '       <div class="title">{{mainMsg}}</div>',

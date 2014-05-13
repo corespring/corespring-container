@@ -4,9 +4,11 @@ import org.corespring.container.client.actions.EditorActions
 import org.corespring.container.client.component.AllItemTypesReader
 import org.corespring.container.client.views.txt.js.EditorServices
 import play.api.{ Play, Mode, Logger }
-import play.api.libs.json.{ JsString, JsArray, Json, JsValue }
+import play.api.libs.json._
 import play.api.mvc.AnyContent
 import scala.concurrent.{ Future, ExecutionContext }
+import play.api.libs.json.JsArray
+import play.api.libs.json.JsString
 
 trait Editor extends AllItemTypesReader with AppWithServices[EditorActions[AnyContent]] {
 
@@ -26,7 +28,8 @@ trait Editor extends AllItemTypesReader with AppWithServices[EditorActions[AnyCo
           "titleGroup" -> JsString(c.titleGroup.getOrElse("")),
           "icon" -> s"$modulePath/icon/$tag",
           "componentType" -> tag,
-          "defaultData" -> c.defaultData)
+          "defaultData" -> c.defaultData,
+          "configuration" -> (c.packageInfo \ "external-configuration").asOpt[JsObject])
     }
 
     EditorServices("editor.services", Item.load(":id"), Item.save(":id"), JsArray(componentJson)).toString
