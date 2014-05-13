@@ -1,10 +1,21 @@
-var Placeholder = function($rootScope, $compile, $log, ComponentRegister) {
+var Placeholder = function(
+  $rootScope,
+  $compile,
+  $log,
+  ComponentRegister,
+  ComponentConfig) {
 
   var log = $log.debug.bind($log, '[placeholder]');
+
+  var msg = "Double Click to Edit";
 
   function link($scope, $element, $attrs) {
 
     $scope.componentPreview = null;
+
+    var showTooltip = ComponentConfig.showTooltip($scope.componentType);
+    $scope.tooltipMsg = showTooltip ? msg : "";
+    $scope.mainMsg = showTooltip ? "" : msg;
 
     function setDataToComponent() {
       if ($scope.register.loadedData[$scope.id] && $scope.componentPreview) {
@@ -105,10 +116,10 @@ var Placeholder = function($rootScope, $compile, $log, ComponentRegister) {
       '<div class="component-placeholder"',
       ' ng-class="[componentType,selectedClass]" ',
       '  data-component-id="{{id}}">',
-      '  <div class="blocker">',
+      '  <div class="blocker" tooltip="{{tooltipMsg}}" tooltip-append-to-body="true" tooltip-placement="bottom">',
       '     <div class="bg"></div>',
       '     <div class="content">',
-      '       <div class="title">Double Click to Edit</div>',
+      '       <div class="title">{{mainMsg}}</div>',
       '     </div>',
       '     <div class="delete-icon">',
       '      <i ng-click="deleteNode()" class="fa fa-times-circle"></i>',
@@ -120,7 +131,12 @@ var Placeholder = function($rootScope, $compile, $log, ComponentRegister) {
   };
 };
 
-angular.module('corespring-editor.directives').directive('placeholder', ['$rootScope', '$compile', '$log', 'ComponentRegister',
-  Placeholder
-
-]);
+angular.module('corespring-editor.directives')
+  .directive('placeholder', [
+    '$rootScope',
+    '$compile',
+    '$log',
+    'ComponentRegister',
+    'ComponentConfig',
+    Placeholder
+  ]);

@@ -4,7 +4,6 @@ A fleshing out of the POC node app (author dog) to run as a scala app.
 
 This will allow integration points into the main corespring-api project.
 
-
 ## Requirements 
 
 These tools should be on your `PATH`:
@@ -28,7 +27,6 @@ submodule. If it doesn't you'll need to add this repo.
 
     git submodule init
     git submodule update
-
 
 ## Run
 
