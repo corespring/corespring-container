@@ -6,15 +6,15 @@ angular.module('corespring.wiggi-wiz-features').directive('mathjaxHolder', ['$lo
     var template = [
       '<div class="component-placeholder"',
       ' tooltip-placement="bottom" ',
+      ' tooltip-append-to-body="true"',
       ' tooltip="Double Click to Edit">',
-      //Note: I'm disabling the delete button - will need to check if they want it.
-      //'  <div class="blocker">',
-      //'     <div class="bg"></div>',
-      //'     <div class="content"></div>',
-      //'     <div class="delete-icon">',
-      //'      <i ng-click="deleteNode()" class="fa fa-times-circle"></i>',
-      //'    </div>',
-      //'  </div>',
+      '  <div class="blocker">',
+      '     <div class="bg"></div>',
+      '     <div class="content"></div>',
+      '     <div class="delete-icon">',
+      '      <i ng-click="deleteNode()" class="fa fa-times-circle"></i>',
+      '    </div>',
+      '  </div>',
       '  <div class="holder"></div>',
       '</div>'
     ].join('\n');
