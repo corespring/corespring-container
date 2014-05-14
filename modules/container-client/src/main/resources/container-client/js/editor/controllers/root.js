@@ -25,11 +25,7 @@ var controller = function($scope, $rootScope, $log, $location, $state, $timeout,
       $scope.showDesignOptions = true;
     }
 
-    if (isOverview()) {
-      $scope.showOverview = true;
-    } else {
-      $scope.showOverview = false;
-    }
+    $scope.showOverview = isOverview();
 
     $scope.showSupportingMaterials = supportingMaterialIndex() !== undefined;
   });
@@ -45,7 +41,7 @@ var controller = function($scope, $rootScope, $log, $location, $state, $timeout,
       ItemService.save({
           supportingMaterials: $scope.data.item.supportingMaterials
         },
-        function() {
+        function () {
           if (index > 0) {
             $state.transitionTo('supporting-material', {
               index: index - 1
@@ -76,11 +72,7 @@ var controller = function($scope, $rootScope, $log, $location, $state, $timeout,
 
   $scope.supportingMaterialPreviewable = function() {
     var index = supportingMaterialIndex();
-    if (index >= 0) {
-      return SupportingMaterialsService.previewable($scope.data.item.supportingMaterials, index);
-    } else {
-      return false;
-    }
+    return isNaN(index) ? false : SupportingMaterialsService.previewable($scope.data.item.supportingMaterials, index);
   };
 
   function previewable() {
@@ -145,11 +137,12 @@ var controller = function($scope, $rootScope, $log, $location, $state, $timeout,
   });
 
   $scope.hasSupportingMaterials = function() {
-    return $scope.data.item ?
-      ($scope.data.item.supportingMaterials && $scope.data.item.supportingMaterials.length > 0) : false;
+    var item = $scope.data.item;
+    return item && item.supportingMaterials && item.supportingMaterials.length > 0;
   };
 
   $scope.isActive = function(tab) {
+    //console.log("isActive", $location.path(), $location.path().replace(/^\/|\/$/g, ''), tab);
     return $location.path().replace(/^\/|\/$/g, '') === tab;
   };
 

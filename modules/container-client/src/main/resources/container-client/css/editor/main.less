@@ -181,7 +181,6 @@
         .user-select(none);
         a {
           font-size: 13px;
-          text-transform: uppercase;
           cursor: pointer;
           letter-spacing: 0.4px;
           color: lighten(@cs-grey, 50%);
@@ -189,6 +188,9 @@
             color: lighten(@cs-grey,30%);
             background-color: darken(@cs-grey, 4%);
           }
+        }
+        a.mainitem-link {
+          text-transform: uppercase;
         }
       }
       li.active{
@@ -283,7 +285,6 @@
 
     }
   }
-
 
   .preview-toggle {
     background: #2693BA;

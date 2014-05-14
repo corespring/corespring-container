@@ -14,27 +14,25 @@ block content
 
       ul.nav.nav-stacked
 
-        li(ng-class="{ active: isActive('design') }")
-          a(ui-sref="design({section: 'main'})") Design
+        li
+          a.mainitem-link(ui-sref="design({section: 'main'})") Design
 
-          ul.nav.nav-subitems
-            li.nav-subitem(ui-sref-active="active")
-              a.subitem-link(ui-sref="design({section: 'main'})") Item
-            li.nav-subitem(ng-class="{active: isActive('item-profile')}")
-              a.subitem-link(ui-sref="item-profile" ) Profile
-            li.nav-subitem(ui-sref-active="active")
-              a.subitem-link(ui-sref="supporting-materials({intro: 'intro'})") Supporting Materials
-              ul.nav.nav-subitems(ng-show="showSupportingMaterials")
-                li.nav-subitem(ng-repeat="supportingMaterial in data.item.supportingMaterials", ng-class="{ active: isSupportingMaterialActive(supportingMaterial, $index)}")
-                  a.subitem-link.supporting-material-link(ui-sref="supporting-material({index: $index})") {{supportingMaterial.name}}
-                  a.delete-supporting-material(ng-click="deleteSupportingMaterial($index)")
+        li.nav-subitem(ui-sref-active="active")
+          a.subitem-link(ui-sref="design({section: 'main'})") Item
+        li.nav-subitem(ui-sref-active="active")
+          a.subitem-link(ui-sref="item-profile" ) Profile
+        li.nav-subitem(ui-sref-active="active")
+          a.subitem-link(ui-sref="supporting-materials({intro: 'intro'})") Supporting Materials
+
+        li.nav-subitem(ng-repeat="supportingMaterial in data.item.supportingMaterials", ng-class="{ active: isSupportingMaterialActive(supportingMaterial, $index)}")
+          a.subitem-link.supporting-material-link(ui-sref="supporting-material({index: $index})") {{supportingMaterial.name}}
+          a.delete-supporting-material(ng-click="deleteSupportingMaterial($index)")
 
         li
-          a(ui-sref="overview") View
+          a.mainitem-link(ui-sref="overview") View
 
-          ul.nav.nav-subitems
-            li.nav-subitem(ui-sref-active="active")
-              a.subitem-link(ui-sref="overview") Catalog View
+        li.nav-subitem(ui-sref-active="active")
+          a.subitem-link(ui-sref="overview") Catalog View
 
     .preview-container
       .contents(ui-view="preview")
