@@ -1,5 +1,4 @@
 .control-panel {
-  padding-left: 21px;
   border-bottom: 1px solid #000000;
   width: 100%;
   min-height: 43px;
@@ -21,35 +20,22 @@
     list-style-type: none;
 
     .action {
-      @icon-size: 25px;
       display: inline-block;
       vertical-align: top;
 
       a {
         display: block;
-        width: @icon-size;
-        height: @icon-size;
         margin: 2px 5px;
-
-        img {
-          width: 100%;
-          height: 100%;
+        i {
+          font-size: 32px;
         }
 
         &.disabled {
           cursor: not-allowed;
-          img {
-            opacity: 0.4;
-          }
+          opacity: 0.2;
         }
       }
 
-      &.reset a {
-        background-size: @icon-size @icon-size;
-        background-repeat: no-repeat;
-        background-position: center center;
-        background-image: url('../images/refresh-icon.png');
-      }
     }
 
     .popover-content {
@@ -72,4 +58,35 @@
     }
   }
 
+  .btn-feedback {
+    color: #ffffff;
+    font-size: 12px;
+    background: #00acce;
+    background-image: url("../images/buttoncheckbox.png") 0 0 no-repeat; /* fallback */
+    background-image: url("../images/buttoncheckbox.png") -webkit-gradient(linear, left top, left bottom, from(#00acce), to(#0086a0)); /* Saf4+, Chrome */
+    background-image: url("../images/buttoncheckbox.png"), -webkit-linear-gradient(top, #00acce, #0086a0); /* Chrome 10+, Saf5.1+ */
+    background-image: url("../images/buttoncheckbox.png"), -moz-linear-gradient(top, #00acce, #0086a0); /* FF3.6+ */
+    background-image: url("../images/buttoncheckbox.png"), -ms-linear-gradient(top, #00acce, #0086a0); /* IE10 */
+    background-image: url("../images/buttoncheckbox.png"), -o-linear-gradient(top, #00acce, #0086a0); /* Opera 11.10+ */
+    background-image: url("../images/buttoncheckbox.png"), linear-gradient(top, #00acce, #0086a0); /* W3C */
+    border-color: #0097b5 #00819b #00819b;
+    border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+    background-position: center top no-repeat;
+    background-repeat: no-repeat;
+    text-shadow: 0 -1px 1px rgba(0, 0, 0, .9);
+    width: 135px;
+    background-position: center;
+  }
+
+  .btn.feedback:hover, .btn.feedback:active, .btn.feedback.active, .btn.feedback.disabled, .btn.save[disabled] {
+    background-color: #00819b;
+    background-position: center;
+    text-shadow: 0px;
+  }
+
+}
+
+.button-holder {
+  margin-top: 15px;
+  text-align: right;
 }

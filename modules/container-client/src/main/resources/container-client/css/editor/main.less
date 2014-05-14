@@ -16,12 +16,15 @@
   }
 
   .preview-btn() {
-    @width: 75px;
+    @width: 150px;
     width: @width;
+    height: 44px;
+    font-size: 24px;
+    display: block;
     border-radius: 0px;
     position: absolute;
-    top: @width - 5px;
-    right: -25px;
+    top: 96px;
+    right: -52px;
     .drop-shadow(1px, 2px, 2px, 0.3);
     -webkit-transform: rotate(-90deg);
     -moz-transform: rotate(-90deg);
@@ -128,7 +131,7 @@
     } 
 
     .preview-active{
-      right: -50px;
+      right: -98px;
     }
 
     .top-nav{
@@ -212,7 +215,8 @@
     background-color: white;
 
     .contents {
-      padding: 10px;
+      padding: 10px 10px 10px 55px;
+
       .component-container {
         .transition-all();
         padding: 4px;

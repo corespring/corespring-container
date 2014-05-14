@@ -31,10 +31,6 @@
           $scope.$broadcast('setMode', { mode: $scope.mode, options: $scope.evaluateOptions, saveResponses: null } );
         });
 
-        $element.on('click', '.dismiss-popover', function() {
-          $('.action.config').popover('hide');
-        });
-
         $scope.hasScore = function() {
           return $scope.score && !_.isNaN($scope.score.summary.percentage);
         };
@@ -88,8 +84,8 @@
         template: [
           '<div class="control-panel">',
           '  <div class="btn-group">',
-          '    <label class="btn btn-success" ng-model="mode" btn-radio="\'gather\'">Gather</label>',
-          '    <label class="btn btn-success" ng-model="mode" btn-radio="\'evaluate\'">Feedback</label>',
+          '    <button class="btn btn-feedback" ng-model="mode"',
+          '      btn-checkbox-true="\'evaluate\'" btn-checkbox btn-checkbox-false="\'gather\'">Feedback Mode</button>',
           '  </div>',
           '  <div class="score" ng-show="hasScore()">',
           '    <label>Score:</label>',
@@ -98,10 +94,14 @@
           '  <ul class="actions">',
           '    <li class="action config">',
           '      <a ng-class="{disabled: mode == \'gather\'}" title="Settings">',
-          '        <img src="../../images/settings-icon.png"/>',
+          '        <i class="fa fa-cog" />',
           '      </a>',
           '    </li>',
-          '    <li class="action reset"><a title="Reset" ng-click="reset()" /></li>',
+          '    <li class="action reset">',
+          '      <a title="Reset" ng-click="reset()">',
+          '        <i class="fa fa-refresh" />',
+          '      </a>',
+          '    </li>',
           '  </ul>',
           '</div>'
         ].join("\n")
