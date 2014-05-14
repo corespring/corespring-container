@@ -8,7 +8,7 @@
     "angular-sanitize": "~1.2.12",
     "angular-animate": "~1.2.12",
     "angular-ui": "~0.4.0",
-    "angular-ui-sortable": "https://github.com/corespring/ui-sortable.git#2ffb9fc44b30685d58d2df9223b3ad52de215e6f",
+    "angular-ui-sortable": "~0.12.6",
     "select2": "~3.4.5",
     "angular-ui-select2": "~0.0.5",
     "angular-bootstrap": "~0.10.0",
@@ -62,7 +62,6 @@
     ]
   },
   "resolutions": {
-    "angular": "~1.2.12",
     "bootstrap": "~3.1.1",
     "jquery": "1.11.0"
   }
