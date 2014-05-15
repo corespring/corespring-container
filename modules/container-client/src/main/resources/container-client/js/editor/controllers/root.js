@@ -142,8 +142,7 @@ var controller = function($scope, $rootScope, $log, $location, $state, $timeout,
   };
 
   $scope.isActive = function(tab) {
-    //console.log("isActive", $location.path(), $location.path().replace(/^\/|\/$/g, ''), tab);
-    return $location.path().replace(/^\/|\/$/g, '') === tab;
+    return $location.path().replace(/^\/|\/$/g, '').indexOf(tab) !== -1;
   };
 
   $scope.isSupportingMaterialActive = function(supportingMaterial, index) {
