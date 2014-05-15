@@ -83,10 +83,8 @@
         link: link,
         template: [
           '<div class="control-panel">',
-          '  <div class="btn-group">',
-          '    <button class="btn btn-feedback" ng-model="mode"',
-          '      btn-checkbox-true="\'evaluate\'" btn-checkbox btn-checkbox-false="\'gather\'">Feedback Mode</button>',
-          '  </div>',
+          '  <button class="btn btn-feedback" ng-model="mode"',
+          '    btn-checkbox-true="\'evaluate\'" btn-checkbox btn-checkbox-false="\'gather\'">Feedback Mode</button>',
           '  <div class="score" ng-show="hasScore()">',
           '    <label>Score:</label>',
           '    <span>{{score.summary.percentage}}%</span>',
