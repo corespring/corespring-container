@@ -2,15 +2,19 @@
 var controller = function(
   $scope,
   $rootScope,
+  $element,
   $http,
   $stateParams,
   $state,
   $log,
   $filter,
   $location,
+  $timeout,
+  $window,
   SupportingMaterialsService,
   ItemService,
   ImageUtils,
+  WiggiWizHelper,
   WiggiMathJaxFeatureDef) {
 
   $scope.index = parseInt($stateParams.index, 10);
@@ -225,20 +229,30 @@ var controller = function(
 
   $scope.init();
 
+  $timeout(function() {
+    var editable = $('.wiggi-wiz-editable', $element);
+    WiggiWizHelper.placeCaretAtEnd(editable[0]);
+    editable.focus();
+  }, 200);
+
 };
 
 angular.module('corespring-editor.controllers')
   .controller('SupportingMaterial', ['$scope',
     '$rootScope',
+    '$element',
     '$http',
     '$stateParams',
     '$state',
     '$log',
     '$filter',
     '$location',
+    '$timeout',
+    '$window',
     'SupportingMaterialsService',
     'ItemService',
     'ImageUtils',
+    'WiggiWizHelper',
     'WiggiMathJaxFeatureDef',
     controller
   ]);

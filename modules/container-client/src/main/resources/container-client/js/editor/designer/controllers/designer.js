@@ -1,7 +1,9 @@
 /* global AddContentModalController, com */
 var controller = function(
   $scope,
+  $element,
   $compile,
+  $window,
   $http,
   $timeout,
   $modal,
@@ -14,6 +16,7 @@ var controller = function(
   ComponentToWiggiwizFeatureAdapter,
   ImageUtils,
   ComponentRegister,
+  WiggiWizHelper,
   WiggiMathJaxFeatureDef) {
 
 
@@ -253,11 +256,20 @@ var controller = function(
   });
 
   DesignerService.loadAvailableComponents($scope.onComponentsLoaded, $scope.onComponentsLoadError);
+
+  $timeout(function() {
+    var editable = $('.wiggi-wiz-editable', $element);
+    WiggiWizHelper.placeCaretAtEnd(editable[0]);
+    editable.focus();
+  }, 200);
+
 };
 
 angular.module('corespring-editor.controllers')
   .controller('Designer', ['$scope',
+    '$element',
     '$compile',
+    '$window',
     '$http',
     '$timeout',
     '$modal',
@@ -270,6 +282,7 @@ angular.module('corespring-editor.controllers')
     'ComponentToWiggiwizFeatureAdapter',
     'ImageUtils',
     'ComponentRegister',
+    'WiggiWizHelper',
     'WiggiMathJaxFeatureDef',
     controller
   ]);
