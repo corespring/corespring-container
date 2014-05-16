@@ -2,6 +2,7 @@
 var controller = function(
   $scope,
   $rootScope,
+  $element,
   $http,
   $stateParams,
   $state,
@@ -11,6 +12,7 @@ var controller = function(
   SupportingMaterialsService,
   ItemService,
   ImageUtils,
+  WiggiWizHelper,
   WiggiMathJaxFeatureDef) {
 
   $scope.index = parseInt($stateParams.index, 10);
@@ -221,6 +223,7 @@ var controller = function(
       $location.search('hidePreview', null);
     }
 
+    WiggiWizHelper.focusCaretAtEnd('.wiggi-wiz-editable', $element);
   };
 
   $scope.init();
@@ -230,6 +233,7 @@ var controller = function(
 angular.module('corespring-editor.controllers')
   .controller('SupportingMaterial', ['$scope',
     '$rootScope',
+    '$element',
     '$http',
     '$stateParams',
     '$state',
@@ -239,6 +243,7 @@ angular.module('corespring-editor.controllers')
     'SupportingMaterialsService',
     'ItemService',
     'ImageUtils',
+    'WiggiWizHelper',
     'WiggiMathJaxFeatureDef',
     controller
   ]);
