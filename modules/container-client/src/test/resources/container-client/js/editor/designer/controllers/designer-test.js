@@ -57,7 +57,11 @@ describe('designer controller', function() {
     scope = $rootScope.$new();
     try {
       ctrl = $controller('Designer', {
-        $scope: scope
+        $scope: scope,
+        $element: $('<div></div>'),
+        WiggiWizHelper: {
+          focusCaretAtEnd: function() {}
+        }
       });
     } catch (e) {
       throw ("Error with the controller: " + e);

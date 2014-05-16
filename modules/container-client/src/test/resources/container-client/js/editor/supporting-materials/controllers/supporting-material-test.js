@@ -45,6 +45,10 @@ describe('supporting material controller', function() {
         $scope: scope,
         $stateParams: stateParams,
         $state: {},
+        $element: $('<div></div>'),
+        WiggiWizHelper: {
+          focusCaretAtEnd: function() {}
+        },
         SupportingMaterialsService: supportingMaterialsService,
         ItemService: itemService
       });
