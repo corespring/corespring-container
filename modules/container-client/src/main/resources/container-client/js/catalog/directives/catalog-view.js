@@ -324,7 +324,7 @@ angular.module('corespring-catalog.directives').directive('catalogview', [ '$sce
       '        <span class="label">{{i18n.standards.label}}</span>',
       '        <ul class="standards-list">',
       '          <li ng-repeat="standard in profile.standards">',
-      '            <span class="standard">{{standard}}</span>',
+      '            <span class="standard">{{standard.dotNotation}}</span>',
       '          </li>',
       '          <li ng-show="!profile.standards || profile.standards.length == 0">',
       '            <span class="standard">{{unassigned}}</span>',
