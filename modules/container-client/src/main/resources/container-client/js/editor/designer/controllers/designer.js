@@ -3,9 +3,7 @@ var controller = function(
   $scope,
   $element,
   $compile,
-  $window,
   $http,
-  $timeout,
   $modal,
   $log,
   $stateParams,
@@ -256,22 +254,14 @@ var controller = function(
   });
 
   DesignerService.loadAvailableComponents($scope.onComponentsLoaded, $scope.onComponentsLoadError);
-
-  $timeout(function() {
-    var editable = $('.wiggi-wiz-editable', $element);
-    WiggiWizHelper.placeCaretAtEnd(editable[0]);
-    editable.focus();
-  }, 200);
-
+  WiggiWizHelper.focusCaretAtEnd('.wiggi-wiz-editable', $element);
 };
 
 angular.module('corespring-editor.controllers')
   .controller('Designer', ['$scope',
     '$element',
     '$compile',
-    '$window',
     '$http',
-    '$timeout',
     '$modal',
     '$log',
     '$stateParams',

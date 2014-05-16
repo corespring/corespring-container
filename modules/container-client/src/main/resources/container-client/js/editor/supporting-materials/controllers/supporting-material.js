@@ -9,8 +9,6 @@ var controller = function(
   $log,
   $filter,
   $location,
-  $timeout,
-  $window,
   SupportingMaterialsService,
   ItemService,
   ImageUtils,
@@ -225,15 +223,10 @@ var controller = function(
       $location.search('hidePreview', null);
     }
 
+    WiggiWizHelper.focusCaretAtEnd('.wiggi-wiz-editable', $element);
   };
 
   $scope.init();
-
-  $timeout(function() {
-    var editable = $('.wiggi-wiz-editable', $element);
-    WiggiWizHelper.placeCaretAtEnd(editable[0]);
-    editable.focus();
-  }, 200);
 
 };
 
@@ -247,8 +240,6 @@ angular.module('corespring-editor.controllers')
     '$log',
     '$filter',
     '$location',
-    '$timeout',
-    '$window',
     'SupportingMaterialsService',
     'ItemService',
     'ImageUtils',
