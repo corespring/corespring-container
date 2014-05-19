@@ -23,3 +23,9 @@ script#designer(type="text/ng-template")
           ng-model="data.item.components",
           markup="data.item.xhtml",
           component-set="componentSet")
+
+    .summary-feedback-container(ng-show="section == 'summary-feedback'")
+      label Summary Feedback
+      textarea(ng-model="data.item.summaryFeedback",class="form-control",
+         placeholder="Use this space to provide summary level feedback for this interaction.")
+

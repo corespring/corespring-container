@@ -20,8 +20,13 @@ block content
         li.nav-subitem(ui-sref-active="active")
           a.subitem-link(ui-sref="design({section: 'main'})") Item
         li.nav-subitem(ui-sref-active="active")
-          a.subitem-link(ui-sref="item-profile" ) Profile
+          a.subitem-link(ui-sref="design({section: 'weighting'})" ) Weighting
         li.nav-subitem(ui-sref-active="active")
+          a.subitem-link(ui-sref="design({section: 'summary-feedback'})" ) Summary Feedback
+        li.nav-subitem(ui-sref-active="active")
+          a.subitem-link(ui-sref="item-profile" ) Profile
+
+        li.nav-subitem(ui-sref-active="active", style="margin-top: 20px;")
           a.subitem-link(ui-sref="supporting-materials({intro: 'intro'})") Supporting Materials
 
         li.nav-subitem(ng-repeat="supportingMaterial in data.item.supportingMaterials", ng-class="{ active: isSupportingMaterialActive(supportingMaterial, $index)}")
