@@ -1,4 +1,6 @@
 @preview-width: 180px;
+@light-grey: #e4e4e4;
+@header-height: 80px;
 
 .abs-full(@left: 0, @right: 0, @top: 0, @bottom: 0){
   position: absolute;
@@ -10,8 +12,42 @@
 
 .mathjax-dialog-root{
   .abs-full();
+
+  .header{
+    padding: 8px;
+    padding-top: 6px;
+    position: absolute;
+    height: @header-height;
+    left: 0;
+    right:0; //@preview-width;
+    background-color: @light-grey;
+    border-bottom: solid 1px darken(@light-grey, 30%);
+  }
+
+  .display-type{
+    padding-left: 10px;
+    a{
+      font-size: 11px;
+    }
+  }
+
+  .mj-dialog-title {
+    font-size: 18px;
+  }
+
+  .mj-dialog-content{
+    font-size: 12px;
+    a{
+      text-decoration: underline;
+    }
+  }
+
+  .mj-math-type{
+    padding-top: 5px;
+  }
+
   .editor{
-    .abs-full(@right: @preview-width);
+    .abs-full(@right: @preview-width, @top: @header-height);
     textarea{
       width: 100%;
       height: 100%;
@@ -27,11 +63,11 @@
   }
 
   .math-preview{
-    .abs-full(@left: none);
+    .abs-full(@left: none, @top: @header-height);
     width: @preview-width;
     padding-top: 40px;
     text-align: center;
-    background-color: #e4e4e1;
+    background-color: @light-grey;
   }
 }
 
