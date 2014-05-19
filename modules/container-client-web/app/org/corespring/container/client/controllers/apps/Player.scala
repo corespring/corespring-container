@@ -43,6 +43,7 @@ trait Player extends PlayerItemTypeReader with AppWithServices[PlayerActions[Any
         def has(n: String) = request.path.contains(n) || request.getQueryString("file") == Some(n)
         val mode = request.queryString.get("mode")
         val pageMode = mode.getOrElse(Play.current.mode.toString.toLowerCase)
+        logger.trace(s"pageMode: $pageMode")
         if (has("container-player.html")) s"container-player.$pageMode.html" else s"player.$pageMode.html"
       }
       val page = playerPage(request)
