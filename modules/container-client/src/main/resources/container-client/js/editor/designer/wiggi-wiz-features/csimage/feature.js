@@ -3,11 +3,14 @@ angular.module('corespring.wiggi-wiz-features').factory('ImageFeature', [
   'TemplateUtils',
   function(ImageDef, TemplateUtils) {
 
-    var imageSrc = "bbbb.png";
     var csImage = new ImageDef();
 
     csImage.compile = true;
     csImage.note = 'Corespring Image Override of Image';
+
+    csImage.getImgNode = function($node) {
+      return $($node).find('img');
+    };
 
     csImage.onClick = function($node, $nodeScope, editor) {
       var buttons = [
@@ -39,24 +42,22 @@ angular.module('corespring.wiggi-wiz-features').factory('ImageFeature', [
 
     csImage.initialise = function($node, replaceWith) {
       var html = $node.html();
-      var clone = $('<div image-holder>' + html + '</div>');
-      return replaceWith(clone);
+      var imageSrc = $node.find('img').attr('src');
+
+      if (imageSrc) {
+        var imageStyle = $node.find('img').attr('style');
+        var clone = $('<div image-holder image-src="' + imageSrc + '" image-style="' + imageStyle + '"></div>');
+        return replaceWith(clone);
+      } else {
+        return $node;
+      }
     };
 
     csImage.getMarkUp = function($node, $scope) {
-      return '<div style="text-align: left;"><img src="' + imageSrc + '"/></div>';
-    };
-
-
-    function getImgNode($node) {
-      return $node.find('img');
-    }
-
-    csImage.deleteNode = function($node, services) {
-      console.log("deleting node: ", $node);
-      services.image.deleteFile(getImgNode($node).attr('src'));
-      $node.remove();
-
+      console.log("Boo: ", $node.html());
+      var imgNode = $node.find('img');
+      console.log("Qtya: ", imgNode);
+      return '<div style="text-align: left;">' + $(imgNode)[0].outerHTML + '</div>';
     };
 
     csImage.addToEditor = function(editor, addContent) {
@@ -77,8 +78,10 @@ angular.module('corespring.wiggi-wiz-features').factory('ImageFeature', [
         }
 
         if (update.imageUrl) {
-
-          addContent($('<div image-holder="" style="text-align: left;"><img src="' + update.imageUrl + '"/></div>'));
+          console.log("Adding Image: ", update.imageUrl);
+          var img = '<div image-holder="" image-src="' + update.imageUrl + '" style="text-align: left;"></div>';
+          console.log(img);
+          addContent($(img));
         }
       }
 

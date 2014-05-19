@@ -13,36 +13,20 @@ angular.module('corespring.wiggi-wiz-features').directive('imageHolder', ['$log'
       '      <i ng-click="deleteNode()" class="fa fa-times-circle"></i>',
       '    </div>',
       '  </div>',
-      '  <div class="holder">click me!!</div>',
+      '  <div class="holder">',
+      '  <img src="imageSrc" style="imageStyle"/>',
+      '  </div>',
       '</div>'
     ].join('\n');
 
     var html;
 
-    function compile($element) {
-      html = $element.html();
-      $element.html(template);
-      return link;
+
+    function compile($element, $attrs) {
+      var tmpl = template.replace("imageSrc", $attrs.imageSrc).replace("imageStyle", $attrs.imageStyle);
+      $element.html(tmpl);
     }
 
-    function link($scope, $element) {
-
-      log('$scope', $scope);
-      log('$element', $element);
-
-      $scope.originalMarkup = html;
-
-      $scope.click = function() {
-        log('> click node');
-        //$scope.$emit('wiggi-wiz.click-node', $element);
-      };
-
-      $scope.$watch('originalMarkup', function(n) {
-        if (n) {
-          $element.find('.holder').html(n);
-        }
-      });
-    }
     return {
       restrict: 'A',
       compile: compile
