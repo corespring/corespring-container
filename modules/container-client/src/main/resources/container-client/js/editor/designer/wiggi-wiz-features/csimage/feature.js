@@ -1,15 +1,45 @@
-angular.module('corespring.wiggi-wiz-features').factory('ImageFeature', ['Image',
-
-  function(ImageDef) {
+angular.module('corespring.wiggi-wiz-features').factory('ImageFeature', [
+  'Image',
+  'TemplateUtils',
+  function(ImageDef, TemplateUtils) {
 
     var imageSrc = "bbbb.png";
     var csImage = new ImageDef();
 
     csImage.compile = true;
+    csImage.note = 'Corespring Image Override of Image';
+
+    csImage.onClick = function($node, $nodeScope, editor) {
+      var buttons = [
+        TemplateUtils.makeButton({
+          html: '<span>25%</span>'
+        }, '0.25'),
+        TemplateUtils.makeButton({
+          html: '<span>50%</span>'
+        }, '0.5'),
+        TemplateUtils.makeButton({
+          html: '<span>75%</span>'
+        }, '0.75'),
+        TemplateUtils.makeButton({
+          html: '<span>100%</span>'
+        }, '1.0'),
+        TemplateUtils.makeButton({
+          icon: 'fa-align-left'
+        }, 'align:left'),
+        TemplateUtils.makeButton({
+          icon: 'fa-align-right'
+        }, 'align:right'),
+        TemplateUtils.makeButton({
+          icon: 'fa-align-center'
+        }, 'align:center')
+      ].join('\n');
+      editor.togglePopover($node, $nodeScope, buttons, $node.find('img'));
+    };
+
 
     csImage.initialise = function($node, replaceWith) {
       var html = $node.html();
-      var clone = $("<div image-holder>" + html + "</div>");
+      var clone = $('<div image-holder>' + html + '</div>');
       return replaceWith(clone);
     };
 
