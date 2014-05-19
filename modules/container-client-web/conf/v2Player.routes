@@ -48,9 +48,8 @@ GET           /rig/:componentType/*file                              @org.coresp
 # Hooks for the editor: config, services + components
 GET           /editor/editor-services.js                             @org.corespring.container.client.controllers.apps.Editor.services
 GET           /editor/:itemId/editor-config.json                     @org.corespring.container.client.controllers.apps.Editor.config(itemId)
-GET           /editor/:itemId/index.html                             @org.corespring.container.client.controllers.apps.Editor.editItem(itemId, mode : Option[String] ?= None )
+GET           /editor/:itemId/index.html                             @org.corespring.container.client.controllers.apps.Editor.editItem(itemId, jsMode : Option[String] ?= None )
 GET           /editor/:itemId/supporting-material/:name/*file        @org.corespring.container.client.controllers.Assets.supportingMaterial(itemId, name, file)
-GET           /editor/:itemId/run                                    @org.corespring.container.client.controllers.Assets.item(itemId, file="new-editor.html")
 GET           /editor/:itemId/*file                                  @org.corespring.container.client.controllers.Assets.item(itemId, file)
 POST          /editor/:itemId/*file                                  @org.corespring.container.client.controllers.Assets.upload(itemId, file)
 DELETE        /editor/:itemId/*file                                  @org.corespring.container.client.controllers.Assets.delete(itemId, file)
