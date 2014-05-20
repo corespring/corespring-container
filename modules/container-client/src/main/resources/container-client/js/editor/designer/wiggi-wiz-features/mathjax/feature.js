@@ -21,7 +21,7 @@ angular.module('corespring.wiggi-wiz-features').factory('WiggiMathJaxFeatureDef'
 
         editor.showEditPane($scope,
           'Edit the Math',
-          '<mathjax-dialog></mathjax-dialog>',
+          '<mathjax-dialog ng-model="data.originalMarkup"></mathjax-dialog>',
           function onUpdate() {},
           null,
           function onClose() {

@@ -1,6 +1,7 @@
 @preview-width: 180px;
 @light-grey: #e4e4e4;
 @header-height: 80px;
+@sub-header-height: 30px;
 
 .abs-full(@left: 0, @right: 0, @top: 0, @bottom: 0){
   position: absolute;
@@ -21,7 +22,20 @@
     left: 0;
     right:0; //@preview-width;
     background-color: @light-grey;
-    border-bottom: solid 1px darken(@light-grey, 30%);
+    border-bottom: solid 1px darken(@light-grey, 10%);
+  }
+
+  .mj-math-type{
+    padding-left: 8px;
+    position: absolute;
+    top: @header-height;
+    height: @sub-header-height;
+    left: 0;
+    right: 0;
+    padding-top: 5px;
+    background-color: darken(@light-grey, 5%);
+    border-bottom: solid 1px darken(@light-grey, 10%);
+    font-size: 11px;
   }
 
   .display-type{
@@ -42,12 +56,9 @@
     }
   }
 
-  .mj-math-type{
-    padding-top: 5px;
-  }
 
   .editor{
-    .abs-full(@right: @preview-width, @top: @header-height);
+    .abs-full(@right: @preview-width, @top: @header-height + @sub-header-height);
     textarea{
       width: 100%;
       height: 100%;
@@ -63,7 +74,7 @@
   }
 
   .math-preview{
-    .abs-full(@left: none, @top: @header-height);
+    .abs-full(@left: none, @top: @header-height + @sub-header-height);
     width: @preview-width;
     padding-top: 40px;
     text-align: center;
