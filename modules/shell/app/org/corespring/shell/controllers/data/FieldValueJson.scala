@@ -7,7 +7,25 @@ object FieldValueJson {
   def apply(): JsValue = fieldValues
 
   val fieldValues = Json.obj(
-    "version" -> "0.0.2",
+    "version" -> "0.0.3",
+    "additionalCopyrightItemType" -> Json.arr(
+      Json.obj(
+        "key" -> "Passage",
+        "value" -> "Passage"
+      ),
+      Json.obj(
+        "key" -> "Image",
+        "value" -> "Image"
+      ),
+      Json.obj(
+        "key" -> "Video",
+        "value" -> "Video"
+      ),
+      Json.obj(
+        "key" -> "Audio",
+        "value" -> "Audio"
+      )
+    ),
     "bloomsTaxonomy" -> Json.arr(
       Json.obj(
         "key" -> "Remembering",
