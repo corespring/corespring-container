@@ -41,8 +41,16 @@
           $scope.standardsAdapter.subCategoryOption));
     }
 
+    function containsLiteracyStandard(standards) {
+      return _.find(standards, function (item) {
+        return item && item.subject && item.subject.toLowerCase().indexOf("literacy") >= 0;
+      });
+    }
+
     $scope.$watch('profile.standards', function (newValue, oldValue) {
       log("profile.standards", newValue);
+
+      $scope.isLiteracyStandardSelected = containsLiteracyStandard(newValue);
     });
 
     $scope.standardsAdapter = {
@@ -52,7 +60,7 @@
       tags: [],
       allowClear: true,
       minimumInputLength: 1,
-      placeholder: "Choose a standard",
+      placeholder: "Begin by typing a standard or skill.",
       id: function (item) {
         return item.id;
       },
@@ -192,7 +200,7 @@
       $scope.bloomsTaxonomyDataProvider = toListOfValues(result);
     });
 
-    $scope.copyrightExpirationYearDataProvider = _.range(new Date().getFullYear(), 2020).concat(['Never']);
+    $scope.copyrightExpirationYearDataProvider = _.range(new Date().getFullYear(), new Date().getFullYear() + 20).concat(['Never']);
 
     $scope.copyrightYearDataProvider = _.range(new Date().getFullYear(), 1939, -1);
 
@@ -315,8 +323,14 @@
       $scope.contributorDetails.copyright.additional.push({});
     };
 
-    $scope.removeCopyrightItem = function () { //TODO Add ui to trigger removal of specific item
-      $scope.contributorDetails.copyright.additional.pop();
+    $scope.removeCopyrightItem = function (item) {
+      var index = $scope.contributorDetails.copyright.additional.indexOf(item);
+      if (index >= 0) {
+        $scope.contributorDetails.copyright.additional.splice(index,1);
+        if($scope.contributorDetails.copyright.additional.length === 0){
+          $scope.needAdditionalCopyrightInformation = '';
+        }
+      }
     };
 
     $scope.clearCopyrightItems = function () {
@@ -459,9 +473,9 @@
       isFormActive = true;
     }
 
-    $scope.$watch('item', function(newValue) {
+    $scope.$watch('item', function (newValue) {
       log("item $watch", newValue);
-      if(newValue && newValue.profile) {
+      if (newValue && newValue.profile) {
         onLoadItemSuccess();
       }
     });
@@ -473,5 +487,67 @@
     $scope.$emit('loadItem');
 
   }
+
+  /*#
+   # A simple button bar
+   # Eg: <button-bar ng-model="selected" button-provider="buttons" key="label"/>
+   #
+   # @ngModel = the chosen items
+   # @buttonProvider an array of choices
+   # @key - the property of the buttonProvider objects to use for display, and to store in the ngModel
+   #*/
+  angular.module('corespring-editor.controllers')
+    .directive('tightButtonBar', [ '$log', function ($log) {
+
+      function link($scope, $element, $attr) {
+        $scope.selected = function (b) {
+          var dataValue = $scope.getValue(b);
+          return $scope.ngModel && $scope.ngModel.indexOf(dataValue) >= 0;
+        };
+
+        $scope.toggle = function (b) {
+          $scope.ngModel = $scope.ngModel || [];
+          var dataValue = $scope.getValue(b);
+          var index = $scope.ngModel.indexOf(dataValue);
+          if (index >= 0) {
+            $scope.ngModel.splice(index, 1);
+          } else {
+            $scope.ngModel.push(dataValue);
+          }
+        };
+
+        $scope.getValue = function (b) {
+          return $scope.key ? b[$scope.key] : b;
+        };
+      }
+
+      return {
+        restrict: 'E',
+        link: link,
+        replace: true,
+        scope: {
+          buttonProvider: '=',
+          ngModel: '=',
+          key: '@'
+        },
+        template: [
+          '<div class="tight-button-bar">',
+          '  <div class="btn-group">',
+          '    <button',
+          '     ng-repeat="b in buttonProvider"',
+          '     type="button"',
+          '     ng-click="toggle(b)"',
+          '     onmouseout="this.blur()"',
+          '     ng-class="{ active: selected(b)}"',
+          '     class="btn btn-default">',
+          '     {{getValue(b)}}',
+          '   </button>',
+          ' </div>',
+          '</div>'
+        ].join("\n")
+      };
+    }
+    ]);
+
 
 })();

@@ -29,9 +29,21 @@
   }
 
   .additional-copyright-information {
-    padding-top: 10px;
-    padding-bottom: 10px;
+    margin-top: 10px;
+    margin-bottom: 20px;
     width: @profile-input-width;
+
+    td {
+      padding: 3px;
+    }
+
+    .label-col {
+      text-align: right;
+    }
+
+    label {
+      width: auto;
+    }
   }
 
   .copyright-information .control-group,
@@ -49,6 +61,18 @@
 
   .copyright-information {
     width: @profile-input-width;
+
+    td.label-col {
+      text-align: right;
+      padding: 5px;
+      width: 30%;
+    }
+  }
+
+  table.license {
+    td {
+      padding: 1px 5px 1px 0px;
+    }
   }
 
   .help-inline {
@@ -83,6 +107,10 @@
     img {
       display: block;
     }
+
+    .label-col {
+      padding-right: 5px;
+    }
   }
 
   .required {
@@ -112,6 +140,14 @@
     float: left;
     font-weight: bold;
     color: lighten(@cs-green, 5%);
+  }
+
+  .tight-button-bar {
+    .btn {
+      border-radius : 4px;
+      padding-left: 7px;
+      padding-right: 7px;
+    }
   }
 
 }
