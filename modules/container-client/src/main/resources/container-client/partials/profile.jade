@@ -226,6 +226,12 @@ form
               a(href="http://creativecommons.org/licenses/", target="_blank") Learn more
     tr
       td.label-col
+        label.control-label(for="ac-item-type") Type
+      td
+        select#ac-item-type(ng-model='item.itemType', ng-options='c for c in additionalCopyrightItemTypeDataProvider')
+
+    tr
+      td.label-col
         label.control-label(for="ac-source-url") Website
       td
         input#ac-source-url.form-control(
@@ -245,7 +251,6 @@ form
 
   .control-group
     label.control-label(for='priorUse') This item was previously used in a
-    .controls
       select#priorUse(name='profile.priorUse', ng-model='profile.priorUse', ng-options='c for c in priorUseDataProvider')
 
   .control-group
@@ -264,7 +269,7 @@ form
         ng-change="onChangeReviewsPassed(rp.key)",
         style="margin-right: 3px;")
         | {{rp.key}}
-      input(style="margin-left:135px;", type="text", placeholder='Enter review...', ng-model='taskInfo.otherReviewsPassed')
+      input(ng-show="isOtherReviewsPassedSelected",style="margin-left:135px;", type="text", placeholder='Enter review...', ng-model='taskInfo.otherReviewsPassed')
 
 
 

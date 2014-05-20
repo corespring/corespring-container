@@ -196,6 +196,10 @@
         .value();
     }
 
+    DataQueryService.list("additionalCopyrightItemType", function (result) {
+      $scope.additionalCopyrightItemTypeDataProvider = toListOfValues(result);
+    });
+
     DataQueryService.list("bloomsTaxonomy", function (result) {
       $scope.bloomsTaxonomyDataProvider = toListOfValues(result);
     });
