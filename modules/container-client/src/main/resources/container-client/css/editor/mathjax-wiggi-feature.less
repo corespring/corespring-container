@@ -2,6 +2,8 @@
 @light-grey: #e4e4e4;
 @header-height: 80px;
 @sub-header-height: 30px;
+@preview-min-height: 80px;
+
 
 .abs-full(@left: 0, @right: 0, @top: 0, @bottom: 0){
   position: absolute;
@@ -9,77 +11,6 @@
   top: @top;
   right: @right;
   bottom: @bottom;
-}
-
-.mathjax-dialog-root{
-  .abs-full();
-
-  .header{
-    padding: 8px;
-    padding-top: 6px;
-    position: absolute;
-    height: @header-height;
-    left: 0;
-    right:0; //@preview-width;
-    background-color: @light-grey;
-    border-bottom: solid 1px darken(@light-grey, 10%);
-  }
-
-  .mj-math-type{
-    padding-left: 8px;
-    position: absolute;
-    top: @header-height;
-    height: @sub-header-height;
-    left: 0;
-    right: 0;
-    padding-top: 5px;
-    background-color: darken(@light-grey, 5%);
-    border-bottom: solid 1px darken(@light-grey, 10%);
-    font-size: 11px;
-  }
-
-  .display-type{
-    padding-left: 10px;
-    a{
-      font-size: 11px;
-    }
-  }
-
-  .mj-dialog-title {
-    font-size: 18px;
-  }
-
-  .mj-dialog-content{
-    font-size: 12px;
-    a{
-      text-decoration: underline;
-    }
-  }
-
-
-  .editor{
-    .abs-full(@right: @preview-width, @top: @header-height + @sub-header-height);
-    textarea{
-      width: 100%;
-      height: 100%;
-      border:0 solid #cecaca;
-      background-color: #ffffff;
-      padding: 10px;
-      font-family: monospace;
-      font-size: 11px;
-      overflow:auto;
-      outline:none;
-      resize:none;
-    }
-  }
-
-  .math-preview{
-    .abs-full(@left: none, @top: @header-height + @sub-header-height);
-    width: @preview-width;
-    padding-top: 40px;
-    text-align: center;
-    background-color: @light-grey;
-  }
 }
 
 .math-sum{
@@ -100,14 +31,67 @@
 
 .mathjax-holder{
   .user-select(none);
-  padding: 2px;
+  padding: 0;
   transition: background-color 200ms;
-  border-radius: 3px;
+  border-radius: 4px;
+  background-color: lighten(@grey-purple, 50%);
+
   &:hover{
     background-color: #ffffff;
   }
-
-  .bg{
-    border-radius: 4px;
+  
+  .blocker{
+    .bg{
+      border-radius: 4px;
+    }
   }
+}
+
+.mathjax-dialog-root{
+
+  .abs-full();
+  display: flex;
+  flex-direction: column;
+
+  .header{
+    padding: 8px;
+    background-color: @light-grey;
+    border-bottom: solid 1px darken(@light-grey, 15%);
+  }
+
+  .mj-math-type{
+    padding: 8px;
+    background-color: darken(@light-grey, 7%);
+    border-bottom: solid 1px darken(@light-grey, 15%);
+    font-size: 11px;
+  }
+
+  .math-preview{
+
+    .preview-label{
+      text-transform: uppercase;
+      color: darken(@light-grey, 20%);
+      padding-bottom: 5px;
+    }
+
+    background-color: @light-grey;
+    min-height: @preview-min-height;
+    border-bottom: solid 1px darken(@light-grey, 15%);
+    text-align: center;
+    padding: 8px;
+  }
+
+  .math-textarea{
+    flex: 1;
+    border:0 solid #cecaca;
+    background-color: #ffffff;
+    padding: 10px;
+    font-family: monospace;
+    font-size: 11px;
+    overflow:auto;
+    outline:none;
+    resize:none;
+  }
+
+
 }

@@ -46,8 +46,8 @@ angular.module('corespring.wiggi-wiz-features').directive('mathjaxDialog', [
 
       function renderPreview(math) {
         log('renderPreview');
-        $element.find('.math-preview').html(math);
-        MathJax.Hub.Queue(['Typeset', MathJax.Hub, $element.find('.math-preview')[0]]);
+        $element.find('.preview-body').html(math);
+        MathJax.Hub.Queue(['Typeset', MathJax.Hub, $element.find('.preview-body')[0]]);
       }
 
       function updateModel() {
@@ -70,32 +70,22 @@ angular.module('corespring.wiggi-wiz-features').directive('mathjaxDialog', [
         if (mathType === 'MathML') {
           return text;
         } else {
-          log('display type: ', $scope.displayType);
-          var latexOut = $scope.displayType === 'block' ? '\\[' + text + '\\]' : '\\(' + text + '\\)';
-          log(latexOut);
-          return latexOut;
+          return MathFormatUtils.wrapLatex(text, $scope.displayType);
         }
       }
 
       function unwrapMath(text) {
-
         var info = MathFormatUtils.getMathInfo(text);
-
-        if (info.mathType === 'LaTex') {
-          return text
-            .replace(/\\[\[|\(]/g, '')
-            .replace(/\\[\]|\)]/g, '');
-        } else {
-          return text;
-        }
+        return info.mathType === 'LaTex' ? MathFormatUtils.unwrapLatex(text) : text;
       }
 
-      $scope.$watch('displayType', function(n) {
+      $scope.$watch('displayType', function() {
         updateModel();
       });
 
       $scope.$watch('preppedMath', function(n) {
         updateModel();
+        updateUI();
       });
 
       $scope.showDisplayMode = function() {
@@ -125,11 +115,11 @@ angular.module('corespring.wiggi-wiz-features').directive('mathjaxDialog', [
         '      </span>',
         '    </form>',
         '  </div>',
-        '<div class="editor">',
-        ' <textarea class="math-textarea" ng-model="preppedMath"></textarea>',
-        '</div>',
-        '<div class="math-preview">',
-        '</div>',
+        '  <div class="math-preview">',
+        '     <div class="preview-label">Preview</div>',
+        '     <div class="preview-body"></div>',
+        '  </div>',
+        '  <textarea class="math-textarea" ng-model="preppedMath"></textarea>',
         '</div>'
       ].join('\n')
     };

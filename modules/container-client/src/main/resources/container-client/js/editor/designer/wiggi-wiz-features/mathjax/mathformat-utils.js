@@ -55,6 +55,18 @@ angular.module('corespring.wiggi-wiz-features').service('MathFormatUtils', ['$lo
           displayMode: display
         });
       };
+
+
+      this.unwrapLatex = function(text) {
+        return text
+          .replace(/\\[\[|\(]/g, '')
+          .replace(/\\[\]|\)]/g, '');
+      };
+
+      this.wrapLatex = function(text, displayMode) {
+        return displayMode === 'block' ? '\\[' + text + '\\]' : '\\(' + text + '\\)';
+      };
+
     }
 
     return new MathFormatUtils();

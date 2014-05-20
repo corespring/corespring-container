@@ -54,5 +54,21 @@ describe('math format utils', function() {
         errors: undefined
       });
     });
+
+    it('should unwrap latex', function() {
+      expect(utils.unwrapLatex('\\(\\frac13\\)')).toEqual('\\frac13');
+    });
+
+    it('should unwrap latex - block', function() {
+      expect(utils.unwrapLatex('\\[\\frac13\\]')).toEqual('\\frac13');
+    });
+
+    it('should wrap latex', function() {
+      expect(utils.wrapLatex('\\frac13', 'inline')).toEqual('\\(\\frac13\\)');
+    });
+
+    it('should wrap latex - block', function() {
+      expect(utils.wrapLatex('\\frac13', 'block')).toEqual('\\[\\frac13\\]');
+    });
   });
 });
