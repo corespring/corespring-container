@@ -54,9 +54,7 @@ angular.module('corespring.wiggi-wiz-features').factory('ImageFeature', [
     };
 
     csImage.getMarkUp = function($node, $scope) {
-      console.log("Boo: ", $node.html());
       var imgNode = $node.find('img');
-      console.log("Qtya: ", imgNode);
       return '<div style="text-align: left;">' + $(imgNode)[0].outerHTML + '</div>';
     };
 

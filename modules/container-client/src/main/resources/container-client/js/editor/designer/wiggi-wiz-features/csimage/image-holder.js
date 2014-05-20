@@ -1,6 +1,6 @@
-angular.module('corespring.wiggi-wiz-features').directive('imageHolder', ['$log',
+angular.module('corespring.wiggi-wiz-features').directive('imageHolder', ['$log', 'ImageFeature',
 
-  function($log) {
+  function($log, ImageFeature) {
 
     var log = $log.debug.bind($log, '[cs-image-holder]');
 
@@ -10,7 +10,7 @@ angular.module('corespring.wiggi-wiz-features').directive('imageHolder', ['$log'
       '     <div class="bg"></div>',
       '     <div class="content"></div>',
       '     <div class="delete-icon">',
-      '      <i ng-click="deleteNode()" class="fa fa-times-circle"></i>',
+      '      <i ng-click="delete()" class="fa fa-times-circle"></i>',
       '    </div>',
       '  </div>',
       '  <div class="holder">',
@@ -19,12 +19,16 @@ angular.module('corespring.wiggi-wiz-features').directive('imageHolder', ['$log'
       '</div>'
     ].join('\n');
 
-    var html;
-
+    function postLink($scope, $element) {
+      $scope.delete = function() {
+        $scope.deleteNode($element, ImageFeature);
+      };
+    }
 
     function compile($element, $attrs) {
       var tmpl = template.replace("imageSrc", $attrs.imageSrc).replace("imageStyle", $attrs.imageStyle);
       $element.html(tmpl);
+      return postLink;
     }
 
     return {
