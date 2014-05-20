@@ -1,7 +1,8 @@
 /* global MathJax */
 angular.module('corespring.wiggi-wiz-features').directive('mathjaxHolder', ['$log',
+  'MathFormatUtils',
 
-  function($log) {
+  function($log, MathFormatUtils) {
 
     var template = [
       '<div class="component-placeholder"',
@@ -37,8 +38,32 @@ angular.module('corespring.wiggi-wiz-features').directive('mathjaxHolder', ['$lo
         $scope.$emit('wiggi-wiz.delete-node', $element);
       };
 
+      /** Note: because we are not replacing the node - we are updating the class att
+       * on a node that isn't in the template.
+       */
+      function updateClass(newClass) {
+        $element.removeClass('block');
+        $element.removeClass('inline');
+        $element.addClass(newClass);
+      }
+
+      function updateDisplayMode(math) {
+        if (!math) {
+          return;
+        }
+        var info = MathFormatUtils.getMathInfo(math);
+        log('displayType: ', info);
+        updateClass(info.displayMode);
+      }
+
       $scope.$watch('originalMarkup', function(n) {
-        if (n) {
+
+        updateDisplayMode(n);
+
+        if (!n || _.isEmpty(n)) {
+          $element.find('.holder').html('Math');
+          updateClass('inline');
+        } else {
           $element.find('.holder').html(n);
           MathJax.Hub.Queue(['Typeset', MathJax.Hub, $element[0]]);
         }

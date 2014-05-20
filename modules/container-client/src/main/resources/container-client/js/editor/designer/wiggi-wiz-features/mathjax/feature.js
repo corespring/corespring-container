@@ -7,7 +7,7 @@ angular.module('corespring.wiggi-wiz-features').factory('WiggiMathJaxFeatureDef'
       this.attributeName = 'mathjax';
       this.draggable = true;
       this.iconclass = 'fa math-sum';
-      this.addToEditor = '<div mathjax-holder><math><msup><mi>r</mi><mn>3</mn></msup><math></div>';
+      this.addToEditor = '<div mathjax-holder></div>';
       this.compile = true;
 
       this.initialise = function($node, replaceWith) {
@@ -21,7 +21,7 @@ angular.module('corespring.wiggi-wiz-features').factory('WiggiMathJaxFeatureDef'
 
         editor.showEditPane($scope,
           'Edit the Math',
-          '<mathjax-dialog></mathjax-dialog>',
+          '<mathjax-dialog ng-model="data.originalMarkup"></mathjax-dialog>',
           function onUpdate() {},
           null,
           function onClose() {
