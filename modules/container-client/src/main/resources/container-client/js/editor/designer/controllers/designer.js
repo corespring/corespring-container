@@ -15,8 +15,8 @@ var controller = function(
   ImageUtils,
   ComponentRegister,
   WiggiWizHelper,
-  WiggiMathJaxFeatureDef) {
-
+  WiggiMathJaxFeatureDef,
+  ImageFeature) {
 
   var configPanels = {};
 
@@ -132,6 +132,10 @@ var controller = function(
       var idx = _.indexOf(orderedComponents, component.componentType);
       return idx >= 0 ? idx : 1000;
     };
+
+    $scope.overrideFeatures = [
+      ImageFeature
+    ];
 
     $scope.extraFeatures = {
       definitions: [{
@@ -274,5 +278,6 @@ angular.module('corespring-editor.controllers')
     'ComponentRegister',
     'WiggiWizHelper',
     'WiggiMathJaxFeatureDef',
+    'ImageFeature',
     controller
   ]);
