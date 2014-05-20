@@ -1,10 +1,11 @@
 /* global MathJax */
 angular.module('corespring.wiggi-wiz-features').directive('mathjaxHolder', ['$log',
+  'MathFormatUtils',
 
-  function($log) {
+  function($log, MathFormatUtils) {
 
     var template = [
-      '<div class="component-placeholder"',
+      '<div class="component-placeholder" ng-class="displayMode"',
       ' tooltip-placement="bottom" ',
       ' tooltip-append-to-body="true"',
       ' tooltip="Double Click to Edit">',
@@ -37,7 +38,21 @@ angular.module('corespring.wiggi-wiz-features').directive('mathjaxHolder', ['$lo
         $scope.$emit('wiggi-wiz.delete-node', $element);
       };
 
+      function updateDisplayMode(math) {
+        if (!math) {
+          return;
+        }
+        var info = MathFormatUtils.getMathInfo(math);
+        log('displayType: ', info);
+        $element.removeClass('block');
+        $element.removeClass('inline');
+        $element.addClass(info.displayMode);
+      }
+
       $scope.$watch('originalMarkup', function(n) {
+
+        updateDisplayMode(n);
+
         if (n) {
           $element.find('.holder').html(n);
           MathJax.Hub.Queue(['Typeset', MathJax.Hub, $element[0]]);

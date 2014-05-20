@@ -90,14 +90,24 @@
   }
 }
 
-.mathjax-holder{
+.mathjax-holder.inline{
   display: inline-block;
+}
+
+.mathjax-holder.block{
+  display: block;
+}
+
+.mathjax-holder{
   .user-select(none);
-  background-color: #cbebbb;
-  padding: 4px;
+  padding: 2px;
   transition: background-color 200ms;
   border-radius: 3px;
   &:hover{
-    background-color: #d9d9c9;
+    background-color: #ffffff;
+  }
+
+  .bg{
+    border-radius: 4px;
   }
 }

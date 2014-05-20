@@ -1,11 +1,16 @@
 /* global MathJax */
 angular.module('corespring.wiggi-wiz-features').directive('mathjaxDialog', [
   '$log',
-  function($log) {
+  '$timeout',
+  'MathFormatUtils',
+  function($log, $timeout, MathFormatUtils) {
+
     var log = $log.debug.bind($log, '[mathjax-dialog]');
+
     var content = [
       'Use this window to add a math equation for your item.',
-      'Do this by authoring some math text in MathML or LaTex format in the window below.',
+      'Do this by authoring some math text in <a href="http://en.wikipedia.org/wiki/MathML" target="_blank">MathML</a>',
+      ' or <a href="http://en.wikipedia.org/wiki/LaTeX" target="_blank">LaTex</a> format in the window below.',
       'If you need help authoring text, <a href="http://www.wiris.com/editor/demo/en/mathml-latex.html" target="_blank">this website</a> can help.',
     ].join(' ');
 
@@ -24,65 +29,54 @@ angular.module('corespring.wiggi-wiz-features').directive('mathjaxDialog', [
 
       log(ngModel);
 
-
-      $scope.triggerUpdate = function(){
+      $scope.triggerUpdate = function() {
         log('triggerUpdate');
         updateModel();
-
       };
 
       function updateUI() {
         log('updateUI');
         var unwrapped = unwrapMath(ngModel.$viewValue);
-        $scope.mathType = getMathType(ngModel.$viewValue);
-        $scope.displayType = $scope.mathType === 'MathML' ? 'block' : getLatexDisplayType(ngModel.$viewValue);
+        var info = MathFormatUtils.getMathInfo(ngModel.$viewValue);
+        $scope.mathType = info.mathType;
+        $scope.displayType = info.displayMode;
         $scope.preppedMath = unwrapped;
         renderPreview(ngModel.$viewValue);
       }
 
-      function getLatexDisplayType(math){
-        var inline = /\s*\\\((.*)\\\)/g;
-        log('getLatexDisplayType: inline: ', inline.test(math));
-        var out = /\s*\\\(.*\\\)/g.test(math) ? 'inline' : 'block';
-        log('getLatexDisplayType out: ', out);
-        return out;
-      }
-
-      function renderPreview(math){
+      function renderPreview(math) {
         log('renderPreview');
         $element.find('.math-preview').html(math);
         MathJax.Hub.Queue(['Typeset', MathJax.Hub, $element.find('.math-preview')[0]]);
       }
 
-      function updateModel(){
-        log('upadateModel'); 
-        var prepped = wrapMath($scope.preppedMath);
-        $scope.mathType = getMathType(ngModel.$viewValue);
+      function updateModel() {
+        log('updateModel');
+        var info = MathFormatUtils.getMathInfo($scope.preppedMath);
+        $scope.mathType = info.mathType;
+        var prepped = wrapMath($scope.preppedMath, $scope.mathType);
         ngModel.$setViewValue(prepped);
         renderPreview(prepped);
       }
 
       ngModel.$render = updateUI;
 
-
-      function wrapMath(text){
-        var mathType = getMathType(text);
-        if(mathType === 'MathML'){
+      function wrapMath(text, mathType) {
+        if (mathType === 'MathML') {
           return text;
         } else {
           log('display type: ', $scope.displayType);
-          var latexOut = $scope.displayType === 'block' ? '\\['+text+'\\]' : '\\('+text+'\\)';
+          var latexOut = $scope.displayType === 'block' ? '\\[' + text + '\\]' : '\\(' + text + '\\)';
           log(latexOut);
           return latexOut;
         }
       }
 
+      function unwrapMath(text) {
 
-      function unwrapMath(text){
+        var info = MathFormatUtils.getMathInfo(text);
 
-        var mathType = getMathType(text);
-
-        if(mathType === 'LaTex'){
+        if (info.mathType === 'LaTex') {
           return text
             .replace(/\\[\[|\(]/g, '')
             .replace(/\\[\]|\)]/g, '');
@@ -91,29 +85,12 @@ angular.module('corespring.wiggi-wiz-features').directive('mathjaxDialog', [
         }
       }
 
-      function getMathType(text){
-        if(!text || _.isEmpty(text)){
-          $scope.mathType = '?';
-        } else {
-          var xml = new DOMParser().parseFromString(text, 'application/xml');
-          if(xml.childNodes && xml.childNodes[0] && xml.childNodes[0].tagName === 'math'){
-            return 'MathML';
-          } else {
-            return 'LaTex';
-          }
-        }
-      }
-
       $scope.$watch('displayType', function(n) {
-        if (n){
-          updateModel();
-        }
+        updateModel();
       });
 
       $scope.$watch('preppedMath', function(n) {
-        if (n){
-          updateModel();
-        }
+        updateModel();
       });
     }
     return {
@@ -128,10 +105,13 @@ angular.module('corespring.wiggi-wiz-features').directive('mathjaxDialog', [
         '    <div class="mj-dialog-content">' + content + '</div>',
         '  </div>',
         '  <div class="mj-math-type">',
-        '    <form ng-disabled="mathType == \'MathML\'" class="form-inline">Display mode for {{mathType}}:',
-        '      <span  class="display-type">',
+        '    <form class="form-inline">Display mode for {{mathType}}:',
+        '      <span ng-show="mathType == \'LaTex\'"  class="display-type">',
         radio('inline', 'Inline', 'displayType'),
         radio('block', 'Block', 'displayType'),
+        '      </span>',
+        '      <span ng-show="mathType == \'MathML\'" class="display-type">',
+        '        Block',
         '      </span>',
         '    </form>',
         '  </div>',
