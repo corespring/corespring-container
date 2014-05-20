@@ -66,8 +66,7 @@ form
             input(type='hidden', ui-select2='standardsAdapter', ng-model='profile.standards', style='width: 500px;')
 
     .control-group(ng-show="isLiteracyStandardSelected")
-      label.control-label(for='lexile')
-        span(style="padding-right: 5px;") Lexile Score
+      label.control-label(for='lexile') Lexile Score
         input#lexile.input-mini(
         type='text',
         ng-model='profile.lexile',
@@ -76,10 +75,9 @@ form
 
     .control-group
       label.control-label(for='gradeLevel') Grade Level
-        p.help-block *Select the grade or grade levels for which this item is appropriate
-        .btn-group
-          button.btn.tight(ng-repeat="gl in gradeLevelDataProvider", button-toggle="active",
-                title="{{gl.value}}", ng-model="gl.selected"){{gl.key}}
+        span.help-inline  Select the grade or grade levels for which this item is appropriate
+        .controls(style="width:80%")
+          tight-button-bar#gradeLevel(ng-model="taskInfo.gradeLevel", button-provider="gradeLevelDataProvider", key="key")
 
   h3 Other Alignments
 
@@ -87,18 +85,20 @@ form
     tr
       td(style='vertical-align: top')
         .control-group
+          p.help-block Assign the Depth of Knowledge that best represents this item
           label.control-label Depth Of Knowledge
             select(ng-model='otherAlignments.depthOfKnowledge', ng-options='c.key as c.value for c in depthOfKnowledgeDataProvider')
-            p.help-block Select the depth of knowledge that best represents the objective
+
       td(style='vertical-align: top; padding-left: 20px;')
         .control-group
+          p.help-block Assign the Bloom's level best represents this item
           label.control-label Bloom's Taxonomy
             select(ng-model='otherAlignments.bloomsTaxonomy', ng-options='c for c in bloomsTaxonomyDataProvider')
 
   .control-group
     label.control-label
       a(ng-click='expandKeySkills=!expandKeySkills')
-        i(class="fa fa-{{!!expandKeySkills ? 'minus' : 'plus'}}-square-o", style="margin-left: 6px")
+        i(class="fa fa-{{!!expandKeySkills ? 'minus' : 'plus'}}-square-o", style="margin-right: 6px")
       | Key Skills
 
       .controls
@@ -119,53 +119,62 @@ form
 
   table.permissions
     tr
+      td.label-col
+        | Make this available via a
       td
-        p Make this available via a
-      td(style="padding: 10px; vertical-align: top")
-        select(ng-model='contributorDetails.licenseType', ng-options='c for c in licenseTypeDataProvider')
-      td(style="padding: 10px; vertical-align: top")
-        span(ng-show='!contributorDetails.licenseType', style='color: #888; font-style: italic;') Not Assigned
-        img(ng-show='contributorDetails.licenseType', src='{{getLicenseTypeUrl(contributorDetails.licenseType)}}')
-        a(href="http://creativecommons.org/licenses/", target="_blank") Learn more
+        table.license
+          tr
+            td
+              select(ng-model='contributorDetails.licenseType', ng-options='c for c in licenseTypeDataProvider')
+            td
+              span(ng-show='!contributorDetails.licenseType', style='color: #888; font-style: italic;') Not Assigned
+              img(ng-show='contributorDetails.licenseType', src='{{getLicenseTypeUrl(contributorDetails.licenseType)}}')
+            td
+              a(href="http://creativecommons.org/licenses/", target="_blank") Learn more
 
   h2 Copyright Information
 
-  .copyright-information
+  table.copyright-information
 
-    .control-group
-      label.control-label(for="title") * Author
-        .controls
-          input#author.form-control(
-          ng-model='contributorDetails.author',
-          placeholder="Enter author's name...")
+    tr
+      td.label-col
+        label.control-label(for="author") * Author
+      td
+        input#author.form-control(
+        ng-model='contributorDetails.author',
+        placeholder="Enter author's name...")
 
-    .control-group
-      label.control-label(for="copyright-owner") * Copyright Owner
-        .controls
-          input#copyright-owner.form-control(
-          ng-model='contributorDetails.copyright.owner',
-          placeholder="Enter the copyright owner...")
+    tr
+      td.label-col
+        label.control-label(for="copyright-owner") * Copyright Owner
+      td
+        input#copyright-owner.form-control(
+        ng-model='contributorDetails.copyright.owner',
+        placeholder="Enter the copyright owner...")
 
-    .control-group
-      label.control-label(for="copyright-year") * Copyright Year
-        .controls
-          select(ng-model='contributorDetails.copyright.year', ng-options='c for c in copyrightYearDataProvider')
+    tr
+      td.label-col
+        label.control-label(for="copyright-year") * Copyright Year
+      td
+        select#copyright-year(ng-model='contributorDetails.copyright.year', ng-options='c for c in copyrightYearDataProvider', style="width:170px;")
 
-    .control-group
-      label.control-label(for="copyright-expiration-date") Copyright Expiration Date
-        .controls
-          select(ng-model='contributorDetails.copyright.expirationDate', ng-options='c for c in copyrightExpirationYearDataProvider')
+    tr
+      td.label-col
+        label.control-label(for="") Copyright Expiration
+      td
+        select#copyright-expiration(ng-model='contributorDetails.copyright.expirationDate', ng-options='c for c in copyrightExpirationYearDataProvider', style="width:170px;")
 
-    .control-group
-      label.control-label(for="title") Website
-        .controls
-          input#author.form-control(
-          ng-model='contributorDetails.sourceUrl',
-          placeholder="Enter the URL...")
+    tr
+      td.label-col
+        label(for="source-url").control-label Website
+      td
+        input#source-url.form-control(
+        ng-model='contributorDetails.sourceUrl',
+        placeholder="Enter the URL...")
 
 
   h3 Additional Copyright Information
-  p Does this item contain any other copyrighted materials? E.g. book passage, image, etc. *
+  p Does this item contain any other copyrighted materials? E.g. book passage, image, etc.
 
   .control-group
     .controls
@@ -177,43 +186,55 @@ form
         input(type='radio', ng-model='needAdditionalCopyrightInformation', value='', style='margin-right: 5px; margin-left: 20px;')
         | No
 
-    p.help-block(ng-show="needAdditionalCopyrightInformation") Please complete the following:
+  table.additional-copyright-information(ng-repeat='item in contributorDetails.copyright.additional', style="background-color:#fafafa;")
 
-  .additional-copyright-information(ng-repeat='item in contributorDetails.copyright.additional')
+    tr
+      td(span="2")
+        | Please complete the following:
 
-    .control-group
-      label.control-label(for="author") Author
-      .controls
-        input#author.form-control(
+    tr
+      td.label-col
+        label.control-label(for="ac-author") Author
+      td
+        input#ac-author.form-control(
         ng-model='item.author',
         placeholder="Enter author's name...",)
-    .control-group
-      label.control-label(for="owner") Copyright Owner
-      .controls
-        input#owner.form-control(
+    tr
+      td.label-col
+        label.control-label(for="ac-owner") Copyright Owner
+      td
+        input#ac-owner.form-control(
         ng-model='item.owner',
         placeholder="Enter the copyright owner...",)
-    .control-group
-      label.control-label(for="year") Copyright Year
-      .controls
-        input#year.form-control(
-        ng-model='item.year',
-        placeholder="Enter the copyright year...",)
-    .control-group
-      label.control-label(for="license") License
-      .controls
-        td(style="padding: 10px; vertical-align: top")
-          select(ng-model='item.licenseType', ng-options='c for c in licenseTypeDataProvider')
-        td(style="padding: 10px; vertical-align: top")
-          span(ng-show='!item.licenseType', style='color: #888; font-style: italic;') Not Assigned
-          img(ng-show='item.licenseType', src='{{getLicenseTypeUrl(item.licenseType)}}')
-          a(href="http://creativecommons.org/licenses/", target="_blank") Learn more
-    .control-group
-      label.control-label(for="url") Website
-      .controls
-        input#url.form-control(
+    tr
+      td.label-col
+        label.control-label(for="ac-year") Copyright Year
+      td
+        select#ac-year(ng-model='item.year', ng-options='c for c in copyrightYearDataProvider', style="width:170px;")
+    tr
+      td.label-col
+        label.control-label(for="ac-license") License
+      td
+        table.license
+          tr
+            td
+              select#ac-license(ng-model='item.licenseType', ng-options='c for c in licenseTypeDataProvider')
+            td
+              span(ng-show='!item.licenseType', style='color: #888; font-style: italic;') Not Assigned
+              img(ng-show='item.licenseType', src='{{getLicenseTypeUrl(item.licenseType)}}')
+            td
+              a(href="http://creativecommons.org/licenses/", target="_blank") Learn more
+    tr
+      td.label-col
+        label.control-label(for="ac-source-url") Website
+      td
+        input#ac-source-url.form-control(
         ng-model='item.sourceUrl',
         placeholder="Enter the URL...",)
+
+    tr
+      td(colspan="2", style="text-align: right;")
+        a(ng-click='removeCopyrightItem(item)') Remove additional copyright
 
   a.add-additional(ng-click='addCopyrightItem()', ng-show='needAdditionalCopyrightInformation')
     i(class="fa fa-{{!!expandKeySkills ? 'minus' : 'plus'}}-square-o", style="margin-left: 6px; margin-right: 6px;")
@@ -228,9 +249,10 @@ form
       select#priorUse(name='profile.priorUse', ng-model='profile.priorUse', ng-options='c for c in priorUseDataProvider')
 
   .control-group
-    label.control-label(for='priorGradeLevel') Grade Level  *Identify the original grade level to which this item was aligned.
+    label.control-label(for='priorGradeLevel') Grade Level
+      span.help-inline  Identify the original grade level to which this item was aligned.
       .controls(style="width:80%")
-        button-bar#gradeLevel(ng-model="profile.priorGradeLevel", button-provider="gradeLevelDataProvider", key="key")
+        tight-button-bar#gradeLevel(ng-model="profile.priorGradeLevel", button-provider="gradeLevelDataProvider", key="key")
 
   h4 Reviews Passed
   .control-group
@@ -242,7 +264,7 @@ form
         ng-change="onChangeReviewsPassed(rp.key)",
         style="margin-right: 3px;")
         | {{rp.key}}
-      input(style="margin-left:120px;", type="text", placeholder='Enter review...', ng-model='taskInfo.otherReviewsPassed')
+      input(style="margin-left:135px;", type="text", placeholder='Enter review...', ng-model='taskInfo.otherReviewsPassed')
 
 
 
