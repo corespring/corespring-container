@@ -3,6 +3,8 @@ angular.module('corespring.wiggi-wiz-features').factory('ImageFeature', [
   'TemplateUtils',
   function(ImageDef, TemplateUtils) {
 
+    var popoverEnabled = false;
+
     var csImage = new ImageDef();
 
     csImage.compile = true;
@@ -36,12 +38,18 @@ angular.module('corespring.wiggi-wiz-features').factory('ImageFeature', [
           icon: 'fa-align-center'
         }, 'align:center')
       ].join('\n');
-      editor.togglePopover($node, $nodeScope, buttons, $node.find('img'));
+
+      if (!popoverEnabled) {
+        editor.togglePopover($node, $nodeScope, buttons, $node.find('img'));
+        $node.popover('enable');
+      } else {
+        $node.popover('disable');
+      }
+      popoverEnabled = !popoverEnabled;
     };
 
 
     csImage.initialise = function($node, replaceWith) {
-      var html = $node.html();
       var imageSrc = $node.find('img').attr('src');
 
       if (imageSrc) {

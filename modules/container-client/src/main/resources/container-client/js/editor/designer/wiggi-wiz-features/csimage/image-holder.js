@@ -5,7 +5,7 @@ angular.module('corespring.wiggi-wiz-features').directive('imageHolder', ['$log'
     var log = $log.debug.bind($log, '[cs-image-holder]');
 
     var template = [
-      '<div class="component-placeholder image image-holder" ng-click="click()">',
+      '<div class="component-placeholder image image-holder">',
       '  <div class="blocker">',
       '     <div class="bg"></div>',
       '     <div class="content"></div>',
