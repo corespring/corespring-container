@@ -3,8 +3,6 @@ angular.module('corespring.wiggi-wiz-features').factory('ImageFeature', [
   'TemplateUtils',
   function(ImageDef, TemplateUtils) {
 
-    var popoverEnabled = false;
-
     var csImage = new ImageDef();
 
     csImage.compile = true;
@@ -39,13 +37,7 @@ angular.module('corespring.wiggi-wiz-features').factory('ImageFeature', [
         }, 'align:center')
       ].join('\n');
 
-      if (!popoverEnabled) {
-        editor.togglePopover($node, $nodeScope, buttons, $node.find('img'));
-        $node.popover('enable');
-      } else {
-        $node.popover('disable');
-      }
-      popoverEnabled = !popoverEnabled;
+      editor.togglePopover($node, $nodeScope, buttons, $node.find('img'));
     };
 
 
