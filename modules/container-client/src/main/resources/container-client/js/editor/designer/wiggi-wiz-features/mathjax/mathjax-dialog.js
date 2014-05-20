@@ -1,5 +1,5 @@
 /* global MathJax */
-angular.module('corespring.wiggi-wiz-features').directive('mathjaxDialog', [
+angular.module('corespring.wiggi-wiz-features.mathjax').directive('mathjaxDialog', [
   '$log',
   '$timeout',
   'MathFormatUtils',

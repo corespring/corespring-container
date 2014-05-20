@@ -1,4 +1,4 @@
-angular.module('corespring.wiggi-wiz-features').service('MathFormatUtils', ['$log',
+angular.module('corespring.wiggi-wiz-features.mathjax').service('MathFormatUtils', ['$log',
   function($log) {
 
     function MathFormatUtils() {

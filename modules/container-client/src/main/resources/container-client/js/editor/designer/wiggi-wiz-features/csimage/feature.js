@@ -1,4 +1,4 @@
-angular.module('corespring.wiggi-wiz-features').factory('ImageFeature', [
+angular.module('corespring.wiggi-wiz-features.cs-image').factory('ImageFeature', [
   'Image',
   'TemplateUtils',
   function(ImageDef, TemplateUtils) {

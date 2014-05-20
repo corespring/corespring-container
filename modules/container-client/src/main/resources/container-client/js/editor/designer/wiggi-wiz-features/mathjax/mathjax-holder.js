@@ -1,5 +1,5 @@
 /* global MathJax */
-angular.module('corespring.wiggi-wiz-features').directive('mathjaxHolder', ['$log',
+angular.module('corespring.wiggi-wiz-features.mathjax').directive('mathjaxHolder', ['$log',
   'MathFormatUtils',
 
   function($log, MathFormatUtils) {
