@@ -1,5 +1,1 @@
-try {
-  angular.module('corespring.wiggi-wiz-features');
-} catch (e) {
-  angular.module('corespring.wiggi-wiz-features', []);
-}
+angular.module('corespring.wiggi-wiz-features.cs-image', []);
