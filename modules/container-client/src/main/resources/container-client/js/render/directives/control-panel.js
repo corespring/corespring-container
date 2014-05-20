@@ -22,13 +22,15 @@
         };
 
         $scope.$watch('mode', function(mode) {
-          if (mode === 'evaluate') {
-            $configLink.popover('enable');
-          } else {
-            $configLink.popover('disable');
-          }
+          if ($configLink && $configLink.popover) {
+            if (mode === 'evaluate') {
+              $configLink.popover('enable');
+            } else {
+              $configLink.popover('disable');
+            }
 
-          $scope.$broadcast('setMode', { mode: $scope.mode, options: $scope.evaluateOptions, saveResponses: null } );
+            $scope.$broadcast('setMode', { mode: $scope.mode, options: $scope.evaluateOptions, saveResponses: null } );
+          }
         });
 
         $scope.hasScore = function() {
@@ -61,20 +63,22 @@
           ].join("\n");
         }
 
-        $configLink.popover({
-          html: true,
-          placement: 'bottom',
-          content: function() {
-            return [
-              '<ul class="settings">',
-                 checkbox("highlightUserResponse", "Highlight user outcome"),
-                 checkbox("highlightCorrectResponse", "Highlight correct outcome"),
-                 checkbox("allowEmptyResponses", "Allow empty responses"),
-              '</ul>',
-              '<a class="btn btn-success btn-small btn-sm dismiss-popover">Done</a>'
-            ].join('\n');
-          }
-        });
+        if ($configLink && $configLink.popover) {
+          $configLink.popover({
+            html: true,
+            placement: 'bottom',
+            content: function() {
+              return [
+                '<ul class="settings">',
+                   checkbox("highlightUserResponse", "Highlight user outcome"),
+                   checkbox("highlightCorrectResponse", "Highlight correct outcome"),
+                   checkbox("allowEmptyResponses", "Allow empty responses"),
+                '</ul>',
+                '<a class="btn btn-success btn-small btn-sm dismiss-popover">Done</a>'
+              ].join('\n');
+            }
+          });
+        }
 
       };
 

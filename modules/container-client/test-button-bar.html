@@ -1,0 +1,54 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>Editor</title>
+
+  <link rel="stylesheet"
+        href="./target/scala-2.10/classes/container-client/bower_components/bootstrap/dist/css/bootstrap.css">
+
+  <style type="text/css" media="screen">
+    .tight {
+      padding-left: 7px;
+      padding-right: 7px;
+    }
+  </style>
+
+</head>
+
+<body ng-app="example-app" ng-controller="Main">
+
+
+<div class="btn-group">
+  <button ng-repeat="gl in gradeLevelDataProvider"
+          class="btn btn-default tight" title="{{gl.value}}" ng-model="gl.selected">{{gl.key}}
+  </button>
+</div>
+
+<script src="target/scala-2.10/classes/container-client/bower_components/jquery/dist/jquery.js"></script>
+<script src="target/scala-2.10/classes/container-client/bower_components/lodash/dist/lodash.js"
+        type="text/javascript" charset="utf-8"></script>
+<script src="target/scala-2.10/classes/container-client/bower_components/angular/angular.js"
+        type="text/javascript" charset="utf-8"></script>
+<script src="target/scala-2.10/classes/container-client/bower_components/angular-bootstrap/ui-bootstrap.js"
+        type="text/javascript" charset="utf-8"></script>
+<script src="target/scala-2.10/classes/container-client/bower_components/bootstrap/dist/js/bootstrap.js"
+        type="text/javascript" charset="utf-8"></script>
+
+<script>
+  angular.module('example-app', []);
+
+  angular.module('example-app').controller('Main', ['$scope',
+    function ($scope) {
+      $scope.gradeLevelDataProvider = [
+        {value: "v1", key: "k1"},
+        {value: "v2", key: "k2"},
+        {value: "v3", key: "k3"}
+      ]
+
+    }
+  ]);
+</script>
+
+</body>
+</html>
