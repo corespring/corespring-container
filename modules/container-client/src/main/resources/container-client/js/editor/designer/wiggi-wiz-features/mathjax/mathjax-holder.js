@@ -53,7 +53,10 @@ angular.module('corespring.wiggi-wiz-features').directive('mathjaxHolder', ['$lo
 
         updateDisplayMode(n);
 
-        if (n) {
+        if (!n || _.isEmpty(n)) {
+          $element.find('.holder').html('Math');
+          $element.addClass('inline');
+        } else {
           $element.find('.holder').html(n);
           MathJax.Hub.Queue(['Typeset', MathJax.Hub, $element[0]]);
         }

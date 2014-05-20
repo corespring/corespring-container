@@ -62,6 +62,11 @@ angular.module('corespring.wiggi-wiz-features').directive('mathjaxDialog', [
       ngModel.$render = updateUI;
 
       function wrapMath(text, mathType) {
+
+        if (!text || _.isEmpty(text)) {
+          return '';
+        }
+
         if (mathType === 'MathML') {
           return text;
         } else {
@@ -92,6 +97,10 @@ angular.module('corespring.wiggi-wiz-features').directive('mathjaxDialog', [
       $scope.$watch('preppedMath', function(n) {
         updateModel();
       });
+
+      $scope.showDisplayMode = function() {
+        return $scope.preppedMath && !_.isEmpty($scope.preppedMath);
+      };
     }
     return {
       restrict: 'E',
@@ -105,7 +114,8 @@ angular.module('corespring.wiggi-wiz-features').directive('mathjaxDialog', [
         '    <div class="mj-dialog-content">' + content + '</div>',
         '  </div>',
         '  <div class="mj-math-type">',
-        '    <form class="form-inline">Display mode for {{mathType}}:',
+        '    <span ng-show="!showDisplayMode()">Enter some math below</span>',
+        '    <form ng-show="showDisplayMode()" class="form-inline">Display mode for {{mathType}}:',
         '      <span ng-show="mathType == \'LaTex\'"  class="display-type">',
         radio('inline', 'Inline', 'displayType'),
         radio('block', 'Block', 'displayType'),
