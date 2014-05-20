@@ -7,7 +7,10 @@ import play.api.mvc.{ SimpleResult, Request, Action, AnyContent }
 import scala.concurrent.{ Await, Future }
 import play.api.{ Play, Logger }
 
-trait Player extends PlayerItemTypeReader with AppWithServices[PlayerActions[AnyContent]] {
+trait Player
+  extends PlayerItemTypeReader
+  with AppWithServices[PlayerActions[AnyContent]]
+  with JsModeReading{
 
   import org.corespring.container.client.controllers.apps.routes.{ Player => PlayerRoutes }
 
@@ -40,11 +43,13 @@ trait Player extends PlayerItemTypeReader with AppWithServices[PlayerActions[Any
     request =>
 
       def playerPage(request: Request[AnyContent]) = {
+
+        val jsMode = getJsMode(request)
+        logger.trace(s"js mode: $jsMode")
         def has(n: String) = request.path.contains(n) || request.getQueryString("file") == Some(n)
-        val mode = request.queryString.get("mode")
-        val pageMode = mode.getOrElse(Play.current.mode.toString.toLowerCase)
-        if (has("container-player.html")) s"container-player.$pageMode.html" else s"player.$pageMode.html"
+        if (has("container-player.html")) s"container-player.$jsMode.html" else s"player.$jsMode.html"
       }
+
       val page = playerPage(request)
       import scala.concurrent.duration._
       logger.debug(s"[loadPlayerForSession] $sessionId - loading $page from /container-client")
