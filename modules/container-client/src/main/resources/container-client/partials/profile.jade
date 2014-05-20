@@ -1,6 +1,6 @@
 h2 Item Profile
 
-p(style="width: 80%") The information stored in this profile will help teachers to search and find items to use. The profile      contains information about authorship, tagging information such as Common Core State Standard, Bloom's       Taxonomy assignment, key skills and copyright information. Authors are encouraged to include as much       information as possible.
+p(style="width: 80%") The profile contains information key data used to store and find an item (e.g., Common Core State Standard aligment, Bloom's Taxonomy assignment, key skills, and copyright information). Authors are encouraged to include as much information as possible.
 
 p * Required
 
@@ -13,7 +13,7 @@ form
         .controls
           textarea#title.form-control(
           ng-model='taskInfo.title',
-          placeholder="Enter a title...",
+          placeholder="Enter a title for this item...",
           rows='1')
 
     .control-group
@@ -29,68 +29,78 @@ form
       .row
         .col-xs-6
           .form-group
-            label.subject-label(for="primarySubject") * Primary Subject
-            input#primarySubject(
-            style="width:300px",
-            ng-model="taskInfo.subjects.primary",
-            type="text",
-            ui-select2="primarySubjectAsync",
-            data-placeholder="Choose a subject...")
+            label.subject-label * Primary Subject
+              input#primarySubject(
+                style="width:300px; margin-left: 5px;",
+                ng-model="taskInfo.subjects.primary",
+                type="text",
+                ui-select2="primarySubjectAsync",
+                data-placeholder="Choose a subject...")
         .col-xs-6
           .form-group
-            label.subject-label(for="relatedSubject") Related Subject
-            input#relatedSubject(
-            style="width:300px",
-            ng-model="taskInfo.subjects.related",
-            ui-select2="relatedSubjectAsync",
-            data-placeholder="Choose a subject...")
+            label.subject-label Related Subject
+              input#relatedSubject(
+                style="width:300px; margin-left: 5px;",
+                ng-model="taskInfo.subjects.related",
+                ui-select2="relatedSubjectAsync",
+                data-placeholder="Choose a subject...")
 
-  h3 Standards Alignment
+
 
   .fieldset
     .control-group.standards
       label.control-label * Standard(s)
-      .controls
-        div(style='padding-bottom: 15px;')
-          div(style='float: left; padding-right: 5px; width: 200px; padding-bottom: 10px;')
-            label Subject
-            select(ng-model='standardAdapter.subjectOption', ng-options='c.name for c in standardsOptions', style='vertical-align: top; width: 100%; padding-top: 0px;')
-          div(style='float: left; padding-right: 5px; width: 380px; padding-bottom: 10px;')
-            label Category
-            select(ng-model='standardAdapter.categoryOption', ng-options='p.name for p in standardAdapter.subjectOption.items', style='width:100%')
-          div(style='float: left; min-width: 300px; padding-bottom: 10px;')
-            label Sub-Category
-            select(ng-model='standardAdapter.subCategoryOption', ng-options='z for z in standardAdapter.categoryOption.items', style='width:100%')
+        span.help-inline Select the Common Core State Standards or standards that are aligned with this item.
+        .controls
+          div(style='margin-bottom: 15px; margin-top: 10px;')
+            div(style='float: left; padding-right: 5px; width: 200px; padding-bottom: 10px;')
+              label Subject
+              select(ng-model='standardAdapter.subjectOption', ng-options='c.name for c in standardsOptions', style='vertical-align: top; width: 100%; padding-top: 0px;')
+            div(style='float: left; padding-right: 5px; width: 380px; padding-bottom: 10px;')
+              label Category
+              select(ng-model='standardAdapter.categoryOption', ng-options='p.name for p in standardAdapter.subjectOption.items', style='width:100%')
+            div(style='float: left; min-width: 300px; padding-bottom: 10px;')
+              label Sub-Category
+              select(ng-model='standardAdapter.subCategoryOption', ng-options='z for z in standardAdapter.categoryOption.items', style='width:100%')
 
-          input(type='hidden', ui-select2='standardsAdapter', ng-model='profile.standards', style='width: 500px;')
+            input(type='hidden', ui-select2='standardsAdapter', ng-model='profile.standards', style='width: 500px;')
+
+    .control-group(ng-show="isLiteracyStandardSelected")
+      label.control-label(for='lexile')
+        span(style="padding-right: 5px;") Lexile Score
+        input#lexile.input-mini(
+        type='text',
+        ng-model='profile.lexile',
+        placeholder="Enter a score...",)
+        span.lead(style='padding-left: 5px;') L
 
     .control-group
       label.control-label(for='gradeLevel') Grade Level
-        .controls(style="width:80%")
-          button-bar#gradeLevel(ng-model="taskInfo.gradeLevel", button-provider="gradeLevelDataProvider", key="key")
+        p.help-block *Select the grade or grade levels for which this item is appropriate
+        .btn-group
+          button.btn.tight(ng-repeat="gl in gradeLevelDataProvider", button-toggle="active",
+                title="{{gl.value}}", ng-model="gl.selected"){{gl.key}}
 
   h3 Other Alignments
 
-  table(style='width: 80%;')
+  table
     tr
       td(style='vertical-align: top')
         .control-group
           label.control-label Depth Of Knowledge
-            .controls
-              select(ng-model='otherAlignments.depthOfKnowledge', ng-options='c.key as c.value for c in depthOfKnowledgeDataProvider')
-              p.help-block Select the depth of knowledge that best represents the objective
-      td(style='vertical-align: top')
+            select(ng-model='otherAlignments.depthOfKnowledge', ng-options='c.key as c.value for c in depthOfKnowledgeDataProvider')
+            p.help-block Select the depth of knowledge that best represents the objective
+      td(style='vertical-align: top; padding-left: 20px;')
         .control-group
           label.control-label Bloom's Taxonomy
-            .controls
-              select(ng-model='otherAlignments.bloomsTaxonomy', ng-options='c for c in bloomsTaxonomyDataProvider')
+            select(ng-model='otherAlignments.bloomsTaxonomy', ng-options='c for c in bloomsTaxonomyDataProvider')
 
   .control-group
     label.control-label
-      | Key Skills
-
       a(ng-click='expandKeySkills=!expandKeySkills')
         i(class="fa fa-{{!!expandKeySkills ? 'minus' : 'plus'}}-square-o", style="margin-left: 6px")
+      | Key Skills
+
       .controls
         div(ng-show='!expandKeySkills', style='padding-top: 4px;')
           label {{getKeySkillsSummary(otherAlignments.keySkills)}}
@@ -100,16 +110,6 @@ form
             span(tag-list='tag-list', tags='skills.list', selected-tags='otherAlignments.keySkills')
           div(style='float: none; clear: both;')
 
-  .control-group
-    .control-group
-      label.control-label(for='lexile') Lexile Score
-        .controls
-          input#lexile.input-mini(
-          type='text',
-          ng-model='profile.lexile',
-          placeholder="Enter a score...",)
-          span.lead(style='padding-left: 5px;') L
-
   .control-group(ng-show='componentTypes.length')
     label.control-label Question Types
       ul
@@ -117,9 +117,10 @@ form
 
   h3 Licensing
 
-  p This item is made available to the CoreSpring Community via a
   table.permissions
     tr
+      td
+        p Make this available via a
       td(style="padding: 10px; vertical-align: top")
         select(ng-model='contributorDetails.licenseType', ng-options='c for c in licenseTypeDataProvider')
       td(style="padding: 10px; vertical-align: top")
@@ -139,18 +140,6 @@ form
           placeholder="Enter author's name...")
 
     .control-group
-      label.control-label Credentials
-        .controls
-          select(ng-model='contributorDetails.credentials', ng-options='c for c in credentialsDataProvider')
-
-    .control-group
-      label.control-label(for="title") Source URL
-        .controls
-          input#author.form-control(
-          ng-model='contributorDetails.sourceUrl',
-          placeholder="Enter the source URL...")
-
-    .control-group
       label.control-label(for="copyright-owner") * Copyright Owner
         .controls
           input#copyright-owner.form-control(
@@ -167,6 +156,14 @@ form
         .controls
           select(ng-model='contributorDetails.copyright.expirationDate', ng-options='c for c in copyrightExpirationYearDataProvider')
 
+    .control-group
+      label.control-label(for="title") Website
+        .controls
+          input#author.form-control(
+          ng-model='contributorDetails.sourceUrl',
+          placeholder="Enter the URL...")
+
+
   h3 Additional Copyright Information
   p Does this item contain any other copyrighted materials? E.g. book passage, image, etc. *
 
@@ -175,73 +172,69 @@ form
       label
         input(type='radio', ng-model='needAdditionalCopyrightInformation', value='yes', style='margin-right: 5px;')
         | Yes
-        span.help-inline(style="padding-left:10px") If yes, please complete the following
 
       label
         input(type='radio', ng-model='needAdditionalCopyrightInformation', value='', style='margin-right: 5px; margin-left: 20px;')
         | No
 
+    p.help-block(ng-show="needAdditionalCopyrightInformation") Please complete the following:
+
   .additional-copyright-information(ng-repeat='item in contributorDetails.copyright.additional')
 
     .control-group
-      label.control-label(for="owner") Owner
-        .controls
-          input#owner.form-control(
-          ng-model='item.owner',
-          placeholder="Enter the copyright owner...",)
-    .control-group
       label.control-label(for="author") Author
-        .controls
-          input#author.form-control(
-          ng-model='item.author',
-          placeholder="Enter author's name...",)
+      .controls
+        input#author.form-control(
+        ng-model='item.author',
+        placeholder="Enter author's name...",)
     .control-group
-      label.control-label(for="publisher") Publisher
-        .controls
-          input#publisher.form-control(
-          ng-model='item.publisher',
-          placeholder="Enter the publisher's name...",)
+      label.control-label(for="owner") Copyright Owner
+      .controls
+        input#owner.form-control(
+        ng-model='item.owner',
+        placeholder="Enter the copyright owner...",)
     .control-group
       label.control-label(for="year") Copyright Year
-        .controls
-          input#year.form-control(
-          ng-model='item.year',
-          placeholder="Enter the copyright year...",)
+      .controls
+        input#year.form-control(
+        ng-model='item.year',
+        placeholder="Enter the copyright year...",)
     .control-group
       label.control-label(for="license") License
-        .controls
-          select(ng-model='item.licenseType', ng-options='c for c in licenseTypeDataProvider', style="width: 100%;")
+      .controls
+        td(style="padding: 10px; vertical-align: top")
+          select(ng-model='item.licenseType', ng-options='c for c in licenseTypeDataProvider')
+        td(style="padding: 10px; vertical-align: top")
+          span(ng-show='!item.licenseType', style='color: #888; font-style: italic;') Not Assigned
+          img(ng-show='item.licenseType', src='{{getLicenseTypeUrl(item.licenseType)}}')
+          a(href="http://creativecommons.org/licenses/", target="_blank") Learn more
     .control-group
-      label.control-label(for="url") Source URL
-        .controls
-          input#url.form-control(
-          ng-model='item.sourceUrl',
-          placeholder="Enter the source URL...",)
+      label.control-label(for="url") Website
+      .controls
+        input#url.form-control(
+        ng-model='item.sourceUrl',
+        placeholder="Enter the URL...",)
 
   a.add-additional(ng-click='addCopyrightItem()', ng-show='needAdditionalCopyrightInformation')
     i(class="fa fa-{{!!expandKeySkills ? 'minus' : 'plus'}}-square-o", style="margin-left: 6px; margin-right: 6px;")
     span Add more
 
 
-  h3 Historical Information
-
   h4 Prior Use
 
   .control-group
-    p.help-block This item was previously used in a
-    label.control-label(for='priorUse') Prior Use
-      .controls
-        select#priorUse(name='profile.priorUse', ng-model='profile.priorUse', ng-options='c for c in priorUseDataProvider')
+    label.control-label(for='priorUse') This item was previously used in a
+    .controls
+      select#priorUse(name='profile.priorUse', ng-model='profile.priorUse', ng-options='c for c in priorUseDataProvider')
 
   .control-group
-    label.control-label(for='priorGradeLevel') Grade Level
+    label.control-label(for='priorGradeLevel') Grade Level  *Identify the original grade level to which this item was aligned.
       .controls(style="width:80%")
         button-bar#gradeLevel(ng-model="profile.priorGradeLevel", button-provider="gradeLevelDataProvider", key="key")
 
   h4 Reviews Passed
   .control-group
-    p.help-block This question passed the following reviews
-    label.control-label Reviews Passed
+    p This item passed the following reviews (check all that apply):
     .div(style="width:240px;")
       label(ng-repeat='rp in reviewsPassedDataProvider', style="width:50%;")
         input(type='checkbox',
@@ -249,8 +242,7 @@ form
         ng-change="onChangeReviewsPassed(rp.key)",
         style="margin-right: 3px;")
         | {{rp.key}}
-      label.control-label(ng-show='isOtherReviewsPassedSelected') Other
-        input(type="text", placeholder='Enter review...', ng-model='taskInfo.otherReviewsPassed')
+      input(style="margin-left:120px;", type="text", placeholder='Enter review...', ng-model='taskInfo.otherReviewsPassed')
 
 
 

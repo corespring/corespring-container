@@ -41,8 +41,16 @@
           $scope.standardsAdapter.subCategoryOption));
     }
 
+    function containsLiteracyStandard(standards){
+      return _.find(standards, function(item){
+        return item && item.subject && item.subject.toLowerCase().indexOf("literacy") >= 0;
+      });
+    }
+
     $scope.$watch('profile.standards', function (newValue, oldValue) {
       log("profile.standards", newValue);
+
+      $scope.isLiteracyStandardSelected = containsLiteracyStandard(newValue);
     });
 
     $scope.standardsAdapter = {
@@ -52,7 +60,7 @@
       tags: [],
       allowClear: true,
       minimumInputLength: 1,
-      placeholder: "Choose a standard",
+      placeholder: "Begin by typing a standard or skill.",
       id: function (item) {
         return item.id;
       },
