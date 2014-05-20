@@ -1,4 +1,9 @@
 @preview-width: 180px;
+@light-grey: #e4e4e4;
+@header-height: 80px;
+@sub-header-height: 30px;
+@preview-min-height: 80px;
+
 
 .abs-full(@left: 0, @right: 0, @top: 0, @bottom: 0){
   position: absolute;
@@ -6,33 +11,6 @@
   top: @top;
   right: @right;
   bottom: @bottom;
-}
-
-.mathjax-dialog-root{
-  .abs-full();
-  .editor{
-    .abs-full(@right: @preview-width);
-    textarea{
-      width: 100%;
-      height: 100%;
-      border:0 solid #cecaca;
-      background-color: #ffffff;
-      padding: 10px;
-      font-family: monospace;
-      font-size: 11px;
-      overflow:auto;
-      outline:none;
-      resize:none;
-    }
-  }
-
-  .math-preview{
-    .abs-full(@left: none);
-    width: @preview-width;
-    padding-top: 40px;
-    text-align: center;
-    background-color: #e4e4e1;
-  }
 }
 
 .math-sum{
@@ -43,14 +21,77 @@
   }
 }
 
-.mathjax-holder{
+.mathjax-holder.inline{
   display: inline-block;
+}
+
+.mathjax-holder.block{
+  display: block;
+}
+
+.mathjax-holder{
   .user-select(none);
-  background-color: #cbebbb;
-  padding: 4px;
+  padding: 0;
   transition: background-color 200ms;
-  border-radius: 3px;
+  border-radius: 4px;
+  background-color: lighten(@grey-purple, 50%);
+
   &:hover{
-    background-color: #d9d9c9;
+    background-color: #ffffff;
   }
+  
+  .blocker{
+    .bg{
+      border-radius: 4px;
+    }
+  }
+}
+
+.mathjax-dialog-root{
+
+  .abs-full();
+  display: flex;
+  flex-direction: column;
+
+  .header{
+    padding: 8px;
+    background-color: @light-grey;
+    border-bottom: solid 1px darken(@light-grey, 15%);
+  }
+
+  .mj-math-type{
+    padding: 8px;
+    background-color: darken(@light-grey, 7%);
+    border-bottom: solid 1px darken(@light-grey, 15%);
+    font-size: 11px;
+  }
+
+  .math-preview{
+
+    .preview-label{
+      text-transform: uppercase;
+      color: darken(@light-grey, 20%);
+      padding-bottom: 5px;
+    }
+
+    background-color: @light-grey;
+    min-height: @preview-min-height;
+    border-bottom: solid 1px darken(@light-grey, 15%);
+    text-align: center;
+    padding: 8px;
+  }
+
+  .math-textarea{
+    flex: 1;
+    border:0 solid #cecaca;
+    background-color: #ffffff;
+    padding: 10px;
+    font-family: monospace;
+    font-size: 11px;
+    overflow:auto;
+    outline:none;
+    resize:none;
+  }
+
+
 }

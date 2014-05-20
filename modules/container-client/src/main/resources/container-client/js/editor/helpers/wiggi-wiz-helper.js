@@ -1,4 +1,4 @@
-angular.module('wiggi-wiz.helpers').factory('WiggiWizHelper', [
+angular.module('corespring.wiggi-wiz-features').factory('WiggiWizHelper', [
   '$timeout',
   function($timeout) {
 
