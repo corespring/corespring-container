@@ -61,6 +61,14 @@ angular.module('corespring-player.services').factory('ComponentRegister', ['$log
         return sessions;
       };
 
+      this.resetStash = function() {
+        for (var x in components) {
+          if (_.isFunction(components[x].resetStash)) {
+            components[x].resetStash();
+          }
+        }
+      };
+
       this.isAnswerEmpty = function(id) {
         return !components[id] || components[id].isAnswerEmpty();
       };
