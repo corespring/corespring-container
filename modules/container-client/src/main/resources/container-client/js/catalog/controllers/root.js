@@ -23,8 +23,20 @@ angular.module('corespring-catalog.controllers')
 
       $scope.onItemLoaded = function(item) {
         $scope.item = item;
+        $scope.init();
         $scope.$broadcast('itemLoaded', item);
       };
+
+      $scope.init = function() {
+        var contributorDetails = $scope.item.profile.contributorDetails;
+        if (contributorDetails) {
+          $scope.licenseTypeUrl = licenseTypeUrl(contributorDetails.licenseType);
+        }
+      };
+
+      function licenseTypeUrl(licenseType) {
+        return licenseType ? "../../images/licenseTypes/" + licenseType.replace(" ", "-") + ".png" : undefined;
+      }
 
       $scope.onItemLoadError = function(error) {
         $log.warn("Error loading item", error);
