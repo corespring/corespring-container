@@ -1,4 +1,4 @@
-angular.module('corespring.wiggi-wiz-features').factory('WiggiMathJaxFeatureDef', [
+angular.module('corespring.wiggi-wiz-features.mathjax').factory('WiggiMathJaxFeatureDef', [
 
   function() {
 

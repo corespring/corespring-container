@@ -1,4 +1,4 @@
-angular.module('corespring.wiggi-wiz-features').directive('imageHolder', ['$log', 'ImageFeature',
+angular.module('corespring.wiggi-wiz-features.cs-image').directive('imageHolder', ['$log', 'ImageFeature',
 
   function($log, ImageFeature) {
 
