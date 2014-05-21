@@ -48,7 +48,9 @@ script(type='text/ng-template', id="/templates/profile")
 
     .round-panel
       .cols
-        .header.left Additional Information
+        .header.left 
+          i.fa.fa-plus-circle
+          | Additional Information
       .cols
         .content
           .title Prior Use 
@@ -58,7 +60,7 @@ script(type='text/ng-template', id="/templates/profile")
           .title Reviews Passed
           div(ng-repeat="rp in item.profile.taskInfo.reviewsPassed") 
             i.fa.fa-check-square-o
-            | &nbsp; {{rp}}
+            | {{rp}}
         .content
           .title Licence
           ?
