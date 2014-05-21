@@ -119,7 +119,7 @@ angular.module('corespring.wiggi-wiz-features.mathjax').directive('mathjaxDialog
         '     <div class="preview-label">Preview</div>',
         '     <div class="preview-body"></div>',
         '  </div>',
-        '  <textarea class="math-textarea" ng-model="preppedMath"></textarea>',
+        '  <textarea class="math-textarea" ng-model="preppedMath" placeholder="Enter MathML or LaTex here..."></textarea>',
         '</div>'
       ].join('\n')
     };
