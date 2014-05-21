@@ -129,6 +129,10 @@ var controller = function($scope, $rootScope, $log, $location, $state, $timeout,
     return !hidePreview && previewable();
   };
 
+  $scope.previewText = function() {
+    return $scope.showPreview($scope.urlParams.hidePreview) ? 'Hide It!' : 'Try It!';
+  };
+
   $rootScope.$on('$stateChangeSuccess', function() {
     if ($scope.isActive('design')) {
       $location.search('hidePreview', true);

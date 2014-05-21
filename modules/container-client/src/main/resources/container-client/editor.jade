@@ -64,7 +64,8 @@ block content
 
       .main-content(ui-view="main")
 
-      button.btn.btn-xs.btn-info.preview-hang-right-btn(ng-click="togglePreview()", ng-show="showPreviewButton", ng-class="{'preview-active': showPreview(urlParams.hidePreview)}") Try It!
+      button.btn.btn-xs.btn-info.preview-hang-right-btn(ng-click="togglePreview()", ng-show="showPreviewButton", ng-class="{'preview-active': showPreview(urlParams.hidePreview)}")
+        {{ previewText() }}
 
   include partials/designer
   include partials/item-profile
