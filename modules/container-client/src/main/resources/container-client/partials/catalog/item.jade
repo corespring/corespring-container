@@ -1,0 +1,10 @@
+script(type='text/ng-template', id="/templates/item")
+  div(ng-controller='ClientSidePreview')
+    player-control-panel(player-settings='session.settings')
+    corespring-player(player-mode='editor', player-markup='item.xhtml', player-item='item', player-session='session', player-outcomes='outcome')
+    .button-holder
+      button.btn.btn-primary(ng-click='submit()', ng-disabled='!canSubmit()') Submit
+      button.btn.btn-warning(ng-click='resetPreview()') Reset
+      hr
+      #score
+        h4 You scored: {{score.summary.percentage}}%

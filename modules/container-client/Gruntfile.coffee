@@ -8,6 +8,9 @@ module.exports = (grunt) ->
 
   devMode = grunt.option("devMode") != false 
 
+  apps = ["**/editor.jade", "**/*player.jade", "**/*catalog.jade"]
+  ignoreApps = _.map apps, (a) -> "!#{a}"
+
 
   jadeConfig = (path, ext, dev) ->
 
@@ -28,6 +31,7 @@ module.exports = (grunt) ->
         editorExtras: pathsFor(common.editorExtras, dev)
         player: pathsFor(common.player, dev)
         catalog: pathsFor(common.catalog, dev)
+        catalogExtras: pathsFor(common.catalogExtras, dev)
 
 
   common = 
@@ -63,6 +67,25 @@ module.exports = (grunt) ->
         '<%= common.dist %>/js/corespring/core.js',
         '<%= common.dist %>/js/corespring/lodash-mixins.js']
 
+
+    catalog: 
+      dest: '<%= common.dist %>/js/prod-catalog.js'
+      src: [
+        '<%= common.dist %>/js/corespring/core-library.js',
+        '<%= common.dist %>/js/corespring/server/init-core-library.js',
+        '<%= common.dist %>/js/catalog/**/*.js',
+        '<%= common.dist %>/js/render/services/**/*.js',
+        '<%= common.dist %>/js/render/directives/**/*.js',
+        '<%= common.dist %>/js/render/controllers/**/*.js'
+      ]
+
+    catalogExtras: 
+      dest: '<%= common.dist %>/js/prod-catalog-extras.js'
+      src: [
+        '<%= common.dist %>/bower_components/angular-route/angular-route.min.js',
+        '<%= common.dist %>/bower_components/angular-ui-router/release/angular-ui-router.min.js',
+      ]
+
     editor:
       dest: '<%= common.dist %>/js/prod-editor.js'
       src: [
@@ -94,12 +117,6 @@ module.exports = (grunt) ->
               '<%= common.dist %>/bower_components/ace-builds/src-min-noconflict/mode-xml.js',
               '<%= common.dist %>/bower_components/ace-builds/src-min-noconflict/worker-json.js',
               '<%= common.dist %>/bower_components/ace-builds/src-min-noconflict/mode-json.js' ]
-
-    catalog:
-      dest: '<%= common.dist %>/js/catalog/prod-catalog.js'
-      src: [
-        '<%= common.dist %>/js/catalog/**/*.js'
-      ]
 
   expandSrc = (arr) ->
     expanded = expand(arr)
@@ -181,10 +198,13 @@ module.exports = (grunt) ->
         jshintrc: '.jshintrc'
       main: ['<%= common.app %>/js/**/*.js', '!<%= common.app %>/**/*.min.js']
 
+
     jade:
-      partials: jadeConfig(["**/*.jade", "!**/editor.jade", "!**/*player.jade"], ".html", false)
-      prod: jadeConfig(["**/editor.jade", "**/*player.jade"], ".prod.html", false )
-      dev: jadeConfig(["**/editor.jade", "**/*player.jade"], ".dev.html", true )
+      
+      
+      partials: jadeConfig(["**/*.jade"].concat(ignoreApps), ".html", false)
+      prod: jadeConfig(apps, ".prod.html", false )
+      dev: jadeConfig(apps, ".dev.html", true )
 
     jasmine:
       unit:
@@ -213,7 +233,8 @@ module.exports = (grunt) ->
           compress: false
         files: [
           common.coreLibs,
-          common.editorExtras
+          common.editorExtras,
+          common.catalogExtras
         ]
 
       minifyAndConcat: 
@@ -241,6 +262,7 @@ module.exports = (grunt) ->
               common.core.dest, 
               common.editor.dest, 
               common.editorExtras.dest,
+              common.catalog.dest, 
               common.player.dest,
               common.coreLibs.dest,
               common.catalog.dest ]

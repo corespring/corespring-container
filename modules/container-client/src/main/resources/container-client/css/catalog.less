@@ -1,0 +1,106 @@
+@import "../bower_components/less-elements/elements";
+@import "../components/font-awesome/css/font-awesome.css";
+@import "app";
+@import "common/variables";
+@import "common/base";
+
+@bg-grey: saturate(lighten(@grey-purple, 56%), 20%);
+@mid-grey: saturate(lighten(@grey-purple, 46%), 10%);
+@heavy-grey: saturate(lighten(@grey-purple, 20%), 0%);
+@box-pad: 5px;
+
+.profile-body{
+  width: 100%;
+  height: 100%;
+  background-color: @bg-grey;
+  padding: 30px;
+
+  .main-title{
+    .bold{
+      text-transform: uppercase;
+      font-weight: bold;
+    }
+    .info{
+      padding-left: 4px;
+      color: @heavy-grey;
+      font-style: italic;
+      font-size: 12px;
+    }
+
+    margin-bottom: 10px;
+  }
+
+  .cols{
+    display: flex;
+
+    .pill-content{
+      flex: 1;
+      text-align: center;
+      padding: 3px;
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      flex-flow: row wrap; 
+
+      .pill{
+        padding: @box-pad;
+        .rounded(3px);
+        background-color: @mid-grey;
+        font-weight: bold;
+        margin: 3px;
+        flex: 0 0 auto;
+        height: auto;
+        max-height: 30px;
+      }
+    }
+    
+    .content{
+      flex: 1;
+      text-align: left;
+      padding: @box-pad; 
+
+      .title{
+        font-weight: bold;
+      }
+    }
+
+    .header{
+      flex: 1;
+      text-align: center;
+      text-transform: uppercase;
+      border-bottom: solid 1px @mid-grey;
+      padding: @box-pad;
+    }
+
+    .left{
+      text-align: left;
+    }
+
+    .bold{
+      font-weight: bold;
+    }
+
+    .footer{
+      flex: 1;
+      padding: @box-pad;
+      border-top: solid 1px @mid-grey;
+    }
+    
+    .middle{
+      border-left: solid 1px @mid-grey;
+      border-right: solid 1px @mid-grey;
+    }
+  }
+  
+  .round-panel{
+    background-color: white;
+    .rounded(5px);
+    .drop-shadow(0, 1px, 2px, 0.2);
+    margin-bottom: 10px;
+  }
+
+  .padded{
+    padding: @box-pad;
+  }
+}
+

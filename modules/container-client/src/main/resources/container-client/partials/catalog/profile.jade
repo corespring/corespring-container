@@ -1,0 +1,70 @@
+script(type='text/ng-template', id="/templates/profile")
+  .profile-body 
+
+    .main-title
+      span.bold 
+        | {{item.profile.taskInfo.subjects.primary.subject || unassigned}}
+      span.info
+        | (also useful in {{item.profile.taskInfo.subjects.related.subject || unassigned}})
+
+    .round-panel.padded
+      | {{item.profile.taskInfo.title || unassigned}}
+
+    .round-panel
+      .cols
+        .header Standard
+        .header.middle Lexile Score
+        .header Question Type 
+      .cols
+        .pill-content 
+          .pill(ng-repeat="standard in item.profile.standards") 
+            | {{standard.dotNotation}}
+          .pill(ng-show="!item.profile.standards || item.profile.standards.length == 0") {{unassigned}}
+
+        .pill-content.middle 
+          .pill
+            | {{item.profile.taskInfo.lexile || unassigned }} 
+        .pill-content
+          .pill Question Tss ype 1 
+          .pill Question Type 2 
+          .pill Question Tpe 3 
+          .pill Questssion Type 4 
+
+    .round-panel
+      .cols
+        .header Blooms Level
+        .header.middle Depth of Knowledge 
+        .header Key Skills 
+      .cols
+        .pill-content
+          .pill
+            | {{item.profile.otherAlignments.bloomsTaxonomy || unassigned}} 
+        .pill-content.middle
+          .pill 
+            | {{item.profile.otherAlignments.depthOfKnowledge || unassigned}}
+        .pill-content 
+          .pill(ng-repeat="skills in item.profile.otherAlignments.keySkills")
+            | {{skills}}
+
+    .round-panel
+      .cols
+        .header.left Additional Information
+      .cols
+        .content
+          .title Prior Use 
+          | {{item.profile.priorUse || unassigned}}
+
+        .content
+          .title Reviews Passed
+          div(ng-repeat="rp in item.profile.taskInfo.reviewsPassed") 
+            i.fa.fa-check-square-o
+            | &nbsp; {{rp}}
+        .content
+          .title Licence
+          ?
+          .title Copyright Year
+      .cols
+        .footer
+          span.bold
+            | ID: 
+          | {{itemId}} 

@@ -26,6 +26,7 @@ GET           /session/:sessionId/*file                              @org.coresp
 GET           /item/:itemId/player                                   @org.corespring.container.client.controllers.apps.Player.createSessionForItem(itemId)
 GET           /item/:itemId.json                                     @org.corespring.container.client.controllers.resources.Item.load(itemId)
 GET           /item/:itemId/preview                                  @org.corespring.container.client.controllers.apps.Catalog.showCatalog(itemId)
+GET           /item/:itemId/new-preview                              @org.corespring.container.client.controllers.apps.Catalog.showNewCatalog(itemId)
 GET           /item/:itemId/:name/*file                              @org.corespring.container.client.controllers.Assets.supportingMaterial(itemId, name, file)
 GET           /item/:itemId/catalog-config.json                      @org.corespring.container.client.controllers.apps.Catalog.config(itemId)
 GET           /item/:itemId/*file                                    @org.corespring.container.client.controllers.Assets.item(itemId, file)
