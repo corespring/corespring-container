@@ -1,6 +1,6 @@
 h2 Item Profile
 
-p(style="width: 80%") The profile contains information key data used to store and find an item (e.g., Common Core State Standard aligment, Bloom's Taxonomy assignment, key skills, and copyright information). Authors are encouraged to include as much information as possible.
+p The profile contains information key data used to store and find an item (e.g., Common Core State Standard alignment, Bloom's Taxonomy assignment, key skills, and copyright information). Authors are encouraged to include as much information as possible.
 
 p * Required
 
@@ -91,11 +91,12 @@ form
 
       td(style='vertical-align: top; padding-left: 20px;')
         .control-group
-          p.help-block Assign the Bloom's level best represents this item
+          p.help-block Assign the Bloom's level that best represents this item
           label.control-label Bloom's Taxonomy
             select(ng-model='otherAlignments.bloomsTaxonomy', ng-options='c for c in bloomsTaxonomyDataProvider')
 
   .control-group
+    p.help-block Identify the key skill or skills that the student will demonstrate when completing this item.
     label.control-label
       a(ng-click='expandKeySkills=!expandKeySkills')
         i(class="fa fa-{{!!expandKeySkills ? 'minus' : 'plus'}}-square-o", style="margin-right: 6px")
@@ -105,7 +106,7 @@ form
         div(ng-show='!expandKeySkills', style='padding-top: 4px;')
           label {{getKeySkillsSummary(otherAlignments.keySkills)}}
         div(ng-repeat='skills in keySkillsDataProvider', ng-show='expandKeySkills')
-          div(style="width:80%;")
+          div
             span.tag-list-header(style='float: left;') {{skills.header}}
             span(tag-list='tag-list', tags='skills.list', selected-tags='otherAlignments.keySkills')
           div(style='float: none; clear: both;')
@@ -143,6 +144,14 @@ form
         input#author.form-control(
         ng-model='contributorDetails.author',
         placeholder="Enter author's name...")
+
+    tr
+      td.label-col
+        label.control-label(for="credentials") Credentials
+      td
+        input#credentials.form-control(
+        ng-model='contributorDetails.credentials',
+        placeholder="Enter credentials...")
 
     tr
       td.label-col
@@ -250,13 +259,13 @@ form
   h4 Prior Use
 
   .control-group
-    label.control-label(for='priorUse') This item was previously used in a
+    label.control-label(for='priorUse') This item was previously used in
       select#priorUse(name='profile.priorUse', ng-model='profile.priorUse', ng-options='c for c in priorUseDataProvider')
 
   .control-group
     label.control-label(for='priorGradeLevel') Grade Level
       span.help-inline  Identify the original grade level to which this item was aligned.
-      .controls(style="width:80%")
+      .controls
         tight-button-bar#gradeLevel(ng-model="profile.priorGradeLevel", button-provider="gradeLevelDataProvider", key="key")
 
   h4 Reviews Passed
