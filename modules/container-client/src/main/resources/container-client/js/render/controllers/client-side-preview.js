@@ -1,7 +1,6 @@
 var controller = function($scope, ComponentRegister, PlayerService) {
 
-  $scope.responses = {};
-  $scope.session = {
+  var defaultSession = {
     remainingAttempts: 1,
     settings: {
       maxNoOfAttempts: 1,
@@ -10,6 +9,9 @@ var controller = function($scope, ComponentRegister, PlayerService) {
       showFeedback: true
     }
   };
+
+  $scope.responses = {};
+  $scope.session = _.cloneDeep(defaultSession);
 
   $scope.submit = function() {
     var components = ComponentRegister.getComponentSessions();
@@ -24,6 +26,10 @@ var controller = function($scope, ComponentRegister, PlayerService) {
     $scope.outcome = data.outcome;
     $scope.score = data.score;
     ComponentRegister.setEditable(false);
+  };
+
+  $scope.resetStash = function() {
+    ComponentRegister.resetStash();
   };
 
   $scope.onSessionSaveError = function(error) {};
@@ -48,6 +54,8 @@ var controller = function($scope, ComponentRegister, PlayerService) {
   };
 
   $scope.$on('resetPreview', $scope.resetPreview);
+  $scope.$on('resetStash', $scope.resetStash);
+
   $scope.$on('setMode', function(event, message) {
     if (message.mode) {
       $scope.setMode(message.mode);

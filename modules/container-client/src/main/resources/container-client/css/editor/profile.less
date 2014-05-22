@@ -1,5 +1,18 @@
 @profile-input-width: 500px;
 
+.select2-item-profile-standard-adapter-drop-down-item {
+  blockquote {
+    font-size: 16px;
+    font-weight: 300;
+    line-height: 22.5px;
+
+    small {
+      font-size: 13px;
+      line-height: 18px;
+    }
+  }
+}
+
 .container {
 
   .profile {
@@ -12,6 +25,8 @@
 }
 
 .profile {
+
+  width: 90%;
 
   a.tag-list-link {
     padding: 3px;
@@ -60,12 +75,13 @@
   }
 
   .copyright-information {
-    width: @profile-input-width;
 
-    td.label-col {
+    min-width: 600px;
+
+    .label-col {
       text-align: right;
       padding: 5px;
-      width: 30%;
+      width: 180px;
     }
   }
 
@@ -80,10 +96,6 @@
     margin-left: 20px;
     color: @help-text;
     font-size: 80%;
-  }
-
-  .item-information {
-    width: 80%;
   }
 
   .itemTypes {

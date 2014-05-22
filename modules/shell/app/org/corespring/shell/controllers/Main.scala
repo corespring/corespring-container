@@ -63,7 +63,7 @@ trait Main extends Controller {
         "components" -> Json.obj(),
         "profile" -> Json.obj(
           "taskInfo" -> Json.obj(
-            "title" -> "New item")))
+            "title" -> "Enter a title for this item...")))
       itemService.create(json).map { id =>
         Redirect(org.corespring.container.client.controllers.apps.routes.Editor.editItem(id.toString))
       }.getOrElse(BadRequest("Error creating an item"))

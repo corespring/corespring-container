@@ -106,12 +106,12 @@ object FieldValueJson {
         "value" -> "Summative"
       ),
       Json.obj(
-        "key" -> "Other",
-        "value" -> "Other"
-      ),
-      Json.obj(
         "key" -> "International Benchmark",
         "value" -> "International Benchmark"
+      ),
+      Json.obj(
+        "key" -> "Other",
+        "value" -> "Other"
       )
     ),
     "credentials" -> Json.arr(

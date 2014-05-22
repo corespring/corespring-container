@@ -75,6 +75,9 @@
       allowClear: true,
       minimumInputLength: 1,
       placeholder: "Begin by typing a standard or skill.",
+      formatResultCssClass: function(object) {
+        return "select2-item-profile-standard-adapter-drop-down-item";
+      },
       id: function(item) {
         return item.id;
       },
@@ -178,33 +181,6 @@
     $scope.relatedSubjectAsync = new Async("subjects.related", subjectText);
     $scope.primarySubjectAsync = new Async("subjects.primary", subjectText);
 
-    $scope.$watch("otherItemType", function(n) {
-      if (isFormActive) {
-        if (n && n !== "") {
-          $scope.taskInfo.itemType = n;
-        }
-      }
-    }, true);
-
-    $scope.$watch("taskInfo.itemType", function(newValue) {
-      if (isFormActive) {
-        updateOtherItemType();
-      }
-    }, true);
-
-    function updateOtherItemType() {
-
-      function isRecognisedType() {
-        return _.some($scope.itemTypeValues, function(it) {
-          return it === $scope.taskInfo.itemType;
-        });
-      }
-
-      if ($scope.itemTypeValues && $scope.taskInfo) {
-        $scope.otherItemType = isRecognisedType() ? "" : $scope.taskInfo.itemType;
-      }
-    }
-
     function toListOfValues(listOfObjects) {
       return _.chain(listOfObjects)
         .pluck("value")
@@ -213,11 +189,11 @@
     }
 
     DataQueryService.list("additionalCopyrightItemType", function(result) {
-      $scope.additionalCopyrightItemTypeDataProvider = toListOfValues(result);
+      $scope.additionalCopyrightItemTypeDataProvider = result;
     });
 
     DataQueryService.list("bloomsTaxonomy", function(result) {
-      $scope.bloomsTaxonomyDataProvider = toListOfValues(result);
+      $scope.bloomsTaxonomyDataProvider = result;
     });
 
     $scope.copyrightExpirationYearDataProvider = _.range(new Date().getFullYear(), new Date().getFullYear() + 20).concat(['Never']);
@@ -225,8 +201,22 @@
     $scope.copyrightYearDataProvider = _.range(new Date().getFullYear(), 1939, -1);
 
     DataQueryService.list("credentials", function(result) {
-      $scope.credentialsDataProvider = toListOfValues(result);
+      $scope.credentialsDataProvider = result;
+      updateCredentialsOtherSelected();
     });
+
+    $scope.$watch('contributorDetails.credentials', function() {
+      updateCredentialsOtherSelected();
+    });
+
+    function updateCredentialsOtherSelected() {
+      var otherSelected = $scope.contributorDetails && $scope.contributorDetails.credentials === 'Other';
+      if ($scope.isCredentialsOtherSelected && !otherSelected) {
+        $scope.contributorDetails.credentialsOther = '';
+      }
+      $scope.isCredentialsOtherSelected = otherSelected;
+    }
+
 
     DataQueryService.list("depthOfKnowledge", function(result) {
       $scope.depthOfKnowledgeDataProvider = result;
@@ -242,17 +232,30 @@
     });
 
     DataQueryService.list("licenseTypes", function(result) {
-      $scope.licenseTypeDataProvider = toListOfValues(result);
+      $scope.licenseTypeDataProvider = result;
     });
 
     DataQueryService.list("priorUses", function(result) {
-      $scope.priorUseDataProvider = toListOfValues(result);
+      $scope.priorUseDataProvider = result;
+      updatePriorUseOtherSelected();
     });
+
+    $scope.$watch('profile.priorUse', function() {
+      updatePriorUseOtherSelected();
+    });
+
+    function updatePriorUseOtherSelected() {
+      var otherSelected = $scope.profile && $scope.profile.priorUse === 'Other';
+      if ($scope.isPriorUseOtherSelected && !otherSelected) {
+        $scope.profile.priorUseOther = '';
+      }
+      $scope.isPriorUseOtherSelected = otherSelected;
+    }
 
     DataQueryService.list("reviewsPassed", function(result) {
       $scope.reviewsPassedDataProvider = result;
       initReviewsPassedDataProvider();
-      updateOtherReviewsPassedSelected();
+      updateReviewsPassedOtherSelected();
     });
 
     function initReviewsPassedDataProvider() {
@@ -305,20 +308,20 @@
     };
 
     $scope.$watch('taskInfo.reviewsPassed', function() {
-      updateOtherReviewsPassedSelected();
+      updateReviewsPassedOtherSelected();
     });
 
-    function updateOtherReviewsPassedSelected() {
+    function updateReviewsPassedOtherSelected() {
       var otherSelected = false;
       if ($scope.reviewsPassedDataProvider) {
         otherSelected = _.some($scope.reviewsPassedDataProvider, function(item) {
           return item.selected && item.key === 'Other';
         });
       }
-      if ($scope.isOtherReviewsPassedSelected && !otherSelected && $scope.taskInfo) {
-        $scope.taskInfo.otherReviewsPassed = '';
+      if ($scope.isReviewsPassedOtherSelected && !otherSelected && $scope.taskInfo) {
+        $scope.taskInfo.reviewsPassedOther = '';
       }
-      $scope.isOtherReviewsPassedSelected = otherSelected;
+      $scope.isReviewsPassedOtherSelected = otherSelected;
     }
 
     $scope.getLicenseTypeUrl = function(licenseType) {
@@ -370,7 +373,7 @@
         if (newValue === 'yes') {
           $scope.addCopyrightItem();
         } else {
-          $scope.clearCopyrightItems(); //TODO Add "are you sure" modal
+          $scope.clearCopyrightItems(); //TODO Add "are you sure" modal?
         }
       }
     });
@@ -481,7 +484,9 @@
         $scope.contributorDetails.copyright.additional.length > 0 ? 'yes' : '';
 
       initReviewsPassedDataProvider();
-      updateOtherReviewsPassedSelected();
+      updateReviewsPassedOtherSelected();
+      updatePriorUseOtherSelected();
+      updateCredentialsOtherSelected();
 
       isFormActive = true;
     }
