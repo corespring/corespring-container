@@ -128,7 +128,7 @@ form
               select(ng-model='contributorDetails.licenseType', ng-options='c.key as c.value for c in licenseTypeDataProvider')
             td
               span(ng-show='!contributorDetails.licenseType', style='color: #888; font-style: italic;') Not Assigned
-              img(ng-show='contributorDetails.licenseType', src='{{getLicenseTypeUrl(contributorDetails.licenseType)}}')
+              img(ng-show='contributorDetails.licenseType', ng-src="{{getLicenseTypeUrl(contributorDetails.licenseType)}}")
             td
               a(href="http://creativecommons.org/licenses/", target="_blank") Learn more
 
@@ -228,7 +228,7 @@ form
               select#ac-license(ng-model='item.licenseType', ng-options='c.key as c.value for c in licenseTypeDataProvider')
             td
               span(ng-show='!item.licenseType', style='color: #888; font-style: italic;') Not Assigned
-              img(ng-show='item.licenseType', src='{{getLicenseTypeUrl(item.licenseType)}}')
+              img(ng-show='contributorDetails.licenseType', ng-src="{{getLicenseTypeUrl(contributorDetails.licenseType)}}")
             td
               a(href="http://creativecommons.org/licenses/", target="_blank") Learn more
     tr

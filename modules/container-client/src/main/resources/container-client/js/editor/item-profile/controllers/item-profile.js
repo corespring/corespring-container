@@ -1,4 +1,4 @@
-(function () {
+(function() {
 
   angular.module('corespring-editor.controllers')
     .controller('ItemProfile', [
@@ -7,10 +7,19 @@
       'DataQueryService',
       'ItemService',
       'StandardQueryCreator',
+      'DesignerService',
+      'ProfileFormatter',
       ItemProfileController
     ]);
 
-  function ItemProfileController($log, $scope, DataQueryService, ItemService, StandardQueryCreator) {
+  function ItemProfileController(
+    $log,
+    $scope,
+    DataQueryService,
+    ItemService,
+    StandardQueryCreator,
+    DesignerService,
+    ProfileFormatter) {
 
     var isFormActive = false;
     var log = $log.debug.bind($log, 'ItemProfileController] -');
@@ -28,9 +37,21 @@
 
     $scope.standardsOptions = [];
 
-    DataQueryService.list("standardsTree", function (result) {
+    DataQueryService.list("standardsTree", function(result) {
       $scope.standardsOptions = result;
     });
+
+    DesignerService.loadAvailableComponents(function(comps) {
+      $scope.availableComponents = comps;
+      applyComponentTypes();
+    });
+
+    function applyComponentTypes() {
+      if (!$scope.item || !$scope.item.components || !$scope.availableComponents) {
+        return;
+      }
+      $scope.componentTypes = ProfileFormatter.componentTypesUsed($scope.item.components, $scope.availableComponents);
+    }
 
     function createStandardQuery(searchText) {
       return JSON.stringify(
@@ -42,12 +63,12 @@
     }
 
     function containsLiteracyStandard(standards) {
-      return _.find(standards, function (item) {
+      return _.find(standards, function(item) {
         return item && item.subject && item.subject.toLowerCase().indexOf("literacy") >= 0;
       });
     }
 
-    $scope.$watch('profile.standards', function (newValue, oldValue) {
+    $scope.$watch('profile.standards', function(newValue, oldValue) {
       log("profile.standards", newValue);
 
       $scope.isLiteracyStandardSelected = containsLiteracyStandard(newValue);
@@ -61,23 +82,25 @@
       allowClear: true,
       minimumInputLength: 1,
       placeholder: "Begin by typing a standard or skill.",
-      formatResultCssClass: function(object){
+      formatResultCssClass: function(object) {
         return "select2-item-profile-standard-adapter-drop-down-item";
       },
-      id: function (item) {
+      id: function(item) {
         return item.id;
       },
-      query: function (query) {
-        DataQueryService.query("standards", createStandardQuery(query.term), function (results) {
-          query.callback({results: results});
+      query: function(query) {
+        DataQueryService.query("standards", createStandardQuery(query.term), function(results) {
+          query.callback({
+            results: results
+          });
         });
       },
-      initSelection: function (element, callback) {
+      initSelection: function(element, callback) {
         var val = $(element).val();
         var ids = val.split(',');
         var results = [];
-        ids.forEach(function (id) {
-          findItemById("standards", id, function (item) {
+        ids.forEach(function(id) {
+          findItemById("standards", id, function(item) {
             results.push(item);
             if (results.length === ids.length) {
               callback(results);
@@ -85,13 +108,13 @@
           });
         });
       },
-      formatSelection: function (standard) {
-        setTimeout(function () {
+      formatSelection: function(standard) {
+        setTimeout(function() {
           $(".standard-adapter-result").tooltip();
         }, 500);
         return "<span class='standard-adapter-result' data-title='" + standard.standard + "'>" + standard.dotNotation + "</span>";
       },
-      formatResult: function (standard) {
+      formatResult: function(standard) {
         return "<blockquote>" +
           '<p>' + standard.standard + '</p>' +
           '<small>' + standard.dotNotation + ', ' + standard.subject + ', ' + standard.subCategory + '</small>' +
@@ -108,7 +131,7 @@
     $scope.queryResults = {};
 
     function findItemById(topic, id, callback) {
-      var local = _.find($scope.queryResults[topic], function (r) {
+      var local = _.find($scope.queryResults[topic], function(r) {
         return r.id === id;
       });
       if (local) {
@@ -124,14 +147,14 @@
 
       var that = this;
 
-      this.elementToVal = function (element) {
+      this.elementToVal = function(element) {
         return $(element).select2('val');
       };
 
-      this.query = function (query) {
+      this.query = function(query) {
         log("query", query);
 
-        DataQueryService.query(topic, query.term, function (result) {
+        DataQueryService.query(topic, query.term, function(result) {
           $scope.queryResults[topic] = result;
           query.callback({
             results: result
@@ -139,20 +162,20 @@
         });
       };
 
-      this.formatResult = function (e) {
+      this.formatResult = function(e) {
         return formatFunc(e);
       };
 
-      this.formatSelection = function (e) {
+      this.formatSelection = function(e) {
         return formatFunc(e);
       };
 
-      this.initSelection = function (element, callback) {
+      this.initSelection = function(element, callback) {
         log("init selection:", element, callback);
         var val = that.elementToVal(element);
         log("val:", val);
 
-        findItemById(topic, val, function (s) {
+        findItemById(topic, val, function(s) {
           return callback(s);
         });
       };
@@ -172,11 +195,11 @@
         .value();
     }
 
-    DataQueryService.list("additionalCopyrightItemType", function (result) {
+    DataQueryService.list("additionalCopyrightItemType", function(result) {
       $scope.additionalCopyrightItemTypeDataProvider = result;
     });
 
-    DataQueryService.list("bloomsTaxonomy", function (result) {
+    DataQueryService.list("bloomsTaxonomy", function(result) {
       $scope.bloomsTaxonomyDataProvider = result;
     });
 
@@ -184,12 +207,12 @@
 
     $scope.copyrightYearDataProvider = _.range(new Date().getFullYear(), 1939, -1);
 
-    DataQueryService.list("credentials", function (result) {
+    DataQueryService.list("credentials", function(result) {
       $scope.credentialsDataProvider = result;
       updateCredentialsOtherSelected();
     });
 
-    $scope.$watch('contributorDetails.credentials', function () {
+    $scope.$watch('contributorDetails.credentials', function() {
       updateCredentialsOtherSelected();
     });
 
@@ -202,26 +225,29 @@
     }
 
 
-    DataQueryService.list("depthOfKnowledge", function (result) {
+    DataQueryService.list("depthOfKnowledge", function(result) {
       $scope.depthOfKnowledgeDataProvider = result;
     });
 
-    DataQueryService.list("keySkills", function (result) {
-      $scope.keySkillsDataProvider = _.map(result, function (k) {
-        return {header: k.key, list: k.value};
+    DataQueryService.list("keySkills", function(result) {
+      $scope.keySkillsDataProvider = _.map(result, function(k) {
+        return {
+          header: k.key,
+          list: k.value
+        };
       });
     });
 
-    DataQueryService.list("licenseTypes", function (result) {
+    DataQueryService.list("licenseTypes", function(result) {
       $scope.licenseTypeDataProvider = result;
     });
 
-    DataQueryService.list("priorUses", function (result) {
+    DataQueryService.list("priorUses", function(result) {
       $scope.priorUseDataProvider = result;
       updatePriorUseOtherSelected();
     });
 
-    $scope.$watch('profile.priorUse', function () {
+    $scope.$watch('profile.priorUse', function() {
       updatePriorUseOtherSelected();
     });
 
@@ -233,7 +259,7 @@
       $scope.isPriorUseOtherSelected = otherSelected;
     }
 
-    DataQueryService.list("reviewsPassed", function (result) {
+    DataQueryService.list("reviewsPassed", function(result) {
       $scope.reviewsPassedDataProvider = result;
       initReviewsPassedDataProvider();
       updateReviewsPassedOtherSelected();
@@ -242,7 +268,7 @@
     function initReviewsPassedDataProvider() {
       if ($scope.reviewsPassedDataProvider && $scope.taskInfo && _.isArray($scope.taskInfo.reviewsPassed)) {
 
-        _.each($scope.reviewsPassedDataProvider, function (item) {
+        _.each($scope.reviewsPassedDataProvider, function(item) {
           var selected = $scope.taskInfo.reviewsPassed.indexOf(item.key) >= 0;
           if (selected !== item.selected) {
             item.selected = selected;
@@ -251,7 +277,7 @@
       }
     }
 
-    $scope.onChangeReviewsPassed = function (changedKey) {
+    $scope.onChangeReviewsPassed = function(changedKey) {
       function getKeys(predicate) {
         return _.chain($scope.reviewsPassedDataProvider)
           .filter(predicate)
@@ -263,7 +289,7 @@
         return selectedKeys.indexOf(key) >= 0;
       }
 
-      var selectedKeys = getKeys(function (item) {
+      var selectedKeys = getKeys(function(item) {
         return item.selected;
       });
       if (changedKey === "None") {
@@ -273,7 +299,7 @@
       } else if (changedKey === "All") {
         if (keyIsSelected(changedKey)) {
           var isOtherSelected = keyIsSelected("Other");
-          selectedKeys = getKeys(function (item) {
+          selectedKeys = getKeys(function(item) {
             return item.key !== "None" && (item.key !== "Other" || isOtherSelected);
           });
         }
@@ -288,14 +314,14 @@
       initReviewsPassedDataProvider();
     };
 
-    $scope.$watch('taskInfo.reviewsPassed', function () {
+    $scope.$watch('taskInfo.reviewsPassed', function() {
       updateReviewsPassedOtherSelected();
     });
 
     function updateReviewsPassedOtherSelected() {
       var otherSelected = false;
       if ($scope.reviewsPassedDataProvider) {
-        otherSelected = _.some($scope.reviewsPassedDataProvider, function (item) {
+        otherSelected = _.some($scope.reviewsPassedDataProvider, function(item) {
           return item.selected && item.key === 'Other';
         });
       }
@@ -305,11 +331,11 @@
       $scope.isReviewsPassedOtherSelected = otherSelected;
     }
 
-    $scope.getLicenseTypeUrl = function (licenseType) {
+    $scope.getLicenseTypeUrl = function(licenseType) {
       return licenseType ? "/assets/images/licenseTypes/" + licenseType.replace(" ", "-") + ".png" : undefined;
     };
 
-    $scope.getKeySkillsSummary = function (keySkills) {
+    $scope.getKeySkillsSummary = function(keySkills) {
       var count = "No";
       var skills = "Skills";
 
@@ -326,11 +352,11 @@
       return count + " Key " + skills + " selected";
     };
 
-    $scope.addCopyrightItem = function () {
+    $scope.addCopyrightItem = function() {
       $scope.contributorDetails.copyright.additional.push({});
     };
 
-    $scope.removeCopyrightItem = function (item) {
+    $scope.removeCopyrightItem = function(item) {
       var index = $scope.contributorDetails.copyright.additional.indexOf(item);
       if (index >= 0) {
         $scope.contributorDetails.copyright.additional.splice(index, 1);
@@ -340,13 +366,13 @@
       }
     };
 
-    $scope.clearCopyrightItems = function () {
+    $scope.clearCopyrightItems = function() {
       $scope.contributorDetails.copyright.additional.splice(0);
     };
 
     $scope.needAdditionalCopyrightInformation = '';
 
-    $scope.$watch("needAdditionalCopyrightInformation", function (newValue, oldValue) {
+    $scope.$watch("needAdditionalCopyrightInformation", function(newValue, oldValue) {
       if (isFormActive) {
         if (newValue === oldValue) {
           return;
@@ -359,11 +385,11 @@
       }
     });
 
-    $scope.$on('save-data', function () {
+    $scope.$on('save-data', function() {
       $scope.save();
     });
 
-    $scope.save = function () {
+    $scope.save = function() {
 
       ItemService.save({
           profile: $scope.profile
@@ -430,7 +456,7 @@
     function removeEmptyAdditionalCopyrightItems() {
 
       function itemIsEmpty(item) {
-        return !item || _.every(item, function (val) {
+        return !item || _.every(item, function(val) {
           return !val;
         });
       }
@@ -443,17 +469,6 @@
           }
         }
       }
-    }
-
-    function getComponentTypes(components) {
-      var result = _.chain(components)
-        .countBy("title")
-        .map(function (value, key) {
-          return key + "(" + value + ")";
-        })
-        .sort()
-        .value();
-      return result;
     }
 
     function onLoadItemSuccess() {
@@ -469,10 +484,11 @@
       log("other alignments:", $scope.otherAlignments);
       log("contributor details:", $scope.contributorDetails);
 
-      $scope.componentTypes = getComponentTypes($scope.item.components);
+
+      applyComponentTypes();
 
       $scope.needAdditionalCopyrightInformation =
-          $scope.contributorDetails.copyright.additional.length > 0 ? 'yes' : '';
+        $scope.contributorDetails.copyright.additional.length > 0 ? 'yes' : '';
 
       initReviewsPassedDataProvider();
       updateReviewsPassedOtherSelected();
@@ -482,14 +498,14 @@
       isFormActive = true;
     }
 
-    $scope.$watch('item', function (newValue) {
+    $scope.$watch('item', function(newValue) {
       log("item $watch", newValue);
       if (newValue && newValue.profile) {
         onLoadItemSuccess();
       }
     });
 
-    $scope.$on('itemLoaded', function (ev, item) {
+    $scope.$on('itemLoaded', function(ev, item) {
       $scope.item = item;
     });
 
@@ -506,56 +522,57 @@
    # @key - the property of the buttonProvider objects to use for display, and to store in the ngModel
    #*/
   angular.module('corespring-editor.controllers')
-    .directive('tightButtonBar', [ '$log', function ($log) {
+    .directive('tightButtonBar', ['$log',
+      function($log) {
 
-      function link($scope, $element, $attr) {
-        $scope.selected = function (b) {
-          var dataValue = $scope.getValue(b);
-          return $scope.ngModel && $scope.ngModel.indexOf(dataValue) >= 0;
-        };
+        function link($scope, $element, $attr) {
+          $scope.selected = function(b) {
+            var dataValue = $scope.getValue(b);
+            return $scope.ngModel && $scope.ngModel.indexOf(dataValue) >= 0;
+          };
 
-        $scope.toggle = function (b) {
-          $scope.ngModel = $scope.ngModel || [];
-          var dataValue = $scope.getValue(b);
-          var index = $scope.ngModel.indexOf(dataValue);
-          if (index >= 0) {
-            $scope.ngModel.splice(index, 1);
-          } else {
-            $scope.ngModel.push(dataValue);
-          }
-        };
+          $scope.toggle = function(b) {
+            $scope.ngModel = $scope.ngModel || [];
+            var dataValue = $scope.getValue(b);
+            var index = $scope.ngModel.indexOf(dataValue);
+            if (index >= 0) {
+              $scope.ngModel.splice(index, 1);
+            } else {
+              $scope.ngModel.push(dataValue);
+            }
+          };
 
-        $scope.getValue = function (b) {
-          return $scope.key ? b[$scope.key] : b;
+          $scope.getValue = function(b) {
+            return $scope.key ? b[$scope.key] : b;
+          };
+        }
+
+        return {
+          restrict: 'E',
+          link: link,
+          replace: true,
+          scope: {
+            buttonProvider: '=',
+            ngModel: '=',
+            key: '@'
+          },
+          template: [
+            '<div class="tight-button-bar">',
+            '  <div class="btn-group">',
+            '    <button',
+            '     ng-repeat="b in buttonProvider"',
+            '     type="button"',
+            '     ng-click="toggle(b)"',
+            '     onmouseout="this.blur()"',
+            '     ng-class="{ active: selected(b)}"',
+            '     class="btn btn-default">',
+            '     {{getValue(b)}}',
+            '   </button>',
+            ' </div>',
+            '</div>'
+          ].join("\n")
         };
       }
-
-      return {
-        restrict: 'E',
-        link: link,
-        replace: true,
-        scope: {
-          buttonProvider: '=',
-          ngModel: '=',
-          key: '@'
-        },
-        template: [
-          '<div class="tight-button-bar">',
-          '  <div class="btn-group">',
-          '    <button',
-          '     ng-repeat="b in buttonProvider"',
-          '     type="button"',
-          '     ng-click="toggle(b)"',
-          '     onmouseout="this.blur()"',
-          '     ng-class="{ active: selected(b)}"',
-          '     class="btn btn-default">',
-          '     {{getValue(b)}}',
-          '   </button>',
-          ' </div>',
-          '</div>'
-        ].join("\n")
-      };
-    }
     ]);
 
 })();

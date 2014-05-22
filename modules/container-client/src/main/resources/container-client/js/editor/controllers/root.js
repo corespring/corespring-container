@@ -1,3 +1,4 @@
+console.log("init editor Root");
 var controller = function($scope, $rootScope, $log, $location, $state, $timeout, $stateParams, DataQueryService, ItemService, ItemIdService, NavModelService, SupportingMaterialsService) {
 
   var navSetOnce = false;
@@ -41,7 +42,7 @@ var controller = function($scope, $rootScope, $log, $location, $state, $timeout,
       ItemService.save({
           supportingMaterials: $scope.data.item.supportingMaterials
         },
-        function () {
+        function() {
           if (index > 0) {
             $state.transitionTo('supporting-material', {
               index: index - 1

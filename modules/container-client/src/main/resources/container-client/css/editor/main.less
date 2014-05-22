@@ -9,12 +9,10 @@
   @designer-min-width: 500px;
   @main-animation-duration: 300ms;
   @top-nav-zindex: 1001;
-
   .previewHidden {
     visibility: hidden;
     opacity: 0;
   }
-
   .preview-btn() {
     @width: 150px;
     width: @width;
@@ -32,7 +30,6 @@
     -o-transform: rotate(-90deg);
     filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3);
   }
-
   .designer {
     position: inherit;
     bottom: 0;
@@ -41,26 +38,21 @@
     top: 0;
     min-width: @designer-min-width;
     overflow-x: auto;
-
     .summary-feedback-container {
       padding: 30px;
     }
-
-    .weighting-container{
+    .weighting-container {
       padding: 30px;
-
-      .title{
+      .title {
         margin-bottom: 30px;
       }
     }
-
     .editor-container {
       position: inherit;
       bottom: 0;
       right: 0;
       left: 0;
       top: 0;
-
       .wiggi-wiz {
         position: absolute;
         right: 0;
@@ -69,12 +61,10 @@
         bottom: 0;
         border: none;
       }
-
       .wiggi-wiz-overlay {
         .close-icon {
           width: 19px;
           height: 19px;
-
           .fa.fa-times-circle {
             top: -1px;
             right: -1px;
@@ -85,33 +75,27 @@
         }
       }
     }
-
     .preview-container {
       position: absolute;
       left: @preview-width;
-      top : -54px;
+      top: -54px;
       width: 600px;
       height: 100%;
     }
-
     .preview {
       position: absolute;
-      left:0;
+      left: 0;
       width: 100%;
       height: 100%;
       transition: left @main-animation-duration;
     }
-
     .preview.collapsed {
       left: -805px;
     }
-
   }
-
-  .cc-transition-left-right{
+  .cc-transition-left-right {
     transition: left @main-animation-duration, right @main-animation-duration;
   }
-
   .content-container {
     position: absolute;
     top: 0;
@@ -123,35 +107,29 @@
     background-color: white;
     border-left: solid 0 fade(darken(@cs-grey, 40%), 10%);
     .drop-shadow(-5px, 10px, 6px, 0.3);
-
-    .cc-transition-right{
+    .cc-transition-right {
       transition: right @main-animation-duration;
     }
-
-    .preview-hang-right-btn{
+    .preview-hang-right-btn {
       .preview-btn();
       position: absolute;
       z-index: @top-nav-zindex - 1;
       outline: none;
-    } 
-
-    .preview-active{
+    }
+    .preview-active {
       right: -98px;
     }
-
     .wiggi-wiz .wiggi-wiz-editable {
       padding-right: 40px;
     }
-
     &.preview {
       .wiggi-wiz .wiggi-wiz-editable {
         padding-right: 15px;
       }
     }
-
-    .top-nav{
-      .saver{
-        float:left;
+    .top-nav {
+      .saver {
+        float: left;
         margin-left: 50px;
         padding-top: @top-nav-height / 4;
         font-size: 12px;
@@ -160,8 +138,7 @@
         text-align: right;
         color: lighten(@top-nav-bg, 40%);
       }
-
-      .toggle-left-nav{
+      .toggle-left-nav {
         width: @top-nav-height - 1px;
         font-size: 24px;
         line-height: 0px;
@@ -169,30 +146,25 @@
       }
     }
   }
-  
   .content-container.preview {
     right: @preview-width;
     border-right: solid 1px darken(@cs-grey, 20%);
   }
-
   .content-container.left-nav {
     left: @left-nav-width;
   }
-
   .nav-container {
     position: absolute;
-    top:0px;
+    top: 0px;
     bottom: 0px;
     width: 200px;
-    padding:0px;
+    padding: 0px;
     overflow: hidden;
     background-color: @cs-grey;
-
-    .top-nav-filler{
+    .top-nav-filler {
       background-color: none;
-      height: @top-nav-height; 
+      height: @top-nav-height;
     }
-
     .nav {
       li {
         border-top: solid 1px darken(@cs-grey, 4%);
@@ -202,8 +174,8 @@
           cursor: pointer;
           letter-spacing: 0.4px;
           color: lighten(@cs-grey, 50%);
-          &:hover{
-            color: lighten(@cs-grey,30%);
+          &:hover {
+            color: lighten(@cs-grey, 30%);
             background-color: darken(@cs-grey, 4%);
           }
         }
@@ -211,42 +183,36 @@
           text-transform: uppercase;
         }
       }
-      li.active{
-        a {
-          color: white;//@cs-primary;
+      li.active {
+        a{color: white;
+          //@cs-primary;
         }
       }
     }
-
   }
-
   .preview-container {
     overflow-y: auto;
     position: absolute;
-    top : @top-nav-height;
+    top: @top-nav-height;
     right: 0px;
-    width: @preview-width; 
+    width: @preview-width;
     bottom: 0px;
     background-color: white;
-
     .contents {
       padding: 10px 10px 10px 55px;
-
       .component-container {
         .transition-all();
         padding: 4px;
         border-radius: 4px;
         border: 2px dashed transparent;
-        &.selected{
+        &.selected {
           @selected-component-border-color: fade(@grey-purple, 50%);
           //.nice-shadow(@selected-component-border-color);
-          border: 2px dashed #eaeaea; 
+          border: 2px dashed #eaeaea;
         }
       }
     }
-
   }
-
   .main-content {
     overflow-y: auto;
     position: absolute;
@@ -254,8 +220,15 @@
     top: @top-nav-height;
     right: 0px;
     bottom: 0px;
+    .overview {
+      width: 100%;
+      height: 100%;
+      iframe {
+        width: 100%;
+        height: 100%;
+      }
+    }
   }
-
   .top-nav {
     position: fixed;
     left: 0px;
@@ -263,11 +236,10 @@
     top: 0px;
     border-bottom: solid 1px darken(@top-nav-bg, 20%);
     background-color: darken(@top-nav-bg, 0%);
-    height: @top-nav-height; 
+    height: @top-nav-height;
     z-index: @top-nav-zindex;
     .drop-shadow(0, 2px, 3px, 0.35);
-
-    .cs-logo{
+    .cs-logo {
       width: 100px;
       height: 35px;
       display: inline;
@@ -275,36 +247,28 @@
       top: 9px;
       position: absolute;
     }
-    
-    .btn-default{
+    .btn-default {
       color: white;
     }
-
-    button{
+    button {
       height: @top-nav-height - 1px;
       background-color: darken(@top-nav-bg, 10%);
-      -moz-outline:0 none;
-      outline:0 none;
+      -moz-outline: 0 none;
+      outline: 0 none;
       color: white;
-
-      &:active{
-        -moz-outline:0 none;
-        outline:0 none;
+      &:active {
+        -moz-outline: 0 none;
+        outline: 0 none;
       }
-
       border: none;
-      
-      .fa{
+      .fa {
         color: white;
       }
-
-      &:hover{
+      &:hover {
         background-color: darken(@top-nav-bg, 34%);
       }
-
     }
   }
-
   .preview-toggle {
     background: #2693BA;
     background-position: 13px 9px;
@@ -314,7 +278,6 @@
     border: 0;
     border-radius: 4px;
   }
-
   .nav-toggle {
     background: #2693BA;
     background-image: url('../images/menu-toggle.png');
@@ -327,7 +290,6 @@
     border: 0;
     border-radius: 4px;
   }
-
   .nav-pills {
     li.active {
       a, a:focus, a:hover {

@@ -7,7 +7,7 @@
 
   angular.module('@namespace', []);
 
-  angular.module('@namespace').factory('DesignerService', ['$http', 'BaseService',function($http, BaseService){
+  angular.module('@namespace').factory('DesignerService', ['$http', function($http){
     return {
         loadAvailableComponents: function(onSuccess, onFailure){
           var components = @{Json.stringify(componentSet)};
