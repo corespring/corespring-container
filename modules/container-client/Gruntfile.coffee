@@ -18,7 +18,7 @@ module.exports = (grunt) ->
 
     expand: true
     cwd: '<%= common.app %>'
-    src: path.concat(['!**/bower_components/**', '!layout.jade'])
+    src: path.concat(['!**/bower_components/**', '!*layout.jade'])
     ext: ext 
     dest: '<%= common.dist %>'
     options:

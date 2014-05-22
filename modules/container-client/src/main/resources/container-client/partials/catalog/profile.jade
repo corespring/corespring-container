@@ -54,12 +54,12 @@ script(type='text/ng-template', id="/templates/profile")
         tr 
           td.panel-left
             .pill-content
-              .pill
-                | {{item.profile.otherAlignments.bloomsTaxonomy || unassigned}} 
-          td 
+              .pill(ng-show="item.profile.otherAlignments.bloomsTaxonomy")
+                | {{item.profile.otherAlignments.bloomsTaxonomy }} 
+          td
             .pill-content
-              .pill 
-                | {{depthOfKnowledgeLabel || unassigned}}
+              .pill(ng-show="depthOfKnowledgeLabel") 
+                | {{depthOfKnowledgeLabel }}
           td.panel-right
             .pill-content 
               .pill(ng-repeat="skills in item.profile.otherAlignments.keySkills")

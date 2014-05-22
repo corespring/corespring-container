@@ -1,10 +1,4 @@
-extends layout
-
-block head
-  
-  script(type="text/javascript", src="../../components/spin.js/spin.js")
-  link(rel="stylesheet", href="../../components/select2/select2.css")
-  link(rel="stylesheet", href="../../css/editor.css")
+extends app-loader-layout
 
 block content
   .root(ng-controller="Root")
@@ -13,10 +7,8 @@ block content
       .top-nav-filler
 
       ul.nav.nav-stacked
-
         li
           a.mainitem-link(ui-sref="design({section: 'main'})") Design
-
         li.nav-subitem(ui-sref-active="active")
           a.subitem-link(ui-sref="design({section: 'main'})") Item
         li.nav-subitem(ui-sref-active="active")
@@ -25,17 +17,13 @@ block content
           a.subitem-link(ui-sref="design({section: 'summary-feedback'})" ) Summary Feedback
         li.nav-subitem(ui-sref-active="active")
           a.subitem-link(ui-sref="item-profile" ) Profile
-
-        li.nav-subitem(ui-sref-active="active", style="margin-top: 20px;")
+        li.nav-subitem(ui-sref-active="active")
           a.subitem-link(ui-sref="supporting-materials({intro: 'intro'})") Supporting Materials
-
         li.nav-subitem(ng-repeat="supportingMaterial in data.item.supportingMaterials", ng-class="{ active: isSupportingMaterialActive(supportingMaterial, $index)}")
           a.subitem-link.supporting-material-link(ui-sref="supporting-material({index: $index})") {{supportingMaterial.name}}
           a.delete-supporting-material(ng-click="deleteSupportingMaterial($index)")
-
         li
           a.mainitem-link(ui-sref="overview") View
-
         li.nav-subitem(ui-sref-active="active")
           a.subitem-link(ui-sref="overview") Catalog View
 
@@ -77,38 +65,27 @@ block content
   include partials/previews/item-profile
   include partials/previews/supporting-material
 
-block scripts
-
-  script(type="text/javascript",src="../../components/wiggi-wiz/dist/wiggi-wiz.js")
-  script(type="text/javascript",src="../../components/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML")
-  for p in editor
-    script(src="#{p}", type="text/javascript")
-
-  for p in editorExtras
-    script(src="#{p}", type="text/javascript")
-
+block app-loader-config
   script.
 
+    function mkEditorState(path, id){
+      return {
+        url: path,
+        views: {
+          main: {
+            template: $('#' + id).html()
+          },
+          preview: {
+            template: $('#' + id + '-preview').html()
+          }
+        }
+      }
+    }
 
-    var opts = {
-      length: 17, // The length of each line
-      width: 8, // The line thickness
-      radius: 20, // The radius of the inner circle
-      color: '#556270', // #rgb or #rrggbb or array of colors
-      shadow: false, // Whether to render a shadow
-      hwaccel: true, // Whether to use hardware acceleration
-    };
-    var target = document.getElementById('spinner');
-    var spinner = new Spinner(opts).spin(target);
-
-
-    $(document).ready(function () {
-      var configPath = 'editor-config.json';
-
-      $.get(configPath, function (data) {
-
-        var allScriptsAreLoaded = function () {
-          var playerDeps = [
+    var appLoadConfig = {
+      moduleName: 'corespring-editor',
+      jsonFile: 'editor-config.json',
+      dependencies: [
             'corespring-common.services',
             'corespring-common.directives',
             'corespring-common.supporting-materials',
@@ -126,94 +103,23 @@ block scripts
             'ngRoute',
             'ui.select2',
             'corespring.wiggi-wiz'
-          ].concat(data.angular.dependencies);
+          ],
+      defaultPath: '/design/main',
+      states: {
+        design : mkEditorState('/design/:section', 'designer'),
+        'item-profile' : mkEditorState('/item-profile', 'item-profile'),
+        'supporting-materials' : mkEditorState('/supporting-materials/:intro', 'supporting-materials'),
+        'supporting-material' : mkEditorState('/supporting-material/:index','supporting-material'),
+        overview: mkEditorState('/overview', 'overview')
+      }
+    };
 
-          angular.module("corespring-editor", playerDeps).config(function($provide, $stateProvider, $urlRouterProvider) {
-            
-            //Disable logging.. 
-            /*$provide.decorator('$log', function($delegate, $sniffer) {
-                var _log = $delegate.log; //Saving the original behavior
+block app-loader-scripts
 
-                $delegate.log = function(message) { };
-                $delegate.debug = function(message) { };
-                $delegate.error = function(message) {
-                }
+  script(type="text/javascript",src="../../components/wiggi-wiz/dist/wiggi-wiz.js")
+  
+  for p in editor
+    script(src="#{p}", type="text/javascript")
 
-                return $delegate;
-            });*/
-
-            $urlRouterProvider.otherwise("/design/main");
-            $stateProvider
-              .state('design', {
-                url: "/design/:section",
-                views: {
-                  main: {
-                    template: $('#designer').html()
-                  },
-                  preview: {
-                    template: $('#designer-preview').html()
-                  }
-                }
-              })
-              .state('item-profile', {
-                url: '/item-profile',
-                views: {
-                  main: {
-                    template: $('#item-profile').html()
-                  },
-                  preview: {
-                    template: $('#item-profile-preview').html()
-                  }
-                }
-              })
-              .state('supporting-materials', {
-                url: '/supporting-materials/:intro',
-                views: {
-                  main: {
-                    template: $('#supporting-materials').html()
-                  },
-                  preview: {
-                    template: $('#supporting-materials-preview').html()
-                  }
-                }
-              })
-              .state('supporting-material', {
-                url: '/supporting-material/:index',
-                views: {
-                  main: {
-                    template: $('#supporting-material').html()
-                  },
-                  preview: {
-                    template: $('#supporting-material-preview').html()
-                  }
-                }
-              })
-              .state('overview', {
-                url: '/overview',
-                views: {
-                  main: {
-                    template: $('#overview').html()
-                  }
-                }
-              })
-          });
-
-          angular.bootstrap(document, ["corespring-editor"]);
-          angular.resumeBootstrap();
-          setTimeout(function(){
-            spinner.stop();
-            $('.pre-loader').remove();
-            $('.main').addClass('blend');
-          }, 200);
-        };
-
-        var args = data.scripts.concat(data.css);
-        console.log(args);
-        head.js.apply(null, args);
-
-        head.ready(function(){
-          allScriptsAreLoaded();
-        });
-
-      });
-    });
+  for p in editorExtras
+    script(src="#{p}", type="text/javascript")
