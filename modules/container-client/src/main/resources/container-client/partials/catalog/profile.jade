@@ -35,7 +35,9 @@ script(type='text/ng-template', id="/templates/profile")
         tr 
           td.panel-left
             .pill-content 
-              .pill(ng-repeat="standard in item.profile.standards", tooltip="{{standard.standard}}") 
+              .pill(ng-repeat="standard in item.profile.standards", 
+                tooltip="{{standard.standard}}",
+                tooltip-append-to-body="true") 
                 | {{standard.dotNotation}}
           td(ng-show="item.profile.lexile")
             .pill-content 
