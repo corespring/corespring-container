@@ -93,7 +93,7 @@ form
         .control-group
           p.help-block Assign the Bloom's level that best represents this item
           label.control-label Bloom's Taxonomy
-            select(ng-model='otherAlignments.bloomsTaxonomy', ng-options='c for c in bloomsTaxonomyDataProvider')
+            select(ng-model='otherAlignments.bloomsTaxonomy', ng-options='c.key as c.value for c in bloomsTaxonomyDataProvider')
 
   .control-group
     p.help-block Identify the key skill or skills that the student will demonstrate when completing this item.
@@ -126,7 +126,7 @@ form
         table.license
           tr
             td
-              select(ng-model='contributorDetails.licenseType', ng-options='c for c in licenseTypeDataProvider')
+              select(ng-model='contributorDetails.licenseType', ng-options='c.key as c.value for c in licenseTypeDataProvider')
             td
               span(ng-show='!contributorDetails.licenseType', style='color: #888; font-style: italic;') Not Assigned
               img(ng-show='contributorDetails.licenseType', src='{{getLicenseTypeUrl(contributorDetails.licenseType)}}')
@@ -149,9 +149,8 @@ form
       td.label-col
         label.control-label(for="credentials") Credentials
       td
-        input#credentials.form-control(
-        ng-model='contributorDetails.credentials',
-        placeholder="Enter credentials...")
+        select(ng-model='contributorDetails.credentials', ng-options='c.key as c.value for c in credentialsDataProvider')
+        input(ng-show="isCredentialsOtherSelected", type="text", placeholder='Enter credentials...', ng-model='contributorDetails.credentialsOther')
 
     tr
       td.label-col
@@ -227,7 +226,7 @@ form
         table.license
           tr
             td
-              select#ac-license(ng-model='item.licenseType', ng-options='c for c in licenseTypeDataProvider')
+              select#ac-license(ng-model='item.licenseType', ng-options='c.key as c.value for c in licenseTypeDataProvider')
             td
               span(ng-show='!item.licenseType', style='color: #888; font-style: italic;') Not Assigned
               img(ng-show='item.licenseType', src='{{getLicenseTypeUrl(item.licenseType)}}')
@@ -237,7 +236,7 @@ form
       td.label-col
         label.control-label(for="ac-item-type") Type
       td
-        select#ac-item-type(ng-model='item.itemType', ng-options='c for c in additionalCopyrightItemTypeDataProvider')
+        select#ac-item-type(ng-model='item.itemType', ng-options='c.key as c.value for c in additionalCopyrightItemTypeDataProvider')
 
     tr
       td.label-col
@@ -255,12 +254,12 @@ form
     i(class="fa fa-{{!!expandKeySkills ? 'minus' : 'plus'}}-square-o", style="margin-left: 6px; margin-right: 6px;")
     span Add more
 
-
   h4 Prior Use
 
   .control-group
     label.control-label(for='priorUse') This item was previously used in
-      select#priorUse(name='profile.priorUse', ng-model='profile.priorUse', ng-options='c for c in priorUseDataProvider')
+      select#priorUse(name='profile.priorUse', ng-model='profile.priorUse', ng-options='c.key as c.value for c in priorUseDataProvider')
+      input(ng-show="isPriorUseOtherSelected", type="text", placeholder='Enter prior use...', ng-model='profile.priorUseOther')
 
   .control-group
     label.control-label(for='priorGradeLevel') Grade Level
@@ -278,7 +277,7 @@ form
         ng-change="onChangeReviewsPassed(rp.key)",
         style="margin-right: 3px;")
         | {{rp.key}}
-      input(ng-show="isOtherReviewsPassedSelected",style="margin-left:135px;", type="text", placeholder='Enter review...', ng-model='taskInfo.otherReviewsPassed')
+      input(ng-show="isReviewsPassedOtherSelected",style="margin-left:135px;", type="text", placeholder='Enter review...', ng-model='taskInfo.reviewsPassedOther')
 
 
 
