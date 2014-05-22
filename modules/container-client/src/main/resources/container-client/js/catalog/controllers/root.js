@@ -6,8 +6,21 @@ angular.module('corespring-catalog.controllers')
     'ItemService',
     'ItemIdService',
     'PlayerService',
-    function($scope, $location, $log, ItemService, ItemIdService, PlayerService) {
+    'DataQueryService',
+    'ComponentService',
+    'ProfileFormatter',
+    function(
+      $scope,
+      $location,
+      $log,
+      ItemService,
+      ItemIdService,
+      PlayerService,
+      DataQueryService,
+      ComponentService,
+      ProfileFormatter) {
       $scope.selectedTab = $location.search().tab;
+
 
       var log = $log.debug.bind($log, '[catalog root] -');
 
@@ -27,22 +40,69 @@ angular.module('corespring-catalog.controllers')
         $scope.$broadcast('itemLoaded', item);
       };
 
-      $scope.init = function() {
-        var contributorDetails = $scope.item.profile.contributorDetails;
-        if (contributorDetails) {
-          $scope.licenseTypeUrl = licenseTypeUrl(contributorDetails.licenseType);
-        }
+      $scope.onComponentsLoaded = function(components) {
+        $scope.availableComponents = components;
+        applyComponentTypes();
       };
 
+      $scope.onComponentsLoadError = function(err) {
+        $log.error('Error loading available components', err);
+      };
+
+      function keyMatch(key) {
+        return function(keyValue) {
+          return keyValue.key === key;
+        };
+      }
+
+      function applyComponentTypes() {
+
+        if (!$scope.item || !$scope.item.components || !$scope.availableComponents) {
+          return;
+        }
+
+        $scope.componentTypeLabels = ProfileFormatter.componentTypesUsed($scope.item.components, $scope.availableComponents);
+      }
+
+      function applyDepthOfKnowledge() {
+        var profile = $scope.item ? $scope.item.profile.otherAlignments : {};
+        if (profile.depthOfKnowledge && $scope.depthOfKnowledgeDataProvider) {
+          var obj = _.find($scope.depthOfKnowledgeDataProvider, keyMatch(profile.depthOfKnowledge));
+          $scope.depthOfKnowledgeLabel = obj ? obj.value : undefined;
+        }
+      }
+
+
+      $scope.init = function() {
+        var profile = $scope.item.profile || {};
+
+        if (profile.contributorDetails) {
+          $scope.licenseTypeUrl = licenseTypeUrl(profile.contributorDetails.licenseType);
+        }
+
+        if (profile.contributorDetails.copyright || profile.contributorDetails.copyright.owner) {
+          $scope.copyrightOwnerUrl = copyrightOwnerUrl(profile.contributorDetails.copyright.owner);
+        }
+
+        applyDepthOfKnowledge();
+        applyComponentTypes();
+      };
+
+      function imageUrl(folder, name, fallback) {
+        return name ? '../../images/' + folder + '/' + name.replace(" ", "-") + ".png" : fallback;
+      }
+
       function licenseTypeUrl(licenseType) {
-        return licenseType ? "../../images/licenseTypes/" + licenseType.replace(" ", "-") + ".png" : undefined;
+        return imageUrl('licenseTypes', licenseType);
+      }
+
+      function copyrightOwnerUrl(owner) {
+        return imageUrl('copyright', owner);
       }
 
       $scope.onItemLoadError = function(error) {
         $log.warn("Error loading item", error);
       };
-
-      ItemService.load($scope.onItemLoaded, $scope.onItemLoadError, $scope.itemId);
 
       PlayerService.setQuestionLookup(function(id) {
         return $scope.item.components[id];
@@ -70,6 +130,13 @@ angular.module('corespring-catalog.controllers')
 
       $scope.toggleLeftNav = updateLocation.bind(null, 'hideLeftNav');
 
+      ItemService.load($scope.onItemLoaded, $scope.onItemLoadError, $scope.itemId);
+      ComponentService.loadAvailableComponents($scope.onComponentsLoaded, $scope.onComponentsLoadError);
+
+      DataQueryService.list("depthOfKnowledge", function(result) {
+        $scope.depthOfKnowledgeDataProvider = result;
+        applyDepthOfKnowledge();
+      });
     }
 
   ]);

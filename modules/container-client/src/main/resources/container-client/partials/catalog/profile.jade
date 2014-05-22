@@ -1,72 +1,88 @@
+mixin tr_header(a, b, c)
+  tr
+    th= a
+      th.middle= b
+      th= c       
+
 script(type='text/ng-template', id="/templates/profile")
   .profile-body 
 
     .main-title
-      span.bold 
-        | {{item.profile.taskInfo.subjects.primary.subject || unassigned}}
-      span.info
-        | (also useful in {{item.profile.taskInfo.subjects.related.subject || unassigned}})
+      table
+        tr
+          td
+            span.bold 
+              | {{item.profile.taskInfo.subjects.primary.subject || unassigned}}
+            span.info
+              | (also useful in {{item.profile.taskInfo.subjects.related.subject || unassigned}})
+          td
+            span.copyright-owner
+              img(ng-src="{{copyrightOwnerUrl}}")
 
     .round-panel.padded
       | {{item.profile.taskInfo.title || unassigned}}
 
     .round-panel
-      .cols
-        .header Standard
-        .header.middle Lexile Score
-        .header Question Type 
-      .cols
-        .pill-content 
-          .pill(ng-repeat="standard in item.profile.standards") 
-            | {{standard.dotNotation}}
-          .pill(ng-show="!item.profile.standards || item.profile.standards.length == 0") {{unassigned}}
-
-        .pill-content.middle 
-          .pill
-            | {{item.profile.taskInfo.lexile || unassigned }} 
-        .pill-content
-          .pill Question Tss ype 1 
-          .pill Question Type 2 
-          .pill Question Tpe 3 
-          .pill Questssion Type 4 
+      table 
+        +tr_header('Standard', 'Lexile Score', 'Question')
+        tr 
+          td
+            .pill-content 
+              .pill(ng-repeat="standard in item.profile.standards") 
+                | {{standard.dotNotation}}
+          td.middle 
+            .pill-content 
+              .pill
+                | {{item.profile.lexile || unassigned }} 
+          td 
+            .pill-content
+              .pill(ng-repeat="t in componentTypeLabels") 
+                | {{t}}
 
     .round-panel
-      .cols
-        .header Blooms Level
-        .header.middle Depth of Knowledge 
-        .header Key Skills 
-      .cols
-        .pill-content
-          .pill
-            | {{item.profile.otherAlignments.bloomsTaxonomy || unassigned}} 
-        .pill-content.middle
-          .pill 
-            | {{item.profile.otherAlignments.depthOfKnowledge || unassigned}}
-        .pill-content 
-          .pill(ng-repeat="skills in item.profile.otherAlignments.keySkills")
-            | {{skills}}
+      table 
+        +tr_header('Blooms Level', 'Depth of Knowledge', 'Key Skills')
+        tr 
+          td
+            .pill-content
+              .pill
+                | {{item.profile.otherAlignments.bloomsTaxonomy || unassigned}} 
+          td.middle 
+            .pill-content
+              .pill 
+                | {{depthOfKnowledgeLabel || unassigned}}
+          td 
+            .pill-content 
+              .pill(ng-repeat="skills in item.profile.otherAlignments.keySkills")
+                | {{skills}}
 
     .round-panel
-      .cols
-        .header.left 
-          i.fa.fa-plus-circle
-          | Additional Information
-      .cols
-        .content
-          .title Prior Use 
-          | {{item.profile.priorUse || unassigned}}
+      .header.left(
+        ng-click="showAdditionalInformation = !showAdditionalInformation",
+        ng-class="{ true: 'open', false: 'closed'}[showAdditionalInformation === true]"
+        )
+        i.fa(ng-class="{ true: 'fa-minus-circle', false: 'fa-plus-circle'}[showAdditionalInformation === true]")
+        | Additional Information
 
-        .content
-          .title Reviews Passed
-          div(ng-repeat="rp in item.profile.taskInfo.reviewsPassed") 
-            i.fa.fa-check-square-o
-            | {{rp}}
-        .content
-          .title Licence
-          img.licence-type(ng-src="{{licenseTypeUrl}}") 
 
-          .title Copyright Year
-          | {{item.profile.contributorDetails.copyright.year || unassigned}}
+      .cols(ng-show="showAdditionalInformation")
+        table 
+          tr 
+            td 
+              .title Prior Use 
+              | {{item.profile.priorUse || unassigned}}
+
+            td
+              .title Reviews Passed
+              div(ng-repeat="rp in item.profile.taskInfo.reviewsPassed") 
+                i.fa.fa-check-square-o
+                | {{rp}}
+            td
+              .title Licence
+              img.licence-type(ng-src="{{licenseTypeUrl}}") 
+
+              .title Copyright Year
+              | {{item.profile.contributorDetails.copyright.year || unassigned}}
       .cols
         .footer
           span.bold

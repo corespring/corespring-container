@@ -9,11 +9,89 @@
 @heavy-grey: saturate(lighten(@grey-purple, 20%), 0%);
 @box-pad: 5px;
 
+
+.copyright-owner{
+  height: 35px;
+  float: right;
+  display: inline-block;
+  .aspire{
+    background: url('../images/copyright/aspire.png');
+  }
+}
+
 .profile-body{
   width: 100%;
   height: 100%;
   background-color: @bg-grey;
   padding: 30px;
+
+  table {
+    table-layout: fixed;
+    width: 100%;
+
+    th{
+      padding: @box-pad;
+      text-align: center;
+      text-transform: uppercase;
+      border-bottom: solid 1px @mid-grey;
+    }
+
+    td{
+      vertical-align: top;
+    }
+  }
+
+  .cols {
+    td{
+      padding: @box-pad;
+      .title {
+        font-weight: bold;
+      }
+    }
+  }
+
+  .header {
+    border-bottom: solid 1px @mid-grey;
+    padding: @box-pad;
+    text-transform: uppercase;
+    font-weight: bold;
+    .user-select(none);
+    cursor: pointer;
+  }
+
+  .header.closed{
+    border-bottom: solid 0px transparent;
+  }
+  
+  .header.open {
+    border-bottom: solid 1px @mid-grey;
+  }
+
+  .pill-content{
+    flex: 1;
+    text-align: center;
+    padding: 3px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    flex-flow: row wrap; 
+  }
+
+  .pill{
+    padding: @box-pad;
+    .rounded(3px);
+    background-color: @mid-grey;
+    font-weight: bold;
+    margin: 3px;
+    flex: 0 0 auto;
+    height: auto;
+    max-height: 30px;
+  }
+
+  .middle{
+    border-left: solid 1px @mid-grey;
+    border-right: solid 1px @mid-grey;
+  }
 
   .licence-type{
     margin-top: 5px;
@@ -35,70 +113,22 @@
     margin-bottom: 10px;
   }
 
-  .cols{
-    display: flex;
+  i.fa{
+    margin-right: @box-pad;
+  }
 
-    i.fa{
-      margin-right: @box-pad;
-    }
+  .left{
+    text-align: left;
+  }
 
-    .pill-content{
-      flex: 1;
-      text-align: center;
-      padding: 3px;
-      display: flex;
-      flex-direction: row;
-      justify-content: center;
-      flex-flow: row wrap; 
+  .bold{
+    font-weight: bold;
+  }
 
-      .pill{
-        padding: @box-pad;
-        .rounded(3px);
-        background-color: @mid-grey;
-        font-weight: bold;
-        margin: 3px;
-        flex: 0 0 auto;
-        height: auto;
-        max-height: 30px;
-      }
-    }
-    
-    .content{
-      flex: 1;
-      text-align: left;
-      padding: @box-pad; 
-
-      .title{
-        font-weight: bold;
-      }
-    }
-
-    .header{
-      flex: 1;
-      text-align: center;
-      text-transform: uppercase;
-      border-bottom: solid 1px @mid-grey;
-      padding: @box-pad;
-    }
-
-    .left{
-      text-align: left;
-    }
-
-    .bold{
-      font-weight: bold;
-    }
-
-    .footer{
-      flex: 1;
-      padding: @box-pad;
-      border-top: solid 1px @mid-grey;
-    }
-    
-    .middle{
-      border-left: solid 1px @mid-grey;
-      border-right: solid 1px @mid-grey;
-    }
+  .footer{
+    flex: 1;
+    padding: @box-pad;
+    border-top: solid 1px @mid-grey;
   }
   
   .round-panel{
