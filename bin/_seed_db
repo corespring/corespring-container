@@ -8,9 +8,9 @@ ObjectID = require('mongodb').ObjectID
 path = require('path')
 EOL = require('os').EOL
 
-mongoUri = process.env["CONTAINER_MONGO_URI"] || "mongodb://localhost/corespring-container"
+mongoUri = process.argv[2] || process.env["CONTAINER_MONGO_URI"] || "mongodb://localhost/corespring-container"
 
-console.log "mongoUri: #{mongoUri}"
+console.log "--------> mongoUri: #{mongoUri}"
 
 seed = (collection, folder, isMultipleItems, next) ->
 
