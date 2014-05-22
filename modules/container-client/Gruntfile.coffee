@@ -176,6 +176,7 @@ module.exports = (grunt) ->
         flatten: false
     clean:
       main: ["<%= common.dist %>/css/*.css"]
+      uglified: [ common.core.dest, common.coreLibs.dest, common.catalog.dest, common.catalogExtras.dest, common.editor.dest, common.editorExtras.dest]
 
     shell:
       bowerCacheClean:
@@ -305,7 +306,7 @@ module.exports = (grunt) ->
   # short cut
   grunt.registerTask('lcd', ['restoreResolutions', 'loadComponentDependencies'])
   grunt.registerTask('prepPlayerLauncher', 'prep the player launcher js', prepPlayerLauncher(grunt))
-  grunt.registerTask('run', ['uglify', 'jade', 'less', 'watch'])
+  grunt.registerTask('run', ['clean:uglified', 'uglify', 'jade', 'less', 'watch'])
   grunt.registerTask('test', ['shell:bower', 'shell:bowerCacheClean', 'lcd', 'prepPlayerLauncher', 'jasmine:unit'])
-  grunt.registerTask('default', ['shell:bower', 'lcd', 'clean_bower', 'jshint', 'uglify', 'copy', 'less', 'jade', 'compress', 'prepPlayerLauncher','jasmine:unit'])
+  grunt.registerTask('default', ['shell:bower', 'lcd', 'clean_bower', 'clean:uglified', 'jshint', 'uglify', 'copy', 'less', 'jade', 'compress', 'prepPlayerLauncher','jasmine:unit'])
   grunt.registerTask('minify-test', ['concat', 'uglify'])
