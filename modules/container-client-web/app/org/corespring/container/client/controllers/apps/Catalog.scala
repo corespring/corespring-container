@@ -8,7 +8,10 @@ import play.api.libs.json.{ JsString, JsArray, Json, JsValue }
 import play.api.mvc.AnyContent
 import scala.concurrent.{ Future, ExecutionContext }
 
-trait Catalog extends AllItemTypesReader with AppWithServices[CatalogActions[AnyContent]] {
+trait Catalog
+  extends AllItemTypesReader
+  with AppWithServices[CatalogActions[AnyContent]]
+  with JsModeReading {
 
   val logger = Logger("catalog")
 
@@ -39,9 +42,12 @@ trait Catalog extends AllItemTypesReader with AppWithServices[CatalogActions[Any
       import ExecutionContext.Implicits.global
       Future(Status(code)(org.corespring.container.client.views.html.error.main(code, msg)))
   } {
+
     request =>
       logger.trace(s"[showCatalog]: $itemId")
-      controllers.Assets.at("/container-client", "catalog.html")(request)
+      val jsMode = getJsMode(request)
+      val page = s"catalog.$jsMode.html"
+      controllers.Assets.at("/container-client", page)(request)
   }
 
 }

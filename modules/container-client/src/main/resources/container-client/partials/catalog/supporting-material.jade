@@ -1,0 +1,6 @@
+script(type='text/ng-template', id="/templates/supporting-material")
+  .supporting-material-preview(ng-controller='SupportingMaterialPreview')
+    div(style="height: 100%;", ng-if="getContentType() != 'text/html'")
+      iframe(ng-src="{{supportingUrl}}", width="100%", height="100%")
+    div(ng-if="getContentType() == 'text/html'")
+      div(ng-bind-html-unsafe='data.item.supportingMaterials[index].files[fileIndex].content')

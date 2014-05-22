@@ -2,8 +2,7 @@ describe('item-profile controller', function() {
 
   var rootScope, ctrl;
 
-  function mockModal() {
-  }
+  function mockModal() {}
 
   function mockDesignerService() {
 
@@ -54,10 +53,13 @@ describe('item-profile controller', function() {
 
   beforeEach(function() {
     module(function($provide) {
-      //$provide.value('ProfileService', new mockProfileService());
       $provide.value('DataQueryService', mockDataQueryService);
       $provide.value('ItemService', new mockItemService());
       $provide.value('StandardQueryCreator', {});
+      $provide.value('DesignerService', {
+        loadAvailableComponents: function() {}
+      });
+      $provide.value('ProfileFormatter', {});
     });
   });
 
@@ -121,7 +123,9 @@ describe('item-profile controller', function() {
     scope.primarySubjectAsync.initSelection(element, initCallback);
     expect(foundSubject).toNotBe(undefined);
     expect(foundSubject).toEqual({
-      id: "1", category: 'category', subject: 'blah'
+      id: "1",
+      category: 'category',
+      subject: 'blah'
     });
   });
 

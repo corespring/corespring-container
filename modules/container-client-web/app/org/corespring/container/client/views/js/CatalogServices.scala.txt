@@ -7,6 +7,15 @@
 
   angular.module('@namespace', []);
 
+  angular.module('@namespace').factory('ComponentService', ['$http',function($http){
+    return {
+        loadAvailableComponents: function(onSuccess, onFailure){
+          var components = @{Json.stringify(componentSet)};
+          onSuccess(components);
+        }
+    };
+  }]);
+
   angular.module('@namespace').factory('ItemService', ['BaseService', function(BaseService){
     return {
       load: function(onSuccess, onFailure, id){

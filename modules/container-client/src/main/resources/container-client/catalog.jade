@@ -1,111 +1,67 @@
-extends layout
-
-block head
-
-  script(type="text/javascript", src="../../components/spin.js/spin.js")
-  link(rel="stylesheet", href="../../components/select2/select2.css")
-  link(rel="stylesheet", href="../../css/editor.css")
-
-  style.
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: Roboto, sans-serif;
-      font-size: 14px;
-    }
-
-    ul {
-      margin-top: 0;
-      margin-bottom: 10px;
-    }
+extends app-loader-layout
 
 block content
-  .root(ng-controller="Root")
-    catalogview(item='item', selectedTab='{{selectedTab}}', printMode='{{printMode}}', supportingMaterialIndex='{{supportingMaterialIndex}}')
+  .root(ng-controller="CatalogRoot")
+    .nav-container
+      .top-nav-filler
 
-block scripts
+      ul.nav.nav-stacked
+        li(ui-sref-active="active")
+          a.mainitem-link(ui-sref="item") Item
+        li(ui-sref-active="active")
+          a.mainitem-link(ui-sref="profile") Profile 
+        li(
+          ui-sref-active="active",
+          ng-repeat="supportingMaterial in item.supportingMaterials")
+          a.mainitem-link(ui-sref="supporting-material({index: $index})") {{supportingMaterial.name}}
 
-  script(type="text/javascript",src="../../components/wiggi-wiz/dist/wiggi-wiz.js")
-  script(type="text/javascript",src="../../components/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML")
-  for p in editor
-    script(src="#{p}", type="text/javascript")
+    .content-container.cc-transition-left-right(ng-class="{'left-nav': !urlParams.hideLeftNav}")
+      .top-nav
+        button.toggle-left-nav.btn.btn-sm.btn-default(ng-click="toggleLeftNav()")
+          i.fa.fa-bars
+    
+      .main-content(ui-view="main")
 
-  for p in editorExtras
-    script(src="#{p}", type="text/javascript")
+    include partials/catalog/item
+    include partials/catalog/profile
+    include partials/catalog/supporting-material
 
-
+block app-loader-config
   script.
 
-    var opts = {
-      length: 17, // The length of each line
-      width: 8, // The line thickness
-      radius: 20, // The radius of the inner circle
-      color: '#556270', // #rgb or #rrggbb or array of colors
-      shadow: false, // Whether to render a shadow
-      hwaccel: true, // Whether to use hardware acceleration
-    };
+    var appLoadConfig = {
+      moduleName: 'corespring-catalog',
+      jsonFile: 'catalog-config.json',
+      dependencies: [
+        'corespring-common.services',
+        'corespring-common.directives',
+        'corespring-common.supporting-materials',
+        'corespring-player.services',
+        'corespring-player.directives',
+        'corespring-player.controllers',
+        'corespring-catalog.controllers',
+        'ui.bootstrap',
+        'ui.router'
+      ],
+      defaultPath: '/item',
+      states: {
+        item: mkState('item'),
+        profile: mkState('profile'),
+        'supporting-material' : {
+          url: '/supporting-material/:index',
+          views: {
+            main: {
+              templateUrl: '/templates/supporting-material'
+            }
+          }
+        }
+      } 
+    }
 
-    var target = document.getElementById('spinner');
-    var spinner = new Spinner(opts).spin(target);
+block app-loader-scripts
+  
+  for p in catalog 
+    script(src="#{p}", type="text/javascript")
 
-    $(document).ready(function () {
-      var configPath = 'catalog-config.json';
-
-      $.get(configPath, function (data) {
-
-        var allScriptsAreLoaded = function () {
-          var playerDeps = [
-            'corespring-common.services',
-            'corespring-common.directives',
-            'corespring-player.services',
-            'corespring-player.directives',
-            'corespring-player.controllers',
-            'corespring-catalog.directives',
-            'corespring-catalog.controllers',
-            'ui.sortable',
-            'ui.bootstrap',
-            'ui.ace',
-            'ui.router',
-            'cs.directives',
-            'ngRoute',
-            'ui.select2',
-            'corespring.wiggi-wiz'
-          ].concat(data.angular.dependencies);
-
-          angular.module("corespring-catalog", playerDeps).config(function($provide) {
-            
-            //Disable logging.. 
-            /*$provide.decorator('$log', function($delegate, $sniffer) {
-                var _log = $delegate.log; //Saving the original behavior
-
-                $delegate.log = function(message) { };
-                $delegate.debug = function(message) { };
-                $delegate.error = function(message) {
-                }
-
-                return $delegate;
-            });*/
-
-          });
-
-          angular.bootstrap(document, ["corespring-catalog"]);
-          angular.resumeBootstrap();
-          setTimeout(function() {
-            spinner.stop();
-            $('.pre-loader').remove();
-            $('.main').addClass('blend');
-          }, 200);
-        };
-
-        var args = data.scripts.concat(data.css);
-        console.log(args);
-        head.js.apply(null, args);
-
-        head.ready(function(){
-          allScriptsAreLoaded();
-        });
-
-      });
-    });
+  for p in catalogExtras
+    script(src="#{p}", type="text/javascript")

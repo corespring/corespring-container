@@ -24,14 +24,15 @@ trait Main extends Controller {
 
       def failLoadPlayerForSession = request.getQueryString(SessionKeys.failLoadPlayer).isDefined
 
-      val items: Seq[(String, String, String, String, String)] = itemService.list("profile.taskInfo.title").sortBy(_.toString).map {
+      val items: Seq[(String, String, String, String, String, String)] = itemService.list("profile.taskInfo.title").sortBy(_.toString).map {
         json: JsValue =>
           val name = (json \ "profile" \ "taskInfo" \ "title").asOpt[String].getOrElse("?")
           val id = (json \ "_id" \ "$oid").as[String]
           val playerUrl = routes.Main.createSessionPage(id).url
           val editorUrl = s"/client/editor/${id}/index.html"
           val deleteUrl = s"/delete-item/$id"
-          (name, id, playerUrl, editorUrl, deleteUrl)
+          val catalogUrl = s"/client/item/$id/preview"
+          (name, id, playerUrl, editorUrl, deleteUrl, catalogUrl)
       }
 
       logger.debug(items.mkString(","))
