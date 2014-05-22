@@ -223,10 +223,10 @@ var controller = function(
       $location.search('hidePreview', null);
     }
 
-    WiggiWizHelper.focusCaretAtEnd('.wiggi-wiz-editable', $element);
   };
 
   $scope.init();
+  WiggiWizHelper.focusCaretAtEnd('.wiggi-wiz-editable', $element);
 
 };
 
