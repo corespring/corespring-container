@@ -1,19 +1,13 @@
 describe('catalog root controller', function() {
 
-  var rootScope, ctrl;
-
-  function mockModal() {
-
-  }
+  var rootScope, ctrl, mockItem, mockDepthOfKnowldge, mockReviewsPassed, formatter;
 
   function mockDesignerService() {
-
-    var item = {};
 
     var availableComponents = [];
 
     this.loadItem = function(id, callback) {
-      callback(item);
+      callback(mockItem);
     };
 
     this.loadAvailableComponents = function(onSuccess, onError) {
@@ -28,7 +22,12 @@ describe('catalog root controller', function() {
 
   function mockMathJaxService() {}
 
-  function mockItemService() {}
+  function mockItemService() {
+
+    this.load = function(loaded, error) {
+      loaded(mockItem);
+    };
+  }
 
   function mockFeatureAdapter() {}
 
@@ -38,43 +37,114 @@ describe('catalog root controller', function() {
     this.section = '';
   }
 
-  function mockImageFeature() {
+  function mockImageFeature() {}
 
+  function mockItemIdService() {
+    this.itemId = function() {
+      return '1';
+    };
+  }
+
+  function mockComponentService() {
+    this.loadAvailableComponents = function() {
+
+    };
+  }
+
+  function mockDataQueryService() {
+
+    this.list = function(name, loaded) {
+
+      switch (name) {
+        case 'depthOfKnowledge':
+          loaded(mockDepthOfKnowldge);
+          break;
+        case 'reviewsPassed':
+          loaded(mockReviewsPassed);
+          break;
+        default:
+          loaded({});
+          break;
+      }
+
+    };
   }
 
   beforeEach(angular.mock.module('corespring-catalog.controllers'));
+  beforeEach(angular.mock.module('corespring-common.services'));
+
 
   beforeEach(function() {
     module(function($provide) {
-      $provide.value('$modal', new mockModal());
-      $provide.value('$stateParams', new mockStateParams());
       $provide.value('DesignerService', new mockDesignerService());
+      $provide.value('DataQueryService', new mockDataQueryService());
       $provide.value('ItemService', new mockItemService());
+      $provide.value('ItemIdService', new mockItemIdService());
+      $provide.value('ComponentService', new mockComponentService());
       $provide.value('PlayerService', new mockPlayerService());
-      $provide.value('MathJaxService', new mockMathJaxService());
-      $provide.value('ComponentToWiggiwizFeatureAdapter', new mockFeatureAdapter());
-      $provide.value('ComponentRegister', new mockComponentRegister());
-      $provide.value('ImageFeature', new mockImageFeature());
     });
   });
 
-  beforeEach(inject(function($rootScope, $controller) {
+  beforeEach(inject(function($rootScope, $controller, ProfileFormatter) {
     scope = $rootScope.$new();
-    try {
-      ctrl = $controller('CatalogRoot', {
-        $scope: scope,
-        $element: $('<div></div>'),
-        WiggiWizHelper: {
-          focusCaretAtEnd: function() {}
+
+    mockItem = {
+      profile: {
+        otherAlignments: {
+          depthOfKnowledge: 'depth-1'
+        },
+        taskInfo: {
+          reviewsPassed: ['A']
         }
-      });
-    } catch (e) {
-      throw ("Error with the controller: " + e);
-    }
+      }
+    };
+
+    mockDepthOfKnowldge = [{
+      key: 'depth-1',
+      value: 'depth-1'
+    }];
+
+    mockReviewsPassed = [{
+      key: 'A',
+      value: 'A'
+    }, {
+      key: 'B',
+      value: 'B'
+    }, {
+      key: 'All',
+      value: 'All'
+    }, {
+      key: 'None',
+      value: 'None'
+    }, {
+      key: 'Other',
+      value: 'Other'
+    }];
+
+    ctrl = $controller('CatalogRoot', {
+      $scope: scope,
+      $element: $('<div></div>')
+    });
   }));
 
   it('should init', function() {
     expect(ctrl).toNotBe(null);
   });
+
+  it('should set the depth of knowledge', function() {
+    expect(scope.depthOfKnowledgeLabel).toEqual('depth-1');
+  });
+
+  it('should set reviews passed', function() {
+    expect(scope.allReviewsPassed).toEqual([{
+      name: 'A',
+      passed: true
+    }, {
+      name: 'B',
+      passed: false
+    }]);
+
+  });
+
 
 });

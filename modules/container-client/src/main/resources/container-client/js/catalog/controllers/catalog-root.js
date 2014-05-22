@@ -19,18 +19,10 @@ angular.module('corespring-catalog.controllers')
       DataQueryService,
       ComponentService,
       ProfileFormatter) {
-      $scope.selectedTab = $location.search().tab;
-
 
       var log = $log.debug.bind($log, '[catalog root] -');
 
       $scope.unassigned = 'Unassigned';
-
-      if ($scope.selectedTab === 'supporting-material') {
-        $scope.supportingMaterialIndex = $location.search().index;
-      }
-
-      $scope.printMode = $location.search().printMode;
 
       $scope.itemId = ItemIdService.itemId();
 
@@ -59,11 +51,9 @@ angular.module('corespring-catalog.controllers')
       }
 
       function applyComponentTypes() {
-
         if (!$scope.item || !$scope.item.components || !$scope.availableComponents) {
           return;
         }
-
         $scope.componentTypeLabels = ProfileFormatter.componentTypesUsed($scope.item.components, $scope.availableComponents);
       }
 
