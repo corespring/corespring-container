@@ -61,6 +61,9 @@
       allowClear: true,
       minimumInputLength: 1,
       placeholder: "Begin by typing a standard or skill.",
+      formatResultCssClass: function(object){
+        return "select2-item-profile-standard-adapter-drop-down-item";
+      },
       id: function (item) {
         return item.id;
       },
