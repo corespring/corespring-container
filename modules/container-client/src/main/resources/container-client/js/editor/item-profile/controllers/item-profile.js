@@ -12,7 +12,14 @@
       ItemProfileController
     ]);
 
-  function ItemProfileController($log, $scope, DataQueryService, ItemService, StandardQueryCreator, DesignerService, ProfileFormatter) {
+  function ItemProfileController(
+    $log,
+    $scope,
+    DataQueryService,
+    ItemService,
+    StandardQueryCreator,
+    DesignerService,
+    ProfileFormatter) {
 
     var isFormActive = false;
     var log = $log.debug.bind($log, 'ItemProfileController] -');
