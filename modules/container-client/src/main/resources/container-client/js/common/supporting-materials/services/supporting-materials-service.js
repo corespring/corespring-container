@@ -94,7 +94,7 @@
 
   }
 
-  angular.module('corespring-editor.services')
+  angular.module('corespring-common.supporting-materials.services')
     .service('SupportingMaterialsService', [
       '$sce',
       '$http',

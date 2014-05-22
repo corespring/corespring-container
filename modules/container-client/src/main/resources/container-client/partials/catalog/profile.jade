@@ -17,7 +17,10 @@ script(type='text/ng-template', id="/templates/profile")
               | (also useful in {{item.profile.taskInfo.subjects.related.subject || unassigned}})
           td
             span.copyright-owner
-              img(ng-src="{{copyrightOwnerUrl}}")
+              img(ng-src="{{copyrightOwnerUrl}}",
+               alt="{{item.profile.contributorDetails.copyright.owner}}",
+               title="{{item.profile.contributorDetails.copyright.owner}}"
+               )
 
     .round-panel.padded
       | {{item.profile.taskInfo.title || unassigned}}
@@ -28,9 +31,9 @@ script(type='text/ng-template', id="/templates/profile")
         tr 
           td
             .pill-content 
-              .pill(ng-repeat="standard in item.profile.standards") 
+              .pill(ng-repeat="standard in item.profile.standards", tooltip="{{standard.standard}}") 
                 | {{standard.dotNotation}}
-          td.middle 
+          td.middle
             .pill-content 
               .pill
                 | {{item.profile.lexile || unassigned }} 
@@ -41,7 +44,7 @@ script(type='text/ng-template', id="/templates/profile")
 
     .round-panel
       table 
-        +tr_header('Blooms Level', 'Depth of Knowledge', 'Key Skills')
+        +tr_header('Bloom\'s Level', 'Depth of Knowledge', 'Key Skills')
         tr 
           td
             .pill-content
@@ -74,9 +77,10 @@ script(type='text/ng-template', id="/templates/profile")
 
             td
               .title Reviews Passed
-              div(ng-repeat="rp in item.profile.taskInfo.reviewsPassed") 
-                i.fa.fa-check-square-o
-                | {{rp}}
+
+              div(ng-repeat="rp in allReviewsPassed") 
+                i.fa(ng-class="{true: 'fa-check-square-o', false: 'fa-square-o'}[rp.passed]") 
+                | {{rp.name}}
             td
               .title Licence
               img.licence-type(ng-src="{{licenseTypeUrl}}") 
@@ -85,6 +89,5 @@ script(type='text/ng-template', id="/templates/profile")
               | {{item.profile.contributorDetails.copyright.year || unassigned}}
       .cols
         .footer
-          span.bold
-            | ID: 
+          span.bold ID: 
           | {{itemId}} 

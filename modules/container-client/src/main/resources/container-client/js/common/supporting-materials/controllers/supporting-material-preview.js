@@ -6,11 +6,11 @@ var controller = function(
   $scope.index = parseInt($stateParams.index, 10);
 
   function supportingMaterials() {
-    return $scope.data.item.supportingMaterials;
+    return ($scope.data && $scope.data.item) ? $scope.data.item.supportingMaterials : undefined;
   }
 
   function fileIndex() {
-    if ($scope.data.item && ($scope.index >= 0) && supportingMaterials()) {
+    if (supportingMaterials() && $scope.data.item && ($scope.index >= 0)) {
       return _.findIndex(supportingMaterials()[$scope.index].files, function(file) {
         return file.default;
       });
@@ -25,9 +25,7 @@ var controller = function(
   };
 
   $scope.getSupportingUrl = function() {
-    if ($scope.data.item) {
-      return SupportingMaterialsService.getSupportingUrl(supportingMaterials(), $scope.index);
-    }
+    return SupportingMaterialsService.getSupportingUrl(supportingMaterials(), $scope.index);
   };
 
   $scope.previewable = SupportingMaterialsService.previewable(supportingMaterials(), $scope.index);
@@ -50,7 +48,7 @@ var controller = function(
 
 };
 
-angular.module('corespring-editor.controllers')
+angular.module('corespring-common.supporting-materials.controllers')
   .controller('SupportingMaterialPreview', ['$scope',
     '$stateParams',
     '$log',

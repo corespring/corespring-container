@@ -9,13 +9,16 @@
 @heavy-grey: saturate(lighten(@grey-purple, 20%), 0%);
 @box-pad: 5px;
 
+.supporting-material-preview{
+  margin-top: 0;
+}
 
 .copyright-owner{
   height: 35px;
   float: right;
   display: inline-block;
-  .aspire{
-    background: url('../images/copyright/aspire.png');
+  img{
+    height: 30px;
   }
 }
 
@@ -86,6 +89,8 @@
     flex: 0 0 auto;
     height: auto;
     max-height: 30px;
+    .user-select(none);
+    cursor: pointer;
   }
 
   .middle{

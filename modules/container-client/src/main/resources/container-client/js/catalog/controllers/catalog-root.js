@@ -35,6 +35,9 @@ angular.module('corespring-catalog.controllers')
       $scope.itemId = ItemIdService.itemId();
 
       $scope.onItemLoaded = function(item) {
+        $scope.data = {
+          item: item
+        };
         $scope.item = item;
         $scope.init();
         $scope.$broadcast('itemLoaded', item);
@@ -65,13 +68,22 @@ angular.module('corespring-catalog.controllers')
       }
 
       function applyDepthOfKnowledge() {
-        var profile = $scope.item ? $scope.item.profile.otherAlignments : {};
-        if (profile.depthOfKnowledge && $scope.depthOfKnowledgeDataProvider) {
-          var obj = _.find($scope.depthOfKnowledgeDataProvider, keyMatch(profile.depthOfKnowledge));
+        var otherAlignments = ($scope.item && $scope.item.profile && $scope.item.profile.otherAlignments) ? $scope.item.profile.otherAlignments : {};
+        if (otherAlignments.depthOfKnowledge && $scope.depthOfKnowledgeDataProvider) {
+          var obj = _.find($scope.depthOfKnowledgeDataProvider, keyMatch(otherAlignments.depthOfKnowledge));
           $scope.depthOfKnowledgeLabel = obj ? obj.value : undefined;
         }
       }
 
+      function applyAllReviewsPassed() {
+        if ($scope.item && $scope.item.profile && $scope.item.profile.taskInfo && $scope.reviewsPassedDataProvider) {
+          var keysToRemove = ['All', 'None', 'Other'];
+          var cleaned = _.filter($scope.reviewsPassedDataProvider, function(rp) {
+            return !_.contains(keysToRemove, rp.key);
+          });
+          $scope.allReviewsPassed = ProfileFormatter.allReviewsPassed($scope.item.profile.taskInfo.reviewsPassed, cleaned);
+        }
+      }
 
       $scope.init = function() {
         var profile = $scope.item.profile || {};
@@ -80,12 +92,13 @@ angular.module('corespring-catalog.controllers')
           $scope.licenseTypeUrl = licenseTypeUrl(profile.contributorDetails.licenseType);
         }
 
-        if (profile.contributorDetails.copyright || profile.contributorDetails.copyright.owner) {
+        if (profile.contributorDetails && profile.contributorDetails.copyright && profile.contributorDetails.copyright.owner) {
           $scope.copyrightOwnerUrl = copyrightOwnerUrl(profile.contributorDetails.copyright.owner);
         }
 
         applyDepthOfKnowledge();
         applyComponentTypes();
+        applyAllReviewsPassed();
       };
 
       function imageUrl(folder, name, fallback) {
@@ -136,6 +149,11 @@ angular.module('corespring-catalog.controllers')
       DataQueryService.list("depthOfKnowledge", function(result) {
         $scope.depthOfKnowledgeDataProvider = result;
         applyDepthOfKnowledge();
+      });
+
+      DataQueryService.list("reviewsPassed", function(result) {
+        $scope.reviewsPassedDataProvider = result;
+        applyAllReviewsPassed();
       });
     }
 

@@ -42,21 +42,11 @@ trait Catalog
       import ExecutionContext.Implicits.global
       Future(Status(code)(org.corespring.container.client.views.html.error.main(code, msg)))
   } {
-    request =>
-      logger.trace(s"[showCatalog]: $itemId")
-      controllers.Assets.at("/container-client", "catalog.html")(request)
-  }
-
-  def showNewCatalog(itemId: String) = actions.showCatalog(itemId) {
-    (code, msg) =>
-      import ExecutionContext.Implicits.global
-      Future(Status(code)(org.corespring.container.client.views.html.error.main(code, msg)))
-  } {
 
     request =>
       logger.trace(s"[showCatalog]: $itemId")
       val jsMode = getJsMode(request)
-      val page = s"new-catalog.$jsMode.html"
+      val page = s"catalog.$jsMode.html"
       controllers.Assets.at("/container-client", page)(request)
   }
 

@@ -34,10 +34,22 @@ angular.module('corespring-common.services')
             })
             .countBy("componentType")
             .map(function(count, componentType) {
-              console.log('->', componentType, typeof(componentType));
               var title = getTitle(componentType);
               return defaultFormatFn(title, count);
             }).sort().value();
+        };
+
+        /**
+         * return { name: 'naem', passed: true|false}
+         */
+        this.allReviewsPassed = function(reviewsPassed, allReviews) {
+          function toNameAndPassed(r) {
+            return {
+              name: r.value,
+              passed: _.contains(reviewsPassed, r.value)
+            };
+          }
+          return _.map(allReviews, toNameAndPassed);
         };
       }
       return new ProfileFormatter();

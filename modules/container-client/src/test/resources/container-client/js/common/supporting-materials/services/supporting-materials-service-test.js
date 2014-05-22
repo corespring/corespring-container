@@ -2,7 +2,7 @@ describe('supporting materials service', function() {
 
   var supportingMaterialsService = null;
 
-  beforeEach(angular.mock.module('corespring-editor.services'));
+  beforeEach(angular.mock.module('corespring-common.supporting-materials.services'));
 
   beforeEach(inject(function(SupportingMaterialsService) {
     supportingMaterialsService = SupportingMaterialsService;

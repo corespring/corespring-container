@@ -5,6 +5,7 @@ block head
   script(type="text/javascript", src="../../components/spin.js/spin.js")
   link(rel="stylesheet", href="../../components/select2/select2.css")
   link(rel="stylesheet", href="../../css/editor.css")
+  link(rel="stylesheet", href="../../css/catalog.css")
 
   style.
     * {
@@ -22,17 +23,39 @@ block head
     }
 
 block content
-  .root(ng-controller="Root")
-    catalogview(item='item', selectedTab='{{selectedTab}}', printMode='{{printMode}}', supportingMaterialIndex='{{supportingMaterialIndex}}')
+  .root(ng-controller="CatalogRoot")
+    .nav-container
+      .top-nav-filler
+
+      ul.nav.nav-stacked
+        li(ui-sref-active="active")
+          a.mainitem-link(ui-sref="item") Item
+        li(ui-sref-active="active")
+          a.mainitem-link(ui-sref="profile") Profile 
+        li(
+          ui-sref-active="active",
+          ng-repeat="supportingMaterial in item.supportingMaterials")
+          a.mainitem-link(ui-sref="supporting-material({index: $index})") {{supportingMaterial.name}}
+
+    .content-container.cc-transition-left-right( ng-class="{'left-nav': !urlParams.hideLeftNav}")
+      .top-nav
+        button.toggle-left-nav.btn.btn-sm.btn-default(ng-click="toggleLeftNav()")
+          i.fa.fa-bars
+    
+      .main-content(ui-view="main")
+
+    include partials/catalog/item
+    include partials/catalog/profile
+    include partials/catalog/supporting-material
 
 block scripts
 
-  script(type="text/javascript",src="../../components/wiggi-wiz/dist/wiggi-wiz.js")
   script(type="text/javascript",src="../../components/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML")
-  for p in editor
+  
+  for p in catalog 
     script(src="#{p}", type="text/javascript")
 
-  for p in editorExtras
+  for p in catalogExtras
     script(src="#{p}", type="text/javascript")
 
 
@@ -59,35 +82,43 @@ block scripts
           var playerDeps = [
             'corespring-common.services',
             'corespring-common.directives',
+            'corespring-common.supporting-materials',
             'corespring-player.services',
             'corespring-player.directives',
             'corespring-player.controllers',
-            'corespring-catalog.directives',
             'corespring-catalog.controllers',
-            'ui.sortable',
             'ui.bootstrap',
-            'ui.ace',
             'ui.router',
-            'cs.directives',
-            'ngRoute',
-            'ui.select2',
-            'corespring.wiggi-wiz'
+            //'cs.directives',
+            //'ngRoute'
           ].concat(data.angular.dependencies);
 
-          angular.module("corespring-catalog", playerDeps).config(function($provide) {
+          angular.module("corespring-catalog", playerDeps)
+            .config(function($provide, $stateProvider, $urlRouterProvider) {
             
-            //Disable logging.. 
-            /*$provide.decorator('$log', function($delegate, $sniffer) {
-                var _log = $delegate.log; //Saving the original behavior
-
-                $delegate.log = function(message) { };
-                $delegate.debug = function(message) { };
-                $delegate.error = function(message) {
+            function mkState(name){
+              return {
+                url: '/' + name,
+                views: {
+                  main: {
+                    templateUrl: '/templates/' + name
+                  }
                 }
+              } 
+            }
 
-                return $delegate;
-            });*/
-
+            $urlRouterProvider.otherwise("/item");
+            $stateProvider
+              .state('item', mkState('item'))
+              .state('profile', mkState('profile'))
+              .state('supporting-material', {
+                url: '/supporting-material/:index',
+                views: {
+                  main: {
+                    templateUrl: '/templates/supporting-material'
+                  }
+                }
+              })
           });
 
           angular.bootstrap(document, ["corespring-catalog"]);
