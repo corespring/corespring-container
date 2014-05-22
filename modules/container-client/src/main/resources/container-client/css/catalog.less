@@ -31,6 +31,7 @@
       text-align: center;
       text-transform: uppercase;
       border-bottom: solid 1px @mid-grey;
+      font-weight: normal;
     }
     td {
       vertical-align: top;
@@ -48,7 +49,7 @@
     border-bottom: solid 1px @mid-grey;
     padding: @box-pad;
     text-transform: uppercase;
-    font-weight: bold;
+    font-weight: normal;
     .user-select(none);
     cursor: pointer;
   }
@@ -79,11 +80,13 @@
     .user-select(none);
     cursor: pointer;
   }
-  .middle {
-    border-left: solid 1px @mid-grey;
+  .panel-left {
     border-right: solid 1px @mid-grey;
   }
-  .licence-type {
+  .panel-right {
+    border-left: solid 1px @mid-grey;
+  }
+  .license-type {
     margin-top: 5px;
     margin-bottom: 10px;
   }

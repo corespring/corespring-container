@@ -1,8 +1,8 @@
 mixin tr_header(a, b, c)
   tr
-    th= a
-      th.middle= b
-      th= c       
+    th.panel-left= a
+    th= b
+    th.panel-right= c       
 
 script(type='text/ng-template', id="/templates/profile")
   .profile-body 
@@ -27,17 +27,21 @@ script(type='text/ng-template', id="/templates/profile")
 
     .round-panel
       table 
-        +tr_header('Standard', 'Lexile Score', 'Question')
+        tr
+          th.panel-left Standard
+          th(ng-show="item.profile.lexile") Lexile Score
+          th.panel-right Question
+
         tr 
-          td
+          td.panel-left
             .pill-content 
               .pill(ng-repeat="standard in item.profile.standards", tooltip="{{standard.standard}}") 
                 | {{standard.dotNotation}}
-          td.middle
+          td(ng-show="item.profile.lexile")
             .pill-content 
               .pill
                 | {{item.profile.lexile || unassigned }} 
-          td 
+          td.panel-right 
             .pill-content
               .pill(ng-repeat="t in componentTypeLabels") 
                 | {{t}}
@@ -46,15 +50,15 @@ script(type='text/ng-template', id="/templates/profile")
       table 
         +tr_header('Bloom\'s Level', 'Depth of Knowledge', 'Key Skills')
         tr 
-          td
+          td.panel-left
             .pill-content
               .pill
                 | {{item.profile.otherAlignments.bloomsTaxonomy || unassigned}} 
-          td.middle 
+          td 
             .pill-content
               .pill 
                 | {{depthOfKnowledgeLabel || unassigned}}
-          td 
+          td.panel-right
             .pill-content 
               .pill(ng-repeat="skills in item.profile.otherAlignments.keySkills")
                 | {{skills}}
@@ -82,8 +86,8 @@ script(type='text/ng-template', id="/templates/profile")
                 i.fa(ng-class="{true: 'fa-check-square-o', false: 'fa-square-o'}[rp.passed]") 
                 | {{rp.name}}
             td
-              .title Licence
-              img.licence-type(ng-src="{{licenseTypeUrl}}") 
+              .title License
+              img.license-type(ng-src="{{licenseTypeUrl}}") 
 
               .title Copyright Year
               | {{item.profile.contributorDetails.copyright.year || unassigned}}
