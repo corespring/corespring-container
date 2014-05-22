@@ -1,26 +1,4 @@
-extends layout
-
-block head
-
-  script(type="text/javascript", src="../../components/spin.js/spin.js")
-  link(rel="stylesheet", href="../../components/select2/select2.css")
-  link(rel="stylesheet", href="../../css/editor.css")
-  link(rel="stylesheet", href="../../css/catalog.css")
-
-  style.
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: Roboto, sans-serif;
-      font-size: 14px;
-    }
-
-    ul {
-      margin-top: 0;
-      margin-bottom: 10px;
-    }
+extends app-loader-layout
 
 block content
   .root(ng-controller="CatalogRoot")
@@ -37,7 +15,7 @@ block content
           ng-repeat="supportingMaterial in item.supportingMaterials")
           a.mainitem-link(ui-sref="supporting-material({index: $index})") {{supportingMaterial.name}}
 
-    .content-container.cc-transition-left-right( ng-class="{'left-nav': !urlParams.hideLeftNav}")
+    .content-container.cc-transition-left-right(ng-class="{'left-nav': !urlParams.hideLeftNav}")
       .top-nav
         button.toggle-left-nav.btn.btn-sm.btn-default(ng-click="toggleLeftNav()")
           i.fa.fa-bars
@@ -48,95 +26,42 @@ block content
     include partials/catalog/profile
     include partials/catalog/supporting-material
 
-block scripts
+block app-loader-config
+  script.
 
-  script(type="text/javascript",src="../../components/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML")
+    var appLoadConfig = {
+      moduleName: 'corespring-catalog',
+      jsonFile: 'catalog-config.json',
+      dependencies: [
+        'corespring-common.services',
+        'corespring-common.directives',
+        'corespring-common.supporting-materials',
+        'corespring-player.services',
+        'corespring-player.directives',
+        'corespring-player.controllers',
+        'corespring-catalog.controllers',
+        'ui.bootstrap',
+        'ui.router'
+      ],
+      defaultPath: '/item',
+      states: {
+        item: mkState('item'),
+        profile: mkState('profile'),
+        'supporting-material' : {
+          url: '/supporting-material/:index',
+          views: {
+            main: {
+              templateUrl: '/templates/supporting-material'
+            }
+          }
+        }
+      } 
+    }
+
+block app-loader-scripts
   
   for p in catalog 
     script(src="#{p}", type="text/javascript")
 
   for p in catalogExtras
     script(src="#{p}", type="text/javascript")
-
-
-  script.
-
-    var opts = {
-      length: 17, // The length of each line
-      width: 8, // The line thickness
-      radius: 20, // The radius of the inner circle
-      color: '#556270', // #rgb or #rrggbb or array of colors
-      shadow: false, // Whether to render a shadow
-      hwaccel: true, // Whether to use hardware acceleration
-    };
-
-    var target = document.getElementById('spinner');
-    var spinner = new Spinner(opts).spin(target);
-
-    $(document).ready(function () {
-      var configPath = 'catalog-config.json';
-
-      $.get(configPath, function (data) {
-
-        var allScriptsAreLoaded = function () {
-          var playerDeps = [
-            'corespring-common.services',
-            'corespring-common.directives',
-            'corespring-common.supporting-materials',
-            'corespring-player.services',
-            'corespring-player.directives',
-            'corespring-player.controllers',
-            'corespring-catalog.controllers',
-            'ui.bootstrap',
-            'ui.router',
-            //'cs.directives',
-            //'ngRoute'
-          ].concat(data.angular.dependencies);
-
-          angular.module("corespring-catalog", playerDeps)
-            .config(function($provide, $stateProvider, $urlRouterProvider) {
-            
-            function mkState(name){
-              return {
-                url: '/' + name,
-                views: {
-                  main: {
-                    templateUrl: '/templates/' + name
-                  }
-                }
-              } 
-            }
-
-            $urlRouterProvider.otherwise("/item");
-            $stateProvider
-              .state('item', mkState('item'))
-              .state('profile', mkState('profile'))
-              .state('supporting-material', {
-                url: '/supporting-material/:index',
-                views: {
-                  main: {
-                    templateUrl: '/templates/supporting-material'
-                  }
-                }
-              })
-          });
-
-          angular.bootstrap(document, ["corespring-catalog"]);
-          angular.resumeBootstrap();
-          setTimeout(function() {
-            spinner.stop();
-            $('.pre-loader').remove();
-            $('.main').addClass('blend');
-          }, 200);
-        };
-
-        var args = data.scripts.concat(data.css);
-        console.log(args);
-        head.js.apply(null, args);
-
-        head.ready(function(){
-          allScriptsAreLoaded();
-        });
-
-      });
-    });
