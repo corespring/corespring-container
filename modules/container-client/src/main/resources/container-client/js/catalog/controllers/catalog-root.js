@@ -15,10 +15,19 @@ angular.module('corespring-catalog.controllers')
       $log,
       ItemService,
       ItemIdService,
-      PlayerService,
+      PlayerServiceDef,
       DataQueryService,
       ComponentService,
       ProfileFormatter) {
+
+      var PlayerService = new PlayerServiceDef(
+        function(id) {
+          return $scope.item.components[id];
+        },
+        function() {
+          return $scope.item;
+        }
+      );
 
       var log = $log.debug.bind($log, '[catalog root] -');
 
@@ -107,22 +116,12 @@ angular.module('corespring-catalog.controllers')
         $log.warn("Error loading item", error);
       };
 
-      PlayerService.setQuestionLookup(function(id) {
-        return $scope.item.components[id];
-      });
-
-      PlayerService.setItemLookup(function() {
-        return $scope.item;
-      });
-
       $scope.$on('$locationChangeSuccess', function() {
         updateNavBindings();
       });
 
       function updateNavBindings() {
         $scope.urlParams = $location.search();
-        //$scope.showPreview($scope.urlParams);
-        log('params', $scope.urlParams);
       }
 
       function updateLocation(name) {
