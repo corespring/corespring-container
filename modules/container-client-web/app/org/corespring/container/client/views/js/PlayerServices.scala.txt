@@ -4,48 +4,51 @@ angular.module('@namespace', []);
 
 angular.module('@namespace').factory('PlayerService', ['$http', function($http){
 
-  var _call = function(method, url, data){
+  function PlayerService(){
 
-    return function(onSuccess, onFailure){
 
-      var args = data ? [url, data] : [url];
-      $http[method].apply(null, args)
-       .success(
-         function(data, status, headers, config) {
-           onSuccess(data)
-         })
-       .error(
-         function(data, status, headers, config) {
-           console.log("error");
-           if( onFailure ) {
-            onFailure(data);
+    var _call = function(method, url, data){
+
+      return function(onSuccess, onFailure){
+
+        var args = data ? [url, data] : [url];
+        $http[method].apply(null, args)
+         .success(
+           function(data, status, headers, config) {
+             onSuccess(data)
+           })
+         .error(
+           function(data, status, headers, config) {
+             console.log("error");
+             if( onFailure ) {
+              onFailure(data);
+             }
            }
-         }
-       );
+         );
+      };
     };
-  };
 
-  var callWithData = function(method, url){
-    return function(data, onSuccess, onFailure, id){
-      var finalUrl = id ? url.replace(":id", id) : url;
-      _call(method, finalUrl, data)(onSuccess, onFailure);
+    var callWithData = function(method, url){
+      return function(data, onSuccess, onFailure, id){
+        var finalUrl = id ? url.replace(":id", id) : url;
+        _call(method, finalUrl, data)(onSuccess, onFailure);
+      };
     };
- };
 
- var callWithNoData = function(method, url){
-  return function(onSuccess, onFailure, id){
-      var finalUrl = id ? url.replace(":id", id) : url;
-    _call(method, finalUrl, null)(onSuccess, onFailure);
-  }
- };
+    var callWithNoData = function(method, url){
+      return function(onSuccess, onFailure, id){
+        var finalUrl = id ? url.replace(":id", id) : url;
+        _call(method, finalUrl, null)(onSuccess, onFailure);
+      };
+    };
 
-var def = {
-    saveSession: callWithData('@saveSession.method.toLowerCase', '@saveSession.url'),
-    getScore: callWithData('@getScore.method.toLowerCase', '@getScore.url'),
-    completeResponse: callWithNoData('@completeResponse.method.toLowerCase', '@completeResponse.url'),
-    loadSession: callWithNoData('@loadSession.method.toLowerCase', '@loadSession.url'),
-    loadOutcome: callWithData('@loadOutcome.method.toLowerCase', '@loadOutcome.url')
-  }
-  return def
+    this.saveSession  = callWithData('@saveSession.method.toLowerCase', '@saveSession.url');
+    this.getScore = callWithData('@getScore.method.toLowerCase', '@getScore.url');
+    this.completeResponse =  callWithNoData('@completeResponse.method.toLowerCase', '@completeResponse.url');
+    this.loadSession = callWithNoData('@loadSession.method.toLowerCase', '@loadSession.url');
+    this.loadOutcome = callWithData('@loadOutcome.method.toLowerCase', '@loadOutcome.url');
+  } 
+
+  return PlayerService; 
 }]);
 

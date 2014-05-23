@@ -3,84 +3,73 @@
 @import "app";
 @import "common/variables";
 @import "common/base";
-
 @bg-grey: saturate(lighten(@grey-purple, 56%), 20%);
 @mid-grey: saturate(lighten(@grey-purple, 46%), 10%);
 @heavy-grey: saturate(lighten(@grey-purple, 20%), 0%);
 @box-pad: 5px;
-
-.supporting-material-preview{
+.supporting-material-preview {
   margin-top: 0;
 }
-
-.copyright-owner{
+.copyright-owner {
   height: 35px;
   float: right;
   display: inline-block;
-  img{
+  img {
     height: 30px;
   }
 }
-
-.profile-body{
+.profile-body {
   width: 100%;
   height: 100%;
   background-color: @bg-grey;
   padding: 30px;
-
   table {
     table-layout: fixed;
     width: 100%;
-
-    th{
+    th {
       padding: @box-pad;
       text-align: center;
       text-transform: uppercase;
       border-bottom: solid 1px @mid-grey;
+      font-weight: normal;
     }
-
-    td{
+    td {
       vertical-align: top;
     }
   }
-
   .cols {
-    td{
+    td {
       padding: @box-pad;
       .title {
         font-weight: bold;
       }
     }
   }
-
   .header {
     border-bottom: solid 1px @mid-grey;
     padding: @box-pad;
     text-transform: uppercase;
-    font-weight: bold;
+    font-weight: normal;
     .user-select(none);
     cursor: pointer;
   }
-
-  .header.closed{
+  .header.closed {
     border-bottom: solid 0px transparent;
   }
-  
   .header.open {
     border-bottom: solid 1px @mid-grey;
   }
-
-  .pill-content{
+  .pill-content {
     flex: 1;
     text-align: center;
     padding: 3px;
     display: flex;
     flex-direction: row;
     justify-content: center;
-    flex-flow: row wrap; 
+    flex-flow: row wrap;
+    min-height: 40px;
   }
-
-  .pill{
+  .pill {
     padding: @box-pad;
     .rounded(3px);
     background-color: @mid-grey;
@@ -92,59 +81,50 @@
     .user-select(none);
     cursor: pointer;
   }
-
-  .middle{
-    border-left: solid 1px @mid-grey;
+  .panel-left {
     border-right: solid 1px @mid-grey;
   }
-
-  .licence-type{
+  .panel-right {
+    border-left: solid 1px @mid-grey;
+  }
+  .license-type {
     margin-top: 5px;
     margin-bottom: 10px;
   }
-
-  .main-title{
-    .bold{
+  .main-title {
+    .bold {
       text-transform: uppercase;
       font-weight: bold;
     }
-    .info{
+    .info {
       padding-left: 4px;
       color: @heavy-grey;
       font-style: italic;
       font-size: 12px;
     }
-
     margin-bottom: 10px;
   }
-
-  i.fa{
+  i.fa {
     margin-right: @box-pad;
   }
-
-  .left{
+  .left {
     text-align: left;
   }
-
-  .bold{
+  .bold {
     font-weight: bold;
   }
-
-  .footer{
+  .footer {
     flex: 1;
     padding: @box-pad;
     border-top: solid 1px @mid-grey;
   }
-  
-  .round-panel{
+  .round-panel {
     background-color: white;
     .rounded(5px);
     .drop-shadow(0, 1px, 2px, 0.2);
     margin-bottom: 10px;
   }
-
-  .padded{
+  .padded {
     padding: @box-pad;
   }
 }
-

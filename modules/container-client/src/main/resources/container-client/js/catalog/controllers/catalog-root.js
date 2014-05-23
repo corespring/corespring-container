@@ -15,22 +15,23 @@ angular.module('corespring-catalog.controllers')
       $log,
       ItemService,
       ItemIdService,
-      PlayerService,
+      PlayerServiceDef,
       DataQueryService,
       ComponentService,
       ProfileFormatter) {
-      $scope.selectedTab = $location.search().tab;
 
+      var PlayerService = new PlayerServiceDef(
+        function(id) {
+          return $scope.item.components[id];
+        },
+        function() {
+          return $scope.item;
+        }
+      );
 
       var log = $log.debug.bind($log, '[catalog root] -');
 
       $scope.unassigned = 'Unassigned';
-
-      if ($scope.selectedTab === 'supporting-material') {
-        $scope.supportingMaterialIndex = $location.search().index;
-      }
-
-      $scope.printMode = $location.search().printMode;
 
       $scope.itemId = ItemIdService.itemId();
 
@@ -59,11 +60,9 @@ angular.module('corespring-catalog.controllers')
       }
 
       function applyComponentTypes() {
-
         if (!$scope.item || !$scope.item.components || !$scope.availableComponents) {
           return;
         }
-
         $scope.componentTypeLabels = ProfileFormatter.componentTypesUsed($scope.item.components, $scope.availableComponents);
       }
 
@@ -117,22 +116,12 @@ angular.module('corespring-catalog.controllers')
         $log.warn("Error loading item", error);
       };
 
-      PlayerService.setQuestionLookup(function(id) {
-        return $scope.item.components[id];
-      });
-
-      PlayerService.setItemLookup(function() {
-        return $scope.item;
-      });
-
       $scope.$on('$locationChangeSuccess', function() {
         updateNavBindings();
       });
 
       function updateNavBindings() {
         $scope.urlParams = $location.search();
-        //$scope.showPreview($scope.urlParams);
-        log('params', $scope.urlParams);
       }
 
       function updateLocation(name) {

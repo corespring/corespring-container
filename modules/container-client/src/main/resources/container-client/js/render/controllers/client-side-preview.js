@@ -1,4 +1,24 @@
-var controller = function($scope, ComponentRegister, PlayerService) {
+var controller = function($scope, ComponentRegister, PlayerServiceDef) {
+
+  $scope.getQuestionForComponentId = function(id) {
+    return $scope.data.item.components[id];
+  };
+
+  $scope.getItem = function() {
+    return $scope.data.item;
+  };
+
+  $scope.getScoringJs = function() {
+    var scoringJs = _.find($scope.data.item.files, function(f) {
+      return f.name === "scoring.js";
+    });
+    return scoringJs;
+  };
+
+  var PlayerService = new PlayerServiceDef(
+    $scope.getQuestionForComponentId,
+    $scope.getItem,
+    $scope.getScoringJs);
 
   var defaultSession = {
     remainingAttempts: 1,
