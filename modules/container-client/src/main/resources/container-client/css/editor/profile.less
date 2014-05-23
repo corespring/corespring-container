@@ -26,7 +26,48 @@
 
 .profile {
 
-  width: 90%;
+  fieldset {
+    padding: 5px;
+  }
+
+  .item-information {
+    .control-group {
+      margin-bottom: 8px;
+    }
+  }
+
+  .prior-use,
+  .reviews-passed {
+    margin-top: 25px;
+
+    h4 {
+      margin-bottom: 5px;
+    }
+
+    fieldset {
+      padding: 5px;
+    }
+
+    .control-group {
+      margin-bottom: 5px;
+    }
+  }
+
+  .other-alignments {
+    fieldset {
+      padding: 5px;
+    }
+
+    .control-group {
+      margin-bottom: 15px;
+    }
+  }
+
+  .licensing {
+    h3 {
+      margin-top: 0;
+    }
+  }
 
   a.tag-list-link {
     padding: 3px;
@@ -44,20 +85,41 @@
   }
 
   .additional-copyright-information {
-    margin-top: 10px;
-    margin-bottom: 20px;
-    width: @profile-input-width;
 
-    td {
-      padding: 3px;
+    margin-top: 30px;
+
+    fieldset {
+      padding-left: 5px;
     }
+
+    .control-group {
+      margin-bottom: 5;
+    }
+
+    .item {
+      padding: 5px;
+      margin-top: 0px;
+      margin-bottom: 10px;
+      background-color: #fafafa;
+      width: 700px;
+
+      .label-col {
+        text-align: right;
+        padding: 5px;
+        width: 180px;
+      }
+
+    }
+  }
+
+  .copyright-information {
+
+    min-width: 600px;
 
     .label-col {
       text-align: right;
-    }
-
-    label {
-      width: auto;
+      padding: 5px;
+      width: 180px;
     }
   }
 
@@ -72,17 +134,6 @@
 
   .control-label {
     width: 100%;
-  }
-
-  .copyright-information {
-
-    min-width: 600px;
-
-    .label-col {
-      text-align: right;
-      padding: 5px;
-      width: 180px;
-    }
   }
 
   table.license {
@@ -121,6 +172,7 @@
     }
 
     .label-col {
+      padding-left: 5px;
       padding-right: 5px;
     }
   }
@@ -156,7 +208,7 @@
 
   .tight-button-bar {
     .btn {
-      border-radius : 4px;
+      border-radius: 4px;
       padding-top: 4px;
       padding-right: 7px;
       padding-bottom: 4px;
@@ -183,7 +235,6 @@
       }
     }
   }
-
 }
 
 
