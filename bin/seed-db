@@ -5,5 +5,5 @@ PATH="node_modules/.bin:$PATH"
 
 echo "seeding the DB!"
 ./bin/prepare_json
-./bin/_seed_db
+./bin/_seed_db $1
 ./bin/remove_generated_json
