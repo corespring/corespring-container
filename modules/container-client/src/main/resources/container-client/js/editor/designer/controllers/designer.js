@@ -9,7 +9,6 @@ var controller = function(
   $stateParams,
   DesignerService,
   ItemService,
-  PlayerService,
   MathJaxService,
   ComponentToWiggiwizFeatureAdapter,
   ImageUtils,
@@ -21,7 +20,6 @@ var controller = function(
   var configPanels = {};
 
   var log = $log.debug.bind($log, '[designer] - ');
-
 
   log($stateParams);
   $scope.section = $stateParams.section;
@@ -171,9 +169,6 @@ var controller = function(
     console.warn("file too big");
   });
 
-  $scope.getQuestionForComponentId = function(id) {
-    return $scope.data.item.components[id];
-  };
 
   $scope.$on('registerConfigPanel', function(a, id, component) {
     configPanels[id] = component;
@@ -218,12 +213,7 @@ var controller = function(
     MathJaxService.parseDomForMath();
   });
 
-  $scope.getItem = function() {
-    return $scope.data.item;
-  };
 
-  PlayerService.setQuestionLookup($scope.getQuestionForComponentId);
-  PlayerService.setItemLookup($scope.getItem);
 
   $scope.$on('itemLoaded', function(ev, item) {
     _.each(item.components, function(c, key) {
@@ -235,14 +225,6 @@ var controller = function(
       }
     });
 
-
-    var scoringJs = _.find($scope.data.item.files, function(f) {
-      return f.name === "scoring.js";
-    });
-
-    if (scoringJs) {
-      PlayerService.setScoringJs(scoringJs);
-    }
   });
 
   $scope.componentSize = 'none';
@@ -271,7 +253,6 @@ angular.module('corespring-editor.controllers')
     '$stateParams',
     'DesignerService',
     'ItemService',
-    'PlayerService',
     'MathJaxService',
     'ComponentToWiggiwizFeatureAdapter',
     'ImageUtils',

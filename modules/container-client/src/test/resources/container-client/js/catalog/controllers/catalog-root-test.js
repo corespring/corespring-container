@@ -81,7 +81,7 @@ describe('catalog root controller', function() {
       $provide.value('ItemService', new mockItemService());
       $provide.value('ItemIdService', new mockItemIdService());
       $provide.value('ComponentService', new mockComponentService());
-      $provide.value('PlayerService', new mockPlayerService());
+      $provide.value('PlayerService', mockPlayerService);
     });
   });
 
