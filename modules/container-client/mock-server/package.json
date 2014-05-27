@@ -10,7 +10,9 @@
     "coffee-script": "*",
     "lodash": "*",
     "winston" : "*",
-    "wrench" : "*"
+    "wrench" : "*",
+    "serve-index" : "*",
+    "body-parser" : "*"
   },
   "engines": {
     "node": ">= 0.10.9"

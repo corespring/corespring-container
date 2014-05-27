@@ -6,6 +6,8 @@ logger = require('./web/log').logger(__filename)
 _ = require('lodash')
 hooks = require('./web/hooks')
 templates = require('./web/templates')
+directory = require('serve-index')
+bodyParser = require('body-parser')
 
 jsonPath = null
 components = null
@@ -26,7 +28,7 @@ app.get '/client/player.html', (req, res) ->
   hooks.init('/client/player', app, components, jsonContents)
   res.sendfile("src/main/resources/container-client/player.html")
 
-app.use('/client', express.directory('src/main/resources/container-client'))
+app.use('/client', directory('src/main/resources/container-client'))
 app.use('/client', express.static('src/main/resources/container-client'))
 
 config = (html, ngModules, scripts, css) ->
@@ -47,7 +49,7 @@ app.get '/client/player-config.json', (req, res) ->
 
 app.set('views', __dirname + '/web/views')
 app.set('view engine', 'jade')
-app.use(express.bodyParser())
+app.use(bodyParser())
 
 port = process.env.PORT || 5000
 app.set('port', port)
