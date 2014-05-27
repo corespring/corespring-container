@@ -24,20 +24,28 @@ block content
         player-session="model.session",
         player-outcomes="modul.outcome")
 
-
-
 block scripts
 
   //build:js js/rig.js
+  script(src="../../js/render/services/_declaration.js")
+  script(src="../../js/render/services/corespring-player-definition.js")
+  script(src="../../js/render/services/client-side-player-service.js")
+  script(src="../../js/render/services/component-register.js")
+  script(src="../../js/render/services/player-utils.js")
+  script(src="../../js/render/services/server-logic.js")
+  script(src="../../js/render/controllers/_declaration.js")
+  script(src="../../js/render/controllers/client-side-preview.js")
+  script(src="../../js/render/controllers/container-player-controls.js")
+  script(src="../../js/render/controllers/main.js")
+  script(src="../../js/render/controllers/root.js")
   script(src="../../js/rig/controllers/_declaration.js")
   script(src="../../js/rig/controllers/root.js")
   script(src="../../js/common/services/_declaration.js")
   script(src="../../js/common/services/math-service.js")
   script(src="../../js/render/directives/_declaration.js")
+  script(src="../../js/render/directives/control-panel.js")
   script(src="../../js/render/directives/corespring-player.js")
-  script(src="../../js/render/services/_declaration.js")
-  script(src="../../js/render/services/component-register.js")
-  script(src="../../js/render/services/player-utils.js")
+  script(src="../../js/render/directives/dimension-propagator.js")
   //endbuild
 
   //build:js js/extras.js

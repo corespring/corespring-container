@@ -54,7 +54,6 @@ module.exports = (grunt) ->
         '<%= common.dist %>/bower_components/angular/angular.min.js',
         '<%= common.dist %>/bower_components/lodash/dist/lodash.min.js',
         '<%= common.dist %>/bower_components/angular-ui-sortable/sortable.js',
-        '<%= common.dist %>/bower_components/corespring-ng-components/build/corespring-ng-components.js',
         '<%= common.dist %>/bower_components/mathjs/dist/math.min.js',
         '<%= common.dist %>/bower_components/saxjs/lib/sax.js'
       ]
@@ -63,6 +62,7 @@ module.exports = (grunt) ->
     core: 
       dest: '<%= common.dist %>/js/prod-core.js'
       src: [
+        '<%= common.dist %>/bower_components/corespring-ng-components/build/corespring-ng-components.js',
         '<%= common.dist %>/js/common/**/*.js', 
         '<%= common.dist %>/js/corespring/core.js',
         '<%= common.dist %>/js/corespring/lodash-mixins.js']
