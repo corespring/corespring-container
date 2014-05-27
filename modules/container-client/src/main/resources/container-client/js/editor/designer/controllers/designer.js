@@ -1,27 +1,44 @@
 (function() {
 
   angular.module('corespring-editor.controllers')
-    .controller('Designer', ['$scope',
-      '$element',
+    .controller('Designer', [
       '$compile',
+      '$element',
       '$http',
-      '$modal',
       '$log',
+      '$modal',
+      '$scope',
       '$stateParams',
+      'ComponentRegister',
+      'ComponentToWiggiwizFeatureAdapter',
       'DesignerService',
+      'ImageFeature',
+      'ImageUtils',
       'ItemService',
       'MathJaxService',
-      'ComponentToWiggiwizFeatureAdapter',
-      'ImageUtils',
-      'ComponentRegister',
-      'WiggiWizHelper',
       'WiggiMathJaxFeatureDef',
-      'ImageFeature',
+      'WiggiWizHelper',
       DesignerController
     ]);
 
   /* global AddContentModalController, com */
-  function DesignerController($scope, $element, $compile, $http, $modal, $log, $stateParams, DesignerService, ItemService, MathJaxService, ComponentToWiggiwizFeatureAdapter, ImageUtils, ComponentRegister, WiggiWizHelper, WiggiMathJaxFeatureDef, ImageFeature) {
+  function DesignerController(
+    $compile,
+    $element,
+    $http,
+    $log,
+    $modal,
+    $scope,
+    $stateParams,
+    ComponentRegister,
+    ComponentToWiggiwizFeatureAdapter,
+    DesignerService,
+    ImageFeature,
+    ImageUtils,
+    ItemService,
+    MathJaxService,
+    WiggiMathJaxFeatureDef,
+    WiggiWizHelper ) {
 
     var configPanels = {};
 
@@ -162,22 +179,22 @@
     }
 
     function onComponentsLoadError(error) {
-      console.warn("Error loading components");
+      $log.warn("Error loading components");
     }
 
     $scope.getUploadUrl = function(file) {
-      console.log(arguments);
+      log(arguments);
       return file.name;
     };
 
     $scope.selectFile = function(file) {
-      console.log("root select file...");
+      log("root select file...");
       $scope.selectedFile = file;
-      console.log($scope.selectedFile);
+      log($scope.selectedFile);
     };
 
     $scope.$on('fileSizeGreaterThanMax', function(event) {
-      console.warn("file too big");
+      $log.warn("file too big");
     });
 
 
