@@ -63,9 +63,11 @@ module.exports = (grunt) ->
       dest: '<%= common.dist %>/js/prod-core.js'
       src: [
         '<%= common.dist %>/bower_components/corespring-ng-components/build/corespring-ng-components.js',
-        '<%= common.dist %>/js/common/**/*.js', 
         '<%= common.dist %>/js/corespring/core.js',
-        '<%= common.dist %>/js/corespring/lodash-mixins.js']
+        '<%= common.dist %>/js/corespring/core-library.js',
+        '<%= common.dist %>/js/corespring/server/init-core-library.js',
+        '<%= common.dist %>/js/corespring/lodash-mixins.js',
+        '<%= common.dist %>/js/common/**/*.js']
 
 
     catalog: 
