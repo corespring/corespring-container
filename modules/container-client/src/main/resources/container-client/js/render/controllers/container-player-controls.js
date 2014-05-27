@@ -34,7 +34,6 @@ var controller = function ($scope, $rootScope, $log) {
     }
   });
 
-
   $scope.$watch('score', function(newValue){
     if(newValue){
       $log.debug("score loaded");

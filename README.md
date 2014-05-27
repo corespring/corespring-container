@@ -68,12 +68,9 @@ Afterwards, install the project modules:
     cd ..
     ./bin/seed-db
 
-
 ### Seeding a remote db
 
-    export CONTAINER_MONGO_URI="mongodb://some_url..."
-    ./bin/seed-db
-
+    ./bin/seed-db mongodb://some_domain.com:888/db
 
 ## Run play app and install client side dependencies
 

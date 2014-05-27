@@ -26,7 +26,16 @@ script#designer(type="text/ng-template")
           component-set="componentSet")
 
     .summary-feedback-container(ng-show="section == 'summary-feedback'")
-      label Summary Feedback
-      textarea(ng-model="data.item.summaryFeedback",class="form-control",
-         placeholder="Use this space to provide summary level feedback for this interaction.")
+      .centered-form
+        p Use this option if you would like to provide summary level feedback for the entire item
+        label
+          input(type='checkbox', ng-model='isSummaryFeedbackSelected')
+          | Add summary feedback
+        div(ng-show="isSummaryFeedbackSelected")
+          textarea(ng-model="data.item.summaryFeedback",class="form-control",
+             placeholder="Type here")
+
+          .button-holder
+            a.btn.btn-success.btn-small.btn-sm
+              | Done
 

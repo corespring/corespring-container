@@ -472,6 +472,8 @@
     }
 
     function onLoadItemSuccess() {
+      isFormActive = false;
+
       initSubObjects();
 
       var profile = $scope.item.profile;
@@ -483,7 +485,6 @@
       log("task info:", $scope.taskInfo);
       log("other alignments:", $scope.otherAlignments);
       log("contributor details:", $scope.contributorDetails);
-
 
       applyComponentTypes();
 
@@ -498,15 +499,11 @@
       isFormActive = true;
     }
 
-    $scope.$watch('item', function(newValue) {
-      log("item $watch", newValue);
-      if (newValue && newValue.profile) {
+    $scope.$on('itemLoaded', function(ev, item) {
+      if (item && item.profile) {
+        $scope.item = item;
         onLoadItemSuccess();
       }
-    });
-
-    $scope.$on('itemLoaded', function(ev, item) {
-      $scope.item = item;
     });
 
     $scope.$emit('loadItem');
