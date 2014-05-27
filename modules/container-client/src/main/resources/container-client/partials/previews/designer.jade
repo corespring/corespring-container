@@ -14,5 +14,4 @@ script#designer-preview(type='text/ng-template')
       button.btn.btn-primary(ng-click="submit()", ng-disabled="!canSubmit()") Submit
     hr/
 
-    .summary-feedback(ng-show="session.isComplete")
-      | {{data.item.summaryFeedback}}
+    summary-feedback
