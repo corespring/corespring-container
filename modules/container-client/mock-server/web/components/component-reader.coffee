@@ -7,7 +7,7 @@ class ClientDef
   constructor: (@render, @configure) ->
 
 class ComponentDef
-  constructor: (@organization, @name, @icon, @client, @server, @pkg) ->
+  constructor: (@organization, @name, @client, @server, @pkg) ->
     @componentType = "#{@organization}-#{@name}"
 
 # private
@@ -15,10 +15,6 @@ orgName = (p) ->
   dir = path.dirname(p)
   basename = path.basename(dir)
   basename
-
-icon = (p) ->
-  iconPath = path.join(p, 'icon.png')
-  fs.readFileSync( iconPath )
 
 componentName = (p) -> path.basename(p)
 
@@ -36,11 +32,9 @@ load = (folders ...) ->
     js = coffeeScript.compile coffeeSrc, { bare : true }
     logger.debug js
     js
-  else
-    throw new Error("Can't find js or coffee at this path: #{p}")
 
 clientDef = (p) ->
-  renderJs = load( p, 'src', 'client', 'render' )
+  renderJs = load(p, 'src', 'client', 'render')
   configJs = load(p, 'src', 'client', 'configure')
   new ClientDef(renderJs, configJs)
 
@@ -48,10 +42,10 @@ requireServer = (folders ...) ->
   p = path.join.apply(null, folders)
 
   if fs.existsSync(p)
-    api : require path.join(process.cwd(), p)
+    api: require path.join(process.cwd(), p)
     contents: loadJsFromSrc("#{p}/index.js")
   else
-    render : (q) -> q
+    render: (q) -> q
     respond: (question, answer, settings) -> { message: "No respond function defined - please implement one for: #{p}" }
 
 loadJsFromSrc = (jsPath) ->
@@ -83,13 +77,11 @@ exports.fromFolder = (p, done) ->
 
   org = orgName(p)
   comp = componentName(p)
-  ico = icon(p)
   cl = clientDef(p)
   srvr = serverDef(p)
   pk = pkg(p)
 
-
-  def = new ComponentDef(org, comp, ico, cl, srvr, pk )
+  def = new ComponentDef(org, comp, cl, srvr, pk)
 
   done(null, def)
 

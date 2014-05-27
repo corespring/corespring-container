@@ -42,7 +42,14 @@ exports.init = (folder) ->
 
     logger.info "orgs and comps",  "./#{orgsAndComps}"
 
-    flattened = _.flatten orgsAndComps
+    # Load common dependencies first
+    commonDeps = ['drag-and-drop-engine']
+
+    flattened = _.sortBy (_.flatten orgsAndComps), (comp) ->
+      f = _.find commonDeps, (dep) ->
+        comp.indexOf(dep) >= 0
+      f == undefined ? 0 : 1
+
     loadedComponents = []
 
     _.each flattened, (p) ->
