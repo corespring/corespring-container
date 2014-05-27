@@ -44,7 +44,7 @@ trait ComponentSets extends Controller with ComponentUrls {
       val out = context match {
         case "editor" => gen(editorGenerator)
         case "player" => gen(playerGenerator)
-        case "rig" => gen(playerGenerator)
+        case "rig" => gen(editorGenerator)
         case "catalog" => gen(catalogGenerator)
         case _ => throw new RuntimeException(s"Error: unknown context: $context")
       }
