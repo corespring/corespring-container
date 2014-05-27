@@ -1,4 +1,24 @@
-var controller = function($scope, $location, $http, $timeout, $log, ComponentRegister, PlayerUtils) {
+var controller = function($scope, $location, $http, $timeout, $log, ComponentRegister, PlayerUtils, PlayerServiceDef) {
+
+  $scope.getQuestionForComponentId = function(id) {
+    return $scope.model.item.components[id];
+  };
+
+  $scope.getItem = function() {
+    return $scope.model.item;
+  };
+
+  $scope.getScoringJs = function() {
+    var scoringJs = _.find($scope.model.item.files, function(f) {
+      return f.name === "scoring.js";
+    });
+    return scoringJs;
+  };
+
+  var PlayerService = new PlayerServiceDef(
+    $scope.getQuestionForComponentId,
+    $scope.getItem,
+    $scope.getScoringJs);
 
   $scope.aceLoaded = function(_editor) {
     _editor.setTheme("ace/theme/twilight");
@@ -19,6 +39,17 @@ var controller = function($scope, $location, $http, $timeout, $log, ComponentReg
       }
     });
   };
+
+  $scope.$on('submitEvent', function() {
+    var components = ComponentRegister.getComponentSessions();
+    PlayerService.submitSession({
+      components: components
+    }, function() {
+      window.alert('saved!');
+    }, function() {
+      window.alert('error');
+    });
+  });
 
   $scope.onSuccess = function(data) {
     $scope.model = data;
@@ -58,5 +89,5 @@ var controller = function($scope, $location, $http, $timeout, $log, ComponentReg
 
 angular.module('corespring-rig.controllers')
   .controller(
-    'Root', ['$scope', '$location', '$http', '$timeout', '$log', 'ComponentRegister', 'PlayerUtils', controller]
+    'Root', ['$scope', '$location', '$http', '$timeout', '$log', 'ComponentRegister', 'PlayerUtils', 'PlayerService', controller]
 );
