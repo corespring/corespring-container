@@ -10,6 +10,8 @@ block player-child
     hr/
     .score(ng-show="score")
       | You scored {{score.summary.percentage}}%
+    .summary-feedback(ng-show="item.summaryFeedback")
+      | {{item.summaryFeedback}}
 
 block extra-scripts
   script(src="../../js/render/controllers/container-player-controls.js", type="text/javascript")
