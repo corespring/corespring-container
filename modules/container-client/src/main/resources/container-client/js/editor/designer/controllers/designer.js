@@ -123,32 +123,23 @@
           deleteComponent);
       }
 
-      function sortComponents(components) {
+      var orderedComponents = [
+        "corespring-multiple-choice",
+        "corespring-inline-choice",
+        "corespring-focus-task",
+        "corespring-ordering",
+        "corespring-drag-and-drop",
+        "corespring-text-entry",
+        "corespring-extended-text-entry",
+        "corespring-point-intercept",
+        "corespring-line",
+        "corespring-function-entry",
+        "corespring-select-text"
+      ];
 
-        var orderedComponents = [
-          "corespring-multiple-choice",
-          "corespring-inline-choice",
-          "corespring-focus-task",
-          "corespring-ordering",
-          "corespring-drag-and-drop",
-          "corespring-text-entry",
-          "corespring-extended-text-entry",
-          "corespring-point-intercept",
-          "corespring-line",
-          "corespring-function-entry",
-          "corespring-select-text"
-        ];
-
-        function orderList(component) {
-
-          var idx = _.indexOf(orderedComponents, component.componentType);
-          return idx >= 0 ? idx : 1000;
-        }
-
-        var otherComponents = _.difference(components, orderedComponents);
-        var corespringComponents = _.difference(components, otherComponents);
-
-        return _.sortBy(corespringComponents, orderList).concat(otherComponents.sort());
+      function orderList(component) {
+        var idx = _.indexOf(orderedComponents, component.componentType);
+        return idx >= 0 ? idx : 1000;
       }
 
       $scope.overrideFeatures = [
@@ -160,7 +151,7 @@
           name: 'external',
           type: 'dropdown',
           dropdownTitle: 'Answer Type',
-          buttons: _.map(sortComponents(componentSet), componentToFeature)
+          buttons: _.map(_.sortBy(componentSet, orderList), componentToFeature)
         }, {
           type: 'group',
           buttons: [
