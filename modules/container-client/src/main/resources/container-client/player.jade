@@ -20,7 +20,10 @@ block content
         player-session="session",
         player-outcomes="outcome")
 
-      block player-child 
+      block player-child
+
+      .summary-feedback(ng-show="session.isComplete")
+        | {{item.summaryFeedback}}
 
 block scripts
 
