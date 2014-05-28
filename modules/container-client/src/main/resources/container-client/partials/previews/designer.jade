@@ -10,8 +10,9 @@ script#designer-preview(type='text/ng-template')
       player-session="rootModel.session",
       player-outcomes="outcome")
 
+    summary-feedback(template="designer.jade",item="data.item",session="session")
+
     .button-holder
       button.btn.btn-primary(ng-click="submit()", ng-disabled="!canSubmit()") Submit
     hr/
 
-    summary-feedback(template="designer.jade",item="data.item",session="session")
