@@ -195,8 +195,8 @@
         .value();
     }
 
-    DataQueryService.list("additionalCopyrightItemType", function(result) {
-      $scope.additionalCopyrightItemTypeDataProvider = result;
+    DataQueryService.list("mediaType", function(result) {
+      $scope.mediaTypeDataProvider = result;
     });
 
     DataQueryService.list("bloomsTaxonomy", function(result) {

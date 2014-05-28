@@ -8,22 +8,22 @@ object FieldValueJson {
 
   val fieldValues = Json.obj(
     "version" -> "0.0.3",
-    "additionalCopyrightItemType" -> Json.arr(
+    "mediaType" -> Json.arr(
       Json.obj(
-        "key" -> "Passage",
-        "value" -> "Passage"
+        "key" -> "Audio",
+        "value" -> "Audio"
       ),
       Json.obj(
         "key" -> "Image",
         "value" -> "Image"
       ),
       Json.obj(
-        "key" -> "Video",
-        "value" -> "Video"
+        "key" -> "Passage",
+        "value" -> "Passage"
       ),
       Json.obj(
-        "key" -> "Audio",
-        "value" -> "Audio"
+        "key" -> "Video",
+        "value" -> "Video"
       )
     ),
     "bloomsTaxonomy" -> Json.arr(

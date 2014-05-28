@@ -13,8 +13,6 @@ class ShellDataQuery extends ContainerDataQuery {
 
   lazy val fieldValueJson: JsValue = FieldValueJson()
 
-  lazy val additionalCopyrightItemType: Seq[JsValue] = (fieldValueJson \ "additionalCopyrightItemType").as[Seq[JsValue]]
-
   lazy val bloomsTaxonomy: Seq[JsValue] = (fieldValueJson \ "bloomsTaxonomy").as[Seq[JsValue]]
 
   lazy val credentials: Seq[JsValue] = (fieldValueJson \ "credentials").as[Seq[JsValue]]
@@ -28,6 +26,8 @@ class ShellDataQuery extends ContainerDataQuery {
   lazy val keySkills: Seq[JsValue] = (fieldValueJson \ "keySkills").as[Seq[JsValue]]
 
   lazy val licenseTypes: Seq[JsValue] = (fieldValueJson \ "licenseTypes").as[Seq[JsValue]]
+
+  lazy val mediaType: Seq[JsValue] = (fieldValueJson \ "mediaType").as[Seq[JsValue]]
 
   lazy val priorUses: Seq[JsValue] = (fieldValueJson \ "priorUses").as[Seq[JsValue]]
 
@@ -49,7 +49,6 @@ class ShellDataQuery extends ContainerDataQuery {
 
 
     val out = topic match {
-      case "additionalCopyrightItemType" => Json.toJson(additionalCopyrightItemType)
       case "bloomsTaxonomy" => Json.toJson(bloomsTaxonomy)
       case "credentials" => Json.toJson(credentials)
       case "depthOfKnowledge" => Json.toJson(depthOfKnowledge)
@@ -57,6 +56,7 @@ class ShellDataQuery extends ContainerDataQuery {
       case "itemType" => itemTypes
       case "keySkills" => Json.toJson(keySkills)
       case "licenseTypes" => Json.toJson(licenseTypes)
+      case "mediaType" => Json.toJson(mediaType)
       case "priorUses" => Json.toJson(priorUses)
       case "reviewsPassed" => Json.toJson(reviewsPassed)
       case "standards" => Json.toJson(StandardsDataQuery.list(standards, query))

@@ -234,9 +234,9 @@ form
                     a(href="http://creativecommons.org/licenses/", target="_blank") Learn more
           tr
             td.label-col
-              label.control-label(for="ac-item-type") Type
+              label.control-label(for="ac-media-type") Media Type
             td
-              select#ac-item-type(ng-model='item.itemType', ng-options='c.key as c.value for c in additionalCopyrightItemTypeDataProvider')
+              select#ac-media-type(ng-model='item.mediaType', ng-options='c.key as c.value for c in mediaTypeDataProvider')
 
           tr
             td.label-col
