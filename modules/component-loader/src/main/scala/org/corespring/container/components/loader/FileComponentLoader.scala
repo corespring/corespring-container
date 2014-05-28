@@ -112,6 +112,7 @@ class FileComponentLoader(paths: Seq[String]) extends ComponentLoader {
     val icon = new File(compRoot.getPath + "/icon.png")
     val defaultDataJson = new File(clientFolder.getPath + "/defaultData.json")
     val sampleDataFolder = new File(compRoot.getPath + "/sample-data")
+    val regressionDataFolder = new File(compRoot.getPath + "/regression-data")
 
     def loadLibraries: Seq[LibraryId] = {
       (packageJson \ "libraries").asOpt[Seq[JsObject]].map {
@@ -147,7 +148,7 @@ class FileComponentLoader(paths: Seq[String]) extends ComponentLoader {
           packageJson,
           loadDefaultData(defaultDataJson),
           loadIcon(icon),
-          loadSampleData(sampleDataFolder),
+          loadSampleData(sampleDataFolder) ++ loadSampleData(regressionDataFolder, Some("regression_")),
           loadLibraries))
     } else {
       None
@@ -166,25 +167,30 @@ class FileComponentLoader(paths: Seq[String]) extends ComponentLoader {
     }
   } else Json.obj()
 
-  private def loadSampleData(sampleDataFolder: File): Map[String, JsValue] = if (sampleDataFolder.exists) {
+  private def loadSampleData(sampleDataFolder: File, prefix: Option[String] = None): Map[String, JsValue] =
+    if (sampleDataFolder.exists) {
+      val jsonFiles = sampleDataFolder.listFiles.filter(_.getName.endsWith(".json"))
 
-    val jsonFiles = sampleDataFolder.listFiles.filter(_.getName.endsWith(".json"))
-
-    val jsonArray = jsonFiles.map {
-      f: File =>
-        try {
-          val contents = readFile(f)
-          val json = Json.parse(contents)
-          Some((f.getName, json))
-        } catch {
-          case e: Throwable => {
-            logger.warn(s"Error parsing: ${f.getPath}: ${e.getMessage}")
-            None
+      val jsonArray = jsonFiles.map {
+        f: File =>
+          try {
+            val contents = readFile(f)
+            val json = Json.parse(contents)
+            prefix match {
+              case Some(pre) => {
+                Some((s"$pre${f.getName}", json))
+              }
+              case _ => Some((f.getName, json))
+            }
+          } catch {
+            case e: Throwable => {
+              logger.warn(s"Error parsing: ${f.getPath}: ${e.getMessage}")
+              None
+            }
           }
-        }
-    }.flatten
-    Map(jsonArray: _*)
-  } else Map.empty
+      }.flatten
+      Map(jsonArray: _*)
+    } else Map.empty
 
   private def loadIcon(iconFile: File): Option[Array[Byte]] = if (iconFile.exists) {
     val source = scala.io.Source.fromFile(iconFile)(scala.io.Codec.ISO8859)
