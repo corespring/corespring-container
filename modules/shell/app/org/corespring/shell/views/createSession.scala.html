@@ -1,9 +1,10 @@
 @(itemId: String, url : String)
 <html>
-  <head>
 
-    <link rel="stylesheet" href="/assets/css/homepage.css">
-    <!--
+<head>
+
+  <link rel="stylesheet" href="/assets/css/homepage.css">
+  <!--
     "maxNoOfAttempts").asOpt[Int].getOrElse(default.maxNoOfAttempts),
     "highlightUserResponse").asOpt[Boolean].getOrElse(default.highlightUserResponse),
     "highlightCorrectResponse").asOpt[Boolean].getOrElse(default.highlightCorrectResponse),
@@ -20,56 +21,113 @@
   <![endif]-->
 
 
-  </head>
-  <body>
-    <div class="container">
+</head>
 
-      <h3>Create session for item: @itemId </h3>
+<body>
+  <div class="container">
 
-      <div class="alert alert-warning">
-        <strong>Note:</strong>
-        These settings don't work at the moment as we need to decide on how the container will run the player.
-        For now just click 'create session' - the settings are in the container-player-controls.js
-      </div>
+    <h3>Create session for item: @itemId </h3>
 
-      <label>Max number of attempts?</label><input type="text" disabled id="maxNoOfAttempts" value="2"><br>
-      <label>Show Feedback?</label><input type="checkbox" disabled id="showFeedback" checked><br>
-      <label>Show Correct Response?</label><input type="checkbox" disabled id="highlightCorrectResponse" checked><br>
-      <label>Show User Response?</label><input type="checkbox" disabled id="highlightUserResponse" checked><br>
-      <label>Allow Empty Response?</label><input type="checkbox" disabled id="allowEmptyResponses" checked><br>
-      <label>Submit Complete Message</label><input type="text" disabled id="submitCompleteMessage"><br>
-      <label>Submit Incorrect Message</label><input type="text" disabled id="submitIncorrectMessage"><br>
-      <button class="btn-primary" id="button"> Create Session</button>
+    <div class="alert alert-warning">
+      <strong>Note:</strong>
+      These settings don't work at the moment as we need to decide on how the container will run the player. For now just click 'create session' - the settings are in the container-player-controls.js
     </div>
-  </body>
-  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-  <script type="text/javascript">
-  $(document).ready(function(){
 
-    $("#button" ).click(function(){
-      var data = {}
+    <label>Max number of attempts?</label>
+    <input type="text" disabled id="maxNoOfAttempts" value="2">
+    <br>
+    <label>Show Feedback?</label>
+    <input type="checkbox" disabled id="showFeedback" checked>
+    <br>
+    <label>Show Correct Response?</label>
+    <input type="checkbox" disabled id="highlightCorrectResponse" checked>
+    <br>
+    <label>Show User Response?</label>
+    <input type="checkbox" disabled id="highlightUserResponse" checked>
+    <br>
+    <label>Allow Empty Response?</label>
+    <input type="checkbox" disabled id="allowEmptyResponses" checked>
+    <br>
+    <label>Submit Complete Message</label>
+    <input type="text" disabled id="submitCompleteMessage">
+    <br>
+    <label>Submit Incorrect Message</label>
+    <input type="text" disabled id="submitIncorrectMessage">
+    <br>
+    <button class="btn-primary" id="button">Create Session</button>
+  </div>
+</body>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<script type="text/javascript">
+  $(document).ready(function() {
+
+    $("#button").click(function() {
+      var data = {};
       data.itemId = "@itemId";
       data.settings = {
-        maxNoOfAttempts : parseInt( $("#maxNoOfAttempts").val ()),
-        showFeedback : $("#showFeedback").is(":checked"),
-        highlightCorrectResponse : $("#highlightCorrectResponse").is(":checked"),
-        highlightUserResponse : $("#highlightUserResponse").is (":checked"),
-        allowEmptyResponses : $("#allowEmptyResponses").is (":checked")
+        maxNoOfAttempts: parseInt($("#maxNoOfAttempts").val()),
+        showFeedback: $("#showFeedback").is(":checked"),
+        highlightCorrectResponse: $("#highlightCorrectResponse").is(":checked"),
+        highlightUserResponse: $("#highlightUserResponse").is(":checked"),
+        allowEmptyResponses: $("#allowEmptyResponses").is(":checked")
       };
 
-  $.ajax({
+      $.ajax({
         type: 'POST',
         url: '@url',
         contentType: 'application/json; charset=utf-8',
         dataType: 'json',
         data: JSON.stringify(data)
-      }).done(function(result){
-          window.location = result.url;
+      }).done(function(result) {
+
+        function UrlBuilder(url) {
+          var parts = url.match(/([^?#]*)(\?([^#]*))?(#(.*))?/);
+
+          var root = parts[1] || "";
+          var query = parts[3] || "";
+          var hash = parts[5] || "";
+
+          var queryParts = query == "" ? [] : query.split("&").map(function(item) {
+            return item.split("=");
+          });
+
+          this.hasParam = function(name) {
+            return queryParts.some(function(param) {
+              return param[0] === name;
+            });
+          };
+
+          this.addParam = function(name, value) {
+            queryParts.push([name, value]);
+          };
+
+          this.build = function() {
+            if (queryParts.length > 0) {
+              query = queryParts.map(function(param) {
+                return param[0] + (param.length > 1 ? "=" + param[1] : "");
+              }).join("&");
+            } else {
+              query = "";
+            }
+            return root + (query ? "?" + query : "") + (hash ? "#" + hash : "");
+          }
+        }
+
+        function addFileParamIfNotSet(url, fileName) {
+          var builder = new UrlBuilder(url);
+          if (!builder.hasParam("file")) {
+            builder.addParam("file", fileName);
+          }
+          return builder.build();
+        }
+
+        window.location = addFileParamIfNotSet(result.url, "container-player.html");
       });
 
     });
   })
-  </script>
+</script>
+
 </html>
 
 
