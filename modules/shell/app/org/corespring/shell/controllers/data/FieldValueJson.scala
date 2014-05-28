@@ -1,6 +1,6 @@
 package org.corespring.shell.controllers.data
 
-import play.api.libs.json.{Json,JsValue}
+import play.api.libs.json.{Json, JsValue}
 
 object FieldValueJson {
 
@@ -116,36 +116,44 @@ object FieldValueJson {
     ),
     "credentials" -> Json.arr(
       Json.obj(
-        "key" -> "Assessment Developer",
-        "value" -> "Assessment Developer"
+        "key" -> "Application Developer",
+        "value" -> "Application Developer"
       ),
       Json.obj(
-        "key" -> "Test Item Writer",
-        "value" -> "Test Item Writer"
+        "key" -> "Assessment Developer Test Item Writer",
+        "value" -> "Assessment Developer Test Item Writer"
       ),
       Json.obj(
-        "key" -> "State Department of Education",
-        "value" -> "State Department of Education"
+        "key" -> "Curriculum Developer",
+        "value" -> "Curriculum Developer"
       ),
       Json.obj(
         "key" -> "District Item Writer",
         "value" -> "District Item Writer"
       ),
       Json.obj(
-        "key" -> "Teacher",
-        "value" -> "Teacher"
+        "key" -> "Game Designer",
+        "value" -> "Game Designer"
+      ),
+      Json.obj(
+        "key" -> "Non-Profit",
+        "value" -> "Non-Profit"
+      ),
+      Json.obj(
+        "key" -> "Professional Developer",
+        "value" -> "Professional Developer"
+      ),
+      Json.obj(
+        "key" -> "State Department of Education Item Writer",
+        "value" -> "State Department of Education Item Writer"
       ),
       Json.obj(
         "key" -> "Student",
         "value" -> "Student"
       ),
       Json.obj(
-        "key" -> "School Network",
-        "value" -> "School Network"
-      ),
-      Json.obj(
-        "key" -> "CMO",
-        "value" -> "CMO"
+        "key" -> "Teacher",
+        "value" -> "Teacher"
       ),
       Json.obj(
         "key" -> "Other",
