@@ -22,7 +22,7 @@ block content
         player-markup="model.item.xhtml",
         player-item="model.item",
         player-session="model.session",
-        player-outcomes="modul.outcome")
+        player-outcomes="model.outcome")
 
 block scripts
 
@@ -114,5 +114,13 @@ block scripts
 
     $('.pre-loader').remove();
     $('.main').addClass('blend');
+
+    window.submit = function() {
+      var scope = angular.element(document.getElementById('root')).scope();
+      var rootScope = scope.$root;
+      scope.$apply(function() {
+        rootScope.$broadcast('submitEvent');
+      });
+    };
 
 
