@@ -35,7 +35,7 @@ angular.module('corespring-common.services')
             .countBy("componentType")
             .map(function(count, componentType) {
               var title = getTitle(componentType);
-              return defaultFormatFn(title, count);
+              return formatFn(title, count);
             }).sort().value();
         };
 

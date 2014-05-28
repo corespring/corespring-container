@@ -63,7 +63,12 @@ angular.module('corespring-catalog.controllers')
         if (!$scope.item || !$scope.item.components || !$scope.availableComponents) {
           return;
         }
-        $scope.componentTypeLabels = ProfileFormatter.componentTypesUsed($scope.item.components, $scope.availableComponents);
+
+        function justTypes(name, count) {
+          return name;
+        }
+
+        $scope.componentTypeLabels = ProfileFormatter.componentTypesUsed($scope.item.components, $scope.availableComponents, justTypes);
       }
 
       function applyDepthOfKnowledge() {
