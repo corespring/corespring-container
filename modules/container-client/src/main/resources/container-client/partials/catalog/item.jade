@@ -8,5 +8,4 @@ script(type='text/ng-template', id="/templates/item")
       hr
       #score
         h4 You scored: {{score.summary.percentage}}%
-    .summary-feedback(ng-show="session.isComplete")
-      | {{item.summaryFeedback}}
+    summary-feedback(template="item.jade",item="item",session="session")

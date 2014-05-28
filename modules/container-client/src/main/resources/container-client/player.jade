@@ -22,8 +22,7 @@ block content
 
       block player-child
 
-      .summary-feedback(ng-show="session.isComplete")
-        | {{item.summaryFeedback}}
+      summary-feedback(template="player.jade",item="item",session="session")
 
 block scripts
 
