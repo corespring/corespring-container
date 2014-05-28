@@ -77,9 +77,9 @@ block scripts
 
       var jsonFile = queryMatch[1];
 
-      $.get( configPath, function(data){
+      $.get(configPath, function(data) {
 
-        var allScriptsAreLoaded = function(){
+        var allScriptsAreLoaded = function() {
 
           console.log("all scripts are loaded");
           //$("#player-body").html(data.xhtml);
@@ -93,8 +93,8 @@ block scripts
             'ui.ace'
           ].concat(data.angular.dependencies);
 
-          angular.module("corespring-rig", playerDeps )
-            .config(['$locationProvider', function($locationProvider){
+          angular.module("corespring-rig", playerDeps)
+            .config(['$locationProvider', function($locationProvider) {
               $locationProvider.html5Mode(true).hashPrefix('!');
             }]);
 
