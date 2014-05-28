@@ -40,14 +40,20 @@ var controller = function($scope, $location, $http, $timeout, $log, ComponentReg
     });
   };
 
+  function onSessionSaved(data) {
+    $scope.model.responses = data.responses;
+    $scope.model.session = data.session;
+    $scope.model.outcome = data.outcome;
+    $scope.model.score = data.score;
+    ComponentRegister.setEditable(false);
+  }
+
   $scope.$on('submitEvent', function() {
     var components = ComponentRegister.getComponentSessions();
     PlayerService.submitSession({
       components: components
-    }, function() {
-      window.alert('saved!');
-    }, function() {
-      window.alert('error');
+    }, onSessionSaved, function() {
+      $log.error('There was a problem saving the session');
     });
   });
 
