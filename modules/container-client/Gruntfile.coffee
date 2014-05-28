@@ -205,8 +205,6 @@ module.exports = (grunt) ->
 
 
     jade:
-      
-      
       partials: jadeConfig(["**/*.jade"].concat(ignoreApps), ".html", false)
       prod: jadeConfig(apps, ".prod.html", false )
       dev: jadeConfig(apps, ".dev.html", true )
@@ -214,9 +212,15 @@ module.exports = (grunt) ->
     jasmine:
       unit:
         src: [
-          '<%= common.app %>/js/**/*.js', 
-          '!<%= common.app %>/js/**/player-launcher/*.js',
-          '<%= common.tmp %>/wrapped/**/*.js']
+          '<%= common.app %>/js/corespring/**/*.js',
+          '<%= common.app %>/js/catalog/**/*.js',
+          '<%= common.app %>/js/common/**/*.js',
+          '<%= common.app %>/js/editor/**/*.js',
+          '<%= common.app %>/js/libs/*.js',
+          '<%= common.app %>/js/render/**/*.js',
+          '<%= common.app %>/js/rig/**/*.js',
+          '<%= common.tmp %>/wrapped/**/*.js'
+          '!<%= common.app %>/js/**/player-launcher/*.js']
         options:
           keepRunner: true
           vendor: [
