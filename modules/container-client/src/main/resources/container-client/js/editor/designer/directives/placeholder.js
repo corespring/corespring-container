@@ -119,7 +119,7 @@ var Placeholder = function(
       '  <div class="blocker" tooltip="{{tooltipMsg}}" tooltip-append-to-body="true" tooltip-placement="bottom">',
       '     <div class="bg"></div>',
       '     <div class="content">',
-      '       <div class="title">{{mainMsg}}</div>',
+      '       <div class="title"><span ng-show="mainMsg">{{mainMsg}}</span></div>',
       '     </div>',
       '     <div class="delete-icon">',
       '      <i ng-click="deleteNode()" class="fa fa-times-circle"></i>',
