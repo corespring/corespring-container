@@ -1,18 +1,17 @@
-
-var Instance = function(element, options, errorCallback, log){
+var Instance = function(element, options, errorCallback, log) {
 
   var errors = require("errors");
 
   var that = this;
 
   log = log || {
-    error: function (s) {
+    error: function(s) {
       console.error(s);
     },
-    debug: function (s) {
+    debug: function(s) {
       console.debug(s);
     },
-    warn: function (s) {
+    warn: function(s) {
       console.warn(s);
     }
   };
@@ -34,14 +33,16 @@ var Instance = function(element, options, errorCallback, log){
               break;
             }
           }
-          if (!found) {$(element).height(json.h + 30);}
+          if (!found) {
+            $(element).height(json.h + 30);
+          }
         }
       } catch (e) {
         log.error("Exception in addDimensionChangeListener: " + e);
       }
     }
 
-    listener.addListener(function (e) {
+    listener.addListener(function(e) {
       listenerFunction(e.data, e);
     });
   }
@@ -49,7 +50,10 @@ var Instance = function(element, options, errorCallback, log){
 
   function initialize(e, options) {
     if (!options || !options.url) {
-      errorCallback({ code: 999, message: "No url specified" });
+      errorCallback({
+        code: 999,
+        message: "No url specified"
+      });
       return;
     }
 
@@ -59,7 +63,10 @@ var Instance = function(element, options, errorCallback, log){
     }
 
     $(e).html("<iframe id='iframe-player' frameborder='0' src='" + options.url + "' style='width: 100%; border: none'></iframe>");
-    $(e).width(options.width ? options.width : "600px");
+
+    if (options.forceWidth) {
+      $(e).width(options.width ? options.width : "600px");
+    }
 
     dimensionChangeListener(e);
   }
@@ -69,14 +76,14 @@ var Instance = function(element, options, errorCallback, log){
     try {
       postMessageFunc(message, data, element);
     } catch (e) {
-      log.error( "[player-instance]", message, data, e);
+      log.error("[player-instance]", message, data, e);
       return false;
     }
     return true;
   }
 
   function expectResult(message, callback, dataProcessor) {
-    dataProcessor = dataProcessor || (function (data) {
+    dataProcessor = dataProcessor || (function(data) {
       return data;
     });
 
@@ -90,8 +97,7 @@ var Instance = function(element, options, errorCallback, log){
         if (data.message === message) {
           callback(dataProcessor(data));
         }
-      }
-      catch (e) {
+      } catch (e) {
         log.error("Exception in [player-instance] : " + e);
       }
       listener.removeListener(this);
@@ -101,7 +107,7 @@ var Instance = function(element, options, errorCallback, log){
   }
 
 
-  this.sendMessage = function (props) {
+  this.sendMessage = function(props) {
     if (props.callback) {
       expectResult(props.message + "Result", props.callback, extractPropertyFromMessage);
     }
@@ -113,12 +119,11 @@ var Instance = function(element, options, errorCallback, log){
     }
   };
 
-  this.parseEvent = function (event) {
+  this.parseEvent = function(event) {
     if (typeof(event.data) === "string") {
       try {
         return JSON.parse(event.data);
-      }
-      catch (e) {
+      } catch (e) {
         log.warn("[player-instance] Can't parse: ", event.data, " as json");
         return {};
       }
@@ -127,8 +132,8 @@ var Instance = function(element, options, errorCallback, log){
     }
   };
 
-  this.addListener = function(name, callback){
-    listener.addListener(function (event) {
+  this.addListener = function(name, callback) {
+    listener.addListener(function(event) {
       var data = that.parseEvent(event);
 
       log.debug("[addListener] [handler] message: " + data.message);
