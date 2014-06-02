@@ -1,12 +1,12 @@
-var EditorDefinition = function(element, options, errorCallback){
+var EditorDefinition = function(element, options, errorCallback) {
 
   var errors = require("errors");
   var launcherErrors = require("launcher-errors");
   var i;
 
-  if(launcherErrors.hasErrors){
-    for(i = 0; i < launcherErrors.errors.length; i++){
-      errorCallback( errors.EXTERNAL_ERROR(launcherErrors.errors[i]) );
+  if (launcherErrors.hasErrors) {
+    for (i = 0; i < launcherErrors.errors.length; i++) {
+      errorCallback(errors.EXTERNAL_ERROR(launcherErrors.errors[i]));
     }
     return;
   }
@@ -16,8 +16,8 @@ var EditorDefinition = function(element, options, errorCallback){
   var defaultOptions = require("default-options");
 
   options = $.extend(defaultOptions, options);
-  
-  var validateOptions = function (options) {
+
+  var validateOptions = function(options) {
     return [];
   };
 
@@ -31,20 +31,23 @@ var EditorDefinition = function(element, options, errorCallback){
   }
 
   var InstanceDef = require("instance");
-  
-  errorCallback = errorCallback || function (error) {
+
+  errorCallback = errorCallback || function(error) {
     throw "error occurred, code: " + error.code + ", message: " + error.message;
   };
-  
-  var loadPaths = function(options, name){
-    if(!options.paths || !options.paths[name]){
-      errorCallback({code: -1, message: name + " not part of options"});
-      return; 
-    } 
+
+  var loadPaths = function(options, name) {
+    if (!options.paths || !options.paths[name]) {
+      errorCallback({
+        code: -1,
+        message: name + " not part of options"
+      });
+      return;
+    }
     return options.paths[name];
   };
 
-  var createItem = function(options, onSuccess, onError){
+  var createItem = function(options, onSuccess, onError) {
     var createCall = loadPaths(options, "create");
 
     $.ajax({
@@ -53,28 +56,29 @@ var EditorDefinition = function(element, options, errorCallback){
       data: options,
       success: onSuccess,
       error: onError,
-      dataType: "json" 
+      dataType: "json"
     });
   };
 
-  var loadItem = function(itemId, options){
+  var loadItem = function(itemId, options) {
     var editorPaths = loadPaths(options, "editor");
     options.url = (options.corespringUrl + editorPaths.url).replace(":itemId", itemId);
+
     var instance = new InstanceDef(element, options, errorCallback);
 
-    instance.addListener("launch-error", function(data){
+    instance.addListener("launch-error", function(data) {
       var error = errors.EXTERNAL_ERROR(data.code + ": " + data.detailedMessage);
       errorCallback(error);
     });
   };
 
-  if(!options.itemId){
-    createItem(options, 
-      function(data){
+  if (!options.itemId) {
+    createItem(options,
+      function(data) {
         console.log("item created");
         loadItem(data.itemId, options);
-      }, 
-      function(err){
+      },
+      function(err) {
         console.log(err);
       });
   } else {
@@ -83,7 +87,3 @@ var EditorDefinition = function(element, options, errorCallback){
 };
 
 module.exports = EditorDefinition;
-
-
-
-

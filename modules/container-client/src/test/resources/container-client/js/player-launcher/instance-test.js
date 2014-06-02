@@ -1,15 +1,21 @@
-describe('instance', function () {
+describe('instance', function() {
 
   var InstanceDef, instance, receivedErrors, listeners, mockResult;
   var originalRootLevelListenerDef, originalPostMessage;
 
   var log = {
-    error: function(s){ console.error(s); },
-    debug: function(s){ console.debug(s); },
-    warn: function(s){ console.warn(s); }
+    error: function(s) {
+      console.error(s);
+    },
+    debug: function(s) {
+      console.debug(s);
+    },
+    warn: function(s) {
+      console.warn(s);
+    }
   };
 
-  function onError (err) {
+  function onError(err) {
     receivedErrors.push(err);
   }
 
@@ -17,15 +23,16 @@ describe('instance', function () {
     return receivedErrors.length > 0;
   }
 
-  function mockPostMessage(message, data, element){
+  function mockPostMessage(message, data, element) {
     //log.debug("postMessage <" + message + "> data <" + data + "> listeners.length <" + listeners.length + ">");
 
-    function createResultEvent(){
+    function createResultEvent() {
       return {
-        event:'message',
-        data: $.extend ({
-          message: message + "Result",
-          data: data},
+        event: 'message',
+        data: $.extend({
+            message: message + "Result",
+            data: data
+          },
           mockResult)
       };
     }
@@ -36,35 +43,39 @@ describe('instance', function () {
     }
   }
 
-  function MockRootLevelListenerDef(){
+  function MockRootLevelListenerDef() {
     listeners = [];
 
     return {
-      addListener: function(callback){
+      addListener: function(callback) {
         //log.debug("addListener " + callback);
         listeners.push(callback);
       },
-      removeListener: function(callback){
+      removeListener: function(callback) {
         var index = listeners.indexOf(callback);
-        if( index >= 0){
+        if (index >= 0) {
           listeners.slice(index, 1);
         }
       },
-      clearListeners: function(){
+      clearListeners: function() {
         listeners = [];
       },
-      listenerLength: function(){
+      listenerLength: function() {
         return listeners.length;
       }
     };
   }
 
-  function clearRootLevelListeners(){
+  function clearRootLevelListeners() {
     var listener = corespring.require("root-level-listener")();
     listener.clearListeners();
   }
+  var ID = 'element-id';
 
-  beforeEach(function () {
+  beforeEach(function() {
+
+    var element = $('<div id="' + ID + '"></div>');
+    $('body').append(element);
     originalPostMessage = corespring.require("post-message");
     originalRootLevelListenerDef = corespring.require("root-level-listener");
 
@@ -75,47 +86,79 @@ describe('instance', function () {
     receivedErrors = [];
   });
 
-  afterEach(function(){
+  afterEach(function() {
     corespring.module("post-message", originalPostMessage);
     corespring.module("root-level-listener", originalRootLevelListenerDef);
+    $('body').find('#' + ID).remove();
   });
 
-  it('should have a InstanceDef', function () {
+  it('should have a InstanceDef', function() {
     expect(InstanceDef).toBeTruthy();
   });
 
-  it('should be possible to create an instance', function () {
-    instance = new InstanceDef("element-id", {}, function () { });
+  it('should be possible to create an instance', function() {
+    instance = new InstanceDef('#' + ID, {}, function() {});
     expect(instance).toBeTruthy();
   });
 
-  it('should report an error if options is missing', function () {
-    instance = new InstanceDef("element-id", null, onError);
+  it('should report an error if options is missing', function() {
+    instance = new InstanceDef('#' + ID, null, onError);
     expect(hasError()).toBeTruthy();
   });
 
-  it('should report an error if options.url is missing', function () {
-    instance = new InstanceDef("element-id", {}, onError);
+  it('should report an error if options.url is missing', function() {
+    instance = new InstanceDef('#' + ID, {}, onError);
     expect(hasError()).toBeTruthy();
   });
 
-  it('should report an error if element cannot be found', function () {
-    instance = new InstanceDef("element-id", {url:"http://corespring.org"}, onError);
+  it('should report an error if element cannot be found', function() {
+    instance = new InstanceDef('#bad-' + ID, {
+      url: "http://corespring.org"
+    }, onError);
     expect(hasError()).toBeTruthy();
   });
 
-  it('should have a sendMessage method', function () {
-    instance = new InstanceDef("element-id", {}, onError);
+  it('should have a sendMessage method', function() {
+    instance = new InstanceDef('#' + ID, {}, onError);
     expect(instance.hasOwnProperty('sendMessage')).toBeTruthy();
   });
 
-  it('should be able to send a message', function () {
-    instance = new InstanceDef("element-id", {}, onError);
+  it('should not set the width if forceWidth is false', function() {
+
+    instance = new InstanceDef('#' + ID, {
+      url: "http://corespring.org"
+    });
+    expect($('#' + ID)[0].style.width).toBe('');
+  });
+
+  it('should set the width if forceWidth is true', function() {
+
+    instance = new InstanceDef('#' + ID, {
+      url: "http://corespring.org",
+      forceWidth: true
+    });
+    expect($('#' + ID)[0].style.width).toBe('600px');
+  });
+
+  it('should set the custom width if forceWidth is true', function() {
+
+    instance = new InstanceDef('#' + ID, {
+      url: "http://corespring.org",
+      forceWidth: true,
+      width: '11px'
+    });
+    expect($('#' + ID)[0].style.width).toBe('11px');
+  });
+
+  it('should be able to send a message', function() {
+    instance = new InstanceDef('#' + ID, {}, onError);
     var resultFromCallback = null;
-    var callback = function(result){
+    var callback = function(result) {
       resultFromCallback = result;
     };
-    mockResult = {"isComplete": true};
+    mockResult = {
+      "isComplete": true
+    };
 
     instance.sendMessage({
       message: "isComplete",

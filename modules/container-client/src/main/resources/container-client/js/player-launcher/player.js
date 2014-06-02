@@ -1,13 +1,13 @@
 exports.define = function(isSecure) {
-  var PlayerDefinition = function(element, options, errorCallback){
+  var PlayerDefinition = function(element, options, errorCallback) {
 
     var errors = require("errors");
     var launcherErrors = require("launcher-errors");
     var i;
 
-    if(launcherErrors.hasErrors){
-      for(i = 0; i < launcherErrors.errors.length; i++){
-        errorCallback( errors.EXTERNAL_ERROR(launcherErrors.errors[i]) );
+    if (launcherErrors.hasErrors) {
+      for (i = 0; i < launcherErrors.errors.length; i++) {
+        errorCallback(errors.EXTERNAL_ERROR(launcherErrors.errors[i]));
       }
       return;
     }
@@ -18,11 +18,11 @@ exports.define = function(isSecure) {
 
 
     options = $.extend(defaultOptions, options);
-    
-    var validateOptions = function (options) {
+
+    var validateOptions = function(options) {
       var out = [];
 
-      if(!options.mode){
+      if (!options.mode) {
         out.push(errors.INVALID_MODE);
         return out;
       }
@@ -47,22 +47,25 @@ exports.define = function(isSecure) {
 
     var InstanceDef = require("instance");
 
-    var prepareUrl = function(){
+    var prepareUrl = function() {
       var id = options.mode === "gather" ? options.itemId : options.sessionId;
       var path = options.paths[options.mode];
       return (options.corespringUrl + path).replace(":id", id);
     };
 
     options.url = prepareUrl();
+    options.forceWidth = true;
 
     var instance = new InstanceDef(element, options, errorCallback);
 
-    var isValidMode = function (m) {
-      if (!m) {return false;}
+    var isValidMode = function(m) {
+      if (!m) {
+        return false;
+      }
       return ["gather", "view", "evaluate"].indexOf(m) !== -1;
     };
 
-    var _isComplete = function(callback){
+    var _isComplete = function(callback) {
       instance.sendMessage({
         message: "isComplete",
         property: "isComplete",
@@ -70,12 +73,12 @@ exports.define = function(isSecure) {
       });
     };
 
-    var isAllowed = function(mode, cb){
-      if(isSecure){
-        _isComplete(function(c){
-          if(mode === "evaluate" && !c){
+    var isAllowed = function(mode, cb) {
+      if (isSecure) {
+        _isComplete(function(c) {
+          if (mode === "evaluate" && !c) {
             cb(false);
-          } else if(mode === "gather" && c){
+          } else if (mode === "gather" && c) {
             cb(false);
           } else {
             cb(true);
@@ -86,45 +89,55 @@ exports.define = function(isSecure) {
       }
     };
 
-    errorCallback = errorCallback || function (error) {
+    errorCallback = errorCallback || function(error) {
       throw "error occurred, code: " + error.code + ", message: " + error.message;
     };
 
-    instance.addListener("launch-error", function(data){
+    instance.addListener("launch-error", function(data) {
       var error = errors.EXTERNAL_ERROR(data.code + ": " + data.detailedMessage);
       errorCallback(error);
     });
-   
+
 
     if (options.onSessionCreated) {
-      instance.addListener("sessionCreated", function(data){
+      instance.addListener("sessionCreated", function(data) {
         options.onSessionCreated(data.session._id.$oid);
-      }); 
+      });
     }
 
-    if(options.onInputReceived){
-      instance.addListener("inputReceived", function(data){
+    if (options.onInputReceived) {
+      instance.addListener("inputReceived", function(data) {
         options.onInputReceived(data.sessionStatus);
       });
     }
 
-    var sendSetModeMessage = function(mode){
+    var sendSetModeMessage = function(mode) {
       var modeOptions = options[mode] || {};
-      var saveResponseOptions = mode === "evaluate" ?  {isAttempt: false, isComplete: false} : null;
-      instance.sendMessage( { message: "setMode", data: {mode: mode, options: modeOptions, saveResponses: saveResponseOptions} });
+      var saveResponseOptions = mode === "evaluate" ? {
+        isAttempt: false,
+        isComplete: false
+      } : null;
+      instance.sendMessage({
+        message: "setMode",
+        data: {
+          mode: mode,
+          options: modeOptions,
+          saveResponses: saveResponseOptions
+        }
+      });
     };
 
     /* API methods */
-    this.setMode = function (mode, callback) {
+    this.setMode = function(mode, callback) {
 
-      if(!isReady){
+      if (!isReady) {
         //no callback bc it results in a stack overflow
         return;
       }
 
       if (isValidMode(mode)) {
-        isAllowed(mode, function(allowed){
-          if(allowed){
+        isAllowed(mode, function(allowed) {
+          if (allowed) {
             sendSetModeMessage(mode);
             if (callback) {
               callback(null);
@@ -141,19 +154,28 @@ exports.define = function(isSecure) {
       }
     };
 
-    this.saveResponses = function (isAttempt) {
-      instance.sendMessage({ message: "saveResponses", data: {isAttempt: isAttempt} });
+    this.saveResponses = function(isAttempt) {
+      instance.sendMessage({
+        message: "saveResponses",
+        data: {
+          isAttempt: isAttempt
+        }
+      });
     };
 
-    this.completeResponse = function () {
-      instance.sendMessage( { message: "completeResponse" });
+    this.completeResponse = function() {
+      instance.sendMessage({
+        message: "completeResponse"
+      });
     };
 
-    this.resetItem = function () {
-      instance.sendMessage( { message: "resetItem" });
+    this.resetItem = function() {
+      instance.sendMessage({
+        message: "resetItem"
+      });
     };
 
-    this.countAttempts = function (callback) {
+    this.countAttempts = function(callback) {
       instance.sendMessage({
         message: "countAttempts",
         property: "count",
@@ -161,16 +183,18 @@ exports.define = function(isSecure) {
       });
     };
 
-    this.getScore = function (format, callback) {
+    this.getScore = function(format, callback) {
       instance.sendMessage({
         message: "getScore",
-        data: {format: format || 'percent'},
+        data: {
+          format: format || 'percent'
+        },
         property: "score",
         callback: callback
       });
     };
 
-    this.getSessionStatus = function (callback) {
+    this.getSessionStatus = function(callback) {
       instance.sendMessage({
         message: "getSessionStatus",
         property: "sessionStatus",
@@ -180,13 +204,15 @@ exports.define = function(isSecure) {
 
     this.isComplete = _isComplete;
 
-    this.reset = function(){
-      instance.sendMessage({ message: "reset" });
+    this.reset = function() {
+      instance.sendMessage({
+        message: "reset"
+      });
     };
 
 
-    instance.addListener("ready", function(data){
-      isReady = true; 
+    instance.addListener("ready", function(data) {
+      isReady = true;
       sendSetModeMessage(options.mode);
     });
 
