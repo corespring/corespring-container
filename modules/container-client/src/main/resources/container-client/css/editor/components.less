@@ -40,14 +40,20 @@
       top: 0;
       bottom: 0;
       .title {
+
+        span{
+          color: white;
+          background-color: black;
+          padding: 3px 7px 3px 7px;
+          display: inline-block;
+          .rounded(3px);
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          overflow-x: hidden;
+        }
         overflow: hidden;
         width: 100%;
         text-align: center;
-        color: black;
-        text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5);
-        white-space: nowrap;
-        text-overflow: ellipsis;
-        overflow-x: hidden;
         .user-select(none);
       }
     }
