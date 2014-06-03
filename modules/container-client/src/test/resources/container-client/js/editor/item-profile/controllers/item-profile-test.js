@@ -1,6 +1,6 @@
 describe('item-profile controller', function() {
 
-  var rootScope, ctrl;
+  var scope, rootScope, ctrl;
 
   function mockModal() {}
 
@@ -20,7 +20,8 @@ describe('item-profile controller', function() {
   }
 
   function mockItemService() {
-    var profile = {};
+    var profile = {
+    };
     this.load = function(id, onSuccess) {
       onSuccess({
         profile: profile
@@ -78,6 +79,12 @@ describe('item-profile controller', function() {
     expect(ctrl).toNotBe(null);
   });
 
+  it("should listen to itemLoaded events", function(){
+    var item = {profile:{}};
+    scope.$broadcast("itemLoaded", item);
+    expect(scope.item).toEqual(item);
+  });
+
   it('should handle subject queries', function() {
 
     var queryResult;
@@ -128,5 +135,57 @@ describe('item-profile controller', function() {
       subject: 'blah'
     });
   });
+
+  describe("additional copyrights", function(){
+    var item = {profile:{contributorDetails:{additionalCopyrights:[]}}};
+
+    beforeEach(function(){
+      scope.$broadcast("itemLoaded", item);
+    });
+
+    it("should init with empty list", function(){
+      expect(scope.contributorDetails.additionalCopyrights).toEqual([]);
+    });
+
+    it("should add item to list", function(){
+      scope.addCopyrightItem();
+      expect(scope.contributorDetails.additionalCopyrights).toEqual([{}]);
+    });
+
+    it("should remove item from list", function(){
+      scope.addCopyrightItem();
+      scope.addCopyrightItem();
+      var copyrightItem1 = scope.contributorDetails.additionalCopyrights[0];
+      var copyrightItem2 = scope.contributorDetails.additionalCopyrights[1];
+      scope.removeCopyrightItem(copyrightItem1);
+      expect(scope.contributorDetails.additionalCopyrights[0]).toBe(copyrightItem2);
+    });
+
+    it("should clear list", function(){
+      scope.addCopyrightItem();
+      scope.addCopyrightItem();
+      scope.clearCopyrightItems();
+      expect(scope.contributorDetails.additionalCopyrights).toEqual([]);
+    });
+
+    it("should add item when needAdditionalCopyrightInformation is set to 'yes'", function(){
+      scope.needAdditionalCopyrightInformation = '';
+      scope.$apply();
+      scope.needAdditionalCopyrightInformation = 'yes';
+      scope.$apply();
+      expect(scope.contributorDetails.additionalCopyrights).toEqual([{}]);
+    });
+
+    it("should clear list when needAdditionalCopyrightInformation is set to empty string", function(){
+      scope.needAdditionalCopyrightInformation = 'yes';
+      scope.$apply();
+      scope.addCopyrightItem();
+      scope.addCopyrightItem();
+      scope.needAdditionalCopyrightInformation = '';
+      scope.$apply();
+      expect(scope.contributorDetails.additionalCopyrights).toEqual([]);
+    });
+  });
+
 
 });

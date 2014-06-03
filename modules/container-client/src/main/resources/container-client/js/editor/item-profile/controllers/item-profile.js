@@ -21,7 +21,6 @@
     DesignerService,
     ProfileFormatter) {
 
-    var isFormActive = false;
     var log = $log.debug.bind($log, 'ItemProfileController] -');
 
     //----------------------------------------------------------------
@@ -353,36 +352,42 @@
     };
 
     $scope.addCopyrightItem = function() {
-      $scope.contributorDetails.copyright.additional.push({});
+      $scope.contributorDetails.additionalCopyrights.push({});
     };
 
     $scope.removeCopyrightItem = function(item) {
-      var index = $scope.contributorDetails.copyright.additional.indexOf(item);
+      var index = $scope.contributorDetails.additionalCopyrights.indexOf(item);
       if (index >= 0) {
-        $scope.contributorDetails.copyright.additional.splice(index, 1);
-        if ($scope.contributorDetails.copyright.additional.length === 0) {
+        $scope.contributorDetails.additionalCopyrights.splice(index, 1);
+        if ($scope.contributorDetails.additionalCopyrights.length === 0) {
           $scope.needAdditionalCopyrightInformation = '';
         }
       }
     };
 
     $scope.clearCopyrightItems = function() {
-      $scope.contributorDetails.copyright.additional.splice(0);
+      $scope.contributorDetails.additionalCopyrights.splice(0);
+    };
+
+    $scope.hasCopyrightItems = function() {
+      return $scope.contributorDetails &&
+        $scope.contributorDetails.additionalCopyrights &&
+        $scope.contributorDetails.additionalCopyrights.length > 0;
     };
 
     $scope.needAdditionalCopyrightInformation = '';
 
     $scope.$watch("needAdditionalCopyrightInformation", function(newValue, oldValue) {
-      if (isFormActive) {
         if (newValue === oldValue) {
           return;
         }
         if (newValue === 'yes') {
-          $scope.addCopyrightItem();
+          if (!$scope.hasCopyrightItems()) {
+            $scope.addCopyrightItem();
+          }
         } else {
           $scope.clearCopyrightItems(); //TODO Add "are you sure" modal?
         }
-      }
     });
 
     $scope.$on('save-data', function() {
@@ -446,8 +451,8 @@
         profile.contributorDetails.copyright.year = new Date().getFullYear();
       }
 
-      if (!_.isArray(profile.contributorDetails.copyright.additional)) {
-        profile.contributorDetails.copyright.additional = [];
+      if (!_.isArray(profile.contributorDetails.additionalCopyrights)) {
+        profile.contributorDetails.additionalCopyrights = [];
       }
 
       removeEmptyAdditionalCopyrightItems();
@@ -461,7 +466,7 @@
         });
       }
 
-      var items = $scope.item.profile.contributorDetails.copyright.additional;
+      var items = $scope.item.profile.contributorDetails.additionalCopyrights;
       if (_.isArray(items)) {
         for (var i = items.length - 1; i >= 0; i--) {
           if (itemIsEmpty(items[i])) {
@@ -472,8 +477,6 @@
     }
 
     function onLoadItemSuccess() {
-      isFormActive = false;
-
       initSubObjects();
 
       var profile = $scope.item.profile;
@@ -488,15 +491,12 @@
 
       applyComponentTypes();
 
-      $scope.needAdditionalCopyrightInformation =
-        $scope.contributorDetails.copyright.additional.length > 0 ? 'yes' : '';
+      $scope.needAdditionalCopyrightInformation = $scope.hasCopyrightItems() ? 'yes' : '';
 
       initReviewsPassedDataProvider();
       updateReviewsPassedOtherSelected();
       updatePriorUseOtherSelected();
       updateCredentialsOtherSelected();
-
-      isFormActive = true;
     }
 
     $scope.$on('itemLoaded', function(ev, item) {
