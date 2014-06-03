@@ -74,7 +74,7 @@
                    checkbox("highlightCorrectResponse", "Highlight correct outcome"),
                    checkbox("allowEmptyResponses", "Allow empty responses"),
                 '</ul>',
-                '<a class="btn btn-success btn-small btn-sm dismiss-popover">Done</a>'
+                '<a class="btn btn-success btn-small btn-sm" onclick=\"$(&quot;.action.config&quot;).popover(&quot;hide&quot;);\">Done</a>'
               ].join('\n');
             }
           });
