@@ -7,6 +7,7 @@ This will allow integration points into the main corespring-api project.
 ## Requirements 
 
 These tools should be on your `PATH`:
+
 [Sbt](http://www.scala-sbt.org/0.13.5/docs/Getting-Started/Setup.html)
 
 [Play 2.2.1](http://www.playframework.com/)
