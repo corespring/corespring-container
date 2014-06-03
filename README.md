@@ -16,6 +16,7 @@ These tools should be on your `PATH`:
 
 [Bower](http://bower.io/) `npm install -g bower`
 
+
 ## Installing
 
     git clone --recursive git@github.com:corespring/corespring-container.git
@@ -29,6 +30,17 @@ submodule. If it doesn't you'll need to add this repo.
     git submodule update
 
 ## Run
+
+### Credentials file
+
+To successfully run sbt/play, you'll need to install the ivy credentials file that will grant you access to repository.corespring.org.
+
+It should be placed here: 
+
+    ~/.ivy2/.credentials
+    
+Ask one of the others to supply you with it.
+
 
 ### ENV VARS
 
