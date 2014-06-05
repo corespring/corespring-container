@@ -34,14 +34,14 @@ class DependencyResolverTest extends Specification with ComponentMaker {
       out.length === 3
     }
 
-    "topsort works" in new withResolver(
-      lib("1", Seq(libId("2"))),
-      lib("2", Seq(libId("3"))),
-      lib("3")) {
+    "topsort works" in new withResolver() {
 
-      resolver.topSort(Seq(libId("1"), libId("2"), libId("3"))) ===
-        Seq(libId("3"), libId("2"), libId("1"))
+      val libs = Seq(
+        lib("1", Seq(libId("2"))),
+        lib("2", Seq(libId("3"))),
+        lib("3"))
 
+      resolver.topSort(libs) === libs.reverse
     }
 
     "work with layout components" in new withResolver(

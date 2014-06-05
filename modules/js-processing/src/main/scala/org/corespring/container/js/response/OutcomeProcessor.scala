@@ -1,6 +1,6 @@
 package org.corespring.container.js.response
 
-import org.corespring.container.components.model.{ UiComponent, Library }
+import org.corespring.container.components.model.{ LibraryUtils, UiComponent, Library }
 import org.corespring.container.components.response.{ OutcomeProcessor => ContainerOutcomeProcessor }
 import org.slf4j.LoggerFactory
 import play.api.libs.json.{ Json, JsObject, JsValue }
@@ -8,13 +8,15 @@ import org.corespring.container.js.api.GetServerLogic
 
 trait Target {
   def targetId(question: JsValue) = (question \ "target" \ "id").asOpt[String]
+
   def hasTarget(question: JsValue) = targetId(question).isDefined
 }
 
 trait OutcomeProcessor
   extends ContainerOutcomeProcessor
   with Target
-  with GetServerLogic {
+  with GetServerLogic
+  with LibraryUtils {
 
   def components: Seq[UiComponent]
 
@@ -39,7 +41,10 @@ trait OutcomeProcessor
           answer.map {
             a =>
               val componentLibraries: Seq[Library] = component.libraries.map(id => libraries.find(l => l.id.matches(id))).flatten
-              val serverComponent = serverLogic(component.componentType, component.server.definition, componentLibraries)
+              println("component libraries: " + componentLibraries)
+              val sorted = topSort(componentLibraries)
+              logger.trace(s"sorted $sorted")
+              val serverComponent = serverLogic(component.componentType, component.server.definition, sorted)
               val outcome = serverComponent.createOutcome(question, a, settings, targetOutcome)
               logger.trace(s"outcome: $outcome")
               (id -> outcome)

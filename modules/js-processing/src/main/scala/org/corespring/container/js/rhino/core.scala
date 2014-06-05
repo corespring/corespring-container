@@ -82,7 +82,13 @@ trait JsContext extends JsLogging {
 
       libs.foreach(addToContext)
 
-      def addSrcToContext(name: String, src: String) = ctx.evaluateString(scope, src, name, 1, null)
+      println("------->")
+      println(srcs)
+      def addSrcToContext(name: String, src: String) = {
+        println(s"add  $name to context")
+        logger.trace(s"add  $name to context")
+        ctx.evaluateString(scope, src, name, 1, null)
+      }
       srcs.foreach(tuple => addSrcToContext(tuple._1, tuple._2))
 
       def addToScope(name: String)(thing: Any) = ScriptableObject.putProperty(scope, name, thing)

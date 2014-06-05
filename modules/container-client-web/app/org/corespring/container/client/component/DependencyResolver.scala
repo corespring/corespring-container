@@ -1,11 +1,17 @@
 package org.corespring.container.client.component
 
 import org.corespring.container.components.model._
-import com.ahum.TopologicalSorter
+import com.ahum.deps.{ DependencyLister, Branch, Leaf, Node }
 
-trait DependencyResolver extends ComponentSplitter {
+trait DependencyResolver extends ComponentSplitter with LibraryUtils {
 
-  /** returns a list of all components used including libraries */
+  /**
+   * Returns a list of all components used including libraries.
+   * UIComponents can depend on Libraries
+   * Libraries can depend on other Libraries
+   *
+   * The libraries are topologically sorted so that dependencies load correctly.
+   */
   def resolveComponents(types: Seq[Id], scope: String): Seq[Component] = {
 
     def withinScope(id: LibraryId) = id.scope.map(_ == scope).getOrElse(true)
@@ -15,23 +21,27 @@ trait DependencyResolver extends ComponentSplitter {
     val uiLibraryIds = uiComps.map(_.libraries).flatten
     val libLibraryIds = libraries.map(_.libraries).flatten
     val libraryIds = (uiLibraryIds ++ libLibraryIds).distinct.filter(withinScope)
-    val topSortedLibraryIds = topSort(libraryIds)
-    //do a topological sort on the library ids so that dependencies are loaded
-    //in the correct order
-    //1 -> Seq(2,3)
-    val libs = libraries.filter(l => topSortedLibraryIds.exists(l.id.matches(_)))
+    val libs = libraries.filter(l => libraryIds.exists(l.id.matches(_)))
+    val topSortedLibs = topSort(libs)
     val layoutComps = layoutComponents.filter(compMatchesTag)
-    (libs ++ uiComps ++ layoutComps).distinct
+    (topSortedLibs ++ uiComps ++ layoutComps).distinct
   }
 
-  type OrgName = (String, String)
+  def getLibById(id: Id): Option[Library] = libraries.find(_.id.matches(id))
 
-  def topSort(ids: Seq[LibraryId]): Seq[LibraryId] = {
-    val libs: Seq[Library] = ids.map(id => libraries.find(_.id.matches(id))).flatten
-    def toNode(l: Library): (OrgName, Seq[OrgName]) = ((l.id.org, l.id.name) -> l.libraries.map(i => (i.org, i.name)))
-    val libNodes: Seq[(OrgName, Seq[OrgName])] = libs.map(toNode)
-    val topsorted: Seq[(OrgName, Seq[OrgName])] = TopologicalSorter.sort(libNodes: _*)
-    def orgNameToLibraryId(on: OrgName): Option[LibraryId] = ids.find(i => i.org == on._1 && i.name == on._2)
-    topsorted.map(_._1).map(orgNameToLibraryId).flatten
+  def resolveDependencyIds(uiComp: UiComponent, scope: Option[String] = None): Seq[Id] = {
+
+    def toNode(id: Id): Node[Id] = {
+      getLibById(id).map { l =>
+        l.libraries match {
+          case Nil => Leaf(id)
+          case head :: rest => Branch(id, (head +: rest).foldRight[Seq[Node[Id]]](Seq()) { (id, acc) => acc :+ toNode(id) })
+        }
+      }.getOrElse(Leaf(id))
+    }
+
+    val root = Branch(uiComp.id, uiComp.libraries.map(toNode))
+    DependencyLister.list(root)
   }
+
 }

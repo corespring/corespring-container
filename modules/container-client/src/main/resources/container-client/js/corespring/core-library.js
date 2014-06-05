@@ -21,12 +21,16 @@
       if(modules[uid]){
         return modules[uid].exports;
       } else {
-        throw new Error("can't find library : " + uid);
+        var names = "";
+        for(var i in modules){
+            names += i + ", ";
+        }
+        throw new Error("can't find library : " + uid + " in modules: " + names);
       }
     };
 
     this.module = function(uid, obj){
-      
+      //console.log("module -> " + uid + ": " + obj);
       if(!uid){
         throw new Error("you must specify a uid");
       }
