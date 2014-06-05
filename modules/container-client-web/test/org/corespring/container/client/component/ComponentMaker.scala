@@ -5,17 +5,19 @@ import play.api.libs.json.Json
 
 trait ComponentMaker {
 
-  def uiComp(org: String, name: String, libs: Seq[LibraryId], title: Option[String] = None, titleGroup: Option[String] = None) = {
+  private lazy val defaultOrg = "org"
+
+  def uiComp(name: String, libs: Seq[LibraryId], title: Option[String] = None, titleGroup: Option[String] = None, org: String = defaultOrg) = {
     UiComponent(org, name, title, titleGroup, Client("", "", None), Server(""), Json.obj("name" -> name, "org" -> org), Json.obj(), None, Map(), libs)
   }
 
-  def lib(org: String, name: String): Library = {
-    Library(org, name, Json.obj("name" -> name), Seq.empty, Seq.empty, None)
+  def lib(name: String, libraries: Seq[LibraryId] = Seq.empty, org: String = defaultOrg): Library = {
+    Library(org, name, Json.obj("name" -> name), Seq.empty, Seq.empty, None, libraries)
   }
 
-  def libId(org: String, name: String, scope: Option[String] = None) = LibraryId(org, name, scope)
+  def libId(name: String, scope: Option[String] = None, org: String = defaultOrg) = LibraryId(org, name, scope)
 
-  def layout(org: String, name: String) = LayoutComponent(org, name, Seq.empty, None, Json.obj("name" -> name, "org" -> org))
+  def layout(name: String, org: String = defaultOrg) = LayoutComponent(org, name, Seq.empty, None, Json.obj("name" -> name, "org" -> org))
 
-  def id(org: String, name: String) = new Id(org, name)
+  def id(name: String, org: String = defaultOrg) = new Id(org, name)
 }

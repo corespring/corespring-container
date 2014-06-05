@@ -5,10 +5,12 @@ import org.corespring.container.components.loader.exceptions.ComponentLoaderExce
 import org.corespring.container.components.model._
 import org.corespring.container.utils.string.hyphenatedToTitleCase
 import org.slf4j.LoggerFactory
-import play.api.libs.json.{ JsObject, Json, JsValue }
+import play.api.libs.json.{ Json, JsValue }
 import scala.Some
 
-class FileComponentLoader(paths: Seq[String]) extends ComponentLoader {
+class FileComponentLoader(paths: Seq[String])
+  extends ComponentLoader
+  with PackageJsonReading {
 
   private val logger = LoggerFactory.getLogger("components.loader")
 
@@ -91,7 +93,8 @@ class FileComponentLoader(paths: Seq[String]) extends ComponentLoader {
         packageJson,
         loadLibrarySources(compRoot.getPath, "client", createClientName(compRoot.getName)),
         loadLibrarySources(compRoot.getPath, "server", createServerName),
-        readMaybeFile(new File(compRoot.getPath + "/src/client/styles.css"))))
+        readMaybeFile(new File(compRoot.getPath + "/src/client/styles.css")),
+        loadLibraries(packageJson)))
   }
 
   private def loadLayout(org: String, packageJson: JsValue)(compRoot: File): Option[Component] = {
@@ -114,27 +117,12 @@ class FileComponentLoader(paths: Seq[String]) extends ComponentLoader {
     val sampleDataFolder = new File(compRoot.getPath + "/sample-data")
     val regressionDataFolder = new File(compRoot.getPath + "/regression-data")
 
-    def loadLibraries: Seq[LibraryId] = {
-      (packageJson \ "libraries").asOpt[Seq[JsObject]].map {
-        seq =>
-          seq.map {
-            o =>
-              val organization = (o \ "organization").asOpt[String]
-              val name = (o \ "name").asOpt[String]
-              val scope = (o \ "scope").asOpt[String]
-              assert(organization.isDefined)
-              assert(name.isDefined)
-              LibraryId(organization.get, name.get, scope)
-          }
-      }.getOrElse(Seq.empty)
-    }
-
     val inProdMode = play.api.Play.maybeApplication match {
       case Some(app) => play.api.Play.isProd(app)
       case _ => false
     }
     val released = (packageJson \ "released").asOpt[Boolean].getOrElse(false)
-    val process = if(inProdMode) released else true
+    val process = if (inProdMode) released else true
 
     if (process) {
       Some(
@@ -149,7 +137,7 @@ class FileComponentLoader(paths: Seq[String]) extends ComponentLoader {
           loadDefaultData(defaultDataJson),
           loadIcon(icon),
           loadSampleData(sampleDataFolder) ++ loadSampleData(regressionDataFolder, Some("regression_")),
-          loadLibraries))
+          loadLibraries(packageJson)))
     } else {
       None
     }

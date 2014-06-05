@@ -20,12 +20,12 @@ class ItemTypeReaderTest extends Specification with ComponentMaker {
     }
 
     "work with comps" in new withReader(
-      uiComp("org", "ui-1", Seq.empty)) {
+      uiComp("ui-1", Seq.empty)) {
       reader.componentTypes("", item) === Seq("org-ui-1")
     }
 
     "work with comps declared in layout" in new withReader(
-      layout("org", "layout-1")) {
+      layout("layout-1")) {
       reader.componentTypes("", item) === Seq("org-layout-1")
     }
   }

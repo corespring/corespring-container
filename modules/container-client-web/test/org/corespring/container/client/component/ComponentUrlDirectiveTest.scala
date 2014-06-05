@@ -4,7 +4,7 @@ import org.specs2.mutable.Specification
 
 class ComponentUrlDirectiveTest extends Specification with ComponentMaker {
 
-  val comps = Seq(uiComp("org", "1", Seq.empty), uiComp("org", "2", Seq.empty), uiComp("org-2", "3", Seq.empty))
+  val comps = Seq(uiComp("1", Seq.empty), uiComp("2", Seq.empty), uiComp("3", Seq.empty, org = "org-2"))
 
   def applyAndUnapply(d: String, names: Seq[String]) = {
     ComponentUrlDirective(d, comps) === names and ComponentUrlDirective.unapply(names, comps) === Some(d)
