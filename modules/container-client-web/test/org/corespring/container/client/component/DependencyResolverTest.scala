@@ -27,9 +27,21 @@ class DependencyResolverTest extends Specification with ComponentMaker {
     "comp -> lib-1 -> lib-2" in new withResolver(
       uiComp("ui-comp-1", Seq(libId("lib-1"))),
       lib("lib-1", Seq(libId("lib-2"))),
-      lib("lib-2")) {
+      lib("lib-2"),
+      lib("lib-3"),
+      lib("lib-4")) {
       val out = resolver.resolveComponents(Seq(id("ui-comp-1")), "player")
       out.length === 3
+    }
+
+    "topsort works" in new withResolver(
+      lib("1", Seq(libId("2"))),
+      lib("2", Seq(libId("3"))),
+      lib("3")) {
+
+      resolver.topSort(Seq(libId("1"), libId("2"), libId("3"))) ===
+        Seq(libId("3"), libId("2"), libId("1"))
+
     }
 
     "work with layout components" in new withResolver(
