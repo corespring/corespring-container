@@ -23,7 +23,7 @@
     "console-polyfill": "~0.1.0",
     "less-elements": "https://github.com/dmitryf/elements.git",
     "mathjs": "~0.18.0",
-    "wiggi-wiz": "https://github.com/corespring/wiggi-wiz.git#replacing-elements",
+    "wiggi-wiz": "https://github.com/corespring/wiggi-wiz.git#master",
     "es5-shim": "~2.3.0",
     "font-awesome": "~4.0.3",
     "mathjax": "https://github.com/mathjax/MathJax.git",
@@ -62,7 +62,6 @@
     ]
   },
   "resolutions": {
-    "angular": "~1.2.12",
     "bootstrap": "~3.1.1",
     "jquery": "1.11.0"
   }
