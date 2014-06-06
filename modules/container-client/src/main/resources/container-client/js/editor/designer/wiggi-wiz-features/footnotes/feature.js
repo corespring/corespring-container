@@ -7,8 +7,9 @@ angular.module('corespring.wiggi-wiz-features.footnotes').factory('WiggiFootnote
     function FeatureDef() {
       this.name = 'footnotes';
       this.attributeName = 'footnotes';
+      this.title = "Footnote";
       this.draggable = true;
-      this.iconclass = 'fa fa-flash'; //TODO find better icon, a foot maybe? ;)
+      //this.iconclass = 'fa fa-flash'; //TODO find better icon, a foot maybe? ;)
       this.addToEditor = '<div footnotes-holder></div>';
       this.compile = true;
 

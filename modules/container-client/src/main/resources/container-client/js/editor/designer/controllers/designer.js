@@ -161,7 +161,11 @@
         }, {
           type: 'group',
           buttons: [
-            new WiggiMathJaxFeatureDef(),
+            new WiggiMathJaxFeatureDef()
+          ]
+        }, {
+          type: 'group',
+          buttons: [
             new WiggiFootnotesFeatureDef()
           ]
         }]
