@@ -97,15 +97,7 @@
       $scope.componentSet = componentSet;
 
       function addToEditor(editor, addContent, component) {
-        var max = 0;
-        $('<div>' + $scope.data.item.xhtml + '</div>').find('[id]').each(function(idx, element) {
-          var id = Number($(element).attr('id'));
-          if (id > max) {
-            max = id;
-          }
-        });
-
-        var id = max + 1;
+        $scope.lastId++;
 
         var defaults = {
           weight: 1
@@ -113,11 +105,11 @@
 
         var newData = _.extend(defaults, _.cloneDeep(component.defaultData));
 
-        $scope.data.item.components[id] = newData;
+        $scope.data.item.components[$scope.lastId] = newData;
 
         addContent($([
           '<placeholder',
-          ' id="' + id + '"',
+          ' id="' + $scope.lastId + '"',
           ' component-type="' + component.componentType + '"',
           ' label="' + component.name + '"',
           '>'
@@ -126,7 +118,6 @@
 
       function deleteComponent(id) {
         if ($scope.data.item && $scope.data.item.components) {
-          delete $scope.data.item.components[id];
           ComponentRegister.deleteComponent(id);
         } else {
           throw 'Can\'t delete component with id ' + id;
@@ -208,8 +199,13 @@
     });
 
     $scope.save = function(callback) {
-      log('Saving...');
+      log('Saving...', $scope.data.item);
       var cleaned = $scope.serialize($scope.data.item.components);
+      for (var key in cleaned) {
+        if (!ComponentRegister.hasComponent(key)) {
+          delete cleaned[key];
+        }
+      }
       ItemService.save({
           components: cleaned,
           xhtml: $scope.data.item.xhtml,
@@ -289,6 +285,16 @@
       if (item) {
         preprocessComponents(item);
         updateSummaryFeedback(item);
+        var max = 0;
+        $('<div>' + $scope.data.item.xhtml + '</div>').find('[id]').each(function(idx, element) {
+          var id = Number($(element).attr('id'));
+          if (id > max) {
+            max = id;
+          }
+        });
+        $scope.lastId = max;
+
+
       }
     });
 
