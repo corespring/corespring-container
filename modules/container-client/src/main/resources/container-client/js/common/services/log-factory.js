@@ -9,14 +9,22 @@ angular.module('corespring-common.services').service('LogFactory', [
        * @param id
        */
       this.getLogger = function(id){
+        var logger = {id: id};
         var prefix = "[" + id + "] - ";
-        var logger = {
-          log: $log.log.bind($log, prefix),
-          info: $log.info.bind($log, prefix),
-          warn: $log.warn.bind($log, prefix),
-          error: $log.error.bind($log, prefix),
-          debug: $log.debug.bind($log, prefix)
-        };
+        var sourceObj = console ? console : $log;
+
+        function bindIfPropertyExists(name){
+          name = _.isFunction(sourceObj[name]) ? name : 'debug';
+          logger[name] = sourceObj[name].bind(sourceObj, prefix);
+        }
+
+        bindIfPropertyExists('log');
+        bindIfPropertyExists('info');
+        bindIfPropertyExists('warn');
+        bindIfPropertyExists('error');
+        bindIfPropertyExists('fail');
+        bindIfPropertyExists('debug');
+
         return logger;
       };
     }
