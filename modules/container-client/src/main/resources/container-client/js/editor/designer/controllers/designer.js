@@ -195,6 +195,9 @@
     $scope.$on('registerConfigPanel', function(a, id, component) {
       configPanels[id] = component;
       component.setModel($scope.data.item.components[id]);
+      if (_.isFunction(component.setProfile)) {
+        component.setProfile($scope.data.item.profile);
+      }
     });
 
     $scope.$on('save-data', function(event) {

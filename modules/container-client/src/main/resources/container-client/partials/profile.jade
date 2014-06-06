@@ -184,74 +184,8 @@ form
   .additional-copyright-information
     h3 Additional Copyright Information
 
-    fieldset
-      p Does this item contain any other copyrighted materials? E.g. book passage, image, etc.
-
-      .control-group(style="padding-left: 5px;")
-        .controls
-          label
-            input(type='radio', ng-model='needAdditionalCopyrightInformation', value='yes', style='margin-right: 5px;')
-            | Yes
-
-          label
-            input(type='radio', ng-model='needAdditionalCopyrightInformation', value='', style='margin-right: 5px; margin-left: 20px;')
-            | No
-
-      .item(ng-repeat='item in contributorDetails.additionalCopyrights')
-        p Please complete the following:
-        table
-          tr
-            td.label-col
-              label.control-label(for="ac-author") Author
-            td
-              input#ac-author.form-control(
-              ng-model='item.author',
-              placeholder="Enter author's name...",)
-          tr
-            td.label-col
-              label.control-label(for="ac-owner") Copyright Owner
-            td
-              input#ac-owner.form-control(
-              ng-model='item.owner',
-              placeholder="Enter the copyright owner...",)
-          tr
-            td.label-col
-              label.control-label(for="ac-year") Copyright Year
-            td
-              select#ac-year(ng-model='item.year', ng-options='c for c in copyrightYearDataProvider', style="width:170px;")
-          tr
-            td.label-col
-              label.control-label(for="ac-license") License
-            td
-              table.license
-                tr
-                  td
-                    select#ac-license(ng-model='item.licenseType', ng-options='c.key as c.value for c in licenseTypeDataProvider')
-                  td
-                    span(ng-show='!item.licenseType', style='color: #888; font-style: italic;') Not Assigned
-                    img(ng-show='item.licenseType', ng-src="{{getLicenseTypeUrl(item.licenseType)}}")
-                  td
-                    a(href="http://creativecommons.org/licenses/", target="_blank") Learn more
-          tr
-            td.label-col
-              label.control-label(for="ac-media-type") Media Type
-            td
-              select#ac-media-type(ng-model='item.mediaType', ng-options='c.key as c.value for c in mediaTypeDataProvider')
-
-          tr
-            td.label-col
-              label.control-label(for="ac-source-url") Website
-            td
-              input#ac-source-url.form-control(
-              ng-model='item.sourceUrl',
-              placeholder="Enter the URL...",)
-
-        div(style="padding-top: 5px; margin-left: 350px")
-          a(ng-click='removeCopyrightItem(item)') Remove additional copyright
-
-      a.add-additional(ng-click='addCopyrightItem()', ng-show='needAdditionalCopyrightInformation')
-        i(class="fa fa-plus-square-o", style="margin-left: 6px; margin-right: 6px;")
-        span Add more
+    additional-copyright-information(copyrights="contributorDetails.additionalCopyrights",
+      prompt="Does this item contain any other copyrighted materials? E.g. book passage, image, etc.")
 
   .prior-use
     h4 Prior Use
