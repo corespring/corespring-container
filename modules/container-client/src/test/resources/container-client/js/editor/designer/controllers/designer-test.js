@@ -42,6 +42,18 @@ describe('designer controller', function() {
     
   }
 
+  function mockLogFactory(){
+      this.getLogger = function(id){
+        return {
+          log: function(){},
+          debug: function(){},
+          warn: function(){},
+          error: function(){},
+          info: function(){}
+        };
+      };
+  }
+
   beforeEach(angular.mock.module('corespring-editor.controllers'));
 
   beforeEach(function() {
@@ -55,6 +67,7 @@ describe('designer controller', function() {
       $provide.value('ComponentToWiggiwizFeatureAdapter', new mockFeatureAdapter());
       $provide.value('ComponentRegister', new mockComponentRegister());
       $provide.value('ImageFeature', new mockImageFeature());
+      $provide.value('LogFactory', new mockLogFactory());
     });
   });
 

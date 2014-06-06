@@ -1,0 +1,53 @@
+
+.footnotes-holder {
+  display: block;
+  .user-select(none);
+  padding: 0;
+  transition: background-color 200ms;
+  border-radius: 4px;
+  background-color: lighten(@grey-purple, 50%);
+
+  &:hover {
+    background-color: #ffffff;
+  }
+
+  .blocker {
+    .bg {
+      border-radius: 4px;
+    }
+  }
+}
+
+.footnotes-display {
+    border-top: 1px #999 solid;
+    padding: 5px 0 0 0;
+    margin: 10px 0 0 0;
+    font-size: 11px;
+    display: inline-block;
+}
+
+.footnotes-dialog-root {
+
+  .abs-full();
+  display: flex;
+  flex-direction: column;
+  padding: 5px;
+
+  .fn-header {
+    padding: 8px;
+    background-color: @light-grey;
+    border-bottom: solid 1px darken(@light-grey, 15%);
+  }
+
+  .fn-textarea {
+    flex: 1;
+    border: 0 solid #cecaca;
+    background-color: #ffffff;
+    padding: 10px;
+    //font-family: monospace;
+    overflow: auto;
+    outline: none;
+    resize: none;
+  }
+
+}
