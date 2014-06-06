@@ -2,11 +2,8 @@
 
   angular.module('corespring-editor.controllers')
     .controller('Designer', [
-      '$compile',
       '$element',
       '$http',
-      '$log',
-      '$modal',
       '$scope',
       '$stateParams',
       'ComponentRegister',
@@ -15,7 +12,9 @@
       'ImageFeature',
       'ImageUtils',
       'ItemService',
+      'LogFactory',
       'MathJaxService',
+      'WiggiFootnotesFeatureDef',
       'WiggiMathJaxFeatureDef',
       'WiggiWizHelper',
       DesignerController
@@ -23,11 +22,8 @@
 
   /* global AddContentModalController, com */
   function DesignerController(
-    $compile,
     $element,
     $http,
-    $log,
-    $modal,
     $scope,
     $stateParams,
     ComponentRegister,
@@ -36,15 +32,17 @@
     ImageFeature,
     ImageUtils,
     ItemService,
+    LogFactory,
     MathJaxService,
+    WiggiFootnotesFeatureDef,
     WiggiMathJaxFeatureDef,
     WiggiWizHelper ) {
 
     var configPanels = {};
 
-    var log = $log.debug.bind($log, '[designer] - ');
+    var $log = LogFactory.getLogger('designer');
 
-    log($stateParams);
+    $log.log($stateParams);
 
     $scope.section = $stateParams.section;
 
@@ -65,15 +63,15 @@
 
         var opts = {
           onUploadComplete: function(body, status) {
-            log('done: ', body, status);
+            $log.log('onUploadComplete: ', body, status);
             onComplete(null, url);
           },
           onUploadProgress: function() {
-            log('progress', arguments);
+            $log.log('onUploadProgress', arguments);
             onProgress(null, 'started');
           },
           onUploadFailed: function() {
-            log('failed', arguments);
+            $log.log('onUploadFailed', arguments);
             onComplete({
               code: 'UPLOAD_FAILED',
               message: 'upload failed!'
@@ -163,7 +161,8 @@
         }, {
           type: 'group',
           buttons: [
-            new WiggiMathJaxFeatureDef()
+            new WiggiMathJaxFeatureDef(),
+            new WiggiFootnotesFeatureDef()
           ]
         }]
       };
@@ -174,14 +173,14 @@
     }
 
     $scope.getUploadUrl = function(file) {
-      log(arguments);
+      $log.log('getUploadUrl',arguments);
       return file.name;
     };
 
     $scope.selectFile = function(file) {
-      log("root select file...");
+      $log.log('selectFile', 'root select file...');
       $scope.selectedFile = file;
-      log($scope.selectedFile);
+      $log.log('selectFile', $scope.selectedFile);
     };
 
     $scope.$on('fileSizeGreaterThanMax', function(event) {
@@ -199,7 +198,7 @@
     });
 
     $scope.save = function(callback) {
-      log('Saving...', $scope.data.item);
+      $log.log('Saving...');
       var cleaned = $scope.serialize($scope.data.item.components);
       for (var key in cleaned) {
         if (!ComponentRegister.hasComponent(key)) {
