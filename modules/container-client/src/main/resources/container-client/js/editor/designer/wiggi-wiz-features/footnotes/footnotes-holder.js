@@ -18,7 +18,7 @@ angular.module('corespring.wiggi-wiz-features.footnotes').directive('footnotesHo
       '      <i ng-click="deleteNode()" class="fa fa-times-circle"></i>',
       '    </div>',
       '  </div>',
-      '  <div class="footnotes-display"></div>',
+      '  <div footnotes></div>',
       '</div>'
     ].join('\n');
 
@@ -47,7 +47,7 @@ angular.module('corespring.wiggi-wiz-features.footnotes').directive('footnotesHo
 
       function setFootnotes(text){
         $log.debug('setFootnotes', text);
-        $element.find('.footnotes-display').html(text);
+        $element.find('div[footnotes]').html(text);
       }
 
     }

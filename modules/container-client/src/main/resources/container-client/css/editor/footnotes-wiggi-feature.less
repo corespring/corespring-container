@@ -5,7 +5,7 @@
   padding: 0;
   transition: background-color 200ms;
   border-radius: 4px;
-  background-color: lighten(@grey-purple, 50%);
+  background-color: lighten(@grey-purple, 80%);
 
   &:hover {
     background-color: #ffffff;
@@ -18,7 +18,8 @@
   }
 }
 
-.footnotes-display {
+//the rendering div
+div[footnotes] {
     border-top: 1px #999 solid;
     padding: 5px 0 0 0;
     margin: 10px 0 0 0;
@@ -37,6 +38,10 @@
     padding: 8px;
     background-color: @light-grey;
     border-bottom: solid 1px darken(@light-grey, 15%);
+  }
+
+  .fn-dialog-title {
+
   }
 
   .fn-textarea {

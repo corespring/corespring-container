@@ -33,7 +33,7 @@ angular.module('corespring.wiggi-wiz-features.footnotes').factory('WiggiFootnote
       };
 
       this.getMarkUp = function($node, $scope) {
-        return '<div class="footnotes-display">' + $scope.originalMarkup + '</div>';
+        return '<div footnotes>' + $scope.originalMarkup + '</div>';
       };
     }
     return FeatureDef;
