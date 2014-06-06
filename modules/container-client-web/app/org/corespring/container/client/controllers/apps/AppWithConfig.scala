@@ -1,7 +1,7 @@
 package org.corespring.container.client.controllers.apps
 
 import org.corespring.container.client.actions.ClientActions
-import org.corespring.container.client.component.{ ComponentUrls, ItemTypeReader, DependencyResolver }
+import org.corespring.container.client.component.{ ComponentUrls, ItemTypeReader }
 import org.corespring.container.client.controllers.angular.AngularModules
 import org.corespring.container.client.controllers.helpers.{ Helpers, XhtmlProcessor }
 import org.corespring.container.components.model.packaging.{ ClientSideDependency, ClientDependencies }
@@ -9,6 +9,7 @@ import org.corespring.container.components.model.{ Component, Id }
 import play.api.http.ContentTypes
 import play.api.libs.json.JsObject
 import play.api.mvc.{ Action, AnyContent, Controller }
+import org.corespring.container.components.model.dependencies.DependencyResolver
 
 trait AppWithConfig[T <: ClientActions[AnyContent]]
   extends Controller

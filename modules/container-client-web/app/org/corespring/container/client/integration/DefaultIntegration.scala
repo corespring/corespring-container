@@ -2,8 +2,8 @@ package org.corespring.container.client.integration
 
 import org.corespring.container.client.V2PlayerConfig
 import org.corespring.container.client.actions._
-import org.corespring.container.client.component.{ ComponentUrls, ComponentSplitter }
-import org.corespring.container.client.controllers.apps.{Catalog, Player, Editor, Rig}
+import org.corespring.container.client.component.ComponentUrls
+import org.corespring.container.client.controllers.apps.{ Catalog, Player, Editor, Rig }
 import org.corespring.container.client.controllers.resources.{ Session, Item }
 import org.corespring.container.client.controllers.{ PlayerLauncher, ComponentsFileController, Icons }
 import org.corespring.container.components.model.Component
@@ -14,6 +14,7 @@ import play.api.mvc.AnyContent
 import org.corespring.container.client.integration.validation.Validator
 import org.corespring.container.js.rhino.score.ItemJsScoreProcessor
 import org.corespring.container.js.rhino.{ RhinoOutcomeProcessor, RhinoPlayerItemPreProcessor }
+import org.corespring.container.components.model.dependencies.ComponentSplitter
 
 trait DefaultIntegration
   extends ContainerControllers

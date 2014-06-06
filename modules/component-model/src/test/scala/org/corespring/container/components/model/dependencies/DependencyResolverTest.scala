@@ -1,4 +1,4 @@
-package org.corespring.container.client.component
+package org.corespring.container.components.model.dependencies
 
 import org.corespring.container.components.model._
 import org.specs2.mutable.Specification
@@ -32,6 +32,15 @@ class DependencyResolverTest extends Specification with ComponentMaker {
       lib("lib-4")) {
       val out = resolver.resolveComponents(Seq(id("ui-comp-1")), "player")
       out.length === 3
+    }
+    "comp -> lib-1 -> lib-2" in new withResolver(
+      uiComp("ui-comp-1", Seq(libId("lib-1"))),
+      lib("lib-1", Seq(libId("lib-2"))),
+      lib("lib-2", Seq(libId("lib-3"))),
+      lib("lib-3"),
+      lib("lib-4")) {
+      val out = resolver.resolveComponents(Seq(id("ui-comp-1")), "player")
+      out.length === 4
     }
 
     "topsort works" in new withResolver() {

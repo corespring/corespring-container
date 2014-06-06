@@ -1,6 +1,7 @@
 package org.corespring.container.client.component
 
 import org.corespring.container.components.model.Component
+import org.corespring.container.components.model.dependencies.ComponentMaker
 import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
 import play.api.libs.json.Json

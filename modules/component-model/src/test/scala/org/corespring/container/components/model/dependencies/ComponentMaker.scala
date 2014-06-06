@@ -1,7 +1,13 @@
-package org.corespring.container.client.component
+package org.corespring.container.components.model.dependencies
 
 import org.corespring.container.components.model._
 import play.api.libs.json.Json
+import org.corespring.container.components.model.LayoutComponent
+import org.corespring.container.components.model.LibraryId
+import org.corespring.container.components.model.Server
+import org.corespring.container.components.model.Library
+import org.corespring.container.components.model.Client
+import org.corespring.container.components.model.UiComponent
 
 trait ComponentMaker {
 

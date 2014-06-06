@@ -1,9 +1,19 @@
-package org.corespring.container.client.component
+package org.corespring.container.components.model.dependencies
 
-import org.corespring.container.components.model._
 import com.ahum.deps.{ DependencyLister, Branch, Leaf, Node }
+import org.corespring.container.components.model._
 
 trait DependencyResolver extends ComponentSplitter with LibraryUtils {
+
+  lazy val relationships: Seq[(Id, Seq[Id])] = {
+    components.map { c =>
+      c match {
+        case UiComponent(org, name, _, _, _, _, _, _, _, _, libs) => (new Id(org, name) -> libs)
+        case Library(org, name, _, _, _, _, libs) => (new Id(org, name) -> libs)
+        case LayoutComponent(org, name, _, _, _) => (new Id(org, name) -> Seq.empty)
+      }
+    }
+  }
 
   /**
    * Returns a list of all components used including libraries.

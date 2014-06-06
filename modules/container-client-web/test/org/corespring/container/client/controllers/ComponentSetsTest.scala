@@ -1,7 +1,8 @@
 package org.corespring.container.client.controllers
 
-import org.corespring.container.client.component.{ ComponentMaker, SourceGenerator }
+import org.corespring.container.client.component.SourceGenerator
 import org.corespring.container.components.model.Component
+import org.corespring.container.components.model.dependencies.ComponentMaker
 import org.specs2.mutable.Specification
 import play.api.GlobalSettings
 import play.api.mvc.SimpleResult

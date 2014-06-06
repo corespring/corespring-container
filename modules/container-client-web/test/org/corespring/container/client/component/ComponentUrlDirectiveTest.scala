@@ -1,6 +1,7 @@
 package org.corespring.container.client.component
 
 import org.specs2.mutable.Specification
+import org.corespring.container.components.model.dependencies.ComponentMaker
 
 class ComponentUrlDirectiveTest extends Specification with ComponentMaker {
 

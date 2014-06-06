@@ -3,6 +3,7 @@ package org.corespring.container.client.component
 import org.corespring.container.client.controllers.helpers.NameHelper
 import org.corespring.container.client.views.txt.js.{ ComponentServerWrapper, ServerLibraryWrapper, ComponentWrapper }
 import org.corespring.container.components.model._
+import org.corespring.container.components.model.dependencies.ComponentTypeFilter
 
 class EditorGenerator extends SourceGenerator {
 
