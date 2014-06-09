@@ -17,9 +17,18 @@ var Placeholder = function(
     $scope.tooltipMsg = showTooltip ? msg : "";
     $scope.mainMsg = showTooltip ? "" : msg;
 
+    function preprocess(component) {
+      var serverLogic = corespring.server.logic(component.data.componentType);
+      if (_.isFunction(serverLogic.preprocess)) {
+        component.data = serverLogic.preprocess(component.data);
+      }
+      return component;
+    }
+
     function setDataToComponent() {
-      if ($scope.register.loadedData[$scope.id] && $scope.componentPreview) {
-        $scope.componentPreview.setDataAndSession($scope.register.loadedData[$scope.id]);
+      var component = $scope.register.loadedData[$scope.id];
+      if (component && $scope.componentPreview) {
+        $scope.componentPreview.setDataAndSession(preprocess(component));
       }
     }
 
@@ -57,6 +66,7 @@ var Placeholder = function(
     $scope.$watch('componentType', renderPlayerComponent);
 
     $scope.id = $scope.id || 2;
+    setDataToComponent();
 
 
     $scope.safeApply = function() {
