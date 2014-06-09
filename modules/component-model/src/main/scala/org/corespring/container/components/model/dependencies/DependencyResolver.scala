@@ -64,12 +64,17 @@ trait DependencyResolver extends ComponentSplitter with LibraryUtils {
 
       def addToAcc(otherIds: Seq[Id])(rel: IdRelation) = {
         val (_, deps) = rel
+        val nonAccumulatedDeps = deps.filterNot(depId => acc.map(_._1).exists(id => id.orgNameMatch(depId)))
         val newAcc = if (acc.contains(rel)) acc else acc :+ rel
-        innerResolve((otherIds ++ deps).distinct, newAcc)
+        val idsRemaining = (otherIds ++ nonAccumulatedDeps).distinct
+        innerResolve(idsRemaining, newAcc)
       }
 
       i match {
-        case Nil => acc
+        case Nil => {
+          println("return the acc id is null")
+          acc
+        }
         case Seq(head) => {
           scopedRelationships
             .find(t => t._1.orgNameMatch(head))

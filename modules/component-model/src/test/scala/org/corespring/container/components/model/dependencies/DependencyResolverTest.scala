@@ -35,6 +35,18 @@ class DependencyResolverTest extends Specification with ComponentMaker {
       r.resolveComponents(Seq(id("a"))) === Seq(b, a)
     }
 
+    "handles cyclical relationships" in  {
+      val one = uiComp("one", Seq(id("a")))
+      val a = lib("a", Seq(id("b")))
+      val b = lib("b", Seq(id("a")))
+
+      val r = new DependencyResolver {
+        override def components: Seq[Component] = Seq(one, a, b)
+      }
+
+      r.resolveComponents(Seq(id("one"))) must throwA[RuntimeException]
+    }
+
     "empty seq returns empty" in new withResolver(comps: _*) {
       resolver.resolveIds(Seq.empty) === Seq.empty
     }

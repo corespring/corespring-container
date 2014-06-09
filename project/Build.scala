@@ -30,7 +30,7 @@ object Build extends sbt.Build {
     val grizzled = "org.clapper" %% "grizzled-scala" % "1.1.4"
     val scalaz = "org.scalaz" %% "scalaz-core" % "7.0.5"
     val htmlCleaner = "net.sourceforge.htmlcleaner" % "htmlcleaner" % "2.6.1"
-    val sortingUtils = "com.ahum" %% "dependency-utils" % "0.3"
+    val dependencyUtils = "com.ahum" %% "dependency-utils" % "0.4"
     //The closure compiler that play uses - we expect this to be provided by the play app.
     val closureCompiler = ("com.google.javascript" % "closure-compiler" % "rr2079.1")
       .exclude("args4j", "args4j")
@@ -149,7 +149,7 @@ object Build extends sbt.Build {
   lazy val componentModel = builder.playApp("component-model")
     .settings(playAppToSbtLibSettings: _*)
     .settings(
-      libraryDependencies ++= Seq(sortingUtils)).dependsOn(utils % "test->compile;compile->compile")
+      libraryDependencies ++= Seq(dependencyUtils)).dependsOn(utils % "test->compile;compile->compile")
 
   //Note: this is a play app for now until we move to play 2.2.0
   lazy val jsProcessing = builder.playApp("js-processing")
