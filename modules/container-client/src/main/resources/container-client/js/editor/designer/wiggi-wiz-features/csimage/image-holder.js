@@ -10,18 +10,20 @@ angular.module('corespring.wiggi-wiz-features.cs-image').directive('imageHolder'
       '     <div class="bg"></div>',
       '     <div class="content"></div>',
       '     <div class="delete-icon">',
-      '      <i ng-click="delete()" class="fa fa-times-circle"></i>',
+      '       <i ng-click="delete($event)" class="fa fa-times-circle"></i>',
       '    </div>',
       '  </div>',
       '  <div class="holder">',
-      '  <img src="imageSrc" style="imageStyle"/>',
+      '    <img src="imageSrc" style="imageStyle" />',
       '  </div>',
       '</div>'
     ].join('\n');
 
     function postLink($scope, $element) {
-      $scope.delete = function() {
+      $scope.delete = function(ev) {
         $scope.deleteNode($element, ImageFeature);
+        ev.stopPropagation();
+        ev.preventDefault();
       };
     }
 
