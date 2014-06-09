@@ -2,11 +2,8 @@
 
   angular.module('corespring-editor.controllers')
     .controller('Designer', [
-      '$compile',
       '$element',
       '$http',
-      '$log',
-      '$modal',
       '$scope',
       '$stateParams',
       'ComponentRegister',
@@ -15,7 +12,9 @@
       'ImageFeature',
       'ImageUtils',
       'ItemService',
+      'LogFactory',
       'MathJaxService',
+      'WiggiFootnotesFeatureDef',
       'WiggiMathJaxFeatureDef',
       'WiggiWizHelper',
       DesignerController
@@ -23,11 +22,8 @@
 
   /* global AddContentModalController, com */
   function DesignerController(
-    $compile,
     $element,
     $http,
-    $log,
-    $modal,
     $scope,
     $stateParams,
     ComponentRegister,
@@ -36,15 +32,17 @@
     ImageFeature,
     ImageUtils,
     ItemService,
+    LogFactory,
     MathJaxService,
+    WiggiFootnotesFeatureDef,
     WiggiMathJaxFeatureDef,
     WiggiWizHelper ) {
 
     var configPanels = {};
 
-    var log = $log.debug.bind($log, '[designer] - ');
+    var $log = LogFactory.getLogger('designer');
 
-    log($stateParams);
+    $log.log($stateParams);
 
     $scope.section = $stateParams.section;
 
@@ -65,15 +63,15 @@
 
         var opts = {
           onUploadComplete: function(body, status) {
-            log('done: ', body, status);
+            $log.log('onUploadComplete: ', body, status);
             onComplete(null, url);
           },
           onUploadProgress: function() {
-            log('progress', arguments);
+            $log.log('onUploadProgress', arguments);
             onProgress(null, 'started');
           },
           onUploadFailed: function() {
-            log('failed', arguments);
+            $log.log('onUploadFailed', arguments);
             onComplete({
               code: 'UPLOAD_FAILED',
               message: 'upload failed!'
@@ -97,15 +95,7 @@
       $scope.componentSet = componentSet;
 
       function addToEditor(editor, addContent, component) {
-        var max = 0;
-        $('<div>' + $scope.data.item.xhtml + '</div>').find('[id]').each(function(idx, element) {
-          var id = Number($(element).attr('id'));
-          if (id > max) {
-            max = id;
-          }
-        });
-
-        var id = max + 1;
+        $scope.lastId++;
 
         var defaults = {
           weight: 1
@@ -113,11 +103,11 @@
 
         var newData = _.extend(defaults, _.cloneDeep(component.defaultData));
 
-        $scope.data.item.components[id] = newData;
+        $scope.data.item.components[$scope.lastId] = newData;
 
         addContent($([
           '<placeholder',
-          ' id="' + id + '"',
+          ' id="' + $scope.lastId + '"',
           ' component-type="' + component.componentType + '"',
           ' label="' + component.name + '"',
           '>'
@@ -126,7 +116,6 @@
 
       function deleteComponent(id) {
         if ($scope.data.item && $scope.data.item.components) {
-          delete $scope.data.item.components[id];
           ComponentRegister.deleteComponent(id);
         } else {
           throw 'Can\'t delete component with id ' + id;
@@ -174,6 +163,11 @@
           buttons: [
             new WiggiMathJaxFeatureDef()
           ]
+        }, {
+          type: 'group',
+          buttons: [
+            new WiggiFootnotesFeatureDef()
+          ]
         }]
       };
     }
@@ -183,14 +177,14 @@
     }
 
     $scope.getUploadUrl = function(file) {
-      log(arguments);
+      $log.log('getUploadUrl',arguments);
       return file.name;
     };
 
     $scope.selectFile = function(file) {
-      log("root select file...");
+      $log.log('selectFile', 'root select file...');
       $scope.selectedFile = file;
-      log($scope.selectedFile);
+      $log.log('selectFile', $scope.selectedFile);
     };
 
     $scope.$on('fileSizeGreaterThanMax', function(event) {
@@ -201,6 +195,9 @@
     $scope.$on('registerConfigPanel', function(a, id, component) {
       configPanels[id] = component;
       component.setModel($scope.data.item.components[id]);
+      if (_.isFunction(component.setProfile)) {
+        component.setProfile($scope.data.item.profile);
+      }
     });
 
     $scope.$on('save-data', function(event) {
@@ -208,8 +205,13 @@
     });
 
     $scope.save = function(callback) {
-      log('Saving...');
+      $log.log('Saving...');
       var cleaned = $scope.serialize($scope.data.item.components);
+      for (var key in cleaned) {
+        if (!ComponentRegister.hasComponent(key)) {
+          delete cleaned[key];
+        }
+      }
       ItemService.save({
           components: cleaned,
           xhtml: $scope.data.item.xhtml,
@@ -289,6 +291,16 @@
       if (item) {
         preprocessComponents(item);
         updateSummaryFeedback(item);
+        var max = 0;
+        $('<div>' + $scope.data.item.xhtml + '</div>').find('[id]').each(function(idx, element) {
+          var id = Number($(element).attr('id'));
+          if (id > max) {
+            max = id;
+          }
+        });
+        $scope.lastId = max;
+
+
       }
     });
 

@@ -41,7 +41,7 @@
         draggable: true,
         deleteNode: function($node, services) {
           deleteComponentCallback($node.attr('id'));
-          $node.remove();
+
         },
         initialise: function($node, replaceWith) {
           var id = $node.attr('id');

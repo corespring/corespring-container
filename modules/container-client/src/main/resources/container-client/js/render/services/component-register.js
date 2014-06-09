@@ -37,8 +37,15 @@ angular.module('corespring-player.services').factory('ComponentRegister', ['$log
       };
 
       this.deleteComponent = function(id) {
+        components[id] = undefined;
         delete components[id];
       };
+
+      this.hasComponent = function(id) {
+        return !_.isUndefined(components[id]);
+      };
+
+
 
       /**
        * @param allData - an object that has the component id as the key and an object
