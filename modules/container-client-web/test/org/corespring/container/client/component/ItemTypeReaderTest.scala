@@ -1,6 +1,7 @@
 package org.corespring.container.client.component
 
 import org.corespring.container.components.model.Component
+import org.corespring.container.components.model.dependencies.ComponentMaker
 import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
 import play.api.libs.json.Json
@@ -20,12 +21,12 @@ class ItemTypeReaderTest extends Specification with ComponentMaker {
     }
 
     "work with comps" in new withReader(
-      uiComp("org", "ui-1", Seq.empty)) {
+      uiComp("ui-1", Seq.empty)) {
       reader.componentTypes("", item) === Seq("org-ui-1")
     }
 
     "work with comps declared in layout" in new withReader(
-      layout("org", "layout-1")) {
+      layout("layout-1")) {
       reader.componentTypes("", item) === Seq("org-layout-1")
     }
   }

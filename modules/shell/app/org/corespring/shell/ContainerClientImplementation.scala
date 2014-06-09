@@ -17,6 +17,7 @@ import play.api.Configuration
 import play.api.mvc._
 import scala.Some
 import scala.concurrent.Future
+import org.corespring.container.components.model.dependencies.DependencyResolver
 
 class ContainerClientImplementation(
   val itemService: MongoService,
@@ -89,6 +90,9 @@ class ContainerClientImplementation(
 
     override def configuration = ContainerClientImplementation.this.configuration.getConfig("components").getOrElse(Configuration.empty)
 
+    override def dependencyResolver: DependencyResolver = new DependencyResolver {
+      override def components: Seq[Component] = allComponents
+    }
   }
 
   override def editorActions: EditorActions[AnyContent] = new ShellEditorActions {

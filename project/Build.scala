@@ -13,6 +13,7 @@ object Build extends sbt.Build {
   val ScalaVersion = "2.10.3"
 
   def isWindows = System.getProperty("os.name").toLowerCase().contains("windows")
+
   val gruntCmd = "node ./node_modules/grunt-cli/bin/grunt"
   val npmCmd = if (isWindows) "npm.cmd" else "npm"
   val bowerCmd = "node ./node_modules/bower/bin/bower"
@@ -29,7 +30,7 @@ object Build extends sbt.Build {
     val grizzled = "org.clapper" %% "grizzled-scala" % "1.1.4"
     val scalaz = "org.scalaz" %% "scalaz-core" % "7.0.5"
     val htmlCleaner = "net.sourceforge.htmlcleaner" % "htmlcleaner" % "2.6.1"
-
+    val dependencyUtils = "org.corespring" %% "dependency-utils" % "0.5"
     //The closure compiler that play uses - we expect this to be provided by the play app.
     val closureCompiler = ("com.google.javascript" % "closure-compiler" % "rr2079.1")
       .exclude("args4j", "args4j")
@@ -48,7 +49,15 @@ object Build extends sbt.Build {
     val corespringReleases = "Corespring Artifactory Releases" at "http://repository.corespring.org/artifactory/ivy-releases"
     val typesafeReleases = "typesafe releases" at "http://repo.typesafe.com/typesafe/releases/"
     val typesafeSnapshots = "typesafe snapshots" at "http://repo.typesafe.com/typesafe/snapshots/"
-    val all = Seq(corespringSnapshots, corespringReleases, typesafeReleases, typesafeSnapshots)
+    val eeSnapshots = "edeustace snapshots" at "http://edeustace.com/repository/snapshots/"
+    val eeReleases = "edeustace releases" at "http://edeustace.com/repository/releases/"
+    val all = Seq(
+      corespringSnapshots,
+      corespringReleases,
+      typesafeReleases,
+      typesafeSnapshots,
+      eeReleases,
+      eeSnapshots)
   }
 
   import Dependencies._
@@ -140,7 +149,7 @@ object Build extends sbt.Build {
   lazy val componentModel = builder.playApp("component-model")
     .settings(playAppToSbtLibSettings: _*)
     .settings(
-      resolvers ++= Resolvers.all).dependsOn(utils % "test->compile;compile->compile")
+      libraryDependencies ++= Seq(dependencyUtils)).dependsOn(utils % "test->compile;compile->compile")
 
   //Note: this is a play app for now until we move to play 2.2.0
   lazy val jsProcessing = builder.playApp("js-processing")
@@ -158,7 +167,11 @@ object Build extends sbt.Build {
       (packagedArtifacts) <<= (packagedArtifacts) dependsOn buildInfo,
       sbt.Keys.fork in Test := false,
       sources in doc in Compile := List(),
-      libraryDependencies ++= Seq(mockito, grizzled, htmlCleaner, scalaz),
+      libraryDependencies ++= Seq(
+        mockito,
+        grizzled,
+        htmlCleaner,
+        scalaz),
       templatesImport ++= Seq("play.api.libs.json.JsValue", "play.api.libs.json.Json")).dependsOn(
         componentModel % "compile->compile;test->test",
         containerClient,
@@ -182,12 +195,13 @@ object Build extends sbt.Build {
 
   val shell = builder.playApp("shell")
     .settings(
-      resolvers ++= Resolvers.all,
-      libraryDependencies ++= Seq(logbackClassic, casbah, playS3, scalaz, play.Keys.cache, yuiCompressor, closureCompiler)).dependsOn(containerClientWeb, componentLoader, mongoJsonService, docs)
+      libraryDependencies ++= Seq(logbackClassic, casbah, playS3, scalaz, play.Keys.cache, yuiCompressor, closureCompiler))
+    .dependsOn(containerClientWeb, componentLoader, mongoJsonService, docs)
     .aggregate(containerClientWeb, componentLoader, containerClient, componentModel, utils, jsProcessing, mongoJsonService, docs)
 
   val root = builder.playApp("root", Some("."))
     .settings(
+      (resolvers in ThisBuild) ++= Resolvers.all,
       sbt.Keys.fork in Test := false,
       // Start grunt on play run
       playOnStarted <+= baseDirectory {

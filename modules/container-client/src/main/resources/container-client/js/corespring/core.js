@@ -59,8 +59,12 @@
         }
       }
 
+      if (this.factory) {
+        ngModule.factory(compName, this.factory);
+      }
+
       if (this.service) {
-        ngModule.factory(compName, this.service);
+        ngModule.service(compName, this.service);
       }
     };
   };
