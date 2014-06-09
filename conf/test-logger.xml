@@ -16,7 +16,7 @@
     <logger name="js" level="TRACE" />
 
 
-    <root level="DEBUG">
+    <root level="TRACE">
         <appender-ref ref="STDOUT" />
     </root>
 </configuration>

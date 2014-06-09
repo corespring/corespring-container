@@ -1,6 +1,6 @@
 package org.corespring.container.js.rhino
 
-import org.corespring.container.components.model.{ Client, UiComponent, Server }
+import org.corespring.container.components.model._
 import org.corespring.container.js.response.Target
 import org.specs2.mutable.Specification
 import play.api.libs.json.{ JsString, Json }
@@ -9,18 +9,18 @@ class OutcomeProcessorTest extends Specification {
 
   val interactionRespondJs =
     """
-    |exports.respond = function(question, answer, settings){
-    |  var correct = question.correctResponse.value == answer.value;
-    |  return { correctness: correct ? "correct" : "incorrect", answer : answer };
-    |}
-  """.stripMargin
+      |exports.respond = function(question, answer, settings){
+      |  var correct = question.correctResponse.value == answer.value;
+      |  return { correctness: correct ? "correct" : "incorrect", answer : answer };
+      |}
+    """.stripMargin
 
   val feedbackRespondJs =
     """
-    |exports.respond = function(question, answer, settings, targetOutcome){
-    |  return { targetOutcome: targetOutcome };
-    |}
-  """.stripMargin
+      |exports.respond = function(question, answer, settings, targetOutcome){
+      |  return { targetOutcome: targetOutcome };
+      |}
+    """.stripMargin
 
   val item = Json.obj(
     "components" -> Json.obj(
@@ -41,7 +41,7 @@ class OutcomeProcessorTest extends Specification {
       "2" -> Json.obj(
         "answers" -> Json.obj())))
 
-  def comp(name: String = "name", serverJs: String) = UiComponent(
+  def comp(name: String = "name", serverJs: String, libraries: Seq[Id] = Seq.empty) = UiComponent(
     "org",
     name,
     None,
@@ -52,7 +52,18 @@ class OutcomeProcessorTest extends Specification {
     Json.obj(),
     None,
     Map(),
-    Seq.empty)
+    libraries)
+
+  def lib(name: String = "name", libJs: String, deps: Seq[Id] = Seq.empty) = {
+    Library(
+      "org",
+      name,
+      Json.obj(),
+      Seq.empty,
+      Seq(LibrarySource(name, libJs)),
+      None,
+      deps)
+  }
 
   "Target" should {
     "work" in {
@@ -61,7 +72,6 @@ class OutcomeProcessorTest extends Specification {
       t.hasTarget(Json.obj("target" -> Json.obj("otherId" -> JsString("1")))) === false
       t.hasTarget(Json.obj()) === false
     }
-
   }
 
   "OutcomeProcessor" should {
@@ -70,21 +80,73 @@ class OutcomeProcessorTest extends Specification {
       val component = comp("name", interactionRespondJs)
       val feedback = comp("feedback", feedbackRespondJs)
 
-      val processor = new RhinoOutcomeProcessor(Seq(component, feedback), Seq.empty)
+      val processor = new RhinoOutcomeProcessor(Seq(component, feedback))
       val result = processor.createOutcome(item, session, Json.obj())
       (result \ "1" \ "correctness").as[String] === "incorrect"
       (result \ "2" \ "targetOutcome" \ "correctness").as[String] === "incorrect"
+    }
 
+    /**
+     * This asserts that library js is loaded in the correct order so that it can be executed correctly.
+     */
+    "Respond when using libs that depend on each other." in {
+
+      val oneJs =
+        """
+          |var a = require("a");
+          |exports.respond = function(question, answer, settings){
+          |  return {
+          |    a: a.respond(),
+          |    oneJs: "hi from oneJs"
+          |  }
+          |}
+        """.stripMargin
+
+      val aJs =
+        """
+          |var b = require("b");
+          |exports.respond = function(){
+          |  return {
+          |    b: b.respond(),
+          |    a: "hi from a"
+          |  }
+          |}
+        """.stripMargin
+
+      val bJs =
+        """
+          |var c = require("c");
+          |exports.respond = function(){
+          | return { b:  "hi from b", c: c.respond() }
+          |}
+        """.stripMargin
+
+      val cJs =
+        """
+          |exports.respond = function(){
+          | return { c : "hi from c" };
+          |}
+        """.stripMargin
+      val one = comp("one", oneJs, Seq(Id("org", "a", None)))
+      val a = lib("a", aJs, Seq(Id("org", "b", None)))
+      val b = lib("b", bJs, Seq(Id("org", "c", None)))
+      val c = lib("c", cJs, Seq.empty)
+
+      val p = new RhinoOutcomeProcessor(Seq(one, a, b, c))
+
+      val item = Json.obj("components" -> Json.obj("1" -> Json.obj("componentType" -> "org-one")))
+      val session = Json.obj("components" -> Json.obj("1" -> Json.obj("answers" -> Json.obj())))
+      val result = p.createOutcome(item, session, Json.obj())
+      println(result)
+      result === Json.parse("""{"1":{"a":{"b":{"b":"hi from b","c":{"c":"hi from c"}},"a":"hi from a"},"oneJs":"hi from oneJs","studentResponse":{}}}""")
     }
 
     "fail - if there is bad js" in {
-
       val component = comp("name", "arst")
       val feedback = comp("feedback", feedbackRespondJs)
-      val processor = new RhinoOutcomeProcessor(Seq(component, feedback), Seq.empty)
+      val processor = new RhinoOutcomeProcessor(Seq(component, feedback))
       try {
         processor.createOutcome(item, session, Json.obj())
-
       } catch {
         case e: Throwable => println(e)
       }

@@ -1,7 +1,8 @@
 package org.corespring.container.client.controllers
 
-import org.corespring.container.client.component.{ ComponentMaker, SourceGenerator }
+import org.corespring.container.client.component.SourceGenerator
 import org.corespring.container.components.model.Component
+import org.corespring.container.components.model.dependencies.{ DependencyResolver, ComponentMaker }
 import org.specs2.mutable.Specification
 import play.api.GlobalSettings
 import play.api.mvc.SimpleResult
@@ -27,7 +28,11 @@ class ComponentSetsTest extends Specification with ComponentMaker {
 
     override def catalogGenerator: SourceGenerator = new MockSourceGenerator("catalog")
 
-    override def allComponents: Seq[Component] = Seq(uiComp("org", "name", Seq.empty))
+    override def allComponents: Seq[Component] = Seq(uiComp("name", Seq.empty))
+
+    override def dependencyResolver: DependencyResolver = new DependencyResolver {
+      override def components: Seq[Component] = allComponents
+    }
   }
 
   object mockGlobal extends GlobalSettings
@@ -51,11 +56,11 @@ class ComponentSetsTest extends Specification with ComponentMaker {
     }
 
     "return js urls" in {
-      sets.jsUrl("editor", Seq(uiComp("org", "name", Seq.empty))) === org.corespring.container.client.controllers.routes.ComponentSets.resource("editor", "org[all]", "js").url
+      sets.jsUrl("editor", Seq(uiComp("name", Seq.empty))) === org.corespring.container.client.controllers.routes.ComponentSets.resource("editor", "org[all]", "js").url
     }
 
     "return css urls" in {
-      sets.cssUrl("player", Seq(uiComp("org", "name", Seq.empty))) === org.corespring.container.client.controllers.routes.ComponentSets.resource("player", "org[all]", "css").url
+      sets.cssUrl("player", Seq(uiComp("name", Seq.empty))) === org.corespring.container.client.controllers.routes.ComponentSets.resource("player", "org[all]", "css").url
     }
   }
 

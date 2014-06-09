@@ -3,6 +3,7 @@ package org.corespring.container.client.component
 import play.api.libs.json.JsValue
 import org.corespring.container.client.controllers.helpers.{ XhtmlProcessor, NameHelper }
 import org.corespring.container.components.model.LayoutComponent
+import org.corespring.container.components.model.dependencies.ComponentSplitter
 
 trait ItemTypeReader {
   /** for an item - return all the components in use */

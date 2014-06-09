@@ -4,7 +4,7 @@ import org.corespring.container.js.api.{ ComponentServerLogic => ApiComponentSer
 import org.mozilla.javascript.{ Function => RhinoFunction }
 import org.mozilla.javascript.{ Scriptable, Context }
 import org.corespring.container.js.processing.PlayerItemPreProcessor
-import org.corespring.container.components.model.{ UiComponent, Library }
+import org.corespring.container.components.model.{ Component, UiComponent, Library }
 import org.corespring.container.js.response.OutcomeProcessor
 import play.api.libs.json.{ JsValue, JsObject, Json }
 
@@ -151,7 +151,7 @@ trait RhinoGetServerLogic extends GetServerLogic {
   }
 }
 
-class RhinoOutcomeProcessor(val components: Seq[UiComponent], val libraries: Seq[Library]) extends OutcomeProcessor with RhinoGetServerLogic
+class RhinoOutcomeProcessor(val components: Seq[Component]) extends OutcomeProcessor with RhinoGetServerLogic
 
 class RhinoPlayerItemPreProcessor(val components: Seq[UiComponent], val libraries: Seq[Library]) extends PlayerItemPreProcessor with RhinoGetServerLogic
 
