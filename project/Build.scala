@@ -30,7 +30,7 @@ object Build extends sbt.Build {
     val grizzled = "org.clapper" %% "grizzled-scala" % "1.1.4"
     val scalaz = "org.scalaz" %% "scalaz-core" % "7.0.5"
     val htmlCleaner = "net.sourceforge.htmlcleaner" % "htmlcleaner" % "2.6.1"
-    val dependencyUtils = "com.ahum" %% "dependency-utils" % "0.4"
+    val dependencyUtils = "org.corespring" %% "dependency-utils" % "0.5"
     //The closure compiler that play uses - we expect this to be provided by the play app.
     val closureCompiler = ("com.google.javascript" % "closure-compiler" % "rr2079.1")
       .exclude("args4j", "args4j")
