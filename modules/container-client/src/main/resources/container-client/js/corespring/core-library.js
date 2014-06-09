@@ -30,7 +30,6 @@
     };
 
     this.module = function(uid, obj){
-      //console.log("module -> " + uid + ": " + obj);
       if(!uid){
         throw new Error("you must specify a uid");
       }

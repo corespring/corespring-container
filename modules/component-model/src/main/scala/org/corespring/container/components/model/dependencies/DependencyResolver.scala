@@ -4,7 +4,7 @@ import com.ahum.deps._
 import org.corespring.container.components.model._
 import org.slf4j.{ LoggerFactory, Logger }
 
-trait DependencyResolver extends ComponentSplitter with LibraryUtils {
+trait DependencyResolver extends ComponentSplitter {
 
   type IdRelation = (Id, Seq[Id])
 
