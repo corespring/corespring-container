@@ -1,6 +1,6 @@
 package org.corespring.container.components.loader
 
-import org.corespring.container.components.model.LibraryId
+import org.corespring.container.components.model.Id
 import org.specs2.mutable.Specification
 import play.api.libs.json.Json
 
@@ -21,8 +21,8 @@ class PackageJsonReadingTest extends Specification {
           Json.obj("organization" -> "org", "name" -> "name"),
           Json.obj("organization" -> "org-2", "name" -> "name-2", "scope" -> "editor"))))
       result === Seq(
-        LibraryId("org", "name", None),
-        LibraryId("org-2", "name-2", Some("editor")))
+        Id("org", "name", None),
+        Id("org-2", "name-2", Some("editor")))
     }
   }
 

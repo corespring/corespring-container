@@ -28,7 +28,7 @@ trait PlayerItemPreProcessor extends PreProcessor with GetServerLogic {
           if (!hasRenderFunction) {
             (id, question)
           } else {
-            val componentLibraries: Seq[Library] = component.libraries.map(id => libraries.find(l => l.id.matches(id))).flatten
+            val componentLibraries: Seq[Library] = component.libraries.map(id => libraries.find(l => l.id.orgNameMatch(id))).flatten
             val serverComponent = serverLogic(component.componentType, component.server.definition, componentLibraries)
             (id, serverComponent.preProcessItem(question, settings))
           }

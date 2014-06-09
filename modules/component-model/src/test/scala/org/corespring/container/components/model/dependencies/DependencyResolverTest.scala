@@ -8,73 +8,117 @@ class DependencyResolverTest extends Specification with ComponentMaker {
 
   "components for types" should {
 
-    "work" in new withResolver() {
-      resolver.resolveComponents(Seq.empty, "player") === Seq.empty
-    }
-
-    "work for comps with no libs" in new withResolver(uiComp("ui-comp-1", Seq.empty)) {
-      val out = resolver.resolveComponents(Seq(id("ui-comp-1")), "player")
-      out.length === 1
-    }
-
-    "work for comps with 1 lib" in new withResolver(
-      uiComp("ui-comp-1", Seq(libId("lib-1"))),
-      lib("lib-1")) {
-      val out = resolver.resolveComponents(Seq(id("ui-comp-1")), "player")
-      out.length === 2
-    }
-
-    "comp -> lib-1 -> lib-2" in new withResolver(
-      uiComp("ui-comp-1", Seq(libId("lib-1"))),
-      lib("lib-1", Seq(libId("lib-2"))),
-      lib("lib-2"),
+    val comps = Seq(
+      uiComp("ui-comp-1", Seq(id("lib-1", scope = Some("editor")))),
+      uiComp("ui-comp-2", Seq(id("lib-3"))),
+      uiComp("ui-comp-3", Seq(id("lib-3"), id("lib-5"))),
+      layout("layout-1"),
+      lib("lib-1", Seq(id("lib-2"))),
+      lib("lib-2", Seq(id("lib-3", scope = Some("player")))),
       lib("lib-3"),
-      lib("lib-4")) {
-      val out = resolver.resolveComponents(Seq(id("ui-comp-1")), "player")
-      out.length === 3
-    }
-    "comp -> lib-1 -> lib-2" in new withResolver(
-      uiComp("ui-comp-1", Seq(libId("lib-1"))),
-      lib("lib-1", Seq(libId("lib-2"))),
-      lib("lib-2", Seq(libId("lib-3"))),
-      lib("lib-3"),
-      lib("lib-4")) {
-      val out = resolver.resolveComponents(Seq(id("ui-comp-1")), "player")
-      out.length === 4
-    }
+      lib("lib-4"),
+      lib("lib-5", Seq(id("lib-6"))),
+      lib("lib-6", Seq(id("lib-7"))),
+      lib("lib-7"))
 
-    "topsort works" in new withResolver() {
+    "simple" in {
 
-      val libs = Seq(
-        lib("1", Seq(libId("2"))),
-        lib("2", Seq(libId("3"))),
-        lib("3"))
+      val one = uiComp("one", Seq(id("a")))
+      val a = lib("a", Seq(id("b")))
+      val b = lib("b")
 
-      resolver.topSort(libs) === libs.reverse
+      val r = new DependencyResolver {
+        override def components: Seq[Component] = Seq(one, a, b)
+      }
+
+      r.resolveComponents(Seq(id("one"))) === Seq(b, a, one)
+      r.resolveComponents(Seq(id("a"))) === Seq(b, a)
     }
 
-    "work with layout components" in new withResolver(
-      uiComp("ui-comp-1", Seq(libId("lib-1"))),
-      layout("layout-1")) {
-      val out = resolver.resolveComponents(Seq(id("ui-comp-1"), id("layout-1")), "player")
-      out.length === 2
+    "empty seq returns empty" in new withResolver(comps: _*) {
+      resolver.resolveIds(Seq.empty) === Seq.empty
     }
 
-    "works with scoped libs" in new withResolver(
-      uiComp("ui-comp1",
-        Seq(
-          libId("player-lib1", Some("player")),
-          libId("server-lib1", Some("editor")))),
-      lib("player-lib1"),
-      lib("server-lib1")) {
+    "scope is applied" in new withResolver(comps: _*) {
+      val result = resolver.resolveIds(Seq(id("ui-comp-1")), Some("scope"))
+      result === Seq(id("ui-comp-1"))
+    }
 
-      val playerComps = resolver.resolveComponents(Seq(id("ui-comp1")), "player")
-      playerComps.length === 2
-      playerComps.find(_.id.name == "player-lib1") must beSome[Component]
+    "scope is applied - when nested" in new withResolver(comps: _*) {
+      val result = resolver.resolveIds(Seq(id("ui-comp-1")), Some("editor"))
+      result === Seq(
+        id("lib-2"),
+        id("lib-1"),
+        id("ui-comp-1"))
+    }
 
-      val editorComps = resolver.resolveComponents(Seq(id("ui-comp1")), "editor")
-      editorComps.length === 2
-      editorComps.find(_.id.name == "server-lib1") must beSome[Component]
+    "resolve ids" in new withResolver(comps: _*) {
+      val result = resolver.resolveIds(Seq(id("ui-comp-1")))
+      result === Seq(
+        id("lib-3"),
+        id("lib-2"),
+        id("lib-1"),
+        id("ui-comp-1"))
+    }
+    "layouts are added" in new withResolver(comps: _*) {
+      val result = resolver.resolveIds(Seq(id("layout-1")))
+      result === Seq(id("layout-1"))
+    }
+
+    "resolve ids - 2" in new withResolver(comps: _*) {
+      val result = resolver.resolveIds(Seq(id("ui-comp-2")))
+      result === Seq(
+        id("lib-3"),
+        id("ui-comp-2"))
+    }
+
+    "resolve ids - 3" in new withResolver(comps: _*) {
+      val result = resolver.resolveIds(Seq(id("ui-comp-3")))
+      result === Seq(
+        id("lib-7"),
+        id("lib-3"),
+        id("lib-6"),
+        id("lib-5"),
+        id("ui-comp-3"))
+    }
+
+    "resolve multiple" in new withResolver(comps: _*) {
+      val result = resolver.resolveIds(Seq(id("ui-comp-1"), id("ui-comp-2")))
+      result === Seq(
+        id("lib-3"),
+        id("lib-2"),
+        id("ui-comp-2"),
+        id("lib-1"),
+        id("ui-comp-1"))
+    }
+
+    "resolve multiple - 2" in new withResolver(comps: _*) {
+      val result = resolver.resolveIds(Seq(id("ui-comp-1"), id("ui-comp-2"), id("ui-comp-3")))
+      result === Seq(
+        id("lib-7"),
+        id("lib-3"),
+        id("lib-6"),
+        id("lib-2"),
+        id("ui-comp-2"),
+        id("lib-5"),
+        id("lib-1"),
+        id("ui-comp-3"),
+        id("ui-comp-1"))
+    }
+
+    "layouts are added" in new withResolver(comps: _*) {
+      val result = resolver.resolveIds(Seq(id("layout-1")))
+      result === Seq(id("layout-1"))
+    }
+
+    "layouts are added with ui comp" in new withResolver(comps: _*) {
+      val result = resolver.resolveIds(Seq(id("ui-comp-1"), id("layout-1")))
+      result === Seq(
+        id("lib-3"),
+        id("layout-1"),
+        id("lib-2"),
+        id("lib-1"),
+        id("ui-comp-1"))
     }
 
   }

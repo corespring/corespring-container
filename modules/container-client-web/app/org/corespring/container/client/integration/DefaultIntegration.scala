@@ -33,7 +33,7 @@ trait DefaultIntegration
 
   override def scoreProcessor: ScoreProcessor = new ScoreProcessorSequence(DefaultScoreProcessor, ItemJsScoreProcessor)
 
-  override def outcomeProcessor: OutcomeProcessor = new RhinoOutcomeProcessor(uiComponents, libraries)
+  override def outcomeProcessor: OutcomeProcessor = new RhinoOutcomeProcessor(DefaultIntegration.this.components)
 
   lazy val rig = new Rig {
 

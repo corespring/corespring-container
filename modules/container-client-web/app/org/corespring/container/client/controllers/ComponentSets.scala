@@ -2,6 +2,7 @@ package org.corespring.container.client.controllers
 
 import org.corespring.container.client.component._
 import org.corespring.container.components.model.Component
+import org.corespring.container.components.model.dependencies.DependencyResolver
 import play.api.Logger
 import play.api.http.ContentTypes
 import play.api.mvc._
@@ -19,6 +20,8 @@ trait ComponentSets extends Controller with ComponentUrls {
 
   def catalogGenerator: SourceGenerator
 
+  def dependencyResolver: DependencyResolver
+
   /**
    * Take a source + contentType and return a Result
    */
@@ -27,7 +30,10 @@ trait ComponentSets extends Controller with ComponentUrls {
   def resource[A >: EssentialAction](context: String, directive: String, suffix: String): A = {
     logger.debug(s"[resource] : $directive")
     val types: Seq[String] = ComponentUrlDirective(directive, allComponents)
-    generate(context, types.map(t => allComponents.find(_.componentType == t)).flatten, suffix)
+
+    val usedComponents = types.map { t => allComponents.find(_.componentType == t) }.flatten
+    val sortedComponents = dependencyResolver.resolveComponents(usedComponents.map(_.id), Some(context))
+    generate(context, sortedComponents, suffix)
   }
 
   protected def generate[A >: EssentialAction](context: String, components: Seq[Component], suffix: String): A = Action {

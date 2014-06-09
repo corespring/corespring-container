@@ -41,7 +41,7 @@ trait AppWithConfig[T <: ClientActions[AnyContent]]
           new Id(org, name)
       }
 
-      val components = resolveComponents(typeIds, context)
+      val components = resolveComponents(typeIds, Some(context))
       val jsUrl = urls.jsUrl(context, components)
       val cssUrl = urls.cssUrl(context, components)
 

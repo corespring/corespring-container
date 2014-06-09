@@ -1,10 +1,11 @@
 package org.corespring.container.js.response
 
-import org.corespring.container.components.model.{ LibraryUtils, UiComponent, Library }
+import org.corespring.container.components.model.dependencies.DependencyResolver
+import org.corespring.container.components.model.{ Component, UiComponent, Library }
 import org.corespring.container.components.response.{ OutcomeProcessor => ContainerOutcomeProcessor }
+import org.corespring.container.js.api.GetServerLogic
 import org.slf4j.LoggerFactory
 import play.api.libs.json.{ Json, JsObject, JsValue }
-import org.corespring.container.js.api.GetServerLogic
 
 trait Target {
   def targetId(question: JsValue) = (question \ "target" \ "id").asOpt[String]
@@ -15,12 +16,13 @@ trait Target {
 trait OutcomeProcessor
   extends ContainerOutcomeProcessor
   with Target
-  with GetServerLogic
-  with LibraryUtils {
+  with GetServerLogic {
 
-  def components: Seq[UiComponent]
+  lazy val dependencyResolver = new DependencyResolver {
+    override def components: Seq[Component] = OutcomeProcessor.this.components
+  }
 
-  def libraries: Seq[Library]
+  def components: Seq[Component]
 
   private lazy val logger = LoggerFactory.getLogger("components.outcome")
 
@@ -35,16 +37,21 @@ trait OutcomeProcessor
 
       val answer = getAnswer(itemSession, id)
 
-      components.find(_.matchesType(componentType)).map {
+      def getUiComponent(t: String): Option[UiComponent] = components.find(_.matchesType(componentType)).map { c =>
+        if (c.isInstanceOf[UiComponent]) {
+          c.asInstanceOf[UiComponent]
+        } else {
+          throw new RuntimeException(s"[OutcomeProcessor] component type: $t is no a [UiComponent]")
+        }
+      }
+
+      getUiComponent(componentType).map {
         component =>
 
           answer.map {
             a =>
-              val componentLibraries: Seq[Library] = component.libraries.map(id => libraries.find(l => l.id.matches(id))).flatten
-              println("component libraries: " + componentLibraries)
-              val sorted = topSort(componentLibraries)
-              logger.trace(s"sorted $sorted")
-              val serverComponent = serverLogic(component.componentType, component.server.definition, sorted)
+              val sortedLibs = dependencyResolver.filterByType[Library](dependencyResolver.resolveComponents(Seq(component.id)).filterNot(_.id.orgNameMatch(component.id)))
+              val serverComponent = serverLogic(component.componentType, component.server.definition, sortedLibs)
               val outcome = serverComponent.createOutcome(question, a, settings, targetOutcome)
               logger.trace(s"outcome: $outcome")
               (id -> outcome)

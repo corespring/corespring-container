@@ -13,11 +13,9 @@ class Component(val id: Id, val packageInfo: JsValue) {
   def componentType: String = s"${id.org}-${id.name}"
 }
 
-class Id(val org: String, val name: String) {
-  def matches(other: Id) = org == other.org && name == other.name
+case class Id(org: String, name: String, scope: Option[String] = None) {
+  def orgNameMatch(other: Id): Boolean = org == other.org && name == other.name
 }
-
-case class LibraryId(override val org: String, override val name: String, scope: Option[String]) extends Id(org, name)
 
 case class Library(
   org: String,
@@ -26,8 +24,8 @@ case class Library(
   client: Seq[LibrarySource] = Seq.empty,
   server: Seq[LibrarySource] = Seq.empty,
   css: Option[String],
-  libraries: Seq[LibraryId])
-  extends Component(new Id(org, name), packageInfo)
+  libraries: Seq[Id])
+  extends Component(Id(org, name), packageInfo)
 
 case class LibrarySource(name: String, source: String)
 
@@ -43,13 +41,13 @@ case class UiComponent(
   defaultData: JsValue,
   icon: Option[Array[Byte]] = None,
   sampleData: Map[String, JsValue] = Map.empty,
-  libraries: Seq[LibraryId] = Seq.empty) extends Component(new Id(org, name), packageInfo)
+  libraries: Seq[Id] = Seq.empty) extends Component(Id(org, name), packageInfo)
 
 case class LayoutComponent(org: String,
   name: String,
   client: Seq[LibrarySource],
   css: Option[String],
-  override val packageInfo: JsValue) extends Component(new Id(org, name), packageInfo)
+  override val packageInfo: JsValue) extends Component(Id(org, name), packageInfo)
 
 case class Client(render: String, configure: String, css: Option[String])
 
