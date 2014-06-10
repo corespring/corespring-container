@@ -22,7 +22,7 @@ trait PlayerLauncher extends Controller {
       /**
        * Note: You can't check a request to see if its http or not in Play
        * But even if you could you may be sitting behind a reverse proxy.
-       * @see: https://groups.google.com/forum/?fromgroups=#!searchin/play-framework/https$20request/play-framework/11zbMtNI3A8/o4318Z-Ir6UJ
+       * see: https://groups.google.com/forum/?fromgroups=#!searchin/play-framework/https$20request/play-framework/11zbMtNI3A8/o4318Z-Ir6UJ
        *       but the tip was to check for the header below
        */
       val protocol = r.headers.get("x-forwarded-proto") match {
@@ -62,7 +62,7 @@ trait PlayerLauncher extends Controller {
             "url" -> create.url)))
       val jsPath = "container-client/js/player-launcher/editor.js"
       val bootstrap = "org.corespring.players.ItemEditor = corespring.require('editor');"
-      make(jsPath, defaultOptions, bootstrap, request.queryString)
+      make(jsPath, defaultOptions, bootstrap)
   }
 
   /**
@@ -85,7 +85,7 @@ trait PlayerLauncher extends Controller {
           "evaluate" -> s"$sessionUrl?mode=evaluate"))
       val jsPath = "container-client/js/player-launcher/player.js"
       val bootstrap = s"org.corespring.players.ItemPlayer = corespring.require('player').define(${request.isSecure});"
-      make(jsPath, defaultOptions, bootstrap, request.queryString)
+      make(jsPath, defaultOptions, bootstrap)
   }
 
   private def pathToNameAndContents(p: String) = {
@@ -100,25 +100,21 @@ trait PlayerLauncher extends Controller {
     }
   }
 
-  private def make(jsPath: String, options: JsValue, bootstrapLine: String, queryString: Map[String, Seq[String]])(implicit request: PlayerJsRequest[AnyContent]): Result = {
+  private def make(jsPath: String, options: JsValue, bootstrapLine: String)(implicit request: PlayerJsRequest[AnyContent]): Result = {
 
-    val queryParamsObject = {
-      val prepped = queryString.map(t => s"""${t._1}: "${t._2.mkString("")}" """)
-      s"{${prepped.mkString(",")}}"
-    }
 
-    val defaultOptions = ("default-options", s"module.exports = ${Json.stringify(options)}")
-    val queryParamsJs = ("query-params", s"module.exports = $queryParamsObject")
-    val launchErrors = ("launcher-errors", errorsToModule(request.errors))
+    val defaultOptions = ("default-options" -> s"module.exports = ${Json.stringify(options)}")
+    val launchErrors = ("launcher-errors" -> errorsToModule(request.errors))
     val rawJs = Seq("container-client/js/corespring/core-library.js")
     val wrappedJs = jsPath +: Seq(
       "container-client/js/player-launcher/errors.js",
       "container-client/js/player-launcher/post-message.js",
       "container-client/js/player-launcher/instance.js",
+      "container-client/js/player-launcher/url-builder.js",
       "container-client/js/player-launcher/root-level-listener.js")
 
     val contents = rawJs.map(pathToNameAndContents(_)).map(_._2)
-    val wrappedNameAndContents = wrappedJs.map(pathToNameAndContents) :+ defaultOptions :+ launchErrors :+ queryParamsJs
+    val wrappedNameAndContents = wrappedJs.map(pathToNameAndContents) :+ defaultOptions :+ launchErrors
     val wrappedContents = wrappedNameAndContents.map(tuple => ServerLibraryWrapper(tuple._1, tuple._2))
 
     val bootstrap =

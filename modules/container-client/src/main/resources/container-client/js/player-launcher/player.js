@@ -3,6 +3,7 @@ exports.define = function(isSecure) {
 
     var errors = require("errors");
     var launcherErrors = require("launcher-errors");
+
     var i;
 
     if (launcherErrors.hasErrors) {
