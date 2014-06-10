@@ -3,18 +3,22 @@ package org.corespring.container.client.controllers.apps
 import org.corespring.container.client.actions.PlayerActions
 import org.corespring.container.client.component.PlayerItemTypeReader
 import org.corespring.container.client.views.txt.js.PlayerServices
-import play.api.mvc.{ SimpleResult, Request, Action, AnyContent }
+import play.api.mvc._
 import scala.concurrent.{ Await, Future }
 import play.api.{ Play, Logger }
+import scala.Some
+import play.api.mvc.SimpleResult
 
 trait Player
   extends PlayerItemTypeReader
   with AppWithServices[PlayerActions[AnyContent]]
-  with JsModeReading{
+  with JsModeReading {
 
   import org.corespring.container.client.controllers.apps.routes.{ Player => PlayerRoutes }
 
   override def context: String = "player"
+
+  def callCreator: CallCreator
 
   lazy val logger = Logger("container.player")
 
@@ -22,11 +26,11 @@ trait Player
     import org.corespring.container.client.controllers.resources.routes._
     PlayerServices(
       "player.services",
-      Session.loadEverything(":id"),
-      Session.saveSession(":id"),
-      Session.getScore(":id"),
-      Session.completeSession(":id"),
-      Session.loadOutcome(":id")).toString
+      callCreator.wrap(Session.loadEverything(":id")),
+      callCreator.wrap(Session.saveSession(":id")),
+      callCreator.wrap(Session.getScore(":id")),
+      callCreator.wrap(Session.completeSession(":id")),
+      callCreator.wrap(Session.loadOutcome(":id"))).toString
   }
 
   def createSessionForItem(itemId: String): Action[AnyContent] = actions.createSessionForItem(itemId) {
