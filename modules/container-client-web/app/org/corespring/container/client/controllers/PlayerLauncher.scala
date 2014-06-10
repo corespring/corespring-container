@@ -62,7 +62,7 @@ trait PlayerLauncher extends Controller {
             "url" -> create.url)))
       val jsPath = "container-client/js/player-launcher/editor.js"
       val bootstrap = "org.corespring.players.ItemEditor = corespring.require('editor');"
-      make(jsPath, defaultOptions, bootstrap, request.queryParams)
+      make(jsPath, defaultOptions, bootstrap, request.queryString)
   }
 
   /**
@@ -85,7 +85,7 @@ trait PlayerLauncher extends Controller {
           "evaluate" -> s"$sessionUrl?mode=evaluate"))
       val jsPath = "container-client/js/player-launcher/player.js"
       val bootstrap = s"org.corespring.players.ItemPlayer = corespring.require('player').define(${request.isSecure});"
-      make(jsPath, defaultOptions, bootstrap, request.queryParams)
+      make(jsPath, defaultOptions, bootstrap, request.queryString)
   }
 
   private def pathToNameAndContents(p: String) = {
@@ -100,15 +100,15 @@ trait PlayerLauncher extends Controller {
     }
   }
 
-  private def asJs(params: Seq[(String, String)]) = {
-    val prepped = params.map(t => s"""${t._1}: "${t._2}" """)
-    s"{ ${prepped.mkString(",")}"
-  }
+  private def make(jsPath: String, options: JsValue, bootstrapLine: String, queryString: Map[String, Seq[String]])(implicit request: PlayerJsRequest[AnyContent]): Result = {
 
-  private def make(jsPath: String, options: JsValue, bootstrapLine: String, queryParams: Seq[(String, String)])(implicit request: PlayerJsRequest[AnyContent]): Result = {
+    val queryParamsObject = {
+      val prepped = queryString.map(t => s"""${t._1}: "${t._2.mkString("")}" """)
+      s"{${prepped.mkString(",")}}"
+    }
 
     val defaultOptions = ("default-options", s"module.exports = ${Json.stringify(options)}")
-    val queryParamsJs = ("query-params", s"module.exports = ${asJs(queryParams)}")
+    val queryParamsJs = ("query-params", s"module.exports = $queryParamsObject")
     val launchErrors = ("launcher-errors", errorsToModule(request.errors))
     val rawJs = Seq("container-client/js/corespring/core-library.js")
     val wrappedJs = jsPath +: Seq(
