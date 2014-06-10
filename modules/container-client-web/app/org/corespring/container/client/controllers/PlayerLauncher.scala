@@ -100,7 +100,10 @@ trait PlayerLauncher extends Controller {
     }
   }
 
-  private def asJs(params: Seq[(String, String)]) = s"""{${params.map { t => s"${t._1}: \" $ { t._2 } \ "" }.mkString(",")}"""
+  private def asJs(params: Seq[(String, String)]) = {
+    val prepped = params.map(t => s"""${t._1}: "${t._2}" """)
+    s"{ ${prepped.mkString(",")}"
+  }
 
   private def make(jsPath: String, options: JsValue, bootstrapLine: String, queryParams: Seq[(String, String)])(implicit request: PlayerJsRequest[AnyContent]): Result = {
 
