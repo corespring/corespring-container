@@ -18,6 +18,7 @@ import play.api.mvc._
 import scala.Some
 import scala.concurrent.Future
 import org.corespring.container.components.model.dependencies.DependencyResolver
+import org.corespring.container.client.controllers.apps.CallCreator
 
 class ContainerClientImplementation(
   val itemService: MongoService,
@@ -122,6 +123,10 @@ class ContainerClientImplementation(
 
   override def dataQuery: DataQuery = new ShellProfile()
 
+  //In the shell we pass through
+  override def callCreator: CallCreator = new CallCreator {
+    override def wrap(c: Call): Call = Call(c.method, c.url + "?blah=blah")
+  }
 }
 
 trait LoadJs {

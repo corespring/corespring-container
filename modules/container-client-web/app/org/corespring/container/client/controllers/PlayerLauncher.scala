@@ -62,7 +62,7 @@ trait PlayerLauncher extends Controller {
             "url" -> create.url)))
       val jsPath = "container-client/js/player-launcher/editor.js"
       val bootstrap = "org.corespring.players.ItemEditor = corespring.require('editor');"
-      make(jsPath, defaultOptions, bootstrap)
+      make(jsPath, defaultOptions, bootstrap, request.queryParams)
   }
 
   /**
@@ -85,7 +85,7 @@ trait PlayerLauncher extends Controller {
           "evaluate" -> s"$sessionUrl?mode=evaluate"))
       val jsPath = "container-client/js/player-launcher/player.js"
       val bootstrap = s"org.corespring.players.ItemPlayer = corespring.require('player').define(${request.isSecure});"
-      make(jsPath, defaultOptions, bootstrap)
+      make(jsPath, defaultOptions, bootstrap, request.queryParams)
   }
 
   private def pathToNameAndContents(p: String) = {
@@ -100,9 +100,12 @@ trait PlayerLauncher extends Controller {
     }
   }
 
-  private def make(jsPath: String, options: JsValue, bootstrapLine: String)(implicit request: PlayerJsRequest[AnyContent]): Result = {
+  private def asJs(params: Seq[(String, String)]) = s"""{${params.map { t => s"${t._1}: \" $ { t._2 } \ "" }.mkString(",")}"""
+
+  private def make(jsPath: String, options: JsValue, bootstrapLine: String, queryParams: Seq[(String, String)])(implicit request: PlayerJsRequest[AnyContent]): Result = {
 
     val defaultOptions = ("default-options", s"module.exports = ${Json.stringify(options)}")
+    val queryParamsJs = ("query-params", s"module.exports = ${asJs(queryParams)}")
     val launchErrors = ("launcher-errors", errorsToModule(request.errors))
     val rawJs = Seq("container-client/js/corespring/core-library.js")
     val wrappedJs = jsPath +: Seq(
@@ -112,7 +115,7 @@ trait PlayerLauncher extends Controller {
       "container-client/js/player-launcher/root-level-listener.js")
 
     val contents = rawJs.map(pathToNameAndContents(_)).map(_._2)
-    val wrappedNameAndContents = wrappedJs.map(pathToNameAndContents) :+ defaultOptions :+ launchErrors
+    val wrappedNameAndContents = wrappedJs.map(pathToNameAndContents) :+ defaultOptions :+ launchErrors :+ queryParamsJs
     val wrappedContents = wrappedNameAndContents.map(tuple => ServerLibraryWrapper(tuple._1, tuple._2))
 
     val bootstrap =

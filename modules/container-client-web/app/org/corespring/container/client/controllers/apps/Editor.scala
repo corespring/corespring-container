@@ -19,6 +19,8 @@ trait Editor
 
   override def context: String = "editor"
 
+  def callCreator: CallCreator
+
   override def servicesJs = {
     import org.corespring.container.client.controllers.resources.routes._
 
@@ -35,7 +37,11 @@ trait Editor
           "configuration" -> (c.packageInfo \ "external-configuration").asOpt[JsObject])
     }
 
-    EditorServices("editor.services", Item.load(":id"), Item.save(":id"), JsArray(componentJson)).toString
+    EditorServices(
+      "editor.services",
+      callCreator.wrap(Item.load(":id")),
+      callCreator.wrap(Item.save(":id")),
+      JsArray(componentJson)).toString
   }
 
   override def additionalScripts: Seq[String] = Seq(org.corespring.container.client.controllers.apps.routes.Editor.services().url)
