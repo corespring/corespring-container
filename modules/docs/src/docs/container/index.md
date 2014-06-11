@@ -12,6 +12,15 @@ The container is a play module that honors the [Component Spec].
 
 Once you have the `container-client-web` on your classpath, you'll need to integrate it with your application.
 
+### Securing the Container
+
+There are 2 means by which you can secure the container.
+
+- By setting session cookies and reading them in the action hooks below
+- By passing queryParams to the Editor/Player and reading them in the hooks below.
+
+### Overview 
+
 The simplest example of an integration is the `shell` module within the app. Have a look at `ContainerClientImplementation`.
 
 This class extends `DefaultIntegration`, which is a trait that provides as many default implementations for you.
