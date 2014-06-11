@@ -19,8 +19,6 @@ trait Editor
 
   override def context: String = "editor"
 
-  def callCreator: CallCreator
-
   override def servicesJs = {
     import org.corespring.container.client.controllers.resources.routes._
 
@@ -39,8 +37,8 @@ trait Editor
 
     EditorServices(
       "editor.services",
-      callCreator.wrap(Item.load(":id")),
-      callCreator.wrap(Item.save(":id")),
+      Item.load(":id"),
+      Item.save(":id"),
       JsArray(componentJson)).toString
   }
 

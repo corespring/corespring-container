@@ -122,11 +122,6 @@ class ContainerClientImplementation(
   }
 
   override def dataQuery: DataQuery = new ShellProfile()
-
-  //In the shell we pass through
-  override def callCreator: CallCreator = new CallCreator {
-    override def wrap(c: Call): Call = Call(c.method, c.url + "?blah=blah")
-  }
 }
 
 trait LoadJs {

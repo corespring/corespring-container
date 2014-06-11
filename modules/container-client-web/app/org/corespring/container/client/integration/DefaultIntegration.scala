@@ -3,17 +3,17 @@ package org.corespring.container.client.integration
 import org.corespring.container.client.V2PlayerConfig
 import org.corespring.container.client.actions._
 import org.corespring.container.client.component.ComponentUrls
+import org.corespring.container.client.controllers.{ComponentsFileController, Icons, PlayerLauncher}
 import org.corespring.container.client.controllers.apps._
-import org.corespring.container.client.controllers.resources.{ Session, Item }
-import org.corespring.container.client.controllers.{ PlayerLauncher, ComponentsFileController, Icons }
+import org.corespring.container.client.controllers.resources.{Item, Session}
 import org.corespring.container.client.integration.validation.Validator
 import org.corespring.container.components.model.Component
 import org.corespring.container.components.model.dependencies.ComponentSplitter
-import org.corespring.container.components.outcome.{ DefaultScoreProcessor, ScoreProcessorSequence, ScoreProcessor }
+import org.corespring.container.components.outcome.{DefaultScoreProcessor, ScoreProcessor, ScoreProcessorSequence}
 import org.corespring.container.components.processing.PlayerItemPreProcessor
 import org.corespring.container.components.response.OutcomeProcessor
+import org.corespring.container.js.rhino.{RhinoOutcomeProcessor, RhinoPlayerItemPreProcessor}
 import org.corespring.container.js.rhino.score.ItemJsScoreProcessor
-import org.corespring.container.js.rhino.{ RhinoOutcomeProcessor, RhinoPlayerItemPreProcessor }
 import play.api.mvc.AnyContent
 
 trait DefaultIntegration
@@ -28,8 +28,6 @@ trait DefaultIntegration
     val componentsPath = configuration.getString("components.path").getOrElse("components")
     Validator.absolutePathInProdMode(componentsPath)
   }
-
-  def callCreator: CallCreator
 
   override def playerItemPreProcessor: PlayerItemPreProcessor = new RhinoPlayerItemPreProcessor(uiComponents, libraries)
 
@@ -56,8 +54,6 @@ trait DefaultIntegration
 
   lazy val editor = new Editor {
 
-    override def callCreator: CallCreator = DefaultIntegration.this.callCreator
-
     override def urls: ComponentUrls = componentUrls
 
     override def components: Seq[Component] = DefaultIntegration.this.components
@@ -72,8 +68,6 @@ trait DefaultIntegration
   }
 
   lazy val player = new Player {
-
-    override def callCreator: CallCreator = DefaultIntegration.this.callCreator
 
     override def urls: ComponentUrls = componentUrls
 

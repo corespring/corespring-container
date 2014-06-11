@@ -32,7 +32,7 @@
 
     function addQueryParamsIfPresent(path) {
       var href = document.location.href;
-      return  path + (href.indexOf('?') == -1 ? '' :  '?' + loc.split('?')[1]);
+      return  path + (href.indexOf('?') == -1 ? '' :  '?' + href.split('?')[1]);
     }
 
     var def = {

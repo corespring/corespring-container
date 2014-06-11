@@ -1,13 +1,13 @@
 package org.corespring.container.client.controllers.apps
 
+import scala.Some
+import scala.concurrent.{Await, Future}
+
 import org.corespring.container.client.actions.PlayerActions
 import org.corespring.container.client.component.PlayerItemTypeReader
 import org.corespring.container.client.views.txt.js.PlayerServices
+import play.api.Logger
 import play.api.mvc._
-import scala.concurrent.{ Await, Future }
-import play.api.{ Play, Logger }
-import scala.Some
-import play.api.mvc.SimpleResult
 
 trait Player
   extends PlayerItemTypeReader
@@ -18,19 +18,17 @@ trait Player
 
   override def context: String = "player"
 
-  def callCreator: CallCreator
-
   lazy val logger = Logger("container.player")
 
   override def servicesJs = {
     import org.corespring.container.client.controllers.resources.routes._
     PlayerServices(
       "player.services",
-      callCreator.wrap(Session.loadEverything(":id")),
-      callCreator.wrap(Session.saveSession(":id")),
-      callCreator.wrap(Session.getScore(":id")),
-      callCreator.wrap(Session.completeSession(":id")),
-      callCreator.wrap(Session.loadOutcome(":id"))).toString
+      Session.loadEverything(":id"),
+      Session.saveSession(":id"),
+      Session.getScore(":id"),
+      Session.completeSession(":id"),
+      Session.loadOutcome(":id")).toString
   }
 
   def createSessionForItem(itemId: String): Action[AnyContent] = actions.createSessionForItem(itemId) {
