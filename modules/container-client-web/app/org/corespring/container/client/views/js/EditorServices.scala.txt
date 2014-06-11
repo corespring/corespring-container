@@ -30,6 +30,11 @@
 
   angular.module('@namespace').factory('BaseService', ['$http', function($http){
 
+    function addQueryParamsIfPresent(path) {
+      var href = document.location.href;
+      return  path + (href.indexOf('?') == -1 ? '' :  '?' + loc.split('?')[1]);
+    }
+
     var def = {
       /**
        * Load the item, check to see if its already loaded.
@@ -38,7 +43,9 @@
         if(loadedData){
           onSuccess(loadedData);
         } else {
+
           var finalUrl = id ? '@load.url'.replace(":id", id) : '@load.url';
+          finalUrl = addQueryParamsIfPresent(finalUrl);
 
           $http['@load.method.toLowerCase'](finalUrl)
             .success(function(data, status, headers, config){
@@ -57,9 +64,12 @@
         this.save(data, onSuccess, onFailure, id);
       },
       save: function(data, onSuccess, onFailure, id){
-         var url = '@save.url.toLowerCase';
-         var finalUrl = id ? url.replace(":id", id) : url;
-         var method = '@save.method.toLowerCase';
+
+
+        var url = addQueryParamsIfPresent('@save.url.toLowerCase');
+        var finalUrl = id ? url.replace(":id", id) : url;
+        var method = '@save.method.toLowerCase';
+
         $http[method](finalUrl, data)
           .success(function(data, status, headers, config) {
             loadedData = data;

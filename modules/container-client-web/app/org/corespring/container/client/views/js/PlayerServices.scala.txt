@@ -6,10 +6,16 @@ angular.module('@namespace').factory('PlayerService', ['$http', function($http){
 
   function PlayerService(){
 
+    function addQueryParamsIfPresent(path) {
+      var href = document.location.href;
+      return  path + (href.indexOf('?') == -1 ? '' :  '?' + loc.split('?')[1]);
+    }
 
     var _call = function(method, url, data){
 
       return function(onSuccess, onFailure){
+
+        url = addQueryParamsIfPresent(url);
 
         var args = data ? [url, data] : [url];
         $http[method].apply(null, args)

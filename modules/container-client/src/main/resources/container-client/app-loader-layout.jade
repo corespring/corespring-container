@@ -51,6 +51,7 @@ block scripts
     var spinner = new Spinner(opts).spin(target);
 
     $(document).ready(function () {
+
       var configPath = appLoadConfig.jsonFile;
 
       $.get(configPath, function (data) {
