@@ -15,113 +15,122 @@
    * then the metadata will be two-way bound, and the caller is responsible for validation (probably using
    * SupportingMaterialService#validateMetadata).
    */
-  angular.module('corespring-editor.directives').directive('supportingmetadata', ['SupportingMaterialsService', function(SupportingMaterialsService) {
-    var otherType = 'Other';
+  angular.module('corespring-editor.directives').directive('supportingmetadata', ['SupportingMaterialsService',
+    function(SupportingMaterialsService) {
+      var otherType = 'Other';
 
-    return {
-      restrict: 'E',
-      scope: {
-        metadata: '=ngModel',
-        persist: '=',
-        bind: '@'
-      },
+      return {
+        restrict: 'E',
+        scope: {
+          metadata: '=ngModel',
+          persist: '=',
+          bind: '@'
+        },
 
-      link: function($scope) {
+        link: function($scope) {
 
-        $scope.materialTypes = ['Proctor Materials', 'Rubric', 'Scoring Guide', 'Student Materials',
-          'Student Work Examples', otherType];
+          $scope.materialTypes = ['none selected', 'Rubric', 'Scoring Guide', 'Student Materials',
+            'Student Work Examples', otherType
+          ];
 
-        function isOther() {
-          return $scope.materialTypeProxy === otherType;
-        }
-
-        function getType() {
-          function getOther() {
-            return _.isEmpty($scope.textMaterialType) ? undefined : $scope.textMaterialType;
+          function isOther() {
+            return $scope.materialTypeProxy === otherType;
           }
-          return isOther() ? getOther() : $scope.materialTypeProxy;
-        }
 
-
-        function updateMetadata() {
-          $scope.metadata.name = $scope.title;
-          $scope.metadata.materialType = getType();
-        }
-
-        $scope.$watch('title', function() {
-          if ($scope.bind) {
-            updateMetadata();
-          }
-        });
-
-        $scope.$watch('materialType', function() {
-          $scope.displayOther = isOther();
-          if ($scope.bind) {
-            updateMetadata();
-          }
-        });
-        $scope.$watch('materialTypeProxy', function() {
-          $scope.materialType = getType();
-          if ($scope.bind) {
-            updateMetadata();
-          }
-        });
-        $scope.$watch('textMaterialType', function() {
-          $scope.materialType = getType();
-          if ($scope.bind) {
-            updateMetadata();
-          }
-        });
-
-        $scope.forceUpdate = function() {
-          if (SupportingMaterialsService.validateMetadata({
-            title: $scope.title,
-            materialType: getType()
-          }, window.alert)) {
-            if ($scope.persist) {
-              $scope.persist($scope.title, getType());
+          function getType() {
+            function getOther() {
+              return _.isEmpty($scope.textMaterialType) ? undefined : $scope.textMaterialType;
             }
+            return isOther() ? getOther() : $scope.materialTypeProxy;
           }
-        };
 
 
-        $scope.$watch('metadata', function() {
+          function updateMetadata() {
+            $scope.metadata.name = $scope.title;
+            $scope.metadata.materialType = getType();
+          }
+
+          $scope.$watch('title', function() {
+            if ($scope.bind) {
+              updateMetadata();
+            }
+          });
+
+          $scope.$watch('materialType', function() {
+            $scope.displayOther = isOther();
+            if ($scope.bind) {
+              updateMetadata();
+            }
+          });
+          $scope.$watch('materialTypeProxy', function() {
+            $scope.materialType = getType();
+            if ($scope.bind) {
+              updateMetadata();
+            }
+          });
+          $scope.$watch('textMaterialType', function() {
+            $scope.materialType = getType();
+            if ($scope.bind) {
+              updateMetadata();
+            }
+          });
+
+          $scope.forceUpdate = function() {
+            if (SupportingMaterialsService.validateMetadata({
+              title: $scope.title,
+              materialType: getType()
+            }, window.alert)) {
+              if ($scope.persist) {
+                $scope.persist($scope.title, getType());
+              }
+            }
+          };
+
+
+          $scope.$watch('metadata', function() {
+            $scope.init();
+          });
+
+          $scope.init = function() {
+            $scope.bind = $scope.persist === undefined;
+            if ($scope.metadata) {
+              $scope.title = $scope.metadata.name;
+              $scope.materialTypeProxy = $scope.metadata.materialType ?
+                (_.contains($scope.materialTypes, $scope.metadata.materialType) ? $scope.metadata.materialType : otherType) :
+                $scope.materialTypes[0];
+              $scope.textMaterialType = isOther() ? $scope.metadata.materialType : undefined;
+            }
+            $scope.displayOther = isOther();
+          };
+
           $scope.init();
-        });
 
-        $scope.init = function() {
-          $scope.bind = $scope.persist === undefined;
-          if ($scope.metadata) {
-            $scope.title = $scope.metadata.name;
-            $scope.materialTypeProxy = $scope.metadata.materialType ?
-              (_.contains($scope.materialTypes, $scope.metadata.materialType) ? $scope.metadata.materialType : otherType) :
-              $scope.materialTypes[0];
-            $scope.textMaterialType = isOther() ? $scope.metadata.materialType : undefined;
-          }
-          $scope.displayOther = isOther();
-        };
+        },
+        template: [
+          '<form name="myForm" class="supporting-material-metadata my-form">',
 
-        $scope.init();
+          '  <div ng-class="{\'field\':true, \'has-error\':myForm.type.$error.required, \'has-success\':!myForm.type.$error.required}"> ',
+          '    <label class="control-label" for="supporting-material-title">Title</label>',
+          '    <span class="error" ng-show="myForm.type.$error.required" >Required!</span>',
+          '    <input name="type" class="form-control" type="text" ng-model="title" required />',
+          '  </div>',
 
-      },
-      template: [
-        '<div class="supporting-material-metadata">',
-        '  <div class="field">',
-        '    <label for="supporting-material-title">Title</label>',
-        '    <input type="text" ng-model="title"/>',
-        '  </div>',
-        '  <div class="field">',
-        '    <label for="supporting-material-type">Select Type</label>',
-        '    <select ng-model="materialTypeProxy" ng-options="materialType for materialType in materialTypes"></select>',
-        '  </div>',
-        '  <div class="field other" ng-show="displayOther">',
-        '    <label for="supporting-material-type-text">Other</label>',
-        '    <input type="text" ng-model="textMaterialType"/>',
-        '  </div>',
-        '  <button class="btn btn-small" ng-show="persist" ng-click="forceUpdate()">Update</button>',
-        '</div>'
-      ].join('\n')
-    };
-  }]);
+          '  <div class="field">',
+          '    <label for="supporting-material-type">Select Type</label>',
+          '    <select ng-model="materialTypeProxy" ng-options="materialType for materialType in materialTypes"></select>',
+          '  </div>',
+
+          '  <div ng-class="{\'field\':true, \'other\':true, \'has-error\':myForm.others.$error.required, \'has-success\':!myForm.type.$error.required}" ng-show="displayOther" >',
+          '    <label class="control-label" for="supporting-material-type-text">Other</label>',
+          '    <span  class="error" ng-show="myForm.others.$error.required">Required!</span>',
+          '    <input name="others" class="form-control"  type="text" ng-model="textMaterialType" required/>',
+          '  </div>',
+
+          '  <button class="btn btn-small" ng-show="persist" ng-click="forceUpdate()">Update</button>',
+          '</form>'
+        ].join('\n')
+      };
+    }
+  ]);
 
 })();
