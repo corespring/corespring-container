@@ -105,6 +105,7 @@ angular.module('corespring-player.services').factory('CorespringPlayerDefinition
             return;
           }
           ComponentRegister.setOutcomes(r);
+          MathJaxService.parseDomForMath();
         }, true);
 
         if (_.isFunction(opts.postLink)) {
