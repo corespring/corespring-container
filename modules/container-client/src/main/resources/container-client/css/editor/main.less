@@ -53,6 +53,7 @@
       right: 0;
       left: 0;
       top: 0;
+
       .wiggi-wiz {
         position: absolute;
         right: 0;
@@ -60,7 +61,18 @@
         left: 0;
         bottom: 0;
         border: none;
+        display: flex;
+        flex-direction: column;
+
+        .wiggi-wiz-editable {
+          margin-top: 10px;
+          padding-right: 40px;
+          overflow-y: auto;
+          overflow-x: auto;
+          height: 100%;
+        }
       }
+
       .wiggi-wiz-overlay {
         .close-icon {
           width: 19px;
@@ -120,7 +132,7 @@
       right: -98px;
     }
     .wiggi-wiz .wiggi-wiz-editable {
-      padding-right: 40px;
+        padding-right: 40px;
     }
     &.preview {
       .wiggi-wiz .wiggi-wiz-editable {
