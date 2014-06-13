@@ -109,7 +109,7 @@
 
           $scope.setActiveCtrl = function(event){
             $scope.activeControl = event && event.target ? event.target : null;
-          }
+          };
 
         },
         template: [
