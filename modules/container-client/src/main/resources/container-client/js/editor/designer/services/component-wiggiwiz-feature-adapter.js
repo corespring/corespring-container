@@ -30,7 +30,7 @@
     }
 
     var service = {};
-    service.componentToWiggiwizFeature = function(component, addToEditorCallback, deleteComponentCallback) {
+    service.componentToWiggiwizFeature = function(component, addToEditorCallback, deleteComponentCallback, readdComponentCallback) {
       var componentType = component.componentType;
       return {
         name: componentType,
@@ -41,7 +41,9 @@
         draggable: true,
         deleteNode: function($node, services) {
           deleteComponentCallback($node.attr('id'));
-
+        },
+        readdNode: function($node, scope) {
+          readdComponentCallback($node);
         },
         initialise: function($node, replaceWith) {
           var id = $node.attr('id');

@@ -148,7 +148,9 @@ angular.module('corespring-player.services').factory('ComponentRegister', ['$log
 
         if (components) {
           $.each(components, function(id, component) {
-            component[cb](loaded[name][id]);
+            if (loaded[name][id]) {
+              component[cb](loaded[name][id]);
+            }
           });
         }
       };
