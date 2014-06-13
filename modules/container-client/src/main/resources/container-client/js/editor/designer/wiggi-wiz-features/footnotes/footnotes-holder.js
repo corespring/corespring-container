@@ -3,7 +3,7 @@ angular.module('corespring.wiggi-wiz-features.footnotes').directive('footnotesHo
   function(LogFactory) {
 
     var html;
-    var DEFAULT_TEXT = "Footnotes";
+    var DEFAULT_TEXT = "Footnote";
     var $log = LogFactory.getLogger('footnotes-holder]');
 
     var template = [

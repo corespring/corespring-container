@@ -44,6 +44,8 @@
 
     $log.log($stateParams);
 
+    $scope.removedComponents = {};
+
     $scope.section = $stateParams.section;
 
     $scope.editorMode = "visual";
@@ -117,16 +119,25 @@
       function deleteComponent(id) {
         if ($scope.data.item && $scope.data.item.components) {
           ComponentRegister.deleteComponent(id);
+          $scope.removedComponents[id] = _.cloneDeep($scope.data.item.components[id]);
+          delete $scope.data.item.components[id];
         } else {
           throw 'Can\'t delete component with id ' + id;
         }
+      }
+
+      function readdToEditor($node) {
+        var id = $($node).attr('id');
+        $scope.data.item.components[id] = $scope.removedComponents[id];
       }
 
       function componentToFeature(component) {
         return ComponentToWiggiwizFeatureAdapter.componentToWiggiwizFeature(
           component,
           addToEditor,
-          deleteComponent);
+          deleteComponent,
+          readdToEditor
+        );
       }
 
       var orderedComponents = [
