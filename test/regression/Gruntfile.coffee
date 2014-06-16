@@ -44,9 +44,9 @@ test remotely via saucelabs:
     common: commonConfig
 
     webdriver:
-      options: if local then localWebdriverOptions else sauceLabsWebdriverOptions
       regression:
         tests: ['src/**/*.js']
+        options: if local then localWebdriverOptions else sauceLabsWebdriverOptions
 
     http_verify:
       statusCode:
@@ -56,12 +56,12 @@ test remotely via saucelabs:
           {type: 'statusCode', operator: 'equals', value: '302'}
         ]
         callback: (err) ->
-          grunt.fail.fatal "#{baseUrl} not reachable, #{err}"
+          grunt.fail.fatal "Verifying #{baseUrl}: #{err}"
 
   grunt.initConfig(config)
 
   npmTasks = [
-    'grunt-webdriver',
+    'grunt-webdriver'
     'grunt-http-verify'
   ]
 
@@ -72,9 +72,7 @@ test remotely via saucelabs:
     grunt.log.writeln("baseUrl", baseUrl))
 
   grunt.registerTask('regression', helpText, ['logParams', 'http_verify:statusCode', 'webdriver:regression'])
-  grunt.registerTask('default', 'help', ->
-    grunt.log.writeln(helpText)
-  )
+  grunt.registerTask('default', 'regression')
 
 
 
