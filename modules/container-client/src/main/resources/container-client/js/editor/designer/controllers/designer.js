@@ -16,7 +16,6 @@
       'MathJaxService',
       'WiggiFootnotesFeatureDef',
       'WiggiMathJaxFeatureDef',
-      'WiggiWizHelper',
       DesignerController
     ]);
 
@@ -35,8 +34,7 @@
     LogFactory,
     MathJaxService,
     WiggiFootnotesFeatureDef,
-    WiggiMathJaxFeatureDef,
-    WiggiWizHelper ) {
+    WiggiMathJaxFeatureDef) {
 
     var configPanels = {};
 
@@ -296,7 +294,6 @@
     });
 
     DesignerService.loadAvailableComponents(onComponentsLoaded, onComponentsLoadError);
-    WiggiWizHelper.focusCaretAtEnd('.wiggi-wiz-editable', $element);
 
     $scope.$on('itemLoaded', function(ev, item) {
       if (item) {

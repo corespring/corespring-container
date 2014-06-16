@@ -76,7 +76,8 @@ var Placeholder = function(
       }
     };
 
-    $scope.deleteNode = function() {
+    $scope.deleteNode = function($event) {
+      $event.stopPropagation();
       $scope.$emit('wiggi-wiz.delete-node', $element);
     };
 
@@ -132,7 +133,7 @@ var Placeholder = function(
       '       <div class="title"><span ng-show="mainMsg">{{mainMsg}}</span></div>',
       '     </div>',
       '     <div class="delete-icon">',
-      '      <i ng-click="deleteNode()" class="fa fa-times-circle"></i>',
+      '      <i ng-click="deleteNode($event)" class="fa fa-times-circle"></i>',
       '    </div>',
       '  </div>',
       '  <div class="holder"></div>',
