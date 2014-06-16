@@ -51,11 +51,11 @@ test remotely via saucelabs:
       statusCode:
         url: baseUrl
         conditions: [
-          {type: 'statusCode', operator: 'equals', value: '200'}
-          {type: 'statusCode', operator: 'equals', value: '302'}
+          {type: 'statusCode'}
         ]
         callback: (err) ->
-          grunt.fail.fatal "Verifying #{baseUrl}: #{err}"
+          if err
+            grunt.fail.fatal "Verifying #{baseUrl}: #{err}"
 
   grunt.initConfig(config)
 
