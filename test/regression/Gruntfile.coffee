@@ -1,5 +1,4 @@
 module.exports = (grunt) ->
-
   local = grunt.option('local') isnt false
 
   if grunt.option('target')
@@ -13,11 +12,6 @@ module.exports = (grunt) ->
   commonConfig =
     app: "."
 
-  localWebdriverOptions =
-    testParams:
-      baseUrl: baseUrl
-    desiredCapabilities:
-      browserName: 'chrome'
   # other options firefox,internet explorer
   # for internet explorer you have to install https://code.google.com/p/selenium/wiki/InternetExplorerDriver
 
@@ -26,11 +20,22 @@ module.exports = (grunt) ->
     port: 80
     user: process.env.SAUCE_USERNAME
     key: process.env.SAUCE_ACCESS_KEY
-    testParams:
-      baseUrl: baseUrl
     desiredCapabilities:
-      browserName: 'chrome'
       'tunnel-identifier': 'regression-tunnel'
+
+  addDesiredCapability = (options, name) ->
+    if(grunt.option(name))
+      options.desiredCapabilites ?= {}
+      options.desiredCapabilites[name] = grunt.option(name)
+      grunt.log.writeln("desired capability ", name, grunt.option(name))
+    options
+
+  getWebdriverOptions = () ->
+    options = if local then {} else sauceLabsWebdriverOptions
+    options.testParams = {baseUrl: baseUrl}
+    addDesiredCapability(options, "browserName")
+    addDesiredCapability(options, "platform")
+    options
 
   helpText = """
 test locally:
@@ -47,7 +52,7 @@ test remotely via saucelabs:
     webdriver:
       regression:
         tests: ['src/**/*.js']
-        options: if local then localWebdriverOptions else sauceLabsWebdriverOptions
+        options: getWebdriverOptions()
 
     http_verify:
       statusCode:
