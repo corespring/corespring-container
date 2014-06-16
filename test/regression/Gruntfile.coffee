@@ -8,6 +8,8 @@ module.exports = (grunt) ->
   else
     baseUrl = grunt.option('baseUrl') ? "http://localhost:9000"
 
+  grunt.fail.fatal "saucelabs credentials missing" unless local || process.env.SAUCE_USERNAME? && process.env.SAUCE_ACCESS_KEY?
+
   commonConfig =
     app: "."
 
