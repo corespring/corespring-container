@@ -27,7 +27,6 @@ module.exports = (grunt) ->
     testParams:
       baseUrl: baseUrl
     desiredCapabilities:
-      platform: 'WINDOWS'
       browserName: 'chrome'
       'tunnel-identifier': 'regression-tunnel'
 

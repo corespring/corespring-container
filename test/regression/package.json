@@ -3,6 +3,10 @@
   "name": "corespring-container-regression-tests",
   "description" : "A suite of functional tests for corespring container",
   "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/corespring/corespring-container"
+  },
   "dependencies": {
   },
   "engines": {
