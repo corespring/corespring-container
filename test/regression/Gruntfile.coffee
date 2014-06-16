@@ -1,4 +1,5 @@
 module.exports = (grunt) ->
+
   local = grunt.option('local') isnt false
 
   if grunt.option('target')
@@ -8,6 +9,12 @@ module.exports = (grunt) ->
     baseUrl = grunt.option('baseUrl') ? "http://localhost:9000"
 
   grunt.fail.fatal "saucelabs credentials missing" unless local || process.env.SAUCE_USERNAME? && process.env.SAUCE_ACCESS_KEY?
+
+  GLOBAL.corespringRegressionTest =
+    baseUrl: baseUrl
+    local: local
+    getUrl: (url) ->
+      if url? && url.toString().toLowerCase().indexOf('http') == 0 then url else baseUrl + url
 
   commonConfig =
     app: "."
@@ -32,7 +39,6 @@ module.exports = (grunt) ->
 
   getWebdriverOptions = () ->
     options = if local then {} else sauceLabsWebdriverOptions
-    options.testParams = {baseUrl: baseUrl}
     addDesiredCapability(options, "browserName")
     addDesiredCapability(options, "platform")
     options
