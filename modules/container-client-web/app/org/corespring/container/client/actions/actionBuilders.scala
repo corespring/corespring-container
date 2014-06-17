@@ -39,19 +39,28 @@ trait ItemHooks {
   def create(json: Option[JsValue])(implicit header: RequestHeader): Future[Either[(Int, String), String]]
 }
 
-trait ItemActions[A] {
+/*trait ItemActions[A] {
   def load(itemId: String)(block: ItemRequest[A] => Result): Action[AnyContent]
 
   @deprecated("Use ItemHooks.save instead", "3.2")
   def save(itemId: String)(block: SaveItemRequest[A] => Result): Action[AnyContent]
 
   def create(error: (Int, String) => Result)(block: NewItemRequest[A] => Result): Action[AnyContent]
-}
+}*/
 
 trait SupportingMaterialActions[A] {
   def create(itemId: String)(block: NewSupportingMaterialRequest[A] => Result): Action[AnyContent]
 }
 
+trait SessionHooks {
+  def loadEverything(id: String)(implicit header: RequestHeader): Future[Either[SimpleResult, FullSession]]
+  def load(id: String)(implicit header: RequestHeader): Future[Either[SimpleResult, JsValue]]
+  def loadOutcome(id: String)(implicit header: RequestHeader): Future[Either[SimpleResult, SessionOutcome]]
+  def getScore(id: String)(implicit header: RequestHeader): Future[Either[SimpleResult, SessionOutcome]]
+  def submitAnswers(id: String)(implicit header: RequestHeader): Future[Either[SimpleResult, JsValue]]
+  def save(id: String)(implicit header: RequestHeader): Future[Either[SimpleResult, SaveSession]]
+}
+/*
 trait SessionActions[A] {
   def loadEverything(id: String)(block: FullSessionRequest[A] => Result): Action[AnyContent]
 
@@ -70,7 +79,7 @@ trait SessionActions[A] {
   def submitAnswers(id: String)(block: SubmitSessionRequest[A] => Result): Action[AnyContent]
 
   def save(id: String)(block: SaveSessionRequest[A] => Result): Action[AnyContent]
-}
+}*/
 
 trait PlayerLauncherActions[A] {
   /**
