@@ -1,4 +1,4 @@
-regressionTestRunner = require('./lib/regression-test-runner')
+regressionTestRunner = require('regression-test-runner')
 
 module.exports = (grunt) ->
 
