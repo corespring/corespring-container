@@ -4,7 +4,7 @@ module.exports = (grunt) ->
 
   config =
     regressionTestRunner:
-      tests: ['src/**/*.js']
+      tests: ['tests/**/*.js']
 
   grunt.initConfig(config)
 
