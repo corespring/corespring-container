@@ -76,10 +76,7 @@ describe('designer controller', function() {
     try {
       ctrl = $controller('Designer', {
         $scope: scope,
-        $element: $('<div></div>'),
-        WiggiWizHelper: {
-          focusCaretAtEnd: function() {}
-        }
+        $element: $('<div></div>')
       });
     } catch (e) {
       throw ("Error with the controller: " + e);
