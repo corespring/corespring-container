@@ -5,20 +5,18 @@ import org.corespring.container.client.actions._
 import org.corespring.container.client.controllers._
 import org.corespring.container.client.integration.DefaultIntegration
 import org.corespring.container.components.model.Component
+import org.corespring.container.components.model.dependencies.DependencyResolver
 import org.corespring.mongo.json.services.MongoService
-import org.corespring.shell.controllers.CachedAndMinifiedComponentSets
-import org.corespring.shell.controllers.editor.actions.{ EditorActions => ShellEditorActions }
-import org.corespring.shell.controllers.catalog.actions.{ CatalogActions => ShellCatalogActions }
-import org.corespring.shell.controllers.editor.{ ItemHooks => ShellItemHooks }
-import org.corespring.shell.controllers.player.actions.{ PlayerActions => ShellPlayerActions }
-import org.corespring.shell.controllers.player.{ SessionActions => ShellSessionActions }
-import org.corespring.shell.controllers.{ ShellDataQuery => ShellProfile }
+import org.corespring.shell.controllers.catalog.actions.{CatalogActions => ShellCatalogActions}
+import org.corespring.shell.controllers.editor.actions.{EditorActions => ShellEditorActions}
+import org.corespring.shell.controllers.editor.{ItemHooks => ShellItemHooks}
+import org.corespring.shell.controllers.player.actions.{PlayerActions => ShellPlayerActions}
+import org.corespring.shell.controllers.player.{SessionHooks => ShellSessionHooks}
+import org.corespring.shell.controllers.{CachedAndMinifiedComponentSets, ShellDataQuery => ShellProfile}
 import play.api.Configuration
 import play.api.mvc._
-import scala.Some
-import scala.concurrent.Future
-import org.corespring.container.components.model.dependencies.DependencyResolver
-import org.corespring.container.client.controllers.apps.CallCreator
+
+import scala.concurrent.ExecutionContext
 
 class ContainerClientImplementation(
   val itemService: MongoService,
@@ -104,10 +102,12 @@ class ContainerClientImplementation(
     override def itemService: MongoService = ContainerClientImplementation.this.itemService
   }
 
-  override def sessionActions: SessionActions[AnyContent] = new ShellSessionActions {
+  override def sessionHooks: SessionHooks = new ShellSessionHooks {
     override def itemService: MongoService = ContainerClientImplementation.this.itemService
 
     override def sessionService: MongoService = ContainerClientImplementation.this.sessionService
+
+    override implicit def ec: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
   }
 
   override def itemHooks: ItemHooks = new ShellItemHooks {

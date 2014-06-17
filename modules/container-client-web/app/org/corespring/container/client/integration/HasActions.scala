@@ -14,13 +14,12 @@ trait HasActions {
 
   def playerActions: PlayerActions[AnyContent]
 
-  def sessionActions: SessionActions[AnyContent]
-
   def playerLauncherActions: PlayerLauncherActions[AnyContent]
 }
 
 trait HasHooks {
   def itemHooks: ItemHooks
+  def sessionHooks: SessionHooks
 }
 
 trait HasConfig {

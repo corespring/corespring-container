@@ -2,7 +2,7 @@ package org.corespring.container.client.actions
 
 import play.api.mvc._
 import scala.concurrent.Future
-import play.api.libs.json.JsValue
+import play.api.libs.json.{Json, JsValue}
 
 /**
  * Client side calls - each will call for config, services and components
@@ -32,54 +32,25 @@ trait CatalogActions[A] extends ClientActions[A] {
   def showCatalog(itemId: String)(error: (Int, String) => Future[SimpleResult])(block: PlayerRequest[A] => Future[SimpleResult]): Action[AnyContent]
 }
 
-//Note: move to this pattern - instead of action decorators
+case class HttpStatusMessage(status:Int,message:String = "")
+
 trait ItemHooks {
-  def load(itemId: String)(implicit header: RequestHeader): Future[Either[SimpleResult, JsValue]]
-  def save(itemId: String, json: JsValue)(implicit header: RequestHeader): Future[Either[SimpleResult, JsValue]]
-  def create(json: Option[JsValue])(implicit header: RequestHeader): Future[Either[(Int, String), String]]
+  def load(itemId: String)(implicit header: RequestHeader): Future[Either[HttpStatusMessage, JsValue]]
+  def save(itemId: String, json: JsValue)(implicit header: RequestHeader): Future[Either[HttpStatusMessage, JsValue]]
+  def create(json: Option[JsValue])(implicit header: RequestHeader): Future[Either[HttpStatusMessage, String]]
 }
-
-/*trait ItemActions[A] {
-  def load(itemId: String)(block: ItemRequest[A] => Result): Action[AnyContent]
-
-  @deprecated("Use ItemHooks.save instead", "3.2")
-  def save(itemId: String)(block: SaveItemRequest[A] => Result): Action[AnyContent]
-
-  def create(error: (Int, String) => Result)(block: NewItemRequest[A] => Result): Action[AnyContent]
-}*/
 
 trait SupportingMaterialActions[A] {
   def create(itemId: String)(block: NewSupportingMaterialRequest[A] => Result): Action[AnyContent]
 }
 
 trait SessionHooks {
-  def loadEverything(id: String)(implicit header: RequestHeader): Future[Either[SimpleResult, FullSession]]
-  def load(id: String)(implicit header: RequestHeader): Future[Either[SimpleResult, JsValue]]
-  def loadOutcome(id: String)(implicit header: RequestHeader): Future[Either[SimpleResult, SessionOutcome]]
-  def getScore(id: String)(implicit header: RequestHeader): Future[Either[SimpleResult, SessionOutcome]]
-  def submitAnswers(id: String)(implicit header: RequestHeader): Future[Either[SimpleResult, JsValue]]
-  def save(id: String)(implicit header: RequestHeader): Future[Either[SimpleResult, SaveSession]]
+  def loadEverything(id: String)(implicit header: RequestHeader): Future[Either[HttpStatusMessage, FullSession]]
+  def load(id: String)(implicit header: RequestHeader): Future[Either[HttpStatusMessage, JsValue]]
+  def loadOutcome(id: String)(implicit header: RequestHeader): Future[Either[HttpStatusMessage, SessionOutcome]]
+  def getScore(id: String)(implicit header: RequestHeader): Future[Either[HttpStatusMessage, SessionOutcome]]
+  def save(id: String)(implicit header: RequestHeader): Future[Either[HttpStatusMessage, SaveSession]]
 }
-/*
-trait SessionActions[A] {
-  def loadEverything(id: String)(block: FullSessionRequest[A] => Result): Action[AnyContent]
-
-  def load(id: String)(block: FullSessionRequest[A] => Result): Action[AnyContent]
-
-  def loadOutcome(id: String)(block: SessionOutcomeRequest[A] => Result): Action[AnyContent]
-
-  def getScore(id: String)(block: SessionOutcomeRequest[A] => Result): Action[AnyContent]
-
-  /**
-   * Load the item and the session return these to the `block` in a SubmitAnswersRequest
-   * @param id
-   * @param block
-   * @return
-   */
-  def submitAnswers(id: String)(block: SubmitSessionRequest[A] => Result): Action[AnyContent]
-
-  def save(id: String)(block: SaveSessionRequest[A] => Result): Action[AnyContent]
-}*/
 
 trait PlayerLauncherActions[A] {
   /**

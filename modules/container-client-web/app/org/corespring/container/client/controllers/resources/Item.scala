@@ -17,9 +17,12 @@ object Item {
 
 trait Item extends Controller with XhtmlCleaner {
 
-  import ExecutionContext.Implicits.global
 
   private lazy val logger = Logger("container.item")
+
+  implicit def toResult(m:HttpStatusMessage) : SimpleResult = play.api.mvc.Results.Status(m.status)(Json.obj("error" -> m.message))
+
+  implicit def ec : ExecutionContext
 
   def hooks: ItemHooks
 
@@ -28,7 +31,7 @@ trait Item extends Controller with XhtmlCleaner {
       hooks.create(request.body.asJson).map {
         either =>
           either match {
-            case Left((code, msg)) => Status(code)(Json.obj("error" -> msg))
+            case Left(sm) => sm //Status(code)(Json.obj("error" -> msg))
             case Right(id) => Ok(Json.obj("itemId" -> id))
           }
       }
@@ -39,7 +42,7 @@ trait Item extends Controller with XhtmlCleaner {
       hooks.load(itemId).map {
         either =>
           either match {
-            case Left(err) => err
+            case Left(sm) => sm
             case Right(json) => Ok(json)
           }
       }
@@ -64,7 +67,7 @@ trait Item extends Controller with XhtmlCleaner {
           }
       }.getOrElse(Success(None))
 
-      val out: Validation[String, Future[Either[SimpleResult, JsValue]]] = for {
+      val out: Validation[String, Future[Either[HttpStatusMessage, JsValue]]] = for {
         json <- request.body.asJson.toSuccess(Item.Errors.noJson)
         validXhtml <- cleanIncomingXhtml((json \ "xhtml").asOpt[String])
       } yield {

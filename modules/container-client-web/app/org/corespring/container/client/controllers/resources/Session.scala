@@ -1,13 +1,22 @@
 package org.corespring.container.client.controllers.resources
 
 import org.corespring.container.client.actions._
+import org.corespring.container.client.controllers.resources.Session.Errors
 import org.corespring.container.client.controllers.resources.session.ItemPruner
 import org.corespring.container.components.outcome.ScoreProcessor
 import org.corespring.container.components.processing.PlayerItemPreProcessor
 import org.corespring.container.components.response.OutcomeProcessor
 import play.api.Logger
 import play.api.libs.json._
-import play.api.mvc.{ Action, Controller, SimpleResult }
+import play.api.mvc.{Action, Controller, SimpleResult}
+
+import scala.concurrent.ExecutionContext
+
+object Session{
+  object Errors{
+    val  cantSaveWhenComplete = "secure mode: can't save when session is complete"
+  }
+}
 
 trait Session extends Controller with ItemPruner {
 
@@ -21,10 +30,13 @@ trait Session extends Controller with ItemPruner {
 
   def hooks: SessionHooks
 
-  private def basicHandler[A](success: (A => SimpleResult))(
-    e: Either[SimpleResult, A]) = e match {
+  implicit def  ec : ExecutionContext
 
-    case Left((code, msg)) => Status(code)(Json.obj("error" -> msg))
+  implicit def toResult(m:HttpStatusMessage) : SimpleResult = play.api.mvc.Results.Status(m.status)(Json.obj("error" -> m.message))
+
+  private def basicHandler[A](success: (A => SimpleResult))(
+    e: Either[HttpStatusMessage, A]) : SimpleResult = e match {
+    case Left(err) => err
     case Right(json) => success(json)
   }
 
@@ -81,7 +93,7 @@ trait Session extends Controller with ItemPruner {
       logger.trace(s"[saveSession] : $id")
 
       if (ss.isSecure && ss.isComplete)
-        BadRequest(Json.obj("error" -> JsString("secure mode: can't save when session is complete")))
+        BadRequest(Json.obj("error" -> JsString(Errors.cantSaveWhenComplete)))
       else {
         request.body.asJson.map {
           requestJson =>
@@ -179,7 +191,6 @@ trait Session extends Controller with ItemPruner {
         }
       })
     }
-
   }
 
   def completeSession(id: String) = Action.async { implicit request =>
@@ -189,7 +200,6 @@ trait Session extends Controller with ItemPruner {
         savedSession =>
           Ok(savedSession)
       }.getOrElse(BadRequest("Error completing"))
-      Ok("")
     }))
   }
 

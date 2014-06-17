@@ -16,6 +16,8 @@ import org.corespring.container.js.rhino.{RhinoOutcomeProcessor, RhinoPlayerItem
 import org.corespring.container.js.rhino.score.ItemJsScoreProcessor
 import play.api.mvc.AnyContent
 
+import scala.concurrent.ExecutionContext
+
 trait DefaultIntegration
   extends ContainerControllers
   with ComponentSplitter
@@ -82,17 +84,21 @@ trait DefaultIntegration
     def outcomeProcessor: OutcomeProcessor = DefaultIntegration.this.outcomeProcessor
 
     override def hooks: ItemHooks = itemHooks
+
+    override implicit def ec: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
   }
 
   lazy val session = new Session {
 
-    override def actions: SessionActions[AnyContent] = sessionActions
+    override def hooks: SessionHooks = sessionHooks
 
     def outcomeProcessor = DefaultIntegration.this.outcomeProcessor
 
     def itemPreProcessor: PlayerItemPreProcessor = DefaultIntegration.this.playerItemPreProcessor
 
     def scoreProcessor: ScoreProcessor = DefaultIntegration.this.scoreProcessor
+
+    override implicit def ec: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
   }
 
   lazy val playerLauncher = new PlayerLauncher {
