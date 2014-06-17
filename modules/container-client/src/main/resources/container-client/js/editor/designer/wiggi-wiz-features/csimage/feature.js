@@ -45,8 +45,9 @@ angular.module('corespring.wiggi-wiz-features.cs-image').factory('ImageFeature',
       var imageSrc = $node.find('img').attr('src');
 
       if (imageSrc) {
+        var divStyle = $node.attr('style');
         var imageStyle = $node.find('img').attr('style');
-        var clone = $('<div image-holder image-src="' + imageSrc + '" image-style="' + imageStyle + '"></div>');
+        var clone = $('<div style="'+divStyle+'" image-holder image-src="' + imageSrc + '" image-style="' + imageStyle + '"></div>');
         return replaceWith(clone);
       } else {
         return $node;
@@ -55,7 +56,8 @@ angular.module('corespring.wiggi-wiz-features.cs-image').factory('ImageFeature',
 
     csImage.getMarkUp = function($node, $scope) {
       var imgNode = $node.find('img');
-      return '<div style="text-align: left;">' + $(imgNode)[0].outerHTML + '</div>';
+      var divStyle = $node.attr('style');
+      return '<div style="' + divStyle + '">' + $(imgNode)[0].outerHTML + '</div>';
     };
 
     csImage.addToEditor = function(editor, addContent) {
