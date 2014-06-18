@@ -153,7 +153,7 @@ trait LoadJs {
       header.session - SessionKeys.failLoadPlayer
     }
 
-    PlayerJs(isSecure, errors /*, updatedSession?*/ )
+    PlayerJs(isSecure, updatedSession, errors)
   }
 }
 

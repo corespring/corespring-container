@@ -4,22 +4,20 @@ import org.corespring.container.client.hooks.Hooks.StatusMessage
 import play.api.libs.json.JsValue
 import play.api.mvc._
 
-import scala.concurrent.Future
+import scala.concurrent.{ ExecutionContext, Future }
 
 object Hooks {
   type StatusMessage = (Int, String)
-
 }
 
+trait HasContext {
+  implicit def ec: ExecutionContext
+}
 /**
  * Client side calls - each will call for config, services and components
  */
-trait ClientHooks {
-  def loadComponents(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]]
-
-  def loadServices(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]]
-
-  def loadConfig(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]]
+trait ClientHooks extends HasContext {
+  def loadItem(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]]
 }
 
 trait PlayerHooks extends ClientHooks {
@@ -38,7 +36,7 @@ trait CatalogHooks extends ClientHooks {
   def showCatalog(itemId: String)(implicit header: RequestHeader): Future[Option[StatusMessage]]
 }
 
-trait ItemHooks {
+trait ItemHooks extends HasContext {
   def load(itemId: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]]
 
   def save(itemId: String, json: JsValue)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]]
@@ -46,11 +44,11 @@ trait ItemHooks {
   def create(json: Option[JsValue])(implicit header: RequestHeader): Future[Either[StatusMessage, String]]
 }
 
-trait SupportingMaterialHooks {
+trait SupportingMaterialHooks extends HasContext {
   def create(itemId: String)(implicit header: RequestHeader): Future[Either[StatusMessage, NewSupportingMaterial]]
 }
 
-trait SessionHooks {
+trait SessionHooks extends HasContext {
   def loadEverything(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, FullSession]]
 
   def load(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]]
@@ -62,13 +60,13 @@ trait SessionHooks {
   def save(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, SaveSession]]
 }
 
-trait PlayerLauncherHooks {
+trait PlayerLauncherHooks extends HasContext {
   def playerJs(implicit header: RequestHeader): Future[PlayerJs]
 
   def editorJs(implicit header: RequestHeader): Future[PlayerJs]
 }
 
-trait AssetHooks {
+trait AssetHooks extends HasContext {
   def delete(itemId: String, file: String)(implicit header: RequestHeader): Future[Option[StatusMessage]]
 
   /**

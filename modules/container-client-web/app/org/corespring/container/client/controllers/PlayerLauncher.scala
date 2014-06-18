@@ -130,8 +130,15 @@ trait PlayerLauncher extends Controller {
         |$bootstrapLine
         |
       """.stripMargin
+
+    def sumSession(s: Session, keyValues: (String, String)*): Session = {
+      keyValues.foldRight(s)((kv: (String, String), acc: Session) => acc + (kv._1, kv._2))
+    }
+
+    val finalSession = sumSession(js.session, (SecureMode, js.isSecure.toString))
+
     Ok(
-      (contents ++ wrappedContents :+ bootstrap).mkString("\n")).as(ContentTypes.JAVASCRIPT).withSession(session + (SecureMode, js.isSecure.toString))
+      (contents ++ wrappedContents :+ bootstrap).mkString("\n")).as(ContentTypes.JAVASCRIPT).withSession(finalSession)
   }
 
   private def errorsToModule(errors: Seq[String]): String = {

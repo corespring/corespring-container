@@ -28,7 +28,7 @@ object Build extends sbt.Build {
     val playS3 = "org.corespring" %% "play-s3" % "0.3-SNAPSHOT"
     val mockito = "org.mockito" % "mockito-all" % "1.9.5" % "test"
     val grizzled = "org.clapper" %% "grizzled-scala" % "1.1.4"
-    val scalaz = "org.scalaz" %% "scalaz-core" % "7.0.5"
+    val scalaz = "org.scalaz" %% "scalaz-core" % "7.0.6"
     val htmlCleaner = "net.sourceforge.htmlcleaner" % "htmlcleaner" % "2.6.1"
     val dependencyUtils = "org.corespring" %% "dependency-utils" % "0.5"
     //The closure compiler that play uses - we expect this to be provided by the play app.

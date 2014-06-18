@@ -1,6 +1,7 @@
 package org.corespring.container.client.hooks
 
 import play.api.libs.json.JsValue
+import play.api.mvc.Session
 
 object requests {
   def isCompleteFromSession(session: JsValue): Boolean = {
@@ -38,6 +39,7 @@ case class SaveSession(
  */
 case class PlayerJs(
   isSecure: Boolean,
+  session: Session,
   errors: Seq[String] = Seq.empty,
   queryParams: Seq[(String, String)] = Seq.empty)
 

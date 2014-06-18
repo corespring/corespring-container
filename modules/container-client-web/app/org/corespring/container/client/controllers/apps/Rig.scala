@@ -1,14 +1,14 @@
 package org.corespring.container.client.controllers.apps
 
-import org.corespring.container.client.hooks.ClientHooks
-import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.client.component.RigItemTypeReader
 import org.corespring.container.client.controllers.angular.AngularModules
+import org.corespring.container.client.hooks.ClientHooks
+import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.components.model.UiComponent
 import play.api.libs.json.{ JsValue, Json }
 import play.api.mvc.{ Action, RequestHeader }
 
-import scala.concurrent.Future
+import scala.concurrent.{ ExecutionContext, Future }
 
 trait Rig extends AppWithConfig[ClientHooks] with RigItemTypeReader {
 
@@ -35,13 +35,11 @@ trait Rig extends AppWithConfig[ClientHooks] with RigItemTypeReader {
 
   override def hooks: ClientHooks = new ClientHooks {
 
+    override implicit def ec: ExecutionContext = ExecutionContext.Implicits.global
+
     def passThrough: Future[Either[StatusMessage, JsValue]] = Future(Right(Json.obj()))
 
-    override def loadComponents(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]] = passThrough
-
-    override def loadServices(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]] = passThrough
-
-    override def loadConfig(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]] = passThrough
+    override def loadItem(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]] = passThrough
   }
 
   override def ngModules: AngularModules = new AngularModules()

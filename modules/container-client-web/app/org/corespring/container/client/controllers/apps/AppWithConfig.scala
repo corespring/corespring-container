@@ -45,7 +45,7 @@ trait AppWithConfig[T <: ClientHooks]
   }
 
   def config(id: String) = Action.async { implicit request =>
-    hooks.loadConfig(id).map(handleSuccess { (itemJson) =>
+    hooks.loadItem(id).map(handleSuccess { (itemJson) =>
       val typeIds = componentTypes(id, itemJson).map {
         t =>
           val typeRegex(org, name) = t
