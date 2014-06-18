@@ -1,5 +1,6 @@
 package org.corespring.container.client.controllers.resources
 
+import org.corespring.container.client.actions.Hooks.StatusMessage
 import org.corespring.container.client.actions._
 import org.corespring.container.components.outcome.ScoreProcessor
 import org.corespring.container.components.processing.PlayerItemPreProcessor
@@ -8,10 +9,10 @@ import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import play.api.libs.json.{ JsValue, Json }
 import play.api.mvc._
-import play.api.test.{FakeHeaders, FakeRequest}
+import play.api.test.{ FakeHeaders, FakeRequest }
 import play.api.test.Helpers._
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ ExecutionContext, Future }
 
 class SessionTest extends Specification with Mockito {
 
@@ -28,7 +29,6 @@ class SessionTest extends Specification with Mockito {
       itemSession,
       true,
       isComplete)
-
 
     "allow save when session is not complete" in new ActionBody(saveSession(false)) {
       val result = session.saveSession("id")(FakeRequest("", "", FakeHeaders(), AnyContentAsJson(Json.obj())))
@@ -102,20 +102,19 @@ class SessionTest extends Specification with Mockito {
 
     import scala.concurrent.ExecutionContext.Implicits.global
 
-    override def loadEverything(id: String)(implicit header: RequestHeader): Future[Either[HttpStatusMessage, FullSession]] = ???
+    override def loadEverything(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, FullSession]] = ???
 
-    override def getScore(id: String)(implicit header: RequestHeader): Future[Either[HttpStatusMessage, SessionOutcome]] = Future{
+    override def getScore(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, SessionOutcome]] = Future {
       Right(m.asInstanceOf[SessionOutcome])
     }
 
-    override def loadOutcome(id: String)(implicit header: RequestHeader): Future[Either[HttpStatusMessage, SessionOutcome]] = Future{
-        Right(m.asInstanceOf[SessionOutcome])
+    override def loadOutcome(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, SessionOutcome]] = Future {
+      Right(m.asInstanceOf[SessionOutcome])
     }
 
+    override def load(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]] = ???
 
-    override def load(id: String)(implicit header: RequestHeader): Future[Either[HttpStatusMessage, JsValue]] = ???
-
-    override def save(id: String)(implicit header: RequestHeader): Future[Either[HttpStatusMessage, SaveSession]] = Future{
+    override def save(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, SaveSession]] = Future {
       Right(m.asInstanceOf[SaveSession])
     }
   }

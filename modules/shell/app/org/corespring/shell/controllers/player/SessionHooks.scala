@@ -1,13 +1,14 @@
 package org.corespring.shell.controllers.player
 
-import org.corespring.container.client.actions.{FullSession, HttpStatusMessage, SaveSession, SessionOutcome, SessionHooks => ContainerSessionHooks}
+import org.corespring.container.client.actions.Hooks.StatusMessage
+import org.corespring.container.client.actions.{ FullSession, SaveSession, SessionOutcome, SessionHooks => ContainerSessionHooks }
 import org.corespring.mongo.json.services.MongoService
 import play.api.Logger
 import play.api.http.Status._
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.{ JsValue, Json }
 import play.api.mvc._
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ ExecutionContext, Future }
 
 trait SessionHooks extends ContainerSessionHooks {
 
@@ -17,29 +18,29 @@ trait SessionHooks extends ContainerSessionHooks {
 
   def itemService: MongoService
 
-  implicit def ec : ExecutionContext
+  implicit def ec: ExecutionContext
 
   private def isSecure(request: RequestHeader): Boolean = request.session.get("corespring.player.secure").map(_ == "true").getOrElse(false)
 
   private def isComplete(session: JsValue): Boolean = (session \ "isComplete").asOpt[Boolean].getOrElse(false)
 
-  private def handleSessionOutcome(id: String)(implicit header : RequestHeader) :  Future[Either[HttpStatusMessage,SessionOutcome]]= Future {
-      val result = for {
-        session <- sessionService.load(id)
-        itemId <- (session \ "itemId").asOpt[String]
-        item <- itemService.load(itemId)
-      } yield {
-        logger.trace(s"[handleSessionOutcomeRequest] session: $session")
-        SessionOutcome(item, session, isSecure(header), isComplete(session))
-      }
-      result.map(Right(_)).getOrElse(Left(HttpStatusMessage( BAD_REQUEST, "Error handling outcome request")))
+  private def handleSessionOutcome(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, SessionOutcome]] = Future {
+    val result = for {
+      session <- sessionService.load(id)
+      itemId <- (session \ "itemId").asOpt[String]
+      item <- itemService.load(itemId)
+    } yield {
+      logger.trace(s"[handleSessionOutcomeRequest] session: $session")
+      SessionOutcome(item, session, isSecure(header), isComplete(session))
+    }
+    result.map(Right(_)).getOrElse(Left(BAD_REQUEST -> "Error handling outcome request"))
   }
 
-  override def getScore(id: String)(implicit header: RequestHeader): Future[Either[HttpStatusMessage, SessionOutcome]] = handleSessionOutcome(id)(header)
+  override def getScore(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, SessionOutcome]] = handleSessionOutcome(id)(header)
 
-  override def loadOutcome(id: String)(implicit header: RequestHeader): Future[Either[HttpStatusMessage, SessionOutcome]] = handleSessionOutcome(id)(header)
+  override def loadOutcome(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, SessionOutcome]] = handleSessionOutcome(id)(header)
 
-  override def loadEverything(id: String)(implicit header: RequestHeader): Future[Either[HttpStatusMessage, FullSession]] = Future{
+  override def loadEverything(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, FullSession]] = Future {
     val result = for {
       session <- sessionService.load(id)
       itemId <- (session \ "itemId").asOpt[String]
@@ -48,24 +49,24 @@ trait SessionHooks extends ContainerSessionHooks {
       val out: JsValue = Json.obj("item" -> item, "session" -> session)
       FullSession(out, isSecure(header))
     }
-    result.map(Right(_)).getOrElse(Left(HttpStatusMessage(BAD_REQUEST)))
+    result.map(Right(_)).getOrElse(Left(BAD_REQUEST -> ""))
   }
 
-  override def load(id: String)(implicit header: RequestHeader): Future[Either[HttpStatusMessage, JsValue]] = Future {
+  override def load(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]] = Future {
     sessionService.load(id).map {
       json =>
         Right(json)
-    }.getOrElse(Left(HttpStatusMessage(NOT_FOUND,s"Can't find a session with id: $id")))
+    }.getOrElse(Left(NOT_FOUND -> s"Can't find a session with id: $id"))
   }
 
-  override def save(id: String)(implicit header: RequestHeader): Future[Either[HttpStatusMessage, SaveSession]] = Future{
+  override def save(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, SaveSession]] = Future {
     logger.debug(s"save session: $id")
     val result = for {
       session <- sessionService.load(id)
     } yield {
       SaveSession(session, isSecure(header), isComplete(session), sessionService.save(_, _))
     }
-    result.map(Right(_)).getOrElse(Left(HttpStatusMessage(BAD_REQUEST)))
+    result.map(Right(_)).getOrElse(Left(BAD_REQUEST -> ""))
   }
 }
 

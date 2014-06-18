@@ -1,75 +1,54 @@
 package org.corespring.shell.controllers.editor.actions
 
-import org.corespring.container.client.actions.PlayerRequest
-import org.corespring.container.client.actions.SessionIdRequest
-import org.corespring.container.client.actions.{ EditorActions => ContainerEditorActions }
+import org.corespring.container.client.actions.Hooks.StatusMessage
+import org.corespring.container.client.actions.{ PlayerData, EditorHooks => ContainerEditorHooks }
 import org.corespring.mongo.json.services.MongoService
 import org.corespring.shell.SessionKeys
 import play.api.Logger
-import play.api.libs.json.JsString
-import play.api.libs.json.Json
-import play.api.mvc.Results._
+import play.api.libs.json.{ JsString, JsValue, Json }
 import play.api.mvc._
-import scala.concurrent.{ ExecutionContext, Future }
 
-trait EditorActions extends ContainerEditorActions[AnyContent] {
+import scala.concurrent.Future
 
-  import ExecutionContext.Implicits.global
+trait EditorHooks extends ContainerEditorHooks {
+
+  import scala.concurrent.ExecutionContext.Implicits.global
 
   lazy val logger = Logger("editor.hooks.action.builder")
 
   def itemService: MongoService
 
-  private def load(itemId: String)(block: (PlayerRequest[AnyContent] => Result)): Action[AnyContent] = Action {
-    request =>
+  import play.api.http.Status._
 
-      val playerRequest: Option[PlayerRequest[AnyContent]] = for {
-        i <- itemService.load(itemId)
-      } yield {
-        PlayerRequest(i, request, None)
-      }
-      playerRequest.map(block(_)).getOrElse(BadRequest("Error loading play action"))
+  private def load(itemId: String)(implicit request: RequestHeader) = Future {
+    itemService.load(itemId).map { json =>
+      Right(json)
+    }.getOrElse(Left(NOT_FOUND -> itemId))
   }
 
-  def loadComponents(id: String)(block: (PlayerRequest[AnyContent]) => Result): Action[AnyContent] = load(id)(block)
+  override def loadComponents(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]] = load(id)
 
-  def loadServices(id: String)(block: (PlayerRequest[AnyContent]) => Result): Action[AnyContent] = load(id)(block)
+  override def loadServices(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]] = load(id)
 
-  def loadConfig(id: String)(block: (PlayerRequest[AnyContent]) => Result): Action[AnyContent] = load(id)(block)
+  override def loadConfig(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]] = load(id)
 
-  def createSessionForItem(itemId: String)(block: (SessionIdRequest[AnyContent]) => Result): Action[AnyContent] = Action(BadRequest("Not supported"))
+  override def createItem(implicit header: RequestHeader) = Future {
 
-  def createItem(block: (PlayerRequest[AnyContent]) => Result): Action[AnyContent] = Action {
-    request: Request[AnyContent] =>
+    logger.debug("[createItem]")
 
-      logger.debug("[createItem]")
+    val newItem = Json.obj(
+      "components" -> Json.obj(),
+      "metadata" -> Json.obj(
+        "title" -> JsString("New title")),
+      "xhtml" -> "<div></div>")
 
-      val newItem = Json.obj(
-        "components" -> Json.obj(),
-        "metadata" -> Json.obj(
-          "title" -> JsString("New title")),
-        "xhtml" -> "<div></div>")
-
-      itemService.create(newItem).map {
-        oid =>
-          val item = newItem ++ Json.obj("_id" -> Json.obj("$oid" -> oid.toString))
-          block(PlayerRequest(item, request))
-      }.getOrElse(BadRequest("Error creating item"))
+    itemService.create(newItem).map {
+      oid =>
+        val item = newItem ++ Json.obj("_id" -> Json.obj("$oid" -> oid.toString))
+        Right(PlayerData(item))
+    }.getOrElse(Left(BAD_REQUEST -> "Error creating item"))
   }
 
-  override def editItem(itemId: String)(error: (Int, String) => Future[SimpleResult])(block: (PlayerRequest[AnyContent]) => Future[SimpleResult]): Action[AnyContent] = Action.async {
-    r =>
-      r.session.get(SessionKeys.failLoadPlayer).map {
-        fail =>
-          error(1001, "Some error occurred")
-      }.getOrElse {
-        logger.debug(s"[editItem] $itemId")
-        itemService.load(itemId).map {
-          item =>
-            block(PlayerRequest(item, r))
-        }.getOrElse {
-          Future(NotFound(s"Can't find item with id: $itemId"))
-        }
-      }
-  }
+  override def editItem(itemId: String)(implicit header: RequestHeader): Future[Option[StatusMessage]] = Future(None)
+
 }

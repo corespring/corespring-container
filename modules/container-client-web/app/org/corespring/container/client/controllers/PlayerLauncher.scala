@@ -1,19 +1,24 @@
 package org.corespring.container.client.controllers
 
-import java.io.{ InputStream, File }
+import java.io.{ File, InputStream }
+
 import org.apache.commons.lang3.StringEscapeUtils
 import org.corespring.container.client.V2PlayerConfig
-import org.corespring.container.client.actions.{ PlayerJsRequest, PlayerLauncherActions }
+import org.corespring.container.client.actions.{ PlayerJs, PlayerLauncherHooks }
 import org.corespring.container.client.views.txt.js.ServerLibraryWrapper
 import play.api.Play
 import play.api.Play.current
 import play.api.http.ContentTypes
-import play.api.libs.json.{ Json, JsValue }
-import play.api.mvc.{ Result, AnyContent, Request, Controller }
+import play.api.libs.json.{ JsValue, Json }
+import play.api.mvc._
+
+import scala.concurrent.ExecutionContext
 
 trait PlayerLauncher extends Controller {
 
   def playerConfig: V2PlayerConfig
+
+  implicit def ec: ExecutionContext
 
   //TODO: This is lifted from corespring-api -> move to a library
   object BaseUrl {
@@ -23,7 +28,7 @@ trait PlayerLauncher extends Controller {
        * Note: You can't check a request to see if its http or not in Play
        * But even if you could you may be sitting behind a reverse proxy.
        * see: https://groups.google.com/forum/?fromgroups=#!searchin/play-framework/https$20request/play-framework/11zbMtNI3A8/o4318Z-Ir6UJ
-       *       but the tip was to check for the header below
+       * but the tip was to check for the header below
        */
       val protocol = r.headers.get("x-forwarded-proto") match {
         case Some("https") => "https"
@@ -34,16 +39,16 @@ trait PlayerLauncher extends Controller {
     }
   }
 
+  import org.corespring.container.client.controllers.apps.routes.{ Editor, Player }
   import org.corespring.container.client.controllers.routes.Assets
-  import org.corespring.container.client.controllers.apps.routes.Editor
-  import org.corespring.container.client.controllers.apps.routes.Player
 
   val SecureMode = "corespring.player.secure"
 
-  def actions: PlayerLauncherActions[AnyContent]
+  def hooks: PlayerLauncherHooks
 
-  def editorJs = actions.editorJs {
-    implicit request =>
+  def editorJs = Action.async { implicit request =>
+    hooks.editorJs.map { implicit js =>
+
       val rootUrl = playerConfig.rootUrl.getOrElse(BaseUrl(request))
       val itemEditorUrl = s"${Editor.editItem(":itemId")}"
 
@@ -63,14 +68,14 @@ trait PlayerLauncher extends Controller {
       val jsPath = "container-client/js/player-launcher/editor.js"
       val bootstrap = "org.corespring.players.ItemEditor = corespring.require('editor');"
       make(jsPath, defaultOptions, bootstrap)
+    }
   }
 
   /**
    * query: playerPage the player page to load (default: index.html), for a simple player you can pass in container-player.html
    */
-  def playerJs = actions.playerJs {
-    implicit request =>
-
+  def playerJs = Action.async { implicit request =>
+    hooks.playerJs.map { implicit js =>
       val playerPage = request.getQueryString("playerPage").getOrElse("player.html")
       val rootUrl = playerConfig.rootUrl.getOrElse(BaseUrl(request))
       val itemUrl = s"${Player.createSessionForItem(":id").url}?file=$playerPage"
@@ -84,8 +89,9 @@ trait PlayerLauncher extends Controller {
           "view" -> s"$sessionUrl?mode=view",
           "evaluate" -> s"$sessionUrl?mode=evaluate"))
       val jsPath = "container-client/js/player-launcher/player.js"
-      val bootstrap = s"org.corespring.players.ItemPlayer = corespring.require('player').define(${request.isSecure});"
+      val bootstrap = s"org.corespring.players.ItemPlayer = corespring.require('player').define(${js.isSecure});"
       make(jsPath, defaultOptions, bootstrap)
+    }
   }
 
   private def pathToNameAndContents(p: String) = {
@@ -100,11 +106,10 @@ trait PlayerLauncher extends Controller {
     }
   }
 
-  private def make(jsPath: String, options: JsValue, bootstrapLine: String)(implicit request: PlayerJsRequest[AnyContent]): Result = {
-
+  private def make(jsPath: String, options: JsValue, bootstrapLine: String)(implicit request: Request[AnyContent], js: PlayerJs): SimpleResult = {
 
     val defaultOptions = ("default-options" -> s"module.exports = ${Json.stringify(options)}")
-    val launchErrors = ("launcher-errors" -> errorsToModule(request.errors))
+    val launchErrors = ("launcher-errors" -> errorsToModule(js.errors))
     val rawJs = Seq("container-client/js/corespring/core-library.js")
     val wrappedJs = jsPath +: Seq(
       "container-client/js/player-launcher/errors.js",
@@ -126,7 +131,7 @@ trait PlayerLauncher extends Controller {
         |
       """.stripMargin
     Ok(
-      (contents ++ wrappedContents :+ bootstrap).mkString("\n")).as(ContentTypes.JAVASCRIPT).withSession(session + (SecureMode, request.isSecure.toString))
+      (contents ++ wrappedContents :+ bootstrap).mkString("\n")).as(ContentTypes.JAVASCRIPT).withSession(session + (SecureMode, js.isSecure.toString))
   }
 
   private def errorsToModule(errors: Seq[String]): String = {

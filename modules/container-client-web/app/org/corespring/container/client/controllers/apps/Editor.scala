@@ -1,18 +1,18 @@
 package org.corespring.container.client.controllers.apps
 
-import org.corespring.container.client.actions.EditorActions
+import org.corespring.container.client.actions.EditorHooks
+import org.corespring.container.client.actions.Hooks.StatusMessage
 import org.corespring.container.client.component.AllItemTypesReader
 import org.corespring.container.client.views.txt.js.EditorServices
-import play.api.{ Play, Mode, Logger }
+import play.api.Logger
 import play.api.libs.json._
-import play.api.mvc.AnyContent
-import scala.concurrent.{ Future, ExecutionContext }
-import play.api.libs.json.JsArray
-import play.api.libs.json.JsString
+import play.api.mvc.{ Action, AnyContent }
+
+import scala.concurrent.Future
 
 trait Editor
   extends AllItemTypesReader
-  with AppWithServices[EditorActions[AnyContent]]
+  with AppWithServices[EditorHooks]
   with JsModeReading {
 
   val logger = Logger("editor")
@@ -44,16 +44,21 @@ trait Editor
 
   override def additionalScripts: Seq[String] = Seq(org.corespring.container.client.controllers.apps.routes.Editor.services().url)
 
-  def editItem(itemId: String, jsMode: Option[String] = None) = actions.editItem(itemId) {
-    (code, msg) =>
-      import ExecutionContext.Implicits.global
+  def editItem(itemId: String, jsMode: Option[String] = None): Action[AnyContent] = Action.async { implicit request =>
+
+    def onError(sm: StatusMessage) = {
+      val (code, msg) = sm
       Future(Status(code)(org.corespring.container.client.views.html.error.main(code, msg)))
-  } {
-    request =>
+    }
+
+    def ifEmpty = {
       logger.trace(s"[editItem]: $itemId")
       val jsMode = getJsMode(request)
       val page = s"editor.$jsMode.html"
       controllers.Assets.at("/container-client", page)(request)
+    }
+
+    hooks.editItem(itemId).flatMap { e => e.fold(ifEmpty)(onError) }
   }
 
 }

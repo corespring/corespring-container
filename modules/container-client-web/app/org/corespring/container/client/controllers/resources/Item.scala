@@ -1,10 +1,12 @@
 package org.corespring.container.client.controllers.resources
 
+import org.corespring.container.client.actions.Hooks.StatusMessage
 import org.corespring.container.client.actions._
 import org.corespring.container.client.controllers.helpers.XhtmlCleaner
 import play.api.Logger
 import play.api.libs.json.{ JsObject, JsValue, Json }
 import play.api.mvc._
+
 import scala.concurrent.{ ExecutionContext, Future }
 
 object Item {
@@ -17,12 +19,11 @@ object Item {
 
 trait Item extends Controller with XhtmlCleaner {
 
-
   private lazy val logger = Logger("container.item")
 
-  implicit def toResult(m:HttpStatusMessage) : SimpleResult = play.api.mvc.Results.Status(m.status)(Json.obj("error" -> m.message))
+  implicit def toResult(m: StatusMessage): SimpleResult = play.api.mvc.Results.Status(m._1)(Json.obj("error" -> m._2))
 
-  implicit def ec : ExecutionContext
+  implicit def ec: ExecutionContext
 
   def hooks: ItemHooks
 
@@ -67,7 +68,7 @@ trait Item extends Controller with XhtmlCleaner {
           }
       }.getOrElse(Success(None))
 
-      val out: Validation[String, Future[Either[HttpStatusMessage, JsValue]]] = for {
+      val out: Validation[String, Future[Either[StatusMessage, JsValue]]] = for {
         json <- request.body.asJson.toSuccess(Item.Errors.noJson)
         validXhtml <- cleanIncomingXhtml((json \ "xhtml").asOpt[String])
       } yield {

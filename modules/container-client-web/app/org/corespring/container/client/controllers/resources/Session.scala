@@ -1,5 +1,6 @@
 package org.corespring.container.client.controllers.resources
 
+import org.corespring.container.client.actions.Hooks.StatusMessage
 import org.corespring.container.client.actions._
 import org.corespring.container.client.controllers.resources.Session.Errors
 import org.corespring.container.client.controllers.resources.session.ItemPruner
@@ -8,13 +9,13 @@ import org.corespring.container.components.processing.PlayerItemPreProcessor
 import org.corespring.container.components.response.OutcomeProcessor
 import play.api.Logger
 import play.api.libs.json._
-import play.api.mvc.{Action, Controller, SimpleResult}
+import play.api.mvc.{ Action, Controller, SimpleResult }
 
 import scala.concurrent.ExecutionContext
 
-object Session{
-  object Errors{
-    val  cantSaveWhenComplete = "secure mode: can't save when session is complete"
+object Session {
+  object Errors {
+    val cantSaveWhenComplete = "secure mode: can't save when session is complete"
   }
 }
 
@@ -30,12 +31,12 @@ trait Session extends Controller with ItemPruner {
 
   def hooks: SessionHooks
 
-  implicit def  ec : ExecutionContext
+  implicit def ec: ExecutionContext
 
-  implicit def toResult(m:HttpStatusMessage) : SimpleResult = play.api.mvc.Results.Status(m.status)(Json.obj("error" -> m.message))
+  implicit def toResult(m: StatusMessage): SimpleResult = play.api.mvc.Results.Status(m._1)(Json.obj("error" -> m._2))
 
   private def basicHandler[A](success: (A => SimpleResult))(
-    e: Either[HttpStatusMessage, A]) : SimpleResult = e match {
+    e: Either[StatusMessage, A]): SimpleResult = e match {
     case Left(err) => err
     case Right(json) => success(json)
   }

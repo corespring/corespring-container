@@ -1,13 +1,16 @@
 package org.corespring.container.client.controllers.apps
 
-import org.corespring.container.client.actions.{ PlayerRequest, ClientActions }
+import org.corespring.container.client.actions.ClientHooks
+import org.corespring.container.client.actions.Hooks.StatusMessage
 import org.corespring.container.client.component.RigItemTypeReader
 import org.corespring.container.client.controllers.angular.AngularModules
 import org.corespring.container.components.model.UiComponent
-import play.api.libs.json.Json
-import play.api.mvc.{ Action, Result, AnyContent }
+import play.api.libs.json.{ JsValue, Json }
+import play.api.mvc.{ Action, RequestHeader }
 
-trait Rig extends AppWithConfig[ClientActions[AnyContent]] with RigItemTypeReader {
+import scala.concurrent.Future
+
+trait Rig extends AppWithConfig[ClientHooks] with RigItemTypeReader {
 
   def index(componentType: String, data: Option[String] = None) = {
     controllers.Assets.at("/container-client", s"rig.html")
@@ -30,18 +33,15 @@ trait Rig extends AppWithConfig[ClientActions[AnyContent]] with RigItemTypeReade
 
   override def additionalScripts: Seq[String] = Seq.empty
 
-  override def actions: ClientActions[AnyContent] = new ClientActions[AnyContent] {
+  override def hooks: ClientHooks = new ClientHooks {
 
-    def passThrough(block: (PlayerRequest[AnyContent]) => Result): Action[AnyContent] = Action {
-      request =>
-        block(PlayerRequest(Json.obj(), request))
-    }
+    def passThrough: Future[Either[StatusMessage, JsValue]] = Future(Right(Json.obj()))
 
-    override def loadConfig(id: String)(block: (PlayerRequest[AnyContent]) => Result): Action[AnyContent] = passThrough(block)
+    override def loadComponents(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]] = passThrough
 
-    override def loadServices(id: String)(block: (PlayerRequest[AnyContent]) => Result): Action[AnyContent] = passThrough(block)
+    override def loadServices(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]] = passThrough
 
-    override def loadComponents(id: String)(block: (PlayerRequest[AnyContent]) => Result): Action[AnyContent] = passThrough(block)
+    override def loadConfig(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]] = passThrough
   }
 
   override def ngModules: AngularModules = new AngularModules()

@@ -1,69 +1,75 @@
 package org.corespring.container.client.actions
 
+import org.corespring.container.client.actions.Hooks.StatusMessage
+import play.api.libs.json.JsValue
 import play.api.mvc._
+
 import scala.concurrent.Future
-import play.api.libs.json.{Json, JsValue}
+
+object Hooks {
+  type StatusMessage = (Int, String)
+
+}
 
 /**
  * Client side calls - each will call for config, services and components
- * @tparam A
  */
-trait ClientActions[A] {
-  def loadComponents(id: String)(block: PlayerRequest[A] => Result): Action[AnyContent]
+trait ClientHooks {
+  def loadComponents(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]]
 
-  def loadServices(id: String)(block: PlayerRequest[A] => Result): Action[AnyContent]
+  def loadServices(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]]
 
-  def loadConfig(id: String)(block: PlayerRequest[A] => Result): Action[AnyContent]
+  def loadConfig(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]]
 }
 
-trait PlayerActions[A] extends ClientActions[A] {
-  def createSessionForItem(itemId: String)(block: SessionIdRequest[A] => Result): Action[AnyContent]
+trait PlayerHooks extends ClientHooks {
+  def createSessionForItem(itemId: String)(implicit header: RequestHeader): Future[Either[StatusMessage, String]]
 
-  def loadPlayerForSession(sessionId: String)(error: (Int, String) => Result)(block: Request[A] => Result): Action[AnyContent]
+  def loadPlayerForSession(sessionId: String)(implicit header: RequestHeader): Future[Option[StatusMessage]]
 }
 
-trait EditorActions[A] extends ClientActions[A] {
-  def createItem(block: PlayerRequest[A] => Result): Action[AnyContent]
+trait EditorHooks extends ClientHooks {
+  def createItem(implicit header: RequestHeader): Future[Either[StatusMessage, PlayerData]]
 
-  def editItem(itemId: String)(error: (Int, String) => Future[SimpleResult])(block: PlayerRequest[A] => Future[SimpleResult]): Action[AnyContent]
+  def editItem(itemId: String)(implicit header: RequestHeader): Future[Option[StatusMessage]]
 }
 
-trait CatalogActions[A] extends ClientActions[A] {
-  def showCatalog(itemId: String)(error: (Int, String) => Future[SimpleResult])(block: PlayerRequest[A] => Future[SimpleResult]): Action[AnyContent]
+trait CatalogHooks extends ClientHooks {
+  def showCatalog(itemId: String)(implicit header: RequestHeader): Future[Option[StatusMessage]]
 }
-
-case class HttpStatusMessage(status:Int,message:String = "")
 
 trait ItemHooks {
-  def load(itemId: String)(implicit header: RequestHeader): Future[Either[HttpStatusMessage, JsValue]]
-  def save(itemId: String, json: JsValue)(implicit header: RequestHeader): Future[Either[HttpStatusMessage, JsValue]]
-  def create(json: Option[JsValue])(implicit header: RequestHeader): Future[Either[HttpStatusMessage, String]]
+  def load(itemId: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]]
+
+  def save(itemId: String, json: JsValue)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]]
+
+  def create(json: Option[JsValue])(implicit header: RequestHeader): Future[Either[StatusMessage, String]]
 }
 
-trait SupportingMaterialActions[A] {
-  def create(itemId: String)(block: NewSupportingMaterialRequest[A] => Result): Action[AnyContent]
+trait SupportingMaterialHooks {
+  def create(itemId: String)(implicit header: RequestHeader): Future[Either[StatusMessage, NewSupportingMaterial]]
 }
 
 trait SessionHooks {
-  def loadEverything(id: String)(implicit header: RequestHeader): Future[Either[HttpStatusMessage, FullSession]]
-  def load(id: String)(implicit header: RequestHeader): Future[Either[HttpStatusMessage, JsValue]]
-  def loadOutcome(id: String)(implicit header: RequestHeader): Future[Either[HttpStatusMessage, SessionOutcome]]
-  def getScore(id: String)(implicit header: RequestHeader): Future[Either[HttpStatusMessage, SessionOutcome]]
-  def save(id: String)(implicit header: RequestHeader): Future[Either[HttpStatusMessage, SaveSession]]
+  def loadEverything(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, FullSession]]
+
+  def load(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]]
+
+  def loadOutcome(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, SessionOutcome]]
+
+  def getScore(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, SessionOutcome]]
+
+  def save(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, SaveSession]]
 }
 
-trait PlayerLauncherActions[A] {
-  /**
-   * Serve the player js that allows 3rd parties to run the player.
-   * @param block
-   * @return
-   */
-  def playerJs(block: PlayerJsRequest[A] => Result): Action[AnyContent]
+trait PlayerLauncherHooks {
+  def playerJs(implicit header: RequestHeader): Future[PlayerJs]
 
-  def editorJs(block: PlayerJsRequest[A] => Result): Action[AnyContent]
+  def editorJs(implicit header: RequestHeader): Future[PlayerJs]
 }
 
-trait AssetActions[A] {
-  def delete(itemId: String, file: String)(block: DeleteAssetRequest[A] => Result): Action[AnyContent]
-  def upload(itemId: String, file: String)(block: Request[Int] => Result): Action[Int]
+trait AssetHooks {
+  def delete(itemId: String, file: String)(implicit header: RequestHeader): Future[Option[StatusMessage]]
+
+  def upload(itemId: String, file: String)(implicit header: RequestHeader): Future[Either[StatusMessage, BodyParser[Int]]]
 }

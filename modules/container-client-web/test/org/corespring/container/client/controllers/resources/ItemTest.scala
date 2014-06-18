@@ -1,25 +1,26 @@
 package org.corespring.container.client.controllers.resources
 
+import org.corespring.container.client.actions.Hooks.StatusMessage
 import org.corespring.container.client.actions._
 import org.corespring.container.client.controllers.resources.Item.Errors
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
-import play.api.libs.json.{JsString, JsValue, Json}
+import play.api.libs.json.{ JsString, JsValue, Json }
 import play.api.mvc._
 import play.api.test.Helpers._
-import play.api.test.{FakeHeaders, FakeRequest}
+import play.api.test.{ FakeHeaders, FakeRequest }
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ ExecutionContext, Future }
 
 class ItemTest extends Specification with Mockito {
 
-  class item(saveResult: Option[JsValue] = Some(Json.obj()), createError: Option[HttpStatusMessage] = None) extends Scope {
+  class item(saveResult: Option[JsValue] = Some(Json.obj()), createError: Option[StatusMessage] = None) extends Scope {
     val item = new Item {
 
       override def hooks: ItemHooks = new ItemHooks {
 
-        override def create(json: Option[JsValue])(implicit header: RequestHeader): Future[Either[HttpStatusMessage, String]] = {
+        override def create(json: Option[JsValue])(implicit header: RequestHeader): Future[Either[StatusMessage, String]] = {
           Future {
             createError.map {
               e =>
@@ -28,15 +29,15 @@ class ItemTest extends Specification with Mockito {
           }
         }
 
-        override def save(itemId: String, json: JsValue)(implicit header: RequestHeader): Future[Either[HttpStatusMessage, JsValue]] = {
+        override def save(itemId: String, json: JsValue)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]] = {
           Future {
             saveResult.map {
               Right(_)
-            }.getOrElse(Left(HttpStatusMessage(BAD_REQUEST,Errors.errorSaving)))
+            }.getOrElse(Left(BAD_REQUEST -> Errors.errorSaving))
           }
         }
 
-        override def load(itemId: String)(implicit header: RequestHeader): Future[Either[HttpStatusMessage, JsValue]] = {
+        override def load(itemId: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]] = {
           Future {
             Right(Json.obj())
           }
@@ -70,7 +71,7 @@ class ItemTest extends Specification with Mockito {
       contentAsString(result) === "{}"
     }
 
-    "create returns error" in new item(createError = Some(HttpStatusMessage(UNAUTHORIZED,"Error"))) {
+    "create returns error" in new item(createError = Some(UNAUTHORIZED -> "Error")) {
       val result = item.create(FakeRequest("", ""))
       status(result) === UNAUTHORIZED
       contentAsJson(result) === Json.obj("error" -> "Error")

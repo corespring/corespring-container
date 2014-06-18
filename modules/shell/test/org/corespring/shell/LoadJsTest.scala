@@ -1,11 +1,12 @@
 package org.corespring.shell
 
-import play.api.mvc._
-import org.corespring.container.client.actions.PlayerJsRequest
-import play.api.test.{ FakeRequest, WithApplication, FakeApplication }
+import org.corespring.container.client.actions.PlayerJs
 import org.specs2.mutable.Specification
+import play.api.mvc._
 import play.api.test.Helpers._
-import scala.concurrent.{ ExecutionContext, Future }
+import play.api.test.{ FakeApplication, FakeRequest, WithApplication }
+
+import scala.concurrent.Future
 
 /**
  * LoadJs is a trait defined in ContainerClientImplementation
@@ -13,11 +14,11 @@ import scala.concurrent.{ ExecutionContext, Future }
  */
 class LoadJsTest extends Specification with Results with LoadJs {
 
-  import ExecutionContext.Implicits.global
+  import scala.concurrent.ExecutionContext.Implicits.global
 
   val sut = this
 
-  def noOp(request: PlayerJsRequest[AnyContent]): SimpleResult = {
+  def noOp(request: PlayerJs): SimpleResult = {
     Ok("noOp").withSession("isSecure" -> request.isSecure.toString)
   }
 
@@ -29,30 +30,13 @@ class LoadJsTest extends Specification with Results with LoadJs {
     new FakeApplication(additionalConfiguration = Map("application.secret" -> "test"))
   }
 
-  "noOp" should {
-    "pass isSecure through as true" in new WithApplication(appWithSecret) {
-      val result = noOp(PlayerJsRequest[AnyContent](true, request()))
-      session(Future(result)).get("isSecure") === Some("true")
-    }
-    "pass isSecure through as false" in new WithApplication(appWithSecret) {
-      val result = noOp(PlayerJsRequest[AnyContent](false, request()))
-      session(Future(result)).get("isSecure") === Some("false")
-    }
-  }
-
   "loadJs" should {
-    "pass secure from the query to the session" in new WithApplication(appWithSecret) {
-      val response = sut.loadJs(noOp)(request("/test?secure=true"))
-      session(response).get("isSecure") === Some("true")
-    }
+
     "pass secure from the query to the session if jsError is set" in new WithApplication(appWithSecret) {
-      val response = sut.loadJs(noOp)(request("/test?secure=true&jsErrors=12,13,14"))
-      session(response).get("isSecure") === Some("true")
-    }
-    "pass secure from the query to the session if pageErrors is set" in new WithApplication(appWithSecret) {
-      val response = sut.loadJs(noOp)(request("/test?secure=true&pageErrors=15,16,17"))
-      session(response).get("isSecure") === Some("true")
+      sut.loadJs(request("/test?secure=true&jsErrors=12,13,14")).map { pjs =>
+        pjs.isSecure === true
+        pjs.errors === Seq(12, 13, 14)
+      }
     }
   }
-
 }

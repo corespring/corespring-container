@@ -1,16 +1,17 @@
 package org.corespring.container.client.controllers
 
-import play.api.mvc._
-import scala.concurrent.{ ExecutionContext, Future }
+import org.corespring.container.client.actions.AssetHooks
 import play.api.Logger
-import play.api.libs.json.{ JsString, Json }
-import org.corespring.container.client.actions.AssetActions
+import play.api.libs.iteratee.Iteratee
+import play.api.mvc._
+
+import scala.concurrent.{ ExecutionContext, Future }
 
 trait Assets extends Controller {
 
   lazy val logger = Logger("v2player.assets")
 
-  import ExecutionContext.Implicits.global
+  implicit def ec: ExecutionContext
 
   def loadAsset(id: String, file: String)(request: Request[AnyContent]): SimpleResult
 
@@ -18,7 +19,7 @@ trait Assets extends Controller {
 
   def resourcePath: String = "/container-client"
 
-  def actions: AssetActions[AnyContent]
+  def hooks: AssetHooks
 
   private def at(id: String, file: String, notFoundLocally: String => SimpleResult) = Action.async {
     request =>
@@ -61,14 +62,27 @@ trait Assets extends Controller {
       })(request)
   }
 
-  def upload(id: String, file: String) = actions.upload(id, file) {
-    request => Ok
+  def upload(id: String, file: String) = Action.async { implicit request =>
+    hooks.upload(id, file).flatMap { e =>
+      e match {
+        case Left((code, msg)) => Future(Status(code)(msg))
+        case Right(bp) => {
+          val action: Action[Int] = Action(bp)(r => Ok(""))
+          val i: Iteratee[Array[Byte], SimpleResult] = action(request)
+          i.run
+        }
+      }
+    }
   }
 
-  def delete(itemId: String, file: String) = actions.delete(itemId, file) {
-    request =>
-      request.error.map { e =>
-        Ok(Json.obj("error" -> JsString(e)))
-      }.getOrElse(Ok)
+  def delete(itemId: String, file: String) = Action.async {
+    implicit request =>
+      hooks.delete(itemId, file).map { err =>
+        err match {
+          case None => Ok
+          case Some((code, msg)) => Status(code)(msg)
+        }
+      }
   }
+
 }
