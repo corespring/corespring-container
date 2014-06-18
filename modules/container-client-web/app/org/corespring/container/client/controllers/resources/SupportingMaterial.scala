@@ -1,6 +1,6 @@
 package org.corespring.container.client.controllers.resources
 
-import org.corespring.container.client.actions.SupportingMaterialHooks
+import org.corespring.container.client.hooks.SupportingMaterialHooks
 import play.api.mvc.{ Action, Controller }
 
 import scala.concurrent.{ ExecutionContext, Future }

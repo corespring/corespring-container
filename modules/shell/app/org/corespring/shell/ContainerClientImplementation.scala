@@ -1,8 +1,8 @@
 package org.corespring.shell
 
 import org.corespring.amazon.s3.ConcreteS3Service
-import org.corespring.container.client.actions.Hooks.StatusMessage
-import org.corespring.container.client.actions._
+import org.corespring.container.client.hooks.Hooks.StatusMessage
+import org.corespring.container.client.hooks._
 import org.corespring.container.client.controllers._
 import org.corespring.container.client.integration.DefaultIntegration
 import org.corespring.container.components.model.Component
@@ -83,9 +83,8 @@ class ContainerClientImplementation(
         }
       }
 
-      override def upload(itemId: String, file: String)(implicit header: RequestHeader): Future[Either[StatusMessage, BodyParser[Int]]] = Future {
-        val bp = playS3.upload(bucket, s"$itemId/$file", (rh) => None)
-        Right(bp)
+      override def uploadAction(itemId: String, file: String)(block: (Request[Int]) => SimpleResult): Action[Int] = Action(playS3.upload(bucket, s"$itemId/$file")) { r =>
+        block(r)
       }
     }
 

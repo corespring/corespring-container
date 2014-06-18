@@ -1,7 +1,7 @@
 package org.corespring.shell.controllers.player
 
-import org.corespring.container.client.actions.Hooks.StatusMessage
-import org.corespring.container.client.actions.{ FullSession, SaveSession, SessionOutcome, SessionHooks => ContainerSessionHooks }
+import org.corespring.container.client.hooks.Hooks.StatusMessage
+import org.corespring.container.client.hooks.{ FullSession, SaveSession, SessionOutcome, SessionHooks => ContainerSessionHooks }
 import org.corespring.mongo.json.services.MongoService
 import play.api.Logger
 import play.api.http.Status._

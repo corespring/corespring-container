@@ -1,6 +1,6 @@
 package org.corespring.container.client.integration
 
-import org.corespring.container.client.actions._
+import org.corespring.container.client.hooks._
 import org.corespring.container.components.outcome.ScoreProcessor
 import org.corespring.container.components.processing.PlayerItemPreProcessor
 import org.corespring.container.components.response.OutcomeProcessor

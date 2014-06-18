@@ -1,8 +1,7 @@
 package org.corespring.container.client.controllers
 
-import org.corespring.container.client.actions.AssetHooks
+import org.corespring.container.client.hooks.AssetHooks
 import play.api.Logger
-import play.api.libs.iteratee.Iteratee
 import play.api.mvc._
 
 import scala.concurrent.{ ExecutionContext, Future }
@@ -62,17 +61,8 @@ trait Assets extends Controller {
       })(request)
   }
 
-  def upload(id: String, file: String) = Action.async { implicit request =>
-    hooks.upload(id, file).flatMap { e =>
-      e match {
-        case Left((code, msg)) => Future(Status(code)(msg))
-        case Right(bp) => {
-          val action: Action[Int] = Action(bp)(r => Ok(""))
-          val i: Iteratee[Array[Byte], SimpleResult] = action(request)
-          i.run
-        }
-      }
-    }
+  def upload(id: String, file: String) = hooks.uploadAction(id, file) {
+    r => Ok("")
   }
 
   def delete(itemId: String, file: String) = Action.async {

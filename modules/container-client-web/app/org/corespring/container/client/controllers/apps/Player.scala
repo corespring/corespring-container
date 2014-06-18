@@ -1,6 +1,6 @@
 package org.corespring.container.client.controllers.apps
 
-import org.corespring.container.client.actions.PlayerHooks
+import org.corespring.container.client.hooks.PlayerHooks
 import org.corespring.container.client.component.PlayerItemTypeReader
 import org.corespring.container.client.views.txt.js.PlayerServices
 import play.api.Logger

@@ -1,7 +1,7 @@
 package org.corespring.shell.controllers.editor
 
-import org.corespring.container.client.actions.Hooks.StatusMessage
-import org.corespring.container.client.actions.{ ItemHooks => ContainerItemHooks }
+import org.corespring.container.client.hooks.Hooks.StatusMessage
+import org.corespring.container.client.hooks.{ ItemHooks => ContainerItemHooks }
 import org.corespring.mongo.json.services.MongoService
 import play.api.http.Status._
 import play.api.libs.json.{ JsString, JsValue, Json }

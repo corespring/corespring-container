@@ -1,6 +1,6 @@
 package org.corespring.shell.controllers.player.actions
 
-import org.corespring.container.client.actions.{ PlayerHooks => ContainerPlayerHooks }
+import org.corespring.container.client.hooks.{ PlayerHooks => ContainerPlayerHooks }
 import org.corespring.mongo.json.services.MongoService
 import org.corespring.shell.SessionKeys
 import play.api.libs.json._

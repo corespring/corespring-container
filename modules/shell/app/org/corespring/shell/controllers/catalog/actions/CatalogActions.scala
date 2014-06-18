@@ -1,6 +1,6 @@
 package org.corespring.shell.controllers.catalog.actions
 
-import org.corespring.container.client.actions.{ CatalogHooks => ContainerCatalogHooks }
+import org.corespring.container.client.hooks.{ CatalogHooks => ContainerCatalogHooks }
 import org.corespring.mongo.json.services.MongoService
 import play.api.Logger
 import play.api.libs.json.JsValue

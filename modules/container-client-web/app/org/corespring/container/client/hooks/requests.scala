@@ -1,4 +1,4 @@
-package org.corespring.container.client.actions
+package org.corespring.container.client.hooks
 
 import play.api.libs.json.JsValue
 

@@ -1,6 +1,6 @@
-package org.corespring.container.client.actions
+package org.corespring.container.client.hooks
 
-import org.corespring.container.client.actions.Hooks.StatusMessage
+import org.corespring.container.client.hooks.Hooks.StatusMessage
 import play.api.libs.json.JsValue
 import play.api.mvc._
 
@@ -71,5 +71,11 @@ trait PlayerLauncherHooks {
 trait AssetHooks {
   def delete(itemId: String, file: String)(implicit header: RequestHeader): Future[Option[StatusMessage]]
 
-  def upload(itemId: String, file: String)(implicit header: RequestHeader): Future[Either[StatusMessage, BodyParser[Int]]]
+  /**
+   * TODO: it would be preferble to have a signature as follows
+   * {{{
+   * def upload(itemId: String, file: String)(implicit header: RequestHeader): Future[Option[StatusMessage]]
+   * }}}
+   */
+  def uploadAction(itemId: String, file: String)(block: Request[Int] => SimpleResult): Action[Int]
 }

@@ -1,7 +1,7 @@
 package org.corespring.container.client.controllers.apps
 
-import org.corespring.container.client.actions.CatalogHooks
-import org.corespring.container.client.actions.Hooks.StatusMessage
+import org.corespring.container.client.hooks.CatalogHooks
+import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.client.component.AllItemTypesReader
 import org.corespring.container.client.views.txt.js.CatalogServices
 import play.api.Logger

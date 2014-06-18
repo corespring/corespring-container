@@ -1,7 +1,7 @@
 package org.corespring.container.client.controllers.apps
 
-import org.corespring.container.client.actions.EditorHooks
-import org.corespring.container.client.actions.Hooks.StatusMessage
+import org.corespring.container.client.hooks.EditorHooks
+import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.client.component.AllItemTypesReader
 import org.corespring.container.client.views.txt.js.EditorServices
 import play.api.Logger

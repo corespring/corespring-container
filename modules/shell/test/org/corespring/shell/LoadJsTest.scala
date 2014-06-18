@@ -1,6 +1,6 @@
 package org.corespring.shell
 
-import org.corespring.container.client.actions.PlayerJs
+import org.corespring.container.client.hooks.PlayerJs
 import org.specs2.mutable.Specification
 import play.api.mvc._
 import play.api.test.Helpers._

@@ -1,7 +1,7 @@
 package org.corespring.container.client.integration
 
 import org.corespring.container.client.V2PlayerConfig
-import org.corespring.container.client.actions._
+import org.corespring.container.client.hooks._
 import org.corespring.container.client.component.ComponentUrls
 import org.corespring.container.client.controllers.apps._
 import org.corespring.container.client.controllers.resources.{ Item, Session }

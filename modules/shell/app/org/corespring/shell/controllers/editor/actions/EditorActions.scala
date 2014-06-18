@@ -1,7 +1,7 @@
 package org.corespring.shell.controllers.editor.actions
 
-import org.corespring.container.client.actions.Hooks.StatusMessage
-import org.corespring.container.client.actions.{ PlayerData, EditorHooks => ContainerEditorHooks }
+import org.corespring.container.client.hooks.Hooks.StatusMessage
+import org.corespring.container.client.hooks.{ PlayerData, EditorHooks => ContainerEditorHooks }
 import org.corespring.mongo.json.services.MongoService
 import org.corespring.shell.SessionKeys
 import play.api.Logger

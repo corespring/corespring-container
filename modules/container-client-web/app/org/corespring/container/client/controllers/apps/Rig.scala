@@ -1,7 +1,7 @@
 package org.corespring.container.client.controllers.apps
 
-import org.corespring.container.client.actions.ClientHooks
-import org.corespring.container.client.actions.Hooks.StatusMessage
+import org.corespring.container.client.hooks.ClientHooks
+import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.client.component.RigItemTypeReader
 import org.corespring.container.client.controllers.angular.AngularModules
 import org.corespring.container.components.model.UiComponent

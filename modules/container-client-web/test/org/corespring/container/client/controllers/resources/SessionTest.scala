@@ -1,7 +1,7 @@
 package org.corespring.container.client.controllers.resources
 
-import org.corespring.container.client.actions.Hooks.StatusMessage
-import org.corespring.container.client.actions._
+import org.corespring.container.client.hooks.Hooks.StatusMessage
+import org.corespring.container.client.hooks._
 import org.corespring.container.components.outcome.ScoreProcessor
 import org.corespring.container.components.processing.PlayerItemPreProcessor
 import org.corespring.container.components.response.OutcomeProcessor
