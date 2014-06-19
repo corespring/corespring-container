@@ -28,8 +28,6 @@ trait PlayerHooks extends ClientHooks {
 
 trait EditorHooks extends ClientHooks {
   def createItem(implicit header: RequestHeader): Future[Either[StatusMessage, PlayerData]]
-
-  def editItem(itemId: String)(implicit header: RequestHeader): Future[Option[StatusMessage]]
 }
 
 trait CatalogHooks extends ClientHooks {

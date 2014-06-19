@@ -51,14 +51,14 @@ trait Editor
       Future(Status(code)(org.corespring.container.client.views.html.error.main(code, msg)))
     }
 
-    def ifEmpty = {
+    def onItem(i:JsValue) = {
       logger.trace(s"[editItem]: $itemId")
       val jsMode = getJsMode(request)
       val page = s"editor.$jsMode.html"
       controllers.Assets.at("/container-client", page)(request)
     }
 
-    hooks.editItem(itemId).flatMap { e => e.fold(ifEmpty)(onError) }
+    hooks.loadItem(itemId).flatMap { e => e.fold(onError, onItem) }
   }
 
 }

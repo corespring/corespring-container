@@ -1,14 +1,12 @@
 package org.corespring.shell.controllers.editor.actions
 
-import org.corespring.container.client.hooks.Hooks.StatusMessage
-import org.corespring.container.client.hooks.{ PlayerData, EditorHooks => ContainerEditorHooks }
-import org.corespring.mongo.json.services.MongoService
-import org.corespring.shell.SessionKeys
-import play.api.Logger
-import play.api.libs.json.{ JsString, JsValue, Json }
-import play.api.mvc._
-
 import scala.concurrent.Future
+
+import org.corespring.container.client.hooks.{EditorHooks => ContainerEditorHooks, PlayerData}
+import org.corespring.mongo.json.services.MongoService
+import play.api.Logger
+import play.api.libs.json.{JsString, JsValue, Json}
+import play.api.mvc._
 
 trait EditorHooks extends ContainerEditorHooks {
 
@@ -44,7 +42,5 @@ trait EditorHooks extends ContainerEditorHooks {
         Right(PlayerData(item))
     }.getOrElse(Left(BAD_REQUEST -> "Error creating item"))
   }
-
-  override def editItem(itemId: String)(implicit header: RequestHeader): Future[Option[StatusMessage]] = Future(None)
 
 }
