@@ -12,7 +12,7 @@ import scala.concurrent.Future
 
 trait EditorHooks extends ContainerEditorHooks {
 
-  import scala.concurrent.ExecutionContext.Implicits.global
+
 
   lazy val logger = Logger("editor.hooks.action.builder")
 
@@ -26,11 +26,7 @@ trait EditorHooks extends ContainerEditorHooks {
     }.getOrElse(Left(NOT_FOUND -> itemId))
   }
 
-  override def loadComponents(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]] = load(id)
-
-  override def loadServices(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]] = load(id)
-
-  override def loadConfig(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]] = load(id)
+  override def loadItem(id: String)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] = load(id)
 
   override def createItem(implicit header: RequestHeader) = Future {
 

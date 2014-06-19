@@ -11,7 +11,7 @@ object Hooks {
 }
 
 trait HasContext {
-  implicit def ec: ExecutionContext
+  implicit def ec: ExecutionContext = ExecutionContext.Implicits.global
 }
 /**
  * Client side calls - each will call for config, services and components

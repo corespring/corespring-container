@@ -100,8 +100,6 @@ class SessionTest extends Specification with Mockito {
 
   class MockBuilder(m: SecureMode) extends SessionHooks {
 
-    import scala.concurrent.ExecutionContext.Implicits.global
-
     override def loadEverything(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, FullSession]] = ???
 
     override def getScore(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, SessionOutcome]] = Future {
