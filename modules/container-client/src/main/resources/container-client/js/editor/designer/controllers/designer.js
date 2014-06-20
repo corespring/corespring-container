@@ -162,7 +162,7 @@
       }
 
       var videoComponent = componentToFeature(_.find(componentSet, function(c) {
-        return c.componentType === "corespring-video"
+        return c.componentType === 'corespring-video';
       }));
       videoComponent.iconclass = "fa fa-film";
 
