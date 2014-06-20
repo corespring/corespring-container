@@ -78,6 +78,7 @@ var Placeholder = function(
 
     $scope.deleteNode = function($event) {
       $event.stopPropagation();
+      $scope.$broadcast("$destroy"); //destroys tooltip
       $scope.$emit('wiggi-wiz.delete-node', $element);
     };
 
