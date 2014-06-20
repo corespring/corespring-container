@@ -30,7 +30,13 @@ describe('designer controller', function() {
 
   function mockItemService() {}
 
-  function mockFeatureAdapter() {}
+  function mockFeatureAdapter() {
+    return {
+      componentToWiggiwizFeature: function() {
+        return {};
+      }
+    };
+  }
 
   function mockComponentRegister() {}
 
