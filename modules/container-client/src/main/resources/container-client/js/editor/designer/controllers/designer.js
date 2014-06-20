@@ -157,27 +157,47 @@
         return idx >= 0 ? idx : 1000;
       }
 
+      function isToolbar(component) {
+        return component.titleGroup === 'toolbar';
+      }
+
+      var videoComponent = componentToFeature(_.find(componentSet, function(c) {
+        return c.componentType === "corespring-video"
+      }));
+      videoComponent.iconclass = "fa fa-film";
+
+
       $scope.overrideFeatures = [
         ImageFeature
       ];
 
       $scope.extraFeatures = {
-        definitions: [{
-          name: 'external',
-          type: 'dropdown',
-          dropdownTitle: 'Answer Type',
-          buttons: _.map(_.sortBy(componentSet, orderList), componentToFeature)
-        }, {
-          type: 'group',
-          buttons: [
-            new WiggiMathJaxFeatureDef()
-          ]
-        }, {
-          type: 'group',
-          buttons: [
-            new WiggiFootnotesFeatureDef()
-          ]
-        }]
+        definitions: [
+          {
+            name: 'external',
+            type: 'dropdown',
+            dropdownTitle: 'Answer Type',
+            buttons: _(componentSet).reject(isToolbar).sortBy(orderList).map(componentToFeature).value()
+          },
+          {
+            type: 'group',
+            buttons: [
+              new WiggiMathJaxFeatureDef()
+            ]
+          },
+          {
+            type: 'group',
+            buttons: [
+              new WiggiFootnotesFeatureDef()
+            ]
+          },
+          {
+            type: 'group',
+            buttons: [
+              videoComponent
+            ]
+          }
+        ]
       };
     }
 
