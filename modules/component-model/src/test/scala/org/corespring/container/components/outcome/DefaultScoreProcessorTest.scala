@@ -117,7 +117,7 @@ class DefaultScoreProcessorTest extends Specification {
       JsonCompare.caseInsensitiveSubTree(Json.stringify(outcome), expectedOutcome) match {
         case Right(_) => true
         case Left(diffs) => {
-          println(diffs.mkString("KAKAMATYI\n"))
+          println(diffs.mkString("\n"))
           false
         }
       }
