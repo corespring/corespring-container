@@ -40,7 +40,7 @@
     };
 
     var scoreForComponent = function(comp, response){
-      var weight = comp.weight || 1;
+      var weight = _.isUndefined(comp.weight) ? 1 : comp.weight;
 
       if(!comp.weight){
         console.warn("no weight for comp", comp);
