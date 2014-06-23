@@ -14,10 +14,8 @@ Once you have the `container-client-web` on your classpath, you'll need to integ
 
 ### Securing the Container
 
-There are 2 means by which you can secure the container.
-
-- By setting session cookies and reading them in the action hooks below
-- By passing queryParams to the Editor/Player and reading them in the hooks below.
+The container doesn't have any security built in. Instead the implementing application is expected to add their own 
+security when implementing the integration points known as 'hooks'.
 
 ### Overview 
 
@@ -27,31 +25,20 @@ This class extends `DefaultIntegration`, which is a trait that provides as many 
 
 For most cases, you can extend this trait and implement its methods.
 
-## Note: Integration pattern is going to change
+## Implementing the hooks
 
-We are going to deprecate the action decorator pattern. Have a look at ItemHooks for the new api.
+Once you extend `DefaultIntegration` it will ask for implementations for the `*Hooks` traits. These traits are called
+ within the controllers and allows the calls to be checked by the implementing application.
 
-Basically it'll look something like:
+The general pattern is: 
 
-    def doThing(params:....) : Future[Either[Error,Thing]]
+    def doThing(params:....)(implicit header : RequestHeader) : Future[Either[(Int,String),DataNeededByController]]
 
+Where the `Left` is an `(Int,String)` representing a status code + message and `Right` represents whatever the 
+controller needs.
 
-This means we can do away with the wrapped requests, and is a simpler model to reason about.
-
-
-Integration uses a decorator pattern, to allow clients to decorate the libraries core action logic.
-
-The basic pattern of integration is as follows:
 
 ![integration](../img/integration.png)
-
-* In the routes file you define a trait as the destination of a route, by adding a '@' before the fully qualified name.
-* Implement the Controller
-* Implement the Actions
-* Register the Controller implementation as the instance to use for the route
-
-
-The controller trait contains the controller methods that are exposed in the routes file.
 
 ### Example: ItemController
 
@@ -59,35 +46,38 @@ For example lets consider loading an Item. For this the library creates a contro
 
     trait ItemController {
 
-        def actions : ItemActions
+        def hooks : ItemHooks
 
-        def load(id:String)  = actions.load(id){ itemRequest =>
-            //item is loaded - do your work..
-            Ok(itemRequest.item)
+        def load(id:String) = Action.async{ implicit request => 
+         
+         hooks.load(id){ either => either match {
+           case Left((code,msg)) => Status(code)(msg)
+           case Right(data) => Ok(....)
+          }
         }
     }
 
 The controller contains an `ItemActions` trait:
 
-    trait ItemActions{
-        def load(id:String)(block: ItemRequest => Result) : Action[AnyContent]
+    trait ItemHooks{
+        def load(id:String)(implicit header : RequestHeader ) : Future[Either[(Int,String),JsValue]]
     }
 
-By implementing `ItemActions` the containing app can plugin any integration points, for example a dao:
+By implementing `ItemHookss` the containing app can plugin any integration points, for example a dao:
 
-    class AppItemActions extends ItemActions{
-        override def load(id:String)(block:ItemRequest=> Result) : Action[AnyContent] = Action { request =>
+    class AppItemHooks extends ItemHooks{
+        override def load(id:String)(implicit header : RequestHeader ) = Future{
             ItemDao.load(id).map{ item =>
                 //call the block passed in from the ItemController
-                block(ItemRequest(item, r))
-            }.getOrElse(NotFound(""))
+                Right(item)
+            }.getOrElse(Left(NOT_FOUND,s"Can't find item with id $id")
         }
     }
 
 This implementation will the be used by the controller implementation:
 
     class AppItemController extends ItemController{
-        override def actions = new AppItemActions()
+        override def hooks = new AppItemHooks()
     }
 
 ### component-sets controller
