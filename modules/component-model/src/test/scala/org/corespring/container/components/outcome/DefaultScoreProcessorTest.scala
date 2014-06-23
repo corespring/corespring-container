@@ -69,6 +69,31 @@ class DefaultScoreProcessorTest extends Specification {
       (item, responses) must GenerateOutcome(expected)
     }
 
+    "zero weight is not counted in score" in {
+
+      val item = """{
+             "components": {
+               "1" : {"weight":1},
+               "2" : {"weight":0}
+             }
+           }"""
+      val responses = """{
+             "1" : {"score":0.0},
+             "2" : {"score":1.0}
+            }"""
+      val expected = """
+         {
+           "summary" : { "maxPoints" : 1, "points" : 0.0, "percentage" : 0.0 },
+           "components" : {
+             "1" : { "weight" : 1, "score" : 0.0, "weightedScore" : 0.0},
+             "2" : { "weight" : 0, "score" : 1.0, "weightedScore" : 0.0}
+           }
+         }
+                     """
+
+      (item, responses) must GenerateOutcome(expected)
+    }
+
     "calculate the proper sum" in {
       DefaultScoreProcessor.getSumOfWeightedScores(
         Json.obj(
