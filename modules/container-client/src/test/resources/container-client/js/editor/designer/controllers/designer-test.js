@@ -30,7 +30,13 @@ describe('designer controller', function() {
 
   function mockItemService() {}
 
-  function mockFeatureAdapter() {}
+  function mockFeatureAdapter() {
+    return {
+      componentToWiggiwizFeature: function() {
+        return {};
+      }
+    };
+  }
 
   function mockComponentRegister() {}
 
@@ -76,10 +82,7 @@ describe('designer controller', function() {
     try {
       ctrl = $controller('Designer', {
         $scope: scope,
-        $element: $('<div></div>'),
-        WiggiWizHelper: {
-          focusCaretAtEnd: function() {}
-        }
+        $element: $('<div></div>')
       });
     } catch (e) {
       throw ("Error with the controller: " + e);

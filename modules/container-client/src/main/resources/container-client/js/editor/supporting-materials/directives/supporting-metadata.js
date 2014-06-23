@@ -105,14 +105,20 @@
 
           $scope.init();
 
+          $scope.activeControl = "";
+
+          $scope.setActiveCtrl = function(event){
+            $scope.activeControl = event && event.target ? event.target : null;
+          };
+
         },
         template: [
           '<form name="myForm" class="supporting-material-metadata my-form">',
 
-          '  <div ng-class="{\'field\':true, \'has-error\':myForm.type.$error.required, \'has-success\':!myForm.type.$error.required}"> ',
+          '  <div ng-class="{\'field\':true, \'has-error\':myForm.type.$error.required && activeControl.name==\'type\', \'has-success\':!myForm.type.$error.required}"> ',
           '    <label class="control-label" for="supporting-material-title">Title</label>',
-          '    <span class="error" ng-show="myForm.type.$error.required" >Required!</span>',
-          '    <input name="type" class="form-control" type="text" ng-model="title" required />',
+          '    <span class="error" ng-show="myForm.type.$error.required" >required</span>',
+          '    <input name="type" class="form-control" type="text" ng-model="title" ng-focus="setActiveCtrl($event)" ng-blur="setActiveCtrl(null)" }" required />',
           '  </div>',
 
           '  <div class="field">',
@@ -120,10 +126,10 @@
           '    <select ng-model="materialTypeProxy" ng-options="materialType for materialType in materialTypes"></select>',
           '  </div>',
 
-          '  <div ng-class="{\'field\':true, \'other\':true, \'has-error\':myForm.others.$error.required, \'has-success\':!myForm.type.$error.required}" ng-show="displayOther" >',
+          '  <div ng-class="{\'field\':true, \'other\':true, \'has-error\':myForm.others.$error.required && activeControl.name==\'others\', \'has-success\':!myForm.others.$error.required}" ng-show="displayOther" >',
           '    <label class="control-label" for="supporting-material-type-text">Other</label>',
-          '    <span  class="error" ng-show="myForm.others.$error.required">Required!</span>',
-          '    <input name="others" class="form-control"  type="text" ng-model="textMaterialType" required/>',
+          '    <span  class="error" ng-show="myForm.others.$error.required">required</span>',
+          '    <input name="others" class="form-control"  type="text" ng-model="textMaterialType" ng-focus="setActiveCtrl($event)" ng-blur="setActiveCtrl(null)" required/>',
           '  </div>',
 
           '  <button class="btn btn-small" ng-show="persist" ng-click="forceUpdate()">Update</button>',

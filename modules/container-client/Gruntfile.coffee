@@ -120,7 +120,9 @@ module.exports = (grunt) ->
               '<%= common.dist %>/bower_components/ace-builds/src-min-noconflict/theme-twilight.js',
               '<%= common.dist %>/bower_components/ace-builds/src-min-noconflict/mode-xml.js',
               '<%= common.dist %>/bower_components/ace-builds/src-min-noconflict/worker-json.js',
-              '<%= common.dist %>/bower_components/ace-builds/src-min-noconflict/mode-json.js' ]
+              '<%= common.dist %>/bower_components/ace-builds/src-min-noconflict/mode-json.js',
+              '<%= common.dist %>/bower_components/jquery.browser/dist/jquery.browser.min.js',
+              '<%= common.dist %>/bower_components/undo.js/undo.js']
 
   expandSrc = (arr) ->
     expanded = expand(arr)

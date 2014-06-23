@@ -62,6 +62,7 @@ var controller = function($scope, ComponentRegister, PlayerServiceDef) {
     ComponentRegister.reset();
     $scope.session.isComplete = false;
     $scope.score = undefined;
+    $scope.outcome = undefined;
     ComponentRegister.setEditable(true);
   };
 
