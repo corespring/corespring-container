@@ -124,7 +124,7 @@
         }
       }
 
-      function readdToEditor($node) {
+      function reAddToEditor($node) {
         var id = $($node).attr('id');
         $scope.data.item.components[id] = $scope.removedComponents[id];
       }
@@ -134,7 +134,7 @@
           component,
           addToEditor,
           deleteComponent,
-          readdToEditor
+          reAddToEditor
         );
       }
 
