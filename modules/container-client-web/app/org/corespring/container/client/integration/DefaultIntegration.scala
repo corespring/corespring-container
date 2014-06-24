@@ -5,7 +5,7 @@ import org.corespring.container.client.hooks._
 import org.corespring.container.client.component.ComponentUrls
 import org.corespring.container.client.controllers.apps._
 import org.corespring.container.client.controllers.resources.{ Item, Session }
-import org.corespring.container.client.controllers.{ ComponentsFileController, Icons, PlayerLauncher }
+import org.corespring.container.client.controllers.{DataQuery, ComponentsFileController, Icons, PlayerLauncher}
 import org.corespring.container.client.integration.validation.Validator
 import org.corespring.container.components.model.Component
 import org.corespring.container.components.model.dependencies.ComponentSplitter
@@ -111,5 +111,10 @@ trait DefaultIntegration
     override def playerConfig: V2PlayerConfig = V2PlayerConfig(configuration)
   }
 
+  override def dataQuery: DataQuery = new DataQuery {
+    override def hooks: DataQueryHooks = dataQueryHooks
+
+    override implicit def ec: ExecutionContext = ExecutionContext.Implicits.global
+  }
 }
 

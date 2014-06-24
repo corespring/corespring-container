@@ -13,7 +13,7 @@ import org.corespring.shell.controllers.editor.actions.{ EditorHooks => ShellEdi
 import org.corespring.shell.controllers.editor.{ ItemHooks => ShellItemHooks }
 import org.corespring.shell.controllers.player.actions.{ PlayerHooks => ShellPlayerHooks }
 import org.corespring.shell.controllers.player.{ SessionHooks => ShellSessionHooks }
-import org.corespring.shell.controllers.{ CachedAndMinifiedComponentSets, ShellDataQuery => ShellProfile }
+import org.corespring.shell.controllers.{ CachedAndMinifiedComponentSets, ShellDataQueryHooks  }
 import play.api.Configuration
 import play.api.mvc._
 
@@ -130,7 +130,9 @@ class ContainerClientImplementation(
     override implicit def ec: ExecutionContext = ContainerClientImplementation.this.ec
   }
 
-  override def dataQuery: DataQuery = new ShellProfile()
+  override def dataQueryHooks: DataQueryHooks = new ShellDataQueryHooks{
+    override implicit def ec: ExecutionContext = ContainerClientImplementation.this.ec
+  }
 }
 
 trait LoadJs {

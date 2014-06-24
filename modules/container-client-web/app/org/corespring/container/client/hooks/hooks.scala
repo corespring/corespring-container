@@ -1,7 +1,7 @@
 package org.corespring.container.client.hooks
 
 import org.corespring.container.client.hooks.Hooks.StatusMessage
-import play.api.libs.json.JsValue
+import play.api.libs.json.{JsArray, JsValue}
 import play.api.mvc._
 
 import scala.concurrent.{ ExecutionContext, Future }
@@ -74,4 +74,10 @@ trait AssetHooks extends HasContext {
    * }}}
    */
   def uploadAction(itemId: String, file: String)(block: Request[Int] => SimpleResult): Action[Int]
+}
+
+trait DataQueryHooks extends HasContext {
+  def list(topic:String, query : Option[String] = None)(implicit header : RequestHeader) : Future[Either[StatusMessage,JsArray]]
+
+  def findOne(topic:String, id:String)(implicit header : RequestHeader) : Future[Either[StatusMessage,Option[JsValue]]]
 }
