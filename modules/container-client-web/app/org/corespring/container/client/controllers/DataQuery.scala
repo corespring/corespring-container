@@ -41,10 +41,9 @@ trait DataQuery extends Controller {
   def list(topic: String, query: Option[String] = None): Action[AnyContent] = Action.async { implicit request =>
 
     if (listTopics.contains(topic)) {
-      hooks.list(topic, query).map { e => e match {
+      hooks.list(topic, query).map {
         case Left((code, msg)) => Status(code)(msg)
         case Right(arr) => Ok(arr)
-      }
       }
     } else {
       Future(BadRequest(Json.obj("error" -> s"$topic is not a valid topic from: ${listTopics.mkString(",")}")))
