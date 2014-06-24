@@ -42,7 +42,7 @@ trait DataQuery extends Controller {
 
     if (listTopics.contains(topic)) {
       hooks.list(topic, query).map {
-        case Left((code, msg)) => Status(code)(msg)
+        case Left((code, msg)) => Status(code)(Json.obj("error" -> msg))
         case Right(arr) => Ok(arr)
       }
     } else {
@@ -55,7 +55,7 @@ trait DataQuery extends Controller {
     implicit request =>
       if (findTopics.contains(topic)) {
         hooks.findOne(topic, id).map {
-          case Left((code, msg)) => Status(code)(msg)
+          case Left((code, msg)) => Status(code)(Json.obj("error" -> msg))
           case Right(maybeData) => Ok(maybeData.getOrElse(Json.obj()))
         }
       } else {
