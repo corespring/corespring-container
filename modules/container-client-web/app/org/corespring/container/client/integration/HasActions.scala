@@ -13,7 +13,8 @@ trait HasHooks {
   def playerLauncherHooks: PlayerLauncherHooks
   def itemHooks: ItemHooks
   def sessionHooks: SessionHooks
-  def dataQueryHooks : DataQueryHooks
+  def dataQueryHooks: DataQueryHooks
+  def supportingMaterialHooks: SupportingMaterialHooks
 }
 
 trait HasConfig {

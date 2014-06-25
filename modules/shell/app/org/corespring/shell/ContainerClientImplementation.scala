@@ -13,6 +13,7 @@ import org.corespring.shell.controllers.editor.actions.{ EditorHooks => ShellEdi
 import org.corespring.shell.controllers.editor.{ ItemHooks => ShellItemHooks }
 import org.corespring.shell.controllers.player.actions.{ PlayerHooks => ShellPlayerHooks }
 import org.corespring.shell.controllers.player.{ SessionHooks => ShellSessionHooks }
+import org.corespring.shell.{ hooks => shellHooks }
 import org.corespring.shell.controllers.{ CachedAndMinifiedComponentSets, ShellDataQueryHooks }
 import play.api.Configuration
 import play.api.mvc._
@@ -132,6 +133,10 @@ class ContainerClientImplementation(
 
   override def dataQueryHooks: DataQueryHooks = new ShellDataQueryHooks {
     override implicit def ec: ExecutionContext = ContainerClientImplementation.this.ec
+  }
+
+  override def supportingMaterialHooks: SupportingMaterialHooks = new shellHooks.SupportingMaterialHooks {
+
   }
 }
 
