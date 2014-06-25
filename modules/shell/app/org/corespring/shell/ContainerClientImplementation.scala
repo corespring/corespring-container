@@ -1,33 +1,38 @@
 package org.corespring.shell
 
 import org.corespring.amazon.s3.ConcreteS3Service
-import org.corespring.container.client.actions._
+import org.corespring.container.client.hooks.Hooks.StatusMessage
+import org.corespring.container.client.hooks._
 import org.corespring.container.client.controllers._
 import org.corespring.container.client.integration.DefaultIntegration
 import org.corespring.container.components.model.Component
+import org.corespring.container.components.model.dependencies.DependencyResolver
 import org.corespring.mongo.json.services.MongoService
-import org.corespring.shell.controllers.CachedAndMinifiedComponentSets
-import org.corespring.shell.controllers.editor.actions.{ EditorActions => ShellEditorActions }
-import org.corespring.shell.controllers.catalog.actions.{ CatalogActions => ShellCatalogActions }
+import org.corespring.shell.controllers.catalog.actions.{ CatalogHooks => ShellCatalogHooks }
+import org.corespring.shell.controllers.editor.actions.{ EditorHooks => ShellEditorHooks }
 import org.corespring.shell.controllers.editor.{ ItemHooks => ShellItemHooks }
-import org.corespring.shell.controllers.player.actions.{ PlayerActions => ShellPlayerActions }
-import org.corespring.shell.controllers.player.{ SessionActions => ShellSessionActions }
-import org.corespring.shell.controllers.{ ShellDataQuery => ShellProfile }
+import org.corespring.shell.controllers.player.actions.{ PlayerHooks => ShellPlayerHooks }
+import org.corespring.shell.controllers.player.{ SessionHooks => ShellSessionHooks }
+import org.corespring.shell.{ hooks => shellHooks }
+import org.corespring.shell.controllers.{ CachedAndMinifiedComponentSets, ShellDataQueryHooks }
 import play.api.Configuration
 import play.api.mvc._
-import scala.Some
-import scala.concurrent.Future
-import org.corespring.container.components.model.dependencies.DependencyResolver
+
+import scala.concurrent.{ ExecutionContext, Future }
 
 class ContainerClientImplementation(
   val itemService: MongoService,
   val sessionService: MongoService,
   componentsIn: => Seq[Component],
-  val configuration: Configuration) extends DefaultIntegration with LoadJs {
+  val configuration: Configuration) extends DefaultIntegration {
 
   override def components: Seq[Component] = componentsIn
 
-  override def playerLauncherActions: PlayerLauncherActions[AnyContent] = new PlayerLauncherActions[AnyContent] {
+  override implicit def ec: ExecutionContext = ExecutionContext.Implicits.global
+
+  override def playerLauncherHooks: PlayerLauncherHooks = new PlayerLauncherHooks {
+
+    val loader = new LoadJs {}
 
     /**
      * Provides a few hooks so that you can simulate scenarios when loading player:
@@ -37,9 +42,10 @@ class ContainerClientImplementation(
      * @param block
      * @return
      */
-    override def playerJs(block: (PlayerJsRequest[AnyContent]) => Result): Action[AnyContent] = loadJs(block)
 
-    override def editorJs(block: (PlayerJsRequest[AnyContent]) => Result) = loadJs(block)
+    override def playerJs(implicit header: RequestHeader): Future[PlayerJs] = loader.loadJs(header)
+
+    override def editorJs(implicit header: RequestHeader): Future[PlayerJs] = loader.loadJs(header)
 
   }
 
@@ -67,22 +73,23 @@ class ContainerClientImplementation(
       json => (json \ "itemId").as[String]
     }
 
-    override def actions: AssetActions[AnyContent] = new AssetActions[AnyContent] {
-      override def delete(itemId: String, file: String)(block: (DeleteAssetRequest[AnyContent]) => Result) = Action { request =>
+    override def hooks: AssetHooks = new AssetHooks {
+
+      override def delete(itemId: String, file: String)(implicit header: RequestHeader): Future[Option[StatusMessage]] = Future {
         val response = playS3.delete(bucket, s"$itemId/$file")
-        val deleteAssetRequest = DeleteAssetRequest(if (response.success) None else Some(response.msg), request)
-        block(deleteAssetRequest)
+        if (response.success) {
+          None
+        } else {
+          Some((BAD_REQUEST -> s"${response.key}: ${response.msg}"))
+        }
       }
 
-      override def upload(itemId: String, file: String)(block: (Request[Int]) => Result) =
-        Action(
-          playS3.upload(
-            bucket, s"$itemId/$file",
-            (rh) => None)) {
-            request =>
-              block(request)
-          }
+      override def uploadAction(itemId: String, file: String)(block: (Request[Int]) => SimpleResult): Action[Int] = Action(playS3.upload(bucket, s"$itemId/$file")) { r =>
+        block(r)
+      }
     }
+
+    override implicit def ec: ExecutionContext = ContainerClientImplementation.this.ec
   }
 
   lazy val componentUrls = new CachedAndMinifiedComponentSets {
@@ -95,18 +102,20 @@ class ContainerClientImplementation(
     }
   }
 
-  override def editorActions: EditorActions[AnyContent] = new ShellEditorActions {
+  override def editorHooks: EditorHooks = new ShellEditorHooks {
     override def itemService: MongoService = ContainerClientImplementation.this.itemService
   }
 
-  override def catalogActions: CatalogActions[AnyContent] = new ShellCatalogActions {
+  override def catalogHooks: CatalogHooks = new ShellCatalogHooks {
     override def itemService: MongoService = ContainerClientImplementation.this.itemService
   }
 
-  override def sessionActions: SessionActions[AnyContent] = new ShellSessionActions {
+  override def sessionHooks: SessionHooks = new ShellSessionHooks {
     override def itemService: MongoService = ContainerClientImplementation.this.itemService
 
     override def sessionService: MongoService = ContainerClientImplementation.this.sessionService
+
+    override implicit def ec: ExecutionContext = ContainerClientImplementation.this.ec
   }
 
   override def itemHooks: ItemHooks = new ShellItemHooks {
@@ -114,40 +123,44 @@ class ContainerClientImplementation(
 
   }
 
-  override def playerActions: PlayerActions[AnyContent] = new ShellPlayerActions {
+  override def playerHooks: PlayerHooks = new ShellPlayerHooks {
     override def sessionService: MongoService = ContainerClientImplementation.this.sessionService
 
     override def itemService: MongoService = ContainerClientImplementation.this.itemService
+
+    override implicit def ec: ExecutionContext = ContainerClientImplementation.this.ec
   }
 
-  override def dataQuery: DataQuery = new ShellProfile()
+  override def dataQueryHooks: DataQueryHooks = new ShellDataQueryHooks {
+    override implicit def ec: ExecutionContext = ContainerClientImplementation.this.ec
+  }
 
 }
 
+/**
+ * A simple shell utility to allow a tester to simulate page and/or js errors when launching the player js
+ */
 trait LoadJs {
 
+  import scala.concurrent.ExecutionContext.Implicits.global
+
   //Implemented as trait so it can be tested without setup
-  def loadJs(block: PlayerJsRequest[AnyContent] => Result): Action[AnyContent] = Action {
-    request =>
-      def isSecure = request.getQueryString("secure").map {
-        _ == "true"
-      }.getOrElse(false)
-      def errors = request.getQueryString("jsErrors").map {
-        s => s.split(",").toSeq
-      }.getOrElse(Seq())
+  def loadJs(implicit header: RequestHeader): Future[PlayerJs] = Future {
+    def isSecure = header.getQueryString("secure").map {
+      _ == "true"
+    }.getOrElse(false)
+    def errors = header.getQueryString("jsErrors").map {
+      s => s.split(",").toSeq
+    }.getOrElse(Seq())
 
-      val updatedSession = request.getQueryString("pageErrors").map {
-        s =>
-          request.session + (SessionKeys.failLoadPlayer -> s)
-      }.getOrElse {
-        request.session - SessionKeys.failLoadPlayer
-      }
+    val updatedSession = header.getQueryString("pageErrors").map {
+      s =>
+        header.session + (SessionKeys.failLoadPlayer -> s)
+    }.getOrElse {
+      header.session - SessionKeys.failLoadPlayer
+    }
 
-      val updatedRequest = new WrappedRequest[AnyContent](request) {
-        override lazy val session = updatedSession
-      }
-
-      block(PlayerJsRequest(isSecure, updatedRequest, errors))
+    PlayerJs(isSecure, updatedSession, errors)
   }
 }
 

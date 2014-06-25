@@ -47,6 +47,10 @@ var Instance = function(element, options, errorCallback, log) {
     });
   }
 
+  function makeUrl(url, queryParams) {
+    var Builder = require('url-builder');
+    return new Builder().build(url, queryParams);
+  }
 
   function initialize(e, options) {
     if (!options || !options.url) {
@@ -62,7 +66,9 @@ var Instance = function(element, options, errorCallback, log) {
       return;
     }
 
-    $(e).html("<iframe id='iframe-player' frameborder='0' src='" + options.url + "' style='width: 100%; border: none'></iframe>");
+    var url = makeUrl(options.url, options.queryParams);
+
+    $(e).html("<iframe id='iframe-player' frameborder='0' src='" + url + "' style='width: 100%; border: none'></iframe>");
 
     if (options.forceWidth) {
       $(e).width(options.width ? options.width : "600px");

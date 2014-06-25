@@ -1,22 +1,27 @@
 package org.corespring.container.client.controllers.apps
 
-import org.corespring.container.client.actions.ClientActions
+import org.corespring.container.client.hooks.ClientHooks
+import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.client.component.{ ComponentUrls, ItemTypeReader }
 import org.corespring.container.client.controllers.angular.AngularModules
 import org.corespring.container.client.controllers.helpers.{ Helpers, XhtmlProcessor }
-import org.corespring.container.components.model.packaging.{ ClientSideDependency, ClientDependencies }
+import org.corespring.container.components.model.dependencies.DependencyResolver
+import org.corespring.container.components.model.packaging.{ ClientDependencies, ClientSideDependency }
 import org.corespring.container.components.model.{ Component, Id }
 import play.api.http.ContentTypes
 import play.api.libs.json.JsObject
-import play.api.mvc.{ Action, AnyContent, Controller }
-import org.corespring.container.components.model.dependencies.DependencyResolver
+import play.api.mvc.{ Action, Controller, SimpleResult }
 
-trait AppWithConfig[T <: ClientActions[AnyContent]]
+import scala.concurrent.ExecutionContext
+
+trait AppWithConfig[T <: ClientHooks]
   extends Controller
   with DependencyResolver
   with XhtmlProcessor
   with Helpers {
   self: ItemTypeReader =>
+
+  implicit def ec: ExecutionContext
 
   def context: String
 
@@ -28,14 +33,20 @@ trait AppWithConfig[T <: ClientActions[AnyContent]]
 
   val typeRegex = "(.*?)-(.*)".r
 
-  def actions: T
+  def hooks: T
 
   def additionalScripts: Seq[String]
 
-  def config(id: String) = actions.loadConfig(id) {
-    request =>
+  def handleSuccess[D](fn: (D) => SimpleResult)(e: Either[StatusMessage, D]): SimpleResult = {
+    e match {
+      case Left((code, msg)) => Status(code)(msg)
+      case Right(s) => fn(s)
+    }
+  }
 
-      val typeIds = componentTypes(id, request.item).map {
+  def config(id: String) = Action.async { implicit request =>
+    hooks.loadItem(id).map(handleSuccess { (itemJson) =>
+      val typeIds = componentTypes(id, itemJson).map {
         t =>
           val typeRegex(org, name) = t
           new Id(org, name)
@@ -53,11 +64,12 @@ trait AppWithConfig[T <: ClientActions[AnyContent]]
       val css = Seq(cssUrl)
 
       val json = configJson(
-        processXhtml((request.item \ "xhtml").asOpt[String]),
+        processXhtml((itemJson \ "xhtml").asOpt[String]),
         dependencies,
         js,
         css)
       Ok(json)
+    })
   }
 
   /**
@@ -109,7 +121,8 @@ trait AppWithConfig[T <: ClientActions[AnyContent]]
   }
 }
 
-trait AppWithServices[T <: ClientActions[AnyContent]] extends AppWithConfig[T] { self: ItemTypeReader =>
+trait AppWithServices[T <: ClientHooks] extends AppWithConfig[T] {
+  self: ItemTypeReader =>
 
   override def ngModules: AngularModules = new AngularModules(s"$context.services")
 

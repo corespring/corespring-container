@@ -1,25 +1,25 @@
 package org.corespring.container.client.integration
 
 import org.corespring.container.client.V2PlayerConfig
-import org.corespring.container.client.actions._
 import org.corespring.container.client.component.ComponentUrls
-import org.corespring.container.client.controllers.apps.{ Catalog, Player, Editor, Rig }
-import org.corespring.container.client.controllers.resources.{ Session, Item }
-import org.corespring.container.client.controllers.{ PlayerLauncher, ComponentsFileController, Icons }
+import org.corespring.container.client.controllers.apps._
+import org.corespring.container.client.controllers.resources.{ Item, Session }
+import org.corespring.container.client.controllers.{ ComponentsFileController, DataQuery, Icons, PlayerLauncher }
+import org.corespring.container.client.hooks._
+import org.corespring.container.client.integration.validation.Validator
 import org.corespring.container.components.model.Component
-import org.corespring.container.components.outcome.{ DefaultScoreProcessor, ScoreProcessorSequence, ScoreProcessor }
+import org.corespring.container.components.model.dependencies.ComponentSplitter
+import org.corespring.container.components.outcome.{ DefaultScoreProcessor, ScoreProcessor, ScoreProcessorSequence }
 import org.corespring.container.components.processing.PlayerItemPreProcessor
 import org.corespring.container.components.response.OutcomeProcessor
-import play.api.mvc.AnyContent
-import org.corespring.container.client.integration.validation.Validator
 import org.corespring.container.js.rhino.score.ItemJsScoreProcessor
 import org.corespring.container.js.rhino.{ RhinoOutcomeProcessor, RhinoPlayerItemPreProcessor }
-import org.corespring.container.components.model.dependencies.ComponentSplitter
+
+import scala.concurrent.ExecutionContext
 
 trait DefaultIntegration
   extends ContainerControllers
   with ComponentSplitter
-  with HasActions
   with HasHooks
   with HasConfig
   with HasProcessors {
@@ -29,6 +29,8 @@ trait DefaultIntegration
     Validator.absolutePathInProdMode(componentsPath)
   }
 
+  implicit def ec: ExecutionContext
+
   override def playerItemPreProcessor: PlayerItemPreProcessor = new RhinoPlayerItemPreProcessor(uiComponents, libraries)
 
   override def scoreProcessor: ScoreProcessor = new ScoreProcessorSequence(DefaultScoreProcessor, ItemJsScoreProcessor)
@@ -36,6 +38,7 @@ trait DefaultIntegration
   override def outcomeProcessor: OutcomeProcessor = new RhinoOutcomeProcessor(DefaultIntegration.this.components)
 
   lazy val rig = new Rig {
+    override implicit def ec: ExecutionContext = DefaultIntegration.this.ec
 
     override def components = DefaultIntegration.this.components
 
@@ -54,26 +57,31 @@ trait DefaultIntegration
 
   lazy val editor = new Editor {
 
+    override implicit def ec: ExecutionContext = DefaultIntegration.this.ec
+
     override def urls: ComponentUrls = componentUrls
 
     override def components: Seq[Component] = DefaultIntegration.this.components
 
-    override def actions = editorActions
+    override def hooks = editorHooks
   }
 
   lazy val catalog = new Catalog {
+    override implicit def ec: ExecutionContext = DefaultIntegration.this.ec
+
     override def urls: ComponentUrls = componentUrls
     override def components = DefaultIntegration.this.components
-    override def actions = catalogActions
+    override def hooks = catalogHooks
   }
 
   lazy val player = new Player {
+    override implicit def ec: ExecutionContext = DefaultIntegration.this.ec
 
     override def urls: ComponentUrls = componentUrls
 
     override def components: Seq[Component] = DefaultIntegration.this.components
 
-    override def actions: PlayerActions[AnyContent] = playerActions
+    override def hooks = playerHooks
   }
 
   lazy val item = new Item {
@@ -82,11 +90,13 @@ trait DefaultIntegration
     def outcomeProcessor: OutcomeProcessor = DefaultIntegration.this.outcomeProcessor
 
     override def hooks: ItemHooks = itemHooks
+
+    override implicit def ec: ExecutionContext = DefaultIntegration.this.ec
   }
 
   lazy val session = new Session {
 
-    override def actions: SessionActions[AnyContent] = sessionActions
+    override def hooks: SessionHooks = sessionHooks
 
     def outcomeProcessor = DefaultIntegration.this.outcomeProcessor
 
@@ -96,10 +106,15 @@ trait DefaultIntegration
   }
 
   lazy val playerLauncher = new PlayerLauncher {
-    def actions: PlayerLauncherActions[AnyContent] = playerLauncherActions
+    override implicit def ec: ExecutionContext = DefaultIntegration.this.ec
+
+    def hooks = playerLauncherHooks
 
     override def playerConfig: V2PlayerConfig = V2PlayerConfig(configuration)
   }
 
+  override def dataQuery: DataQuery = new DataQuery {
+    override def hooks: DataQueryHooks = dataQueryHooks
+  }
 }
 

@@ -1,17 +1,21 @@
 package org.corespring.container.client.controllers.apps
 
-import org.corespring.container.client.actions.{CatalogActions, EditorActions}
+import org.corespring.container.client.hooks.CatalogHooks
+import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.client.component.AllItemTypesReader
 import org.corespring.container.client.views.txt.js.CatalogServices
 import play.api.Logger
-import play.api.libs.json.{ JsString, JsArray, Json, JsValue }
-import play.api.mvc.AnyContent
-import scala.concurrent.{ Future, ExecutionContext }
+import play.api.libs.json.{ JsArray, JsString, JsValue, Json }
+import play.api.mvc.Action
+
+import scala.concurrent.{ ExecutionContext, Future }
 
 trait Catalog
   extends AllItemTypesReader
-  with AppWithServices[CatalogActions[AnyContent]]
+  with AppWithServices[CatalogHooks]
   with JsModeReading {
+
+  implicit def ec: ExecutionContext
 
   val logger = Logger("catalog")
 
@@ -37,17 +41,23 @@ trait Catalog
 
   override def additionalScripts: Seq[String] = Seq(org.corespring.container.client.controllers.apps.routes.Catalog.services().url)
 
-  def showCatalog(itemId: String) = actions.showCatalog(itemId) {
-    (code, msg) =>
-      import ExecutionContext.Implicits.global
-      Future(Status(code)(org.corespring.container.client.views.html.error.main(code, msg)))
-  } {
+  def showCatalog(itemId: String) = Action.async {
+    implicit request =>
+      hooks.showCatalog(itemId).flatMap { e =>
 
-    request =>
-      logger.trace(s"[showCatalog]: $itemId")
-      val jsMode = getJsMode(request)
-      val page = s"catalog.$jsMode.html"
-      controllers.Assets.at("/container-client", page)(request)
+        def ifEmpty = {
+          logger.trace(s"[showCatalog]: $itemId")
+          val jsMode = getJsMode(request)
+          val page = s"catalog.$jsMode.html"
+          controllers.Assets.at("/container-client", page)(request)
+        }
+
+        def onError(sm: StatusMessage) = {
+          val (code, msg) = sm
+          Future(Status((code))(org.corespring.container.client.views.html.error.main(code, msg)))
+        }
+        e.fold(ifEmpty)(onError)
+      }
   }
 
 }

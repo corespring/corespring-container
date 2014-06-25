@@ -12,7 +12,6 @@ var controller = function(
   SupportingMaterialsService,
   ItemService,
   ImageUtils,
-  WiggiWizHelper,
   WiggiMathJaxFeatureDef) {
 
   $scope.index = parseInt($stateParams.index, 10);
@@ -226,7 +225,9 @@ var controller = function(
   };
 
   $scope.init();
-  WiggiWizHelper.focusCaretAtEnd('.wiggi-wiz-editable', $element);
+  //TODO: this was removed here: https://github.com/corespring/corespring-container/commit/d98f2bb1233fa8604cfdacfae6e71b10e3f1d7b0#diff-beb43a764faeb46818a5aa8afbe3c1ec
+  //Check with ben if it's save to remove this line
+  //WiggiWizHelper.focusCaretAtEnd('.wiggi-wiz-editable', $element);
 
 };
 
@@ -243,7 +244,6 @@ angular.module('corespring-editor.controllers')
     'SupportingMaterialsService',
     'ItemService',
     'ImageUtils',
-    'WiggiWizHelper',
     'WiggiMathJaxFeatureDef',
     controller
   ]);

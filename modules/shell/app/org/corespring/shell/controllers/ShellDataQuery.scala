@@ -1,13 +1,14 @@
 package org.corespring.shell.controllers
 
-import org.corespring.container.client.controllers.{DataQuery => ContainerDataQuery}
-import play.api.libs.json.{JsValue, JsObject, Json}
-import play.api.mvc.{AnyContent, Action}
+import scala.concurrent.Future
+
+import org.corespring.container.client.hooks.{DataQueryHooks => ContainerDataQueryHooks}
 import org.corespring.shell.controllers.data._
 import play.api.Logger
-import play.api.libs.json.JsObject
+import play.api.libs.json._
+import play.api.mvc.RequestHeader
 
-class ShellDataQuery extends ContainerDataQuery {
+trait ShellDataQueryHooks extends ContainerDataQueryHooks {
 
   lazy val logger = Logger("shell.home")
 
@@ -39,14 +40,14 @@ class ShellDataQuery extends ContainerDataQuery {
 
   lazy val standardsTree: Seq[JsObject] = StandardsTreeJson()
 
-  override def list(topic: String, query: Option[String]): Action[AnyContent] = Action {
 
+
+  override def list(topic: String, query: Option[String])(implicit header: RequestHeader): Future[Either[(Int, String), JsArray]] = Future{
     logger.debug(s"list topic <$topic> query <$query>")
 
     def filterSubjects(s: JsObject) = query.map {
       q => (s \ "subject").asOpt[String].map(s => s.toLowerCase().contains(q.toLowerCase)).getOrElse(true)
     }.getOrElse(true)
-
 
     val out = topic match {
       case "bloomsTaxonomy" => Json.toJson(bloomsTaxonomy)
@@ -64,19 +65,19 @@ class ShellDataQuery extends ContainerDataQuery {
       case "subjects.primary" => Json.toJson(subjects.filter(filterSubjects))
       case "subjects.related" => Json.toJson(subjects.filter(filterSubjects))
     }
-    Ok(out)
+    Right(out.as[JsArray])
   }
 
-  override def findOne(topic: String, id: String): Action[AnyContent] = Action {
-    request =>
+  override def findOne(topic: String, id: String)(implicit header: RequestHeader): Future[Either[(Int, String), Option[JsValue]]] = Future{
 
-      def filter(o: JsObject) = (o \ "id").asOpt[String].map(_ == id).getOrElse(false)
+    def filter(o: JsObject) = (o \ "id").asOpt[String].map(_ == id).getOrElse(false)
 
-      val out = topic match {
-        case "subjects.primary" => subjects.filter(filter).headOption.map(Json.toJson(_)).getOrElse(JsObject(Seq()))
-        case "subjects.related" => subjects.filter(filter).headOption.map(Json.toJson(_)).getOrElse(JsObject(Seq()))
-        case _ => JsObject(Seq())
-      }
-      Ok(out)
+    val out = topic match {
+      case "subjects.primary" => subjects.filter(filter).headOption.map(Json.toJson(_)).getOrElse(JsObject(Seq()))
+      case "subjects.related" => subjects.filter(filter).headOption.map(Json.toJson(_)).getOrElse(JsObject(Seq()))
+      case _ => JsObject(Seq())
+    }
+    Right(Some(out))
   }
+
 }

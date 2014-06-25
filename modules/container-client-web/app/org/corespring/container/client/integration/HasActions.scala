@@ -1,26 +1,19 @@
 package org.corespring.container.client.integration
 
-import org.corespring.container.client.actions._
-import play.api.mvc.AnyContent
-import play.api.Configuration
-import org.corespring.container.components.response.OutcomeProcessor
-import org.corespring.container.components.processing.PlayerItemPreProcessor
+import org.corespring.container.client.hooks._
 import org.corespring.container.components.outcome.ScoreProcessor
-
-trait HasActions {
-  def editorActions: EditorActions[AnyContent]
-
-  def catalogActions: CatalogActions[AnyContent]
-
-  def playerActions: PlayerActions[AnyContent]
-
-  def sessionActions: SessionActions[AnyContent]
-
-  def playerLauncherActions: PlayerLauncherActions[AnyContent]
-}
+import org.corespring.container.components.processing.PlayerItemPreProcessor
+import org.corespring.container.components.response.OutcomeProcessor
+import play.api.Configuration
 
 trait HasHooks {
+  def editorHooks: EditorHooks
+  def catalogHooks: CatalogHooks
+  def playerHooks: PlayerHooks
+  def playerLauncherHooks: PlayerLauncherHooks
   def itemHooks: ItemHooks
+  def sessionHooks: SessionHooks
+  def dataQueryHooks: DataQueryHooks
 }
 
 trait HasConfig {

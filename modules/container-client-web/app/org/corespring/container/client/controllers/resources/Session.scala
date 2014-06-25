@@ -1,15 +1,26 @@
 package org.corespring.container.client.controllers.resources
 
-import org.corespring.container.client.actions._
+import org.corespring.container.client.HasContext
+import org.corespring.container.client.hooks.Hooks.StatusMessage
+import org.corespring.container.client.hooks._
+import org.corespring.container.client.controllers.resources.Session.Errors
 import org.corespring.container.client.controllers.resources.session.ItemPruner
 import org.corespring.container.components.outcome.ScoreProcessor
 import org.corespring.container.components.processing.PlayerItemPreProcessor
 import org.corespring.container.components.response.OutcomeProcessor
 import play.api.Logger
 import play.api.libs.json._
-import play.api.mvc.{ AnyContent, Controller }
+import play.api.mvc.{ Action, Controller, SimpleResult }
 
-trait Session extends Controller with ItemPruner {
+import scala.concurrent.ExecutionContext
+
+object Session {
+  object Errors {
+    val cantSaveWhenComplete = "secure mode: can't save when session is complete"
+  }
+}
+
+trait Session extends Controller with ItemPruner with HasContext {
 
   val logger = Logger("session.controller")
 
@@ -19,24 +30,41 @@ trait Session extends Controller with ItemPruner {
 
   def scoreProcessor: ScoreProcessor
 
-  def actions: SessionActions[AnyContent]
+  def hooks: SessionHooks
 
-  def load(id: String) = actions.load(id)(request => Ok((request.everything \ "session").as[JsValue]))
+  implicit def toResult(m: StatusMessage): SimpleResult = play.api.mvc.Results.Status(m._1)(Json.obj("error" -> m._2))
 
-  def loadEverything(id: String) = actions.loadEverything(id) {
-    request =>
+  private def basicHandler[A](success: (A => SimpleResult))(
+    e: Either[StatusMessage, A]): SimpleResult = e match {
+    case Left(err) => err
+    case Right(json) => success(json)
+  }
+
+  def load(id: String) = Action.async { implicit request =>
+    hooks.load(id).map(basicHandler(Ok(_)))
+  }
+
+  def loadEverything(id: String) = Action.async { implicit request =>
+    hooks.loadEverything(id).map(basicHandler { fs =>
+
+      val json = fs.everything
+
+      def isCompleteFromSession(session: JsValue): Boolean = {
+        (session \ "isComplete").asOpt[Boolean].getOrElse(false)
+      }
 
       def includeOutcome = {
         val requested = request.getQueryString("includeOutcome").map {
           _ == "true"
         }.getOrElse(false)
-        requested && (request.isSecure && request.isComplete)
+
+        requested && (fs.isSecure && isCompleteFromSession(json \ "session"))
       }
 
-      val itemJson = (request.everything \ "item").as[JsObject]
+      val itemJson = (json \ "item").as[JsObject]
       val prunedItem = pruneItem(itemJson)
 
-      val sessionJson = (request.everything \ "session").as[JsObject]
+      val sessionJson = (json \ "session").as[JsObject]
 
       val processedItem = itemPreProcessor.preProcessItemForPlayer(prunedItem, sessionJson \ "settings")
 
@@ -55,15 +83,17 @@ trait Session extends Controller with ItemPruner {
           "session" -> sessionJson)
         Ok(out)
       }
+      Ok(json)
+    })
   }
 
-  def saveSession(id: String) = actions.save(id) {
-    request =>
+  def saveSession(id: String) = Action.async { implicit request =>
+    hooks.save(id).map(basicHandler { ss =>
 
       logger.trace(s"[saveSession] : $id")
 
-      if (request.isSecure && request.isComplete)
-        BadRequest(Json.obj("error" -> JsString("secure mode: can't save when session is complete")))
+      if (ss.isSecure && ss.isComplete)
+        BadRequest(Json.obj("error" -> JsString(Errors.cantSaveWhenComplete)))
       else {
         request.body.asJson.map {
           requestJson =>
@@ -72,23 +102,24 @@ trait Session extends Controller with ItemPruner {
             val isComplete: Boolean = (requestJson \ "isComplete").asOpt[Boolean].getOrElse(false)
 
             val attemptUpdate = if (isAttempt) {
-              val currentCount = (request.itemSession \ "attempts").asOpt[Int].getOrElse(0)
+              val currentCount = (ss.existingSession \ "attempts").asOpt[Int].getOrElse(0)
               Json.obj("attempts" -> JsNumber(currentCount + 1))
             } else Json.obj()
 
             val completeUpdate = if (isComplete) Json.obj("isComplete" -> JsBoolean(true)) else Json.obj()
 
-            val update = request.itemSession.as[JsObject] ++
+            val update = ss.existingSession.as[JsObject] ++
               Json.obj("components" -> requestJson \ "components") ++
               attemptUpdate ++ completeUpdate
 
-            request.saveSession(id, update).map {
+            ss.saveSession(id, update).map {
               savedSession =>
                 logger.trace(s"session has been saved as: $savedSession")
                 Ok(savedSession)
             }.getOrElse(BadRequest("Error saving"))
         }.getOrElse(BadRequest("No session in the request body"))
       }
+    })
   }
 
   /**
@@ -97,22 +128,24 @@ trait Session extends Controller with ItemPruner {
    * request body : json - a set of evaluation options to be passed in to the outcome processors
    * @return
    */
-  def loadOutcome(id: String) = actions.loadOutcome(id) {
-    request: SessionOutcomeRequest[AnyContent] =>
-      logger.trace(s"[loadOutcome]: $id : ${Json.stringify(request.itemSession)}")
+  def loadOutcome(id: String) = Action.async { implicit request =>
+    hooks.loadOutcome(id).map(basicHandler { (so: SessionOutcome) =>
 
-      def hasAnswers = (request.itemSession \ "components").asOpt[JsObject].isDefined
+      logger.trace(s"[loadOutcome]: $id : ${Json.stringify(so.itemSession)}")
 
-      if (request.isSecure && !request.isComplete) {
+      def hasAnswers = (so.itemSession \ "components").asOpt[JsObject].isDefined
+
+      if (so.isSecure && !so.isComplete) {
         BadRequest(Json.obj("error" -> JsString("secure mode: can't load outcome - session isn't complete")))
       } else if (!hasAnswers) {
         BadRequest(Json.obj("error" -> JsString("Can't create an outcome if no answers have been saved")))
       } else {
         val options = request.body.asJson.getOrElse(Json.obj())
-        val outcome = outcomeProcessor.createOutcome(request.item, request.itemSession, options)
-        val score = scoreProcessor.score(request.item, request.itemSession, outcome)
+        val outcome = outcomeProcessor.createOutcome(so.item, so.itemSession, options)
+        val score = scoreProcessor.score(so.item, so.itemSession, outcome)
         Ok(Json.obj("outcome" -> outcome) ++ Json.obj("score" -> score))
       }
+    })
   }
 
   /**
@@ -123,46 +156,51 @@ trait Session extends Controller with ItemPruner {
    * @param id
    * @return
    */
-  def getScore(id: String) = actions.getScore(id) {
-    request: SessionOutcomeRequest[AnyContent] =>
-      logger.trace(s"[getScore]: $id : ${Json.stringify(request.itemSession)}")
+  def getScore(id: String) = Action.async { implicit request =>
+    hooks.getScore(id).map {
+      basicHandler({ (so: SessionOutcome) =>
 
-      if (request.isSecure) {
-        def hasAnswers = (request.itemSession \ "components").asOpt[JsObject].isDefined
-        if (!request.isComplete) {
-          BadRequest(Json.obj("error" -> JsString("Can't get score if session has not been completed")))
-        } else if (!hasAnswers) {
-          BadRequest(Json.obj("error" -> JsString("Can't get score if no answers have been saved")))
-        } else {
-          val options = request.body.asJson.getOrElse(Json.obj())
-          val outcome = outcomeProcessor.createOutcome(request.item, request.itemSession, options)
-          val score = scoreProcessor.score(request.item, request.itemSession, outcome)
-          Ok(score)
-        }
-      } else {
-        def settings = Json.obj(
-          "maxNoOfAttempts" -> JsNumber(2),
-          "showFeedback" -> JsBoolean(true),
-          "highlightCorrectResponse" -> JsBoolean(true),
-          "highlightUserResponse" -> JsBoolean(true),
-          "allowEmptyResponses" -> JsBoolean(true))
+        logger.trace(s"[getScore]: $id : ${Json.stringify(so.itemSession)}")
 
-        request.body.asJson.map {
-          answers =>
-            val responses = outcomeProcessor.createOutcome(request.item, answers, settings)
-            val score = scoreProcessor.score(request.item, Json.obj(), responses)
+        if (so.isSecure) {
+          def hasAnswers = (so.itemSession \ "components").asOpt[JsObject].isDefined
+          if (!so.isComplete) {
+            BadRequest(Json.obj("error" -> JsString("Can't get score if session has not been completed")))
+          } else if (!hasAnswers) {
+            BadRequest(Json.obj("error" -> JsString("Can't get score if no answers have been saved")))
+          } else {
+            val options = request.body.asJson.getOrElse(Json.obj())
+            val outcome = outcomeProcessor.createOutcome(so.item, so.itemSession, options)
+            val score = scoreProcessor.score(so.item, so.itemSession, outcome)
             Ok(score)
-        }.getOrElse(BadRequest("No json in request body"))
-      }
+          }
+        } else {
+          def settings = Json.obj(
+            "maxNoOfAttempts" -> JsNumber(2),
+            "showFeedback" -> JsBoolean(true),
+            "highlightCorrectResponse" -> JsBoolean(true),
+            "highlightUserResponse" -> JsBoolean(true),
+            "allowEmptyResponses" -> JsBoolean(true))
+
+          request.body.asJson.map {
+            answers =>
+              val responses = outcomeProcessor.createOutcome(so.item, answers, settings)
+              val score = scoreProcessor.score(so.item, Json.obj(), responses)
+              Ok(score)
+          }.getOrElse(BadRequest("No json in request body"))
+        }
+      })
+    }
   }
 
-  def completeSession(id: String) = actions.save(id) {
-    request: SaveSessionRequest[AnyContent] =>
-      val sessionJson = request.itemSession.as[JsObject] ++ Json.obj("isComplete" -> JsBoolean(true))
-      request.saveSession(id, sessionJson).map {
+  def completeSession(id: String) = Action.async { implicit request =>
+    hooks.save(id).map(basicHandler({ (ss: SaveSession) =>
+      val sessionJson = ss.existingSession.as[JsObject] ++ Json.obj("isComplete" -> JsBoolean(true))
+      ss.saveSession(id, sessionJson).map {
         savedSession =>
           Ok(savedSession)
       }.getOrElse(BadRequest("Error completing"))
+    }))
   }
 
 }

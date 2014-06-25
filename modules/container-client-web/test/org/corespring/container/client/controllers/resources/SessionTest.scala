@@ -1,77 +1,79 @@
 package org.corespring.container.client.controllers.resources
 
-import org.corespring.container.client.actions._
+import org.corespring.container.client.hooks.Hooks.StatusMessage
+import org.corespring.container.client.hooks._
 import org.corespring.container.components.outcome.ScoreProcessor
 import org.corespring.container.components.processing.PlayerItemPreProcessor
 import org.corespring.container.components.response.OutcomeProcessor
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import play.api.libs.json.{ JsValue, Json }
-import play.api.mvc.{ Request, Action, Result, AnyContent }
-import play.api.test.FakeRequest
+import play.api.mvc._
+import play.api.test.{ FakeHeaders, FakeRequest }
 import play.api.test.Helpers._
+
+import scala.concurrent.{ ExecutionContext, Future }
 
 class SessionTest extends Specification with Mockito {
 
   "secure mode" should {
 
-    def saveRequest(isComplete: Boolean) = SaveSessionRequest[AnyContent](
+    def saveSession(isComplete: Boolean) = SaveSession(
       Json.obj(),
       true,
       isComplete,
-      (a, b) => Some(Json.obj()),
-      FakeRequest().withJsonBody(Json.obj()))
+      (a, b) => Some(Json.obj()))
 
-    def outcomeRequest(itemSession: JsValue = Json.obj(), isComplete: Boolean) = SessionOutcomeRequest[AnyContent](
+    def outcome(itemSession: JsValue = Json.obj(), isComplete: Boolean) = SessionOutcome(
       Json.obj(),
       itemSession,
       true,
-      isComplete,
-      FakeRequest().withJsonBody(Json.obj()))
+      isComplete)
 
-    "allow save when session is not complete" in new ActionBody(saveRequest(false)) {
-      val result = session.saveSession("id")(FakeRequest())
+    "allow save when session is not complete" in new ActionBody(saveSession(false)) {
+      val result = session.saveSession("id")(FakeRequest("", "", FakeHeaders(), AnyContentAsJson(Json.obj())))
       status(result) === OK
     }
 
-    "not allow save when session is complete" in new ActionBody(saveRequest(true)) {
+    "not allow save when session is complete" in new ActionBody(saveSession(true)) {
       val result = session.saveSession("id")(FakeRequest())
       status(result) === BAD_REQUEST
+      (contentAsJson(result) \ "error").as[String] === Session.Errors.cantSaveWhenComplete
     }
 
-    "not allow load outcome when session is complete, but there are no answers" in new ActionBody(outcomeRequest(isComplete = true)) {
+    "not allow load outcome when session is complete, but there are no answers" in new ActionBody(outcome(isComplete = true)) {
       val result = session.loadOutcome("id")(FakeRequest())
       status(result) === BAD_REQUEST
     }
 
-    "allow load outcome when session is complete" in new ActionBody(outcomeRequest(itemSession = Json.obj("components" -> Json.obj()), isComplete = true)) {
+    "allow load outcome when session is complete" in new ActionBody(outcome(itemSession = Json.obj("components" -> Json.obj()), isComplete = true)) {
       val result = session.loadOutcome("id")(FakeRequest())
       status(result) === OK
     }
 
-    "not allow load outcome when session is not complete" in new ActionBody(outcomeRequest(isComplete = false)) {
+    "not allow load outcome when session is not complete" in new ActionBody(outcome(isComplete = false)) {
       val result = session.loadOutcome("id")(FakeRequest())
       status(result) === BAD_REQUEST
     }
 
-    "not allow load getScore when session is complete, but there are no answers" in new ActionBody(outcomeRequest(isComplete = true)) {
+    "not allow load getScore when session is complete, but there are no answers" in new ActionBody(outcome(isComplete = true)) {
       val result = session.getScore("id")(FakeRequest())
       status(result) === BAD_REQUEST
     }
 
-    "allow load getScore when session is complete" in new ActionBody(outcomeRequest(itemSession = Json.obj("components" -> Json.obj()), isComplete = true)) {
+    "allow load getScore when session is complete" in new ActionBody(outcome(itemSession = Json.obj("components" -> Json.obj()), isComplete = true)) {
       val result = session.getScore("id")(FakeRequest())
       status(result) === OK
     }
 
-    "not allow getScore when session is not complete" in new ActionBody(outcomeRequest(isComplete = false)) {
+    "not allow getScore when session is not complete" in new ActionBody(outcome(isComplete = false)) {
       val result = session.getScore("id")(FakeRequest())
       status(result) === BAD_REQUEST
     }
 
   }
 
-  class ActionBody(request: SecureModeRequest[AnyContent]) extends org.specs2.specification.Before {
+  class ActionBody(mode: SecureMode) extends org.specs2.specification.Before {
 
     val session = new Session {
       def outcomeProcessor: OutcomeProcessor = {
@@ -88,37 +90,30 @@ class SessionTest extends Specification with Mockito {
 
       def itemPreProcessor: PlayerItemPreProcessor = mock[PlayerItemPreProcessor]
 
-      def actions: SessionActions[AnyContent] = new MockBuilder(request)
+      override def hooks: SessionHooks = new MockBuilder(mode)
+
+      override implicit def ec: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
     }
 
     def before = {}
   }
 
-  class MockBuilder(r: Request[AnyContent]) extends SessionActions[AnyContent] {
-    def loadEverything(id: String)(block: (FullSessionRequest[AnyContent]) => Result): Action[AnyContent] = ???
+  class MockBuilder(m: SecureMode) extends SessionHooks {
 
-    def load(id: String)(block: (FullSessionRequest[AnyContent]) => Result): Action[AnyContent] = ???
+    override def loadEverything(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, FullSession]] = ???
 
-    def loadOutcome(id: String)(block: (SessionOutcomeRequest[AnyContent]) => Result): Action[AnyContent] = Action {
-      request =>
-        block(r.asInstanceOf[SessionOutcomeRequest[AnyContent]])
+    override def getScore(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, SessionOutcome]] = Future {
+      Right(m.asInstanceOf[SessionOutcome])
     }
 
-    def getScore(id: String)(block: (SessionOutcomeRequest[AnyContent]) => Result): Action[AnyContent] = Action {
-      request =>
-        block(r.asInstanceOf[SessionOutcomeRequest[AnyContent]])
+    override def loadOutcome(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, SessionOutcome]] = Future {
+      Right(m.asInstanceOf[SessionOutcome])
     }
 
-    def checkScore(id: String)(block: (SessionOutcomeRequest[AnyContent]) => Result): Action[AnyContent] = Action {
-      request =>
-        block(r.asInstanceOf[SessionOutcomeRequest[AnyContent]])
-    }
+    override def load(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]] = ???
 
-    def submitAnswers(id: String)(block: (SubmitSessionRequest[AnyContent]) => Result): Action[AnyContent] = ???
-
-    def save(id: String)(block: (SaveSessionRequest[AnyContent]) => Result): Action[AnyContent] = Action {
-      request =>
-        block(r.asInstanceOf[SaveSessionRequest[AnyContent]])
+    override def save(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, SaveSession]] = Future {
+      Right(m.asInstanceOf[SaveSession])
     }
   }
 
