@@ -135,11 +135,11 @@ class ContainerClientImplementation(
     override implicit def ec: ExecutionContext = ContainerClientImplementation.this.ec
   }
 
-  override def supportingMaterialHooks: SupportingMaterialHooks = new shellHooks.SupportingMaterialHooks {
-
-  }
 }
 
+/**
+ * A simple shell utility to allow a tester to simulate page and/or js errors when launching the player js
+ */
 trait LoadJs {
 
   import scala.concurrent.ExecutionContext.Implicits.global

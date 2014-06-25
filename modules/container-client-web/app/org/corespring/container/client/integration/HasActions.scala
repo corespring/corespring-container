@@ -14,7 +14,6 @@ trait HasHooks {
   def itemHooks: ItemHooks
   def sessionHooks: SessionHooks
   def dataQueryHooks: DataQueryHooks
-  def supportingMaterialHooks: SupportingMaterialHooks
 }
 
 trait HasConfig {
