@@ -11,8 +11,8 @@
     this.score = function(item, session, responses){
 
       var maxPoints = _.reduce(item.components, function(result, component, key){
-        var weight = component.weight || 1;
-        if(!component.weight){
+        var weight = _.isUndefined(component.weight) ? 1 : component.weight;
+        if(_.isUndefined(component.weight)){
           console.warn("no weight specified for component", component);
         }
         var total = result + weight;
