@@ -13,7 +13,7 @@ import org.corespring.shell.controllers.editor.actions.{ EditorHooks => ShellEdi
 import org.corespring.shell.controllers.editor.{ ItemHooks => ShellItemHooks }
 import org.corespring.shell.controllers.player.actions.{ PlayerHooks => ShellPlayerHooks }
 import org.corespring.shell.controllers.player.{ SessionHooks => ShellSessionHooks }
-import org.corespring.shell.controllers.{ CachedAndMinifiedComponentSets, ShellDataQueryHooks  }
+import org.corespring.shell.controllers.{ CachedAndMinifiedComponentSets, ShellDataQueryHooks }
 import play.api.Configuration
 import play.api.mvc._
 
@@ -27,7 +27,7 @@ class ContainerClientImplementation(
 
   override def components: Seq[Component] = componentsIn
 
-  implicit def ec: ExecutionContext = ExecutionContext.Implicits.global
+  override implicit def ec: ExecutionContext = ExecutionContext.Implicits.global
 
   override def playerLauncherHooks: PlayerLauncherHooks = new PlayerLauncherHooks {
 
@@ -88,7 +88,7 @@ class ContainerClientImplementation(
       }
     }
 
-    override implicit def ec: ExecutionContext = ExecutionContext.Implicits.global
+    override implicit def ec: ExecutionContext = ContainerClientImplementation.this.ec
   }
 
   lazy val componentUrls = new CachedAndMinifiedComponentSets {
@@ -114,7 +114,7 @@ class ContainerClientImplementation(
 
     override def sessionService: MongoService = ContainerClientImplementation.this.sessionService
 
-    override implicit def ec: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
+    override implicit def ec: ExecutionContext = ContainerClientImplementation.this.ec
   }
 
   override def itemHooks: ItemHooks = new ShellItemHooks {
@@ -130,7 +130,7 @@ class ContainerClientImplementation(
     override implicit def ec: ExecutionContext = ContainerClientImplementation.this.ec
   }
 
-  override def dataQueryHooks: DataQueryHooks = new ShellDataQueryHooks{
+  override def dataQueryHooks: DataQueryHooks = new ShellDataQueryHooks {
     override implicit def ec: ExecutionContext = ContainerClientImplementation.this.ec
   }
 }

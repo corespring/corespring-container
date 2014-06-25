@@ -1,18 +1,16 @@
 package org.corespring.container.client.hooks
 
+import org.corespring.container.client.HasContext
 import org.corespring.container.client.hooks.Hooks.StatusMessage
-import play.api.libs.json.{JsArray, JsValue}
+import play.api.libs.json.{ JsArray, JsValue }
 import play.api.mvc._
 
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.Future
 
 object Hooks {
   type StatusMessage = (Int, String)
 }
 
-trait HasContext {
-  implicit def ec: ExecutionContext = ExecutionContext.Implicits.global
-}
 /**
  * Client side calls - each will call for config, services and components
  */
@@ -77,7 +75,7 @@ trait AssetHooks extends HasContext {
 }
 
 trait DataQueryHooks extends HasContext {
-  def list(topic:String, query : Option[String] = None)(implicit header : RequestHeader) : Future[Either[StatusMessage,JsArray]]
+  def list(topic: String, query: Option[String] = None)(implicit header: RequestHeader): Future[Either[StatusMessage, JsArray]]
 
-  def findOne(topic:String, id:String)(implicit header : RequestHeader) : Future[Either[StatusMessage,Option[JsValue]]]
+  def findOne(topic: String, id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, Option[JsValue]]]
 }

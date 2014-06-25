@@ -1,13 +1,13 @@
 package org.corespring.shell.controllers
 
-import com.google.javascript.jscomp.{ JSSourceFile, CompilerOptions }
-import java.io.{ StringWriter, StringReader }
+import java.io.{ StringReader, StringWriter }
+
+import com.google.javascript.jscomp.{ CompilerOptions, JSSourceFile }
 import org.corespring.container.client.controllers.DefaultComponentSets
+import play.api.Configuration
 import play.api.cache.Cached
 import play.api.http.ContentTypes
-import play.api.mvc.{ Result, EssentialAction }
-import play.api.{ Configuration, Play }
-import com.typesafe.config.Config
+import play.api.mvc.{ EssentialAction, Result }
 
 /**
  * An example of component sets with caching.

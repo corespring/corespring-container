@@ -1,16 +1,17 @@
 package org.corespring.container.client.controllers
 
-import scala.concurrent.{ExecutionContext, Future}
+import org.corespring.container.client.HasContext
+
+import scala.concurrent.{ ExecutionContext, Future }
 
 import org.corespring.container.client.hooks.DataQueryHooks
 import play.api.libs.json.Json
-import play.api.mvc.{Action, AnyContent, Controller}
+import play.api.mvc.{ Action, AnyContent, Controller }
 
 object DataQuery {
   val findTopics = Seq(
     "subjects.primary",
-    "subjects.related"
-  )
+    "subjects.related")
   val listTopics = Seq(
     "bloomsTaxonomy",
     "credentials",
@@ -23,19 +24,17 @@ object DataQuery {
     "priorUses",
     "reviewsPassed",
     "standards",
-    "standardsTree"
-  ) ++ findTopics
+    "standardsTree") ++ findTopics
 }
 
-
 /** Query service for static data, eg: subject, gradelevel, etc */
-trait DataQuery extends Controller {
+trait DataQuery extends Controller with HasContext {
 
   import org.corespring.container.client.controllers.DataQuery._
 
   def hooks: DataQueryHooks
 
-  implicit def ec : ExecutionContext
+  implicit def ec: ExecutionContext
 
   /** list all that match the query - if there's no query list all */
   def list(topic: String, query: Option[String] = None): Action[AnyContent] = Action.async { implicit request =>
@@ -49,7 +48,6 @@ trait DataQuery extends Controller {
       Future(BadRequest(Json.obj("error" -> s"$topic is not a valid topic from: ${listTopics.mkString(",")}")))
     }
   }
-
 
   def findOne(topic: String, id: String): Action[AnyContent] = Action.async {
     implicit request =>

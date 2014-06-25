@@ -11,8 +11,6 @@ import scala.concurrent.Future
 
 trait ItemHooks extends ContainerItemHooks {
 
-  import scala.concurrent.ExecutionContext.Implicits.global
-
   def itemService: MongoService
 
   override def save(itemId: String, data: JsValue)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]] = {

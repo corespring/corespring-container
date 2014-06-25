@@ -1,11 +1,11 @@
 package org.corespring.container.client.integration
 
 import org.corespring.container.client.V2PlayerConfig
-import org.corespring.container.client.hooks._
 import org.corespring.container.client.component.ComponentUrls
 import org.corespring.container.client.controllers.apps._
 import org.corespring.container.client.controllers.resources.{ Item, Session }
-import org.corespring.container.client.controllers.{DataQuery, ComponentsFileController, Icons, PlayerLauncher}
+import org.corespring.container.client.controllers.{ ComponentsFileController, DataQuery, Icons, PlayerLauncher }
+import org.corespring.container.client.hooks._
 import org.corespring.container.client.integration.validation.Validator
 import org.corespring.container.components.model.Component
 import org.corespring.container.components.model.dependencies.ComponentSplitter
@@ -29,6 +29,8 @@ trait DefaultIntegration
     Validator.absolutePathInProdMode(componentsPath)
   }
 
+  implicit def ec: ExecutionContext
+
   override def playerItemPreProcessor: PlayerItemPreProcessor = new RhinoPlayerItemPreProcessor(uiComponents, libraries)
 
   override def scoreProcessor: ScoreProcessor = new ScoreProcessorSequence(DefaultScoreProcessor, ItemJsScoreProcessor)
@@ -36,7 +38,7 @@ trait DefaultIntegration
   override def outcomeProcessor: OutcomeProcessor = new RhinoOutcomeProcessor(DefaultIntegration.this.components)
 
   lazy val rig = new Rig {
-    override implicit def ec: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
+    override implicit def ec: ExecutionContext = DefaultIntegration.this.ec
 
     override def components = DefaultIntegration.this.components
 
@@ -55,7 +57,7 @@ trait DefaultIntegration
 
   lazy val editor = new Editor {
 
-    override implicit def ec: ExecutionContext = ExecutionContext.Implicits.global
+    override implicit def ec: ExecutionContext = DefaultIntegration.this.ec
 
     override def urls: ComponentUrls = componentUrls
 
@@ -65,14 +67,15 @@ trait DefaultIntegration
   }
 
   lazy val catalog = new Catalog {
-    override implicit def ec: ExecutionContext = ExecutionContext.Implicits.global
+    override implicit def ec: ExecutionContext = DefaultIntegration.this.ec
+
     override def urls: ComponentUrls = componentUrls
     override def components = DefaultIntegration.this.components
     override def hooks = catalogHooks
   }
 
   lazy val player = new Player {
-    override implicit def ec: ExecutionContext = ExecutionContext.Implicits.global
+    override implicit def ec: ExecutionContext = DefaultIntegration.this.ec
 
     override def urls: ComponentUrls = componentUrls
 
@@ -88,7 +91,7 @@ trait DefaultIntegration
 
     override def hooks: ItemHooks = itemHooks
 
-    override implicit def ec: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
+    override implicit def ec: ExecutionContext = DefaultIntegration.this.ec
   }
 
   lazy val session = new Session {
@@ -100,12 +103,11 @@ trait DefaultIntegration
     def itemPreProcessor: PlayerItemPreProcessor = DefaultIntegration.this.playerItemPreProcessor
 
     def scoreProcessor: ScoreProcessor = DefaultIntegration.this.scoreProcessor
-
-    override implicit def ec: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
   }
 
   lazy val playerLauncher = new PlayerLauncher {
-    override implicit def ec: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
+    override implicit def ec: ExecutionContext = DefaultIntegration.this.ec
+
     def hooks = playerLauncherHooks
 
     override def playerConfig: V2PlayerConfig = V2PlayerConfig(configuration)
@@ -113,8 +115,6 @@ trait DefaultIntegration
 
   override def dataQuery: DataQuery = new DataQuery {
     override def hooks: DataQueryHooks = dataQueryHooks
-
-    override implicit def ec: ExecutionContext = ExecutionContext.Implicits.global
   }
 }
 

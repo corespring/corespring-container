@@ -1,16 +1,15 @@
 package org.corespring.container.client.controllers
 
+import org.corespring.container.client.HasContext
 import org.corespring.container.client.hooks.AssetHooks
 import play.api.Logger
 import play.api.mvc._
 
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.Future
 
-trait Assets extends Controller {
+trait Assets extends Controller with HasContext {
 
   lazy val logger = Logger("v2player.assets")
-
-  implicit def ec: ExecutionContext
 
   def loadAsset(id: String, file: String)(request: Request[AnyContent]): SimpleResult
 

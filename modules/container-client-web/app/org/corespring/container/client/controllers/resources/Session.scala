@@ -1,5 +1,6 @@
 package org.corespring.container.client.controllers.resources
 
+import org.corespring.container.client.HasContext
 import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.client.hooks._
 import org.corespring.container.client.controllers.resources.Session.Errors
@@ -19,7 +20,7 @@ object Session {
   }
 }
 
-trait Session extends Controller with ItemPruner {
+trait Session extends Controller with ItemPruner with HasContext {
 
   val logger = Logger("session.controller")
 
@@ -30,8 +31,6 @@ trait Session extends Controller with ItemPruner {
   def scoreProcessor: ScoreProcessor
 
   def hooks: SessionHooks
-
-  implicit def ec: ExecutionContext
 
   implicit def toResult(m: StatusMessage): SimpleResult = play.api.mvc.Results.Status(m._1)(Json.obj("error" -> m._2))
 
