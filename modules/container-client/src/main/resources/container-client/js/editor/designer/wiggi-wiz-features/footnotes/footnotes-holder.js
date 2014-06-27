@@ -37,6 +37,7 @@ angular.module('corespring.wiggi-wiz-features.footnotes').directive('footnotesHo
 
       $scope.deleteNode = function() {
         $log.debug('deleteNode');
+        $scope.$broadcast("$destroy"); //destroys tooltip
         $scope.$emit('wiggi-wiz.delete-node', $element);
       };
 
