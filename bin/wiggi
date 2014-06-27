@@ -1,0 +1,57 @@
+#!/usr/bin/env coffee
+
+fs = require('fs')
+sys = require('sys')
+exec = require('child_process').exec;
+path = require('path')
+puts = (error, stdout, stderr) -> sys.puts(stdout)
+
+
+usage = """
+Usage
+----------------------------------------------------------
+Creates a symlink to wiggi so you can preview you changes.
+
+Usage: bin/wiggi link
+Usage: bin/wiggi rm-link
+
+Note when unlinking - it copies over the wiggi source folder
+
+"""
+
+wiggiPath = "modules/container-client/target/scala-2.10/classes/container-client/bower_components/wiggi-wiz"
+
+srcPath = path.resolve(process.cwd(),  "../wiggi-wiz")
+
+console.log process.argv
+
+if process.argv.length <= 2
+  console.log usage
+  return
+
+
+action = process.argv[2]
+
+console.log action
+
+
+link = ->
+  console.log "linking..."
+  exists = fs.existsSync(wiggiPath)
+  console.log "exists? #{exists}"
+  exec("rm -rf #{wiggiPath}", puts) if exists
+  exec("ln -s #{srcPath} #{wiggiPath}", puts)
+
+
+rmLink = ->
+  console.log "removing link..."
+  exec("rm #{wiggiPath}", puts)
+  exec("mkdir -p #{wiggiPath}")
+  exec("cp -r #{srcPath}/dist #{wiggiPath}/dist", puts)
+
+switch action
+  when "link" then link()
+  when "rm-link" then rmLink()
+  else
+    console.log "unknown action: #{action}"
+    console.log usage
