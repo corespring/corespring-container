@@ -28,7 +28,7 @@ class DataQueryTest extends Specification with Mockito {
     }
 
     "return OK" in {
-      val result = dq.list("itemType")(FakeRequest("", ""))
+      val result = dq.list("itemTypes")(FakeRequest("", ""))
       status(result) === OK
     }
   }
