@@ -4,6 +4,7 @@ script#supporting-material(type='text/ng-template')
     supportingmetadata(ng-model='supportingMaterial', persist='updateMetadata')
     .editor-container(ng-class="editorMode", ng-show="isContentType('text/html')")
       wiggi-wiz(
+        formatting-display="dropdown",
         ng-model="supportingMarkup",
         image-service="imageService",
         features="extraFeatures")

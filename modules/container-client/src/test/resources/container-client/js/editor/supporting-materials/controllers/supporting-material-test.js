@@ -50,6 +50,7 @@ describe('supporting material controller', function() {
         WiggiWizHelper: {
           focusCaretAtEnd: function() {}
         },
+        WiggiFootnotesFeatureDef: function() {},
         SupportingMaterialsService: supportingMaterialsService,
         ItemService: itemService
       });
