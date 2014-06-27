@@ -157,20 +157,20 @@ form
         label.control-label(for="copyright-owner") * Copyright Owner
       td
         input#copyright-owner.form-control(
-        ng-model='contributorDetails.copyright.owner',
+        ng-model='contributorDetails.copyrightOwner',
         placeholder="Enter the copyright owner...")
 
     tr
       td.label-col
         label.control-label(for="copyright-year") * Copyright Year
       td
-        select#copyright-year(ng-model='contributorDetails.copyright.year', ng-options='c for c in copyrightYearDataProvider', style="width:170px;")
+        select#copyright-year(ng-model='contributorDetails.copyrightYear', ng-options='c for c in copyrightYearDataProvider', style="width:170px;")
 
     tr
       td.label-col
         label.control-label(for="") Copyright Expiration
       td
-        select#copyright-expiration(ng-model='contributorDetails.copyright.expirationDate', ng-options='c for c in copyrightExpirationYearDataProvider', style="width:170px;")
+        select#copyright-expiration(ng-model='contributorDetails.copyrightExpirationDate', ng-options='c for c in copyrightExpirationYearDataProvider', style="width:170px;")
 
     tr
       td.label-col
@@ -213,6 +213,6 @@ form
             ng-change="onChangeReviewsPassed(rp.key)",
             style="margin-right: 3px;")
             | {{rp.key}}
-          input(ng-show="isReviewsPassedOtherSelected",style="margin-left:135px;", type="text", placeholder='Enter review...', ng-model='taskInfo.reviewsPassedOther')
+          input(ng-show="isReviewsPassedOtherSelected",style="margin-left:135px;", type="text", placeholder='Enter review...', ng-model='profile.reviewsPassedOther')
 
   a.btn.btn-default.btn-success.pull-right(ui-sref="design({section: 'main'})") Done

@@ -210,11 +210,11 @@ var controller = function($scope, $rootScope, $log, $location, $state, $timeout,
     });
   };
 
-  DataQueryService.list("gradeLevel", function(result) {
+  DataQueryService.list("gradeLevels", function(result) {
     $scope.gradeLevelDataProvider = result;
   });
 
-  DataQueryService.list("itemType", function(result) {
+  DataQueryService.list("itemTypes", function(result) {
     $scope.itemTypeDataProvider = result;
     $scope.itemTypeValues = toListOfValues($scope.itemTypeDataProvider);
   });

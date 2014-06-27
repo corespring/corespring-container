@@ -36,7 +36,14 @@ angular.module('corespring-common.directives').directive('additionalCopyrightInf
           $scope.copyrights.splice(0);
         };
 
-        $scope.copyrightYearDataProvider = _.range(new Date().getFullYear(), 1939, -1);
+        function years(fromYear, toYear){
+          var direction = fromYear > toYear ? -1 : 1;
+          return _.range( fromYear, toYear, direction).map(function(year){
+            return year.toString();
+          });
+        }
+
+        $scope.copyrightYearDataProvider = years(new Date().getFullYear(), 1939);
 
         DataQueryService.list("licenseTypes", function(result) {
           $scope.licenseTypeDataProvider = result;

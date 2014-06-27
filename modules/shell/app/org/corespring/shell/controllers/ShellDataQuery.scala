@@ -53,8 +53,8 @@ trait ShellDataQueryHooks extends ContainerDataQueryHooks {
       case "bloomsTaxonomy" => Json.toJson(bloomsTaxonomy)
       case "credentials" => Json.toJson(credentials)
       case "depthOfKnowledge" => Json.toJson(depthOfKnowledge)
-      case "gradeLevel" => Json.toJson(gradeLevels)
-      case "itemType" => itemTypes
+      case "gradeLevels" => Json.toJson(gradeLevels)
+      case "itemTypes" => itemTypes
       case "keySkills" => Json.toJson(keySkills)
       case "licenseTypes" => Json.toJson(licenseTypes)
       case "mediaType" => Json.toJson(mediaType)

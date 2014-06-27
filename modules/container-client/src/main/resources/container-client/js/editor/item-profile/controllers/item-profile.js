@@ -202,9 +202,16 @@
       $scope.bloomsTaxonomyDataProvider = result;
     });
 
-    $scope.copyrightExpirationYearDataProvider = _.range(new Date().getFullYear(), new Date().getFullYear() + 20).concat(['Never']);
+    function years(fromYear, toYear){
+      var direction = fromYear > toYear ? -1 : 1;
+      return _.range( fromYear, toYear, direction).map(function(year){
+        return year.toString();
+      });
+    }
 
-    $scope.copyrightYearDataProvider = _.range(new Date().getFullYear(), 1939, -1);
+    $scope.copyrightExpirationYearDataProvider = years(new Date().getFullYear(), new Date().getFullYear() + 20).concat(['Never']);
+
+    $scope.copyrightYearDataProvider = years(new Date().getFullYear(), 1939);
 
     DataQueryService.list("credentials", function(result) {
       $scope.credentialsDataProvider = result;
@@ -265,10 +272,10 @@
     });
 
     function initReviewsPassedDataProvider() {
-      if ($scope.reviewsPassedDataProvider && $scope.taskInfo && _.isArray($scope.taskInfo.reviewsPassed)) {
+      if ($scope.reviewsPassedDataProvider && $scope.profile && _.isArray($scope.profile.reviewsPassed)) {
 
         _.each($scope.reviewsPassedDataProvider, function(item) {
-          var selected = $scope.taskInfo.reviewsPassed.indexOf(item.key) >= 0;
+          var selected = $scope.profile.reviewsPassed.indexOf(item.key) >= 0;
           if (selected !== item.selected) {
             item.selected = selected;
           }
@@ -309,11 +316,11 @@
           selectedKeys = _.without(selectedKeys, "All");
         }
       }
-      $scope.taskInfo.reviewsPassed = selectedKeys;
+      $scope.profile.reviewsPassed = selectedKeys;
       initReviewsPassedDataProvider();
     };
 
-    $scope.$watch('taskInfo.reviewsPassed', function() {
+    $scope.$watch('profile.reviewsPassed', function() {
       updateReviewsPassedOtherSelected();
     });
 
@@ -324,8 +331,8 @@
           return item.selected && item.key === 'Other';
         });
       }
-      if ($scope.isReviewsPassedOtherSelected && !otherSelected && $scope.taskInfo) {
-        $scope.taskInfo.reviewsPassedOther = '';
+      if ($scope.isReviewsPassedOtherSelected && !otherSelected && $scope.profile) {
+        $scope.profile.reviewsPassedOther = '';
       }
       $scope.isReviewsPassedOtherSelected = otherSelected;
     }
@@ -351,53 +358,22 @@
       return count + " Key " + skills + " selected";
     };
 
-    $scope.addCopyrightItem = function() {
-      $scope.contributorDetails.additionalCopyrights.push({});
-    };
-
-    $scope.removeCopyrightItem = function(item) {
-      var index = $scope.contributorDetails.additionalCopyrights.indexOf(item);
-      if (index >= 0) {
-        $scope.contributorDetails.additionalCopyrights.splice(index, 1);
-        if ($scope.contributorDetails.additionalCopyrights.length === 0) {
-          $scope.needAdditionalCopyrightInformation = '';
-        }
-      }
-    };
-
-    $scope.clearCopyrightItems = function() {
-      $scope.contributorDetails.additionalCopyrights.splice(0);
-    };
-
-    $scope.hasCopyrightItems = function() {
-      return $scope.contributorDetails &&
-        $scope.contributorDetails.additionalCopyrights &&
-        $scope.contributorDetails.additionalCopyrights.length > 0;
-    };
-
-    $scope.needAdditionalCopyrightInformation = '';
-
-    $scope.$watch("needAdditionalCopyrightInformation", function(newValue, oldValue) {
-        if (newValue === oldValue) {
-          return;
-        }
-        if (newValue === 'yes') {
-          if (!$scope.hasCopyrightItems()) {
-            $scope.addCopyrightItem();
-          }
-        } else {
-          $scope.clearCopyrightItems(); //TODO Add "are you sure" modal?
-        }
-    });
-
     $scope.$on('save-data', function() {
       $scope.save();
     });
 
+    function getProfileDataForSaving(){
+      var profile = _.cloneDeep($scope.profile);
+      profile.standards = profile.standards.map(function(standard){
+        return standard.dotNotation;
+      });
+      return profile;
+    }
+
     $scope.save = function() {
 
       ItemService.save({
-          profile: $scope.profile
+          profile: getProfileDataForSaving()
         },
         onSaveSuccess,
         onSaveError,
@@ -422,12 +398,11 @@
       if (!(profile.taskInfo)) {
         profile.taskInfo = {};
       }
-
-      if (!_.isArray(profile.taskInfo.reviewsPassed)) {
-        profile.taskInfo.reviewsPassed = [];
+      if (!_.isArray(profile.reviewsPassed)) {
+        profile.reviewsPassed = [];
       }
-      if (!_.isArray(profile.taskInfo.standards)) {
-        profile.taskInfo.standards = [];
+      if (!_.isArray(profile.standards)) {
+        profile.standards = [];
       }
       if (!(profile.otherAlignments)) {
         profile.otherAlignments = {};
@@ -439,16 +414,12 @@
         profile.contributorDetails = {};
       }
 
-      if (!(profile.contributorDetails.licenseTyp)) {
+      if (!(profile.contributorDetails.licenseType)) {
         profile.contributorDetails.licenseType = "CC BY";
       }
 
-      if (!(profile.contributorDetails.copyright)) {
-        profile.contributorDetails.copyright = {};
-      }
-
-      if (!(profile.contributorDetails.copyright.year)) {
-        profile.contributorDetails.copyright.year = new Date().getFullYear();
+      if (!(profile.contributorDetails.copyrightYear)) {
+        profile.contributorDetails.copyrightYear = (new Date().getFullYear()).toString();
       }
 
       if (!_.isArray(profile.contributorDetails.additionalCopyrights)) {
@@ -490,8 +461,6 @@
       log("contributor details:", $scope.contributorDetails);
 
       applyComponentTypes();
-
-      $scope.needAdditionalCopyrightInformation = $scope.hasCopyrightItems() ? 'yes' : '';
 
       initReviewsPassedDataProvider();
       updateReviewsPassedOtherSelected();
