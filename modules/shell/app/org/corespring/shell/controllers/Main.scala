@@ -26,7 +26,10 @@ trait Main extends Controller {
 
       val items: Seq[(String, String, String, String, String, String)] = itemService.list("profile.taskInfo.title").sortBy(_.toString).map {
         json: JsValue =>
-          val name = (json \ "profile" \ "taskInfo" \ "title").asOpt[String].getOrElse("?")
+          val name = (json \ "profile" \ "taskInfo" \ "title").asOpt[String] match {
+            case Some(title) if title.trim().length() > 0 => title
+            case _ => "No title"
+          }
           val id = (json \ "_id" \ "$oid").as[String]
           val playerUrl = routes.Main.createSessionPage(id).url
           val editorUrl = s"/client/editor/${id}/index.html"
@@ -63,7 +66,7 @@ trait Main extends Controller {
         "components" -> Json.obj(),
         "profile" -> Json.obj(
           "taskInfo" -> Json.obj(
-            "title" -> "Enter a title for this item...")))
+            "title" -> "")))
       itemService.create(json).map { id =>
         Redirect(org.corespring.container.client.controllers.apps.routes.Editor.editItem(id.toString))
       }.getOrElse(BadRequest("Error creating an item"))
