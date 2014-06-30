@@ -29,38 +29,43 @@ trait ComponentSets extends Controller with ComponentUrls {
 
   def resource[A >: EssentialAction](context: String, directive: String, suffix: String): A = {
     logger.debug(s"[resource] : $directive")
+    val (out, contentType) = generateBodyAndContentType(context, directive, suffix)
+    Action {
+      process(out, contentType)
+    }
+  }
+
+  protected def generateBodyAndContentType(context: String, directive: String, suffix: String): (String, String) = {
+
     val types: Seq[String] = ComponentUrlDirective(directive, allComponents)
 
     val usedComponents = types.map { t => allComponents.find(_.componentType == t) }.flatten
-    val sortedComponents = dependencyResolver.resolveComponents(usedComponents.map(_.id), Some(context))
-    generate(context, sortedComponents, suffix)
-  }
+    val components = dependencyResolver.resolveComponents(usedComponents.map(_.id), Some(context))
 
-  protected def generate[A >: EssentialAction](context: String, components: Seq[Component], suffix: String): A = Action {
-    request =>
+    logger.trace(s"context: $context, comps: ${components.map(_.componentType).mkString(",")}")
 
-      logger.trace(s"context: $context, comps: ${components.map(_.componentType).mkString(",")}")
+    def gen(generator: SourceGenerator): String = suffix match {
+      case "js" => generator.js(components.toSeq)
+      case "css" => generator.css(components.toSeq)
+      case _ => ""
+    }
 
-      def gen(generator: SourceGenerator) = suffix match {
-        case "js" => generator.js(components.toSeq)
-        case "css" => generator.css(components.toSeq)
-        case _ => ""
-      }
+    val out = context match {
+      case "editor" => gen(editorGenerator)
+      case "player" => gen(playerGenerator)
+      case "rig" => gen(editorGenerator)
+      case "catalog" => gen(catalogGenerator)
+      case _ => throw new RuntimeException(s"Error: unknown context: $context")
+    }
 
-      val out = context match {
-        case "editor" => gen(editorGenerator)
-        case "player" => gen(playerGenerator)
-        case "rig" => gen(editorGenerator)
-        case "catalog" => gen(catalogGenerator)
-        case _ => throw new RuntimeException(s"Error: unknown context: $context")
-      }
+    val contentType = suffix match {
+      case "js" => ContentTypes.JAVASCRIPT
+      case "css" => ContentTypes.CSS
+      case _ => throw new RuntimeException(s"Unknown suffix: $suffix")
+    }
 
-      val contentType = suffix match {
-        case "js" => ContentTypes.JAVASCRIPT
-        case "css" => ContentTypes.CSS
-        case _ => throw new RuntimeException(s"Unknown suffix: $suffix")
-      }
-      process(out, contentType)
+    (out, contentType)
+
   }
 
   override def cssUrl(context: String, components: Seq[Component]): String = url(context, components, "css")
