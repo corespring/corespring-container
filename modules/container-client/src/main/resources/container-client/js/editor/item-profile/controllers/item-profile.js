@@ -2,26 +2,26 @@
 
   angular.module('corespring-editor.controllers')
     .controller('ItemProfile', [
-      '$log',
       '$scope',
       'DataQueryService',
-      'ItemService',
-      'StandardQueryCreator',
       'DesignerService',
+      'ItemService',
+      'LogFactory',
       'ProfileFormatter',
+      'StandardQueryCreator',
       ItemProfileController
     ]);
 
   function ItemProfileController(
-    $log,
     $scope,
     DataQueryService,
-    ItemService,
-    StandardQueryCreator,
     DesignerService,
-    ProfileFormatter) {
+    ItemService,
+    LogFactory,
+    ProfileFormatter,
+    StandardQueryCreator) {
 
-    var log = $log.debug.bind($log, 'ItemProfileController] -');
+    var $log = LogFactory.getLogger('ItemProfileController');
 
     //----------------------------------------------------------------
     // Standards start
@@ -68,7 +68,7 @@
     }
 
     $scope.$watch('profile.standards', function(newValue, oldValue) {
-      log("profile.standards", newValue);
+      $log.debug("profile.standards", newValue);
 
       $scope.isLiteracyStandardSelected = containsLiteracyStandard(newValue);
     });
@@ -130,6 +130,7 @@
     $scope.queryResults = {};
 
     function findItemById(topic, id, callback) {
+
       var local = _.find($scope.queryResults[topic], function(r) {
         return r.id === id;
       });
@@ -151,7 +152,7 @@
       };
 
       this.query = function(query) {
-        log("query", query);
+        $log.debug("query", query);
 
         DataQueryService.query(topic, query.term, function(result) {
           $scope.queryResults[topic] = result;
@@ -170,9 +171,9 @@
       };
 
       this.initSelection = function(element, callback) {
-        log("init selection:", element, callback);
+        $log.debug("init selection:", element, callback);
         var val = that.elementToVal(element);
-        log("val:", val);
+        $log.debug("val:", val);
 
         findItemById(topic, val, function(s) {
           return callback(s);
@@ -362,18 +363,10 @@
       $scope.save();
     });
 
-    function getProfileDataForSaving(){
-      var profile = _.cloneDeep($scope.profile);
-      profile.standards = profile.standards.map(function(standard){
-        return standard.dotNotation;
-      });
-      return profile;
-    }
-
     $scope.save = function() {
 
       ItemService.save({
-          profile: getProfileDataForSaving()
+          profile: $scope.profile
         },
         onSaveSuccess,
         onSaveError,
@@ -382,12 +375,12 @@
     };
 
     function onSaveSuccess(updated) {
-      log("profile saved");
+      $log.debug("profile saved");
       $scope.data.saveInProgress = false;
     }
 
     function onSaveError(err) {
-      log("error saving profile", err);
+      $log.debug("error saving profile", err);
       $scope.data.saveError = err;
       $scope.data.saveInProgress = false;
     }
@@ -456,9 +449,9 @@
       $scope.contributorDetails = profile.contributorDetails;
       $scope.profile = profile;
 
-      log("task info:", $scope.taskInfo);
-      log("other alignments:", $scope.otherAlignments);
-      log("contributor details:", $scope.contributorDetails);
+      $log.debug("task info:", $scope.taskInfo);
+      $log.debug("other alignments:", $scope.otherAlignments);
+      $log.debug("contributor details:", $scope.contributorDetails);
 
       applyComponentTypes();
 
