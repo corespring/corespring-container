@@ -29,6 +29,14 @@ describe('item-profile controller', function() {
     };
   }
 
+  function MockLogFactory(){
+    this.getLogger = function(id){
+      return {
+        debug: function(){}
+      };
+    };
+  }
+
   function MockDataQueryService() {
 
     this.results = [];
@@ -56,6 +64,7 @@ describe('item-profile controller', function() {
     module(function($provide) {
       $provide.value('DataQueryService', mockDataQueryService);
       $provide.value('ItemService', new mockItemService());
+      $provide.value('LogFactory', new MockLogFactory());
       $provide.value('StandardQueryCreator', {});
       $provide.value('DesignerService', {
         loadAvailableComponents: function() {}

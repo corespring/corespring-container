@@ -35,6 +35,7 @@ angular.module('corespring.wiggi-wiz-features.mathjax').directive('mathjaxHolder
       $scope.originalMarkup = html;
 
       $scope.deleteNode = function() {
+        $scope.$broadcast("$destroy"); //destroys tooltip
         $scope.$emit('wiggi-wiz.delete-node', $element);
       };
 

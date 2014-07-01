@@ -1,24 +1,5 @@
-angular.module('corespring-editor.controllers')
-  .controller('SupportingMaterial', [
-    '$element',
-    '$filter',
-    '$http',
-    '$location',
-    '$log',
-    '$rootScope',
-    '$scope',
-    '$state',
-    '$stateParams',
-    'ImageUtils',
-    'ItemService',
-    'SupportingMaterialsService',
-    'WiggiFootnotesFeatureDef',
-    'WiggiMathJaxFeatureDef',
-    controller
-  ]);
-
-  /* global AddContentModalController, com */
-function controller(
+/* global AddContentModalController, com */
+var controller = function(
   $element,
   $filter,
   $http,
@@ -41,14 +22,12 @@ function controller(
     definitions: [{
       type: 'group',
       buttons: [new WiggiMathJaxFeatureDef()]
-    },
-    {
+    }, {
       type: 'group',
       buttons: [
         new WiggiFootnotesFeatureDef()
       ]
-    }
-    ]
+    }]
   };
 
   $scope.imageService = {
@@ -138,7 +117,9 @@ function controller(
   });
 
   $scope.addNew = function() {
-    $state.transitionTo('supporting-materials', {intro: false});
+    $state.transitionTo('supporting-materials', {
+      intro: false
+    });
   };
 
   $scope.save = function() {
@@ -196,7 +177,9 @@ function controller(
   };
 
   $scope.delete = function() {
-    $scope.$emit('deleteSupportingMaterial', { index: $scope.index });
+    $scope.$emit('deleteSupportingMaterial', {
+      index: $scope.index
+    });
   };
 
   $scope.isContentType = function(contentType) {
@@ -256,5 +239,23 @@ function controller(
   //Check with ben if it's save to remove this line
   //WiggiWizHelper.focusCaretAtEnd('.wiggi-wiz-editable', $element);
 
-}
+};
 
+angular.module('corespring-editor.controllers')
+  .controller('SupportingMaterial', [
+    '$element',
+    '$filter',
+    '$http',
+    '$location',
+    '$log',
+    '$rootScope',
+    '$scope',
+    '$state',
+    '$stateParams',
+    'ImageUtils',
+    'ItemService',
+    'SupportingMaterialsService',
+    'WiggiFootnotesFeatureDef',
+    'WiggiMathJaxFeatureDef',
+    controller
+  ]);
