@@ -7,7 +7,7 @@ import org.corespring.container.client.controllers.DefaultComponentSets
 import play.api.Configuration
 import play.api.cache.Cached
 import play.api.http.ContentTypes
-import play.api.mvc.{ EssentialAction, Result }
+import play.api.mvc.{ Action, EssentialAction, Result }
 
 /**
  * An example of component sets with caching.
@@ -44,7 +44,7 @@ trait CachedAndMinifiedComponentSets extends DefaultComponentSets {
 
   def cachingEnabled = configuration.getBoolean("cache").getOrElse(false)
 
-  override def process(s: String, contentType: String): Result = {
+  def process(s: String, contentType: String): Result = {
     val out: Either[String, String] = contentType match {
       case ss: String if ss == ContentTypes.JAVASCRIPT => if (minifyEnabled) minifyJs(s) else Right(s)
       case ss: String if ss == ContentTypes.CSS => if (minifyEnabled) minifyCss(s) else Right(s)
@@ -58,10 +58,16 @@ trait CachedAndMinifiedComponentSets extends DefaultComponentSets {
 
   override def resource[A >: EssentialAction](context: String, directive: String, suffix: String) = if (cachingEnabled) {
     Cached(s"$context-$directive-$suffix") {
-      super.resource(context, directive, suffix)
+      Action {
+        val (body, ct) = generateBodyAndContentType(context, directive, suffix)
+        process(body, ct)
+      }
     }
   } else {
-    super.resource(context, directive, suffix)
+    Action {
+      val (body, ct) = generateBodyAndContentType(context, directive, suffix)
+      process(body, ct)
+    }
   }
 
 }
