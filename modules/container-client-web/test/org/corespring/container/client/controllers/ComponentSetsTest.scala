@@ -5,7 +5,7 @@ import org.corespring.container.components.model.Component
 import org.corespring.container.components.model.dependencies.{ DependencyResolver, ComponentMaker }
 import org.specs2.mutable.Specification
 import play.api.GlobalSettings
-import play.api.mvc.SimpleResult
+import play.api.mvc.{ Action, EssentialAction, SimpleResult }
 import play.api.test.Helpers._
 import play.api.test.{ FakeApplication, FakeRequest }
 import scala.concurrent.Future
@@ -32,6 +32,11 @@ class ComponentSetsTest extends Specification with ComponentMaker {
 
     override def dependencyResolver: DependencyResolver = new DependencyResolver {
       override def components: Seq[Component] = allComponents
+    }
+
+    override def resource[A >: EssentialAction](context: String, directive: String, suffix: String): A = Action {
+      val (body, ct) = generateBodyAndContentType(context, directive, suffix)
+      Ok(body).as(ct)
     }
   }
 
