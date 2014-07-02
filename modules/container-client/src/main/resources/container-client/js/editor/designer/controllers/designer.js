@@ -5,6 +5,7 @@
       '$element',
       '$http',
       '$scope',
+      '$timeout',
       '$stateParams',
       'ComponentRegister',
       'ComponentToWiggiwizFeatureAdapter',
@@ -24,6 +25,7 @@
     $element,
     $http,
     $scope,
+    $timeout,
     $stateParams,
     ComponentRegister,
     ComponentToWiggiwizFeatureAdapter,
@@ -112,8 +114,6 @@
           ' label="' + component.name + '"',
           '>'
         ].join('')));
-
-        angular.element('.wiggi-wiz', $element).scope().focusCaretAtEnd();
       }
 
       function deleteComponent(id) {
@@ -233,6 +233,13 @@
 
     $scope.$on('save-data', function(event) {
       $scope.save();
+    });
+
+    $scope.$on('itemAdded', function(event, $node) {
+      // This ends up in some weird race condition if we don't wrap it in a $timeout
+      $timeout(function() {
+        angular.element('.wiggi-wiz', $element).scope().focusCaretAtEnd();
+      });
     });
 
     $scope.save = function(callback) {
