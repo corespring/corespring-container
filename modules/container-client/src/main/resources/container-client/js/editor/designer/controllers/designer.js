@@ -112,6 +112,8 @@
           ' label="' + component.name + '"',
           '>'
         ].join('')));
+
+        angular.element('.wiggi-wiz', $element).scope().focusCaretAtEnd();
       }
 
       function deleteComponent(id) {
@@ -327,12 +329,11 @@
           }
         });
         $scope.lastId = max;
-
-
       }
     });
 
     $scope.$emit('loadItem');
+
   }
 
 
