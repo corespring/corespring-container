@@ -8,24 +8,21 @@ block content
 
       ul.nav.nav-stacked
         li
-          a.mainitem-link(ui-sref="design({section: 'main'})") Design
-        li.nav-subitem(ui-sref-active="active")
-          a.subitem-link(ui-sref="design({section: 'main'})") Item
+          a.mainitem-link(ui-sref="design({section: 'main'})") ITEM
         li.nav-subitem(ui-sref-active="active")
           a.subitem-link(ui-sref="design({section: 'weighting'})" ) Weighting
         li.nav-subitem(ui-sref-active="active")
           a.subitem-link(ui-sref="design({section: 'summary-feedback'})" ) Summary Feedback
-        li.nav-subitem(ui-sref-active="active")
-          a.subitem-link(ui-sref="item-profile" ) Profile
-        li.nav-subitem(ui-sref-active="active")
-          a.subitem-link(ui-sref="supporting-materials({intro: 'intro'})") Supporting Materials
+
+        li
+          a.mainitem-link(ui-sref="item-profile" ) PROFILE
+
+        li
+          a.mainitem-link(ui-sref="supporting-materials({intro: 'intro'})") SUPPORTING MATERIALS
+
         li.nav-subitem(ng-repeat="supportingMaterial in data.item.supportingMaterials", ng-class="{ active: isSupportingMaterialActive(supportingMaterial, $index)}")
           a.subitem-link.supporting-material-link(ui-sref="supporting-material({index: $index})") {{supportingMaterial.name}}
           a.delete-supporting-material(ng-click="deleteSupportingMaterial($index)")
-        li
-          a.mainitem-link(ui-sref="overview") View
-        li.nav-subitem(ui-sref-active="active")
-          a.subitem-link(ui-sref="overview") Catalog View
 
     .preview-container
       .contents(ui-view="preview")
