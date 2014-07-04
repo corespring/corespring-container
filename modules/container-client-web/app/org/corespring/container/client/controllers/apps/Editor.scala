@@ -22,7 +22,7 @@ trait Editor
   override def servicesJs = {
     import org.corespring.container.client.controllers.resources.routes._
 
-    val componentJson: Seq[JsValue] = uiComponents.map {
+    val componentJson: Seq[JsValue] = interactions.map {
       c =>
         val tag = tagName(c.id.org, c.id.name)
         Json.obj(
@@ -51,7 +51,7 @@ trait Editor
       Future(Status(code)(org.corespring.container.client.views.html.error.main(code, msg)))
     }
 
-    def onItem(i:JsValue) = {
+    def onItem(i: JsValue) = {
       logger.trace(s"[editItem]: $itemId")
       val jsMode = getJsMode(request)
       val page = s"editor.$jsMode.html"

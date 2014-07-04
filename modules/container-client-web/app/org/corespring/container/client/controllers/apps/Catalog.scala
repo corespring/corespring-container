@@ -24,7 +24,7 @@ trait Catalog
   override def servicesJs = {
     import org.corespring.container.client.controllers.resources.routes._
 
-    val componentJson: Seq[JsValue] = uiComponents.map {
+    val componentJson: Seq[JsValue] = interactions.map {
       c =>
         val tag = tagName(c.id.org, c.id.name)
         Json.obj(

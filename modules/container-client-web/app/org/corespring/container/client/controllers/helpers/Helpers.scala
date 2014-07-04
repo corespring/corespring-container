@@ -2,7 +2,7 @@ package org.corespring.container.client.controllers.helpers
 
 import org.corespring.container.client.VersionInfo
 import org.corespring.container.client.views.txt.js.ComponentWrapper
-import org.corespring.container.components.model.UiComponent
+import org.corespring.container.components.model.Interaction
 import org.corespring.container.utils.string
 import play.api.libs.json._
 import play.api.mvc.{ Results, Result }
@@ -36,7 +36,8 @@ trait Helpers extends NameHelper {
       "css" -> cssPaths,
       "versionInfo" -> Json.toJson(VersionInfo.make))
 
-  protected def componentsToResource(components: Seq[UiComponent], componentToString: UiComponent => String, contentType: String): Result = {
+  protected def componentsToResource(components: Seq[Interaction], componentToString: Interaction => String,
+    contentType: String): Result = {
     Results.Ok(components.map(componentToString).mkString("\n")).as(contentType)
   }
 

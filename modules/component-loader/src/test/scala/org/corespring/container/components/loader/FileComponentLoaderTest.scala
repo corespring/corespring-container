@@ -1,7 +1,7 @@
 package org.corespring.container.components.loader
 
 import org.specs2.mutable.Specification
-import org.corespring.container.components.model.{ LayoutComponent, UiComponent, Library }
+import org.corespring.container.components.model.{ Interaction, LayoutComponent, Library }
 
 class FileComponentLoaderTest extends Specification {
 
@@ -21,15 +21,15 @@ class FileComponentLoaderTest extends Specification {
       loader.all.length === 1
     }
 
-    "load a ui component" in {
+    "load an interaction" in {
       val loader = getLoader("one")
       val component = loader.all(0)
 
-      component.isInstanceOf[UiComponent] === true
-      val uiComponent = component.asInstanceOf[UiComponent]
+      component.isInstanceOf[Interaction] === true
+      val interaction = component.asInstanceOf[Interaction]
 
-      uiComponent.title.get === "Single Choice"
-      uiComponent.titleGroup.get === "Fixed Choice"
+      interaction.title.get === "Single Choice"
+      interaction.titleGroup.get === "Fixed Choice"
     }
 
     "load a library" in {
@@ -46,17 +46,17 @@ class FileComponentLoaderTest extends Specification {
       lib.css.get.startsWith("body") mustEqual true
     }
 
-    "a ui component can specify a library" in {
+    "an interaction can specify a library" in {
       val loader = getLoader("three")
       val lib = loader.all(0)
       lib match {
-        case u: UiComponent => {
-          u.libraries.length === 1
-          u.libraries(0).org === "org-name"
-          u.libraries(0).name === "lib-name"
+        case i: Interaction => {
+          i.libraries.length === 1
+          i.libraries(0).org === "org-name"
+          i.libraries(0).name === "lib-name"
           success
         }
-        case _ => failure("not a Ui component")
+        case _ => failure("not an Interaction")
       }
     }
 

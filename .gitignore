@@ -9,3 +9,4 @@ node_modules
 *.sublime*
 Thumbs.db
 .DS_Store
+atlassian-*

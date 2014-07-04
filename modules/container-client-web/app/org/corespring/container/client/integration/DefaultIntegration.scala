@@ -31,7 +31,7 @@ trait DefaultIntegration
 
   implicit def ec: ExecutionContext
 
-  override def playerItemPreProcessor: PlayerItemPreProcessor = new RhinoPlayerItemPreProcessor(uiComponents, libraries)
+  override def playerItemPreProcessor: PlayerItemPreProcessor = new RhinoPlayerItemPreProcessor(interactions, libraries)
 
   override def scoreProcessor: ScoreProcessor = new ScoreProcessorSequence(DefaultScoreProcessor, ItemJsScoreProcessor)
 
@@ -46,7 +46,7 @@ trait DefaultIntegration
   }
 
   lazy val icons = new Icons {
-    def loadedComponents: Seq[Component] = DefaultIntegration.this.components
+    def components: Seq[Component] = DefaultIntegration.this.components
   }
 
   lazy val libs = new ComponentsFileController {

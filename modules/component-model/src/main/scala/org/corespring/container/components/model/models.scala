@@ -29,8 +29,11 @@ case class Library(
 
 case class LibrarySource(name: String, source: String)
 
-/** A component implementation */
-case class UiComponent(
+/**
+ * An interaction is a component that the user can interact with.
+ *
+ */
+case class Interaction(
   org: String,
   name: String,
   title: Option[String],

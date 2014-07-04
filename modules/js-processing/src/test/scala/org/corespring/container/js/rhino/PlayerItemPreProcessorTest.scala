@@ -1,6 +1,6 @@
 package org.corespring.container.js.rhino
 
-import org.corespring.container.components.model.{ Server, UiComponent, Client }
+import org.corespring.container.components.model.{ Interaction, Server, Client }
 import org.specs2.mutable.Specification
 import play.api.libs.json.Json
 
@@ -18,7 +18,7 @@ class PlayerItemPreProcessorTest extends Specification {
 
     "process" in {
 
-      val component = UiComponent(
+      val interaction = Interaction(
         "org",
         "name",
         None,
@@ -46,7 +46,7 @@ class PlayerItemPreProcessorTest extends Specification {
             "itemSession" -> Json.obj("value" -> "2"),
             "stash" -> Json.obj())))
 
-      val processor = new RhinoPlayerItemPreProcessor(Seq(component), Seq.empty)
+      val processor = new RhinoPlayerItemPreProcessor(Seq(interaction), Seq.empty)
       val result = processor.preProcessItemForPlayer(item, session)
       (result \ "components" \ "1" \ "dummy").as[String] === "something"
       (result \ "components" \ "1" \ "model").as[String] === "someModel"
@@ -55,7 +55,7 @@ class PlayerItemPreProcessorTest extends Specification {
 
     "should not throw exception if render function doesnt exist" in {
 
-      val component = UiComponent(
+      val interaction = Interaction(
         "org",
         "name",
         None,
@@ -77,7 +77,7 @@ class PlayerItemPreProcessorTest extends Specification {
             "correctResponse" -> Json.obj(
               "value" -> "1"))))
 
-      val processor = new RhinoPlayerItemPreProcessor(Seq(component), Seq.empty)
+      val processor = new RhinoPlayerItemPreProcessor(Seq(interaction), Seq.empty)
 
       try {
         processor.preProcessItemForPlayer(item, Json.obj())

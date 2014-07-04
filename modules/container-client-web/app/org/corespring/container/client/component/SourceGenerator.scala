@@ -17,7 +17,7 @@ class EditorGenerator extends SourceGenerator {
 
   override def js(components: Seq[Component]): String = {
     val (libs, uiComps, layoutComps) = splitComponents(components)
-    val uiJs = uiComps.map(uiComponentToJs).mkString("\n")
+    val uiJs = uiComps.map(interactionToJs).mkString("\n")
     val libJs = libs.map(libraryToJs(true, true)).mkString("\n")
     val layoutJs = layoutComps.map(layoutToJs).mkString("\n")
     s"$libJs\n$uiJs\n$layoutJs"
@@ -36,7 +36,7 @@ class EditorGenerator extends SourceGenerator {
 
   private def wrapServerJs(componentType: String, definition: String): String = ComponentServerWrapper(componentType, definition).toString
 
-  private def uiComponentToJs(ui: UiComponent): String = {
+  private def interactionToJs(ui: Interaction): String = {
     val configJs = wrapEditorComponent(ui.org, ui.name, ui.client.configure, Some(s"${directiveName(ui.org, ui.name)}Config"))
     //Add the render directives as previews
     val previewJs = wrapEditorComponent(ui.org, ui.name, ui.client.render, Some(s"${directiveName(ui.org, ui.name)}"))
@@ -65,7 +65,7 @@ class CatalogGenerator extends SourceGenerator {
 
   override def js(components: Seq[Component]): String = {
     val (libs, uiComps, layoutComps) = splitComponents(components)
-    val uiJs = uiComps.map(uiComponentToJs).mkString("\n")
+    val uiJs = uiComps.map(interactionToJs).mkString("\n")
     val libJs = libs.map(libraryToJs(true, true)).mkString("\n")
     val layoutJs = layoutComps.map(layoutToJs).mkString("\n")
     s"$libJs\n$uiJs\n$layoutJs"
@@ -84,7 +84,7 @@ class CatalogGenerator extends SourceGenerator {
 
   private def wrapServerJs(componentType: String, definition: String): String = ComponentServerWrapper(componentType, definition).toString
 
-  private def uiComponentToJs(ui: UiComponent): String = {
+  private def interactionToJs(ui: Interaction): String = {
     val configJs = wrapEditorComponent(ui.org, ui.name, ui.client.configure, Some(s"${directiveName(ui.org, ui.name)}Config"))
     //Add the render directives as previews
     val previewJs = wrapEditorComponent(ui.org, ui.name, ui.client.render, Some(s"${directiveName(ui.org, ui.name)}"))
@@ -163,9 +163,9 @@ trait SourceGenerator
       """
   }
 
-  protected def splitComponents(comps: Seq[Component]): (Seq[Library], Seq[UiComponent], Seq[LayoutComponent]) = (
+  protected def splitComponents(comps: Seq[Component]): (Seq[Library], Seq[Interaction], Seq[LayoutComponent]) = (
     filterByType[Library](comps),
-    filterByType[UiComponent](comps),
+    filterByType[Interaction](comps),
     filterByType[LayoutComponent](comps))
 
 }
