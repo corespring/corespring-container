@@ -1,14 +1,14 @@
 # Component Spec
 
-There are 3 types of component: [UiComponent], [Layout] and [Library]
+There are 3 types of component: [Interaction], [Layout] and [Library]
 
-* UiComponents - Interactive elements that are part of the test, and so consist of client side logic and server side logic.
+* Interaction - Interactive elements allow a user to interact with them, and consist of client side and server side logic.
 * Layout - Ui elements that can contain other elements, they are not part of the test and are client side only.
 * Library - for sharing either client or server side logic amongst components use Libraries.
 
-## UiComponent
+## Interaction
 
-//TODO - UiComponent rename to Interaction
+
 
 ### How to depend on a library
 

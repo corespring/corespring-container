@@ -4,7 +4,7 @@ import org.corespring.container.client.component.RigItemTypeReader
 import org.corespring.container.client.controllers.angular.AngularModules
 import org.corespring.container.client.hooks.ClientHooks
 import org.corespring.container.client.hooks.Hooks.StatusMessage
-import org.corespring.container.components.model.UiComponent
+import org.corespring.container.components.model.Interaction
 import play.api.libs.json.{ JsValue, Json }
 import play.api.mvc.{ Action, RequestHeader }
 
@@ -25,7 +25,7 @@ trait Rig extends AppWithConfig[ClientHooks] with RigItemTypeReader {
       Ok(data.getOrElse(Json.obj()))
   }
 
-  def component(componentType: String): Option[UiComponent] = uiComponents.find(c => c.componentType == componentType)
+  def component(componentType: String): Option[Interaction] = interactions.find(c => c.componentType == componentType)
 
   def asset(componentType: String, file: String) = controllers.Assets.at("/container-client", file)
 

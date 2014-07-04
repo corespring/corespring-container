@@ -8,7 +8,8 @@ trait ComponentMaker {
   private lazy val defaultOrg = "org"
 
   def uiComp(name: String, libs: Seq[Id], title: Option[String] = None, titleGroup: Option[String] = None, org: String = defaultOrg) = {
-    UiComponent(org, name, title, titleGroup, Client("", "", None), Server(""), Json.obj("name" -> name, "org" -> org), Json.obj(), None, Map(), libs)
+    Interaction(org, name, title, titleGroup, Client("", "", None), Server(""), Json.obj("name" -> name, "org" -> org),
+      Json.obj(), None, Map(), libs)
   }
 
   def lib(name: String, libraries: Seq[Id] = Seq.empty, org: String = defaultOrg): Library = {

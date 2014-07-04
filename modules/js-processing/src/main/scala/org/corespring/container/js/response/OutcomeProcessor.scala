@@ -1,7 +1,7 @@
 package org.corespring.container.js.response
 
 import org.corespring.container.components.model.dependencies.DependencyResolver
-import org.corespring.container.components.model.{ Component, UiComponent, Library }
+import org.corespring.container.components.model.{ Component, Interaction, Library }
 import org.corespring.container.components.response.{ OutcomeProcessor => ContainerOutcomeProcessor }
 import org.corespring.container.js.api.GetServerLogic
 import org.slf4j.LoggerFactory
@@ -37,15 +37,15 @@ trait OutcomeProcessor
 
       val answer = getAnswer(itemSession, id)
 
-      def getUiComponent(t: String): Option[UiComponent] = components.find(_.matchesType(componentType)).map { c =>
-        if (c.isInstanceOf[UiComponent]) {
-          c.asInstanceOf[UiComponent]
+      def getInteraction(t: String): Option[Interaction] = components.find(_.matchesType(componentType)).map { c =>
+        if (c.isInstanceOf[Interaction]) {
+          c.asInstanceOf[Interaction]
         } else {
-          throw new RuntimeException(s"[OutcomeProcessor] component type: $t is no a [UiComponent]")
+          throw new RuntimeException(s"[OutcomeProcessor] component type: $t is not an Interaction")
         }
       }
 
-      getUiComponent(componentType).map {
+      getInteraction(componentType).map {
         component =>
 
           answer.map {

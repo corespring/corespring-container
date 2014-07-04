@@ -41,7 +41,7 @@ class OutcomeProcessorTest extends Specification {
       "2" -> Json.obj(
         "answers" -> Json.obj())))
 
-  def comp(name: String = "name", serverJs: String, libraries: Seq[Id] = Seq.empty) = UiComponent(
+  def interaction(name: String = "name", serverJs: String, libraries: Seq[Id] = Seq.empty) = Interaction(
     "org",
     name,
     None,
@@ -77,8 +77,8 @@ class OutcomeProcessorTest extends Specification {
   "OutcomeProcessor" should {
     "respond" in {
 
-      val component = comp("name", interactionRespondJs)
-      val feedback = comp("feedback", feedbackRespondJs)
+      val component = interaction("name", interactionRespondJs)
+      val feedback = interaction("feedback", feedbackRespondJs)
 
       val processor = new RhinoOutcomeProcessor(Seq(component, feedback))
       val result = processor.createOutcome(item, session, Json.obj())
@@ -127,7 +127,7 @@ class OutcomeProcessorTest extends Specification {
           | return { c : "hi from c" };
           |}
         """.stripMargin
-      val one = comp("one", oneJs, Seq(Id("org", "a", None)))
+      val one = interaction("one", oneJs, Seq(Id("org", "a", None)))
       val a = lib("a", aJs, Seq(Id("org", "b", None)))
       val b = lib("b", bJs, Seq(Id("org", "c", None)))
       val c = lib("c", cJs, Seq.empty)
@@ -142,8 +142,8 @@ class OutcomeProcessorTest extends Specification {
     }
 
     "fail - if there is bad js" in {
-      val component = comp("name", "arst")
-      val feedback = comp("feedback", feedbackRespondJs)
+      val component = interaction("name", "arst")
+      val feedback = interaction("feedback", feedbackRespondJs)
       val processor = new RhinoOutcomeProcessor(Seq(component, feedback))
       try {
         processor.createOutcome(item, session, Json.obj())

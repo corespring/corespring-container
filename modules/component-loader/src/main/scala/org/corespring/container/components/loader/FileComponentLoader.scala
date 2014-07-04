@@ -55,7 +55,7 @@ class FileComponentLoader(paths: Seq[String])
     val purpose = (packageJson \ "purpose").asOpt[String].getOrElse("interaction")
 
     purpose match {
-      case "interaction" => loadUiComponent(org, packageJson)(compRoot)
+      case "interaction" => loadInteraction(org, packageJson)(compRoot)
       case "library" => loadLibrary(org, packageJson)(compRoot)
       case "layout" => loadLayout(org, packageJson)(compRoot)
       case _ => throw new RuntimeException(s"Unknown purpose: [$purpose] for component: ${compRoot.getPath}")
@@ -108,7 +108,7 @@ class FileComponentLoader(paths: Seq[String])
         packageJson))
   }
 
-  private def loadUiComponent(org: String, packageJson: JsValue)(compRoot: File): Option[Component] = {
+  private def loadInteraction(org: String, packageJson: JsValue)(compRoot: File): Option[Component] = {
 
     val clientFolder = new File(compRoot.getPath + "/src/client")
     val serverFolder = new File(compRoot.getPath + "/src/server")
@@ -126,7 +126,7 @@ class FileComponentLoader(paths: Seq[String])
 
     if (process) {
       Some(
-        UiComponent(
+        Interaction(
           org,
           compRoot.getName,
           (packageJson \ "title").asOpt[String],

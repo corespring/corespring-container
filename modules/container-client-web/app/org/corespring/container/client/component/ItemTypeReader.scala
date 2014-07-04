@@ -20,7 +20,8 @@ trait PlayerItemTypeReader extends ItemTypeReader with ComponentSplitter with Na
   override def componentTypes(id: String, json: JsValue): Seq[String] = {
     val modelComponents: Seq[String] = (json \ "components" \\ "componentType").map(_.as[String]).distinct
 
-    val validComponents = modelComponents.filter(modelComp => uiComponents.exists(ui => tagName(ui.org, ui.name) == modelComp))
+    val validComponents = modelComponents.filter(modelComp => interactions.exists(ui => tagName(ui.org,
+      ui.name) == modelComp))
 
     def layoutComponentsInItem: Seq[String] = {
       val out: Seq[String] = (json \ "xhtml").asOpt[String].map {
