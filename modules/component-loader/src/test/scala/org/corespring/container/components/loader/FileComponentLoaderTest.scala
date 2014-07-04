@@ -11,7 +11,7 @@ class FileComponentLoaderTest extends Specification {
 
     def getLoader(p: String) = {
       val path = s"$rootPath/$p"
-      val loader = new FileComponentLoader(Seq(path))
+      val loader = new FileComponentLoader(Seq(path), false)
       loader.reload
       loader
     }

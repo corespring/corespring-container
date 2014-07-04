@@ -29,6 +29,16 @@ case class Library(
 
 case class LibrarySource(name: String, source: String)
 
+case class Widget(org: String,
+  name: String,
+  title: Option[String],
+  titleGroup: Option[String],
+  client: Client,
+  override val packageInfo: JsValue,
+  defaultData: JsValue,
+  icon: Option[Array[Byte]] = None,
+  sampleData: Map[String, JsValue] = Map.empty,
+  libraries: Seq[Id] = Seq.empty) extends Component(Id(org, name), packageInfo)
 /**
  * An interaction is a component that the user can interact with.
  *

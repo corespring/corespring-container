@@ -7,7 +7,7 @@ import org.corespring.play.utils.{ CallBlockOnHeaderFilter, ControllerInstanceRe
 import org.corespring.shell.controllers.Main
 import org.corespring.shell.filters.AccessControlFilter
 import play.api.mvc.{ RequestHeader, WithFilters, Controller }
-import play.api.{ GlobalSettings, Logger, Play }
+import play.api.{ Mode, GlobalSettings, Logger, Play }
 
 object Global extends WithFilters(AccessControlFilter, CallBlockOnHeaderFilter) with ControllerInstanceResolver with GlobalSettings {
 
@@ -60,7 +60,8 @@ object Global extends WithFilters(AccessControlFilter, CallBlockOnHeaderFilter) 
   }
 
   private lazy val componentLoader = {
-    val out = new FileComponentLoader(Play.current.configuration.getString("components.path").toSeq)
+    val onlyProcessReleased = Play.current.mode == Mode.Prod
+    val out = new FileComponentLoader(Play.current.configuration.getString("components.path").toSeq, onlyProcessReleased)
     out.reload
     out
   }
