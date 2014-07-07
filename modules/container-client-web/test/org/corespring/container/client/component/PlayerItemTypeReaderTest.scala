@@ -5,10 +5,14 @@ import org.corespring.container.components.model.dependencies.ComponentMaker
 import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
 import play.api.libs.json.Json
+import play.api.mvc.RequestHeader
+import play.api.test.FakeRequest
 
 class PlayerItemTypeReaderTest extends Specification with ComponentMaker {
 
   class readerScope(comps:Seq[Component] = Seq.empty) extends Scope{
+
+    implicit val h : RequestHeader = FakeRequest("", "")
 
     val reader = new PlayerItemTypeReader {
       override def components: Seq[Component] = comps
