@@ -92,19 +92,16 @@
       }
     };
 
-    function onWidgetsLoaded(widgets) {
-      $scope.widgets = widgets;
-      initComponents();
-    }
-    
-    function onComponentsLoaded(componentSet) {
-      $scope.componentSet = componentSet;
+
+    function onComponentsLoaded(uiComponents) {
+      $scope.interactions = uiComponents.interactions;
+      $scope.widgets = uiComponents.widgets;
       initComponents();
     }
 
     function initComponents() {
 
-      if(!$scope.componentSet || !$scope.widgets){
+      if (!$scope.interactions || !$scope.widgets) {
         return;
       }
 
@@ -178,7 +175,7 @@
       var videoComponent = componentToFeature(_.find($scope.widgets, function(c) {
         return c.componentType === 'corespring-video';
       }));
-      
+
       videoComponent.iconclass = "fa fa-film";
 
       $scope.overrideFeatures = [
@@ -186,37 +183,28 @@
       ];
 
       $scope.extraFeatures = {
-        definitions: [
-          {
-            name: 'external',
-            type: 'dropdown',
-            dropdownTitle: 'Answer Type',
-            buttons: _($scope.componentSet).reject(isToolbar).sortBy(orderList).map(componentToFeature).value()
-          },
-          {
-            type: 'group',
-            buttons: [
-              new WiggiMathJaxFeatureDef()
-            ]
-          },
-          {
-            type: 'group',
-            buttons: [
-              new WiggiFootnotesFeatureDef()
-            ]
-          },
-          {
-            type: 'group',
-            buttons: [
-              videoComponent
-            ]
-          }
-        ]
+        definitions: [{
+          name: 'external',
+          type: 'dropdown',
+          dropdownTitle: 'Answer Type',
+          buttons: _($scope.interactions).reject(isToolbar).sortBy(orderList).map(componentToFeature).value()
+        }, {
+          type: 'group',
+          buttons: [
+            new WiggiMathJaxFeatureDef()
+          ]
+        }, {
+          type: 'group',
+          buttons: [
+            new WiggiFootnotesFeatureDef()
+          ]
+        }, {
+          type: 'group',
+          buttons: [
+            videoComponent
+          ]
+        }]
       };
-    }
-
-    function onWidgetsLoadError(error) {
-      throw new Error("Error loading widgets");
     }
 
     function onComponentsLoadError(error) {
@@ -224,7 +212,7 @@
     }
 
     $scope.getUploadUrl = function(file) {
-      $log.log('getUploadUrl',arguments);
+      $log.log('getUploadUrl', arguments);
       return file.name;
     };
 
@@ -338,8 +326,7 @@
       $scope.componentSize = sizeToString(_.size(components));
     });
 
-    DesignerService.loadAvailableComponents(onComponentsLoaded, onComponentsLoadError);
-    DesignerService.loadAvailableWidgets(onWidgetsLoaded, onWidgetsLoadError);
+    DesignerService.loadAvailableUiComponents(onComponentsLoaded, onComponentsLoadError);
 
     $scope.$on('itemLoaded', function(ev, item) {
       if (item) {
