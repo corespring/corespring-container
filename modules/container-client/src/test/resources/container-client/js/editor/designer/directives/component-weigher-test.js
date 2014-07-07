@@ -2,7 +2,6 @@ describe('componentWeights', function() {
 
   beforeEach(angular.mock.module('corespring-editor.directives'));
 
-
   describe('weighter', function() {
     var rootScope, compile, timeout;
 
@@ -35,7 +34,12 @@ describe('componentWeights', function() {
         }
       };
 
-      rootScope.componentSet = [];
+      rootScope.componentSet = [{
+        componentType: 'one'
+      }, {
+        componentType: 'two'
+      }];
+
       rootScope.markup = '<two id="2"></two><one id="1"></one>';
       var elem = compile("<component-weights ng-model='components' component-set='componentSet' markup='markup'></component-weights>")(rootScope);
       var scope = rootScope.$$childHead;
@@ -47,5 +51,21 @@ describe('componentWeights', function() {
       assertPercent(elem, '2', '66%');
       console.log(elem.html());
     });
+
+    it('should ignore components that are not in the component set', function() {
+      rootScope.components = {
+        '1': {
+          componentType: 'widget-one'
+        }
+      };
+
+      rootScope.componentSet = [];
+      rootScope.markup = '<widget-one id="1"></widget-one>';
+      var elem = compile("<component-weights ng-model='components' component-set='componentSet' markup='markup'></component-weights>")(rootScope);
+      var scope = rootScope.$$childHead;
+      rootScope.$digest();
+      expect(scope.sortedComponents.length).toBe(0);
+    });
   });
+
 });

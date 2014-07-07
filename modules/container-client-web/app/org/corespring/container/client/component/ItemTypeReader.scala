@@ -18,13 +18,13 @@ trait PlayerItemTypeReader extends ItemTypeReader with ComponentSplitter with Na
 
   /** List components used in the model */
   override def componentTypes(json: JsValue): Seq[String] = {
-    val modelComponents: Seq[String] = (json \ "components" \\ "componentType").map(_.as[String]).distinct
+    val types: Seq[String] = (json \ "components" \\ "componentType").map(_.as[String]).distinct
 
-    def componentTypeMatches(t: String)( ci:ComponentInfo) = tagName(ci.id.org, ci.id.name) == t
+    def componentTypeMatches(t: String)(ci:ComponentInfo) = tagName(ci.id.org, ci.id.name) == t
 
-    val validComponents = modelComponents.filter{
-      modelComp =>
-        interactions.exists(componentTypeMatches(modelComp)) || widgets.exists(componentTypeMatches(modelComp))
+    val validComponents = types.filter{
+      t =>
+        interactions.exists(componentTypeMatches(t)) || widgets.exists(componentTypeMatches(t))
     }
 
     def layoutComponentsInItem: Seq[String] = {

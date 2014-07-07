@@ -21,16 +21,26 @@ angular.module('corespring-editor.directives').directive('componentWeights', [
           return $markup.find('[id]').size() > 0 ? $markup.find('[id]') : $markup.filter('[id]');
         })();
 
-        var ids = _.map(nodesOnly, function(n) {
-          return $(n).attr('id');
-        });
+        function interactionsOnly(n) {
+          return _.contains($scope.componentSetTypes, n.tagName.toLowerCase());
+        }
 
-        var sorted = _.map(ids, function(id) {
+        function getId(n) {
+          return $(n).attr('id');
+        }
+
+        function toIdAndComp(id) {
           return {
             id: id,
             component: $scope.components[id]
           };
-        });
+        }
+
+        var sorted = _(nodesOnly)
+          .filter(interactionsOnly)
+          .map(getId)
+          .map(toIdAndComp)
+          .value();
 
         $scope.sortedComponents = sorted;
 
@@ -46,6 +56,11 @@ angular.module('corespring-editor.directives').directive('componentWeights', [
           updateSortedComponent();
           compSize = _.size($scope.components);
         }
+      });
+
+      $scope.$watch('componentSet', function() {
+        $scope.componentSetTypes = _.pluck($scope.componentSet, 'componentType');
+        updateSortedComponent();
       });
     }
 
