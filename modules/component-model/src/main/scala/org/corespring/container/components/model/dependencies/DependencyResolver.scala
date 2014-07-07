@@ -14,6 +14,7 @@ trait DependencyResolver extends ComponentSplitter {
     components.map { c =>
       c match {
         case Interaction(org, name, _, _, _, _, _, _, _, _, libs) => (Id(org, name) -> libs)
+        case Widget(org, name, _, _, _, _, _, _, _, libs) => (Id(org, name) -> libs)
         case Library(org, name, _, _, _, _, libs) => (Id(org, name) -> libs)
         case LayoutComponent(org, name, _, _, _) => (Id(org, name) -> Seq.empty)
       }

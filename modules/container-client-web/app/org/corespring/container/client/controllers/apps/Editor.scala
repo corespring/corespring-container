@@ -4,6 +4,7 @@ import org.corespring.container.client.hooks.EditorHooks
 import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.client.component.AllItemTypesReader
 import org.corespring.container.client.views.txt.js.EditorServices
+import org.corespring.container.components.model.ComponentInfo
 import play.api.Logger
 import play.api.libs.json._
 import play.api.mvc.{ Action, AnyContent }
@@ -19,27 +20,31 @@ trait Editor
 
   override def context: String = "editor"
 
+  private def toJson(ci:ComponentInfo) : JsValue = {
+    val tag = tagName(ci.id.org, ci.id.name)
+    Json.obj(
+      "name" -> ci.id.name,
+      "title" -> JsString(ci.title.getOrElse("")),
+      "titleGroup" -> JsString(ci.titleGroup.getOrElse("")),
+      "icon" -> s"$modulePath/icon/$tag",
+      "componentType" -> tag,
+      "defaultData" -> ci.defaultData,
+      "configuration" -> (ci.packageInfo \ "external-configuration").asOpt[JsObject])
+  }
+
   override def servicesJs = {
     import org.corespring.container.client.controllers.resources.routes._
 
-    val componentJson: Seq[JsValue] = interactions.map {
-      c =>
-        val tag = tagName(c.id.org, c.id.name)
-        Json.obj(
-          "name" -> c.id.name,
-          "title" -> JsString(c.title.getOrElse("")),
-          "titleGroup" -> JsString(c.titleGroup.getOrElse("")),
-          "icon" -> s"$modulePath/icon/$tag",
-          "componentType" -> tag,
-          "defaultData" -> c.defaultData,
-          "configuration" -> (c.packageInfo \ "external-configuration").asOpt[JsObject])
-    }
+    val componentJson: Seq[JsValue] = interactions.map(toJson)
+    val widgetJson : Seq[JsValue] = widgets.map(toJson)
+
 
     EditorServices(
       "editor.services",
       Item.load(":id"),
       Item.save(":id"),
-      JsArray(componentJson)).toString
+      JsArray(componentJson),
+      JsArray(widgetJson)).toString
   }
 
   override def additionalScripts: Seq[String] = Seq(org.corespring.container.client.controllers.apps.routes.Editor.services().url)

@@ -1,14 +1,14 @@
 package org.corespring.container.components.loader
 
 import java.io.File
+
 import org.corespring.container.components.loader.exceptions.ComponentLoaderException
 import org.corespring.container.components.model._
 import org.corespring.container.utils.string.hyphenatedToTitleCase
 import org.slf4j.LoggerFactory
-import play.api.libs.json.{ Json, JsValue }
-import scala.Some
+import play.api.libs.json.{ JsValue, Json }
 
-class FileComponentLoader(paths: Seq[String])
+class FileComponentLoader(paths: Seq[String], onlyProcessReleased: Boolean)
   extends ComponentLoader
   with PackageJsonReading {
 
@@ -22,7 +22,11 @@ class FileComponentLoader(paths: Seq[String])
     loadedComponents = loadAllComponents(paths)
   }
 
-  def all: Seq[Component] = loadedComponents
+  def all: Seq[Component] = {
+    logger.trace(s"loaded: ${loadedComponents.length}" )
+    logger.trace(loadedComponents.map(c => s"${c.componentType} - ${c.getClass.getSimpleName}").mkString("\n"))
+    loadedComponents
+  }
 
   private def loadAllComponents(paths: Seq[String]): Seq[Component] = {
     paths.map {
@@ -56,6 +60,7 @@ class FileComponentLoader(paths: Seq[String])
 
     purpose match {
       case "interaction" => loadInteraction(org, packageJson)(compRoot)
+      case "widget" => loadWidget(org, packageJson)(compRoot)
       case "library" => loadLibrary(org, packageJson)(compRoot)
       case "layout" => loadLayout(org, packageJson)(compRoot)
       case _ => throw new RuntimeException(s"Unknown purpose: [$purpose] for component: ${compRoot.getPath}")
@@ -108,41 +113,83 @@ class FileComponentLoader(paths: Seq[String])
         packageJson))
   }
 
-  private def loadInteraction(org: String, packageJson: JsValue)(compRoot: File): Option[Component] = {
-
-    val clientFolder = new File(compRoot.getPath + "/src/client")
-    val serverFolder = new File(compRoot.getPath + "/src/server")
-    val icon = new File(compRoot.getPath + "/icon.png")
-    val defaultDataJson = new File(clientFolder.getPath + "/defaultData.json")
-    val sampleDataFolder = new File(compRoot.getPath + "/sample-data")
-    val regressionDataFolder = new File(compRoot.getPath + "/regression-data")
-
-    val inProdMode = play.api.Play.maybeApplication match {
-      case Some(app) => play.api.Play.isProd(app)
-      case _ => false
+  private def loadWidget(org: String, packageJson: JsValue)(compRoot: File): Option[Widget] = load[Widget](org,
+    packageJson, compRoot) { ld =>
+      Widget(
+        ld.org,
+        ld.name,
+        ld.title,
+        ld.titleGroup,
+        ld.client,
+        packageJson,
+        ld.defaultData,
+        ld.icon,
+        ld.sampleData,
+        ld.libs)
     }
-    val released = (packageJson \ "released").asOpt[Boolean].getOrElse(false)
-    val process = if (inProdMode) released else true
 
-    if (process) {
-      Some(
-        Interaction(
-          org,
-          compRoot.getName,
-          (packageJson \ "title").asOpt[String],
-          (packageJson \ "titleGroup").asOpt[String],
-          loadClient(clientFolder),
-          loadServer(serverFolder),
-          packageJson,
-          loadDefaultData(defaultDataJson),
-          loadIcon(icon),
-          loadSampleData(sampleDataFolder) ++ loadSampleData(regressionDataFolder, Some("regression_")),
-          loadLibraries(packageJson)))
-    } else {
+  /** a interim model for building interaction */
+  case class LoadedData(org: String,
+    name: String,
+    title: Option[String],
+    titleGroup: Option[String],
+    client: Client,
+    defaultData: JsValue,
+    icon: Option[Array[Byte]],
+    sampleData: Map[String, JsValue],
+    libs: Seq[Id])
+
+  object LoadedData {
+    def apply(org: String, packageJson: JsValue, compRoot: File): LoadedData = {
+      val clientFolder = new File(compRoot.getPath + "/src/client")
+      val icon = new File(compRoot.getPath + "/icon.png")
+      val defaultDataJson = new File(clientFolder.getPath + "/defaultData.json")
+      val sampleDataFolder = new File(compRoot.getPath + "/sample-data")
+      val regressionDataFolder = new File(compRoot.getPath + "/regression-data")
+
+      LoadedData(
+        org,
+        compRoot.getName,
+        (packageJson \ "title").asOpt[String],
+        (packageJson \ "titleGroup").asOpt[String],
+        loadClient(clientFolder),
+        loadDefaultData(defaultDataJson),
+        loadIcon(icon),
+        loadSampleData(sampleDataFolder) ++ loadSampleData(regressionDataFolder, Some("regression_")),
+        loadLibraries(packageJson))
+    }
+  }
+
+  private def load[C <: Component](org: String, packageJson: JsValue, compRoot: File)(make: LoadedData => C): Option[C] = {
+
+    val released = (packageJson \ "released").asOpt[Boolean].getOrElse(false)
+
+    if (onlyProcessReleased && !released) {
       None
     }
-
+    else {
+      Some(make(LoadedData(org, packageJson, compRoot)))
+    }
   }
+
+  private def loadInteraction(org: String, packageJson: JsValue)(compRoot: File): Option[Interaction] =
+    load[Interaction](org, packageJson, compRoot) { ld =>
+
+      val serverFolder = new File(compRoot.getPath + "/src/server")
+
+      Interaction(
+        ld.org,
+        ld.name,
+        ld.title,
+        ld.titleGroup,
+        ld.client,
+        loadServer(serverFolder),
+        packageJson,
+        ld.defaultData,
+        ld.icon,
+        ld.sampleData,
+        ld.libs)
+    }
 
   private def loadDefaultData(dataJson: File): JsValue = if (dataJson.exists) {
     try {
