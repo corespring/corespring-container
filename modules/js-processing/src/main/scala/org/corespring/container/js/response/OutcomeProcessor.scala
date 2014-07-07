@@ -1,6 +1,6 @@
 package org.corespring.container.js.response
 
-import org.corespring.container.components.model.dependencies.DependencyResolver
+import org.corespring.container.components.model.dependencies.{ComponentSplitter, DependencyResolver}
 import org.corespring.container.components.model.{ Component, Interaction, Library }
 import org.corespring.container.components.response.{ OutcomeProcessor => ContainerOutcomeProcessor }
 import org.corespring.container.js.api.GetServerLogic
@@ -16,7 +16,7 @@ trait Target {
 trait OutcomeProcessor
   extends ContainerOutcomeProcessor
   with Target
-  with GetServerLogic {
+  with GetServerLogic with ComponentSplitter {
 
   lazy val dependencyResolver = new DependencyResolver {
     override def components: Seq[Component] = OutcomeProcessor.this.components
@@ -63,7 +63,12 @@ trait OutcomeProcessor
 
     }
 
-    val questions: Seq[(String, JsValue)] = (item \ "components").as[JsObject].fields
+    def canHaveOutcome(t:(String,JsValue)) : Boolean = {
+      val componentType = (t._2 \ "componentType").as[String]
+      interactions.exists(_.matchesType(componentType))
+    }
+
+    val questions: Seq[(String, JsValue)] = (item \ "components").as[JsObject].fields.filter(canHaveOutcome)
 
     val (normalQuestions, questionsThatNeedOutcomes) = questions.partition { kv =>
       !hasTarget(kv._2)
