@@ -1,88 +1,9 @@
-extends layout
+extends player-base
 
-block head
-  link(href='//fonts.googleapis.com/css?family=Ubuntu:300,400,500,500italic,700', rel='stylesheet', type='text/css')
-  link(rel="stylesheet", href="../../css/player.css")
+block player-header
+  div(player-control-panel="",showResetButton="false",showFeedbackButton="false")
 
-block content
+//player goes here
 
-  div#root.container(ng-controller="Root", dimension-propagator="")
-    div(ng-controller="Main")
-
-      block player-header
-
-      div(player-control-panel="")
-
-      div(corespring-player,
-        player-mode="player",
-        player-markup="item.xhtml",
-        player-item="item",
-        player-session="session",
-        player-outcomes="outcome")
-
-      summary-feedback(template="player.jade",item="item",session="session")
-
-      block player-child
-
-block scripts
-
-  //[if lte IE 8]> <script src="../../js/common/ie-support/Function.bind.js"></script> <![endif]
-  //[if lte IE 8]> <script src="../../js/common/ie-support/Array.map.js"></script> <![endif]
-  script.
-    var bootstrapResumeTimeout = 0;
-  //[if lte IE 9]> <script>bootstrapResumeTimeout = 500;</script> <![endif]
-  //[if lte IE 9]> <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script> <![endif]
-  //[if lte IE 9]> <script src="//cdnjs.cloudflare.com/ajax/libs/json3/3.2.6/json3.min.js"></script> <![endif]
-
-  for p in player 
-    script(src="#{p}", type="text/javascript")
-
-  script(src="../../components/angular-ui/build/angular-ui.js")
-  script(type="text/javascript",src="../../components/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML")
-
-  block extra-scripts
-
-
-  script.
-    $(document).ready(function(){
-      console.log("load config", document.location);
-
-      var configPath = 'player-config.json';
-
-      $.get( configPath, function(data){
-        console.log("data", data);
-
-        var allScriptsAreLoaded = function(){
-
-          console.log("all scripts are loaded");
-          $("#player-body").html(data.xhtml);
-
-          var playerDeps = [
-            'corespring-common.services',
-            'corespring-common.directives',
-            'corespring-player.controllers',
-            'corespring-player.directives',
-            'corespring-player.services'
-          ].concat(data.angular.dependencies);
-
-          angular.module("corespring-player", playerDeps );
-          angular.bootstrap(document, ["corespring-player"]);
-
-          setTimeout(function(){
-            angular.resumeBootstrap();
-            $(".main").addClass('blend');
-          }, bootstrapResumeTimeout);
-        };
-
-        var allScripts = data.scripts.concat(data.css);
-        console.log(allScripts);
-        head.js.apply(null, allScripts);
-
-        head.ready(function(){
-          console.log("!!! head.js.ready !!!");
-          allScriptsAreLoaded();
-        });
-      });
-    });
-
-
+block player-child
+  summary-feedback(template="player.jade",item="item",session="session")
