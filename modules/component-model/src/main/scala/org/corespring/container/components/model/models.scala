@@ -29,6 +29,16 @@ case class Library(
 
 case class LibrarySource(name: String, source: String)
 
+trait ComponentInfo {
+  def id : Id
+  def title : Option[String]
+  def titleGroup : Option[String]
+  def icon : Option[Array[Byte]]
+  def componentType: String
+  def defaultData : JsValue
+  def packageInfo : JsValue
+}
+
 case class Widget(org: String,
   name: String,
   title: Option[String],
@@ -38,7 +48,8 @@ case class Widget(org: String,
   defaultData: JsValue,
   icon: Option[Array[Byte]] = None,
   sampleData: Map[String, JsValue] = Map.empty,
-  libraries: Seq[Id] = Seq.empty) extends Component(Id(org, name), packageInfo)
+  libraries: Seq[Id] = Seq.empty) extends Component(Id(org, name), packageInfo) with ComponentInfo
+
 /**
  * An interaction is a component that the user can interact with.
  *
@@ -54,7 +65,7 @@ case class Interaction(
   defaultData: JsValue,
   icon: Option[Array[Byte]] = None,
   sampleData: Map[String, JsValue] = Map.empty,
-  libraries: Seq[Id] = Seq.empty) extends Component(Id(org, name), packageInfo)
+  libraries: Seq[Id] = Seq.empty) extends Component(Id(org, name), packageInfo) with ComponentInfo
 
 case class LayoutComponent(org: String,
   name: String,

@@ -12,6 +12,11 @@ trait ComponentMaker {
       Json.obj(), None, Map(), libs)
   }
 
+  def widget(name: String, libs: Seq[Id] = Seq.empty, title: Option[String] = None, titleGroup: Option[String] = None, org: String = defaultOrg) = {
+    Widget(org, name, title, titleGroup, Client("", "", None), Json.obj("name" -> name, "org" -> org),
+      Json.obj(), None, Map(), libs)
+  }
+
   def lib(name: String, libraries: Seq[Id] = Seq.empty, org: String = defaultOrg): Library = {
     Library(org, name, Json.obj("name" -> name), Seq.empty, Seq.empty, None, libraries)
   }

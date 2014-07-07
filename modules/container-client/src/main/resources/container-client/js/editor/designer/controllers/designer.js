@@ -92,9 +92,21 @@
       }
     };
 
+    function onWidgetsLoaded(widgets) {
+      $scope.widgets = widgets;
+      initComponents();
+    }
+    
     function onComponentsLoaded(componentSet) {
-
       $scope.componentSet = componentSet;
+      initComponents();
+    }
+
+    function initComponents() {
+
+      if(!$scope.componentSet || !$scope.widgets){
+        return;
+      }
 
       function addToEditor(editor, addContent, component) {
         $scope.lastId++;
@@ -163,11 +175,11 @@
         return component.titleGroup === 'toolbar';
       }
 
-      var videoComponent = componentToFeature(_.find(componentSet, function(c) {
+      var videoComponent = componentToFeature(_.find($scope.widgets, function(c) {
         return c.componentType === 'corespring-video';
       }));
+      
       videoComponent.iconclass = "fa fa-film";
-
 
       $scope.overrideFeatures = [
         ImageFeature
@@ -179,7 +191,7 @@
             name: 'external',
             type: 'dropdown',
             dropdownTitle: 'Answer Type',
-            buttons: _(componentSet).reject(isToolbar).sortBy(orderList).map(componentToFeature).value()
+            buttons: _($scope.componentSet).reject(isToolbar).sortBy(orderList).map(componentToFeature).value()
           },
           {
             type: 'group',
@@ -203,8 +215,12 @@
       };
     }
 
+    function onWidgetsLoadError(error) {
+      throw new Error("Error loading widgets");
+    }
+
     function onComponentsLoadError(error) {
-      $log.warn("Error loading components");
+      throw new Error("Error loading components");
     }
 
     $scope.getUploadUrl = function(file) {
@@ -323,6 +339,7 @@
     });
 
     DesignerService.loadAvailableComponents(onComponentsLoaded, onComponentsLoadError);
+    DesignerService.loadAvailableWidgets(onWidgetsLoaded, onWidgetsLoadError);
 
     $scope.$on('itemLoaded', function(ev, item) {
       if (item) {

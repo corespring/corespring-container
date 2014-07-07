@@ -22,7 +22,11 @@ class FileComponentLoader(paths: Seq[String], onlyProcessReleased: Boolean /*= f
     loadedComponents = loadAllComponents(paths)
   }
 
-  def all: Seq[Component] = loadedComponents
+  def all: Seq[Component] = {
+    logger.trace(s"loaded: ${loadedComponents.length}" )
+    logger.trace(loadedComponents.map(c => s"${c.componentType} - ${c.getClass.getSimpleName}").mkString("\n"))
+    loadedComponents
+  }
 
   private def loadAllComponents(paths: Seq[String]): Seq[Component] = {
     paths.map {
@@ -160,10 +164,11 @@ class FileComponentLoader(paths: Seq[String], onlyProcessReleased: Boolean /*= f
 
     val released = (packageJson \ "released").asOpt[Boolean].getOrElse(false)
 
-    if (onlyProcessReleased && released) {
-      Some(make(LoadedData(org, packageJson, compRoot)))
-    } else {
+    if (onlyProcessReleased && !released) {
       None
+    }
+    else {
+      Some(make(LoadedData(org, packageJson, compRoot)))
     }
   }
 

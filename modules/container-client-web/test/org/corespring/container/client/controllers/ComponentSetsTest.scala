@@ -1,7 +1,7 @@
 package org.corespring.container.client.controllers
 
 import org.corespring.container.client.component.SourceGenerator
-import org.corespring.container.components.model.Component
+import org.corespring.container.components.model.{Library, Component}
 import org.corespring.container.components.model.dependencies.{ DependencyResolver, ComponentMaker }
 import org.specs2.mutable.Specification
 import play.api.GlobalSettings
@@ -18,6 +18,8 @@ class ComponentSetsTest extends Specification with ComponentMaker {
     override def css(components: Seq[Component]): String = s"$name - css - ${components.map(_.componentType).mkString(",")}"
 
     override def js(components: Seq[Component]): String = s"$name - js - ${components.map(_.componentType).mkString(",")}"
+
+    override protected def libraryToJs(l: Library): String = "libaryToJs"
   }
 
   val sets = new ComponentSets {

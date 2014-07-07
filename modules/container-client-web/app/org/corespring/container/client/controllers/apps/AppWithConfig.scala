@@ -46,20 +46,20 @@ trait AppWithConfig[T <: ClientHooks]
 
   def config(id: String) = Action.async { implicit request =>
     hooks.loadItem(id).map(handleSuccess { (itemJson) =>
-      val typeIds = componentTypes(id, itemJson).map {
+      val typeIds = componentTypes(itemJson).map {
         t =>
           val typeRegex(org, name) = t
           new Id(org, name)
       }
 
-      val components = resolveComponents(typeIds, Some(context))
-      val jsUrl = urls.jsUrl(context, components)
-      val cssUrl = urls.cssUrl(context, components)
+      val resolvedComponents = resolveComponents(typeIds, Some(context))
+      val jsUrl = urls.jsUrl(context, resolvedComponents)
+      val cssUrl = urls.cssUrl(context, resolvedComponents)
 
-      val clientSideDependencies = getClientSideDependencies(components)
-      val dependencies = ngModules.createAngularModules(components, clientSideDependencies)
+      val clientSideDependencies = getClientSideDependencies(resolvedComponents)
+      val dependencies = ngModules.createAngularModules(resolvedComponents, clientSideDependencies)
       val clientSideScripts = get3rdPartyScripts(clientSideDependencies)
-      val localScripts = getLocalScripts(components)
+      val localScripts = getLocalScripts(resolvedComponents)
       val js = (clientSideScripts ++ localScripts ++ additionalScripts :+ jsUrl).distinct
       val css = Seq(cssUrl)
 

@@ -4,7 +4,7 @@ import play.api.libs.json.JsValue
 
 trait RigItemTypeReader extends ItemTypeReader {
   /** for an item - return all the components in use */
-  override def componentTypes(id: String, json: JsValue): Seq[String] = {
-    Seq(id)
+  override def componentTypes(json: JsValue): Seq[String] = {
+    Seq("??? rig item type reader ???")
   }
 }

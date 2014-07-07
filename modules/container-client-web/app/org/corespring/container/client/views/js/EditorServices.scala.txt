@@ -1,4 +1,4 @@
-@(namespace : String, load : Call, save : Call, componentSet : JsValue)
+@(namespace : String, load : Call, save : Call, componentSet : JsValue, widgets : JsValue)
 
 (function(){
   "use strict";
@@ -9,10 +9,15 @@
 
   angular.module('@namespace').factory('DesignerService', ['$http', function($http){
     return {
-        loadAvailableComponents: function(onSuccess, onFailure){
-          var components = @{Json.stringify(componentSet)};
-          onSuccess(components);
-        }
+      loadAvailableComponents: function(onSuccess, onFailure){
+        var components = @{Json.stringify(componentSet)};
+        onSuccess(components);
+      },
+
+      loadAvailableWidgets: function(onSuccess, onFailure){
+        var widgets = @{Json.stringify(widgets)};
+        onSuccess(widgets);
+      }
     };
 
   }]);
