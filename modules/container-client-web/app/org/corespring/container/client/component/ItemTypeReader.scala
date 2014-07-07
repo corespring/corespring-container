@@ -2,26 +2,31 @@ package org.corespring.container.client.component
 
 import play.api.libs.json.JsValue
 import org.corespring.container.client.controllers.helpers.{ XhtmlProcessor, NameHelper }
-import org.corespring.container.components.model.LayoutComponent
+import org.corespring.container.components.model.{ComponentInfo, LayoutComponent}
 import org.corespring.container.components.model.dependencies.ComponentSplitter
+import play.api.mvc.RequestHeader
 
 trait ItemTypeReader {
   /** for an item - return all the components in use */
-  def componentTypes(id: String, json: JsValue): Seq[String]
+  def componentTypes(json: JsValue)(implicit request : RequestHeader): Seq[String]
 }
 
 trait AllItemTypesReader extends ItemTypeReader with ComponentSplitter {
-  override def componentTypes(id: String, json: JsValue): Seq[String] = components.map(_.componentType)
+  override def componentTypes(json: JsValue)(implicit request : RequestHeader): Seq[String] = components.map(_.componentType)
 }
 
 trait PlayerItemTypeReader extends ItemTypeReader with ComponentSplitter with NameHelper with XhtmlProcessor {
 
   /** List components used in the model */
-  override def componentTypes(id: String, json: JsValue): Seq[String] = {
-    val modelComponents: Seq[String] = (json \ "components" \\ "componentType").map(_.as[String]).distinct
+  override def componentTypes(json: JsValue)(implicit request : RequestHeader): Seq[String] = {
+    val types: Seq[String] = (json \ "components" \\ "componentType").map(_.as[String]).distinct
 
-    val validComponents = modelComponents.filter(modelComp => interactions.exists(ui => tagName(ui.org,
-      ui.name) == modelComp))
+    def componentTypeMatches(t: String)(ci:ComponentInfo) = tagName(ci.id.org, ci.id.name) == t
+
+    val validComponents = types.filter{
+      t =>
+        interactions.exists(componentTypeMatches(t)) || widgets.exists(componentTypeMatches(t))
+    }
 
     def layoutComponentsInItem: Seq[String] = {
       val out: Seq[String] = (json \ "xhtml").asOpt[String].map {

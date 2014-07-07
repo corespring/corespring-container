@@ -1,32 +1,27 @@
 # Component Spec
 
-There are 3 types of component: [Interaction], [Layout] and [Library]
-
-* Interaction - Interactive elements allow a user to interact with them, and consist of client side and server side logic.
-* Layout - Ui elements that can contain other elements, they are not part of the test and are client side only.
-* Library - for sharing either client or server side logic amongst components use Libraries.
+There are 4 types of component: [Interaction], [Widget], [Layout] and [Library]
 
 ## Interaction
+Interactions are ui elements that may require a user response. They consist of client side and server side logic. They are configured with markup and json.
 
+## Widget 
 
+A widget is a ui element that doesn't require any user response. It only has client side logic (because there is nothing to process on the server). They are configured with markup and json. 
 
-### How to depend on a library
+Example: video widget. It has a custom tag + a json model.
 
-## Layout Component
+## Layout 
 
-A layout component is a component that only has logic that
-provides layouts within an item. For example: Tabs, Carousel, Expanders etc.
+A layout element is an element that can contain other elements/markup, It only has client side logic and are configured in the xhtml (no json config [unlike a widget]).
 
-* no server side logic required
-* can not be configured using a ui component instead they are added to the item xhtml
+For example; Tabs, Carousel, Expanders are all layout components.
 
 The container decides to include the components by inspecting the Item.xhtml property for usage.
 
-### Defining
-
-### Adding multiple items
-
 ## Library
+
+For sharing either client or server side logic amongst components use Libraries.
 
 This spec defines how to create a component that can run within a corespring container.
 

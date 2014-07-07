@@ -6,17 +6,19 @@ describe('component config', function() {
 
   function mockDesignerService() {
 
-    this.loadAvailableComponents = function(onSuccess) {
-      onSuccess([{
-        componentType: "one",
-        configuration: {
-          "corespring-editor": {
-            "placeholder-show-tooltip": true
+    this.loadAvailableUiComponents = function(onSuccess) {
+      onSuccess({
+        interactions: [{
+          componentType: "one",
+          configuration: {
+            "corespring-editor": {
+              "placeholder-show-tooltip": true
+            }
           }
-        }
-      }, {
-        componentType: "two",
-      }]);
+        }, {
+          componentType: "two",
+        }]
+      });
     };
   }
 

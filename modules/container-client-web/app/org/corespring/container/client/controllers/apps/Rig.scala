@@ -1,28 +1,31 @@
 package org.corespring.container.client.controllers.apps
 
-import org.corespring.container.client.component.RigItemTypeReader
+import org.corespring.container.client.component.PlayerItemTypeReader
 import org.corespring.container.client.controllers.angular.AngularModules
 import org.corespring.container.client.hooks.ClientHooks
 import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.components.model.Interaction
-import play.api.libs.json.{ JsValue, Json }
-import play.api.mvc.{ Action, RequestHeader }
+import play.api.libs.json.{JsValue, Json}
+import play.api.mvc.{Action, RequestHeader}
 
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.{ExecutionContext, Future}
 
-trait Rig extends AppWithConfig[ClientHooks] with RigItemTypeReader {
+trait Rig extends AppWithConfig[ClientHooks] with PlayerItemTypeReader {
 
-  def index(componentType: String, data: Option[String] = None) = {
-    controllers.Assets.at("/container-client", s"rig.html")
-  }
+  def index(componentType: String, data: Option[String] = None) = controllers.Assets.at("/container-client", s"rig.html")
 
   def data(componentType: String, dataName: String) = Action {
     request =>
+      Ok(loadData(componentType, dataName))
+  }
+
+  def loadData(componentType: String, dataName: String) : JsValue = {
       val data = for {
         c <- component(componentType)
-        d <- c.sampleData.get(s"$dataName.json")
+        filename <- Some(if(dataName.endsWith(".json")) dataName else s"$dataName.json")
+        d <- c.sampleData.get(filename)
       } yield d
-      Ok(data.getOrElse(Json.obj()))
+      data.getOrElse(Json.obj())
   }
 
   def component(componentType: String): Option[Interaction] = interactions.find(c => c.componentType == componentType)
@@ -37,9 +40,11 @@ trait Rig extends AppWithConfig[ClientHooks] with RigItemTypeReader {
 
     override implicit def ec: ExecutionContext = ExecutionContext.Implicits.global
 
-    def passThrough: Future[Either[StatusMessage, JsValue]] = Future(Right(Json.obj()))
-
-    override def loadItem(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]] = passThrough
+    override def loadItem(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]] = Future{
+      header.getQueryString("data").map{ jsonFile =>
+        Right( (loadData(id, jsonFile) \ "item").as[JsValue])
+      }.getOrElse(Left(BAD_REQUEST, "You need to specify a json file using 'data' query param"))
+    }
   }
 
   override def ngModules: AngularModules = new AngularModules()

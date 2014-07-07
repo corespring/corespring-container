@@ -5,11 +5,11 @@ angular.module('corespring-editor.services')
 
       var componentSet;
 
-      function onLoaded(set) {
-        componentSet = set;
+      function onLoaded(components) {
+        componentSet = components.interactions;
       }
 
-      DesignerService.loadAvailableComponents(onLoaded);
+      DesignerService.loadAvailableUiComponents(onLoaded);
 
       function Definition() {
         this.showTooltip = function(componentType) {

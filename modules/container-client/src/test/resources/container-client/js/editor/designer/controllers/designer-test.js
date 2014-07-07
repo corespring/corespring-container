@@ -10,14 +10,17 @@ describe('designer controller', function() {
 
     var item = {};
 
-    var availableComponents = [];
+    var availableUiComponents = {
+      interactions: [],
+      widgets: []
+    };
 
     this.loadItem = function(id, callback) {
       callback(item);
     };
 
-    this.loadAvailableComponents = function(onSuccess, onError) {
-      onSuccess(availableComponents);
+    this.loadAvailableUiComponents = function(onSuccess, onError) {
+      onSuccess(availableUiComponents);
     };
   }
 
@@ -45,19 +48,19 @@ describe('designer controller', function() {
   }
 
   function mockImageFeature() {
-    
+
   }
 
-  function mockLogFactory(){
-      this.getLogger = function(id){
-        return {
-          log: function(){},
-          debug: function(){},
-          warn: function(){},
-          error: function(){},
-          info: function(){}
-        };
+  function mockLogFactory() {
+    this.getLogger = function(id) {
+      return {
+        log: function() {},
+        debug: function() {},
+        warn: function() {},
+        error: function() {},
+        info: function() {}
       };
+    };
   }
 
   beforeEach(angular.mock.module('corespring-editor.controllers'));

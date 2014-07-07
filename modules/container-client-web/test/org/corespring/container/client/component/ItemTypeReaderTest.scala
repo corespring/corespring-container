@@ -5,6 +5,8 @@ import org.corespring.container.components.model.dependencies.ComponentMaker
 import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
 import play.api.libs.json.Json
+import play.api.mvc.RequestHeader
+import play.api.test.FakeRequest
 
 class ItemTypeReaderTest extends Specification with ComponentMaker {
 
@@ -17,21 +19,23 @@ class ItemTypeReaderTest extends Specification with ComponentMaker {
   "type reader" should {
 
     "work" in new withReader() {
-      reader.componentTypes("", item) === Seq.empty
+      reader.componentTypes(item) === Seq.empty
     }
 
     "work with comps" in new withReader(
       uiComp("ui-1", Seq.empty)) {
-      reader.componentTypes("", item) === Seq("org-ui-1")
+      reader.componentTypes(item) === Seq("org-ui-1")
     }
 
     "work with comps declared in layout" in new withReader(
       layout("layout-1")) {
-      reader.componentTypes("", item) === Seq("org-layout-1")
+      reader.componentTypes(item) === Seq("org-layout-1")
     }
   }
 
   class withReader(comps: Component*) extends Scope {
+
+    implicit val r : RequestHeader = FakeRequest("", "")
     val reader = new PlayerItemTypeReader {
       override def components: Seq[Component] = comps
     }
