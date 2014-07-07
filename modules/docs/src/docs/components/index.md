@@ -9,15 +9,18 @@ Interactions are ui elements that may require a user response. They consist of c
 
 A widget is a ui element that doesn't require any user response. It only has client side logic (because there is nothing to process on the server). They are configured with markup and json. 
 
+Example: video widget. It has a custom tag + a json model.
+
 ## Layout 
 
-Ui elements that can contain other elements, they are client side only. They are only configured in the xhtml (no json config).
+A layout element is an element that can contain other elements/markup, It only has client side logic and are configured in the xhtml (no json config [unlike a widget]).
 
 For example; Tabs, Carousel, Expanders are all layout components.
 
 The container decides to include the components by inspecting the Item.xhtml property for usage.
 
 ## Library
+
 For sharing either client or server side logic amongst components use Libraries.
 
 This spec defines how to create a component that can run within a corespring container.
