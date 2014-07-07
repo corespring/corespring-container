@@ -1,8 +1,13 @@
-extends player
+extends player-base
 
 block player-header
+  div(player-control-panel="",showResetButton="true",showFeedbackButton="true")
+
+//player comes here
 
 block player-child
+  summary-feedback(template="player.jade",item="item",session="session")
+
   .container-player(ng-controller="ContainerPlayerControls")
     br/
     button.btn.btn-primary(ng-click="submit()",ng-disabled="!canSubmit()") Submit
