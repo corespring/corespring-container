@@ -77,7 +77,7 @@ block scripts
 
       var jsonFile = queryMatch[1];
 
-      $.get(configPath, function(data) {
+      $.get(configPath += ('?data=' + queryMatch[1]), function(data) {
 
         var allScriptsAreLoaded = function() {
 
