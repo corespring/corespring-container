@@ -10,20 +10,17 @@ describe('designer controller', function() {
 
     var item = {};
 
-    var availableComponents = [];
-
-    var availableWidgets = [];
+    var availableUiComponents = {
+      interactions: [],
+      widgets: []
+    };
 
     this.loadItem = function(id, callback) {
       callback(item);
     };
 
-    this.loadAvailableComponents = function(onSuccess, onError) {
-      onSuccess(availableComponents);
-    };
-
-    this.loadAvailableWidgets = function(onSuccess, onError) {
-      onSuccess(availableWidgets);
+    this.loadAvailableUiComponents = function(onSuccess, onError) {
+      onSuccess(availableUiComponents);
     };
   }
 
