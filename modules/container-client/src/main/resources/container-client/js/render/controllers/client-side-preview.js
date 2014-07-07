@@ -40,6 +40,10 @@ var controller = function($scope, ComponentRegister, PlayerServiceDef) {
     }, $scope.onSessionSaved, $scope.onSessionSaveError);
   };
 
+  $scope.preview = function() {
+    $scope.$emit('launch-catalog-preview');
+  };
+
   $scope.onSessionSaved = function(data) {
     $scope.responses = data.responses;
     $scope.session = data.session;
@@ -73,6 +77,10 @@ var controller = function($scope, ComponentRegister, PlayerServiceDef) {
   $scope.setDataAndSession = function(data) {
     ComponentRegister.setDataAndSession(data);
   };
+
+  $scope.$watch('data', function(d) {
+    console.log('...........d ', d);
+  });
 
   $scope.$on('resetPreview', $scope.resetPreview);
   $scope.$on('resetStash', $scope.resetStash);
