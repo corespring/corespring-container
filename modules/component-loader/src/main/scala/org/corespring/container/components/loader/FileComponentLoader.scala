@@ -8,7 +8,7 @@ import org.corespring.container.utils.string.hyphenatedToTitleCase
 import org.slf4j.LoggerFactory
 import play.api.libs.json.{ JsValue, Json }
 
-class FileComponentLoader(paths: Seq[String], onlyProcessReleased: Boolean /*= false*/ )
+class FileComponentLoader(paths: Seq[String], onlyProcessReleased: Boolean)
   extends ComponentLoader
   with PackageJsonReading {
 
