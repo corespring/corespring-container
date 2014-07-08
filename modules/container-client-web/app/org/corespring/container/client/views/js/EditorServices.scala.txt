@@ -50,7 +50,6 @@
 
           $http['@load.method.toLowerCase'](finalUrl)
             .success(function(data, status, headers, config){
-              console.log("[player-services] load item successful");
               loadedData = data;
               onSuccess(data);
             })

@@ -64,6 +64,26 @@ block scripts
             for( var x in appLoadConfig.states){
               $stateProvider.state(x, appLoadConfig.states[x]);
             }
+            if(document.location.search.indexOf('disableLogging=true') !== -1){
+              $provide.decorator('LogFactory', function($delegate){
+                return {
+                  getLogger: function(n){
+                    return {
+                      log: function(){}
+                    }
+                  }
+                }
+              });
+
+              $provide.decorator('$log', function($delegate, $sniffer) {
+                var _log = $delegate.log; //Saving the original behavior
+                $delegate.log = function(message) { };
+                $delegate.debug = function(message) { };
+                $delegate.error = function(message) { };
+                $delegate.warn = function(message) { };
+                return $delegate;
+              });
+            }
           });
 
           angular.bootstrap(document, [appLoadConfig.moduleName]);
@@ -76,7 +96,6 @@ block scripts
         };
 
         var args = data.scripts.concat(data.css);
-        console.log(args);
         head.js.apply(null, args);
 
         head.ready(function(){
