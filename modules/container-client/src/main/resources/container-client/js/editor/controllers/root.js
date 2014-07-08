@@ -1,5 +1,16 @@
-console.log("init editor Root");
-var controller = function($scope, $rootScope, $log, $location, $state, $timeout, $stateParams, DataQueryService, ItemService, ItemIdService, NavModelService, SupportingMaterialsService) {
+var controller = function($scope,
+  $rootScope,
+  $log,
+  $location,
+  $state,
+  $timeout,
+  $stateParams,
+  DataQueryService,
+  ItemService,
+  ItemIdService,
+  NavModelService,
+  SupportingMaterialsService,
+  CatalogPreview) {
 
   var navSetOnce = false;
 
@@ -13,6 +24,10 @@ var controller = function($scope, $rootScope, $log, $location, $state, $timeout,
     saveError: undefined,
     item: {}
   };
+
+  $scope.$on('launch-catalog-preview', function(event) {
+    CatalogPreview.launch($scope.itemId);
+  });
 
   $rootScope.$on('$stateChangeSuccess', function(event, state, params) {
     function isOverview() {
@@ -258,5 +273,6 @@ angular.module('corespring-editor.controllers')
     'ItemIdService',
     'NavModelService',
     'SupportingMaterialsService',
+    'CatalogPreview',
     controller
   ]);

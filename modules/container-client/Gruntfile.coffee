@@ -78,9 +78,7 @@ module.exports = (grunt) ->
         '<%= common.dist %>/js/catalog/**/*.js',
         '<%= common.dist %>/js/render/services/**/*.js',
         '<%= common.dist %>/js/render/directives/**/*.js',
-        '<%= common.dist %>/js/render/controllers/**/*.js',
-        # needed for client side player
-        '<%= common.dist %>/js/editor/designer/score-processor.js'
+        '<%= common.dist %>/js/render/controllers/**/*.js'
       ]
 
     catalogExtras: 
