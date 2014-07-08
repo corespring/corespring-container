@@ -78,10 +78,6 @@ var controller = function($scope, ComponentRegister, PlayerServiceDef) {
     ComponentRegister.setDataAndSession(data);
   };
 
-  $scope.$watch('data', function(d) {
-    console.log('...........d ', d);
-  });
-
   $scope.$on('resetPreview', $scope.resetPreview);
   $scope.$on('resetStash', $scope.resetStash);
 
