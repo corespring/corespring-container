@@ -29,8 +29,6 @@ angular.module('corespring-editor.services')
               }
             }
           });
-
-          modalInstance.result.then(function() {}, function() {});
         };
       }
       return new CatalogPreview();
