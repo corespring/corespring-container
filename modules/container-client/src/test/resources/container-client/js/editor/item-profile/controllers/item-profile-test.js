@@ -8,7 +8,7 @@ describe('item-profile controller', function() {
 
     var item = {};
 
-    var availableComponents = [];
+    var availableComponents = {interactions:[], widgets:[]};
 
     this.loadItem = function(id, callback) {
       callback(item);

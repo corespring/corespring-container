@@ -4,7 +4,7 @@ describe('catalog root controller', function() {
 
   function mockDesignerService() {
 
-    var availableComponents = [];
+    var availableComponents = {interactions:[], widgets:[]};
 
     this.loadItem = function(id, callback) {
       callback(mockItem);

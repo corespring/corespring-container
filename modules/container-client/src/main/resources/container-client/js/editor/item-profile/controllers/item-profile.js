@@ -41,7 +41,7 @@
     });
 
     DesignerService.loadAvailableUiComponents(function(comps) {
-      $scope.availableComponents = comps;
+      $scope.availableComponents = [].concat(comps.interactions).concat(comps.widgets);
       applyComponentTypes();
     });
 
