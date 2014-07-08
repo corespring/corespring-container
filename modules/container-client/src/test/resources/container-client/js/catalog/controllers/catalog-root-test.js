@@ -10,7 +10,7 @@ describe('catalog root controller', function() {
       callback(mockItem);
     };
 
-    this.loadAvailableComponents = function(onSuccess, onError) {
+    this.loadAvailableUiComponents = function(onSuccess, onError) {
       onSuccess(availableComponents);
     };
   }

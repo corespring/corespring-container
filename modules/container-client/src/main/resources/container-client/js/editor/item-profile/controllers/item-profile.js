@@ -40,7 +40,7 @@
       $scope.standardsOptions = result;
     });
 
-    DesignerService.loadAvailableComponents(function(comps) {
+    DesignerService.loadAvailableUiComponents(function(comps) {
       $scope.availableComponents = comps;
       applyComponentTypes();
     });

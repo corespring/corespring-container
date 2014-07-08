@@ -14,7 +14,7 @@ describe('item-profile controller', function() {
       callback(item);
     };
 
-    this.loadAvailableComponents = function(onSuccess, onError) {
+    this.loadAvailableUiComponents = function(onSuccess, onError) {
       onSuccess(availableComponents);
     };
   }
@@ -67,7 +67,7 @@ describe('item-profile controller', function() {
       $provide.value('LogFactory', new MockLogFactory());
       $provide.value('StandardQueryCreator', {});
       $provide.value('DesignerService', {
-        loadAvailableComponents: function() {}
+        loadAvailableUiComponents: function() {}
       });
       $provide.value('ProfileFormatter', {});
     });
