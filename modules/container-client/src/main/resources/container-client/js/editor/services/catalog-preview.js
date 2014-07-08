@@ -16,7 +16,7 @@ angular.module('corespring-editor.services')
             template: [
               '<div class="catalog-preview">',
               '  <div class="header">',
-              '    <span class="pull-right"><button ng-click="close()" class="button btn-sm btn btn-default">Close</button>',
+              '    <span class="pull-right"><button ng-click="close()" class="button btn-sm btn btn-success">Close</button>',
               '  </div>',
               '  <iframe src="{{url}}" frameborder="0"></iframe>',
               '</div>'
@@ -25,7 +25,7 @@ angular.module('corespring-editor.services')
             size: 'lg',
             resolve: {
               url: function() {
-                return '../../item/' + itemId + '/preview'; //$scope.catalogUrl;
+                return '../../item/' + itemId + '/preview';
               }
             }
           });
