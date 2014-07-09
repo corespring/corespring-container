@@ -21,7 +21,10 @@ angular.module('corespring-editor.services')
               '  <iframe src="{{url}}" frameborder="0"></iframe>',
               '</div>'
             ].join('\n'),
-            controller: ModalPreview,
+            /**
+             * We need to pass the parameters as an array of string so that minification doesn't break.
+             */
+            controller: ['$scope', '$modalInstance', 'url', ModalPreview],
             size: 'lg',
             resolve: {
               url: function() {

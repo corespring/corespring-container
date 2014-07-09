@@ -20,7 +20,7 @@ trait Editor
 
   override def context: String = "editor"
 
-  private def toJson(ci:ComponentInfo) : JsValue = {
+  private def toJson(ci: ComponentInfo): JsValue = {
     val tag = tagName(ci.id.org, ci.id.name)
     Json.obj(
       "name" -> ci.id.name,
@@ -36,8 +36,7 @@ trait Editor
     import org.corespring.container.client.controllers.resources.routes._
 
     val componentJson: Seq[JsValue] = interactions.map(toJson)
-    val widgetJson : Seq[JsValue] = widgets.map(toJson)
-
+    val widgetJson: Seq[JsValue] = widgets.map(toJson)
 
     EditorServices(
       "editor.services",
@@ -57,9 +56,9 @@ trait Editor
     }
 
     def onItem(i: JsValue) = {
-      logger.trace(s"[editItem]: $itemId")
       val jsMode = getJsMode(request)
       val page = s"editor.$jsMode.html"
+      logger.trace(s"[editItem] $itemId; page $page")
       controllers.Assets.at("/container-client", page)(request)
     }
 
