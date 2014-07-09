@@ -13,6 +13,7 @@ angular.module('corespring-editor.services')
       function CatalogPreview() {
         this.launch = function(itemId) {
           var modalInstance = $modal.open({
+            windowClass: 'catalog-preview-modal',
             template: [
               '<div class="catalog-preview">',
               '  <div class="header">',
