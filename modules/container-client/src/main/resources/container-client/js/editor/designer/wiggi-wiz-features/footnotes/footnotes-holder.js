@@ -4,21 +4,22 @@ angular.module('corespring.wiggi-wiz-features.footnotes').directive('footnotesHo
 
     var html;
     var DEFAULT_TEXT = "Footnote";
-    var $log = LogFactory.getLogger('footnotes-holder]');
+    var $log = LogFactory.getLogger('footnotes-holder');
 
     var template = [
-      '<div class="component-placeholder"',
-      ' tooltip-placement="bottom" ',
-      ' tooltip-append-to-body="true"',
-      ' tooltip="Double Click to Edit">',
+      '<div class="component-placeholder" contenteditable="false">',
       '  <div class="blocker">',
-      '     <div class="bg"></div>',
-      '     <div class="content"></div>',
-      '     <div class="delete-icon">',
-      '      <i ng-click="deleteNode()" class="fa fa-times-circle"></i>',
+      '    <div class="bg"></div>',
+      '    <div class="edit-controls">',
+      '      <div class="edit-icon-button" tooltip="edit" tooltip-append-to-body="true" tooltip-placement="bottom">',
+      '        <i ng-click="editNode($event)" class="fa fa-pencil"></i>',
+      '      </div>',
+      '      <div class="delete-icon-button" tooltip="delete" tooltip-append-to-body="true" tooltip-placement="bottom">',
+      '        <i ng-click="deleteNode($event)" class="fa fa-trash-o"></i>',
+      '      </div>',
       '    </div>',
       '  </div>',
-      '  <div footnotes></div>',
+      '  <div class="holder"><div footnotes></div></div>',
       '</div>'
     ].join('\n');
 
@@ -35,10 +36,20 @@ angular.module('corespring.wiggi-wiz-features.footnotes').directive('footnotesHo
 
       $scope.originalMarkup = html;
 
-      $scope.deleteNode = function() {
-        $log.debug('deleteNode');
-        $scope.$broadcast("$destroy"); //destroys tooltip
+      function removeTooltip(){
+        $scope.$broadcast("$destroy");
+      }
+
+      $scope.deleteNode = function($event) {
+        $event.stopPropagation();
+        removeTooltip();
         $scope.$emit('wiggi-wiz.delete-node', $element);
+      };
+
+      $scope.editNode = function($event) {
+        $event.stopPropagation();
+        removeTooltip();
+        $scope.$emit('wiggi-wiz.call-feature-method', 'editNode', $element);
       };
 
       $scope.$watch('originalMarkup', function(n) {

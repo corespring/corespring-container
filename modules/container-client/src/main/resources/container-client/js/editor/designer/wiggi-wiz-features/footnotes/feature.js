@@ -20,7 +20,7 @@ angular.module('corespring.wiggi-wiz-features.footnotes').factory('WiggiFootnote
         return replaceWith(newNode);
       };
 
-      this.onDblClick = function($node, $scope, editor) {
+      this.editNode = function($node, $scope, editor) {
 
         editor.showEditPane($scope,
           'Edit the Footnotes',

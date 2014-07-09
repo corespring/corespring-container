@@ -31,6 +31,16 @@
       $rootScope.$broadcast('componentDeselected');
     }
 
+    function tag(name,attributes){
+      var result = [];
+      result.push('<' + name);
+      for(var prop in attributes){
+        result.push(' ' + prop + '="' + attributes[prop] + '"');
+      }
+      result.push('></' + name + '>');
+      return result.join('');
+    }
+
     var service = {};
     service.componentToWiggiwizFeature = function(component, addToEditorCallback, deleteComponentCallback, reAddComponentCallback) {
       var componentType = component.componentType;
@@ -49,24 +59,25 @@
         },
         initialise: function($node, replaceWith) {
           var id = $node.attr('id');
-          return replaceWith('<placeholder' +
-            ' component-type="' + component.componentType +
-            '" label="' + component.title + ': ' + id +
-            '" id="' + id +
-            '" contenteditable="' + false +
-            '"></placeholder>');
+          return replaceWith(tag('placeholder', {
+            'component-type': component.componentType,
+            'label': component.title + ': ' + id,
+            'id': id,
+            'contenteditable': false
+          }));
         },
         addToEditor: function(editor, addContent) {
           addToEditorCallback(editor, addContent, component);
         },
         editNode: function($node, $scope, editor) {
           var data = {};
+          var tagName = componentType + '-config';
           var content = [
             '<div class="navigator-toggle-button-row">',
             '  <div class="navigator-title">' + getTitle(component) + '</div>',
             '</div>',
             '<div class="config-panel-container">',
-            '<' + componentType + '-config id="' + $node.attr('id') + '"></' + componentType + '-config>',
+            tag(tagName, {id: $node.attr('id')}),
             '</div>'
           ].join('\n');
 
@@ -85,8 +96,7 @@
         },
 
         getMarkUp: function($node, $scope) {
-          var id = $node.attr('id');
-          return '<' + componentType + ' id = "' + id + '"></' + componentType + '>';
+          return tag(componentType, {id: $node.attr('id')});
         }
       };
     };
