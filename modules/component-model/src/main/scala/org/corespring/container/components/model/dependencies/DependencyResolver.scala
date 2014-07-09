@@ -73,7 +73,6 @@ trait DependencyResolver extends ComponentSplitter {
 
       i match {
         case Nil => {
-          println("return the acc id is null")
           acc
         }
         case Seq(head) => {
