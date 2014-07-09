@@ -1,8 +1,7 @@
 @component-bg-color: #ffffff;
 
-
-.weight-form{
-  .form-group{
+.weight-form {
+  .form-group {
     padding-bottom: 30px;
   }
 }
@@ -10,14 +9,14 @@
 .input-holder {
   background-color: @component-bg-color;
   margin-top: 10px;
-  .header{
+  .header {
     border-left: solid 6px @component-bg-color;
     padding-left: 5px;
-    color: desaturate( darken(@component-bg-color, 35%), 20%);
+    color: desaturate(darken(@component-bg-color, 35%), 20%);
     font-size: 16px;
   }
 
-  .body{
+  .body {
     padding: 10px;
   }
 }
@@ -41,7 +40,7 @@
       bottom: 0;
       .title {
 
-        span{
+        span {
           color: white;
           background-color: black;
           padding: 3px 7px 3px 7px;
@@ -59,11 +58,12 @@
     }
     z-index: 10;
     .user-select(none);
-    .border-radius(4px, 4px, 4px, 4px);
     transition: opacity 200ms;
+    .border-radius(4px);
+    border: solid 1px black;
 
-    .bg{
-      background-color: black;
+    .bg {
+      background-color: white;
       opacity: 0.3;
       position: absolute;
       left: -2px;
@@ -72,7 +72,7 @@
       right: -2px;
     }
 
-    &:hover{
+    &:hover {
       opacity: 1.0;
     }
 
@@ -83,31 +83,60 @@
     position: absolute;
     height: 100%;
     width: 100%;
-    opacity: 0;
-  }
-}
-
-.delete-icon, .close-icon {
-  @close-icon-base-color: @grey-purple;
-  width: 20px;
-  height: 20px;
-  background-color: white;
-  border-radius: 12px;
-  position:absolute;
-  right: -8px;
-  top: -10px;
-  .drop-shadow(2px, 2px, 2px, 0.3);
-
-  &:hover {
-    cursor: pointer;
+    opacity: 0.5;
   }
 
-  i {
-    font-size: 24px;
-    color: darken(@close-icon-base-color, 10%);
+  .delete-icon, .close-icon {
+    @close-icon-base-color: @grey-purple;
+    width: 20px;
+    height: 20px;
+    background-color: white;
+    border-radius: 12px;
+    position: absolute;
+    right: -8px;
+    top: -10px;
+    .drop-shadow(2px, 2px, 2px, 0.3);
 
     &:hover {
-      color: darken(@close-icon-base-color, 16%);
+      cursor: pointer;
+    }
+
+    i {
+      font-size: 24px;
+      color: darken(@close-icon-base-color, 10%);
+
+      &:hover {
+        color: darken(@close-icon-base-color, 16%);
+      }
+    }
+  }
+
+  .edit-controls {
+    position: absolute;
+    padding: 5px 5px 5px 20px;
+    top: 2px;
+    right: 2px;
+    background: white;
+
+    .delete-icon-button, .edit-icon-button {
+      display: inline-block;
+      @close-icon-base-color: @grey-purple;
+      width: 20px;
+      height: 20px;
+      margin-left: 5px;
+
+      &:hover {
+        cursor: pointer;
+      }
+
+      i {
+        font-size: 24px;
+        color: darken(@close-icon-base-color, 10%);
+
+        &:hover {
+          color: darken(@close-icon-base-color, 16%);
+        }
+      }
     }
   }
 }

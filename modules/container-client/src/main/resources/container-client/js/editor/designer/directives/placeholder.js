@@ -7,15 +7,10 @@ var Placeholder = function(
 
   var log = $log.debug.bind($log, '[placeholder]');
 
-  var msg = "Double Click to Edit";
-
   function link($scope, $element, $attrs) {
 
+    $scope.title = '';
     $scope.componentPreview = null;
-
-    var showTooltip = ComponentConfig.showTooltip($scope.componentType);
-    $scope.tooltipMsg = showTooltip ? msg : "";
-    $scope.mainMsg = showTooltip ? "" : msg;
 
     function preprocess(component) {
       var serverLogic = corespring.server.logic(component.data.componentType);
@@ -54,12 +49,15 @@ var Placeholder = function(
     });
 
     function renderPlayerComponent() {
-
       if (!$scope.id || !$scope.componentType) {
         return;
       }
-      $element.find('.holder').html('<' + $scope.componentType + ' id="' + $scope.id + '"></' + $scope.componentType + '>');
-      $compile($element.find('.holder'))($scope.$new());
+      var $holder = $element.find('.holder');
+      if (!$holder) {
+        return;
+      }
+      $holder.html('<' + $scope.componentType + ' id="' + $scope.id + '"></' + $scope.componentType + '>');
+      $compile($holder)($scope.$new());
     }
 
     $scope.$watch('id', renderPlayerComponent);
@@ -68,26 +66,31 @@ var Placeholder = function(
     $scope.id = $scope.id || 2;
     setDataToComponent();
 
-
     $scope.safeApply = function() {
       var phase = this.$root.$$phase;
-      if (!(phase === '$apply' || phase === '$digest')) {
+      if (phase !== '$apply' && phase !== '$digest') {
         this.$apply();
       }
     };
 
+    function removeTooltip(){
+      $scope.$broadcast("$destroy");
+    }
+
     $scope.deleteNode = function($event) {
       $event.stopPropagation();
-      $scope.$broadcast("$destroy"); //destroys tooltip
+      removeTooltip();
       $scope.$emit('wiggi-wiz.delete-node', $element);
     };
 
-    function isElement(data, fn, elseFn) {
-      if (data.id === $scope.id) {
-        fn();
-      } else if (elseFn) {
-        elseFn();
-      }
+    $scope.editNode = function($event) {
+      $event.stopPropagation();
+      removeTooltip();
+      $scope.$emit('wiggi-wiz.call-feature-method', 'editNode', $element);
+    };
+
+    function isElement(data) {
+      return data.id === $scope.id;
     }
 
     function setSelected(selected) {
@@ -96,17 +99,17 @@ var Placeholder = function(
     }
 
     $rootScope.$on('componentSelectionToggled', function(event, data) {
-      isElement(data, function() {
+      if (isElement(data)) {
         setSelected(!$scope.selected);
-      }, function() {
+      } else {
         setSelected(false);
-      });
+      }
     });
 
     $rootScope.$on('componentSelected', function(event, data) {
-      isElement(data, function() {
+      if (isElement(data)) {
         setSelected(true);
-      });
+      }
     });
 
     $rootScope.$on('componentDeselected', function(event, data) {
@@ -125,16 +128,19 @@ var Placeholder = function(
       id: '@'
     },
     template: [
-      '<div class="component-placeholder"',
-      ' ng-class="[componentType,selectedClass]" ',
-      '  data-component-id="{{id}}">',
-      '  <div class="blocker" tooltip="{{tooltipMsg}}" tooltip-append-to-body="true" tooltip-placement="bottom">',
-      '     <div class="bg"></div>',
-      '     <div class="content">',
-      '       <div class="title"><span ng-show="mainMsg">{{mainMsg}}</span></div>',
-      '     </div>',
-      '     <div class="delete-icon">',
-      '      <i ng-click="deleteNode($event)" class="fa fa-times-circle"></i>',
+      '<div class="component-placeholder" ng-class="[componentType,selectedClass]" data-component-id="{{id}}">',
+      '  <div class="blocker">',
+      '    <div class="bg"></div>',
+      '    <div class="content">',
+      '      <div class="title"><span ng-show="mainMsg">{{title}}</span></div>',
+      '    </div>',
+      '    <div class="edit-controls">',
+      '      <div class="delete-icon-button" tooltip="delete" tooltip-append-to-body="true" tooltip-placement="bottom">',
+      '        <i ng-click="deleteNode($event)" class="fa fa-trash-o"></i>',
+      '      </div>',
+      '      <div class="edit-icon-button" tooltip="edit" tooltip-append-to-body="true" tooltip-placement="bottom">',
+      '        <i ng-click="editNode($event)" class="fa fa-pencil"></i>',
+      '      </div>',
       '    </div>',
       '  </div>',
       '  <div class="holder"></div>',

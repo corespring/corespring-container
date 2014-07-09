@@ -6,19 +6,21 @@
       return _.isEmpty(component.title) ? component.name : component.title;
     }
 
+    function getComponentId($node) {
+      return parseInt($node.attr('id'), 10);
+    }
+
     function fireComponentSelection($node) {
-      $rootScope.selectedComponentId = parseInt($node.attr('id'), 10);
+      $rootScope.selectedComponentId = getComponentId($node);
       $rootScope.$broadcast('componentSelected', {
         id: $node.attr('id')
       });
     }
 
     function fireComponentSelectionToggled($node) {
-      if ($rootScope.selectedComponentId === parseInt($node.attr('id'), 10)) {
-        $rootScope.selectedComponentId = undefined;
-      } else {
-        $rootScope.selectedComponentId = parseInt($node.attr('id'), 10);
-      }
+      $rootScope.selectedComponentId = $rootScope.selectedComponentId === getComponentId($node) ?
+        undefined : getComponentId($node);
+
       $rootScope.$broadcast('componentSelectionToggled', {
         id: $node.attr('id')
       });
@@ -47,12 +49,17 @@
         },
         initialise: function($node, replaceWith) {
           var id = $node.attr('id');
-          return replaceWith('<placeholder component-type="' + component.componentType + '" label="' + component.title + ': ' + id + '" id="' + id + '"></placeholder>');
+          return replaceWith('<placeholder' +
+            ' component-type="' + component.componentType +
+            '" label="' + component.title + ': ' + id +
+            '" id="' + id +
+            '" contenteditable="' + false +
+            '"></placeholder>');
         },
         addToEditor: function(editor, addContent) {
           addToEditorCallback(editor, addContent, component);
         },
-        onDblClick: function($node, $scope, editor) {
+        editNode: function($node, $scope, editor) {
           var data = {};
           var content = [
             '<div class="navigator-toggle-button-row">',
@@ -76,25 +83,7 @@
 
           fireComponentSelection($node);
         },
-        onClick: function($node, $scope) {
 
-          /** Use timer trickery to only execute provided function on single click **/
-          function onSingleClick(fn) {
-            if ($scope.clickTimer) {
-              clearTimeout($scope.clickTimer);
-              $scope.clickTimer = undefined;
-            } else {
-              $scope.clickTimer = setTimeout(function() {
-                fn();
-                $scope.clickTimer = undefined;
-              }, 200);
-            }
-          }
-
-          onSingleClick(function() {
-            fireComponentSelectionToggled($node);
-          });
-        },
         getMarkUp: function($node, $scope) {
           var id = $node.attr('id');
           return '<' + componentType + ' id = "' + id + '"></' + componentType + '>';
