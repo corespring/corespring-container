@@ -76,16 +76,16 @@ trait PlayerLauncher extends Controller {
    */
   def playerJs = Action.async { implicit request =>
     hooks.playerJs.map { implicit js =>
-      val playerPage = request.getQueryString("playerPage").getOrElse("player.html")
+      val playerPage = request.getQueryString("playerPage").getOrElse("player")
       val rootUrl = playerConfig.rootUrl.getOrElse(BaseUrl(request))
       val itemUrl = s"${Player.createSessionForItem(":id").url}?file=$playerPage"
       val sessionUrl = s"${Assets.session(":id", playerPage)}"
-
       val defaultOptions: JsValue = Json.obj(
         "corespringUrl" -> rootUrl,
         "mode" -> "gather",
         "paths" -> Json.obj(
           "gather" -> itemUrl,
+          "gatherSession" -> s"$sessionUrl?mode=gather",
           "view" -> s"$sessionUrl?mode=view",
           "evaluate" -> s"$sessionUrl?mode=evaluate"))
       val jsPath = "container-client/js/player-launcher/player.js"
@@ -107,7 +107,6 @@ trait PlayerLauncher extends Controller {
   }
 
   private def make(jsPath: String, options: JsValue, bootstrapLine: String)(implicit request: Request[AnyContent], js: PlayerJs): SimpleResult = {
-
     val defaultOptions = ("default-options" -> s"module.exports = ${Json.stringify(options)}")
     val launchErrors = ("launcher-errors" -> errorsToModule(js.errors))
     val rawJs = Seq("container-client/js/corespring/core-library.js")

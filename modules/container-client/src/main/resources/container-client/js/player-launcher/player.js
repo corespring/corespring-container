@@ -28,8 +28,8 @@ exports.define = function(isSecure) {
         return out;
       }
 
-      if (!options.itemId && options.mode === "gather") {
-        out.push(errors.NO_ITEM_ID);
+      if (!options.itemId && !options.sessionId) {
+        out.push(errors.NO_ITEM_OR_SESSION_ID);
       }
       if (!options.sessionId && options.mode !== "gather") {
         out.push(errors.NO_SESSION_ID);
@@ -49,8 +49,11 @@ exports.define = function(isSecure) {
     var InstanceDef = require("instance");
 
     var prepareUrl = function() {
-      var id = options.mode === "gather" ? options.itemId : options.sessionId;
+      var id = options.mode === "gather" ? (options.sessionId || options.itemId) : options.sessionId;
       var path = options.paths[options.mode];
+      if (options.mode === "gather" && options.sessionId) {
+        path = options.paths.gatherSession;
+      }
       return (options.corespringUrl + path).replace(":id", id);
     };
 
