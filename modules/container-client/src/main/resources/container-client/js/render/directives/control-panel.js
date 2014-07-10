@@ -34,7 +34,7 @@
         });
 
         $scope.hasScore = function() {
-          return $scope.score && !_.isNaN($scope.score.summary.percentage);
+          return $scope.score && $scope.score.summary && !_.isNaN($scope.score.summary.percentage);
         };
 
         $element.on('hide.bs.popover', function() {
