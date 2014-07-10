@@ -1,22 +1,20 @@
-angular.module('corespring-player.directives').directive('dimensionPropagator', ['MessageBridge', function(MessageBridge) {
+angular.module('corespring-player.directives').directive('dimensionPropagator',
+  ['$log', 'MessageBridge', function($log, MessageBridge) {
 
   return {
 
     link: function($scope, $element){
 
-      var $body = $element.parent('body');
+      var $body = $element.parents('body');
 
-      var lastW = null;
-      var lastH = null;
+      var lastW;
+      var lastH;
 
-      var different = function(w,h){
-        if(!lastW || !lastH){
-          return true;
-        }
+      function different(w,h){
         return lastW !== w || lastH !== h;
-      };
+      }
 
-      var dispatchDimensions = function(){
+      function dispatchDimensions(){
         var b = $body[0];
         if (!b) {return;}
 
@@ -26,10 +24,10 @@ angular.module('corespring-player.directives').directive('dimensionPropagator', 
         if(different(w,h)){
           lastW = w;
           lastH = h;
-          var msg = {message:'dimensionsUpdate', w: w, h: h};
-          MessageBridge.sendMessage('parent', msg, false);
+          $log.debug("dispatchDimensions", w, h);
+          MessageBridge.sendMessage('parent', {message:'dimensionsUpdate', w: w, h: h});
         }
-      };
+      }
 
       setInterval(dispatchDimensions, 400);
       dispatchDimensions();
