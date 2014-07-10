@@ -7,7 +7,7 @@ angular.module('corespring.wiggi-wiz-features.footnotes').directive('footnotesHo
     var $log = LogFactory.getLogger('footnotes-holder');
 
     var template = [
-      '<div class="component-placeholder footnotes" contenteditable="false">',
+      '<div class="component-placeholder" contenteditable="false">',
       '  <div class="blocker">',
       '    <div class="bg"></div>',
       '    <div class="edit-controls">',

@@ -5,15 +5,17 @@ angular.module('corespring.wiggi-wiz-features.mathjax').directive('mathjaxHolder
   function($log, MathFormatUtils) {
 
     var template = [
-      '<div class="component-placeholder"',
-      ' tooltip-placement="bottom" ',
-      ' tooltip-append-to-body="true"',
-      ' tooltip="Double Click to Edit">',
+      '<div class="component-placeholder" contenteditable="false">',
       '  <div class="blocker">',
       '     <div class="bg"></div>',
       '     <div class="content"></div>',
-      '     <div class="delete-icon">',
-      '      <i ng-click="deleteNode()" class="fa fa-times-circle"></i>',
+      '     <div class="edit-controls">',
+      '      <div class="edit-icon-button" tooltip="edit" tooltip-append-to-body="true" tooltip-placement="bottom">',
+      '        <i ng-click="editNode($event)" class="fa fa-pencil"></i>',
+      '      </div>',
+      '      <div class="delete-icon-button" tooltip="delete" tooltip-append-to-body="true" tooltip-placement="bottom">',
+      '        <i ng-click="deleteNode($event)" class="fa fa-trash-o"></i>',
+      '      </div>',
       '    </div>',
       '  </div>',
       '  <div class="holder"></div>',
@@ -34,9 +36,20 @@ angular.module('corespring.wiggi-wiz-features.mathjax').directive('mathjaxHolder
       log(html);
       $scope.originalMarkup = html;
 
-      $scope.deleteNode = function() {
-        $scope.$broadcast("$destroy"); //destroys tooltip
+      function removeTooltip(){
+        $scope.$broadcast("$destroy");
+      }
+
+      $scope.deleteNode = function($event) {
+        $event.stopPropagation();
+        removeTooltip();
         $scope.$emit('wiggi-wiz.delete-node', $element);
+      };
+
+      $scope.editNode = function($event) {
+        $event.stopPropagation();
+        removeTooltip();
+        $scope.$emit('wiggi-wiz.call-feature-method', 'editNode', $element);
       };
 
       /** Note: because we are not replacing the node - we are updating the class att
@@ -58,7 +71,6 @@ angular.module('corespring.wiggi-wiz-features.mathjax').directive('mathjaxHolder
       }
 
       $scope.$watch('originalMarkup', function(n) {
-
         updateDisplayMode(n);
 
         if (!n || _.isEmpty(n)) {
