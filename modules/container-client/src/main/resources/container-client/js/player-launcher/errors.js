@@ -5,3 +5,4 @@ exports.NOT_ALLOWED = {code: 104, message: "Not allowed perform this action"};
 exports.EXTERNAL_ERROR = function(msg){ return {code: 105, message: msg}; };
 exports.CANT_FIND_IFRAME = {code: 106, message: "Can't find Iframe"};
 exports.PLAYER_NOT_READY = {code: 107, message: "Player not ready yet"};
+exports.NO_ITEM_OR_SESSION_ID = {code: 108, message: "itemId or sessionId is missing from options"};

@@ -88,12 +88,13 @@ describe('player launcher', function() {
   });
 
 
-  it('should invoke error callback when mode is gather and there is no itemId', function() {
+  it('should invoke error callback when mode is gather and there is no itemId/sessionId', function() {
     var player = create({
       mode: "gather",
-      itemId: null
+      itemId: null,
+      sessionId: null
     });
-    expect(lastError.code).toEqual(errors.NO_ITEM_ID.code);
+    expect(lastError.code).toEqual(errors.NO_ITEM_OR_SESSION_ID.code);
   });
 
   it('should construct', function() {
