@@ -38,7 +38,10 @@ var Instance = function(element, options, errorCallback, log) {
           }
         }
       } catch (e) {
-        log.error("Exception in addDimensionChangeListener: " + e);
+        // Ignore json parsing errors (message was not meant for us)
+        if (!(e instanceof SyntaxError)) {
+          log.error("Exception in dimensionChangeListener: " + e + " for data: " + data);
+        }
       }
     }
 
