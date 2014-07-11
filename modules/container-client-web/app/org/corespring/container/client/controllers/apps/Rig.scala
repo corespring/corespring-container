@@ -4,11 +4,11 @@ import org.corespring.container.client.component.PlayerItemTypeReader
 import org.corespring.container.client.controllers.angular.AngularModules
 import org.corespring.container.client.hooks.ClientHooks
 import org.corespring.container.client.hooks.Hooks.StatusMessage
-import org.corespring.container.components.model.Interaction
-import play.api.libs.json.{JsValue, Json}
-import play.api.mvc.{Action, RequestHeader}
+import org.corespring.container.components.model.{ ComponentInfo, Interaction }
+import play.api.libs.json.{ JsValue, Json }
+import play.api.mvc.{ Action, RequestHeader }
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ ExecutionContext, Future }
 
 trait Rig extends AppWithConfig[ClientHooks] with PlayerItemTypeReader {
 
@@ -19,16 +19,16 @@ trait Rig extends AppWithConfig[ClientHooks] with PlayerItemTypeReader {
       Ok(loadData(componentType, dataName))
   }
 
-  def loadData(componentType: String, dataName: String) : JsValue = {
-      val data = for {
-        c <- component(componentType)
-        filename <- Some(if(dataName.endsWith(".json")) dataName else s"$dataName.json")
-        d <- c.sampleData.get(filename)
-      } yield d
-      data.getOrElse(Json.obj())
+  def loadData(componentType: String, dataName: String): JsValue = {
+    val data = for {
+      c <- component(componentType)
+      filename <- Some(if (dataName.endsWith(".json")) dataName else s"$dataName.json")
+      d <- c.sampleData.get(filename)
+    } yield d
+    data.getOrElse(Json.obj())
   }
 
-  def component(componentType: String): Option[Interaction] = interactions.find(c => c.componentType == componentType)
+  def component(componentType: String): Option[ComponentInfo] = (interactions ++ widgets).find(c => c.componentType == componentType)
 
   def asset(componentType: String, file: String) = controllers.Assets.at("/container-client", file)
 
@@ -40,9 +40,9 @@ trait Rig extends AppWithConfig[ClientHooks] with PlayerItemTypeReader {
 
     override implicit def ec: ExecutionContext = ExecutionContext.Implicits.global
 
-    override def loadItem(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]] = Future{
-      header.getQueryString("data").map{ jsonFile =>
-        Right( (loadData(id, jsonFile) \ "item").as[JsValue])
+    override def loadItem(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]] = Future {
+      header.getQueryString("data").map { jsonFile =>
+        Right((loadData(id, jsonFile) \ "item").as[JsValue])
       }.getOrElse(Left(BAD_REQUEST, "You need to specify a json file using 'data' query param"))
     }
   }

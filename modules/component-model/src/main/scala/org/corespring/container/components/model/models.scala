@@ -30,13 +30,14 @@ case class Library(
 case class LibrarySource(name: String, source: String)
 
 trait ComponentInfo {
-  def id : Id
-  def title : Option[String]
-  def titleGroup : Option[String]
-  def icon : Option[Array[Byte]]
+  def id: Id
+  def title: Option[String]
+  def titleGroup: Option[String]
+  def icon: Option[Array[Byte]]
   def componentType: String
-  def defaultData : JsValue
-  def packageInfo : JsValue
+  def defaultData: JsValue
+  def packageInfo: JsValue
+  def sampleData: Map[String, JsValue]
 }
 
 case class Widget(org: String,
