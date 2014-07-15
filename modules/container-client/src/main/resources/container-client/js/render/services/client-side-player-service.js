@@ -35,11 +35,11 @@ angular.module('corespring-player.services')
 
           var out = {};
 
-          function addResponse(id, question) {
+          function addResponse(id, question, targetOutcome) {
             var answer = components[id].answers;
             serverLogic = corespring.server.logic(question.componentType);
             if (serverLogic && serverLogic.respond) {
-              out[id] = serverLogic.respond(question, answer, settings);
+              out[id] = serverLogic.respond(question, answer, settings, targetOutcome);
               out[id].studentResponse = _.cloneDeep(answer);
             } else {
               console.warn('didn\'t find server logic for: ', question.componentType);
@@ -58,7 +58,10 @@ angular.module('corespring-player.services')
           for (id in components) {
             question = angular.copy(getQuestionFor(id));
             if (question.target) {
-              addResponse(id, question);
+              var targetId = question.target.id;
+              var targetOutcome = out[targetId];
+
+              addResponse(id, question, targetOutcome);
             }
           }
 
