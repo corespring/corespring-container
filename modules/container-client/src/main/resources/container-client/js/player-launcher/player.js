@@ -158,12 +158,13 @@ exports.define = function(isSecure) {
       }
     };
 
-    this.saveResponses = function(isAttempt) {
+    this.saveResponses = function(isAttempt, callback) {
       instance.sendMessage({
         message: "saveResponses",
         data: {
           isAttempt: isAttempt
-        }
+        },
+        callback: callback
       });
     };
 
