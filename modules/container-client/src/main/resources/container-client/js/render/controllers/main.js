@@ -161,9 +161,16 @@ angular.module('corespring-player.controllers')
           PlayerService.loadSession($scope.onEverythingLoaded, $scope.onSessionLoadError, $scope.sessionId);
         });
 
-        $scope.$on('saveResponses', function(event, data) {
+        $scope.$on('saveResponses', function(event, data, callback) {
           $log.debug('[onSaveResponses] -> ', data);
-          $scope.save(data.isAttempt, data.isComplete, data.onSaveSuccess);
+
+          function onSaved(err, result) {
+            if (callback) {
+              callback(err || result);
+            }
+          }
+
+          $scope.save(data.isAttempt, data.isComplete, onSaved);
         });
 
         $scope.$on('countAttempts', function(event, data, callback) {
