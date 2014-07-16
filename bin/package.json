@@ -7,6 +7,7 @@
     "node": ">= 0.10.9"
   },
   "devDependencies": {
+    "mongo-seeder" : "git+ssh://git@github.com:corespring/mongo-seeder.git",
     "coffee-script": "*",
     "lodash": "*",
     "mongodb" : "*",
