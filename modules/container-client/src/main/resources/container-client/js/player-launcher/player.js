@@ -164,13 +164,16 @@ exports.define = function(isSecure) {
         data: {
           isAttempt: isAttempt
         },
-        callback: callback
+        callback: callback,
+        property: "result"
       });
     };
 
-    this.completeResponse = function() {
+    this.completeResponse = function(callback) {
       instance.sendMessage({
-        message: "completeResponse"
+        message: "completeResponse",
+        callback: callback,
+        property: "result"
       });
     };
 
