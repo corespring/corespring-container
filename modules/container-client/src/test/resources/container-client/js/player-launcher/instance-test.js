@@ -66,10 +66,6 @@ describe('instance', function() {
     };
   }
 
-  function clearRootLevelListeners() {
-    var listener = corespring.require("root-level-listener")();
-    listener.clearListeners();
-  }
   var ID = 'element-id';
 
   beforeEach(function() {

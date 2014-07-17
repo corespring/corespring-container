@@ -4,6 +4,34 @@ var Instance = function(element, options, errorCallback, log) {
 
   var that = this;
 
+  var findInstanceIframe = function() {
+    if (that.iframeRef) {
+      return that.iframeRef;
+    }
+    that.iframeRef = $(element).find('iframe');
+    if (!that.iframeRef) {
+      log.error("No iframe was found in player instance");
+    }
+  };
+
+  var isMessageDestinedForInstance = function(event) {
+    var eventIframe = findDestinationIframe(event);
+    var instanceIframe = findInstanceIframe();
+    if (instanceIframe === eventIframe) {
+      return true;
+    } else {
+      return (instanceIframe && eventIframe) && instanceIframe[0] === eventIframe[0];
+    }
+  };
+
+  var forThisInstance = function(fn) {
+    return function(event) {
+      if (isMessageDestinedForInstance(event)) {
+        fn(event);
+      }
+    };
+  };
+
   log = log || {
     error: function(s) {
       console.error(s);
@@ -17,23 +45,37 @@ var Instance = function(element, options, errorCallback, log) {
   };
 
   var listener = require("root-level-listener")();
-  listener.clearListeners();
+  var listenersToRemove = [];
+
+  var findDestinationIframe = function(event) {
+    var frames = document.getElementsByTagName('iframe');
+    for (var i = 0; i < frames.length; i++) {
+      if (frames[i].contentWindow === event.source) {
+        return $(frames[i]);
+      }
+    }
+  };
+
+  function detachOnRemove(handler) {
+    listenersToRemove.push(handler);
+  }
+
+  function removeListeners() {
+    for (var i = 0; i < listenersToRemove.length; i++) {
+      listener.removeListener(listenersToRemove[i]);
+    }
+    listenersToRemove = [];
+  }
 
   function dimensionChangeListener(element) {
     function listenerFunction(data, event) {
       try {
         var json = JSON.parse(data);
         if (json.message === 'dimensionsUpdate') {
-          var frames = document.getElementsByTagName('iframe');
-          var found = false;
-          for (var i = 0; i < frames.length; i++) {
-            if (frames[i].contentWindow === event.source) {
-              $(frames[i]).height(json.h + 30);
-              found = true;
-              break;
-            }
-          }
-          if (!found) {
+          var iframe = findDestinationIframe(event);
+          if (iframe) {
+            iframe.height(json.h + 30);
+          } else {
             $(element).height(json.h + 30);
           }
         }
@@ -45,9 +87,12 @@ var Instance = function(element, options, errorCallback, log) {
       }
     }
 
-    listener.addListener(function(e) {
+    var listenerFn = function(e) {
       listenerFunction(e.data, e);
-    });
+    };
+
+    listener.addListener(listenerFn);
+    detachOnRemove(listenerFn);
   }
 
   function makeUrl(url, queryParams) {
@@ -78,6 +123,12 @@ var Instance = function(element, options, errorCallback, log) {
     }
 
     dimensionChangeListener(e);
+
+    $(element).parent().bind('DOMNodeRemoved', function(e) {
+      if ('#'+e.target.id === element) {
+        removeListeners();
+      }
+    });
   }
 
   function postMessage(message, data) {
@@ -112,7 +163,9 @@ var Instance = function(element, options, errorCallback, log) {
       listener.removeListener(this);
     }
 
-    listener.addListener(resultHandler);
+    var resultHandlerForThisInstance = forThisInstance(resultHandler);
+    listener.addListener(resultHandlerForThisInstance);
+    detachOnRemove(resultHandlerForThisInstance);
   }
 
 
@@ -142,7 +195,7 @@ var Instance = function(element, options, errorCallback, log) {
   };
 
   this.addListener = function(name, callback) {
-    listener.addListener(function(event) {
+    var listenerForThisInstance = forThisInstance(function(event) {
       var data = that.parseEvent(event);
 
       log.debug("[addListener] [handler] message: " + data.message);
@@ -152,6 +205,14 @@ var Instance = function(element, options, errorCallback, log) {
         callback(data);
       }
     });
+
+    listener.addListener(listenerForThisInstance);
+    detachOnRemove(listenerForThisInstance);
+  };
+
+  this.remove = function() {
+    removeListeners();
+    $(element).remove();
   };
 
   initialize(element, options);
