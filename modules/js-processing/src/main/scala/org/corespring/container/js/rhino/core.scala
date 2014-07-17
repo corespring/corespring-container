@@ -9,25 +9,6 @@ import play.api.libs.json.JsString
 import play.api.libs.json.{ Json, JsValue }
 import scala.Some
 
-trait JsConsole {
-  def log(msg: String)
-
-  def warn(msg: String)
-
-  def info(msg: String)
-
-  def debug(msg: String)
-}
-
-class DefaultLogger(log: Logger) extends JsConsole {
-  def log(msg: String) = log.info(msg)
-
-  def warn(msg: String) = log.warn(msg)
-
-  def info(msg: String) = log.info(msg)
-
-  def debug(msg: String) = log.debug(msg)
-}
 
 trait JsLogging {
   lazy val logger = Logger("js.processing")
