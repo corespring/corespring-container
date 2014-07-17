@@ -102,14 +102,16 @@ angular.module('corespring-player.controllers')
           );
         };
 
-        $scope.completeResponse = function() {
+        $scope.completeResponse = function(callback) {
           PlayerService.completeResponse(
             function() {
               $scope.isComplete = true;
+              callback(null, $scope.isComplete);
             },
             function(err) {
               $scope.isComplete = false;
               $log.error(err);
+              callback(err, $scope.isComplete);
             },
             $scope.sessionId
           );
@@ -142,6 +144,7 @@ angular.module('corespring-player.controllers')
           $scope.session = data.session;
           $scope.outcome = data.outcome;
           $scope.score = data.score;
+          $scope.isComplete = data.session ? data.session.isComplete : false;
           $scope.$emit("session-loaded", data.session);
         };
 
@@ -162,11 +165,17 @@ angular.module('corespring-player.controllers')
         });
 
         $scope.$on('saveResponses', function(event, data, callback) {
+
           $log.debug('[onSaveResponses] -> ', data);
 
           function onSaved(err, result) {
             if (callback) {
-              callback(err || result);
+              callback({
+                result: {
+                  error: err,
+                  session: result
+                }
+              });
             }
           }
 
@@ -190,8 +199,17 @@ angular.module('corespring-player.controllers')
           $scope.getScore(onScoreReceived);
         });
 
-        $scope.$on('completeResponse', function() {
-          $scope.completeResponse();
+        $scope.$on('completeResponse', function(event, data, callback) {
+          $scope.completeResponse(function(err, isComplete) {
+            if (callback) {
+              callback({
+                result: {
+                  error: err,
+                  isComplete: isComplete
+                }
+              });
+            }
+          });
         });
 
         $scope.$on('isComplete', function(event, data, callback) {
