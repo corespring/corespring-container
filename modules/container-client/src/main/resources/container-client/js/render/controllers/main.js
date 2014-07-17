@@ -144,6 +144,7 @@ angular.module('corespring-player.controllers')
           $scope.session = data.session;
           $scope.outcome = data.outcome;
           $scope.score = data.score;
+          $scope.isComplete = data.session ? data.session.isComplete : false;
           $scope.$emit("session-loaded", data.session);
         };
 
