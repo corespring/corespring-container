@@ -7,7 +7,7 @@ import org.corespring.container.client.views.txt.js.EditorServices
 import org.corespring.container.components.model.ComponentInfo
 import play.api.Logger
 import play.api.libs.json._
-import play.api.mvc.{ Action, AnyContent }
+import play.api.mvc.{Action, AnyContent}
 
 import scala.concurrent.Future
 
@@ -52,7 +52,12 @@ trait Editor
 
     def onError(sm: StatusMessage) = {
       val (code, msg) = sm
-      Future(Status(code)(org.corespring.container.client.views.html.error.main(code, msg)))
+      Future {
+        code match {
+          case SEE_OTHER => SeeOther(msg)
+          case _ => Status(code)(org.corespring.container.client.views.html.error.main(code, msg))
+        }
+      }
     }
 
     def onItem(i: JsValue) = {
@@ -62,7 +67,7 @@ trait Editor
       controllers.Assets.at("/container-client", page)(request)
     }
 
-    hooks.loadItem(itemId).flatMap { e => e.fold(onError, onItem) }
+    hooks.loadItem(itemId).flatMap { e => e.fold(onError, onItem)}
   }
 
 }
