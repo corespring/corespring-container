@@ -45,6 +45,7 @@ var Instance = function(element, options, errorCallback, log) {
   };
 
   var listener = require("root-level-listener")();
+  var listenersToRemove = [];
 
   var findDestinationIframe = function(event) {
     var frames = document.getElementsByTagName('iframe');
@@ -54,6 +55,17 @@ var Instance = function(element, options, errorCallback, log) {
       }
     }
   };
+
+  function detachOnRemove(handler) {
+    listenersToRemove.push(handler);
+  }
+
+  function removeListeners() {
+    for (var i = 0; i < listenersToRemove.length; i++) {
+      listener.removeListener(listenersToRemove[i]);
+    }
+    listenersToRemove = [];
+  }
 
   function dimensionChangeListener(element) {
     function listenerFunction(data, event) {
@@ -75,9 +87,12 @@ var Instance = function(element, options, errorCallback, log) {
       }
     }
 
-    listener.addListener(function(e) {
+    var listenerFn = function(e) {
       listenerFunction(e.data, e);
-    });
+    };
+
+    listener.addListener(listenerFn);
+    detachOnRemove(listenerFn);
   }
 
   function makeUrl(url, queryParams) {
@@ -108,6 +123,12 @@ var Instance = function(element, options, errorCallback, log) {
     }
 
     dimensionChangeListener(e);
+
+    $(element).parent().bind('DOMNodeRemoved', function(e) {
+      if ('#'+e.target.id === element) {
+        removeListeners();
+      }
+    });
   }
 
   function postMessage(message, data) {
@@ -142,7 +163,9 @@ var Instance = function(element, options, errorCallback, log) {
       listener.removeListener(this);
     }
 
-    listener.addListener(forThisInstance(resultHandler));
+    var resultHandlerForThisInstance = forThisInstance(resultHandler);
+    listener.addListener(resultHandlerForThisInstance);
+    detachOnRemove(resultHandlerForThisInstance);
   }
 
 
@@ -172,7 +195,7 @@ var Instance = function(element, options, errorCallback, log) {
   };
 
   this.addListener = function(name, callback) {
-    listener.addListener(forThisInstance(function(event) {
+    var listenerForThisInstance = forThisInstance(function(event) {
       var data = that.parseEvent(event);
 
       log.debug("[addListener] [handler] message: " + data.message);
@@ -181,7 +204,15 @@ var Instance = function(element, options, errorCallback, log) {
       if (data.message === name) {
         callback(data);
       }
-    }));
+    });
+
+    listener.addListener(listenerForThisInstance);
+    detachOnRemove(listenerForThisInstance);
+  };
+
+  this.remove = function() {
+    removeListeners();
+    $(element).remove();
   };
 
   initialize(element, options);

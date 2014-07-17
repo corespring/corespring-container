@@ -215,6 +215,10 @@ exports.define = function(isSecure) {
       });
     };
 
+    this.remove = function() {
+      instance.remove();
+    };
+
 
     instance.addListener("ready", function(data) {
       isReady = true;
