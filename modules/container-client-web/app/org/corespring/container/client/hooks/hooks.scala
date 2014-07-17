@@ -15,6 +15,14 @@ object Hooks {
  * Client side calls - each will call for config, services and components
  */
 trait ClientHooks extends HasContext {
+
+  /**
+   * load the item with the id into the editor, aka it will be read+write access.
+   * If returning a status message - you can optionally return a SEE_OTHER status and it will be handled correctly
+   * @param id
+   * @param header
+   * @return
+   */
   def loadItem(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]]
 }
 
