@@ -39,7 +39,7 @@ trait PlayerLauncher extends Controller {
     }
   }
 
-  import org.corespring.container.client.controllers.apps.routes.{ Editor, Player }
+  import org.corespring.container.client.controllers.apps.routes.{Editor, BasePlayer}
   import org.corespring.container.client.controllers.routes.Assets
 
   val SecureMode = "corespring.player.secure"
@@ -78,7 +78,8 @@ trait PlayerLauncher extends Controller {
     hooks.playerJs.map { implicit js =>
       val playerPage = request.getQueryString("playerPage").getOrElse("player")
       val rootUrl = playerConfig.rootUrl.getOrElse(BaseUrl(request))
-      val itemUrl = s"${Player.createSessionForItem(":id").url}?file=$playerPage"
+      val itemUrl = s"${BasePlayer.createSessionForItem(":id").url}?file=$playerPage"
+      //val itemUrl = s"${Player.createSessionForItem(":id").url}?file=$playerPage"
       val sessionUrl = s"${Assets.session(":id", playerPage)}"
       val defaultOptions: JsValue = Json.obj(
         "corespringUrl" -> rootUrl,

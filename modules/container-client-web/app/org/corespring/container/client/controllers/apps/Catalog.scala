@@ -5,10 +5,10 @@ import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.client.component.AllItemTypesReader
 import org.corespring.container.client.views.txt.js.CatalogServices
 import play.api.Logger
-import play.api.libs.json.{ JsArray, JsString, JsValue, Json }
-import play.api.mvc.Action
+import play.api.libs.json.{JsArray, JsString, JsValue, Json}
+import play.api.mvc.{SimpleResult, Action}
 
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.{ExecutionContext, Future}
 
 trait Catalog
   extends AllItemTypesReader
@@ -17,9 +17,19 @@ trait Catalog
 
   implicit def ec: ExecutionContext
 
-  val logger = Logger("catalog")
+  override lazy val logger = Logger("container.catalog")
 
   override def context: String = "catalog"
+
+  override protected def configToResult(xhtml: Option[String], ngDependencies: Seq[String], js: Seq[String], css: Seq[String]): SimpleResult = {
+    val json = configJson(
+      processXhtml(xhtml),
+      ngDependencies,
+      js,
+      css
+    )
+    Ok(json)
+  }
 
   override def servicesJs = {
     import org.corespring.container.client.controllers.resources.routes._

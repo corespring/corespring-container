@@ -1,6 +1,6 @@
 package org.corespring.container.client.integration
 
-import org.corespring.container.client.controllers.apps.{Catalog, Rig, Editor, Player}
+import org.corespring.container.client.controllers.apps._
 import org.corespring.container.client.component.ComponentUrls
 import org.corespring.container.client.controllers.resources.{ Session, Item }
 import org.corespring.container.client.controllers._
@@ -37,7 +37,10 @@ trait RigControllers extends CommonControllers {
 
 trait PlayerControllers extends CommonControllers with ResourceControllers {
   /** The player app */
-  def player: Player
+  def jsonPlayer: JsonPlayer
+
+  def devHtmlPlayer : DevHtmlPlayer
+  def prodHtmlPlayer : ProdHtmlPlayer
 }
 
 trait EditorControllers extends CommonControllers with ResourceControllers {
@@ -72,7 +75,9 @@ trait ContainerControllers
     item,
     session,
     rig,
-    player,
+    jsonPlayer,
+    devHtmlPlayer,
+    prodHtmlPlayer,
     editor,
     catalog,
     icons,

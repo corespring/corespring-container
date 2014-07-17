@@ -8,16 +8,16 @@ import play.api.mvc._
 
 import scala.concurrent.Future
 
-trait Player
+trait BasePlayer
   extends PlayerItemTypeReader
   with AppWithServices[PlayerHooks]
   with JsModeReading {
 
-  import org.corespring.container.client.controllers.apps.routes.{ Player => PlayerRoutes }
+  import org.corespring.container.client.controllers.apps.routes.{ BasePlayer => PlayerRoutes }
 
   override def context: String = "player"
 
-  lazy val logger = Logger("container.player")
+  override lazy val logger = Logger("container.player")
 
   override def servicesJs = {
     import org.corespring.container.client.controllers.resources.routes._
@@ -63,4 +63,29 @@ trait Player
 
   override def additionalScripts: Seq[String] = Seq(PlayerRoutes.services().url)
 
+}
+
+trait JsonPlayer extends BasePlayer {
+
+  override protected def configToResult(xhtml: Option[String], ngDependencies: Seq[String], js: Seq[String], css: Seq[String]): SimpleResult = {
+    val json = configJson(
+      processXhtml(xhtml),
+      ngDependencies,
+      js,
+      css
+      )
+     Ok(json)
+  }
+}
+
+trait DevHtmlPlayer extends BasePlayer {
+  override protected def configToResult(xhtml: Option[String], ngDependencies: Seq[String], js: Seq[String], css: Seq[String]) : SimpleResult = {
+    Ok(org.corespring.container.client.views.html.playerDev(xhtml.getOrElse("?"), ngDependencies, js, css))
+  }
+}
+
+trait ProdHtmlPlayer extends BasePlayer {
+  override protected def configToResult(xhtml: Option[String], ngDependencies: Seq[String], js: Seq[String], css: Seq[String]) : SimpleResult = {
+    Ok(org.corespring.container.client.views.html.playerProd(xhtml.getOrElse("?"), ngDependencies, js, css))
+  }
 }
