@@ -66,7 +66,7 @@ trait JsContext extends JsLogging {
   def console: Option[JsConsole] = Some(new DefaultLogger(Logger("js.console")))
 
   def withJsContext[A](libs: Seq[String], srcs: Seq[(String, String)] = Seq.empty)(f: (Context, Scriptable) => Either[JavascriptError, A]): Either[JavascriptError, A] = {
-    val ctx = Context.enter
+    val ctx = Context.enter()
     ctx.setErrorReporter(new LocalErrorReporter)
     ctx.setOptimizationLevel(-1)
     val global = new Global
@@ -99,7 +99,7 @@ trait JsContext extends JsLogging {
       case e: RhinoException => Left(RhinoJsError(e))
       case e: Throwable => throw e
     } finally {
-      Context.exit
+      Context.exit()
     }
   }
 
