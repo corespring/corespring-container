@@ -62,30 +62,18 @@ trait BasePlayer
   }
 
   override def additionalScripts: Seq[String] = Seq(PlayerRoutes.services().url)
-
 }
 
-trait JsonPlayer extends BasePlayer {
-
-  override protected def configToResult(xhtml: Option[String], ngDependencies: Seq[String], js: Seq[String], css: Seq[String]): SimpleResult = {
-    val json = configJson(
-      processXhtml(xhtml),
-      ngDependencies,
-      js,
-      css
-      )
-     Ok(json)
-  }
-}
+trait JsonPlayer extends BasePlayer {}
 
 trait DevHtmlPlayer extends BasePlayer {
-  override protected def configToResult(xhtml: Option[String], ngDependencies: Seq[String], js: Seq[String], css: Seq[String]) : SimpleResult = {
+  override protected def configToResult(xhtml: Option[String], ngDependencies: Seq[String], js: Seq[String], css: Seq[String]): SimpleResult = {
     Ok(org.corespring.container.client.views.html.playerDev(xhtml.getOrElse("?"), ngDependencies, js, css))
   }
 }
 
 trait ProdHtmlPlayer extends BasePlayer {
-  override protected def configToResult(xhtml: Option[String], ngDependencies: Seq[String], js: Seq[String], css: Seq[String]) : SimpleResult = {
+  override protected def configToResult(xhtml: Option[String], ngDependencies: Seq[String], js: Seq[String], css: Seq[String]): SimpleResult = {
     Ok(org.corespring.container.client.views.html.playerProd(xhtml.getOrElse("?"), ngDependencies, js, css))
   }
 }

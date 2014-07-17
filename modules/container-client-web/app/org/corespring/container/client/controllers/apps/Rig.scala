@@ -4,11 +4,11 @@ import org.corespring.container.client.component.PlayerItemTypeReader
 import org.corespring.container.client.controllers.angular.AngularModules
 import org.corespring.container.client.hooks.ClientHooks
 import org.corespring.container.client.hooks.Hooks.StatusMessage
-import org.corespring.container.components.model.{ComponentInfo, Interaction}
-import play.api.libs.json.{JsValue, Json}
-import play.api.mvc.{SimpleResult, Action, RequestHeader}
+import org.corespring.container.components.model.{ ComponentInfo, Interaction }
+import play.api.libs.json.{ JsValue, Json }
+import play.api.mvc.{ SimpleResult, Action, RequestHeader }
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ ExecutionContext, Future }
 
 trait Rig extends AppWithConfig[ClientHooks] with PlayerItemTypeReader {
 
@@ -49,13 +49,4 @@ trait Rig extends AppWithConfig[ClientHooks] with PlayerItemTypeReader {
 
   override def ngModules: AngularModules = new AngularModules()
 
-  override protected def configToResult(xhtml: Option[String], ngDependencies: Seq[String], js: Seq[String], css: Seq[String]): SimpleResult = {
-    val json = configJson(
-      processXhtml(xhtml),
-      ngDependencies,
-      js,
-      css
-    )
-    Ok(json)
-  }
 }

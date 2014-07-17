@@ -7,7 +7,7 @@ import org.corespring.container.client.views.txt.js.EditorServices
 import org.corespring.container.components.model.ComponentInfo
 import play.api.Logger
 import play.api.libs.json._
-import play.api.mvc.{SimpleResult, Action, AnyContent}
+import play.api.mvc.{ SimpleResult, Action, AnyContent }
 
 import scala.concurrent.Future
 
@@ -19,16 +19,6 @@ trait Editor
   override lazy val logger = Logger("container.editor")
 
   override def context: String = "editor"
-
-  override protected def configToResult(xhtml: Option[String], ngDependencies: Seq[String], js: Seq[String], css: Seq[String]): SimpleResult = {
-    val json = configJson(
-      processXhtml(xhtml),
-      ngDependencies,
-      js,
-      css
-    )
-    Ok(json)
-  }
 
   private def toJson(ci: ComponentInfo): JsValue = {
     val tag = tagName(ci.id.org, ci.id.name)
@@ -77,7 +67,7 @@ trait Editor
       controllers.Assets.at("/container-client", page)(request)
     }
 
-    hooks.loadItem(itemId).flatMap { e => e.fold(onError, onItem)}
+    hooks.loadItem(itemId).flatMap { e => e.fold(onError, onItem) }
   }
 
 }

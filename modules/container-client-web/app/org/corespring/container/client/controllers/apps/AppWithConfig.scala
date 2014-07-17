@@ -44,7 +44,14 @@ trait AppWithConfig[T <: ClientHooks]
     }
   }
 
-  protected def configToResult(xhtml: Option[String], ngDependencies: Seq[String], js: Seq[String], css: Seq[String]): SimpleResult
+  protected def configToResult(xhtml: Option[String], ngDependencies: Seq[String], js: Seq[String], css: Seq[String]): SimpleResult = {
+    val json = configJson(
+      processXhtml(xhtml),
+      ngDependencies,
+      js,
+      css)
+    Ok(json)
+  }
 
   def config(id: String) = Action.async { implicit request =>
     hooks.loadItem(id).map(handleSuccess { (itemJson) =>
@@ -66,16 +73,10 @@ trait AppWithConfig[T <: ClientHooks]
       val css = Seq(cssUrl)
 
       configToResult(
-      Some(processXhtml((itemJson \ "xhtml").asOpt[String])),
-      dependencies,
-      js,
-      css)
-      /*al json = configJson(
-        processXhtml((itemJson \ "xhtml").asOpt[String]),
+        Some(processXhtml((itemJson \ "xhtml").asOpt[String])),
         dependencies,
         js,
         css)
-      Ok(json)*/
     })
   }
 
