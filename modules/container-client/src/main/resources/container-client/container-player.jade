@@ -1,26 +1,17 @@
-extends player-base
+extends player
 
-block player-content
-  div#root.container(ng-controller="Root", dimension-propagator="")
+block player-header
 
-    div(ng-controller="Main")
+  div(player-control-panel="")
 
-      player-control-panel(playerSettings="evaluateOptions")
+block player-child
+  .container-player(ng-controller="ContainerPlayerControls")
+    br/
+    button.btn.btn-primary(ng-click="submit()",ng-disabled="!canSubmit()") Submit
+    button.btn.btn-warning(ng-click="reset()") Reset
+    hr/
+    .score(ng-show="score")
+      | You scored {{score.summary.percentage}}%
 
-      div(corespring-player,
-        player-mode="player",
-        player-markup="item.xhtml",
-        player-item="item",
-        player-session="session",
-        player-outcomes="outcome")
-
-      summary-feedback(template="player.jade",item="item",session="session")
-
-      .container-player(ng-controller="ContainerPlayerControls")
-        br/
-        button.btn.btn-primary(ng-click="submit()",ng-disabled="!canSubmit()") Submit
-        button.btn.btn-warning(ng-click="reset()") Reset
-        hr/
-        .score(ng-show="score")
-          | You scored {{score.summary.percentage}}%
-
+block extra-scripts
+  script(src="../../js/render/controllers/container-player-controls.js", type="text/javascript")
