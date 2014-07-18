@@ -94,13 +94,13 @@ trait AppWithConfig[T <: ClientHooks]
       }
   }.getOrElse("<div><h1>New Item</h1></div>")
 
-  private def getClientSideDependencies(comps: Seq[Component]): Seq[ClientSideDependency] = {
+  protected def getClientSideDependencies(comps: Seq[Component]): Seq[ClientSideDependency] = {
     val packages = comps.map(_.packageInfo)
     val deps = packages.flatMap(p => (p \ "dependencies").asOpt[JsObject])
     deps.map(ClientDependencies(_)).flatten
   }
 
-  private def get3rdPartyScripts(deps: Seq[ClientSideDependency]): Seq[String] = {
+  protected def get3rdPartyScripts(deps: Seq[ClientSideDependency]): Seq[String] = {
     val scripts = deps.map {
       d =>
         d.files match {
@@ -111,7 +111,7 @@ trait AppWithConfig[T <: ClientHooks]
     scripts
   }
 
-  private def getLocalScripts(comps: Seq[Component]): Seq[String] = {
+  protected def getLocalScripts(comps: Seq[Component]): Seq[String] = {
 
     def assetPath(compAndPath: (Component, Seq[String]), acc: Seq[String]) = {
       val (c, filenames) = compAndPath

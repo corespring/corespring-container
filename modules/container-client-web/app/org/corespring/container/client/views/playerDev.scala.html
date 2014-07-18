@@ -1,4 +1,4 @@
-@(xhtml:String, ngModules:Seq[String], js : Seq[String], css : Seq[String] )
+@(xhtml:String, ngModules:Seq[String], js : Seq[String], css : Seq[String], session : JsValue )
 
 @extraLibs = @{
   Seq("../../components/es5-shim/es5-shim.min.js",
@@ -55,5 +55,5 @@
         }
 
 
-@playerRoot( xhtml, ngModules, extraLibs ++ js, css ++ Seq() )
+@playerRoot( xhtml, ngModules, extraLibs ++ js, css ++ Seq(), session )
 

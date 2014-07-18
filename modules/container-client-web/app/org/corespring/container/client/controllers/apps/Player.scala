@@ -3,8 +3,11 @@ package org.corespring.container.client.controllers.apps
 import org.corespring.container.client.hooks.PlayerHooks
 import org.corespring.container.client.component.PlayerItemTypeReader
 import org.corespring.container.client.views.txt.js.PlayerServices
+import org.corespring.container.components.model.Id
 import play.api.Logger
+import play.api.libs.json.{JsValue, Json}
 import play.api.mvc._
+import play.api.templates.HtmlFormat
 
 import scala.concurrent.Future
 
@@ -66,14 +69,43 @@ trait BasePlayer
 
 trait JsonPlayer extends BasePlayer {}
 
-trait DevHtmlPlayer extends BasePlayer {
-  override protected def configToResult(xhtml: Option[String], ngDependencies: Seq[String], js: Seq[String], css: Seq[String]): SimpleResult = {
-    Ok(org.corespring.container.client.views.html.playerDev(xhtml.getOrElse("?"), ngDependencies, js, css))
+trait HtmlPlayer extends BasePlayer {
+
+  val template : (String, Seq[String], Seq[String], Seq[String], JsValue) => play.api.templates.HtmlFormat.Appendable
+
+  override def config(id: String) = Action.async { implicit request =>
+
+    hooks.loadSessionAndItem(id).map{
+      case Left((code,msg)) => Status(code)(Json.obj("error" -> msg))
+      case Right((session, itemJson)) => {
+
+        val typeIds = componentTypes(itemJson).map {
+          t =>
+            val typeRegex(org, name) = t
+            new Id(org, name)
+        }
+
+        val resolvedComponents = resolveComponents(typeIds, Some(context))
+        val jsUrl = urls.jsUrl(context, resolvedComponents)
+        val cssUrl = urls.cssUrl(context, resolvedComponents)
+
+        val clientSideDependencies = getClientSideDependencies(resolvedComponents)
+        val dependencies = ngModules.createAngularModules(resolvedComponents, clientSideDependencies)
+        val clientSideScripts = get3rdPartyScripts(clientSideDependencies)
+        val localScripts = getLocalScripts(resolvedComponents)
+        val js = (clientSideScripts ++ localScripts ++ additionalScripts :+ jsUrl).distinct
+        val css = Seq(cssUrl)
+
+        Ok(template(processXhtml((itemJson \ "xhtml").asOpt[String]), dependencies, js, css, Json.obj( "session" -> session, "item" -> itemJson)))
+        }
+      }
+    }
   }
+
+trait DevHtmlPlayer extends HtmlPlayer{
+  override val template = org.corespring.container.client.views.html.playerDev.apply _
 }
 
-trait ProdHtmlPlayer extends BasePlayer {
-  override protected def configToResult(xhtml: Option[String], ngDependencies: Seq[String], js: Seq[String], css: Seq[String]): SimpleResult = {
-    Ok(org.corespring.container.client.views.html.playerProd(xhtml.getOrElse("?"), ngDependencies, js, css))
-  }
+trait ProdHtmlPlayer extends HtmlPlayer {
+  override val template = org.corespring.container.client.views.html.playerProd.apply _
 }
