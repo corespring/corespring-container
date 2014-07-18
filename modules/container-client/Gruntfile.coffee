@@ -53,7 +53,7 @@ module.exports = (grunt) ->
         '<%= common.dist %>/bower_components/jquery-ui/jquery-ui.min.js',
         '<%= common.dist %>/bower_components/angular/angular.min.js',
         '<%= common.dist %>/bower_components/lodash/dist/lodash.min.js',
-        '<%= common.dist %>/bower_components/angular-ui-sortable/sortable.js',
+        '<%= common.dist %>/bower_components/angular-ui-sortable/sortable.min.js',
         '<%= common.dist %>/bower_components/mathjs/dist/math.min.js',
         '<%= common.dist %>/bower_components/saxjs/lib/sax.js'
       ]
@@ -209,6 +209,17 @@ module.exports = (grunt) ->
       prod: jadeConfig(apps, ".prod.html", false )
       dev: jadeConfig(apps, ".dev.html", true )
 
+    ejs:
+      prod: 
+        options: 
+          scripts: [pathsFor(common.core, false), pathsFor(common.coreLibs, false), pathsFor(common.player, false)]
+        src: ['**/*.jade.ejs']
+        cwd: '<%= common.app %>'
+        dest: '<%= common.dist %>'
+        expand: true
+        ext: '.jade'
+
+
     jasmine:
       unit:
         src: [
@@ -258,6 +269,14 @@ module.exports = (grunt) ->
           common.catalog
         ]
 
+      prodPlayer: 
+        options:
+          sourceMap:true
+          compress: false
+          mangle: false 
+        files: [ common.prodPlayer ]
+
+
     compress: 
       generated: 
         options: 
@@ -280,6 +299,7 @@ module.exports = (grunt) ->
         ]
 
 
+
   grunt.initConfig(config)
 
   npmTasks = [
@@ -296,6 +316,7 @@ module.exports = (grunt) ->
     'grunt-contrib-copy',
     'grunt-contrib-compress',
     'grunt-usemin',
+    'grunt-ejs',
     'grunt-bower-clean'
   ]
 
@@ -314,5 +335,7 @@ module.exports = (grunt) ->
   grunt.registerTask('prepPlayerLauncher', 'prep the player launcher js', prepPlayerLauncher(grunt))
   grunt.registerTask('run', ['clean:uglified', 'uglify', 'jade', 'less', 'watch'])
   grunt.registerTask('test', ['shell:bower', 'shell:bowerCacheClean', 'lcd', 'prepPlayerLauncher', 'jasmine:unit'])
-  grunt.registerTask('default', ['shell:bower', 'lcd', 'clean_bower', 'clean:uglified', 'jshint', 'uglify', 'copy', 'less', 'jade', 'compress', 'prepPlayerLauncher','jasmine:unit'])
+  grunt.registerTask('uglification', ['clean:uglified', 'uglify:concatOnly', 'uglify:minifyAndConcat', 'uglify:player'])
+  grunt.registerTask('default', ['shell:bower', 'lcd', 'clean_bower', 'jshint', 'uglification', 'copy', 'less', 'jade', 'compress', 'prepPlayerLauncher','jasmine:unit'])
   grunt.registerTask('minify-test', ['concat', 'uglify'])
+  grunt.registerTask('ejs-test', ['ejs'])

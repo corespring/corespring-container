@@ -1,13 +1,18 @@
 package org.corespring.container.client.controllers.apps
 
+import java.io.{Reader, InputStreamReader, BufferedReader, FileReader}
+import java.net.URL
+
+import de.neuland.jade4j.{JadeConfiguration, Jade4J}
+import de.neuland.jade4j.template.{FileTemplateLoader, JadeTemplate}
 import org.corespring.container.client.hooks.PlayerHooks
 import org.corespring.container.client.component.PlayerItemTypeReader
 import org.corespring.container.client.views.txt.js.PlayerServices
 import org.corespring.container.components.model.Id
-import play.api.Logger
+import play.api.{Play, Logger}
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc._
-import play.api.templates.HtmlFormat
+import play.api.templates.{Html, HtmlFormat}
 
 import scala.concurrent.Future
 
@@ -71,6 +76,21 @@ trait JsonPlayer extends BasePlayer {}
 
 trait HtmlPlayer extends BasePlayer {
 
+  val jadeConfig = {
+    val c = new JadeConfiguration
+    c.setTemplateLoader(new FileTemplateLoader("container-client/", "UTF-8"))
+    c.setMode(Jade4J.Mode.HTML)
+    c.setPrettyPrint(false)
+    c
+  }
+
+  lazy val jadeTemplate : JadeTemplate = {
+    val name = "opt-player.jade"
+    Jade4J.getTemplate(name)
+  }
+
+  //String html = Jade4J.render(template, model);
+
   val template : (String, Seq[String], Seq[String], Seq[String], JsValue) => play.api.templates.HtmlFormat.Appendable
 
   override def config(id: String) = Action.async { implicit request =>
@@ -103,7 +123,12 @@ trait HtmlPlayer extends BasePlayer {
   }
 
 trait DevHtmlPlayer extends HtmlPlayer{
-  override val template = org.corespring.container.client.views.html.playerDev.apply _
+  override val template = { (html:String, deps : Seq[String], js : Seq[String], css : Seq[String], json : JsValue) =>
+    import scala.collection.JavaConversions._
+    val m : java.util.Map[String,Object] = Map[String,Object]()
+    val out : String = jadeConfig.renderTemplate(jadeTemplate, m)//.renderTemplate(jadeTemplate, locals)
+    Html(new StringBuilder("hi").toString)
+  }
 }
 
 trait ProdHtmlPlayer extends HtmlPlayer {
