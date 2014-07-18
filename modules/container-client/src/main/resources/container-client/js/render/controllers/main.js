@@ -1,13 +1,13 @@
 angular.module('corespring-player.controllers')
   .controller(
     'Main', [
-      '$scope',
-      '$log',
-      '$timeout',
       '$location',
+      '$log',
+      '$scope',
+      '$timeout',
       'ComponentRegister',
       'PlayerService',
-      function($scope, $log, $timeout, $location, ComponentRegister, PlayerServiceDef) {
+      function($location, $log, $scope, $timeout, ComponentRegister, PlayerServiceDef) {
 
         var PlayerService = new PlayerServiceDef();
 
@@ -131,11 +131,15 @@ angular.module('corespring-player.controllers')
         };
 
         $scope.onSessionLoadError = function(error) {
-          $log.warn("Error loading session");
+          $log.warn("Error loading session", error);
+        };
+
+        $scope.onSessionReopenedError = function(error) {
+          $log.warn("Error reopening session", error);
         };
 
         $scope.onSessionSaveError = function(error) {
-          $log.warn("Error saving session");
+          $log.warn("Error saving session", error);
         };
 
         $scope.onEverythingLoaded = function(data) {
@@ -146,6 +150,16 @@ angular.module('corespring-player.controllers')
           $scope.score = data.score;
           $scope.isComplete = data.session ? data.session.isComplete : false;
           $scope.$emit("session-loaded", data.session);
+        };
+
+        $scope.onSessionReopened = function(session) {
+          $log.info("onSessionReopened", session);
+          $scope.session = session;
+          $scope.outcome = undefined;
+          $scope.score = undefined;
+          $scope.isComplete = false;
+
+          ComponentRegister.reset();
         };
 
         $scope.resetPreview = function() {
@@ -161,12 +175,17 @@ angular.module('corespring-player.controllers')
         };
 
         $scope.$on('begin', function() {
+          $log.debug('[on begin]');
           PlayerService.loadSession($scope.onEverythingLoaded, $scope.onSessionLoadError, $scope.sessionId);
+        });
+
+        $scope.$on('resetPreview', function() {
+          PlayerService.reopenSession($scope.onSessionReopened, $scope.onSessionReopenedError, $scope.sessionId);
         });
 
         $scope.$on('saveResponses', function(event, data, callback) {
 
-          $log.debug('[onSaveResponses] -> ', data);
+          $log.debug('[onSaveResponses] -> ', data, callback);
 
           function onSaved(err, result) {
             if (callback) {

@@ -44,6 +44,10 @@ trait Session extends Controller with ItemPruner with HasContext {
     hooks.load(id).map(basicHandler(Ok(_)))
   }
 
+  def reopenSession(id: String) = Action.async { implicit request =>
+    hooks.reopen(id).map(basicHandler(Ok(_)))
+  }
+
   def loadEverything(id: String) = Action.async { implicit request =>
     hooks.loadEverything(id).map(basicHandler { fs =>
 

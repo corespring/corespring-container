@@ -5,7 +5,7 @@ import org.corespring.container.client.hooks.{ FullSession, SaveSession, Session
 import org.corespring.mongo.json.services.MongoService
 import play.api.Logger
 import play.api.http.Status._
-import play.api.libs.json.{ JsValue, Json }
+import play.api.libs.json.{ JsObject, Json, JsValue }
 import play.api.mvc._
 
 import scala.concurrent.{ ExecutionContext, Future }
@@ -57,6 +57,26 @@ trait SessionHooks extends ContainerSessionHooks {
       json =>
         Right(json)
     }.getOrElse(Left(NOT_FOUND -> s"Can't find a session with id: $id"))
+  }
+
+  override def reopen(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]] = Future {
+    logger.debug(s"reopen session: $id")
+
+    def reopenSession(session: JsValue) = {
+      val reopenedSession = session.as[JsObject] ++
+        Json.obj("isComplete" -> false) ++
+        Json.obj("components" -> Json.obj()) ++
+        Json.obj("attempts" -> 0)
+      sessionService.save(id, reopenedSession)
+      reopenedSession
+    }
+
+    val result = for {
+      session <- sessionService.load(id)
+    } yield {
+      if (isSecure(header)) session else reopenSession(session)
+    }
+    result.map(Right(_)).getOrElse(Left(BAD_REQUEST -> ""))
   }
 
   override def save(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, SaveSession]] = Future {

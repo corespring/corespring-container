@@ -58,6 +58,8 @@ trait SessionHooks extends HasContext {
 
   def load(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]]
 
+  def reopen(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]]
+
   def loadOutcome(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, SessionOutcome]]
 
   def getScore(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, SessionOutcome]]
