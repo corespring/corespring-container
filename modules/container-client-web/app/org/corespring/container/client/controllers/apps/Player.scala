@@ -94,6 +94,8 @@ trait HtmlPlayer extends BasePlayer {
 
   import Play.current
 
+  val name = "server-generated-player.jade"
+
   val jadeConfig = {
     val c = new JadeConfiguration
     c.setTemplateLoader(new TL("container-client"))
@@ -103,7 +105,6 @@ trait HtmlPlayer extends BasePlayer {
   }
 
   lazy val jadeTemplate: JadeTemplate = {
-    val name = "opt-player.jade"
     jadeConfig.getTemplate(name)
   }
 
@@ -150,6 +151,8 @@ trait HtmlPlayer extends BasePlayer {
   }
 }
 
-trait DevHtmlPlayer extends HtmlPlayer {}
+trait DevHtmlPlayer extends HtmlPlayer {
+  override def config(id:String) = Action(SeeOther(org.corespring.container.client.controllers.apps.routes.ProdHtmlPlayer.config(id).url))
+}
 
 trait ProdHtmlPlayer extends HtmlPlayer {}
