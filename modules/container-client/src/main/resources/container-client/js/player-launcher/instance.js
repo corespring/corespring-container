@@ -44,7 +44,7 @@ var Instance = function(element, options, errorCallback, log) {
     }
   };
 
-  var listener = require("root-level-listener")();
+  var listener = require("root-level-listener")(log);
   var listenersToRemove = [];
 
   var findDestinationIframe = function(event) {
@@ -147,12 +147,16 @@ var Instance = function(element, options, errorCallback, log) {
       return data;
     });
 
-    function resultHandler(event) {
+    var resultHandlerForThisInstance;
 
-      var uid = new Date().getTime();
+    var resultHandler = function(event) {
+      listener.removeListener(resultHandlerForThisInstance);
+      var index = listenersToRemove.indexOf(resultHandlerForThisInstance);
+      if (index >= 0) {
+        listenersToRemove.splice(index, 1);
+      }
 
       try {
-        var dataString = event.data;
         var data = typeof(event.data) === "string" ? JSON.parse(event.data) : event.data;
         if (data.message === message) {
           callback(dataProcessor(data));
@@ -160,10 +164,9 @@ var Instance = function(element, options, errorCallback, log) {
       } catch (e) {
         log.error("Exception in [player-instance] : " + e);
       }
-      listener.removeListener(this);
-    }
+    };
 
-    var resultHandlerForThisInstance = forThisInstance(resultHandler);
+    resultHandlerForThisInstance = forThisInstance(resultHandler);
     listener.addListener(resultHandlerForThisInstance);
     detachOnRemove(resultHandlerForThisInstance);
   }

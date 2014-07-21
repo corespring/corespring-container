@@ -55,7 +55,7 @@ var Listener = function(log){
   this.removeListener = function(callback){
     var index = listeners.indexOf(callback);
     if(index === -1){
-      throw "Can't find callback in listeners";
+      log.error("Can't find callback in listeners: "+callback);
     }
     listeners.splice(index, 1);
   };
@@ -70,7 +70,8 @@ module.exports = function(log){
   if(!log){
 
     log = {
-      debug: function(){ console.debug(arguments); }
+      debug: function(){ console.debug(arguments); },
+      error: function(){ console.error(arguments); }
     };
   }
 

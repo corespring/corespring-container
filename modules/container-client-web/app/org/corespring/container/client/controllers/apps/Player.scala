@@ -11,6 +11,7 @@ import org.corespring.container.client.views.txt.js.PlayerServices
 import org.corespring.container.components.model.Id
 import play.api.{ Mode, Play, Logger }
 import play.api.libs.json.{ JsValue, Json }
+import play.api.{Play, Logger}
 import play.api.mvc._
 import play.api.templates.{ Html, HtmlFormat }
 
@@ -26,6 +27,8 @@ trait BasePlayer
   override def context: String = "player"
 
   override lazy val logger = Logger("container.player")
+
+  def showErrorInUi : Boolean
 
   override def servicesJs = {
     import org.corespring.container.client.controllers.resources.routes._
@@ -51,7 +54,7 @@ trait BasePlayer
 
       maybeError.map { sm =>
         val (code, msg) = sm
-        Future(Ok(org.corespring.container.client.views.html.error.main(code, msg)))
+        Future(Ok(org.corespring.container.client.views.html.error.main(code, msg, showErrorInUi)))
       }.getOrElse {
 
         def playerPage(request: Request[AnyContent]) = {

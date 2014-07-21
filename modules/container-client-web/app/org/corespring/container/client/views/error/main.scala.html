@@ -1,4 +1,4 @@
-@(code:Int, msg:String)
+@(code:Int, msg:String, showUserError:Boolean)
 <html>
 <head>
     <style type="text/css">
@@ -21,7 +21,11 @@
 
                 if(parent != window){
                   parent.postMessage(JSON.stringify(error), "*");
-                } else {
+                }
+
+                var showUserError = @showUserError;
+
+                if(showUserError){
                   $("#error").html( "@code: @msg");
                 }
             });
