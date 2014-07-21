@@ -37,6 +37,8 @@ class EditorTest extends Specification with Mockito{
       override def components: Seq[Component] = {
         Seq.empty
       }
+
+      override def showErrorInUi: Boolean = false
     }
   }
 
@@ -52,7 +54,7 @@ class EditorTest extends Specification with Mockito{
       "show the error page" in new editorScope(Left(BAD_REQUEST, "bad")){
         val r = editor.editItem("itemId")(FakeRequest("", ""))
         status(r) === BAD_REQUEST
-        contentAsString(r) === org.corespring.container.client.views.html.error.main(BAD_REQUEST, "bad").toString
+        contentAsString(r) === org.corespring.container.client.views.html.error.main(BAD_REQUEST, "bad", false).toString
       }
     }
   }

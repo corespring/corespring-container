@@ -14,6 +14,7 @@ import org.corespring.container.components.processing.PlayerItemPreProcessor
 import org.corespring.container.components.response.OutcomeProcessor
 import org.corespring.container.js.rhino.score.ItemJsScoreProcessor
 import org.corespring.container.js.rhino.{ RhinoOutcomeProcessor, RhinoPlayerItemPreProcessor }
+import play.api.{Play, Mode}
 
 import scala.concurrent.ExecutionContext
 
@@ -27,6 +28,10 @@ trait DefaultIntegration
   def validate: Either[String, Boolean] = {
     val componentsPath = configuration.getString("components.path").getOrElse("components")
     Validator.absolutePathInProdMode(componentsPath)
+  }
+
+  def showErrorInUi : Boolean = {
+    Play.current.mode == Mode.Dev || configuration.getBoolean("showErrorInUi").getOrElse(false)
   }
 
   implicit def ec: ExecutionContext
@@ -57,6 +62,8 @@ trait DefaultIntegration
 
   lazy val editor = new Editor {
 
+    override def showErrorInUi: Boolean = DefaultIntegration.this.showErrorInUi
+
     override implicit def ec: ExecutionContext = DefaultIntegration.this.ec
 
     override def urls: ComponentUrls = componentUrls
@@ -67,6 +74,9 @@ trait DefaultIntegration
   }
 
   lazy val catalog = new Catalog {
+
+    override def showErrorInUi: Boolean = DefaultIntegration.this.showErrorInUi
+
     override implicit def ec: ExecutionContext = DefaultIntegration.this.ec
 
     override def urls: ComponentUrls = componentUrls
@@ -75,6 +85,8 @@ trait DefaultIntegration
   }
 
   lazy val jsonPlayer = new JsonPlayer {
+
+    override def showErrorInUi: Boolean = DefaultIntegration.this.showErrorInUi
 
     override implicit def ec: ExecutionContext = DefaultIntegration.this.ec
 
@@ -87,6 +99,8 @@ trait DefaultIntegration
 
   lazy val devHtmlPlayer = new DevHtmlPlayer {
 
+    override def showErrorInUi: Boolean = DefaultIntegration.this.showErrorInUi
+
     override implicit def ec: ExecutionContext = DefaultIntegration.this.ec
 
     override def urls: ComponentUrls = componentUrls
@@ -97,6 +111,8 @@ trait DefaultIntegration
   }
 
   lazy val prodHtmlPlayer = new ProdHtmlPlayer {
+
+    override def showErrorInUi: Boolean = DefaultIntegration.this.showErrorInUi
 
     override implicit def ec: ExecutionContext = DefaultIntegration.this.ec
 
