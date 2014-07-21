@@ -113,3 +113,17 @@ td.para-left {
   vertical-align:middle;
   min-width:50px;
 }
+
+table.no-border {
+  margin: 0 0 10px;
+  width: 100%;
+
+  tbody tr td {
+    border: none;
+    vertical-align: bottom;
+
+    &.right-dashed-border {
+      border-right: 2px dashed #EEE;
+    }
+  }
+}
