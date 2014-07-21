@@ -84,7 +84,7 @@
           '    <button class="btn action preview" ng-click="preview()"',
           '      >Preview</button>',
           '    <button class="btn action feedback-mode"',
-          '      >Feedback Mode</button>',
+          '      >Feedback Mode <span class="caret"></span></button>',
           '  </div>',
           '</div>'
         ].join("\n")
