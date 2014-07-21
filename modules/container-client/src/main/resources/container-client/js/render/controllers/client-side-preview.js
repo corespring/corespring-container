@@ -81,6 +81,12 @@ var controller = function($scope, ComponentRegister, PlayerServiceDef) {
   $scope.$on('resetPreview', $scope.resetPreview);
   $scope.$on('resetStash', $scope.resetStash);
 
+  $scope.$on('setEvaluateOptions', function(event, evaluateOptions){
+    if (evaluateOptions) {
+      PlayerService.updateSessionSettings(evaluateOptions);
+    }
+  });
+
   $scope.$on('setMode', function(event, message) {
     if (message.mode) {
       $scope.setMode(message.mode);

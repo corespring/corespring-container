@@ -1,20 +1,17 @@
 script#designer-preview(type='text/ng-template')
   .client-side-preview(ng-controller="ClientSidePreview", ng-class="{previewHidden: isPreviewHidden()}")
-    //Note: not going to polish ui here - that's part of CA-1532
-    //For now just adding the button
-    button.btn.btn-warning(ng-click="preview()") Preview 
-    player-control-panel(player-settings="session.settings")
+    player-control-panel
 
-    corespring-preview-player(
-      player-mode="editor",
-      player-markup="data.item.xhtml",
-      player-item="data.item",
-      player-session="rootModel.session",
-      player-outcomes="outcome")
+    .player-container
 
-    summary-feedback(template="designer.jade",item="data.item",session="session")
+      corespring-preview-player(
+        player-mode="editor",
+        player-markup="data.item.xhtml",
+        player-item="data.item",
+        player-session="rootModel.session",
+        player-outcomes="outcome")
 
-    .button-holder
-      button.btn.btn-primary(ng-click="submit()", ng-disabled="!canSubmit()") Submit
-    hr/
+      summary-feedback(template="designer.jade",item="data.item",session="session")
 
+      .button-holder
+        button.btn.btn-primary(ng-click="submit()", ng-disabled="!canSubmit()") Submit

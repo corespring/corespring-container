@@ -8,30 +8,17 @@
   };
 
   angular.module('corespring-player.directives').directive('playerControlPanel', [
+
     function() {
       var link = function($scope, $element) {
-        var $configLink = $element.find('.action.config');
+        var $configLink = $element.find('.action.feedback-mode');
 
         $scope.showSettings = false;
         $scope.evaluateOptions = defaultSettings;
 
-        $scope.mode = 'gather';
-
         $scope.reset = function() {
           $scope.$broadcast('resetPreview');
         };
-
-        $scope.$watch('mode', function(mode) {
-          if ($configLink && $configLink.popover) {
-            if (mode === 'evaluate') {
-              $configLink.popover('enable');
-            } else {
-              $configLink.popover('disable');
-            }
-
-            $scope.$broadcast('setMode', { mode: $scope.mode, options: $scope.evaluateOptions, saveResponses: null } );
-          }
-        });
 
         $scope.hasScore = function() {
           return $scope.score && $scope.score.summary && !_.isNaN($scope.score.summary.percentage);
@@ -47,6 +34,7 @@
               $scope.evaluateOptions[attr] = $(input).is(':checked');
             }
           });
+          $scope.$broadcast('setEvaluateOptions', $scope.evaluateOptions);
         });
 
         function checkbox(prop, label) {
@@ -54,8 +42,7 @@
             '<li class="setting">',
             '  <label>',
             '    <input type="checkbox" ',
-            '      name="evaluateOptions.' + prop + '"',
-                   ($scope.evaluateOptions[prop] ? " checked='checked'" : ''),
+            '      name="evaluateOptions.' + prop + '"', ($scope.evaluateOptions[prop] ? " checked='checked'" : ''),
             '    >',
             '    <span>' + label + '</span>',
             '  </label>',
@@ -68,13 +55,14 @@
             html: true,
             placement: 'bottom',
             content: function() {
+
               return [
                 '<ul class="settings">',
-                   checkbox("highlightUserResponse", "Highlight user outcome"),
-                   checkbox("highlightCorrectResponse", "Highlight correct outcome"),
-                   checkbox("allowEmptyResponses", "Allow empty responses"),
+                checkbox("highlightUserResponse", "Highlight user outcome"),
+                checkbox("highlightCorrectResponse", "Highlight correct outcome"),
+                checkbox("allowEmptyResponses", "Allow empty responses"),
                 '</ul>',
-                '<a class="btn btn-success btn-small btn-sm" onclick=\"$(&quot;.action.config&quot;).popover(&quot;hide&quot;);\">Done</a>'
+                '<a class="btn btn-success btn-small btn-sm" onclick=\"$(&quot;.action.feedback-mode&quot;).popover(&quot;hide&quot;);\">Done</a>'
               ].join('\n');
             }
           });
@@ -86,25 +74,17 @@
         link: link,
         template: [
           '<div class="control-panel">',
-          '  <div class="score">',
-          '    <label ng-show="hasScore()">Score:</label>',
-          '    <span ng-show="hasScore()">{{score.summary.percentage}}%</span>',
+          '  <div class="score" ng-show="hasScore()">',
+          '    <label>Score:</label>',
+          '    <span>{{score.summary.percentage}}%</span>',
           '  </div>',
-
-          '  <div class="action reset">',
-          '    <a title="Reset" ng-click="reset()">',
-          '      <i class="fa fa-refresh" />',
-          '    </a>',
-          '  </div>',
-
           '  <div class="pull-right">',
-          '    <button class="btn btn-feedback" ng-model="mode"',
-          '      btn-checkbox-true="\'evaluate\'" btn-checkbox btn-checkbox-false="\'gather\'">Feedback Mode</button>',
-          '    <div class="action config">',
-          '      <a ng-class="{disabled: mode == \'gather\'}" title="Settings">',
-          '        <i class="fa fa-cog" />',
-          '      </a>',
-          '    </div>',
+          '    <button class="btn action reset" ng-click="reset()"',
+          '      >Reset</button>',
+          '    <button class="btn action preview" ng-click="preview()"',
+          '      >Preview</button>',
+          '    <button class="btn action feedback-mode"',
+          '      >Feedback Mode</button>',
           '  </div>',
           '</div>'
         ].join("\n")
