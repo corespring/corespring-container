@@ -212,7 +212,7 @@ module.exports = (grunt) ->
     ejs:
       prod: 
         options: 
-          scripts: [pathsFor(common.core, false), pathsFor(common.coreLibs, false), pathsFor(common.player, false)]
+          scripts: [pathsFor(common.coreLibs, false), pathsFor(common.core, false), pathsFor(common.player, false)]
         src: ['**/*.jade.ejs']
         cwd: '<%= common.app %>'
         dest: '<%= common.dist %>'
@@ -269,12 +269,12 @@ module.exports = (grunt) ->
           common.catalog
         ]
 
-      prodPlayer: 
-        options:
-          sourceMap:true
-          compress: false
-          mangle: false 
-        files: [ common.prodPlayer ]
+      #prodPlayer: 
+      #  options:
+      #    sourceMap:true
+      #    compress: false
+      #    mangle: false 
+      #  files: [ common.prodPlayer ]
 
 
     compress: 

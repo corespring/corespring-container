@@ -1,18 +1,18 @@
 package org.corespring.container.client.controllers.apps
 
-import java.io.{Reader, InputStreamReader, BufferedReader, FileReader}
+import java.io.{ Reader, InputStreamReader, BufferedReader, FileReader }
 import java.net.URL
 
-import de.neuland.jade4j.{JadeConfiguration, Jade4J}
-import de.neuland.jade4j.template.{FileTemplateLoader, JadeTemplate}
+import de.neuland.jade4j.{ JadeConfiguration, Jade4J }
+import de.neuland.jade4j.template.{ TemplateLoader, FileTemplateLoader, JadeTemplate }
 import org.corespring.container.client.hooks.PlayerHooks
 import org.corespring.container.client.component.PlayerItemTypeReader
 import org.corespring.container.client.views.txt.js.PlayerServices
 import org.corespring.container.components.model.Id
-import play.api.{Play, Logger}
-import play.api.libs.json.{JsValue, Json}
+import play.api.{ Mode, Play, Logger }
+import play.api.libs.json.{ JsValue, Json }
 import play.api.mvc._
-import play.api.templates.{Html, HtmlFormat}
+import play.api.templates.{ Html, HtmlFormat }
 
 import scala.concurrent.Future
 
@@ -74,29 +74,54 @@ trait BasePlayer
 
 trait JsonPlayer extends BasePlayer {}
 
+private class TL(val root: String) extends TemplateLoader {
+
+  import Play.current
+
+  override def getLastModified(name: String): Long = Play.resource(s"$root/$name").map { url =>
+    url.openConnection().getLastModified
+  }.getOrElse { throw new RuntimeException(s"Unable to load jade file as a resource from: $root/$name") }
+
+  override def getReader(name: String): Reader = Play.resource(s"$root/$name").map { url =>
+    new BufferedReader(new InputStreamReader(url.openStream()))
+  }.getOrElse { throw new RuntimeException(s"Unable to load jade file as a resource from: $root/$name") }
+}
+
 trait HtmlPlayer extends BasePlayer {
+
+  import Play.current
 
   val jadeConfig = {
     val c = new JadeConfiguration
-    c.setTemplateLoader(new FileTemplateLoader("container-client/", "UTF-8"))
+    c.setTemplateLoader(new TL("container-client"))
     c.setMode(Jade4J.Mode.HTML)
-    c.setPrettyPrint(false)
+    c.setPrettyPrint(Play.mode == Mode.Dev)
     c
   }
 
-  lazy val jadeTemplate : JadeTemplate = {
+  lazy val jadeTemplate: JadeTemplate = {
     val name = "opt-player.jade"
-    Jade4J.getTemplate(name)
+    jadeConfig.getTemplate(name)
   }
 
-  //String html = Jade4J.render(template, model);
+  def template(html: String, deps: Seq[String], js: Seq[String], css: Seq[String], json: JsValue) = {
+    import scala.collection.JavaConversions._
+    val params = Map(
+      "html" -> html,
+      "ngModules" -> s"[${deps.map(d => s"'$d'").mkString(",")}]",
+      "js" -> js.toArray,
+      "css" -> css.toArray,
+      "sessionJson" -> Json.stringify(json))
+    logger.trace(s"render jade with params: $params")
 
-  val template : (String, Seq[String], Seq[String], Seq[String], JsValue) => play.api.templates.HtmlFormat.Appendable
+    val rendered = jadeConfig.renderTemplate(jadeTemplate, params)
+    Html(new StringBuilder(rendered).toString)
+  }
 
   override def config(id: String) = Action.async { implicit request =>
 
-    hooks.loadSessionAndItem(id).map{
-      case Left((code,msg)) => Status(code)(Json.obj("error" -> msg))
+    hooks.loadSessionAndItem(id).map {
+      case Left((code, msg)) => Status(code)(Json.obj("error" -> msg))
       case Right((session, itemJson)) => {
 
         val typeIds = componentTypes(itemJson).map {
@@ -116,21 +141,12 @@ trait HtmlPlayer extends BasePlayer {
         val js = (clientSideScripts ++ localScripts ++ additionalScripts :+ jsUrl).distinct
         val css = Seq(cssUrl)
 
-        Ok(template(processXhtml((itemJson \ "xhtml").asOpt[String]), dependencies, js, css, Json.obj( "session" -> session, "item" -> itemJson)))
-        }
+        Ok(template(processXhtml((itemJson \ "xhtml").asOpt[String]), dependencies, js, css, Json.obj("session" -> session, "item" -> itemJson)))
       }
     }
   }
-
-trait DevHtmlPlayer extends HtmlPlayer{
-  override val template = { (html:String, deps : Seq[String], js : Seq[String], css : Seq[String], json : JsValue) =>
-    import scala.collection.JavaConversions._
-    val m : java.util.Map[String,Object] = Map[String,Object]()
-    val out : String = jadeConfig.renderTemplate(jadeTemplate, m)//.renderTemplate(jadeTemplate, locals)
-    Html(new StringBuilder("hi").toString)
-  }
 }
 
-trait ProdHtmlPlayer extends HtmlPlayer {
-  override val template = org.corespring.container.client.views.html.playerProd.apply _
-}
+trait DevHtmlPlayer extends HtmlPlayer {}
+
+trait ProdHtmlPlayer extends HtmlPlayer {}

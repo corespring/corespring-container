@@ -1,7 +1,9 @@
 !!! 5
 html(xmlns='http://www.w3.org/1999/html')
   head
-    - for c in css
+    link(href='//fonts.googleapis.com/css?family=Ubuntu:300,400,500,500italic,700', rel='stylesheet', type='text/css')
+    link(rel="stylesheet", href="../../css/player.css")
+    for c in css
       link(rel='stylesheet', href='#{c}')
 
   body(ng-app='corespring-player')
@@ -19,11 +21,17 @@ html(xmlns='http://www.w3.org/1999/html')
             player-outcomes='outcome')
               != xhtml
 
+
+    //[if lte IE 8]> <script src="../../js/common/ie-support/Function.bind.js"></script> <![endif]
+    //[if lte IE 8]> <script src="../../js/common/ie-support/Array.map.js"></script> <![endif]
+    //[if lte IE 9]> <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script> <![endif]
+    //[if lte IE 9]> <script src="//cdnjs.cloudflare.com/ajax/libs/json3/3.2.6/json3.min.js"></script> <![endif]
+    
     <% for(i in scripts) { %>
     script(type='text/javascript', src='<%= scripts[i] %>')
     <% } %>
 
-    - for j in js
+    for j in js
       script(type='text/javascript', src='#{j}')
     
     script(type='text/javascript')
@@ -43,7 +51,7 @@ html(xmlns='http://www.w3.org/1999/html')
               this.getScore = inst.getScore;
               this.completeResponse = inst.completeResponse;
               this.loadSession = function(onSuccess, onFailure, id) {
-                var sessionJson = #{sessionJson};
+                var sessionJson = !{sessionJson};
                 onSuccess(sessionJson);
               };
             this.loadOutcome = inst.loadOutcome;
