@@ -21,6 +21,8 @@ trait Catalog
 
   override def context: String = "catalog"
 
+  def showErrorInUi:Boolean
+
   override def servicesJs = {
     import org.corespring.container.client.controllers.resources.routes._
 
@@ -54,7 +56,7 @@ trait Catalog
 
         def onError(sm: StatusMessage) = {
           val (code, msg) = sm
-          Future(Status((code))(org.corespring.container.client.views.html.error.main(code, msg)))
+          Future(Status((code))(org.corespring.container.client.views.html.error.main(code, msg, showErrorInUi)))
         }
         e.fold(ifEmpty)(onError)
       }

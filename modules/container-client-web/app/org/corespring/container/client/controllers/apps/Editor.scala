@@ -18,6 +18,8 @@ trait Editor
 
   override lazy val logger = Logger("container.editor")
 
+  def showErrorInUi : Boolean
+
   override def context: String = "editor"
 
   private def toJson(ci: ComponentInfo): JsValue = {
@@ -55,7 +57,7 @@ trait Editor
       Future {
         code match {
           case SEE_OTHER => SeeOther(msg)
-          case _ => Status(code)(org.corespring.container.client.views.html.error.main(code, msg))
+          case _ => Status(code)(org.corespring.container.client.views.html.error.main(code, msg, showErrorInUi))
         }
       }
     }
