@@ -58,3 +58,16 @@ input[type="file"] > input[type="button"]::-moz-focus-inner {
 }
 
 
+table.no-border {
+  margin: 0 0 10px;
+  width: 100%;
+
+  tbody tr td {
+    border: none;
+    vertical-align: bottom;
+
+    &.right-dashed-border {
+      border-right: 2px dashed #EEE;
+    }
+  }
+}
