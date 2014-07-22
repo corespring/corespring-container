@@ -59,8 +59,7 @@ object Build extends sbt.Build {
       eeSnapshots,
       jade4jReleases,
       typesafeReleases,
-      typesafeSnapshots
-    )
+      typesafeSnapshots)
   }
 
   import Build.Dependencies._
@@ -182,6 +181,9 @@ object Build extends sbt.Build {
         utils,
         jsProcessing)
 
+  val containerProduction = builder.playApp("container-production").settings(
+    libraryDependencies ++= Seq(play.Keys.cache, closureCompiler, yuiCompressor)).dependsOn(containerClientWeb)
+
   val mongoJsonService = builder.playApp("mongo-json-service")
     .settings(playAppToSbtLibSettings: _*).settings(
       libraryDependencies ++= Seq(casbah))
@@ -200,8 +202,8 @@ object Build extends sbt.Build {
   val shell = builder.playApp("shell")
     .settings(
       libraryDependencies ++= Seq(logbackClassic, casbah, playS3, scalaz, play.Keys.cache, yuiCompressor, closureCompiler))
-    .dependsOn(containerClientWeb, componentLoader, mongoJsonService, docs)
-    .aggregate(containerClientWeb, componentLoader, containerClient, componentModel, utils, jsProcessing, mongoJsonService, docs)
+    .dependsOn(containerProduction, containerClientWeb, componentLoader, mongoJsonService, docs)
+    .aggregate(containerProduction, containerClientWeb, componentLoader, containerClient, componentModel, utils, jsProcessing, mongoJsonService, docs)
 
   val root = builder.playApp("root", Some("."))
     .settings(
