@@ -134,8 +134,8 @@ angular.module('corespring-player.controllers')
           $log.warn("Error loading session", error);
         };
 
-        $scope.onSessionReopenedError = function(error) {
-          $log.warn("Error reopening session", error);
+        $scope.onSessionResetError = function(error) {
+          $log.warn("Error resetting session", error);
         };
 
         $scope.onSessionSaveError = function(error) {
@@ -152,8 +152,8 @@ angular.module('corespring-player.controllers')
           $scope.$emit("session-loaded", data.session);
         };
 
-        $scope.onSessionReopened = function(session) {
-          $log.info("onSessionReopened", session);
+        $scope.onSessionReset = function(session) {
+          $log.info("onSessionReset", session);
           $scope.session = session;
           $scope.outcome = undefined;
           $scope.score = undefined;
@@ -180,7 +180,7 @@ angular.module('corespring-player.controllers')
         });
 
         $scope.$on('resetPreview', function() {
-          PlayerService.resetSession($scope.onSessionReopened, $scope.onSessionReopenedError, $scope.sessionId);
+          PlayerService.resetSession($scope.onSessionReset, $scope.onSessionResetError, $scope.sessionId);
         });
 
         $scope.$on('saveResponses', function(event, data, callback) {
