@@ -14,8 +14,15 @@ block content
             a(ui-sref="design({section: 'summary-feedback'})" ) Summary Feedback
           li(ui-sref-active="active")
             a(ui-sref="item-profile" ) Profile
-          li(ui-sref-active="active")
-            a(ui-sref="supporting-materials({intro: 'intro'})") Supporting Materials
+          li.dropdown(ng-class="{active: isSupportingMaterialsSection()}")
+            a.dropdown-toggle(data-toggle="dropdown") Supporting Materials <span class="caret"></span>
+            ul.dropdown-menu
+              li
+                a(ui-sref="supporting-materials({intro: 'intro'})") Add
+              li.divider
+              li(ng-repeat="supportingMaterial in data.item.supportingMaterials", ng-class="{ active: isSupportingMaterialActive(supportingMaterial, $index)}")
+                a.supporting-material-link(ui-sref="supporting-material({index: $index})") {{supportingMaterial.name}}
+                a.delete-supporting-material(ng-click="deleteSupportingMaterial($index)")
 
         .saver
           model-saver(

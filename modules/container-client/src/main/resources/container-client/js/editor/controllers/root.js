@@ -165,6 +165,10 @@ var controller = function($scope,
     return $location.path().replace(/^\/|\/$/g, '').indexOf(tab) !== -1;
   };
 
+  $scope.isSupportingMaterialsSection = function(){
+    return this.isActive("supporting-material") || this.isActive("supporting-materials");
+  };
+
   $scope.isSupportingMaterialActive = function(supportingMaterial, index) {
     return supportingMaterialIndex() === index;
   };
