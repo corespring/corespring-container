@@ -6,12 +6,15 @@ block content
     .nav-container
       nav.navbar.navbar-default.navbar-fixed-top
         ul.nav.navbar-nav
-          li(ui-sref-active="active")
-            a(ui-sref="design({section: 'main'})") Edit
-          li(ui-sref-active="active")
-            a(ui-sref="design({section: 'weighting'})" ) Weighting
-          li(ui-sref-active="active")
-            a(ui-sref="design({section: 'summary-feedback'})" ) Summary Feedback
+          li.dropdown(ng-class="{active: isActive('main') || isActive('weighting') || isActive('summary-feedback')}")
+            a.dropdown-toggle(data-toggle="dropdown") Edit <span class="caret"></span>
+            ul.dropdown-menu
+              li(ui-sref-active="active")
+                a(ui-sref="design({section: 'main'})" ) Item
+              li(ui-sref-active="active")
+                a(ui-sref="design({section: 'weighting'})" ) Weighting
+              li(ui-sref-active="active")
+                a(ui-sref="design({section: 'summary-feedback'})" ) Summary Feedback
           li(ui-sref-active="active")
             a(ui-sref="item-profile" ) Profile
           li.dropdown(ng-class="{active: isSupportingMaterialsSection()}")
