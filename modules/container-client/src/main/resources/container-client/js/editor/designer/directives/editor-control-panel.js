@@ -14,7 +14,7 @@
       '</div>'].join("\n");
   };
 
-  angular.module('corespring-editor.directives').directive('editorpControlPanel', [function(){
+  angular.module('corespring-editor.directives').directive('editorControlPanel', [function(){
 
         var link = function($scope, $elem, $attrs){
           console.log("player control panel");

@@ -78,7 +78,7 @@
           '    <label>Score:</label>',
           '    <span>{{score.summary.percentage}}%</span>',
           '  </div>',
-          '  <div class="pull-right">',
+          '  <div class="action-holder pull-right">',
           '    <button class="btn action reset" ng-click="reset()"',
           '      >Reset</button>',
           '    <button class="btn action preview" ng-click="preview()"',
