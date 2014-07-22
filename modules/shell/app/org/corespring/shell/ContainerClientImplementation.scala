@@ -1,6 +1,6 @@
 package org.corespring.shell
 
-import org.corespring.container.production.controllers.CachedCompressedAndMinifiedComponentSets
+import org.corespring.container.client.CompressedAndMinifiedComponentSets
 
 import scala.concurrent.{ ExecutionContext, Future }
 
@@ -93,7 +93,7 @@ class ContainerClientImplementation(
     override implicit def ec: ExecutionContext = ContainerClientImplementation.this.ec
   }
 
-  lazy val componentUrls = new CachedCompressedAndMinifiedComponentSets {
+  lazy val componentSets = new CompressedAndMinifiedComponentSets {
     override def allComponents: Seq[Component] = ContainerClientImplementation.this.components
 
     override def configuration = ContainerClientImplementation.this.configuration.getConfig("components").getOrElse(Configuration.empty)

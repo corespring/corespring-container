@@ -1,6 +1,6 @@
-package org.corespring.container.production.processing
+package org.corespring.container.client.processing
 
-import com.google.javascript.jscomp.{ JSSourceFile, CompilerOptions }
+import com.google.javascript.jscomp.{JSSourceFile, CompilerOptions}
 
 trait JsMinifier {
 

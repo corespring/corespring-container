@@ -1,6 +1,6 @@
-package org.corespring.container.production.processing
+package org.corespring.container.client.processing
 
-import java.io.{ StringWriter, StringReader }
+import java.io.{StringReader, StringWriter}
 
 trait CssMinifier {
 

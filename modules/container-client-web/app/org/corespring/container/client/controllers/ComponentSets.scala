@@ -6,7 +6,6 @@ import org.corespring.container.components.model.dependencies.DependencyResolver
 import play.api.Logger
 import play.api.http.ContentTypes
 import play.api.mvc._
-import scala.Some
 
 trait ComponentSets extends Controller with ComponentUrls {
 

@@ -52,6 +52,8 @@ object Build extends sbt.Build {
     var jade4jReleases = "jade4j" at "https://raw.github.com/neuland/jade4j/master/releases"
     val typesafeReleases = "typesafe releases" at "http://repo.typesafe.com/typesafe/releases/"
     val typesafeSnapshots = "typesafe snapshots" at "http://repo.typesafe.com/typesafe/snapshots/"
+    val memcached = "Spy Repository" at "http://files.couchbase.com/maven2" // required to resolve `spymemcached`, the plugin's dependency.
+
     val all = Seq(
       corespringSnapshots,
       corespringReleases,
@@ -59,7 +61,8 @@ object Build extends sbt.Build {
       eeSnapshots,
       jade4jReleases,
       typesafeReleases,
-      typesafeSnapshots)
+      typesafeSnapshots,
+      memcached)
   }
 
   import Build.Dependencies._
@@ -174,15 +177,14 @@ object Build extends sbt.Build {
         grizzled,
         htmlCleaner,
         scalaz,
-        jade4j),
+        jade4j,
+        closureCompiler,
+        yuiCompressor),
       templatesImport ++= Seq("play.api.libs.json.JsValue", "play.api.libs.json.Json")).dependsOn(
         componentModel % "compile->compile;test->test",
         containerClient,
         utils,
         jsProcessing)
-
-  val containerProduction = builder.playApp("container-production").settings(
-    libraryDependencies ++= Seq(play.Keys.cache, closureCompiler, yuiCompressor)).dependsOn(containerClientWeb)
 
   val mongoJsonService = builder.playApp("mongo-json-service")
     .settings(playAppToSbtLibSettings: _*).settings(
@@ -202,8 +204,8 @@ object Build extends sbt.Build {
   val shell = builder.playApp("shell")
     .settings(
       libraryDependencies ++= Seq(logbackClassic, casbah, playS3, scalaz, play.Keys.cache, yuiCompressor, closureCompiler))
-    .dependsOn(containerProduction, containerClientWeb, componentLoader, mongoJsonService, docs)
-    .aggregate(containerProduction, containerClientWeb, componentLoader, containerClient, componentModel, utils, jsProcessing, mongoJsonService, docs)
+    .dependsOn(containerClientWeb, componentLoader, mongoJsonService, docs)
+    .aggregate(containerClientWeb, componentLoader, containerClient, componentModel, utils, jsProcessing, mongoJsonService, docs)
 
   val root = builder.playApp("root", Some("."))
     .settings(

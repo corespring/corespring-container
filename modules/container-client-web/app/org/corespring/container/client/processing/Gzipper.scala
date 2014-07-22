@@ -1,4 +1,4 @@
-package org.corespring.container.production.processing
+package org.corespring.container.client.processing
 
 import java.io.ByteArrayOutputStream
 import java.util.zip.GZIPOutputStream

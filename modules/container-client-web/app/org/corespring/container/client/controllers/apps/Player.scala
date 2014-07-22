@@ -1,28 +1,26 @@
 package org.corespring.container.client.controllers.apps
 
-import java.io.{ Reader, InputStreamReader, BufferedReader, FileReader }
-import java.net.URL
-
-import de.neuland.jade4j.{ JadeConfiguration, Jade4J }
-import de.neuland.jade4j.template.{ TemplateLoader, FileTemplateLoader, JadeTemplate }
-import org.corespring.container.client.hooks.PlayerHooks
-import org.corespring.container.client.component.PlayerItemTypeReader
-import org.corespring.container.client.views.txt.js.PlayerServices
-import org.corespring.container.components.model.Id
-import play.api.{ Mode, Play, Logger }
-import play.api.libs.json.{ JsValue, Json }
-import play.api.{ Play, Logger }
-import play.api.mvc._
-import play.api.templates.{ Html, HtmlFormat }
+import java.io.{BufferedReader, InputStreamReader, Reader}
 
 import scala.concurrent.Future
+
+import de.neuland.jade4j.{Jade4J, JadeConfiguration}
+import de.neuland.jade4j.template.{JadeTemplate, TemplateLoader}
+import org.corespring.container.client.component.PlayerItemTypeReader
+import org.corespring.container.client.hooks.PlayerHooks
+import org.corespring.container.client.views.txt.js.PlayerServices
+import org.corespring.container.components.model.Id
+import play.api.{Logger, Mode, Play}
+import play.api.libs.json.{JsValue, Json}
+import play.api.mvc._
+import play.api.templates.Html
 
 trait BasePlayer
   extends PlayerItemTypeReader
   with AppWithServices[PlayerHooks]
   with JsModeReading {
 
-  import org.corespring.container.client.controllers.apps.routes.{ BasePlayer => PlayerRoutes }
+  import org.corespring.container.client.controllers.apps.routes.{BasePlayer => PlayerRoutes}
 
   override def context: String = "player"
 
@@ -79,7 +77,7 @@ trait JsonPlayer extends BasePlayer {}
 
 private class TL(val root: String) extends TemplateLoader {
 
-  import Play.current
+  import play.api.Play.current
 
   override def getLastModified(name: String): Long = Play.resource(s"$root/$name").map { url =>
     url.openConnection().getLastModified
@@ -92,7 +90,7 @@ private class TL(val root: String) extends TemplateLoader {
 
 trait HtmlPlayer extends BasePlayer {
 
-  import Play.current
+  import play.api.Play.current
 
   val name = "server-generated-player.jade"
 
