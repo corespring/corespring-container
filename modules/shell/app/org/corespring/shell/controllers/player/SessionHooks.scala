@@ -59,8 +59,8 @@ trait SessionHooks extends ContainerSessionHooks {
     }.getOrElse(Left(NOT_FOUND -> s"Can't find a session with id: $id"))
   }
 
-  override def reopen(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]] = Future {
-    logger.debug(s"reopen session: $id")
+  override def reset(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]] = Future {
+    logger.debug(s"reset session: $id")
 
     def reopenSession(session: JsValue) = {
       val reopenedSession = session.as[JsObject] ++

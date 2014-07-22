@@ -180,7 +180,7 @@ angular.module('corespring-player.controllers')
         });
 
         $scope.$on('resetPreview', function() {
-          PlayerService.reopenSession($scope.onSessionReopened, $scope.onSessionReopenedError, $scope.sessionId);
+          PlayerService.resetSession($scope.onSessionReopened, $scope.onSessionReopenedError, $scope.sessionId);
         });
 
         $scope.$on('saveResponses', function(event, data, callback) {
