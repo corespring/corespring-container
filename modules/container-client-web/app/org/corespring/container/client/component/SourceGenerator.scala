@@ -1,5 +1,6 @@
 package org.corespring.container.client.component
 
+import java.io.File
 import java.net.URL
 
 import org.corespring.container.client.controllers.helpers.{LoadClientSideDependencies, NameHelper}
@@ -8,6 +9,7 @@ import org.corespring.container.components.model._
 import org.corespring.container.components.model.dependencies.ComponentTypeFilter
 import org.corespring.container.components.model.packaging.ClientSideDependency
 import play.api.Play
+import play.api.libs.json.JsObject
 
 import scala.io.Codec
 
@@ -79,6 +81,30 @@ abstract class BaseGenerator extends SourceGenerator with LoadClientSideDependen
     scripts.flatten
   }
 
+  def componentsPath : String
+
+  protected def getLibScripts(components:Seq[Component]) : Seq[String] = {
+
+      def loadSrc(org:String, name:String, path:String) : Option[String] = {
+        val fullPath = s"$componentsPath/$org/$name/libs/$path"
+        val file = new File(fullPath)
+        if(file.exists()){
+          Some(scala.io.Source.fromFile(file).getLines.mkString("\n"))
+        } else None
+      }
+
+      val compAndPaths = for {
+        comp <- components
+        lib <- (comp.packageInfo \ "libs").asOpt[JsObject]
+        client <- (lib \ "client").asOpt[JsObject]
+        paths <- client.fields.map(_._2.as[Seq[String]])
+        path <- paths
+        src <- loadSrc(comp.id.org, comp.id.name, path)
+      } yield (comp, paths)
+      //WIP..
+      Seq.empty
+  }
+
   override def css(components: Seq[Component]): String = {
     val (libraries, uiComps, layoutComps, widgets) = splitComponents(components)
     val uiCss = uiComps.map(_.client.css.getOrElse("")).mkString("\n")
@@ -102,8 +128,12 @@ abstract class BaseGenerator extends SourceGenerator with LoadClientSideDependen
 
     val dependencies = getClientSideDependencies(components)
     val scripts = get3rdPartyScripts(dependencies).mkString("\n")
+    val libScripts = getLibScripts(dependencies).mkString("\n")
 
     s"""
+    |//-- lib scripts
+    |$libScripts
+    |//-- End lib scripts
     |//-- 3rd party scripts
     |$scripts
     |//-- End 3rd party scripts

@@ -68,8 +68,7 @@ trait AppWithConfig[T <: ClientHooks]
 
       val clientSideDependencies = getClientSideDependencies(resolvedComponents)
       val dependencies = ngModules.createAngularModules(resolvedComponents, clientSideDependencies)
-      val localScripts = getLocalScripts(resolvedComponents)
-      val js = (localScripts ++ additionalScripts :+ jsUrl).distinct
+      val js = (additionalScripts :+ jsUrl).distinct
       val css = Seq(cssUrl)
 
       configToResult(
@@ -107,7 +106,7 @@ trait AppWithConfig[T <: ClientHooks]
     scripts
   }*/
 
-  protected def getLocalScripts(comps: Seq[Component]): Seq[String] = {
+  /*protected def getLocalScripts(comps: Seq[Component]): Seq[String] = {
 
     def assetPath(compAndPath: (Component, Seq[String]), acc: Seq[String]) = {
       val (c, filenames) = compAndPath
@@ -122,7 +121,7 @@ trait AppWithConfig[T <: ClientHooks]
 
     val assetPaths = out.foldRight[Seq[String]](Seq.empty)(assetPath)
     assetPaths
-  }
+  }*/
 }
 
 trait AppWithServices[T <: ClientHooks] extends AppWithConfig[T] {
