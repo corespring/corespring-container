@@ -9,6 +9,8 @@ import org.corespring.container.components.model.dependencies.ComponentTypeFilte
 import org.corespring.container.components.model.packaging.ClientSideDependency
 import play.api.Play
 
+import scala.io.Codec
+
 trait SourceGenerator
   extends ComponentTypeFilter
   with NameHelper {
@@ -70,7 +72,7 @@ abstract class BaseGenerator extends SourceGenerator with LoadClientSideDependen
   protected def get3rdPartyScripts(dependencies: Seq[ClientSideDependency]): Seq[String] = {
 
     def loadSrc(name:String)(path:String) : Option[String] = resource(s"container-client/bower_components/$name/$path").map{ url =>
-      scala.io.Source.fromInputStream(url.openStream()).getLines().mkString("\n")
+      scala.io.Source.fromInputStream(url.openStream())(Codec("utf-8")).getLines().mkString("\n")
     }
 
     val scripts = dependencies.map { d => d.files.map(loadSrc(d.name)) }.flatten
