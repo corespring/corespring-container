@@ -138,9 +138,8 @@ trait HtmlPlayer extends BasePlayer {
 
         val clientSideDependencies = getClientSideDependencies(resolvedComponents)
         val dependencies = ngModules.createAngularModules(resolvedComponents, clientSideDependencies)
-        val clientSideScripts = get3rdPartyScripts(clientSideDependencies)
         val localScripts = getLocalScripts(resolvedComponents)
-        val js = (clientSideScripts ++ localScripts ++ additionalScripts :+ jsUrl).distinct
+        val js = (localScripts ++ additionalScripts :+ jsUrl).distinct
         val css = Seq(cssUrl)
 
         Ok(template(processXhtml((itemJson \ "xhtml").asOpt[String]), dependencies, js, css, Json.obj("session" -> session, "item" -> itemJson)))

@@ -4,7 +4,7 @@ import org.corespring.container.client.hooks.ClientHooks
 import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.client.component.{ ComponentUrls, ItemTypeReader }
 import org.corespring.container.client.controllers.angular.AngularModules
-import org.corespring.container.client.controllers.helpers.{ Helpers, XhtmlProcessor }
+import org.corespring.container.client.controllers.helpers.{LoadClientSideDependencies, Helpers, XhtmlProcessor}
 import org.corespring.container.components.model.dependencies.DependencyResolver
 import org.corespring.container.components.model.packaging.{ ClientDependencies, ClientSideDependency }
 import org.corespring.container.components.model.{ Component, Id }
@@ -18,7 +18,8 @@ trait AppWithConfig[T <: ClientHooks]
   extends Controller
   with DependencyResolver
   with XhtmlProcessor
-  with Helpers {
+  with Helpers
+  with LoadClientSideDependencies{
   self: ItemTypeReader =>
 
   implicit def ec: ExecutionContext
@@ -67,9 +68,8 @@ trait AppWithConfig[T <: ClientHooks]
 
       val clientSideDependencies = getClientSideDependencies(resolvedComponents)
       val dependencies = ngModules.createAngularModules(resolvedComponents, clientSideDependencies)
-      val clientSideScripts = get3rdPartyScripts(clientSideDependencies)
       val localScripts = getLocalScripts(resolvedComponents)
-      val js = (clientSideScripts ++ localScripts ++ additionalScripts :+ jsUrl).distinct
+      val js = (localScripts ++ additionalScripts :+ jsUrl).distinct
       val css = Seq(cssUrl)
 
       configToResult(
@@ -94,12 +94,8 @@ trait AppWithConfig[T <: ClientHooks]
       }
   }.getOrElse("<div><h1>New Item</h1></div>")
 
-  protected def getClientSideDependencies(comps: Seq[Component]): Seq[ClientSideDependency] = {
-    val packages = comps.map(_.packageInfo)
-    val deps = packages.flatMap(p => (p \ "dependencies").asOpt[JsObject])
-    deps.map(ClientDependencies(_)).flatten
-  }
 
+  /*
   protected def get3rdPartyScripts(deps: Seq[ClientSideDependency]): Seq[String] = {
     val scripts = deps.map {
       d =>
@@ -109,7 +105,7 @@ trait AppWithConfig[T <: ClientHooks]
         }
     }.flatten
     scripts
-  }
+  }*/
 
   protected def getLocalScripts(comps: Seq[Component]): Seq[String] = {
 

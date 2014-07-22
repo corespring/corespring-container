@@ -1,9 +1,13 @@
 package org.corespring.container.client.component
 
-import org.corespring.container.client.controllers.helpers.NameHelper
+import java.net.URL
+
+import org.corespring.container.client.controllers.helpers.{LoadClientSideDependencies, NameHelper}
 import org.corespring.container.client.views.txt.js.{ ComponentServerWrapper, ServerLibraryWrapper, ComponentWrapper }
 import org.corespring.container.components.model._
 import org.corespring.container.components.model.dependencies.ComponentTypeFilter
+import org.corespring.container.components.model.packaging.ClientSideDependency
+import play.api.Play
 
 trait SourceGenerator
   extends ComponentTypeFilter
@@ -56,7 +60,22 @@ trait SourceGenerator
     filterByType[Widget](comps))
 }
 
-abstract class BaseGenerator extends SourceGenerator{
+trait ResourceLoading {
+  def resource(path:String) : Option[URL]
+}
+
+abstract class BaseGenerator extends SourceGenerator with LoadClientSideDependencies with ResourceLoading{
+
+
+  protected def get3rdPartyScripts(dependencies: Seq[ClientSideDependency]): Seq[String] = {
+
+    def loadSrc(name:String)(path:String) : Option[String] = resource(s"container-client/bower_components/$name/$path").map{ url =>
+      scala.io.Source.fromInputStream(url.openStream()).getLines().mkString("\n")
+    }
+
+    val scripts = dependencies.map { d => d.files.map(loadSrc(d.name)) }.flatten
+    scripts.flatten
+  }
 
   override def css(components: Seq[Component]): String = {
     val (libraries, uiComps, layoutComps, widgets) = splitComponents(components)
@@ -78,7 +97,14 @@ abstract class BaseGenerator extends SourceGenerator{
     val widgetJs = widgets.map(widgetToJs).mkString("\n")
     val libJs = libs.map(libraryToJs).mkString("\n")
     val layoutJs = layoutComps.map(layoutToJs).mkString("\n")
+
+    val dependencies = getClientSideDependencies(components)
+    val scripts = get3rdPartyScripts(dependencies).mkString("\n")
+
     s"""
+    |//-- 3rd party scripts
+    |$scripts
+    |//-- End 3rd party scripts
     |$libJs
     |$uiJs
     |$widgetJs
@@ -107,7 +133,7 @@ abstract class BaseGenerator extends SourceGenerator{
   protected def interactionToJs(ui: Interaction): String = previewJs(ui.id, ui.client.render)
 }
 
-class EditorGenerator extends BaseGenerator {
+trait EditorGenerator extends BaseGenerator {
 
   private def configJs(id : Id, js : String) = wrapJs(id, js, "Config", "Client Config")
 
@@ -146,11 +172,11 @@ class EditorGenerator extends BaseGenerator {
   override protected def libraryToJs(l: Library): String = addLibraryJs(true, true)(l)
 }
 
-class CatalogGenerator extends BaseGenerator {
+trait CatalogGenerator extends BaseGenerator {
   override protected def libraryToJs(l: Library): String = addLibraryJs(true, false)(l)
 }
 
-class PlayerGenerator extends BaseGenerator {
+trait PlayerGenerator extends BaseGenerator {
   override protected def libraryToJs(l: Library): String = addLibraryJs(true, false)(l)
 }
 

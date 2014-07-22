@@ -1,9 +1,11 @@
 package org.corespring.container.client.controllers
 
+import java.net.URL
+
 import org.corespring.container.client.component._
 import org.corespring.container.components.model.Component
 import org.corespring.container.components.model.dependencies.DependencyResolver
-import play.api.Logger
+import play.api.{Play, Logger}
 import play.api.http.ContentTypes
 import play.api.mvc._
 
@@ -69,7 +71,15 @@ trait ComponentSets extends Controller with ComponentUrls {
 }
 
 trait DefaultComponentSets extends ComponentSets {
-  val editorGenerator: SourceGenerator = new EditorGenerator()
-  val playerGenerator: SourceGenerator = new PlayerGenerator()
-  val catalogGenerator: SourceGenerator = new CatalogGenerator()
+  import Play.current
+
+  val editorGenerator: SourceGenerator = new EditorGenerator() {
+    override def resource (p:String) = Play.resource(p)
+  }
+  val playerGenerator: SourceGenerator = new PlayerGenerator() {
+    override def resource (p:String) = Play.resource(p)
+  }
+  val catalogGenerator: SourceGenerator = new CatalogGenerator() {
+    override def resource (p:String) = Play.resource(p)
+  }
 }
