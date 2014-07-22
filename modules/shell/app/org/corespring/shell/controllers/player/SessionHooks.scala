@@ -62,19 +62,19 @@ trait SessionHooks extends ContainerSessionHooks {
   override def reset(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]] = Future {
     logger.debug(s"reset session: $id")
 
-    def reopenSession(session: JsValue) = {
-      val reopenedSession = session.as[JsObject] ++
+    def resetSession(session: JsValue) = {
+      val resettedSession = session.as[JsObject] ++
         Json.obj("isComplete" -> false) ++
         Json.obj("components" -> Json.obj()) ++
         Json.obj("attempts" -> 0)
-      sessionService.save(id, reopenedSession)
-      reopenedSession
+      sessionService.save(id, resettedSession)
+      resettedSession
     }
 
     val result = for {
       session <- sessionService.load(id)
     } yield {
-      if (isSecure(header)) session else reopenSession(session)
+      if (isSecure(header)) session else resetSession(session)
     }
     result.map(Right(_)).getOrElse(Left(BAD_REQUEST -> ""))
   }
