@@ -35,8 +35,9 @@ block content
 
       .main-content(ui-view="main")
 
-      button.btn.btn-xs.btn-info.preview-hang-right-btn(ng-click="togglePreview()", ng-show="showPreviewButton", ng-class="{'preview-active': showPreview(urlParams.hidePreview)}")
-        {{ previewText() }}
+      button.btn.btn-xs.preview-hang-right-btn(ng-click="togglePreview()",
+        ng-show="showPreviewButton", ng-class="{'preview-active': showPreview(urlParams.hidePreview)}")
+        i.fa.fa-bars
 
   include partials/designer
   include partials/item-profile
