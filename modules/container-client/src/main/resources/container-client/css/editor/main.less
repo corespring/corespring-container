@@ -1,8 +1,9 @@
 @import "mixins";
 @import "components";
 
+
 .root {
-  @top-nav-bg: @cs-secondary;
+  @top-nav-bg: #4A4A4A;
   @top-nav-height: 43px;
   @preview-width: 610px;
   @left-nav-width: 200px;
@@ -14,16 +15,19 @@
     opacity: 0;
   }
   .preview-btn() {
-    @width: 150px;
-    width: @width;
-    height: 44px;
-    font-size: 18px;
+    width: 42px;
+    height: 42px;
+    font-size: 28px;
+    padding: 0px;
+    color: #ffffff;
+    background-color: #4a4a4a;
+    border-color: #4a4a4a;
     display: block;
     border-radius: 0px;
     position: absolute;
-    top: 96px;
-    right: -52px;
-    .drop-shadow(1px, 2px, 2px, 0.3);
+    top: 60px;
+    right: 0px;
+    //.drop-shadow(1px, 2px, 2px, 0.3);
     -webkit-transform: rotate(-90deg);
     -moz-transform: rotate(-90deg);
     -ms-transform: rotate(-90deg);
@@ -128,33 +132,17 @@
       z-index: @top-nav-zindex - 1;
       outline: none;
     }
+
     .preview-active {
-      right: -98px;
+      right: 0px;
     }
+
     .wiggi-wiz .wiggi-wiz-editable {
-        padding-right: 40px;
+      padding-right: 40px;
     }
     &.preview {
       .wiggi-wiz .wiggi-wiz-editable {
         padding-right: 15px;
-      }
-    }
-    .top-nav {
-      .saver {
-        float: left;
-        margin-left: 50px;
-        padding-top: @top-nav-height / 4;
-        font-size: 12px;
-        padding-right: 10px;
-        font-style: italic;
-        text-align: right;
-        color: lighten(@top-nav-bg, 40%);
-      }
-      .toggle-left-nav {
-        width: @top-nav-height - 1px;
-        font-size: 24px;
-        line-height: 0px;
-        float: left;
       }
     }
   }
@@ -165,42 +153,27 @@
   .content-container.left-nav {
     left: @left-nav-width;
   }
+
   .nav-container {
-    position: absolute;
-    top: 0px;
-    bottom: 0px;
-    width: 200px;
-    padding: 0px;
-    overflow: hidden;
-    background-color: @cs-grey;
-    .top-nav-filler {
-      background-color: none;
-      height: @top-nav-height;
+
+    .navbar-default {
+      background-color: @top-nav-bg;
+      border-bottom: solid 1px darken(@top-nav-bg, 20%);
+      z-index: @top-nav-zindex;
+      .drop-shadow(0, 2px, 3px, 0.35);
     }
-    .nav {
-      li {
-        border-top: solid 1px darken(@cs-grey, 4%);
-        .user-select(none);
-        a {
-          font-size: 13px;
-          cursor: pointer;
-          letter-spacing: 0.4px;
-          color: lighten(@cs-grey, 50%);
-          &:hover {
-            color: lighten(@cs-grey, 30%);
-            background-color: darken(@cs-grey, 4%);
-          }
-        }
-        a.mainitem-link {
-          text-transform: uppercase;
-        }
-      }
-      li.active {
-        a{color: white;
-          //@cs-primary;
-        }
-      }
+
+    .saver {
+      display: inline-block;
+      margin-left: 50px;
+      padding-top: @top-nav-height / 4 + 3;
+      font-size: 12px;
+      padding-right: 10px;
+      font-style: italic;
+      text-align: right;
+      color: #B8E986;
     }
+
   }
   .preview-container {
     overflow-y: auto;
@@ -214,6 +187,7 @@
     .player-container {
       background-color: white;
       padding: 10px;
+      margin-top: 26px;
     }
 
     .contents {
@@ -247,64 +221,13 @@
       }
     }
   }
-  .top-nav {
-    position: fixed;
-    left: 0px;
-    right: 0px;
-    top: 0px;
-    border-bottom: solid 1px darken(@top-nav-bg, 20%);
-    background-color: darken(@top-nav-bg, 0%);
-    height: @top-nav-height;
-    z-index: @top-nav-zindex;
-    .drop-shadow(0, 2px, 3px, 0.35);
-    .cs-logo {
-      width: 100px;
-      height: 35px;
-      display: inline;
-      background-repeat: no-repeat;
-      top: 9px;
-      position: absolute;
-    }
-    .btn-default {
-      color: white;
-    }
-    button {
-      height: @top-nav-height - 1px;
-      background-color: darken(@top-nav-bg, 10%);
-      -moz-outline: 0 none;
-      outline: 0 none;
-      color: white;
-      &:active {
-        -moz-outline: 0 none;
-        outline: 0 none;
-      }
-      border: none;
-      .fa {
-        color: white;
-      }
-      &:hover {
-        background-color: darken(@top-nav-bg, 34%);
-      }
-    }
-  }
+
   .preview-toggle {
     background: #2693BA;
     background-position: 13px 9px;
     color: white;
     height: 40px;
     max-height: 40px;
-    border: 0;
-    border-radius: 4px;
-  }
-  .nav-toggle {
-    background: #2693BA;
-    background-image: url('../images/menu-toggle.png');
-    background-repeat: no-repeat;
-    background-position: 13px 9px;
-    height: 40px;
-    max-height: 40px;
-    max-width: 50px;
-    min-width: 50px;
     border: 0;
     border-radius: 4px;
   }

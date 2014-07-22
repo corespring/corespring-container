@@ -4,42 +4,25 @@ block content
   .root(ng-controller="Root")
 
     .nav-container
-      .top-nav-filler
+      nav.navbar.navbar-default.navbar-fixed-top
+        ul.nav.navbar-nav
+          li(ui-sref-active="active")
+            a(ui-sref="design({section: 'main'})") Edit
+          li(ui-sref-active="active")
+            a(ui-sref="design({section: 'weighting'})" ) Weighting
+          li(ui-sref-active="active")
+            a(ui-sref="design({section: 'summary-feedback'})" ) Summary Feedback
+          li(ui-sref-active="active")
+            a(ui-sref="item-profile" ) Profile
+          li(ui-sref-active="active")
+            a(ui-sref="supporting-materials({intro: 'intro'})") Supporting Materials
 
-      ul.nav.nav-stacked
-        li
-          a.mainitem-link(ui-sref="design({section: 'main'})") ITEM
-        li.nav-subitem(ui-sref-active="active")
-          a.subitem-link(ui-sref="design({section: 'weighting'})" ) Weighting
-        li.nav-subitem(ui-sref-active="active")
-          a.subitem-link(ui-sref="design({section: 'summary-feedback'})" ) Summary Feedback
-
-        li
-          a.mainitem-link(ui-sref="item-profile" ) PROFILE
-
-        li
-          a.mainitem-link(ui-sref="supporting-materials({intro: 'intro'})") SUPPORTING MATERIALS
-
-        li.nav-subitem(ng-repeat="supportingMaterial in data.item.supportingMaterials", ng-class="{ active: isSupportingMaterialActive(supportingMaterial, $index)}")
-          a.subitem-link.supporting-material-link(ui-sref="supporting-material({index: $index})") {{supportingMaterial.name}}
-          a.delete-supporting-material(ng-click="deleteSupportingMaterial($index)")
-
-    .preview-container
-      .contents(ui-view="preview")
-
-    .content-container(
-      ng-class="{preview: showPreview(urlParams.hidePreview), 'left-nav': !urlParams.hideLeftNav}")
-      .top-nav
-        button.toggle-left-nav.btn.btn-sm.btn-default(ng-click="toggleLeftNav()")
-          i.fa.fa-bars
-        .cs-logo
-
-        span.saver
+        .saver
           model-saver(
-            ng-model="data.item",
-            save-trigger="save()", 
-            saving="data.saveInProgress", 
-            save-error="data.saveError")
+          ng-model="data.item",
+          save-trigger="save()",
+          saving="data.saveInProgress",
+          save-error="data.saveError")
             #saved
               | All changes saved
             #save-in-progress
@@ -47,10 +30,16 @@ block content
             #save-error
               | There was an error saving your content
 
+    .preview-container
+      .contents(ui-view="preview")
+
+    .content-container(ng-class="{preview: showPreview(urlParams.hidePreview)}")
+
       .main-content(ui-view="main")
 
-      button.btn.btn-xs.btn-info.preview-hang-right-btn(ng-click="togglePreview()", ng-show="showPreviewButton", ng-class="{'preview-active': showPreview(urlParams.hidePreview)}")
-        {{ previewText() }}
+      button.btn.btn-xs.preview-hang-right-btn(ng-click="togglePreview()",
+        ng-show="showPreviewButton", ng-class="{'preview-active': showPreview(urlParams.hidePreview)}")
+        i.fa.fa-bars
 
   include partials/designer
   include partials/item-profile
@@ -114,7 +103,7 @@ block app-loader-config
 block app-loader-scripts
 
   script(type="text/javascript",src="../../components/wiggi-wiz/dist/wiggi-wiz.js")
-  
+
   for p in editor
     script(src="#{p}", type="text/javascript")
 
