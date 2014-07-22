@@ -5,7 +5,7 @@ import java.net.URL
 import org.corespring.container.client.component._
 import org.corespring.container.components.model.Component
 import org.corespring.container.components.model.dependencies.DependencyResolver
-import play.api.{Play, Logger}
+import play.api.{ Play, Logger }
 import play.api.http.ContentTypes
 import play.api.mvc._
 
@@ -70,16 +70,23 @@ trait ComponentSets extends Controller with ComponentUrls {
   }
 }
 
-trait DefaultComponentSets extends ComponentSets {
-  import Play.current
+trait DefaultComponentSets extends ComponentSets
+  with ResourceLoading
+  with LibrarySourceLoading {
 
   val editorGenerator: SourceGenerator = new EditorGenerator() {
-    override def resource (p:String) = Play.resource(p)
+    override def resource(p: String) = DefaultComponentSets.this.resource(p)
+
+    override def loadLibrarySource(path: String): Option[String] = DefaultComponentSets.this.loadLibrarySource(path)
   }
+
   val playerGenerator: SourceGenerator = new PlayerGenerator() {
-    override def resource (p:String) = Play.resource(p)
+    override def resource(p: String) = DefaultComponentSets.this.resource(p)
+    override def loadLibrarySource(path: String): Option[String] = DefaultComponentSets.this.loadLibrarySource(path)
   }
+
   val catalogGenerator: SourceGenerator = new CatalogGenerator() {
-    override def resource (p:String) = Play.resource(p)
+    override def resource(p: String) = DefaultComponentSets.this.resource(p)
+    override def loadLibrarySource(path: String): Option[String] = DefaultComponentSets.this.loadLibrarySource(path)
   }
 }

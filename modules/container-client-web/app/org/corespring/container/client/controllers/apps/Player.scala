@@ -1,17 +1,17 @@
 package org.corespring.container.client.controllers.apps
 
-import java.io.{BufferedReader, InputStreamReader, Reader}
+import java.io.{ BufferedReader, InputStreamReader, Reader }
 
 import scala.concurrent.Future
 
-import de.neuland.jade4j.{Jade4J, JadeConfiguration}
-import de.neuland.jade4j.template.{JadeTemplate, TemplateLoader}
+import de.neuland.jade4j.{ Jade4J, JadeConfiguration }
+import de.neuland.jade4j.template.{ JadeTemplate, TemplateLoader }
 import org.corespring.container.client.component.PlayerItemTypeReader
 import org.corespring.container.client.hooks.PlayerHooks
 import org.corespring.container.client.views.txt.js.PlayerServices
 import org.corespring.container.components.model.Id
-import play.api.{Logger, Mode, Play}
-import play.api.libs.json.{JsValue, Json}
+import play.api.{ Logger, Mode, Play }
+import play.api.libs.json.{ JsValue, Json }
 import play.api.mvc._
 import play.api.templates.Html
 
@@ -20,7 +20,7 @@ trait BasePlayer
   with AppWithServices[PlayerHooks]
   with JsModeReading {
 
-  import org.corespring.container.client.controllers.apps.routes.{BasePlayer => PlayerRoutes}
+  import org.corespring.container.client.controllers.apps.routes.{ BasePlayer => PlayerRoutes }
 
   override def context: String = "player"
 
@@ -138,8 +138,7 @@ trait HtmlPlayer extends BasePlayer {
 
         val clientSideDependencies = getClientSideDependencies(resolvedComponents)
         val dependencies = ngModules.createAngularModules(resolvedComponents, clientSideDependencies)
-        val localScripts = getLocalScripts(resolvedComponents)
-        val js = (localScripts ++ additionalScripts :+ jsUrl).distinct
+        val js = (additionalScripts :+ jsUrl).distinct
         val css = Seq(cssUrl)
 
         Ok(template(processXhtml((itemJson \ "xhtml").asOpt[String]), dependencies, js, css, Json.obj("session" -> session, "item" -> itemJson)))

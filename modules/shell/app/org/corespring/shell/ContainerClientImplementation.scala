@@ -1,5 +1,7 @@
 package org.corespring.shell
 
+import java.io.File
+
 import org.corespring.container.client.CompressedAndMinifiedComponentSets
 
 import scala.concurrent.{ ExecutionContext, Future }
@@ -19,7 +21,7 @@ import org.corespring.shell.controllers.editor.{ ItemHooks => ShellItemHooks }
 import org.corespring.shell.controllers.editor.actions.{ EditorHooks => ShellEditorHooks }
 import org.corespring.shell.controllers.player.{ SessionHooks => ShellSessionHooks }
 import org.corespring.shell.controllers.player.actions.{ PlayerHooks => ShellPlayerHooks }
-import play.api.Configuration
+import play.api.{ Play, Configuration }
 import play.api.mvc._
 
 class ContainerClientImplementation(
@@ -94,12 +96,31 @@ class ContainerClientImplementation(
   }
 
   lazy val componentSets = new CompressedAndMinifiedComponentSets {
+
+    import Play.current
+
     override def allComponents: Seq[Component] = ContainerClientImplementation.this.components
 
     override def configuration = ContainerClientImplementation.this.configuration.getConfig("components").getOrElse(Configuration.empty)
 
     override def dependencyResolver: DependencyResolver = new DependencyResolver {
       override def components: Seq[Component] = allComponents
+    }
+
+    override def resource(path: String): Option[String] = Play.resource(s"container-client/bower_components/$path").map { url =>
+      scala.io.Source.fromInputStream(url.openStream()).getLines().mkString("\n")
+    }
+
+    override def loadLibrarySource(path: String): Option[String] = {
+      val componentsPath = configuration.getString("path").getOrElse("?")
+      val fullPath = s"$componentsPath/$path"
+      val file = new File(fullPath)
+
+      if (file.exists()) {
+        Some(scala.io.Source.fromFile(file).getLines.mkString("\n"))
+      } else {
+        Some(s"console.warn('failed to log $fullPath');")
+      }
     }
   }
 

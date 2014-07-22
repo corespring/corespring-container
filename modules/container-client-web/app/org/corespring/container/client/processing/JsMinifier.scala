@@ -1,14 +1,20 @@
 package org.corespring.container.client.processing
 
-import com.google.javascript.jscomp.{JSSourceFile, CompilerOptions}
+import com.google.javascript.jscomp.{ JSSourceFile, CompilerOptions }
 
 trait JsMinifier {
+
+  val defaultOptions: CompilerOptions = {
+    val o = new CompilerOptions()
+    o.setLanguageIn(CompilerOptions.LanguageMode.ECMASCRIPT5)
+    o
+  }
 
   def minifyJs(source: String, compilerOptions: Option[CompilerOptions] = None): Either[String, String] = {
 
     val compiler = new com.google.javascript.jscomp.Compiler()
     val extern = JSSourceFile.fromCode("externs.js", "function alert(x) {}")
-    val options = compilerOptions.getOrElse(new CompilerOptions())
+    val options = compilerOptions.getOrElse(defaultOptions)
     val input = JSSourceFile.fromCode("generated", source)
 
     compiler.compile(extern, input, options).success match {

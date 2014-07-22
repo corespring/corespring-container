@@ -3,7 +3,7 @@ package org.corespring.container.client.component
 import java.io.File
 import java.net.URL
 
-import org.corespring.container.client.controllers.helpers.{LoadClientSideDependencies, NameHelper}
+import org.corespring.container.client.controllers.helpers.{ LoadClientSideDependencies, NameHelper }
 import org.corespring.container.client.views.txt.js.{ ComponentServerWrapper, ServerLibraryWrapper, ComponentWrapper }
 import org.corespring.container.components.model._
 import org.corespring.container.components.model.dependencies.ComponentTypeFilter
@@ -21,7 +21,7 @@ trait SourceGenerator
 
   def css(components: Seq[Component]): String
 
-  protected def wrapComponent(moduleName:String,directiveName: String, src: String) = {
+  protected def wrapComponent(moduleName: String, directiveName: String, src: String) = {
     ComponentWrapper(moduleName, directiveName, src).toString
   }
 
@@ -65,44 +65,41 @@ trait SourceGenerator
 }
 
 trait ResourceLoading {
-  def resource(path:String) : Option[URL]
+  def resource(path: String): Option[String]
 }
 
-abstract class BaseGenerator extends SourceGenerator with LoadClientSideDependencies with ResourceLoading{
+trait LibrarySourceLoading {
+  def loadLibrarySource(path: String): Option[String]
+}
 
+abstract class BaseGenerator
+  extends SourceGenerator
+  with LoadClientSideDependencies
+  with ResourceLoading
+  with LibrarySourceLoading {
 
   protected def get3rdPartyScripts(dependencies: Seq[ClientSideDependency]): Seq[String] = {
-
-    def loadSrc(name:String)(path:String) : Option[String] = resource(s"container-client/bower_components/$name/$path").map{ url =>
-      scala.io.Source.fromInputStream(url.openStream())(Codec("utf-8")).getLines().mkString("\n")
-    }
-
+    def loadSrc(name: String)(path: String): Option[String] = resource(s"$name/$path")
     val scripts = dependencies.map { d => d.files.map(loadSrc(d.name)) }.flatten
     scripts.flatten
   }
 
-  def componentsPath : String
+  protected def getLibScripts(components: Seq[Component]): Seq[String] = {
 
-  protected def getLibScripts(components:Seq[Component]) : Seq[String] = {
+    def loadSrc(org: String, name: String, path: String): Option[String] = {
+      val fullPath = s"$org/$name/libs/$path"
+      loadLibrarySource(fullPath)
+    }
 
-      def loadSrc(org:String, name:String, path:String) : Option[String] = {
-        val fullPath = s"$componentsPath/$org/$name/libs/$path"
-        val file = new File(fullPath)
-        if(file.exists()){
-          Some(scala.io.Source.fromFile(file).getLines.mkString("\n"))
-        } else None
-      }
-
-      val compAndPaths = for {
-        comp <- components
-        lib <- (comp.packageInfo \ "libs").asOpt[JsObject]
-        client <- (lib \ "client").asOpt[JsObject]
-        paths <- client.fields.map(_._2.as[Seq[String]])
-        path <- paths
-        src <- loadSrc(comp.id.org, comp.id.name, path)
-      } yield (comp, paths)
-      //WIP..
-      Seq.empty
+    val libSrc = for {
+      comp <- components
+      lib <- (comp.packageInfo \ "libs").asOpt[JsObject]
+      client <- (lib \ "client").asOpt[JsObject]
+      paths <- Some(client.fields.map(_._2.as[Seq[String]]).flatten)
+    } yield {
+      for (p <- paths) yield loadSrc(comp.id.org, comp.id.name, p)
+    }
+    libSrc.flatten.flatten
   }
 
   override def css(components: Seq[Component]): String = {
@@ -128,7 +125,7 @@ abstract class BaseGenerator extends SourceGenerator with LoadClientSideDependen
 
     val dependencies = getClientSideDependencies(components)
     val scripts = get3rdPartyScripts(dependencies).mkString("\n")
-    val libScripts = getLibScripts(dependencies).mkString("\n")
+    val libScripts = getLibScripts(components).mkString("\n")
 
     s"""
     |//-- lib scripts
@@ -150,7 +147,7 @@ abstract class BaseGenerator extends SourceGenerator with LoadClientSideDependen
       // -----------------------------------------
   """
 
-  protected def wrapWithHeader(id : Id, js : String, msg:String) =  {
+  protected def wrapWithHeader(id: Id, js: String, msg: String) = {
     val m = moduleName(id.org, id.name)
     val d = directiveName(id.org, id.name)
     s"""
@@ -159,17 +156,18 @@ abstract class BaseGenerator extends SourceGenerator with LoadClientSideDependen
      """.stripMargin
   }
 
-  private def previewJs(id : Id, js : String) = wrapWithHeader(id, js, "Client Preview")
+  private def previewJs(id: Id, js: String) = wrapWithHeader(id, js, "Client Preview")
 
   protected def widgetToJs(ui: Widget): String = previewJs(ui.id, ui.client.render)
+
   protected def interactionToJs(ui: Interaction): String = previewJs(ui.id, ui.client.render)
 }
 
 trait EditorGenerator extends BaseGenerator {
 
-  private def configJs(id : Id, js : String) = wrapJs(id, js, "Config", "Client Config")
+  private def configJs(id: Id, js: String) = wrapJs(id, js, "Config", "Client Config")
 
-  private def wrapJs(id : Id, js : String, suffix:String, msg:String) =  {
+  private def wrapJs(id: Id, js: String, suffix: String, msg: String) = {
     val m = moduleName(id.org, id.name)
     val d = s"${directiveName(id.org, id.name)}$suffix"
 
@@ -181,7 +179,7 @@ trait EditorGenerator extends BaseGenerator {
 
   private def serverJs(componentType: String, definition: String): String = ComponentServerWrapper(componentType, definition).toString
 
-  override def interactionToJs(i:Interaction) : String = {
+  override def interactionToJs(i: Interaction): String = {
     val base = super.interactionToJs(i)
     val cfg = configJs(i.id, i.client.configure)
     val server = serverJs(i.componentType, i.server.definition)
@@ -192,7 +190,7 @@ trait EditorGenerator extends BaseGenerator {
      """.stripMargin
   }
 
-  override def widgetToJs(w:Widget) : String = {
+  override def widgetToJs(w: Widget): String = {
     val base = super.widgetToJs(w)
     val cfg = configJs(w.id, w.client.configure)
     s"""
@@ -211,5 +209,4 @@ trait CatalogGenerator extends BaseGenerator {
 trait PlayerGenerator extends BaseGenerator {
   override protected def libraryToJs(l: Library): String = addLibraryJs(true, false)(l)
 }
-
 
