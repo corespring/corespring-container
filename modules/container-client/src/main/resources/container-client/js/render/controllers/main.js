@@ -268,14 +268,20 @@ angular.module('corespring-player.controllers')
             $log.warn("mode is already set to: ", data.mode);
             return;
           }
-          currentMode = data.mode;
+
+          var firstTimeSet = currentMode === undefined || currentMode === null;
           var editable = (data.mode === 'gather');
+          currentMode = data.mode;
 
           $timeout(function() {
             $log.debug("[Main] $timeout: set mode: ", data.mode);
             ComponentRegister.setEditable(editable);
             ComponentRegister.setMode(data.mode);
           });
+
+          if(firstTimeSet){
+            return;
+          }
 
           var afterMaybeSave = function() {
             if (data.mode === 'evaluate') {
