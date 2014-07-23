@@ -71,7 +71,7 @@ trait AppWithConfig[T <: ClientHooks]
       val resolvedComponents = resolveComponents(typeIds, Some(context))
 
       logger.trace(s"[config: $id] json: ${Json.stringify(itemJson)}")
-      logger.debug(s"[config: $id] Resolved components: $resolvedComponents")
+      logger.debug(s"[config: $id] Resolved components: ${resolvedComponents.map(_.componentType).mkString(",")}")
 
       val jsUrl = if(resolvedComponents.length == 0) Seq.empty else Seq(urls.jsUrl(context, resolvedComponents))
       val cssUrl = if(resolvedComponents.length == 0) Seq.empty else  Seq(urls.cssUrl(context, resolvedComponents))

@@ -102,14 +102,12 @@ class ContainerClientImplementation(
 
     override def configuration = ContainerClientImplementation.this.configuration.getConfig("components")
       .getOrElse{
-        import scala.collection.JavaConversions._
+        val c = ConfigFactory.parseString(
+          s"""
+             |minify: ${Play.mode == Mode.Prod}
+             |gzip: ${Play.mode == Mode.Prod}
+           """.stripMargin)
 
-        val m = Map(
-          "minify" ->  (Play.mode == Mode.Prod).toString,
-          "gzip" -> (Play.mode == Mode.Prod).toString
-        )
-
-        val c = ConfigFactory.parseMap(m)
         new Configuration(c)
     }
 
