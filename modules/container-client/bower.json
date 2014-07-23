@@ -58,7 +58,6 @@
     ],
     "bootstrap": [
       "fonts",
-      "less",
       "test-infra"
     ],
     "jsxgraph": [

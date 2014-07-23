@@ -8,8 +8,9 @@ import org.corespring.container.client.controllers.helpers.{LoadClientSideDepend
 import org.corespring.container.components.model.dependencies.DependencyResolver
 import org.corespring.container.components.model.packaging.{ ClientDependencies, ClientSideDependency }
 import org.corespring.container.components.model.{ Component, Id }
+import org.slf4j.LoggerFactory
 import play.api.http.ContentTypes
-import play.api.libs.json.JsObject
+import play.api.libs.json.{Json, JsObject}
 import play.api.mvc.{ Action, Controller, SimpleResult }
 
 import scala.concurrent.ExecutionContext
@@ -21,6 +22,9 @@ trait AppWithConfig[T <: ClientHooks]
   with Helpers
   with LoadClientSideDependencies{
   self: ItemTypeReader =>
+
+
+  lazy val logger = LoggerFactory.getLogger("container.app")
 
   implicit def ec: ExecutionContext
 
@@ -63,19 +67,22 @@ trait AppWithConfig[T <: ClientHooks]
       }
 
       val resolvedComponents = resolveComponents(typeIds, Some(context))
-      val jsUrl = urls.jsUrl(context, resolvedComponents)
-      val cssUrl = urls.cssUrl(context, resolvedComponents)
+
+      logger.trace(s"[config: $id] json: ${Json.stringify(itemJson)}")
+      logger.debug(s"[config: $id] Resolved components: $resolvedComponents")
+
+      val jsUrl = if(resolvedComponents.length == 0) Seq.empty else Seq(urls.jsUrl(context, resolvedComponents))
+      val cssUrl = if(resolvedComponents.length == 0) Seq.empty else  Seq(urls.cssUrl(context, resolvedComponents))
 
       val clientSideDependencies = getClientSideDependencies(resolvedComponents)
       val dependencies = ngModules.createAngularModules(resolvedComponents, clientSideDependencies)
-      val js = (additionalScripts :+ jsUrl).distinct
-      val css = Seq(cssUrl)
+      val js = (additionalScripts ++ jsUrl).distinct
 
       configToResult(
         Some(processXhtml((itemJson \ "xhtml").asOpt[String])),
         dependencies,
         js,
-        css)
+        cssUrl)
     })
   }
 
