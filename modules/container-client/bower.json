@@ -42,10 +42,24 @@
     "mathjs": [
       "**/!(dist)/**"
     ],
+    "angular-ui-select2": [
+      "test",
+      "docs"
+    ],
     "ace-builds": [
+      "demo",
       "**/*.html",
       "*.txt",
-      "**/!(src-min-noconflict)/**"
+      "**/src-min-noconflict/!*json*.js"
+    ],
+    "jquery-ui": [
+      "ui",
+      "themes"
+    ],
+    "bootstrap": [
+      "fonts",
+      "less",
+      "test-infra"
     ],
     "jsxgraph": [
       "**/!(distrib)/**"
@@ -57,6 +71,7 @@
       "**/!(build)**"
     ],
     "mathjax": [
+      "**/fonts/HTML-CSS/Asana-Math",
       "**/docs/**",
       "**/test/**",
       "**/unpacked/**",

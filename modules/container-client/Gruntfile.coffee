@@ -181,9 +181,22 @@ module.exports = (grunt) ->
         dest: '<%= common.dist %>/css/'
         ext: '.css'
         flatten: false
+
+      production: 
+        options: 
+          cleancss: true 
+        expand: true
+        cwd: '<%= common.dist %>/css'
+        src: '*.less'
+        dest: '<%= common.dist %>/css/'
+        ext: '.min.css'
+        flatten: false
+
+    
     clean:
       main: ["<%= common.dist %>/css/*.css"]
       uglified: _.toArray(destinations)
+      less: ['<%= common.dist %>/css/**/*.less']
 
     shell:
       bowerCacheClean:
@@ -200,6 +213,13 @@ module.exports = (grunt) ->
           failOnError: true
       mathjax_rm_pngs:
         command: 'rm -fr <%= common.dist %>/bower_components/mathjax/fonts/HTML-CSS/TeX/png'
+        options :
+          failOnError: true
+      mathjax_rm_fonts:
+        command: """
+        rm -fr <%= common.dist %>/bower_components/mathjax/**/*.otf\n
+        rm -fr <%= common.dist %>/bower_components/mathjax/**/*.eot\n
+        """
         options :
           failOnError: true
 
@@ -288,12 +308,25 @@ module.exports = (grunt) ->
         options: 
           mode: 'gzip'
         files: [
-          # Each of the files in the src/ folder will be output to
-          # the dist/ folder each with the extension .gz.js
           { 
             expand: true 
             src: _.toArray(destinations)
             ext: '.js.gz'
+          }
+        ]
+      css: 
+        options: 
+          mode: 'gzip'
+        files: [
+          {
+            expand: true 
+            src: ['<%= common.dist %>/css/*.css', '!<%= common.dist %>/css/*.min.css'] 
+            ext: '.css.gz'
+          }
+          {
+            expand: true 
+            src: ['!<%= common.dist %>/css/*.css', '<%= common.dist %>/css/*.min.css'] 
+            ext: '.min.css.gz'
           }
         ]
 
@@ -328,13 +361,13 @@ module.exports = (grunt) ->
   
   grunt.registerTask('restoreResolutions', 'Add "resolutions" back to bower.json', restoreResolutions(grunt))
   
-  grunt.registerTask('clean_bower', 'bower_clean', 'shell:mathjax_rm_pngs')  
+  grunt.registerTask('clean_bower', ['bower_clean', 'shell:mathjax_rm_pngs', 'shell:mathjax_rm_fonts'])  
   # short cut
   grunt.registerTask('lcd', ['restoreResolutions', 'loadComponentDependencies'])
   grunt.registerTask('prepPlayerLauncher', 'prep the player launcher js', prepPlayerLauncher(grunt))
   grunt.registerTask('run', ['uglification', 'ejs', 'jade', 'less', 'watch'])
   grunt.registerTask('test', ['shell:bower', 'shell:bowerCacheClean', 'lcd', 'prepPlayerLauncher', 'jasmine:unit'])
   grunt.registerTask('uglification', ['clean:uglified', 'uglify:concatOnly', 'uglify:minifyAndConcat', 'uglify:prodPlayer'])
-  grunt.registerTask('default', ['shell:bower', 'lcd', 'clean_bower', 'jshint', 'uglification', 'ejs', 'copy', 'less', 'jade', 'compress', 'prepPlayerLauncher','jasmine:unit'])
+  grunt.registerTask('default', ['shell:bower', 'lcd', 'jshint', 'uglification', 'ejs', 'copy', 'less', 'clean:less', 'clean_bower', 'jade', 'compress', 'prepPlayerLauncher','jasmine:unit'])
   grunt.registerTask('minify-test', ['concat', 'uglify'])
   grunt.registerTask('ejs-test', ['ejs'])
