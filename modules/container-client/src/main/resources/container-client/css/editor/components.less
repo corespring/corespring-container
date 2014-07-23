@@ -21,16 +21,41 @@
   }
 }
 
-@placeholder-base-color: @grey-purple;
-
 .component-placeholder {
   position: relative;
   margin-left: 1px;
   min-width: 90px;
   min-height: 40px;
 
+  &.has-icon {
+    @width: 220px;
+    @height: 205px;
+    @icon-padding: 10px;
+
+    width: @width;
+    height: @height;
+    display: table;
+
+    .holder {
+      height: @height;
+      display: table-cell;
+      vertical-align: middle;
+      text-align: center;
+
+      .icon {
+        max-width: @width - (2 * @icon-padding);
+        max-height: auto;
+      }
+    }
+  }
+
   .blocker,
   .non-blocker {
+    z-index: 10;
+    .user-select(none);
+    transition: opacity 200ms;
+    .border-radius(3px);
+    border: solid 1px #cccccc;
 
     .content {
       display: inline-flex;
@@ -40,33 +65,11 @@
       right: 0;
       top: 0;
       bottom: 0;
-      .title {
-
-        span {
-          color: white;
-          background-color: black;
-          padding: 3px 7px 3px 7px;
-          display: inline-block;
-          .rounded(3px);
-          white-space: nowrap;
-          text-overflow: ellipsis;
-          overflow-x: hidden;
-        }
-        overflow: hidden;
-        width: 100%;
-        text-align: center;
-        .user-select(none);
-      }
     }
-    z-index: 10;
-    .user-select(none);
-    transition: opacity 200ms;
-    .border-radius(4px);
-    border: solid 1px black;
 
     .bg {
       background-color: white;
-      opacity: 0.3;
+      opacity: 0;
       position: absolute;
       left: -2px;
       top: -2px;
@@ -74,14 +77,22 @@
       right: -2px;
     }
 
-    &:hover {
-      opacity: 1.0;
-    }
-
   }
 
   .holder {
-    padding: 5px 5px 0 5px;
+    position: relative;
+
+    .title {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      font-family: 'Helvetica Neue', helvetica, sans-serif;
+      font-weight: bold;
+      color: #4a4a4a;
+      display: block;
+      font-size: 11px;
+      line-height: 13px;
+    }
   }
 
   .blocker {
@@ -89,7 +100,7 @@
     position: absolute;
     height: 100%;
     width: 100%;
-    opacity: 0.5;
+    opacity: 1;
   }
 
   .delete-icon, .close-icon {

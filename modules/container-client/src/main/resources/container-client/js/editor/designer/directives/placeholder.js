@@ -17,6 +17,7 @@ var Placeholder = function(
       if (_.isFunction(serverLogic.preprocess)) {
         component.data = serverLogic.preprocess(component.data);
       }
+      console.log(component);
       return component;
     }
 
@@ -53,11 +54,25 @@ var Placeholder = function(
         return;
       }
       var $holder = $element.find('.holder');
+      var config = ComponentConfig.get($scope.componentType);
+
       if (!$holder) {
         return;
       }
-      $holder.html('<' + $scope.componentType + ' id="' + $scope.id + '"></' + $scope.componentType + '>');
-      $compile($holder)($scope.$new());
+
+      $scope.hasIcon = config.icon !== undefined;
+      $scope.icon = config.icon;
+      $scope.name = config.name;
+
+      if ($scope.hasIcon) {
+        $holder.html([
+          '<span class="title">' + $scope.name + '</span>',
+          '<img class="icon" src="' + $scope.icon + '"/>'
+        ].join('\n'));
+      } else {
+        $holder.html('<' + $scope.componentType + ' id="' + $scope.id + '"></' + $scope.componentType + '>');
+        $compile($holder)($scope.$new());
+      }
     }
 
     $scope.$watch('id', renderPlayerComponent);
@@ -128,11 +143,10 @@ var Placeholder = function(
       id: '@'
     },
     template: [
-      '<div class="component-placeholder" ng-class="[componentType,selectedClass]" data-component-id="{{id}}">',
+      '<div class="component-placeholder" ng-class="{\'has-icon\': hasIcon}" data-component-id="{{id}}">',
       '  <div class="blocker">',
       '    <div class="bg"></div>',
       '    <div class="content">',
-      '      <div class="title"><span ng-show="mainMsg">{{title}}</span></div>',
       '    </div>',
       '    <div class="edit-controls">',
       '      <div class="edit-icon-button" tooltip="edit" tooltip-append-to-body="true" tooltip-placement="bottom">',
@@ -143,7 +157,8 @@ var Placeholder = function(
       '      </div>',
       '    </div>',
       '  </div>',
-      '  <div class="holder"></div>',
+      '  <div class="holder">',
+      '  </div>',
       '</div>'
     ].join('\n')
   };

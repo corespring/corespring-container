@@ -4,7 +4,7 @@ package object string {
 
   def hyphenatedToTitleCase(s: String) = s.split("-").map(_.capitalize).mkString("")
 
-  def join(delimiter: String, s: String*) = s.mkString(delimiter)
+  def join(delimiter: String, s: String*): String = s.mkString(delimiter)
 
 }
 

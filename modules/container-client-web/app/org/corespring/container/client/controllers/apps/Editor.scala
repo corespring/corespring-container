@@ -24,14 +24,15 @@ trait Editor
 
   private def toJson(ci: ComponentInfo): JsValue = {
     val tag = tagName(ci.id.org, ci.id.name)
-    Json.obj(
-      "name" -> ci.id.name,
-      "title" -> JsString(ci.title.getOrElse("")),
-      "titleGroup" -> JsString(ci.titleGroup.getOrElse("")),
-      "icon" -> s"$modulePath/icon/$tag",
-      "componentType" -> tag,
-      "defaultData" -> ci.defaultData,
-      "configuration" -> (ci.packageInfo \ "external-configuration").asOpt[JsObject])
+    partialObj(
+      "name" -> Some(JsString(ci.id.name)),
+      "title" -> Some(JsString(ci.title.getOrElse(""))),
+      "titleGroup" -> Some(JsString(ci.titleGroup.getOrElse(""))),
+      "icon" -> interactions.find(_.componentType == tag).map(_.icon).map(icon => JsString(s"$modulePath/icon/$tag")),
+      "componentType" -> Some(JsString(tag)),
+      "defaultData" -> Some(ci.defaultData),
+      "configuration" -> (ci.packageInfo \ "external-configuration").asOpt[JsObject]
+    )
   }
 
   override def servicesJs = {
@@ -71,5 +72,8 @@ trait Editor
 
     hooks.loadItem(itemId).flatMap { e => e.fold(onError, onItem) }
   }
+
+  private def partialObj(fields : (String, Option[JsValue])*): JsObject =
+    JsObject(fields.filter{ case (_, v) => v.nonEmpty }.map{ case (a,b) => (a, b.get) })
 
 }

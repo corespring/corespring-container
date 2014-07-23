@@ -11,7 +11,7 @@ trait NameHelper {
 
   protected def moduleName(org: String, comp: String) = string.join(".", org, comp)
 
-  protected def tagName(org: String, comp: String) = string.join("-", org, comp)
+  protected def tagName(org: String, comp: String): String = string.join("-", org, comp)
 
   protected def directiveName(org: String, comp: String) = s"$org${string.hyphenatedToTitleCase(comp)}"
 }
