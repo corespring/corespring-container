@@ -63,6 +63,9 @@ trait ComponentSets extends Controller with ComponentUrls {
   override def jsUrl(context: String, components: Seq[Component]): String = url(context, components, "js")
 
   private def url(context: String, components: Seq[Component], suffix: String): String = {
+
+    require(components.length > 0, "Can't load components")
+
     ComponentUrlDirective.unapply(components.map(_.componentType), allComponents) match {
       case Some(path) => routes.ComponentSets.resource(context, path, suffix).url
       case _ => "?"

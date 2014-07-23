@@ -63,6 +63,11 @@ object Global extends WithFilters(AccessControlFilter, CallBlockOnHeaderFilter) 
     val onlyProcessReleased = Play.current.mode == Mode.Prod
     val out = new FileComponentLoader(Play.current.configuration.getString("components.path").toSeq, onlyProcessReleased)
     out.reload
+
+    if(out.all.length == 0){
+      throw new RuntimeException("Can't load any components - check the path!")
+    }
+
     out
   }
 
