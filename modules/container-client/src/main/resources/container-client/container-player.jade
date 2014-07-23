@@ -5,13 +5,6 @@ block player-header
   div(player-control-panel="")
 
 block player-child
-  .container-player(ng-controller="ContainerPlayerControls")
-    br/
-    button.btn.btn-primary(ng-click="submit()",ng-disabled="!canSubmit()") Submit
-    button.btn.btn-warning(ng-click="reset()") Reset
-    hr/
-    .score(ng-show="score")
-      | You scored {{score.summary.percentage}}%
 
 block extra-scripts
   script(src="../../js/render/controllers/container-player-controls.js", type="text/javascript")
