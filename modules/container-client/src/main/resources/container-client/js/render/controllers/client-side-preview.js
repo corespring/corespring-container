@@ -33,22 +33,28 @@ var controller = function($scope, ComponentRegister, PlayerServiceDef) {
   $scope.responses = {};
   $scope.session = _.cloneDeep(defaultSession);
 
-  $scope.submit = function() {
+  $scope.$on('saveResponses', function saveResponses( event, data) {
     var components = ComponentRegister.getComponentSessions();
     PlayerService.submitSession({
       components: components
-    }, $scope.onSessionSaved, $scope.onSessionSaveError);
-  };
+    },
+    function(everything){
+      $scope.onSessionSaved(everything);
+      if(_.isFunction(data.onSaveSuccess)){
+        data.onSaveSuccess();
+      }
+    }, $scope.onSessionSaveError);
+  });
 
   $scope.preview = function() {
     $scope.$emit('launch-catalog-preview');
   };
 
-  $scope.onSessionSaved = function(data) {
-    $scope.responses = data.responses;
-    $scope.session = data.session;
-    $scope.outcome = data.outcome;
-    $scope.score = data.score;
+  $scope.onSessionSaved = function(everything) {
+    $scope.responses = everything.responses;
+    $scope.session = everything.session;
+    $scope.outcome = everything.outcome;
+    $scope.score = everything.score;
     ComponentRegister.setEditable(false);
   };
 
