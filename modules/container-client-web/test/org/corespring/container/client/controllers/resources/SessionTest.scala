@@ -123,8 +123,8 @@ class SessionTest extends Specification with Mockito {
       Right(m.asInstanceOf[SaveSession])
     }
 
-    override def reset(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]] = Future {
-      Right(m.asInstanceOf[SaveSession].existingSession)
+    override def reset(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, ResetSession]] = Future {
+      Right(m.asInstanceOf[ResetSession])
     }
   }
 
