@@ -16,7 +16,7 @@ trait Editor
   with AppWithServices[EditorHooks]
   with JsModeReading {
 
-  override lazy val logger = Logger("container.editor")
+  override def loggerName = "container.app.editor"
 
   def showErrorInUi : Boolean
 

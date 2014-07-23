@@ -24,7 +24,7 @@ trait BasePlayer
 
   override def context: String = "player"
 
-  override lazy val logger = Logger("container.player")
+  override def loggerName = "container.app.player"
 
   def showErrorInUi: Boolean
 

@@ -20,11 +20,13 @@ trait AppWithConfig[T <: ClientHooks]
   with DependencyResolver
   with XhtmlProcessor
   with Helpers
-  with LoadClientSideDependencies{
+  with LoadClientSideDependencies
+  with HasLogger{
   self: ItemTypeReader =>
 
+  def loggerName = "container.app"
 
-  lazy val logger = LoggerFactory.getLogger("container.app")
+  override lazy val logger = LoggerFactory.getLogger(loggerName)
 
   implicit def ec: ExecutionContext
 

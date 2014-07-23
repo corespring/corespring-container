@@ -15,9 +15,9 @@ trait Catalog
   with AppWithServices[CatalogHooks]
   with JsModeReading {
 
-  implicit def ec: ExecutionContext
+  override def loggerName = "container.app.catalog"
 
-  override lazy val logger = Logger("container.catalog")
+  implicit def ec: ExecutionContext
 
   override def context: String = "catalog"
 
