@@ -2,11 +2,11 @@ package org.corespring.shell
 
 import java.io.File
 
-import org.corespring.container.client.CompressedAndMinifiedComponentSets
+import scala.concurrent.{ExecutionContext, Future}
 
-import scala.concurrent.{ ExecutionContext, Future }
-
+import com.typesafe.config.ConfigFactory
 import org.corespring.amazon.s3.ConcreteS3Service
+import org.corespring.container.client.CompressedAndMinifiedComponentSets
 import org.corespring.container.client.controllers._
 import org.corespring.container.client.hooks._
 import org.corespring.container.client.hooks.Hooks.StatusMessage
@@ -14,14 +14,13 @@ import org.corespring.container.client.integration.DefaultIntegration
 import org.corespring.container.components.model.Component
 import org.corespring.container.components.model.dependencies.DependencyResolver
 import org.corespring.mongo.json.services.MongoService
-import org.corespring.shell.{ hooks => shellHooks }
 import org.corespring.shell.controllers.ShellDataQueryHooks
-import org.corespring.shell.controllers.catalog.actions.{ CatalogHooks => ShellCatalogHooks }
-import org.corespring.shell.controllers.editor.{ ItemHooks => ShellItemHooks }
-import org.corespring.shell.controllers.editor.actions.{ EditorHooks => ShellEditorHooks }
-import org.corespring.shell.controllers.player.{ SessionHooks => ShellSessionHooks }
-import org.corespring.shell.controllers.player.actions.{ PlayerHooks => ShellPlayerHooks }
-import play.api.{ Play, Configuration }
+import org.corespring.shell.controllers.catalog.actions.{CatalogHooks => ShellCatalogHooks}
+import org.corespring.shell.controllers.editor.{ItemHooks => ShellItemHooks}
+import org.corespring.shell.controllers.editor.actions.{EditorHooks => ShellEditorHooks}
+import org.corespring.shell.controllers.player.{SessionHooks => ShellSessionHooks}
+import org.corespring.shell.controllers.player.actions.{PlayerHooks => ShellPlayerHooks}
+import play.api.{Configuration, Mode, Play}
 import play.api.mvc._
 
 class ContainerClientImplementation(
@@ -83,7 +82,7 @@ class ContainerClientImplementation(
         if (response.success) {
           None
         } else {
-          Some((BAD_REQUEST -> s"${response.key}: ${response.msg}"))
+          Some(BAD_REQUEST -> s"${response.key}: ${response.msg}")
         }
       }
 
@@ -97,11 +96,22 @@ class ContainerClientImplementation(
 
   lazy val componentSets = new CompressedAndMinifiedComponentSets {
 
-    import Play.current
+    import play.api.Play.current
 
     override def allComponents: Seq[Component] = ContainerClientImplementation.this.components
 
-    override def configuration = ContainerClientImplementation.this.configuration.getConfig("components").getOrElse(Configuration.empty)
+    override def configuration = ContainerClientImplementation.this.configuration.getConfig("components")
+      .getOrElse{
+        import scala.collection.JavaConversions._
+
+        val m = Map(
+          "minify" ->  (Play.mode == Mode.Prod).toString,
+          "gzip" -> (Play.mode == Mode.Prod).toString
+        )
+
+        val c = ConfigFactory.parseMap(m)
+        new Configuration(c)
+    }
 
     override def dependencyResolver: DependencyResolver = new DependencyResolver {
       override def components: Seq[Component] = allComponents
@@ -117,7 +127,7 @@ class ContainerClientImplementation(
       val file = new File(fullPath)
 
       if (file.exists()) {
-        Some(scala.io.Source.fromFile(file).getLines.mkString("\n"))
+        Some(scala.io.Source.fromFile(file).getLines().mkString("\n"))
       } else {
         Some(s"console.warn('failed to log $fullPath');")
       }
@@ -168,9 +178,7 @@ trait LoadJs {
 
   //Implemented as trait so it can be tested without setup
   def loadJs(implicit header: RequestHeader): Future[PlayerJs] = Future {
-    def isSecure = header.getQueryString("secure").map {
-      _ == "true"
-    }.getOrElse(false)
+    def isSecure = header.getQueryString("secure").exists(_ == "true")
     def errors = header.getQueryString("jsErrors").map {
       s => s.split(",").toSeq
     }.getOrElse(Seq())
