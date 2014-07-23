@@ -25,6 +25,7 @@ GET           /session/:sessionId/player                             @org.coresp
 #GET           /session/player-services.js                            @org.corespring.container.client.controllers.apps.Player.services
 #GET           /session/:sessionId/player                             @org.corespring.container.client.controllers.apps.Player.loadPlayerForSession(sessionId)
 GET           /session/everything/:id.json                           @org.corespring.container.client.controllers.resources.Session.loadEverything(id)
+GET           /session/reset/:id.json                                 @org.corespring.container.client.controllers.resources.Session.resetSession(id)
 PUT           /session/save/:id.json                                 @org.corespring.container.client.controllers.resources.Session.saveSession(id)
 PUT           /session/complete/:id.json                             @org.corespring.container.client.controllers.resources.Session.completeSession(id)
 PUT           /session/load-outcome/:id.json                         @org.corespring.container.client.controllers.resources.Session.loadOutcome(id)
