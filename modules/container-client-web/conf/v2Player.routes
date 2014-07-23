@@ -15,8 +15,7 @@ GET           /component-sets/:context/:directive.:suffix            @org.coresp
 # Hooks for the player: config, services + components
 
 GET           /session/:sessionId/player-config.json                 @org.corespring.container.client.controllers.apps.JsonPlayer.config(sessionId:String)
-GET           /session/:sessionId/player-gen-dev.html                @org.corespring.container.client.controllers.apps.DevHtmlPlayer.config(sessionId:String)
-GET           /session/:sessionId/player-gen-prod.html               @org.corespring.container.client.controllers.apps.ProdHtmlPlayer.config(sessionId:String)
+GET           /session/:sessionId/player.html                        @org.corespring.container.client.controllers.apps.ProdHtmlPlayer.config(sessionId:String)
 GET           /session/player-services.js                            @org.corespring.container.client.controllers.apps.BasePlayer.services
 GET           /session/:sessionId/player                             @org.corespring.container.client.controllers.apps.BasePlayer.loadPlayerForSession(sessionId:String)
 
