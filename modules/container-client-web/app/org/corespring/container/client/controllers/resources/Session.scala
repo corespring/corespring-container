@@ -17,6 +17,7 @@ import scala.concurrent.ExecutionContext
 object Session {
   object Errors {
     val cantSaveWhenComplete = "secure mode: can't save when session is complete"
+    val cantResetSecureSession = "secure mode: can't reset secure session"
   }
 }
 
@@ -45,7 +46,17 @@ trait Session extends Controller with ItemPruner with HasContext {
   }
 
   def resetSession(id: String) = Action.async { implicit request =>
-    hooks.reset(id).map(basicHandler(Ok(_)))
+    hooks.reset(id).map(basicHandler { rs =>
+      if( rs.isSecure )
+        BadRequest(Json.obj("error" -> JsString(Errors.cantResetSecureSession)))
+      else {
+        rs.saveSession(id, rs.resettedSession).map {
+          savedSession =>
+            logger.trace(s"resetted session has been saved as: $savedSession")
+            Ok(savedSession)
+        }.getOrElse(BadRequest("Error saving resetted session"))
+      }
+    })
   }
 
   def loadEverything(id: String) = Action.async { implicit request =>

@@ -33,6 +33,13 @@ case class SaveSession(
   isComplete: Boolean,
   saveSession: (String, JsValue) => Option[JsValue]) extends SecureMode
 
+case class ResetSession(
+  existingSession: JsValue,
+  resettedSession: JsValue,
+  isSecure: Boolean,
+  isComplete: Boolean,
+  saveSession: (String, JsValue) => Option[JsValue]) extends SecureMode
+
 /**
  * @param isSecure - whether the player will run in secureMode - ake some capabilities will be locked down.
  * @param errors - if there were any errors loading the player js

@@ -1,7 +1,7 @@
 package org.corespring.shell.controllers.player
 
 import org.corespring.container.client.hooks.Hooks.StatusMessage
-import org.corespring.container.client.hooks.{ FullSession, SaveSession, SessionOutcome, SessionHooks => ContainerSessionHooks }
+import org.corespring.container.client.hooks.{SessionHooks => ContainerSessionHooks, ResetSession, FullSession, SaveSession, SessionOutcome}
 import org.corespring.mongo.json.services.MongoService
 import play.api.Logger
 import play.api.http.Status._
@@ -59,22 +59,20 @@ trait SessionHooks extends ContainerSessionHooks {
     }.getOrElse(Left(NOT_FOUND -> s"Can't find a session with id: $id"))
   }
 
-  override def reset(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]] = Future {
+  override def reset(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, ResetSession]] = Future {
     logger.debug(s"reset session: $id")
 
     def resetSession(session: JsValue) = {
-      val resettedSession = session.as[JsObject] ++
+      session.as[JsObject] ++
         Json.obj("isComplete" -> false) ++
         Json.obj("components" -> Json.obj()) ++
         Json.obj("attempts" -> 0)
-      sessionService.save(id, resettedSession)
-      resettedSession
     }
 
     val result = for {
       session <- sessionService.load(id)
     } yield {
-      if (isSecure(header)) session else resetSession(session)
+      ResetSession(session, resetSession(session), isSecure(header), isComplete(session), sessionService.save(_, _))
     }
     result.map(Right(_)).getOrElse(Left(BAD_REQUEST -> ""))
   }
