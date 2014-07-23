@@ -22,6 +22,7 @@ trait DependencyResolver extends ComponentSplitter {
   }
 
   def resolveComponents(ids: Seq[Id], scope: Option[String] = None): Seq[Component] = {
+    logger.debug(s"[resolveComponents] id: ${ids.mkString(",")}, scope: $scope")
     val sortedIds = resolveIds(ids, scope)
     val out = sortedIds.flatMap(id => components.find(c => c.id == id))
     out
@@ -33,6 +34,8 @@ trait DependencyResolver extends ComponentSplitter {
    * @return
    */
   def resolveIds(ids: Seq[Id], scope: Option[String] = None): Seq[Id] = {
+
+    logger.debug(s"[resolveIds]")
 
     /**
      * Is id in scope - if the id has no scope it is thought to be in scope
@@ -62,6 +65,8 @@ trait DependencyResolver extends ComponentSplitter {
      * @return
      */
     def innerResolve(i: Seq[Id], acc: Seq[(Id, Seq[Id])]): Seq[(Id, Seq[Id])] = {
+
+      logger.trace(s"[innerResolve]: id: $i, accumulator: $acc")
 
       def addToAcc(otherIds: Seq[Id])(rel: IdRelation) = {
         val (_, deps) = rel
@@ -97,13 +102,13 @@ trait DependencyResolver extends ComponentSplitter {
 
     def orgName(id: Id): OrgName = id.org -> id.name
 
-    logger.trace(s"relations: $relations")
+    logger.debug(s"[resolveIds] relations: $relations")
 
     //To simplify the topSort - we use string based tuples - the build the ids back up
     val orgNames: Seq[OrgRelation] = relations.map(t => orgName(t._1) -> t._2.map(orgName))
     val sortedRelations: Seq[OrgRelation] = TopologicalSorter.sort(orgNames: _*)
     val sortedIds = sortedRelations.map(r => Id(r._1._1, r._1._2))
-    logger.trace(s"sortedIds -> $sortedIds")
+    logger.debug(s"[resolveIds] sortedIds -> $sortedIds")
     sortedIds.map(i => i.copy(scope = None)).distinct
   }
 
