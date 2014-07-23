@@ -30,7 +30,13 @@ trait Editor
       "name" -> Some(JsString(ci.id.name)),
       "title" -> Some(JsString(ci.title.getOrElse(""))),
       "titleGroup" -> Some(JsString(ci.titleGroup.getOrElse(""))),
-      "icon" -> interactions.find(_.componentType == tag).map(_.icon).map(icon => JsString(s"$modulePath/icon/$tag")),
+      "icon" -> (interactions.find(_.componentType == tag).map(_.icon) match {
+        case Some(iconBytes) => iconBytes match {
+          case Some(thing) => Some(JsString(s"$modulePath/icon/$tag"))
+          case _ => None
+        }
+        case _ => None
+      }),
       "componentType" -> Some(JsString(tag)),
       "defaultData" -> Some(ci.defaultData),
       "configuration" -> (ci.packageInfo \ "external-configuration").asOpt[JsObject]
