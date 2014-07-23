@@ -78,6 +78,23 @@ class SessionTest extends Specification with Mockito {
 
   }
 
+  "not secure mode" should {
+    def unsaveSession(isComplete: Boolean) = SaveSession(
+      Json.obj(),
+      false,
+      isComplete,
+      (a, b) => Some(b))
+
+    "reset session" in new ActionBody(unsaveSession(true)) {
+      val result = session.resetSession("id")(FakeRequest())
+      status(result) === OK
+      val resettedSession = contentAsJson(result)
+      (resettedSession \ "isComplete").as[Boolean] === false
+      (resettedSession \ "attempts").as[Int] === 0
+      (resettedSession \ "components") === Json.obj()
+    }
+  }
+
   class ActionBody(mode: SecureMode) extends org.specs2.specification.Before {
 
     val session = new Session {
