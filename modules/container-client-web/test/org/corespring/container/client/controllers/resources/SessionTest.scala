@@ -71,6 +71,11 @@ class SessionTest extends Specification with Mockito {
       status(result) === BAD_REQUEST
     }
 
+    "not allow reset session" in new ActionBody(saveSession(true)) {
+      val result = session.resetSession("id")(FakeRequest())
+      status(result) === BAD_REQUEST
+    }
+
   }
 
   class ActionBody(mode: SecureMode) extends org.specs2.specification.Before {
