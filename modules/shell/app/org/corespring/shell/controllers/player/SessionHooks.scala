@@ -1,11 +1,11 @@
 package org.corespring.shell.controllers.player
 
 import org.corespring.container.client.hooks.Hooks.StatusMessage
-import org.corespring.container.client.hooks.{ FullSession, SaveSession, SessionOutcome, SessionHooks => ContainerSessionHooks }
+import org.corespring.container.client.hooks.{ SessionHooks => ContainerSessionHooks, FullSession, SaveSession, SessionOutcome }
 import org.corespring.mongo.json.services.MongoService
 import play.api.Logger
 import play.api.http.Status._
-import play.api.libs.json.{ JsValue, Json }
+import play.api.libs.json.{ JsObject, Json, JsValue }
 import play.api.mvc._
 
 import scala.concurrent.{ ExecutionContext, Future }
