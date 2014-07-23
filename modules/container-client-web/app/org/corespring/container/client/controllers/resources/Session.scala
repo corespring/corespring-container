@@ -9,10 +9,11 @@ import org.corespring.container.components.outcome.ScoreProcessor
 import org.corespring.container.components.processing.PlayerItemPreProcessor
 import org.corespring.container.components.response.OutcomeProcessor
 import play.api.Logger
+import play.api.http.Status._
 import play.api.libs.json._
-import play.api.mvc.{ Action, Controller, SimpleResult }
+import play.api.mvc.{ RequestHeader, Action, Controller, SimpleResult }
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ Future, ExecutionContext }
 
 object Session {
   object Errors {
@@ -46,11 +47,18 @@ trait Session extends Controller with ItemPruner with HasContext {
   }
 
   def resetSession(id: String) = Action.async { implicit request =>
-    hooks.reset(id).map(basicHandler { rs =>
-      if( rs.isSecure )
+    hooks.save(id).map(basicHandler { ss =>
+      if (ss.isSecure)
         BadRequest(Json.obj("error" -> JsString(Errors.cantResetSecureSession)))
       else {
-        rs.saveSession(id, rs.resettedSession).map {
+        def resetSession(session: JsValue) = {
+          session.as[JsObject] ++
+            Json.obj("isComplete" -> false) ++
+            Json.obj("components" -> Json.obj()) ++
+            Json.obj("attempts" -> 0)
+        }
+
+        ss.saveSession(id, resetSession(ss.existingSession)).map {
           savedSession =>
             logger.trace(s"resetted session has been saved as: $savedSession")
             Ok(savedSession)
