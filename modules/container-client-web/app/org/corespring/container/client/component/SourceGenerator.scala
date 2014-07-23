@@ -1,17 +1,21 @@
 package org.corespring.container.client.component
 
-import java.io.File
-import java.net.URL
-
 import org.corespring.container.client.controllers.helpers.{ LoadClientSideDependencies, NameHelper }
-import org.corespring.container.client.views.txt.js.{ ComponentServerWrapper, ServerLibraryWrapper, ComponentWrapper }
+import org.corespring.container.client.views.txt.js.{ ComponentServerWrapper, ComponentWrapper, ServerLibraryWrapper }
 import org.corespring.container.components.model._
 import org.corespring.container.components.model.dependencies.ComponentTypeFilter
 import org.corespring.container.components.model.packaging.ClientSideDependency
-import play.api.Play
 import play.api.libs.json.JsObject
-
-import scala.io.Codec
+object SourceGenerator {
+  object Keys {
+    val LocalLibs = "local libs"
+    val ThirdParty = "3rd party"
+    val Libraries = "libraries"
+    val Interactions = "Interactions"
+    val Widgets = "Widgets"
+    val Layout = "Layout"
+  }
+}
 
 trait SourceGenerator
   extends ComponentTypeFilter
@@ -25,7 +29,7 @@ trait SourceGenerator
     ComponentWrapper(moduleName, directiveName, src).toString
   }
 
-  protected def layoutToJs(layout: LayoutComponent): String = {
+  def layoutToJs(layout: LayoutComponent): String = {
     layout.client.map(wrapClientLibraryJs(moduleName(layout.org, layout.name))).mkString("\n")
   }
 
@@ -76,7 +80,8 @@ abstract class BaseGenerator
   extends SourceGenerator
   with LoadClientSideDependencies
   with ResourceLoading
-  with LibrarySourceLoading {
+  with LibrarySourceLoading
+  with CodeMaker {
 
   protected def get3rdPartyScripts(dependencies: Seq[ClientSideDependency]): Seq[String] = {
     def loadSrc(name: String)(path: String): Option[String] = resource(s"$name/$path")
@@ -127,18 +132,15 @@ abstract class BaseGenerator
     val scripts = get3rdPartyScripts(dependencies).mkString("\n")
     val libScripts = getLibScripts(components).mkString("\n")
 
-    s"""
-    |//-- lib scripts
-    |$libScripts
-    |//-- End lib scripts
-    |//-- 3rd party scripts
-    |$scripts
-    |//-- End 3rd party scripts
-    |$libJs
-    |$uiJs
-    |$widgetJs
-    |$layoutJs
-    """.stripMargin
+    import SourceGenerator.Keys._
+
+    makeJs(
+      LocalLibs -> libScripts,
+      ThirdParty -> scripts,
+      Libraries -> libJs,
+      Interactions -> uiJs,
+      Widgets -> widgetJs,
+      Layout -> layoutJs)
   }
 
   protected def header(id: Id, msg: String) = s"""
@@ -158,12 +160,12 @@ abstract class BaseGenerator
 
   private def previewJs(id: Id, js: String) = wrapWithHeader(id, js, "Client Preview")
 
-  protected def widgetToJs(ui: Widget): String = previewJs(ui.id, ui.client.render)
+  def widgetToJs(ui: Widget): String = previewJs(ui.id, ui.client.render)
 
-  protected def interactionToJs(ui: Interaction): String = previewJs(ui.id, ui.client.render)
+  def interactionToJs(ui: Interaction): String = previewJs(ui.id, ui.client.render)
 }
 
-trait EditorGenerator extends BaseGenerator {
+trait EditorGenerator extends BaseGenerator with DefaultCodeMaker {
 
   private def configJs(id: Id, js: String) = wrapJs(id, js, "Config", "Client Config")
 
@@ -202,11 +204,11 @@ trait EditorGenerator extends BaseGenerator {
   override protected def libraryToJs(l: Library): String = addLibraryJs(true, true)(l)
 }
 
-trait CatalogGenerator extends BaseGenerator {
+trait CatalogGenerator extends BaseGenerator with DefaultCodeMaker {
   override protected def libraryToJs(l: Library): String = addLibraryJs(true, false)(l)
 }
 
-trait PlayerGenerator extends BaseGenerator {
+trait PlayerGenerator extends BaseGenerator with DefaultCodeMaker {
   override protected def libraryToJs(l: Library): String = addLibraryJs(true, false)(l)
 }
 
