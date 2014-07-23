@@ -10,11 +10,13 @@ import play.api.libs.json._
 import play.api.mvc.{ SimpleResult, Action, AnyContent }
 
 import scala.concurrent.Future
+import org.corespring.container.client.controllers.helpers.JsonHelper
 
 trait Editor
   extends AllItemTypesReader
   with AppWithServices[EditorHooks]
-  with JsModeReading {
+  with JsModeReading
+  with JsonHelper {
 
   override lazy val logger = Logger("container.editor")
 
@@ -72,8 +74,5 @@ trait Editor
 
     hooks.loadItem(itemId).flatMap { e => e.fold(onError, onItem) }
   }
-
-  private def partialObj(fields : (String, Option[JsValue])*): JsObject =
-    JsObject(fields.filter{ case (_, v) => v.nonEmpty }.map{ case (a,b) => (a, b.get) })
 
 }

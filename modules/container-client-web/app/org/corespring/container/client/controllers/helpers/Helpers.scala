@@ -47,3 +47,9 @@ trait Helpers extends NameHelper {
 
 }
 
+trait JsonHelper {
+
+  def partialObj(fields : (String, Option[JsValue])*): JsObject =
+    JsObject(fields.filter{ case (_, v) => v.nonEmpty }.map{ case (a,b) => (a, b.get) })
+
+}
