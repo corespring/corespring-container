@@ -142,12 +142,10 @@ angular.module('corespring-player.controllers')
           $log.warn("Error saving session", error);
         };
 
-        $scope.onEverythingLoaded = function(data) {
+        $scope.onItemAndSessionLoaded = function(data) {
           $scope.rootModel = data;
           $scope.item = data.item;
           $scope.session = data.session;
-          $scope.outcome = data.outcome;
-          $scope.score = data.score;
           $scope.isComplete = data.session ? data.session.isComplete : false;
           $scope.$emit("session-loaded", data.session);
         };
@@ -176,7 +174,7 @@ angular.module('corespring-player.controllers')
 
         $scope.$on('begin', function() {
           $log.debug('[on begin]');
-          PlayerService.loadSession($scope.onEverythingLoaded, $scope.onSessionLoadError, $scope.sessionId);
+          PlayerService.loadItemAndSession($scope.onItemAndSessionLoaded, $scope.onSessionLoadError, $scope.sessionId);
         });
 
         $scope.$on('resetPreview', function() {
@@ -268,14 +266,26 @@ angular.module('corespring-player.controllers')
             $log.warn("mode is already set to: ", data.mode);
             return;
           }
-          currentMode = data.mode;
+
+          var firstTimeSet = currentMode === undefined || currentMode === null;
           var editable = (data.mode === 'gather');
+          currentMode = data.mode;
 
           $timeout(function() {
             $log.debug("[Main] $timeout: set mode: ", data.mode);
             ComponentRegister.setEditable(editable);
             ComponentRegister.setMode(data.mode);
           });
+
+          if(firstTimeSet){
+
+            if(data.mode === 'evaluate'){
+              $scope.loadOutcome(data.options, function() {
+                $log.debug("[Main] score received");
+              });
+            }
+            return;
+          }
 
           var afterMaybeSave = function() {
             if (data.mode === 'evaluate') {

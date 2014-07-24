@@ -119,7 +119,7 @@ trait ComponentServerLogic
     }
   }
 
-  def preProcessItem(question: JsValue, settings: JsValue): JsValue = {
+  override def preProcessItem(question: JsValue): JsValue = {
     val result = withJsContext[JsValue](libs, wrappedComponentLibs) {
       (ctx: Context, scope: Scriptable) =>
         implicit val rootScope = scope
