@@ -47,7 +47,22 @@ angular.module('corespring-editor.directives').directive('modelSaver', [
 
       $scope.$watch('ngModel', function(newValue, oldValue) {
 
+        /**
+         * Returns component ids which have been changed (but not newly added) in the model.
+         */
+        function dirtyComponentIds(newValue, oldValue) {
+          return _.isEmpty(oldValue) ? [] : _.filter(_.keys(newValue.components), function(key) {
+            var component = newValue.components[key];
+            return _.contains(_.keys(oldValue.components), key) &&
+              !(_.isEqual(component, oldValue.components[key]));
+          });
+        }
+
         log('ngModel changed');
+
+        _.forEach(dirtyComponentIds(newValue, oldValue), function(id) {
+          delete newValue.components[id].clean;
+        });
 
         var now = new Date().getTime();
 

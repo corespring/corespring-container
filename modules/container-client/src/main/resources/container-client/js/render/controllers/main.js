@@ -142,12 +142,10 @@ angular.module('corespring-player.controllers')
           $log.warn("Error saving session", error);
         };
 
-        $scope.onEverythingLoaded = function(data) {
+        $scope.onItemAndSessionLoaded = function(data) {
           $scope.rootModel = data;
           $scope.item = data.item;
           $scope.session = data.session;
-          $scope.outcome = data.outcome;
-          $scope.score = data.score;
           $scope.isComplete = data.session ? data.session.isComplete : false;
           $scope.$emit("session-loaded", data.session);
         };
@@ -180,7 +178,25 @@ angular.module('corespring-player.controllers')
         $scope.$on('initialise', function(event, data) {
           $log.debug('[on initialise]');
           PlayerService.setQueryParams(data.queryParams || {});
-          PlayerService.loadSession($scope.onEverythingLoaded, $scope.onSessionLoadError, $scope.sessionId);
+          PlayerService.loadItemAndSession(
+            function(data){
+              $scope.onItemandSesionLoaded(data);
+              
+              if(currentMode !== undefined && currentMode !== null){
+                throw new Error('The mode is already set');
+              }
+
+              currentMode = data.mode;
+              updateRegisterMode();
+
+              if(data.mode === 'evaluate'){
+                $scope.loadOutcome(data.options, function() {
+                  $log.debug("[Main] outcome received");
+                });
+              }
+            }, 
+            $scope.onSessionLoadError, 
+            $scope.sessionId);
         });
 
         $scope.$on('resetPreview', function() {
@@ -255,6 +271,16 @@ angular.module('corespring-player.controllers')
           ComponentRegister.setEditable(data.editable);
         });
 
+        function updateRegisterMode(){
+         var editable = (currentMode === 'gather');
+
+          $timeout(function() {
+            $log.debug("[Main] $timeout: set mode: ", currentMode);
+            ComponentRegister.setEditable(editable);
+            ComponentRegister.setMode(currentMode);
+          }); 
+        }
+
         /** Set mode to view, gather or evaluate
          * Optionally save the responses too.
          * The data object contains:
@@ -272,14 +298,9 @@ angular.module('corespring-player.controllers')
             $log.warn("mode is already set to: ", data.mode);
             return;
           }
-          currentMode = data.mode;
-          var editable = (data.mode === 'gather');
 
-          $timeout(function() {
-            $log.debug("[Main] $timeout: set mode: ", data.mode);
-            ComponentRegister.setEditable(editable);
-            ComponentRegister.setMode(data.mode);
-          });
+          currentMode = data.mode;
+          updateRegisterMode();
 
           var afterMaybeSave = function() {
             if (data.mode === 'evaluate') {

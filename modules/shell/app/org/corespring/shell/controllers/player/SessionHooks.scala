@@ -40,7 +40,7 @@ trait SessionHooks extends ContainerSessionHooks {
 
   override def loadOutcome(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, SessionOutcome]] = handleSessionOutcome(id)(header)
 
-  override def loadEverything(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, FullSession]] = Future {
+  override def loadItemAndSession(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, FullSession]] = Future {
     val result = for {
       session <- sessionService.load(id)
       itemId <- (session \ "itemId").asOpt[String]

@@ -10,7 +10,7 @@ trait PlayerItemPreProcessor extends PreProcessor with GetServerLogic {
   def interactions: Seq[Interaction]
   def libraries: Seq[Library]
 
-  def preProcessItemForPlayer(item: JsValue, settings: JsValue): JsValue = {
+  def preProcessItemForPlayer(item: JsValue): JsValue = {
 
     def processComponent(id: String): (String, JsValue) = {
       val componentQuestions = (item \ "components").as[JsObject]
@@ -30,7 +30,7 @@ trait PlayerItemPreProcessor extends PreProcessor with GetServerLogic {
           } else {
             val componentLibraries: Seq[Library] = i.libraries.map(id => libraries.find(l => l.id.orgNameMatch(id))).flatten
             val serverComponent = serverLogic(i.componentType, i.server.definition, componentLibraries)
-            (id, serverComponent.preProcessItem(question, settings))
+            (id, serverComponent.preProcessItem(question))
           }
       }.getOrElse((id, JsObject(Seq.empty)))
     }
