@@ -41,7 +41,7 @@ var controller = function($scope, ComponentRegister, PlayerServiceDef) {
     function(everything){
       $scope.onSessionSaved(everything);
       if(_.isFunction(data.onSaveSuccess)){
-        data.onSaveSuccess();
+        data.onSaveSuccess(everything);
       }
     }, $scope.onSessionSaveError);
   });
@@ -51,11 +51,11 @@ var controller = function($scope, ComponentRegister, PlayerServiceDef) {
   };
 
   $scope.onSessionSaved = function(everything) {
+    ComponentRegister.setEditable(false);
     $scope.responses = everything.responses;
     $scope.session = everything.session;
     $scope.outcome = everything.outcome;
     $scope.score = everything.score;
-    ComponentRegister.setEditable(false);
   };
 
   $scope.resetStash = function() {
@@ -69,11 +69,10 @@ var controller = function($scope, ComponentRegister, PlayerServiceDef) {
   };
 
   $scope.resetPreview = function() {
-    ComponentRegister.reset();
     $scope.session.isComplete = false;
     $scope.score = undefined;
     $scope.outcome = undefined;
-    ComponentRegister.setEditable(true);
+    ComponentRegister.reset();
   };
 
   $scope.setMode = function(mode) {
@@ -90,6 +89,7 @@ var controller = function($scope, ComponentRegister, PlayerServiceDef) {
   $scope.$on('setEvaluateOptions', function(event, evaluateOptions){
     if (evaluateOptions) {
       PlayerService.updateSessionSettings(evaluateOptions);
+
     }
   });
 
@@ -100,6 +100,7 @@ var controller = function($scope, ComponentRegister, PlayerServiceDef) {
     if (message.options) {
       PlayerService.updateSessionSettings(message.options);
     }
+    ComponentRegister.setEditable(message.mode === 'gather');
   });
 
 };

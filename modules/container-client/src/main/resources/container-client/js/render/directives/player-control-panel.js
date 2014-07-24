@@ -1,40 +1,51 @@
 (function() {
 
+  var GATHER = 'gather';
+  var EVALUATE = 'evaluate';
+
   var defaultSettings = {
     maxNoOfAttempts: 1,
     highlightUserResponse: true,
     highlightCorrectResponse: true,
-    showFeedback: true
+    showFeedback: true,
+    allowEmptyResponses: false
   };
 
-  var configButtonSelector = '.action.config';
+  var defaultSettingsEnabled = {
+    maxNoOfAttempts: true,
+    highlightUserResponse: true,
+    highlightCorrectResponse: true,
+    showFeedback: true,
+    allowEmptyResponses: true
+  };
 
-  angular.module('corespring-player.directives').directive('playerControlPanel', [
+  angular.module('corespring-player.directives').directive('playerControlPanel', ['$compile','$log',
 
-    function() {
-      var link = function($scope, $element) {
+    function playerControlPanel($compile, $log) {
+      function link($scope, $element) {
 
-        var $configLink = $element.find(configButtonSelector);
-
-        $scope.showSettings = false;
         $scope.evaluateOptions = defaultSettings;
+        $scope.evaluateOptionsEnabled = defaultSettingsEnabled;
 
-        var mode = "gather";
+        $scope.playerMode = GATHER;
 
         function setMode(newMode) {
-          if (mode !== newMode) {
+          if ($scope.playerMode !== newMode) {
             $scope.$emit('setMode', {
               mode: newMode,
               options: $scope.evaluateOptions,
               saveResponses: null
             });
-            mode = newMode;
+            $scope.playerMode = newMode;
           }
         }
 
-        $scope.submit = function() {
-          var onSaveSuccess = function(err) {
-            setMode('evaluate');
+        function submitAnswer() {
+          var onSaveSuccess = function(everything) {
+            if (everything) {
+              $scope.score = everything.score;
+            }
+            setMode(EVALUATE);
           };
 
           $scope.$emit('saveResponses', {
@@ -42,36 +53,59 @@
             isComplete: true,
             onSaveSuccess: onSaveSuccess
           });
+        }
+
+        function changeAnswer() {
+          setMode(GATHER);
+        }
+
+        $scope.$watch('playerMode', function onPlayerModeChange(newValue) {
+          if (newValue === GATHER) {
+            $scope.evaluateOptionsEnabled.highlightUserResponse = false;
+            $scope.evaluateOptionsEnabled.highlightCorrectResponse = false;
+            $scope.evaluateOptionsEnabled.allowEmptyResponses = true;
+          } else {
+            $scope.evaluateOptionsEnabled.highlightUserResponse = true;
+            $scope.evaluateOptionsEnabled.highlightCorrectResponse = true;
+            $scope.evaluateOptionsEnabled.allowEmptyResponses = false;
+          }
+        });
+
+
+        $scope.submit = function() {
+          if ($scope.playerMode === GATHER) {
+            submitAnswer();
+          } else {
+            changeAnswer();
+          }
         };
 
         $scope.reset = function() {
           $scope.$broadcast('resetPreview');
+          setMode(GATHER);
         };
 
-        $scope.hasScore = function() {
-          $scope.score = {summary:{percentage: 100}};
+        $scope.hasScore = function hasScore() {
           return $scope.score && $scope.score.summary && !_.isNaN($scope.score.summary.percentage);
         };
 
-        $element.on('hide.bs.popover', function() {
-          $('.settings input', $element).each(function(index, input) {
-            var attr = (function() {
-              var match = $(input).attr('name').match(/evaluateOptions\.(.*)/);
-              return (match && match.length > 1) ? match[1] : undefined;
-            }());
-            if (attr) {
-              $scope.evaluateOptions[attr] = $(input).is(':checked');
-            }
-          });
+        $scope.broadcastSettings = function(){
+          //$log.debug("[playerControlPanel] broadcastSettings");
           $scope.$broadcast('setEvaluateOptions', $scope.evaluateOptions);
+        };
+
+        $element.on('hide.bs.popover', function() {
+          $scope.broadcastSettings();
         });
 
         function checkbox(prop, label) {
           return [
             '<li class="setting">',
-            '  <label>',
+            '  <label ng-class="{disabled: !evaluateOptionsEnabled.' + prop + '}">',
             '    <input type="checkbox" ',
-            '      name="evaluateOptions.' + prop + '"', ($scope.evaluateOptions[prop] ? " checked='checked'" : ''),
+            '      ng-model="evaluateOptions.' + prop + '"',
+            '      ng-disabled="!evaluateOptionsEnabled.' + prop + '"',
+            '      ng-change="broadcastSettings()"',
             '    >',
             '    <span>' + label + '</span>',
             '  </label>',
@@ -79,24 +113,39 @@
           ].join("\n");
         }
 
-        if ($configLink && $configLink.popover) {
-          $configLink.popover({
-            html: true,
-            placement: 'bottom',
-            content: function() {
+        function initConfigPopover() {
+          var CONFIG_BUTTON_SELECTOR = '.action.config';
+          var $configLink = $element.find(CONFIG_BUTTON_SELECTOR);
+          if ($configLink && $configLink.popover) {
 
-              return [
-                '<ul class="settings">',
-                checkbox("highlightUserResponse", "Highlight user outcome"),
-                checkbox("highlightCorrectResponse", "Highlight correct outcome"),
-                checkbox("allowEmptyResponses", "Allow empty responses"),
-                '</ul>',
-                '<a class="btn btn-success btn-small btn-sm" onclick="$(&quot;' + configButtonSelector + '&quot;).popover(&quot;hide&quot;);">Done</a>'
-              ].join('\n');
-            }
-          });
+            $scope.closePopup = function(){
+              $configLink.popover('hide');
+            };
+
+            var template =  [
+              '<ul class="settings">',
+              checkbox("highlightUserResponse", "Highlight user outcome"),
+              checkbox("highlightCorrectResponse", "Highlight correct outcome"),
+              checkbox("allowEmptyResponses", "Allow empty responses"),
+              '</ul>',
+              '<a class="btn btn-success btn-small btn-sm" ng-click="closePopup()">Done</a>'
+            ].join('\n');
+            var linker = $compile(template);
+            var popupContent = linker($scope);
+
+            $configLink.popover({
+              html: true,
+              placement: 'bottom',
+              content: function () {
+                return popupContent;
+              }
+            });
+          }
         }
-      };
+
+        initConfigPopover();
+
+      }
 
       return {
         restrict: 'AE',
@@ -113,7 +162,7 @@
           '      <span ng-show="hasScore()">{{score.summary.percentage}}%</span>',
           '    </div>',
           '    <button class="btn action submit" ng-click="submit()"',
-          '      >Submit</button>',
+          '      >{{playerMode === "gather" ? "Submit Answer" : "Change Answer"}}</button>',
           '    <button class="btn action reset" ng-click="reset()"',
           '      >Reset</button>',
           '    <div class="action config">',
