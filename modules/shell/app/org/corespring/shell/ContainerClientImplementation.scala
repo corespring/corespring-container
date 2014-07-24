@@ -2,7 +2,9 @@ package org.corespring.shell
 
 import java.io.File
 
-import scala.concurrent.{ExecutionContext, Future}
+import org.slf4j.LoggerFactory
+
+import scala.concurrent.{ ExecutionContext, Future }
 
 import com.typesafe.config.ConfigFactory
 import org.corespring.amazon.s3.ConcreteS3Service
@@ -15,12 +17,12 @@ import org.corespring.container.components.model.Component
 import org.corespring.container.components.model.dependencies.DependencyResolver
 import org.corespring.mongo.json.services.MongoService
 import org.corespring.shell.controllers.ShellDataQueryHooks
-import org.corespring.shell.controllers.catalog.actions.{CatalogHooks => ShellCatalogHooks}
-import org.corespring.shell.controllers.editor.{ItemHooks => ShellItemHooks}
-import org.corespring.shell.controllers.editor.actions.{EditorHooks => ShellEditorHooks}
-import org.corespring.shell.controllers.player.{SessionHooks => ShellSessionHooks}
-import org.corespring.shell.controllers.player.actions.{PlayerHooks => ShellPlayerHooks}
-import play.api.{Configuration, Mode, Play}
+import org.corespring.shell.controllers.catalog.actions.{ CatalogHooks => ShellCatalogHooks }
+import org.corespring.shell.controllers.editor.{ ItemHooks => ShellItemHooks }
+import org.corespring.shell.controllers.editor.actions.{ EditorHooks => ShellEditorHooks }
+import org.corespring.shell.controllers.player.{ SessionHooks => ShellSessionHooks }
+import org.corespring.shell.controllers.player.actions.{ PlayerHooks => ShellPlayerHooks }
+import play.api.{ Configuration, Mode, Play }
 import play.api.mvc._
 
 class ContainerClientImplementation(
@@ -28,6 +30,8 @@ class ContainerClientImplementation(
   val sessionService: MongoService,
   componentsIn: => Seq[Component],
   val configuration: Configuration) extends DefaultIntegration {
+
+  lazy val logger = LoggerFactory.getLogger("container.shell.ContainerClientImplementation")
 
   override def components: Seq[Component] = componentsIn
 
@@ -101,7 +105,7 @@ class ContainerClientImplementation(
     override def allComponents: Seq[Component] = ContainerClientImplementation.this.components
 
     override def configuration = ContainerClientImplementation.this.configuration.getConfig("components")
-      .getOrElse{
+      .getOrElse {
         val c = ConfigFactory.parseString(
           s"""
              |minify: ${Play.mode == Mode.Prod}
@@ -109,14 +113,15 @@ class ContainerClientImplementation(
            """.stripMargin)
 
         new Configuration(c)
-    }
+      }
 
     override def dependencyResolver: DependencyResolver = new DependencyResolver {
       override def components: Seq[Component] = allComponents
     }
 
     override def resource(path: String): Option[String] = Play.resource(s"container-client/bower_components/$path").map { url =>
-      scala.io.Source.fromInputStream(url.openStream()).getLines().mkString("\n")
+      logger.trace(s"load resource $path")
+      scala.io.Source.fromInputStream(url.openStream())(scala.io.Codec.UTF8).getLines().mkString("\n")
     }
 
     override def loadLibrarySource(path: String): Option[String] = {
@@ -125,7 +130,8 @@ class ContainerClientImplementation(
       val file = new File(fullPath)
 
       if (file.exists()) {
-        Some(scala.io.Source.fromFile(file).getLines().mkString("\n"))
+        logger.trace(s"load file: $path")
+        Some(scala.io.Source.fromFile(file)(scala.io.Codec.UTF8).getLines().mkString("\n"))
       } else {
         Some(s"console.warn('failed to log $fullPath');")
       }
