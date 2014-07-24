@@ -17,6 +17,7 @@ var Placeholder = function(
       if (_.isFunction(serverLogic.preprocess)) {
         component.data = serverLogic.preprocess(component.data);
       }
+      console.log(component);
       return component;
     }
 
@@ -52,13 +53,35 @@ var Placeholder = function(
       if (!$scope.id || !$scope.componentType) {
         return;
       }
+
+      var component = $scope.register.loadedData[$scope.id];
+
       var $holder = $element.find('.holder');
+      var config = ComponentConfig.get($scope.componentType);
+
       if (!$holder) {
         return;
       }
-      $holder.html('<' + $scope.componentType + ' id="' + $scope.id + '"></' + $scope.componentType + '>');
-      $compile($holder)($scope.$new());
+
+      $scope.showIcon = (config.icon !== undefined) && (component.data.clean === true);
+      $scope.icon = config.icon;
+      $scope.name = config.name;
+
+      if ($scope.showIcon) {
+        $holder.html([
+          '<span class="title">' + $scope.name + '</span>',
+          '<img class="icon" src="' + $scope.icon + '"/>'
+        ].join('\n'));
+      } else {
+        $holder.html('<' + $scope.componentType + ' id="' + $scope.id + '"></' + $scope.componentType + '>');
+        $compile($holder)($scope.$new());
+      }
     }
+
+    // When the item changes, re-render the player component
+    $scope.$emit('registerComponent', $scope.id, {
+      setDataAndSession: renderPlayerComponent
+    });
 
     $scope.$watch('id', renderPlayerComponent);
     $scope.$watch('componentType', renderPlayerComponent);
@@ -128,11 +151,10 @@ var Placeholder = function(
       id: '@'
     },
     template: [
-      '<div class="component-placeholder" ng-class="[componentType,selectedClass]" data-component-id="{{id}}">',
+      '<div class="component-placeholder" ng-class="{\'show-icon\': showIcon}" data-component-id="{{id}}">',
       '  <div class="blocker">',
       '    <div class="bg"></div>',
       '    <div class="content">',
-      '      <div class="title"><span ng-show="mainMsg">{{title}}</span></div>',
       '    </div>',
       '    <div class="edit-controls">',
       '      <div class="edit-icon-button" tooltip="edit" tooltip-append-to-body="true" tooltip-placement="bottom">',
@@ -143,7 +165,8 @@ var Placeholder = function(
       '      </div>',
       '    </div>',
       '  </div>',
-      '  <div class="holder"></div>',
+      '  <div class="holder">',
+      '  </div>',
       '</div>'
     ].join('\n')
   };

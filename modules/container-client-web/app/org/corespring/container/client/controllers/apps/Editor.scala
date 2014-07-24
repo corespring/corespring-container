@@ -10,11 +10,13 @@ import play.api.libs.json._
 import play.api.mvc.{ SimpleResult, Action, AnyContent }
 
 import scala.concurrent.Future
+import org.corespring.container.client.controllers.helpers.JsonHelper
 
 trait Editor
   extends AllItemTypesReader
   with AppWithServices[EditorHooks]
-  with JsModeReading {
+  with JsModeReading
+  with JsonHelper {
 
   override def loggerName = "container.app.editor"
 
@@ -24,14 +26,21 @@ trait Editor
 
   private def toJson(ci: ComponentInfo): JsValue = {
     val tag = tagName(ci.id.org, ci.id.name)
-    Json.obj(
-      "name" -> ci.id.name,
-      "title" -> JsString(ci.title.getOrElse("")),
-      "titleGroup" -> JsString(ci.titleGroup.getOrElse("")),
-      "icon" -> s"$modulePath/icon/$tag",
-      "componentType" -> tag,
-      "defaultData" -> ci.defaultData,
-      "configuration" -> (ci.packageInfo \ "external-configuration").asOpt[JsObject])
+    partialObj(
+      "name" -> Some(JsString(ci.id.name)),
+      "title" -> Some(JsString(ci.title.getOrElse(""))),
+      "titleGroup" -> Some(JsString(ci.titleGroup.getOrElse(""))),
+      "icon" -> (interactions.find(_.componentType == tag).map(_.icon) match {
+        case Some(iconBytes) => iconBytes match {
+          case Some(thing) => Some(JsString(s"$modulePath/icon/$tag"))
+          case _ => None
+        }
+        case _ => None
+      }),
+      "componentType" -> Some(JsString(tag)),
+      "defaultData" -> Some(ci.defaultData),
+      "configuration" -> (ci.packageInfo \ "external-configuration").asOpt[JsObject]
+    )
   }
 
   override def servicesJs = {

@@ -1,7 +1,7 @@
 package org.corespring.shell.controllers.player
 
 import org.corespring.container.client.hooks.Hooks.StatusMessage
-import org.corespring.container.client.hooks.{ FullSession, SaveSession, SessionOutcome, SessionHooks => ContainerSessionHooks }
+import org.corespring.container.client.hooks.{ SessionHooks => ContainerSessionHooks, FullSession, SaveSession, SessionOutcome }
 import org.corespring.mongo.json.services.MongoService
 import play.api.Logger
 import play.api.http.Status._
@@ -40,7 +40,7 @@ trait SessionHooks extends ContainerSessionHooks {
 
   override def loadOutcome(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, SessionOutcome]] = handleSessionOutcome(id)(header)
 
-  override def loadEverything(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, FullSession]] = Future {
+  override def loadItemAndSession(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, FullSession]] = Future {
     val result = for {
       session <- sessionService.load(id)
       itemId <- (session \ "itemId").asOpt[String]
@@ -57,26 +57,6 @@ trait SessionHooks extends ContainerSessionHooks {
       json =>
         Right(json)
     }.getOrElse(Left(NOT_FOUND -> s"Can't find a session with id: $id"))
-  }
-
-  override def reset(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]] = Future {
-    logger.debug(s"reset session: $id")
-
-    def resetSession(session: JsValue) = {
-      val resettedSession = session.as[JsObject] ++
-        Json.obj("isComplete" -> false) ++
-        Json.obj("components" -> Json.obj()) ++
-        Json.obj("attempts" -> 0)
-      sessionService.save(id, resettedSession)
-      resettedSession
-    }
-
-    val result = for {
-      session <- sessionService.load(id)
-    } yield {
-      if (isSecure(header)) session else resetSession(session)
-    }
-    result.map(Right(_)).getOrElse(Left(BAD_REQUEST -> ""))
   }
 
   override def save(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, SaveSession]] = Future {

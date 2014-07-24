@@ -12,7 +12,7 @@ trait NameHelper {
 
   protected def moduleName(org: String, comp: String) = string.join(".", org, comp)
 
-  protected def tagName(org: String, comp: String) = string.join("-", org, comp)
+  protected def tagName(org: String, comp: String): String = string.join("-", org, comp)
 
   protected def directiveName(org: String, comp: String) = s"$org${string.hyphenatedToTitleCase(comp)}"
 }
@@ -56,3 +56,9 @@ trait Helpers extends NameHelper {
   }
 }
 
+trait JsonHelper {
+
+  def partialObj(fields : (String, Option[JsValue])*): JsObject =
+    JsObject(fields.filter{ case (_, v) => v.nonEmpty }.map{ case (a,b) => (a, b.get) })
+
+}

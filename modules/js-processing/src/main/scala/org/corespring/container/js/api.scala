@@ -9,7 +9,7 @@ object api {
 
     def createOutcome(question: JsValue, response: JsValue, settings: JsValue, targetOutcome: JsValue): JsValue
 
-    def preProcessItem(question: JsValue, settings: JsValue): JsValue
+    def preProcessItem(question: JsValue): JsValue
   }
 
   trait ItemAuthorOverride {

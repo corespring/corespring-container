@@ -52,9 +52,10 @@ angular.module('@namespace').factory('PlayerService', ['$http', function($http){
     this.resetSession  = callWithNoData('@resetSession.method.toLowerCase', '@resetSession.url');
     this.getScore = callWithData('@getScore.method.toLowerCase', '@getScore.url');
     this.completeResponse =  callWithNoData('@completeResponse.method.toLowerCase', '@completeResponse.url');
-    this.loadSession = callWithNoData('@loadSession.method.toLowerCase', '@loadSession.url');
+    this.loadItemAndSession = callWithNoData('@loadSession.method.toLowerCase', '@loadSession.url');
     this.loadOutcome = callWithData('@loadOutcome.method.toLowerCase', '@loadOutcome.url');
-  } 
+    }
+
 
   return PlayerService; 
 }]);

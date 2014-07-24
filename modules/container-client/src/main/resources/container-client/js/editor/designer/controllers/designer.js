@@ -109,7 +109,8 @@
         $scope.lastId++;
 
         var defaults = {
-          weight: 1
+          weight: 1,
+          clean: true
         };
 
         var newData = _.extend(defaults, _.cloneDeep(component.defaultData));

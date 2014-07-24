@@ -54,11 +54,9 @@ trait SupportingMaterialHooks extends HasContext {
 }
 
 trait SessionHooks extends HasContext {
-  def loadEverything(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, FullSession]]
+  def loadItemAndSession(sessionId: String)(implicit header: RequestHeader): Future[Either[StatusMessage, FullSession]]
 
   def load(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]]
-
-  def reset(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]]
 
   def loadOutcome(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, SessionOutcome]]
 
