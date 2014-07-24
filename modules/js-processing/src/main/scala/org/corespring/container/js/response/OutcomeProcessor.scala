@@ -1,6 +1,6 @@
 package org.corespring.container.js.response
 
-import org.corespring.container.components.model.dependencies.{ComponentSplitter, DependencyResolver}
+import org.corespring.container.components.model.dependencies.{ ComponentSplitter, DependencyResolver }
 import org.corespring.container.components.model.{ Component, Interaction, Library }
 import org.corespring.container.components.response.{ OutcomeProcessor => ContainerOutcomeProcessor }
 import org.corespring.container.js.api.GetServerLogic
@@ -24,7 +24,7 @@ trait OutcomeProcessor
 
   def components: Seq[Component]
 
-  private lazy val logger = LoggerFactory.getLogger("components.outcome")
+  private lazy val logger = LoggerFactory.getLogger("container.OutcomeProcessor")
 
   def createOutcome(item: JsValue, itemSession: JsValue, settings: JsValue): JsValue = {
 
@@ -52,6 +52,7 @@ trait OutcomeProcessor
             a =>
               val sortedLibs = dependencyResolver.filterByType[Library](dependencyResolver.resolveComponents(Seq(component.id)).filterNot(_.id.orgNameMatch(component.id)))
               val serverComponent = serverLogic(component.componentType, component.server.definition, sortedLibs)
+              logger.trace(s"call server logic: \nquestion: $question, \nanswer: $a, \nsetting: $settings, \ntargetOutcome: $targetOutcome")
               val outcome = serverComponent.createOutcome(question, a, settings, targetOutcome)
               logger.trace(s"outcome: $outcome")
               (id -> outcome)
@@ -63,7 +64,7 @@ trait OutcomeProcessor
 
     }
 
-    def canHaveOutcome(t:(String,JsValue)) : Boolean = {
+    def canHaveOutcome(t: (String, JsValue)): Boolean = {
       val componentType = (t._2 \ "componentType").as[String]
       interactions.exists(_.matchesType(componentType))
     }
