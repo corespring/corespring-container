@@ -53,6 +53,9 @@ var Placeholder = function(
       if (!$scope.id || !$scope.componentType) {
         return;
       }
+
+      var component = $scope.register.loadedData[$scope.id];
+
       var $holder = $element.find('.holder');
       var config = ComponentConfig.get($scope.componentType);
 
@@ -60,11 +63,11 @@ var Placeholder = function(
         return;
       }
 
-      $scope.hasIcon = config.icon !== undefined;
+      $scope.showIcon = (config.icon !== undefined) && (component.data.clean === true);
       $scope.icon = config.icon;
       $scope.name = config.name;
 
-      if ($scope.hasIcon) {
+      if ($scope.showIcon) {
         $holder.html([
           '<span class="title">' + $scope.name + '</span>',
           '<img class="icon" src="' + $scope.icon + '"/>'
@@ -143,7 +146,7 @@ var Placeholder = function(
       id: '@'
     },
     template: [
-      '<div class="component-placeholder" ng-class="{\'has-icon\': hasIcon}" data-component-id="{{id}}">',
+      '<div class="component-placeholder" ng-class="{\'show-icon\': showIcon}" data-component-id="{{id}}">',
       '  <div class="blocker">',
       '    <div class="bg"></div>',
       '    <div class="content">',
