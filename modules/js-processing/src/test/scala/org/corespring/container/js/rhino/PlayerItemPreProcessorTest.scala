@@ -40,14 +40,8 @@ class PlayerItemPreProcessorTest extends Specification {
             "correctResponse" -> Json.obj(
               "value" -> "1"))))
 
-      val session = Json.obj(
-        "components" -> Json.obj(
-          "1" -> Json.obj(
-            "itemSession" -> Json.obj("value" -> "2"),
-            "stash" -> Json.obj())))
-
       val processor = new RhinoPlayerItemPreProcessor(Seq(interaction), Seq.empty)
-      val result = processor.preProcessItemForPlayer(item, session)
+      val result = processor.preProcessItemForPlayer(item)
       (result \ "components" \ "1" \ "dummy").as[String] === "something"
       (result \ "components" \ "1" \ "model").as[String] === "someModel"
       (result \ "weight").as[String] === "1"
@@ -80,7 +74,7 @@ class PlayerItemPreProcessorTest extends Specification {
       val processor = new RhinoPlayerItemPreProcessor(Seq(interaction), Seq.empty)
 
       try {
-        processor.preProcessItemForPlayer(item, Json.obj())
+        processor.preProcessItemForPlayer(item)
         success
       } catch {
         case x: Throwable => failure
