@@ -16,7 +16,7 @@
     <logger name="application" level="DEBUG" />
     <logger name="container" level="TRACE" />
 
-    <root level="DEBUG">
+    <root level="INFO">
         <appender-ref ref="STDOUT" />
         <appender-ref ref="FILE" />
     </root>
