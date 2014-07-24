@@ -78,6 +78,11 @@ var Placeholder = function(
       }
     }
 
+    // When the item changes, re-render the player component
+    $scope.$emit('registerComponent', $scope.id, {
+      setDataAndSession: renderPlayerComponent
+    });
+
     $scope.$watch('id', renderPlayerComponent);
     $scope.$watch('componentType', renderPlayerComponent);
 
