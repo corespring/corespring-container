@@ -3,10 +3,10 @@ package org.corespring.shell.controllers
 import play.api.Logger
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsString
-import play.api.libs.json.{ Json, JsValue }
+import play.api.libs.json.{Json, JsValue}
 import play.api.mvc._
 import org.corespring.mongo.json.services.MongoService
-import org.corespring.shell.SessionKeys
+import org.corespring.shell.{IndexLink, SessionKeys}
 
 trait Main extends Controller {
 
@@ -24,7 +24,7 @@ trait Main extends Controller {
 
       def failLoadPlayerForSession = request.getQueryString(SessionKeys.failLoadPlayer).isDefined
 
-      val items: Seq[(String, String, String, String, String, String)] = itemService.list("profile.taskInfo.title").sortBy(_.toString).map {
+      val items: Seq[IndexLink] = itemService.list("profile.taskInfo.title").sortBy(_.toString).map {
         json: JsValue =>
           val name = (json \ "profile" \ "taskInfo" \ "title").asOpt[String] match {
             case Some(title) if title.trim().length() > 0 => title
@@ -35,7 +35,7 @@ trait Main extends Controller {
           val editorUrl = s"/client/editor/${id}/index.html"
           val deleteUrl = s"/delete-item/$id"
           val catalogUrl = s"/client/item/$id/preview"
-          (name, id, playerUrl, editorUrl, deleteUrl, catalogUrl)
+          IndexLink(name, playerUrl, editorUrl, deleteUrl, catalogUrl)
       }
 
       logger.debug(items.mkString(","))
@@ -50,7 +50,10 @@ trait Main extends Controller {
   def createSessionPage(itemId: String) = Action {
     request =>
       val createSessionCall = routes.Main.createSession
-      Ok(html.createSession(itemId, createSessionCall.url))
+      val url = s"${createSessionCall.url}?${request.rawQueryString}"
+      println(s"----> $url")
+
+      Ok(html.createSession(itemId, url))
   }
 
   def deleteItem(itemId: String) = Action {
@@ -86,7 +89,18 @@ trait Main extends Controller {
 
       result.map {
         oid =>
-          val call = org.corespring.container.client.controllers.apps.routes.BasePlayer.loadPlayerForSession(oid.toString)
+
+          println(s"mode-----> ${request.rawQueryString}")
+          println(request.queryString("mode").exists(_ == "prod"))
+
+          val call = {
+            if(request.queryString("mode").exists(_ == "prod")){
+              org.corespring.container.client.controllers.apps.routes.ProdHtmlPlayer.config(oid.toString)
+            } else {
+              org.corespring.container.client.controllers.apps.routes.BasePlayer.loadPlayerForSession(oid.toString)
+            }
+          }
+          println(s"url ${call.url}")
           Ok(JsObject(Seq("url" -> JsString(call.url))))
       }.getOrElse {
         logger.debug("Can't create the session")

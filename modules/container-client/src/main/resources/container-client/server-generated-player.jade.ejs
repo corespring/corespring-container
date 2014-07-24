@@ -54,7 +54,7 @@ html(xmlns='http://www.w3.org/1999/html')
               this.saveSession  = inst.saveSession;
               this.getScore = inst.getScore;
               this.completeResponse = inst.completeResponse;
-              this.loadSession = function(onSuccess, onFailure, id) {
+              this.loadItemAndSession = function(onSuccess, onFailure, id) {
                 var sessionJson = !{sessionJson};
                 onSuccess(sessionJson);
               };
