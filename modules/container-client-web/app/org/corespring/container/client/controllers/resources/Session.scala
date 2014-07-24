@@ -1,19 +1,16 @@
 package org.corespring.container.client.controllers.resources
 
 import org.corespring.container.client.HasContext
-import org.corespring.container.client.hooks.Hooks.StatusMessage
-import org.corespring.container.client.hooks._
 import org.corespring.container.client.controllers.resources.Session.Errors
 import org.corespring.container.client.controllers.resources.session.ItemPruner
+import org.corespring.container.client.hooks.Hooks.StatusMessage
+import org.corespring.container.client.hooks._
 import org.corespring.container.components.outcome.ScoreProcessor
 import org.corespring.container.components.processing.PlayerItemPreProcessor
 import org.corespring.container.components.response.OutcomeProcessor
 import play.api.Logger
-import play.api.http.Status._
 import play.api.libs.json._
-import play.api.mvc.{ RequestHeader, Action, Controller, SimpleResult }
-
-import scala.concurrent.{ Future, ExecutionContext }
+import play.api.mvc.{ Action, Controller, SimpleResult }
 
 object Session {
   object Errors {
@@ -24,7 +21,7 @@ object Session {
 
 trait Session extends Controller with ItemPruner with HasContext {
 
-  val logger = Logger("session.controller")
+  val logger = Logger("container.Session")
 
   def outcomeProcessor: OutcomeProcessor
 
@@ -72,41 +69,53 @@ trait Session extends Controller with ItemPruner with HasContext {
 
       val json = fs.everything
 
+      def defaultSetting: JsObject = {
+        logger.warn(s"[$id][loadEverything] - the session has no 'settings' object - we are going to provide a default")
+        Json.obj("showFeedback" -> true,
+          "allowEmptyResponses" -> true,
+          "highlightCorrectResponse" -> true,
+          "highlightUserResponse" -> true)
+      }
+
       def isCompleteFromSession(session: JsValue): Boolean = {
         (session \ "isComplete").asOpt[Boolean].getOrElse(false)
       }
 
-      def includeOutcome = {
-        val requested = request.getQueryString("includeOutcome").map {
-          _ == "true"
-        }.getOrElse(false)
+      lazy val includeOutcome = {
+        val isEvaluate = request.getQueryString("mode").exists { io =>
+          io == "evaluate"
+        }
 
-        requested && (fs.isSecure && isCompleteFromSession(json \ "session"))
+        logger.trace(s"[$id][loadEverything] evaluate mode?: $isEvaluate")
+
+        if (fs.isSecure) {
+          isEvaluate && isCompleteFromSession(json \ "session")
+        } else {
+          isEvaluate
+        }
       }
 
       val itemJson = (json \ "item").as[JsObject]
       val prunedItem = pruneItem(itemJson)
-
       val sessionJson = (json \ "session").as[JsObject]
+      val processedItem = itemPreProcessor.preProcessItemForPlayer(prunedItem)
 
-      val processedItem = itemPreProcessor.preProcessItemForPlayer(prunedItem, sessionJson \ "settings")
+      logger.trace(s"[$id][loadEverything] include outcome: $includeOutcome")
 
-      if (!includeOutcome) {
-        Ok(
-          Json.obj(
-            "item" -> processedItem,
-            "session" -> sessionJson))
-      } else {
-        val outcome = outcomeProcessor.createOutcome(itemJson, sessionJson, sessionJson \ "settings")
+      val base = Json.obj(
+        "item" -> processedItem,
+        "session" -> sessionJson)
+
+      val extras = if (includeOutcome) {
+        val settings = (json \ "settings").asOpt[JsObject].getOrElse(defaultSetting)
+        val outcome = outcomeProcessor.createOutcome(itemJson, sessionJson, settings)
         val score = scoreProcessor.score(itemJson, sessionJson, outcome)
-        val out = Json.obj(
-          "item" -> processedItem,
+        Json.obj(
           "outcome" -> outcome,
-          "score" -> score,
-          "session" -> sessionJson)
-        Ok(out)
-      }
-      Ok(json)
+          "score" -> score)
+      } else Json.obj()
+
+      Ok(base ++ extras)
     })
   }
 
@@ -163,8 +172,8 @@ trait Session extends Controller with ItemPruner with HasContext {
       } else if (!hasAnswers) {
         BadRequest(Json.obj("error" -> JsString("Can't create an outcome if no answers have been saved")))
       } else {
-        val options = request.body.asJson.getOrElse(Json.obj())
-        val outcome = outcomeProcessor.createOutcome(so.item, so.itemSession, options)
+        val settings = request.body.asJson.getOrElse(Json.obj())
+        val outcome = outcomeProcessor.createOutcome(so.item, so.itemSession, settings)
         val score = scoreProcessor.score(so.item, so.itemSession, outcome)
         Ok(Json.obj("outcome" -> outcome) ++ Json.obj("score" -> score))
       }
