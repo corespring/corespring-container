@@ -179,8 +179,8 @@ angular.module('corespring-player.controllers')
           $log.debug('[on initialise]');
           PlayerService.setQueryParams(data.queryParams || {});
           PlayerService.loadItemAndSession(
-            function(data){
-              $scope.onItemandSesionLoaded(data);
+            function(itemAndSession){
+              $scope.onItemAndSessionLoaded(itemAndSession);
               
               if(currentMode !== undefined && currentMode !== null){
                 throw new Error('The mode is already set');
