@@ -12,7 +12,7 @@ var controller = function ($scope, $log, $timeout, MessageBridge) {
       });
     };
 
-    $timeout(broadcastToChildren, 400);
+    $timeout(broadcastToChildren, 100);
   };
 
   MessageBridge.addMessageListener($scope.messageBridgeListener);
@@ -24,10 +24,6 @@ var controller = function ($scope, $log, $timeout, MessageBridge) {
 
   $scope.$on("inputReceived", function(event, data){
     MessageBridge.sendMessage('parent', { message: "inputReceived", sessionStatus: data.sessionStatus});
-  });
-
-  $timeout( function(){
-    $scope.$broadcast('begin');
   });
 
 };

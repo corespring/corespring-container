@@ -173,9 +173,13 @@ angular.module('corespring-player.controllers')
             interactionsWithResponseCount: ComponentRegister.interactionsWithResponseCount()
           };
         };
-
-        $scope.$on('begin', function() {
-          $log.debug('[on begin]');
+        
+        /**
+         * Initialise the controller - this has to be the 1st thing you call
+         */
+        $scope.$on('initialise', function(event, data) {
+          $log.debug('[on initialise]');
+          PlayerService.setQueryParams(data.queryParams || {});
           PlayerService.loadSession($scope.onEverythingLoaded, $scope.onSessionLoadError, $scope.sessionId);
         });
 
