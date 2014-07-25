@@ -6,6 +6,7 @@ import org.corespring.container.components.model._
 import org.corespring.container.components.model.dependencies.ComponentTypeFilter
 import org.corespring.container.components.model.packaging.ClientSideDependency
 import play.api.libs.json.JsObject
+
 object SourceGenerator {
   object Keys {
     val LocalLibs = "local libs"
@@ -81,7 +82,7 @@ abstract class BaseGenerator
   with LoadClientSideDependencies
   with ResourceLoading
   with LibrarySourceLoading
-  with CodeMaker {
+  with JsStringBuilder {
 
   protected def get3rdPartyScripts(dependencies: Seq[ClientSideDependency]): Seq[String] = {
     def loadSrc(name: String)(path: String): Option[String] = resource(s"$name/$path")
@@ -134,7 +135,7 @@ abstract class BaseGenerator
 
     import SourceGenerator.Keys._
 
-    makeJs(
+    buildJsString(
       LocalLibs -> libScripts,
       ThirdParty -> scripts,
       Libraries -> libJs,
@@ -165,7 +166,7 @@ abstract class BaseGenerator
   def interactionToJs(ui: Interaction): String = previewJs(ui.id, ui.client.render)
 }
 
-trait EditorGenerator extends BaseGenerator with DefaultCodeMaker {
+trait EditorGenerator extends BaseGenerator {
 
   private def configJs(id: Id, js: String) = wrapJs(id, js, "Config", "Client Config")
 
@@ -204,11 +205,11 @@ trait EditorGenerator extends BaseGenerator with DefaultCodeMaker {
   override protected def libraryToJs(l: Library): String = addLibraryJs(true, true)(l)
 }
 
-trait CatalogGenerator extends BaseGenerator with DefaultCodeMaker {
+trait CatalogGenerator extends BaseGenerator with JsStringBuilder {
   override protected def libraryToJs(l: Library): String = addLibraryJs(true, false)(l)
 }
 
-trait PlayerGenerator extends BaseGenerator with DefaultCodeMaker {
+trait PlayerGenerator extends BaseGenerator with JsStringBuilder {
   override protected def libraryToJs(l: Library): String = addLibraryJs(true, false)(l)
 }
 

@@ -1,12 +1,7 @@
 package org.corespring.container.client.component
 
-trait CodeMaker {
-  def makeJs(e: (String, String)*): String
-}
-
-trait DefaultCodeMaker extends CodeMaker {
-
-  override def makeJs(e: (String, String)*): String = {
+trait JsStringBuilder {
+  def buildJsString(e: (String, String)*): String = {
     val sb = new StringBuilder()
     e.foldLeft(sb)((acc, v) => {
       val (n, src) = v
@@ -15,3 +10,4 @@ trait DefaultCodeMaker extends CodeMaker {
     sb.toString
   }
 }
+
