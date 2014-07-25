@@ -104,16 +104,16 @@ class ContainerClientImplementation(
 
     override def allComponents: Seq[Component] = ContainerClientImplementation.this.components
 
-    override def configuration = ContainerClientImplementation.this.configuration.getConfig("components")
-      .getOrElse {
-        val c = ConfigFactory.parseString(
-          s"""
-             |minify: ${Play.mode == Mode.Prod}
-             |gzip: ${Play.mode == Mode.Prod}
+    override def configuration = {
+      val rc = ContainerClientImplementation.this.configuration
+      val c = ConfigFactory.parseString(
+        s"""
+             |minify: ${rc.getBoolean("components.minify").getOrElse(Play.mode == Mode.Prod)}
+             |gzip: ${rc.getBoolean("components.gzip").getOrElse(Play.mode == Mode.Prod)}
            """.stripMargin)
 
-        new Configuration(c)
-      }
+      new Configuration(c)
+    }
 
     override def dependencyResolver: DependencyResolver = new DependencyResolver {
       override def components: Seq[Component] = allComponents
