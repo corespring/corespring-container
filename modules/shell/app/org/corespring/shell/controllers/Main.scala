@@ -1,13 +1,11 @@
 package org.corespring.shell.controllers
 
-import org.corespring.container.client.controllers.player.{AddUrlParam, PlayerQueryStringOptions}
-import play.api.Logger
-import play.api.libs.json.JsObject
-import play.api.libs.json.JsString
-import play.api.libs.json.{Json, JsValue}
-import play.api.mvc._
+import org.corespring.container.client.controllers.player.{ AddUrlParam, PlayerQueryStringOptions }
 import org.corespring.mongo.json.services.MongoService
-import org.corespring.shell.{IndexLink, SessionKeys}
+import org.corespring.shell.{ IndexLink, SessionKeys }
+import play.api.Logger
+import play.api.libs.json.{ JsObject, JsString, JsValue, Json }
+import play.api.mvc._
 
 trait Main
   extends Controller
@@ -15,7 +13,6 @@ trait Main
   with AddUrlParam {
 
   import org.corespring.shell.views._
-  import org.corespring.shell.controllers._
 
   val logger = Logger("shell.home")
 
@@ -55,7 +52,7 @@ trait Main
     implicit request =>
       val createSessionCall = routes.Main.createSession
       val url = createSessionCall.url.setPlayerPage(getPlayerPage)
-      val finalUrl : String = request.getQueryString("mode").map { m =>
+      val finalUrl: String = request.getQueryString("mode").map { m =>
         addUrlParam(url, "mode", m)
       }.getOrElse(url)
 
@@ -102,7 +99,7 @@ trait Main
               org.corespring.container.client.controllers.apps.routes.BasePlayer.loadPlayerForSession(oid.toString)
             }
           }
-          println(s"url ${call.url}")
+          logger.info(s"url ${call.url}")
           Ok(JsObject(Seq("url" -> JsString(call.url.setPlayerPage(getPlayerPage)))))
       }.getOrElse {
         logger.debug("Can't create the session")

@@ -1,21 +1,15 @@
 package org.corespring.container.client.controllers.apps
 
-import java.io.{ BufferedReader, InputStreamReader, Reader }
-
-import org.corespring.container.client.controllers.player.PlayerQueryStringOptions
-
-import scala.concurrent.Future
-
-import de.neuland.jade4j.{ Jade4J, JadeConfiguration }
-import de.neuland.jade4j.template.{ JadeTemplate, TemplateLoader }
 import org.corespring.container.client.component.PlayerItemTypeReader
+import org.corespring.container.client.controllers.jade.Jade
+import org.corespring.container.client.controllers.player.PlayerQueryStringOptions
 import org.corespring.container.client.hooks.PlayerHooks
 import org.corespring.container.client.views.txt.js.PlayerServices
 import org.corespring.container.components.model.Id
-import play.api.{ Logger, Mode, Play }
 import play.api.libs.json.{ JsValue, Json }
 import play.api.mvc._
-import play.api.templates.Html
+
+import scala.concurrent.Future
 
 trait BasePlayer
   extends PlayerItemTypeReader
@@ -23,7 +17,7 @@ trait BasePlayer
   with JsModeReading
   with PlayerQueryStringOptions {
 
-  import org.corespring.container.client.controllers.apps.routes.{ BasePlayer => PlayerRoutes, ProdHtmlPlayer }
+  import org.corespring.container.client.controllers.apps.routes.{ ProdHtmlPlayer, BasePlayer => PlayerRoutes }
 
   override def context: String = "player"
 
@@ -46,7 +40,7 @@ trait BasePlayer
   def createSessionForItem(itemId: String): Action[AnyContent] = Action.async { implicit request =>
     hooks.createSessionForItem(itemId).map(handleSuccess { sessionId =>
 
-      val url : String = isProdPlayer match {
+      val url: String = isProdPlayer match {
         case true => ProdHtmlPlayer.config(sessionId).url
         case _ => PlayerRoutes.loadPlayerForSession(sessionId).url.setPlayerPage(getPlayerPage)
       }
@@ -80,49 +74,19 @@ trait BasePlayer
 
 trait JsonPlayer extends BasePlayer {}
 
-private class InternalTemplateLoader(val root: String) extends TemplateLoader {
-
-  import play.api.Play.current
-
-  override def getLastModified(name: String): Long = Play.resource(s"$root/$name").map { url =>
-    url.openConnection().getLastModified
-  }.getOrElse { throw new RuntimeException(s"Unable to load jade file as a resource from: $root/$name") }
-
-  override def getReader(name: String): Reader = Play.resource(s"$root/$name").map { url =>
-    new BufferedReader(new InputStreamReader(url.openStream()))
-  }.getOrElse { throw new RuntimeException(s"Unable to load jade file as a resource from: $root/$name") }
-}
-
-trait HtmlPlayer extends BasePlayer {
-
-  import play.api.Play.current
+trait HtmlPlayer extends BasePlayer with Jade {
 
   val name = "server-generated-player.jade"
 
-  val jadeConfig = {
-    val c = new JadeConfiguration
-    c.setTemplateLoader(new InternalTemplateLoader("container-client"))
-    c.setMode(Jade4J.Mode.HTML)
-    c.setPrettyPrint(Play.mode == Mode.Dev)
-    c
-  }
-
-  lazy val jadeTemplate: JadeTemplate = {
-    jadeConfig.getTemplate(name)
-  }
-
   def template(html: String, deps: Seq[String], js: Seq[String], css: Seq[String], json: JsValue) = {
-    import scala.collection.JavaConversions._
-    val params = Map(
+    val params: Map[String, Object] = Map(
       "html" -> html,
       "ngModules" -> s"[${deps.map(d => s"'$d'").mkString(",")}]",
       "js" -> js.toArray,
       "css" -> css.toArray,
       "sessionJson" -> Json.stringify(json))
     logger.trace(s"render jade with params: $params")
-
-    val rendered = jadeConfig.renderTemplate(jadeTemplate, params)
-    Html(new StringBuilder(rendered).toString)
+    renderJade(name, params)
   }
 
   override def config(id: String) = Action.async { implicit request =>

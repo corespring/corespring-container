@@ -1,17 +1,17 @@
 package org.corespring.container.client.component
 
+import org.corespring.container.client.component.SourceGenerator.Keys._
 import org.corespring.container.components.model._
 import org.corespring.container.components.model.dependencies.ComponentMaker
 import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
-import SourceGenerator.Keys._
 import play.api.libs.json.Json
 
 class BaseGeneratorTest extends Specification with ComponentMaker {
 
   class generatorScope(libJs: String = "libJs") extends Scope {
 
-    val generator = new BaseGenerator {
+    val generator = new BaseGenerator with JsStringBuilder {
       override protected def libraryToJs(l: Library): String = libJs
 
       override def resource(path: String): Option[String] = {
@@ -20,22 +20,11 @@ class BaseGeneratorTest extends Specification with ComponentMaker {
 
       override def loadLibrarySource(path: String): Option[String] = Some(s"lib-$path")
 
-      override def makeJs(e: (String, String)*): String = e.foldLeft("")((acc, s) => acc + s)
+      override def buildJsString(e: (String, String)*): String = e.foldLeft("")((acc, s) => acc + s)
     }
   }
 
   "BaseGenerator" should {
-
-    "work" in new generatorScope() {
-      import SourceGenerator.Keys._
-      generator.js(Seq.empty) === generator.makeJs(
-        LocalLibs -> "",
-        ThirdParty -> "",
-        Libraries -> "",
-        Interactions -> "",
-        Widgets -> "",
-        Layout -> "")
-    }
 
     "with 1 interaction, 1 widget and 1 layout components" in new generatorScope() {
 
@@ -43,7 +32,7 @@ class BaseGeneratorTest extends Specification with ComponentMaker {
         uiComp("one", Seq.empty).copy(client = Client("render", "configure", None)),
         widget("two", Seq.empty).copy(client = Client("render", "configure", None)),
         layout("three").copy(client = Seq(LibrarySource("a", "a"))))
-      generator.js(comps) === generator.makeJs(
+      generator.js(comps) === generator.buildJsString(
         LocalLibs -> "",
         ThirdParty -> "",
         Libraries -> "",
@@ -66,7 +55,7 @@ class BaseGeneratorTest extends Specification with ComponentMaker {
 
       val comps = Seq(comp)
 
-      generator.js(comps) === generator.makeJs(
+      generator.js(comps) === generator.buildJsString(
         LocalLibs -> generator.loadLibrarySource("org/one/libs/a").get,
         ThirdParty -> generator.resource("dep-1/path/to/dep-1").get,
         Libraries -> "",
