@@ -95,11 +95,6 @@ var Instance = function(element, options, errorCallback, log) {
     detachOnRemove(listenerFn);
   }
 
-  function makeUrl(url, queryParams) {
-    var Builder = require('url-builder');
-    return new Builder().build(url, queryParams);
-  }
-
   function initialize(e, options) {
     if (!options || !options.url) {
       errorCallback({
@@ -114,7 +109,7 @@ var Instance = function(element, options, errorCallback, log) {
       return;
     }
 
-    var url = makeUrl(options.url, options.queryParams);
+    var url = options.url;
 
     $(e).html("<iframe id='iframe-player' frameborder='0' src='" + url + "' style='width: 100%; border: none'></iframe>");
 
