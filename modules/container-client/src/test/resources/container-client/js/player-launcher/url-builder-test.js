@@ -20,4 +20,12 @@ describe('instance', function() {
       c: 'c'
     })).toEqual('blah?c=z&a=a&b=b&c=c');
   });
+
+  it('should skip empties', function(){
+    expect(urlBuilder.build('blah', {
+      a: null,
+      b: null,
+      c: 'a'
+    })).toEqual('blah?c=a');
+  });
 });
