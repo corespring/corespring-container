@@ -76,7 +76,7 @@ trait BasePlayer
 
 trait JsonPlayer extends BasePlayer {}
 
-private class TL(val root: String) extends TemplateLoader {
+private class InternalTemplateLoader(val root: String) extends TemplateLoader {
 
   import play.api.Play.current
 
@@ -97,7 +97,7 @@ trait HtmlPlayer extends BasePlayer {
 
   val jadeConfig = {
     val c = new JadeConfiguration
-    c.setTemplateLoader(new TL("container-client"))
+    c.setTemplateLoader(new InternalTemplateLoader("container-client"))
     c.setMode(Jade4J.Mode.HTML)
     c.setPrettyPrint(Play.mode == Mode.Dev)
     c
