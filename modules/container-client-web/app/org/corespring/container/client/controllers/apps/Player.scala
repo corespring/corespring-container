@@ -2,6 +2,8 @@ package org.corespring.container.client.controllers.apps
 
 import java.io.{ BufferedReader, InputStreamReader, Reader }
 
+import org.corespring.container.client.controllers.player.PlayerQueryStringOptions
+
 import scala.concurrent.Future
 
 import de.neuland.jade4j.{ Jade4J, JadeConfiguration }
@@ -18,9 +20,10 @@ import play.api.templates.Html
 trait BasePlayer
   extends PlayerItemTypeReader
   with AppWithServices[PlayerHooks]
-  with JsModeReading {
+  with JsModeReading
+  with PlayerQueryStringOptions {
 
-  import org.corespring.container.client.controllers.apps.routes.{ BasePlayer => PlayerRoutes }
+  import org.corespring.container.client.controllers.apps.routes.{ BasePlayer => PlayerRoutes, ProdHtmlPlayer }
 
   override def context: String = "player"
 
@@ -42,8 +45,11 @@ trait BasePlayer
 
   def createSessionForItem(itemId: String): Action[AnyContent] = Action.async { implicit request =>
     hooks.createSessionForItem(itemId).map(handleSuccess { sessionId =>
-      val file = request.queryString.get("file").map(_(0)).getOrElse("index.html")
-      val url = s"${PlayerRoutes.loadPlayerForSession(sessionId).url}?file=$file&mode=gather"
+
+      val url : String = isProdPlayer match {
+        case true => ProdHtmlPlayer.config(sessionId).url
+        case _ => PlayerRoutes.loadPlayerForSession(sessionId).url.setPlayerPage(getPlayerPage)
+      }
       SeeOther(url)
     })
   }
@@ -56,12 +62,10 @@ trait BasePlayer
         Future(Ok(org.corespring.container.client.views.html.error.main(code, msg, showErrorInUi)))
       }.getOrElse {
 
-        def playerPage(request: Request[AnyContent]) = {
-
+        def playerPage(implicit request: Request[AnyContent]) = {
           val jsMode = getJsMode(request)
           logger.trace(s"js mode: $jsMode")
-          def has(n: String) = request.path.contains(n) || request.getQueryString("file") == Some(n)
-          if (has("container-player.html")) s"container-player.$jsMode.html" else s"player.$jsMode.html"
+          if (getPlayerPage == "container-player.html") s"container-player.$jsMode.html" else s"player.$jsMode.html"
         }
 
         val page = playerPage(request)

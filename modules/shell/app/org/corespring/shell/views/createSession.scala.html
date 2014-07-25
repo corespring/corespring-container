@@ -121,7 +121,7 @@
           return builder.build();
         }
         console.log("-------> url ", result.url);
-        window.location = addFileParamIfNotSet(result.url, "container-player.html");
+        window.location = result.url; //addFileParamIfNotSet(result.url, "container-player.html");
       });
 
     });
