@@ -25,6 +25,12 @@ angular.module('corespring-editor.services')
           var editorConfig = (set && set.configuration) ? set.configuration['corespring-editor'] : {};
           return editorConfig['placeholder-show-tooltip'];
         };
+
+        this.get = function(componentType) {
+          return _.find(componentSet, function(component) {
+            return component.componentType === componentType;
+          });
+        };
       }
       return new Definition();
     }

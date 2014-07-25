@@ -25,7 +25,7 @@ trait BasePlayer
     import org.corespring.container.client.controllers.resources.routes._
     PlayerServices(
       "player.services",
-      Session.loadEverything(":id"),
+      Session.loadItemAndSession(":id"),
       Session.resetSession(":id"),
       Session.saveSession(":id"),
       Session.getScore(":id"),

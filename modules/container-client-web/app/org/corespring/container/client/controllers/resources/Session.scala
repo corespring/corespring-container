@@ -1,19 +1,16 @@
 package org.corespring.container.client.controllers.resources
 
 import org.corespring.container.client.HasContext
-import org.corespring.container.client.hooks.Hooks.StatusMessage
-import org.corespring.container.client.hooks._
 import org.corespring.container.client.controllers.resources.Session.Errors
 import org.corespring.container.client.controllers.resources.session.ItemPruner
+import org.corespring.container.client.hooks.Hooks.StatusMessage
+import org.corespring.container.client.hooks._
 import org.corespring.container.components.outcome.ScoreProcessor
 import org.corespring.container.components.processing.PlayerItemPreProcessor
 import org.corespring.container.components.response.OutcomeProcessor
 import play.api.Logger
-import play.api.http.Status._
 import play.api.libs.json._
-import play.api.mvc.{ RequestHeader, Action, Controller, SimpleResult }
-
-import scala.concurrent.{ Future, ExecutionContext }
+import play.api.mvc.{ Action, Controller, SimpleResult }
 
 object Session {
   object Errors {
@@ -24,7 +21,7 @@ object Session {
 
 trait Session extends Controller with ItemPruner with HasContext {
 
-  val logger = Logger("session.controller")
+  val logger = Logger("container.Session")
 
   def outcomeProcessor: OutcomeProcessor
 
@@ -60,53 +57,28 @@ trait Session extends Controller with ItemPruner with HasContext {
 
         ss.saveSession(id, resetSession(ss.existingSession)).map {
           savedSession =>
-            logger.trace(s"resetted session has been saved as: $savedSession")
+            logger.trace(s"reset - session has been saved as: $savedSession")
             Ok(savedSession)
         }.getOrElse(BadRequest("Error saving resetted session"))
       }
     })
   }
 
-  def loadEverything(id: String) = Action.async { implicit request =>
-    hooks.loadEverything(id).map(basicHandler { fs =>
+  def loadItemAndSession(sessionId: String) = Action.async { implicit request =>
+    hooks.loadItemAndSession(sessionId).map(basicHandler { fs =>
 
       val json = fs.everything
 
-      def isCompleteFromSession(session: JsValue): Boolean = {
-        (session \ "isComplete").asOpt[Boolean].getOrElse(false)
-      }
-
-      def includeOutcome = {
-        val requested = request.getQueryString("includeOutcome").map {
-          _ == "true"
-        }.getOrElse(false)
-
-        requested && (fs.isSecure && isCompleteFromSession(json \ "session"))
-      }
-
       val itemJson = (json \ "item").as[JsObject]
       val prunedItem = pruneItem(itemJson)
-
       val sessionJson = (json \ "session").as[JsObject]
+      val processedItem = itemPreProcessor.preProcessItemForPlayer(prunedItem)
 
-      val processedItem = itemPreProcessor.preProcessItemForPlayer(prunedItem, sessionJson \ "settings")
+      val base = Json.obj(
+        "item" -> processedItem,
+        "session" -> sessionJson)
 
-      if (!includeOutcome) {
-        Ok(
-          Json.obj(
-            "item" -> processedItem,
-            "session" -> sessionJson))
-      } else {
-        val outcome = outcomeProcessor.createOutcome(itemJson, sessionJson, sessionJson \ "settings")
-        val score = scoreProcessor.score(itemJson, sessionJson, outcome)
-        val out = Json.obj(
-          "item" -> processedItem,
-          "outcome" -> outcome,
-          "score" -> score,
-          "session" -> sessionJson)
-        Ok(out)
-      }
-      Ok(json)
+      Ok(base)
     })
   }
 
@@ -163,10 +135,13 @@ trait Session extends Controller with ItemPruner with HasContext {
       } else if (!hasAnswers) {
         BadRequest(Json.obj("error" -> JsString("Can't create an outcome if no answers have been saved")))
       } else {
-        val options = request.body.asJson.getOrElse(Json.obj())
-        val outcome = outcomeProcessor.createOutcome(so.item, so.itemSession, options)
-        val score = scoreProcessor.score(so.item, so.itemSession, outcome)
-        Ok(Json.obj("outcome" -> outcome) ++ Json.obj("score" -> score))
+        request.body.asJson.map{ settings =>
+          val outcome = outcomeProcessor.createOutcome(so.item, so.itemSession, settings)
+          val score = scoreProcessor.score(so.item, so.itemSession, outcome)
+          Ok(Json.obj("outcome" -> outcome) ++ Json.obj("score" -> score))
+        }.getOrElse{
+          BadRequest(Json.obj("error" -> "No settings in request body"))
+        }
       }
     })
   }
@@ -183,34 +158,31 @@ trait Session extends Controller with ItemPruner with HasContext {
     hooks.getScore(id).map {
       basicHandler({ (so: SessionOutcome) =>
 
-        logger.trace(s"[getScore]: $id : ${Json.stringify(so.itemSession)}")
+        val answers: Either[String, JsValue] = {
 
-        if (so.isSecure) {
-          def hasAnswers = (so.itemSession \ "components").asOpt[JsObject].isDefined
-          if (!so.isComplete) {
-            BadRequest(Json.obj("error" -> JsString("Can't get score if session has not been completed")))
-          } else if (!hasAnswers) {
-            BadRequest(Json.obj("error" -> JsString("Can't get score if no answers have been saved")))
+          if (so.isSecure) {
+            if (!so.isComplete) {
+              Left("Can't get score if session has not been completed")
+            } else {
+              (so.itemSession \ "components").asOpt[JsValue].map { _ =>
+                Right(so.itemSession)
+              }.getOrElse(Left("Can't calculate a score if there are no saved answers"))
+            }
           } else {
-            val options = request.body.asJson.getOrElse(Json.obj())
-            val outcome = outcomeProcessor.createOutcome(so.item, so.itemSession, options)
-            val score = scoreProcessor.score(so.item, so.itemSession, outcome)
-            Ok(score)
+            request.body.asJson
+              .orElse((so.itemSession \ "components").asOpt[JsValue].map(_ => so.itemSession))
+              .map(Right(_))
+              .getOrElse(Left("Can't find answers in request body or in the db"))
           }
-        } else {
-          def settings = Json.obj(
-            "maxNoOfAttempts" -> JsNumber(2),
-            "showFeedback" -> JsBoolean(true),
-            "highlightCorrectResponse" -> JsBoolean(true),
-            "highlightUserResponse" -> JsBoolean(true),
-            "allowEmptyResponses" -> JsBoolean(true))
+        }
 
-          request.body.asJson.map {
-            answers =>
-              val responses = outcomeProcessor.createOutcome(so.item, answers, settings)
-              val score = scoreProcessor.score(so.item, Json.obj(), responses)
-              Ok(score)
-          }.getOrElse(BadRequest("No json in request body"))
+        answers match {
+          case Left(err) => BadRequest(Json.obj("error" -> err))
+          case Right(a) =>
+            logger.trace(s"[getScore]: $id : ${Json.stringify(a)}")
+            val outcome = outcomeProcessor.createOutcome(so.item, a, Json.obj())
+            val score = scoreProcessor.score(so.item, a, outcome)
+            Ok(score)
         }
       })
     }
