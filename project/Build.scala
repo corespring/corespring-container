@@ -52,7 +52,6 @@ object Build extends sbt.Build {
     var jade4jReleases = "jade4j" at "https://raw.github.com/neuland/jade4j/master/releases"
     val typesafeReleases = "typesafe releases" at "http://repo.typesafe.com/typesafe/releases/"
     val typesafeSnapshots = "typesafe snapshots" at "http://repo.typesafe.com/typesafe/snapshots/"
-    val memcached = "Spy Repository" at "http://files.couchbase.com/maven2" // required to resolve `spymemcached`, the plugin's dependency.
 
     val all = Seq(
       corespringSnapshots,
@@ -61,8 +60,7 @@ object Build extends sbt.Build {
       eeSnapshots,
       jade4jReleases,
       typesafeReleases,
-      typesafeSnapshots,
-      memcached)
+      typesafeSnapshots)
   }
 
   import Build.Dependencies._
