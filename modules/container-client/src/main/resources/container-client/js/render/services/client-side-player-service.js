@@ -1,9 +1,9 @@
 angular.module('corespring-player.services')
-  .factory('PlayerService', [
+  .factory('ClientSidePlayerService', [
     '$timeout',
       function($timeout) {
 
-      function PlayerService(getQuestionFor, getItem) {
+      function ClientSidePlayerService(getQuestionFor, getItem) {
 
         var settings = {
           maxNoOfAttempts: 1,
@@ -78,6 +78,6 @@ angular.module('corespring-player.services')
 
       }
 
-      return PlayerService;
+      return ClientSidePlayerService;
     }
   ]);

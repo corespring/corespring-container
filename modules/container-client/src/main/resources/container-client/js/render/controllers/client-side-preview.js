@@ -5,11 +5,11 @@
       '$log',
       '$scope',
       'ComponentRegister',
-      'PlayerService',
+      'ClientSidePlayerService',
       ClientSidePreview
     ]);
 
-  function ClientSidePreview($log, $scope, ComponentRegister, PlayerServiceDef) {
+  function ClientSidePreview($log, $scope, ComponentRegister, ClientSidePlayerServiceDef) {
 
     $scope.playerMode = 'gather';
 
@@ -38,6 +38,8 @@
       return $scope.data.item;
     }
 
+    var PlayerService = new ClientSidePlayerServiceDef(getQuestionForComponentId, getItem);
+
     function setMode(mode) {
       $scope.playerMode = mode;
       ComponentRegister.setMode(mode);
@@ -48,7 +50,7 @@
       return $scope.playerMode === 'gather';
     }
 
-    var PlayerService = new PlayerServiceDef(getQuestionForComponentId, getItem);
+
 
     $scope.$on('playerControlPanel.preview', function () {
       $scope.$emit('launch-catalog-preview');
@@ -93,24 +95,13 @@
           $scope.session = everything.session;
           $scope.outcome = everything.outcome;
           $scope.score = everything.score;
+          $log.info("onSessionLoaded", everything, $scope.score);
           setMode('evaluate');
         },
         function (err) {
           $log.error("submitSession failed", err);
         });
     }
-
-    $scope.resetStash = function () {
-      ComponentRegister.resetStash();
-    };
-
-    $scope.canSubmit = function () {
-      return !ComponentRegister.hasEmptyAnswers();
-    };
-
-    $scope.setDataAndSession = function (data) {
-      ComponentRegister.setDataAndSession(data);
-    };
 
   }
 
