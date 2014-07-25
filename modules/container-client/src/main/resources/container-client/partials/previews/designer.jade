@@ -1,6 +1,6 @@
 script#designer-preview(type='text/ng-template')
   .client-side-preview(ng-controller="ClientSidePreview", ng-class="{previewHidden: isPreviewHidden()}")
-    player-control-panel
+    player-control-panel(data-mode='playerMode', data-settings='playerSettings', data-score="score")
 
     .player-container
 
