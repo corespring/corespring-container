@@ -4,6 +4,15 @@ var Instance = function(element, options, errorCallback, log) {
 
   var that = this;
 
+  log = log || {
+    error: function(s) {
+      console.error(s);
+    },
+    warn: function(s) {
+      console.warn(s);
+    }
+  };
+
   var findInstanceIframe = function() {
     if (that.iframeRef) {
       return that.iframeRef;
@@ -30,30 +39,6 @@ var Instance = function(element, options, errorCallback, log) {
         fn(event);
       }
     };
-  };
-
-  log = log || {
-    error: function(s) {
-      if(console.error){
-        console.error(s);
-      } else if(console.log){
-        console.log("[ERROR]" + s);
-      }
-    },
-    debug: function(s) {
-      if(console.debug){
-        console.debug(s);
-      } else if(console.log){
-        console.log("[DEBUG]" + s);
-      }
-    },
-    warn: function(s) {
-      if(console.warn){
-        console.warn(s);
-      } else if(console.log){
-        console.log("[WARN]" + s);
-      }
-    }
   };
 
   var listener = require("root-level-listener")(log);
@@ -213,9 +198,6 @@ var Instance = function(element, options, errorCallback, log) {
     var listenerForThisInstance = forThisInstance(function(event) {
       var data = that.parseEvent(event);
 
-      log.debug("[addListener] [handler] message: " + data.message);
-      log.debug("[addListener] [handler]", data.message, "===", name, data.message === name);
-      log.debug("[addListener] [handler] name: ", name);
       if (data.message === name) {
         callback(data);
       }
