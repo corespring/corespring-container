@@ -58,8 +58,8 @@ angular.module('corespring-player.services').factory('CorespringPlayerDefinition
           ComponentRegister.registerComponent(id, obj);
         });
 
-        $scope.$on('rerender-math', function(event, delay) {
-          MathJaxService.parseDomForMath(delay);
+        $scope.$on('rerender-math', function(event, options) {
+          MathJaxService.parseDomForMath(options.delay || 0, options.element);
         });
 
         /**        
