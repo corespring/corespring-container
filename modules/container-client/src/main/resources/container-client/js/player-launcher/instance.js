@@ -34,13 +34,25 @@ var Instance = function(element, options, errorCallback, log) {
 
   log = log || {
     error: function(s) {
-      console.error(s);
+      if(console.error){
+        console.error(s);
+      } else if(console.log){
+        console.log("[ERROR]" + s);
+      }
     },
     debug: function(s) {
-      console.debug(s);
+      if(console.debug){
+        console.debug(s);
+      } else if(console.log){
+        console.log("[DEBUG]" + s);
+      }
     },
     warn: function(s) {
-      console.warn(s);
+      if(console.warn){
+        console.warn(s);
+      } else if(console.log){
+        console.log("[WARN]" + s);
+      }
     }
   };
 
