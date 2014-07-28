@@ -15,7 +15,7 @@
     "angular-ui-router": "0.2.10",
     "jquery": "1.11.0",
     "jquery-ui": "1.11.0",
-    "saxjs": "https://github.com/isaacs/sax-js.git",
+    "saxjs": "https://github.com/corespring/sax-js.git#v0.6.0-corespring",
     "bootstrap": "~3.1.0",
     "lodash": "~2.4.1",
     "corespring-ng-components": "https://github.com/corespring/corespring-ng-components.git#v0.0.7",
