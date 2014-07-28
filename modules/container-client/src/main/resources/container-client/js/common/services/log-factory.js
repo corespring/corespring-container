@@ -14,7 +14,7 @@ angular.module('corespring-common.services').service('LogFactory', [
         var sourceObj = console ? console : $log;
 
         function bindIfPropertyExists(name){
-          name = _.isFunction(sourceObj[name]) ? name : 'debug';
+          name = _.isFunction(sourceObj[name]) ? name : 'log';
           logger[name] = sourceObj[name].bind(sourceObj, prefix);
         }
 

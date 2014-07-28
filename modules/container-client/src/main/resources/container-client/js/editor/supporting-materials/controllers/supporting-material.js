@@ -103,9 +103,7 @@ var controller = function(
       var supportingMaterialFile = SupportingMaterialsService.getSupportingMaterialFile($scope.supportingMaterials(), $scope.index);
       if (supportingMaterialFile) {
         supportingMaterialFile.content = newValue;
-        var fileIndex = _.findIndex($scope.supportingMaterials()[$scope.index].files, function(file) {
-          return file.default;
-        });
+        var fileIndex = _.findIndex($scope.supportingMaterials()[$scope.index].files, SupportingMaterialsService.isDefault);
         updatedSupportingMaterials[$scope.index].files[fileIndex] = supportingMaterialFile;
         $scope.data.item.supportingMaterials = updatedSupportingMaterials;
       }
