@@ -18,7 +18,6 @@ class ComponentUrlDirectiveTest extends Specification with ComponentMaker {
 
   "url directive" should {
     "org[all]" in applyAndUnapply("org[all]", Seq("org-1", "org-2"))
-    //"org[1,2]" in applyAndUnapply("org[1,2]", Seq("org-1", "org-2"))
     "org[1]" in applyAndUnapply("org[1]", Seq("org-1"))
     "org[1]+org-2[3]" in applyAndUnapply("org[1]+org-2[all]", Seq("org-1", "org-2-3"))
 

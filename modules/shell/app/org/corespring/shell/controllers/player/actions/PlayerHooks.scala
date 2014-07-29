@@ -56,4 +56,14 @@ import scalaz.Scalaz._
   }
 
   override def loadItem(id: String)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] = load(id)
+
+  override def loadSessionAndItem(sessionId: String)(implicit header: RequestHeader): Future[Either[(Int, String), (JsValue, JsValue)]] = Future{
+    val out = for{
+      session <- sessionService.load(sessionId)
+      itemId <- (session \ "itemId").asOpt[String]
+      item <- itemService.load(itemId)
+    } yield  (session -> item)
+
+    out.map(Right(_)).getOrElse(Left(NOT_FOUND -> "Can't find item or session"))
+  }
 }

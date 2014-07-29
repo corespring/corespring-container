@@ -12,116 +12,6 @@ module.exports = (grunt) ->
   ignoreApps = _.map apps, (a) -> "!#{a}"
 
 
-  jadeConfig = (path, ext, dev) ->
-
-    ext = ".html" unless ext?
-
-    expand: true
-    cwd: '<%= common.app %>'
-    src: path.concat(['!**/bower_components/**', '!*layout.jade'])
-    ext: ext 
-    dest: '<%= common.dist %>'
-    options:
-      pretty: true
-      data:
-        devMode: dev
-        core: pathsFor(common.core, dev) 
-        coreLibs: pathsFor(common.coreLibs, dev)
-        editor: pathsFor(common.editor, dev)
-        editorExtras: pathsFor(common.editorExtras, dev)
-        player: pathsFor(common.player, dev)
-        catalog: pathsFor(common.catalog, dev)
-        catalogExtras: pathsFor(common.catalogExtras, dev)
-
-
-  common = 
-    app: 'src/main/resources/container-client'
-    dist: 'target/scala-2.10/classes/container-client'
-    test: 'src/test/resources/container-client'
-    tmp: '.tmp'
-    components: '../../corespring-components/components'
-    player: 
-      src:  [
-        '<%= common.dist %>/js/render/**/*.js' ]
-      dest: '<%= common.dist %>/js/prod-player.js'
-
-    coreLibs: 
-      src: [
-        '<%= common.dist %>/bower_components/es5-shim/es5-shim.min.js',
-        '<%= common.dist %>/bower_components/console-polyfill/index.js',
-        '<%= common.dist %>/bower_components/jquery/dist/jquery.min.js',
-        '<%= common.dist %>/bower_components/jquery-ui/jquery-ui.min.js',
-        '<%= common.dist %>/bower_components/angular/angular.min.js',
-        '<%= common.dist %>/bower_components/lodash/dist/lodash.min.js',
-        '<%= common.dist %>/bower_components/angular-ui-sortable/sortable.js',
-        '<%= common.dist %>/bower_components/mathjs/dist/math.min.js',
-        '<%= common.dist %>/bower_components/saxjs/lib/sax.js'
-      ]
-      dest: '<%= common.dist %>/js/core-libs.js'
-
-    core: 
-      dest: '<%= common.dist %>/js/prod-core.js'
-      src: [
-        '<%= common.dist %>/bower_components/corespring-ng-components/build/corespring-ng-components.js',
-        '<%= common.dist %>/js/corespring/core.js',
-        '<%= common.dist %>/js/corespring/core-library.js',
-        '<%= common.dist %>/js/corespring/server/init-core-library.js',
-        '<%= common.dist %>/js/corespring/lodash-mixins.js',
-        '<%= common.dist %>/js/common/**/*.js']
-
-
-    catalog: 
-      dest: '<%= common.dist %>/js/prod-catalog.js'
-      src: [
-        '<%= common.dist %>/js/corespring/core-library.js',
-        '<%= common.dist %>/js/corespring/server/init-core-library.js',
-        '<%= common.dist %>/js/catalog/**/*.js',
-        '<%= common.dist %>/js/render/services/**/*.js',
-        '<%= common.dist %>/js/render/directives/**/*.js',
-        '<%= common.dist %>/js/render/controllers/**/*.js'
-      ]
-
-    catalogExtras: 
-      dest: '<%= common.dist %>/js/prod-catalog-extras.js'
-      src: [
-        '<%= common.dist %>/bower_components/angular-route/angular-route.min.js',
-        '<%= common.dist %>/bower_components/angular-ui-router/release/angular-ui-router.min.js',
-      ]
-
-    editor:
-      dest: '<%= common.dist %>/js/prod-editor.js'
-      src: [
-        '<%= common.dist %>/js/corespring/core-library.js',
-        '<%= common.dist %>/js/corespring/server/init-core-library.js',
-        '<%= common.dist %>/js/editor/**/*.js',
-        '<%= common.dist %>/js/catalog/**/*.js',
-        '<%= common.dist %>/js/render/services/**/*.js',
-        '<%= common.dist %>/js/render/directives/**/*.js',
-        '<%= common.dist %>/js/render/controllers/**/*.js'
-      ]
-
-    editorExtras:
-      dest: '<%= common.dist %>/js/prod-editor-extras.js'
-      src: [
-              '<%= common.dist %>/bower_components/angular-route/angular-route.min.js',
-              '<%= common.dist %>/bower_components/angular-ui-router/release/angular-ui-router.min.js',
-              '<%= common.dist %>/bower_components/select2/select2.js',
-              '<%= common.dist %>/bower_components/angular-ui-select2/src/select2.js',
-              '<%= common.dist %>/bower_components/angular-ui/build/angular-ui.min.js',
-              '<%= common.dist %>/bower_components/angular-bootstrap/ui-bootstrap-tpls.js',
-              '<%= common.dist %>/bower_components/bootstrap/js/dropdown.js',
-              '<%= common.dist %>/bower_components/bootstrap/js/modal.js',
-              '<%= common.dist %>/bower_components/bootstrap/js/tooltip.js',
-              '<%= common.dist %>/bower_components/bootstrap/js/popover.js',
-              '<%= common.dist %>/bower_components/angular-ui-ace/ui-ace.js',
-              '<%= common.dist %>/bower_components/ace-builds/src-min-noconflict/ace.js',
-              '<%= common.dist %>/bower_components/ace-builds/src-min-noconflict/theme-twilight.js',
-              '<%= common.dist %>/bower_components/ace-builds/src-min-noconflict/mode-xml.js',
-              '<%= common.dist %>/bower_components/ace-builds/src-min-noconflict/worker-json.js',
-              '<%= common.dist %>/bower_components/ace-builds/src-min-noconflict/mode-json.js',
-              '<%= common.dist %>/bower_components/jquery.browser/dist/jquery.browser.min.js',
-              '<%= common.dist %>/bower_components/undo.js/undo.js']
-
   expandSrc = (arr) ->
     expanded = expand(arr)
     urls = _.map(expanded, toUrl)
@@ -137,12 +27,127 @@ module.exports = (grunt) ->
       .replace("#{fileRoot}/bower_components" , "../../components")
       .replace(fileRoot, "../..")
 
-  pathsFor = (obj, dev) ->
+  srcDest = (key) ->
+    src: sources[key]
+    dest: destinations[key]
+
+  pathsFor = (key, dev) ->
+    obj = srcDest(key)
     name = "dest"
-    filePaths =  if dev then obj["src"] else [obj[name]] 
+    filePaths =  if dev then obj["src"] else [obj[name]]
+    
+    grunt.log.debug("---------------> expand for: #{key}") 
+
     expanded = expand(filePaths) 
     mapped = _.map( expanded, toUrl )
     mapped
+
+  # Build a jade config object
+  jadeConfig = (path, ext, dev) ->
+    ext = ".html" unless ext?
+    
+    expand: true
+    cwd: '<%= common.app %>'
+    src: path.concat(['!**/bower_components/**', '!*layout.jade'])
+    ext: ext 
+    dest: '<%= common.dist %>'
+    options:
+      pretty: true
+      data:
+        devMode: dev
+        core: pathsFor("core", dev) 
+        coreLibs: pathsFor("coreLibs", dev)
+        editor: pathsFor("editor", dev)
+        editorExtras: pathsFor("editorExtras", dev)
+        player: pathsFor("player", dev)
+        catalog: pathsFor("catalog", dev)
+        catalogExtras: pathsFor("catalogExtras", dev)
+
+  # Some common vars
+  common = 
+    app: 'src/main/resources/container-client'
+    dist: 'target/scala-2.10/classes/container-client'
+    test: 'src/test/resources/container-client'
+    tmp: '.tmp'
+    components: '../../corespring-components/components'
+  
+  destinations = 
+    player: '<%= common.dist %>/js/prod-player.js'
+    rootPlayer: '<%= common.dist %>/js/root-prod-player.js'
+    coreLibs: '<%= common.dist %>/js/core-libs.js'
+    core: '<%= common.dist %>/js/prod-core.js'
+    catalog: '<%= common.dist %>/js/prod-catalog.js'
+    catalogExtras: '<%= common.dist %>/js/prod-catalog-extras.js'
+    editor: '<%= common.dist %>/js/prod-editor.js'
+    editorExtras: '<%= common.dist %>/js/prod-editor-extras.js'
+
+
+  sources = 
+    player: [ '<%= common.dist %>/js/render/**/*.js' ]
+
+    coreLibs: [
+      '<%= common.dist %>/bower_components/es5-shim/es5-shim.min.js',
+      '<%= common.dist %>/bower_components/console-polyfill/index.js',
+      '<%= common.dist %>/bower_components/jquery/dist/jquery.min.js',
+      '<%= common.dist %>/bower_components/jquery-ui/jquery-ui.min.js',
+      '<%= common.dist %>/bower_components/angular/angular.min.js',
+      '<%= common.dist %>/bower_components/lodash/dist/lodash.min.js',
+      '<%= common.dist %>/bower_components/angular-ui-sortable/sortable.min.js',
+      '<%= common.dist %>/bower_components/mathjs/dist/math.min.js',
+      '<%= common.dist %>/bower_components/saxjs/lib/sax.js' ]
+
+    core: [
+      '<%= common.dist %>/bower_components/corespring-ng-components/build/corespring-ng-components.js',
+      '<%= common.dist %>/js/corespring/core.js',
+      '<%= common.dist %>/js/corespring/core-library.js',
+      '<%= common.dist %>/js/corespring/server/init-core-library.js',
+      '<%= common.dist %>/js/corespring/lodash-mixins.js',
+      '<%= common.dist %>/js/common/**/*.js']
+
+    catalog: [
+      '<%= common.dist %>/js/corespring/core-library.js',
+      '<%= common.dist %>/js/corespring/server/init-core-library.js',
+      '<%= common.dist %>/js/catalog/**/*.js',
+      '<%= common.dist %>/js/render/services/**/*.js',
+      '<%= common.dist %>/js/render/directives/**/*.js',
+      '<%= common.dist %>/js/render/controllers/**/*.js' ]
+
+    catalogExtras: [ 
+      '<%= common.dist %>/bower_components/angular-route/angular-route.min.js',
+      '<%= common.dist %>/bower_components/angular-ui-router/release/angular-ui-router.min.js']
+
+    editor: [
+      '<%= common.dist %>/js/corespring/core-library.js',
+      '<%= common.dist %>/js/corespring/server/init-core-library.js',
+      '<%= common.dist %>/js/editor/**/*.js',
+      '<%= common.dist %>/js/catalog/**/*.js',
+      '<%= common.dist %>/js/render/services/**/*.js',
+      '<%= common.dist %>/js/render/directives/**/*.js',
+      '<%= common.dist %>/js/render/controllers/**/*.js' ]
+
+    editorExtras: [
+      '<%= common.dist %>/bower_components/angular-route/angular-route.min.js',
+      '<%= common.dist %>/bower_components/angular-ui-router/release/angular-ui-router.min.js',
+      '<%= common.dist %>/bower_components/select2/select2.js',
+      '<%= common.dist %>/bower_components/angular-ui-select2/src/select2.js',
+      '<%= common.dist %>/bower_components/angular-ui/build/angular-ui.min.js',
+      '<%= common.dist %>/bower_components/angular-bootstrap/ui-bootstrap-tpls.js',
+      '<%= common.dist %>/bower_components/bootstrap/js/dropdown.js',
+      '<%= common.dist %>/bower_components/bootstrap/js/modal.js',
+      '<%= common.dist %>/bower_components/bootstrap/js/tooltip.js',
+      '<%= common.dist %>/bower_components/bootstrap/js/popover.js',
+      '<%= common.dist %>/bower_components/angular-ui-ace/ui-ace.js',
+      '<%= common.dist %>/bower_components/ace-builds/src-min-noconflict/ace.js',
+      '<%= common.dist %>/bower_components/ace-builds/src-min-noconflict/theme-twilight.js',
+      '<%= common.dist %>/bower_components/ace-builds/src-min-noconflict/mode-xml.js',
+      '<%= common.dist %>/bower_components/ace-builds/src-min-noconflict/worker-json.js',
+      '<%= common.dist %>/bower_components/ace-builds/src-min-noconflict/mode-json.js',
+      '<%= common.dist %>/bower_components/jquery.browser/dist/jquery.browser.min.js',
+      '<%= common.dist %>/bower_components/undo.js/undo.js']
+
+    rootPlayer: [destinations.coreLibs, destinations.core, destinations.player]
+
+
 
  
   config =
@@ -152,7 +157,7 @@ module.exports = (grunt) ->
       options:
         livereload: true
         debounceDelay: 5000
-        files: ['<%= common.dest %>/**/*']
+        files: ['<%= common.dist %>/**/*']
       less:
         files: ['<%= common.app %>/**/*.less']
         tasks: ['copy:main', 'less:development']
@@ -176,9 +181,22 @@ module.exports = (grunt) ->
         dest: '<%= common.dist %>/css/'
         ext: '.css'
         flatten: false
+
+      production: 
+        options: 
+          cleancss: true 
+        expand: true
+        cwd: '<%= common.dist %>/css'
+        src: '*.less'
+        dest: '<%= common.dist %>/css/'
+        ext: '.min.css'
+        flatten: false
+
+    
     clean:
       main: ["<%= common.dist %>/css/*.css"]
-      uglified: [ common.core.dest, common.coreLibs.dest, common.catalog.dest, common.catalogExtras.dest, common.editor.dest, common.editorExtras.dest]
+      uglified: _.toArray(destinations)
+      less: ['<%= common.dist %>/css/**/*.less']
 
     shell:
       bowerCacheClean:
@@ -197,6 +215,13 @@ module.exports = (grunt) ->
         command: 'rm -fr <%= common.dist %>/bower_components/mathjax/fonts/HTML-CSS/TeX/png'
         options :
           failOnError: true
+      mathjax_rm_fonts:
+        command: """
+        rm -fr <%= common.dist %>/bower_components/mathjax/**/*.otf\n
+        rm -fr <%= common.dist %>/bower_components/mathjax/**/*.eot\n
+        """
+        options :
+          failOnError: true
 
     jshint:
       options: 
@@ -208,6 +233,17 @@ module.exports = (grunt) ->
       partials: jadeConfig(["**/*.jade"].concat(ignoreApps), ".html", false)
       prod: jadeConfig(apps, ".prod.html", false )
       dev: jadeConfig(apps, ".dev.html", true )
+
+    ejs:
+      prod: 
+        options: 
+          scripts: [pathsFor("rootPlayer", false)]
+        src: ['**/*.jade.ejs']
+        cwd: '<%= common.app %>'
+        dest: '<%= common.dist %>'
+        expand: true
+        ext: '.jade'
+
 
     jasmine:
       unit:
@@ -241,9 +277,9 @@ module.exports = (grunt) ->
           mangle: false
           compress: false
         files: [
-          common.coreLibs,
-          common.editorExtras,
-          common.catalogExtras
+          srcDest("coreLibs"),
+          srcDest("editorExtras"),
+          srcDest("catalogExtras")
         ]
 
       minifyAndConcat: 
@@ -252,32 +288,48 @@ module.exports = (grunt) ->
           compress: true
           mangle: true
         files: [
-          common.core,
-          common.editor,
-          common.player,
-          common.catalog
+          srcDest("core"),
+          srcDest("editor"),
+          srcDest("player"),
+          srcDest("catalog")
         ]
+
+      prodPlayer: 
+        options:
+          sourceMap:false
+          compress: false
+          mangle: false 
+        files: [
+          {src: sources.rootPlayer, dest: destinations.rootPlayer}
+        ] 
 
     compress: 
       generated: 
         options: 
           mode: 'gzip'
         files: [
-          # Each of the files in the src/ folder will be output to
-          # the dist/ folder each with the extension .gz.js
           { 
             expand: true 
-            src: [ 
-              common.core.dest, 
-              common.editor.dest, 
-              common.editorExtras.dest,
-              common.catalog.dest, 
-              common.player.dest,
-              common.coreLibs.dest,
-              common.catalog.dest ]
+            src: _.toArray(destinations)
             ext: '.js.gz'
           }
         ]
+      css: 
+        options: 
+          mode: 'gzip'
+        files: [
+          {
+            expand: true 
+            src: ['<%= common.dist %>/css/*.css', '!<%= common.dist %>/css/*.min.css'] 
+            ext: '.css.gz'
+          }
+          {
+            expand: true 
+            src: ['!<%= common.dist %>/css/*.css', '<%= common.dist %>/css/*.min.css'] 
+            ext: '.min.css.gz'
+          }
+        ]
+
 
 
   grunt.initConfig(config)
@@ -296,6 +348,7 @@ module.exports = (grunt) ->
     'grunt-contrib-copy',
     'grunt-contrib-compress',
     'grunt-usemin',
+    'grunt-ejs',
     'grunt-bower-clean'
   ]
 
@@ -308,11 +361,13 @@ module.exports = (grunt) ->
   
   grunt.registerTask('restoreResolutions', 'Add "resolutions" back to bower.json', restoreResolutions(grunt))
   
-  grunt.registerTask('clean_bower', 'bower_clean', 'shell:mathjax_rm_pngs')  
+  grunt.registerTask('clean_bower', ['bower_clean', 'shell:mathjax_rm_pngs', 'shell:mathjax_rm_fonts'])  
   # short cut
   grunt.registerTask('lcd', ['restoreResolutions', 'loadComponentDependencies'])
   grunt.registerTask('prepPlayerLauncher', 'prep the player launcher js', prepPlayerLauncher(grunt))
-  grunt.registerTask('run', ['clean:uglified', 'uglify', 'jade', 'less', 'watch'])
+  grunt.registerTask('run', ['uglification', 'ejs', 'jade', 'less', 'watch'])
   grunt.registerTask('test', ['shell:bower', 'shell:bowerCacheClean', 'lcd', 'prepPlayerLauncher', 'jasmine:unit'])
-  grunt.registerTask('default', ['shell:bower', 'lcd', 'clean_bower', 'clean:uglified', 'jshint', 'uglify', 'copy', 'less', 'jade', 'compress', 'prepPlayerLauncher','jasmine:unit'])
+  grunt.registerTask('uglification', ['clean:uglified', 'uglify:concatOnly', 'uglify:minifyAndConcat', 'uglify:prodPlayer'])
+  grunt.registerTask('default', ['shell:bower', 'lcd', 'jshint', 'uglification', 'ejs', 'copy', 'less', 'clean:less', 'clean_bower', 'jade', 'compress', 'prepPlayerLauncher','jasmine:unit'])
   grunt.registerTask('minify-test', ['concat', 'uglify'])
+  grunt.registerTask('ejs-test', ['ejs'])

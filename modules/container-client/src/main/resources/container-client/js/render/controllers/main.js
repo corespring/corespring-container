@@ -171,10 +171,32 @@ angular.module('corespring-player.controllers')
             interactionsWithResponseCount: ComponentRegister.interactionsWithResponseCount()
           };
         };
+        
+        /**
+         * Initialise the controller - this has to be the 1st thing you call
+         */
+        $scope.$on('initialise', function(event, data) {
+          $log.debug('[on initialise]');
+          PlayerService.setQueryParams(data.queryParams || {});
+          PlayerService.loadItemAndSession(
+            function(itemAndSession){
+              $scope.onItemAndSessionLoaded(itemAndSession);
+              
+              if(currentMode !== undefined && currentMode !== null){
+                throw new Error('The mode is already set');
+              }
 
-        $scope.$on('begin', function() {
-          $log.debug('[on begin]');
-          PlayerService.loadItemAndSession($scope.onItemAndSessionLoaded, $scope.onSessionLoadError, $scope.sessionId);
+              currentMode = data.mode;
+              updateRegisterMode();
+
+              if(data.mode === 'evaluate'){
+                $scope.loadOutcome(data.options, function() {
+                  $log.debug("[Main] outcome received");
+                });
+              }
+            }, 
+            $scope.onSessionLoadError, 
+            $scope.sessionId);
         });
 
         $scope.$on('resetPreview', function() {
@@ -249,6 +271,16 @@ angular.module('corespring-player.controllers')
           ComponentRegister.setEditable(data.editable);
         });
 
+        function updateRegisterMode(){
+         var editable = (currentMode === 'gather');
+
+          $timeout(function() {
+            $log.debug("[Main] $timeout: set mode: ", currentMode);
+            ComponentRegister.setEditable(editable);
+            ComponentRegister.setMode(currentMode);
+          }); 
+        }
+
         /** Set mode to view, gather or evaluate
          * Optionally save the responses too.
          * The data object contains:
@@ -267,25 +299,8 @@ angular.module('corespring-player.controllers')
             return;
           }
 
-          var firstTimeSet = currentMode === undefined || currentMode === null;
-          var editable = (data.mode === 'gather');
           currentMode = data.mode;
-
-          $timeout(function() {
-            $log.debug("[Main] $timeout: set mode: ", data.mode);
-            ComponentRegister.setEditable(editable);
-            ComponentRegister.setMode(data.mode);
-          });
-
-          if(firstTimeSet){
-
-            if(data.mode === 'evaluate'){
-              $scope.loadOutcome(data.options, function() {
-                $log.debug("[Main] score received");
-              });
-            }
-            return;
-          }
+          updateRegisterMode();
 
           var afterMaybeSave = function() {
             if (data.mode === 'evaluate') {

@@ -7,10 +7,15 @@ function UrlBuilder() {
     if (split.length === 2) {
       paramsToAdd = split[1];
     }
+    var kv = [];
+
     for (var x in params) {
-      paramsToAdd += paramsToAdd === '' ? '' : '&';
-      paramsToAdd += x + '=' + params[x];
+      if(params[x]){
+        kv.push(x + '=' + params[x]);
+      }
     }
+    paramsToAdd += (paramsToAdd === '') ? '' : '&';
+    paramsToAdd += kv.join('&'); 
     return base + '?' + paramsToAdd;
   };
 }

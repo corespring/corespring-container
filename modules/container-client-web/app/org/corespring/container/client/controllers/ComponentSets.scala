@@ -1,12 +1,13 @@
 package org.corespring.container.client.controllers
 
+import java.net.URL
+
 import org.corespring.container.client.component._
 import org.corespring.container.components.model.Component
 import org.corespring.container.components.model.dependencies.DependencyResolver
-import play.api.Logger
+import play.api.{ Play, Logger }
 import play.api.http.ContentTypes
 import play.api.mvc._
-import scala.Some
 
 trait ComponentSets extends Controller with ComponentUrls {
 
@@ -62,6 +63,9 @@ trait ComponentSets extends Controller with ComponentUrls {
   override def jsUrl(context: String, components: Seq[Component]): String = url(context, components, "js")
 
   private def url(context: String, components: Seq[Component], suffix: String): String = {
+
+    require(allComponents.length > 0, "Can't load components")
+
     ComponentUrlDirective.unapply(components.map(_.componentType), allComponents) match {
       case Some(path) => routes.ComponentSets.resource(context, path, suffix).url
       case _ => "?"
@@ -69,8 +73,23 @@ trait ComponentSets extends Controller with ComponentUrls {
   }
 }
 
-trait DefaultComponentSets extends ComponentSets {
-  val editorGenerator: SourceGenerator = new EditorGenerator()
-  val playerGenerator: SourceGenerator = new PlayerGenerator()
-  val catalogGenerator: SourceGenerator = new CatalogGenerator()
+trait DefaultComponentSets extends ComponentSets
+  with ResourceLoading
+  with LibrarySourceLoading {
+
+  val editorGenerator: SourceGenerator = new EditorGenerator() {
+    override def resource(p: String) = DefaultComponentSets.this.resource(p)
+
+    override def loadLibrarySource(path: String): Option[String] = DefaultComponentSets.this.loadLibrarySource(path)
+  }
+
+  val playerGenerator: SourceGenerator = new PlayerGenerator() {
+    override def resource(p: String) = DefaultComponentSets.this.resource(p)
+    override def loadLibrarySource(path: String): Option[String] = DefaultComponentSets.this.loadLibrarySource(path)
+  }
+
+  val catalogGenerator: SourceGenerator = new CatalogGenerator() {
+    override def resource(p: String) = DefaultComponentSets.this.resource(p)
+    override def loadLibrarySource(path: String): Option[String] = DefaultComponentSets.this.loadLibrarySource(path)
+  }
 }

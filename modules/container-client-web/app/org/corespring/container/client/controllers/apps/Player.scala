@@ -1,9 +1,12 @@
 package org.corespring.container.client.controllers.apps
 
-import org.corespring.container.client.hooks.PlayerHooks
 import org.corespring.container.client.component.PlayerItemTypeReader
+import org.corespring.container.client.controllers.jade.Jade
+import org.corespring.container.client.controllers.player.PlayerQueryStringOptions
+import org.corespring.container.client.hooks.PlayerHooks
 import org.corespring.container.client.views.txt.js.PlayerServices
-import play.api.{Play, Logger}
+import org.corespring.container.components.model.Id
+import play.api.libs.json.{ JsValue, Json }
 import play.api.mvc._
 
 import scala.concurrent.Future
@@ -11,15 +14,16 @@ import scala.concurrent.Future
 trait BasePlayer
   extends PlayerItemTypeReader
   with AppWithServices[PlayerHooks]
-  with JsModeReading {
+  with JsModeReading
+  with PlayerQueryStringOptions {
 
-  import org.corespring.container.client.controllers.apps.routes.{ BasePlayer => PlayerRoutes }
+  import org.corespring.container.client.controllers.apps.routes.{ ProdHtmlPlayer, BasePlayer => PlayerRoutes }
 
   override def context: String = "player"
 
-  override lazy val logger = Logger("container.player")
+  override def loggerName = "container.app.player"
 
-  def showErrorInUi : Boolean
+  def showErrorInUi: Boolean
 
   override def servicesJs = {
     import org.corespring.container.client.controllers.resources.routes._
@@ -35,8 +39,11 @@ trait BasePlayer
 
   def createSessionForItem(itemId: String): Action[AnyContent] = Action.async { implicit request =>
     hooks.createSessionForItem(itemId).map(handleSuccess { sessionId =>
-      val file = request.queryString.get("file").map(_(0)).getOrElse("index.html")
-      val url = s"${PlayerRoutes.loadPlayerForSession(sessionId).url}?file=$file&mode=gather"
+
+      val url: String = isProdPlayer match {
+        case true => ProdHtmlPlayer.config(sessionId).url
+        case _ => PlayerRoutes.loadPlayerForSession(sessionId).url.setPlayerPage(getPlayerPage)
+      }
       SeeOther(url)
     })
   }
@@ -49,12 +56,10 @@ trait BasePlayer
         Future(Ok(org.corespring.container.client.views.html.error.main(code, msg, showErrorInUi)))
       }.getOrElse {
 
-        def playerPage(request: Request[AnyContent]) = {
-
+        def playerPage(implicit request: Request[AnyContent]) = {
           val jsMode = getJsMode(request)
           logger.trace(s"js mode: $jsMode")
-          def has(n: String) = request.path.contains(n) || request.getQueryString("file") == Some(n)
-          if (has("container-player.html")) s"container-player.$jsMode.html" else s"player.$jsMode.html"
+          if (getPlayerPage == "container-player.html") s"container-player.$jsMode.html" else s"player.$jsMode.html"
         }
 
         val page = playerPage(request)
@@ -69,14 +74,50 @@ trait BasePlayer
 
 trait JsonPlayer extends BasePlayer {}
 
-trait DevHtmlPlayer extends BasePlayer {
-  override protected def configToResult(xhtml: Option[String], ngDependencies: Seq[String], js: Seq[String], css: Seq[String]): SimpleResult = {
-    Ok(org.corespring.container.client.views.html.playerDev(xhtml.getOrElse("?"), ngDependencies, js, css))
+trait HtmlPlayer extends BasePlayer with Jade {
+
+  val name = "server-generated-player.jade"
+
+  def template(html: String, deps: Seq[String], js: Seq[String], css: Seq[String], json: JsValue) = {
+    val params: Map[String, Object] = Map(
+      "html" -> html,
+      "ngModules" -> s"[${deps.map(d => s"'$d'").mkString(",")}]",
+      "js" -> js.toArray,
+      "css" -> css.toArray,
+      "sessionJson" -> Json.stringify(json))
+    logger.trace(s"render jade with params: $params")
+    renderJade(name, params)
+  }
+
+  override def config(id: String) = Action.async { implicit request =>
+
+    hooks.loadSessionAndItem(id).map {
+      case Left((code, msg)) => Status(code)(Json.obj("error" -> msg))
+      case Right((session, itemJson)) => {
+
+        val typeIds = componentTypes(itemJson).map {
+          t =>
+            val typeRegex(org, name) = t
+            new Id(org, name)
+        }
+
+        val resolvedComponents = resolveComponents(typeIds, Some(context))
+        val jsUrl = urls.jsUrl(context, resolvedComponents)
+        val cssUrl = urls.cssUrl(context, resolvedComponents)
+
+        val clientSideDependencies = getClientSideDependencies(resolvedComponents)
+        val dependencies = ngModules.createAngularModules(resolvedComponents, clientSideDependencies)
+        val js = (additionalScripts :+ jsUrl).distinct
+        val css = Seq(cssUrl)
+
+        Ok(template(processXhtml((itemJson \ "xhtml").asOpt[String]), dependencies, js, css, Json.obj("session" -> session, "item" -> itemJson)))
+      }
+    }
   }
 }
 
-trait ProdHtmlPlayer extends BasePlayer {
-  override protected def configToResult(xhtml: Option[String], ngDependencies: Seq[String], js: Seq[String], css: Seq[String]): SimpleResult = {
-    Ok(org.corespring.container.client.views.html.playerProd(xhtml.getOrElse("?"), ngDependencies, js, css))
-  }
+trait DevHtmlPlayer extends HtmlPlayer {
+  override def config(id: String) = Action(SeeOther(org.corespring.container.client.controllers.apps.routes.ProdHtmlPlayer.config(id).url))
 }
+
+trait ProdHtmlPlayer extends HtmlPlayer {}
