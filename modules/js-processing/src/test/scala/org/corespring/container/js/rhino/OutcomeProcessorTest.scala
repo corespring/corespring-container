@@ -86,6 +86,24 @@ class OutcomeProcessorTest extends Specification {
       (result \ "2" \ "targetOutcome" \ "correctness").as[String] === "incorrect"
     }
 
+    "return an incorrect response if the answer is empty" in {
+
+      val component = interaction("name", interactionRespondJs)
+      val processor = new RhinoOutcomeProcessor(Seq(component))
+
+      val item = Json.obj(
+        "components" -> Json.obj(
+          "1" -> Json.obj(
+            "componentType" ->
+              "org-name",
+            "correctResponse" -> Json.obj(
+              "value" -> "1"))))
+
+      val session = Json.obj("components" -> Json.obj())
+      val result = processor.createOutcome(item, session, Json.obj())
+      (result \ "1" \ "correctness").as[String] === "incorrect"
+    }
+
     /**
      * This asserts that library js is loaded in the correct order so that it can be executed correctly.
      */
