@@ -115,6 +115,23 @@ exports.define = function(isSecure) {
       });
     }
 
+    var initialiseMessage = function(mode) {
+      var modeOptions = options[mode] || {};
+      var saveResponseOptions = mode === "evaluate" ? {
+        isAttempt: false,
+        isComplete: false
+      } : null;
+      instance.sendMessage({
+        message: "initialise",
+        data: {
+          mode: mode,
+          options: modeOptions,
+          saveResponses: saveResponseOptions,
+          queryParams: options.queryParams
+        }
+      });
+    };
+    
     var sendSetModeMessage = function(mode) {
       var modeOptions = options[mode] || {};
       var saveResponseOptions = mode === "evaluate" ? {
@@ -225,7 +242,7 @@ exports.define = function(isSecure) {
 
     instance.addListener("ready", function(data) {
       isReady = true;
-      sendSetModeMessage(options.mode);
+      initialiseMessage(options.mode);
     });
 
   };
