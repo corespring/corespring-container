@@ -1,4 +1,4 @@
-@(xhtml:String, ngModules:Seq[String], js : Seq[String], css : Seq[String] )
+@(xhtml:String, ngModules:Seq[String], js : Seq[String], css : Seq[String], session : JsValue )
 
 @extraLibs = @{ Seq(
     "../../js/core-libs.js",
@@ -8,4 +8,4 @@
     "../../components/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML"
 ) }
 
-@playerRoot( xhtml, ngModules, extraLibs ++ js, css ++ Seq())
+@playerRoot( xhtml, ngModules, extraLibs ++ js, css ++ Seq(), session: JsValue)

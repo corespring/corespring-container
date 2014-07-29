@@ -1,8 +1,14 @@
 package org.corespring.shell
 
-import scala.concurrent.{ExecutionContext, Future}
+import java.io.File
 
+import org.slf4j.LoggerFactory
+
+import scala.concurrent.{ ExecutionContext, Future }
+
+import com.typesafe.config.ConfigFactory
 import org.corespring.amazon.s3.ConcreteS3Service
+import org.corespring.container.client.CompressedAndMinifiedComponentSets
 import org.corespring.container.client.controllers._
 import org.corespring.container.client.hooks._
 import org.corespring.container.client.hooks.Hooks.StatusMessage
@@ -10,14 +16,13 @@ import org.corespring.container.client.integration.DefaultIntegration
 import org.corespring.container.components.model.Component
 import org.corespring.container.components.model.dependencies.DependencyResolver
 import org.corespring.mongo.json.services.MongoService
-import org.corespring.shell.{hooks => shellHooks}
-import org.corespring.shell.controllers.{CachedAndMinifiedComponentSets, ShellDataQueryHooks}
-import org.corespring.shell.controllers.catalog.actions.{CatalogHooks => ShellCatalogHooks}
-import org.corespring.shell.controllers.editor.{ItemHooks => ShellItemHooks}
-import org.corespring.shell.controllers.editor.actions.{EditorHooks => ShellEditorHooks}
-import org.corespring.shell.controllers.player.{SessionHooks => ShellSessionHooks}
-import org.corespring.shell.controllers.player.actions.{PlayerHooks => ShellPlayerHooks}
-import play.api.Configuration
+import org.corespring.shell.controllers.ShellDataQueryHooks
+import org.corespring.shell.controllers.catalog.actions.{ CatalogHooks => ShellCatalogHooks }
+import org.corespring.shell.controllers.editor.{ ItemHooks => ShellItemHooks }
+import org.corespring.shell.controllers.editor.actions.{ EditorHooks => ShellEditorHooks }
+import org.corespring.shell.controllers.player.{ SessionHooks => ShellSessionHooks }
+import org.corespring.shell.controllers.player.actions.{ PlayerHooks => ShellPlayerHooks }
+import play.api.{ Configuration, Mode, Play }
 import play.api.mvc._
 
 class ContainerClientImplementation(
@@ -25,6 +30,8 @@ class ContainerClientImplementation(
   val sessionService: MongoService,
   componentsIn: => Seq[Component],
   val configuration: Configuration) extends DefaultIntegration {
+
+  lazy val logger = LoggerFactory.getLogger("container.shell.ContainerClientImplementation")
 
   override def components: Seq[Component] = componentsIn
 
@@ -39,7 +46,6 @@ class ContainerClientImplementation(
      * ?secure - a secure request
      * ?jsErrors  - throw errors when loading the player js
      * ?pageErrors - throw errors when loading the player page
-     * @param block
      * @return
      */
 
@@ -80,7 +86,7 @@ class ContainerClientImplementation(
         if (response.success) {
           None
         } else {
-          Some((BAD_REQUEST -> s"${response.key}: ${response.msg}"))
+          Some(BAD_REQUEST -> s"${response.key}: ${response.msg}")
         }
       }
 
@@ -92,13 +98,43 @@ class ContainerClientImplementation(
     override implicit def ec: ExecutionContext = ContainerClientImplementation.this.ec
   }
 
-  lazy val componentUrls = new CachedAndMinifiedComponentSets {
+  lazy val componentSets = new CompressedAndMinifiedComponentSets {
+
+    import play.api.Play.current
+
     override def allComponents: Seq[Component] = ContainerClientImplementation.this.components
 
-    override def configuration = ContainerClientImplementation.this.configuration.getConfig("components").getOrElse(Configuration.empty)
+    override def configuration = {
+      val rc = ContainerClientImplementation.this.configuration
+      val c = ConfigFactory.parseString(
+        s"""
+             |minify: ${rc.getBoolean("components.minify").getOrElse(Play.mode == Mode.Prod)}
+             |gzip: ${rc.getBoolean("components.gzip").getOrElse(Play.mode == Mode.Prod)}
+           """.stripMargin)
+
+      new Configuration(c)
+    }
 
     override def dependencyResolver: DependencyResolver = new DependencyResolver {
       override def components: Seq[Component] = allComponents
+    }
+
+    override def resource(path: String): Option[String] = Play.resource(s"container-client/bower_components/$path").map { url =>
+      logger.trace(s"load resource $path")
+      scala.io.Source.fromInputStream(url.openStream())(scala.io.Codec.UTF8).getLines().mkString("\n")
+    }
+
+    override def loadLibrarySource(path: String): Option[String] = {
+      val componentsPath = configuration.getString("path").getOrElse("?")
+      val fullPath = s"$componentsPath/$path"
+      val file = new File(fullPath)
+
+      if (file.exists()) {
+        logger.trace(s"load file: $path")
+        Some(scala.io.Source.fromFile(file)(scala.io.Codec.UTF8).getLines().mkString("\n"))
+      } else {
+        Some(s"console.warn('failed to log $fullPath');")
+      }
     }
   }
 
@@ -146,9 +182,7 @@ trait LoadJs {
 
   //Implemented as trait so it can be tested without setup
   def loadJs(implicit header: RequestHeader): Future[PlayerJs] = Future {
-    def isSecure = header.getQueryString("secure").map {
-      _ == "true"
-    }.getOrElse(false)
+    def isSecure = header.getQueryString("secure").exists(_ == "true")
     def errors = header.getQueryString("jsErrors").map {
       s => s.split(",").toSeq
     }.getOrElse(Seq())

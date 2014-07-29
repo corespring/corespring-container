@@ -1,0 +1,68 @@
+//- -----------------------------------------------------------------
+//- This version of the player requires rendering on the server side.
+//- It is optimized to render the player as quickly as possible.
+//- As part of the app build - the ejs is processed a jade file is generated.
+//- This jade file is then served by the app.
+//- -----------------------------------------------------------------
+!!! 5
+html(xmlns='http://www.w3.org/1999/html')
+  head
+    link(href='//fonts.googleapis.com/css?family=Ubuntu:300,400,500,500italic,700', rel='stylesheet', type='text/css')
+    link(rel="stylesheet", href="../../css/player.min.css")
+    for c in css
+      link(rel='stylesheet', href='#{c}')
+
+  body(ng-app='corespring-player')
+    .pre-loader
+      #spinner
+      #root.container(ng-controller='Root', dimension-propagator='')
+        div(ng-controller='Main')
+          div(player-control-panel='')
+          div(
+            corespring-player='corespring-player', 
+            player-mode='player', 
+            player-markup='item.xhtml', 
+            player-item='item', 
+            player-session='session', 
+            player-outcomes='outcome')
+              != xhtml
+
+
+    //[if lte IE 8]> <script src="../../js/common/ie-support/Function.bind.js"></script> <![endif]
+    //[if lte IE 8]> <script src="../../js/common/ie-support/Array.map.js"></script> <![endif]
+    //[if lte IE 9]> <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script> <![endif]
+    //[if lte IE 9]> <script src="//cdnjs.cloudflare.com/ajax/libs/json3/3.2.6/json3.min.js"></script> <![endif]
+    
+    <% for(i in scripts) { %>
+    script(type='text/javascript', src='<%= scripts[i] %>')
+    <% } %>
+
+    for j in js
+      script(type='text/javascript', src='#{j}')
+    
+    script(type='text/javascript')
+      var deps = [
+      'corespring-common.services',
+      'corespring-common.directives',
+      'corespring-player.controllers',
+      'corespring-player.directives',
+      'corespring-player.services'
+      ];
+      var dynDeps = #{ngModules};
+      angular.module("corespring-player", deps.concat(dynDeps) ).config(['$provide', function($provide) {
+        $provide.decorator('PlayerService', function($delegate, $sniffer) {
+            function Wrapper(){
+              var inst = new $delegate();
+              this.saveSession  = inst.saveSession;
+              this.getScore = inst.getScore;
+              this.completeResponse = inst.completeResponse;
+              this.loadItemAndSession = function(onSuccess, onFailure, id) {
+                var sessionJson = !{sessionJson};
+                onSuccess(sessionJson);
+              };
+            this.loadOutcome = inst.loadOutcome;
+          }
+          return Wrapper;
+        });
+      }]);
+      $(".main").addClass('blend');

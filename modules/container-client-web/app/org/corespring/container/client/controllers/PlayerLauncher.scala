@@ -1,20 +1,22 @@
 package org.corespring.container.client.controllers
 
-import java.io.{ File, InputStream }
+import java.io.{File, InputStream}
 
 import org.apache.commons.lang3.StringEscapeUtils
 import org.corespring.container.client.V2PlayerConfig
-import org.corespring.container.client.hooks.{ PlayerJs, PlayerLauncherHooks }
+import org.corespring.container.client.controllers.player.PlayerQueryStringOptions
+import org.corespring.container.client.hooks.{PlayerJs, PlayerLauncherHooks}
 import org.corespring.container.client.views.txt.js.ServerLibraryWrapper
 import play.api.Play
 import play.api.Play.current
 import play.api.http.ContentTypes
-import play.api.libs.json.{ JsValue, Json }
+import play.api.libs.json.{JsValue, Json}
 import play.api.mvc._
 
 import scala.concurrent.ExecutionContext
 
-trait PlayerLauncher extends Controller {
+
+trait PlayerLauncher extends Controller with PlayerQueryStringOptions{
 
   def playerConfig: V2PlayerConfig
 
@@ -39,8 +41,7 @@ trait PlayerLauncher extends Controller {
     }
   }
 
-  import org.corespring.container.client.controllers.apps.routes.{Editor, BasePlayer}
-  import org.corespring.container.client.controllers.routes.Assets
+  import org.corespring.container.client.controllers.apps.routes.{BasePlayer, Editor, ProdHtmlPlayer}
 
   val SecureMode = "corespring.player.secure"
 
@@ -76,19 +77,26 @@ trait PlayerLauncher extends Controller {
    */
   def playerJs = Action.async { implicit request =>
     hooks.playerJs.map { implicit js =>
-      val playerPage = request.getQueryString("playerPage").getOrElse("player")
+
+      val sessionIdPlayerUrl = isProdPlayer match {
+        case true => ProdHtmlPlayer.config(":id").url
+        case _ => BasePlayer.loadPlayerForSession(":id")
+      }
+
       val rootUrl = playerConfig.rootUrl.getOrElse(BaseUrl(request))
-      val itemUrl = s"${BasePlayer.createSessionForItem(":id").url}?file=$playerPage"
-      //val itemUrl = s"${Player.createSessionForItem(":id").url}?file=$playerPage"
-      val sessionUrl = s"${Assets.session(":id", playerPage)}"
+
+      val itemUrl : String = BasePlayer.createSessionForItem(":id").url
+        .setPlayerPage(getPlayerPage)
+        .setProdPlayer(isProdPlayer)
+
       val defaultOptions: JsValue = Json.obj(
         "corespringUrl" -> rootUrl,
         "mode" -> "gather",
         "paths" -> Json.obj(
           "gather" -> itemUrl,
-          "gatherSession" -> s"$sessionUrl?mode=gather",
-          "view" -> s"$sessionUrl?mode=view",
-          "evaluate" -> s"$sessionUrl?mode=evaluate"))
+          "gatherSession" -> s"$sessionIdPlayerUrl?mode=gather",
+          "view" -> s"$sessionIdPlayerUrl?mode=view",
+          "evaluate" -> s"$sessionIdPlayerUrl?mode=evaluate"))
       val jsPath = "container-client/js/player-launcher/player.js"
       val bootstrap = s"org.corespring.players.ItemPlayer = corespring.require('player').define(${js.isSecure});"
       make(jsPath, defaultOptions, bootstrap)

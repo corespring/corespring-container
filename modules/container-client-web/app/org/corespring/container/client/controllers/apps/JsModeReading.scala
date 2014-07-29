@@ -1,14 +1,16 @@
 package org.corespring.container.client.controllers.apps
 
-import play.api.{Logger, Mode, Play}
+import org.slf4j.Logger
+import play.api.{Mode, Play}
 import play.api.mvc.RequestHeader
 
-trait JsModeReading {
+trait HasLogger {
+  def logger : Logger
+}
 
-  lazy val logger = Logger("container.player.jsMode")
+trait JsModeReading { self : HasLogger =>
 
   def getJsMode(r: RequestHeader): String = {
-
 
     logger.trace(s"queryString -> ${r.queryString.mkString(",")}")
 

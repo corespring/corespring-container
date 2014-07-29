@@ -1,4 +1,7 @@
-@(xhtml:String, ngModules:Seq[String], js : Seq[String], css : Seq[String] )
+@(xhtml:String, ngModules:Seq[String], js : Seq[String], css : Seq[String], session : JsValue )
+
+@import play.api.libs.json.{ JsValue, Json }
+
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/html">
 <head>
@@ -42,7 +45,7 @@
     @for(s <- js) {
     <script type="text/javascript" src="@s"></script>
     }
-    <script>
+    <script type="text/javascript">
       var deps = [
               'corespring-common.services',
               'corespring-common.directives',
@@ -52,7 +55,27 @@
             ];
 
         var dynDeps = [ @Html(ngModules.map( m => s"\'$m\'").mkString(",")) ];
-        angular.module("corespring-player", deps.concat(dynDeps) );
+        angular.module("corespring-player", deps.concat(dynDeps) ).config(['$provide', function($provide) {
+
+            console.debug('------------> init');
+
+           $provide.decorator('PlayerService', function($delegate, $sniffer) {
+                function Wrapper(){
+                    var inst = new $delegate();
+                    this.saveSession  = inst.saveSession;
+                    this.getScore = inst.getScore;
+                    this.completeResponse = inst.completeResponse;
+                    this.loadSession = function(onSuccess, onFailure, id) {
+                      console.log(' -----------> override loadSession!!!');
+                      var sessionJson = @Html(play.api.libs.json.Json.stringify(session));
+                      onSuccess(sessionJson);
+                    };
+                    this.loadOutcome = inst.loadOutcome;
+                }
+                return Wrapper;
+           });
+
+        }]);
 
         $(".main").addClass('blend');
 

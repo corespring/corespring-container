@@ -47,7 +47,7 @@ trait DefaultIntegration
 
     override def components = DefaultIntegration.this.components
 
-    override def urls: ComponentUrls = componentUrls
+    override def urls: ComponentUrls = componentSets
   }
 
   lazy val icons = new Icons {
@@ -66,7 +66,7 @@ trait DefaultIntegration
 
     override implicit def ec: ExecutionContext = DefaultIntegration.this.ec
 
-    override def urls: ComponentUrls = componentUrls
+    override def urls: ComponentUrls = componentSets
 
     override def components: Seq[Component] = DefaultIntegration.this.components
 
@@ -79,7 +79,7 @@ trait DefaultIntegration
 
     override implicit def ec: ExecutionContext = DefaultIntegration.this.ec
 
-    override def urls: ComponentUrls = componentUrls
+    override def urls: ComponentUrls = componentSets
     override def components = DefaultIntegration.this.components
     override def hooks = catalogHooks
   }
@@ -90,7 +90,7 @@ trait DefaultIntegration
 
     override implicit def ec: ExecutionContext = DefaultIntegration.this.ec
 
-    override def urls: ComponentUrls = componentUrls
+    override def urls: ComponentUrls = componentSets
 
     override def components: Seq[Component] = DefaultIntegration.this.components
 
@@ -103,7 +103,7 @@ trait DefaultIntegration
 
     override implicit def ec: ExecutionContext = DefaultIntegration.this.ec
 
-    override def urls: ComponentUrls = componentUrls
+    override def urls: ComponentUrls = componentSets
 
     override def components: Seq[Component] = DefaultIntegration.this.components
 
@@ -116,7 +116,7 @@ trait DefaultIntegration
 
     override implicit def ec: ExecutionContext = DefaultIntegration.this.ec
 
-    override def urls: ComponentUrls = componentUrls
+    override def urls: ComponentUrls = componentSets
 
     override def components: Seq[Component] = DefaultIntegration.this.components
 

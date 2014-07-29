@@ -1,9 +1,22 @@
 package org.corespring.container.client.component
 
-import org.corespring.container.client.controllers.helpers.NameHelper
-import org.corespring.container.client.views.txt.js.{ ComponentServerWrapper, ServerLibraryWrapper, ComponentWrapper }
+import org.corespring.container.client.controllers.helpers.{ LoadClientSideDependencies, NameHelper }
+import org.corespring.container.client.views.txt.js.{ ComponentServerWrapper, ComponentWrapper, ServerLibraryWrapper }
 import org.corespring.container.components.model._
 import org.corespring.container.components.model.dependencies.ComponentTypeFilter
+import org.corespring.container.components.model.packaging.ClientSideDependency
+import play.api.libs.json.JsObject
+
+object SourceGenerator {
+  object Keys {
+    val LocalLibs = "local libs"
+    val ThirdParty = "3rd party"
+    val Libraries = "libraries"
+    val Interactions = "Interactions"
+    val Widgets = "Widgets"
+    val Layout = "Layout"
+  }
+}
 
 trait SourceGenerator
   extends ComponentTypeFilter
@@ -13,11 +26,11 @@ trait SourceGenerator
 
   def css(components: Seq[Component]): String
 
-  protected def wrapComponent(moduleName:String,directiveName: String, src: String) = {
+  protected def wrapComponent(moduleName: String, directiveName: String, src: String) = {
     ComponentWrapper(moduleName, directiveName, src).toString
   }
 
-  protected def layoutToJs(layout: LayoutComponent): String = {
+  def layoutToJs(layout: LayoutComponent): String = {
     layout.client.map(wrapClientLibraryJs(moduleName(layout.org, layout.name))).mkString("\n")
   }
 
@@ -56,7 +69,44 @@ trait SourceGenerator
     filterByType[Widget](comps))
 }
 
-abstract class BaseGenerator extends SourceGenerator{
+trait ResourceLoading {
+  def resource(path: String): Option[String]
+}
+
+trait LibrarySourceLoading {
+  def loadLibrarySource(path: String): Option[String]
+}
+
+abstract class BaseGenerator
+  extends SourceGenerator
+  with LoadClientSideDependencies
+  with ResourceLoading
+  with LibrarySourceLoading
+  with JsStringBuilder {
+
+  protected def get3rdPartyScripts(dependencies: Seq[ClientSideDependency]): Seq[String] = {
+    def loadSrc(name: String)(path: String): Option[String] = resource(s"$name/$path")
+    val scripts = dependencies.map { d => d.files.map(loadSrc(d.name)) }.flatten
+    scripts.flatten
+  }
+
+  protected def getLibScripts(components: Seq[Component]): Seq[String] = {
+
+    def loadSrc(org: String, name: String, path: String): Option[String] = {
+      val fullPath = s"$org/$name/libs/$path"
+      loadLibrarySource(fullPath)
+    }
+
+    val libSrc = for {
+      comp <- components
+      lib <- (comp.packageInfo \ "libs").asOpt[JsObject]
+      client <- (lib \ "client").asOpt[JsObject]
+      paths <- Some(client.fields.map(_._2.as[Seq[String]]).flatten)
+    } yield {
+      for (p <- paths) yield loadSrc(comp.id.org, comp.id.name, p)
+    }
+    libSrc.flatten.flatten
+  }
 
   override def css(components: Seq[Component]): String = {
     val (libraries, uiComps, layoutComps, widgets) = splitComponents(components)
@@ -78,12 +128,20 @@ abstract class BaseGenerator extends SourceGenerator{
     val widgetJs = widgets.map(widgetToJs).mkString("\n")
     val libJs = libs.map(libraryToJs).mkString("\n")
     val layoutJs = layoutComps.map(layoutToJs).mkString("\n")
-    s"""
-    |$libJs
-    |$uiJs
-    |$widgetJs
-    |$layoutJs
-    """.stripMargin
+
+    val dependencies = getClientSideDependencies(components)
+    val scripts = get3rdPartyScripts(dependencies).mkString("\n")
+    val libScripts = getLibScripts(components).mkString("\n")
+
+    import SourceGenerator.Keys._
+
+    buildJsString(
+      LocalLibs -> libScripts,
+      ThirdParty -> scripts,
+      Libraries -> libJs,
+      Interactions -> uiJs,
+      Widgets -> widgetJs,
+      Layout -> layoutJs)
   }
 
   protected def header(id: Id, msg: String) = s"""
@@ -92,7 +150,7 @@ abstract class BaseGenerator extends SourceGenerator{
       // -----------------------------------------
   """
 
-  protected def wrapWithHeader(id : Id, js : String, msg:String) =  {
+  protected def wrapWithHeader(id: Id, js: String, msg: String) = {
     val m = moduleName(id.org, id.name)
     val d = directiveName(id.org, id.name)
     s"""
@@ -101,17 +159,18 @@ abstract class BaseGenerator extends SourceGenerator{
      """.stripMargin
   }
 
-  private def previewJs(id : Id, js : String) = wrapWithHeader(id, js, "Client Preview")
+  private def previewJs(id: Id, js: String) = wrapWithHeader(id, js, "Client Preview")
 
-  protected def widgetToJs(ui: Widget): String = previewJs(ui.id, ui.client.render)
-  protected def interactionToJs(ui: Interaction): String = previewJs(ui.id, ui.client.render)
+  def widgetToJs(ui: Widget): String = previewJs(ui.id, ui.client.render)
+
+  def interactionToJs(ui: Interaction): String = previewJs(ui.id, ui.client.render)
 }
 
-class EditorGenerator extends BaseGenerator {
+trait EditorGenerator extends BaseGenerator {
 
-  private def configJs(id : Id, js : String) = wrapJs(id, js, "Config", "Client Config")
+  private def configJs(id: Id, js: String) = wrapJs(id, js, "Config", "Client Config")
 
-  private def wrapJs(id : Id, js : String, suffix:String, msg:String) =  {
+  private def wrapJs(id: Id, js: String, suffix: String, msg: String) = {
     val m = moduleName(id.org, id.name)
     val d = s"${directiveName(id.org, id.name)}$suffix"
 
@@ -123,7 +182,7 @@ class EditorGenerator extends BaseGenerator {
 
   private def serverJs(componentType: String, definition: String): String = ComponentServerWrapper(componentType, definition).toString
 
-  override def interactionToJs(i:Interaction) : String = {
+  override def interactionToJs(i: Interaction): String = {
     val base = super.interactionToJs(i)
     val cfg = configJs(i.id, i.client.configure)
     val server = serverJs(i.componentType, i.server.definition)
@@ -134,7 +193,7 @@ class EditorGenerator extends BaseGenerator {
      """.stripMargin
   }
 
-  override def widgetToJs(w:Widget) : String = {
+  override def widgetToJs(w: Widget): String = {
     val base = super.widgetToJs(w)
     val cfg = configJs(w.id, w.client.configure)
     s"""
@@ -146,12 +205,11 @@ class EditorGenerator extends BaseGenerator {
   override protected def libraryToJs(l: Library): String = addLibraryJs(true, true)(l)
 }
 
-class CatalogGenerator extends BaseGenerator {
+trait CatalogGenerator extends BaseGenerator with JsStringBuilder {
   override protected def libraryToJs(l: Library): String = addLibraryJs(true, false)(l)
 }
 
-class PlayerGenerator extends BaseGenerator {
+trait PlayerGenerator extends BaseGenerator with JsStringBuilder {
   override protected def libraryToJs(l: Library): String = addLibraryJs(true, false)(l)
 }
-
 

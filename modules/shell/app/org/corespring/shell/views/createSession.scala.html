@@ -121,8 +121,8 @@
           }
           return builder.build();
         }
-
-        window.location = addFileParamIfNotSet(result.url, "container-player.html");
+        console.log("-------> url ", result.url);
+        window.location = result.url; //addFileParamIfNotSet(result.url, "container-player.html");
       });
 
     });
