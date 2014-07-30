@@ -1,11 +1,11 @@
 package org.corespring.container.js.rhino
 
-import org.corespring.container.components.model.{Component, Library}
-import org.corespring.container.js.api.{GetServerLogic, JavascriptError, JavascriptProcessingException, ComponentServerLogic => ApiComponentServerLogic, ItemAuthorOverride => ApiItemAuthorOverride}
+import org.corespring.container.components.model.{ Component, Library }
+import org.corespring.container.js.api.{ GetServerLogic, JavascriptError, JavascriptProcessingException, ComponentServerLogic => ApiComponentServerLogic, ItemAuthorOverride => ApiItemAuthorOverride }
 import org.corespring.container.js.processing.PlayerItemPreProcessor
 import org.corespring.container.js.response.OutcomeProcessor
-import org.mozilla.javascript.{Context, Scriptable, Function => RhinoFunction}
-import play.api.libs.json.{JsObject, JsValue, Json}
+import org.mozilla.javascript.{ Context, Scriptable, Function => RhinoFunction }
+import play.api.libs.json.{ JsObject, JsValue, Json }
 
 trait CorespringJs {
 
@@ -152,5 +152,5 @@ trait RhinoGetServerLogic extends GetServerLogic {
 
 class RhinoOutcomeProcessor(val components: Seq[Component]) extends OutcomeProcessor with RhinoGetServerLogic
 
-class RhinoPlayerItemPreProcessor(val components : Seq[Component]) extends PlayerItemPreProcessor with RhinoGetServerLogic
+class RhinoPlayerItemPreProcessor(val components: Seq[Component]) extends PlayerItemPreProcessor with RhinoGetServerLogic
 

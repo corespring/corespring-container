@@ -14,7 +14,7 @@ import org.corespring.container.components.processing.PlayerItemPreProcessor
 import org.corespring.container.components.response.OutcomeProcessor
 import org.corespring.container.js.rhino.score.ItemJsScoreProcessor
 import org.corespring.container.js.rhino.{ RhinoOutcomeProcessor, RhinoPlayerItemPreProcessor }
-import play.api.{Play, Mode}
+import play.api.{ Play, Mode }
 
 import scala.concurrent.ExecutionContext
 
@@ -30,7 +30,7 @@ trait DefaultIntegration
     Validator.absolutePathInProdMode(componentsPath)
   }
 
-  def showErrorInUi : Boolean = {
+  def showErrorInUi: Boolean = {
     Play.current.mode == Mode.Dev || configuration.getBoolean("showErrorInUi").getOrElse(false)
   }
 
@@ -122,7 +122,6 @@ trait DefaultIntegration
 
     override def hooks = playerHooks
   }
-
 
   lazy val item = new Item {
     def scoreProcessor: ScoreProcessor = DefaultIntegration.this.scoreProcessor

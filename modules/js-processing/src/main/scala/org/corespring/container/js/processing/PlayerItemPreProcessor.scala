@@ -1,14 +1,14 @@
 package org.corespring.container.js.processing
 
-import org.corespring.container.components.model.dependencies.{ComponentSplitter, DependencyResolver}
-import org.corespring.container.components.model.{Component, Interaction, Library}
+import org.corespring.container.components.model.dependencies.{ ComponentSplitter, DependencyResolver }
+import org.corespring.container.components.model.{ Component, Interaction, Library }
 import org.corespring.container.components.processing.{ PlayerItemPreProcessor => PreProcessor }
 import org.corespring.container.js.api.GetServerLogic
 import play.api.libs.json._
 
-trait PlayerItemPreProcessor extends PreProcessor with GetServerLogic with ComponentSplitter{
+trait PlayerItemPreProcessor extends PreProcessor with GetServerLogic with ComponentSplitter {
 
-  def components : Seq[Component]
+  def components: Seq[Component]
 
   lazy val dependencyResolver = new DependencyResolver {
     override def components: Seq[Component] = PlayerItemPreProcessor.this.components
