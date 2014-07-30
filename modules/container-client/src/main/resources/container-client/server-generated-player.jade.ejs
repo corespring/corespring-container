@@ -53,14 +53,15 @@ html(xmlns='http://www.w3.org/1999/html')
         $provide.decorator('PlayerService', function($delegate, $sniffer) {
             function Wrapper(){
               var inst = new $delegate();
-              this.saveSession  = inst.saveSession;
-              this.getScore = inst.getScore;
-              this.completeResponse = inst.completeResponse;
+              for(var x in inst){
+                if(typeof(inst[x]) === 'function'){
+                  this[x] = inst[x];
+                }
+              }
               this.loadItemAndSession = function(onSuccess, onFailure, id) {
                 var sessionJson = !{sessionJson};
                 onSuccess(sessionJson);
               };
-            this.loadOutcome = inst.loadOutcome;
           }
           return Wrapper;
         });
