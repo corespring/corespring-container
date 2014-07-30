@@ -106,7 +106,12 @@ var Instance = function(element, options, errorCallback, log) {
       return;
     }
 
-    var url = options.url;
+    function makeUrl(url, queryParams) {
+      var Builder = require('url-builder');
+      return new Builder().build(url, queryParams);
+    }
+
+    var url = makeUrl(options.url, options.queryParams);
 
     $(e).html("<iframe id='iframe-player' frameborder='0' src='" + url + "' style='width: 100%; border: none'></iframe>");
 
