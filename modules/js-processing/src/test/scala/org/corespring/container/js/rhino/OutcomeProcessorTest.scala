@@ -10,6 +10,10 @@ class OutcomeProcessorTest extends Specification {
   val interactionRespondJs =
     """
       |exports.respond = function(question, answer, settings){
+      |
+      |  if(!answer){
+      |    return { correctness: 'incorrect', score: 0 }
+      |  }
       |  var correct = question.correctResponse.value == answer.value;
       |  return { correctness: correct ? "correct" : "incorrect", answer : answer };
       |}
