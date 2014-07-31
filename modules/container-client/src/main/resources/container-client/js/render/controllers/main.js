@@ -150,17 +150,13 @@ angular.module('corespring-player.controllers')
           $scope.$emit("session-loaded", data.session);
         };
 
-        $scope.onSessionReset = function(session) {
-          $log.info("onSessionReset", session);
+        $scope.onSessionResetSuccess = function(session) {
+          $log.info("onSessionResetSuccess", session);
           $scope.session = session;
           $scope.outcome = undefined;
           $scope.score = undefined;
           $scope.isComplete = false;
 
-          ComponentRegister.reset();
-        };
-
-        $scope.resetPreview = function() {
           ComponentRegister.reset();
         };
 
@@ -176,14 +172,14 @@ angular.module('corespring-player.controllers')
          * Initialise the controller - this has to be the 1st thing you call
          */
         $scope.$on('initialise', function(event, data) {
-          $log.debug('[on initialise]');
+          $log.debug('[on initialise]', data);
           PlayerService.setQueryParams(data.queryParams || {});
           PlayerService.loadItemAndSession(
             function(itemAndSession){
               $scope.onItemAndSessionLoaded(itemAndSession);
               
               if(currentMode !== undefined && currentMode !== null){
-                throw new Error('The mode is already set');
+                throw new Error('The mode is already set to ' + currentMode);
               }
 
               currentMode = data.mode;
@@ -199,8 +195,8 @@ angular.module('corespring-player.controllers')
             $scope.sessionId);
         });
 
-        $scope.$on('resetPreview', function() {
-          PlayerService.resetSession($scope.onSessionReset, $scope.onSessionResetError, $scope.sessionId);
+        $scope.$on('resetSession', function() {
+          PlayerService.resetSession($scope.onSessionResetSuccess, $scope.onSessionResetError, $scope.sessionId);
         });
 
         $scope.$on('saveResponses', function(event, data, callback) {
@@ -255,10 +251,6 @@ angular.module('corespring-player.controllers')
           callback({
             isComplete: $scope.isComplete || false
           });
-        });
-
-        $scope.$on('reset', function() {
-          $scope.resetPreview();
         });
 
         $scope.$on('getSessionStatus', function(event, data, callback) {

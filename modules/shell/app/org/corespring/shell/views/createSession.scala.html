@@ -80,49 +80,8 @@
         dataType: 'json',
         data: JSON.stringify(data)
       }).done(function(result) {
-
-        function UrlBuilder(url) {
-          var parts = url.match(/([^?#]*)(\?([^#]*))?(#(.*))?/);
-
-          var root = parts[1] || "";
-          var query = parts[3] || "";
-          var hash = parts[5] || "";
-
-          var queryParts = query == "" ? [] : query.split("&").map(function(item) {
-            return item.split("=");
-          });
-
-          this.hasParam = function(name) {
-            return queryParts.some(function(param) {
-              return param[0] === name;
-            });
-          };
-
-          this.addParam = function(name, value) {
-            queryParts.push([name, value]);
-          };
-
-          this.build = function() {
-            if (queryParts.length > 0) {
-              query = queryParts.map(function(param) {
-                return param[0] + (param.length > 1 ? "=" + param[1] : "");
-              }).join("&");
-            } else {
-              query = "";
-            }
-            return root + (query ? "?" + query : "") + (hash ? "#" + hash : "");
-          }
-        }
-
-        function addFileParamIfNotSet(url, fileName) {
-          var builder = new UrlBuilder(url);
-          if (!builder.hasParam("file")) {
-            builder.addParam("file", fileName);
-          }
-          return builder.build();
-        }
         console.log("-------> url ", result.url);
-        window.location = result.url; //addFileParamIfNotSet(result.url, "container-player.html");
+        window.location = result.url;
       });
 
     });

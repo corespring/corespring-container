@@ -1,10 +1,22 @@
-extends player
+extends player-base
 
-block player-header
+block player-content
 
-  player-control-panel(data-mode='playerMode', data-settings='playerSettings', data-score="score", data-show-preview-button="false")
+  div(ng-controller="ContainerPlayerController")
 
-block player-child
+    div(ng-controller="Main")
+
+      player-control-panel(data-mode='playerMode', data-settings='playerSettings', data-score="score", data-show-preview-button="false")
+
+      .player-container
+        div(corespring-player,
+        player-mode="player",
+        player-markup="item.xhtml",
+        player-item="item",
+        player-session="session",
+        player-outcomes="outcome")
+
+        summary-feedback(template="player.jade",item="item",session="session")
 
 block extra-scripts
   script( src="../../components/angular-ui/build/angular-ui.min.js", type="text/javascript")
