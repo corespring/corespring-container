@@ -10,7 +10,7 @@ import play.api.mvc.{ Action, EssentialAction, RequestHeader, Result }
 trait CompressedAndMinifiedComponentSets extends DefaultComponentSets
   with JsMinifier with CssMinifier with Gzipper {
 
-  lazy val logger = ContainerLogger.getLogger("container.ComponentSets")
+  lazy val logger = ContainerLogger.getLogger("CompressedComponentSets")
 
   def configuration: Configuration
 

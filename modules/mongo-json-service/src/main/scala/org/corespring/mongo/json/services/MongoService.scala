@@ -5,12 +5,12 @@ import com.mongodb.casbah.{ WriteConcern, MongoCollection }
 import com.mongodb.casbah.commons.MongoDBObject
 import com.mongodb.util.{ JSON => MongoPlayJson }
 import org.bson.types.ObjectId
-import play.api.Logger
 import play.api.libs.json.{Json => PlayJson, JsUndefined, JsArray, JsObject, JsValue}
+import org.corespring.container.logging.ContainerLogger
 
 class MongoService(collection: MongoCollection) {
 
-  def logger = Logger(s"shell.mongo-service.${collection.name}")
+  def logger = ContainerLogger.getLogger(s"MongoService.${collection.name}")
 
   def list(fields: String*): Seq[JsValue] = {
 

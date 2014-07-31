@@ -14,7 +14,7 @@ trait Main
 
   import org.corespring.shell.views._
 
-  val logger = ContainerLogger.getLogger("shell.home")
+  val logger = ContainerLogger.getLogger("Main")
 
   def itemService: MongoService
 
@@ -99,7 +99,7 @@ trait Main
               org.corespring.container.client.controllers.apps.routes.BasePlayer.loadPlayerForSession(oid.toString)
             }
           }
-          logger.info(s"url ${call.url}")
+          logger.debug(s"url ${call.url}")
           Ok(JsObject(Seq("url" -> JsString(call.url.setPlayerPage(getPlayerPage)))))
       }.getOrElse {
         logger.debug("Can't create the session")

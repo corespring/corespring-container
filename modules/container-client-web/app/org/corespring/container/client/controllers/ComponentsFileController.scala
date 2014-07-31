@@ -13,7 +13,7 @@ import play.api.mvc._
 /** A very simple file asset loader for now */
 trait ComponentsFileController extends Controller with HasContext {
 
-  val log  = ContainerLogger.getLogger("container.components.file.controller")
+  val log  = ContainerLogger.getLogger("ComponentsFileController")
 
   def componentsPath: String
   def defaultCharSet: String

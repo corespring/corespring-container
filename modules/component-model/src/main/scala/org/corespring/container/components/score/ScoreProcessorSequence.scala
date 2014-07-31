@@ -9,7 +9,7 @@ import org.corespring.container.logging.ContainerLogger
  * @param processors
  */
 class ScoreProcessorSequence(processors: ScoreProcessor*) extends ScoreProcessor {
-  lazy val logger = ContainerLogger.getLogger("score.processor")
+  lazy val logger = ContainerLogger.getLogger("ScoreProcessor")
 
   def score(item: JsValue, session: JsValue, outcomes: JsValue): JsValue = {
 

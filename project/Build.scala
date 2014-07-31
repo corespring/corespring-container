@@ -194,8 +194,9 @@ object Build extends sbt.Build {
         jsProcessing)
 
   val mongoJsonService = builder.playApp("mongo-json-service")
-    .settings(playAppToSbtLibSettings: _*).settings(
-      libraryDependencies ++= Seq(casbah))
+    .settings( playAppToSbtLibSettings: _*)
+    .settings(libraryDependencies ++= Seq(casbah))
+    .dependsOn(logging)
 
   val docs = builder.playApp("docs")
     .settings(LaikaPlugin.defaults: _*)

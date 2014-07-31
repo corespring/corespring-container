@@ -9,7 +9,7 @@ import scala.concurrent.Future
 
 trait Assets extends Controller with HasContext {
 
-  lazy val logger = ContainerLogger.getLogger("v2player.assets")
+  lazy val logger = ContainerLogger.getLogger("Assets")
 
   def loadAsset(id: String, file: String)(request: Request[AnyContent]): SimpleResult
 

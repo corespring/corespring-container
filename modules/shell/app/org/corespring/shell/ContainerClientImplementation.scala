@@ -29,7 +29,7 @@ class ContainerClientImplementation(
   componentsIn: => Seq[Component],
   val configuration: Configuration) extends DefaultIntegration {
 
-  lazy val logger = ContainerLogger.getLogger("container.shell.ContainerClientImplementation")
+  lazy val logger = ContainerLogger.getLogger("ContainerClientImplementation")
 
   override def components: Seq[Component] = componentsIn
 

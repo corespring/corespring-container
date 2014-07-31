@@ -11,7 +11,7 @@ import play.api.mvc._
 
 trait ComponentSets extends Controller with ComponentUrls {
 
-  private lazy val logger = ContainerLogger.getLogger("container.component.sets")
+  private lazy val logger = ContainerLogger.getLogger("ComponentSets")
 
   def allComponents: Seq[Component]
 

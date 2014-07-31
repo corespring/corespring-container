@@ -7,7 +7,7 @@ import play.api.mvc.{ Action, Controller }
 
 trait Icons extends Controller with ComponentSplitter {
 
-  private lazy val logger = ContainerLogger.getLogger("icons")
+  private lazy val logger = ContainerLogger.getLogger("Icons")
 
   val Split = """(.*?)-(.*)""".r
 

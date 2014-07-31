@@ -10,7 +10,7 @@ import play.api.mvc.RequestHeader
 
 trait ShellDataQueryHooks extends ContainerDataQueryHooks {
 
-  lazy val logger = ContainerLogger.getLogger("shell.home")
+  lazy val logger = ContainerLogger.getLogger("ShellDataQueryHooks")
 
   lazy val fieldValueJson: JsValue = FieldValueJson()
 

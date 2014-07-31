@@ -21,7 +21,7 @@ object Session {
 
 trait Session extends Controller with ItemPruner with HasContext {
 
-  val logger = ContainerLogger.getLogger("container.Session")
+  val logger = ContainerLogger.getLogger("Session")
 
   def outcomeProcessor: OutcomeProcessor
 

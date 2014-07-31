@@ -7,7 +7,7 @@ import org.corespring.container.logging.ContainerLogger
 
 object ItemJsScoreProcessor extends ScoreProcessor {
 
-  lazy val logger = ContainerLogger.getLogger("js.processing")
+  lazy val logger = ContainerLogger.getLogger("JsProcessing")
 
   def score(item: JsValue, session: JsValue, outcomes: JsValue): JsValue = {
     getScoringJs(item).map {

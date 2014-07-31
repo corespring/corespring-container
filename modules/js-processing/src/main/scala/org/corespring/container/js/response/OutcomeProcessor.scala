@@ -23,7 +23,7 @@ trait OutcomeProcessor
 
   def components: Seq[Component]
 
-  private lazy val logger = ContainerLogger.getLogger("container.OutcomeProcessor")
+  private lazy val logger = ContainerLogger.getLogger("OutcomeProcessor")
 
   def createOutcome(item: JsValue, itemSession: JsValue, settings: JsValue): JsValue = {
 

@@ -12,7 +12,7 @@ trait EditorHooks extends ContainerEditorHooks {
 
 
 
-  lazy val logger = ContainerLogger.getLogger("editor.hooks.action.builder")
+  lazy val logger = ContainerLogger.getLogger("EditorHooks")
 
   def itemService: MongoService
 

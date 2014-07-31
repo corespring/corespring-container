@@ -13,7 +13,7 @@ import scalaz.Scalaz._
 trait CatalogHooks extends ContainerCatalogHooks {
 
 
-  lazy val logger = ContainerLogger.getLogger("catalog.hooks.action.builder")
+  lazy val logger = ContainerLogger.getLogger("CatalogHooks")
 
   def itemService: MongoService
 

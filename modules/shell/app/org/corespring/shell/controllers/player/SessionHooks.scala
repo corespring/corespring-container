@@ -12,7 +12,7 @@ import scala.concurrent.{ ExecutionContext, Future }
 
 trait SessionHooks extends ContainerSessionHooks {
 
-  val logger = ContainerLogger.getLogger("session.builder")
+  val logger = ContainerLogger.getLogger("SessionHooks")
 
   def sessionService: MongoService
 

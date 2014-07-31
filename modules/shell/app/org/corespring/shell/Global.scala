@@ -12,7 +12,7 @@ import play.api.{ Mode, GlobalSettings, Play }
 
 object Global extends WithFilters(AccessControlFilter, CallBlockOnHeaderFilter) with ControllerInstanceResolver with GlobalSettings {
 
-  private lazy val logger = ContainerLogger.getLogger("shell.global")
+  private lazy val logger = ContainerLogger.getLogger("Global")
 
   lazy val controllers: Seq[Controller] = containerClient.controllers :+ home
 

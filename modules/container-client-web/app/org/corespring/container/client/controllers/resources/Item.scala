@@ -19,7 +19,7 @@ object Item {
 
 trait Item extends Controller with XhtmlCleaner {
 
-  private lazy val logger = ContainerLogger.getLogger("container.item")
+  private lazy val logger = ContainerLogger.getLogger("Item")
 
   implicit def toResult(m: StatusMessage): SimpleResult = play.api.mvc.Results.Status(m._1)(Json.obj("error" -> m._2))
 

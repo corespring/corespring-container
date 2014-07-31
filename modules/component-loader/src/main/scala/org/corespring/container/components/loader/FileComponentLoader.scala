@@ -12,7 +12,7 @@ class FileComponentLoader(paths: Seq[String], onlyProcessReleased: Boolean)
   extends ComponentLoader
   with PackageJsonReading {
 
-  private val logger = ContainerLogger.getLogger("components.FileComponentLoader")
+  private val logger = ContainerLogger.getLogger("FileComponentLoader")
 
   private var loadedComponents: Seq[Component] = Seq.empty
 

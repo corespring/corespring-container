@@ -7,7 +7,7 @@ trait DependencyResolver extends ComponentSplitter {
 
   type IdRelation = (Id, Seq[Id])
 
-  lazy val logger  = ContainerLogger.getLogger("container.dependencies.DependencyResolver")
+  lazy val logger  = ContainerLogger.getLogger("dependencies.DependencyResolver")
 
   lazy val relationships: Seq[(Id, Seq[Id])] = {
     components.map { c =>
