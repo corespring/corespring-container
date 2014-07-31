@@ -15,30 +15,52 @@
     display: inline-block;
   }
 
-  .action {
+  .action,
+  .action:focus,
+  .action:hover {
     display: inline-block;
     vertical-align: middle;
-    .border-radius(3px);
-    border-style: none;
+    .border-radius(4px);
     color: white;
     margin-left: 5px;
   }
 
   .action.reset {
     background-color: #D9534F;
+    border: solid 1px #D43F3A;
+  }
+
+  .action.reset:focus,
+  .action.reset:hover {
+    background-color: #C9302C;
+    border: solid 1px #AC2925;
   }
 
   .action.preview {
     background-color: #F0AD4E;
+    border: 1px solid #EEA236;
+  }
+
+  .action.preview:focus,
+  .action.preview:hover {
+    background: #EC971F;
+    border: 1px solid #D58512;
   }
 
   .action.submit {
-    background-color: #428BCA;
+    background: #428BCA;
+    border: 1px solid #357EBD;
+  }
+
+  .action.submit:focus,
+  .action.submit  :hover {
+    background: #3071A9;
+    border: 1px solid #285E8E;
   }
 
   .action.config {
     font-size: 30px;
-    color: #4a4a4a;
+    color: #4A4A4A;
   }
 
   .popover-content {
