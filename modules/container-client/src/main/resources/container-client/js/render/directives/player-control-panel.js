@@ -22,19 +22,19 @@
             $scope.settingsEnabled.allowEmptyResponses = playerIsInGatherMode;
           });
 
-          $scope.preview = function () {
+          $scope.preview = function() {
             $scope.$emit('playerControlPanel.preview');
           };
 
-          $scope.submit = function () {
+          $scope.submit = function() {
             $scope.$emit('playerControlPanel.submit');
           };
 
-          $scope.reset = function () {
+          $scope.reset = function() {
             $scope.$emit('playerControlPanel.reset');
           };
 
-          $scope.settingsChange = function () {
+          $scope.settingsChange = function() {
             $scope.$emit('playerControlPanel.settingsChange');
           };
 
@@ -42,7 +42,7 @@
             return $scope.score && $scope.score.summary;
           };
 
-          $scope.isPreviewButtonVisible = function(){
+          $scope.isPreviewButtonVisible = function() {
             return $scope.showPreviewButton !== "false";
           };
 
@@ -51,27 +51,27 @@
             var $configLink = $element.find(CONFIG_BUTTON_SELECTOR);
             if (!$configLink) {
               $log.error("Cannot find config button", $configLink);
-              throw("Cannot find config button");
+              throw ("Cannot find config button");
             }
             if (!$configLink.popover) {
               $log.error("config button has no popover method", $configLink.popover);
-              throw("config button has no popover method");
+              throw ("config button has no popover method");
             }
 
-            $scope.closePopup = function () {
+            $scope.closePopup = function() {
               $configLink.popover('hide');
             };
 
             function checkbox(prop, label) {
               return [
                 '<li class="setting">',
-                  '  <label ng-class="{disabled: !settingsEnabled.' + prop + '}">',
+                '  <label ng-class="{disabled: !settingsEnabled.' + prop + '}">',
                 '    <input type="checkbox" ',
-                  '      ng-model="settings.' + prop + '"',
-                  '      ng-disabled="!settingsEnabled.' + prop + '"',
+                '      ng-model="settings.' + prop + '"',
+                '      ng-disabled="!settingsEnabled.' + prop + '"',
                 '      ng-change="settingsChange()"',
                 '    >',
-                  '    <span>' + label + '</span>',
+                '    <span>' + label + '</span>',
                 '  </label>',
                 '</li>'
               ].join("\n");
@@ -92,7 +92,7 @@
             $configLink.popover({
               html: true,
               placement: 'bottom',
-              content: function () {
+              content: function() {
                 return popupContent;
               }
             });
