@@ -4,14 +4,13 @@ import java.io.{ InputStreamReader, Reader }
 import org.corespring.container.js.api.JavascriptError
 import org.mozilla.javascript.tools.shell.Global
 import org.mozilla.javascript.{ Function => RhinoFunction, _ }
-import play.api.Logger
 import play.api.libs.json.JsString
 import play.api.libs.json.{ Json, JsValue }
 import scala.Some
-
+import org.corespring.container.logging.ContainerLogger
 
 trait JsLogging {
-  lazy val logger = Logger("js.processing")
+  lazy val logger = ContainerLogger.getLogger("JsProcessing")
 }
 
 case class RhinoJsError(
@@ -44,7 +43,7 @@ class LocalErrorReporter extends ErrorReporter {
 
 trait JsContext extends JsLogging {
 
-  def console: Option[JsConsole] = Some(new DefaultLogger(Logger("js.console")))
+  def console: Option[JsConsole] = Some(new DefaultLogger(ContainerLogger.getLogger("JsConsole")))
 
   def withJsContext[A](libs: Seq[String], srcs: Seq[(String, String)] = Seq.empty)(f: (Context, Scriptable) => Either[JavascriptError, A]): Either[JavascriptError, A] = {
     val ctx = Context.enter()

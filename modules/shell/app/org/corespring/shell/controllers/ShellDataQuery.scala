@@ -4,13 +4,13 @@ import scala.concurrent.Future
 
 import org.corespring.container.client.hooks.{DataQueryHooks => ContainerDataQueryHooks}
 import org.corespring.shell.controllers.data._
-import play.api.Logger
+import org.corespring.container.logging.ContainerLogger
 import play.api.libs.json._
 import play.api.mvc.RequestHeader
 
 trait ShellDataQueryHooks extends ContainerDataQueryHooks {
 
-  lazy val logger = Logger("shell.home")
+  lazy val logger = ContainerLogger.getLogger("ShellDataQueryHooks")
 
   lazy val fieldValueJson: JsValue = FieldValueJson()
 

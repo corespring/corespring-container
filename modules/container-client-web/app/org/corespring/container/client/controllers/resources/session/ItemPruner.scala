@@ -1,7 +1,7 @@
 package org.corespring.container.client.controllers.resources.session
 
 import play.api.libs.json._
-import play.api.Logger
+import grizzled.slf4j.Logger
 
 trait ItemPruner {
 

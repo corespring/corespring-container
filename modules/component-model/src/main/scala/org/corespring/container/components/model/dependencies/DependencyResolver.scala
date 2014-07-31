@@ -2,13 +2,12 @@ package org.corespring.container.components.model.dependencies
 
 import com.ahum.deps._
 import org.corespring.container.components.model._
-import org.slf4j.{ LoggerFactory, Logger }
-
+import org.corespring.container.logging.ContainerLogger
 trait DependencyResolver extends ComponentSplitter {
 
   type IdRelation = (Id, Seq[Id])
 
-  lazy val logger: Logger = LoggerFactory.getLogger("container.dependencies.DependencyResolver")
+  lazy val logger  = ContainerLogger.getLogger("dependencies.DependencyResolver")
 
   lazy val relationships: Seq[(Id, Seq[Id])] = {
     components.map { c =>

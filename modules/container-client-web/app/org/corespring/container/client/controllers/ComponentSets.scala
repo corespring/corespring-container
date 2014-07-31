@@ -5,13 +5,13 @@ import java.net.URL
 import org.corespring.container.client.component._
 import org.corespring.container.components.model.Component
 import org.corespring.container.components.model.dependencies.DependencyResolver
-import play.api.{ Play, Logger }
+import org.corespring.container.logging.ContainerLogger
 import play.api.http.ContentTypes
 import play.api.mvc._
 
 trait ComponentSets extends Controller with ComponentUrls {
 
-  private lazy val logger = Logger("container.component.sets")
+  private lazy val logger = ContainerLogger.getLogger("ComponentSets")
 
   def allComponents: Seq[Component]
 

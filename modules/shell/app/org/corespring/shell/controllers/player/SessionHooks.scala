@@ -3,7 +3,7 @@ package org.corespring.shell.controllers.player
 import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.client.hooks.{ SessionHooks => ContainerSessionHooks, FullSession, SaveSession, SessionOutcome }
 import org.corespring.mongo.json.services.MongoService
-import play.api.Logger
+import org.corespring.container.logging.ContainerLogger
 import play.api.http.Status._
 import play.api.libs.json.{ JsObject, Json, JsValue }
 import play.api.mvc._
@@ -12,7 +12,7 @@ import scala.concurrent.{ ExecutionContext, Future }
 
 trait SessionHooks extends ContainerSessionHooks {
 
-  val logger = Logger("session.builder")
+  val logger = ContainerLogger.getLogger("SessionHooks")
 
   def sessionService: MongoService
 

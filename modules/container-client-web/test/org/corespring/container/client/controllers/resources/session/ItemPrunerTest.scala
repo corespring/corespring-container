@@ -52,5 +52,5 @@ class ItemPrunerTest extends Specification with ItemPruner {
     }
   }
 
-  def logger: Logger = Logger("test")
+  def logger: Logger = ContainerLogger.getLogger("Test")
 }

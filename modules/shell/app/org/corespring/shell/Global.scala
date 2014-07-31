@@ -7,11 +7,12 @@ import org.corespring.play.utils.{ CallBlockOnHeaderFilter, ControllerInstanceRe
 import org.corespring.shell.controllers.Main
 import org.corespring.shell.filters.AccessControlFilter
 import play.api.mvc.{ RequestHeader, WithFilters, Controller }
-import play.api.{ Mode, GlobalSettings, Logger, Play }
+import org.corespring.container.logging.ContainerLogger
+import play.api.{ Mode, GlobalSettings, Play }
 
 object Global extends WithFilters(AccessControlFilter, CallBlockOnHeaderFilter) with ControllerInstanceResolver with GlobalSettings {
 
-  private lazy val logger = Logger("shell.global")
+  private lazy val logger = ContainerLogger.getLogger("Global")
 
   lazy val controllers: Seq[Controller] = containerClient.controllers :+ home
 

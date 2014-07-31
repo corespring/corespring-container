@@ -4,7 +4,7 @@ import scala.concurrent.Future
 
 import org.corespring.container.client.hooks.{CatalogHooks => ContainerCatalogHooks}
 import org.corespring.mongo.json.services.MongoService
-import play.api.Logger
+import org.corespring.container.logging.ContainerLogger
 import play.api.libs.json.JsValue
 import play.api.mvc._
 import scalaz.Validation
@@ -13,7 +13,7 @@ import scalaz.Scalaz._
 trait CatalogHooks extends ContainerCatalogHooks {
 
 
-  lazy val logger = Logger("catalog.hooks.action.builder")
+  lazy val logger = ContainerLogger.getLogger("CatalogHooks")
 
   def itemService: MongoService
 

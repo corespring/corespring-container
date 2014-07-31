@@ -5,14 +5,14 @@ import java.io.File
 import org.corespring.container.components.loader.exceptions.ComponentLoaderException
 import org.corespring.container.components.model._
 import org.corespring.container.utils.string.hyphenatedToTitleCase
-import org.slf4j.LoggerFactory
+import org.corespring.container.logging.ContainerLogger
 import play.api.libs.json.{ JsValue, Json }
 
 class FileComponentLoader(paths: Seq[String], onlyProcessReleased: Boolean)
   extends ComponentLoader
   with PackageJsonReading {
 
-  private val logger = LoggerFactory.getLogger("container.components.FileComponentLoader")
+  private val logger = ContainerLogger.getLogger("FileComponentLoader")
 
   private var loadedComponents: Seq[Component] = Seq.empty
 
