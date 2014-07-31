@@ -65,7 +65,7 @@ var Placeholder = function(
 
       $scope.showIcon = (config.icon !== undefined) && (component.data.clean === true);
       $scope.icon = config.icon;
-      $scope.name = config.name;
+      $scope.name = config.title;
 
       if ($scope.showIcon) {
         $holder.html([
