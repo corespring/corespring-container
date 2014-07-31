@@ -4,24 +4,24 @@
 
   .score {
     display: inline-block;
-    margin-left: 20px;
-    width: 150px;
-
-    label {
-      font-weight: bold;
-    }
+    margin-top: 7px;
+    width: 80px;
+    color: white;
+    font-weight: bold;
   }
 
   .action-holder {
     margin-top: 10px;
+    display: inline-block;
   }
 
   .action {
     display: inline-block;
-    vertical-align: top;
+    vertical-align: middle;
     .border-radius(3px);
     border-style: none;
     color: white;
+    margin-left: 5px;
   }
 
   .action.reset {
@@ -29,11 +29,16 @@
   }
 
   .action.preview {
+    background-color: #F0AD4E;
+  }
+
+  .action.submit {
     background-color: #428BCA;
   }
 
-  .action.feedback-mode {
-    background-color: #F0AD4E;
+  .action.config {
+    font-size: 30px;
+    color: #4a4a4a;
   }
 
   .popover-content {
@@ -50,6 +55,9 @@
         span {
           padding-left: 20px;
           display: block;
+        }
+        .disabled {
+          color: #d3d3d3;
         }
       }
     }

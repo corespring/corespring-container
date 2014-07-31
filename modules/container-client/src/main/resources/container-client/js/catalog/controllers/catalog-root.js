@@ -5,7 +5,6 @@ angular.module('corespring-catalog.controllers')
     '$log',
     'ItemService',
     'ItemIdService',
-    'PlayerService',
     'DataQueryService',
     'ComponentService',
     'ProfileFormatter',
@@ -15,19 +14,9 @@ angular.module('corespring-catalog.controllers')
       $log,
       ItemService,
       ItemIdService,
-      PlayerServiceDef,
       DataQueryService,
       ComponentService,
       ProfileFormatter) {
-
-      var PlayerService = new PlayerServiceDef(
-        function(id) {
-          return $scope.item.components[id];
-        },
-        function() {
-          return $scope.item;
-        }
-      );
 
       var log = $log.debug.bind($log, '[catalog root] -');
 

@@ -1,109 +1,108 @@
-var controller = function($scope, ComponentRegister, PlayerServiceDef) {
+(function () {
 
-  $scope.getQuestionForComponentId = function(id) {
-    return $scope.data.item.components[id];
-  };
+  angular.module('corespring-player.controllers')
+    .controller('ClientSidePreview', [
+      '$log',
+      '$scope',
+      'ComponentRegister',
+      'ClientSidePlayerService',
+      ClientSidePreview
+    ]);
 
-  $scope.getItem = function() {
-    return $scope.data.item;
-  };
+  function ClientSidePreview($log, $scope, ComponentRegister, ClientSidePlayerServiceDef) {
 
-  $scope.getScoringJs = function() {
-    var scoringJs = _.find($scope.data.item.files, function(f) {
-      return f.name === "scoring.js";
-    });
-    return scoringJs;
-  };
+    $scope.playerMode = 'gather';
 
-  var PlayerService = new PlayerServiceDef(
-    $scope.getQuestionForComponentId,
-    $scope.getItem,
-    $scope.getScoringJs);
-
-  var defaultSession = {
-    remainingAttempts: 1,
-    settings: {
+    $scope.playerSettings = {
       maxNoOfAttempts: 1,
       highlightUserResponse: true,
       highlightCorrectResponse: true,
-      showFeedback: true
+      showFeedback: true,
+      allowEmptyResponses: false
+    };
+
+    $scope.score = NaN;
+
+    $scope.responses = {};
+
+    $scope.session = {
+      remainingAttempts: 1,
+      settings: _.cloneDeep($scope.playerSettings)
+    };
+
+    function getQuestionForComponentId(id) {
+      return $scope.data.item.components[id];
     }
-  };
 
-  $scope.responses = {};
-  $scope.session = _.cloneDeep(defaultSession);
-
-  $scope.submit = function() {
-    var components = ComponentRegister.getComponentSessions();
-    PlayerService.submitSession({
-      components: components
-    }, $scope.onSessionSaved, $scope.onSessionSaveError);
-  };
-
-  $scope.preview = function() {
-    $scope.$emit('launch-catalog-preview');
-  };
-
-  $scope.onSessionSaved = function(data) {
-    $scope.responses = data.responses;
-    $scope.session = data.session;
-    $scope.outcome = data.outcome;
-    $scope.score = data.score;
-    ComponentRegister.setEditable(false);
-  };
-
-  $scope.resetStash = function() {
-    ComponentRegister.resetStash();
-  };
-
-  $scope.onSessionSaveError = function(error) {};
-
-  $scope.canSubmit = function() {
-    return !ComponentRegister.hasEmptyAnswers();
-  };
-
-  $scope.resetPreview = function() {
-    ComponentRegister.reset();
-    $scope.session.isComplete = false;
-    $scope.score = undefined;
-    $scope.outcome = undefined;
-    ComponentRegister.setEditable(true);
-  };
-
-  $scope.setMode = function(mode) {
-    ComponentRegister.setMode(mode);
-  };
-
-  $scope.setDataAndSession = function(data) {
-    ComponentRegister.setDataAndSession(data);
-  };
-
-  $scope.$on('resetPreview', $scope.resetPreview);
-  $scope.$on('resetStash', $scope.resetStash);
-
-  $scope.$on('setEvaluateOptions', function(event, evaluateOptions){
-    if (evaluateOptions) {
-      PlayerService.updateSessionSettings(evaluateOptions);
+    function getItem() {
+      return $scope.data.item;
     }
-  });
 
-  $scope.$on('setMode', function(event, message) {
-    if (message.mode) {
-      $scope.setMode(message.mode);
+    var PlayerService = new ClientSidePlayerServiceDef(getQuestionForComponentId, getItem);
+
+    function setMode(mode) {
+      $scope.playerMode = mode;
+      ComponentRegister.setMode(mode);
+      ComponentRegister.setEditable(isGatherMode());
     }
-    if (message.options) {
-      PlayerService.updateSessionSettings(message.options);
+
+    function isGatherMode(){
+      return $scope.playerMode === 'gather';
     }
-  });
 
-};
 
-angular.module('corespring-player.controllers')
-  .controller(
-    'ClientSidePreview', [
-      '$scope',
-      'ComponentRegister',
-      'PlayerService',
-      controller
-    ]
-);
+
+    $scope.$on('playerControlPanel.preview', function () {
+      $scope.$emit('launch-catalog-preview');
+    });
+
+    $scope.$on('playerControlPanel.submit', function () {
+      if (isGatherMode()) {
+        submitSession();
+      } else {
+        setMode('gather');
+      }
+    });
+
+    $scope.$on('playerControlPanel.reset', function () {
+      if ($scope.session) {
+        $scope.session.isComplete = false;
+        $scope.session.remainingAttempts = 1;
+      }
+      $scope.score = undefined;
+      $scope.outcome = undefined;
+      $scope.responses = {};
+      ComponentRegister.reset();
+      setMode('gather');
+    });
+
+    $scope.$on('playerControlPanel.settingsChange', function () {
+      PlayerService.updateSessionSettings($scope.playerSettings);
+      if(isGatherMode()){
+        //nothing to do
+      } else {
+        submitSession();
+      }
+    });
+
+    function submitSession() {
+      var components = ComponentRegister.getComponentSessions();
+      PlayerService.submitSession({
+          components: components
+        },
+        function (everything) {
+          $scope.responses = everything.responses;
+          $scope.session = everything.session;
+          $scope.outcome = everything.outcome;
+          $scope.score = everything.score;
+          $log.info("onSessionLoaded", everything, $scope.score);
+          setMode('evaluate');
+        },
+        function (err) {
+          $log.error("submitSession failed", err);
+        });
+    }
+
+  }
+
+}).call(this);

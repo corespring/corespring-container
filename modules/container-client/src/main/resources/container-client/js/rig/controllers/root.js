@@ -95,5 +95,5 @@ var controller = function($scope, $location, $http, $timeout, $log, ComponentReg
 
 angular.module('corespring-rig.controllers')
   .controller(
-    'Root', ['$scope', '$location', '$http', '$timeout', '$log', 'ComponentRegister', 'PlayerUtils', 'PlayerService', controller]
+    'Root', ['$scope', '$location', '$http', '$timeout', '$log', 'ComponentRegister', 'PlayerUtils', 'ClientSidePlayerService', controller]
 );

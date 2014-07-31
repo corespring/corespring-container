@@ -7,10 +7,10 @@ block content
       nav.navbar.navbar-default.navbar-fixed-top
         ul.nav.navbar-nav
           li.dropdown(ng-class="{active: isActive('main') || isActive('weighting') || isActive('summary-feedback')}")
-            a.dropdown-toggle(data-toggle="dropdown") Edit <span class="caret"></span>
+            a.dropdown-toggle(data-toggle="dropdown") Item <span class="caret"></span>
             ul.dropdown-menu
               li(ui-sref-active="active")
-                a(ui-sref="design({section: 'main'})" ) Item
+                a(ui-sref="design({section: 'main'})" ) Edit
               li(ui-sref-active="active")
                 a(ui-sref="design({section: 'weighting'})" ) Weighting
               li(ui-sref-active="active")
