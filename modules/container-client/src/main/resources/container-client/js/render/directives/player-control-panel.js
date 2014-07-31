@@ -39,12 +39,10 @@
           };
 
           $scope.hasScore = function hasScore() {
-            $log.debug("hasScore", $scope.score, $scope.score && $scope.score.summary);
             return $scope.score && $scope.score.summary;
           };
 
           $scope.isPreviewButtonVisible = function(){
-            $log.log("isPreviewButtonVisible", $scope.showPreviewButton);
             return $scope.showPreviewButton !== "false";
           };
 
