@@ -41,8 +41,8 @@ trait BasePlayer
     hooks.createSessionForItem(itemId).map(handleSuccess { sessionId =>
 
       val url: String = isProdPlayer match {
-        case true => ProdHtmlPlayer.config(sessionId).url
-        case _ => PlayerRoutes.loadPlayerForSession(sessionId).url.setPlayerPage(getPlayerPage)
+        case true => s"${ProdHtmlPlayer.config(sessionId).url}?${request.rawQueryString}"
+        case _ => s"${PlayerRoutes.loadPlayerForSession(sessionId).url}?${request.rawQueryString}"
       }
       SeeOther(url)
     })
