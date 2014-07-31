@@ -24,7 +24,12 @@ trait DependencyResolver extends ComponentSplitter {
   def resolveComponents(ids: Seq[Id], scope: Option[String] = None): Seq[Component] = {
     logger.debug(s"[resolveComponents] id: ${ids.mkString(",")}, scope: $scope")
     val sortedIds = resolveIds(ids, scope)
-    val out = sortedIds.flatMap(id => components.find(c => c.id == id))
+    val out = sortedIds.flatMap(id => components.find { c => c.id.orgNameMatch(id) })
+
+    if (out.length != sortedIds.length) {
+      val missing = sortedIds.filterNot { sid => components.exists(c => c.id.orgNameMatch(sid)) }
+      logger.warn(s"Missing components: ${missing.mkString(",")} from possible ids: ${components.map(_.id).mkString(",")}")
+    }
     out
   }
 
@@ -109,7 +114,9 @@ trait DependencyResolver extends ComponentSplitter {
     val sortedRelations: Seq[OrgRelation] = TopologicalSorter.sort(orgNames: _*)
     val sortedIds = sortedRelations.map(r => Id(r._1._1, r._1._2))
     logger.debug(s"[resolveIds] sortedIds -> $sortedIds")
-    sortedIds.map(i => i.copy(scope = None)).distinct
+    val out = sortedIds.map(i => i.copy(scope = None)).distinct
+    logger.trace(s"[resolveIds] return -> $out")
+    out
   }
 
 }

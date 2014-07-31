@@ -1,14 +1,18 @@
 package org.corespring.container.js.processing
 
-import org.corespring.container.components.model.{ Interaction, Library }
+import org.corespring.container.components.model.dependencies.{ ComponentSplitter, DependencyResolver }
+import org.corespring.container.components.model.{ Component, Interaction, Library }
 import org.corespring.container.components.processing.{ PlayerItemPreProcessor => PreProcessor }
 import org.corespring.container.js.api.GetServerLogic
 import play.api.libs.json._
 
-trait PlayerItemPreProcessor extends PreProcessor with GetServerLogic {
+trait PlayerItemPreProcessor extends PreProcessor with GetServerLogic with ComponentSplitter {
 
-  def interactions: Seq[Interaction]
-  def libraries: Seq[Library]
+  def components: Seq[Component]
+
+  lazy val dependencyResolver = new DependencyResolver {
+    override def components: Seq[Component] = PlayerItemPreProcessor.this.components
+  }
 
   def preProcessItemForPlayer(item: JsValue): JsValue = {
 
@@ -28,8 +32,8 @@ trait PlayerItemPreProcessor extends PreProcessor with GetServerLogic {
           if (!hasRenderFunction) {
             (id, question)
           } else {
-            val componentLibraries: Seq[Library] = i.libraries.map(id => libraries.find(l => l.id.orgNameMatch(id))).flatten
-            val serverComponent = serverLogic(i.componentType, i.server.definition, componentLibraries)
+            val sortedLibs = dependencyResolver.filterByType[Library](dependencyResolver.resolveComponents(Seq(i.id)).filterNot(_.id.orgNameMatch(i.id)))
+            val serverComponent = serverLogic(i.componentType, i.server.definition, sortedLibs)
             (id, serverComponent.preProcessItem(question))
           }
       }.getOrElse((id, JsObject(Seq.empty)))

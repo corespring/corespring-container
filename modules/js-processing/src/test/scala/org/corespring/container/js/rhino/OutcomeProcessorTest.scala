@@ -10,6 +10,10 @@ class OutcomeProcessorTest extends Specification {
   val interactionRespondJs =
     """
       |exports.respond = function(question, answer, settings){
+      |
+      |  if(!answer){
+      |    return { correctness: 'incorrect', score: 0 }
+      |  }
       |  var correct = question.correctResponse.value == answer.value;
       |  return { correctness: correct ? "correct" : "incorrect", answer : answer };
       |}
@@ -84,6 +88,24 @@ class OutcomeProcessorTest extends Specification {
       val result = processor.createOutcome(item, session, Json.obj())
       (result \ "1" \ "correctness").as[String] === "incorrect"
       (result \ "2" \ "targetOutcome" \ "correctness").as[String] === "incorrect"
+    }
+
+    "return an incorrect response if the answer is empty" in {
+
+      val component = interaction("name", interactionRespondJs)
+      val processor = new RhinoOutcomeProcessor(Seq(component))
+
+      val item = Json.obj(
+        "components" -> Json.obj(
+          "1" -> Json.obj(
+            "componentType" ->
+              "org-name",
+            "correctResponse" -> Json.obj(
+              "value" -> "1"))))
+
+      val session = Json.obj("components" -> Json.obj())
+      val result = processor.createOutcome(item, session, Json.obj())
+      (result \ "1" \ "correctness").as[String] === "incorrect"
     }
 
     /**

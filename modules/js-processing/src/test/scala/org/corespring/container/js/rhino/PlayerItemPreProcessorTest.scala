@@ -40,7 +40,7 @@ class PlayerItemPreProcessorTest extends Specification {
             "correctResponse" -> Json.obj(
               "value" -> "1"))))
 
-      val processor = new RhinoPlayerItemPreProcessor(Seq(interaction), Seq.empty)
+      val processor = new RhinoPlayerItemPreProcessor(Seq(interaction))
       val result = processor.preProcessItemForPlayer(item)
       (result \ "components" \ "1" \ "dummy").as[String] === "something"
       (result \ "components" \ "1" \ "model").as[String] === "someModel"
@@ -71,7 +71,7 @@ class PlayerItemPreProcessorTest extends Specification {
             "correctResponse" -> Json.obj(
               "value" -> "1"))))
 
-      val processor = new RhinoPlayerItemPreProcessor(Seq(interaction), Seq.empty)
+      val processor = new RhinoPlayerItemPreProcessor(Seq(interaction))
 
       try {
         processor.preProcessItemForPlayer(item)
