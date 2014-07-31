@@ -4,9 +4,8 @@ import org.corespring.container.components.model.dependencies.{ ComponentSplitte
 import org.corespring.container.components.model.{ Component, Interaction, Library }
 import org.corespring.container.components.response.{ OutcomeProcessor => ContainerOutcomeProcessor }
 import org.corespring.container.js.api.GetServerLogic
-import org.slf4j.LoggerFactory
 import play.api.libs.json._
-
+import org.corespring.container.logging.ContainerLogger
 trait Target {
   def targetId(question: JsValue) = (question \ "target" \ "id").asOpt[String]
 
@@ -24,7 +23,7 @@ trait OutcomeProcessor
 
   def components: Seq[Component]
 
-  private lazy val logger = LoggerFactory.getLogger("container.OutcomeProcessor")
+  private lazy val logger = ContainerLogger.getLogger("container.OutcomeProcessor")
 
   def createOutcome(item: JsValue, itemSession: JsValue, settings: JsValue): JsValue = {
 

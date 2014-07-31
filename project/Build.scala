@@ -31,7 +31,8 @@ object Build extends sbt.Build {
       .exclude("junit", "junit")
     val commonsLang = "org.apache.commons" % "commons-lang3" % "3.2.1" % "test"
     val dependencyUtils = "org.corespring" %% "dependency-utils" % "0.5"
-    val grizzled = "org.clapper" %% "grizzled-scala" % "1.1.4"
+    val grizzled = "org.clapper" %% "grizzled-scala" % "1.2"
+    val grizzledLog = "org.clapper" %% "grizzled-slf4j" % "1.0.2"
     val htmlCleaner = "net.sourceforge.htmlcleaner" % "htmlcleaner" % "2.6.1"
     val jade4j = "de.neuland" % "jade4j" % "0.3.17"
     val logbackClassic = "ch.qos.logback" % "logback-classic" % "1.0.7"
@@ -140,6 +141,10 @@ object Build extends sbt.Build {
       }
   }
 
+  lazy val logging = builder.lib("logging").settings(
+    libraryDependencies ++= Seq(grizzledLog)
+  )
+
   lazy val containerClient = builder.lib("container-client")
     .settings(
       buildClientTask,
@@ -152,17 +157,20 @@ object Build extends sbt.Build {
   lazy val componentModel = builder.playApp("component-model")
     .settings(playAppToSbtLibSettings: _*)
     .settings(
-      libraryDependencies ++= Seq(dependencyUtils)).dependsOn(utils % "test->compile;compile->compile")
+      libraryDependencies ++= Seq(dependencyUtils))
+    .dependsOn(logging, utils % "test->compile;compile->compile")
 
   //Note: this is a play app for now until we move to play 2.2.0
   lazy val jsProcessing = builder.playApp("js-processing")
     .settings(playAppToSbtLibSettings: _*)
     .settings(
-      libraryDependencies ++= Seq(rhinoJs)).dependsOn(containerClient, componentModel)
+      libraryDependencies ++= Seq(rhinoJs, grizzledLog))
+    .dependsOn(logging, containerClient, componentModel)
 
   lazy val componentLoader = builder.lib("component-loader")
     .settings(
-      libraryDependencies ++= Seq(logbackClassic, specs2, rhinoJs, commonsLang)).dependsOn(componentModel, jsProcessing)
+      libraryDependencies ++= Seq(logbackClassic, specs2, rhinoJs, commonsLang))
+    .dependsOn(logging, componentModel, jsProcessing)
 
   val containerClientWeb = builder.playApp("container-client-web")
     .settings(
@@ -182,6 +190,7 @@ object Build extends sbt.Build {
         componentModel % "compile->compile;test->test",
         containerClient,
         utils,
+        logging,
         jsProcessing)
 
   val mongoJsonService = builder.playApp("mongo-json-service")
@@ -202,8 +211,8 @@ object Build extends sbt.Build {
   val shell = builder.playApp("shell")
     .settings(
       libraryDependencies ++= Seq(logbackClassic, casbah, playS3, scalaz, play.Keys.cache, yuiCompressor, closureCompiler))
-    .dependsOn(containerClientWeb, componentLoader, mongoJsonService, docs)
-    .aggregate(containerClientWeb, componentLoader, containerClient, componentModel, utils, jsProcessing, mongoJsonService, docs)
+    .dependsOn(containerClientWeb, componentLoader, mongoJsonService, docs, logging)
+    .aggregate(containerClientWeb, componentLoader, containerClient, componentModel, utils, jsProcessing, mongoJsonService, docs, logging)
 
   val root = builder.playApp("root", Some("."))
     .settings(

@@ -1,13 +1,13 @@
 package org.corespring.container.js.rhino.score
 
 import org.corespring.container.components.outcome.ScoreProcessor
-import play.api.Logger
 import play.api.libs.json.{ Json, JsValue }
 import org.corespring.container.js.rhino.ItemAuthorOverride
+import org.corespring.container.logging.ContainerLogger
 
 object ItemJsScoreProcessor extends ScoreProcessor {
 
-  lazy val logger = Logger("js.processing")
+  lazy val logger = ContainerLogger.getLogger("js.processing")
 
   def score(item: JsValue, session: JsValue, outcomes: JsValue): JsValue = {
     getScoringJs(item).map {

@@ -1,6 +1,6 @@
 package org.corespring.container.client.controllers.apps
 
-import org.slf4j.Logger
+import grizzled.slf4j.Logger
 import play.api.{Mode, Play}
 import play.api.mvc.RequestHeader
 

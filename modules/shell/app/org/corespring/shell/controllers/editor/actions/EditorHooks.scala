@@ -4,7 +4,7 @@ import scala.concurrent.Future
 
 import org.corespring.container.client.hooks.{EditorHooks => ContainerEditorHooks, PlayerData}
 import org.corespring.mongo.json.services.MongoService
-import play.api.Logger
+import org.corespring.container.logging.ContainerLogger
 import play.api.libs.json.{JsString, JsValue, Json}
 import play.api.mvc._
 
@@ -12,7 +12,7 @@ trait EditorHooks extends ContainerEditorHooks {
 
 
 
-  lazy val logger = Logger("editor.hooks.action.builder")
+  lazy val logger = ContainerLogger.getLogger("editor.hooks.action.builder")
 
   def itemService: MongoService
 

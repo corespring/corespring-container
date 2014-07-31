@@ -8,7 +8,7 @@ import org.corespring.container.client.hooks._
 import org.corespring.container.components.outcome.ScoreProcessor
 import org.corespring.container.components.processing.PlayerItemPreProcessor
 import org.corespring.container.components.response.OutcomeProcessor
-import play.api.Logger
+import org.corespring.container.logging.ContainerLogger
 import play.api.libs.json._
 import play.api.mvc.{ Action, Controller, SimpleResult }
 
@@ -21,7 +21,7 @@ object Session {
 
 trait Session extends Controller with ItemPruner with HasContext {
 
-  val logger = Logger("container.Session")
+  val logger = ContainerLogger.getLogger("container.Session")
 
   def outcomeProcessor: OutcomeProcessor
 

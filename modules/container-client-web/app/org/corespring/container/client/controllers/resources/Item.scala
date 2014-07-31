@@ -3,7 +3,7 @@ package org.corespring.container.client.controllers.resources
 import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.client.hooks._
 import org.corespring.container.client.controllers.helpers.XhtmlCleaner
-import play.api.Logger
+import org.corespring.container.logging.ContainerLogger
 import play.api.libs.json.{ JsObject, JsValue, Json }
 import play.api.mvc._
 
@@ -19,7 +19,7 @@ object Item {
 
 trait Item extends Controller with XhtmlCleaner {
 
-  private lazy val logger = Logger("container.item")
+  private lazy val logger = ContainerLogger.getLogger("container.item")
 
   implicit def toResult(m: StatusMessage): SimpleResult = play.api.mvc.Results.Status(m._1)(Json.obj("error" -> m._2))
 

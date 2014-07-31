@@ -2,10 +2,8 @@ package org.corespring.shell
 
 import java.io.File
 
-import org.slf4j.LoggerFactory
-
+import org.corespring.container.logging.ContainerLogger
 import scala.concurrent.{ ExecutionContext, Future }
-
 import com.typesafe.config.ConfigFactory
 import org.corespring.amazon.s3.ConcreteS3Service
 import org.corespring.container.client.CompressedAndMinifiedComponentSets
@@ -31,7 +29,7 @@ class ContainerClientImplementation(
   componentsIn: => Seq[Component],
   val configuration: Configuration) extends DefaultIntegration {
 
-  lazy val logger = LoggerFactory.getLogger("container.shell.ContainerClientImplementation")
+  lazy val logger = ContainerLogger.getLogger("container.shell.ContainerClientImplementation")
 
   override def components: Seq[Component] = componentsIn
 

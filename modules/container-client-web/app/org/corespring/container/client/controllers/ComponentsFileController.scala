@@ -5,7 +5,7 @@ import org.corespring.container.client.HasContext
 import org.corespring.container.client.integration.validation.Validator
 import org.joda.time.DateTimeZone
 import org.joda.time.format.{ DateTimeFormat, DateTimeFormatter }
-import play.api.Logger
+import org.corespring.container.logging.ContainerLogger
 import play.api.libs.MimeTypes
 import play.api.libs.iteratee.Enumerator
 import play.api.mvc._
@@ -13,7 +13,7 @@ import play.api.mvc._
 /** A very simple file asset loader for now */
 trait ComponentsFileController extends Controller with HasContext {
 
-  val log: Logger = Logger("container.components.file.controller")
+  val log  = ContainerLogger.getLogger("container.components.file.controller")
 
   def componentsPath: String
   def defaultCharSet: String

@@ -2,7 +2,7 @@ package org.corespring.container.client
 
 import org.corespring.container.client.controllers.DefaultComponentSets
 import org.corespring.container.client.processing.{ CssMinifier, Gzipper, JsMinifier }
-import org.slf4j.LoggerFactory
+import org.corespring.container.logging.ContainerLogger
 import play.api.Configuration
 import play.api.http.ContentTypes
 import play.api.mvc.{ Action, EssentialAction, RequestHeader, Result }
@@ -10,7 +10,7 @@ import play.api.mvc.{ Action, EssentialAction, RequestHeader, Result }
 trait CompressedAndMinifiedComponentSets extends DefaultComponentSets
   with JsMinifier with CssMinifier with Gzipper {
 
-  lazy val logger = LoggerFactory.getLogger("container.ComponentSets")
+  lazy val logger = ContainerLogger.getLogger("container.ComponentSets")
 
   def configuration: Configuration
 

@@ -2,14 +2,14 @@ package org.corespring.container.client.controllers
 
 import org.corespring.container.client.HasContext
 import org.corespring.container.client.hooks.AssetHooks
-import play.api.Logger
+import org.corespring.container.logging.ContainerLogger
 import play.api.mvc._
 
 import scala.concurrent.Future
 
 trait Assets extends Controller with HasContext {
 
-  lazy val logger = Logger("v2player.assets")
+  lazy val logger = ContainerLogger.getLogger("v2player.assets")
 
   def loadAsset(id: String, file: String)(request: Request[AnyContent]): SimpleResult
 

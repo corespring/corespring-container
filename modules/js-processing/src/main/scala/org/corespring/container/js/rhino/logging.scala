@@ -1,7 +1,6 @@
 package org.corespring.container.js.rhino
 
-import play.api.Logger
-
+import grizzled.slf4j.Logger
 /**
  * Provides a definition of the methods which must be implemented for a Javascript logger.
  */

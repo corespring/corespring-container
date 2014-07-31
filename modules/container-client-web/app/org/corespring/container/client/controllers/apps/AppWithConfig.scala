@@ -7,10 +7,10 @@ import org.corespring.container.client.hooks.ClientHooks
 import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.components.model.Id
 import org.corespring.container.components.model.dependencies.DependencyResolver
-import org.slf4j.LoggerFactory
 import play.api.http.ContentTypes
 import play.api.libs.json.Json
 import play.api.mvc.{ Action, Controller, SimpleResult }
+import org.corespring.container.logging.ContainerLogger
 
 import scala.concurrent.ExecutionContext
 
@@ -25,7 +25,7 @@ trait AppWithConfig[T <: ClientHooks]
 
   def loggerName = "container.app"
 
-  override lazy val logger = LoggerFactory.getLogger(loggerName)
+  override lazy val logger = ContainerLogger.getLogger(loggerName)
 
   implicit def ec: ExecutionContext
 
