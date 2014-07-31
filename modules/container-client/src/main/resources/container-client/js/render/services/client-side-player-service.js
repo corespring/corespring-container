@@ -1,9 +1,9 @@
 angular.module('corespring-player.services')
-  .factory('PlayerService', [
+  .factory('ClientSidePlayerService', [
     '$timeout',
-    function($timeout) {
+      function($timeout) {
 
-      var PlayerService = function(getQuestionFor, getItem, getScoringJsFile) {
+      function ClientSidePlayerService(getQuestionFor, getItem) {
 
         var settings = {
           maxNoOfAttempts: 1,
@@ -12,9 +12,7 @@ angular.module('corespring-player.services')
           showFeedback: true
         };
 
-        var attemptsCountdown = 0;
-
-        var createResponse = function(session) {
+        function createResponse(session) {
 
           if (!session) {
             throw "Sessions is empty";
@@ -29,11 +27,11 @@ angular.module('corespring-player.services')
           out.outcome = outcomes;
           out.score = corespring.scoreProcessor.score(angular.copy(getItem()), {}, outcomes);
           return out;
-        };
+        }
 
-        var getOutcomes = function(components, settings) {
+        function getOutcomes(components, settings) {
 
-          var out = {};
+          var serverLogic, answer, id, question, out = {};
 
           function addResponse(id, question, targetOutcome) {
             var answer = components[id].answers;
@@ -45,8 +43,6 @@ angular.module('corespring-player.services')
               console.warn('didn\'t find server logic for: ', question.componentType);
             }
           }
-
-          var serverLogic, answer, id, question;
 
           for (id in components) {
             question = angular.copy(getQuestionFor(id));
@@ -66,9 +62,10 @@ angular.module('corespring-player.services')
           }
 
           return out;
-        };
+        }
 
         this.submitSession = function(session, onSuccess, onFailure) {
+          console.log("submitSession", session);
           $timeout(function() {
             var response = createResponse(session);
             onSuccess(response);
@@ -77,11 +74,10 @@ angular.module('corespring-player.services')
 
         this.updateSessionSettings = function(s) {
           settings = s;
-          attemptsCountdown = settings.maxNoOfAttempts;
         };
 
-      };
+      }
 
-      return PlayerService;
+      return ClientSidePlayerService;
     }
   ]);

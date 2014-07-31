@@ -1,95 +1,140 @@
 (function() {
 
-  var defaultSettings = {
-    maxNoOfAttempts: 1,
-    highlightUserResponse: true,
-    highlightCorrectResponse: true,
-    showFeedback: true
-  };
+  angular.module('corespring-player.directives')
+    .directive('playerControlPanel', ['$compile', '$log',
 
-  angular.module('corespring-player.directives').directive('playerControlPanel', [
+      function playerControlPanel($compile, $log) {
 
-    function() {
-      var link = function($scope, $element) {
-        var $configLink = $element.find('.action.feedback-mode');
+        function link($scope, $element) {
 
-        $scope.showSettings = false;
-        $scope.evaluateOptions = defaultSettings;
+          $scope.settingsEnabled = {
+            maxNoOfAttempts: true,
+            highlightUserResponse: true,
+            highlightCorrectResponse: true,
+            showFeedback: true,
+            allowEmptyResponses: true
+          };
 
-        $scope.reset = function() {
-          $scope.$broadcast('resetPreview');
-        };
-
-        $scope.hasScore = function() {
-          return $scope.score && $scope.score.summary && !_.isNaN($scope.score.summary.percentage);
-        };
-
-        $element.on('hide.bs.popover', function() {
-          $('.settings input', $element).each(function(index, input) {
-            var attr = (function() {
-              var match = $(input).attr('name').match(/evaluateOptions\.(.*)/);
-              return (match && match.length > 1) ? match[1] : undefined;
-            }());
-            if (attr) {
-              $scope.evaluateOptions[attr] = $(input).is(':checked');
-            }
+          $scope.$watch('mode', function onPlayerModeChange(newValue) {
+            var playerIsInGatherMode = newValue === 'gather';
+            $scope.settingsEnabled.highlightUserResponse = !playerIsInGatherMode;
+            $scope.settingsEnabled.highlightCorrectResponse = !playerIsInGatherMode;
+            $scope.settingsEnabled.allowEmptyResponses = playerIsInGatherMode;
           });
-          $scope.$broadcast('setEvaluateOptions', $scope.evaluateOptions);
-        });
 
-        function checkbox(prop, label) {
-          return [
-            '<li class="setting">',
-            '  <label>',
-            '    <input type="checkbox" ',
-            '      name="evaluateOptions.' + prop + '"', ($scope.evaluateOptions[prop] ? " checked='checked'" : ''),
-            '    >',
-            '    <span>' + label + '</span>',
-            '  </label>',
-            '</li>'
-          ].join("\n");
-        }
+          $scope.preview = function() {
+            $scope.$emit('playerControlPanel.preview');
+          };
 
-        if ($configLink && $configLink.popover) {
-          $configLink.popover({
-            html: true,
-            placement: 'bottom',
-            content: function() {
+          $scope.submit = function() {
+            $scope.$emit('playerControlPanel.submit');
+          };
 
+          $scope.reset = function() {
+            $scope.$emit('playerControlPanel.reset');
+          };
+
+          $scope.settingsChange = function() {
+            $scope.$emit('playerControlPanel.settingsChange');
+          };
+
+          $scope.hasScore = function hasScore() {
+            return $scope.score && $scope.score.summary;
+          };
+
+          $scope.isPreviewButtonVisible = function() {
+            return $scope.showPreviewButton !== "false";
+          };
+
+          function initConfigPopover() {
+            var CONFIG_BUTTON_SELECTOR = '.action.config';
+            var $configLink = $element.find(CONFIG_BUTTON_SELECTOR);
+            if (!$configLink) {
+              $log.error("Cannot find config button", $configLink);
+              throw ("Cannot find config button");
+            }
+            if (!$configLink.popover) {
+              $log.error("config button has no popover method", $configLink.popover);
+              throw ("config button has no popover method");
+            }
+
+            $scope.closePopup = function() {
+              $configLink.popover('hide');
+            };
+
+            function checkbox(prop, label) {
               return [
-                '<ul class="settings">',
-                checkbox("highlightUserResponse", "Highlight user outcome"),
-                checkbox("highlightCorrectResponse", "Highlight correct outcome"),
-                checkbox("allowEmptyResponses", "Allow empty responses"),
-                '</ul>',
-                '<a class="btn btn-success btn-small btn-sm" onclick=\"$(&quot;.action.feedback-mode&quot;).popover(&quot;hide&quot;);\">Done</a>'
-              ].join('\n');
+                '<li class="setting">',
+                '  <label ng-class="{disabled: !settingsEnabled.' + prop + '}">',
+                '    <input type="checkbox" ',
+                '      ng-model="settings.' + prop + '"',
+                '      ng-disabled="!settingsEnabled.' + prop + '"',
+                '      ng-change="settingsChange()"',
+                '    >',
+                '    <span>' + label + '</span>',
+                '  </label>',
+                '</li>'
+              ].join("\n");
             }
-          });
-        }
-      };
 
-      return {
-        restrict: 'AE',
-        link: link,
-        template: [
-          '<div class="control-panel">',
-          '  <div class="score" ng-show="hasScore()">',
-          '    <label>Score:</label>',
-          '    <span>{{score.summary.percentage}}%</span>',
-          '  </div>',
-          '  <div class="action-holder pull-right">',
-          '    <button class="btn action reset" ng-click="reset()"',
-          '      >Reset</button>',
-          '    <button class="btn action preview" ng-click="preview()"',
-          '      >Preview</button>',
-          '    <button class="btn action feedback-mode"',
-          '      >Feedback Mode <span class="caret"></span></button>',
-          '  </div>',
-          '</div>'
-        ].join("\n")
-      };
-    }
-  ]);
+            var template = [
+              '<ul class="settings">',
+              checkbox("highlightUserResponse", "Highlight user outcome"),
+              checkbox("highlightCorrectResponse", "Highlight correct outcome"),
+              checkbox("allowEmptyResponses", "Allow empty responses"),
+              '</ul>',
+              '<a class="btn btn-success btn-small btn-sm" ng-click="closePopup()">Done</a>'
+            ].join('\n');
+
+            var linker = $compile(template);
+            var popupContent = linker($scope);
+
+            $configLink.popover({
+              html: true,
+              placement: 'bottom',
+              content: function() {
+                return popupContent;
+              }
+            });
+          }
+
+          initConfigPopover();
+        }
+
+        return {
+          restrict: 'AE',
+          link: link,
+          scope: {
+            settings: '=',
+            mode: '=',
+            score: '=',
+            showPreviewButton: '@'
+          },
+          template: [
+            '<div class="control-panel">',
+            '  <div class="action-holder" ng-show="isPreviewButtonVisible()">',
+            '    <button class="btn action preview" ng-click="preview()"',
+            '      >Preview</button>',
+            '  </div>',
+            '  <div class="action-holder pull-right">',
+            '    <div class="score">',
+            '      <label ng-show="hasScore()">Score:</label>',
+            '      <span ng-show="hasScore()">{{score.summary.percentage}}%</span>',
+            '    </div>',
+            '    <button class="btn action submit" ng-click="submit()"',
+            '      >{{mode === "gather" ? "Submit Answer" : "Change Answer"}}</button>',
+            '    <button class="btn action reset" ng-click="reset()"',
+            '      >Reset</button>',
+            '    <div class="action config">',
+            '      <a title="Settings">',
+            '        <i class="fa fa-cog" />',
+            '      </a>',
+            '    </div>',
+            '  </div>',
+            '</div>'
+          ].join("\n")
+        };
+      }
+    ]);
 
 }).call(this);

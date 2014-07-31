@@ -1,21 +1,21 @@
 script(type='text/ng-template', id="/templates/item")
-  .client-side-preview(ng-controller='ClientSidePreview')
-    
-    player-control-panel(player-settings='session.settings')
-    
-    corespring-player(
-      player-mode='editor', 
-      player-markup='item.xhtml', 
-      player-item='item', 
-      player-session='session', 
-      player-outcomes='outcome')
+  .client-side-preview(ng-controller="ClientSidePreview")
+    player-control-panel(
+      data-mode='playerMode',
+      data-settings='playerSettings',
+      data-score="score",
+      data-show-preview-button="false")
 
-    summary-feedback(
-      template="item.jade",
-      item="item",
-      session="session")
+    .player-container
 
-    .button-holder
-      button.btn.btn-primary(ng-click='submit()', ng-disabled='!canSubmit()') Submit
-      button.btn.btn-warning(ng-click='resetPreview()') Reset
-      hr
+      corespring-player(
+        player-mode="editor",
+        player-markup="data.item.xhtml",
+        player-item="data.item",
+        player-session="rootModel.session",
+        player-outcomes="outcome")
+
+      summary-feedback(
+        template="designer.jade",
+        item="data.item",
+        session="session")
