@@ -50,6 +50,14 @@ Ask one of the others to supply you with it.
 *  CONTAINER_S3_SECRET - mandatory - Amazon s3 secret
 *  CONTAINER_COMPONENTS_PATH - optional - the path to the components library
 
+### LOGGING
+
+There are some logging config files in `conf/logging/*.xml`.
+
+If deploying the shell app to heroku you can change the logger by updating: 
+
+* ENV_LOGGER - relative path to logger file eg: `conf/logging/debug.xml`
+
 #### CONTAINER_COMPONENTS_PATH + Prod mode play apps
 
 Production mode: When setting this path in a Prod mode play application, you must use 

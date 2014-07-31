@@ -1,17 +1,12 @@
-@(items:Seq[(String, String, String, String, String, String)])
+@(items:Seq[org.corespring.shell.IndexLink])
+
+
 <!DOCTYPE html>
 <html>
 <head>
   <title>Corespring Container Shell</title>
-
   <link href="http://fonts.googleapis.com/css?family=Ubuntu" rel="stylesheet" type="text/css">
   <link rel="stylesheet" href="/assets/css/homepage.css">
-  <!--
-  <link rel="stylesheet" href="css/app.css">
-  <title></title>
-  <link rel="stylesheet" href="css/editor.css">
-  -->
-
 </head>
 <body>
   <div class="container">
@@ -21,10 +16,12 @@
     </div>
 
     @items.map{ i =>
-      @i._1 : <a href="@i._3">Run</a>
-      <a href="@i._4">Edit</a>
-      <a href="@i._5">Delete</a>
-      <a href="@i._6">Catalog</a>
+      @i.title :
+      <a href="@i.createSession?playerPage=container-player.html">Run</a>
+      <a href="@i.createSession?mode=prod">[Run-Prod]</a>
+      <a href="@i.edit">Edit</a>
+      <a href="@i.delete">Delete</a>
+      <a href="@i.catalog">Catalog</a>
       <br/>
     }
     <br/>

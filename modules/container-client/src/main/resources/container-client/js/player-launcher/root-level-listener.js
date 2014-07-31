@@ -9,8 +9,15 @@ var rootListener = null;
 
 var Listener = function(log){
 
-  var uid = new Date().getTime();
+  if(!log){
 
+    log = {
+      warn: function(){ console.warn(arguments); },
+      error: function(){ console.error(arguments); }
+    };
+  }
+
+  var uid = new Date().getTime();
 
   var eventName = function () {
     return window.addEventListener ? "message" : "onmessage";
@@ -70,7 +77,7 @@ module.exports = function(log){
   if(!log){
 
     log = {
-      debug: function(){ console.debug(arguments); },
+      warn: function(){ console.warn(arguments); },
       error: function(){ console.error(arguments); }
     };
   }

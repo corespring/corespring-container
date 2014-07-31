@@ -7,9 +7,6 @@ describe('instance', function() {
     error: function(s) {
       console.error(s);
     },
-    debug: function(s) {
-      console.debug(s);
-    },
     warn: function(s) {
       console.warn(s);
     }

@@ -6,9 +6,16 @@ angular.module('@namespace').factory('PlayerService', ['$http', function($http){
 
   function PlayerService(){
 
+    var params = {};
+
     function addQueryParamsIfPresent(path) {
-      var href = document.location.href;
-      return  path + (href.indexOf('?') == -1 ? '' :  '?' + href.split('?')[1]);
+      var out = [];
+      for(var x in params){
+        out.push(x + '=' + params[x]);
+      }
+
+      var qs = out.join('&');
+      return  path + (path.indexOf('?') == -1 ? '?' :  '&') + qs;
     }
 
     var _call = function(method, url, data){
@@ -47,6 +54,10 @@ angular.module('@namespace').factory('PlayerService', ['$http', function($http){
         _call(method, finalUrl, null)(onSuccess, onFailure);
       };
     };
+
+    this.setQueryParams = function(p){
+      params = p;
+    }
 
     this.saveSession  = callWithData('@saveSession.method.toLowerCase', '@saveSession.url');
     this.resetSession  = callWithNoData('@resetSession.method.toLowerCase', '@resetSession.url');

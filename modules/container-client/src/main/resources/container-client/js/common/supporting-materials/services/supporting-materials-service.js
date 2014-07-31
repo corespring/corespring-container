@@ -20,8 +20,11 @@
       } else {
         return 0;
       }
-
     }
+
+    this.isDefault = function(file) {
+      return file['default']; //TODO ie8 doesn't like default, change to isMain?
+    };
 
     this.validateMetadata = function(metadata, log) {
       log = log || function() {};
@@ -38,9 +41,7 @@
 
     this.getSupportingMaterialFile = function(supportingMaterials, index) {
       if (supportingMaterials && supportingMaterials[index]) {
-        var fileIndex = _.findIndex(supportingMaterials[index].files, function(file) {
-          return file.default;
-        });
+        var fileIndex = _.findIndex(supportingMaterials[index].files, this.isDefault);
         return supportingMaterials[index].files[fileIndex];
       } else {
         return undefined;

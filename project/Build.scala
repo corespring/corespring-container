@@ -19,18 +19,7 @@ object Build extends sbt.Build {
   val bowerCmd = "node ./node_modules/bower/bin/bower"
 
   object Dependencies {
-    val specs2 = "org.specs2" %% "specs2" % "2.2.2" % "test"
-    val commonsLang = "org.apache.commons" % "commons-lang3" % "3.2.1" % "test"
-    val logbackClassic = "ch.qos.logback" % "logback-classic" % "1.0.7"
-    val logbackCore = "ch.qos.logback" % "logback-core" % "1.0.7"
-    val rhinoJs = "org.mozilla" % "rhino" % "1.7R4"
     val casbah = "org.mongodb" %% "casbah" % "2.6.3"
-    val playS3 = "org.corespring" %% "play-s3" % "0.3-SNAPSHOT"
-    val mockito = "org.mockito" % "mockito-all" % "1.9.5" % "test"
-    val grizzled = "org.clapper" %% "grizzled-scala" % "1.1.4"
-    val scalaz = "org.scalaz" %% "scalaz-core" % "7.0.6"
-    val htmlCleaner = "net.sourceforge.htmlcleaner" % "htmlcleaner" % "2.6.1"
-    val dependencyUtils = "org.corespring" %% "dependency-utils" % "0.5"
     //The closure compiler that play uses - we expect this to be provided by the play app.
     val closureCompiler = ("com.google.javascript" % "closure-compiler" % "rr2079.1")
       .exclude("args4j", "args4j")
@@ -40,24 +29,38 @@ object Build extends sbt.Build {
       .exclude("com.google.code.findbugs", "jsr305")
       .exclude("com.googlecode.jarjar", "jarjar")
       .exclude("junit", "junit")
-
+    val commonsLang = "org.apache.commons" % "commons-lang3" % "3.2.1" % "test"
+    val dependencyUtils = "org.corespring" %% "dependency-utils" % "0.5"
+    val grizzled = "org.clapper" %% "grizzled-scala" % "1.1.4"
+    val htmlCleaner = "net.sourceforge.htmlcleaner" % "htmlcleaner" % "2.6.1"
+    val jade4j = "de.neuland" % "jade4j" % "0.3.17"
+    val logbackClassic = "ch.qos.logback" % "logback-classic" % "1.0.7"
+    val logbackCore = "ch.qos.logback" % "logback-core" % "1.0.7"
+    val mockito = "org.mockito" % "mockito-all" % "1.9.5" % "test"
+    val playS3 = "org.corespring" %% "play-s3" % "0.3-SNAPSHOT"
+    val rhinoJs = "org.mozilla" % "rhino" % "1.7R4"
+    val scalaz = "org.scalaz" %% "scalaz-core" % "7.0.6"
+    val specs2 = "org.specs2" %% "specs2" % "2.2.2" % "test"
     val yuiCompressor = "com.yahoo.platform.yui" % "yuicompressor" % "2.4.7"
   }
 
   object Resolvers {
-    val corespringSnapshots = "Corespring Artifactory Snapshots" at "http://repository.corespring.org/artifactory/ivy-snapshots"
     val corespringReleases = "Corespring Artifactory Releases" at "http://repository.corespring.org/artifactory/ivy-releases"
+    val corespringSnapshots = "Corespring Artifactory Snapshots" at "http://repository.corespring.org/artifactory/ivy-snapshots"
+    val eeReleases = "edeustace releases" at "http://edeustace.com/repository/releases/"
+    val eeSnapshots = "edeustace snapshots" at "http://edeustace.com/repository/snapshots/"
+    var jade4jReleases = "jade4j" at "https://raw.github.com/neuland/jade4j/master/releases"
     val typesafeReleases = "typesafe releases" at "http://repo.typesafe.com/typesafe/releases/"
     val typesafeSnapshots = "typesafe snapshots" at "http://repo.typesafe.com/typesafe/snapshots/"
-    val eeSnapshots = "edeustace snapshots" at "http://edeustace.com/repository/snapshots/"
-    val eeReleases = "edeustace releases" at "http://edeustace.com/repository/releases/"
+
     val all = Seq(
       corespringSnapshots,
       corespringReleases,
-      typesafeReleases,
-      typesafeSnapshots,
       eeReleases,
-      eeSnapshots)
+      eeSnapshots,
+      jade4jReleases,
+      typesafeReleases,
+      typesafeSnapshots)
   }
 
   import Build.Dependencies._
@@ -171,7 +174,10 @@ object Build extends sbt.Build {
         mockito,
         grizzled,
         htmlCleaner,
-        scalaz),
+        scalaz,
+        jade4j,
+        closureCompiler,
+        yuiCompressor),
       templatesImport ++= Seq("play.api.libs.json.JsValue", "play.api.libs.json.Json")).dependsOn(
         componentModel % "compile->compile;test->test",
         containerClient,

@@ -12,11 +12,11 @@ import play.api.mvc.RequestHeader
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 
-import scala.concurrent.{Future, ExecutionContext}
+import scala.concurrent.{ Future, ExecutionContext }
 
-class EditorTest extends Specification with Mockito{
+class EditorTest extends Specification with Mockito {
 
-  class editorScope(val hookResponse : Either[StatusMessage, JsValue]) extends Scope{
+  class editorScope(val hookResponse: Either[StatusMessage, JsValue]) extends Scope {
 
     val editor = new Editor {
       override def hooks: EditorHooks = {
@@ -34,9 +34,7 @@ class EditorTest extends Specification with Mockito{
         m
       }
 
-      override def components: Seq[Component] = {
-        Seq.empty
-      }
+      override def components: Seq[Component] = Seq.empty
 
       override def showErrorInUi: Boolean = false
     }
@@ -45,13 +43,13 @@ class EditorTest extends Specification with Mockito{
   "Editor" should {
     "when calling edit item" should {
 
-      "honor a SEE_OTHER" in new editorScope(Left(SEE_OTHER, "other-url")){
+      "honor a SEE_OTHER" in new editorScope(Left(SEE_OTHER, "other-url")) {
         val r = editor.editItem("itemId")(FakeRequest("", ""))
         status(r) === SEE_OTHER
         header(LOCATION, r) === Some("other-url")
       }
 
-      "show the error page" in new editorScope(Left(BAD_REQUEST, "bad")){
+      "show the error page" in new editorScope(Left(BAD_REQUEST, "bad")) {
         val r = editor.editItem("itemId")(FakeRequest("", ""))
         status(r) === BAD_REQUEST
         contentAsString(r) === org.corespring.container.client.views.html.error.main(BAD_REQUEST, "bad", false).toString

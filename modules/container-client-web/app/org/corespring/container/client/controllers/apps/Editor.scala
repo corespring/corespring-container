@@ -18,7 +18,7 @@ trait Editor
   with JsModeReading
   with JsonHelper {
 
-  override lazy val logger = Logger("container.editor")
+  override def loggerName = "container.app.editor"
 
   def showErrorInUi : Boolean
 

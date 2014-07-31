@@ -1,159 +1,334 @@
 angular.module('corespring-player.controllers')
   .controller(
-  'Main', [
-    '$location',
-    '$log',
-    '$scope',
-    '$timeout',
-    'ComponentRegister',
-    'PlayerService',
-    function ($location, $log, $scope, $timeout, ComponentRegister, PlayerServiceDef) {
+    'Main', [
+      '$location',
+      '$log',
+      '$scope',
+      '$timeout',
+      'ComponentRegister',
+      'PlayerService',
+      function($location, $log, $scope, $timeout, ComponentRegister, PlayerServiceDef) {
 
-      var currentMode;
+        var PlayerService = new PlayerServiceDef();
 
-      $scope.playerMode = 'gather';
+        var currentMode = null;
 
-      $scope.playerSettings = {
-        maxNoOfAttempts: 1,
-        highlightUserResponse: true,
-        highlightCorrectResponse: true,
-        showFeedback: true,
-        allowEmptyResponses: false
-      };
+        $scope.evaluateOptions = {
+          showFeedback: true,
+          allowEmptyResponses: true,
+          highlightCorrectResponse: true,
+          highlightUserResponse: true
+        };
 
-      $scope.score = NaN;
+        $scope.sessionId = (function() {
+          //TODO: This is a temporary means of extracting the session id
+          return document.location.pathname.match(/.*\/(.*)\/.*/)[1];
+        })();
 
-      $scope.responses = {};
+        $scope.onAnswerChanged = function() {
+          $scope.$emit("inputReceived", {
+            sessionStatus: getSessionStatus()
+          });
+        };
 
-      $scope.session = {
-        remainingAttempts: 1,
-        settings: _.cloneDeep($scope.playerSettings)
-      };
+        ComponentRegister.setAnswerChangedHandler($scope.onAnswerChanged);
 
-      var PlayerService = new PlayerServiceDef();
+        $scope.canSubmit = function() {
+          return $scope.evaluateOptions.allowEmptyResponses || !ComponentRegister.hasEmptyAnswers();
+        };
 
-      function setMode(mode) {
-        $scope.playerMode = mode;
-        ComponentRegister.setMode(mode);
-        ComponentRegister.setEditable(isGatherMode());
-      }
+        $scope.save = function(isAttempt, isComplete, cb) {
 
-      function isGatherMode() {
-        return $scope.playerMode === 'gather';
-      }
+          $log.debug('[save] -> attempt: ', isAttempt, ' complete:', isComplete, 'callback:', cb);
 
-      $scope.$on('playerControlPanel.preview', function () {
-        $scope.$emit('launch-catalog-preview');
-      });
+          PlayerService.saveSession({
+              isAttempt: isAttempt,
+              isComplete: isComplete,
+              components: ComponentRegister.getComponentSessions()
+            },
+            function(s) {
+              $log.debug('[save] successful');
+              $scope.onSessionSaved(s);
+              if (cb) {
+                cb(null, s);
+              }
+            },
+            function(e) {
+              $log.debug('[save] error');
+              $scope.onSessionSaveError(e);
+              if (cb) {
+                cb(e);
+              }
+            },
+            $scope.sessionId
+          );
+        };
 
-      $scope.$on('playerControlPanel.submit', function () {
-        if (isGatherMode()) {
-          submitSession();
-        } else {
-          setMode('gather');
-        }
-      });
+        $scope.loadOutcome = function(options, cb) {
+          //TODO - need to fetch the player options
+          //Passed in to the launcher
+          PlayerService.loadOutcome(options,
+            function(data) {
+              $scope.onOutcomeLoaded(data);
+              if (cb) {
+                cb(null, data);
+              }
+            }, function(err) {
+              $log.error(err);
+              if (cb) {
+                cb(err);
+              }
+            },
+            $scope.sessionId
+          );
+        };
 
-      $scope.$on('playerControlPanel.reset', function () {
-        resetSession();
-      });
+        $scope.onOutcomeLoaded = function(data) {
+          $scope.outcome = data.outcome;
+          $scope.score = data.score;
+        };
 
-      $scope.$on('playerControlPanel.settingsChange', function () {
-        if (isGatherMode()) {
-          //nothing to do
-        } else {
+        $scope.loadOutcomeError = function(err) {
+          $log.error(err);
+        };
+
+        $scope.getScore = function(onSuccess, onError) {
+          PlayerService.getScore({
+              components: ComponentRegister.getComponentSessions()
+            },
+            onSuccess,
+            onError,
+            $scope.sessionId
+          );
+        };
+
+        $scope.completeResponse = function(callback) {
+          PlayerService.completeResponse(
+            function() {
+              $scope.isComplete = true;
+              callback(null, $scope.isComplete);
+            },
+            function(err) {
+              $scope.isComplete = false;
+              $log.error(err);
+              callback(err, $scope.isComplete);
+            },
+            $scope.sessionId
+          );
+        };
+
+        $scope.onSessionSaved = function(session) {
+          $scope.session = session;
+        };
+
+        $scope.updateSession = function(data) {
+          if (!$scope.model || !$scope.model.session) {
+            return;
+          }
+          $scope.session.remainingAttempts = data.session.remainingAttempts;
+          $scope.session.isFinished = data.session.isFinished;
+          $scope.$broadcast('session-finished', $scope.model.session.isFinished);
+        };
+
+        $scope.onSessionLoadError = function(error) {
+          $log.warn("Error loading session", error);
+        };
+
+        $scope.onSessionResetError = function(error) {
+          $log.warn("Error resetting session", error);
+        };
+
+        $scope.onSessionSaveError = function(error) {
+          $log.warn("Error saving session", error);
+        };
+
+        $scope.onItemAndSessionLoaded = function(data) {
+          $scope.rootModel = data;
+          $scope.item = data.item;
+          $scope.session = data.session;
+          $scope.isComplete = data.session ? data.session.isComplete : false;
+          $scope.$emit("session-loaded", data.session);
+        };
+
+        $scope.onSessionReset = function(session) {
+          $log.info("onSessionReset", session);
+          $scope.session = session;
+          $scope.outcome = undefined;
+          $scope.score = undefined;
+          $scope.isComplete = false;
+
           ComponentRegister.reset();
-          loadOutcome();
+        };
+
+        $scope.resetPreview = function() {
+          ComponentRegister.reset();
+        };
+
+        var getSessionStatus = function() {
+          return {
+            allInteractionsHaveResponse: !ComponentRegister.hasEmptyAnswers(),
+            interactionCount: ComponentRegister.interactionCount(),
+            interactionsWithResponseCount: ComponentRegister.interactionsWithResponseCount()
+          };
+        };
+        
+        /**
+         * Initialise the controller - this has to be the 1st thing you call
+         */
+        $scope.$on('initialise', function(event, data) {
+          $log.debug('[on initialise]');
+          PlayerService.setQueryParams(data.queryParams || {});
+          PlayerService.loadItemAndSession(
+            function(itemAndSession){
+              $scope.onItemAndSessionLoaded(itemAndSession);
+              
+              if(currentMode !== undefined && currentMode !== null){
+                throw new Error('The mode is already set');
+              }
+
+              currentMode = data.mode;
+              updateRegisterMode();
+
+              if(data.mode === 'evaluate'){
+                $scope.loadOutcome(data.options, function() {
+                  $log.debug("[Main] outcome received");
+                });
+              }
+            }, 
+            $scope.onSessionLoadError, 
+            $scope.sessionId);
+        });
+
+        $scope.$on('resetPreview', function() {
+          PlayerService.resetSession($scope.onSessionReset, $scope.onSessionResetError, $scope.sessionId);
+        });
+
+        $scope.$on('saveResponses', function(event, data, callback) {
+
+          $log.debug('[onSaveResponses] -> ', data, callback);
+
+          function onSaved(err, result) {
+            if (callback) {
+              callback({
+                result: {
+                  error: err,
+                  session: result
+                }
+              });
+            }
+          }
+
+          $scope.save(data.isAttempt, data.isComplete, onSaved);
+        });
+
+        $scope.$on('countAttempts', function(event, data, callback) {
+          callback({
+            count: $scope.session.attempts
+          });
+        });
+
+        $scope.$on('getScore', function(event, data, callback) {
+
+          var onScoreReceived = function(outcome) {
+            var percentage = outcome.summary.percentage;
+            callback({
+              score: data.format === 'scaled' ? (percentage / 100) : percentage
+            });
+          };
+          $scope.getScore(onScoreReceived);
+        });
+
+        $scope.$on('completeResponse', function(event, data, callback) {
+          $scope.completeResponse(function(err, isComplete) {
+            if (callback) {
+              callback({
+                result: {
+                  error: err,
+                  isComplete: isComplete
+                }
+              });
+            }
+          });
+        });
+
+        $scope.$on('isComplete', function(event, data, callback) {
+          callback({
+            isComplete: $scope.isComplete || false
+          });
+        });
+
+        $scope.$on('reset', function() {
+          $scope.resetPreview();
+        });
+
+        $scope.$on('getSessionStatus', function(event, data, callback) {
+          callback({
+            sessionStatus: getSessionStatus()
+          });
+        });
+
+        $scope.$on('editable', function(event, data) {
+          ComponentRegister.setEditable(data.editable);
+        });
+
+        function updateRegisterMode(){
+         var editable = (currentMode === 'gather');
+
+          $timeout(function() {
+            $log.debug("[Main] $timeout: set mode: ", currentMode);
+            ComponentRegister.setEditable(editable);
+            ComponentRegister.setMode(currentMode);
+          }); 
         }
-      });
 
-      function resetSession() {
-        PlayerService.resetSession(onResetSessionSuccess, onResetSessionError, sessionId());
+        /** Set mode to view, gather or evaluate
+         * Optionally save the responses too.
+         * The data object contains:
+         * ```
+         * mode : view|gather|evaluate //required
+         * saveResponses : { isAttempt : true|false, isComplete: true|false}
+         * ```
+         * saveResponses will save the client side data. Its optional - if not present nothing will be saved.
+         */
+        $scope.$on('setMode', function(event, data) {
+
+          $log.debug("[Main] setMode: ", data);
+
+          if (data.mode && data.mode === currentMode) {
+            $log.warn("mode is already set to: ", data.mode);
+            return;
+          }
+
+          currentMode = data.mode;
+          updateRegisterMode();
+
+          var afterMaybeSave = function() {
+            if (data.mode === 'evaluate') {
+              $timeout(function() {
+
+                $log.debug("[Main] load outcome!!!");
+                $scope.loadOutcome(data.options, function() {
+                  $log.debug("[Main] score received");
+                });
+              });
+            } else {
+              _.forIn($scope.outcome, function(value, key) {
+                $scope.outcome[key] = {};
+              });
+              $scope.score = {};
+            }
+          };
+
+          if (data.saveResponses) {
+            $scope.save(data.saveResponses.isAttempt, data.saveResponses.isComplete, function() {
+              $log.debug("[Main] session save successful - call maybeSave");
+              afterMaybeSave();
+            });
+          } else {
+            $log.debug("[Main] no need to save responses - call maybeSave");
+            afterMaybeSave();
+          }
+        });
+
       }
-
-      function onResetSessionSuccess(session) {
-        $log.info("onSessionReset", session);
-        $scope.session = session;
-        $scope.outcome = undefined;
-        $scope.score = undefined;
-        $scope.responses = {};
-        ComponentRegister.reset();
-        setMode('gather');
-      }
-
-      function onResetSessionError(error) {
-        $log.warn("Error resetting session", error);
-      }
-
-      function submitSession() {
-        var isAttempt = true;
-        var isComplete = true;
-        var components = ComponentRegister.getComponentSessions();
-        PlayerService.saveSession({
-            isAttempt: isAttempt,
-            isComplete: isComplete,
-            components: components
-          },
-          onSessionSaveSuccess,
-          onSessionSaveError,
-          sessionId());
-      }
-
-      function onSessionSaveError(err) {
-        $log.error("submitSession failed", err);
-      }
-
-      function onSessionSaveSuccess(session) {
-        $scope.session = session;
-        $log.info("onSessionSaved", session);
-        setMode('evaluate');
-        loadOutcome();
-      }
-
-      function sessionId() {
-        //TODO: This is a temporary means of extracting the session id
-        return document.location.pathname.match(/.*\/(.*)\/.*/)[1];
-      }
-
-      function loadOutcome() {
-        //TODO - need to fetch the player options passed in to the launcher
-        $log.log("loadOutcome", $scope.playerSettings);
-        PlayerService.loadOutcome($scope.playerSettings,
-          onLoadOutcomeSuccess,
-          onLoadOutcomeError,
-          sessionId()
-        );
-      }
-
-      function onLoadOutcomeSuccess(data) {
-        $scope.outcome = data.outcome;
-        $scope.score = data.score;
-      }
-
-      function onLoadOutcomeError(err) {
-        $log.error(err);
-      }
-
-      function loadItemAndSession() {
-        PlayerService.loadItemAndSession(onLoadItemAndSessionSuccess, onLoadItemAndSessionError, sessionId());
-      }
-
-      function onLoadItemAndSessionSuccess(everything) {
-        $scope.rootModel = everything;
-        $scope.item = everything.item;
-        $scope.session = everything.session;
-        $scope.outcome = everything.outcome;
-        $scope.score = everything.score;
-        $scope.isComplete = everything.session ? everything.session.isComplete : false;
-        $scope.$emit("session-loaded", everything.session);
-      }
-
-      function onLoadItemAndSessionError(err) {
-        $log.error("loadEverything failed", err);
-      }
-
-      $scope.$on('begin', function () {
-        loadItemAndSession();
-      });
-    }
-  ]);
+    ]);

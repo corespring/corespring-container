@@ -1,15 +1,15 @@
 package org.corespring.container.client.controllers.apps
 
-import org.corespring.container.client.hooks.ClientHooks
-import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.client.component.{ ComponentUrls, ItemTypeReader }
 import org.corespring.container.client.controllers.angular.AngularModules
-import org.corespring.container.client.controllers.helpers.{ Helpers, XhtmlProcessor }
+import org.corespring.container.client.controllers.helpers.{ Helpers, LoadClientSideDependencies, XhtmlProcessor }
+import org.corespring.container.client.hooks.ClientHooks
+import org.corespring.container.client.hooks.Hooks.StatusMessage
+import org.corespring.container.components.model.Id
 import org.corespring.container.components.model.dependencies.DependencyResolver
-import org.corespring.container.components.model.packaging.{ ClientDependencies, ClientSideDependency }
-import org.corespring.container.components.model.{ Component, Id }
+import org.slf4j.LoggerFactory
 import play.api.http.ContentTypes
-import play.api.libs.json.JsObject
+import play.api.libs.json.Json
 import play.api.mvc.{ Action, Controller, SimpleResult }
 
 import scala.concurrent.ExecutionContext
@@ -18,8 +18,14 @@ trait AppWithConfig[T <: ClientHooks]
   extends Controller
   with DependencyResolver
   with XhtmlProcessor
-  with Helpers {
+  with Helpers
+  with LoadClientSideDependencies
+  with HasLogger {
   self: ItemTypeReader =>
+
+  def loggerName = "container.app"
+
+  override lazy val logger = LoggerFactory.getLogger(loggerName)
 
   implicit def ec: ExecutionContext
 
@@ -62,21 +68,22 @@ trait AppWithConfig[T <: ClientHooks]
       }
 
       val resolvedComponents = resolveComponents(typeIds, Some(context))
-      val jsUrl = urls.jsUrl(context, resolvedComponents)
-      val cssUrl = urls.cssUrl(context, resolvedComponents)
+
+      logger.trace(s"[config: $id] json: ${Json.stringify(itemJson)}")
+      logger.debug(s"[config: $id] Resolved components: ${resolvedComponents.map(_.componentType).mkString(",")}")
+
+      val jsUrl = if (resolvedComponents.length == 0) Seq.empty else Seq(urls.jsUrl(context, resolvedComponents))
+      val cssUrl = if (resolvedComponents.length == 0) Seq.empty else Seq(urls.cssUrl(context, resolvedComponents))
 
       val clientSideDependencies = getClientSideDependencies(resolvedComponents)
       val dependencies = ngModules.createAngularModules(resolvedComponents, clientSideDependencies)
-      val clientSideScripts = get3rdPartyScripts(clientSideDependencies)
-      val localScripts = getLocalScripts(resolvedComponents)
-      val js = (clientSideScripts ++ localScripts ++ additionalScripts :+ jsUrl).distinct
-      val css = Seq(cssUrl)
+      val js = (additionalScripts ++ jsUrl).distinct
 
       configToResult(
         Some(processXhtml((itemJson \ "xhtml").asOpt[String])),
         dependencies,
         js,
-        css)
+        cssUrl)
     })
   }
 
@@ -93,40 +100,6 @@ trait AppWithConfig[T <: ClientHooks]
         throw new RuntimeException(s"Error processing xhtml: $xhtml")
       }
   }.getOrElse("<div><h1>New Item</h1></div>")
-
-  private def getClientSideDependencies(comps: Seq[Component]): Seq[ClientSideDependency] = {
-    val packages = comps.map(_.packageInfo)
-    val deps = packages.flatMap(p => (p \ "dependencies").asOpt[JsObject])
-    deps.map(ClientDependencies(_)).flatten
-  }
-
-  private def get3rdPartyScripts(deps: Seq[ClientSideDependency]): Seq[String] = {
-    val scripts = deps.map {
-      d =>
-        d.files match {
-          case Seq(p) => Some(s"$modulePath/components/${d.name}/${d.files(0)}")
-          case _ => None
-        }
-    }.flatten
-    scripts
-  }
-
-  private def getLocalScripts(comps: Seq[Component]): Seq[String] = {
-
-    def assetPath(compAndPath: (Component, Seq[String]), acc: Seq[String]) = {
-      val (c, filenames) = compAndPath
-      acc ++ filenames.map(f => s"$modulePath/libs/${c.id.org}/${c.id.name}/$f")
-    }
-
-    val out = for {
-      comp <- comps
-      lib <- (comp.packageInfo \ "libs").asOpt[JsObject]
-      client <- (lib \ "client").asOpt[JsObject]
-    } yield (comp, client.fields.map(_._2.as[Seq[String]]).flatten)
-
-    val assetPaths = out.foldRight[Seq[String]](Seq.empty)(assetPath)
-    assetPaths
-  }
 }
 
 trait AppWithServices[T <: ClientHooks] extends AppWithConfig[T] {

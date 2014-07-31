@@ -28,8 +28,8 @@ trait ClientHooks extends HasContext {
 
 trait PlayerHooks extends ClientHooks {
   def createSessionForItem(itemId: String)(implicit header: RequestHeader): Future[Either[StatusMessage, String]]
-
   def loadPlayerForSession(sessionId: String)(implicit header: RequestHeader): Future[Option[StatusMessage]]
+  def loadSessionAndItem(sessionId: String)(implicit header: RequestHeader): Future[Either[StatusMessage,(JsValue,JsValue)]]
 }
 
 trait EditorHooks extends ClientHooks {

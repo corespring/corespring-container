@@ -9,7 +9,7 @@ import play.api.mvc.Controller
 trait CommonControllers {
 
   /** urls for component sets eg one or more components */
-  def componentUrls: ComponentUrls
+  def componentSets: ComponentSets
 
   /** load assets for items (request may come from a session or item based app */
   def assets: Assets
@@ -68,7 +68,7 @@ trait ContainerControllers
   with CatalogControllers
 {
   def controllers: Seq[Controller] = Seq(
-    componentUrls,
+    componentSets,
     assets,
     playerLauncher,
     libs,

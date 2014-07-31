@@ -11,9 +11,7 @@ var controller = function(
 
   function fileIndex() {
     if (supportingMaterials() && $scope.data.item && ($scope.index >= 0)) {
-      return _.findIndex(supportingMaterials()[$scope.index].files, function(file) {
-        return file.default;
-      });
+      return _.findIndex(supportingMaterials()[$scope.index].files, SupportingMaterialsService.isDefault);
     } else {
       return undefined;
     }
