@@ -12,7 +12,7 @@ class FileComponentLoader(paths: Seq[String], onlyProcessReleased: Boolean)
   extends ComponentLoader
   with PackageJsonReading {
 
-  private val logger = LoggerFactory.getLogger("components.loader")
+  private val logger = LoggerFactory.getLogger("container.components.FileComponentLoader")
 
   private var loadedComponents: Seq[Component] = Seq.empty
 
@@ -23,7 +23,7 @@ class FileComponentLoader(paths: Seq[String], onlyProcessReleased: Boolean)
   }
 
   def all: Seq[Component] = {
-    logger.trace(s"loaded: ${loadedComponents.length}" )
+    logger.trace(s"loaded: ${loadedComponents.length}")
     logger.trace(loadedComponents.map(c => s"${c.componentType} - ${c.getClass.getSimpleName}").mkString("\n"))
     loadedComponents
   }
@@ -166,8 +166,7 @@ class FileComponentLoader(paths: Seq[String], onlyProcessReleased: Boolean)
 
     if (onlyProcessReleased && !released) {
       None
-    }
-    else {
+    } else {
       Some(make(LoadedData(org, packageJson, compRoot)))
     }
   }

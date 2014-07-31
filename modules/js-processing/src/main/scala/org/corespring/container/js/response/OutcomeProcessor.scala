@@ -5,7 +5,7 @@ import org.corespring.container.components.model.{ Component, Interaction, Libra
 import org.corespring.container.components.response.{ OutcomeProcessor => ContainerOutcomeProcessor }
 import org.corespring.container.js.api.GetServerLogic
 import org.slf4j.LoggerFactory
-import play.api.libs.json.{ Json, JsObject, JsValue }
+import play.api.libs.json._
 
 trait Target {
   def targetId(question: JsValue) = (question \ "target" \ "id").asOpt[String]
@@ -35,7 +35,10 @@ trait OutcomeProcessor
       val question = (componentQuestions \ id).as[JsObject]
       val componentType = (question \ "componentType").as[String]
 
-      val answer = getAnswer(itemSession, id)
+      val answer = getAnswer(itemSession, id).getOrElse {
+        logger.debug(s"No answer provided for $id - defaulting to null")
+        JsNull(0)
+      }
 
       def getInteraction(t: String): Option[Interaction] = components.find(_.matchesType(componentType)).map { c =>
         if (c.isInstanceOf[Interaction]) {
@@ -47,19 +50,12 @@ trait OutcomeProcessor
 
       getInteraction(componentType).map {
         component =>
-
-          answer.map {
-            a =>
-              val sortedLibs = dependencyResolver.filterByType[Library](dependencyResolver.resolveComponents(Seq(component.id)).filterNot(_.id.orgNameMatch(component.id)))
-              val serverComponent = serverLogic(component.componentType, component.server.definition, sortedLibs)
-              logger.trace(s"call server logic: \nquestion: $question, \nanswer: $a, \nsetting: $settings, \ntargetOutcome: $targetOutcome")
-              val outcome = serverComponent.createOutcome(question, a, settings, targetOutcome)
-              logger.trace(s"outcome: $outcome")
-              (id -> outcome)
-          }.getOrElse {
-            logger.debug(s"no answer provided for: $id")
-            (id, JsObject(Seq.empty))
-          }
+          val sortedLibs = dependencyResolver.filterByType[Library](dependencyResolver.resolveComponents(Seq(component.id)).filterNot(_.id.orgNameMatch(component.id)))
+          val serverComponent = serverLogic(component.componentType, component.server.definition, sortedLibs)
+          logger.trace(s"call server logic: \nquestion: $question, \nanswer: $answer, \nsetting: $settings, \ntargetOutcome: $targetOutcome")
+          val outcome = serverComponent.createOutcome(question, answer, settings, targetOutcome)
+          logger.trace(s"outcome: $outcome")
+          (id -> outcome)
       }.getOrElse((id, JsObject(Seq.empty)))
 
     }
