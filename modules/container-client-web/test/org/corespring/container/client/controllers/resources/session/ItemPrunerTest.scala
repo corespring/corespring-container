@@ -2,8 +2,8 @@ package org.corespring.container.client.controllers.resources.session
 
 import org.corespring.test.utils.JsonCompare
 import org.specs2.mutable.Specification
-import play.api.Logger
 import play.api.libs.json.Json
+import org.corespring.container.logging.ContainerLogger
 
 class ItemPrunerTest extends Specification with ItemPruner {
 
@@ -52,5 +52,5 @@ class ItemPrunerTest extends Specification with ItemPruner {
     }
   }
 
-  def logger: Logger = ContainerLogger.getLogger("Test")
+  def logger = ContainerLogger.getLogger("Test")
 }
