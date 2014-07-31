@@ -166,7 +166,7 @@ abstract class BaseGenerator
   def interactionToJs(ui: Interaction): String = previewJs(ui.id, ui.client.render)
 }
 
-trait EditorGenerator extends BaseGenerator {
+trait BaseWithWrappingGenerator extends BaseGenerator {
 
   private def configJs(id: Id, js: String) = wrapJs(id, js, "Config", "Client Config")
 
@@ -205,8 +205,12 @@ trait EditorGenerator extends BaseGenerator {
   override protected def libraryToJs(l: Library): String = addLibraryJs(true, true)(l)
 }
 
-trait CatalogGenerator extends BaseGenerator with JsStringBuilder {
-  override protected def libraryToJs(l: Library): String = addLibraryJs(true, false)(l)
+trait EditorGenerator extends BaseWithWrappingGenerator {
+
+}
+
+trait CatalogGenerator extends BaseWithWrappingGenerator {
+
 }
 
 trait PlayerGenerator extends BaseGenerator with JsStringBuilder {
