@@ -65,7 +65,6 @@ angular.module('corespring-player.services')
         }
 
         this.submitSession = function(session, onSuccess, onFailure) {
-          console.log("submitSession", session);
           $timeout(function() {
             var response = createResponse(session);
             onSuccess(response);
