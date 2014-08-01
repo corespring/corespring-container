@@ -30,6 +30,7 @@ trait BasePlayer
     PlayerServices(
       "player.services",
       Session.loadItemAndSession(":id"),
+      Session.reopenSession(":id"),
       Session.resetSession(":id"),
       Session.saveSession(":id"),
       Session.getScore(":id"),

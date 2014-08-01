@@ -16,6 +16,7 @@ object Session {
   object Errors {
     val cantSaveWhenComplete = "secure mode: can't save when session is complete"
     val cantResetSecureSession = "secure mode: can't reset secure session"
+    val cantReopenSecureSession = "secure mode: can't reopen secure session"
   }
 }
 
@@ -60,6 +61,26 @@ trait Session extends Controller with ItemPruner with HasContext {
             logger.trace(s"reset - session has been saved as: $savedSession")
             Ok(savedSession)
         }.getOrElse(BadRequest("Error saving resetted session"))
+      }
+    })
+  }
+
+  def reopenSession(id: String) = Action.async { implicit request =>
+    hooks.save(id).map(basicHandler { ss =>
+      if (ss.isSecure)
+        BadRequest(Json.obj("error" -> JsString(Errors.cantReopenSecureSession)))
+      else {
+        def reopenSession(session: JsValue) = {
+          session.as[JsObject] ++
+            Json.obj("isComplete" -> false) ++
+            Json.obj("attempts" -> 0)
+        }
+
+        ss.saveSession(id, reopenSession(ss.existingSession)).map {
+          savedSession =>
+            logger.trace(s"reopen - session has been saved as: $savedSession")
+            Ok(savedSession)
+        }.getOrElse(BadRequest("Error saving reopened session"))
       }
     })
   }
