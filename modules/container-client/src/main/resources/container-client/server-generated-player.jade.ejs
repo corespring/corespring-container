@@ -19,12 +19,14 @@ html(xmlns='http://www.w3.org/1999/html')
         div(ng-controller='Main')
           div(
             corespring-player='corespring-player', 
-            player-mode='player', 
-            player-markup='item.xhtml', 
-            player-item='item', 
-            player-session='session', 
-            player-outcomes='outcome')
+              player-mode='player',
+              player-markup='item.xhtml',
+              player-item='item',
+              player-session='session',
+              player-outcomes='outcome')
               != xhtml
+
+            summary-feedback(item="item",session="session")
 
 
     //[if lte IE 8]> <script src="../../js/common/ie-support/Function.bind.js"></script> <![endif]
