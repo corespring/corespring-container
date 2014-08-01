@@ -4,6 +4,8 @@ exports.define = function(isSecure) {
     var errors = require("errors");
     var launcherErrors = require("launcher-errors");
 
+    options.queryParams = options.queryParams || require("query-params");
+
     var i;
 
     if (launcherErrors.hasErrors) {
