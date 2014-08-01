@@ -1,73 +1,75 @@
-@(namespace : String, loadSession : Call, resetSession: Call, saveSession: Call, getScore: Call, completeResponse:Call, loadOutcome: Call)
+@(namespace : String, loadSession : Call, reopenSession: Call, resetSession: Call, saveSession: Call, getScore: Call, completeResponse:Call, loadOutcome: Call)
 
 angular.module('@namespace', []);
 
-angular.module('@namespace').factory('PlayerService', ['$http', function($http){
+angular.module('@namespace').factory('PlayerService', ['$http',
+  function($http) {
 
-  function PlayerService(){
+    function PlayerService() {
 
-    var params = {};
+      var params = {};
 
-    function addQueryParamsIfPresent(path) {
-      var out = [];
-      for(var x in params){
-        out.push(x + '=' + params[x]);
+      function addQueryParamsIfPresent(path) {
+        var out = [];
+        for (var x in params) {
+          out.push(x + '=' + params[x]);
+        }
+
+        var qs = out.join('&');
+        return path + (path.indexOf('?') == -1 ? '?' : '&') + qs;
       }
 
-      var qs = out.join('&');
-      return  path + (path.indexOf('?') == -1 ? '?' :  '&') + qs;
-    }
+      var _call = function(method, url, data) {
 
-    var _call = function(method, url, data){
+        return function(onSuccess, onFailure) {
 
-      return function(onSuccess, onFailure){
+          url = addQueryParamsIfPresent(url);
 
-        url = addQueryParamsIfPresent(url);
-
-        var args = data ? [url, data] : [url];
-        $http[method].apply(null, args)
-         .success(
-           function(data, status, headers, config) {
-             onSuccess(data)
-           })
-         .error(
-           function(data, status, headers, config) {
-             console.log("error");
-             if( onFailure ) {
-              onFailure(data);
-             }
-           }
-         );
+          var args = data ? [url, data] : [url];
+          $http[method].apply(null, args)
+            .success(
+              function(data, status, headers, config) {
+                onSuccess(data)
+              })
+            .error(
+              function(data, status, headers, config) {
+                console.log("error");
+                if (onFailure) {
+                  onFailure(data);
+                }
+              }
+          );
+        };
       };
-    };
 
-    var callWithData = function(method, url){
-      return function(data, onSuccess, onFailure, id){
-        var finalUrl = id ? url.replace(":id", id) : url;
-        _call(method, finalUrl, data)(onSuccess, onFailure);
+      var callWithData = function(method, url) {
+        return function(data, onSuccess, onFailure, id) {
+          var finalUrl = id ? url.replace(":id", id) : url;
+          _call(method, finalUrl, data)(onSuccess, onFailure);
+        };
       };
-    };
 
-    var callWithNoData = function(method, url){
-      return function(onSuccess, onFailure, id){
-        var finalUrl = id ? url.replace(":id", id) : url;
-        _call(method, finalUrl, null)(onSuccess, onFailure);
+      var callWithNoData = function(method, url) {
+        return function(onSuccess, onFailure, id) {
+          var finalUrl = id ? url.replace(":id", id) : url;
+          _call(method, finalUrl, null)(onSuccess, onFailure);
+        };
       };
-    };
 
-    this.setQueryParams = function(p){
-      params = p;
-    }
+      this.setQueryParams = function(p) {
+        params = p;
+      }
 
-    this.saveSession  = callWithData('@saveSession.method.toLowerCase', '@saveSession.url');
-    this.resetSession  = callWithNoData('@resetSession.method.toLowerCase', '@resetSession.url');
-    this.getScore = callWithData('@getScore.method.toLowerCase', '@getScore.url');
-    this.completeResponse =  callWithNoData('@completeResponse.method.toLowerCase', '@completeResponse.url');
-    this.loadItemAndSession = callWithNoData('@loadSession.method.toLowerCase', '@loadSession.url');
-    this.loadOutcome = callWithData('@loadOutcome.method.toLowerCase', '@loadOutcome.url');
+      this.saveSession = callWithData('@saveSession.method.toLowerCase', '@saveSession.url');
+      this.reopenSession = callWithNoData('@reopenSession.method.toLowerCase', '@reopenSession.url');
+      this.resetSession = callWithNoData('@resetSession.method.toLowerCase', '@resetSession.url');
+      this.getScore = callWithData('@getScore.method.toLowerCase', '@getScore.url');
+      this.completeResponse = callWithNoData('@completeResponse.method.toLowerCase', '@completeResponse.url');
+      this.loadItemAndSession = callWithNoData('@loadSession.method.toLowerCase', '@loadSession.url');
+      this.loadOutcome = callWithData('@loadOutcome.method.toLowerCase', '@loadOutcome.url');
     }
 
 
-  return PlayerService; 
-}]);
-
+    return PlayerService;
+  }
+]);
