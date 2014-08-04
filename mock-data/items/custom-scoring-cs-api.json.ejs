@@ -1,0 +1,105 @@
+{
+  "profile" : {
+    "taskInfo" : {
+      "title" : "Cs-api custom scoring test"
+    }
+  },
+  "customScoring" : "<%- helper.read('../js/custom-scoring-cs-api.js') %>",
+  "components": {
+    "RESPONSE": {
+      "componentType": "corespring-multiple-choice",
+      "correctResponse": {
+        "value": [
+          "1",
+          "2",
+          "3"
+        ]
+      },
+      "feedback": [
+        {
+          "feedback": "Correct!",
+          "notChosenFeedback": "Correct!",
+          "value": "1"
+        },
+        {
+          "feedback": "Correct!",
+          "notChosenFeedback": "Correct!",
+          "value": "2"
+        },
+        {
+          "feedback": "Correct!",
+          "notChosenFeedback": "Correct!",
+          "value": "3"
+        },
+        {
+          "feedback": "Your answer",
+          "notChosenFeedback": "Your answer",
+          "value": "4"
+        },
+        {
+          "feedback": "Your answer",
+          "notChosenFeedback": "Your answer",
+          "value": "5"
+        },
+        {
+          "feedback": "Your answer",
+          "notChosenFeedback": "Your answer",
+          "value": "6"
+        }
+      ],
+      "model": {
+        "choices": [
+          {
+            "label": "(1,-1)",
+            "value": "1"
+          },
+          {
+            "label": "(-2,-10)",
+            "value": "2"
+          },
+          {
+            "label": "(4,9)",
+            "value": "3"
+          },
+          {
+            "label": "(-1,1)",
+            "value": "4"
+          },
+          {
+            "label": "(2,7)",
+            "value": "5"
+          },
+          {
+            "label": "(9,4)",
+            "value": "6"
+          }
+        ],
+        "config": {
+          "choiceStyle": "",
+          "orientation": "vertical",
+          "shuffle": "true",
+          "singleChoice": false
+        },
+        "prompt": "Check the box next to the coordinate pair or pairs that lie on the line \n \n  \n   \n    y\n    =\n    \n     4x\n     \u2212\n     4\n    \n   \n  \n  y=3x-4\n \n \n \n\n\n \n shown above."
+      }
+    },
+    "graphTest": {
+      "componentType": "corespring-line",
+      "model": {
+        "config": {
+          "domain": 10,
+          "domainLabel": "x",
+          "exhibitOnly": true,
+          "initialCurve": "y=3x-4\n                           ",
+          "range": 10,
+          "rangeLabel": "y",
+          "scale": 1,
+          "showInputs": false,
+          "showLabels": false,
+          "sigfigs": -1,
+          "tickLabelFrequency": 10
+        }
+      }
+    }
+  }
+}
