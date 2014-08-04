@@ -52,6 +52,32 @@ html(xmlns='http://www.w3.org/1999/html')
       ];
       var dynDeps = #{ngModules};
       angular.module("corespring-player", deps.concat(dynDeps) ).config(['$provide', function($provide) {
+
+        var enabledInQueryString = (document.location.search.indexOf('disableLogging=false') !== -1) 
+        var loggingEnabled = enabledInQueryString || false;
+
+        if(!loggingEnabled){
+          var mockLogger = {
+            log: function(){},
+            debug: function(){},
+            error: function(){},
+            warn: function(){},
+            info: function(){}
+          };
+
+          $provide.decorator('LogFactory', function($delegate){
+            return {
+              getLogger: function(n){
+                return mockLogger;
+              }
+            }
+          });
+
+          $provide.decorator('$log', function($delegate, $sniffer) {
+            return mockLogger;
+          });
+        }
+
         $provide.decorator('PlayerService', function($delegate, $sniffer) {
             function Wrapper(){
               var inst = new $delegate();
