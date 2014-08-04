@@ -19,17 +19,21 @@ var controller = function($scope, $log, $timeout, MessageBridge) {
 
   MessageBridge.addMessageListener($scope.messageBridgeListener);
 
-  if (parent === window) {
-    $timeout(function() {
-      $scope.$broadcast('initialise', {
-        mode: 'gather'
+
+  (function() {
+    //jshint eqeqeq:false
+    if (parent == window) {
+      $timeout(function() {
+        $scope.$broadcast('initialise', {
+          mode: 'gather'
+        });
       });
-    });
-  } else {
-    MessageBridge.sendMessage('parent', {
-      message: 'ready'
-    });
-  }
+    } else {
+      MessageBridge.sendMessage('parent', {
+        message: 'ready'
+      });
+    }
+  })();
 
   $scope.$on("session-loaded", function(event, session) {
     MessageBridge.sendMessage('parent', {

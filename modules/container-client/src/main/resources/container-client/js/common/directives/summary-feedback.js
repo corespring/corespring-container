@@ -7,7 +7,7 @@ angular.module('corespring-common.directives').directive('summaryFeedback', ['$l
         session: "=",
         template: "@"
       },
-      restrict: 'E',
+      restrict: 'AE',
       replace: true,
       template: [
         '<div class="summary-feedback" ng-show="summaryFeedback && isComplete">',
