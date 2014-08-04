@@ -1,22 +1,21 @@
 package org.corespring.container.client.controllers
 
-import java.io.{File, InputStream}
+import java.io.{ File, InputStream }
 
 import org.apache.commons.lang3.StringEscapeUtils
 import org.corespring.container.client.V2PlayerConfig
 import org.corespring.container.client.controllers.player.PlayerQueryStringOptions
-import org.corespring.container.client.hooks.{PlayerJs, PlayerLauncherHooks}
+import org.corespring.container.client.hooks.{ PlayerJs, PlayerLauncherHooks }
 import org.corespring.container.client.views.txt.js.ServerLibraryWrapper
 import play.api.Play
 import play.api.Play.current
 import play.api.http.ContentTypes
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.{ JsValue, Json }
 import play.api.mvc._
 
 import scala.concurrent.ExecutionContext
 
-
-trait PlayerLauncher extends Controller with PlayerQueryStringOptions{
+trait PlayerLauncher extends Controller with PlayerQueryStringOptions {
 
   def playerConfig: V2PlayerConfig
 
@@ -41,7 +40,7 @@ trait PlayerLauncher extends Controller with PlayerQueryStringOptions{
     }
   }
 
-  import org.corespring.container.client.controllers.apps.routes.{BasePlayer, Editor, ProdHtmlPlayer}
+  import org.corespring.container.client.controllers.apps.routes.{ BasePlayer, Editor, ProdHtmlPlayer }
 
   val SecureMode = "corespring.player.secure"
 
@@ -85,7 +84,7 @@ trait PlayerLauncher extends Controller with PlayerQueryStringOptions{
 
       val rootUrl = playerConfig.rootUrl.getOrElse(BaseUrl(request))
 
-      val itemUrl : String = BasePlayer.createSessionForItem(":id").url
+      val itemUrl: String = BasePlayer.createSessionForItem(":id").url
         .setPlayerPage(getPlayerPage)
         .setProdPlayer(isProdPlayer)
 
@@ -115,30 +114,33 @@ trait PlayerLauncher extends Controller with PlayerQueryStringOptions{
     }
   }
 
-  private def make(jsPath: String, options: JsValue, bootstrapLine: String)(implicit request: Request[AnyContent], js: PlayerJs): SimpleResult = {
-    val defaultOptions = ("default-options" -> s"module.exports = ${Json.stringify(options)}")
-    val launchErrors = ("launcher-errors" -> errorsToModule(js.errors))
-    val rawJs = Seq("container-client/js/corespring/core-library.js")
-    val wrappedJs = jsPath +: Seq(
+  lazy val coreJs: String = {
+    val corePaths = Seq(
       "container-client/js/player-launcher/errors.js",
       "container-client/js/player-launcher/post-message.js",
       "container-client/js/player-launcher/instance.js",
       "container-client/js/player-launcher/url-builder.js",
       "container-client/js/player-launcher/root-level-listener.js")
-
-    val contents = rawJs.map(pathToNameAndContents(_)).map(_._2)
-    val wrappedNameAndContents = wrappedJs.map(pathToNameAndContents) :+ defaultOptions :+ launchErrors
-    val wrappedContents = wrappedNameAndContents.map(tuple => ServerLibraryWrapper(tuple._1, tuple._2))
-
+    val rawJs = pathToNameAndContents("container-client/js/corespring/core-library.js")._2
+    val wrapped = corePaths.map(pathToNameAndContents).map(t => ServerLibraryWrapper(t._1, t._2))
     val bootstrap =
       s"""
         |window.org = window.org || {};
         |org.corespring = org.corespring || {};
         |org.corespring.players = org.corespring.players || {};
-        |$bootstrapLine
-        |
       """.stripMargin
+    s"""$bootstrap
+        $rawJs
+        ${wrapped.mkString("\n")}
+      """
+  }
 
+  private def make(jsPath: String, options: JsValue, bootstrapLine: String)(implicit request: Request[AnyContent], js: PlayerJs): SimpleResult = {
+    val defaultOptions = ("default-options" -> s"module.exports = ${Json.stringify(options)}")
+    val launchErrors = ("launcher-errors" -> errorsToModule(js.errors))
+    val queryParams = ("query-params" -> makeQueryParams(request.queryString))
+    val wrappedNameAndContents = Seq(jsPath).map(pathToNameAndContents) :+ defaultOptions :+ launchErrors :+ queryParams
+    val wrappedContents = wrappedNameAndContents.map(tuple => ServerLibraryWrapper(tuple._1, tuple._2))
     def sumSession(s: Session, keyValues: (String, String)*): Session = {
       keyValues.foldRight(s)((kv: (String, String), acc: Session) => acc + (kv._1, kv._2))
     }
@@ -146,7 +148,17 @@ trait PlayerLauncher extends Controller with PlayerQueryStringOptions{
     val finalSession = sumSession(js.session, (SecureMode, js.isSecure.toString))
 
     Ok(
-      (contents ++ wrappedContents :+ bootstrap).mkString("\n")).as(ContentTypes.JAVASCRIPT).withSession(finalSession)
+      s"""
+       $coreJs
+       ${wrappedContents.mkString("\n")}
+       $bootstrapLine""").as(ContentTypes.JAVASCRIPT).withSession(finalSession)
+  }
+
+  private def makeQueryParams(qp: Map[String, Seq[String]]): String = {
+    val js = qp.foldRight[String]("") { (m: (String, Seq[String]), acc: String) =>
+      acc ++ s"\nexports.${m._1} = '${m._2.head}';"
+    }
+    js
   }
 
   private def errorsToModule(errors: Seq[String]): String = {
