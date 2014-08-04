@@ -19,7 +19,8 @@ var controller = function($scope, $log, $timeout, MessageBridge) {
 
   MessageBridge.addMessageListener($scope.messageBridgeListener);
 
-  if (parent === window) {
+
+  if (parent === top) {
     $timeout(function() {
       $scope.$broadcast('initialise', {
         mode: 'gather'
