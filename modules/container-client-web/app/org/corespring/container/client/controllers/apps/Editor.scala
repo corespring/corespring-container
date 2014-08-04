@@ -30,7 +30,7 @@ trait Editor
       "name" -> Some(JsString(ci.id.name)),
       "title" -> Some(JsString(ci.title.getOrElse(""))),
       "titleGroup" -> Some(JsString(ci.titleGroup.getOrElse(""))),
-      "icon" -> (interactions.find(_.componentType == tag).map(_.icon) match {
+      "icon" -> ((interactions ++ widgets).find(_.componentType == tag).map(_.icon) match {
         case Some(iconBytes) => iconBytes match {
           case Some(thing) => Some(JsString(s"$modulePath/icon/$tag"))
           case _ => None
