@@ -14,7 +14,7 @@
     },false);
   };
 
-  var getParent = function(){ return (parent && parent !== window) ? parent : null; };
+  var getParent = function(){ return (parent && parent !== top) ? parent : null; };
   
   var getIframe = function(id){
     try{
