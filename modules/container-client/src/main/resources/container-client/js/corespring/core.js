@@ -83,7 +83,7 @@
 
     var serverLogic = {};
 
-    var override = {};
+    var scoring = {};
 
     /** Provide an object to which a commonjs module can attach behaviour
      exports.process = function(x,y,z){}
@@ -96,8 +96,8 @@
       return serverLogic[componentType];
     };
 
-    this.itemOverride = function() {
-      return override;
+    this.customScoring = function() {
+      return scoring;
     };
   };
 

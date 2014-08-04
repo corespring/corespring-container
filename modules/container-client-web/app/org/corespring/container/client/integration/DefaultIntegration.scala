@@ -12,7 +12,7 @@ import org.corespring.container.components.model.dependencies.ComponentSplitter
 import org.corespring.container.components.outcome.{ DefaultScoreProcessor, ScoreProcessor, ScoreProcessorSequence }
 import org.corespring.container.components.processing.PlayerItemPreProcessor
 import org.corespring.container.components.response.OutcomeProcessor
-import org.corespring.container.js.rhino.score.ItemJsScoreProcessor
+import org.corespring.container.js.rhino.score.CustomScoreProcessor
 import org.corespring.container.js.rhino.{ RhinoOutcomeProcessor, RhinoPlayerItemPreProcessor }
 import play.api.{ Play, Mode }
 
@@ -38,7 +38,7 @@ trait DefaultIntegration
 
   override def playerItemPreProcessor: PlayerItemPreProcessor = new RhinoPlayerItemPreProcessor(DefaultIntegration.this.components)
 
-  override def scoreProcessor: ScoreProcessor = new ScoreProcessorSequence(DefaultScoreProcessor, ItemJsScoreProcessor)
+  override def scoreProcessor: ScoreProcessor = new ScoreProcessorSequence(DefaultScoreProcessor, CustomScoreProcessor)
 
   override def outcomeProcessor: OutcomeProcessor = new RhinoOutcomeProcessor(DefaultIntegration.this.components)
 

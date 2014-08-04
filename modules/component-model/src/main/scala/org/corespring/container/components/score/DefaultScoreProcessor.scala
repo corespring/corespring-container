@@ -1,12 +1,19 @@
 package org.corespring.container.components.outcome
 
+import org.corespring.container.logging.ContainerLogger
 import play.api.libs.json.{ JsValue, JsObject, JsNumber, Json }
 
 object DefaultScoreProcessor extends ScoreProcessor {
 
+  lazy val logger = ContainerLogger.getLogger("DefaultScoreProcessor")
+
   private def decimalize(v: BigDecimal, scale: Int = 2): Double = v.setScale(scale, BigDecimal.RoundingMode.HALF_UP).toDouble
 
   def score(item: JsValue, session: JsValue, outcomes: JsValue): JsValue = {
+    logger.debug(s"[score] item")
+    logger.trace(s"[score] item: ${Json.stringify(item)}")
+    logger.trace(s"[score] session: ${Json.stringify(session)}")
+    logger.trace(s"[score] outcomes: ${Json.stringify(outcomes)}")
 
     val components = (item \ "components").as[JsObject]
 
@@ -25,6 +32,8 @@ object DefaultScoreProcessor extends ScoreProcessor {
         val score = (outcomes \ key \ "score").asOpt[BigDecimal].map(v => decimalize(v)).getOrElse(0.0)
         val weightedScore = decimalize(weight * score)
 
+        logger.trace(s"[score] $key -> weight: $weight, score: $score, weightedScore: $weightedScore")
+
         acc ++ Json.obj(key -> Json.obj(
           "weight" -> JsNumber(weight),
           "score" -> JsNumber(score),
@@ -39,6 +48,8 @@ object DefaultScoreProcessor extends ScoreProcessor {
       "maxPoints" -> JsNumber(maxPoints),
       "points" -> JsNumber(points),
       "percentage" -> JsNumber(percentage))
+
+    logger.trace(s"[score] summary: ${Json.stringify(summary)}")
 
     Json.obj("summary" -> summary, "components" -> componentScores)
   }

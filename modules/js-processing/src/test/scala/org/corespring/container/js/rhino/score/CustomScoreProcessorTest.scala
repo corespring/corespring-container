@@ -4,20 +4,25 @@ import org.apache.commons.lang3.StringEscapeUtils
 import org.specs2.mutable.Specification
 import play.api.libs.json.{ JsValue, Json }
 
-class ItemJsScoreProcessorTest extends Specification {
+class CustomScoreProcessorTest extends Specification {
 
   import StringEscapeUtils._
 
-  "ItemJsOutcomeProcessor" should {
+  "Custom Scoring" should {
 
     val js =
       """
-        exports.process = function(item, answers){
-          return { score : 0.39 };
+        exports.process = function(item, session){
+          return {
+            summary : {
+              score : 0.39
+            }
+          }
         };
       """
     val item =
       s"""{
+          "customScoring" : "${escapeEcmaScript(js)}",
           "components" : {
             "1" : {
               "componentType" : "corespring-multiple-choice",
@@ -32,21 +37,16 @@ class ItemJsScoreProcessorTest extends Specification {
                 ]
               }
             }
-          },
-          "files" : [
-            {"name" : "scoring.js", "contentType" : "text/javascript", "content" : "${escapeEcmaScript(js)}"}
-          ]
+          }
          }"""
 
     val session = """{}"""
 
-    val responses = """{}"""
-
     implicit def stringToJsValue(s: String): JsValue = Json.parse(s)
 
     "process using the js defined by the item" in {
-      val out = ItemJsScoreProcessor.score(item, session, responses)
-      (out \ "score").asOpt[Double] === Some(0.39)
+      val out = CustomScoreProcessor.score(item, session, Json.obj())
+      (out \ "summary" \ "score").asOpt[Double] === Some(0.39)
     }
   }
 
