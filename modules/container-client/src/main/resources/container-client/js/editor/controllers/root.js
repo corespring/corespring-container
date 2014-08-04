@@ -117,7 +117,7 @@ var controller = function($scope,
   $scope.toggleLeftNav = updateLocation.bind(null, 'hideLeftNav');
   $scope.togglePreview = function() {
     showPreview = !showPreview;
-  }
+  };
 
   $scope.$on('$locationChangeSuccess', function() {
     updateNavBindings();
@@ -162,7 +162,7 @@ var controller = function($scope,
 
   $scope.$on('hidePreview', function() {
     showPreview = false;
-  })
+  });
 
   $scope.hasSupportingMaterials = function() {
     var item = $scope.data.item;
