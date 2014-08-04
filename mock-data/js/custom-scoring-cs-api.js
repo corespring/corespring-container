@@ -1,7 +1,14 @@
-exports.process = function(item, answers){
+function toOldModel(data){
+  return {
+    value: data.answers ? data.answers : []
+  };
+}
 
+exports.process = function(item, session){
 
-  /// ----------- can't edit 
+  var RESPONSE = toOldModel(session.components.RESPONSE);
+
+  /// ----------- this is qti js - can't edit 
   var correctAnswers = 0;
   if (RESPONSE.value.indexOf("1") != -1) correctAnswers += 1;
   if (RESPONSE.value.indexOf("2") != -1) correctAnswers += 1;
@@ -15,5 +22,10 @@ exports.process = function(item, answers){
   var outcome = {};
   outcome.score = score;
   outcome;
-  /// -----------------------
-}
+  /// -------------- end qti js
+  return {
+    summary: {
+      percentage: (outcome.score * 100)
+    }
+  };
+};

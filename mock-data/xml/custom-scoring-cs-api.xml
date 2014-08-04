@@ -1,0 +1,25 @@
+<itemBody>
+    <corespring-line id="graphTest"></corespring-line>
+    <p>Check the box next to the coordinate pair or pairs that lie on the line <math>
+ <semantics>
+  <mrow>
+   <mrow>
+    <mi>y</mi>
+    <mo stretchy="false">=</mo>
+    <mrow>
+     <mn>3x</mn>
+     <mo stretchy="false">−</mo>
+     <mn>4</mn>
+    </mrow>
+   </mrow>
+  </mrow>
+  <annotation encoding="StarMath 5.0">y=3x-4</annotation>
+ </semantics>
+
+ <p>
+
+</p>
+
+</math> shown above.</p><corespring-multiple-choice id="RESPONSE"></corespring-multiple-choice>
+
+</itemBody>
