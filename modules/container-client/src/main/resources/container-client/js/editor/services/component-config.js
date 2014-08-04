@@ -4,9 +4,11 @@ angular.module('corespring-editor.services')
     function(DesignerService) {
 
       var componentSet;
+      var widgetSet;
 
       function onLoaded(components) {
         componentSet = components.interactions;
+        widgetSet = components.widgets;
       }
 
       DesignerService.loadAvailableUiComponents(onLoaded);
@@ -27,8 +29,13 @@ angular.module('corespring-editor.services')
         };
 
         this.get = function(componentType) {
-          return _.find(componentSet, function(component) {
+
+          var component = _.find(componentSet, function(component) {
             return component.componentType === componentType;
+          });
+
+          return component ? component: _.find(widgetSet, function(widget) {
+            return widget.componentType === componentType;
           });
         };
       }
