@@ -36,5 +36,5 @@ script#designer(type="text/ng-template")
           input(type='checkbox', ng-model='isSummaryFeedbackSelected')
           | Add summary feedback
         div(ng-show="isSummaryFeedbackSelected")
-          textarea(ng-model="data.item.summaryFeedback",class="form-control",
-             placeholder="Type here")
+          div(mini-wiggi-wiz="", ng-model='data.item.summaryFeedback', placeholder='Type here',
+            feature-overrides="overrideFeatures", image-service="imageService")

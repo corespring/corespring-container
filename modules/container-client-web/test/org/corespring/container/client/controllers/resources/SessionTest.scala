@@ -81,24 +81,27 @@ class SessionTest extends Specification with Mockito {
       }
     }
 
-    "when resetting session" should {
+    "not allow to reset session" in new ActionBody(saveSession(true)) {
+      val result = session.resetSession("id")(FakeRequest())
+      status(result) === BAD_REQUEST
+    }
 
-      "not allow reset session" in new ActionBody(saveSession(true)) {
-        val result = session.resetSession("id")(FakeRequest())
-        status(result) === BAD_REQUEST
-      }
+    "not allow to reopen session" in new ActionBody(saveSession(true)) {
+      val result = session.reopenSession("id")(FakeRequest())
+      status(result) === BAD_REQUEST
     }
 
   }
 
   "not secure mode" should {
-    def unsaveSession(isComplete: Boolean) = SaveSession(
-      Json.obj(),
-      false,
-      isComplete,
+
+    def unsaveSession() = SaveSession(
+      Json.obj("attempts" -> 123, "components" -> Json.arr(1,2,3)),
+      isSecure = false,
+      isComplete = true,
       (a, b) => Some(b))
 
-    "reset session" in new ActionBody(unsaveSession(true)) {
+    "allow to reset session" in new ActionBody(unsaveSession()) {
       val result = session.resetSession("id")(FakeRequest())
       status(result) === OK
       val resettedSession = contentAsJson(result)
@@ -106,6 +109,15 @@ class SessionTest extends Specification with Mockito {
       (resettedSession \ "attempts").as[Int] === 0
       (resettedSession \ "components") === Json.obj()
     }
+
+    "allow to reopen session" in new ActionBody(unsaveSession()) {
+      val result = session.reopenSession("id")(FakeRequest())
+      status(result) === OK
+      val reopenedSession = contentAsJson(result)
+      (reopenedSession \ "isComplete").as[Boolean] === false
+      (reopenedSession \ "attempts").as[Int] === 0
+    }
+
   }
 
   class ActionBody(mode: SecureMode) extends org.specs2.specification.Before {

@@ -13,6 +13,7 @@ var controller = function($scope,
   CatalogPreview) {
 
   var navSetOnce = false;
+  var showPreview = false;
 
   $scope.nav = NavModelService;
 
@@ -114,7 +115,9 @@ var controller = function($scope,
   }
 
   $scope.toggleLeftNav = updateLocation.bind(null, 'hideLeftNav');
-  $scope.togglePreview = updateLocation.bind(null, 'hidePreview');
+  $scope.togglePreview = function() {
+    showPreview = !showPreview;
+  };
 
   $scope.$on('$locationChangeSuccess', function() {
     updateNavBindings();
@@ -141,19 +144,24 @@ var controller = function($scope,
     return !_.isUndefined($scope.urlParams.hidePreview);
   };
 
-  $scope.showPreview = function(hidePreview) {
-    return !hidePreview && previewable();
+  $scope.showPreview = function() {
+    return showPreview && previewable();
   };
 
-  $scope.previewText = function() {
-    return $scope.showPreview($scope.urlParams.hidePreview) ? 'Hide It!' : 'Try It!';
-  };
 
   $rootScope.$on('$stateChangeSuccess', function() {
     if ($scope.isActive('design')) {
-      $location.search('hidePreview', true);
+      showPreview = false;
     }
     $scope.showPreviewButton = previewable();
+  });
+
+  $scope.$on('showPreview', function() {
+    showPreview = true;
+  });
+
+  $scope.$on('hidePreview', function() {
+    showPreview = false;
   });
 
   $scope.hasSupportingMaterials = function() {

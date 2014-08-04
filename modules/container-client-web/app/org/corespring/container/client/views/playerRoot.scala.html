@@ -57,20 +57,23 @@
         var dynDeps = [ @Html(ngModules.map( m => s"\'$m\'").mkString(",")) ];
         angular.module("corespring-player", deps.concat(dynDeps) ).config(['$provide', function($provide) {
 
-            console.debug('------------> init');
+            console.log('------------> init');
 
            $provide.decorator('PlayerService', function($delegate, $sniffer) {
                 function Wrapper(){
                     var inst = new $delegate();
-                    this.saveSession  = inst.saveSession;
-                    this.getScore = inst.getScore;
-                    this.completeResponse = inst.completeResponse;
+
+                    for(var x in inst){
+                      if(typeof(inst[x]) === 'function'){
+                        this[x] = inst[x];
+                      }
+                    }
+
                     this.loadSession = function(onSuccess, onFailure, id) {
                       console.log(' -----------> override loadSession!!!');
                       var sessionJson = @Html(play.api.libs.json.Json.stringify(session));
                       onSuccess(sessionJson);
                     };
-                    this.loadOutcome = inst.loadOutcome;
                 }
                 return Wrapper;
            });

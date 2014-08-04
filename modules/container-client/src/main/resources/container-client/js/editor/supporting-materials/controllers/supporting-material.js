@@ -225,9 +225,9 @@ var controller = function(
     $scope.materialType = getSupportingMaterialType();
 
     if ($scope.isContentType('text/html')) {
-      $location.search('hidePreview', true);
+      $scope.$emit('showPreview');
     } else {
-      $location.search('hidePreview', null);
+      $scope.$emit('hidePreview');
     }
 
   };
