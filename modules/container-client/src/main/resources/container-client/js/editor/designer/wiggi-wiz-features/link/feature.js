@@ -48,11 +48,8 @@ angular.module('corespring.wiggi-wiz-features.link').factory('WiggiLinkFeatureDe
       };
 
       this.addToEditor = function(editor, addContent) {
-        var text = '';
-
-        if (editor.getCurrentRange()) {
-          text = $(editor.getCurrentRange().cloneContents().cloneNode(true)).text();
-        }
+        var hasRange = editor.getCurrentRange() !== undefined;
+        var text = hasRange ? $(editor.getCurrentRange().cloneContents().cloneNode(true)).text() : '';
 
         var data = {
           url: "http://www.google.com",

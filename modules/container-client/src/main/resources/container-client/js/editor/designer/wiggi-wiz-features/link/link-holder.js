@@ -45,7 +45,8 @@ angular.module('corespring.wiggi-wiz-features.link').directive('linkHolder', ['$
       $scope.unlink = function($event) {
         $event.stopPropagation();
         removeTooltip();
-        $scope.$emit('wiggi-wiz.delete-node', $element);
+        var replacement = $('a', $element).html();
+        $scope.$emit('wiggi-wiz.replace-node', $element, $("<span>" + replacement + "</span>"));
       };
 
       $scope.edit = function($event) {
