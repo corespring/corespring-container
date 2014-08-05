@@ -13,7 +13,8 @@ angular.module('corespring.wiggi-wiz-features.link').factory('WiggiLinkFeatureDe
     }
 
     function FeatureDef() {
-      this.name = 'link';
+      this.name = 'a';
+      this.tag = 'a';
       this.draggable = true;
       this.iconclass = 'fa fa-link';
       this.compile = true;

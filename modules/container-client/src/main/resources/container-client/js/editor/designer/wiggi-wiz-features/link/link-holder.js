@@ -3,19 +3,16 @@ angular.module('corespring.wiggi-wiz-features.link').directive('linkHolder', ['$
   function($log) {
 
     var template = [
-      '<div class="component-placeholder">',
-      '  <div class="blocker">',
-      '     <div class="bg"></div>',
-      '     <ul class="edit-controls">',
-      '       <li class="edit-icon-button" tooltip="edit" tooltip-append-to-body="true" tooltip-placement="bottom">',
-      '         <i ng-click="editNode($event)" class="fa fa-pencil"></i>',
-      '       </li>',
-      '       <li class="delete-icon-button" tooltip="delete" tooltip-append-to-body="true" tooltip-placement="bottom">',
-      '         <i ng-click="deleteNode($event)" class="fa fa-trash-o"></i>',
-      '       </li>',
-      '     </ul>',
-      '  </div>',
-      '  <div class="holder" ng-transclude></div>',
+      '<div class="component-placeholder" contenteditable="false">',
+      '  <ul class="edit-controls">',
+      '    <li class="edit-icon-button" tooltip="edit" tooltip-append-to-body="true" tooltip-placement="bottom">',
+      '      <i ng-click="edit($event)" class="fa fa-pencil"></i>',
+      '    </li>',
+      '    <li class="delete-icon-button" tooltip="unlink" tooltip-append-to-body="true" tooltip-placement="bottom">',
+      '      <i ng-click="unlink($event)" class="fa fa-chain-broken"></i>',
+      '    </li>',
+      '  </ul>',
+      '  <div class="holder" ng-click="follow($event)" ng-transclude></div>',
       '</div>'
     ].join('\n');
 
@@ -33,20 +30,28 @@ angular.module('corespring.wiggi-wiz-features.link').directive('linkHolder', ['$
       log(html);
       $scope.originalMarkup = html;
 
+      $scope.follow = function($event) {
+        $event.stopPropagation();
+        $event.preventDefault();
+        window.open($('a', $element).attr('href'), '_blank');
+        return false;
+      };
+
+
       function removeTooltip(){
         $scope.$broadcast("$destroy");
       }
 
-      $scope.deleteNode = function($event) {
+      $scope.unlink = function($event) {
         $event.stopPropagation();
         removeTooltip();
         $scope.$emit('wiggi-wiz.delete-node', $element);
       };
 
-      $scope.editNode = function($event) {
+      $scope.edit = function($event) {
         $event.stopPropagation();
         removeTooltip();
-        $scope.$emit('wiggi-wiz.call-feature-method', 'editNode', $element)
+        $scope.$emit('wiggi-wiz.call-feature-method', 'editNode', $element);
       };
 
     }
