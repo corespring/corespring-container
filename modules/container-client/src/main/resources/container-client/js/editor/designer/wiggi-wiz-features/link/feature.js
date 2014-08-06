@@ -1,15 +1,15 @@
-angular.module('corespring.wiggi-wiz-features.link').factory('WiggiLinkFeatureDef', [ '$compile',
+angular.module('corespring.wiggi-wiz-features.link').factory('WiggiLinkFeatureDef', [ '$compile', '$timeout',
 
-  function($compile) {
+  function($compile, $timeout) {
 
     function getLink(model) {
-      return $([
+      return [
         '<a href="',
         model.url,
         '">',
         (_.isEmpty(model.text) ? model.url : model.text),
         '</a>'
-      ].join(""));
+      ].join("");
     }
 
     function FeatureDef() {
@@ -36,7 +36,7 @@ angular.module('corespring.wiggi-wiz-features.link').factory('WiggiLinkFeatureDe
         var $a = $('.holder a', $node);
 
         var onUpdate = function(update) {
-          var newNode = getLink(update);
+          var newNode = $(getLink(update));
           $node.html(newNode);
           $compile($node)($scope);
         };
@@ -48,19 +48,20 @@ angular.module('corespring.wiggi-wiz-features.link').factory('WiggiLinkFeatureDe
       };
 
       this.addToEditor = function(editor, addContent) {
-        var hasRange = editor.getCurrentRange() !== undefined;
-        var text = hasRange ? $(editor.getCurrentRange().cloneContents().cloneNode(true)).text() : '';
-
-        var data = {
-          url: "http://www.google.com",
-          text: text
-        };
+        var text = editor.getCurrentRange() !== undefined ? $(editor.getCurrentRange().cloneContents().cloneNode(true)).text() : '';
+        var hasRange = !_.isEmpty(text);
 
         var onUpdate = function(update) {
-          addContent(getLink(update));
+          if (hasRange) {
+            editor.wrapSelection('delete', null);
+          }
+          // A document.execCommand('delete') has a bit of a lag
+          $timeout(function() {
+            addContent($(getLink(update)));
+          });
         };
 
-        editor.launchDialog(data, 'Add Link', dialogTemplate, onUpdate, scopeExtension);
+        editor.launchDialog({text: text, url: ""}, 'Add Link', dialogTemplate, onUpdate, scopeExtension);
       };
 
       this.getMarkUp = function($node, $scope) {
