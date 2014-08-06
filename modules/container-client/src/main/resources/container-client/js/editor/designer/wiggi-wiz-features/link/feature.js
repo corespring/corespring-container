@@ -27,7 +27,7 @@ angular.module('corespring.wiggi-wiz-features.link').factory('WiggiLinkFeatureDe
       var scopeExtension = {};
 
       this.initialise = function($node, replaceWith) {
-        var content = $node.wrap('<div/>').parent().html();
+        var content = $node.clone().wrap('<div/>').parent().html();
         var newNode = $('<div link-holder>' + content + '</div>');
         return replaceWith(newNode);
       };
