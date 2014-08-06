@@ -3,9 +3,14 @@ angular.module('corespring.wiggi-wiz-features.link').factory('WiggiLinkFeatureDe
   function($compile, $timeout) {
 
     function getLink(model) {
+
+      function sanitizeUrl(url) {
+        return url.match(/(htt(p|ps):)*\/\/.*/) !== null ? url : ("http://" + url);
+      }
+
       return [
         '<a href="',
-        model.url,
+        sanitizeUrl(model.url),
         '">',
         (_.isEmpty(model.text) ? model.url : model.text),
         '</a>'
