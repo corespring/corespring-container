@@ -38,7 +38,7 @@ object Build extends sbt.Build {
     val logbackClassic = "ch.qos.logback" % "logback-classic" % "1.0.7"
     val logbackCore = "ch.qos.logback" % "logback-core" % "1.0.7"
     val mockito = "org.mockito" % "mockito-all" % "1.9.5" % "test"
-    val playS3 = "org.corespring" %% "play-s3" % "0.3-SNAPSHOT"
+    val playS3 = "org.corespring" %% "s3-play-plugin" % "0.3"
     val rhinoJs = "org.mozilla" % "rhino" % "1.7R4"
     val scalaz = "org.scalaz" %% "scalaz-core" % "7.0.6"
     val specs2 = "org.specs2" %% "specs2" % "2.2.2" % "test"
@@ -142,8 +142,7 @@ object Build extends sbt.Build {
   }
 
   lazy val logging = builder.lib("logging").settings(
-    libraryDependencies ++= Seq(grizzledLog)
-  )
+    libraryDependencies ++= Seq(grizzledLog))
 
   lazy val containerClient = builder.lib("container-client")
     .settings(
@@ -194,7 +193,7 @@ object Build extends sbt.Build {
         jsProcessing)
 
   val mongoJsonService = builder.playApp("mongo-json-service")
-    .settings( playAppToSbtLibSettings: _*)
+    .settings(playAppToSbtLibSettings: _*)
     .settings(libraryDependencies ++= Seq(casbah))
     .dependsOn(logging)
 
