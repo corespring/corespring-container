@@ -17,6 +17,7 @@
       'MathJaxService',
       'WiggiFootnotesFeatureDef',
       'WiggiMathJaxFeatureDef',
+      'WiggiLinkFeatureDef',
       DesignerController
     ]);
 
@@ -36,7 +37,8 @@
     LogFactory,
     MathJaxService,
     WiggiFootnotesFeatureDef,
-    WiggiMathJaxFeatureDef) {
+    WiggiMathJaxFeatureDef,
+    WiggiLinkFeatureDef) {
 
     var configPanels = {};
 
@@ -203,6 +205,11 @@
           type: 'group',
           buttons: [
             videoComponent
+          ]
+        }, {
+          type: 'group',
+          buttons: [
+            new WiggiLinkFeatureDef()
           ]
         }]
       };
