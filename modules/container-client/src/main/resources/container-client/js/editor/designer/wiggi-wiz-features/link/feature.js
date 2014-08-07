@@ -2,7 +2,7 @@ angular.module('corespring.wiggi-wiz-features.link').factory('WiggiLinkFeatureDe
 
   function($compile, $timeout) {
 
-    function getLink(model) {
+    function getLink(model, target) {
 
       function sanitizeUrl(url) {
         return url.match(/(htt(p|ps):)*\/\/.*/) !== null ? url : ("http://" + url);
@@ -11,7 +11,9 @@ angular.module('corespring.wiggi-wiz-features.link').factory('WiggiLinkFeatureDe
       return [
         '<a href="',
         sanitizeUrl(model.url),
-        '">',
+        '"',
+        (target === undefined ? '' : ' target = "' + target + '"'),
+        '>',
         (_.isEmpty(model.text) ? model.url : model.text),
         '</a>'
       ].join("");
@@ -41,9 +43,12 @@ angular.module('corespring.wiggi-wiz-features.link').factory('WiggiLinkFeatureDe
         var $a = $('.holder a', $node);
 
         var onUpdate = function(update) {
-          var newNode = $(getLink(update));
-          $node.html(newNode);
-          $compile($node)($scope);
+          var newNode;
+          if (update.cancelled !== true) {
+            newNode = $(getLink(update, "_blank"));
+            $node.html(newNode);
+            $compile($node)($scope);
+          }
         };
 
         editor.launchDialog({
@@ -57,13 +62,15 @@ angular.module('corespring.wiggi-wiz-features.link').factory('WiggiLinkFeatureDe
         var hasRange = !_.isEmpty(text);
 
         var onUpdate = function(update) {
-          if (hasRange) {
-            editor.wrapSelection('delete', null);
+          if (update.cancelled !== true) {
+            if (hasRange) {
+              editor.wrapSelection('delete', null);
+            }
+            // A document.execCommand('delete') has a bit of a lag
+            $timeout(function() {
+              addContent($(getLink(update, "_blank")));
+            });
           }
-          // A document.execCommand('delete') has a bit of a lag
-          $timeout(function() {
-            addContent($(getLink(update)));
-          });
         };
 
         editor.launchDialog({text: text, url: ""}, 'Add Link', dialogTemplate, onUpdate, scopeExtension);
