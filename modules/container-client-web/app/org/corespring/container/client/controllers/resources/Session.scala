@@ -153,14 +153,15 @@ trait Session extends Controller with ItemPruner with HasContext {
 
       if (so.isSecure && !so.isComplete) {
         BadRequest(Json.obj("error" -> JsString("secure mode: can't load outcome - session isn't complete")))
-      } else if (!hasAnswers) {
-        BadRequest(Json.obj("error" -> JsString("Can't create an outcome if no answers have been saved")))
       } else {
-        request.body.asJson.map{ settings =>
+        request.body.asJson.map { settings =>
           val outcome = outcomeProcessor.createOutcome(so.item, so.itemSession, settings)
           val score = scoreProcessor.score(so.item, so.itemSession, outcome)
-          Ok(Json.obj("outcome" -> outcome) ++ Json.obj("score" -> score))
-        }.getOrElse{
+          Ok(Json.obj("outcome" -> outcome) ++ Json.obj("score" -> score) ++ (hasAnswers match {
+            case false => Json.obj("warning" -> "this session contains no answers")
+            case true => Json.obj()
+          }))
+        }.getOrElse {
           BadRequest(Json.obj("error" -> "No settings in request body"))
         }
       }

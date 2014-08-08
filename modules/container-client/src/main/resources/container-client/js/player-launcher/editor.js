@@ -64,6 +64,8 @@ var EditorDefinition = function(element, options, errorCallback) {
     var editorPaths = loadPaths(options, "editor");
     options.url = (options.corespringUrl + editorPaths.url).replace(":itemId", itemId);
 
+    options.queryParams = require('query-params');
+
     var instance = new InstanceDef(element, options, errorCallback);
 
     instance.addListener("launch-error", function(data) {

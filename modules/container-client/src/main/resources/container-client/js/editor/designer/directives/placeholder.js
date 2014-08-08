@@ -17,7 +17,6 @@ var Placeholder = function(
       if (_.isFunction(serverLogic.preprocess)) {
         component.data = serverLogic.preprocess(component.data);
       }
-      console.log(component);
       return component;
     }
 

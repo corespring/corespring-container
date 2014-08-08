@@ -27,8 +27,6 @@ trait OutcomeProcessor
 
   def createOutcome(item: JsValue, itemSession: JsValue, settings: JsValue): JsValue = {
 
-    require((itemSession \ "components").asOpt[JsObject].isDefined, "The item session has no 'components' key")
-
     def createOutcomeForComponent(id: String, targetOutcome: JsValue): (String, JsValue) = {
       val componentQuestions = (item \ "components").as[JsObject]
       val question = (componentQuestions \ id).as[JsObject]

@@ -7,7 +7,7 @@ angular.module('corespring-common.directives').directive('summaryFeedback', ['$l
         session: "=",
         template: "@"
       },
-      restrict: 'E',
+      restrict: 'AE',
       replace: true,
       template: [
         '<div class="summary-feedback" ng-show="summaryFeedback && isComplete">',
@@ -15,8 +15,7 @@ angular.module('corespring-common.directives').directive('summaryFeedback', ['$l
         '    <i class="fa fa-{{isSummaryFeedbackOpen ? \'minus\' : \'plus\'}}-square-o"></i>',
         '    <span>Click for more feedback</span>',
         '  </a>',
-        '  <div class="feedback-text" ng-show="isSummaryFeedbackOpen">',
-        '    {{summaryFeedback}}',
+        '  <div class="feedback-text" ng-show="isSummaryFeedbackOpen" ng-bind-html-unsafe="summaryFeedback">',
         '  </div>',
         '</div>'
       ].join(""),
@@ -27,13 +26,17 @@ angular.module('corespring-common.directives').directive('summaryFeedback', ['$l
         log("setup");
 
         $scope.$watch("item.summaryFeedback", function(value){
-          log("watch item.summaryFeedback", value);
-          $scope.summaryFeedback = value;
+          if (!_.isUndefined(value)) {
+            log("watch item.summaryFeedback", value);
+            $scope.summaryFeedback = value;
+          }
         });
 
         $scope.$watch("data.item.summaryFeedback", function(value){
-          log("watch data.item.summaryFeedback", value);
-          $scope.summaryFeedback = value;
+          if (!_.isUndefined(value)) {
+            log("watch data.item.summaryFeedback", value);
+            $scope.summaryFeedback = value;
+          }
         });
 
         $scope.$watch("session.isComplete", function(value){

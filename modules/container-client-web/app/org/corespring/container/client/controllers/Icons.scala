@@ -1,7 +1,7 @@
 package org.corespring.container.client.controllers
 
 import org.corespring.container.components.model.dependencies.ComponentSplitter
-import org.corespring.container.components.model.{ Interaction }
+import org.corespring.container.components.model.{ComponentInfo, Widget, Interaction}
 import org.corespring.container.logging.ContainerLogger
 import play.api.mvc.{ Action, Controller }
 
@@ -14,14 +14,19 @@ trait Icons extends Controller with ComponentSplitter {
   def icon(iconName: String) = Action {
     request =>
 
-      def matchingComponent(c: Interaction) = {
+      def matchingComponentInfo(c: ComponentInfo) = {
         val Split(org, name) = iconName
         val matches = c.id.name == name && c.id.org == org
         logger.debug(s"matches: $matches")
         matches
       }
 
-      val bytes: Option[Array[Byte]] = interactions.find(matchingComponent).map(_.icon).flatten
+
+      val bytes: Option[Array[Byte]] =
+        interactions.find(matchingComponentInfo).map(_.icon) match {
+          case Some(icon) => icon
+          case _ => widgets.find(matchingComponentInfo).map(_.icon).get
+        }
 
       bytes.map {
         b =>
