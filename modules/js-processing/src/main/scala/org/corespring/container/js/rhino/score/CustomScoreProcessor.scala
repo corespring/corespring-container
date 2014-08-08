@@ -9,7 +9,7 @@ object CustomScoreProcessor extends ScoreProcessor {
 
   lazy val logger = ContainerLogger.getLogger("CustomScoreProcessor")
 
-  override def score(item: JsValue, session: JsValue, outcomes : JsValue): JsValue = {
+  override def score(item: JsValue, session: JsValue, outcomes: JsValue): JsValue = {
 
     logger.debug(s"[score]")
 
@@ -24,6 +24,9 @@ object CustomScoreProcessor extends ScoreProcessor {
           result
         } catch {
           case e: Throwable => {
+            if (logger.isDebugEnabled) {
+              e.printStackTrace()
+            }
             logger.warn("Error running js", e)
             Json.obj()
           }
