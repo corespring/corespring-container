@@ -50,9 +50,11 @@ block scripts
     var target = document.getElementById('spinner');
     var spinner = new Spinner(opts).spin(target);
 
+    var queryString = window.location.search.substring(1);
+
     $(document).ready(function () {
 
-      var configPath = appLoadConfig.jsonFile;
+      var configPath = appLoadConfig.jsonFile + ((queryString.length > 0) ? ("?" + queryString) : "");
 
       $.get(configPath, function (data) {
 
