@@ -19,6 +19,8 @@ object DefaultScoreProcessor extends ScoreProcessor {
 
     val weights: Seq[(String, Int)] = components.keys.map {
       k =>
+
+        logger.trace(s"model for: $k")
         val comp = (item \ "components" \ k).as[JsObject]
         (k, (comp \ "weight").asOpt[Int].getOrElse(1))
     }.toSeq
