@@ -1,6 +1,14 @@
 //create an item
 //create a session
 //call load-outcome many times
+
+/**
+ * Creates an item and a session then calls /load-outcome for that session 
+ * repeatedly with a timeout
+ * node run.js //will run against local db + server
+ * node run.js mongodb://xxxxxxxxxxxxx@mongolab.com:49598/corespring-container-devt corespring-container-devt.herokuapp.com 20
+ *
+ */
 var _ = require('lodash');
 var dbUri = process.argv[2] || 'mongodb://localhost/corespring-container';
 var serverName = process.argv[3] || 'localhost';
@@ -24,11 +32,11 @@ function addItemAndSession(uri, item, session, done) {
     item.profile.taskInfo.title = 'peft test item';
 
     collection.insert(item, function(err, dbItem) {
-      console.log(dbItem[0]);
-      console.log(session);
-      console.log(dbItem[0]._id);
+      //console.log(dbItem[0]);
+      //console.log(session);
+      //console.log(dbItem[0]._id);
       session.itemId = dbItem[0]._id.toString();
-      console.log("id: " + session.itemId);
+      //console.log("id: " + session.itemId);
       db.collection('sessions').insert(session, function(err, dbSession) {
         db.close();
         console.log('session: ', dbSession)
@@ -63,39 +71,54 @@ function Runner(index, settings, session) {
   };
 
 
-  this.run = function(start) {
+  this.run = function(start, result, done) {
     // Set up the request
     var postReq = http.request(options, function(res) {
       res.setEncoding('utf8');
       res.on('data', function(chunk) {
-        console.log(index, 'Response: ' + chunk);
-        console.log(index, 'Duration: ', new Date().getTime() - start)
+        result.duration = new Date().getTime() - start;
+        done();
       });
     });
-    console.log(index, 'Run request ---->', start)
     postReq.write(data);
     postReq.end();
   }
 }
 
 
+
 addItemAndSession(dbUri,
   item, session,
   function(err, dbResult) {
     console.log('done ..');
+    var results = {};
 
     var indices = _.range(repeatCount);
 
     var runners = _.map(indices, function(i) {
+      results[i] = {};
       return {
         index: i,
+        result: results[i],
         runner: new Runner(i, settings, session)
       };
     });
 
+    var done = _.after(runners.length, function(){
+
+      console.log(JSON.stringify(results));
+      var durations = _.pluck(results, 'duration');
+      console.log(JSON.stringify(durations));
+
+      var total = _.reduce(durations, function(a,b){return a + b}, 0);
+      var average = total / durations.length;
+      console.log('Average: ', average);
+      //console.log(JSON)
+
+    });
     _.forEach(runners, function(r) {
       setTimeout(function() {
-        r.runner.run(new Date().getTime());
+        r.runner.run(new Date().getTime(), r.result, done);
       }, r.index * timeout);
     });
 
