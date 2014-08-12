@@ -25,7 +25,7 @@ trait PlayerItemPreProcessor extends PreProcessor with GetServerLogic with Compo
         i =>
 
           def hasRenderFunction: Boolean = {
-            val renderFunctionRegexp = "(?s)exports(\\.|\\[\")render[^;]*?=[^;]*function".r
+            val renderFunctionRegexp = "(?s)exports(\\.|\\[\")preprocess[^;]*?=[^;]*function".r
             renderFunctionRegexp.findFirstIn(i.server.definition).isDefined
           }
 

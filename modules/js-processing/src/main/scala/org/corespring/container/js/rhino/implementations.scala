@@ -125,7 +125,7 @@ trait ComponentServerLogic
         implicit val rootContext = ctx
         ctx.evaluateString(scope, wrapped, s"$componentType.preProcessItem", 1, null)
         val server = serverLogic(ctx, scope)
-        val renderFunction = server.get("render", server).asInstanceOf[RhinoFunction]
+        val renderFunction = server.get("preprocess", server).asInstanceOf[RhinoFunction]
         callJsFunction(wrapped, renderFunction, server, Array(question))
     }
 
