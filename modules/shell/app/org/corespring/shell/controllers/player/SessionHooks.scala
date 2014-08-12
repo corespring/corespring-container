@@ -33,7 +33,11 @@ trait SessionHooks extends ContainerSessionHooks {
       logger.trace(s"[handleSessionOutcomeRequest] session: $session")
       SessionOutcome(item, session, isSecure(header), isComplete(session))
     }
-    result.map(Right(_)).getOrElse(Left(BAD_REQUEST -> "Error handling outcome request"))
+    result.map(Right(_)).getOrElse{
+
+      logger.trace(s"load session: ${sessionService.load(id)}")
+      Left(BAD_REQUEST -> "Error handling outcome request")
+    }
   }
 
   override def getScore(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, SessionOutcome]] = handleSessionOutcome(id)(header)
