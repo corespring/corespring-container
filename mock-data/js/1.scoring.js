@@ -5,8 +5,8 @@
  * Available Globals: console, JSON, etc
  * Available Dependencies: "underscore"|"lodash"
  */
-exports.process = function(item, answers){
-
+exports.process = function(item, session){
+  var answers = session.components;
   console.log("process item " + JSON.stringify(answers));
   var correctAnswers = 0;
 
