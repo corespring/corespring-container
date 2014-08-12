@@ -53,8 +53,7 @@ trait OutcomeProcessor
           val start = System.currentTimeMillis()
           val outcome = serverComponent.createOutcome(question, answer, settings, targetOutcome)
           logger.trace(s"outcome: $outcome")
-          logger.debug(s"js execution duration (ms): ${System.currentTimeMillis() - start}")
-          println(s"js execution duration (ms): ${System.currentTimeMillis() - start}")
+          logger.info(s"${component.componentType} js execution duration (ms): ${System.currentTimeMillis() - start}")
           (id -> outcome)
       }.getOrElse((id, JsObject(Seq.empty)))
 
