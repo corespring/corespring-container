@@ -85,27 +85,24 @@ abstract class BaseGenerator
   with JsStringBuilder {
 
   protected def get3rdPartyScripts(dependencies: Seq[ClientSideDependency]): Seq[String] = {
-    def loadSrc(name: String)(path: String): Option[String] = resource(s"$name/$path")
-    val scripts = dependencies.map { d => d.files.map(loadSrc(d.name)) }.flatten
-    scripts.flatten
+    val paths: Seq[String] = dependencies.map(d => d.files.map { name => s"${d.name}/$name" }).flatten.distinct
+    paths.flatMap(resource)
   }
 
   protected def getLibScripts(components: Seq[Component]): Seq[String] = {
 
-    def loadSrc(org: String, name: String, path: String): Option[String] = {
-      val fullPath = s"$org/$name/libs/$path"
-      loadLibrarySource(fullPath)
-    }
+    val allPaths: Seq[String] = {
+      for {
+        comp <- components
+        lib <- (comp.packageInfo \ "libs").asOpt[JsObject]
+        client <- (lib \ "client").asOpt[JsObject]
+        paths <- Some(client.fields.map(_._2.as[Seq[String]]).flatten)
+      } yield {
+        for (p <- paths) yield s"${comp.id.org}/${comp.id.name}/libs/$p"
+      }
+    }.flatten.distinct
 
-    val libSrc = for {
-      comp <- components
-      lib <- (comp.packageInfo \ "libs").asOpt[JsObject]
-      client <- (lib \ "client").asOpt[JsObject]
-      paths <- Some(client.fields.map(_._2.as[Seq[String]]).flatten)
-    } yield {
-      for (p <- paths) yield loadSrc(comp.id.org, comp.id.name, p)
-    }
-    libSrc.flatten.flatten
+    allPaths.flatMap(loadLibrarySource)
   }
 
   override def css(components: Seq[Component]): String = {

@@ -11,7 +11,7 @@ import org.corespring.container.logging.ContainerLogger
 class ScoreProcessorSequence(processors: ScoreProcessor*) extends ScoreProcessor {
   lazy val logger = ContainerLogger.getLogger("ScoreProcessor")
 
-  def score(item: JsValue, session: JsValue, outcomes: JsValue): JsValue = {
+  override def score(item: JsValue, session: JsValue, outcomes:JsValue): JsValue = {
 
     val scores = processors.map { _.score(item, session, outcomes) }
 

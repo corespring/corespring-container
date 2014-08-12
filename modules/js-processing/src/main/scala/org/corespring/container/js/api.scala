@@ -12,14 +12,18 @@ object api {
     def preProcessItem(question: JsValue): JsValue
   }
 
-  trait ItemAuthorOverride {
-    def process(item: JsValue, answers: JsValue): JsValue
+  trait CustomScoringJs {
+    /**
+     * Create a score object, bypassing any built in component scoring logic.
+     * @param item
+     * @param session
+     * @return json : { score: 0.0 - 1.0 }
+     */
+    def process(item: JsValue, session:JsValue): JsValue
   }
 
   trait GetServerLogic {
     def serverLogic(componentType: String, definition: String, libs: Seq[Library]): ComponentServerLogic
-    //def componentLibs: Seq[(String, String)] = libraries.map(l => l.server.map(s => (s.name, s.source))).flatten
-
   }
 
   trait JavascriptError {

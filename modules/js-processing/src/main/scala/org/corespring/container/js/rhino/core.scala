@@ -62,10 +62,7 @@ trait JsContext extends JsLogging {
 
       libs.foreach(addToContext)
 
-      println("------->")
-      println(s" srcs -> $srcs")
       def addSrcToContext(name: String, src: String) = {
-        println(s"add  $name to context")
         logger.trace(s"add  $name to context")
         ctx.evaluateString(scope, src, name, 1, null)
       }
