@@ -9,6 +9,8 @@ import play.api.libs.json.{ Json, JsValue }
 import scala.Some
 import org.corespring.container.logging.ContainerLogger
 
+import scala.collection.mutable
+
 trait JsLogging {
   lazy val logger = ContainerLogger.getLogger("JsProcessing")
 }
@@ -40,37 +42,64 @@ class LocalErrorReporter extends ErrorReporter {
     println(s"[LocalErrorReporter:warning] -> $message")
   }
 }
+object Scopes {
+  lazy val logger = ContainerLogger.getLogger("Scopes")
+  private val scopes : mutable.Map[Int,Scriptable] = mutable.Map()
+
+  def get(uid:Int) : Option[Scriptable] = {
+    val out = scopes.get(uid)
+    logger.trace(s"get $uid: $out")
+    out
+  }
+
+  def put(uid:Int, s:Scriptable) : Unit = {
+    logger.trace(s"set: $uid: $s")
+    scopes.put(uid, s)
+  }
+}
 
 trait JsContext extends JsLogging {
 
   def console: Option[JsConsole] = Some(new DefaultLogger(ContainerLogger.getLogger("JsConsole")))
 
+  private def loadScope(context: Context, libs:Seq[String], srcs : Seq[(String, String)]) : ScriptableObject = {
+
+    val uid = s"${libs.mkString(",")}-${srcs.map(_._1).mkString(",")}}".hashCode
+    val s : Scriptable = Scopes.get(uid).getOrElse{
+
+        logger.debug(s"Need to build a new scope for ${srcs.map(_._1).mkString("-")}")
+        val global = new Global
+        global.init(context)
+        val scope = context.initStandardObjects(global)
+
+        def addToContext(libPath: String) = loadJsLib(libPath).map {
+          reader =>
+            context.evaluateReader(scope, reader, libPath, 1, null)
+        }
+
+        libs.foreach(addToContext)
+
+        def addSrcToContext(name: String, src: String) = {
+          logger.trace(s"add  $name to context")
+          context.evaluateString(scope, src, name, 1, null)
+        }
+        srcs.foreach(tuple => addSrcToContext(tuple._1, tuple._2))
+
+        def addToScope(name: String)(thing: Any) = ScriptableObject.putProperty(scope, name, thing)
+
+        console.foreach(addToScope("console"))
+        Scopes.put(uid, scope)
+        scope
+    }
+    s.asInstanceOf[ScriptableObject]
+  }
+
   def withJsContext[A](libs: Seq[String], srcs: Seq[(String, String)] = Seq.empty)(f: (Context, Scriptable) => Either[JavascriptError, A]): Either[JavascriptError, A] = {
     val ctx = Context.enter()
     ctx.setErrorReporter(new LocalErrorReporter)
     ctx.setOptimizationLevel(-1)
-    val global = new Global
-    global.init(ctx)
-    val scope = ctx.initStandardObjects(global)
-
     try {
-
-      def addToContext(libPath: String) = loadJsLib(libPath).map {
-        reader =>
-          ctx.evaluateReader(scope, reader, libPath, 1, null)
-      }
-
-      libs.foreach(addToContext)
-
-      def addSrcToContext(name: String, src: String) = {
-        logger.trace(s"add  $name to context")
-        ctx.evaluateString(scope, src, name, 1, null)
-      }
-      srcs.foreach(tuple => addSrcToContext(tuple._1, tuple._2))
-
-      def addToScope(name: String)(thing: Any) = ScriptableObject.putProperty(scope, name, thing)
-
-      console.foreach(addToScope("console"))
+      val scope = loadScope(ctx, libs, srcs)
       f(ctx, scope)
     } catch {
       case e: RhinoException => Left(RhinoJsError(e))
