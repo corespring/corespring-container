@@ -13,7 +13,7 @@ import org.corespring.container.components.outcome.{DefaultScoreProcessor, Score
 import org.corespring.container.components.processing.PlayerItemPreProcessor
 import org.corespring.container.components.response.OutcomeProcessor
 import org.corespring.container.js.rhino.score.CustomScoreProcessor
-import org.corespring.container.js.rhino.{NewRhinoOutcomeProcessor, RhinoPlayerItemPreProcessor}
+import org.corespring.container.js.rhino.{RhinoScopeBuilder, RhinoOutcomeProcessor, RhinoPlayerItemPreProcessor}
 import play.api.{Mode, Play}
 
 import scala.concurrent.ExecutionContext
@@ -36,11 +36,13 @@ trait DefaultIntegration
 
   implicit def ec: ExecutionContext
 
-  override def playerItemPreProcessor: PlayerItemPreProcessor = new RhinoPlayerItemPreProcessor(DefaultIntegration.this.components)
+  override def playerItemPreProcessor: PlayerItemPreProcessor = new RhinoPlayerItemPreProcessor(DefaultIntegration.this.components, scopeBuilder.scope)
 
   override def scoreProcessor: ScoreProcessor = new ScoreProcessorSequence(DefaultScoreProcessor, CustomScoreProcessor)
 
-  lazy val outcomeProcessor: OutcomeProcessor = new NewRhinoOutcomeProcessor(DefaultIntegration.this.components)
+  private lazy val scopeBuilder = new RhinoScopeBuilder(DefaultIntegration.this.components)
+
+  lazy val outcomeProcessor: OutcomeProcessor = new RhinoOutcomeProcessor(DefaultIntegration.this.components, scopeBuilder.scope)
 
   lazy val rig = new Rig {
     override implicit def ec: ExecutionContext = DefaultIntegration.this.ec

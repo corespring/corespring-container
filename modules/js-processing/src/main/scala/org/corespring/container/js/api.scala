@@ -9,6 +9,12 @@ object api {
 
     def createOutcome(question: JsValue, response: JsValue, settings: JsValue, targetOutcome: JsValue): JsValue
 
+
+    /**
+     * Preprocess the item. If there is now implementation available - return the input
+     * @param question
+     * @return
+     */
     def preProcessItem(question: JsValue): JsValue
   }
 
@@ -23,7 +29,7 @@ object api {
   }
 
   trait GetServerLogic {
-    def serverLogic(componentType: String, definition: String, libs: Seq[Library]): ComponentServerLogic
+    def serverLogic(componentType: String): ComponentServerLogic
   }
 
   trait JavascriptError {

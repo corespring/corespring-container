@@ -1,11 +1,12 @@
 package org.corespring.container.js.response
 
-import org.corespring.container.components.model.dependencies.{ ComponentSplitter, DependencyResolver }
-import org.corespring.container.components.model.{ Component, Interaction, Library }
-import org.corespring.container.components.response.{ OutcomeProcessor => ContainerOutcomeProcessor }
+import org.corespring.container.components.model.dependencies.{ComponentSplitter, DependencyResolver}
+import org.corespring.container.components.model.{Component, Interaction, Library}
+import org.corespring.container.components.response.{OutcomeProcessor => ContainerOutcomeProcessor}
 import org.corespring.container.js.api.GetServerLogic
 import play.api.libs.json._
 import org.corespring.container.logging.ContainerLogger
+
 trait Target {
   def targetId(question: JsValue) = (question \ "target" \ "id").asOpt[String]
 
@@ -15,13 +16,9 @@ trait Target {
 trait OutcomeProcessor
   extends ContainerOutcomeProcessor
   with Target
-  with GetServerLogic with ComponentSplitter {
+  with GetServerLogic {
 
-  lazy val dependencyResolver = new DependencyResolver {
-    override def components: Seq[Component] = OutcomeProcessor.this.components
-  }
-
-  def components: Seq[Component]
+  def isInteraction(componentType: String): Boolean
 
   private lazy val logger = ContainerLogger.getLogger("OutcomeProcessor")
 
@@ -37,30 +34,18 @@ trait OutcomeProcessor
         JsNull(0)
       }
 
-      def getInteraction(t: String): Option[Interaction] = components.find(_.matchesType(componentType)).map { c =>
-        if (c.isInstanceOf[Interaction]) {
-          c.asInstanceOf[Interaction]
-        } else {
-          throw new RuntimeException(s"[OutcomeProcessor] component type: $t is not an Interaction")
-        }
-      }
-
-      getInteraction(componentType).map {
-        component =>
-          val sortedLibs = dependencyResolver.filterByType[Library](dependencyResolver.resolveComponents(Seq(component.id)).filterNot(_.id.orgNameMatch(component.id)))
-          val serverComponent = serverLogic(component.componentType, component.server.definition, sortedLibs)
-          logger.trace(s"call server logic: \nquestion: $question, \nanswer: $answer, \nsetting: $settings, \ntargetOutcome: $targetOutcome")
-          val start = System.currentTimeMillis()
-          val outcome = serverComponent.createOutcome(question, answer, settings, targetOutcome)
-          logger.trace(s"outcome: $outcome")
-          logger.info(s"${component.componentType} js execution duration (ms): ${System.currentTimeMillis() - start}")
-          (id -> outcome)
-      }.getOrElse((id, JsObject(Seq.empty)))
+      val serverComponent = serverLogic(componentType)
+      logger.trace(s"call server logic: \nquestion: $question, \nanswer: $answer, \nsetting: $settings, \ntargetOutcome: $targetOutcome")
+      val start = System.currentTimeMillis()
+      val outcome = serverComponent.createOutcome(question, answer, settings, targetOutcome)
+      logger.trace(s"outcome: $outcome")
+      logger.info(s"${componentType} js execution duration (ms): ${System.currentTimeMillis() - start}")
+      (id -> outcome)
 
     }
 
     def canHaveOutcome(t: (String, JsValue)): Boolean = (t._2 \ "componentType").asOpt[String].map { ct =>
-      interactions.exists(_.matchesType(ct))
+      isInteraction(ct)
     }.getOrElse(false)
 
     val questions: Seq[(String, JsValue)] = (item \ "components").as[JsObject].fields.filter(canHaveOutcome)

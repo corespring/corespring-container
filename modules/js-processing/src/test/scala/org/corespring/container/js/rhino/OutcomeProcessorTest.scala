@@ -1,11 +1,12 @@
 package org.corespring.container.js.rhino
 
 import org.corespring.container.components.model._
+import org.corespring.container.components.model.dependencies.ComponentMaker
 import org.corespring.container.js.response.Target
 import org.specs2.mutable.Specification
 import play.api.libs.json.{ JsString, Json }
 
-class OutcomeProcessorTest extends Specification {
+class OutcomeProcessorTest extends Specification with ComponentMaker{
 
   val interactionRespondJs =
     """
@@ -45,29 +46,12 @@ class OutcomeProcessorTest extends Specification {
       "2" -> Json.obj(
         "answers" -> Json.obj())))
 
-  def interaction(name: String = "name", serverJs: String, libraries: Seq[Id] = Seq.empty) = Interaction(
-    "org",
-    name,
-    None,
-    None,
-    client = Client("", "", None),
-    server = Server(serverJs),
-    Json.obj(),
-    Json.obj(),
-    None,
-    Map(),
-    libraries)
+  def interaction(name: String = "name", serverJs: String, libraries: Seq[Id] = Seq.empty) =
+    uiComp(name, libraries).copy(server = Server(serverJs))
 
-  def lib(name: String = "name", libJs: String, deps: Seq[Id] = Seq.empty) = {
-    Library(
-      "org",
-      name,
-      Json.obj(),
-      Seq.empty,
-      Seq(LibrarySource(name, libJs)),
-      None,
-      deps)
-  }
+  def customLib(name: String = "name", libJs: String, deps: Seq[Id] = Seq.empty) =
+    lib(name, deps).copy(server = Seq(LibrarySource(name, libJs)))
+
 
   "Target" should {
     "work" in {
@@ -83,8 +67,8 @@ class OutcomeProcessorTest extends Specification {
 
       val component = interaction("name", interactionRespondJs)
       val feedback = interaction("feedback", feedbackRespondJs)
-
-      val processor = new RhinoOutcomeProcessor(Seq(component, feedback))
+      val builder = new RhinoScopeBuilder(Seq(component, feedback))
+      val processor = new RhinoOutcomeProcessor(Seq(component, feedback), builder.scope)
       val result = processor.createOutcome(item, session, Json.obj())
       (result \ "1" \ "correctness").as[String] === "incorrect"
       (result \ "2" \ "targetOutcome" \ "correctness").as[String] === "incorrect"
@@ -93,7 +77,8 @@ class OutcomeProcessorTest extends Specification {
     "return an incorrect response if the answer is empty" in {
 
       val component = interaction("name", interactionRespondJs)
-      val processor = new RhinoOutcomeProcessor(Seq(component))
+      val builder = new RhinoScopeBuilder(Seq(component))
+      val processor = new RhinoOutcomeProcessor(Seq(component), builder.scope)
 
       val item = Json.obj(
         "components" -> Json.obj(
@@ -150,11 +135,12 @@ class OutcomeProcessorTest extends Specification {
           |}
         """.stripMargin
       val one = interaction("one", oneJs, Seq(Id("org", "a", None)))
-      val a = lib("a", aJs, Seq(Id("org", "b", None)))
-      val b = lib("b", bJs, Seq(Id("org", "c", None)))
-      val c = lib("c", cJs, Seq.empty)
+      val a = customLib("a", aJs, Seq(Id("org", "b", None)))
+      val b = customLib("b", bJs, Seq(Id("org", "c", None)))
+      val c = customLib("c", cJs, Seq.empty)
 
-      val p = new RhinoOutcomeProcessor(Seq(one, a, b, c))
+      val builder = new RhinoScopeBuilder(Seq(one, a, b, c))
+      val p = new RhinoOutcomeProcessor(Seq(one, a, b, c), builder.scope)
 
       val item = Json.obj("components" -> Json.obj("1" -> Json.obj("componentType" -> "org-one")))
       val session = Json.obj("components" -> Json.obj("1" -> Json.obj("answers" -> Json.obj())))
@@ -166,13 +152,47 @@ class OutcomeProcessorTest extends Specification {
     "fail - if there is bad js" in {
       val component = interaction("name", "arst")
       val feedback = interaction("feedback", feedbackRespondJs)
-      val processor = new RhinoOutcomeProcessor(Seq(component, feedback))
-      try {
-        processor.createOutcome(item, session, Json.obj())
-      } catch {
-        case e: Throwable => println(e)
-      }
-      processor.createOutcome(item, session, Json.obj()) must throwA[RuntimeException]
+      val builder = new RhinoScopeBuilder(Seq(component, feedback))
+      builder.scope must throwA[RuntimeException]
+    }
+  }
+
+
+
+  "new processor" should {
+    lazy val library = lib("lib").copy(server = Seq(LibrarySource("src-1",
+      """
+        |exports.ping = function(){
+        |  return "pong";
+        |}
+      """.stripMargin)))
+    lazy val interaction = uiComp("interaction", Seq(Id("org", "lib"))).copy(server = Server(
+      """
+        |var l = require('src-1');
+        |exports.respond = function(){
+        |  return { msg: l.ping() }
+        |}
+      """.stripMargin))
+
+    lazy val components = Seq(interaction, library)
+    lazy val builder = new RhinoScopeBuilder(components)
+    lazy val processor = new RhinoOutcomeProcessor(components, builder.scope)
+    "execute js" in {
+      val item = Json.obj("components" -> Json.obj(
+        "1" -> Json.obj(
+          "componentType" -> "org-interaction"
+        )))
+      val session = Json.obj("components" -> Json.obj(
+        "1" -> Json.obj(
+          "answers" -> "a"
+        )
+      ))
+      val settings = Json.obj()
+      processor.createOutcome(item, session, settings) === Json.obj(
+        "1" -> Json.obj(
+          "msg" -> "pong",
+          "studentResponse" -> "a")
+      )
     }
   }
 

@@ -1,12 +1,12 @@
 package org.corespring.container.js.rhino
 
-import java.io.{ InputStreamReader, Reader }
+import java.io.{InputStreamReader, Reader}
+import grizzled.slf4j.Logger
 import org.corespring.container.js.api.JavascriptError
 import org.mozilla.javascript.tools.shell.Global
-import org.mozilla.javascript.{ Function => RhinoFunction, _ }
+import org.mozilla.javascript.{Function => RhinoFunction, _}
 import play.api.libs.json.JsString
-import play.api.libs.json.{ Json, JsValue }
-import scala.Some
+import play.api.libs.json.{Json, JsValue}
 import org.corespring.container.logging.ContainerLogger
 
 import scala.collection.mutable
@@ -16,11 +16,11 @@ trait JsLogging {
 }
 
 case class RhinoJsError(
-  val message: String,
-  val lineNo: Int,
-  val column: Int,
-  val source: String,
-  val name: String) extends JavascriptError
+                         val message: String,
+                         val lineNo: Int,
+                         val column: Int,
+                         val source: String,
+                         val name: String) extends JavascriptError
 
 object RhinoJsError {
   def apply(e: RhinoException): RhinoJsError = {
@@ -42,75 +42,75 @@ class LocalErrorReporter extends ErrorReporter {
     println(s"[LocalErrorReporter:warning] -> $message")
   }
 }
-object Scopes {
-  lazy val logger = ContainerLogger.getLogger("Scopes")
-  private val scopes : mutable.Map[Int,Scriptable] = mutable.Map()
 
-  def get(uid:Int) : Option[Scriptable] = {
+private[rhino] object Scopes {
+  lazy val logger = ContainerLogger.getLogger("Scopes")
+  private val scopes: mutable.Map[Int, Scriptable] = mutable.Map()
+
+  def get(uid: Int): Option[Scriptable] = {
     val out = scopes.get(uid)
     logger.trace(s"get $uid: $out")
     out
   }
 
-  def put(uid:Int, s:Scriptable) : Unit = {
+  def put(uid: Int, s: Scriptable): Unit = {
     logger.trace(s"set: $uid: $s")
     scopes.put(uid, s)
   }
 }
 
-trait GlobalScope {
+trait LibLoading {
 
-  def console: Option[JsConsole] = Some(new DefaultLogger(ContainerLogger.getLogger("JsConsole")))
+  def logger : Logger
 
-  lazy val logger = ContainerLogger.getLogger("Scopes")
-
-  private def loadJsLib(path: String): Option[Reader] = {
+  def loadJsLib(path: String): Option[Reader] = {
     val stream = getClass.getResourceAsStream(path)
     if (stream == null) {
-      logger.warn(s"Failed to load js from path: $path")
       throw new java.io.IOException(s"Resource not found: $path")
     } else {
       Some(new InputStreamReader((stream)))
     }
   }
 
-  def files : Seq[String]
-  def srcs : Seq[(String, String)]
+  def addToContext(context:Context, scope : Scriptable, libPath: String) = loadJsLib(libPath).map {
+    reader =>
+      logger.debug(s"[addToContext] $libPath")
+      context.evaluateReader(scope, reader, libPath, 1, null)
+  }
 
-  lazy val globalScriptable : Option[Scriptable] = {
+  def addSrcToContext(context:Context, scope:Scriptable, name: String, src: String) = {
+    logger.trace(s"add  $name to context")
+    context.evaluateString(scope, src, name, 1, null)
+  }
+
+  def addToScope(scope:Scriptable, name: String)(thing: Any) = ScriptableObject.putProperty(scope, name, thing)
+
+  def console: Option[JsConsole] = Some(new DefaultLogger(ContainerLogger.getLogger("JsConsole")))
+}
+
+trait GlobalScope extends LibLoading{
+
+  lazy val logger = ContainerLogger.getLogger("Scopes")
+
+  def files: Seq[String]
+
+  def srcs: Seq[(String, String)]
+
+  lazy val globalScriptable: Option[Scriptable] = {
 
     try {
       val context = Context.enter()
-      logger.info(s"Building a global reusble scope ${srcs.map(_._1).mkString("-")}")
-      logger.trace(s"reusble scope files: ${files.mkString("\n")}")
-      logger.trace(s"reusble scope srcs: ${srcs.map(_._1).mkString("\n")}")
+      logger.trace(s"reusable scope files: ${files.mkString("\n")}")
+      logger.trace(s"reusable scope srcs: ${srcs.map(_._1).mkString("\n")}")
       val global = new Global
       global.init(context)
       val scope = context.initStandardObjects(global)
-      console.foreach(addToScope("console"))
-
-      def addToContext(libPath: String) = loadJsLib(libPath).map {
-        reader =>
-          logger.debug(s"[addToContext] $libPath")
-          context.evaluateReader(scope, reader, libPath, 1, null)
-      }
-
-       files.foreach(addToContext)
-
-      def addSrcToContext(name: String, src: String) = {
-        logger.trace(s"add  $name to context")
-        println(s"add  $name to context")
-        println(s"add  $src")
-        context.evaluateString(scope, src, name, 1, null)
-      }
-      srcs.foreach(tuple => addSrcToContext(tuple._1, tuple._2))
-
-      def addToScope(name: String)(thing: Any) = ScriptableObject.putProperty(scope, name, thing)
-
+      console.foreach(addToScope(scope, "console"))
+      files.foreach(addToContext(context, scope, _))
+      srcs.foreach(tuple => addSrcToContext(context, scope, tuple._1, tuple._2))
       Some(scope)
-
     } catch {
-      case e : Throwable => {
+      case e: Throwable => {
         logger.error(e.getMessage)
         None
       }
@@ -118,41 +118,24 @@ trait GlobalScope {
       Context.exit()
     }
   }
-
 }
 
-trait JsContext extends JsLogging {
+trait JsContext extends JsLogging with LibLoading{
 
-  def console: Option[JsConsole] = Some(new DefaultLogger(ContainerLogger.getLogger("JsConsole")))
-
-  private def loadScope(context: Context, libs:Seq[String], srcs : Seq[(String, String)]) : ScriptableObject = {
+  private def loadScope(context: Context, libs: Seq[String], srcs: Seq[(String, String)]): ScriptableObject = {
 
     val uid = s"${libs.mkString(",")}-${srcs.map(_._1).mkString(",")}}".hashCode
-    val s : Scriptable = Scopes.get(uid).getOrElse{
-
-        logger.debug(s"Need to build a new scope for ${srcs.map(_._1).mkString("-")}")
-        val global = new Global
-        global.init(context)
-        val scope = context.initStandardObjects(global)
-
-        def addToContext(libPath: String) = loadJsLib(libPath).map {
-          reader =>
-            context.evaluateReader(scope, reader, libPath, 1, null)
-        }
-
-        libs.foreach(addToContext)
-
-        def addSrcToContext(name: String, src: String) = {
-          logger.trace(s"add  $name to context")
-          context.evaluateString(scope, src, name, 1, null)
-        }
-        srcs.foreach(tuple => addSrcToContext(tuple._1, tuple._2))
-
-        def addToScope(name: String)(thing: Any) = ScriptableObject.putProperty(scope, name, thing)
-
-        console.foreach(addToScope("console"))
-        Scopes.put(uid, scope)
-        scope
+    val s: Scriptable = Scopes.get(uid).getOrElse {
+      logger.debug(s"Need to build a new scope for srcs: ${srcs.map(_._1).mkString("\n")}")
+      logger.debug(s"Need to build a new scope for libs: ${libs.mkString("\n")}")
+      val global = new Global
+      global.init(context)
+      val scope = context.initStandardObjects(global)
+      console.foreach(addToScope(scope, "console"))
+      libs.foreach(addToContext(context,scope,_))
+      srcs.foreach(tuple => addSrcToContext(context, scope, tuple._1, tuple._2))
+      Scopes.put(uid, scope)
+      scope
     }
     s.asInstanceOf[ScriptableObject]
   }
@@ -169,16 +152,6 @@ trait JsContext extends JsLogging {
       case e: Throwable => throw e
     } finally {
       Context.exit()
-    }
-  }
-
-  private def loadJsLib(path: String): Option[Reader] = {
-    val stream = getClass.getResourceAsStream(path)
-    if (stream == null) {
-      logger.warn(s"Failed to load js from path: $path")
-      throw new java.io.IOException(s"Resource not found: $path")
-    } else {
-      Some(new InputStreamReader((stream)))
     }
   }
 }
