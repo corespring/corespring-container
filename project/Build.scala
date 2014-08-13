@@ -164,7 +164,7 @@ object Build extends sbt.Build {
     .settings(playAppToSbtLibSettings: _*)
     .settings(
       libraryDependencies ++= Seq(rhinoJs, grizzledLog))
-    .dependsOn(logging, containerClient, componentModel)
+    .dependsOn(logging, containerClient, componentModel % "test->test;compile->compile")
 
   lazy val componentLoader = builder.lib("component-loader")
     .settings(

@@ -13,7 +13,7 @@ import org.corespring.container.components.outcome.{ DefaultScoreProcessor, Scor
 import org.corespring.container.components.processing.PlayerItemPreProcessor
 import org.corespring.container.components.response.OutcomeProcessor
 import org.corespring.container.js.rhino.score.ItemJsScoreProcessor
-import org.corespring.container.js.rhino.{ RhinoOutcomeProcessor, RhinoPlayerItemPreProcessor }
+import org.corespring.container.js.rhino.{NewRhinoOutcomeProcessor, RhinoPlayerItemPreProcessor}
 import play.api.{ Play, Mode }
 
 import scala.concurrent.ExecutionContext
@@ -40,7 +40,8 @@ trait DefaultIntegration
 
   override def scoreProcessor: ScoreProcessor = new ScoreProcessorSequence(DefaultScoreProcessor, ItemJsScoreProcessor)
 
-  override def outcomeProcessor: OutcomeProcessor = new RhinoOutcomeProcessor(DefaultIntegration.this.components)
+  //override def outcomeProcessor: OutcomeProcessor = new RhinoOutcomeProcessor(DefaultIntegration.this.components)
+  lazy val outcomeProcessor: OutcomeProcessor = new NewRhinoOutcomeProcessor(DefaultIntegration.this.components)
 
   lazy val rig = new Rig {
     override implicit def ec: ExecutionContext = DefaultIntegration.this.ec

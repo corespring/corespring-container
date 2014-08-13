@@ -58,6 +58,69 @@ object Scopes {
   }
 }
 
+trait GlobalScope {
+
+  def console: Option[JsConsole] = Some(new DefaultLogger(ContainerLogger.getLogger("JsConsole")))
+
+  lazy val logger = ContainerLogger.getLogger("Scopes")
+
+  private def loadJsLib(path: String): Option[Reader] = {
+    val stream = getClass.getResourceAsStream(path)
+    if (stream == null) {
+      logger.warn(s"Failed to load js from path: $path")
+      throw new java.io.IOException(s"Resource not found: $path")
+    } else {
+      Some(new InputStreamReader((stream)))
+    }
+  }
+
+  def files : Seq[String]
+  def srcs : Seq[(String, String)]
+
+  lazy val globalScriptable : Option[Scriptable] = {
+
+    try {
+      val context = Context.enter()
+      logger.info(s"Building a global reusble scope ${srcs.map(_._1).mkString("-")}")
+      logger.trace(s"reusble scope files: ${files.mkString("\n")}")
+      logger.trace(s"reusble scope srcs: ${srcs.map(_._1).mkString("\n")}")
+      val global = new Global
+      global.init(context)
+      val scope = context.initStandardObjects(global)
+      console.foreach(addToScope("console"))
+
+      def addToContext(libPath: String) = loadJsLib(libPath).map {
+        reader =>
+          logger.debug(s"[addToContext] $libPath")
+          context.evaluateReader(scope, reader, libPath, 1, null)
+      }
+
+       files.foreach(addToContext)
+
+      def addSrcToContext(name: String, src: String) = {
+        logger.trace(s"add  $name to context")
+        println(s"add  $name to context")
+        println(s"add  $src")
+        context.evaluateString(scope, src, name, 1, null)
+      }
+      srcs.foreach(tuple => addSrcToContext(tuple._1, tuple._2))
+
+      def addToScope(name: String)(thing: Any) = ScriptableObject.putProperty(scope, name, thing)
+
+      Some(scope)
+
+    } catch {
+      case e : Throwable => {
+        logger.error(e.getMessage)
+        None
+      }
+    } finally {
+      Context.exit()
+    }
+  }
+
+}
+
 trait JsContext extends JsLogging {
 
   def console: Option[JsConsole] = Some(new DefaultLogger(ContainerLogger.getLogger("JsConsole")))
