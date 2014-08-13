@@ -7,7 +7,7 @@ trait DependencyResolver extends ComponentSplitter {
 
   type IdRelation = (Id, Seq[Id])
 
-  lazy val logger  = ContainerLogger.getLogger("dependencies.DependencyResolver")
+  lazy val logger = ContainerLogger.getLogger("dependencies.DependencyResolver")
 
   lazy val relationships: Seq[(Id, Seq[Id])] = {
     components.map { c =>
@@ -106,13 +106,13 @@ trait DependencyResolver extends ComponentSplitter {
 
     def orgName(id: Id): OrgName = id.org -> id.name
 
-    logger.debug(s"[resolveIds] relations: $relations")
+    logger.trace(s"[resolveIds] relations: $relations")
 
     //To simplify the topSort - we use string based tuples - the build the ids back up
     val orgNames: Seq[OrgRelation] = relations.map(t => orgName(t._1) -> t._2.map(orgName))
     val sortedRelations: Seq[OrgRelation] = TopologicalSorter.sort(orgNames: _*)
     val sortedIds = sortedRelations.map(r => Id(r._1._1, r._1._2))
-    logger.debug(s"[resolveIds] sortedIds -> $sortedIds")
+    logger.trace(s"[resolveIds] sortedIds -> $sortedIds")
     val out = sortedIds.map(i => i.copy(scope = None)).distinct
     logger.trace(s"[resolveIds] return -> $out")
     out

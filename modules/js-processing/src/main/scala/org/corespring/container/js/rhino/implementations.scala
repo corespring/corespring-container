@@ -1,20 +1,19 @@
 package org.corespring.container.js.rhino
 
-import org.corespring.container.components.model.{Component, Interaction, Library, LibrarySource}
+import org.corespring.container.components.model.{ Component, Interaction, Library, LibrarySource }
 import org.corespring.container.components.model.dependencies.DependencyResolver
-import org.corespring.container.js.api.{ComponentServerLogic => ApiComponentServerLogic, CustomScoringJs => ApiCustomScoring, JavascriptProcessingException}
+import org.corespring.container.js.api.{ ComponentServerLogic => ApiComponentServerLogic, CustomScoringJs => ApiCustomScoring, JavascriptProcessingException }
 import org.corespring.container.js.processing.PlayerItemPreProcessor
 import org.corespring.container.js.response.OutcomeProcessor
-import org.mozilla.javascript.{Function => RhinoFunction, UniqueTag, Context, Scriptable}
-import play.api.libs.json.{JsObject, JsValue, Json}
+import org.mozilla.javascript.{ Function => RhinoFunction, UniqueTag, Context, Scriptable }
+import play.api.libs.json.{ JsObject, JsValue, Json }
 import org.corespring.container.logging.ContainerLogger
 
 trait CoreLibs {
 
   protected val rootJs = Seq(
     "/container-client/js/corespring/core-library.js",
-    "/container-client/js/corespring/core.js"
-  )
+    "/container-client/js/corespring/core.js")
 
   protected val libs = Seq(
     "/js-libs/lodash.min.js",
@@ -23,8 +22,7 @@ trait CoreLibs {
     "/container-client/js/corespring/server/init-core-library.js"
 }
 
-trait CorespringJs extends CoreLibs{
-
+trait CorespringJs extends CoreLibs {
 
   def js: String
 
@@ -38,7 +36,7 @@ trait CorespringJs extends CoreLibs{
 }
 
 trait CustomScoringJs
-  extends ApiCustomScoring 
+  extends ApiCustomScoring
   with JsContext
   with JsFunctionCalling
   with CorespringJs {
@@ -90,11 +88,11 @@ class RhinoServerLogic(componentType: String, scope: Scriptable)
       val server = serverLogic(context, scope)
       //TODO: rename 'respond' => 'createOutcome' in the components
       server.get("respond", server) match {
-        case ut : UniqueTag => {
+        case ut: UniqueTag => {
           throw new RuntimeException("Error can't find function respond")
         }
-        case fn : RhinoFunction => {
-          val result = callJsFunction("", fn, server, Array(question, response, settings, targetOutcome))(context,scope)
+        case fn: RhinoFunction => {
+          val result = callJsFunction("", fn, server, Array(question, response, settings, targetOutcome))(context, scope)
           result match {
             case Left(err) => {
               logger.error(err.message)
@@ -104,7 +102,7 @@ class RhinoServerLogic(componentType: String, scope: Scriptable)
           }
 
         }
-      }//.asInstanceOf[RhinoFunction]
+      } //.asInstanceOf[RhinoFunction]
 
     } catch {
       case e: Throwable => {
@@ -120,8 +118,8 @@ class RhinoServerLogic(componentType: String, scope: Scriptable)
     val context = Context.enter()
     val server = serverLogic(context, scope)
     server.get("preprocess", server) match {
-      case ut : UniqueTag => question
-      case fn : RhinoFunction => {
+      case ut: UniqueTag => question
+      case fn: RhinoFunction => {
         val result = callJsFunction("", fn, server, Array(question))(context, scope)
         result match {
           case Left(err) => throw JavascriptProcessingException(err)
@@ -130,7 +128,7 @@ class RhinoServerLogic(componentType: String, scope: Scriptable)
       }
     }
   } catch {
-    case e : Throwable => {
+    case e: Throwable => {
       throw new RuntimeException("[preProcessItem] error:", e)
     }
   } finally {
@@ -138,12 +136,11 @@ class RhinoServerLogic(componentType: String, scope: Scriptable)
   }
 }
 
-
 class RhinoScopeBuilder(val components: Seq[Component])
   extends CoreLibs
   with GlobalScope
-  with DependencyResolver{
-   override lazy val logger = ContainerLogger.getLogger("NewRhinoOutcomeProcessor")
+  with DependencyResolver {
+  override lazy val logger = ContainerLogger.getLogger("RhinoScopeBuilder")
 
   lazy val files: Seq[String] = libs
 
@@ -152,8 +149,8 @@ class RhinoScopeBuilder(val components: Seq[Component])
     resolveComponents(components.map(_.id)).flatMap(toWrappedJsSrcAndName)
   }
 
-  def wrappedComponentLibs(ls:LibrarySource): (String,String) = {
-      (ls.name -> s"""
+  def wrappedComponentLibs(ls: LibrarySource): (String, String) = {
+    (ls.name -> s"""
     (function(exports, require, module){
     ${ls.source};
     })(corespring.module("${ls.name}").exports, corespring.require, corespring.module("${ls.name}"));
@@ -162,33 +159,33 @@ class RhinoScopeBuilder(val components: Seq[Component])
 
   def toNameAndSource(l: Seq[LibrarySource]): Seq[(String, String)] = l.map(wrappedComponentLibs)
 
-  private def toWrappedJsSrcAndName(c:Component) : Seq[(String,String)] = {
+  private def toWrappedJsSrcAndName(c: Component): Seq[(String, String)] = {
     c match {
-      case Interaction(org,name,_,_,_,server,_,_,_,_,_) => Seq(s"$org-$name" -> wrap(s"$org-$name", server.definition))
+      case Interaction(org, name, _, _, _, server, _, _, _, _, _) => Seq(s"$org-$name" -> wrap(s"$org-$name", server.definition))
       case Library(org, name, _, _, server, _, _) => toNameAndSource(server)
       case _ => Seq.empty
     }
   }
 
-  private def wrap(name:String, js:String) : String =
+  private def wrap(name: String, js: String): String =
     s"""
        |(function(exports, require){
        |$js
        |})(corespring.server.logic('$name'), corespring.require);
      """.stripMargin
 
-  def scope : Scriptable = globalScriptable.getOrElse{
+  def scope: Scriptable = globalScriptable.getOrElse {
     throw new RuntimeException("Error loading global scope - check the logs")
   }
 }
 
-class RhinoOutcomeProcessor(val components : Seq[Component], val scope:Scriptable) extends OutcomeProcessor{
-  override def isInteraction(componentType: String): Boolean = components.exists( c => c.matchesType(componentType) && c.isInstanceOf[Interaction])
+class RhinoOutcomeProcessor(val components: Seq[Component], val scope: Scriptable) extends OutcomeProcessor {
+  override def isInteraction(componentType: String): Boolean = components.exists(c => c.matchesType(componentType) && c.isInstanceOf[Interaction])
 
-  override def serverLogic(componentType: String): ApiComponentServerLogic =  new RhinoServerLogic(componentType, scope)
+  override def serverLogic(componentType: String): ApiComponentServerLogic = new RhinoServerLogic(componentType, scope)
 }
 
-class RhinoPlayerItemPreProcessor(val components: Seq[Component], val scope : Scriptable) extends PlayerItemPreProcessor{
+class RhinoPlayerItemPreProcessor(val components: Seq[Component], val scope: Scriptable) extends PlayerItemPreProcessor {
   override def serverLogic(componentType: String): ApiComponentServerLogic = new RhinoServerLogic(componentType, scope)
 }
 

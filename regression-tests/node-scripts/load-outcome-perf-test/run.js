@@ -1,3 +1,4 @@
+
 //create an item
 //create a session
 //call load-outcome many times
@@ -58,7 +59,7 @@ function Runner(index, settings, session) {
   var data = JSON.stringify(settings);
   var length = Buffer.byteLength(data, 'utf8');
   var path = '/client/session/load-outcome/' + session._id + '.json';
-  console.log(path)
+  //console.log(path)
   var options = {
     host: serverName,
     port: port,
