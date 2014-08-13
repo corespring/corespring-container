@@ -185,7 +185,9 @@ trait ComponentServerLogic
 }
 
 trait NewRhinoGetServerLogic extends GetServerLogic with GlobalScope{
-  override def serverLogic(componentType: String, definition: String, libs: Seq[Library]): ApiComponentServerLogic = new NewServerLogic(componentType, globalScriptable.get)
+  override def serverLogic(componentType: String, definition: String, libs: Seq[Library]): ApiComponentServerLogic = globalScriptable.map{ gs =>
+    new NewServerLogic(componentType, gs)
+  }.getOrElse(throw new RuntimeException("Global Scriptable is empty - check the logs there must have been a js error"))
 }
 
 trait RhinoGetServerLogic extends GetServerLogic {
