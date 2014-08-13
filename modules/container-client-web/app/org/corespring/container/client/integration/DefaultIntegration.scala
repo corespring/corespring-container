@@ -3,18 +3,18 @@ package org.corespring.container.client.integration
 import org.corespring.container.client.V2PlayerConfig
 import org.corespring.container.client.component.ComponentUrls
 import org.corespring.container.client.controllers.apps._
-import org.corespring.container.client.controllers.resources.{ Item, Session }
-import org.corespring.container.client.controllers.{ ComponentsFileController, DataQuery, Icons, PlayerLauncher }
+import org.corespring.container.client.controllers.resources.{Item, Session}
+import org.corespring.container.client.controllers.{ComponentsFileController, DataQuery, Icons, PlayerLauncher}
 import org.corespring.container.client.hooks._
 import org.corespring.container.client.integration.validation.Validator
 import org.corespring.container.components.model.Component
 import org.corespring.container.components.model.dependencies.ComponentSplitter
-import org.corespring.container.components.outcome.{ DefaultScoreProcessor, ScoreProcessor, ScoreProcessorSequence }
+import org.corespring.container.components.outcome.{DefaultScoreProcessor, ScoreProcessor, ScoreProcessorSequence}
 import org.corespring.container.components.processing.PlayerItemPreProcessor
 import org.corespring.container.components.response.OutcomeProcessor
-import org.corespring.container.js.rhino.score.ItemJsScoreProcessor
+import org.corespring.container.js.rhino.score.CustomScoreProcessor
 import org.corespring.container.js.rhino.{NewRhinoOutcomeProcessor, RhinoPlayerItemPreProcessor}
-import play.api.{ Play, Mode }
+import play.api.{Mode, Play}
 
 import scala.concurrent.ExecutionContext
 
@@ -38,9 +38,8 @@ trait DefaultIntegration
 
   override def playerItemPreProcessor: PlayerItemPreProcessor = new RhinoPlayerItemPreProcessor(DefaultIntegration.this.components)
 
-  override def scoreProcessor: ScoreProcessor = new ScoreProcessorSequence(DefaultScoreProcessor, ItemJsScoreProcessor)
+  override def scoreProcessor: ScoreProcessor = new ScoreProcessorSequence(DefaultScoreProcessor, CustomScoreProcessor)
 
-  //override def outcomeProcessor: OutcomeProcessor = new RhinoOutcomeProcessor(DefaultIntegration.this.components)
   lazy val outcomeProcessor: OutcomeProcessor = new NewRhinoOutcomeProcessor(DefaultIntegration.this.components)
 
   lazy val rig = new Rig {

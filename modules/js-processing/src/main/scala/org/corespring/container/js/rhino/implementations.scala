@@ -3,6 +3,8 @@ package org.corespring.container.js.rhino
 import org.corespring.container.components.model.dependencies.DependencyResolver
 import org.corespring.container.components.model.{LibrarySource, Interaction, Component, Library}
 import org.corespring.container.js.api.{GetServerLogic, JavascriptError, JavascriptProcessingException, ComponentServerLogic => ApiComponentServerLogic, ItemAuthorOverride => ApiItemAuthorOverride}
+import org.corespring.container.components.model.{ Component, Library }
+import org.corespring.container.js.api.{ GetServerLogic, JavascriptError, JavascriptProcessingException, ComponentServerLogic => ApiComponentServerLogic, CustomScoringJs => ApiCustomScoring }
 import org.corespring.container.js.processing.PlayerItemPreProcessor
 import org.corespring.container.js.response.OutcomeProcessor
 import org.mozilla.javascript.tools.shell.Global
@@ -35,18 +37,18 @@ trait CorespringJs extends CoreLibs{
   """
 }
 
-trait ItemAuthorOverride
-  extends ApiItemAuthorOverride
+trait CustomScoringJs
+  extends ApiCustomScoring 
   with JsContext
   with JsFunctionCalling
   with CorespringJs {
 
-  override def exports = "corespring.server.itemOverride()"
+  override def exports = "corespring.server.customScoring()"
 
-  private def getOverrideObject(ctx: Context, scope: Scriptable): Scriptable = {
+  private def getScoringObject(ctx: Context, scope: Scriptable): Scriptable = {
     val corespring = scope.get("corespring", scope).asInstanceOf[Scriptable]
     val server = corespring.get("server", corespring).asInstanceOf[Scriptable]
-    val overrideFn = server.get("itemOverride", server).asInstanceOf[RhinoFunction]
+    val overrideFn = server.get("customScoring", server).asInstanceOf[RhinoFunction]
     val obj = overrideFn.call(ctx, scope, server, Array())
     obj.asInstanceOf[Scriptable]
   }
@@ -56,10 +58,10 @@ trait ItemAuthorOverride
       (ctx: Context, scope: Scriptable) =>
         implicit val rootScope = scope
         implicit val rootContext = ctx
-        ctx.evaluateString(scope, wrapped, s"itemAuthorOverride.process", 1, null)
-        val overrideObject = getOverrideObject(ctx, scope)
-        val processFn = overrideObject.get("process", overrideObject).asInstanceOf[RhinoFunction]
-        callJsFunction(wrapped, processFn, overrideObject, Array(item, answers))
+        ctx.evaluateString(scope, wrapped, s"customScoring.process", 1, null)
+        val scoringObject = getScoringObject(ctx, scope)
+        val processFn = scoringObject.get("process", scoringObject).asInstanceOf[RhinoFunction]
+        callJsFunction(wrapped, processFn, scoringObject, Array(item, answers))
     }
 
     result match {
@@ -173,7 +175,7 @@ trait ComponentServerLogic
         implicit val rootContext = ctx
         ctx.evaluateString(scope, wrapped, s"$componentType.preProcessItem", 1, null)
         val server = serverLogic(ctx, scope)
-        val renderFunction = server.get("render", server).asInstanceOf[RhinoFunction]
+        val renderFunction = server.get("preprocess", server).asInstanceOf[RhinoFunction]
         callJsFunction(wrapped, renderFunction, server, Array(question))
     }
 

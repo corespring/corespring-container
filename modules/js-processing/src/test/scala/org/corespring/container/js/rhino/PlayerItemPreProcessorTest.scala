@@ -8,7 +8,7 @@ class PlayerItemPreProcessorTest extends Specification {
 
   val interactionProcessJs =
     """
-      |exports.render   =     function(json){
+      |exports.preprocess   =     function(json){
       |  json.dummy = "something";
       |  return json;
       |}

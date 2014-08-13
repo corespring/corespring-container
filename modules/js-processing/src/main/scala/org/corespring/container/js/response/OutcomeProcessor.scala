@@ -59,10 +59,9 @@ trait OutcomeProcessor
 
     }
 
-    def canHaveOutcome(t: (String, JsValue)): Boolean = {
-      val componentType = (t._2 \ "componentType").as[String]
-      interactions.exists(_.matchesType(componentType))
-    }
+    def canHaveOutcome(t: (String, JsValue)): Boolean = (t._2 \ "componentType").asOpt[String].map { ct =>
+      interactions.exists(_.matchesType(ct))
+    }.getOrElse(false)
 
     val questions: Seq[(String, JsValue)] = (item \ "components").as[JsObject].fields.filter(canHaveOutcome)
 
