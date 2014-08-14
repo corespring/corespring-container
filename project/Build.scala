@@ -116,7 +116,6 @@ object Build extends sbt.Build {
       val propertiesFile = s"${n}-buildInfo.properties"
       s.log.info(s"[buildInfo] ---> write build properties file] on ${base.getAbsolutePath}/$propertiesFile")
       val file = base / propertiesFile
-      //s"${name}-buildInfo.properties"
       val commitHash: String = Process("git rev-parse --short HEAD").!!.trim
       val branch: String = Process("git rev-parse --abbrev-ref HEAD").!!.trim
       val formatter = DateTimeFormat.forPattern("HH:mm dd MMMM yyyy");
