@@ -11,7 +11,7 @@ object VersionInfo {
     new VersionInfo(version, branch, commitHashShort, pushDate)
   }
 
-  val propsFile = "/buildInfo.properties"
+  val propsFile = "/container-client-web-buildInfo.properties"
 
   private lazy val properties = {
     val url = Play.resource(propsFile)
