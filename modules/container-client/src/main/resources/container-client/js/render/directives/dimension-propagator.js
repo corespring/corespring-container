@@ -1,6 +1,16 @@
 angular.module('corespring-player.directives').directive('dimensionPropagator',
   ['$log', 'MessageBridge', function($log, MessageBridge) {
 
+  function calculateContentHeight(){
+    var visible = $( "body :visible" );
+    var max = 0;
+    visible.each(function(){
+      var rect = this.getBoundingClientRect();
+      max = Math.max(rect.bottom,max);
+    });
+    return max;
+  }
+
   return {
 
     link: function($scope, $element){
@@ -19,7 +29,7 @@ angular.module('corespring-player.directives').directive('dimensionPropagator',
         if (!b) {return;}
 
         var w = b.clientWidth;
-        var h = b.clientHeight;
+        var h = calculateContentHeight();
 
         if(different(w,h)){
           lastW = w;

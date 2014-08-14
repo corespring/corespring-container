@@ -71,9 +71,9 @@ var Instance = function(element, options, errorCallback, log) {
         if (json.message === 'dimensionsUpdate') {
           var iframe = findDestinationIframe(event);
           if (iframe) {
-            iframe.height(json.h + 30);
+            iframe.height(json.h);
           } else {
-            $(element).height(json.h + 30);
+            $(element).height(json.h);
           }
         }
       } catch (e) {
