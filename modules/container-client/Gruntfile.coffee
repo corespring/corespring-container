@@ -197,6 +197,8 @@ module.exports = (grunt) ->
       main: ["<%= common.dist %>/css/*.css"]
       uglified: _.toArray(destinations)
       less: ['<%= common.dist %>/css/**/*.less']
+      gzip: _.map(_.toArray(destinations),(dest) -> dest + '.gz')
+      map: _.map(_.toArray(destinations),(dest) -> dest.replace('.js','.map'))
 
     shell:
       bowerCacheClean:
