@@ -72,7 +72,7 @@ The basic folder structure for all components is like so:
 * underscore/lodash
 
 
-### [Draft] preprocess
+### preprocess
 
 
     /**
@@ -86,7 +86,7 @@ The basic folder structure for all components is like so:
     }
 
 
-### respond method
+### createOutcome method (was called respond)
 
     /**
      * @return an object with the following properties:
@@ -94,9 +94,17 @@ The basic folder structure for all components is like so:
      *   - response: an response object for the client side part of your component - typically contains feedback
      *   - score: a value from 0.0 - 1.0
      */
-    response(question, answer, settings)
+    exports.respond(question, answer, settings, targetOutcomes)
     
-### Respond Function
+
+### isScoreable
+    
+    /**
+     * Some components aren't may not be scoreable in certain scenarios.
+     * If this isn't defined the container assumes isScoreable == true.
+     * By not being scoreable, the components outcome will not be used to calculate the item's score.
+     */
+    exports.isScoreable(question, answer, outcome) //=> true|false
 
 #### Scoring
 
