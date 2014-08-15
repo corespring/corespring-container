@@ -1,12 +1,12 @@
 package org.corespring.container.js.rhino
 
-import java.io.{InputStreamReader, Reader}
+import java.io.{ InputStreamReader, Reader }
 import grizzled.slf4j.Logger
 import org.corespring.container.js.api.JavascriptError
 import org.mozilla.javascript.tools.shell.Global
-import org.mozilla.javascript.{Function => RhinoFunction, _}
+import org.mozilla.javascript.{ Function => RhinoFunction, _ }
 import play.api.libs.json.JsString
-import play.api.libs.json.{Json, JsValue}
+import play.api.libs.json.{ Json, JsValue }
 import org.corespring.container.logging.ContainerLogger
 
 import scala.collection.mutable
@@ -16,11 +16,11 @@ trait JsLogging {
 }
 
 case class RhinoJsError(
-                         val message: String,
-                         val lineNo: Int,
-                         val column: Int,
-                         val source: String,
-                         val name: String) extends JavascriptError
+  val message: String,
+  val lineNo: Int,
+  val column: Int,
+  val source: String,
+  val name: String) extends JavascriptError
 
 object RhinoJsError {
   def apply(e: RhinoException): RhinoJsError = {
@@ -61,7 +61,7 @@ private[rhino] object Scopes {
 
 trait LibLoading {
 
-  def logger : Logger
+  def logger: Logger
 
   def loadJsLib(path: String): Option[Reader] = {
     val stream = getClass.getResourceAsStream(path)
@@ -72,23 +72,26 @@ trait LibLoading {
     }
   }
 
-  def addToContext(context:Context, scope : Scriptable, libPath: String) = loadJsLib(libPath).map {
+  def addToContext(context: Context, scope: Scriptable, libPath: String) = loadJsLib(libPath).map {
     reader =>
-      logger.debug(s"[addToContext] $libPath")
+      logger.trace(s"[addToContext] $libPath")
       context.evaluateReader(scope, reader, libPath, 1, null)
   }
 
-  def addSrcToContext(context:Context, scope:Scriptable, name: String, src: String) = {
+  def addSrcToContext(context: Context, scope: Scriptable, name: String, src: String) = {
     logger.trace(s"add  $name to context")
     context.evaluateString(scope, src, name, 1, null)
   }
 
-  def addToScope(scope:Scriptable, name: String)(thing: Any) = ScriptableObject.putProperty(scope, name, thing)
+  def addToScope(scope: Scriptable, name: String)(thing: Any) = ScriptableObject.putProperty(scope, name, thing)
 
   def console: Option[JsConsole] = Some(new DefaultLogger(ContainerLogger.getLogger("JsConsole")))
 }
 
-trait GlobalScope extends LibLoading{
+/**
+ * Lazily initializes a single `Scriptable` for the instance, with the files and srcs added to the scope.
+ */
+trait GlobalScope extends LibLoading {
 
   lazy val logger = ContainerLogger.getLogger("Scopes")
 
@@ -120,7 +123,7 @@ trait GlobalScope extends LibLoading{
   }
 }
 
-trait JsContext extends JsLogging with LibLoading{
+trait JsContext extends JsLogging with LibLoading {
 
   private def loadScope(context: Context, libs: Seq[String], srcs: Seq[(String, String)]): ScriptableObject = {
 
@@ -132,7 +135,7 @@ trait JsContext extends JsLogging with LibLoading{
       global.init(context)
       val scope = context.initStandardObjects(global)
       console.foreach(addToScope(scope, "console"))
-      libs.foreach(addToContext(context,scope,_))
+      libs.foreach(addToContext(context, scope, _))
       srcs.foreach(tuple => addSrcToContext(context, scope, tuple._1, tuple._2))
       Scopes.put(uid, scope)
       scope
@@ -170,15 +173,44 @@ trait JsFunctionCalling extends JsLogging {
 
   def toObject(implicit scope: Scriptable): RhinoFunction = jsJson.get("parse", jsJson).asInstanceOf[RhinoFunction]
 
-  def toJsonString(implicit scope: Scriptable): RhinoFunction = jsJson.get("stringify", jsJson).asInstanceOf[RhinoFunction]
+  def toJsonString(implicit scope: Scriptable): RhinoFunction = {
+    jsJson.get("stringify",
+      jsJson).asInstanceOf[RhinoFunction]
+  }
 
-  def callJsFunction(rawJs: String, fn: RhinoFunction, parentScope: Scriptable, args: Array[JsValue])(implicit ctx: Context, rootScope: Scriptable): Either[JavascriptError, JsValue] = {
+  def callJsFunctionJson(
+    rawJs: String,
+    fn: RhinoFunction,
+    parentScope: Scriptable,
+    args: Array[JsValue])(implicit ctx: Context, rootScope: Scriptable): Either[JavascriptError, JsValue] = {
+    def mkJson(o: Any): JsValue = {
+      val jsonString: String = NativeJSON.stringify(ctx, rootScope, o, null, null).asInstanceOf[String]
+      Json.parse(jsonString.toString)
+    }
+    callJsFunction(rawJs, fn, parentScope, args, mkJson)(ctx, rootScope)
+  }
+
+  def callJsFunctionBoolean(
+    rawJs: String,
+    fn: RhinoFunction,
+    parentScope: Scriptable,
+    args: Array[JsValue])(implicit ctx: Context, rootScope: Scriptable): Either[JavascriptError, Boolean] = {
+    def mkBoolean(o: Any): Boolean = {
+      Context.jsToJava(o, classOf[java.lang.Boolean]).asInstanceOf[Boolean]
+    }
+    callJsFunction(rawJs, fn, parentScope, args, mkBoolean)(ctx, rootScope)
+  }
+
+  def callJsFunction[A](
+    rawJs: String,
+    fn: RhinoFunction,
+    parentScope: Scriptable,
+    args: Array[JsValue],
+    makeResult: Any => A)(implicit ctx: Context, rootScope: Scriptable): Either[JavascriptError, A] = {
     try {
       val jsArgs: Array[AnyRef] = args.toArray.map(jsObject(_))
       val result = fn.call(ctx, rootScope, parentScope, jsArgs)
-      val jsonString: Any = toJsonString.call(ctx, rootScope, rootScope, Array(result))
-      val jsonOut = Json.parse(jsonString.toString)
-      Right(jsonOut)
+      Right(makeResult(result))
     } catch {
       case e: EcmaError => Left(RhinoJsError(e))
       case e: Throwable => throw new RuntimeException("General error while processing js", e)

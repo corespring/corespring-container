@@ -60,9 +60,11 @@ angular.module('corespring-player.services').factory('ComponentRegister', ['$log
         var sessions = {};
 
         for (var x in components) {
-          var s = components[x].getSession();
-          if (s) {
-            sessions[x] = s;
+          if(components[x].getSession){
+            var s = components[x].getSession();
+            if (s) {
+              sessions[x] = s;
+            }
           }
         }
         return sessions;

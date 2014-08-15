@@ -21,7 +21,7 @@ trait DependencyResolver extends ComponentSplitter {
   }
 
   def resolveComponents(ids: Seq[Id], scope: Option[String] = None): Seq[Component] = {
-    logger.debug(s"[resolveComponents] id: ${ids.mkString(",")}, scope: $scope")
+    logger.debug(s"[resolveComponents] id: ${ids.map(_.name).mkString(",")}, scope: $scope")
     val sortedIds = resolveIds(ids, scope)
     val out = sortedIds.flatMap(id => components.find { c => c.id.orgNameMatch(id) })
 
