@@ -3,7 +3,9 @@ package org.corespring.container.components.outcome
 import org.corespring.container.logging.ContainerLogger
 import play.api.libs.json.{ JsValue, JsObject, JsNumber, Json }
 
-object DefaultScoreProcessor extends ScoreProcessor {
+trait DefaultScoreProcessor extends ScoreProcessor {
+
+  def isComponentScoreable(compType: String, comp: JsValue, session: JsValue, outcome: JsValue): Boolean
 
   lazy val logger = ContainerLogger.getLogger("DefaultScoreProcessor")
 
@@ -15,21 +17,37 @@ object DefaultScoreProcessor extends ScoreProcessor {
     logger.trace(s"[score] session: ${Json.stringify(session)}")
     logger.trace(s"[score] outcomes: ${Json.stringify(outcomes)}")
 
-    val components = (item \ "components").as[JsObject]
+    lazy val scoreableComponents: Seq[(String, JsValue)] = (item \ "components").asOpt[JsObject].map { c =>
 
-    val weights: Seq[(String, Int)] = components.keys.map {
-      k =>
+      c.fields.flatMap {
+        case (key, json) =>
+          for {
+            compType <- (json \ "componentType").asOpt[String]
+            compSession <- (session \ "components" \ key).asOpt[JsValue].orElse(Some(Json.obj()))
+            compOutcome <- (outcomes \ "components" \ key).asOpt[JsValue].orElse(Some(Json.obj()))
+            if (isComponentScoreable(compType, json, compSession, compOutcome))
+          } yield {
+            (key, json)
+          }
+      }
+    }.getOrElse {
+      throw new RuntimeException(s"Json has no components field: ${Json.stringify(item)}")
+    }
 
-        logger.trace(s"model for: $k")
-        val comp = (item \ "components" \ k).as[JsObject]
-        (k, (comp \ "weight").asOpt[Int].getOrElse(1))
+    logger.trace(s"scoreable components: ${Json.stringify(JsObject(scoreableComponents))}")
+    println(s"scoreable components: ${Json.stringify(JsObject(scoreableComponents))}")
+
+    val weights: Seq[(String, Int)] = scoreableComponents.map {
+      case (key, json) =>
+        logger.trace(s"model for: $key")
+        (key, (json \ "weight").asOpt[Int].getOrElse(1))
     }.toSeq
 
     val maxPoints = weights.map(_._2).fold(0)(_ + _)
 
-    val componentScores = components.keys.foldRight[JsObject](Json.obj()) {
-      (key: String, acc: JsObject) =>
-
+    val componentScores = scoreableComponents.foldRight[JsObject](Json.obj()) {
+      (tuple: (String, JsValue), acc: JsObject) =>
+        val (key, _) = tuple
         val weight = weights.find(_._1 == key).map(_._2).getOrElse(-1)
         val score = (outcomes \ key \ "score").asOpt[BigDecimal].map(v => decimalize(v)).getOrElse(0.0)
         val weightedScore = decimalize(weight * score)
@@ -43,7 +61,9 @@ object DefaultScoreProcessor extends ScoreProcessor {
     }
 
     val points = getSumOfWeightedScores(componentScores)
-    val rawPercentage = (points / maxPoints) * 100
+    println(points)
+    println(maxPoints)
+    val rawPercentage: BigDecimal = if (maxPoints == 0) 0 else (points / maxPoints) * 100
     val percentage = decimalize(rawPercentage, 1)
 
     val summary = Json.obj(

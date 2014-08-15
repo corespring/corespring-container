@@ -53,7 +53,7 @@ object Global extends WithFilters(AccessControlFilter, CallBlockOnHeaderFilter) 
     }
 
     CallBlockOnHeaderFilter.block = (rh: RequestHeader) => {
-      if ((rh.path.contains(".html") || rh.path.contains("player")) && componentLoader != null) {
+      if ((rh.path.contains(".html") || rh.path.endsWith("player")) && componentLoader != null) {
         logger.info("-------------------------> reload components!")
         componentLoader.reload
       }
