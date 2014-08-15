@@ -11,22 +11,24 @@ class DefaultScoreProcessorTest extends Specification {
 
     "generate an score for one component" in {
 
-      ("""{"components":{"3":{"weight":4}}}""", """{"3":{"score":1.0}}""") must GenerateOutcome("""
+      (
+        """
+          {"components":{"3":{"componentType" : "a", "weight":4}}}""".stripMargin, """{"3":{"score":1.0}}""") must
+        GenerateOutcome("""
          {
            "summary" : { "maxPoints" : 4, "points" : 4.0, "percentage" : 100.0 },
            "components" : {
              "3" : { "weight" : 4, "score" : 1.0, "weightedScore" : 4.0}
            }
-         }
-                                                                                                  """)
+         }""")
     }
 
     "generate an score for two component" in {
 
       val item = """{
              "components": {
-               "3" : {"weight":4},
-               "4" : {"weight":5}
+               "3" : {"weight":4, "componentType" : "a"},
+               "4" : {"weight":5, "componentType" : "b"}
              }
            }"""
       val responses = """{
@@ -49,8 +51,8 @@ class DefaultScoreProcessorTest extends Specification {
 
       val item = """{
              "components": {
-               "1" : {"weight":1},
-               "2" : {"weight":1}
+               "1" : {"weight":1, "componentType" : "a"},
+               "2" : {"weight":1, "componentType" : "b"}
              }
            }"""
       val responses = """{
@@ -73,8 +75,8 @@ class DefaultScoreProcessorTest extends Specification {
 
       val item = """{
              "components": {
-               "1" : {"weight":1},
-               "2" : {"weight":0}
+               "1" : {"weight":1, "componentType" : "a"},
+               "2" : {"weight":0, "componentType" : "b" }
              }
            }"""
       val responses = """{
@@ -93,6 +95,7 @@ class DefaultScoreProcessorTest extends Specification {
 
       (item, responses) must GenerateOutcome(expected)
     }
+
     "filters non scoreable components" in {
 
       val item = """{
@@ -138,19 +141,21 @@ class DefaultScoreProcessorTest extends Specification {
 
   case class GenerateOutcome(expectedOutcome: String, isScoreable: (String, JsValue, JsValue, JsValue) => Boolean = allScoreable) extends Matcher[(String, String)] {
 
+    val processor = new DefaultScoreProcessor {
+      override def isComponentScoreable(compType: String, comp: JsValue, session: JsValue,
+        outcome: JsValue): Boolean = isScoreable(compType, comp, session, outcome)
+    }
+
     def apply[S <: (String, String)](s: Expectable[S]) = {
-      result(matchesOutcome(s.value._1, s.value._2),
+      val outcome = processor.score(Json.parse(s.value._1), Json.obj(), Json.parse(s.value._2))
+      val matches = matchesOutcome(outcome)
+      result(matches,
         s"${s.description} generates expected score",
-        s"${s.description} does not generate expected score",
+        s"${s.description} does not generate expected score: ${Json.stringify(outcome)}",
         s)
     }
 
-    private def matchesOutcome(itemDefinition: String, responses: String): Boolean = {
-      val processor = new DefaultScoreProcessor {
-        override def isComponentScoreable(compType: String, comp: JsValue, session: JsValue,
-          outcome: JsValue): Boolean = isScoreable(compType, comp, session, outcome)
-      }
-      val outcome = processor.score(Json.parse(itemDefinition), Json.obj(), Json.parse(responses))
+    private def matchesOutcome(outcome: JsValue): Boolean = {
       JsonCompare.caseInsensitiveSubTree(Json.stringify(outcome), expectedOutcome) match {
         case Right(_) => true
         case Left(diffs) => {

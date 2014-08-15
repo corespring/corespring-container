@@ -21,6 +21,9 @@ trait DefaultScoreProcessor extends ScoreProcessor {
 
       c.fields.flatMap {
         case (key, json) =>
+
+          require((json \ "componentType").asOpt[String].isDefined, "No component type specified")
+
           for {
             compType <- (json \ "componentType").asOpt[String]
             compSession <- (session \ "components" \ key).asOpt[JsValue].orElse(Some(Json.obj()))
@@ -35,7 +38,6 @@ trait DefaultScoreProcessor extends ScoreProcessor {
     }
 
     logger.trace(s"scoreable components: ${Json.stringify(JsObject(scoreableComponents))}")
-    println(s"scoreable components: ${Json.stringify(JsObject(scoreableComponents))}")
 
     val weights: Seq[(String, Int)] = scoreableComponents.map {
       case (key, json) =>

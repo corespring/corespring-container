@@ -9,13 +9,21 @@ object api {
 
     def createOutcome(question: JsValue, response: JsValue, settings: JsValue, targetOutcome: JsValue): JsValue
 
-
     /**
      * Preprocess the item. If there is now implementation available - return the input
      * @param question
      * @return
      */
     def preProcessItem(question: JsValue): JsValue
+
+    /**
+     * Is this component scoreable?
+     * @param question
+     * @param response
+     * @param outcome
+     * @return
+     */
+    def isScoreable(question: JsValue, response: JsValue, outcome: JsValue): Boolean
   }
 
   trait CustomScoringJs {
@@ -25,7 +33,7 @@ object api {
      * @param session
      * @return json : { score: 0.0 - 1.0 }
      */
-    def process(item: JsValue, session:JsValue): JsValue
+    def process(item: JsValue, session: JsValue): JsValue
   }
 
   trait GetServerLogic {
