@@ -26,7 +26,7 @@ trait DefaultIntegration
   with HasConfig
   with HasProcessors {
 
-  lazy val logger = ContainerLogger.getLogger("DefaultIntegration")
+  private lazy val logger = ContainerLogger.getLogger("DefaultIntegration")
 
   def validate: Either[String, Boolean] = {
     val componentsPath = configuration.getString("components.path").getOrElse("components")
