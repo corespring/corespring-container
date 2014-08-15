@@ -13,8 +13,9 @@ import org.corespring.container.components.outcome.{ DefaultScoreProcessor, Scor
 import org.corespring.container.components.processing.PlayerItemPreProcessor
 import org.corespring.container.components.response.OutcomeProcessor
 import org.corespring.container.js.rhino.score.CustomScoreProcessor
-import org.corespring.container.js.rhino.{ RhinoOutcomeProcessor, RhinoPlayerItemPreProcessor }
-import play.api.{ Play, Mode }
+import org.corespring.container.js.rhino.{ RhinoScopeBuilder, RhinoOutcomeProcessor, RhinoPlayerItemPreProcessor }
+import org.corespring.container.logging.ContainerLogger
+import play.api.{ Mode, Play }
 
 import scala.concurrent.ExecutionContext
 
@@ -24,6 +25,8 @@ trait DefaultIntegration
   with HasHooks
   with HasConfig
   with HasProcessors {
+
+  lazy val logger = ContainerLogger.getLogger("DefaultIntegration")
 
   def validate: Either[String, Boolean] = {
     val componentsPath = configuration.getString("components.path").getOrElse("components")
@@ -36,11 +39,29 @@ trait DefaultIntegration
 
   implicit def ec: ExecutionContext
 
-  override def playerItemPreProcessor: PlayerItemPreProcessor = new RhinoPlayerItemPreProcessor(DefaultIntegration.this.components)
+  override def playerItemPreProcessor: PlayerItemPreProcessor = new RhinoPlayerItemPreProcessor(DefaultIntegration.this.components, scopeBuilder.scope)
 
   override def scoreProcessor: ScoreProcessor = new ScoreProcessorSequence(DefaultScoreProcessor, CustomScoreProcessor)
 
-  override def outcomeProcessor: OutcomeProcessor = new RhinoOutcomeProcessor(DefaultIntegration.this.components)
+  private lazy val prodScopeBuilder = new RhinoScopeBuilder(DefaultIntegration.this.components)
+
+  private lazy val prodProcessor = new RhinoOutcomeProcessor(DefaultIntegration.this.components, scopeBuilder.scope)
+
+  def scopeBuilder = if (Play.current.mode == Mode.Prod) {
+    logger.trace("Prod RhinoScopeBuilder")
+    prodScopeBuilder
+  } else {
+    logger.trace("Dev RhinoScopeBuilder")
+    new RhinoScopeBuilder(DefaultIntegration.this.components)
+  }
+
+  def outcomeProcessor: OutcomeProcessor = if (Play.current.mode == Mode.Prod) {
+    logger.trace("Prod OutcomeProcessor")
+    prodProcessor
+  } else {
+    logger.trace("Dev OutcomeProcessor")
+    new RhinoOutcomeProcessor(DefaultIntegration.this.components, scopeBuilder.scope)
+  }
 
   lazy val rig = new Rig {
     override implicit def ec: ExecutionContext = DefaultIntegration.this.ec

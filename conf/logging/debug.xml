@@ -14,7 +14,7 @@
     </appender>
     <logger name="play" level="DEBUG" />
     <logger name="application" level="DEBUG" />
-    <logger name="container" level="TRACE" />
+    <logger name="org.corespring.container" level="TRACE" />
 
     <root level="INFO">
         <appender-ref ref="STDOUT" />

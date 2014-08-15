@@ -1,0 +1,8 @@
+{
+    "name" : "load-outcome-perf-test",
+    "description" : "see where the slowness is with load outcome",
+    "devDependencies" : {
+      "mongodb" : "~1.4.7",
+      "lodash" : "~2.4.1"
+    }
+}
