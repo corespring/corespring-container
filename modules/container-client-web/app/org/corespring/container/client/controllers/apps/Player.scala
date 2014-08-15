@@ -1,5 +1,6 @@
 package org.corespring.container.client.controllers.apps
 
+import org.corespring.container.client.VersionInfo
 import org.corespring.container.client.component.PlayerItemTypeReader
 import org.corespring.container.client.controllers.jade.Jade
 import org.corespring.container.client.controllers.player.PlayerQueryStringOptions
@@ -85,7 +86,8 @@ trait HtmlPlayer extends BasePlayer with Jade {
       "ngModules" -> s"[${deps.map(d => s"'$d'").mkString(",")}]",
       "js" -> js.toArray,
       "css" -> css.toArray,
-      "sessionJson" -> Json.stringify(json))
+      "sessionJson" -> Json.stringify(json),
+      "versionInfo" -> Json.stringify(VersionInfo.json))
     logger.trace(s"render jade with params: $params")
     renderJade(name, params)
   }
