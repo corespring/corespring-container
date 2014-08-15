@@ -63,8 +63,6 @@ trait DefaultScoreProcessor extends ScoreProcessor {
     }
 
     val points = getSumOfWeightedScores(componentScores)
-    println(points)
-    println(maxPoints)
     val rawPercentage: BigDecimal = if (maxPoints == 0) 0 else (points / maxPoints) * 100
     val percentage = decimalize(rawPercentage, 1)
 
