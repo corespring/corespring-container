@@ -100,7 +100,7 @@ The basic folder structure for all components is like so:
 ### isScoreable
     
     /**
-     * Some components aren't may not be scoreable in certain scenarios.
+     * Some components may not be scoreable in certain scenarios.
      * If this isn't defined the container assumes isScoreable == true.
      * By not being scoreable, the components outcome will not be used to calculate the item's score.
      */
