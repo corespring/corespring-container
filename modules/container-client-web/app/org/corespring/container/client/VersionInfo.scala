@@ -3,6 +3,7 @@ package org.corespring.container.client
 import java.util.Properties
 import play.api.Play
 import play.api.Play.current
+import play.api.libs.json.Json
 
 case class VersionInfo(version: String, branch: String, commitHash: String, date: String)
 
@@ -10,6 +11,12 @@ object VersionInfo {
   def make = {
     new VersionInfo(version, branch, commitHashShort, pushDate)
   }
+
+  def json = Json.obj(
+    "version" -> version,
+    "commitHash" -> commitHashShort,
+    "branch" -> branch,
+    "date" -> pushDate)
 
   val propsFile = "/container-client-web-buildInfo.properties"
 

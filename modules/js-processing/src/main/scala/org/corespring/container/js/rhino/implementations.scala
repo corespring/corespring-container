@@ -59,7 +59,7 @@ trait CustomScoringJs
         ctx.evaluateString(scope, wrapped, s"customScoring.process", 1, null)
         val scoringObject = getScoringObject(ctx, scope)
         val processFn = scoringObject.get("process", scoringObject).asInstanceOf[RhinoFunction]
-        callJsFunction(wrapped, processFn, scoringObject, Array(item, answers))
+        callJsFunctionJson(wrapped, processFn, scoringObject, Array(item, answers))
     }
 
     result match {
@@ -86,24 +86,27 @@ class RhinoServerLogic(componentType: String, scope: Scriptable)
     try {
       val context = Context.enter()
       val server = serverLogic(context, scope)
-      //TODO: rename 'respond' => 'createOutcome' in the components
-      server.get("respond", server) match {
-        case ut: UniqueTag => {
-          throw new RuntimeException("Error can't find function respond")
-        }
-        case fn: RhinoFunction => {
-          val result = callJsFunction("", fn, server, Array(question, response, settings, targetOutcome))(context, scope)
-          result match {
-            case Left(err) => {
-              logger.error(err.message)
-              throw new JavascriptProcessingException(err)
-            }
-            case Right(json) => json.asInstanceOf[JsObject] ++ Json.obj("studentResponse" -> response)
+      def execute(fn: RhinoFunction) = {
+        val result = callJsFunctionJson("", fn, server, Array(question, response, settings, targetOutcome))(context, scope)
+        result match {
+          case Left(err) => {
+            logger.error(err.message)
+            throw new JavascriptProcessingException(err)
           }
-
+          case Right(json) => json.asInstanceOf[JsObject] ++ Json.obj("studentResponse" -> response)
         }
-      } //.asInstanceOf[RhinoFunction]
+      }
 
+      server.get("createOutcome", server) match {
+        case fn: RhinoFunction => execute(fn)
+        case ut: UniqueTag => {
+          logger.warn(s"$componentType : Function 'createOutcome' not found, attempting with old name 'respond' - change this!")
+          server.get("respond", server) match {
+            case fn: RhinoFunction => execute(fn)
+            case uut: UniqueTag => throw new RuntimeException(s"$componentType : Error can't find function respond")
+          }
+        }
+      }
     } catch {
       case e: Throwable => {
         logger.error(e.getMessage)
@@ -120,7 +123,7 @@ class RhinoServerLogic(componentType: String, scope: Scriptable)
     server.get("preprocess", server) match {
       case ut: UniqueTag => question
       case fn: RhinoFunction => {
-        val result = callJsFunction("", fn, server, Array(question))(context, scope)
+        val result = callJsFunctionJson("", fn, server, Array(question))(context, scope)
         result match {
           case Left(err) => throw JavascriptProcessingException(err)
           case Right(json) => json
@@ -133,6 +136,28 @@ class RhinoServerLogic(componentType: String, scope: Scriptable)
     }
   } finally {
     Context.exit()
+  }
+
+  /**
+   * Is this component scoreable?
+   * @param question
+   * @param response
+   * @param outcome
+   * @return
+   */
+  override def isScoreable(question: JsValue, response: JsValue, outcome: JsValue): Boolean = try {
+    val context = Context.enter()
+    val server = serverLogic(context, scope)
+    server.get("isScoreable", server) match {
+      case ut: UniqueTag => true
+      case fn: RhinoFunction => {
+        val result = callJsFunctionBoolean("", fn, server, Array(question, response, outcome))(context, scope)
+        result match {
+          case Left(err) => throw JavascriptProcessingException(err)
+          case Right(scoreable) => scoreable
+        }
+      }
+    }
   }
 }
 

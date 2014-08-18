@@ -13,8 +13,9 @@ import org.corespring.container.components.outcome.{ DefaultScoreProcessor, Scor
 import org.corespring.container.components.processing.PlayerItemPreProcessor
 import org.corespring.container.components.response.OutcomeProcessor
 import org.corespring.container.js.rhino.score.CustomScoreProcessor
-import org.corespring.container.js.rhino.{ RhinoScopeBuilder, RhinoOutcomeProcessor, RhinoPlayerItemPreProcessor }
+import org.corespring.container.js.rhino.{ RhinoServerLogic, RhinoScopeBuilder, RhinoOutcomeProcessor, RhinoPlayerItemPreProcessor }
 import org.corespring.container.logging.ContainerLogger
+import play.api.libs.json.JsValue
 import play.api.{ Mode, Play }
 
 import scala.concurrent.ExecutionContext
@@ -41,7 +42,17 @@ trait DefaultIntegration
 
   override def playerItemPreProcessor: PlayerItemPreProcessor = new RhinoPlayerItemPreProcessor(DefaultIntegration.this.components, scopeBuilder.scope)
 
-  override def scoreProcessor: ScoreProcessor = new ScoreProcessorSequence(DefaultScoreProcessor, CustomScoreProcessor)
+  /**
+   * Plug isScoreable into the components js server logic.
+   */
+  private lazy val mainScoreProcessor = new DefaultScoreProcessor {
+    override def isComponentScoreable(compType: String, comp: JsValue, session: JsValue, outcome: JsValue): Boolean = {
+      val serverLogic = new RhinoServerLogic(compType, scopeBuilder.scope)
+      serverLogic.isScoreable(comp, session, outcome)
+    }
+  }
+
+  override def scoreProcessor: ScoreProcessor = new ScoreProcessorSequence(mainScoreProcessor, CustomScoreProcessor)
 
   private lazy val prodScopeBuilder = new RhinoScopeBuilder(DefaultIntegration.this.components)
 

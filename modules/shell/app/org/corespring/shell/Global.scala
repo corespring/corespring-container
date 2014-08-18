@@ -53,8 +53,8 @@ object Global extends WithFilters(AccessControlFilter, CallBlockOnHeaderFilter) 
     }
 
     CallBlockOnHeaderFilter.block = (rh: RequestHeader) => {
-      if (rh.path.contains(".html") && componentLoader != null) {
-        logger.info("reload components!")
+      if ((rh.path.contains(".html") || rh.path.endsWith("player")) && componentLoader != null) {
+        logger.info("-------------------------> reload components!")
         componentLoader.reload
       }
     }
@@ -65,7 +65,7 @@ object Global extends WithFilters(AccessControlFilter, CallBlockOnHeaderFilter) 
     val out = new FileComponentLoader(Play.current.configuration.getString("components.path").toSeq, onlyProcessReleased)
     out.reload
 
-    if(out.all.length == 0){
+    if (out.all.length == 0) {
       throw new RuntimeException("Can't load any components - check the path!")
     }
 
