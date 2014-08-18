@@ -94,7 +94,7 @@ The basic folder structure for all components is like so:
      *   - response: an response object for the client side part of your component - typically contains feedback
      *   - score: a value from 0.0 - 1.0
      */
-    exports.respond(question, answer, settings, targetOutcomes)
+    exports.createOutcome(question, answer, settings, targetOutcomes)
     
 
 ### isScoreable
