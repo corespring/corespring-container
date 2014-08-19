@@ -56,9 +56,6 @@ exports.define = function(isSecure) {
       if (options.mode === "gather" && options.sessionId) {
         path = options.paths.gatherSession;
       }
-      if (options.showPreview === true) {
-        path += "#/?showPreviewButton";
-      }
       return (options.corespringUrl + path).replace(":id", id);
     };
 
