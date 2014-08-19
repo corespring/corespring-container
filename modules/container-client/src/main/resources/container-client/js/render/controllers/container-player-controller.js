@@ -3,9 +3,9 @@ angular.module('corespring-player.controllers')
     'ContainerPlayerController', [
       '$log',
       '$scope',
-      function($log, $scope) {
-
-        $scope.playerMode = 'gather';
+      '$location',
+      function($log, $scope, $location) {
+        $scope.showPreviewButton = ($location.search().showPreviewButton) ? 'true' : 'false';
 
         $scope.playerSettings = {
           maxNoOfAttempts: 1,

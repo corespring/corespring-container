@@ -6,7 +6,7 @@ block player-content
 
     div(ng-controller="Main")
 
-      div(player-control-panel,data-mode='playerMode', data-settings='playerSettings', data-score="score", data-show-preview-button="false")
+      div(player-control-panel,data-mode='playerMode', data-settings='playerSettings', data-score="score", show-preview-button="{{showPreviewButton}}")
 
       .player-container
         div(corespring-player,
