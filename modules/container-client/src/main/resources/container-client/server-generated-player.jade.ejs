@@ -36,10 +36,13 @@ html(xmlns='http://www.w3.org/1999/html')
     //[if lte IE 9]> <script src="//cdnjs.cloudflare.com/ajax/libs/json3/3.2.6/json3.min.js"></script> <![endif]
 
     script(src="../../components/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML", type="text/javascript")
+    
+    //Disable client side build here
+    //Instead - the js will be added by the server.
+    //<% for(i in scripts) { %>
+    //script(type='text/javascript', src='<%= scripts[i] %>')
+    //<% } %>
 
-    <% for(i in scripts) { %>
-    script(type='text/javascript', src='<%= scripts[i] %>')
-    <% } %>
 
     for j in js
       script(type='text/javascript', src='#{j}')

@@ -29,6 +29,8 @@ class ContainerClientImplementation(
   componentsIn: => Seq[Component],
   val configuration: Configuration) extends DefaultIntegration {
 
+  override def resolveDomain(path:String) : String = s"http://some.cdn.com/$path"
+
   lazy val logger = ContainerLogger.getLogger("ContainerClientImplementation")
 
   override def components: Seq[Component] = componentsIn
@@ -195,4 +197,3 @@ trait LoadJs {
     PlayerJs(isSecure, updatedSession, errors)
   }
 }
-

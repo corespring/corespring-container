@@ -27,6 +27,11 @@ trait DefaultIntegration
   with HasConfig
   with HasProcessors {
 
+  /**
+    * For a given resource path return a resolved path
+    */
+  def resolveDomain(path:String) : String
+
   private lazy val logger = ContainerLogger.getLogger("DefaultIntegration")
 
   def validate: Either[String, Boolean] = {
@@ -153,6 +158,8 @@ trait DefaultIntegration
     override def components: Seq[Component] = DefaultIntegration.this.components
 
     override def hooks = playerHooks
+
+    override def resolveDomain(path:String) : String = DefaultIntegration.this.resolveDomain(path)
   }
 
   lazy val item = new Item {
@@ -188,4 +195,3 @@ trait DefaultIntegration
     override def hooks: DataQueryHooks = dataQueryHooks
   }
 }
-
