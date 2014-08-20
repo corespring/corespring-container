@@ -28,9 +28,11 @@ trait DefaultIntegration
   with HasProcessors {
 
   /**
-    * For a given resource path return a resolved path
-    */
-  def resolveDomain(path:String) : String
+   * For a given resource path return a resolved path.
+   * By default this just returns the path, so no domain is used.
+   * Override it if you want to make use of it.
+   */
+  def resolveDomain(path: String): String = path
 
   private lazy val logger = ContainerLogger.getLogger("DefaultIntegration")
 
@@ -146,7 +148,7 @@ trait DefaultIntegration
 
     override def hooks = playerHooks
 
-    override def resolveDomain(path:String) : String = DefaultIntegration.this.resolveDomain(path)
+    override def resolveDomain(path: String): String = DefaultIntegration.this.resolveDomain(path)
   }
 
   lazy val item = new Item {
