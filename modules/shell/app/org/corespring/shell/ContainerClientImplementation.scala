@@ -29,7 +29,13 @@ class ContainerClientImplementation(
   componentsIn: => Seq[Component],
   val configuration: Configuration) extends DefaultIntegration {
 
-  override def resolveDomain(path:String) : String = s"http://some.cdn.com/$path"
+  override def resolveDomain(path:String) : String = {
+    val separator = if(path.startsWith("/")) "" else "/"
+    configuration.getString("cdn.domain").map{ d =>
+      logger.trace(s"cdn.domain: $d")
+      s"$d$separator$path"
+    }.getOrElse(path)
+  }
 
   lazy val logger = ContainerLogger.getLogger("ContainerClientImplementation")
 

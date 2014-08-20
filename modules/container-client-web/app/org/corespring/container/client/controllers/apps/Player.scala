@@ -76,9 +76,15 @@ trait BasePlayer
 
 trait JsonPlayer extends BasePlayer {}
 
-trait HtmlPlayer extends BasePlayer with Jade {
+/**
+ * The ProdHtmlPlayer serves server side generated html.
+ * This is to speed up this player load time and performance
+ */
+trait ProdHtmlPlayer extends BasePlayer with Jade {
 
   val name = "server-generated-player.jade"
+
+  val prefix = v2Player.Routes.prefix
 
   def template(html: String, deps: Seq[String], js: Seq[String], css: Seq[String], json: JsValue) = {
     val params: Map[String, Object] = Map(
@@ -92,16 +98,25 @@ trait HtmlPlayer extends BasePlayer with Jade {
     renderJade(name, params)
   }
 
-  def coreJs: Seq[String] = Seq.empty
+  def coreJs = Seq(
+    s"$prefix/components/mathjax/MathJax.js")
 
-  def coreCss: Seq[String] = Seq.empty
+  def coreCss = Seq(
+    s"$prefix/css/player.min.css",
+    s"$prefix/components/font-awesome/css/font-awesome.min.css")
 
   def resolveDomain(path: String): String = path
 
+  /**
+   * A temporary means of defining paths that may be resolved
+   */
   private def resolvePath(s: String): String = {
-    if (s.contains("component-sets/") ||
-      s.contains("components/") ||
-      s.contains("player.min")) resolveDomain(s) else s
+    val needsResolution = Seq(
+      "component-sets/",
+      "components/",
+      "player-services.js",
+      "player.min").exists(s.contains)
+    if (needsResolution) resolveDomain(s) else s
   }
 
   override def config(id: String) = Action.async { implicit request =>
@@ -123,7 +138,6 @@ trait HtmlPlayer extends BasePlayer with Jade {
         val clientSideDependencies = getClientSideDependencies(resolvedComponents)
         val dependencies = ngModules.createAngularModules(resolvedComponents, clientSideDependencies)
 
-        //TODO: Add root-player.js and other js resources...
         val js = coreJs ++ (additionalScripts :+ jsUrl).distinct
 
         val domainResolvedJs = js.map(resolvePath)
@@ -141,18 +155,4 @@ trait HtmlPlayer extends BasePlayer with Jade {
       }
     }
   }
-}
-
-trait DevHtmlPlayer extends HtmlPlayer {
-  override def config(id: String) = Action(SeeOther(org.corespring.container.client.controllers.apps.routes.ProdHtmlPlayer.config(id).url))
-}
-
-trait ProdHtmlPlayer extends HtmlPlayer {
-
-  override def coreJs = Seq(
-    s"/client/components/mathjax/MathJax.js")
-
-  override def coreCss = Seq(
-    "/client/css/player.min.css",
-    "/client/components/font-awesome/css/font-awesome.min.css")
 }

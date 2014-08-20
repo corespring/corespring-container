@@ -134,19 +134,6 @@ trait DefaultIntegration
     override def hooks = playerHooks
   }
 
-  lazy val devHtmlPlayer = new DevHtmlPlayer {
-
-    override def showErrorInUi: Boolean = DefaultIntegration.this.showErrorInUi
-
-    override implicit def ec: ExecutionContext = DefaultIntegration.this.ec
-
-    override def urls: ComponentUrls = componentSets
-
-    override def components: Seq[Component] = DefaultIntegration.this.components
-
-    override def hooks = playerHooks
-  }
-
   lazy val prodHtmlPlayer = new ProdHtmlPlayer {
 
     override def showErrorInUi: Boolean = DefaultIntegration.this.showErrorInUi
