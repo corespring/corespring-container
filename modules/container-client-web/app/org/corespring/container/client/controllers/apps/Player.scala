@@ -99,7 +99,9 @@ trait ProdHtmlPlayer extends BasePlayer with Jade {
   }
 
   def coreJs = Seq(
-    s"$prefix/components/mathjax/MathJax.js")
+    s"$prefix/components/mathjax/MathJax.js",
+    s"$prefix/js/root-prod-player.min.js"
+)
 
   def coreCss = Seq(
     s"$prefix/css/player.min.css",
