@@ -99,9 +99,8 @@ trait ProdHtmlPlayer extends BasePlayer with Jade {
   }
 
   def coreJs = Seq(
-    s"$prefix/components/mathjax/MathJax.js",
-    s"$prefix/js/root-prod-player.min.js"
-)
+    s"$prefix/js/root-prod-player.js",
+    s"$prefix/components/mathjax/MathJax.js")
 
   def coreCss = Seq(
     s"$prefix/css/player.min.css",
@@ -116,6 +115,7 @@ trait ProdHtmlPlayer extends BasePlayer with Jade {
     val needsResolution = Seq(
       "component-sets/",
       "components/",
+      "root-prod-player",
       "player-services.js",
       "player.min").exists(s.contains)
     if (needsResolution) resolveDomain(s) else s
