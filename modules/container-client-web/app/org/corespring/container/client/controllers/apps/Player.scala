@@ -92,6 +92,18 @@ trait HtmlPlayer extends BasePlayer with Jade {
     renderJade(name, params)
   }
 
+  def coreJs: Seq[String] = Seq.empty
+
+  def coreCss: Seq[String] = Seq.empty
+
+  def resolveDomain(path: String): String = path
+
+  private def resolvePath(s: String): String = {
+    if (s.contains("component-sets/") ||
+      s.contains("components/") ||
+      s.contains("player.min")) resolveDomain(s) else s
+  }
+
   override def config(id: String) = Action.async { implicit request =>
 
     hooks.loadSessionAndItem(id).map {
@@ -110,10 +122,22 @@ trait HtmlPlayer extends BasePlayer with Jade {
 
         val clientSideDependencies = getClientSideDependencies(resolvedComponents)
         val dependencies = ngModules.createAngularModules(resolvedComponents, clientSideDependencies)
-        val js = (additionalScripts :+ jsUrl).distinct
-        val css = Seq(cssUrl)
 
-        Ok(template(processXhtml((itemJson \ "xhtml").asOpt[String]), dependencies, js, css, Json.obj("session" -> session, "item" -> itemJson)))
+        //TODO: Add root-player.js and other js resources...
+        val js = coreJs ++ (additionalScripts :+ jsUrl).distinct
+
+        val domainResolvedJs = js.map(resolvePath)
+        val css = coreCss :+ cssUrl
+        val domainResolvedCss = css.map(resolvePath)
+
+        Ok(
+          template(
+            processXhtml(
+              (itemJson \ "xhtml").asOpt[String]),
+            dependencies,
+            domainResolvedJs,
+            domainResolvedCss,
+            Json.obj("session" -> session, "item" -> itemJson)))
       }
     }
   }
@@ -123,4 +147,12 @@ trait DevHtmlPlayer extends HtmlPlayer {
   override def config(id: String) = Action(SeeOther(org.corespring.container.client.controllers.apps.routes.ProdHtmlPlayer.config(id).url))
 }
 
-trait ProdHtmlPlayer extends HtmlPlayer {}
+trait ProdHtmlPlayer extends HtmlPlayer {
+
+  override def coreJs = Seq(
+    s"/client/components/mathjax/MathJax.js")
+
+  override def coreCss = Seq(
+    "/client/css/player.min.css",
+    "/client/components/font-awesome/css/font-awesome.min.css")
+}
