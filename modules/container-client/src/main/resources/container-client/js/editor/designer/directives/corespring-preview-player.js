@@ -1,9 +1,10 @@
 angular.module('corespring-editor.directives').directive('corespringPreviewPlayer', [
   '$log',
   '$rootScope',
+  '$compile',
   'ComponentRegister',
   'CorespringPlayerDefinition',
-  function($log, $rootScope, ComponentRegister, CorespringPlayerDefinition) {
+  function($log, $rootScope, $compile, ComponentRegister, CorespringPlayerDefinition) {
     // TODO: Stop using id attributes for this!
     function getComponentById(id) {
       return $(_.find($('corespring-preview-player #' + id), function(el) {
@@ -11,13 +12,14 @@ angular.module('corespring-editor.directives').directive('corespringPreviewPlaye
       }));
     }
 
-    function postRender() {
+    function postRender($scope, $element) {
       _(ComponentRegister.components).keys().each(function(id) {
         var comp = getComponentById(id);
         if (parseInt(id, 10) === $rootScope.selectedComponentId) {
-          comp.addClass('selected');
+          comp.parent().addClass('selected');
         }
-        getComponentById(id).addClass('component-container');
+        getComponentById(id).wrap('<component-container class="component-container"></component-container>');
+        $compile($(getComponentById(id)).parent())($scope);
       });
     }
 
@@ -25,13 +27,13 @@ angular.module('corespring-editor.directives').directive('corespringPreviewPlaye
 
       function selectContainer(id) {
         $('.player-body .selected').removeClass('selected');
-        if (getComponentById(id).hasClass('component-container')) {
-          getComponentById(id).addClass('selected');
+        if (getComponentById(id).parent().prop('tagName') === 'component-container') {
+          getComponentById(id).parent().addClass('selected');
           $scope.selectedComponentId = id;
           $scope.$apply();
 
-          if ($('.component-container.selected').size() > 0) {
-            var target = $('.component-container.selected')[0];
+          if ($('component-container.selected').size() > 0) {
+            var target = $('component-container.selected')[0];
             target.scrollIntoView();
           }
         } else {
