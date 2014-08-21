@@ -13,14 +13,39 @@ angular.module('corespring-editor.directives').directive('corespringPreviewPlaye
     }
 
     function postRender($scope, $element) {
+
+      function renderComponent(id) {
+        console.log('ComponentRegister:', ComponentRegister);
+        var component = {
+          'componentType' : 'corespring-multiple-choice',
+          'label' : 'multiple-choice'
+        };
+
+        getComponentById(id).wrap([
+          '<placeholder',
+            'id="' + id + '"',
+            'component-type="' + component.componentType + '"',
+            'label="' + component.label + '"',
+            'configurable="false"',
+          '>',
+          '</placeholder>'
+        ].join(' '));
+
+        $compile($element)($scope);
+      }
+
       _(ComponentRegister.components).keys().each(function(id) {
         var comp = getComponentById(id);
         if (parseInt(id, 10) === $rootScope.selectedComponentId) {
           comp.parent().addClass('selected');
         }
-        getComponentById(id).wrap('<component-container class="component-container"></component-container>');
+
+        setTimeout(function() {
+          renderComponent(id);
+        }, 2000);
+
       });
-      $compile($element)($scope);
+
     }
 
     function postLink($scope) {

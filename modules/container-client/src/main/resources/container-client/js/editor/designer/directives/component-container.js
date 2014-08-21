@@ -3,7 +3,7 @@ angular.module('corespring-editor.directives').directive('componentContainer', [
   function() {
 
     function link($scope) {
-      console.log('linking the container...');
+      console.log('linking the container...', $scope);
     }
 
     return {
@@ -12,7 +12,7 @@ angular.module('corespring-editor.directives').directive('componentContainer', [
       transclude: true,
       template: [
         '<img src=""/>',
-        '<div class="component-body" ng-transclude/>'
+        '<div class="component-body" ng-transclude />'
       ].join('')
     };
   }

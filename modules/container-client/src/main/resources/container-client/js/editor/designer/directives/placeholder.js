@@ -9,6 +9,8 @@ var Placeholder = function(
 
   function link($scope, $element, $attrs) {
 
+    $scope.configurable = $scope.canConfig !== 'false';
+
     $scope.title = '';
     $scope.componentPreview = null;
 
@@ -147,14 +149,15 @@ var Placeholder = function(
     scope: {
       label: '@',
       componentType: '@',
-      id: '@'
+      id: '@',
+      canConfig: '@configurable'
     },
     template: [
       '<div class="component-placeholder" ng-class="{\'show-icon\': showIcon}" data-component-id="{{id}}">',
       '  <div class="blocker">',
       '    <div class="bg"></div>',
       '    <div class="content"></div>',
-      '    <ul class="edit-controls">',
+      '    <ul ng-if="configurable" class="edit-controls">',
       '      <li class="edit-icon-button" tooltip="edit" tooltip-append-to-body="true" tooltip-placement="bottom">',
       '        <i ng-click="editNode($event)" class="fa fa-pencil"></i>',
       '      </li>',
