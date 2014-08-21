@@ -19,8 +19,8 @@ angular.module('corespring-editor.directives').directive('corespringPreviewPlaye
           comp.parent().addClass('selected');
         }
         getComponentById(id).wrap('<component-container class="component-container"></component-container>');
-        $compile($(getComponentById(id)).parent())($scope);
       });
+      $compile($element)($scope);
     }
 
     function postLink($scope) {

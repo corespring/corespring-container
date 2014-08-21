@@ -34,7 +34,7 @@ angular.module('corespring-player.services').factory('CorespringPlayerDefinition
           MathJaxService.parseDomForMath();
 
           if (_.isFunction(opts.postRender)) {
-            opts.postRender($scope, $elem);
+            opts.postRender($scope.lastScope, $body);
           }
         };
 

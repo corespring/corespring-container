@@ -10,7 +10,6 @@ angular.module('corespring-editor.directives').directive('componentContainer', [
       link: link,
       restrict: 'E',
       transclude: true,
-      scope: true,
       template: [
         '<img src=""/>',
         '<div class="component-body" ng-transclude/>'
