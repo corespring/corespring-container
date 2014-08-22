@@ -31,6 +31,12 @@ angular.module('corespring-player.services').factory('CorespringPlayerDefinition
           $scope.lastScope = $scope.$new();
           var $body = $elem.find(".player-body").html(xhtml);
           $compile($body)($scope.lastScope);
+
+          MathJaxService.onEndProcess(function(){
+            $('.player-body').show();
+            MathJaxService.off(arguments.callee);
+          });
+
           MathJaxService.parseDomForMath();
 
           if (_.isFunction(opts.postRender)) {
@@ -105,7 +111,9 @@ angular.module('corespring-player.services').factory('CorespringPlayerDefinition
             return;
           }
           ComponentRegister.setOutcomes(r);
-          MathJaxService.parseDomForMath();
+          //MathJaxService.parseDomForMath();
+
+          //MathJax.Hub.Startup.signal.Interest(function (message) {Message("Startup: "+message)});
         }, true);
 
         if (_.isFunction(opts.postLink)) {
@@ -124,7 +132,8 @@ angular.module('corespring-player.services').factory('CorespringPlayerDefinition
         session: '=playerSession'
       };
       this.template = ['<div class="corespring-player">',
-        '  <div class="player-body"></div>',
+        '  <div class="player-body" style="display: none"></div>',
+        //'  <div class="player-body" ></div>',
         '</div>'
       ].join("\n");
     }
