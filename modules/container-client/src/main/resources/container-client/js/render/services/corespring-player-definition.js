@@ -111,9 +111,7 @@ angular.module('corespring-player.services').factory('CorespringPlayerDefinition
             return;
           }
           ComponentRegister.setOutcomes(r);
-          //MathJaxService.parseDomForMath();
-
-          //MathJax.Hub.Startup.signal.Interest(function (message) {Message("Startup: "+message)});
+          MathJaxService.parseDomForMath();
         }, true);
 
         if (_.isFunction(opts.postLink)) {
@@ -131,9 +129,9 @@ angular.module('corespring-player.services').factory('CorespringPlayerDefinition
         outcomes: '=playerOutcomes',
         session: '=playerSession'
       };
-      this.template = ['<div class="corespring-player">',
+      this.template = [
+        '<div class="corespring-player">',
         '  <div class="player-body" style="display: none"></div>',
-        //'  <div class="player-body" ></div>',
         '</div>'
       ].join("\n");
     }
