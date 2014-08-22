@@ -154,10 +154,10 @@ var Placeholder = function(
     },
     template: [
       '<div class="component-placeholder" ng-class="{\'show-icon\': showIcon}" data-component-id="{{id}}">',
-      '  <div class="blocker">',
+      '  <div ng-if="configurable" class="blocker">',
       '    <div class="bg"></div>',
       '    <div class="content"></div>',
-      '    <ul ng-if="configurable" class="edit-controls">',
+      '    <ul class="edit-controls">',
       '      <li class="edit-icon-button" tooltip="edit" tooltip-append-to-body="true" tooltip-placement="bottom">',
       '        <i ng-click="editNode($event)" class="fa fa-pencil"></i>',
       '      </li>',
