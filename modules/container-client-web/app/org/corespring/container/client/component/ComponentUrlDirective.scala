@@ -11,7 +11,7 @@ import org.corespring.container.logging.ContainerLogger
  */
 object ComponentUrlDirective {
   lazy val logger = ContainerLogger.getLogger("ComponentUrlDirective")
-  val Regex = """(.*)\[(.*)\](.*)""".r
+  val Regex = """(.*)\[(.*)\].*""".r
   def apply(d: String, comps: Seq[Component]): Seq[String] = {
     val orgDirectives = d.split("\\+").toSeq.map { od => od match {
       case Regex(org, directive) => Some(OrgDirective(org, directive, comps.filter(_.id.org == org)))
