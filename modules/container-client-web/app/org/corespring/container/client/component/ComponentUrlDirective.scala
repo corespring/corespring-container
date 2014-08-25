@@ -1,6 +1,7 @@
 package org.corespring.container.client.component
 
 import org.corespring.container.components.model.Component
+import org.corespring.container.logging.ContainerLogger
 
 /**
  * Expand url directive to a list of component types.
@@ -9,13 +10,17 @@ import org.corespring.container.components.model.Component
  *   corespring[comp-one,comp-two] => Seq(corespring-comp-one,corespring-comp-two)
  */
 object ComponentUrlDirective {
-  val Regex = """(.*)\[(.*)\]""".r
+  lazy val logger = ContainerLogger.getLogger("ComponentUrlDirective")
+  val Regex = """(.*)\[(.*)\](.*)""".r
   def apply(d: String, comps: Seq[Component]): Seq[String] = {
-    val orgDirectives = d.split("\\+").toSeq.map { od =>
-      val Regex(org, directive) = od
-      OrgDirective(org, directive, comps.filter(_.id.org == org))
-    }
-    val all = orgDirectives.fold(Seq())(_ ++ _)
+    val orgDirectives = d.split("\\+").toSeq.map { od => od match {
+      case Regex(org, directive) => Some(OrgDirective(org, directive, comps.filter(_.id.org == org)))
+      case _ => {
+        logger.warn(s"Could not parse '$od' for organization and directive.")
+        None
+      }
+    }}
+    val all = orgDirectives.flatten.fold(Seq())(_ ++ _)
     all
   }
 
