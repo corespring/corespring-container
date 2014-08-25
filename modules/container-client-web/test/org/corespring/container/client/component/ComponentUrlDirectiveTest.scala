@@ -24,6 +24,7 @@ class ComponentUrlDirectiveTest extends Specification with ComponentMaker {
     "unknown-1[all]" in ComponentUrlDirective("unknown-1[all]", comps) === Seq.empty
     "unknown-1[all]+unknown2[all]" in ComponentUrlDirective("unknown-1[all]+unknown2[all]", comps) === Seq.empty
     "unknown-1[all]+org[1]" in ComponentUrlDirective("unknown-1[all]+org[1]", comps) === Seq("org-1")
+    "unknown-1[all]+org[1].js" in ComponentUrlDirective("unknown-1[all]+org[1].js", comps) === Seq("org-1")
   }
 
   "org directive" should {
