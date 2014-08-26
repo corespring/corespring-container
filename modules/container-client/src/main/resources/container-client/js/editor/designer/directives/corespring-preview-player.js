@@ -28,7 +28,10 @@ angular.module('corespring-editor.directives').directive('corespringPreviewPlaye
         if (getComponentById(id).hasClass('component-container')) {
           getComponentById(id).addClass('selected');
           $scope.selectedComponentId = id;
-          $scope.$apply();
+          var phase = $scope.root && $scope.$root.$$phase;
+          if (phase && phase !== '$apply' && phase !== '$digest') {
+            $scope.$apply();
+          }
 
           if ($('.component-container.selected').size() > 0) {
             var target = $('.component-container.selected')[0];
