@@ -83,7 +83,9 @@
               checkbox("highlightCorrectResponse", "Highlight correct outcome"),
               checkbox("allowEmptyResponses", "Allow empty responses"),
               '</ul>',
-              '<a class="btn btn-success btn-small btn-sm" ng-click="closePopup()">Done</a>'
+              '<div style="display:block" align="right">',
+              '<a class="btn btn-default btn-small btn-sm done" ng-click="closePopup()">Done</a>',
+              '</div>'
             ].join('\n');
 
             var linker = $compile(template);
@@ -92,9 +94,11 @@
             $configLink.popover({
               html: true,
               placement: 'bottom',
+              template: '<div class="popover"><h3 class="popover-title"></h3><div class="popover-content"></div></div>',
               content: function() {
                 return popupContent;
-              }
+              },
+              viewport:{selector:'.client-side-preview'}
             });
           }
 
