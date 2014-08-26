@@ -185,6 +185,17 @@
         ImageFeature
       ];
 
+      var linkFeatureGroup = {
+        type: 'group',
+        buttons: [
+          new WiggiLinkFeatureDef()
+        ]
+      };
+
+      $scope.linkFeature = {
+        definitions: [linkFeatureGroup]
+      };
+
       $scope.extraFeatures = {
         definitions: [{
           name: 'external',
@@ -206,13 +217,9 @@
           buttons: [
             videoComponent
           ]
-        }, {
-          type: 'group',
-          buttons: [
-            new WiggiLinkFeatureDef()
-          ]
-        }]
-      };
+        },
+        linkFeatureGroup
+      ]};
     }
 
     function onComponentsLoadError(error) {
