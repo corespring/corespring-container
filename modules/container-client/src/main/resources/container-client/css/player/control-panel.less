@@ -1,3 +1,5 @@
+@btn-border-radius: 4px;
+
 .control-panel {
   width: 100%;
   min-height: 43px;
@@ -15,12 +17,15 @@
     display: inline-block;
   }
 
+  .done {
+    .border-radius(@btn-border-radius);
+  }
   .action,
   .action:focus,
   .action:hover {
     display: inline-block;
     vertical-align: middle;
-    .border-radius(4px);
+    .border-radius(@btn-border-radius);
     color: white;
     margin-left: 5px;
   }
@@ -75,7 +80,6 @@
           position: absolute;
         }
         span {
-          padding-left: 20px;
           display: block;
         }
         .disabled {
@@ -103,3 +107,41 @@
   margin-top: 15px;
   text-align: right;
 }
+
+input[type="checkbox"] {
+  display:none;
+}
+
+input[type="checkbox"] + span {
+  margin-left: 35px;
+  line-height: 34px;
+}
+
+input[type="checkbox"] + span:before {
+  font-family: 'FontAwesome';
+  content: "";
+  position: absolute;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  background-color: #fff;
+  font-size: 28px;
+  width: 30px;
+  height: 30px;
+  top: 0px;
+  left: 0px;
+}
+
+input[type="checkbox"]:checked + span:before {
+  content: "\f00c";
+}
+
+ul.settings {
+  width: 200px;
+}
+
+.setting label {
+  cursor: pointer;
+  cursor: hand;
+}
+
+

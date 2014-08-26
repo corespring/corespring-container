@@ -31,6 +31,12 @@ angular.module('corespring-player.services').factory('CorespringPlayerDefinition
           $scope.lastScope = $scope.$new();
           var $body = $elem.find(".player-body").html(xhtml);
           $compile($body)($scope.lastScope);
+
+          MathJaxService.onEndProcess(function(){
+            $('.player-body').show();
+            MathJaxService.off(arguments.callee);
+          });
+
           MathJaxService.parseDomForMath();
 
           if (_.isFunction(opts.postRender)) {
@@ -123,8 +129,9 @@ angular.module('corespring-player.services').factory('CorespringPlayerDefinition
         outcomes: '=playerOutcomes',
         session: '=playerSession'
       };
-      this.template = ['<div class="corespring-player">',
-        '  <div class="player-body"></div>',
+      this.template = [
+        '<div class="corespring-player">',
+        '  <div class="player-body" style="display: none"></div>',
         '</div>'
       ].join("\n");
     }
