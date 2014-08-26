@@ -21,6 +21,18 @@
   }
 }
 
+.corespring-player {
+  .component-placeholder {
+    .holder {
+      border: none;
+    }
+
+    &.show-icon .holder {
+      border: solid 1px #cccccc;
+    }
+  }
+}
+
 .component-placeholder {
   position: relative;
   margin-left: 1px;
@@ -54,8 +66,6 @@
     z-index: 10;
     .user-select(none);
     transition: opacity 200ms;
-    .border-radius(3px);
-    border: solid 1px #cccccc;
 
     .content {
       display: inline-flex;
@@ -81,6 +91,8 @@
 
   .holder {
     position: relative;
+    .border-radius(3px);
+    border: solid 1px #cccccc;
 
     .title {
       position: absolute;

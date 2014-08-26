@@ -40,7 +40,7 @@ angular.module('corespring-player.services').factory('CorespringPlayerDefinition
           MathJaxService.parseDomForMath();
 
           if (_.isFunction(opts.postRender)) {
-            opts.postRender();
+            opts.postRender($scope.lastScope, $body);
           }
         };
 
