@@ -15,17 +15,14 @@ angular.module('corespring-editor.directives').directive('corespringPreviewPlaye
     function postRender($scope, $element) {
 
       function renderComponent(id) {
-        console.log('ComponentRegister:', ComponentRegister);
         var component = {
-          'componentType' : 'corespring-multiple-choice',
-          'label' : 'multiple-choice'
+          'componentType' : ComponentRegister.loadedData[id].data.componentType
         };
 
         getComponentById(id).wrap([
           '<placeholder',
             'id="' + id + '"',
             'component-type="' + component.componentType + '"',
-            'label="' + component.label + '"',
             'configurable="false"',
           '>',
           '</placeholder>'
@@ -40,10 +37,10 @@ angular.module('corespring-editor.directives').directive('corespringPreviewPlaye
           comp.parent().addClass('selected');
         }
 
-        setTimeout(function() {
-          renderComponent(id);
-        }, 2000);
+      });
 
+      $scope.$on('updatedComponent', function(event, id) {
+        renderComponent(id);
       });
 
     }

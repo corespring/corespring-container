@@ -1,5 +1,5 @@
-angular.module('corespring-player.services').factory('ComponentRegister', ['$log',
-  function($log) {
+angular.module('corespring-player.services').factory('ComponentRegister', ['$log', '$rootScope',
+  function($log, $rootScope) {
 
     var log = $log.debug.bind($log, '[component-register]');
 
@@ -152,6 +152,7 @@ angular.module('corespring-player.services').factory('ComponentRegister', ['$log
           $.each(components, function(id, component) {
             if (loaded[name][id]) {
               component[cb](loaded[name][id]);
+              $rootScope.$broadcast('updatedComponent', id);
             }
           });
         }
