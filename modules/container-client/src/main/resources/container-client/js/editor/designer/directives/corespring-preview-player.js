@@ -39,7 +39,7 @@
            */
           function shouldRerender(id) {
             if (data.clean) {
-              window.cleanCache.push(id);
+              cleanCache.push(id);
             }
             return data.clean || wasClean(id);
           }
