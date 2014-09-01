@@ -116,6 +116,7 @@ class ContainerClientImplementation(
         s"""
              |minify: ${rc.getBoolean("components.minify").getOrElse(Play.mode == Mode.Prod)}
              |gzip: ${rc.getBoolean("components.gzip").getOrElse(Play.mode == Mode.Prod)}
+             |path: ${rc.getString("components.path").getOrElse("?")}
            """.stripMargin)
 
       new Configuration(c)
