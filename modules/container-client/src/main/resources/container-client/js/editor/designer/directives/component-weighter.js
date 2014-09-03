@@ -25,6 +25,11 @@ angular.module('corespring-editor.directives').directive('componentWeights', [
           return _.contains($scope.componentSetTypes, n.tagName.toLowerCase());
         }
 
+        function weightableOnly(n) {
+          var config = (n.component && n.component.model) ? n.component.model.config : undefined;
+          return (config && config.exhibitOnly === true) ? false : true;
+        }
+
         function getId(n) {
           return $(n).attr('id');
         }
@@ -40,6 +45,7 @@ angular.module('corespring-editor.directives').directive('componentWeights', [
           .filter(interactionsOnly)
           .map(getId)
           .map(toIdAndComp)
+          .filter(weightableOnly)
           .value();
 
         $scope.sortedComponents = sorted;
