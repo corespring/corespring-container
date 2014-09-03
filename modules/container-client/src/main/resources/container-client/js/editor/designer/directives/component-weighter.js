@@ -83,7 +83,7 @@ angular.module('corespring-editor.directives').directive('componentWeights', [
     function controller($scope) {
       this.getPercentage = function(weight) {
         var weightNumber = readWeight(weight);
-        var total = _.reduce($scope.components, addWeights, 0);
+        var total = _.reduce(_.pluck($scope.sortedComponents, 'component'), addWeights, 0);
         return Math.floor((weight / total) * 100) || 0;
       };
 
