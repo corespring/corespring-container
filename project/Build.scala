@@ -43,6 +43,7 @@ object Build extends sbt.Build {
     val scalaz = "org.scalaz" %% "scalaz-core" % "7.0.6"
     val specs2 = "org.specs2" %% "specs2" % "2.2.2" % "test"
     val yuiCompressor = "com.yahoo.platform.yui" % "yuicompressor" % "2.4.7"
+    val lessCssEngine = "com.asual.lesscss" % "lesscss-engine" % "1.3.0"
   }
 
   object Resolvers {
@@ -169,7 +170,7 @@ object Build extends sbt.Build {
 
   lazy val componentLoader = builder.lib("component-loader")
     .settings(
-      libraryDependencies ++= Seq(logbackClassic, specs2, rhinoJs, commonsLang))
+      libraryDependencies ++= Seq(logbackClassic, specs2, rhinoJs, commonsLang, lessCssEngine))
     .dependsOn(logging, componentModel, jsProcessing)
 
   val containerClientWeb = builder.playApp("container-client-web")

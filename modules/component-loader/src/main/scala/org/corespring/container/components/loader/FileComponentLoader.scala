@@ -2,6 +2,7 @@ package org.corespring.container.components.loader
 
 import java.io.File
 
+import com.asual.lesscss.LessEngine
 import org.corespring.container.components.loader.exceptions.ComponentLoaderException
 import org.corespring.container.components.model._
 import org.corespring.container.utils.string.hyphenatedToTitleCase
@@ -15,6 +16,8 @@ class FileComponentLoader(paths: Seq[String], onlyProcessReleased: Boolean)
   private val logger = ContainerLogger.getLogger("FileComponentLoader")
 
   private var loadedComponents: Seq[Component] = Seq.empty
+
+  private val lessEngine = new LessEngine()
 
   //TODO: This is only to support dev mode - better name for this // alternatives?
   override def reload: Unit = {
@@ -243,7 +246,11 @@ class FileComponentLoader(paths: Seq[String], onlyProcessReleased: Boolean)
   } else {
     val renderJs = getJsFromFile(client.getPath + "/render")
     val configureJs = getJsFromFile(client.getPath + "/configure")
-    val styleCss = readMaybeFile(new File(client.getPath + "/styles.css"))
+    val styleCss = Seq(readMaybeFile(new File(client.getPath + "/styles.css")),
+      readMaybeFile(new File(client.getPath + "/styles.less")).map(lessEngine.compile(_))).flatten.mkString("") match {
+      case nonEmpty: String if !nonEmpty.isEmpty => Some(nonEmpty)
+      case _ => None
+    }
     Client(renderJs, configureJs, styleCss)
   }
 
