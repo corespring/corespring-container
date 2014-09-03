@@ -23,8 +23,13 @@
 
 .corespring-player {
   .component-placeholder {
+    display: inline-block;
+    min-width: 90px;
+    min-height: 40px;
+
     .holder {
       border: none;
+
     }
 
     &.show-icon .holder {
@@ -34,30 +39,35 @@
 }
 
 .component-placeholder {
+  @width: 220px;
+  @height: 205px;
   position: relative;
   margin-left: 1px;
-  min-width: 90px;
-  min-height: 40px;
+  display: inline-block;
+  min-width: @width;
+
+  .holder {
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    padding-top: 31px;
+  }
 
   &.show-icon {
-    @width: 220px;
-    @height: 205px;
     @icon-padding: 10px;
 
     width: @width;
     height: @height;
-    display: table;
+    display: inline-block;
 
     .holder {
-      height: @height;
-      display: table-cell;
-      vertical-align: middle;
-      text-align: center;
-
-      .icon {
-        max-width: @width - (2 * @icon-padding);
-        max-height: auto;
-      }
+      height: 100%;
+      width: 100%;
+      position: absolute;
+      background-repeat: no-repeat;
+      background-position-y: 50%;
+      background-position-x: 50%;
+      padding-top: 0px;
     }
   }
 

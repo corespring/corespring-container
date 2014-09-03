@@ -76,7 +76,7 @@
 
         function selectContainer(id) {
           $('.player-body .selected').removeClass('selected');
-          if (getComponentById(id).parent().prop('tagName') === 'component-container') {
+          if (getComponentById(id).hasClass('component-placeholder')) {
             getComponentById(id).parent().addClass('selected');
             $scope.selectedComponentId = id;
             var phase = $scope.root && $scope.$root.$$phase;

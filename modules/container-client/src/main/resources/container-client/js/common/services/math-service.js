@@ -21,8 +21,7 @@
       _.each(listeners,function(listener){
         if (message && _.isArray(message)){
           var type = message[0];
-
-          if (listener.type === type){
+          if (listener && listener.type === type){
             try{
               listener.callback.apply(null, _.rest(message));
             }catch(e){}
@@ -32,7 +31,7 @@
     };
 
     this.onEndProcess = function(callback,element){
-
+      _.remove(listeners, _.isUndefined);
       var listener = {
         callback: callback,
         element: element,
