@@ -69,11 +69,10 @@ var Placeholder = function(
       $scope.name = config.title;
 
       if ($scope.showIcon) {
-        $holder.html([
-          '<span class="title">' + $scope.name + '</span>',
-          '<img class="icon" src="' + $scope.icon + '"/>'
-        ].join('\n'));
+        $holder.html('<span class="title">' + $scope.name + '</span>');
+        $holder.css('background-image', 'url('+ $scope.icon + ')');
       } else {
+        $holder.css('background-image', 'none');
         $holder.html('<' + $scope.componentType + ' id="' + $scope.id + '"></' + $scope.componentType + '>');
         $compile($holder)($scope.$new());
       }
