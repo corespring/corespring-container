@@ -161,6 +161,9 @@ module.exports = (grunt) ->
       less:
         files: ['<%= common.app %>/**/*.less']
         tasks: ['copy:main', 'less:development']
+      componentLess:
+        files: ['<%= common.components %>/**/*.less']
+        tasks: ['runComponentLess']
       js:
         files: ['<%= common.app %>/js/**/*.js', '<%= common.components %>/**/*.js']
         tasks: ['jshint:main']
@@ -373,3 +376,15 @@ module.exports = (grunt) ->
   grunt.registerTask('default', ['shell:bower', 'lcd', 'jshint', 'uglification', 'ejs', 'copy', 'less', 'clean:less', 'clean_bower', 'jade', 'compress', 'prepPlayerLauncher','jasmine:unit'])
   grunt.registerTask('minify-test', ['concat', 'uglify'])
   grunt.registerTask('ejs-test', ['ejs'])
+
+  grunt.registerTask('runComponentLess', ->
+    cb = @async()
+    grunt.util.spawn(
+      grunt: true, args: [ 'less' ]
+      opts:
+        cwd: common.components
+    , (error, result, code) ->
+      console.log result.stdout
+      cb()
+    )
+  )

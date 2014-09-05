@@ -2,7 +2,6 @@ package org.corespring.container.components.loader
 
 import java.io.File
 
-import com.asual.lesscss.LessEngine
 import org.corespring.container.components.loader.exceptions.ComponentLoaderException
 import org.corespring.container.components.model._
 import org.corespring.container.utils.string.hyphenatedToTitleCase
@@ -16,8 +15,6 @@ class FileComponentLoader(paths: Seq[String], onlyProcessReleased: Boolean)
   private val logger = ContainerLogger.getLogger("FileComponentLoader")
 
   private var loadedComponents: Seq[Component] = Seq.empty
-
-  private val lessEngine = new LessEngine()
 
   //TODO: This is only to support dev mode - better name for this // alternatives?
   override def reload: Unit = {
@@ -90,6 +87,20 @@ class FileComponentLoader(paths: Seq[String], onlyProcessReleased: Boolean)
     hyphenatedToTitleCase(name)
   }
 
+  private def loadCss(root: String): Option[String] = {
+    val maybeFiles = Seq("styles.css", "styles.less.css")
+
+    maybeFiles
+      .map(filename => readMaybeFile(new File(s"${if (root.endsWith("/")) root else s"$root/" }$filename")))
+      .foldLeft("")((acc, maybeCss) => maybeCss match {
+        case Some(css) => acc + css
+        case _ => acc
+      }) match {
+        case nonEmpty: String if nonEmpty.nonEmpty => Some(nonEmpty)
+        case _ => None
+      }
+  }
+
   private def loadLibrary(org: String, packageJson: JsValue)(compRoot: File): Option[Component] = {
 
     def createServerName(n: String) = s"$org.${compRoot.getName}.server${if (n == "index") "" else s".$n"}"
@@ -101,18 +112,19 @@ class FileComponentLoader(paths: Seq[String], onlyProcessReleased: Boolean)
         packageJson,
         loadLibrarySources(compRoot.getPath, "client", createClientName(compRoot.getName)),
         loadLibrarySources(compRoot.getPath, "server", createServerName),
-        readMaybeFile(new File(compRoot.getPath + "/src/client/styles.css")),
+        loadCss(s"${compRoot.getPath}/src/client"),
         loadLibraries(packageJson)))
   }
 
   private def loadLayout(org: String, packageJson: JsValue)(compRoot: File): Option[Component] = {
     logger.debug(s"load layout component: ${compRoot.getPath}")
+
     Some(
       LayoutComponent(
         org,
         compRoot.getName,
         loadLibrarySources(compRoot.getPath, "client", createClientName(compRoot.getPath)),
-        readMaybeFile(new File(compRoot.getPath + "/src/client/styles.css")),
+        loadCss(s"${compRoot.getPath}/src/client"),
         packageJson))
   }
 
@@ -246,11 +258,7 @@ class FileComponentLoader(paths: Seq[String], onlyProcessReleased: Boolean)
   } else {
     val renderJs = getJsFromFile(client.getPath + "/render")
     val configureJs = getJsFromFile(client.getPath + "/configure")
-    val styleCss = Seq(readMaybeFile(new File(client.getPath + "/styles.css")),
-      readMaybeFile(new File(client.getPath + "/styles.less")).map(lessEngine.compile(_))).flatten.mkString("") match {
-      case nonEmpty: String if !nonEmpty.isEmpty => Some(nonEmpty)
-      case _ => None
-    }
+    val styleCss = loadCss(client.getPath)
     Client(renderJs, configureJs, styleCss)
   }
 
