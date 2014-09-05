@@ -237,25 +237,28 @@ object Build extends sbt.Build {
       commands <++= baseDirectory {
         base =>
           val clientDir = base / "modules" / "container-client"
+          val componentsDir = base / "corespring-components"
           Seq(
-            ("grunt", "./node_modules/grunt-cli/bin/grunt", s"$clientDir\\lib\\grunt.cmd"),
-            ("bower", "./node_modules/bower/bin/bower", s"$clientDir\\lib\\bower.cmd"),
-            ("npm", "npm", "npm.cmd")).map((x: (String, String, String)) => cmd(x._1, x._2, x._3, clientDir))
+            cmd("grunt", "./node_modules/grunt-cli/bin/grunt", s"$clientDir\\lib\\grunt.cmd", Seq(clientDir)),
+            cmd("bower", "./node_modules/bower/bin/bower", s"$clientDir\\lib\\bower.cmd", Seq(clientDir, componentsDir)),
+            cmd("npm", "npm", "npm.cmd", Seq(clientDir, componentsDir))
+          )
       })
     .dependsOn(shell)
     .aggregate(shell)
 
-  private def cmd(name: String, unixCmd: String, windowsCmd: String, base: File): Command = {
+  private def cmd(name: String, unixCmd: String, windowsCmd: String, bases: Seq[File]): Command =
     Command.args(name, "<" + name + "-command>") {
       (state, args) =>
         val cmd = if (isWindows) windowsCmd else unixCmd
-        val exitCode = Process(cmd :: args.toList, base) !;
-        if (exitCode != 0) {
-          throw new RuntimeException(s"${name}, ${base.getPath} returned a non zero exit code")
-        }
-        state
+        bases.map{base =>
+          val exitCode = Process(cmd :: args.toList, base) !;
+          if (exitCode != 0) {
+            throw new RuntimeException(s"${name}, ${base.getPath} returned a non zero exit code")
+          }
+          state
+        }.head
     }
-  }
 
   object Grunt {
     var process: Option[Process] = None
