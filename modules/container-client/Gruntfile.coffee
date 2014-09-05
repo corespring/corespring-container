@@ -370,7 +370,7 @@ module.exports = (grunt) ->
   # short cut
   grunt.registerTask('lcd', ['restoreResolutions', 'loadComponentDependencies'])
   grunt.registerTask('prepPlayerLauncher', 'prep the player launcher js', prepPlayerLauncher(grunt))
-  grunt.registerTask('run', ['uglification', 'ejs', 'jade', 'less', 'watch'])
+  grunt.registerTask('run', ['uglification', 'ejs', 'jade', 'runComponentLess', 'less', 'watch'])
   grunt.registerTask('test', ['shell:bower', 'shell:bowerCacheClean', 'lcd', 'prepPlayerLauncher', 'jasmine:unit'])
   grunt.registerTask('uglification', ['clean:uglified', 'uglify:concatOnly', 'uglify:minifyAndConcat', 'uglify:prodPlayer'])
   grunt.registerTask('default', ['shell:bower', 'lcd', 'jshint', 'uglification', 'ejs', 'copy', 'less', 'clean:less', 'clean_bower', 'jade', 'compress', 'prepPlayerLauncher','jasmine:unit'])
