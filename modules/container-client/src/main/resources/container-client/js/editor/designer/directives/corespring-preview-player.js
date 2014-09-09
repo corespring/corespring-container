@@ -3,17 +3,6 @@
   // Caches ids of elements that were previously clean.
   var cleanCache = [];
 
-  /**
-   * Returns true if the item by id was previously clean. Has a side effect to remove the id from the clean cache.
-   */
-  function wasClean(id) {
-    var index = cleanCache.indexOf(id);
-    if (index >= 0) {
-      cleanCache.splice(index, 1);
-    }
-    return index >= 0;
-  }
-
   angular.module('corespring-editor.directives').directive('corespringPreviewPlayer', [
     '$log',
     '$rootScope',
@@ -22,62 +11,73 @@
     'CorespringPlayerDefinition',
 
     function($log, $rootScope, $compile, ComponentRegister, CorespringPlayerDefinition) {
+
       // TODO: Stop using id attributes for this!
-      function getComponentById(id) {
+      function getPreviewComponentById(id) {
         return $(_.find($('corespring-preview-player #' + id), function(el) {
           return !$(el).is('span');
         }));
       }
 
-      function postRender($scope, $element) {
-
-        function renderComponent(id) {
-          var data = ComponentRegister.loadedData[id].data;
-
-          /**
-           * Only rerender components when they are clean or when they were previously clean.
-           */
-          function shouldRerender(id) {
-            if (data.clean) {
-              cleanCache.push(id);
+      function preCompile($body) {
+        for (var id in ComponentRegister.loadedData) {
+          var compData = ComponentRegister.loadedData[id].data;
+          if (compData.clean) {
+            var comp = $body.find('#' + id);
+            if (comp) {
+              comp.replaceWith(placeHolderMarkup(id, compData.componentType));
             }
-            return data.clean || wasClean(id);
           }
-
-          if (shouldRerender(id)) {
-            getComponentById(id).wrap([
-              '<placeholder',
-              'id="' + id + '"',
-              'component-type="' + data.componentType + '"',
-              'configurable="false"',
-              '>',
-              '</placeholder>'
-            ].join(' '));
-            $compile($element)($scope);
-          }
-
         }
+      }
+
+      function placeHolderMarkup(id, componentType) {
+        return [
+          '<placeholder',
+          ' id="' + id + '"',
+          ' component-type="' + componentType + '"',
+          ' configurable="false"',
+          '>',
+          '</placeholder>'
+        ].join('');
+      }
+
+      function afterSetDataAndSession($scope, allComponentsData) {
+        var shouldRerender = false;
+        for (var id in allComponentsData) {
+          var compData = allComponentsData[id].data;
+          if (compData.clean) {
+            if (!cleanCache[id]) {
+              cleanCache[id] = true;
+              shouldRerender = true;
+            }
+          } else if (cleanCache[id]) {
+            cleanCache[id] = false;
+            shouldRerender = true;
+          }
+        }
+        if (shouldRerender) {
+          $scope.$emit("rerender-xhtml");
+        }
+      }
+
+      function postRender($scope, $element, $compile) {
 
         _(ComponentRegister.components).keys().each(function(id) {
-          var comp = getComponentById(id);
+          var comp = getPreviewComponentById(id);
           if (parseInt(id, 10) === $rootScope.selectedComponentId) {
             comp.parent().addClass('selected');
           }
-
         });
-
-        $scope.$on('updatedComponent', function(event, id) {
-          renderComponent(id);
-        });
-
       }
 
       function postLink($scope) {
 
         function selectContainer(id) {
           $('.player-body .selected').removeClass('selected');
-          if (getComponentById(id).hasClass('component-placeholder')) {
-            getComponentById(id).parent().addClass('selected');
+          var comp = getPreviewComponentById(id);
+          if (comp) {
+            comp.parent().addClass('selected');
             $scope.selectedComponentId = id;
             var phase = $scope.root && $scope.$root.$$phase;
             if (phase && phase !== '$apply' && phase !== '$digest') {
@@ -125,7 +125,9 @@
       return new CorespringPlayerDefinition({
         mode: 'editor',
         postLink: postLink,
-        postRender: postRender
+        postRender: postRender,
+        afterSetDataAndSession: afterSetDataAndSession,
+        preCompile: preCompile
       });
     }
   ]);
