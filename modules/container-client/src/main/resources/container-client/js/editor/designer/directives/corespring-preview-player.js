@@ -89,7 +89,7 @@
               target.scrollIntoView();
             }
           } else {
-            $log.error('Could not find component-container for id = ' + id);
+            $log.warn('selectContainer: Could not find component-container for id = ' + id);
           }
         }
 

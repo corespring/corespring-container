@@ -87,6 +87,7 @@ angular.module('corespring-player.services').factory('CorespringPlayerDefinition
 
         $scope.$on('rerender-xhtml', function(event) {
           renderMarkup($scope.xhtml);
+          setDataAndSession();
         });
 
         /**        
