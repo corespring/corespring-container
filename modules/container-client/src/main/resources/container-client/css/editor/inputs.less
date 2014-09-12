@@ -1,0 +1,43 @@
+.radio-size(@size) {
+  .radio-toggle {
+    font-size: @size;
+    &:after {
+      min-width: @size;
+    }
+    &.checked:after {
+      min-width: @size;
+    }
+  }
+}
+
+.radio-input {
+  position: relative;
+  .radio-size(22px);
+
+  .radio-toggle {
+    position: relative;
+    vertical-align: middle;
+    display: inline-block;
+    font-family: FontAwesome;
+
+    &:after {
+      display: inline-block;
+      content: "\f10c";
+    }
+
+    &.checked:after {
+      content: "\f192";
+    }
+
+    &.disabled:after {
+      color: #cccccc;
+    }
+  }
+
+  .label-text {
+    display: inline-block;
+    vertical-align: middle;
+    cursor: pointer;
+  }
+
+}
