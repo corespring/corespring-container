@@ -73,7 +73,9 @@ angular.module('corespring.wiggi-wiz-features.cs-image').factory('ImageFeature',
       function onUpdate(update) {
 
         if (update.cancelled) {
-          editor.services.image.deleteFile(update.imageUrl);
+          if (update.imageUrl) {
+            editor.services.image.deleteFile(update.imageUrl);
+          }
           return;
         }
 
@@ -86,13 +88,33 @@ angular.module('corespring.wiggi-wiz-features.cs-image').factory('ImageFeature',
       }
 
       var dialogTemplate = [
-        '<button class="btn btn-small btn-info wiggi-wiz-button" ng-model="data" file-chooser>Choose a file...</button>',
-        '<br/>',
-        '<div class="alert alert-danger wiggi-wiz-alert" ng-show="error">{{error.message}}</div>',
-        '<div class="alert alert-success wiggi-wiz-alert" ng-show="fileName"><strong>You have uploaded:</strong> {{fileName}}</div>'
+        '<div class="file-upload-modal">',
+        '  <div class="alert alert-danger wiggi-wiz-alert" ng-show="error"><strong>Upload error</strong><br/>Your image was not uploaded. Please try again.</div>',
+        '  <div class="alert alert-success wiggi-wiz-alert" ng-show="fileName"><strong>Upload successful.</strong><br/>You have successfully uploaded: {{fileName}}</div>',
+        '  <div class="center-container">',
+        '    <div class="button-row-top">',
+        '      <button ng-show="status == \'initial\' || status == \'failed\'" class="btn btn-primary upload-button" ng-model="data" file-chooser=""><span class="upload-icon"><i class="fa fa-upload"></i></span>Upload Image</button>',
+        '      <button ng-show="status == \'failed\'" class="btn btn-default" ng-click="cancel()">Cancel</button>',
+        '    </div>',
+        '    <div ng-if="status == \'started\'">',
+        '      <div class="uploading-label">Uploading image {{percentProgress}}%</div>',
+        '      <progressbar value="percentProgress" class="progress-striped"></progressbar>',
+        '    </div>',
+        '    <div ng-if="status !== \'completed\' && status !== \'failed\'">',
+        '      <button class="btn btn-default" ng-click="cancel()">Cancel</button>',
+        '    </div>',
+        '  </div>',
+        '  <div class="center-container" ng-if="status == \'completed\'">',
+        '    <button class="btn btn-primary" ng-click="ok()">Submit</button>',
+        '    <button class="btn btn-default" ng-click="cancel()">Cancel</button>',
+        '  </div>',
+        '</div>'
       ].join('\n');
 
-      editor.launchDialog(data, 'Add Image!', dialogTemplate, onUpdate, scopeExtension);
+      editor.launchDialog(data, '', dialogTemplate, onUpdate, scopeExtension, {
+        omitHeader: true,
+        omitFooter: true
+      });
     };
 
 

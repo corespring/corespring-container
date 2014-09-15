@@ -70,9 +70,9 @@
             $log.log('onUploadComplete: ', body, status);
             onComplete(null, url);
           },
-          onUploadProgress: function() {
+          onUploadProgress: function(progress) {
             $log.log('onUploadProgress', arguments);
-            onProgress(null, 'started');
+            onProgress(null, progress);
           },
           onUploadFailed: function() {
             $log.log('onUploadFailed', arguments);
