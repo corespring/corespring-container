@@ -89,7 +89,7 @@ angular.module('corespring.wiggi-wiz-features.cs-image').factory('ImageFeature',
 
       var dialogTemplate = [
         '<div class="file-upload-modal">',
-        '  <div class="alert alert-danger wiggi-wiz-alert" ng-show="error"><strong>Upload error</strong><br/>Your image was not uploaded. Please try again.</div>',
+        '  <div class="alert alert-danger wiggi-wiz-alert" ng-show="error" ng-bind-html-unsafe="error"></div>',
         '  <div class="alert alert-success wiggi-wiz-alert" ng-show="fileName"><strong>Upload successful.</strong><br/>You have successfully uploaded: {{fileName}}</div>',
         '  <div class="center-container">',
         '    <div class="button-row-top">',

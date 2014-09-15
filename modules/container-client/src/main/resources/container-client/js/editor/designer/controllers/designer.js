@@ -61,7 +61,9 @@
         var url = '' + file.name;
 
         if (ImageUtils.bytesToKb(file.size) > 500) {
-          onComplete(ImageUtils.fileTooBigError(file.size, 500));
+          $timeout(function() {
+            onComplete(ImageUtils.fileTooBigError(file.size, 500).message);
+          });
           return;
         }
 
@@ -76,10 +78,7 @@
           },
           onUploadFailed: function() {
             $log.log('onUploadFailed', arguments);
-            onComplete({
-              code: 'UPLOAD_FAILED',
-              message: 'upload failed!'
-            });
+            onComplete('<strong>Upload error</strong><br/>Your image was not uploaded. Please try again.');
           }
         };
 
