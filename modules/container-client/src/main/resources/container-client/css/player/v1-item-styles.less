@@ -44,6 +44,10 @@ p {
   max-width: 600px;
 }
 
+.para-center {
+  text-align: center;
+}
+
 div.copyright, div.image-copyright, div.image_copyright {
   position: relative;
   top: -30px;
@@ -90,4 +94,78 @@ table.no-border {
       border-right: 2px dashed #EEE;
     }
   }
+}
+
+hr.element-seperator {
+  height: 1px;
+  background-color: #ccc;
+  border: none;
+  color: #0FF;
+  margin: 30px 0;
+  display: block;
+}
+
+.p-list {
+  padding: 0;
+  margin: 0;
+  counter-reset: section;
+  font-size: 14px;
+  line-height: 18px;
+
+  li {
+    padding: 0 0 18px 30px;
+    list-style: none;
+    position: relative;
+
+    &:before {
+      content: counter(section);
+      counter-increment: section;
+      font-size: 14px;
+      line-height: 18px;
+      position: absolute;
+      top: 2px;
+      left: 0;
+      width: 20px;
+      height: 18px;
+      text-align: right;
+      color: #333;
+    }
+  }
+}
+
+.author-name, .passage-author, .passage_author, .passage-byline {
+  display: block;
+  font-style: italic;
+  font-weight: normal;
+  text-align: center;
+  padding-bottom: 20px;
+  margin-top: -5px;
+}
+
+.passage-subtitle {
+  display: block;
+  font-size: 17px;
+  font-weight: bold;
+  text-align: center;
+  color: #000;
+  margin: 0;
+}
+
+.leading-150-percent {
+  line-height: 28px !important;
+}
+
+.leading-200-percent {
+  line-height: 38px !important;
+}
+
+/* For leading in numbered lines */
+.leading-150-percent line li {
+  padding-bottom: 10px;
+  line-height: 28px !important;
+}
+
+.leading-200-percent line li {
+  padding-bottom: 20px;
+  line-height: 38px !important;
 }
