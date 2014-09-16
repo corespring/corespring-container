@@ -1,4 +1,4 @@
-//styles to correctly render v1 items in v2
+//Styles to correctly render v1 items in v2 including custom classes that are being used in v1
 
 .view-feedback {
   a {
@@ -7,5 +7,164 @@
     &:hover {
       color: #005580;
     }
+  }
+}
+
+p {
+  &.p-indent-20 {
+    padding-left: 20px;
+  }
+
+  &.p-indent-30 {
+    padding-left: 30px;
+  }
+}
+
+.prompt {
+  padding: 0 0 18px;
+  margin: 0;
+  display: block;
+}
+
+.intro-2 {
+  line-height: 18px;
+  font-size: 14px;
+  margin: 0;
+  color: #333;
+}
+
+.imagewrapper-200, .imagewrapper-400, .imagewrapper-600, .imagewrapper, .image-wrapper {
+  margin: 0 auto 37px;
+  padding: 0;
+  overflow: hidden;
+  text-align: center;
+}
+
+.imagewrapper img, .image-wrapper img {
+  max-width: 600px;
+}
+
+.para-center {
+  text-align: center;
+}
+
+div.copyright, div.image-copyright, div.image_copyright {
+  position: relative;
+  top: -30px;
+  margin-bottom: 20px;
+  font-size: 11px;
+  text-align: center;
+  display: block;
+}
+
+.note-tip {
+  border-top: 1px #999 solid;
+  padding: 5px 0 0 0;
+  margin: 10px 0 0 0;
+  font-size: 11px;
+  display: inline-block;
+}
+
+td.three-col {
+  width: 33%
+}
+
+.table-title {
+  margin-left: 20px;
+  padding-top: 10px;
+}
+
+td.para-left {
+  padding: 10px 5px;
+  border: 1px solid #999;
+  text-align: left;
+  vertical-align: middle;
+  min-width: 50px;
+}
+
+table.no-border {
+  margin: 0 0 10px;
+  width: 100%;
+
+  tbody tr td {
+    border: none;
+    vertical-align: bottom;
+
+    &.right-dashed-border {
+      border-right: 2px dashed #EEE;
+    }
+  }
+}
+
+hr.element-seperator {
+  height: 1px;
+  background-color: #ccc;
+  border: none;
+  color: #0FF;
+  margin: 30px 0;
+  display: block;
+}
+
+.p-list {
+  padding: 0;
+  margin: 0;
+  counter-reset: section;
+  font-size: 14px;
+  line-height: 18px;
+
+  li {
+    padding: 0 0 18px 30px;
+    list-style: none;
+    position: relative;
+
+    &:before {
+      content: counter(section);
+      counter-increment: section;
+      font-size: 14px;
+      line-height: 18px;
+      position: absolute;
+      top: 2px;
+      left: 0;
+      width: 20px;
+      height: 18px;
+      text-align: right;
+      color: #333;
+    }
+  }
+}
+
+.author-name, .passage-author, .passage_author, .passage-byline {
+  display: block;
+  font-style: italic;
+  font-weight: normal;
+  text-align: center;
+  padding-bottom: 20px;
+  margin-top: -5px;
+}
+
+.passage-subtitle {
+  display: block;
+  font-size: 17px;
+  font-weight: bold;
+  text-align: center;
+  color: #000;
+  margin: 0;
+}
+
+.leading-150-percent {
+  line-height: 28px !important;
+
+  line li {
+    padding-bottom: 10px;
+    line-height: 28px !important;
+  }
+}
+
+.leading-200-percent {
+  line-height: 38px !important;
+
+  line li {
+    padding-bottom: 20px;
+    line-height: 38px !important;
   }
 }
