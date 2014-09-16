@@ -105,7 +105,7 @@ angular.module('corespring.wiggi-wiz-features.cs-image').factory('ImageFeature',
         '    </div>',
         '  </div>',
         '  <div class="center-container" ng-if="status == \'completed\'">',
-        '    <button class="btn btn-primary" ng-click="ok()">Submit</button>',
+        '    <button class="btn btn-primary" ng-click="ok()">Insert</button>',
         '    <button class="btn btn-default" ng-click="cancel()">Cancel</button>',
         '  </div>',
         '</div>'
