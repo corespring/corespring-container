@@ -262,17 +262,6 @@ class FileComponentLoader(paths: Seq[String], onlyProcessReleased: Boolean)
     Client(renderJs, configureJs, styleCss)
   }
 
-  private def getJsFromFile(path: String): String = {
-
-    def getJs(p: String) = load(p, (f) => scala.io.Source.fromFile(f).getLines.mkString("\n"))
-
-    def load(p: String, block: File => String) = {
-      val f = new File(p)
-      if (f.exists()) Some(block(f)) else None
-    }
-    getJs(path + ".js").getOrElse(throw new ComponentLoaderException(s"Can't find js here: $path"))
-  }
-
   private def loadServer(server: File): Server = if (!server.exists()) {
     throw new ComponentLoaderException(s"Can't find client file: ${server.getAbsolutePath}")
   } else {
@@ -280,17 +269,24 @@ class FileComponentLoader(paths: Seq[String], onlyProcessReleased: Boolean)
     Server(indexJs)
   }
 
+  private def getJsFromFile(path: String): String = {
+    readFile(new File(path + ".js"))
+  }
+
+  private def readFile(f: File): String = readMaybeFile(f).getOrElse {
+    throw new ComponentLoaderException(s"Can't find client file: ${f.getAbsolutePath}")
+  }
+
   private def readMaybeFile(f: File): Option[String] = {
     if (!f.exists()) {
       logger.debug(s"${f.getPath} does not exist")
       None
     } else {
-      Some(scala.io.Source.fromFile(f).getLines().mkString("\n"))
+      val d = scala.io.Source.fromFile(f)
+      val content = Some(d.getLines().mkString("\n"))
+      d.close()
+      content
     }
-  }
-
-  private def readFile(f: File): String = readMaybeFile(f).getOrElse {
-    throw new ComponentLoaderException(s"Can't find client file: ${f.getAbsolutePath}")
   }
 
 }
