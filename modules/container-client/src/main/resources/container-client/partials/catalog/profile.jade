@@ -5,95 +5,75 @@ mixin tr_header(a, b, c)
     th.panel-right= c       
 
 script(type='text/ng-template', id="/templates/profile")
-  .profile-body 
-
-    .main-title
+  .profile-body
+    h2 Profile
+    .round-border-container
+      div.description {{item.profile.taskInfo.description}}
       table
         tr
           td
-            span.bold 
-              | {{item.profile.taskInfo.subjects.primary.subject || unassigned}}
-            span.info
-              | (also useful in {{item.profile.taskInfo.subjects.related.subject || unassigned}})
+            .label.label-info Primary Subject
+            span {{item.profile.taskInfo.subjects.primary.subject}}
           td
-            span.copyright-owner
-              img(ng-src="{{copyrightOwnerUrl}}",
-               alt="{{item.profile.contributorDetails.copyright.owner}}",
-               title="{{item.profile.contributorDetails.copyright.owner}}"
-               )
-
-    .round-panel.padded
-      | {{item.profile.taskInfo.title || unassigned}}
-
-    .round-panel
-      table 
+            .label.label-info Grade Level(s)
+            span {{item.profile.taskInfo.gradeLevel.join(", ")}}
         tr
-          th.panel-left Standard
-          th(ng-show="item.profile.lexile") Lexile Score
-          th.panel-right Question
-
-        tr 
-          td.panel-left
-            .pill-content 
-              .pill(ng-repeat="standard in item.profile.standards", 
-                tooltip="{{standard.standard}}",
-                tooltip-append-to-body="true") 
-                | {{standard.dotNotation}}
-          td(ng-show="item.profile.lexile")
-            .pill-content 
-              .pill
-                | {{item.profile.lexile || unassigned }} 
-          td.panel-right 
-            .pill-content
-              .pill(ng-repeat="t in componentTypeLabels") 
-                | {{t}}
-
-    .round-panel
-      table 
-        +tr_header('Bloom\'s Level', 'Depth of Knowledge', 'Key Skills')
-        tr 
-          td.panel-left
-            .pill-content
-              .pill(ng-show="item.profile.otherAlignments.bloomsTaxonomy")
-                | {{item.profile.otherAlignments.bloomsTaxonomy }} 
           td
-            .pill-content
-              .pill(ng-show="depthOfKnowledgeLabel") 
-                | {{depthOfKnowledgeLabel }}
-          td.panel-right
-            .pill-content 
-              .pill(ng-repeat="skills in item.profile.otherAlignments.keySkills")
-                | {{skills}}
+            .label.label-info Related Subject
+            span {{item.profile.taskInfo.subjects.related.subject}}
+          td
+            .label.label-info Difficulty Level
+            span {{getPValueAsString(item.profile.pValue)}}
+        tr
+          td
+            .label.label-info Item Type
+            span {{componentTypeLabels.join(", ")}}
+          td
+            .label.label-info CCSS
+            span(ng-repeat="standard in item.profile.standards") {{standard.dotNotation}}{{$last ? '' : ', '}}
+        tr
+          td
+          td
+            .label.label-info License
+            img.license-type(ng-src="{{licenseTypeUrl}}")
 
-    .round-panel
-      .header.left(
-        ng-click="showAdditionalInformation = !showAdditionalInformation",
-        ng-class="{ true: 'open', false: 'closed'}[showAdditionalInformation === true]"
-        )
-        i.fa(ng-class="{ true: 'fa-minus-circle', false: 'fa-plus-circle'}[showAdditionalInformation === true]")
-        | Additional Information
+    table
+      tr
+        td
+          .label.label-warning Bloom's Taxonomy
+          .content {{item.profile.taskInfo.subjects.primary.subject}}
+          .label.label-warning Demonstrated Knowledge
+          .content {{item.profile.demonstratedKnowledge || unassigned}}
+          .label.label-warning Lexile Score
+          .content {{item.profile.lexile || unassigned }}
+        td
+          .label.label-warning Key Skills
+          .content {{item.profile.otherAlignments.keySkills.join(", ")}}
+          .content
+            img.copyright-image(ng-src="{{copyrightOwnerUrl}}",
+             alt="{{item.profile.contributorDetails.copyright.owner}}",
+             title="{{item.profile.contributorDetails.copyright.owner}}"
+             )
+            | This item was made available to CoreSpring users courtesy of {{item.profile.contributorDetails.copyright.owner}}
+            .clearfix &nbsp;
+            .more-info
+              a(ng-click="showMore = !showMore").pull-right {{showMore ? 'hide info' : 'more info'}}
+            table(ng-show="showMore")
+              tr
+                td
+                  .title Copyright Year
+                  .sub-content {{item.profile.contributorDetails.copyright.year || unassigned}}
+                  .title Copyright Expiration Date
+                  .sub-content {{item.profile.contributorDetails.copyrightExpirationDate}}
+                  .title Reviews Passed
+                  .sub-content
+                    span(ng-repeat="rp in allReviewsPassed", ng-if="rp.passed") {{rp.name}}{{!$last ? ', ' : ''}}
+                td
+                  .title Credentials
+                  .sub-content {{item.profile.contributorDetails.credentials || unassigned}}
+                  .title Prior Use
+                  .sub-content {{item.profile.priorUse || unassigned}}
+                  .title Source
+                  .sub-content
+                    a(href="{{item.profile.sourceUrl}}"){{item.profile.sourceUrl || unassigned}}
 
-
-      .cols(ng-show="showAdditionalInformation")
-        table 
-          tr 
-            td 
-              .title Prior Use 
-              | {{item.profile.priorUse || unassigned}}
-
-            td
-              .title Reviews Passed
-
-              div(ng-repeat="rp in allReviewsPassed") 
-                i.fa(ng-class="{true: 'fa-check-square-o', false: 'fa-square-o'}[rp.passed]") 
-                | {{rp.name}}
-            td
-              .title License
-              img.license-type(ng-src="{{licenseTypeUrl}}") 
-
-              .title Copyright Year
-              | {{item.profile.contributorDetails.copyright.year || unassigned}}
-      .cols
-        .footer
-          span.bold ID: 
-          | {{itemId}} 
