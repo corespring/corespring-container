@@ -24,12 +24,29 @@ angular.module('corespring-catalog.controllers')
 
       $scope.itemId = ItemIdService.itemId();
 
+      var createSupportingMaterialsDropDown = function(item) {
+        var groupedSupportingMaterials = _.groupBy(item.supportingMaterials, "materialType");
+        $scope.supportingMaterials = [];
+        var index = 0;
+        var insertSupportingMaterialsForType = function(supMat) {
+          $scope.supportingMaterials.push({label: supMat.name, type: "data", index: index});
+          index++;
+        };
+        for (var key in groupedSupportingMaterials) {
+          $scope.supportingMaterials.push({label: key, type: "header"});
+          _.each(groupedSupportingMaterials[key], insertSupportingMaterialsForType);
+          $scope.supportingMaterials.push({type: "divider"});
+        }
+        $scope.supportingMaterials = _.initial($scope.supportingMaterials);
+      };
+
       $scope.onItemLoaded = function(item) {
         $scope.data = {
           item: item
         };
         $scope.item = item;
         $scope.init();
+        createSupportingMaterialsDropDown(item);
         $scope.$broadcast('itemLoaded', item);
       };
 
@@ -93,6 +110,27 @@ angular.module('corespring-catalog.controllers')
         applyComponentTypes();
         applyAllReviewsPassed();
       };
+
+      $scope.getPValueAsString = function (value) {
+
+        var vals = {
+          "NO_VALUE": 0,
+          "Very Hard": 20,
+          "Moderately Hard": 40,
+          "Moderate": 60,
+          "Easy": 80,
+          "Very Easy": 100 };
+
+        var getLabelFromValue = function (numberArray, valueToCheck) {
+          for (var x in numberArray) {
+            if (valueToCheck <= numberArray[x]) {
+              return x === "NO_VALUE" ? "" : x;
+            }
+          }
+        };
+        return getLabelFromValue(vals, value);
+      };
+
 
       function imageUrl(folder, name, fallback) {
         return name ? '../../images/' + folder + '/' + name.replace(" ", "-") + ".png" : fallback;
