@@ -94,7 +94,9 @@ module.exports = (grunt) ->
       '<%= common.dist %>/bower_components/lodash/dist/lodash.min.js',
       '<%= common.dist %>/bower_components/angular-ui-sortable/sortable.min.js',
       '<%= common.dist %>/bower_components/mathjs/dist/math.min.js',
-      '<%= common.dist %>/bower_components/saxjs/lib/sax.js' ]
+      '<%= common.dist %>/bower_components/saxjs/lib/sax.js',
+      '<%= common.dist %>/bower_components/bootstrap/dist/js/bootstrap.min.js'
+    ]
 
     core: [
       '<%= common.dist %>/bower_components/corespring-ng-components/build/corespring-ng-components.js',
@@ -271,6 +273,7 @@ module.exports = (grunt) ->
             '<%= common.dist %>/bower_components/jquery/dist/jquery.js',
             '<%= common.dist %>/bower_components/lodash/dist/lodash.js'
             '<%= common.dist %>/bower_components/saxjs/lib/sax.js',
+            '<%= common.dist %>/bower_components/bootstrap/dist/js/bootstrap.min.js',
             '<%= common.dist %>/bower_components/angular-ui-bootstrap-bower/ui-bootstrap-tpls.js'
           ]
           specs: '<%= common.test %>/js/**/*-test.js'
