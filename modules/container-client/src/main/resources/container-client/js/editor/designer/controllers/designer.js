@@ -18,6 +18,7 @@
       'WiggiFootnotesFeatureDef',
       'WiggiMathJaxFeatureDef',
       'WiggiLinkFeatureDef',
+      'ComponentImageService',
       DesignerController
     ]);
 
@@ -38,7 +39,8 @@
     MathJaxService,
     WiggiFootnotesFeatureDef,
     WiggiMathJaxFeatureDef,
-    WiggiLinkFeatureDef) {
+    WiggiLinkFeatureDef,
+    ComponentImageService) {
 
     var configPanels = {};
 
@@ -52,47 +54,7 @@
 
     $scope.editorMode = "visual";
 
-    $scope.imageService = {
-
-      deleteFile: function(url) {
-        $http['delete'](url);
-      },
-      addFile: function(file, onComplete, onProgress) {
-        var url = '' + file.name;
-
-        if (ImageUtils.bytesToKb(file.size) > 500) {
-          $timeout(function() {
-            onComplete(ImageUtils.fileTooBigError(file.size, 500).message);
-          });
-          return;
-        }
-
-        var opts = {
-          onUploadComplete: function(body, status) {
-            $log.log('onUploadComplete: ', body, status);
-            onComplete(null, url);
-          },
-          onUploadProgress: function(progress) {
-            $log.log('onUploadProgress', arguments);
-            onProgress(null, progress);
-          },
-          onUploadFailed: function() {
-            $log.log('onUploadFailed', arguments);
-            onComplete('<strong>Upload error</strong><br/>Your image was not uploaded. Please try again.');
-          }
-        };
-
-        var reader = new FileReader();
-
-        reader.onloadend = function() {
-          var uploader = new com.ee.RawFileUploader(file, reader.result, url, name, opts);
-          uploader.beginUpload();
-        };
-
-        reader.readAsBinaryString(file);
-      }
-    };
-
+    $scope.imageService = ComponentImageService;
 
     function onComponentsLoaded(uiComponents) {
       $scope.interactions = uiComponents.interactions;
