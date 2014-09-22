@@ -62,6 +62,11 @@
       initComponents();
     }
 
+    // Dropdowns in wiggi-wiz toolbar don't trigger when bootstrap is imported?
+    $timeout(function() {
+      $('.wiggi-wiz-toolbar button', $element).dropdown();
+    });
+
     function initComponents() {
 
       if (!$scope.interactions || !$scope.widgets) {
