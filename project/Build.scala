@@ -29,6 +29,7 @@ object Build extends sbt.Build {
       .exclude("com.google.code.findbugs", "jsr305")
       .exclude("com.googlecode.jarjar", "jarjar")
       .exclude("junit", "junit")
+    val commonsIo = "commons-io" % "commons-io" % "2.4"
     val commonsLang = "org.apache.commons" % "commons-lang3" % "3.2.1" % "test"
     val dependencyUtils = "org.corespring" %% "dependency-utils" % "0.5"
     val grizzled = "org.clapper" %% "grizzled-scala" % "1.2"
@@ -169,7 +170,7 @@ object Build extends sbt.Build {
 
   lazy val componentLoader = builder.lib("component-loader")
     .settings(
-      libraryDependencies ++= Seq(logbackClassic, specs2, rhinoJs, commonsLang))
+      libraryDependencies ++= Seq(logbackClassic, specs2, rhinoJs, commonsLang, commonsIo))
     .dependsOn(logging, componentModel, jsProcessing)
 
   val containerClientWeb = builder.playApp("container-client-web")
@@ -185,7 +186,8 @@ object Build extends sbt.Build {
         scalaz,
         jade4j,
         closureCompiler,
-        yuiCompressor),
+        yuiCompressor,
+        commonsIo),
       templatesImport ++= Seq("play.api.libs.json.JsValue", "play.api.libs.json.Json")).dependsOn(
         componentModel % "compile->compile;test->test",
         containerClient,
@@ -211,7 +213,7 @@ object Build extends sbt.Build {
 
   val shell = builder.playApp("shell")
     .settings(
-      libraryDependencies ++= Seq(logbackClassic, casbah, playS3, scalaz, play.Keys.cache, yuiCompressor, closureCompiler))
+      libraryDependencies ++= Seq(logbackClassic, casbah, playS3, scalaz, play.Keys.cache, yuiCompressor, closureCompiler, commonsIo))
     .dependsOn(containerClientWeb, componentLoader, mongoJsonService, docs, logging)
     .aggregate(containerClientWeb, componentLoader, containerClient, componentModel, utils, jsProcessing, mongoJsonService, docs, logging)
 

@@ -2,6 +2,7 @@ package org.corespring.container.client.controllers
 
 import java.io.{ File, InputStream }
 
+import org.apache.commons.io.IOUtils
 import org.apache.commons.lang3.StringEscapeUtils
 import org.corespring.container.client.V2PlayerConfig
 import org.corespring.container.client.controllers.player.PlayerQueryStringOptions
@@ -107,7 +108,7 @@ trait PlayerLauncher extends Controller with PlayerQueryStringOptions {
     Play.resource(p).map {
       r =>
         val name = new File(r.getFile).basename.getName.replace(".js", "")
-        val contents = scala.io.Source.fromInputStream(r.getContent().asInstanceOf[InputStream]).getLines.mkString("\n")
+        val contents = IOUtils.toString(r.getContent().asInstanceOf[InputStream])
         (name, contents)
     }.getOrElse {
       throw new RuntimeException(s"Can't find resource for path: $p")

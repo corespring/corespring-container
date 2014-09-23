@@ -2,6 +2,7 @@ package org.corespring.shell
 
 import java.io.File
 
+import org.apache.commons.io.{FileUtils, IOUtils}
 import org.corespring.container.logging.ContainerLogger
 import scala.concurrent.{ ExecutionContext, Future }
 import com.typesafe.config.ConfigFactory
@@ -119,7 +120,7 @@ class ContainerClientImplementation(
 
     override def resource(path: String): Option[String] = Play.resource(s"container-client/bower_components/$path").map { url =>
       logger.trace(s"load resource $path")
-      scala.io.Source.fromInputStream(url.openStream())(scala.io.Codec.UTF8).getLines().mkString("\n")
+      IOUtils.toString(url.openStream(), "UTF-8")
     }
 
     override def loadLibrarySource(path: String): Option[String] = {
@@ -129,7 +130,7 @@ class ContainerClientImplementation(
 
       if (file.exists()) {
         logger.trace(s"load file: $path")
-        Some(scala.io.Source.fromFile(file)(scala.io.Codec.UTF8).getLines().mkString("\n"))
+        Some(FileUtils.readFileToString(file, "UTF-8"))
       } else {
         Some(s"console.warn('failed to log $fullPath');")
       }
