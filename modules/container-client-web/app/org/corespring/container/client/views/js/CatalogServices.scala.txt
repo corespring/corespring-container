@@ -24,33 +24,38 @@
     };
   }]);
 
-  angular.module('@namespace').factory('BaseService', ['$http', function($http){
+  angular.module('@namespace').factory('BaseService', ['$http' ,
+    function($http){
 
-    var def = {
-      /**
-       * Load the item, check to see if its already loaded.
-       */
-      load: function(onSuccess, onFailure, id){
-        if(loadedData){
-          onSuccess(loadedData);
-        } else {
-          var finalUrl = id ? '@load.url'.replace(":id", id) : '@load.url';
+      var def = {
+        /**
+         * Load the item, check to see if its already loaded.
+         */
+        load: function(onSuccess, onFailure, id){
+          if(loadedData){
+            onSuccess(loadedData);
+          } else {
+            var finalUrl = id ? '@load.url'.replace(":id", id) : '@load.url';
 
-          $http['@load.method.toLowerCase'](finalUrl)
-            .success(function(data, status, headers, config){
-              console.log("[player-services] load item successful");
-              loadedData = data;
-              onSuccess(data);
-            })
-            .error(function(data, status, headers, config){
-              if(onFailure){
-                onFailure(data);
-              }
-            });
+            if (window && window.location && window.location.search){
+              finalUrl +=  window.location.search;
+            }
+
+            $http['@load.method.toLowerCase'](finalUrl)
+              .success(function(data, status, headers, config){
+                console.log("[player-services] load item successful");
+                loadedData = data;
+                onSuccess(data);
+              })
+              .error(function(data, status, headers, config){
+                if(onFailure){
+                  onFailure(data);
+                }
+              });
+          }
         }
-      }
-    };
-    return def;
-  }]);
+      };
+      return def;
+    }]);
 })();
 
