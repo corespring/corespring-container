@@ -186,7 +186,7 @@ var Instance = function(element, options, errorCallback, log) {
       try {
         return JSON.parse(event.data);
       } catch (e) {
-        log.warn("[player-instance] Can't parse: ", event.data, " as json");
+        log.warn("[player-instance] Can't parse: " + event.data + " as json", event);
         return {};
       }
     } else {

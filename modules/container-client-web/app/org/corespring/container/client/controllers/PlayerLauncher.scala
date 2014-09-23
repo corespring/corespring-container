@@ -108,7 +108,9 @@ trait PlayerLauncher extends Controller with PlayerQueryStringOptions {
     Play.resource(p).map {
       r =>
         val name = new File(r.getFile).basename.getName.replace(".js", "")
-        val contents = IOUtils.toString(r.getContent().asInstanceOf[InputStream])
+        val input = r.getContent().asInstanceOf[InputStream]
+        val contents = IOUtils.toString(input)
+        IOUtils.closeQuietly(input)
         (name, contents)
     }.getOrElse {
       throw new RuntimeException(s"Can't find resource for path: $p")

@@ -120,7 +120,10 @@ class ContainerClientImplementation(
 
     override def resource(path: String): Option[String] = Play.resource(s"container-client/bower_components/$path").map { url =>
       logger.trace(s"load resource $path")
-      IOUtils.toString(url.openStream(), "UTF-8")
+      val input = url.openStream()
+      val content = IOUtils.toString(input, "UTF-8")
+      IOUtils.closeQuietly(input)
+      content
     }
 
     override def loadLibrarySource(path: String): Option[String] = {
