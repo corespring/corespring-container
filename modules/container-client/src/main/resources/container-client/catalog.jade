@@ -11,7 +11,7 @@ block content
             a(ui-sref="item" ) Item
           li(ui-sref-active="active")
             a(ui-sref="profile" ) Profile
-          li.dropdown(ng-class="{active: isSupportingMaterialsSection()}")
+          li.dropdown(ng-class="{active: isSupportingMaterialsSection()}",ng-show="hasSupportingMaterials")
             a.dropdown-toggle(data-toggle="dropdown") Supporting Materials <span class="caret"></span>
             ul.dropdown-menu
               li(ng-repeat="s in supportingMaterials",ng-model="s",ng-class="{divider: s.type == 'divider'}")
