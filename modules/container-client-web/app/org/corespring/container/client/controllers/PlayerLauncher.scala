@@ -78,7 +78,7 @@ trait PlayerLauncher extends Controller with PlayerQueryStringOptions {
   def playerJs = Action.async { implicit request =>
     hooks.playerJs.map { implicit js =>
 
-      val sessionIdPlayerUrl = isProdPlayer match {
+      /*val sessionIdPlayerUrl = isProdPlayer match {
         case true => ProdHtmlPlayer.config(":id").url
         case _ => BasePlayer.loadPlayerForSession(":id")
       }
@@ -99,7 +99,8 @@ trait PlayerLauncher extends Controller with PlayerQueryStringOptions {
           "evaluate" -> s"$sessionIdPlayerUrl?mode=evaluate"))
       val jsPath = "container-client/js/player-launcher/player.js"
       val bootstrap = s"org.corespring.players.ItemPlayer = corespring.require('player').define(${js.isSecure});"
-      make(jsPath, defaultOptions, bootstrap)
+      make(jsPath, defaultOptions, bootstrap)*/
+      Ok("?")
     }
   }
 
