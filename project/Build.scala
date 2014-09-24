@@ -83,7 +83,7 @@ object Build extends sbt.Build {
 
   val buildClientTask = buildClient <<= (baseDirectory, streams) map {
     (baseDir, s) =>
-      val clientRoot: File = baseDir
+    /*val clientRoot: File = baseDir
 
       val commands = Seq(
         (npmCmd, "install"),
@@ -105,7 +105,7 @@ object Build extends sbt.Build {
           if (exitCode != 0) {
             throw new RuntimeException(s"The following commands failed: $c")
           }
-      }
+      }*/
 
   }
 
