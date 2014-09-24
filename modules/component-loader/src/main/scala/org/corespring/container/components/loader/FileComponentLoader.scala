@@ -2,6 +2,7 @@ package org.corespring.container.components.loader
 
 import java.io.File
 
+import org.apache.commons.io.FileUtils
 import org.corespring.container.components.loader.exceptions.ComponentLoaderException
 import org.corespring.container.components.model._
 import org.corespring.container.utils.string.hyphenatedToTitleCase
@@ -91,7 +92,7 @@ class FileComponentLoader(paths: Seq[String], onlyProcessReleased: Boolean)
     val maybeFiles = Seq("styles.css", "styles.less.css")
 
     maybeFiles
-      .map(filename => readMaybeFile(new File(s"${if (root.endsWith("/")) root else s"$root/" }$filename")))
+      .map(filename => readMaybeFile(new File(s"${if (root.endsWith("/")) root else s"$root/"}$filename")))
       .foldLeft("")((acc, maybeCss) => maybeCss match {
         case Some(css) => acc + css
         case _ => acc
@@ -242,9 +243,7 @@ class FileComponentLoader(paths: Seq[String], onlyProcessReleased: Boolean)
     } else Map.empty
 
   private def loadIcon(iconFile: File): Option[Array[Byte]] = if (iconFile.exists) {
-    val source = scala.io.Source.fromFile(iconFile)(scala.io.Codec.ISO8859)
-    val byteArray = source.map(_.toByte).toArray
-    source.close()
+    val byteArray = FileUtils.readFileToByteArray(iconFile)
     Some(byteArray)
   } else None
 
@@ -282,10 +281,7 @@ class FileComponentLoader(paths: Seq[String], onlyProcessReleased: Boolean)
       logger.debug(s"${f.getPath} does not exist")
       None
     } else {
-      val d = scala.io.Source.fromFile(f)
-      val content = Some(d.getLines().mkString("\n"))
-      d.close()
-      content
+      Some(FileUtils.readFileToString(f))
     }
   }
 

@@ -2,6 +2,7 @@ package org.corespring.shell
 
 import java.io.File
 
+import org.apache.commons.io.{ FileUtils, IOUtils }
 import org.corespring.container.logging.ContainerLogger
 import scala.concurrent.{ ExecutionContext, Future }
 import com.typesafe.config.ConfigFactory
@@ -29,9 +30,9 @@ class ContainerClientImplementation(
   componentsIn: => Seq[Component],
   val configuration: Configuration) extends DefaultIntegration {
 
-  override def resolveDomain(path:String) : String = {
-    val separator = if(path.startsWith("/")) "" else "/"
-    configuration.getString("cdn.domain").map{ d =>
+  override def resolveDomain(path: String): String = {
+    val separator = if (path.startsWith("/")) "" else "/"
+    configuration.getString("cdn.domain").map { d =>
       logger.trace(s"cdn.domain: $d")
       s"$d$separator$path"
     }.getOrElse(path)
@@ -128,7 +129,10 @@ class ContainerClientImplementation(
 
     override def resource(path: String): Option[String] = Play.resource(s"container-client/bower_components/$path").map { url =>
       logger.trace(s"load resource $path")
-      scala.io.Source.fromInputStream(url.openStream())(scala.io.Codec.UTF8).getLines().mkString("\n")
+      val input = url.openStream()
+      val content = IOUtils.toString(input, "UTF-8")
+      IOUtils.closeQuietly(input)
+      content
     }
 
     override def loadLibrarySource(path: String): Option[String] = {
@@ -138,7 +142,7 @@ class ContainerClientImplementation(
 
       if (file.exists()) {
         logger.trace(s"load file: $path")
-        Some(scala.io.Source.fromFile(file)(scala.io.Codec.UTF8).getLines().mkString("\n"))
+        Some(FileUtils.readFileToString(file, "UTF-8"))
       } else {
         Some(s"console.warn('failed to log $fullPath');")
       }
