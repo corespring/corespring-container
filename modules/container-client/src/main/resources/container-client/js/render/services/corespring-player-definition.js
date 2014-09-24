@@ -17,7 +17,15 @@ angular.module('corespring-player.services').factory('CorespringPlayerDefinition
         /**
          * Allows the scope to be extended - called at the end of link
          */
-        postLink: null
+        postLink: null,
+        /**
+         * Called after data has been passed to the components
+         */
+        afterSetDataAndSession: null,
+        /**
+         * Called before the body is compiled
+         */
+        preCompile: null
       }, opts);
 
       var link = function($scope, $elem) {
@@ -30,6 +38,9 @@ angular.module('corespring-player.services').factory('CorespringPlayerDefinition
           }
           $scope.lastScope = $scope.$new();
           var $body = $elem.find(".player-body").html(xhtml);
+          if(_.isFunction(opts.preCompile)){
+            opts.preCompile($body);
+          }
           $compile($body)($scope.lastScope);
 
           MathJaxService.onEndProcess(function(){
@@ -55,9 +66,15 @@ angular.module('corespring-player.services').factory('CorespringPlayerDefinition
             return;
           }
 
+          $log.debug("corespring player definition setDataAndSession rendering");
+
           var allData = PlayerUtils.zipDataAndSession($scope.item, $scope.session);
           ComponentRegister.setDataAndSession(allData);
           rendered = true;
+
+          if(_.isFunction(opts.afterSetDataAndSession)){
+            opts.afterSetDataAndSession($scope, allData);
+          }
         };
 
         $scope.$on('registerComponent', function(event, id, obj) {
@@ -66,6 +83,11 @@ angular.module('corespring-player.services').factory('CorespringPlayerDefinition
 
         $scope.$on('rerender-math', function(event, options) {
           MathJaxService.parseDomForMath(options.delay || 0, options.element);
+        });
+
+        $scope.$on('rerender-xhtml', function(event) {
+          renderMarkup($scope.xhtml);
+          setDataAndSession();
         });
 
         /**        

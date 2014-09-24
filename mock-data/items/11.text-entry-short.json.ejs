@@ -4,13 +4,37 @@
       "title" : "This is a test of short text entry..."
     }
   },
-  "xhtml" : "<div><corespring-short-text-entry id='2'></corespring-short-text-entry></div>",
+  "xhtml" : "<div><corespring-text-entry id='2'></corespring-text-entry></div>",
   "components" : {
     "2" : {
-      "componentType" : "corespring-short-text-entry",
-      "correctResponse": "apple",
-      "model" : {
-        "prompt": "This is a test item..."
+      "componentType": "corespring-text-entry",
+      "correctResponses": {
+        "award": 100,
+        "values": ["one", "two", "three"],
+        "ignoreWhitespace": true,
+        "ignoreCase": true,
+        "feedback": {
+          "type": "default",
+          "value": "correct, clever",
+          "specific": [
+            {"answer": "one", "feedback": "yes, it is one"}
+          ]
+
+        }
+      },
+      "incorrectResponses": {
+        "award": 0,
+        "feedback": {
+          "type": "default",
+          "value": "incorrect, stupid",
+          "specific": [
+            {"answer": "house", "feedback": "yes it is a house"}
+          ]
+        }
+      },
+      "model": {
+        "answerBlankSize": 8,
+        "answerAlignment": "left"
       }
     }
   },

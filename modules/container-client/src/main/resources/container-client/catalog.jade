@@ -1,25 +1,28 @@
+
 extends app-loader-layout
 
 block content
   .root(ng-controller="CatalogRoot")
+
     .nav-container
-      .top-nav-filler
+      nav.navbar.navbar-default.navbar-fixed-top
+        ul.nav.navbar-nav
+          li(ui-sref-active="active")
+            a(ui-sref="item" ) Item
+          li(ui-sref-active="active")
+            a(ui-sref="profile" ) Profile
+          li.dropdown(ng-class="{active: isSupportingMaterialsSection()}",ng-show="hasSupportingMaterials")
+            a.dropdown-toggle(data-toggle="dropdown") Supporting Materials <span class="caret"></span>
+            ul.dropdown-menu
+              li(ng-repeat="s in supportingMaterials",ng-model="s",ng-class="{divider: s.type == 'divider'}")
+                .dropdown-header(ng-if="s.type == 'header'") {{s.label}}
+                a(ng-if="s.type == 'data'",ui-sref="supporting-material({index: s.index})") {{s.label}}
 
-      ul.nav.nav-stacked
-        li(ui-sref-active="active")
-          a.mainitem-link(ui-sref="item") Item
-        li(ui-sref-active="active")
-          a.mainitem-link(ui-sref="profile") Profile 
-        li(
-          ui-sref-active="active",
-          ng-repeat="supportingMaterial in item.supportingMaterials")
-          a.mainitem-link(ui-sref="supporting-material({index: $index})") {{supportingMaterial.name}}
-
-    .content-container.cc-transition-left-right(ng-class="{'left-nav': !urlParams.hideLeftNav}")
+    .content-container
       .top-nav
         button.toggle-left-nav.btn.btn-sm.btn-default(ng-click="toggleLeftNav()")
           i.fa.fa-bars
-    
+
       .main-content(ui-view="main")
 
     include partials/catalog/item
@@ -55,7 +58,7 @@ block app-loader-config
             }
           }
         }
-      } 
+      }
     }
 
 block app-loader-scripts
@@ -66,8 +69,8 @@ block app-loader-scripts
   script( src="../../components/bootstrap/js/modal.js", type="text/javascript")
   script( src="../../components/bootstrap/js/tooltip.js", type="text/javascript")
   script( src="../../components/bootstrap/js/popover.js", type="text/javascript")
-  
-  for p in catalog 
+
+  for p in catalog
     script(src="#{p}", type="text/javascript")
 
   for p in catalogExtras
