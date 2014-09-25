@@ -102,8 +102,16 @@ block scripts
 
         head.ready(function(){
           allScriptsAreLoaded();
-        });
-
+        })
+      })
+      .fail(function(e){
+        var data = {
+          status: (e && e.status) ? e.status : 'error',
+          statusText: (e && e.statusText) ? e.statusText : 'NA',
+          responseText: (e && e.responseText) ? e.responseText : 'NA',
+          description: 'Failed to load application configuration'
+        };
+        (new MessageBridge()).sendMessage('parent', data, true);
       });
     }); 
 

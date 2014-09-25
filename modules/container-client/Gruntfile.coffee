@@ -112,7 +112,9 @@ module.exports = (grunt) ->
       '<%= common.dist %>/js/catalog/**/*.js',
       '<%= common.dist %>/js/render/services/**/*.js',
       '<%= common.dist %>/js/render/directives/**/*.js',
-      '<%= common.dist %>/js/render/controllers/**/*.js' ]
+      '<%= common.dist %>/js/render/controllers/**/*.js',
+      '<%= common.dist %>/js/common/services/message-bridge.js'
+    ]
 
     catalogExtras: [ 
       '<%= common.dist %>/bower_components/angular-route/angular-route.min.js',
