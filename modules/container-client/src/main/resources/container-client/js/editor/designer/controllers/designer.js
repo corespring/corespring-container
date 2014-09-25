@@ -18,6 +18,7 @@
       'WiggiFootnotesFeatureDef',
       'WiggiMathJaxFeatureDef',
       'WiggiLinkFeatureDef',
+      'ComponentImageService',
       DesignerController
     ]);
 
@@ -38,7 +39,8 @@
     MathJaxService,
     WiggiFootnotesFeatureDef,
     WiggiMathJaxFeatureDef,
-    WiggiLinkFeatureDef) {
+    WiggiLinkFeatureDef,
+    ComponentImageService) {
 
     var configPanels = {};
 
@@ -52,54 +54,18 @@
 
     $scope.editorMode = "visual";
 
-    $scope.imageService = {
-
-      deleteFile: function(url) {
-        $http['delete'](url);
-      },
-      addFile: function(file, onComplete, onProgress) {
-        var url = '' + file.name;
-
-        if (ImageUtils.bytesToKb(file.size) > 500) {
-          onComplete(ImageUtils.fileTooBigError(file.size, 500));
-          return;
-        }
-
-        var opts = {
-          onUploadComplete: function(body, status) {
-            $log.log('onUploadComplete: ', body, status);
-            onComplete(null, url);
-          },
-          onUploadProgress: function() {
-            $log.log('onUploadProgress', arguments);
-            onProgress(null, 'started');
-          },
-          onUploadFailed: function() {
-            $log.log('onUploadFailed', arguments);
-            onComplete({
-              code: 'UPLOAD_FAILED',
-              message: 'upload failed!'
-            });
-          }
-        };
-
-        var reader = new FileReader();
-
-        reader.onloadend = function() {
-          var uploader = new com.ee.RawFileUploader(file, reader.result, url, name, opts);
-          uploader.beginUpload();
-        };
-
-        reader.readAsBinaryString(file);
-      }
-    };
-
+    $scope.imageService = ComponentImageService;
 
     function onComponentsLoaded(uiComponents) {
       $scope.interactions = uiComponents.interactions;
       $scope.widgets = uiComponents.widgets;
       initComponents();
     }
+
+    // Dropdowns in wiggi-wiz toolbar don't trigger when bootstrap is imported?
+    $timeout(function() {
+      $('.wiggi-wiz-toolbar button', $element).dropdown();
+    });
 
     function initComponents() {
 
@@ -185,6 +151,17 @@
         ImageFeature
       ];
 
+      var linkFeatureGroup = {
+        type: 'group',
+        buttons: [
+          new WiggiLinkFeatureDef()
+        ]
+      };
+
+      $scope.linkFeature = {
+        definitions: [linkFeatureGroup]
+      };
+
       $scope.extraFeatures = {
         definitions: [{
           name: 'external',
@@ -206,13 +183,9 @@
           buttons: [
             videoComponent
           ]
-        }, {
-          type: 'group',
-          buttons: [
-            new WiggiLinkFeatureDef()
-          ]
-        }]
-      };
+        },
+        linkFeatureGroup
+      ]};
     }
 
     function onComponentsLoadError(error) {

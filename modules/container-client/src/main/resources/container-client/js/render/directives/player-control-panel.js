@@ -83,18 +83,37 @@
               checkbox("highlightCorrectResponse", "Highlight correct outcome"),
               checkbox("allowEmptyResponses", "Allow empty responses"),
               '</ul>',
-              '<a class="btn btn-success btn-small btn-sm" ng-click="closePopup()">Done</a>'
+              '<div style="display:block" align="right">',
+              '<a class="btn btn-default btn-small btn-sm done" ng-click="closePopup()">Done</a>',
+              '</div>'
             ].join('\n');
 
-            var linker = $compile(template);
-            var popupContent = linker($scope);
+            $configLink.on('show.bs.popover', function () {
+
+              function isOrChildOf(selector,elem) {
+                var target = $(elem);
+                return target.is(selector) || target.parents(selector).length > 0;
+              }
+
+              function onClickAnyWhere(e) {
+                if (!isOrChildOf('.popover',e.target) && !isOrChildOf('.fa-cog',e.target)) {
+                  $scope.closePopup();
+                  $('html').off( "click", arguments.callee);
+                }
+              }
+
+              $('html').click(onClickAnyWhere);
+            });
 
             $configLink.popover({
               html: true,
               placement: 'bottom',
+              template: '<div class="popover"><h3 class="popover-title"></h3><div class="popover-content"></div></div>',
               content: function() {
-                return popupContent;
-              }
+                return $compile(template)($scope);
+              },
+              viewport:{selector:'.client-side-preview'},
+              trigger:'click'
             });
           }
 

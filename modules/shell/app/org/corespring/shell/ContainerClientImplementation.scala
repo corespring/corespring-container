@@ -2,7 +2,7 @@ package org.corespring.shell
 
 import java.io.File
 
-import org.apache.commons.io.{FileUtils, IOUtils}
+import org.apache.commons.io.{ FileUtils, IOUtils }
 import org.corespring.container.logging.ContainerLogger
 import scala.concurrent.{ ExecutionContext, Future }
 import com.typesafe.config.ConfigFactory
@@ -29,6 +29,14 @@ class ContainerClientImplementation(
   val sessionService: MongoService,
   componentsIn: => Seq[Component],
   val configuration: Configuration) extends DefaultIntegration {
+
+  override def resolveDomain(path: String): String = {
+    val separator = if (path.startsWith("/")) "" else "/"
+    configuration.getString("cdn.domain").map { d =>
+      logger.trace(s"cdn.domain: $d")
+      s"$d$separator$path"
+    }.getOrElse(path)
+  }
 
   lazy val logger = ContainerLogger.getLogger("ContainerClientImplementation")
 
@@ -109,6 +117,7 @@ class ContainerClientImplementation(
         s"""
              |minify: ${rc.getBoolean("components.minify").getOrElse(Play.mode == Mode.Prod)}
              |gzip: ${rc.getBoolean("components.gzip").getOrElse(Play.mode == Mode.Prod)}
+             |path: ${rc.getString("components.path").getOrElse("?")}
            """.stripMargin)
 
       new Configuration(c)
@@ -199,4 +208,3 @@ trait LoadJs {
     PlayerJs(isSecure, updatedSession, errors)
   }
 }
-

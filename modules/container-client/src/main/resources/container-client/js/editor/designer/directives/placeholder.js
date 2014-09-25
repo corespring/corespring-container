@@ -9,8 +9,31 @@ var Placeholder = function(
 
   function link($scope, $element, $attrs) {
 
+    $scope.configurable = $scope.canConfig !== 'false';
     $scope.title = '';
     $scope.componentPreview = null;
+    $scope.register = ComponentRegister;
+    $scope.selected = false;
+
+    $scope.safeApply = function() {
+      var phase = this.$root.$$phase;
+      if (phase !== '$apply' && phase !== '$digest') {
+        this.$apply();
+      }
+    };
+
+    function isElement(data) {
+      return data.id === $scope.id;
+    }
+
+    function setSelected(selected) {
+      $scope.selected = selected;
+      $scope.safeApply();
+    }
+
+    function removeTooltip(){
+      $scope.$broadcast("$destroy");
+    }
 
     function preprocess(component) {
       var serverLogic = corespring.server.logic(component.data.componentType);
@@ -27,77 +50,55 @@ var Placeholder = function(
       }
     }
 
-    $scope.$on('registerComponent', function(event, id, component) {
-
-      $scope.componentPreview = component;
-      log('registerComponent', component, id);
-
-      setDataToComponent();
-    });
-
-    $scope.register = ComponentRegister;
-
-    $scope.$watch('register.loadedData', function() {
-      log('data has changed!');
-      setDataToComponent();
-    });
-
-    $scope.selected = false;
-
-    $scope.$watch('selected', function(n) {
-      $scope.selectedClass = n === true ? 'selected' : '';
-    });
+    function markDirty(){
+      var component = $scope.register.loadedData[$scope.id];
+      if (component && component.data && component.data.clean && $scope.componentPreview) {
+        delete component.data.clean;
+        log("markDirty ", $scope.componentPreview);
+        $scope.componentPreview.setDataAndSession(component);
+      }
+    }
 
     function renderPlayerComponent() {
       if (!$scope.id || !$scope.componentType) {
         return;
       }
 
-      var component = $scope.register.loadedData[$scope.id];
-
       var $holder = $element.find('.holder');
-      var config = ComponentConfig.get($scope.componentType);
-
       if (!$holder) {
         return;
       }
+
+      var component = $scope.register.loadedData[$scope.id];
+      var config = ComponentConfig.get($scope.componentType);
+
+      log("renderPlayerComponent", $holder, component);
 
       $scope.showIcon = (config.icon !== undefined) && (component.data.clean === true);
       $scope.icon = config.icon;
       $scope.name = config.title;
 
       if ($scope.showIcon) {
-        $holder.html([
-          '<span class="title">' + $scope.name + '</span>',
-          '<img class="icon" src="' + $scope.icon + '"/>'
-        ].join('\n'));
+        $holder.html('<span class="title">' + $scope.name + '</span>');
+        $holder.css('background-image', 'url('+ $scope.icon + ')');
       } else {
+        $holder.css('background-image', 'none');
         $holder.html('<' + $scope.componentType + ' id="' + $scope.id + '"></' + $scope.componentType + '>');
         $compile($holder)($scope.$new());
       }
     }
 
-    // When the item changes, re-render the player component
-    $scope.$emit('registerComponent', $scope.id, {
-      setDataAndSession: renderPlayerComponent
+    $scope.$watch('register.loadedData', function() {
+      log('data has changed!');
+      setDataToComponent();
+    });
+
+    $scope.$watch('selected', function(n) {
+      $scope.selectedClass = n === true ? 'selected' : '';
     });
 
     $scope.$watch('id', renderPlayerComponent);
     $scope.$watch('componentType', renderPlayerComponent);
-
-    $scope.id = $scope.id || 2;
-    setDataToComponent();
-
-    $scope.safeApply = function() {
-      var phase = this.$root.$$phase;
-      if (phase !== '$apply' && phase !== '$digest') {
-        this.$apply();
-      }
-    };
-
-    function removeTooltip(){
-      $scope.$broadcast("$destroy");
-    }
 
     $scope.deleteNode = function($event) {
       $event.stopPropagation();
@@ -106,19 +107,11 @@ var Placeholder = function(
     };
 
     $scope.editNode = function($event) {
+      markDirty();
       $event.stopPropagation();
       removeTooltip();
       $scope.$emit('wiggi-wiz.call-feature-method', 'editNode', $element);
     };
-
-    function isElement(data) {
-      return data.id === $scope.id;
-    }
-
-    function setSelected(selected) {
-      $scope.selected = selected;
-      $scope.safeApply();
-    }
 
     $rootScope.$on('componentSelectionToggled', function(event, data) {
       if (isElement(data)) {
@@ -138,6 +131,23 @@ var Placeholder = function(
       setSelected(false);
     });
 
+    $scope.$on('registerComponent', function(event, id, component) {
+
+      $scope.componentPreview = component;
+      log('registerComponent', component, id);
+
+      setDataToComponent();
+    });
+
+    // When the item changes, re-render the player component
+    $scope.$emit('registerComponent', $scope.id, {
+      setDataAndSession: renderPlayerComponent
+    });
+
+    //do we need to do that?
+    //$scope.id = $scope.id || 2;
+    //setDataToComponent();
+
   }
 
   return {
@@ -147,11 +157,12 @@ var Placeholder = function(
     scope: {
       label: '@',
       componentType: '@',
-      id: '@'
+      id: '@',
+      canConfig: '@configurable'
     },
     template: [
       '<div class="component-placeholder" ng-class="{\'show-icon\': showIcon}" data-component-id="{{id}}">',
-      '  <div class="blocker">',
+      '  <div ng-if="configurable" class="blocker">',
       '    <div class="bg"></div>',
       '    <div class="content"></div>',
       '    <ul class="edit-controls">',

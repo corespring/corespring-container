@@ -27,6 +27,13 @@ trait DefaultIntegration
   with HasConfig
   with HasProcessors {
 
+  /**
+   * For a given resource path return a resolved path.
+   * By default this just returns the path, so no domain is used.
+   * Override it if you want to make use of it.
+   */
+  def resolveDomain(path: String): String = path
+
   private lazy val logger = ContainerLogger.getLogger("DefaultIntegration")
 
   def validate: Either[String, Boolean] = {
@@ -129,19 +136,6 @@ trait DefaultIntegration
     override def hooks = playerHooks
   }
 
-  lazy val devHtmlPlayer = new DevHtmlPlayer {
-
-    override def showErrorInUi: Boolean = DefaultIntegration.this.showErrorInUi
-
-    override implicit def ec: ExecutionContext = DefaultIntegration.this.ec
-
-    override def urls: ComponentUrls = componentSets
-
-    override def components: Seq[Component] = DefaultIntegration.this.components
-
-    override def hooks = playerHooks
-  }
-
   lazy val prodHtmlPlayer = new ProdHtmlPlayer {
 
     override def showErrorInUi: Boolean = DefaultIntegration.this.showErrorInUi
@@ -153,6 +147,8 @@ trait DefaultIntegration
     override def components: Seq[Component] = DefaultIntegration.this.components
 
     override def hooks = playerHooks
+
+    override def resolveDomain(path: String): String = DefaultIntegration.this.resolveDomain(path)
   }
 
   lazy val item = new Item {
@@ -188,4 +184,3 @@ trait DefaultIntegration
     override def hooks: DataQueryHooks = dataQueryHooks
   }
 }
-

@@ -94,7 +94,9 @@ module.exports = (grunt) ->
       '<%= common.dist %>/bower_components/lodash/dist/lodash.min.js',
       '<%= common.dist %>/bower_components/angular-ui-sortable/sortable.min.js',
       '<%= common.dist %>/bower_components/mathjs/dist/math.min.js',
-      '<%= common.dist %>/bower_components/saxjs/lib/sax.js' ]
+      '<%= common.dist %>/bower_components/saxjs/lib/sax.js',
+      '<%= common.dist %>/bower_components/bootstrap/dist/js/bootstrap.min.js'
+    ]
 
     core: [
       '<%= common.dist %>/bower_components/corespring-ng-components/build/corespring-ng-components.js',
@@ -161,6 +163,9 @@ module.exports = (grunt) ->
       less:
         files: ['<%= common.app %>/**/*.less']
         tasks: ['copy:main', 'less:development']
+      componentLess:
+        files: ['<%= common.components %>/**/*.less']
+        tasks: ['runComponentLess']
       js:
         files: ['<%= common.app %>/js/**/*.js', '<%= common.components %>/**/*.js']
         tasks: ['jshint:main']
@@ -268,6 +273,7 @@ module.exports = (grunt) ->
             '<%= common.dist %>/bower_components/jquery/dist/jquery.js',
             '<%= common.dist %>/bower_components/lodash/dist/lodash.js'
             '<%= common.dist %>/bower_components/saxjs/lib/sax.js',
+            '<%= common.dist %>/bower_components/bootstrap/dist/js/bootstrap.min.js',
             '<%= common.dist %>/bower_components/angular-ui-bootstrap-bower/ui-bootstrap-tpls.js'
           ]
           specs: '<%= common.test %>/js/**/*-test.js'
@@ -367,9 +373,21 @@ module.exports = (grunt) ->
   # short cut
   grunt.registerTask('lcd', ['restoreResolutions', 'loadComponentDependencies'])
   grunt.registerTask('prepPlayerLauncher', 'prep the player launcher js', prepPlayerLauncher(grunt))
-  grunt.registerTask('run', ['uglification', 'ejs', 'jade', 'less', 'watch'])
+  grunt.registerTask('run', ['uglification', 'ejs', 'jade', 'runComponentLess', 'less', 'watch'])
   grunt.registerTask('test', ['shell:bower', 'shell:bowerCacheClean', 'lcd', 'prepPlayerLauncher', 'jasmine:unit'])
   grunt.registerTask('uglification', ['clean:uglified', 'uglify:concatOnly', 'uglify:minifyAndConcat', 'uglify:prodPlayer'])
-  grunt.registerTask('default', ['shell:bower', 'lcd', 'jshint', 'uglification', 'ejs', 'copy', 'less', 'clean:less', 'clean_bower', 'jade', 'compress', 'prepPlayerLauncher','jasmine:unit'])
+  grunt.registerTask('default', ['shell:bower', 'lcd', 'jshint', 'uglification', 'ejs', 'copy', 'less', 'clean:less', 'runComponentLess', 'clean_bower', 'jade', 'compress', 'prepPlayerLauncher','jasmine:unit'])
   grunt.registerTask('minify-test', ['concat', 'uglify'])
   grunt.registerTask('ejs-test', ['ejs'])
+
+  grunt.registerTask('runComponentLess', ->
+    cb = @async()
+    grunt.util.spawn(
+      grunt: true, args: [ 'less' ]
+      opts:
+        cwd: common.components
+    , (error, result, code) ->
+      console.log result.stdout
+      cb()
+    )
+  )

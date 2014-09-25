@@ -1,5 +1,8 @@
+@btn-border-radius: 4px;
+
 .control-panel {
   width: 100%;
+  padding-right: 10px;
   min-height: 43px;
 
   .score {
@@ -15,12 +18,15 @@
     display: inline-block;
   }
 
+  .done {
+    .border-radius(@btn-border-radius);
+  }
   .action,
   .action:focus,
   .action:hover {
     display: inline-block;
     vertical-align: middle;
-    .border-radius(4px);
+    .border-radius(@btn-border-radius);
     color: white;
     margin-left: 5px;
   }
@@ -75,7 +81,6 @@
           position: absolute;
         }
         span {
-          padding-left: 20px;
           display: block;
         }
         .disabled {
@@ -97,9 +102,52 @@
     filter: progid:dximagetransform.microsoft.gradient(enabled=false);
   }
 
+
+  .button-holder {
+    margin-top: 15px;
+    text-align: right;
+  }
+
+  input[type="checkbox"] {
+    display:none;
+  }
+
+  input[type="checkbox"] + span {
+    margin-left: 27px;
+    line-height: 34px;
+  }
+
+  input[type="checkbox"] + span:before {
+    font-family: 'FontAwesome';
+    content: "";
+    position: absolute;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    background-color: #fff;
+    font-size: 18px;
+    width: 20px;
+    height: 20px;
+    top: 6px;
+    left: 2px;
+    line-height: 20px;
+  }
+
+  input[type="checkbox"]:checked + span:before {
+    content: "\f00c";
+  }
+
+  ul.settings {
+    width: 191px;
+  }
+
+  .setting label {
+    cursor: pointer;
+    cursor: hand;
+  }
+
+  .fa-cog{
+    cursor: pointer;
+    cursor: hand;
+  }
 }
 
-.button-holder {
-  margin-top: 15px;
-  text-align: right;
-}

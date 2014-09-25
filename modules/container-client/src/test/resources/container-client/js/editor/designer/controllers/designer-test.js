@@ -77,6 +77,7 @@ describe('designer controller', function() {
       $provide.value('ComponentRegister', new mockComponentRegister());
       $provide.value('ImageFeature', new mockImageFeature());
       $provide.value('LogFactory', new mockLogFactory());
+      $provide.value('ComponentImageService', {});
     });
   });
 
@@ -94,11 +95,6 @@ describe('designer controller', function() {
 
   it('should init', function() {
     expect(ctrl).toNotBe(null);
-  });
-
-  //Note: the controller will be changing soon, so tests are pending also.
-  xit("pending tests", function() {
-
   });
 
 
