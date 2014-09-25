@@ -111,6 +111,11 @@ trait PlayerLauncher extends Controller with PlayerQueryStringOptions {
     }
   }
 
+  /**
+   * Read a js resource from the classpath
+   * @param p
+   * @return name (without suffix) -> source
+   */
   private def pathToNameAndContents(p: String): (String, String) = {
     import grizzled.file.GrizzledFile._
     Play.resource(p).map {
@@ -123,7 +128,7 @@ trait PlayerLauncher extends Controller with PlayerQueryStringOptions {
           input.close()
           (name, contents)
         } catch {
-          case e: Throwable => throw new RuntimeException("Error converting input to string", e) //no-op
+          case e: Throwable => throw new RuntimeException("Error converting input to string", e)
         } finally {
           IOUtils.closeQuietly(input)
         }
