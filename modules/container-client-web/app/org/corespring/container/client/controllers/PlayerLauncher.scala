@@ -47,6 +47,16 @@ trait PlayerLauncher extends Controller with PlayerQueryStringOptions {
 
   def hooks: PlayerLauncherHooks
 
+  lazy val editorNameAndSrc = {
+    val jsPath = "container-client/js/player-launcher/editor.js"
+    pathToNameAndContents(jsPath)
+  }
+
+  lazy val playerNameAndSrc = {
+    val jsPath = "container-client/js/player-launcher/player.js"
+    pathToNameAndContents(jsPath)
+  }
+
   def editorJs = Action.async { implicit request =>
     hooks.editorJs.map { implicit js =>
 
@@ -66,9 +76,8 @@ trait PlayerLauncher extends Controller with PlayerQueryStringOptions {
           "create" -> Json.obj(
             "method" -> create.method,
             "url" -> create.url)))
-      val jsPath = "container-client/js/player-launcher/editor.js"
       val bootstrap = "org.corespring.players.ItemEditor = corespring.require('editor');"
-      make(jsPath, defaultOptions, bootstrap)
+      make(editorNameAndSrc, defaultOptions, bootstrap)
     }
   }
 
@@ -78,7 +87,7 @@ trait PlayerLauncher extends Controller with PlayerQueryStringOptions {
   def playerJs = Action.async { implicit request =>
     hooks.playerJs.map { implicit js =>
 
-      /*val sessionIdPlayerUrl = isProdPlayer match {
+      val sessionIdPlayerUrl = isProdPlayer match {
         case true => ProdHtmlPlayer.config(":id").url
         case _ => BasePlayer.loadPlayerForSession(":id")
       }
@@ -97,22 +106,27 @@ trait PlayerLauncher extends Controller with PlayerQueryStringOptions {
           "gatherSession" -> s"$sessionIdPlayerUrl?mode=gather",
           "view" -> s"$sessionIdPlayerUrl?mode=view",
           "evaluate" -> s"$sessionIdPlayerUrl?mode=evaluate"))
-      val jsPath = "container-client/js/player-launcher/player.js"
       val bootstrap = s"org.corespring.players.ItemPlayer = corespring.require('player').define(${js.isSecure});"
-      make(jsPath, defaultOptions, bootstrap)*/
-      Ok("?")
+      make(playerNameAndSrc, defaultOptions, bootstrap)
     }
   }
 
-  private def pathToNameAndContents(p: String) = {
+  private def pathToNameAndContents(p: String): (String, String) = {
     import grizzled.file.GrizzledFile._
     Play.resource(p).map {
       r =>
         val name = new File(r.getFile).basename.getName.replace(".js", "")
+
         val input = r.getContent().asInstanceOf[InputStream]
-        val contents = IOUtils.toString(input)
-        IOUtils.closeQuietly(input)
-        (name, contents)
+        try {
+          val contents = IOUtils.toString(input)
+          input.close()
+          (name, contents)
+        } catch {
+          case e: Throwable => throw new RuntimeException("Error converting input to string", e) //no-op
+        } finally {
+          IOUtils.closeQuietly(input)
+        }
     }.getOrElse {
       throw new RuntimeException(s"Can't find resource for path: $p")
     }
@@ -139,11 +153,11 @@ trait PlayerLauncher extends Controller with PlayerQueryStringOptions {
       """
   }
 
-  private def make(jsPath: String, options: JsValue, bootstrapLine: String)(implicit request: Request[AnyContent], js: PlayerJs): SimpleResult = {
+  private def make(additionalJsNameAndSrc: (String, String), options: JsValue, bootstrapLine: String)(implicit request: Request[AnyContent], js: PlayerJs): SimpleResult = {
     val defaultOptions = ("default-options" -> s"module.exports = ${Json.stringify(options)}")
     val launchErrors = ("launcher-errors" -> errorsToModule(js.errors))
     val queryParams = ("query-params" -> makeQueryParams(request.queryString))
-    val wrappedNameAndContents = Seq(jsPath).map(pathToNameAndContents) :+ defaultOptions :+ launchErrors :+ queryParams
+    val wrappedNameAndContents = Seq(additionalJsNameAndSrc, defaultOptions, launchErrors, queryParams)
     val wrappedContents = wrappedNameAndContents.map(tuple => ServerLibraryWrapper(tuple._1, tuple._2))
     def sumSession(s: Session, keyValues: (String, String)*): Session = {
       keyValues.foldRight(s)((kv: (String, String), acc: Session) => acc + (kv._1, kv._2))
