@@ -24,8 +24,10 @@ object VersionInfo {
     val url = Play.resource(propsFile)
     url.map {
       u =>
+        val input = u.openStream()
         val props = new Properties()
-        props.load(u.openStream())
+        props.load(input)
+        input.close()
         props
     }.getOrElse(new Properties())
   }
