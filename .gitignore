@@ -10,3 +10,4 @@ atlassian-*
 bower_components
 node_modules
 target
+.ensime*
