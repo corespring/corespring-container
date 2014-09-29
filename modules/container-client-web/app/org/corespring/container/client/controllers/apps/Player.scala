@@ -26,7 +26,7 @@ trait BasePlayer
 
   def showErrorInUi: Boolean
 
-  override def servicesJs = {
+  override lazy val servicesJs = {
     import org.corespring.container.client.controllers.resources.routes._
     PlayerServices(
       "player.services",
