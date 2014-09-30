@@ -2,6 +2,7 @@ import sbt._
 import Keys._
 import play.Project._
 import sbtrelease.ReleasePlugin._
+import sbtrelease.Version
 
 class Builders(org: String, rootScalaVersion: String) {
 
@@ -24,6 +25,8 @@ class Builders(org: String, rootScalaVersion: String) {
   }
 
   val sharedSettings = releaseSettings ++ Seq(
+    //By default always bump the minor for a release
+    ReleaseKeys.versionBump := Version.Bump.Minor,
     credentials += cred,
     Keys.fork in Test := false,
     Keys.parallelExecution in Test := false,
