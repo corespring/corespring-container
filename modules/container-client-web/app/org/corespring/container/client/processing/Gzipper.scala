@@ -9,6 +9,8 @@ trait Gzipper {
     val gzip: GZIPOutputStream = new GZIPOutputStream(out)
     gzip.write(src.getBytes())
     gzip.close()
-    out.toByteArray
+    val returnValue = out.toByteArray
+    out.close()
+    returnValue
   }
 }

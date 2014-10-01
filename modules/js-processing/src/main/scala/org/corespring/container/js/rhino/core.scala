@@ -76,6 +76,7 @@ trait LibLoading {
     reader =>
       logger.trace(s"[addToContext] $libPath")
       context.evaluateReader(scope, reader, libPath, 1, null)
+      reader.close()
   }
 
   def addSrcToContext(context: Context, scope: Scriptable, name: String, src: String) = {
