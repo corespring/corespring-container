@@ -149,6 +149,8 @@ trait DefaultIntegration
     override def hooks = playerHooks
 
     override def resolveDomain(path: String): String = DefaultIntegration.this.resolveDomain(path)
+
+    override def itemPreProcessor: PlayerItemPreProcessor = DefaultIntegration.this.playerItemPreProcessor
   }
 
   lazy val item = new Item {

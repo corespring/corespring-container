@@ -41,6 +41,14 @@ angular.module('corespring-catalog.controllers')
       };
 
       $scope.onItemLoaded = function(item) {
+
+        _.forEach(item.components,function(component){
+          var serverLogic = corespring.server.logic(component.componentType);
+          if (serverLogic && serverLogic.preprocess){
+            serverLogic.preprocess(component);
+          }
+        });
+
         $scope.data = {
           item: item
         };

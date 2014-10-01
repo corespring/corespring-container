@@ -19,14 +19,39 @@ var controller = function($scope, $log, $timeout, MessageBridge) {
 
   MessageBridge.addMessageListener($scope.messageBridgeListener);
 
+  var getQueryParams = function(  ) {
+
+    var queryString = (window && window.location &&
+      window.location.search && _.isString(window.location.search) &&
+      window.location.search.length > 1) ? window.location.search.substring(1): null;
+
+    if (!queryString){
+      return null;
+    }
+    var params = {}, queries, temp, i, l;
+
+    queries = queryString.split("&");
+
+    for ( i = 0, l = queries.length; i < l; i++ ) {
+      temp = queries[i].split('=');
+      params[temp[0]] = temp[1];
+    }
+
+    return params;
+  };
 
   (function() {
     //jshint eqeqeq:false
     if (parent == window) {
       $timeout(function() {
-        $scope.$broadcast('initialise', {
+        var data ={
           mode: 'gather'
-        });
+        };
+        var qparams = getQueryParams();
+        if (qparams){
+          data.queryParams = qparams;
+        }
+        $scope.$broadcast('initialise', data);
       });
     } else {
       MessageBridge.sendMessage('parent', {
