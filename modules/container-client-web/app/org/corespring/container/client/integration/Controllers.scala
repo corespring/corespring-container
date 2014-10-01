@@ -39,7 +39,7 @@ trait PlayerControllers extends CommonControllers with ResourceControllers {
   /** The player app */
   def jsonPlayer: JsonPlayer
 
-  /** The production player */
+  def devHtmlPlayer : DevHtmlPlayer
   def prodHtmlPlayer : ProdHtmlPlayer
 }
 
@@ -76,6 +76,7 @@ trait ContainerControllers
     session,
     rig,
     jsonPlayer,
+    devHtmlPlayer,
     prodHtmlPlayer,
     editor,
     catalog,

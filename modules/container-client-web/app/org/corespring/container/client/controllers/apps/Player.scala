@@ -76,15 +76,9 @@ trait BasePlayer
 
 trait JsonPlayer extends BasePlayer {}
 
-/**
- * The ProdHtmlPlayer serves server side generated html.
- * This is to speed up this player load time and performance
- */
-trait ProdHtmlPlayer extends BasePlayer with Jade {
+trait HtmlPlayer extends BasePlayer with Jade {
 
   val name = "server-generated-player.jade"
-
-  val prefix = v2Player.Routes.prefix
 
   def template(html: String, deps: Seq[String], js: Seq[String], css: Seq[String], json: JsValue) = {
     val params: Map[String, Object] = Map(
@@ -96,29 +90,6 @@ trait ProdHtmlPlayer extends BasePlayer with Jade {
       "versionInfo" -> Json.stringify(VersionInfo.json))
     logger.trace(s"render jade with params: $params")
     renderJade(name, params)
-  }
-
-  def coreJs = Seq(
-    s"$prefix/js/root-prod-player.js",
-    s"$prefix/components/mathjax/MathJax.js")
-
-  def coreCss = Seq(
-    s"$prefix/css/player.min.css",
-    s"$prefix/components/font-awesome/css/font-awesome.min.css")
-
-  def resolveDomain(path: String): String = path
-
-  /**
-   * A temporary means of defining paths that may be resolved
-   */
-  private def resolvePath(s: String): String = {
-    val needsResolution = Seq(
-      "component-sets/",
-      "components/",
-      "root-prod-player",
-      "player-services.js",
-      "player.min").exists(s.contains)
-    if (needsResolution) resolveDomain(s) else s
   }
 
   override def config(id: String) = Action.async { implicit request =>
@@ -139,22 +110,17 @@ trait ProdHtmlPlayer extends BasePlayer with Jade {
 
         val clientSideDependencies = getClientSideDependencies(resolvedComponents)
         val dependencies = ngModules.createAngularModules(resolvedComponents, clientSideDependencies)
+        val js = (additionalScripts :+ jsUrl).distinct
+        val css = Seq(cssUrl)
 
-        val js = coreJs ++ (additionalScripts :+ jsUrl).distinct
-
-        val domainResolvedJs = js.map(resolvePath)
-        val css = coreCss :+ cssUrl
-        val domainResolvedCss = css.map(resolvePath)
-
-        Ok(
-          template(
-            processXhtml(
-              (itemJson \ "xhtml").asOpt[String]),
-            dependencies,
-            domainResolvedJs,
-            domainResolvedCss,
-            Json.obj("session" -> session, "item" -> itemJson)))
+        Ok(template(processXhtml((itemJson \ "xhtml").asOpt[String]), dependencies, js, css, Json.obj("session" -> session, "item" -> itemJson)))
       }
     }
   }
 }
+
+trait DevHtmlPlayer extends HtmlPlayer {
+  override def config(id: String) = Action(SeeOther(org.corespring.container.client.controllers.apps.routes.ProdHtmlPlayer.config(id).url))
+}
+
+trait ProdHtmlPlayer extends HtmlPlayer {}

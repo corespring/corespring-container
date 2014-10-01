@@ -112,9 +112,6 @@ var Instance = function(element, options, errorCallback, log) {
     }
 
     var url = makeUrl(options.url, options.queryParams);
-    if (options.showPreview === true) {
-      url += "#/?showPreviewButton";
-    }
 
     $(e).html("<iframe id='iframe-player' frameborder='0' src='" + url + "' style='width: 100%; border: none'></iframe>");
 
