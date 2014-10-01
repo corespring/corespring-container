@@ -131,6 +131,8 @@ trait DefaultIntegration
 
   lazy val devHtmlPlayer = new DevHtmlPlayer {
 
+    override def itemPreProcessor: PlayerItemPreProcessor = DefaultIntegration.this.playerItemPreProcessor
+
     override def showErrorInUi: Boolean = DefaultIntegration.this.showErrorInUi
 
     override implicit def ec: ExecutionContext = DefaultIntegration.this.ec
@@ -143,6 +145,7 @@ trait DefaultIntegration
   }
 
   lazy val prodHtmlPlayer = new ProdHtmlPlayer {
+    override def itemPreProcessor: PlayerItemPreProcessor = DefaultIntegration.this.playerItemPreProcessor
 
     override def showErrorInUi: Boolean = DefaultIntegration.this.showErrorInUi
 

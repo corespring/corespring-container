@@ -7,6 +7,7 @@ import org.corespring.container.client.controllers.player.PlayerQueryStringOptio
 import org.corespring.container.client.hooks.PlayerHooks
 import org.corespring.container.client.views.txt.js.PlayerServices
 import org.corespring.container.components.model.Id
+import org.corespring.container.components.processing.PlayerItemPreProcessor
 import play.api.libs.json.{ JsValue, Json }
 import play.api.mvc._
 
@@ -78,6 +79,8 @@ trait JsonPlayer extends BasePlayer {}
 
 trait HtmlPlayer extends BasePlayer with Jade {
 
+  def itemPreProcessor: PlayerItemPreProcessor
+
   val name = "server-generated-player.jade"
 
   def template(html: String, deps: Seq[String], js: Seq[String], css: Seq[String], json: JsValue) = {
@@ -113,7 +116,9 @@ trait HtmlPlayer extends BasePlayer with Jade {
         val js = (additionalScripts :+ jsUrl).distinct
         val css = Seq(cssUrl)
 
-        Ok(template(processXhtml((itemJson \ "xhtml").asOpt[String]), dependencies, js, css, Json.obj("session" -> session, "item" -> itemJson)))
+        val preprocessedItem = itemPreProcessor.preProcessItemForPlayer(itemJson)
+
+        Ok(template(processXhtml((itemJson \ "xhtml").asOpt[String]), dependencies, js, css, Json.obj("session" -> session, "item" -> preprocessedItem)))
       }
     }
   }
