@@ -198,7 +198,7 @@ exports.define = function(isSecure) {
 
     this.resetItem = function() {
       instance.sendMessage({
-        message: "resetItem"
+        message: "resetSession"
       });
     };
 
@@ -233,7 +233,7 @@ exports.define = function(isSecure) {
 
     this.reset = function() {
       instance.sendMessage({
-        message: "reset"
+        message: "resetSession"
       });
     };
 
