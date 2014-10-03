@@ -1,6 +1,6 @@
-## Corespring Container
+# Corespring Container
 
-A fleshing out of the POC node app (author dog) to run as a scala app.
+Contains the container libraries, and a shell module so you can run the application with some dummy data.
 
 This will allow integration points into the main corespring-api project.
 
@@ -44,13 +44,13 @@ It should be placed here:
 Ask one of the others to supply you with it.
 
 
-### ENV VARS
+#### ENV VARS
 
 *  CONTAINER_S3_KEY - mandatory - Amazon s3 key
 *  CONTAINER_S3_SECRET - mandatory - Amazon s3 secret
 *  CONTAINER_COMPONENTS_PATH - optional - the path to the components library
 
-### LOGGING
+#### LOGGING
 
 There are some logging config files in `conf/logging/*.xml`.
 
@@ -58,7 +58,7 @@ If deploying the shell app to heroku you can change the logger by updating:
 
 * ENV_LOGGER - relative path to logger file eg: `conf/logging/debug.xml`
 
-#### CONTAINER_COMPONENTS_PATH + Prod mode play apps
+##### CONTAINER_COMPONENTS_PATH + Prod mode play apps
 
 Production mode: When setting this path in a Prod mode play application, you must use 
 an absolute path. This is because play doesn't guarantee the use of relative paths for
@@ -72,7 +72,7 @@ The most straightforward way to obtain these keys if you do not have them is to 
 
 If you do not have access to the Heroku application, please get in touch with someone to give you access.
 
-## Seeding the Database
+### Seeding the Database
 
 Ensure that you have Coffeescript installed:
 
@@ -94,7 +94,7 @@ Afterwards, install the project modules:
 
     ./bin/seed-db mongodb://some_domain.com:888/db
 
-## Run play app and install client side dependencies
+### Run play app and install client side dependencies
 
     play
     [shell] npm install # installs the dependencies for the container-client
@@ -107,6 +107,21 @@ Afterwards, install the project modules:
     play
     
     
+## Publishing jars
+
+    play publish #will publish the SNAPSHOT jars to the remote repo
+    play publish-local #will publish the SNAPSHOT jars to the local repo
+    
+## Creating a release 
+    
+We use [sbt-release](https://github.com/sbt/sbt-release) to create releases. See it's readme for more info. To run it: 
+    
+    play release
+    
+### version.sbt - always keep it as a SNAPSHOT version
+
+Because we are using sbt-release, we should keep the version as a SNAPSHOT always. the plugin will the manage creating the appropriate release and publish it for us.
+
     
 Then go to [http://localhost:9000](http://localhost:9000)
 
