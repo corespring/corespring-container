@@ -76,7 +76,7 @@
             '<div class="navigator-toggle-button-row">',
             '  <div class="navigator-title">' + getTitle(component) + '</div>',
             '</div>',
-            '<div class="config-panel-container">',
+            '<div class="config-panel-container" navigator="">',
             tag(tagName, {id: $node.attr('id')}),
             '</div>'
           ].join('\n');
