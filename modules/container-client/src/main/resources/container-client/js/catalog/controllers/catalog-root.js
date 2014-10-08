@@ -212,7 +212,7 @@ angular.module('corespring-catalog.controllers')
           isNonEmptyString(getOrNull(profile,"contributorDetails","copyright","copyrightExpirationDate")) ||
           isNonEmptyString(getOrNull(profile,"contributorDetails","credentials")) ||
           isNonEmptyString(profile.sourceUrl));
-      }
+      };
 
       function getOrNull(){
         if (!arguments){
