@@ -41,6 +41,7 @@ case class PlayerJs(
   isSecure: Boolean,
   session: Session,
   errors: Seq[String] = Seq.empty,
+  warnings: Seq[String] = Seq.empty,
   queryParams: Seq[(String, String)] = Seq.empty)
 
 case class DeleteAsset(error: Option[String])

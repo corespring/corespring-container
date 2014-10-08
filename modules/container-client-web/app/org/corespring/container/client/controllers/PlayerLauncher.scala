@@ -161,8 +161,9 @@ trait PlayerLauncher extends Controller with PlayerQueryStringOptions {
   private def make(additionalJsNameAndSrc: (String, String), options: JsValue, bootstrapLine: String)(implicit request: Request[AnyContent], js: PlayerJs): SimpleResult = {
     val defaultOptions = ("default-options" -> s"module.exports = ${Json.stringify(options)}")
     val launchErrors = ("launcher-errors" -> errorsToModule(js.errors))
+    val launchWarnings = ("launcher-warnings" -> warningsToModule(js.warnings))
     val queryParams = ("query-params" -> makeQueryParams(request.queryString))
-    val wrappedNameAndContents = Seq(additionalJsNameAndSrc, defaultOptions, launchErrors, queryParams)
+    val wrappedNameAndContents = Seq(additionalJsNameAndSrc, defaultOptions, launchErrors, launchWarnings, queryParams)
     val wrappedContents = wrappedNameAndContents.map(tuple => ServerLibraryWrapper(tuple._1, tuple._2))
     def sumSession(s: Session, keyValues: (String, String)*): Session = {
       keyValues.foldRight(s)((kv: (String, String), acc: Session) => acc + (kv._1, kv._2))
@@ -184,13 +185,19 @@ trait PlayerLauncher extends Controller with PlayerQueryStringOptions {
     js
   }
 
-  private def errorsToModule(errors: Seq[String]): String = {
+  private def errorsToModule(errors: Seq[String]): String = msgToModule(errors, "errors")
+  private def warningsToModule(warnings: Seq[String]): String = msgToModule(warnings, "warnings")
 
-    val cleaned = errors.map(StringEscapeUtils.escapeEcmaScript)
+
+  private def msgToModule(msgs: Seq[String], msgType:String): String = {
+    val cleaned = msgs.map(StringEscapeUtils.escapeEcmaScript)
 
     s"""
-     |exports.hasErrors = ${errors.length > 0};
-     |exports.errors = ${if (errors.length == 0) "[];" else s"['${cleaned.mkString("','")}'];"}
+     |exports.has${msgType.toUpperCase} = function(){
+     |  return exports.$msgType.length > 0;
+     |}
+     |
+     |exports.$msgType = ${if (msgs.length == 0) "[];" else s"['${cleaned.mkString("','")}'];"}
      """.stripMargin
   }
 }
