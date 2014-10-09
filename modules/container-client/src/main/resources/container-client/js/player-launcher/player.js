@@ -117,6 +117,12 @@ exports.define = function(isSecure) {
       });
     }
 
+    if (options.onPlayerRendered) {
+      instance.addListener("rendered", function(data) {
+        options.onPlayerRendered();
+      });
+    }
+
     var initialiseMessage = function(mode) {
       var modeOptions = options[mode] || {};
       var saveResponseOptions = mode === "evaluate" ? {

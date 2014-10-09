@@ -14,13 +14,12 @@ var Instance = function(element, options, errorCallback, log) {
   };
 
   var findInstanceIframe = function() {
-    if (that.iframeRef) {
-      return that.iframeRef;
-    }
-    that.iframeRef = $(element).find('iframe');
-    if (!that.iframeRef) {
+    var iframe = $(element).find('iframe');
+    if (iframe.length === 0) {
       log.error("No iframe was found in player instance");
+      return undefined;
     }
+    return iframe;
   };
 
   var isMessageDestinedForInstance = function(event) {
@@ -116,7 +115,14 @@ var Instance = function(element, options, errorCallback, log) {
       url += "#/?showPreviewButton";
     }
 
-    $(e).html("<iframe id='iframe-player' frameborder='0' src='" + url + "' style='width: 100%; border: none'></iframe>");
+    var iframeTemplate = [
+      " <iframe id='iframe-player' ",
+      "         frameborder='0' ",
+      "         src='" + url + "' style='width: 100%; border: none; display:none'>",
+      " </iframe>"
+    ].join('\n');
+
+    $(e).html(iframeTemplate);
 
     if (options.forceWidth) {
       $(e).width(options.width ? options.width : "600px");
@@ -214,6 +220,11 @@ var Instance = function(element, options, errorCallback, log) {
     removeListeners();
     $(element).remove();
   };
+
+  this.addListener("rendered", function(data) {
+    var iframe = findInstanceIframe();
+    iframe.show();
+  });
 
   initialize(element, options);
 };

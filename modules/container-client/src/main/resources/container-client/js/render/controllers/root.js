@@ -74,6 +74,12 @@ var controller = function($scope, $log, $timeout, MessageBridge) {
     });
   });
 
+  $scope.$on("rendered", function(event) {
+    MessageBridge.sendMessage('parent', {
+      message: "rendered"
+    });
+  });
+
 };
 
 angular.module('corespring-player.controllers')

@@ -28,6 +28,8 @@ angular.module('corespring-player.services').factory('CorespringPlayerDefinition
         preCompile: null
       }, opts);
 
+      var isRenderedOnce = false;
+
       var link = function($scope, $elem) {
 
         var rendered = false;
@@ -46,6 +48,10 @@ angular.module('corespring-player.services').factory('CorespringPlayerDefinition
           MathJaxService.onEndProcess(function(){
             $('.player-body').css('visibility','visible');
             MathJaxService.off(arguments.callee);
+            if (!isRenderedOnce){
+              isRenderedOnce = true;
+              $scope.$emit("rendered");
+            }
           });
 
           MathJaxService.parseDomForMath();
