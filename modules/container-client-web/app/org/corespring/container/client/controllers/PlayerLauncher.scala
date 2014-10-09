@@ -193,7 +193,7 @@ trait PlayerLauncher extends Controller with PlayerQueryStringOptions {
     val cleaned = msgs.map(StringEscapeUtils.escapeEcmaScript)
 
     s"""
-     |exports.has${msgType.toUpperCase} = function(){
+     |exports.has${msgType.capitalize} = function(){
      |  return exports.$msgType.length > 0;
      |}
      |
