@@ -185,6 +185,60 @@ angular.module('corespring-catalog.controllers')
         $scope.reviewsPassedDataProvider = result;
         applyAllReviewsPassed();
       });
+
+      $scope.textOrNA = function(txt){
+        return txt ? txt : "No information available";
+      };
+
+      $scope.arrayTextOrNA = function(arr){
+        if (arr && _.isArray(arr) && arr.length > 0){
+          return arr.join(", ");
+        }
+        return "No information available";
+      };
+
+      $scope.isNonEmptyString = function(str){
+        return str && _.isString(str) && str.length > 0;
+      };
+
+      $scope.isNonEmptyStringArray = function(arr){
+        return arr && _.isArray(arr) && arr.length > 0 && arr.join('').length > 0;
+      };
+
+      $scope.isThereCopyrightInfo = function(profile){
+        return (
+          isNonEmptyString(getOrNull(profile,"contributorDetails","copyright","owner")) ||
+          isNonEmptyString(getOrNull(profile,"contributorDetails","copyrightYear")) ||
+          isNonEmptyString(getOrNull(profile,"contributorDetails","copyright","copyrightExpirationDate")) ||
+          isNonEmptyString(getOrNull(profile,"contributorDetails","credentials")) ||
+          isNonEmptyString(profile.sourceUrl));
+      };
+
+      function getOrNull(){
+        if (!arguments){
+          return null;
+        }
+        var args = Array.prototype.slice.call(arguments);
+        if (!args || !args[0] || args.length === 0){
+          return null;
+        }
+        var object = args.shift();
+        do{
+          var propName = args.shift();
+          object = (propName && (propName in object)) ? object[propName] : null;
+        }while(object && args.length > 0 );
+        return object;
+      }
+
+      function isNonEmptyString(str){
+        if (!str) {
+          return false;
+        }
+        if (!_.isString(str) && str.toString() === ''){
+          return false;
+        }
+        return str.length > 0;
+      }
     }
 
   ]);
