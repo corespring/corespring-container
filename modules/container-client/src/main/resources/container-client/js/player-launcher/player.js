@@ -1,14 +1,22 @@
 exports.define = function(isSecure) {
   var PlayerDefinition = function(element, options, errorCallback) {
-
     var errors = require("errors");
     var launcherErrors = require("launcher-errors");
+    var launcherWarnings = require("launcher-warnings");
 
     options.queryParams = options.queryParams || require("query-params");
 
     var i;
 
-    if (launcherErrors.hasErrors) {
+    if(launcherWarnings.hasWarnings()){
+      for (i = 0; i < launcherWarnings.warnings.length; i++) {
+        if(console && console.warn && typeof(console.warn) === 'function'){
+          console.warn(launcherWarnings.warnings[i]);
+        }
+      }
+    }
+
+    if (launcherErrors.hasErrors()) {
       for (i = 0; i < launcherErrors.errors.length; i++) {
         errorCallback(errors.EXTERNAL_ERROR(launcherErrors.errors[i]));
       }
@@ -18,7 +26,6 @@ exports.define = function(isSecure) {
     var isReady = false;
 
     var defaultOptions = require("default-options");
-
 
     options = $.extend(defaultOptions, options);
 

@@ -24,14 +24,28 @@ describe('player launcher', function() {
     return this;
   };
 
-  var MockErrors = {
-    hasErrors: false,
-    errors: []
+
+  function MockErrors(errs){
+    this.errors = errs;
+    this.hasErrors = function(){ 
+      return this.errors && this.errors.length > 0; 
+    };
   };
+
+  function MockWarnings(wrns){
+    this.warnings = wrns;
+    this.hasWarnings = function(){ 
+      return this.warnings && this.warnings.length > 0; 
+    };
+  }
 
   var mockInstance = null;
   var originalInstance = null;
   var lastError = null;
+  var warnings = [];
+  
+  var origWarn = window.console.warn;
+
 
   var defaultOptions = corespring.module("default-options").exports;
   defaultOptions.corespringUrl = "http://blah.com";
@@ -39,17 +53,23 @@ describe('player launcher', function() {
   beforeEach(function() {
     originalInstance = corespring.require("instance");
     mockInstance = corespring.module("instance", MockInstance);
-    launchErrors = corespring.module("launcher-errors", MockErrors);
+    launchErrors = corespring.module("launcher-errors", new MockErrors());
     launcher = corespring.require("player");
+    warnings = [];
+    window.console.warn = function(msg){
+      warnings.push(msg);
+    }
   });
 
   afterEach(function() {
     corespring.module("player-instance", originalInstance);
+    window.console.warn = origWarn;
   });
 
-  var create = function(options, secureMode, playerErrors) {
+  var create = function(options, secureMode, playerErrors, warnings) {
 
-    corespring.module("launcher-errors", playerErrors || MockErrors);
+    corespring.module("launcher-errors", playerErrors || new MockErrors());
+    corespring.module("launcher-warnings", warnings || new MockWarnings());
     corespring.module("query-params", {});
 
     secureMode = secureMode !== undefined ? secureMode : true;
@@ -60,6 +80,7 @@ describe('player launcher', function() {
     }
 
     var Player = launcher.define(secureMode);
+
 
     //$("body").append("<div id='blah'></div>")
     var player = new Player("blah", {}, function(err) {
@@ -72,12 +93,24 @@ describe('player launcher', function() {
   it('should invoke error callback if there are launcher-errors', function() {
     var player = create({
       mode: null
-    }, false, {
-      hasErrors: true,
-      errors: ["error one"]
-    });
+      }, 
+      false, 
+      new MockErrors(["error one"])
+    );
+
     expect(lastError.code).toEqual(errors.EXTERNAL_ERROR("error one").code);
     expect(lastError.message).toEqual(errors.EXTERNAL_ERROR("error one").message);
+  });
+
+  it('should log warnings if there are warnings', function(){
+    var player = create({
+      mode: null
+      }, 
+      false, 
+      null, 
+      new MockWarnings(['warning one'])
+    );
+    expect(warnings.length).toEqual(1);
   });
 
   it('should invoke error callback with invalid mode', function() {
