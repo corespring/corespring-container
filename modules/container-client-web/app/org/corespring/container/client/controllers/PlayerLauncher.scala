@@ -5,7 +5,6 @@ import java.io.{ File, InputStream }
 import org.apache.commons.io.IOUtils
 import org.apache.commons.lang3.StringEscapeUtils
 import org.corespring.container.client.V2PlayerConfig
-import org.corespring.container.client.controllers.player.PlayerQueryStringOptions
 import org.corespring.container.client.hooks.{ PlayerJs, PlayerLauncherHooks }
 import org.corespring.container.client.views.txt.js.ServerLibraryWrapper
 import play.api.Play
@@ -16,7 +15,7 @@ import play.api.mvc._
 
 import scala.concurrent.ExecutionContext
 
-trait PlayerLauncher extends Controller with PlayerQueryStringOptions {
+trait PlayerLauncher extends Controller {
 
   def playerConfig: V2PlayerConfig
 
@@ -41,7 +40,7 @@ trait PlayerLauncher extends Controller with PlayerQueryStringOptions {
     }
   }
 
-  import org.corespring.container.client.controllers.apps.routes.{ BasePlayer, Editor, ProdHtmlPlayer }
+  import org.corespring.container.client.controllers.apps.routes.{ Editor, CleanPlayer}
 
   val SecureMode = "corespring.player.secure"
 
@@ -87,16 +86,12 @@ trait PlayerLauncher extends Controller with PlayerQueryStringOptions {
   def playerJs = Action.async { implicit request =>
     hooks.playerJs.map { implicit js =>
 
-      val sessionIdPlayerUrl = isProdPlayer match {
-        case true => ProdHtmlPlayer.config(":id").url
-        case _ => BasePlayer.loadPlayerForSession(":id")
-      }
+      val sessionIdPlayerUrl = s"${CleanPlayer.load(":id").url}?${request.rawQueryString}"
+
 
       val rootUrl = playerConfig.rootUrl.getOrElse(BaseUrl(request))
 
-      val itemUrl: String = BasePlayer.createSessionForItem(":id").url
-        .setPlayerPage(getPlayerPage)
-        .setProdPlayer(isProdPlayer)
+      val itemUrl: String = CleanPlayer.createSessionForItem(":id").url
 
       val defaultOptions: JsValue = Json.obj(
         "corespringUrl" -> rootUrl,

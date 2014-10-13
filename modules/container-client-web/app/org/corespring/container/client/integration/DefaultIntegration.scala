@@ -123,22 +123,7 @@ trait DefaultIntegration
     override def hooks = catalogHooks
   }
 
-  lazy val jsonPlayer = new JsonPlayer {
-
-    override def showErrorInUi: Boolean = DefaultIntegration.this.showErrorInUi
-
-    override implicit def ec: ExecutionContext = DefaultIntegration.this.ec
-
-    override def urls: ComponentUrls = componentSets
-
-    override def components: Seq[Component] = DefaultIntegration.this.components
-
-    override def hooks = playerHooks
-  }
-
-  lazy val prodHtmlPlayer = new ProdHtmlPlayer {
-
-    override def showErrorInUi: Boolean = DefaultIntegration.this.showErrorInUi
+  lazy val prodHtmlPlayer = new CleanPlayer {
 
     override implicit def ec: ExecutionContext = DefaultIntegration.this.ec
 
@@ -152,6 +137,7 @@ trait DefaultIntegration
 
     override def itemPreProcessor: PlayerItemPreProcessor = DefaultIntegration.this.playerItemPreProcessor
   }
+
 
   lazy val item = new Item {
     def scoreProcessor: ScoreProcessor = DefaultIntegration.this.scoreProcessor

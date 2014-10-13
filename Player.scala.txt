@@ -13,19 +13,18 @@ import play.api.mvc._
 
 import scala.concurrent.Future
 
-trait BasePlayer
+trait Player
   extends PlayerItemTypeReader
   with AppWithServices[PlayerHooks]
   with JsModeReading
-  with PlayerQueryStringOptions {
+  with PlayerQueryStringOptions
+  with Jade {
 
   import org.corespring.container.client.controllers.apps.routes.{ ProdHtmlPlayer, BasePlayer => PlayerRoutes }
 
   override def context: String = "player"
 
   override def loggerName = "container.app.player"
-
-  def showErrorInUi: Boolean
 
   override lazy val servicesJs = {
     import org.corespring.container.client.controllers.resources.routes._
@@ -51,37 +50,7 @@ trait BasePlayer
     })
   }
 
-  def loadPlayerForSession(sessionId: String) = Action.async { implicit request =>
-    hooks.loadPlayerForSession(sessionId).flatMap { maybeError =>
-
-      maybeError.map { sm =>
-        val (code, msg) = sm
-        Future(Ok(org.corespring.container.client.views.html.error.main(code, msg, showErrorInUi)))
-      }.getOrElse {
-
-        def playerPage(implicit request: Request[AnyContent]) = {
-          val jsMode = getJsMode(request)
-          logger.trace(s"js mode: $jsMode")
-          if (getPlayerPage == "container-player.html") s"container-player.$jsMode.html" else s"player.$jsMode.html"
-        }
-
-        val page = playerPage(request)
-        logger.debug(s"[loadPlayerForSession] $sessionId - loading $page from /container-client")
-        controllers.Assets.at("/container-client", page)(request)
-      }
-    }
-  }
-
   override def additionalScripts: Seq[String] = Seq(PlayerRoutes.services().url)
-}
-
-trait JsonPlayer extends BasePlayer {}
-
-/**
- * The ProdHtmlPlayer serves server side generated html.
- * This is to speed up this player load time and performance
- */
-trait ProdHtmlPlayer extends BasePlayer with Jade {
 
   val name = "server-generated-player.jade"
 
@@ -152,7 +121,7 @@ trait ProdHtmlPlayer extends BasePlayer with Jade {
         val css = coreCss :+ cssUrl
         val domainResolvedCss = css.map(resolvePath)
 
-        var preprocessedItem = itemPreProcessor.preProcessItemForPlayer(itemJson)
+        val preprocessedItem = itemPreProcessor.preProcessItemForPlayer(itemJson)
 
         Ok(
           template(

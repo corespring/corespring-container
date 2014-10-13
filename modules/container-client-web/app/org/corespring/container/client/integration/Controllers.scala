@@ -36,11 +36,7 @@ trait RigControllers extends CommonControllers {
 }
 
 trait PlayerControllers extends CommonControllers with ResourceControllers {
-  /** The player app */
-  def jsonPlayer: JsonPlayer
-
-  /** The production player */
-  def prodHtmlPlayer : ProdHtmlPlayer
+  def prodHtmlPlayer : CleanPlayer
 }
 
 trait EditorControllers extends CommonControllers with ResourceControllers {
@@ -75,7 +71,6 @@ trait ContainerControllers
     item,
     session,
     rig,
-    jsonPlayer,
     prodHtmlPlayer,
     editor,
     catalog,

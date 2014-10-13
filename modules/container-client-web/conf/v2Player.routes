@@ -14,23 +14,20 @@ GET           /component-sets/:context/:directive.:suffix            @org.coresp
 
 # Hooks for the player: config, services + components
 
-GET           /session/:sessionId/player-config.json                 @org.corespring.container.client.controllers.apps.JsonPlayer.config(sessionId:String)
-GET           /session/:sessionId/player.html                        @org.corespring.container.client.controllers.apps.ProdHtmlPlayer.config(sessionId:String)
-GET           /session/player-services.js                            @org.corespring.container.client.controllers.apps.BasePlayer.services
-GET           /session/:sessionId/player                             @org.corespring.container.client.controllers.apps.BasePlayer.loadPlayerForSession(sessionId:String)
+GET           /session/:sessionId/player.html                        @org.corespring.container.client.controllers.apps.CleanPlayer.load(sessionId:String)
+GET           /session/player-services.js                            @org.corespring.container.client.controllers.apps.CleanPlayer.services
+GET           /item/:itemId/player                                   @org.corespring.container.client.controllers.apps.CleanPlayer.createSessionForItem(itemId:String)
 
 
 GET           /session/item-and-session/:id.json                     @org.corespring.container.client.controllers.resources.Session.loadItemAndSession(id)
-GET           /session/reopen/:id.json                                @org.corespring.container.client.controllers.resources.Session.reopenSession(id)
-GET           /session/reset/:id.json                                 @org.corespring.container.client.controllers.resources.Session.resetSession(id)
+GET           /session/reopen/:id.json                               @org.corespring.container.client.controllers.resources.Session.reopenSession(id)
+GET           /session/reset/:id.json                                @org.corespring.container.client.controllers.resources.Session.resetSession(id)
 PUT           /session/save/:id.json                                 @org.corespring.container.client.controllers.resources.Session.saveSession(id)
 PUT           /session/complete/:id.json                             @org.corespring.container.client.controllers.resources.Session.completeSession(id)
 PUT           /session/load-outcome/:id.json                         @org.corespring.container.client.controllers.resources.Session.loadOutcome(id)
 PUT           /session/:id/score.json                                @org.corespring.container.client.controllers.resources.Session.getScore(id)
 GET           /session/:sessionId/*file                              @org.corespring.container.client.controllers.Assets.session(sessionId, file)
 
-GET           /item/:itemId/player                                   @org.corespring.container.client.controllers.apps.BasePlayer.createSessionForItem(itemId:String)
-#GET           /item/:itemId/player                                  org.corespring.container.client.controllers.apps.Player.createSessionForItem(itemId)
 GET           /item/:itemId.json                                     @org.corespring.container.client.controllers.resources.Item.load(itemId)
 GET           /item/:itemId/preview                                  @org.corespring.container.client.controllers.apps.Catalog.showCatalog(itemId)
 GET           /item/:itemId/:name/*file                              @org.corespring.container.client.controllers.Assets.supportingMaterial(itemId, name, file)
