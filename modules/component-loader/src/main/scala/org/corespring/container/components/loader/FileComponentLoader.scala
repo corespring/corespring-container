@@ -89,7 +89,7 @@ class FileComponentLoader(paths: Seq[String], onlyProcessReleased: Boolean)
   }
 
   private def loadCss(root: String): Option[String] = {
-    val maybeFiles = Seq("styles.css", "styles.less.css")
+    val maybeFiles = Seq("styles.css", "styles.less.css", "styles.less.min.css")
 
     maybeFiles
       .map(filename => readMaybeFile(new File(s"${if (root.endsWith("/")) root else s"$root/"}$filename")))
