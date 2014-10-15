@@ -22,17 +22,32 @@
             $scope.settingsEnabled.allowEmptyResponses = playerIsInGatherMode;
           });
 
+          var playerButtonSubmit = {"class": "btn action submit", "text": "Submit Answer", "mode": "gather"};
+          var playerButtonReset = {"class": "btn action reset", "text": "    Reset    ", "mode": "evaluate"};
+
+          $scope.playerButtonSettings = playerButtonSubmit;
+
+          $scope.updatePlayer = function() {
+            if ($scope.playerButtonSettings.mode === "evaluate") {
+              reset();
+              $scope.playerButtonSettings = playerButtonSubmit;
+            } else {
+              submit();
+              $scope.playerButtonSettings = playerButtonReset;
+            }
+          };
+
           $scope.preview = function() {
             $scope.$emit('playerControlPanel.preview');
           };
 
-          $scope.submit = function() {
+          function submit() {
             $scope.$emit('playerControlPanel.submit');
-          };
+          }
 
-          $scope.reset = function() {
+          function reset() {
             $scope.$emit('playerControlPanel.reset');
-          };
+          }
 
           $scope.settingsChange = function() {
             $scope.$emit('playerControlPanel.settingsChange');
@@ -123,6 +138,7 @@
         return {
           restrict: 'AE',
           link: link,
+          transclude:true,
           scope: {
             settings: '=',
             mode: '=',
@@ -135,22 +151,24 @@
             '    <button class="btn action preview" ng-click="preview()"',
             '      >Preview</button>',
             '  </div>',
-            '  <div class="action-holder pull-right">',
+            '  <div class="header action-holder pull-right">',
             '    <div class="score">',
             '      <label ng-show="hasScore()">Score:</label>',
             '      <span ng-show="hasScore()">{{score.summary.percentage}}%</span>',
             '    </div>',
-            '    <button class="btn action submit" ng-click="submit()"',
-            '      >{{mode === "gather" ? "Submit Answer" : "Change Answer"}}</button>',
-            '    <button class="btn action reset" ng-click="reset()"',
-            '      >Reset</button>',
             '    <div class="action config">',
             '      <a title="Settings">',
             '        <i class="fa fa-cog" />',
             '      </a>',
             '    </div>',
             '  </div>',
-            '</div>'
+            '  <div ng-transclude></div>', // Player
+            '  <div class="pull-right">',
+            '    <button  ng-class="playerButtonSettings.class" ng-click="updatePlayer();">',
+            '        {{playerButtonSettings.text}}',
+            '    </button>',
+            '  </div>',
+            ' </div>'
           ].join("\n")
         };
       }

@@ -6,16 +6,16 @@ script(type='text/ng-template', id="/templates/item")
       data-score="score",
       data-show-preview-button="false")
 
-    .player-container
+      .player-container
 
-      corespring-player(
-        player-mode="editor",
-        player-markup="data.item.xhtml",
-        player-item="data.item",
-        player-session="rootModel.session",
-        player-outcomes="outcome")
+        corespring-player(
+          player-mode="editor",
+          player-markup="data.item.xhtml",
+          player-item="data.item",
+          player-session="rootModel.session",
+          player-outcomes="outcome")
 
-      summary-feedback(
-        template="designer.jade",
-        item="data.item",
-        session="session")
+        summary-feedback(
+          template="designer.jade",
+          item="data.item",
+          session="session")
