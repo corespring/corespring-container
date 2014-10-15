@@ -8,13 +8,13 @@ block player-content
 
       div(player-control-panel,data-mode='playerMode', data-settings='playerSettings', data-score="score", show-preview-button="{{showPreviewButton}}")
 
-      .player-container
-        div(corespring-player,
-        player-mode="player",
-        player-markup="item.xhtml",
-        player-item="item",
-        player-session="session",
-        player-outcomes="outcome")
+        .player-container
+          div(corespring-player,
+          player-mode="player",
+          player-markup="item.xhtml",
+          player-item="item",
+          player-session="session",
+          player-outcomes="outcome")
 
         div(summary-feedback,template="player.jade",item="item",session="session")
 
