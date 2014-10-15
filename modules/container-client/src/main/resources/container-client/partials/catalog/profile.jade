@@ -70,7 +70,7 @@ script(type='text/ng-template', id="/templates/profile")
         .info
           .label.label-warning Key Skills
         .content {{item.profile.otherAlignments.keySkills.join(", ")}}
-      .content
+      .field
         img.copyright-image(ng-src="{{copyrightOwnerUrl}}",
          alt="{{item.profile.contributorDetails.copyrightOwner}}",
          title="{{item.profile.contributorDetails.copyrightOwner}}"
