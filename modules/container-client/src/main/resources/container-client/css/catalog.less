@@ -29,20 +29,7 @@
   width: 100%;
   height: 100%;
   padding: 30px;
-  table {
-    table-layout: fixed;
-    width: 100%;
-    th {
-      padding: @box-pad;
-      text-align: center;
-      text-transform: uppercase;
-      border-bottom: solid 1px @mid-grey;
-      font-weight: normal;
-    }
-    td {
-      vertical-align: top;
-    }
-  }
+
   .cols {
     td {
       padding: @box-pad;
@@ -93,10 +80,7 @@
   .panel-right {
     border-left: solid 1px @mid-grey;
   }
-  .license-type {
-    margin-top: 5px;
-    margin-bottom: 10px;
-  }
+
   .main-title {
     .bold {
       text-transform: uppercase;
@@ -125,13 +109,13 @@
     border-top: solid 1px @mid-grey;
   }
   .label {
-    margin-right: 20px;
     padding: 6px;
     font-size: 14px;
     font-weight: normal;
   }
   .title {
     text-decoration: underline;
+    font-weight: bold;
   }
   .content {
     margin-left: 10px;
@@ -140,12 +124,6 @@
   }
   .sub-content {
     margin-bottom: 10px;
-  }
-  .more-info {
-    margin-top: 10px;
-    a {
-      color: #428bca;
-    }
   }
   .copyright-image {
     float: left;
@@ -158,23 +136,82 @@
     .drop-shadow(0, 1px, 2px, 0.2);
     margin-bottom: 10px;
   }
-  .round-border-container {
-    border: 1px solid @mid-grey;
-    border-radius: 5px;
-    padding: 10px;
-    margin-bottom: 30px;
 
-    td {
-      padding: 12px;
+  .field{
+    min-height: 31px;
+    line-height: 16px;
+    width: 49%;
+    margin-bottom: 10px;
+    display: inline-block;
+    vertical-align: text-top;
+    padding-right: 10px;
+
+    .info {
+      display: table-cell;
+      vertical-align: text-top;
     }
+    .content{
+      display: table-cell;
+      font-size: 14px;
+      max-width: 60%;
+      margin: 0px;
+      padding-left: 8px;
+    }
+  }
+
+  .clearfix:after {
+    content: " ";
+    display: block;
+    height: 0;
+    clear: both;
+  }
+
+  .round-border-container , .borderless-container{
+
+    padding: 20px;
+    margin-bottom: 25px;
+
+    .field {
+      float: left;
+    }
+
     .description {
       font-size: 20px;
       margin-bottom: 20px;
     }
   }
+
+  .more-info-container {
+    width: 51%;
+    float: right;
+    padding: 0px;
+
+    .show-more{
+      position: relative;
+      float: right;
+      padding-right: 28px;
+      cursor: pointer;
+    }
+
+    .fields{
+      margin-top: 26px;
+    }
+
+    a {
+      color: #428bca;
+    }
+  }
+
+  .round-border-container {
+    border: 1px solid @mid-grey;
+    border-radius: 5px;
+  }
+
   .padded {
     padding: @box-pad;
   }
+
+
 }
 
 .navbar-default {

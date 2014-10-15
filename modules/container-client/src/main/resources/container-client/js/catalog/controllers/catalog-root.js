@@ -111,8 +111,9 @@ angular.module('corespring-catalog.controllers')
           $scope.licenseTypeUrl = licenseTypeUrl(profile.contributorDetails.licenseType);
         }
 
-        if (profile.contributorDetails && profile.contributorDetails.copyright && profile.contributorDetails.copyright.owner) {
-          $scope.copyrightOwnerUrl = copyrightOwnerUrl(profile.contributorDetails.copyright.owner);
+        var copyrightOwner = getOrNull(profile,"contributorDetails","copyrightOwner");
+        if (copyrightOwner) {
+          $scope.copyrightOwnerUrl = copyrightOwnerUrl(copyrightOwner);
         }
 
         applyDepthOfKnowledge();
@@ -207,11 +208,11 @@ angular.module('corespring-catalog.controllers')
 
       $scope.isThereCopyrightInfo = function(profile){
         return (
-          isNonEmptyString(getOrNull(profile,"contributorDetails","copyright","owner")) ||
+          isNonEmptyString(getOrNull(profile,"contributorDetails","copyrightOwner")) ||
           isNonEmptyString(getOrNull(profile,"contributorDetails","copyrightYear")) ||
-          isNonEmptyString(getOrNull(profile,"contributorDetails","copyright","copyrightExpirationDate")) ||
+          isNonEmptyString(getOrNull(profile,"contributorDetails","copyrightExpirationDate")) ||
           isNonEmptyString(getOrNull(profile,"contributorDetails","credentials")) ||
-          isNonEmptyString(profile.sourceUrl));
+          isNonEmptyString(getOrNull(profile,"contributorDetails","sourceUrl")));
       };
 
       function getOrNull(){

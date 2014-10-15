@@ -7,92 +7,100 @@ mixin tr_header(a, b, c)
 script(type='text/ng-template', id="/templates/profile")
   .profile-body
     h2 Profile
-    .round-border-container
-      div.description {{item.profile.taskInfo.description}}
-      div.description {{item.profile.taskInfo.description}}
-      table
-        tr
-          td
-            .field
-              .label.label-info Primary Subject
-              span {{textOrNA(item.profile.taskInfo.subjects.primary.subject)}}
-          td
-            .field
-              .label.label-info Grade Level(s)
-              span {{arrayTextOrNA(item.profile.taskInfo.gradeLevel)}}
-        tr
-          td
-            .field(ng-show="item.profile.taskInfo.subjects.related.subject")
-              .label.label-info Related Subject
-              span {{item.profile.taskInfo.subjects.related.subject}}
-          td
-            .field(ng-show="isNonEmptyString(getPValueAsString(item.profile.pValue))")
-              .label.label-info Difficulty Level
-              span {{getPValueAsString(item.profile.pValue)}}
-        tr
-          td
-            .field
-              .label.label-info Item Type
-              span {{arrayTextOrNA(componentTypeLabels)}}
-          td
-            .field(ng-show="item.profile.standards.length > 0")
-              .label.label-info CCSS
-              span(ng-repeat="standard in item.profile.standards") {{standard.dotNotation}}{{$last ? '' : ', '}}
-        tr
-          td
-          td
-            .field(ng-show="licenseTypeUrl")
-              .label.label-info License
-              img.license-type(ng-src="{{licenseTypeUrl}}")
+    .round-border-container.clearfix
+      .description {{item.profile.taskInfo.description}}
 
-    table
-      tr
-        td
-          .field(ng-show="isNonEmptyString(item.profile.otherAlignments.bloomsTaxonomy)")
-            .label.label-warning Bloom's Taxonomy
-            .content {{item.profile.otherAlignments.bloomsTaxonomy}}
-          .field(ng-show="item.profile.demonstratedKnowledge")
-            .label.label-warning Demonstrated Knowledge
-            .content {{item.profile.demonstratedKnowledge}}
-          .field(ng-show="item.profile.lexile")
-            .label.label-warning Lexile Score
-            .content(ng-show="item.profile.lexile") {{item.profile.lexile }}
-        td
-          .field(ng-show="isNonEmptyStringArray(item.profile.otherAlignments.keySkills)")
-            .label.label-warning Key Skills
-            .content {{item.profile.otherAlignments.keySkills.join(", ")}}
-          .content
-            img.copyright-image(ng-src="{{copyrightOwnerUrl}}",
-             alt="{{item.profile.contributorDetails.copyright.owner}}",
-             title="{{item.profile.contributorDetails.copyright.owner}}"
-             )
-            .courtesy(ng-show="item.profile.contributorDetails.copyright.owner")
-              | This item was made available to CoreSpring users courtesy of {{item.profile.contributorDetails.copyright.owner}}
-            .clearfix &nbsp;
-            .more-info
-              a(ng-click="showMore = !showMore", ng-show="isThereCopyrightInfo(item.profile)").pull-right {{showMore ? 'hide info' : 'more info'}}
-            table(ng-show="showMore")
-              tr
-                td
-                  .field(ng-show="item.profile.contributorDetails.copyrightYear")
-                    .title Copyright Year
-                    .sub-content {{item.profile.contributorDetails.copyrightYear}}
-                  .field(ng-show="item.profile.contributorDetails.copyrightExpirationDate")
-                    .title Copyright Expiration Date
-                    .sub-content {{item.profile.contributorDetails.copyrightExpirationDate}}
-                  .field(ng-show="item.profile.allReviewsPassed")
-                    .title Reviews Passed
-                    .sub-content
-                      span(ng-repeat="rp in item.profile.allReviewsPassed", ng-if="rp.passed") {{rp.name}}{{!$last ? ', ' : ''}}
-                td
-                  .field(ng-show="item.profile.contributorDetails.credentials")
-                    .title Credentials
-                    .sub-content {{item.profile.contributorDetails.credentials}}
-                  .field(ng-show="item.profile.priorUse")
-                    .title Prior Use
-                    .sub-content {{item.profile.priorUse}}
-                  .field(ng-show="item.profile.sourceUrl")
-                    .title Source
-                    .sub-content
-                      a(href="{{item.profile.sourceUrl}}"){{item.profile.sourceUrl || unassigned}}
+      .field
+        .info
+          .label.label-info Primary Subject
+        .content
+          span {{textOrNA(item.profile.taskInfo.subjects.primary.subject)}}
+
+      .field
+        .info
+          .label.label-info Grade Level(s)
+        .content
+          span {{arrayTextOrNA(item.profile.taskInfo.gradeLevel)}}
+
+      .field(ng-show="item.profile.taskInfo.subjects.related.subject")
+        .info
+          .label.label-info Related Subject
+        .content
+          span {{item.profile.taskInfo.subjects.related.subject}}
+
+      .field(ng-show="isNonEmptyString(getPValueAsString(item.profile.pValue))")
+        .info
+          .label.label-info Difficulty Level
+        .content
+          span {{getPValueAsString(item.profile.pValue)}}
+
+      .field
+        .info
+          .label.label-info Item Type
+        .content
+         span {{arrayTextOrNA(componentTypeLabels)}}
+
+      .field(ng-show="item.profile.standards.length > 0")
+        .info
+          .label.label-info CCSS
+        .content
+          span(ng-repeat="standard in item.profile.standards") {{standard.dotNotation}}{{$last ? '' : ', '}}
+
+      .field(ng-show="licenseTypeUrl")
+        .info
+          .label.label-info License
+        .content
+          img.license-type(ng-src="{{licenseTypeUrl}}")
+
+
+    .borderless-container.clearfix
+      .field(ng-show="isNonEmptyString(item.profile.otherAlignments.bloomsTaxonomy)")
+        .info
+          .label.label-warning Bloom's Taxonomy
+        .content {{item.profile.otherAlignments.bloomsTaxonomy}}
+      .field(ng-show="item.profile.demonstratedKnowledge")
+        .info
+          .label.label-warning Demonstrated Knowledge
+        .content {{item.profile.demonstratedKnowledge}}
+      .field(ng-show="item.profile.lexile")
+        .info
+          .label.label-warning Lexile Score
+        .content(ng-show="item.profile.lexile") {{item.profile.lexile }}
+      .field(ng-show="isNonEmptyStringArray(item.profile.otherAlignments.keySkills)")
+        .info
+          .label.label-warning Key Skills
+        .content {{item.profile.otherAlignments.keySkills.join(", ")}}
+      .content
+        img.copyright-image(ng-src="{{copyrightOwnerUrl}}",
+         alt="{{item.profile.contributorDetails.copyrightOwner}}",
+         title="{{item.profile.contributorDetails.copyrightOwner}}"
+         )
+        .courtesy(ng-show="item.profile.contributorDetails.copyrightOwner")
+          | This item was made available to CoreSpring users courtesy of {{item.profile.contributorDetails.copyrightOwner}}
+        .clearfix &nbsp;
+
+
+    .more-info-container.clearfix
+      a.show-more.clearfix(ng-click="showMore = !showMore", ng-show="isThereCopyrightInfo(item.profile)") {{showMore ? 'hide info' : 'more info'}}
+      .fields(ng-show="showMore")
+        .field(ng-show="item.profile.contributorDetails.copyrightYear")
+          .title Copyright Year
+          .sub-content {{item.profile.contributorDetails.copyrightYear}}
+        .field(ng-show="item.profile.contributorDetails.copyrightExpirationDate")
+          .title Copyright Expiration Date
+          .sub-content {{item.profile.contributorDetails.copyrightExpirationDate}}
+        .field(ng-show="item.profile.allReviewsPassed")
+          .title Reviews Passed
+          .sub-content
+            span(ng-repeat="rp in item.profile.allReviewsPassed", ng-if="rp.passed") {{rp.name}}{{!$last ? ', ' : ''}}
+        .field(ng-show="item.profile.contributorDetails.credentials")
+          .title Credentials
+          .sub-content {{item.profile.contributorDetails.credentials}}
+        .field(ng-show="item.profile.priorUse")
+          .title Prior Use
+          .sub-content {{item.profile.priorUse}}
+        .field(ng-show="item.profile.sourceUrl")
+          .title Source
+          .sub-content
+            a(href="{{item.profile.sourceUrl}}"){{item.profile.sourceUrl || unassigned}}
 
