@@ -8,7 +8,7 @@ script(type='text/ng-template', id="/templates/profile")
   .profile-body
     h2 Profile
     .round-border-container.clearfix
-      .description {{item.profile.taskInfo.description}}
+      .description(ng-if="isNonEmptyString(item.profile.taskInfo.description)") {{item.profile.taskInfo.description}}
 
       .field
         .info
