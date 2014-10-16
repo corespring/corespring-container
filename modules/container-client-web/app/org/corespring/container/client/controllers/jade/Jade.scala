@@ -46,12 +46,18 @@ trait Jade {
   }
 
   private def loadTemplate(name: String): JadeTemplate = {
-    templates.get(name).getOrElse {
+
+    def readIn = {
       val out = jadeConfig.getTemplate(name)
       templates.put(name, jadeConfig.getTemplate(name))
       cleanupReaders()
       out
     }
+
+    if (current.mode == Mode.Dev) {
+      jadeConfig.clearCache()
+      readIn
+    } else templates.get(name).getOrElse { readIn }
   }
 
   def renderJade(name: String, params: Map[String, Object]): Html = {

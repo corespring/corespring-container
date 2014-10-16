@@ -5,16 +5,19 @@ expander = require "./lib/expander"
 pathReporter = require './lib/path-reporter'
 _ = require "lodash"
 
+withDist = (d,s) -> "#{d}/#{s}"
+
 playerConfig = require './grunt/config/player'
 
+console.log(JSON.stringify(playerConfig))
+playerResolved = 
+  js:
+    src: _.map(playerConfig.js.src, withDist.bind(null,'<%= common.dist %>')) , 
+    dest: withDist("<%= common.dist %>", playerConfig.js.dest)
 
-withDist = (d,s) -> "#{d}/#{s}"
 
 
 module.exports = (grunt) ->
-
-  #devMode = grunt.option("devMode") != false 
-
 
   # Some common vars
   common = 
@@ -28,6 +31,15 @@ module.exports = (grunt) ->
     pkg: grunt.file.readJSON('package.json')
     common: common
 
+    less:
+      player:
+        expand: true
+        cwd: '<%= common.dist %>/css'
+        src: '*.less'
+        dest: '<%= common.dist %>/css/'
+        ext: '.css'
+        flatten: false
+
     ## Uglify - js concatenation, minification
     uglify:
       player:
@@ -37,12 +49,9 @@ module.exports = (grunt) ->
           compress: false 
           mangle: false 
         files: [
-          {
-            src: _.map(playerConfig.src, withDist.bind(null,'<%= common.dist %>')) , 
-            dest: withDist("<%= common.dist %>", playerConfig.dest)
-          }
+          playerResolved.js
         ]
-
+    # Gzip compression
     compress: 
       player: 
         options: 
@@ -50,18 +59,48 @@ module.exports = (grunt) ->
         files: [
           { 
             expand: true 
-            src: [ withDist("<%= common.dist %>", playerConfig.dest) ]
+            src: [playerResolved.js.dest]
             ext: '.js.gz'
           }
         ]
-
+    # write paths to a json file
     pathReporter: 
       player:
-        src: _.map(playerConfig.src, withDist.bind(null,'<%= common.dist %>')) , 
-        dest: withDist("<%= common.dist %>", playerConfig.dest) 
+        src: playerResolved.js.src
+        dest: playerResolved.js.dest 
         report: '<%= common.dist %>/player-report.json'
+        process: (p) ->
+          p.replace(common.dist, '').replace('bower_components', 'components')
 
 
+    watch:
+      options:
+        livereload: true
+        debounceDelay: 5000
+        files: ['<%= common.dist %>/**/*']
+      jade:
+        files: ['<%= common.app %>/**/*.jade']
+        tasks: ['copy:jade']
+
+    copy:
+      less: 
+        files: [
+          {
+            expand: true
+            cwd: '<%= common.app %>',
+            src: ['./**/*.less'],
+            dest: '<%= common.dist %>'
+          }
+        ]
+      jade:
+        files: [
+          {
+            expand: true, 
+            cwd: '<%= common.app %>', 
+            src: ['./**/*.jade'], 
+            dest: '<%= common.dist %>/'
+          }
+        ]
   grunt.initConfig(config)
 
   npmTasks = [
@@ -84,17 +123,8 @@ module.exports = (grunt) ->
 
   grunt.loadNpmTasks(t) for t in npmTasks
   grunt.loadTasks('./lib')
+  grunt.registerTask('run', ['watch'])
+  grunt.registerTask('mk-css', ['copy:less', 'less'])
+  grunt.registerTask('default', ['stage'])
   grunt.registerTask('stage', 'Work with the play stage task', 
     ['uglify', 'compress', 'pathReporter'])
-###  grunt.registerTask('loadComponentDependencies', 'Load client side dependencies for the components', componentDependencies(grunt))
-  grunt.registerTask('restoreResolutions', 'Add "resolutions" back to bower.json', restoreResolutions(grunt))
-  grunt.registerTask('clean_bower', ['bower_clean', 'shell:mathjax_rm_pngs', 'shell:mathjax_rm_fonts'])  
-  # short cut
-  grunt.registerTask('lcd', ['restoreResolutions', 'loadComponentDependencies'])
-  grunt.registerTask('prepPlayerLauncher', 'prep the player launcher js', prepPlayerLauncher(grunt))
-  grunt.registerTask('run', ['uglification', 'ejs', 'jade', 'runComponentLess', 'less', 'watch'])
-  grunt.registerTask('test', ['shell:bower', 'shell:bowerCacheClean', 'lcd', 'prepPlayerLauncher', 'jasmine:unit'])
-  grunt.registerTask('uglification', ['clean:uglified', 'uglify:concatOnly', 'uglify:minifyAndConcat', 'uglify:prodPlayer'])
-  grunt.registerTask('default', ['shell:bower', 'lcd', 'jshint', 'uglification', 'ejs', 'copy', 'less', 'clean:less', 'runComponentLess', 'clean_bower', 'jade', 'compress', 'prepPlayerLauncher','jasmine:unit'])
-  grunt.registerTask('minify-test', ['concat', 'uglify'])
-###
