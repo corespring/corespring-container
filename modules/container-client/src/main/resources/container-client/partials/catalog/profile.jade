@@ -6,7 +6,7 @@ mixin tr_header(a, b, c)
 
 script(type='text/ng-template', id="/templates/profile")
   .profile-body
-    h2 Profile
+    h2(ng-bind-html="htmlOrNull(item.profile.taskInfo.title)")
     .round-border-container.clearfix
       .description(ng-if="isNonEmptyString(item.profile.taskInfo.description)") {{item.profile.taskInfo.description}}
 
