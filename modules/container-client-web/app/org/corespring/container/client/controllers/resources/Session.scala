@@ -100,7 +100,7 @@ trait Session extends Controller with ItemPruner with HasContext {
       val sessionJson = (json \ "session").as[JsObject]
 
       val base = Json.obj(
-        "item" -> processedItem,
+        "item" -> prunedItem,
         "session" -> sessionJson)
 
       Ok(base)
