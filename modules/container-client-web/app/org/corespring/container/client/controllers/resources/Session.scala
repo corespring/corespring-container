@@ -91,12 +91,16 @@ trait Session extends Controller with ItemPruner with HasContext {
       val json = fs.everything
 
       val itemJson = (json \ "item").as[JsObject]
-      val prunedItem = pruneItem(itemJson)
+
+      //Note: We must run the itemProcessor with the complete data model as it depends on it.
+      val processedItem = itemPreProcessor.preProcessItemForPlayer(itemJson)
+
+      //Note: we can now run the regular prune ...
+      val prunedItem = pruneItem(processedItem)
       val sessionJson = (json \ "session").as[JsObject]
-      val processedItem = itemPreProcessor.preProcessItemForPlayer(prunedItem)
 
       val base = Json.obj(
-        "item" -> processedItem,
+        "item" -> prunedItem,
         "session" -> sessionJson)
 
       Ok(base)

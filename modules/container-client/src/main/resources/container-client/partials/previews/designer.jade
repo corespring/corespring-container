@@ -1,16 +1,13 @@
 script#designer-preview(type='text/ng-template')
   .client-side-preview(ng-controller="ClientSidePreview", ng-class="{previewHidden: isPreviewHidden()}")
-    player-control-panel(data-mode='playerMode', data-settings='playerSettings',
-      data-score="score")
+    player-control-panel(data-mode='playerMode', data-settings='playerSettings', data-score="score")
+      .player-container
+        corespring-preview-player(
+          player-mode="editor",
+          player-markup="data.item.xhtml",
+          player-item="data.item",
+          player-session="rootModel.session",
+          player-outcomes="outcome")
 
-    .player-container
-
-      corespring-preview-player(
-        player-mode="editor",
-        player-markup="data.item.xhtml",
-        player-item="data.item",
-        player-session="rootModel.session",
-        player-outcomes="outcome")
-
-      summary-feedback(template="designer.jade",item="data.item",session="session")
+        summary-feedback(template="designer.jade",item="data.item",session="session")
 
