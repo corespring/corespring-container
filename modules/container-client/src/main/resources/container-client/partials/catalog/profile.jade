@@ -102,4 +102,5 @@ script(type='text/ng-template', id="/templates/profile")
               .title Source
               .sub-content
                 a(href="{{item.profile.sourceUrl}}"){{item.profile.sourceUrl || unassigned}}
-
+    .footer
+      .item-id Item ID: {{item._id.$oid}}
