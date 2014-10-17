@@ -8,6 +8,7 @@ angular.module('corespring-catalog.controllers')
     'DataQueryService',
     'ComponentService',
     'ProfileFormatter',
+    '$sce',
     function(
       $scope,
       $location,
@@ -16,7 +17,8 @@ angular.module('corespring-catalog.controllers')
       ItemIdService,
       DataQueryService,
       ComponentService,
-      ProfileFormatter) {
+      ProfileFormatter,
+      $sce) {
 
       var log = $log.debug.bind($log, '[catalog root] -');
 
@@ -58,6 +60,16 @@ angular.module('corespring-catalog.controllers')
         createSupportingMaterialsDropDown(item);
         $scope.$broadcast('itemLoaded', item);
       };
+
+      $scope.$on("$stateChangeSuccess",function(){
+        $scope.$evalAsync(function( scope ) {
+          setTimeout(function() {
+            /* jshint ignore:start */
+            MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+            /* jshint ignore:end */
+          },200);
+        });
+      })
 
       $scope.onComponentsLoaded = function(components) {
         $scope.availableComponents = components;
@@ -105,6 +117,7 @@ angular.module('corespring-catalog.controllers')
       }
 
       $scope.init = function() {
+
         var profile = $scope.item.profile || {};
 
         if (profile.contributorDetails) {
@@ -206,6 +219,13 @@ angular.module('corespring-catalog.controllers')
         return arr && _.isArray(arr) && arr.length > 0 && arr.join('').length > 0;
       };
 
+      $scope.htmlOrNull = function(str){
+        if (!isNonEmptyString(str)){
+          return null;
+        }
+        return $sce.trustAsHtml(str);
+      };
+
       $scope.isThereCopyrightInfo = function(profile){
         return (
           isNonEmptyString(getOrNull(profile,"contributorDetails","copyrightOwner")) ||
@@ -241,5 +261,14 @@ angular.module('corespring-catalog.controllers')
         return str.length > 0;
       }
     }
+
+
+
+        /* setTimeout( function(){
+            MathJax.Hub.Queue(["Typeset",MathJax.Hub])
+          },
+          2000);*/
+
+
 
   ]);
