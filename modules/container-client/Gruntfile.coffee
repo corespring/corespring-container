@@ -9,12 +9,15 @@ withDist = (d,s) -> "#{d}/#{s}"
 
 playerConfig = require './grunt/config/player'
 
-console.log(JSON.stringify(playerConfig))
 playerResolved = 
   js:
     src: _.map(playerConfig.js.src, withDist.bind(null,'<%= common.dist %>')) , 
     dest: withDist("<%= common.dist %>", playerConfig.js.dest)
-
+    libs: _.map(playerConfig.js.libs, withDist.bind(null,'<%= common.dist %>')) , 
+  css: 
+    src: _.map(playerConfig.css.src, withDist.bind(null,'<%= common.dist %>')) , 
+    dest: withDist("<%= common.dist %>", playerConfig.css.dest)
+    libs: _.map(playerConfig.css.libs, withDist.bind(null,'<%= common.dist %>')) , 
 
 
 module.exports = (grunt) ->
@@ -65,12 +68,22 @@ module.exports = (grunt) ->
         ]
     # write paths to a json file
     pathReporter: 
-      player:
-        src: playerResolved.js.src
-        dest: playerResolved.js.dest 
-        report: '<%= common.dist %>/player-report.json'
+      options: 
         process: (p) ->
-          p.replace(common.dist, '').replace('bower_components', 'components')
+          p
+            .replace(common.dist, '')
+            .replace('bower_components', 'components')
+            .replace('///', '//')
+      playerJs:
+        src: playerResolved.js.src
+        dest: playerResolved.js.dest
+        libs: playerResolved.js.libs 
+        report: '<%= common.dist %>/player-js-report.json'
+      playerCss:
+        src: playerResolved.css.src
+        dest: playerResolved.css.dest 
+        libs: playerResolved.css.libs 
+        report: '<%= common.dist %>/player-css-report.json'
 
 
     watch:
@@ -127,4 +140,4 @@ module.exports = (grunt) ->
   grunt.registerTask('mk-css', ['copy:less', 'less'])
   grunt.registerTask('default', ['stage'])
   grunt.registerTask('stage', 'Work with the play stage task', 
-    ['uglify', 'compress', 'pathReporter'])
+    ['mk-css', 'uglify', 'compress', 'pathReporter'])

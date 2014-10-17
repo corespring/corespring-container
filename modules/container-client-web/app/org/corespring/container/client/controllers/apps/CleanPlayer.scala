@@ -1,7 +1,5 @@
 package org.corespring.container.client.controllers.apps
 
-import java.net.URL
-
 import org.corespring.container.client.VersionInfo
 import org.corespring.container.client.component.PlayerItemTypeReader
 import org.corespring.container.client.controllers.jade.Jade
@@ -10,10 +8,8 @@ import org.corespring.container.client.views.txt.js.PlayerServices
 import org.corespring.container.components.model.Id
 import org.corespring.container.components.processing.PlayerItemPreProcessor
 import play.api.Play
-import play.api.libs.json.{ JsValue, Json }
-import play.api.mvc.{ Action, AnyContent }
-
-case class SourceDef(src: Seq[String], dest: String)
+import play.api.libs.json.{JsValue, Json}
+import play.api.mvc.{Action, AnyContent, RequestHeader}
 
 trait CleanPlayer
   extends AppWithServices[PlayerHooks]
@@ -21,22 +17,14 @@ trait CleanPlayer
   with JsModeReading
   with Jade {
 
-  import play.api.Play.current
 
-  lazy val jsSrc: SourceDef = {
-    Play.resource("container-client/player-report.json").map { u: URL =>
-      val bs = scala.io.Source.fromURL(u)
-      val jsonString: String = bs.getLines().mkString("\n")
-      bs.close()
-      val json = Json.parse(jsonString)
-      val src = (json \ "src").as[Seq[String]].map(p => s"$modulePath$p")
-      val dest = s"$modulePath${(json \ "dest").as[String]}"
-      SourceDef(src, dest)
-    }.getOrElse(
-      throw new RuntimeException("Bad player report"))
-  }
+  def prefixModule(p:String) = if(p.startsWith("//")) p else s"$modulePath$p"
 
-  val name = "new-player.jade"
+  /** Read in the src report from the client side build */
+  lazy val jsSrc: SourcePaths = SourcePaths.fromJsonResource(modulePath, "container-client/player-js-report.json")
+  lazy val cssSrc: SourcePaths = SourcePaths.fromJsonResource(modulePath, "container-client/player-css-report.json")
+
+  val name = "player.jade"
 
   override def context: String = "player"
 
@@ -46,6 +34,10 @@ trait CleanPlayer
   def itemPreProcessor: PlayerItemPreProcessor
 
   override def additionalScripts: Seq[String] = Seq(org.corespring.container.client.controllers.apps.routes.CleanPlayer.services().url)
+
+  private def jsMode(implicit r : RequestHeader) : String = {
+    r.getQueryString("mode").getOrElse(Play.current.mode.toString.toLowerCase)
+  }
 
   /**
    * Query params:
@@ -78,39 +70,44 @@ trait CleanPlayer
         val clientSideDependencies = getClientSideDependencies(resolvedComponents)
         val dependencies = ngModules.createAngularModules(resolvedComponents, clientSideDependencies)
 
-        val jsMode = request.getQueryString("mode").getOrElse(
-          Play.current.mode.toString.toLowerCase)
-
         val jsToLoad = jsMode match {
           case "prod" => Seq(jsSrc.dest)
           case "dev" => jsSrc.src
-          case _ => throw new RuntimeException(s"Wrong mode $jsMode") //PlayerError()
+          case _ => throw new RuntimeException(s"Wrong mode $jsMode")
         }
-        val js = jsToLoad ++ (additionalScripts :+ jsUrl).distinct
+
+        val js = jsToLoad ++ jsSrc.otherLibs ++ (additionalScripts :+ jsUrl).distinct
 
         val domainResolvedJs = js.map(resolvePath)
-        val css = Seq(s"$modulePath/css/player.css", cssUrl)
+        val css = cssSrc.otherLibs :+  cssUrl :+ cssSrc.dest
         val domainResolvedCss = css.map(resolvePath)
 
         val preprocessedItem = itemPreProcessor.preProcessItemForPlayer(itemJson)
 
         Ok(
           template(
+            request.getQueryString("showControls").getOrElse("false") == "true",
             processXhtml(
               (itemJson \ "xhtml").asOpt[String]),
             dependencies,
             domainResolvedJs,
             domainResolvedCss,
             Json.obj("session" -> session, "item" -> preprocessedItem)))
-
       }
 
     }
 
   }
 
-  def template(html: String, deps: Seq[String], js: Seq[String], css: Seq[String], json: JsValue) = {
+  def template(
+                showControls : Boolean,
+                html: String,
+                deps: Seq[String],
+                js: Seq[String],
+                css: Seq[String],
+                json: JsValue) = {
     val params: Map[String, Object] = Map(
+      "showControls" -> new java.lang.Boolean(showControls),
       "html" -> html,
       "ngModules" -> s"[${deps.map(d => s"'$d'").mkString(",")}]",
       "js" -> js.toArray,
@@ -125,9 +122,9 @@ trait CleanPlayer
    */
   private def resolvePath(s: String): String = {
     val needsResolution = Seq(
-      "component-sets/",
       "components/",
-      "root-prod-player",
+      "component-sets/",
+      "prod-player",
       "player-services.js",
       "player.min").exists(s.contains)
     if (needsResolution) resolveDomain(s) else s

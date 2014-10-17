@@ -20,10 +20,10 @@ module.exports =
     libs: [
       'bower_components/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML'
     ]
-    
+      
   css:
-    src: 'css/player.less'
-    dest: 'css/player.css'
+    src: ['css/player.css']
+    dest: 'css/player.min.css'
     libs: [
       'bower_components/font-awesome/css/font-awesome.min.css',
       '//fonts.googleapis.com/css?family=Ubuntu:300,400,500,500italic,700'
