@@ -73,7 +73,10 @@ trait CleanPlayer
         val jsToLoad = jsMode match {
           case "prod" => Seq(jsSrc.dest)
           case "dev" => jsSrc.src
-          case _ => throw new RuntimeException(s"Wrong mode $jsMode")
+          case _ => {
+            logger.warn(s"Unknown mode $jsMode - falling back to prod")
+            Seq(jsSrc.dest)
+          }
         }
 
         val js = jsToLoad ++ jsSrc.otherLibs ++ (additionalScripts :+ jsUrl).distinct
