@@ -18,8 +18,6 @@ trait CleanPlayer
   with Jade {
 
 
-  def prefixModule(p:String) = if(p.startsWith("//")) p else s"$modulePath$p"
-
   /** Read in the src report from the client side build */
   lazy val jsSrc: SourcePaths = SourcePaths.fromJsonResource(modulePath, "container-client/player-js-report.json")
   lazy val cssSrc: SourcePaths = SourcePaths.fromJsonResource(modulePath, "container-client/player-css-report.json")
