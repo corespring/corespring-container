@@ -35,14 +35,23 @@ module.exports = (grunt) ->
     common: common
 
     less:
-      player:
+      dev:
         expand: true
         cwd: '<%= common.dist %>/css'
         src: '*.less'
         dest: '<%= common.dist %>/css/'
         ext: '.css'
         flatten: false
-
+      production: 
+        options: 
+          cleancss: true 
+        expand: true
+        cwd: '<%= common.dist %>/css'
+        src: '*.less'
+        dest: '<%= common.dist %>/css/'
+        ext: '.min.css'
+        flatten: false
+        
     ## Uglify - js concatenation, minification
     uglify:
       player:
@@ -136,6 +145,9 @@ module.exports = (grunt) ->
 
   grunt.loadNpmTasks(t) for t in npmTasks
   grunt.loadTasks('./lib')
+  grunt.registerTask('restoreResolutions', 'Add "resolutions" back to bower.json', restoreResolutions(grunt))
+  grunt.registerTask('lcd', ['restoreResolutions', 'loadComponentDependencies'])
+  grunt.registerTask('loadComponentDependencies', 'Load client side dependencies for the components', componentDependencies(grunt))
   grunt.registerTask('run', ['watch'])
   grunt.registerTask('mk-css', ['copy:less', 'less'])
   grunt.registerTask('default', ['stage'])
