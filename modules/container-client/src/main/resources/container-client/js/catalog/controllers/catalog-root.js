@@ -69,7 +69,7 @@ angular.module('corespring-catalog.controllers')
             /* jshint ignore:end */
           },200);
         });
-      })
+      });
 
       $scope.onComponentsLoaded = function(components) {
         $scope.availableComponents = components;
