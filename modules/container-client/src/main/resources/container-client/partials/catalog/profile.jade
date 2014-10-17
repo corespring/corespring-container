@@ -65,7 +65,7 @@ script(type='text/ng-template', id="/templates/profile")
       .field(ng-show="item.profile.lexile")
         .info
           .label.label-warning Lexile Score
-        .content(ng-show="item.profile.lexile") {{item.profile.lexile }}
+        .content(ng-show="item.profile.lexile") {{item.profile.lexile }}L
       .field(ng-show="isNonEmptyStringArray(item.profile.otherAlignments.keySkills)")
         .info
           .label.label-warning Key Skills
@@ -78,28 +78,28 @@ script(type='text/ng-template', id="/templates/profile")
         .courtesy(ng-show="item.profile.contributorDetails.copyrightOwner")
           | This item was made available to CoreSpring users courtesy of {{item.profile.contributorDetails.copyrightOwner}}
 
-
-    .more-info-container.clearfix
-      a.show-more.clearfix(ng-click="showMore = !showMore", ng-show="isThereCopyrightInfo(item.profile)") {{showMore ? 'hide info' : 'more info'}}
-      .fields(ng-show="showMore")
-        .field(ng-show="item.profile.contributorDetails.copyrightYear")
-          .title Copyright Year
-          .sub-content {{item.profile.contributorDetails.copyrightYear}}
-        .field(ng-show="item.profile.contributorDetails.copyrightExpirationDate")
-          .title Copyright Expiration Date
-          .sub-content {{item.profile.contributorDetails.copyrightExpirationDate}}
-        .field(ng-show="item.profile.allReviewsPassed")
-          .title Reviews Passed
-          .sub-content
-            span(ng-repeat="rp in item.profile.allReviewsPassed", ng-if="rp.passed") {{rp.name}}{{!$last ? ', ' : ''}}
-        .field(ng-show="item.profile.contributorDetails.credentials")
-          .title Credentials
-          .sub-content {{item.profile.contributorDetails.credentials}}
-        .field(ng-show="item.profile.priorUse")
-          .title Prior Use
-          .sub-content {{item.profile.priorUse}}
-        .field(ng-show="item.profile.sourceUrl")
-          .title Source
-          .sub-content
-            a(href="{{item.profile.sourceUrl}}"){{item.profile.sourceUrl || unassigned}}
+      .field
+        .more-info-container.clearfix
+          a.show-more.clearfix(ng-click="showMore = !showMore", ng-show="isThereCopyrightInfo(item.profile)") {{showMore ? 'hide info' : 'more info'}}
+          .fields(ng-show="showMore")
+            .field(ng-show="item.profile.contributorDetails.copyrightYear")
+              .title Copyright Year
+              .sub-content {{item.profile.contributorDetails.copyrightYear}}
+            .field(ng-show="item.profile.contributorDetails.copyrightExpirationDate")
+              .title Copyright Expiration Date
+              .sub-content {{item.profile.contributorDetails.copyrightExpirationDate}}
+            .field(ng-show="item.profile.allReviewsPassed")
+              .title Reviews Passed
+              .sub-content
+                span(ng-repeat="rp in item.profile.allReviewsPassed", ng-if="rp.passed") {{rp.name}}{{!$last ? ', ' : ''}}
+            .field(ng-show="item.profile.contributorDetails.credentials")
+              .title Credentials
+              .sub-content {{item.profile.contributorDetails.credentials}}
+            .field(ng-show="item.profile.priorUse")
+              .title Prior Use
+              .sub-content {{item.profile.priorUse}}
+            .field(ng-show="item.profile.sourceUrl")
+              .title Source
+              .sub-content
+                a(href="{{item.profile.sourceUrl}}"){{item.profile.sourceUrl || unassigned}}
 
