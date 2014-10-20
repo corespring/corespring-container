@@ -88,16 +88,18 @@ script(type='text/ng-template', id="/templates/profile")
             .field(ng-show="item.profile.contributorDetails.copyrightExpirationDate")
               .title Copyright Expiration Date
               .sub-content {{item.profile.contributorDetails.copyrightExpirationDate}}
-            .field(ng-show="item.profile.allReviewsPassed")
+            .field(ng-show="isNonEmptyStringArray(item.profile.reviewsPassed)")
               .title Reviews Passed
-              .sub-content
-                span(ng-repeat="rp in item.profile.allReviewsPassed", ng-if="rp.passed") {{rp.name}}{{!$last ? ', ' : ''}}
+              .sub-content {{item.profile.reviewsPassed.join(", ")}}
             .field(ng-show="item.profile.contributorDetails.credentials")
               .title Credentials
               .sub-content {{item.profile.contributorDetails.credentials}}
             .field(ng-show="item.profile.priorUse")
               .title Prior Use
               .sub-content {{item.profile.priorUse}}
+            .field(ng-show="item.collection.name")
+              .title Collection
+              .sub-content {{item.collection.name}}
             .field(ng-show="item.profile.sourceUrl")
               .title Source
               .sub-content
