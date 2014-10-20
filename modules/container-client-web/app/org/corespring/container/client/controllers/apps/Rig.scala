@@ -10,7 +10,7 @@ import play.api.mvc.{ SimpleResult, Action, RequestHeader }
 
 import scala.concurrent.{ ExecutionContext, Future }
 
-trait Rig extends AppWithConfig[ClientHooks] with PlayerItemTypeReader {
+trait Rig extends App[ClientHooks] with PlayerItemTypeReader {
 
   def index(componentType: String, data: Option[String] = None) = controllers.Assets.at("/container-client", s"rig.html")
 

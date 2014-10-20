@@ -1,11 +1,12 @@
-exports.src = [
+js =
+  src: [
   'js/corespring/core-library.js',
   'js/corespring/server/init-core-library.js',
   'js/editor/**/*.js',
   'js/catalog/**/*.js',
   'js/render/services/**/*.js',
   'js/render/directives/**/*.js',
-  'js/render/controllers/**/*.js', 
+  'js/render/controllers/**/*.js',
   'bower_components/angular-route/angular-route.min.js',
   'bower_components/angular-ui-router/release/angular-ui-router.min.js',
   'bower_components/select2/select2.js',

@@ -10,7 +10,8 @@ html(xmlns='http://www.w3.org/1999/html')
 
       #root.container(ng-controller='Root', dimension-propagator='')
 
-        if showControls 
+        if showControls
+
           div(ng-controller="ContainerPlayerController")
             div(ng-controller="Main")
               div(player-control-panel,data-mode='playerMode', data-settings='playerSettings', data-score="score", show-preview-button="{{showPreviewButton}}")

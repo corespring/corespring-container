@@ -16,7 +16,7 @@ GET           /component-sets/:context/:directive.:suffix            @org.coresp
 
 GET           /session/:sessionId/player.html                        @org.corespring.container.client.controllers.apps.CleanPlayer.load(sessionId:String)
 GET           /session/player-services.js                            @org.corespring.container.client.controllers.apps.CleanPlayer.services
-GET           /item/:itemId/player                                   @org.corespring.container.client.controllers.apps.CleanPlayer.createSessionForItem(itemId:String)
+GET           /item/:itemId/player.html                              @org.corespring.container.client.controllers.apps.CleanPlayer.createSessionForItem(itemId:String)
 
 
 GET           /session/item-and-session/:id.json                     @org.corespring.container.client.controllers.resources.Session.loadItemAndSession(id)
@@ -51,8 +51,7 @@ GET           /rig/:componentType/*file                              @org.coresp
 
 # Hooks for the editor: config, services + components
 GET           /editor/editor-services.js                             @org.corespring.container.client.controllers.apps.Editor.services
-GET           /editor/:itemId/editor-config.json                     @org.corespring.container.client.controllers.apps.Editor.config(itemId)
-GET           /editor/:itemId/index.html                             @org.corespring.container.client.controllers.apps.Editor.editItem(itemId, jsMode : Option[String] ?= None )
+GET           /editor/:itemId/index.html                             @org.corespring.container.client.controllers.apps.Editor.load(itemId)
 GET           /editor/:itemId/supporting-material/:name/*file        @org.corespring.container.client.controllers.Assets.supportingMaterial(itemId, name, file)
 GET           /editor/:itemId/*file                                  @org.corespring.container.client.controllers.Assets.item(itemId, file)
 POST          /editor/:itemId/*file                                  @org.corespring.container.client.controllers.Assets.upload(itemId, file)

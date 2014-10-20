@@ -3,18 +3,20 @@ package org.corespring.container.client.controllers.apps
 import org.corespring.container.client.component.{ ComponentUrls, ItemTypeReader }
 import org.corespring.container.client.controllers.angular.AngularModules
 import org.corespring.container.client.controllers.helpers.{ Helpers, LoadClientSideDependencies, XhtmlProcessor }
+import org.corespring.container.client.controllers.jade.Jade
 import org.corespring.container.client.hooks.ClientHooks
 import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.components.model.Id
 import org.corespring.container.components.model.dependencies.DependencyResolver
+import play.api.Play
 import play.api.http.ContentTypes
-import play.api.libs.json.Json
-import play.api.mvc.{ Action, Controller, SimpleResult }
+import play.api.libs.json.{ JsValue, Json }
+import play.api.mvc._
 import org.corespring.container.logging.ContainerLogger
 
 import scala.concurrent.ExecutionContext
 
-trait AppWithConfig[T <: ClientHooks]
+trait App[T <: ClientHooks]
   extends Controller
   with DependencyResolver
   with XhtmlProcessor
@@ -59,7 +61,9 @@ trait AppWithConfig[T <: ClientHooks]
     Ok(json)
   }
 
-  def config(id: String) = Action.async { implicit request =>
+  def load(id: String): Action[AnyContent]
+
+  /*def config(id: String) = Action.async { implicit request =>
     hooks.loadItem(id).map(handleSuccess { (itemJson) =>
       val typeIds = componentTypes(itemJson).map {
         t =>
@@ -85,7 +89,7 @@ trait AppWithConfig[T <: ClientHooks]
         js,
         cssUrl)
     })
-  }
+  }*/
 
   /**
    * Preprocess the xml so that it'll work in all browsers
@@ -102,9 +106,25 @@ trait AppWithConfig[T <: ClientHooks]
   }.getOrElse("<div><h1>New Item</h1></div>")
 }
 
-trait AppWithServices[T <: ClientHooks] extends AppWithConfig[T] {
+case class ComponentScriptInfo(jsUrl: String, cssUrl: String, ngDependencies: Seq[String])
+
+trait AppWithServices[T <: ClientHooks] extends App[T] with Jade {
   self: ItemTypeReader =>
 
+  /**
+   * A temporary means of defining paths that may be resolved
+   */
+  protected def resolvePath(s: String): String = {
+
+    val needsResolution = Seq(
+      "components/",
+      "component-sets/",
+      "editor",
+      "prod-player",
+      "player-services.js",
+      "player.min").exists(s.contains)
+    if (needsResolution) resolveDomain(s) else s
+  }
   override def ngModules: AngularModules = new AngularModules(s"$context.services")
 
   def services = Action {
@@ -112,4 +132,40 @@ trait AppWithServices[T <: ClientHooks] extends AppWithConfig[T] {
   }
 
   def servicesJs: String
+
+  protected def jsMode(implicit r: RequestHeader): String = {
+    r.getQueryString("mode").getOrElse(Play.current.mode.toString.toLowerCase)
+  }
+
+  protected def paths(d: SourcePaths)(implicit r: RequestHeader) = jsMode match {
+    case "prod" => Seq(d.dest)
+    case "dev" => d.src
+    case _ => {
+      logger.warn(s"Unknown mode $jsMode - falling back to prod")
+      Seq(d.dest)
+    }
+  }
+
+  protected def componentScriptInfo(itemJson: JsValue): ComponentScriptInfo = {
+
+    val typeIds = componentTypes(itemJson).map {
+      t =>
+        val typeRegex(org, name) = t
+        new Id(org, name)
+    }
+
+    val resolvedComponents = resolveComponents(typeIds, Some(context))
+    val jsUrl = urls.jsUrl(context, resolvedComponents)
+    val cssUrl = urls.cssUrl(context, resolvedComponents)
+    val clientSideDependencies = getClientSideDependencies(resolvedComponents)
+    val dependencies = ngModules.createAngularModules(resolvedComponents, clientSideDependencies)
+    ComponentScriptInfo(jsUrl, cssUrl, dependencies)
+  }
+
+  /** Allow external domains to be configured */
+  def resolveDomain(path: String): String = path
+
+  /** Read in the src report from the client side build */
+  lazy val jsSrc: SourcePaths = SourcePaths.fromJsonResource(modulePath, s"container-client/$context-js-report.json")
+  lazy val cssSrc: SourcePaths = SourcePaths.fromJsonResource(modulePath, s"container-client/$context-css-report.json")
 }

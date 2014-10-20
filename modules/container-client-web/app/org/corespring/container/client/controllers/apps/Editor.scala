@@ -20,7 +20,7 @@ trait Editor
 
   override def loggerName = "container.app.editor"
 
-  def showErrorInUi : Boolean
+  def showErrorInUi: Boolean
 
   override def context: String = "editor"
 
@@ -39,8 +39,7 @@ trait Editor
       }),
       "componentType" -> Some(JsString(tag)),
       "defaultData" -> Some(ci.defaultData),
-      "configuration" -> (ci.packageInfo \ "external-configuration").asOpt[JsObject]
-    )
+      "configuration" -> (ci.packageInfo \ "external-configuration").asOpt[JsObject])
   }
 
   override def servicesJs = {
@@ -59,26 +58,30 @@ trait Editor
 
   override def additionalScripts: Seq[String] = Seq(org.corespring.container.client.controllers.apps.routes.Editor.services().url)
 
-  def editItem(itemId: String, jsMode: Option[String] = None): Action[AnyContent] = Action.async { implicit request =>
+  override def load(itemId: String): Action[AnyContent] = Action.async { implicit request =>
 
     def onError(sm: StatusMessage) = {
       val (code, msg) = sm
-      Future {
-        code match {
-          case SEE_OTHER => SeeOther(msg)
-          case _ => Status(code)(org.corespring.container.client.views.html.error.main(code, msg, showErrorInUi))
-        }
+      code match {
+        case SEE_OTHER => SeeOther(msg)
+        case _ => Status(code)(org.corespring.container.client.views.html.error.main(code, msg, showErrorInUi))
       }
     }
 
-    def onItem(i: JsValue) = {
-      val jsMode = getJsMode(request)
-      val page = s"editor.$jsMode.html"
-      logger.trace(s"[editItem] $itemId; page $page")
-      controllers.Assets.at("/container-client", page)(request)
+    def onItem(i: JsValue): SimpleResult = {
+      val scriptInfo = componentScriptInfo(i)
+      val mainJs = paths(jsSrc)
+      val js = mainJs ++ jsSrc.otherLibs ++ (additionalScripts :+ scriptInfo.jsUrl).distinct
+
+      val domainResolvedJs = js.map(resolvePath)
+      val css = Seq(cssSrc.dest) ++ cssSrc.otherLibs :+ scriptInfo.cssUrl
+      val domainResolvedCss = css.map(resolvePath)
+
+      val params: Map[String, Object] = Map()
+      Ok(renderJade(s"$context.jade", params))
     }
 
-    hooks.loadItem(itemId).flatMap { e => e.fold(onError, onItem) }
+    hooks.loadItem(itemId).map { e => e.fold(onError, onItem) }
   }
 
 }

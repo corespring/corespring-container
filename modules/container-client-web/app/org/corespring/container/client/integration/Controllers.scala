@@ -36,7 +36,7 @@ trait RigControllers extends CommonControllers {
 }
 
 trait PlayerControllers extends CommonControllers with ResourceControllers {
-  def prodHtmlPlayer : CleanPlayer
+  def prodHtmlPlayer: Player
 }
 
 trait EditorControllers extends CommonControllers with ResourceControllers {
@@ -61,8 +61,7 @@ trait ContainerControllers
   with PlayerControllers
   with EditorControllers
   with ProfileControllers
-  with CatalogControllers
-{
+  with CatalogControllers {
   def controllers: Seq[Controller] = Seq(
     componentSets,
     assets,

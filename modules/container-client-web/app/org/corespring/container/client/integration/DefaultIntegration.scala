@@ -123,7 +123,7 @@ trait DefaultIntegration
     override def hooks = catalogHooks
   }
 
-  lazy val prodHtmlPlayer = new CleanPlayer {
+  lazy val prodHtmlPlayer = new Player {
 
     override implicit def ec: ExecutionContext = DefaultIntegration.this.ec
 
@@ -137,7 +137,6 @@ trait DefaultIntegration
 
     override def itemPreProcessor: PlayerItemPreProcessor = DefaultIntegration.this.playerItemPreProcessor
   }
-
 
   lazy val item = new Item {
     def scoreProcessor: ScoreProcessor = DefaultIntegration.this.scoreProcessor
