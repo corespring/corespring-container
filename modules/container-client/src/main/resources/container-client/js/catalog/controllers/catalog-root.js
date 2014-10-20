@@ -232,7 +232,22 @@ angular.module('corespring-catalog.controllers')
           isNonEmptyString(getOrNull(profile,"contributorDetails","copyrightYear")) ||
           isNonEmptyString(getOrNull(profile,"contributorDetails","copyrightExpirationDate")) ||
           isNonEmptyString(getOrNull(profile,"contributorDetails","credentials")) ||
-          isNonEmptyString(getOrNull(profile,"contributorDetails","sourceUrl")));
+          isNonEmptyString(getOrNull(profile,"contributorDetails","sourceUrl")) ||
+          isNonEmptyString(getOrNull($scope,"item","collection","name"))
+          );
+      };
+
+      $scope.getUrl = function(src){
+        if (!isNonEmptyString(src)){
+          return null;
+        }
+
+
+        if (src.indexOf('http://') === -1){
+          src = 'http://' + src;
+        }
+
+        return $sce.trustAsUrl(src);
       };
 
       function getOrNull(){

@@ -100,9 +100,9 @@ script(type='text/ng-template', id="/templates/profile")
             .field(ng-show="item.collection.name")
               .title Collection
               .sub-content {{item.collection.name}}
-            .field(ng-show="item.profile.sourceUrl")
+            .field(ng-show="getUrl(item.profile.contributorDetails.sourceUrl)")
               .title Source
               .sub-content
-                a(href="{{item.profile.sourceUrl}}"){{item.profile.sourceUrl || unassigned}}
+                a(href="{{getUrl(item.profile.contributorDetails.sourceUrl)}}", target="_blank"){{getUrl(item.profile.contributorDetails.sourceUrl)}}
     .footer
       .item-id Item ID: {{item._id.$oid}}
