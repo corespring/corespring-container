@@ -99,9 +99,10 @@ angular.module('corespring-catalog.controllers')
       }
 
       function applyDepthOfKnowledge() {
-        var otherAlignments = ($scope.item && $scope.item.profile && $scope.item.profile.otherAlignments) ? $scope.item.profile.otherAlignments : {};
-        if (otherAlignments.depthOfKnowledge && $scope.depthOfKnowledgeDataProvider) {
-          var obj = _.find($scope.depthOfKnowledgeDataProvider, keyMatch(otherAlignments.depthOfKnowledge));
+        var depthOfKnowledge = getOrNull($scope,"item","profile","otherAlignments","depthOfKnowledge");
+
+        if (depthOfKnowledge && $scope.depthOfKnowledgeDataProvider) {
+          var obj = _.find($scope.depthOfKnowledgeDataProvider, keyMatch(depthOfKnowledge));
           $scope.depthOfKnowledgeLabel = obj ? obj.value : undefined;
         }
       }
@@ -276,14 +277,5 @@ angular.module('corespring-catalog.controllers')
         return str.length > 0;
       }
     }
-
-
-
-        /* setTimeout( function(){
-            MathJax.Hub.Queue(["Typeset",MathJax.Hub])
-          },
-          2000);*/
-
-
 
   ]);
