@@ -22,6 +22,15 @@ var Instance = function(element, options, errorCallback, log) {
     return iframe;
   };
 
+  var findDestinationIframe = function(event) {
+    var frames = document.getElementsByTagName('iframe');
+    for (var i = 0; i < frames.length; i++) {
+      if (frames[i].contentWindow === event.source) {
+        return $(frames[i]);
+      }
+    }
+  };
+
   var isMessageDestinedForInstance = function(event) {
     var eventIframe = findDestinationIframe(event);
     var instanceIframe = findInstanceIframe();
@@ -42,15 +51,6 @@ var Instance = function(element, options, errorCallback, log) {
 
   var listener = require("root-level-listener")(log);
   var listenersToRemove = [];
-
-  var findDestinationIframe = function(event) {
-    var frames = document.getElementsByTagName('iframe');
-    for (var i = 0; i < frames.length; i++) {
-      if (frames[i].contentWindow === event.source) {
-        return $(frames[i]);
-      }
-    }
-  };
 
   function detachOnRemove(handler) {
     listenersToRemove.push(handler);
@@ -91,6 +91,11 @@ var Instance = function(element, options, errorCallback, log) {
     detachOnRemove(listenerFn);
   }
 
+  function isMsie() {
+    //from MathJax at https://github.com/mathjax/MathJax/blob/master/unpacked/MathJax.js#L2987
+    return ("ActiveXObject" in window && "clipboardData" in window);
+  }
+
   function initialize(e, options) {
     if (!options || !options.url) {
       errorCallback({
@@ -115,10 +120,15 @@ var Instance = function(element, options, errorCallback, log) {
       url += "#/?showPreviewButton";
     }
 
+    /**
+     * Msie has trouble rendering MathJax in public site when display:none is used
+     */
+    var hideUnlessMsie = isMsie() ? '' : 'display:none';
+
     var iframeTemplate = [
       " <iframe id='iframe-player' ",
       "         frameborder='0' ",
-      "         src='" + url + "' style='width: 100%; border: none; display:none'>",
+      "         src='" + url + "' style='width: 100%; border: none; " + hideUnlessMsie + "'>",
       " </iframe>"
     ].join('\n');
 
