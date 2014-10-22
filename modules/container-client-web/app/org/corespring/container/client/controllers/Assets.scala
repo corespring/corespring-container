@@ -41,7 +41,7 @@ trait Assets extends Controller with HasContext {
         getItemId(s).map {
           itemId =>
             logger.trace(s"[session] sessionId: $sessionId, itemId: $itemId -> $file")
-            loadAsset(itemId, "", file)(request)
+            loadAsset(itemId, "data", file)(request)
         }.getOrElse(NotFound(s"Can't find session id: $sessionId, path: ${request.path}"))
       })(request)
   }
@@ -49,7 +49,7 @@ trait Assets extends Controller with HasContext {
   def item(itemId: String, file: String) = Action.async {
     request =>
       at(itemId, file, (i: String) => {
-        loadAsset(itemId, "", file)(request)
+        loadAsset(itemId, "data", file)(request)
       })(request)
   }
 
