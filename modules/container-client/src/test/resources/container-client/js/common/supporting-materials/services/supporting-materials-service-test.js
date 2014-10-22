@@ -51,7 +51,7 @@ describe('supporting materials service', function() {
           return file.default === true;
         });
       expect(supportingMaterialsService.getSupportingUrl(supportingMaterials, 0).$$unwrapTrustedValue()).toEqual(
-        supportingMaterials[0].id + "/" + supportingMaterial.name);
+          (supportingMaterials[0].id || supportingMaterials[0].name)+ "/" + supportingMaterial.name);
     });
   });
 

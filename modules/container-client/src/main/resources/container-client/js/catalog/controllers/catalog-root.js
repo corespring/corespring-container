@@ -35,7 +35,9 @@ angular.module('corespring-catalog.controllers')
           index++;
         };
         for (var key in groupedSupportingMaterials) {
-          $scope.supportingMaterials.push({label: key, type: "header"});
+          if (key !== "undefined"){
+            $scope.supportingMaterials.push({label: key, type: "header"});
+          }
           _.each(groupedSupportingMaterials[key], insertSupportingMaterialsForType);
           $scope.supportingMaterials.push({type: "divider"});
         }
