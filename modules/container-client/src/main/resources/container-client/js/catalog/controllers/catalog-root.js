@@ -220,7 +220,7 @@ angular.module('corespring-catalog.controllers')
 
       function isNonEmptyStringArray(arr){
         return arr && _.isArray(arr) && arr.length > 0 && arr.join('').length > 0;
-      };
+      }
 
       $scope.isNonEmptyStringArray = isNonEmptyStringArray;
 
@@ -239,9 +239,8 @@ angular.module('corespring-catalog.controllers')
           isNonEmptyString(getOrNull(profile,"contributorDetails","credentials")) ||
           isNonEmptyString(getOrNull(profile,"contributorDetails","sourceUrl")) ||
           isNonEmptyStringArray(getOrNull(profile,"priorGradeLevel")) ||
-          isNonEmptyString(getOrNull($scope,"item","collection","name"))
-          );
-      };
+          isNonEmptyString(getOrNull($scope,"item","collection","name")));
+     };
 
       $scope.getUrl = function(src){
         if (!isNonEmptyString(src)){
