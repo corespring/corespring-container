@@ -188,7 +188,8 @@ object Build extends sbt.Build {
         closureCompiler,
         yuiCompressor,
         commonsIo),
-      templatesImport ++= Seq("play.api.libs.json.JsValue", "play.api.libs.json.Json")).dependsOn(
+      templatesImport ++= Seq("play.api.libs.json.JsValue", "play.api.libs.json.Json"))
+      .dependsOn(
         componentModel % "compile->compile;test->test",
         containerClient,
         utils,

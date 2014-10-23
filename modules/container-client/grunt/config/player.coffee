@@ -1,5 +1,6 @@
 core = require './core'
 coreLibs = require './core-libs'
+buildUglifyOptions = require('../lib/uglify-options-generator').buildUglifyOptions
 _ = require 'lodash'
 _.mixin(require('lodash-deep'))
 
@@ -31,19 +32,8 @@ css =
   ]
   report: 'player-css-report.json'
 
-exports.config = (toTargetPath) ->
-
-  uglify:
-    player:
-      options:
-        sourceMap:true
-        sourceMapIncludeSource: true
-        compress: false
-        mangle: false
-      files: [
-        _.deepMapValues(_.cloneDeep(js), toTargetPath)
-      ]
-
+exports.config = (grunt, toTargetPath) ->
+  uglify: buildUglifyOptions(grunt, 'player', js, toTargetPath)
   compress:
     player:
       options:

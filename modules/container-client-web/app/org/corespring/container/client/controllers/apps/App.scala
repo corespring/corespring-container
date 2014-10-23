@@ -8,7 +8,7 @@ import org.corespring.container.client.hooks.ClientHooks
 import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.components.model.Id
 import org.corespring.container.components.model.dependencies.DependencyResolver
-import play.api.Play
+import play.api.{Mode, Play}
 import play.api.http.ContentTypes
 import play.api.libs.json.{ JsValue, Json }
 import play.api.mvc._
@@ -25,9 +25,7 @@ trait App[T <: ClientHooks]
   with HasLogger {
   self: ItemTypeReader =>
 
-  def loggerName = "container.app"
-
-  override lazy val logger = ContainerLogger.getLogger(loggerName)
+  override lazy val logger = ContainerLogger.getLogger(context)
 
   implicit def ec: ExecutionContext
 
@@ -154,6 +152,7 @@ trait AppWithServices[T <: ClientHooks] extends App[T] with Jade {
         new Id(org, name)
     }
 
+    logger.trace(s"function=componentScriptInfo typeIds=$typeIds")
     val resolvedComponents = resolveComponents(typeIds, Some(context))
     val jsUrl = urls.jsUrl(context, resolvedComponents)
     val cssUrl = urls.cssUrl(context, resolvedComponents)
@@ -166,6 +165,15 @@ trait AppWithServices[T <: ClientHooks] extends App[T] with Jade {
   def resolveDomain(path: String): String = path
 
   /** Read in the src report from the client side build */
-  lazy val jsSrc: SourcePaths = SourcePaths.fromJsonResource(modulePath, s"container-client/$context-js-report.json")
+  lazy val loadedJsSrc = SourcePaths.fromJsonResource(modulePath, s"container-client/$context-js-report.json")
+
+  def jsSrc: SourcePaths = {
+    if(Play.current.mode == Mode.Dev) {
+      SourcePaths.fromJsonResource(modulePath, s"container-client/$context-js-report.json")
+    } else {
+      loadedJsSrc
+    }
+  }
+
   lazy val cssSrc: SourcePaths = SourcePaths.fromJsonResource(modulePath, s"container-client/$context-css-report.json")
 }

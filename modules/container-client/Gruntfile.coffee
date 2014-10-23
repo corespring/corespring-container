@@ -80,14 +80,17 @@ module.exports = (grunt) ->
       options:
         process: tidyPaths
 
-  toTargetPath = (p) -> if(p.startsWith("//")) then p else "<%= common.dist %>/#{p}"
+  toTargetPath = (p) -> 
+    if(p.startsWith("//")) then p 
+    else 
+      "<%= common.dist %>/#{p.replace('(.min)', '')}"
 
   fullConfig = _.merge(config, 
-    player.config(toTargetPath), 
+    player.config(grunt,toTargetPath), 
     playerControls.config(toTargetPath),
-    editor.config(toTargetPath))
+    editor.config(grunt, toTargetPath))
 
-  grunt.log.debug(JSON.stringify(fullConfig, null, "  "))
+  #grunt.log.debug(JSON.stringify(fullConfig, null, "  "))
   grunt.initConfig(fullConfig)
 
   npmTasks = [

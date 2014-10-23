@@ -2,34 +2,35 @@ core = require './core'
 coreLibs = require './core-libs'
 _ = require 'lodash'
 _.mixin(require('lodash-deep'))
+buildUglifyOptions = require('../lib/uglify-options-generator').buildUglifyOptions
 
 editorSrcs = [
+  'bower_components/angular-route/angular-route(.min).js',
+  'bower_components/angular-ui-router/release/angular-ui-router(.min).js',
+  'bower_components/wiggi-wiz/dist/wiggi-wiz.js',
+  'bower_components/select2/select2(.min).js',
+  'bower_components/angular-ui-select2/src/select2.js',
+  'bower_components/angular-ui/build/angular-ui(.min).js',
+  'bower_components/angular-bootstrap/ui-bootstrap-tpls(.min).js',
+  #'bower_components/bootstrap/js/dropdown.js',
+  #'bower_components/bootstrap/js/modal.js',
+  #'bower_components/bootstrap/js/tooltip.js',
+  #'bower_components/bootstrap/js/popover.js',
+  'bower_components/angular-ui-ace/ui-ace(.min).js',
+  'bower_components/ace-builds/src-min-noconflict/ace.js',
+  'bower_components/ace-builds/src-min-noconflict/theme-twilight.js',
+  'bower_components/ace-builds/src-min-noconflict/mode-xml.js',
+  'bower_components/ace-builds/src-min-noconflict/worker-json.js',
+  'bower_components/ace-builds/src-min-noconflict/mode-json.js',
+  'bower_components/jquery.browser/dist/jquery.browser(.min).js',
+  'bower_components/undo.js/undo.js',
   'js/corespring/core-library.js',
   'js/corespring/server/init-core-library.js',
   'js/editor/**/*.js',
   'js/catalog/**/*.js',
   'js/render/services/**/*.js',
   'js/render/directives/**/*.js',
-  'js/render/controllers/**/*.js',
-  'bower_components/angular-route/angular-route.min.js',
-  'bower_components/angular-ui-router/release/angular-ui-router.min.js',
-  'bower_components/wiggi-wiz/dist/wiggi-wiz.js',
-  'bower_components/select2/select2.js',
-  'bower_components/angular-ui-select2/src/select2.js',
-  'bower_components/angular-ui/build/angular-ui.min.js',
-  'bower_components/angular-bootstrap/ui-bootstrap-tpls.js',
-  'bower_components/bootstrap/js/dropdown.js',
-  'bower_components/bootstrap/js/modal.js',
-  'bower_components/bootstrap/js/tooltip.js',
-  'bower_components/bootstrap/js/popover.js',
-  'bower_components/angular-ui-ace/ui-ace.js',
-  'bower_components/ace-builds/src-min-noconflict/ace.js',
-  'bower_components/ace-builds/src-min-noconflict/theme-twilight.js',
-  'bower_components/ace-builds/src-min-noconflict/mode-xml.js',
-  'bower_components/ace-builds/src-min-noconflict/worker-json.js',
-  'bower_components/ace-builds/src-min-noconflict/mode-json.js',
-  'bower_components/jquery.browser/dist/jquery.browser.min.js',
-  'bower_components/undo.js/undo.js'
+  'js/render/controllers/**/*.js'
 ]
 
 js =
@@ -50,18 +51,8 @@ css =
   report: 'editor-css-report.json'
 
   
-exports.config = (toTargetPath) ->
-  uglify:
-    editor:
-      options:
-        sourceMap:true
-        sourceMapIncludeSource: true
-        compress: false
-        mangle: false
-      files: [
-        _.deepMapValues(_.cloneDeep(js), toTargetPath)
-      ]
-
+exports.config = (grunt, toTargetPath) ->
+  uglify: buildUglifyOptions(grunt, 'editor', js, toTargetPath)
   compress:
     editor:
       options:

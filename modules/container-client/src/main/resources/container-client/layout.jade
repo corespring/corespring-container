@@ -4,10 +4,11 @@ html(xmlns="http://www.w3.org/1999/html")
     meta(charset="utf-8")
     meta(http-equiv="X-UA-Compatible", content="IE=edge")
     title= title
+    
+    for c in css
+      link(rel='stylesheet',href='#{c}')
 
-  block vars
-
-  body
+  body(ng-app="corespring-#{appName}")
     .pre-loader
       #spinner
 
@@ -19,7 +20,7 @@ html(xmlns="http://www.w3.org/1999/html")
 
     block before-main-script
 
-    script.
+    script(type="text/javascript")
 
       var opts = {
         length: 17, // The length of each line
@@ -42,12 +43,12 @@ html(xmlns="http://www.w3.org/1999/html")
       });
 
       var componentNgModules = [#{componentNgModules}];
-      angular.module(
-        '#{appName}', 
-        window.ngAppModules.concat(componentNgModules) 
-        ).config(['$provide', function($provide) {
+      var allNgModules = window.ngAppModules.concat(componentNgModules);
+      //declare the app..
+      console.log('..');
+      angular.module( 'corespring-#{appName}', allNgModules ).config(['$provide', function($provide) {
 
-          var enabledInQueryString = (document.location.search.indexOf('disableLogging=false') !== -1) 
+          var enabledInQueryString = document.location.search.indexOf('loggingEnabled=true') !== -1;
           var loggingEnabled = enabledInQueryString || false;
           if(!loggingEnabled){
             function mockLogger($delegate) {
@@ -78,3 +79,5 @@ html(xmlns="http://www.w3.org/1999/html")
           }
 
         }]);
+
+    block after-main-script

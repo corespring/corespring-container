@@ -8,8 +8,8 @@ import org.corespring.container.client.views.txt.js.PlayerServices
 import org.corespring.container.components.model.Id
 import org.corespring.container.components.processing.PlayerItemPreProcessor
 import play.api.Play
-import play.api.libs.json.{ JsValue, Json }
-import play.api.mvc.{ Action, AnyContent, RequestHeader }
+import play.api.libs.json.{JsValue, Json}
+import play.api.mvc.{Action, AnyContent, RequestHeader}
 
 trait Player
   extends AppWithServices[PlayerHooks]
@@ -41,8 +41,8 @@ trait Player
    * @return
    */
   override def load(sessionId: String) = Action.async { implicit request =>
-
     hooks.loadSessionAndItem(sessionId).map {
+
       case Left((code, msg)) => Status(code)(Json.obj("error" -> msg))
       case Right((session, itemJson)) => {
 
@@ -58,39 +58,31 @@ trait Player
 
         val preprocessedItem = itemPreProcessor.preProcessItemForPlayer(itemJson)
 
+        logger.trace(s"function=load domainResolvedJs=$domainResolvedJs")
+        logger.trace(s"function=load domainResolvedCss=$domainResolvedCss")
+
         Ok(
-          template(
-            showControls,
-            processXhtml(
-              (itemJson \ "xhtml").asOpt[String]),
-            scriptInfo.ngDependencies,
-            domainResolvedJs,
-            domainResolvedCss,
-            Json.obj("session" -> session, "item" -> preprocessedItem)))
+          renderJade(
+            context,
+            PlayerTemplateParams(
+              domainResolvedJs,
+              domainResolvedCss,
+              scriptInfo.ngDependencies,
+              showControls,
+              processXhtml((itemJson \ "xhtml").asOpt[String]),
+              Json.obj("session" -> session, "item" -> preprocessedItem),
+              VersionInfo.json
+            ).toJadeParams)
+        )
       }
-
     }
-
   }
 
-  def template(
-    showControls: Boolean,
-    html: String,
-    deps: Seq[String],
-    js: Seq[String],
-    css: Seq[String],
-    json: JsValue) = {
-    val params: Map[String, Object] = Map(
-      "showControls" -> new java.lang.Boolean(showControls),
-      "html" -> html,
-      "ngModules" -> s"[${deps.map(d => s"'$d'").mkString(",")}]",
-      "js" -> js.toArray,
-      "css" -> css.toArray,
-      "sessionJson" -> Json.stringify(json),
-      "versionInfo" -> Json.stringify(VersionInfo.json))
-    logger.trace(s"render jade with params: $params")
-    renderJade(s"$context.jade", params)
-  }
+  //TODO: CA-2186 - catalog + rig support
+  //TODO: CA-2186 - clean up grunt
+  //TODO: CA-2186 - set up other build items
+  //TODO: CA-2186 - remove old parts of the api
+
 
   def createSessionForItem(itemId: String): Action[AnyContent] = Action.async { implicit request =>
     hooks.createSessionForItem(itemId).map(handleSuccess { sessionId =>

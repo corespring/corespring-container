@@ -4,13 +4,17 @@ import java.io.{ BufferedReader, InputStreamReader, Reader }
 
 import de.neuland.jade4j.template.{ JadeTemplate, TemplateLoader }
 import de.neuland.jade4j.{ Jade4J, JadeConfiguration }
+import grizzled.slf4j.Logger
 import org.apache.commons.io.IOUtils
+import play.api.{Mode, Play}
 import play.api.templates.Html
-import play.api.{ Mode, Play }
+
 
 import scala.collection.mutable
 
 trait Jade {
+
+  def logger : Logger
 
   import play.api.Play.current
 
@@ -66,9 +70,9 @@ trait Jade {
     require(params != null, "params is null")
     import scala.collection.JavaConversions._
     val template = loadTemplate(name)
-    println(s"-> template $template")
-    println(s"-> params $params")
-    println(s"-> name $name")
+    logger.trace(s"function=renderJade template=$template")
+    logger.trace(s"function=renderJade params=$params")
+    logger.trace(s"function=renderJade name=$name")
     val rendered = jadeConfig.renderTemplate(template, params)
     Html(new StringBuilder(rendered).toString)
   }

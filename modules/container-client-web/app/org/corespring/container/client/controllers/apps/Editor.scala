@@ -1,24 +1,19 @@
 package org.corespring.container.client.controllers.apps
 
+import org.corespring.container.client.component.AllItemTypesReader
+import org.corespring.container.client.controllers.helpers.JsonHelper
 import org.corespring.container.client.hooks.EditorHooks
 import org.corespring.container.client.hooks.Hooks.StatusMessage
-import org.corespring.container.client.component.AllItemTypesReader
 import org.corespring.container.client.views.txt.js.EditorServices
 import org.corespring.container.components.model.ComponentInfo
-import play.api.Logger
 import play.api.libs.json._
-import play.api.mvc.{ SimpleResult, Action, AnyContent }
-
-import scala.concurrent.Future
-import org.corespring.container.client.controllers.helpers.JsonHelper
+import play.api.mvc.{Action, AnyContent, SimpleResult}
 
 trait Editor
   extends AllItemTypesReader
   with AppWithServices[EditorHooks]
   with JsModeReading
   with JsonHelper {
-
-  override def loggerName = "container.app.editor"
 
   def showErrorInUi: Boolean
 
@@ -78,12 +73,19 @@ trait Editor
       logger.debug(s"domainResolvedJs: $domainResolvedJs")
       val params: Map[String, Object] = Map(
         "js" -> domainResolvedJs.toArray,
-        "componentNgModules" -> s"${scriptInfo.ngDependencies.map{d => s"'$d'"}.mkString(",")}",
+        "css" -> domainResolvedCss.toArray,
+        "componentNgModules" -> s"${scriptInfo.ngDependencies.map { d => s"'$d'"}.mkString(",")}",
         "appName" -> context)
-      Ok(renderJade(context, params))
+      Ok(renderJade(
+        context,
+        EditorTemplateParams(
+          domainResolvedJs,
+          domainResolvedCss,
+          scriptInfo.ngDependencies).toJadeParams)
+      )
     }
 
-    hooks.loadItem(itemId).map { e => e.fold(onError, onItem) }
+    hooks.loadItem(itemId).map { e => e.fold(onError, onItem)}
   }
 
 }
