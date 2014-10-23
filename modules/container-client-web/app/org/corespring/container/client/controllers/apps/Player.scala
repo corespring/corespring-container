@@ -5,16 +5,28 @@ import org.corespring.container.client.component.PlayerItemTypeReader
 import org.corespring.container.client.controllers.jade.Jade
 import org.corespring.container.client.hooks.PlayerHooks
 import org.corespring.container.client.views.txt.js.PlayerServices
-import org.corespring.container.components.model.Id
 import org.corespring.container.components.processing.PlayerItemPreProcessor
-import play.api.Play
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.{Json}
 import play.api.mvc.{Action, AnyContent, RequestHeader}
 
 trait Player
-  extends AppWithServices[PlayerHooks]
+  extends App[PlayerHooks]
   with PlayerItemTypeReader
-  with JsModeReading {
+  with Jade{
+
+  /**
+   * Preprocess the xml so that it'll work in all browsers
+   * aka: convert tagNames -> attributes for ie 8 support
+   * TODO: A layout component may have multiple elements
+   * So we need a way to get all potential component names from
+   * each component, not just assume its the top level.
+   */
+  def processXhtml(maybeXhtml: Option[String]) = maybeXhtml.map {
+    xhtml =>
+      tagNamesToAttributes(xhtml).getOrElse {
+        throw new RuntimeException(s"Error processing xhtml: $xhtml")
+      }
+  }.getOrElse("<div><h1>New Item</h1></div>")
 
   lazy val controlsJsSrc: SourcePaths = SourcePaths.fromJsonResource(modulePath, s"container-client/$context-controls-js-report.json")
 

@@ -1,9 +1,13 @@
-componentDependencies = require "./lib/component-dependencies"
-restoreResolutions = require "./lib/restore-resolutions"
-prepPlayerLauncher = require "./lib/prep-player-launcher"
-expander = require "./lib/expander"
-pathReporter = require './lib/path-reporter'
+componentDependencies = require "./grunt/lib/component-dependencies"
+restoreResolutions = require "./grunt/lib/restore-resolutions"
+prepPlayerLauncher = require "./grunt/lib/prep-player-launcher"
+expander = require "./grunt/lib/expander"
+pathReporter = require './grunt/lib/path-reporter'
 _ = require "lodash"
+
+###
+Configs...
+###
 player = require './grunt/config/player'
 editor = require './grunt/config/editor'
 playerControls = require './grunt/config/playerControls'

@@ -242,8 +242,8 @@ object Build extends sbt.Build {
           val clientDir = base / "modules" / "container-client"
           val componentsDir = base / "corespring-components"
           Seq(
-            cmd("grunt", "./node_modules/grunt-cli/bin/grunt", s"$clientDir\\lib\\grunt.cmd", Seq(clientDir)),
-            cmd("bower", "./node_modules/bower/bin/bower", s"$clientDir\\lib\\bower.cmd", Seq(clientDir, componentsDir)),
+            cmd("grunt", "./node_modules/grunt-cli/bin/grunt", s"$clientDir\\cmds\\grunt.cmd", Seq(clientDir)),
+            cmd("bower", "./node_modules/bower/bin/bower", s"$clientDir\\cmds\\bower.cmd", Seq(clientDir, componentsDir)),
             cmd("npm", "npm", "npm.cmd", Seq(clientDir, componentsDir)))
       })
     .dependsOn(shell)

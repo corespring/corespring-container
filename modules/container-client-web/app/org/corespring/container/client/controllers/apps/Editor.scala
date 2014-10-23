@@ -2,6 +2,7 @@ package org.corespring.container.client.controllers.apps
 
 import org.corespring.container.client.component.AllItemTypesReader
 import org.corespring.container.client.controllers.helpers.JsonHelper
+import org.corespring.container.client.controllers.jade.Jade
 import org.corespring.container.client.hooks.EditorHooks
 import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.client.views.txt.js.EditorServices
@@ -11,9 +12,9 @@ import play.api.mvc.{Action, AnyContent, SimpleResult}
 
 trait Editor
   extends AllItemTypesReader
-  with AppWithServices[EditorHooks]
-  with JsModeReading
-  with JsonHelper {
+  with App[EditorHooks]
+  with JsonHelper
+  with Jade{
 
   def showErrorInUi: Boolean
 
@@ -71,11 +72,6 @@ trait Editor
       val css = Seq(cssSrc.dest) ++ cssSrc.otherLibs :+ scriptInfo.cssUrl
       val domainResolvedCss = css.map(resolvePath)
       logger.debug(s"domainResolvedJs: $domainResolvedJs")
-      val params: Map[String, Object] = Map(
-        "js" -> domainResolvedJs.toArray,
-        "css" -> domainResolvedCss.toArray,
-        "componentNgModules" -> s"${scriptInfo.ngDependencies.map { d => s"'$d'"}.mkString(",")}",
-        "appName" -> context)
       Ok(renderJade(
         EditorTemplateParams(
           context,
