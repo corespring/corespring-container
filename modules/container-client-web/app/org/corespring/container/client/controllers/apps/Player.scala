@@ -8,7 +8,7 @@ import org.corespring.container.client.hooks.PlayerHooks
 import org.corespring.container.client.views.txt.js.PlayerServices
 import org.corespring.container.components.model.Id
 import org.corespring.container.components.processing.PlayerItemPreProcessor
-import play.api.libs.json.{ JsValue, Json }
+import play.api.libs.json.{JsObject, JsValue, Json}
 import play.api.mvc._
 
 import scala.concurrent.Future
@@ -152,12 +152,12 @@ trait ProdHtmlPlayer extends BasePlayer with Jade {
         val css = coreCss :+ cssUrl
         val domainResolvedCss = css.map(resolvePath)
 
-        var preprocessedItem = itemPreProcessor.preProcessItemForPlayer(itemJson)
+        val processedXhtml = processXhtml((itemJson \ "xhtml").asOpt[String])
+        val preprocessedItem = itemPreProcessor.preProcessItemForPlayer(itemJson).as[JsObject] ++ Json.obj("xhtml" -> processedXhtml)
 
         Ok(
           template(
-            processXhtml(
-              (itemJson \ "xhtml").asOpt[String]),
+            processedXhtml,
             dependencies,
             domainResolvedJs,
             domainResolvedCss,
