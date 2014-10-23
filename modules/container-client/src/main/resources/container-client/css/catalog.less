@@ -187,9 +187,11 @@
   }
 
   .more-info-container {
-    float: right;
     padding: 0px;
 
+    .field {
+      padding-right: 0px;
+    }
     .show-more{
       position: relative;
       float: right;
@@ -203,6 +205,14 @@
 
     a {
       color: #428bca;
+    }
+
+    .source-url-text{
+      text-overflow: ellipsis;
+      display: block;
+      white-space: nowrap;
+      width: 100%;
+      overflow: hidden;
     }
   }
 

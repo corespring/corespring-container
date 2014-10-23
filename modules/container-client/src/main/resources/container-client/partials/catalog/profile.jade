@@ -112,6 +112,7 @@ script(type='text/ng-template', id="/templates/profile")
             .field(ng-show="getUrl(item.profile.contributorDetails.sourceUrl)")
               .title Source
               .sub-content
-                a(href="{{getUrl(item.profile.contributorDetails.sourceUrl)}}", target="_blank"){{getUrl(item.profile.contributorDetails.sourceUrl)}}
+                a(href="{{getUrl(item.profile.contributorDetails.sourceUrl)}}", target="_blank")
+                  .source-url-text{{getUrl(item.profile.contributorDetails.sourceUrl)}}
     .footer
       .item-id Item ID: {{item.itemId}}
