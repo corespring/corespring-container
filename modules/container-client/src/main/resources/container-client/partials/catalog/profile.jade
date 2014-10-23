@@ -89,26 +89,36 @@ script(type='text/ng-template', id="/templates/profile")
 
       .field
         .more-info-container.clearfix
-          a.show-more.clearfix(ng-click="showMore = !showMore", ng-show="isThereCopyrightInfo(item.profile)") {{showMore ? 'hide info' : 'more info'}}
+          a.show-more.clearfix(ng-click="showMore = !showMore", ng-show="isThereMoreData(item.profile)") {{showMore ? 'hide info' : 'more info'}}
           .fields(ng-show="showMore")
             .field(ng-show="item.profile.contributorDetails.copyrightYear")
               .title Copyright Year
               .sub-content {{item.profile.contributorDetails.copyrightYear}}
+
             .field(ng-show="item.profile.contributorDetails.copyrightExpirationDate")
               .title Copyright Expiration Date
               .sub-content {{item.profile.contributorDetails.copyrightExpirationDate}}
+
             .field(ng-show="isNonEmptyStringArray(item.profile.reviewsPassed)")
               .title Reviews Passed
               .sub-content {{item.profile.reviewsPassed.join(", ")}}
+
             .field(ng-show="item.profile.contributorDetails.credentials")
               .title Credentials
               .sub-content {{item.profile.contributorDetails.credentials}}
+
             .field(ng-show="item.profile.priorUse")
               .title Prior Use
               .sub-content {{item.profile.priorUse}}
+
+            .field(ng-show="isNonEmptyStringArray(item.profile.priorGradeLevel)")
+              .title Prior Use grade Level
+              .sub-content {{item.profile.priorGradeLevel.join(", ")}}
+
             .field(ng-show="item.collection.name")
               .title Collection
               .sub-content {{item.collection.name}}
+
             .field(ng-show="getUrl(item.profile.contributorDetails.sourceUrl)")
               .title Source
               .sub-content
