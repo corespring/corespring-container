@@ -39,13 +39,12 @@ html(xmlns="http://www.w3.org/1999/html")
           spinner.stop();
           $('.pre-loader').remove();
           $('.main').addClass('blend');
-        }, 200);
+        }, 100);
       });
 
       var componentNgModules = [#{componentNgModules}];
       var allNgModules = window.ngAppModules.concat(componentNgModules);
       //declare the app..
-      console.log('..');
       angular.module( 'corespring-#{appName}', allNgModules ).config(['$provide', function($provide) {
 
           var enabledInQueryString = document.location.search.indexOf('loggingEnabled=true') !== -1;

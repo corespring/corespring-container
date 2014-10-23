@@ -63,8 +63,8 @@ trait Player
 
         Ok(
           renderJade(
-            context,
             PlayerTemplateParams(
+              context,
               domainResolvedJs,
               domainResolvedCss,
               scriptInfo.ngDependencies,
@@ -72,7 +72,7 @@ trait Player
               processXhtml((itemJson \ "xhtml").asOpt[String]),
               Json.obj("session" -> session, "item" -> preprocessedItem),
               VersionInfo.json
-            ).toJadeParams)
+            ))
         )
       }
     }

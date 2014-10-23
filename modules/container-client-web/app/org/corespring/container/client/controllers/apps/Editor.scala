@@ -77,11 +77,11 @@ trait Editor
         "componentNgModules" -> s"${scriptInfo.ngDependencies.map { d => s"'$d'"}.mkString(",")}",
         "appName" -> context)
       Ok(renderJade(
-        context,
         EditorTemplateParams(
+          context,
           domainResolvedJs,
           domainResolvedCss,
-          scriptInfo.ngDependencies).toJadeParams)
+          scriptInfo.ngDependencies))
       )
     }
 

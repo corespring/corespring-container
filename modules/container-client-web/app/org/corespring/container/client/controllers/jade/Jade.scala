@@ -6,6 +6,7 @@ import de.neuland.jade4j.template.{ JadeTemplate, TemplateLoader }
 import de.neuland.jade4j.{ Jade4J, JadeConfiguration }
 import grizzled.slf4j.Logger
 import org.apache.commons.io.IOUtils
+import org.corespring.container.client.controllers.apps.TemplateParams
 import play.api.{Mode, Play}
 import play.api.templates.Html
 
@@ -66,14 +67,13 @@ trait Jade {
     } else templates.get(name).getOrElse { readIn }
   }
 
-  def renderJade(name: String, params: Map[String, Object]): Html = {
+  def renderJade(params: TemplateParams): Html = {
     require(params != null, "params is null")
     import scala.collection.JavaConversions._
-    val template = loadTemplate(name)
+    val template = loadTemplate(params.appName)
     logger.trace(s"function=renderJade template=$template")
     logger.trace(s"function=renderJade params=$params")
-    logger.trace(s"function=renderJade name=$name")
-    val rendered = jadeConfig.renderTemplate(template, params)
+    val rendered = jadeConfig.renderTemplate(template, params.toJadeParams)
     Html(new StringBuilder(rendered).toString)
   }
 }
