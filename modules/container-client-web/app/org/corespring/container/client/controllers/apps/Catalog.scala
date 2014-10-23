@@ -1,25 +1,26 @@
 package org.corespring.container.client.controllers.apps
 
+import org.corespring.container.client.controllers.jade.Jade
 import org.corespring.container.client.hooks.CatalogHooks
 import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.client.component.AllItemTypesReader
 import org.corespring.container.client.views.txt.js.CatalogServices
 import play.api.Logger
 import play.api.libs.json.{ JsArray, JsString, JsValue, Json }
-import play.api.mvc.{AnyContent, SimpleResult, Action}
+import play.api.mvc.{ AnyContent, SimpleResult, Action }
 
 import scala.concurrent.{ ExecutionContext, Future }
 
 trait Catalog
   extends AllItemTypesReader
-  with AppWithServices[CatalogHooks]
-  with JsModeReading {
+  with App[CatalogHooks]
+  with Jade {
 
   implicit def ec: ExecutionContext
 
   override def context: String = "catalog"
 
-  def showErrorInUi:Boolean
+  def showErrorInUi: Boolean
 
   override def servicesJs = {
     import org.corespring.container.client.controllers.resources.routes._
@@ -41,24 +42,23 @@ trait Catalog
 
   override def additionalScripts: Seq[String] = Seq(org.corespring.container.client.controllers.apps.routes.Catalog.services().url)
 
-  override def load(id: String): Action[AnyContent] = Action(BadRequest("TODO"))
-
-  def showCatalog(itemId: String) = Action.async {
+  override def load(id: String): Action[AnyContent] = Action.async {
     implicit request =>
-      hooks.showCatalog(itemId).flatMap { e =>
+      hooks.showCatalog(id).flatMap { e =>
 
         def ifEmpty = {
-          logger.trace(s"[showCatalog]: $itemId")
-          val jsMode = getJsMode(request)
-          val page = s"catalog.$jsMode.html"
-          controllers.Assets.at("/container-client", page)(request)
+          logger.trace(s"[showCatalog]: $id")
+          val mainJs = paths(jsSrc)
+          val js = mainJs ++ jsSrc.otherLibs
+          val css = cssSrc.dest +: cssSrc.otherLibs
+          Ok(renderJade(CatalogTemplateParams(context, js, css, Seq.empty)))
         }
 
         def onError(sm: StatusMessage) = {
           val (code, msg) = sm
-          Future(Status((code))(org.corespring.container.client.views.html.error.main(code, msg, showErrorInUi)))
+          Status((code))(org.corespring.container.client.views.html.error.main(code, msg, showErrorInUi))
         }
-        e.fold(ifEmpty)(onError)
+        Future(e.fold(ifEmpty)(onError))
       }
   }
 

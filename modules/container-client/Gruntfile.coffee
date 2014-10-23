@@ -10,6 +10,7 @@ Configs...
 ###
 player = require './grunt/config/player'
 editor = require './grunt/config/editor'
+catalog = require './grunt/config/catalog'
 playerControls = require './grunt/config/playerControls'
 
 String::startsWith ?= (s) -> @[...s.length] is s
@@ -92,6 +93,7 @@ module.exports = (grunt) ->
   fullConfig = _.merge(config, 
     player.config(grunt,toTargetPath), 
     playerControls.config(toTargetPath),
+    catalog.config(grunt, toTargetPath),
     editor.config(grunt, toTargetPath))
 
   #grunt.log.debug(JSON.stringify(fullConfig, null, "  "))
@@ -116,7 +118,7 @@ module.exports = (grunt) ->
   ]
 
   grunt.loadNpmTasks(t) for t in npmTasks
-  grunt.loadTasks('./lib')
+  grunt.loadTasks('./grunt/lib')
   grunt.registerTask('restoreResolutions', 'Add "resolutions" back to bower.json', restoreResolutions(grunt))
   grunt.registerTask('lcd', ['restoreResolutions', 'loadComponentDependencies'])
   grunt.registerTask('loadComponentDependencies', 'Load client side dependencies for the components', componentDependencies(grunt))
