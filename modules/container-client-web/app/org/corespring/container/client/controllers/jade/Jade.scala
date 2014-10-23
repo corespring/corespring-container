@@ -22,15 +22,17 @@ trait Jade {
 
     import play.api.Play.current
 
-    override def getLastModified(name: String): Long = Play.resource(s"$root/$name").map { url =>
-      url.openConnection().getLastModified
-    }.getOrElse { throw new RuntimeException(s"Unable to load jade file as a resource from: $root/$name") }
+    private def toPath(name:String) = s"$root/$name.jade"
 
-    override def getReader(name: String): Reader = Play.resource(s"$root/$name").map { url =>
+    override def getLastModified(name: String): Long = Play.resource(toPath(name)).map { url =>
+      url.openConnection().getLastModified
+    }.getOrElse { throw new RuntimeException(s"Unable to load jade file as a resource from: ${toPath(name)}") }
+
+    override def getReader(name: String): Reader = Play.resource(toPath(name)).map { url =>
       val returnValue = new BufferedReader(new InputStreamReader(url.openStream()))
       readers.push(returnValue)
       returnValue
-    }.getOrElse { throw new RuntimeException(s"Unable to load jade file as a resource from: $root/$name") }
+    }.getOrElse { throw new RuntimeException(s"Unable to load jade file as a resource from: ${toPath(name)}") }
   }
 
   val jadeConfig = {
@@ -61,8 +63,13 @@ trait Jade {
   }
 
   def renderJade(name: String, params: Map[String, Object]): Html = {
+    require(params != null, "params is null")
     import scala.collection.JavaConversions._
-    val rendered = jadeConfig.renderTemplate(loadTemplate(name), params)
+    val template = loadTemplate(name)
+    println(s"-> template $template")
+    println(s"-> params $params")
+    println(s"-> name $name")
+    val rendered = jadeConfig.renderTemplate(template, params)
     Html(new StringBuilder(rendered).toString)
   }
 }

@@ -8,17 +8,17 @@ import play.api.mvc.RequestHeader
 
 trait ItemTypeReader {
   /** for an item - return all the components in use */
-  def componentTypes(json: JsValue)(implicit request : RequestHeader): Seq[String]
+  def componentTypes(json: JsValue)/*(implicit request : RequestHeader)*/: Seq[String]
 }
 
 trait AllItemTypesReader extends ItemTypeReader with ComponentSplitter {
-  override def componentTypes(json: JsValue)(implicit request : RequestHeader): Seq[String] = components.map(_.componentType)
+  override def componentTypes(json: JsValue)/*(implicit request : RequestHeader)*/: Seq[String] = components.map(_.componentType)
 }
 
 trait PlayerItemTypeReader extends ItemTypeReader with ComponentSplitter with NameHelper with XhtmlProcessor {
 
   /** List components used in the model */
-  override def componentTypes(json: JsValue)(implicit request : RequestHeader): Seq[String] = {
+  override def componentTypes(json: JsValue)/*(implicit request : RequestHeader)*/: Seq[String] = {
     val types: Seq[String] = (json \ "components" \\ "componentType").map(_.as[String]).distinct
 
     def componentTypeMatches(t: String)(ci:ComponentInfo) = tagName(ci.id.org, ci.id.name) == t

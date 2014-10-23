@@ -1,0 +1,80 @@
+doctype 5
+html(xmlns="http://www.w3.org/1999/html")
+  head
+    meta(charset="utf-8")
+    meta(http-equiv="X-UA-Compatible", content="IE=edge")
+    title= title
+
+  block vars
+
+  body
+    .pre-loader
+      #spinner
+
+  .main.hide-body
+    block content
+
+    for j in js
+      script(type='text/javascript', src='#{j}')
+
+    block before-main-script
+
+    script.
+
+      var opts = {
+        length: 17, // The length of each line
+        width: 8, // The line thickness
+        radius: 20, // The radius of the inner circle
+        color: '#556270', // #rgb or #rrggbb or array of colors
+        shadow: false, // Whether to render a shadow
+        hwaccel: true, // Whether to use hardware acceleration
+      };
+
+      var target = document.getElementById('spinner');
+      var spinner = new Spinner(opts).spin(target);
+
+      $(document).ready(function () {
+        setTimeout(function() {
+          spinner.stop();
+          $('.pre-loader').remove();
+          $('.main').addClass('blend');
+        }, 200);
+      });
+
+      var componentNgModules = [#{componentNgModules}];
+      angular.module(
+        '#{appName}', 
+        window.ngAppModules.concat(componentNgModules) 
+        ).config(['$provide', function($provide) {
+
+          var enabledInQueryString = (document.location.search.indexOf('disableLogging=false') !== -1) 
+          var loggingEnabled = enabledInQueryString || false;
+          if(!loggingEnabled){
+            function mockLogger($delegate) {
+
+              var out = {
+                log: function(){},
+                debug: function(){},
+                error: function(){},
+                warn: function(){},
+                info: function(){}
+              }
+              out.error = $delegate.error;
+              out.warn = $delegate.warn;
+              return out;
+            }
+
+            $provide.decorator('LogFactory', function($delegate){
+              return {
+                getLogger: function(n){
+                  return mockLogger($delegate.getLogger(n));
+                }
+              }
+            });
+
+            $provide.decorator('$log', function($delegate, $sniffer) {
+              return mockLogger($delegate);
+            });
+          }
+
+        }]);

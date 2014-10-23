@@ -1,4 +1,5 @@
 exports.src = [
+  'bower_components/spin.js/spin.js',
   'bower_components/es5-shim/es5-shim.min.js',
   'bower_components/console-polyfill/index.js',
   'bower_components/jquery/dist/jquery.min.js',

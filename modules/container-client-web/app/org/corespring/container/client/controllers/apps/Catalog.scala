@@ -6,7 +6,7 @@ import org.corespring.container.client.component.AllItemTypesReader
 import org.corespring.container.client.views.txt.js.CatalogServices
 import play.api.Logger
 import play.api.libs.json.{ JsArray, JsString, JsValue, Json }
-import play.api.mvc.{ SimpleResult, Action }
+import play.api.mvc.{AnyContent, SimpleResult, Action}
 
 import scala.concurrent.{ ExecutionContext, Future }
 
@@ -42,6 +42,8 @@ trait Catalog
   }
 
   override def additionalScripts: Seq[String] = Seq(org.corespring.container.client.controllers.apps.routes.Catalog.services().url)
+
+  override def load(id: String): Action[AnyContent] = Action(BadRequest("TODO"))
 
   def showCatalog(itemId: String) = Action.async {
     implicit request =>

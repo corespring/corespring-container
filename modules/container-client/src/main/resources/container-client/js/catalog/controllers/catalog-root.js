@@ -35,7 +35,9 @@ angular.module('corespring-catalog.controllers')
           index++;
         };
         for (var key in groupedSupportingMaterials) {
-          $scope.supportingMaterials.push({label: key, type: "header"});
+          if (key !== "undefined"){
+            $scope.supportingMaterials.push({label: key, type: "header"});
+          }
           _.each(groupedSupportingMaterials[key], insertSupportingMaterialsForType);
           $scope.supportingMaterials.push({type: "divider"});
         }
@@ -99,9 +101,10 @@ angular.module('corespring-catalog.controllers')
       }
 
       function applyDepthOfKnowledge() {
-        var otherAlignments = ($scope.item && $scope.item.profile && $scope.item.profile.otherAlignments) ? $scope.item.profile.otherAlignments : {};
-        if (otherAlignments.depthOfKnowledge && $scope.depthOfKnowledgeDataProvider) {
-          var obj = _.find($scope.depthOfKnowledgeDataProvider, keyMatch(otherAlignments.depthOfKnowledge));
+        var depthOfKnowledge = getOrNull($scope,"item","profile","otherAlignments","depthOfKnowledge");
+
+        if (depthOfKnowledge && $scope.depthOfKnowledgeDataProvider) {
+          var obj = _.find($scope.depthOfKnowledgeDataProvider, keyMatch(depthOfKnowledge));
           $scope.depthOfKnowledgeLabel = obj ? obj.value : undefined;
         }
       }
@@ -232,7 +235,22 @@ angular.module('corespring-catalog.controllers')
           isNonEmptyString(getOrNull(profile,"contributorDetails","copyrightYear")) ||
           isNonEmptyString(getOrNull(profile,"contributorDetails","copyrightExpirationDate")) ||
           isNonEmptyString(getOrNull(profile,"contributorDetails","credentials")) ||
-          isNonEmptyString(getOrNull(profile,"contributorDetails","sourceUrl")));
+          isNonEmptyString(getOrNull(profile,"contributorDetails","sourceUrl")) ||
+          isNonEmptyString(getOrNull($scope,"item","collection","name"))
+          );
+      };
+
+      $scope.getUrl = function(src){
+        if (!isNonEmptyString(src)){
+          return null;
+        }
+
+
+        if (src.indexOf('http://') === -1){
+          src = 'http://' + src;
+        }
+
+        return $sce.trustAsUrl(src);
       };
 
       function getOrNull(){
@@ -261,14 +279,5 @@ angular.module('corespring-catalog.controllers')
         return str.length > 0;
       }
     }
-
-
-
-        /* setTimeout( function(){
-            MathJax.Hub.Queue(["Typeset",MathJax.Hub])
-          },
-          2000);*/
-
-
 
   ]);

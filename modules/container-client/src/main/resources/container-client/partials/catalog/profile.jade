@@ -58,18 +58,27 @@ script(type='text/ng-template', id="/templates/profile")
         .info
           .label.label-warning Bloom's Taxonomy
         .content {{item.profile.otherAlignments.bloomsTaxonomy}}
+
       .field(ng-show="item.profile.demonstratedKnowledge")
         .info
           .label.label-warning Demonstrated Knowledge
         .content {{item.profile.demonstratedKnowledge}}
+
+      .field(ng-show="depthOfKnowledgeLabel")
+        .info
+          .label.label-warning Depth of knowledge
+        .content {{depthOfKnowledgeLabel}}
+
       .field(ng-show="item.profile.lexile")
         .info
           .label.label-warning Lexile Score
         .content(ng-show="item.profile.lexile") {{item.profile.lexile }}L
+
       .field(ng-show="isNonEmptyStringArray(item.profile.otherAlignments.keySkills)")
         .info
           .label.label-warning Key Skills
         .content {{item.profile.otherAlignments.keySkills.join(", ")}}
+
       .field
         img.copyright-image(ng-src="{{copyrightOwnerUrl}}",
          alt="{{item.profile.contributorDetails.copyrightOwner}}",
@@ -88,19 +97,21 @@ script(type='text/ng-template', id="/templates/profile")
             .field(ng-show="item.profile.contributorDetails.copyrightExpirationDate")
               .title Copyright Expiration Date
               .sub-content {{item.profile.contributorDetails.copyrightExpirationDate}}
-            .field(ng-show="item.profile.allReviewsPassed")
+            .field(ng-show="isNonEmptyStringArray(item.profile.reviewsPassed)")
               .title Reviews Passed
-              .sub-content
-                span(ng-repeat="rp in item.profile.allReviewsPassed", ng-if="rp.passed") {{rp.name}}{{!$last ? ', ' : ''}}
+              .sub-content {{item.profile.reviewsPassed.join(", ")}}
             .field(ng-show="item.profile.contributorDetails.credentials")
               .title Credentials
               .sub-content {{item.profile.contributorDetails.credentials}}
             .field(ng-show="item.profile.priorUse")
               .title Prior Use
               .sub-content {{item.profile.priorUse}}
-            .field(ng-show="item.profile.sourceUrl")
+            .field(ng-show="item.collection.name")
+              .title Collection
+              .sub-content {{item.collection.name}}
+            .field(ng-show="getUrl(item.profile.contributorDetails.sourceUrl)")
               .title Source
               .sub-content
-                a(href="{{item.profile.sourceUrl}}"){{item.profile.sourceUrl || unassigned}}
+                a(href="{{getUrl(item.profile.contributorDetails.sourceUrl)}}", target="_blank"){{getUrl(item.profile.contributorDetails.sourceUrl)}}
     .footer
       .item-id Item ID: {{item._id.$oid}}

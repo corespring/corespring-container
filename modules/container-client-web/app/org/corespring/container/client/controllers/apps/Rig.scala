@@ -6,7 +6,7 @@ import org.corespring.container.client.hooks.ClientHooks
 import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.components.model.{ ComponentInfo, Interaction }
 import play.api.libs.json.{ JsValue, Json }
-import play.api.mvc.{ SimpleResult, Action, RequestHeader }
+import play.api.mvc.{AnyContent, SimpleResult, Action, RequestHeader}
 
 import scala.concurrent.{ ExecutionContext, Future }
 
@@ -49,4 +49,5 @@ trait Rig extends App[ClientHooks] with PlayerItemTypeReader {
 
   override def ngModules: AngularModules = new AngularModules()
 
+  override def load(id: String): Action[AnyContent] = Action(BadRequest("TODO"))
 }

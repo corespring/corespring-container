@@ -11,7 +11,7 @@ trait Assets extends Controller with HasContext {
 
   lazy val logger = ContainerLogger.getLogger("Assets")
 
-  def loadAsset(id: String, file: String)(request: Request[AnyContent]): SimpleResult
+  def loadAsset(id: String, name: String, file: String)(request: Request[AnyContent]): SimpleResult
 
   def getItemId(sessionId: String): Option[String]
 
@@ -41,7 +41,7 @@ trait Assets extends Controller with HasContext {
         getItemId(s).map {
           itemId =>
             logger.trace(s"[session] sessionId: $sessionId, itemId: $itemId -> $file")
-            loadAsset(itemId, file)(request)
+            loadAsset(itemId, "", file)(request)
         }.getOrElse(NotFound(s"Can't find session id: $sessionId, path: ${request.path}"))
       })(request)
   }
@@ -49,14 +49,14 @@ trait Assets extends Controller with HasContext {
   def item(itemId: String, file: String) = Action.async {
     request =>
       at(itemId, file, (i: String) => {
-        loadAsset(itemId, file)(request)
+        loadAsset(itemId, "", file)(request)
       })(request)
   }
 
   def supportingMaterial(itemId: String, name: String, file: String) = Action.async {
     request =>
       at(itemId, s"$name/$file", (i: String) => {
-        loadAsset(itemId, s"$name/$file")(request)
+        loadAsset(itemId, name, file)(request)
       })(request)
   }
 

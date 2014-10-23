@@ -40,7 +40,7 @@ trait PlayerLauncher extends Controller {
     }
   }
 
-  import org.corespring.container.client.controllers.apps.routes.{ Editor, CleanPlayer}
+  import org.corespring.container.client.controllers.apps.routes.{ Editor, Player}
 
   val SecureMode = "corespring.player.secure"
 
@@ -59,9 +59,9 @@ trait PlayerLauncher extends Controller {
   def editorJs = Action.async { implicit request =>
     hooks.editorJs.map { implicit js =>
 
-      val rootUrl = playerConfig.rootUrl.getOrElse(BaseUrl(request))
-      val itemEditorUrl = s"${Editor.editItem(":itemId")}"
+      val loadEditorCall = Editor.load(":itemId")
 
+      val rootUrl = playerConfig.rootUrl.getOrElse(BaseUrl(request))
       val create = org.corespring.container.client.controllers.resources.routes.Item.create()
 
       val defaultOptions: JsValue = Json.obj(
@@ -69,8 +69,8 @@ trait PlayerLauncher extends Controller {
         "paths" -> Json.obj(
 
           "editor" -> Json.obj(
-            "method" -> Editor.editItem(":itemId").method,
-            "url" -> itemEditorUrl),
+            "method" -> loadEditorCall.method,
+            "url" -> loadEditorCall.url),
 
           "create" -> Json.obj(
             "method" -> create.method,
@@ -86,12 +86,12 @@ trait PlayerLauncher extends Controller {
   def playerJs = Action.async { implicit request =>
     hooks.playerJs.map { implicit js =>
 
-      val sessionIdPlayerUrl = s"${CleanPlayer.load(":id").url}?${request.rawQueryString}"
+      val sessionIdPlayerUrl = s"${Player.load(":id").url}?${request.rawQueryString}"
 
 
       val rootUrl = playerConfig.rootUrl.getOrElse(BaseUrl(request))
 
-      val itemUrl: String = CleanPlayer.createSessionForItem(":id").url
+      val itemUrl: String = Player.createSessionForItem(":id").url
 
       val defaultOptions: JsValue = Json.obj(
         "corespringUrl" -> rootUrl,

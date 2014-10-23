@@ -72,13 +72,15 @@ trait Editor
       val scriptInfo = componentScriptInfo(i)
       val mainJs = paths(jsSrc)
       val js = mainJs ++ jsSrc.otherLibs ++ (additionalScripts :+ scriptInfo.jsUrl).distinct
-
       val domainResolvedJs = js.map(resolvePath)
       val css = Seq(cssSrc.dest) ++ cssSrc.otherLibs :+ scriptInfo.cssUrl
       val domainResolvedCss = css.map(resolvePath)
-
-      val params: Map[String, Object] = Map()
-      Ok(renderJade(s"$context.jade", params))
+      logger.debug(s"domainResolvedJs: $domainResolvedJs")
+      val params: Map[String, Object] = Map(
+        "js" -> domainResolvedJs.toArray,
+        "componentNgModules" -> s"${scriptInfo.ngDependencies.map{d => s"'$d'"}.mkString(",")}",
+        "appName" -> context)
+      Ok(renderJade(context, params))
     }
 
     hooks.loadItem(itemId).map { e => e.fold(onError, onItem) }

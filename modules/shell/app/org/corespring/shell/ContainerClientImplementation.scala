@@ -78,8 +78,8 @@ class ContainerClientImplementation(
       out.getOrElse(throw new RuntimeException("No amazon key/secret"))
     }
 
-    override def loadAsset(id: String, file: String)(request: Request[AnyContent]): SimpleResult = {
-      playS3.download(bucket, s"$id/$file", Some(request.headers))
+    override def loadAsset(id: String, name:String, file: String)(request: Request[AnyContent]): SimpleResult = {
+      playS3.download(bucket, s"$id/$name/$file", Some(request.headers))
     }
 
     override def getItemId(sessionId: String): Option[String] = ContainerClientImplementation.this.sessionService.load(sessionId).map {

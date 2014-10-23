@@ -5,6 +5,7 @@ expander = require "./lib/expander"
 pathReporter = require './lib/path-reporter'
 _ = require "lodash"
 player = require './grunt/config/player'
+editor = require './grunt/config/editor'
 playerControls = require './grunt/config/playerControls'
 
 String::startsWith ?= (s) -> @[...s.length] is s
@@ -81,7 +82,11 @@ module.exports = (grunt) ->
 
   toTargetPath = (p) -> if(p.startsWith("//")) then p else "<%= common.dist %>/#{p}"
 
-  fullConfig = _.merge(config, player.config(toTargetPath), playerControls.config(toTargetPath))
+  fullConfig = _.merge(config, 
+    player.config(toTargetPath), 
+    playerControls.config(toTargetPath),
+    editor.config(toTargetPath))
+
   grunt.log.debug(JSON.stringify(fullConfig, null, "  "))
   grunt.initConfig(fullConfig)
 

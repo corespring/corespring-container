@@ -22,7 +22,7 @@ trait Player
 
   def itemPreProcessor: PlayerItemPreProcessor
 
-  override def additionalScripts: Seq[String] = Seq(org.corespring.container.client.controllers.apps.routes.CleanPlayer.services().url)
+  override def additionalScripts: Seq[String] = Seq(org.corespring.container.client.controllers.apps.routes.Player.services().url)
 
   private def showControls(implicit r: RequestHeader): Boolean = {
     r.getQueryString("showControls").map(_ == "true").getOrElse(false)
@@ -94,7 +94,7 @@ trait Player
 
   def createSessionForItem(itemId: String): Action[AnyContent] = Action.async { implicit request =>
     hooks.createSessionForItem(itemId).map(handleSuccess { sessionId =>
-      val call = org.corespring.container.client.controllers.apps.routes.CleanPlayer.load(sessionId)
+      val call = org.corespring.container.client.controllers.apps.routes.Player.load(sessionId)
       val url: String = s"${call.url}?${request.rawQueryString}"
       SeeOther(url)
     })

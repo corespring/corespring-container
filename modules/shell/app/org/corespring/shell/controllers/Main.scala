@@ -71,7 +71,7 @@ trait Main
           "taskInfo" -> Json.obj(
             "title" -> "")))
       itemService.create(json).map { id =>
-        Redirect(org.corespring.container.client.controllers.apps.routes.Editor.editItem(id.toString))
+        Redirect(org.corespring.container.client.controllers.apps.routes.Editor.load(id.toString))
       }.getOrElse(BadRequest("Error creating an item"))
   }
 
@@ -89,7 +89,7 @@ trait Main
 
       result.map {
         oid =>
-          val call = org.corespring.container.client.controllers.apps.routes.CleanPlayer.load(oid.toString)
+          val call = org.corespring.container.client.controllers.apps.routes.Player.load(oid.toString)
           logger.debug(s"url ${call.url}")
           val url = s"${call.url}?${request.rawQueryString}"
           Ok(Json.obj("url" -> url))
