@@ -1,26 +1,21 @@
 package org.corespring.container.client.controllers.apps
 
+import org.corespring.container.client.component.AllItemTypesReader
 import org.corespring.container.client.controllers.jade.Jade
 import org.corespring.container.client.hooks.CatalogHooks
 import org.corespring.container.client.hooks.Hooks.StatusMessage
-import org.corespring.container.client.component.AllItemTypesReader
 import org.corespring.container.client.views.txt.js.CatalogServices
-import play.api.Logger
-import play.api.libs.json.{ JsArray, JsString, JsValue, Json }
-import play.api.mvc.{ AnyContent, SimpleResult, Action }
+import play.api.libs.json.{JsArray, JsString, JsValue, Json}
+import play.api.mvc.{Action, AnyContent}
 
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.{Future}
 
 trait Catalog
   extends AllItemTypesReader
   with App[CatalogHooks]
   with Jade {
 
-  implicit def ec: ExecutionContext
-
   override def context: String = "catalog"
-
-  def showErrorInUi: Boolean
 
   override def servicesJs = {
     import org.corespring.container.client.controllers.resources.routes._
@@ -48,11 +43,20 @@ trait Catalog
 
         def ifEmpty = {
           logger.trace(s"[showCatalog]: $id")
-          val mainJs = paths(jsSrc)
-          val js = mainJs ++ jsSrc.otherLibs ++ additionalScripts
-          val css = cssSrc.dest +: cssSrc.otherLibs
-          //CA-2186 - shouldn't have to remember to add this module...
-          Ok(renderJade(CatalogTemplateParams(context, js, css, Seq("catalog.services"))))
+
+          val scriptInfo = componentScriptInfo(Json.obj())
+          val domainResolvedJs = buildJs(scriptInfo)
+          val domainResolvedCss = buildCss(scriptInfo)
+          Ok(
+            renderJade(
+              CatalogTemplateParams(
+                context,
+                domainResolvedJs,
+                domainResolvedCss,
+                scriptInfo.ngDependencies
+              )
+            )
+          )
         }
 
         def onError(sm: StatusMessage) = {

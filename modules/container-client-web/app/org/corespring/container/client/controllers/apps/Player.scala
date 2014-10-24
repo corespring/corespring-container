@@ -52,6 +52,9 @@ trait Player
    * @param sessionId
    * @return
    */
+
+
+
   override def load(sessionId: String) = Action.async { implicit request =>
     hooks.loadSessionAndItem(sessionId).map {
 
@@ -59,15 +62,9 @@ trait Player
       case Right((session, itemJson)) => {
 
         val scriptInfo = componentScriptInfo(itemJson)
-        val mainJs = paths(jsSrc)
         val controlsJs = if (showControls) paths(controlsJsSrc) else Seq.empty
-
-        val js = mainJs ++ controlsJs ++ jsSrc.otherLibs ++ (additionalScripts :+ scriptInfo.jsUrl).distinct
-
-        val domainResolvedJs = js.map(resolvePath)
-        val css = Seq(cssSrc.dest) ++ cssSrc.otherLibs :+ scriptInfo.cssUrl
-        val domainResolvedCss = css.map(resolvePath)
-
+        val domainResolvedJs = buildJs(scriptInfo, controlsJs )
+        val domainResolvedCss = buildCss(scriptInfo)
         val preprocessedItem = itemPreProcessor.preProcessItemForPlayer(itemJson)
 
         logger.trace(s"function=load domainResolvedJs=$domainResolvedJs")

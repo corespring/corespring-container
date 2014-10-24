@@ -64,10 +64,9 @@
         allowEmptyResponses: $("#allowEmptyResponses").is(":checked")
       };
 
-      console.log('url ------>', '@Html(url)');
       $.ajax({
         type: 'POST',
-        url: '@url',
+        url: '@Html(url)',
         contentType: 'application/json; charset=utf-8',
         dataType: 'json',
         data: JSON.stringify(data)

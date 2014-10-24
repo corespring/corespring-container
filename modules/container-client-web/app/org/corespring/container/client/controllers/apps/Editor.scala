@@ -16,7 +16,9 @@ trait Editor
   with JsonHelper
   with Jade{
 
-  def showErrorInUi: Boolean
+  import org.corespring.container.client.controllers.resources.{routes => resourceRoutes}
+  import org.corespring.container.client.controllers.apps.{routes => appRoutes}
+
 
   override def context: String = "editor"
 
@@ -39,39 +41,36 @@ trait Editor
   }
 
   override def servicesJs = {
-    import org.corespring.container.client.controllers.resources.routes._
 
     val componentJson: Seq[JsValue] = interactions.map(toJson)
     val widgetJson: Seq[JsValue] = widgets.map(toJson)
 
     EditorServices(
       "editor.services",
-      Item.load(":id"),
-      Item.save(":id"),
+      resourceRoutes.Item.load(":id"),
+      resourceRoutes.Item.save(":id"),
       JsArray(componentJson),
       JsArray(widgetJson)).toString
   }
 
-  override def additionalScripts: Seq[String] = Seq(org.corespring.container.client.controllers.apps.routes.Editor.services().url)
+  override def additionalScripts: Seq[String] = Seq(appRoutes.Editor.services().url)
 
   override def load(itemId: String): Action[AnyContent] = Action.async { implicit request =>
+
+    import org.corespring.container.client.views.html.error
 
     def onError(sm: StatusMessage) = {
       val (code, msg) = sm
       code match {
         case SEE_OTHER => SeeOther(msg)
-        case _ => Status(code)(org.corespring.container.client.views.html.error.main(code, msg, showErrorInUi))
+        case _ => Status(code)(error.main(code, msg, showErrorInUi))
       }
     }
 
     def onItem(i: JsValue): SimpleResult = {
       val scriptInfo = componentScriptInfo(i)
-      val mainJs = paths(jsSrc)
-      val js = mainJs ++ jsSrc.otherLibs ++ (additionalScripts :+ scriptInfo.jsUrl).distinct
-      val domainResolvedJs = js.map(resolvePath)
-      val css = Seq(cssSrc.dest) ++ cssSrc.otherLibs :+ scriptInfo.cssUrl
-      val domainResolvedCss = css.map(resolvePath)
-      logger.debug(s"domainResolvedJs: $domainResolvedJs")
+      val domainResolvedJs = buildJs(scriptInfo)
+      val domainResolvedCss = buildCss(scriptInfo)
       Ok(renderJade(
         EditorTemplateParams(
           context,

@@ -15,7 +15,7 @@ import org.corespring.container.logging.ContainerLogger
 
 import scala.concurrent.ExecutionContext
 
-case class ComponentScriptInfo(jsUrl: String, cssUrl: String, ngDependencies: Seq[String])
+case class ComponentScriptInfo(jsUrl: Option[String], cssUrl: Option[String], ngDependencies: Seq[String])
 
 trait App[T <: ClientHooks]
   extends Controller
@@ -26,6 +26,8 @@ trait App[T <: ClientHooks]
   self: ItemTypeReader =>
 
   override lazy val logger = ContainerLogger.getLogger(context)
+
+  def showErrorInUi(implicit rh : RequestHeader): Boolean = jsMode(rh) == "dev"
 
   implicit def ec: ExecutionContext
 
@@ -84,6 +86,18 @@ trait App[T <: ClientHooks]
       logger.warn(s"Unknown mode $jsMode - falling back to prod")
       Seq(d.dest)
     }
+  }
+
+  protected def buildJs(scriptInfo : ComponentScriptInfo,
+                        extras : Seq[String] = Seq.empty)(implicit rh : RequestHeader) = {
+    val mainJs = paths(jsSrc)
+    val js = mainJs ++ jsSrc.otherLibs ++ additionalScripts ++ scriptInfo.jsUrl.toSeq ++ extras
+    js.distinct.map(resolvePath)
+  }
+
+  protected def buildCss(scriptInfo: ComponentScriptInfo)(implicit rh : RequestHeader) = {
+    val css = paths(cssSrc) ++ cssSrc.otherLibs ++ scriptInfo.cssUrl.toSeq
+    css.map(resolvePath)
   }
 
   protected def componentScriptInfo(itemJson: JsValue): ComponentScriptInfo = {

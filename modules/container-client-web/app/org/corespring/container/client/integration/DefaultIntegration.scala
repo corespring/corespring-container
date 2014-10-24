@@ -41,10 +41,6 @@ trait DefaultIntegration
     Validator.absolutePathInProdMode(componentsPath)
   }
 
-  def showErrorInUi: Boolean = {
-    Play.current.mode == Mode.Dev || configuration.getBoolean("showErrorInUi").getOrElse(false)
-  }
-
   implicit def ec: ExecutionContext
 
   override def playerItemPreProcessor: PlayerItemPreProcessor = new RhinoPlayerItemPreProcessor(DefaultIntegration.this.components, scopeBuilder.scope)
@@ -101,8 +97,6 @@ trait DefaultIntegration
 
   lazy val editor = new Editor {
 
-    override def showErrorInUi: Boolean = DefaultIntegration.this.showErrorInUi
-
     override implicit def ec: ExecutionContext = DefaultIntegration.this.ec
 
     override def urls: ComponentUrls = componentSets
@@ -113,8 +107,6 @@ trait DefaultIntegration
   }
 
   lazy val catalog = new Catalog {
-
-    override def showErrorInUi: Boolean = DefaultIntegration.this.showErrorInUi
 
     override implicit def ec: ExecutionContext = DefaultIntegration.this.ec
 
