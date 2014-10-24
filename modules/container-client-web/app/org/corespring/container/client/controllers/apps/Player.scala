@@ -59,7 +59,7 @@ trait Player
       case Left((code, msg)) => Status(code)(Json.obj("error" -> msg))
       case Right((session, itemJson)) => {
 
-        val scriptInfo = componentScriptInfo(itemJson)
+        val scriptInfo = componentScriptInfo(componentTypes(itemJson))
         val controlsJs = if (showControls) paths(controlsJsSrc) else Seq.empty
         val domainResolvedJs = buildJs(scriptInfo, controlsJs )
         val domainResolvedCss = buildCss(scriptInfo)

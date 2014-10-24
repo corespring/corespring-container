@@ -11,6 +11,7 @@ Configs...
 player = require './grunt/config/player'
 editor = require './grunt/config/editor'
 catalog = require './grunt/config/catalog'
+rig = require './grunt/config/rig'
 playerControls = require './grunt/config/playerControls'
 
 String::startsWith ?= (s) -> @[...s.length] is s
@@ -94,6 +95,7 @@ module.exports = (grunt) ->
     player.config(grunt,toTargetPath), 
     playerControls.config(toTargetPath),
     catalog.config(grunt, toTargetPath),
+    rig.config(grunt, toTargetPath),
     editor.config(grunt, toTargetPath))
 
   #grunt.log.debug(JSON.stringify(fullConfig, null, "  "))

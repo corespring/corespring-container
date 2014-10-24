@@ -1,5 +1,6 @@
 package org.corespring.container.client.controllers.apps
 
+import grizzled.slf4j.Logger
 import org.corespring.container.client.component.{ ComponentUrls, ItemTypeReader }
 import org.corespring.container.client.controllers.angular.AngularModules
 import org.corespring.container.client.controllers.helpers.{ Helpers, LoadClientSideDependencies, XhtmlProcessor }
@@ -17,12 +18,17 @@ import scala.concurrent.ExecutionContext
 
 case class ComponentScriptInfo(jsUrl: Option[String], cssUrl: Option[String], ngDependencies: Seq[String])
 
+trait HasLogger {
+  def logger : Logger
+}
+
 trait App[T <: ClientHooks]
   extends Controller
   with DependencyResolver
   with XhtmlProcessor
   with Helpers
-  with LoadClientSideDependencies {
+  with LoadClientSideDependencies
+  with HasLogger{
   self: ItemTypeReader =>
 
   override lazy val logger = ContainerLogger.getLogger(context)
@@ -100,9 +106,9 @@ trait App[T <: ClientHooks]
     css.map(resolvePath)
   }
 
-  protected def componentScriptInfo(itemJson: JsValue): ComponentScriptInfo = {
+  protected def componentScriptInfo(components:Seq[String]): ComponentScriptInfo = {
 
-    val typeIds = componentTypes(itemJson).map {
+    val typeIds = components.map {
       t =>
         val typeRegex(org, name) = t
         new Id(org, name)

@@ -1,0 +1,51 @@
+extends layout
+
+block content
+  div#root(ng-controller="Root")
+    nav.navbar.navbar-inverse.navbar-static-top(role="navigation")
+      .nav-bar-header
+        a.navbar-brand Rig
+      ul.nav.navbar-nav
+        li
+          a(ng-click='updatePreview()') Update Preview (Ctrl+S)
+    .flex-box.main-pane
+      div(ui-ace,
+        ng-model="componentJson",
+        ui-ace="{useWrapMode : true, onLoad: aceLoaded, onChange: aceChanged }")
+
+      #preview-pane(corespring-rig-player,
+        player-mode="editor",
+        player-markup="model.item.xhtml",
+        player-item="model.item",
+        player-session="model.session",
+        player-outcomes="model.outcome")
+
+block before-main-script
+  script.
+
+    window.ngAppModules = [
+      'corespring-rig.controllers',
+      'corespring-rig.directives',
+      'corespring-player.services',
+      'corespring-player.directives',
+      'corespring-common.services',
+      'corespring-common.directives',
+      'ui.ace'
+      ];
+
+block after-main-script
+  script.
+
+    angular.module("corespring-#{appName}")
+      .config(['$locationProvider', function($locationProvider) {
+        $locationProvider.html5Mode(true).hashPrefix('!');
+      }]);
+
+    window.submit = function() {
+      var scope = angular.element(document.getElementById('root')).scope();
+      var rootScope = scope.$root;
+      scope.$apply(function() {
+        rootScope.$broadcast('submitEvent');
+      });
+    };
+

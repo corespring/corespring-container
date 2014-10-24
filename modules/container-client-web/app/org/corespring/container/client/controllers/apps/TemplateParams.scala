@@ -30,6 +30,11 @@ case class EditorTemplateParams(appName: String,
   css: Seq[String],
   componentNgModules: Seq[String]) extends TemplateParams
 
+case class RigTemplateParams(appName: String,
+                                js: Seq[String],
+                                css: Seq[String],
+                                componentNgModules: Seq[String]) extends TemplateParams
+
 case class PlayerTemplateParams(
   appName: String,
   js: Seq[String],
