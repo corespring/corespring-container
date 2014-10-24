@@ -121,6 +121,19 @@ var Instance = function(element, options, errorCallback, log) {
       url += "#/?showPreviewButton";
     }
 
+    var iframeStyles = [
+      '',
+      '.player-loading{visibility: hidden; position: absolute;}',
+      '.player-loaded{visibility: visible; position: initial;}'
+    ].join('\n');
+
+    // This is a workaround for IE* because $(iframe).css("absolute","initial") is not working
+    (function injectPlayerStyles(){
+      if ($('head #playerstyle').length === 0){
+        $('head').append('<style id="playerstyle" type="text/css">' + iframeStyles + '</style>');
+      }
+    })();
+
     var iframeTemplate = [
       "<iframe",
       " id='iframe-player'",
@@ -128,11 +141,11 @@ var Instance = function(element, options, errorCallback, log) {
       " src='",
       url,
       "'",
+      " class='player-loading'",
       " style='",
-      "width: 100%;",
-      "border: none;",
-      isMsie() ? "" : "display: none;", //ie does not render MathJax in public site when display:none is set
-      "'",
+      "   width: 100%;",
+      "   border: none;",
+      " '",
       "></iframe>"
     ].join('');
 
@@ -237,7 +250,8 @@ var Instance = function(element, options, errorCallback, log) {
 
   this.addListener("rendered", function(data) {
     var iframe = findInstanceIframe();
-    iframe.show();
+    iframe.removeClass("player-loading");
+    iframe.addClass("player-loaded");
   });
 
   initialize(element, options);
