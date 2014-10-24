@@ -16,7 +16,7 @@ var Instance = function(element, options, errorCallback, log) {
   var findInstanceIframe = function() {
     var iframe = $(element).find('iframe');
     if (iframe.length === 0) {
-      log.error("No iframe was found in player instance");
+      log.error("instance iframe not found");
       return undefined;
     }
     return iframe;
@@ -120,17 +120,33 @@ var Instance = function(element, options, errorCallback, log) {
       url += "#/?showPreviewButton";
     }
 
-    /**
-     * Msie has trouble rendering MathJax in public site when display:none is used
-     */
-    var hideUnlessMsie = isMsie() ? '' : 'display:none';
+    var iframeStyles = [
+      '',
+      '.player-loading{visibility: hidden; position: absolute;}',
+      '.player-loaded{visibility: visible; position: initial;}'
+    ].join('\n');
+
+    // This is a workaround for IE* because $(iframe).css("absolute","initial") is not working
+    (function injectPlayerStyles(){
+      if ($('head #playerstyle').length === 0){
+        $('head').append('<style id="playerstyle" type="text/css">' + iframeStyles + '</style>');
+      }
+    })();
 
     var iframeTemplate = [
-      " <iframe id='iframe-player' ",
-      "         frameborder='0' ",
-      "         src='" + url + "' style='width: 100%; border: none; " + hideUnlessMsie + "'>",
-      " </iframe>"
-    ].join('\n');
+      "<iframe",
+      " id='iframe-player'",
+      " frameborder='0'",
+      " src='",
+      url,
+      "'",
+      " class='player-loading'",
+      " style='",
+      "   width: 100%;",
+      "   border: none;",
+      " '",
+      "></iframe>"
+    ].join('');
 
     $(e).html(iframeTemplate);
 
@@ -141,7 +157,7 @@ var Instance = function(element, options, errorCallback, log) {
     dimensionChangeListener(e);
 
     $(element).parent().bind('DOMNodeRemoved', function(e) {
-      if ('#'+e.target.id === element) {
+      if ('#' + e.target.id === element) {
         removeListeners();
       }
     });
@@ -233,7 +249,8 @@ var Instance = function(element, options, errorCallback, log) {
 
   this.addListener("rendered", function(data) {
     var iframe = findInstanceIframe();
-    iframe.show();
+    iframe.removeClass("player-loading");
+    iframe.addClass("player-loaded");
   });
 
   initialize(element, options);
