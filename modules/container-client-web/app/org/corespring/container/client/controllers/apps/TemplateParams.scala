@@ -36,12 +36,10 @@ case class PlayerTemplateParams(
   css: Seq[String],
   componentNgModules: Seq[String],
   showControls: Boolean,
-  html: String,
   sessionJson: JsValue,
   versionInfo: JsValue) extends TemplateParams {
   override def toJadeParams = {
     super.toJadeParams ++ Map(
-      "html" -> html,
       "showControls" -> new java.lang.Boolean(showControls),
       "sessionJson" -> Json.stringify(sessionJson),
       "versionInfo" -> Json.stringify(versionInfo))

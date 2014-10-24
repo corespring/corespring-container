@@ -66,6 +66,7 @@ trait Player
         val controlsJs = if (showControls) paths(controlsJsSrc) else Seq.empty
         val domainResolvedJs = buildJs(scriptInfo, controlsJs )
         val domainResolvedCss = buildCss(scriptInfo)
+
         val processedXhtml = processXhtml((itemJson \ "xhtml").asOpt[String])
         val preprocessedItem = itemPreProcessor.preProcessItemForPlayer(itemJson).as[JsObject] ++ Json.obj("xhtml" -> processedXhtml)
 
@@ -80,7 +81,6 @@ trait Player
               domainResolvedCss,
               scriptInfo.ngDependencies,
               showControls,
-              processedXhtml,
               Json.obj("session" -> session, "item" -> preprocessedItem),
               VersionInfo.json
             ))
