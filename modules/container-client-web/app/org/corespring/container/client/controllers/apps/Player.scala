@@ -53,9 +53,6 @@ trait Player
    * @param sessionId
    * @return
    */
-
-
-
   override def load(sessionId: String) = Action.async { implicit request =>
     hooks.loadSessionAndItem(sessionId).map {
 
