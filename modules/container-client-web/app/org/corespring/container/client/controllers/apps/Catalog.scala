@@ -42,7 +42,6 @@ trait Catalog
 
   override def additionalScripts: Seq[String] = Seq(org.corespring.container.client.controllers.apps.routes.Catalog.services().url)
 
-
   override def load(id: String): Action[AnyContent] = Action.async {
     implicit request =>
       hooks.showCatalog(id).flatMap { e =>
@@ -52,6 +51,7 @@ trait Catalog
           val mainJs = paths(jsSrc)
           val js = mainJs ++ jsSrc.otherLibs ++ additionalScripts
           val css = cssSrc.dest +: cssSrc.otherLibs
+          //CA-2186 - shouldn't have to remember to add this module...
           Ok(renderJade(CatalogTemplateParams(context, js, css, Seq("catalog.services"))))
         }
 
