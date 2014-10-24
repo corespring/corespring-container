@@ -62,7 +62,6 @@ angular.module('corespring-player.services').factory('CorespringPlayerDefinition
         };
 
         var setDataAndSession = function() {
-
           if (!$scope.item || !$scope.session) {
             return;
           }

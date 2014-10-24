@@ -1,4 +1,5 @@
 core = require './core'
+player = require './player'
 coreLibs = require './core-libs'
 buildUglifyOptions = require('../lib/uglify-options-generator').buildUglifyOptions
 _ = require 'lodash'
@@ -34,6 +35,12 @@ css =
   ]
   report: 'catalog-css-report.json'
 
+exports.ngModules = _.union( player.ngModules, [
+  'corespring-common.supporting-materials',
+  'corespring-catalog.controllers',
+  'ui.bootstrap',
+  'ui.router'
+])
 
 exports.config = (grunt, toTargetPath) ->
   uglify: buildUglifyOptions(grunt, 'catalog', js, toTargetPath)
@@ -51,5 +58,5 @@ exports.config = (grunt, toTargetPath) ->
 
   # write paths to a json file
   pathReporter:
-    catalogJs: _.deepMapValues(_.cloneDeep(js), toTargetPath)
+    catalogJs: _.extend(_.deepMapValues(_.cloneDeep(js), toTargetPath), { ngModules: @ngModules})
     catalogCss: _.deepMapValues(_.cloneDeep(css), toTargetPath)

@@ -76,7 +76,7 @@ trait Player
               context,
               domainResolvedJs,
               domainResolvedCss,
-              scriptInfo.ngDependencies,
+              jsSrc.ngModules ++ scriptInfo.ngDependencies,
               showControls,
               Json.obj("session" -> session, "item" -> preprocessedItem),
               VersionInfo.json

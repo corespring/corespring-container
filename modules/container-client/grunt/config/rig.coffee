@@ -35,7 +35,33 @@ css =
   ]
   report: 'rig-css-report.json'
 
+exports.ngModules = _.union(core.ngModules, [
+    'corespring-rig.controllers',
+    'corespring-rig.directives',
+    'corespring-player.services',
+    'corespring-player.directives',
+    'ui.ace'
+  ])
+###
+mkAppConfig = (name, grunt, js, css, ngModules, processFn) ->
+  uglify: buildUglifyOptions(grunt, name, js, processFn)
+  compress:
+    player:
+      options:
+        mode: 'gzip'
+      files: [
+        {
+          expand: true
+          src: [processFn(js.dest)]
+          ext: '.js.gz'
+        }
+      ]
 
+  # write paths to a json file
+  pathReporter:
+    rigJs: _.extend(_.deepMapValues(_.cloneDeep(js), processFn), {ngModules: ngModules})
+    rigCss: _.deepMapValues(_.cloneDeep(css), processFn) 
+###
 exports.config = (grunt, toTargetPath) ->
   uglify: buildUglifyOptions(grunt, 'rig', js, toTargetPath)
   compress:
@@ -52,5 +78,5 @@ exports.config = (grunt, toTargetPath) ->
 
   # write paths to a json file
   pathReporter:
-    catalogJs: _.deepMapValues(_.cloneDeep(js), toTargetPath)
-    catalogCss: _.deepMapValues(_.cloneDeep(css), toTargetPath)
+    rigJs: _.extend(_.deepMapValues(_.cloneDeep(js), toTargetPath), {ngModules: @ngModules})
+    rigCss: _.deepMapValues(_.cloneDeep(css), toTargetPath)

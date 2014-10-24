@@ -92,10 +92,12 @@ object Build extends sbt.Build {
          * Note: Adding a bower cache clean to workaround this issue:
          * https://github.com/bower/bower/issues/991
          * Once this is fixed we can remove this
+         * (bowerCmd, "cache clean"),
          */
-        (bowerCmd, "cache clean"),
         (bowerCmd, "install"),
-        (gruntCmd, "--devMode=false"))
+        (gruntCmd, "loadComponentDependencies"),
+        (gruntCmd, "stage")
+      )
 
       commands.foreach {
         c =>

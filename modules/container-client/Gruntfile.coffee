@@ -1,5 +1,4 @@
 componentDependencies = require "./grunt/lib/component-dependencies"
-restoreResolutions = require "./grunt/lib/restore-resolutions"
 prepPlayerLauncher = require "./grunt/lib/prep-player-launcher"
 expander = require "./grunt/lib/expander"
 pathReporter = require './grunt/lib/path-reporter'
@@ -86,6 +85,56 @@ module.exports = (grunt) ->
       options:
         process: tidyPaths
 
+    jshint:
+      options: 
+        jshintrc: '.jshintrc'
+      main: ['<%= common.app %>/js/**/*.js', '!<%= common.app %>/**/*.min.js']
+
+    prepPlayerLauncher:
+      files: 
+        src: "<%= common.app %>/**/player-launcher/*.js"
+        dest: '<%= common.tmp %>/wrapped/player-launcher-wrapped.js'
+
+    jasmine:
+      unit:
+        src: [
+          '<%= common.app %>/js/corespring/**/*.js',
+          '<%= common.app %>/js/catalog/**/*.js',
+          '<%= common.app %>/js/common/**/*.js',
+          '<%= common.app %>/js/editor/**/*.js',
+          '<%= common.app %>/js/libs/*.js',
+          '<%= common.app %>/js/render/**/*.js',
+          '<%= common.app %>/js/rig/**/*.js',
+          '<%= common.tmp %>/wrapped/player-launcher-wrapped.js',
+          '!<%= common.app %>/js/**/player-launcher/*.js']
+        options:
+          keepRunner: true
+          vendor: [
+            '<%= common.dist %>/bower_components/angular/angular.js',
+            '<%= common.dist %>/bower_components/angular-mocks/angular-mocks.js',
+            '<%= common.dist %>/bower_components/wiggi-wiz/dist/wiggi-wiz.js',
+            '<%= common.dist %>/bower_components/jquery/dist/jquery.js',
+            '<%= common.dist %>/bower_components/lodash/dist/lodash.js'
+            '<%= common.dist %>/bower_components/saxjs/lib/sax.js',
+            '<%= common.dist %>/bower_components/bootstrap/dist/js/bootstrap.min.js',
+            '<%= common.dist %>/bower_components/angular-ui-bootstrap-bower/ui-bootstrap-tpls.js'
+          ]
+          specs: '<%= common.test %>/js/**/*-test.js'
+
+
+    shell:
+      mathjax_rm_pngs:
+        command: 'rm -fr <%= common.dist %>/bower_components/mathjax/fonts/HTML-CSS/TeX/png'
+        options :
+          failOnError: true
+      mathjax_rm_fonts:
+        command: """
+        rm -fr <%= common.dist %>/bower_components/mathjax/**/*.otf\n
+        rm -fr <%= common.dist %>/bower_components/mathjax/**/*.eot\n
+        """
+        options :
+          failOnError: true
+
   toTargetPath = (p) -> 
     if(p.startsWith("//")) then p 
     else 
@@ -98,15 +147,14 @@ module.exports = (grunt) ->
     rig.config(grunt, toTargetPath),
     editor.config(grunt, toTargetPath))
 
-  #grunt.log.debug(JSON.stringify(fullConfig, null, "  "))
+  grunt.log.debug(JSON.stringify(fullConfig, null, "  "))
+  
   grunt.initConfig(fullConfig)
 
   npmTasks = [
     'grunt-shell',
-    'grunt-contrib-jade',
     'grunt-contrib-copy',
     'grunt-contrib-uglify',
-    'grunt-contrib-concat',
     'grunt-contrib-clean',
     'grunt-contrib-less',
     'grunt-contrib-watch',
@@ -114,18 +162,27 @@ module.exports = (grunt) ->
     'grunt-contrib-jasmine',
     'grunt-contrib-copy',
     'grunt-contrib-compress',
-    'grunt-usemin',
-    'grunt-ejs',
     'grunt-bower-clean'
   ]
 
   grunt.loadNpmTasks(t) for t in npmTasks
   grunt.loadTasks('./grunt/lib')
-  grunt.registerTask('restoreResolutions', 'Add "resolutions" back to bower.json', restoreResolutions(grunt))
-  grunt.registerTask('lcd', ['restoreResolutions', 'loadComponentDependencies'])
+  grunt.registerTask('lcd', ['loadComponentDependencies'])
   grunt.registerTask('loadComponentDependencies', 'Load client side dependencies for the components', componentDependencies(grunt))
-  grunt.registerTask('run', ['watch'])
+  grunt.registerTask('run', ['mk-css', 'pathReporter', 'watch'])
   grunt.registerTask('mk-css', ['copy:less', 'less'])
   grunt.registerTask('default', ['stage'])
+  grunt.registerTask('test', ['lcd', 'prepPlayerLauncher', 'jasmine:unit'])
+
   grunt.registerTask('stage', 'Work with the play stage task',
-    ['mk-css', 'uglify', 'compress', 'pathReporter'])
+    ['mk-css', 
+    'jshint',
+    'uglify', 
+    'compress', 
+    'pathReporter'])
+
+  grunt.registerTask('clean_bower', 
+    ['bower_clean', 
+    'shell:mathjax_rm_pngs', 
+    'shell:mathjax_rm_fonts'])  
+

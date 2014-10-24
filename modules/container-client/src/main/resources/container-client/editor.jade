@@ -62,29 +62,6 @@ block content
   include partials/previews/item-profile
   include partials/previews/supporting-material
 
-block before-main-script
-
-  script.
-
-    window.ngAppModules = [
-      'corespring-common.services',
-      'corespring-common.directives',
-      'corespring-common.supporting-materials',
-      'corespring-player.services',
-
-      'corespring-player.controllers',
-      'corespring-editor.services',
-      'corespring-editor.controllers',
-      'corespring-editor.directives',
-      'ui.sortable',
-      'ui.bootstrap',
-      'ui.ace',
-      'ui.router',
-      'cs.directives',
-      'ngRoute',
-      'ui.select2',
-      'corespring.wiggi-wiz'];
-
 //After the angular module has been created.
 block after-main-script
 

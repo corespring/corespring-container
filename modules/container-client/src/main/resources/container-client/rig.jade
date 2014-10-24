@@ -20,19 +20,6 @@ block content
         player-session="model.session",
         player-outcomes="model.outcome")
 
-block before-main-script
-  script.
-
-    window.ngAppModules = [
-      'corespring-rig.controllers',
-      'corespring-rig.directives',
-      'corespring-player.services',
-      'corespring-player.directives',
-      'corespring-common.services',
-      'corespring-common.directives',
-      'ui.ace'
-      ];
-
 block after-main-script
   script.
 

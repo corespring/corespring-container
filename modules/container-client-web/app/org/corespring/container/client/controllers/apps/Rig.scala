@@ -60,7 +60,7 @@ trait Rig
     val css = buildCss(scriptInfo)
 
     Future(
-      Ok(renderJade(RigTemplateParams(context, js, css, scriptInfo.ngDependencies)))
+      Ok(renderJade(RigTemplateParams(context, js, css, jsSrc.ngModules ++ scriptInfo.ngDependencies)))
     )
   }
 

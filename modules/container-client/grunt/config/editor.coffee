@@ -1,4 +1,5 @@
 core = require './core'
+player = require './player'
 coreLibs = require './core-libs'
 _ = require 'lodash'
 _.mixin(require('lodash-deep'))
@@ -12,10 +13,6 @@ editorSrcs = [
   'bower_components/angular-ui-select2/src/select2.js',
   'bower_components/angular-ui/build/angular-ui(.min).js',
   'bower_components/angular-bootstrap/ui-bootstrap-tpls(.min).js',
-  #'bower_components/bootstrap/js/dropdown.js',
-  #'bower_components/bootstrap/js/modal.js',
-  #'bower_components/bootstrap/js/tooltip.js',
-  #'bower_components/bootstrap/js/popover.js',
   'bower_components/angular-ui-ace/ui-ace(.min).js',
   'bower_components/ace-builds/src-min-noconflict/ace.js',
   'bower_components/ace-builds/src-min-noconflict/theme-twilight.js',
@@ -32,6 +29,7 @@ editorSrcs = [
   'js/render/directives/**/*.js',
   'js/render/controllers/**/*.js'
 ]
+
 
 js =
   src: _.union(coreLibs.src, core.src, editorSrcs)
@@ -50,6 +48,19 @@ css =
   ]
   report: 'editor-css-report.json'
 
+exports.ngModules = _.union(player.ngModules, [
+  'corespring-common.supporting-materials',
+  'corespring-editor.services',
+  'corespring-editor.controllers',
+  'corespring-editor.directives',
+  'ui.sortable',
+  'ui.bootstrap',
+  'ui.ace',
+  'ui.router',
+  'cs.directives',
+  'ngRoute',
+  'ui.select2',
+  'corespring.wiggi-wiz' ])
   
 exports.config = (grunt, toTargetPath) ->
   uglify: buildUglifyOptions(grunt, 'editor', js, toTargetPath)
@@ -67,7 +78,7 @@ exports.config = (grunt, toTargetPath) ->
 
   # write paths to a json file
   pathReporter:
-    editorJs: _.deepMapValues(_.cloneDeep(js), toTargetPath)
+    editorJs: _.extend(_.deepMapValues(_.cloneDeep(js), toTargetPath), {ngModules: @ngModules})
     editorCss: _.deepMapValues(_.cloneDeep(css), toTargetPath)
 
 

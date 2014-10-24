@@ -32,6 +32,12 @@ css =
   ]
   report: 'player-css-report.json'
 
+exports.ngModules = _.union( core.ngModules, [
+    'corespring-player.controllers',
+    'corespring-player.directives',
+    'corespring-player.services'
+  ])
+
 exports.config = (grunt, toTargetPath) ->
   uglify: buildUglifyOptions(grunt, 'player', js, toTargetPath)
   compress:
@@ -48,5 +54,5 @@ exports.config = (grunt, toTargetPath) ->
 
   # write paths to a json file
   pathReporter:
-    playerJs: _.deepMapValues(_.cloneDeep(js), toTargetPath)
+    playerJs: _.extend(_.deepMapValues(_.cloneDeep(js), toTargetPath), {ngModules: @ngModules})
     playerCss: _.deepMapValues(_.cloneDeep(css), toTargetPath)

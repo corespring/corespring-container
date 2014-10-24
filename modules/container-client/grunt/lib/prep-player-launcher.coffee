@@ -3,38 +3,33 @@ path = require "path"
 fs = require "fs"
 mkdirp = require 'mkdirp'
 
+###
+Depends on the corespring core.js 
+###
+template = (name, contents) ->
+  """
+  (function(exports, require, module){
+    #{contents}
+  })(corespring.module("#{name}").exports, corespring.require, corespring.module("#{name}"));
+  """
 
 module.exports = (grunt) ->
+
+  ###
+  For each js file in 'src', wrap it and concat all to the 'dest'.
+  ###
+  grunt.registerMultiTask 'prepPlayerLauncher', 'Wrap player js so that exports and require will work', ->
   
-  template = (name, contents) ->
-    """
-    (function(exports, require, module){
-      #{contents}
-    })(corespring.module("#{name}").exports, corespring.require, corespring.module("#{name}"));
-    """
-  
-  ->
+      readAndWrap = (p) ->
+        js = grunt.file.read(p, {encoding:  'utf-8'})
+        name = path.basename(p, ".js")
+        template(name, js)
 
-    grunt.log.writeln("prep player launcher")
-    common = grunt.config("common")
-    
-    processed = grunt.template.process(
-      "<%= common.app %>/**/player-launcher/*.js",
-      data:
-        common: common
-    )
+      writeWrapped = (f) ->
+        grunt.log.debug('src', JSON.stringify(f.src))
+        grunt.log.debug('dest', JSON.stringify(f.dest))
+        sumString = (sum, s) -> sum += "\n\n#{readAndWrap(s)}"
+        wrapped = _.reduce(f.src, sumString, "")
+        grunt.file.write(f.dest, wrapped)
 
-    filesToWrap = grunt.file.expand({ nonull: true }, processed)
-
-    _.map filesToWrap, (p) ->
-      grunt.log.writeln(p)
-      name = path.basename(p, ".js") 
-      contents = fs.readFileSync(p)
-      wrapped = template(name, contents)
-      basePath = "#{common.tmp}/wrapped"
-      mkdirp.sync basePath
-      fs.writeFileSync("#{basePath}/#{name}-wrapped.js", wrapped)
-
-
-
-
+      @files.forEach(writeWrapped)

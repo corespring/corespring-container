@@ -6,3 +6,5 @@ exports.src =   [
   'js/corespring/lodash-mixins.js',
   'js/common/**/*.js'
 ]
+
+exports.ngModules = ['corespring-common.services', 'corespring-common.directives']

@@ -53,7 +53,7 @@ trait Catalog
                 context,
                 domainResolvedJs,
                 domainResolvedCss,
-                scriptInfo.ngDependencies
+                jsSrc.ngModules ++ scriptInfo.ngDependencies
               )
             )
           )

@@ -127,15 +127,15 @@ trait App[T <: ClientHooks]
   def resolveDomain(path: String): String = path
 
   /** Read in the src report from the client side build */
-  lazy val loadedJsSrc = SourcePaths.fromJsonResource(modulePath, s"container-client/$context-js-report.json")
+  lazy val loadedJsSrc : NgSourcePaths = NgSourcePaths.fromJsonResource(modulePath, s"container-client/$context-js-report.json")
 
-  def jsSrc: SourcePaths = {
+  def jsSrc: NgSourcePaths = {
     if(Play.current.mode == Mode.Dev) {
-      SourcePaths.fromJsonResource(modulePath, s"container-client/$context-js-report.json")
+      NgSourcePaths.fromJsonResource(modulePath, s"container-client/$context-js-report.json")
     } else {
       loadedJsSrc
     }
   }
 
-  lazy val cssSrc: SourcePaths = SourcePaths.fromJsonResource(modulePath, s"container-client/$context-css-report.json")
+  lazy val cssSrc: CssSourcePaths = CssSourcePaths.fromJsonResource(modulePath, s"container-client/$context-css-report.json")
 }

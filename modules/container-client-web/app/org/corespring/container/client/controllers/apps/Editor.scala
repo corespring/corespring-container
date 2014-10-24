@@ -76,7 +76,7 @@ trait Editor
           context,
           domainResolvedJs,
           domainResolvedCss,
-          scriptInfo.ngDependencies))
+          jsSrc.ngModules ++ scriptInfo.ngDependencies))
       )
     }
 

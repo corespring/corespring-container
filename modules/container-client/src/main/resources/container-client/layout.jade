@@ -42,8 +42,7 @@ html(xmlns="http://www.w3.org/1999/html")
         }, 100);
       });
 
-      var componentNgModules = [#{componentNgModules}];
-      var allNgModules = window.ngAppModules.concat(componentNgModules);
+      var allNgModules =[#{componentNgModules}];
       //declare the app..
       angular.module( 'corespring-#{appName}', allNgModules ).config(['$provide', function($provide) {
 
