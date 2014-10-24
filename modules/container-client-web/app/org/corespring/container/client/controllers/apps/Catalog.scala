@@ -42,6 +42,7 @@ trait Catalog
 
   override def additionalScripts: Seq[String] = Seq(org.corespring.container.client.controllers.apps.routes.Catalog.services().url)
 
+
   override def load(id: String): Action[AnyContent] = Action.async {
     implicit request =>
       hooks.showCatalog(id).flatMap { e =>
@@ -49,9 +50,9 @@ trait Catalog
         def ifEmpty = {
           logger.trace(s"[showCatalog]: $id")
           val mainJs = paths(jsSrc)
-          val js = mainJs ++ jsSrc.otherLibs
+          val js = mainJs ++ jsSrc.otherLibs ++ additionalScripts
           val css = cssSrc.dest +: cssSrc.otherLibs
-          Ok(renderJade(CatalogTemplateParams(context, js, css, Seq.empty)))
+          Ok(renderJade(CatalogTemplateParams(context, js, css, Seq("catalog.services"))))
         }
 
         def onError(sm: StatusMessage) = {

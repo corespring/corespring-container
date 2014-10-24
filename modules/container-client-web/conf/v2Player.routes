@@ -29,12 +29,8 @@ PUT           /session/:id/score.json                                @org.coresp
 GET           /session/:sessionId/*file                              @org.corespring.container.client.controllers.Assets.session(sessionId, file)
 
 GET           /item/:itemId.json                                     @org.corespring.container.client.controllers.resources.Item.load(itemId)
-GET           /item/:itemId/preview                                  @org.corespring.container.client.controllers.apps.Catalog.load(itemId)
 GET           /item/:itemId/:name/*file                              @org.corespring.container.client.controllers.Assets.supportingMaterial(itemId, name, file)
-GET           /item/:itemId/catalog.html                             @org.corespring.container.client.controllers.apps.Catalog.load(itemId)
 GET           /item/:itemId/*file                                    @org.corespring.container.client.controllers.Assets.item(itemId, file)
-GET           /item/catalog-services.js                              @org.corespring.container.client.controllers.apps.Catalog.services
-
 PUT           /item/:itemId.json                                     @org.corespring.container.client.controllers.resources.Item.save(itemId)
 POST          /item/create                                           @org.corespring.container.client.controllers.resources.Item.create()
 
@@ -43,10 +39,12 @@ POST          /item/:itemId/supporting-materials/create              @org.coresp
 
 GET           /icon/:icon                                            @org.corespring.container.client.controllers.Icons.icon(icon)
         
-#GET           /rig/:componentType/index.html                         @org.corespring.container.client.controllers.apps.Rig.load(componentType, data: Option[String] ?= None)
-#GET           /rig/:componentType/:dataName.json                     @org.corespring.container.client.controllers.apps.Rig.data(componentType, dataName)
-#GET           /rig/:componentType/*file                              @org.corespring.container.client.controllers.apps.Rig.asset(componentType, file)
+#GET          /rig/:componentType/index.html                         @org.corespring.container.client.controllers.apps.Rig.load(componentType, data: Option[String] ?= None)
+#GET          /rig/:componentType/:dataName.json                     @org.corespring.container.client.controllers.apps.Rig.data(componentType, dataName)
+#GET          /rig/:componentType/*file                              @org.corespring.container.client.controllers.apps.Rig.asset(componentType, file)
 
+GET           /catalog/:itemId/index.html                          @org.corespring.container.client.controllers.apps.Catalog.load(itemId)
+GET           /catalog/catalog-services.js                           @org.corespring.container.client.controllers.apps.Catalog.services
 
 # Hooks for the editor: config, services + components
 GET           /editor/editor-services.js                             @org.corespring.container.client.controllers.apps.Editor.services

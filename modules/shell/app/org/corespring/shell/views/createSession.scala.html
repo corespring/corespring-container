@@ -4,15 +4,6 @@
 <head>
 
   <link rel="stylesheet" href="/assets/css/homepage.css">
-  <!--
-    "maxNoOfAttempts").asOpt[Int].getOrElse(default.maxNoOfAttempts),
-    "highlightUserResponse").asOpt[Boolean].getOrElse(default.highlightUserResponse),
-    "highlightCorrectResponse").asOpt[Boolean].getOrElse(default.highlightCorrectResponse),
-    "showFeedback").asOpt[Boolean].getOrElse(default.showFeedback),
-    "allowEmptyResponses").asOpt[Boolean].getOrElse(default.allowEmptyResponses),
-    "submitCompleteMessage").asOpt[String].getOrElse(default.submitCompleteMessage),
-    "submitIncorrectMessage").asOpt[String].getOrElse(default.submitIncorrectMessage)))
-  -->
 
 
   <!--[if lte IE 9]>
@@ -73,6 +64,7 @@
         allowEmptyResponses: $("#allowEmptyResponses").is(":checked")
       };
 
+      console.log('url ------>', '@Html(url)');
       $.ajax({
         type: 'POST',
         url: '@url',

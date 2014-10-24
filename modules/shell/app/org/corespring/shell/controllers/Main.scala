@@ -28,11 +28,13 @@ trait Main
             case Some(title) if title.trim().length() > 0 => title
             case _ => "No title"
           }
+
+          import org.corespring.container.client.controllers.apps.{routes => appRoutes}
           val id = (json \ "_id" \ "$oid").as[String]
           val playerUrl = routes.Main.createSessionPage(id).url
-          val editorUrl = s"/client/editor/${id}/index.html"
-          val deleteUrl = s"/delete-item/$id"
-          val catalogUrl = s"/client/item/$id/preview"
+          val deleteUrl = routes.Main.deleteItem(id).url
+          val editorUrl = appRoutes.Editor.load(id).url
+          val catalogUrl = appRoutes.Catalog.load(id).url
           IndexLink(name, playerUrl, editorUrl, deleteUrl, catalogUrl)
       }
 
@@ -49,10 +51,9 @@ trait Main
     implicit request =>
       val createSessionCall = routes.Main.createSession
       val url = createSessionCall.url
-      val finalUrl: String = request.getQueryString("mode").map { m =>
-        s"$url?mode=$m"
-      }.getOrElse(url)
 
+      println(s"------> ${request.rawQueryString}")
+      val finalUrl: String = s"$url?${request.rawQueryString}"
       Ok(html.createSession(itemId, finalUrl))
   }
 
