@@ -8,6 +8,7 @@ import org.corespring.container.client.views.txt.js.PlayerServices
 import org.corespring.container.components.processing.PlayerItemPreProcessor
 import play.api.libs.json.{Json}
 import play.api.mvc.{Action, AnyContent, RequestHeader}
+import play.api.libs.json.{JsObject, JsValue, Json}
 
 trait Player
   extends App[PlayerHooks]
@@ -65,7 +66,8 @@ trait Player
         val controlsJs = if (showControls) paths(controlsJsSrc) else Seq.empty
         val domainResolvedJs = buildJs(scriptInfo, controlsJs )
         val domainResolvedCss = buildCss(scriptInfo)
-        val preprocessedItem = itemPreProcessor.preProcessItemForPlayer(itemJson)
+        val processedXhtml = processXhtml((itemJson \ "xhtml").asOpt[String])
+        val preprocessedItem = itemPreProcessor.preProcessItemForPlayer(itemJson).as[JsObject] ++ Json.obj("xhtml" -> processedXhtml)
 
         logger.trace(s"function=load domainResolvedJs=$domainResolvedJs")
         logger.trace(s"function=load domainResolvedCss=$domainResolvedCss")
@@ -78,7 +80,7 @@ trait Player
               domainResolvedCss,
               scriptInfo.ngDependencies,
               showControls,
-              processXhtml((itemJson \ "xhtml").asOpt[String]),
+              processedXhtml,
               Json.obj("session" -> session, "item" -> preprocessedItem),
               VersionInfo.json
             ))

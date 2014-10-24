@@ -218,9 +218,11 @@ angular.module('corespring-catalog.controllers')
         return str && _.isString(str) && str.length > 0;
       };
 
-      $scope.isNonEmptyStringArray = function(arr){
+      function isNonEmptyStringArray(arr){
         return arr && _.isArray(arr) && arr.length > 0 && arr.join('').length > 0;
-      };
+      }
+
+      $scope.isNonEmptyStringArray = isNonEmptyStringArray;
 
       $scope.htmlOrNull = function(str){
         if (!isNonEmptyString(str)){
@@ -229,16 +231,16 @@ angular.module('corespring-catalog.controllers')
         return $sce.trustAsHtml(str);
       };
 
-      $scope.isThereCopyrightInfo = function(profile){
+      $scope.isThereMoreData = function(profile){
         return (
           isNonEmptyString(getOrNull(profile,"contributorDetails","copyrightOwner")) ||
           isNonEmptyString(getOrNull(profile,"contributorDetails","copyrightYear")) ||
           isNonEmptyString(getOrNull(profile,"contributorDetails","copyrightExpirationDate")) ||
           isNonEmptyString(getOrNull(profile,"contributorDetails","credentials")) ||
           isNonEmptyString(getOrNull(profile,"contributorDetails","sourceUrl")) ||
-          isNonEmptyString(getOrNull($scope,"item","collection","name"))
-          );
-      };
+          isNonEmptyStringArray(getOrNull(profile,"priorGradeLevel")) ||
+          isNonEmptyString(getOrNull($scope,"item","collection","name")));
+     };
 
       $scope.getUrl = function(src){
         if (!isNonEmptyString(src)){

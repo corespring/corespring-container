@@ -16,10 +16,21 @@ var Instance = function(element, options, errorCallback, log) {
   var findInstanceIframe = function() {
     var iframe = $(element).find('iframe');
     if (iframe.length === 0) {
-      log.error("No iframe was found in player instance");
+      log.error("instance iframe not found");
       return undefined;
     }
     return iframe;
+  };
+
+  var findDestinationIframe = function(event) {
+    var frames = document.getElementsByTagName('iframe');
+    for (var i = 0; i < frames.length; i++) {
+      if (frames[i].contentWindow === event.source) {
+        return $(frames[i]);
+      }
+    }
+    log.error("destination iframe not found");
+    return undefined;
   };
 
   var isMessageDestinedForInstance = function(event) {
@@ -27,9 +38,8 @@ var Instance = function(element, options, errorCallback, log) {
     var instanceIframe = findInstanceIframe();
     if (instanceIframe === eventIframe) {
       return true;
-    } else {
-      return (instanceIframe && eventIframe) && instanceIframe[0] === eventIframe[0];
     }
+    return (instanceIframe && eventIframe) && instanceIframe[0] === eventIframe[0];
   };
 
   var forThisInstance = function(fn) {
@@ -42,15 +52,6 @@ var Instance = function(element, options, errorCallback, log) {
 
   var listener = require("root-level-listener")(log);
   var listenersToRemove = [];
-
-  var findDestinationIframe = function(event) {
-    var frames = document.getElementsByTagName('iframe');
-    for (var i = 0; i < frames.length; i++) {
-      if (frames[i].contentWindow === event.source) {
-        return $(frames[i]);
-      }
-    }
-  };
 
   function detachOnRemove(handler) {
     listenersToRemove.push(handler);
@@ -91,6 +92,11 @@ var Instance = function(element, options, errorCallback, log) {
     detachOnRemove(listenerFn);
   }
 
+  function isMsie() {
+    //from MathJax at https://github.com/mathjax/MathJax/blob/master/unpacked/MathJax.js#L2987
+    return ("ActiveXObject" in window && "clipboardData" in window);
+  }
+
   function initialize(e, options) {
     if (!options || !options.url) {
       errorCallback({
@@ -116,11 +122,19 @@ var Instance = function(element, options, errorCallback, log) {
     }
 
     var iframeTemplate = [
-      " <iframe id='iframe-player' ",
-      "         frameborder='0' ",
-      "         src='" + url + "' style='width: 100%; border: none; display:none'>",
-      " </iframe>"
-    ].join('\n');
+      "<iframe",
+      " id='iframe-player'",
+      " frameborder='0'",
+      " src='",
+      url,
+      "'",
+      " style='",
+      "width: 100%;",
+      "border: none;",
+      isMsie() ? "" : "display: none;", //ie does not render MathJax in public site when display:none is set
+      "'",
+      "></iframe>"
+    ].join('');
 
     $(e).html(iframeTemplate);
 
@@ -131,7 +145,7 @@ var Instance = function(element, options, errorCallback, log) {
     dimensionChangeListener(e);
 
     $(element).parent().bind('DOMNodeRemoved', function(e) {
-      if ('#'+e.target.id === element) {
+      if ('#' + e.target.id === element) {
         removeListeners();
       }
     });
