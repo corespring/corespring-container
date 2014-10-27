@@ -1,9 +1,7 @@
 core = require './core'
 player = require './player'
 coreLibs = require './core-libs'
-buildUglifyOptions = require('../lib/uglify-options-generator').buildUglifyOptions
 _ = require 'lodash'
-_.mixin(require('lodash-deep'))
 
 catalogSrcs = [
     'bower_components/angular-route/angular-route(.min).js',
@@ -18,7 +16,7 @@ catalogSrcs = [
     'js/common/services/message-bridge.js'
   ]
 
-js =
+exports.js =
   src: _.union(coreLibs.src, core.src, catalogSrcs)
   dest: 'js/catalog-prod.js'
   libs: [
@@ -26,7 +24,7 @@ js =
   ]
   report: 'catalog-js-report.json'
 
-css = 
+exports.css = 
   src: ['css/catalog.css']
   dest: 'css/catalog.min.css'
   libs: [
@@ -41,22 +39,3 @@ exports.ngModules = _.union( player.ngModules, [
   'ui.bootstrap',
   'ui.router'
 ])
-
-exports.config = (grunt, toTargetPath) ->
-  uglify: buildUglifyOptions(grunt, 'catalog', js, toTargetPath)
-  compress:
-    player:
-      options:
-        mode: 'gzip'
-      files: [
-        {
-          expand: true
-          src: [toTargetPath(js.dest)]
-          ext: '.js.gz'
-        }
-      ]
-
-  # write paths to a json file
-  pathReporter:
-    catalogJs: _.extend(_.deepMapValues(_.cloneDeep(js), toTargetPath), { ngModules: @ngModules})
-    catalogCss: _.deepMapValues(_.cloneDeep(css), toTargetPath)

@@ -1,10 +1,8 @@
 core = require './core'
 coreLibs = require './core-libs'
-buildUglifyOptions = require('../lib/uglify-options-generator').buildUglifyOptions
 _ = require 'lodash'
-_.mixin(require('lodash-deep'))
 
-js =
+exports.js =
   ###
   All the core js files that are included in the player and may be
   concatted
@@ -23,7 +21,7 @@ js =
   report: 'player-js-report.json'
 
 
-css =
+exports.css =
   src: ['css/player.css']
   dest: 'css/player.min.css'
   libs: [
@@ -37,22 +35,3 @@ exports.ngModules = _.union( core.ngModules, [
     'corespring-player.directives',
     'corespring-player.services'
   ])
-
-exports.config = (grunt, toTargetPath) ->
-  uglify: buildUglifyOptions(grunt, 'player', js, toTargetPath)
-  compress:
-    player:
-      options:
-        mode: 'gzip'
-      files: [
-        {
-          expand: true
-          src: [toTargetPath(js.dest)]
-          ext: '.js.gz'
-        }
-      ]
-
-  # write paths to a json file
-  pathReporter:
-    playerJs: _.extend(_.deepMapValues(_.cloneDeep(js), toTargetPath), {ngModules: @ngModules})
-    playerCss: _.deepMapValues(_.cloneDeep(css), toTargetPath)

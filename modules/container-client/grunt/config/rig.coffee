@@ -1,8 +1,6 @@
 core = require './core'
 coreLibs = require './core-libs'
-buildUglifyOptions = require('../lib/uglify-options-generator').buildUglifyOptions
 _ = require 'lodash'
-_.mixin(require('lodash-deep'))
 
 rigSrcs = [
     'bower_components/angular-ui/build/angular-ui(.min).js',
@@ -18,7 +16,7 @@ rigSrcs = [
     'js/rig/**/*.js',
   ]
 
-js =
+exports.js =
   src: _.union(coreLibs.src, core.src, rigSrcs)
   dest: 'js/rig-prod.js'
   libs: [
@@ -26,7 +24,7 @@ js =
   ]
   report: 'rig-js-report.json'
 
-css = 
+exports.css = 
   src: ['css/rig.css']
   dest: 'css/rig.min.css'
   libs: [
@@ -42,41 +40,3 @@ exports.ngModules = _.union(core.ngModules, [
     'corespring-player.directives',
     'ui.ace'
   ])
-###
-mkAppConfig = (name, grunt, js, css, ngModules, processFn) ->
-  uglify: buildUglifyOptions(grunt, name, js, processFn)
-  compress:
-    player:
-      options:
-        mode: 'gzip'
-      files: [
-        {
-          expand: true
-          src: [processFn(js.dest)]
-          ext: '.js.gz'
-        }
-      ]
-
-  # write paths to a json file
-  pathReporter:
-    rigJs: _.extend(_.deepMapValues(_.cloneDeep(js), processFn), {ngModules: ngModules})
-    rigCss: _.deepMapValues(_.cloneDeep(css), processFn) 
-###
-exports.config = (grunt, toTargetPath) ->
-  uglify: buildUglifyOptions(grunt, 'rig', js, toTargetPath)
-  compress:
-    player:
-      options:
-        mode: 'gzip'
-      files: [
-        {
-          expand: true
-          src: [toTargetPath(js.dest)]
-          ext: '.js.gz'
-        }
-      ]
-
-  # write paths to a json file
-  pathReporter:
-    rigJs: _.extend(_.deepMapValues(_.cloneDeep(js), toTargetPath), {ngModules: @ngModules})
-    rigCss: _.deepMapValues(_.cloneDeep(css), toTargetPath)

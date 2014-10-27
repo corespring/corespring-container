@@ -1,8 +1,7 @@
-componentDependencies = require "./grunt/lib/component-dependencies"
-prepPlayerLauncher = require "./grunt/lib/prep-player-launcher"
-expander = require "./grunt/lib/expander"
-pathReporter = require './grunt/lib/path-reporter'
 _ = require "lodash"
+componentDependencies = require "./grunt/lib/component-dependencies"
+appConfigBuilder = require './grunt/lib/app-config-builder'
+
 
 ###
 Configs...
@@ -140,12 +139,15 @@ module.exports = (grunt) ->
     else 
       "<%= common.dist %>/#{p.replace('(.min)', '')}"
 
+  mkConfig = (name, config) ->
+    appConfigBuilder.build(name, grunt, config.js, config.css, config.ngModules, toTargetPath) 
+
   fullConfig = _.merge(config, 
-    player.config(grunt,toTargetPath), 
-    playerControls.config(toTargetPath),
-    catalog.config(grunt, toTargetPath),
-    rig.config(grunt, toTargetPath),
-    editor.config(grunt, toTargetPath))
+    mkConfig('catalog', catalog),
+    mkConfig('editor', editor),
+    mkConfig('rig', rig),
+    mkConfig('player', player)
+    mkConfig('playerControls', playerControls))
 
   grunt.log.debug(JSON.stringify(fullConfig, null, "  "))
   
@@ -166,7 +168,7 @@ module.exports = (grunt) ->
   ]
 
   grunt.loadNpmTasks(t) for t in npmTasks
-  grunt.loadTasks('./grunt/lib')
+  grunt.loadTasks('./grunt/lib/tasks')
   grunt.registerTask('lcd', ['loadComponentDependencies'])
   grunt.registerTask('loadComponentDependencies', 'Load client side dependencies for the components', componentDependencies(grunt))
   grunt.registerTask('run', ['mk-css', 'pathReporter', 'watch'])

@@ -2,8 +2,6 @@ core = require './core'
 player = require './player'
 coreLibs = require './core-libs'
 _ = require 'lodash'
-_.mixin(require('lodash-deep'))
-buildUglifyOptions = require('../lib/uglify-options-generator').buildUglifyOptions
 
 editorSrcs = [
   'bower_components/angular-route/angular-route(.min).js',
@@ -30,8 +28,7 @@ editorSrcs = [
   'js/render/controllers/**/*.js'
 ]
 
-
-js =
+exports.js =
   src: _.union(coreLibs.src, core.src, editorSrcs)
   dest: 'js/editor-prod.js'
   libs: [
@@ -39,7 +36,7 @@ js =
   ]
   report: 'editor-js-report.json'
 
-css =
+exports.css =
   src: ['css/editor.css']
   dest: 'css/editor.min.css'
   libs: [
@@ -61,26 +58,4 @@ exports.ngModules = _.union(player.ngModules, [
   'ngRoute',
   'ui.select2',
   'corespring.wiggi-wiz' ])
-  
-exports.config = (grunt, toTargetPath) ->
-  uglify: buildUglifyOptions(grunt, 'editor', js, toTargetPath)
-  compress:
-    editor:
-      options:
-        mode: 'gzip'
-      files: [
-        {
-          expand: true
-          src: [toTargetPath(js.dest)]
-          ext: '.js.gz'
-        }
-      ]
-
-  # write paths to a json file
-  pathReporter:
-    editorJs: _.extend(_.deepMapValues(_.cloneDeep(js), toTargetPath), {ngModules: @ngModules})
-    editorCss: _.deepMapValues(_.cloneDeep(css), toTargetPath)
-
-
-
 
