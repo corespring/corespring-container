@@ -23,6 +23,24 @@ buildPathReporterCss = (name, css, processFn) ->
   out = {}
   out["#{name}Css"] = _.extend(_.deepMapValues(_.cloneDeep(css), processFn)) 
 
+
+###
+Builds a configuration object for the given js, css, ngmodules
+
+outputs something like: 
+
+{
+  uglify: {
+    //uglify-config...
+  },
+  compress: {
+    //compress-config ...
+  },
+  pathReporter: {
+    //path-reporter config...
+  }
+}
+###
 exports.build = (name, grunt, js, css, ngModules, processFn) ->
   out =
     uglify: buildUglifyOptions(grunt, name, js, processFn)

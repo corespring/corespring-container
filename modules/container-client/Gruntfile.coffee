@@ -60,6 +60,10 @@ module.exports = (grunt) ->
     .replace('bower_components', 'components')
     .replace('///', '//')
 
+  prepend = (pre, s) -> "#{pre}#{s}"
+
+  comps = prepend.bind( null, '<%= common.dist %>/bower_components/')
+
   config =
     pkg: grunt.file.readJSON('package.json')
     common: common
@@ -108,16 +112,14 @@ module.exports = (grunt) ->
           '!<%= common.app %>/js/**/player-launcher/*.js']
         options:
           keepRunner: true
-          vendor: [
-            '<%= common.dist %>/bower_components/angular/angular.js',
-            '<%= common.dist %>/bower_components/angular-mocks/angular-mocks.js',
-            '<%= common.dist %>/bower_components/wiggi-wiz/dist/wiggi-wiz.js',
-            '<%= common.dist %>/bower_components/jquery/dist/jquery.js',
-            '<%= common.dist %>/bower_components/lodash/dist/lodash.js'
-            '<%= common.dist %>/bower_components/saxjs/lib/sax.js',
-            '<%= common.dist %>/bower_components/bootstrap/dist/js/bootstrap.min.js',
-            '<%= common.dist %>/bower_components/angular-ui-bootstrap-bower/ui-bootstrap-tpls.js'
-          ]
+          vendor: _.map(['angular/angular.js',
+            'angular-mocks/angular-mocks.js',
+            'wiggi-wiz/dist/wiggi-wiz.js',
+            'jquery/dist/jquery.js',
+            'lodash/dist/lodash.js'
+            'saxjs/lib/sax.js',
+            'bootstrap/dist/js/bootstrap.min.js',
+            'angular-ui-bootstrap-bower/ui-bootstrap-tpls.js'], comps)
           specs: '<%= common.test %>/js/**/*-test.js'
 
 
@@ -142,6 +144,9 @@ module.exports = (grunt) ->
   mkConfig = (name, config) ->
     appConfigBuilder.build(name, grunt, config.js, config.css, config.ngModules, toTargetPath) 
 
+  ###
+  We merge in the app specific configs - run with --debug to see the final config.
+  ###
   fullConfig = _.merge(config, 
     mkConfig('catalog', catalog),
     mkConfig('editor', editor),
