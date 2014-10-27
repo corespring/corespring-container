@@ -39,11 +39,17 @@ object CssSourcePaths {
 
 object SourcePaths {
 
+  import org.corespring.container.logging.ContainerLogger
+
+  private val logger = ContainerLogger.getLogger("SourcePaths")
+
   import play.api.Play.current
 
   def fromJsonResource(prefix: String, r: String): SourcePaths = {
 
     def prefixModule(p: String) = if (p.startsWith("//")) p else s"$prefix$p"
+
+    logger.debug(s"load json resource: $prefix, $r")
 
     Play.resource(r).map { u: URL =>
       val bs = scala.io.Source.fromURL(u)

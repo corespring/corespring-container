@@ -129,13 +129,30 @@ trait App[T <: ClientHooks]
   /** Read in the src report from the client side build */
   lazy val loadedJsSrc: NgSourcePaths = NgSourcePaths.fromJsonResource(modulePath, s"container-client/$context-js-report.json")
 
-  def jsSrc: NgSourcePaths = {
+  lazy val jsPathHolder = new PathHolder[NgSourcePaths](modulePath, context, "js", NgSourcePaths.fromJsonResource _)
+  lazy val cssPathHolder = new PathHolder[CssSourcePaths](modulePath, context, "css", CssSourcePaths.fromJsonResource _)
+  def jsSrc: NgSourcePaths = jsPathHolder.src(mode)
+  def cssSrc: CssSourcePaths = cssPathHolder.src(mode)
+}
+
+/**
+ * Loads in a source path, if Play.current.mode == Dev it reloads it each time
+ */
+private[apps] class PathHolder[A <: SourcePaths](path: String, context: String, suffix: String, loadFn: (String, String) => A) {
+
+  private val reportName = s"container-client/$context-$suffix-report.json"
+
+  /** Read in the src report from the client side build */
+  private lazy val loaded: A = loadFn(path, reportName)
+
+  private def load = loadFn(path, reportName)
+
+  def src(mode: Mode): A = {
     if (mode == Mode.Dev) {
-      NgSourcePaths.fromJsonResource(modulePath, s"container-client/$context-js-report.json")
+      load
     } else {
-      loadedJsSrc
+      loaded
     }
   }
 
-  lazy val cssSrc: CssSourcePaths = CssSourcePaths.fromJsonResource(modulePath, s"container-client/$context-css-report.json")
 }
