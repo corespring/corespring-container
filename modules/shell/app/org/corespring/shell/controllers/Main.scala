@@ -7,7 +7,7 @@ import play.api.libs.json.{ JsObject, JsString, JsValue, Json }
 import play.api.mvc._
 
 trait Main
-  extends Controller{
+  extends Controller {
 
   import org.corespring.shell.views._
 
@@ -29,7 +29,7 @@ trait Main
             case _ => "No title"
           }
 
-          import org.corespring.container.client.controllers.apps.{routes => appRoutes}
+          import org.corespring.container.client.controllers.apps.{ routes => appRoutes }
           val id = (json \ "_id" \ "$oid").as[String]
           val playerUrl = routes.Main.createSessionPage(id).url
           val deleteUrl = routes.Main.deleteItem(id).url

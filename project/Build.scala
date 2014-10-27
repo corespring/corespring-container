@@ -96,8 +96,7 @@ object Build extends sbt.Build {
          */
         (bowerCmd, "install"),
         (gruntCmd, "loadComponentDependencies"),
-        (gruntCmd, "stage")
-      )
+        (gruntCmd, "stage"))
 
       commands.foreach {
         c =>
@@ -191,12 +190,12 @@ object Build extends sbt.Build {
         yuiCompressor,
         commonsIo),
       templatesImport ++= Seq("play.api.libs.json.JsValue", "play.api.libs.json.Json"))
-      .dependsOn(
-        componentModel % "compile->compile;test->test",
-        containerClient,
-        utils,
-        logging,
-        jsProcessing)
+    .dependsOn(
+      componentModel % "compile->compile;test->test",
+      containerClient,
+      utils,
+      logging,
+      jsProcessing)
 
   val mongoJsonService = builder.playApp("mongo-json-service")
     .settings(playAppToSbtLibSettings: _*)

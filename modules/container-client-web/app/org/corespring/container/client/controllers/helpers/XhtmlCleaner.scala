@@ -1,8 +1,8 @@
 package org.corespring.container.client.controllers.helpers
 
-import org.htmlcleaner.{CompactXmlSerializer, TagNode, HtmlCleaner}
+import org.htmlcleaner.{ CompactXmlSerializer, TagNode, HtmlCleaner }
 
-object XhtmlCleaner{
+object XhtmlCleaner {
   val cleaner = {
     val cleaner: HtmlCleaner = new HtmlCleaner()
     cleaner.getProperties.setUseEmptyElementTags(false)
@@ -14,7 +14,7 @@ object XhtmlCleaner{
 
 trait XhtmlCleaner {
 
-  def cleanXhtml(s:String) : String = {
+  def cleanXhtml(s: String): String = {
     val n: TagNode = XhtmlCleaner.cleaner.clean(s)
     val serializer = new CompactXmlSerializer(XhtmlCleaner.cleaner.getProperties)
     serializer.getAsString(n)

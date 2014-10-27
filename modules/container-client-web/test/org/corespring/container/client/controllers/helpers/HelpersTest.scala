@@ -14,15 +14,13 @@ class HelpersTest extends Specification with JsonHelper {
       "return JSON attribute for Some" in {
         val value = "value!"
         val json = partialObj(
-          attr -> Some(JsString(value))
-        )
+          attr -> Some(JsString(value)))
         (json \ attr).as[String] === value
       }
 
       "return no JSON attribute for None" in {
         val json = partialObj(
-          attr -> None
-        )
+          attr -> None)
         (json \ attr) must beAnInstanceOf[JsUndefined]
       }
 

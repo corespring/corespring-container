@@ -5,7 +5,7 @@ import com.mongodb.casbah.{ WriteConcern, MongoCollection }
 import com.mongodb.casbah.commons.MongoDBObject
 import com.mongodb.util.{ JSON => MongoPlayJson }
 import org.bson.types.ObjectId
-import play.api.libs.json.{Json => PlayJson, JsUndefined, JsArray, JsObject, JsValue}
+import play.api.libs.json.{ Json => PlayJson, JsUndefined, JsArray, JsObject, JsValue }
 import org.corespring.container.logging.ContainerLogger
 
 class MongoService(collection: MongoCollection) {
@@ -55,7 +55,7 @@ class MongoService(collection: MongoCollection) {
     }
   }
 
-  def delete(id:String) : Unit = {
+  def delete(id: String): Unit = {
     collection.findAndRemove(MongoDBObject("_id" -> new ObjectId(id)))
   }
 

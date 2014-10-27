@@ -81,7 +81,7 @@ trait DefaultIntegration
 
   lazy val rig = new Rig {
 
-    override def mode : Mode = Play.current.mode
+    override def mode: Mode = Play.current.mode
 
     override implicit def ec: ExecutionContext = DefaultIntegration.this.ec
 
@@ -101,7 +101,7 @@ trait DefaultIntegration
   }
 
   lazy val editor = new Editor {
-    override def mode : Mode = Play.current.mode
+    override def mode: Mode = Play.current.mode
 
     override implicit def ec: ExecutionContext = DefaultIntegration.this.ec
 
@@ -113,7 +113,7 @@ trait DefaultIntegration
   }
 
   lazy val catalog = new Catalog {
-    override def mode : Mode = Play.current.mode
+    override def mode: Mode = Play.current.mode
 
     override implicit def ec: ExecutionContext = DefaultIntegration.this.ec
 
@@ -123,7 +123,7 @@ trait DefaultIntegration
   }
 
   lazy val prodHtmlPlayer = new Player {
-    override def mode : Mode = Play.current.mode
+    override def mode: Mode = Play.current.mode
 
     override implicit def ec: ExecutionContext = DefaultIntegration.this.ec
 

@@ -68,8 +68,8 @@ trait ComponentSets extends Controller with ComponentUrls {
 
     components match {
       case Nil => None
-      case _ =>{
-        ComponentUrlDirective.unapply(components.map(_.componentType), allComponents).map{ path =>
+      case _ => {
+        ComponentUrlDirective.unapply(components.map(_.componentType), allComponents).map { path =>
           routes.ComponentSets.resource(context, path, suffix).url
         }
       }

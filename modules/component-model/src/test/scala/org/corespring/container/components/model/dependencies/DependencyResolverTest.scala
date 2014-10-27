@@ -35,7 +35,7 @@ class DependencyResolverTest extends Specification with ComponentMaker {
       r.resolveComponents(Seq(id("a"))) === Seq(b, a)
     }
 
-    "handles cyclical relationships" in  {
+    "handles cyclical relationships" in {
       val one = uiComp("one", Seq(id("a")))
       val a = lib("a", Seq(id("b")))
       val b = lib("b", Seq(id("a")))

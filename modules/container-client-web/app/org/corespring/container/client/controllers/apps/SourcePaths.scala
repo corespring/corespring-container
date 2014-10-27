@@ -13,28 +13,28 @@ trait SourcePaths {
   def otherLibs: Seq[String]
 }
 
-case class CssSourcePaths(src: Seq[String], dest: String, otherLibs: Seq[String])  extends SourcePaths
+case class CssSourcePaths(src: Seq[String], dest: String, otherLibs: Seq[String]) extends SourcePaths
 
-case class NgSourcePaths(src: Seq[String], dest: String, otherLibs: Seq[String], ngModules : Seq[String]) extends SourcePaths
+case class NgSourcePaths(src: Seq[String], dest: String, otherLibs: Seq[String], ngModules: Seq[String]) extends SourcePaths
 
-object NgSourcePaths{
+object NgSourcePaths {
 
-  def fromJsonResource(prefix:String, r:String) : NgSourcePaths = {
+  def fromJsonResource(prefix: String, r: String): NgSourcePaths = {
     SourcePaths.fromJsonResource(prefix, r) match {
-      case ng : NgSourcePaths => ng
+      case ng: NgSourcePaths => ng
       case _ => throw new RuntimeException(s"Not the right source path type: $r")
     }
   }
 }
 
-object CssSourcePaths{
+object CssSourcePaths {
 
-def fromJsonResource(prefix:String, r:String) : CssSourcePaths = {
- SourcePaths.fromJsonResource(prefix, r) match {
-   case css : CssSourcePaths => css
-   case _ => throw new RuntimeException(s"Not the right source path type: $r")
- }
-}
+  def fromJsonResource(prefix: String, r: String): CssSourcePaths = {
+    SourcePaths.fromJsonResource(prefix, r) match {
+      case css: CssSourcePaths => css
+      case _ => throw new RuntimeException(s"Not the right source path type: $r")
+    }
+  }
 }
 
 object SourcePaths {
@@ -54,11 +54,10 @@ object SourcePaths {
       val dest = s"$prefix${(json \ "dest").as[String]}"
       val otherLibs = (json \ "libs").as[Seq[String]].map(prefixModule)
 
-      (json \ "ngModules").asOpt[Seq[String]].map{ ngModules =>
+      (json \ "ngModules").asOpt[Seq[String]].map { ngModules =>
         NgSourcePaths(src, dest, otherLibs, ngModules)
       }.getOrElse(
-          CssSourcePaths(src, dest, otherLibs)
-        )
+        CssSourcePaths(src, dest, otherLibs))
     }.getOrElse(throw new RuntimeException(s"Error reading src paths: $r"))
   }
 }

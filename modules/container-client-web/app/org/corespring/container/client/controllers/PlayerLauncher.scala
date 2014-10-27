@@ -40,7 +40,7 @@ trait PlayerLauncher extends Controller {
     }
   }
 
-  import org.corespring.container.client.controllers.apps.routes.{ Editor, Player}
+  import org.corespring.container.client.controllers.apps.routes.{ Editor, Player }
 
   val SecureMode = "corespring.player.secure"
 
@@ -87,7 +87,6 @@ trait PlayerLauncher extends Controller {
     hooks.playerJs.map { implicit js =>
 
       val sessionIdPlayerUrl = s"${Player.load(":id").url}?${request.rawQueryString}"
-
 
       val rootUrl = playerConfig.rootUrl.getOrElse(BaseUrl(request))
 
@@ -183,8 +182,7 @@ trait PlayerLauncher extends Controller {
   private def errorsToModule(errors: Seq[String]): String = msgToModule(errors, "errors")
   private def warningsToModule(warnings: Seq[String]): String = msgToModule(warnings, "warnings")
 
-
-  private def msgToModule(msgs: Seq[String], msgType:String): String = {
+  private def msgToModule(msgs: Seq[String], msgType: String): String = {
     val cleaned = msgs.map(StringEscapeUtils.escapeEcmaScript)
 
     s"""

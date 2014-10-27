@@ -5,10 +5,10 @@ import org.corespring.container.client.controllers.jade.Jade
 import org.corespring.container.client.hooks.CatalogHooks
 import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.client.views.txt.js.CatalogServices
-import play.api.libs.json.{JsArray, JsString, JsValue, Json}
-import play.api.mvc.{Action, AnyContent}
+import play.api.libs.json.{ JsArray, JsString, JsValue, Json }
+import play.api.mvc.{ Action, AnyContent }
 
-import scala.concurrent.{Future}
+import scala.concurrent.{ Future }
 
 trait Catalog
   extends AllItemTypesReader
@@ -52,10 +52,7 @@ trait Catalog
                 domainResolvedJs,
                 domainResolvedCss,
                 jsSrc.ngModules ++ scriptInfo.ngDependencies,
-                servicesJs
-              )
-            )
-          )
+                servicesJs)))
         }
 
         def onError(sm: StatusMessage) = {

@@ -2,7 +2,7 @@ package org.corespring.shell.controllers
 
 import scala.concurrent.Future
 
-import org.corespring.container.client.hooks.{DataQueryHooks => ContainerDataQueryHooks}
+import org.corespring.container.client.hooks.{ DataQueryHooks => ContainerDataQueryHooks }
 import org.corespring.shell.controllers.data._
 import org.corespring.container.logging.ContainerLogger
 import play.api.libs.json._
@@ -40,9 +40,7 @@ trait ShellDataQueryHooks extends ContainerDataQueryHooks {
 
   lazy val standardsTree: Seq[JsObject] = StandardsTreeJson()
 
-
-
-  override def list(topic: String, query: Option[String])(implicit header: RequestHeader): Future[Either[(Int, String), JsArray]] = Future{
+  override def list(topic: String, query: Option[String])(implicit header: RequestHeader): Future[Either[(Int, String), JsArray]] = Future {
     logger.debug(s"list topic <$topic> query <$query>")
 
     def filterSubjects(s: JsObject) = query.map {
@@ -68,7 +66,7 @@ trait ShellDataQueryHooks extends ContainerDataQueryHooks {
     Right(out.as[JsArray])
   }
 
-  override def findOne(topic: String, id: String)(implicit header: RequestHeader): Future[Either[(Int, String), Option[JsValue]]] = Future{
+  override def findOne(topic: String, id: String)(implicit header: RequestHeader): Future[Either[(Int, String), Option[JsValue]]] = Future {
 
     def filter(o: JsObject) = (o \ "id").asOpt[String].map(_ == id).getOrElse(false)
 

@@ -5,7 +5,7 @@ import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.client.hooks._
 import org.corespring.container.client.controllers.helpers.XhtmlCleaner
 import org.corespring.container.logging.ContainerLogger
-import play.api.libs.json.{JsUndefined, JsObject, JsValue, Json}
+import play.api.libs.json.{ JsUndefined, JsObject, JsValue, Json }
 import play.api.mvc._
 
 import scala.concurrent.{ ExecutionContext, Future }
@@ -39,13 +39,13 @@ trait Item extends Controller with XhtmlCleaner {
       }
   }
 
-  def cleanUpRawItemJson(rawItem:JsValue):JsValue = {
+  def cleanUpRawItemJson(rawItem: JsValue): JsValue = {
     val itemJson = rawItem.as[JsObject]
 
     def addItemIdAndRemoveDbGarbage = (itemJson \ "_id" \ "$oid").asOpt[String]
-      .fold(rawItem) (itemId => itemJson - "_id" ++ Json.obj("itemId" -> Json.toJson(itemId)))
+      .fold(rawItem)(itemId => itemJson - "_id" ++ Json.obj("itemId" -> Json.toJson(itemId)))
 
-    (itemJson \ "itemId").asOpt[String].fold(addItemIdAndRemoveDbGarbage) (_ => rawItem)
+    (itemJson \ "itemId").asOpt[String].fold(addItemIdAndRemoveDbGarbage)(_ => rawItem)
   }
 
   def load(itemId: String) = Action.async {

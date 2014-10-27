@@ -9,7 +9,7 @@ import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.components.model.Id
 import org.corespring.container.components.model.dependencies.DependencyResolver
 import play.api.Mode.Mode
-import play.api.{Mode}
+import play.api.{ Mode }
 import play.api.http.ContentTypes
 import play.api.libs.json.{ JsValue, Json }
 import play.api.mvc._
@@ -20,7 +20,7 @@ import scala.concurrent.ExecutionContext
 case class ComponentScriptInfo(jsUrl: Option[String], cssUrl: Option[String], ngDependencies: Seq[String])
 
 trait HasLogger {
-  def logger : Logger
+  def logger: Logger
 }
 
 trait App[T <: ClientHooks]
@@ -29,14 +29,14 @@ trait App[T <: ClientHooks]
   with XhtmlProcessor
   with Helpers
   with LoadClientSideDependencies
-  with HasLogger{
+  with HasLogger {
   self: ItemTypeReader =>
 
-  def mode : Mode
+  def mode: Mode
 
   override lazy val logger = ContainerLogger.getLogger(context)
 
-  def showErrorInUi(implicit rh : RequestHeader): Boolean = jsMode(rh) == "dev"
+  def showErrorInUi(implicit rh: RequestHeader): Boolean = jsMode(rh) == "dev"
 
   implicit def ec: ExecutionContext
 
@@ -95,19 +95,19 @@ trait App[T <: ClientHooks]
     }
   }
 
-  protected def buildJs(scriptInfo : ComponentScriptInfo,
-                        extras : Seq[String] = Seq.empty)(implicit rh : RequestHeader) = {
+  protected def buildJs(scriptInfo: ComponentScriptInfo,
+    extras: Seq[String] = Seq.empty)(implicit rh: RequestHeader) = {
     val mainJs = paths(jsSrc)
     val js = mainJs ++ jsSrc.otherLibs ++ scriptInfo.jsUrl.toSeq ++ extras
     js.distinct.map(resolvePath)
   }
 
-  protected def buildCss(scriptInfo: ComponentScriptInfo)(implicit rh : RequestHeader) = {
+  protected def buildCss(scriptInfo: ComponentScriptInfo)(implicit rh: RequestHeader) = {
     val css = paths(cssSrc) ++ cssSrc.otherLibs ++ scriptInfo.cssUrl.toSeq
     css.map(resolvePath)
   }
 
-  protected def componentScriptInfo(components:Seq[String]): ComponentScriptInfo = {
+  protected def componentScriptInfo(components: Seq[String]): ComponentScriptInfo = {
 
     val typeIds = components.map {
       t =>
@@ -128,10 +128,10 @@ trait App[T <: ClientHooks]
   def resolveDomain(path: String): String = path
 
   /** Read in the src report from the client side build */
-  lazy val loadedJsSrc : NgSourcePaths = NgSourcePaths.fromJsonResource(modulePath, s"container-client/$context-js-report.json")
+  lazy val loadedJsSrc: NgSourcePaths = NgSourcePaths.fromJsonResource(modulePath, s"container-client/$context-js-report.json")
 
   def jsSrc: NgSourcePaths = {
-    if(mode == Mode.Dev) {
+    if (mode == Mode.Dev) {
       NgSourcePaths.fromJsonResource(modulePath, s"container-client/$context-js-report.json")
     } else {
       loadedJsSrc

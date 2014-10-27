@@ -6,14 +6,14 @@ import org.corespring.container.client.controllers.jade.Jade
 import org.corespring.container.client.hooks.PlayerHooks
 import org.corespring.container.client.views.txt.js.PlayerServices
 import org.corespring.container.components.processing.PlayerItemPreProcessor
-import play.api.libs.json.{Json}
-import play.api.mvc.{Action, AnyContent, RequestHeader}
-import play.api.libs.json.{JsObject, Json}
+import play.api.libs.json.{ Json }
+import play.api.mvc.{ Action, AnyContent, RequestHeader }
+import play.api.libs.json.{ JsObject, Json }
 
 trait Player
   extends App[PlayerHooks]
   with PlayerItemTypeReader
-  with Jade{
+  with Jade {
 
   /**
    * Preprocess the xml so that it'll work in all browsers
@@ -62,7 +62,7 @@ trait Player
 
         val scriptInfo = componentScriptInfo(componentTypes(itemJson))
         val controlsJs = if (showControls) paths(controlsJsSrc) else Seq.empty
-        val domainResolvedJs = buildJs(scriptInfo, controlsJs )
+        val domainResolvedJs = buildJs(scriptInfo, controlsJs)
         val domainResolvedCss = buildCss(scriptInfo)
 
         val processedXhtml = processXhtml((itemJson \ "xhtml").asOpt[String])
@@ -81,9 +81,7 @@ trait Player
               servicesJs,
               showControls,
               Json.obj("session" -> session, "item" -> preprocessedItem),
-              VersionInfo.json
-            ))
-        )
+              VersionInfo.json)))
       }
     }
   }

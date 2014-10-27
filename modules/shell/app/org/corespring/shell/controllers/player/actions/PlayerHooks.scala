@@ -2,7 +2,7 @@ package org.corespring.shell.controllers.player.actions
 
 import scala.concurrent.Future
 
-import org.corespring.container.client.hooks.{PlayerHooks => ContainerPlayerHooks}
+import org.corespring.container.client.hooks.{ PlayerHooks => ContainerPlayerHooks }
 import org.corespring.mongo.json.services.MongoService
 import play.api.libs.json._
 import play.api.mvc._
@@ -12,7 +12,7 @@ trait PlayerHooks extends ContainerPlayerHooks {
 
   import play.api.http.Status._
 
-import scalaz.Scalaz._
+  import scalaz.Scalaz._
 
   def sessionService: MongoService
 
@@ -51,12 +51,12 @@ import scalaz.Scalaz._
 
   override def loadItem(id: String)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] = load(id)
 
-  override def loadSessionAndItem(sessionId: String)(implicit header: RequestHeader): Future[Either[(Int, String), (JsValue, JsValue)]] = Future{
-    val out = for{
+  override def loadSessionAndItem(sessionId: String)(implicit header: RequestHeader): Future[Either[(Int, String), (JsValue, JsValue)]] = Future {
+    val out = for {
       session <- sessionService.load(sessionId)
       itemId <- (session \ "itemId").asOpt[String]
       item <- itemService.load(itemId)
-    } yield  (session -> item)
+    } yield (session -> item)
 
     out.map(Right(_)).getOrElse(Left(NOT_FOUND -> "Can't find item or session"))
   }

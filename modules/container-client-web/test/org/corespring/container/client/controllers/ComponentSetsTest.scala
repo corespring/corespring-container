@@ -1,7 +1,7 @@
 package org.corespring.container.client.controllers
 
 import org.corespring.container.client.component.SourceGenerator
-import org.corespring.container.components.model.{Library, Component}
+import org.corespring.container.components.model.{ Library, Component }
 import org.corespring.container.components.model.dependencies.{ DependencyResolver, ComponentMaker }
 import org.specs2.mutable.Specification
 import play.api.GlobalSettings

@@ -11,7 +11,7 @@ trait TemplateParams {
 
   def componentNgModules: Seq[String]
 
-  def ngServiceLogic:String
+  def ngServiceLogic: String
 
   def toJadeParams: Map[String, Object] = {
     Map(
@@ -27,20 +27,18 @@ case class CatalogTemplateParams(appName: String,
   js: Seq[String],
   css: Seq[String],
   componentNgModules: Seq[String],
-                                  ngServiceLogic:String) extends TemplateParams
+  ngServiceLogic: String) extends TemplateParams
 
 case class EditorTemplateParams(appName: String,
   js: Seq[String],
   css: Seq[String],
   componentNgModules: Seq[String],
-  ngServiceLogic:String
-
-                                 ) extends TemplateParams
+  ngServiceLogic: String) extends TemplateParams
 
 case class RigTemplateParams(appName: String,
-                                js: Seq[String],
-                                css: Seq[String],
-                                componentNgModules: Seq[String] ) extends TemplateParams{
+  js: Seq[String],
+  css: Seq[String],
+  componentNgModules: Seq[String]) extends TemplateParams {
   override def ngServiceLogic: String = ""
 }
 
@@ -49,8 +47,8 @@ case class PlayerTemplateParams(
   js: Seq[String],
   css: Seq[String],
   componentNgModules: Seq[String],
-ngServiceLogic:String,
-showControls: Boolean,
+  ngServiceLogic: String,
+  showControls: Boolean,
   sessionJson: JsValue,
   versionInfo: JsValue) extends TemplateParams {
   override def toJadeParams = {

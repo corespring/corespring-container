@@ -5,8 +5,7 @@ import org.corespring.container.components.model.dependencies.ComponentMaker
 import org.specs2.mutable.Specification
 import play.api.libs.json.Json
 
-class RhinoServerLogicTest extends Specification with ComponentMaker{
-
+class RhinoServerLogicTest extends Specification with ComponentMaker {
 
   val builder = new RhinoScopeBuilder(Seq(
     uiComp("test-comp", Seq.empty).copy(server = Server(
@@ -14,8 +13,7 @@ class RhinoServerLogicTest extends Specification with ComponentMaker{
         |exports.respond = function(question, answer, settings){
         |  return { correctness: 'correct' };
         |}
-      """.stripMargin))
-  ))
+      """.stripMargin))))
 
   val serverLogic = new RhinoServerLogic("org-test-comp", builder.scope)
 

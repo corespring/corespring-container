@@ -1,7 +1,7 @@
 package org.corespring.container.components.loader
 
 import org.specs2.mutable.Specification
-import org.corespring.container.components.model.{Widget, Interaction, LayoutComponent, Library}
+import org.corespring.container.components.model.{ Widget, Interaction, LayoutComponent, Library }
 
 class FileComponentLoaderTest extends Specification {
 
@@ -80,7 +80,7 @@ class FileComponentLoaderTest extends Specification {
       val comp = loader.all(0)
 
       comp match {
-        case Widget(org, name, client, _, _, _, _,_,_,_) => {
+        case Widget(org, name, client, _, _, _, _, _, _, _) => {
           org === "corespring"
           name === "widget"
           success

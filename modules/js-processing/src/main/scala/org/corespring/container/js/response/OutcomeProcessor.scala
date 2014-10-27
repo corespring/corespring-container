@@ -1,8 +1,8 @@
 package org.corespring.container.js.response
 
-import org.corespring.container.components.model.dependencies.{ComponentSplitter, DependencyResolver}
-import org.corespring.container.components.model.{Component, Interaction, Library}
-import org.corespring.container.components.response.{OutcomeProcessor => ContainerOutcomeProcessor}
+import org.corespring.container.components.model.dependencies.{ ComponentSplitter, DependencyResolver }
+import org.corespring.container.components.model.{ Component, Interaction, Library }
+import org.corespring.container.components.response.{ OutcomeProcessor => ContainerOutcomeProcessor }
 import org.corespring.container.js.api.GetServerLogic
 import play.api.libs.json._
 import org.corespring.container.logging.ContainerLogger

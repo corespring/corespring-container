@@ -38,7 +38,7 @@ class ItemTypeReaderTest extends Specification with ComponentMaker with Mockito 
 
   class withReader(comps: Component*) extends Scope {
 
-    implicit val r : RequestHeader = FakeRequest("", "")
+    implicit val r: RequestHeader = FakeRequest("", "")
     val reader = new PlayerItemTypeReader with HasLogger {
       override def components: Seq[Component] = comps
 

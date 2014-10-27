@@ -8,17 +8,16 @@ import grizzled.slf4j.Logger
 import org.apache.commons.io.IOUtils
 import org.corespring.container.client.controllers.apps.TemplateParams
 import play.api.Mode.Mode
-import play.api.{Mode, Play}
+import play.api.{ Mode, Play }
 import play.api.templates.Html
-
 
 import scala.collection.mutable
 
 trait Jade {
 
-  def logger : Logger
+  def logger: Logger
 
-  def mode : Mode
+  def mode: Mode
 
   import play.api.Play.current
 
@@ -28,7 +27,7 @@ trait Jade {
 
   private class InternalTemplateLoader(val root: String) extends TemplateLoader {
 
-    private def toPath(name:String) = s"$root/$name.jade"
+    private def toPath(name: String) = s"$root/$name.jade"
 
     override def getLastModified(name: String): Long = Play.resource(toPath(name)).map { url =>
       url.openConnection().getLastModified

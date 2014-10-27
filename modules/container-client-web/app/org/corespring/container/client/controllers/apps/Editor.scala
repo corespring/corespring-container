@@ -8,15 +8,15 @@ import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.client.views.txt.js.EditorServices
 import org.corespring.container.components.model.ComponentInfo
 import play.api.libs.json._
-import play.api.mvc.{Action, AnyContent, SimpleResult}
+import play.api.mvc.{ Action, AnyContent, SimpleResult }
 
 trait Editor
   extends AllItemTypesReader
   with App[EditorHooks]
   with JsonHelper
-  with Jade{
+  with Jade {
 
-  import org.corespring.container.client.controllers.resources.{routes => resourceRoutes}
+  import org.corespring.container.client.controllers.resources.{ routes => resourceRoutes }
 
   override def context: String = "editor"
 
@@ -73,12 +73,10 @@ trait Editor
           domainResolvedJs,
           domainResolvedCss,
           jsSrc.ngModules ++ scriptInfo.ngDependencies,
-          servicesJs
-        ))
-      )
+          servicesJs)))
     }
 
-    hooks.loadItem(itemId).map { e => e.fold(onError, onItem)}
+    hooks.loadItem(itemId).map { e => e.fold(onError, onItem) }
   }
 
 }
