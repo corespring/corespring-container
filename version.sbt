@@ -1,1 +1,1 @@
-version in ThisBuild := "0.12.0-render-fixes-SNAPSHOT"
+version in ThisBuild := "0.11.0-render-fixes-SNAPSHOT"
