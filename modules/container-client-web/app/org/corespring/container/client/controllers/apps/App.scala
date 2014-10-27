@@ -8,7 +8,8 @@ import org.corespring.container.client.hooks.ClientHooks
 import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.components.model.Id
 import org.corespring.container.components.model.dependencies.DependencyResolver
-import play.api.{Mode, Play}
+import play.api.Mode.Mode
+import play.api.{Mode}
 import play.api.http.ContentTypes
 import play.api.libs.json.{ JsValue, Json }
 import play.api.mvc._
@@ -30,6 +31,8 @@ trait App[T <: ClientHooks]
   with LoadClientSideDependencies
   with HasLogger{
   self: ItemTypeReader =>
+
+  def mode : Mode
 
   override lazy val logger = ContainerLogger.getLogger(context)
 
@@ -80,7 +83,7 @@ trait App[T <: ClientHooks]
   def servicesJs: String
 
   protected def jsMode(implicit r: RequestHeader): String = {
-    r.getQueryString("mode").getOrElse(Play.current.mode.toString.toLowerCase)
+    r.getQueryString("mode").getOrElse(mode.toString.toLowerCase)
   }
 
   protected def paths(d: SourcePaths)(implicit r: RequestHeader) = jsMode match {
@@ -128,7 +131,7 @@ trait App[T <: ClientHooks]
   lazy val loadedJsSrc : NgSourcePaths = NgSourcePaths.fromJsonResource(modulePath, s"container-client/$context-js-report.json")
 
   def jsSrc: NgSourcePaths = {
-    if(Play.current.mode == Mode.Dev) {
+    if(mode == Mode.Dev) {
       NgSourcePaths.fromJsonResource(modulePath, s"container-client/$context-js-report.json")
     } else {
       loadedJsSrc

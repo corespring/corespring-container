@@ -7,6 +7,7 @@ import de.neuland.jade4j.{ Jade4J, JadeConfiguration }
 import grizzled.slf4j.Logger
 import org.apache.commons.io.IOUtils
 import org.corespring.container.client.controllers.apps.TemplateParams
+import play.api.Mode.Mode
 import play.api.{Mode, Play}
 import play.api.templates.Html
 
@@ -17,6 +18,8 @@ trait Jade {
 
   def logger : Logger
 
+  def mode : Mode
+
   import play.api.Play.current
 
   private val templates: mutable.Map[String, JadeTemplate] = mutable.Map()
@@ -24,8 +27,6 @@ trait Jade {
   private val readers: mutable.Stack[Reader] = new mutable.Stack[Reader]()
 
   private class InternalTemplateLoader(val root: String) extends TemplateLoader {
-
-    import play.api.Play.current
 
     private def toPath(name:String) = s"$root/$name.jade"
 
@@ -44,7 +45,7 @@ trait Jade {
     val c = new JadeConfiguration
     c.setTemplateLoader(new InternalTemplateLoader("container-client"))
     c.setMode(Jade4J.Mode.HTML)
-    c.setPrettyPrint(Play.mode == Mode.Dev)
+    c.setPrettyPrint(mode == Mode.Dev)
     c
   }
 
@@ -61,7 +62,7 @@ trait Jade {
       out
     }
 
-    if (current.mode == Mode.Dev) {
+    if (mode == Mode.Dev) {
       jadeConfig.clearCache()
       readIn
     } else templates.get(name).getOrElse { readIn }

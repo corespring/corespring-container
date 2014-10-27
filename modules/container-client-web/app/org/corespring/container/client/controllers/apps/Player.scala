@@ -8,7 +8,7 @@ import org.corespring.container.client.views.txt.js.PlayerServices
 import org.corespring.container.components.processing.PlayerItemPreProcessor
 import play.api.libs.json.{Json}
 import play.api.mvc.{Action, AnyContent, RequestHeader}
-import play.api.libs.json.{JsObject, JsValue, Json}
+import play.api.libs.json.{JsObject, Json}
 
 trait Player
   extends App[PlayerHooks]
@@ -47,6 +47,9 @@ trait Player
    *
    * showControls=true|false (default: false)
    * - show simple player controls (for devs)
+   *
+   * loggingEnabled=true|false (default: false)
+   * - implemented in the jade - whether to allow ng logging.
    *
    * @param sessionId
    * @return
