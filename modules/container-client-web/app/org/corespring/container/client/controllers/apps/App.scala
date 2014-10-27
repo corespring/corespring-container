@@ -69,7 +69,6 @@ trait App[T <: ClientHooks]
       "component-sets/",
       "editor",
       "prod-player",
-      "player-services.js",
       "player.min").exists(s.contains)
     if (needsResolution) resolveDomain(s) else s
   }

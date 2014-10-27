@@ -11,7 +11,7 @@ exports.js =
   ###
   The output for the concatted js
   ###
-  dest: 'js/player-prod-new.js'
+  dest: 'js/player-prod.js'
   ###
   Any other js file that should be added to the player, but not concatted
   ###
