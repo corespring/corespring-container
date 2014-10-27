@@ -4,7 +4,6 @@ import scala.concurrent.Future
 
 import org.corespring.container.client.hooks.{PlayerHooks => ContainerPlayerHooks}
 import org.corespring.mongo.json.services.MongoService
-import org.corespring.shell.SessionKeys
 import play.api.libs.json._
 import play.api.mvc._
 import scalaz.Validation
