@@ -11,36 +11,46 @@ trait TemplateParams {
 
   def componentNgModules: Seq[String]
 
+  def ngServiceLogic:String
+
   def toJadeParams: Map[String, Object] = {
     Map(
       "appName" -> appName,
       "js" -> js.toArray,
       "css" -> css.toArray,
-      "componentNgModules" -> s"${componentNgModules.map { m => s"'$m'" }.mkString(",")}")
+      "componentNgModules" -> s"${componentNgModules.map { m => s"'$m'" }.mkString(",")}",
+      "ngServiceLogic" -> ngServiceLogic)
   }
 }
 
 case class CatalogTemplateParams(appName: String,
   js: Seq[String],
   css: Seq[String],
-  componentNgModules: Seq[String]) extends TemplateParams
+  componentNgModules: Seq[String],
+                                  ngServiceLogic:String) extends TemplateParams
 
 case class EditorTemplateParams(appName: String,
   js: Seq[String],
   css: Seq[String],
-  componentNgModules: Seq[String]) extends TemplateParams
+  componentNgModules: Seq[String],
+  ngServiceLogic:String
+
+                                 ) extends TemplateParams
 
 case class RigTemplateParams(appName: String,
                                 js: Seq[String],
                                 css: Seq[String],
-                                componentNgModules: Seq[String]) extends TemplateParams
+                                componentNgModules: Seq[String] ) extends TemplateParams{
+  override def ngServiceLogic: String = ""
+}
 
 case class PlayerTemplateParams(
   appName: String,
   js: Seq[String],
   css: Seq[String],
   componentNgModules: Seq[String],
-  showControls: Boolean,
+ngServiceLogic:String,
+showControls: Boolean,
   sessionJson: JsValue,
   versionInfo: JsValue) extends TemplateParams {
   override def toJadeParams = {

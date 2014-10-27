@@ -35,8 +35,6 @@ trait Player
 
   def itemPreProcessor: PlayerItemPreProcessor
 
-  override def additionalScripts: Seq[String] = Seq(org.corespring.container.client.controllers.apps.routes.Player.services().url)
-
   private def showControls(implicit r: RequestHeader): Boolean = {
     r.getQueryString("showControls").map(_ == "true").getOrElse(false)
   }
@@ -77,6 +75,7 @@ trait Player
               domainResolvedJs,
               domainResolvedCss,
               jsSrc.ngModules ++ scriptInfo.ngDependencies,
+              servicesJs,
               showControls,
               Json.obj("session" -> session, "item" -> preprocessedItem),
               VersionInfo.json

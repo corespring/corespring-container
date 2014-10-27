@@ -12,10 +12,9 @@ GET           /libs/:orgName/:componentName/*file                    @org.coresp
 # Component sets js/css
 GET           /component-sets/:context/:directive.:suffix            @org.corespring.container.client.controllers.ComponentSets.resource(context, directive, suffix)
 
-# Hooks for the player: config, services + components
+# Hooks for the player: config,  components
 
 GET           /player/session/:sessionId/index.html                  @org.corespring.container.client.controllers.apps.Player.load(sessionId:String)
-GET           /player/player-services.js                             @org.corespring.container.client.controllers.apps.Player.services
 GET           /player/item/:itemId/index.html                        @org.corespring.container.client.controllers.apps.Player.createSessionForItem(itemId:String)
 
 # Session
@@ -46,10 +45,8 @@ GET          /rig/:componentType/*file                              @org.corespr
 
 # Catalog
 GET           /catalog/:itemId/index.html                          @org.corespring.container.client.controllers.apps.Catalog.load(itemId)
-GET           /catalog/catalog-services.js                           @org.corespring.container.client.controllers.apps.Catalog.services
 
-# Editor: config, services + components
-GET           /editor/editor-services.js                             @org.corespring.container.client.controllers.apps.Editor.services
+# Editor: config, components
 GET           /editor/:itemId/index.html                             @org.corespring.container.client.controllers.apps.Editor.load(itemId)
 GET           /editor/:itemId/supporting-material/:name/*file        @org.corespring.container.client.controllers.Assets.supportingMaterial(itemId, name, file)
 GET           /editor/:itemId/*file                                  @org.corespring.container.client.controllers.Assets.item(itemId, file)

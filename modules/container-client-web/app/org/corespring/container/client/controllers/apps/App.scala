@@ -45,8 +45,6 @@ trait App[T <: ClientHooks]
 
   def hooks: T
 
-  def additionalScripts: Seq[String]
-
   def handleSuccess[D](fn: (D) => SimpleResult)(e: Either[StatusMessage, D]): SimpleResult = {
     e match {
       case Left((code, msg)) => Status(code)(msg)
@@ -97,7 +95,7 @@ trait App[T <: ClientHooks]
   protected def buildJs(scriptInfo : ComponentScriptInfo,
                         extras : Seq[String] = Seq.empty)(implicit rh : RequestHeader) = {
     val mainJs = paths(jsSrc)
-    val js = mainJs ++ jsSrc.otherLibs ++ additionalScripts ++ scriptInfo.jsUrl.toSeq ++ extras
+    val js = mainJs ++ jsSrc.otherLibs ++ scriptInfo.jsUrl.toSeq ++ extras
     js.distinct.map(resolvePath)
   }
 

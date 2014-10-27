@@ -39,8 +39,6 @@ trait Rig
 
   override def context: String = "rig"
 
-  override def additionalScripts: Seq[String] = Seq.empty
-
   override def hooks: ClientHooks = new ClientHooks {
 
     override implicit def ec: ExecutionContext = ExecutionContext.Implicits.global
@@ -60,7 +58,12 @@ trait Rig
     val css = buildCss(scriptInfo)
 
     Future(
-      Ok(renderJade(RigTemplateParams(context, js, css, jsSrc.ngModules ++ scriptInfo.ngDependencies)))
+      Ok(renderJade(
+        RigTemplateParams(
+          context,
+          js,
+          css,
+          jsSrc.ngModules ++ scriptInfo.ngDependencies)))
     )
   }
 

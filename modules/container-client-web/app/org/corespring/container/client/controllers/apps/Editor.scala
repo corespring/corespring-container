@@ -40,7 +40,7 @@ trait Editor
       "configuration" -> (ci.packageInfo \ "external-configuration").asOpt[JsObject])
   }
 
-  override def servicesJs = {
+  override val servicesJs = {
 
     val componentJson: Seq[JsValue] = interactions.map(toJson)
     val widgetJson: Seq[JsValue] = widgets.map(toJson)
@@ -52,8 +52,6 @@ trait Editor
       JsArray(componentJson),
       JsArray(widgetJson)).toString
   }
-
-  override def additionalScripts: Seq[String] = Seq(appRoutes.Editor.services().url)
 
   override def load(itemId: String): Action[AnyContent] = Action.async { implicit request =>
 
@@ -76,7 +74,9 @@ trait Editor
           context,
           domainResolvedJs,
           domainResolvedCss,
-          jsSrc.ngModules ++ scriptInfo.ngDependencies))
+          jsSrc.ngModules ++ scriptInfo.ngDependencies,
+          servicesJs
+        ))
       )
     }
 
