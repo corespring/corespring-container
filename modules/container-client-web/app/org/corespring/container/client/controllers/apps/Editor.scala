@@ -17,8 +17,6 @@ trait Editor
   with Jade{
 
   import org.corespring.container.client.controllers.resources.{routes => resourceRoutes}
-  import org.corespring.container.client.controllers.apps.{routes => appRoutes}
-
 
   override def context: String = "editor"
 

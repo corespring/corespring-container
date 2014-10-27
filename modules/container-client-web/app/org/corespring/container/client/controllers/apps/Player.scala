@@ -85,12 +85,6 @@ trait Player
     }
   }
 
-  //TODO: CA-2186 - catalog + rig support
-  //TODO: CA-2186 - clean up grunt
-  //TODO: CA-2186 - set up other build items
-  //TODO: CA-2186 - remove old parts of the api
-
-
   def createSessionForItem(itemId: String): Action[AnyContent] = Action.async { implicit request =>
     hooks.createSessionForItem(itemId).map(handleSuccess { sessionId =>
       val call = org.corespring.container.client.controllers.apps.routes.Player.load(sessionId)

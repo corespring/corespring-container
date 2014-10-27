@@ -50,11 +50,6 @@ import scalaz.Scalaz._
     }.getOrElse(Left(BAD_REQUEST -> "Error creating session"))
   }
 
-  override def loadPlayerForSession(sessionId: String)(implicit header: RequestHeader): Future[Option[(Int, String)]] = Future {
-    val s = header.session.get(SessionKeys.failLoadPlayer)
-    s.map(_ => 1001 -> "Some error occured")
-  }
-
   override def loadItem(id: String)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] = load(id)
 
   override def loadSessionAndItem(sessionId: String)(implicit header: RequestHeader): Future[Either[(Int, String), (JsValue, JsValue)]] = Future{
