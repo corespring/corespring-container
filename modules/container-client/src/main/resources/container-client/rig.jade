@@ -18,7 +18,7 @@ block content
         ui-ace="{useWrapMode : true, onLoad: aceLoaded, onChange: aceChanged }")
       //#preview-pane(inline-preview, ng-model="model.item.xhtml")
 
-      #preview-pane(corespring-player,
+      #preview-pane(corespring-rig-player,
         player-markup="model.item.xhtml",
         player-item="model.item",
         player-session="model.session",
@@ -36,17 +36,20 @@ block scripts
   script(src="../../js/render/services/server-logic.js")
   script(src="../../js/render/controllers/_declaration.js")
   script(src="../../js/render/controllers/client-side-preview.js")
-  script(src="../../js/render/controllers/container-player-controls.js")
+  //script(src="../../js/render/controllers/container-player-controls.js")
   script(src="../../js/render/controllers/main.js")
   script(src="../../js/render/controllers/root.js")
   script(src="../../js/rig/controllers/_declaration.js")
   script(src="../../js/rig/controllers/root.js")
+  script(src="../../js/rig/directives/_declaration.js")
+  script(src="../../js/rig/directives/corespring-rig-player.js")
   script(src="../../js/common/services/_declaration.js")
   script(src="../../js/common/services/math-service.js")
   script(src="../../js/render/directives/_declaration.js")
-  script(src="../../js/render/directives/control-panel.js")
+  script(src="../../js/render/directives/player-control-panel.js")
   script(src="../../js/render/directives/corespring-player.js")
   script(src="../../js/render/directives/dimension-propagator.js")
+
   //endbuild
 
   //build:js js/extras.js
@@ -86,6 +89,7 @@ block scripts
           //$("#player-body").html(data.xhtml);
 
           var playerDeps = [
+            'corespring-rig.directives',
             'corespring-rig.controllers',
             'corespring-player.services',
             'corespring-player.directives',
