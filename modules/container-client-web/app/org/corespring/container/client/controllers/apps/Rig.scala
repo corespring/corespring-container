@@ -1,16 +1,21 @@
 package org.corespring.container.client.controllers.apps
 
+import org.corespring.container.client.controllers.jade.Jade
+
+import scala.concurrent.{ ExecutionContext, Future }
+
 import org.corespring.container.client.component.PlayerItemTypeReader
 import org.corespring.container.client.controllers.angular.AngularModules
 import org.corespring.container.client.hooks.ClientHooks
 import org.corespring.container.client.hooks.Hooks.StatusMessage
-import org.corespring.container.components.model.{ ComponentInfo, Interaction }
+import org.corespring.container.components.model.ComponentInfo
 import play.api.libs.json.{ JsValue, Json }
-import play.api.mvc.{ SimpleResult, Action, RequestHeader }
+import play.api.mvc.{ Action, AnyContent, RequestHeader }
 
-import scala.concurrent.{ ExecutionContext, Future }
-
-trait Rig extends AppWithConfig[ClientHooks] with PlayerItemTypeReader {
+trait Rig
+  extends App[ClientHooks]
+  with PlayerItemTypeReader
+  with Jade {
 
   def index(componentType: String, data: Option[String] = None) = controllers.Assets.at("/container-client", s"rig.html")
 
@@ -34,8 +39,6 @@ trait Rig extends AppWithConfig[ClientHooks] with PlayerItemTypeReader {
 
   override def context: String = "rig"
 
-  override def additionalScripts: Seq[String] = Seq.empty
-
   override def hooks: ClientHooks = new ClientHooks {
 
     override implicit def ec: ExecutionContext = ExecutionContext.Implicits.global
@@ -49,4 +52,19 @@ trait Rig extends AppWithConfig[ClientHooks] with PlayerItemTypeReader {
 
   override def ngModules: AngularModules = new AngularModules()
 
+  override def load(componentType: String): Action[AnyContent] = Action.async { implicit request =>
+    val scriptInfo = componentScriptInfo(Seq(componentType))
+    val js = buildJs(scriptInfo)
+    val css = buildCss(scriptInfo)
+
+    Future(
+      Ok(renderJade(
+        RigTemplateParams(
+          context,
+          js,
+          css,
+          jsSrc.ngModules ++ scriptInfo.ngDependencies))))
+  }
+
+  override def servicesJs: String = ""
 }

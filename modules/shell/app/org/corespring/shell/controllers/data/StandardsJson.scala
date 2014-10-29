@@ -1,7 +1,6 @@
 package org.corespring.shell.controllers.data
 
-import play.api.libs.json.{JsObject, Json}
-
+import play.api.libs.json.{ JsObject, Json }
 
 object StandardsJson {
 
@@ -87,6 +86,5 @@ object StandardsJson {
       |,{"id":"50bca86f30047de5a0f50853","category":"English Language Arts Standards » Writing","dotNotation":"WHST.6-8.2b","guid":"882415FF81EC4000B1BD1730DBD4FD83","standard":"Develop the topic with relevant, well-chosen facts, definitions, concrete details, quotations, or other information and examples.","subCategory":"Text Types and Purposes","subject":"ELA-Literacy","uri":"http://corestandards.org/ELA-Literacy/WHST/6-8/2/b/","source":"HtmlParsed","grades":["06","07","08"]}
       |,{"id":"50bca86f30047de5a0f50867","category":"English Language Arts Standards » Writing","dotNotation":"WHST.11-12.1e","guid":"B42F4ABBDB544d138E4CAB09B582CF80","standard":"Provide a concluding statement or section that follows from or supports the argument presented.","subCategory":"Text Types and Purposes","subject":"ELA-Literacy","uri":"http://corestandards.org/ELA-Literacy/WHST/11-12/1/e/","source":"HtmlParsed","grades":["11","12"]}
       |]
-    """.stripMargin
-  )
+    """.stripMargin)
 }

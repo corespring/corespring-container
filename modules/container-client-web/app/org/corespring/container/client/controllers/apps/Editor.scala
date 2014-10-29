@@ -1,26 +1,22 @@
 package org.corespring.container.client.controllers.apps
 
+import org.corespring.container.client.component.AllItemTypesReader
+import org.corespring.container.client.controllers.helpers.JsonHelper
+import org.corespring.container.client.controllers.jade.Jade
 import org.corespring.container.client.hooks.EditorHooks
 import org.corespring.container.client.hooks.Hooks.StatusMessage
-import org.corespring.container.client.component.AllItemTypesReader
 import org.corespring.container.client.views.txt.js.EditorServices
 import org.corespring.container.components.model.ComponentInfo
-import play.api.Logger
 import play.api.libs.json._
-import play.api.mvc.{ SimpleResult, Action, AnyContent }
-
-import scala.concurrent.Future
-import org.corespring.container.client.controllers.helpers.JsonHelper
+import play.api.mvc.{ Action, AnyContent, SimpleResult }
 
 trait Editor
   extends AllItemTypesReader
-  with AppWithServices[EditorHooks]
-  with JsModeReading
-  with JsonHelper {
+  with App[EditorHooks]
+  with JsonHelper
+  with Jade {
 
-  override def loggerName = "container.app.editor"
-
-  def showErrorInUi : Boolean
+  import org.corespring.container.client.controllers.resources.{ routes => resourceRoutes }
 
   override def context: String = "editor"
 
@@ -39,46 +35,48 @@ trait Editor
       }),
       "componentType" -> Some(JsString(tag)),
       "defaultData" -> Some(ci.defaultData),
-      "configuration" -> (ci.packageInfo \ "external-configuration").asOpt[JsObject]
-    )
+      "configuration" -> (ci.packageInfo \ "external-configuration").asOpt[JsObject])
   }
 
-  override def servicesJs = {
-    import org.corespring.container.client.controllers.resources.routes._
+  override val servicesJs = {
 
     val componentJson: Seq[JsValue] = interactions.map(toJson)
     val widgetJson: Seq[JsValue] = widgets.map(toJson)
 
     EditorServices(
       "editor.services",
-      Item.load(":id"),
-      Item.save(":id"),
+      resourceRoutes.Item.load(":id"),
+      resourceRoutes.Item.save(":id"),
       JsArray(componentJson),
       JsArray(widgetJson)).toString
   }
 
-  override def additionalScripts: Seq[String] = Seq(org.corespring.container.client.controllers.apps.routes.Editor.services().url)
+  override def load(itemId: String): Action[AnyContent] = Action.async { implicit request =>
 
-  def editItem(itemId: String, jsMode: Option[String] = None): Action[AnyContent] = Action.async { implicit request =>
+    import org.corespring.container.client.views.html.error
 
     def onError(sm: StatusMessage) = {
       val (code, msg) = sm
-      Future {
-        code match {
-          case SEE_OTHER => SeeOther(msg)
-          case _ => Status(code)(org.corespring.container.client.views.html.error.main(code, msg, showErrorInUi))
-        }
+      code match {
+        case SEE_OTHER => SeeOther(msg)
+        case _ => Status(code)(error.main(code, msg, showErrorInUi))
       }
     }
 
-    def onItem(i: JsValue) = {
-      val jsMode = getJsMode(request)
-      val page = s"editor.$jsMode.html"
-      logger.trace(s"[editItem] $itemId; page $page")
-      controllers.Assets.at("/container-client", page)(request)
+    def onItem(i: JsValue): SimpleResult = {
+      val scriptInfo = componentScriptInfo(componentTypes(i))
+      val domainResolvedJs = buildJs(scriptInfo)
+      val domainResolvedCss = buildCss(scriptInfo)
+      Ok(renderJade(
+        EditorTemplateParams(
+          context,
+          domainResolvedJs,
+          domainResolvedCss,
+          jsSrc.ngModules ++ scriptInfo.ngDependencies,
+          servicesJs)))
     }
 
-    hooks.loadItem(itemId).flatMap { e => e.fold(onError, onItem) }
+    hooks.loadItem(itemId).map { e => e.fold(onError, onItem) }
   }
 
 }

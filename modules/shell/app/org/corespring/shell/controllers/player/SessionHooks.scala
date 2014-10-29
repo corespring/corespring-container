@@ -33,7 +33,7 @@ trait SessionHooks extends ContainerSessionHooks {
       logger.trace(s"[handleSessionOutcomeRequest] session: $session")
       SessionOutcome(item, session, isSecure(header), isComplete(session))
     }
-    result.map(Right(_)).getOrElse{
+    result.map(Right(_)).getOrElse {
 
       logger.trace(s"load session: ${sessionService.load(id)}")
       Left(BAD_REQUEST -> "Error handling outcome request")

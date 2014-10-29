@@ -1,6 +1,7 @@
-extends app-loader-layout
+extends layout
 
 block content
+
   .root(ng-controller="Root")
 
     .nav-container
@@ -61,7 +62,9 @@ block content
   include partials/previews/item-profile
   include partials/previews/supporting-material
 
-block app-loader-config
+//After the angular module has been created.
+block after-main-script
+
   script.
 
     function mkEditorState(path, id){
@@ -80,26 +83,6 @@ block app-loader-config
 
     var appLoadConfig = {
       moduleName: 'corespring-editor',
-      jsonFile: 'editor-config.json',
-      dependencies: [
-            'corespring-common.services',
-            'corespring-common.directives',
-            'corespring-common.supporting-materials',
-            'corespring-player.services',
-            'corespring-player.directives',
-            'corespring-player.controllers',
-            'corespring-editor.services',
-            'corespring-editor.controllers',
-            'corespring-editor.directives',
-            'ui.sortable',
-            'ui.bootstrap',
-            'ui.ace',
-            'ui.router',
-            'cs.directives',
-            'ngRoute',
-            'ui.select2',
-            'corespring.wiggi-wiz'
-          ],
       defaultPath: '/design/main',
       states: {
         design : mkEditorState('/design/:section', 'designer'),
@@ -110,12 +93,10 @@ block app-loader-config
       }
     };
 
-block app-loader-scripts
-
-  script(type="text/javascript",src="../../components/wiggi-wiz/dist/wiggi-wiz.js")
-
-  for p in editor
-    script(src="#{p}", type="text/javascript")
-
-  for p in editorExtras
-    script(src="#{p}", type="text/javascript")
+    angular.module('corespring-#{appName}').config(
+      function($provide, $stateProvider, $urlRouterProvider) {
+        $urlRouterProvider.otherwise(appLoadConfig.defaultPath);
+        for( var x in appLoadConfig.states){
+          $stateProvider.state(x, appLoadConfig.states[x]);
+        }
+      });

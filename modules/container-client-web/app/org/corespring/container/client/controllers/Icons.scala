@@ -1,7 +1,7 @@
 package org.corespring.container.client.controllers
 
 import org.corespring.container.components.model.dependencies.ComponentSplitter
-import org.corespring.container.components.model.{ComponentInfo, Widget, Interaction}
+import org.corespring.container.components.model.{ ComponentInfo, Widget, Interaction }
 import org.corespring.container.logging.ContainerLogger
 import play.api.mvc.{ Action, Controller }
 
@@ -20,7 +20,6 @@ trait Icons extends Controller with ComponentSplitter {
         logger.debug(s"matches: $matches")
         matches
       }
-
 
       val bytes: Option[Array[Byte]] =
         interactions.find(matchingComponentInfo).map(_.icon) match {

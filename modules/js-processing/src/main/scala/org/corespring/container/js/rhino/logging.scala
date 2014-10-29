@@ -26,7 +26,6 @@ class PlayJsLogger(log: Logger) extends JsLogger {
  */
 class DefaultLogger(log: Logger) extends JsConsoleImpl(new PlayJsLogger(log))
 
-
 /**
  * Expanded signatures for forms possible calls to Javascript console.log. We tried to do implement with varargs in both
  * Java and Scala, but those method signatures actually use Arrays under the hood, and those signatures do not match the
@@ -132,10 +131,10 @@ trait JsConsole {
  */
 class JsConsoleImpl(logger: JsLogger) extends JsConsole {
 
-  def logImpl(msg: String*) = logger.log(msg:_*)
-  def warnImpl(msg: String*) = logger.warn(msg:_*)
-  def infoImpl(msg: String*) = logger.info(msg:_*)
-  def debugImpl(msg: String*) = logger.debug(msg:_*)
+  def logImpl(msg: String*) = logger.log(msg: _*)
+  def warnImpl(msg: String*) = logger.warn(msg: _*)
+  def infoImpl(msg: String*) = logger.info(msg: _*)
+  def debugImpl(msg: String*) = logger.debug(msg: _*)
 
   def log(msg: String): Unit = logImpl(msg)
   def log(msg: String, msg2: String): Unit = logImpl(msg, msg2)

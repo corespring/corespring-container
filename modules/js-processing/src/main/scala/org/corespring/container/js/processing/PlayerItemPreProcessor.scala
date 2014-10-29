@@ -1,6 +1,6 @@
 package org.corespring.container.js.processing
 
-import org.corespring.container.components.processing.{PlayerItemPreProcessor => PreProcessor}
+import org.corespring.container.components.processing.{ PlayerItemPreProcessor => PreProcessor }
 import org.corespring.container.js.api.GetServerLogic
 import play.api.libs.json._
 

@@ -92,10 +92,11 @@ object Build extends sbt.Build {
          * Note: Adding a bower cache clean to workaround this issue:
          * https://github.com/bower/bower/issues/991
          * Once this is fixed we can remove this
+         * (bowerCmd, "cache clean"),
          */
-        (bowerCmd, "cache clean"),
         (bowerCmd, "install"),
-        (gruntCmd, "--devMode=false"))
+        (gruntCmd, "loadComponentDependencies"),
+        (gruntCmd, "stage"))
 
       commands.foreach {
         c =>
@@ -188,12 +189,13 @@ object Build extends sbt.Build {
         closureCompiler,
         yuiCompressor,
         commonsIo),
-      templatesImport ++= Seq("play.api.libs.json.JsValue", "play.api.libs.json.Json")).dependsOn(
-        componentModel % "compile->compile;test->test",
-        containerClient,
-        utils,
-        logging,
-        jsProcessing)
+      templatesImport ++= Seq("play.api.libs.json.JsValue", "play.api.libs.json.Json"))
+    .dependsOn(
+      componentModel % "compile->compile;test->test",
+      containerClient,
+      utils,
+      logging,
+      jsProcessing)
 
   val mongoJsonService = builder.playApp("mongo-json-service")
     .settings(playAppToSbtLibSettings: _*)
@@ -241,8 +243,8 @@ object Build extends sbt.Build {
           val clientDir = base / "modules" / "container-client"
           val componentsDir = base / "corespring-components"
           Seq(
-            cmd("grunt", "./node_modules/grunt-cli/bin/grunt", s"$clientDir\\lib\\grunt.cmd", Seq(clientDir)),
-            cmd("bower", "./node_modules/bower/bin/bower", s"$clientDir\\lib\\bower.cmd", Seq(clientDir, componentsDir)),
+            cmd("grunt", "./node_modules/grunt-cli/bin/grunt", s"$clientDir\\cmds\\grunt.cmd", Seq(clientDir)),
+            cmd("bower", "./node_modules/bower/bin/bower", s"$clientDir\\cmds\\bower.cmd", Seq(clientDir, componentsDir)),
             cmd("npm", "npm", "npm.cmd", Seq(clientDir, componentsDir)))
       })
     .dependsOn(shell)

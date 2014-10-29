@@ -28,7 +28,7 @@ module.exports = (grunt) ->
     isWindows = ->
       pltfrm = os.platform()
       isWin = /^win/.test(pltfrm) 
-      grunt.log.writeln("[isWindows] Platform #{os.platform()} #{isWin}")
+      grunt.log.debug("[isWindows] Platform #{os.platform()} #{isWin}")
       isWin
 
     # target - may be undefined (if so uses the bower default target)

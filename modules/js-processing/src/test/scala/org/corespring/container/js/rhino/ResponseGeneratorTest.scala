@@ -8,7 +8,7 @@ import org.specs2.mutable.Specification
 import play.api.libs.json.{ JsValue, Json, JsObject }
 import scala.language.dynamics
 
-class ResponseGeneratorTest extends Specification with ComponentMaker{
+class ResponseGeneratorTest extends Specification with ComponentMaker {
 
   val respondJs =
     """
@@ -42,8 +42,7 @@ class ResponseGeneratorTest extends Specification with ComponentMaker{
       val answer = Json.obj("value" -> value)
 
       val builder = new RhinoScopeBuilder(Seq(
-        uiComp("comp-type-tester", Seq.empty).copy(server = Server(respondJs))
-      ))
+        uiComp("comp-type-tester", Seq.empty).copy(server = Server(respondJs))))
 
       val serverLogic = new RhinoServerLogic("org-comp-type-tester", builder.scope)
 

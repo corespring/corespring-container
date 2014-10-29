@@ -3,29 +3,95 @@ package org.corespring.container.client.controllers.apps
 import org.corespring.container.client.VersionInfo
 import org.corespring.container.client.component.PlayerItemTypeReader
 import org.corespring.container.client.controllers.jade.Jade
-import org.corespring.container.client.controllers.player.PlayerQueryStringOptions
 import org.corespring.container.client.hooks.PlayerHooks
 import org.corespring.container.client.views.txt.js.PlayerServices
-import org.corespring.container.components.model.Id
 import org.corespring.container.components.processing.PlayerItemPreProcessor
-import play.api.libs.json.{JsObject, JsValue, Json}
-import play.api.mvc._
+import play.api.libs.json.{ JsObject, Json }
+import play.api.mvc.{ Action, AnyContent, RequestHeader }
 
-import scala.concurrent.Future
+trait Player
+  extends App[PlayerHooks]
+  with PlayerItemTypeReader
+  with Jade {
 
-trait BasePlayer
-  extends PlayerItemTypeReader
-  with AppWithServices[PlayerHooks]
-  with JsModeReading
-  with PlayerQueryStringOptions {
+  /**
+   * Preprocess the xml so that it'll work in all browsers
+   * aka: convert tagNames -> attributes for ie 8 support
+   * TODO: A layout component may have multiple elements
+   * So we need a way to get all potential component names from
+   * each component, not just assume its the top level.
+   */
+  def processXhtml(maybeXhtml: Option[String]) = maybeXhtml.map {
+    xhtml =>
+      tagNamesToAttributes(xhtml).getOrElse {
+        throw new RuntimeException(s"Error processing xhtml: $xhtml")
+      }
+  }.getOrElse("<div><h1>New Item</h1></div>")
 
-  import org.corespring.container.client.controllers.apps.routes.{ ProdHtmlPlayer, BasePlayer => PlayerRoutes }
+  lazy val controlsJsSrc: SourcePaths = SourcePaths.fromJsonResource(modulePath, s"container-client/$context-controls-js-report.json")
 
   override def context: String = "player"
 
-  override def loggerName = "container.app.player"
+  def itemPreProcessor: PlayerItemPreProcessor
 
-  def showErrorInUi: Boolean
+  private def showControls(implicit r: RequestHeader): Boolean = {
+    r.getQueryString("showControls").map(_ == "true").getOrElse(false)
+  }
+
+  /**
+   * Query params:
+   * mode=prod|dev (default: whichever way the app is run)
+   * - dev mode loads all the js as separate files
+   * - prod mode loads minified + concatenated js/css
+   *
+   * showControls=true|false (default: false)
+   * - show simple player controls (for devs)
+   *
+   * loggingEnabled=true|false (default: false)
+   * - implemented in the jade - whether to allow ng logging.
+   *
+   * @param sessionId
+   * @return
+   */
+  override def load(sessionId: String) = Action.async { implicit request =>
+    hooks.loadSessionAndItem(sessionId).map {
+
+      case Left((code, msg)) => Status(code)(Json.obj("error" -> msg))
+      case Right((session, itemJson)) => {
+
+        val scriptInfo = componentScriptInfo(componentTypes(itemJson))
+        val controlsJs = if (showControls) paths(controlsJsSrc) else Seq.empty
+        val domainResolvedJs = buildJs(scriptInfo, controlsJs)
+        val domainResolvedCss = buildCss(scriptInfo)
+
+        val processedXhtml = processXhtml((itemJson \ "xhtml").asOpt[String])
+        val preprocessedItem = itemPreProcessor.preProcessItemForPlayer(itemJson).as[JsObject] ++ Json.obj("xhtml" -> processedXhtml)
+
+        logger.trace(s"function=load domainResolvedJs=$domainResolvedJs")
+        logger.trace(s"function=load domainResolvedCss=$domainResolvedCss")
+
+        Ok(
+          renderJade(
+            PlayerTemplateParams(
+              context,
+              domainResolvedJs,
+              domainResolvedCss,
+              jsSrc.ngModules ++ scriptInfo.ngDependencies,
+              servicesJs,
+              showControls,
+              Json.obj("session" -> session, "item" -> preprocessedItem),
+              VersionInfo.json)))
+      }
+    }
+  }
+
+  def createSessionForItem(itemId: String): Action[AnyContent] = Action.async { implicit request =>
+    hooks.createSessionForItem(itemId).map(handleSuccess { sessionId =>
+      val call = org.corespring.container.client.controllers.apps.routes.Player.load(sessionId)
+      val url: String = s"${call.url}?${request.rawQueryString}"
+      SeeOther(url)
+    })
+  }
 
   override lazy val servicesJs = {
     import org.corespring.container.client.controllers.resources.routes._
@@ -38,131 +104,5 @@ trait BasePlayer
       Session.getScore(":id"),
       Session.completeSession(":id"),
       Session.loadOutcome(":id")).toString
-  }
-
-  def createSessionForItem(itemId: String): Action[AnyContent] = Action.async { implicit request =>
-    hooks.createSessionForItem(itemId).map(handleSuccess { sessionId =>
-
-      val url: String = isProdPlayer match {
-        case true => s"${ProdHtmlPlayer.config(sessionId).url}?${request.rawQueryString}"
-        case _ => s"${PlayerRoutes.loadPlayerForSession(sessionId).url}?${request.rawQueryString}"
-      }
-      SeeOther(url)
-    })
-  }
-
-  def loadPlayerForSession(sessionId: String) = Action.async { implicit request =>
-    hooks.loadPlayerForSession(sessionId).flatMap { maybeError =>
-
-      maybeError.map { sm =>
-        val (code, msg) = sm
-        Future(Ok(org.corespring.container.client.views.html.error.main(code, msg, showErrorInUi)))
-      }.getOrElse {
-
-        def playerPage(implicit request: Request[AnyContent]) = {
-          val jsMode = getJsMode(request)
-          logger.trace(s"js mode: $jsMode")
-          if (getPlayerPage == "container-player.html") s"container-player.$jsMode.html" else s"player.$jsMode.html"
-        }
-
-        val page = playerPage(request)
-        logger.debug(s"[loadPlayerForSession] $sessionId - loading $page from /container-client")
-        controllers.Assets.at("/container-client", page)(request)
-      }
-    }
-  }
-
-  override def additionalScripts: Seq[String] = Seq(PlayerRoutes.services().url)
-}
-
-trait JsonPlayer extends BasePlayer {}
-
-/**
- * The ProdHtmlPlayer serves server side generated html.
- * This is to speed up this player load time and performance
- */
-trait ProdHtmlPlayer extends BasePlayer with Jade {
-
-  val name = "server-generated-player.jade"
-
-  val prefix = v2Player.Routes.prefix
-
-  def itemPreProcessor: PlayerItemPreProcessor
-
-  def template(html: String, deps: Seq[String], js: Seq[String], css: Seq[String], json: JsValue) = {
-    val params: Map[String, Object] = Map(
-      "html" -> html,
-      "ngModules" -> s"[${deps.map(d => s"'$d'").mkString(",")}]",
-      "js" -> js.toArray,
-      "css" -> css.toArray,
-      "sessionJson" -> Json.stringify(json),
-      "versionInfo" -> Json.stringify(VersionInfo.json))
-    logger.trace(s"render jade with params: $params")
-    renderJade(name, params)
-  }
-
-  def coreJs = Seq(
-    s"$prefix/js/root-prod-player.js",
-    /**
-     * Important: The query params for MathJax are required - don't remove them.
-     */
-    s"$prefix/components/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML")
-
-  def coreCss = Seq(
-    s"$prefix/css/player.min.css",
-    s"$prefix/components/font-awesome/css/font-awesome.min.css")
-
-  def resolveDomain(path: String): String = path
-
-  /**
-   * A temporary means of defining paths that may be resolved
-   */
-  private def resolvePath(s: String): String = {
-    val needsResolution = Seq(
-      "component-sets/",
-      "components/",
-      "root-prod-player",
-      "player-services.js",
-      "player.min").exists(s.contains)
-    if (needsResolution) resolveDomain(s) else s
-  }
-
-  override def config(id: String) = Action.async { implicit request =>
-
-    hooks.loadSessionAndItem(id).map {
-      case Left((code, msg)) => Status(code)(Json.obj("error" -> msg))
-      case Right((session, itemJson)) => {
-
-        val typeIds = componentTypes(itemJson).map {
-          t =>
-            val typeRegex(org, name) = t
-            new Id(org, name)
-        }
-
-        val resolvedComponents = resolveComponents(typeIds, Some(context))
-        val jsUrl = urls.jsUrl(context, resolvedComponents)
-        val cssUrl = urls.cssUrl(context, resolvedComponents)
-
-        val clientSideDependencies = getClientSideDependencies(resolvedComponents)
-        val dependencies = ngModules.createAngularModules(resolvedComponents, clientSideDependencies)
-
-        val js = coreJs ++ (additionalScripts :+ jsUrl).distinct
-
-        val domainResolvedJs = js.map(resolvePath)
-        val css = coreCss :+ cssUrl
-        val domainResolvedCss = css.map(resolvePath)
-
-        val processedXhtml = processXhtml((itemJson \ "xhtml").asOpt[String])
-        val preprocessedItem = itemPreProcessor.preProcessItemForPlayer(itemJson).as[JsObject] ++ Json.obj("xhtml" -> processedXhtml)
-
-        Ok(
-          template(
-            processedXhtml,
-            dependencies,
-            domainResolvedJs,
-            domainResolvedCss,
-            Json.obj("session" -> session, "item" -> preprocessedItem)))
-      }
-    }
   }
 }

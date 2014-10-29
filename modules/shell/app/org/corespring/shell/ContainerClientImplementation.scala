@@ -78,7 +78,7 @@ class ContainerClientImplementation(
       out.getOrElse(throw new RuntimeException("No amazon key/secret"))
     }
 
-    override def loadAsset(id: String, name:String, file: String)(request: Request[AnyContent]): SimpleResult = {
+    override def loadAsset(id: String, name: String, file: String)(request: Request[AnyContent]): SimpleResult = {
       playS3.download(bucket, s"$id/$name/$file", Some(request.headers))
     }
 
@@ -100,7 +100,7 @@ class ContainerClientImplementation(
       override def uploadAction(itemId: String, file: String)(block: (Request[Int]) => SimpleResult): Action[Int] =
         Action(playS3.upload(bucket, s"$itemId/data/$file")) { r =>
           block(r)
-      }
+        }
     }
 
     override implicit def ec: ExecutionContext = ContainerClientImplementation.this.ec

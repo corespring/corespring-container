@@ -7,12 +7,12 @@ import org.corespring.container.components.processing.PlayerItemPreProcessor
 import org.corespring.container.components.response.OutcomeProcessor
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.{ JsValue, Json }
 import play.api.mvc._
-import play.api.test.{FakeHeaders, FakeRequest}
+import play.api.test.{ FakeHeaders, FakeRequest }
 import play.api.test.Helpers._
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ ExecutionContext, Future }
 
 class SessionTest extends Specification with Mockito {
 
@@ -96,7 +96,7 @@ class SessionTest extends Specification with Mockito {
   "not secure mode" should {
 
     def unsaveSession() = SaveSession(
-      Json.obj("attempts" -> 123, "components" -> Json.arr(1,2,3)),
+      Json.obj("attempts" -> 123, "components" -> Json.arr(1, 2, 3)),
       isSecure = false,
       isComplete = true,
       (a, b) => Some(b))

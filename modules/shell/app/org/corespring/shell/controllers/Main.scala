@@ -1,6 +1,5 @@
 package org.corespring.shell.controllers
 
-import org.corespring.container.client.controllers.player.{ AddUrlParam, PlayerQueryStringOptions }
 import org.corespring.mongo.json.services.MongoService
 import org.corespring.shell.{ IndexLink, SessionKeys }
 import org.corespring.container.logging.ContainerLogger
@@ -8,9 +7,7 @@ import play.api.libs.json.{ JsObject, JsString, JsValue, Json }
 import play.api.mvc._
 
 trait Main
-  extends Controller
-  with PlayerQueryStringOptions
-  with AddUrlParam {
+  extends Controller {
 
   import org.corespring.shell.views._
 
@@ -31,11 +28,13 @@ trait Main
             case Some(title) if title.trim().length() > 0 => title
             case _ => "No title"
           }
+
+          import org.corespring.container.client.controllers.apps.{ routes => appRoutes }
           val id = (json \ "_id" \ "$oid").as[String]
           val playerUrl = routes.Main.createSessionPage(id).url
-          val editorUrl = s"/client/editor/${id}/index.html"
-          val deleteUrl = s"/delete-item/$id"
-          val catalogUrl = s"/client/item/$id/preview"
+          val deleteUrl = routes.Main.deleteItem(id).url
+          val editorUrl = appRoutes.Editor.load(id).url
+          val catalogUrl = appRoutes.Catalog.load(id).url
           IndexLink(name, playerUrl, editorUrl, deleteUrl, catalogUrl)
       }
 
@@ -51,11 +50,10 @@ trait Main
   def createSessionPage(itemId: String) = Action {
     implicit request =>
       val createSessionCall = routes.Main.createSession
-      val url = createSessionCall.url.setPlayerPage(getPlayerPage)
-      val finalUrl: String = request.getQueryString("mode").map { m =>
-        addUrlParam(url, "mode", m)
-      }.getOrElse(url)
+      val url = createSessionCall.url
 
+      println(s"------> ${request.rawQueryString}")
+      val finalUrl: String = s"$url?${request.rawQueryString}"
       Ok(html.createSession(itemId, finalUrl))
   }
 
@@ -74,7 +72,7 @@ trait Main
           "taskInfo" -> Json.obj(
             "title" -> "")))
       itemService.create(json).map { id =>
-        Redirect(org.corespring.container.client.controllers.apps.routes.Editor.editItem(id.toString))
+        Redirect(org.corespring.container.client.controllers.apps.routes.Editor.load(id.toString))
       }.getOrElse(BadRequest("Error creating an item"))
   }
 
@@ -92,15 +90,10 @@ trait Main
 
       result.map {
         oid =>
-          val call = {
-            if (request.getQueryString("mode").exists(_ == "prod")) {
-              org.corespring.container.client.controllers.apps.routes.ProdHtmlPlayer.config(oid.toString)
-            } else {
-              org.corespring.container.client.controllers.apps.routes.BasePlayer.loadPlayerForSession(oid.toString)
-            }
-          }
+          val call = org.corespring.container.client.controllers.apps.routes.Player.load(oid.toString)
           logger.debug(s"url ${call.url}")
-          Ok(JsObject(Seq("url" -> JsString(call.url.setPlayerPage(getPlayerPage)))))
+          val url = s"${call.url}?${request.rawQueryString}"
+          Ok(Json.obj("url" -> url))
       }.getOrElse {
         logger.debug("Can't create the session")
         BadRequest("Create session - where's the body?")

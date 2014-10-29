@@ -3,26 +3,82 @@ html(xmlns="http://www.w3.org/1999/html")
   head
     meta(charset="utf-8")
     meta(http-equiv="X-UA-Compatible", content="IE=edge")
-    link(href='//fonts.googleapis.com/css?family=Roboto:400,700,400italic', rel='stylesheet', type='text/css')
-    link(href='//fonts.googleapis.com/css?family=Ubuntu:300,400,500,500italic,700', rel='stylesheet', type='text/css')
     title= title
-    block head
-  body
-  .pre-loader
-    #spinner
+    
+    for c in css
+      link(rel='stylesheet',href='#{c}')
+
+  body(ng-app="corespring-#{appName}")
+    .pre-loader
+      #spinner
 
   .main.hide-body
     block content
 
+    for j in js
+      script(type='text/javascript', src='#{j}')
+
+    block before-main-script
+
+    script(type="text/javascript")
+
+      var opts = {
+        length: 17, // The length of each line
+        width: 8, // The line thickness
+        radius: 20, // The radius of the inner circle
+        color: '#556270', // #rgb or #rrggbb or array of colors
+        shadow: false, // Whether to render a shadow
+        hwaccel: true, // Whether to use hardware acceleration
+      };
+
+      var target = document.getElementById('spinner');
+      var spinner = new Spinner(opts).spin(target);
+
+      $(document).ready(function () {
+        setTimeout(function() {
+          spinner.stop();
+          $('.pre-loader').remove();
+          $('.main').addClass('blend');
+        }, 100);
+      });
+
+      var allNgModules =[#{componentNgModules}];
+      //declare the app..
+      angular.module( 'corespring-#{appName}', allNgModules ).config(['$provide', function($provide) {
+
+          var enabledInQueryString = document.location.search.indexOf('loggingEnabled=true') !== -1;
+          var loggingEnabled = enabledInQueryString || false;
+          if(!loggingEnabled){
+            function mockLogger($delegate) {
+
+              var out = {
+                log: function(){},
+                debug: function(){},
+                error: function(){},
+                warn: function(){},
+                info: function(){}
+              }
+              out.error = $delegate.error;
+              out.warn = $delegate.warn;
+              return out;
+            }
+
+            $provide.decorator('LogFactory', function($delegate){
+              return {
+                getLogger: function(n){
+                  return mockLogger($delegate.getLogger(n));
+                }
+              }
+            });
+
+            $provide.decorator('$log', function($delegate, $sniffer) {
+              return mockLogger($delegate);
+            });
+          }
+
+        }]);
+
+    block after-main-script
+
     script.
-      // hey Angular, we're bootstrapping manually!
-      window.name = "NG_DEFER_BOOTSTRAP!";
-
-    script(src="../../js/libs/headjs/1.0.3/head.min.js")
-    for p in coreLibs
-      script(src="#{p}", type="text/javascript")
-        
-    for p in core
-      script(src="#{p}", type="text/javascript")
-
-    block scripts
+      !{ngServiceLogic}

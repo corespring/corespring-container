@@ -15,6 +15,8 @@ import org.corespring.container.components.response.OutcomeProcessor
 import org.corespring.container.js.rhino.score.CustomScoreProcessor
 import org.corespring.container.js.rhino.{ RhinoServerLogic, RhinoScopeBuilder, RhinoOutcomeProcessor, RhinoPlayerItemPreProcessor }
 import org.corespring.container.logging.ContainerLogger
+import play.api.Mode
+import play.api.Mode.Mode
 import play.api.libs.json.JsValue
 import play.api.{ Mode, Play }
 
@@ -39,10 +41,6 @@ trait DefaultIntegration
   def validate: Either[String, Boolean] = {
     val componentsPath = configuration.getString("components.path").getOrElse("components")
     Validator.absolutePathInProdMode(componentsPath)
-  }
-
-  def showErrorInUi: Boolean = {
-    Play.current.mode == Mode.Dev || configuration.getBoolean("showErrorInUi").getOrElse(false)
   }
 
   implicit def ec: ExecutionContext
@@ -82,6 +80,9 @@ trait DefaultIntegration
   }
 
   lazy val rig = new Rig {
+
+    override def mode: Mode = Play.current.mode
+
     override implicit def ec: ExecutionContext = DefaultIntegration.this.ec
 
     override def components = DefaultIntegration.this.components
@@ -100,8 +101,7 @@ trait DefaultIntegration
   }
 
   lazy val editor = new Editor {
-
-    override def showErrorInUi: Boolean = DefaultIntegration.this.showErrorInUi
+    override def mode: Mode = Play.current.mode
 
     override implicit def ec: ExecutionContext = DefaultIntegration.this.ec
 
@@ -113,8 +113,7 @@ trait DefaultIntegration
   }
 
   lazy val catalog = new Catalog {
-
-    override def showErrorInUi: Boolean = DefaultIntegration.this.showErrorInUi
+    override def mode: Mode = Play.current.mode
 
     override implicit def ec: ExecutionContext = DefaultIntegration.this.ec
 
@@ -123,22 +122,8 @@ trait DefaultIntegration
     override def hooks = catalogHooks
   }
 
-  lazy val jsonPlayer = new JsonPlayer {
-
-    override def showErrorInUi: Boolean = DefaultIntegration.this.showErrorInUi
-
-    override implicit def ec: ExecutionContext = DefaultIntegration.this.ec
-
-    override def urls: ComponentUrls = componentSets
-
-    override def components: Seq[Component] = DefaultIntegration.this.components
-
-    override def hooks = playerHooks
-  }
-
-  lazy val prodHtmlPlayer = new ProdHtmlPlayer {
-
-    override def showErrorInUi: Boolean = DefaultIntegration.this.showErrorInUi
+  lazy val prodHtmlPlayer = new Player {
+    override def mode: Mode = Play.current.mode
 
     override implicit def ec: ExecutionContext = DefaultIntegration.this.ec
 

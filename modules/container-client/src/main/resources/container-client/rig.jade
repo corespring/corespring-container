@@ -1,9 +1,5 @@
 extends layout
 
-block head
-  title Rig
-  link(rel="stylesheet", href="css/rig.css")
-
 block content
   div#root(ng-controller="Root")
     nav.navbar.navbar-inverse.navbar-static-top(role="navigation")
@@ -16,7 +12,6 @@ block content
       div(ui-ace,
         ng-model="componentJson",
         ui-ace="{useWrapMode : true, onLoad: aceLoaded, onChange: aceChanged }")
-      //#preview-pane(inline-preview, ng-model="model.item.xhtml")
 
       #preview-pane(corespring-rig-player,
         player-markup="model.item.xhtml",
@@ -24,101 +19,13 @@ block content
         player-session="model.session",
         player-outcomes="model.outcome")
 
-block scripts
-  script(type="text/javascript",src="../../components/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML")
-
-  //build:js js/rig.js
-  script(src="../../js/render/services/_declaration.js")
-  script(src="../../js/render/services/corespring-player-definition.js")
-  script(src="../../js/render/services/client-side-player-service.js")
-  script(src="../../js/render/services/component-register.js")
-  script(src="../../js/render/services/player-utils.js")
-  script(src="../../js/render/services/server-logic.js")
-  script(src="../../js/render/controllers/_declaration.js")
-  script(src="../../js/render/controllers/client-side-preview.js")
-  //script(src="../../js/render/controllers/container-player-controls.js")
-  script(src="../../js/render/controllers/main.js")
-  script(src="../../js/render/controllers/root.js")
-  script(src="../../js/rig/controllers/_declaration.js")
-  script(src="../../js/rig/controllers/root.js")
-  script(src="../../js/rig/directives/_declaration.js")
-  script(src="../../js/rig/directives/corespring-rig-player.js")
-  script(src="../../js/common/services/_declaration.js")
-  script(src="../../js/common/services/math-service.js")
-  script(src="../../js/render/directives/_declaration.js")
-  script(src="../../js/render/directives/player-control-panel.js")
-  script(src="../../js/render/directives/corespring-player.js")
-  script(src="../../js/render/directives/dimension-propagator.js")
-
-  //endbuild
-
-  //build:js js/extras.js
-
-  script(src="../../components/angular-ui/build/angular-ui.js")
-  script(src="../../components/angular-ui-ace/ui-ace.js")
-  script(src="../../components/ace-builds/src-min-noconflict/ace.js")
-  script(src="../../components/ace-builds/src-min-noconflict/theme-twilight.js")
-  script(src="../../components/ace-builds/src-min-noconflict/mode-xml.js")
-  script(src="../../components/ace-builds/src-min-noconflict/worker-json.js")
-  script(src="../../components/ace-builds/src-min-noconflict/mode-json.js")
-  //endbuild
-
+block after-main-script
   script.
-    $(document).ready(function(){
-      console.log("load config", document.location);
 
-      var configPath = 'config.json';
-
-      console.log(document.location);
-
-      var queryMatch = document.location.search.match(/\?data=(.*)/)
-      console.log(queryMatch);
-
-      if(queryMatch[1].indexOf(".json") == -1){
-        throw "You need to specify a json file using '?data=xxx.json'";
-        return;
-      }
-
-      var jsonFile = queryMatch[1];
-
-      $.get(configPath += ('?data=' + queryMatch[1]), function(data) {
-
-        var allScriptsAreLoaded = function() {
-
-          console.log("all scripts are loaded");
-          //$("#player-body").html(data.xhtml);
-
-          var playerDeps = [
-            'corespring-rig.directives',
-            'corespring-rig.controllers',
-            'corespring-player.services',
-            'corespring-player.directives',
-            'corespring-common.services',
-            'corespring-common.directives',
-            'ui.ace'
-          ].concat(data.angular.dependencies);
-
-          angular.module("corespring-rig", playerDeps)
-            .config(['$locationProvider', function($locationProvider) {
-              $locationProvider.html5Mode(true).hashPrefix('!');
-            }]);
-
-          angular.bootstrap(document, ["corespring-rig"]);
-          angular.resumeBootstrap();
-          $("body").addClass('blend');
-        };
-
-        var allScripts = data.scripts.concat(data.css);
-        head.js.apply(null, allScripts);
-
-        head.ready(function(){
-          allScriptsAreLoaded();
-        });
-      });
-    });
-
-    $('.pre-loader').remove();
-    $('.main').addClass('blend');
+    angular.module("corespring-#{appName}")
+      .config(['$locationProvider', function($locationProvider) {
+        $locationProvider.html5Mode(true).hashPrefix('!');
+      }]);
 
     window.submit = function() {
       var scope = angular.element(document.getElementById('root')).scope();
@@ -127,5 +34,3 @@ block scripts
         rootScope.$broadcast('submitEvent');
       });
     };
-
-

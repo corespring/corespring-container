@@ -1,29 +1,42 @@
 package org.corespring.container.client.component
 
+import org.corespring.container.client.controllers.apps.HasLogger
 import play.api.libs.json.JsValue
 import org.corespring.container.client.controllers.helpers.{ XhtmlProcessor, NameHelper }
-import org.corespring.container.components.model.{ComponentInfo, LayoutComponent}
+import org.corespring.container.components.model.{ ComponentInfo, LayoutComponent }
 import org.corespring.container.components.model.dependencies.ComponentSplitter
-import play.api.mvc.RequestHeader
 
 trait ItemTypeReader {
   /** for an item - return all the components in use */
-  def componentTypes(json: JsValue)(implicit request : RequestHeader): Seq[String]
+  def componentTypes(json: JsValue): Seq[String]
 }
 
-trait AllItemTypesReader extends ItemTypeReader with ComponentSplitter {
-  override def componentTypes(json: JsValue)(implicit request : RequestHeader): Seq[String] = components.map(_.componentType)
+trait AllItemTypesReader extends ItemTypeReader with ComponentSplitter { self: HasLogger =>
+
+  override def componentTypes(json: JsValue): Seq[String] = {
+    logger.debug(s"function=componentTypes - return all components")
+    val out = components.map(_.componentType)
+    logger.trace(s"function=componentTypes types=$out")
+    out
+  }
 }
 
-trait PlayerItemTypeReader extends ItemTypeReader with ComponentSplitter with NameHelper with XhtmlProcessor {
+trait PlayerItemTypeReader
+  extends ItemTypeReader
+  with ComponentSplitter
+  with NameHelper
+  with XhtmlProcessor { self: HasLogger =>
 
   /** List components used in the model */
-  override def componentTypes(json: JsValue)(implicit request : RequestHeader): Seq[String] = {
+  override def componentTypes(json: JsValue): Seq[String] = {
+
+    logger.debug(s"function=componentTypes - inspect json for types...")
+
     val types: Seq[String] = (json \ "components" \\ "componentType").map(_.as[String]).distinct
 
-    def componentTypeMatches(t: String)(ci:ComponentInfo) = tagName(ci.id.org, ci.id.name) == t
+    def componentTypeMatches(t: String)(ci: ComponentInfo) = tagName(ci.id.org, ci.id.name) == t
 
-    val validComponents = types.filter{
+    val validComponents = types.filter {
       t =>
         interactions.exists(componentTypeMatches(t)) || widgets.exists(componentTypeMatches(t))
     }
@@ -35,7 +48,9 @@ trait PlayerItemTypeReader extends ItemTypeReader with ComponentSplitter with Na
       }.getOrElse(Seq())
       out
     }
-    validComponents ++ layoutComponentsInItem
+    val out = validComponents ++ layoutComponentsInItem
+    logger.trace(s"function=componentTypes types=$out")
+    out
   }
 
   private def layoutTypesInXml(xmlString: String, components: Seq[LayoutComponent]): Seq[String] = {

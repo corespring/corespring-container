@@ -1,6 +1,6 @@
 package org.corespring.shell.controllers.data
 
-import play.api.libs.json.{Json, JsValue}
+import play.api.libs.json.{ Json, JsValue }
 
 object FieldValueJson {
 
@@ -11,177 +11,130 @@ object FieldValueJson {
     "mediaType" -> Json.arr(
       Json.obj(
         "key" -> "Audio",
-        "value" -> "Audio"
-      ),
+        "value" -> "Audio"),
       Json.obj(
         "key" -> "Image",
-        "value" -> "Image"
-      ),
+        "value" -> "Image"),
       Json.obj(
         "key" -> "Passage",
-        "value" -> "Passage"
-      ),
+        "value" -> "Passage"),
       Json.obj(
         "key" -> "Video",
-        "value" -> "Video"
-      )
-    ),
+        "value" -> "Video")),
     "bloomsTaxonomy" -> Json.arr(
       Json.obj(
         "key" -> "Remembering",
-        "value" -> "Remembering"
-      ),
+        "value" -> "Remembering"),
       Json.obj(
         "key" -> "Understanding",
-        "value" -> "Understanding"
-      ),
+        "value" -> "Understanding"),
       Json.obj(
         "key" -> "Applying",
-        "value" -> "Applying"
-      ),
+        "value" -> "Applying"),
       Json.obj(
         "key" -> "Analyzing",
-        "value" -> "Analyzing"
-      ),
+        "value" -> "Analyzing"),
       Json.obj(
         "key" -> "Evaluating",
-        "value" -> "Evaluating"
-      ),
+        "value" -> "Evaluating"),
       Json.obj(
         "key" -> "Creating",
-        "value" -> "Creating"
-      )
-    ),
+        "value" -> "Creating")),
     "depthOfKnowledge" -> Json.arr(
       Json.obj(
         "key" -> "1",
-        "value" -> "Level 1 Recall & Reproduction"
-      ),
+        "value" -> "Level 1 Recall & Reproduction"),
       Json.obj(
         "key" -> "2",
-        "value" -> "Level 2 Skills & Concepts"
-      ),
+        "value" -> "Level 2 Skills & Concepts"),
       Json.obj(
         "key" -> "3",
-        "value" -> "Level 3 Strategic Thinking/Reasoning"
-      ),
+        "value" -> "Level 3 Strategic Thinking/Reasoning"),
       Json.obj(
         "key" -> "4",
-        "value" -> "Level 4 Extended Thinking"
-      )
-    ),
+        "value" -> "Level 4 Extended Thinking")),
     "demonstratedKnowledge" -> Json.arr(
       Json.obj(
         "key" -> "Factual",
-        "value" -> "Factual"
-      ),
+        "value" -> "Factual"),
       Json.obj(
         "key" -> "Conceptual",
-        "value" -> "Conceptual"
-      ),
+        "value" -> "Conceptual"),
       Json.obj(
         "key" -> "Procedural",
-        "value" -> "Procedural"
-      ),
+        "value" -> "Procedural"),
       Json.obj(
         "key" -> "Metacognitive",
-        "value" -> "Metacognitive"
-      )
-    ),
+        "value" -> "Metacognitive")),
     "priorUses" -> Json.arr(
       Json.obj(
         "key" -> "Formative",
-        "value" -> "Formative"
-      ),
+        "value" -> "Formative"),
       Json.obj(
         "key" -> "Interim",
-        "value" -> "Interim"
-      ),
+        "value" -> "Interim"),
       Json.obj(
         "key" -> "Benchmark",
-        "value" -> "Benchmark"
-      ),
+        "value" -> "Benchmark"),
       Json.obj(
         "key" -> "Summative",
-        "value" -> "Summative"
-      ),
+        "value" -> "Summative"),
       Json.obj(
         "key" -> "International Benchmark",
-        "value" -> "International Benchmark"
-      ),
+        "value" -> "International Benchmark"),
       Json.obj(
         "key" -> "Other",
-        "value" -> "Other"
-      )
-    ),
+        "value" -> "Other")),
     "credentials" -> Json.arr(
       Json.obj(
         "key" -> "Application Developer",
-        "value" -> "Application Developer"
-      ),
+        "value" -> "Application Developer"),
       Json.obj(
         "key" -> "Assessment Developer Test Item Writer",
-        "value" -> "Assessment Developer Test Item Writer"
-      ),
+        "value" -> "Assessment Developer Test Item Writer"),
       Json.obj(
         "key" -> "Curriculum Developer",
-        "value" -> "Curriculum Developer"
-      ),
+        "value" -> "Curriculum Developer"),
       Json.obj(
         "key" -> "District Item Writer",
-        "value" -> "District Item Writer"
-      ),
+        "value" -> "District Item Writer"),
       Json.obj(
         "key" -> "Game Designer",
-        "value" -> "Game Designer"
-      ),
+        "value" -> "Game Designer"),
       Json.obj(
         "key" -> "Non-Profit",
-        "value" -> "Non-Profit"
-      ),
+        "value" -> "Non-Profit"),
       Json.obj(
         "key" -> "Professional Developer",
-        "value" -> "Professional Developer"
-      ),
+        "value" -> "Professional Developer"),
       Json.obj(
         "key" -> "State Department of Education Item Writer",
-        "value" -> "State Department of Education Item Writer"
-      ),
+        "value" -> "State Department of Education Item Writer"),
       Json.obj(
         "key" -> "Student",
-        "value" -> "Student"
-      ),
+        "value" -> "Student"),
       Json.obj(
         "key" -> "Teacher",
-        "value" -> "Teacher"
-      ),
+        "value" -> "Teacher"),
       Json.obj(
         "key" -> "Other",
-        "value" -> "Other"
-      )
-    ),
+        "value" -> "Other")),
     "licenseTypes" -> Json.arr(
       Json.obj(
         "key" -> "CC BY",
-        "value" -> "CC BY"
-      ),
+        "value" -> "CC BY"),
       Json.obj(
         "key" -> "CC BY-SA",
-        "value" -> "CC BY-SA"
-      ),
+        "value" -> "CC BY-SA"),
       Json.obj(
         "key" -> "CC BY-NC",
-        "value" -> "CC BY-NC"
-      ),
+        "value" -> "CC BY-NC"),
       Json.obj(
         "key" -> "CC BY-ND",
-        "value" -> "CC BY-ND"
-      ),
+        "value" -> "CC BY-ND"),
       Json.obj(
         "key" -> "CC BY-NC-SA",
-        "value" -> "CC BY-NC-SA"
-      )
-    ),
+        "value" -> "CC BY-NC-SA")),
     "itemTypes" -> Json.arr(
       Json.obj(
         "key" -> "Fixed Choice",
@@ -191,24 +144,18 @@ object FieldValueJson {
           "Visual Multi Choice",
           "Inline Choice",
           "Ordering",
-          "Drag & Drop"
-        )
-      ),
+          "Drag & Drop")),
       Json.obj(
         "key" -> "Constructed Response",
         "value" -> Json.arr(
           "Constructed Response - Short Answer",
-          "Constructed Response - Open Ended"
-        )
-      ),
+          "Constructed Response - Open Ended")),
       Json.obj(
         "key" -> "Evidence",
         "value" -> Json.arr(
           "Select Evidence in Text",
           "Document Based Question",
-          "Passage With Questions"
-        )
-      ),
+          "Passage With Questions")),
       Json.obj(
         "key" -> "Composite",
         "value" -> Json.arr(
@@ -218,126 +165,93 @@ object FieldValueJson {
           "Composite - Project",
           "Composite - Performance",
           "Composite - Activity",
-          "Composite - Algebra"
-        )
-      ),
+          "Composite - Algebra")),
       Json.obj(
         "key" -> "Algebra",
         "value" -> Json.arr(
           "Plot Lines",
           "Plot Points",
-          "Evaluate an Equation"
-        )
-      )
-    ),
+          "Evaluate an Equation"))),
     "gradeLevels" -> Json.arr(
       Json.obj(
         "key" -> "PK",
-        "value" -> "Prekindergarten"
-      ),
+        "value" -> "Prekindergarten"),
       Json.obj(
         "key" -> "KG",
-        "value" -> "Kindergarten"
-      ),
+        "value" -> "Kindergarten"),
       Json.obj(
         "key" -> "01",
-        "value" -> "First grade"
-      ),
+        "value" -> "First grade"),
       Json.obj(
         "key" -> "02",
-        "value" -> "Second grade"
-      ),
+        "value" -> "Second grade"),
       Json.obj(
         "key" -> "03",
-        "value" -> "Third grade"
-      ),
+        "value" -> "Third grade"),
       Json.obj(
         "key" -> "04",
-        "value" -> "Fourth grade"
-      ),
+        "value" -> "Fourth grade"),
       Json.obj(
         "key" -> "05",
-        "value" -> "Fifth grade"
-      ),
+        "value" -> "Fifth grade"),
       Json.obj(
         "key" -> "06",
-        "value" -> "Sixth grade"
-      ),
+        "value" -> "Sixth grade"),
       Json.obj(
         "key" -> "07",
-        "value" -> "Seventh grade"
-      ),
+        "value" -> "Seventh grade"),
       Json.obj(
         "key" -> "08",
-        "value" -> "Eighth grade"
-      ),
+        "value" -> "Eighth grade"),
       Json.obj(
         "key" -> "09",
-        "value" -> "Ninth grade"
-      ),
+        "value" -> "Ninth grade"),
       Json.obj(
         "key" -> "10",
-        "value" -> "Tenth grade"
-      ),
+        "value" -> "Tenth grade"),
       Json.obj(
         "key" -> "11",
-        "value" -> "Eleventh grade"
-      ),
+        "value" -> "Eleventh grade"),
       Json.obj(
         "key" -> "12",
-        "value" -> "Twelfth grade"
-      ),
+        "value" -> "Twelfth grade"),
       Json.obj(
         "key" -> "13",
-        "value" -> "Grade 13"
-      ),
+        "value" -> "Grade 13"),
       Json.obj(
         "key" -> "PS",
-        "value" -> "Postsecondary"
-      ),
+        "value" -> "Postsecondary"),
       Json.obj(
         "key" -> "AP",
-        "value" -> "Advanced Placement"
-      ),
+        "value" -> "Advanced Placement"),
       Json.obj(
         "key" -> "UG",
-        "value" -> "Ungraded"
-      )
-    ),
+        "value" -> "Ungraded")),
     "reviewsPassed" -> Json.arr(
       Json.obj(
         "key" -> "Editorial",
-        "value" -> "Editorial"
-      ),
+        "value" -> "Editorial"),
       Json.obj(
         "key" -> "Bias",
-        "value" -> "Bias"
-      ),
+        "value" -> "Bias"),
       Json.obj(
         "key" -> "Fairness",
-        "value" -> "Fairness"
-      ),
+        "value" -> "Fairness"),
       Json.obj(
         "key" -> "Content",
-        "value" -> "Content"
-      ),
+        "value" -> "Content"),
       Json.obj(
         "key" -> "Psychometric",
-        "value" -> "Psychometric"
-      ),
+        "value" -> "Psychometric"),
       Json.obj(
         "key" -> "All",
-        "value" -> "All"
-      ),
+        "value" -> "All"),
       Json.obj(
         "key" -> "None",
-        "value" -> "None"
-      ),
+        "value" -> "None"),
       Json.obj(
         "key" -> "Other",
-        "value" -> "Other"
-      )
-    ),
+        "value" -> "Other")),
     "keySkills" -> Json.arr(
       Json.obj(
         "key" -> "Knowledge",
@@ -360,9 +274,7 @@ object FieldValueJson {
           "Repeat",
           "Reproduce",
           "Select",
-          "State"
-        )
-      ),
+          "State")),
       Json.obj(
         "key" -> "Understand",
         "value" -> Json.arr(
@@ -387,9 +299,7 @@ object FieldValueJson {
           "Rewrite",
           "Summarize",
           "Translate",
-          "Understand"
-        )
-      ),
+          "Understand")),
       Json.obj(
         "key" -> "Apply",
         "value" -> Json.arr(
@@ -414,9 +324,7 @@ object FieldValueJson {
           "Sketch",
           "Solve",
           "Use",
-          "Write"
-        )
-      ),
+          "Write")),
       Json.obj(
         "key" -> "Analyze",
         "value" -> Json.arr(
@@ -438,9 +346,7 @@ object FieldValueJson {
           "Point-Out",
           "Question",
           "Separate",
-          "Test"
-        )
-      ),
+          "Test")),
       Json.obj(
         "key" -> "Evaluate",
         "value" -> Json.arr(
@@ -454,9 +360,7 @@ object FieldValueJson {
           "Formulate",
           "Generate",
           "Plan",
-          "Rearrange"
-        )
-      ),
+          "Rearrange")),
       Json.obj(
         "key" -> "Create",
         "value" -> Json.arr(
@@ -465,9 +369,5 @@ object FieldValueJson {
           "Construct",
           "Create",
           "Design",
-          "Develop"
-        )
-      )
-    )
-  )
+          "Develop"))))
 }

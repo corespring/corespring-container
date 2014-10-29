@@ -6,7 +6,7 @@ import org.corespring.container.js.response.Target
 import org.specs2.mutable.Specification
 import play.api.libs.json.{ JsString, Json }
 
-class OutcomeProcessorTest extends Specification with ComponentMaker{
+class OutcomeProcessorTest extends Specification with ComponentMaker {
 
   val interactionRespondJs =
     """
@@ -51,7 +51,6 @@ class OutcomeProcessorTest extends Specification with ComponentMaker{
 
   def customLib(name: String = "name", libJs: String, deps: Seq[Id] = Seq.empty) =
     lib(name, deps).copy(server = Seq(LibrarySource(name, libJs)))
-
 
   "Target" should {
     "work" in {
@@ -157,8 +156,6 @@ class OutcomeProcessorTest extends Specification with ComponentMaker{
     }
   }
 
-
-
   "new processor" should {
     lazy val library = lib("lib").copy(server = Seq(LibrarySource("src-1",
       """
@@ -180,19 +177,15 @@ class OutcomeProcessorTest extends Specification with ComponentMaker{
     "execute js" in {
       val item = Json.obj("components" -> Json.obj(
         "1" -> Json.obj(
-          "componentType" -> "org-interaction"
-        )))
+          "componentType" -> "org-interaction")))
       val session = Json.obj("components" -> Json.obj(
         "1" -> Json.obj(
-          "answers" -> "a"
-        )
-      ))
+          "answers" -> "a")))
       val settings = Json.obj()
       processor.createOutcome(item, session, settings) === Json.obj(
         "1" -> Json.obj(
           "msg" -> "pong",
-          "studentResponse" -> "a")
-      )
+          "studentResponse" -> "a"))
     }
   }
 

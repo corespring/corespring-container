@@ -1,29 +1,23 @@
 package org.corespring.container.client.controllers.apps
 
+import org.corespring.container.client.component.AllItemTypesReader
+import org.corespring.container.client.controllers.jade.Jade
 import org.corespring.container.client.hooks.CatalogHooks
 import org.corespring.container.client.hooks.Hooks.StatusMessage
-import org.corespring.container.client.component.AllItemTypesReader
 import org.corespring.container.client.views.txt.js.CatalogServices
-import play.api.Logger
 import play.api.libs.json.{ JsArray, JsString, JsValue, Json }
-import play.api.mvc.{ SimpleResult, Action }
+import play.api.mvc.{ Action, AnyContent }
 
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.{ Future }
 
 trait Catalog
   extends AllItemTypesReader
-  with AppWithServices[CatalogHooks]
-  with JsModeReading {
-
-  override def loggerName = "container.app.catalog"
-
-  implicit def ec: ExecutionContext
+  with App[CatalogHooks]
+  with Jade {
 
   override def context: String = "catalog"
 
-  def showErrorInUi:Boolean
-
-  override def servicesJs = {
+  override val servicesJs = {
     import org.corespring.container.client.controllers.resources.routes._
 
     val componentJson: Seq[JsValue] = interactions.map {
@@ -41,24 +35,31 @@ trait Catalog
     CatalogServices("catalog.services", Item.load(":id"), Item.save(":id"), JsArray(componentJson)).toString
   }
 
-  override def additionalScripts: Seq[String] = Seq(org.corespring.container.client.controllers.apps.routes.Catalog.services().url)
-
-  def showCatalog(itemId: String) = Action.async {
+  override def load(id: String): Action[AnyContent] = Action.async {
     implicit request =>
-      hooks.showCatalog(itemId).flatMap { e =>
+      hooks.showCatalog(id).flatMap { e =>
 
         def ifEmpty = {
-          logger.trace(s"[showCatalog]: $itemId")
-          val jsMode = getJsMode(request)
-          val page = s"catalog.$jsMode.html"
-          controllers.Assets.at("/container-client", page)(request)
+          logger.trace(s"[showCatalog]: $id")
+
+          val scriptInfo = componentScriptInfo(componentTypes(Json.obj()))
+          val domainResolvedJs = buildJs(scriptInfo)
+          val domainResolvedCss = buildCss(scriptInfo)
+          Ok(
+            renderJade(
+              CatalogTemplateParams(
+                context,
+                domainResolvedJs,
+                domainResolvedCss,
+                jsSrc.ngModules ++ scriptInfo.ngDependencies,
+                servicesJs)))
         }
 
         def onError(sm: StatusMessage) = {
           val (code, msg) = sm
-          Future(Status((code))(org.corespring.container.client.views.html.error.main(code, msg, showErrorInUi)))
+          Status((code))(org.corespring.container.client.views.html.error.main(code, msg, showErrorInUi))
         }
-        e.fold(ifEmpty)(onError)
+        Future(e.fold(ifEmpty)(onError))
       }
   }
 
