@@ -89,7 +89,7 @@ class ContainerClientImplementation(
     override def hooks: AssetHooks = new AssetHooks {
 
       override def delete(itemId: String, file: String)(implicit header: RequestHeader): Future[Option[StatusMessage]] = Future {
-        val response = playS3.delete(bucket, s"$itemId/$file")
+        val response = playS3.delete(bucket, s"$itemId/data/$file")
         if (response.success) {
           None
         } else {
@@ -97,9 +97,10 @@ class ContainerClientImplementation(
         }
       }
 
-      override def uploadAction(itemId: String, file: String)(block: (Request[Int]) => SimpleResult): Action[Int] = Action(playS3.upload(bucket, s"$itemId/$file")) { r =>
-        block(r)
-      }
+      override def uploadAction(itemId: String, file: String)(block: (Request[Int]) => SimpleResult): Action[Int] =
+        Action(playS3.upload(bucket, s"$itemId/data/$file")) { r =>
+          block(r)
+        }
     }
 
     override implicit def ec: ExecutionContext = ContainerClientImplementation.this.ec

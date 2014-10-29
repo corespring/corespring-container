@@ -14,7 +14,6 @@ block content
         ui-ace="{useWrapMode : true, onLoad: aceLoaded, onChange: aceChanged }")
 
       #preview-pane(corespring-rig-player,
-        player-mode="editor",
         player-markup="model.item.xhtml",
         player-item="model.item",
         player-session="model.session",
@@ -35,4 +34,3 @@ block after-main-script
         rootScope.$broadcast('submitEvent');
       });
     };
-
