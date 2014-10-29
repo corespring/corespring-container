@@ -6,9 +6,8 @@ import org.corespring.container.client.controllers.jade.Jade
 import org.corespring.container.client.hooks.PlayerHooks
 import org.corespring.container.client.views.txt.js.PlayerServices
 import org.corespring.container.components.processing.PlayerItemPreProcessor
-import play.api.libs.json.{ Json }
-import play.api.mvc.{ Action, AnyContent, RequestHeader }
 import play.api.libs.json.{ JsObject, Json }
+import play.api.mvc.{ Action, AnyContent, RequestHeader }
 
 trait Player
   extends App[PlayerHooks]
