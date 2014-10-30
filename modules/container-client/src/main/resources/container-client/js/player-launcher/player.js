@@ -79,11 +79,7 @@ exports.define = function(isSecure) {
     };
 
     var _isComplete = function(callback) {
-      instance.sendMessage({
-        message: "isComplete",
-        property: "isComplete",
-        callback: callback
-      });
+      instance.send( "isComplete", callback);
     };
 
     var isAllowed = function(mode, cb) {
@@ -136,14 +132,12 @@ exports.define = function(isSecure) {
         isAttempt: false,
         isComplete: false
       } : null;
-      instance.sendMessage({
-        message: "initialise",
-        data: {
-          mode: mode,
-          options: modeOptions,
-          saveResponses: saveResponseOptions,
-          queryParams: options.queryParams
-        }
+      
+      instance.send( "initialise", {
+        mode: mode,
+        options: modeOptions,
+        saveResponses: saveResponseOptions,
+        queryParams: options.queryParams
       });
     };
     
@@ -153,13 +147,10 @@ exports.define = function(isSecure) {
         isAttempt: false,
         isComplete: false
       } : null;
-      instance.sendMessage({
-        message: "setMode",
-        data: {
-          mode: mode,
-          options: modeOptions,
-          saveResponses: saveResponseOptions
-        }
+      instance.send("setMode", {
+        mode: mode,
+        options: modeOptions,
+        saveResponses: saveResponseOptions
       });
     };
 
@@ -203,21 +194,21 @@ exports.define = function(isSecure) {
     };
 
     this.countAttempts = function(callback) {
-      instance.sendMessage("countAttempts", callback);
+      instance.send("countAttempts", callback);
     };
 
     this.getScore = function(format, callback) {
-      instance.sendMessage( "getScore", {format: format || 'percent'}, callback);
-    };
+      instance.send( "getScore", {format: format || 'percent'}, callback);
+    }; 
 
     this.getSessionStatus = function(callback) {
-      instance.sendMessage( "getSessionStatus", callback);
+      instance.send( "getSessionStatus", callback);
     };
 
     this.isComplete = _isComplete;
 
     this.reset = function() {
-      instance.sendMessage("reset");
+      instance.send("reset");
     };
 
     this.remove = function() {

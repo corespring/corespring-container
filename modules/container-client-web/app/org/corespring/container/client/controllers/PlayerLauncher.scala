@@ -133,6 +133,7 @@ trait PlayerLauncher extends Controller {
 
   lazy val coreJs: String = {
     val corePaths = Seq(
+      "container-client/bower_components/msgr.js/dist/msgr.js",
       "container-client/js/player-launcher/errors.js",
       "container-client/js/player-launcher/post-message.js",
       "container-client/js/player-launcher/instance.js",

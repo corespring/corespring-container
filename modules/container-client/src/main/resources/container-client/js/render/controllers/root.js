@@ -1,23 +1,27 @@
 var controller = function($scope, $log, $timeout, MessageBridge) {
 
-  $scope.messageBridgeListener = function(event) {
-    var data = typeof(event.data) === "string" ? JSON.parse(event.data) : event.data;
+  /* global msgr */
+  var dispatcher = new msgr.Dispatcher(window, window.parent);
+  var receiver = new msgr.Receiver(window, window.parent);
 
-    $log.info("[Root.messageBridgeListener] event received: " + event.data + " : " + typeof(event.data));
-    var broadcastToChildren = function() {
-      $log.info("[Root.broadcastToChildren] " + data.message);
-      $scope.$broadcast(data.message, data, function(result) {
-        var response = _.extend(result, {
-          message: data.message + 'Result'
-        });
-        MessageBridge.sendMessage('parent', response);
-      });
-    };
+  receiver.on('?', function(data, done){
+    $log.info("[Root.broadcastToChildren] " + data.message);
+    $scope.$broadcast('?', data, function(result) {
+      done(null, result);
+    });
+  });
 
-    $timeout(broadcastToChildren, 100);
-  };
+  $scope.$on("session-loaded", function(event, session) {
+    dispatcher.send( "sessionCreated", {session: session});
+  });
 
-  MessageBridge.addMessageListener($scope.messageBridgeListener);
+  $scope.$on("inputReceived", function(event, data) {
+    dispatcher.send("inputReceived", data.sessionStatus);
+  });
+
+  $scope.$on("rendered", function(event) {
+    dispatcher.send("rendered");
+  });
 
   var getQueryParams = function(  ) {
 
@@ -53,32 +57,8 @@ var controller = function($scope, $log, $timeout, MessageBridge) {
         }
         $scope.$broadcast('initialise', data);
       });
-    } else {
-      MessageBridge.sendMessage('parent', {
-        message: 'ready'
-      });
     }
   })();
-
-  $scope.$on("session-loaded", function(event, session) {
-    MessageBridge.sendMessage('parent', {
-      message: "sessionCreated",
-      session: session
-    });
-  });
-
-  $scope.$on("inputReceived", function(event, data) {
-    MessageBridge.sendMessage('parent', {
-      message: "inputReceived",
-      sessionStatus: data.sessionStatus
-    });
-  });
-
-  $scope.$on("rendered", function(event) {
-    MessageBridge.sendMessage('parent', {
-      message: "rendered"
-    });
-  });
 
 };
 

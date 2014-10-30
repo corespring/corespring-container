@@ -1,5 +1,7 @@
 var Instance = function(element, options, errorCallback, log) {
 
+  var dispatcher, receiver;
+
   var errors = require("errors");
 
   var that = this;
@@ -12,90 +14,6 @@ var Instance = function(element, options, errorCallback, log) {
       console.warn(s);
     }
   };
-
-  var findInstanceIframe = function() {
-    var iframe = $(element).find('iframe');
-    if (iframe.length === 0) {
-      log.error("instance iframe not found");
-      return undefined;
-    }
-    return iframe;
-  };
-
-  var findDestinationIframe = function(event) {
-    var frames = document.getElementsByTagName('iframe');
-    for (var i = 0; i < frames.length; i++) {
-      if (frames[i].contentWindow === event.source) {
-        return $(frames[i]);
-      }
-    }
-    log.error("destination iframe not found");
-    return undefined;
-  };
-
-  var isMessageDestinedForInstance = function(event) {
-    var eventIframe = findDestinationIframe(event);
-    var instanceIframe = findInstanceIframe();
-    if (instanceIframe === eventIframe) {
-      return true;
-    }
-    return (instanceIframe && eventIframe) && instanceIframe[0] === eventIframe[0];
-  };
-
-  var forThisInstance = function(fn) {
-    return function(event) {
-      if (isMessageDestinedForInstance(event)) {
-        fn(event);
-      }
-    };
-  };
-
-  var listener = require("root-level-listener")(log);
-  var listenersToRemove = [];
-
-  function detachOnRemove(handler) {
-    listenersToRemove.push(handler);
-  }
-
-  function removeListeners() {
-    for (var i = 0; i < listenersToRemove.length; i++) {
-      listener.removeListener(listenersToRemove[i]);
-    }
-    listenersToRemove = [];
-  }
-
-  function dimensionChangeListener(element) {
-    function listenerFunction(data, event) {
-      try {
-        var json = JSON.parse(data);
-        if (json.message === 'dimensionsUpdate') {
-          var iframe = findDestinationIframe(event);
-          if (iframe) {
-            iframe.height(json.h);
-          } else {
-            $(element).height(json.h);
-          }
-        }
-      } catch (e) {
-        // Ignore json parsing errors (message was not meant for us)
-        if (!(e instanceof SyntaxError)) {
-          log.error("Exception in dimensionChangeListener: " + e + " for data: " + data);
-        }
-      }
-    }
-
-    var listenerFn = function(e) {
-      listenerFunction(e.data, e);
-    };
-
-    listener.addListener(listenerFn);
-    detachOnRemove(listenerFn);
-  }
-
-  function isMsie() {
-    //from MathJax at https://github.com/mathjax/MathJax/blob/master/unpacked/MathJax.js#L2987
-    return ("ActiveXObject" in window && "clipboardData" in window);
-  }
 
   function initialize(e, options) {
     if (!options || !options.url) {
@@ -151,108 +69,43 @@ var Instance = function(element, options, errorCallback, log) {
 
     $(e).html(iframeTemplate);
 
+    /* global msgr */
+    dispatcher = new msgr.Dispatcher(window, $('#iframe-player')[0].contentWindow, {enableLogging: true});
+    receiver = new msgr.Receiver(window, $('#iframe-player')[0].contentWindow);
+
     if (options.forceWidth) {
       $(e).width(options.width ? options.width : "600px");
     }
 
-    dimensionChangeListener(e);
+    that.addListener("rendered", function(data) {
+      $('#iframe-player')[0].removeClass("player-loading");
+      $('#iframe-player')[0].addClass("player-loaded");
+    });
+
+
+    //dimensionChangeListener(e);
 
     $(element).parent().bind('DOMNodeRemoved', function(e) {
       if ('#' + e.target.id === element) {
-        removeListeners();
+        this.remove();
       }
     });
   }
 
-  function postMessage(message, data) {
-    var postMessageFunc = require("post-message");
-    try {
-      postMessageFunc(message, data, element);
-    } catch (e) {
-      log.error("[player-instance]", message, data, e);
-      return false;
-    }
-    return true;
-  }
-
-  function expectResult(message, callback, dataProcessor) {
-    dataProcessor = dataProcessor || (function(data) {
-      return data;
-    });
-
-    var resultHandlerForThisInstance;
-
-    var resultHandler = function(event) {
-      listener.removeListener(resultHandlerForThisInstance);
-      var index = listenersToRemove.indexOf(resultHandlerForThisInstance);
-      if (index >= 0) {
-        listenersToRemove.splice(index, 1);
-      }
-
-      try {
-        var data = typeof(event.data) === "string" ? JSON.parse(event.data) : event.data;
-        if (data.message === message) {
-          callback(dataProcessor(data));
-        }
-      } catch (e) {
-        log.error("Exception in [player-instance] : " + e);
-      }
-    };
-
-    resultHandlerForThisInstance = forThisInstance(resultHandler);
-    listener.addListener(resultHandlerForThisInstance);
-    detachOnRemove(resultHandlerForThisInstance);
-  }
-
-
-  this.sendMessage = function(props) {
-    if (props.callback) {
-      expectResult(props.message + "Result", props.callback, extractPropertyFromMessage);
-    }
-
-    postMessage(props.message, props.data);
-
-    function extractPropertyFromMessage(message) {
-      return message[props.property];
-    }
-  };
-
-  this.parseEvent = function(event) {
-    if (typeof(event.data) === "string") {
-      try {
-        return JSON.parse(event.data);
-      } catch (e) {
-        log.warn("[player-instance] Can't parse: " + event.data + " as json", event);
-        return {};
-      }
-    } else {
-      return event.data;
-    }
+  this.send = function() {
+    dispatcher.send.apply(Array.prototype.slice(arguments, 0));
   };
 
   this.addListener = function(name, callback) {
-    var listenerForThisInstance = forThisInstance(function(event) {
-      var data = that.parseEvent(event);
-
-      if (data.message === name) {
-        callback(data);
-      }
-    });
-
-    listener.addListener(listenerForThisInstance);
-    detachOnRemove(listenerForThisInstance);
+    receiver.on(name, callback);
   };
 
   this.remove = function() {
-    removeListeners();
+    dispatcher.remove();
+    receiver.remove();
     $(element).remove();
   };
 
-  this.addListener("rendered", function(data) {
-    var iframe = findInstanceIframe();
-    iframe.removeClass("player-loading");
-    iframe.addClass("player-loaded");
-  });
 
   initialize(element, options);
 };
