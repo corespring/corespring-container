@@ -1,12 +1,13 @@
 package org.corespring.container.client.controllers.apps
 
 import org.corespring.container.client.VersionInfo
+import org.corespring.container.client.V2PlayerConfig
 import org.corespring.container.client.component.PlayerItemTypeReader
 import org.corespring.container.client.controllers.jade.Jade
 import org.corespring.container.client.hooks.PlayerHooks
 import org.corespring.container.client.views.txt.js.PlayerServices
 import org.corespring.container.components.processing.PlayerItemPreProcessor
-import play.api.libs.json.{ JsObject, Json }
+import play.api.libs.json.{JsString, JsValue, JsObject, Json}
 import play.api.mvc.{ Action, AnyContent, RequestHeader }
 
 trait Player
@@ -38,6 +39,8 @@ trait Player
     r.getQueryString("showControls").map(_ == "true").getOrElse(false)
   }
 
+  def playerConfig : V2PlayerConfig
+
   /**
    * Query params:
    * mode=prod|dev (default: whichever way the app is run)
@@ -67,6 +70,8 @@ trait Player
         val processedXhtml = processXhtml((itemJson \ "xhtml").asOpt[String])
         val preprocessedItem = itemPreProcessor.preProcessItemForPlayer(itemJson).as[JsObject] ++ Json.obj("xhtml" -> processedXhtml)
 
+        val newRelicRumConf : Option[JsValue] = playerConfig.newRelicRumConfig
+
         logger.trace(s"function=load domainResolvedJs=$domainResolvedJs")
         logger.trace(s"function=load domainResolvedCss=$domainResolvedCss")
 
@@ -80,7 +85,10 @@ trait Player
               servicesJs,
               showControls,
               Json.obj("session" -> session, "item" -> preprocessedItem),
-              VersionInfo.json)))
+              VersionInfo.json,
+              newRelicRumConf != None,
+              newRelicRumConf.getOrElse(Json.obj())
+            )))
       }
     }
   }
