@@ -45,6 +45,8 @@ trait DefaultIntegration
     Play.current.mode == Mode.Dev || configuration.getBoolean("showErrorInUi").getOrElse(false)
   }
 
+
+
   implicit def ec: ExecutionContext
 
   override def playerItemPreProcessor: PlayerItemPreProcessor = new RhinoPlayerItemPreProcessor(DefaultIntegration.this.components, scopeBuilder.scope)
@@ -123,6 +125,8 @@ trait DefaultIntegration
     override def hooks = catalogHooks
   }
 
+  private lazy val playerConfig: V2PlayerConfig = V2PlayerConfig(configuration)
+
   lazy val jsonPlayer = new JsonPlayer {
 
     override def showErrorInUi: Boolean = DefaultIntegration.this.showErrorInUi
@@ -151,6 +155,8 @@ trait DefaultIntegration
     override def resolveDomain(path: String): String = DefaultIntegration.this.resolveDomain(path)
 
     override def itemPreProcessor: PlayerItemPreProcessor = DefaultIntegration.this.playerItemPreProcessor
+
+    override def playerConfig: V2PlayerConfig = DefaultIntegration.this.playerConfig
   }
 
   lazy val item = new Item {
@@ -179,7 +185,7 @@ trait DefaultIntegration
 
     def hooks = playerLauncherHooks
 
-    override def playerConfig: V2PlayerConfig = V2PlayerConfig(configuration)
+    override def playerConfig: V2PlayerConfig = DefaultIntegration.this.playerConfig
   }
 
   override def dataQuery: DataQuery = new DataQuery {

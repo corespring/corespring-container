@@ -1,6 +1,6 @@
 package org.corespring.container.client.controllers.apps
 
-import org.corespring.container.client.VersionInfo
+import org.corespring.container.client.{V2PlayerConfig, VersionInfo}
 import org.corespring.container.client.component.PlayerItemTypeReader
 import org.corespring.container.client.controllers.jade.Jade
 import org.corespring.container.client.controllers.player.PlayerQueryStringOptions
@@ -8,7 +8,7 @@ import org.corespring.container.client.hooks.PlayerHooks
 import org.corespring.container.client.views.txt.js.PlayerServices
 import org.corespring.container.components.model.Id
 import org.corespring.container.components.processing.PlayerItemPreProcessor
-import play.api.libs.json.{JsObject, JsValue, Json}
+import play.api.libs.json._
 import play.api.mvc._
 
 import scala.concurrent.Future
@@ -89,14 +89,20 @@ trait ProdHtmlPlayer extends BasePlayer with Jade {
 
   def itemPreProcessor: PlayerItemPreProcessor
 
+  def playerConfig: V2PlayerConfig
+
+
   def template(html: String, deps: Seq[String], js: Seq[String], css: Seq[String], json: JsValue) = {
+    import org.corespring.container.client.NewRelicRumConfig.writes
     val params: Map[String, Object] = Map(
       "html" -> html,
       "ngModules" -> s"[${deps.map(d => s"'$d'").mkString(",")}]",
       "js" -> js.toArray,
       "css" -> css.toArray,
       "sessionJson" -> Json.stringify(json),
-      "versionInfo" -> Json.stringify(VersionInfo.json))
+      "versionInfo" -> Json.stringify(VersionInfo.json),
+      "newRelicRumConfig" -> playerConfig.newRelicRumConfig.map(c => Json.toJson(c)).getOrElse("")
+      )
     logger.trace(s"render jade with params: $params")
     renderJade(name, params)
   }

@@ -12,6 +12,11 @@ html(xmlns='http://www.w3.org/1999/html')
     for c in css
       link(rel='stylesheet', href='#{c}')
 
+    if(newRelicRumConfig)
+      script(type="text/javascript", src="../../js/libs/newrelic/newrelic-rum-js-agent.min.js")
+      script(type="text/javascript")
+        NREUM.info=!{newRelicRumConfig}
+
   body(ng-app='corespring-player')
     .pre-loader
       #spinner
