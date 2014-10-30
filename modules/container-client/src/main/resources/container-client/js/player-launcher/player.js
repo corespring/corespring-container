@@ -191,69 +191,38 @@ exports.define = function(isSecure) {
     };
 
     this.saveResponses = function(isAttempt, callback) {
-      instance.sendMessage({
-        message: "saveResponses",
-        data: {
-          isAttempt: isAttempt
-        },
-        callback: callback,
-        property: "result"
-      });
+      instance.send('saveResponses', {isAttempt: isAttempt}, callback);
     };
 
     this.completeResponse = function(callback) {
-      instance.sendMessage({
-        message: "completeResponse",
-        callback: callback,
-        property: "result"
-      });
+      instance.send('completeResponse', callback);
     };
 
     this.resetItem = function() {
-      instance.sendMessage({
-        message: "resetItem"
-      });
+      instance.send("resetItem");
     };
 
     this.countAttempts = function(callback) {
-      instance.sendMessage({
-        message: "countAttempts",
-        property: "count",
-        callback: callback
-      });
+      instance.sendMessage("countAttempts", callback);
     };
 
     this.getScore = function(format, callback) {
-      instance.sendMessage({
-        message: "getScore",
-        data: {
-          format: format || 'percent'
-        },
-        property: "score",
-        callback: callback
-      });
+      instance.sendMessage( "getScore", {format: format || 'percent'}, callback);
     };
 
     this.getSessionStatus = function(callback) {
-      instance.sendMessage({
-        message: "getSessionStatus",
-        property: "sessionStatus",
-        callback: callback
-      });
+      instance.sendMessage( "getSessionStatus", callback);
     };
 
     this.isComplete = _isComplete;
 
     this.reset = function() {
-      instance.sendMessage({
-        message: "reset"
-      });
+      instance.sendMessage("reset");
     };
 
     this.remove = function() {
       instance.remove();
     };
-
 
     instance.addListener("ready", function(data) {
       isReady = true;
