@@ -63,6 +63,8 @@ trait DefaultIntegration
 
   private lazy val prodProcessor = new RhinoOutcomeProcessor(DefaultIntegration.this.components, scopeBuilder.scope)
 
+  private lazy val playerConfig: V2PlayerConfig = V2PlayerConfig(configuration)
+
   def scopeBuilder = if (Play.current.mode == Mode.Prod) {
     logger.trace("Prod RhinoScopeBuilder")
     prodScopeBuilder
@@ -129,6 +131,8 @@ trait DefaultIntegration
 
     override def urls: ComponentUrls = componentSets
 
+    override def playerConfig: V2PlayerConfig = DefaultIntegration.this.playerConfig
+
     override def components: Seq[Component] = DefaultIntegration.this.components
 
     override def hooks = playerHooks
@@ -164,7 +168,7 @@ trait DefaultIntegration
 
     def hooks = playerLauncherHooks
 
-    override def playerConfig: V2PlayerConfig = V2PlayerConfig(configuration)
+    override def playerConfig: V2PlayerConfig = DefaultIntegration.this.playerConfig
   }
 
   override def dataQuery: DataQuery = new DataQuery {
