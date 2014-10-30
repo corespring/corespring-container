@@ -2,8 +2,11 @@ extends layout
 
 block header-scripts
   if useNewRelicRum
+
     script(type="text/javascript", src="../../js/libs/newrelic/newrelic-rum-js-agent.min.js")
+
     script(type="text/javascript")
+
       NREUM.info=!{newRelicRumConfig}
 
 block content
