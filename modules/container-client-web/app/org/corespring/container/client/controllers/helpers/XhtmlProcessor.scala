@@ -10,23 +10,13 @@ trait XhtmlProcessor {
    */
   def tagNamesToAttributes(xhtml: String): Option[String] = {
 
-    val tagsFixed = "<(corespring-.*?)(\\w.*?>)".r.replaceAllIn(xhtml, {
-      m: Regex.Match =>
-        s"<div ${m.group(1)}${m.group(2)}</div>"
-    })
+    val substitutedClosingTag = "(?<=<\\/)(corespring-.*?)(?=>)".r
+      .replaceAllIn(xhtml,{m => s"div"})
 
-    val cleaner: HtmlCleaner = new HtmlCleaner()
-    val transformations: CleanerTransformations = new CleanerTransformations()
+    val substitutedOpeningTag = "(?<=<)(corespring-.*?)(?=\\s|>)".r
+      .replaceAllIn(substitutedClosingTag,{m => s"""div ${m.group(1)}=\"${m.group(1)}\""""})
 
-    val customToDiv = new TagTransformation()
-    transformations.addTransformation(customToDiv)
-    cleaner.getProperties.setUseEmptyElementTags(false)
-    cleaner.getProperties.setOmitXmlDeclaration(true)
-    cleaner.getProperties.setOmitHtmlEnvelope(true)
-    cleaner.getProperties.setCleanerTransformations(transformations)
-    val n: TagNode = cleaner.clean(tagsFixed)
-    val serializer = new CompactXmlSerializer(cleaner.getProperties)
-    Some(serializer.getAsString(n))
+    Some(substitutedOpeningTag)
   }
 
   def toWellFormedXhtml(html: String): String = {
