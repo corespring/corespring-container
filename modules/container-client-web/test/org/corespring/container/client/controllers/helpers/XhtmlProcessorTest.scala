@@ -24,6 +24,12 @@ class XhtmlProcessorTest extends Specification with XhtmlProcessor {
       tagNamesToAttributes(xhtml).get.trim.toUnix ===
         """<div corespring-one="corespring-one"><div corespring-two="corespring-two">Content</div></div>""".toUnix
     }
+
+    "does not split tags" in {
+      val xhtml = "<p>Hello<corespring-one><corespring-two>Content</corespring-two></corespring-one>World</p>"
+      tagNamesToAttributes(xhtml).get.trim.toUnix ===
+        """<p>Hello<div corespring-one="corespring-one"><div corespring-two="corespring-two">Content</div></div>World</p>""".toUnix
+    }
   }
 
 }
