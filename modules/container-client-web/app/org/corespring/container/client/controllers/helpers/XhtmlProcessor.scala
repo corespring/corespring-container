@@ -14,9 +14,23 @@ trait XhtmlProcessor {
       .replaceAllIn(xhtml,{m => s"div"})
 
     val substitutedOpeningTag = "(?<=<)(corespring-.*?)(?=\\s|>)".r
-      .replaceAllIn(substitutedClosingTag,{m => s"""div ${m.group(1)}=\"${m.group(1)}\""""})
+      .replaceAllIn(substitutedClosingTag,{m => s"""div ${m.group(1)}="${m.group(1)}""""})
 
-    Some(substitutedOpeningTag)
+    val cleaner: HtmlCleaner = new HtmlCleaner()
+    val transformations: CleanerTransformations = new CleanerTransformations()
+
+    val pToDiv = new TagTransformation("p", "div", true)
+    pToDiv.addAttributeTransformation("class", "para ${class}")
+    transformations.addTransformation(pToDiv)
+    cleaner.getProperties.setCleanerTransformations(transformations)
+
+    cleaner.getProperties.setUseEmptyElementTags(false)
+    cleaner.getProperties.setOmitXmlDeclaration(true)
+    cleaner.getProperties.setOmitHtmlEnvelope(true)
+
+    val n: TagNode = cleaner.clean(substitutedOpeningTag)
+    val serializer = new CompactXmlSerializer(cleaner.getProperties)
+    Some(serializer.getAsString(n))
   }
 
   def toWellFormedXhtml(html: String): String = {
