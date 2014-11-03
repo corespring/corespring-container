@@ -11,7 +11,7 @@ trait XhtmlProcessor {
   def tagNamesToAttributes(xhtml: String): Option[String] = {
 
     val substitutedClosingTag = "(?<=<\\/)(corespring-.*?)(?=>)".r
-      .replaceAllIn(xhtml,{m => s"div"})
+      .replaceAllIn(xhtml,{m => "div"})
 
     val substitutedOpeningTag = "(?<=<)(corespring-.*?)(?=\\s|>)".r
       .replaceAllIn(substitutedClosingTag,{m => s"""div ${m.group(1)}="${m.group(1)}""""})
@@ -30,7 +30,11 @@ trait XhtmlProcessor {
 
     val n: TagNode = cleaner.clean(substitutedOpeningTag)
     val serializer = new CompactXmlSerializer(cleaner.getProperties)
-    Some(serializer.getAsString(n))
+    val cleanHtml = serializer.getAsString(n)
+
+    //the cleaner creates class="para " (with anextra blank) when the p does not have class
+    //the regexp below removes that blank
+    Some("""class="para """".r.replaceAllIn(cleanHtml, {m => """class="para""""}))
   }
 
   def toWellFormedXhtml(html: String): String = {
@@ -43,4 +47,6 @@ trait XhtmlProcessor {
     serializer.getAsString(n)
   }
 }
+
+
 
