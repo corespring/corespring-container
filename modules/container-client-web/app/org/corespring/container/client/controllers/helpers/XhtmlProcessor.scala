@@ -10,23 +10,31 @@ trait XhtmlProcessor {
    */
   def tagNamesToAttributes(xhtml: String): Option[String] = {
 
-    val tagsFixed = "<(corespring-.*?)(\\w.*?>)".r.replaceAllIn(xhtml, {
-      m: Regex.Match =>
-        s"<div ${m.group(1)}${m.group(2)}</div>"
-    })
+    val substitutedClosingTag = "(?<=<\\/)(corespring-.*?)(?=>)".r
+      .replaceAllIn(xhtml,{m => "div"})
+
+    val substitutedOpeningTag = "(?<=<)(corespring-.*?)(?=\\s|>)".r
+      .replaceAllIn(substitutedClosingTag,{m => s"""div ${m.group(1)}="${m.group(1)}""""})
 
     val cleaner: HtmlCleaner = new HtmlCleaner()
     val transformations: CleanerTransformations = new CleanerTransformations()
 
-    val customToDiv = new TagTransformation()
-    transformations.addTransformation(customToDiv)
+    val pToDiv = new TagTransformation("p", "div", true)
+    pToDiv.addAttributeTransformation("class", "para ${class}")
+    transformations.addTransformation(pToDiv)
+    cleaner.getProperties.setCleanerTransformations(transformations)
+
     cleaner.getProperties.setUseEmptyElementTags(false)
     cleaner.getProperties.setOmitXmlDeclaration(true)
     cleaner.getProperties.setOmitHtmlEnvelope(true)
-    cleaner.getProperties.setCleanerTransformations(transformations)
-    val n: TagNode = cleaner.clean(tagsFixed)
+
+    val n: TagNode = cleaner.clean(substitutedOpeningTag)
     val serializer = new CompactXmlSerializer(cleaner.getProperties)
-    Some(serializer.getAsString(n))
+    val cleanHtml = serializer.getAsString(n)
+
+    //the cleaner creates class="para " (with an extra blank) when the p does not have class
+    //the regexp below removes that blank
+    Some("""class="para """".r.replaceAllIn(cleanHtml, {m => """class="para""""}))
   }
 
   def toWellFormedXhtml(html: String): String = {
@@ -39,4 +47,6 @@ trait XhtmlProcessor {
     serializer.getAsString(n)
   }
 }
+
+
 

@@ -46,7 +46,7 @@ angular.module('corespring-player.services').factory('CorespringPlayerDefinition
           $compile($body)($scope.lastScope);
 
           MathJaxService.onEndProcess(function(){
-            $('.player-body').css('visibility','visible');
+            $('.player-body').removeClass('hidden-player-body');
             MathJaxService.off(arguments.callee);
             if (!isRenderedOnce){
               isRenderedOnce = true;
@@ -158,7 +158,7 @@ angular.module('corespring-player.services').factory('CorespringPlayerDefinition
       };
       this.template = [
         '<div class="corespring-player">',
-        '  <div class="player-body" style="visibility: hidden"></div>',
+        '  <div class="player-body hidden-player-body"></div>',
         '</div>'
       ].join("\n");
     }

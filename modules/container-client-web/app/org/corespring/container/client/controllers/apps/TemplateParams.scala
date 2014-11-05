@@ -50,11 +50,15 @@ case class PlayerTemplateParams(
   ngServiceLogic: String,
   showControls: Boolean,
   sessionJson: JsValue,
-  versionInfo: JsValue) extends TemplateParams {
+  versionInfo: JsValue,
+  useNewRelicRum : Boolean,
+  newRelicRumConfig: JsValue) extends TemplateParams {
   override def toJadeParams = {
     super.toJadeParams ++ Map(
       "showControls" -> new java.lang.Boolean(showControls),
       "sessionJson" -> Json.stringify(sessionJson),
-      "versionInfo" -> Json.stringify(versionInfo))
+      "versionInfo" -> Json.stringify(versionInfo),
+      "useNewRelicRum" -> new java.lang.Boolean(useNewRelicRum),
+      "newRelicRumConfig" -> Json.stringify(newRelicRumConfig))
   }
 }
