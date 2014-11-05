@@ -4,7 +4,7 @@
       "title": "Number Line"
     }
   },
-  "xhtml": "<div><div corespring-number-line id='1'></div><br/></div>",
+  "xhtml": "<div>Number A line test<br/> <corespring-number-line id='1'></corespring-number-line><br/>Here.</div>",
   "components": {
     "1": {
       "componentType": "corespring-number-line",
@@ -17,31 +17,11 @@
         }
       ],
       "model": {
+        "config": {
+          "domain": [0, 20]
+        },
         "objects": [
-          {
-            "type": "point",
-            "pointType": "empty",
-            "domainPosition": 3,
-            "rangePosition": 1
-          },
-          {
-            "type": "line",
-            "domainPosition": 2,
-            "rangePosition": 2,
-            "size": 2,
-            "leftPoint": "full",
-            "rightPoint": "empty"
-          }
         ]
-      }
-    },
-    "2": {
-      "componentType": "corespring-number-line",
-      "title": "Number Line",
-      "weight": 1,
-      "correctResponse": {},
-      "model": {
-        "orientation": "horizontal"
       }
     }
   },
