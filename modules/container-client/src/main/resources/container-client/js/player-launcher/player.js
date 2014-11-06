@@ -10,7 +10,7 @@ exports.define = function(isSecure) {
 
     if(launcherWarnings.hasWarnings()){
       for (i = 0; i < launcherWarnings.warnings.length; i++) {
-        if(console && console.warn && typeof(console.warn) === 'function'){
+        if(typeof(console) === 'object' && console.warn && typeof(console.warn) === 'function'){
           console.warn(launcherWarnings.warnings[i]);
         }
       }
