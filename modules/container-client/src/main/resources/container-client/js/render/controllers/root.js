@@ -53,6 +53,9 @@ angular.module('corespring-player.controllers')
           $scope.$on("rendered", function(event) {
             channel.send("rendered");
           });
+
+          channel.send('ready');
+
         } else {
             $timeout(function() {
               var data = { mode: 'gather' };

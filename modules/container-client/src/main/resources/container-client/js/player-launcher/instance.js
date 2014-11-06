@@ -1,6 +1,7 @@
 var Instance = function(element, options, errorCallback, log) {
 
-  var dispatcher, receiver;
+  /** msgr.Channel */
+  var channel;
 
   var errors = require("errors");
 
@@ -70,16 +71,15 @@ var Instance = function(element, options, errorCallback, log) {
     $(e).html(iframeTemplate);
 
     /* global msgr */
-    dispatcher = new msgr.Dispatcher(window, $('#iframe-player')[0].contentWindow, {enableLogging: true});
-    receiver = new msgr.Receiver(window, $('#iframe-player')[0].contentWindow);
+    channel = new msgr.Channel(window, $('#iframe-player')[0].contentWindow, {enableLogging: true});
 
     if (options.forceWidth) {
       $(e).width(options.width ? options.width : "600px");
     }
 
     that.addListener("rendered", function(data) {
-      $('#iframe-player')[0].removeClass("player-loading");
-      $('#iframe-player')[0].addClass("player-loaded");
+      $('#iframe-player').removeClass("player-loading");
+      $('#iframe-player').addClass("player-loaded");
     });
 
 
@@ -93,16 +93,16 @@ var Instance = function(element, options, errorCallback, log) {
   }
 
   this.send = function() {
-    dispatcher.send.apply(Array.prototype.slice(arguments, 0));
+    var args = Array.prototype.slice.call(arguments);
+    channel.send.apply(channel, args);
   };
 
   this.addListener = function(name, callback) {
-    receiver.on(name, callback);
+    channel.on(name, callback);
   };
 
   this.remove = function() {
-    dispatcher.remove();
-    receiver.remove();
+    channel.remove();
     $(element).remove();
   };
 
