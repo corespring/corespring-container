@@ -18,5 +18,5 @@ exports.src = [
   'bower_components/mathjs/dist/math(.min).js',
   'bower_components/saxjs/lib/sax.js',
   'bower_components/bootstrap/dist/js/bootstrap(.min).js',
-  'bower_components/msgr/dist/msgr(.min).js',
+  'bower_components/msgr.js/dist/msgr(.min).js'
 ]
