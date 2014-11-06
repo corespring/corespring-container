@@ -7,9 +7,9 @@ angular.module('corespring-player.controllers')
        function($scope, $log, $timeout, MessageBridge) {
 
         function isInIframe(){
-         return top !== window; 
+         return top !== window;
         }
-        
+
         function getQueryParams() {
 
           var queryString = (window && window.location &&
@@ -32,11 +32,10 @@ angular.module('corespring-player.controllers')
         }
 
         if(isInIframe()){
-          /* global msgr */  
-          var dispatcher = new msgr.Dispatcher(window, window.parent);
-          var receiver = new msgr.Receiver(window, window.parent);
+          /* global msgr */
+          var channel = new msgr.Channel(window, window.parent);
 
-          receiver.on('*', function(eventName, data, done){
+          channel.on('*', function(eventName, data, done){
             $log.info("[Root.broadcastToChildren] " + data.message);
             $scope.$broadcast(eventName, data, function(result) {
               done(null, result);
@@ -44,15 +43,15 @@ angular.module('corespring-player.controllers')
           });
 
           $scope.$on("session-loaded", function(event, session) {
-            dispatcher.send( "sessionCreated", {session: session});
+            channel.send( "sessionCreated", {session: session});
           });
 
           $scope.$on("inputReceived", function(event, data) {
-            dispatcher.send("inputReceived", data.sessionStatus);
+            channel.send("inputReceived", data.sessionStatus);
           });
 
           $scope.$on("rendered", function(event) {
-            dispatcher.send("rendered");
+            channel.send("rendered");
           });
         } else {
             $timeout(function() {
@@ -66,5 +65,3 @@ angular.module('corespring-player.controllers')
         }
       }
 ]);
-      
-
