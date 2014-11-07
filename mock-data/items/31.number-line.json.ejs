@@ -13,14 +13,59 @@
       "correctResponse": [
         {
           "type": "point",
+          "pointType": "empty",
           "domainPosition": 3
+        },
+        {
+          "type": "line",
+          "domainPosition": 2,
+          "size": 2,
+          "leftPoint": "full",
+          "rightPoint": "empty"
         }
       ],
       "model": {
         "config": {
-          "domain": [0, 20]
+          "domain": [0, 20],
+          "maxNumberOfPoints": 3,
+          "tickFrequency": 20,
+          "snapPerTick": 2,
+          "initialType": "PF",
+          "exhibitOnly": false,
+          "availableTypes": {
+            "PF":  true,
+            "LEE": true,
+            "LEF": true,
+            "LFE": true,
+            "LFF": true,
+            "REP": true,
+            "REP": true,
+            "REN": true,
+            "RFN": true
+          }
         },
         "objects": [
+          {
+            "type": "point",
+            "pointType": "full",
+            "domainPosition": 3,
+            "rangePosition": 1
+          },
+          {
+            "type": "line",
+            "domainPosition": 2,
+            "rangePosition": 2,
+            "size": 2,
+            "leftPoint": "full",
+            "rightPoint": "empty"
+          },
+          {
+            "type": "ray",
+            "domainPosition": 2,
+            "rangePosition": 3,
+            "pointType": "empty",
+            "direction": "positive"
+          }
         ]
       }
     }
