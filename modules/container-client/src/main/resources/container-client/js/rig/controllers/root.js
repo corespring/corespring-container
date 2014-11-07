@@ -1,4 +1,14 @@
-var controller = function($scope, $location, $http, $timeout, $log, ComponentRegister, PlayerUtils, PlayerServiceDef) {
+var controller = function($scope,$http, $location, $timeout, $log, ComponentRegister, PlayerUtils, PlayerServiceDef) {
+
+  $scope.playerMode = 'gather';
+
+  $scope.playerSettings = {
+    maxNoOfAttempts: 1,
+    highlightUserResponse: true,
+    highlightCorrectResponse: true,
+    showFeedback: true,
+    allowEmptyResponses: false
+  };
 
   $scope.getQuestionForComponentId = function(id) {
     return $scope.model.item.components[id];
@@ -40,21 +50,56 @@ var controller = function($scope, $location, $http, $timeout, $log, ComponentReg
     });
   };
 
+  function setMode(mode) {
+    $scope.playerMode = mode;
+    ComponentRegister.setMode(mode);
+    ComponentRegister.setEditable(isGatherMode());
+  }
+
+
   function onSessionSaved(data) {
     $scope.model.responses = data.responses;
     $scope.model.session = data.session;
     $scope.model.outcome = data.outcome;
+    $scope.outcome = data.outcome;
+    $scope.score = data.score;
     $scope.model.score = data.score;
     ComponentRegister.setEditable(false);
   }
 
-  $scope.$on('submitEvent', function() {
+  function submitSession(){
     var components = ComponentRegister.getComponentSessions();
     PlayerService.submitSession({
       components: components
     }, onSessionSaved, function() {
       $log.error('There was a problem saving the session');
     });
+  }
+
+  $scope.$on('playerControlPanel.submit', function() {
+    submitSession();
+  });
+
+  $scope.$on('playerControlPanel.reset', function () {
+    $scope.model.session = null;
+    $scope.model.score = undefined;
+    $scope.model.outcome = undefined;
+    $scope.model.responses = {};
+    ComponentRegister.reset();
+    setMode('gather');
+  });
+
+  function isGatherMode(){
+    return $scope.playerMode === 'gather';
+  }
+
+  $scope.$on('playerControlPanel.settingsChange', function () {
+    PlayerService.updateSessionSettings($scope.playerSettings);
+    if(isGatherMode()){
+      //nothing to do
+    } else {
+      submitSession();
+    }
   });
 
   $scope.onSuccess = function(data) {
@@ -88,12 +133,24 @@ var controller = function($scope, $location, $http, $timeout, $log, ComponentReg
     //}, 200);
   }, true);
 
-  var jsonFile = $location.search().data;
+  function getQueryVariable(variable) {
+    var query = window.location.search.substring(1);
+    var vars = query.split('&');
+    for (var i = 0; i < vars.length; i++) {
+      var pair = vars[i].split('=');
+      if (decodeURIComponent(pair[0]) === variable) {
+        return decodeURIComponent(pair[1]);
+      }
+    }
+    console.log('Query variable %s not found', variable);
+  }
+
+  var jsonFile = getQueryVariable("data");
   $http.get(jsonFile)
     .success($scope.onSuccess);
 };
 
 angular.module('corespring-rig.controllers')
   .controller(
-    'Root', ['$scope', '$location', '$http', '$timeout', '$log', 'ComponentRegister', 'PlayerUtils', 'ClientSidePlayerService', controller]
+    'Root', ['$scope','$http' ,'$location', '$timeout', '$log', 'ComponentRegister', 'PlayerUtils', 'ClientSidePlayerService', controller]
 );
