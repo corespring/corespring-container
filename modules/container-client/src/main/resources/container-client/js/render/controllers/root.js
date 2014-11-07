@@ -3,8 +3,8 @@ angular.module('corespring-player.controllers')
     'Root', ['$scope',
       '$log',
       '$timeout',
-      'MessageBridge',
-       function($scope, $log, $timeout, MessageBridge) {
+      'Msgr',
+       function($scope, $log, $timeout, Msgr) {
 
         function isInIframe(){
          return top !== window;
@@ -32,29 +32,25 @@ angular.module('corespring-player.controllers')
         }
 
         if(isInIframe()){
-          /* global msgr */
-          var channel = new msgr.Channel(window, window.parent);
 
-          channel.on('*', function(eventName, data, done){
-            $log.info("[Root.broadcastToChildren] " + data.message);
-            $scope.$broadcast(eventName, data, function(result) {
-              done(null, result);
-            });
+          Msgr.on('*', function(eventName, data, done){
+            $log.info("[Root.broadcastToChildren] " + eventName);
+            $scope.$broadcast(eventName, data, done);
           });
 
           $scope.$on("session-loaded", function(event, session) {
-            channel.send( "sessionCreated", {session: session});
+            Msgr.send( "sessionCreated", {session: session});
           });
 
           $scope.$on("inputReceived", function(event, data) {
-            channel.send("inputReceived", data.sessionStatus);
+            Msgr.send("inputReceived", data.sessionStatus);
           });
 
           $scope.$on("rendered", function(event) {
-            channel.send("rendered");
+            Msgr.send("rendered");
           });
 
-          channel.send('ready');
+          Msgr.send('ready');
 
         } else {
             $timeout(function() {
