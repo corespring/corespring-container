@@ -87,9 +87,9 @@
 
         addContent($([
           '<placeholder',
-          ' id="' + $scope.lastId + '"',
-          ' component-type="' + component.componentType + '"',
-          ' label="' + component.name + '"',
+            ' id="' + $scope.lastId + '"',
+            ' component-type="' + component.componentType + '"',
+            ' label="' + component.name + '"',
           '>'
         ].join('')));
       }
@@ -163,29 +163,32 @@
       };
 
       $scope.extraFeatures = {
-        definitions: [{
-          name: 'external',
-          type: 'dropdown',
-          dropdownTitle: 'Answer Type',
-          buttons: _($scope.interactions).reject(isToolbar).sortBy(orderList).map(componentToFeature).value()
-        }, {
-          type: 'group',
-          buttons: [
-            new WiggiMathJaxFeatureDef()
-          ]
-        }, {
-          type: 'group',
-          buttons: [
-            new WiggiFootnotesFeatureDef()
-          ]
-        }, {
-          type: 'group',
-          buttons: [
-            videoComponent
-          ]
-        },
-        linkFeatureGroup
-      ]};
+        definitions: [
+          {
+            name: 'external',
+            type: 'dropdown',
+            dropdownTitle: 'Answer Type',
+            buttons: _($scope.interactions).reject(isToolbar).sortBy(orderList).map(componentToFeature).value()
+          },
+          {
+            type: 'group',
+            buttons: [
+              new WiggiMathJaxFeatureDef()
+            ]
+          },
+          {
+            type: 'group',
+            buttons: [
+              new WiggiFootnotesFeatureDef()
+            ]
+          },
+          {
+            type: 'group',
+            buttons: [
+              videoComponent
+            ]
+          }
+        ]};
     }
 
     function onComponentsLoadError(error) {
