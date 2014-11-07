@@ -10,16 +10,18 @@ exports.define = function(isSecure) {
 
     var logger = options.logger || require('logger');
 
-    if(launcherWarnings.hasWarnings()){
-      for (var i = 0; i < launcherWarnings.warnings.length; i++) {
-        logger.warn(launcherWarnings.warnings[i]);
+    function iterate(arr, fn){
+      for(var i = 0; i < arr.length; i++){
+        fn(arr[i]);
       }
     }
 
+    if(launcherWarnings.hasWarnings()){
+      iterate(launcherWarnings.warnings, logger.warn);
+    }
+
     if (launcherErrors.hasErrors()) {
-      for (var z = 0; z < launcherErrors.errors.length; z++) {
-        errorCallback(errors.EXTERNAL_ERROR(launcherErrors.errors[z]));
-      }
+      iterate(launcherErrors.errors, function(e){errorCallback(errors.EXTERNAL_ERROR(e)); });
       return;
     }
 
@@ -46,9 +48,7 @@ exports.define = function(isSecure) {
     var result = validateOptions(options);
 
     if (result.length > 0) {
-      for (i = 0; i < result.length; i++) {
-        errorCallback(result[i]);
-      }
+      iterate(result, errorCallback);
       return;
     }
 
@@ -87,8 +87,8 @@ exports.define = function(isSecure) {
         } else {
           originalCallback(result);
         }
-      }
-    };
+      };
+    }
 
     var _isComplete = function(callback) {
       instance.send( 'isComplete', messageResultHandler(callback));
