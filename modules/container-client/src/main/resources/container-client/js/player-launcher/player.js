@@ -1,5 +1,10 @@
 exports.define = function(isSecure) {
   var PlayerDefinition = function(element, options, errorCallback) {
+
+    errorCallback = errorCallback || function(error) {
+      throw "error occurred, code: " + error.code + ", message: " + error.message;
+    };
+
     var errors = require('errors');
     var launcherErrors = require('launcher-errors');
     var launcherWarnings = require('launcher-warnings');
@@ -10,18 +15,20 @@ exports.define = function(isSecure) {
 
     var logger = options.logger || require('logger');
 
-    function iterate(arr, fn){
-      for(var i = 0; i < arr.length; i++){
-        fn(arr[i]);
+    function forEach(arr, fn){
+      if(fn){
+        for(var i = 0; i < arr.length; i++){
+          fn(arr[i]);
+        }
       }
     }
 
     if(launcherWarnings.hasWarnings()){
-      iterate(launcherWarnings.warnings, logger.warn);
+      forEach(launcherWarnings.warnings, logger.warn);
     }
 
-    if (launcherErrors.hasErrors()) {
-      iterate(launcherErrors.errors, function(e){errorCallback(errors.EXTERNAL_ERROR(e)); });
+    if (launcherErrors.hasErrors() && errorCallback) {
+      forEach(launcherErrors.errors, function(e){errorCallback(errors.EXTERNAL_ERROR(e)); });
       return;
     }
 
@@ -48,7 +55,7 @@ exports.define = function(isSecure) {
     var result = validateOptions(options);
 
     if (result.length > 0) {
-      iterate(result, errorCallback);
+      forEach(result, errorCallback);
       return;
     }
 
@@ -108,10 +115,6 @@ exports.define = function(isSecure) {
       } else {
         cb(true);
       }
-    };
-
-    errorCallback = errorCallback || function(error) {
-      throw 'error occurred, code: ' + error.code + ', message: ' + error.message;
     };
 
     /*
