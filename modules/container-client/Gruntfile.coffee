@@ -181,7 +181,7 @@ module.exports = (grunt) ->
   grunt.registerTask('lcd', ['loadComponentDependencies'])
   grunt.registerTask('loadComponentDependencies', 'Load client side dependencies for the components', componentDependencies(grunt))
   grunt.registerTask('run', ['mk-css', 'pathReporter', 'runComponentLess', 'watch'])
-  grunt.registerTask('mk-css', ['copy:less', 'less'])
+  grunt.registerTask('mk-css', ['copy:less', 'less', 'runComponentLess'])
   grunt.registerTask('default', ['stage'])
   grunt.registerTask('test', ['lcd', 'prepPlayerLauncher', 'jasmine:unit'])
 
