@@ -73,7 +73,7 @@ var Instance = function(element, options, errorCallback, log) {
 
     $(e).html(iframeTemplate);
 
-    channel = new msgr.Channel(window, $('#iframe-player')[0].contentWindow, {enableLogging: true});
+    channel = new msgr.Channel(window, $('#iframe-player')[0].contentWindow, {enableLogging: false});
 
     channel.on('dimensionsUpdate', function(data){
       $('#iframe-player').height(data.h);

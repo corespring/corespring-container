@@ -131,8 +131,8 @@ exports.define = function(isSecure) {
     }
 
     if (options.onInputReceived) {
-      instance.on('inputReceived', function(data) {
-        options.onInputReceived(data.sessionStatus);
+      instance.on('inputReceived', function(sessionStatus) {
+        options.onInputReceived(sessionStatus);
       });
     }
 
@@ -210,7 +210,7 @@ exports.define = function(isSecure) {
     };
 
     this.countAttempts = function(callback) {
-      instance.send('countAttempts', callback);
+      instance.send('countAttempts', messageResultHandler(callback));
     };
 
     this.getScore = function(format, callback) {
@@ -221,7 +221,7 @@ exports.define = function(isSecure) {
     };
 
     this.getSessionStatus = function(callback) {
-      instance.send( 'getSessionStatus', callback);
+      instance.send( 'getSessionStatus', messageResultHandler(callback));
     };
 
     this.isComplete = _isComplete;
