@@ -88,11 +88,13 @@ var Instance = function(element, options, errorCallback, log) {
       $(e).width(options.width ? options.width : "600px");
     }
 
+    /* TODO check in w/ @mikl about this
     $(element).parent().bind('DOMNodeRemoved', function(e) {
       if ('#' + e.target.id === element) {
         this.remove();
       }
     });
+    */
   }
 
   this.send = function() {

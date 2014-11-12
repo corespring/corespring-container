@@ -8,15 +8,20 @@ describe('player launcher', function() {
 
     this.isComplete = false;
 
-    this.sendMessage = function(props) {
-      if (props.message == "isComplete") {
-        props.callback(this.isComplete);
-      } else if (props.message == "completeResponse") {
+    this.send = function() {
+      var args = Array.prototype.slice.call(arguments);
+      var message = args[0];
+      var cb = typeof(args[1] == 'function') ? args[1] : args[2];
+      var data = typeof(args[1] == 'function') ? null : args[1];
+
+      if (message === "isComplete") {
+        cb(null, this.isComplete);
+      } else if (message === "completeResponse") {
         this.isComplete = true;
       }
     };
 
-    this.addListener = function(name, cb) {
+    this.on = function(name, cb) {
       if (name == "ready") {
         cb();
       }
@@ -30,7 +35,7 @@ describe('player launcher', function() {
     this.hasErrors = function(){ 
       return this.errors && this.errors.length > 0; 
     };
-  };
+  }
 
   function MockWarnings(wrns){
     this.warnings = wrns;
@@ -58,7 +63,7 @@ describe('player launcher', function() {
     warnings = [];
     window.console.warn = function(msg){
       warnings.push(msg);
-    }
+    };
   });
 
   afterEach(function() {
