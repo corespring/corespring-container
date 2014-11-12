@@ -33,6 +33,8 @@ describe('instance', function() {
     this.on = function(){
       console.log('mock:on', arguments);
     };
+
+    this.remove = function(){};
   }
 
   var ID = 'element-id';
