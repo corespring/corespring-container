@@ -198,7 +198,9 @@ exports.define = function(isSecure) {
     };
 
     this.saveResponses = function(isAttempt, callback) {
-      instance.send('saveResponses', {isAttempt: isAttempt}, callback);
+      instance.send('saveResponses', {isAttempt: isAttempt}, function(err, session){
+        callback({error: err, session: session});
+      });
     };
 
     this.completeResponse = function(callback) {
