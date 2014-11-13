@@ -6,18 +6,7 @@ var Instance = function(element, options, errorCallback, log) {
 
   var errors = require("errors");
 
-  log = log || {
-    error: function(s) {
-      if(window.console) {
-        console.error(s);
-      }
-    },
-    warn: function(s) {
-      if(window.console){
-        console.warn(s);
-      }
-    }
-  };
+  log = log || require('logger');
 
   function initialize(e, options) {
     if (!options || !options.url) {
