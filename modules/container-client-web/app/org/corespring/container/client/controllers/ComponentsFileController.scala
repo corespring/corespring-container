@@ -42,7 +42,7 @@ trait ComponentsFileController extends Controller with HasContext {
 
     require(Validator.absolutePathInProdMode(componentsPath).isRight, s"The component path ($componentsPath) is relative - this can cause unpredictable behaviour when running in Prod Mode. see: https://github.com/playframework/playframework/issues/2411")
 
-    val fullPath = s"$componentsPath/$org/$component/libs/$filename"
+    val fullPath = s"$componentsPath/$org/$component/public/$filename"
     log.trace(s"fullPath: $fullPath")
     loadFile(fullPath).map {
       tuple =>
