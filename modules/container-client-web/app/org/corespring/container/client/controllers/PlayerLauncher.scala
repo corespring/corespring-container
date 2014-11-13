@@ -133,11 +133,11 @@ trait PlayerLauncher extends Controller {
 
   lazy val coreJs: String = {
     val corePaths = Seq(
+      "container-client/bower_components/msgr.js/dist/msgr.js",
+      "container-client/js/player-launcher/logger.js",
       "container-client/js/player-launcher/errors.js",
-      "container-client/js/player-launcher/post-message.js",
       "container-client/js/player-launcher/instance.js",
-      "container-client/js/player-launcher/url-builder.js",
-      "container-client/js/player-launcher/root-level-listener.js")
+      "container-client/js/player-launcher/url-builder.js")
     val rawJs = pathToNameAndContents("container-client/js/corespring/core-library.js")._2
     val wrapped = corePaths.map(pathToNameAndContents).map(t => ServerLibraryWrapper(t._1, t._2))
     val bootstrap =

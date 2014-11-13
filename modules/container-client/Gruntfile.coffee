@@ -98,8 +98,11 @@ module.exports = (grunt) ->
       main: ['<%= common.app %>/js/**/*.js', '!<%= common.app %>/**/*.min.js']
 
     prepPlayerLauncher:
-      files:
-        src: "<%= common.app %>/**/player-launcher/*.js"
+      files: 
+        src: [
+          '<%= common.dist %>/bower_components/msgr.js/dist/msgr.js',
+          "<%= common.app %>/**/player-launcher/*.js",
+        ]
         dest: '<%= common.tmp %>/wrapped/player-launcher-wrapped.js'
 
     jasmine:
@@ -123,7 +126,8 @@ module.exports = (grunt) ->
             'lodash/dist/lodash.js'
             'saxjs/lib/sax.js',
             'bootstrap/dist/js/bootstrap.min.js',
-            'angular-ui-bootstrap-bower/ui-bootstrap-tpls.js'], comps)
+            'angular-ui-bootstrap-bower/ui-bootstrap-tpls.js',
+            'msgr.js/dist/msgr.js'], comps)
           specs: '<%= common.test %>/js/**/*-test.js'
 
 

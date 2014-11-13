@@ -3,6 +3,8 @@ describe('instance', function() {
   var InstanceDef, instance, receivedErrors, listeners, mockResult;
   var originalRootLevelListenerDef, originalPostMessage;
 
+  var originalMsgr;
+
   var log = {
     error: function(s) {
       console.error(s);
@@ -20,68 +22,37 @@ describe('instance', function() {
     return receivedErrors.length > 0;
   }
 
-  function mockPostMessage(message, data, element) {
-    //log.debug("postMessage <" + message + "> data <" + data + "> listeners.length <" + listeners.length + ">");
-
-    function createResultEvent() {
-      return {
-        event: 'message',
-        data: $.extend({
-            message: message + "Result",
-            data: data
-          },
-          mockResult)
-      };
-    }
-
-    for (var i = 0; i < listeners.length; i++) {
-      //invoke the listener within its own context.
-      listeners[i].apply(listeners[i], [createResultEvent()]);
-    }
-  }
-
-  function MockRootLevelListenerDef() {
-    listeners = [];
-
-    return {
-      addListener: function(callback) {
-        //log.debug("addListener " + callback);
-        listeners.push(callback);
-      },
-      removeListener: function(callback) {
-        var index = listeners.indexOf(callback);
-        if (index >= 0) {
-          listeners.slice(index, 1);
-        }
-      },
-      clearListeners: function() {
-        listeners = [];
-      },
-      listenerLength: function() {
-        return listeners.length;
-      }
+  function MockChannel(){
+    console.log('new MockChannel');
+    this.send = function(){
+      console.log('mock:send', arguments);
+      var args = Array.prototype.slice.call(arguments);
+      var callback = typeof(args[1] === 'function') ? args[1] : args[2];
+      callback(null, mockResult);
     };
+    this.on = function(){
+      console.log('mock:on', arguments);
+    };
+
+    this.remove = function(){};
   }
 
   var ID = 'element-id';
 
   beforeEach(function() {
 
+
     var element = $('<div id="' + ID + '"></div>');
     $('body').append(element);
-    originalPostMessage = corespring.require("post-message");
-    originalRootLevelListenerDef = corespring.require("root-level-listener");
-
-    corespring.module("post-message", mockPostMessage);
-    corespring.module("root-level-listener", MockRootLevelListenerDef);
+    originalMsgr = window.msgr;
+    window.msgr.Channel = MockChannel;
 
     InstanceDef = new corespring.require("instance");
     receivedErrors = [];
   });
 
   afterEach(function() {
-    corespring.module("post-message", originalPostMessage);
-    corespring.module("root-level-listener", originalRootLevelListenerDef);
+    window.msgr.Channel = originalMsgr.Channel;
     $('body').find('#' + ID).remove();
   });
 
@@ -113,7 +84,7 @@ describe('instance', function() {
 
   it('should have a sendMessage method', function() {
     instance = new InstanceDef('#' + ID, {}, onError);
-    expect(instance.hasOwnProperty('sendMessage')).toBeTruthy();
+    expect(instance.hasOwnProperty('send')).toBeTruthy();
   });
 
   it('should not set the width if forceWidth is false', function() {
@@ -144,21 +115,15 @@ describe('instance', function() {
   });
 
   it('should be able to send a message', function() {
-    instance = new InstanceDef('#' + ID, {}, onError);
+    instance = new InstanceDef('#' + ID, {url: 'http://blah.com'}, onError);
     var resultFromCallback = null;
-    var callback = function(result) {
+    var callback = function(err, result) {
       resultFromCallback = result;
     };
-    mockResult = {
-      "isComplete": true
-    };
+    mockResult = true;
 
-    instance.sendMessage({
-      message: "isComplete",
-      property: "isComplete",
-      callback: callback
-    });
-
+    expect(receivedErrors.length).toBe(0);
+    instance.send( "isComplete", callback );
     expect(resultFromCallback).toBe(true);
   });
 

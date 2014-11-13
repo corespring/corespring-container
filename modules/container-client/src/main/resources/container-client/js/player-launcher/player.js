@@ -1,33 +1,39 @@
 exports.define = function(isSecure) {
   var PlayerDefinition = function(element, options, errorCallback) {
-    var errors = require("errors");
-    var launcherErrors = require("launcher-errors");
-    var launcherWarnings = require("launcher-warnings");
 
-    options.queryParams = options.queryParams || require("query-params");
+    errorCallback = errorCallback || function(error) {
+      throw "error occurred, code: " + error.code + ", message: " + error.message;
+    };
 
-    var i;
+    var errors = require('errors');
+    var launcherErrors = require('launcher-errors');
+    var launcherWarnings = require('launcher-warnings');
 
-    if(launcherWarnings.hasWarnings()){
-      for (i = 0; i < launcherWarnings.warnings.length; i++) {
-        if(window.console && console.warn && typeof(console.warn) === 'function'){
-          console.warn(launcherWarnings.warnings[i]);
+    options.queryParams = options.queryParams || require('query-params');
+
+    options = $.extend(require('default-options'), options);
+
+    var logger = options.logger || require('logger');
+
+    function forEach(arr, fn){
+      if(fn){
+        for(var i = 0; i < arr.length; i++){
+          fn(arr[i]);
         }
       }
     }
 
-    if (launcherErrors.hasErrors()) {
-      for (i = 0; i < launcherErrors.errors.length; i++) {
-        errorCallback(errors.EXTERNAL_ERROR(launcherErrors.errors[i]));
-      }
+    if(launcherWarnings.hasWarnings()){
+      forEach(launcherWarnings.warnings, logger.warn);
+    }
+
+    if (launcherErrors.hasErrors() && errorCallback) {
+      forEach(launcherErrors.errors, function(e){errorCallback(errors.EXTERNAL_ERROR(e)); });
       return;
     }
 
     var isReady = false;
 
-    var defaultOptions = require("default-options");
-
-    options = $.extend(defaultOptions, options);
 
     var validateOptions = function(options) {
       var out = [];
@@ -40,7 +46,7 @@ exports.define = function(isSecure) {
       if (!options.itemId && !options.sessionId) {
         out.push(errors.NO_ITEM_OR_SESSION_ID);
       }
-      if (!options.sessionId && options.mode !== "gather") {
+      if (!options.sessionId && options.mode !== 'gather') {
         out.push(errors.NO_SESSION_ID);
       }
       return out;
@@ -49,49 +55,58 @@ exports.define = function(isSecure) {
     var result = validateOptions(options);
 
     if (result.length > 0) {
-      for (i = 0; i < result.length; i++) {
-        errorCallback(result[i]);
-      }
+      forEach(result, errorCallback);
       return;
     }
 
-    var InstanceDef = require("instance");
+    var InstanceDef = require('instance');
 
     var prepareUrl = function() {
-      var id = options.mode === "gather" ? (options.sessionId || options.itemId) : options.sessionId;
+      var id = options.mode === 'gather' ? (options.sessionId || options.itemId) : options.sessionId;
       var path = options.paths[options.mode];
-      if (options.mode === "gather" && options.sessionId) {
+      if (options.mode === 'gather' && options.sessionId) {
         path = options.paths.gatherSession;
       }
-      return (options.corespringUrl + path).replace(":id", id);
+      return (options.corespringUrl + path).replace(':id', id);
     };
 
     options.url = prepareUrl();
     options.forceWidth = true;
 
-    var instance = new InstanceDef(element, options, errorCallback);
+    var instance = new InstanceDef(element, options, errorCallback, logger);
 
     var isValidMode = function(m) {
       if (!m) {
         return false;
       }
-      return ["gather", "view", "evaluate"].indexOf(m) !== -1;
+      return ['gather', 'view', 'evaluate'].indexOf(m) !== -1;
     };
 
+    /**
+     * Utility that calls errorCallback if an error has occured.
+     * If there has been no error,
+     * then call the originalCallback with the result
+     */
+    function messageResultHandler(originalCallback){
+      return function(err, result) {
+        if(err){
+          errorCallback(errors.MESSAGE_ERROR(err));
+        } else {
+          originalCallback(result);
+        }
+      };
+    }
+
     var _isComplete = function(callback) {
-      instance.sendMessage({
-        message: "isComplete",
-        property: "isComplete",
-        callback: callback
-      });
+      instance.send( 'isComplete', messageResultHandler(callback));
     };
 
     var isAllowed = function(mode, cb) {
       if (isSecure) {
         _isComplete(function(c) {
-          if (mode === "evaluate" && !c) {
+          if (mode === 'evaluate' && !c) {
             cb(false);
-          } else if (mode === "gather" && c) {
+          } else if (mode === 'gather' && c) {
             cb(false);
           } else {
             cb(true);
@@ -102,64 +117,56 @@ exports.define = function(isSecure) {
       }
     };
 
-    errorCallback = errorCallback || function(error) {
-      throw "error occurred, code: " + error.code + ", message: " + error.message;
-    };
-
-    instance.addListener("launch-error", function(data) {
-      var error = errors.EXTERNAL_ERROR(data.code + ": " + data.detailedMessage);
+    /*
+    //TODO - is this still in use?
+    instance.on('launch-error', function(data) {
+      var error = errors.EXTERNAL_ERROR(data.code + ': ' + data.detailedMessage);
       errorCallback(error);
-    });
-
+    });*/
 
     if (options.onSessionCreated) {
-      instance.addListener("sessionCreated", function(data) {
+      instance.on('sessionCreated', function(data) {
         options.onSessionCreated(data.session._id.$oid);
       });
     }
 
     if (options.onInputReceived) {
-      instance.addListener("inputReceived", function(data) {
-        options.onInputReceived(data.sessionStatus);
+      instance.on('inputReceived', function(sessionStatus) {
+        options.onInputReceived(sessionStatus);
       });
     }
 
     if (options.onPlayerRendered) {
-      instance.addListener("rendered", function(data) {
+      instance.on('rendered', function(data) {
         options.onPlayerRendered();
       });
     }
 
     var initialiseMessage = function(mode) {
       var modeOptions = options[mode] || {};
-      var saveResponseOptions = mode === "evaluate" ? {
+      var saveResponseOptions = mode === 'evaluate' ? {
         isAttempt: false,
         isComplete: false
       } : null;
-      instance.sendMessage({
-        message: "initialise",
-        data: {
-          mode: mode,
-          options: modeOptions,
-          saveResponses: saveResponseOptions,
-          queryParams: options.queryParams
-        }
+
+      instance.send( 'initialise', {
+        mode: mode,
+        options: modeOptions,
+        saveResponses: saveResponseOptions,
+        queryParams: options.queryParams
       });
     };
-    
+
     var sendSetModeMessage = function(mode) {
       var modeOptions = options[mode] || {};
-      var saveResponseOptions = mode === "evaluate" ? {
+      var saveResponseOptions = mode === 'evaluate' ? {
         isAttempt: false,
         isComplete: false
       } : null;
-      instance.sendMessage({
-        message: "setMode",
-        data: {
-          mode: mode,
-          options: modeOptions,
-          saveResponses: saveResponseOptions
-        }
+      instance.send('setMode', {
+        mode: mode,
+        options: modeOptions,
+        saveResponses: saveResponseOptions
       });
     };
 
@@ -191,71 +198,45 @@ exports.define = function(isSecure) {
     };
 
     this.saveResponses = function(isAttempt, callback) {
-      instance.sendMessage({
-        message: "saveResponses",
-        data: {
-          isAttempt: isAttempt
-        },
-        callback: callback,
-        property: "result"
+      instance.send('saveResponses', {isAttempt: isAttempt}, function(err, session){
+        callback({error: err, session: session});
       });
     };
 
     this.completeResponse = function(callback) {
-      instance.sendMessage({
-        message: "completeResponse",
-        callback: callback,
-        property: "result"
-      });
+      instance.send('completeResponse', callback);
     };
 
     this.resetItem = function() {
-      instance.sendMessage({
-        message: "resetItem"
-      });
+      instance.send('resetItem');
     };
 
     this.countAttempts = function(callback) {
-      instance.sendMessage({
-        message: "countAttempts",
-        property: "count",
-        callback: callback
-      });
+      instance.send('countAttempts', messageResultHandler(callback));
     };
 
     this.getScore = function(format, callback) {
-      instance.sendMessage({
-        message: "getScore",
-        data: {
-          format: format || 'percent'
-        },
-        property: "score",
-        callback: callback
-      });
+      instance.send(
+        'getScore',
+      {format: format || 'percent'},
+      messageResultHandler(callback) );
     };
 
     this.getSessionStatus = function(callback) {
-      instance.sendMessage({
-        message: "getSessionStatus",
-        property: "sessionStatus",
-        callback: callback
-      });
+      instance.send( 'getSessionStatus', messageResultHandler(callback));
     };
 
     this.isComplete = _isComplete;
 
     this.reset = function() {
-      instance.sendMessage({
-        message: "reset"
-      });
+      instance.send('reset');
     };
 
     this.remove = function() {
       instance.remove();
     };
 
-
-    instance.addListener("ready", function(data) {
+    instance.on('ready', function() {
       isReady = true;
       initialiseMessage(options.mode);
     });

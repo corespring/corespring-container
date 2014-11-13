@@ -181,7 +181,7 @@ angular.module('corespring-player.controllers')
             interactionsWithResponseCount: ComponentRegister.interactionsWithResponseCount()
           };
         };
-        
+
         /**
          * Initialise the controller - this has to be the 1st thing you call
          */
@@ -191,7 +191,7 @@ angular.module('corespring-player.controllers')
           PlayerService.loadItemAndSession(
             function(itemAndSession){
               $scope.onItemAndSessionLoaded(itemAndSession);
-              
+
               if(currentMode !== undefined && currentMode !== null){
                 throw new Error('The mode is already set to ' + currentMode);
               }
@@ -204,8 +204,8 @@ angular.module('corespring-player.controllers')
                   $log.debug("[Main] outcome received");
                 });
               }
-            }, 
-            $scope.onSessionLoadError, 
+            },
+            $scope.onSessionLoadError,
             $scope.sessionId);
         });
 
@@ -218,63 +218,35 @@ angular.module('corespring-player.controllers')
         });
 
         $scope.$on('saveResponses', function(event, data, callback) {
-
           $log.debug('[onSaveResponses] -> ', data, callback);
-
-          function onSaved(err, result) {
-            if (callback) {
-              callback({
-                result: {
-                  error: err,
-                  session: result
-                }
-              });
-            }
-          }
-
-          $scope.save(data.isAttempt, data.isComplete, onSaved);
+          $scope.save(data.isAttempt, data.isComplete, callback || function(){});
         });
 
         $scope.$on('countAttempts', function(event, data, callback) {
-          callback({
-            count: $scope.session.attempts
-          });
+          callback(null, $scope.session.attempts);
         });
 
         $scope.$on('getScore', function(event, data, callback) {
 
           var onScoreReceived = function(outcome) {
             var percentage = outcome.summary.percentage;
-            callback({
-              score: data.format === 'scaled' ? (percentage / 100) : percentage
-            });
+            var score = data.format === 'scaled' ? (percentage / 100) : percentage;
+            callback(null, score);
           };
+
           $scope.getScore(onScoreReceived);
         });
 
         $scope.$on('completeResponse', function(event, data, callback) {
-          $scope.completeResponse(function(err, isComplete) {
-            if (callback) {
-              callback({
-                result: {
-                  error: err,
-                  isComplete: isComplete
-                }
-              });
-            }
-          });
+          $scope.completeResponse(callback || function(){});
         });
 
         $scope.$on('isComplete', function(event, data, callback) {
-          callback({
-            isComplete: $scope.isComplete || false
-          });
+          callback(null, $scope.isComplete || false );
         });
 
         $scope.$on('getSessionStatus', function(event, data, callback) {
-          callback({
-            sessionStatus: getSessionStatus()
-          });
+          callback(null, getSessionStatus());
         });
 
         $scope.$on('editable', function(event, data) {
@@ -288,7 +260,7 @@ angular.module('corespring-player.controllers')
             $log.debug("[Main] $timeout: set mode: ", currentMode);
             ComponentRegister.setEditable(editable);
             ComponentRegister.setMode(currentMode);
-          }); 
+          });
         }
 
         /** Set mode to view, gather or evaluate
