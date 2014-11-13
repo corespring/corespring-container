@@ -1,7 +1,3 @@
-//TODO: The iframe sizing is sluggish and looks messy
-//Would it be better if we watched for dimension changes more frequently
-//at the start and the slow down once things have stabilized?
-
 angular.module('corespring-player.directives').directive('dimensionPropagator',
   ['$log', 'Msgr', function($log, Msgr) {
 
