@@ -4,7 +4,7 @@
       "title": "Number Line"
     }
   },
-  "xhtml": "<div><div corespring-number-line id='1'></div><br/></div>",
+  "xhtml": "<div>Number A line test<br/> <corespring-number-line id='1'></corespring-number-line><br/>Here.</div>",
   "components": {
     "1": {
       "componentType": "corespring-number-line",
@@ -13,14 +13,41 @@
       "correctResponse": [
         {
           "type": "point",
+          "pointType": "empty",
           "domainPosition": 3
+        },
+        {
+          "type": "line",
+          "domainPosition": 2,
+          "size": 2,
+          "leftPoint": "full",
+          "rightPoint": "empty"
         }
       ],
       "model": {
+        "config": {
+          "domain": [0, 20],
+          "maxNumberOfPoints": 3,
+          "tickFrequency": 20,
+          "snapPerTick": 2,
+          "initialType": "PF",
+          "exhibitOnly": false,
+          "availableTypes": {
+            "PF":  true,
+            "LEE": true,
+            "LEF": true,
+            "LFE": true,
+            "LFF": true,
+            "REP": true,
+            "REP": true,
+            "REN": true,
+            "RFN": true
+          }
+        },
         "objects": [
           {
             "type": "point",
-            "pointType": "empty",
+            "pointType": "full",
             "domainPosition": 3,
             "rangePosition": 1
           },
@@ -31,17 +58,15 @@
             "size": 2,
             "leftPoint": "full",
             "rightPoint": "empty"
+          },
+          {
+            "type": "ray",
+            "domainPosition": 2,
+            "rangePosition": 3,
+            "pointType": "empty",
+            "direction": "positive"
           }
         ]
-      }
-    },
-    "2": {
-      "componentType": "corespring-number-line",
-      "title": "Number Line",
-      "weight": 1,
-      "correctResponse": {},
-      "model": {
-        "orientation": "horizontal"
       }
     }
   },

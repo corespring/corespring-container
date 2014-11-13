@@ -3,7 +3,8 @@
 @import "app";
 @import "common/variables";
 @import "common/base";
-  
+@import "player/control-panel";
+
 body{
   font-size: 12px;
 }
@@ -28,15 +29,21 @@ body{
     min-width: 400px;
     min-height: 700px;
     height: 100%;
+    display: inline-block;
   }
 
-  #preview-pane{
-    float: left;
-    width: 100%;
-    height: 100%;
-    padding: 20px;
-    flex: 1;
+  #control-panel{
+    width:800px;
+    display: inline-block;
+    #preview-pane{
+      float: left;
+      width: 100%;
+      height: 100%;
+      padding: 20px;
+      flex: 1;
+    }
   }
+
   .main-pane{
     width: 100%;
     position: fixed;
@@ -45,4 +52,7 @@ body{
     display: flex;
     height: 100%;
   }
+}
+.control-panel .score {
+  color: black;
 }

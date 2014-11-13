@@ -72,6 +72,7 @@ module.exports = (grunt) ->
       dev: lessConfig(false)
       production: lessConfig(true)
 
+
     watch:
       options:
         livereload: true
@@ -79,6 +80,9 @@ module.exports = (grunt) ->
         files: ['<%= common.dist %>/**/*']
       jade: watchConfig('jade', ['copy:jade'])
       less: watchConfig('less', ['copy:less', 'less:dev'])
+      components:
+        files: ['<%= common.components %>/**/*.less']
+        tasks: ['runComponentLess']
 
     copy:
       less: copyConfig('less')
@@ -89,7 +93,7 @@ module.exports = (grunt) ->
         process: tidyPaths
 
     jshint:
-      options: 
+      options:
         jshintrc: '.jshintrc'
       main: ['<%= common.app %>/js/**/*.js', '!<%= common.app %>/**/*.min.js']
 
@@ -140,18 +144,18 @@ module.exports = (grunt) ->
         options :
           failOnError: true
 
-  toTargetPath = (p) -> 
-    if(p.startsWith("//")) then p 
-    else 
+  toTargetPath = (p) ->
+    if(p.startsWith("//")) then p
+    else
       "<%= common.dist %>/#{p.replace('(.min)', '')}"
 
   mkConfig = (name, config) ->
-    appConfigBuilder.build(name, grunt, config.js, config.css, config.ngModules, toTargetPath) 
+    appConfigBuilder.build(name, grunt, config.js, config.css, config.ngModules, toTargetPath)
 
   ###
   We merge in the app specific configs - run with --debug to see the final config.
   ###
-  fullConfig = _.merge(config, 
+  fullConfig = _.merge(config,
     mkConfig('catalog', catalog),
     mkConfig('editor', editor),
     mkConfig('rig', rig),
@@ -159,7 +163,7 @@ module.exports = (grunt) ->
     mkConfig('playerControls', playerControls))
 
   grunt.log.debug(JSON.stringify(fullConfig, null, "  "))
-  
+
   grunt.initConfig(fullConfig)
 
   npmTasks = [
@@ -180,20 +184,36 @@ module.exports = (grunt) ->
   grunt.loadTasks('./grunt/lib/tasks')
   grunt.registerTask('lcd', ['loadComponentDependencies'])
   grunt.registerTask('loadComponentDependencies', 'Load client side dependencies for the components', componentDependencies(grunt))
-  grunt.registerTask('run', ['mk-css', 'pathReporter', 'watch'])
-  grunt.registerTask('mk-css', ['copy:less', 'less'])
+  grunt.registerTask('run', ['mk-css', 'pathReporter', 'runComponentLess', 'watch'])
+  grunt.registerTask('mk-css', ['copy:less', 'less', 'runComponentLess'])
   grunt.registerTask('default', ['stage'])
   grunt.registerTask('test', ['lcd', 'prepPlayerLauncher', 'jasmine:unit'])
 
   grunt.registerTask('stage', 'Work with the play stage task',
-    ['mk-css', 
+    ['mk-css',
     'jshint',
-    'uglify', 
-    'compress', 
+    'uglify',
+    'compress',
     'pathReporter'])
 
-  grunt.registerTask('clean_bower', 
-    ['bower_clean', 
-    'shell:mathjax_rm_pngs', 
-    'shell:mathjax_rm_fonts'])  
+  grunt.registerTask('clean_bower',
+    ['bower_clean',
+    'shell:mathjax_rm_pngs',
+    'shell:mathjax_rm_fonts'])
 
+  grunt.registerTask('runComponentLess', ->
+
+    cb = @async()
+
+    spawnConfig =
+      grunt: true
+      args: [ 'less' ]
+      opts:
+        cwd: common.components
+
+    spawnResultHandler = (err, result, code) ->
+      console.log result.stdout
+      cb()
+
+    grunt.util.spawn( spawnConfig, spawnResultHandler )
+  )
