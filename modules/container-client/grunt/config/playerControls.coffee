@@ -7,7 +7,7 @@ exports.js =
   concatted
   ###
   src: [
-    'bower_components/angular-ui/build/angular-ui.min.js'
+    'bower_components/angular-ui/build/angular-ui(.min).js'
     'bower_components/angular-bootstrap/ui-bootstrap-tpls.js'
     'bower_components/bootstrap/js/dropdown.js'
     'bower_components/bootstrap/js/modal.js'
