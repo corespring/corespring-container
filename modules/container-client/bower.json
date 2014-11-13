@@ -19,7 +19,7 @@
     "bootstrap-multiselect": "0.9.9",
     "console-polyfill": "~0.1.0",
     "corespring-ng-components": "https://github.com/corespring/corespring-ng-components.git#v0.0.9",
-    "msgr.js" : "git@github.com:corespring/msgr.js.git#master",
+    "msgr.js" : "git@github.com:corespring/msgr.js.git#v0.0.3",
     "es5-shim": "~2.3.0",
     "font-awesome": "~4.0.3",
     "jquery": "1.11.0",
