@@ -194,9 +194,10 @@ module.exports = (grunt) ->
     'jshint',
     'uglify',
     'compress',
-    'pathReporter'])
+    'pathReporter',
+    'cleanAssets'])
 
-  grunt.registerTask('clean_bower',
+  grunt.registerTask('cleanAssets',
     ['bower_clean',
     'shell:mathjax_rm_pngs',
     'shell:mathjax_rm_fonts'])
