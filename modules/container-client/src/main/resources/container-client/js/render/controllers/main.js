@@ -174,13 +174,13 @@ angular.module('corespring-player.controllers')
           ComponentRegister.reset();
         };
 
-        var getSessionStatus = function() {
+        function getSessionStatus() {
           return {
             allInteractionsHaveResponse: !ComponentRegister.hasEmptyAnswers(),
             interactionCount: ComponentRegister.interactionCount(),
             interactionsWithResponseCount: ComponentRegister.interactionsWithResponseCount()
           };
-        };
+        }
 
         /**
          * Initialise the controller - this has to be the 1st thing you call
@@ -189,17 +189,17 @@ angular.module('corespring-player.controllers')
           $log.debug('[on initialise]', data);
           PlayerService.setQueryParams(data.queryParams || {});
           PlayerService.loadItemAndSession(
-            function(itemAndSession){
+            function(itemAndSession) {
               $scope.onItemAndSessionLoaded(itemAndSession);
 
-              if(currentMode !== undefined && currentMode !== null){
+              if (currentMode !== undefined && currentMode !== null) {
                 throw new Error('The mode is already set to ' + currentMode);
               }
 
               currentMode = data.mode;
-              updateRegisterMode();
+              updateComponentsMode();
 
-              if(data.mode === 'evaluate'){
+              if (data.mode === 'evaluate') {
                 $scope.loadOutcome(data.options, function() {
                   $log.debug("[Main] outcome received");
                 });
@@ -219,7 +219,7 @@ angular.module('corespring-player.controllers')
 
         $scope.$on('saveResponses', function(event, data, callback) {
           $log.debug('[onSaveResponses] -> ', data, callback);
-          $scope.save(data.isAttempt, data.isComplete, callback || function(){});
+          $scope.save(data.isAttempt, data.isComplete, callback || function() {});
         });
 
         $scope.$on('countAttempts', function(event, data, callback) {
@@ -228,21 +228,21 @@ angular.module('corespring-player.controllers')
 
         $scope.$on('getScore', function(event, data, callback) {
 
-          var onScoreReceived = function(outcome) {
+          function onScoreReceived(outcome) {
             var percentage = outcome.summary.percentage;
             var score = data.format === 'scaled' ? (percentage / 100) : percentage;
             callback(null, score);
-          };
+          }
 
           $scope.getScore(onScoreReceived);
         });
 
         $scope.$on('completeResponse', function(event, data, callback) {
-          $scope.completeResponse(callback || function(){});
+          $scope.completeResponse(callback || function() {});
         });
 
         $scope.$on('isComplete', function(event, data, callback) {
-          callback(null, $scope.isComplete || false );
+          callback(null, $scope.isComplete || false);
         });
 
         $scope.$on('getSessionStatus', function(event, data, callback) {
@@ -253,8 +253,8 @@ angular.module('corespring-player.controllers')
           ComponentRegister.setEditable(data.editable);
         });
 
-        function updateRegisterMode(){
-         var editable = (currentMode === 'gather');
+        function updateComponentsMode() {
+          var editable = (currentMode === 'gather');
 
           $timeout(function() {
             $log.debug("[Main] $timeout: set mode: ", currentMode);
@@ -264,6 +264,7 @@ angular.module('corespring-player.controllers')
         }
 
         /** Set mode to view, gather or evaluate
+         * Updates the components mode and editable state.
          * Optionally save the responses too.
          * The data object contains:
          * ```
@@ -282,34 +283,47 @@ angular.module('corespring-player.controllers')
           }
 
           currentMode = data.mode;
-          updateRegisterMode();
-
-          var afterMaybeSave = function() {
-            if (data.mode === 'evaluate') {
-              $timeout(function() {
-
-                $log.debug("[Main] load outcome!!!");
-                $scope.loadOutcome(data.options, function() {
-                  $log.debug("[Main] score received");
-                });
-              });
-            } else {
-              _.forIn($scope.outcome, function(value, key) {
-                $scope.outcome[key] = {};
-              });
-              $scope.score = {};
-            }
-          };
+          updateComponentsMode();
 
           if (data.saveResponses) {
-            $scope.save(data.saveResponses.isAttempt, data.saveResponses.isComplete, function() {
-              $log.debug("[Main] session save successful - call maybeSave");
-              afterMaybeSave();
-            });
+            saveResponses(updateOutcome);
           } else {
-            $log.debug("[Main] no need to save responses - call maybeSave");
-            afterMaybeSave();
+            updateOutcome();
           }
+
+          function saveResponses(onSuccess) {
+            $log.debug("[Main] saving responses");
+            $scope.save(data.saveResponses.isAttempt, data.saveResponses.isComplete, function() {
+              $log.debug("[Main] session save successful");
+              onSuccess();
+            });
+          }
+
+          function updateOutcome(){
+            if( data.mode === 'evaluate') {
+              loadOutcome();
+            } else {
+              clearOutcome();
+            }
+          }
+
+          function loadOutcome() {
+            $timeout(function() {
+              $log.debug("[Main] load outcome!!!");
+              $scope.loadOutcome(data.options, function() {
+                $log.debug("[Main] score received");
+              });
+            });
+          }
+
+          function clearOutcome() {
+            $log.debug("[Main] clear outcome!!!");
+            _.forIn($scope.outcome, function(value, key) {
+              $scope.outcome[key] = {};
+            });
+            $scope.score = {};
+          }
+
         });
 
       }
