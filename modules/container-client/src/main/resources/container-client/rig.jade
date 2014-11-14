@@ -35,6 +35,6 @@ block after-main-script
       var scope = angular.element(document.getElementById('root')).scope();
       var rootScope = scope.$root;
       scope.$apply(function() {
-        rootScope.$broadcast('submitEvent');
+        rootScope.$broadcast('playerControlPanel.submit');
       });
     };
