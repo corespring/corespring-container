@@ -16,6 +16,7 @@ GET           /component-sets/:context/:directive.:suffix            @org.coresp
 
 GET           /player/session/:sessionId/index.html                  @org.corespring.container.client.controllers.apps.Player.load(sessionId:String)
 GET           /player/item/:itemId/index.html                        @org.corespring.container.client.controllers.apps.Player.createSessionForItem(itemId:String)
+GET           /player/session/:sessionId/*file                       @org.corespring.container.client.controllers.Assets.session(sessionId, file)
 
 # Session
 GET           /session/item-and-session/:id.json                     @org.corespring.container.client.controllers.resources.Session.loadItemAndSession(id)
@@ -25,7 +26,6 @@ PUT           /session/save/:id.json                                 @org.coresp
 PUT           /session/complete/:id.json                             @org.corespring.container.client.controllers.resources.Session.completeSession(id)
 PUT           /session/load-outcome/:id.json                         @org.corespring.container.client.controllers.resources.Session.loadOutcome(id)
 PUT           /session/:id/score.json                                @org.corespring.container.client.controllers.resources.Session.getScore(id)
-GET           /session/:sessionId/*file                              @org.corespring.container.client.controllers.Assets.session(sessionId, file)
 
 # Item
 GET           /item/:itemId.json                                     @org.corespring.container.client.controllers.resources.Item.load(itemId)
