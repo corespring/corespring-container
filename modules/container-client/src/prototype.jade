@@ -1,0 +1,1074 @@
+!!! 5
+  body
+    .container-fluid
+      .nav-container.row
+        nav.navbar-default
+          .container-fluid
+            .helpWrapper
+              a.help(href='#help')
+                i.fa.fa-question-circle
+            ul.list-unstyled.list-inline
+              li
+                .title-nav Untitled
+              li
+                .dropdown
+                  button#dropdownMenu1.btn.btn-default.dropdown-toggle(type='button', data-toggle='dropdown')
+                    | Actions
+                    span.caret
+                  ul.dropdown-menu(role='menu', aria-labelledby='dropdownMenu1')
+                    li(role='presentation')
+                      a#nav-new(role='menuitem', tabindex='-1', href='#') New
+                    li(role='presentation')
+                      a#nav-open(role='menuitem', tabindex='-1', href='#') Open...
+                    li(role='presentation')
+                      a#nav-copy(role='menuitem', tabindex='-1', href='#') Copy...
+                    li.divider(role='presentation')
+                    li(role='presentation')
+                      a#nav-archive(role='menuitem', tabindex='-1', href='#') Archive
+                    li(role='presentation')
+                      a#nav-delete(role='menuitem', tabindex='-1', href='#') Delete
+                    li.divider(role='presentation')
+                    li(role='presentation')
+                      a#nav-question-info.catalog-view(role='menuitem', tabindex='-1', href='#') Question Information
+              li
+                .saveMessaging
+              li
+            ul#mainTabNav.nav.nav-tabs(role='tablist')
+              li.active
+                a(href='#questions', data-toggle='tab', role='tab') Question
+              li.dropdown
+                a.dropdown-toggle(href='#', data-toggle='dropdown')
+                  | Profile
+                  span.caret
+                ul.dropdown-menu(role='menu')
+                  li
+                    a(href='#profile', tabindex='-1', role='tab', data-toggle='tab') Profile Information
+                  li
+                    a(href='#metadata', tabindex='-1', role='tab', data-toggle='tab') Metadata
+              li
+                a#myTabDrop1.dropdown-toggle(href='#supporting-materials', data-toggle='dropdown') Supporting Materials
+      //
+         nav-container 
+      .tab-content.content-wrapper
+        //
+           ************************************************ QUESTIONS ********************************************************** 
+        #questions.tab-pane.fade.in.active.row
+          .row.text-right
+            .col-md-6
+              button#btn-scoring.btn.btn-default Scoring
+              a#btnEditPreview.btn.btn-default.btn-warning
+                | Preview Question
+                i.fa.fa-toggle-right
+              hr
+          //
+             row 
+          .row
+            .col-md-6
+              .wiggi-wiz-toolbar
+                .btn-group
+                  button.btn.btn-cp
+                    | Insert Interaction
+                    span.caret
+                .btn-group
+                  button.btn.btn-default.btn-sm.btn-small(type='button')
+                    | Normal
+                    span.caret
+                .btn-group
+                  button.btn.btn-default.btn-sm.btn-small(tabindex='-1', ng-class='{active: state.bold}', ng-click='toolbarButtonClicked(\'bold\')')
+                    i.fa.fa-bold
+                  button.btn.btn-default.btn-sm.btn-small(tabindex='-1', ng-class='{active: state.italic}', ng-click='toolbarButtonClicked(\'italic\')')
+                    i.fa.fa-italic
+                  button.btn.btn-default.btn-sm.btn-small(tabindex='-1', ng-class='{active: state.underline}', ng-click='toolbarButtonClicked(\'underline\')')
+                    i.fa.fa-underline
+                  button.btn.btn-default.btn-sm.btn-small(tabindex='-1', ng-class='{active: state.superscript}', ng-click='toolbarButtonClicked(\'superscript\')')
+                    i.fa.fa-superscript
+                  button.btn.btn-default.btn-sm.btn-small(tabindex='-1', ng-class='{active: state.subscript}', ng-click='toolbarButtonClicked(\'subscript\')')
+                    i.fa.fa-subscript
+                .btn-group
+                  button.btn.btn-default.btn-sm.btn-small(tabindex='-1', ng-class='{active: state.insertunorderedlist}', ng-click='toolbarButtonClicked(\'insertunorderedlist\')')
+                    i.fa.fa-list-ul
+                  button.btn.btn-default.btn-sm.btn-small(tabindex='-1', ng-class='{active: state.insertorderedlist}', ng-click='toolbarButtonClicked(\'insertorderedlist\')')
+                    i.fa.fa-list-ol
+                .btn-group
+                  button.btn.btn-default.btn-sm.btn-small(tabindex='-1', ng-class='{active: state.justifyLeft}', ng-click='toolbarButtonClicked(\'justifyLeft\')')
+                    i.fa.fa-align-left
+                  button.btn.btn-default.btn-sm.btn-small(tabindex='-1', ng-class='{active: state.justifyCenter}', ng-click='toolbarButtonClicked(\'justifyCenter\')')
+                    i.fa.fa-align-center
+                  button.btn.btn-default.btn-sm.btn-small(tabindex='-1', ng-class='{active: state.justifyRight}', ng-click='toolbarButtonClicked(\'justifyRight\')')
+                    i.fa.fa-align-right
+                  button.btn.btn-default.btn-sm.btn-small(tabindex='-1', ng-click='toolbarButtonClicked(\'indent\')')
+                    i.fa.fa-indent
+                  button.btn.btn-default.btn-sm.btn-small(tabindex='-1', ng-click='toolbarButtonClicked(\'outdent\')')
+                    i.fa.fa-dedent
+                .btn-group
+                  button.btn.btn-default.btn-sm.btn-small(type='button', data-toggle='dropdown')
+                    i.fa.fa-text-height
+                    span.caret
+                  ul.dropdown-menu
+                    li
+                      a 1.0
+                    li
+                      a 1.5
+                    li
+                      a 2.0
+                .btn-group
+                  button.btn.btn-default.btn-sm.btn-small(tabindex='-1', ng-click='toolbarButtonClicked(\'hr\')')
+                    i.fa.fa-minus
+                .btn-group
+                  button.btn.btn-default.btn-sm.btn-small(tabindex='-1', ng-click='toolbarButtonClicked(\'image\')')
+                    i.fa.fa-picture-o
+                .btn-group
+                  button.btn.btn-default.btn-sm.btn-small(tabindex='-1', ng-click='toolbarButtonClicked(\'table\')')
+                    i.fa.fa-table
+                .btn-group
+                  button.btn.btn-default.btn-sm.btn-small(tabindex='-1', ng-click='toolbarButtonClicked(\'footnotes\')')
+                    | Footnote
+                .btn-group
+                  button.btn.btn-default.btn-sm.btn-small(tabindex='-1', ng-click='toolbarButtonClicked(\'corespring-video\')')
+                    i.fa.fa-film
+                .btn-group
+                  button.btn.btn-default.btn-sm.btn-small(tabindex='-1', ng-click='toolbarButtonClicked(\'a\')')
+                    i.fa.fa-link
+              //
+                wiggi-wiz-toolbar
+              .edit-wrapper
+                .col-md-6.editable
+                  img#btn-shortanswer(src='short-answer-fpo.png')
+                  br
+                  img#btn-config(src='graph-edit2.png')
+                //
+                   col-md-6 
+              br
+              .panel.panel-default.summary-feedback-panel.panel-primary(style='display: block;')
+                .panel-heading
+                  h4.panel-title
+                    a(data-toggle='collapse', href='#feedback')
+                      | Add Feedback (optional)
+                      i.fa.fa-comment-o
+                //
+                   panel-heading
+                #feedback.panel-collapse.collapse(style='height: auto;')
+                  .panel-body
+                    textarea.form-control(rows='3')
+                    .toolbar
+                      .wiggi-wiz-toolbar
+                        .btn-group
+                          button.btn.btn-default.btn-sm.btn-small(tabindex='-1')
+                            i.fa.fa-bold
+                          button.btn.btn-default.btn-sm.btn-small(tabindex='-1')
+                            i.fa.fa-italic
+                        .btn-group
+                          button.btn.btn-default.btn-sm.btn-small(tabindex='-1')
+                            i.fa.fa-picture-o
+                //
+                   panel-body 
+              //
+                 panel 
+              br
+              br
+            //
+               col-md-6 
+            .col-md-6
+              .editPreviewWrapper.content
+                .row
+                  .itemPreviewWrapper.col-md-8
+                    .playerLabel
+                      img(src='item-player-label.png')
+                    .playerContent
+                      p
+                        | Henry read a 60-page book in 120 minutes.  This graph shows the number of pages he read over time.
+                      p
+                        img.img-responsive(src='item-preview-chart.png')
+                      br
+                      p After how many minutes was Henry exactly halfway through the book?
+                      p
+                        .form-group
+                          ul.list-inline.list-unstyled
+                            li
+                              input.form-control(size='5', type='text')
+                            li minutes
+                    .text-right
+                      br
+                      ul.list-unstyled.list-inline
+                        li
+                          .scoreWrapper(style='display: none;')
+                            label  Score:
+                            span 15%
+                        li
+                          button.btn.btn-submit.btn-info submit answer
+                        li
+                          button.btn.btn-reset.btn-danger(disabled='disabled') reset
+              //
+                 editPreviewWrapper 
+            //
+               col-md-6 
+          //
+             row 
+        //
+           questions 
+        //
+           ************************************************ PROFILE ************************************************************* 
+        #profile.tab-pane.fade.in.row
+          .row.text-right
+            .col-md-6
+              a#btnPreviewProfile.btn.btn-default.btn-warning
+                | Preview Profile Information
+                i.fa.fa-toggle-right
+              hr
+          .row
+            .col-md-6
+              img(src='edit-profile.png')
+            .col-md-6
+              .profileInformationPreviewWrapper.content
+                img.img-responsive(src='preview-profile.png')
+        //
+           ************************************************ METADATA ************************************************************ 
+        #metadata.tab-pane.fade.in.row
+          .row.text-right
+            .col-md-6
+              a#btnPreviewMetadata.btn.btn-default.btn-warning
+                | Preview Metadata Information
+                i.fa.fa-toggle-left
+              hr
+          .row
+            .col-md-6
+        //
+           ************************************************ SUPPORTING MATERIALS ************************************************ 
+        #supporting-materials.tab-pane.fade.in.row
+          #leftNav.col-md-4.row
+            .page-header
+              button#btn-add-supporting-materials.btn.btn-default
+                i.fa.fa-plus
+                | add new supporting material
+            h4 SCORING GUIDE
+            ul.list-unstyled.supporting-materials-list.scoring-guide-list
+              li
+                a.nav-filename1(href='#filename1') SAT Scoring Guide
+                i.fa.fa-trash-o
+              li
+                a.nav-filename2(href='#filename2') Scoring Guide 2
+                i.fa.fa-trash-o
+            h4 STUDENT WORK EXAMPLES
+            ul.list-unstyled.supporting-materials-list.student-work-examples-list
+              li
+                a.nav-filename3(href='#filename3') Score Point 4
+                i.fa.fa-trash-o
+            h4 OTHER
+            ul.list-unstyled.supporting-materials-list.other-list
+              li
+                a.nav-filename4(href='#filename4') List of links
+                i.fa.fa-trash-o
+          //
+            col-md-4
+          .col-md-6
+            //
+               filename 1 
+            #filename1.content
+              dl.dl-horizontal
+                dt
+                  .form-horizontal
+                    label.control-label Title
+                dd
+                  .editable
+                    span SAT Scoring Guide
+                dt
+                  .form-horizontal
+                    label.control-label Type
+                dd
+                  .dropdown
+                    button#dropdownMenu1.btn.btn-default.dropdown-toggle(type='button', data-toggle='dropdown')
+                      | Scoring Guide
+                      span.caret
+                    ul.dropdown-menu(role='menu', aria-labelledby='dropdownMenu1')
+                      li(role='presentation')
+                        a(role='menuitem', tabindex='-1', href='#') Rubric
+                      li.active(role='presentation')
+                        a(role='menuitem', tabindex='-1', href='#') Scoring Guide
+                      li(role='presentation')
+                        a(role='menuitem', tabindex='-1', href='#') Student Materials
+                      li(role='presentation')
+                        a(role='menuitem', tabindex='-1', href='#') Student Work Examples
+                      li(role='presentation')
+                        a(role='menuitem', tabindex='-1', href='#') Other
+                dt File Name
+                dd scoring_2012-2013.pdf
+                dt File Size
+                dd 81.11kb
+              embed(src='https://satonlinecourse.collegeboard.org/SR/digital_assets/pdfs/eri/scoring_2012-2013.pdf', width='800', height='700')
+            //
+               //end of filename 1 
+            #filename2.content
+              dl.dl-horizontal
+                dt
+                  .form-horizontal
+                    label.control-label Title
+                dd
+                  .editable
+                    span Scoring Guide 2
+                dt
+                  .form-horizontal
+                    label.control-label Type
+                dd
+                  .dropdown
+                    button#dropdownMenu1.btn.btn-default.dropdown-toggle(type='button', data-toggle='dropdown')
+                      | Scoring Guide
+                      span.caret
+                    ul.dropdown-menu(role='menu', aria-labelledby='dropdownMenu1')
+                      li(role='presentation')
+                        a(role='menuitem', tabindex='-1', href='#') Rubric
+                      li.active(role='presentation')
+                        a(role='menuitem', tabindex='-1', href='#') Scoring Guide
+                      li(role='presentation')
+                        a(role='menuitem', tabindex='-1', href='#') Student Materials
+                      li(role='presentation')
+                        a(role='menuitem', tabindex='-1', href='#') Student Work Examples
+                      li(role='presentation')
+                        a(role='menuitem', tabindex='-1', href='#') Other
+              .wiggi-wiz-toolbar
+                .btn-group
+                  button.btn.btn-default.btn-sm.btn-small(type='button')
+                    | Normal
+                    span.caret
+                .btn-group
+                  button.btn.btn-default.btn-sm.btn-small(tabindex='-1', ng-class='{active: state.bold}', ng-click='toolbarButtonClicked(\'bold\')')
+                    i.fa.fa-bold
+                  button.btn.btn-default.btn-sm.btn-small(tabindex='-1', ng-class='{active: state.italic}', ng-click='toolbarButtonClicked(\'italic\')')
+                    i.fa.fa-italic
+                  button.btn.btn-default.btn-sm.btn-small(tabindex='-1', ng-class='{active: state.underline}', ng-click='toolbarButtonClicked(\'underline\')')
+                    i.fa.fa-underline
+                  button.btn.btn-default.btn-sm.btn-small(tabindex='-1', ng-class='{active: state.superscript}', ng-click='toolbarButtonClicked(\'superscript\')')
+                    i.fa.fa-superscript
+                  button.btn.btn-default.btn-sm.btn-small(tabindex='-1', ng-class='{active: state.subscript}', ng-click='toolbarButtonClicked(\'subscript\')')
+                    i.fa.fa-subscript
+                .btn-group
+                  button.btn.btn-default.btn-sm.btn-small(tabindex='-1', ng-class='{active: state.insertunorderedlist}', ng-click='toolbarButtonClicked(\'insertunorderedlist\')')
+                    i.fa.fa-list-ul
+                  button.btn.btn-default.btn-sm.btn-small(tabindex='-1', ng-class='{active: state.insertorderedlist}', ng-click='toolbarButtonClicked(\'insertorderedlist\')')
+                    i.fa.fa-list-ol
+                .btn-group
+                  button.btn.btn-default.btn-sm.btn-small(tabindex='-1', ng-class='{active: state.justifyLeft}', ng-click='toolbarButtonClicked(\'justifyLeft\')')
+                    i.fa.fa-align-left
+                  button.btn.btn-default.btn-sm.btn-small(tabindex='-1', ng-class='{active: state.justifyCenter}', ng-click='toolbarButtonClicked(\'justifyCenter\')')
+                    i.fa.fa-align-center
+                  button.btn.btn-default.btn-sm.btn-small(tabindex='-1', ng-class='{active: state.justifyRight}', ng-click='toolbarButtonClicked(\'justifyRight\')')
+                    i.fa.fa-align-right
+                  button.btn.btn-default.btn-sm.btn-small(tabindex='-1', ng-click='toolbarButtonClicked(\'indent\')')
+                    i.fa.fa-indent
+                  button.btn.btn-default.btn-sm.btn-small(tabindex='-1', ng-click='toolbarButtonClicked(\'outdent\')')
+                    i.fa.fa-dedent
+                .btn-group
+                  button.btn.btn-default.btn-sm.btn-small(type='button', data-toggle='dropdown')
+                    i.fa.fa-text-height
+                    span.caret
+                  ul.dropdown-menu
+                    li
+                      a 1.0
+                    li
+                      a 1.5
+                    li
+                      a 2.0
+                .btn-group
+                  button.btn.btn-default.btn-sm.btn-small(tabindex='-1', ng-click='toolbarButtonClicked(\'hr\')')
+                    i.fa.fa-minus
+                .btn-group
+                  button.btn.btn-default.btn-sm.btn-small(tabindex='-1', ng-click='toolbarButtonClicked(\'image\')')
+                    i.fa.fa-picture-o
+                .btn-group
+                  button.btn.btn-default.btn-sm.btn-small(tabindex='-1', ng-click='toolbarButtonClicked(\'table\')')
+                    i.fa.fa-table
+                .btn-group
+                  button.btn.btn-default.btn-sm.btn-small(tabindex='-1', ng-click='toolbarButtonClicked(\'footnotes\')')
+                    | Footnote
+                .btn-group
+                  button.btn.btn-default.btn-sm.btn-small(tabindex='-1', ng-click='toolbarButtonClicked(\'corespring-video\')')
+                    i.fa.fa-film
+                .btn-group
+                  button.btn.btn-default.btn-sm.btn-small(tabindex='-1', ng-click='toolbarButtonClicked(\'a\')')
+                    i.fa.fa-link
+              //
+                wiggi-wiz-toolbar
+              .edit-wrapper
+                .editable.col-md-6
+                  h3.col-md-offset-2 Scoring Guide 2
+                  .col-md-offset-2.col-md-8
+                    table.table.table-striped.table-bordered
+                      thead
+                        tr
+                          th Score
+                          th Criteria
+                      tbody
+                        tr
+                          td.col-md-4
+                            .scoreNumber 4
+                          td
+                            | The question or task is completed correctly and contains additional, unexpected, or outstanding features.
+                        tr
+                          td
+                            .scoreNumber 3
+                          td The question or task is compelted correctly; there are no mistakes.
+                        tr
+                          td
+                            .scoreNumber 2
+                          td The answer or task is partly correct; it has no big mistakes.
+                        tr
+                          td
+                            .scoreNumber 1
+                          td
+                            | The student does not do the question or task, or gives an answer that has nothing to do with what is asked.
+            //
+              filename2
+            //
+               filename 3 
+            #filename3.content
+              dl.dl-horizontal
+                dt
+                  .form-horizontal
+                    label.control-label Title
+                dd
+                  .editable
+                    span Score Point 4
+                dt
+                  .form-horizontal
+                    label.control-label Type
+                dd
+                  .dropdown
+                    button#dropdownMenu1.btn.btn-default.dropdown-toggle(type='button', data-toggle='dropdown')
+                      | Student Work Examples
+                      span.caret
+                    ul.dropdown-menu(role='menu', aria-labelledby='dropdownMenu1')
+                      li(role='presentation')
+                        a(role='menuitem', tabindex='-1', href='#') Rubric
+                      li(role='presentation')
+                        a(role='menuitem', tabindex='-1', href='#') Scoring Guide
+                      li(role='presentation')
+                        a(role='menuitem', tabindex='-1', href='#') Student Materials
+                      li.active(role='presentation')
+                        a(role='menuitem', tabindex='-1', href='#') Student Work Examples
+                      li(role='presentation')
+                        a(role='menuitem', tabindex='-1', href='#') Other
+              img(src='student-sample.png')
+            //
+               //end of filename 3 
+            #filename4.content
+              dl.dl-horizontal
+                dt
+                  .form-horizontal
+                    label.control-label Title
+                dd
+                  .editable
+                    span List of Links
+                dt Type
+                dd
+                  .dropdown
+                    button#dropdownMenu1.btn.btn-default.dropdown-toggle(type='button', data-toggle='dropdown')
+                      | Other
+                      span.caret
+                    ul.dropdown-menu(role='menu', aria-labelledby='dropdownMenu1')
+                      li(role='presentation')
+                        a(role='menuitem', tabindex='-1', href='#') Rubric
+                      li(role='presentation')
+                        a(role='menuitem', tabindex='-1', href='#') Scoring Guide
+                      li(role='presentation')
+                        a(role='menuitem', tabindex='-1', href='#') Student Materials
+                      li(role='presentation')
+                        a(role='menuitem', tabindex='-1', href='#') Student Work Examples
+                      li.active(role='presentation')
+                        a(role='menuitem', tabindex='-1', href='#') Other
+              .wiggi-wiz-toolbar
+                .btn-group
+                  button.btn.btn-default.btn-sm.btn-small(type='button')
+                    | Normal
+                    span.caret
+                .btn-group
+                  button.btn.btn-default.btn-sm.btn-small(tabindex='-1', ng-class='{active: state.bold}', ng-click='toolbarButtonClicked(\'bold\')')
+                    i.fa.fa-bold
+                  button.btn.btn-default.btn-sm.btn-small(tabindex='-1', ng-class='{active: state.italic}', ng-click='toolbarButtonClicked(\'italic\')')
+                    i.fa.fa-italic
+                  button.btn.btn-default.btn-sm.btn-small(tabindex='-1', ng-class='{active: state.underline}', ng-click='toolbarButtonClicked(\'underline\')')
+                    i.fa.fa-underline
+                  button.btn.btn-default.btn-sm.btn-small(tabindex='-1', ng-class='{active: state.superscript}', ng-click='toolbarButtonClicked(\'superscript\')')
+                    i.fa.fa-superscript
+                  button.btn.btn-default.btn-sm.btn-small(tabindex='-1', ng-class='{active: state.subscript}', ng-click='toolbarButtonClicked(\'subscript\')')
+                    i.fa.fa-subscript
+                .btn-group
+                  button.btn.btn-default.btn-sm.btn-small(tabindex='-1', ng-class='{active: state.insertunorderedlist}', ng-click='toolbarButtonClicked(\'insertunorderedlist\')')
+                    i.fa.fa-list-ul
+                  button.btn.btn-default.btn-sm.btn-small(tabindex='-1', ng-class='{active: state.insertorderedlist}', ng-click='toolbarButtonClicked(\'insertorderedlist\')')
+                    i.fa.fa-list-ol
+                .btn-group
+                  button.btn.btn-default.btn-sm.btn-small(tabindex='-1', ng-class='{active: state.justifyLeft}', ng-click='toolbarButtonClicked(\'justifyLeft\')')
+                    i.fa.fa-align-left
+                  button.btn.btn-default.btn-sm.btn-small(tabindex='-1', ng-class='{active: state.justifyCenter}', ng-click='toolbarButtonClicked(\'justifyCenter\')')
+                    i.fa.fa-align-center
+                  button.btn.btn-default.btn-sm.btn-small(tabindex='-1', ng-class='{active: state.justifyRight}', ng-click='toolbarButtonClicked(\'justifyRight\')')
+                    i.fa.fa-align-right
+                  button.btn.btn-default.btn-sm.btn-small(tabindex='-1', ng-click='toolbarButtonClicked(\'indent\')')
+                    i.fa.fa-indent
+                  button.btn.btn-default.btn-sm.btn-small(tabindex='-1', ng-click='toolbarButtonClicked(\'outdent\')')
+                    i.fa.fa-dedent
+                .btn-group
+                  button.btn.btn-default.btn-sm.btn-small(type='button', data-toggle='dropdown')
+                    i.fa.fa-text-height
+                    span.caret
+                  ul.dropdown-menu
+                    li
+                      a 1.0
+                    li
+                      a 1.5
+                    li
+                      a 2.0
+                .btn-group
+                  button.btn.btn-default.btn-sm.btn-small(tabindex='-1', ng-click='toolbarButtonClicked(\'hr\')')
+                    i.fa.fa-minus
+                .btn-group
+                  button.btn.btn-default.btn-sm.btn-small(tabindex='-1', ng-click='toolbarButtonClicked(\'image\')')
+                    i.fa.fa-picture-o
+                .btn-group
+                  button.btn.btn-default.btn-sm.btn-small(tabindex='-1', ng-click='toolbarButtonClicked(\'table\')')
+                    i.fa.fa-table
+                .btn-group
+                  button.btn.btn-default.btn-sm.btn-small(tabindex='-1', ng-click='toolbarButtonClicked(\'footnotes\')')
+                    | Footnote
+                .btn-group
+                  button.btn.btn-default.btn-sm.btn-small(tabindex='-1', ng-click='toolbarButtonClicked(\'corespring-video\')')
+                    i.fa.fa-film
+                .btn-group
+                  button.btn.btn-default.btn-sm.btn-small(tabindex='-1', ng-click='toolbarButtonClicked(\'a\')')
+                    i.fa.fa-link
+              //
+                wiggi-wiz-toolbar
+              .edit-wrapper
+                .editable.col-md-6
+                  ul
+                    li
+                      a(href='') Link 1
+                    li
+                      a(href='') Link 2
+                    li
+                      a(href='') Link 3
+                    li
+                      a(href='') Link 4
+            //
+              filename4
+          //
+             col-md-6 right side 
+        //
+           supporting-materials 
+      //
+        content-wrapper
+    //
+       container-fluid 
+    //
+       modal and dialog 
+    //
+       addSupportingMaterial 
+    #addSupportingMaterial.modal.fade
+      .modal-dialog
+        .modal-content
+          .modal-header
+            button.close(type='button', data-dismiss='modal')
+              span(aria-hidden='true') ×
+              span.sr-only Close
+            h4.modal-title Add Supporting Material
+          .modal-body
+            form.form-horizontal(role='form')
+              p
+                | When composing an assessment item, it can be useful to include supplemental materials to assist in scoring or classroom discussion.
+              .form-group
+                label.col-sm-2.control-label Type:
+                #menu-supporting-material.dropdown.col-sm-10
+                  button#dropdownMenu1.btn.btn-default.dropdown-toggle(type='button', data-toggle='dropdown', value='testing')
+                    | Select Type of Supporting Material
+                    span.caret
+                  ul.dropdown-menu(role='menu', aria-labelledby='dropdownMenu1')
+                    li(role='presentation')
+                      a(role='menuitem', tabindex='-1', href='#') Rubric
+                    li(role='presentation')
+                      a(role='menuitem', tabindex='-1', href='#') Scoring Guide
+                    li(role='presentation')
+                      a(role='menuitem', tabindex='-1', href='#') Teacher Notes
+                    li(role='presentation')
+                      a(role='menuitem', tabindex='-1', href='#') Handouts
+              //
+                form-group
+              .form-group
+                label.col-sm-2.control-label Title:
+                .col-sm-6
+                  input#title.form-control(type='text', placeholder='enter title')
+              //
+                form-group
+              .form-group
+                label.col-sm-2.control-label Source:
+                #select-file-type.dropdown.col-sm-10
+                  button#dropdownMenu1.btn.btn-default.dropdown-toggle(type='button', data-toggle='dropdown')
+                    i.fa.fa-upload
+                    | Upload File (.pdf, .txt., .doc)
+                  | OR
+                  button.btn.btn-default create your own
+              //
+                 form-group 
+              button.btn.btn-info submit
+    //
+       //end of addSupportingMaterial 
+    //
+       //renameQuestion  
+    #renameQuestion.modal.fade
+      .modal-dialog.modal-sm
+        .modal-content
+          .modal-header
+            button.close(type='button', data-dismiss='modal')
+              span(aria-hidden='true') ×
+              span.sr-only Close
+            h4.modal-title Rename Question
+          .modal-body
+            label Enter a new name:
+            #itemName.editable
+              span tests
+            br
+            br
+            button#save.btn.btn-primary(type='button') OK
+            button.btn.btn-default(type='button', data-dismiss='modal') Cancel
+          .modal-footer
+        //
+           /.modal-content 
+      //
+         /.modal-dialog 
+    //
+       /.modal 
+    //
+       //end of renameQuestion  
+    //
+       //catalog-view 
+    #catalog-view.modal.fade(tabindex='-1', role='dialog', aria-hidden='true')
+      .modal-dialog.modal-lg
+        .modal-content
+          .modal-header
+            button.close(type='button', data-dismiss='modal')
+              span(aria-hidden='true') ×
+              span.sr-only Close
+            h4.modal-title Question Information
+          .modal-body
+            .row
+              .col-md-2
+                ul.nav.nav-pills.nav-stacked(role='tablist')
+                  li.active(role='presentation')
+                    a(href='#catalog-view1', data-toggle='tab') Question
+                  li(role='presentation')
+                    a(href='#catalog-view2', data-toggle='tab') Profile Information
+                  li(role='presentation')
+                    a.dropdown-toggle(data-toggle='dropdown')
+                      | Supporting Materials
+                      span.caret
+                    ul.dropdown-menu(role='menu')
+                      li.dropdown-header(role='presentation') SCORING GUIDE
+                      li
+                        a(href='#catalog-view-filename1', data-toggle='tab') SAT Scoring Guide
+                      li
+                        a(href='#catalog-view-filename2', data-toggle='tab') Scoring Guide
+                      li.divider(role='presentation')
+                      li.dropdown-header(role='presentation') STUDENT WORK SAMPLES
+                      li
+                        a(href='#catalog-view-filename3', data-toggle='tab') Score Point 4
+                      li.divider(role='presentation')
+                      li.dropdown-header(role='presentation') STUDENT WORK SAMPLES
+                      li
+                        a(href='#catalog-view-filename4', data-toggle='tab') List of Links
+              .col-md-10
+                //
+                   Tab panes 
+                .tab-content
+                  #catalog-view1.tab-pane.active(role='tabpanel')
+                    img(src='item-preview.png')
+                  #catalog-view2.tab-pane(role='tabpanel')
+                    img(src='preview-profile.png')
+                  #catalog-view3.tab-pane(role='tabpanel')
+                    embed(src='https://satonlinecourse.collegeboard.org/SR/digital_assets/pdfs/eri/scoring_2012-2013.pdf', width='600', height='700')
+                  #catalog-view-filename1.tab-pane(role='tabpanel')
+                    embed(src='https://satonlinecourse.collegeboard.org/SR/digital_assets/pdfs/eri/scoring_2012-2013.pdf', width='600', height='700')
+                  #catalog-view-filename2.tab-pane(role='tabpanel')
+                    h3 Scoring Guide 2
+                    table.table.table-striped.table-bordered
+                      thead
+                        tr
+                          th Score
+                          th Criteria
+                      tbody
+                        tr
+                          td.col-md-4
+                            .scoreNumber 4
+                          td
+                            | The question or task is completed correctly and contains additional, unexpected, or outstanding features.
+                        tr
+                          td
+                            .scoreNumber 3
+                          td The question or task is compelted correctly; there are no mistakes.
+                        tr
+                          td
+                            .scoreNumber 2
+                          td The answer or task is partly correct; it has no big mistakes.
+                        tr
+                          td
+                            .scoreNumber 1
+                          td
+                            | The student does not do the question or task, or gives an answer that has nothing to do with what is asked.
+                  #catalog-view-filename3.tab-pane(role='tabpanel')
+                    img(src='student-sample.png')
+                  #catalog-view-filename4.tab-pane(role='tabpanel')
+                    ul
+                      li
+                        a(href='') Link 1
+                      li
+                        a(href='') Link 2
+                      li
+                        a(href='') Link 3
+                      li
+                        a(href='') Link 4
+          //
+             modal-body 
+        //
+           modal-content 
+      //
+         modal-dialog modal-lg 
+    //
+       //end of catalog-view 
+    //
+       //openFileModal 
+    #openFileModal.modal.fade
+      .modal-dialog.modal-sm
+        .modal-content
+          .modal-header
+            button.close(type='button', data-dismiss='modal')
+              span(aria-hidden='true') ×
+              span.sr-only Close
+            h4.modal-title Open an item
+          .modal-body
+            #menu-supporting-material.dropdown
+              button#dropdownMenu1.btn.btn-default.dropdown-toggle(type='button', data-toggle='dropdown', value='testing')
+                | Select an item to open
+                span.caret
+              ul.dropdown-menu(role='menu', aria-labelledby='dropdownMenu1')
+                li.dropdown-header(role='presentation') Collection Name
+                li(role='presentation')
+                  a(role='menuitem', tabindex='-1', href='#') Item 1
+                li.divider(role='presentation')
+                li.dropdown-header(role='presentation') Collection Name
+                li(role='presentation')
+                  a(role='menuitem', tabindex='-1', href='#') Item 2
+                li(role='presentation')
+                  a(role='menuitem', tabindex='-1', href='#') Item 3
+                li.divider(role='presentation')
+                li.dropdown-header(role='presentation') Collection Name
+                li(role='presentation')
+                  a(role='menuitem', tabindex='-1', href='#') Item 4
+            br
+            button#save.btn.btn-primary(type='button') Open
+            button.btn.btn-default(type='button', data-dismiss='modal') Cancel
+        //
+           /.modal-content 
+      //
+         /.modal-dialog 
+    //
+       /.modal 
+    //
+       //end of openFileModal 
+    //
+       copyFileModal 
+    #copyFileModal.modal.fade
+      .modal-dialog.modal-sm
+        .modal-content
+          .modal-header
+            button.close(type='button', data-dismiss='modal')
+              span(aria-hidden='true') ×
+              span.sr-only Close
+            h4.modal-title Copy question
+          .modal-body
+            label Enter a new question name:
+            input#title.form-control(type='text', placeholder='copy of Untitled Item')
+            br
+            button#save.btn.btn-primary(type='button') OK
+            button.btn.btn-default(type='button', data-dismiss='modal') Cancel
+        //
+           /.modal-content 
+      //
+         /.modal-dialog 
+    //
+       /.modal 
+    //
+       //end of copyFileModal 
+    //
+       deleteFileModal 
+    #deleteFileModal.modal.fade
+      .modal-dialog.modal-sm
+        .modal-content
+          .modal-header
+            button.close(type='button', data-dismiss='modal')
+              span(aria-hidden='true') ×
+              span.sr-only Close
+            h4.modal-title Delete Item
+          .modal-body
+            p Are you sure you want to delete this item?
+            button#save.btn.btn-primary(type='button') Yes
+            button.btn.btn-default(type='button', data-dismiss='modal') Cancel
+        //
+           /.modal-content 
+      //
+         /.modal-dialog 
+    //
+       /.modal 
+    //
+       //end of deleteFileModal 
+    //
+       archiveFileModal 
+    #archiveFileModal.modal.fade
+      .modal-dialog.modal-sm
+        .modal-content
+          .modal-header
+            button.close(type='button', data-dismiss='modal')
+              span(aria-hidden='true') ×
+              span.sr-only Close
+            h4.modal-title Archive Item
+          .modal-body
+            p Are you sure you want to archive this item?
+            button#save.btn.btn-primary(type='button') Yes
+            button.btn.btn-default(type='button', data-dismiss='modal') Cancel
+        //
+           /.modal-content 
+      //
+         /.modal-dialog 
+    //
+       /.modal 
+    //
+       //end of archiveFileModal 
+    //
+       scoringModal 
+    #scoringModal.modal.fade
+      .modal-dialog
+        .modal-content
+          .modal-header
+            button.close(type='button', data-dismiss='modal')
+              span(aria-hidden='true') ×
+              span.sr-only Close
+            h4.modal-title Scoring
+          .modal-body
+            p
+              | An item with only one question will receive full weight. In an item with more than one question, you can assign specific weights to each part. This feature is optional; if you don't adjust weights, weight will be evenly divided across each question.
+            p
+              form(role='form')
+                ul.list-inline.list-unstyled
+                  li.col-sm-8
+                    label.control-label Multiple Choice is worth
+                  li
+                    input.form-control(type='text', size='2', placeholder='1')
+                  li pts (20%)
+                ul.list-inline.list-unstyled
+                  li.col-sm-8
+                    label.control-label Open-Ended Answer is worth
+                  li
+                    input.form-control(type='text', size='2', placeholder='1')
+                  li pts (20%)
+                ul.list-inline.list-unstyled
+                  li.col-sm-8
+                    label.control-label Multiple Choice is worth
+                  li
+                    input.form-control(type='text', size='2', placeholder='1')
+                  li pts (20%)
+                ul.list-inline.list-unstyled
+                  li.col-sm-8
+                    label.control-label Evaluate and Equation is worth
+                  li
+                    input.form-control(type='text', size='2', placeholder='1')
+                  li pts (20%)
+                ul.list-inline.list-unstyled
+                  li.col-sm-8
+                    label.control-label Drop Down Choice is worth
+                  li
+                    input.form-control(type='text', size='2', placeholder='1')
+                  li pts (20%)
+        //
+           /.modal-content 
+      //
+         /.modal-dialog 
+    //
+       /.modal 
+    //
+       //end of scoringModal 
+    //
+       //config dialog 
+    #configDialog(title='Short Answer', style='display: none;')
+      img(src='config-panel.png')
+    //
+       //end of dialog 
+    .configWrapper.click-to-top
+      .modal-content
+        .modal-header
+          button.close(type='button', data-dismiss='modal')
+            span(aria-hidden='true') ×
+            span.sr-only Close
+          h4.modal-title Short Answer
+        .modal-body
+          img.img-responsive(src='config-panel.png')
+      //
+         /.modal-content 
+    .shortAnswerConfigPanel.click-to-top
+      .modal-content
+        .modal-header
+          button.close(type='button', data-dismiss='modal')
+            span(aria-hidden='true') ×
+            span.sr-only Close
+          h4.modal-title Short Answer
+        .modal-body
+          img.img-responsive(src='short-answer-config-panel.png')
+      //
+         /.modal-content 
+    //
+       //shortAnswerDialog 
+    #shortAnswerDialog(title='Short Answer', style='display: none;')
+      img(src='short-answer-config-panel.png')
+    #editPreviewDialog(title='Item Preview', style='display: none;')
+      img(src='item-preview.png')
+    //
+       //helpDialog 
+    #helpDialog(title='Help', style='display: none;')
+      .row
+        .col-md-4
+          ul.nav.nav-pills.nav-stacked(role='tablist')
+            li.active(role='presentation')
+              a(href='#help1', data-toggle='tab') Adding an Image
+            li(role='presentation')
+              a(href='#help2', data-toggle='tab') Adding and setting up an Answer Type
+            li(role='presentation')
+              a(href='#help3', data-toggle='tab') Adding Math using LaTex or MathML
+            li(role='presentation')
+              a(href='#help4', data-toggle='tab') Adding Video
+            li(role='presentation')
+              a(href='#help5', data-toggle='tab') Categorize
+            li(role='presentation')
+              a(href='#help6', data-toggle='tab') Creating an Item
+        .col-md-8
+          //
+             Tab panes 
+          .tab-content
+            #help1.tab-pane.active(role='tabpanel')
+              h4 Adding an Image
+              ol
+                li In the formatting menu, click on the [ image] icon.
+                li Locate the image and then click Upload Image
+                li After the system has confirmed that the image has been upload, click Insert
+                li Click on the image to adjust sizing and alignment
+            #help2.tab-pane(role='tabpanel')
+              h4 Adding and setting up an Answer Type
+              p
+                | An item may include one or more answer types. For example, it may include a Short Answer question and an Open Ended question to ask the student to explain his or her answer.
+              ol
+                li In the formatting menu, click on the Answer Type drop down menu
+                li Select the answer type you would like to add to the item
+                li In the editor menu, click on the [pencil image] to open the configuration panel
+                li Add the information (e.g., choices, feedback, scoring information)
+                li Click Done to return to the editor
+              p
+                | The Preview window will be automatically visible so that you can view your changes in real time.
+            #help3.tab-pane(role='tabpanel')
+              h4 Adding Math using LaTex or MathML
+              ol
+                li In the formatting menu, click on the [math] icon.
+                li Add text in the form of MathML or LaTex to the window.
+                ol
+                  li
+                    | If needed, refer to LaTex or MathML authoring sites that are referenced in the configuration panel
+                  li
+                    | If using LaTex, indicate whether the text should be rendered as Block (stand alone on one line) or Inline with text.
+                li Click Done to return to the editor.
+            #help4.tab-pane(role='tabpanel')
+              h4 Adding Video
+              p
+                | Authors may add videos hosted by YouTube and Vimeo. Authors may add a video by providing the video URL and description below.
+              ol
+                li In the formatting menu, click on the [video image] icon.
+                li Add a URL for the video.
+                li Adjust the aspect ratio to standard or wide screen.
+                li Select the size of the video.
+            #help5.tab-pane(role='tabpanel')
+              h4 Adding Video
+              p
+                | In Categorize, students may drag & drop answer tiles to the appropriate category area or areas.
+              ol
+                li
+                  | In the formatting menu, click on the Answer Type drop down menu and select Categorize.
+                li
+                  | In the editor menu, click on the
+                  i.fa.fa-pencil
+                  | to open the configuration panel
+                li Determine the categories for the interaction.
+                ol
+                  li Add Categories using the "Add a Category" button.
+                  li
+                    | Remove Categories using the
+                    i.fa.fa-trash-o
+                    | .
+                li Edit the choices.
+                ol
+                  li Adding a Choice: Use the "Add a Choice Button" to add a choice.
+                  li Removing a Choice: Use the [trash can] next to the choice
+                li
+                  | Determine the correct answer. Do this by selecting the category into which the choice should be placed using the drop down menu next to the choice.
+                li
+                  | Author the
+                  strong feedback
+                  | by selecting the preferred settings:
+                ol
+                  li
+                    | Correct Answer: If the interaction if fully correct; the default message is "Correct!"
+                  li
+                    | Partially Correct Answer: Author feedback message if the interaction is partially correct: the default message is "Almost!"
+                  li
+                    | Incorrect Answer: Author feedback message if the interaction is partially correct: the default message is "Good try but that is not the correct answer."
+                  li
+                    | Summary Feedback: Authors may provide interaction level feedback for the answer type. The default setting is set to "no feedback."
+                li
+                  | Score the interaction. Allow partial credit based on the number of correct answers submitted, this feature is optional.
+                li Define other settings
+                ol
+                  li
+                    | Shuffle: Selecting "Shuffle Choices" will change the order of choices as they are presented to a student each time that the item is presented launched.
+                  li Labeling
+                  ol
+                    li
+                      | Choice Group Label: Authors may label the container for the choices; the default is ‘no label’.
+                    li
+                      | Category Labels: Authors may label the area where the student will place the choices in the correct order; the default is 'no label.'
+            #help6.tab-pane(role='tabpanel')
+              h4 Creating an Item
+              p
+                | When you create a new item it'll be named "Untitled" by default.  To rename the item:
+              ol
+                li
+                  | Go to the
+                  strong File
+                  | menu.
+                li
+                  | Select
+                  strong Rename
+                  | .
+                li Type a name for your item.
+                li
+                  | Click
+                  strong OK
+                  | .
+              p Adding a title will update the title that will be used in the Item Profile.
+              p To create an item:
+              ol
+                li
+                  | Enter an introduction and/or a prompt and format it using standard formatting features such as italics, bold, headings.
+                li
+                  | Select the way that you want the student to respond by inserting an Answer Type into the item by using the drop down menu in the formatting toolbar.
+                li Edit the answer type by opening the configuration panel
+                li Update the Profile Information - the profile information is
+                li Add Supporting materials
+      //
+         row 
+    //
+       //end of helpDialog 
+    script(data-require='jquery@*', data-semver='2.1.1', src='http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js')
+    script(data-require='bootstrap@3.1.1', data-semver='3.1.1', src='http://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js')
+    script(src='http://code.jquery.com/ui/1.11.1/jquery-ui.js')
+    script(src='des-12.js')
