@@ -41,7 +41,7 @@ trait ComponentSets extends Controller with ComponentUrls {
     }
 
     val out = context match {
-      case "editor" => gen(editorGenerator)
+      case s: String if (s.contains("editor")) => gen(editorGenerator)
       case "player" => gen(playerGenerator)
       case "rig" => gen(editorGenerator)
       case "catalog" => gen(catalogGenerator)

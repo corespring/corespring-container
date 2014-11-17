@@ -1,0 +1,102 @@
+extends layout
+
+block content
+
+  .root(ng-controller="Root")
+
+    .nav-container
+      nav.navbar.navbar-default.navbar-fixed-top
+        ul.nav.navbar-nav
+          li.dropdown(ng-class="{active: isActive('main') || isActive('weighting') || isActive('summary-feedback')}")
+            a.dropdown-toggle(data-toggle="dropdown") Item <span class="caret"></span>
+            ul.dropdown-menu
+              li(ui-sref-active="active")
+                a(ui-sref="design({section: 'main'})" ) Edit
+              li(ui-sref-active="active")
+                a(ui-sref="design({section: 'weighting'})" ) Weighting
+              li(ui-sref-active="active")
+                a(ui-sref="design({section: 'summary-feedback'})" ) Summary Feedback
+          li(ui-sref-active="active")
+            a(ui-sref="item-profile" ) Profile
+          li.dropdown(ng-class="{active: isSupportingMaterialsSection()}")
+            a.dropdown-toggle(data-toggle="dropdown") Supporting Materials <span class="caret"></span>
+            ul.dropdown-menu
+              li
+                a(ui-sref="supporting-materials({intro: 'intro'})") Add
+              li.divider
+              li(ng-repeat="supportingMaterial in data.item.supportingMaterials", ng-class="{ active: isSupportingMaterialActive(supportingMaterial, $index)}")
+                a.supporting-material-link(ui-sref="supporting-material({index: $index})") {{supportingMaterial.name}}
+                a.delete-supporting-material(ng-click="deleteSupportingMaterial($index)")
+
+        .saver
+          model-saver(
+          ng-model="data.item",
+          save-trigger="save()",
+          saving="data.saveInProgress",
+          save-error="data.saveError")
+            #saved
+              | All changes saved
+            #save-in-progress
+              | Saving...
+            #save-error
+              | There was an error saving your content
+
+    .preview-container
+      .contents(ui-view="preview")
+
+    .content-container(ng-class="{preview: showPreview()}")
+
+      .main-content(ui-view="main")
+
+      button.btn.btn-xs.preview-hang-right-btn(ng-click="togglePreview()",
+        ng-show="showPreviewButton", ng-class="{'preview-active': showPreview()}")
+        i.fa.fa-bars
+
+  include partials/designer
+  include partials/item-profile
+  include partials/supporting-materials
+  include partials/supporting-material
+  include partials/overview
+  include partials/overview-supporting-material
+  include partials/previews/designer
+  include partials/previews/item-profile
+  include partials/previews/supporting-material
+
+//After the angular module has been created.
+block after-main-script
+
+  script.
+
+    function mkEditorState(path, id){
+      return {
+        url: path,
+        views: {
+          main: {
+            template: $('#' + id).html()
+          },
+          preview: {
+            template: $('#' + id + '-preview').html()
+          }
+        }
+      }
+    }
+
+    var appLoadConfig = {
+      moduleName: 'corespring-editor',
+      defaultPath: '/design/main',
+      states: {
+        design : mkEditorState('/design/:section', 'designer'),
+        'item-profile' : mkEditorState('/item-profile', 'item-profile'),
+        'supporting-materials' : mkEditorState('/supporting-materials/:intro', 'supporting-materials'),
+        'supporting-material' : mkEditorState('/supporting-material/:index','supporting-material'),
+        overview: mkEditorState('/overview', 'overview')
+      }
+    };
+
+    angular.module('corespring-#{appName}').config(
+      function($provide, $stateProvider, $urlRouterProvider) {
+        $urlRouterProvider.otherwise(appLoadConfig.defaultPath);
+        for( var x in appLoadConfig.states){
+          $stateProvider.state(x, appLoadConfig.states[x]);
+        }
+      });

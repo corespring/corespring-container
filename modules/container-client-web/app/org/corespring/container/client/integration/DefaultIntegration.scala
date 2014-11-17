@@ -114,6 +114,18 @@ trait DefaultIntegration
     override def hooks = editorHooks
   }
 
+  lazy val v2Editor = new V2Editor {
+    override def mode: Mode = Play.current.mode
+
+    override implicit def ec: ExecutionContext = DefaultIntegration.this.ec
+
+    override def urls: ComponentUrls = componentSets
+
+    override def components: Seq[Component] = DefaultIntegration.this.components
+
+    override def hooks = editorHooks
+  }
+
   lazy val catalog = new Catalog {
     override def mode: Mode = Play.current.mode
 
