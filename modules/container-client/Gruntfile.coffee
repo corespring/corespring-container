@@ -45,9 +45,9 @@ module.exports = (grunt) ->
 
   # Some common vars
   common =
-    app: 'src/main/resources/container-client'
+    app: 'src'
     dist: 'target/scala-2.10/classes/container-client'
-    test: 'src/test/resources/container-client'
+    test: 'test'
     tmp: '.tmp'
     components: '../../corespring-components/components'
 
