@@ -1,7 +1,10 @@
 extends layout
 
 block content
-  .container-fluid
+  
+  include mixins/v2-editor
+
+  .container-fluid(ng-controller="Root")
     .nav-container.row
       nav.navbar-default
         .container-fluid
@@ -10,27 +13,66 @@ block content
               i.fa.fa-question-circle
           ul.list-unstyled.list-inline
             li
-              .title-nav Untitled
+              .title-nav {{data.item.profile.taskInfo.title}} 
             li
               .dropdown
-                button#dropdownMenu1.btn.btn-default.dropdown-toggle(type='button', data-toggle='dropdown')
+                button.btn.btn-default.dropdown-toggle(
+                  type='button', 
+                  data-toggle='dropdown')
                   | Actions
                   span.caret
                 ul.dropdown-menu(role='menu', aria-labelledby='dropdownMenu1')
-                  li(role='presentation')
-                    a#nav-new(role='menuitem', tabindex='-1', href='#') New
-                  li(role='presentation')
-                    a#nav-open(role='menuitem', tabindex='-1', href='#') Open...
-                  li(role='presentation')
-                    a#nav-copy(role='menuitem', tabindex='-1', href='#') Copy...
+                  dd_button New
+                  dd_button Open... 
+                  dd_button Copy... 
                   li.divider(role='presentation')
-                  li(role='presentation')
-                    a#nav-archive(role='menuitem', tabindex='-1', href='#') Archive
-                  li(role='presentation')
-                    a#nav-delete(role='menuitem', tabindex='-1', href='#') Delete
+                  dd_button Archive... 
+                  dd_button Delete 
                   li.divider(role='presentation')
-                  li(role='presentation')
-                    a#nav-question-info.catalog-view(role='menuitem', tabindex='-1', href='#') Question Information
+                  dd_button QuestionInfo 
             li
               .saveMessaging
-            li
+
+          ul#mainTabNav.nav.nav-tabs(role='tablist')
+            +tab('Question', 'question')
+            +tab('Profile', 'profile')
+            +tab('Supporting Materials', 'supporting-materials')
+ 
+//After the angular module has been created.
+block after-main-script
+
+  script.
+
+    function mkEditorState(path, id){
+      return {
+        url: path,
+        views: {
+          main: {
+            template: $('#' + id).html()
+          },
+          preview: {
+            template: $('#' + id + '-preview').html()
+          }
+        }
+      }
+    }
+
+    var appLoadConfig = {
+      moduleName: 'corespring-editor',
+      defaultPath: '/design/main',
+      states: {
+        design : mkEditorState('/design/:section', 'designer'),
+        'item-profile' : mkEditorState('/item-profile', 'item-profile'),
+        'supporting-materials' : mkEditorState('/supporting-materials/:intro', 'supporting-materials'),
+        'supporting-material' : mkEditorState('/supporting-material/:index','supporting-material'),
+        overview: mkEditorState('/overview', 'overview')
+      }
+    };
+
+    angular.module('corespring-#{appName}').config(
+      function($provide, $stateProvider, $urlRouterProvider) {
+        $urlRouterProvider.otherwise(appLoadConfig.defaultPath);
+        for( var x in appLoadConfig.states){
+          $stateProvider.state(x, appLoadConfig.states[x]);
+        }
+      });
