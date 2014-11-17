@@ -147,7 +147,7 @@ object Build extends sbt.Build {
   lazy val logging = builder.lib("logging").settings(
     libraryDependencies ++= Seq(grizzledLog))
 
-  lazy val containerClient = builder.lib("container-client")
+  lazy val containerClient = builder.clientSideLib("container-client")
     .settings(
       buildClientTask,
       runClientTestsTask,
