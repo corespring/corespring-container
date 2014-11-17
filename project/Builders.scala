@@ -54,7 +54,7 @@ class Builders(org: String, rootScalaVersion: String) {
   private val copyToNamedDirTask = copyToNamedDir <<=
     (name, (classDirectory in Compile), cacheDirectory, (resources in Compile), (resourceDirectories in Compile), streams) map { (n, target, cache, resrcs, dirs, s) =>
       val namedTarget = target / n
-      val cacheFile = cache / "copy-resources" //  / n
+      val cacheFile = cache / "copy-resources"
       s.log.debug("named target " + namedTarget.toString)
       val mappings = (resrcs --- dirs) pair (rebase(dirs, namedTarget) | flat(namedTarget))
       s.log.debug("Copy resource mappings: " + mappings.mkString("\n\t", "\n\t", ""))
