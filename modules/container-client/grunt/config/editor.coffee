@@ -40,7 +40,7 @@ exports.css =
   src: ['css/editor.css']
   dest: 'css/editor.min.css'
   libs: [
-    'bower_components/font-awesome/css/font-awesome.min.css',
+    'bower_components/components-font-awesome/css/font-awesome.min.css',
     '//fonts.googleapis.com/css?family=Ubuntu:300,400,500,500italic,700'
   ]
   report: 'editor-css-report.json'
