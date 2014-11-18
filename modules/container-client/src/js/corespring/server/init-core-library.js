@@ -3,7 +3,6 @@
  The core library starts life with no modules defined.
  Add the base set of libraries here.
  */
-
 if (!corespring) {
   throw "Can't find global corespring object";
 }

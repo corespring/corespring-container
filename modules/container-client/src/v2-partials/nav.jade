@@ -1,0 +1,45 @@
+mixin dropdown_btn(name)
+  li(role='presentation')
+    a(role='menuitem', tabindex='-1', ng-click="#{name}()")
+      block 
+
+mixin tab(label, name)
+  li(ui-sref-active="active")
+    a(ui-sref="#{name}", role='tab')= label 
+
+mixin help
+  a.help(ng-click="help()")
+    i.fa.fa-question-circle
+
+include ../v2-templates/popups/open
+include ../v2-templates/popups/copy
+include ../v2-templates/popups/archive
+include ../v2-templates/popups/delete
+include ../v2-templates/popups/question-information
+include ../v2-templates/popups/help
+
+nav.navbar-default(ng-controller="NavController")
+  +help
+  ul.list-inline
+    li.title-nav data.item.profile.taskInfo.title
+    li.dropdown
+      button.btn.btn-default.dropdown-toggle(type='button', data-toggle='dropdown')
+        | Actions
+        span.caret
+      ul.dropdown-menu(role='menu', aria-labelledby='dropdownMenu1')
+        +dropdown_btn('new') New
+        +dropdown_btn('open') Open...
+        +dropdown_btn('copy') Copy...
+        li.divider(role='presentation')
+        +dropdown_btn('archive') Archive...
+        +dropdown_btn('delete') Delete
+        li.divider(role='presentation')
+        +dropdown_btn('questionInformation') Question Information
+    li.saveMessaging
+
+  ul.nav.nav-tabs(role='tablist')
+    +tab('Question', 'question')
+    +tab('Profile', 'profile')
+    //li(ui-sref-active="active")
+    //  a(ui-sref="supportingMaterials({name: null})") Supporting Materials
+    +tab('Supporting Materials', 'supporting-materials')

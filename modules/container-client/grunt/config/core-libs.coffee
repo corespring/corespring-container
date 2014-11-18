@@ -1,12 +1,12 @@
 
 ###
 If the path contains (.min)
-This means that: 
+This means that:
  - for prod builds - use the pre-minified file
  - for dev builds - use the non minified file
 ###
 
-exports.src = [
+exports.js = [
   'bower_components/spin.js/spin.js',
   'bower_components/es5-shim/es5-shim(.min).js',
   'bower_components/console-polyfill/index.js',
@@ -19,4 +19,8 @@ exports.src = [
   'bower_components/saxjs/lib/sax.js',
   'bower_components/bootstrap/dist/js/bootstrap(.min).js',
   'bower_components/msgr.js/dist/msgr(.min).js'
+]
+
+exports.css = [
+  'bower_components/jquery-ui/themes/base/resizable.css',
 ]

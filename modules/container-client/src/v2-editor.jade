@@ -1,86 +1,64 @@
 extends layout
 
-
 block content
-  include mixins/v2-editor
+    
+  include v2-mixins/modal
+  include v2-templates/question
+  include v2-templates/profile
+  include v2-templates/supporting-materials
+    
 
-  include partials/question
-
-  .container-fluid(ng-controller="Root")
-    .nav-container.row
-      nav.navbar-default
-        .container-fluid
-          .helpWrapper
-            a.help(href='#help')
-              i.fa.fa-question-circle
-          ul.list-unstyled.list-inline
-            li
-              .title-nav {{data.item.profile.taskInfo.title}} 
-            li
-              .dropdown
-                button.btn.btn-default.dropdown-toggle(
-                  type='button', 
-                  data-toggle='dropdown')
-                  | Actions
-                  span.caret
-                ul.dropdown-menu(role='menu', aria-labelledby='dropdownMenu1')
-                  +dropdown_btn New
-                  +dropdown_btn Open... 
-                  +dropdown_btn Copy... 
-                  li.divider(role='presentation')
-                  +dropdown_btn Archive... 
-                  +dropdown_btn Delete 
-                  li.divider(role='presentation')
-                  +dropdown_btn QuestionInfo 
-            li
-              .saveMessaging
-
-          ul#mainTabNav.nav.nav-tabs(role='tablist')
-            +tab('Question', 'question')
-            +tab('Profile', 'profile')
-            +tab('Supporting Materials', 'supporting-materials')
-
+  .root(ng-controller="Root")
+    .container-fluid
+      include v2-partials/nav  
     .main-content(ui-view="main")
-
-
+    
 
  
 //After the angular module has been created.
 block after-main-script
 
-  script.
+  script(type="text/javascript").
+    
+    (function(){
 
-    function mkEditorState(path, id){
-      return {
-        url: path,
-        views: {
-          main: {
-            template: $('#' + id).html()
-          },
-          preview: {
-            template: $('#' + id + '-preview').html()
+      function mkEditorState(name){
+        return {
+          url: '/' + name,
+          views: {
+            main: {
+              templateUrl: '/templates/' + name 
+            }
           }
         }
       }
-    }
 
-    var appLoadConfig = {
-      moduleName: 'corespring-#{appName}',
-      defaultPath: '/design/main',
-      states: {
-        question : mkEditorState('/design/:section', 'question'),
-        design : mkEditorState('/design/:section', 'designer'),
-        'item-profile' : mkEditorState('/item-profile', 'item-profile'),
-        'supporting-materials' : mkEditorState('/supporting-materials/:intro', 'supporting-materials'),
-        'supporting-material' : mkEditorState('/supporting-material/:index','supporting-material'),
-        overview: mkEditorState('/overview', 'overview')
-      }
-    };
-
-    angular.module('corespring-#{appName}').config(
-      function($provide, $stateProvider, $urlRouterProvider) {
+      var appLoadConfig = {
+        defaultPath: '/question',
+        states: {
+          question : mkEditorState('question'),
+          profile : mkEditorState('profile'),
+          'supporting-materials' : {
+            url: '/supporting-materials/{name}',
+            params: {
+              name: { value: 'all' }
+            },
+            views: {
+              main: {
+                templateUrl: '/templates/supporting-materials'
+              }
+            }
+          }
+        }
+      };
+      
+      function uiRouterConfig($provide, $stateProvider, $urlRouterProvider) {
         $urlRouterProvider.otherwise(appLoadConfig.defaultPath);
         for( var x in appLoadConfig.states){
           $stateProvider.state(x, appLoadConfig.states[x]);
         }
-      });
+      }
+      
+      angular.module('corespring-#{appName}').config(uiRouterConfig);
+      
+    })(this);

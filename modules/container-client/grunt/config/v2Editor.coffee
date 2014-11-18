@@ -29,7 +29,7 @@ editorSrcs = [
 ]
 
 exports.js =
-  src: _.union(coreLibs.src, core.src, editorSrcs)
+  src: _.union(coreLibs.js, core.src, editorSrcs)
   dest: 'js/v2-editor-prod.js'
   libs: [
     'bower_components/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML'
@@ -39,10 +39,10 @@ exports.js =
 exports.css =
   src: ['css/v2-editor.css']
   dest: 'css/v2-editor.min.css'
-  libs: [
+  libs: _.union(coreLibs.css, [
     'bower_components/font-awesome/css/font-awesome.min.css',
     '//fonts.googleapis.com/css?family=Ubuntu:300,400,500,500italic,700'
-  ]
+  ])
   report: 'v2-editor-css-report.json'
 
 exports.ngModules = _.union(player.ngModules, [
@@ -58,4 +58,3 @@ exports.ngModules = _.union(player.ngModules, [
   'ngRoute',
   'ui.select2',
   'corespring.wiggi-wiz' ])
-
