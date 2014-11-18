@@ -74,7 +74,7 @@ var Placeholder = function(
 
       log("renderPlayerComponent", $holder, component);
 
-      $scope.showIcon = (config.icon !== undefined) && (component.data.clean === true);
+      $scope.showIcon = (config.icon !== undefined) && component && component.data && (component.data.clean === true);
       $scope.icon = config.icon;
       $scope.name = config.title;
 

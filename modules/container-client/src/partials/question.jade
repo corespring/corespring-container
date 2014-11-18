@@ -1,0 +1,8 @@
+//question.jade
+
+script#question(type="text/ng-template", templateUrl="/design/template")
+
+  h1 Question....
+  .designer(ng-controller="Designer")
+    .editor-container(ng-class="editorMode", ng-show="section == 'main'")
+      {{data.item.xhtml}}

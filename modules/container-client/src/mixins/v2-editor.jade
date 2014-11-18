@@ -1,4 +1,9 @@
-      mixin tab(label, name)
-        h1 a
-        //li(ui-sref-active="active")
-        //  a(ui-sref-active="design({section: '#{name}'})", data-toggle='tab', role='tab')= label
+
+mixin dropdown_btn(label, name)
+  li(role='presentation')
+    a#nav-new(role='menuitem', tabindex='-1', href='#')
+      block 
+
+mixin tab(label, name)
+  li(ui-sref-active="active")
+    a(ui-sref="design({section: '#{name}'})", data-toggle='tab', role='tab')= label 

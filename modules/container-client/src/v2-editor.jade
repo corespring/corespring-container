@@ -1,8 +1,10 @@
 extends layout
 
+
 block content
-  
   include mixins/v2-editor
+
+  include partials/question
 
   .container-fluid(ng-controller="Root")
     .nav-container.row
@@ -22,14 +24,14 @@ block content
                   | Actions
                   span.caret
                 ul.dropdown-menu(role='menu', aria-labelledby='dropdownMenu1')
-                  dd_button New
-                  dd_button Open... 
-                  dd_button Copy... 
+                  +dropdown_btn New
+                  +dropdown_btn Open... 
+                  +dropdown_btn Copy... 
                   li.divider(role='presentation')
-                  dd_button Archive... 
-                  dd_button Delete 
+                  +dropdown_btn Archive... 
+                  +dropdown_btn Delete 
                   li.divider(role='presentation')
-                  dd_button QuestionInfo 
+                  +dropdown_btn QuestionInfo 
             li
               .saveMessaging
 
@@ -37,6 +39,11 @@ block content
             +tab('Question', 'question')
             +tab('Profile', 'profile')
             +tab('Supporting Materials', 'supporting-materials')
+
+    .main-content(ui-view="main")
+
+
+
  
 //After the angular module has been created.
 block after-main-script
@@ -58,9 +65,10 @@ block after-main-script
     }
 
     var appLoadConfig = {
-      moduleName: 'corespring-editor',
+      moduleName: 'corespring-#{appName}',
       defaultPath: '/design/main',
       states: {
+        question : mkEditorState('/design/:section', 'question'),
         design : mkEditorState('/design/:section', 'designer'),
         'item-profile' : mkEditorState('/item-profile', 'item-profile'),
         'supporting-materials' : mkEditorState('/supporting-materials/:intro', 'supporting-materials'),
