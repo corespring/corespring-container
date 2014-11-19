@@ -111,7 +111,6 @@ var controller = function($scope,$http, $location, $timeout, $log, ComponentRegi
       $scope.model = JSON.parse($scope.componentJson);
     } catch (e) {
       console.warn("invalid json: ", e);
-      return;
     }
   };
 
