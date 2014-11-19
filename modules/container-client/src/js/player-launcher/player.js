@@ -76,10 +76,13 @@ exports.define = function(isSecure) {
     var instance = new InstanceDef(element, options, errorCallback, logger);
 
     var isValidMode = function(m) {
-      if (!m) {
-        return false;
+      switch(m){
+        case 'gather':
+        case 'view':
+        case 'evaluate':
+          return true;
       }
-      return ['gather', 'view', 'evaluate'].indexOf(m) !== -1;
+      return false;
     };
 
     /**
