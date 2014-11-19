@@ -1,2 +1,28 @@
+include ../v2-templates/popups/scoring
 script(type="text/ng-template", id="/templates/question")
-  h1 Question...
+  .question(ng-controller="QuestionController")
+    .col-md-6
+      .row.button-bar
+        button.pull-right.btn.btn-default(
+          ng-click="togglePreview()",
+          ng-class="{'btn-warning': !previewOn}")  
+          | {{previewOn ? 'Close' : 'Preview'}} Question 
+          i.fa.fa-toggle-right
+        button.pull-right.btn.btn-default(ng-click="scoring()") Scoring
+
+      hr/
+
+      .row
+        wiggi-wiz(
+          formatting-display="dropdown",
+          ng-model="item.xhtml",
+          focus="true",
+          features="extraFeatures",
+          feature-overrides="overrideFeatures",
+          image-service="imageService")
+
+
+
+    .col-md-4
+      .preview(ng-show="previewOn")
+        p stuff...

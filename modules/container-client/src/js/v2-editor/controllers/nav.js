@@ -2,7 +2,8 @@ angular.module('corespring-editor.controllers').controller('NavController', [
   '$scope',
   'LogFactory',
   '$modal',
-  function($scope, LogFactory, $modal){
+  'ItemService',
+  function($scope, LogFactory, $modal, ItemService){
 
     var logger = LogFactory.getLogger('nav-controller');
 
@@ -42,12 +43,20 @@ angular.module('corespring-editor.controllers').controller('NavController', [
     }
 
     $scope.open = launchModal('open');
+    $scope.editTitle = launchModal('edit-title');
     $scope.copy = launchModal('copy');
     $scope['new'] = launchModal('new');
     $scope.archive = launchModal('archive');
     $scope.delete = launchModal('delete');
     $scope.questionInformation = launchModal('question-information', 'lg');
     $scope.help = launchModal('help', 'lg', false);
+
+    ItemService.load(function(item){
+      $scope.title = item.profile.taskInfo.title;
+    }, 
+    function(err){
+      logger.error('error loading item', err);
+    });
 
   }
 ]);
@@ -57,7 +66,6 @@ angular.module('corespring-editor.controllers')
     return {
       restrict: 'EA',
       link: function(scope, element) {
-        console.log('.>>>>>>>', element);
         element.draggable({
           handle: '.modal-header',
           opacity: 0.7,

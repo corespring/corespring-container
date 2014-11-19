@@ -6,14 +6,12 @@ block content
   include v2-templates/question
   include v2-templates/profile
   include v2-templates/supporting-materials
-    
 
   .root(ng-controller="Root")
     .container-fluid
       include v2-partials/nav  
     .main-content(ui-view="main")
     
-
  
 //After the angular module has been created.
 block after-main-script

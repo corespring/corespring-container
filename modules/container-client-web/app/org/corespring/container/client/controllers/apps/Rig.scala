@@ -66,5 +66,4 @@ trait Rig
           jsSrc.ngModules ++ scriptInfo.ngDependencies))))
   }
 
-  override def servicesJs: String = ""
 }

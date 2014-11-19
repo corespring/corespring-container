@@ -75,12 +75,6 @@ trait App[T <: ClientHooks]
 
   def ngModules: AngularModules = new AngularModules(s"$context.services")
 
-  def services = Action {
-    Ok(servicesJs.toString).as(ContentTypes.JAVASCRIPT)
-  }
-
-  def servicesJs: String
-
   protected def jsMode(implicit r: RequestHeader): String = {
     r.getQueryString("mode").getOrElse(mode.toString.toLowerCase)
   }

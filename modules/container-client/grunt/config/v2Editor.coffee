@@ -4,6 +4,7 @@ coreLibs = require './core-libs'
 _ = require 'lodash'
 
 editorSrcs = [
+  'bower_components/angular-animate/angular-animate(.min).js',
   'bower_components/angular-route/angular-route(.min).js',
   'bower_components/angular-ui-router/release/angular-ui-router(.min).js',
   'bower_components/wiggi-wiz/dist/wiggi-wiz.js',
@@ -46,6 +47,7 @@ exports.css =
   report: 'v2-editor-css-report.json'
 
 exports.ngModules = _.union(player.ngModules, [
+  'ngAnimate',
   'corespring-common.supporting-materials',
   'corespring-editor.services',
   'corespring-editor.controllers',

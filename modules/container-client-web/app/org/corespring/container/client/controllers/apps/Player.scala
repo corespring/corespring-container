@@ -101,7 +101,7 @@ trait Player
     })
   }
 
-  override lazy val servicesJs = {
+  lazy val servicesJs = {
     import org.corespring.container.client.controllers.resources.routes._
     PlayerServices(
       "player.services",

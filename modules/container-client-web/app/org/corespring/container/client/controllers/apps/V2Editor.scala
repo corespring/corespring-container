@@ -5,7 +5,7 @@ import org.corespring.container.client.controllers.helpers.JsonHelper
 import org.corespring.container.client.controllers.jade.Jade
 import org.corespring.container.client.hooks.EditorHooks
 import org.corespring.container.client.hooks.Hooks.StatusMessage
-import org.corespring.container.client.views.txt.js.EditorServices
+import org.corespring.container.client.views.txt.js.V2EditorServices
 import org.corespring.container.components.model.ComponentInfo
 import play.api.libs.json._
 import play.api.mvc.{ Action, AnyContent, SimpleResult }
@@ -38,15 +38,15 @@ trait V2Editor
       "configuration" -> (ci.packageInfo \ "external-configuration").asOpt[JsObject])
   }
 
-  override val servicesJs = {
+  def servicesJs(id:String) : String = {
 
     val componentJson: Seq[JsValue] = interactions.map(toJson)
     val widgetJson: Seq[JsValue] = widgets.map(toJson)
 
-    EditorServices(
+    V2EditorServices(
       s"$context.services",
-      resourceRoutes.Item.load(":id"),
-      resourceRoutes.Item.save(":id"),
+      resourceRoutes.Item.load(id),
+      resourceRoutes.Item.save(id),
       JsArray(componentJson),
       JsArray(widgetJson)).toString
   }
@@ -73,7 +73,7 @@ trait V2Editor
           domainResolvedJs,
           domainResolvedCss,
           jsSrc.ngModules ++ scriptInfo.ngDependencies,
-          servicesJs)))
+          servicesJs(itemId))))
     }
 
     hooks.loadItem(itemId).map { e => e.fold(onError, onItem) }

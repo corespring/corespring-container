@@ -8,9 +8,10 @@ mixin tab(label, name)
     a(ui-sref="#{name}", role='tab')= label
 
 mixin help
-  a.help(ng-click="help()")
+  a.help.navbar-right(ng-click="help()")
     i.fa.fa-question-circle
 
+include ../v2-templates/popups/edit-title
 include ../v2-templates/popups/open
 include ../v2-templates/popups/copy
 include ../v2-templates/popups/archive
@@ -19,9 +20,8 @@ include ../v2-templates/popups/question-information
 include ../v2-templates/popups/help
 
 nav.row.navbar-default(ng-controller="NavController")
-  +help
   ul.list-inline
-    li.title-nav data.item.profile.taskInfo.title
+    li.title(ng-click="editTitle()") {{title}}
     li.dropdown
       button.btn.btn-default.dropdown-toggle(type='button', data-toggle='dropdown')
         | Actions
@@ -36,10 +36,10 @@ nav.row.navbar-default(ng-controller="NavController")
         li.divider(role='presentation')
         +dropdown_btn('questionInformation') Question Information
     li.saveMessaging
+  
+  +help
 
   ul.nav.nav-tabs(role='tablist')
     +tab('Question', 'question')
     +tab('Profile', 'profile')
-    //li(ui-sref-active="active")
-    //  a(ui-sref="supportingMaterials({name: null})") Supporting Materials
     +tab('Supporting Materials', 'supporting-materials')

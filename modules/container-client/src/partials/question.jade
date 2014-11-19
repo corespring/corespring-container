@@ -1,8 +1,6 @@
-//question.jade
-
 script#question(type="text/ng-template", templateUrl="/design/template")
 
-  h1 Question....
-  .designer(ng-controller="Designer")
-    .editor-container(ng-class="editorMode", ng-show="section == 'main'")
-      {{data.item.xhtml}}
+  include ../v2-templates/popups/scoring
+  .question(ng-controller="QuestionController")
+    button.btn.btn-default(ng-click="scoring()") Scoring
+

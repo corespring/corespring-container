@@ -38,7 +38,7 @@ trait Editor
       "configuration" -> (ci.packageInfo \ "external-configuration").asOpt[JsObject])
   }
 
-  override val servicesJs = {
+  val servicesJs = {
 
     val componentJson: Seq[JsValue] = interactions.map(toJson)
     val widgetJson: Seq[JsValue] = widgets.map(toJson)
