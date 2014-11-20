@@ -240,14 +240,16 @@ exports.define = function(isSecure) {
     };
 
     instance.on('ready', function() {
-      if( isReady ) {
-        var msg = "Unexpected initialisation event in player. Call player.remove() before creating a new player instance.";
+      function throwOrWarn(msg){
         if(options.strict){
           throw(msg);
         } else {
           logger.warn(msg);
-          instance.removeChannel();
         }
+      }
+      if( isReady ) {
+        instance.removeChannel();
+        errorCallback("Unexpected initialisation event in player. Call player.remove() before creating a new player instance.");
       } else {
         isReady = true;
         initialiseMessage(options.mode);
