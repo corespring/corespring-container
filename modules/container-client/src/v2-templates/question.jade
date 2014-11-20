@@ -21,8 +21,26 @@ script(type="text/ng-template", id="/templates/question")
           feature-overrides="overrideFeatures",
           image-service="imageService")
 
-
-
     .col-md-4
-      .preview(ng-show="previewOn")
-        p stuff...
+
+      .preview(ng-show="previewOn", 
+          ng-controller="ClientSidePreview")
+        .item-preview-wrapper
+          .player-label
+            img(src='item-player-label.png')
+          .player-container
+            corespring-preview-player(
+              player-mode="editor",
+              player-markup="item.xhtml",
+              player-item="item",
+              player-session="rootModel.session",
+              player-outcomes="outcome")
+          .row
+            player-control-panel(
+              data-mode='playerMode', 
+              data-settings='playerSettings', 
+              data-score="score")
+
+
+
+

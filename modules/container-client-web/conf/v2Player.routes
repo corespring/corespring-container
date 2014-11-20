@@ -48,6 +48,7 @@ GET           /catalog/:itemId/index.html                           @org.corespr
 
 # v2 editor
 GET           /v2-editor/:itemId/index.html                         @org.corespring.container.client.controllers.apps.V2Editor.load(itemId)
+GET           /v2-editor/:itemId/*file                              @org.corespring.container.client.controllers.Assets.item(itemId, file)
 
 # Editor: config, components
 GET           /editor/:itemId/index.html                            @org.corespring.container.client.controllers.apps.Editor.load(itemId)

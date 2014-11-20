@@ -15,7 +15,7 @@
 
   .preview {
     padding:10px;
-    border:1px solid black;
+    border:2px solid dashed;
     background:white;
     -webkit-transition:all linear 0.5s;
     transition:all linear 0.5s;
@@ -23,6 +23,30 @@
 
   .preview.ng-hide {
     opacity:0;
+  }
+
+
+  .item-preview-wrapper {
+  
+    .player-container{
+      border:1px dashed #ccc;
+      overflow:hidden;
+      border-radius: 4px;
+      margin:0 auto;
+      width: 600px;
+      min-width: 600px;
+      max-width: 600px;
+    }
+ 
+    .playerLabel {
+      border:1px dashed #ccc;
+      border-radius: 4px;
+      position:absolute;
+      top: -20px;
+      left:35%;
+      background:#fff;
+      text-align: center;
+    }
   }
 }
 
