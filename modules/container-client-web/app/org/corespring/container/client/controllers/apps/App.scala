@@ -17,7 +17,7 @@ import org.corespring.container.logging.ContainerLogger
 
 import scala.concurrent.ExecutionContext
 
-case class ComponentScriptInfo(jsUrl: Option[String], cssUrl: Option[String], ngDependencies: Seq[String])
+case class ComponentScriptInfo(jsUrl: Seq[String], cssUrl: Seq[String], ngDependencies: Seq[String])
 
 trait HasLogger {
   def logger: Logger
@@ -100,7 +100,7 @@ trait App[T <: ClientHooks]
     css.map(resolvePath)
   }
 
-  protected def componentScriptInfo(components: Seq[String]): ComponentScriptInfo = {
+  protected def componentScriptInfo(components: Seq[String], separatePaths: Boolean): ComponentScriptInfo = {
 
     val typeIds = components.map {
       t =>
@@ -110,8 +110,8 @@ trait App[T <: ClientHooks]
 
     logger.trace(s"function=componentScriptInfo typeIds=$typeIds")
     val resolvedComponents = resolveComponents(typeIds, Some(context))
-    val jsUrl = urls.jsUrl(context, resolvedComponents)
-    val cssUrl = urls.cssUrl(context, resolvedComponents)
+    val jsUrl = urls.jsUrl(context, resolvedComponents, separatePaths)
+    val cssUrl = urls.cssUrl(context, resolvedComponents, separatePaths)
     val clientSideDependencies = getClientSideDependencies(resolvedComponents)
     val dependencies = ngModules.createAngularModules(resolvedComponents, clientSideDependencies)
     ComponentScriptInfo(jsUrl, cssUrl, dependencies)

@@ -70,6 +70,12 @@ var Placeholder = function(
       }
 
       var component = $scope.register.loadedData[$scope.id];
+
+      if(!component){
+        $log.warn('[placeholder] can\'t find component of type: ', $scope.componentType);
+        return;
+      }
+      
       var config = ComponentConfig.get($scope.componentType);
 
       log("renderPlayerComponent", $holder, component);

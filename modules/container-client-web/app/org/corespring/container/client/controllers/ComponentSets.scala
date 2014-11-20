@@ -25,18 +25,13 @@ trait ComponentSets extends Controller with ComponentUrls {
 
   def resource[A >: EssentialAction](context: String, directive: String, suffix: String): A
 
-  protected final def generateBodyAndContentType(context: String, directive: String, suffix: String): (String, String) = {
+  def singleResource[A >: EssentialAction](context: String, componentType: String, suffix: String): A
 
-    val types: Seq[String] = ComponentUrlDirective(directive, allComponents)
-
-    val usedComponents = types.map { t => allComponents.find(_.componentType == t) }.flatten
-    val components = dependencyResolver.resolveComponents(usedComponents.map(_.id), Some(context))
-
-    logger.trace(s"context: $context, comps: ${components.map(_.componentType).mkString(",")}")
+  protected final def generate(context: String, resolvedComponents: Seq[Component], suffix: String): (String, String) = {
 
     def gen(generator: SourceGenerator): String = suffix match {
-      case "js" => generator.js(components.toSeq)
-      case "css" => generator.css(components.toSeq)
+      case "js" => generator.js(resolvedComponents)
+      case "css" => generator.css(resolvedComponents)
       case _ => ""
     }
 
@@ -55,25 +50,39 @@ trait ComponentSets extends Controller with ComponentUrls {
     }
 
     (out, contentType)
-
   }
 
-  override def cssUrl(context: String, components: Seq[Component]): Option[String] = url(context, components, "css")
+  protected final def generateBodyAndContentType(context: String, directive: String, suffix: String): (String, String) = {
+    val types: Seq[String] = ComponentUrlDirective(directive, allComponents)
+    val usedComponents = types.map { t => allComponents.find(_.componentType == t) }.flatten
+    val components = dependencyResolver.resolveComponents(usedComponents.map(_.id), Some(context))
+    logger.trace(s"context: $context, comps: ${components.map(_.componentType).mkString(",")}")
+    generate(context, components, suffix)
+  }
 
-  override def jsUrl(context: String, components: Seq[Component]): Option[String] = url(context, components, "js")
+  override def cssUrl(context: String, components: Seq[Component], separatePaths: Boolean): Seq[String] = url(context, components, "css", separatePaths)
 
-  private def url(context: String, components: Seq[Component], suffix: String): Option[String] = {
+  override def jsUrl(context: String, components: Seq[Component], separatePaths: Boolean): Seq[String] = url(context, components, "js", separatePaths)
+
+  private def url(context: String, components: Seq[Component], suffix: String, separatePaths: Boolean): Seq[String] = {
 
     require(allComponents.length > 0, "Can't load components")
 
-    components match {
-      case Nil => None
-      case _ => {
-        ComponentUrlDirective.unapply(components.map(_.componentType), allComponents).map { path =>
-          routes.ComponentSets.resource(context, path, suffix).url
+    if (separatePaths) {
+      val resolvedComponents = dependencyResolver.resolveComponents(components.map(_.id), Some(context))
+      resolvedComponents.map { c => routes.ComponentSets.singleResource(context, c.componentType, suffix).url }
+    } else {
+      components match {
+        case Nil => Seq.empty
+        case _ => {
+          ComponentUrlDirective.unapply(components.map(_.componentType), allComponents).map { path =>
+            routes.ComponentSets.resource(context, path, suffix).url
+          }.toSeq
         }
       }
+
     }
+
   }
 }
 

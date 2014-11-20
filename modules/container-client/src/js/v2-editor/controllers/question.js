@@ -334,6 +334,9 @@ angular.module('corespring-editor.controllers').controller('QuestionController',
 
     ItemService.load(function(item){
       $scope.item = item; 
+      $scope.data = {
+        item : item
+      };
       preprocessComponents(item);
       updateSummaryFeedback(item);
       var max = 0;

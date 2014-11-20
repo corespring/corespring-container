@@ -38,7 +38,7 @@ trait V2Editor
       "configuration" -> (ci.packageInfo \ "external-configuration").asOpt[JsObject])
   }
 
-  def servicesJs(id:String) : String = {
+  def servicesJs(id: String): String = {
 
     val componentJson: Seq[JsValue] = interactions.map(toJson)
     val widgetJson: Seq[JsValue] = widgets.map(toJson)
@@ -64,7 +64,7 @@ trait V2Editor
     }
 
     def onItem(i: JsValue): SimpleResult = {
-      val scriptInfo = componentScriptInfo(componentTypes(i))
+      val scriptInfo = componentScriptInfo(componentTypes(i), jsMode == "dev")
       val domainResolvedJs = buildJs(scriptInfo)
       val domainResolvedCss = buildCss(scriptInfo)
       Ok(renderJade(

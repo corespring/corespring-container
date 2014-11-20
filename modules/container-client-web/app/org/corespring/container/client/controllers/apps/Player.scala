@@ -7,7 +7,7 @@ import org.corespring.container.client.controllers.jade.Jade
 import org.corespring.container.client.hooks.PlayerHooks
 import org.corespring.container.client.views.txt.js.PlayerServices
 import org.corespring.container.components.processing.PlayerItemPreProcessor
-import play.api.libs.json.{JsString, JsValue, JsObject, Json}
+import play.api.libs.json.{ JsString, JsValue, JsObject, Json }
 import play.api.mvc.{ Action, AnyContent, RequestHeader }
 
 trait Player
@@ -39,7 +39,7 @@ trait Player
     r.getQueryString("showControls").map(_ == "true").getOrElse(false)
   }
 
-  def playerConfig : V2PlayerConfig
+  def playerConfig: V2PlayerConfig
 
   /**
    * Query params:
@@ -62,7 +62,7 @@ trait Player
       case Left((code, msg)) => Status(code)(Json.obj("error" -> msg))
       case Right((session, itemJson)) => {
 
-        val scriptInfo = componentScriptInfo(componentTypes(itemJson))
+        val scriptInfo = componentScriptInfo(componentTypes(itemJson), jsMode == "dev")
         val controlsJs = if (showControls) paths(controlsJsSrc) else Seq.empty
         val domainResolvedJs = buildJs(scriptInfo, controlsJs)
         val domainResolvedCss = buildCss(scriptInfo)
@@ -70,7 +70,7 @@ trait Player
         val processedXhtml = processXhtml((itemJson \ "xhtml").asOpt[String])
         val preprocessedItem = itemPreProcessor.preProcessItemForPlayer(itemJson).as[JsObject] ++ Json.obj("xhtml" -> processedXhtml)
 
-        val newRelicRumConf : Option[JsValue] = playerConfig.newRelicRumConfig
+        val newRelicRumConf: Option[JsValue] = playerConfig.newRelicRumConfig
 
         logger.trace(s"function=load domainResolvedJs=$domainResolvedJs")
         logger.trace(s"function=load domainResolvedCss=$domainResolvedCss")
@@ -87,8 +87,7 @@ trait Player
               Json.obj("session" -> session, "item" -> preprocessedItem),
               VersionInfo.json,
               newRelicRumConf != None,
-              newRelicRumConf.getOrElse(Json.obj())
-            )))
+              newRelicRumConf.getOrElse(Json.obj()))))
       }
     }
   }
