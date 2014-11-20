@@ -249,7 +249,7 @@ exports.define = function(isSecure) {
       }
       if( isReady ) {
         instance.removeChannel();
-        errorCallback("Unexpected initialisation event in player. Call player.remove() before creating a new player instance.");
+        errorCallback(errors.PLAYER_NOT_REMOVED);
       } else {
         isReady = true;
         initialiseMessage(options.mode);
