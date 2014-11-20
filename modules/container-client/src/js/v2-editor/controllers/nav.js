@@ -20,7 +20,8 @@ angular.module('corespring-editor.controllers').controller('NavController', [
       return _.map(s.split('-'), _titleCaseWord).join('');
     }
 
-    function launchModal(name, size, backdrop){
+    function launchModal(name, size, backdrop, resolve, okFn, dismissFn){
+
       size = size || 'sm';
       backdrop = backdrop !== undefined ? backdrop : 'static';
 
@@ -31,19 +32,33 @@ angular.module('corespring-editor.controllers').controller('NavController', [
           templateUrl: '/templates/popups/' + name,
           controller: titleCaseName + 'PopupController',
           size: size,
-          backdrop: backdrop
+          backdrop: backdrop,
+          resolve: resolve
         });
 
-        modalInstance.result.then(function () {
-          logger.debug('Modal ok with', arguments);
-        }, function () {
+        okFn = okFn || function(){
+          logger.debug('ok!', arguments);
+        };
+        
+        dismissFn  = dismissFn|| function(){
           logger.debug('Modal dismissed at: ' + new Date());
-        });
+        };
+
+        modalInstance.result.then(okFn, dismissFn);
       };
     }
 
+    function onItemLoaded(item){
+      $scope.title = item.profile.taskInfo.title; 
+    }
+
     $scope.open = launchModal('open');
-    $scope.editTitle = launchModal('edit-title');
+    $scope.editTitle = launchModal('edit-title', 'sm', 'static', {
+      title : function(){ return $scope.title; }
+    }, function(title){
+      logger.debug('--> ok --> ', arguments);
+      ItemService.save({'profile.taskInfo.title': title}, onItemLoaded);
+    });
     $scope.copy = launchModal('copy');
     $scope['new'] = launchModal('new');
     $scope.archive = launchModal('archive');
@@ -51,10 +66,8 @@ angular.module('corespring-editor.controllers').controller('NavController', [
     $scope.questionInformation = launchModal('question-information', 'lg');
     $scope.help = launchModal('help', 'lg', false);
 
-    ItemService.load(function(item){
-      $scope.title = item.profile.taskInfo.title;
-    }, 
-    function(err){
+    ItemService.load(onItemLoaded, 
+      function(err){
       logger.error('error loading item', err);
     });
 

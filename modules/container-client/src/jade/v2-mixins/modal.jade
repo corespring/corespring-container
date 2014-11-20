@@ -11,6 +11,6 @@ mixin modal(title, okLabel, showFooter)
       
   if showFooter
     .modal-footer
-      button.btn.btn-primary(type='button', ng-click="$close(result)")= okLabel 
-      button.btn.btn-default(type='button', ng-click="$dismiss()") Cancel
+      button.btn.btn-primary(type='button', ng-click="ok()")= okLabel 
+      button.btn.btn-default(type='button', ng-click="cancel()") Cancel
     

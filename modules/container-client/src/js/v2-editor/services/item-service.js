@@ -66,17 +66,25 @@ angular.module('corespring-editor.services').service('ItemService', [
         }
       };
 
-      this.saveSupportingMaterial = function(data, onSuccess, onFailure, id) {
-        this.save(data, onSuccess, onFailure, id);
+      this.saveSupportingMaterial = function(data, onSuccess, onFailure) {
+        this.save(data, onSuccess, onFailure);
       };
 
-      this.save = function(data, onSuccess, onFailure, id){
+
+      var setter = new NestedSetterAndGetter();
+
+      this.save = function(data, onSuccess, onFailure){
         logger.debug('save', data );
         var url = addQueryParamsIfPresent(ItemUrls.save.url);
         $http[ItemUrls.save.method](url, data)
           .success(function(data, status, headers, config) {
             loadedData = data;
-            onSuccess(data);
+
+            if(onSuccess){
+              onSuccess(loadedData);
+            } else {
+              logger.error('no onSuccess handler');
+            }
           })
           .error(function(data, status, headers, config) {
             if( onFailure ) {
