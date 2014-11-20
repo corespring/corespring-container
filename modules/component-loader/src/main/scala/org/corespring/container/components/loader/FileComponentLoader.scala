@@ -89,17 +89,11 @@ class FileComponentLoader(paths: Seq[String], onlyProcessReleased: Boolean)
   }
 
   private def loadCss(root: String): Option[String] = {
-    val maybeFiles = Seq("styles.css", "styles.less.css", "styles.less.min.css")
+    val maybeFiles = Seq("styles.less.min.css", "styles.less.css", "styles.css")
 
     maybeFiles
       .map(filename => readMaybeFile(new File(s"${if (root.endsWith("/")) root else s"$root/"}$filename")))
-      .foldLeft("")((acc, maybeCss) => maybeCss match {
-        case Some(css) => acc + css
-        case _ => acc
-      }) match {
-        case nonEmpty: String if nonEmpty.nonEmpty => Some(nonEmpty)
-        case _ => None
-      }
+      .find(!_.isEmpty).flatten
   }
 
   private def loadLibrary(org: String, packageJson: JsValue)(compRoot: File): Option[Component] = {

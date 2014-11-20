@@ -76,10 +76,13 @@ exports.define = function(isSecure) {
     var instance = new InstanceDef(element, options, errorCallback, logger);
 
     var isValidMode = function(m) {
-      if (!m) {
-        return false;
+      switch(m){
+        case 'gather':
+        case 'view':
+        case 'evaluate':
+          return true;
       }
-      return ['gather', 'view', 'evaluate'].indexOf(m) !== -1;
+      return false;
     };
 
     /**
@@ -237,8 +240,20 @@ exports.define = function(isSecure) {
     };
 
     instance.on('ready', function() {
-      isReady = true;
-      initialiseMessage(options.mode);
+      function throwOrWarn(msg){
+        if(options.strict){
+          throw(msg);
+        } else {
+          logger.warn(msg);
+        }
+      }
+      if( isReady ) {
+        instance.removeChannel();
+        errorCallback(errors.PLAYER_NOT_REMOVED);
+      } else {
+        isReady = true;
+        initialiseMessage(options.mode);
+      }
     });
 
   };
