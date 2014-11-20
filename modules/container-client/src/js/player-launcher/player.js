@@ -240,8 +240,18 @@ exports.define = function(isSecure) {
     };
 
     instance.on('ready', function() {
-      isReady = true;
-      initialiseMessage(options.mode);
+      if( isReady ) {
+        var msg = "Unexpected initialisation event in player. Call player.remove() before creating a new player instance.";
+        if(options.strict){
+          throw(msg);
+        } else {
+          logger.warn(msg);
+          instance.removeChannel();
+        }
+      } else {
+        isReady = true;
+        initialiseMessage(options.mode);
+      }
     });
 
   };

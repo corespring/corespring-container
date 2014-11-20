@@ -76,16 +76,6 @@ var Instance = function(element, options, errorCallback, log) {
     if (options.forceWidth) {
       $(e).width(options.width ? options.width : "600px");
     }
-
-    /**
-     * Note: the *official* way of removing the player is to call `remove()`.
-     * However we'll add this to be nice to modern browsers.
-     * TODO: We should be using MutationObservers for this as the event below is deprecated
-     * see: https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Mutation_events 
-     */
-     if($(element).length > 0 && typeof($(element)[0].addEventListener) === 'function'){
-      $(element)[0].addEventListener('DOMNodeRemovedFromDocument', this.remove.bind(this));
-     }
   }
 
   this.send = function() {
@@ -100,6 +90,10 @@ var Instance = function(element, options, errorCallback, log) {
   this.remove = function() {
     channel.remove();
     $(element).find('#iframe-player').remove();
+  };
+
+  this.removeChannel = function() {
+    channel.remove();
   };
 
 
