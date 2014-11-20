@@ -21,13 +21,13 @@ script(type="text/ng-template", id="/templates/question")
           feature-overrides="overrideFeatures",
           image-service="imageService")
 
-    .col-md-4
+    .col-md-6
 
       .preview(ng-show="previewOn", 
           ng-controller="ClientSidePreview")
         .item-preview-wrapper
           .player-label
-            img(src='item-player-label.png')
+            img(src='../../images/item-player-label.png')
           .player-container
             corespring-preview-player(
               player-mode="editor",

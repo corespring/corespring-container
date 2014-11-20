@@ -14,6 +14,7 @@
   }
 
   .preview {
+    min-width: 600px;
     padding:10px;
     border:2px solid dashed;
     background:white;
@@ -29,23 +30,22 @@
   .item-preview-wrapper {
   
     .player-container{
+      padding: 5px;
       border:1px dashed #ccc;
-      overflow:hidden;
       border-radius: 4px;
-      margin:0 auto;
       width: 600px;
       min-width: 600px;
       max-width: 600px;
     }
  
-    .playerLabel {
-      border:1px dashed #ccc;
+    .player-label {
       border-radius: 4px;
-      position:absolute;
-      top: -20px;
-      left:35%;
-      background:#fff;
       text-align: center;
+      img{
+        border: dashed #cccccc 1px;
+        position: relative;
+        top: 15px;
+      }
     }
   }
 }
