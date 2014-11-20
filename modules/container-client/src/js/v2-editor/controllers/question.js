@@ -52,14 +52,49 @@ angular.module('corespring-editor.controllers').controller('QuestionController',
         templateUrl: '/templates/popups/scoring',
         controller: 'ScoringPopupController',
         size: 'lg',
-        backdrop:'static' 
+        backdrop:'static', 
+        resolve: {
+          components: function(){
+            var typeAndWeights = _.mapValues($scope.item.components, function(v){
+              return {componentType: v.componentType, weight: v.weight};
+            });
+            return typeAndWeights; 
+          },
+          xhtml: function(){
+            return $scope.item.xhtml;
+          }
+        }
       });
 
-      modalInstance.result.then(function () {
-        logger.debug('Modal ok with', arguments);
-      }, function () {
-        logger.debug('Modal dismissed at: ' + new Date());
-      });
+      function weightsDiffer(a,b){
+        for(var x in a){
+          if(a[x].weight !== b[x].weight){
+            return true;
+          }
+        }
+        return false;
+      }
+
+      function onScoringComplete(typeAndWeights){
+        logger.debug('scoring ok-ed - save');
+
+        if(weightsDiffer(typeAndWeights, $scope.item.components)){
+          _.forIn($scope.item.components, function(comp, key){
+            comp.weight = typeAndWeights[key].weight;
+          });
+
+          logger.debug('weights are different - save');
+          ItemService.save({components: $scope.item.components}, function(item){
+            $scope.item.components = item.components;
+          });
+        }
+      }
+
+      function onScoringDismiss(){
+        logger.debug('scoring dismissed');
+      }
+
+      modalInstance.result.then(onScoringComplete, onScoringDismiss);
     };
 
     var configPanels = {};

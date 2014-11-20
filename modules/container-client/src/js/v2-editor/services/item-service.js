@@ -70,9 +70,6 @@ angular.module('corespring-editor.services').service('ItemService', [
         this.save(data, onSuccess, onFailure);
       };
 
-
-      var setter = new NestedSetterAndGetter();
-
       this.save = function(data, onSuccess, onFailure){
         logger.debug('save', data );
         var url = addQueryParamsIfPresent(ItemUrls.save.url);

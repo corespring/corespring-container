@@ -10,8 +10,8 @@ script( type="text/ng-template", id="/templates/popups/scoring")
     .container(style="max-width: 700px;")
       component-weights(
         ng-disabled="{{componentSize != 'many'}}",
-        ng-model="item.components",
-        markup="item.xhtml",
+        ng-model="components",
+        markup="xhtml",
         component-set="interactions")
 
 script(type="text/ng-template", id="/templates/question")
