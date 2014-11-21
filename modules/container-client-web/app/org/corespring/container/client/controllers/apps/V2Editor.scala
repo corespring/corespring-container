@@ -47,6 +47,7 @@ trait V2Editor
       s"$context.services",
       resourceRoutes.Item.load(id),
       resourceRoutes.Item.save(id),
+      resourceRoutes.Item.fineGrainedSave(id),
       JsArray(componentJson),
       JsArray(widgetJson)).toString
   }

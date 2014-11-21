@@ -75,6 +75,31 @@ class MongoService(collection: MongoCollection) {
 
   }
 
+  def fineGrainedSave(id: String, data: JsValue): Option[JsValue] = withOid(id) {
+    oid =>
+      logger.debug(s"[save]: $id")
+      logger.trace(s"[save]: ${PlayJson.stringify(data)}")
+
+      def toDbo(json: JsValue): DBObject = {
+        MongoPlayJson.parse(PlayJson.stringify(json.addSupportingMaterialIds)).asInstanceOf[DBObject]
+      }
+      def toJson(dbo: DBObject) = PlayJson.parse(MongoPlayJson.serialize(dbo))
+      val q = MongoDBObject("_id" -> new ObjectId(id))
+
+      val setDbo = toDbo(data)
+      setDbo.removeField("_id")
+      logger.trace(s"set dbo: $setDbo")
+      val d = MongoDBObject("$set" -> setDbo)
+      val result = collection.update(q, d, false, false, WriteConcern.Safe)
+
+      if (result.getLastError(WriteConcern.Safe).ok()) {
+        Some(data)
+      } else {
+        logger.warn(s"Error saving: $id")
+        None
+      }
+  }
+
   def save(id: String, data: JsValue): Option[JsValue] = withOid(id) {
     oid =>
       logger.debug(s"[save]: $id")

@@ -7,6 +7,9 @@ import org.corespring.container.client.controllers.helpers.XhtmlCleaner
 import org.corespring.container.logging.ContainerLogger
 import play.api.libs.json.{ JsUndefined, JsObject, JsValue, Json }
 import play.api.mvc._
+import scalaz.Scalaz._
+import scalaz._
+
 
 import scala.concurrent.{ ExecutionContext, Future }
 
@@ -59,24 +62,36 @@ trait Item extends Controller with XhtmlCleaner {
       }
   }
 
-  def save(itemId: String) = Action.async {
-    implicit request: Request[AnyContent] =>
+  /**
+   * A fine grained save.
+   *
+   * eg:
+   *
+   * { "xhtml" : "<h1>..</h1>", "profile.taskInfo.title" : "new title", "components.4.weight" : 4 }
+   *
+   * Will update those properties in the object graph:
+   *
+   * {
+   *   profile: {
+   *     taskInfo: {
+   *       title: "...",
+   *       ..
+   *     }
+   *   },
+   *   components: {
+   *     4: {
+   *       weight: 44,
+   *       ..
+   *     }
+   *   }
+   * It will then return the db values for the paths passed in.
+   *
+   * @param itemId
+   * @return
+   */
+  private def processSave(itemId:String, saveFn: (String,JsValue,RequestHeader) => Future[Either[StatusMessage, JsValue]]) = Action.async{
+    implicit request : Request[AnyContent] =>
 
-      logger.trace(s"[save] $itemId")
-      import scalaz.Scalaz._
-      import scalaz._
-
-      def cleanIncomingXhtml(xmlString: Option[String]): Validation[String, Option[String]] = xmlString.map {
-        s =>
-          try {
-            Success(Some(cleanXhtml(s)))
-          } catch {
-            case e: Throwable => {
-              logger.error(s"error parsing xhtml: ${e.getMessage}")
-              Failure(e.getMessage)
-            }
-          }
-      }.getOrElse(Success(None))
 
       val out: Validation[String, Future[Either[StatusMessage, JsValue]]] = for {
         json <- request.body.asJson.toSuccess(Item.Errors.noJson)
@@ -89,7 +104,8 @@ trait Item extends Controller with XhtmlCleaner {
             logger.trace(s"clean xhtml: $x")
             json.as[JsObject] ++ Json.obj("xhtml" -> x)
         }.getOrElse(json)
-        hooks.save(itemId, cleanedJson)
+
+        saveFn(itemId, cleanedJson,request)
       }
 
       out match {
@@ -102,5 +118,22 @@ trait Item extends Controller with XhtmlCleaner {
         }
       }
   }
+
+  def fineGrainedSave(itemId:String) = processSave(itemId, (s,j,rh) => hooks.fineGrainedSave(s,j)(rh))
+
+  def save(itemId: String) = processSave(itemId, (s,j,rh) => hooks.save(s,j)(rh))
+
+  private def cleanIncomingXhtml(xmlString: Option[String]): Validation[String, Option[String]] = xmlString.map {
+    s =>
+      try {
+        Success(Some(cleanXhtml(s)))
+      } catch {
+        case e: Throwable => {
+          logger.error(s"error parsing xhtml: ${e.getMessage}")
+          Failure(e.getMessage)
+        }
+      }
+  }.getOrElse(Success(None))
+
 
 }
