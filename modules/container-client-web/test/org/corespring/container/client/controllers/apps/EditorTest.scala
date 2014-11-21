@@ -31,8 +31,8 @@ class EditorTest extends Specification with Mockito {
 
       override def urls: ComponentUrls = {
         val m = mock[ComponentUrls]
-        m.cssUrl(anyString, any[Seq[Component]]) returns Some("url.css")
-        m.jsUrl(anyString, any[Seq[Component]]) returns Some("url.js")
+        m.cssUrl(anyString, any[Seq[Component]], any[Boolean]) returns Seq("url.css")
+        m.jsUrl(anyString, any[Seq[Component]], any[Boolean]) returns Seq("url.js")
         m
       }
 
