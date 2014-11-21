@@ -56,7 +56,8 @@
     ],
     "jquery-ui": [
       "ui",
-      "themes/!(base)/**"
+      "*.txt",
+      "*.json"
     ],
     "bootstrap": [
       "fonts",
