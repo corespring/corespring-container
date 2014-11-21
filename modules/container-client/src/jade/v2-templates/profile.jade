@@ -1,2 +1,27 @@
+mixin h_form
+  form.form-horizontal(role='form')
+    block
+
+
+mixin field(label, ngModel)
+  if block 
+    block
+  else 
+    .form-group
+      label.col-sm-3.control-label(for=ngModel)= label 
+      .col-sm-9
+        input.form-control(id=ngModel, ng-model=ngModel)
+
 script(type="text/ng-template", id="/templates/profile")
-  h1 Profile...
+  .profile(ng-controller="ProfileController")
+    .row.col-md-8
+      h2 Item Profile
+      p The profile contains information key data used to store and find an item (e.g., Common Core State Standard alignment, Bloom's Taxonomy assignment, key skills, and copyright information). Authors are encouraged to include as much information as possible.
+      p * Required
+
+      +h_form
+        +field("* Title", "taskInfo.title")
+        +field("Description", "taskInfo.description")
+        +field("* Primary Subject", "taskInfo.subjects.primary")
+          h1 Block.. 
+
