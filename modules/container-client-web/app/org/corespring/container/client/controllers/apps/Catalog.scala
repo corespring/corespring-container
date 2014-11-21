@@ -17,7 +17,7 @@ trait Catalog
 
   override def context: String = "catalog"
 
-  override val servicesJs = {
+  val servicesJs = {
     import org.corespring.container.client.controllers.resources.routes._
 
     val componentJson: Seq[JsValue] = interactions.map {
@@ -42,7 +42,7 @@ trait Catalog
         def ifEmpty = {
           logger.trace(s"[showCatalog]: $id")
 
-          val scriptInfo = componentScriptInfo(componentTypes(Json.obj()))
+          val scriptInfo = componentScriptInfo(componentTypes(Json.obj()), false)
           val domainResolvedJs = buildJs(scriptInfo)
           val domainResolvedCss = buildCss(scriptInfo)
           Ok(

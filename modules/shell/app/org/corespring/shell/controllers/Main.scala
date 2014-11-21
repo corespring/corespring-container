@@ -34,8 +34,9 @@ trait Main
           val playerUrl = routes.Main.createSessionPage(id).url
           val deleteUrl = routes.Main.deleteItem(id).url
           val editorUrl = appRoutes.Editor.load(id).url
+          val v2EditorUrl = appRoutes.V2Editor.load(id).url
           val catalogUrl = appRoutes.Catalog.load(id).url
-          IndexLink(name, playerUrl, editorUrl, deleteUrl, catalogUrl)
+          IndexLink(name, playerUrl, editorUrl, v2EditorUrl, deleteUrl, catalogUrl)
       }
 
       logger.debug(items.mkString(","))

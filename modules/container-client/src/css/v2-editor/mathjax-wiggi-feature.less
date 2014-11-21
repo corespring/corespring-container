@@ -1,0 +1,100 @@
+@preview-width: 180px;
+@light-grey: #e4e4e4;
+@header-height: 80px;
+@sub-header-height: 30px;
+@preview-min-height: 80px;
+
+
+.abs-full(@left: 0, @right: 0, @top: 0, @bottom: 0) {
+  position: absolute;
+  left: @left;
+  top: @top;
+  right: @right;
+  bottom: @bottom;
+}
+
+.math-sum {
+  font-family: serif;
+  font-weight: bold;
+
+  &:before {
+    content: "∑";
+  }
+}
+
+.mathjax-holder.inline {
+  display: inline-block;
+}
+
+.mathjax-holder.block {
+  display: block;
+}
+
+.mathjax-holder {
+  .user-select(none);
+  padding: 0;
+  transition: background-color 200ms;
+  border-radius: 4px;
+  background-color: lighten(@component-icon-bg, 50%);
+
+  &:hover {
+    background-color: #ffffff;
+  }
+  
+  .blocker .bg {
+    border-radius: 4px;
+  }
+}
+
+.mathjax-dialog-root {
+  .abs-full();
+  display: flex;
+  flex-direction: column;
+
+  .header {
+    padding: 8px;
+    background-color: @light-grey;
+    border-left: none;
+    border-bottom: solid 1px darken(@light-grey, 15%);
+    font-size: 14px;
+  }
+
+  .mj-math-type {
+    padding: 8px;
+    background-color: darken(@light-grey, 7%);
+    border-bottom: solid 1px darken(@light-grey, 15%);
+  }
+
+  .mj-dialog-content {
+    color: #00008b;
+    a:hover {
+      text-decoration: underline;
+    }
+  }
+
+  .math-preview {
+    background-color: @light-grey;
+    min-height: @preview-min-height;
+    border-bottom: solid 1px darken(@light-grey, 15%);
+    text-align: center;
+    padding: 8px;
+
+    .preview-label {
+      text-transform: uppercase;
+      color: darken(@light-grey, 20%);
+      padding-bottom: 5px;
+    }
+  }
+
+  .math-textarea {
+    flex: 1;
+    border:0 solid #cecaca;
+    background-color: #ffffff;
+    padding: 10px;
+    font-family: monospace;
+    overflow:auto;
+    outline:none;
+    resize:none;
+  }
+
+}

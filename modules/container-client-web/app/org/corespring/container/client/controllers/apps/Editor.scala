@@ -38,7 +38,7 @@ trait Editor
       "configuration" -> (ci.packageInfo \ "external-configuration").asOpt[JsObject])
   }
 
-  override val servicesJs = {
+  val servicesJs = {
 
     val componentJson: Seq[JsValue] = interactions.map(toJson)
     val widgetJson: Seq[JsValue] = widgets.map(toJson)
@@ -64,7 +64,7 @@ trait Editor
     }
 
     def onItem(i: JsValue): SimpleResult = {
-      val scriptInfo = componentScriptInfo(componentTypes(i))
+      val scriptInfo = componentScriptInfo(componentTypes(i), jsMode == "dev")
       val domainResolvedJs = buildJs(scriptInfo)
       val domainResolvedCss = buildCss(scriptInfo)
       Ok(renderJade(

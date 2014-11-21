@@ -1,6 +1,6 @@
 (function () {
 
-  angular.module('corespring-player.controllers')
+  angular.module('corespring-editor.controllers')
     .controller('ClientSidePreview', [
       '$log',
       '$scope',
@@ -31,11 +31,11 @@
     };
 
     function getQuestionForComponentId(id) {
-      return $scope.data.item.components[id];
+      return $scope.item.components[id];
     }
 
     function getItem() {
-      return $scope.data.item;
+      return $scope.item;
     }
 
     var PlayerService = new ClientSidePlayerServiceDef(getQuestionForComponentId, getItem);

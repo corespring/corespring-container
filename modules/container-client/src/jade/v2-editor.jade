@@ -1,0 +1,61 @@
+extends layout
+
+block content
+    
+  include v2-templates/question
+  include v2-templates/profile
+  include v2-templates/supporting-materials
+
+  .root(ng-controller="Root")
+    .container-fluid
+      include v2-partials/nav  
+    .main-content(ui-view="main")
+    
+ 
+//After the angular module has been created.
+block after-main-script
+
+  script(type="text/javascript").
+    
+    (function(){
+
+      function mkEditorState(name){
+        return {
+          url: '/' + name,
+          views: {
+            main: {
+              templateUrl: '/templates/' + name 
+            }
+          }
+        }
+      }
+
+      var appLoadConfig = {
+        defaultPath: '/question',
+        states: {
+          question : mkEditorState('question'),
+          profile : mkEditorState('profile'),
+          'supporting-materials' : {
+            url: '/supporting-materials/{name}',
+            params: {
+              name: { value: 'all' }
+            },
+            views: {
+              main: {
+                templateUrl: '/templates/supporting-materials'
+              }
+            }
+          }
+        }
+      };
+      
+      function uiRouterConfig($provide, $stateProvider, $urlRouterProvider) {
+        $urlRouterProvider.otherwise(appLoadConfig.defaultPath);
+        for( var x in appLoadConfig.states){
+          $stateProvider.state(x, appLoadConfig.states[x]);
+        }
+      }
+      
+      angular.module('corespring-#{appName}').config(uiRouterConfig);
+      
+    })(this);

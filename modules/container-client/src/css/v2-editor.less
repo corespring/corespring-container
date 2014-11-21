@@ -1,0 +1,54 @@
+@import "../bower_components/less-elements/elements";
+@import "../bower_components/bootstrap/less/bootstrap";
+@import "../components/wiggi-wiz/dist/wiggi-wiz.css";
+@import "../components/components-font-awesome/css/font-awesome.css";
+
+@import "app";
+@import "common/base";
+@import "v2-editor/modal";
+@import "v2-editor/question";
+@import "v2-editor/buttons";
+@import "v2-editor/menus";
+@import "v2-editor/inputs";
+@import "v2-editor/components";
+@import "v2-editor/additional-copyright-information";
+@import "v2-editor/profile";
+@import "v2-editor/config";
+@import "v2-editor/catalog-preview";
+@import "v2-editor/overview";
+@import "v2-editor/wiggi-wiz-overrides";
+@import "v2-editor/footnotes-wiggi-feature";
+@import "v2-editor/image-wiggi-feature";
+@import "v2-editor/mathjax-wiggi-feature";
+@import "v2-editor/link-wiggi-feature";
+
+@new-blue: #4da7c1;
+@component-icon-bg: #707070;
+@help-text: @new-blue;
+@cs-green: @new-blue;
+@cs-grey: #777777;
+
+.btn{
+  &:focus, &:active:focus, &:active{
+    outline:none;
+  }
+}
+
+nav{
+  .title {
+    font-size: 20px;
+    padding: 20px 0 0 15px;
+    &:hover, &:focus {
+      cursor: pointer;
+    }
+  }
+
+  .help {
+    font-size: 29px;
+    position: relative;
+    right: 10px;
+    i {
+      color: @new-blue;
+    }
+  }
+}

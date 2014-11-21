@@ -53,7 +53,7 @@ trait Rig
   override def ngModules: AngularModules = new AngularModules()
 
   override def load(componentType: String): Action[AnyContent] = Action.async { implicit request =>
-    val scriptInfo = componentScriptInfo(Seq(componentType))
+    val scriptInfo = componentScriptInfo(Seq(componentType), jsMode == "dev")
     val js = buildJs(scriptInfo)
     val css = buildCss(scriptInfo)
 
@@ -66,5 +66,4 @@ trait Rig
           jsSrc.ngModules ++ scriptInfo.ngDependencies))))
   }
 
-  override def servicesJs: String = ""
 }

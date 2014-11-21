@@ -7,7 +7,7 @@ exports.js =
   All the core js files that are included in the player and may be
   concatted
   ###
-  src: _.union(coreLibs.src, core.src, ['js/render/**/*.js'])
+  src: _.union(coreLibs.js, core.src, ['js/render/**/*.js'])
   ###
   The output for the concatted js
   ###

@@ -42,7 +42,7 @@ trait Jade {
 
   val jadeConfig = {
     val c = new JadeConfiguration
-    c.setTemplateLoader(new InternalTemplateLoader("container-client"))
+    c.setTemplateLoader(new InternalTemplateLoader("container-client/jade"))
     c.setMode(Jade4J.Mode.HTML)
     c.setPrettyPrint(mode == Mode.Dev)
     c

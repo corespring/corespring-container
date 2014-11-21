@@ -17,14 +17,14 @@ catalogSrcs = [
   ]
 
 exports.js =
-  src: _.union(coreLibs.src, core.src, catalogSrcs)
+  src: _.union(coreLibs.js, core.src, catalogSrcs)
   dest: 'js/catalog-prod.js'
   libs: [
     'bower_components/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML'
   ]
   report: 'catalog-js-report.json'
 
-exports.css = 
+exports.css =
   src: ['css/catalog.css']
   dest: 'css/catalog.min.css'
   libs: [

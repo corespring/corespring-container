@@ -7,10 +7,12 @@ GET           /js/*file                                              controllers
 GET           /css/*file                                             controllers.Assets.at(path="/container-client/css", file)
 GET           /images/*file                                          controllers.Assets.at(path="/container-client/images", file)
 GET           /components/*file                                      controllers.Assets.at(path="/container-client/bower_components", file)
-GET           /public/:orgName/:componentName/*file                    @org.corespring.container.client.controllers.ComponentsFileController.at(orgName, componentName, file)
+GET           /public/:orgName/:componentName/*file                  @org.corespring.container.client.controllers.ComponentsFileController.at(orgName, componentName, file)
 
 # Component sets js/css
 GET           /component-sets/:context/:directive.:suffix            @org.corespring.container.client.controllers.ComponentSets.resource(context, directive, suffix)
+# Component single js/css
+GET           /component-single/:context/:componentType.:suffix      @org.corespring.container.client.controllers.ComponentSets.singleResource(context, componentType, suffix)
 
 # Hooks for the player: config,  components
 
@@ -44,14 +46,18 @@ GET          /rig/:componentType/:dataName.json                     @org.corespr
 GET          /rig/:componentType/*file                              @org.corespring.container.client.controllers.apps.Rig.asset(componentType, file)
 
 # Catalog
-GET           /catalog/:itemId/index.html                          @org.corespring.container.client.controllers.apps.Catalog.load(itemId)
+GET           /catalog/:itemId/index.html                           @org.corespring.container.client.controllers.apps.Catalog.load(itemId)
+
+# v2 editor
+GET           /v2-editor/:itemId/index.html                         @org.corespring.container.client.controllers.apps.V2Editor.load(itemId)
+GET           /v2-editor/:itemId/*file                              @org.corespring.container.client.controllers.Assets.item(itemId, file)
 
 # Editor: config, components
-GET           /editor/:itemId/index.html                             @org.corespring.container.client.controllers.apps.Editor.load(itemId)
-GET           /editor/:itemId/supporting-material/:name/*file        @org.corespring.container.client.controllers.Assets.supportingMaterial(itemId, name, file)
-GET           /editor/:itemId/*file                                  @org.corespring.container.client.controllers.Assets.item(itemId, file)
-POST          /editor/:itemId/*file                                  @org.corespring.container.client.controllers.Assets.upload(itemId, file)
-DELETE        /editor/:itemId/*file                                  @org.corespring.container.client.controllers.Assets.delete(itemId, file)
+GET           /editor/:itemId/index.html                            @org.corespring.container.client.controllers.apps.Editor.load(itemId)
+GET           /editor/:itemId/supporting-material/:name/*file       @org.corespring.container.client.controllers.Assets.supportingMaterial(itemId, name, file)
+GET           /editor/:itemId/*file                                 @org.corespring.container.client.controllers.Assets.item(itemId, file)
+POST          /editor/:itemId/*file                                 @org.corespring.container.client.controllers.Assets.upload(itemId, file)
+DELETE        /editor/:itemId/*file                                 @org.corespring.container.client.controllers.Assets.delete(itemId, file)
 
-GET           /data-query/:topic                                     @org.corespring.container.client.controllers.DataQuery.list(topic, query : Option[String] ?= None)
-GET           /data-query/:topic/:id                                 @org.corespring.container.client.controllers.DataQuery.findOne(topic, id)
+GET           /data-query/:topic                                    @org.corespring.container.client.controllers.DataQuery.list(topic, query : Option[String] ?= None)
+GET           /data-query/:topic/:id                                @org.corespring.container.client.controllers.DataQuery.findOne(topic, id)
