@@ -24,7 +24,7 @@ html(xmlns="http://www.w3.org/1999/html")
 
     script(type="text/javascript").
 
-      var opts = {
+      var spinnerOpts = {
         length: 17, // The length of each line
         width: 8, // The line thickness
         radius: 20, // The radius of the inner circle
@@ -34,7 +34,7 @@ html(xmlns="http://www.w3.org/1999/html")
       };
 
       var target = document.getElementById('spinner');
-      var spinner = new Spinner(opts).spin(target);
+      var spinner = new Spinner(spinnerOpts).spin(target);
 
       $(document).ready(function () {
         setTimeout(function() {
@@ -45,6 +45,7 @@ html(xmlns="http://www.w3.org/1999/html")
       });
 
       var allNgModules =[#{componentNgModules}];
+
       //declare the app..
       angular.module( 'corespring-#{appName}', allNgModules ).config(['$provide', function($provide) {
 
