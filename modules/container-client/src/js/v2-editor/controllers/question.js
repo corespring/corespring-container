@@ -359,10 +359,19 @@ angular.module('corespring-editor.controllers').controller('QuestionController',
         logger.debug('old', oldValue);
         if(oldValue !== newValue){
           ItemService.fineGrainedSave({'xhtml': $scope.item.xhtml}, function(result){
-            //$scope.item.xhtml = result.xhtml;
           });
         }
       }));
+
+      $scope.$watch('item.summaryFeedback', throttle(function(oldValue, newValue){
+        logger.debug('old', oldValue);
+        if(oldValue !== newValue){
+          ItemService.fineGrainedSave({'summaryFeedback': $scope.item.summaryFeedback}, function(result){
+          });
+        }
+      }));
+
+
 
       var max = 0;
       $('<div>' + $scope.item.xhtml + '</div>').find('[id]').each(function(idx, element) {
