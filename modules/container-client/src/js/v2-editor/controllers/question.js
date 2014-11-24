@@ -40,6 +40,7 @@ angular.module('corespring-editor.controllers').controller('QuestionController',
     var logger = LogFactory.getLogger('QuestionController');
 
     $scope.previewOn = false;
+    $scope.showSummaryFeedback = false;
     
     $scope.togglePreview = function(){
       $scope.previewOn = !$scope.previewOn;

@@ -36,6 +36,23 @@ script(type="text/ng-template", id="/templates/question")
           feature-overrides="overrideFeatures",
           image-service="imageService")
 
+      br/
+
+      .row
+        .panel.summary-feedback-panel
+          .panel-heading
+            h4.panel-title
+              a(ng-click="showSummaryFeedback = !showSummaryFeedback")
+                | Add Feedback (optional)
+                i.fa.fa-comment-o
+          .panel-body(collapse="!showSummaryFeedback")
+            div(mini-wiggi-wiz="", 
+              ng-model='item.summaryFeedback', 
+              placeholder='Type here',
+              feature-overrides="overrideFeatures",
+              image-service="imageService", 
+              features="linkFeature")
+
     .col-md-6
 
       .preview(ng-show="previewOn", 
