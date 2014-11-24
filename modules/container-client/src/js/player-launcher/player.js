@@ -16,7 +16,7 @@ exports.define = function(isSecure) {
     var logger = options.logger || require('logger');
 
     function forEach(arr, fn){
-      if(fn){
+      if(typeof fn === 'function'){
         for(var i = 0; i < arr.length; i++){
           fn(arr[i]);
         }
