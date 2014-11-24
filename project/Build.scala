@@ -35,7 +35,8 @@ object Build extends sbt.Build {
     val grizzled = "org.clapper" %% "grizzled-scala" % "1.2"
     val grizzledLog = "org.clapper" %% "grizzled-slf4j" % "1.0.2"
     val htmlCleaner = "net.sourceforge.htmlcleaner" % "htmlcleaner" % "2.6.1"
-    val jade4j = "de.neuland-bfi" % "jade4j" % "0.4.0"
+    //Note: temp until PR is merged
+    val jade4j = "de.neuland-bfi" % "jade4j" % "0.4.1-PR-80-SNAPSHOT"
     val logbackClassic = "ch.qos.logback" % "logback-classic" % "1.0.7"
     val logbackCore = "ch.qos.logback" % "logback-core" % "1.0.7"
     val mockito = "org.mockito" % "mockito-all" % "1.9.5" % "test"
