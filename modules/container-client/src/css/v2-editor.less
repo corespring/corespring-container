@@ -5,7 +5,9 @@
 
 @import "app";
 @import "common/base";
+
 @import "v2-editor/modal";
+@import "v2-editor/nav";
 @import "v2-editor/question";
 @import "v2-editor/buttons";
 @import "v2-editor/menus";
@@ -34,21 +36,3 @@
   }
 }
 
-nav{
-  .title {
-    font-size: 20px;
-    padding: 20px 0 0 15px;
-    &:hover, &:focus {
-      cursor: pointer;
-    }
-  }
-
-  .help {
-    font-size: 29px;
-    position: relative;
-    right: 10px;
-    i {
-      color: @new-blue;
-    }
-  }
-}

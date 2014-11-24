@@ -29,8 +29,17 @@ nav.row.navbar-default(ng-controller="NavController")
         +dropdown_btn('delete') Delete
         li.divider(role='presentation')
         +dropdown_btn('questionInformation') Question Information
-    li.saveMessaging
-  
+    li
+      span.save-msg(ng-switch on="saveStatus")
+        span#saved(ng-switch-when="saved")
+          | All changes saved
+        span#save-in-progress(ng-switch-when="saving")
+          | Saving...
+        span#save-error(ng-switch-when="error")
+          | There was an error saving your content
+        span#save-error(ng-switch-default)
+          |  &nbsp;
+
   +help
 
   ul.nav.nav-tabs(role='tablist')
