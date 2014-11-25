@@ -9,10 +9,10 @@
       'LogFactory',
       'ProfileFormatter',
       'StandardQueryCreator',
-      ItemProfileController
+      ProfileController
     ]);
 
-  function ItemProfileController(
+  function ProfileController(
     $scope,
     DataQueryService,
     DesignerService,
@@ -42,10 +42,10 @@
 
     DesignerService.loadAvailableUiComponents(function(comps) {
       $scope.availableComponents = [].concat(comps.interactions).concat(comps.widgets);
-      applyComponentTypes();
+      initComponentTypesUsed();
     });
 
-    function applyComponentTypes() {
+    function initComponentTypesUsed() {
       if (!$scope.item || !$scope.item.components || !$scope.availableComponents) {
         return;
       }
@@ -68,7 +68,7 @@
     }
 
     $scope.$watch('profile.standards', function(newValue, oldValue) {
-      $log.debug("profile.standards", newValue);
+      $log.log("profile.standards", newValue);
 
       $scope.isLiteracyStandardSelected = containsLiteracyStandard(newValue);
     });
@@ -129,6 +129,12 @@
 
     $scope.queryResults = {};
 
+    /**
+     * Return & cache data from DataQueryService
+     * @param topic
+     * @param id
+     * @param callback
+     */
     function findItemById(topic, id, callback) {
 
       var local = _.find($scope.queryResults[topic], function(r) {
@@ -143,6 +149,12 @@
       }
     }
 
+    /**
+     * Adapter for select fields
+     * @param topic
+     * @param formatFunc
+     * @constructor
+     */
     function Async(topic, formatFunc) {
 
       var that = this;
@@ -152,7 +164,7 @@
       };
 
       this.query = function(query) {
-        $log.debug("query", query);
+        $log.log("query", query);
 
         DataQueryService.query(topic, query.term, function(result) {
           $scope.queryResults[topic] = result;
@@ -171,9 +183,9 @@
       };
 
       this.initSelection = function(element, callback) {
-        $log.debug("init selection:", element, callback);
+        $log.log("init selection:", element, callback);
         var val = that.elementToVal(element);
-        $log.debug("val:", val);
+        $log.log("val:", val);
 
         findItemById(topic, val, function(s) {
           return callback(s);
@@ -188,13 +200,6 @@
     $scope.relatedSubjectAsync = new Async("subjects.related", subjectText);
     $scope.primarySubjectAsync = new Async("subjects.primary", subjectText);
 
-    function toListOfValues(listOfObjects) {
-      return _.chain(listOfObjects)
-        .pluck("value")
-        .flatten()
-        .value();
-    }
-
     DataQueryService.list("mediaType", function(result) {
       $scope.mediaTypeDataProvider = result;
     });
@@ -203,6 +208,12 @@
       $scope.bloomsTaxonomyDataProvider = result;
     });
 
+    /**
+     * Return an array of consecutive numbers
+     * @param fromYear
+     * @param toYear
+     * @returns {*}
+     */
     function years(fromYear, toYear){
       var direction = fromYear > toYear ? -1 : 1;
       return _.range( fromYear, toYear, direction).map(function(year){
@@ -292,13 +303,14 @@
           .value();
       }
 
+      var selectedKeys = getKeys(function(item) {
+        return item.selected;
+      });
+
       function keyIsSelected(key) {
         return selectedKeys.indexOf(key) >= 0;
       }
 
-      var selectedKeys = getKeys(function(item) {
-        return item.selected;
-      });
       if (changedKey === "None") {
         if (keyIsSelected(changedKey)) {
           selectedKeys = ["None"];
@@ -375,12 +387,12 @@
     };
 
     function onSaveSuccess(updated) {
-      $log.debug("profile saved");
+      $log.log("profile saved");
       $scope.data.saveInProgress = false;
     }
 
     function onSaveError(err) {
-      $log.debug("error saving profile", err);
+      $log.log("error saving profile", err);
       $scope.data.saveError = err;
       $scope.data.saveInProgress = false;
     }
@@ -449,26 +461,39 @@
       $scope.contributorDetails = profile.contributorDetails;
       $scope.profile = profile;
 
-      $log.debug("task info:", $scope.taskInfo);
-      $log.debug("other alignments:", $scope.otherAlignments);
-      $log.debug("contributor details:", $scope.contributorDetails);
+      $log.log("task info:", $scope.taskInfo);
+      $log.log("other alignments:", $scope.otherAlignments);
+      $log.log("contributor details:", $scope.contributorDetails);
 
-      applyComponentTypes();
-
+      initComponentTypesUsed();
       initReviewsPassedDataProvider();
       updateReviewsPassedOtherSelected();
       updatePriorUseOtherSelected();
       updateCredentialsOtherSelected();
+
+      function throttle(fn){
+        return _.throttle(fn, 500, {trailing: true, leading: false});
+      }
+
+      var watchNestedProperties;
+      $scope.$watch('item', throttle(function(oldValue, newValue){
+        $log.log('old', oldValue);
+        ItemService.fineGrainedSave({'profile': $scope.item.profile}, function(result){
+          $log.log("fineGrainedSave callback", result);
+        });
+      }), watchNestedProperties = true);
     }
 
-    $scope.$on('itemLoaded', function(ev, item) {
+    $log.log("loading item for profile");
+    ItemService.load(function(item){
+      $log.log('item loading success hasItem:' + (!!item) + " hasProfile:" + (!!item && !!item.profile));
       if (item && item.profile) {
         $scope.item = item;
         onLoadItemSuccess();
       }
+    },function(){
+      $log.error('error loading item');
     });
-
-    $scope.$emit('loadItem');
 
   }
 
