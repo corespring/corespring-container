@@ -62,7 +62,7 @@ angular.module('corespring-player.services').factory('CorespringPlayerDefinition
         };
 
         var setDataAndSession = function() {
-          if (!$scope.item || !$scope.session) {
+          if (!$scope.item || !$scope.item.xhtml || !$scope.item.components || !$scope.session) {
             return;
           }
 
@@ -120,8 +120,10 @@ angular.module('corespring-player.services').factory('CorespringPlayerDefinition
           }
         });
 
-        $scope.$watch('item', function(item) {
-          setDataAndSession();
+        $scope.$watch('components', function(components) {
+          if(components){
+            setDataAndSession();
+          }
         }, true);
 
         $scope.$watch('session', function(session, oldSession) {
@@ -152,7 +154,7 @@ angular.module('corespring-player.services').factory('CorespringPlayerDefinition
       this.scope = {
         mode: '@playerMode',
         xhtml: '=playerMarkup',
-        item: '=playerItem',
+        components: '=playerComponents',
         outcomes: '=playerOutcomes',
         session: '=playerSession'
       };
