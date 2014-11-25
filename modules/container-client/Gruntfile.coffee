@@ -33,7 +33,7 @@ lessConfig = (cleancss) ->
     cleancss: cleancss
   expand: true
   cwd: '<%= common.dist %>/css'
-  src: '*.less'
+  src: ['**/rig.less', '**/player.less', '**/v2-editor.less', '**/editor.less']
   dest: '<%= common.dist %>/css/'
   ext: suffix
   flatten: false
@@ -81,6 +81,9 @@ module.exports = (grunt) ->
         files: ['<%= common.dist %>/**/*']
       jade: watchConfig('jade', ['copy:jade'])
       less: watchConfig('less', ['copy:less', 'less:dev'])
+      directives: 
+        files: ['<%= common.app %>/**/directives/*.jade']
+        tasks: ['directive-templates']
       components:
         files: ['<%= common.components %>/**/*.less']
         tasks: ['runComponentLess']
@@ -145,6 +148,25 @@ module.exports = (grunt) ->
         options :
           failOnError: true
 
+    jade:
+      directives:
+        cwd: '<%= common.app %>' 
+        src:  '**/directives/**.jade'
+        dest: '<%= common.dist %>'
+        ext: '.html'
+        expand: true
+
+    ngtemplates:  
+      v2Editor: 
+        cwd: '<%= common.dist %>' 
+        dest: '<%= common.dist %>'
+        src:  '**/directives/**.html'
+        options:
+          module: 'corespring-editor.directives'       
+          url: (u) -> u.replace( common.dist + '/js', '')
+        expand: true
+        ext: '.tpl.js'
+
   toTargetPath = (p) ->
     if(p.startsWith("//")) then p
     else
@@ -159,10 +181,11 @@ module.exports = (grunt) ->
   fullConfig = _.merge(config,
     mkConfig('catalog', catalog),
     mkConfig('editor', editor),
-    mkConfig('v2Editor', v2Editor),
+    mkConfig('v2Editor', v2Editor)
     mkConfig('rig', rig),
     mkConfig('player', player)
-    mkConfig('playerControls', playerControls))
+    mkConfig('playerControls', playerControls)
+  )
 
   grunt.log.debug(JSON.stringify(fullConfig, null, "  "))
 
@@ -171,6 +194,7 @@ module.exports = (grunt) ->
   npmTasks = [
     'grunt-shell',
     'grunt-contrib-copy',
+    'grunt-contrib-jade',
     'grunt-contrib-uglify',
     'grunt-contrib-clean',
     'grunt-contrib-less',
@@ -179,20 +203,23 @@ module.exports = (grunt) ->
     'grunt-contrib-jasmine',
     'grunt-contrib-copy',
     'grunt-contrib-compress',
-    'grunt-bower-clean'
+    'grunt-bower-clean',
+    'grunt-angular-templates'
   ]
 
   grunt.loadNpmTasks(t) for t in npmTasks
   grunt.loadTasks('./grunt/lib/tasks')
+  grunt.registerTask('none', [])
   grunt.registerTask('lcd', ['loadComponentDependencies'])
   grunt.registerTask('loadComponentDependencies', 'Load client side dependencies for the components', componentDependencies(grunt))
-  grunt.registerTask('run', ['mk-css', 'pathReporter', 'runComponentLess', 'watch'])
+  grunt.registerTask('run', ['mk-css', 'directive-templates','pathReporter', 'runComponentLess', 'watch'])
   grunt.registerTask('mk-css', ['copy:less', 'less', 'runComponentLess'])
   grunt.registerTask('default', ['stage'])
   grunt.registerTask('test', ['lcd', 'prepPlayerLauncher', 'jasmine:unit'])
-
+  grunt.registerTask('directive-templates', ['jade:directives', 'ngtemplates'])
   grunt.registerTask('stage', 'Work with the play stage task',
     ['mk-css',
+    'directive-templates',
     'jshint',
     'uglify',
     'compress',
