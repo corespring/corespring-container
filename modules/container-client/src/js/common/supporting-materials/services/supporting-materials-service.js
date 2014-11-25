@@ -74,6 +74,7 @@
     };
 
     this.getSupportingUrl = function(supportingMaterials, index) {
+      console.log("getting s m url", supportingMaterials, index);
       return $sce.trustAsResourceUrl(getUrl(supportingMaterials, index));
     };
 

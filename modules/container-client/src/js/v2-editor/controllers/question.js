@@ -328,26 +328,12 @@ angular.module('corespring-editor.controllers').controller('QuestionController',
 
     $scope.isSummaryFeedbackSelected = false;
 
-    function updateSummaryFeedback(item) {
-      $scope.isSummaryFeedbackSelected = !!item.summaryFeedback;
-    }
-
     $scope.$watch("isSummaryFeedbackSelected", function(newValue, oldValue) {
       if (!newValue && newValue !== oldValue) {
         $scope.item.summaryFeedback = "";
       }
     });
 
-    function preprocessComponents(item) {
-      _.each(item.components, function(c, key) {
-        var serverLogic = corespring.server.logic(c.componentType);
-        if (serverLogic.preprocess) {
-          //TODO: This is part of a larger task to add preprocess to the container
-          //@see: https://thesib.atlassian.net/browse/CA-842
-          item.components[key] = serverLogic.preprocess(c);
-        }
-      });
-    }
 
     function sizeToString(size) {
       if (size > 1) {
@@ -367,23 +353,5 @@ angular.module('corespring-editor.controllers').controller('QuestionController',
 
     DesignerService.loadAvailableUiComponents(onComponentsLoaded, onComponentsLoadError);
 
-    ItemService.load(function(item){
-      $scope.item = item; 
-      $scope.data = {
-        item : item
-      };
-      preprocessComponents(item);
-      updateSummaryFeedback(item);
-      var max = 0;
-      $('<div>' + $scope.item.xhtml + '</div>').find('[id]').each(function(idx, element) {
-        var id = Number($(element).attr('id'));
-        if (id > max) {
-          max = id;
-        }
-      });
-      $scope.lastId = max;
-    },function(){
-      logger.error('error loading');
-    });
   }
   ]);
