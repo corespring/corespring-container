@@ -17,79 +17,61 @@ angular.module('corespring-editor.controllers').controller('QuestionController',
   'WiggiMathJaxFeatureDef',
   'WiggiLinkFeatureDef',
   'ComponentImageService',
-  function(
-    $scope, 
-    $modal, 
-    ItemService, 
-    LogFactory, 
-    $element,
-    $http,
-    $timeout,
-    $stateParams,
-    ComponentRegister,
-    ComponentToWiggiwizFeatureAdapter,
-    DesignerService,
-    ImageFeature,
-    ImageUtils,
-    MathJaxService,
-    WiggiFootnotesFeatureDef,
-    WiggiMathJaxFeatureDef,
-    WiggiLinkFeatureDef,
-    ComponentImageService){
+  function($scope, $modal, ItemService, LogFactory, $element, $http, $timeout, $stateParams, ComponentRegister, ComponentToWiggiwizFeatureAdapter, DesignerService, ImageFeature, ImageUtils, MathJaxService, WiggiFootnotesFeatureDef, WiggiMathJaxFeatureDef, WiggiLinkFeatureDef, ComponentImageService) {
 
     var logger = LogFactory.getLogger('QuestionController');
 
     $scope.previewOn = false;
     $scope.showSummaryFeedback = false;
-    
-    $scope.togglePreview = function(){
+
+    $scope.togglePreview = function() {
       $scope.previewOn = !$scope.previewOn;
     };
 
-    $scope.scoring = function(){
+    $scope.scoring = function() {
       var modalInstance = $modal.open({
         templateUrl: '/templates/popups/scoring',
         controller: 'ScoringPopupController',
         size: 'lg',
-        backdrop:'static', 
+        backdrop: 'static',
         resolve: {
-          components: function(){
-            var typeAndWeights = _.mapValues($scope.item.components, function(v){
+          components: function() {
+            var typeAndWeights = _.mapValues($scope.item.components, function(v) {
               return {componentType: v.componentType, weight: v.weight};
             });
-            return typeAndWeights; 
+            return typeAndWeights;
           },
-          xhtml: function(){
+          xhtml: function() {
             return $scope.item.xhtml;
           }
         }
       });
 
-      function weightsDiffer(a,b){
-        for(var x in a){
-          if(a[x].weight !== b[x].weight){
+      function weightsDiffer(a, b) {
+        for (var x in a) {
+          if (a[x].weight !== b[x].weight) {
             return true;
           }
         }
         return false;
       }
 
-      function onScoringComplete(typeAndWeights){
+      function onScoringComplete(typeAndWeights) {
         logger.debug('scoring ok-ed - save');
 
-        if(weightsDiffer(typeAndWeights, $scope.item.components)){
-          _.forIn($scope.item.components, function(comp, key){
+        if (weightsDiffer(typeAndWeights, $scope.item.components)) {
+          _.forIn($scope.item.components, function(comp, key) {
             comp.weight = typeAndWeights[key].weight;
           });
 
           logger.debug('weights are different - save');
-          ItemService.save({components: $scope.item.components}, function(item){
+          ItemService.save({components: $scope.item.components}, function(item) {
             $scope.item.components = item.components;
           });
         }
       }
 
-      function onScoringDismiss(){
+      function onScoringDismiss() {
         logger.debug('scoring dismissed');
       }
 
@@ -273,6 +255,7 @@ angular.module('corespring-editor.controllers').controller('QuestionController',
       $scope.save();
     });
 
+
     $scope.$on('itemAdded', function(event, $node) {
       // This ends up in some weird race condition if we don't wrap it in a $timeout
       $timeout(function() {
@@ -329,6 +312,14 @@ angular.module('corespring-editor.controllers').controller('QuestionController',
       }
     });
 
+    $scope.$watch('item.xhtml', throttle(function(oldValue, newValue) {
+      logger.debug('old', oldValue);
+      if (oldValue !== newValue) {
+        ItemService.fineGrainedSave({'xhtml': $scope.item.xhtml}, function(result) {
+          //$scope.item.xhtml = result.xhtml;
+        });
+      }
+    }));
 
     function throttle(fn){
       return _.throttle(fn, 500, {trailing: true, leading: false});
@@ -337,4 +328,4 @@ angular.module('corespring-editor.controllers').controller('QuestionController',
     DesignerService.loadAvailableUiComponents(onComponentsLoaded, onComponentsLoadError);
 
   }
-  ]);
+]);
