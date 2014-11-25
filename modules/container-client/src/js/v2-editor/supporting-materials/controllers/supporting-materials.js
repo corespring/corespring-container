@@ -7,10 +7,9 @@ var controller = function($element, $filter, $http, $location, $log, $rootScope,
   var createSupportingMaterialsDropDown = function(item) {
     var groupedSupportingMaterials = _.groupBy(item.supportingMaterials, "materialType");
     $scope.supportingMaterials = [];
-    var index = 0;
     var insertSupportingMaterialsForType = function(supMat) {
+      var index = _.indexOf(item.supportingMaterials, supMat);
       $scope.supportingMaterials.push({label: supMat.name, type: "data", index: index});
-      index++;
     };
     for (var key in groupedSupportingMaterials) {
       if (key !== "undefined") {
