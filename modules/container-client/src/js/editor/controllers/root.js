@@ -164,7 +164,7 @@ var controller = function($scope,
     showPreview = false;
   });
 
-  $scope.hasSupportingMaterials = function() {
+  $scope.getSupportingMaterials = function() {
     var item = $scope.data.item;
     return item && item.supportingMaterials && item.supportingMaterials.length > 0;
   };

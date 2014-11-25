@@ -36,9 +36,9 @@ block after-main-script
           question : mkEditorState('question'),
           profile : mkEditorState('profile'),
           'supporting-materials' : {
-            url: '/supporting-materials/{name}',
+            url: '/supporting-materials/{index}',
             params: {
-              name: { value: 'all' }
+              index: { value: 0 }
             },
             views: {
               main: {
