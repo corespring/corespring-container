@@ -58,7 +58,7 @@ angular.module('corespring-catalog.controllers')
         };
         $scope.item = item;
         $scope.init();
-        $scope.hasSupportingMaterials = item.supportingMaterials && item.supportingMaterials.length > 0;
+        $scope.getSupportingMaterials = item.supportingMaterials && item.supportingMaterials.length > 0;
         createSupportingMaterialsDropDown(item);
         $scope.$broadcast('itemLoaded', item);
       };

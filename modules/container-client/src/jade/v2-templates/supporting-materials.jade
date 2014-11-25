@@ -1,3 +1,55 @@
 script(type="text/ng-template", id="/templates/supporting-materials")
   .supporting-materials(ng-controller="SupportingMaterials")
-    h1 Supporting Materials
+    .col-md-4.row
+      .add-new-block
+        button#btn-add-supporting-materials.btn.btn-default
+            i.fa.fa-plus
+            | &nbsp;add new supporting material
+      ul.supporting-materials-list
+        li(ng-repeat="s in supportingMaterials",ng-model="s",ng-class="{divider: s.type == 'divider', data: s.type == 'data'}")
+          h4(ng-if="s.type == 'header'") {{s.label}}
+          a(ng-if="s.type == 'data'",ui-sref="supporting-materials({index: s.index})") {{s.label}}
+    .col-md-6
+      .supporting-material
+        div(supportingmetadata="", ng-model='supportingMaterial', persist='updateMetadata')
+        .editor-container(ng-class="editorMode", ng-show="isContentType('text/html')")
+          wiggi-wiz(
+            formatting-display="dropdown",
+            ng-model="supportingMarkup",
+            image-service="imageService",
+            features="extraFeatures")
+            toolbar(basic="bold italic underline", formatting="h1 h2 p")
+            edit-pane-toolbar(alignment="bottom")
+              .btn-group
+                button(ng-click="closePane()", class="btn btn-sm btn-success", style="float:right;") OK
+
+        .file-upload-info(ng-show="!isContentType('text/html')")
+          h3 File Upload Info
+          dl
+            div
+              dt File Name
+              dd {{supportingMaterial.name}}
+            div
+              dt Material Type
+              dd {{materialType}}
+            div
+              dt File Size
+              dd {{formatKB(supportingMaterialFileSize)}}
+            div
+              dt(ng-show='hasDate(supportingMaterial)') Date
+              dd(ng-show='hasDate(supportingMaterial)') {{formatDate(supportingMaterial.dateModified)}}
+
+            div(style="height: 100%;")
+              iframe(ng-src="{{getSupportingUrl()}}", width="100%", height="100%")
+
+          ul.actions
+            li(ng-show="isContentType('text/html')")
+              button.btn(ng-click='toggleEdit()') Edit
+            li
+              button.btn(ng-click='delete()') Remove
+
+        ul.button-bar
+          li
+            button.btn.btn-small(ng-click='addNew()') Add Another
+
+
