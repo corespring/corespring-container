@@ -11,20 +11,18 @@ angular.module('corespring-editor.directives')
         $scope.reset = function(){
           $scope.$emit('playerControlPanel.reset');
         };
-        
+
       }
 
     return {
       restrict: 'AE',
       link: link,
       scope: {
-        settings: '=',
         mode: '=',
-        score: '=',
-        showPreviewButton: '@'
+        score: '='
       },
       templateUrl: '/v2-editor/question/directives/preview-player-control-panel.html'
-      };
+    };
   }
 ]);
 
