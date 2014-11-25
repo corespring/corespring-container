@@ -66,8 +66,47 @@ angular.module('corespring-editor.services').service('ItemService', [
         }
       };
 
+      var saveListeners = {};
+
+      this.addSaveListener = function(id,handler){
+        saveListeners[id] = handler;
+      };
+
+      function notifyListeners(message){
+        _.forIn(saveListeners, function(listener, key){
+          if(listener.handleSaveMessage){
+            listener.handleSaveMessage(message);
+          } else {
+            logger.warn('listener with id:', key, 'has no function called handleSaveMessage');
+          }
+        });
+      }
+
       this.saveSupportingMaterial = function(data, onSuccess, onFailure) {
         this.save(data, onSuccess, onFailure);
+      };
+
+      this.fineGrainedSave = function(data, onSuccess, onFailure){
+        logger.debug('save', data );
+        var url = addQueryParamsIfPresent(ItemUrls.fineGrainedSave.url);
+        
+        notifyListeners('saving') ;
+        $http[ItemUrls.fineGrainedSave.method](url, data)
+          .success(function(data, status, headers, config) {
+            notifyListeners('saved');
+            if(onSuccess){
+              onSuccess(data);
+            } else {
+              logger.error('no onSuccess handler');
+            }
+          })
+          .error(function(data, status, headers, config) {
+            notifyListeners('error');
+            if(onFailure) {
+              data = data || { error: status + ": an unknown error occured" };
+              onFailure(data);
+            }
+          });
       };
 
       this.save = function(data, onSuccess, onFailure){

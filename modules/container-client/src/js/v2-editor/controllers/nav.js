@@ -5,7 +5,7 @@ angular.module('corespring-editor.controllers').controller('NavController', [
   'ItemService',
   function($scope, LogFactory, $modal, ItemService){
 
-    var logger = LogFactory.getLogger('nav-controller');
+    var logger = LogFactory.getLogger('NavController');
 
     function titleCase(s) {
       function _titleCaseWord(str){
@@ -57,7 +57,9 @@ angular.module('corespring-editor.controllers').controller('NavController', [
       title : function(){ return $scope.title; }
     }, function(title){
       logger.debug('--> ok --> ', arguments);
-      ItemService.save({'profile.taskInfo.title': title}, onItemLoaded);
+      ItemService.fineGrainedSave({'profile.taskInfo.title': title}, function(result){
+        $scope.title = result['profile.taskInfo.title'];
+      });
     });
     $scope.copy = launchModal('copy');
     $scope['new'] = launchModal('new');
@@ -71,6 +73,12 @@ angular.module('corespring-editor.controllers').controller('NavController', [
       logger.error('error loading item', err);
     });
 
+    $scope.saveStatus = null;
+    $scope.handleSaveMessage = function(msg){
+      $scope.saveStatus = msg;
+    };
+
+    ItemService.addSaveListener('nav', $scope);
   }
 ]);
 

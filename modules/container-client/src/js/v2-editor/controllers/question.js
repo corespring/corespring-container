@@ -40,9 +40,8 @@ angular.module('corespring-editor.controllers').controller('QuestionController',
     var logger = LogFactory.getLogger('QuestionController');
 
     $scope.previewOn = false;
+    $scope.showSummaryFeedback = false;
     
-    
-
     $scope.togglePreview = function(){
       $scope.previewOn = !$scope.previewOn;
     };
@@ -98,10 +97,6 @@ angular.module('corespring-editor.controllers').controller('QuestionController',
     };
 
     var configPanels = {};
-
-    var $log = LogFactory.getLogger('designer');
-
-    $log.log($stateParams);
 
     $scope.removedComponents = {};
 
@@ -251,18 +246,18 @@ angular.module('corespring-editor.controllers').controller('QuestionController',
     }
 
     $scope.getUploadUrl = function(file) {
-      $log.log('getUploadUrl', arguments);
+      logger.log('getUploadUrl', arguments);
       return file.name;
     };
 
     $scope.selectFile = function(file) {
-      $log.log('selectFile', 'root select file...');
+      logger.log('selectFile', 'root select file...');
       $scope.selectedFile = file;
-      $log.log('selectFile', $scope.selectedFile);
+      logger.log('selectFile', $scope.selectedFile);
     };
 
     $scope.$on('fileSizeGreaterThanMax', function(event) {
-      $log.warn("file too big");
+      logger.warn("file too big");
     });
 
 
@@ -286,7 +281,7 @@ angular.module('corespring-editor.controllers').controller('QuestionController',
     });
 
     $scope.save = function(callback) {
-      $log.log('Saving...');
+      logger.log('Saving...');
       var cleaned = $scope.serialize($scope.item.components);
       for (var key in cleaned) {
         if (!ComponentRegister.hasComponent(key)) {
@@ -335,21 +330,9 @@ angular.module('corespring-editor.controllers').controller('QuestionController',
     });
 
 
-    function sizeToString(size) {
-      if (size > 1) {
-        return 'many';
-      } else if (size === 1) {
-        return 'one';
-      } else {
-        return 'none';
-      }
+    function throttle(fn){
+      return _.throttle(fn, 500, {trailing: true, leading: false});
     }
-
-    $scope.componentSize = sizeToString(0);
-
-    $scope.$watch('item.components', function(components) {
-      $scope.componentSize = sizeToString(_.size(components));
-    });
 
     DesignerService.loadAvailableUiComponents(onComponentsLoaded, onComponentsLoadError);
 

@@ -5,7 +5,9 @@
 
 @import "app";
 @import "common/base";
+
 @import "v2-editor/modal";
+@import "v2-editor/nav";
 @import "v2-editor/question";
 @import "v2-editor/buttons";
 @import "v2-editor/menus";
@@ -24,10 +26,14 @@
 @import "v2-editor/supporting-materials";
 
 @new-blue: #4da7c1;
+@darker-blue: #008BC9;
 @component-icon-bg: #707070;
 @help-text: @new-blue;
 @cs-green: @new-blue;
 @cs-grey: #777777;
+
+
+@profile-summary-feedback-panel-bg: @darker-blue;
 
 .btn{
   &:focus, &:active:focus, &:active{
@@ -35,21 +41,3 @@
   }
 }
 
-nav{
-  .title {
-    font-size: 20px;
-    padding: 20px 0 0 15px;
-    &:hover, &:focus {
-      cursor: pointer;
-    }
-  }
-
-  .help {
-    font-size: 29px;
-    position: relative;
-    right: 10px;
-    i {
-      color: @new-blue;
-    }
-  }
-}
