@@ -1,7 +1,6 @@
 angular.module('corespring-editor.directives')
-  .directive('previewPlayerControlPanel', ['$compile', '$log',
-
-    function(){
+  .directive('previewPlayerControlPanel', ['$log',
+    function($log){
       
       function link($scope, $element, $attrs){
 
@@ -12,6 +11,7 @@ angular.module('corespring-editor.directives')
         $scope.reset = function(){
           $scope.$emit('playerControlPanel.reset');
         };
+        
       }
 
     return {
