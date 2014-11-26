@@ -62,7 +62,7 @@ angular.module('corespring-player.services').factory('CorespringPlayerDefinition
         };
 
         var setDataAndSession = function() {
-          if (!$scope.item || !$scope.item.xhtml || !$scope.item.components || !$scope.session) {
+          if (!$scope.xhtml || !$scope.components || !$scope.session) {
             return;
           }
 
@@ -73,7 +73,7 @@ angular.module('corespring-player.services').factory('CorespringPlayerDefinition
 
           $log.debug("corespring player definition setDataAndSession rendering");
 
-          var allData = PlayerUtils.zipDataAndSession($scope.item, $scope.session);
+          var allData = PlayerUtils.zipDataAndSession($scope.components, $scope.session);
           ComponentRegister.setDataAndSession(allData);
           rendered = true;
 
@@ -116,11 +116,13 @@ angular.module('corespring-player.services').factory('CorespringPlayerDefinition
 
         $scope.$watch('xhtml', function(xhtml) {
           if (xhtml) {
+            //log.debug('..');
             renderMarkup(xhtml);
           }
         });
 
         $scope.$watch('components', function(components) {
+          $log.debug('components: ', components);
           if(components){
             setDataAndSession();
           }
