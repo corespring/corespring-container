@@ -6,6 +6,42 @@
   display: inline-block;
   min-width: @width;
 
+  .icon-holder {
+    .border-radius(3px);
+    border: solid 1px #cccccc;
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    background-repeat: no-repeat;
+    background-position-y: 50%;
+    background-position-x: 50%;
+    padding-top: 0px;
+
+    .title {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      font-family: 'Helvetica Neue', helvetica, sans-serif;
+      font-weight: bold;
+      color: #4a4a4a;
+      display: block;
+      font-size: 11px;
+      line-height: 13px;
+    }
+  }
+  
+  &.show-icon {
+    @icon-padding: 10px;
+
+    width: @width;
+    height: @height;
+    display: inline-block;
+
+    .edit-controls{
+      z-index: 20;
+    }
+  }
+
   .blocker{
 
     .content {

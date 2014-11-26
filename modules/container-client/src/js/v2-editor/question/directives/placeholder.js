@@ -17,11 +17,8 @@ angular.module('corespring-editor.directives')
       function link($scope, $element, $attrs) {
 
         function markDirty() {
-          var component = ComponentRegister.loadedData[$scope.id];
-          if (component && component.data && component.data.clean && $scope.componentPreview) {
-            delete component.data.clean;
-            log.debug('markDirty ', $scope.componentPreview);
-            $scope.componentPreview.setDataAndSession(component);
+          if ($scope.dataAndSession && $scope.dataAndSession.data) {
+            delete $scope.dataAndSession.data.clean;
           }
         }
 
@@ -42,7 +39,6 @@ angular.module('corespring-editor.directives')
           $scope.$emit('wiggi-wiz.call-feature-method', 'editNode', $element);
         };
 
-
         $scope.setDataAndSession = function(dataAndSession){
           $scope.dataAndSession =  dataAndSession;
           log.debug('setDataAndSession - call renderPlayerComponent');
@@ -50,29 +46,35 @@ angular.module('corespring-editor.directives')
         };
 
         /**
-         * The placeholder intercepts the 'registerComponent' event 
-         * and sets the data
+         * The placeholder intercepts the 'registerComponent' event from 
+         * the component and sets the data.
          */
         $scope.$on('registerComponent', function(event, id, api ){
           $scope.componentBridge = api;
           $scope.componentBridge.setDataAndSession($scope.dataAndSession);
         });
 
-        //1. register the placeholder 
+        //1. register the placeholder for this id..
         ComponentRegister.registerComponent($scope.id, $scope);
+
+        $scope.config = ComponentConfig.get($scope.componentType);
 
         $scope.loadedData = ComponentRegister.loadedData;
 
+        $scope.$watch('dataAndSession.data.clean', function(clean){
+          $scope.showIcon = ($scope.config.icon !== undefined) && clean;
+        }); 
+
         $scope.$watch('loadedData.' + $scope.id, function(newData, oldData) {
-          log.debug('data has changed!', newData);
+          log.debug( $scope.id + ' - data has changed!', newData);
 
           var isEqual = _.isEqual(newData, oldData);
 
           if(isEqual){
-            log.debug('data is the same - skip the update');
+            log.debug( $scope.id + ' - data is the same - skip the update');
             return;
           }
-          
+
           if($scope.componentBridge){
             $scope.componentBridge.setDataAndSession(newData);
           }
@@ -93,25 +95,12 @@ angular.module('corespring-editor.directives')
           }
 
           if (!dataAndSession) {
-            log.warn('[placeholder] can\'t find component of type: ', $scope.componentType);
+            log.warn('can\'t find component of type: ', $scope.componentType);
             return;
           }
 
-          var config = ComponentConfig.get($scope.componentType);
-
-          $scope.showIcon = (config.icon !== undefined) && (dataAndSession.data.clean === true);
-          $scope.icon = config.icon;
-          $scope.name = config.title;
-
-          if ($scope.showIcon) {
-            $holder.html('<span class="title">' + $scope.name + '</span>');
-            $holder.css('background-image', 'url(' + $scope.icon + ')');
-          } else {
-            $holder.css('background-image', 'none');
-            $holder.html('<' + $scope.componentType + ' id="' + $scope.id + '"></' + $scope.componentType + '>');
-             
-            $compile($holder)($scope.$new());
-          }
+          $holder.html('<' + $scope.componentType + ' id="' + $scope.id + '"></' + $scope.componentType + '>');
+          $compile($holder)($scope.$new());
         }
 
       }
