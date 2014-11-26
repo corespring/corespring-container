@@ -1,12 +1,15 @@
 *.iml
 *.log
 *.sublime*
+.bower*
 .bower-tmp*
 .DS_Store
 .ensime*
+.grunt
 .idea
 .idea_modules
 .tmp
+_SpecRunner.html
 atlassian-*
 bower_components
 node_modules
