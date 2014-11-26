@@ -34,6 +34,10 @@ angular.module('corespring-player.services').factory('ComponentRegister', ['$log
           component.editable(editable);
         }
 
+        if(component.setDataAndSession && this.loadedData[id]){
+          component.setDataAndSession(this.loadedData[id]);
+        }
+
       };
 
       this.deleteComponent = function(id) {

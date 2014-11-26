@@ -1,5 +1,8 @@
-.component-placeholder(ng-class="{'show-icon': showIcon}", data-component-id='{{id}}')
-  .blocker(ng-if='configurable')
+.component-placeholder(
+  ng-class="{'show-icon': showIcon}", 
+  data-component-id='{{id}}')
+  //ng-if="configurable"
+  .blocker
     .bg
     .content
     ul.edit-controls

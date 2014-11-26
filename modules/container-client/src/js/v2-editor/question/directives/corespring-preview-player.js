@@ -15,6 +15,8 @@
 
         function registDataAndSession(){
 
+          logger.debug('skip data and session registration');
+          /*
           if(!$scope.components){
             logger.debug('no components or xhtml - don\'t register comps');
             return;
@@ -22,6 +24,7 @@
 
           var allData = PlayerUtils.zipDataAndSession($scope.components, $scope.session);
           ComponentRegister.setDataAndSession(allData);
+          */
         }
 
         $scope.$watch('xhtml', function(xhtml) {

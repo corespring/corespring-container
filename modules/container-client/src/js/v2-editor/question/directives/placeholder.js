@@ -1,181 +1,132 @@
-var Placeholder = function(
-  $rootScope,
-  $compile,
-  $log,
-  ComponentRegister,
-  ComponentConfig) {
-
-  var log = $log.debug.bind($log, '[placeholder]');
-
-  function link($scope, $element, $attrs) {
-
-    $scope.configurable = $scope.canConfig !== 'false';
-    $scope.title = '';
-    $scope.componentPreview = null;
-    $scope.register = ComponentRegister;
-    $scope.selected = false;
-
-    $scope.safeApply = function() {
-      var phase = this.$root.$$phase;
-      if (phase !== '$apply' && phase !== '$digest') {
-        this.$apply();
-      }
-    };
-
-    function isElement(data) {
-      return data.id === $scope.id;
-    }
-
-    function setSelected(selected) {
-      $scope.selected = selected;
-      $scope.safeApply();
-    }
-
-    function removeTooltip(){
-      $scope.$broadcast("$destroy");
-    }
-
-    function preprocess(component) {
-      var serverLogic = corespring.server.logic(component.data.componentType);
-      if (_.isFunction(serverLogic.preprocess)) {
-        component.data = serverLogic.preprocess(component.data);
-      }
-      return component;
-    }
-
-    function setDataToComponent() {
-      var component = $scope.register.loadedData[$scope.id];
-      if (component && $scope.componentPreview) {
-        $scope.componentPreview.setDataAndSession(preprocess(component));
-      }
-    }
-
-    function markDirty(){
-      var component = $scope.register.loadedData[$scope.id];
-      if (component && component.data && component.data.clean && $scope.componentPreview) {
-        delete component.data.clean;
-        log("markDirty ", $scope.componentPreview);
-        $scope.componentPreview.setDataAndSession(component);
-      }
-    }
-
-    function renderPlayerComponent() {
-      if (!$scope.id || !$scope.componentType) {
-        return;
-      }
-
-      var $holder = $element.find('.holder');
-      if (!$holder) {
-        return;
-      }
-
-      var component = $scope.register.loadedData[$scope.id];
-
-      if(!component){
-        $log.warn('[placeholder] can\'t find component of type: ', $scope.componentType);
-        return;
-      }
-      
-      var config = ComponentConfig.get($scope.componentType);
-
-      log("renderPlayerComponent", $holder, component);
-
-      $scope.showIcon = (config.icon !== undefined) && (component.data.clean === true);
-      $scope.icon = config.icon;
-      $scope.name = config.title;
-
-      if ($scope.showIcon) {
-        $holder.html('<span class="title">' + $scope.name + '</span>');
-        $holder.css('background-image', 'url('+ $scope.icon + ')');
-      } else {
-        $holder.css('background-image', 'none');
-        $holder.html('<' + $scope.componentType + ' id="' + $scope.id + '"></' + $scope.componentType + '>');
-        $compile($holder)($scope.$new());
-      }
-    }
-
-    $scope.$watch('register.loadedData', function() {
-      log('data has changed!');
-      setDataToComponent();
-    });
-
-    $scope.$watch('selected', function(n) {
-      $scope.selectedClass = n === true ? 'selected' : '';
-    });
-
-    $scope.$watch('id', renderPlayerComponent);
-    $scope.$watch('componentType', renderPlayerComponent);
-
-    $scope.deleteNode = function($event) {
-      $event.stopPropagation();
-      removeTooltip();
-      $scope.$emit('wiggi-wiz.delete-node', $element);
-    };
-
-    $scope.editNode = function($event) {
-      markDirty();
-      $event.stopPropagation();
-      removeTooltip();
-      $scope.$emit('wiggi-wiz.call-feature-method', 'editNode', $element);
-    };
-
-    $rootScope.$on('componentSelectionToggled', function(event, data) {
-      if (isElement(data)) {
-        setSelected(!$scope.selected);
-      } else {
-        setSelected(false);
-      }
-    });
-
-    $rootScope.$on('componentSelected', function(event, data) {
-      if (isElement(data)) {
-        setSelected(true);
-      }
-    });
-
-    $rootScope.$on('componentDeselected', function(event, data) {
-      setSelected(false);
-    });
-
-    $scope.$on('registerComponent', function(event, id, component) {
-
-      $scope.componentPreview = component;
-      log('registerComponent', component, id);
-
-      setDataToComponent();
-    });
-
-    // When the item changes, re-render the player component
-    $scope.$emit('registerComponent', $scope.id, {
-      setDataAndSession: renderPlayerComponent
-    });
-
-    //do we need to do that?
-    //$scope.id = $scope.id || 2;
-    //setDataToComponent();
-
-  }
-
-  return {
-    restrict: 'E',
-    replace: true,
-    link: link,
-    scope: {
-      label: '@',
-      componentType: '@',
-      id: '@',
-      canConfig: '@configurable'
-    },
-    templateUrl: '/v2-editor/question/directives/placeholder.html',
-  };
-};
-
 angular.module('corespring-editor.directives')
   .directive('placeholder', [
     '$rootScope',
     '$compile',
-    '$log',
+    'LogFactory',
     'ComponentRegister',
     'ComponentConfig',
-    Placeholder
-  ]);
+    function(
+      $rootScope,
+      $compile,
+      LogFactory,
+      ComponentRegister,
+      ComponentConfig) {
+
+       var log = LogFactory.getLogger('placeholder');
+
+      function link($scope, $element, $attrs) {
+
+        function markDirty() {
+          var component = ComponentRegister.loadedData[$scope.id];
+          if (component && component.data && component.data.clean && $scope.componentPreview) {
+            delete component.data.clean;
+            log.debug('markDirty ', $scope.componentPreview);
+            $scope.componentPreview.setDataAndSession(component);
+          }
+        }
+
+        function removeTooltip() {
+          $scope.$broadcast('$destroy');
+        }
+        
+        $scope.deleteNode = function($event) {
+          $event.stopPropagation();
+          removeTooltip();
+          $scope.$emit('wiggi-wiz.delete-node', $element);
+        };
+
+        $scope.editNode = function($event) {
+          markDirty();
+          $event.stopPropagation();
+          removeTooltip();
+          $scope.$emit('wiggi-wiz.call-feature-method', 'editNode', $element);
+        };
+
+
+        $scope.setDataAndSession = function(dataAndSession){
+          $scope.dataAndSession =  dataAndSession;
+          log.debug('setDataAndSession - call renderPlayerComponent');
+          renderPlayerComponent(dataAndSession);
+        };
+
+        /**
+         * The placeholder intercepts the 'registerComponent' event 
+         * and sets the data
+         */
+        $scope.$on('registerComponent', function(event, id, api ){
+          $scope.componentBridge = api;
+          $scope.componentBridge.setDataAndSession($scope.dataAndSession);
+        });
+
+        //1. register the placeholder 
+        ComponentRegister.registerComponent($scope.id, $scope);
+
+        $scope.loadedData = ComponentRegister.loadedData;
+
+        $scope.$watch('loadedData.' + $scope.id, function(newData, oldData) {
+          log.debug('data has changed!', newData);
+
+          var isEqual = _.isEqual(newData, oldData);
+
+          if(isEqual){
+            log.debug('data is the same - skip the update');
+            return;
+          }
+          
+          if($scope.componentBridge){
+            $scope.componentBridge.setDataAndSession(newData);
+          }
+        }, true);
+
+        function renderPlayerComponent(dataAndSession) {
+          if (!$scope.id || !$scope.componentType) {
+            return;
+          }
+
+          log.debug('renderPlayerComponent: id:', $scope.id, 'type:', $scope.componentType);
+
+          var $holder = $element.find('.holder');
+
+          if (!$holder || $holder.length === 0) {
+            log.warn('can\'t find holder');
+            return;
+          }
+
+          if (!dataAndSession) {
+            log.warn('[placeholder] can\'t find component of type: ', $scope.componentType);
+            return;
+          }
+
+          var config = ComponentConfig.get($scope.componentType);
+
+          $scope.showIcon = (config.icon !== undefined) && (dataAndSession.data.clean === true);
+          $scope.icon = config.icon;
+          $scope.name = config.title;
+
+          if ($scope.showIcon) {
+            $holder.html('<span class="title">' + $scope.name + '</span>');
+            $holder.css('background-image', 'url(' + $scope.icon + ')');
+          } else {
+            $holder.css('background-image', 'none');
+            $holder.html('<' + $scope.componentType + ' id="' + $scope.id + '"></' + $scope.componentType + '>');
+             
+            $compile($holder)($scope.$new());
+          }
+        }
+
+      }
+
+      return {
+        restrict: 'E',
+        replace: false,
+        link: link,
+        scope: {
+          label: '@',
+          componentType: '@',
+          id: '@',
+          configurable: '@'
+        },
+        templateUrl: '/v2-editor/question/directives/placeholder.html',
+      };
+
+    }]);
