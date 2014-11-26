@@ -211,6 +211,10 @@
       $scope.bloomsTaxonomyDataProvider = result;
     });
 
+    DataQueryService.list("gradeLevels", function(result) {
+      $scope.gradeLevelDataProvider = result;
+    });
+
     /**
      * Return an array of consecutive numbers
      * @param fromYear
