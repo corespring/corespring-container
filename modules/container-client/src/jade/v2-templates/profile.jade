@@ -111,9 +111,28 @@ script(type="text/ng-template", id="/templates/profile")
       br/
 
       +h_form
-        h6 Ownership 
-        expander(ng-model="taskInfo.copyrightInformation", title="Copyright Information") 
-        expander(ng-model="taskInfo.additionalMediaCopyright", title="Additional Media Copyright") 
-        expander(ng-model="taskInfo.creativecommons", title="Creative Commons License") 
+        h6 Ownership
+
+        +field('Author', 'contributorDetails.author')
+
+        +field('Credentials','contributorDetails.credentials')
+          select(id='contributorDetails.credentials',ng-model='contributorDetails.credentials', ng-options='c.key as c.value for c in credentialsDataProvider')
+          input(id='contributorDetails.credentialsOther',ng-show="isCredentialsOtherSelected", type="text", placeholder='Enter credentials...', ng-model='contributorDetails.credentialsOther')
+
+        +field('* Copyright Owner','contributorDetails.copyrightOwner')
+
+        +field('* Copyright Year','contributorDetails.copyrightYear')
+          select(id='contributorDetails.copyrightYear',ng-model='contributorDetails.copyrightYear', ng-options='c for c in copyrightYearDataProvider', style="width:170px;")
+
+        +field('* Copyright Expiration','contributorDetails.copyrightExpirationDate')
+          select(id='contributorDetails.copyrightExpirationDate',ng-model='contributorDetails.copyrightExpirationDate', ng-options='c for c in copyrightExpirationYearDataProvider', style="width:170px;")
+
+        +field('Website', 'contributorDetails.sourceUrl')
+
+        br/
+
+        additional-copyright-information-for-profile(copyrights="contributorDetails.additionalCopyrights",
+          prompt="Does this item contain any other copyrighted materials? E.g. book passage, image, etc.")
+
 
 
