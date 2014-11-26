@@ -4,41 +4,42 @@
   //var cleanCache = [];
 
   angular.module('corespring-editor.directives').directive('corespringPreviewPlayer', [
+    '$compile', 
     'LogFactory',
     'ComponentRegister',
     'PlayerUtils',
-    function(LogFactory, ComponentRegister, PlayerUtils) {
+    'MathJaxService',
+    function($compile, LogFactory, ComponentRegister, PlayerUtils, MathJaxService) {
 
       var logger = LogFactory.getLogger('corespring-preview-player');
 
       function link($scope, $element, $attrs){
 
-        function registDataAndSession(){
-
-          logger.debug('skip data and session registration');
-          /*
-          if(!$scope.components){
-            logger.debug('no components or xhtml - don\'t register comps');
-            return;
+        var renderMarkup = function(xhtml) {
+          if ($scope.lastScope) {
+            $scope.lastScope.$destroy();
           }
+          $scope.lastScope = $scope.$new();
+          var $body = $element.find(".player-body").html(xhtml);
+          
+          $compile($body)($scope.lastScope);
 
-          var allData = PlayerUtils.zipDataAndSession($scope.components, $scope.session);
-          ComponentRegister.setDataAndSession(allData);
-          */
-        }
+          MathJaxService.onEndProcess(function(){
+            $('.player-body').removeClass('hidden-player-body');
+            MathJaxService.off(arguments.callee);
+          });
 
-        $scope.$watch('xhtml', function(xhtml) {
-          if (xhtml) {
+          MathJaxService.parseDomForMath(0, $element.find('.player-body')[0]);
+        };
+
+        $scope.$watch('xhtml', function(xhtml, oldXhtml) {
+
+          var isEqual = _.isEqual(xhtml, oldXhtml);
+          if (xhtml && !isEqual) {
             logger.debug('xhtml', xhtml);
+            renderMarkup(xhtml);
           }
         });
-
-        $scope.$watch('components', function(components) {
-          logger.debug('components: ', components);
-          if(components){
-            registDataAndSession();
-          }
-        }, true);
 
         $scope.$watch('session', function(session, oldSession) {
 

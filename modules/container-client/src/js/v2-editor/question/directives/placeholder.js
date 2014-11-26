@@ -62,7 +62,7 @@ angular.module('corespring-editor.directives')
         $scope.loadedData = ComponentRegister.loadedData;
 
         $scope.$watch('dataAndSession.data.clean', function(clean){
-          $scope.showIcon = ($scope.config.icon !== undefined) && clean;
+          $scope.showIcon = $scope.config && $scope.config.icon && clean;
         }); 
 
         $scope.$watch('loadedData.' + $scope.id, function(newData, oldData) {

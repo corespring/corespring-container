@@ -243,6 +243,10 @@ angular.module('corespring-editor.controllers').controller('QuestionController',
       logger.warn("file too big");
     });
 
+    $scope.$on('registerComponent', function(event, id, componentBridge){
+      logger.debug('registerComponent ', id);
+      ComponentRegister.registerComponent(id, componentBridge);
+    });
 
     $scope.$on('registerConfigPanel', function(a, id, component) {
       configPanels[id] = component;
