@@ -64,7 +64,7 @@
   }
 
   ul.supporting-materials-list {
-    line-height: 180%;
+    line-height: 220%;
   }
 
   li.data {
@@ -76,6 +76,9 @@
     cursor: pointer;
   }
 
+  li {
+    position: relative;
+  }
   li a {
     margin-left: 10px;
   }
@@ -83,6 +86,15 @@
   .supporting-materials-list {
     padding-left: 0;
     list-style: none;
+
+    .fa-trash-o {
+      position: absolute;
+      top: 5px;
+      right: 12px;
+      font-size: 22px;
+      color: #cccccc;
+      cursor: pointer;
+    }
 
     h4 {
       text-transform: uppercase;
