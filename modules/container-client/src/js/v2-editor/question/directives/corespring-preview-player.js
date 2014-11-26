@@ -13,6 +13,18 @@
 
       var logger = LogFactory.getLogger('corespring-preview-player');
 
+      /**
+        * Performance improvements.
+        * The player rendering is really sluggish and jumpy cos we re compile for every change.
+        * 0. if the player isn't visible - no need to update
+        * 1. when updating text in the editor, we only need to update the text in the player
+        * 2. when updating the data for a component, we only need to update the data for that component
+        * 3. when adding a new components, we only need to compile that node within the player body
+        * 4. when removing a component we only need to remove that node + call $scope.destroy();
+        *
+        * Editor:
+        * 1. When we launch an overlay, we should give the overlay a clone of the data and on close check a diff and merge the data back.
+        */
       function link($scope, $element, $attrs){
 
         var renderMarkup = function(xhtml) {
