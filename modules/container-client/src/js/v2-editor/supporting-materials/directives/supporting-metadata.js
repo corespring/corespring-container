@@ -59,6 +59,7 @@
 
           $scope.$watch('materialType', function() {
             $scope.displayOther = isOther();
+            console.log("boo", $scope.bind);
             if ($scope.bind) {
               updateMetadata();
             }
@@ -114,19 +115,23 @@
 
         },
         template: [
-          '<form name="myForm" class="supporting-material-metadata my-form">',
-
-          '  <div ng-class="{\'field\':true, \'has-error\':myForm.type.$error.required && activeControl.name==\'type\', \'has-success\':!myForm.type.$error.required}"> ',
-          '    <label class="control-label" for="supporting-material-title">Title</label>',
-          '    <span class="error" ng-show="myForm.type.$error.required" >required</span>',
+          '<dl class="dl-horizontal">',
+          '  <dt>',
+          '    <div class="form-horizontal">',
+          '      <label>Title</label>',
+          '    </div>',
+          '  </dt>',
+          '  <dd>',
           '    <input name="type" class="form-control" type="text" ng-model="title" ng-focus="setActiveCtrl($event)" ng-blur="setActiveCtrl(null)" }" required />',
-          '  </div>',
-
-          '  <div class="field">',
-          '    <label for="supporting-material-type">Select Type</label>',
-          '    <select ng-model="materialTypeProxy" ng-options="materialType for materialType in materialTypes"></select>',
-          '  </div>',
-
+          '  </dd>',
+          '  <dt>',
+          '    <div class="form-horizontal">',
+          '      <label>Type</label>',
+          '    </div>',
+          '  </dt>',
+          '  <dd>',
+          '    <select ng-model="materialTypeProxy" class="form-control" ng-options="materialType for materialType in materialTypes"></select>',
+          '  </dd>',
           '  <div ng-class="{\'field\':true, \'other\':true, \'has-error\':myForm.others.$error.required && activeControl.name==\'others\', \'has-success\':!myForm.others.$error.required}" ng-show="displayOther" >',
           '    <label class="control-label" for="supporting-material-type-text">Other</label>',
           '    <span  class="error" ng-show="myForm.others.$error.required">required</span>',
