@@ -54,27 +54,41 @@ script(type="text/ng-template", id="/templates/profile")
 
       br/
 
-      +form
+      +h_form
         h6 Add the Standards
-        .form-group
-          label.col-sm-3.control-label(for="standardAdapter.subjectOption") Subject 
+        +field('Subject', 'standardAdapter.subjectOption')
           select(ng-model='standardAdapter.subjectOption', ng-options='c.name for c in standardsOptions')
-        .form-group
-          label.col-sm-3.control-label(for="standardAdapter.subjectOption") Category 
+        +field('Category','standardAdapter.categoryOption')
           select(ng-model='standardAdapter.categoryOption', ng-options='p.name for p in standardAdapter.subjectOption.items')
-        .form-group
-          label.col-sm-3.control-label(for="standardAdapter.subjectOption") Sub-Category 
+        +field('Sub-Category','standardAdapter.subCategoryOption')
           select(ng-model='standardAdapter.subCategoryOption', ng-options='z for z in standardAdapter.categoryOption.items')
-        .form-group
+        +field('Standards','profile.standards')
           input(type='hidden', ui-select2='standardsAdapter', ng-model='profile.standards', style='width: 500px;')
 
+        div(ng-show="isLiteracyStandardSelected")
+          +field('Lexile Score', 'profile.lexile')
+            input.form-control(id='profile.lexile', ng-model='profile.lexile', style='width: 40px;')
+            span L
       br/
 
       +h_form
         h6 Other Alignments
-        expander(ng-model="taskInfo.depthOfKnowledge", title="Depth of Knowledge")
-        expander(ng-model="taskInfo.bloomsTaxonomy", title="Bloom's Taxonomy") 
-        expander(ng-model="taskInfo.keySkills", title="keySkills") 
+        +field('Depth Of Knowledge','otherAlignments.depthOfKnowledge')
+          select(ng-model='otherAlignments.depthOfKnowledge', ng-options='c.key as c.value for c in depthOfKnowledgeDataProvider')
+        +field('Bloom\'s Taxonomy','otherAlignments.bloomsTaxonomy')
+          select(ng-model='otherAlignments.bloomsTaxonomy', ng-options='c.key as c.value for c in bloomsTaxonomyDataProvider')
+        .form-group
+          label.col-sm-3.control-label(ng-click='expandKeySkills=!expandKeySkills')
+            i(class="fa fa-{{!!expandKeySkills ? 'minus' : 'plus'}}-square-o", style="margin-right: 6px")
+            | Key Skills
+          div.col-sm-9
+            div(ng-show='!expandKeySkills')
+              label {{getKeySkillsSummary(otherAlignments.keySkills)}}
+            div(ng-show='expandKeySkills', ng-repeat='skills in keySkillsDataProvider')
+              div
+                span.tag-list-header(style='float: left;') {{skills.header}}
+                span(tag-list='tag-list', tags='skills.list', selected-tags='otherAlignments.keySkills')
+              div(style='float: none; clear: both;')
 
       br/
 
