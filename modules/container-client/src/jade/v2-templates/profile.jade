@@ -35,10 +35,10 @@ script(type="text/ng-template", id="/templates/profile")
         hr/ 
         
         +field("* Primary Subject", "taskInfo.subjects.primary")
-          +select2("primarySubjectAsync", "Choose a subject...")
+          +select2("primarySubjectSelect2Adapter", "Choose a subject...")
         
         +field("* Related Subject", "taskInfo.subjects.related")
-          +select2("relatedSubjectAsync", "Choose a subject...")
+          +select2("relatedSubjectSelect2Adapter", "Choose a subject...")
 
         +field("Grade Level", "taskInfo.gradeLevel")
           tight-button-bar(
