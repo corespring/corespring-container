@@ -247,6 +247,11 @@ var controller = function($element, $filter, $http, $location, $log, $rootScope,
     }
   };
 
+  $scope.deleteSupportingMaterial = function(index) {
+    $scope.$emit('deleteSupportingMaterial', {
+      index: index
+    });
+  };
 
   $scope.init = function() {
     console.log("showing supmat ", $scope.index);
