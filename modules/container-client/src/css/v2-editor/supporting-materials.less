@@ -1,16 +1,9 @@
 .supporting-material {
 
-  .supporting-material-metadata {
-    background-color: #f5f5f5;
-    border: 1px solid #a9a9a9;
-  }
+  margin-top: 30px;
 
-  .editor-container {
-    position: absolute;
-    left: 0;
-    top: 90px;
-    right: 0;
-    bottom: 0;
+  dt {
+    padding-bottom: 10px;
   }
 
   .wiggi-wiz, .wiggi-wiz-editable {
@@ -19,7 +12,6 @@
   }
 
   .file-upload-info {
-    padding: 20px;
 
     h3 {
       margin: 0 0 15px;
@@ -32,11 +24,6 @@
       &:after {
         content: ":"
       }
-    }
-
-    dd {
-      display: inline-block;
-      margin-bottom: 5px;
     }
   }
 
@@ -67,6 +54,52 @@
 
 .supporting-materials {
   height: 100%;
+  margin-left: 20px;
+
+
+  .add-new-block {
+    padding-bottom: 9px;
+    margin-top: 20px;
+    border-bottom: 1px solid #eee;
+  }
+
+  ul.supporting-materials-list {
+    line-height: 220%;
+  }
+
+  li.data {
+    border: 1px solid #ffffff;
+  }
+  li.data:hover {
+    border:1px dashed #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  li {
+    position: relative;
+  }
+  li a {
+    margin-left: 10px;
+  }
+
+  .supporting-materials-list {
+    padding-left: 0;
+    list-style: none;
+
+    .fa-trash-o {
+      position: absolute;
+      top: 5px;
+      right: 12px;
+      font-size: 22px;
+      color: #cccccc;
+      cursor: pointer;
+    }
+
+    h4 {
+      text-transform: uppercase;
+    }
+  }
 
   .wiggi-wiz-overlay {
 
@@ -80,22 +113,6 @@
     .wiggi-wiz-toolbar {
       border-top: solid 1px #a9a9a9;
     }
-  }
-
-}
-
-.supporting-material-metadata {
-  padding: 15px 15px 5px 15px;
-
-  .field {
-    display: inline-block;
-    margin: 0 20px 10px 0;
-  }
-
-  label {
-    display: inline-block;
-    font-weight: bold;
-    margin-right: 5px;
   }
 
 }

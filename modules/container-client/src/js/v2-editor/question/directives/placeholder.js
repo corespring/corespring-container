@@ -166,23 +166,7 @@ var Placeholder = function(
       id: '@',
       canConfig: '@configurable'
     },
-    template: [
-      '<div class="component-placeholder" ng-class="{\'show-icon\': showIcon}" data-component-id="{{id}}">',
-      '  <div ng-if="configurable" class="blocker">',
-      '    <div class="bg"></div>',
-      '    <div class="content"></div>',
-      '    <ul class="edit-controls">',
-      '      <li class="edit-icon-button" tooltip="edit" tooltip-append-to-body="true" tooltip-placement="bottom">',
-      '        <i ng-click="editNode($event)" class="fa fa-pencil"></i>',
-      '      </li>',
-      '      <li class="delete-icon-button" tooltip="delete" tooltip-append-to-body="true" tooltip-placement="bottom">',
-      '        <i ng-click="deleteNode($event)" class="fa fa-trash-o"></i>',
-      '      </li>',
-      '    </ul>',
-      '  </div>',
-      '  <div class="holder"></div>',
-      '</div>'
-    ].join('\n')
+    templateUrl: '/v2-editor/question/directives/placeholder.html',
   };
 };
 

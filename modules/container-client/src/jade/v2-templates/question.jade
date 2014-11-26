@@ -22,13 +22,14 @@ script(type="text/ng-template", id="/templates/question")
           ng-click="togglePreview()",
           ng-class="{'btn-warning': !previewOn}")  
           | {{previewOn ? 'Close' : 'Preview'}} Question 
-          i.fa.fa-toggle-right
+          i.fa(ng-class="{'fa-toggle-left': previewOn, 'fa-toggle-right' : !previewOn}")
         button.pull-right.btn.btn-default(ng-click="scoring()") Scoring
 
       hr/
 
       .row
         wiggi-wiz(
+          style="height: 600px;",
           formatting-display="dropdown",
           ng-model="item.xhtml",
           focus="true",
@@ -68,7 +69,7 @@ script(type="text/ng-template", id="/templates/question")
               player-session="rootModel.session",
               player-outcomes="outcome")
           .row
-            player-control-panel(
+            preview-player-control-panel(
               data-mode='playerMode', 
               data-settings='playerSettings', 
               data-score="score")
