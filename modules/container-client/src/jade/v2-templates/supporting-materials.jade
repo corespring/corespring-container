@@ -9,6 +9,7 @@ script(type="text/ng-template", id="/templates/supporting-materials")
         li(ng-repeat="s in supportingMaterials",ng-model="s",ng-class="{divider: s.type == 'divider', data: s.type == 'data'}")
           h4(ng-if="s.type == 'header'") {{s.label}}
           a(ng-if="s.type == 'data'",ui-sref="supporting-materials({index: s.index})") {{s.label}}
+          i.fa.fa-trash-o.pull-right(ng-if="s.type == 'data'", ng-click="deleteSupportingMaterial(s.index)")
     .col-md-6
       .supporting-material
         div(supportingmetadata="", ng-model='supportingMaterial')
