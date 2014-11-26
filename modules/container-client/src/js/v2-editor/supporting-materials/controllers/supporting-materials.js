@@ -1,5 +1,5 @@
 /* global AddContentModalController, com */
-var controller = function($element, $filter, $http, $location, $log, $rootScope, $scope, $state, $stateParams, ImageUtils, ItemService, SupportingMaterialsService, WiggiFootnotesFeatureDef, WiggiMathJaxFeatureDef, WiggiLinkFeatureDef) {
+var controller = function($element, $filter, $http, $location, $modal, $log, $rootScope, $scope, $state, $stateParams, ImageUtils, ItemService, SupportingMaterialsService, WiggiFootnotesFeatureDef, WiggiMathJaxFeatureDef, WiggiLinkFeatureDef) {
 
   $scope.index = parseInt($stateParams.index, 10);
   $scope.editing = false;
@@ -28,7 +28,7 @@ var controller = function($element, $filter, $http, $location, $log, $rootScope,
 
     if (oldValue !== newValue) {
       console.log("SavingSupMat");
-      ItemService.fineGrainedSave({'supportingMaterials': $scope.item.supportingMaterials}, function(result){
+      ItemService.fineGrainedSave({'supportingMaterials': $scope.item.supportingMaterials}, function(result) {
       });
     }
   }, true);
@@ -253,6 +253,26 @@ var controller = function($element, $filter, $http, $location, $log, $rootScope,
     });
   };
 
+  $scope.addNew = function() {
+    var modalInstance = $modal.open({
+      templateUrl: '/templates/popups/addSupportingMaterial',
+      controller: 'AddSupportingMaterialPopupController',
+      backdrop: 'static',
+      resolve: {
+        components: function() {
+          var typeAndWeights = _.mapValues($scope.item.components, function(v) {
+            return {componentType: v.componentType, weight: v.weight};
+          });
+          return typeAndWeights;
+        },
+        xhtml: function() {
+          return $scope.item.xhtml;
+        }
+      }
+    });
+  }
+
+
   $scope.init = function() {
     console.log("showing supmat ", $scope.index);
     $scope.supportingMaterial = getSupportingMaterial();
@@ -278,6 +298,7 @@ angular.module('corespring-editor.controllers')
     '$filter',
     '$http',
     '$location',
+    '$modal',
     '$log',
     '$rootScope',
     '$scope',

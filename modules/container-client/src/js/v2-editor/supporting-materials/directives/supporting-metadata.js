@@ -117,29 +117,27 @@
         template: [
           '<dl class="dl-horizontal">',
           '  <dt>',
-          '    <div class="form-horizontal">',
-          '      <label>Title</label>',
-          '    </div>',
+          '    <label>Title</label>',
           '  </dt>',
           '  <dd>',
-          '    <input name="type" class="form-control" type="text" ng-model="title" ng-focus="setActiveCtrl($event)" ng-blur="setActiveCtrl(null)" }" required />',
+          '    <input name="type" class="form-control" type="text" ng-model="title" ng-focus="setActiveCtrl($event)" ng-blur="setActiveCtrl(null)" }" placeholder="enter title" required />',
           '  </dd>',
           '  <dt>',
-          '    <div class="form-horizontal">',
-          '      <label>Type</label>',
-          '    </div>',
+          '    <label>Type</label>',
           '  </dt>',
           '  <dd>',
           '    <select ng-model="materialTypeProxy" class="form-control" ng-options="materialType for materialType in materialTypes"></select>',
           '  </dd>',
-          '  <div ng-class="{\'field\':true, \'other\':true, \'has-error\':myForm.others.$error.required && activeControl.name==\'others\', \'has-success\':!myForm.others.$error.required}" ng-show="displayOther" >',
-          '    <label class="control-label" for="supporting-material-type-text">Other</label>',
-          '    <span  class="error" ng-show="myForm.others.$error.required">required</span>',
-          '    <input name="others" class="form-control"  type="text" ng-model="textMaterialType" ng-focus="setActiveCtrl($event)" ng-blur="setActiveCtrl(null)" required/>',
+          '  <div ng-show="displayOther" >',
+          '    <dt>',
+          '      <label class="control-label" for="supporting-material-type-text">Other</label>',
+          '    </dt>',
+          '    <dd>',
+          '      <input name="others" class="form-control"  type="text" ng-model="textMaterialType" ng-focus="setActiveCtrl($event)" ng-blur="setActiveCtrl(null)" required/>',
+          '    </dd>',
           '  </div>',
-
           '  <button class="btn btn-small" ng-show="persist" ng-click="forceUpdate()">Update</button>',
-          '</form>'
+          '</dl>'
         ].join('\n')
       };
     }

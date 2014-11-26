@@ -1,8 +1,23 @@
+//Add new popup
+script( type="text/ng-template", id="/templates/popups/addSupportingMaterial")
+  +modal('Add Supporting Material', 'Submit')
+
+    .alert.title
+        | When composing an assessment item, it can be useful to include supplemental materials to assist in scoring or classroom discussion.
+
+    .add-supporting-material-popup
+      div(supportingmetadata="", ng-model='supportingMaterial') Cucu
+      dl.dl-horizontal
+        dt Source
+        dd
+          button.btn.btn-default create your own
+      div {{supportingMaterial}}
+
 script(type="text/ng-template", id="/templates/supporting-materials")
   .supporting-materials(ng-controller="SupportingMaterials")
     .col-md-4.row
       .add-new-block
-        button#btn-add-supporting-materials.btn.btn-default
+        button.btn.btn-default(ng-click="addNew()")
             i.fa.fa-plus
             | &nbsp;add new supporting material
       ul.supporting-materials-list
