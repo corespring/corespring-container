@@ -33,6 +33,7 @@
         $scope.$watch('components', function(components) {
           logger.debug('components: ', components);
           if(components){
+            registDataAndSession();
           }
         }, true);
 
