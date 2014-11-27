@@ -2,18 +2,37 @@ angular.module('corespring-editor.controllers').controller('AddSupportingMateria
   '$scope',
   '$modalInstance',
   'LogFactory',
-  'DesignerService',
-  function($scope, $modalInstance, LogFactory, DesignerService){
+  function($scope, $modalInstance, LogFactory){
 
     var logger = LogFactory.getLogger('AddSupportingMaterialPopupController');
-    logger.log("CICICIC");
-    $scope.supportingMaterial = {};
+    $scope.supportingMaterial = {method: 'createHtml'};
+
+    $scope.$watch('supportingMaterial.name', function(n) {
+      $scope.okDisabled = _.isEmpty(n);
+    });
+
+    $scope.$on('fileChange', function(ev, file) {
+      $scope.supportingMaterial.fileToUpload = file;
+    });
 
     $scope.ok = function(){
-      $modalInstance.close();
+      $modalInstance.close($scope.supportingMaterial);
     };
 
     $scope.cancel = function(){
       $modalInstance.dismiss();
     };
-  }]);
+  }]).directive('filechange', function () {
+    var linker = function ($scope, element, attributes) {
+      element.bind('change', function (event) {
+        $scope.$emit('fileChange', $(element)[0].files[0]);
+        $scope.$apply();
+      });
+    };
+
+    return {
+      restrict: 'A',
+      link: linker
+    };
+
+  });

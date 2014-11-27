@@ -6,11 +6,15 @@ script( type="text/ng-template", id="/templates/popups/addSupportingMaterial")
         | When composing an assessment item, it can be useful to include supplemental materials to assist in scoring or classroom discussion.
 
     .add-supporting-material-popup
-      div(supportingmetadata="", ng-model='supportingMaterial') Cucu
+      div(supportingmetadata="", ng-model='supportingMaterial')
       dl.dl-horizontal
         dt Source
         dd
-          button.btn.btn-default create your own
+          input(id='create', type='radio', value='createHtml', ng-model='supportingMaterial.method')
+          label(for='create') create your own
+          input(id='upload', type='radio', value='uploadFile', ng-model='supportingMaterial.method')
+          label(for='upload') upload a file
+          input(type='file', fileChange="",ng-show="supportingMaterial.method == 'uploadFile'")
       div {{supportingMaterial}}
 
 script(type="text/ng-template", id="/templates/supporting-materials")
@@ -26,7 +30,7 @@ script(type="text/ng-template", id="/templates/supporting-materials")
           a(ng-if="s.type == 'data'",ui-sref="supporting-materials({index: s.index})") {{s.label}}
           i.fa.fa-trash-o.pull-right(ng-if="s.type == 'data'", ng-click="deleteSupportingMaterial(s.index)")
     .col-md-6
-      .supporting-material
+      .supporting-material(ng-show='supportingMaterial')
         div(supportingmetadata="", ng-model='supportingMaterial')
         .editor-container(ng-class="editorMode", ng-show="isContentType('text/html')")
           wiggi-wiz(
@@ -54,11 +58,6 @@ script(type="text/ng-template", id="/templates/supporting-materials")
               dt(ng-show='hasDate(supportingMaterial)') Date
               dd(ng-show='hasDate(supportingMaterial)') {{formatDate(supportingMaterial.dateModified)}}
 
-            div(style="height: 100%;")
+            div(style="height: 100%;",ng-if="!isContentType('text/html')")
               iframe(ng-src="{{getSupportingUrl()}}", width="100%", height="100%")
 
-          ul.actions
-            li(ng-show="isContentType('text/html')")
-              button.btn(ng-click='toggleEdit()') Edit
-            li
-              button.btn(ng-click='delete()') Remove

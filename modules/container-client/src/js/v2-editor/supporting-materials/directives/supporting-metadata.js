@@ -29,7 +29,6 @@
 
         link: function($scope) {
 
-          console.log("linking");
           $scope.materialTypes = ['none selected', 'Rubric', 'Scoring Guide', 'Student Materials',
             'Student Work Examples', otherType
           ];
@@ -59,7 +58,6 @@
 
           $scope.$watch('materialType', function() {
             $scope.displayOther = isOther();
-            console.log("boo", $scope.bind);
             if ($scope.bind) {
               updateMetadata();
             }
@@ -100,9 +98,11 @@
               $scope.materialTypeProxy = $scope.metadata.materialType ?
                 (_.contains($scope.materialTypes, $scope.metadata.materialType) ? $scope.metadata.materialType : otherType) :
                 $scope.materialTypes[0];
+
               $scope.textMaterialType = isOther() ? $scope.metadata.materialType : undefined;
             }
             $scope.displayOther = isOther();
+
           };
 
           $scope.init();
@@ -114,31 +114,7 @@
           };
 
         },
-        template: [
-          '<dl class="dl-horizontal">',
-          '  <dt>',
-          '    <label>Title</label>',
-          '  </dt>',
-          '  <dd>',
-          '    <input name="type" class="form-control" type="text" ng-model="title" ng-focus="setActiveCtrl($event)" ng-blur="setActiveCtrl(null)" }" placeholder="enter title" required />',
-          '  </dd>',
-          '  <dt>',
-          '    <label>Type</label>',
-          '  </dt>',
-          '  <dd>',
-          '    <select ng-model="materialTypeProxy" class="form-control" ng-options="materialType for materialType in materialTypes"></select>',
-          '  </dd>',
-          '  <div ng-show="displayOther" >',
-          '    <dt>',
-          '      <label class="control-label" for="supporting-material-type-text">Other</label>',
-          '    </dt>',
-          '    <dd>',
-          '      <input name="others" class="form-control"  type="text" ng-model="textMaterialType" ng-focus="setActiveCtrl($event)" ng-blur="setActiveCtrl(null)" required/>',
-          '    </dd>',
-          '  </div>',
-          '  <button class="btn btn-small" ng-show="persist" ng-click="forceUpdate()">Update</button>',
-          '</dl>'
-        ].join('\n')
+        templateUrl: "/v2-editor/supporting-materials/directives/supporting-metadata.html"
       };
     }
   ]);
