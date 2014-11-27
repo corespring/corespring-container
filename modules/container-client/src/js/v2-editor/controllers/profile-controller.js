@@ -3,6 +3,7 @@
   angular.module('corespring-editor.controllers')
     .controller('ProfileController', [
       '$scope',
+      'throttle',
       'DataQueryService',
       'DesignerService',
       'ItemService',
@@ -14,6 +15,7 @@
 
   function ProfileController(
     $scope,
+    throttle,
     DataQueryService,
     DesignerService,
     ItemService,
@@ -190,9 +192,7 @@
         var val = that.elementToVal(element);
         $log.log("val:", val);
 
-        findItemById(topic, val, function(s) {
-          return callback(s);
-        });
+        findItemById(topic, val, callback);
       };
     }
 
@@ -378,32 +378,6 @@
       return count + " Key " + skills + " selected";
     };
 
-    $scope.$on('save-data', function() {
-      $scope.save();
-    });
-
-    $scope.save = function() {
-
-      ItemService.save({
-          profile: $scope.profile
-        },
-        onSaveSuccess,
-        onSaveError,
-        $scope.itemId);
-      $scope.data.saveInProgress = true;
-    };
-
-    function onSaveSuccess(updated) {
-      $log.log("profile saved");
-      $scope.data.saveInProgress = false;
-    }
-
-    function onSaveError(err) {
-      $log.log("error saving profile", err);
-      $scope.data.saveError = err;
-      $scope.data.saveInProgress = false;
-    }
-
     function initSubObjects() {
       var profile = $scope.item.profile;
 
@@ -471,30 +445,32 @@
       updatePriorUseOtherSelected();
       updateCredentialsOtherSelected();
 
-      function throttle(fn){
-        return _.throttle(fn, 500, {trailing: true, leading: false});
-      }
-
       var watchNestedProperties;
       $scope.$watch('item.profile', throttle(function(oldValue, newValue){
-        $log.log('old', oldValue);
-        ItemService.fineGrainedSave({'profile': $scope.item.profile}, function(result){
-          $log.log("fineGrainedSave callback", result);
-        });
+        $scope.saveProfile();
       }), watchNestedProperties = true);
     }
 
-    $log.log("loading item for profile");
-    ItemService.load(function(item){
-      $log.log('item loading success hasItem:' + (!!item) + " hasProfile:" + (!!item && !!item.profile));
-      if (item && item.profile) {
-        $scope.item = item;
-        onLoadItemSuccess();
-      }
-    },function(){
-      $log.error('error loading item');
-    });
+    $scope.saveProfile = function() {
+      ItemService.fineGrainedSave({'profile': $scope.item.profile}, function(result){
+        $log.log("fineGrainedSave callback", result);
+      });
+    };
 
+    $scope.loadProfile = function(){
+      $log.log("loading profile");
+      ItemService.load(function(item){
+        $log.log('item loading success hasItem:' + (!!item) + " hasProfile:" + (!!item && !!item.profile));
+        if (item && item.profile) {
+          $scope.item = item;
+          onLoadItemSuccess();
+        }
+      },function(){
+        $log.error('error loading profile');
+      });
+    };
+
+    $scope.loadProfile();
   }
 
   /*#
