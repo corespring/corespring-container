@@ -166,7 +166,7 @@ var Placeholder = function(
       id: '@',
       canConfig: '@configurable'
     },
-    templateUrl: '/v2-editor/question/directives/placeholder.html',
+    templateUrl: '/v2-editor/question/directives/placeholder.html'
   };
 };
 
