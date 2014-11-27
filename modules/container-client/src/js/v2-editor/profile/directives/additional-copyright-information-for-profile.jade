@@ -1,0 +1,78 @@
+fieldset
+  p
+    | {{prompt}}
+  .control-group(style="padding-left: 5px;")
+    .controls
+      label
+        input(type="radio",ng-model="required",value="yes",style="margin-right: 5px;")
+          | Yes
+      label
+        input(type="radio",ng-model="required",value="no",style="margin-right: 5px; margin-left: 20px;")
+          | No
+
+    .item(ng-repeat="item in copyrights")
+      p
+        | Please complete the following
+      table
+        tr
+          td.label-col
+            label.control-label(for="ac-author")
+              | Author
+          td
+            input.form-control(id="ac-author",ng-model="item.author",
+            placeholder="Enter author\s name...")
+        tr
+          td.label-col
+            label.control-label(for="ac-owner")
+              | Copyright Owner
+          td
+            input.form-control(id="ac-owner",ng-model="item.owner",
+            placeholder="Enter the copyright owner...")
+        tr
+          td.label-col
+            label.control-label(for="ac-year")
+              | Copyright Year
+          td
+            select(id="ac-year",ng-model="item.year",ng-options="c for c in copyrightYearDataProvider",
+            style="width: 170px;")
+        tr
+          td.label-col
+            label.control-label(for="ac-license")
+            | License
+          td
+            table.license
+              tr
+                td
+                  select(id="ac-license",ng-model="item.licenseType",
+                  ng-options="c.key as c.value for c in licenseTypeDataProvider")
+                td
+                  span(ng-show="!item.licenseType",style="color: #888; font-style: italic;")
+                    | Not Assigned
+                  img(ng-show="item.licenseType",ng-src="{{getLicenseTypeUrl(item.licenseType)}}")
+                td
+                  a(href="http://creativecommons.org/licenses/",target="_blank")
+                    | Learn More
+        tr
+          td.label-col
+            label.control-label(for="ac-media-type")
+              | Media Type
+
+          td
+            select(id="ac-media-type",ng-model="item.mediaType",
+            ng-options="c.key as c.value for c in mediaTypeDataProvider")
+        tr
+          td.label-col
+            label.control-label(for="ac-source-url")
+              | Website
+          td
+            input.form-control(id="ac-source-url",ng-model="item.sourceUrl",
+            placeholder="Enter the URL...")
+
+            div(style="padding-top: 5px; margin-left: 350px")
+              a(ng-click="removeCopyrightItem(item)")
+                | Remove additional copyright
+
+    a.add-additional(ng-click="addCopyrightItem()", ng - show = "required")
+      i.fa.fa-plus-square-o(style="margin-left: 6px; margin-right: 6px;")
+      span
+        | Add more
