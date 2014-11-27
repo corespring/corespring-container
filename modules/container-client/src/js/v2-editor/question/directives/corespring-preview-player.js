@@ -24,6 +24,10 @@
         *
         * Editor:
         * 1. When we launch an overlay, we should give the overlay a clone of the data and on close check a diff and merge the data back.
+        *
+        * ComponentData TODO: 
+        * submit answer - update session
+        * reset session
         */
       function link($scope, $element, $attrs){
 
@@ -47,7 +51,7 @@
         $scope.$watch('xhtml', function(xhtml, oldXhtml) {
 
           var isEqual = _.isEqual(xhtml, oldXhtml);
-          if (xhtml && !isEqual) {
+          if (xhtml && !isEqual && $scope.components) {
             logger.debug('xhtml', xhtml);
             renderMarkup(xhtml);
           }

@@ -118,7 +118,7 @@ html(xmlns="http://www.w3.org/1999/html")
                 if(matches){
                   return $delegate.getLogger(n);
                 } else {
-                  return loggers.empty($delegate);
+                  return loggers.empty($delegate.getLogger(n));
                 }
               }
             }

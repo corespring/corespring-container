@@ -40,9 +40,6 @@ angular.module('corespring-editor.controllers')
         });
         $scope.lastId = max;
         $scope.$broadcast('itemLoaded');
-
-        var allData = PlayerUtils.zipDataAndSession(item.components, {});
-        ComponentRegister.setDataAndSession(allData);
       };
 
       ItemService.load($scope.onItemLoaded, function() {
