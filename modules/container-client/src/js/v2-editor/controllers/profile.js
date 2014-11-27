@@ -9,10 +9,10 @@
       'LogFactory',
       'ProfileFormatter',
       'StandardQueryCreator',
-      ItemProfileController
+      ProfileController
     ]);
 
-  function ItemProfileController(
+  function ProfileController(
     $scope,
     DataQueryService,
     DesignerService,
@@ -42,10 +42,10 @@
 
     DesignerService.loadAvailableUiComponents(function(comps) {
       $scope.availableComponents = [].concat(comps.interactions).concat(comps.widgets);
-      applyComponentTypes();
+      initComponentTypesUsed();
     });
 
-    function applyComponentTypes() {
+    function initComponentTypesUsed() {
       if (!$scope.item || !$scope.item.components || !$scope.availableComponents) {
         return;
       }
@@ -68,7 +68,7 @@
     }
 
     $scope.$watch('profile.standards', function(newValue, oldValue) {
-      $log.debug("profile.standards", newValue);
+      $log.log("profile.standards", newValue);
 
       $scope.isLiteracyStandardSelected = containsLiteracyStandard(newValue);
     });
@@ -129,6 +129,12 @@
 
     $scope.queryResults = {};
 
+    /**
+     * Return data from DataQueryService or local cache
+     * @param topic
+     * @param id
+     * @param callback
+     */
     function findItemById(topic, id, callback) {
 
       var local = _.find($scope.queryResults[topic], function(r) {
@@ -143,7 +149,22 @@
       }
     }
 
-    function Async(topic, formatFunc) {
+    function queryAndCache(topic, query){
+      DataQueryService.query(topic, query.term, function(result) {
+        $scope.queryResults[topic] = result;
+        query.callback({
+          results: result
+        });
+      });
+    }
+
+    /**
+     * Adapter for select2 fields
+     * @param topic
+     * @param formatFunc
+     * @constructor
+     */
+    function Select2Adapter(topic, formatFunc) {
 
       var that = this;
 
@@ -152,14 +173,8 @@
       };
 
       this.query = function(query) {
-        $log.debug("query", query);
-
-        DataQueryService.query(topic, query.term, function(result) {
-          $scope.queryResults[topic] = result;
-          query.callback({
-            results: result
-          });
-        });
+        $log.log("query", query);
+        queryAndCache(topic, query);
       };
 
       this.formatResult = function(e) {
@@ -171,9 +186,9 @@
       };
 
       this.initSelection = function(element, callback) {
-        $log.debug("init selection:", element, callback);
+        $log.log("init selection:", element, callback);
         var val = that.elementToVal(element);
-        $log.debug("val:", val);
+        $log.log("val:", val);
 
         findItemById(topic, val, function(s) {
           return callback(s);
@@ -185,15 +200,8 @@
       return s.category + ": " + s.subject;
     }
 
-    $scope.relatedSubjectAsync = new Async("subjects.related", subjectText);
-    $scope.primarySubjectAsync = new Async("subjects.primary", subjectText);
-
-    function toListOfValues(listOfObjects) {
-      return _.chain(listOfObjects)
-        .pluck("value")
-        .flatten()
-        .value();
-    }
+    $scope.relatedSubjectSelect2Adapter = new Select2Adapter("subjects.related", subjectText);
+    $scope.primarySubjectSelect2Adapter = new Select2Adapter("subjects.primary", subjectText);
 
     DataQueryService.list("mediaType", function(result) {
       $scope.mediaTypeDataProvider = result;
@@ -203,6 +211,16 @@
       $scope.bloomsTaxonomyDataProvider = result;
     });
 
+    DataQueryService.list("gradeLevels", function(result) {
+      $scope.gradeLevelDataProvider = result;
+    });
+
+    /**
+     * Return an array of consecutive numbers
+     * @param fromYear
+     * @param toYear
+     * @returns {*}
+     */
     function years(fromYear, toYear){
       var direction = fromYear > toYear ? -1 : 1;
       return _.range( fromYear, toYear, direction).map(function(year){
@@ -292,13 +310,14 @@
           .value();
       }
 
+      var selectedKeys = getKeys(function(item) {
+        return item.selected;
+      });
+
       function keyIsSelected(key) {
         return selectedKeys.indexOf(key) >= 0;
       }
 
-      var selectedKeys = getKeys(function(item) {
-        return item.selected;
-      });
       if (changedKey === "None") {
         if (keyIsSelected(changedKey)) {
           selectedKeys = ["None"];
@@ -375,12 +394,12 @@
     };
 
     function onSaveSuccess(updated) {
-      $log.debug("profile saved");
+      $log.log("profile saved");
       $scope.data.saveInProgress = false;
     }
 
     function onSaveError(err) {
-      $log.debug("error saving profile", err);
+      $log.log("error saving profile", err);
       $scope.data.saveError = err;
       $scope.data.saveInProgress = false;
     }
@@ -430,14 +449,7 @@
         });
       }
 
-      var items = $scope.item.profile.contributorDetails.additionalCopyrights;
-      if (_.isArray(items)) {
-        for (var i = items.length - 1; i >= 0; i--) {
-          if (itemIsEmpty(items[i])) {
-            items.splice(i, 1);
-          }
-        }
-      }
+      _.remove($scope.item.profile.contributorDetails.additionalCopyrights, itemIsEmpty);
     }
 
     function onLoadItemSuccess() {
@@ -449,32 +461,45 @@
       $scope.contributorDetails = profile.contributorDetails;
       $scope.profile = profile;
 
-      $log.debug("task info:", $scope.taskInfo);
-      $log.debug("other alignments:", $scope.otherAlignments);
-      $log.debug("contributor details:", $scope.contributorDetails);
+      $log.log("task info:", $scope.taskInfo);
+      $log.log("other alignments:", $scope.otherAlignments);
+      $log.log("contributor details:", $scope.contributorDetails);
 
-      applyComponentTypes();
-
+      initComponentTypesUsed();
       initReviewsPassedDataProvider();
       updateReviewsPassedOtherSelected();
       updatePriorUseOtherSelected();
       updateCredentialsOtherSelected();
+
+      function throttle(fn){
+        return _.throttle(fn, 500, {trailing: true, leading: false});
+      }
+
+      var watchNestedProperties;
+      $scope.$watch('item.profile', throttle(function(oldValue, newValue){
+        $log.log('old', oldValue);
+        ItemService.fineGrainedSave({'profile': $scope.item.profile}, function(result){
+          $log.log("fineGrainedSave callback", result);
+        });
+      }), watchNestedProperties = true);
     }
 
-    $scope.$on('itemLoaded', function(ev, item) {
+    $log.log("loading item for profile");
+    ItemService.load(function(item){
+      $log.log('item loading success hasItem:' + (!!item) + " hasProfile:" + (!!item && !!item.profile));
       if (item && item.profile) {
         $scope.item = item;
         onLoadItemSuccess();
       }
+    },function(){
+      $log.error('error loading item');
     });
-
-    $scope.$emit('loadItem');
 
   }
 
   /*#
    # A simple button bar
-   # Eg: <button-bar ng-model="selected" button-provider="buttons" key="label"/>
+   # Eg: <tight-button-bar ng-model="selected" button-provider="buttons" key="label"/>
    #
    # @ngModel = the chosen items
    # @buttonProvider an array of choices
@@ -485,25 +510,25 @@
       function($log) {
 
         function link($scope, $element, $attr) {
+
+          $scope.getValue = function(b) {
+            return $scope.key ? b[$scope.key] : b;
+          };
+
           $scope.selected = function(b) {
-            var dataValue = $scope.getValue(b);
-            return $scope.ngModel && $scope.ngModel.indexOf(dataValue) >= 0;
+            return _.contains($scope.ngModel, $scope.getValue(b));
           };
 
           $scope.toggle = function(b) {
             $scope.ngModel = $scope.ngModel || [];
             var dataValue = $scope.getValue(b);
-            var index = $scope.ngModel.indexOf(dataValue);
-            if (index >= 0) {
-              $scope.ngModel.splice(index, 1);
+            if(_.contains(dataValue)){
+              _.pull($scope.ngModel, dataValue);
             } else {
               $scope.ngModel.push(dataValue);
             }
           };
 
-          $scope.getValue = function(b) {
-            return $scope.key ? b[$scope.key] : b;
-          };
         }
 
         return {

@@ -41,6 +41,7 @@ exports.css =
   src: ['css/v2-editor.css']
   dest: 'css/v2-editor.min.css'
   libs: _.union(coreLibs.css, [
+    'bower_components/select2/select2.css',
     'bower_components/font-awesome/css/font-awesome.min.css',
     '//fonts.googleapis.com/css?family=Ubuntu:300,400,500,500italic,700'
   ])

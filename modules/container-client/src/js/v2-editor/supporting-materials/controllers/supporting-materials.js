@@ -21,11 +21,17 @@ var controller = function($element, $filter, $http, $location, $log, $rootScope,
     $scope.supportingMaterials = _.initial($scope.supportingMaterials);
   };
 
-  $scope.$watchCollection('item.supportingMaterials', function(n) {
-    if (n) {
+  $scope.$watch('item.supportingMaterials', function(newValue, oldValue) {
+    if (newValue) {
       createSupportingMaterialsDropDown($scope.item);
     }
-  });
+
+    if (oldValue !== newValue) {
+      console.log("SavingSupMat");
+      ItemService.fineGrainedSave({'supportingMaterials': $scope.item.supportingMaterials}, function(result){
+      });
+    }
+  }, true);
 
   $scope.extraFeatures = {
     definitions: [
@@ -229,7 +235,7 @@ var controller = function($element, $filter, $http, $location, $log, $rootScope,
 
   $scope.updateMetadata = function(name, materialType) {
     if ($scope.data && $scope.data.item) {
-      console.log("updating metadata",name,materialType);
+      console.log("updating metadata", name, materialType);
       var updatedSupportingMaterials = $scope.data.item.supportingMaterials;
       var supportingMaterial = $scope.getSupportingMaterials()[$scope.index];
       if (supportingMaterial) {
@@ -241,6 +247,11 @@ var controller = function($element, $filter, $http, $location, $log, $rootScope,
     }
   };
 
+  $scope.deleteSupportingMaterial = function(index) {
+    $scope.$emit('deleteSupportingMaterial', {
+      index: index
+    });
+  };
 
   $scope.init = function() {
     console.log("showing supmat ", $scope.index);

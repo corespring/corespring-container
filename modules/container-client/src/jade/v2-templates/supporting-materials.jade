@@ -9,9 +9,10 @@ script(type="text/ng-template", id="/templates/supporting-materials")
         li(ng-repeat="s in supportingMaterials",ng-model="s",ng-class="{divider: s.type == 'divider', data: s.type == 'data'}")
           h4(ng-if="s.type == 'header'") {{s.label}}
           a(ng-if="s.type == 'data'",ui-sref="supporting-materials({index: s.index})") {{s.label}}
+          i.fa.fa-trash-o.pull-right(ng-if="s.type == 'data'", ng-click="deleteSupportingMaterial(s.index)")
     .col-md-6
       .supporting-material
-        div(supportingmetadata="", ng-model='supportingMaterial', persist='updateMetadata')
+        div(supportingmetadata="", ng-model='supportingMaterial')
         .editor-container(ng-class="editorMode", ng-show="isContentType('text/html')")
           wiggi-wiz(
             formatting-display="dropdown",
@@ -24,8 +25,7 @@ script(type="text/ng-template", id="/templates/supporting-materials")
                 button(ng-click="closePane()", class="btn btn-sm btn-success", style="float:right;") OK
 
         .file-upload-info(ng-show="!isContentType('text/html')")
-          h3 File Upload Info
-          dl
+          dl.dl-horizontal
             div
               dt File Name
               dd {{supportingMaterial.name}}
@@ -47,9 +47,3 @@ script(type="text/ng-template", id="/templates/supporting-materials")
               button.btn(ng-click='toggleEdit()') Edit
             li
               button.btn(ng-click='delete()') Remove
-
-        ul.button-bar
-          li
-            button.btn.btn-small(ng-click='addNew()') Add Another
-
-

@@ -13,6 +13,65 @@
       color: lighten(@cs-grey, 10%);
     }
   }
+
+  .tag-list-header {
+    padding: 3px;
+    float: left;
+    font-weight: bold;
+    color: lighten(@cs-green, 5%);
+  }
+
+  a.tag-list-link {
+    padding: 3px;
+    float: left;
+    text-decoration: none;
+  }
+
+  a.tag-list-link.selected {
+    font-weight: bold;
+  }
+
+  .tight-button-bar {
+    .btn {
+      border-radius: 4px;
+      padding-top: 4px;
+      padding-right: 7px;
+      padding-bottom: 4px;
+      padding-left: 7px;
+      margin-bottom: 0;
+    }
+
+    .btn-default {
+      font-size: 13px;
+      line-height: 18px;
+      color: @btn-default-color;
+      #gradient > .vertical(#ffffff, #e6e6e6, 0%, 100%);
+      border-color: darken(@btn-default-bg, 10%);
+      border-bottom-color: darken(@btn-default-bg, 20%);
+      .box-shadow(inset 0 1px 0 rgba(255, 255, 255, .1));
+
+      &:hover,
+      &:focus,
+      &:active,
+      &.active {
+        #gradient > .vertical(darken(@btn-default-bg, 20), darken(@btn-default-bg, 15%), 0%, 100%);
+        border-color: darken(@btn-default-bg, 20%);
+        color: @btn-default-color;
+      }
+    }
+  }
+
+  .lexile {
+    .form-control {
+      display: inline-block;
+      width: 45px;
+    }
+    .measure {
+      font-weight: bold;
+      font-size: 16px;
+    }
+  }
+
 }
 
 .expander{
