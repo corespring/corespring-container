@@ -1,134 +1,95 @@
 (function() {
 
   // Caches ids of elements that were previously clean.
-  var cleanCache = [];
+  //var cleanCache = [];
 
   angular.module('corespring-editor.directives').directive('corespringPreviewPlayer', [
-    '$log',
-    '$rootScope',
-    '$compile',
+    '$compile', 
+    'LogFactory',
     'ComponentRegister',
-    'CorespringPlayerDefinition',
+    'PlayerUtils',
+    'MathJaxService',
+    function($compile, LogFactory, ComponentRegister, PlayerUtils, MathJaxService) {
 
-    function($log, $rootScope, $compile, ComponentRegister, CorespringPlayerDefinition) {
+      var logger = LogFactory.getLogger('corespring-preview-player');
 
-      // TODO: Stop using id attributes for this!
-      function getPreviewComponentById(id) {
-        return $(_.find($('corespring-preview-player #' + id), function(el) {
-          return !$(el).is('span');
-        }));
-      }
+      /**
+        * Performance improvements.
+        * The player rendering is really sluggish and jumpy cos we re compile for every change.
+        * 0. if the player isn't visible - no need to update
+        * 1. when updating text in the editor, we only need to update the text in the player
+        * 2. when updating the data for a component, we only need to update the data for that component
+        * 3. when adding a new components, we only need to compile that node within the player body
+        * 4. when removing a component we only need to remove that node + call $scope.destroy();
+        *
+        * Editor:
+        * 1. When we launch an overlay, we should give the overlay a clone of the data and on close check a diff and merge the data back.
+        */
+      function link($scope, $element, $attrs){
 
-      function preCompile($body) {
-        for (var id in ComponentRegister.loadedData) {
-          var compData = ComponentRegister.loadedData[id].data;
-          if (compData.clean) {
-            var comp = $body.find('#' + id);
-            if (comp) {
-              comp.replaceWith(placeHolderMarkup(id, compData.componentType));
-            }
+        var renderMarkup = function(xhtml) {
+          if ($scope.lastScope) {
+            $scope.lastScope.$destroy();
           }
-        }
-      }
+          $scope.lastScope = $scope.$new();
+          var $body = $element.find(".player-body").html(xhtml);
+          
+          $compile($body)($scope.lastScope);
 
-      function placeHolderMarkup(id, componentType) {
-        return [
-          '<placeholder',
-          ' id="' + id + '"',
-          ' component-type="' + componentType + '"',
-          ' configurable="false"',
-          '>',
-          '</placeholder>'
-        ].join('');
-      }
+          MathJaxService.onEndProcess(function(){
+            $('.player-body').removeClass('hidden-player-body');
+            MathJaxService.off(arguments.callee);
+          });
 
-      function afterSetDataAndSession($scope, allComponentsData) {
-        var shouldRerender = false;
-        for (var id in allComponentsData) {
-          var compData = allComponentsData[id].data;
-          if (compData.clean) {
-            if (!cleanCache[id]) {
-              cleanCache[id] = true;
-              shouldRerender = true;
-            }
-          } else if (cleanCache[id]) {
-            cleanCache[id] = false;
-            shouldRerender = true;
-          }
-        }
-        if (shouldRerender) {
-          $scope.$emit("rerender-xhtml");
-        }
-      }
+          MathJaxService.parseDomForMath(0, $element.find('.player-body')[0]);
+        };
 
-      function postRender($scope, $element, $compile) {
+        $scope.$watch('xhtml', function(xhtml, oldXhtml) {
 
-        _(ComponentRegister.components).keys().each(function(id) {
-          var comp = getPreviewComponentById(id);
-          if (parseInt(id, 10) === $rootScope.selectedComponentId) {
-            comp.parent().addClass('selected');
-          }
-        });
-      }
-
-      function postLink($scope) {
-
-        function selectContainer(id) {
-          $('.player-body .selected').removeClass('selected');
-          var comp = getPreviewComponentById(id);
-          if (comp) {
-            comp.parent().addClass('selected');
-            $scope.selectedComponentId = id;
-            var phase = $scope.root && $scope.$root.$$phase;
-            if (phase && phase !== '$apply' && phase !== '$digest') {
-              $scope.$apply();
-            }
-
-            if ($('component-container.selected').size() > 0) {
-              var target = $('component-container.selected')[0];
-              target.scrollIntoView();
-            }
-          } else {
-            $log.warn('selectContainer: Could not find component-container for id = ' + id);
-          }
-        }
-
-        function deselectContainer() {
-          $('.player-body .selected').removeClass('selected');
-          $scope.selectedComponentId = undefined;
-        }
-
-        $rootScope.$on('componentSelectionToggled', function(event, data) {
-          var phase = $scope.$$phase;
-
-          if ($scope.selectedComponentId === data.id) {
-            deselectContainer();
-          } else {
-            selectContainer(data.id);
-          }
-
-          if (phase !== '$apply' && phase !== '$digest') {
-            $scope.$apply();
+          var isEqual = _.isEqual(xhtml, oldXhtml);
+          if (xhtml && !isEqual) {
+            logger.debug('xhtml', xhtml);
+            renderMarkup(xhtml);
           }
         });
 
-        $rootScope.$on('componentSelected', function(event, data) {
-          selectContainer(data.id);
-        });
+        $scope.$watch('session', function(session, oldSession) {
 
-        $rootScope.$on('componentDeselected', function() {
-          deselectContainer();
-        });
+          logger.debug('session', session);
+
+          if ($scope.mode !== "player" && !session) {
+            $scope.session = {};
+          }
+
+        }, true);
+
+        $scope.$watch('outcomes', function(r) {
+          if (!r) {
+            return;
+          }
+          ComponentRegister.setOutcomes(r);
+          //MathJaxService.parseDomForMath();
+        }, true);
 
       }
 
-      return new CorespringPlayerDefinition({
-        mode: 'editor',
-        postLink: postLink,
-        postRender: postRender,
-        afterSetDataAndSession: afterSetDataAndSession,
-        preCompile: preCompile
-      });
+      return {
+        restrict: 'E',
+        link: link,
+        scope : {
+        xhtml: '=playerMarkup',
+        components: '=playerComponents',
+        outcomes: '=playerOutcomes',
+        session: '=playerSession'
+        },
+        template : [
+          '<div class="corespring-player">',
+          '  <h1>New preview player!</h1>',
+          '  <div class="player-body hidden-player-body"></div>',
+          '</div>'
+        ].join("\n"),
+        replace: true
+      };
     }
   ]);
 })();

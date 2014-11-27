@@ -65,7 +65,8 @@ angular.module('corespring-editor.controllers').controller('QuestionController',
           });
 
           logger.debug('weights are different - save');
-          ItemService.save({components: $scope.item.components}, function(item) {
+          //TODO - only update the weights?
+          ItemService.fineGrainedSave({components: $scope.item.components}, function(item) {
             $scope.item.components = item.components;
           });
         }
@@ -242,6 +243,10 @@ angular.module('corespring-editor.controllers').controller('QuestionController',
       logger.warn("file too big");
     });
 
+    $scope.$on('registerComponent', function(event, id, componentBridge){
+      logger.debug('registerComponent ', id);
+      ComponentRegister.registerComponent(id, componentBridge);
+    });
 
     $scope.$on('registerConfigPanel', function(a, id, component) {
       configPanels[id] = component;
@@ -271,14 +276,15 @@ angular.module('corespring-editor.controllers').controller('QuestionController',
           delete cleaned[key];
         }
       }
-      ItemService.save({
+      throw new Error('refactoring');
+      /*ItemService.save({
           components: cleaned,
           xhtml: $scope.item.xhtml,
           summaryFeedback: $scope.isSummaryFeedbackSelected ? $scope.item.summaryFeedback : ""
         },
         $scope.onItemSaved,
         $scope.onItemSaveError,
-        $scope.itemId);
+        $scope.itemId);*/
     };
 
     $scope.serialize = function(comps) {
