@@ -106,7 +106,7 @@ script(type="text/ng-template", id="/templates/profile")
           label(ng-repeat='rp in reviewsPassedDataProvider', style="width:50%;")
             input(type='checkbox',ng-model='rp.selected',ng-change='onChangeReviewsPassed(rp.key)',style='margin-right: 3px;')
             | {{rp.key}}
-          input(ng-show='isReviewsPassedOtherSelected',style='margin-left:135px;', type='text', placeholder='Enter review...', ng-model='profile.reviewsPassedOther')
+            input(ng-if='rp.key == "Other"', ng-show='rp.selected', style='margin-left:10px;', type='text', placeholder='Enter review...', ng-model='profile.reviewsPassedOther')
 
       br/
 
