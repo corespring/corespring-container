@@ -1,11 +1,11 @@
 angular.module('corespring-editor.controllers')
   .controller(
   'Root',
-  [ 
-  '$scope', 
+  [
+  '$scope',
   '$state',
-  'ItemService', 
-  'LogFactory', 
+  'ItemService',
+  'LogFactory',
   'ComponentRegister',
   'PlayerUtils',
     function($scope, $state, ItemService, LogFactory, ComponentRegister, PlayerUtils) {
