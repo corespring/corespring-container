@@ -115,7 +115,7 @@ angular.module('corespring-editor.directives')
           id: '@',
           configurable: '@'
         },
-        templateUrl: '/v2-editor/question/directives/placeholder.html',
+        templateUrl: '/v2-editor/question/directives/placeholder.html'
       };
 
     }]);
