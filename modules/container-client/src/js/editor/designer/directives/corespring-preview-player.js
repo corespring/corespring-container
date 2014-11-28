@@ -3,7 +3,7 @@
   // Caches ids of elements that were previously clean.
   var cleanCache = [];
 
-  angular.module('corespring-editor.directives').directive('corespringPreviewPlayer', [
+  angular.module('corespring-v1-editor.directives').directive('corespringPreviewPlayer', [
     '$log',
     '$rootScope',
     '$compile',

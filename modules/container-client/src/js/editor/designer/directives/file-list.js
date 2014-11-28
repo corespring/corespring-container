@@ -9,7 +9,7 @@
    console.log("file preview");
   };
 
-  angular.module('corespring-editor.directives').directive('fileList', [
+  angular.module('corespring-v1-editor.directives').directive('fileList', [
     function () {
       var def;
       def = {

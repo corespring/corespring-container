@@ -29,7 +29,7 @@
     };
   };
 
-  angular.module('corespring-editor.directives').directive('filePreview', [
+  angular.module('corespring-v1-editor.directives').directive('filePreview', [
     '$compile', '$timeout', function ($compile, $timeout) {
       var def;
       def = {

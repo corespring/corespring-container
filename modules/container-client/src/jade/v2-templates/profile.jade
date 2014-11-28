@@ -57,7 +57,7 @@ script(type="text/ng-template", id="/templates/profile")
       +h_form
         h6 Add the Standards
         +field('Subject', 'standardAdapter.subjectOption')
-          select(id='standardAdapter.subjectOption', ng-model='standardAdapter.subjectOption', ng-options='c.name for c in standardsOptions')
+          select(id='standardAdapter.subjectOption', ng-model='standardAdapter.subjectOption', ng-options='c.name for c in standardsTree')
         +field('Category','standardAdapter.categoryOption')
           select(id='standardAdapter.categoryOption', ng-model='standardAdapter.categoryOption', ng-options='p.name for p in standardAdapter.subjectOption.items')
         +field('Sub-Category','standardAdapter.subCategoryOption')

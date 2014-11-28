@@ -1,6 +1,6 @@
 (function () {
 
-  angular.module('corespring-editor.controllers')
+  angular.module('corespring-v1-editor.controllers')
     .controller('ClientSidePreview', [
       '$log',
       '$scope',

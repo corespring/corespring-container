@@ -272,7 +272,7 @@ var controller = function($scope,
   }, 300);
 };
 
-angular.module('corespring-editor.controllers')
+angular.module('corespring-v1-editor.controllers')
   .controller('Root', ['$scope',
     '$rootScope',
     '$log',

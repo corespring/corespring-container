@@ -58,7 +58,7 @@ describe('item-profile controller', function() {
 
   function mockComponentRegister() {}
 
-  beforeEach(angular.mock.module('corespring-editor.controllers'));
+  beforeEach(angular.mock.module('corespring-v1-editor.controllers'));
 
   beforeEach(function() {
     module(function($provide) {
