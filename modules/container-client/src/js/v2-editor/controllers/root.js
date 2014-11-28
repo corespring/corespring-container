@@ -43,14 +43,15 @@ angular.module('corespring-editor.controllers')
 
       $scope.$on('deleteSupportingMaterial', function(event, data) {
         function deleteSupportingMaterial(index) {
+           $state.transitionTo('supporting-materials', {
+                index: 0
+              }, {reload: true});
+
           $scope.data.item.supportingMaterials.splice(index, 1);
-          ItemService.fineGrainedSave({
+          ItemService.save({
               supportingMaterials: $scope.data.item.supportingMaterials
             },
             function() {
-              $state.transitionTo('supporting-materials', {
-                index: Math.max(0, index - 1)
-              }, {reload: true});
             },
             $scope.onSaveError, $scope.itemId
           );
