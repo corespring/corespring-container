@@ -15,7 +15,13 @@ script( type="text/ng-template", id="/templates/popups/addSupportingMaterial")
           input(id='upload', type='radio', value='uploadFile', ng-model='supportingMaterial.method')
           label(for='upload') upload a file
           input(type='file', fileChange="",ng-show="supportingMaterial.method == 'uploadFile'")
-      div {{supportingMaterial}}
+
+// Upload progress popup
+script( type="text/ng-template", id="/templates/popups/uploadingSupportingMaterial")
+  +modal('Uploading Supporting Material', 'Ok', false)
+    div(style="text-align: center") Uploading...
+    progressbar(max="100",value="progress")
+      span(style="color:black; white-space:nowrap;") {{progress}}%
 
 script(type="text/ng-template", id="/templates/supporting-materials")
   .supporting-materials(ng-controller="SupportingMaterials")
@@ -25,10 +31,10 @@ script(type="text/ng-template", id="/templates/supporting-materials")
             i.fa.fa-plus
             | &nbsp;add new supporting material
       ul.supporting-materials-list
-        li(ng-repeat="s in supportingMaterials",ng-model="s",ng-class="{divider: s.type == 'divider', data: s.type == 'data'}")
+        li(ng-repeat="s in supportingMaterials",ng-model="s",ng-class="{divider: s.type == 'divider', data: s.type == 'data', selected: s.index == index}", ui-sref="supporting-materials({index: s.index})")
           h4(ng-if="s.type == 'header'") {{s.label}}
-          a(ng-if="s.type == 'data'",ui-sref="supporting-materials({index: s.index})") {{s.label}}
-          i.fa.fa-trash-o.pull-right(ng-if="s.type == 'data'", ng-click="deleteSupportingMaterial(s.index)")
+          a(ng-if="s.type == 'data'") {{s.label}}
+          i.fa.fa-trash-o.pull-right(ng-if="s.type == 'data'", ng-click="deleteSupportingMaterial(s.index, $event)")
     .col-md-6
       .supporting-material(ng-show='supportingMaterial')
         div(supportingmetadata="", ng-model='supportingMaterial')
@@ -58,6 +64,6 @@ script(type="text/ng-template", id="/templates/supporting-materials")
               dt(ng-show='hasDate(supportingMaterial)') Date
               dd(ng-show='hasDate(supportingMaterial)') {{formatDate(supportingMaterial.dateModified)}}
 
-            div(style="height: 100%;",ng-if="!isContentType('text/html')")
+            div.preview-file(ng-if="!isContentType('text/html')")
               iframe(ng-src="{{getSupportingUrl()}}", width="100%", height="100%")
 

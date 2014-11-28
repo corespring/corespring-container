@@ -5,10 +5,19 @@ angular.module('corespring-editor.controllers').controller('AddSupportingMateria
   function($scope, $modalInstance, LogFactory){
 
     var logger = LogFactory.getLogger('AddSupportingMaterialPopupController');
-    $scope.supportingMaterial = {method: 'createHtml'};
 
-    $scope.$watch('supportingMaterial.name', function(n) {
-      $scope.okDisabled = _.isEmpty(n);
+    $scope.supportingMaterial = {method: 'uploadFile'};
+
+    function isUploadFileEmpty() {
+      return $scope.supportingMaterial.method === 'uploadFile' && _.isEmpty($scope.supportingMaterial.fileToUpload);
+    }
+
+    $scope.isSubmitDisabled = function() {
+      return _.isEmpty($scope.supportingMaterial.name) || isUploadFileEmpty();
+    };
+
+    $scope.$watch($scope.isSubmitDisabled, function(n) {
+      $scope.okDisabled = n;
     });
 
     $scope.$on('fileChange', function(ev, file) {
