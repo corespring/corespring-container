@@ -57,31 +57,31 @@ script(type="text/ng-template", id="/templates/profile")
       +h_form
         h6 Add the Standards
         +field('Subject', 'standardAdapter.subjectOption')
-          select(ng-model='standardAdapter.subjectOption', ng-options='c.name for c in standardsOptions')
+          select(id='standardAdapter.subjectOption', ng-model='standardAdapter.subjectOption', ng-options='c.name for c in standardsTree')
         +field('Category','standardAdapter.categoryOption')
-          select(ng-model='standardAdapter.categoryOption', ng-options='p.name for p in standardAdapter.subjectOption.items')
+          select(id='standardAdapter.categoryOption', ng-model='standardAdapter.categoryOption', ng-options='p.name for p in standardAdapter.subjectOption.items')
         +field('Sub-Category','standardAdapter.subCategoryOption')
-          select(ng-model='standardAdapter.subCategoryOption', ng-options='z for z in standardAdapter.categoryOption.items')
+          select(id='subCategoryOption',ng-model='standardAdapter.subCategoryOption', ng-options='z for z in standardAdapter.categoryOption.items')
         +field('Standards','profile.standards')
-          input(type='hidden', ui-select2='standardsAdapter', ng-model='profile.standards', style='width: 500px;')
+          input(id='profile.standards', type='hidden', ui-select2='standardsAdapter', ng-model='profile.standards', style='width: 500px;')
 
-        div(ng-show="isLiteracyStandardSelected")
+        .lexile(ng-show="isLiteracyStandardSelected")
           +field('Lexile Score', 'profile.lexile')
-            input.form-control(id='profile.lexile', ng-model='profile.lexile', style='width: 40px;')
-            span L
+            input.form-control(id='profile.lexile', ng-model='profile.lexile')
+            span.measure L
       br/
 
       +h_form
         h6 Other Alignments
         +field('Depth Of Knowledge','otherAlignments.depthOfKnowledge')
-          select(ng-model='otherAlignments.depthOfKnowledge', ng-options='c.key as c.value for c in depthOfKnowledgeDataProvider')
+          select(id='otherAlignments.depthOfKnowledge', ng-model='otherAlignments.depthOfKnowledge', ng-options='c.key as c.value for c in depthOfKnowledgeDataProvider')
         +field('Bloom\'s Taxonomy','otherAlignments.bloomsTaxonomy')
-          select(ng-model='otherAlignments.bloomsTaxonomy', ng-options='c.key as c.value for c in bloomsTaxonomyDataProvider')
+          select(id='otherAlignments.bloomsTaxonomy', ng-model='otherAlignments.bloomsTaxonomy', ng-options='c.key as c.value for c in bloomsTaxonomyDataProvider')
         .form-group
           label.col-sm-3.control-label(ng-click='expandKeySkills=!expandKeySkills')
             i(class="fa fa-{{!!expandKeySkills ? 'minus' : 'plus'}}-square-o", style="margin-right: 6px")
             | Key Skills
-          div.col-sm-9
+          .col-sm-9
             div(ng-show='!expandKeySkills')
               label {{getKeySkillsSummary(otherAlignments.keySkills)}}
             div(ng-show='expandKeySkills', ng-repeat='skills in keySkillsDataProvider')
@@ -93,17 +93,46 @@ script(type="text/ng-template", id="/templates/profile")
       br/
 
       +h_form
-        h6 History 
-        expander(ng-model="taskInfo.priorUse", title="Prior Use") 
-        expander(ng-model="taskInfo.reviewsPassed", title="Reviews Passed") 
-        expander(ng-model="taskInfo.collections", title="Collections") 
+        h6 History
+
+        +field('This item was previously used in', 'profile.priorUse')
+          select(id='profile.priorUse', ng-model='profile.priorUse', ng-options='c.key as c.value for c in priorUseDataProvider')
+          input(ng-show="isPriorUseOtherSelected", type="text", placeholder='Enter prior use...', ng-model='profile.priorUseOther')
+
+        +field('Prior Use Grade Level', 'profile.priorGradeLevel')
+          tight-button-bar(id='profile.priorGradeLevel', ng-model="profile.priorGradeLevel", button-provider="gradeLevelDataProvider", key="key")
+
+        +field('Reviews Passed', 'profile.reviewsPassed')
+          label(ng-repeat='rp in reviewsPassedDataProvider', style="width:50%;")
+            input(type='checkbox',ng-model='rp.selected',ng-change='onChangeReviewsPassed(rp.key)',style='margin-right: 3px;')
+            | {{rp.key}}
+            input(ng-if='rp.key == "Other"', ng-show='rp.selected', style='margin-left:10px;', type='text', placeholder='Enter review...', ng-model='profile.reviewsPassedOther')
 
       br/
 
       +h_form
-        h6 Ownership 
-        expander(ng-model="taskInfo.copyrightInformation", title="Copyright Information") 
-        expander(ng-model="taskInfo.additionalMediaCopyright", title="Additional Media Copyright") 
-        expander(ng-model="taskInfo.creativecommons", title="Creative Commons License") 
+        h6 Ownership
+
+        +field('Author', 'contributorDetails.author')
+
+        +field('Credentials','contributorDetails.credentials')
+          select(id='contributorDetails.credentials',ng-model='contributorDetails.credentials', ng-options='c.key as c.value for c in credentialsDataProvider')
+          input(id='contributorDetails.credentialsOther',ng-show="isCredentialsOtherSelected", type="text", placeholder='Enter credentials...', ng-model='contributorDetails.credentialsOther')
+
+        +field('* Copyright Owner','contributorDetails.copyrightOwner')
+
+        +field('* Copyright Year','contributorDetails.copyrightYear')
+          select(id='contributorDetails.copyrightYear',ng-model='contributorDetails.copyrightYear', ng-options='c for c in copyrightYearDataProvider', style="width:170px;")
+
+        +field('* Copyright Expiration','contributorDetails.copyrightExpirationDate')
+          select(id='contributorDetails.copyrightExpirationDate',ng-model='contributorDetails.copyrightExpirationDate', ng-options='c for c in copyrightExpirationYearDataProvider', style="width:170px;")
+
+        +field('Website', 'contributorDetails.sourceUrl')
+
+        br/
+
+        additional-copyright-information-for-profile(copyrights="contributorDetails.additionalCopyrights",
+          prompt="Does this item contain any other copyrighted materials? E.g. book passage, image, etc.")
+
 
 

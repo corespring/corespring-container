@@ -49,8 +49,8 @@ exports.css =
 exports.ngModules = _.union(player.ngModules, [
   'corespring-common.supporting-materials',
   'corespring-editor.services',
-  'corespring-editor.controllers',
-  'corespring-editor.directives',
+  'corespring-v1-editor.controllers',
+  'corespring-v1-editor.directives',
   'ui.sortable',
   'ui.bootstrap',
   'ui.ace',

@@ -1,6 +1,6 @@
 (function() {
 
-  angular.module('corespring-editor.controllers')
+  angular.module('corespring-v1-editor.controllers')
     .controller('ItemProfile', [
       '$scope',
       'DataQueryService',
@@ -480,7 +480,7 @@
    # @buttonProvider an array of choices
    # @key - the property of the buttonProvider objects to use for display, and to store in the ngModel
    #*/
-  angular.module('corespring-editor.controllers')
+  angular.module('corespring-v1-editor.controllers')
     .directive('tightButtonBar', ['$log',
       function($log) {
 

@@ -16,7 +16,7 @@ angular.module('corespring-editor.directives').directive('expander', [
         title: '@'
       },
       template: '<div class="expander">{{title}}</div>',
-      replace: true,
+      replace: true
     };
   }
   ]);

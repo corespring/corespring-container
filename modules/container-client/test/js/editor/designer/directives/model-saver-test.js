@@ -1,6 +1,6 @@
 describe('model saver', function() {
 
-  beforeEach(angular.mock.module('corespring-editor.directives'));
+  beforeEach(angular.mock.module('corespring-v1-editor.directives'));
 
   var rootScope, compile, timeout;
 

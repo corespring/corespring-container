@@ -197,7 +197,7 @@ var controller = function($scope, ItemService, SupportingMaterialsService, $moda
 
 };
 
-angular.module('corespring-editor.controllers')
+angular.module('corespring-v1-editor.controllers')
   .controller('SupportingMaterials', ['$scope',
     'ItemService',
     'SupportingMaterialsService',
