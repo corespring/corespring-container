@@ -58,22 +58,39 @@ describe('profile controller', function() {
     };
   }
 
+  function MockProfileFormatter(){
+    this.componentTypesUsedResult = "OK";
+    this.componentTypesUsed = function(components, availableComponents){
+      return this.componentTypesUsedResult;
+    }
+  }
 
-  var mockDesignerService = new MockDesignerService();
-  var mockItemService = new MockItemService();
-  var mockDataQueryService = new MockDataQueryService();
+  function MockStandardQueryCreator(){
+    this.createStandardQueryArguments = [];
+    this.createStandardQuery = function (search, subject, category, subCategory){
+      this.createStandardQueryArguments.push({search:search, subject:subject, category:category, subCategory: subCategory});
+    };
+  }
 
   beforeEach(angular.mock.module('corespring-editor.controllers'));
 
+  var mockDesignerService, mockItemService, mockDataQueryService, mockProfileFormatter,mockStandardQueryCreator;
+
   beforeEach(function() {
+    mockDesignerService = new MockDesignerService();
+    mockItemService = new MockItemService();
+    mockDataQueryService = new MockDataQueryService();
+    mockProfileFormatter = new MockProfileFormatter();
+    mockStandardQueryCreator = new MockStandardQueryCreator();
+
     module(function($provide) {
       $provide.value('throttle', _.identity);
       $provide.value('DataQueryService', mockDataQueryService);
       $provide.value('DesignerService', mockDesignerService);
       $provide.value('ItemService', mockItemService);
       $provide.value('LogFactory', new MockLogFactory());
-      $provide.value('StandardQueryCreator', {});
-      $provide.value('ProfileFormatter', {});
+      $provide.value('StandardQueryCreator', mockStandardQueryCreator);
+      $provide.value('ProfileFormatter', mockProfileFormatter);
     });
   });
 
@@ -93,6 +110,22 @@ describe('profile controller', function() {
     } catch (e) {
       throw ("Error with the controller: " + e);
     }
+  }
+
+  function keyValue(id){
+    return {key:id, value:id, selected: false};
+  }
+
+  function keyValueList(list){
+    return _.map(list, keyValue);
+  }
+
+  function randomString(){
+    return Math.floor(Math.random() * 1000).toString();
+  }
+
+  function randomArray(){
+    return _.map([1,2,3], randomString);
   }
 
   describe("init", function(){
@@ -124,63 +157,290 @@ describe('profile controller', function() {
     });
   });
 
-  describe("additional copyrights", function(){
-    it("should init with empty list", function(){
+  describe("standards", function(){
+
+    it("loads standards tree",function(){
+      var expectedDataProvider = randomArray();
+      mockDataQueryService.listResult = expectedDataProvider;
       makeProfileController();
-      expect(scope.contributorDetails.additionalCopyrights).toEqual([]);
+      expect(scope.standardsTree).toEqual(expectedDataProvider);
     });
 
-    it("should remove empty items", function(){
-      mockItemService.loadResult = {profile: {contributorDetails: {additionalCopyrights: [{}]}}};
+    it("uses selected subject, category and sub-category to filter search results",function(){
       makeProfileController();
-      expect(scope.contributorDetails.additionalCopyrights).toEqual([]);
+      scope.standardsAdapter.subjectOption = "subject";
+      scope.standardsAdapter.categoryOption = "category";
+      scope.standardsAdapter.subCategoryOption = "subCategory";
+      scope.standardsAdapter.query({term:"searchterm", callback:function(){}})
+      expect(mockStandardQueryCreator.createStandardQueryArguments.pop()).toEqual({
+        search:"searchterm", subject:"subject", category:"category", subCategory:"subCategory"});
     });
 
-    it("should not remove items with content", function(){
-      mockItemService.loadResult = {profile: {contributorDetails: {additionalCopyrights: [{author: "Albert Einstein"}]}}};
+    it("initialises standards from comma separated string", function(){
       makeProfileController();
-      expect(scope.contributorDetails.additionalCopyrights).toEqual([{author: "Albert Einstein"}]);
+
+      //init cache with some standards
+      scope.queryResults.standards = [{id:"standard-a"},{id:"standard-b"}, {id:"standard-c"}]
+
+      //override getVal so we can set the val for this test
+      scope.standardsAdapter.getVal = function(){
+        return "standard-a,standard-b";
+      };
+
+      var actualResult;
+      var domElement = {};
+      scope.standardsAdapter.initSelection(domElement, function(result){
+        actualResult = result;
+      });
+
+      expect(actualResult).toEqual([{id:"standard-a"},{id:"standard-b"}]);
+    });
+
+    describe("isLiteracyStandardSelected",function(){
+      beforeEach(makeProfileController);
+      it("is true if literacy standard is selected",function(){
+        scope.profile.standards.push({subject:"some literacy subject"});
+        scope.$apply();
+        expect(scope.isLiteracyStandardSelected).toEqual(true);
+      });
+      it("is false if no literacy standard is selected",function(){
+        scope.profile.standards.push({subject:"some math subject"});
+        scope.$apply();
+        expect(scope.isLiteracyStandardSelected).toEqual(false);
+      });
     });
   });
 
-  describe("save", function(){
+  describe("componentTypes", function(){
+
+    it("loads available components",function(){
+      mockDesignerService.loadAvailableUiComponentsResult = {interactions:["one","two"], widgets:["three","four"]};
+      makeProfileController();
+      expect(scope.availableComponents).toEqual(["one","two","three","four"]);
+    });
+
+    it("uses ProfileFormatter to initialise componentTypes from item",function(){
+      var expectedResult = randomString();
+      mockProfileFormatter.componentTypesUsedResult = expectedResult;
+      mockItemService.loadResult = {profile:{}, components:["one"]};
+      makeProfileController();
+      expect(scope.componentTypes).toEqual(expectedResult);
+    });
+  });
+
+  describe("subject", function(){
+
+    beforeEach(makeProfileController);
+
+    describe("select2Adapter", function(){
+
+      it('select2Adapter.query should return the result of DataQueryService.query', function() {
+
+        var expectedResult = [{
+          id: "1",
+          category: "category",
+          subject: "blah"
+        }];
+
+        mockDataQueryService.queryResult = expectedResult;
+
+        var actualResult;
+
+        var query = {
+          term: "blah",
+          callback: function(success) {
+            actualResult = success.results;
+          }
+        };
+
+        scope.primarySubjectSelect2Adapter.query(query);
+        expect(actualResult).toEqual(expectedResult);
+      });
+
+      it("should init selection with a cached result", function() {
+
+        var expectedItem = {
+          id: "1",
+          category: "category",
+          subject: "blah"
+        };
+
+        //add item to queryResults cache
+        scope.queryResults['subjects.primary'] = [expectedItem];
+
+        //override element to val to return the id of the item that should be found
+        scope.primarySubjectSelect2Adapter.elementToVal = function(e) {
+          return "1";
+        };
+
+        var domElement = {};
+        var actualItem;
+
+        scope.primarySubjectSelect2Adapter.initSelection(domElement, function(s) {
+          actualItem = s;
+        });
+
+        expect(actualItem).toEqual(expectedItem);
+      });
+    });
+  });
+
+  describe("dataProviders",function(){
+
+    var expectedDataProvider;
+
     beforeEach(function(){
+      expectedDataProvider = randomArray();
+      mockDataQueryService.listResult = expectedDataProvider;
       makeProfileController();
-      scope.$apply();
-      mockItemService.fineGrainedSaveCalls = [];
     });
-    it("is triggered when a property of profile is changed", function(){
-      scope.item.profile.someProperty = "some value";
-      scope.$apply();
-      expect(mockItemService.fineGrainedSaveCalls.length).toEqual(1);
+
+    describe("media type", function(){
+      it("loads data",function(){
+        expect(scope.mediaTypeDataProvider).toEqual(expectedDataProvider);
+      });
     });
-    it("is not triggered when a property of item is changed", function(){
-      scope.item.someProperty = "some value";
-      scope.$apply();
-      expect(mockItemService.fineGrainedSaveCalls.length).toEqual(0);
+
+    describe("bloom's taxononmy", function(){
+      it("loads data",function(){
+        expect(scope.bloomsTaxonomyDataProvider).toEqual(expectedDataProvider);
+      });
+    });
+
+    describe("grade levels", function(){
+      it("loads data",function(){
+        expect(scope.gradeLevelDataProvider).toEqual(expectedDataProvider);
+      });
+    });
+
+    describe("depth of knowledge", function(){
+      it("loads data",function(){
+        expect(scope.depthOfKnowledgeDataProvider).toEqual(expectedDataProvider);
+      });
+    });
+
+  });
+
+  describe("copyright related dates",function(){
+    function fullYear(offset){
+      return (new Date().getFullYear() + (offset ? offset : 0)).toString();
+    }
+    beforeEach(makeProfileController);
+
+    describe("expiration date dataProvider", function(){
+      it("first element should be current year", function(){
+        expect(_.first(scope.copyrightExpirationYearDataProvider)).toEqual(fullYear());
+      });
+      it("last element should be Never", function(){
+        expect(_.last(scope.copyrightExpirationYearDataProvider)).toEqual("Never");
+      });
+      it("but last element should be current year plus 20", function(){
+        expect(_.first(_.last(scope.copyrightExpirationYearDataProvider, 2))).toEqual(fullYear(20));
+      });
+    });
+    describe("copyright date dataProvider", function(){
+      it("first element should be current year", function(){
+        expect(_.first(scope.copyrightYearDataProvider)).toEqual(fullYear());
+      });
+      it("last element should be Never", function(){
+        expect(_.last(scope.copyrightYearDataProvider)).toEqual(fullYear(-120));
+      });
     });
   });
 
-  describe("getLicenseTypeUrl", function(){
-    beforeEach(makeProfileController);
-    it("returns undefined if licenseType is empty", function(){
-      expect(scope.getLicenseTypeUrl("")).toEqual(undefined);
+  describe("credentials", function(){
+    var items;
+
+    beforeEach(function(){
+      items = keyValueList([1,2,'Other']);
+      mockDataQueryService.listResult = items;
+      makeProfileController();
     });
-    it("returns licenseType url if licenseType is string", function(){
-      expect(scope.getLicenseTypeUrl("CC")).toEqual("/assets/images/licenseTypes/CC.png");
+
+    it("loads data provider",function(){
+      expect(scope.credentialsDataProvider).toEqual(items);
+    });
+
+    describe("isCredentialsOtherSelected",function(){
+      it("is true if 'Other' is selected", function(){
+        scope.contributorDetails.credentials = 'Other';
+        scope.$apply();
+        expect(scope.isCredentialsOtherSelected).toEqual(true);
+      });
+      it("is false if 'Other' is deselected", function(){
+        scope.contributorDetails.credentials = 'Other';
+        scope.$apply();
+        expect(scope.isCredentialsOtherSelected).toEqual(true);
+
+        scope.contributorDetails.credentials = 'Something else';
+        scope.$apply();
+        expect(scope.isCredentialsOtherSelected).toEqual(false);
+      });
+    });
+
+  });
+
+  describe('keySkills',function(){
+    var expectedDataProvider;
+
+    beforeEach(function(){
+      expectedDataProvider = randomArray()
+      mockDataQueryService.listResult = keyValueList(expectedDataProvider);
+      makeProfileController();
+    });
+
+    it("should init dataProvider",function(){
+      function tagListItem(id){
+        return {header:id, list:id};
+      }
+      expect(scope.keySkillsDataProvider).toEqual(_.map(expectedDataProvider, tagListItem));
+    });
+
+    describe("getKeySkillsSummary", function(){
+      beforeEach(makeProfileController);
+      it("can handle zero key skills", function(){
+        expect(scope.getKeySkillsSummary([])).toEqual("No Key Skills selected")
+      });
+      it("can handle one key skill", function(){
+        expect(scope.getKeySkillsSummary([1])).toEqual("1 Key Skill selected")
+      });
+      it("can handle multiple key skills", function(){
+        expect(scope.getKeySkillsSummary([1,2,3])).toEqual("3 Key Skills selected")
+      });
     });
   });
 
-  describe("getKeySkillsSummary", function(){
-    beforeEach(makeProfileController);
-    it("can handle zero key skills", function(){
-      expect(scope.getKeySkillsSummary([])).toEqual("No Key Skills selected")
+  describe('priorUse',function(){
+    var itemOne,itemTwo,itemOther;
+
+    beforeEach(function(){
+      itemOne = keyValue("one");
+      itemTwo = keyValue("two");
+      itemOther = keyValue("Other");
+      priorUseItems = [itemOne, itemTwo, itemOther];
+      mockDataQueryService.listResult = priorUseItems;
+      makeProfileController();
     });
-    it("can handle one key skill", function(){
-      expect(scope.getKeySkillsSummary([1])).toEqual("1 Key Skill selected")
+
+    it("should init the dataProvider", function(){
+      expect(scope.priorUseDataProvider).toEqual(priorUseItems);
     });
-    it("can handle multiple key skills", function(){
-      expect(scope.getKeySkillsSummary([1,2,3])).toEqual("3 Key Skills selected")
+
+    it("selecting 'Other' reveals input", function(){
+      scope.profile.priorUse = "Other";
+      scope.$apply();
+      expect(scope.isPriorUseOtherSelected).toEqual(true);
+    });
+
+    it("deselecting 'Other' clears model", function(){
+      scope.profile.priorUse = "Other";
+      scope.profile.priorUseOther = "Some prior use";
+      scope.$apply();
+      expect(scope.profile.priorUseOther).toEqual("Some prior use");
+
+      scope.profile.priorUse = "";
+      scope.$apply();
+      expect(scope.profile.priorUseOther).toEqual("");
     });
   });
 
@@ -188,14 +448,11 @@ describe('profile controller', function() {
     var itemOne,itemTwo,itemOther,itemNone,itemAll,reviewsPassedItems;
 
     beforeEach(function(){
-      function item(id) {
-        return {key: id, selected: false}
-      }
-      itemOne = item("one");
-      itemTwo = item("two");
-      itemOther = item("Other");
-      itemNone = item("None");
-      itemAll = item("All");
+      itemOne = keyValue("one");
+      itemTwo = keyValue("two");
+      itemOther = keyValue("Other");
+      itemNone = keyValue("None");
+      itemAll = keyValue("All");
       reviewsPassedItems = [itemOne, itemTwo, itemOther, itemNone, itemAll];
       mockDataQueryService.listResult = reviewsPassedItems;
       makeProfileController();
@@ -279,135 +536,70 @@ describe('profile controller', function() {
     });
   });
 
-  describe('priorUse',function(){
-    var itemOne,itemTwo,itemOther;
+  describe("license types", function() {
 
+    var expextedDataProvider = randomArray();
     beforeEach(function(){
-      function item(id) {
-        return {key: id, selected: false};
-      }
-      itemOne = item("one");
-      itemTwo = item("two");
-      itemOther = item("Other");
-      priorUseItems = [itemOne, itemTwo, itemOther];
-      mockDataQueryService.listResult = priorUseItems;
+
+      mockDataQueryService.listResult = expextedDataProvider;
       makeProfileController();
     });
 
-    it("should init the dataProvider", function(){
-      expect(scope.priorUseDataProvider).toEqual(priorUseItems);
+    it("loads dataProvider",function(){
+      expect(scope.licenseTypeDataProvider).toEqual(expextedDataProvider);
     });
 
-    it("selecting 'Other' reveals input", function(){
-      scope.profile.priorUse = "Other";
-      scope.$apply();
-      expect(scope.isPriorUseOtherSelected).toEqual(true);
-    });
-
-    it("deselecting 'Other' clears model", function(){
-      scope.profile.priorUse = "Other";
-      scope.profile.priorUseOther = "Some prior use";
-      scope.$apply();
-      expect(scope.profile.priorUseOther).toEqual("Some prior use");
-
-      scope.profile.priorUse = "";
-      scope.$apply();
-      expect(scope.profile.priorUseOther).toEqual("");
-    });
-  });
-
-  describe('keySkills',function(){
-    beforeEach(function(){
-      function item(id){
-        return {key:id, value:id};
-      }
-      mockDataQueryService.listResult = [item(1),item(2),item(3)];
-      makeProfileController();
-    });
-
-    it("should init dataProvider",function(){
-      function tagListItem(id){
-        return {header:id, list:id};
-      }
-      expect(scope.keySkillsDataProvider).toEqual([tagListItem(1),tagListItem(2),tagListItem(3)]);
-    });
-  });
-
-  describe('depthOfKnowledge',function(){
-    beforeEach(function(){
-      mockDataQueryService.listResult = [1,2,3];
-      makeProfileController();
-    });
-
-    it("should init dataProvider",function(){
-      expect(scope.depthOfKnowledgeDataProvider).toEqual([1,2,3]);
-    });
-  });
-
-  describe('licenseTypes',function(){
-    beforeEach(function(){
-      mockDataQueryService.listResult = [1,2,3];
-      makeProfileController();
-    });
-
-    it("should init dataProvider",function(){
-      expect(scope.licenseTypeDataProvider).toEqual([1,2,3]);
-    });
-  });
-
-  describe("primarySubjectSelect2Adapter", function(){
-
-    beforeEach(makeProfileController);
-
-    it('should handle subject queries', function() {
-
-      var queryResult;
-
-      var query = {
-        term: "blah",
-        callback: function(success) {
-          queryResult = success.results;
-        }
-      };
-
-      mockDataQueryService.queryResult = [{
-        id: "1",
-        category: "category",
-        subject: "blah"
-      }];
-
-      scope.primarySubjectSelect2Adapter.query(query);
-      expect(queryResult).toEqual(mockDataQueryService.queryResult);
-    });
-
-    it("should init selection with a cached result", function() {
-
-      //add item to queryResults cache
-      scope.queryResults['subjects.primary'] = [{
-        id: "1",
-        category: "category",
-        subject: "blah"
-      }];
-
-      //override element to val to return the id of the item that should be found
-      scope.primarySubjectSelect2Adapter.elementToVal = function(e) {
-        return "1";
-      };
-
-      var domElement = {};
-      var foundSubject = "not found";
-
-      scope.primarySubjectSelect2Adapter.initSelection(domElement, function(s) {
-        foundSubject = s;
+    describe("getLicenseTypeUrl", function () {
+      it("returns undefined if licenseType is empty", function () {
+        expect(scope.getLicenseTypeUrl("")).toEqual(undefined);
       });
-
-      expect(foundSubject).toEqual({
-        id: "1",
-        category: 'category',
-        subject: 'blah'
+      it("returns licenseType url if licenseType is string", function () {
+        expect(scope.getLicenseTypeUrl("CC")).toEqual("/assets/images/licenseTypes/CC.png");
       });
     });
   });
 
+  describe("save", function(){
+    beforeEach(function(){
+      makeProfileController();
+      scope.$apply();
+      mockItemService.fineGrainedSaveCalls = [];
+    });
+    it("is triggered when a property of profile is changed", function(){
+      scope.item.profile.someProperty = "some value";
+      scope.$apply();
+      expect(mockItemService.fineGrainedSaveCalls.length).toEqual(1);
+    });
+    it("is not triggered when a property of item is changed", function(){
+      scope.item.someProperty = "some value";
+      scope.$apply();
+      expect(mockItemService.fineGrainedSaveCalls.length).toEqual(0);
+    });
+  });
+
+  describe("additional copyrights", function(){
+    function profileWithAdditionalCopyright(item){
+      return {profile: {contributorDetails: {additionalCopyrights: [item]}}};
+    }
+
+    it("should be initialised with empty list", function(){
+      makeProfileController();
+      expect(scope.contributorDetails.additionalCopyrights).toEqual([]);
+    });
+
+    describe("on load", function(){
+      it("should remove empty items", function(){
+        mockItemService.loadResult = profileWithAdditionalCopyright({});
+        makeProfileController();
+        expect(scope.contributorDetails.additionalCopyrights).toEqual([]);
+      });
+
+      it("should not remove items with content", function(){
+        mockItemService.loadResult = profileWithAdditionalCopyright({author: "Albert Einstein"});
+        makeProfileController();
+        expect(scope.contributorDetails.additionalCopyrights).toEqual([{author: "Albert Einstein"}]);
+      });
+    });
+  });
 
 });

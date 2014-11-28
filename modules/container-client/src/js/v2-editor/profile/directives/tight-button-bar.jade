@@ -1,0 +1,9 @@
+.tight-button-bar
+  .btn-group
+    button.btn.btn-default(
+     ng-repeat="b in buttonProvider",
+     type="button",
+     ng-click="toggle(b)",
+     onmouseout="this.blur()",
+     ng-class="{ active: selected(b)}")
+      | {{getValue(b)}}
