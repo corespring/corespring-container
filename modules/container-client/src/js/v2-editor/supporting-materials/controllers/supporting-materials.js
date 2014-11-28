@@ -36,7 +36,7 @@ var controller = function($element, $filter, $http, $location, $q, $modal, $log,
 
         var onError = function(error) {
           uploadModal.dismiss();
-          alert('There was an error uploading the Supporting Material');
+          window.alert('There was an error uploading the Supporting Material');
         };
 
         $scope.createFile(supportingMaterial, onProgress, onFinished, onError);

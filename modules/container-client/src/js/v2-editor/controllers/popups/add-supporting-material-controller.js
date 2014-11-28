@@ -6,7 +6,7 @@ angular.module('corespring-editor.controllers').controller('AddSupportingMateria
 
     var logger = LogFactory.getLogger('AddSupportingMaterialPopupController');
 
-    $scope.supportingMaterial = {method: 'uploadFile'};
+    $scope.supportingMaterial = {method: 'createHtml'};
 
     function isUploadFileEmpty() {
       return $scope.supportingMaterial.method === 'uploadFile' && _.isEmpty($scope.supportingMaterial.fileToUpload);
