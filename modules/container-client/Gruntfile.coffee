@@ -2,7 +2,6 @@ _ = require "lodash"
 componentDependencies = require "./grunt/lib/component-dependencies"
 appConfigBuilder = require './grunt/lib/app-config-builder'
 
-
 ###
 Configs...
 ###
@@ -65,6 +64,11 @@ module.exports = (grunt) ->
 
   comps = prepend.bind( null, '<%= common.dist %>/bower_components/')
 
+  getFiles = (patterns) ->
+    grunt.log.writeln(patterns)
+    grunt.log.writeln(grunt.file.expand({},patterns))
+    grunt.file.expand({}, patterns)
+
   config =
     pkg: grunt.file.readJSON('package.json')
     common: common
@@ -105,7 +109,7 @@ module.exports = (grunt) ->
       files: 
         src: [
           '<%= common.dist %>/bower_components/msgr.js/dist/msgr.js',
-          "<%= common.app %>/**/player-launcher/*.js",
+          '<%= common.app %>/**/player-launcher/*.js'
         ]
         dest: '<%= common.tmp %>/wrapped/player-launcher-wrapped.js'
 
@@ -119,8 +123,9 @@ module.exports = (grunt) ->
           '<%= common.app %>/js/libs/*.js',
           '<%= common.app %>/js/render/**/*.js',
           '<%= common.app %>/js/rig/**/*.js',
-          '<%= common.tmp %>/wrapped/player-launcher-wrapped.js',
-          '!<%= common.app %>/js/**/player-launcher/*.js']
+          '<%= common.app %>/js/v2-catalog/**/*.js',
+          '<%= common.app %>/js/v2-editor/**/*.js'
+          ]
         options:
           keepRunner: true
           vendor: _.map(['angular/angular.js',
@@ -132,8 +137,9 @@ module.exports = (grunt) ->
             'bootstrap/dist/js/bootstrap.min.js',
             'angular-ui-bootstrap-bower/ui-bootstrap-tpls.js',
             'msgr.js/dist/msgr.js'], comps)
-          specs: '<%= common.test %>/js/**/*-test.js'
-
+          specs: getFiles([
+            common.test + "/js/**/*-test.js",
+            "!" + common.test + "/js/player-launcher/*-test.js"])
 
     shell:
       mathjax_rm_pngs:

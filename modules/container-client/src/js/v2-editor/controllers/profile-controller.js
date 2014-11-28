@@ -64,7 +64,7 @@
         return item.id;
       },
 
-      getVal: function(){
+      getVal: function(element){
         return $(element).val();
       },
 
@@ -77,7 +77,7 @@
       },
 
       initSelection: function(element, callback) {
-        var val = this.getVal();
+        var val = this.getVal(element);
         var ids = val.split(',');
         var results = [];
         ids.forEach(function(id) {

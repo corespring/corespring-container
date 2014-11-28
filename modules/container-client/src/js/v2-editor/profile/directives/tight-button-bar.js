@@ -12,7 +12,6 @@ angular.module('corespring-editor.directives')
   function($log) {
     return {
       restrict: 'E',
-      link: link,
       replace: true,
       scope: {
         buttonProvider: '=',

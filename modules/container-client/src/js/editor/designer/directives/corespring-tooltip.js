@@ -8,7 +8,7 @@
     };
   };
 
-  angular.module('corespring-editor.directives').directive('corespringTooltip', [
+  angular.module('corespring-v1-editor.directives').directive('corespringTooltip', [
     function () {
       var def;
       def = {
