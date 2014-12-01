@@ -14,6 +14,7 @@ angular.module('corespring-editor.controllers')
     'ComponentImageService',
     'ComponentToWiggiwizFeatureAdapter',
     'ComponentData',
+    'AppState',
     function($scope,
       $modal,
       $element,
@@ -27,13 +28,15 @@ angular.module('corespring-editor.controllers')
       WiggiLinkFeatureDef,
       ComponentImageService,
       ComponentToWiggiwizFeatureAdapter,
-      ComponentData) {
+      ComponentData,
+      AppState) {
 
       var configPanels = {};
 
       var logger = LogFactory.getLogger('QuestionController');
 
-      $scope.previewOn = false;
+      $scope.previewOn = AppState.question.preview || false;
+
       $scope.showSummaryFeedback = false;
 
       $scope.togglePreview = function() {
