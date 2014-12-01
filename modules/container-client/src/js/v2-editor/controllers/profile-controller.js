@@ -83,7 +83,7 @@
         ids.forEach(function(id) {
           findItemById("standards", id, function(item) {
             results.push(item);
-            if (results.length === ids.length) {
+            if (ids.length === results.length) {
               callback(results);
             }
           });
@@ -154,7 +154,7 @@
     function findItemById(topic, id, callback) {
 
       var local = _.find($scope.queryResults[topic], function(r) {
-        return r.id === id;
+        return id === r.id;
       });
       if (local) {
         callback(local);
@@ -261,7 +261,7 @@
     });
 
     function updateCredentialsOtherSelected() {
-      var otherSelected = $scope.contributorDetails && $scope.contributorDetails.credentials === 'Other';
+      var otherSelected = $scope.contributorDetails && 'Other' === $scope.contributorDetails.credentials;
       if ($scope.isCredentialsOtherSelected && !otherSelected) {
         $scope.contributorDetails.credentialsOther = '';
       }
@@ -287,11 +287,11 @@
 
       if (keySkills) {
 
-        if (keySkills.length > 0) {
+        if (0 < keySkills.length) {
           count = keySkills.length;
         }
 
-        if (keySkills.length === 1) {
+        if (1 === keySkills.length) {
           skills = "Skill";
         }
       }
@@ -312,7 +312,7 @@
     });
 
     function updatePriorUseOtherSelected() {
-      var otherSelected = $scope.profile && $scope.profile.priorUse === 'Other';
+      var otherSelected = $scope.profile && 'Other' === $scope.profile.priorUse;
       if ($scope.isPriorUseOtherSelected && !otherSelected) {
         $scope.profile.priorUseOther = '';
       }
@@ -345,7 +345,7 @@
       var otherSelected = false;
       if ($scope.reviewsPassedDataProvider) {
         otherSelected = _.some($scope.reviewsPassedDataProvider, function(item) {
-          return item.selected && item.key === 'Other';
+          return item.selected && 'Other' === item.key;
         });
       }
       if ($scope.isReviewsPassedOtherSelected && !otherSelected && $scope.profile) {
@@ -370,15 +370,15 @@
         return selectedKeys.indexOf(key) >= 0;
       }
 
-      if (changedKey === "None") {
+      if ("None"  === changedKey) {
         if (keyIsSelected(changedKey)) {
           selectedKeys = ["None"];
         }
-      } else if (changedKey === "All") {
+      } else if ("All" === changedKey) {
         if (keyIsSelected(changedKey)) {
           var isOtherSelected = keyIsSelected("Other");
           selectedKeys = getKeys(function(item) {
-            return item.key !== "None" && (item.key !== "Other" || isOtherSelected);
+            return "None" !== item.key && ("Other" !== item.key || isOtherSelected);
           });
         }
       } else {
