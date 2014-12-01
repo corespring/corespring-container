@@ -104,7 +104,7 @@ html(xmlns="http://www.w3.org/1999/html")
           var logFn = (function(){
             if(params.logCategory){
               return loggers.filtering(params.logCategory);
-            } else if(params.loggingEnabled){
+            } else if(params.loggingEnabled === 'true'){
               return loggers.passThrough;
             } else {
               return loggers.empty;
@@ -114,8 +114,14 @@ html(xmlns="http://www.w3.org/1999/html")
           $provide.decorator('LogFactory', function($delegate){
             return {
               getLogger: function(n){
-                var matches = new RegExp('.*' + params.logCategory + '.*').test(n);
-                if(matches){
+                if(params.logCategory){
+                  var matches = new RegExp('.*' + params.logCategory + '.*').test(n);
+                  if(matches){
+                    return $delegate.getLogger(n);
+                  } else {
+                    return loggers.empty($delegate.getLogger(n));
+                  }
+                } else if(params.loggingEnabled === 'true'){
                   return $delegate.getLogger(n);
                 } else {
                   return loggers.empty($delegate.getLogger(n));

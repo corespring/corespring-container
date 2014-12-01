@@ -1,8 +1,5 @@
 (function() {
 
-  // Caches ids of elements that were previously clean.
-  //var cleanCache = [];
-
   angular.module('corespring-editor.directives').directive('corespringPreviewPlayer', [
     '$compile', 
     'LogFactory',
@@ -27,15 +24,27 @@
         * ComponentData TODO: 
         * submit answer - update session
         * reset session
+
+        * 1. 
         */
+
+
       function link($scope, $element, $attrs){
+ 
+        var rendered = {};
 
         var renderMarkup = function(xhtml) {
+          logger.debug('[renderMarkup]...');
+
+          $element.find('.player-body').addClass('hidden-player-body');
+
           if ($scope.lastScope) {
             $scope.lastScope.$destroy();
           }
+          
           $scope.lastScope = $scope.$new();
-          var $body = $element.find(".player-body").html(xhtml);
+          
+          var $body = $element.find('.player-body').html(xhtml);
           
           $compile($body)($scope.lastScope);
 
@@ -47,56 +56,67 @@
           MathJaxService.parseDomForMath(0, $element.find('.player-body')[0]);
         };
 
-        var renderedOnce = false;
-        $scope.$watch('xhtml', function(xhtml, oldXhtml) {
 
-          var isEqual = _.isEqual(xhtml, oldXhtml);
-          if (xhtml && !isEqual && $scope.components) {
-            logger.debug('xhtml', xhtml);
+        function updateUi(){
+          
+          logger.debug('[updateUi]');
 
-            if(!renderedOnce){
-              renderMarkup(xhtml);
-              renderedOnce = true;
-            }
-          }
-        });
-
-        $scope.$watch('components', function(newData, oldData){
-
-          if(_.isEqual(newData, oldData)){
-            logger.debug('data is the same - skip update');
+          if(!$scope.xhtml){
+            return;
           }
 
-          logger.debug('-----> update data and sessions');
+          if(!$scope.components){
+            return;
+          }
 
-          _.forIn(newData, function(model, id){
+          var isEqual = _.isEqual($scope.xhtml, rendered.xhtml);
+          
+          if (!isEqual) {
+            logger.debug('[updateUi] xhtml', $scope.xhtml);
+            renderMarkup($scope.xhtml);
+            rendered.xhtml = _.cloneDeep($scope.xhtml);
+          }
 
-            if(_.isEqual(model, oldData ? oldData[id] : null)){
-              logger.debug('id', id, 'data is same skip...');
+          if(_.isEqual($scope.components, rendered.components)){
+            logger.debug('[updateUi] components are the same - skip update');
+            return;
+          }
+
+          _.forIn($scope.components, function(model, id){
+            if(_.isEqual(model, rendered.components ? rendered.components[id] : null)){
+              logger.debug('[updateUi] id', id, 'data is same skip...');
             } else {
+              logger.debug('[updateUi] id', id, 'updating...');
               ComponentData.updateComponent(id, model);
             }
           });
+
+          rendered.components = _.cloneDeep($scope.components);
+        }
+
+        var debouncedUpdateUi = debounce(updateUi);
+
+        function debounce(fn){
+          return _.debounce(fn, 300, {leading: false, trailing: true});
+        }
+
+        $scope.$watch('xhtml', function() {
+          debouncedUpdateUi();
+        });
+
+        $scope.$watch('components', function(){
+          debouncedUpdateUi();
         }, true);
-
-        /*$scope.$watch('session', function(session, oldSession) {
-
-          logger.debug('session', session);
-
-          if ($scope.mode !== "player" && !session) {
-            $scope.session = {};
-          }
-
-        }, true);*/
 
         $scope.$watch('outcomes', function(r) {
           if (!r) {
             return;
           }
           ComponentData.setOutcomes(r);
-          //MathJaxService.parseDomForMath();
+          MathJaxService.parseDomForMath();
         }, true);
 
+        debouncedUpdateUi();
       }
 
       return {
@@ -110,10 +130,9 @@
         },
         template : [
           '<div class="corespring-player">',
-          '  <h1>New preview player!</h1>',
           '  <div class="player-body hidden-player-body"></div>',
           '</div>'
-        ].join("\n"),
+        ].join('\n'),
         replace: true
       };
     }

@@ -29,6 +29,8 @@ angular.module('corespring-editor.controllers')
       ComponentToWiggiwizFeatureAdapter,
       ComponentData) {
 
+      var configPanels = {};
+
       var logger = LogFactory.getLogger('QuestionController');
 
       $scope.previewOn = false;
@@ -80,11 +82,7 @@ angular.module('corespring-editor.controllers')
 
             logger.debug('weights are different - save');
             //TODO - only update the weights?
-            ItemService.fineGrainedSave({
-              components: $scope.item.components
-            }, function(item) {
-              $scope.item.components = item.components;
-            });
+            saveComponents();
           }
         }
 
@@ -95,11 +93,6 @@ angular.module('corespring-editor.controllers')
         modalInstance.result.then(onScoringComplete, onScoringDismiss);
       };
 
-      var configPanels = {};
-
-      $scope.removedComponents = {};
-
-      $scope.editorMode = "visual";
 
       $scope.imageService = ComponentImageService;
 
@@ -262,10 +255,17 @@ angular.module('corespring-editor.controllers')
         }
       });
 
-      $scope.$on('save-data', function(event) {
-        $scope.save();
-      });
+      $scope.onItemSaved = function(){
 
+      };
+
+      function saveComponents(){
+        logger.debug('[saveComponents]');
+        ItemService.fineGrainedSave(
+          {components: $scope.serialize($scope.item.components)}, 
+          $scope.onItemSaved, 
+          $scope.onItemSaveError);
+      }
 
       $scope.$on('itemAdded', function(event, $node) {
         // This ends up in some weird race condition if we don't wrap it in a $timeout
@@ -273,25 +273,6 @@ angular.module('corespring-editor.controllers')
           angular.element('.wiggi-wiz', $element).scope().focusCaretAtEnd();
         });
       });
-
-      $scope.save = function(callback) {
-        logger.log('Saving...');
-        var cleaned = $scope.serialize($scope.item.components);
-        /*for (var key in cleaned) {
-          if (!ComponentRegister.hasComponent(key)) {
-            delete cleaned[key];
-          }
-        }*/
-        throw new Error('refactoring');
-        /*ItemService.save({
-            components: cleaned,
-            xhtml: $scope.item.xhtml,
-            summaryFeedback: $scope.isSummaryFeedbackSelected ? $scope.item.summaryFeedback : ""
-          },
-          $scope.onItemSaved,
-          $scope.onItemSaveError,
-          $scope.itemId);*/
-      };
 
       $scope.serialize = function(comps) {
         if (!configPanels) {
@@ -301,9 +282,9 @@ angular.module('corespring-editor.controllers')
         var newModel = _.cloneDeep(comps);
 
         function storeComponentModelInNewModel(value, key) {
-          var component = configPanels[key];
-          if (component && component.getModel) {
-            newModel[key] = component.getModel();
+          var configPanel = configPanels[key];
+          if (configPanel && configPanel.getModel) {
+            newModel[key] = configPanel.getModel();
           }
         }
 
@@ -325,7 +306,16 @@ angular.module('corespring-editor.controllers')
         }
       });
 
-      $scope.$watch('item.xhtml', throttle(function(oldValue, newValue) {
+      $scope.$watch('item.components', debounce(function(newComps, oldComps){
+
+        if(_.isEqual(newComps, oldComps)){
+          logger.debug('they are the same - ignore...');
+          return;
+        }
+        saveComponents();
+      }), true);
+
+      $scope.$watch('item.xhtml', debounce(function(oldValue, newValue) {
         logger.debug('old', oldValue);
         if (oldValue !== newValue) {
           ItemService.fineGrainedSave({
@@ -334,7 +324,7 @@ angular.module('corespring-editor.controllers')
         }
       }));
 
-      $scope.$watch('item.summaryFeedback', throttle(function(oldValue,
+      $scope.$watch('item.summaryFeedback', debounce(function(oldValue,
         newValue) {
         logger.debug('old', oldValue);
         if (oldValue !== newValue) {
@@ -344,8 +334,8 @@ angular.module('corespring-editor.controllers')
         }
       }));
 
-      function throttle(fn) {
-        return _.throttle(fn, 500, {
+      function debounce(fn) {
+        return _.debounce(fn, 500, {
           trailing: true,
           leading: false
         });
