@@ -9,10 +9,10 @@
 
           return function ($scope, $element, attr) {
 
-            $scope.showPreviewButton = (attr.showPreviewButton == undefined) ? false : (attr.showPreviewButton == 'true');
-            $scope.showSettingsButton = (attr.showSettingsButton == undefined) ? false : (attr.showSettingsButton == 'true');
-            $scope.showSubmitButton = (attr.showSubmitButton == undefined) ? true : (attr.showSubmitButton == 'true');
-            $scope.showScore = (attr.showScore == undefined) ? true : (attr.showScore == 'true');
+            $scope.showPreviewButton = (attr.showPreviewButton === undefined) ? false : (attr.showPreviewButton === 'true');
+            $scope.showSettingsButton = (attr.showSettingsButton === undefined) ? false : (attr.showSettingsButton === 'true');
+            $scope.showSubmitButton = (attr.showSubmitButton === undefined) ? true : (attr.showSubmitButton === 'true');
+            $scope.showScore = (attr.showScore === undefined) ? true : (attr.showScore === 'true');
 
 
             $scope.settingsEnabled = {
