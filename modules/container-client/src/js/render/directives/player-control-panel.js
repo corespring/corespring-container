@@ -9,6 +9,12 @@
 
           return function ($scope, $element, attr) {
 
+            $scope.showPreviewButton = (attr.showPreviewButton == undefined) ? false : (attr.showPreviewButton == 'true');
+            $scope.showSettingsButton = (attr.showSettingsButton == undefined) ? false : (attr.showSettingsButton == 'true');
+            $scope.showSubmitButton = (attr.showSubmitButton == undefined) ? false : (attr.showSubmitButton == 'true');
+            $scope.showScore = (attr.showScore == undefined) ? true : (attr.showScore == 'true');
+
+
             $scope.settingsEnabled = {
               maxNoOfAttempts: true,
               highlightUserResponse: true,
@@ -57,10 +63,6 @@
 
             $scope.hasScore = function hasScore() {
               return $scope.score && $scope.score.summary;
-            };
-
-            $scope.isPreviewButtonVisible = function() {
-              return $scope.showPreviewButton !== "false";
             };
 
             function initConfigPopover() {
@@ -153,27 +155,29 @@
             settings: '=',
             mode: '=',
             score: '=',
-            showPreviewButton: '@'
+            showPreviewButton: '@',
+            showSettingsButton: '@',
+            showSubmitButton: '@'
           },
           template: [
             '<div class="control-panel">',
-            '  <div class="action-holder" ng-show="isPreviewButtonVisible(showPreviewButton)">',
+            '  <div class="action-holder" ng-show="showPreviewButton">',
             '    <button class="btn action preview" ng-click="preview()">Preview</button>',
             '  </div>',
-            '  <div class="header action-holder pull-right">',
+            '  <div class="header action-holder pull-right" ng-show="showScore">',
             '    <div class="score">',
             '      <label ng-show="hasScore()">Score:</label>',
             '      <span ng-show="hasScore()">{{score.summary.percentage}}%</span>',
             '    </div>',
-            '    <div class="action config">',
+            '    <div class="action config" ng-show="showSettingsButton">',
             '      <a title="Settings">',
             '        <i class="fa fa-cog" />',
             '      </a>',
             '    </div>',
             '  </div>',
-            '  <div class="playerholder" ></div>', // Player
-            '  <div class="pull-right">',
-            '    <button  ng-class="playerButtonSettings.class" ng-click="updatePlayer();">',
+            '  <div class="playerholder"></div>', // Player
+            '  <div class="pull-right" ng-show="showSubmitButton">',
+            '    <button ng-class="playerButtonSettings.class" ng-click="updatePlayer();">',
             '        {{playerButtonSettings.text}}',
             '    </button>',
             '  </div>',

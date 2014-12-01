@@ -16,7 +16,8 @@ block content
 
       div(ng-controller="ContainerPlayerController")
         div(ng-controller="Main")
-          div(player-control-panel,data-mode='playerMode', data-settings='playerSettings', data-score="score", show-preview-button="{{showPreviewButton}}")
+          div(player-control-panel,data-mode='playerMode', data-settings='playerSettings',
+              data-score="score", show-settings-button="true")
           
           div(
             corespring-player='corespring-player', 
@@ -27,6 +28,10 @@ block content
               player-outcomes='outcome')
               != xhtml
             summary-feedback(item="item",session="session")
+
+          div(player-control-panel, data-mode='playerMode', data-settings='playerSettings',
+              data-score="score", show-submit-button="true", show-score="false")
+
     else 
       div(ng-controller='Main')
         div(
