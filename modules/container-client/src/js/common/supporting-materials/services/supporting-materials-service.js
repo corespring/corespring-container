@@ -6,7 +6,12 @@
     function getUrl(supportingMaterials, index) {
       if (supportingMaterials) {
         var material = supportingMaterials[index];
-        return (material.id || material.name)+ "/" + self.getSupportingMaterialFile(supportingMaterials, index).name;
+        var file = self.getSupportingMaterialFile(supportingMaterials, index);
+        if (file) {
+          return (material.id || material.name) + "/" + file.name;
+        } else {
+          return undefined;
+        }
       } else {
         return undefined;
       }
@@ -74,12 +79,12 @@
     };
 
     this.getSupportingUrl = function(supportingMaterials, index) {
-      console.log("getting s m url", supportingMaterials, index);
       return $sce.trustAsResourceUrl(getUrl(supportingMaterials, index));
     };
 
     this.getContentType = function(supportingMaterials, index) {
-      return self.getSupportingMaterialFile(supportingMaterials, index).contentType;
+      var file = self.getSupportingMaterialFile(supportingMaterials, index);
+      return file ? file.contentType : undefined;
     };
 
     /**
