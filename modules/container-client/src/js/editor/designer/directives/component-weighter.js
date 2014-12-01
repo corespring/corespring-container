@@ -1,4 +1,4 @@
-angular.module('corespring-editor.directives').directive('componentWeights', [
+angular.module('corespring-v1-editor.directives').directive('componentWeights', [
   '$log',
   function($log) {
 
@@ -120,7 +120,7 @@ angular.module('corespring-editor.directives').directive('componentWeights', [
 ]);
 
 
-angular.module('corespring-editor.directives').directive('numberValidation', ['$log',
+angular.module('corespring-v1-editor.directives').directive('numberValidation', ['$log',
 
   function($log) {
     var onlyNumbers = /^\d+$/;
@@ -155,7 +155,7 @@ angular.module('corespring-editor.directives').directive('numberValidation', ['$
   }
 ]);
 
-angular.module('corespring-editor.directives').directive('componentWeightInput', [
+angular.module('corespring-v1-editor.directives').directive('componentWeightInput', [
   '$log', '$timeout',
   function($log, $timeout) {
 

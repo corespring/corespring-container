@@ -1,4 +1,5 @@
-angular.module('corespring-editor.directives').directive('additionalCopyrightInformationForProfile', [
+angular.module('corespring-editor.directives')
+  .directive('additionalCopyrightInformationForProfile', [
   'DataQueryService',
   function(DataQueryService) {
     return {
@@ -8,6 +9,7 @@ angular.module('corespring-editor.directives').directive('additionalCopyrightInf
         prompt: '@'
       },
       replace: true,
+      templateUrl: "/v2-editor/profile/directives/additional-copyright-information-for-profile.html",
       link: function($scope) {
 
         $scope.hasCopyrightItems = function() {
@@ -67,8 +69,7 @@ angular.module('corespring-editor.directives').directive('additionalCopyrightInf
           }
         });
 
-      },
-      templateUrl: "/v2-editor/profile/directives/additional-copyright-information-for-profile.html"
+      }
     };
   }
 ]);
