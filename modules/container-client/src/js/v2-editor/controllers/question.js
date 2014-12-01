@@ -293,19 +293,6 @@ angular.module('corespring-editor.controllers')
         return newModel;
       };
 
-      $scope.$on('mathJaxUpdateRequest', function() {
-        throw new Error('todo..');
-        //MathJaxService.parseDomForMath();
-      });
-
-      $scope.isSummaryFeedbackSelected = false;
-
-      $scope.$watch("isSummaryFeedbackSelected", function(newValue, oldValue) {
-        if (!newValue && newValue !== oldValue) {
-          $scope.item.summaryFeedback = "";
-        }
-      });
-
       $scope.$watch('item.components', debounce(function(newComps, oldComps){
 
         if(_.isEqual(newComps, oldComps)){

@@ -22,14 +22,9 @@ angular.module('corespring-editor.controllers')
         });
       }
 
-      function updateSummaryFeedback(item) {
-        $scope.isSummaryFeedbackSelected = !!item.summaryFeedback;
-      }
-
       $scope.onItemLoaded = function(item){
         $scope.item = item;
         preprocessComponents(item);
-        updateSummaryFeedback(item);
         var max = 0;
         $('<div>' + $scope.item.xhtml + '</div>').find('[id]').each(function(idx, element) {
           var id = Number($(element).attr('id'));
