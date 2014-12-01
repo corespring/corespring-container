@@ -11,7 +11,7 @@ script( type="text/ng-template", id="/templates/popups/addSupportingMaterial")
         dt Source
         dd
           input(id='create', type='radio', value='createHtml', ng-model='supportingMaterial.method')
-          label(for='create') create your own
+          label.create-own(for='create') create your own
           input(id='upload', type='radio', value='uploadFile', ng-model='supportingMaterial.method')
           label(for='upload') upload a file
           input(type='file', fileChange="",ng-show="supportingMaterial.method == 'uploadFile'")
