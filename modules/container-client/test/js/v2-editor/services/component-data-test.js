@@ -1,6 +1,6 @@
 describe('component data', function() {
 
-  var componentData;
+  /*var componentData;
 
   beforeEach(angular.mock.module('corespring-editor.services'));
 
@@ -15,5 +15,5 @@ describe('component data', function() {
 
   it('should init', function() {
     expect(componentData).toNotBe(null);
-  });
+  });*/
 });

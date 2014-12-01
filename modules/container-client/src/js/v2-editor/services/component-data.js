@@ -1,16 +1,16 @@
 angular.module('corespring-editor.services')
   .service('ComponentData', [
     'LogFactory',
-    function(LogFactory) {
+    'ComponentRegister',
+    function(LogFactory, ComponentRegister) {
 
       var logger = LogFactory.getLogger('component-data');
 
       function ComponentData() {
-        var components,
-          removedComponents = {},
+        var componentModels,
+          removedComponentModels = {},
           placeholders = {},
-          mockSession = {},
-          bridges = {};
+          mockSession = {};
 
         function getNextAvailableId(){
 
@@ -18,39 +18,70 @@ angular.module('corespring-editor.services')
           var id = 0;
 
           do{
-            if(!_.has(components, id.toString()) && !_.has(removedComponents, id.toString())){
+            if(!_.has(componentModels, id.toString()) && !_.has(removedComponentModels, id.toString())){
               idFound = true;
             }
             id++;
-          } while(!idFound);
+          } while(!idFound && id < 100);
 
           return id;
         }
 
+        this.getSessions = function(){
+          return ComponentRegister.getSessions();
+        };
+
+        this.setMode = function(mode){
+          ComponentRegister.setMode(mode);
+        };
+
+        this.setEditable = function(isEditable){
+          ComponentRegister.setEditable(isEditable);
+        };
+
+        this.reset = function() {
+          ComponentRegister.reset();
+        };
+
+        this.updateComponent = function(id, model){
+          
+          _.forIn(mockSession[id], function(value, key){
+            delete mockSession[id][key];
+          });
+
+          ComponentRegister.setSingleDataAndSession(id, model, mockSession[id]);
+        };
+
+        this.setOutcomes = function(outcomes) {
+          ComponentRegister.setOutcomes(outcomes);
+        };
+
         this.setModel = function(model) {
-          components = model;
+          componentModels = model;
 
           _.forIn(placeholders, function(p, id) {
-            p.setComponent(components[id]);
+            p.setComponent(componentModels[id]);
           });
         };
 
         this.registerPlaceholder = function(id, placeholder) {
           placeholders[id] = placeholder;
-          placeholder.setComponent(components[id]);
+          placeholder.setComponent(componentModels[id]);
         };
 
         this.registerComponent = function(id, bridge) {
-          bridges[id] = bridge;
+          ComponentRegister.registerComponent(id, bridge);
           mockSession[id] = mockSession[id] || {};
-          bridge.setDataAndSession({
-            data: components[id], 
-            session: mockSession[id]
-          });
+          ComponentRegister.setSingleDataAndSession(id, componentModels[id], mockSession[id]);
         };
 
-        this.addComponent = function(defaultData){
-          if(!components){
+        this.addComponent = function(d){
+          console.warn('@deprecated use "addComponentModel" instead');
+          this.addComponentModel(d);
+        };
+
+        this.addComponentModel = function(defaultData){
+          if(!componentModels){
             throw new Error('components aren\'t defined yet.');
           }
 
@@ -62,42 +93,42 @@ angular.module('corespring-editor.services')
           };
 
           var newData = _.extend(defaults, _.cloneDeep(defaultData));
-          components[id] = newData;
+          componentModels[id] = newData;
           return id;
         };
 
         this.deleteComponent = function(id){
-          if(!components) {
+          if(!componentModels) {
             throw new Error('no components');
           }   
           
-          if(!components[id]) {
+          if(!componentModels[id]) {
             throw new Error('no component with id', id);
           }   
 
-          removedComponents[id] = _.cloneDeep(components[id]);
-          delete components[id];
+          removedComponentModels[id] = _.cloneDeep(componentModels[id]);
+          delete componentModels[id];
         };
 
         this.restoreComponent = function(id){
-          if(!components) {
+          if(!componentModels) {
             throw new Error('no components');
           }   
           
-          if(!removedComponents[id]) {
+          if(!removedComponentModels[id]) {
             throw new Error('no component with id', id);
           }   
 
-          if(_.has(components, id)){
+          if(_.has(componentModels, id)){
             throw new Error('There is already a component with that id');
           }
 
-          if(!_.has(removedComponents, id)){
+          if(!_.has(removedComponentModels, id)){
             throw new Error('There is no component with that id to restore');
           }
 
-          components[id] = removedComponents[id];
-          delete removedComponents[id];
+          componentModels[id] = removedComponentModels[id];
+          delete removedComponentModels[id];
         };
       }
 

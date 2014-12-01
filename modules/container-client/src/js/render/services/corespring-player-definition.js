@@ -62,7 +62,7 @@ angular.module('corespring-player.services').factory('CorespringPlayerDefinition
         };
 
         var setDataAndSession = function() {
-          if (!$scope.xhtml || !$scope.components || !$scope.session) {
+          if (!$scope.item || !$scope.session) {
             return;
           }
 
@@ -73,7 +73,7 @@ angular.module('corespring-player.services').factory('CorespringPlayerDefinition
 
           $log.debug("corespring player definition setDataAndSession rendering");
 
-          var allData = PlayerUtils.zipDataAndSession($scope.components, $scope.session);
+          var allData = PlayerUtils.zipDataAndSession($scope.item, $scope.session);
           ComponentRegister.setDataAndSession(allData);
           rendered = true;
 
@@ -116,16 +116,12 @@ angular.module('corespring-player.services').factory('CorespringPlayerDefinition
 
         $scope.$watch('xhtml', function(xhtml) {
           if (xhtml) {
-            //log.debug('..');
             renderMarkup(xhtml);
           }
         });
 
-        $scope.$watch('components', function(components) {
-          $log.debug('components: ', components);
-          if(components){
-            setDataAndSession();
-          }
+        $scope.$watch('item', function(item) {
+          setDataAndSession();
         }, true);
 
         $scope.$watch('session', function(session, oldSession) {
@@ -156,7 +152,7 @@ angular.module('corespring-player.services').factory('CorespringPlayerDefinition
       this.scope = {
         mode: '@playerMode',
         xhtml: '=playerMarkup',
-        components: '=playerComponents',
+        item: '=playerItem',
         outcomes: '=playerOutcomes',
         session: '=playerSession'
       };

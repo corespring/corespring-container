@@ -6,10 +6,9 @@
   angular.module('corespring-editor.directives').directive('corespringPreviewPlayer', [
     '$compile', 
     'LogFactory',
-    'ComponentRegister',
-    'PlayerUtils',
+    'ComponentData',
     'MathJaxService',
-    function($compile, LogFactory, ComponentRegister, PlayerUtils, MathJaxService) {
+    function($compile, LogFactory, ComponentData, MathJaxService) {
 
       var logger = LogFactory.getLogger('corespring-preview-player');
 
@@ -48,16 +47,39 @@
           MathJaxService.parseDomForMath(0, $element.find('.player-body')[0]);
         };
 
+        var renderedOnce = false;
         $scope.$watch('xhtml', function(xhtml, oldXhtml) {
 
           var isEqual = _.isEqual(xhtml, oldXhtml);
           if (xhtml && !isEqual && $scope.components) {
             logger.debug('xhtml', xhtml);
-            renderMarkup(xhtml);
+
+            if(!renderedOnce){
+              renderMarkup(xhtml);
+              renderedOnce = true;
+            }
           }
         });
 
-        $scope.$watch('session', function(session, oldSession) {
+        $scope.$watch('components', function(newData, oldData){
+
+          if(_.isEqual(newData, oldData)){
+            logger.debug('data is the same - skip update');
+          }
+
+          logger.debug('-----> update data and sessions');
+
+          _.forIn(newData, function(model, id){
+
+            if(_.isEqual(model, oldData ? oldData[id] : null)){
+              logger.debug('id', id, 'data is same skip...');
+            } else {
+              ComponentData.updateComponent(id, model);
+            }
+          });
+        }, true);
+
+        /*$scope.$watch('session', function(session, oldSession) {
 
           logger.debug('session', session);
 
@@ -65,13 +87,13 @@
             $scope.session = {};
           }
 
-        }, true);
+        }, true);*/
 
         $scope.$watch('outcomes', function(r) {
           if (!r) {
             return;
           }
-          ComponentRegister.setOutcomes(r);
+          ComponentData.setOutcomes(r);
           //MathJaxService.parseDomForMath();
         }, true);
 

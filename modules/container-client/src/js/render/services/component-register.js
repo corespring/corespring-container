@@ -1,114 +1,116 @@
-angular.module('corespring-player.services').factory('ComponentRegister', ['$log', '$rootScope',
+angular.module('corespring-player.services')
+  .factory('ComponentRegister', ['$log', '$rootScope',
   function($log, $rootScope) {
 
     var log = $log.debug.bind($log, '[component-register]');
 
-    var ComponentRegister = function() {
+    var NewRegister = function(){
 
-      var editable = null;
+      var bridges = {};
 
-      var loaded = {};
+      var answerChangedHandler = null;
 
-      var components = {};
+      var isEditable = null;
 
-      var answerChangedHandler = function() {};
+      this.registerComponent = function(id, bridge) {
+        bridges[id] = bridge;
 
-      this.setAnswerChangedHandler = function(cb) {
-        answerChangedHandler = cb;
+        if (bridge.answerChangedHandler && answerChangedHandler) {
+          bridge.answerChangedHandler(answerChangedHandler);
+        }
+
+        if (_.isBoolean(isEditable) && bridge.editable) {
+          $log.debug("init ", id, "to editable: ", isEditable);
+          bridge.editable(isEditable);
+        }
       };
 
-      this.components = components;
-      this.loadedData = {};
-
-      this.registerComponent = function(id, component) {
-        log('registerComponent: ', id);
-
-        components[id] = component;
-
-        if (component.answerChangedHandler && answerChangedHandler) {
-          component.answerChangedHandler(answerChangedHandler);
+      Object.defineProperty(this, 'loadedData', {
+        get: function(){
+          throw new Error('Illegal Access - "loadedData" is no longer allowed');
+        }, 
+        set: function(d){
         }
+      });
 
-        if (editable !== undefined && editable !== null && component.editable) {
-          $log.debug("init ", id, "to editable: ", editable);
-          component.editable(editable);
-        }
+      this.setDataAndSession = function(allData) {
+        console.warn('@deprecated: use "setDataAndSessions(data, sessions)" instead');
+        this.loadedData = allData;
 
-        if(component.setDataAndSession && this.loadedData[id]){
-          component.setDataAndSession(this.loadedData[id]);
-        }
-
+        _.forIn(allData, function(ds, id){
+          if(bridges[id]){
+            bridges[id].setDataAndSession(ds);
+          }
+        });
       };
 
-      this.deleteComponent = function(id) {
-        components[id] = undefined;
-        delete components[id];
+      this.setDataAndSessions = function (data, session){
+        _.forIn(bridges, function(b, key){
+          b.setDataAndSession({data: data[key], session: session[key]});
+        });
+      };
+
+      this.setSingleDataAndSession = function(id, data, session){
+        if(bridges[id]){
+          bridges[id].setDataAndSession({data: data, session: session});
+        }
+      };
+
+      this.getComponentSessions = function(){
+        $log.warn('@deprecated - use "getSessions()" instead');
+        return this.getSessions();
+      };
+
+      this.getSessions = function(){
+        return _.mapValues(bridges, function(b){
+          return b.getSession();
+        });
+      };
+      
+      this.deregisterComponent = function(id) {
+        bridges[id] = undefined;
+        delete bridges[id];
       };
 
       this.hasComponent = function(id) {
-        return !_.isUndefined(components[id]);
-      };
-
-
-
-      /**
-       * @param allData - an object that has the component id as the key and an object
-       *                  that has the following format: { data: {}, session : null || {} }
-       */
-      this.setDataAndSession = function(allData) {
-        this.loadedData = allData;
-        setAndApplyToComponents(allData, "dataAndSession", "setDataAndSession");
-      };
-
-      this.getComponentSessions = function() {
-        var sessions = {};
-
-        for (var x in components) {
-          if(components[x].getSession){
-            var s = components[x].getSession();
-            if (s) {
-              sessions[x] = s;
-            }
-          }
-        }
-        return sessions;
+        return !_.isUndefined(bridges[id]);
       };
 
       this.resetStash = function() {
-        for (var x in components) {
-          if (_.isFunction(components[x].resetStash)) {
-            components[x].resetStash();
-          }
-        }
+        _.forIn(bridges, fn('resetStash'));
       };
 
       this.isAnswerEmpty = function(id) {
-        return !components[id] || components[id].isAnswerEmpty();
+        return !bridges[id] || bridges[id].isAnswerEmpty();
       };
 
       this.hasEmptyAnswers = function() {
         return this.interactionCount() > this.interactionsWithResponseCount();
       };
 
+      var fn = function(fnName, data){
+        return function(bridge, id){
+          if(bridge[fnName]){
+            var d = data ? data[id] : undefined; 
+            bridge[fnName](d);
+          }
+        };
+      };
+
       this.setOutcomes = function(outcomes) {
-        //TODO: https://www.pivotaltracker.com/s/projects/926438/stories/61558258
-        setAndApplyToComponents(outcomes, "outcomes", "setResponse");
+        _.forIn(bridges, fn('setResponse', outcomes));
       };
 
       this.reset = function() {
-        $.each(components, function(id, comp) {
-          if (comp.reset) {
-            comp.reset();
-          }
-        });
+        _.forIn(bridges, fn('reset'));
       };
 
       this.interactionCount = function() {
-        return _.keys(components).length;
+        return _.keys(bridges).length;
       };
 
       this.interactionsWithResponseCount = function() {
-        var answered = _.filter(components, function(c) {
+        var answered = _.filter(bridges, function(c) {
           return !c.isAnswerEmpty();
         });
         return answered.length;
@@ -116,54 +118,24 @@ angular.module('corespring-player.services').factory('ComponentRegister', ['$log
 
       this.setEditable = function(e) {
 
-        editable = e;
+        isEditable = e;
 
-        $.each(components, function(id, c) {
-
-          if (!c.editable) {
-            throw "editable isn't supported";
+        _.forIn(bridges, function(b){
+          if(b.editable){
+            b.editable(isEditable);
           }
-
-          c.editable(editable);
         });
       };
 
       this.setMode = function(mode) {
-        $.each(components, function(id, c) {
-          if (c.setMode) {
-            c.setMode(mode);
+        _.forIn(bridges, function(b){
+          if(b.setMode){
+            b.setMode(mode);
           }
         });
       };
-
-      /**
-       * set the value to the 'loaded' object and apply sub objects out to
-       * the respective components using their uid.
-       * @param value - the value to apply
-       * @param name - the name of the property within the loaded object
-       * @param cb - either a callback function or a string that names a component function to invoke.
-       * If a callback the signature is: function(component, data){}
-       */
-      var setAndApplyToComponents = function(value, name, cb) {
-
-        if (!value) {
-          throw new Error("No data for: " + name);
-        }
-
-        loaded[name] = value;
-
-        if (components) {
-          $.each(components, function(id, component) {
-            if (loaded[name][id]) {
-              component[cb](loaded[name][id]);
-              $rootScope.$broadcast('updatedComponent', id);
-            }
-          });
-        }
-      };
-
     };
 
-    return new ComponentRegister();
+    return new NewRegister();
   }
 ]);

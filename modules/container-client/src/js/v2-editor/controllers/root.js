@@ -7,8 +7,7 @@ angular.module('corespring-editor.controllers')
   'ItemService',
   'LogFactory',
   'ComponentRegister',
-  'PlayerUtils',
-    function($scope, $state, ItemService, LogFactory, ComponentRegister, PlayerUtils) {
+    function($scope, $state, ItemService, LogFactory, ComponentRegister) {
       var logger = LogFactory.getLogger('RootController');
       logger.debug('Root');
 
