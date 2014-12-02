@@ -33,7 +33,9 @@ exports.js =
   src: _.union(coreLibs.js, core.src, editorSrcs)
   dest: 'js/v2-editor-prod.js'
   libs: [
-    'bower_components/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML'
+    'bower_components/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML',
+    '//wzrd.in/standalone/virtual-dom@latest',
+    '//wzrd.in/standalone/vdom-virtualize@latest'
   ]
   report: 'v2-editor-js-report.json'
 

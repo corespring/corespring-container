@@ -1,4 +1,30 @@
+/* global VirtualPatch */ 
 (function() {
+
+  function Type(fn) {
+   this.fn = fn;
+  }
+
+  Type.prototype.hook = function () {
+    this.fn.apply(this, arguments);
+  };
+
+  function hook(fn) {
+    return new Type(fn);
+  }
+  
+  function DomUtil(){
+    var parser = new DOMParser();
+
+    this.stringToElement = function(s){
+      var doc = parser.parseFromString(s, 'application/xml');
+      var errors = doc.querySelectorAll('parsererror');
+
+      if(errors.length === 0){
+        return doc.children[0];
+      } 
+    };
+  } 
 
   angular.module('corespring-editor.directives').directive('corespringPreviewPlayer', [
     '$compile', 
@@ -6,30 +32,73 @@
     'ComponentData',
     'MathJaxService',
     function($compile, LogFactory, ComponentData, MathJaxService) {
-
       var logger = LogFactory.getLogger('corespring-preview-player');
 
-      /**
-        * Performance improvements.
-        * The player rendering is really sluggish and jumpy cos we re compile for every change.
-        * 0. if the player isn't visible - no need to update
-        * 1. when updating text in the editor, we only need to update the text in the player
-        * 2. when updating the data for a component, we only need to update the data for that component
-        * 3. when adding a new components, we only need to compile that node within the player body
-        * 4. when removing a component we only need to remove that node + call $scope.destroy();
-        *
-        * Editor:
-        * 1. When we launch an overlay, we should give the overlay a clone of the data and on close check a diff and merge the data back.
-        *
-        * ComponentData TODO: 
-        * submit answer - update session
-        * reset session
+      function link($scope, $element, $attrs, ngModel){
 
-        * 1. 
-        */
+        var firstRun = true;
+        var rootDom, rootNode;
+        var domUtil = new DomUtil();
+
+        var h = virtualDom.h; //jshint ignore:line
+        var diff = virtualDom.diff; //jshint ignore:line
+        var patch = virtualDom.patch; //jshint ignore:line 
+        var createElement = virtualDom.create; //jshint ignore:line
+        var virtualize = vdomVirtualize; //jshint ignore:line
 
 
-      function link($scope, $element, $attrs){
+        function compileHook(el, prop){
+          $compile(el)($scope.$new());
+        }
+
+        function addHooks(patches){
+
+          var out = {};
+          for(var k in patches){
+            if(k !== 'a'){
+              var p = patches[k];
+
+              if(p.type === VirtualPatch.INSERT && p.patch.tagName.indexOf('coresspring') !== -1 ){
+                console.log('found a patch that needs compile: ', p);
+                
+                var key = p.patch.tagName; 
+                p.patch.properties = p.patch.properties || {};
+                p.patch.properties[key] = hook( compileHook ) ;
+                out[k] = p;
+              }
+            }
+          }
+          return out;
+        }
+
+        /**
+         * Update the dom using the latest $viewValue
+         */
+        ngModel.$render = function() {
+
+          if (!ngModel.$viewValue) {
+            return;
+          }
+
+          if (firstRun) {
+            var el = domUtil.stringToElement(ngModel.$viewValue);
+            rootDom = virtualize(el);
+            rootNode = createElement(rootDom);
+            $element[0].appendChild(rootNode);
+          }
+
+          firstRun = false;
+
+          var newEl = domUtil.stringToElement(ngModel.$viewValue);
+
+          if (newEl) {
+            var newDom = virtualize(newEl);
+            var patches = diff(rootDom, newDom);
+            var cPatches = addHooks(patches);
+            rootNode = patch(rootNode, patches);
+            rootDom = newDom;
+          }
+        };
  
         var rendered = {};
 
@@ -100,9 +169,9 @@
           return _.debounce(fn, 300, {leading: false, trailing: true});
         }
 
-        $scope.$watch('xhtml', function() {
+        /*$scope.$watch('xhtml', function() {
           debouncedUpdateUi();
-        });
+        });*/
 
         $scope.$watch('components', function(){
           debouncedUpdateUi();
@@ -122,11 +191,11 @@
       return {
         restrict: 'E',
         link: link,
+        require: '?ngModel',
         scope : {
-        xhtml: '=playerMarkup',
-        components: '=playerComponents',
-        outcomes: '=playerOutcomes',
-        session: '=playerSession'
+          components: '=playerComponents',
+          outcomes: '=playerOutcomes',
+          session: '=playerSession'
         },
         template : [
           '<div class="corespring-player">',
