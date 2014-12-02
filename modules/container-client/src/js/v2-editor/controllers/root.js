@@ -1,8 +1,13 @@
 angular.module('corespring-editor.controllers')
   .controller(
   'Root',
-  [ '$scope', 'ItemService', 'LogFactory', '$state',
-    function($scope, ItemService, LogFactory, $state) {
+  [
+  '$scope',
+  '$state',
+  'ItemService',
+  'LogFactory',
+  'ComponentRegister',
+    function($scope, $state, ItemService, LogFactory, ComponentRegister) {
       var logger = LogFactory.getLogger('RootController');
       logger.debug('Root');
 
@@ -17,17 +22,9 @@ angular.module('corespring-editor.controllers')
         });
       }
 
-      function updateSummaryFeedback(item) {
-        $scope.isSummaryFeedbackSelected = !!item.summaryFeedback;
-      }
-
-      ItemService.load(function(item) {
+      $scope.onItemLoaded = function(item){
         $scope.item = item;
-        $scope.data = {
-          item: item
-        };
         preprocessComponents(item);
-        updateSummaryFeedback(item);
         var max = 0;
         $('<div>' + $scope.item.xhtml + '</div>').find('[id]').each(function(idx, element) {
           var id = Number($(element).attr('id'));
@@ -37,7 +34,9 @@ angular.module('corespring-editor.controllers')
         });
         $scope.lastId = max;
         $scope.$broadcast('itemLoaded');
-      }, function() {
+      };
+
+      ItemService.load($scope.onItemLoaded, function() {
         logger.error('error loading');
       });
 

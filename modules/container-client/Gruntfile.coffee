@@ -83,6 +83,10 @@ module.exports = (grunt) ->
         livereload: true
         debounceDelay: 5000
         files: ['<%= common.dist %>/**/*']
+      js: 
+        files: ['<%= common.app %>/**/*.js'] 
+        tasks: ['copy:js'] 
+
       jade: watchConfig('jade', ['copy:jade'])
       less: watchConfig('less', ['copy:less', 'less:dev'])
       directives: 
@@ -95,6 +99,7 @@ module.exports = (grunt) ->
     copy:
       less: copyConfig('less')
       jade: copyConfig('jade')
+      js: copyConfig('js')
 
     pathReporter:
       options:

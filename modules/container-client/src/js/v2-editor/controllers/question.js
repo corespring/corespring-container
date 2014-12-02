@@ -1,338 +1,340 @@
-angular.module('corespring-editor.controllers').controller('QuestionController', [
-  '$scope',
-  '$modal',
-  'ItemService',
-  'LogFactory',
-  '$element',
-  '$http',
-  '$timeout',
-  '$stateParams',
-  'ComponentRegister',
-  'ComponentToWiggiwizFeatureAdapter',
-  'DesignerService',
-  'ImageFeature',
-  'ImageUtils',
-  'MathJaxService',
-  'WiggiFootnotesFeatureDef',
-  'WiggiMathJaxFeatureDef',
-  'WiggiLinkFeatureDef',
-  'ComponentImageService',
-  function($scope, $modal, ItemService, LogFactory, $element, $http, $timeout, $stateParams, ComponentRegister, ComponentToWiggiwizFeatureAdapter, DesignerService, ImageFeature, ImageUtils, MathJaxService, WiggiFootnotesFeatureDef, WiggiMathJaxFeatureDef, WiggiLinkFeatureDef, ComponentImageService) {
+angular.module('corespring-editor.controllers')
+  .controller('QuestionController', [
+    '$scope',
+    '$modal',
+    '$element',
+    '$timeout',
+    'ItemService',
+    'LogFactory',
+    'DesignerService',
+    'ImageFeature',
+    'WiggiFootnotesFeatureDef',
+    'WiggiMathJaxFeatureDef',
+    'WiggiLinkFeatureDef',
+    'ComponentImageService',
+    'ComponentToWiggiwizFeatureAdapter',
+    'ComponentData',
+    function($scope,
+      $modal,
+      $element,
+      $timeout,
+      ItemService,
+      LogFactory,
+      DesignerService,
+      ImageFeature,
+      WiggiFootnotesFeatureDef,
+      WiggiMathJaxFeatureDef,
+      WiggiLinkFeatureDef,
+      ComponentImageService,
+      ComponentToWiggiwizFeatureAdapter,
+      ComponentData) {
 
-    var logger = LogFactory.getLogger('QuestionController');
+      var configPanels = {};
 
-    $scope.previewOn = false;
-    $scope.showSummaryFeedback = false;
+      var logger = LogFactory.getLogger('QuestionController');
 
-    $scope.togglePreview = function() {
-      $scope.previewOn = !$scope.previewOn;
-    };
+      $scope.previewOn = false;
+      $scope.showSummaryFeedback = false;
 
-    $scope.scoring = function() {
-      var modalInstance = $modal.open({
-        templateUrl: '/templates/popups/scoring',
-        controller: 'ScoringPopupController',
-        size: 'lg',
-        backdrop: 'static',
-        resolve: {
-          components: function() {
-            var typeAndWeights = _.mapValues($scope.item.components, function(v) {
-              return {componentType: v.componentType, weight: v.weight};
+      $scope.togglePreview = function() {
+        $scope.previewOn = !$scope.previewOn;
+      };
+
+      $scope.scoring = function() {
+        var modalInstance = $modal.open({
+          templateUrl: '/templates/popups/scoring',
+          controller: 'ScoringPopupController',
+          size: 'lg',
+          backdrop: 'static',
+          resolve: {
+            components: function() {
+              var typeAndWeights = _.mapValues($scope.item.components,
+                function(v) {
+                  return {
+                    componentType: v.componentType,
+                    weight: v.weight
+                  };
+                });
+              return typeAndWeights;
+            },
+            xhtml: function() {
+              return $scope.item.xhtml;
+            }
+          }
+        });
+
+        function weightsDiffer(a, b) {
+          for (var x in a) {
+            if (a[x].weight !== b[x].weight) {
+              return true;
+            }
+          }
+          return false;
+        }
+
+        function onScoringComplete(typeAndWeights) {
+          logger.debug('scoring ok-ed - save');
+
+          if (weightsDiffer(typeAndWeights, $scope.item.components)) {
+            _.forIn($scope.item.components, function(comp, key) {
+              comp.weight = typeAndWeights[key].weight;
             });
-            return typeAndWeights;
-          },
-          xhtml: function() {
-            return $scope.item.xhtml;
+
+            logger.debug('weights are different - save');
+            //TODO - only update the weights?
+            saveComponents();
           }
         }
+
+        function onScoringDismiss() {
+          logger.debug('scoring dismissed');
+        }
+
+        modalInstance.result.then(onScoringComplete, onScoringDismiss);
+      };
+
+
+      $scope.imageService = ComponentImageService;
+
+      function onComponentsLoaded(uiComponents) {
+        $scope.interactions = uiComponents.interactions;
+        $scope.widgets = uiComponents.widgets;
+        initComponents();
+      }
+
+      // Dropdowns in wiggi-wiz toolbar don't trigger when bootstrap is imported?
+      $timeout(function() {
+        $('.wiggi-wiz-toolbar button', $element).dropdown();
       });
 
-      function weightsDiffer(a, b) {
-        for (var x in a) {
-          if (a[x].weight !== b[x].weight) {
-            return true;
-          }
+      function initComponents() {
+
+        if (!$scope.interactions || !$scope.widgets) {
+          return;
         }
-        return false;
-      }
 
-      function onScoringComplete(typeAndWeights) {
-        logger.debug('scoring ok-ed - save');
+        function addToEditor(editor, addContent, component) {
 
-        if (weightsDiffer(typeAndWeights, $scope.item.components)) {
-          _.forIn($scope.item.components, function(comp, key) {
-            comp.weight = typeAndWeights[key].weight;
-          });
+          var newComponentId = ComponentData.addComponent(component.defaultData);
 
-          logger.debug('weights are different - save');
-          ItemService.save({components: $scope.item.components}, function(item) {
-            $scope.item.components = item.components;
-          });
-        }
-      }
-
-      function onScoringDismiss() {
-        logger.debug('scoring dismissed');
-      }
-
-      modalInstance.result.then(onScoringComplete, onScoringDismiss);
-    };
-
-    var configPanels = {};
-
-    $scope.removedComponents = {};
-
-    $scope.section = $stateParams.section;
-
-    $scope.editorMode = "visual";
-
-    $scope.imageService = ComponentImageService;
-
-    function onComponentsLoaded(uiComponents) {
-      $scope.interactions = uiComponents.interactions;
-      $scope.widgets = uiComponents.widgets;
-      initComponents();
-    }
-
-    // Dropdowns in wiggi-wiz toolbar don't trigger when bootstrap is imported?
-    $timeout(function() {
-      $('.wiggi-wiz-toolbar button', $element).dropdown();
-    });
-
-    function initComponents() {
-
-      if (!$scope.interactions || !$scope.widgets) {
-        return;
-      }
-
-      function addToEditor(editor, addContent, component) {
-        $scope.lastId++;
-
-        var defaults = {
-          weight: 1,
-          clean: true
-        };
-
-        var newData = _.extend(defaults, _.cloneDeep(component.defaultData));
-
-        $scope.item.components[$scope.lastId] = newData;
-
-        addContent($([
-          '<placeholder',
-            ' id="' + $scope.lastId + '"',
+          addContent($([
+            '<placeholder',
+            ' id="' + newComponentId + '"',
             ' component-type="' + component.componentType + '"',
             ' label="' + component.name + '"',
-          '>'
-        ].join('')));
-      }
-
-      function deleteComponent(id) {
-        if ($scope.item && $scope.item.components) {
-          ComponentRegister.deleteComponent(id);
-          $scope.removedComponents[id] = _.cloneDeep($scope.item.components[id]);
-          delete $scope.item.components[id];
-        } else {
-          throw 'Can\'t delete component with id ' + id;
+            '>'
+          ].join('')));
         }
-      }
 
-      function reAddToEditor($node) {
-        var id = $($node).attr('id');
-        $scope.item.components[id] = $scope.removedComponents[id];
-      }
+        function deleteComponent(id) {
+          ComponentData.deleteComponent(id);
+        }
 
-      function componentToFeature(component) {
-        return ComponentToWiggiwizFeatureAdapter.componentToWiggiwizFeature(
-          component,
-          addToEditor,
-          deleteComponent,
-          reAddToEditor
-        );
-      }
+        function reAddToEditor($node) {
+          var id = $($node).attr('id');
+          ComponentData.restoreComponent(id);
+        }
 
-      var orderedComponents = [
-        "corespring-multiple-choice",
-        "corespring-inline-choice",
-        "corespring-focus-task",
-        "corespring-ordering",
-        "corespring-drag-and-drop",
-        "corespring-text-entry",
-        "corespring-extended-text-entry",
-        "corespring-point-intercept",
-        "corespring-line",
-        "corespring-function-entry",
-        "corespring-select-text"
-      ];
+        function componentToFeature(component) {
+          return ComponentToWiggiwizFeatureAdapter.componentToWiggiwizFeature(
+            component,
+            addToEditor,
+            deleteComponent,
+            reAddToEditor
+          );
+        }
 
-      function orderList(component) {
-        var idx = _.indexOf(orderedComponents, component.componentType);
-        return idx >= 0 ? idx : 1000;
-      }
+        var orderedComponents = [
+          "corespring-multiple-choice",
+          "corespring-inline-choice",
+          "corespring-focus-task",
+          "corespring-ordering",
+          "corespring-drag-and-drop",
+          "corespring-text-entry",
+          "corespring-extended-text-entry",
+          "corespring-point-intercept",
+          "corespring-line",
+          "corespring-function-entry",
+          "corespring-select-text"
+        ];
 
-      function isToolbar(component) {
-        return component.titleGroup === 'toolbar';
-      }
+        function orderList(component) {
+          var idx = _.indexOf(orderedComponents, component.componentType);
+          return idx >= 0 ? idx : 1000;
+        }
 
-      var videoComponent = componentToFeature(_.find($scope.widgets, function(c) {
-        return c.componentType === 'corespring-video';
-      }));
+        function isToolbar(component) {
+          return component.titleGroup === 'toolbar';
+        }
 
-      videoComponent.iconclass = "fa fa-film";
+        var videoComponent = componentToFeature(_.find($scope.widgets,
+          function(c) {
+            return c.componentType === 'corespring-video';
+          }));
 
-      $scope.overrideFeatures = [
-        ImageFeature
-      ];
+        videoComponent.iconclass = "fa fa-film";
 
-      var linkFeatureGroup = {
-        type: 'group',
-        buttons: [
-          new WiggiLinkFeatureDef()
-        ]
-      };
+        $scope.overrideFeatures = [
+          ImageFeature
+        ];
 
-      $scope.linkFeature = {
-        definitions: [linkFeatureGroup]
-      };
+        var linkFeatureGroup = {
+          type: 'group',
+          buttons: [
+            new WiggiLinkFeatureDef()
+          ]
+        };
 
-      $scope.extraFeatures = {
-        definitions: [
-          {
+        $scope.linkFeature = {
+          definitions: [linkFeatureGroup]
+        };
+
+        $scope.extraFeatures = {
+          definitions: [{
             name: 'external',
             type: 'dropdown',
             dropdownTitle: 'Answer Type',
-            buttons: _($scope.interactions).reject(isToolbar).sortBy(orderList).map(componentToFeature).value()
-          },
-          {
+            buttons: _($scope.interactions)
+              .reject(isToolbar)
+              .sortBy(orderList)
+              .map(componentToFeature)
+              .value()
+          }, {
             type: 'group',
             buttons: [
               new WiggiMathJaxFeatureDef()
             ]
-          },
-          {
+          }, {
             type: 'group',
             buttons: [
               new WiggiFootnotesFeatureDef()
             ]
-          },
-          {
+          }, {
             type: 'group',
             buttons: [
               videoComponent
             ]
-          }
-        ]};
-    }
-
-    function onComponentsLoadError(error) {
-      throw new Error("Error loading components");
-    }
-
-    $scope.getUploadUrl = function(file) {
-      logger.log('getUploadUrl', arguments);
-      return file.name;
-    };
-
-    $scope.selectFile = function(file) {
-      logger.log('selectFile', 'root select file...');
-      $scope.selectedFile = file;
-      logger.log('selectFile', $scope.selectedFile);
-    };
-
-    $scope.$on('fileSizeGreaterThanMax', function(event) {
-      logger.warn("file too big");
-    });
-
-
-    $scope.$on('registerConfigPanel', function(a, id, component) {
-      configPanels[id] = component;
-      component.setModel($scope.item.components[id]);
-      if (_.isFunction(component.setProfile)) {
-        component.setProfile($scope.item.profile);
+          }]
+        };
       }
-    });
 
-    $scope.$on('save-data', function(event) {
-      $scope.save();
-    });
+      function onComponentsLoadError(error) {
+        throw new Error("Error loading components");
+      }
 
+      $scope.getUploadUrl = function(file) {
+        logger.log('getUploadUrl', arguments);
+        return file.name;
+      };
 
-    $scope.$on('itemAdded', function(event, $node) {
-      // This ends up in some weird race condition if we don't wrap it in a $timeout
-      $timeout(function() {
-        angular.element('.wiggi-wiz', $element).scope().focusCaretAtEnd();
+      $scope.selectFile = function(file) {
+        logger.log('selectFile', 'root select file...');
+        $scope.selectedFile = file;
+        logger.log('selectFile', $scope.selectedFile);
+      };
+
+      $scope.$on('fileSizeGreaterThanMax', function(event) {
+        logger.warn("file too big");
       });
-    });
 
-    $scope.save = function(callback) {
-      logger.log('Saving...');
-      var cleaned = $scope.serialize($scope.item.components);
-      for (var key in cleaned) {
-        if (!ComponentRegister.hasComponent(key)) {
-          delete cleaned[key];
+      $scope.$on('registerComponent', function(event, id, componentBridge) {
+        logger.debug('registerComponent ', id);
+        ComponentData.registerComponent(id, componentBridge);
+      });
+
+      $scope.$on('registerPlaceholder', function(event, id, placeholder) {
+        logger.debug('registerPlaceholder ', id);
+        ComponentData.registerPlaceholder(id, placeholder);
+      });
+
+      $scope.$on('registerConfigPanel', function(a, id, component) {
+        configPanels[id] = component;
+        component.setModel($scope.item.components[id]);
+        if (_.isFunction(component.setProfile)) {
+          component.setProfile($scope.item.profile);
         }
-      }
-      ItemService.save({
-          components: cleaned,
-          xhtml: $scope.item.xhtml,
-          summaryFeedback: $scope.isSummaryFeedbackSelected ? $scope.item.summaryFeedback : ""
-        },
-        $scope.onItemSaved,
-        $scope.onItemSaveError,
-        $scope.itemId);
-    };
+      });
 
-    $scope.serialize = function(comps) {
-      if (!configPanels) {
-        return comps;
+      $scope.onItemSaved = function(){
+
+      };
+
+      function saveComponents(){
+        logger.debug('[saveComponents]');
+        ItemService.fineGrainedSave(
+          {components: $scope.serialize($scope.item.components)}, 
+          $scope.onItemSaved, 
+          $scope.onItemSaveError);
       }
 
-      var newModel = _.cloneDeep(comps);
+      $scope.$on('itemAdded', function(event, $node) {
+        // This ends up in some weird race condition if we don't wrap it in a $timeout
+        $timeout(function() {
+          angular.element('.wiggi-wiz', $element).scope().focusCaretAtEnd();
+        });
+      });
 
-      function storeComponentModelInNewModel(value, key) {
-        var component = configPanels[key];
-        if (component && component.getModel) {
-          newModel[key] = component.getModel();
+      $scope.serialize = function(comps) {
+        if (!configPanels) {
+          return comps;
         }
-      }
 
-      _.each(comps, storeComponentModelInNewModel);
+        var newModel = _.cloneDeep(comps);
 
-      return newModel;
-    };
+        function storeComponentModelInNewModel(value, key) {
+          var configPanel = configPanels[key];
+          if (configPanel && configPanel.getModel) {
+            newModel[key] = configPanel.getModel();
+          }
+        }
 
-    $scope.$on('mathJaxUpdateRequest', function() {
-      MathJaxService.parseDomForMath();
-    });
+        _.each(comps, storeComponentModelInNewModel);
 
-    $scope.isSummaryFeedbackSelected = false;
+        return newModel;
+      };
 
-    $scope.$watch("isSummaryFeedbackSelected", function(newValue, oldValue) {
-      if (!newValue && newValue !== oldValue) {
-        $scope.item.summaryFeedback = "";
-      }
-    });
+      $scope.$watch('item.components', debounce(function(newComps, oldComps){
 
-    $scope.$watch('item.xhtml', throttle(function(oldValue, newValue) {
-      logger.debug('old', oldValue);
-      if (oldValue !== newValue) {
-        ItemService.fineGrainedSave({'xhtml': $scope.item.xhtml}, function(result) {
+        if(_.isEqual(newComps, oldComps)){
+          logger.debug('they are the same - ignore...');
+          return;
+        }
+        saveComponents();
+      }), true);
+
+      $scope.$watch('item.xhtml', debounce(function(oldValue, newValue) {
+        logger.debug('old', oldValue);
+        if (oldValue !== newValue) {
+          ItemService.fineGrainedSave({
+            'xhtml': $scope.item.xhtml
+          }, function(result) {});
+        }
+      }));
+
+      $scope.$watch('item.summaryFeedback', debounce(function(oldValue,
+        newValue) {
+        logger.debug('old', oldValue);
+        if (oldValue !== newValue) {
+          ItemService.fineGrainedSave({
+            'summaryFeedback': $scope.item.summaryFeedback
+          }, function(result) {});
+        }
+      }));
+
+      function debounce(fn) {
+        return _.debounce(fn, 500, {
+          trailing: true,
+          leading: false
         });
       }
-    }));
 
-    $scope.$watch('item.summaryFeedback', throttle(function(oldValue, newValue){
-      logger.debug('old', oldValue);
-      if(oldValue !== newValue){
-        ItemService.fineGrainedSave({'summaryFeedback': $scope.item.summaryFeedback}, function(result){
-        });
-      }
-    }));
+      DesignerService.loadAvailableUiComponents(onComponentsLoaded,
+        onComponentsLoadError);
 
-    function throttle(fn){
-      return _.throttle(fn, 500, {trailing: true, leading: false});
+      ItemService.load(function(item){
+        $scope.item = item;
+        ComponentData.setModel(item.components);
+      });
+
     }
-
-    DesignerService.loadAvailableUiComponents(onComponentsLoaded, onComponentsLoadError);
-
-  }
-]);
+  ]);

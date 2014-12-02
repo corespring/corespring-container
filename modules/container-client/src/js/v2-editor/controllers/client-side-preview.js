@@ -4,12 +4,12 @@
     .controller('ClientSidePreview', [
       '$log',
       '$scope',
-      'ComponentRegister',
+      'ComponentData',
       'ClientSidePlayerService',
       ClientSidePreview
     ]);
 
-  function ClientSidePreview($log, $scope, ComponentRegister, ClientSidePlayerServiceDef) {
+  function ClientSidePreview($log, $scope, ComponentData, ClientSidePlayerServiceDef) {
 
     $scope.playerMode = 'gather';
 
@@ -42,19 +42,19 @@
 
     function setMode(mode) {
       $scope.playerMode = mode;
-      ComponentRegister.setMode(mode);
-      ComponentRegister.setEditable(isGatherMode());
+      ComponentData.setMode(mode);
+      ComponentData.setEditable(isGatherMode());
     }
 
     function isGatherMode(){
       return $scope.playerMode === 'gather';
     }
 
-
-
+    /*
     $scope.$on('playerControlPanel.preview', function () {
       $scope.$emit('launch-catalog-preview');
     });
+    */
 
     $scope.$on('playerControlPanel.submit', function () {
       if (isGatherMode()) {
@@ -64,6 +64,8 @@
       }
     });
 
+    
+
     $scope.$on('playerControlPanel.reset', function () {
       if ($scope.session) {
         $scope.session.isComplete = false;
@@ -72,10 +74,13 @@
       $scope.score = undefined;
       $scope.outcome = undefined;
       $scope.responses = {};
-      ComponentRegister.reset();
+      ComponentData.reset();
       setMode('gather');
     });
+    /* 
+    */
 
+    /*
     $scope.$on('playerControlPanel.settingsChange', function () {
       PlayerService.updateSessionSettings($scope.playerSettings);
       if(isGatherMode()){
@@ -84,11 +89,12 @@
         submitSession();
       }
     });
+    */
 
     function submitSession() {
-      var components = ComponentRegister.getComponentSessions();
+      var sessions = ComponentData.getSessions();
       PlayerService.submitSession({
-          components: components
+          components: sessions 
         },
         function (everything) {
           $scope.responses = everything.responses;
@@ -97,6 +103,7 @@
           $scope.score = everything.score;
           $log.info("onSessionLoaded", everything, $scope.score);
           setMode('evaluate');
+          ComponentData.setOutcomes(everything.outcome);
         },
         function (err) {
           $log.error("submitSession failed", err);
