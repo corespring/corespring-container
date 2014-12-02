@@ -122,14 +122,8 @@ module.exports = (grunt) ->
       unit:
         src: [
           '<%= common.app %>/js/corespring/**/*.js',
-          '<%= common.app %>/js/catalog/**/*.js',
-          '<%= common.app %>/js/common/**/*.js',
-          '<%= common.app %>/js/editor/**/*.js',
-          '<%= common.app %>/js/libs/*.js',
-          '<%= common.app %>/js/render/**/*.js',
-          '<%= common.app %>/js/rig/**/*.js',
-          '<%= common.app %>/js/v2-catalog/**/*.js',
-          '<%= common.app %>/js/v2-editor/**/*.js'
+          '<%= common.app %>/js/**/*.js',
+          '<%= common.tmp %>/wrapped/player-launcher-wrapped.js'
           ]
         options:
           keepRunner: true
@@ -142,9 +136,7 @@ module.exports = (grunt) ->
             'bootstrap/dist/js/bootstrap.min.js',
             'angular-ui-bootstrap-bower/ui-bootstrap-tpls.js',
             'msgr.js/dist/msgr.js'], comps)
-          specs: getFiles([
-            common.test + "/js/**/*-test.js",
-            "!" + common.test + "/js/player-launcher/*-test.js"])
+          specs: '<%= common.test %>/js/**/*-test.js'
 
     shell:
       mathjax_rm_pngs:
