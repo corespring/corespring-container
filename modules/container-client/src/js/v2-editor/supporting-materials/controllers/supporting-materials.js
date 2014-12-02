@@ -64,14 +64,14 @@ var controller = function($element, $filter, $http, $location, $q, $modal, $log,
   }, true);
 
   $scope.$watch('supportingMarkup', function(newValue) {
-    if ($scope.data && $scope.data.item) {
-      var updatedSupportingMaterials = $scope.data.item.supportingMaterials;
+    if ($scope.item) {
+      var updatedSupportingMaterials = $scope.item.supportingMaterials;
       var supportingMaterialFile = SupportingMaterialsService.getSupportingMaterialFile($scope.getSupportingMaterials(), $scope.index);
       if (supportingMaterialFile) {
         supportingMaterialFile.content = newValue;
         var fileIndex = _.findIndex($scope.getSupportingMaterials()[$scope.index].files, SupportingMaterialsService.isDefault);
         updatedSupportingMaterials[$scope.index].files[fileIndex] = supportingMaterialFile;
-        $scope.data.item.supportingMaterials = updatedSupportingMaterials;
+        $scope.item.supportingMaterials = updatedSupportingMaterials;
       }
     }
   });
@@ -164,18 +164,15 @@ var controller = function($element, $filter, $http, $location, $q, $modal, $log,
   };
 
   $scope.onNewSupportingMaterialSaveSuccess = function(data) {
-    $scope.data.saveInProgress = false;
-    $scope.data.item.supportingMaterials = data.supportingMaterials;
+    $scope.item.supportingMaterials = data.supportingMaterials;
     var idx = $scope.getSupportingMaterials().length - 1;
     $state.transitionTo('supporting-materials', { index: idx }, { reload: true });
   };
 
   $scope.onSaveSuccess = function(data) {
-    $scope.data.saveInProgress = false;
   };
 
   $scope.onSaveError = function() {
-    $scope.data.saveInProgress = false;
   };
 
   $scope.formatKB = function(kb, decimalPlaces) {
@@ -194,7 +191,7 @@ var controller = function($element, $filter, $http, $location, $q, $modal, $log,
   };
 
   $scope.getSupportingMaterials = function() {
-    return ($scope.data && $scope.data.item && !_.isEmpty($scope.data.item.supportingMaterials)) ? $scope.data.item.supportingMaterials : undefined;
+    return ($scope.item && !_.isEmpty($scope.item.supportingMaterials)) ? $scope.item.supportingMaterials : undefined;
   };
 
   $scope.formatDate = function(date) {
@@ -248,7 +245,7 @@ var controller = function($element, $filter, $http, $location, $q, $modal, $log,
   };
 
   $scope.init = function() {
-    if (!$scope.data || !$scope.data.item || !$scope.data.item.supportingMaterials || $scope.index >= $scope.data.item.supportingMaterials.length) {
+    if (!$scope.item || !$scope.item.supportingMaterials || $scope.index >= $scope.item.supportingMaterials.length) {
       return;
     }
     $scope.supportingMaterial = getSupportingMaterial();
@@ -278,7 +275,7 @@ var controller = function($element, $filter, $http, $location, $q, $modal, $log,
      */
     function persistInitial(callback) {
       var supportingMaterial = { name: newMaterial.name, materialType: newMaterial.materialType, files: [] };
-      var supportingMaterials = $scope.data.item.supportingMaterials || [];
+      var supportingMaterials = $scope.item.supportingMaterials || [];
       supportingMaterials.push(supportingMaterial);
 
       var deferred = $q.defer();
@@ -378,12 +375,12 @@ var controller = function($element, $filter, $http, $location, $q, $modal, $log,
         onError(error);
       }
       // Remove the newly added supporting material if upload is unsuccessful
-      $scope.data.item.supportingMaterials = _.initial($scope.data.item.supportingMaterials);
+      $scope.item.supportingMaterials = _.initial($scope.item.supportingMaterials);
     });
   };
 
   $scope.createText = function(newMaterial) {
-    var supportingMaterials = $scope.data.item.supportingMaterials || [];
+    var supportingMaterials = $scope.item.supportingMaterials || [];
     var newSupportingMaterial = {
       name: newMaterial.name,
       materialType: newMaterial.materialType,
