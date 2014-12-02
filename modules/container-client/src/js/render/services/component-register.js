@@ -26,10 +26,13 @@ angular.module('corespring-player.services')
       };
 
       Object.defineProperty(this, 'loadedData', {
+        _loadedData: null,
         get: function(){
-          throw new Error('Illegal Access - "loadedData" is no longer allowed');
+          $log.warn('@deprecated - get loadedData')
+          return this._loadedData;
         }, 
         set: function(d){
+          this._loadedData = d;
         }
       });
 
