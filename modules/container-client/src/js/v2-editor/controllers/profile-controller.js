@@ -56,7 +56,7 @@
       },
       componentTypes: {
         visible:true,
-        readonly:true
+        readonly:false
       },
       //--------------------
       standards: {
@@ -70,58 +70,58 @@
       //--------------------
       depthOfKnowledge: {
         visible:true,
-        readonly:true
+        readonly:false
       },
       bloomsTaxonomy: {
         visible:true,
-        readonly:true
+        readonly:false
       },
       keySkills: {
         visible:true,
-        readonly:true
+        readonly:false
       },
       //--------------------
       priorUse: {
         visible:true,
-        readonly:true
+        readonly:false
       },
       priorGradeLevel: {
         visible:true,
-        readonly:true
+        readonly:false
       },
       reviewsPassed: {
         visible:true,
-        readonly:true
+        readonly:false
       },
       //--------------------
       author: {
         visible:true,
-        readonly:true
+        readonly:false
       },
       credentials: {
         visible:true,
-        readonly:true
+        readonly:false
       },
       copyrightOwner: {
         visible:true,
-        readonly:true
+        readonly:false
       },
       copyrightYear: {
         visible:true,
-        readonly:true
+        readonly:false
       },
       copyrightExpirationDate: {
         visible:true,
-        readonly:true
+        readonly:false
       },
       sourceUrl: {
         visible:true,
-        readonly:true
+        readonly:false
       },
       //--------------------
       additionalCopyrights: {
         visible:true,
-        readonly:true
+        readonly:false
       }
     };
 
