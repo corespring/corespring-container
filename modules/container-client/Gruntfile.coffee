@@ -242,7 +242,7 @@ module.exports = (grunt) ->
       grunt: true
       args: [ 'less' ]
       opts:
-        cwd: common.components + '../'
+        cwd: common.components 
 
     spawnResultHandler = (err, result, code) ->
       console.log result.stdout
