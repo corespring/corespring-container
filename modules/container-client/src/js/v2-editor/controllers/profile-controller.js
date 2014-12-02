@@ -282,6 +282,7 @@
 
       initSelection: function(element, callback) {
         var val = this.getVal(element);
+        $log.warn("standards initSelection val", val);
         var ids = val.split(',');
         var results = [];
         ids.forEach(function(id) {
