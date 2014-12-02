@@ -28,7 +28,7 @@ angular.module('corespring-player.services')
       Object.defineProperty(this, 'loadedData', {
         _loadedData: null,
         get: function(){
-          $log.warn('@deprecated - get loadedData')
+          $log.warn('@deprecated - get loadedData');
           return this._loadedData;
         }, 
         set: function(d){
