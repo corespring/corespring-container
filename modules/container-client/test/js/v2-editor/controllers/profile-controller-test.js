@@ -33,6 +33,7 @@ describe('profile controller', function() {
     this.getLogger = function(id){
       return {
         log: function(){},
+        warn: function(){},
         error: function(){}
       };
     };
@@ -140,7 +141,7 @@ describe('profile controller', function() {
     });
 
     it("initialises empty sub-properties", function() {
-      expect(scope.item.profile.taskInfo).toEqual({});
+      expect(scope.item.profile.taskInfo).toEqual({subjects:{}});
       expect(scope.item.profile.otherAlignments).toEqual({keySkills: []});
       expect(scope.item.profile.contributorDetails).toEqual({
         licenseType: 'CC BY',

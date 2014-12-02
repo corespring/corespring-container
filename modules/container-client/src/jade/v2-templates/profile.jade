@@ -8,49 +8,59 @@ mixin form
 
 mixin field(label, ngModel)
   .form-group
-    label.col-sm-3.control-label(for=ngModel)= label 
+    label.col-sm-3.control-label(for=ngModel)= label
     .col-sm-9
-      if block 
+      if block
         block
-      else 
+      else
         input.form-control(id=ngModel, ng-model=ngModel)
 
-mixin select2(select2Model, msg)
-  input(id=ngModel,
-    ng-model=ngModel,
-    type="text",
-    ui-select2=select2Model,
-    data-placeholder=msg)
+mixin field2(label, ngModel, formModel)
+  .form-group(ng-show='#{formModel}.visible')
+    label.col-sm-3.control-label(for=ngModel)= label
+    .col-sm-9
+      if block
+        block
+      else
+        input.form-control(id=ngModel, ng-model=ngModel, ng-readonly='#{formModel}.readonly')
 
-script(type="text/ng-template", id="/templates/profile")
-  .profile(ng-controller="ProfileController")
+mixin select2(select2Model, msg, formModel)
+  input(id=ngModel,
+  ng-model=ngModel,
+  type='text',
+  ui-select2=select2Model,
+  data-placeholder=msg,
+  ng-readonly='#{formModel}.readonly')
+
+script(type='text/ng-template', id='/templates/profile')
+  .profile(ng-controller='ProfileController')
     .row.col-md-8
       h2 Item Profile
       p The profile contains information key data used to store and find an item (e.g., Common Core State Standard alignment, Bloom's Taxonomy assignment, key skills, and copyright information). Authors are encouraged to include as much information as possible.
       p * Required
 
       +h_form
-        +field("* Title", "taskInfo.title")
-        +field("Description", "taskInfo.description")
-        hr/ 
-        
-        +field("* Primary Subject", "taskInfo.subjects.primary")
-          +select2("primarySubjectSelect2Adapter", "Choose a subject...")
-        
-        +field("* Related Subject", "taskInfo.subjects.related")
-          +select2("relatedSubjectSelect2Adapter", "Choose a subject...")
+        +field2('* Title', 'taskInfo.title', 'formModels.title')
+        +field2('Description', 'taskInfo.description', 'formModels.description')
+        hr/
 
-        +field("Grade Level", "taskInfo.gradeLevel")
+        +field2('* Primary Subject', 'taskInfo.subjects.primary', 'formModels.primarySubject')
+          +select2('primarySubjectSelect2Adapter', 'Choose a subject...', 'formModels.primarySubject')
+
+        +field2('* Related Subject', 'taskInfo.subjects.related', 'formModels.relatedSubject')
+          +select2('relatedSubjectSelect2Adapter', 'Choose a subject...', 'formModels.relatedSubject')
+
+        +field2('Grade Level', 'taskInfo.gradeLevel', 'formModels.gradeLevel')
           tight-button-bar(
-            id="taskInfo.gradeLevel", 
-            ng-model="taskInfo.gradeLevel", 
-            button-provider="gradeLevelDataProvider", 
-            key="key")
+          id='taskInfo.gradeLevel',
+          ng-model='taskInfo.gradeLevel',
+          button-provider='gradeLevelDataProvider',
+          key='key',
+          readonly='formModels.gradeLevel.readonly')
 
-        div(ng-show='componentTypes.length')
-          +field("Question Types", "$qt")
-            ul
-              li(ng-repeat='type in componentTypes') {{type}}
+        +field2('Item Types', '$qt', 'formModels.componentTypes')
+          ul
+            li(ng-repeat='type in componentTypes') {{type}}
 
       br/
 
@@ -65,21 +75,21 @@ script(type="text/ng-template", id="/templates/profile")
         +field('Standards','profile.standards')
           input(id='profile.standards', type='hidden', ui-select2='standardsAdapter', ng-model='profile.standards', style='width: 500px;')
 
-        .lexile(ng-show="isLiteracyStandardSelected")
-          +field('Lexile Score', 'profile.lexile')
-            input.form-control(id='profile.lexile', ng-model='profile.lexile')
+        .lexile(ng-show='isLiteracyStandardSelected')
+          +field2('Lexile Score', 'profile.lexile', 'formModels.lexile')
+            input.form-control(id='profile.lexile', ng-model='profile.lexile', ng-readonly='formModels.lexile.readonly')
             span.measure L
       br/
 
       +h_form
         h6 Other Alignments
-        +field('Depth Of Knowledge','otherAlignments.depthOfKnowledge')
-          select(id='otherAlignments.depthOfKnowledge', ng-model='otherAlignments.depthOfKnowledge', ng-options='c.key as c.value for c in depthOfKnowledgeDataProvider')
-        +field('Bloom\'s Taxonomy','otherAlignments.bloomsTaxonomy')
-          select(id='otherAlignments.bloomsTaxonomy', ng-model='otherAlignments.bloomsTaxonomy', ng-options='c.key as c.value for c in bloomsTaxonomyDataProvider')
+        +field2('Depth Of Knowledge','otherAlignments.depthOfKnowledge', 'formModels.depthOfKnowledge')
+          select(id='otherAlignments.depthOfKnowledge', ng-model='otherAlignments.depthOfKnowledge', ng-options='c.key as c.value for c in depthOfKnowledgeDataProvider', ng-disabled='formModels.depthOfKnowledge.readonly')
+        +field2('Bloom\'s Taxonomy', 'otherAlignments.bloomsTaxonomy', 'formModels.bloomsTaxonomy')
+          select(id='otherAlignments.bloomsTaxonomy', ng-model='otherAlignments.bloomsTaxonomy', ng-options='c.key as c.value for c in bloomsTaxonomyDataProvider', ng-disabled='formModels.bloomsTaxonomy.readonly')
         .form-group
           label.col-sm-3.control-label(ng-click='expandKeySkills=!expandKeySkills')
-            i(class="fa fa-{{!!expandKeySkills ? 'minus' : 'plus'}}-square-o", style="margin-right: 6px")
+            i(class='fa fa-{{!!expandKeySkills ? "minus" : "plus"}}-square-o', style='margin-right: 6px')
             | Key Skills
           .col-sm-9
             div(ng-show='!expandKeySkills')
@@ -95,44 +105,44 @@ script(type="text/ng-template", id="/templates/profile")
       +h_form
         h6 History
 
-        +field('This item was previously used in', 'profile.priorUse')
-          select(id='profile.priorUse', ng-model='profile.priorUse', ng-options='c.key as c.value for c in priorUseDataProvider')
-          input(ng-show="isPriorUseOtherSelected", type="text", placeholder='Enter prior use...', ng-model='profile.priorUseOther')
+        +field2('This item was previously used in', 'profile.priorUse', 'formModels.priorUse')
+          select(id='profile.priorUse', ng-model='profile.priorUse', ng-options='c.key as c.value for c in priorUseDataProvider', ng-disabled='formModels.depthOfKnowledge.readonly')
+          input(ng-show='isPriorUseOtherSelected', type='text', placeholder='Enter prior use...', ng-model='profile.priorUseOther', ng-readonly='formModels.depthOfKnowledge.readonly')
 
-        +field('Prior Use Grade Level', 'profile.priorGradeLevel')
-          tight-button-bar(id='profile.priorGradeLevel', ng-model="profile.priorGradeLevel", button-provider="gradeLevelDataProvider", key="key")
+        +field2('Prior Use Grade Level', 'profile.priorGradeLevel', 'formModels.priorGradeLevel')
+          tight-button-bar(id='profile.priorGradeLevel', ng-model='profile.priorGradeLevel', button-provider='gradeLevelDataProvider', key='key', readonly='formModels.priorGradeLevel.readonly')
 
         +field('Reviews Passed', 'profile.reviewsPassed')
-          label(ng-repeat='rp in reviewsPassedDataProvider', style="width:50%;")
+          label(ng-repeat='rp in reviewsPassedDataProvider', style='width:50%;')
             input(type='checkbox',ng-model='rp.selected',ng-change='onChangeReviewsPassed(rp.key)',style='margin-right: 3px;')
             | {{rp.key}}
-            input(ng-if='rp.key == "Other"', ng-show='rp.selected', style='margin-left:10px;', type='text', placeholder='Enter review...', ng-model='profile.reviewsPassedOther')
+            input(ng-if='"Other" === rp.key', ng-show='rp.selected', style='margin-left:10px;', type='text', placeholder='Enter review...', ng-model='profile.reviewsPassedOther')
 
       br/
 
       +h_form
         h6 Ownership
 
-        +field('Author', 'contributorDetails.author')
+        +field('Author', 'contributorDetails.author', 'formModels.author')
 
-        +field('Credentials','contributorDetails.credentials')
-          select(id='contributorDetails.credentials',ng-model='contributorDetails.credentials', ng-options='c.key as c.value for c in credentialsDataProvider')
-          input(id='contributorDetails.credentialsOther',ng-show="isCredentialsOtherSelected", type="text", placeholder='Enter credentials...', ng-model='contributorDetails.credentialsOther')
+        +field('Credentials','contributorDetails.credentials', 'formModels.credentials')
+          select(id='contributorDetails.credentials',ng-model='contributorDetails.credentials', ng-options='c.key as c.value for c in credentialsDataProvider', ng-disabled='formModels.credentials.readonly')
+          input(id='contributorDetails.credentialsOther',ng-show='isCredentialsOtherSelected', type='text', placeholder='Enter credentials...', ng-model='contributorDetails.credentialsOther', ng-readonly='formModels.credentials.readonly')
 
-        +field('* Copyright Owner','contributorDetails.copyrightOwner')
+        +field('* Copyright Owner','contributorDetails.copyrightOwner', 'formModels.copyrightOwner')
 
-        +field('* Copyright Year','contributorDetails.copyrightYear')
-          select(id='contributorDetails.copyrightYear',ng-model='contributorDetails.copyrightYear', ng-options='c for c in copyrightYearDataProvider', style="width:170px;")
+        +field('* Copyright Year','contributorDetails.copyrightYear', 'formModels.copyrightYear')
+          select(id='contributorDetails.copyrightYear',ng-model='contributorDetails.copyrightYear', ng-options='c for c in copyrightYearDataProvider', style='width:170px;', ng-disabled='formModels.copyrightYear.readonly')
 
-        +field('* Copyright Expiration','contributorDetails.copyrightExpirationDate')
-          select(id='contributorDetails.copyrightExpirationDate',ng-model='contributorDetails.copyrightExpirationDate', ng-options='c for c in copyrightExpirationYearDataProvider', style="width:170px;")
+        +field('* Copyright Expiration','contributorDetails.copyrightExpirationDate', 'formModels.copyrightExpirationDate')
+          select(id='contributorDetails.copyrightExpirationDate',ng-model='contributorDetails.copyrightExpirationDate', ng-options='c for c in copyrightExpirationYearDataProvider', style='width:170px;', ng-disabled='formModels.copyrightExpirationDate.readonly')
 
-        +field('Website', 'contributorDetails.sourceUrl')
+        +field('Website', 'contributorDetails.sourceUrl', 'formModels.sourceUrl')
 
         br/
 
-        additional-copyright-information-for-profile(copyrights="contributorDetails.additionalCopyrights",
-          prompt="Does this item contain any other copyrighted materials? E.g. book passage, image, etc.")
+        additional-copyright-information-for-profile(copyrights='contributorDetails.additionalCopyrights',
+        prompt='Does this item contain any other copyrighted materials? E.g. book passage, image, etc.')
 
 
 

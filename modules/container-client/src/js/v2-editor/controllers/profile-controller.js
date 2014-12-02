@@ -2,6 +2,7 @@
 
   angular.module('corespring-editor.controllers')
     .controller('ProfileController', [
+      '$location',
       '$scope',
       'throttle',
       'DataQueryService',
@@ -14,6 +15,7 @@
     ]);
 
   function ProfileController(
+    $location,
     $scope,
     throttle,
     DataQueryService,
@@ -24,6 +26,208 @@
     StandardQueryCreator) {
 
     var $log = LogFactory.getLogger('ProfileController');
+
+    //----------------------------------------------------------------
+    // Form configuration
+    // The form can be configured by passing the json encoded
+    // configuration as config={"title":{"value":"some title", "readonly":false, "visible":true}}
+    //----------------------------------------------------------------
+
+    $scope.formModels = {
+      title: {
+        visible:true,
+        readonly:false
+      },
+      description: {
+        visible:true,
+        readonly:false
+      },
+      primarySubject: {
+        visible:true,
+        readonly:false
+      },
+      relatedSubject: {
+        visible:true,
+        readonly:false
+      },
+      gradeLevel: {
+        visible:true,
+        readonly:false
+      },
+      componentTypes: {
+        visible:true,
+        readonly:true
+      },
+      //--------------------
+      standards: {
+        visible:true,
+        readonly:false
+      },
+      lexile: {
+        visible:true,
+        readonly:false
+      },
+      //--------------------
+      depthOfKnowledge: {
+        visible:true,
+        readonly:true
+      },
+      bloomsTaxonomy: {
+        visible:true,
+        readonly:true
+      },
+      keySkills: {
+        visible:true,
+        readonly:true
+      },
+      //--------------------
+      priorUse: {
+        visible:true,
+        readonly:true
+      },
+      priorGradeLevel: {
+        visible:true,
+        readonly:true
+      },
+      reviewsPassed: {
+        visible:true,
+        readonly:true
+      },
+      //--------------------
+      author: {
+        visible:true,
+        readonly:true
+      },
+      credentials: {
+        visible:true,
+        readonly:true
+      },
+      copyrightOwner: {
+        visible:true,
+        readonly:true
+      },
+      copyrightYear: {
+        visible:true,
+        readonly:true
+      },
+      copyrightExpirationDate: {
+        visible:true,
+        readonly:true
+      },
+      sourceUrl: {
+        visible:true,
+        readonly:true
+      },
+      //--------------------
+      additionalCopyrights: {
+        visible:true,
+        readonly:true
+      }
+    };
+
+    /**
+     * Update a single formModel with the values from config
+     * @param model
+     * @param config
+     */
+    function updateFormModel(model, config){
+      if(!config){
+        return;
+      }
+      if(config.hasOwnProperty("visible")){
+        model.visible = config.visible === true;
+      }
+      if(config.hasOwnProperty("readonly")){
+        model.readonly = config.readonly === true;
+      }
+      if(config.hasOwnProperty("value")){
+        model.value = config.value;
+      }
+      if(config.hasOwnProperty("options")){
+        model.options = config.options;
+      }
+    }
+
+    /**
+     * Walk through all formModels and update them from config
+     * @param formModels
+     * @param config
+     */
+    function updateFormModels(formModels, config){
+      if(!config){
+        return;
+      }
+      for(var key in formModels){
+        $log.log("updateFormModels", [key, formModels[key], config[key]]);
+        updateFormModel(formModels[key], config[key]);
+      }
+    }
+
+    /**
+     * Get the json encoded configuration from the "config" query parameter
+     * @returns {*}
+     */
+    function getFormConfigFromUrl(){
+      var search = $location.search();
+      var hash = $location.hash();
+      var configJson = search.config || hash.config;
+      if(configJson) {
+        try {
+          var config = JSON.parse(configJson);
+          return config;
+        } catch (e) {
+          $log.warn("error parsing config json", configJson, e);
+        }
+      }
+      return null;
+    }
+
+    updateFormModels($scope.formModels, getFormConfigFromUrl());
+
+
+    /**
+     * Once the profile is loaded, we can use the formModels
+     * to update the profile with the configured values
+     * @param profile
+     * @param config
+     */
+    function overrideProfileValuesWithConfig(profile, config){
+
+      function assign(dest, name, sourceName){
+        var source = config[sourceName || name];
+        if(source && source.hasOwnProperty('value')){
+          dest[name] = source.value;
+        }
+      }
+
+      assign(profile.taskInfo, "title");
+      assign(profile.taskInfo, "description");
+      assign(profile.taskInfo.subjects, "primary", "primarySubject");
+      assign(profile.taskInfo.subjects, "related", "relatedSubject");
+      assign(profile.taskInfo, "gradeLevel");
+
+      assign(profile, "standards");
+      assign(profile, "lexile");
+
+      assign(profile.otherAlignments, "depthOfKnowledge");
+      assign(profile.otherAlignments, "bloomsTaxonomy");
+      assign(profile.otherAlignments, "keySkills");
+
+      assign(profile, "priorUse");
+      assign(profile, "priorGradeLevel");
+      assign(profile, "reviewsPassed");
+
+      assign(profile.contributorDetails, "author");
+      assign(profile.contributorDetails, "credentials");
+      assign(profile.contributorDetails, "copyrightOwner");
+      assign(profile.contributorDetails, "copyrightYear");
+      assign(profile.contributorDetails, "copyrightExpirationDate");
+      assign(profile.contributorDetails, "sourceUrl");
+
+      assign(profile.contributorDetails, "additionalCopyrights");
+
+    }
+
 
     //----------------------------------------------------------------
     // Standards
@@ -78,12 +282,13 @@
 
       initSelection: function(element, callback) {
         var val = this.getVal(element);
+        $log.warn("standards initSelection val", val);
         var ids = val.split(',');
         var results = [];
         ids.forEach(function(id) {
           findItemById("standards", id, function(item) {
             results.push(item);
-            if (results.length === ids.length) {
+            if (ids.length === results.length) {
               callback(results);
             }
           });
@@ -137,6 +342,7 @@
         return;
       }
       $scope.componentTypes = ProfileFormatter.componentTypesUsed($scope.item.components, $scope.availableComponents);
+      $scope.formModels.componentTypes.visible = 0 < $scope.componentTypes.length;
     }
 
     //----------------------------------------------------------------
@@ -154,7 +360,7 @@
     function findItemById(topic, id, callback) {
 
       var local = _.find($scope.queryResults[topic], function(r) {
-        return r.id === id;
+        return id === r.id;
       });
       if (local) {
         callback(local);
@@ -218,12 +424,12 @@
       $scope.bloomsTaxonomyDataProvider = result;
     });
 
-    DataQueryService.list("gradeLevels", function(result) {
-      $scope.gradeLevelDataProvider = result;
-    });
-
     DataQueryService.list("depthOfKnowledge", function(result) {
       $scope.depthOfKnowledgeDataProvider = result;
+    });
+
+    DataQueryService.list("gradeLevels", function(result) {
+      $scope.gradeLevelDataProvider = result;
     });
 
     //----------------------------------------------------------------
@@ -261,7 +467,7 @@
     });
 
     function updateCredentialsOtherSelected() {
-      var otherSelected = $scope.contributorDetails && $scope.contributorDetails.credentials === 'Other';
+      var otherSelected = $scope.contributorDetails && 'Other' === $scope.contributorDetails.credentials;
       if ($scope.isCredentialsOtherSelected && !otherSelected) {
         $scope.contributorDetails.credentialsOther = '';
       }
@@ -287,11 +493,11 @@
 
       if (keySkills) {
 
-        if (keySkills.length > 0) {
+        if (0 < keySkills.length) {
           count = keySkills.length;
         }
 
-        if (keySkills.length === 1) {
+        if (1 === keySkills.length) {
           skills = "Skill";
         }
       }
@@ -312,7 +518,7 @@
     });
 
     function updatePriorUseOtherSelected() {
-      var otherSelected = $scope.profile && $scope.profile.priorUse === 'Other';
+      var otherSelected = $scope.profile && 'Other' === $scope.profile.priorUse;
       if ($scope.isPriorUseOtherSelected && !otherSelected) {
         $scope.profile.priorUseOther = '';
       }
@@ -345,7 +551,7 @@
       var otherSelected = false;
       if ($scope.reviewsPassedDataProvider) {
         otherSelected = _.some($scope.reviewsPassedDataProvider, function(item) {
-          return item.selected && item.key === 'Other';
+          return item.selected && 'Other' === item.key;
         });
       }
       if ($scope.isReviewsPassedOtherSelected && !otherSelected && $scope.profile) {
@@ -370,15 +576,15 @@
         return selectedKeys.indexOf(key) >= 0;
       }
 
-      if (changedKey === "None") {
+      if ("None"  === changedKey) {
         if (keyIsSelected(changedKey)) {
           selectedKeys = ["None"];
         }
-      } else if (changedKey === "All") {
+      } else if ("All" === changedKey) {
         if (keyIsSelected(changedKey)) {
           var isOtherSelected = keyIsSelected("Other");
           selectedKeys = getKeys(function(item) {
-            return item.key !== "None" && (item.key !== "Other" || isOtherSelected);
+            return "None" !== item.key && ("Other" !== item.key || isOtherSelected);
           });
         }
       } else {
@@ -409,14 +615,17 @@
     };
 
     //----------------------------------------------------------------
-    // initialisation, load and save
+    // profile initialisation
     //----------------------------------------------------------------
 
-    function initSubObjects() {
+    function onLoadItemSuccess() {
       var profile = $scope.item.profile;
 
       if (!(profile.taskInfo)) {
         profile.taskInfo = {};
+      }
+      if (!(profile.taskInfo.subjects)) {
+        profile.taskInfo.subjects = {};
       }
       if (!_.isArray(profile.reviewsPassed)) {
         profile.reviewsPassed = [];
@@ -444,26 +653,12 @@
 
       if (!_.isArray(profile.contributorDetails.additionalCopyrights)) {
         profile.contributorDetails.additionalCopyrights = [];
+      } else {
+        removeEmptyAdditionalCopyrightItems();
       }
 
-      removeEmptyAdditionalCopyrightItems();
-    }
+      overrideProfileValuesWithConfig(profile, $scope.formModels);
 
-    function removeEmptyAdditionalCopyrightItems() {
-
-      function itemIsEmpty(item) {
-        return !item || _.every(item, function(val) {
-          return !val;
-        });
-      }
-
-      _.remove($scope.item.profile.contributorDetails.additionalCopyrights, itemIsEmpty);
-    }
-
-    function onLoadItemSuccess() {
-      initSubObjects();
-
-      var profile = $scope.item.profile;
       $scope.taskInfo = profile.taskInfo;
       $scope.otherAlignments = profile.otherAlignments;
       $scope.contributorDetails = profile.contributorDetails;
@@ -478,29 +673,45 @@
       updateReviewsPassedOtherSelected();
       updatePriorUseOtherSelected();
       updateCredentialsOtherSelected();
-
-      var watchNestedProperties;
-      $scope.$watch('item.profile', throttle(function(oldValue, newValue){
-        $scope.saveProfile();
-      }), watchNestedProperties = true);
     }
 
-    $scope.saveProfile = function() {
-      ItemService.fineGrainedSave({'profile': $scope.item.profile}, function(result){
-        $log.log("fineGrainedSave callback", result);
-      });
-    };
+    function removeEmptyAdditionalCopyrightItems() {
+
+      function itemIsEmpty(item) {
+        return !item || _.every(item, function(val) {
+            return !val;
+          });
+      }
+
+      _.remove($scope.item.profile.contributorDetails.additionalCopyrights, itemIsEmpty);
+    }
+
+    //----------------------------------------------------------------
+    // profile load and save
+    //----------------------------------------------------------------
 
     $scope.loadProfile = function(){
       $log.log("loading profile");
       ItemService.load(function(item){
         $log.log('item loading success hasItem:' + (!!item) + " hasProfile:" + (!!item && !!item.profile));
         if (item && item.profile) {
+
           $scope.item = item;
           onLoadItemSuccess();
+
+          var watchNestedProperties;
+          $scope.$watch('item.profile', throttle(function(oldValue, newValue){
+            $scope.saveProfile();
+          }), watchNestedProperties = true);
         }
       },function(){
         $log.error('error loading profile');
+      });
+    };
+
+    $scope.saveProfile = function() {
+      ItemService.fineGrainedSave({'profile': $scope.item.profile}, function(result){
+        $log.log("fineGrainedSave callback", result);
       });
     };
 
