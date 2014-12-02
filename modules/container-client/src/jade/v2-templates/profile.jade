@@ -135,7 +135,7 @@ script(type='text/ng-template', id='/templates/profile')
           select(id='contributorDetails.copyrightYear',ng-model='contributorDetails.copyrightYear', ng-options='c for c in copyrightYearDataProvider', style='width:170px;', ng-disabled='formModels.copyrightYear.readonly')
 
         +field('* Copyright Expiration','contributorDetails.copyrightExpirationDate', 'formModels.copyrightExpirationDate')
-          select(id='contributorDetails.copyrightExpirationDate',ng-model='contributorDetails.copyrightExpirationDate', ng-options='c for c in copyrightExpirationYearDataProvider', style='width:170px;', ng-disabled='formModels.copyrightExpirationDate.readonly')
+          select(id='contributorDetails.copyrightExpirationDate',ng-model='contributorDetails.copyrightExpirationDate', ng-options='c for c in copyrightExpirationDateDataProvider', style='width:170px;', ng-disabled='formModels.copyrightExpirationDate.readonly')
 
         +field('Website', 'contributorDetails.sourceUrl', 'formModels.sourceUrl')
 

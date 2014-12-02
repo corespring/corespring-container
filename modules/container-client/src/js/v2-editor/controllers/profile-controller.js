@@ -413,33 +413,42 @@
     $scope.relatedSubjectSelect2Adapter = new Select2Adapter("subjects.related", subjectText);
 
     //----------------------------------------------------------------
-    // some dataproviders for selects
+    // some dataProviders for selects
     //----------------------------------------------------------------
 
     DataQueryService.list("mediaType", function(result) {
-      $scope.mediaTypeDataProvider = result;
+      $scope.mediaTypeDataProvider = result; //not configurable, so no applyConfig here
     });
 
     DataQueryService.list("bloomsTaxonomy", function(result) {
-      $scope.bloomsTaxonomyDataProvider = result;
+      $scope.bloomsTaxonomyDataProvider = applyConfig(result,$scope.formModels.bloomsTaxonomy);
     });
 
     DataQueryService.list("depthOfKnowledge", function(result) {
-      $scope.depthOfKnowledgeDataProvider = result;
+      $scope.depthOfKnowledgeDataProvider = applyConfig(result, $scope.formModels.depthOfKnowledge);
     });
 
     DataQueryService.list("gradeLevels", function(result) {
-      function applyConfig(data, config){
-        if(_.isArray(config.options)){
-          return _.filter(data, function(item){
-            return _.contains(config.options, item);
-          });
-        }
-        return data;
-      }
       $scope.gradeLevelDataProvider = applyConfig(result, $scope.formModels.gradeLevel);
       $scope.priorGradeLevelDataProvider = applyConfig(result, $scope.formModels.priorGradeLevel);
     });
+
+
+    function applyConfig(data, config){
+      if(!_.isArray(config.options)) {
+        return data;
+      }
+
+      function itemIsInOptions(item){
+        //most items are key-value objects
+        //but some items like the copyright year are simple values
+        var key = item && item.hasOwnProperty('key') ? item.key : item;
+        return -1 < _.findIndex(config.options, function (option) {
+            return key === option;
+          });
+      }
+      return _.filter(data, itemIsInOptions);
+    }
 
     //----------------------------------------------------------------
     // copyright related dates
@@ -458,16 +467,20 @@
       });
     }
 
-    $scope.copyrightExpirationYearDataProvider = years(new Date().getFullYear(), new Date().getFullYear() + 20).concat(['Never']);
+    $scope.copyrightExpirationDateDataProvider = applyConfig(
+      years(new Date().getFullYear(), new Date().getFullYear() + 20).concat(['Never']),
+      $scope.formModels.copyrightExpirationDate);
 
-    $scope.copyrightYearDataProvider = years(new Date().getFullYear(), new Date().getFullYear() - 120);
+    $scope.copyrightYearDataProvider = applyConfig(
+      years(new Date().getFullYear(), new Date().getFullYear() - 120),
+      $scope.formModels.copyrightYear);
 
     //----------------------------------------------------------------
     // credentials
     //----------------------------------------------------------------
 
     DataQueryService.list("credentials", function(result) {
-      $scope.credentialsDataProvider = result;
+      $scope.credentialsDataProvider = applyConfig(result, $scope.formModels.credentials);
       updateCredentialsOtherSelected();
     });
 
@@ -518,7 +531,7 @@
     //----------------------------------------------------------------
 
     DataQueryService.list("priorUses", function(result) {
-      $scope.priorUseDataProvider = result;
+      $scope.priorUseDataProvider = applyConfig(result,$scope.formModels.priorUse);
       updatePriorUseOtherSelected();
     });
 
@@ -539,7 +552,7 @@
     //----------------------------------------------------------------
 
     DataQueryService.list("reviewsPassed", function(result) {
-      $scope.reviewsPassedDataProvider = result;
+      $scope.reviewsPassedDataProvider = applyConfig(result,$scope.formModels.reviewsPassed);
       initReviewsPassedDataProvider();
       updateReviewsPassedOtherSelected();
     });
