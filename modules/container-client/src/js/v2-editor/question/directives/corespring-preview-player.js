@@ -1,4 +1,4 @@
-/* global VirtualPatch */ 
+/* global VirtualPatch */
 (function() {
 
   function Type(fn) {
@@ -12,7 +12,7 @@
   function hook(fn) {
     return new Type(fn);
   }
-  
+
   function DomUtil(){
     var parser = new DOMParser();
 
@@ -22,12 +22,12 @@
 
       if(errors.length === 0){
         return doc.children[0];
-      } 
+      }
     };
-  } 
+  }
 
   angular.module('corespring-editor.directives').directive('corespringPreviewPlayer', [
-    '$compile', 
+    '$compile',
     'LogFactory',
     'ComponentData',
     'MathJaxService',
@@ -42,7 +42,7 @@
 
         var h = virtualDom.h; //jshint ignore:line
         var diff = virtualDom.diff; //jshint ignore:line
-        var patch = virtualDom.patch; //jshint ignore:line 
+        var patch = virtualDom.patch; //jshint ignore:line
         var createElement = virtualDom.create; //jshint ignore:line
         var virtualize = vdomVirtualize; //jshint ignore:line
 
@@ -60,8 +60,8 @@
 
               if(p.type === VirtualPatch.INSERT && p.patch.tagName.indexOf('coresspring') !== -1 ){
                 console.log('found a patch that needs compile: ', p);
-                
-                var key = p.patch.tagName; 
+
+                var key = p.patch.tagName;
                 p.patch.properties = p.patch.properties || {};
                 p.patch.properties[key] = hook( compileHook ) ;
                 out[k] = p;
@@ -85,6 +85,7 @@
             rootDom = virtualize(el);
             rootNode = createElement(rootDom);
             $element[0].appendChild(rootNode);
+            $compile($element)($scope.$new());
           }
 
           firstRun = false;
@@ -99,7 +100,7 @@
             rootDom = newDom;
           }
         };
- 
+
         var rendered = {};
 
         var renderMarkup = function(xhtml) {
@@ -110,11 +111,11 @@
           if ($scope.lastScope) {
             $scope.lastScope.$destroy();
           }
-          
+
           $scope.lastScope = $scope.$new();
-          
+
           var $body = $element.find('.player-body').html(xhtml);
-          
+
           $compile($body)($scope.lastScope);
 
           MathJaxService.onEndProcess(function(){
@@ -127,7 +128,7 @@
 
 
         function updateUi(){
-          
+
           logger.debug('[updateUi]');
 
           if(!$scope.xhtml){
@@ -139,7 +140,7 @@
           }
 
           var isEqual = _.isEqual($scope.xhtml, rendered.xhtml);
-          
+
           if (!isEqual) {
             logger.debug('[updateUi] xhtml', $scope.xhtml);
             renderMarkup($scope.xhtml);
