@@ -250,10 +250,14 @@ module.exports = (grunt) ->
       grunt: true
       args: [ 'less' ]
       opts:
-        cwd: common.components
+        cwd: common.components + '../'
 
     spawnResultHandler = (err, result, code) ->
       console.log result.stdout
+      if err?
+        console.log(result.stderr)
+        grunt.fail.fatal(err) 
+
       cb()
 
     grunt.util.spawn( spawnConfig, spawnResultHandler )
