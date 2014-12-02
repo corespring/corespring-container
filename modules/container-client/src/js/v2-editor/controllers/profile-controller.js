@@ -429,7 +429,16 @@
     });
 
     DataQueryService.list("gradeLevels", function(result) {
-      $scope.gradeLevelDataProvider = result;
+      function applyConfig(data, config){
+        if(_.isArray(config.options)){
+          return _.filter(data, function(item){
+            return _.contains(config.options, item);
+          });
+        }
+        return data;
+      }
+      $scope.gradeLevelDataProvider = applyConfig(result, $scope.formModels.gradeLevel);
+      $scope.priorGradeLevelDataProvider = applyConfig(result, $scope.formModels.priorGradeLevel);
     });
 
     //----------------------------------------------------------------

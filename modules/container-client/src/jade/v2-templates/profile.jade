@@ -110,7 +110,7 @@ script(type='text/ng-template', id='/templates/profile')
           input(ng-show='isPriorUseOtherSelected', type='text', placeholder='Enter prior use...', ng-model='profile.priorUseOther', ng-readonly='formModels.depthOfKnowledge.readonly')
 
         +field2('Prior Use Grade Level', 'profile.priorGradeLevel', 'formModels.priorGradeLevel')
-          tight-button-bar(id='profile.priorGradeLevel', ng-model='profile.priorGradeLevel', button-provider='gradeLevelDataProvider', key='key', readonly='formModels.priorGradeLevel.readonly')
+          tight-button-bar(id='profile.priorGradeLevel', ng-model='profile.priorGradeLevel', button-provider='priorGradeLevelDataProvider', key='key', readonly='formModels.priorGradeLevel.readonly')
 
         +field('Reviews Passed', 'profile.reviewsPassed')
           label(ng-repeat='rp in reviewsPassedDataProvider', style='width:50%;')

@@ -787,8 +787,44 @@ describe('profile controller', function () {
         expect(scope.contributorDetails.additionalCopyrights).toEqual([{author: "some author"}]);
       });
     });
-
-
+    describe("options", function(){
+      describe("gradeLevel", function(){
+        it("should not change dataProvider, when options are not defined", function(){
+          mockDataQueryService.listResult = ["01", "03", "05"];
+          mockLocation.hashResult = {config: JSON.stringify({
+            gradeLevel: {}
+          })};
+          makeProfileController();
+          expect(scope.gradeLevelDataProvider).toEqual(["01","03", "05"]);
+        });
+        it("should remove items which are not in both, dataProvider and options", function(){
+          mockDataQueryService.listResult = ["01", "03", "not in options"];
+          mockLocation.hashResult = {config: JSON.stringify({
+            gradeLevel: {options: ["01","03","not in dataProvider"]}
+          })};
+          makeProfileController();
+          expect(scope.gradeLevelDataProvider).toEqual(["01","03"]);
+        });
+      });
+      describe("priorGradeLevel", function(){
+        it("should not change dataProvider, when options are not defined", function(){
+          mockDataQueryService.listResult = ["01", "03", "05"];
+          mockLocation.hashResult = {config: JSON.stringify({
+            priorGradeLevel: {}
+          })};
+          makeProfileController();
+          expect(scope.priorGradeLevelDataProvider).toEqual(["01","03", "05"]);
+        });
+        it("should remove items which are not in both, dataProvider and options", function(){
+          mockDataQueryService.listResult = ["01", "03", "not in options"];
+          mockLocation.hashResult = {config: JSON.stringify({
+            priorGradeLevel: {options: ["01","03","not in dataProvider"]}
+          })};
+          makeProfileController();
+          expect(scope.priorGradeLevelDataProvider).toEqual(["01","03"]);
+        });
+      });
+    });
   });
 
 });
