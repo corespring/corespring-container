@@ -37,6 +37,10 @@ angular.module('corespring-editor.controllers')
 
       $scope.previewOn = AppState.question.preview || false;
 
+      $scope.$watch('previewOn', function(){
+        AppState.question.preview = $scope.previewOn;
+      });
+
       $scope.showSummaryFeedback = false;
 
       $scope.togglePreview = function() {
