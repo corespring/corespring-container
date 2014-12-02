@@ -4,6 +4,7 @@
      ng-repeat="b in buttonProvider",
      type="button",
      ng-click="toggle(b)",
+     ng-disabled="readonly"
      onmouseout="this.blur()",
      ng-class="{ active: selected(b)}")
       | {{getValue(b)}}

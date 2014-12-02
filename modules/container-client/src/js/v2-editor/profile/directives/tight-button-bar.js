@@ -16,7 +16,8 @@ angular.module('corespring-editor.directives')
       scope: {
         buttonProvider: '=',
         ngModel: '=',
-        key: '@'
+        key: '@',
+        readonly: '='
       },
       templateUrl: "/v2-editor/profile/directives/tight-button-bar.html",
       link: function ($scope) {
