@@ -434,6 +434,7 @@
     });
 
 
+
     function applyConfig(data, config){
       if(!_.isArray(config.options)) {
         return data;
