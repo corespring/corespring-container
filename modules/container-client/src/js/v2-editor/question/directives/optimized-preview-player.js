@@ -132,7 +132,11 @@
               scopes[id].$destroy();
             }
             scopes[id] = $scope.$new();
-            $compile(node)(scopes[id]); 
+            //$compile(node)(scopes[id]);
+            $scope.$apply(function(){
+              $compile(node)(scopes[id]);
+
+            }); 
           });
           
           /** because we are outside of angular - we need to trigger a $digest() */

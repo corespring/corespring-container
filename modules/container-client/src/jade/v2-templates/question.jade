@@ -71,11 +71,21 @@ script(type="text/ng-template", id="/templates/question")
           .player-label
             img(src='../../images/item-player-label.png')
           .player-container
-            optimized-preview-player(
-              ng-model="item.xhtml",
+            old-preview-player(
+              player-markup="item.xhtml",
               player-components="item.components",
               player-session="rootModel.session",
               player-outcomes="outcome")
+            //corespring-preview-player(
+            //  player-markup="item.xhtml",
+            //  player-components="item.components",
+            //  player-session="rootModel.session",
+            //  player-outcomes="outcome")
+            //optimized-preview-player(
+            //  ng-model="item.xhtml",
+            //  player-components="item.components",
+            //  player-session="rootModel.session",
+            //  player-outcomes="outcome")
           .row
             preview-player-control-panel(
               data-mode='playerMode', 
