@@ -32,6 +32,17 @@ mixin select2(select2Model, msg, formModel)
   data-placeholder=msg,
   ng-readonly='#{formModel}.readonly')
 
+mixin select2Multiple(dataProvider, msg, formModel)
+  select(id=ngModel,
+  ng-model=ngModel,
+  ui-select2,
+  multiple,
+  data-placeholder=msg,
+  ng-readonly='#{formModel}.readonly',
+  style='width:100%;')
+    option(ng-repeat="c in #{dataProvider}",value="{{c.key}}") {{c.value}}
+
+
 script(type='text/ng-template', id='/templates/profile')
   .profile(ng-controller='ProfileController')
     .row.col-md-8
@@ -51,9 +62,7 @@ script(type='text/ng-template', id='/templates/profile')
           +select2('relatedSubjectSelect2Adapter', 'Choose a subject...', 'formModels.relatedSubject')
 
         +field2('Grade Level', 'taskInfo.gradeLevel', 'formModels.gradeLevel')
-          select(ui-select2, multiple, id='taskInfo.gradeLevel',ng-model='taskInfo.gradeLevel',style='width:400px;',
-            data-placeholder='Choose a grade level...', ng-readonly='formModels.gradeLevel.readonly')
-            option(ng-repeat="c in gradeLevelDataProvider",value="{{c.key}}") {{c.value}}
+          +select2Multiple('gradeLevelDataProvider','Choose a grade level...','formModels.gradeLevel')
 
         +field2('Item Types', '$qt', 'formModels.componentTypes')
           ul
@@ -107,9 +116,7 @@ script(type='text/ng-template', id='/templates/profile')
           input(ng-show='isPriorUseOtherSelected', type='text', placeholder='Enter prior use...', ng-model='profile.priorUseOther', ng-readonly='formModels.depthOfKnowledge.readonly')
 
         +field2('Prior Use Grade Level', 'profile.priorGradeLevel', 'formModels.priorGradeLevel')
-          select(ui-select2, multiple, id='profile.priorGradeLevel',ng-model='profile.priorGradeLevel',style='width:400px;',
-          data-placeholder='Choose a grade level...', ng-readonly='formModels.priorGradeLevel.readonly')
-            option(ng-repeat="c in priorGradeLevelDataProvider",value="{{c.key}}") {{c.value}}
+          +select2Multiple('priorGradeLevelDataProvider','Choose a grade level...','formModels.priorGradeLevel')
 
         +field('Reviews Passed', 'profile.reviewsPassed')
           label(ng-repeat='rp in reviewsPassedDataProvider', style='width:50%;')
