@@ -17,11 +17,16 @@
     var parser = new DOMParser();
 
     this.stringToElement = function(s){
-      var doc = parser.parseFromString(s, 'application/xml');
+      var doc = parser.parseFromString(s, 'text/html');
       var errors = doc.querySelectorAll('parsererror');
 
       if(errors.length === 0){
-        return doc.children[0];
+        var body = doc.querySelector('body');
+        var holder = document.createElement('div');
+        for(var x = 0; x < body.children.length; x++){
+          holder.appendChild(body.children[x]);
+        }
+        return holder;
       }
     };
   }
@@ -55,11 +60,15 @@
 
           var out = {};
           for(var k in patches){
+            logger.debug('patches', k, patches[k]);
             if(k !== 'a'){
               var p = patches[k];
 
-              if(p.type === VirtualPatch.INSERT && p.patch.tagName.indexOf('coresspring') !== -1 ){
-                console.log('found a patch that needs compile: ', p);
+              var isSupportedType = _.contains([VirtualPatch.INSERT, VirtualPatch.VNODE], p.type);
+              var isCorespringTag = p.patch && p.patch.tagName && _.contains(p.patch.tagName.toLowerCase(), 'corespring');
+              
+              if(isSupportedType && isCorespringTag ){
+                logger.debug('found a patch that needs compile: ', p);
 
                 var key = p.patch.tagName;
                 p.patch.properties = p.patch.properties || {};
@@ -90,6 +99,7 @@
 
           firstRun = false;
 
+          logger.debug(ngModel.$viewValue);
           var newEl = domUtil.stringToElement(ngModel.$viewValue);
 
           if (newEl) {
