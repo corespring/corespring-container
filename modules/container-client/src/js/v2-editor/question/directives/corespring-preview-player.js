@@ -20,8 +20,6 @@
       var doc = parser.parseFromString('<div class="preview-player-tmp-wrapper">' + s + '</div>', 'text/html');
       var errors = doc.querySelectorAll('parsererror');
 
-      console.debug('doc innerHTML: ', doc.innerHTML);
-
       if(errors.length === 0){
         var div = doc.querySelector('.preview-player-tmp-wrapper');
         return div;
@@ -50,8 +48,8 @@
         var virtualize = vdomVirtualize; //jshint ignore:line
 
 
-        function compileHook(el, prop){
-          $compile(el)($scope.$new());
+        function addCompilationPending(el, prop){
+          el.setAttribute('compilation-pending', true);
         }
 
         function addHookToPatch(vp){
@@ -62,7 +60,7 @@
             var key = vp.patch.tagName;
             logger.debug('found a patch that needs compile: ', key);
             vp.patch.properties = vp.patch.properties || {};
-            vp.patch.properties[key] = hook( compileHook ) ;
+            vp.patch.properties[key] = hook( addCompilationPending ) ;
           }
         }
 
@@ -84,7 +82,7 @@
         /**
          * Update the dom using the latest $viewValue
          */
-        ngModel.$render = function() {
+        ngModel.$render = _.debounce(function() {
 
           if (!ngModel.$viewValue) {
             return;
@@ -94,7 +92,7 @@
             var el = domUtil.stringToElement(ngModel.$viewValue);
             rootVDom = virtualize(el);
             rootNode = createElement(rootVDom);
-            $element[0].appendChild(rootNode);
+            $element[0].appendChild(rootNode); //.cloneNode(true));
             $compile($element)($scope.$new());
           }
 
@@ -112,7 +110,22 @@
             rootNode = patch(rootNode, patches);
             rootVDom = newVDom;
           }
-        };
+
+          var compileNodes = $element.find('[compilation-pending=true]');
+
+          compileNodes.each(function(index, node){
+            logger.debug('compiling -> ', node);
+            node.removeAttribute('compilation-pending');
+            var id = node.getAttribute('id');
+            if(scopes[id]){
+              scopes[id].$destroy();
+            }
+            scopes[id] = $scope.$new();
+            $compile(node)(scopes[id]); 
+          });
+        }, 200, {leading: false, trailing: true});
+        
+        var scopes = {};
 
         var rendered = {};
 
