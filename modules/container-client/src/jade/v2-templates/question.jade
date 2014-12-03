@@ -37,6 +37,15 @@ script(type="text/ng-template", id="/templates/question")
           feature-overrides="overrideFeatures",
           image-service="imageService")
 
+          toolbar.main-editor-wiggi-toolbar(
+            basic="bold italic underline superscript subscript", 
+            formatting="blockquote h1 h2 h3")
+
+          edit-pane-toolbar(alignment="bottom")
+            .btn-group.pull-right
+              button.btn.btn-default(ng-click="closePane()") Done
+
+
       br/
 
       .row

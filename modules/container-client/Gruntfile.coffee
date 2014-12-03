@@ -32,7 +32,7 @@ lessConfig = (cleancss) ->
     cleancss: cleancss
   expand: true
   cwd: '<%= common.dist %>/css'
-  src: ['**/rig.less', '**/player.less', '**/v2-editor.less', '**/editor.less']
+  src: ['**/rig.less', '**/player.less', '**/v2-editor.less', '**/editor.less', '**/homepage.less']
   dest: '<%= common.dist %>/css/'
   ext: suffix
   flatten: false
@@ -242,10 +242,14 @@ module.exports = (grunt) ->
       grunt: true
       args: [ 'less' ]
       opts:
-        cwd: common.components
+        cwd: common.components 
 
     spawnResultHandler = (err, result, code) ->
       console.log result.stdout
+      if err?
+        console.log(result.stderr)
+        grunt.fail.fatal(err) 
+
       cb()
 
     grunt.util.spawn( spawnConfig, spawnResultHandler )

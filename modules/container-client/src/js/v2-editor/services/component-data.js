@@ -77,7 +77,7 @@ angular.module('corespring-editor.services')
 
         this.addComponent = function(d){
           console.warn('@deprecated use "addComponentModel" instead');
-          this.addComponentModel(d);
+          return this.addComponentModel(d);
         };
 
         this.addComponentModel = function(defaultData){
