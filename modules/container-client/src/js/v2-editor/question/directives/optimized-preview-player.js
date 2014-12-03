@@ -139,34 +139,24 @@
           if(compileNodes.length > 0){
             $scope.$digest();
           }          
+
+
+          //TODO: We can apply the same selective rendering here as we do with $compile
+          triggerMathRendering();
         }, 200, {leading: false, trailing: true});
         
         var scopes = {};
 
         var rendered = {};
 
-        var renderMarkup = function(xhtml) {
-          logger.debug('[renderMarkup]...');
-
-          $element.find('.player-body').addClass('hidden-player-body');
-
-          if ($scope.lastScope) {
-            $scope.lastScope.$destroy();
-          }
-
-          $scope.lastScope = $scope.$new();
-
-          var $body = $element.find('.player-body').html(xhtml);
-
-          $compile($body)($scope.lastScope);
-
+        function triggerMathRendering(){
           MathJaxService.onEndProcess(function(){
             $('.player-body').removeClass('hidden-player-body');
             MathJaxService.off(arguments.callee);
           });
 
           MathJaxService.parseDomForMath(0, $element.find('.player-body')[0]);
-        };
+        }
 
 
         function updateRenderedComponents(){
