@@ -26,7 +26,7 @@
       }
     };
   }
-  
+
   /**
    * A preview that is optimized to make a minimum of calls to $compile. 
    */
@@ -169,11 +169,11 @@
         };
 
 
-        function updateUi(){
+        function updateRenderedComponents(){
 
-          logger.debug('[updateUi]');
+          logger.debug('[updateRenderedComponents]');
 
-          if(!$scope.xhtml){
+          if(!ngModel.$viewValue){
             return;
           }
 
@@ -181,24 +181,16 @@
             return;
           }
 
-          var isEqual = _.isEqual($scope.xhtml, rendered.xhtml);
-
-          if (!isEqual) {
-            logger.debug('[updateUi] xhtml', $scope.xhtml);
-            renderMarkup($scope.xhtml);
-            rendered.xhtml = _.cloneDeep($scope.xhtml);
-          }
-
           if(_.isEqual($scope.components, rendered.components)){
-            logger.debug('[updateUi] components are the same - skip update');
+            logger.debug('[updateRenderedComponents] components are the same - skip update');
             return;
           }
 
           _.forIn($scope.components, function(model, id){
             if(_.isEqual(model, rendered.components ? rendered.components[id] : null)){
-              logger.debug('[updateUi] id', id, 'data is same skip...');
+              logger.debug('[updateRenderedComponents] id', id, 'data is same skip...');
             } else {
-              logger.debug('[updateUi] id', id, 'updating...');
+              logger.debug('[updateRenderedComponents] id', id, 'updating...');
               ComponentData.updateComponent(id, model);
             }
           });
@@ -206,28 +198,17 @@
           rendered.components = _.cloneDeep($scope.components);
         }
 
-        var debouncedUpdateUi = debounce(updateUi);
+        var debouncedUpdateComponents = debounce(updateRenderedComponents);
 
         function debounce(fn){
           return _.debounce(function(){
-
-            if(!$scope.$$phase) {
-              $scope.$apply(fn);
-              //$digest or $apply
-            } else {
-              fn();
-            }
-            //fn();
-            //$scope.$digest();
+            fn();
+            $scope.$digest();
           }, 300, {leading: false, trailing: true});
         }
 
-        /*$scope.$watch('xhtml', function() {
-          debouncedUpdateUi();
-        });*/
-
         $scope.$watch('components', function(){
-          debouncedUpdateUi();
+          debouncedUpdateComponents();
         }, true);
 
         $scope.$watch('outcomes', function(r) {
@@ -238,7 +219,7 @@
           MathJaxService.parseDomForMath();
         }, true);
 
-        debouncedUpdateUi();
+        debouncedUpdateComponents();
       }
 
       return {
