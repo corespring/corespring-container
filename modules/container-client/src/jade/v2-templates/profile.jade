@@ -51,12 +51,9 @@ script(type='text/ng-template', id='/templates/profile')
           +select2('relatedSubjectSelect2Adapter', 'Choose a subject...', 'formModels.relatedSubject')
 
         +field2('Grade Level', 'taskInfo.gradeLevel', 'formModels.gradeLevel')
-          tight-button-bar(
-          id='taskInfo.gradeLevel',
-          ng-model='taskInfo.gradeLevel',
-          button-provider='gradeLevelDataProvider',
-          key='key',
-          readonly='formModels.gradeLevel.readonly')
+          select(ui-select2, multiple, id='taskInfo.gradeLevel',ng-model='taskInfo.gradeLevel',style='width:400px;',
+            data-placeholder='Choose a grade level...', ng-readonly='formModels.gradeLevel.readonly')
+            option(ng-repeat="c in gradeLevelDataProvider",value="{{c.key}}") {{c.value}}
 
         +field2('Item Types', '$qt', 'formModels.componentTypes')
           ul
@@ -110,7 +107,9 @@ script(type='text/ng-template', id='/templates/profile')
           input(ng-show='isPriorUseOtherSelected', type='text', placeholder='Enter prior use...', ng-model='profile.priorUseOther', ng-readonly='formModels.depthOfKnowledge.readonly')
 
         +field2('Prior Use Grade Level', 'profile.priorGradeLevel', 'formModels.priorGradeLevel')
-          tight-button-bar(id='profile.priorGradeLevel', ng-model='profile.priorGradeLevel', button-provider='gradeLevelDataProvider', key='key', readonly='formModels.priorGradeLevel.readonly')
+          select(ui-select2, multiple, id='profile.priorGradeLevel',ng-model='profile.priorGradeLevel',style='width:400px;',
+          data-placeholder='Choose a grade level...', ng-readonly='formModels.priorGradeLevel.readonly')
+            option(ng-repeat="c in priorGradeLevelDataProvider",value="{{c.key}}") {{c.value}}
 
         +field('Reviews Passed', 'profile.reviewsPassed')
           label(ng-repeat='rp in reviewsPassedDataProvider', style='width:50%;')
@@ -135,7 +134,7 @@ script(type='text/ng-template', id='/templates/profile')
           select(id='contributorDetails.copyrightYear',ng-model='contributorDetails.copyrightYear', ng-options='c for c in copyrightYearDataProvider', style='width:170px;', ng-disabled='formModels.copyrightYear.readonly')
 
         +field('* Copyright Expiration','contributorDetails.copyrightExpirationDate', 'formModels.copyrightExpirationDate')
-          select(id='contributorDetails.copyrightExpirationDate',ng-model='contributorDetails.copyrightExpirationDate', ng-options='c for c in copyrightExpirationYearDataProvider', style='width:170px;', ng-disabled='formModels.copyrightExpirationDate.readonly')
+          select(id='contributorDetails.copyrightExpirationDate',ng-model='contributorDetails.copyrightExpirationDate', ng-options='c for c in copyrightExpirationDateDataProvider', style='width:170px;', ng-disabled='formModels.copyrightExpirationDate.readonly')
 
         +field('Website', 'contributorDetails.sourceUrl', 'formModels.sourceUrl')
 
