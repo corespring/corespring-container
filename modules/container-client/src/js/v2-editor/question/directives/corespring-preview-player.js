@@ -1,162 +1,51 @@
-/* global VirtualPatch */
 (function() {
 
-  function Type(fn) {
-   this.fn = fn;
-  }
-
-  Type.prototype.hook = function () {
-    this.fn.apply(this, arguments);
-  };
-
-  function hook(fn) {
-    return new Type(fn);
-  }
-
-  function DomUtil(){
-
-    this.stringToElement = function(s){
-      var parser = new DOMParser();
-      var doc = parser.parseFromString('<div class="preview-player-tmp-wrapper">' + s + '</div>', 'text/html');
-      var errors = doc.querySelectorAll('parsererror');
-
-      if(errors.length === 0){
-        var div = doc.querySelector('.preview-player-tmp-wrapper');
-        return div;
-      }
-    };
-  }
-
   angular.module('corespring-editor.directives').directive('corespringPreviewPlayer', [
-    '$compile',
+    '$compile', 
     'LogFactory',
     'ComponentData',
     'MathJaxService',
     function($compile, LogFactory, ComponentData, MathJaxService) {
+
       var logger = LogFactory.getLogger('corespring-preview-player');
 
-      function link($scope, $element, $attrs, ngModel){
+      /**
+        * Performance improvements.
+        * The player rendering is really sluggish and jumpy cos we re compile for every change.
+        * 0. if the player isn't visible - no need to update
+        * 1. when updating text in the editor, we only need to update the text in the player
+        * 2. when updating the data for a component, we only need to update the data for that component
+        * 3. when adding a new components, we only need to compile that node within the player body
+        * 4. when removing a component we only need to remove that node + call $scope.destroy();
+        *
+        * Editor:
+        * 1. When we launch an overlay, we should give the overlay a clone of the data and on close check a diff and merge the data back.
+        *
+        * ComponentData TODO: 
+        * submit answer - update session
+        * reset session
 
-        var firstRun = true;
-        var rootVDom, rootNode;
-        var domUtil = new DomUtil();
-
-        var h = virtualDom.h; //jshint ignore:line
-        var diff = virtualDom.diff; //jshint ignore:line
-        var patch = virtualDom.patch; //jshint ignore:line
-        var createElement = virtualDom.create; //jshint ignore:line
-        var virtualize = vdomVirtualize; //jshint ignore:line
+        * 1. 
+        */
 
 
-        function addCompilationPending(el, prop){
-          el.setAttribute('compilation-pending', true);
-        }
-
-        function containsCorespring(s){ 
-          return _.contains(s.toLowerCase(), 'corespring');
-        }
-
-        function processPatch(vp){
-          var isNodeMoveOrInsert = vp && _.contains([VirtualPatch.INSERT, VirtualPatch.VNODE], vp.type);
-          var isCorespringTag = vp.patch && vp.patch.tagName && containsCorespring(vp.patch.tagName);
-
-          if(isCorespringTag && isNodeMoveOrInsert){
-            var key = vp.patch.tagName;
-            logger.debug('found a patch that needs compile: ', key);
-            vp.patch.properties = vp.patch.properties || {};
-            vp.patch.properties[key] = hook( addCompilationPending ) ;
-          }
-
-          if(vp.vNode && vp.vNode.tagName && containsCorespring(vp.vNode.tagName)){
-            var id = vp.vNode.properties.id;
-            if(scopes[id]){
-              logger.debug('destroy scope: ', id);
-              scopes[id].$destroy();
-            }
-          }
-        }
-
-        function addHooks(patches){
-          for(var k in patches){
-            logger.debug('patches', k, patches[k]);
-            if(k !== 'a'){
-              var p = patches[k];
-
-              if(_.isArray(p)){
-                _.forEach(p, processPatch);
-              } else {
-                processPatch(p);
-              }
-            }
-          }
-        }
-
-        /**
-         * Update the dom using the latest $viewValue
-         */
-        ngModel.$render = _.debounce(function() {
-
-          if (!ngModel.$viewValue) {
-            return;
-          }
-
-          if (firstRun) {
-            var el = domUtil.stringToElement(ngModel.$viewValue);
-            rootVDom = virtualize(el);
-            rootNode = createElement(rootVDom);
-            $element[0].appendChild(rootNode); //.cloneNode(true));
-            $compile($element)($scope.$new());
-          }
-
-          firstRun = false;
-
-          logger.debug('new html:', ngModel.$viewValue);
-          var newEl = domUtil.stringToElement(ngModel.$viewValue);
-          logger.debug('new el:', newEl.innerHTML);
-          logger.debug('existing el:', rootNode.innerHTML);
-
-          if (newEl) {
-            var newVDom = virtualize(newEl);
-            var patches = diff(rootVDom, newVDom);
-            var cPatches = addHooks(patches);
-            rootNode = patch(rootNode, patches);
-            rootVDom = newVDom;
-          }
-
-          var compileNodes = $element.find('[compilation-pending=true]');
-
-          $compile(compileNodes)($scope.$new());
-          compileNodes.attr('id');
-          compileNodes.removeAttr('compilation-pending');
-          /*compileNodes.each(function(index, node){
-            logger.debug('compiling -> ', node);
-            node.removeAttribute('compilation-pending');
-            var id = node.getAttribute('id');
-            if(scopes[id]){
-              scopes[id].$destroy();
-            }
-            scopes[id] = $scope.$new();
-            $compile(node)(scopes[id]); 
-          });*/
-        }, 200, {leading: false, trailing: true});
-        
-        var scopes = {};
-
+      function link($scope, $element, $attrs){
+ 
         var rendered = {};
 
         var renderMarkup = function(xhtml) {
           logger.debug('[renderMarkup]...');
 
-          $element.find('.player-body').addClass('hidden-player-body');
+          //$element.find('.player-body').addClass('hidden-player-body');
 
           if ($scope.lastScope) {
             $scope.lastScope.$destroy();
           }
-
+          
           $scope.lastScope = $scope.$new();
-
+          
           var $body = $element.find('.player-body').html(xhtml);
-
+          
           $compile($body)($scope.lastScope);
 
           MathJaxService.onEndProcess(function(){
@@ -169,7 +58,7 @@
 
 
         function updateUi(){
-
+          
           logger.debug('[updateUi]');
 
           if(!$scope.xhtml){
@@ -181,7 +70,7 @@
           }
 
           var isEqual = _.isEqual($scope.xhtml, rendered.xhtml);
-
+          
           if (!isEqual) {
             logger.debug('[updateUi] xhtml', $scope.xhtml);
             renderMarkup($scope.xhtml);
@@ -208,12 +97,15 @@
         var debouncedUpdateUi = debounce(updateUi);
 
         function debounce(fn){
-          return _.debounce(fn, 300, {leading: false, trailing: true});
+          return _.debounce(function(){
+            fn();
+            //$scope.$digest();
+          }, 300, {leading: false, trailing: true});
         }
 
-        /*$scope.$watch('xhtml', function() {
+        $scope.$watch('xhtml', function() {
           debouncedUpdateUi();
-        });*/
+        });
 
         $scope.$watch('components', function(){
           debouncedUpdateUi();
@@ -233,11 +125,11 @@
       return {
         restrict: 'E',
         link: link,
-        require: '?ngModel',
         scope : {
-          components: '=playerComponents',
-          outcomes: '=playerOutcomes',
-          session: '=playerSession'
+        xhtml: '=playerMarkup',
+        components: '=playerComponents',
+        outcomes: '=playerOutcomes',
+        session: '=playerSession'
         },
         template : [
           '<div class="corespring-player">',
