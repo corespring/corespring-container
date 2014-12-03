@@ -36,6 +36,10 @@ angular.module('corespring-player.services')
         }
       });
 
+      this.setAnswerChangedHandler = function(cb) {
+        answerChangedHandler = cb;
+      };
+
       this.setDataAndSession = function(allData) {
         console.warn('@deprecated: use "setDataAndSessions(data, sessions)" instead');
         this.loadedData = allData;
