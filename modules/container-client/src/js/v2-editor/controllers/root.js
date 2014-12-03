@@ -33,7 +33,7 @@ angular.module('corespring-editor.controllers')
           }
         });
         $scope.lastId = max;
-        $scope.$broadcast('itemLoaded');
+        $scope.$broadcast('itemLoaded', item);
       };
 
       ItemService.load($scope.onItemLoaded, function() {
