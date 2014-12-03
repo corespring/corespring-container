@@ -87,8 +87,7 @@ angular.module('corespring-editor.directives')
           markDirty();
           $event.stopPropagation();
           removeTooltip();
-          $scope.$emit('wiggi-wiz.call-feature-method', 'editNode',
-            $element);
+          $scope.$emit( 'edit-node', $scope.id, $scope.componentModel);
         };
 
         /**

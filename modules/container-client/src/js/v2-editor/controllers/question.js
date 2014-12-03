@@ -8,6 +8,7 @@ angular.module('corespring-editor.controllers')
     'LogFactory',
     'ComponentImageService',
     'ComponentData',
+    'ComponentPopups',
     'AppState',
     'ScoringHandler',
     function($scope,
@@ -18,6 +19,7 @@ angular.module('corespring-editor.controllers')
       LogFactory,
       ComponentImageService,
       ComponentData,
+      ComponentPopups,
       AppState,
       ScoringHandler) {
 
@@ -43,6 +45,9 @@ angular.module('corespring-editor.controllers')
         });
       };
 
+      $scope.$on('edit-node', function($event, id, model){
+        ComponentPopups.launch(id, model);
+      });
 
       $scope.imageService = ComponentImageService;
       $scope.overrideFeatures = EditorConfig.overrideFeatures;
