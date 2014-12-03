@@ -3,6 +3,10 @@ mixin dropdown_btn(name)
     a(role='menuitem', tabindex='-1', ng-click="#{name}()")
       block
 
+mixin info_btn(name)
+    a(ng-click="#{name}()")
+      block
+
 mixin tab(label, name)
   li(ui-sref-active="active")
     a(ui-sref="#{name}", role='tab')= label
@@ -10,6 +14,13 @@ mixin tab(label, name)
 mixin help
   a.help.navbar-right(ng-click="help()")
     i.fa.fa-question-circle
+
+mixin helper-icons
+  ul.list-inline.list-unstyled.helper-icons
+    li 
+      +info_btn('questionInformation') Question Information
+    li 
+      +help
 
 include ../v2-templates/popups
 
@@ -40,7 +51,7 @@ nav.row.navbar-default(ng-controller="NavController")
         span#save-error(ng-switch-default)
           |  &nbsp;
 
-  +help
+  +helper-icons
 
   ul.nav.nav-tabs(role='tablist')
     +tab('Question', 'question')

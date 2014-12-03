@@ -1,4 +1,5 @@
 nav{
+  position: relative;
   .title {
     font-size: 20px;
     padding: 20px 0 0 15px;
@@ -6,15 +7,19 @@ nav{
       cursor: pointer;
     }
   }
-
-  .help {
-    font-size: 29px;
-    position: relative;
+  .helper-icons{
+    position: absolute;
     right: 10px;
+    bottom: 0;
+  }
+
+  .help{
+    font-size: 29px;
     i {
       color: @new-blue;
     }
   }
+
 
   .save-msg{
     position: relative;
