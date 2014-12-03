@@ -39,17 +39,16 @@
       var logger = LogFactory.getLogger('corespring-preview-player');
 
       function link($scope, $element, $attrs, ngModel){
-
         var firstRun = true;
         var rootVDom, rootNode;
         var domUtil = new DomUtil();
-
+        var componentScopes = {};
+        var rendered = {};
         var h = virtualDom.h; //jshint ignore:line
         var diff = virtualDom.diff; //jshint ignore:line
         var patch = virtualDom.patch; //jshint ignore:line
         var createElement = virtualDom.create; //jshint ignore:line
         var virtualize = vdomVirtualize; //jshint ignore:line
-
 
         function addCompilationPending(el, prop){
           el.setAttribute('compilation-pending', true);
@@ -72,9 +71,9 @@
 
           if(vp.vNode && vp.vNode.tagName && containsCorespring(vp.vNode.tagName)){
             var id = vp.vNode.properties.id;
-            if(scopes[id]){
+            if(componentScopes[id]){
               logger.debug('destroy scope: ', id);
-              scopes[id].$destroy();
+              componentScopes[id].$destroy();
             }
           }
         }
@@ -128,15 +127,11 @@
           compileNodes.each(function(index, node){
             node.removeAttribute('compilation-pending');
             var id = node.getAttribute('id');
-            if(scopes[id]){
-              scopes[id].$destroy();
+            if(componentScopes[id]){
+              componentScopes[id].$destroy();
             }
-            scopes[id] = $scope.$new();
-            //$compile(node)(scopes[id]);
-            $scope.$apply(function(){
-              $compile(node)(scopes[id]);
-
-            }); 
+            componentScopes[id] = $scope.$new();
+            $compile(node)(componentScopes[id]);
           });
           
           /** because we are outside of angular - we need to trigger a $digest() */
@@ -144,14 +139,10 @@
             $scope.$digest();
           }          
 
-
           //TODO: We can apply the same selective rendering here as we do with $compile
           triggerMathRendering();
         }, 200, {leading: false, trailing: true});
         
-        var scopes = {};
-
-        var rendered = {};
 
         function triggerMathRendering(){
           MathJaxService.onEndProcess(function(){
@@ -198,7 +189,7 @@
           return _.debounce(function(){
             fn();
             $scope.$digest();
-          }, 300, {leading: false, trailing: true});
+          }, 200, {leading: false, trailing: true});
         }
 
         $scope.$watch('components', function(){
