@@ -52,15 +52,27 @@
           el.setAttribute('compilation-pending', true);
         }
 
-        function addHookToPatch(vp){
-          var isSupportedType = vp && _.contains([VirtualPatch.INSERT, VirtualPatch.VNODE], vp.type);
-          var isCorespringTag = vp.patch && vp.patch.tagName && _.contains(vp.patch.tagName.toLowerCase(), 'corespring');
+        function containsCorespring(s){ 
+          return _.contains(s.toLowerCase(), 'corespring');
+        }
 
-          if(isSupportedType && isCorespringTag ){
+        function processPatch(vp){
+          var isNodeMoveOrInsert = vp && _.contains([VirtualPatch.INSERT, VirtualPatch.VNODE], vp.type);
+          var isCorespringTag = vp.patch && vp.patch.tagName && containsCorespring(vp.patch.tagName);
+
+          if(isCorespringTag && isNodeMoveOrInsert){
             var key = vp.patch.tagName;
             logger.debug('found a patch that needs compile: ', key);
             vp.patch.properties = vp.patch.properties || {};
             vp.patch.properties[key] = hook( addCompilationPending ) ;
+          }
+
+          if(vp.vNode && vp.vNode.tagName && containsCorespring(vp.vNode.tagName)){
+            var id = vp.vNode.properties.id;
+            if(scopes[id]){
+              logger.debug('destroy scope: ', id);
+              scopes[id].$destroy();
+            }
           }
         }
 
@@ -71,9 +83,9 @@
               var p = patches[k];
 
               if(_.isArray(p)){
-                _.forEach(p, addHookToPatch);
+                _.forEach(p, processPatch);
               } else {
-                addHookToPatch(p);
+                processPatch(p);
               }
             }
           }
@@ -113,7 +125,10 @@
 
           var compileNodes = $element.find('[compilation-pending=true]');
 
-          compileNodes.each(function(index, node){
+          $compile(compileNodes)($scope.$new());
+          compileNodes.attr('id');
+          compileNodes.removeAttr('compilation-pending');
+          /*compileNodes.each(function(index, node){
             logger.debug('compiling -> ', node);
             node.removeAttribute('compilation-pending');
             var id = node.getAttribute('id');
@@ -122,7 +137,7 @@
             }
             scopes[id] = $scope.$new();
             $compile(node)(scopes[id]); 
-          });
+          });*/
         }, 200, {leading: false, trailing: true});
         
         var scopes = {};
