@@ -14,19 +14,17 @@
   }
 
   function DomUtil(){
-    var parser = new DOMParser();
 
     this.stringToElement = function(s){
-      var doc = parser.parseFromString(s, 'text/html');
+      var parser = new DOMParser();
+      var doc = parser.parseFromString('<div class="preview-player-tmp-wrapper">' + s + '</div>', 'text/html');
       var errors = doc.querySelectorAll('parsererror');
 
+      console.debug('doc innerHTML: ', doc.innerHTML);
+
       if(errors.length === 0){
-        var body = doc.querySelector('body');
-        var holder = document.createElement('div');
-        for(var x = 0; x < body.children.length; x++){
-          holder.appendChild(body.children[x]);
-        }
-        return holder;
+        var div = doc.querySelector('.preview-player-tmp-wrapper');
+        return div;
       }
     };
   }
@@ -42,7 +40,7 @@
       function link($scope, $element, $attrs, ngModel){
 
         var firstRun = true;
-        var rootDom, rootNode;
+        var rootVDom, rootNode;
         var domUtil = new DomUtil();
 
         var h = virtualDom.h; //jshint ignore:line
@@ -56,28 +54,31 @@
           $compile(el)($scope.$new());
         }
 
-        function addHooks(patches){
+        function addHookToPatch(vp){
+          var isSupportedType = vp && _.contains([VirtualPatch.INSERT, VirtualPatch.VNODE], vp.type);
+          var isCorespringTag = vp.patch && vp.patch.tagName && _.contains(vp.patch.tagName.toLowerCase(), 'corespring');
 
-          var out = {};
+          if(isSupportedType && isCorespringTag ){
+            var key = vp.patch.tagName;
+            logger.debug('found a patch that needs compile: ', key);
+            vp.patch.properties = vp.patch.properties || {};
+            vp.patch.properties[key] = hook( compileHook ) ;
+          }
+        }
+
+        function addHooks(patches){
           for(var k in patches){
             logger.debug('patches', k, patches[k]);
             if(k !== 'a'){
               var p = patches[k];
 
-              var isSupportedType = _.contains([VirtualPatch.INSERT, VirtualPatch.VNODE], p.type);
-              var isCorespringTag = p.patch && p.patch.tagName && _.contains(p.patch.tagName.toLowerCase(), 'corespring');
-              
-              if(isSupportedType && isCorespringTag ){
-                logger.debug('found a patch that needs compile: ', p);
-
-                var key = p.patch.tagName;
-                p.patch.properties = p.patch.properties || {};
-                p.patch.properties[key] = hook( compileHook ) ;
-                out[k] = p;
+              if(_.isArray(p)){
+                _.forEach(p, addHookToPatch);
+              } else {
+                addHookToPatch(p);
               }
             }
           }
-          return out;
         }
 
         /**
@@ -91,23 +92,25 @@
 
           if (firstRun) {
             var el = domUtil.stringToElement(ngModel.$viewValue);
-            rootDom = virtualize(el);
-            rootNode = createElement(rootDom);
+            rootVDom = virtualize(el);
+            rootNode = createElement(rootVDom);
             $element[0].appendChild(rootNode);
             $compile($element)($scope.$new());
           }
 
           firstRun = false;
 
-          logger.debug(ngModel.$viewValue);
+          logger.debug('new html:', ngModel.$viewValue);
           var newEl = domUtil.stringToElement(ngModel.$viewValue);
+          logger.debug('new el:', newEl.innerHTML);
+          logger.debug('existing el:', rootNode.innerHTML);
 
           if (newEl) {
-            var newDom = virtualize(newEl);
-            var patches = diff(rootDom, newDom);
+            var newVDom = virtualize(newEl);
+            var patches = diff(rootVDom, newVDom);
             var cPatches = addHooks(patches);
             rootNode = patch(rootNode, patches);
-            rootDom = newDom;
+            rootVDom = newVDom;
           }
         };
 
