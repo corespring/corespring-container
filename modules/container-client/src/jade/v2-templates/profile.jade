@@ -32,16 +32,27 @@ mixin select2(select2Model, msg, formModel)
   data-placeholder=msg,
   ng-readonly='#{formModel}.readonly')
 
+mixin select2Multiple(dataProvider, msg, formModel)
+  select(id=ngModel,
+  ng-model=ngModel,
+  ui-select2,
+  multiple,
+  data-placeholder=msg,
+  ng-readonly='#{formModel}.readonly',
+  style='width:100%;')
+    option(ng-repeat="c in #{dataProvider}",value="{{c.key}}") {{c.value}}
+
+
 script(type='text/ng-template', id='/templates/profile')
   .profile(ng-controller='ProfileController')
     .col-md-6
-
       .row.button-bar
         button.pull-right.btn.btn-default(
           ng-click="togglePreview()",
           ng-class="{'btn-warning': !previewOn}")
           | {{previewOn ? 'Close' : 'Open'}} Preview
           i.fa(ng-class="{'fa-toggle-left': previewOn, 'fa-toggle-right' : !previewOn}")
+
       hr/
 
       .row
@@ -61,9 +72,7 @@ script(type='text/ng-template', id='/templates/profile')
             +select2('relatedSubjectSelect2Adapter', 'Choose a subject...', 'formModels.relatedSubject')
 
           +field2('Grade Level', 'taskInfo.gradeLevel', 'formModels.gradeLevel')
-            select(ui-select2, multiple, id='taskInfo.gradeLevel',ng-model='taskInfo.gradeLevel',style='width:400px;',
-              data-placeholder='Choose a grade level...', ng-readonly='formModels.gradeLevel.readonly')
-              option(ng-repeat="c in gradeLevelDataProvider",value="{{c.key}}") {{c.value}}
+            +select2Multiple('gradeLevelDataProvider','Choose a grade level...','formModels.gradeLevel')
 
           +field2('Item Types', '$qt', 'formModels.componentTypes')
             ul
@@ -117,9 +126,7 @@ script(type='text/ng-template', id='/templates/profile')
             input(ng-show='isPriorUseOtherSelected', type='text', placeholder='Enter prior use...', ng-model='profile.priorUseOther', ng-readonly='formModels.depthOfKnowledge.readonly')
 
           +field2('Prior Use Grade Level', 'profile.priorGradeLevel', 'formModels.priorGradeLevel')
-            select(ui-select2, multiple, id='profile.priorGradeLevel',ng-model='profile.priorGradeLevel',style='width:400px;',
-            data-placeholder='Choose a grade level...', ng-readonly='formModels.priorGradeLevel.readonly')
-              option(ng-repeat="c in priorGradeLevelDataProvider",value="{{c.key}}") {{c.value}}
+            +select2Multiple('priorGradeLevelDataProvider','Choose a grade level...','formModels.priorGradeLevel')
 
           +field('Reviews Passed', 'profile.reviewsPassed')
             label(ng-repeat='rp in reviewsPassedDataProvider', style='width:50%;')
@@ -150,8 +157,87 @@ script(type='text/ng-template', id='/templates/profile')
 
           br/
 
-          additional-copyright-information-for-profile(copyrights='contributorDetails.additionalCopyrights',
-          prompt='Does this item contain any other copyrighted materials? E.g. book passage, image, etc.')
+          +h_form
+            h6 Add the Standards
+            +field('Subject', 'standardAdapter.subjectOption')
+              select(id='standardAdapter.subjectOption', ng-model='standardAdapter.subjectOption', ng-options='c.name for c in standardsTree')
+            +field('Category','standardAdapter.categoryOption')
+              select(id='standardAdapter.categoryOption', ng-model='standardAdapter.categoryOption', ng-options='p.name for p in standardAdapter.subjectOption.items')
+            +field('Sub-Category','standardAdapter.subCategoryOption')
+              select(id='subCategoryOption',ng-model='standardAdapter.subCategoryOption', ng-options='z for z in standardAdapter.categoryOption.items')
+            +field('Standards','profile.standards')
+              input(id='profile.standards', type='hidden', ui-select2='standardsAdapter', ng-model='profile.standards', style='width: 500px;')
+
+            .lexile(ng-show='isLiteracyStandardSelected')
+              +field2('Lexile Score', 'profile.lexile', 'formModels.lexile')
+                input.form-control(id='profile.lexile', ng-model='profile.lexile', ng-readonly='formModels.lexile.readonly')
+                span.measure L
+          br/
+
+          +h_form
+            h6 Other Alignments
+            +field2('Depth Of Knowledge','otherAlignments.depthOfKnowledge', 'formModels.depthOfKnowledge')
+              select(id='otherAlignments.depthOfKnowledge', ng-model='otherAlignments.depthOfKnowledge', ng-options='c.key as c.value for c in depthOfKnowledgeDataProvider', ng-disabled='formModels.depthOfKnowledge.readonly')
+            +field2('Bloom\'s Taxonomy', 'otherAlignments.bloomsTaxonomy', 'formModels.bloomsTaxonomy')
+              select(id='otherAlignments.bloomsTaxonomy', ng-model='otherAlignments.bloomsTaxonomy', ng-options='c.key as c.value for c in bloomsTaxonomyDataProvider', ng-disabled='formModels.bloomsTaxonomy.readonly')
+            .form-group
+              label.col-sm-3.control-label(ng-click='expandKeySkills=!expandKeySkills')
+                i(class='fa fa-{{!!expandKeySkills ? "minus" : "plus"}}-square-o', style='margin-right: 6px')
+                | Key Skills
+              .col-sm-9
+                div(ng-show='!expandKeySkills')
+                  label {{getKeySkillsSummary(otherAlignments.keySkills)}}
+                div(ng-show='expandKeySkills', ng-repeat='skills in keySkillsDataProvider')
+                  div
+                    span.tag-list-header(style='float: left;') {{skills.header}}
+                    span(tag-list='tag-list', tags='skills.list', selected-tags='otherAlignments.keySkills')
+                  div(style='float: none; clear: both;')
+
+          br/
+
+          +h_form
+            h6 History
+
+            +field2('This item was previously used in', 'profile.priorUse', 'formModels.priorUse')
+              select(id='profile.priorUse', ng-model='profile.priorUse', ng-options='c.key as c.value for c in priorUseDataProvider', ng-disabled='formModels.depthOfKnowledge.readonly')
+              input(ng-show='isPriorUseOtherSelected', type='text', placeholder='Enter prior use...', ng-model='profile.priorUseOther', ng-readonly='formModels.depthOfKnowledge.readonly')
+
+            +field2('Prior Use Grade Level', 'profile.priorGradeLevel', 'formModels.priorGradeLevel')
+              select(ui-select2, multiple, id='profile.priorGradeLevel',ng-model='profile.priorGradeLevel',style='width:400px;',
+              data-placeholder='Choose a grade level...', ng-readonly='formModels.priorGradeLevel.readonly')
+                option(ng-repeat="c in priorGradeLevelDataProvider",value="{{c.key}}") {{c.value}}
+
+            +field('Reviews Passed', 'profile.reviewsPassed')
+              label(ng-repeat='rp in reviewsPassedDataProvider', style='width:50%;')
+                input(type='checkbox',ng-model='rp.selected',ng-change='onChangeReviewsPassed(rp.key)',style='margin-right: 3px;')
+                | {{rp.key}}
+                input(ng-if='"Other" === rp.key', ng-show='rp.selected', style='margin-left:10px;', type='text', placeholder='Enter review...', ng-model='profile.reviewsPassedOther')
+
+          br/
+
+          +h_form
+            h6 Ownership
+
+            +field('Author', 'contributorDetails.author', 'formModels.author')
+
+            +field('Credentials','contributorDetails.credentials', 'formModels.credentials')
+              select(id='contributorDetails.credentials',ng-model='contributorDetails.credentials', ng-options='c.key as c.value for c in credentialsDataProvider', ng-disabled='formModels.credentials.readonly')
+              input(id='contributorDetails.credentialsOther',ng-show='isCredentialsOtherSelected', type='text', placeholder='Enter credentials...', ng-model='contributorDetails.credentialsOther', ng-readonly='formModels.credentials.readonly')
+
+            +field('* Copyright Owner','contributorDetails.copyrightOwner', 'formModels.copyrightOwner')
+
+            +field('* Copyright Year','contributorDetails.copyrightYear', 'formModels.copyrightYear')
+              select(id='contributorDetails.copyrightYear',ng-model='contributorDetails.copyrightYear', ng-options='c for c in copyrightYearDataProvider', style='width:170px;', ng-disabled='formModels.copyrightYear.readonly')
+
+            +field('* Copyright Expiration','contributorDetails.copyrightExpirationDate', 'formModels.copyrightExpirationDate')
+              select(id='contributorDetails.copyrightExpirationDate',ng-model='contributorDetails.copyrightExpirationDate', ng-options='c for c in copyrightExpirationDateDataProvider', style='width:170px;', ng-disabled='formModels.copyrightExpirationDate.readonly')
+
+            +field('Website', 'contributorDetails.sourceUrl', 'formModels.sourceUrl')
+
+            br/
+
+            additional-copyright-information-for-profile(copyrights='contributorDetails.additionalCopyrights',
+            prompt='Does this item contain any other copyrighted materials? E.g. book passage, image, etc.')
 
     .col-md-6
       div(ng-show="previewOn", profile-preview="",ng-model="item")
