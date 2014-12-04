@@ -67,7 +67,7 @@ describe('player launcher', function() {
   });
 
   afterEach(function() {
-    corespring.module("player-instance", originalInstance);
+    corespring.module("instance", originalInstance);
     window.console.warn = origWarn;
   });
 
@@ -80,15 +80,11 @@ describe('player launcher', function() {
     secureMode = secureMode !== undefined ? secureMode : true;
     lastError = null;
 
-    for (var x in options) {
-      defaultOptions[x] = options[x];
-    }
-
     var Player = launcher.define(secureMode);
 
 
     //$("body").append("<div id='blah'></div>")
-    var player = new Player("blah", {}, function(err) {
+    var player = new Player("blah", options, function(err) {
       lastError = err;
     });
 

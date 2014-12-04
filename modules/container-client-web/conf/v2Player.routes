@@ -2,6 +2,7 @@
 
 GET           /player.js                                               @org.corespring.container.client.controllers.PlayerLauncher.playerJs
 GET           /editor.js                                               @org.corespring.container.client.controllers.PlayerLauncher.editorJs
+GET           /editor-v2.js                                            @org.corespring.container.client.controllers.PlayerLauncher.editorV2Js
 
 GET           /js/*file                                                controllers.Assets.at(path="/container-client/js", file)
 GET           /css/*file                                               controllers.Assets.at(path="/container-client/css", file)
