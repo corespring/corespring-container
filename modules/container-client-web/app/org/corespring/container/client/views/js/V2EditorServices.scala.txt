@@ -22,6 +22,15 @@
     }
   }]);
 
+  angular.module('@namespace').factory('ComponentService', [function(){
+    return {
+        loadAvailableComponents: function(onSuccess, onFailure){
+          var components = @{Json.stringify(componentSet)};
+          onSuccess(components);
+        }
+    };
+  }]);
+
   angular.module('@namespace').factory('DesignerService', ['$http', function($http){
     return {
       loadAvailableUiComponents: function(onSuccess, onFailure){

@@ -1,9 +1,5 @@
 include ../v2-mixins/modal
 
-mixin ng_popup_template(name)
-  script(type="text/ng-template", id="/templates/popups/#{name}")
-    block
-
 +ng_popup_template("archive")
   +modal('Archive Item')
     p This feature isn't ready yet come back soon. 
@@ -47,8 +43,4 @@ mixin ng_popup_template(name)
         li.dropdown-header(role='presentation') Collection Name
         li(role='presentation')
           a(role='menuitem', tabindex='-1', href='#') Item 4
-
-+ng_popup_template("question-information")
-  +modal('Question Information', null, false)
-    p Coming soon...
 

@@ -147,20 +147,7 @@ var controller = function($element, $filter, $http, $location, $q, $modal, $log,
   };
 
   var updateSupportingMaterialsList = function(item) {
-    var groupedSupportingMaterials = _.groupBy(item.supportingMaterials, "materialType");
-    $scope.supportingMaterials = [];
-    var insertSupportingMaterialsForType = function(supMat) {
-      var index = _.indexOf(item.supportingMaterials, supMat);
-      $scope.supportingMaterials.push({label: supMat.name, type: "data", index: index});
-    };
-    for (var key in groupedSupportingMaterials) {
-      if (key !== "undefined") {
-        $scope.supportingMaterials.push({label: key, type: "header"});
-      }
-      _.each(groupedSupportingMaterials[key], insertSupportingMaterialsForType);
-      $scope.supportingMaterials.push({type: "divider"});
-    }
-    $scope.supportingMaterials = _.initial($scope.supportingMaterials);
+    $scope.supportingMaterials = SupportingMaterialsService.getSupportingMaterialsByGroups(item.supportingMaterials);
   };
 
   $scope.onNewSupportingMaterialSaveSuccess = function(data) {

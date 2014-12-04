@@ -87,6 +87,11 @@
       return file ? file.contentType : undefined;
     };
 
+    this.getContent = function(supportingMaterials, index) {
+      var file = self.getSupportingMaterialFile(supportingMaterials, index);
+      return file ? file.content : undefined;
+    };
+
     /**
      * Return true if we should display a preview for the supporting material.
      */
@@ -99,6 +104,23 @@
       return (supportingMaterial && contentType) ?
         supportingMaterial.contentType === contentType : false;
     }
+
+    this.getSupportingMaterialsByGroups = function(supportingMaterials) {
+      var groupedSupportingMaterials = _.groupBy(supportingMaterials, "materialType");
+      var result = [];
+      var insertSupportingMaterialsForType = function(supMat) {
+        var index = _.indexOf(supportingMaterials, supMat);
+        result.push({label: supMat.name, type: "data", index: index});
+      };
+      for (var key in groupedSupportingMaterials) {
+        if (key !== "undefined") {
+          result.push({label: key, type: "header"});
+        }
+        _.each(groupedSupportingMaterials[key], insertSupportingMaterialsForType);
+        result.push({type: "divider"});
+      }
+      return _.initial(result);
+    };
 
   }
 
