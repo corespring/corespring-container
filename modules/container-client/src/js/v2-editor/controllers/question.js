@@ -41,12 +41,12 @@ angular.module('corespring-editor.controllers')
 
       $scope.scoring = function(){
         ScoringHandler.scoring($scope.item.components, $scope.item.xhtml, function(){
-          saveComponents(); 
+          saveComponents();
         });
       };
 
       $scope.$on('edit-node', function($event, id, model){
-        ComponentPopups.launch(id, model);
+        ComponentPopups.launch($scope, id, model);
       });
 
       $scope.imageService = ComponentImageService;
@@ -83,6 +83,7 @@ angular.module('corespring-editor.controllers')
       });
 
       $scope.$on('registerConfigPanel', function(a, id, component) {
+        logger.debug('registerConfigPanel', id);
         configPanels[id] = component;
         component.setModel($scope.item.components[id]);
         if (_.isFunction(component.setProfile)) {
@@ -97,8 +98,8 @@ angular.module('corespring-editor.controllers')
       function saveComponents(){
         logger.debug('[saveComponents]');
         ItemService.fineGrainedSave(
-          {components: $scope.serialize($scope.item.components)}, 
-          $scope.onItemSaved, 
+          {components: $scope.serialize($scope.item.components)},
+          $scope.onItemSaved,
           $scope.onItemSaveError);
       }
 
