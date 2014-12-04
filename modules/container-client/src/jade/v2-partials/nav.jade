@@ -4,7 +4,7 @@ mixin dropdown_btn(name)
       block
 
 mixin info_btn(name)
-    a(ng-click="#{name}()")
+    a.btn.btn-default(ng-click="#{name}()")
       block
 
 mixin tab(label, name)
@@ -38,8 +38,6 @@ nav.row.navbar-default(ng-controller="NavController")
         li.divider(role='presentation')
         +dropdown_btn('archive') Archive...
         +dropdown_btn('delete') Delete
-        li.divider(role='presentation')
-        +dropdown_btn('questionInformation') Question Information
     li
       span.save-msg(ng-switch on="saveStatus")
         span#saved(ng-switch-when="saved")
