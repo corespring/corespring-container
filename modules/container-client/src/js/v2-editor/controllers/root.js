@@ -1,18 +1,18 @@
 angular.module('corespring-editor.controllers')
-  .controller(
-  'Root',
-  [
-  '$scope',
-  '$state',
-  'ItemService',
-  'LogFactory',
-  'ComponentRegister',
-    function($scope, $state, ItemService, LogFactory, ComponentRegister) {
+  .controller('Root', [
+    '$scope',
+    '$state',
+    'ComponentRegister',
+    'ItemService',
+    'LogFactory',
+    'Msgr',
+    function ($scope, $state, ComponentRegister, ItemService, LogFactory, Msgr) {
+
       var logger = LogFactory.getLogger('RootController');
       logger.debug('Root');
 
       function preprocessComponents(item) {
-        _.each(item.components, function(c, key) {
+        _.each(item.components, function (c, key) {
           var serverLogic = corespring.server.logic(c.componentType);
           if (serverLogic.preprocess) {
             //TODO: This is part of a larger task to add preprocess to the container
@@ -22,11 +22,11 @@ angular.module('corespring-editor.controllers')
         });
       }
 
-      $scope.onItemLoaded = function(item){
+      $scope.onItemLoaded = function (item) {
         $scope.item = item;
         preprocessComponents(item);
         var max = 0;
-        $('<div>' + $scope.item.xhtml + '</div>').find('[id]').each(function(idx, element) {
+        $('<div>' + $scope.item.xhtml + '</div>').find('[id]').each(function (idx, element) {
           var id = Number($(element).attr('id'));
           if (id > max) {
             max = id;
@@ -36,21 +36,21 @@ angular.module('corespring-editor.controllers')
         $scope.$broadcast('itemLoaded');
       };
 
-      ItemService.load($scope.onItemLoaded, function() {
+      ItemService.load($scope.onItemLoaded, function () {
         logger.error('error loading');
       });
 
-      $scope.$on('deleteSupportingMaterial', function(event, data) {
+      $scope.$on('deleteSupportingMaterial', function (event, data) {
         function deleteSupportingMaterial(index) {
-           $state.transitionTo('supporting-materials', {
-                index: 0
-              }, {reload: true});
+          $state.transitionTo('supporting-materials', {
+            index: 0
+          }, {reload: true});
 
           $scope.data.item.supportingMaterials.splice(index, 1);
           ItemService.save({
               supportingMaterials: $scope.data.item.supportingMaterials
             },
-            function() {
+            function () {
             },
             $scope.onSaveError, $scope.itemId
           );
@@ -66,6 +66,7 @@ angular.module('corespring-editor.controllers')
         }
       });
 
+      Msgr.send('rendered');
     }
   ]
 );

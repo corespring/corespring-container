@@ -380,9 +380,11 @@
       });
     }
 
-    function Select2Adapter(topic, formatFunc) {
+    function Select2Adapter(topic, formatFunc, properties) {
 
       var that = this;
+
+      _.assign(this, properties);
 
       this.formatResult = formatFunc;
       this.formatSelection = formatFunc;
@@ -406,7 +408,7 @@
     }
 
     function subjectText(s) {
-      return s.category + ": " + s.subject;
+      return s + "::" + s.category + ": " + s.subject;
     }
 
     $scope.primarySubjectSelect2Adapter = new Select2Adapter("subjects.primary", subjectText);
