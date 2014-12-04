@@ -637,6 +637,10 @@
       return licenseType ? "/assets/images/licenseTypes/" + licenseType.replace(" ", "-") + ".png" : undefined;
     };
 
+    $scope.togglePreview = function() {
+      $scope.previewOn = !$scope.previewOn;
+    };
+
     //----------------------------------------------------------------
     // profile initialisation
     //----------------------------------------------------------------
