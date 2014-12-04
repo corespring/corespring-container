@@ -22,7 +22,6 @@ editorSrcs = [
   'bower_components/undo.js/undo.js',
   'js/corespring/core-library.js',
   'js/corespring/server/init-core-library.js',
-  'js/v2-common/**/*.js',
   'js/v2-editor/**/*.js',
   'js/v2-catalog/**/*.js',
   'js/render/services/**/*.js',
@@ -42,7 +41,6 @@ exports.css =
   src: ['css/v2-editor.css']
   dest: 'css/v2-editor.min.css'
   libs: _.union(coreLibs.css, [
-    'bower_components/select2/select2.css',
     'bower_components/font-awesome/css/font-awesome.min.css',
     '//fonts.googleapis.com/css?family=Ubuntu:300,400,500,500italic,700'
   ])

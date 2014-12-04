@@ -63,7 +63,7 @@ describe('designer controller', function() {
     };
   }
 
-  beforeEach(angular.mock.module('corespring-v1-editor.controllers'));
+  beforeEach(angular.mock.module('corespring-editor.controllers'));
 
   beforeEach(function() {
     module(function($provide) {

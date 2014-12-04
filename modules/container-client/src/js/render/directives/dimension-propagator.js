@@ -34,6 +34,7 @@ angular.module('corespring-player.directives').directive('dimensionPropagator',
         if(different(w,h)){
           lastW = w;
           lastH = h;
+          $log.debug("dispatchDimensions", w, h);
           Msgr.send('dimensionsUpdate',{w:w, h:h});
         }
       }

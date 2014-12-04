@@ -1,6 +1,6 @@
 (function() {
 
-  angular.module('corespring-v1-editor.controllers')
+  angular.module('corespring-editor.controllers')
     .controller('Designer', [
       '$element',
       '$http',

@@ -1,19 +1,16 @@
-var controller = function(
-  $location,
-  $log,
+var controller = function($scope,
   $rootScope,
-  $scope,
+  $log,
+  $location,
   $state,
-  $stateParams,
   $timeout,
-  CatalogPreview,
+  $stateParams,
   DataQueryService,
-  ItemIdService,
   ItemService,
-  Msgr,
+  ItemIdService,
   NavModelService,
-  SupportingMaterialsService
-) {
+  SupportingMaterialsService,
+  CatalogPreview) {
 
   var navSetOnce = false;
   var showPreview = false;
@@ -167,7 +164,7 @@ var controller = function(
     showPreview = false;
   });
 
-  $scope.getSupportingMaterials = function() {
+  $scope.hasSupportingMaterials = function() {
     var item = $scope.data.item;
     return item && item.supportingMaterials && item.supportingMaterials.length > 0;
   };
@@ -272,26 +269,22 @@ var controller = function(
     // add animation now that the ui is set up
     $('.content-container').addClass('cc-transition-left-right');
     $('.preview-hang-right-btn').addClass('cc-transition-right');
-    Msgr.send("rendered");
   }, 300);
-
 };
 
-angular.module('corespring-v1-editor.controllers')
-  .controller('Root', [
-    '$location',
-    '$log',
+angular.module('corespring-editor.controllers')
+  .controller('Root', ['$scope',
     '$rootScope',
-    '$scope',
+    '$log',
+    '$location',
     '$state',
-    '$stateParams',
     '$timeout',
-    'CatalogPreview',
+    '$stateParams',
     'DataQueryService',
-    'ItemIdService',
     'ItemService',
-    'Msgr',
+    'ItemIdService',
     'NavModelService',
     'SupportingMaterialsService',
+    'CatalogPreview',
     controller
   ]);

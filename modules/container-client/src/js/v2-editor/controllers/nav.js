@@ -48,10 +48,9 @@ angular.module('corespring-editor.controllers').controller('NavController', [
       };
     }
 
-    $scope.$on('itemLoaded', function onItemLoaded(ev, item){
-      $scope.title = item.profile.taskInfo.title;
-      $scope.item = item;
-    });
+    function onItemLoaded(item){
+      $scope.title = item.profile.taskInfo.title; 
+    }
 
     $scope.open = launchModal('open');
     $scope.editTitle = launchModal('edit-title', 'sm', 'static', {
@@ -66,12 +65,13 @@ angular.module('corespring-editor.controllers').controller('NavController', [
     $scope['new'] = launchModal('new');
     $scope.archive = launchModal('archive');
     $scope.delete = launchModal('delete');
-    $scope.questionInformation = launchModal('question-information', 'lg', undefined, {
-      item: function() {
-        return $scope.item;
-      }
-    });
+    $scope.questionInformation = launchModal('question-information', 'lg');
     $scope.help = launchModal('help', 'lg', false);
+
+    ItemService.load(onItemLoaded, 
+      function(err){
+      logger.error('error loading item', err);
+    });
 
     $scope.saveStatus = null;
     $scope.handleSaveMessage = function(msg){

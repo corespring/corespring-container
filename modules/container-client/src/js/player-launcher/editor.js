@@ -1,70 +1,54 @@
-function EditorDefinition(element, options, errorCallback) {
+var EditorDefinition = function(element, options, errorCallback) {
+
+  var errors = require("errors");
+  var launcherErrors = require("launcher-errors");
+  var i;
+
+  if (launcherErrors.hasErrors) {
+    for (i = 0; i < launcherErrors.errors.length; i++) {
+      errorCallback(errors.EXTERNAL_ERROR(launcherErrors.errors[i]));
+    }
+    return;
+  }
 
   var isReady = false;
-  var errors = require("errors");
-  var logger = options.logger || require('logger');
 
-  errorCallback = errorCallback || function (error) {
-    throw "error occurred, code: " + error.code + ", message: " + error.message;
+  var defaultOptions = require("default-options");
+
+  options = $.extend(defaultOptions, options);
+
+  var validateOptions = function(options) {
+    return [];
   };
 
-  function hasLauncherErrors() {
-    var launcherErrors = require("launcher-errors");
-    if (launcherErrors.hasErrors()) {
-      for (var i = 0; i < launcherErrors.errors.length; i++) {
-        errorCallback(errors.EXTERNAL_ERROR(launcherErrors.errors[i]));
-      }
-      return true;
-    }
-    return false;
-  }
+  var result = validateOptions(options);
 
-  if (hasLauncherErrors()) {
+  if (result.length > 0) {
+    for (i = 0; i < result.length; i++) {
+      errorCallback(result[i]);
+    }
     return;
   }
-
-  function hasInvalidOptions() {
-    var defaultOptions = require("default-options");
-    options = $.extend(defaultOptions, options);
-
-    function validateOptions(options) {
-      return [];
-    }
-
-    var result = validateOptions(options);
-
-    if (result.length > 0) {
-      for (var i = 0; i < result.length; i++) {
-        errorCallback(result[i]);
-      }
-      return true;
-    }
-    return false;
-  }
-
-  if (hasInvalidOptions()) {
-    return;
-  }
-
 
   var InstanceDef = require("instance");
 
-  function loadPaths(options, name) {
+  errorCallback = errorCallback || function(error) {
+    throw "error occurred, code: " + error.code + ", message: " + error.message;
+  };
+
+  var loadPaths = function(options, name) {
     if (!options.paths || !options.paths[name]) {
       errorCallback({
-        code: 105,
+        code: -1,
         message: name + " not part of options"
       });
-      return null;
-    }
-    return options.paths[name];
-  }
-
-  function createItem(options, onSuccess, onError) {
-    var createCall = loadPaths(options, "create");
-    if (!createCall) {
       return;
     }
+    return options.paths[name];
+  };
+
+  var createItem = function(options, onSuccess, onError) {
+    var createCall = loadPaths(options, "create");
 
     $.ajax({
       type: createCall.method,
@@ -74,38 +58,34 @@ function EditorDefinition(element, options, errorCallback) {
       error: onError,
       dataType: "json"
     });
-  }
+  };
 
-  function loadItem(itemId, options) {
-    var loadCall = loadPaths(options, "editor");
-    if (!loadCall) {
-      return;
-    }
+  var loadItem = function(itemId, options) {
+    var editorPaths = loadPaths(options, "editor");
+    options.url = (options.corespringUrl + editorPaths.url).replace(":itemId", itemId);
 
-    options.url = (options.corespringUrl + loadCall.url).replace(":itemId", itemId);
     options.queryParams = require('query-params');
 
-    var instance = new InstanceDef(element, options, errorCallback, logger);
+    var instance = new InstanceDef(element, options, errorCallback);
 
-    instance.on("launch-error", function (data) {
+    instance.addListener("launch-error", function(data) {
       var error = errors.EXTERNAL_ERROR(data.code + ": " + data.detailedMessage);
       errorCallback(error);
     });
-  }
+  };
 
-  if (options.itemId) {
-    logger.log("loading item");
-    loadItem(options.itemId, options);
-  } else {
+  if (!options.itemId) {
     createItem(options,
-      function (data) {
-        logger.log("item created");
+      function(data) {
+        console.log("item created");
         loadItem(data.itemId, options);
       },
-      function (err) {
-        logger.log(err);
+      function(err) {
+        console.log(err);
       });
+  } else {
+    loadItem(options.itemId, options);
   }
-}
+};
 
 module.exports = EditorDefinition;

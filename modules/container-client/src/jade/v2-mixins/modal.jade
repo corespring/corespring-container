@@ -11,9 +11,6 @@ mixin modal(title, okLabel, showFooter)
       
   if showFooter
     .modal-footer
-      button.btn.btn-primary(type='button', ng-click="ok()", ng-disabled="okDisabled")= okLabel
+      button.btn.btn-primary(type='button', ng-click="ok()")= okLabel 
       button.btn.btn-default(type='button', ng-click="cancel()") Cancel
     
-mixin ng_popup_template(name)
-  script(type="text/ng-template", id="/templates/popups/#{name}")
-    block

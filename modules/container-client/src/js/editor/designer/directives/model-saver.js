@@ -8,7 +8,7 @@ model-saver(ng-model="item", saving="saveInProgress", save-error="saveError")
     | There was an error saving your content
 */
 
-angular.module('corespring-v1-editor.directives').directive('modelSaver', [
+angular.module('corespring-editor.directives').directive('modelSaver', [
   '$log',
   '$timeout',
   '$compile',

@@ -29,7 +29,7 @@ angular.module('corespring-editor.services')
             size: 'lg',
             resolve: {
               url: function() {
-                return '../../catalog/'+itemId+'/index.html';
+                return '../../item/' + itemId + '/preview';
               }
             }
           });

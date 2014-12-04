@@ -32,7 +32,7 @@ trait ComponentsFileController extends Controller with HasContext {
     else {
       val file = new File(p)
       if (file.exists)
-        Some((file, Map.empty[String,String]))
+        Some((file, Map()))
       else
         None
     }

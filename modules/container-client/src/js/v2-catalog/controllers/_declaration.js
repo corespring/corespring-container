@@ -1,1 +1,1 @@
-angular.module('corespring-catalog.controllers', ['corespring-v2-common.directives']);
+angular.module('corespring-catalog.controllers', []);

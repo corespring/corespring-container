@@ -44,14 +44,5 @@ trait ItemHooks extends ContainerItemHooks {
       }.getOrElse(Left(BAD_REQUEST -> "Error creating item"))
     }
   }
-
-  override def fineGrainedSave(itemId: String, json: JsValue)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] = {
-    Future {
-      itemService.fineGrainedSave(itemId, json).map {
-        json =>
-          Right(json)
-      }.getOrElse(Left(BAD_REQUEST -> "Error saving"))
-    }
-  }
 }
 

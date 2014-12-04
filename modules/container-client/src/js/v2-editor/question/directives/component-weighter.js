@@ -187,6 +187,7 @@ angular.module('corespring-editor.directives').directive('componentWeightInput',
           });
         });
       };
+
     }
 
     return {
@@ -194,7 +195,19 @@ angular.module('corespring-editor.directives').directive('componentWeightInput',
       link: link,
       replace: true,
       require: '^componentWeights',
-      templateUrl: '/v2-editor/question/directives/component-weighter.html',
+      template: [
+        ' <form class="weight-form" name="weightForm">',
+        '  <div class="form-group" ng-click="selectComponent()" ng-class="{\'has-error\': weightForm.input.$error.number}">',
+        '    <label class="control-label col-sm-5" for="{{uid}}">{{getTitle(component.componentType)}} is worth</label>',
+        '    <div class="col-sm-4">',
+        '      <div class="input-group">',
+        '        <input id="{{uid}}" ng-disabled="{{disabled}}" name="input" min="0" max="100" number-validation ng-focus="selectComponent()" class="form-control" ng-model="component.weight"></input>',
+        '        <span class="input-group-addon">pts</span>',
+        '        <span class="input-group-addon" style="width: 52px;">{{getPercentage(component.weight)}}%</span>',
+        '    </div>',
+        '  </div>',
+        '</form>'
+      ].join('\n'),
       scope: {
         component: '=ngModel',
         componentId: '=componentId',

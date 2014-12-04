@@ -245,7 +245,7 @@ var controller = function(
 
 };
 
-angular.module('corespring-v1-editor.controllers')
+angular.module('corespring-editor.controllers')
   .controller('SupportingMaterial', [
     '$element',
     '$filter',

@@ -19,7 +19,7 @@ describe('supporting material controller', function() {
     }]
   };
 
-  beforeEach(angular.mock.module('corespring-v1-editor.controllers'));
+  beforeEach(angular.mock.module('corespring-editor.controllers'));
   beforeEach(angular.mock.module('corespring-common.supporting-materials'));
 
   beforeEach(inject(function($rootScope, $controller) {

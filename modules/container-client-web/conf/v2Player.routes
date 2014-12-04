@@ -1,8 +1,7 @@
 # Note: The order is important - there are some asset calls that we want to intercept before they hit the *file
 
-GET           /player.js                                               @org.corespring.container.client.controllers.PlayerLauncher.playerJs
-GET           /editor.js                                               @org.corespring.container.client.controllers.PlayerLauncher.editorJs
-GET           /editor-v2.js                                            @org.corespring.container.client.controllers.PlayerLauncher.editorV2Js
+GET           /player.js                                             @org.corespring.container.client.controllers.PlayerLauncher.playerJs
+GET           /editor.js                                             @org.corespring.container.client.controllers.PlayerLauncher.editorJs
 
 GET           /js/*file                                              controllers.Assets.at(path="/container-client/js", file)
 GET           /css/*file                                             controllers.Assets.at(path="/container-client/css", file)
@@ -35,7 +34,6 @@ GET           /item/:itemId.json                                     @org.coresp
 GET           /item/:itemId/:name/*file                              @org.corespring.container.client.controllers.Assets.supportingMaterial(itemId, name, file)
 GET           /item/:itemId/*file                                    @org.corespring.container.client.controllers.Assets.item(itemId, file)
 PUT           /item/:itemId.json                                     @org.corespring.container.client.controllers.resources.Item.save(itemId)
-PUT           /item/update/:itemId.json                              @org.corespring.container.client.controllers.resources.Item.fineGrainedSave(itemId)
 POST          /item/create                                           @org.corespring.container.client.controllers.resources.Item.create()
 POST          /item/:itemId/supporting-materials/create              @org.corespring.container.client.controllers.resources.SupportingMaterial.create(itemId)
 

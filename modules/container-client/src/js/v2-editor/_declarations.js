@@ -1,1 +1,1 @@
-angular.module('corespring-editor.directives', ['ui.bootstrap', 'corespring-player.services','corespring-v2-common.directives']);
+angular.module('corespring-editor.directives', ['ui.bootstrap', 'corespring-player.services']);

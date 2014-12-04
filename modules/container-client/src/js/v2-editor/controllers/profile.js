@@ -1,7 +1,7 @@
 (function() {
 
   angular.module('corespring-editor.controllers')
-    .controller('ItemProfile', [
+    .controller('ProfileController', [
       '$scope',
       'DataQueryService',
       'DesignerService',
@@ -21,7 +21,7 @@
     ProfileFormatter,
     StandardQueryCreator) {
 
-    var $log = LogFactory.getLogger('ItemProfileController');
+    var $log = LogFactory.getLogger('ProfileController');
 
     //----------------------------------------------------------------
     // Standards start

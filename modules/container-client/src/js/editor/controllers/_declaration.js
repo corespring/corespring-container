@@ -1,4 +1,4 @@
-angular.module('corespring-v1-editor.controllers', [
+angular.module('corespring-editor.controllers', [
   'wiggi-wiz.services',
   'corespring.wiggi-wiz-features'
 ]);

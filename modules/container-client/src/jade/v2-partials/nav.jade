@@ -11,12 +11,7 @@ mixin help
   a.help.navbar-right(ng-click="help()")
     i.fa.fa-question-circle
 
-mixin questionInformation
-  a.info.navbar-right(ng-click="questionInformation()")
-    i.fa.fa-info
-
 include ../v2-templates/popups
-include ../v2-templates/question-information
 
 nav.row.navbar-default(ng-controller="NavController")
   ul.list-inline
@@ -46,7 +41,6 @@ nav.row.navbar-default(ng-controller="NavController")
           |  &nbsp;
 
   +help
-  +questionInformation
 
   ul.nav.nav-tabs(role='tablist')
     +tab('Question', 'question')

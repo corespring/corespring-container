@@ -15,7 +15,7 @@
    * then the metadata will be two-way bound, and the caller is responsible for validation (probably using
    * SupportingMaterialService#validateMetadata).
    */
-  angular.module('corespring-v1-editor.directives').directive('supportingmetadata', ['SupportingMaterialsService',
+  angular.module('corespring-editor.directives').directive('supportingmetadata', ['SupportingMaterialsService',
     function(SupportingMaterialsService) {
       var otherType = 'Other';
 

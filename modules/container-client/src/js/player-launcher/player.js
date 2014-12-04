@@ -27,7 +27,7 @@ exports.define = function(isSecure) {
       forEach(launcherWarnings.warnings, logger.warn);
     }
 
-    if (launcherErrors.hasErrors()) {
+    if (launcherErrors.hasErrors() && errorCallback) {
       forEach(launcherErrors.errors, function(e){errorCallback(errors.EXTERNAL_ERROR(e)); });
       return;
     }
@@ -240,6 +240,13 @@ exports.define = function(isSecure) {
     };
 
     instance.on('ready', function() {
+      function throwOrWarn(msg){
+        if(options.strict){
+          throw(msg);
+        } else {
+          logger.warn(msg);
+        }
+      }
       if( isReady ) {
         instance.removeChannel();
         errorCallback(errors.PLAYER_NOT_REMOVED);

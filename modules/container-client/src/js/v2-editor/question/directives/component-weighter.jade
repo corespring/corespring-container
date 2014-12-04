@@ -1,8 +1,0 @@
-form.weight-form(name='weightForm')
-  .form-group(ng-click='selectComponent()', ng-class="{'has-error': weightForm.input.$error.number}")
-    label.control-label.col-sm-5(for='{{uid}}') {{getTitle(component.componentType)}} is worth
-    .col-sm-4
-      .input-group
-        input.form-control(id="{{uid}}", ng-disabled='{{disabled}}', name='input', min='0', max='100', number-validation='number-validation', ng-focus='selectComponent()', ng-model='component.weight')
-        span.input-group-addon pts
-        span.input-group-addon(style='width: 52px;') {{getPercentage(component.weight)}}%

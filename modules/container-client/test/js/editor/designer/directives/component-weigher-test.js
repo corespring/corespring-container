@@ -1,6 +1,6 @@
 describe('componentWeights', function() {
 
-  beforeEach(angular.mock.module('corespring-v1-editor.directives'));
+  beforeEach(angular.mock.module('corespring-editor.directives'));
 
   describe('weighter', function() {
     var rootScope, compile, timeout;
