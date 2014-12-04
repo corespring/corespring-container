@@ -1,4 +1,4 @@
-describe('component-register', function(){
+describe('component-player', function(){
 
   var rootScope, compile, mockRegister;
 

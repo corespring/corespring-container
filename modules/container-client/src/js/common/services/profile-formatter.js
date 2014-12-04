@@ -8,6 +8,8 @@ angular.module('corespring-common.services')
 
         /**
          * returns an array of strings indicating the type used and it's count: 'Multiple Choice (1)'
+         * you can change the format by passing in a different format function with the signature
+         * function format( name, count) -> String
          */
         this.componentTypesUsed = function(components, allComponentMetadata, formatFn) {
 

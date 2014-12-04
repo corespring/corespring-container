@@ -40,6 +40,7 @@ exports.css =
   src: ['css/editor.css']
   dest: 'css/editor.min.css'
   libs: _.union(coreLibs.css, [
+    'bower_components/select2/select2.css',
     'bower_components/font-awesome/css/font-awesome.min.css',
     'bower_components/components-font-awesome/css/font-awesome.min.css',
     '//fonts.googleapis.com/css?family=Ubuntu:300,400,500,500italic,700'
@@ -49,8 +50,8 @@ exports.css =
 exports.ngModules = _.union(player.ngModules, [
   'corespring-common.supporting-materials',
   'corespring-editor.services',
-  'corespring-editor.controllers',
-  'corespring-editor.directives',
+  'corespring-v1-editor.controllers',
+  'corespring-v1-editor.directives',
   'ui.sortable',
   'ui.bootstrap',
   'ui.ace',

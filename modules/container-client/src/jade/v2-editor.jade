@@ -6,7 +6,7 @@ block content
   include v2-templates/profile
   include v2-templates/supporting-materials
 
-  .root(ng-controller="Root")
+  .root(ng-controller="Root", dimension-propagator='')
     .container-fluid
       include v2-partials/nav  
     .main-content(ui-view="main")
@@ -36,9 +36,9 @@ block after-main-script
           question : mkEditorState('question'),
           profile : mkEditorState('profile'),
           'supporting-materials' : {
-            url: '/supporting-materials/{name}',
+            url: '/supporting-materials/{index}',
             params: {
-              name: { value: 'all' }
+              index: { value: 0 }
             },
             views: {
               main: {

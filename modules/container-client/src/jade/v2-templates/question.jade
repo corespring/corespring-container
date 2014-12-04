@@ -22,19 +22,29 @@ script(type="text/ng-template", id="/templates/question")
           ng-click="togglePreview()",
           ng-class="{'btn-warning': !previewOn}")  
           | {{previewOn ? 'Close' : 'Preview'}} Question 
-          i.fa.fa-toggle-right
+          i.fa(ng-class="{'fa-toggle-left': previewOn, 'fa-toggle-right' : !previewOn}")
         button.pull-right.btn.btn-default(ng-click="scoring()") Scoring
 
       hr/
 
       .row
         wiggi-wiz(
+          style="height: 600px;",
           formatting-display="dropdown",
           ng-model="item.xhtml",
           focus="true",
           features="extraFeatures",
           feature-overrides="overrideFeatures",
           image-service="imageService")
+
+          toolbar.main-editor-wiggi-toolbar(
+            basic="bold italic underline superscript subscript", 
+            formatting="blockquote h1 h2 h3")
+
+          edit-pane-toolbar(alignment="bottom")
+            .btn-group.pull-right
+              button.btn.btn-default(ng-click="closePane()") Done
+
 
       br/
 
@@ -61,14 +71,13 @@ script(type="text/ng-template", id="/templates/question")
           .player-label
             img(src='../../images/item-player-label.png')
           .player-container
-            corespring-preview-player(
-              player-mode="editor",
-              player-markup="item.xhtml",
-              player-item="item",
+            optimized-preview-player(
+              ng-model="item.xhtml",
+              player-components="item.components",
               player-session="rootModel.session",
               player-outcomes="outcome")
           .row
-            player-control-panel(
+            preview-player-control-panel(
               data-mode='playerMode', 
               data-settings='playerSettings', 
               data-score="score")

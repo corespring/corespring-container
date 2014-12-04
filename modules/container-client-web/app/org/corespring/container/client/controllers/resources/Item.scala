@@ -119,6 +119,8 @@ trait Item extends Controller with XhtmlCleaner {
       }
   }
 
+  def fineGrainedSave(itemId:String) = processSave(itemId, (s,j,rh) => hooks.fineGrainedSave(s,j)(rh))
+
   def save(itemId: String) = processSave(itemId, (s,j,rh) => hooks.save(s,j)(rh))
 
   private def cleanIncomingXhtml(xmlString: Option[String]): Validation[String, Option[String]] = xmlString.map {

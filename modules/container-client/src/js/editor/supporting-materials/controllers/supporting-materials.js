@@ -55,6 +55,7 @@ var controller = function($scope, ItemService, SupportingMaterialsService, $moda
   $scope.$watch('newMaterial.materialType', updateEnabled);
 
   $scope.onSaveSuccess = function(result) {
+    console.log("Futty: ", result);
     $scope.data.item.supportingMaterials = result.supportingMaterials;
     $state.transitionTo('supporting-material', {
       index: result.supportingMaterials.length - 1
@@ -196,7 +197,7 @@ var controller = function($scope, ItemService, SupportingMaterialsService, $moda
 
 };
 
-angular.module('corespring-editor.controllers')
+angular.module('corespring-v1-editor.controllers')
   .controller('SupportingMaterials', ['$scope',
     'ItemService',
     'SupportingMaterialsService',

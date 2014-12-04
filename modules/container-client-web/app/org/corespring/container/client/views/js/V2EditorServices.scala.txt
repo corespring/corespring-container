@@ -1,4 +1,4 @@
-@(namespace:String, load : Call, save : Call, componentSet : JsValue, widgets : JsValue)
+@(namespace:String, load : Call, save : Call, fineGrainedSave:Call, componentSet : JsValue, widgets : JsValue)
 
 (function(){
   "use strict";
@@ -14,8 +14,21 @@
       save: {
         method : '@save.method.toLowerCase',
         url: '@save.url'
+      },
+      fineGrainedSave : {
+        method : '@fineGrainedSave.method.toLowerCase',
+        url: '@fineGrainedSave.url'
       }
     }
+  }]);
+
+  angular.module('@namespace').factory('ComponentService', [function(){
+    return {
+        loadAvailableComponents: function(onSuccess, onFailure){
+          var components = @{Json.stringify(componentSet)};
+          onSuccess(components);
+        }
+    };
   }]);
 
   angular.module('@namespace').factory('DesignerService', ['$http', function($http){

@@ -180,7 +180,7 @@ var Placeholder = function(
   };
 };
 
-angular.module('corespring-editor.directives')
+angular.module('corespring-v1-editor.directives')
   .directive('placeholder', [
     '$rootScope',
     '$compile',

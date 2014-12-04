@@ -2,7 +2,6 @@ _ = require "lodash"
 componentDependencies = require "./grunt/lib/component-dependencies"
 appConfigBuilder = require './grunt/lib/app-config-builder'
 
-
 ###
 Configs...
 ###
@@ -33,7 +32,7 @@ lessConfig = (cleancss) ->
     cleancss: cleancss
   expand: true
   cwd: '<%= common.dist %>/css'
-  src: '*.less'
+  src: ['**/rig.less', '**/player.less', '**/v2-editor.less', '**/editor.less', '**/homepage.less']
   dest: '<%= common.dist %>/css/'
   ext: suffix
   flatten: false
@@ -65,6 +64,11 @@ module.exports = (grunt) ->
 
   comps = prepend.bind( null, '<%= common.dist %>/bower_components/')
 
+  getFiles = (patterns) ->
+    grunt.log.writeln(patterns)
+    grunt.log.writeln(grunt.file.expand({},patterns))
+    grunt.file.expand({}, patterns)
+
   config =
     pkg: grunt.file.readJSON('package.json')
     common: common
@@ -79,8 +83,15 @@ module.exports = (grunt) ->
         livereload: true
         debounceDelay: 5000
         files: ['<%= common.dist %>/**/*']
+      js: 
+        files: ['<%= common.app %>/**/*.js'] 
+        tasks: ['copy:js'] 
+
       jade: watchConfig('jade', ['copy:jade'])
       less: watchConfig('less', ['copy:less', 'less:dev'])
+      directives: 
+        files: ['<%= common.app %>/**/directives/*.jade']
+        tasks: ['directive-templates']
       components:
         files: ['<%= common.components %>/**/*.less']
         tasks: ['runComponentLess']
@@ -88,6 +99,7 @@ module.exports = (grunt) ->
     copy:
       less: copyConfig('less')
       jade: copyConfig('jade')
+      js: copyConfig('js')
 
     pathReporter:
       options:
@@ -102,7 +114,7 @@ module.exports = (grunt) ->
       files: 
         src: [
           '<%= common.dist %>/bower_components/msgr.js/dist/msgr.js',
-          "<%= common.app %>/**/player-launcher/*.js",
+          '<%= common.app %>/**/player-launcher/*.js'
         ]
         dest: '<%= common.tmp %>/wrapped/player-launcher-wrapped.js'
 
@@ -110,14 +122,9 @@ module.exports = (grunt) ->
       unit:
         src: [
           '<%= common.app %>/js/corespring/**/*.js',
-          '<%= common.app %>/js/catalog/**/*.js',
-          '<%= common.app %>/js/common/**/*.js',
-          '<%= common.app %>/js/editor/**/*.js',
-          '<%= common.app %>/js/libs/*.js',
-          '<%= common.app %>/js/render/**/*.js',
-          '<%= common.app %>/js/rig/**/*.js',
-          '<%= common.tmp %>/wrapped/player-launcher-wrapped.js',
-          '!<%= common.app %>/js/**/player-launcher/*.js']
+          '<%= common.app %>/js/**/*.js',
+          '<%= common.tmp %>/wrapped/player-launcher-wrapped.js'
+          ]
         options:
           keepRunner: true
           vendor: _.map(['angular/angular.js',
@@ -131,7 +138,6 @@ module.exports = (grunt) ->
             'msgr.js/dist/msgr.js'], comps)
           specs: '<%= common.test %>/js/**/*-test.js'
 
-
     shell:
       mathjax_rm_pngs:
         command: 'rm -fr <%= common.dist %>/bower_components/mathjax/fonts/HTML-CSS/TeX/png'
@@ -144,6 +150,34 @@ module.exports = (grunt) ->
         """
         options :
           failOnError: true
+
+    jade:
+      directives:
+        cwd: '<%= common.app %>' 
+        src:  '**/directives/**.jade'
+        dest: '<%= common.dist %>'
+        ext: '.html'
+        expand: true
+
+    ngtemplates:  
+      v2Common:
+        cwd: '<%= common.dist %>' 
+        dest: '<%= common.dist %>'
+        src:  'js/v2-common/**/directives/**.html'
+        options:
+          module: 'corespring-v2-common.directives'
+          url: (u) -> u.replace( common.dist + '/js', '')
+        expand: true
+        ext: '.tpl.js'
+      v2Editor:
+        cwd: '<%= common.dist %>'
+        dest: '<%= common.dist %>'
+        src:  'js/v2-editor/**/directives/**.html'
+        options:
+          module: 'corespring-editor.directives'
+          url: (u) -> u.replace( common.dist + '/js', '')
+        expand: true
+        ext: '.tpl.js'
 
   toTargetPath = (p) ->
     if(p.startsWith("//")) then p
@@ -159,10 +193,11 @@ module.exports = (grunt) ->
   fullConfig = _.merge(config,
     mkConfig('catalog', catalog),
     mkConfig('editor', editor),
-    mkConfig('v2Editor', v2Editor),
+    mkConfig('v2Editor', v2Editor)
     mkConfig('rig', rig),
     mkConfig('player', player)
-    mkConfig('playerControls', playerControls))
+    mkConfig('playerControls', playerControls)
+  )
 
   grunt.log.debug(JSON.stringify(fullConfig, null, "  "))
 
@@ -171,6 +206,7 @@ module.exports = (grunt) ->
   npmTasks = [
     'grunt-shell',
     'grunt-contrib-copy',
+    'grunt-contrib-jade',
     'grunt-contrib-uglify',
     'grunt-contrib-clean',
     'grunt-contrib-less',
@@ -179,20 +215,23 @@ module.exports = (grunt) ->
     'grunt-contrib-jasmine',
     'grunt-contrib-copy',
     'grunt-contrib-compress',
-    'grunt-bower-clean'
+    'grunt-bower-clean',
+    'grunt-angular-templates'
   ]
 
   grunt.loadNpmTasks(t) for t in npmTasks
   grunt.loadTasks('./grunt/lib/tasks')
+  grunt.registerTask('none', [])
   grunt.registerTask('lcd', ['loadComponentDependencies'])
   grunt.registerTask('loadComponentDependencies', 'Load client side dependencies for the components', componentDependencies(grunt))
-  grunt.registerTask('run', ['mk-css', 'pathReporter', 'runComponentLess', 'watch'])
+  grunt.registerTask('run', ['mk-css', 'directive-templates','pathReporter', 'runComponentLess', 'watch'])
   grunt.registerTask('mk-css', ['copy:less', 'less', 'runComponentLess'])
   grunt.registerTask('default', ['stage'])
   grunt.registerTask('test', ['lcd', 'prepPlayerLauncher', 'jasmine:unit'])
-
+  grunt.registerTask('directive-templates', ['jade:directives', 'ngtemplates'])
   grunt.registerTask('stage', 'Work with the play stage task',
     ['mk-css',
+    'directive-templates',
     'jshint',
     'uglify',
     'compress',
@@ -212,10 +251,14 @@ module.exports = (grunt) ->
       grunt: true
       args: [ 'less' ]
       opts:
-        cwd: common.components
+        cwd: common.components 
 
     spawnResultHandler = (err, result, code) ->
       console.log result.stdout
+      if err?
+        console.log(result.stderr)
+        grunt.fail.fatal(err) 
+
       cb()
 
     grunt.util.spawn( spawnConfig, spawnResultHandler )

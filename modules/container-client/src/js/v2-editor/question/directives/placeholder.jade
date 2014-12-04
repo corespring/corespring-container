@@ -1,0 +1,17 @@
+.component-placeholder(
+  data-component-id='{{id}}', 
+  ng-class="{\'show-icon\': showIcon}"
+  )
+  //ng-if="configurable"
+  .blocker
+    .bg
+    .content
+    ul.edit-controls
+      li.edit-icon-button(tooltip='edit', tooltip-append-to-body='true', tooltip-placement='bottom')
+        i.fa.fa-pencil(ng-click='editNode($event)')
+      li.delete-icon-button(tooltip='delete', tooltip-append-to-body='true', tooltip-placement='bottom')
+        i.fa.fa-trash-o(ng-click='deleteNode($event)')
+    .holder(ng-hide="showIcon")
+    .icon-holder(ng-show="showIcon", style="{{ 'background-image:  url(\\'' + config.icon + '\\');' }}")
+      span.title {{config.name}}
+
