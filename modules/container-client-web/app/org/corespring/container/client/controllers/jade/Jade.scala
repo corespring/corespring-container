@@ -27,17 +27,23 @@ trait Jade {
 
   private class InternalTemplateLoader(val root: String) extends TemplateLoader {
 
-    private def toPath(name: String) = s"$root/$name.jade"
+    private def toPath(name: String) = {
+      s"$root/$name${if (name.endsWith(".jade")) "" else ".jade"}"
+    }
 
     override def getLastModified(name: String): Long = Play.resource(toPath(name)).map { url =>
       url.openConnection().getLastModified
-    }.getOrElse { throw new RuntimeException(s"Unable to load jade file as a resource from: ${toPath(name)}") }
+    }.getOrElse { throw new RuntimeException(s"getLastModified - Unable to load jade file as a resource from: ${toPath(name)}") }
 
-    override def getReader(name: String): Reader = Play.resource(toPath(name)).map { url =>
-      val returnValue = new BufferedReader(new InputStreamReader(url.openStream()))
-      readers.push(returnValue)
-      returnValue
-    }.getOrElse { throw new RuntimeException(s"Unable to load jade file as a resource from: ${toPath(name)}") }
+    override def getReader(name: String): Reader = {
+      logger.trace(s"getReader name=$name")
+      val expandedPath = toPath(name)
+      Play.resource(expandedPath).map { url =>
+        val returnValue = new BufferedReader(new InputStreamReader(url.openStream()))
+        readers.push(returnValue)
+        returnValue
+      }.getOrElse { throw new RuntimeException(s"getReader - Unable to load jade file as a resource from: ${expandedPath}") }
+    }
   }
 
   val jadeConfig = {
