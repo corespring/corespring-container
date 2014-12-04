@@ -50,7 +50,7 @@ angular.module('corespring-editor.controllers').controller('NavController', [
 
     $scope.$watch('item.profile.taskInfo.title', function(newValue, oldValue){
       $scope.title = newValue;
-    })
+    });
 
     $scope.$on('itemLoaded', function onItemLoaded(ev, item){
       $scope.item = item;
