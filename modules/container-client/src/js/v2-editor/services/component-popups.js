@@ -28,7 +28,7 @@ angular.module('corespring-editor.services')
         }
 
         function getTitle(component) {
-          return _.isEmpty(component.title) ? component.name : component.title;
+          return _.isEmpty(component.title) ? component.name || 'no title provided' : component.title;
         }
 
         function launchModal($scope, id, model){
