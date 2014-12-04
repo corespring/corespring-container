@@ -48,13 +48,14 @@ html(xmlns="http://www.w3.org/1999/html")
 
       function getParams(){
         var nameValueStrings = document.location.search.replace('?', '').split('&');
-        var out = {}
-        function toNameValue(result, s){
+
+        function toNameValue(acc, s){
           var arr = s.split('=');
-          result[arr[0]] = arr[1];
+          acc[arr[0]] = arr[1];
+          return acc;
         }
-        _.reduce(nameValueStrings, toNameValue, out);
-        return out;
+        
+        return _.reduce(nameValueStrings, toNameValue, {});
       }
 
       var loggers = {

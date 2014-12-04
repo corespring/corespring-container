@@ -20,8 +20,9 @@ angular.module('corespring-editor.services')
           do{
             if(!_.has(componentModels, id.toString()) && !_.has(removedComponentModels, id.toString())){
               idFound = true;
+            } else {
+              id++;
             }
-            id++;
           } while(!idFound && id < 100);
 
           return id;
