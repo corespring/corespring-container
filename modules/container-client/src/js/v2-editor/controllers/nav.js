@@ -48,8 +48,12 @@ angular.module('corespring-editor.controllers').controller('NavController', [
       };
     }
 
+    $scope.$watch('item.profile.taskInfo.title', function(newValue, oldValue){
+      $scope.title = newValue;
+    })
+
     function onItemLoaded(item){
-      $scope.title = item.profile.taskInfo.title; 
+      $scope.item = item;
     }
 
     $scope.open = launchModal('open');
@@ -58,7 +62,7 @@ angular.module('corespring-editor.controllers').controller('NavController', [
     }, function(title){
       logger.debug('--> ok --> ', arguments);
       ItemService.fineGrainedSave({'profile.taskInfo.title': title}, function(result){
-        $scope.title = result['profile.taskInfo.title'];
+        $scope.item.profile.taskInfo.title = result['profile.taskInfo.title'];
       });
     });
     $scope.copy = launchModal('copy');
