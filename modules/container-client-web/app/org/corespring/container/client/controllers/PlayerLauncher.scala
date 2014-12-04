@@ -6,6 +6,7 @@ import org.apache.commons.io.IOUtils
 import org.apache.commons.lang3.StringEscapeUtils
 import org.corespring.container.client.V2PlayerConfig
 import org.corespring.container.client.hooks.{ PlayerJs, PlayerLauncherHooks }
+import org.corespring.container.client.views.txt.js.ServerLibraryWrapper
 import play.api.Play
 import play.api.Play.current
 import play.api.http.ContentTypes
