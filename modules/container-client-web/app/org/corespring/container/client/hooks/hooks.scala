@@ -45,6 +45,8 @@ trait ItemHooks extends HasContext {
 
   def save(itemId: String, json: JsValue)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]]
 
+  def fineGrainedSave(itemId: String, json: JsValue)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]]
+
   def create(json: Option[JsValue])(implicit header: RequestHeader): Future[Either[StatusMessage, String]]
 }
 

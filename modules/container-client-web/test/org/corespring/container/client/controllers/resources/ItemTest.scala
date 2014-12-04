@@ -37,6 +37,8 @@ class ItemTest extends Specification with Mockito {
           }
         }
 
+        override def fineGrainedSave(itemId: String, json: JsValue)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] = save(itemId, json)
+
         override def load(itemId: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]] = {
           Future {
             Right(Json.obj())
