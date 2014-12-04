@@ -76,7 +76,9 @@ angular.module('corespring-v2-common.directives')
             $scope.licenseTypeUrl = licenseTypeUrl($scope.item.profile.contributorDetails.licenseType);
           }
 
-          var copyrightOwner = getOrNull($scope.item.profile, "contributorDetails", "copyrightOwner");
+          var copyrightOwner = getOrNull($scope.item.profile, "contributorDetails", "copyrightOwner") ||
+            getOrNull($scope.item.profile, "contributorDetails", "copyright", "owner");
+
           if (copyrightOwner) {
             $scope.copyrightOwnerUrl = copyrightOwnerUrl(copyrightOwner);
           }
