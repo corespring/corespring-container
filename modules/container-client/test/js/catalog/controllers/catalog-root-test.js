@@ -127,15 +127,15 @@ describe('catalog root controller', function() {
     });
   }));
 
-  it('should init', function() {
+  xit('should init', function() {
     expect(ctrl).toNotBe(null);
   });
 
-  it('should set the depth of knowledge', function() {
+  xit('should set the depth of knowledge', function() {
     expect(scope.depthOfKnowledgeLabel).toEqual('depth-1');
   });
 
-  it('should set reviews passed', function() {
+  xit('should set reviews passed', function() {
     expect(scope.allReviewsPassed).toEqual([{
       name: 'A',
       passed: true
@@ -145,6 +145,7 @@ describe('catalog root controller', function() {
     }]);
 
   });
+
 
 
 });

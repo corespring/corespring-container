@@ -18,6 +18,16 @@
     display: inline-block;
   }
 
+  .header-container {
+    width: 100%;
+  }
+
+  .header-container:after {
+    clear: both;
+    content: "";
+    display: table;
+  }
+
   .done {
     .border-radius(@btn-border-radius);
   }

@@ -40,7 +40,7 @@ trait PlayerLauncher extends Controller {
     }
   }
 
-  import org.corespring.container.client.controllers.apps.routes.{ Editor, Player }
+  import org.corespring.container.client.controllers.apps.routes.{ Editor, V2Editor, Player }
 
   val SecureMode = "corespring.player.secure"
 
@@ -56,10 +56,12 @@ trait PlayerLauncher extends Controller {
     pathToNameAndContents(jsPath)
   }
 
-  def editorJs = Action.async { implicit request =>
-    hooks.editorJs.map { implicit js =>
+  def editorJs = getEditorJs(Editor.load(":itemId"))
 
-      val loadEditorCall = Editor.load(":itemId")
+  def editorV2Js = getEditorJs(V2Editor.load(":itemId"))
+
+  def getEditorJs(loadEditorCall: Call) = Action.async { implicit request =>
+    hooks.editorJs.map { implicit js =>
 
       val rootUrl = playerConfig.rootUrl.getOrElse(BaseUrl(request))
       val create = org.corespring.container.client.controllers.resources.routes.Item.create()
@@ -180,6 +182,7 @@ trait PlayerLauncher extends Controller {
   }
 
   private def errorsToModule(errors: Seq[String]): String = msgToModule(errors, "errors")
+
   private def warningsToModule(warnings: Seq[String]): String = msgToModule(warnings, "warnings")
 
   private def msgToModule(msgs: Seq[String], msgType: String): String = {
