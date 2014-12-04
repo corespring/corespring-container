@@ -6,13 +6,11 @@ import org.apache.commons.io.IOUtils
 import org.apache.commons.lang3.StringEscapeUtils
 import org.corespring.container.client.V2PlayerConfig
 import org.corespring.container.client.hooks.{ PlayerJs, PlayerLauncherHooks }
-import org.corespring.container.client.views.txt.js.ServerLibraryWrapper
 import play.api.Play
 import play.api.Play.current
 import play.api.http.ContentTypes
 import play.api.libs.json.{ JsValue, Json }
 import play.api.mvc._
-import play.core.Router.Routes
 
 import scala.concurrent.ExecutionContext
 
@@ -58,6 +56,7 @@ trait PlayerLauncher extends Controller {
   }
 
   def editorJs = getEditorJs(Editor.load(":itemId"))
+
   def editorV2Js = getEditorJs(V2Editor.load(":itemId"))
 
   def getEditorJs(loadEditorCall: Call) = Action.async { implicit request =>
@@ -182,6 +181,7 @@ trait PlayerLauncher extends Controller {
   }
 
   private def errorsToModule(errors: Seq[String]): String = msgToModule(errors, "errors")
+
   private def warningsToModule(warnings: Seq[String]): String = msgToModule(warnings, "warnings")
 
   private def msgToModule(msgs: Seq[String], msgType: String): String = {
