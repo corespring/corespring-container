@@ -341,7 +341,14 @@
       if (!$scope.item || !$scope.item.components || !$scope.availableComponents) {
         return;
       }
-      $scope.componentTypes = ProfileFormatter.componentTypesUsed($scope.item.components, $scope.availableComponents);
+
+      function simpleFormat(name, count) {
+        return name;
+      }
+
+      $scope.componentTypes = ProfileFormatter.componentTypesUsed(
+        $scope.item.components, $scope.availableComponents, simpleFormat);
+
       $scope.formModels.componentTypes.visible = 0 < $scope.componentTypes.length;
     }
 
@@ -408,7 +415,7 @@
     }
 
     function subjectText(s) {
-      return s + "::" + s.category + ": " + s.subject;
+      return s.category + ": " + s.subject;
     }
 
     $scope.primarySubjectSelect2Adapter = new Select2Adapter("subjects.primary", subjectText);
@@ -431,6 +438,13 @@
     });
 
     DataQueryService.list("gradeLevels", function(result) {
+      function showKeyInsteadOfValue(result) {
+        return _.map(result, function (item) {
+          item.value = item.key;
+          return item;
+        });
+      }
+      result = showKeyInsteadOfValue(result);
       $scope.gradeLevelDataProvider = applyConfig(result, $scope.formModels.gradeLevel);
       $scope.priorGradeLevelDataProvider = applyConfig(result, $scope.formModels.priorGradeLevel);
     });
