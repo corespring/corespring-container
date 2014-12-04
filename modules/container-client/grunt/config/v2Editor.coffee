@@ -22,6 +22,7 @@ editorSrcs = [
   'bower_components/undo.js/undo.js',
   'js/corespring/core-library.js',
   'js/corespring/server/init-core-library.js',
+  'js/v2-common/**/*.js',
   'js/v2-editor/**/*.js',
   'js/v2-catalog/**/*.js',
   'js/render/services/**/*.js',
