@@ -4,63 +4,62 @@ GET           /player.js                                               @org.core
 GET           /editor.js                                               @org.corespring.container.client.controllers.PlayerLauncher.editorJs
 GET           /editor-v2.js                                            @org.corespring.container.client.controllers.PlayerLauncher.editorV2Js
 
-GET           /js/*file                                                controllers.Assets.at(path="/container-client/js", file)
-GET           /css/*file                                               controllers.Assets.at(path="/container-client/css", file)
-GET           /images/*file                                            controllers.Assets.at(path="/container-client/images", file)
-GET           /components/*file                                        controllers.Assets.at(path="/container-client/bower_components", file)
-GET           /public/:orgName/:componentName/*file                    @org.corespring.container.client.controllers.ComponentsFileController.at(orgName, componentName, file)
+GET           /js/*file                                              controllers.Assets.at(path="/container-client/js", file)
+GET           /css/*file                                             controllers.Assets.at(path="/container-client/css", file)
+GET           /images/*file                                          controllers.Assets.at(path="/container-client/images", file)
+GET           /components/*file                                      controllers.Assets.at(path="/container-client/bower_components", file)
+GET           /public/:orgName/:componentName/*file                  @org.corespring.container.client.controllers.ComponentsFileController.at(orgName, componentName, file)
 
 # Component sets js/css
-GET           /component-sets/:context/:directive.:suffix              @org.corespring.container.client.controllers.ComponentSets.resource(context, directive, suffix)
+GET           /component-sets/:context/:directive.:suffix            @org.corespring.container.client.controllers.ComponentSets.resource(context, directive, suffix)
 # Component single js/css
-GET           /component-single/:context/:componentType.:suffix        @org.corespring.container.client.controllers.ComponentSets.singleResource(context, componentType, suffix)
+GET           /component-single/:context/:componentType.:suffix      @org.corespring.container.client.controllers.ComponentSets.singleResource(context, componentType, suffix)
 
 # Hooks for the player: config,  components
 
-GET           /player/session/:sessionId/index.html                    @org.corespring.container.client.controllers.apps.Player.load(sessionId:String)
-GET           /player/item/:itemId/index.html                          @org.corespring.container.client.controllers.apps.Player.createSessionForItem(itemId:String)
-GET           /player/session/:sessionId/*file                         @org.corespring.container.client.controllers.Assets.session(sessionId, file)
+GET           /player/session/:sessionId/index.html                  @org.corespring.container.client.controllers.apps.Player.load(sessionId:String)
+GET           /player/item/:itemId/index.html                        @org.corespring.container.client.controllers.apps.Player.createSessionForItem(itemId:String)
+GET           /player/session/:sessionId/*file                       @org.corespring.container.client.controllers.Assets.session(sessionId, file)
 
 # Session
-GET           /session/item-and-session/:id.json                       @org.corespring.container.client.controllers.resources.Session.loadItemAndSession(id)
-GET           /session/reopen/:id.json                                 @org.corespring.container.client.controllers.resources.Session.reopenSession(id)
-GET           /session/reset/:id.json                                  @org.corespring.container.client.controllers.resources.Session.resetSession(id)
-PUT           /session/save/:id.json                                   @org.corespring.container.client.controllers.resources.Session.saveSession(id)
-PUT           /session/complete/:id.json                               @org.corespring.container.client.controllers.resources.Session.completeSession(id)
-PUT           /session/load-outcome/:id.json                           @org.corespring.container.client.controllers.resources.Session.loadOutcome(id)
-PUT           /session/:id/score.json                                  @org.corespring.container.client.controllers.resources.Session.getScore(id)
+GET           /session/item-and-session/:id.json                     @org.corespring.container.client.controllers.resources.Session.loadItemAndSession(id)
+GET           /session/reopen/:id.json                               @org.corespring.container.client.controllers.resources.Session.reopenSession(id)
+GET           /session/reset/:id.json                                @org.corespring.container.client.controllers.resources.Session.resetSession(id)
+PUT           /session/save/:id.json                                 @org.corespring.container.client.controllers.resources.Session.saveSession(id)
+PUT           /session/complete/:id.json                             @org.corespring.container.client.controllers.resources.Session.completeSession(id)
+PUT           /session/load-outcome/:id.json                         @org.corespring.container.client.controllers.resources.Session.loadOutcome(id)
+PUT           /session/:id/score.json                                @org.corespring.container.client.controllers.resources.Session.getScore(id)
 
 # Item
-GET           /item/:itemId.json                                       @org.corespring.container.client.controllers.resources.Item.load(itemId)
-GET           /item/:itemId/:name/*file                                @org.corespring.container.client.controllers.Assets.supportingMaterial(itemId, name, file)
-GET           /item/:itemId/*file                                      @org.corespring.container.client.controllers.Assets.item(itemId, file)
-PUT           /item/:itemId.json                                       @org.corespring.container.client.controllers.resources.Item.save(itemId)
-PUT           /item/update/:itemId.json                                @org.corespring.container.client.controllers.resources.Item.fineGrainedSave(itemId)
-POST          /item/create                                             @org.corespring.container.client.controllers.resources.Item.create()
-POST          /item/:itemId/supporting-materials/create                @org.corespring.container.client.controllers.resources.SupportingMaterial.create(itemId)
+GET           /item/:itemId.json                                     @org.corespring.container.client.controllers.resources.Item.load(itemId)
+GET           /item/:itemId/:name/*file                              @org.corespring.container.client.controllers.Assets.supportingMaterial(itemId, name, file)
+GET           /item/:itemId/*file                                    @org.corespring.container.client.controllers.Assets.item(itemId, file)
+PUT           /item/:itemId.json                                     @org.corespring.container.client.controllers.resources.Item.save(itemId)
+PUT           /item/update/:itemId.json                              @org.corespring.container.client.controllers.resources.Item.fineGrainedSave(itemId)
+POST          /item/create                                           @org.corespring.container.client.controllers.resources.Item.create()
+POST          /item/:itemId/supporting-materials/create              @org.corespring.container.client.controllers.resources.SupportingMaterial.create(itemId)
 
 
-GET           /icon/:icon                                              @org.corespring.container.client.controllers.Icons.icon(icon)
+GET           /icon/:icon                                            @org.corespring.container.client.controllers.Icons.icon(icon)
 
 # Rig
-GET           /rig/:componentType/index.html                           @org.corespring.container.client.controllers.apps.Rig.load(componentType)
-GET           /rig/:componentType/:dataName.json                       @org.corespring.container.client.controllers.apps.Rig.data(componentType, dataName)
-GET           /rig/:componentType/*file                                @org.corespring.container.client.controllers.apps.Rig.asset(componentType, file)
+GET          /rig/:componentType/index.html                         @org.corespring.container.client.controllers.apps.Rig.load(componentType)
+GET          /rig/:componentType/:dataName.json                     @org.corespring.container.client.controllers.apps.Rig.data(componentType, dataName)
+GET          /rig/:componentType/*file                              @org.corespring.container.client.controllers.apps.Rig.asset(componentType, file)
 
 # Catalog
-GET           /catalog/:itemId/index.html                              @org.corespring.container.client.controllers.apps.Catalog.load(itemId)
+GET           /catalog/:itemId/index.html                           @org.corespring.container.client.controllers.apps.Catalog.load(itemId)
 
 # v2 editor
-GET           /v2-editor/:itemId/index.html                            @org.corespring.container.client.controllers.apps.V2Editor.load(itemId)
-GET           /v2-editor/:itemId/*file                                 @org.corespring.container.client.controllers.Assets.item(itemId, file)
-POST          /v2-editor/:itemId/*file                                 @org.corespring.container.client.controllers.Assets.upload(itemId, file)
+GET           /v2-editor/:itemId/index.html                         @org.corespring.container.client.controllers.apps.V2Editor.load(itemId)
+GET           /v2-editor/:itemId/*file                              @org.corespring.container.client.controllers.Assets.item(itemId, file)
 
 # Editor: config, components
-GET           /editor/:itemId/index.html                               @org.corespring.container.client.controllers.apps.Editor.load(itemId)
-GET           /editor/:itemId/supporting-material/:name/*file          @org.corespring.container.client.controllers.Assets.supportingMaterial(itemId, name, file)
-GET           /editor/:itemId/*file                                    @org.corespring.container.client.controllers.Assets.item(itemId, file)
-POST          /editor/:itemId/*file                                    @org.corespring.container.client.controllers.Assets.upload(itemId, file)
-DELETE        /editor/:itemId/*file                                    @org.corespring.container.client.controllers.Assets.delete(itemId, file)
+GET           /editor/:itemId/index.html                            @org.corespring.container.client.controllers.apps.Editor.load(itemId)
+GET           /editor/:itemId/supporting-material/:name/*file       @org.corespring.container.client.controllers.Assets.supportingMaterial(itemId, name, file)
+GET           /editor/:itemId/*file                                 @org.corespring.container.client.controllers.Assets.item(itemId, file)
+POST          /editor/:itemId/*file                                 @org.corespring.container.client.controllers.Assets.upload(itemId, file)
+DELETE        /editor/:itemId/*file                                 @org.corespring.container.client.controllers.Assets.delete(itemId, file)
 
-GET           /data-query/:topic                                       @org.corespring.container.client.controllers.DataQuery.list(topic, query : Option[String] ?= None)
-GET           /data-query/:topic/:id                                   @org.corespring.container.client.controllers.DataQuery.findOne(topic, id)
+GET           /data-query/:topic                                    @org.corespring.container.client.controllers.DataQuery.list(topic, query : Option[String] ?= None)
+GET           /data-query/:topic/:id                                @org.corespring.container.client.controllers.DataQuery.findOne(topic, id)
