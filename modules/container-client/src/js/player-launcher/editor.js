@@ -82,6 +82,11 @@ function EditorDefinition(element, options, errorCallback) {
       return;
     }
 
+    var tab = options.selectedTab;
+    if ('profile' === tab) {
+       options.hash = '/profile';
+    }
+
     options.url = (options.corespringUrl + loadCall.url).replace(":itemId", itemId);
     options.queryParams = require('query-params');
 

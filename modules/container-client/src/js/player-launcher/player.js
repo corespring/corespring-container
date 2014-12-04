@@ -73,6 +73,10 @@ exports.define = function(isSecure) {
     options.url = prepareUrl();
     options.forceWidth = true;
 
+    if (options.showPreview === true) {
+      options.hash = '/?showPreviewButton';
+    }
+
     var instance = new InstanceDef(element, options, errorCallback, logger);
 
     var isValidMode = function(m) {
