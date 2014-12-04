@@ -28,8 +28,8 @@ var Instance = function(element, options, errorCallback, log) {
     }
 
     var url = makeUrl(options.url, options.queryParams);
-    if (options.showPreview === true) {
-      url += "#/?showPreviewButton";
+    if(options.hash){
+      url += '#' + options.hash;
     }
 
     var iframeStyles = [
