@@ -28,6 +28,7 @@ include ../v2-mixins/modal
                 player-outcomes="outcome")
 
             .profile(ng-if="activeTab == 'profile'")
+              div(profile-preview="", ng-model="item")
 
             .supporting-material(ng-if="activeTab == 'supportingMaterial'")
               div(style="height: 100%;", ng-if="getContentType() != 'text/html'")
