@@ -380,8 +380,6 @@
     }
 
     $scope.$watch('profile.standards', function(newValue, oldValue) {
-      $log.warn("profile.standards", newValue);
-
       $scope.isLiteracyStandardSelected = containsLiteracyStandard(newValue);
     });
 
@@ -458,14 +456,11 @@
       };
 
       this.query = function(query) {
-        $log.log("query", query);
         queryAndCache(topic, query);
       };
 
       this.initSelection = function(element, callback) {
-        $log.log("init selection:", element, callback);
         var val = that.elementToVal(element);
-        $log.log("val:", val);
 
         findItemById(topic, val, callback);
       };
