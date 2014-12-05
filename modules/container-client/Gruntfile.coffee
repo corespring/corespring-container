@@ -78,13 +78,13 @@ module.exports = (grunt) ->
         livereload: true
         debounceDelay: 5000
         files: ['<%= common.dist %>/**/*']
-      js: 
-        files: ['<%= common.app %>/**/*.js'] 
-        tasks: ['copy:js'] 
+      js:
+        files: ['<%= common.app %>/**/*.js']
+        tasks: ['copy:js']
 
       jade: watchConfig('jade', ['copy:jade'])
       less: watchConfig('less', ['copy:less', 'less:dev'])
-      directives: 
+      directives:
         files: ['<%= common.app %>/**/directives/*.jade']
         tasks: ['directive-templates']
       components:
@@ -106,7 +106,7 @@ module.exports = (grunt) ->
       main: ['<%= common.app %>/js/**/*.js', '!<%= common.app %>/**/*.min.js']
 
     prepPlayerLauncher:
-      files: 
+      files:
         src: [
           '<%= common.dist %>/bower_components/msgr.js/dist/msgr.js',
           '<%= common.app %>/**/player-launcher/*.js'
@@ -149,15 +149,15 @@ module.exports = (grunt) ->
 
     jade:
       directives:
-        cwd: '<%= common.app %>' 
+        cwd: '<%= common.app %>'
         src:  '**/directives/**.jade'
         dest: '<%= common.dist %>'
         ext: '.html'
         expand: true
 
-    ngtemplates:  
+    ngtemplates:
       v2Common:
-        cwd: '<%= common.dist %>' 
+        cwd: '<%= common.dist %>'
         dest: '<%= common.dist %>'
         src:  'js/v2-common/**/directives/**.html'
         options:
@@ -215,9 +215,13 @@ module.exports = (grunt) ->
     'grunt-angular-templates'
   ]
 
+  writeConfig = () ->
+    grunt.file.write( 'grunt-debug-config.json', JSON.stringify(fullConfig, null, "  "))
+
   grunt.loadNpmTasks(t) for t in npmTasks
   grunt.loadTasks('./grunt/lib/tasks')
   grunt.registerTask('none', [])
+  grunt.registerTask('write-config', '',writeConfig)
   grunt.registerTask('lcd', ['loadComponentDependencies'])
   grunt.registerTask('loadComponentDependencies', 'Load client side dependencies for the components', componentDependencies(grunt))
   grunt.registerTask('run', ['mk-css', 'directive-templates','pathReporter', 'runComponentLess', 'watch'])
@@ -247,13 +251,13 @@ module.exports = (grunt) ->
       grunt: true
       args: [ 'less' ]
       opts:
-        cwd: common.components 
+        cwd: common.components
 
     spawnResultHandler = (err, result, code) ->
       console.log result.stdout
       if err?
         console.log(result.stderr)
-        grunt.fail.fatal(err) 
+        grunt.fail.fatal(err)
 
       cb()
 
