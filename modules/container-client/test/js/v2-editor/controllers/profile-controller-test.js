@@ -132,6 +132,7 @@ describe('profile controller', function () {
       ctrl = controller('ProfileController', {
         $scope: scope
       });
+      scope.$broadcast('getEditorOptionsResult');
     } catch (e) {
       throw ("Error with the controller: " + e);
     }
@@ -228,7 +229,7 @@ describe('profile controller', function () {
     describe("isLiteracyStandardSelected", function () {
       beforeEach(makeProfileController);
       it("is true if literacy standard is selected", function () {
-        scope.profile.standards.push({subject: "some literacy subject"});
+        scope.item.profile.standards.push({subject: "some literacy subject"});
         scope.$apply();
         expect(scope.isLiteracyStandardSelected).toEqual(true);
       });

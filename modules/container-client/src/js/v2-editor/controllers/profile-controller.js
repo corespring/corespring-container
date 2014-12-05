@@ -236,6 +236,9 @@
       dataProviderInitialiser.push(initialiser);
     }
 
+    /**
+     * Execute all initialiser functions, which are stored in dataProviderInitialiser
+     */
     function initDataProviders(){
       _.forEach(dataProviderInitialiser, function(initialiser){
         try {
@@ -246,6 +249,28 @@
       });
     }
 
+    /**
+     * Filter the objects in data by the values in config.options.
+     * The resulting collection contains all objects with a key that is in the options.
+     * @param data
+     * @param config
+     * @returns {*}
+     */
+    function applyConfig(data, config){
+      if(!_.isArray(config.options)) {
+        return data;
+      }
+
+      function itemIsInOptions(item){
+        //most items are key-value objects
+        //but some items like the copyright year are simple values
+        var key = item && item.hasOwnProperty('key') ? item.key : item;
+        return -1 < _.findIndex(config.options, function (option) {
+            return key === option;
+          });
+      }
+      return _.filter(data, itemIsInOptions);
+    }
 
     //----------------------------------------------------------------
     // Standards
@@ -340,7 +365,7 @@
     }
 
     $scope.$watch('profile.standards', function(newValue, oldValue) {
-      $log.log("profile.standards", newValue);
+      $log.warn("profile.standards", newValue);
 
       $scope.isLiteracyStandardSelected = containsLiteracyStandard(newValue);
     });
@@ -474,25 +499,6 @@
         $scope.priorGradeLevelDataProvider = applyConfig(result, $scope.formModels.priorGradeLevel);
       });
     });
-
-
-
-    function applyConfig(data, config){
-      $log.warn("applyConfig", data, config);
-      if(!_.isArray(config.options)) {
-        return data;
-      }
-
-      function itemIsInOptions(item){
-        //most items are key-value objects
-        //but some items like the copyright year are simple values
-        var key = item && item.hasOwnProperty('key') ? item.key : item;
-        return -1 < _.findIndex(config.options, function (option) {
-            return key === option;
-          });
-      }
-      return _.filter(data, itemIsInOptions);
-    }
 
     //----------------------------------------------------------------
     // copyright related dates
@@ -699,6 +705,8 @@
     //----------------------------------------------------------------
 
     function setItem(item) {
+      $scope.item = item;
+
       var profile = item.profile;
 
       if (!(profile.taskInfo)) {
@@ -746,7 +754,6 @@
       $scope.otherAlignments = profile.otherAlignments;
       $scope.contributorDetails = profile.contributorDetails;
       $scope.profile = profile;
-      $scope.item = item;
 
       $log.log("task info:", $scope.taskInfo);
       $log.log("other alignments:", $scope.otherAlignments);
@@ -781,10 +788,6 @@
         if (item && item.profile) {
 
           setItem(item);
-
-          //for some reason $apply is
-          //necessary to update the view
-          $scope.$apply();
 
           var watchNestedProperties;
           $scope.$watch('item.profile', throttle(function(oldValue, newValue){
