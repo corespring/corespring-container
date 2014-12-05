@@ -740,7 +740,7 @@
     $scope.loadProfile = function(){
       $log.log("loading profile");
       ItemService.load(function(item){
-        $log.warn('item loading success hasItem:' + (!!item) + " hasProfile:" + (!!item && !!item.profile), item);
+        $log.log('item loading success hasItem:' + (!!item) + " hasProfile:" + (!!item && !!item.profile), item);
         if (item && item.profile) {
 
           setItem(item);
@@ -763,7 +763,6 @@
     };
 
     $scope.$on('getEditorOptionsResult', function(evt, data){
-      $log.warn('getEditorOptionsResult', data);
       if(data) {
         updateFormModels($scope.formModels, data.profileConfig);
       }

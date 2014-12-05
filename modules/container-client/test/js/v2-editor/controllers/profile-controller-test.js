@@ -636,52 +636,52 @@ describe('profile controller', function () {
   describe("form configuration", function () {
 
     it("should be possible to configure visible to false", function () {
-      mockLocation.hashResult = {config: JSON.stringify({title: {visible: false}})};
+      mockLocation.hashResult = {profileConfig: JSON.stringify({title: {visible: false}})};
       makeProfileController();
       expect(scope.formModels.title.visible).toEqual(false);
     });
     it("should be possible to configure visible to true", function () {
-      mockLocation.hashResult = {config: JSON.stringify({title: {visible: true}})};
+      mockLocation.hashResult = {profileConfig: JSON.stringify({title: {visible: true}})};
       makeProfileController();
       expect(scope.formModels.title.visible).toEqual(true);
     });
     it("should not configure visible if property does not exist in config", function () {
-      mockLocation.hashResult = {config: JSON.stringify({title: {}})};
+      mockLocation.hashResult = {profileConfig: JSON.stringify({title: {}})};
       makeProfileController();
       expect(scope.formModels.title.visible).toEqual(true);
     });
     it("should be possible to configure readonly to false", function () {
-      mockLocation.hashResult = {config: JSON.stringify({title: {readonly: false}})};
+      mockLocation.hashResult = {profileConfig: JSON.stringify({title: {readonly: false}})};
       makeProfileController();
       expect(scope.formModels.title.readonly).toEqual(false);
     });
     it("should be possible to configure readonly to true", function () {
-      mockLocation.hashResult = {config: JSON.stringify({title: {readonly: true}})};
+      mockLocation.hashResult = {profileConfig: JSON.stringify({title: {readonly: true}})};
       makeProfileController();
       expect(scope.formModels.title.readonly).toEqual(true);
     });
     it("should not configure readonly if property does not exist in config", function () {
-      mockLocation.hashResult = {config: JSON.stringify({title: {}})};
+      mockLocation.hashResult = {profileConfig: JSON.stringify({title: {}})};
       makeProfileController();
       expect(scope.formModels.title.readonly).toEqual(false);
     });
     it("should be possible to configure value", function () {
-      mockLocation.hashResult = {config: JSON.stringify({title: {value: "some value"}})};
+      mockLocation.hashResult = {profileConfig: JSON.stringify({title: {value: "some value"}})};
       makeProfileController();
       expect(scope.formModels.title.value).toEqual("some value");
     });
     it("should not configure value if property does not exist in config", function () {
-      mockLocation.hashResult = {config: JSON.stringify({title: {}})};
+      mockLocation.hashResult = {profileConfig: JSON.stringify({title: {}})};
       makeProfileController();
       expect(scope.formModels.title.value).toEqual(undefined);
     });
     it("should be possible to configure options", function () {
-      mockLocation.hashResult = {config: JSON.stringify({standards: {options: [1, 2, 3]}})};
+      mockLocation.hashResult = {profileConfig: JSON.stringify({standards: {options: [1, 2, 3]}})};
       makeProfileController();
       expect(scope.formModels.standards.options).toEqual([1, 2, 3]);
     });
     it("should not configure options if property does not exist in config", function () {
-      mockLocation.hashResult = {config: JSON.stringify({title: {}})};
+      mockLocation.hashResult = {profileConfig: JSON.stringify({title: {}})};
       makeProfileController();
       expect(scope.formModels.title.options).toEqual(undefined);
     });
@@ -700,7 +700,7 @@ describe('profile controller', function () {
     });
     describe("overrides values in profile", function(){
       beforeEach(function(){
-        mockLocation.hashResult = {config: JSON.stringify({
+        mockLocation.hashResult = {profileConfig: JSON.stringify({
           title: {value: "some title"},
           description: {value: "some description"},
           primarySubject: {value: "some primary subject"},
@@ -791,7 +791,7 @@ describe('profile controller', function () {
       describe("bloomsTaxonomy", function(){
         it("should not change dataProvider, when options are not defined", function(){
           mockDataQueryService.listResult = keyValueList(["one", "two", "three"]);
-          mockLocation.hashResult = {config: JSON.stringify({
+          mockLocation.hashResult = {profileConfig: JSON.stringify({
             bloomsTaxonomy: {}
           })};
           makeProfileController();
@@ -799,7 +799,7 @@ describe('profile controller', function () {
         });
         it("should remove items which are not in both, dataProvider and options", function(){
           mockDataQueryService.listResult = keyValueList(["one", "two", "not in options"]);
-          mockLocation.hashResult = {config: JSON.stringify({
+          mockLocation.hashResult = {profileConfig: JSON.stringify({
             bloomsTaxonomy: {options: ["one","two","not in dataProvider"]}
           })};
           makeProfileController();
@@ -808,7 +808,7 @@ describe('profile controller', function () {
       });
       describe("copyrightYear", function(){
         it("should remove items which are not in both, dataProvider and options", function(){
-          mockLocation.hashResult = {config: JSON.stringify({
+          mockLocation.hashResult = {profileConfig: JSON.stringify({
             copyrightYear: {options: ['1981', '1982', "not in dataProvider"]}
           })};
           makeProfileController();
@@ -817,7 +817,7 @@ describe('profile controller', function () {
       });
       describe("copyrightExpirationDate", function(){
         it("should remove items which are not in both, dataProvider and options", function(){
-          mockLocation.hashResult = {config: JSON.stringify({
+          mockLocation.hashResult = {profileConfig: JSON.stringify({
             copyrightExpirationDate: {options: ['2020', '2021', "not in dataProvider"]}
           })};
           makeProfileController();
@@ -827,7 +827,7 @@ describe('profile controller', function () {
       describe("credentials", function(){
         it("should not change dataProvider, when options are not defined", function(){
           mockDataQueryService.listResult = keyValueList(["one", "two", "three"]);
-          mockLocation.hashResult = {config: JSON.stringify({
+          mockLocation.hashResult = {profileConfig: JSON.stringify({
             credentials: {}
           })};
           makeProfileController();
@@ -835,7 +835,7 @@ describe('profile controller', function () {
         });
         it("should remove items which are not in both, dataProvider and options", function(){
           mockDataQueryService.listResult = keyValueList(["one", "two", "not in options"]);
-          mockLocation.hashResult = {config: JSON.stringify({
+          mockLocation.hashResult = {profileConfig: JSON.stringify({
             credentials: {options: ["one","two","not in dataProvider"]}
           })};
           makeProfileController();
@@ -845,7 +845,7 @@ describe('profile controller', function () {
       describe("depthOfKnowledge", function(){
         it("should not change dataProvider, when options are not defined", function(){
           mockDataQueryService.listResult = keyValueList(["one", "two", "three"]);
-          mockLocation.hashResult = {config: JSON.stringify({
+          mockLocation.hashResult = {profileConfig: JSON.stringify({
             depthOfKnowledge: {}
           })};
           makeProfileController();
@@ -853,7 +853,7 @@ describe('profile controller', function () {
         });
         it("should remove items which are not in both, dataProvider and options", function(){
           mockDataQueryService.listResult = keyValueList(["one", "two", "not in options"]);
-          mockLocation.hashResult = {config: JSON.stringify({
+          mockLocation.hashResult = {profileConfig: JSON.stringify({
             depthOfKnowledge: {options: ["one","two","not in dataProvider"]}
           })};
           makeProfileController();
@@ -863,7 +863,7 @@ describe('profile controller', function () {
       describe("gradeLevel", function(){
         it("should not change dataProvider, when options are not defined", function(){
           mockDataQueryService.listResult = keyValueList(["01", "03", "05"]);
-          mockLocation.hashResult = {config: JSON.stringify({
+          mockLocation.hashResult = {profileConfig: JSON.stringify({
             gradeLevel: {}
           })};
           makeProfileController();
@@ -871,7 +871,7 @@ describe('profile controller', function () {
         });
         it("should remove items which are not in both, dataProvider and options", function(){
           mockDataQueryService.listResult = keyValueList(["01", "03", "not in options"]);
-          mockLocation.hashResult = {config: JSON.stringify({
+          mockLocation.hashResult = {profileConfig: JSON.stringify({
             gradeLevel: {options: ["01","03","not in dataProvider"]}
           })};
           makeProfileController();
@@ -881,7 +881,7 @@ describe('profile controller', function () {
       describe("priorGradeLevel", function(){
         it("should not change dataProvider, when options are not defined", function(){
           mockDataQueryService.listResult = keyValueList(["01", "03", "05"]);
-          mockLocation.hashResult = {config: JSON.stringify({
+          mockLocation.hashResult = {profileConfig: JSON.stringify({
             priorGradeLevel: {}
           })};
           makeProfileController();
@@ -889,7 +889,7 @@ describe('profile controller', function () {
         });
         it("should remove items which are not in both, dataProvider and options", function(){
           mockDataQueryService.listResult = keyValueList(["01", "03", "not in options"]);
-          mockLocation.hashResult = {config: JSON.stringify({
+          mockLocation.hashResult = {profileConfig: JSON.stringify({
             priorGradeLevel: {options: ["01","03","not in dataProvider"]}
           })};
           makeProfileController();
@@ -900,7 +900,7 @@ describe('profile controller', function () {
         it("should not change dataProvider, when options are not defined", function(){
           var expectedDataProvider = keyValueList(["one", "two", "three"]);
           mockDataQueryService.listResult = expectedDataProvider;
-          mockLocation.hashResult = {config: JSON.stringify({
+          mockLocation.hashResult = {profileConfig: JSON.stringify({
             priorUse: {}
           })};
           makeProfileController();
@@ -908,7 +908,7 @@ describe('profile controller', function () {
         });
         it("should remove items which are not in both, dataProvider and options", function(){
           mockDataQueryService.listResult = keyValueList(["one", "two", "not in options"]);
-          mockLocation.hashResult = {config: JSON.stringify({
+          mockLocation.hashResult = {profileConfig: JSON.stringify({
             priorUse: {options: ["one","two","not in dataProvider"]}
           })};
           makeProfileController();

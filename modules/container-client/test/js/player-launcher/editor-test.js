@@ -21,6 +21,9 @@ describe('editor launcher', function () {
         cb();
       }
     };
+
+    this.send = function() {
+    };
   }
 
 

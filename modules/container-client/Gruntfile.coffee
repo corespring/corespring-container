@@ -64,11 +64,6 @@ module.exports = (grunt) ->
 
   comps = prepend.bind( null, '<%= common.dist %>/bower_components/')
 
-  getFiles = (patterns) ->
-    grunt.log.writeln(patterns)
-    grunt.log.writeln(grunt.file.expand({},patterns))
-    grunt.file.expand({}, patterns)
-
   config =
     pkg: grunt.file.readJSON('package.json')
     common: common
@@ -123,6 +118,7 @@ module.exports = (grunt) ->
         src: [
           '<%= common.app %>/js/corespring/**/*.js',
           '<%= common.app %>/js/**/*.js',
+          '!<%= common.app %>/js/player-launcher/**/*.js',
           '<%= common.tmp %>/wrapped/player-launcher-wrapped.js'
           ]
         options:

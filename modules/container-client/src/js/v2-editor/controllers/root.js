@@ -83,19 +83,15 @@ angular.module('corespring-editor.controllers')
         return top != window; // jshint ignore:line
       }
 
-      var editorOptions;
+      if(isInIframe()) {
+        var editorOptions;
 
-      $scope.$on('getEditorOptions', function(){
-        if(isInIframe()) {
+        $scope.$on('getEditorOptions', function(){
           if (editorOptions) {
             $scope.$broadcast('getEditorOptionsResult', editorOptions);
           }
-        } else {
-          $scope.$broadcast('getEditorOptionsResult', {});
-        }
-      });
+        });
 
-      if(isInIframe()) {
         Msgr.on('initialise', function (data) {
           $log.warn('on initialise', data);
           editorOptions = data;
