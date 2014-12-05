@@ -8,8 +8,8 @@ angular.module('corespring-editor.controllers')
     'Msgr',
     function ($scope, $state, ComponentRegister, ItemService, LogFactory, Msgr) {
 
-      var logger = LogFactory.getLogger('RootController');
-      logger.debug('Root');
+      var $log = LogFactory.getLogger('RootController');
+      $log.debug('Root');
 
       function preprocessComponents(item) {
         _.each(item.components, function (c, key) {
@@ -22,31 +22,38 @@ angular.module('corespring-editor.controllers')
         });
       }
 
-      $scope.onItemLoaded = function (item) {
-        $scope.item = item;
-        preprocessComponents(item);
+      function findLastId(item){
         var max = 0;
-        $('<div>' + $scope.item.xhtml + '</div>').find('[id]').each(function (idx, element) {
+        $('<div>' + item.xhtml + '</div>').find('[id]').each(function (idx, element) {
           var id = Number($(element).attr('id'));
           if (id > max) {
             max = id;
           }
         });
-        $scope.lastId = max;
+        return max;
+      }
+
+      $scope.onItemLoaded = function(item){
+        $scope.item = item;
+        preprocessComponents(item);
+        $scope.lastId = findLastId(item);
         $scope.$broadcast('itemLoaded', item);
       };
 
       ItemService.load($scope.onItemLoaded, function () {
-        logger.error('error loading');
+        $log.error('error loading');
       });
 
       $scope.$on('deleteSupportingMaterial', function (event, data) {
-        function deleteSupportingMaterial(index) {
+        function showFirstItem(){
           $state.transitionTo('supporting-materials', {
             index: 0
           }, {reload: true});
-
+        }
+        function deleteSupportingMaterial(index) {
           $scope.data.item.supportingMaterials.splice(index, 1);
+
+          //TODO change to ItemService.fineGrainedSave
           ItemService.save({
               supportingMaterials: $scope.data.item.supportingMaterials
             },
@@ -62,11 +69,44 @@ angular.module('corespring-editor.controllers')
         ].join('\n');
 
         if (window.confirm(confirmationMessage)) {
+          showFirstItem();
           deleteSupportingMaterial(data.index);
         }
       });
 
-      Msgr.send('rendered');
+      //----------------------------------------------------------------
+      // startup
+      //----------------------------------------------------------------
+
+      function isInIframe(){
+        /** note use != to support ie8 instead of !== */
+        return top != window; // jshint ignore:line
+      }
+
+      if(isInIframe()) {
+        var editorOptions;
+
+        $scope.$on('getEditorOptions', function(){
+          if (editorOptions) {
+            $scope.$broadcast('getEditorOptionsResult', editorOptions);
+          }
+        });
+
+        Msgr.on('initialise', function (data) {
+          $log.warn('on initialise', data);
+          editorOptions = data;
+          $scope.$broadcast('getEditorOptionsResult', editorOptions);
+          Msgr.send('rendered');
+        });
+
+        //send msg "ready" to instance
+        //this will result in msg "initialise" being sent back to us
+        $log.warn('sending ready');
+        Msgr.send('ready');
+      } else {
+        $scope.$broadcast('getEditorOptionsResult', {});
+      }
+
     }
   ]
 );

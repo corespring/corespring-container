@@ -7,9 +7,8 @@ mixin field(label, ngModel)
       else
         input.form-control(id=ngModel, ng-model=ngModel)
 
-fieldset.additional-copyright-information-for-profile
-  p
-    | {{prompt}}
+.additional-copyright-information-for-profile
+  p {{prompt}}
   .control-group(style="padding-left: 5px;")
     .controls
       label
@@ -21,39 +20,34 @@ fieldset.additional-copyright-information-for-profile
 
     br/
 
-    .item(ng-repeat="item in copyrights")
-      p
-        | Please complete the following
+  .item(ng-repeat="item in copyrights")
+    p Please complete the following
+    +field('Author','item.author')
+    +field('Copyright Owner','item.owner')
+    +field('Copyright Year','item.year')
+      select(id="item.year",ng-model="item.year",ng-options="c for c in copyrightYearDataProvider",
+            style="width: 170px;")
+    +field('License','item.licenseType')
+      table.license
+        tr
+          td
+            select(id="ac-license",ng-model="item.licenseType",
+            ng-options="c.key as c.value for c in licenseTypeDataProvider")
+          td
+            span(ng-show="!item.licenseType",style="color: #888; font-style: italic;")
+              | Not Assigned
+            img(ng-show="item.licenseType",ng-src="{{getLicenseTypeUrl(item.licenseType)}}")
+          td
+            a(href="http://creativecommons.org/licenses/",target="_blank") Learn More
+    +field('Media Type','item.mediaType')
+      select(id="item.mediaType",ng-model="item.mediaType",ng-options="c.key as c.value for c in mediaTypeDataProvider")
+    +field('Website','item.sourceUrl')
 
-      +field('Author','item.author')
-      +field('Copyright Owner','item.owner')
-      +field('Copyright Year','item.year')
-        select(id="item.year",ng-model="item.year",ng-options="c for c in copyrightYearDataProvider",
-              style="width: 170px;")
-      +field('License','item.licenseType')
-        table.license
-          tr
-            td
-              select(id="ac-license",ng-model="item.licenseType",
-              ng-options="c.key as c.value for c in licenseTypeDataProvider")
-            td
-              span(ng-show="!item.licenseType",style="color: #888; font-style: italic;")
-                | Not Assigned
-              img(ng-show="item.licenseType",ng-src="{{getLicenseTypeUrl(item.licenseType)}}")
-            td
-              a(href="http://creativecommons.org/licenses/",target="_blank")
-                | Learn More
-      +field('Media Type','item.mediaType')
-        select(id="item.mediaType",ng-model="item.mediaType",ng-options="c.key as c.value for c in mediaTypeDataProvider")
-      +field('Website','item.sourceUrl')
+    .form-group
+      .col-sm-3
+      .col-sm-9.text-right
+        a(ng-click="removeCopyrightItem(item)", style="padding-right: 10px;") Remove additional copyright
 
-      .form-group
-        .col-sm-3
-        .col-sm-9.text-right
-          a(ng-click="removeCopyrightItem(item)", style="padding-right: 10px;")
-            | Remove additional copyright
-
-    a.add-additional(ng-click="addCopyrightItem()", ng - show = "required")
-      i.fa.fa-plus-square-o(style="margin-left: 6px; margin-right: 6px;")
-      span
-        | Add more
+  a.add-additional(ng-click="addCopyrightItem()", ng-show="required")
+    i.fa.fa-plus-square-o(style="margin-left: 6px; margin-right: 6px;")
+    span Add more

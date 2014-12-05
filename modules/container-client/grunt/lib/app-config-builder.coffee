@@ -3,31 +3,27 @@ _ = require 'lodash'
 _.mixin(require('lodash-deep'))
 
 buildCompress = (name, js, processFn) ->
-  out = {}
-
-  opts = 
+  out =
     options:
       mode: 'gzip'
-    files: 
-      expand: true
-      src: processFn(js.dest)
-      ext: '.js.gz'
-    
-  out[name] = opts
+    expand: true
+    src: processFn(js.dest)
+    ext: '.js.gz'
+  out
 
 buildPathReporterJs = (name, js, processFn, ngModules) ->
   out = {}
-  out["#{name}Js"] = _.extend(_.deepMapValues(_.cloneDeep(js), processFn), {ngModules: ngModules}) 
+  out["#{name}Js"] = _.extend(_.deepMapValues(_.cloneDeep(js), processFn), {ngModules: ngModules})
 
 buildPathReporterCss = (name, css, processFn) ->
   out = {}
-  out["#{name}Css"] = _.extend(_.deepMapValues(_.cloneDeep(css), processFn)) 
+  out["#{name}Css"] = _.extend(_.deepMapValues(_.cloneDeep(css), processFn))
 
 
 ###
 Builds a configuration object for the given js, css, ngmodules
 
-outputs something like: 
+outputs something like:
 
 {
   uglify: {
@@ -44,9 +40,10 @@ outputs something like:
 exports.build = (name, grunt, js, css, ngModules, processFn) ->
   out =
     uglify: buildUglifyOptions(grunt, name, js, processFn)
-    compress: buildCompress(name, js, processFn)
+    compress: {}
     pathReporter: {}
 
+  out.compress["#{name}"] = buildCompress(name, js, processFn)
   out.pathReporter["#{name}Js"] = buildPathReporterJs('rig', js, processFn, ngModules)
   out.pathReporter["#{name}Css"] = buildPathReporterCss('rig', css, processFn) if css?
 
