@@ -22,9 +22,9 @@ angular.module('corespring-editor.services').service('EditorConfig', [
 
       function EditorConfig(){
 
-        var 
+        var
           configPanels = {},
-          interactions = null, 
+          interactions = null,
           widgets = null,
           logger = LogFactory.getLogger('editor-config');
 
@@ -121,7 +121,8 @@ angular.module('corespring-editor.services').service('EditorConfig', [
             definitions: [{
               name: 'external',
               type: 'dropdown',
-              dropdownTitle: 'Answer Type',
+              class: 'external',
+              dropdownTitle: 'Insert Interaction',
               buttons: _(interactions)
                 .reject(isToolbar)
                 .sortBy(orderList)
