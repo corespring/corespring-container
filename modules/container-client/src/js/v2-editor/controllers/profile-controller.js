@@ -170,7 +170,7 @@
     function getFormConfigFromUrl(){
       var search = $location.search();
       var hash = $location.hash();
-      var configJson = search.config || hash.config;
+      var configJson = search.profileConfig || hash.profileConfig;
       if(configJson) {
         try {
           var config = JSON.parse(configJson);
@@ -661,8 +661,8 @@
     // profile initialisation
     //----------------------------------------------------------------
 
-    function onLoadItemSuccess() {
-      var profile = $scope.item.profile;
+    function setItem(item) {
+      var profile = item.profile;
 
       if (!(profile.taskInfo)) {
         profile.taskInfo = {};
@@ -682,22 +682,25 @@
       if (!_.isArray(profile.otherAlignments.keySkills)) {
         profile.otherAlignments.keySkills = [];
       }
+
       if (!(profile.contributorDetails)) {
         profile.contributorDetails = {};
       }
 
-      if (!(profile.contributorDetails.licenseType)) {
-        profile.contributorDetails.licenseType = "CC BY";
+      var contributorDetails = profile.contributorDetails;
+
+      if (!(contributorDetails.licenseType)) {
+        contributorDetails.licenseType = "CC BY";
       }
 
-      if (!(profile.contributorDetails.copyrightYear)) {
-        profile.contributorDetails.copyrightYear = (new Date().getFullYear()).toString();
+      if (!(contributorDetails.copyrightYear)) {
+        contributorDetails.copyrightYear = (new Date().getFullYear()).toString();
       }
 
-      if (!_.isArray(profile.contributorDetails.additionalCopyrights)) {
-        profile.contributorDetails.additionalCopyrights = [];
+      if (!_.isArray(contributorDetails.additionalCopyrights)) {
+        contributorDetails.additionalCopyrights = [];
       } else {
-        removeEmptyAdditionalCopyrightItems();
+        removeEmptyAdditionalCopyrightItems(contributorDetails.additionalCopyrights);
       }
 
       overrideProfileValuesWithConfig(profile, $scope.formModels);
@@ -706,6 +709,7 @@
       $scope.otherAlignments = profile.otherAlignments;
       $scope.contributorDetails = profile.contributorDetails;
       $scope.profile = profile;
+      $scope.item = item;
 
       $log.log("task info:", $scope.taskInfo);
       $log.log("other alignments:", $scope.otherAlignments);
@@ -718,7 +722,7 @@
       updateCredentialsOtherSelected();
     }
 
-    function removeEmptyAdditionalCopyrightItems() {
+    function removeEmptyAdditionalCopyrightItems(copyrights) {
 
       function itemIsEmpty(item) {
         return !item || _.every(item, function(val) {
@@ -726,7 +730,7 @@
           });
       }
 
-      _.remove($scope.item.profile.contributorDetails.additionalCopyrights, itemIsEmpty);
+      _.remove(copyrights, itemIsEmpty);
     }
 
     //----------------------------------------------------------------
@@ -736,11 +740,10 @@
     $scope.loadProfile = function(){
       $log.log("loading profile");
       ItemService.load(function(item){
-        $log.log('item loading success hasItem:' + (!!item) + " hasProfile:" + (!!item && !!item.profile));
+        $log.warn('item loading success hasItem:' + (!!item) + " hasProfile:" + (!!item && !!item.profile), item);
         if (item && item.profile) {
 
-          $scope.item = item;
-          onLoadItemSuccess();
+          setItem(item);
 
           var watchNestedProperties;
           $scope.$watch('item.profile', throttle(function(oldValue, newValue){
@@ -759,6 +762,14 @@
       });
     };
 
+    $scope.$on('getEditorOptionsResult', function(evt, data){
+      $log.warn('getEditorOptionsResult', data);
+      if(data) {
+        updateFormModels($scope.formModels, data.profileConfig);
+      }
+    });
+
+    $scope.$emit("getEditorOptions");
     $scope.loadProfile();
   }
 

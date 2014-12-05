@@ -8,3 +8,4 @@ exports.PLAYER_NOT_READY = {code: 107, message: "Player not ready yet"};
 exports.NO_ITEM_OR_SESSION_ID = {code: 108, message: "itemId or sessionId is missing from options"};
 exports.MESSAGE_ERROR = function(msg){ return {code: 109, message: msg}; };
 exports.PLAYER_NOT_REMOVED = {code: 110, message: "Unexpected re-initialisation of the player. Call player.remove() before creating a new player instance."};
+exports.EDITOR_NOT_REMOVED = {code: 111, message: "Unexpected re-initialisation of the editor. Call editor.remove() before creating a new editor instance."};

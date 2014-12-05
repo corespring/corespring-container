@@ -84,7 +84,7 @@ function EditorDefinition(element, options, errorCallback) {
 
     var tab = options.selectedTab;
     if ('profile' === tab) {
-       options.hash = '/profile';
+      options.hash = '/profile';
     }
 
     options.url = (options.corespringUrl + loadCall.url).replace(":itemId", itemId);
@@ -95,6 +95,16 @@ function EditorDefinition(element, options, errorCallback) {
     instance.on("launch-error", function (data) {
       var error = errors.EXTERNAL_ERROR(data.code + ": " + data.detailedMessage);
       errorCallback(error);
+    });
+
+    instance.on('ready', function () {
+      if (isReady) {
+        instance.removeChannel();
+        errorCallback(errors.EDITOR_NOT_REMOVED);
+      } else {
+        isReady = true;
+        instance.send('initialise', options);
+      }
     });
   }
 
@@ -111,6 +121,7 @@ function EditorDefinition(element, options, errorCallback) {
         logger.log(err);
       });
   }
+
 }
 
 module.exports = EditorDefinition;
