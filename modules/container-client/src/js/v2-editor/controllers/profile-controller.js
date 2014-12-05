@@ -153,13 +153,12 @@
      * @param formModels
      * @param config
      */
-    function updateFormModels(formModels, config){
+    function updateFormModels(config){
       if(!config){
         return;
       }
-      for(var key in formModels){
-        $log.log("updateFormModels", [key, formModels[key], config[key]]);
-        updateFormModel(formModels[key], config[key]);
+      for(var key in $scope.formModels){
+        updateFormModel($scope.formModels[key], config[key]);
       }
     }
 
@@ -182,8 +181,7 @@
       return null;
     }
 
-    updateFormModels($scope.formModels, getFormConfigFromUrl());
-
+    updateFormModels(getFormConfigFromUrl());
 
     /**
      * Once the profile is loaded, we can use the formModels
@@ -225,7 +223,27 @@
       assign(profile.contributorDetails, "sourceUrl");
 
       assign(profile.contributorDetails, "additionalCopyrights");
+    }
 
+    /**
+     * The dataProviders are filtered by the configuration
+     * Therefore we postpone the dataProvider initialisation until the config is loaded
+     * TODO Check if this can be implemented using a angular filter
+     */
+    var dataProviderInitialiser = [];
+
+    function addDataProviderInitialiser(initialiser){
+      dataProviderInitialiser.push(initialiser);
+    }
+
+    function initDataProviders(){
+      _.forEach(dataProviderInitialiser, function(initialiser){
+        try {
+          initialiser();
+        } catch(err){
+          $log.error("Error running initialiser", err);
+        }
+      });
     }
 
 
@@ -282,7 +300,6 @@
 
       initSelection: function(element, callback) {
         var val = this.getVal(element);
-        $log.warn("standards initSelection val", val);
         var ids = val.split(',');
         var results = [];
         ids.forEach(function(id) {
@@ -425,33 +442,43 @@
     // some dataProviders for selects
     //----------------------------------------------------------------
 
-    DataQueryService.list("mediaType", function(result) {
-      $scope.mediaTypeDataProvider = result; //not configurable, so no applyConfig here
+    addDataProviderInitialiser(function() {
+      DataQueryService.list("mediaType", function (result) {
+        $scope.mediaTypeDataProvider = result; //not configurable, so no applyConfig here
+      });
     });
 
-    DataQueryService.list("bloomsTaxonomy", function(result) {
-      $scope.bloomsTaxonomyDataProvider = applyConfig(result,$scope.formModels.bloomsTaxonomy);
+    addDataProviderInitialiser(function() {
+      DataQueryService.list("bloomsTaxonomy", function (result) {
+        $scope.bloomsTaxonomyDataProvider = applyConfig(result, $scope.formModels.bloomsTaxonomy);
+      });
     });
 
-    DataQueryService.list("depthOfKnowledge", function(result) {
-      $scope.depthOfKnowledgeDataProvider = applyConfig(result, $scope.formModels.depthOfKnowledge);
+    addDataProviderInitialiser(function() {
+      DataQueryService.list("depthOfKnowledge", function (result) {
+        $scope.depthOfKnowledgeDataProvider = applyConfig(result, $scope.formModels.depthOfKnowledge);
+      });
     });
 
-    DataQueryService.list("gradeLevels", function(result) {
-      function showKeyInsteadOfValue(result) {
-        return _.map(result, function (item) {
-          item.value = item.key;
-          return item;
-        });
-      }
-      result = showKeyInsteadOfValue(result);
-      $scope.gradeLevelDataProvider = applyConfig(result, $scope.formModels.gradeLevel);
-      $scope.priorGradeLevelDataProvider = applyConfig(result, $scope.formModels.priorGradeLevel);
+    addDataProviderInitialiser(function() {
+      DataQueryService.list("gradeLevels", function (result) {
+        function showKeyInsteadOfValue(result) {
+          return _.map(result, function (item) {
+            item.value = item.key;
+            return item;
+          });
+        }
+
+        result = showKeyInsteadOfValue(result);
+        $scope.gradeLevelDataProvider = applyConfig(result, $scope.formModels.gradeLevel);
+        $scope.priorGradeLevelDataProvider = applyConfig(result, $scope.formModels.priorGradeLevel);
+      });
     });
 
 
 
     function applyConfig(data, config){
+      $log.warn("applyConfig", data, config);
       if(!_.isArray(config.options)) {
         return data;
       }
@@ -484,21 +511,27 @@
       });
     }
 
-    $scope.copyrightExpirationDateDataProvider = applyConfig(
-      years(new Date().getFullYear(), new Date().getFullYear() + 20).concat(['Never']),
-      $scope.formModels.copyrightExpirationDate);
+    addDataProviderInitialiser(function() {
+      $scope.copyrightExpirationDateDataProvider = applyConfig(
+        years(new Date().getFullYear(), new Date().getFullYear() + 20).concat(['Never']),
+        $scope.formModels.copyrightExpirationDate);
+    });
 
-    $scope.copyrightYearDataProvider = applyConfig(
-      years(new Date().getFullYear(), new Date().getFullYear() - 120),
-      $scope.formModels.copyrightYear);
+    addDataProviderInitialiser(function() {
+      $scope.copyrightYearDataProvider = applyConfig(
+        years(new Date().getFullYear(), new Date().getFullYear() - 120),
+        $scope.formModels.copyrightYear);
+    });
 
     //----------------------------------------------------------------
     // credentials
     //----------------------------------------------------------------
 
-    DataQueryService.list("credentials", function(result) {
-      $scope.credentialsDataProvider = applyConfig(result, $scope.formModels.credentials);
-      updateCredentialsOtherSelected();
+    addDataProviderInitialiser(function() {
+      DataQueryService.list("credentials", function (result) {
+        $scope.credentialsDataProvider = applyConfig(result, $scope.formModels.credentials);
+        updateCredentialsOtherSelected();
+      });
     });
 
     $scope.$watch('contributorDetails.credentials', function() {
@@ -547,9 +580,11 @@
     // prior use
     //----------------------------------------------------------------
 
-    DataQueryService.list("priorUses", function(result) {
-      $scope.priorUseDataProvider = applyConfig(result,$scope.formModels.priorUse);
-      updatePriorUseOtherSelected();
+    addDataProviderInitialiser(function() {
+      DataQueryService.list("priorUses", function (result) {
+        $scope.priorUseDataProvider = applyConfig(result, $scope.formModels.priorUse);
+        updatePriorUseOtherSelected();
+      });
     });
 
     $scope.$watch('profile.priorUse', function() {
@@ -568,10 +603,12 @@
     // reviews passed
     //----------------------------------------------------------------
 
-    DataQueryService.list("reviewsPassed", function(result) {
-      $scope.reviewsPassedDataProvider = applyConfig(result,$scope.formModels.reviewsPassed);
-      initReviewsPassedDataProvider();
-      updateReviewsPassedOtherSelected();
+    addDataProviderInitialiser(function() {
+      DataQueryService.list("reviewsPassed", function (result) {
+        $scope.reviewsPassedDataProvider = applyConfig(result, $scope.formModels.reviewsPassed);
+        initReviewsPassedDataProvider();
+        updateReviewsPassedOtherSelected();
+      });
     });
 
     function initReviewsPassedDataProvider() {
@@ -745,6 +782,10 @@
 
           setItem(item);
 
+          //for some reason $apply is
+          //necessary to update the view
+          $scope.$apply();
+
           var watchNestedProperties;
           $scope.$watch('item.profile', throttle(function(oldValue, newValue){
             $scope.saveProfile();
@@ -764,12 +805,13 @@
 
     $scope.$on('getEditorOptionsResult', function(evt, data){
       if(data) {
-        updateFormModels($scope.formModels, data.profileConfig);
+        updateFormModels(data.profileConfig);
       }
+      initDataProviders();
+      $scope.loadProfile();
     });
 
     $scope.$emit("getEditorOptions");
-    $scope.loadProfile();
   }
 
 })();

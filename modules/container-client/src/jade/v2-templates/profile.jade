@@ -89,7 +89,7 @@ script(type='text/ng-template', id='/templates/profile')
           +field('Sub-Category','standardAdapter.subCategoryOption')
             select(id='subCategoryOption',ng-model='standardAdapter.subCategoryOption', ng-options='z for z in standardAdapter.categoryOption.items')
           +field('Standards','profile.standards')
-            input(id='profile.standards', type='hidden', ui-select2='standardsAdapter', ng-model='profile.standards', style='width: 500px;')
+            input(id='profile.standards', type='hidden', ui-select2='standardsAdapter', ng-model='profile.standards', style='width: 100%;')
 
           .lexile(ng-show='isLiteracyStandardSelected')
             +field2('Lexile Score', 'profile.lexile', 'formModels.lexile')

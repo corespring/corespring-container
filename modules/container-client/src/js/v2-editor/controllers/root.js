@@ -103,7 +103,10 @@ angular.module('corespring-editor.controllers')
         //this will result in msg "initialise" being sent back to us
         $log.warn('sending ready');
         Msgr.send('ready');
+      } else {
+        $scope.$broadcast('getEditorOptionsResult', {});
       }
+
     }
   ]
 );
