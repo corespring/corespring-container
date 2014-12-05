@@ -15,7 +15,7 @@ mixin help
   a.help.navbar-right(ng-click="help()")
     i.fa.fa-question-circle
 
-mixin helper-icons
+mixin helper_icons
   ul.list-inline.list-unstyled.helper-icons
     li 
       +info_btn('questionInformation') Question Information
@@ -50,7 +50,7 @@ nav.row.navbar-default(ng-controller="NavController")
         span#save-error(ng-switch-default)
           |  &nbsp;
 
-  +helper-icons
+  +helper_icons
 
   ul.nav.nav-tabs(role='tablist')
     +tab('Question', 'question')
