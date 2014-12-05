@@ -24,8 +24,8 @@ angular.module('corespring-editor.controllers').controller('NavController', [
 
       size = size || 'sm';
       backdrop = backdrop !== undefined ? backdrop : 'static';
-
       var titleCaseName = titleCase(name);
+
       return function(){
 
         var modalInstance = $modal.open({
@@ -52,9 +52,14 @@ angular.module('corespring-editor.controllers').controller('NavController', [
       $scope.title = newValue;
     });
 
-    $scope.$on('itemLoaded', function onItemLoaded(ev, item){
-      $scope.item = item;
-    });
+    ItemService.load(
+      function onItemLoadSuccess(item){
+        $scope.item = item;
+      },
+      function onItemLoadError(err){
+        logger.error('error loading item', err);
+      });
+
 
     $scope.open = launchModal('open');
     $scope.editTitle = launchModal('edit-title', 'sm', 'static', {
@@ -80,7 +85,6 @@ angular.module('corespring-editor.controllers').controller('NavController', [
     $scope.handleSaveMessage = function(msg){
       $scope.saveStatus = msg;
     };
-
     ItemService.addSaveListener('nav', $scope);
   }
 ]);

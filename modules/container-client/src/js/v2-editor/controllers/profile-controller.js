@@ -753,8 +753,9 @@
     };
 
     $scope.saveProfile = function() {
+      $log.log("saving profile");
       ItemService.fineGrainedSave({'profile': $scope.item.profile}, function(result){
-        $log.log("fineGrainedSave callback", result);
+        $log.log("profile saved result:", result);
       });
     };
 
