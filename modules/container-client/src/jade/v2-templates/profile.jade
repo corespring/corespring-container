@@ -50,7 +50,7 @@ script(type='text/ng-template', id='/templates/profile')
         button.pull-right.btn.btn-default(
           ng-click="togglePreview()",
           ng-class="{'btn-warning': !previewOn}")
-          | {{previewOn ? 'Close' : 'Open'}} Preview
+          | {{previewOn ? 'Close Preview' : 'Preview Profile Information'}} 
           i.fa(ng-class="{'fa-toggle-left': previewOn, 'fa-toggle-right' : !previewOn}")
 
       hr/
