@@ -5,7 +5,7 @@
     "ace-builds": "~1.1.1",
     "angular": "~1.2.12",
     "angular-animate": "~1.2.12",
-    "angular-bootstrap": "~0.12.0",
+    "angular-bootstrap": "~0.10.0",
     "angular-dragdrop": "https://github.com/corespring/angular-dragdrop.git",
     "angular-resource": "~1.2.12",
     "angular-route": "~1.2.12",
