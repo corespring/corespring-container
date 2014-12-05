@@ -85,11 +85,19 @@
         visible:true,
         readonly:false
       },
+      priorUseOther: {
+        visible:true,
+        readonly:false
+      },
       priorGradeLevel: {
         visible:true,
         readonly:false
       },
       reviewsPassed: {
+        visible:true,
+        readonly:false
+      },
+      reviewsPassedOther: {
         visible:true,
         readonly:false
       },
@@ -99,6 +107,10 @@
         readonly:false
       },
       credentials: {
+        visible:true,
+        readonly:false
+      },
+      credentialsOther: {
         visible:true,
         readonly:false
       },
@@ -212,11 +224,14 @@
       assign(profile.otherAlignments, "keySkills");
 
       assign(profile, "priorUse");
+      assign(profile, "priorUseOther");
       assign(profile, "priorGradeLevel");
       assign(profile, "reviewsPassed");
+      assign(profile, "reviewsPassedOther");
 
       assign(profile.contributorDetails, "author");
       assign(profile.contributorDetails, "credentials");
+      assign(profile.contributorDetails, "credentialsOther");
       assign(profile.contributorDetails, "copyrightOwner");
       assign(profile.contributorDetails, "copyrightYear");
       assign(profile.contributorDetails, "copyrightExpirationDate");
@@ -555,13 +570,17 @@
     //----------------------------------------------------------------
     // key skills
     //----------------------------------------------------------------
+    addDataProviderInitialiser(function() {
+      DataQueryService.list("keySkills", function (result) {
 
-    DataQueryService.list("keySkills", function(result) {
-      $scope.keySkillsDataProvider = _.map(result, function(k) {
-        return {
-          header: k.key,
-          list: k.value
-        };
+        $scope.keySkillsDataProvider = _.map(result, function (k) {
+          return {
+            header: k.key,
+            list: applyConfig(k.value, $scope.formModels.keySkills)
+          };
+        }).filter(function(item){
+          return item && item.list.length > 0;
+        });
       });
     });
 

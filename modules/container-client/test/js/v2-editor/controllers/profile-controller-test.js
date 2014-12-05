@@ -713,10 +713,13 @@ describe('profile controller', function () {
           bloomsTaxonomy: {value: "some blooms"},
           keySkills: {value: ["one","two"]},
           priorUse: {value: "some prior use"},
+          priorUseOther: {value: "some other prior use"},
           priorGradeLevel: {value: ["02","04"]},
           reviewsPassed: {value: ["r1","r2"]},
+          reviewsPassedOther: {value: "Other reviews passed"},
           author: {value: "some author"},
           credentials: {value: "some credentials"},
+          credentialsOther: {value: "some other credentials"},
           copyrightOwner: {value: "some copyright owner"},
           copyrightYear: {value: 1978},
           copyrightExpirationDate: {value: 2020},
@@ -760,17 +763,26 @@ describe('profile controller', function () {
       it("priorUse", function(){
         expect(scope.profile.priorUse).toEqual("some prior use");
       });
+      it("priorUseOther", function(){
+        expect(scope.profile.priorUseOther).toEqual("some other prior use");
+      });
       it("priorGradeLevel", function(){
         expect(scope.profile.priorGradeLevel).toEqual(["02", "04"]);
       });
       it("reviewsPassed", function(){
         expect(scope.profile.reviewsPassed).toEqual(["r1", "r2"]);
       });
+      it("reviewsPassedOther", function(){
+        expect(scope.profile.reviewsPassedOther).toEqual("Other reviews passed");
+      });
       it("author", function(){
         expect(scope.contributorDetails.author).toEqual("some author");
       });
       it("credentials", function(){
         expect(scope.contributorDetails.credentials).toEqual("some credentials");
+      });
+      it("credentialsOther", function(){
+        expect(scope.contributorDetails.credentialsOther).toEqual("some other credentials");
       });
       it("copyrightOwner", function(){
         expect(scope.contributorDetails.copyrightOwner).toEqual("some copyright owner");
