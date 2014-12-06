@@ -325,12 +325,6 @@ describe('profile controller', function () {
       makeProfileController();
     });
 
-    describe("media type", function () {
-      it("loads data", function () {
-        expect(scope.mediaTypeDataProvider).toEqual(expectedDataProvider);
-      });
-    });
-
     describe("bloom's taxononmy", function () {
       it("loads data", function () {
         expect(scope.bloomsTaxonomyDataProvider).toEqual(expectedDataProvider);
@@ -801,131 +795,92 @@ describe('profile controller', function () {
       });
     });
     describe("options", function(){
+      beforeEach(makeProfileController);
+
       describe("bloomsTaxonomy", function(){
         it("should not change dataProvider, when options are not defined", function(){
-          mockDataQueryService.listResult = keyValueList(["one", "two", "three"]);
-          mockLocation.hashResult = {profileConfig: JSON.stringify({
-            bloomsTaxonomy: {}
-          })};
-          makeProfileController();
-          expect(scope.bloomsTaxonomyDataProvider).toEqual(keyValueList(["one","two", "three"]));
+          delete scope.formModels.bloomsTaxonomy.options;
+          var actual = _.filter(keyValueList(["one", "two", "three"]), scope.bloomsTaxonomyFilter);
+          expect(actual).toEqual(keyValueList(["one","two", "three"]));
         });
         it("should remove items which are not in both, dataProvider and options", function(){
-          mockDataQueryService.listResult = keyValueList(["one", "two", "not in options"]);
-          mockLocation.hashResult = {profileConfig: JSON.stringify({
-            bloomsTaxonomy: {options: ["one","two","not in dataProvider"]}
-          })};
-          makeProfileController();
-          expect(scope.bloomsTaxonomyDataProvider).toEqual(keyValueList(["one","two"]));
+          scope.formModels.bloomsTaxonomy.options = ["one","two","not in dataProvider"];
+          var actual = _.filter(keyValueList(["one", "two", "three"]), scope.bloomsTaxonomyFilter);
+          expect(actual).toEqual(keyValueList(["one","two"]));
         });
       });
       describe("copyrightYear", function(){
         it("should remove items which are not in both, dataProvider and options", function(){
-          mockLocation.hashResult = {profileConfig: JSON.stringify({
-            copyrightYear: {options: ['1981', '1982', "not in dataProvider"]}
-          })};
-          makeProfileController();
-          expect(scope.copyrightYearDataProvider).toEqual(['1982', '1981']);
+          scope.formModels.copyrightYear.options = ['1981', '1982', "not in dataProvider"];
+          var actual = _.filter(scope.copyrightYearDataProvider, scope.copyrightYearFilter);
+          expect(actual).toEqual(['1982', '1981']);
         });
       });
       describe("copyrightExpirationDate", function(){
         it("should remove items which are not in both, dataProvider and options", function(){
-          mockLocation.hashResult = {profileConfig: JSON.stringify({
-            copyrightExpirationDate: {options: ['2020', '2021', "not in dataProvider"]}
-          })};
-          makeProfileController();
-          expect(scope.copyrightExpirationDateDataProvider).toEqual(['2020', '2021']);
+          scope.formModels.copyrightExpirationDate.options = ['2020', '2021', "not in dataProvider"];
+          var actual = _.filter(scope.copyrightExpirationDateDataProvider, scope.copyrightExpirationDateFilter);
+          expect(actual).toEqual(['2020', '2021']);
         });
       });
       describe("credentials", function(){
         it("should not change dataProvider, when options are not defined", function(){
-          mockDataQueryService.listResult = keyValueList(["one", "two", "three"]);
-          mockLocation.hashResult = {profileConfig: JSON.stringify({
-            credentials: {}
-          })};
-          makeProfileController();
-          expect(scope.credentialsDataProvider).toEqual(keyValueList(["one","two", "three"]));
+          delete scope.formModels.credentials.options;
+          var actual = _.filter(keyValueList(["one", "two", "three"]), scope.credentialsFilter);
+          expect(actual).toEqual(keyValueList(["one","two", "three"]));
         });
         it("should remove items which are not in both, dataProvider and options", function(){
-          mockDataQueryService.listResult = keyValueList(["one", "two", "not in options"]);
-          mockLocation.hashResult = {profileConfig: JSON.stringify({
-            credentials: {options: ["one","two","not in dataProvider"]}
-          })};
-          makeProfileController();
-          expect(scope.credentialsDataProvider).toEqual(keyValueList(["one","two"]));
+          scope.formModels.credentials.options = ["one","two","not in dataProvider"];
+          var actual = _.filter(keyValueList(["one", "two", "three"]), scope.credentialsFilter);
+          expect(actual).toEqual(keyValueList(["one","two"]));
         });
       });
       describe("depthOfKnowledge", function(){
         it("should not change dataProvider, when options are not defined", function(){
-          mockDataQueryService.listResult = keyValueList(["one", "two", "three"]);
-          mockLocation.hashResult = {profileConfig: JSON.stringify({
-            depthOfKnowledge: {}
-          })};
-          makeProfileController();
-          expect(scope.depthOfKnowledgeDataProvider).toEqual(keyValueList(["one","two", "three"]));
+          delete scope.formModels.depthOfKnowledge.options;
+          var actual = _.filter(keyValueList(["one", "two", "three"]), scope.depthOfKnowledgeFilter);
+          expect(actual).toEqual(keyValueList(["one","two", "three"]));
         });
         it("should remove items which are not in both, dataProvider and options", function(){
-          mockDataQueryService.listResult = keyValueList(["one", "two", "not in options"]);
-          mockLocation.hashResult = {profileConfig: JSON.stringify({
-            depthOfKnowledge: {options: ["one","two","not in dataProvider"]}
-          })};
-          makeProfileController();
-          expect(scope.depthOfKnowledgeDataProvider).toEqual(keyValueList(["one","two"]));
+          scope.formModels.depthOfKnowledge.options = ["one","two","not in dataProvider"];
+          var actual = _.filter(keyValueList(["one", "two", "three"]), scope.depthOfKnowledgeFilter);
+          expect(actual).toEqual(keyValueList(["one","two"]));
         });
       });
       describe("gradeLevel", function(){
         it("should not change dataProvider, when options are not defined", function(){
-          mockDataQueryService.listResult = keyValueList(["01", "03", "05"]);
-          mockLocation.hashResult = {profileConfig: JSON.stringify({
-            gradeLevel: {}
-          })};
-          makeProfileController();
-          expect(scope.gradeLevelDataProvider).toEqual(keyValueList(["01","03", "05"]));
+          delete scope.formModels.gradeLevel.options;
+          var actual = _.filter(keyValueList(["01", "03", "05"]), scope.gradeLevelFilter);
+          expect(actual).toEqual(keyValueList(["01", "03", "05"]));
         });
         it("should remove items which are not in both, dataProvider and options", function(){
-          mockDataQueryService.listResult = keyValueList(["01", "03", "not in options"]);
-          mockLocation.hashResult = {profileConfig: JSON.stringify({
-            gradeLevel: {options: ["01","03","not in dataProvider"]}
-          })};
-          makeProfileController();
-          expect(scope.gradeLevelDataProvider).toEqual(keyValueList(["01","03"]));
+          scope.formModels.gradeLevel.options = ["01", "03","not in dataProvider"];
+          var actual = _.filter(keyValueList(["01", "03", "not in options"]), scope.gradeLevelFilter);
+          expect(actual).toEqual(keyValueList(["01","03"]));
         });
       });
       describe("priorGradeLevel", function(){
         it("should not change dataProvider, when options are not defined", function(){
-          mockDataQueryService.listResult = keyValueList(["01", "03", "05"]);
-          mockLocation.hashResult = {profileConfig: JSON.stringify({
-            priorGradeLevel: {}
-          })};
-          makeProfileController();
-          expect(scope.priorGradeLevelDataProvider).toEqual(keyValueList(["01","03", "05"]));
+          delete scope.formModels.priorGradeLevel.options;
+          var actual = _.filter(keyValueList(["01", "03", "05"]), scope.priorGradeLevelFilter);
+          expect(actual).toEqual(keyValueList(["01", "03", "05"]));
         });
         it("should remove items which are not in both, dataProvider and options", function(){
-          mockDataQueryService.listResult = keyValueList(["01", "03", "not in options"]);
-          mockLocation.hashResult = {profileConfig: JSON.stringify({
-            priorGradeLevel: {options: ["01","03","not in dataProvider"]}
-          })};
-          makeProfileController();
-          expect(scope.priorGradeLevelDataProvider).toEqual(keyValueList(["01","03"]));
+          scope.formModels.priorGradeLevel.options = ["01", "03","not in dataProvider"];
+          var actual = _.filter(keyValueList(["01", "03", "not in options"]), scope.priorGradeLevelFilter);
+          expect(actual).toEqual(keyValueList(["01","03"]));
         });
       });
       describe("priorUse", function(){
         it("should not change dataProvider, when options are not defined", function(){
-          var expectedDataProvider = keyValueList(["one", "two", "three"]);
-          mockDataQueryService.listResult = expectedDataProvider;
-          mockLocation.hashResult = {profileConfig: JSON.stringify({
-            priorUse: {}
-          })};
-          makeProfileController();
-          expect(scope.priorUseDataProvider).toEqual(expectedDataProvider);
+          delete scope.formModels.priorUse.options;
+          var actual = _.filter(keyValueList(["one", "two", "three"]), scope.priorUseFilter);
+          expect(actual).toEqual(keyValueList(["one","two", "three"]));
         });
         it("should remove items which are not in both, dataProvider and options", function(){
-          mockDataQueryService.listResult = keyValueList(["one", "two", "not in options"]);
-          mockLocation.hashResult = {profileConfig: JSON.stringify({
-            priorUse: {options: ["one","two","not in dataProvider"]}
-          })};
-          makeProfileController();
-          expect(scope.priorUseDataProvider).toEqual(keyValueList(["one","two"]));
+          scope.formModels.priorUse.options = ["one","two","not in dataProvider"];
+          var actual = _.filter(keyValueList(["one", "two", "three"]), scope.priorUseFilter);
+          expect(actual).toEqual(keyValueList(["one","two"]));
         });
       });
     });

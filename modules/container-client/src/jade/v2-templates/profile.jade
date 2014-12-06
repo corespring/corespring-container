@@ -32,7 +32,7 @@ mixin select2(select2Model, msg, formModel)
   data-placeholder=msg,
   ng-readonly='#{formModel}.readonly')
 
-mixin select2Multiple(dataProvider, msg, formModel)
+mixin select2GradeLevel(dataProvider, msg, formModel)
   select(id=ngModel,
   ng-model=ngModel,
   ui-select2,
@@ -40,7 +40,7 @@ mixin select2Multiple(dataProvider, msg, formModel)
   data-placeholder=msg,
   ng-readonly='#{formModel}.readonly',
   style='width:100%;')
-    option(ng-repeat="c in #{dataProvider}",value="{{c.key}}") {{c.value}}
+    option(ng-repeat="c in #{dataProvider}",value="{{c.key}}") {{c.key}}
 
 
 script(type='text/ng-template', id='/templates/profile')
@@ -72,7 +72,7 @@ script(type='text/ng-template', id='/templates/profile')
             +select2('relatedSubjectSelect2Adapter', 'Choose a subject...', 'formModels.relatedSubject')
 
           +field2('Grade Level', 'taskInfo.gradeLevel', 'formModels.gradeLevel')
-            +select2Multiple('gradeLevelDataProvider','Choose a grade level...','formModels.gradeLevel')
+            +select2GradeLevel('gradeLevelDataProvider | gradeLevelFilter','Choose a grade level...','formModels.gradeLevel')
 
           +field2('Item Types', '$qt', 'formModels.componentTypes')
             ul
@@ -99,10 +99,13 @@ script(type='text/ng-template', id='/templates/profile')
 
         +h_form
           h6 Other Alignments
+
           +field2('Depth Of Knowledge','otherAlignments.depthOfKnowledge', 'formModels.depthOfKnowledge')
-            select(id='otherAlignments.depthOfKnowledge', ng-model='otherAlignments.depthOfKnowledge', ng-options='c.key as c.value for c in depthOfKnowledgeDataProvider', ng-disabled='formModels.depthOfKnowledge.readonly')
+            select(id='otherAlignments.depthOfKnowledge', ng-model='otherAlignments.depthOfKnowledge', ng-options='c.key as c.value for c in depthOfKnowledgeDataProvider | filter:depthOfKnowledgeFilter', ng-disabled='formModels.depthOfKnowledge.readonly')
+
           +field2('Bloom\'s Taxonomy', 'otherAlignments.bloomsTaxonomy', 'formModels.bloomsTaxonomy')
-            select(id='otherAlignments.bloomsTaxonomy', ng-model='otherAlignments.bloomsTaxonomy', ng-options='c.key as c.value for c in bloomsTaxonomyDataProvider', ng-disabled='formModels.bloomsTaxonomy.readonly')
+            select(id='otherAlignments.bloomsTaxonomy', ng-model='otherAlignments.bloomsTaxonomy', ng-options='c.key as c.value for c in bloomsTaxonomyDataProvider | filter:bloomsTaxonomyFilter', ng-disabled='formModels.bloomsTaxonomy.readonly')
+
           .form-group
             label.col-sm-3.control-label(ng-click='expandKeySkills=!expandKeySkills')
               i(class='fa fa-{{!!expandKeySkills ? "minus" : "plus"}}-square-o', style='margin-right: 6px')
@@ -122,14 +125,14 @@ script(type='text/ng-template', id='/templates/profile')
           h6 History
 
           +field2('This item was previously used in', 'profile.priorUse', 'formModels.priorUse')
-            select(id='profile.priorUse', ng-model='profile.priorUse', ng-options='c.key as c.value for c in priorUseDataProvider', ng-disabled='formModels.depthOfKnowledge.readonly')
+            select(id='profile.priorUse', ng-model='profile.priorUse', ng-options='c.key as c.value for c in priorUseDataProvider | filter:priorUseFilter', ng-disabled='formModels.depthOfKnowledge.readonly')
             input(ng-show='isPriorUseOtherSelected', type='text', placeholder='Enter prior use...', ng-model='profile.priorUseOther', ng-readonly='formModels.depthOfKnowledge.readonly')
 
           +field2('Prior Use Grade Level', 'profile.priorGradeLevel', 'formModels.priorGradeLevel')
-            +select2Multiple('priorGradeLevelDataProvider','Choose a grade level...','formModels.priorGradeLevel')
+            +select2GradeLevel('priorGradeLevelDataProvider | filter:priorGradeLevelFilter','Choose a grade level...','formModels.priorGradeLevel')
 
           +field('Reviews Passed', 'profile.reviewsPassed')
-            label(ng-repeat='rp in reviewsPassedDataProvider', style='width:50%;')
+            label(ng-repeat='rp in reviewsPassedDataProvider | filter:reviewsPassedFilter', style='width:50%;')
               input(type='checkbox',ng-model='rp.selected',ng-change='onChangeReviewsPassed(rp.key)',style='margin-right: 3px;')
               | {{rp.key}}
               input(ng-if='"Other" === rp.key', ng-show='rp.selected', style='margin-left:10px;', type='text', placeholder='Enter review...', ng-model='profile.reviewsPassedOther')
@@ -142,16 +145,16 @@ script(type='text/ng-template', id='/templates/profile')
           +field('Author', 'contributorDetails.author', 'formModels.author')
 
           +field('Credentials','contributorDetails.credentials', 'formModels.credentials')
-            select(id='contributorDetails.credentials',ng-model='contributorDetails.credentials', ng-options='c.key as c.value for c in credentialsDataProvider', ng-disabled='formModels.credentials.readonly')
+            select(id='contributorDetails.credentials',ng-model='contributorDetails.credentials', ng-options='c.key as c.value for c in credentialsDataProvider | filter:credentialsFilter', ng-disabled='formModels.credentials.readonly')
             input(id='contributorDetails.credentialsOther',ng-show='isCredentialsOtherSelected', type='text', placeholder='Enter credentials...', ng-model='contributorDetails.credentialsOther', ng-readonly='formModels.credentials.readonly')
 
           +field('* Copyright Owner','contributorDetails.copyrightOwner', 'formModels.copyrightOwner')
 
           +field('* Copyright Year','contributorDetails.copyrightYear', 'formModels.copyrightYear')
-            select(id='contributorDetails.copyrightYear',ng-model='contributorDetails.copyrightYear', ng-options='c for c in copyrightYearDataProvider', style='width:170px;', ng-disabled='formModels.copyrightYear.readonly')
+            select(id='contributorDetails.copyrightYear',ng-model='contributorDetails.copyrightYear', ng-options='c for c in copyrightYearDataProvider | filter:copyrightYearFilter', style='width:170px;', ng-disabled='formModels.copyrightYear.readonly')
 
           +field('* Copyright Expiration','contributorDetails.copyrightExpirationDate', 'formModels.copyrightExpirationDate')
-            select(id='contributorDetails.copyrightExpirationDate',ng-model='contributorDetails.copyrightExpirationDate', ng-options='c for c in copyrightExpirationDateDataProvider', style='width:170px;', ng-disabled='formModels.copyrightExpirationDate.readonly')
+            select(id='contributorDetails.copyrightExpirationDate',ng-model='contributorDetails.copyrightExpirationDate', ng-options='c for c in copyrightExpirationDateDataProvider | filter:copyrightExpirationDateFilter', style='width:170px;', ng-disabled='formModels.copyrightExpirationDate.readonly')
 
           +field('Website', 'contributorDetails.sourceUrl', 'formModels.sourceUrl')
 
