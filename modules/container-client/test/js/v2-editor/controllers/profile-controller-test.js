@@ -10,7 +10,7 @@ describe('profile controller', function () {
     this.loadAvailableUiComponentsResult = {interactions: [], widgets: []};
 
     this.loadAvailableUiComponents = function (onSuccess, onError) {
-      onSuccess(this.loadAvailableUiComponentsResult);
+      onSuccess(_.cloneDeep(this.loadAvailableUiComponentsResult));
     };
   }
 
@@ -18,7 +18,7 @@ describe('profile controller', function () {
     this.loadResult = {profile: {}};
 
     this.load = function (onSuccess) {
-      onSuccess(this.loadResult);
+      onSuccess(_.cloneDeep(this.loadResult));
     };
 
     this.fineGrainedSaveResult = "OK";
@@ -26,13 +26,13 @@ describe('profile controller', function () {
 
     this.fineGrainedSave = function (data, callback) {
       this.fineGrainedSaveCalls.push(arguments);
-      callback(this.fineGrainedSaveResult);
+      callback(_.cloneDeep(this.fineGrainedSaveResult));
     };
   }
 
   function MockLogFactory() {
     this.getLogger = function (id) {
-      return {
+      return window.console || {
         log: function () {
         },
         warn: function () {
@@ -47,19 +47,19 @@ describe('profile controller', function () {
     this.queryResult = [];
 
     this.query = function (topic, term, callback) {
-      callback(this.queryResult);
+      callback(_.cloneDeep(this.queryResult));
     };
 
     this.findOneResult = {};
 
     this.findOne = function (topic, id, callback) {
-      callback(this.findOneResult);
+      callback(_.cloneDeep(this.findOneResult));
     };
 
     this.listResult = [];
 
     this.list = function (topic, callback) {
-      callback(this.listResult);
+      callback(_.cloneDeep(this.listResult));
     };
   }
 
@@ -162,7 +162,7 @@ describe('profile controller', function () {
     });
 
     it("loads item on init", function () {
-      expect(scope.item).toEqual(mockItemService.loadResult);
+      expect(scope.item).toNotBe(null);
     });
 
     it("initialises empty sub-properties", function () {
@@ -480,14 +480,14 @@ describe('profile controller', function () {
     var itemOne, itemTwo, itemOther, itemNone, itemAll, reviewsPassedItems;
 
     beforeEach(function () {
-      itemOne = keyValue("one");
-      itemTwo = keyValue("two");
-      itemOther = keyValue("Other");
-      itemNone = keyValue("None");
-      itemAll = keyValue("All");
-      reviewsPassedItems = [itemOne, itemTwo, itemOther, itemNone, itemAll];
+      reviewsPassedItems = [keyValue("one"),keyValue("two"),keyValue("Other"),keyValue("None"),keyValue("All")];
       mockDataQueryService.listResult = reviewsPassedItems;
       makeProfileController();
+      itemOne = scope.reviewsPassedDataProvider[0];
+      itemTwo = scope.reviewsPassedDataProvider[1];
+      itemOther = scope.reviewsPassedDataProvider[2];
+      itemNone = scope.reviewsPassedDataProvider[3];
+      itemAll = scope.reviewsPassedDataProvider[4];
     });
 
     it("should init the dataProvider", function () {
