@@ -205,41 +205,52 @@
      */
     function overrideProfileValuesWithConfig(profile, config){
 
-      function assign(dest, name, sourceName){
-        var source = config[sourceName || name];
-        if(source && source.hasOwnProperty('value')){
-          dest[name] = source.value;
+      function applyConfig(dest, name, sourceName){
+        var configItem = config[sourceName || name];
+        if(configItem && configItem.hasOwnProperty('value')){
+          dest[name] = configItem.value;
         }
       }
 
-      assign(profile.taskInfo, "title");
-      assign(profile.taskInfo, "description");
-      assign(profile.taskInfo.subjects, "primary", "primarySubject");
-      assign(profile.taskInfo.subjects, "related", "relatedSubject");
-      assign(profile.taskInfo, "gradeLevel");
+      function applyConfigAsynchronously(dest, name, configName, getConfig) {
+        var configItem = config[configName];
+        if (!configItem || !configItem.hasOwnProperty('value')) {
+          return;
+        }
 
-      assign(profile, "standards");
-      assign(profile, "lexile");
+        getConfig(configItem.value, function (result) {
+          dest[name] = result;
+        });
+      }
 
-      assign(profile.otherAlignments, "depthOfKnowledge");
-      assign(profile.otherAlignments, "bloomsTaxonomy");
-      assign(profile.otherAlignments, "keySkills");
+      applyConfig(profile.taskInfo, "title");
+      applyConfig(profile.taskInfo, "description");
+      applyConfigAsynchronously(profile.taskInfo.subjects, 'primary', 'primarySubject', configToPrimarySubject);
+      applyConfigAsynchronously(profile.taskInfo.subjects, 'related', 'relatedSubject', configToRelatedSubject);
+      applyConfig(profile.taskInfo, "gradeLevel");
 
-      assign(profile, "priorUse");
-      assign(profile, "priorUseOther");
-      assign(profile, "priorGradeLevel");
-      assign(profile, "reviewsPassed");
-      assign(profile, "reviewsPassedOther");
+      applyConfigAsynchronously(profile, 'standards', 'standards', configToStandards);
+      applyConfig(profile, "lexile");
 
-      assign(profile.contributorDetails, "author");
-      assign(profile.contributorDetails, "credentials");
-      assign(profile.contributorDetails, "credentialsOther");
-      assign(profile.contributorDetails, "copyrightOwner");
-      assign(profile.contributorDetails, "copyrightYear");
-      assign(profile.contributorDetails, "copyrightExpirationDate");
-      assign(profile.contributorDetails, "sourceUrl");
+      applyConfig(profile.otherAlignments, "depthOfKnowledge");
+      applyConfig(profile.otherAlignments, "bloomsTaxonomy");
+      applyConfig(profile.otherAlignments, "keySkills");
 
-      assign(profile.contributorDetails, "additionalCopyrights");
+      applyConfig(profile, "priorUse");
+      applyConfig(profile, "priorUseOther");
+      applyConfig(profile, "priorGradeLevel");
+      applyConfig(profile, "reviewsPassed");
+      applyConfig(profile, "reviewsPassedOther");
+
+      applyConfig(profile.contributorDetails, "author");
+      applyConfig(profile.contributorDetails, "credentials");
+      applyConfig(profile.contributorDetails, "credentialsOther");
+      applyConfig(profile.contributorDetails, "copyrightOwner");
+      applyConfig(profile.contributorDetails, "copyrightYear");
+      applyConfig(profile.contributorDetails, "copyrightExpirationDate");
+      applyConfig(profile.contributorDetails, "sourceUrl");
+
+      applyConfig(profile.contributorDetails, "additionalCopyrights");
     }
 
     /**
@@ -317,7 +328,7 @@
         var results = [];
         $log.log("standards initSelection", val, ids);
         _.forEach(ids, function(id) {
-          findItemById("standards", id, function(item) {
+          DataQueryService.findOne("standards", id, function success(item) {
             results.push(item);
             if (ids.length === results.length) {
               callback(results);
@@ -344,8 +355,28 @@
       formatResultCssClass: function(object) {
         return "select2-item-profile-standard-adapter-drop-down-item";
       }
-
     };
+
+    /**
+     * The config contains an array of standards in dotNotation.
+     * For each item we need to load the full standard object
+     */
+    function configToStandards(dotNotations, callback){
+      if(!_.isArray(dotNotations) || 0 === dotNotations.length){
+        return;
+      }
+
+      var results = [];
+      _.forEach(dotNotations, function(dotNotation) {
+          DataQueryService.query('standards', JSON.stringify({searchTerm: dotNotation, fields: ['dotNotation']}),
+            function(item) {
+              results.push(item[0]);
+              if (dotNotations.length === results.length) {
+                callback(results)
+              }
+            });
+      });
+    }
 
     $scope.standardsAdapter.initSelection = $scope.standardsAdapter.initSelection.bind($scope.standardsAdapter);
 
@@ -387,94 +418,74 @@
     // subject and related subject
     //----------------------------------------------------------------
 
-    $scope.queryResults = {};
-
-    /**
-     * Return data from DataQueryService or local cache
-     * @param topic
-     * @param id
-     * @param callback
-     */
-    function findItemById(topic, id, callback) {
-
-      var local = _.find($scope.queryResults[topic], function(r) {
-        return id === r.id;
-      });
-      if (local) {
-        callback(local);
-      } else {
-        DataQueryService.findOne(topic, id, function success(data) {
-          callback(data);
-        });
-      }
-    }
-
-    function queryAndCache(topic, query){
-      DataQueryService.query(topic, query.term, function(result) {
-        $scope.queryResults[topic] = result;
-        query.callback({
-          results: result
-        });
-      });
-    }
-
-    function Select2Adapter(topic, formatFunc, properties) {
-
-      var that = this;
-
-      _.assign(this, properties);
-
-      this.id = function(s){
-        $log.warn("id", topic, s);
-        return s.id;
-      }
-
-      this.formatResult = function(s) {
-        $log.warn("formatResult", topic, s);
-        return s.category + ": " + s.subject;
-      };
-      this.formatSelection = function(s) {
-        $log.warn("formatSelection", topic, s);
-        return s.category + ": " + s.subject;
-      };
-
-      this.elementToVal = function(element) {
-        var result = $(element).select2('val');
-        $log.warn("elementToVal", topic, result)
-        return result;
-      };
+    function Select2Adapter(topic, formatFunc) {
+      this.formatResult = formatFunc;
+      this.formatSelection = formatFunc;
 
       this.query = function(query) {
-        $log.warn('subjects.related', $scope.taskInfo.subjects.related);
-        $log.warn("query", topic, query);
-        var cb = query.callback;
-        query.callback = function(result){
-          $log.warn("query callback", topic, result);
-          cb(result);
-        };
-        queryAndCache(topic, query);
-      };
-
-      this.initSelection = function(element, callback) {
-        $log.warn('subjects.related', $scope.taskInfo.subjects.related);
-        $log.warn("initSelection", topic);
-        var val = that.elementToVal(element);
-        $log.warn("initSelection", topic, val);
-
-        findItemById(topic, val, function(result){
-          $log.warn("initSelection callback", topic, result);
-          callback(result);
-        });
+        DataQueryService.query(topic,
+          JSON.stringify({searchTerm: query.term, fields:['subject']}),
+          function(result) {
+            query.callback({
+              results: result
+            });
+          });
       };
     }
 
     function subjectText(s) {
-      $log.warn("subjectText", s);
       return s.category + ": " + s.subject;
     }
 
     $scope.primarySubjectSelect2Adapter = new Select2Adapter("subjects.primary", subjectText);
     $scope.relatedSubjectSelect2Adapter = new Select2Adapter("subjects.related", subjectText);
+
+    function findSubjectByCategorySubject(topic, categorySubject, callback){
+      var parts = categorySubject.split(":");
+      var category = parts[0];
+      var subject = parts[1];
+      DataQueryService.query(
+        topic,
+        JSON.stringify({filters:[{field:'category', value:category},{field:'subject', value:subject}]}),
+        function(item) {
+          callback(item[0]);
+        });
+    }
+
+    /**
+     * The config is a category:subject string.
+     */
+    function configToPrimarySubject(categorySubject, callback){
+      $log.log("configToPrimarySubject", categorySubject);
+
+      if(!_.isString(categorySubject)){
+        return;
+      }
+
+      findSubjectByCategorySubject('subjects.primary', categorySubject, callback);
+    }
+
+    /**
+     * The config is a list of category:subject strings.
+     */
+    function configToRelatedSubject(categorySubjectList, callback){
+      $log.log("configToRelatedSubject", categorySubjectList);
+
+      if(!_.isArray(categorySubjectList)){
+        return;
+      }
+
+      var results = [];
+      _.forEach(categorySubjectList, function(categorySubject){
+
+        findSubjectByCategorySubject('subjects.related', categorySubject, function(result){
+          results.push(result);
+          if(results.length == categorySubjectList.length){
+            callback(results);
+          }
+        });
+      });
+    }
 
     //----------------------------------------------------------------
     // some dataProviders for selects
@@ -570,21 +581,24 @@
     function initKeySkillsSelection(){
       if($scope.otherAlignments && $scope.otherAlignments.keySkills && $scope.keySkillsDataProvider){
         _.forEach($scope.keySkillsDataProvider, function(categoryItem){
+          var header = categoryItem.header;
+          var keySkillsList = $scope.keySkills[header] = $scope.keySkills[header] || [];
           _.forEach(categoryItem.list, function(skill){
             if(_.contains($scope.otherAlignments.keySkills, skill)){
-              $scope.keySkills[categoryItem.header] = $scope.keySkills[categoryItem.header] || [];
-              $scope.keySkills[categoryItem.header].push(skill);
+              if(!_.contains(keySkillsList,skill)){
+                keySkillsList.push(skill);
+              }
             }
           });
         });
-
-        $scope.$watch('keySkills', function(newValue){
-          if($scope.otherAlignments){
-            $scope.otherAlignments.keySkills = getKeySkills();
-          }
-        }, true); //watch nested properties
       }
     }
+
+    $scope.$watch('keySkills', function(newValue){
+      if($scope.otherAlignments){
+        $scope.otherAlignments.keySkills = getKeySkills();
+      }
+    }, true); //watch nested properties
 
     DataQueryService.list("keySkills", function (result) {
       $scope.keySkillsDataProvider = _.map(result, function (k) {
@@ -816,15 +830,15 @@
         if (item && item.profile) {
 
           setItem(item);
-
-          $scope.$watch('item.profile', throttle(function(oldValue, newValue){
-            $scope.saveProfile();
-          }), true); //watch nestedProperties
         }
       },function(){
         $log.error('error loading profile');
       });
     };
+
+    $scope.$watch('item.profile', throttle(function(oldValue, newValue){
+      $scope.saveProfile();
+    }), true); //watch nestedProperties
 
     $scope.saveProfile = function() {
       $log.log("saving profile");

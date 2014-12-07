@@ -36,6 +36,18 @@ class StandardsDataQueryTest extends Specification {
       result.length === 2
     }
 
+    "return all standards that exactly match all the filters" in {
+      val standards: Seq[JsObject] = List(
+        Json.obj("category" -> "Reading", "subject" -> "test-1"),
+        Json.obj("category" -> "Reading", "subject" -> "test-2"),
+        Json.obj("category" -> "Reading and Speaking", "subject" -> "test-3"))
+      val result = sut.list(standards, Some(Json.obj(
+        "filters" -> Json.arr(
+          Json.obj("field" -> "category", "value" -> "Reading"),
+          Json.obj("field" -> "subject", "value" -> "test-2"))).toString()))
+      result.length === 1
+    }
+
     "return standards that match the filters and contain the searchTerm" in {
       val standards: Seq[JsObject] = List(
         Json.obj("id" -> "1", "category" -> "Reading", "subCategory" -> "sub one"),
