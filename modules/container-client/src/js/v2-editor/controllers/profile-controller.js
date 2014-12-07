@@ -3,6 +3,7 @@
   angular.module('corespring-editor.controllers')
     .controller('ProfileController', [
       '$location',
+      '$rootScope',
       '$scope',
       'throttle',
       'DataQueryService',
@@ -16,6 +17,7 @@
 
   function ProfileController(
     $location,
+    $rootScope,
     $scope,
     throttle,
     DataQueryService,
@@ -295,10 +297,12 @@
       },
 
       getVal: function(element){
-        return $(element).val();
+        $log.warn('getVal', $(element).select2('val'));
+        return $(element).select2('val');
       },
 
       query: function(query) {
+        $log.warn("standards query", query);
         DataQueryService.query("standards", createStandardQuery(query.term), function(results) {
           query.callback({
             results: results
@@ -307,10 +311,12 @@
       },
 
       initSelection: function(element, callback) {
+        $log.warn("standards initSelection", this);
         var val = this.getVal(element);
         var ids = val.split(',');
         var results = [];
-        ids.forEach(function(id) {
+        $log.log("standards initSelection", val, ids);
+        _.forEach(ids, function(id) {
           findItemById("standards", id, function(item) {
             results.push(item);
             if (ids.length === results.length) {
@@ -340,6 +346,8 @@
       }
 
     };
+
+    $scope.standardsAdapter.initSelection = $scope.standardsAdapter.initSelection.bind($scope.standardsAdapter);
 
     function containsLiteracyStandard(standards) {
       return null != _.find(standards, function(item) {
@@ -416,25 +424,52 @@
 
       _.assign(this, properties);
 
-      this.formatResult = formatFunc;
-      this.formatSelection = formatFunc;
+      this.id = function(s){
+        $log.warn("id", topic, s);
+        return s.id;
+      }
+
+      this.formatResult = function(s) {
+        $log.warn("formatResult", topic, s);
+        return s.category + ": " + s.subject;
+      };
+      this.formatSelection = function(s) {
+        $log.warn("formatSelection", topic, s);
+        return s.category + ": " + s.subject;
+      };
 
       this.elementToVal = function(element) {
-        return $(element).select2('val');
+        var result = $(element).select2('val');
+        $log.warn("elementToVal", topic, result)
+        return result;
       };
 
       this.query = function(query) {
+        $log.warn('subjects.related', $scope.taskInfo.subjects.related);
+        $log.warn("query", topic, query);
+        var cb = query.callback;
+        query.callback = function(result){
+          $log.warn("query callback", topic, result);
+          cb(result);
+        };
         queryAndCache(topic, query);
       };
 
       this.initSelection = function(element, callback) {
+        $log.warn('subjects.related', $scope.taskInfo.subjects.related);
+        $log.warn("initSelection", topic);
         var val = that.elementToVal(element);
+        $log.warn("initSelection", topic, val);
 
-        findItemById(topic, val, callback);
+        findItemById(topic, val, function(result){
+          $log.warn("initSelection callback", topic, result);
+          callback(result);
+        });
       };
     }
 
     function subjectText(s) {
+      $log.warn("subjectText", s);
       return s.category + ": " + s.subject;
     }
 
@@ -803,6 +838,14 @@
         updateFormModels(data.profileConfig);
       }
       $scope.loadProfile();
+    });
+
+    /**
+     * In a full implementation the getEditorOptions event
+     * would be canceled before it reaches the root
+     */
+    $rootScope.$on('getEditorOptions', function(){
+      $scope.$broadcast("getEditorOptionsResult", {});
     });
 
     $scope.$emit("getEditorOptions");

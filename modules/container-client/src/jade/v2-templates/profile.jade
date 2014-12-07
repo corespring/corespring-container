@@ -68,7 +68,14 @@ script(type='text/ng-template', id='/templates/profile')
             +select2('primarySubjectSelect2Adapter', 'Choose a subject...', 'formModels.primarySubject')
 
           +field2('* Related Subject', 'taskInfo.subjects.related', 'formModels.relatedSubject')
-            +select2('relatedSubjectSelect2Adapter', 'Choose a subject...', 'formModels.relatedSubject')
+            input(id='taskInfo.subjects.related',
+            ng-model='taskInfo.subjects.related',
+            type='hidden',
+            multiple='multiple',
+            ui-select2='relatedSubjectSelect2Adapter',
+            data-placeholder='Choose a subject...',
+            ng-readonly='formModels.relatedSubject.readonly',
+            style='width:100%;')
 
           +field2('Grade Level', 'taskInfo.gradeLevel', 'formModels.gradeLevel')
             +select2GradeLevel('gradeLevelDataProvider | filter:gradeLevelFilter','Choose a grade level...','formModels.gradeLevel')
@@ -88,7 +95,7 @@ script(type='text/ng-template', id='/templates/profile')
           +field('Sub-Category','standardAdapter.subCategoryOption')
             select(id='subCategoryOption',ng-model='standardAdapter.subCategoryOption', ng-options='z for z in standardAdapter.categoryOption.items')
           +field('Standards','profile.standards')
-            input(id='profile.standards', type='hidden', ui-select2='standardsAdapter', ng-model='profile.standards', style='width: 100%;')
+            input(id='profile.standards', type='text', ui-select2='standardsAdapter', ng-model='profile.standards', style='width: 100%;')
 
           .lexile(ng-show='isLiteracyStandardSelected')
             +field2('Lexile Score', 'profile.lexile', 'formModels.lexile')
