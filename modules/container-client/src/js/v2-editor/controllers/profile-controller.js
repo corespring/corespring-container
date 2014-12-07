@@ -240,6 +240,21 @@
       assign(profile.contributorDetails, "additionalCopyrights");
     }
 
+    /**
+     * Create a ng filter function for a formModel/dataProvider
+     * @param formModel
+     * @param propertyName
+     * @returns {Function}
+     */
+    function createOptionsFilter(formModel, propertyName){
+      return function(item,index){
+        var value = propertyName ? item[propertyName] : item;
+        return _.isArray(formModel.options) ?
+          _.contains(formModel.options, value)
+          : true;
+      }
+    }
+
     //----------------------------------------------------------------
     // Standards
     //----------------------------------------------------------------
@@ -430,13 +445,13 @@
     // some dataProviders for selects
     //----------------------------------------------------------------
 
-    $scope.bloomsTaxonomyFilter = isInOptionsFilter($scope.formModels.bloomsTaxonomy, 'key');
+    $scope.bloomsTaxonomyFilter = createOptionsFilter($scope.formModels.bloomsTaxonomy, 'key');
 
     DataQueryService.list("bloomsTaxonomy", function (result) {
       $scope.bloomsTaxonomyDataProvider = result;
     });
 
-    $scope.depthOfKnowledgeFilter = isInOptionsFilter($scope.formModels.depthOfKnowledge, 'key');
+    $scope.depthOfKnowledgeFilter = createOptionsFilter($scope.formModels.depthOfKnowledge, 'key');
 
     DataQueryService.list("depthOfKnowledge", function (result) {
       $scope.depthOfKnowledgeDataProvider = result;
@@ -444,9 +459,9 @@
 
     DataQueryService.list("gradeLevels", function (result) {
       $scope.gradeLevelDataProvider = result;
-      $scope.gradeLevelFilter = isInOptionsFilter($scope.formModels.gradeLevel, 'key');
+      $scope.gradeLevelFilter = createOptionsFilter($scope.formModels.gradeLevel, 'key');
       $scope.priorGradeLevelDataProvider = result;
-      $scope.priorGradeLevelFilter = isInOptionsFilter($scope.formModels.priorGradeLevel, 'key');
+      $scope.priorGradeLevelFilter = createOptionsFilter($scope.formModels.priorGradeLevel, 'key');
     });
 
     //----------------------------------------------------------------
@@ -466,11 +481,11 @@
       });
     }
 
-    $scope.copyrightExpirationDateFilter = isInOptionsFilter($scope.formModels.copyrightExpirationDate);
+    $scope.copyrightExpirationDateFilter = createOptionsFilter($scope.formModels.copyrightExpirationDate);
 
     $scope.copyrightExpirationDateDataProvider = years(new Date().getFullYear(), new Date().getFullYear() + 20).concat(['Never']);
 
-    $scope.copyrightYearFilter = isInOptionsFilter($scope.formModels.copyrightYear);
+    $scope.copyrightYearFilter = createOptionsFilter($scope.formModels.copyrightYear);
 
     $scope.copyrightYearDataProvider = years(new Date().getFullYear(), new Date().getFullYear() - 120);
 
@@ -478,7 +493,7 @@
     // credentials
     //----------------------------------------------------------------
 
-    $scope.credentialsFilter = isInOptionsFilter($scope.formModels.credentials, 'key');
+    $scope.credentialsFilter = createOptionsFilter($scope.formModels.credentials, 'key');
 
     DataQueryService.list("credentials", function (result) {
       $scope.credentialsDataProvider = result;
@@ -500,14 +515,50 @@
     //----------------------------------------------------------------
     // key skills
     //----------------------------------------------------------------
-    DataQueryService.list("keySkills", function (result) {
 
+    $scope.keySkillsFilter = function(item,index){
+      return _.some(item.list, $scope.keySkillsSubListFilter);
+    };
+
+    $scope.keySkillsSubListFilter = function(item,index){
+      return true;
+    };
+
+    $scope.keySkills = {
+    };
+
+    function getKeySkills(){
+      var result = _.chain($scope.keySkills).values().flatten().value();
+      return result;
+    }
+
+    function initKeySkillsSelection(){
+      if($scope.otherAlignments && $scope.otherAlignments.keySkills && $scope.keySkillsDataProvider){
+        _.forEach($scope.keySkillsDataProvider, function(categoryItem){
+          _.forEach(categoryItem.list, function(skill){
+            if(_.contains($scope.otherAlignments.keySkills, skill)){
+              $scope.keySkills[categoryItem.header] = $scope.keySkills[categoryItem.header] || [];
+              $scope.keySkills[categoryItem.header].push(skill);
+            }
+          });
+        });
+
+        $scope.$watch('keySkills', function(newValue){
+          if($scope.otherAlignments){
+            $scope.otherAlignments.keySkills = getKeySkills();
+          }
+        }, true); //watch nested properties
+      }
+    }
+
+    DataQueryService.list("keySkills", function (result) {
       $scope.keySkillsDataProvider = _.map(result, function (k) {
         return {
           header: k.key,
           list: k.value
         };
       });
+      initKeySkillsSelection();
     });
 
     $scope.getKeySkillsSummary = function(keySkills) {
@@ -531,7 +582,7 @@
     // prior use
     //----------------------------------------------------------------
 
-    $scope.priorUseFilter = isInOptionsFilter($scope.formModels.priorUse, 'key');
+    $scope.priorUseFilter = createOptionsFilter($scope.formModels.priorUse, 'key');
 
     $scope.$watch('profile.priorUse', function() {
       updatePriorUseOtherSelected();
@@ -554,24 +605,15 @@
     // reviews passed
     //----------------------------------------------------------------
 
-    $scope.reviewsPassedFilter = isInOptionsFilter($scope.formModels.reviewsPassed, 'key');
-
-    function isInOptionsFilter(formModel, propertyName){
-      return function(item,index){
-        var value = propertyName ? item[propertyName] : item;
-        return _.isArray(formModel.options) ?
-          _.contains(formModel.options, value)
-          : true;
-      }
-    }
+    $scope.reviewsPassedFilter = createOptionsFilter($scope.formModels.reviewsPassed, 'key');
 
     DataQueryService.list("reviewsPassed", function (result) {
       $scope.reviewsPassedDataProvider = result;
-      initReviewsPassedDataProvider();
+      initReviewsPassedSelection();
       updateReviewsPassedOtherSelected();
     });
 
-    function initReviewsPassedDataProvider() {
+    function initReviewsPassedSelection() {
       if ($scope.reviewsPassedDataProvider && $scope.profile && _.isArray($scope.profile.reviewsPassed)) {
 
         _.each($scope.reviewsPassedDataProvider, function(item) {
@@ -631,7 +673,7 @@
         }
       }
       $scope.profile.reviewsPassed = selectedKeys;
-      initReviewsPassedDataProvider();
+      initReviewsPassedSelection();
     };
 
     $scope.$watch('profile.reviewsPassed', function() {
@@ -709,12 +751,9 @@
       $scope.contributorDetails = profile.contributorDetails;
       $scope.profile = profile;
 
-      $log.log("task info:", $scope.taskInfo);
-      $log.log("other alignments:", $scope.otherAlignments);
-      $log.log("contributor details:", $scope.contributorDetails);
-
       initComponentTypesUsed();
-      initReviewsPassedDataProvider();
+      initKeySkillsSelection();
+      initReviewsPassedSelection();
       updateReviewsPassedOtherSelected();
       updatePriorUseOtherSelected();
       updateCredentialsOtherSelected();
@@ -743,10 +782,9 @@
 
           setItem(item);
 
-          var watchNestedProperties;
           $scope.$watch('item.profile', throttle(function(oldValue, newValue){
             $scope.saveProfile();
-          }), watchNestedProperties = true);
+          }), true); //watch nestedProperties
         }
       },function(){
         $log.error('error loading profile');

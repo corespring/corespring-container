@@ -406,20 +406,22 @@ describe('profile controller', function () {
   });
 
   describe('keySkills', function () {
-    var expectedDataProvider;
+    var inputData;
 
     beforeEach(function () {
-      expectedDataProvider = randomArray()
-      mockDataQueryService.listResult = keyValueList(expectedDataProvider);
-      makeProfileController();
+      inputData = [{key:'categoryA', value:['skillA-1','skillA-2']},{key:'categoryB', value:['skillB-1','skillB-2']}];
+      mockDataQueryService.listResult = inputData;
     });
 
     it("should init dataProvider", function () {
-      function tagListItem(id) {
-        return {header: id, list: id};
-      }
+      makeProfileController();
+      expect(scope.keySkillsDataProvider).toEqual([{header:'categoryA', list:['skillA-1','skillA-2']},{header:'categoryB', list:['skillB-1','skillB-2']}]);
+    });
 
-      expect(scope.keySkillsDataProvider).toEqual(_.map(expectedDataProvider, tagListItem));
+    it("should init selection", function(){
+      mockItemService.loadResult = {profile:{otherAlignments:{keySkills:['skillA-1','skillB-2']}}};
+      makeProfileController();
+      expect(scope.keySkills).toEqual({categoryA:['skillA-1'],categoryB:['skillB-2']});
     });
 
     describe("getKeySkillsSummary", function () {
