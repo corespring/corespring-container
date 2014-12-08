@@ -86,7 +86,8 @@ angular.module('corespring-editor.controllers')
       if(isInIframe()) {
         var editorOptions;
 
-        $scope.$on('getEditorOptions', function(){
+        $scope.$on('getEditorOptions', function(evt){
+          evt.stopPropagation();
           if (editorOptions) {
             $scope.$broadcast('getEditorOptionsResult', editorOptions);
           }

@@ -145,16 +145,16 @@ script(type='text/ng-template', id='/templates/profile')
 
         +h_form
           h6 Copyright Information
-            +field('* Author', 'contributorDetails.author', 'formModels.author')
-            +field('Credentials','contributorDetails.credentials', 'formModels.credentials')
-              select(id='contributorDetails.credentials',ng-model='contributorDetails.credentials', ng-options='c.key as c.value for c in credentialsDataProvider | filter:credentialsFilter', ng-disabled='formModels.credentials.readonly')
-              input(id='contributorDetails.credentialsOther',ng-show='isCredentialsOtherSelected', type='text', placeholder='Enter credentials...', ng-model='contributorDetails.credentialsOther', ng-readonly='formModels.credentials.readonly')
-            +field('* Copyright Owner','contributorDetails.copyrightOwner', 'formModels.copyrightOwner')
-            +field('* Copyright Year','contributorDetails.copyrightYear', 'formModels.copyrightYear')
-              select(id='contributorDetails.copyrightYear',ng-model='contributorDetails.copyrightYear', ng-options='c for c in copyrightYearDataProvider | filter:copyrightYearFilter', style='width:170px;', ng-disabled='formModels.copyrightYear.readonly')
-            +field('* Copyright Expiration','contributorDetails.copyrightExpirationDate', 'formModels.copyrightExpirationDate')
-              select(id='contributorDetails.copyrightExpirationDate',ng-model='contributorDetails.copyrightExpirationDate', ng-options='c for c in copyrightExpirationDateDataProvider | filter:copyrightExpirationDateFilter', style='width:170px;', ng-disabled='formModels.copyrightExpirationDate.readonly')
-            +field('Website URL', 'contributorDetails.sourceUrl', 'formModels.sourceUrl')
+          +field('* Author', 'contributorDetails.author', 'formModels.author')
+          +field('Credentials','contributorDetails.credentials', 'formModels.credentials')
+            select(id='contributorDetails.credentials',ng-model='contributorDetails.credentials', ng-options='c.key as c.value for c in credentialsDataProvider | filter:credentialsFilter', ng-disabled='formModels.credentials.readonly')
+            input(id='contributorDetails.credentialsOther',ng-show='isCredentialsOtherSelected', type='text', placeholder='Enter credentials...', ng-model='contributorDetails.credentialsOther', ng-readonly='formModels.credentials.readonly')
+          +field('* Copyright Owner','contributorDetails.copyrightOwner', 'formModels.copyrightOwner')
+          +field('* Copyright Year','contributorDetails.copyrightYear', 'formModels.copyrightYear')
+            select(id='contributorDetails.copyrightYear',ng-model='contributorDetails.copyrightYear', ng-options='c for c in copyrightYearDataProvider | filter:copyrightYearFilter', style='width:170px;', ng-disabled='formModels.copyrightYear.readonly')
+          +field('* Copyright Expiration','contributorDetails.copyrightExpirationDate', 'formModels.copyrightExpirationDate')
+            select(id='contributorDetails.copyrightExpirationDate',ng-model='contributorDetails.copyrightExpirationDate', ng-options='c for c in copyrightExpirationDateDataProvider | filter:copyrightExpirationDateFilter', style='width:170px;', ng-disabled='formModels.copyrightExpirationDate.readonly')
+          +field('Website URL', 'contributorDetails.sourceUrl', 'formModels.sourceUrl')
 
         +h_form
           h6 Additional Media Copyright

@@ -115,6 +115,7 @@ function EditorDefinition(element, options, errorCallback) {
     createItem(options,
       function (data) {
         logger.log("item created");
+        options.itemId = data.itemId;
         loadItem(data.itemId, options);
       },
       function (err) {

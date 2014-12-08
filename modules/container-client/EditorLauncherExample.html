@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+  <script type="text/javascript" src="http://localhost:9000/client/editor-v2.js"></script>
+
+  <script type="text/javascript">
+
+    var corespringEditorOptions = {
+      //"itemId": "54859f7bcc7336ac2f9ed775", //supply a valid item id
+      "selectedTab": 'profile',
+      "profileConfig": {
+
+        author: {
+          visible: true,
+          readonly: false,
+          value: 'config author'
+        },
+        bloomsTaxonomy: {
+          visible: true,
+          readonly: false,
+          value: 'Understanding',
+          options: ['Remembering', 'Understanding']
+          //available options
+          //"Remembering", "Understanding","Applying","Analyzing","Evaluating","Creating"
+        },
+        copyrightExpirationDate: {
+          visible: true,
+          readonly: false,
+          value: '2020',
+          options: ["2010", "2020", "2030"]
+          //available options: from current year to 20 years into the future
+        },
+        copyrightOwner: {
+          visible: true,
+          readonly: false,
+          value: 'config copyright owner'
+        },
+        copyrightYear: {
+          visible: true,
+          readonly: false,
+          value: '1980',
+          options: ["1980", "1990", "2000"]
+          //available options: from current year to 120 years into the past
+        },
+        credentials: {
+          visible: true,
+          readonly: false,
+          value: 'Other',
+          options: ["District Item Writer", "Game Designer", "Other"]
+          //available options
+          //"Application Developer""Assessment Developer Test Item Writer","Curriculum Developer",
+          //"District Item Writer","Game Designer","Non-Profit","Professional Developer",
+          //"State Department of Education Item Writer","Student","Teacher","Other"
+        },
+        credentialsOther: {
+          visible: true,
+          readonly: false,
+          value: "Some other credential"
+        },
+        depthOfKnowledge: {
+          visible: true,
+          readonly: false,
+          value: '1',
+          options: ['1', '2']
+          //available options
+          //1,2,3,4
+          //which are
+          //"Level 1 Recall & Reproduction",
+          //"Level 2 Skills & Concepts",
+          //"Level 3 Strategic Thinking/Reasoning",
+          //"Level 4 Extended Thinking",
+        },
+        description: {
+          visible: true,
+          readonly: true,
+          value: "config description"
+        },
+        gradeLevel: {
+          visible: true,
+          readonly: false,
+          value: ['03', '04'],
+          options: ['01', '02', '03', '04']
+          //available options
+          //"PK","KG","01","02","03","04","05","06","07","08","09","10","11","12","13","PS","AP","UG"
+        },
+        keySkills: {
+          visible: true,
+          readonly: false,
+          value: ['Define', 'Practice'],
+          options: ['Define', 'Practice', 'Discriminate', 'Design']
+          //TODO
+          //"keySkills":["Repeat","Name","Illustrate"]
+          //available options
+          //Category Knowledge
+          //"Arrange","Define","Describe","Duplicate","Identify","Label","List","Match","Memorize","Name",
+          //"Order","Outline","Recall","Recognize","Relate","Repeat","Reproduce","Select","State"
+          //Category Understand
+          //"Classify","Convert","Defend","Discuss","Distinguish","Estimate","Example(s)","Explain","Express","Extend",
+          //"Generalize","Give","Indicate","Infer","Locate","Paraphrase","Predict","Review","Rewrite","Summarize",
+          //"Translate","Understand"
+          //Category Apply
+          //"Apply","Change","Choose","Compute","Demonstrate","Discover","Dramatize","Employ","Illustrate","Interpret",
+          //"Manipulate","Modify","Operate","Practice","Prepare","Produce","Schedule","Show","Sketch","Solve","Use",
+          //"Write"
+          //Category Analyze
+          //"Analyze","Appraise","Breakdown","Calculate","Categorize","Compare","Contrast","Criticize","Diagram",
+          //"Differentiate","Discriminate","Examine","Experiment","Infer","Model","Point-Out","Question","Separate",
+          //"Test"
+          //Category Evaluate
+          //"Assemble","Collect","Combine","Comply","Devise","Evaluate","Explain","Formulate","Generate","Plan",
+          //"Rearrange"
+          //Category Create
+          //"Create","Compose","Construct","Create","Design","Develop"
+        },
+        lexile: {
+          visible: true,
+          readonly: false,
+          value: '56'
+        },
+        primarySubject: {
+          visible: true,
+          readonly: false,
+          value: "Art:Other"
+          //TODO Do we need options?
+        },
+        priorGradeLevel: {
+          visible: true,
+          readonly: false,
+          value: ['03', '04'],
+          options: ['01', '02', '03', '04']
+          //available options
+          //"PK","KG","01","02","03","04","05","06","07","08","09","10","11","12","13","PS","AP","UG"
+        },
+        priorUse: {
+          visible: true,
+          readonly: false,
+          value: "Other",
+          options: ["Formative", "Benchmark", "Other"]
+          //available options
+          //"Formative","Interim","Benchmark","Summative","International Benchmark","Other"
+        },
+        priorUseOther: {
+          visible: true,
+          readonly: false,
+          value: "some other prior use"
+        },
+        relatedSubject: {
+          visible: true,
+          readonly: false,
+          value: ["Art:Other", "English Language Arts:English Language Arts"]
+          //TODO Do we need options?
+        },
+        reviewsPassed: {
+          visible: true,
+          readonly: false,
+          value: ["Other"],
+          options: ["Bias", "Fairness", "Other"]
+          //"Editorial","Bias","Fairness","Content","Psychometric","Other",
+        },
+        reviewsPassedOther: {
+          visible: true,
+          readonly: false,
+          value: "Other value for review passed"
+        },
+        sourceUrl: {
+          visible: true,
+          readonly: false,
+          value: "config source url"
+        },
+        standards: {
+          visible: true,
+          readonly: false,
+          value: ['W.3.1b', 'W.6.6']
+          //TODO DO we need options?
+        },
+        title: {
+          visible: true,
+          readonly: false,
+          value: "config title"
+        }
+      }
+    };
+
+    $(document).ready(function () {
+      console.log("document.ready: launching editor " + corespringEditorOptions);
+      window.corespringEditor = new org.corespring.players.ItemEditor(
+        '.player-holder',
+        corespringEditorOptions,
+        function onEditorError(error) {
+          console.error("error creating editor " + error);
+        });
+      console.log("created corespringEditor:", corespringEditor);
+    });
+
+  </script>
+</head>
+<body>
+  <h1>Testing Corespring Item Editor</h1>
+
+  <div class="player-holder"></div>
+</body>
+</html>
