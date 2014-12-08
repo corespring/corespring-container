@@ -31,7 +31,8 @@ include ../v2-mixins/modal
               div(profile-preview="", ng-model="item")
 
             .supporting-material(ng-if="activeTab == 'supportingMaterial'")
-              div(style="height: 100%;", ng-if="getContentType() != 'text/html'")
+              h3 {{selectedSupportingMaterialName}}
+              div(style="height: 400px;", ng-if="getContentType() != 'text/html'")
                 iframe(ng-src="{{selectedSupportingMaterialUrl}}")
               div(ng-if="getContentType() == 'text/html'")
                 div(ng-bind-html-unsafe='selectedSupportingMaterialContent')

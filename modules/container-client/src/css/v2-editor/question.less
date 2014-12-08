@@ -42,6 +42,7 @@
     width: @player-width;
     min-width: @player-width;
     max-width: @player-width;
+    position: relative;
   
     .player-container{
       padding: 5px;
@@ -57,20 +58,21 @@
       text-align: center;
       img{
         border: dashed #cccccc 1px;
-        position: relative;
-        top: 15px;
+        position: absolute;
+        bottom: 45px;
+        left: 10px;
+        height: 20px;
       }
     }
   }
 
   .summary-feedback-panel {
-    @fb-blue: @profile-summary-feedback-panel-bg;
-    border: solid 2px @fb-blue;
+    border: solid 2px @feedback-bg;
     .panel-heading {
       a {
         cursor: pointer;
       }
-      background-color: @fb-blue;
+      background-color: @feedback-bg;
       color: white;
     }
   }

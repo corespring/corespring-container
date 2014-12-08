@@ -50,7 +50,7 @@ script(type='text/ng-template', id='/templates/profile')
         button.pull-right.btn.btn-default(
           ng-click="togglePreview()",
           ng-class="{'btn-warning': !previewOn}")
-          | {{previewOn ? 'Close' : 'Open'}} Preview
+          | {{previewOn ? 'Close Preview' : 'Preview Profile Information'}} 
           i.fa(ng-class="{'fa-toggle-left': previewOn, 'fa-toggle-right' : !previewOn}")
 
       hr/
@@ -152,12 +152,15 @@ script(type='text/ng-template', id='/templates/profile')
           +field('* Author', 'contributorDetails.author', 'formModels.author')
           +field('Credentials','contributorDetails.credentials', 'formModels.credentials')
             select(id='contributorDetails.credentials',ng-model='contributorDetails.credentials', ng-options='c.key as c.value for c in credentialsDataProvider | filter:credentialsFilter', ng-disabled='formModels.credentials.readonly')
+              option(value='') Select ...
             input(id='contributorDetails.credentialsOther',ng-show='isCredentialsOtherSelected', type='text', placeholder='Enter credentials...', ng-model='contributorDetails.credentialsOther', ng-readonly='formModels.credentials.readonly')
           +field('* Copyright Owner','contributorDetails.copyrightOwner', 'formModels.copyrightOwner')
           +field('* Copyright Year','contributorDetails.copyrightYear', 'formModels.copyrightYear')
             select(id='contributorDetails.copyrightYear',ng-model='contributorDetails.copyrightYear', ng-options='c for c in copyrightYearDataProvider | filter:copyrightYearFilter', style='width:170px;', ng-disabled='formModels.copyrightYear.readonly')
+              option(value='') Select ...
           +field('* Copyright Expiration','contributorDetails.copyrightExpirationDate', 'formModels.copyrightExpirationDate')
             select(id='contributorDetails.copyrightExpirationDate',ng-model='contributorDetails.copyrightExpirationDate', ng-options='c for c in copyrightExpirationDateDataProvider | filter:copyrightExpirationDateFilter', style='width:170px;', ng-disabled='formModels.copyrightExpirationDate.readonly')
+              option(value='') Select ...
           +field('Website URL', 'contributorDetails.sourceUrl', 'formModels.sourceUrl')
 
         +h_form
@@ -174,6 +177,7 @@ script(type='text/ng-template', id='/templates/profile')
                 td
                   select(id="license",ng-model="contributorDetails.licenseType",
                   ng-options="c.key as c.value for c in licenseTypeDataProvider")
+                    option(value='') Select ...
                 td
                   span(ng-show="!contributorDetails.licenseType",style="color: #888; font-style: italic;")
                     | Not Assigned

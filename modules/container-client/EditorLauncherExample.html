@@ -2,12 +2,12 @@
 <html>
 <head>
   <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-  <script type="text/javascript" src="http://localhost:9000/client/editor-v2.js"></script>
+  <script type="text/javascript" src="http://corespring-container-pe-7.herokuapp.com/client/editor-v2.js"></script>
 
   <script type="text/javascript">
 
     var corespringEditorOptions = {
-      //"itemId": "54859f7bcc7336ac2f9ed775", //supply a valid item id
+      //"itemId": "54859f7bcc7336ac2f9ed775", //supply a item id if you want to load an existing item, otherwise a new item is created
       "selectedTab": 'profile',
       "profileConfig": {
 
@@ -122,7 +122,7 @@
           visible: true,
           readonly: false,
           value: "Art:Other"
-          //TODO Do we need options?
+          //options is an array like value with all the options that are allowed
         },
         priorGradeLevel: {
           visible: true,
@@ -149,7 +149,7 @@
           visible: true,
           readonly: false,
           value: ["Art:Other", "English Language Arts:English Language Arts"]
-          //TODO Do we need options?
+          //options is an array like value with all the options that are allowed
         },
         reviewsPassed: {
           visible: true,
@@ -172,7 +172,7 @@
           visible: true,
           readonly: false,
           value: ['W.3.1b', 'W.6.6']
-          //TODO DO we need options?
+          //options is an array like value with all the options that are allowed
         },
         title: {
           visible: true,

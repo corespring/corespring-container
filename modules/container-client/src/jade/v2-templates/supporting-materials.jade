@@ -51,18 +51,10 @@ script(type="text/ng-template", id="/templates/supporting-materials")
 
         .file-upload-info(ng-show="!isContentType('text/html')")
           dl.dl-horizontal
-            div
-              dt File Name
-              dd {{supportingMaterial.name}}
-            div
-              dt Material Type
-              dd {{materialType}}
-            div
-              dt File Size
-              dd {{formatKB(supportingMaterialFileSize)}}
-            div
-              dt(ng-show='hasDate(supportingMaterial)') Date
-              dd(ng-show='hasDate(supportingMaterial)') {{formatDate(supportingMaterial.dateModified)}}
+            dt File Size
+            dd {{formatKB(supportingMaterialFileSize)}}
+            dt(ng-show='hasDate(supportingMaterial)') Date
+            dd(ng-show='hasDate(supportingMaterial)') {{formatDate(supportingMaterial.dateModified)}}
 
             div.preview-file(ng-if="!isContentType('text/html')")
               iframe(ng-src="{{getSupportingUrl()}}", width="100%", height="100%")
