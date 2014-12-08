@@ -27,14 +27,14 @@ mixin field(label, ngModel)
     +field('Copyright Year','item.year')
       select(id="item.year",ng-model="item.year",ng-options="c for c in copyrightYearDataProvider",
             style="width: 170px;")
-        option(value='') Select
+        option(value='') Select ...
     +field('License','item.licenseType')
       table.license
         tr
           td
             select(id="ac-license",ng-model="item.licenseType",
             ng-options="c.key as c.value for c in licenseTypeDataProvider")
-              option(value='') Select
+              option(value='') Select ...
           td
             span(ng-show="!item.licenseType",style="color: #888; font-style: italic;")
               | Not Assigned
@@ -43,7 +43,7 @@ mixin field(label, ngModel)
             a(href="http://creativecommons.org/licenses/",target="_blank") Learn More
     +field('Media Type','item.mediaType')
       select(id="item.mediaType",ng-model="item.mediaType",ng-options="c.key as c.value for c in mediaTypeDataProvider")
-        option(value='') Select
+        option(value='') Select ...
     +field('Website','item.sourceUrl')
 
     .form-group
