@@ -1,5 +1,7 @@
 (function() {
 
+  "use strict";
+
   angular.module('corespring-editor.controllers')
     .controller('ProfileController', [
       '$location',
@@ -171,9 +173,9 @@
       if(!config){
         return;
       }
-      for(var key in $scope.formModels){
-        updateFormModel($scope.formModels[key], config[key]);
-      }
+      _.forOwn($scope.formModels, function(value,key){
+        updateFormModel(value, config[key]);
+      });
     }
 
     /**
@@ -265,7 +267,7 @@
         return _.isArray(formModel.options) ?
           _.contains(formModel.options, value)
           : true;
-      }
+      };
     }
 
     //----------------------------------------------------------------
@@ -389,14 +391,14 @@
             function(item) {
               results.push(item[0]);
               if (dotNotations.length === results.length) {
-                callback(results)
+                callback(results);
               }
             });
       });
     }
 
     function containsLiteracyStandard(standards) {
-      return null != _.find(standards, function(item) {
+      return null !== _.find(standards, function(item) {
         return item && item.subject && item.subject.toLowerCase().indexOf("literacy") >= 0;
       });
     }
@@ -495,7 +497,7 @@
 
         findSubjectByCategorySubject('subjects.related', categorySubject, function(result){
           results.push(result);
-          if(results.length == categorySubjectList.length){
+          if(results.length === categorySubjectList.length){
             callback(results);
           }
         });

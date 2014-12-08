@@ -69,7 +69,7 @@
         }, []);
       }
       return query;
-    }
+    };
   }
 
   angular.module('corespring-common.services')
