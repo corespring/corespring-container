@@ -398,7 +398,7 @@
     }
 
     function containsLiteracyStandard(standards) {
-      return null !== _.find(standards, function(item) {
+      return -1 !== _.findIndex(standards, function(item) {
         return item && item.subject && item.subject.toLowerCase().indexOf("literacy") >= 0;
       });
     }

@@ -146,11 +146,14 @@ describe('profile controller', function () {
   }
 
   function randomString() {
-    return Math.floor(Math.random() * 1000).toString();
+    return 'random-' + Math.floor(Math.random() * 1000).toString();
   }
 
   function randomArray() {
-    return _.map([1, 2, 3], randomString);
+    return _.map([1, 2, 3], function(item){
+      var s = randomString();
+      return {key:s, value:s};
+    });
   }
 
   describe("init", function () {
@@ -208,12 +211,12 @@ describe('profile controller', function () {
     describe("isLiteracyStandardSelected", function () {
       beforeEach(makeProfileController);
       it("is true if literacy standard is selected", function () {
-        scope.item.profile.standards.push({subject: "some literacy subject"});
+        scope.item.profile.standards = [{subject: "some literacy subject"}];
         scope.$apply();
         expect(scope.isLiteracyStandardSelected).toEqual(true);
       });
       it("is false if no literacy standard is selected", function () {
-        scope.profile.standards.push({subject: "some math subject"});
+        scope.profile.standards = [{subject: "some math subject"}];
         scope.$apply();
         expect(scope.isLiteracyStandardSelected).toEqual(false);
       });
