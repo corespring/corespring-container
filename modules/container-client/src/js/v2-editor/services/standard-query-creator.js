@@ -11,7 +11,7 @@
   function StandardQueryCreator($log) {
 
     this.createStandardQuery = function (searchText, subjectOption, categoryOption, subCategoryOption) {
-      $log.debug("StandardQueryCreator.createStandardQuery", searchText, subjectOption, categoryOption, subCategoryOption);
+      $log.log("StandardQueryCreator.createStandardQuery", searchText, subjectOption, categoryOption, subCategoryOption);
 
       function createQuery(searchTerm, fields) {
         var result = {

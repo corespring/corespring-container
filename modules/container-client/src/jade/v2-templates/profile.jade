@@ -144,44 +144,57 @@ script(type='text/ng-template', id='/templates/profile')
                 option(ng-repeat="c in skills.list | filter:keySkillsSubListFilter",value="{{c}}") {{c}}
 
         +h_form
-          h6 History
+          h6 Copyright Information
+            +field('* Author', 'contributorDetails.author', 'formModels.author')
+            +field('Credentials','contributorDetails.credentials', 'formModels.credentials')
+              select(id='contributorDetails.credentials',ng-model='contributorDetails.credentials', ng-options='c.key as c.value for c in credentialsDataProvider | filter:credentialsFilter', ng-disabled='formModels.credentials.readonly')
+              input(id='contributorDetails.credentialsOther',ng-show='isCredentialsOtherSelected', type='text', placeholder='Enter credentials...', ng-model='contributorDetails.credentialsOther', ng-readonly='formModels.credentials.readonly')
+            +field('* Copyright Owner','contributorDetails.copyrightOwner', 'formModels.copyrightOwner')
+            +field('* Copyright Year','contributorDetails.copyrightYear', 'formModels.copyrightYear')
+              select(id='contributorDetails.copyrightYear',ng-model='contributorDetails.copyrightYear', ng-options='c for c in copyrightYearDataProvider | filter:copyrightYearFilter', style='width:170px;', ng-disabled='formModels.copyrightYear.readonly')
+            +field('* Copyright Expiration','contributorDetails.copyrightExpirationDate', 'formModels.copyrightExpirationDate')
+              select(id='contributorDetails.copyrightExpirationDate',ng-model='contributorDetails.copyrightExpirationDate', ng-options='c for c in copyrightExpirationDateDataProvider | filter:copyrightExpirationDateFilter', style='width:170px;', ng-disabled='formModels.copyrightExpirationDate.readonly')
+            +field('Website URL', 'contributorDetails.sourceUrl', 'formModels.sourceUrl')
+
+        +h_form
+          h6 Additional Media Copyright
+          additional-copyright-information-for-profile(copyrights='contributorDetails.additionalCopyrights',
+          prompt='Does this item contain any other copyrighted materials? E.g. book passage, image, etc.')
+
+        +h_form
+          h6 Creative Commons License
+
+          +field('Make this available via a','contributorDetails.licenseType')
+            table.license
+              tr
+                td
+                  select(id="license",ng-model="contributorDetails.licenseType",
+                  ng-options="c.key as c.value for c in licenseTypeDataProvider")
+                td
+                  span(ng-show="!contributorDetails.licenseType",style="color: #888; font-style: italic;")
+                    | Not Assigned
+                  img(ng-show="contributorDetails.licenseType",ng-src="{{getLicenseTypeUrl(contributorDetails.licenseType)}}")
+                td
+                  a(href="http://creativecommons.org/licenses/",target="_blank") Learn More
+
+        +h_form
+          h6 Prior Use
 
           +field2('This item was previously used in', 'profile.priorUse', 'formModels.priorUse')
             select(id='profile.priorUse', ng-model='profile.priorUse', ng-options='c.key as c.value for c in priorUseDataProvider | filter:priorUseFilter', ng-disabled='formModels.depthOfKnowledge.readonly')
             input(ng-show='isPriorUseOtherSelected', type='text', placeholder='Enter prior use...', ng-model='profile.priorUseOther', ng-readonly='formModels.depthOfKnowledge.readonly')
 
-          +field2('Prior Use Grade Level', 'profile.priorGradeLevel', 'formModels.priorGradeLevel')
+          +field2('Grade Level', 'profile.priorGradeLevel', 'formModels.priorGradeLevel')
             +select2GradeLevel('priorGradeLevelDataProvider | filter:priorGradeLevelFilter','Choose a grade level...','formModels.priorGradeLevel')
 
-          +field('Reviews Passed', 'profile.reviewsPassed')
+        +h_form
+          h6 Reviews Passed
+
+          +field('This item passed the following reviews', 'profile.reviewsPassed')
             label(ng-repeat='rp in reviewsPassedDataProvider | filter:reviewsPassedFilter', style='width:50%;')
               input(type='checkbox',ng-model='rp.selected',ng-change='onChangeReviewsPassed(rp.key)',style='margin-right: 3px;')
               | {{rp.key}}
               input(ng-if='"Other" === rp.key', ng-show='rp.selected', style='margin-left:10px;', type='text', placeholder='Enter review...', ng-model='profile.reviewsPassedOther')
-
-        +h_form
-          h6 Ownership
-
-          +field('Author', 'contributorDetails.author', 'formModels.author')
-
-          +field('Credentials','contributorDetails.credentials', 'formModels.credentials')
-            select(id='contributorDetails.credentials',ng-model='contributorDetails.credentials', ng-options='c.key as c.value for c in credentialsDataProvider | filter:credentialsFilter', ng-disabled='formModels.credentials.readonly')
-            input(id='contributorDetails.credentialsOther',ng-show='isCredentialsOtherSelected', type='text', placeholder='Enter credentials...', ng-model='contributorDetails.credentialsOther', ng-readonly='formModels.credentials.readonly')
-
-          +field('* Copyright Owner','contributorDetails.copyrightOwner', 'formModels.copyrightOwner')
-
-          +field('* Copyright Year','contributorDetails.copyrightYear', 'formModels.copyrightYear')
-            select(id='contributorDetails.copyrightYear',ng-model='contributorDetails.copyrightYear', ng-options='c for c in copyrightYearDataProvider | filter:copyrightYearFilter', style='width:170px;', ng-disabled='formModels.copyrightYear.readonly')
-
-          +field('* Copyright Expiration','contributorDetails.copyrightExpirationDate', 'formModels.copyrightExpirationDate')
-            select(id='contributorDetails.copyrightExpirationDate',ng-model='contributorDetails.copyrightExpirationDate', ng-options='c for c in copyrightExpirationDateDataProvider | filter:copyrightExpirationDateFilter', style='width:170px;', ng-disabled='formModels.copyrightExpirationDate.readonly')
-
-          +field('Website', 'contributorDetails.sourceUrl', 'formModels.sourceUrl')
-
-          br/
-
-          additional-copyright-information-for-profile(copyrights='contributorDetails.additionalCopyrights',
-          prompt='Does this item contain any other copyrighted materials? E.g. book passage, image, etc.')
 
 
     .col-md-6

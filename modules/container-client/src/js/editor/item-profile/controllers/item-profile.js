@@ -154,7 +154,7 @@
       this.query = function(query) {
         $log.debug("query", query);
 
-        DataQueryService.query(topic, query.term, function(result) {
+        DataQueryService.query(topic, {searchTerm: query.term, fields:['subject']}, function(result) {
           $scope.queryResults[topic] = result;
           query.callback({
             results: result

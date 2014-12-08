@@ -193,9 +193,9 @@ describe('profile controller', function () {
 
     it("uses selected subject, category and sub-category to filter search results", function () {
       makeProfileController();
-      scope.standardsAdapter.subjectOption = "subject";
-      scope.standardsAdapter.categoryOption = "category";
-      scope.standardsAdapter.subCategoryOption = "subCategory";
+      scope.standardFilterOption.subject = "subject";
+      scope.standardFilterOption.category = "category";
+      scope.standardFilterOption.subCategory = "subCategory";
       scope.standardsAdapter.query({
         term: "searchterm", callback: function () {
         }

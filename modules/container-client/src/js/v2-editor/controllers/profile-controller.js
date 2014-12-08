@@ -313,12 +313,11 @@
     }, true); //watch nested properties
 
     function createStandardQuery(searchText) {
-      return JSON.stringify(
-        StandardQueryCreator.createStandardQuery(
+      return StandardQueryCreator.createStandardQuery(
           searchText,
           $scope.standardFilterOption.subject,
           $scope.standardFilterOption.category,
-          $scope.standardFilterOption.subCategory));
+          $scope.standardFilterOption.subCategory);
     }
 
     $scope.standardsAdapter = {
@@ -386,7 +385,7 @@
 
       var results = [];
       _.forEach(dotNotations, function(dotNotation) {
-          DataQueryService.query('standards', JSON.stringify({searchTerm: dotNotation, fields: ['dotNotation']}),
+          DataQueryService.query('standards', {searchTerm: dotNotation, fields: ['dotNotation']},
             function(item) {
               results.push(item[0]);
               if (dotNotations.length === results.length) {
@@ -440,7 +439,7 @@
 
       this.query = function(query) {
         DataQueryService.query(topic,
-          JSON.stringify({searchTerm: query.term, fields:['subject']}),
+          {searchTerm: query.term, fields:['subject']},
           function(result) {
             query.callback({
               results: result
@@ -462,7 +461,7 @@
       var subject = parts[1];
       DataQueryService.query(
         topic,
-        JSON.stringify({filters:[{field:'category', value:category},{field:'subject', value:subject}]}),
+        {filters:[{field:'category', value:category},{field:'subject', value:subject}]},
         function(item) {
           callback(item[0]);
         });
