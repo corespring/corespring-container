@@ -1,9 +1,10 @@
-mixin h_form
-  form.form-horizontal(role='form')
+mixin form(cssClass)
+  form(role='form', class=cssClass)
     block
+  br/
 
-mixin form
-  form(role='form')
+mixin h_form
+  +form('form-horizontal')
     block
 
 mixin field(label, ngModel)
@@ -84,16 +85,21 @@ script(type='text/ng-template', id='/templates/profile')
             ul
               li(ng-repeat='type in componentTypes') {{type}}
 
-        br/
-
         +h_form
           h6 Add the Standards
-          +field('Subject', 'standardAdapter.subjectOption')
-            select(id='standardAdapter.subjectOption', ng-model='standardAdapter.subjectOption', ng-options='c.name for c in standardsTree')
-          +field('Category','standardAdapter.categoryOption')
-            select(id='standardAdapter.categoryOption', ng-model='standardAdapter.categoryOption', ng-options='p.name for p in standardAdapter.subjectOption.items')
-          +field('Sub-Category','standardAdapter.subCategoryOption')
-            select(id='subCategoryOption',ng-model='standardAdapter.subCategoryOption', ng-options='z for z in standardAdapter.categoryOption.items')
+          +field('Subject', 'standardFilterOption.subject')
+
+            select(id='standardFilterOption.subject', ng-model='standardFilterOption.subject', ng-options='c.name for c in standardsTree')
+              option(value='') {{standardFilterPlaceholder.subject}}
+
+          +field('Category','standardFilterOption.category')
+            select(id='standardFilterOption.category', ng-model='standardFilterOption.category', ng-options='p.name for p in standardFilterOption.subject.items')
+              option(value='') {{standardFilterPlaceholder.category}}
+
+          +field('Sub-Category','standardFilterOption.subCategory')
+            select(id='standardFilterOption.subCategory',ng-model='standardFilterOption.subCategory', ng-options='z for z in standardFilterOption.category.items')
+              option(value='') {{standardFilterPlaceholder.subCategory}}
+
           +field('Standards','profile.standards')
             input(id='profile.standards', type='text', ui-select2='standardsAdapter', ng-model='profile.standards', style='width: 100%;')
 
@@ -101,18 +107,27 @@ script(type='text/ng-template', id='/templates/profile')
             +field2('Lexile Score', 'profile.lexile', 'formModels.lexile')
               input.form-control(id='profile.lexile', ng-model='profile.lexile', ng-readonly='formModels.lexile.readonly')
               span.measure L
-        br/
 
-        +h_form
-          h6 Other Alignments
+        +form('form-horizontal depth-of-knowledge')
+          h6 Depth Of Knowledge
 
-          +field2('Depth Of Knowledge','otherAlignments.depthOfKnowledge', 'formModels.depthOfKnowledge')
-            select(id='otherAlignments.depthOfKnowledge', ng-model='otherAlignments.depthOfKnowledge', ng-options='c.key as c.value for c in depthOfKnowledgeDataProvider | filter:depthOfKnowledgeFilter', ng-disabled='formModels.depthOfKnowledge.readonly')
+          label(ng-repeat='c in depthOfKnowledgeDataProvider | filter:depthOfKnowledgeFilter')
+            input(type='radio',
+            ng-model='otherAlignments.depthOfKnowledge',
+            ng-disabled='formModels.depthOfKnowledge.readonly',
+            value='{{c.key}}')
+            | {{ c.value }}
 
-          +field2('Bloom\'s Taxonomy', 'otherAlignments.bloomsTaxonomy', 'formModels.bloomsTaxonomy')
-            select(id='otherAlignments.bloomsTaxonomy', ng-model='otherAlignments.bloomsTaxonomy', ng-options='c.key as c.value for c in bloomsTaxonomyDataProvider | filter:bloomsTaxonomyFilter', ng-disabled='formModels.bloomsTaxonomy.readonly')
 
-        br/
+        +form('form-horizontal blooms-taxonomy')
+          h6 Bloom's Taxonomy
+
+          label(ng-repeat='c in bloomsTaxonomyDataProvider | filter:bloomsTaxonomyFilter')
+            input(type='radio',
+            ng-model='otherAlignments.bloomsTaxonomy',
+            ng-disabled='formModels.bloomsTaxonomy.readonly',
+            value='{{c.key}}')
+            | {{ c.value }}
 
         +h_form
           h6 Key Skills
@@ -127,7 +142,6 @@ script(type='text/ng-template', id='/templates/profile')
                 ng-readonly='formModels.keySkills.readonly',
                 style='width:100%;')
                 option(ng-repeat="c in skills.list | filter:keySkillsSubListFilter",value="{{c}}") {{c}}
-        br/
 
         +h_form
           h6 History
@@ -144,8 +158,6 @@ script(type='text/ng-template', id='/templates/profile')
               input(type='checkbox',ng-model='rp.selected',ng-change='onChangeReviewsPassed(rp.key)',style='margin-right: 3px;')
               | {{rp.key}}
               input(ng-if='"Other" === rp.key', ng-show='rp.selected', style='margin-left:10px;', type='text', placeholder='Enter review...', ng-model='profile.reviewsPassedOther')
-
-        br/
 
         +h_form
           h6 Ownership

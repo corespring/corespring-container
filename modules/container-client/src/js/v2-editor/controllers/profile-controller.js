@@ -285,48 +285,64 @@
       $scope.standardsTree = result;
     });
 
+    $scope.standardFilterOption = {
+      subject: {},
+      category: {},
+      subCategory: {}
+    };
+
+    $scope.standardFilterPlaceholder = {
+      subject: 'Choose one',
+      category: 'Choose one',
+      subCategory: 'Choose one'
+    };
+
+    $scope.$watch('standardFilterOption', function(options){
+      if(!options.subject){
+        options.subject = {items:[]};
+      }
+      if(_.isEmpty(options.subject.items)){
+        options.category = {items:[]};
+      }
+      if(_.isEmpty(options.category.items)){
+        options.subCategory = {items:[]};
+      }
+
+      $scope.standardFilterPlaceholder.category = _.isEmpty(options.subject.items) ? 'Not assigned' : 'Choose one';
+      $scope.standardFilterPlaceholder.subCategory = _.isEmpty(options.category.items)? 'Not assigned' : 'Choose one';
+    }, true); //watch nested properties
+
     function createStandardQuery(searchText) {
       return JSON.stringify(
         StandardQueryCreator.createStandardQuery(
           searchText,
-          $scope.standardsAdapter.subjectOption,
-          $scope.standardsAdapter.categoryOption,
-          $scope.standardsAdapter.subCategoryOption));
+          $scope.standardFilterOption.subject,
+          $scope.standardFilterOption.category,
+          $scope.standardFilterOption.subCategory));
     }
 
     $scope.standardsAdapter = {
-      subjectOption: {},
-      categoryOption: {},
-      subCategoryOption: {},
       tags: [],
       allowClear: true,
       minimumInputLength: 1,
       placeholder: "Begin by typing a standard or skill.",
 
-      id: function(item) {
-        return item.id;
-      },
-
       getVal: function(element){
-        $log.warn('getVal', $(element).select2('val'));
         return $(element).select2('val');
       },
 
       query: function(query) {
-        $log.warn("standards query", query);
         DataQueryService.query("standards", createStandardQuery(query.term), function(results) {
           query.callback({
-            results: results
+            results: [{text:'',id:''}].concat(results)
           });
         });
       },
 
       initSelection: function(element, callback) {
-        $log.warn("standards initSelection", this);
         var val = this.getVal(element);
         var ids = val.split(',');
         var results = [];
-        $log.log("standards initSelection", val, ids);
         _.forEach(ids, function(id) {
           DataQueryService.findOne("standards", id, function success(item) {
             results.push(item);
@@ -357,6 +373,8 @@
       }
     };
 
+    $scope.standardsAdapter.initSelection = $scope.standardsAdapter.initSelection.bind($scope.standardsAdapter);
+
     /**
      * The config contains an array of standards in dotNotation.
      * For each item we need to load the full standard object
@@ -377,8 +395,6 @@
             });
       });
     }
-
-    $scope.standardsAdapter.initSelection = $scope.standardsAdapter.initSelection.bind($scope.standardsAdapter);
 
     function containsLiteracyStandard(standards) {
       return null != _.find(standards, function(item) {
