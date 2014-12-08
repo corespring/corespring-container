@@ -322,6 +322,18 @@
           $scope.standardFilterOption.subCategory);
     }
 
+    function filterStandardsByConfig(standards){
+      var options = $scope.formModels.standards.options;
+      if(!_.isArray(options)){
+        return standards;
+      }
+
+      return _.filter(standards, function(item){
+        return -1 !== _.indexOf(options, item.dotNotation);
+      });
+    }
+
+
     $scope.standardsAdapter = {
       tags: [],
       allowClear: true,
@@ -335,7 +347,7 @@
       query: function(query) {
         DataQueryService.query("standards", createStandardQuery(query.term), function(results) {
           query.callback({
-            results: [{text:'',id:''}].concat(results)
+            results: filterStandardsByConfig(results)
           });
         });
       },
@@ -421,6 +433,7 @@
         return;
       }
 
+      //As per request from Gwen we only display the name, not the count
       function simpleFormat(name, count) {
         return name;
       }
@@ -435,16 +448,27 @@
     // subject and related subject
     //----------------------------------------------------------------
 
-    function Select2Adapter(topic, formatFunc) {
+    function Select2Adapter(topic, formatFunc, formModel) {
+
       this.formatResult = formatFunc;
       this.formatSelection = formatFunc;
+
+      function filterSubjectsByConfig(subjects){
+        var options = formModel.options;
+        if(!_.isArray(options)){
+          return subjects;
+        }
+        return _.filter(subjects, function(item){
+          return -1 !== _.indexOf(options, item.category + ":" + item.subject);
+        });
+      }
 
       this.query = function(query) {
         DataQueryService.query(topic,
           {searchTerm: query.term, fields:['subject']},
           function(result) {
             query.callback({
-              results: result
+              results: filterSubjectsByConfig(result)
             });
           });
       };
@@ -454,8 +478,8 @@
       return s.category + ": " + s.subject;
     }
 
-    $scope.primarySubjectSelect2Adapter = new Select2Adapter("subjects.primary", subjectText);
-    $scope.relatedSubjectSelect2Adapter = new Select2Adapter("subjects.related", subjectText);
+    $scope.primarySubjectSelect2Adapter = new Select2Adapter("subjects.primary", subjectText, $scope.formModels.primarySubject);
+    $scope.relatedSubjectSelect2Adapter = new Select2Adapter("subjects.related", subjectText, $scope.formModels.relatedSubject);
 
     function findSubjectByCategorySubject(topic, categorySubject, callback){
       var parts = categorySubject.split(":");

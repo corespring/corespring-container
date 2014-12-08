@@ -818,6 +818,28 @@ describe('profile controller', function () {
           expect(actual).toEqual(keyValueList(["01","03"]));
         });
       });
+      describe("primarySubject", function(){
+        it("should not change dataProvider, when options are not defined", function(){
+          delete scope.formModels.primarySubject.options;
+          var inputData = [{subject:'A', category:'A'},{subject:'B', category:'B'}];
+          mockDataQueryService.queryResult = inputData;
+          var actualResult;
+          scope.primarySubjectSelect2Adapter.query({term:"some term", callback: function(result){
+            actualResult = result;
+          }});
+          expect(actualResult).toEqual({results:inputData});
+        });
+        it("should remove items which are not in both, dataProvider and options", function(){
+          scope.formModels.primarySubject.options = ['A:B','Something:Else'];
+          var inputData = [{category:'A', subject:'B'},{category:'C', subject:'D'}];
+          mockDataQueryService.queryResult = inputData;
+          var actualResult;
+          scope.primarySubjectSelect2Adapter.query({term:"some term", callback: function(result){
+            actualResult = result;
+          }});
+          expect(actualResult).toEqual({results:[{category:'A',subject:'B'}]});
+        });
+      });
       describe("priorGradeLevel", function(){
         it("should not change dataProvider, when options are not defined", function(){
           delete scope.formModels.priorGradeLevel.options;
@@ -840,6 +862,50 @@ describe('profile controller', function () {
           scope.formModels.priorUse.options = ["one","two","not in dataProvider"];
           var actual = _.filter(keyValueList(["one", "two", "three"]), scope.priorUseFilter);
           expect(actual).toEqual(keyValueList(["one","two"]));
+        });
+      });
+      describe("relatedSubject", function(){
+        it("should not change dataProvider, when options are not defined", function(){
+          delete scope.formModels.relatedSubject.options;
+          var inputData = [{subject:'A', category:'A'},{subject:'B', category:'B'}];
+          mockDataQueryService.queryResult = inputData;
+          var actualResult;
+          scope.relatedSubjectSelect2Adapter.query({term:"some term", callback: function(result){
+            actualResult = result;
+          }});
+          expect(actualResult).toEqual({results:inputData});
+        });
+        it("should remove items which are not in both, dataProvider and options", function(){
+          scope.formModels.relatedSubject.options = ['A:B','Something:Else'];
+          var inputData = [{category:'A', subject:'B'},{category:'C', subject:'D'}];
+          mockDataQueryService.queryResult = inputData;
+          var actualResult;
+          scope.relatedSubjectSelect2Adapter.query({term:"some term", callback: function(result){
+            actualResult = result;
+          }});
+          expect(actualResult).toEqual({results:[{category:'A',subject:'B'}]});
+        });
+      });
+      describe("standards", function(){
+        it("should not change dataProvider, when options are not defined", function(){
+          delete scope.formModels.standards.options;
+          var inputData = [{dotNotation:'A'},{dotNotation:'B'}];
+          mockDataQueryService.queryResult = inputData;
+          var actualResult;
+          scope.standardsAdapter.query({term:"some term", callback: function(result){
+            actualResult = result;
+          }});
+          expect(actualResult).toEqual({results:inputData});
+        });
+        it("should remove items which are not in both, dataProvider and options", function(){
+          scope.formModels.standards.options = ['A','Something'];
+          var inputData = [{dotNotation:'A'},{dotNotation:'B'}];
+          mockDataQueryService.queryResult = inputData;
+          var actualResult;
+          scope.standardsAdapter.query({term:"some term", callback: function(result){
+            actualResult = result;
+          }});
+          expect(actualResult).toEqual({results:[{dotNotation:'A'}]});
         });
       });
     });
