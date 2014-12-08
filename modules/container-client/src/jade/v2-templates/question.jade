@@ -21,7 +21,7 @@ script(type="text/ng-template", id="/templates/question")
         button.pull-right.btn.btn-default(
           ng-click="togglePreview()",
           ng-class="{'btn-warning': !previewOn}")  
-          | {{previewOn ? 'Close' : 'Preview'}} Question 
+          | {{previewOn ? 'Close Preview' : 'Preview Question'}} 
           i.fa(ng-class="{'fa-toggle-left': previewOn, 'fa-toggle-right' : !previewOn}")
         button.pull-right.btn.btn-default(ng-click="scoring()") Scoring
 
@@ -29,7 +29,6 @@ script(type="text/ng-template", id="/templates/question")
 
       .row
         wiggi-wiz(
-          style="height: 600px;",
           formatting-display="dropdown",
           ng-model="item.xhtml",
           focus="true",

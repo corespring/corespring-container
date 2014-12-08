@@ -17,6 +17,20 @@
       }
     }
 
+    function getName(supportingMaterials, index) {
+      if (supportingMaterials) {
+        var material = supportingMaterials[index];
+        var file = self.getSupportingMaterialFile(supportingMaterials, index);
+        if (file) {
+          return material.name;
+        } else {
+          return undefined;
+        }
+      } else {
+        return undefined;
+      }
+    }
+
     function lengthInUtf8Bytes(str) {
       var m;
       if (str) {
@@ -81,6 +95,11 @@
     this.getSupportingUrl = function(supportingMaterials, index) {
       return $sce.trustAsResourceUrl(getUrl(supportingMaterials, index));
     };
+
+    this.getSupportingName = function(supportingMaterials,index){
+      return $sce.trustAsResourceUrl(getName(supportingMaterials, index));
+    };
+
 
     this.getContentType = function(supportingMaterials, index) {
       var file = self.getSupportingMaterialFile(supportingMaterials, index);
