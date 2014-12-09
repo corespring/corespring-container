@@ -5,7 +5,7 @@
     * with basic controls such as Submit and Reset button
     */
   angular.module('corespring-player.directives')
-    .directive('extendedCorespringPlayer', ['$log', 'ComponentRegister', 'ClientSidePlayerService',
+    .directive('corespringDemoPlayer', ['$log', 'ComponentRegister', 'ClientSidePlayerService',
       function($log, ComponentRegister, ClientSidePlayerServiceDef) {
 
         var linkFn = function($scope) {
