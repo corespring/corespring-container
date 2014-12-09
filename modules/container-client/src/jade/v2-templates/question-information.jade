@@ -9,7 +9,7 @@ include ../v2-mixins/modal
                 a Question
               li(role='presentation',ng-class="{active: activeTab == 'profile'}",ng-click="selectTab('profile')")
                 a Profile Information
-              li(role='presentation')
+              li(role='presentation', ng-show='item.supportingMaterials.length > 0')
                 a.dropdown-toggle(data-toggle='dropdown')
                   | Supporting Materials
                   span.caret
@@ -20,12 +20,10 @@ include ../v2-mixins/modal
 
           .col-md-10
             .player-container(ng-if="activeTab == 'question'")
-              corespring-player(
-                player-mode="editor",
+              extended-corespring-player(
                 player-markup="item.xhtml",
                 player-item="item",
-                player-session="rootModel.session",
-                player-outcomes="outcome")
+                player-mode="playerMode")
 
             .profile(ng-if="activeTab == 'profile'")
               div(profile-preview="", ng-model="item")

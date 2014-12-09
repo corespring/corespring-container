@@ -7,7 +7,7 @@ angular.module('corespring-editor.controllers').controller('QuestionInformationP
   function($scope, LogFactory, $modal, SupportingMaterialsService, item) {
     $scope.item = item;
     $scope.activeTab = 'question';
-
+    $scope.playerMode = "gather";
     $scope.supportingMaterials = SupportingMaterialsService.getSupportingMaterialsByGroups(item.supportingMaterials);
 
     $scope.selectTab = function(tab) {
@@ -27,5 +27,6 @@ angular.module('corespring-editor.controllers').controller('QuestionInformationP
     $scope.getContentType = function() {
       return SupportingMaterialsService.getContentType(item.supportingMaterials, $scope.activeSmIndex);
     };
+
 
   }]);
