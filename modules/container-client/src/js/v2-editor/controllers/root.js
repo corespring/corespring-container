@@ -3,10 +3,13 @@ angular.module('corespring-editor.controllers')
     '$scope',
     '$state',
     'ComponentRegister',
+    'ConfigurationService',
     'ItemService',
     'LogFactory',
     'Msgr',
-    function ($scope, $state, ComponentRegister, ItemService, LogFactory, Msgr) {
+    function ($scope, $state, ComponentRegister, ConfigurationService, ItemService, LogFactory, Msgr) {
+
+      "use strict";
 
       var $log = LogFactory.getLogger('RootController');
       $log.debug('Root');
@@ -33,23 +36,14 @@ angular.module('corespring-editor.controllers')
         return max;
       }
 
-      $scope.onItemLoaded = function(item){
-        $scope.item = item;
-        preprocessComponents(item);
-        $scope.lastId = findLastId(item);
-        $scope.$broadcast('itemLoaded', item);
-      };
-
-      ItemService.load($scope.onItemLoaded, function () {
-        $log.error('error loading');
-      });
-
       $scope.$on('deleteSupportingMaterial', function (event, data) {
+
         function showFirstItem(){
           $state.transitionTo('supporting-materials', {
             index: 0
           }, {reload: true});
         }
+
         function deleteSupportingMaterial(index) {
           $scope.data.item.supportingMaterials.splice(index, 1);
 
@@ -74,6 +68,19 @@ angular.module('corespring-editor.controllers')
         }
       });
 
+      $scope.onItemLoadSuccess = function(item){
+        $scope.item = item;
+        preprocessComponents(item);
+        $scope.lastId = findLastId(item);
+        $scope.$broadcast('itemLoaded', item);
+      };
+
+      $scope.onItemLoadError = function(err){
+        $log.error('error loading', err);
+      };
+
+      ItemService.load($scope.onItemLoadSuccess, $scope.onItemLoadError);
+
       //----------------------------------------------------------------
       // startup
       //----------------------------------------------------------------
@@ -84,28 +91,19 @@ angular.module('corespring-editor.controllers')
       }
 
       if(isInIframe()) {
-        var editorOptions;
-
-        $scope.$on('getEditorOptions', function(evt){
-          evt.stopPropagation();
-          if (editorOptions) {
-            $scope.$broadcast('getEditorOptionsResult', editorOptions);
-          }
-        });
 
         Msgr.on('initialise', function (data) {
-          $log.warn('on initialise', data);
-          editorOptions = data;
-          $scope.$broadcast('getEditorOptionsResult', editorOptions);
+          $log.log('on initialise', data);
+          ConfigurationService.setConfig(data);
           Msgr.send('rendered');
         });
 
         //send msg "ready" to instance
         //this will result in msg "initialise" being sent back to us
-        $log.warn('sending ready');
+        $log.log('sending ready');
         Msgr.send('ready');
       } else {
-        $scope.$broadcast('getEditorOptionsResult', {});
+        ConfigurationService.setConfig({});
       }
 
     }
