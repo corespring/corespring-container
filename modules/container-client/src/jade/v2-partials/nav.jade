@@ -1,11 +1,6 @@
-mixin dropdown_btn(name)
-  li(role='presentation')
-    a(role='menuitem', tabindex='-1', ng-click="#{name}()")
-      block
-
 mixin info_btn(name)
-    a.btn.btn-info(ng-click="#{name}()")
-      block
+  a.btn.btn-info(ng-click="#{name}()")
+    block
 
 mixin tab(label, name)
   li(ui-sref-active="active")
@@ -28,17 +23,6 @@ include ../v2-templates/question-information
 nav.row.navbar-default(ng-controller="NavController")
   ul.list-inline
     li.title(ng-click="editTitle()") {{title}}
-    li.dropdown
-      button.btn.btn-default.dropdown-toggle(type='button', data-toggle='dropdown')
-        | Actions
-        span.caret
-      ul.dropdown-menu(role='menu', aria-labelledby='dropdownMenu1')
-        +dropdown_btn('new') New
-        +dropdown_btn('open') Open...
-        +dropdown_btn('copy') Copy...
-        li.divider(role='presentation')
-        +dropdown_btn('archive') Archive...
-        +dropdown_btn('delete') Delete
     li
       span.save-msg(ng-switch on="saveStatus")
         span#saved(ng-switch-when="saved")
