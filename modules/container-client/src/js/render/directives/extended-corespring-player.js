@@ -102,7 +102,7 @@
              '    player-outcomes="outcome"',
              '    player-session="itemSession"></corespring-player>',
              '  <a class="pull-right btn btn-{{playerMode == \'gather\' ? \'info\' : \'danger\'}}" ng-click="submitOrReset()">',
-             '    {{playerMode == \'gather\' ? \'Submit\' : \'Reset\'}}',
+             '    {{playerMode == \'gather\' ? \'Submit Answer\' : \'Reset\'}}',
              '  </a>',
              '</div>'
           ].join("\n")
