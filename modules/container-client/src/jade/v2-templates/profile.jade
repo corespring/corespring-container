@@ -97,29 +97,41 @@ script(type='text/ng-template', id='/templates/profile')
           +field2('Grade Level', 'taskInfo.gradeLevel', 'formModels.gradeLevel')
             +select2GradeLevel('gradeLevelDataProvider | filter:gradeLevelFilter','Choose a grade level...','formModels.gradeLevel')
 
-          +field2('Item Types', '$qt', 'formModels.componentTypes')
-            ul
-              li(ng-repeat='type in componentTypes') {{type}}
+          .form-group(ng-show='formModels.componentTypes.visible && 0 < componentTypes.length')
+            label.col-sm-3.control-label Item Types
+            .col-sm-9
+              ul
+                li(ng-repeat='type in componentTypes') {{type}}
 
-        +h_form
-          h6 Add the Standards
-          +field('Subject', 'standardFilterOption.subject')
+        +h_form(ng-show='formModels.standards.visible')
+          div(ng-show='!formModels.standards.readonly')
+            h6 Add the Standards
+            +field('Subject', 'standardFilterOption.subject')
+              select(id='standardFilterOption.subject',
+              ng-model='standardFilterOption.subject',
+              ng-options='c.name for c in standardsTree')
+                option(value='') {{standardFilterPlaceholder.subject}}
 
-            select(id='standardFilterOption.subject', ng-model='standardFilterOption.subject', ng-options='c.name for c in standardsTree')
-              option(value='') {{standardFilterPlaceholder.subject}}
+            +field('Category','standardFilterOption.category')
+              select(id='standardFilterOption.category',
+              ng-model='standardFilterOption.category',
+              ng-options='p.name for p in standardFilterOption.subject.items')
+                option(value='') {{standardFilterPlaceholder.category}}
 
-          +field('Category','standardFilterOption.category')
-            select(id='standardFilterOption.category', ng-model='standardFilterOption.category', ng-options='p.name for p in standardFilterOption.subject.items')
-              option(value='') {{standardFilterPlaceholder.category}}
+            +field('Sub-Category','standardFilterOption.subCategory')
+              select(id='standardFilterOption.subCategory',
+              ng-model='standardFilterOption.subCategory',
+              ng-options='z for z in standardFilterOption.category.items')
+                option(value='') {{standardFilterPlaceholder.subCategory}}
 
-          +field('Sub-Category','standardFilterOption.subCategory')
-            select(id='standardFilterOption.subCategory',ng-model='standardFilterOption.subCategory', ng-options='z for z in standardFilterOption.category.items')
-              option(value='') {{standardFilterPlaceholder.subCategory}}
+            +field('Standards','profile.standards')
+              input(id='profile.standards',
+              type='text',
+              ui-select2='standardsAdapter',
+              ng-model='profile.standards',
+              style='width: 100%;')
 
-          +field('Standards','profile.standards')
-            input(id='profile.standards', type='text', ui-select2='standardsAdapter', ng-model='profile.standards', style='width: 100%;')
-
-          hr/
+            hr/
 
           h6 Standards
 
@@ -151,26 +163,23 @@ script(type='text/ng-template', id='/templates/profile')
                 value='{{c.key}}')
                 | {{ c.value }}
 
-
           +panelHeader("KeySkills","formModels.keySkills")
             span(ng-bind-html-unsafe="keySkillsTitle")
           +panelBody("KeySkills")
             .panel-body
-              .form-group(ng-repeat='skills in keySkillsDataProvider | filter:keySkillsFilter')
-                label.col-sm-3.control-label {{skills.header}}
-                .col-sm-9
-                  select(
-                    ng-model='keySkills[skills.header]',
-                    ui-select2='',
-                    multiple='',
-                    data-placeholder='Choose one or more key skills...',
-                    ng-readonly='formModels.keySkills.readonly',
-                    style='width:100%;')
-                    option(ng-repeat="c in skills.list | filter:keySkillsSubListFilter",value="{{c}}") {{c}}
+              +field("Skills", "keySkills")
+                select(id='keySkills',
+                ng-model='otherAlignments.keySkills',
+                ui-select2,
+                multiple,
+                data-placeholder='Choose one or more key skills...',
+                ng-readonly='formModels.keySkills.readonly',
+                style='width:100%;')
+                  option(ng-repeat="c in keySkillsDataProvider | filter:keySkillsFilter ",value="{{c.key}}") {{c.value}}
 
           +panel("LexileScore", "Lexile Score", "formModels.lexile")
             .panel-body.lexile
-              +field('Lexile Score', 'profile.lexile')
+              +field('Lexile Score', 'lexile')
                 input.form-control(id='profile.lexile', ng-model='profile.lexile',
                 ng-readonly='formModels.lexile.readonly')
                 span.measure L
@@ -184,10 +193,10 @@ script(type='text/ng-template', id='/templates/profile')
                 select(id='profile.priorUse',
                   ng-model='profile.priorUse',
                   ng-options='c.key as c.value for c in priorUseDataProvider | filter:priorUseFilter',
-                  ng-disabled='formModels.depthOfKnowledge.readonly')
+                  ng-disabled='formModels.priorUse.readonly')
                   option(value='') Select ...
                 input(ng-show='isPriorUseOtherSelected', type='text', placeholder='Enter prior use...',
-                ng-model='profile.priorUseOther', ng-readonly='formModels.depthOfKnowledge.readonly')
+                ng-model='profile.priorUseOther', ng-readonly='formModels.priorUse.readonly')
 
               +field2('Grade Level', 'profile.priorGradeLevel', 'formModels.priorGradeLevel')
                 +select2GradeLevel('priorGradeLevelDataProvider | filter:priorGradeLevelFilter','Choose a grade level...','formModels.priorGradeLevel')
@@ -196,42 +205,49 @@ script(type='text/ng-template', id='/templates/profile')
             .panel-body
               +field('This item passed the following reviews', 'profile.reviewsPassed')
                 label(ng-repeat='rp in reviewsPassedDataProvider | filter:reviewsPassedFilter', style='width:50%;')
-                  input(type='checkbox',ng-model='rp.selected',ng-change='onChangeReviewsPassed(rp.key)',style='margin-right: 3px;')
+                  input(type='checkbox',
+                  ng-model='rp.selected',
+                  ng-change='onChangeReviewsPassed(rp.key)',
+                  style='margin-right: 3px;'
+                  ng-disabled='formModels.reviewsPassed.readonly',)
                   | {{rp.key}}
-                  input(ng-if='"Other" === rp.key', ng-show='rp.selected', style='margin-left:10px;', type='text',
-                  placeholder='Enter review...', ng-model='profile.reviewsPassedOther')
+
+                input(ng-show='isReviewsPassedOtherSelected', style='margin-left:50%', type='text',
+                placeholder='Enter review...', ng-model='profile.reviewsPassedOther',
+                ng-readonly='formModels.reviewsPassed.readonly')
 
         +h_form
           h6 Ownership
 
           +panel("CopyrightInformation", "Copyright Information", "formModels.copyrightInformationPanel")
             .panel-body
-              +field('* Author', 'contributorDetails.author', 'formModels.author')
+              +field2('* Author', 'contributorDetails.author', 'formModels.author')
 
-              +field('Credentials','contributorDetails.credentials', 'formModels.credentials')
+              +field2('Credentials','contributorDetails.credentials', 'formModels.credentials')
                 select(id='contributorDetails.credentials',ng-model='contributorDetails.credentials',
                 ng-options='c.key as c.value for c in credentialsDataProvider | filter:credentialsFilter',
                 ng-disabled='formModels.credentials.readonly')
                   option(value='') Select ...
+
                 input(id='contributorDetails.credentialsOther',ng-show='isCredentialsOtherSelected', type='text',
                 placeholder='Enter credentials...', ng-model='contributorDetails.credentialsOther',
                 ng-readonly='formModels.credentials.readonly')
 
-              +field('* Copyright Owner','contributorDetails.copyrightOwner', 'formModels.copyrightOwner')
+              +field2('* Copyright Owner','contributorDetails.copyrightOwner', 'formModels.copyrightOwner')
 
-              +field('* Copyright Year','contributorDetails.copyrightYear', 'formModels.copyrightYear')
+              +field2('* Copyright Year','contributorDetails.copyrightYear', 'formModels.copyrightYear')
                 select(id='contributorDetails.copyrightYear',ng-model='contributorDetails.copyrightYear',
                 ng-options='c for c in copyrightYearDataProvider | filter:copyrightYearFilter', style='width:170px;',
                 ng-disabled='formModels.copyrightYear.readonly')
                   option(value='') Select ...
 
-              +field('* Copyright Expiration','contributorDetails.copyrightExpirationDate', 'formModels.copyrightExpirationDate')
+              +field2('* Copyright Expiration','contributorDetails.copyrightExpirationDate', 'formModels.copyrightExpirationDate')
                 select(id='contributorDetails.copyrightExpirationDate',ng-model='contributorDetails.copyrightExpirationDate',
                 ng-options='c for c in copyrightExpirationDateDataProvider | filter:copyrightExpirationDateFilter',
                 style='width:170px;', ng-disabled='formModels.copyrightExpirationDate.readonly')
                   option(value='') Select ...
 
-              +field('Website URL', 'contributorDetails.sourceUrl', 'formModels.sourceUrl')
+              +field2('Website URL', 'contributorDetails.sourceUrl', 'formModels.sourceUrl')
 
           +panel("AdditionalMediaCopyright", "Additional Media Copyright", "formModels.additionalCopyrights")
             .panel-body

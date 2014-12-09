@@ -65,10 +65,6 @@
         visible:true,
         readonly:false
       },
-      lexile: {
-        visible:true,
-        readonly:false
-      },
       //--------------------
       depthOfKnowledge: {
         visible:true,
@@ -79,6 +75,10 @@
         readonly:false
       },
       keySkills: {
+        visible:true,
+        readonly:false
+      },
+      lexile: {
         visible:true,
         readonly:false
       },
@@ -118,7 +118,7 @@
       },
       credentials: {
         visible:true,
-        readonly:false
+        readonly:true
       },
       credentialsOther: {
         visible:true,
@@ -140,12 +140,13 @@
         visible:true,
         readonly:false
       },
-      licenseType: {
+      //--------------------
+      additionalCopyrights: {
         visible:true,
         readonly:false
       },
       //--------------------
-      additionalCopyrights: {
+      licenseType: {
         visible:true,
         readonly:false
       }
@@ -452,7 +453,7 @@
       $scope.componentTypes = ProfileFormatter.componentTypesUsed(
         $scope.item.components, $scope.availableComponents, simpleFormat);
 
-      $scope.formModels.componentTypes.visible = 0 < $scope.componentTypes.length;
+      //$scope.formModels.componentTypes.visible = 0 < $scope.componentTypes.length;
     }
 
     //----------------------------------------------------------------
@@ -482,6 +483,10 @@
               results: filterSubjectsByConfig(result)
             });
           });
+      };
+
+      this.initSelection = function(){
+        //keep this is to avoid exceptions in the single select
       };
     }
 
@@ -614,54 +619,18 @@
     // key skills
     //----------------------------------------------------------------
 
-    $scope.keySkillsFilter = function(item,index){
-      return _.some(item.list, $scope.keySkillsSubListFilter);
-    };
+    $scope.keySkillsFilter = createOptionsFilter($scope.formModels.keySkills);
 
-    $scope.keySkillsSubListFilter = function(item,index){
-      return true;
-    };
-
-    $scope.keySkills = {
-    };
-
-    function getKeySkills(){
-      var result = _.chain($scope.keySkills).values().flatten().value();
-      return result;
-    }
-
-    function initKeySkillsSelection(){
-      if($scope.otherAlignments && $scope.otherAlignments.keySkills && $scope.keySkillsDataProvider){
-        _.forEach($scope.keySkillsDataProvider, function(categoryItem){
-          var header = categoryItem.header;
-          var keySkillsList = $scope.keySkills[header] = $scope.keySkills[header] || [];
-          _.forEach(categoryItem.list, function(skill){
-            if(_.contains($scope.otherAlignments.keySkills, skill)){
-              if(!_.contains(keySkillsList,skill)){
-                keySkillsList.push(skill);
-              }
-            }
-          });
-        });
-      }
-    }
-
-    $scope.$watch('keySkills', function(newValue){
-      if($scope.otherAlignments){
-        $scope.otherAlignments.keySkills = getKeySkills();
+    $scope.$watch('otherAlignments.keySkills', function(newValue){
+      if( $scope.otherAlignments &&  $scope.otherAlignments.keySkills ) {
         $scope.keySkillsTitle = "<span class='key-skills'>Key Skills <span class='badge'>" + $scope.otherAlignments.keySkills.length + "</span> <span class='selected'>selected.</span></span>";
-
       }
-    }, true); //watch nested properties
+    });
 
     DataQueryService.list("keySkills", function (result) {
-      $scope.keySkillsDataProvider = _.map(result, function (k) {
-        return {
-          header: k.key,
-          list: k.value
-        };
-      });
-      initKeySkillsSelection();
+      $scope.keySkillsDataProvider = _.chain(result).pluck('value').flatten().sort().map(function(item){
+        return {key:item, value:item};
+      }).value();
     });
 
     //----------------------------------------------------------------
@@ -839,7 +808,6 @@
       $scope.profile = profile;
 
       initComponentTypesUsed();
-      initKeySkillsSelection();
       initReviewsPassedSelection();
       updateReviewsPassedOtherSelected();
       updatePriorUseOtherSelected();
