@@ -104,6 +104,15 @@ script(type='text/ng-template', id='/templates/profile')
 
           hr/
 
+          h6 Standards
+
+          .form-group(ng-repeat='c in standardGroups',class='standards')
+            .col-sm-3
+              image(src='c.imageSrc', ng-if='c.hasImage')
+              label(ng-if='!c.hasImage') {{ c.label }}
+            .col-sm-9
+              input(type='text', ui-select2='standardGroupsAdapter', ng-model='c.standards', style='width: 100%;')
+
         +form('form-horizontal depth-of-knowledge')
           h6 Depth Of Knowledge
 
@@ -145,7 +154,6 @@ script(type='text/ng-template', id='/templates/profile')
             input.form-control(id='profile.lexile', ng-model='profile.lexile', ng-readonly='formModels.lexile.readonly')
             span.measure L
         br/
-
 
         +h_form
           h6 Copyright Information

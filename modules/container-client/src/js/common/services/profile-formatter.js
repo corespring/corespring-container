@@ -38,7 +38,9 @@ angular.module('corespring-common.services')
             .map(function(count, componentType) {
               var title = getTitle(componentType);
               return formatFn(title, count);
-            }).sort().value();
+            })
+            .sort()
+            .value();
         };
 
         /**

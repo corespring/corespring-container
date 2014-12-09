@@ -8,6 +8,7 @@
       '$rootScope',
       '$scope',
       'throttle',
+      'ConfigurationService',
       'DataQueryService',
       'DesignerService',
       'ItemService',
@@ -22,6 +23,7 @@
     $rootScope,
     $scope,
     throttle,
+    ConfigurationService,
     DataQueryService,
     DesignerService,
     ItemService,
@@ -791,6 +793,7 @@
     //----------------------------------------------------------------
 
     function setItem(item) {
+      $log.log('setItem', item);
       $scope.item = item;
 
       var profile = item.profile = item.profile || {};
@@ -867,12 +870,18 @@
     $scope.loadProfile = function(){
       $log.log("loading profile");
       ItemService.load(function(item){
-        $log.log('item loading success hasItem:' + (!!item) + " hasProfile:" + (!!item && !!item.profile), item);
+        $log.log('item loading success hasItem:' + (!!item), item);
         if (item) {
-          setItem(item);
+          ConfigurationService.getConfig(function(config){
+            $log.log('getConfig callback', config);
+            updateFormModels(config.profileConfig);
+            setItem(item);
+          });
+        } else {
+          $log.error('error loading profile, item is null');
         }
-      },function(){
-        $log.error('error loading profile');
+      },function(err){
+        $log.error('error loading profile', err);
       });
     };
 
@@ -891,33 +900,8 @@
     // startup
     //----------------------------------------------------------------
 
-    /**
-     * We've been sent the options
-     * Next load the profile
-     */
-    $scope.$on('getEditorOptionsResult', function(evt, data){
-      if(data) {
-        updateFormModels(data.profileConfig);
-      }
-      $scope.loadProfile();
-    });
+    $scope.loadProfile();
 
-    /**
-     * In a full implementation the getEditorOptions event
-     * should be canceled before it reaches the rootScope,
-     * This is just to be able to run the editor without somebody answering
-     * with event "getEditorOptionsResult"
-     */
-    $rootScope.$on('getEditorOptions', function(){
-      $log.warn("broadcasting empty editor options from root scope.");
-      $scope.$broadcast("getEditorOptionsResult", {});
-    });
-
-    /**
-     * First try to get the options from somewhere above us
-     * Note: We rely on this event being answered with a getEditorOptionsResult event
-     */
-    $scope.$emit("getEditorOptions");
   }
 
 })();

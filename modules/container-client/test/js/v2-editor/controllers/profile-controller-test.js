@@ -15,7 +15,7 @@ describe('profile controller', function () {
   }
 
   function MockItemService() {
-    this.loadResult = {profile: {}};
+    this.loadResult = {};
 
     this.load = function (onSuccess) {
       onSuccess(_.cloneDeep(this.loadResult));
@@ -94,22 +94,33 @@ describe('profile controller', function () {
     };
   }
 
+  function MockConfigurationService(){
+    this.config = {};
+    this.getConfig = function(callback){
+      callback(this.config);
+      return this.config;
+    };
+  }
+
   beforeEach(angular.mock.module('corespring-editor.controllers'));
 
-  var mockLocation, mockDesignerService, mockItemService,
+  var mockLocation, mockDesignerService, mockItemService,mockConfigurationService,
     mockDataQueryService, mockProfileFormatter, mockStandardQueryCreator;
 
   beforeEach(function () {
     mockLocation = new MockLocation();
+    mockConfigurationService = new MockConfigurationService();
     mockDesignerService = new MockDesignerService();
     mockItemService = new MockItemService();
     mockDataQueryService = new MockDataQueryService();
     mockProfileFormatter = new MockProfileFormatter();
     mockStandardQueryCreator = new MockStandardQueryCreator();
 
+
     module(function ($provide) {
       $provide.value('$location', mockLocation)
       $provide.value('throttle', _.identity);
+      $provide.value('ConfigurationService', mockConfigurationService);
       $provide.value('DataQueryService', mockDataQueryService);
       $provide.value('DesignerService', mockDesignerService);
       $provide.value('ItemService', mockItemService);
@@ -161,13 +172,16 @@ describe('profile controller', function () {
 
     it('should init', function () {
       expect(ctrl).toNotBe(null);
+      expect(ctrl).toNotBe(undefined);
     });
 
     it("loads item on init", function () {
       expect(scope.item).toNotBe(null);
+      expect(scope.item).toNotBe(undefined);
     });
 
     it("initialises empty sub-properties", function () {
+      expect(scope.item.profile).toNotBe(null);
       expect(scope.item.profile.taskInfo).toEqual({subjects: {}});
       expect(scope.item.profile.otherAlignments).toEqual({keySkills: []});
       expect(scope.item.profile.contributorDetails).toEqual({
