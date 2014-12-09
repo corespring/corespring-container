@@ -386,13 +386,12 @@ describe('profile controller', function () {
 
     it("should init dataProvider", function () {
       makeProfileController();
-      expect(scope.keySkillsDataProvider).toEqual([{header:'categoryA', list:['skillA-1','skillA-2']},{header:'categoryB', list:['skillB-1','skillB-2']}]);
-    });
-
-    it("should init selection", function(){
-      mockItemService.loadResult = {profile:{otherAlignments:{keySkills:['skillA-1','skillB-2']}}};
-      makeProfileController();
-      expect(scope.keySkills).toEqual({categoryA:['skillA-1'],categoryB:['skillB-2']});
+      expect(scope.keySkillsDataProvider).toEqual([
+        {key:'skillA-1',value:'skillA-1'},
+        {key:'skillA-2',value:'skillA-2'},
+        {key:'skillB-1',value:'skillB-1'},
+        {key:'skillB-2',value:'skillB-2'},
+        ]);
     });
   });
 
