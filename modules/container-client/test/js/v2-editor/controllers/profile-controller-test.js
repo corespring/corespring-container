@@ -394,19 +394,6 @@ describe('profile controller', function () {
       makeProfileController();
       expect(scope.keySkills).toEqual({categoryA:['skillA-1'],categoryB:['skillB-2']});
     });
-
-    describe("getKeySkillsSummary", function () {
-      beforeEach(makeProfileController);
-      it("can handle zero key skills", function () {
-        expect(scope.getKeySkillsSummary([])).toEqual("No Key Skills selected")
-      });
-      it("can handle one key skill", function () {
-        expect(scope.getKeySkillsSummary([1])).toEqual("1 Key Skill selected")
-      });
-      it("can handle multiple key skills", function () {
-        expect(scope.getKeySkillsSummary([1, 2, 3])).toEqual("3 Key Skills selected")
-      });
-    });
   });
 
   describe('priorUse', function () {

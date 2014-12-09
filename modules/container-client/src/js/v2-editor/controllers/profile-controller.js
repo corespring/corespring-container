@@ -5,7 +5,6 @@
   angular.module('corespring-editor.controllers')
     .controller('ProfileController', [
       '$location',
-      '$rootScope',
       '$scope',
       'throttle',
       'ConfigurationService',
@@ -20,7 +19,6 @@
 
   function ProfileController(
     $location,
-    $rootScope,
     $scope,
     throttle,
     ConfigurationService,
@@ -35,8 +33,6 @@
 
     //----------------------------------------------------------------
     // Form configuration
-    // The form can be configured by passing the json encoded
-    // configuration as config={"title":{"value":"some title", "readonly":false, "visible":true}}
     //----------------------------------------------------------------
 
     $scope.formModels = {
@@ -87,6 +83,10 @@
         readonly:false
       },
       //--------------------
+      priorUsePanel: {
+        visible:true,
+        readonly:false
+      },
       priorUse: {
         visible:true,
         readonly:false
@@ -108,6 +108,10 @@
         readonly:false
       },
       //--------------------
+      copyrightInformationPanel: {
+        visible:true,
+        readonly:false
+      },
       author: {
         visible:true,
         readonly:false
@@ -133,6 +137,10 @@
         readonly:false
       },
       sourceUrl: {
+        visible:true,
+        readonly:false
+      },
+      licenseType: {
         visible:true,
         readonly:false
       },
@@ -253,6 +261,7 @@
       applyConfig(profile.contributorDetails, "copyrightYear");
       applyConfig(profile.contributorDetails, "copyrightExpirationDate");
       applyConfig(profile.contributorDetails, "sourceUrl");
+      applyConfig(profile.contributorDetails, "licenseType");
 
       applyConfig(profile.contributorDetails, "additionalCopyrights");
     }
@@ -640,6 +649,8 @@
     $scope.$watch('keySkills', function(newValue){
       if($scope.otherAlignments){
         $scope.otherAlignments.keySkills = getKeySkills();
+        $scope.keySkillsTitle = "<span class='key-skills'>Key Skills <span class='badge'>" + $scope.otherAlignments.keySkills.length + "</span> <span class='selected'>selected.</span></span>";
+
       }
     }, true); //watch nested properties
 
@@ -652,23 +663,6 @@
       });
       initKeySkillsSelection();
     });
-
-    $scope.getKeySkillsSummary = function(keySkills) {
-      var count = "No";
-      var skills = "Skills";
-
-      if (keySkills) {
-
-        if (0 < keySkills.length) {
-          count = keySkills.length;
-        }
-
-        if (1 === keySkills.length) {
-          skills = "Skill";
-        }
-      }
-      return count + " Key " + skills + " selected";
-    };
 
     //----------------------------------------------------------------
     // prior use
