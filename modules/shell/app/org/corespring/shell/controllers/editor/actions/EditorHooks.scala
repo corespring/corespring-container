@@ -24,21 +24,5 @@ trait EditorHooks extends ContainerEditorHooks {
 
   override def loadItem(id: String)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] = load(id)
 
-  override def createItem(implicit header: RequestHeader) = Future {
-
-    logger.debug("[createItem]")
-
-    val newItem = Json.obj(
-      "components" -> Json.obj(),
-      "metadata" -> Json.obj(
-        "title" -> JsString("New title")),
-      "xhtml" -> "<div></div>")
-
-    itemService.create(newItem).map {
-      oid =>
-        val item = newItem ++ Json.obj("_id" -> Json.obj("$oid" -> oid.toString))
-        Right(PlayerData(item))
-    }.getOrElse(Left(BAD_REQUEST -> "Error creating item"))
-  }
 
 }

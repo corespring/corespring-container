@@ -32,7 +32,6 @@ trait PlayerHooks extends ClientHooks {
 }
 
 trait EditorHooks extends ClientHooks {
-  def createItem(implicit header: RequestHeader): Future[Either[StatusMessage, PlayerData]]
 }
 
 trait CatalogHooks extends ClientHooks {
