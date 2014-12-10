@@ -35,8 +35,7 @@ trait ItemHooks extends ContainerItemHooks {
       val newItem = Json.obj(
         "components" -> Json.obj(),
         "profile" -> Json.obj("taskInfo" -> Json.obj("title" -> "Untitled")),
-        "metadata" -> Json.obj(
-          "title" -> JsString("Untitled")),
+        "metadata" -> Json.obj(),
         "xhtml" -> "<div></div>")
 
       itemService.create(newItem).map {
