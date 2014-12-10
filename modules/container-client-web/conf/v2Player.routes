@@ -59,6 +59,7 @@ GET           /editor/:itemId/supporting-material/:name/*file       @org.corespr
 GET           /editor/:itemId/*file                                 @org.corespring.container.client.controllers.Assets.item(itemId, file)
 POST          /editor/:itemId/*file                                 @org.corespring.container.client.controllers.Assets.upload(itemId, file)
 DELETE        /editor/:itemId/*file                                 @org.corespring.container.client.controllers.Assets.delete(itemId, file)
+GET           /dev-editor/:itemId/index.html                        @org.corespring.container.client.controllers.apps.DevEditor.load(itemId)
 
 GET           /data-query/:topic                                    @org.corespring.container.client.controllers.DataQuery.list(topic, query : Option[String] ?= None)
 GET           /data-query/:topic/:id                                @org.corespring.container.client.controllers.DataQuery.findOne(topic, id)

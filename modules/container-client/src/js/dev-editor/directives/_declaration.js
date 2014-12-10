@@ -1,0 +1,1 @@
+angular.module('corespring-dev-editor.directives', []);

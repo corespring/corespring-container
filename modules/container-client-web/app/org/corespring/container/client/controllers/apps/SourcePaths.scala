@@ -49,7 +49,7 @@ object SourcePaths {
 
     def prefixModule(p: String) = if (p.startsWith("//")) p else s"$prefix$p"
 
-    logger.debug(s"load json resource: $prefix, $r")
+    logger.info(s"load json resource: $prefix, $r")
 
     Play.resource(r).map { u: URL =>
       val bs = scala.io.Source.fromURL(u)
