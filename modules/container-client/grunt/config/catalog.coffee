@@ -25,7 +25,7 @@ exports.js =
   report: 'catalog-js-report.json'
 
 exports.css = 
-  src: ['css/catalog.css']
+  src: ['css/player.css','css/catalog.css']
   dest: 'css/catalog.min.css'
   libs: [
     'bower_components/font-awesome/css/font-awesome.min.css',
