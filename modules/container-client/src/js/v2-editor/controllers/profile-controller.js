@@ -352,10 +352,6 @@
       minimumInputLength: 1,
       placeholder: "Begin by typing a standard or skill.",
 
-      getVal: function(element){
-        return $(element).select2('val');
-      },
-
       query: function(query) {
         DataQueryService.query("standards", createStandardQuery(query.term), function(results) {
           query.callback({
@@ -365,17 +361,7 @@
       },
 
       initSelection: function(element, callback) {
-        var val = this.getVal(element);
-        var ids = val.split(',');
-        var results = [];
-        _.forEach(ids, function(id) {
-          DataQueryService.findOne("standards", id, function success(item) {
-            results.push(item);
-            if (ids.length === results.length) {
-              callback(results);
-            }
-          });
-        });
+        $log.warn("initSelection", element);
       },
 
       formatSelection: function(standard) {
@@ -427,9 +413,57 @@
       });
     }
 
+    function getStandardDomain(item){
+      if(item && item.uri) {
+        var parts = item.uri.toLowerCase().split('/');
+        while (parts.length > 0) {
+          var part = parts.shift();
+          if (part !== '' && part !== 'http:' && part !== 'https:') {
+            return part;
+          }
+        }
+      }
+      return 'standard';
+    }
+
+    function getImageUrlForStandardDomain(domain){
+      //TODO Get an official logo
+      return 'http://www.corestandards.org/wp-content/themes/corestandards/images/logo.png';
+    }
+
+    function getStandardsGroups(){
+      var results = [];
+      var groups = _.groupBy($scope.profile.standards, getStandardDomain);
+      _.forEach(groups, function(item,key){
+        $log.warn(item);
+        results.push({label:key, standards: _.map(item, function(s){
+          return {id: s.id, text: s.dotNotation};
+        }), imageUrl:getImageUrlForStandardDomain(key), hasImage:false});
+      });
+      return results;
+    }
+
     $scope.$watch('profile.standards', function(newValue, oldValue) {
-      $scope.isLiteracyStandardSelected = containsLiteracyStandard(newValue);
+      if($scope.profile && $scope.profile.standards) {
+        $scope.isLiteracyStandardSelected = containsLiteracyStandard(newValue);
+        $scope.standardsGroups = getStandardsGroups();
+      }
     });
+
+    $scope.$watch('standardsGroups', function(newValue, oldValue) {
+      if($scope.profile && $scope.profile.standards && $scope.standardsGroups) {
+        var newStandards = _.chain(newValue).pluck('standards').flatten().pluck('id').value();
+        var oldStandards = _.chain($scope.profile.standards).pluck('id').value();
+        if(newStandards.length < oldStandards.length) {
+          var dif = _.difference(oldStandards,newStandards);
+          _.remove($scope.profile.standards, function(item){
+            return item && _.contains(dif,item.id);
+          });
+        }
+      }
+    }, true); //watch nested properties
+
+
 
     //----------------------------------------------------------------
     // list of component types used in the item
@@ -452,9 +486,8 @@
 
       $scope.componentTypes = ProfileFormatter.componentTypesUsed(
         $scope.item.components, $scope.availableComponents, simpleFormat);
-
-      //$scope.formModels.componentTypes.visible = 0 < $scope.componentTypes.length;
     }
+
 
     //----------------------------------------------------------------
     // subject and related subject

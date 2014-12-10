@@ -106,41 +106,44 @@ script(type='text/ng-template', id='/templates/profile')
         +h_form(ng-show='formModels.standards.visible')
           div(ng-show='!formModels.standards.readonly')
             h6 Add the Standards
-            +field('Subject', 'standardFilterOption.subject')
-              select(id='standardFilterOption.subject',
-              ng-model='standardFilterOption.subject',
-              ng-options='c.name for c in standardsTree')
-                option(value='') {{standardFilterPlaceholder.subject}}
+            .row
+              .col-sm-6
+                +field('Subject', 'standardFilterOption.subject')
+                  select(id='standardFilterOption.subject',
+                  ng-model='standardFilterOption.subject',
+                  ng-options='c.name for c in standardsTree')
+                    option(value='') {{standardFilterPlaceholder.subject}}
 
-            +field('Category','standardFilterOption.category')
-              select(id='standardFilterOption.category',
-              ng-model='standardFilterOption.category',
-              ng-options='p.name for p in standardFilterOption.subject.items')
-                option(value='') {{standardFilterPlaceholder.category}}
+                +field('Category','standardFilterOption.category')
+                  select(id='standardFilterOption.category',
+                  ng-model='standardFilterOption.category',
+                  ng-options='p.name for p in standardFilterOption.subject.items')
+                    option(value='') {{standardFilterPlaceholder.category}}
 
-            +field('Sub-Category','standardFilterOption.subCategory')
-              select(id='standardFilterOption.subCategory',
-              ng-model='standardFilterOption.subCategory',
-              ng-options='z for z in standardFilterOption.category.items')
-                option(value='') {{standardFilterPlaceholder.subCategory}}
-
-            +field('Standards','profile.standards')
-              input(id='profile.standards',
-              type='text',
-              ui-select2='standardsAdapter',
-              ng-model='profile.standards',
-              style='width: 100%;')
-
+                +field('Sub-Category','standardFilterOption.subCategory')
+                  select(id='standardFilterOption.subCategory',
+                  ng-model='standardFilterOption.subCategory',
+                  ng-options='z for z in standardFilterOption.category.items')
+                    option(value='') {{standardFilterPlaceholder.subCategory}}
+              .col-sm-6
+                +field('Standards','profile.standards')
+                  input(id='standards',
+                  class='add-standards',
+                  type='text',
+                  ui-select2='standardsAdapter',
+                  ng-model='profile.standards',
+                  style='width: 100%;')
             hr/
 
           h6 Standards
 
-          .form-group(ng-repeat='c in standardGroups',class='standards')
+          .form-group(ng-repeat='c in standardsGroups',class='standards')
             .col-sm-3
-              image(src='{{c.imageSrc}}', ng-if='c.hasImage')
+              image(src='{{c.imageUrl}}', ng-if='c.hasImage')
               label(ng-if='!c.hasImage') {{ c.label }}
-            .col-sm-9
-              input(type='text', ui-select2='standardGroupsAdapter', ng-model='c.standards', style='width: 100%;')
+            .col-sm-9.no-input
+              input(type='hidden', multiple, ui-select2='{tags:[],dropdownCss:{display:"none"}}',
+              ng-model='c.standards', style='width: 100%;')
 
         +h_form
           h6 Other Alignments
