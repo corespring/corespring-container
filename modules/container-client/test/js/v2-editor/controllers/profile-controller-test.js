@@ -197,6 +197,11 @@ describe('profile controller', function () {
       expect(scope.item.profile.otherAlignments).toEqual(scope.otherAlignments);
       expect(scope.item.profile.contributorDetails).toEqual(scope.contributorDetails);
     });
+
+    it("should not call save after loading an item", function(){
+      scope.$apply();
+      expect(mockItemService.fineGrainedSaveCalls).toEqual([]);
+    });
   });
 
   describe("standards", function () {

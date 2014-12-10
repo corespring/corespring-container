@@ -361,7 +361,7 @@
       },
 
       initSelection: function(element, callback) {
-        $log.warn("initSelection", element);
+
       },
 
       formatSelection: function(standard) {
@@ -435,7 +435,6 @@
       var results = [];
       var groups = _.groupBy($scope.profile.standards, getStandardDomain);
       _.forEach(groups, function(item,key){
-        $log.warn(item);
         results.push({label:key, standards: _.map(item, function(s){
           return {id: s.id, text: s.dotNotation};
         }), imageUrl:getImageUrlForStandardDomain(key), hasImage:false});
@@ -862,6 +861,23 @@
     // profile load and save
     //----------------------------------------------------------------
 
+    $scope.$watch('item.profile', throttle(function(newValue, oldValue){
+      if(undefined === oldValue){
+        return;
+      }
+      if(_.isEqual(oldValue, newValue)) {
+        return;
+      }
+      $scope.saveProfile();
+    }), true); //watch nestedProperties
+
+    $scope.saveProfile = function() {
+      $log.log("saving profile");
+      ItemService.fineGrainedSave({'profile': $scope.item.profile}, function(result){
+        $log.log("profile saved result:", result);
+      });
+    };
+
     $scope.loadProfile = function(){
       $log.log("loading profile");
       ItemService.load(function(item){
@@ -877,17 +893,6 @@
         }
       },function(err){
         $log.error('error loading profile', err);
-      });
-    };
-
-    $scope.$watch('item.profile', throttle(function(oldValue, newValue){
-      $scope.saveProfile();
-    }), true); //watch nestedProperties
-
-    $scope.saveProfile = function() {
-      $log.log("saving profile");
-      ItemService.fineGrainedSave({'profile': $scope.item.profile}, function(result){
-        $log.log("profile saved result:", result);
       });
     };
 
