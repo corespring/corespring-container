@@ -103,8 +103,8 @@ describe('editor launcher', function () {
         corespringUrl: 'http://blah.com',
         paths: {create: {url: '/expected-create-url', method: 'expected-method'}}
       });
-      expect(actualAjaxOptions.success).toNotBe(null);
-      expect(actualAjaxOptions.error).toNotBe(null);
+      expect(actualAjaxOptions.success).not.toBe(null);
+      expect(actualAjaxOptions.error).not.toBe(null);
       expect(actualAjaxOptions.dataType).toEqual('json');
     });
 

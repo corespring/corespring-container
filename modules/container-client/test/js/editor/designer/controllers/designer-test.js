@@ -94,7 +94,7 @@ describe('designer controller', function() {
   }));
 
   it('should init', function() {
-    expect(ctrl).toNotBe(null);
+    expect(ctrl).not.toBe(null);
   });
 
 

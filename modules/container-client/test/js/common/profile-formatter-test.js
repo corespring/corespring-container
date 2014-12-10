@@ -9,7 +9,7 @@ describe('profile formatter', function() {
   }));
 
   it('should init', function() {
-    expect(formatter).toNotBe(null);
+    expect(formatter).not.toBe(null);
   });
 
   describe('all reviews passed', function() {

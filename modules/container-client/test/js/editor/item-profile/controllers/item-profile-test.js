@@ -85,7 +85,7 @@ describe('item-profile controller', function() {
   }));
 
   it('should init', function() {
-    expect(ctrl).toNotBe(null);
+    expect(ctrl).not.toBe(null);
   });
 
   it("should listen to itemLoaded events", function(){
@@ -112,7 +112,7 @@ describe('item-profile controller', function() {
     }];
 
     scope.primarySubjectAsync.query(query);
-    expect(queryResult).toNotBe(null);
+    expect(queryResult).not.toBe(null);
     expect(queryResult.length).toEqual(1);
     expect(queryResult[0]).toEqual(mockDataQueryService.results[0]);
   });
@@ -137,7 +137,7 @@ describe('item-profile controller', function() {
     }
 
     scope.primarySubjectAsync.initSelection(element, initCallback);
-    expect(foundSubject).toNotBe(undefined);
+    expect(foundSubject).not.toBe(undefined);
     expect(foundSubject).toEqual({
       id: "1",
       category: 'category',

@@ -12,7 +12,7 @@ describe('component data', function() {
   }));
 
   it('should init', function() {
-    expect(componentData).toNotBe(null);
+    expect(componentData).not.toBe(null);
   });
 
   function assertComponent(comp){

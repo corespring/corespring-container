@@ -10,7 +10,7 @@ describe('math format utils', function() {
 
   describe('formatting', function() {
     it('should init', function() {
-      expect(utils).toNotBe(null);
+      expect(utils).not.toBe(null);
     });
 
     //Note: can't test this in Phantom (works in Chrome) - disabled until the issue is resolved

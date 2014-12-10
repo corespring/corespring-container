@@ -32,7 +32,7 @@ describe('supporting materials service', function() {
 
 
   it('should init', function() {
-    expect(supportingMaterialsService).toNotBe(null);
+    expect(supportingMaterialsService).not.toBe(null);
   });
 
   describe('getSupportingMaterial', function() {

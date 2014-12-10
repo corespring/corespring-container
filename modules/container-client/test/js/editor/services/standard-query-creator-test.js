@@ -9,7 +9,7 @@ describe('standard query creator', function() {
   }));
 
   it('should init', function() {
-    expect(sut).toNotBe(null);
+    expect(sut).not.toBe(null);
   });
 
   it('should create query with subject field, if subject option is empty', function() {
@@ -29,7 +29,7 @@ describe('standard query creator', function() {
     var result = sut.createStandardQuery("test", {
       name: 'important subject'
     });
-    expect(result.fields).toNotContain("subject");
+    expect(result.fields).not.toContain("subject");
   });
 
   it('should create query without filters, if subject option is all', function() {

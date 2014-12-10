@@ -33,7 +33,7 @@ describe('component config', function() {
   }));
 
   it('should init', function() {
-    expect(config).toNotBe(null);
+    expect(config).not.toBe(null);
   });
 
   it('should return showTooltip', function() {
