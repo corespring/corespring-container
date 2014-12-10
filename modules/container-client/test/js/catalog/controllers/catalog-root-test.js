@@ -128,7 +128,7 @@ describe('catalog root controller', function() {
   }));
 
   xit('should init', function() {
-    expect(ctrl).toNotBe(null);
+    expect(ctrl).not.toBe(null);
   });
 
   xit('should set the depth of knowledge', function() {

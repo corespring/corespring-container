@@ -18,7 +18,7 @@ describe('componentWeights', function() {
 
     it('should init', function() {
       var elem = compile("<component-weights/>")(rootScope);
-      expect(elem).toNotBe(null);
+      expect(elem).not.toBe(null);
     });
 
     it('should sort components based on the layout', function() {

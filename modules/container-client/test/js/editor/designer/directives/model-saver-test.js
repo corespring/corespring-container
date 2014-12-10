@@ -12,7 +12,7 @@ describe('model saver', function() {
 
   it('should init', function() {
     var elem = compile("<model-saver/>")(rootScope);
-    expect(elem).toNotBe(null);
+    expect(elem).not.toBe(null);
   });
 
   it('should init', function() {

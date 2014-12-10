@@ -1,19 +1,86 @@
 describe('component data', function() {
 
-  /*var componentData;
+  var componentData;
 
+  beforeEach(angular.mock.module('corespring-player.services'));
+  beforeEach(angular.mock.module('corespring-common.services'));
   beforeEach(angular.mock.module('corespring-editor.services'));
-
-  beforeEach(function() {
-    module(function($provide) {
-    });
-  });
 
   beforeEach(inject(function(ComponentData) {
     componentData = ComponentData;
+    componentData.setModel({});
   }));
 
   it('should init', function() {
-    expect(componentData).toNotBe(null);
-  });*/
+    expect(componentData).not.toBe(null);
+  });
+
+  function assertComponent(comp){
+    expect(comp.compData).toBe('comp-data');
+    expect(comp.clean).toBe(true);
+    expect(comp.weight).toBe(1);
+  }
+
+  it('adding a component, merges the default data with the component data', function(){
+    componentData.setModel({});
+    var id = componentData.addComponentModel({compData: 'comp-data'});
+    var component = null;
+    componentData.registerPlaceholder(id, {
+      setComponent: function(obj){
+        component = obj;
+      }
+    });
+
+    assertComponent(component);
+  });
+
+  it('adding and removing components, gets the latest id available', function(){
+    var id = componentData.addComponentModel({compData: 'comp-data'});
+    expect(id).toBe(0);
+    var idTwo = componentData.addComponentModel({compData: 'comp-data'});
+    expect(idTwo).toBe(1);
+    componentData.deleteComponent(1);
+    var idThree = componentData.addComponentModel({compData: 'comp-data'});
+    expect(idThree).toBe(2);
+  });
+
+  it('restore component', function(){
+    var id = componentData.addComponentModel({compData: 'comp-data'});
+    expect(id).toBe(0);
+    componentData.deleteComponent(0);
+    var idThree = componentData.restoreComponent(0);
+
+    var restoredComp = null;
+    componentData.registerPlaceholder(0, {
+      setComponent: function(obj) {
+        restoredComp = obj;
+      }
+    });
+    assertComponent(restoredComp);
+  });
+
+  it('allows component registration', function(){
+    var id = componentData.addComponentModel({ compData: 'comp-data'});
+    var result = null;
+    var bridge = {
+      setDataAndSession: function(dataAndSession){
+        result = dataAndSession;
+      }
+    };
+    componentData.registerComponent(id, bridge);
+    expect(result).toEqual({data: { weight: 1, clean: true, compData: 'comp-data'}, session: {}});
+  });
+
+  it('allows component updates', function(){
+    var id = componentData.addComponentModel({ compData: 'comp-data'});
+    var result = null;
+    var bridge = {
+      setDataAndSession: function(dataAndSession){
+        result = dataAndSession;
+      }
+    };
+    componentData.registerComponent(id, bridge);
+    componentData.updateComponent(id, { clean: false, compData: 'new data'});
+    expect(result).toEqual({data: {clean: false, compData: 'new data'}, session : {}});
+  });
 });

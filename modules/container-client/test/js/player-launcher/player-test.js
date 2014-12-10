@@ -32,15 +32,15 @@ describe('player launcher', function() {
 
   function MockErrors(errs){
     this.errors = errs;
-    this.hasErrors = function(){ 
-      return this.errors && this.errors.length > 0; 
+    this.hasErrors = function(){
+      return this.errors && this.errors.length > 0;
     };
   }
 
   function MockWarnings(wrns){
     this.warnings = wrns;
-    this.hasWarnings = function(){ 
-      return this.warnings && this.warnings.length > 0; 
+    this.hasWarnings = function(){
+      return this.warnings && this.warnings.length > 0;
     };
   }
 
@@ -48,7 +48,7 @@ describe('player launcher', function() {
   var originalInstance = null;
   var lastError = null;
   var warnings = [];
-  
+
   var origWarn = window.console.warn;
 
 
@@ -94,8 +94,8 @@ describe('player launcher', function() {
   it('should invoke error callback if there are launcher-errors', function() {
     var player = create({
       mode: null
-      }, 
-      false, 
+      },
+      false,
       new MockErrors(["error one"])
     );
 
@@ -106,9 +106,9 @@ describe('player launcher', function() {
   it('should log warnings if there are warnings', function(){
     var player = create({
       mode: null
-      }, 
-      false, 
-      null, 
+      },
+      false,
+      null,
       new MockWarnings(['warning one'])
     );
     expect(warnings.length).toEqual(1);
@@ -137,7 +137,7 @@ describe('player launcher', function() {
       itemId: "1",
       paths: {}
     });
-    expect(player).toNotBe(null);
+    expect(player).not.toBe(null);
     expect(lastError).toBe(null);
   });
 
@@ -194,26 +194,27 @@ describe('player launcher', function() {
     }
 
     beforeEach(function() {
-      this.addMatchers({
-        toSucceed: function() {
-          var testResult = this.actual.do();
-          var pass = !testResult.lastError;
+
+      function mkCompareFn(expectSuccess, successMsg, failedMsg) {
+        return function(actual, expected){
+          var testResult = actual.do();
+          var pass = expectSuccess ? !testResult.lastError : testResult.lastError;
           var message = createModeChangeResultMessage(testResult) +
-            " " + (pass ? "succeeded" : "failed");
-          this.message = function() {
-            return message;
+            " " + (pass ? successMsg : failedMsg );
+          return { pass: pass, message: message};
+        };
+      }
+
+      jasmine.addMatchers({
+        toSucceed: function(util, customEqualityTesters) {
+          return {
+            compare: mkCompareFn(true, 'succeeded', 'failed')
           };
-          return pass;
         },
-        toFail: function() {
-          var testResult = this.actual.do();
-          var pass = testResult.lastError;
-          var message = createModeChangeResultMessage(testResult) +
-            " " + (pass ? "should have failed" : "did not fail as expected.");
-          this.message = function() {
-            return message;
+        toFail: function(util, customEqualityTesters) {
+          return {
+            compare: mkCompareFn(false, 'should have failed', 'did not fail as expected')
           };
-          return pass;
         }
       });
     });

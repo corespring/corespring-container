@@ -171,17 +171,17 @@ describe('profile controller', function () {
     beforeEach(makeProfileController);
 
     it('should init', function () {
-      expect(ctrl).toNotBe(null);
-      expect(ctrl).toNotBe(undefined);
+      expect(ctrl).not.toBe(null);
+      expect(ctrl).not.toBe(undefined);
     });
 
     it("loads item on init", function () {
-      expect(scope.item).toNotBe(null);
-      expect(scope.item).toNotBe(undefined);
+      expect(scope.item).not.toBe(null);
+      expect(scope.item).not.toBe(undefined);
     });
 
     it("initialises empty sub-properties", function () {
-      expect(scope.item.profile).toNotBe(null);
+      expect(scope.item.profile).not.toBe(null);
       expect(scope.item.profile.taskInfo).toEqual({subjects: {}});
       expect(scope.item.profile.otherAlignments).toEqual({keySkills: []});
       expect(scope.item.profile.contributorDetails).toEqual({

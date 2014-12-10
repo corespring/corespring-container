@@ -37,7 +37,7 @@ describe('component-player', function(){
 
   it('should init', function(){
     var elem = compile("<corespring-player/>")(rootScope);
-    expect(elem).toNotBe(null);
+    expect(elem).not.toBe(null);
   });
 
   it('should work with data', function(){

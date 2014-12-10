@@ -60,7 +60,7 @@ describe('supporting material controller', function() {
   }));
 
   it('should init', function() {
-    expect(ctrl).toNotBe(undefined);
+    expect(ctrl).not.toBe(undefined);
   });
 
   describe('formatKB', function() {
