@@ -647,10 +647,10 @@ describe('profile controller', function () {
 
       makeProfileController();
       _.forEach(keys,function(key){
-        var item = scope.formModels[key];
-        expect(item.visible).toEqual(true);
-        expect(item.readonly).toEqual(false);
-      });
+          var item = scope.formModels[key];
+          expect(key + ".visible " + item.visible).toEqual(key + ".visible " + true);
+          expect(key + ".readonly " + item.readonly).toEqual(key + ".readonly " + false);
+        });
     });
     describe("overrides values in profile", function(){
       beforeEach(function(){

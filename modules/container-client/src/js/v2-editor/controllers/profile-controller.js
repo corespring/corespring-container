@@ -118,7 +118,7 @@
       },
       credentials: {
         visible:true,
-        readonly:true
+        readonly:false
       },
       credentialsOther: {
         visible:true,
