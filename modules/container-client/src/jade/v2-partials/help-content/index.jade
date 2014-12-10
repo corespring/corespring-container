@@ -1,0 +1,146 @@
+.row.help
+  .col-md-3    
+    ul.nav.nav-pills.nav-stacked(role='tablist')  
+      // section
+      li
+        h3 Getting Started            
+      li.active(role='presentation')
+        a(href='#introduction', data-toggle='tab') Introduction
+      li(role='presentation')
+        a(href='#wysiwyg', data-toggle='tab') WYSIWYG Authoring
+      li(role='presentation')
+        a(href='#create-item', data-toggle='tab') Building a Question 
+      // section
+      li
+        h3 Rich Text Editor
+      li(role='presentation')
+        a(href='#rt-introduction', data-toggle='tab') Introduction
+      li(role='presentation')
+        a(href='#images', data-toggle='tab') Images
+      li(role='presentation')
+        a(href='#add-math', data-toggle='tab') LaTex and MathML
+      li(role='presentation')
+        a(href='#add-video', data-toggle='tab') Video 
+      li(role='presentation')
+        a(href='#add-interaction', data-toggle='tab') Interactions
+      // section    
+      li
+        h3 Interactions Library
+      li(role='presentation')
+        a(href='#interactions-introduction', data-toggle='tab') Introduction
+      li(role='presentation')
+        a(href='#multiple-choice', data-toggle='tab') Multiple Choice
+      li(role='presentation')
+        a(href='#short-answer', data-toggle='tab') Short Answer
+      li(role='presentation')
+        a(href='#fill-blank', data-toggle='tab') Short Answer - Drag & Drop Answer 
+      li(role='presentation')
+        a(href='#drop-down', data-toggle='tab') Short Answer - Select an Answer
+      li(role='presentation')
+        a(href='#open-ended', data-toggle='tab') Open Ended Answer
+      li(role='presentation')
+        a(href='#order', data-toggle='tab') Order
+      li(role='presentation')
+        a(href='#categorize', data-toggle='tab') Categorize
+      li(role='presentation')
+        a(href='#draw-lines', data-toggle='tab') Graph Lines
+      li(role='presentation')
+        a(href='#plot-points', data-toggle='tab') Plot Points
+      li(role='presentation')
+        a(href='#eval-expression', data-toggle='tab') Evaluate an Expression          
+      // section
+      li
+        h3 Feedback and Scoring
+      li(role='presentation')
+        a(href='#feedscore-introduction', data-toggle='tab') Introduction
+      li(role='presentation')
+        a(href='#feedback', data-toggle='tab') Adding Feedback
+      li(role='presentation')
+        a(href='#scoring', data-toggle='tab') Scoring a Question
+      // section
+      li
+        h3 Supporting Materials
+      li(role='presentation')
+        a(href='#sm-introduction', data-toggle='tab') Introduction
+      // section
+      li
+        h3 Profile
+      li(role='presentation')
+        a(href='#profile-introduction', data-toggle='tab') Introduction  
+      li(role='presentation')
+        a(href='#question-profile', data-toggle='tab') Question Profile
+      li(role='presentation')
+        a(href='#additional-data', data-toggle='tab') Organization Information    
+ 
+       
+  
+       
+                                             
+  .col-md-9
+    .tab-content
+      // section panels
+      #introduction.tab-pane.active(role='tabpanel')
+        include get-started/introduction
+      #wysiwyg.tab-pane(role='tabpanel')
+        include get-started/wysiwyg
+      #create-item.tab-pane(role='tabpanel')
+        include get-started/create-item 
+        
+      // section panels  
+      #rt-introduction.tab-pane(role='tabpanel')
+        include rich-text-editor/rt-introduction
+      #images.tab-pane(role='tabpanel')
+        include rich-text-editor/add-image
+      #add-math.tab-pane(role='tabpanel')
+        include rich-text-editor/add-math 
+      #add-video.tab-pane(role='tabpanel')
+        include rich-text-editor/add-video
+      #add-interaction.tab-pane(role='tabpanel')
+        include rich-text-editor/add-interaction  
+        
+      // section panels  
+      #interactions-introduction.tab-pane(role='tabpanel')
+        include interactions/interactions-introduction
+      #multiple-choice.tab-pane(role='tabpanel')
+        include interactions/multiple-choice
+      #short-answer.tab-pane(role='tabpanel')
+        include interactions/short-answer
+      #fill-blank.tab-pane(role='tabpanel')
+        include interactions/fill-blank
+      #drop-down.tab-pane(role='tabpanel')
+        include interactions/drop-down
+      #open-ended.tab-pane(role='tabpanel')
+        include interactions/open-ended
+      #order.tab-pane(role='tabpanel')
+        include interactions/order
+      #categorize.tab-pane(role='tabpanel')
+        include interactions/categorize
+      #draw-lines.tab-pane(role='tabpanel')
+        include interactions/draw-lines
+      #plot-points.tab-pane(role='tabpanel')
+        include interactions/plot-points
+      #eval-expression.tab-pane(role='tabpanel')
+        include interactions/eval-expression
+        
+      // section panels  
+      #feedscore-introduction.tab-pane(role='tabpanel')
+        include feedback-scoring/feedscore-introduction 
+      #feedback.tab-pane(role='tabpanel')
+        include feedback-scoring/feedback        
+      #scoring.tab-pane(role='tabpanel')
+        include feedback-scoring/scoring 
+        
+      // section panels  
+      #sm-introduction.tab-pane(role='tabpanel')
+        include support-materials/sm-introduction 
+        
+      // section panels  
+      #profile-introduction.tab-pane(role='tabpanel')
+        include profile/profile-introduction 
+      #question-profile.tab-pane(role='tabpanel')
+        include profile/question-profile        
+      #additional-data.tab-pane(role='tabpanel')
+        include profile/additional-data         
+      
+                                
+                                

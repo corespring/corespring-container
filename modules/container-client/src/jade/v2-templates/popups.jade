@@ -20,8 +20,8 @@ include ../v2-mixins/modal
 
 +ng_popup_template("help")
   +modal('Help', null, false)
-    p Coming soon..
-
+    // help content
+    include ../v2-partials/help-content/index
 +ng_popup_template("open")
   +modal('Open an Item')
     .dropdown
@@ -43,4 +43,3 @@ include ../v2-mixins/modal
         li.dropdown-header(role='presentation') Collection Name
         li(role='presentation')
           a(role='menuitem', tabindex='-1', href='#') Item 4
-
