@@ -60,14 +60,11 @@ angular.module('corespring-editor.controllers')
       });
 
       $scope.getUploadUrl = function(file) {
-        logger.log('getUploadUrl', arguments);
-        return file.name;
+        throw new Error('deprecated');
       };
 
       $scope.selectFile = function(file) {
-        logger.log('selectFile', 'root select file...');
-        $scope.selectedFile = file;
-        logger.log('selectFile', $scope.selectedFile);
+        throw new Error('deprecated');
       };
 
       $scope.$on('fileSizeGreaterThanMax', EditorConfig.onFileSizeGreaterThanMax);

@@ -69,7 +69,6 @@ describe('component data', function() {
     var update = changeWeight ? { 1: {componentType: 'a', weight: 1.5}} : comps;
     mockModal.simulateOk(update);
     expect(saveCalled).toBe(isCalled);
-
   }
 
   it('should not trigger a save if the weights change', function(){
