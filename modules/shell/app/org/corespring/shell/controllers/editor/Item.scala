@@ -34,6 +34,7 @@ trait ItemHooks extends ContainerItemHooks {
     Future {
       val newItem = Json.obj(
         "components" -> Json.obj(),
+        "profile" -> Json.obj("taskInfo" -> Json.obj("title" -> "Untitled")),
         "metadata" -> Json.obj(
           "title" -> JsString("Untitled")),
         "xhtml" -> "<div></div>")
