@@ -139,7 +139,7 @@ script(type='text/ng-template', id='/templates/profile')
 
           .form-group(ng-repeat='c in standardsGroups',class='standards')
             .col-sm-3
-              image(src='{{c.imageUrl}}', ng-if='c.hasImage')
+              image(ng-src='{{c.imageUrl}}', ng-if='c.hasImage')
               label(ng-if='!c.hasImage') {{ c.label }}
             .col-sm-9.no-input
               input(type='hidden', multiple, ui-select2='{tags:[],dropdownCss:{display:"none"}}',

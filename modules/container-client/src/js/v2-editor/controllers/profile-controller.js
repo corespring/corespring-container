@@ -427,17 +427,22 @@
     }
 
     function getImageUrlForStandardDomain(domain){
-      //TODO Get an official logo
-      return 'http://www.corestandards.org/wp-content/themes/corestandards/images/logo.png';
+      //TODO Get official logos
+      return 'images/standards/common-core.png';
     }
 
     function getStandardsGroups(){
       var results = [];
       var groups = _.groupBy($scope.profile.standards, getStandardDomain);
       _.forEach(groups, function(item,key){
-        results.push({label:key, standards: _.map(item, function(s){
-          return {id: s.id, text: s.dotNotation};
-        }), imageUrl:getImageUrlForStandardDomain(key), hasImage:false});
+        var imageUrl = getImageUrlForStandardDomain(key);
+        results.push({
+          label:key,
+          standards: _.map(item, function(s){
+            return {id: s.id, text: s.dotNotation};
+          }),
+          imageUrl:imageUrl,
+          hasImage:!!imageUrl});
       });
       return results;
     }
