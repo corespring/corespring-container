@@ -81,7 +81,7 @@ angular.module('corespring-editor.services')
           return this.addComponentModel(d);
         };
 
-        this.addComponentModel = function(defaultData){
+        this.addComponentModel = function(componentData){
           if(!componentModels){
             throw new Error('components aren\'t defined yet.');
           }
@@ -93,7 +93,7 @@ angular.module('corespring-editor.services')
             clean: true
           };
 
-          var newData = _.extend(defaults, _.cloneDeep(defaultData));
+          var newData = _.extend(defaults, _.cloneDeep(componentData));
           componentModels[id] = newData;
           return id;
         };
