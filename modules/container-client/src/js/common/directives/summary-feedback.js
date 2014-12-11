@@ -4,8 +4,6 @@ angular.module('corespring-common.directives')
 
     function link($scope,$element, $attrs){
 
-      console.log($scope.ngModel);
-
       $scope.isSummaryFeedbackOpen = false;
       $scope.toggleSummaryFeedbackOpen = function() {
         $scope.isSummaryFeedbackOpen = !$scope.isSummaryFeedbackOpen;
