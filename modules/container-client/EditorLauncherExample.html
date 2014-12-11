@@ -2,7 +2,8 @@
 <html>
 <head>
   <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-  <script type="text/javascript" src="http://corespring-app-branch-one.herokuapp.com/v2/player/client/editor-v2.js"></script>
+  <script type="text/javascript" src="http://corespring-app-branch-one.herokuapp.com/v2/player/editor-v2.js?secure=false&playerToken=644f903731038c90d1bd0842f6798b9ca29f08b65d2531d207e6016848743f1ca795d95f7700c0f72d8df916a6c7c58345d0affac6796e277111188ef4a9870fd0364a4a5a12e70aaec110506d4692db--bbcf7c7d7e163a70caf6822106ac4f84&apiClient=513f6927e4b0ca79ccd2484b"></script>
+
 
   <script type="text/javascript">
 
@@ -54,8 +55,7 @@
           //"State Department of Education Item Writer","Student","Teacher","Other"
         },
         credentialsOther: {
-          visible: true,
-          readonly: false,
+          //use this to define the value of the input if credentials is 'Other'
           value: "Some other credential"
         },
         depthOfKnowledge: {
@@ -120,8 +120,9 @@
         },
         primarySubject: {
           visible: true,
-          readonly: false,
-          value: "Art:Other"
+          readonly: false
+          //TODO: value and options for subjects not implemented yet
+          //value: "Art:Other"
           //options is an array like value with all the options that are allowed
         },
         priorGradeLevel: {
@@ -141,14 +142,14 @@
           //"Formative","Interim","Benchmark","Summative","International Benchmark","Other"
         },
         priorUseOther: {
-          visible: true,
-          readonly: false,
+          //use this to define the value of the input if priorUse is 'Other'
           value: "some other prior use"
         },
         relatedSubject: {
           visible: true,
-          readonly: false,
-          value: ["Art:Other", "English Language Arts:English Language Arts"]
+          readonly: false
+          //TODO: value and options for subjects not implemented yet
+          //value: ["Art:Other", "English Language Arts:English Language Arts"]
           //options is an array like value with all the options that are allowed
         },
         reviewsPassed: {
@@ -159,8 +160,7 @@
           //"Editorial","Bias","Fairness","Content","Psychometric","Other",
         },
         reviewsPassedOther: {
-          visible: true,
-          readonly: false,
+          //use this to define the value of the input if reviewsPassed is 'Other'
           value: "Other value for review passed"
         },
         sourceUrl: {
@@ -170,8 +170,9 @@
         },
         standards: {
           visible: true,
-          readonly: false,
-          value: ['W.3.1b', 'W.6.6']
+          readonly: false
+          //TODO: value and options for standards not implemented yet
+          //value: ['W.3.1b', 'W.6.6']
           //options is an array like value with all the options that are allowed
         },
         title: {
@@ -184,12 +185,14 @@
 
     $(document).ready(function () {
       console.log("document.ready: launching editor " + corespringEditorOptions);
+
       window.corespringEditor = new org.corespring.players.ItemEditor(
         '.player-holder',
         corespringEditorOptions,
         function onEditorError(error) {
-          console.error("error creating editor " + error);
+          console.error("error creating editor ", error);
         });
+
       console.log("created corespringEditor:", corespringEditor);
     });
 

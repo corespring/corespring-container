@@ -60,15 +60,22 @@ function EditorDefinition(element, options, errorCallback) {
     return options.paths[name];
   }
 
+  function makeUrl(url, queryParams) {
+    var Builder = require('url-builder');
+    return new Builder().build(url, queryParams);
+  }
+
   function createItem(options, onSuccess, onError) {
     var createCall = loadPaths(options, "create");
     if (!createCall) {
       return;
     }
 
+    var queryParams = require('query-params');
+
     $.ajax({
       type: createCall.method,
-      url: options.corespringUrl + createCall.url,
+      url: makeUrl(options.corespringUrl + createCall.url, queryParams),
       data: options,
       success: onSuccess,
       error: onError,
