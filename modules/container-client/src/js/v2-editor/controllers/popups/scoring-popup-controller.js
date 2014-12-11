@@ -18,7 +18,7 @@ angular.module('corespring-editor.controllers').controller('ScoringPopupControll
     }
 
     var logger = LogFactory.getLogger('ScoringPopupController');
-    
+
     $scope.components = components;
     $scope.componentSize = sizeToString(_.keys(components).length);
     $scope.xhtml = xhtml;
@@ -34,11 +34,7 @@ angular.module('corespring-editor.controllers').controller('ScoringPopupControll
 
     DesignerService.loadAvailableUiComponents(onComponentsLoaded, onComponentsLoadError);
 
-    $scope.ok = function(){
-      $modalInstance.close(components);
-    };
-
-    $scope.cancel = function(){
-      $modalInstance.dismiss();
+    $scope.close = function(){
+      $modalInstance.close();
     };
   }]);
