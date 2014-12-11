@@ -38,15 +38,16 @@ trait Editor
       "configuration" -> (ci.packageInfo \ "external-configuration").asOpt[JsObject])
   }
 
-  val servicesJs = {
+  def servicesJs(id: String): String = {
 
     val componentJson: Seq[JsValue] = interactions.map(toJson)
     val widgetJson: Seq[JsValue] = widgets.map(toJson)
 
     EditorServices(
-      "editor.services",
-      resourceRoutes.Item.load(":id"),
-      resourceRoutes.Item.save(":id"),
+      s"$context.services",
+      resourceRoutes.Item.load(id),
+      resourceRoutes.Item.save(id),
+      resourceRoutes.Item.fineGrainedSave(id),
       JsArray(componentJson),
       JsArray(widgetJson)).toString
   }
@@ -73,7 +74,7 @@ trait Editor
           domainResolvedJs,
           domainResolvedCss,
           jsSrc.ngModules ++ scriptInfo.ngDependencies,
-          servicesJs)))
+          servicesJs(itemId))))
     }
 
     hooks.loadItem(itemId).map { e => e.fold(onError, onItem) }

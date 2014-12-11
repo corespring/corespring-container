@@ -1,0 +1,45 @@
+include ../mixins/modal
+
++ng_popup_template("archive")
+  +modal('Archive Item')
+    p This feature isn't ready yet come back soon. 
+
++ng_popup_template("copy")
+  +modal('Copy Item', 'Ok')
+    label Enter a new question name:
+    input.form-control#title(type="text", placeholder="copy of Untitled Item")
+
++ng_popup_template("delete")
+  +modal('Delete Item')
+    | Are you sure you want to delete this item?
+
++ng_popup_template("edit-title")
+  +modal('Rename Question', 'Ok')
+    label Enter a new name:
+    input.form-control#title(type="text", ng-model="title", placeholder="copy of Untitled Item")
+
++ng_popup_template("help")
+  +modal('Help', null, false)
+    // help content
+    include ../partials/help-content/index
++ng_popup_template("open")
+  +modal('Open an Item')
+    .dropdown
+      button.btn.btn-default.dropdown-toggle(type='button', 
+      data-toggle='dropdown')
+        | Select an item to open
+        span.caret
+      ul.dropdown-menu(role='menu', aria-labelledby='dropdownMenu1')
+        li.dropdown-header(role='presentation') Collection Name
+        li(role='presentation')
+          a(role='menuitem', tabindex='-1', href='#') Item 1
+        li.divider(role='presentation')
+        li.dropdown-header(role='presentation') Collection Name
+        li(role='presentation')
+          a(role='menuitem', tabindex='-1', href='#') Item 2
+        li(role='presentation')
+          a(role='menuitem', tabindex='-1', href='#') Item 3
+        li.divider(role='presentation')
+        li.dropdown-header(role='presentation') Collection Name
+        li(role='presentation')
+          a(role='menuitem', tabindex='-1', href='#') Item 4

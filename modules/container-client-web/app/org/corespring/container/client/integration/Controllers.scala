@@ -43,9 +43,6 @@ trait EditorControllers extends CommonControllers with ResourceControllers {
   /** The editor */
   def editor: Editor
 
-  /** The editor */
-  def v2Editor: V2Editor
-
   /** icons are only used in the editor */
   def icons: Icons
 }
@@ -75,7 +72,6 @@ trait ContainerControllers
     rig,
     prodHtmlPlayer,
     editor,
-    v2Editor,
     catalog,
     icons,
     dataQuery)
