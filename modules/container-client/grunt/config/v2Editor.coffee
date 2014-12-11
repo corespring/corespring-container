@@ -50,7 +50,6 @@ exports.css =
 
 exports.ngModules = _.union(player.ngModules, [
   'ngAnimate',
-  'corespring-templates',
   'corespring-common.supporting-materials',
   'corespring-editor.services',
   'corespring-editor.controllers',
