@@ -1,15 +1,14 @@
-(function () {
-
-  angular.module('corespring-editor.controllers')
+angular.module('corespring-editor.controllers')
     .controller('ClientSidePreview', [
-      '$log',
-      '$scope',
-      'ComponentData',
-      'ClientSidePlayerService',
-      ClientSidePreview
-    ]);
-
-  function ClientSidePreview($log, $scope, ComponentData, ClientSidePlayerServiceDef) {
+    '$log',
+    '$scope',
+    'ComponentData',
+    'ClientSidePlayerService',
+    function ClientSidePreview(
+      $log,
+      $scope,
+      ComponentData,
+      ClientSidePlayerServiceDef) {
 
     $scope.playerMode = 'gather';
 
@@ -50,12 +49,6 @@
       return $scope.playerMode === 'gather';
     }
 
-    /*
-    $scope.$on('playerControlPanel.preview', function () {
-      $scope.$emit('launch-catalog-preview');
-    });
-    */
-
     $scope.$on('playerControlPanel.submit', function () {
       if (isGatherMode()) {
         submitSession();
@@ -63,8 +56,6 @@
         setMode('gather');
       }
     });
-
-    
 
     $scope.$on('playerControlPanel.reset', function () {
       if ($scope.session) {
@@ -77,24 +68,11 @@
       ComponentData.reset();
       setMode('gather');
     });
-    /* 
-    */
-
-    /*
-    $scope.$on('playerControlPanel.settingsChange', function () {
-      PlayerService.updateSessionSettings($scope.playerSettings);
-      if(isGatherMode()){
-        //nothing to do
-      } else {
-        submitSession();
-      }
-    });
-    */
 
     function submitSession() {
       var sessions = ComponentData.getSessions();
       PlayerService.submitSession({
-          components: sessions 
+          components: sessions
         },
         function (everything) {
           $scope.responses = everything.responses;
@@ -110,6 +88,4 @@
         });
     }
 
-  }
-
-}).call(this);
+}]);
