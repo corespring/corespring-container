@@ -1,6 +1,6 @@
 (function () {
 
-  angular.module('corespring-editor.services')
+  angular.module('corespring-common.services')
     .service('StandardQueryCreator',
     [
       '$log',
@@ -13,10 +13,9 @@
     this.createStandardQuery = function (searchText, subjectOption, categoryOption, subCategoryOption) {
       $log.debug("StandardQueryCreator.createStandardQuery", searchText, subjectOption, categoryOption, subCategoryOption);
 
-      function createQuery(searchTerm, fields) {
+      function createQuery(searchTerm) {
         var result = {
-          searchTerm: searchTerm,
-          fields: fields
+          searchTerm: searchTerm
         };
         return result;
       }
@@ -33,18 +32,16 @@
         if (isAllSelected(item)) {
           return false;
         }
-        query.filters = query.filters || [];
-        query.filters.push({field: field, value: item.name});
+        query.filters = query.filters || {};
+        query.filters[field] = item.name;
         return true;
       }
 
-      var fields = ['dotNotation', 'category', 'subCategory', 'standard'];
-
       if (isAllSelected(subjectOption)) {
-        return createQuery(searchText, ['subject'].concat(fields));
+        return createQuery(searchText);
       }
 
-      var query = createQuery(searchText, fields);
+      var query = createQuery(searchText);
 
       if (addFilterIfApplicable(subjectOption, query, "subject")) {
         if (addFilterIfApplicable(categoryOption, query, "category")) {

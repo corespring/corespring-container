@@ -397,7 +397,7 @@
 
       var results = [];
       _.forEach(dotNotations, function(dotNotation) {
-          DataQueryService.query('standards', {searchTerm: dotNotation, fields: ['dotNotation']},
+          DataQueryService.query('standards', {searchTerm: dotNotation},
             function(item) {
               results.push(item[0]);
               if (dotNotations.length === results.length) {
@@ -514,7 +514,7 @@
 
       this.query = function(query) {
         DataQueryService.query(topic,
-          {searchTerm: query.term, fields:['subject']},
+          {searchTerm: query.term},
           function(result) {
             query.callback({
               results: filterSubjectsByConfig(result)
@@ -540,7 +540,7 @@
       var subject = parts[1];
       DataQueryService.query(
         topic,
-        {filters:[{field:'category', value:category},{field:'subject', value:subject}]},
+        {filters:{'category':category,'subject':subject}},
         function(item) {
           callback(item[0]);
         });
