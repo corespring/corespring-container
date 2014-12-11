@@ -1,0 +1,29 @@
+extends layout
+
+block header-scripts
+  link(rel='stylesheet', href='/client/css/dev-editor.css')
+
+block content
+
+  .root(ng-controller="DevEditorRoot")
+    .header(style="position: fixed; top: 0;")
+      .col-md-6
+        h4 XHTML
+      .col-md-4
+        h4 Component JSON
+      .col-md-2
+        ul.editor-actions
+          li
+            button.btn.btn-success(ng-click="save()") Save
+          li
+            button.btn.btn-default(ng-click="preview()") Preview
+
+    .editors
+      .col-md-6
+        div(ui-ace,
+          ng-model="xhtml",
+          ui-ace="{useWrapMode : true, onLoad: aceLoaded, onChange: aceChanged }")
+      .col-md-6
+        div(ui-ace,
+          ng-model="json",
+          ui-ace="{useWrapMode : true, onLoad: aceLoaded, onChange: aceChanged }")
