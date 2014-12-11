@@ -56,10 +56,10 @@ describe('editor launcher', function () {
     window.console.warn = origWarn;
   });
 
-  function create(options, playerErrors) {
+  function create(options, playerErrors, queryParams) {
 
     corespring.module("launcher-errors", playerErrors || new MockErrors());
-    corespring.module("query-params", {});
+    corespring.module("query-params", queryParams || {});
 
     lastError = null;
 
@@ -108,6 +108,18 @@ describe('editor launcher', function () {
       expect(actualAjaxOptions.dataType).toEqual('json');
     });
 
+    it('should pass query params', function () {
+      defaultOptions.paths.create = {url: "/expected-create-url", method: 'expected-method'};
+
+      var actualAjaxOptions = null;
+      $.ajax = function (ajaxOptions) {
+        actualAjaxOptions = ajaxOptions;
+      };
+
+      var editor = create({}, null, {apiClient:123});
+      expect(actualAjaxOptions.url).toEqual('http://blah.com/expected-create-url?apiClient=123');
+    });
+
     it("should invoke error callback if options.path does not contain 'create'", function(){
       defaultOptions.paths = {};
       var editor = create({});
@@ -128,6 +140,15 @@ describe('editor launcher', function () {
       var call = instanceCalls.pop();
       expect(call.options.url).toEqual('http://blah.com/expected-editor-url');
     });
+
+    it('should pass queryParams in options', function () {
+      defaultOptions.paths.editor = {url: "/expected-editor-url", method: 'expected-method'};
+
+      var editor = create({itemId:'expected-item-id'}, null, {apiClient:123});
+      var call = instanceCalls.pop();
+      expect(call.options.queryParams).toEqual({apiClient:123});
+    });
+
 
     it("should invoke error callback if options.path does not contain 'editor'", function(){
       defaultOptions.paths = {};
