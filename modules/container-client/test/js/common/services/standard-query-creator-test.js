@@ -2,7 +2,7 @@ describe('standard query creator', function() {
 
   var sut = null;
 
-  beforeEach(angular.mock.module('corespring-editor.services'));
+  beforeEach(angular.mock.module('corespring-common.services'));
 
   beforeEach(inject(function(StandardQueryCreator) {
     sut = StandardQueryCreator;
@@ -12,24 +12,9 @@ describe('standard query creator', function() {
     expect(sut).not.toBe(null);
   });
 
-  it('should create query with subject field, if subject option is empty', function() {
+  it('should create query with searchTerm only, filters are empty', function() {
     var result = sut.createStandardQuery("test");
-    expect(result.fields).toContain("subject");
-  });
-
-  it('should create query with the following default fields', function() {
-    var result = sut.createStandardQuery("test");
-    expect(result.fields).toContain("dotNotation");
-    expect(result.fields).toContain("category");
-    expect(result.fields).toContain("subCategory");
-    expect(result.fields).toContain("standard");
-  });
-
-  it('should create query without subject field, if subject option is not empty', function() {
-    var result = sut.createStandardQuery("test", {
-      name: 'important subject'
-    });
-    expect(result.fields).not.toContain("subject");
+    expect(result).toEqual({searchTerm:"test"});
   });
 
   it('should create query without filters, if subject option is all', function() {
@@ -55,10 +40,9 @@ describe('standard query creator', function() {
     var result = sut.createStandardQuery("test", {
       name: 'important subject'
     });
-    expect(result.filters).toEqual([{
-      field: 'subject',
-      value: 'important subject'
-    }]);
+    expect(result.filters).toEqual({
+      subject:'important subject'
+    });
   });
 
   it('should create query with two filters, if subject and category option are set', function() {
@@ -67,13 +51,10 @@ describe('standard query creator', function() {
     }, {
       name: 'important category'
     });
-    expect(result.filters).toEqual([{
-      field: 'subject',
-      value: 'important subject'
-    }, {
-      field: 'category',
-      value: 'important category'
-    }]);
+    expect(result.filters).toEqual({
+      'subject': 'important subject',
+      'category': 'important category'
+    });
   });
 
   it('should create query with three filters, if subject, category and subCategory option are set', function() {
@@ -84,16 +65,11 @@ describe('standard query creator', function() {
     }, {
       name: 'important sub-category'
     });
-    expect(result.filters).toEqual([{
-      field: 'subject',
-      value: 'important subject'
-    }, {
-      field: 'category',
-      value: 'important category'
-    }, {
-      field: 'subCategory',
-      value: 'important sub-category'
-    }]);
+    expect(result.filters).toEqual({
+      'subject': 'important subject',
+      'category': 'important category',
+      'subCategory': 'important sub-category'
+    });
   });
 
   describe("the first empty option removes all filters after it", function() {
@@ -113,10 +89,9 @@ describe('standard query creator', function() {
       }, null, {
         name: 'important sub-category'
       });
-      expect(result.filters).toEqual([{
-        field: 'subject',
-        value: 'important subject'
-      }]);
+      expect(result.filters).toEqual({
+        'subject': 'important subject'
+      });
     });
 
   });
