@@ -35,6 +35,6 @@ angular.module('corespring-editor.controllers').controller('ScoringPopupControll
     DesignerService.loadAvailableUiComponents(onComponentsLoaded, onComponentsLoadError);
 
     $scope.close = function(){
-      $modalInstance.close(components);
+      $modalInstance.close();
     };
   }]);
