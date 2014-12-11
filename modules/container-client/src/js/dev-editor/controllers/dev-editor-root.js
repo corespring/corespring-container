@@ -3,7 +3,8 @@ angular.module('corespring-dev-editor.controllers')
     '$scope',
     'ItemIdService',
     'ItemService',
-    function($scope, ItemIdService, ItemService) {
+    'CatalogPreview',
+    function($scope, ItemIdService, ItemService, CatalogPreview) {
       $scope.itemId = ItemIdService.itemId();
 
       $scope.onItemLoaded = function(item) {
@@ -20,6 +21,10 @@ angular.module('corespring-dev-editor.controllers')
         }, function() {
           window.alert('failure!');
         }, $scope.itemId);
+      };
+
+      $scope.preview = function() {
+        CatalogPreview.launch($scope.itemId);
       };
 
       $scope.onItemLoadError = function(err) {
