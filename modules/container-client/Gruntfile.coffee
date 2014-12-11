@@ -118,6 +118,7 @@ module.exports = (grunt) ->
           '<%= common.app %>/js/corespring/**/*.js',
           '<%= common.app %>/js/**/*.js',
           '!<%= common.app %>/js/player-launcher/**/*.js',
+          '!<%= common.app %>/js/old-*/**/*.js',
           '<%= common.tmp %>/wrapped/player-launcher-wrapped.js'
           ]
         options:
@@ -131,7 +132,10 @@ module.exports = (grunt) ->
             'bootstrap/dist/js/bootstrap.min.js',
             'angular-ui-bootstrap-bower/ui-bootstrap-tpls.js',
             'msgr.js/dist/msgr.js'], comps)
-          specs: '<%= common.test %>/js/**/*-test.js'
+          specs: [
+            '<%= common.test %>/js/**/*-test.js',
+            '!<%= common.test %>/js/old-*/**/*-test.js'
+            ]
 
     shell:
       mathjax_rm_pngs:

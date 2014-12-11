@@ -1,4 +1,4 @@
-describe('component data', function() {
+describe('scoring-handler', function() {
 
   var scoringHandler;
 
