@@ -43,8 +43,8 @@ html(xmlns="http://www.w3.org/1999/html")
           $('.main').addClass('blend');
         }, 100);
       });
-
-      var allNgModules =[#{componentNgModules}];
+      
+      var allNgModules = ['corespring-templates'].concat([#{componentNgModules}]);
 
       function getParams(){
         var nameValueStrings = document.location.search.replace('?', '').split('&');

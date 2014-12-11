@@ -74,8 +74,8 @@ script(type="text/ng-template", id="/templates/question")
             optimized-preview-player(
               ng-model="item.xhtml",
               player-components="item.components",
-              player-session="rootModel.session",
               player-outcomes="outcome")
+            summary-feedback(ng-show="session.isComplete", ng-model="item.summaryFeedback")
           .row
             preview-player-control-panel(
               data-mode='playerMode', 
