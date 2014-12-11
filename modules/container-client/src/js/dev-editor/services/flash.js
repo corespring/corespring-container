@@ -28,7 +28,7 @@ angular.module('corespring-dev-editor.services')
         };
         this.error = function(msg) {
           showFlash(msg, 'alert-danger');
-        }
+        };
       }
       return new Flash();
     }
