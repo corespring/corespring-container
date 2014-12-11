@@ -2,7 +2,23 @@
 <html>
 <head>
   <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-  <script type="text/javascript" src="http://corespring-app-branch-one.herokuapp.com/v2/player/editor-v2.js?secure=false&playerToken=644f903731038c90d1bd0842f6798b9ca29f08b65d2531d207e6016848743f1ca795d95f7700c0f72d8df916a6c7c58345d0affac6796e277111188ef4a9870fd0364a4a5a12e70aaec110506d4692db--bbcf7c7d7e163a70caf6822106ac4f84&apiClient=513f6927e4b0ca79ccd2484b"></script>
+
+  <!--
+  run the following script to get the token for the editor
+
+  curl \
+  -H "Content-Type: application/json" \
+  -d '{
+        "expires" : "0",
+        "mode":"gather",
+        "sessionId": "*"
+      }' \
+  http://corespring-app-sandbox-one.herokuapp.com/api/v2/player-token?access_token=demo_token
+
+  {searchTerm: "a", filters:[{field:'category', value:'b'}, {field:'subject', value:'c'}]
+  -->
+
+  <script type="text/javascript" src="http://corespring-app-sandbox-one.herokuapp.com/v2/player/editor-v2.js?secure=false&playerToken=95fa9a023a9649061b1d31b676e99ff6a3d7bfbd8f8cee49dcc222626edb932ef9c466610bcb6943c17d0e46987f43c4d63d2b196d319fc4b01415ec1a7bcbc9c85740466470cced87f0639ef1302e27--ba7e0559c41f03431d1dc8bab971440d&apiClient=513f6927e4b0ca79ccd2484b"></script>
 
 
   <script type="text/javascript">
@@ -80,17 +96,15 @@
           visible: true,
           readonly: false,
           value: ['03', '04'],
-          options: ['01', '02', '03', '04']
+          //options: ['01', '02', '03', '04']
           //available options
           //"PK","KG","01","02","03","04","05","06","07","08","09","10","11","12","13","PS","AP","UG"
         },
         keySkills: {
           visible: true,
-          readonly: false,
-          value: ['Define', 'Practice'],
-          options: ['Define', 'Practice', 'Discriminate', 'Design']
-          //TODO
-          //"keySkills":["Repeat","Name","Illustrate"]
+          readonly: false
+          //value: ['Define', 'Practice'],
+          //options: ['Define', 'Practice', 'Discriminate', 'Design']
           //available options
           //Category Knowledge
           //"Arrange","Define","Describe","Duplicate","Identify","Label","List","Match","Memorize","Name",
