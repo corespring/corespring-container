@@ -4,7 +4,8 @@ angular.module('corespring-dev-editor.controllers')
     'ItemIdService',
     'ItemService',
     'CatalogPreview',
-    function($scope, ItemIdService, ItemService, CatalogPreview) {
+    'Flash',
+    function($scope, ItemIdService, ItemService, CatalogPreview, Flash) {
       $scope.itemId = ItemIdService.itemId();
 
       $scope.onItemLoaded = function(item) {
@@ -17,9 +18,9 @@ angular.module('corespring-dev-editor.controllers')
         $scope.item.xhtml = $scope.xhtml;
         $scope.item.components = JSON.parse($scope.json);
         ItemService.save($scope.item, function() {
-          window.alert('success!');
+          Flash.info('Saved successfully.');
         }, function() {
-          window.alert('failure!');
+          Flash.error('There was an error saving the item.');
         }, $scope.itemId);
       };
 
@@ -28,7 +29,7 @@ angular.module('corespring-dev-editor.controllers')
       };
 
       $scope.onItemLoadError = function(err) {
-        window.alert("There was an error. Please try later. Thanks!");
+        Flash.error("There was an error loading the item.");
       };
 
       ItemService.load($scope.onItemLoaded, $scope.onItemLoadError, $scope.itemId);

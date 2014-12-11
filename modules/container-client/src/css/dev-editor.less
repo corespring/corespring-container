@@ -1,0 +1,49 @@
+@header-size: 50px;
+
+html, body, .main, .root, .col-md-6, .ace_editor {
+  height: 100%;
+}
+
+body {
+  overflow: hidden;
+}
+
+.flash.alert {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  z-index: 100;
+  margin: 0;
+}
+
+.ace_editor {
+  width: 100%;
+}
+
+.root .header {
+  background: #ffffff;
+  min-height: @header-size;
+  width: 100%;
+  z-index: 10;
+}
+
+.editor-actions {
+  list-style-type: none;
+  padding: 10px;
+  margin: 0;
+  width: 100%;
+  text-align: right;
+
+  li {
+    display: inline;
+
+    button {
+      display: inline-block;
+    }
+  }
+}
+
+.editors {
+  height: 100%;
+  margin-top: @header-size + 5px;
+}
