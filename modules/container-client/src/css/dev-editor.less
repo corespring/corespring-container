@@ -4,10 +4,6 @@ html, body, .main, .root, .col-md-6, .ace_editor {
   height: 100%;
 }
 
-body {
-  overflow: hidden;
-}
-
 .flash.alert {
   position: absolute;
   bottom: 10px;
@@ -21,10 +17,15 @@ body {
 }
 
 .root .header {
-  background: #ffffff;
+  background: #ebebeb;
+  border-bottom: 1px solid #000000;
   min-height: @header-size;
   width: 100%;
   z-index: 10;
+
+  h4 {
+    margin-top: 19px;
+  }
 }
 
 .editor-actions {
@@ -45,5 +46,5 @@ body {
 
 .editors {
   height: 100%;
-  margin-top: @header-size + 5px;
+  margin-top: @header-size + 4px;
 }
