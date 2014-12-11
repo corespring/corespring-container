@@ -9,6 +9,15 @@ angular.module('corespring-editor.services')
 
     function ScoringHandler(){
       this.scoring = function(components, xhtml, saveCallback) {
+
+        var typeAndWeights = _.mapValues(components,
+          function(v) {
+            return {
+              componentType: v.componentType,
+              weight: v.weight
+            };
+          }, this);
+
         var modalInstance = $modal.open({
           templateUrl: '/templates/popups/scoring',
           controller: 'ScoringPopupController',
@@ -16,13 +25,6 @@ angular.module('corespring-editor.services')
           backdrop: 'static',
           resolve: {
             components: function() {
-              var typeAndWeights = _.mapValues(components,
-                function(v) {
-                  return {
-                    componentType: v.componentType,
-                    weight: v.weight
-                  };
-                });
               return typeAndWeights;
             },
             xhtml: function() {
@@ -40,25 +42,34 @@ angular.module('corespring-editor.services')
           return false;
         }
 
-        function onScoringComplete(typeAndWeights) {
-          logger.debug('scoring ok-ed - save');
-
-          if (weightsDiffer(typeAndWeights, components)) {
-            _.forIn(components, function(comp, key) {
-              comp.weight = typeAndWeights[key].weight;
-            });
-
-            logger.debug('weights are different - save');
-            //TODO - only update the weights?
-            saveCallback();
-          }
+        function onScoringClose() {
+          logger.debug('scoring closed');
+          handlePopupRemoved();
         }
 
+        /** even if the popup is dismissed we save if required */
         function onScoringDismiss() {
           logger.debug('scoring dismissed');
+          handlePopupRemoved();
         }
 
-        modalInstance.result.then(onScoringComplete, onScoringDismiss);
+        function handlePopupRemoved(){
+
+          if (!weightsDiffer(typeAndWeights, components)) {
+            logger.debug('weights haven\'t changed - skip save');
+            return;
+          }
+
+          _.forIn(components, function(comp, key) {
+            comp.weight = typeAndWeights[key].weight;
+          });
+
+          logger.debug('weights are different - save');
+          //TODO - only update the weights?
+          saveCallback();
+        }
+
+        modalInstance.result.then(onScoringClose.bind(this), onScoringDismiss.bind(this));
       };
     }
 

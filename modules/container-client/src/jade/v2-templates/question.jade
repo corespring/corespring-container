@@ -2,7 +2,7 @@ include ../v2-mixins/modal
 
 //Scoring popup..
 script( type="text/ng-template", id="/templates/popups/scoring")
-  +modal('Scoring', 'Ok')
+  +modal('Scoring', null, false)
     
     .alert.title
         | An item with only one question will receive full weight. In an item with more than one question, you can assign specific weights to each part. This feature is optional; if you don't adjust weights, weight will be evenly divided across each question.
