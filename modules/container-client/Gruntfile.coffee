@@ -156,21 +156,12 @@ module.exports = (grunt) ->
         expand: true
 
     ngtemplates:
-      v2Common:
+      all:
         cwd: '<%= common.dist %>'
         dest: '<%= common.dist %>'
-        src:  'js/v2-common/**/directives/**.html'
+        src:  'js/**/directives/**.html'
         options:
-          module: 'corespring-v2-common.directives'
-          url: (u) -> u.replace( common.dist + '/js', '')
-        expand: true
-        ext: '.tpl.js'
-      v2Editor:
-        cwd: '<%= common.dist %>'
-        dest: '<%= common.dist %>'
-        src:  'js/v2-editor/**/directives/**.html'
-        options:
-          module: 'corespring-editor.directives'
+          module: 'corespring-templates'
           url: (u) -> u.replace( common.dist + '/js', '')
         expand: true
         ext: '.tpl.js'

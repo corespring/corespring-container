@@ -19,7 +19,7 @@ describe('component data', function() {
 
   function MockModal(){
 
-    var modalInstance;
+    var modalInstance = null;
 
     this.simulateOk = function(data){
       if(modalInstance){
@@ -58,7 +58,9 @@ describe('component data', function() {
     expect(resolvedComps).toEqual({1: {componentType: 'a', weight: 1}});
   });
 
-  function assertSaveCalled(isCalled, changeWeight){
+  function assertSaveCalled(changeWeight){
+
+    var isCalled = changeWeight;
     var comps = { 1: { componentType: 'a', weight: 1, data: {}}};
     var xhtml = '<h1>Helo</h1>';
     var saveCalled = false;
@@ -66,17 +68,20 @@ describe('component data', function() {
       saveCalled = true;
     });
 
-    var update = changeWeight ? { 1: {componentType: 'a', weight: 1.5}} : comps;
-    mockModal.simulateOk(update);
+    if(changeWeight){
+      var instanceComps = modalOpts.resolve.components();
+      instanceComps['1'].weight = 1.5;
+    }
+    mockModal.simulateOk();
     expect(saveCalled).toBe(isCalled);
   }
 
   it('should not trigger a save if the weights change', function(){
-    assertSaveCalled(false, false);
+    assertSaveCalled(false);
   });
 
   it('should trigger a save if the weights change', function(){
-    assertSaveCalled(true, true);
+    assertSaveCalled(true);
   });
 
 });
