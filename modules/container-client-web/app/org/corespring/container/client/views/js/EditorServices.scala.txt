@@ -1,11 +1,35 @@
-@(namespace : String, load : Call, save : Call, componentSet : JsValue, widgets : JsValue)
+@(namespace:String, load : Call, save : Call, fineGrainedSave:Call, componentSet : JsValue, widgets : JsValue)
 
 (function(){
   "use strict";
 
-  var loadedData = null;
-
   angular.module('@namespace', []);
+
+  angular.module('@namespace').factory('ItemUrls', [ function($http){
+    return {
+      load: {
+        method : '@load.method.toLowerCase',
+        url: '@load.url'
+      },
+      save: {
+        method : '@save.method.toLowerCase',
+        url: '@save.url'
+      },
+      fineGrainedSave : {
+        method : '@fineGrainedSave.method.toLowerCase',
+        url: '@fineGrainedSave.url'
+      }
+    }
+  }]);
+
+  angular.module('@namespace').factory('ComponentService', [function(){
+    return {
+        loadAvailableComponents: function(onSuccess, onFailure){
+          var components = @{Json.stringify(componentSet)};
+          onSuccess(components);
+        }
+    };
+  }]);
 
   angular.module('@namespace').factory('DesignerService', ['$http', function($http){
     return {
@@ -15,75 +39,6 @@
         onSuccess({ interactions: interactions, widgets: widgets });
       }
     };
-
   }]);
 
-  angular.module('@namespace').factory('ItemService', ['BaseService', function(BaseService){
-    return {
-      load: function(onSuccess, onFailure, id){
-        BaseService.load(onSuccess, onFailure, id);
-      },
-      save: function(data, onSuccess, onFailure, id){
-        BaseService.save(data, onSuccess, onFailure, id);
-      }
-    };
-  }]);
-
-  angular.module('@namespace').factory('BaseService', ['$http', function($http){
-
-    function addQueryParamsIfPresent(path) {
-      var href = document.location.href;
-      return  path + (href.indexOf('?') == -1 ? '' :  '?' + href.split('?')[1]);
-    }
-
-    var def = {
-      /**
-       * Load the item, check to see if its already loaded.
-       */
-      load: function(onSuccess, onFailure, id){
-        if(loadedData){
-          onSuccess(loadedData);
-        } else {
-
-          var finalUrl = id ? '@load.url'.replace(":id", id) : '@load.url';
-          finalUrl = addQueryParamsIfPresent(finalUrl);
-
-          $http['@load.method.toLowerCase'](finalUrl)
-            .success(function(data, status, headers, config){
-              loadedData = data;
-              onSuccess(data);
-            })
-            .error(function(data, status, headers, config){
-              if(onFailure){
-                onFailure(data);
-              }
-            });
-        }
-      },
-      saveSupportingMaterial: function(data, onSuccess, onFailure, id) {
-        this.save(data, onSuccess, onFailure, id);
-      },
-      save: function(data, onSuccess, onFailure, id){
-
-
-        var url = addQueryParamsIfPresent('@save.url.toLowerCase');
-        var finalUrl = id ? url.replace(":id", id) : url;
-        var method = '@save.method.toLowerCase';
-
-        $http[method](finalUrl, data)
-          .success(function(data, status, headers, config) {
-            loadedData = data;
-            onSuccess(data);
-          })
-          .error(function(data, status, headers, config) {
-            if( onFailure ) {
-              data = data || { error: status + ": an unknown error occured" };
-              onFailure(data);
-            }
-          });
-      }
-    };
-    return def;
-  }]);
-})();
-
+})(this);
