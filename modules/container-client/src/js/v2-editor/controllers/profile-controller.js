@@ -92,8 +92,8 @@
         readonly:false
       },
       priorUseOther: {
-        visible:true,
-        readonly:false
+        //here you can only set the value, in case the value of priorUse is 'Other'
+        //visiblity and readonly are controlled by priorUse
       },
       priorGradeLevel: {
         visible:true,
@@ -104,8 +104,8 @@
         readonly:false
       },
       reviewsPassedOther: {
-        visible:true,
-        readonly:false
+        //here you can only set the value, in case the value of reviewsPassed is 'Other'
+        //visiblity and readonly are controlled by reviewsPassed
       },
       //--------------------
       copyrightInformationPanel: {
@@ -121,8 +121,8 @@
         readonly:false
       },
       credentialsOther: {
-        visible:true,
-        readonly:false
+        //here you can only set the value, in case the value of credentials is 'Other'
+        //visiblity and readonly are controlled by credentials
       },
       copyrightOwner: {
         visible:true,
