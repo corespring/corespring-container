@@ -102,12 +102,18 @@ function getElementProperties(el) {
       obj[propName] = data
       return
     }
-    
+
     // Special case: attributes
-    // some properties are only accessible via .attributes, so 
+    // some properties are only accessible via .attributes, so
     // that's what we'd do, if vdom-create-element could handle this.
     if("attributes" == propName) return
-    
+
+    // Special case: tabIndex
+    // It'll return -1 by default if not present
+    // in which case we don't want to add it to the node.
+    if("tabIndex" == propName && el[propName] === -1) {
+      return;
+    }
 
     // default: just copy the property
     obj[propName] = el[propName]

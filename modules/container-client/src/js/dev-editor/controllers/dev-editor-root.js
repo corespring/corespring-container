@@ -4,11 +4,14 @@ angular.module('corespring-dev-editor.controllers')
     'ItemIdService',
     'ItemService',
     'CatalogPreview',
-    function($scope, ItemIdService, ItemService, CatalogPreview) {
+    'ComponentData',
+    '$timeout',
+    function($scope, ItemIdService, ItemService, CatalogPreview, ComponentData, $timeout) {
       $scope.itemId = ItemIdService.itemId();
 
       $scope.onItemLoaded = function(item) {
         $scope.item = item;
+        ComponentData.setModel(item.components);
         $scope.xhtml = item.xhtml;
         $scope.json = JSON.stringify(item.components, undefined, 2);
       };
@@ -23,6 +26,21 @@ angular.module('corespring-dev-editor.controllers')
         }, $scope.itemId);
       };
 
+
+      $scope.aceJsonChanged = function(){
+
+        try{
+          var update = JSON.parse($scope.json);
+          $scope.item.components = update;
+
+          $timeout(function(){
+            $scope.$digest();
+          });
+        } catch(e) {
+          console.warn('bad json', e);
+        }
+      };
+
       $scope.preview = function() {
         CatalogPreview.launch($scope.itemId);
       };
@@ -30,6 +48,12 @@ angular.module('corespring-dev-editor.controllers')
       $scope.onItemLoadError = function(err) {
         window.alert("There was an error. Please try later. Thanks!");
       };
+
+      $scope.$on('registerComponent', function(event, id, componentBridge) {
+        //logger.debug('registerComponent ', id);
+        ComponentData.registerComponent(id, componentBridge);
+      });
+
 
       ItemService.load($scope.onItemLoaded, $scope.onItemLoadError, $scope.itemId);
     }

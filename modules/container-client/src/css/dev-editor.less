@@ -1,0 +1,92 @@
+@import "../bower_components/bootstrap/less/bootstrap";
+@import "../bower_components/bootstrap/less/bootstrap";
+@import "../bower_components/less-elements/elements";
+
+@header-size: 50px;
+
+html, body, .main, .root{
+  height: 100%;
+}
+
+body {
+  overflow: hidden;
+}
+
+.root{
+  display: flex;
+  flex-direction: column;
+}
+
+.top-row{
+  background-color: #ececec;
+  height: 90px;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  padding: 10px;
+  .left, .right, .preview{
+    width: 33%;
+  }
+  z-index: 10;
+  .drop-shadow(0, 1px, 2px, 0.2);
+}
+
+
+.bottom-row{
+  position: relative;
+  background-color: #ebebeb;
+  width: 100%;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: row;
+
+  .left, .right {
+    flex-grow: 1;
+
+    .ace_editor{
+      height: 100%;
+      width: 30%;
+    }
+  }
+  .preview{
+    //flex-grow: 1;
+    width: 33%;
+    overflow: scroll;
+  }
+}
+
+.root .header {
+  background: #fff;
+  min-height: 30px;
+  width: 100%;
+  z-index: 10;
+}
+
+.flash.alert {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  z-index: 100;
+  margin: 0;
+}
+
+.editor-actions {
+  list-style-type: none;
+  padding: 10px;
+  margin: 0;
+  width: 100%;
+  text-align: right;
+
+  li {
+    display: inline;
+
+    button {
+      display: inline-block;
+    }
+  }
+}
+
+.editors {
+  height: 100%;
+  margin-top: @header-size + 4px;
+}

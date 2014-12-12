@@ -2,38 +2,29 @@ extends layout
 
 block content
   style
-    html, body, .main, .root, .col-md-6, .ace_editor {
-      height: 100%;
-    }
-    body {
-      overflow: hidden;
-    }
-    .ace_editor {
-      width: 100%;
-    }
-    .root .header {
-      background: #fff;
-      min-height: 30px;
-      width: 100%;
-      z-index: 10;
-    }
-
 
   .root(ng-controller="DevEditorRoot")
-    .header(style="position: fixed; top: 0;")
-      .col-md-6
-        h4 XHTML
-      .col-md-5
-        h4 Component JSON
-      .col-md-1
-        button(ng-click="save()") Save
-        button(ng-click="preview()") Preview
-    div(style="height: 100%; margin-top: 50px;")
-      .col-md-6
+    .top-row
+      .left
+        span XHTML
+      .right
+        span Component JSON
+      .preview
+        span Preview
+        .pull-right
+          button.btn.btn-sm.btn-default(ng-click="save()") Save
+    .bottom-row
+      .left
         div(ui-ace,
           ng-model="xhtml",
+          style="position: absolute;",
           ui-ace="{useWrapMode : true, onLoad: aceLoaded, onChange: aceChanged }")
-      .col-md-6
-        div(ui-ace,
+      .right
+        div(ui-ace
           ng-model="json",
-          ui-ace="{useWrapMode : true, onLoad: aceLoaded, onChange: aceChanged }")
+          style="position: absolute;",
+          ui-ace="{useWrapMode : true, onLoad: aceLoaded, onChange: aceJsonChanged }")
+      .preview
+        optimized-preview-player(
+          ng-model="xhtml",
+          player-components="item.components")

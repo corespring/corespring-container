@@ -19,7 +19,10 @@ angular.module('corespring-common.services')
               '  <div class="header">',
               '    <span class="pull-right"><button ng-click="close()" class="button btn-sm btn btn-success">Close</button>',
               '  </div>',
-              '  <iframe src="{{url}}" frameborder="0"></iframe>',
+              '<optimized-preview-player ',
+              '  ng-model="xhtml" ',
+              '  player-components="json"></optimized-preview-player>',
+              //'  <iframe ng-src="{{url}}" frameborder="0"></iframe>',
               '</div>'
             ].join('\n'),
             /**
