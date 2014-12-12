@@ -3,10 +3,9 @@ angular.module('corespring-dev-editor.controllers')
     '$scope',
     'ItemIdService',
     'ItemService',
-    'CatalogPreview',
     'ComponentData',
     '$timeout',
-    function($scope, ItemIdService, ItemService, CatalogPreview, ComponentData, $timeout) {
+    function($scope, ItemIdService, ItemService, ComponentData, $timeout) {
       $scope.itemId = ItemIdService.itemId();
 
       $scope.onItemLoaded = function(item) {
@@ -41,16 +40,11 @@ angular.module('corespring-dev-editor.controllers')
         }
       };
 
-      $scope.preview = function() {
-        CatalogPreview.launch($scope.itemId);
-      };
-
       $scope.onItemLoadError = function(err) {
         window.alert("There was an error. Please try later. Thanks!");
       };
 
       $scope.$on('registerComponent', function(event, id, componentBridge) {
-        //logger.debug('registerComponent ', id);
         ComponentData.registerComponent(id, componentBridge);
       });
 
