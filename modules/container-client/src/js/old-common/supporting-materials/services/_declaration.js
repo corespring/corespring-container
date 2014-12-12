@@ -1,1 +1,0 @@
-angular.module('corespring-common.supporting-materials.services', []);
