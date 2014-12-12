@@ -49,11 +49,6 @@ trait ItemHooks extends HasContext {
   def create(json: Option[JsValue])(implicit header: RequestHeader): Future[Either[StatusMessage, String]]
 }
 
-@deprecated("I don't think this is being used anywhere - check with ben", "0.3.4")
-trait SupportingMaterialHooks extends HasContext {
-  def create(itemId: String)(implicit header: RequestHeader): Future[Either[StatusMessage, NewSupportingMaterial]]
-}
-
 trait SessionHooks extends HasContext {
   def loadItemAndSession(sessionId: String)(implicit header: RequestHeader): Future[Either[StatusMessage, FullSession]]
 
