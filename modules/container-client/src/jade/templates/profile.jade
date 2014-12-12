@@ -219,7 +219,7 @@ script(type='text/ng-template', id='/templates/profile')
                   ng-disabled='formModels.reviewsPassed.readonly',)
                   | {{rp.key}}
 
-                input.form-control(ng-show='isReviewsPassedOtherSelected', style='margin-left:50%', type='text',
+                input.form-control(ng-show='isReviewsPassedOtherSelected', style='width:50%; margin-left:50%', type='text',
                 placeholder='Enter review...', ng-model='profile.reviewsPassedOther',
                 ng-readonly='formModels.reviewsPassed.readonly')
 
