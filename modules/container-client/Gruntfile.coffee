@@ -7,6 +7,7 @@ Configs...
 ###
 player = require './grunt/config/player'
 editor = require './grunt/config/editor'
+devEditor = require './grunt/config/devEditor'
 catalog = require './grunt/config/catalog'
 rig = require './grunt/config/rig'
 playerControls = require './grunt/config/playerControls'
@@ -183,6 +184,7 @@ module.exports = (grunt) ->
   fullConfig = _.merge(config,
     mkConfig('catalog', catalog),
     mkConfig('editor', editor),
+    mkConfig('devEditor', devEditor),
     mkConfig('rig', rig),
     mkConfig('player', player)
     mkConfig('playerControls', playerControls)
