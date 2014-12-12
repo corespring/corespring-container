@@ -31,7 +31,10 @@ script(type="text/ng-template", id="/templates/supporting-materials")
             i.fa.fa-plus
             | &nbsp;add new supporting material
       ul.supporting-materials-list
-        li(ng-repeat="s in supportingMaterials",ng-model="s",ng-class="{divider: s.type == 'divider', data: s.type == 'data', selected: s.index == index}", ui-sref="supporting-materials({index: s.index})")
+        li(ng-repeat="s in supportingMaterials",
+          ng-model="s",
+          ng-class="{divider: s.type == 'divider', data: s.type == 'data', selected: s.index == index}", 
+          ui-sref="supporting-materials({index: s.index})")
           h4(ng-if="s.type == 'header'") {{s.label}}
           a(ng-if="s.type == 'data'") {{s.label}}
           i.fa.fa-trash-o.pull-right(ng-if="s.type == 'data'", ng-click="deleteSupportingMaterial(s.index, $event)")
@@ -57,5 +60,4 @@ script(type="text/ng-template", id="/templates/supporting-materials")
             dd(ng-show='hasDate(supportingMaterial)') {{formatDate(supportingMaterial.dateModified)}}
 
             div.preview-file(ng-if="!isContentType('text/html')")
-              iframe(ng-src="{{getSupportingUrl()}}", width="100%", height="100%")
-
+              iframe(frameborder="0", ng-src="{{getSupportingUrl()}}", width="100%", height="100%")
