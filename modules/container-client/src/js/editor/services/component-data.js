@@ -45,10 +45,14 @@ angular.module('corespring-editor.services')
         };
 
         this.updateComponent = function(id, model){
-          
+
           _.forIn(mockSession[id], function(value, key){
             delete mockSession[id][key];
           });
+
+          if(componentModels[id]){
+            componentModels[id] = model;
+          }
 
           ComponentRegister.setSingleDataAndSession(id, model, mockSession[id]);
         };
@@ -101,11 +105,11 @@ angular.module('corespring-editor.services')
         this.deleteComponent = function(id){
           if(!componentModels) {
             throw new Error('no components');
-          }   
-          
+          }
+
           if(!componentModels[id]) {
             throw new Error('no component with id', id);
-          }   
+          }
 
           removedComponentModels[id] = _.cloneDeep(componentModels[id]);
           delete componentModels[id];
@@ -114,11 +118,11 @@ angular.module('corespring-editor.services')
         this.restoreComponent = function(id){
           if(!componentModels) {
             throw new Error('no components');
-          }   
-          
+          }
+
           if(!removedComponentModels[id]) {
             throw new Error('no component with id', id);
-          }   
+          }
 
           if(_.has(componentModels, id)){
             throw new Error('There is already a component with that id');

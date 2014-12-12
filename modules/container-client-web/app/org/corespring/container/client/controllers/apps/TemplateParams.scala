@@ -35,6 +35,12 @@ case class EditorTemplateParams(appName: String,
   componentNgModules: Seq[String],
   ngServiceLogic: String) extends TemplateParams
 
+case class DevEditorTemplateParams(appName: String,
+  js: Seq[String],
+  css: Seq[String],
+  componentNgModules: Seq[String],
+  ngServiceLogic: String) extends TemplateParams
+
 case class RigTemplateParams(appName: String,
   js: Seq[String],
   css: Seq[String],
