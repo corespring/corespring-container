@@ -29,7 +29,7 @@ editorSrcs = [
 ]
 
 exports.js =
-  src: _.union(coreLibs.js, core.src, editorSrcs)
+  src: _.union(coreLibs.src, core.src, editorSrcs)
   dest: 'js/v2-editor-prod.js'
   libs: [
     'bower_components/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML'

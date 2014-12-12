@@ -37,7 +37,7 @@ trait DevEditor
     }
 
     def onItem(i: JsValue): SimpleResult = {
-      val scriptInfo = componentScriptInfo(componentTypes(i), jsMode == "dev")
+      val scriptInfo = componentScriptInfo(componentTypes(i))
       val domainResolvedJs = buildJs(scriptInfo)
       val domainResolvedCss = buildCss(scriptInfo)
       Ok(renderJade(
