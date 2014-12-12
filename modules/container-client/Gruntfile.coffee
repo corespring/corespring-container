@@ -8,6 +8,11 @@ Configs...
 ###
 player = require './grunt/config/player'
 editor = require './grunt/config/editor'
+<<<<<<< HEAD
+=======
+v2Editor = require './grunt/config/v2Editor'
+devEditor = require './grunt/config/devEditor'
+>>>>>>> ffaa4e3... Added dev-editor route to container (whew!)
 catalog = require './grunt/config/catalog'
 rig = require './grunt/config/rig'
 playerControls = require './grunt/config/playerControls'
@@ -158,6 +163,7 @@ module.exports = (grunt) ->
   fullConfig = _.merge(config,
     mkConfig('catalog', catalog),
     mkConfig('editor', editor),
+    mkConfig('devEditor', devEditor),
     mkConfig('rig', rig),
     mkConfig('player', player)
     mkConfig('playerControls', playerControls))

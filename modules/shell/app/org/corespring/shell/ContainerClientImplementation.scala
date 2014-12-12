@@ -168,7 +168,6 @@ class ContainerClientImplementation(
 
   override def itemHooks: ItemHooks = new ShellItemHooks {
     override def itemService: MongoService = ContainerClientImplementation.this.itemService
-
   }
 
   override def playerHooks: PlayerHooks = new ShellPlayerHooks {

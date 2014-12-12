@@ -1,7 +1,6 @@
 package org.corespring.container.client.integration
 
 import org.corespring.container.client.controllers.apps._
-import org.corespring.container.client.component.ComponentUrls
 import org.corespring.container.client.controllers.resources.{ Session, Item }
 import org.corespring.container.client.controllers._
 import play.api.mvc.Controller
@@ -43,6 +42,9 @@ trait EditorControllers extends CommonControllers with ResourceControllers {
   /** The editor */
   def editor: Editor
 
+  /** The dev editor */
+  def devEditor: DevEditor
+
   /** icons are only used in the editor */
   def icons: Icons
 }
@@ -72,6 +74,7 @@ trait ContainerControllers
     rig,
     prodHtmlPlayer,
     editor,
+    devEditor,
     catalog,
     icons,
     dataQuery)
