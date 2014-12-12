@@ -9,8 +9,8 @@ mixin h_form
 
 mixin field(label, ngModel)
   .form-group
-    label.col-sm-3.control-label(for=ngModel)= label
-    .col-sm-9
+    label.col-sm-4.control-label(for=ngModel)= label
+    .col-sm-8
       if block
         block
       else
@@ -110,18 +110,21 @@ script(type='text/ng-template', id='/templates/profile')
               .col-sm-6
                 +field('Subject', 'standardFilterOption.subject')
                   select(id='standardFilterOption.subject',
+                  class= 'form-control',
                   ng-model='standardFilterOption.subject',
                   ng-options='c.name for c in standardsTree')
                     option(value='') {{standardFilterPlaceholder.subject}}
 
                 +field('Category','standardFilterOption.category')
-                  select(id='standardFilterOption.category',
+                  select(id='standardFilterOption.category', 
+                  class= 'form-control',
                   ng-model='standardFilterOption.category',
                   ng-options='p.name for p in standardFilterOption.subject.items')
                     option(value='') {{standardFilterPlaceholder.category}}
 
                 +field('Sub-Category','standardFilterOption.subCategory')
-                  select(id='standardFilterOption.subCategory',
+                  select(id='standardFilterOption.subCategory', 
+                  class= 'form-control',
                   ng-model='standardFilterOption.subCategory',
                   ng-options='z for z in standardFilterOption.category.items')
                     option(value='') {{standardFilterPlaceholder.subCategory}}
@@ -194,6 +197,7 @@ script(type='text/ng-template', id='/templates/profile')
             .panel-body
               +field2('This item was previously used in', 'profile.priorUse', 'formModels.priorUse')
                 select(id='profile.priorUse',
+                  class='form-control',
                   ng-model='profile.priorUse',
                   ng-options='c.key as c.value for c in priorUseDataProvider | filter:priorUseFilter',
                   ng-disabled='formModels.priorUse.readonly')
@@ -215,7 +219,7 @@ script(type='text/ng-template', id='/templates/profile')
                   ng-disabled='formModels.reviewsPassed.readonly',)
                   | {{rp.key}}
 
-                input(ng-show='isReviewsPassedOtherSelected', style='margin-left:50%', type='text',
+                input.form-control(ng-show='isReviewsPassedOtherSelected', style='width:50%; margin-left:50%', type='text',
                 placeholder='Enter review...', ng-model='profile.reviewsPassedOther',
                 ng-readonly='formModels.reviewsPassed.readonly')
 
@@ -227,7 +231,7 @@ script(type='text/ng-template', id='/templates/profile')
               +field2('* Author', 'contributorDetails.author', 'formModels.author')
 
               +field2('Credentials','contributorDetails.credentials', 'formModels.credentials')
-                select(id='contributorDetails.credentials',ng-model='contributorDetails.credentials',
+                select(id='contributorDetails.credentials',class='form-control',ng-model='contributorDetails.credentials',
                 ng-options='c.key as c.value for c in credentialsDataProvider | filter:credentialsFilter',
                 ng-disabled='formModels.credentials.readonly')
                   option(value='') Select ...
@@ -239,13 +243,13 @@ script(type='text/ng-template', id='/templates/profile')
               +field2('* Copyright Owner','contributorDetails.copyrightOwner', 'formModels.copyrightOwner')
 
               +field2('* Copyright Year','contributorDetails.copyrightYear', 'formModels.copyrightYear')
-                select(id='contributorDetails.copyrightYear',ng-model='contributorDetails.copyrightYear',
+                select(id='contributorDetails.copyrightYear',class='form-control',ng-model='contributorDetails.copyrightYear',
                 ng-options='c for c in copyrightYearDataProvider | filter:copyrightYearFilter', style='width:170px;',
                 ng-disabled='formModels.copyrightYear.readonly')
                   option(value='') Select ...
 
               +field2('* Copyright Expiration','contributorDetails.copyrightExpirationDate', 'formModels.copyrightExpirationDate')
-                select(id='contributorDetails.copyrightExpirationDate',ng-model='contributorDetails.copyrightExpirationDate',
+                select(id='contributorDetails.copyrightExpirationDate',class='form-control',ng-model='contributorDetails.copyrightExpirationDate',
                 ng-options='c for c in copyrightExpirationDateDataProvider | filter:copyrightExpirationDateFilter',
                 style='width:170px;', ng-disabled='formModels.copyrightExpirationDate.readonly')
                   option(value='') Select ...
@@ -264,6 +268,7 @@ script(type='text/ng-template', id='/templates/profile')
                   tr
                     td
                       select(id="license",ng-model="contributorDetails.licenseType",
+                      class='form-control',
                       ng-disabled='formModels.licenseType.readonly'
                       ng-options="c.key as c.value for c in licenseTypeDataProvider")
                         option(value='') Select ...

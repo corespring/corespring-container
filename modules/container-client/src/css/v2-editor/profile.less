@@ -3,13 +3,13 @@
 
   .panel {
     margin-bottom: 5px;
-  }
 
-  .panel-title {
-    * {
+    .panel-title:hover{
+      text-decoration: none;
       cursor: pointer;
     }
   }
+
   .panel-body {
     padding: 5px 15px 15px 15px;
   }
@@ -18,9 +18,7 @@
     border: solid lighten(@cs-grey, 34%) 1px;
     border-radius: 4px;
     padding: 10px;
-  }
-
-  form{
+  
     h4, h5, h6 {
       text-transform: uppercase;
       color: lighten(@cs-grey, 10%);
@@ -64,7 +62,6 @@
     border-radius: 4px;
     line-height: 17px;
   }
-
 
   .tag-list-header {
     padding: 3px;
@@ -149,3 +146,4 @@
   }
 
 }
+
