@@ -1,0 +1,84 @@
+include ../mixins/modal
+
+//Scoring popup..
+script( type="text/ng-template", id="/templates/popups/scoring")
+  +modal('Scoring', null, false)
+    
+    .alert.title
+        | An item with only one question will receive full weight. In an item with more than one question, you can assign specific weights to each part. This feature is optional; if you don't adjust weights, weight will be evenly divided across each question.
+
+    .container(style="max-width: 700px;")
+      component-weights(
+        ng-disabled="{{componentSize != 'many'}}",
+        ng-model="components",
+        markup="xhtml",
+        component-set="interactions")
+
+script(type="text/ng-template", id="/templates/question")
+  .question(ng-controller="QuestionController")
+    .col-md-6
+      .row.button-bar
+        button.pull-right.btn.btn-default(
+          ng-click="togglePreview()",
+          ng-class="{'btn-warning': !previewOn}")  
+          | {{previewOn ? 'Close Preview' : 'Preview Question'}} 
+          i.fa(ng-class="{'fa-toggle-left': previewOn, 'fa-toggle-right' : !previewOn}")
+        button.pull-right.btn.btn-default(ng-click="scoring()") Scoring
+
+      hr/
+
+      .row
+        wiggi-wiz(
+          formatting-display="dropdown",
+          ng-model="item.xhtml",
+          focus="true",
+          features="extraFeatures",
+          feature-overrides="overrideFeatures",
+          image-service="imageService")
+
+          toolbar.main-editor-wiggi-toolbar(
+            basic="bold italic underline superscript subscript", 
+            formatting="blockquote h1 h2 h3",
+            order="external")
+
+          edit-pane-toolbar(alignment="bottom")
+            .btn-group.pull-right
+              button.btn.btn-default(ng-click="closePane()") Done
+
+
+      br/
+
+      .row
+        .panel.summary-feedback-panel
+          .panel-heading
+            h4.panel-title
+              a(ng-click="showSummaryFeedback = !showSummaryFeedback")
+                | Add Feedback (optional)
+                i.fa.fa-comment-o
+          .panel-body(collapse="!showSummaryFeedback")
+            div(mini-wiggi-wiz="", 
+              ng-model='item.summaryFeedback', 
+              placeholder='Type here',
+              feature-overrides="overrideFeatures",
+              image-service="imageService", 
+              features="linkFeature")
+
+    .col-md-6
+
+      .preview(ng-show="previewOn", 
+          ng-controller="ClientSidePreview")
+        .item-preview-wrapper
+          .player-label
+            img(src='../../images/item-player-label.png')
+          .player-container
+            optimized-preview-player(
+              ng-model="item.xhtml",
+              player-components="item.components",
+              player-outcomes="outcome")
+
+            summary-feedback(ng-show="session.isComplete", ng-model="item.summaryFeedback")
+          .row
+            preview-player-control-panel(
+              data-mode='playerMode', 
+              data-settings='playerSettings', 
+              data-score="score")

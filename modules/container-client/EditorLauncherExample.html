@@ -18,8 +18,9 @@
   {searchTerm: "a", filters:[{field:'category', value:'b'}, {field:'subject', value:'c'}]
   -->
 
-  <script type="text/javascript" src="http://corespring-app-sandbox-one.herokuapp.com/v2/player/editor-v2.js?secure=false&playerToken=95fa9a023a9649061b1d31b676e99ff6a3d7bfbd8f8cee49dcc222626edb932ef9c466610bcb6943c17d0e46987f43c4d63d2b196d319fc4b01415ec1a7bcbc9c85740466470cced87f0639ef1302e27--ba7e0559c41f03431d1dc8bab971440d&apiClient=513f6927e4b0ca79ccd2484b"></script>
-
+  <!--script type="text/javascript" src="http://corespring-app-sandbox-one.herokuapp.com/v2/player/editor-v2.js?secure=false&playerToken=95fa9a023a9649061b1d31b676e99ff6a3d7bfbd8f8cee49dcc222626edb932ef9c466610bcb6943c17d0e46987f43c4d63d2b196d319fc4b01415ec1a7bcbc9c85740466470cced87f0639ef1302e27--ba7e0559c41f03431d1dc8bab971440d&apiClient=513f6927e4b0ca79ccd2484b"></script-->
+  <!--script type="text/javascript" src="http://localhost:9000/client/editor-v2.js?secure=false&playerToken=95fa9a023a9649061b1d31b676e99ff6a3d7bfbd8f8cee49dcc222626edb932ef9c466610bcb6943c17d0e46987f43c4d63d2b196d319fc4b01415ec1a7bcbc9c85740466470cced87f0639ef1302e27--ba7e0559c41f03431d1dc8bab971440d&apiClient=513f6927e4b0ca79ccd2484b"></script-->
+  <script type="text/javascript" src="http://localhost:9000/v2/player/editor-v2.js?secure=false&playerToken=95fa9a023a9649061b1d31b676e99ff6a3d7bfbd8f8cee49dcc222626edb932ef9c466610bcb6943c17d0e46987f43c4d63d2b196d319fc4b01415ec1a7bcbc9c85740466470cced87f0639ef1302e27--ba7e0559c41f03431d1dc8bab971440d&apiClient=513f6927e4b0ca79ccd2484b"></script>
 
   <script type="text/javascript">
 
@@ -102,8 +103,8 @@
         },
         keySkills: {
           visible: true,
-          readonly: false
-          //value: ['Define', 'Practice'],
+          readonly: false,
+          value: ['Define', 'Practice'],
           //options: ['Define', 'Practice', 'Discriminate', 'Design']
           //available options
           //Category Knowledge
@@ -134,9 +135,8 @@
         },
         primarySubject: {
           visible: true,
-          readonly: false
-          //TODO: value and options for subjects not implemented yet
-          //value: "Art:Other"
+          readonly: false,
+          value: "Art:Other"
           //options is an array like value with all the options that are allowed
         },
         priorGradeLevel: {
@@ -161,9 +161,8 @@
         },
         relatedSubject: {
           visible: true,
-          readonly: false
-          //TODO: value and options for subjects not implemented yet
-          //value: ["Art:Other", "English Language Arts:English Language Arts"]
+          readonly: false,
+          value: ["Art:Other", "English Language Arts:English Language Arts"]
           //options is an array like value with all the options that are allowed
         },
         reviewsPassed: {
@@ -184,9 +183,8 @@
         },
         standards: {
           visible: true,
-          readonly: false
-          //TODO: value and options for standards not implemented yet
-          //value: ['W.3.1b', 'W.6.6']
+          readonly: false,
+          value: ['W.3.1b', 'W.6.6']
           //options is an array like value with all the options that are allowed
         },
         title: {

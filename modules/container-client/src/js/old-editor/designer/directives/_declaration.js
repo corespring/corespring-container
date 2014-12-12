@@ -1,0 +1,1 @@
+angular.module('corespring-v1-editor.directives', ['ui.bootstrap', 'corespring-player.services']);

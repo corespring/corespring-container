@@ -7,7 +7,6 @@ Configs...
 ###
 player = require './grunt/config/player'
 editor = require './grunt/config/editor'
-v2Editor = require './grunt/config/v2Editor'
 catalog = require './grunt/config/catalog'
 rig = require './grunt/config/rig'
 playerControls = require './grunt/config/playerControls'
@@ -32,7 +31,7 @@ lessConfig = (cleancss) ->
     cleancss: cleancss
   expand: true
   cwd: '<%= common.dist %>/css'
-  src: ['**/rig.less', '**/player.less', '**/v2-editor.less', '**/editor.less', '**/homepage.less']
+  src: ['**/rig.less', '**/player.less', '**/editor.less', '**/homepage.less']
   dest: '<%= common.dist %>/css/'
   ext: suffix
   flatten: false
@@ -119,6 +118,7 @@ module.exports = (grunt) ->
           '<%= common.app %>/js/corespring/**/*.js',
           '<%= common.app %>/js/**/*.js',
           '!<%= common.app %>/js/player-launcher/**/*.js',
+          '!<%= common.app %>/js/old-*/**/*.js',
           '<%= common.tmp %>/wrapped/player-launcher-wrapped.js'
           ]
         options:
@@ -132,7 +132,10 @@ module.exports = (grunt) ->
             'bootstrap/dist/js/bootstrap.min.js',
             'angular-ui-bootstrap-bower/ui-bootstrap-tpls.js',
             'msgr.js/dist/msgr.js'], comps)
-          specs: '<%= common.test %>/js/**/*-test.js'
+          specs: [
+            '<%= common.test %>/js/**/*-test.js',
+            '!<%= common.test %>/js/old-*/**/*-test.js'
+            ]
 
     shell:
       mathjax_rm_pngs:
@@ -180,7 +183,6 @@ module.exports = (grunt) ->
   fullConfig = _.merge(config,
     mkConfig('catalog', catalog),
     mkConfig('editor', editor),
-    mkConfig('v2Editor', v2Editor)
     mkConfig('rig', rig),
     mkConfig('player', player)
     mkConfig('playerControls', playerControls)

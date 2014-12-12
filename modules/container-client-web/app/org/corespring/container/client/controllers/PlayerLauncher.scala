@@ -40,7 +40,7 @@ trait PlayerLauncher extends Controller {
     }
   }
 
-  import org.corespring.container.client.controllers.apps.routes.{ Editor, V2Editor, Player }
+  import org.corespring.container.client.controllers.apps.routes.{ Editor, Player }
 
   val SecureMode = "corespring.player.secure"
 
@@ -57,8 +57,6 @@ trait PlayerLauncher extends Controller {
   }
 
   def editorJs = getEditorJs(Editor.load(":itemId"))
-
-  def editorV2Js = getEditorJs(V2Editor.load(":itemId"))
 
   def getEditorJs(loadEditorCall: Call) = Action.async { implicit request =>
     hooks.editorJs.map { implicit js =>

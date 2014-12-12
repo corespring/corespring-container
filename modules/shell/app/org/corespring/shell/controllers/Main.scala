@@ -37,9 +37,8 @@ trait Main
           val playerUrl = routes.Main.createSessionPage(id).url
           val deleteUrl = routes.Main.deleteItem(id).url
           val editorUrl = appRoutes.Editor.load(id).url
-          val v2EditorUrl = appRoutes.V2Editor.load(id).url
           val catalogUrl = appRoutes.Catalog.load(id).url
-          IndexLink(name, playerUrl, editorUrl, v2EditorUrl, deleteUrl, catalogUrl)
+          IndexLink(name, playerUrl, editorUrl, deleteUrl, catalogUrl)
       }
 
       logger.debug(items.mkString(","))
@@ -73,7 +72,7 @@ trait Main
       import scala.concurrent.ExecutionContext.Implicits.global
       itemHooks.create(None)(request).map{
         case Left(err) => BadRequest("Error creating item")
-        case Right(id) => Redirect(org.corespring.container.client.controllers.apps.routes.V2Editor.load(id.toString))
+        case Right(id) => Redirect(org.corespring.container.client.controllers.apps.routes.Editor.load(id.toString))
       }
   }
 

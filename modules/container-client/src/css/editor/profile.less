@@ -1,72 +1,37 @@
-@profile-input-width: 500px;
+.profile{
+  padding: 10px;
 
-.select2-item-profile-standard-adapter-drop-down-item {
-  blockquote {
-    font-size: 16px;
-    font-weight: 300;
-    line-height: 22.5px;
+  .panel {
+    margin-bottom: 5px;
+  }
 
-    small {
-      font-size: 13px;
-      line-height: 18px;
+  .panel-title {
+    * {
+      cursor: pointer;
     }
   }
-}
-
-.container {
-
-  .profile {
-
-    .nav {
-      height: 42px;
-    }
-
-  }
-}
-
-.profile {
-
-  fieldset {
-    padding: 5px;
+  .panel-body {
+    padding: 5px 15px 15px 15px;
   }
 
-  .item-information {
-    .control-group {
-      margin-bottom: 8px;
+  form{
+    border: solid lighten(@cs-grey, 34%) 1px;
+    border-radius: 4px;
+    padding: 10px;
+  }
+
+  form{
+    h4, h5, h6 {
+      text-transform: uppercase;
+      color: lighten(@cs-grey, 10%);
     }
   }
 
-  .prior-use,
-  .reviews-passed {
-    margin-top: 25px;
-
-    h4 {
-      margin-bottom: 5px;
-    }
-
-    fieldset {
-      padding: 5px;
-    }
-
-    .control-group {
-      margin-bottom: 5px;
-    }
-  }
-
-  .other-alignments {
-    fieldset {
-      padding: 5px;
-    }
-
-    .control-group {
-      margin-bottom: 15px;
-    }
-  }
-
-  .licensing {
-    h3 {
-      margin-top: 0;
-    }
+  .tag-list-header {
+    padding: 3px;
+    float: left;
+    font-weight: bold;
+    color: lighten(@cs-green, 5%);
   }
 
   a.tag-list-link {
@@ -79,137 +44,69 @@
     font-weight: bold;
   }
 
-  .add-additional {
-    display: inline-block;
-    margin-bottom: 30px;
-  }
-
-  .copyright-information {
-
-    min-width: 600px;
-
-    .label-col {
-      text-align: right;
-      padding: 5px;
-      width: 180px;
+  .key-skills {
+    .badge {
+      margin-left: 20px;
+    }
+    .selected {
+      font-style: italic;
+      font-size: 70%;
     }
   }
 
-  .copyright-information .control-group {
-    margin-bottom: 0;
+  .lexile {
+    .form-control {
+      display: inline-block;
+      width: 45px;
+    }
+    .measure {
+      margin-left: 10px;
+      font-weight: bold;
+      font-size: 16px;
+    }
   }
 
-  .control-group {
-    margin-bottom: 30px;
+  .depth-of-knowledge {
+    label {
+      width: 50%;
+
+      input[type='radio'] {
+        margin: 4px 10px 0px;
+      }
+    }
   }
 
-  .control-label {
-    width: 100%;
+  .blooms-taxonomy {
+    label {
+      width: 50%;
+
+      input[type='radio'] {
+        margin: 4px 10px 0px;
+      }
+    }
+  }
+
+  .add-standards {
+    .select2-search-choice {
+      display: none;
+    }
+  }
+
+  .standards {
+    .no-input {
+      input[type='text'] {
+        display: none !important;
+      }
+    }
   }
 
   table.license {
+    margin: 0 0 0 0;
     td {
+      border-style: none;
+      vertical-align: middle;
       padding: 1px 5px 1px 0px;
     }
   }
 
-  .help-inline {
-    display: inline;
-    margin-left: 20px;
-    color: @help-text;
-    font-size: 80%;
-  }
-
-  .itemTypes {
-
-    h5 {
-      font-weight: bold;
-    }
-
-    li {
-      list-style-type: none;
-    }
-
-    td {
-      vertical-align: top;
-    }
-  }
-
-  .permissions {
-    margin-bottom: 15px;
-
-    img {
-      display: block;
-    }
-
-    .label-col {
-      padding-left: 5px;
-      padding-right: 5px;
-    }
-  }
-
-  .required {
-    display: inline-block;
-    margin-bottom: 20px;
-  }
-
-  .save-btn {
-    border: 2px;
-    border-radius: 3px;
-  }
-
-  .standards label {
-    display: block;
-
-    &.control-label {
-      margin-bottom: 15px;
-    }
-  }
-
-  .subject-label {
-    display: block;
-  }
-
-  .tag-list-header {
-    padding: 3px;
-    float: left;
-    font-weight: bold;
-    color: lighten(@cs-green, 5%);
-  }
-
-  .tight-button-bar {
-    .btn {
-      border-radius: 4px;
-      padding-top: 4px;
-      padding-right: 7px;
-      padding-bottom: 4px;
-      padding-left: 7px;
-      margin-bottom: 0;
-    }
-
-    .btn-default {
-      font-size: 13px;
-      line-height: 18px;
-      color: @btn-default-color;
-      #gradient > .vertical(#ffffff, #e6e6e6, 0%, 100%);
-      border-color: darken(@btn-default-bg, 10%);
-      border-bottom-color: darken(@btn-default-bg, 20%);
-      .box-shadow(inset 0 1px 0 rgba(255, 255, 255, .1));
-
-      &:hover,
-      &:focus,
-      &:active,
-      &.active {
-        #gradient > .vertical(darken(@btn-default-bg, 20), darken(@btn-default-bg, 15%), 0%, 100%);
-        border-color: darken(@btn-default-bg, 20%);
-        color: @btn-default-color;
-      }
-    }
-  }
 }
-
-
-
-
-
-

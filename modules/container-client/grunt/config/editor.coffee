@@ -4,6 +4,7 @@ coreLibs = require './core-libs'
 _ = require 'lodash'
 
 editorSrcs = [
+  'bower_components/angular-animate/angular-animate(.min).js',
   'bower_components/angular-route/angular-route(.min).js',
   'bower_components/angular-ui-router/release/angular-ui-router(.min).js',
   'bower_components/wiggi-wiz/dist/wiggi-wiz.js',
@@ -21,6 +22,7 @@ editorSrcs = [
   'bower_components/undo.js/undo.js',
   'js/corespring/core-library.js',
   'js/corespring/server/init-core-library.js',
+  'js/common/**/*.js',
   'js/editor/**/*.js',
   'js/catalog/**/*.js',
   'js/render/services/**/*.js',
@@ -42,16 +44,16 @@ exports.css =
   libs: _.union(coreLibs.css, [
     'bower_components/select2/select2.css',
     'bower_components/font-awesome/css/font-awesome.min.css',
-    'bower_components/components-font-awesome/css/font-awesome.min.css',
     '//fonts.googleapis.com/css?family=Ubuntu:300,400,500,500italic,700'
   ])
   report: 'editor-css-report.json'
 
 exports.ngModules = _.union(player.ngModules, [
+  'ngAnimate',
   'corespring-common.supporting-materials',
   'corespring-editor.services',
-  'corespring-v1-editor.controllers',
-  'corespring-v1-editor.directives',
+  'corespring-editor.controllers',
+  'corespring-editor.directives',
   'ui.sortable',
   'ui.bootstrap',
   'ui.ace',

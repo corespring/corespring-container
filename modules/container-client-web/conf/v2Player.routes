@@ -2,7 +2,6 @@
 
 GET           /player.js                                               @org.corespring.container.client.controllers.PlayerLauncher.playerJs
 GET           /editor.js                                               @org.corespring.container.client.controllers.PlayerLauncher.editorJs
-GET           /editor-v2.js                                            @org.corespring.container.client.controllers.PlayerLauncher.editorV2Js
 
 GET           /js/*file                                              controllers.Assets.at(path="/container-client/js", file)
 GET           /css/*file                                             controllers.Assets.at(path="/container-client/css", file)
@@ -37,7 +36,6 @@ GET           /item/:itemId/*file                                    @org.coresp
 PUT           /item/:itemId.json                                     @org.corespring.container.client.controllers.resources.Item.save(itemId)
 PUT           /item/update/:itemId.json                              @org.corespring.container.client.controllers.resources.Item.fineGrainedSave(itemId)
 POST          /item/create                                           @org.corespring.container.client.controllers.resources.Item.create()
-POST          /item/:itemId/supporting-materials/create              @org.corespring.container.client.controllers.resources.SupportingMaterial.create(itemId)
 
 
 GET           /icon/:icon                                            @org.corespring.container.client.controllers.Icons.icon(icon)
@@ -49,11 +47,6 @@ GET          /rig/:componentType/*file                              @org.corespr
 
 # Catalog
 GET           /catalog/:itemId/index.html                           @org.corespring.container.client.controllers.apps.Catalog.load(itemId)
-
-# v2 editor
-GET           /v2-editor/:itemId/index.html                         @org.corespring.container.client.controllers.apps.V2Editor.load(itemId)
-GET           /v2-editor/:itemId/*file                              @org.corespring.container.client.controllers.Assets.item(itemId, file)
-POST          /v2-editor/:itemId/*file                              @org.corespring.container.client.controllers.Assets.upload(itemId, file)
 
 # Editor: config, components
 GET           /editor/:itemId/index.html                            @org.corespring.container.client.controllers.apps.Editor.load(itemId)

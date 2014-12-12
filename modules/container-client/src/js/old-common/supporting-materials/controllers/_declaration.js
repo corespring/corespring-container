@@ -1,0 +1,1 @@
+angular.module('corespring-common.supporting-materials.controllers', []);
