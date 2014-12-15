@@ -118,7 +118,7 @@ describe('profile controller', function () {
 
 
     module(function ($provide) {
-      $provide.value('$location', mockLocation)
+      $provide.value('$location', mockLocation);
       $provide.value('throttle', _.identity);
       $provide.value('ConfigurationService', mockConfigurationService);
       $provide.value('DataQueryService', mockDataQueryService);
@@ -658,106 +658,140 @@ describe('profile controller', function () {
         });
     });
     describe("overrides values in profile", function(){
-      beforeEach(function(){
-        mockLocation.hashResult = {profileConfig: JSON.stringify({
-          title: {value: "some title"},
-          description: {value: "some description"},
-          primarySubject: {value: "some primary subject"},
-          relatedSubject: {value: "some related subject"},
-          gradeLevel: {value: ["01","03"]},
-          standards: {value: ["1","2"]},
-          lexile: {value: 76},
-          depthOfKnowledge: {value: "some depth"},
-          bloomsTaxonomy: {value: "some blooms"},
-          keySkills: {value: ["one","two"]},
-          priorUse: {value: "some prior use"},
-          priorUseOther: {value: "some other prior use"},
-          priorGradeLevel: {value: ["02","04"]},
-          reviewsPassed: {value: ["r1","r2"]},
-          reviewsPassedOther: {value: "Other reviews passed"},
-          author: {value: "some author"},
-          credentials: {value: "some credentials"},
-          credentialsOther: {value: "some other credentials"},
-          copyrightOwner: {value: "some copyright owner"},
-          copyrightYear: {value: 1978},
-          copyrightExpirationDate: {value: 2020},
-          sourceUrl: {value: "some source url"},
-          additionalCopyrights: {value: [
-            {author: "some author"}
-          ]}
-        })};
-        makeProfileController()
+      describe("simple", function(){
+        beforeEach(function(){
+          mockLocation.hashResult = {profileConfig: JSON.stringify({
+            title: {value: "some title"},
+            description: {value: "some description"},
+            gradeLevel: {value: ["01","03"]},
+            lexile: {value: 76},
+            depthOfKnowledge: {value: "some depth"},
+            bloomsTaxonomy: {value: "some blooms"},
+            keySkills: {value: ["one","two"]},
+            priorUse: {value: "some prior use"},
+            priorUseOther: {value: "some other prior use"},
+            priorGradeLevel: {value: ["02","04"]},
+            reviewsPassed: {value: ["r1","r2"]},
+            reviewsPassedOther: {value: "Other reviews passed"},
+            author: {value: "some author"},
+            credentials: {value: "some credentials"},
+            credentialsOther: {value: "some other credentials"},
+            copyrightOwner: {value: "some copyright owner"},
+            copyrightYear: {value: 1978},
+            copyrightExpirationDate: {value: 2020},
+            sourceUrl: {value: "some source url"},
+            additionalCopyrights: {value: [
+              {author: "some author"}
+            ]}
+          })};
+          makeProfileController();
+
+        });
+        it("title", function(){
+          expect(scope.taskInfo.title).toEqual("some title");
+        });
+        it("description", function(){
+          expect(scope.taskInfo.description).toEqual("some description");
+        });
+        it("gradeLevel", function(){
+          expect(scope.taskInfo.gradeLevel).toEqual(["01","03"]);
+        });
+        it("lexile", function(){
+          expect(scope.profile.lexile).toEqual(76);
+        });
+        it("depthOfKnowledge", function(){
+          expect(scope.profile.otherAlignments.depthOfKnowledge).toEqual("some depth");
+        });
+        it("bloomsTaxonomy", function(){
+          expect(scope.profile.otherAlignments.bloomsTaxonomy).toEqual("some blooms");
+        });
+        it("keySkills", function(){
+          expect(scope.profile.otherAlignments.keySkills).toEqual(["one", "two"]);
+        });
+        it("priorUse", function(){
+          expect(scope.profile.priorUse).toEqual("some prior use");
+        });
+        it("priorUseOther", function(){
+          expect(scope.profile.priorUseOther).toEqual("some other prior use");
+        });
+        it("priorGradeLevel", function(){
+          expect(scope.profile.priorGradeLevel).toEqual(["02", "04"]);
+        });
+        it("reviewsPassed", function(){
+          expect(scope.profile.reviewsPassed).toEqual(["r1", "r2"]);
+        });
+        it("reviewsPassedOther", function(){
+          expect(scope.profile.reviewsPassedOther).toEqual("Other reviews passed");
+        });
+        it("author", function(){
+          expect(scope.contributorDetails.author).toEqual("some author");
+        });
+        it("credentials", function(){
+          expect(scope.contributorDetails.credentials).toEqual("some credentials");
+        });
+        it("credentialsOther", function(){
+          expect(scope.contributorDetails.credentialsOther).toEqual("some other credentials");
+        });
+        it("copyrightOwner", function(){
+          expect(scope.contributorDetails.copyrightOwner).toEqual("some copyright owner");
+        });
+        it("copyrightYear", function(){
+          expect(scope.contributorDetails.copyrightYear).toEqual(1978);
+        });
+        it("copyrightExpirationDate", function(){
+          expect(scope.contributorDetails.copyrightExpirationDate).toEqual(2020);
+        });
+        it("sourceUrl", function(){
+          expect(scope.contributorDetails.sourceUrl).toEqual("some source url");
+        });
+        it("additionalCopyrights", function(){
+          expect(scope.contributorDetails.additionalCopyrights).toEqual([{author: "some author"}]);
+        });
       });
-      it("title", function(){
-        expect(scope.taskInfo.title).toEqual("some title");
+      describe("subjects.primary", function(){
+        beforeEach(function() {
+          mockLocation.hashResult = {
+            profileConfig: JSON.stringify({
+              primarySubject: {value: "Cat1:Sub1"}
+            })
+          };
+          mockDataQueryService.queryResult = [{subject:"Sub1", category:"Cat1"}];
+          makeProfileController();
+        });
+        it("should equal to the first result of the data query", function(){
+          expect(scope.taskInfo.subjects.primary).toEqual({subject:"Sub1", category:"Cat1"});
+        });
       });
-      it("description", function(){
-        expect(scope.taskInfo.description).toEqual("some description");
+      describe("subjects.related", function(){
+        beforeEach(function() {
+          mockLocation.hashResult = {
+            profileConfig: JSON.stringify({
+              relatedSubject: {value: ["Cat1:Sub1"]}
+            })
+          };
+          mockDataQueryService.queryResult = [{subject:"Sub1", category:"Cat1"}];
+          makeProfileController();
+        });
+        it("related subject", function(){
+          expect(scope.taskInfo.subjects.related).toEqual([{subject:"Sub1", category:"Cat1"}]);
+        });
       });
-      it("primary subject", function(){
-        //TODO expect(scope.taskInfo.subjects.primary).toEqual("some primary subject");
-      });
-      it("related subject", function(){
-        //TODO expect(scope.taskInfo.subjects.related).toEqual("some related subject");
-      });
-      it("gradeLevel", function(){
-        expect(scope.taskInfo.gradeLevel).toEqual(["01","03"]);
-      });
-      it("standards", function(){
-        //TODO expect(scope.profile.standards).toEqual(["1","2"]);
-      });
-      it("lexile", function(){
-        expect(scope.profile.lexile).toEqual(76);
-      });
-      it("depthOfKnowledge", function(){
-        expect(scope.profile.otherAlignments.depthOfKnowledge).toEqual("some depth");
-      });
-      it("bloomsTaxonomy", function(){
-        expect(scope.profile.otherAlignments.bloomsTaxonomy).toEqual("some blooms");
-      });
-      it("keySkills", function(){
-        expect(scope.profile.otherAlignments.keySkills).toEqual(["one", "two"]);
-      });
-      it("priorUse", function(){
-        expect(scope.profile.priorUse).toEqual("some prior use");
-      });
-      it("priorUseOther", function(){
-        expect(scope.profile.priorUseOther).toEqual("some other prior use");
-      });
-      it("priorGradeLevel", function(){
-        expect(scope.profile.priorGradeLevel).toEqual(["02", "04"]);
-      });
-      it("reviewsPassed", function(){
-        expect(scope.profile.reviewsPassed).toEqual(["r1", "r2"]);
-      });
-      it("reviewsPassedOther", function(){
-        expect(scope.profile.reviewsPassedOther).toEqual("Other reviews passed");
-      });
-      it("author", function(){
-        expect(scope.contributorDetails.author).toEqual("some author");
-      });
-      it("credentials", function(){
-        expect(scope.contributorDetails.credentials).toEqual("some credentials");
-      });
-      it("credentialsOther", function(){
-        expect(scope.contributorDetails.credentialsOther).toEqual("some other credentials");
-      });
-      it("copyrightOwner", function(){
-        expect(scope.contributorDetails.copyrightOwner).toEqual("some copyright owner");
-      });
-      it("copyrightYear", function(){
-        expect(scope.contributorDetails.copyrightYear).toEqual(1978);
-      });
-      it("copyrightExpirationDate", function(){
-        expect(scope.contributorDetails.copyrightExpirationDate).toEqual(2020);
-      });
-      it("sourceUrl", function(){
-        expect(scope.contributorDetails.sourceUrl).toEqual("some source url");
-      });
-      it("additionalCopyrights", function(){
-        expect(scope.contributorDetails.additionalCopyrights).toEqual([{author: "some author"}]);
+      describe("standards", function(){
+        beforeEach(function() {
+          mockLocation.hashResult = {
+            profileConfig: JSON.stringify({
+              standards: {value: ["RL.1.1"]}
+            })
+          };
+          mockDataQueryService.queryResult = [{dotNotation:"RL.1.1"}];
+          makeProfileController();
+        });
+        it("standards", function(){
+          expect(scope.profile.standards).toEqual([{dotNotation:"RL.1.1"}]);
+        });
       });
     });
+
     describe("options", function(){
       beforeEach(makeProfileController);
 

@@ -32,7 +32,7 @@ class StandardsDataQueryTest extends Specification {
         Json.obj("category" -> "Reading"),
         Json.obj("category" -> "Reading and Speaking"))
       val result = sut.list(standards, Some(Json.obj(
-        "filters" -> Json.arr(Json.obj("field" -> "category", "value" -> "Reading"))).toString()))
+        "filters" -> Json.obj("category" -> "Reading")).toString()))
       result.length === 2
     }
 
@@ -42,9 +42,7 @@ class StandardsDataQueryTest extends Specification {
         Json.obj("category" -> "Reading", "subject" -> "test-2"),
         Json.obj("category" -> "Reading and Speaking", "subject" -> "test-3"))
       val result = sut.list(standards, Some(Json.obj(
-        "filters" -> Json.arr(
-          Json.obj("field" -> "category", "value" -> "Reading"),
-          Json.obj("field" -> "subject", "value" -> "test-2"))).toString()))
+        "filters" -> Json.obj("category"-> "Reading", "subject" -> "test-2")).toString()))
       result.length === 1
     }
 
@@ -55,8 +53,7 @@ class StandardsDataQueryTest extends Specification {
         Json.obj("id" -> "3", "category" -> "Reading and Speaking", "subCategory" -> "sub two"))
       val result = sut.list(standards, Some(Json.obj(
         "searchTerm" -> "two",
-        "fields" -> Json.arr("subCategory"),
-        "filters" -> Json.arr(Json.obj("field" -> "category", "value" -> "Reading"))).toString()))
+        "filters" -> Json.obj("category" -> "Reading")).toString()))
       result.length === 1
       (result.head \ "id").as[String] === "2"
     }

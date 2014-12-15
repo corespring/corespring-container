@@ -46,7 +46,8 @@
       },
       primarySubject: {
         visible:true,
-        readonly:false
+        readonly:false,
+        value: "Art:Other"
       },
       relatedSubject: {
         visible:true,
@@ -232,6 +233,7 @@
         }
 
         getConfig(configItem.value, function (result) {
+          $log.log("getConfig callback ", name, dest, result);
           dest[name] = result;
         });
       }
@@ -536,12 +538,13 @@
 
     function findSubjectByCategorySubject(topic, categorySubject, callback){
       var parts = categorySubject.split(":");
-      var category = parts[0];
-      var subject = parts[1];
+      var query = {filters:{'category':parts[0],'subject':parts[1]}};
+      $log.log("findSubjectByCategorySubject", topic, categorySubject, query);
       DataQueryService.query(
         topic,
-        {filters:{'category':category,'subject':subject}},
+        query,
         function(item) {
+          $log.log("DataQueryService callback", item);
           callback(item[0]);
         });
     }

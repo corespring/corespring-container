@@ -27,18 +27,18 @@ object StandardsDataQuery {
          * && (item[filter[..].field] == filter[..].value )
          */
         val jsonQuery = Json.parse(q)
+
         val searchTerm = (jsonQuery \ "searchTerm").asOpt[String]
-        val fields = (jsonQuery \ "fields").asOpt[Seq[String]]
-        val filters = (jsonQuery \ "filters").asOpt[Seq[JsValue]]
+        val fields = Some(Array("subject", "dotNotation", "category", "subCategory"))
+        val filters = (jsonQuery \ "filters").asOpt[Map[String,String]]
 
         def matchAllFilters(s: JsObject): Boolean = filters.map {
-          filterList =>
-            {
-              filterList.forall(filterItem => {
-                (s \ (filterItem \ "field").as[String]).asOpt[String]
-                  .map(s => s == (filterItem \ "value").as[String])
-                  .getOrElse(false)
-              })
+          filterObject: Map[String, String] =>
+            filterObject.forall { case (key, value) => {
+              (s \ key).asOpt[String]
+                .map(s => s == value)
+                .getOrElse(false)
+            }
             }
         }.getOrElse(true)
 
