@@ -99,33 +99,31 @@ script(type="text/ng-template", id="/templates/profile")
         form.form-horizontal(role="form",ng-show="formModels.standards.visible")
           div(ng-show="!formModels.standards.readonly")
             h6 Add the Standards
-            .row
-              .col-sm-6
-                +field("standard-filter-subject","Subject")
-                  select.from-control(id="standard-filter-subject",
-                  ng-model="standardFilterOption.subject",
-                  ng-options="c.name for c in standardsTree")
-                    option(value="") {{standardFilterPlaceholder.subject}}
+            +field("standard-filter-subject","Subject")
+              select.from-control(id="standard-filter-subject",
+              ng-model="standardFilterOption.subject",
+              ng-options="c.name for c in standardsTree")
+                option(value="") {{standardFilterPlaceholder.subject}}
 
-                +field("standard-filter-category","Category")
-                  select.from-control(id="standard-filter-category",
-                  ng-model="standardFilterOption.category",
-                  ng-options="p.name for p in standardFilterOption.subject.items")
-                    option(value="") {{standardFilterPlaceholder.category}}
+            +field("standard-filter-category","Category")
+              select.from-control(id="standard-filter-category",
+              ng-model="standardFilterOption.category",
+              ng-options="p.name for p in standardFilterOption.subject.items")
+                option(value="") {{standardFilterPlaceholder.category}}
 
-                +field("standard-filter-sub-category","Sub-Category")
-                  select.from-control(id="standard-filter-sub-category",
-                  ng-model="standardFilterOption.subCategory",
-                  ng-options="z for z in standardFilterOption.category.items")
-                    option(value="") {{standardFilterPlaceholder.subCategory}}
-              .col-sm-6
-                +field("standard-filter-search","Standards")
-                  input(id="standard-filter-search",
-                  class="add-standards",
-                  type="text",
-                  ui-select2="standardsAdapter",
-                  ng-model="profile.standards",
-                  style="width: 100%;")
+            +field("standard-filter-sub-category","Sub-Category")
+              select.from-control(id="standard-filter-sub-category",
+              ng-model="standardFilterOption.subCategory",
+              ng-options="z for z in standardFilterOption.category.items")
+                option(value="") {{standardFilterPlaceholder.subCategory}}
+            +field("standard-filter-search","Standards")
+              input(id="standard-filter-search",
+              class="add-standards",
+              type="text",
+              ui-select2="standardsAdapter",
+              ng-model="profile.standards",
+              style="width: 100%;")
+              span Begin entering standard codes
             hr/
 
           h6 Standards
@@ -164,15 +162,18 @@ script(type="text/ng-template", id="/templates/profile")
             span(ng-bind-html-unsafe="keySkillsTitle")
           +panelBody("keySkills")
             .panel-body
-              +field("keySkills", "Skills")
-                select(id="keySkills",
-                ng-model="otherAlignments.keySkills",
-                ui-select2,
-                multiple,
-                data-placeholder="Choose one or more key skills...",
-                ng-readonly="formModels.keySkills.readonly",
-                style="width:100%;")
-                  option(ng-repeat="c in keySkillsDataProvider | filter:keySkillsFilter ",value="{{c.key}}") {{c.value}}
+              .form-group
+                .col-sm-3 Please select all applicable key skills for this item.
+                label.col-sm-1.control-label(for="keySkills") Skills
+                .col-sm-8
+                  select(id="keySkills",
+                  ng-model="otherAlignments.keySkills",
+                  ui-select2,
+                  multiple,
+                  data-placeholder="Choose one or more key skills...",
+                  ng-readonly="formModels.keySkills.readonly",
+                  style="width:100%;")
+                    option(ng-repeat="c in keySkillsDataProvider | filter:keySkillsFilter ",value="{{c.key}}") {{c.value}}
 
           +panel("lexile", "Lexile Score")
             .panel-body.lexile
