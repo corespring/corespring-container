@@ -11,11 +11,12 @@ mixin help
     i.fa.fa-question-circle
 
 mixin helper_icons
-  ul.list-inline.list-unstyled.helper-icons
-    li 
-      +info_btn('questionInformation') Question Information
-    li 
-      +help
+  table 
+    tr 
+      td
+        +info_btn('questionInformation') Question Information
+      td 
+        +help
 
 include ../templates/popups
 include ../templates/question-information
@@ -33,10 +34,10 @@ nav.row.navbar-default(ng-controller="NavController")
           | There was an error saving your content
         span#save-error(ng-switch-default)
           |  &nbsp;
+  .tab-and-help
+    ul.nav.nav-tabs(role='tablist')
+      +tab('Question', 'question')
+      +tab('Profile', 'profile')
+      +tab('Supporting Materials', 'supporting-materials')
 
-  +helper_icons
-
-  ul.nav.nav-tabs(role='tablist')
-    +tab('Question', 'question')
-    +tab('Profile', 'profile')
-    +tab('Supporting Materials', 'supporting-materials')
+    +helper_icons

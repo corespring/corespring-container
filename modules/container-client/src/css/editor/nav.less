@@ -1,5 +1,4 @@
 nav{
-  position: relative;
   .title {
     font-size: 20px;
     padding: 20px 0 0 15px;
@@ -7,21 +6,36 @@ nav{
       cursor: pointer;
     }
   }
+
   .helper-icons{
     position: absolute;
-    right: 10px;
-    bottom: 0;
+    right: 0;
+    top: 0;
   }
 
   .help{
-    font-size: 29px;
-    position:relative;
-    top: 15px;
+    font-size: 27px;
     i {
       color: @new-blue;
     }
   }
 
+  .tab-and-help{
+    position:relative;
+
+    table{
+      position: absolute;
+      top: 0;
+      right: 5px;
+
+      td {
+        border: none;
+        padding: 0;
+        margin: 0;
+        min-width: 30px;
+      }
+    }
+  }
 
   .save-msg{
     position: relative;
@@ -52,4 +66,6 @@ nav{
         color: red;
     }
   }
+
+
 }
