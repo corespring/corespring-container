@@ -142,21 +142,17 @@ script(type="text/ng-template", id="/templates/profile")
 
           +panel("depthOfKnowledge", "Depth Of Knowledge")
             .panel-body.depth-of-knowledge
-              label(ng-repeat="c in depthOfKnowledgeDataProvider | filter:depthOfKnowledgeFilter")
-                radio(
-                ng-model="otherAlignments.depthOfKnowledge",
-                ng-disabled="formModels.depthOfKnowledge.readonly",
-                value="{{c.key}}")
-                | {{ c.value }}
+              radio(ng-repeat="c in depthOfKnowledgeDataProvider | filter:depthOfKnowledgeFilter",
+              ng-model="otherAlignments.depthOfKnowledge",
+              ng-disabled="formModels.depthOfKnowledge.readonly",
+              value="{{c.key}}") {{ c.value }}
 
           +panel("bloomsTaxonomy", "Bloom's Taxonomy")
             .panel-body.blooms-taxonomy
-              label(ng-repeat="c in bloomsTaxonomyDataProvider | filter:bloomsTaxonomyFilter")
-                radio(
-                ng-model="otherAlignments.bloomsTaxonomy",
-                ng-disabled="formModels.bloomsTaxonomy.readonly",
-                value="{{c.key}}")
-                | {{ c.value }}
+              radio(ng-repeat="c in bloomsTaxonomyDataProvider | filter:bloomsTaxonomyFilter",
+              ng-model="otherAlignments.bloomsTaxonomy",
+              ng-disabled="formModels.bloomsTaxonomy.readonly",
+              value="{{c.key}}") {{ c.value }}
 
           +panelHeader("keySkills")
             span(ng-bind-html-unsafe="keySkillsTitle")
