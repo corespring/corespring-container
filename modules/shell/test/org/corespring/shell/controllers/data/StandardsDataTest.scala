@@ -21,8 +21,7 @@ class StandardsDataTest extends Specification {
         Json.obj("category" -> "Writing"),
         Json.obj("category" -> "Speaking"))
       val result = sut.list(standards, Some(Json.obj(
-        "searchTerm" -> "Reading",
-        "fields" -> Json.arr("category")).toString()))
+        "searchTerm" -> "Reading").toString()))
       result.length === 1
     }
 
@@ -32,7 +31,7 @@ class StandardsDataTest extends Specification {
         Json.obj("category" -> "Reading"),
         Json.obj("category" -> "Reading and Speaking"))
       val result = sut.list(standards, Some(Json.obj(
-        "filters" -> Json.arr(Json.obj("field" -> "category", "value" -> "Reading"))).toString()))
+        "filters" -> Json.obj("category" -> "Reading")).toString()))
       result.length === 2
     }
 
@@ -43,8 +42,7 @@ class StandardsDataTest extends Specification {
         Json.obj("id" -> "3", "category" -> "Reading and Speaking", "subCategory" -> "sub two"))
       val result = sut.list(standards, Some(Json.obj(
         "searchTerm" -> "two",
-        "fields" -> Json.arr("subCategory"),
-        "filters" -> Json.arr(Json.obj("field" -> "category", "value" -> "Reading"))).toString()))
+        "filters" -> Json.obj("category" -> "Reading")).toString()))
       result.length === 1
       (result.head \ "id").as[String] === "2"
     }
