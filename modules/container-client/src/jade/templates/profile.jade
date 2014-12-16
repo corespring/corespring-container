@@ -21,7 +21,7 @@ mixin configurableField(id, label, ngModel)
       else
         input.form-control(id=id, ng-model=ngModel, ng-readonly="formModels.#{id}.readonly")
 
-mixin gradeLevelSelector(id, dataProvider, msg)
+mixin gradeLevelSelector(id, ngModel, dataProvider, msg)
   select(id=id,
   ng-model=ngModel,
   ui-select2,
@@ -39,7 +39,7 @@ mixin panelHeader(id)
           block
 
 mixin panelBody(id)
-  .panel-collapse.collapse(id="collapse-#{id}",role="tabpanel",aria-labelledby="heading-#{id}")
+  .panel-collapse.collapse(id="collapse-#{id}",role="tabpanel",aria-labelledby="heading-#{id}", ng-class="formModels.#{id}.collapse")
     block
 
 mixin panel(id, title)
@@ -88,7 +88,7 @@ script(type="text/ng-template", id="/templates/profile")
             style="width:100%;")
 
           +configurableField("gradeLevel","Grade Level", "taskInfo.gradeLevel")
-            +gradeLevelSelector("gradeLevel","gradeLevelDataProvider | filter:gradeLevelFilter","Choose a grade level...")
+            +gradeLevelSelector("gradeLevel","taskInfo.gradeLevel","gradeLevelDataProvider | filter:gradeLevelFilter","Choose a grade level...")
 
           .form-group(ng-show="formModels.componentTypes.visible && 0 < componentTypes.length")
             label.col-sm-3.control-label Item Types
@@ -97,7 +97,7 @@ script(type="text/ng-template", id="/templates/profile")
                 li(ng-repeat="type in componentTypes") {{type}}
 
         form.form-horizontal(role="form",ng-show="formModels.standards.visible")
-          div(ng-show="!formModels.standards.readonly")
+          div.standard-filter(ng-show="!formModels.standards.readonly")
             h6 Add the Standards
             +field("standard-filter-subject","Subject")
               select.from-control(id="standard-filter-subject",
@@ -197,7 +197,7 @@ script(type="text/ng-template", id="/templates/profile")
                 ng-model="profile.priorUseOther", ng-readonly="formModels.priorUse.readonly")
 
               +configurableField("priorGradeLevel","Grade Level", "profile.priorGradeLevel")
-                +gradeLevelSelector("priorGradeLevel","priorGradeLevelDataProvider | filter:priorGradeLevelFilter","Choose a grade level...")
+                +gradeLevelSelector("priorGradeLevel","profile.priorGradeLevel","priorGradeLevelDataProvider | filter:priorGradeLevelFilter","Choose a grade level...")
 
           +panel("reviewsPassed", "Reviews Passed")
             .panel-body
@@ -207,6 +207,7 @@ script(type="text/ng-template", id="/templates/profile")
                   ng-model="rp.selected",
                   ng-change="onChangeReviewsPassed(rp.key)",
                   style="margin-right: 3px;"
+                  value="{{rp.key}}"
                   ng-disabled="formModels.reviewsPassed.readonly",)
                   | {{rp.key}}
 

@@ -119,6 +119,7 @@ describe('profile controller', function () {
 
     module(function ($provide) {
       $provide.value('$location', mockLocation);
+      $provide.value('$timeout', function(fn){fn();});
       $provide.value('throttle', _.identity);
       $provide.value('ConfigurationService', mockConfigurationService);
       $provide.value('DataQueryService', mockDataQueryService);

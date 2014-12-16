@@ -6,6 +6,7 @@
     .controller('ProfileController', [
       '$location',
       '$scope',
+      '$timeout',
       'throttle',
       'ConfigurationService',
       'DataQueryService',
@@ -20,6 +21,7 @@
   function ProfileController(
     $location,
     $scope,
+    $timeout,
     throttle,
     ConfigurationService,
     DataQueryService,
@@ -46,8 +48,7 @@
       },
       primarySubject: {
         visible:true,
-        readonly:false,
-        value: "Art:Other"
+        readonly:false
       },
       relatedSubject: {
         visible:true,
@@ -69,24 +70,28 @@
       //--------------------
       depthOfKnowledge: {
         visible:true,
-        readonly:false
+        readonly:false,
+        collapse:true
       },
       bloomsTaxonomy: {
         visible:true,
-        readonly:false
+        readonly:false,
+        collapse:true
       },
       keySkills: {
         visible:true,
-        readonly:false
+        readonly:false,
+        collapse:true
       },
       lexile: {
         visible:true,
-        readonly:false
+        readonly:false,
+        collapse:true
       },
       //--------------------
       priorUsePanel: {
         visible:true,
-        readonly:false
+        collapse:true
       },
       priorUse: {
         visible:true,
@@ -102,7 +107,8 @@
       },
       reviewsPassed: {
         visible:true,
-        readonly:false
+        readonly:false,
+        collapse:true
       },
       reviewsPassedOther: {
         //here you can only set the value, in case the value of reviewsPassed is 'Other'
@@ -111,7 +117,7 @@
       //--------------------
       copyrightInformationPanel: {
         visible:true,
-        readonly:false
+        collapse:true
       },
       author: {
         visible:true,
@@ -144,12 +150,14 @@
       //--------------------
       additionalCopyrights: {
         visible:true,
-        readonly:false
+        readonly:false,
+        collapse:true
       },
       //--------------------
       licenseType: {
         visible:true,
-        readonly:false
+        readonly:false,
+        collapse:true
       }
     };
 
@@ -173,6 +181,9 @@
       }
       if(config.hasOwnProperty("options")){
         model.options = config.options;
+      }
+      if(config.hasOwnProperty("collapse")){
+        model.collapse = config.collapse === false ? 'in' : null;
       }
     }
 
@@ -233,7 +244,6 @@
         }
 
         getConfig(configItem.value, function (result) {
-          $log.log("getConfig callback ", name, dest, result);
           dest[name] = result;
         });
       }
@@ -367,7 +377,7 @@
       },
 
       formatSelection: function(standard) {
-        setTimeout(function() {
+        $timeout(function() {
           $(".standard-adapter-result").tooltip();
         }, 500);
         return "<span class='standard-adapter-result' data-title='" + standard.standard + "'>" + standard.dotNotation + "</span>";
@@ -539,12 +549,10 @@
     function findSubjectByCategorySubject(topic, categorySubject, callback){
       var parts = categorySubject.split(":");
       var query = {filters:{'category':parts[0],'subject':parts[1]}};
-      $log.log("findSubjectByCategorySubject", topic, categorySubject, query);
       DataQueryService.query(
         topic,
         query,
         function(item) {
-          $log.log("DataQueryService callback", item);
           callback(item[0]);
         });
     }
@@ -553,7 +561,6 @@
      * The config is a category:subject string.
      */
     function configToPrimarySubject(categorySubject, callback){
-      $log.log("configToPrimarySubject", categorySubject);
 
       if(!_.isString(categorySubject)){
         return;
@@ -566,8 +573,6 @@
      * The config is a list of category:subject strings.
      */
     function configToRelatedSubject(categorySubjectList, callback){
-      $log.log("configToRelatedSubject", categorySubjectList);
-
       if(!_.isArray(categorySubjectList)){
         return;
       }
@@ -659,7 +664,7 @@
     // key skills
     //----------------------------------------------------------------
 
-    $scope.keySkillsFilter = createOptionsFilter($scope.formModels.keySkills);
+    $scope.keySkillsFilter = createOptionsFilter($scope.formModels.keySkills, 'key');
 
     $scope.$watch('otherAlignments.keySkills', function(newValue){
       if( $scope.otherAlignments &&  $scope.otherAlignments.keySkills ) {
@@ -668,7 +673,7 @@
     });
 
     DataQueryService.list("keySkills", function (result) {
-      $scope.keySkillsDataProvider = _.chain(result).pluck('value').flatten().sort().map(function(item){
+      $scope.keySkillsDataProvider = _.chain(result).pluck('value').flatten().uniq().sort().map(function(item){
         return {key:item, value:item};
       }).value();
     });
@@ -796,9 +801,6 @@
     //----------------------------------------------------------------
 
     function setItem(item) {
-      $log.log('setItem', item);
-      $scope.item = item;
-
       var profile = item.profile = item.profile || {};
 
       if (!(profile.taskInfo)) {
@@ -842,10 +844,11 @@
 
       overrideProfileValuesWithConfig(profile, $scope.formModels);
 
+      $scope.item = item;
+      $scope.profile = profile;
       $scope.taskInfo = profile.taskInfo;
       $scope.otherAlignments = profile.otherAlignments;
       $scope.contributorDetails = profile.contributorDetails;
-      $scope.profile = profile;
 
       initComponentTypesUsed();
       initReviewsPassedSelection();
@@ -894,7 +897,7 @@
           ConfigurationService.getConfig(function(config){
             $log.log('getConfig callback', config);
             updateFormModels(config.profileConfig);
-            setItem(item);
+            $timeout(function(){setItem(item);}, 20);
           });
         } else {
           $log.error('error loading profile, item is null');
