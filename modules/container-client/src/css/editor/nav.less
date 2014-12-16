@@ -2,6 +2,13 @@ nav{
   .title {
     font-size: 20px;
     padding: 20px 0 0 15px;
+
+    div{
+      text-overflow: ellipsis;
+      max-width: 300px;
+      white-space: nowrap;
+      overflow: hidden;
+    }
     &:hover, &:focus {
       cursor: pointer;
     }
@@ -39,13 +46,7 @@ nav{
 
   .save-msg{
     position: relative;
-    width: 300px;
-    display: block;
-    top: -12px;
-
-    span{
-      position: absolute;
-    }
+    top: -7px;
 
     span.ng-animate {
       -webkit-transition:all linear 0.1s;
@@ -60,7 +61,7 @@ nav{
     span.ng-leave,
     span.ng-enter.ng-enter-active {
       opacity: 1;
-    } 
+    }
 
     #save-error{
         color: red;

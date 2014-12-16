@@ -1,9 +1,8 @@
 angular.module('corespring-editor.controllers').controller('EditTitlePopupController', [
   '$scope',
-  'LogFactory',
   '$modalInstance',
   'title',
-  function($scope, LogFactory, $modalInstance, title){
+  function($scope, $modalInstance, title){
 
     $scope.title = title;
 
