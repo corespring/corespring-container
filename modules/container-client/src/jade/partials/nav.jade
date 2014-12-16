@@ -23,7 +23,7 @@ include ../templates/question-information
 
 nav.row.navbar-default(ng-controller="NavController")
   ul.list-inline
-    li.title(ng-click="editTitle()") {{title}}
+    li.title(ng-click="editTitle()", ng-bind-html-unsafe="title") 
     li
       span.save-msg(ng-switch on="saveStatus")
         span#saved(ng-switch-when="saved")
