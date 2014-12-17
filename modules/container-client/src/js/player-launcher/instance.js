@@ -4,6 +4,20 @@ var Instance = function(element, options, errorCallback, log) {
   /** msgr.Channel */
   var channel;
 
+  var iframeUid = 'corespring-iframe-' + msgr.utils.getUid();
+
+  function $iframe() {
+
+    var $node = $('#' + iframeUid);
+
+    if($node.size() === 1){
+      return $node;
+    } else {
+      var err = errors.CANT_FIND_IFRAME(iframeUid);
+      errorCallback(err);
+    }
+  }
+
   var errors = require("errors");
 
   log = log || require('logger');
@@ -18,7 +32,7 @@ var Instance = function(element, options, errorCallback, log) {
     }
 
     if ($(e).length === 0) {
-      errorCallback(errors.CANT_FIND_IFRAME);
+      errorCallback(errors.CANT_FIND_CONTAINER_FOR_PLAYER);
       return;
     }
 
@@ -30,7 +44,7 @@ var Instance = function(element, options, errorCallback, log) {
     var url = makeUrl(options.url, options.queryParams);
     if(options.hash){
       url += '#' + options.hash;
-    }
+   }
 
     var iframeStyles = [
       '',
@@ -46,31 +60,25 @@ var Instance = function(element, options, errorCallback, log) {
     })();
 
     var iframeTemplate = [
-      "<iframe",
-      " id='iframe-player'",
-      " frameborder='0'",
-      " src='",
-      url,
-      "'",
-      " class='player-loading'",
-      " style='",
-      "   width: 100%;",
-      "   border: none;",
-      " '",
-      "></iframe>"
+      '<iframe',
+      ' id="', iframeUid , '"',
+      ' frameborder="0"',
+      ' src="', url, '"',
+      ' class="player-loading"',
+      ' style="width: 100%; border: none;"></iframe>'
     ].join('');
 
     $(e).html(iframeTemplate);
 
-    channel = new msgr.Channel(window, $('#iframe-player')[0].contentWindow, {enableLogging: false});
+    channel = new msgr.Channel(window, $iframe()[0].contentWindow, {enableLogging: false});
 
     channel.on('dimensionsUpdate', function(data){
-      $('#iframe-player').height(data.h);
+      $iframe().height(data.h);
     });
 
     channel.on('rendered', function() {
-      $('#iframe-player').removeClass("player-loading");
-      $('#iframe-player').addClass("player-loaded");
+      $iframe().removeClass("player-loading");
+      $iframe().addClass("player-loaded");
     });
 
     if (options.forceWidth) {
@@ -89,7 +97,7 @@ var Instance = function(element, options, errorCallback, log) {
 
   this.remove = function() {
     channel.remove();
-    $(element).find('#iframe-player').remove();
+    $iframe().remove();
   };
 
   this.removeChannel = function() {
