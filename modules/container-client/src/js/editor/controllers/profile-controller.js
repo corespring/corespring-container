@@ -184,7 +184,7 @@
         model.options = config.options;
       }
       if(config.hasOwnProperty("collapse")){
-        model.collapse = config.collapse === false ? 'in' : null;
+        model.collapse = config.collapse === false;
       }
     }
 

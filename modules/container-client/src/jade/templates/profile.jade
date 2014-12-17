@@ -39,7 +39,7 @@ mixin panelHeader(id)
           block
 
 mixin panelBody(id)
-  .panel-collapse.collapse(id="collapse-#{id}",role="tabpanel",aria-labelledby="heading-#{id}", ng-class="formModels.#{id}.collapse")
+  .panel-collapse.collapse(id="collapse-#{id}",role="tabpanel",aria-labelledby="heading-#{id}", ng-class="{in: !formModels.#{id}.collapse}")
     block
 
 mixin panel(id, title)
