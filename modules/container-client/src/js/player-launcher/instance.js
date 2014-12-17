@@ -4,7 +4,7 @@ var Instance = function(element, options, errorCallback, log) {
   /** msgr.Channel */
   var channel;
 
-  var iframeUid = 'corespring-player-' + msgr.utils.getUid();
+  var iframeUid = 'corespring-iframe-' + msgr.utils.getUid();
 
   function $iframe() {
 
