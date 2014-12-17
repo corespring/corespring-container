@@ -100,19 +100,19 @@ script(type="text/ng-template", id="/templates/profile")
           div.standard-filter(ng-show="!formModels.standards.readonly")
             h6 Add the Standards
             +field("standard-filter-subject","Subject")
-              select.from-control(id="standard-filter-subject",
+              select.form-control(id="standard-filter-subject",
               ng-model="standardFilterOption.subject",
               ng-options="c.name for c in standardsTree")
                 option(value="") {{standardFilterPlaceholder.subject}}
 
             +field("standard-filter-category","Category")
-              select.from-control(id="standard-filter-category",
+              select.form-control(id="standard-filter-category",
               ng-model="standardFilterOption.category",
               ng-options="p.name for p in standardFilterOption.subject.items")
                 option(value="") {{standardFilterPlaceholder.category}}
 
             +field("standard-filter-sub-category","Sub-Category")
-              select.from-control(id="standard-filter-sub-category",
+              select.form-control(id="standard-filter-sub-category",
               ng-model="standardFilterOption.subCategory",
               ng-options="z for z in standardFilterOption.category.items")
                 option(value="") {{standardFilterPlaceholder.subCategory}}
