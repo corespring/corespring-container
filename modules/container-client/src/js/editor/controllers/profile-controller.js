@@ -108,7 +108,8 @@
       reviewsPassed: {
         visible:true,
         readonly:false,
-        collapse:true
+        collapse:true,
+        value:[]
       },
       reviewsPassedOther: {
         //here you can only set the value, in case the value of reviewsPassed is 'Other'
@@ -709,75 +710,47 @@
 
     DataQueryService.list("reviewsPassed", function (result) {
       $scope.reviewsPassedDataProvider = result;
-      initReviewsPassedSelection();
       updateReviewsPassedOtherSelected();
     });
 
-    function initReviewsPassedSelection() {
-      if ($scope.reviewsPassedDataProvider && $scope.profile && _.isArray($scope.profile.reviewsPassed)) {
-
-        _.each($scope.reviewsPassedDataProvider, function(item) {
-          var selected = $scope.profile.reviewsPassed.indexOf(item.key) >= 0;
-          if (selected !== item.selected) {
-            item.selected = selected;
-          }
-        });
-      }
-    }
 
     function updateReviewsPassedOtherSelected() {
-      var otherSelected = false;
-      if ($scope.reviewsPassedDataProvider) {
-        otherSelected = _.some($scope.reviewsPassedDataProvider, function(item) {
-          return item.selected && 'Other' === item.key;
-        });
+      if (!$scope.profile) {
+        return;
       }
-      if ($scope.isReviewsPassedOtherSelected && !otherSelected && $scope.profile) {
+      var otherSelected = _.contains($scope.profile.reviewsPassed, 'Other');
+      if ($scope.isReviewsPassedOtherSelected && !otherSelected) {
         $scope.profile.reviewsPassedOther = '';
       }
       $scope.isReviewsPassedOtherSelected = otherSelected;
     }
 
-    $scope.onChangeReviewsPassed = function(changedKey) {
-      function getKeys(predicate) {
-        return _.chain($scope.reviewsPassedDataProvider)
-          .filter(predicate)
-          .pluck("key")
-          .value();
+    $scope.$watch('profile.reviewsPassed', function(newValue, oldValue) {
+      if(!$scope.profile || !$scope.reviewsPassedDataProvider){
+        return;
       }
 
-      var selectedKeys = getKeys(function(item) {
-        return item.selected;
+      function noop(){}
+
+      function setNone(){
+        $scope.profile.reviewsPassed = [];
+      }
+
+      function setAll(){
+        $scope.profile.reviewsPassed = _.chain($scope.reviewsPassedDataProvider).pluck('value').without('Other')
+          .union(newValue).without('None', 'All').value();
+      }
+
+      var updateAction = noop;
+      if(_.contains(newValue, 'None')) {
+        updateAction = setNone;
+      } else if(_.contains(newValue, 'All')) {
+        updateAction = setAll;
+      }
+      $timeout(function(){
+        updateAction();
+        updateReviewsPassedOtherSelected();
       });
-
-      function keyIsSelected(key) {
-        return selectedKeys.indexOf(key) >= 0;
-      }
-
-      if ("None"  === changedKey) {
-        if (keyIsSelected(changedKey)) {
-          selectedKeys = ["None"];
-        }
-      } else if ("All" === changedKey) {
-        if (keyIsSelected(changedKey)) {
-          var isOtherSelected = keyIsSelected("Other");
-          selectedKeys = getKeys(function(item) {
-            return "None" !== item.key && ("Other" !== item.key || isOtherSelected);
-          });
-        }
-      } else {
-        if (keyIsSelected(changedKey)) {
-          selectedKeys = _.without(selectedKeys, "None");
-        } else {
-          selectedKeys = _.without(selectedKeys, "All");
-        }
-      }
-      $scope.profile.reviewsPassed = selectedKeys;
-      initReviewsPassedSelection();
-    };
-
-    $scope.$watch('profile.reviewsPassed', function() {
-      updateReviewsPassedOtherSelected();
     });
 
     //----------------------------------------------------------------
@@ -851,7 +824,6 @@
       $scope.contributorDetails = profile.contributorDetails;
 
       initComponentTypesUsed();
-      initReviewsPassedSelection();
       updateReviewsPassedOtherSelected();
       updatePriorUseOtherSelected();
       updateCredentialsOtherSelected();

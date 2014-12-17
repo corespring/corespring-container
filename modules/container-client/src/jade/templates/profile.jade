@@ -21,7 +21,7 @@ mixin configurableField(id, label, ngModel)
       else
         input.form-control(id=id, ng-model=ngModel, ng-readonly="formModels.#{id}.readonly")
 
-mixin gradeLevelSelector(id, ngModel, dataProvider, msg)
+mixin multipleValueSelector(id, ngModel, dataProvider, msg)
   select(id=id,
   ng-model=ngModel,
   ui-select2,
@@ -88,7 +88,7 @@ script(type="text/ng-template", id="/templates/profile")
             style="width:100%;")
 
           +configurableField("gradeLevel","Grade Level", "taskInfo.gradeLevel")
-            +gradeLevelSelector("gradeLevel","taskInfo.gradeLevel","gradeLevelDataProvider | filter:gradeLevelFilter","Choose a grade level...")
+            +multipleValueSelector("gradeLevel","taskInfo.gradeLevel","gradeLevelDataProvider | filter:gradeLevelFilter","Choose a grade level...")
 
           .form-group(ng-show="formModels.componentTypes.visible && 0 < componentTypes.length")
             label.col-sm-3.control-label Item Types
@@ -142,21 +142,17 @@ script(type="text/ng-template", id="/templates/profile")
 
           +panel("depthOfKnowledge", "Depth Of Knowledge")
             .panel-body.depth-of-knowledge
-              label(ng-repeat="c in depthOfKnowledgeDataProvider | filter:depthOfKnowledgeFilter")
-                input(type="radio",
-                ng-model="otherAlignments.depthOfKnowledge",
-                ng-disabled="formModels.depthOfKnowledge.readonly",
-                value="{{c.key}}")
-                | {{ c.value }}
+              radio(ng-repeat="c in depthOfKnowledgeDataProvider | filter:depthOfKnowledgeFilter",
+              ng-model="otherAlignments.depthOfKnowledge",
+              ng-disabled="formModels.depthOfKnowledge.readonly",
+              value="{{c.key}}") {{ c.value }}
 
           +panel("bloomsTaxonomy", "Bloom's Taxonomy")
             .panel-body.blooms-taxonomy
-              label(ng-repeat="c in bloomsTaxonomyDataProvider | filter:bloomsTaxonomyFilter")
-                input(type="radio",
-                ng-model="otherAlignments.bloomsTaxonomy",
-                ng-disabled="formModels.bloomsTaxonomy.readonly",
-                value="{{c.key}}")
-                | {{ c.value }}
+              radio(ng-repeat="c in bloomsTaxonomyDataProvider | filter:bloomsTaxonomyFilter",
+              ng-model="otherAlignments.bloomsTaxonomy",
+              ng-disabled="formModels.bloomsTaxonomy.readonly",
+              value="{{c.key}}") {{ c.value }}
 
           +panelHeader("keySkills")
             span(ng-bind-html-unsafe="keySkillsTitle")
@@ -197,23 +193,19 @@ script(type="text/ng-template", id="/templates/profile")
                 ng-model="profile.priorUseOther", ng-readonly="formModels.priorUse.readonly")
 
               +configurableField("priorGradeLevel","Grade Level", "profile.priorGradeLevel")
-                +gradeLevelSelector("priorGradeLevel","profile.priorGradeLevel","priorGradeLevelDataProvider | filter:priorGradeLevelFilter","Choose a grade level...")
+                +multipleValueSelector("priorGradeLevel","profile.priorGradeLevel","priorGradeLevelDataProvider | filter:priorGradeLevelFilter","Choose a grade level...")
 
           +panel("reviewsPassed", "Reviews Passed")
             .panel-body
               +field("reviewsPassed","This item passed the following reviews")
-                label(ng-repeat="rp in reviewsPassedDataProvider | filter:reviewsPassedFilter", style="width:50%;")
-                  input(type="checkbox",
-                  ng-model="rp.selected",
-                  ng-change="onChangeReviewsPassed(rp.key)",
-                  style="margin-right: 3px;"
-                  value="{{rp.key}}"
-                  ng-disabled="formModels.reviewsPassed.readonly",)
-                  | {{rp.key}}
+                +multipleValueSelector("reviewsPassed","profile.reviewsPassed","reviewsPassedDataProvider | filter:reviewsPassedFilter","Choose a review...")
 
-                input.form-control(id="reviewsPassedOther", ng-show="isReviewsPassedOtherSelected", style="width:50%; margin-left:50%", type="text",
-                placeholder="Enter review...", ng-model="profile.reviewsPassedOther",
-                ng-readonly="formModels.reviewsPassed.readonly")
+              .form-group(ng-show="isReviewsPassedOtherSelected")
+                label.col-sm-4.control-label(for="reviewsPassedOther") Other review
+                .col-sm-8
+                  input.form-control(id="reviewsPassedOther", type="text",
+                  placeholder="Enter review...", ng-model="profile.reviewsPassedOther",
+                  ng-readonly="formModels.reviewsPassed.readonly")
 
         +h_form
           h6 Ownership

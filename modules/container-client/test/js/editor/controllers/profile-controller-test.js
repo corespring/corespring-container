@@ -457,71 +457,37 @@ describe('profile controller', function () {
       expect(scope.profile.reviewsPassed).toEqual([]);
     });
 
-    it("should select items", function () {
-      itemOne.selected = true;
-      scope.onChangeReviewsPassed("one");
-      expect(scope.profile.reviewsPassed).toEqual(['one']);
-    });
-
-    it("should deselect items", function () {
-      itemOne.selected = true;
-      scope.onChangeReviewsPassed("one");
-      itemTwo.selected = true;
-      scope.onChangeReviewsPassed("two");
-      itemOne.selected = false;
-      scope.onChangeReviewsPassed("one");
-      expect(scope.profile.reviewsPassed).toEqual(['two']);
-    });
-
     it("should remove all items when 'None' is selected", function () {
-      itemOne.selected = true;
-      scope.onChangeReviewsPassed("one");
-      itemOther.selected = true;
-      scope.onChangeReviewsPassed("Other");
-      itemNone.selected = true;
-      scope.onChangeReviewsPassed("None");
-      expect(scope.profile.reviewsPassed).toEqual(['None']);
+      scope.profile.reviewsPassed = ["one", "Other", "None"];
+      scope.$apply();
+      expect(scope.profile.reviewsPassed).toEqual([]);
     });
 
     it("should add all items apart from 'Other' when 'All' is selected", function () {
-      itemAll.selected = true;
-      scope.onChangeReviewsPassed("All");
-      expect(scope.profile.reviewsPassed).toEqual(['one', 'two', 'All']);
+      scope.profile.reviewsPassed = ["All"];
+      scope.$apply()
+      expect(scope.profile.reviewsPassed).toEqual(['one', 'two']);
     });
 
     it("should not remove 'Other' when 'All' is selected", function () {
-      itemOther.selected = true;
-      scope.onChangeReviewsPassed("Other");
-      itemAll.selected = true;
-      scope.onChangeReviewsPassed("All");
-      expect(scope.profile.reviewsPassed).toEqual(['one', 'two', 'Other', 'All']);
-    });
-
-    it("should replace 'None' with all items when 'All' is selected", function () {
-      itemNone.selected = true;
-      scope.onChangeReviewsPassed("None");
-      expect(scope.profile.reviewsPassed).toEqual(['None']);
-      itemAll.selected = true;
-      scope.onChangeReviewsPassed("All");
-      expect(scope.profile.reviewsPassed).toEqual(['one', 'two', 'All']);
+      scope.profile.reviewsPassed = ["All", "Other"];
+      scope.$apply()
+      expect(scope.profile.reviewsPassed).toEqual(['one', 'two', "Other"]);
     });
 
     it('selecting "Other" reveals input', function () {
-      itemOther.selected = true;
-      scope.onChangeReviewsPassed("Other");
-      scope.$apply();
+      scope.profile.reviewsPassed = ["Other"];
+      scope.$apply()
       expect(scope.isReviewsPassedOtherSelected).toEqual(true);
     });
 
-    it('selecting "Other" clears model', function () {
-      itemOther.selected = true;
-      scope.onChangeReviewsPassed("Other");
+    it('deselecting "Other" clears model', function () {
+      scope.profile.reviewsPassed = ["Other"];
       scope.profile.reviewsPassedOther = "Some other review";
       scope.$apply();
       expect(scope.profile.reviewsPassedOther).toEqual("Some other review");
 
-      itemOther.selected = false;
-      scope.onChangeReviewsPassed("Other");
+      scope.profile.reviewsPassed = [];
       scope.$apply();
       expect(scope.profile.reviewsPassedOther).toEqual("");
     });

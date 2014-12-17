@@ -20,6 +20,8 @@ editorSrcs = [
   'bower_components/ace-builds/src-min-noconflict/mode-json.js',
   'bower_components/jquery.browser/dist/jquery.browser(.min).js',
   'bower_components/undo.js/undo.js',
+  'bower_components/corespring-checkbox/src/directive.js',
+  'bower_components/corespring-radio/src/directive.js',
   'js/corespring/core-library.js',
   'js/corespring/server/init-core-library.js',
   'js/common/**/*.js',
