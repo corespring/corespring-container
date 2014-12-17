@@ -41,7 +41,11 @@ angular.module('corespring-player.services')
       };
 
       this.setDataAndSession = function(allData) {
-        console.warn('@deprecated: use "setDataAndSessions(data, sessions)" instead');
+        
+        if(window.console && _.isFunction(window.console.warn)){
+          console.warn('@deprecated: use "setDataAndSessions(data, sessions)" instead');
+        }
+
         this.loadedData = allData;
 
         _.forIn(allData, function(ds, id){
