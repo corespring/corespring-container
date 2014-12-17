@@ -65,7 +65,7 @@ function getElementProperties(el) {
   var obj = {}
 
   props.forEach(function(propName) {
-    if(!el[propName]) return
+    if(!el[propName] && propName !== "src") return;
 
     // Special case: style
     // .style is a DOMStyleDeclaration, thus we need to iterate over all
@@ -113,6 +113,16 @@ function getElementProperties(el) {
     // in which case we don't want to add it to the node.
     if("tabIndex" == propName && el[propName] === -1) {
       return;
+    }
+
+    if("src" === propName && el.src === ""){
+      if(el.getAttribute){
+        obj["src"] = el.getAttribute("src");
+        return;
+      } else {
+        obj["src"] = el.src;
+        return;
+      }
     }
 
     // default: just copy the property
