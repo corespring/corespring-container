@@ -159,9 +159,9 @@ script(type="text/ng-template", id="/templates/profile")
           +panelBody("keySkills")
             .panel-body
               .form-group
-                .col-sm-3 Please select all applicable key skills for this item.
-                label.col-sm-1.control-label(for="keySkills") Skills
-                .col-sm-8
+                p Please select all applicable key skills for this item.
+                label.col-sm-2.control-label(for="keySkills") Skills
+                .col-sm-10
                   select(id="keySkills",
                   ng-model="otherAlignments.keySkills",
                   ui-select2,
