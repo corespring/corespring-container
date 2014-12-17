@@ -55,7 +55,10 @@ trait Jade {
   }
 
   private def cleanupReaders() = {
-    while (readers.length > 0) IOUtils.closeQuietly(readers.pop())
+    readers.foreach{ r =>
+      IOUtils.closeQuietly(r)
+    }
+    readers.clear()
   }
 
   private def loadTemplate(name: String): JadeTemplate = {
