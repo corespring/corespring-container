@@ -14,11 +14,7 @@ var Instance = function(element, options, errorCallback, log) {
       return $node;
     } else {
       var err = errors.CANT_FIND_IFRAME(iframeUid);
-      if(errorCallback){
-        errorCallback(err);
-      } else {
-        throw new Error(err);
-      }
+      errorCallback(err);
     }
   }
 
