@@ -93,6 +93,9 @@ function EditorDefinition(element, options, errorCallback) {
     if ('profile' === tab) {
       options.hash = '/profile';
     }
+    if ('supporting-materials' === tab) {
+      options.hash = '/supporting-materials/0';
+    }
 
     options.url = (options.corespringUrl + loadCall.url).replace(":itemId", itemId);
     options.queryParams = require('query-params');

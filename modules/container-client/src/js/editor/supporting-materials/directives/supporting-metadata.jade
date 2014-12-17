@@ -3,12 +3,12 @@ dl.dl-horizontal.supporting-material-metadata
         div.form-horizontal
           label.control-label Title 
       dd
-        input.form-control(name='type', type='text', ng-model='title', ng-focus='setActiveCtrl($event)', ng-blur='setActiveCtrl(null)', placeholder='enter title', required='required')
+        input.form-control(id='title', type='text', ng-model='title',placeholder='enter title', required='required')
     dt
         div.form-horizontal
           label.control-label Type
       dd
-        select(ui-select2='{minimumResultsForSearch: -1}', style='width: 200px;', ng-model='materialTypeProxy')
+        select(id='type', ui-select2='{minimumResultsForSearch: -1}', style='width: 200px;', ng-model='materialTypeProxy')
           option(ng-repeat='materialType in materialTypes') {{materialType}}
           
       div(ng-show='displayOther')
