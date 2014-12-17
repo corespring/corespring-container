@@ -12,6 +12,15 @@ mixin field(id, label, ngModel)
       else
         input.form-control(id=id, ng-model=ngModel)
 
+mixin field2(id, label, ngModel)
+  .form-group
+    label.col-sm-2.control-label(for=id)= label
+    .col-sm-10
+      if block
+        block
+      else
+        input.form-control(id=id, ng-model=ngModel)
+
 mixin configurableField(id, label, ngModel)
   .form-group(ng-show="formModels.#{id}.visible")
     label.col-sm-3.control-label(for=id)= label
@@ -38,8 +47,12 @@ mixin panelHeader(id)
         a(data-toggle="collapse",data-target="#collapse-#{id}",aria-expanded="false",aria-controls="collapse-#{id}")
           block
 
-mixin panelBody(id)
+mixin panelBody(idn)
   .panel-collapse.collapse(id="collapse-#{id}",role="tabpanel",aria-labelledby="heading-#{id}")
+    block
+
+mixin panelBodyOpen(id)
+  .panel-collapse.collapse.in(id="collapse-#{id}",role="tabpanel",aria-labelledby="heading-#{id}")
     block
 
 mixin panel(id, title)
@@ -100,32 +113,33 @@ script(type="text/ng-template", id="/templates/profile")
           div(ng-show="!formModels.standards.readonly")
             h6 Add the Standards
             .row
-              .col-sm-6
+              .col-sm-10
                 +field("standard-filter-subject","Subject")
-                  select.from-control(id="standard-filter-subject",
+                  select.form-control(id="standard-filter-subject",
                   ng-model="standardFilterOption.subject",
                   ng-options="c.name for c in standardsTree")
                     option(value="") {{standardFilterPlaceholder.subject}}
 
                 +field("standard-filter-category","Category")
-                  select.from-control(id="standard-filter-category",
+                  select.form-control(id="standard-filter-category",
                   ng-model="standardFilterOption.category",
                   ng-options="p.name for p in standardFilterOption.subject.items")
                     option(value="") {{standardFilterPlaceholder.category}}
 
                 +field("standard-filter-sub-category","Sub-Category")
-                  select.from-control(id="standard-filter-sub-category",
+                  select.form-control(id="standard-filter-sub-category",
                   ng-model="standardFilterOption.subCategory",
                   ng-options="z for z in standardFilterOption.category.items")
                     option(value="") {{standardFilterPlaceholder.subCategory}}
-              .col-sm-6
                 +field("standard-filter-search","Standards")
                   input(id="standard-filter-search",
+                  aria-describedby="helpBlock",
                   class="add-standards",
                   type="text",
                   ui-select2="standardsAdapter",
                   ng-model="profile.standards",
                   style="width: 100%;")
+                  span(id="helpBlock",class="help-block") Begin entering standard codes.
             hr/
 
           h6 Standards
@@ -162,9 +176,10 @@ script(type="text/ng-template", id="/templates/profile")
 
           +panelHeader("keySkills")
             span(ng-bind-html-unsafe="keySkillsTitle")
-          +panelBody("keySkills")
+          +panelBodyOpen("keySkills")
             .panel-body
-              +field("keySkills", "Skills")
+              p Please select all applicable key skills for this item.
+              +field2("keySkills", "Skills")
                 select(id="keySkills",
                 ng-model="otherAlignments.keySkills",
                 ui-select2,
