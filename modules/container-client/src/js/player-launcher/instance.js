@@ -7,15 +7,12 @@ var Instance = function(element, options, errorCallback, log) {
   var iframeUid = 'corespring-iframe-' + msgr.utils.getUid();
 
   function $iframe() {
-
     var $node = $('#' + iframeUid);
-
-    if($node.size() === 1){
-      return $node;
-    } else {
+    if($node.size() !== 1){
       var err = errors.CANT_FIND_IFRAME(iframeUid);
       errorCallback(err);
     }
+    return $node;
   }
 
   var errors = require("errors");
