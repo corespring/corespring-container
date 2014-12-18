@@ -1,7 +1,6 @@
-.summary-feedback
-  a.show-feedback-button(ng-click='toggleSummaryFeedbackOpen()')
-    i.fa(class="fa-{{isSummaryFeedbackOpen ? \'minus\' : \'plus\'}}-square-o")
-      span &nbsp Click for more feedback
-      .feedback-text(ng-show='isSummaryFeedbackOpen', ng-bind-html-unsafe='ngModel')
-        
-        
+.panel.summary-feedback-panel-preview
+  .panel-heading.show-feedback-button(ng-click='toggleSummaryFeedbackOpen()')
+    h4.panel-title 
+      i.fa.fa-lightbulb-o
+      &nbsp;Learn More
+  .panel-body.feedback-text(ng-show='isSummaryFeedbackOpen', ng-bind-html-unsafe='ngModel')
