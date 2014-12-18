@@ -19,7 +19,6 @@ angular.module('corespring-editor.services').service('EditorConfig', [
       ComponentToWiggiwizFeatureAdapter,
       ComponentData) {
 
-
       function EditorConfig(){
 
         var
@@ -106,15 +105,23 @@ angular.module('corespring-editor.services').service('EditorConfig', [
             ImageFeature
           ];
 
-          var linkFeatureGroup = {
-            type: 'group',
-            buttons: [
-              new WiggiLinkFeatureDef()
-            ]
-          };
+          function mkGroup(){
+            return {
+              type: 'group',
+              buttons: [
+                Array.prototype.slice.call(arguments)
+              ]
+            };
+          }
 
-          var linkFeature = {
-            definitions: [linkFeatureGroup]
+          var linkFeatureGroup = mkGroup(new WiggiLinkFeatureDef());
+
+          this.mathJaxFeatureGroup =  function(){
+            return mkGroup(new WiggiMathJaxFeatureDef());
+          };
+          
+          this.footnotesFeatureGroup = function(){
+            return mkGroup(new WiggiFootnotesFeatureDef());
           };
 
           this.extraFeatures = {
@@ -128,17 +135,10 @@ angular.module('corespring-editor.services').service('EditorConfig', [
                 .sortBy(orderList)
                 .map(componentToFeature)
                 .value()
-            }, {
-              type: 'group',
-              buttons: [
-                new WiggiMathJaxFeatureDef()
-              ]
-            }, {
-              type: 'group',
-              buttons: [
-                new WiggiFootnotesFeatureDef()
-              ]
-            }, {
+            }, 
+            this.mathJaxFeatureGroup(), 
+            this.footnotesFeatureGroup(),
+            {
               type: 'group',
               buttons: [
                 videoComponent
