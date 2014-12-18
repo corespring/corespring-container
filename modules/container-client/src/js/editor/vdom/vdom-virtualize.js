@@ -62,10 +62,10 @@ function createFromElement(el) {
 
 
 function getElementProperties(el) {
-  var obj = {}
+  var obj = {};
 
   props.forEach(function(propName) {
-    if(!el[propName]) return
+    if(el[propName] === undefined ||  el[propName] === null ) return;
 
     // Special case: style
     // .style is a DOMStyleDeclaration, thus we need to iterate over all
@@ -113,6 +113,16 @@ function getElementProperties(el) {
     // in which case we don't want to add it to the node.
     if("tabIndex" == propName && el[propName] === -1) {
       return;
+    }
+
+    if("src" === propName ){
+      if(el.getAttribute){
+        obj["src"] = el.getAttribute("src");
+        return;
+      } else {
+        obj["src"] = el.src;
+        return;
+      }
     }
 
     // default: just copy the property
