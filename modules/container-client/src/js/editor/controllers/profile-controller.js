@@ -700,7 +700,7 @@
     $scope.onChangeKeySkill = function(){
       updateKeySkillsInProfile();
       updateKeySkillsTitle();
-    }
+    };
 
     function updateKeySkillsInProfile(){
       if(!$scope.keySkillsDataProvider || !$scope.otherAlignments){
