@@ -356,10 +356,23 @@ function applyProperties(node, props, previous) {
             if (isObject(propValue)) {
                 patchObject(node, props, previous, propName, propValue);
             } else if (propValue !== undefined) {
-                node[propName] = propValue
+
+                if(node.setAttribute){
+                  node.setAttribute(propName, propValue);
+                } else {
+                  node[propName] = propValue
+                }
             }
         }
     }
+}
+
+function updateAttribute(node, attr, value) {
+  if(value === null || value === undefined){
+    node.removeAttribute(attr);
+  } else {
+    node.setAttribute(attr, value);
+  }
 }
 
 function removeProperty(node, props, previous, propName) {
@@ -375,10 +388,16 @@ function removeProperty(node, props, previous, propName) {
                 for (var i in previousValue) {
                     node.style[i] = ""
                 }
-            } else if (typeof previousValue === "string") {
-                node[propName] = ""
-            } else {
-                node[propName] = null
+            }
+            /** Note: I'm not clear on why they are doing this.
+            This isn't removing a property it's setting it to be ""
+            code:
+              else if (typeof previousValue === "string") {
+                updateAttribute(node, propName, "");
+              }
+            */
+            else {
+                updateAttribute(node, propName, null);
             }
         } else if (previousValue.unhook) {
             previousValue.unhook(node, propName)

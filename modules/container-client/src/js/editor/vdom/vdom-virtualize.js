@@ -60,6 +60,11 @@ function createFromElement(el) {
   return new VNode(tagName, properties, children, null, namespace)
 }
 
+function isEmptyObject(obj){
+  return Object.keys(obj).length === 0;
+}
+
+function isEmptyString(s) { return s === '';}
 
 function getElementProperties(el) {
   var obj = {};
@@ -67,22 +72,56 @@ function getElementProperties(el) {
   props.forEach(function(propName) {
     if(el[propName] === undefined ||  el[propName] === null ) return;
 
+
+    //className: '', contentEditable: 'inherit', dataset: {  }, dir: '', draggable: false, id: '', lang: '', scrollLeft: 0,
+    //scrollTop: 0, style: {  }, title: ''
+
+    if(["accessKey", "className", "dir", "id", "lang", "title"].indexOf(propName) !== -1 && isEmptyString(el[propName])) {
+      return;
+    }
+
+    if("contentEditable" === propName && el.contentEditable === "inherit") {
+      return;
+    }
+
+    if("dataset" === propName && isEmptyObject(el.dataset)) {
+      return;
+    }
+
+    if("draggable" === propName && el.draggable === false){
+      return;
+    }
+
+    if("scrollLeft" === propName && el.scrollLeft === 0){
+      return;
+    }
+
+    if("scrollTop" === propName && el.scrollTop === 0){
+      return;
+    }
+
     // Special case: style
     // .style is a DOMStyleDeclaration, thus we need to iterate over all
     // rules to create a hash of applied css properties.
     //
     // You can directly set a specific .style[prop] = value so patching with vdom
     // is possible.
-    if("style" == propName) {
+    if("style" === propName) {
       var css = {}
-        , styleProp
+        , styleProp;
+
+
       for(var i=0; i<el.style.length; i++) {
         styleProp = el.style[i]
         css[styleProp] = el.style.getPropertyValue(styleProp) // XXX: add support for "!important" via getPropertyPriority()!
       }
 
-      obj[propName] = css
-      return
+      if(isEmptyObject(css)){
+        return;
+      }
+
+      obj[propName] = css;
+      return;
     }
 
     // Special case: dataset
@@ -128,7 +167,16 @@ function getElementProperties(el) {
     // default: just copy the property
     obj[propName] = el[propName]
     return
-  })
+  });
+
+  //There may be some custom attributes defined on the node that also need to be propogated
+  var currentKeys = Object.keys(obj);
+  for(var i = 0; i < el.attributes.length; i++){
+    var attr = el.attributes[i];
+    if(currentKeys.indexOf(attr.name) === -1){
+      obj[attr.name] = attr.value;
+    }
+  }
 
   return obj
 }
