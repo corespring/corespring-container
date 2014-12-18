@@ -108,9 +108,7 @@ angular.module('corespring-editor.services').service('EditorConfig', [
           function mkGroup(){
             return {
               type: 'group',
-              buttons: [
-                Array.prototype.slice.call(arguments)
-              ]
+              buttons: Array.prototype.slice.call(arguments)
             };
           }
 
