@@ -170,10 +170,11 @@ function getElementProperties(el) {
   });
 
   //There may be some custom attributes defined on the node that also need to be propogated
+  var currentKeys = Object.keys(obj);
   for(var i = 0; i < el.attributes.length; i++){
-    var name = el.attributes[i].name;
-    if(props.indexOf(name) === -1){
-      obj[name] = el.attributes[i].value;
+    var attr = el.attributes[i];
+    if(currentKeys.indexOf(attr.name) === -1){
+      obj[attr.name] = attr.value;
     }
   }
 

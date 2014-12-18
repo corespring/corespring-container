@@ -23,6 +23,6 @@ describe('vdom-virtualize', function(){
     var div = document.createElement('div');
     div.setAttribute('name', 'test');
     var virtualDom = vdomVirtualize(div); //jshint ignore:line
-    expect(Object.keys(virtualDom.properties).toEqual({});
+    expect(virtualDom.properties).toEqual({name: 'test'});
   });
 });
