@@ -160,16 +160,11 @@ script(type="text/ng-template", id="/templates/profile")
             .panel-body
               .form-group
                 p Please select all applicable key skills for this item.
-                label.col-sm-2.control-label(for="keySkills") Skills
-                .col-sm-10
-                  select(id="keySkills",
-                  ng-model="otherAlignments.keySkills",
-                  ui-select2,
-                  multiple,
-                  data-placeholder="Choose one or more key skills...",
-                  ng-readonly="formModels.keySkills.readonly",
-                  style="width:100%;")
-                    option(ng-repeat="c in keySkillsDataProvider | filter:keySkillsFilter ",value="{{c.key}}") {{c.value}}
+                .col-sm-3(ng-repeat="skill in keySkillsDataProvider | filter:keySkillsFilter")
+                  checkbox(
+                  ng-model="skill.selected",
+                  ng-change="onChangeKeySkill()",
+                  ng-disabled="formModels.keySkills.readonly") {{ skill.value }}
 
           +panel("lexile", "Lexile Score")
             .panel-body.lexile

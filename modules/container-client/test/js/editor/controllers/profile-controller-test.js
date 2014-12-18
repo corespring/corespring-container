@@ -393,10 +393,10 @@ describe('profile controller', function () {
     it("should init dataProvider", function () {
       makeProfileController();
       expect(scope.keySkillsDataProvider).toEqual([
-        {key:'skillA-1',value:'skillA-1'},
-        {key:'skillA-2',value:'skillA-2'},
-        {key:'skillB-1',value:'skillB-1'},
-        {key:'skillB-2',value:'skillB-2'},
+        {key:'skillA-1',value:'skillA-1',selected:false},
+        {key:'skillA-2',value:'skillA-2',selected:false},
+        {key:'skillB-1',value:'skillB-1',selected:false},
+        {key:'skillB-2',value:'skillB-2',selected:false},
         ]);
     });
   });

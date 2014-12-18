@@ -106,10 +106,9 @@
         readonly:false
       },
       reviewsPassed: {
-        visible:true,
-        readonly:false,
-        collapse:true,
-        value:[]
+        visible: true,
+        readonly: false,
+        collapse: true
       },
       reviewsPassedOther: {
         //here you can only set the value, in case the value of reviewsPassed is 'Other'
@@ -667,17 +666,54 @@
 
     $scope.keySkillsFilter = createOptionsFilter($scope.formModels.keySkills, 'key');
 
-    $scope.$watch('otherAlignments.keySkills', function(newValue){
+    function initKeySkillsDataProvider() {
+      DataQueryService.list("keySkills", function (result) {
+        $scope.keySkillsDataProvider = _.chain(result).pluck('value').flatten().uniq().sort().map(function (item) {
+          return {key: item, value: item};
+        }).value();
+        initKeySkillsSelection();
+        updateKeySkillsTitle();
+      });
+    }
+
+    function initKeySkillsSelection(){
+      if(!$scope.keySkillsDataProvider || !$scope.otherAlignments){
+        return;
+      }
+      var selectedKeySkills = _.isArray($scope.otherAlignments.keySkills) ? $scope.otherAlignments.keySkills : [];
+
+      _.forEach($scope.keySkillsDataProvider, function(item){
+        var selected = _.contains(selectedKeySkills, item.key);
+        if(selected !== item.selected) {
+          item.selected = selected;
+        }
+      });
+      $scope.keySkillsDataProvider = _.clone($scope.keySkillsDataProvider);
+    }
+
+    function updateKeySkillsTitle(){
       if( $scope.otherAlignments &&  $scope.otherAlignments.keySkills ) {
         $scope.keySkillsTitle = "<span class='key-skills'>Key Skills <span class='badge'>" + $scope.otherAlignments.keySkills.length + "</span> <span class='selected'>selected.</span></span>";
       }
-    });
+    }
 
-    DataQueryService.list("keySkills", function (result) {
-      $scope.keySkillsDataProvider = _.chain(result).pluck('value').flatten().uniq().sort().map(function(item){
-        return {key:item, value:item};
-      }).value();
-    });
+    $scope.onChangeKeySkill = function(){
+      updateKeySkillsInProfile();
+      updateKeySkillsTitle();
+    }
+
+    function updateKeySkillsInProfile(){
+      if(!$scope.keySkillsDataProvider || !$scope.otherAlignments){
+        return;
+      }
+      var keySkills = [];
+      _.forEach($scope.keySkillsDataProvider, function(item){
+        if(item.selected){
+          keySkills.push(item.key);
+        }
+      });
+      $scope.otherAlignments.keySkills = keySkills;
+    }
 
     //----------------------------------------------------------------
     // prior use
@@ -824,6 +860,7 @@
       $scope.contributorDetails = profile.contributorDetails;
 
       initComponentTypesUsed();
+      initKeySkillsDataProvider();
       updateReviewsPassedOtherSelected();
       updatePriorUseOtherSelected();
       updateCredentialsOtherSelected();
@@ -869,7 +906,7 @@
           ConfigurationService.getConfig(function(config){
             $log.log('getConfig callback', config);
             updateFormModels(config.profileConfig);
-            $timeout(function(){setItem(item);}, 20);
+            $timeout(function(){setItem(item);}, 2000);
           });
         } else {
           $log.error('error loading profile, item is null');
