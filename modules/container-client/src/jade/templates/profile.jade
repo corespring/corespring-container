@@ -164,6 +164,7 @@ script(type="text/ng-template", id="/templates/profile")
                   checkbox(
                   ng-model="skill.selected",
                   ng-change="onChangeKeySkill()",
+                  value="{{skill.key}}"
                   ng-disabled="formModels.keySkills.readonly") {{ skill.value }}
 
           +panel("lexile", "Lexile Score")
