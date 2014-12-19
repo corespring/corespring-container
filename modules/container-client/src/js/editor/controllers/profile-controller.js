@@ -81,7 +81,7 @@
       keySkills: {
         visible:true,
         readonly:false,
-        collapse:false
+        collapse:true
       },
       lexile: {
         visible:true,
