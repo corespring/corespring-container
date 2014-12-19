@@ -11,13 +11,8 @@ mixin field(label, ngModel)
   p {{prompt}}
   .control-group(style="padding-left: 5px;")
     .controls
-      label
-        input(type="radio",ng-model="required",value="yes",style="margin-right: 5px;")
-        | Yes
-      label
-        input(type="radio",ng-model="required",value="no",style="margin-right: 5px; margin-left: 20px;")
-        | No
-
+      radio(ng-model="required",value="yes") Yes
+      radio(ng-model="required",value="no",style="margin-left: 20px;") No
     br/
 
   .item(ng-repeat="item in copyrights")
