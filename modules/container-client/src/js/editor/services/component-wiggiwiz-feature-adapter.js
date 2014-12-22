@@ -69,32 +69,6 @@
         addToEditor: function(editor, addContent) {
           addToEditorCallback(editor, addContent, component);
         },
-        editNode: function($node, $scope, editor) {
-          var data = {};
-          var tagName = componentType + '-config';
-          var content = [
-            '<div class="navigator-toggle-button-row">',
-            '  <div class="navigator-title">' + getTitle(component) + '</div>',
-            '</div>',
-            '<div class="config-panel-container" navigator="">',
-            tag(tagName, {id: $node.attr('id')}),
-            '</div>'
-          ].join('\n');
-
-          $scope.$emit('open-config-panel');
-
-          data.defaultData = _.defaults(component.defaultData, { clean: true });
-
-          editor.showEditPane(data, getTitle(component), content, function() {
-            $log.debug('on update...');
-          }, {}, function() {
-            /** Deselect component when config dismissed **/
-            fireComponentDeselection($node);
-          });
-
-          fireComponentSelection($node);
-        },
-
         getMarkUp: function($node, $scope) {
           return tag(componentType, {id: $node.attr('id')});
         }

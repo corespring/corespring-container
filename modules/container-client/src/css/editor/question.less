@@ -31,10 +31,11 @@
     background:white;
     -webkit-transition:all linear 0.5s;
     transition:all linear 0.5s;
-  }
+    opacity: 0;
 
-  .preview.ng-hide {
-    opacity:0;
+    &.visible {
+      opacity: 1;
+    }
   }
 
 

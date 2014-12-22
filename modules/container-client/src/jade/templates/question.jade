@@ -65,7 +65,7 @@ script(type="text/ng-template", id="/templates/question")
 
     .col-md-6
 
-      .preview(ng-show="previewOn", 
+      .preview(ng-class="{visible: previewOn}",
           ng-controller="ClientSidePreview")
         .item-preview-wrapper
           .player-label
