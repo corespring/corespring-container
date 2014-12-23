@@ -9,10 +9,8 @@ script( type="text/ng-template", id="/templates/popups/addSupportingMaterial")
       dl.dl-horizontal
         dt Source
         dd
-          input(id='create', type='radio', value='createHtml', ng-model='supportingMaterial.method')
-          label.create-own(for='create') create your own
-          input(id='upload', type='radio', value='uploadFile', ng-model='supportingMaterial.method')
-          label(for='upload') upload a file
+          radio(id='create', value='createHtml', ng-model='supportingMaterial.method') create your own
+          radio(id='upload', type='radio', value='uploadFile', ng-model='supportingMaterial.method') upload a file
           input(type='file', fileChange="",ng-show="supportingMaterial.method == 'uploadFile'")
 
 // Upload progress popup
