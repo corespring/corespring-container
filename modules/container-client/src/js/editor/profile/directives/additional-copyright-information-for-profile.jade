@@ -23,19 +23,6 @@ mixin field(label, ngModel)
       select.form-control(id="item.year",ng-model="item.year",ng-options="c for c in copyrightYearDataProvider",
             style="width: 170px;")
         option(value='') Select ...
-    +field('License','item.licenseType')
-      table.license
-        tr
-          td
-            select.form-control(id="ac-license",ng-model="item.licenseType",
-            ng-options="c.key as c.value for c in licenseTypeDataProvider")
-              option(value='') Select ...
-          td
-            span(ng-show="!item.licenseType",style="color: #888; font-style: italic;")
-              | Not Assigned
-            img(ng-show="item.licenseType",ng-src="{{getLicenseTypeUrl(item.licenseType)}}")
-          td
-            a(href="http://creativecommons.org/licenses/",target="_blank") Learn More
     +field('Media Type','item.mediaType')
       select.form-control(id="item.mediaType",ng-model="item.mediaType",ng-options="c.key as c.value for c in mediaTypeDataProvider")
         option(value='') Select ...
