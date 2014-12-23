@@ -88,5 +88,12 @@
   .holder{
     .border-radius(3px);
     border: solid 1px #cccccc;
+    position: inherit;
+    visibility: visible;
+
+    &.nonvisible {
+      position: absolute;
+      visibility: hidden;
+    }
   }
 }
