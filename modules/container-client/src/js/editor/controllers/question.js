@@ -45,8 +45,8 @@ angular.module('corespring-editor.controllers')
         });
       };
 
-      $scope.$on('edit-node', function($event, id, model){
-        ComponentPopups.launch($scope, id, model);
+      $scope.$on('edit-node', function($event, id, model, config){
+        ComponentPopups.launch($scope, id, model, config);
       });
 
       $scope.imageService = ComponentImageService;

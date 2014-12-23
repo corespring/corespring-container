@@ -43,7 +43,7 @@ angular.module('corespring-editor.directives')
             ['<' + $scope.componentType + ' id="' , $scope.id , '">',
               '</', $scope.componentType, '>'].join(''));
           logger.debug('$compile component: ', $scope.id);
-          $compile($holder)($scope.$new());
+          $compile($holder)($scope.$new(true));
         }
 
         function setDataAndSession() {
@@ -87,7 +87,7 @@ angular.module('corespring-editor.directives')
           markDirty();
           $event.stopPropagation();
           removeTooltip();
-          $scope.$emit( 'edit-node', $scope.id, $scope.componentModel);
+          $scope.$emit( 'edit-node', $scope.id, $scope.componentModel, $scope.config);
         };
 
         /**

@@ -31,7 +31,7 @@ angular.module('corespring-editor.services')
           return _.isEmpty(component.title) ? component.name || 'no title provided' : component.title;
         }
 
-        function launchModal($scope, id, model){
+        function launchModal($scope, id, model, config){
           var tagName = model.componentType + '-config';
 
 
@@ -53,19 +53,22 @@ angular.module('corespring-editor.services')
             '</div>'
           ].join('\n');
 
+          $scope.data = _.cloneDeep(config);
+
           var modalInstance = $modal.open({
             template: content,
             scope: $scope,
             controller: 'ComponentPopupController',
             size: 'lg',
             backdrop: 'static',
-            resolve: {}
+            resolve: {
+            }
           });
         }
 
-        this.launch = function($scope, id, model){
-          logger.debug('launch popup based on node: ', id, model);
-          launchModal($scope, id, model);
+        this.launch = function($scope, id, model, config){
+          logger.debug('launch popup based on node: ', id, model, config);
+          launchModal($scope, id, model, config);
         };
       }
 

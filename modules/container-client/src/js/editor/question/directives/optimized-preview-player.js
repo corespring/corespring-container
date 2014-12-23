@@ -192,12 +192,16 @@
           }, 200, {leading: false, trailing: true});
         }
 
-        $scope.$watch('components', function(){
+        $scope.$watch('components', function(c, prev){
+          if (!c || !prev) {
+            return;
+          }
+
           debouncedUpdateComponents();
         }, true);
 
-        $scope.$watch('outcomes', function(r) {
-          if (!r) {
+        $scope.$watch('outcomes', function(r, prev) {
+          if (!r || !prev) {
             return;
           }
           ComponentData.setOutcomes(r);
