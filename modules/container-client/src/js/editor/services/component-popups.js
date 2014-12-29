@@ -41,7 +41,7 @@ angular.module('corespring-editor.services')
             '    <span>&times;</span>',
             '    <span class="sr-only">Close</span>',
             '  </button>',
-            '  <h4 class="modal-title">' + getTitle(model) + '</h4>',
+            '  <h4 class="modal-title">' + getTitle(config) + '</h4>',
             '</div>',
             '<div class="modal-body">',
             '  <div class="config-panel-container" navigator="">',
