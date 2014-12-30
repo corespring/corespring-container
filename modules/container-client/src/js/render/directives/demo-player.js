@@ -95,12 +95,12 @@
           link: linkFn,
           template: [
              '<div>',
-             '  <corespring-player',
+             '  <corespring-isolate-player',
              '    player-mode="mode"',
              '    player-markup="xhtml"',
              '    player-item="item"',
              '    player-outcomes="outcome"',
-             '    player-session="itemSession"></corespring-player>',
+             '    player-session="itemSession"></corespring-isolate-player>',
              '  <a class="pull-right btn btn-{{playerMode == \'gather\' ? \'info\' : \'danger\'}}" ng-click="submitOrReset()">',
              '    {{playerMode == \'gather\' ? \'Submit Answer\' : \'Reset\'}}',
              '  </a>',
@@ -109,5 +109,17 @@
         };
       }
     ]);
+
+  angular.module('corespring-player.directives')
+    .directive('corespringIsolatePlayer', ['ComponentRegisterDefinition', 'CorespringPlayerDefinition',
+      function(ComponentRegisterDefinition, CorespringPlayerDefinition) {
+        var isolateComponentRegister = new ComponentRegisterDefinition();
+        return new CorespringPlayerDefinition({
+          mode: 'player',
+          ComponentRegister: isolateComponentRegister
+        });
+      }
+  ]);
+
 
 }).call(this);
