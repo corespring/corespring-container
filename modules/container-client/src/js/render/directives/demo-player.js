@@ -1,11 +1,18 @@
 (function() {
 
+
   /**
-    * This is a directive for conveniently embedding corespring player
-    * with basic controls such as Submit and Reset button
-    */
+   * This is a directive for conveniently embedding corespring player
+   * with basic controls such as Submit and Reset button
+   */
   angular.module('corespring-player.directives')
-    .directive('corespringDemoPlayer', ['$log', 'ComponentRegister', 'ClientSidePlayerService',
+    .factory('DemoComponentRegister', ['ComponentRegisterDefinition',
+      function(ComponentRegisterDefinition) {
+        return new ComponentRegisterDefinition();
+      }
+    ])
+
+    .directive('corespringDemoPlayer', ['$log', 'DemoComponentRegister', 'ClientSidePlayerService',
       function($log, ComponentRegister, ClientSidePlayerServiceDef) {
 
         var linkFn = function($scope) {
@@ -47,7 +54,7 @@
             ComponentRegister.setEditable(isGatherMode());
           }
 
-          function isGatherMode(){
+          function isGatherMode() {
             return $scope.playerMode === 'gather';
           }
 
@@ -94,32 +101,31 @@
           },
           link: linkFn,
           template: [
-             '<div>',
-             '  <corespring-isolate-player',
-             '    player-mode="mode"',
-             '    player-markup="xhtml"',
-             '    player-item="item"',
-             '    player-outcomes="outcome"',
-             '    player-session="itemSession"></corespring-isolate-player>',
-             '  <a class="pull-right btn btn-{{playerMode == \'gather\' ? \'info\' : \'danger\'}}" ng-click="submitOrReset()">',
-             '    {{playerMode == \'gather\' ? \'Submit Answer\' : \'Reset\'}}',
-             '  </a>',
-             '</div>'
+            '<div>',
+            '  <corespring-isolate-player',
+            '    player-mode="mode"',
+            '    player-markup="xhtml"',
+            '    player-item="item"',
+            '    player-outcomes="outcome"',
+            '    player-session="itemSession"></corespring-isolate-player>',
+            '  <a class="pull-right btn btn-{{playerMode == \'gather\' ? \'info\' : \'danger\'}}" ng-click="submitOrReset()">',
+            '    {{playerMode == \'gather\' ? \'Submit Answer\' : \'Reset\'}}',
+            '  </a>',
+            '</div>'
           ].join("\n")
         };
       }
     ]);
 
   angular.module('corespring-player.directives')
-    .directive('corespringIsolatePlayer', ['ComponentRegisterDefinition', 'CorespringPlayerDefinition',
-      function(ComponentRegisterDefinition, CorespringPlayerDefinition) {
-        var isolateComponentRegister = new ComponentRegisterDefinition();
+    .directive('corespringIsolatePlayer', ['DemoComponentRegister', 'CorespringPlayerDefinition',
+      function(DemoComponentRegister, CorespringPlayerDefinition) {
         return new CorespringPlayerDefinition({
           mode: 'player',
-          ComponentRegister: isolateComponentRegister
+          ComponentRegister: DemoComponentRegister
         });
       }
-  ]);
+    ]);
 
 
 }).call(this);
