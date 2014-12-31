@@ -1,11 +1,10 @@
 package org.corespring.container.client.controllers.resources
 
-import com.fasterxml.jackson.annotation.JsonValue
 import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.client.hooks._
 import org.corespring.container.client.controllers.helpers.XhtmlCleaner
 import org.corespring.container.logging.ContainerLogger
-import play.api.libs.json.{ JsUndefined, JsObject, JsValue, Json }
+import play.api.libs.json.{ JsObject, JsValue, Json }
 import play.api.mvc._
 import scalaz.Scalaz._
 import scalaz._
@@ -16,6 +15,7 @@ import scala.concurrent.{ ExecutionContext, Future }
 object Item {
   object Errors {
     val noJson = "No json in request body"
+    val unknownSubset = "unknown subset"
     val errorSaving = "Error Saving"
     val invalidXhtml = "Invalid xhtml"
   }
@@ -62,78 +62,44 @@ trait Item extends Controller with XhtmlCleaner {
       }
   }
 
-  /**
-   * A fine grained save.
-   *
-   * eg:
-   *
-   * { "xhtml" : "<h1>..</h1>", "profile.taskInfo.title" : "new title", "components.4.weight" : 4 }
-   *
-   * Will update those properties in the object graph:
-   *
-   * {
-   *   profile: {
-   *     taskInfo: {
-   *       title: "...",
-   *       ..
-   *     }
-   *   },
-   *   components: {
-   *     4: {
-   *       weight: 44,
-   *       ..
-   *     }
-   *   }
-   * It will then return the db values for the paths passed in.
-   *
-   * @param itemId
-   * @return
-   */
-  private def processSave(itemId:String, saveFn: (String,JsValue,RequestHeader) => Future[Either[StatusMessage, JsValue]]) = Action.async{
-    implicit request : Request[AnyContent] =>
+  type SaveSig = String => Future[Either[(Int,String), JsValue]]
 
+  def saveSubset(itemId:String, subset:String) = Action.async{ implicit request : Request[AnyContent] =>
 
-      val out: Validation[String, Future[Either[StatusMessage, JsValue]]] = for {
+    logger.debug(s"function=saveSubset subset=$subset")
+    def missingProperty(p:String) = (i:String) => Future(Left(BAD_REQUEST, s"Missing property $i in json request"))
+
+     def saveFn(subset:String, json:JsValue) : Option[SaveSig] = Some(subset match {
+       case "supporting-materials" => hooks.saveSupportingMaterials(_:String, json)
+       case "xhtml" => (json \ "xhtml")
+         .asOpt[String]
+         .map{s =>
+           val validXhtml = cleanXhtml(s)
+           hooks.saveXhtml(_:String, validXhtml)}
+         .getOrElse(missingProperty("xhtml"))
+       case "summary-feedback" => (json \ "summaryFeedback").asOpt[String].map(s => hooks.saveSummaryFeedback(_:String, s)).getOrElse(missingProperty("summaryFeedback"))
+       case "profile" => hooks.saveProfile(_:String, json)
+       case "components" => hooks.saveComponents(_:String, json)
+       case _ => (itemId : String) => Future(Left(BAD_REQUEST, s"Unknown subset: $subset"))
+     })
+
+      val out : Validation[String, Future[Either[StatusMessage, JsValue]]] = for{
         json <- request.body.asJson.toSuccess(Item.Errors.noJson)
-        validXhtml <- cleanIncomingXhtml((json \ "xhtml").asOpt[String])
-      } yield {
-        logger.trace("[save] -> call hook")
-
-        val cleanedJson = validXhtml.map {
-          x =>
-            logger.trace(s"clean xhtml: $x")
-            json.as[JsObject] ++ Json.obj("xhtml" -> x)
-        }.getOrElse(json)
-
-        saveFn(itemId, cleanedJson,request)
-      }
+        fn <- saveFn(subset, json).toSuccess(Item.Errors.unknownSubset)
+        result <- Success(fn(itemId))
+      } yield result
 
       out match {
         case Failure(msg) => Future(BadRequest(Json.obj("error" -> msg)))
         case Success(future) => {
           future.map {
-            case Left(err) => err
+            case Left(err) => Status(err._1)(Json.obj("error" -> err._2))
             case Right(json) => Ok(json)
           }
         }
       }
-  }
+    }
 
-  def fineGrainedSave(itemId:String) = processSave(itemId, (s,j,rh) => hooks.fineGrainedSave(s,j)(rh))
-
-  def save(itemId: String) = processSave(itemId, (s,j,rh) => hooks.save(s,j)(rh))
-
-  private def cleanIncomingXhtml(xmlString: Option[String]): Validation[String, Option[String]] = xmlString.map {
-    s =>
-      try {
-        Success(Some(cleanXhtml(s)))
-      } catch {
-        case e: Throwable => {
-          logger.error(s"error parsing xhtml: ${e.getMessage}")
-          Failure(e.getMessage)
-        }
-      }
-  }.getOrElse(Success(None))
 
 
 }

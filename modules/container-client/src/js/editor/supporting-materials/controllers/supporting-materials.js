@@ -85,9 +85,7 @@ angular.module('corespring-editor.controllers')
         }
 
         if (oldValue !== newValue) {
-          ItemService.fineGrainedSave({
-            'supportingMaterials': $scope.item.supportingMaterials
-          }, function(result) {});
+          ItemService.saveSupportingMaterials($scope.item.supportingMaterials);
         }
       }, true);
 

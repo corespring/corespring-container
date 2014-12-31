@@ -29,15 +29,6 @@ class ItemTest extends Specification with Mockito {
           }
         }
 
-        override def save(itemId: String, json: JsValue)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]] = {
-          Future {
-            saveResult.map {
-              Right(_)
-            }.getOrElse(Left(BAD_REQUEST -> Errors.errorSaving))
-          }
-        }
-
-        override def fineGrainedSave(itemId: String, json: JsValue)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] = save(itemId, json)
 
         override def load(itemId: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]] = {
           Future {
@@ -45,6 +36,15 @@ class ItemTest extends Specification with Mockito {
           }
         }
 
+        override def saveProfile(itemId: String, json: JsValue)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] = Future(Right(Json.obj()))
+
+        override def saveXhtml(itemId: String, xhtml: String)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] = Future(Right(Json.obj()))
+
+        override def saveSupportingMaterials(itemId: String, json: JsValue)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] = Future(Right(Json.obj()))
+
+        override def saveComponents(itemId: String, json: JsValue)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] = Future(Right(Json.obj()))
+
+        override def saveSummaryFeedback(itemId: String, feedback: String)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] = Future(Right(Json.obj()))
       }
 
       override implicit def ec: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
@@ -57,12 +57,12 @@ class ItemTest extends Specification with Mockito {
     }
 
     "fail to save if no json is supplied" in new item {
-      val result = item.save("x")(FakeRequest())
+      val result = item.saveSubset("x", "xhtml")(FakeRequest())
       status(result) === BAD_REQUEST
       (contentAsJson(result) \ "error").as[String] === Errors.noJson
     }
 
-    "fail to save if save failed" in new item(saveResult = None) {
+    /*"fail to save if save failed" in new item(saveResult = None) {
       val result = item.save("x")(FakeRequest("", "", FakeHeaders(), AnyContentAsJson(Json.obj("xhtml" -> JsString("<root/>")))))
       status(result) === BAD_REQUEST
       (contentAsJson(result) \ "error").as[String] === Errors.errorSaving
@@ -73,6 +73,7 @@ class ItemTest extends Specification with Mockito {
       status(result) === OK
       contentAsString(result) === "{}"
     }
+    */
 
     "create returns error" in new item(createError = Some(UNAUTHORIZED -> "Error")) {
       val result = item.create(FakeRequest("", ""))

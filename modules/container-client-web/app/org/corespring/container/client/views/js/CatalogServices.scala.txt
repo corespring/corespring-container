@@ -1,4 +1,4 @@
-@(namespace : String, load : Call, save : Call, componentSet : JsValue)
+@(namespace : String, load : Call, componentSet : JsValue)
 
 (function(){
   "use strict";

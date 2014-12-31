@@ -1,4 +1,4 @@
-@(namespace:String, load : Call, save : Call, fineGrainedSave:Call, componentSet : JsValue, widgets : JsValue)
+@(namespace:String, load : Call, saveSubset : Call, componentSet : JsValue, widgets : JsValue)
 
 (function(){
   "use strict";
@@ -11,13 +11,9 @@
         method : '@load.method.toLowerCase',
         url: '@load.url'
       },
-      save: {
-        method : '@save.method.toLowerCase',
-        url: '@save.url'
-      },
-      fineGrainedSave : {
-        method : '@fineGrainedSave.method.toLowerCase',
-        url: '@fineGrainedSave.url'
+      saveSubset: {
+        method : '@saveSubset.method.toLowerCase',
+        url: '@saveSubset.url'
       }
     }
   }]);

@@ -70,8 +70,8 @@ angular.module('corespring-editor.controllers').controller('NavController', [
       title : function(){ return $scope.item.profile.taskInfo.title; }
     }, function(title){
       logger.debug('--> ok --> ', arguments);
-      ItemService.fineGrainedSave({'profile.taskInfo.title': title}, function(result){
-        $scope.item.profile.taskInfo.title = result['profile.taskInfo.title'];
+      ItemService.saveProfile($scope.item.profile, function(result){
+        //$scope.item.profile.taskInfo.title = result['profile.taskInfo.title'];
       });
     });
     $scope.copy = launchModal('copy');
