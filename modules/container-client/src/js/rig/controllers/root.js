@@ -59,7 +59,6 @@ var controller = function($scope,$http, $location, $timeout, $log, ComponentRegi
 
   function onSessionSaved(data) {
     $scope.model.responses = data.responses;
-    $scope.model.session = data.session;
     $scope.model.outcome = data.outcome;
     $scope.outcome = data.outcome;
     $scope.score = data.score;
