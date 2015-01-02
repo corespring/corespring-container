@@ -21,12 +21,12 @@ describe('profile controller', function () {
       onSuccess(_.cloneDeep(this.loadResult));
     };
 
-    this.fineGrainedSaveResult = "OK";
-    this.fineGrainedSaveCalls = [];
+    this.saveProfileResult = "OK";
+    this.saveProfileCalls = [];
 
-    this.fineGrainedSave = function (data, callback) {
-      this.fineGrainedSaveCalls.push(arguments);
-      callback(_.cloneDeep(this.fineGrainedSaveResult));
+    this.saveProfile = function (data, callback) {
+      this.saveProfileCalls.push(arguments);
+      callback(_.cloneDeep(this.saveProfileResult));
     };
   }
 
@@ -67,7 +67,7 @@ describe('profile controller', function () {
     this.componentTypesUsedResult = "OK";
     this.componentTypesUsed = function (components, availableComponents) {
       return this.componentTypesUsedResult;
-    }
+    };
   }
 
   function MockStandardQueryCreator() {
@@ -201,7 +201,7 @@ describe('profile controller', function () {
 
     it("should not call save after loading an item", function(){
       scope.$apply();
-      expect(mockItemService.fineGrainedSaveCalls).toEqual([]);
+      expect(mockItemService.saveProfileCalls).toEqual([]);
     });
   });
 
@@ -222,7 +222,7 @@ describe('profile controller', function () {
       scope.standardsAdapter.query({
         term: "searchterm", callback: function () {
         }
-      })
+      });
       expect(mockStandardQueryCreator.createStandardQueryArguments.pop()).toEqual({
         search: "searchterm", subject: "subject", category: "category", subCategory: "subCategory"
       });
@@ -465,19 +465,19 @@ describe('profile controller', function () {
 
     it("should add all items apart from 'Other' when 'All' is selected", function () {
       scope.profile.reviewsPassed = ["All"];
-      scope.$apply()
+      scope.$apply();
       expect(scope.profile.reviewsPassed).toEqual(['one', 'two']);
     });
 
     it("should not remove 'Other' when 'All' is selected", function () {
       scope.profile.reviewsPassed = ["All", "Other"];
-      scope.$apply()
+      scope.$apply();
       expect(scope.profile.reviewsPassed).toEqual(['one', 'two', "Other"]);
     });
 
     it('selecting "Other" reveals input', function () {
       scope.profile.reviewsPassed = ["Other"];
-      scope.$apply()
+      scope.$apply();
       expect(scope.isReviewsPassedOtherSelected).toEqual(true);
     });
 
@@ -520,17 +520,17 @@ describe('profile controller', function () {
     beforeEach(function () {
       makeProfileController();
       scope.$apply();
-      mockItemService.fineGrainedSaveCalls = [];
+      mockItemService.saveProfileCalls = [];
     });
     it("is triggered when a property of profile is changed", function () {
       scope.profile.someProperty = "some value";
       scope.$apply();
-      expect(mockItemService.fineGrainedSaveCalls.length).toEqual(1);
+      expect(mockItemService.saveProfileCalls.length).toEqual(1);
     });
     it("is not triggered when a property of item is changed", function () {
       scope.item.someProperty = "some value";
       scope.$apply();
-      expect(mockItemService.fineGrainedSaveCalls.length).toEqual(0);
+      expect(mockItemService.saveProfileCalls.length).toEqual(0);
     });
   });
 
