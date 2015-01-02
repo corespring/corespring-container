@@ -9,7 +9,6 @@ import play.api.mvc._
 import scalaz.Scalaz._
 import scalaz._
 
-
 import scala.concurrent.{ ExecutionContext, Future }
 
 object Item {
@@ -62,44 +61,43 @@ trait Item extends Controller with XhtmlCleaner {
       }
   }
 
-  type SaveSig = String => Future[Either[(Int,String), JsValue]]
+  type SaveSig = String => Future[Either[(Int, String), JsValue]]
 
-  def saveSubset(itemId:String, subset:String) = Action.async{ implicit request : Request[AnyContent] =>
+  def saveSubset(itemId: String, subset: String) = Action.async { implicit request: Request[AnyContent] =>
 
     logger.debug(s"function=saveSubset subset=$subset")
-    def missingProperty(p:String) = (i:String) => Future(Left(BAD_REQUEST, s"Missing property $i in json request"))
+    def missingProperty(p: String) = (i: String) => Future(Left(BAD_REQUEST, s"Missing property $p in json request for $i"))
 
-     def saveFn(subset:String, json:JsValue) : Option[SaveSig] = Some(subset match {
-       case "supporting-materials" => hooks.saveSupportingMaterials(_:String, json)
-       case "xhtml" => (json \ "xhtml")
-         .asOpt[String]
-         .map{s =>
-           val validXhtml = cleanXhtml(s)
-           hooks.saveXhtml(_:String, validXhtml)}
-         .getOrElse(missingProperty("xhtml"))
-       case "summary-feedback" => (json \ "summaryFeedback").asOpt[String].map(s => hooks.saveSummaryFeedback(_:String, s)).getOrElse(missingProperty("summaryFeedback"))
-       case "profile" => hooks.saveProfile(_:String, json)
-       case "components" => hooks.saveComponents(_:String, json)
-       case _ => (itemId : String) => Future(Left(BAD_REQUEST, s"Unknown subset: $subset"))
-     })
+    def saveFn(subset: String, json: JsValue): Option[SaveSig] = Some(subset match {
+      case "supporting-materials" => hooks.saveSupportingMaterials(_: String, json)
+      case "xhtml" => (json \ "xhtml")
+        .asOpt[String]
+        .map { s =>
+          val validXhtml = cleanXhtml(s)
+          hooks.saveXhtml(_: String, validXhtml)
+        }
+        .getOrElse(missingProperty("xhtml"))
+      case "summary-feedback" => (json \ "summaryFeedback").asOpt[String].map(s => hooks.saveSummaryFeedback(_: String, s)).getOrElse(missingProperty("summaryFeedback"))
+      case "profile" => hooks.saveProfile(_: String, json)
+      case "components" => hooks.saveComponents(_: String, json)
+      case _ => (itemId: String) => Future(Left(BAD_REQUEST, s"Unknown subset: $subset"))
+    })
 
-      val out : Validation[String, Future[Either[StatusMessage, JsValue]]] = for{
-        json <- request.body.asJson.toSuccess(Item.Errors.noJson)
-        fn <- saveFn(subset, json).toSuccess(Item.Errors.unknownSubset)
-        result <- Success(fn(itemId))
-      } yield result
+    val out: Validation[String, Future[Either[StatusMessage, JsValue]]] = for {
+      json <- request.body.asJson.toSuccess(Item.Errors.noJson)
+      fn <- saveFn(subset, json).toSuccess(Item.Errors.unknownSubset)
+      result <- Success(fn(itemId))
+    } yield result
 
-      out match {
-        case Failure(msg) => Future(BadRequest(Json.obj("error" -> msg)))
-        case Success(future) => {
-          future.map {
-            case Left(err) => Status(err._1)(Json.obj("error" -> err._2))
-            case Right(json) => Ok(json)
-          }
+    out match {
+      case Failure(msg) => Future(BadRequest(Json.obj("error" -> msg)))
+      case Success(future) => {
+        future.map {
+          case Left(err) => Status(err._1)(Json.obj("error" -> err._2))
+          case Right(json) => Ok(json)
         }
       }
     }
-
-
+  }
 
 }

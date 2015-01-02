@@ -138,9 +138,7 @@ angular.module('corespring-editor.controllers')
       $scope.$watch('item.xhtml', debounce(function(oldValue, newValue) {
         logger.debug('old', oldValue);
         if (oldValue !== newValue) {
-          ItemService.saveXhtml({
-            'xhtml': $scope.item.xhtml
-          }, function(result) {});
+          ItemService.saveXhtml($scope.item.xhtml);
         }
       }));
 
@@ -148,9 +146,7 @@ angular.module('corespring-editor.controllers')
         newValue) {
         logger.debug('old', oldValue);
         if (oldValue !== newValue) {
-          ItemService.saveSummaryFeedback({
-            'summaryFeedback': $scope.item.summaryFeedback
-          }, function(result) {});
+          ItemService.saveSummaryFeedback($scope.item.summaryFeedback);
         }
       }));
 
