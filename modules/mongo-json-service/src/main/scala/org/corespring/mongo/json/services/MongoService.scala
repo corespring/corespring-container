@@ -1,12 +1,25 @@
 package org.corespring.mongo.json.services
 
-import com.mongodb.DBObject
+import com.mongodb.{MongoException, DBObject}
 import com.mongodb.casbah.{ WriteConcern, MongoCollection }
 import com.mongodb.casbah.commons.MongoDBObject
 import com.mongodb.util.{ JSON => MongoPlayJson }
 import org.bson.types.ObjectId
 import play.api.libs.json.{ Json => PlayJson, JsUndefined, JsArray, JsObject, JsValue }
 import org.corespring.container.logging.ContainerLogger
+
+object MongoServiceException {
+
+  def mkMessage(action:String, collection:String, msg : Option[String] = None) : String = {
+    s"Error with $action on collection $collection ${msg.map( m => s"- $m").getOrElse("")}"
+  }
+
+  def apply(action: String, collection:String, message:String) : MongoServiceException = new MongoServiceException(mkMessage(action, collection, Some(message)))
+  def apply(action:String, collection:String,  cause: Throwable) = new MongoServiceException(mkMessage(action, collection, None)).initCause(cause)
+}
+
+case class MongoServiceException(msg:String) extends RuntimeException(msg)
+
 
 class MongoService(collection: MongoCollection) {
 
@@ -47,11 +60,21 @@ class MongoService(collection: MongoCollection) {
     val dbo = MongoPlayJson.parse(jsonString).asInstanceOf[DBObject]
     dbo.put("_id", oid)
 
-    val result = collection.insert(dbo)
-    if (result.getLastError.ok) {
-      Some(oid)
-    } else {
-      None
+    try{
+      val result = collection.insert(dbo, WriteConcern.Safe)
+      if (result.getLastError.ok) {
+        Some(oid)
+      } else {
+        throw MongoServiceException("insert", collection.name, result.getLastError.getErrorMessage)
+      }
+    } catch {
+      case mse : MongoServiceException => throw mse
+      case e : MongoException => {
+        throw MongoServiceException("insert", collection.name, e)
+      }
+      case t : Throwable => {
+        throw MongoServiceException("insert", collection.name, t)
+      }
     }
   }
 

@@ -200,7 +200,7 @@ object Build extends sbt.Build {
 
   val mongoJsonService = builder.playApp("mongo-json-service")
     .settings(playAppToSbtLibSettings: _*)
-    .settings(libraryDependencies ++= Seq(casbah))
+    .settings(libraryDependencies ++= Seq(casbah, mockito))
     .dependsOn(logging)
 
   val docs = builder.playApp("docs")
