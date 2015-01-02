@@ -8,18 +8,18 @@ import org.bson.types.ObjectId
 import play.api.libs.json.{ Json => PlayJson, JsUndefined, JsArray, JsObject, JsValue }
 import org.corespring.container.logging.ContainerLogger
 
+object MongoServiceException {
 
-case class MongoServiceException(action:String, collection:String, msg:String, throwable:Throwable) extends RuntimeException(s"Error: $action on $collection: $msg", throwable)
+  def mkMessage(action:String, collection:String, msg : Option[String] = None) : String = {
+    s"Error with $action on collection $collection ${msg.map( m => s"- $m").getOrElse("")}"
+  }
 
-object MongoServiceException{
-  def apply(action:String, collection:String, message:String) : MongoServiceException = {
-    MongoServiceException(action, collection, message, null)
-  }
-  
-  def apply(action:String, collection:String, t:Throwable) : MongoServiceException = {
-    MongoServiceException(action, collection, "", t)
-  }
+  def apply(action: String, collection:String, message:String) : MongoServiceException = new MongoServiceException(mkMessage(action, collection, Some(message)))
+  def apply(action:String, collection:String,  cause: Throwable) = new MongoServiceException(mkMessage(action, collection, None)).initCause(cause)
 }
+
+case class MongoServiceException(msg:String) extends RuntimeException(msg)
+
 
 class MongoService(collection: MongoCollection) {
 
@@ -68,6 +68,7 @@ class MongoService(collection: MongoCollection) {
         throw MongoServiceException("insert", collection.name, result.getLastError.getErrorMessage)
       }
     } catch {
+      case mse : MongoServiceException => throw mse
       case e : MongoException => {
         throw MongoServiceException("insert", collection.name, e)
       }
