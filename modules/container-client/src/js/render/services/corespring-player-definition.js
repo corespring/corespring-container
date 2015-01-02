@@ -28,6 +28,8 @@ angular.module('corespring-player.services').factory('CorespringPlayerDefinition
         preCompile: null
       }, opts);
 
+      ComponentRegister = opts.ComponentRegister || ComponentRegister;
+
       var isRenderedOnce = false;
 
       var link = function($scope, $elem) {
