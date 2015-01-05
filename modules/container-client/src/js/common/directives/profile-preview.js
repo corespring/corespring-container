@@ -60,7 +60,7 @@ angular.module('corespring-common.directives')
               src = 'http://' + src;
             }
 
-            return $sce.trustAsUrl(src);
+            return src;
           };
 
           $scope.onComponentsLoaded = function(components) {
