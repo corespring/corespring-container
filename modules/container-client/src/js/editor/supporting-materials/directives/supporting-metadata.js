@@ -20,7 +20,7 @@
       var otherType = 'Other';
 
       return {
-        restrict: 'E',
+        restrict: 'A',
         scope: {
           metadata: '=ngModel',
           persist: '=',
@@ -98,9 +98,11 @@
               $scope.materialTypeProxy = $scope.metadata.materialType ?
                 (_.contains($scope.materialTypes, $scope.metadata.materialType) ? $scope.metadata.materialType : otherType) :
                 $scope.materialTypes[0];
+
               $scope.textMaterialType = isOther() ? $scope.metadata.materialType : undefined;
             }
             $scope.displayOther = isOther();
+
           };
 
           $scope.init();
@@ -112,29 +114,7 @@
           };
 
         },
-        template: [
-          '<form name="myForm" class="supporting-material-metadata my-form">',
-
-          '  <div ng-class="{\'field\':true, \'has-error\':myForm.type.$error.required && activeControl.name==\'type\', \'has-success\':!myForm.type.$error.required}"> ',
-          '    <label class="control-label" for="supporting-material-title">Title</label>',
-          '    <span class="error" ng-show="myForm.type.$error.required" >required</span>',
-          '    <input name="type" class="form-control" type="text" ng-model="title" ng-focus="setActiveCtrl($event)" ng-blur="setActiveCtrl(null)" }" required />',
-          '  </div>',
-
-          '  <div class="field">',
-          '    <label for="supporting-material-type">Select Type</label>',
-          '    <select ng-model="materialTypeProxy" ng-options="materialType for materialType in materialTypes"></select>',
-          '  </div>',
-
-          '  <div ng-class="{\'field\':true, \'other\':true, \'has-error\':myForm.others.$error.required && activeControl.name==\'others\', \'has-success\':!myForm.others.$error.required}" ng-show="displayOther" >',
-          '    <label class="control-label" for="supporting-material-type-text">Other</label>',
-          '    <span  class="error" ng-show="myForm.others.$error.required">required</span>',
-          '    <input name="others" class="form-control"  type="text" ng-model="textMaterialType" ng-focus="setActiveCtrl($event)" ng-blur="setActiveCtrl(null)" required/>',
-          '  </div>',
-
-          '  <button class="btn btn-small" ng-show="persist" ng-click="forceUpdate()">Update</button>',
-          '</form>'
-        ].join('\n')
+        templateUrl: "/editor/supporting-materials/directives/supporting-metadata.html"
       };
     }
   ]);

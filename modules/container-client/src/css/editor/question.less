@@ -1,0 +1,105 @@
+@player-width: 600px;
+
+.preview-player-control-panel{
+  text-align: right;
+  padding: 10px;
+  * {
+    margin-left: 5px;
+    text-transform: lowercase;
+  }
+}
+
+.question{
+  padding: 10px;
+  width: 100%;
+
+  hr{
+    margin-top: 10px;
+    margin-bottom: 10px;
+  }
+  
+  .button-bar{
+    *{
+      margin-left: 5px;
+    }
+  }
+
+  .preview {
+    min-width: @player-width;
+    padding:10px;
+    border:2px solid dashed;
+    background:white;
+    -webkit-transition:all linear 0.5s;
+    transition:all linear 0.5s;
+    opacity: 0;
+
+    &.visible {
+      opacity: 1;
+    }
+  }
+
+
+  .item-preview-wrapper {
+    width: @player-width;
+    min-width: @player-width;
+    max-width: @player-width;
+    position: relative;
+  
+    .player-container{
+      padding: 5px;
+      border:1px dashed #ccc;
+      border-radius: 4px;
+      width: @player-width;
+      min-width: @player-width;
+      max-width: @player-width;
+      min-height: 465px;
+    }
+ 
+    .player-label {
+      border-radius: 4px;
+      text-align: center;
+      img{
+        border: dashed #cccccc 1px;
+        position: absolute;
+        bottom: 45px;
+        left: 10px;
+        height: 20px;
+      }
+    }
+  }
+
+  .summary-feedback-panel,
+  .summary-feedback-panel-preview {
+    border: solid 2px @feedback-bg;
+    width:550px;
+    .panel-heading {
+      a {
+        cursor: pointer;
+      }
+      background-color: @feedback-bg;
+      color: white;
+    }
+  }
+
+  .summary-feedback-panel-preview{
+    .panel-body{
+      .ng-binding{
+        border: none;
+      }
+    }
+    .panel-heading{
+      :hover{
+        cursor: pointer;
+      }
+    }
+
+    .panel-heading i{
+      font-size: 30px;
+    }
+
+    .panel-title{
+      line-height: 30px;
+    }
+  }
+}
+

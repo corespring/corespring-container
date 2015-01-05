@@ -23,6 +23,7 @@ editorSrcs = [
   'js/corespring/core-library.js',
   'js/corespring/server/init-core-library.js',
   'js/dev-editor/**/*.js',
+  'js/editor/**/*.js',
   'js/render/services/**/*.js',
   'js/render/directives/**/*.js',
   'js/render/controllers/**/*.js'
@@ -30,7 +31,7 @@ editorSrcs = [
 
 exports.js =
   src: _.union(coreLibs.js, core.src, editorSrcs)
-  dest: 'js/v2-editor-prod.js'
+  dest: 'js/dev-editor-prod.js'
   libs: [
     'bower_components/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML'
   ]
@@ -51,6 +52,9 @@ exports.ngModules = _.union(player.ngModules, [
   'corespring-dev-editor.services',
   'corespring-dev-editor.controllers',
   'corespring-dev-editor.directives',
+  'corespring-editor.directives',
+  'corespring-editor.services',
+  'corespring-editor.controllers',
   'ui.sortable',
   'ui.bootstrap',
   'ui.ace',

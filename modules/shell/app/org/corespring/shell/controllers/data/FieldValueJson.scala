@@ -364,7 +364,6 @@ object FieldValueJson {
       Json.obj(
         "key" -> "Create",
         "value" -> Json.arr(
-          "Create",
           "Compose",
           "Construct",
           "Create",

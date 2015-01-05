@@ -1,26 +1,32 @@
 extends layout
 
 block content
+  style
 
   .root(ng-controller="DevEditorRoot")
-    .header(style="position: fixed; top: 0;")
-      .col-md-6
-        h4 XHTML
-      .col-md-4
-        h4 Component JSON
-      .col-md-2
-        ul.editor-actions
-          li
-            button.btn.btn-success(ng-click="save()") Save
-          li
-            button.btn.btn-default(ng-click="preview()") Preview
-
-    .editors
-      .col-md-6
-        div(ui-ace,
+    .top-row
+      span Dev Editor
+      .pull-right
+        button.btn.btn-sm.btn-default(ng-click="save()") Save
+    .bottom-row
+      
+      .xhtml-pane(ui-ace,
           ng-model="xhtml",
-          ui-ace="{useWrapMode : true, onLoad: aceLoaded, onChange: aceChanged }")
-      .col-md-6
-        div(ui-ace,
+          ui-ace="{mode: 'html', useWrapMode : true, onLoad: aceLoaded, onChange: aceChanged }")
+      .json-pane(ui-ace
           ng-model="json",
-          ui-ace="{useWrapMode : true, onLoad: aceLoaded, onChange: aceChanged }")
+          ui-ace="{mode: 'json', useWrapMode : true, onLoad: aceLoaded, onChange: aceJsonChanged }")
+      .preview(ng-controller="ClientSidePreview")
+        .item-preview-wrapper
+          .player-label
+            img(src='../../images/item-player-label.png')
+          .player-container
+            optimized-preview-player(
+              ng-model="xhtml",
+              player-components="item.components",
+              player-outcomes="outcome")
+            summary-feedback(ng-show="session.isComplete", ng-model="item.summaryFeedback")
+          preview-player-control-panel(
+            data-mode='playerMode', 
+            data-settings='playerSettings', 
+            data-score="score")

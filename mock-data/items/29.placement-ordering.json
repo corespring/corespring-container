@@ -21,9 +21,9 @@
   },
   "components": {
     "1": {
-      "componentType": "corespring-placement-ordering",
-      "title": "Butterfly Ordering",
-      "correctResponse": ["dog","cat"],
+      "componentType": "corespring-ordering",
+      "title": "",
+      "correctResponse": ["c1","c2"],
       "feedback": {
         "correctFeedbackType": "default",
         "partialFeedbackType": "default",
@@ -38,31 +38,30 @@
       "model": {
         "choices": [
           {
-            "label": "Dog",
+            "label": "Apple",
             "labelType": "text",
-            "id": "dog"
+            "id": "c1",
+            "moveOnDrag": true
           },
           {
-            "label": "Cat",
+            "label": "Pear",
             "labelType": "text",
-            "id": "cat"
+            "id": "c2",
+            "moveOnDrag": true
           },
           {
-            "label": "Bird",
+            "label": "Banana",
             "labelType": "text",
-            "id": "bird"
-          },
-          {
-            "label": "Adult",
-            "labelType": "text",
-            "id": "adult"
+            "id": "c3",
+            "moveOnDrag": true
           }
         ],
         "config": {
           "shuffle": true,
           "choiceAreaLayout": "vertical",
           "choiceAreaLabel": "Choice Label",
-          "answerAreaLabel": "Answer Label"
+          "answerAreaLabel": "Answer Label",
+          "placementType": "placement"
         }
       },
       "weight": 1
@@ -74,5 +73,5 @@
       "corespring/*"
     ]
   },
-  "xhtml": "<div><corespring-placement-ordering id='1'></corespring-placement-ordering></div>"
+  "xhtml": "<div><corespring-ordering id='1'></corespring-ordering></div>"
 }

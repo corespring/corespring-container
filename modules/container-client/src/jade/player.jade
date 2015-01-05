@@ -1,42 +1,41 @@
 extends layout
 
+
 block header-scripts
   if useNewRelicRum
 
     script(type="text/javascript", src="../../js/libs/newrelic/newrelic-rum-js-agent.min.js")
 
-    script(type="text/javascript")
+    script(type="text/javascript").
 
-      NREUM.info=!{newRelicRumConfig}
+      NREUM.info!= newRelicRumConfig
 
 block content
+
+  mixin player
+    div(corespring-player='corespring-player', 
+      player-mode='player',
+      player-markup='item.xhtml',
+      player-item='item',
+      player-session='session',
+      player-outcomes='outcome')
+      != xhtml
+    summary-feedback(ng-model="item.summaryFeedback", ng-show="session.isComplete")
+
   .root.container(ng-controller='Root', dimension-propagator='')
 
     if showControls
-
       div(ng-controller="ContainerPlayerController")
         div(ng-controller="Main")
-          div(player-control-panel,data-mode='playerMode', data-settings='playerSettings', data-score="score", show-preview-button="{{showPreviewButton}}")
-            div(
-              corespring-player='corespring-player',
-                player-mode='player',
-                player-markup='item.xhtml',
-                player-item='item',
-                player-session='session',
-                player-outcomes='outcome')
-                != xhtml
-              summary-feedback(item="item",session="session")
+          div(player-control-panel, 
+          data-mode='playerMode', 
+          data-settings='playerSettings', 
+          data-score="score", 
+          show-submit-button="true")
+            +player
     else 
       div(ng-controller='Main')
-        div(
-          corespring-player='corespring-player', 
-            player-mode='player',
-            player-markup='item.xhtml',
-            player-item='item',
-            player-session='session',
-            player-outcomes='outcome')
-            != xhtml
-          summary-feedback(item="item",session="session")
+        +player
 
     //[if lte IE 8]> <script src="../../js/common/ie-support/Function.bind.js"></script> <![endif]
     //[if lte IE 8]> <script src="../../js/common/ie-support/Array.map.js"></script> <![endif]
@@ -45,13 +44,13 @@ block content
 
 block before-main-script
   
-  script(type="text/javascript") 
+  script(type="text/javascript").
     
     window.playerVersionInfo = !{versionInfo};
 
 block after-main-script
 
-  script(type="text/javascript")
+  script(type="text/javascript").
 
     angular.module( 'corespring-player').config(['$provide', function($provide) {
 

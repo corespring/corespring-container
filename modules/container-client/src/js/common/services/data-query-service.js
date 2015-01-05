@@ -7,7 +7,7 @@
       var url = baseUrl + topic;
 
       if(query){
-       url += "?query=" + query;
+       url += "?query=" + JSON.stringify(query);
       }
 
       $http({method: 'GET', url: url})
@@ -46,6 +46,29 @@
       $http({method: 'GET', url: url})
         .success(onSuccess)
         .error(onError);
+    };
+
+    /**
+     * Create a query object. SearchTerm and fields are optional if you specify filters and vice versa.
+     * @param searchTerm The string that all the specified fields are searched for
+     * @param fields An array of field names. These fields are compared to searchTerm.
+     * @param filters Filters the results. Only items that have the same properties are returned.
+     * @returns a query object that can be passed to the query function
+     */
+    this.createQuery = function(searchTerm, fields, filters){
+      var query = {};
+      if(searchTerm){
+        query.searchTerm = searchTerm;
+      }
+      if(fields && !_.isEmpty(fields)){
+        query.fields = fields;
+      }
+      if(filters && !_.isEmpty(filters)){
+        query.filters = _.transform(filters,function(result, num, key){
+          result.push({field:key, value:filters[key]});
+        }, []);
+      }
+      return query;
     };
   }
 

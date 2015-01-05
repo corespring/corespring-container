@@ -1,9 +1,61 @@
 @import "../bower_components/bootstrap/less/bootstrap";
+@import "../bower_components/less-elements/elements";
 
-@header-size: 50px;
-
-html, body, .main, .root, .col-md-6, .ace_editor {
+html, body, .main, .root{
   height: 100%;
+}
+
+body {
+  overflow: hidden;
+}
+
+.root{
+  display: flex;
+  flex-direction: column;
+}
+
+.top-row{
+  background-color: #ececec;
+  height: 50px;
+  width: 100%;
+  padding: 10px;
+  .pull-right{
+    float: right;
+  }
+  z-index: 101;
+  .drop-shadow(0, 1px, 2px, 0.2);
+}
+
+.bottom-row{
+  position: relative;
+  height: 100%;
+
+  .xhtml-pane{
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 400px;
+  }
+
+  .json-pane{
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 100%;
+    left: 400px;
+  }
+  .preview{
+    overflow: auto;
+    padding: 15px;
+    border-left: solid 1px #cacaca;
+    background-color: #fff;
+    z-index: 100;
+    position: absolute;
+    width: 400px;
+    right: 0px;
+    top: 0px;
+    bottom: 0px;
+  }
 }
 
 .flash.alert {
@@ -12,41 +64,4 @@ html, body, .main, .root, .col-md-6, .ace_editor {
   right: 10px;
   z-index: 100;
   margin: 0;
-}
-
-.ace_editor {
-  width: 100%;
-}
-
-.root .header {
-  background: #ebebeb;
-  border-bottom: 1px solid #000000;
-  min-height: @header-size;
-  width: 100%;
-  z-index: 10;
-
-  h4 {
-    margin-top: 19px;
-  }
-}
-
-.editor-actions {
-  list-style-type: none;
-  padding: 10px;
-  margin: 0;
-  width: 100%;
-  text-align: right;
-
-  li {
-    display: inline;
-
-    button {
-      display: inline-block;
-    }
-  }
-}
-
-.editors {
-  height: 100%;
-  margin-top: @header-size + 4px;
 }

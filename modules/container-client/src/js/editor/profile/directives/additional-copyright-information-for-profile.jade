@@ -1,0 +1,38 @@
+mixin field(label, ngModel)
+  .form-group
+    label.col-sm-3.control-label(for=ngModel)= label
+    .col-sm-9
+      if block
+        block
+      else
+        input.form-control(id=ngModel, ng-model=ngModel)
+
+.additional-copyright-information-for-profile
+  p {{prompt}}
+  .control-group(style="padding-left: 5px;")
+    .controls
+      radio(ng-model="required",value="yes") Yes
+      radio(ng-model="required",value="no",style="margin-left: 20px;") No
+    br/
+
+  .item(ng-repeat="item in copyrights")
+    p Please complete the following
+    +field('Author','item.author')
+    +field('Copyright Owner','item.owner')
+    +field('Copyright Year','item.year')
+      select.form-control(id="item.year",ng-model="item.year",ng-options="c for c in copyrightYearDataProvider",
+            style="width: 170px;")
+        option(value='') Select ...
+    +field('Media Type','item.mediaType')
+      select.form-control(id="item.mediaType",ng-model="item.mediaType",ng-options="c.key as c.value for c in mediaTypeDataProvider")
+        option(value='') Select ...
+    +field('Website','item.sourceUrl')
+
+    .form-group
+      .col-sm-3
+      .col-sm-9.text-right
+        a.btn.btn-default(ng-click="removeCopyrightItem(item)", style="padding-right: 10px;") Remove additional copyright
+
+  a.btn.btn-default.add-additional(ng-click="addCopyrightItem()", ng-show="required")
+    i.fa.fa-plus(style="margin-left: 6px; margin-right: 6px;")
+    span Add more

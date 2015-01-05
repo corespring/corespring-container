@@ -2,21 +2,18 @@ function UrlBuilder() {
 
   this.build = function(url, params) {
     var split = url.split('?');
-    var base = split[0];
-    var paramsToAdd = '';
-    if (split.length === 2) {
-      paramsToAdd = split[1];
-    }
-    var kv = [];
+    var base = split.shift();
+    var paramsToAdd = split.join('?');
 
+    var kv = [];
     for (var x in params) {
       if(params[x]){
         kv.push(x + '=' + params[x]);
       }
     }
     paramsToAdd += (paramsToAdd === '') ? '' : '&';
-    paramsToAdd += kv.join('&'); 
-    return base + '?' + paramsToAdd;
+    paramsToAdd += kv.join('&');
+    return base + ((paramsToAdd !== '') ? '?' + paramsToAdd : '');
   };
 }
 

@@ -1,4 +1,4 @@
-/*describe('profile formatter', function() {
+describe('profile formatter', function() {
 
   beforeEach(angular.mock.module('corespring-common.services'));
 
@@ -9,7 +9,7 @@
   }));
 
   it('should init', function() {
-    expect(formatter).toNotBe(null);
+    expect(formatter).not.toBe(null);
   });
 
   describe('all reviews passed', function() {
@@ -128,4 +128,4 @@
   });
 
 
-});*/
+});

@@ -8,7 +8,7 @@ mkUglify = (srcAndDest, compress, processFn) ->
   options:
     sourceMap:true
     sourceMapIncludeSource: true
-    compress: compress 
+    compress: compress
     mangle: false
   files: [
     _.deepMapValues(srcAndDest, processFn)
@@ -34,16 +34,16 @@ exports.buildUglifyOptions = (grunt, name, jsIn, processFn) ->
   grunt.log.debug('split paths normal: ', splitPaths.normal)
 
   cleanSplit = _.map(splitPaths.min, (p) -> p.replace("(.min)", ".min"))
-  
-  libs = 
+
+  libs =
     src: cleanSplit
-    dest: "js/tmp.#{name}-libs-concatted.js"
+    dest: ".tmp/js/tmp.#{name}-libs-concatted.js"
 
-  srcs = 
+  srcs =
     src: splitPaths.normal
-    dest: "js/tmp.#{name}-srcs-compressed-concatted.js"
+    dest: ".tmp/js/tmp.#{name}-srcs-compressed-concatted.js"
 
-  final = 
+  final =
     src: [libs.dest, srcs.dest]
     dest: jsIn.dest
 

@@ -1,38 +1,59 @@
 angular.module('corespring-dev-editor.controllers')
   .controller('DevEditorRoot', [
     '$scope',
-    'ItemIdService',
     'ItemService',
-    'CatalogPreview',
-    'Flash',
-    function($scope, ItemIdService, ItemService, CatalogPreview, Flash) {
-      $scope.itemId = ItemIdService.itemId();
+    'ComponentData',
+    '$timeout',
+    function($scope, ItemService, ComponentData, $timeout) {
 
       $scope.onItemLoaded = function(item) {
         $scope.item = item;
+        ComponentData.setModel(item.components);
         $scope.xhtml = item.xhtml;
         $scope.json = JSON.stringify(item.components, undefined, 2);
       };
 
       $scope.save = function() {
-        $scope.item.xhtml = $scope.xhtml;
-        $scope.item.components = JSON.parse($scope.json);
-        ItemService.save($scope.item, function() {
-          Flash.info('Saved successfully.');
-        }, function() {
-          Flash.error('There was an error saving the item.');
-        }, $scope.itemId);
+
+        if($scope.xhtml !== $scope.item.xhtml) {
+          $scope.item.xhtml = $scope.xhtml;
+          ItemService.saveXhtml($scope.item.xhtml, function(){
+            console.log('xhtml saved');
+          });
+        }
+
+        if(!_.isEqual($scope.item.components, $scope.components)){
+          $scope.item.components  = $scope.components;
+          ItemService.saveComponents($scope.item.components, function(){
+            console.log('components saved');
+          });
+        }
       };
 
-      $scope.preview = function() {
-        CatalogPreview.launch($scope.itemId);
+
+      $scope.aceJsonChanged = function(){
+
+        try{
+          var update = JSON.parse($scope.json);
+          $scope.components = update;
+
+          $timeout(function(){
+            $scope.$digest();
+          });
+        } catch(e) {
+          console.warn('bad json', e);
+        }
       };
 
       $scope.onItemLoadError = function(err) {
-        Flash.error("There was an error loading the item.");
+        window.alert("There was an error. Please try later. Thanks!");
       };
 
-      ItemService.load($scope.onItemLoaded, $scope.onItemLoadError, $scope.itemId);
+      $scope.$on('registerComponent', function(event, id, componentBridge) {
+        ComponentData.registerComponent(id, componentBridge);
+      });
+
+      ItemService.load($scope.onItemLoaded, $scope.onItemLoadError);
     }
   ]
 );

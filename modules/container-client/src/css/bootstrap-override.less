@@ -5,3 +5,27 @@
 .popover.bottom {
   margin-top: 0px;
 }
+
+.panel {
+
+  .panel-heading {
+    cursor: pointer;
+  }
+
+  &.disabled {
+
+    .panel-heading {
+      cursor: default;
+
+      .panel-title {
+        color: #cccccc;
+
+        a {
+          text-decoration: none;
+        }
+      }
+    }
+
+  }
+
+}

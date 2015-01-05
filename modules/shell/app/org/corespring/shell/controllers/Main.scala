@@ -1,5 +1,6 @@
 package org.corespring.shell.controllers
 
+import org.corespring.container.client.hooks.ItemHooks
 import org.corespring.mongo.json.services.MongoService
 import org.corespring.shell.{ IndexLink, SessionKeys }
 import org.corespring.container.logging.ContainerLogger
@@ -16,6 +17,8 @@ trait Main
   def itemService: MongoService
 
   def sessionService: MongoService
+
+  def itemHooks : ItemHooks
 
   def index = Action {
     request =>
@@ -34,9 +37,9 @@ trait Main
           val playerUrl = routes.Main.createSessionPage(id).url
           val deleteUrl = routes.Main.deleteItem(id).url
           val editorUrl = appRoutes.Editor.load(id).url
-          val v2EditorUrl = appRoutes.V2Editor.load(id).url
+          val devEditorUrl = appRoutes.DevEditor.load(id).url
           val catalogUrl = appRoutes.Catalog.load(id).url
-          IndexLink(name, playerUrl, editorUrl, v2EditorUrl, deleteUrl, catalogUrl)
+          IndexLink(name, playerUrl, editorUrl, devEditorUrl, deleteUrl, catalogUrl)
       }
 
       logger.debug(items.mkString(","))
@@ -64,17 +67,14 @@ trait Main
       Redirect("/")
   }
 
-  def createItem = Action {
+  def createItem = Action.async {
     request =>
-      val json = Json.obj(
-        "xhtml" -> "<div></div>",
-        "components" -> Json.obj(),
-        "profile" -> Json.obj(
-          "taskInfo" -> Json.obj(
-            "title" -> "")))
-      itemService.create(json).map { id =>
-        Redirect(org.corespring.container.client.controllers.apps.routes.Editor.load(id.toString))
-      }.getOrElse(BadRequest("Error creating an item"))
+
+      import scala.concurrent.ExecutionContext.Implicits.global
+      itemHooks.create(None)(request).map{
+        case Left(err) => BadRequest("Error creating item")
+        case Right(id) => Redirect(org.corespring.container.client.controllers.apps.routes.Editor.load(id.toString))
+      }
   }
 
   def createSession = Action {

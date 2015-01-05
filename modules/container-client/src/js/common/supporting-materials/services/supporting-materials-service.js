@@ -6,7 +6,26 @@
     function getUrl(supportingMaterials, index) {
       if (supportingMaterials) {
         var material = supportingMaterials[index];
-        return (material.id || material.name)+ "/" + self.getSupportingMaterialFile(supportingMaterials, index).name;
+        var file = self.getSupportingMaterialFile(supportingMaterials, index);
+        if (file) {
+          return (material.id || material.name) + "/" + file.name;
+        } else {
+          return undefined;
+        }
+      } else {
+        return undefined;
+      }
+    }
+
+    function getName(supportingMaterials, index) {
+      if (supportingMaterials) {
+        var material = supportingMaterials[index];
+        var file = self.getSupportingMaterialFile(supportingMaterials, index);
+        if (file) {
+          return material.name;
+        } else {
+          return undefined;
+        }
       } else {
         return undefined;
       }
@@ -77,8 +96,19 @@
       return $sce.trustAsResourceUrl(getUrl(supportingMaterials, index));
     };
 
+    this.getSupportingName = function(supportingMaterials,index){
+      return $sce.trustAsResourceUrl(getName(supportingMaterials, index));
+    };
+
+
     this.getContentType = function(supportingMaterials, index) {
-      return self.getSupportingMaterialFile(supportingMaterials, index).contentType;
+      var file = self.getSupportingMaterialFile(supportingMaterials, index);
+      return file ? file.contentType : undefined;
+    };
+
+    this.getContent = function(supportingMaterials, index) {
+      var file = self.getSupportingMaterialFile(supportingMaterials, index);
+      return file ? file.content : undefined;
     };
 
     /**
@@ -93,6 +123,23 @@
       return (supportingMaterial && contentType) ?
         supportingMaterial.contentType === contentType : false;
     }
+
+    this.getSupportingMaterialsByGroups = function(supportingMaterials) {
+      var groupedSupportingMaterials = _.groupBy(supportingMaterials, "materialType");
+      var result = [];
+      var insertSupportingMaterialsForType = function(supMat) {
+        var index = _.indexOf(supportingMaterials, supMat);
+        result.push({label: supMat.name, type: "data", index: index});
+      };
+      for (var key in groupedSupportingMaterials) {
+        if (key !== "undefined") {
+          result.push({label: key, type: "header"});
+        }
+        _.each(groupedSupportingMaterials[key], insertSupportingMaterialsForType);
+        result.push({type: "divider"});
+      }
+      return _.initial(result);
+    };
 
   }
 

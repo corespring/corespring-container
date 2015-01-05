@@ -9,9 +9,12 @@ import play.api.libs.json.Json
 import play.api.mvc.{ Action, AnyContent, Controller }
 
 object DataQuery {
+
   val findTopics = Seq(
+    "standards",
     "subjects.primary",
     "subjects.related")
+
   val listTopics = Seq(
     "bloomsTaxonomy",
     "credentials",
@@ -24,7 +27,9 @@ object DataQuery {
     "priorUses",
     "reviewsPassed",
     "standards",
-    "standardsTree") ++ findTopics
+    "standardsTree",
+    "subjects.primary",
+    "subjects.related")
 }
 
 /** Query service for static data, eg: subject, gradelevel, etc */

@@ -1,0 +1,18 @@
+mixin modal(title, okLabel, showFooter)
+  - okLabel = okLabel ? okLabel : 'Yes'
+  - showFooter = showFooter == false ? false : true
+  .modal-header
+    button.close(type='button', ng-click="close ? close() : $dismiss()")
+      span &times;
+      span.sr-only Close
+    h4.modal-title= title 
+  .modal-body
+    block      
+  if showFooter
+    .modal-footer
+      button.btn.btn-primary(type='button', ng-click="ok()", ng-disabled="okDisabled")= okLabel
+      button.btn.btn-default(type='button', ng-click="cancel()") Cancel
+    
+mixin ng_popup_template(name)
+  script(type="text/ng-template", id="/templates/popups/#{name}")
+    block

@@ -17,14 +17,14 @@ rigSrcs = [
   ]
 
 exports.js =
-  src: _.union(coreLibs.src, core.src, rigSrcs)
+  src: _.union(coreLibs.js, core.src, rigSrcs)
   dest: 'js/rig-prod.js'
   libs: [
     'bower_components/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML'
   ]
   report: 'rig-js-report.json'
 
-exports.css = 
+exports.css =
   src: ['css/rig.css']
   dest: 'css/rig.min.css'
   libs: [

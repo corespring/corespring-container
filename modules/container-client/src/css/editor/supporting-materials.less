@@ -1,25 +1,25 @@
 .supporting-material {
 
-  .supporting-material-metadata {
-    background-color: #f5f5f5;
-    border: 1px solid #a9a9a9;
+  margin-top: 30px;
+
+  dt {
+    padding-bottom: 20px;
   }
 
   .editor-container {
-    position: absolute;
-    left: 0;
-    top: 90px;
-    right: 0;
-    bottom: 0;
+    height: 600px;
+  }
+
+  .preview-file {
+    height: 600px;
   }
 
   .wiggi-wiz, .wiggi-wiz-editable {
-    height: 100%;
-    overflow: inherit;
+    height: 400px;
+    overflow: auto;
   }
 
   .file-upload-info {
-    padding: 20px;
 
     h3 {
       margin: 0 0 15px;
@@ -32,11 +32,6 @@
       &:after {
         content: ":"
       }
-    }
-
-    dd {
-      display: inline-block;
-      margin-bottom: 5px;
     }
   }
 
@@ -65,14 +60,109 @@
 
 }
 
+.add-supporting-material-popup {
+  dt {
+    text-align: right;
+    width: 100px;
+  }
+
+  dd {
+    margin-bottom: 20px;
+  }
+
+  .create-own {
+    margin-right: 10px;
+  }
+
+  .radio-input {
+    display: inline-block;
+    margin-right: 20px;
+  }
+}
+
+.supporting-material-metadata {
+  .select2-container .select2-choice {
+    background-image: none;
+    height: 34px;
+    line-height: 34px;
+  }
+
+  .select2-container .select2-choice .select2-arrow {
+    background: none;
+    border-left: none;
+    top: 4px;
+  }
+
+  .select2-dropdown-open .select2-choice {
+    background: none;
+  }
+
+  .select2-dropdown-open.select2-drop-above .select2-choice, .select2-dropdown-open.select2-drop-above .select2-choices {
+    background: none;
+  }
+
+}
+
 .supporting-materials {
   height: 100%;
+  margin-left: 20px;
+
+
+  .add-new-block {
+    padding-bottom: 9px;
+    margin-top: 20px;
+    border-bottom: 1px solid #eee;
+  }
+
+  ul.supporting-materials-list {
+    line-height: 220%;
+  }
+
+  li.data {
+    border: 1px solid #ffffff;
+    border-radius: 4px;
+  }
+  li.data:hover {
+    border:1px dashed #ddd;
+    cursor: pointer;
+  }
+  li.data.selected {
+    border:1px dashed #ddd;
+    background-color:#f9f9f9;
+  }
+
+  li {
+    position: relative;
+  }
+  li a {
+    margin-left: 10px;
+  }
+
+  .supporting-materials-list {
+    padding-left: 0;
+    list-style: none;
+
+    .fa-trash-o {
+      position: absolute;
+      top: 5px;
+      right: 12px;
+      font-size: 22px;
+      color: #cccccc;
+      cursor: pointer;
+    }
+
+    h4 {
+      text-transform: uppercase;
+    }
+  }
+
 
   .wiggi-wiz-overlay {
 
     .toolbar {
       display: none;
     }
+
     .content {
       top: 0;
     }
@@ -84,221 +174,3 @@
 
 }
 
-.supporting-material-metadata {
-  padding: 15px 15px 5px 15px;
-
-  .field {
-    display: inline-block;
-    margin: 0 20px 10px 0;
-  }
-
-  label {
-    display: inline-block;
-    font-weight: bold;
-    margin-right: 5px;
-  }
-
-}
-
-.supporting-materials {
-
-  .intro {
-    display: block;
-    padding: 40px 20px;
-    max-width: 600px;
-    margin: 0;
-
-    button {
-      margin-top: 20px;
-      float: right;
-    }
-  }
-
-}
-
-.new-supporting-material {
-
-  .selection {
-    position: relative;
-
-    .prompt {
-      position: absolute;
-      margin: 0;
-      padding: 0;
-      left: 20px;
-      top: 0;
-    }
-
-    .or {
-      text-transform: uppercase;
-      font-weight: bold;
-      display: inline-block;
-      margin: 5px 0;
-    }
-
-    .options {
-      margin-left: 140px;
-      padding: 0 0 50px 0;
-
-      .file-header, .pdf-header {
-        display: inline-block;
-
-        img {
-          display: inline-block;
-          margin-left: 10px;
-        }
-      }
-
-      label {
-        font-weight: bold;
-      }
-
-      a {
-        text-decoration: underline;
-        &:hover {
-          cursor: pointer;
-        }
-      }
-
-      &.disabled {
-        @disabled-color: #c0c0c0;
-        color: @disabled-color;
-
-        .file-header, .pdf-header {
-          img {
-            opacity: 0.2;
-          }
-        }
-
-        a {
-          color: #c0c0c0;
-          text-decoration: none;
-          &:hover {
-            text-decoration: none;
-            cursor: default;
-          }
-        }
-      }
-    }
-
-    .field {
-      display: inline-block;
-      margin: 0 20px 10px 0;
-    }
-
-  }
-
-
-}
-
-.supporting-material-preview {
-  margin-top: 20px;
-}
-
-.root .nav-container .nav {
-
-  li.nav-subitem {
-
-    .subitem-link {
-      padding-left: 40px;
-    }
-
-    .supporting-material-link {
-      padding-right: 32px;
-    }
-
-    .delete-supporting-material {
-      position: absolute;
-      height: 100%;
-      width: 14px;
-      right: 0;
-      top: 0;
-      display: block;
-      padding: 0 16px;
-      background: url('../images/delete-icon.png') no-repeat center center;
-      background-size: 14px 14px;
-      opacity: 0.5;
-
-      &:hover {
-        opacity: 1;
-      }
-    }
-  }
-
-  .nav-subheader {
-    position: relative;
-
-    a {
-      padding-left: 38px;
-
-      &.empty {
-        padding-left: 15px;
-      }
-
-      &.collapsable {
-        position: absolute;
-        cursor: pointer;
-        left: 0;
-        top: 0;
-        width: 10px;
-        height: 10px;
-        display: block;
-        background: url('../images/disclosure-arrow-right.png') no-repeat center center;
-        padding: 19px;
-
-        &.expanded {
-          background-image: url('../images/disclosure-arrow-down.png');
-        }
-      }
-    }
-
-    &.active {
-      .nav-subitem {
-        a {
-          color: #c2bfc2;
-        }
-
-        &.active a {
-          color: #94d228;
-        }
-      }
-    }
-
-  }
-}
-
-.save-supporting-material-window .modal-content {
-  width: 400px;
-}
-
-.save-supporting-material {
-  padding: 20px;
-  overflow: auto;
-
-  label {
-    min-width: 50px;
-    display: inline-block;
-  }
-
-  .other {
-    display: inline-block;
-    float: right;
-    margin-bottom: 10px;
-  }
-
-  .buttons {
-    list-style-type: none;
-    float: right;
-    margin: 0;
-
-    li {
-      @button-spacing: 10px;
-      display: inline-block;
-      padding: 0 @button-spacing/2;
-
-      &:last-child {
-        padding: 0 0 0 @button-spacing/2;
-      }
-    }
-  }
-}

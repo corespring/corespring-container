@@ -43,10 +43,6 @@ trait ShellDataQueryHooks extends ContainerDataQueryHooks {
   override def list(topic: String, query: Option[String])(implicit header: RequestHeader): Future[Either[(Int, String), JsArray]] = Future {
     logger.debug(s"list topic <$topic> query <$query>")
 
-    def filterSubjects(s: JsObject) = query.map {
-      q => (s \ "subject").asOpt[String].map(s => s.toLowerCase().contains(q.toLowerCase)).getOrElse(true)
-    }.getOrElse(true)
-
     val out = topic match {
       case "bloomsTaxonomy" => Json.toJson(bloomsTaxonomy)
       case "credentials" => Json.toJson(credentials)
@@ -60,8 +56,8 @@ trait ShellDataQueryHooks extends ContainerDataQueryHooks {
       case "reviewsPassed" => Json.toJson(reviewsPassed)
       case "standards" => Json.toJson(StandardsDataQuery.list(standards, query))
       case "standardsTree" => Json.toJson(standardsTree)
-      case "subjects.primary" => Json.toJson(subjects.filter(filterSubjects))
-      case "subjects.related" => Json.toJson(subjects.filter(filterSubjects))
+      case "subjects.primary" => Json.toJson(StandardsDataQuery.list(subjects, query))
+      case "subjects.related" => Json.toJson(StandardsDataQuery.list(subjects, query))
     }
     Right(out.as[JsArray])
   }

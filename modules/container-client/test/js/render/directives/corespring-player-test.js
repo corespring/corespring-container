@@ -1,4 +1,4 @@
-describe('component-register', function(){
+describe('component-player', function(){
 
   var rootScope, compile, mockRegister;
 
@@ -37,7 +37,7 @@ describe('component-register', function(){
 
   it('should init', function(){
     var elem = compile("<corespring-player/>")(rootScope);
-    expect(elem).toNotBe(null);
+    expect(elem).not.toBe(null);
   });
 
   it('should work with data', function(){

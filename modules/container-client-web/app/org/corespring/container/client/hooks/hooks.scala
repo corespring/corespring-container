@@ -2,7 +2,7 @@ package org.corespring.container.client.hooks
 
 import org.corespring.container.client.HasContext
 import org.corespring.container.client.hooks.Hooks.StatusMessage
-import play.api.libs.json.{ JsArray, JsValue }
+import play.api.libs.json.{ JsString, JsArray, JsValue }
 import play.api.mvc._
 
 import scala.concurrent.Future
@@ -32,7 +32,6 @@ trait PlayerHooks extends ClientHooks {
 }
 
 trait EditorHooks extends ClientHooks {
-  def createItem(implicit header: RequestHeader): Future[Either[StatusMessage, PlayerData]]
 }
 
 trait CatalogHooks extends ClientHooks {
@@ -43,14 +42,13 @@ trait ItemHooks extends HasContext {
 
   def load(itemId: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]]
 
-  def save(itemId: String, json: JsValue)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]]
+  def saveProfile(itemId: String, json: JsValue)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]]
+  def saveSupportingMaterials(itemId: String, json: JsValue)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]]
+  def saveComponents(itemId: String, json: JsValue)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]]
+  def saveXhtml(itemId: String, xhtml: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]]
+  def saveSummaryFeedback(itemId: String, feedback: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]]
 
   def create(json: Option[JsValue])(implicit header: RequestHeader): Future[Either[StatusMessage, String]]
-}
-
-@deprecated("I don't think this is being used anywhere - check with ben", "0.3.4")
-trait SupportingMaterialHooks extends HasContext {
-  def create(itemId: String)(implicit header: RequestHeader): Future[Either[StatusMessage, NewSupportingMaterial]]
 }
 
 trait SessionHooks extends HasContext {
@@ -75,7 +73,7 @@ trait AssetHooks extends HasContext {
   def delete(itemId: String, file: String)(implicit header: RequestHeader): Future[Option[StatusMessage]]
 
   /**
-   * TODO: it would be preferble to have a signature as follows
+   * TODO: it would be preferable to have a signature as follows
    * {{{
    * def upload(itemId: String, file: String)(implicit header: RequestHeader): Future[Option[StatusMessage]]
    * }}}

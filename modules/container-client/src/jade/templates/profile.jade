@@ -1,0 +1,265 @@
+mixin h_form
+  form.form-horizontal(role="form")
+    block
+    br/
+
+mixin field(id, label, ngModel)
+  .form-group
+    label.col-sm-4.control-label(for=id)= label
+    .col-sm-8
+      if block
+        block
+      else
+        input.form-control(id=id, ng-model=ngModel)
+
+mixin configurableField(id, label, ngModel)
+  .form-group(ng-show="formModels.#{id}.visible")
+    label.col-sm-3.control-label(for=id)= label
+    .col-sm-9
+      if block
+        block
+      else
+        input.form-control(id=id, ng-model=ngModel, ng-readonly="formModels.#{id}.readonly")
+
+mixin multipleValueSelector(id, ngModel, dataProvider, msg)
+  select(id=id,
+  ng-model=ngModel,
+  ui-select2,
+  multiple,
+  data-placeholder=msg,
+  ng-readonly="formModels.#{id}.readonly",
+  style="width:100%;")
+    option(ng-repeat="c in #{dataProvider}",value="{{c.key}}") {{c.key}}
+
+mixin panelHeader(id)
+  .panel.panel-default(ng-show="formModels.#{id}.visible")
+    .panel-heading(role="tab",id="heading-#{id}")
+      .panel-title
+        a(data-toggle="collapse",data-target="#collapse-#{id}",aria-expanded="false",aria-controls="collapse-#{id}")
+          block
+
+mixin panelBody(id)
+  .panel-collapse.collapse(id="collapse-#{id}",role="tabpanel",aria-labelledby="heading-#{id}", ng-class="{in: !formModels.#{id}.collapse}")
+    block
+
+mixin panel(id, title)
+  +panelHeader(id)
+    span= title
+  +panelBody(id)
+    block
+
+script(type="text/ng-template", id="/templates/profile")
+  .profile(ng-controller="ProfileController")
+    .col-md-6
+      .row.button-bar
+        button.pull-right.btn.btn-default(
+        ng-click="togglePreview()",
+        ng-class="{'btn-warning': !previewOn}")
+          | {{previewOn ? "Close Preview" : "Preview Profile Information"}}
+          i.fa(ng-class="{'fa-toggle-left': previewOn, 'fa-toggle-right' : !previewOn}")
+
+      hr/
+
+      .row
+        h2 Item Profile
+        p The profile contains information key data used to store and find an item (e.g., Common Core State Standard alignment, Bloom"s Taxonomy assignment, key skills, and copyright information). Authors are encouraged to include as much information as possible.
+        p * Required
+
+        +h_form
+          +configurableField("title", "* Title", "taskInfo.title")
+          +configurableField("description","Description", "taskInfo.description")
+
+          +configurableField("primarySubject","* Primary Subject", "taskInfo.subjects.primary")
+            input(id="primarySubject",
+            ng-model="taskInfo.subjects.primary",
+            type="text",
+            ui-select2="primarySubjectSelect2Adapter",
+            data-placeholder="Choose a subject...",
+            ng-readonly="formModels.primarySubject.readonly")
+
+          +configurableField("relatedSubject","Related Subject", "taskInfo.subjects.related")
+            input(id="relatedSubject",
+            ng-model="taskInfo.subjects.related",
+            type="hidden",
+            multiple="multiple",
+            ui-select2="relatedSubjectSelect2Adapter",
+            data-placeholder="Choose a subject...",
+            ng-readonly="formModels.relatedSubject.readonly",
+            style="width:100%;")
+
+          +configurableField("gradeLevel","Grade Level", "taskInfo.gradeLevel")
+            +multipleValueSelector("gradeLevel","taskInfo.gradeLevel","gradeLevelDataProvider | filter:gradeLevelFilter","Choose a grade level...")
+
+          .form-group(ng-show="formModels.componentTypes.visible && 0 < componentTypes.length")
+            label.col-sm-3.control-label Item Types
+            .col-sm-9
+              ul
+                li(ng-repeat="type in componentTypes") {{type}}
+
+        form.form-horizontal(role="form",ng-show="formModels.standards.visible")
+          div.standard-filter(ng-show="!formModels.standards.readonly")
+            h6 Add the Standards
+            +field("standard-filter-subject","Subject")
+              select.form-control(id="standard-filter-subject",
+              ng-model="standardFilterOption.subject",
+              ng-options="c.name for c in standardsTree")
+                option(value="") {{standardFilterPlaceholder.subject}}
+
+            +field("standard-filter-category","Category")
+              select.form-control(id="standard-filter-category",
+              ng-model="standardFilterOption.category",
+              ng-options="p.name for p in standardFilterOption.subject.items")
+                option(value="") {{standardFilterPlaceholder.category}}
+
+            +field("standard-filter-sub-category","Sub-Category")
+              select.form-control(id="standard-filter-sub-category",
+              ng-model="standardFilterOption.subCategory",
+              ng-options="z for z in standardFilterOption.category.items")
+                option(value="") {{standardFilterPlaceholder.subCategory}}
+            +field("standard-filter-search","Standards")
+              input(id="standard-filter-search",
+              class="add-standards",
+              type="text",
+              ui-select2="standardsAdapter",
+              ng-model="profile.standards",
+              style="width: 100%;")
+              span Begin entering standard codes
+            hr/
+
+          h6 Standards
+
+          .form-group(ng-repeat="c in standardsGroups",class="standards")
+            .col-sm-3
+              image(ng-src="{{c.imageUrl}}", ng-if="c.hasImage")
+              label(ng-if="!c.hasImage") {{ c.label }}
+            .col-sm-9.no-input
+              input(type="hidden", multiple, ui-select2="{tags:[],dropdownCss:{display:'none'}}",
+              ng-model="c.standards", style="width: 100%;")
+          br/
+
+        +h_form
+          h6 Other Alignments
+
+          +panel("depthOfKnowledge", "Depth Of Knowledge")
+            .panel-body.depth-of-knowledge
+              radio(ng-repeat="c in depthOfKnowledgeDataProvider | filter:depthOfKnowledgeFilter",
+              ng-model="otherAlignments.depthOfKnowledge",
+              ng-disabled="formModels.depthOfKnowledge.readonly",
+              value="{{c.key}}") {{ c.value }}
+
+          +panel("bloomsTaxonomy", "Bloom's Taxonomy")
+            .panel-body.blooms-taxonomy
+              radio(ng-repeat="c in bloomsTaxonomyDataProvider | filter:bloomsTaxonomyFilter",
+              ng-model="otherAlignments.bloomsTaxonomy",
+              ng-disabled="formModels.bloomsTaxonomy.readonly",
+              value="{{c.key}}") {{ c.value }}
+
+          +panelHeader("keySkills")
+            span(ng-bind-html-unsafe="keySkillsTitle")
+          +panelBody("keySkills")
+            .panel-body
+              .form-group
+                p Please select all applicable key skills for this item.
+                .col-sm-3(ng-repeat="skill in keySkillsDataProvider | filter:keySkillsFilter")
+                  checkbox(
+                  ng-model="skill.selected",
+                  ng-change="onChangeKeySkill()",
+                  value="{{skill.key}}"
+                  ng-disabled="formModels.keySkills.readonly") {{ skill.value }}
+
+          +panel("lexile", "Lexile Score")
+            .panel-body.lexile
+              +field("lexile", "Lexile Score")
+                input.form-control(id="lexile", ng-model="profile.lexile",
+                ng-readonly="formModels.lexile.readonly")
+                span.measure L
+
+        +h_form
+          h6 History
+
+          +panel("priorUsePanel", "Prior Use")
+            .panel-body
+              +configurableField("priorUse","This item was previously used in", "profile.priorUse")
+                select.form-control(id="priorUse",
+                ng-model="profile.priorUse",
+                ng-options="c.key as c.value for c in priorUseDataProvider | filter:priorUseFilter",
+                ng-disabled="formModels.priorUse.readonly")
+                  option(value="") Select ...
+                input(id="priorUseOther", ng-show="isPriorUseOtherSelected", type="text", placeholder="Enter prior use...",
+                ng-model="profile.priorUseOther", ng-readonly="formModels.priorUse.readonly")
+
+              +configurableField("priorGradeLevel","Grade Level", "profile.priorGradeLevel")
+                +multipleValueSelector("priorGradeLevel","profile.priorGradeLevel","priorGradeLevelDataProvider | filter:priorGradeLevelFilter","Choose a grade level...")
+
+          +panel("reviewsPassed", "Reviews Passed")
+            .panel-body
+              +field("reviewsPassed","This item passed the following reviews")
+                +multipleValueSelector("reviewsPassed","profile.reviewsPassed","reviewsPassedDataProvider | filter:reviewsPassedFilter","Choose a review...")
+
+              .form-group(ng-show="isReviewsPassedOtherSelected")
+                label.col-sm-4.control-label(for="reviewsPassedOther") Other review
+                .col-sm-8
+                  input.form-control(id="reviewsPassedOther", type="text",
+                  placeholder="Enter review...", ng-model="profile.reviewsPassedOther",
+                  ng-readonly="formModels.reviewsPassed.readonly")
+
+        +h_form
+          h6 Ownership
+
+          +panel("copyrightInformationPanel", "Copyright Information")
+            .panel-body
+              +configurableField("author","* Author", "contributorDetails.author")
+
+              +configurableField("credentials","Credentials","contributorDetails.credentials")
+                select.form-control(id="credentials",ng-model="contributorDetails.credentials",
+                ng-options="c.key as c.value for c in credentialsDataProvider | filter:credentialsFilter",
+                ng-disabled="formModels.credentials.readonly")
+                  option(value="") Select ...
+
+                input(id="credentialsOther",ng-show="isCredentialsOtherSelected", type="text",
+                placeholder="Enter credentials...", ng-model="contributorDetails.credentialsOther",
+                ng-readonly="formModels.credentials.readonly")
+
+              +configurableField("copyrightOwner","* Copyright Owner","contributorDetails.copyrightOwner")
+
+              +configurableField("copyrightYear","* Copyright Year","contributorDetails.copyrightYear")
+                select.form-control(id="copyrightYear",ng-model="contributorDetails.copyrightYear",
+                ng-options="c for c in copyrightYearDataProvider | filter:copyrightYearFilter", style="width:170px;",
+                ng-disabled="formModels.copyrightYear.readonly")
+                  option(value="") Select ...
+
+              +configurableField("copyrightExpirationDate","* Copyright Expiration","contributorDetails.copyrightExpirationDate")
+                select.form-control(id="copyrightExpirationDate",ng-model="contributorDetails.copyrightExpirationDate",
+                ng-options="c for c in copyrightExpirationDateDataProvider | filter:copyrightExpirationDateFilter",
+                style="width:170px;", ng-disabled="formModels.copyrightExpirationDate.readonly")
+                  option(value="") Select ...
+
+              +configurableField("sourceUrl","Website URL", "contributorDetails.sourceUrl")
+
+          +panel("additionalMediaCopyrights", "Additional Media Copyright")
+            .panel-body
+              additional-copyright-information-for-profile(copyrights="contributorDetails.additionalCopyrights",
+              prompt="Does this item contain any other copyrighted materials? E.g. book passage, image, etc.")
+
+          +panel("licenseType", "Creative Commons License")
+            .panel-body
+              +field("licenseType","Make this available via a")
+                table.license
+                  tr
+                    td
+                      select.form-control(id="licenseType",ng-model="contributorDetails.licenseType",
+                      ng-disabled="formModels.licenseType.readonly"
+                      ng-options="c.key as c.value for c in licenseTypeDataProvider | filter:licenseTypeFilter")
+                        option(value="") Select ...
+                    td
+                      span(ng-show="!contributorDetails.licenseType",style="color: #888; font-style: italic;")
+                        | Not Assigned
+                      img(ng-show="contributorDetails.licenseType",ng-src="{{getLicenseTypeUrl(contributorDetails.licenseType)}}")
+                    td
+                      a(href="http://creativecommons.org/licenses/",target="_blank") Learn More
+
+    .col-md-6
+      div(ng-if="previewOn", profile-preview="", ng-model="item")
+
+
+
