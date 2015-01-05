@@ -73,7 +73,7 @@ trait AssetHooks extends HasContext {
   def delete(itemId: String, file: String)(implicit header: RequestHeader): Future[Option[StatusMessage]]
 
   /**
-   * TODO: it would be preferble to have a signature as follows
+   * TODO: it would be preferable to have a signature as follows
    * {{{
    * def upload(itemId: String, file: String)(implicit header: RequestHeader): Future[Option[StatusMessage]]
    * }}}
