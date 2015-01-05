@@ -12,7 +12,7 @@ angular.module('corespring-editor.controllers').controller('QuestionInformationP
 
     $scope.selectTab = function(tab) {
       $scope.activeTab = tab;
-      $scope.activeSmIndex =  $scope.selectedSupportingMaterialUrl = $scope.selectedSupportingMaterialContent = undefined;
+      $scope.activeSmIndex = $scope.selectedSupportingMaterialUrl = $scope.selectedSupportingMaterialContent = undefined;
     };
 
     $scope.selectSupportingMaterial = function(smIndex) {
