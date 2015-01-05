@@ -82,22 +82,21 @@ angular.module('corespring-editor.services').service('ItemService', [
         });
       }
 
-      this.saveSupportingMaterial = function(data, onSuccess, onFailure) {
-        this.save(data, onSuccess, onFailure);
-      };
-
-      this.fineGrainedSave = function(data, onSuccess, onFailure){
+      function save(set, data, onSuccess, onFailure){
+        var method = ItemUrls.saveSubset.method;
+        var url = ItemUrls.saveSubset.url.replace(':subset', set);
+        url = addQueryParamsIfPresent(url);
         logger.debug('save', data );
-        var url = addQueryParamsIfPresent(ItemUrls.fineGrainedSave.url);
+        logger.debug('save - url:', url); 
         
         notifyListeners('saving') ;
-        $http[ItemUrls.fineGrainedSave.method](url, data)
+        $http[method](url, data)
           .success(function(data, status, headers, config) {
             notifyListeners('saved');
             if(onSuccess){
               onSuccess(data);
             } else {
-              logger.error('no onSuccess handler');
+              logger.warn('no onSuccess handler');
             }
           })
           .error(function(data, status, headers, config) {
@@ -107,27 +106,26 @@ angular.module('corespring-editor.services').service('ItemService', [
               onFailure(data);
             }
           });
+      }
+
+      this.saveProfile = function(data, onSuccess, onFailure){
+        save('profile', data, onSuccess, onFailure);
       };
 
-      this.save = function(data, onSuccess, onFailure){
-        logger.debug('save', data );
-        var url = addQueryParamsIfPresent(ItemUrls.save.url);
-        $http[ItemUrls.save.method](url, data)
-          .success(function(data, status, headers, config) {
-            loadedData = data;
+      this.saveComponents = function(data, onSuccess, onFailure){
+        save('components', data, onSuccess, onFailure);
+      };
 
-            if(onSuccess){
-              onSuccess(loadedData);
-            } else {
-              logger.error('no onSuccess handler');
-            }
-          })
-          .error(function(data, status, headers, config) {
-            if( onFailure ) {
-              data = data || { error: status + ": an unknown error occured" };
-              onFailure(data);
-            }
-          });
+      this.saveXhtml = function(data, onSuccess, onFailure){
+        save('xhtml', {xhtml: data}, onSuccess, onFailure);
+      };
+
+      this.saveSummaryFeedback = function(data, onSuccess, onFailure){
+        save('summary-feedback', {summaryFeedback: data}, onSuccess, onFailure);
+      };
+
+      this.saveSupportingMaterials = function(data, onSuccess, onFailure) {
+        save('supporting-materials', data, onSuccess, onFailure);
       };
     }
 

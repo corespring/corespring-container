@@ -32,7 +32,7 @@ trait Catalog
           "defaultData" -> c.defaultData)
     }
 
-    CatalogServices("catalog.services", Item.load(":id"), Item.save(":id"), JsArray(componentJson)).toString
+    CatalogServices("catalog.services", Item.load(":id"), JsArray(componentJson)).toString
   }
 
   override def load(id: String): Action[AnyContent] = Action.async {

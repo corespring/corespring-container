@@ -1,12 +1,10 @@
 angular.module('corespring-dev-editor.controllers')
   .controller('DevEditorRoot', [
     '$scope',
-    'ItemIdService',
     'ItemService',
     'ComponentData',
     '$timeout',
-    function($scope, ItemIdService, ItemService, ComponentData, $timeout) {
-      $scope.itemId = ItemIdService.itemId();
+    function($scope, ItemService, ComponentData, $timeout) {
 
       $scope.onItemLoaded = function(item) {
         $scope.item = item;
@@ -16,13 +14,20 @@ angular.module('corespring-dev-editor.controllers')
       };
 
       $scope.save = function() {
-        $scope.item.xhtml = $scope.xhtml;
-        $scope.item.components = JSON.parse($scope.json);
-        ItemService.save($scope.item, function() {
-          window.alert('success!');
-        }, function() {
-          window.alert('failure!');
-        }, $scope.itemId);
+
+        if($scope.xhtml !== $scope.item.xhtml) {
+          $scope.item.xhtml = $scope.xhtml;
+          ItemService.saveXhtml($scope.item.xhtml, function(){
+            console.log('xhtml saved');
+          });
+        }
+
+        if(!_.isEqual($scope.item.components, $scope.components)){
+          $scope.item.components  = $scope.components;
+          ItemService.saveComponents($scope.item.components, function(){
+            console.log('components saved');
+          });
+        }
       };
 
 
@@ -30,7 +35,7 @@ angular.module('corespring-dev-editor.controllers')
 
         try{
           var update = JSON.parse($scope.json);
-          $scope.item.components = update;
+          $scope.components = update;
 
           $timeout(function(){
             $scope.$digest();
@@ -48,8 +53,7 @@ angular.module('corespring-dev-editor.controllers')
         ComponentData.registerComponent(id, componentBridge);
       });
 
-
-      ItemService.load($scope.onItemLoaded, $scope.onItemLoadError, $scope.itemId);
+      ItemService.load($scope.onItemLoaded, $scope.onItemLoadError);
     }
   ]
 );

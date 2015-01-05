@@ -921,7 +921,7 @@
 
     $scope.saveProfile = function() {
       $log.log("saving profile");
-      ItemService.fineGrainedSave({'profile': $scope.item.profile}, function(result){
+      ItemService.saveProfile($scope.item.profile, function(result){
         $log.log("profile saved result:", result);
       });
     };

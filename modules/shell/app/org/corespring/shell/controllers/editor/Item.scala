@@ -1,10 +1,11 @@
 package org.corespring.shell.controllers.editor
 
+import org.bson.types.ObjectId
 import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.client.hooks.{ ItemHooks => ContainerItemHooks }
 import org.corespring.mongo.json.services.MongoService
 import play.api.http.Status._
-import play.api.libs.json.{ JsString, JsValue, Json }
+import play.api.libs.json._
 import play.api.mvc._
 
 import scala.concurrent.Future
@@ -13,9 +14,30 @@ trait ItemHooks extends ContainerItemHooks {
 
   def itemService: MongoService
 
-  override def save(itemId: String, data: JsValue)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]] = {
+  override def saveProfile(itemId: String, json: JsValue)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] =
+    fineGrainedSave(itemId, Json.obj("profile" -> json))
+
+  override def saveXhtml(itemId: String, xhtml: String)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] =
+    fineGrainedSave(itemId, Json.obj("xhtml" -> xhtml))
+
+  override def saveSummaryFeedback(itemId: String, fb: String)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] =
+    fineGrainedSave(itemId, Json.obj("summaryFeedback" -> fb))
+
+  override def saveSupportingMaterials(itemId: String, json: JsValue)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] = {
+    def addSupportingMaterialIds(sm: JsValue): JsArray = sm match {
+      case JsArray(o) => JsArray(o.map({
+        case obj: JsObject => obj ++ Json.obj("id" -> ObjectId.get.toString)
+      }))
+    }
+    fineGrainedSave(itemId, Json.obj("supportingMaterials" -> addSupportingMaterialIds(json)))
+  }
+
+  override def saveComponents(itemId: String, json: JsValue)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] =
+    fineGrainedSave(itemId, Json.obj("components" -> json))
+
+  private def fineGrainedSave(itemId: String, json: JsValue)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] = {
     Future {
-      itemService.save(itemId, data).map {
+      itemService.fineGrainedSave(itemId, json).map {
         json =>
           Right(json)
       }.getOrElse(Left(BAD_REQUEST -> "Error saving"))
@@ -45,13 +67,5 @@ trait ItemHooks extends ContainerItemHooks {
     }
   }
 
-  override def fineGrainedSave(itemId: String, json: JsValue)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] = {
-    Future {
-      itemService.fineGrainedSave(itemId, json).map {
-        json =>
-          Right(json)
-      }.getOrElse(Left(BAD_REQUEST -> "Error saving"))
-    }
-  }
 }
 

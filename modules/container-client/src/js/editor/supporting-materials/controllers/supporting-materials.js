@@ -85,9 +85,7 @@ angular.module('corespring-editor.controllers')
         }
 
         if (oldValue !== newValue) {
-          ItemService.fineGrainedSave({
-            'supportingMaterials': $scope.item.supportingMaterials
-          }, function(result) {});
+          ItemService.saveSupportingMaterials($scope.item.supportingMaterials);
         }
       }, true);
 
@@ -106,10 +104,6 @@ angular.module('corespring-editor.controllers')
 
       $scope.$on('fileSizeGreaterThanMax', function(event) {
         console.warn("file too big");
-      });
-
-      $scope.$on('save-data', function() {
-        $scope.save();
       });
 
       $scope.$on('itemLoaded', function() {
@@ -295,9 +289,8 @@ angular.module('corespring-editor.controllers')
 
           var deferred = $q.defer();
 
-          ItemService.save({
-              supportingMaterials: supportingMaterials
-            }, function(result) {
+          ItemService.saveSupportingMaterials( supportingMaterials, 
+            function(result) {
               deferred.resolve(result);
             },
             function(error) {
@@ -359,9 +352,7 @@ angular.module('corespring-editor.controllers')
             "default": true
           }];
           data.supportingMaterials[data.supportingMaterials.length - 1] = supportingMaterial;
-          ItemService.save({
-              supportingMaterials: data.supportingMaterials
-            },
+          ItemService.saveSupportingMaterials(data.supportingMaterials,
             function(data) {
               deferred.resolve(data);
             },
@@ -410,10 +401,13 @@ angular.module('corespring-editor.controllers')
             "default": true
           }]
         };
+        
         supportingMaterials.push(newSupportingMaterial);
-        ItemService.save({
-          supportingMaterials: supportingMaterials
-        }, $scope.onNewSupportingMaterialSaveSuccess, $scope.onSaveError);
+        
+        ItemService.saveSupportingMaterials(  
+          supportingMaterials,
+          $scope.onNewSupportingMaterialSaveSuccess, 
+          $scope.onSaveError);
       };
 
       $scope.init();

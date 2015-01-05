@@ -46,8 +46,7 @@ trait Editor
     EditorServices(
       s"$context.services",
       resourceRoutes.Item.load(id),
-      resourceRoutes.Item.save(id),
-      resourceRoutes.Item.fineGrainedSave(id),
+      resourceRoutes.Item.saveSubset(id, ":subset"),
       JsArray(componentJson),
       JsArray(widgetJson)).toString
   }

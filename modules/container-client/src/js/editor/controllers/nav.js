@@ -69,10 +69,8 @@ angular.module('corespring-editor.controllers').controller('NavController', [
     $scope.editTitle = launchModal('edit-title', 'sm', 'static', {
       title : function(){ return $scope.item.profile.taskInfo.title; }
     }, function(title){
-      logger.debug('--> ok --> ', arguments);
-      ItemService.fineGrainedSave({'profile.taskInfo.title': title}, function(result){
-        $scope.item.profile.taskInfo.title = result['profile.taskInfo.title'];
-      });
+      $scope.item.profile.taskInfo.title = title;
+      ItemService.saveProfile($scope.item.profile);
     });
     $scope.copy = launchModal('copy');
     $scope['new'] = launchModal('new');

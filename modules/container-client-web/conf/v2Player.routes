@@ -33,8 +33,7 @@ PUT           /session/:id/score.json                                @org.coresp
 GET           /item/:itemId.json                                     @org.corespring.container.client.controllers.resources.Item.load(itemId)
 GET           /item/:itemId/:name/*file                              @org.corespring.container.client.controllers.Assets.supportingMaterial(itemId, name, file)
 GET           /item/:itemId/*file                                    @org.corespring.container.client.controllers.Assets.item(itemId, file)
-PUT           /item/:itemId.json                                     @org.corespring.container.client.controllers.resources.Item.save(itemId)
-PUT           /item/update/:itemId.json                              @org.corespring.container.client.controllers.resources.Item.fineGrainedSave(itemId)
+PUT           /item/update/:subset/:itemId.json                      @org.corespring.container.client.controllers.resources.Item.saveSubset(itemId, subset)
 POST          /item/create                                           @org.corespring.container.client.controllers.resources.Item.create()
 
 

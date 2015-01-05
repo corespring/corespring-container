@@ -47,10 +47,8 @@ angular.module('corespring-editor.controllers')
         function deleteSupportingMaterial(index) {
           $scope.item.supportingMaterials.splice(index, 1);
 
-          //TODO change to ItemService.fineGrainedSave
-          ItemService.save({
-              supportingMaterials: $scope.item.supportingMaterials
-            },
+          ItemService.saveSupportingMaterials(
+              $scope.item.supportingMaterials,
             function () {
             },
             $scope.onSaveError, $scope.itemId

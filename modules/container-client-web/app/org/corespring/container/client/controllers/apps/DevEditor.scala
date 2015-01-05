@@ -7,8 +7,8 @@ import org.corespring.container.client.controllers.resources
 import org.corespring.container.client.hooks.Hooks._
 import org.corespring.container.client.hooks._
 import org.corespring.container.client.views.html.error
-import org.corespring.container.client.views.txt.js.DevEditorServices
-import play.api.libs.json.{JsArray, JsValue}
+import org.corespring.container.client.views.txt.js.EditorServices
+import play.api.libs.json.{ Json, JsValue }
 import play.api.mvc._
 
 trait DevEditor
@@ -20,11 +20,13 @@ trait DevEditor
 
   import resources.{ routes => resourceRoutes }
 
-  val servicesJs = {
-    DevEditorServices(
+  def servicesJs(itemId: String) = {
+    EditorServices(
       "dev-editor.services",
-      resourceRoutes.Item.load(":id"),
-      resourceRoutes.Item.save(":id")).toString
+      resourceRoutes.Item.load(itemId),
+      resourceRoutes.Item.saveSubset(itemId, ":subset"),
+      Json.obj(),
+      Json.obj()).toString
   }
 
   override def load(itemId: String): Action[AnyContent] = Action.async { implicit request =>
@@ -46,7 +48,7 @@ trait DevEditor
           domainResolvedJs,
           domainResolvedCss,
           jsSrc.ngModules ++ scriptInfo.ngDependencies,
-          servicesJs)))
+          servicesJs(itemId))))
     }
 
     hooks.loadItem(itemId).map { e => e.fold(onError, onItem) }

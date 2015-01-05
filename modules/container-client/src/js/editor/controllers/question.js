@@ -94,8 +94,8 @@ angular.module('corespring-editor.controllers')
 
       function saveComponents(){
         logger.debug('[saveComponents]');
-        ItemService.fineGrainedSave(
-          {components: $scope.serialize($scope.item.components)},
+        ItemService.saveComponents(
+          $scope.serialize($scope.item.components),
           $scope.onItemSaved,
           $scope.onItemSaveError);
       }
@@ -138,9 +138,7 @@ angular.module('corespring-editor.controllers')
       $scope.$watch('item.xhtml', debounce(function(oldValue, newValue) {
         logger.debug('old', oldValue);
         if (oldValue !== newValue) {
-          ItemService.fineGrainedSave({
-            'xhtml': $scope.item.xhtml
-          }, function(result) {});
+          ItemService.saveXhtml($scope.item.xhtml);
         }
       }));
 
@@ -148,9 +146,7 @@ angular.module('corespring-editor.controllers')
         newValue) {
         logger.debug('old', oldValue);
         if (oldValue !== newValue) {
-          ItemService.fineGrainedSave({
-            'summaryFeedback': $scope.item.summaryFeedback
-          }, function(result) {});
+          ItemService.saveSummaryFeedback($scope.item.summaryFeedback);
         }
       }));
 
