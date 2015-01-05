@@ -2,7 +2,7 @@ package org.corespring.container.client.hooks
 
 import org.corespring.container.client.HasContext
 import org.corespring.container.client.hooks.Hooks.StatusMessage
-import play.api.libs.json.{JsString, JsArray, JsValue}
+import play.api.libs.json.{ JsString, JsArray, JsValue }
 import play.api.mvc._
 
 import scala.concurrent.Future
@@ -42,15 +42,11 @@ trait ItemHooks extends HasContext {
 
   def load(itemId: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]]
 
-  //def save(itemId: String, json: JsValue)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]]
-
-  //def fineGrainedSave(itemId: String, json: JsValue)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]]
-
-  def saveProfile(itemId:String, json : JsValue)(implicit header: RequestHeader) : Future[Either[StatusMessage, JsValue]]
-  def saveSupportingMaterials(itemId:String, json : JsValue)(implicit header: RequestHeader) : Future[Either[StatusMessage, JsValue]]
-  def saveComponents(itemId:String, json : JsValue)(implicit header: RequestHeader) : Future[Either[StatusMessage, JsValue]]
-  def saveXhtml(itemId:String, xhtml : String)(implicit header: RequestHeader) : Future[Either[StatusMessage, JsValue]]
-  def saveSummaryFeedback(itemId:String, feedback : String)(implicit header: RequestHeader) : Future[Either[StatusMessage, JsValue]]
+  def saveProfile(itemId: String, json: JsValue)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]]
+  def saveSupportingMaterials(itemId: String, json: JsValue)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]]
+  def saveComponents(itemId: String, json: JsValue)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]]
+  def saveXhtml(itemId: String, xhtml: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]]
+  def saveSummaryFeedback(itemId: String, feedback: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]]
 
   def create(json: Option[JsValue])(implicit header: RequestHeader): Future[Either[StatusMessage, String]]
 }
