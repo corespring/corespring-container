@@ -29,7 +29,6 @@ class ItemTest extends Specification with Mockito {
           }
         }
 
-
         override def load(itemId: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]] = {
           Future {
             Right(Json.obj())
@@ -61,19 +60,6 @@ class ItemTest extends Specification with Mockito {
       status(result) === BAD_REQUEST
       (contentAsJson(result) \ "error").as[String] === Errors.noJson
     }
-
-    /*"fail to save if save failed" in new item(saveResult = None) {
-      val result = item.save("x")(FakeRequest("", "", FakeHeaders(), AnyContentAsJson(Json.obj("xhtml" -> JsString("<root/>")))))
-      status(result) === BAD_REQUEST
-      (contentAsJson(result) \ "error").as[String] === Errors.errorSaving
-    }
-
-    "save if save worked" in new item {
-      val result = item.save("x")(FakeRequest("", "", FakeHeaders(), AnyContentAsJson(Json.obj("xhtml" -> JsString("<root/>")))))
-      status(result) === OK
-      contentAsString(result) === "{}"
-    }
-    */
 
     "create returns error" in new item(createError = Some(UNAUTHORIZED -> "Error")) {
       val result = item.create(FakeRequest("", ""))
