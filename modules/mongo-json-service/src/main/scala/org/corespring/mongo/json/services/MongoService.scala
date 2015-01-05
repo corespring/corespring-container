@@ -1,25 +1,24 @@
 package org.corespring.mongo.json.services
 
-import com.mongodb.{MongoException, DBObject}
+import com.mongodb.{ MongoException, DBObject }
 import com.mongodb.casbah.{ WriteConcern, MongoCollection }
 import com.mongodb.casbah.commons.MongoDBObject
-import com.mongodb.util.{ JSON => MongoPlayJson }
+import com.mongodb.util.{ JSON => MongoJson }
 import org.bson.types.ObjectId
 import play.api.libs.json.{ Json => PlayJson, JsUndefined, JsArray, JsObject, JsValue }
 import org.corespring.container.logging.ContainerLogger
 
 object MongoServiceException {
 
-  def mkMessage(action:String, collection:String, msg : Option[String] = None) : String = {
-    s"Error with $action on collection $collection ${msg.map( m => s"- $m").getOrElse("")}"
+  def mkMessage(action: String, collection: String, msg: Option[String] = None): String = {
+    s"Error with $action on collection $collection ${msg.map(m => s"- $m").getOrElse("")}"
   }
 
-  def apply(action: String, collection:String, message:String) : MongoServiceException = new MongoServiceException(mkMessage(action, collection, Some(message)))
-  def apply(action:String, collection:String,  cause: Throwable) = new MongoServiceException(mkMessage(action, collection, None)).initCause(cause)
+  def apply(action: String, collection: String, message: String): MongoServiceException = new MongoServiceException(mkMessage(action, collection, Some(message)))
+  def apply(action: String, collection: String, cause: Throwable) = new MongoServiceException(mkMessage(action, collection, None)).initCause(cause)
 }
 
-case class MongoServiceException(msg:String) extends RuntimeException(msg)
-
+case class MongoServiceException(msg: String) extends RuntimeException(msg)
 
 class MongoService(collection: MongoCollection) {
 
@@ -32,7 +31,7 @@ class MongoService(collection: MongoCollection) {
     val fieldsDbo = MongoDBObject(fields.toList.map(s => (s, 1)))
     collection.find(MongoDBObject(), fieldsDbo).toSeq.map {
       dbo =>
-        val jsonString = MongoPlayJson.serialize(dbo)
+        val jsonString = MongoJson.serialize(dbo)
         logger.trace(s"found: $jsonString")
         PlayJson.parse(jsonString)
     }
@@ -44,7 +43,7 @@ class MongoService(collection: MongoCollection) {
       val maybeDbo: Option[DBObject] = collection.findOneByID(oid)
       maybeDbo.map {
         dbo =>
-          val s = MongoPlayJson.serialize(dbo)
+          val s = MongoJson.serialize(dbo)
           val json = PlayJson.parse(s)
           logger.trace(s"[load]: $id : ${PlayJson.stringify(json)}")
           json
@@ -57,10 +56,10 @@ class MongoService(collection: MongoCollection) {
     val oid = ObjectId.get
     val jsonString = PlayJson.stringify(data)
     logger.trace(s"[create]: $jsonString")
-    val dbo = MongoPlayJson.parse(jsonString).asInstanceOf[DBObject]
+    val dbo = MongoJson.parse(jsonString).asInstanceOf[DBObject]
     dbo.put("_id", oid)
 
-    try{
+    try {
       val result = collection.insert(dbo, WriteConcern.Safe)
       if (result.getLastError.ok) {
         Some(oid)
@@ -68,11 +67,11 @@ class MongoService(collection: MongoCollection) {
         throw MongoServiceException("insert", collection.name, result.getLastError.getErrorMessage)
       }
     } catch {
-      case mse : MongoServiceException => throw mse
-      case e : MongoException => {
+      case mse: MongoServiceException => throw mse
+      case e: MongoException => {
         throw MongoServiceException("insert", collection.name, e)
       }
-      case t : Throwable => {
+      case t: Throwable => {
         throw MongoServiceException("insert", collection.name, t)
       }
     }
@@ -82,31 +81,11 @@ class MongoService(collection: MongoCollection) {
     collection.findAndRemove(MongoDBObject("_id" -> new ObjectId(id)))
   }
 
-  implicit class SupportingMaterialJson(jsValue: JsValue) {
-
-    def addSupportingMaterialIds = jsValue match {
-      case json: JsObject => (json \ "supportingMaterials") match {
-        case array: JsArray => json ++ PlayJson.obj("supportingMaterials" ->
-          JsArray(array.as[Seq[JsObject]].map(supportingMaterial => (supportingMaterial \ "id") match {
-            case _: JsUndefined => supportingMaterial ++ PlayJson.obj("id" -> new ObjectId().toString)
-            case _ => supportingMaterial
-          })))
-        case _ => json
-      }
-      case _ => jsValue
-    }
-
-  }
-
   def fineGrainedSave(id: String, data: JsValue): Option[JsValue] = withOid(id) {
     oid =>
       logger.debug(s"[save]: $id")
       logger.trace(s"[save]: ${PlayJson.stringify(data)}")
 
-      def toDbo(json: JsValue): DBObject = {
-        MongoPlayJson.parse(PlayJson.stringify(json.addSupportingMaterialIds)).asInstanceOf[DBObject]
-      }
-      def toJson(dbo: DBObject) = PlayJson.parse(MongoPlayJson.serialize(dbo))
       val q = MongoDBObject("_id" -> new ObjectId(id))
 
       val setDbo = toDbo(data)
@@ -123,15 +102,14 @@ class MongoService(collection: MongoCollection) {
       }
   }
 
+  def toDbo(json: JsValue): DBObject = MongoJson.parse(PlayJson.stringify(json)).asInstanceOf[DBObject]
+  def toJson(dbo: DBObject) = PlayJson.parse(MongoJson.serialize(dbo))
+
   def save(id: String, data: JsValue): Option[JsValue] = withOid(id) {
     oid =>
       logger.debug(s"[save]: $id")
       logger.trace(s"[save]: ${PlayJson.stringify(data)}")
 
-      def toDbo(json: JsValue): DBObject = {
-        MongoPlayJson.parse(PlayJson.stringify(json.addSupportingMaterialIds)).asInstanceOf[DBObject]
-      }
-      def toJson(dbo: DBObject) = PlayJson.parse(MongoPlayJson.serialize(dbo))
       val q = MongoDBObject("_id" -> new ObjectId(id))
 
       val setDbo = toDbo(data)
