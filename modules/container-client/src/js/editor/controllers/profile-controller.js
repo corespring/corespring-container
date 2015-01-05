@@ -35,48 +35,78 @@
 
     //----------------------------------------------------------------
     // Form configuration
+    // Form elements can be configured with the following properties
+    // visible - hide/show a form element
+    // readonly - make the element readonly/editable
+    // value - set the value of the element. Multi select fields take an array as value.
+    // options - set the options for a element that allows selecting like a combo box.
+    // collapse - collapse/expand an element, applies to elements in a collapsible container only, see jade
+    //
+    // The value for a form element is applied after the profile is loaded, thus it overrides the value
+    // of the stored profile. When there is no value property in the formModel, the original value is left untouched.
+    // The options are applied as angular filter (see jade). Only if an option is in the original data
+    // it will be used. When there is no options property in the formModel, no filtering is applied.
     //----------------------------------------------------------------
 
+    /**
+     * The default form models. Can be overridden by passing in values through the editor constructor.
+     * These values are accessible from here through the ConfigurationService.
+     */
     $scope.formModels = {
-      title: {
+      additionalCopyrights: {
+        visible:true,
+        readonly:false,
+        collapse:true
+      },
+      author: {
         visible:true,
         readonly:false
+      },
+      bloomsTaxonomy: {
+        visible:true,
+        readonly:false,
+        collapse:true
+      },
+      componentTypes: {
+        visible:true,
+        readonly:false
+      },
+      copyrightExpirationDate: {
+        visible:true,
+        readonly:false
+      },
+      copyrightInformationPanel: {
+        visible:true,
+        collapse:true
+      },
+      copyrightOwner: {
+        visible:true,
+        readonly:false
+      },
+      copyrightYear: {
+        visible:true,
+        readonly:false
+      },
+      credentials: {
+        visible:true,
+        readonly:false
+      },
+      credentialsOther: {
+        //here you can only set the value if the value of credentials is 'Other'
+        //visibility and readonly are controlled by the formModel for credentials
+      },
+      depthOfKnowledge: {
+        visible:true,
+        readonly:false,
+        collapse:true
       },
       description: {
-        visible:true,
-        readonly:false
-      },
-      primarySubject: {
-        visible:true,
-        readonly:false
-      },
-      relatedSubject: {
         visible:true,
         readonly:false
       },
       gradeLevel: {
         visible:true,
         readonly:false
-      },
-      componentTypes: {
-        visible:true,
-        readonly:false
-      },
-      //--------------------
-      standards: {
-        visible:true,
-        readonly:false
-      },
-      //--------------------
-      depthOfKnowledge: {
-        visible:true,
-        readonly:false,
-        collapse:true
-      },
-      bloomsTaxonomy: {
-        visible:true,
-        readonly:false,
-        collapse:true
       },
       keySkills: {
         visible:true,
@@ -88,20 +118,32 @@
         readonly:false,
         collapse:true
       },
-      //--------------------
-      priorUsePanel: {
+      licenseType: {
         visible:true,
+        readonly:false,
         collapse:true
+      },
+      primarySubject: {
+        visible:true,
+        readonly:false
+      },
+      priorGradeLevel: {
+        visible:true,
+        readonly:false
       },
       priorUse: {
         visible:true,
         readonly:false
       },
       priorUseOther: {
-        //here you can only set the value, in case the value of priorUse is 'Other'
-        //visiblity and readonly are controlled by priorUse
+        //here you can only set the value if the value of priorUse is 'Other'
+        //visibility and readonly are controlled by the formModel for priorUse
       },
-      priorGradeLevel: {
+      priorUsePanel: {
+        visible:true,
+        collapse:true
+      },
+      relatedSubject: {
         visible:true,
         readonly:false
       },
@@ -111,58 +153,25 @@
         collapse: true
       },
       reviewsPassedOther: {
-        //here you can only set the value, in case the value of reviewsPassed is 'Other'
-        //visiblity and readonly are controlled by reviewsPassed
-      },
-      //--------------------
-      copyrightInformationPanel: {
-        visible:true,
-        collapse:true
-      },
-      author: {
-        visible:true,
-        readonly:false
-      },
-      credentials: {
-        visible:true,
-        readonly:false
-      },
-      credentialsOther: {
-        //here you can only set the value, in case the value of credentials is 'Other'
-        //visiblity and readonly are controlled by credentials
-      },
-      copyrightOwner: {
-        visible:true,
-        readonly:false
-      },
-      copyrightYear: {
-        visible:true,
-        readonly:false
-      },
-      copyrightExpirationDate: {
-        visible:true,
-        readonly:false
+        //here you can only set the value if the value of reviewsPassed is 'Other'
+        //visibility and readonly are controlled by the formModel for reviewsPassed
       },
       sourceUrl: {
         visible:true,
         readonly:false
       },
-      //--------------------
-      additionalCopyrights: {
+      standards: {
         visible:true,
-        readonly:false,
-        collapse:true
+        readonly:false
       },
-      //--------------------
-      licenseType: {
+      title: {
         visible:true,
-        readonly:false,
-        collapse:true
+        readonly:false
       }
     };
 
     /**
-     * Update a single formModel with the values from config
+     * Update a single formModel with the values from a config
      * @param model
      * @param config
      */
@@ -188,7 +197,7 @@
     }
 
     /**
-     * Walk through all formModels and update them from config
+     * Walk through all formModels and update them from the config that has been passed in
      * @param formModels
      * @param config
      */
@@ -220,6 +229,7 @@
       return null;
     }
 
+    //We are loading config from the url. Might not be necessary, but doesn't hurt.
     updateFormModels(getFormConfigFromUrl());
 
     /**
@@ -234,16 +244,25 @@
         var configItem = config[sourceName || name];
         if(configItem && configItem.hasOwnProperty('value')){
           dest[name] = configItem.value;
+          //TODO Do we need to check the value against the available options?
         }
       }
 
-      function applyConfigAsynchronously(dest, name, configName, getConfig) {
+      /**
+       * Some values are checked against an asynchronous service
+       * @param dest - the host object for the property to set
+       * @param name - the name of the property to set in the host
+       * @param configName - the name of the formModel in config
+       * @param getAsyncValue - a function, which uses the value in the formModel
+       * to retrieve a value that can be assigned to the host
+       */
+      function applyConfigAsynchronously(dest, name, configName, getAsyncValue) {
         var configItem = config[configName];
         if (!configItem || !configItem.hasOwnProperty('value')) {
           return;
         }
 
-        getConfig(configItem.value, function (result) {
+        getAsyncValue(configItem.value, function (result) {
           dest[name] = result;
         });
       }
@@ -281,13 +300,17 @@
 
     /**
      * Create a ng filter function for a formModel/dataProvider
-     * @param formModel
-     * @param propertyName
-     * @returns {Function}
+     * This filter returns true if the item can be found in formModel.options
+     * or if there are no options
+     * @param formModel - holds the options that are used for filtering
+     * @param propertyName - pass in a truthy string if you want to compare item[propertyName] instead of the item
+     * @returns a filter function
      */
     function createOptionsFilter(formModel, propertyName){
       return function(item,index){
         var value = propertyName ? item[propertyName] : item;
+        //TODO As an optimisation we could create the filter functions after the formModels have been configured and
+        //move that check for formModel.options out of the filter function. Only do that if you find it to be necessary.
         return _.isArray(formModel.options) ?
           _.contains(formModel.options, value)
           : true;
@@ -367,6 +390,8 @@
       query: function(query) {
         DataQueryService.query("standards", createStandardQuery(query.term), function(results) {
           query.callback({
+            //Most other dataProviders are filtered through a ng filter function that is applied in jade
+            //This filter here is applied directly bc. in jade we don't have access to the dataProvider.
             results: filterStandardsByConfig(results)
           });
         });
@@ -529,6 +554,8 @@
           {searchTerm: query.term},
           function(result) {
             query.callback({
+              //Most other dataProviders are filtered through a ng filter function that is applied in jade
+              //This filter here is applied directly bc. in jade we don't have access to the dataProvider.
               results: filterSubjectsByConfig(result)
             });
           });
@@ -561,7 +588,6 @@
      * The config is a category:subject string.
      */
     function configToPrimarySubject(categorySubject, callback){
-
       if(!_.isString(categorySubject)){
         return;
       }
@@ -792,6 +818,8 @@
     //----------------------------------------------------------------
     // show image for license type
     //----------------------------------------------------------------
+
+    $scope.licenseTypeFilter = createOptionsFilter($scope.formModels.licenseType, 'key');
 
     DataQueryService.list("licenseTypes", function(result) {
       $scope.licenseTypeDataProvider = result;

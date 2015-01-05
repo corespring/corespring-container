@@ -249,7 +249,7 @@ script(type="text/ng-template", id="/templates/profile")
                     td
                       select.form-control(id="licenseType",ng-model="contributorDetails.licenseType",
                       ng-disabled="formModels.licenseType.readonly"
-                      ng-options="c.key as c.value for c in licenseTypeDataProvider")
+                      ng-options="c.key as c.value for c in licenseTypeDataProvider | filter:licenseTypeFilter")
                         option(value="") Select ...
                     td
                       span(ng-show="!contributorDetails.licenseType",style="color: #888; font-style: italic;")
