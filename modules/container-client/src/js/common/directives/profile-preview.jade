@@ -73,7 +73,7 @@
       .content {{item.profile.otherAlignments.keySkills.join(", ")}}
 
     .field
-      img(ng-if="{{copyrightOwnerUrl}}").copyright-image(ng-src="{{copyrightOwnerUrl}}",
+      img(ng-if="copyrightOwnerUrl").copyright-image(ng-src="{{copyrightOwnerUrl}}",
        alt="{{item.profile.contributorDetails.copyrightOwner}}",
        title="{{item.profile.contributorDetails.copyrightOwner}}"
        )
