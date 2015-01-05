@@ -53,45 +53,60 @@
      * These values are accessible from here through the ConfigurationService.
      */
     $scope.formModels = {
-      title: {
+      additionalCopyrights: {
+        visible:true,
+        readonly:false,
+        collapse:true
+      },
+      author: {
         visible:true,
         readonly:false
+      },
+      bloomsTaxonomy: {
+        visible:true,
+        readonly:false,
+        collapse:true
+      },
+      componentTypes: {
+        visible:true,
+        readonly:false
+      },
+      copyrightExpirationDate: {
+        visible:true,
+        readonly:false
+      },
+      copyrightInformationPanel: {
+        visible:true,
+        collapse:true
+      },
+      copyrightOwner: {
+        visible:true,
+        readonly:false
+      },
+      copyrightYear: {
+        visible:true,
+        readonly:false
+      },
+      credentials: {
+        visible:true,
+        readonly:false
+      },
+      credentialsOther: {
+        //here you can only set the value if the value of credentials is 'Other'
+        //visibility and readonly are controlled by the formModel for credentials
+      },
+      depthOfKnowledge: {
+        visible:true,
+        readonly:false,
+        collapse:true
       },
       description: {
-        visible:true,
-        readonly:false
-      },
-      primarySubject: {
-        visible:true,
-        readonly:false
-      },
-      relatedSubject: {
         visible:true,
         readonly:false
       },
       gradeLevel: {
         visible:true,
         readonly:false
-      },
-      componentTypes: {
-        visible:true,
-        readonly:false
-      },
-      //--------------------
-      standards: {
-        visible:true,
-        readonly:false
-      },
-      //--------------------
-      depthOfKnowledge: {
-        visible:true,
-        readonly:false,
-        collapse:true
-      },
-      bloomsTaxonomy: {
-        visible:true,
-        readonly:false,
-        collapse:true
       },
       keySkills: {
         visible:true,
@@ -103,10 +118,18 @@
         readonly:false,
         collapse:true
       },
-      //--------------------
-      priorUsePanel: {
+      licenseType: {
         visible:true,
+        readonly:false,
         collapse:true
+      },
+      primarySubject: {
+        visible:true,
+        readonly:false
+      },
+      priorGradeLevel: {
+        visible:true,
+        readonly:false
       },
       priorUse: {
         visible:true,
@@ -116,7 +139,11 @@
         //here you can only set the value if the value of priorUse is 'Other'
         //visibility and readonly are controlled by the formModel for priorUse
       },
-      priorGradeLevel: {
+      priorUsePanel: {
+        visible:true,
+        collapse:true
+      },
+      relatedSubject: {
         visible:true,
         readonly:false
       },
@@ -129,50 +156,17 @@
         //here you can only set the value if the value of reviewsPassed is 'Other'
         //visibility and readonly are controlled by the formModel for reviewsPassed
       },
-      //--------------------
-      copyrightInformationPanel: {
-        visible:true,
-        collapse:true
-      },
-      author: {
-        visible:true,
-        readonly:false
-      },
-      credentials: {
-        visible:true,
-        readonly:false
-      },
-      credentialsOther: {
-        //here you can only set the value if the value of credentials is 'Other'
-        //visibility and readonly are controlled by the formModel for credentials
-      },
-      copyrightOwner: {
-        visible:true,
-        readonly:false
-      },
-      copyrightYear: {
-        visible:true,
-        readonly:false
-      },
-      copyrightExpirationDate: {
-        visible:true,
-        readonly:false
-      },
       sourceUrl: {
         visible:true,
         readonly:false
       },
-      //--------------------
-      additionalCopyrights: {
+      standards: {
         visible:true,
-        readonly:false,
-        collapse:true
+        readonly:false
       },
-      //--------------------
-      licenseType: {
+      title: {
         visible:true,
-        readonly:false,
-        collapse:true
+        readonly:false
       }
     };
 
