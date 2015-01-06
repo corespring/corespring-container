@@ -124,10 +124,11 @@ module.exports = (grunt) ->
           ]
         options:
           keepRunner: true
-          vendor: _.map(['angular/angular.js',
+          vendor: _.map([
+            'jquery/dist/jquery.js',
+            'angular/angular.js',
             'angular-mocks/angular-mocks.js',
             'wiggi-wiz/dist/wiggi-wiz.js',
-            'jquery/dist/jquery.js',
             'lodash/dist/lodash.js'
             'saxjs/lib/sax.js',
             'bootstrap/dist/js/bootstrap.min.js',

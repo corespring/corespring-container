@@ -19,16 +19,16 @@ include ../mixins/modal
                     a(ng-if="s.type == 'data'",ng-click="selectSupportingMaterial(s.index)") {{s.label}}
 
           .col-md-10
-            .player-container(ng-if="activeTab == 'question'")
+            .player-container(ng-show="activeTab == 'question'")
               corespring-demo-player(
                 player-markup="item.xhtml",
                 player-item="item",
                 player-mode="playerMode")
 
-            .profile(ng-if="activeTab == 'profile'")
+            .profile(ng-show="activeTab == 'profile'")
               div(profile-preview="", ng-model="item")
 
-            .supporting-material(ng-if="activeTab == 'supportingMaterial'")
+            .supporting-material(ng-show="activeTab == 'supportingMaterial'")
               h3 {{selectedSupportingMaterialName}}
               div(style="height: 400px;", ng-if="getContentType() != 'text/html'")
                 iframe(ng-src="{{selectedSupportingMaterialUrl}}")
