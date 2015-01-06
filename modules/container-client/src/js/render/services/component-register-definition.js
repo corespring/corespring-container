@@ -36,17 +36,6 @@ angular.module('corespring-player.services')
         }
       };
 
-      Object.defineProperty(this, 'loadedData', {
-        _loadedData: null,
-        get: function(){
-          $log.warn('@deprecated - get loadedData');
-          return this._loadedData;
-        }, 
-        set: function(d){
-          this._loadedData = d;
-        }
-      });
-
       this.setAnswerChangedHandler = function(cb) {
         answerChangedHandler = cb;
       };
@@ -56,8 +45,6 @@ angular.module('corespring-player.services')
         if(window.console && _.isFunction(window.console.warn)){
           console.warn('@deprecated: use "setDataAndSessions(data, sessions)" instead');
         }
-
-        this.loadedData = allData;
 
         _.forIn(allData, function(ds, id){
           if(bridges[id]){
