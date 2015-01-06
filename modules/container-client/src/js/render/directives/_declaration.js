@@ -1,4 +1,4 @@
 (function() {
-  angular.module('corespring-player.directives', []);
+  angular.module('corespring-player.directives', ['corespring-player.services']);
 
 }).call(this);
