@@ -214,8 +214,9 @@ exports.define = function(isSecure) {
       instance.send('completeResponse', callback);
     };
 
+    /** @deprecated use 'reset()' */
     this.resetItem = function() {
-      instance.send('resetItem');
+      this.reset();
     };
 
     this.countAttempts = function(callback) {
@@ -236,7 +237,8 @@ exports.define = function(isSecure) {
     this.isComplete = _isComplete;
 
     this.reset = function() {
-      instance.send('reset');
+      instance.send('resetSession');
+      this.setMode('gather');
     };
 
     this.remove = function() {
