@@ -45,9 +45,11 @@ angular.module('corespring-common.directives')
             return (
               isNonEmptyString(getOrNull(profile, "contributorDetails", "copyrightOwner")) ||
               isNonEmptyString(getOrNull(profile, "contributorDetails", "copyrightYear")) ||
+              isNonEmptyString(getOrNull(profile, "contributorDetails", "copyright", "year")) ||
               isNonEmptyString(getOrNull(profile, "contributorDetails", "copyrightExpirationDate")) ||
               isNonEmptyString(getOrNull(profile, "contributorDetails", "credentials")) ||
               isNonEmptyString(getOrNull(profile, "contributorDetails", "sourceUrl")) ||
+              isNonEmptyString(getOrNull(profile, "priorUse")) ||
               isNonEmptyStringArray(getOrNull(profile, "priorGradeLevel")) ||
               isNonEmptyString(getOrNull($scope, "item", "collection", "name")));
           };
@@ -181,4 +183,10 @@ angular.module('corespring-common.directives')
         }
       };
     }
-  ]);
+  ])
+  .filter('selectSubjects', function() {
+    return function(input) {
+      input = input || [];
+      return _.pluck(input, "subject").join(", ");
+    };
+  });
