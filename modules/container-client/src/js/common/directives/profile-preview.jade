@@ -15,11 +15,11 @@
       .content
         span {{arrayTextOrNA(item.profile.taskInfo.gradeLevel)}}
 
-    .field(ng-show="item.profile.taskInfo.subjects.related.subject")
+    .field(ng-show="item.profile.taskInfo.subjects.related")
       .info
         .label.label-info Related Subject
       .content
-        span {{item.profile.taskInfo.subjects.related.subject}}
+        span {{item.profile.taskInfo.subjects.related | selectSubjects}}
 
     .field(ng-show="isNonEmptyString(getPValueAsString(item.profile.pValue))")
       .info
@@ -29,7 +29,7 @@
 
     .field
       .info
-        .label.label-info Item Type
+        .label.label-info Interactions
       .content
         span {{arrayTextOrNA(componentTypeLabels)}}
 
@@ -73,49 +73,51 @@
       .content {{item.profile.otherAlignments.keySkills.join(", ")}}
 
     .field
+      .info(ng-show="item.profile.contributorDetails.copyrightOwner || copyrightOwnerUrl")
+        .label.label-warning Copyright Owner
+
       img(ng-if="copyrightOwnerUrl").copyright-image(ng-src="{{copyrightOwnerUrl}}",
        alt="{{item.profile.contributorDetails.copyrightOwner}}",
        title="{{item.profile.contributorDetails.copyrightOwner}}"
        )
       .courtesy(ng-show="item.profile.contributorDetails.copyrightOwner")
-        | This item was made available to CoreSpring users courtesy of {{item.profile.contributorDetails.copyrightOwner}}
+        | {{item.profile.contributorDetails.copyrightOwner}}
 
-    .field
-      .more-info-container.clearfix
-        a.show-more.clearfix(ng-click="showMore = !showMore", ng-show="isThereMoreData(item.profile)") {{showMore ? 'hide info' : 'more info'}}
-        .fields(ng-show="showMore")
-          .field(ng-show="item.profile.contributorDetails.copyrightYear")
-            .title Copyright Year
-            .sub-content {{item.profile.contributorDetails.copyrightYear}}
+  .more-info-container.clearfix
+    a.show-more.clearfix(ng-click="showMore = !showMore", ng-show="isThereMoreData(item.profile)") {{showMore ? 'hide info' : 'more info'}}
+    .fields(ng-show="showMore")
+      .field(ng-show="item.profile.contributorDetails.copyrightYear")
+        .title Copyright Year
+        .sub-content {{item.profile.contributorDetails.copyrightYear}}
 
-          .field(ng-show="item.profile.contributorDetails.copyrightExpirationDate")
-            .title Copyright Expiration Date
-            .sub-content {{item.profile.contributorDetails.copyrightExpirationDate}}
+      .field(ng-show="item.profile.contributorDetails.copyrightExpirationDate")
+        .title Copyright Expiration Date
+        .sub-content {{item.profile.contributorDetails.copyrightExpirationDate}}
 
-          .field(ng-show="isNonEmptyStringArray(item.profile.reviewsPassed)")
-            .title Reviews Passed
-            .sub-content {{item.profile.reviewsPassed.join(", ")}}
+      .field(ng-show="isNonEmptyStringArray(item.profile.reviewsPassed)")
+        .title Reviews Passed
+        .sub-content {{item.profile.reviewsPassed.join(", ")}}
 
-          .field(ng-show="item.profile.contributorDetails.credentials")
-            .title Credentials
-            .sub-content {{item.profile.contributorDetails.credentials}}
+      .field(ng-show="item.profile.contributorDetails.credentials")
+        .title Credentials
+        .sub-content {{item.profile.contributorDetails.credentials}}
 
-          .field(ng-show="item.profile.priorUse")
-            .title Prior Use
-            .sub-content {{item.profile.priorUse}}
+      .field(ng-show="item.profile.priorUse")
+        .title Prior Use
+        .sub-content {{item.profile.priorUse}}
 
-          .field(ng-show="isNonEmptyStringArray(item.profile.priorGradeLevel)")
-            .title Prior Use grade Level
-            .sub-content {{item.profile.priorGradeLevel.join(", ")}}
+      .field(ng-show="isNonEmptyStringArray(item.profile.priorGradeLevel)")
+        .title Prior Use grade Level
+        .sub-content {{item.profile.priorGradeLevel.join(", ")}}
 
-          .field(ng-show="item.collection.name")
-            .title Collection
-            .sub-content {{item.collection.name}}
+      .field(ng-show="item.collection.name")
+        .title Collection
+        .sub-content {{item.collection.name}}
 
-          .field(ng-show="getUrl(item.profile.contributorDetails.sourceUrl)")
-            .title Source
-            .sub-content
-              a(href="{{getUrl(item.profile.contributorDetails.sourceUrl)}}", target="_blank")
-                .source-url-text{{getUrl(item.profile.contributorDetails.sourceUrl)}}
+      .field(ng-show="getUrl(item.profile.contributorDetails.sourceUrl)")
+        .title Source
+        .sub-content
+          a(href="{{getUrl(item.profile.contributorDetails.sourceUrl)}}", target="_blank")
+            .source-url-text{{getUrl(item.profile.contributorDetails.sourceUrl)}}
   .footer
     .item-id Item ID: {{item.itemId}}
