@@ -1,4 +1,4 @@
-describe('component-player', function(){
+describe('corespring-player', function(){
 
   var rootScope, compile, mockRegister;
 
@@ -36,8 +36,8 @@ describe('component-player', function(){
   }));
 
   it('should init', function(){
-    var elem = compile("<corespring-player/>")(rootScope);
-    expect(elem).not.toBe(null);
+    var elem = compile("<corespring-player></corespring-player>")(rootScope);
+    expect(elem.children().attr('class')).toBe('corespring-player');
   });
 
   it('should work with data', function(){
@@ -59,7 +59,7 @@ describe('component-player', function(){
     };
 
 
-    var elem = compile("<corespring-player player-item='item' player-session='session'/>")(rootScope);
+    var elem = compile("<corespring-player player-item='item' player-session='session'></corespring-player>")(rootScope);
 
 
     rootScope.$digest();

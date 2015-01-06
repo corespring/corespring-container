@@ -1,4 +1,4 @@
-angular.module('corespring-player.directives', ['corespring-player.services']).directive('passage',
+angular.module('corespring-player.directives').directive('passage',
   function() {
     return {
       restrict: 'C',
