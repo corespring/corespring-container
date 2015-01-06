@@ -20,7 +20,7 @@ block content
       player-session='session',
       player-outcomes='outcome')
       != xhtml
-    summary-feedback(ng-model="item.summaryFeedback", ng-show="session.isComplete")
+    summary-feedback(ng-model="item.summaryFeedback", ng-show="displaySummaryFeedback()")
 
   .root.container(ng-controller='Root', dimension-propagator='')
 

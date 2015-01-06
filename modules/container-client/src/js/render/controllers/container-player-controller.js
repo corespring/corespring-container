@@ -54,6 +54,9 @@ angular.module('corespring-player.controllers')
           }, options));
         }
 
+        $scope.displaySummaryFeedback = function() {
+          return $scope.session.isComplete && !_.isEmpty($scope.item.summaryFeedback);
+        };
 
         $scope.$on('playerControlPanel.preview', function() {
           $scope.$emit('launch-catalog-preview');
