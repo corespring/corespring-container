@@ -1,16 +1,29 @@
 /* global VirtualPatch */
 (function() {
 
-  function Type(fn) {
-   this.fn = fn;
+  "use strict";
+
+  function Type(fn, cleanup) {
+    this.fn = fn;
+    this.cleanup = cleanup;
   }
 
   Type.prototype.hook = function () {
     this.fn.apply(this, arguments);
+    this.cleanup.call(this);
   };
 
-  function hook(fn) {
-    return new Type(fn);
+  function addHook(vp, key, fn){
+    vp.patch.properties = vp.patch.properties || {};
+    vp.patch.properties[key] = new Type( fn, createCleanup(vp.patch.properties, key));
+  }
+
+  function createCleanup(vpatchProperties, key){
+    return function() {
+      if (vpatchProperties && key) {
+        delete vpatchProperties[key];
+      }
+    };
   }
 
   function DomUtil(){
@@ -50,12 +63,12 @@
         var createElement = virtualDom.create; //jshint ignore:line
         var virtualize = vdomVirtualize; //jshint ignore:line
 
-        function addCompilationPending(el, prop){
-          el.setAttribute('compilation-pending', true);
+        function containsCorespring(s){
+          return _.contains(s.toLowerCase(), 'corespring');
         }
 
-        function containsCorespring(s){ 
-          return _.contains(s.toLowerCase(), 'corespring');
+        function addCompilationPending(el, prop){
+          el.setAttribute('compilation-pending', true);
         }
 
         function processPatch(vp){
@@ -65,8 +78,7 @@
           if(isCorespringTag && isNodeMoveOrInsert){
             var key = vp.patch.tagName;
             logger.debug('found a patch that needs compile: ', key);
-            vp.patch.properties = vp.patch.properties || {};
-            vp.patch.properties[key] = hook( addCompilationPending ) ;
+            addHook(vp, key, addCompilationPending);
           }
 
           if(vp.vNode && vp.vNode.tagName && containsCorespring(vp.vNode.tagName)){
@@ -117,7 +129,7 @@
           if (newEl) {
             var newVDom = virtualize(newEl);
             var patches = diff(rootVDom, newVDom);
-            var cPatches = addHooks(patches);
+            addHooks(patches);
             rootNode = patch(rootNode, patches);
             rootVDom = newVDom;
           }
@@ -147,7 +159,7 @@
         function triggerMathRendering(){
           MathJaxService.onEndProcess(function(){
             $('.player-body').removeClass('hidden-player-body');
-            MathJaxService.off(arguments.callee);
+            MathJaxService.off(arguments.callee); //jshint ignore:line
           });
 
           MathJaxService.parseDomForMath(0, $element.find('.player-body')[0]);
@@ -155,7 +167,6 @@
 
 
         function updateRenderedComponents(){
-
           logger.debug('[updateRenderedComponents]');
 
           if(!ngModel.$viewValue){
