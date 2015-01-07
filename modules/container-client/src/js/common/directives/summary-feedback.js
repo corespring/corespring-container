@@ -3,7 +3,7 @@ angular.module('corespring-common.directives').directive('summaryFeedback', [
     return {
       link: function($scope) {
         $scope.displaySummaryFeedback = function() {
-          return $scope.session.isComplete && !_.isEmpty($scope.item.summaryFeedback);
+          return $scope.sessionComplete && !_.isEmpty($scope.ngModel);
         };
 
         $scope.isSummaryFeedbackOpen = false;
@@ -12,8 +12,8 @@ angular.module('corespring-common.directives').directive('summaryFeedback', [
         };
       },
       scope : {
-        item: '=',
-        session: '='
+        ngModel: '=',
+        sessionComplete: '='
       },
       restrict: 'AE',
       replace: true,
@@ -27,7 +27,7 @@ angular.module('corespring-common.directives').directive('summaryFeedback', [
         '      </h4>',
         '    </div>',
         '    <div class="panel-body feedback-text" ng-show="isSummaryFeedbackOpen"',
-        '        ng-bind-html-unsafe="item.summaryFeedback">',
+        '        ng-bind-html-unsafe="ngModel">',
         '    </div>',
         '  </div>',
         '</div>'
