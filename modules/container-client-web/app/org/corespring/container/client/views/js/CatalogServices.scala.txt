@@ -18,8 +18,8 @@
 
   angular.module('@namespace').factory('ItemService', ['BaseService', function(BaseService){
     return {
-      load: function(onSuccess, onFailure, id){
-        BaseService.load(onSuccess, onFailure, id);
+      load: function(onSuccess, onFailure){
+        BaseService.load(onSuccess, onFailure);
       }
     };
   }]);
@@ -31,11 +31,11 @@
         /**
          * Load the item, check to see if its already loaded.
          */
-        load: function(onSuccess, onFailure, id){
+        load: function(onSuccess, onFailure){
           if(loadedData){
             onSuccess(loadedData);
           } else {
-            var finalUrl = id ? '@load.url'.replace(":id", id) : '@load.url';
+            var finalUrl = '@load.url';
 
             if (window && window.location && window.location.search){
               finalUrl +=  window.location.search;
@@ -43,7 +43,6 @@
 
             $http['@load.method.toLowerCase'](finalUrl)
               .success(function(data, status, headers, config){
-                console.log("[player-services] load item successful");
                 loadedData = data;
                 onSuccess(data);
               })
