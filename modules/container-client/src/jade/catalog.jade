@@ -2,75 +2,11 @@ extends layout
 
 block content
   .root(ng-controller="CatalogRoot")
-    .nav-container
-      nav.navbar.navbar-default.navbar-fixed-top
-        ul.nav.navbar-nav
-          li(ui-sref-active="active")
-            a(ui-sref="item" ) Item
-          li(ui-sref-active="active")
-            a(ui-sref="profile" ) Profile
-          li.dropdown(ng-class="{active: isSupportingMaterialsSection()}",ng-show="hasSupportingMaterials")
-            a.dropdown-toggle(data-toggle="dropdown") Supporting Materials <span class="caret"></span>
-            ul.dropdown-menu
-              li(ng-repeat="s in supportingMaterials",ng-model="s",ng-class="{divider: s.type == 'divider'}")
-                .dropdown-header(ng-if="s.type == 'header'") {{s.label}}
-                a(ng-if="s.type == 'data'",ui-sref="supporting-material({index: s.index})") {{s.label}}
-
-    .content-container
-      .top-nav
-        button.toggle-left-nav.btn.btn-sm.btn-default(ng-click="toggleLeftNav()")
-          i.fa.fa-bars
-
-      .main-content(ui-view="main")
-
-    include partials/catalog/item
-    include partials/catalog/profile
-    include partials/catalog/supporting-material
-
-block before-main-script 
-
-  script.
-
-    function mkState(name){
-        return {
-          url: '/' + name,
-          views: {
-            main: {
-              templateUrl: '/templates/' + name
-            }
-          }
-        } 
-      }
-
-    var appLoadConfig = {
-      jsonFile: 'catalog-config.json',
-      defaultPath: '/item',
-      states: {
-        item: mkState('item'),
-        profile: mkState('profile'),
-        'supporting-material' : {
-          url: '/supporting-material/:index',
-          views: {
-            main: {
-              templateUrl: '/templates/supporting-material'
-            }
-          }
-        }
-      }
-    }
-
-// The angular module is now ready you can now add to it..
+    div(question-information="", ng-model="item") Boooo
 
 block after-main-script
   
-  script. 
-    angular.module('corespring-#{appName}').config(
-      function($provide, $stateProvider, $urlRouterProvider) {
-        $urlRouterProvider.otherwise(appLoadConfig.defaultPath);
-        for( var x in appLoadConfig.states){
-          $stateProvider.state(x, appLoadConfig.states[x]);
-        }
-      }
-    );
+  script(type="text/javascript"). 
+    angular.module('corespring-#{appName}');
 
 

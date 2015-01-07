@@ -17,7 +17,7 @@ trait Catalog
 
   override def context: String = "catalog"
 
-  val servicesJs = {
+  def servicesJs(itemId:String) = {
     import org.corespring.container.client.controllers.resources.routes._
 
     val componentJson: Seq[JsValue] = interactions.map {
@@ -32,7 +32,7 @@ trait Catalog
           "defaultData" -> c.defaultData)
     }
 
-    CatalogServices("catalog.services", Item.load(":id"), JsArray(componentJson)).toString
+    CatalogServices("catalog.services", Item.load(itemId), JsArray(componentJson)).toString
   }
 
   override def load(id: String): Action[AnyContent] = Action.async {
@@ -52,7 +52,7 @@ trait Catalog
                 domainResolvedJs,
                 domainResolvedCss,
                 jsSrc.ngModules ++ scriptInfo.ngDependencies,
-                servicesJs)))
+                servicesJs(id))))
         }
 
         def onError(sm: StatusMessage) = {
