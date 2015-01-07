@@ -1,6 +1,8 @@
 /* global VirtualPatch */
 (function() {
 
+  "use strict";
+
   function Type(fn) {
    this.fn = fn;
   }
@@ -50,26 +52,13 @@
         var createElement = virtualDom.create; //jshint ignore:line
         var virtualize = vdomVirtualize; //jshint ignore:line
 
-        function addCompilationPending(el, prop){
-          el.setAttribute('compilation-pending', true);
-        }
-
-        function containsCorespring(s){ 
+        function containsCorespring(s){
           return _.contains(s.toLowerCase(), 'corespring');
         }
 
-        function runTasks(tasks){
-          while(tasks.length){
-            try {
-              tasks.pop()();
-            } catch( err ){
-              //ignore
-            }
-          }
-        }
-
-        function createCleanupTask(obj, key){
-          return function(){
+        function addCompilationPendingAndRemoveHook(obj, key){
+          return function(el, prop){
+            el.setAttribute('compilation-pending', true);
             if(obj && key){
               delete obj[key];
             }
@@ -84,8 +73,7 @@
             var key = vp.patch.tagName;
             logger.debug('found a patch that needs compile: ', key);
             vp.patch.properties = vp.patch.properties || {};
-            vp.patch.properties[key] = hook( addCompilationPending );
-            afterPatchTasks.push(createCleanupTask(vp.patch.properties, key));
+            vp.patch.properties[key] = hook( addCompilationPendingAndRemoveHook(vp.patch.properties, key) );
           }
 
           if(vp.vNode && vp.vNode.tagName && containsCorespring(vp.vNode.tagName)){
@@ -97,18 +85,15 @@
           }
         }
 
-        function addHooks(patches, afterPatchTasks){
-          function addHook(p){
-            processPatch(p, afterPatchTasks);
-          }
+        function addHooks(patches){
           for(var k in patches){
             if(k !== 'a'){
               var p = patches[k];
 
               if(_.isArray(p)){
-                _.forEach(p, addHook);
+                _.forEach(p, processPatch);
               } else {
-                addHook(p);
+                processPatch(p);
               }
             }
           }
@@ -137,12 +122,10 @@
           var newEl = domUtil.stringToElement(ngModel.$viewValue);
 
           if (newEl) {
-            var afterPatchTasks = [];
             var newVDom = virtualize(newEl);
             var patches = diff(rootVDom, newVDom);
-            addHooks(patches, afterPatchTasks);
+            addHooks(patches);
             rootNode = patch(rootNode, patches);
-            runTasks(afterPatchTasks);
             rootVDom = newVDom;
           }
 
@@ -171,7 +154,7 @@
         function triggerMathRendering(){
           MathJaxService.onEndProcess(function(){
             $('.player-body').removeClass('hidden-player-body');
-            MathJaxService.off(arguments.callee);
+            MathJaxService.off(arguments.callee); //jshint ignore:line
           });
 
           MathJaxService.parseDomForMath(0, $element.find('.player-body')[0]);
