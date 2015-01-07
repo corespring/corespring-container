@@ -97,8 +97,7 @@
           }
         }
 
-        function addHooks(patches){
-          var afterPatchTasks = [];
+        function addHooks(patches, afterPatchTasks){
           function addHook(p){
             processPatch(p, afterPatchTasks);
           }
@@ -113,7 +112,6 @@
               }
             }
           }
-          return afterPatchTasks;
         }
 
         /**
@@ -139,9 +137,10 @@
           var newEl = domUtil.stringToElement(ngModel.$viewValue);
 
           if (newEl) {
+            var afterPatchTasks = [];
             var newVDom = virtualize(newEl);
             var patches = diff(rootVDom, newVDom);
-            var afterPatchTasks = addHooks(patches);
+            addHooks(patches, afterPatchTasks);
             rootNode = patch(rootNode, patches);
             runTasks(afterPatchTasks);
             rootVDom = newVDom;
