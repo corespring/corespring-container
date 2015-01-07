@@ -130,10 +130,6 @@ angular.module('corespring-player.controllers')
           $scope.$broadcast('session-finished', $scope.model.session.isFinished);
         };
 
-        $scope.displaySummaryFeedback = function() {
-          return $scope.session.isComplete && !_.isEmpty($scope.item.summaryFeedback);
-        };
-
         $scope.onSessionLoadError = function(error) {
           $log.warn("Error loading session", error);
         };

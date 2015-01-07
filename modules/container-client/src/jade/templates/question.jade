@@ -76,7 +76,7 @@ script(type="text/ng-template", id="/templates/question")
               player-components="item.components",
               player-outcomes="outcome")
 
-            summary-feedback(ng-show="session.isComplete && displaySummaryFeedback()", ng-model="item.summaryFeedback")
+            summary-feedback(item="item", session="session")
           .row
             preview-player-control-panel(
               data-mode='playerMode', 

@@ -35,10 +35,6 @@ angular.module('corespring-editor.controllers')
 
       $scope.showSummaryFeedback = false;
 
-      $scope.displaySummaryFeedback = function() {
-        return $scope.showSummaryFeedback && !_.isEmpty($scope.item.summaryFeedback);
-      }
-
       $scope.togglePreview = function() {
         $scope.previewOn = !$scope.previewOn;
       };
