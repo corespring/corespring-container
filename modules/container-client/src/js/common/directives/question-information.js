@@ -16,9 +16,9 @@ angular.module('corespring-common.directives')
         link: function($scope) {
 
           $scope.$watch('item', function(n) {
-             if (n) {
-               $scope.supportingMaterials = SupportingMaterialsService.getSupportingMaterialsByGroups($scope.item.supportingMaterials);
-             }
+            if (n) {
+              $scope.supportingMaterials = SupportingMaterialsService.getSupportingMaterialsByGroups($scope.item.supportingMaterials);
+            }
           });
 
           $scope.activeTab = 'question';
@@ -31,7 +31,7 @@ angular.module('corespring-common.directives')
 
           $scope.selectSupportingMaterial = function(smIndex) {
             $scope.activeTab = 'supportingMaterial';
-            $scope.activeSmIndex =  smIndex;
+            $scope.activeSmIndex = smIndex;
 
             $scope.selectedSupportingMaterialName = SupportingMaterialsService.getSupportingName($scope.item.supportingMaterials, smIndex);
             $scope.selectedSupportingMaterialUrl = SupportingMaterialsService.getSupportingUrl($scope.item.supportingMaterials, smIndex);
