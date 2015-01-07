@@ -3,16 +3,27 @@
 
   "use strict";
 
-  function Type(fn) {
-   this.fn = fn;
+  function Type(fn, cleanup) {
+    this.fn = fn;
+    this.cleanup = cleanup;
   }
 
   Type.prototype.hook = function () {
     this.fn.apply(this, arguments);
+    this.cleanup.call(this);
   };
 
-  function hook(fn) {
-    return new Type(fn);
+  function addHook(vp, key, fn){
+    vp.patch.properties = vp.patch.properties || {};
+    vp.patch.properties[key] = new Type( fn, createCleanup(vp.patch.properties, key));
+  }
+
+  function createCleanup(vpatchProperties, key){
+    return function() {
+      if (vpatchProperties && key) {
+        delete vpatchProperties[key];
+      }
+    };
   }
 
   function DomUtil(){
@@ -56,24 +67,18 @@
           return _.contains(s.toLowerCase(), 'corespring');
         }
 
-        function addCompilationPendingAndRemoveHook(obj, key){
-          return function(el, prop){
-            el.setAttribute('compilation-pending', true);
-            if(obj && key){
-              delete obj[key];
-            }
-          };
+        function addCompilationPending(el, prop){
+          el.setAttribute('compilation-pending', true);
         }
 
-        function processPatch(vp, afterPatchTasks){
+        function processPatch(vp){
           var isNodeMoveOrInsert = vp && _.contains([VirtualPatch.INSERT, VirtualPatch.VNODE], vp.type);
           var isCorespringTag = vp.patch && vp.patch.tagName && containsCorespring(vp.patch.tagName);
 
           if(isCorespringTag && isNodeMoveOrInsert){
             var key = vp.patch.tagName;
             logger.debug('found a patch that needs compile: ', key);
-            vp.patch.properties = vp.patch.properties || {};
-            vp.patch.properties[key] = hook( addCompilationPendingAndRemoveHook(vp.patch.properties, key) );
+            addHook(vp, key, addCompilationPending);
           }
 
           if(vp.vNode && vp.vNode.tagName && containsCorespring(vp.vNode.tagName)){
