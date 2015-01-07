@@ -58,7 +58,25 @@
           return _.contains(s.toLowerCase(), 'corespring');
         }
 
-        function processPatch(vp){
+        function runTasks(tasks){
+          while(tasks.length){
+            try {
+              tasks.pop()();
+            } catch( err ){
+              //ignore
+            }
+          }
+        }
+
+        function createCleanupTask(obj, key){
+          return function(){
+            if(obj && key){
+              delete obj[key];
+            }
+          };
+        }
+
+        function processPatch(vp, afterPatchTasks){
           var isNodeMoveOrInsert = vp && _.contains([VirtualPatch.INSERT, VirtualPatch.VNODE], vp.type);
           var isCorespringTag = vp.patch && vp.patch.tagName && containsCorespring(vp.patch.tagName);
 
@@ -66,7 +84,8 @@
             var key = vp.patch.tagName;
             logger.debug('found a patch that needs compile: ', key);
             vp.patch.properties = vp.patch.properties || {};
-            vp.patch.properties[key] = hook( addCompilationPending ) ;
+            vp.patch.properties[key] = hook( addCompilationPending );
+            afterPatchTasks.push(createCleanupTask(vp.patch.properties, key));
           }
 
           if(vp.vNode && vp.vNode.tagName && containsCorespring(vp.vNode.tagName)){
@@ -79,17 +98,22 @@
         }
 
         function addHooks(patches){
+          var afterPatchTasks = [];
+          function addHook(p){
+            processPatch(p, afterPatchTasks);
+          }
           for(var k in patches){
             if(k !== 'a'){
               var p = patches[k];
 
               if(_.isArray(p)){
-                _.forEach(p, processPatch);
+                _.forEach(p, addHook);
               } else {
-                processPatch(p);
+                addHook(p);
               }
             }
           }
+          return afterPatchTasks;
         }
 
         /**
@@ -117,8 +141,9 @@
           if (newEl) {
             var newVDom = virtualize(newEl);
             var patches = diff(rootVDom, newVDom);
-            var cPatches = addHooks(patches);
+            var afterPatchTasks = addHooks(patches);
             rootNode = patch(rootNode, patches);
+            runTasks(afterPatchTasks);
             rootVDom = newVDom;
           }
 
@@ -155,7 +180,6 @@
 
 
         function updateRenderedComponents(){
-
           logger.debug('[updateRenderedComponents]');
 
           if(!ngModel.$viewValue){
