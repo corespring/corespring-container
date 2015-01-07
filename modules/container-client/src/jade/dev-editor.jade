@@ -25,7 +25,7 @@ block content
               ng-model="xhtml",
               player-components="item.components",
               player-outcomes="outcome")
-            summary-feedback(ng-show="session.isComplete", ng-model="item.summaryFeedback")
+            summary-feedback(ng-model="item.summaryFeedback", session-complete="session.isComplete")
           preview-player-control-panel(
             data-mode='playerMode', 
             data-settings='playerSettings', 

@@ -1,22 +1,37 @@
-angular.module('corespring-common.directives')
-  .directive('summaryFeedback',
-  [ function() {
+angular.module('corespring-common.directives').directive('summaryFeedback', [
+  function() {
+    return {
+      link: function($scope) {
+        $scope.displaySummaryFeedback = function() {
+          return $scope.sessionComplete && !_.isEmpty($scope.ngModel);
+        };
 
-    function link($scope,$element, $attrs){
-
-      $scope.isSummaryFeedbackOpen = false;
-      $scope.toggleSummaryFeedbackOpen = function() {
-        $scope.isSummaryFeedbackOpen = !$scope.isSummaryFeedbackOpen;
-      };
-    }
-
-  return {
-    link: link,
-    scope : {
-      ngModel: '='
-    },
-    restrict: 'AE',
-    replace: true,
-    templateUrl : '/common/directives/summary-feedback.html'
-  };
-}]);
+        $scope.isSummaryFeedbackOpen = false;
+        $scope.toggleSummaryFeedbackOpen = function() {
+          $scope.isSummaryFeedbackOpen = !$scope.isSummaryFeedbackOpen;
+        };
+      },
+      scope : {
+        ngModel: '=',
+        sessionComplete: '='
+      },
+      restrict: 'AE',
+      replace: true,
+      template : [
+        '<div class="summary-feedback" ng-show="displaySummaryFeedback()">',
+        '  <div class="panel summary-feedback-panel-preview">',
+        '    <div class="panel-heading show-feedback-button" ng-click="toggleSummaryFeedbackOpen()">',
+        '      <h4 class="panel-title">',
+        '        <i class="fa fa-lightbulb-o"></i>',
+        '        &nbsp;Learn More',
+        '      </h4>',
+        '    </div>',
+        '    <div class="panel-body feedback-text" ng-show="isSummaryFeedbackOpen"',
+        '        ng-bind-html-unsafe="ngModel">',
+        '    </div>',
+        '  </div>',
+        '</div>'
+      ].join('\n')
+    };
+  }
+]);

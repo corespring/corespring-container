@@ -54,7 +54,6 @@ angular.module('corespring-player.controllers')
           }, options));
         }
 
-
         $scope.$on('playerControlPanel.preview', function() {
           $scope.$emit('launch-catalog-preview');
         });
