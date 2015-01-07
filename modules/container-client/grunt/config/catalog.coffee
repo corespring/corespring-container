@@ -25,12 +25,13 @@ exports.js =
   report: 'catalog-js-report.json'
 
 exports.css =
-  src: ['css/catalog.css']
-  dest: 'css/catalog.min.css'
-  libs: [
+  src: ['css/editor.css']
+  dest: 'css/editor.min.css'
+  libs: _.union(coreLibs.css, [
+    'bower_components/select2/select2.css',
     'bower_components/font-awesome/css/font-awesome.min.css',
     '//fonts.googleapis.com/css?family=Ubuntu:300,400,500,500italic,700'
-  ]
+  ])
   report: 'catalog-css-report.json'
 
 exports.ngModules = _.union( player.ngModules, [

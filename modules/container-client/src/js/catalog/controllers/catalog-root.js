@@ -9,8 +9,9 @@ angular.module('corespring-catalog.controllers')
         $scope.supportingMaterials = SupportingMaterialsService.getSupportingMaterialsByGroups(item.supportingMaterials);
       });
 
-      $scope.onLoaded = function(){
+      $scope.onLoaded = function(item){
         log.debug('loaded', arguments);
+        $scope.item = item;
       };
       $scope.onLoadFailed = function(){
         log.debug('load failed', arguments);
