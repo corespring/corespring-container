@@ -114,6 +114,8 @@
             return;
           }
 
+          console.log("Rendering: ", ngModel.$viewValue);
+
           if (firstRun) {
             var el = domUtil.stringToElement(ngModel.$viewValue);
             rootVDom = virtualize(el);
@@ -125,6 +127,8 @@
           firstRun = false;
 
           var newEl = domUtil.stringToElement(ngModel.$viewValue);
+          console.log("new: ");
+          console.log(newEl);
 
           if (newEl) {
             var newVDom = virtualize(newEl);
@@ -162,7 +166,7 @@
             MathJaxService.off(arguments.callee); //jshint ignore:line
           });
 
-          MathJaxService.parseDomForMath(0, $element.find('.player-body')[0]);
+          MathJaxService.parseDomForMath(0, $element.find('.corespring-player')[0]);
         }
 
 
