@@ -104,6 +104,19 @@
           }
         }
 
+        var customVirtualizers = [
+          {
+            canVirtualize: function(el){
+              console.log(el, el.hasAttribute('mathjax'));
+              return el.hasAttribute('mathjax');
+            },
+            virtualize: function(el){
+              var text = el.innerHTML;
+              return new VirtualNode(el.tagName, null, [new VirtualText(text)]); //jshint ignore: line
+            }
+          }
+        ];
+
         /**
          * Update the dom using the latest $viewValue
          * Note - if we moved to 1.3.x we can use: ng-model-options="{debounce: 300}"
@@ -118,7 +131,7 @@
 
           if (firstRun) {
             var el = domUtil.stringToElement(ngModel.$viewValue);
-            rootVDom = virtualize(el);
+            rootVDom = virtualize(el, customVirtualizers);
             rootNode = createElement(rootVDom);
             $element[0].appendChild(rootNode); //.cloneNode(true));
             $compile($element)($scope.$new());
@@ -131,7 +144,7 @@
           console.log(newEl);
 
           if (newEl) {
-            var newVDom = virtualize(newEl);
+            var newVDom = virtualize(newEl, customVirtualizers);
             var patches = diff(rootVDom, newVDom);
             addHooks(patches);
             rootNode = patch(rootNode, patches);

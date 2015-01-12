@@ -70,7 +70,7 @@ function createFromElement(el, customVirtualizers) {
     , children = []
 
     for (var i = 0; i < el.childNodes.length; i++) {
-      children.push(createVNode(el.childNodes[i]/*, i*/))
+      children.push(createVNode(el.childNodes[i], customVirtualizers));
     }
 
     return new VNode(tagName, properties, children, null, namespace)
