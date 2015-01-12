@@ -68,9 +68,7 @@ angular.module('corespring-player.controllers')
         }
 
         $scope.$on('playerControlPanel.settingsChange', function() {
-          if (isGatherMode()) {
-            //nothing to do
-          } else {
+          if (!isGatherMode()) {
             loadOutcome();
           }
         });
@@ -82,8 +80,8 @@ angular.module('corespring-player.controllers')
           });
         }
 
-        $scope.$on("initialise", function(event, data){
-          if(data && data.mode){
+        $scope.$on("initialise", function(event, data) {
+          if (data && data.mode) {
             $scope.playerMode = data.mode;
           }
         });
