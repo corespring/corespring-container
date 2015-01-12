@@ -25,4 +25,21 @@ describe('vdom-virtualize', function(){
     var virtualDom = vdomVirtualize(div); //jshint ignore:line
     expect(virtualDom.properties).toEqual({name: 'test'});
   });
+
+  it('allows for custom virtualization on given nodes', function(){
+    var div = document.createElement('div');
+    div.setAttribute('custom-virtualize', true);
+    
+    var customVirtualizer = {
+      canVirtualize: function(el){
+        return el.getAttribute('custom-virtualize')  == 'true';
+      },
+      virtualize: function(el){
+       return new VirtualNode(el.tagName, null, [new VirtualText('Custom!!')] );
+      }
+    };
+
+    var virtualDom = vdomVirtualize(div, [customVirtualizer]);
+    expect(virtualDom.children[0].text).toEqual('Custom!!');
+  });
 });
