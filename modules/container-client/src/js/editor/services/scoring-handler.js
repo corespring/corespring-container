@@ -29,9 +29,10 @@ angular.module('corespring-editor.services')
             return {
               componentType: v.componentType,
               weight: weightForComponent(v),
-              isScorable: isComponentScorable(v)
+              isScoreable: isComponentScorable(v)
             };
           }, this);
+
 
         var modalInstance = $modal.open({
           templateUrl: '/templates/popups/scoring',

@@ -55,7 +55,7 @@ describe('scoring-handler', function() {
     });
 
     var resolvedComps = modalOpts.resolve.components();
-    expect(resolvedComps).toEqual({1: {componentType: 'a', weight: 1}});
+    expect(resolvedComps).toEqual({1: {componentType: 'a', weight: 1, isScoreable: true}});
   });
 
   function assertSaveCalled(changeWeight){

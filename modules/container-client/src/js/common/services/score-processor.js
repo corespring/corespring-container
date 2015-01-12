@@ -18,14 +18,6 @@
       return weight;
     };
 
-    this.isComponentScorable = function(component) {
-      var serverLogic = corespring.server.logic(component.componentType);
-      if (_.isFunction(serverLogic.isScoreable)) {
-        return serverLogic.isScoreable(component);
-      }
-      return true;
-    };
-
     this.score = function(item, session, responses) {
 
       var maxPoints = _.reduce(item.components, function(result, component, key) {
