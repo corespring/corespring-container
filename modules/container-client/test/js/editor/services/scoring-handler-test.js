@@ -58,6 +58,24 @@ describe('scoring-handler', function() {
     expect(resolvedComps).toEqual({1: {componentType: 'a', weight: 1, isScoreable: true}});
   });
 
+  it('should mark non scorable components with isScoreable: false', function(){
+    corespring.server.logic = function(type) {
+      return {
+        isScoreable: function() {
+          return type !== "line";
+        }
+      };
+    };
+
+    var comps = { 1: { componentType: 'a', weight: 1, data: {}}, 2: { componentType: 'line', weight: 1, data: {}}};
+    var xhtml = '<h1>Helo</h1>';
+    scoringHandler.scoring(comps, xhtml, function(){
+    });
+
+    var resolvedComps = modalOpts.resolve.components();
+    expect(resolvedComps['2'].isScoreable).toEqual(false);
+  });
+
   function assertSaveCalled(changeWeight){
 
     var isCalled = changeWeight;
