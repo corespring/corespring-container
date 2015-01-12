@@ -26,8 +26,7 @@ angular.module('corespring-editor.directives').directive('componentWeights', [
         }
 
         function weightableOnly(n) {
-          var config = (n.component && n.component.model) ? n.component.model.config : undefined;
-          return (config && config.exhibitOnly === true) ? false : true;
+          return !!n.component.isScorable;
         }
 
         function getId(n) {
