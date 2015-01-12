@@ -18,6 +18,7 @@ VirtualPatch.REMOVE = 7;
 VirtualPatch.THUNK = 8;
 
 VirtualPatch.prototype.type = "VirtualPatch";
+VirtualPatch.prototype.version = "1";
 
 
 
@@ -86,7 +87,10 @@ function VirtualNode(tagName, properties, children, key, namespace) {
 }
 
 VirtualNode.prototype.type = "VirtualNode";
+VirtualNode.prototype.version = "1";
 
 function VirtualText(text) {
   this.text = String(text);
 }
+VirtualText.prototype.type = "VirtualText";
+VirtualText.prototype.version = "1";
