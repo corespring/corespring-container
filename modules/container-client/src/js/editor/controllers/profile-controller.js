@@ -545,7 +545,7 @@
           return subjects;
         }
         return _.filter(subjects, function(item){
-          return -1 !== _.indexOf(options, item.category + ":" + item.subject);
+          return -1 !== _.indexOf(options, formatFunc(item));
         });
       }
 
@@ -570,12 +570,19 @@
       return s.category + ": " + s.subject;
     }
 
+    function fromSubjectText(categorySubject){
+      var parts = categorySubject.split(": ");
+      return {
+        category:parts[0],
+        subject:parts[1]
+      };
+    }
+
     $scope.primarySubjectSelect2Adapter = new Select2Adapter("subjects.primary", subjectText, $scope.formModels.primarySubject);
     $scope.relatedSubjectSelect2Adapter = new Select2Adapter("subjects.related", subjectText, $scope.formModels.relatedSubject);
 
     function findSubjectByCategorySubject(topic, categorySubject, callback){
-      var parts = categorySubject.split(":");
-      var query = {filters:{'category':parts[0],'subject':parts[1]}};
+      var query = {filters:fromSubjectText(categorySubject)};
       DataQueryService.query(
         topic,
         query,
@@ -585,7 +592,7 @@
     }
 
     /**
-     * The config is a category:subject string.
+     * The config is a category: subject string.
      */
     function configToPrimarySubject(categorySubject, callback){
       if(!_.isString(categorySubject)){
@@ -596,7 +603,7 @@
     }
 
     /**
-     * The config is a list of category:subject strings.
+     * The config is a list of category: subject strings.
      */
     function configToRelatedSubject(categorySubjectList, callback){
       if(!_.isArray(categorySubjectList)){
