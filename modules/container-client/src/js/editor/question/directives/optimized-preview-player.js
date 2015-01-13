@@ -138,10 +138,11 @@
           this.update = function(old, domNode){
             var info = MathFormatUtils.getMathInfo(this.math);
 
+            while (domNode.firstChild) {
+              domNode.removeChild(domNode.firstChild);
+            }
+
             if(info.mathType === 'MathML'){
-              while (domNode.firstChild) {
-                domNode.removeChild(domNode.firstChild);
-              }
               
               var range = document.createRange();
               var documentFragment = range.createContextualFragment(this.math);
