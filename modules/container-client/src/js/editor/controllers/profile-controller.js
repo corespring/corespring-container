@@ -534,18 +534,21 @@
     // subject and related subject
     //----------------------------------------------------------------
 
-    function Select2Adapter(topic, formatFunc, formModel) {
+    function SubjectSelect2Adapter(topic, formModel) {
 
-      this.formatResult = formatFunc;
-      this.formatSelection = formatFunc;
+      this.formatResult = subjectText;
+      this.formatSelection = subjectText;
 
       function filterSubjectsByConfig(subjects){
         var options = formModel.options;
         if(!_.isArray(options)){
           return subjects;
         }
+        options = _.map(options, fromSubjectText);
         return _.filter(subjects, function(item){
-          return -1 !== _.indexOf(options, formatFunc(item));
+          return -1 !== _.findIndex(options, function(o){
+              return item && o && item.category === o.category && item.subject === o.subject;
+            });
         });
       }
 
@@ -562,7 +565,7 @@
       };
 
       this.initSelection = function(){
-        //keep this is to avoid exceptions in the single select
+        //keep this to avoid exceptions in the select
       };
     }
 
@@ -571,15 +574,15 @@
     }
 
     function fromSubjectText(categorySubject){
-      var parts = categorySubject.split(": ");
+      var parts = categorySubject.split(":");
       return {
-        category:parts[0],
-        subject:parts[1]
+        category:parts[0].trim(),
+        subject:parts.length >= 2 ? parts[1].trim() : ''
       };
     }
 
-    $scope.primarySubjectSelect2Adapter = new Select2Adapter("subjects.primary", subjectText, $scope.formModels.primarySubject);
-    $scope.relatedSubjectSelect2Adapter = new Select2Adapter("subjects.related", subjectText, $scope.formModels.relatedSubject);
+    $scope.primarySubjectSelect2Adapter = new SubjectSelect2Adapter("subjects.primary", $scope.formModels.primarySubject);
+    $scope.relatedSubjectSelect2Adapter = new SubjectSelect2Adapter("subjects.related", $scope.formModels.relatedSubject);
 
     function findSubjectByCategorySubject(topic, categorySubject, callback){
       var query = {filters:fromSubjectText(categorySubject)};
