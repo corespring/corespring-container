@@ -719,7 +719,7 @@ describe('profile controller', function () {
         beforeEach(function() {
           mockLocation.hashResult = {
             profileConfig: JSON.stringify({
-              primarySubject: {value: "Cat1:Sub1"}
+              primarySubject: {value: "Cat1: Sub1"}
             })
           };
           mockDataQueryService.queryResult = [{subject:"Sub1", category:"Cat1"}];
@@ -733,7 +733,7 @@ describe('profile controller', function () {
         beforeEach(function() {
           mockLocation.hashResult = {
             profileConfig: JSON.stringify({
-              relatedSubject: {value: ["Cat1:Sub1"]}
+              relatedSubject: {value: ["Cat1: Sub1"]}
             })
           };
           mockDataQueryService.queryResult = [{subject:"Sub1", category:"Cat1"}];
@@ -836,7 +836,7 @@ describe('profile controller', function () {
           expect(actualResult).toEqual({results:inputData});
         });
         it("should remove items which are not in both, dataProvider and options", function(){
-          scope.formModels.primarySubject.options = ['A:B','Something:Else'];
+          scope.formModels.primarySubject.options = ['A: B','Something: Else'];
           var inputData = [{category:'A', subject:'B'},{category:'C', subject:'D'}];
           mockDataQueryService.queryResult = inputData;
           var actualResult;
@@ -882,7 +882,7 @@ describe('profile controller', function () {
           expect(actualResult).toEqual({results:inputData});
         });
         it("should remove items which are not in both, dataProvider and options", function(){
-          scope.formModels.relatedSubject.options = ['A:B','Something:Else'];
+          scope.formModels.relatedSubject.options = ['A: B','Something: Else'];
           var inputData = [{category:'A', subject:'B'},{category:'C', subject:'D'}];
           mockDataQueryService.queryResult = inputData;
           var actualResult;
