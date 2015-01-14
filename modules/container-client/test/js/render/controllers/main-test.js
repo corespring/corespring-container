@@ -68,8 +68,6 @@ describe('Main', function() {
     this.info = mockInfo;
   }
 
-  var mps = new MockPlayerService();
-
   beforeEach(angular.mock.module('corespring-player.controllers'));
 
   beforeEach(module(function($provide) {
