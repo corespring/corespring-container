@@ -168,8 +168,6 @@
             return;
           }
 
-          console.log("Rendering: ", ngModel.$viewValue);
-
           if (firstRun) {
             var el = domUtil.stringToElement(ngModel.$viewValue);
             rootVDom = virtualize(el, customVirtualizers);
@@ -181,8 +179,6 @@
           firstRun = false;
 
           var newEl = domUtil.stringToElement(ngModel.$viewValue);
-          console.log("new: ");
-          console.log(newEl);
 
           if (newEl) {
             var newVDom = virtualize(newEl, customVirtualizers);
