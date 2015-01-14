@@ -21,18 +21,22 @@ describe('Main', function() {
 
   var mockSaveSession = jasmine.createSpy('saveSession');
   var mockLoadOutcome = jasmine.createSpy('loadOutcome');
+  var mockLoadItemAndSession = jasmine.createSpy('loadItemAndSession');
   var mockCompleteResponse = jasmine.createSpy('completeResponse');
   var mockReopenSession = jasmine.createSpy('reopenSession');
   var mockResetSession = jasmine.createSpy('resetSession');
   var mockGetScore = jasmine.createSpy('getScore');
+  var mockSetQueryParams = jasmine.createSpy('setQueryParams');
 
   function MockPlayerService() {
     this.saveSession = mockSaveSession;
     this.loadOutcome = mockLoadOutcome;
+    this.loadItemAndSession = mockLoadItemAndSession;
     this.completeResponse = mockCompleteResponse;
     this.reopenSession = mockReopenSession;
     this.resetSession = mockResetSession;
     this.getScore = mockGetScore;
+    this.setQueryParams = mockSetQueryParams;
   }
 
   var mockError = jasmine.createSpy('error');
@@ -44,9 +48,12 @@ describe('Main', function() {
     mockSetEditable.calls.reset();
     mockSaveSession.calls.reset();
     mockLoadOutcome.calls.reset();
+    mockLoadItemAndSession.calls.reset();
     mockCompleteResponse.calls.reset();
     mockReopenSession.calls.reset();
     mockResetSession.calls.reset();
+    mockGetScore.calls.reset();
+    mockSetQueryParams.calls.reset();
     mockError.calls.reset();
     mockWarn.calls.reset();
     mockInfo.calls.reset();
@@ -401,7 +408,25 @@ describe('Main', function() {
 
   });
 
-  // todo describe initiailse
+  describe('initialise event', function() {
+    var data = {
+      queryParams: 'these are some sweet query params'
+    };
+
+    beforeEach(function() {
+      scope.$emit('initialise', data);
+    });
+
+    it('should call PlayerService.setQueryParams with data.queryParams', function() {
+      expect(mockSetQueryParams).toHaveBeenCalledWith(data.queryParams);
+    });
+
+    it('should call PlayerService.loadItemAndSession', function() {
+      expect(mockLoadItemAndSession).toHaveBeenCalled();
+    });
+
+  });
+
 
   describe('reopenSession event', function() {
 
