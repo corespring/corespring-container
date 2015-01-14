@@ -12,7 +12,7 @@ angular.module('corespring.wiggi-wiz-features.mathjax').factory('WiggiMathJaxFea
 
       this.initialise = function($node, replaceWith) {
         var content = $node.html();
-        var newNode = $('<div mathjax-holder>');
+        var newNode = $('<div mathjax-holder contenteditable="false">');
         newNode.html(content);
         return replaceWith(newNode);
       };
