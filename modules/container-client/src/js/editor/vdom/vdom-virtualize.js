@@ -27,12 +27,15 @@ var VNode = require("vtree/vnode")
 
 module.exports = createVNode
 
-function createVNode(domNode, key) {
-  key = key || null // XXX: Leave out `key` for now... merely used for (re-)ordering
-
-  if(domNode.nodeType == 1) return createFromElement(domNode, key)
-  if(domNode.nodeType == 3) return createFromTextNode(domNode, key)
-  return
+function createVNode(domNode, customVirtualizers) {
+  customVirtualizers = customVirtualizers || [];
+  if(domNode.nodeType === 1) {
+    return createFromElement(domNode, customVirtualizers);
+  }
+  if(domNode.nodeType === 3) {
+    return createFromTextNode(domNode);
+  }
+  return;
 }
 
 createVNode.fromHTML = function(html, key) {
@@ -46,18 +49,32 @@ function createFromTextNode(tNode) {
   return new VText(tNode.nodeValue)
 }
 
-
-function createFromElement(el) {
-  var tagName = el.tagName
-  , namespace = el.namespaceURI == 'http://www.w3.org/1999/xhtml'? null : el.namespaceURI
-  , properties = getElementProperties(el)
-  , children = []
-
-  for (var i = 0; i < el.childNodes.length; i++) {
-    children.push(createVNode(el.childNodes[i]/*, i*/))
+function hasCustomVirtualizer(el, virtualizers){
+  for(var i = 0; i < virtualizers.length; i++){
+    if(virtualizers[i].canVirtualize(el)){
+      return virtualizers[i].virtualize;
+    } 
   }
+}
 
-  return new VNode(tagName, properties, children, null, namespace)
+function createFromElement(el, customVirtualizers) {
+
+  var customVirtualize = hasCustomVirtualizer(el, customVirtualizers);
+
+  if(customVirtualize && typeof(customVirtualize === 'function')){
+    return customVirtualize(el);
+  } else {
+    var tagName = el.tagName
+    , namespace = el.namespaceURI == 'http://www.w3.org/1999/xhtml'? null : el.namespaceURI
+    , properties = getElementProperties(el)
+    , children = []
+
+    for (var i = 0; i < el.childNodes.length; i++) {
+      children.push(createVNode(el.childNodes[i], customVirtualizers));
+    }
+
+    return new VNode(tagName, properties, children, null, namespace)
+  }
 }
 
 function isEmptyObject(obj){

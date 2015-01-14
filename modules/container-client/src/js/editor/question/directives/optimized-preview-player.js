@@ -48,7 +48,8 @@
     'LogFactory',
     'ComponentData',
     'MathJaxService',
-    function($compile, LogFactory, ComponentData, MathJaxService) {
+    'MathFormatUtils',
+    function($compile, LogFactory, ComponentData, MathJaxService, MathFormatUtils) {
       var logger = LogFactory.getLogger('corespring-preview-player');
 
       function link($scope, $element, $attrs, ngModel){
@@ -105,6 +106,59 @@
         }
 
         /**
+         * Math rendering requires that we virtualize the entire node containing math (MathML or LaTex).
+         * We create a vdom Widget which allows us to control how the target dom gets updated.
+         */
+
+        var customVirtualizers = [
+          {
+            canVirtualize: function(el){
+              return el.hasAttribute('mathjax');
+            },
+            virtualize: function(el){
+              var text = el.innerHTML;
+              return new MathWidget(el.innerHTML);
+            }
+          }
+        ];
+
+        /** Vdom MathWidget definition */ 
+        function MathWidget(math){
+          this.name = 'MathWidget';
+          this.type = 'Widget';
+          this.version = '1';
+          this.math = math;
+
+          this.init = function(){
+            var out = document.createElement('span');
+            out.textContent = this.math;
+            return out; 
+          };
+
+          this.update = function(old, domNode){
+            var info = MathFormatUtils.getMathInfo(this.math);
+
+            while (domNode.firstChild) {
+              domNode.removeChild(domNode.firstChild);
+            }
+
+            if(info.mathType === 'MathML'){
+              
+              var range = document.createRange();
+              var documentFragment = range.createContextualFragment(this.math);
+              domNode.appendChild(documentFragment);
+            } else {
+              domNode.textContent = this.math;
+            }
+          };
+          
+          this.destroy = function(){
+            this.math = null;
+          };
+        }
+ 
+
+        /**
          * Update the dom using the latest $viewValue
          * Note - if we moved to 1.3.x we can use: ng-model-options="{debounce: 300}"
          */
@@ -116,7 +170,7 @@
 
           if (firstRun) {
             var el = domUtil.stringToElement(ngModel.$viewValue);
-            rootVDom = virtualize(el);
+            rootVDom = virtualize(el, customVirtualizers);
             rootNode = createElement(rootVDom);
             $element[0].appendChild(rootNode); //.cloneNode(true));
             $compile($element)($scope.$new());
@@ -127,7 +181,7 @@
           var newEl = domUtil.stringToElement(ngModel.$viewValue);
 
           if (newEl) {
-            var newVDom = virtualize(newEl);
+            var newVDom = virtualize(newEl, customVirtualizers);
             var patches = diff(rootVDom, newVDom);
             addHooks(patches);
             rootNode = patch(rootNode, patches);
@@ -162,7 +216,7 @@
             MathJaxService.off(arguments.callee); //jshint ignore:line
           });
 
-          MathJaxService.parseDomForMath(0, $element.find('.player-body')[0]);
+          MathJaxService.parseDomForMath(0, $element.find('.corespring-player')[0]);
         }
 
 
