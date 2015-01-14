@@ -162,7 +162,7 @@
             MathJaxService.off(arguments.callee); //jshint ignore:line
           });
 
-          MathJaxService.parseDomForMath(0, $element.find('.corespring-player')[0]);
+          MathJaxService.parseDomForMath(0, $element.find('.player-body')[0]);
         }
 
 
