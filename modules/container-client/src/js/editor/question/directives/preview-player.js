@@ -1,6 +1,4 @@
 (function() {
-
-
   /**
    * Non optimized preview player for the editor
    */
@@ -22,34 +20,7 @@
             allowEmptyResponses: false
           };
 
-          $scope.score = NaN;
-
           $scope.responses = {};
-
-          $scope.session = {
-            remainingAttempts: 1,
-            settings: _.cloneDeep($scope.playerSettings)
-          };
-
-          $scope.itemSession = undefined;
-
-          function getQuestionForComponentId(id) {
-            return $scope.item.components[id];
-          }
-
-          function getItem() {
-            return $scope.item;
-          }
-
-          function setMode(mode) {
-            $scope.playerMode = mode;
-            ComponentRegister.setMode(mode);
-            ComponentRegister.setEditable(isGatherMode());
-          }
-
-          function isGatherMode() {
-            return $scope.playerMode === 'gather';
-          }
 
           var debouncedUpdateComponents = debounce(updateRenderedComponents);
 
@@ -88,7 +59,6 @@
             debouncedUpdateComponents();
           }, true);
 
-          setMode('gather');
         };
 
         return {
