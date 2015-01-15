@@ -299,8 +299,8 @@ angular.module('corespring-player.controllers')
             });
           }
 
-          function updateOutcome(){
-            if( data.mode === 'evaluate') {
+          function updateOutcome() {
+            if (data.mode === 'evaluate') {
               loadOutcome();
             } else {
               clearOutcome();
