@@ -53,8 +53,8 @@
      * These values are accessible from here through the ConfigurationService.
      */
     $scope.formModels = {
-      additionalCopyrights: {
-        visible:true,
+      additionalMediaCopyrights: {
+        visible:false,
         readonly:false,
         collapse:true
       },
@@ -125,7 +125,8 @@
       },
       primarySubject: {
         visible:true,
-        readonly:false
+        readonly:false,
+        options: ['Art: Other', 'Art: Performing Arts']
       },
       priorGradeLevel: {
         visible:true,
@@ -295,7 +296,7 @@
       applyConfig(profile.contributorDetails, "sourceUrl");
       applyConfig(profile.contributorDetails, "licenseType");
 
-      applyConfig(profile.contributorDetails, "additionalCopyrights");
+      applyConfig(profile.contributorDetails, "additionalCopyrights", 'additionalMediaCopyrights');
     }
 
     /**
