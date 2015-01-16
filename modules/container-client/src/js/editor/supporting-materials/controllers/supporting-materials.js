@@ -39,35 +39,7 @@ angular.module('corespring-editor.controllers')
         });
 
         modalInstance.result.then(function(supportingMaterial) {
-          if (supportingMaterial.method === 'createHtml') {
-            $scope.createText(supportingMaterial);
-          } else {
-
-            var uploadScope = $scope.$new();
-            uploadScope.progress = "0";
-
-            var uploadModal = $modal.open({
-              templateUrl: '/templates/popups/uploadingSupportingMaterial',
-              backdrop: 'static',
-              scope: uploadScope
-            });
-
-            var onProgress = function(progress) {
-              uploadScope.progress = progress;
-              uploadScope.$apply();
-            };
-
-            var onFinished = function() {
-              uploadModal.dismiss();
-            };
-
-            var onError = function(error) {
-              uploadModal.dismiss();
-              window.alert('There was an error uploading the Supporting Material');
-            };
-
-            $scope.createFile(supportingMaterial, onProgress, onFinished, onError);
-          }
+          $scope.createText(supportingMaterial);
         });
       };
 
@@ -126,6 +98,8 @@ angular.module('corespring-editor.controllers')
         },
 
         addFile: function(file, onComplete, onProgress) {
+
+          onComplete('Image upload is currently disabled');
           var url = $scope.getSupportingMaterials()[$scope.index].id + '/' + file.name;
 
           if (ImageUtils.bytesToKb(file.size) > 500) {
