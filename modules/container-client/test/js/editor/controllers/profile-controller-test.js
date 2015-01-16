@@ -615,7 +615,7 @@ describe('profile controller', function () {
       var keys = ["title", "description", "primarySubject", "relatedSubject", "gradeLevel", "componentTypes",
         "standards", "lexile", "depthOfKnowledge", "bloomsTaxonomy", "keySkills", "priorUse", "priorGradeLevel",
         "reviewsPassed", "author", "credentials", "copyrightOwner", "copyrightYear",
-        "copyrightExpirationDate", "sourceUrl", "additionalCopyrights"];
+        "copyrightExpirationDate", "sourceUrl", "additionalMediaCopyrights"];
 
       makeProfileController();
       _.forEach(keys,function(key){
@@ -647,7 +647,7 @@ describe('profile controller', function () {
             copyrightYear: {value: 1978},
             copyrightExpirationDate: {value: 2020},
             sourceUrl: {value: "some source url"},
-            additionalCopyrights: {value: [
+            additionalMediaCopyrights: {value: [
               {author: "some author"}
             ]}
           })};
@@ -711,7 +711,7 @@ describe('profile controller', function () {
         it("sourceUrl", function(){
           expect(scope.contributorDetails.sourceUrl).toEqual("some source url");
         });
-        it("additionalCopyrights", function(){
+        it("additionalMediaCopyrights", function(){
           expect(scope.contributorDetails.additionalCopyrights).toEqual([{author: "some author"}]);
         });
       });

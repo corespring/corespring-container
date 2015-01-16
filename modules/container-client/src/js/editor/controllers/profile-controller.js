@@ -54,7 +54,7 @@
      */
     $scope.formModels = {
       additionalMediaCopyrights: {
-        visible:false,
+        visible:true,
         readonly:false,
         collapse:true
       },
@@ -125,8 +125,7 @@
       },
       primarySubject: {
         visible:true,
-        readonly:false,
-        options: ['Art: Other', 'Art: Performing Arts']
+        readonly:false
       },
       priorGradeLevel: {
         visible:true,
