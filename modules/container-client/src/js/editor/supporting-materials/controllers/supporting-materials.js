@@ -99,7 +99,6 @@ angular.module('corespring-editor.controllers')
 
         addFile: function(file, onComplete, onProgress) {
 
-          onComplete('Image upload is currently disabled');
           var url = $scope.getSupportingMaterials()[$scope.index].id + '/' + file.name;
 
           if (ImageUtils.bytesToKb(file.size) > 500) {
