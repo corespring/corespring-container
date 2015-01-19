@@ -1,6 +1,7 @@
 form.weight-form(name='weightForm')
-  .form-group(ng-click='selectComponent()', ng-class="{'has-error': weightForm.input.$error.number}")
-    label.control-label.col-sm-5(for='{{uid}}') {{getTitle(component.componentType)}} is worth
+  .row.form-group(ng-click='selectComponent()', ng-class="{'has-error': weightForm.input.$error.number}")
+    .col-sm-offset-2.col-sm-4
+      label.control-label(for='{{uid}}') {{getTitle(component.componentType)}} is worth
     .col-sm-4
       .input-group
         input.form-control(id="{{uid}}", ng-disabled='{{disabled}}', name='input', min='0', max='100', number-validation='number-validation', ng-focus='selectComponent()', ng-model='component.weight')
