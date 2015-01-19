@@ -5,7 +5,7 @@
 
       function playerControlPanel($compile, $log) {
 
-        function compile (element, attr, trascludeFunc) {
+        function compile (element, attr, transcludeFunc) {
 
           return function ($scope, $element, attr) {
 
@@ -13,7 +13,6 @@
             $scope.showSettingsButton = (attr.showSettingsButton === undefined) ? false : (attr.showSettingsButton === 'true');
             $scope.showSubmitButton = (attr.showSubmitButton === undefined) ? true : (attr.showSubmitButton === 'true');
             $scope.showScore = (attr.showScore === undefined) ? true : (attr.showScore === 'true');
-
 
             $scope.settingsEnabled = {
               maxNoOfAttempts: true,
@@ -61,8 +60,8 @@
               $scope.$emit('playerControlPanel.settingsChange');
             };
 
-            $scope.hasScore = function hasScore() {
-              return $scope.score && $scope.score.summary;
+            $scope.hasScore = function() {
+              return !(_.isUndefined($scope.score) || _.isUndefined($scope.score.summary));
             };
 
             function initConfigPopover() {
@@ -139,7 +138,7 @@
             initConfigPopover();
 
 
-            trascludeFunc($scope.$parent, function(clone){
+            transcludeFunc($scope.$parent, function(clone){
               element.find(".playerholder").append(clone);
             });
 
@@ -148,9 +147,8 @@
 
         return {
           restrict: 'AE',
-          //link: link,
-          compile : compile,
-          transclude:true,
+          compile: compile,
+          transclude: true,
           scope: {
             settings: '=',
             mode: '=',
@@ -161,16 +159,16 @@
           },
           template: [
             '<div class="control-panel">',
-            '  <div class="action-holder" ng-show="showPreviewButton">',
+            '  <div class="action-holder preview-holder" ng-show="showPreviewButton">',
             '    <button class="btn action preview" ng-click="preview()">Preview</button>',
             '  </div>',
             '  <div class="header-container">',
-            '    <div class="header action-holder pull-right" ng-show="showScore">',
+            '    <div class="header action-holder score-holder pull-right" ng-show="showScore">',
             '      <div class="score">',
             '        <label ng-show="hasScore()">Score:</label>',
             '        <span ng-show="hasScore()">{{score.summary.percentage}}%</span>',
             '      </div>',
-            '      <div class="action config" ng-show="showSettingsButton">',
+            '      <div class="action config settings-holder" ng-show="showSettingsButton">',
             '        <a title="Settings">',
             '          <i class="fa fa-cog" />',
             '        </a>',
@@ -178,7 +176,7 @@
             '    </div>',
             '  </div>',
             '  <div class="playerholder"></div>', // Player
-            '  <div class="pull-right" ng-show="showSubmitButton">',
+            '  <div class="pull-right submit-button-holder" ng-show="showSubmitButton">',
             '    <button ng-class="playerButtonSettings.class" ng-click="updatePlayer();">',
             '        {{playerButtonSettings.text}}',
             '    </button>',

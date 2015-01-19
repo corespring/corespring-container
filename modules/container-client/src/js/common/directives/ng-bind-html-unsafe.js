@@ -1,7 +1,7 @@
 angular.module('corespring-common.directives').directive('ngBindHtmlUnsafe', ['$sce', function($sce){
   return {
     scope: {
-      ngBindHtmlUnsafe: '=',
+      ngBindHtmlUnsafe: '='
     },
     template: "<div ng-bind-html='trustedHtml'></div>",
     link: function($scope, iElm, iAttrs, controller) {
