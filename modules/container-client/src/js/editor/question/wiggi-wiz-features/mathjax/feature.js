@@ -1,6 +1,6 @@
-angular.module('corespring.wiggi-wiz-features.mathjax').factory('WiggiMathJaxFeatureDef', [
+angular.module('corespring.wiggi-wiz-features.mathjax').factory('WiggiMathJaxFeatureDef', ['MathJaxService',
 
-  function() {
+  function(MathJaxService) {
 
     function FeatureDef() {
       this.name = 'mathjax';
@@ -14,6 +14,7 @@ angular.module('corespring.wiggi-wiz-features.mathjax').factory('WiggiMathJaxFea
         var content = $node.html();
         var newNode = $('<div mathjax-holder contenteditable="false">');
         newNode.html(content);
+        MathJaxService.parseDomForMath(100);
         return replaceWith(newNode);
       };
 
@@ -26,6 +27,7 @@ angular.module('corespring.wiggi-wiz-features.mathjax').factory('WiggiMathJaxFea
           null,
           function onClose() {
             $scope.$emit('save-data');
+            MathJaxService.parseDomForMath(100);
           }
         );
       };
