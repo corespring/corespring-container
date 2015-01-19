@@ -1,13 +1,14 @@
 describe('component data', function() {
 
-  var componentData;
+  var componentData, register;
 
   beforeEach(angular.mock.module('corespring-player.services'));
   beforeEach(angular.mock.module('corespring-common.services'));
   beforeEach(angular.mock.module('corespring-editor.services'));
 
-  beforeEach(inject(function(ComponentData) {
+  beforeEach(inject(function(ComponentData, ComponentRegister) {
     componentData = ComponentData;
+    register = ComponentRegister;
     componentData.setModel({});
   }));
 
@@ -82,5 +83,32 @@ describe('component data', function() {
     componentData.registerComponent(id, bridge);
     componentData.updateComponent(id, { clean: false, compData: 'new data'});
     expect(result).toEqual({data: {clean: false, compData: 'new data'}, session : {}});
+  });
+
+  var Bridge = function(){
+    this.dataAndSession = null;
+    this.setDataAndSession = function(ds){
+      this.dataAndSession = ds;
+    };
+    this.getSession = function(){
+      return this.dataAndSession;
+    };
+  };
+
+  it('adds and removes the component from the register', function(){
+
+    var id = '1';
+    var bridge = new Bridge();
+    
+    componentData.setModel({ 1: {}});
+    componentData.registerComponent(id, bridge);
+    expect(_.keys(register.getSessions()).length).toEqual(1);
+    
+    componentData.deleteComponent(id);
+    expect(_.keys(register.getSessions()).length).toEqual(0);
+    
+    componentData.restoreComponent(id);
+    componentData.registerComponent(id, bridge);
+    expect(_.keys(register.getSessions()).length).toEqual(1);
   });
 });
