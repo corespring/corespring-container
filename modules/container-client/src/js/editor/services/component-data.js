@@ -111,6 +111,8 @@ angular.module('corespring-editor.services')
             throw new Error('no component with id', id);
           }
 
+          ComponentRegister.deregisterComponent(id);
+
           removedComponentModels[id] = _.cloneDeep(componentModels[id]);
           delete componentModels[id];
         };
@@ -133,6 +135,7 @@ angular.module('corespring-editor.services')
           }
 
           componentModels[id] = removedComponentModels[id];
+
           delete removedComponentModels[id];
         };
       }
