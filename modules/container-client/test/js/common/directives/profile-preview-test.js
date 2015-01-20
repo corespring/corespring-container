@@ -5,8 +5,6 @@ describe('profile-preview', function(){
 
   var scope = null, template = null;
 
-  var directivePath = '/common/directives/profile-preview.html';
-  
   beforeEach(angular.mock.module('corespring-templates'));
 
   beforeEach(function () {
