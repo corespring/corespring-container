@@ -7,8 +7,8 @@ import org.apache.commons.lang3.StringEscapeUtils
 import org.corespring.container.client.V2PlayerConfig
 import org.corespring.container.client.hooks.{ PlayerJs, PlayerLauncherHooks }
 import org.corespring.container.client.views.txt.js.ServerLibraryWrapper
+import org.corespring.container.logging.ContainerLogger
 import play.api.Play
-import play.api.Play.current
 import play.api.http.ContentTypes
 import play.api.libs.json.{ JsValue, Json }
 import play.api.mvc._
@@ -20,6 +20,8 @@ trait PlayerLauncher extends Controller {
   def playerConfig: V2PlayerConfig
 
   implicit def ec: ExecutionContext
+
+  lazy val logger = ContainerLogger.getLogger("PlayerLauncher")
 
   //TODO: This is lifted from corespring-api -> move to a library
   object BaseUrl {
@@ -86,7 +88,9 @@ trait PlayerLauncher extends Controller {
   def playerJs = Action.async { implicit request =>
     hooks.playerJs.map { implicit js =>
 
-      val sessionIdPlayerUrl = s"${Player.load(":id").url}?${request.rawQueryString}"
+      logger.debug(s"playerJs - isSecure=${js.isSecure}, path=${request.path}, queryString=${request.rawQueryString}")
+
+      val sessionIdPlayerUrl = Player.load(":id").url
 
       val rootUrl = playerConfig.rootUrl.getOrElse(BaseUrl(request))
 
@@ -97,9 +101,9 @@ trait PlayerLauncher extends Controller {
         "mode" -> "gather",
         "paths" -> Json.obj(
           "gather" -> itemUrl,
-          "gatherSession" -> s"$sessionIdPlayerUrl?mode=gather",
-          "view" -> s"$sessionIdPlayerUrl?mode=view",
-          "evaluate" -> s"$sessionIdPlayerUrl?mode=evaluate"))
+          "gatherSession" -> sessionIdPlayerUrl,
+          "view" -> sessionIdPlayerUrl,
+          "evaluate" -> sessionIdPlayerUrl))
       val bootstrap = s"org.corespring.players.ItemPlayer = corespring.require('player').define(${js.isSecure});"
       make(playerNameAndSrc, defaultOptions, bootstrap)
     }
@@ -112,6 +116,7 @@ trait PlayerLauncher extends Controller {
    */
   private def pathToNameAndContents(p: String): (String, String) = {
     import grizzled.file.GrizzledFile._
+    import Play.current
     Play.resource(p).map {
       r =>
         val name = new File(r.getFile).basename.getName.replace(".js", "")
@@ -169,7 +174,9 @@ trait PlayerLauncher extends Controller {
       s"""
        $coreJs
        ${wrappedContents.mkString("\n")}
-       $bootstrapLine""").as(ContentTypes.JAVASCRIPT).withSession(finalSession)
+       $bootstrapLine""")
+      .as(ContentTypes.JAVASCRIPT)
+      .withSession(finalSession)
   }
 
   private def makeQueryParams(qp: Map[String, Seq[String]]): String = {
