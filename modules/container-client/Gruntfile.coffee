@@ -118,6 +118,7 @@ module.exports = (grunt) ->
         src: [
           '<%= common.app %>/js/corespring/**/*.js',
           '<%= common.app %>/js/**/*.js',
+          '<%= common.dist %>/js/**/*.tpl.js',
           '!<%= common.app %>/js/player-launcher/**/*.js',
           '!<%= common.app %>/js/old-*/**/*.js',
           '<%= common.tmp %>/wrapped/player-launcher-wrapped.js'
