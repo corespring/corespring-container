@@ -1,7 +1,15 @@
 describe('component data', function() {
 
   var componentData, register;
-
+  window.MathJax = {
+    Hub: {
+      signal: {
+        Interest: function() {
+        }
+      },
+      Config: function() {}
+    }
+  };
   beforeEach(angular.mock.module('corespring-player.services'));
   beforeEach(angular.mock.module('corespring-common.services'));
   beforeEach(angular.mock.module('corespring-editor.services'));
@@ -16,18 +24,18 @@ describe('component data', function() {
     expect(componentData).not.toBe(null);
   });
 
-  function assertComponent(comp){
+  function assertComponent(comp) {
     expect(comp.compData).toBe('comp-data');
     expect(comp.clean).toBe(true);
     expect(comp.weight).toBe(1);
   }
 
-  it('adding a component, merges the default data with the component data', function(){
+  it('adding a component, merges the default data with the component data', function() {
     componentData.setModel({});
     var id = componentData.addComponentModel({compData: 'comp-data'});
     var component = null;
     componentData.registerPlaceholder(id, {
-      setComponent: function(obj){
+      setComponent: function(obj) {
         component = obj;
       }
     });
@@ -35,7 +43,7 @@ describe('component data', function() {
     assertComponent(component);
   });
 
-  it('adding and removing components, gets the latest id available', function(){
+  it('adding and removing components, gets the latest id available', function() {
     var id = componentData.addComponentModel({compData: 'comp-data'});
     expect(id).toBe(0);
     var idTwo = componentData.addComponentModel({compData: 'comp-data'});
@@ -45,7 +53,7 @@ describe('component data', function() {
     expect(idThree).toBe(2);
   });
 
-  it('restore component', function(){
+  it('restore component', function() {
     var id = componentData.addComponentModel({compData: 'comp-data'});
     expect(id).toBe(0);
     componentData.deleteComponent(0);
@@ -60,11 +68,11 @@ describe('component data', function() {
     assertComponent(restoredComp);
   });
 
-  it('allows component registration', function(){
+  it('allows component registration', function() {
     var id = componentData.addComponentModel({ compData: 'comp-data'});
     var result = null;
     var bridge = {
-      setDataAndSession: function(dataAndSession){
+      setDataAndSession: function(dataAndSession) {
         result = dataAndSession;
       }
     };
@@ -72,41 +80,41 @@ describe('component data', function() {
     expect(result).toEqual({data: { weight: 1, clean: true, compData: 'comp-data'}, session: {}});
   });
 
-  it('allows component updates', function(){
+  it('allows component updates', function() {
     var id = componentData.addComponentModel({ compData: 'comp-data'});
     var result = null;
     var bridge = {
-      setDataAndSession: function(dataAndSession){
+      setDataAndSession: function(dataAndSession) {
         result = dataAndSession;
       }
     };
     componentData.registerComponent(id, bridge);
     componentData.updateComponent(id, { clean: false, compData: 'new data'});
-    expect(result).toEqual({data: {clean: false, compData: 'new data'}, session : {}});
+    expect(result).toEqual({data: {clean: false, compData: 'new data'}, session: {}});
   });
 
-  var Bridge = function(){
+  var Bridge = function() {
     this.dataAndSession = null;
-    this.setDataAndSession = function(ds){
+    this.setDataAndSession = function(ds) {
       this.dataAndSession = ds;
     };
-    this.getSession = function(){
+    this.getSession = function() {
       return this.dataAndSession;
     };
   };
 
-  it('adds and removes the component from the register', function(){
+  it('adds and removes the component from the register', function() {
 
     var id = '1';
     var bridge = new Bridge();
-    
+
     componentData.setModel({ 1: {}});
     componentData.registerComponent(id, bridge);
     expect(_.keys(register.getSessions()).length).toEqual(1);
-    
+
     componentData.deleteComponent(id);
     expect(_.keys(register.getSessions()).length).toEqual(0);
-    
+
     componentData.restoreComponent(id);
     componentData.registerComponent(id, bridge);
     expect(_.keys(register.getSessions()).length).toEqual(1);
