@@ -59,6 +59,13 @@
             debouncedUpdateComponents();
           }, true);
 
+
+          var xhtmlChange = function(c, prev) {
+            $scope.slowXhtml = c;
+          };
+
+          $scope.$watch('xhtml', _.debounce(xhtmlChange, 200, {leading: false, trailing: true}));
+
         };
 
         return {
@@ -74,7 +81,7 @@
             '<div>',
             '  <corespring-player',
             '    player-mode="mode"',
-            '    player-markup="xhtml"',
+            '    player-markup="slowXhtml"',
             '    player-item="item"',
             '    player-outcomes="outcome"',
             '    player-session="itemSession"></corespring-player>',
