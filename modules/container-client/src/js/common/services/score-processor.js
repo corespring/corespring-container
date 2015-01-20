@@ -8,10 +8,20 @@
 
   var ScoreProcessor = function() {
 
+    var weightForComponent = function(component) {
+      var weight = _.isUndefined(component.weight) ? 1 : component.weight;
+      var serverLogic = corespring.server.logic(component.componentType);
+      if (_.isFunction(serverLogic.isScoreable)) {
+        weight = serverLogic.isScoreable(component) ? weight : 0;
+      }
+
+      return weight;
+    };
+
     this.score = function(item, session, responses) {
 
       var maxPoints = _.reduce(item.components, function(result, component, key) {
-        var weight = _.isUndefined(component.weight) ? 1 : component.weight;
+        var weight = weightForComponent(component);
         if (_.isUndefined(component.weight)) {
           console.warn("no weight specified for component", component);
         }
@@ -48,7 +58,7 @@
         };
       }
 
-      var weight = _.isUndefined(comp.weight) ? 1 : comp.weight;
+      var weight = weightForComponent(comp);
 
       if (!comp.weight) {
         console.warn("no weight for comp", comp);

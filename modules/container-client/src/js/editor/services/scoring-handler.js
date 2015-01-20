@@ -10,13 +10,29 @@ angular.module('corespring-editor.services')
     function ScoringHandler(){
       this.scoring = function(components, xhtml, saveCallback) {
 
+        var isComponentScorable = function(component) {
+          var serverLogic = corespring.server.logic(component.componentType);
+          if (_.isFunction(serverLogic.isScoreable)) {
+            return serverLogic.isScoreable(component);
+          }
+          return true;
+        };
+
+        var weightForComponent = function(component) {
+          var weight = _.isUndefined(component.weight) ? 1 : component.weight;
+          weight = isComponentScorable(component) ? weight : 0;
+          return weight;
+        };
+
         var typeAndWeights = _.mapValues(components,
           function(v) {
             return {
               componentType: v.componentType,
-              weight: v.weight
+              weight: weightForComponent(v),
+              isScoreable: isComponentScorable(v)
             };
           }, this);
+
 
         var modalInstance = $modal.open({
           templateUrl: '/templates/popups/scoring',

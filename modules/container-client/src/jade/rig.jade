@@ -38,3 +38,11 @@ block after-main-script
         rootScope.$broadcast('playerControlPanel.submit');
       });
     };
+
+    window.reset = function() {
+      var scope = angular.element(document.getElementById('root')).scope();
+      var rootScope = scope.$root;
+      scope.$apply(function() {
+        rootScope.$broadcast('playerControlPanel.reset');
+      });
+    };

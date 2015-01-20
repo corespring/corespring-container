@@ -53,7 +53,7 @@
      * These values are accessible from here through the ConfigurationService.
      */
     $scope.formModels = {
-      additionalCopyrights: {
+      additionalMediaCopyrights: {
         visible:true,
         readonly:false,
         collapse:true
@@ -295,7 +295,7 @@
       applyConfig(profile.contributorDetails, "sourceUrl");
       applyConfig(profile.contributorDetails, "licenseType");
 
-      applyConfig(profile.contributorDetails, "additionalCopyrights");
+      applyConfig(profile.contributorDetails, "additionalCopyrights", 'additionalMediaCopyrights');
     }
 
     /**
@@ -534,18 +534,21 @@
     // subject and related subject
     //----------------------------------------------------------------
 
-    function Select2Adapter(topic, formatFunc, formModel) {
+    function SubjectSelect2Adapter(topic, formModel) {
 
-      this.formatResult = formatFunc;
-      this.formatSelection = formatFunc;
+      this.formatResult = subjectText;
+      this.formatSelection = subjectText;
 
       function filterSubjectsByConfig(subjects){
         var options = formModel.options;
         if(!_.isArray(options)){
           return subjects;
         }
+        options = _.map(options, fromSubjectText);
         return _.filter(subjects, function(item){
-          return -1 !== _.indexOf(options, item.category + ":" + item.subject);
+          return -1 !== _.findIndex(options, function(o){
+              return item && o && item.category === o.category && item.subject === o.subject;
+            });
         });
       }
 
@@ -562,7 +565,7 @@
       };
 
       this.initSelection = function(){
-        //keep this is to avoid exceptions in the single select
+        //keep this to avoid exceptions in the select
       };
     }
 
@@ -570,12 +573,19 @@
       return s.category + ": " + s.subject;
     }
 
-    $scope.primarySubjectSelect2Adapter = new Select2Adapter("subjects.primary", subjectText, $scope.formModels.primarySubject);
-    $scope.relatedSubjectSelect2Adapter = new Select2Adapter("subjects.related", subjectText, $scope.formModels.relatedSubject);
+    function fromSubjectText(categorySubject){
+      var parts = categorySubject.split(":");
+      return {
+        category:parts[0].trim(),
+        subject:parts.length >= 2 ? parts[1].trim() : ''
+      };
+    }
+
+    $scope.primarySubjectSelect2Adapter = new SubjectSelect2Adapter("subjects.primary", $scope.formModels.primarySubject);
+    $scope.relatedSubjectSelect2Adapter = new SubjectSelect2Adapter("subjects.related", $scope.formModels.relatedSubject);
 
     function findSubjectByCategorySubject(topic, categorySubject, callback){
-      var parts = categorySubject.split(":");
-      var query = {filters:{'category':parts[0],'subject':parts[1]}};
+      var query = {filters:fromSubjectText(categorySubject)};
       DataQueryService.query(
         topic,
         query,
@@ -585,7 +595,7 @@
     }
 
     /**
-     * The config is a category:subject string.
+     * The config is a category: subject string.
      */
     function configToPrimarySubject(categorySubject, callback){
       if(!_.isString(categorySubject)){
@@ -596,7 +606,7 @@
     }
 
     /**
-     * The config is a list of category:subject strings.
+     * The config is a list of category: subject strings.
      */
     function configToRelatedSubject(categorySubjectList, callback){
       if(!_.isArray(categorySubjectList)){

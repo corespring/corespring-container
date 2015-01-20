@@ -11,6 +11,7 @@ angular.module('corespring-editor.controllers')
     'ComponentPopups',
     'AppState',
     'ScoringHandler',
+    'MathJaxService',
     function($scope,
       $element,
       $timeout,
@@ -21,7 +22,8 @@ angular.module('corespring-editor.controllers')
       ComponentData,
       ComponentPopups,
       AppState,
-      ScoringHandler) {
+      ScoringHandler,
+      MathJaxService) {
 
       var configPanels = {};
 
@@ -69,9 +71,9 @@ angular.module('corespring-editor.controllers')
 
       $scope.$on('fileSizeGreaterThanMax', EditorConfig.onFileSizeGreaterThanMax);
 
-      $scope.$on('registerComponent', function(event, id, componentBridge) {
+      $scope.$on('registerComponent', function(event, id, componentBridge, componentElement) {
         logger.debug('registerComponent ', id);
-        ComponentData.registerComponent(id, componentBridge);
+        ComponentData.registerComponent(id, componentBridge, componentElement);
       });
 
       $scope.$on('registerPlaceholder', function(event, id, placeholder) {
@@ -157,9 +159,10 @@ angular.module('corespring-editor.controllers')
         });
       }
 
-      ItemService.load(function(item){
+      ItemService.load(function(item) {
         $scope.item = item;
         ComponentData.setModel(item.components);
+        MathJaxService.parseDomForMath(100);
       });
 
     }

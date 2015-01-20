@@ -1,5 +1,5 @@
 /** This is a port of DefaultOutcomeProcessor.scala */
-describe('score-processor', function(){
+describe('score-processor', function() {
 
   corespring.bootstrap(angular);
 
@@ -31,6 +31,27 @@ describe('score-processor', function(){
       }
     };
 
+    var actual = corespring.scoreProcessor.score(item, {}, responses);
+    expect(_.isEqual(actual, expected)).toBe(true);
+  });
+
+  it('should not score non-scoreable components', function() {
+    corespring.server.logic = function(type) {
+      return {
+        isScoreable: function() {
+          return type !== "line";
+        }
+      };
+    };
+    var item = {components: {"3": {componentType: "line", weight: 4}, "4": {weight: 5} } };
+    var responses = {"3": {score: 0.1}, "4": {score: 0.6} };
+    var expected = {
+      summary: { maxPoints: 5, points: 3, percentage: 60 },
+      components: {
+        "3": { weight: 0, score: 0.1, weightedScore: 0.0},
+        "4": { weight: 5, score: 0.6, weightedScore: 3.0}
+      }
+    };
     var actual = corespring.scoreProcessor.score(item, {}, responses);
     expect(_.isEqual(actual, expected)).toBe(true);
   });

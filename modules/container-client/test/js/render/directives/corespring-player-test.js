@@ -61,7 +61,6 @@ describe('corespring-player', function(){
 
     var elem = compile("<corespring-player player-item='item' player-session='session'></corespring-player>")(rootScope);
 
-
     rootScope.$digest();
 
     var expected = {

@@ -49,6 +49,9 @@
 
     // Register for hub signals
     MathJax.Hub.signal.Interest(onHubSignnal);
+    MathJax.Hub.Config({
+      showProcessingMessages: false
+    });
 
   };
 
