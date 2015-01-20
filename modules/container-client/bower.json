@@ -29,7 +29,7 @@
     "jquery.browser": "~0.0.6",
     "less-elements": "https://github.com/dmitryf/elements.git",
     "lodash": "~2.4.1",
-    "mathjax": "https://github.com/mathjax/MathJax.git",
+    "mathjax": "https://github.com/mathjax/MathJax.git#2.3.0",
     "mathjs": "~0.18.0",
     "saxjs": "https://github.com/corespring/sax-js.git#v0.6.0-corespring",
     "select2": "~3.4.5",
