@@ -1,6 +1,7 @@
 describe('questionInformation', function() {
 
   beforeEach(angular.mock.module('corespring-common.directives'));
+  beforeEach(angular.mock.module('corespring-templates'));
 
   var scope, element, mathJaxService;
 
@@ -50,8 +51,9 @@ describe('questionInformation', function() {
     };
     element = angular.element('<div question-information="" ng-model="model"></div>');
     $compile(element)(scope);
+
+    element.scope().$apply();
     scope = element.isolateScope();
-    scope.$apply();
   }));
 
   afterEach(resetMocks);
