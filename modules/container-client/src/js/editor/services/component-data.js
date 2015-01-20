@@ -2,7 +2,8 @@ angular.module('corespring-editor.services')
   .service('ComponentData', [
     'LogFactory',
     'ComponentRegister',
-    function(LogFactory, ComponentRegister) {
+    'MathJaxService',
+    function(LogFactory, ComponentRegister, MathJaxService) {
 
       var logger = LogFactory.getLogger('component-data');
 
@@ -11,6 +12,9 @@ angular.module('corespring-editor.services')
           removedComponentModels = {},
           placeholders = {},
           mockSession = {};
+
+        var elements = {};
+
 
         function getNextAvailableId(){
 
@@ -55,6 +59,9 @@ angular.module('corespring-editor.services')
           }
 
           ComponentRegister.setSingleDataAndSession(id, model, mockSession[id]);
+          if (elements[id]) {
+            MathJaxService.parseDomForMath(10, elements[id]);
+          }
         };
 
         this.setOutcomes = function(outcomes) {
@@ -74,10 +81,11 @@ angular.module('corespring-editor.services')
           placeholder.setComponent(componentModels[id]);
         };
 
-        this.registerComponent = function(id, bridge) {
+        this.registerComponent = function(id, bridge, element) {
           ComponentRegister.registerComponent(id, bridge);
           mockSession[id] = mockSession[id] || {};
           ComponentRegister.setSingleDataAndSession(id, componentModels[id], mockSession[id]);
+          elements[id] = element;
         };
 
         this.addComponent = function(d){
@@ -115,6 +123,7 @@ angular.module('corespring-editor.services')
 
           removedComponentModels[id] = _.cloneDeep(componentModels[id]);
           delete componentModels[id];
+          delete elements[id];
         };
 
         this.restoreComponent = function(id){

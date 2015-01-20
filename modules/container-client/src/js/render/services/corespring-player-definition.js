@@ -56,7 +56,7 @@ angular.module('corespring-player.services').factory('CorespringPlayerDefinition
             }
           });
 
-          MathJaxService.parseDomForMath();
+          MathJaxService.parseDomForMath(100, $('.player-body')[0]);
 
           if (_.isFunction(opts.postRender)) {
             opts.postRender($scope.lastScope, $body);
@@ -140,7 +140,7 @@ angular.module('corespring-player.services').factory('CorespringPlayerDefinition
             return;
           }
           ComponentRegister.setOutcomes(r);
-          MathJaxService.parseDomForMath();
+          MathJaxService.parseDomForMath(100, $('.player-body')[0]);
         }, true);
 
         if (_.isFunction(opts.postLink)) {
