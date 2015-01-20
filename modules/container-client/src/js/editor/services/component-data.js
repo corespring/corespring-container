@@ -121,6 +121,7 @@ angular.module('corespring-editor.services')
 
           removedComponentModels[id] = _.cloneDeep(componentModels[id]);
           delete componentModels[id];
+          delete elements[id];
         };
 
         this.restoreComponent = function(id){
