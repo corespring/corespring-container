@@ -2,7 +2,6 @@ package org.corespring.container.client.controllers.resources
 
 import org.corespring.container.client.HasContext
 import org.corespring.container.client.controllers.resources.Session.Errors
-import org.corespring.container.client.controllers.resources.session.ItemPruner
 import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.client.hooks._
 import org.corespring.container.components.outcome.ScoreProcessor
