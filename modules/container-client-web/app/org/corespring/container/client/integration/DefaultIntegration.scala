@@ -1,8 +1,10 @@
 package org.corespring.container.client.integration
 
+import grizzled.slf4j.Logger
 import org.corespring.container.client.V2PlayerConfig
 import org.corespring.container.client.component.ComponentUrls
 import org.corespring.container.client.controllers.apps._
+import org.corespring.container.client.controllers.resources.session.ItemPruner
 import org.corespring.container.client.controllers.resources.{ Item, Session }
 import org.corespring.container.client.controllers.{ ComponentsFileController, DataQuery, Icons, PlayerLauncher }
 import org.corespring.container.client.hooks._
@@ -44,6 +46,16 @@ trait DefaultIntegration
   }
 
   implicit def ec: ExecutionContext
+
+  protected val internalProcessor: PlayerItemPreProcessor = new PlayerItemPreProcessor with ItemPruner {
+
+    override def preProcessItemForPlayer(item: JsValue): JsValue = {
+      val compProcessed = playerItemPreProcessor.preProcessItemForPlayer(item)
+      pruneItem(compProcessed)
+    }
+
+    override def logger: Logger = DefaultIntegration.this.logger
+  }
 
   override def playerItemPreProcessor: PlayerItemPreProcessor = new RhinoPlayerItemPreProcessor(DefaultIntegration.this.components, scopeBuilder.scope)
 
@@ -151,7 +163,7 @@ trait DefaultIntegration
 
     override def resolveDomain(path: String): String = DefaultIntegration.this.resolveDomain(path)
 
-    override def itemPreProcessor: PlayerItemPreProcessor = DefaultIntegration.this.playerItemPreProcessor
+    override def itemPreProcessor: PlayerItemPreProcessor = DefaultIntegration.this.internalProcessor
   }
 
   lazy val item = new Item {
@@ -170,7 +182,7 @@ trait DefaultIntegration
 
     def outcomeProcessor = DefaultIntegration.this.outcomeProcessor
 
-    def itemPreProcessor: PlayerItemPreProcessor = DefaultIntegration.this.playerItemPreProcessor
+    def itemPreProcessor: PlayerItemPreProcessor = DefaultIntegration.this.internalProcessor
 
     def scoreProcessor: ScoreProcessor = DefaultIntegration.this.scoreProcessor
   }
