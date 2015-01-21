@@ -1,5 +1,6 @@
 package org.corespring.container.client.controllers.apps
 
+import org.corespring.container.client.VersionInfo
 import org.corespring.container.client.component.AllItemTypesReader
 import org.corespring.container.client.controllers.helpers.JsonHelper
 import org.corespring.container.client.controllers.jade.Jade
@@ -73,7 +74,8 @@ trait Editor
           domainResolvedJs,
           domainResolvedCss,
           jsSrc.ngModules ++ scriptInfo.ngDependencies,
-          servicesJs(itemId))))
+          servicesJs(itemId),
+          VersionInfo.json)))
     }
 
     hooks.loadItem(itemId).map { e => e.fold(onError, onItem) }
