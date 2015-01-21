@@ -20,7 +20,7 @@ object Session {
   }
 }
 
-trait Session extends Controller with ItemPruner with HasContext {
+trait Session extends Controller with HasContext {
 
   val logger = ContainerLogger.getLogger("Session")
 
@@ -92,15 +92,12 @@ trait Session extends Controller with ItemPruner with HasContext {
 
       val itemJson = (json \ "item").as[JsObject]
 
-      //Note: We must run the itemProcessor with the complete data model as it depends on it.
       val processedItem = itemPreProcessor.preProcessItemForPlayer(itemJson)
 
-      //Note: we can now run the regular prune ...
-      val prunedItem = pruneItem(processedItem)
       val sessionJson = (json \ "session").as[JsObject]
 
       val base = Json.obj(
-        "item" -> prunedItem,
+        "item" -> processedItem,
         "session" -> sessionJson)
 
       Ok(base)
