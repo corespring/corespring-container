@@ -35,6 +35,15 @@ angular.module('corespring-player.services').factory('CorespringPlayerDefinition
 
       var link = function($scope, $elem) {
 
+        $scope.domId = (function() {
+          var prefix = 'player-body-';
+          var idx = 0;
+          while ($('body').find('#' + prefix + idx).length !== 0) {
+            idx++;
+          }
+          return prefix + idx;
+        })();
+
         var rendered = false;
 
         var renderMarkup = function(xhtml) {
@@ -160,7 +169,7 @@ angular.module('corespring-player.services').factory('CorespringPlayerDefinition
       };
       this.template = [
         '<div class="corespring-player">',
-        '  <div class="player-body hidden-player-body"></div>',
+        '  <div class="player-body hidden-player-body" id="{{domId}}"></div>',
         '</div>'
       ].join("\n");
     }

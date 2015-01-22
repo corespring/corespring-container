@@ -33,8 +33,12 @@
         return [key, scoreForComponent(value, responses[key])];
       }).zipObject().value();
 
+      function isNumber(x){
+        return !_.isNaN(x) && _.isNumber(x);
+      }
+
       var points = _.reduce(componentScores, function(result, value, key) {
-        return result + value.weightedScore;
+        return result + (isNumber(value.weightedScore) ? value.weightedScore : 0 );
       }, 0);
 
       var percentage = Math.round(points / maxPoints * 1000) / 10;

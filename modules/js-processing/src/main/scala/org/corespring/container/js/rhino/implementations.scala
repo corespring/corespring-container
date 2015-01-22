@@ -52,7 +52,7 @@ trait CustomScoringJs
   }
 
   def process(item: JsValue, answers: JsValue): JsValue = {
-    val result = withJsContext[JsValue](rootJs) {
+    val result = withJsContext[JsValue](libs) {
       (ctx: Context, scope: Scriptable) =>
         implicit val rootScope = scope
         implicit val rootContext = ctx
