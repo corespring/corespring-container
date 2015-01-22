@@ -4,10 +4,6 @@ describe('MessageBridge', function() {
 
   beforeEach(angular.mock.module('corespring-common.services'));
 
-  beforeEach(function() {
-
-  });
-
   beforeEach(inject(function(MessageBridge) {
     messageBridge = MessageBridge;
   }));
