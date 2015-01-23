@@ -9,7 +9,7 @@ import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
 import play.api.Mode
 import play.api.Mode.Mode
-import play.api.libs.json.JsValue
+import play.api.libs.json.{ Json, JsObject, JsValue }
 import play.api.mvc.RequestHeader
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -21,6 +21,9 @@ class EditorTest extends Specification with Mockito {
   class editorScope(val hookResponse: Either[StatusMessage, JsValue]) extends Scope {
 
     val editor = new Editor {
+
+      override def versionInfo: JsObject = Json.obj()
+
       override def hooks: EditorHooks = {
         val m = mock[EditorHooks]
         m.loadItem(anyString)(any[RequestHeader]) returns Future(hookResponse)

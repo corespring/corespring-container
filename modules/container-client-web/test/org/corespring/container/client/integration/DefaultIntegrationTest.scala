@@ -17,6 +17,8 @@ class DefaultIntegrationTest extends Specification with Mockito with PlaySpecifi
   def mkDefaultIntegration(json: JsObject) = {
     new DefaultIntegration {
 
+      override def versionInfo: JsObject = Json.obj()
+
       override implicit def ec: ExecutionContext = ExecutionContext.Implicits.global
 
       override def playerHooks: PlayerHooks = mock[PlayerHooks]
