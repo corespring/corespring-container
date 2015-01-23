@@ -1,6 +1,5 @@
 package org.corespring.container.client.controllers.apps
 
-import org.corespring.container.client.VersionInfo
 import org.corespring.container.client.component.AllItemTypesReader
 import org.corespring.container.client.controllers.helpers.JsonHelper
 import org.corespring.container.client.controllers.jade.Jade
@@ -20,6 +19,8 @@ trait Editor
   import org.corespring.container.client.controllers.resources.{ routes => resourceRoutes }
 
   override def context: String = "editor"
+
+  def versionInfo: JsObject
 
   private def toJson(ci: ComponentInfo): JsValue = {
     val tag = tagName(ci.id.org, ci.id.name)
@@ -75,7 +76,7 @@ trait Editor
           domainResolvedCss,
           jsSrc.ngModules ++ scriptInfo.ngDependencies,
           servicesJs(itemId),
-          VersionInfo.json)))
+          versionInfo)))
     }
 
     hooks.loadItem(itemId).map { e => e.fold(onError, onItem) }
