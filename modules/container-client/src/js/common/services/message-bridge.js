@@ -34,7 +34,6 @@
     * that IE only supports sending strings as message)
     */
    this.sendMessage = function(id, msg, disableStringify) {
-
      var target = (!id || id === "parent") ? getParent() : getIframe(id);
 
      if (target) {
