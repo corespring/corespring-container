@@ -33,7 +33,13 @@ case class EditorTemplateParams(appName: String,
   js: Seq[String],
   css: Seq[String],
   componentNgModules: Seq[String],
-  ngServiceLogic: String) extends TemplateParams
+  ngServiceLogic: String,
+  versionInfo: JsValue) extends TemplateParams {
+  override def toJadeParams = {
+    super.toJadeParams ++ Map(
+      "versionInfo" -> Json.stringify(versionInfo))
+  }
+}
 
 case class DevEditorTemplateParams(appName: String,
   js: Seq[String],
@@ -57,7 +63,7 @@ case class PlayerTemplateParams(
   showControls: Boolean,
   sessionJson: JsValue,
   versionInfo: JsValue,
-  useNewRelicRum : Boolean,
+  useNewRelicRum: Boolean,
   newRelicRumConfig: JsValue) extends TemplateParams {
   override def toJadeParams = {
     super.toJadeParams ++ Map(

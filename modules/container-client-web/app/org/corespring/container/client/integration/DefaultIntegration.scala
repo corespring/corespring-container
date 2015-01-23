@@ -19,7 +19,7 @@ import org.corespring.container.js.rhino.{ RhinoServerLogic, RhinoScopeBuilder, 
 import org.corespring.container.logging.ContainerLogger
 import play.api.Mode
 import play.api.Mode.Mode
-import play.api.libs.json.JsValue
+import play.api.libs.json.{ JsObject, JsValue }
 import play.api.{ Mode, Play }
 
 import scala.concurrent.ExecutionContext
@@ -30,6 +30,8 @@ trait DefaultIntegration
   with HasHooks
   with HasConfig
   with HasProcessors {
+
+  def versionInfo: JsObject
 
   /**
    * For a given resource path return a resolved path.
@@ -115,6 +117,9 @@ trait DefaultIntegration
   }
 
   lazy val editor = new Editor {
+
+    override def versionInfo: JsObject = DefaultIntegration.this.versionInfo
+
     override def mode: Mode = Play.current.mode
 
     override implicit def ec: ExecutionContext = DefaultIntegration.this.ec
@@ -149,6 +154,9 @@ trait DefaultIntegration
   }
 
   lazy val prodHtmlPlayer = new Player {
+
+    override def versionInfo: JsObject = DefaultIntegration.this.versionInfo
+
     override def mode: Mode = Play.current.mode
 
     override implicit def ec: ExecutionContext = DefaultIntegration.this.ec

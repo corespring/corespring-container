@@ -89,7 +89,7 @@ module.exports = (grunt) ->
         tasks: ['directive-templates']
       components:
         files: ['<%= common.components %>/**/*.less']
-        tasks: ['runComponentLess']
+        tasks: ['component-less']
 
     copy:
       less: copyConfig('less')
@@ -221,13 +221,14 @@ module.exports = (grunt) ->
   grunt.registerTask('write-config', '',writeConfig)
   grunt.registerTask('lcd', ['loadComponentDependencies'])
   grunt.registerTask('loadComponentDependencies', 'Load client side dependencies for the components', componentDependencies(grunt))
-  grunt.registerTask('run', ['mk-css', 'directive-templates','pathReporter', 'runComponentLess', 'watch'])
-  grunt.registerTask('mk-css', ['copy:less', 'less', 'runComponentLess'])
+  grunt.registerTask('run', ['mk-css', 'directive-templates','pathReporter', 'component-less', 'watch'])
+  grunt.registerTask('mk-css', ['copy:less', 'less', 'component-less'])
   grunt.registerTask('default', ['stage'])
   grunt.registerTask('test', ['lcd', 'prepPlayerLauncher', 'jasmine:unit'])
   grunt.registerTask('directive-templates', ['jade:directives', 'ngtemplates'])
   grunt.registerTask('stage', 'Work with the play stage task',
     ['mk-css',
+    'component-version-info'
     'directive-templates',
     'jshint',
     'uglify',
@@ -239,24 +240,37 @@ module.exports = (grunt) ->
     ['bower_clean',
     'shell:mathjax_rm_pngs',
     'shell:mathjax_rm_fonts'])
-
-  grunt.registerTask('runComponentLess', ->
-
-    cb = @async()
-
-    spawnConfig =
-      grunt: true
-      args: [ 'less' ]
-      opts:
-        cwd: common.components
-
-    spawnResultHandler = (err, result, code) ->
+  
+  ###
+  Result handler for spawned grunt tasks
+  ###
+  spawnResultHandler = (done) ->
+    (err, result, code) ->
       console.log result.stdout
       if err?
         console.log(result.stderr)
         grunt.fail.fatal(err)
+      done()
 
-      cb()
+  ###
+  Run a grunt task in the components folder
+  ###
+  runComponentGrunt = (cmd, done) ->
+    grunt.log.writeln('running `grunt ' + cmd + '` in this directory:', common.components)
+    config =
+      grunt: true
+      args: [cmd]
+      opts:
+        cwd: common.components
 
-    grunt.util.spawn( spawnConfig, spawnResultHandler )
-  )
+    grunt.util.spawn( config, spawnResultHandler(done) )
+
+  grunt.registerTask 'component-version-info', ->
+    done = @async()
+    runComponentGrunt('version-info', done)
+
+  grunt.registerTask 'component-less', ->
+    done = @async()
+    runComponentGrunt('less', done)
+
+
