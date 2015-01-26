@@ -2,8 +2,8 @@ describe('summaryFeedback', function() {
 
   var compile, scope, element;
 
-  beforeEach(angular.mock.module('corespring-common.directives'));
   beforeEach(angular.mock.module('corespring-templates'));
+  beforeEach(angular.mock.module('corespring-common.directives'));
 
   beforeEach(inject(function($rootScope, $compile) {
     scope = $rootScope.$new();
