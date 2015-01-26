@@ -9,6 +9,8 @@ angular.module('corespring-editor.controllers')
     'ComponentImageService',
     'ComponentData',
     'ComponentPopups',
+    'WiggiDialogLauncher',
+    'MainPopupTemplate',
     'AppState',
     'ScoringHandler',
     'MathJaxService',
@@ -21,6 +23,8 @@ angular.module('corespring-editor.controllers')
       ComponentImageService,
       ComponentData,
       ComponentPopups,
+      WiggiDialogLauncher,
+      MainPopupTemplate,
       AppState,
       ScoringHandler,
       MathJaxService) {
@@ -45,6 +49,12 @@ angular.module('corespring-editor.controllers')
         ScoringHandler.scoring($scope.item.components, $scope.item.xhtml, function(){
           saveComponents();
         });
+      };
+
+      $scope.dialogLauncher = function(){
+        return function($editorScope, applyUpdate){
+          return new WiggiDialogLauncher($editorScope, applyUpdate, MainPopupTemplate);
+        };
       };
 
       $scope.$on('edit-node', function($event, id, model, config){

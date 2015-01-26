@@ -8,10 +8,44 @@ angular.module('corespring-editor.services')
   ]);
 
 angular.module('corespring-editor.services')
+  .service('MainPopupTemplate', [function(){
+
+    function template(title, content, omitHeader, omitFooter) {
+
+      var header = [
+        '<div class="modal-header">',
+        '  <button class="close" type="button" ng-click="$dismiss()">',
+        '    <span>&times;</span>',
+        '    <span class="sr-only">Close</span>',
+        '  </button>',
+        '  <h4 class="modal-title">' + title + '</h4>',
+        '</div>'].join('\n');
+
+
+      var footer = [
+        '<div class="modal-footer right">',
+        ' <button class="btn btn-default" type="button" ng-click="$dismiss()">Done</button>',
+        '</div>'
+      ].join('\n');
+
+      return [
+        omitHeader ? '' : header,
+        '<div class="modal-body">',
+        content,
+        '</div>',
+        omitFooter ? '' : footer
+      ].join('\n');
+    }
+
+    return template;
+  }]);
+
+angular.module('corespring-editor.services')
   .service('ComponentPopups', [
     '$modal',
     'LogFactory',
-    function($modal, LogFactory) {
+    'MainPopupTemplate',
+    function($modal, LogFactory, mainTemplate) {
 
       var logger = LogFactory.getLogger('component-popups');
 
@@ -35,23 +69,12 @@ angular.module('corespring-editor.services')
           var tagName = model.componentType + '-config';
 
 
-          var content = [
-            '<div class="modal-header">',
-            '  <button class="close" type="button" ng-click="$dismiss()">',
-            '    <span>&times;</span>',
-            '    <span class="sr-only">Close</span>',
-            '  </button>',
-            '  <h4 class="modal-title">' + getTitle(config) + '</h4>',
-            '</div>',
-            '<div class="modal-body">',
-            '  <div class="config-panel-container" navigator="">',
+          var body =
+            ['  <div class="config-panel-container" navigator="">',
             '    ' + tag(tagName, {id: id}),
-            '  </div>',
-            '</div>',
-            '<div class="modal-footer right">',
-            ' <button class="btn btn-default" type="button" ng-click="$dismiss()">Done</button>',
-            '</div>'
-          ].join('\n');
+            '  </div>'].join('\n');
+
+          var content = mainTemplate(getTitle(), body);
 
           $scope.data = _.cloneDeep(config);
 
