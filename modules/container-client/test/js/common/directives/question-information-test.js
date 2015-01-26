@@ -7,6 +7,10 @@ describe('questionInformation', function() {
 
   var mockParseDomForMath = jasmine.createSpy('parseDomForMath');
 
+  var supportingName = "This is the name of the supporting material.";
+  var url = "http://supporting-material-url.com/";
+  var content = "This is the content of the supporting material.";
+
   function MockDataQueryService() {
     this.list = function() {};
   }
@@ -17,10 +21,10 @@ describe('questionInformation', function() {
 
   function MockSupportingMaterialsService() {
     this.getSupportingMaterialsByGroups = function() {};
-    this.getSupportingName = function() {};
+    this.getSupportingName = function() { return supportingName; };
     this.getContentType = function() {};
-    this.getSupportingUrl = function() {};
-    this.getContent = function() {};
+    this.getSupportingUrl = function() { return url; };
+    this.getContent = function() { return content; };
   }
 
   function MockMathJaxService() {
@@ -58,15 +62,58 @@ describe('questionInformation', function() {
 
   afterEach(resetMocks);
 
+  describe('selectTab', function() {
+    var tab = "this is a tab";
+
+    beforeEach(function() {
+      scope.activeSmIndex = "not undefined!";
+      scope.selectedSupportingMaterialContent = "not undefined!";
+      scope.selectTab(tab);
+    });
+
+    it('should set activeTab to provided tab', function() {
+      expect(scope.activeTab).toEqual(tab);
+    });
+
+    it('should set activeSmIndex to undefined', function() {
+      expect(scope.activeSmIndex).toBeUndefined();
+    });
+
+    it('should set selectedSupportingMaterialContent to undefined', function() {
+      expect(scope.selectedSupportingMaterialContent).toBeUndefined();
+    });
+
+  });
+
   describe('selectSupportingMaterial', function() {
     var index = 0;
 
     beforeEach(function() {
       scope.selectSupportingMaterial(index);
-    })
+    });
 
-    it('should call MathJaxService.parseDomForMath', function() {
-      expect(mathJaxService.parseDomForMath).toHaveBeenCalled();
+    it('should set activeTab to supportingMaterial', function() {
+      expect(scope.activeTab).toEqual('supportingMaterial');
+    });
+
+    it('should set activeSmIndex to provided index', function() {
+      expect(scope.activeSmIndex).toEqual(index);
+    });
+
+    it('should set selected supporting material name to value returned by SupportingMaterialsService', function() {
+      expect(scope.selectedSupportingMaterialName).toEqual(supportingName);
+    });
+
+    it('should set selected supporting material url to value returned by SupportingMaterialsService', function() {
+      expect(scope.selectedSupportingMaterialUrl).toEqual(url);
+    });
+
+    it('should set selected supporting material content to value returned by SupportingMaterialsService', function() {
+      expect(scope.selectedSupportingMaterialContent).toEqual(content);
+    });
+
+    it('should call MathJaxService.parseDomForMath with element', function() {
+      expect(mathJaxService.parseDomForMath).toHaveBeenCalledWith(100, element[0]);
     });
 
   });
