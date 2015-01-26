@@ -30,7 +30,6 @@ var controller = function(
   $scope.supportingUrl = $scope.getSupportingUrl();
   $scope.supportingMarkup = $scope.getSupportingMarkup();
   $scope.fileIndex = fileIndex();
-  log("fileIndex = " + $scope.fileIndex);
   $scope.getContentType = function() {
     return supportingMaterials() ?
       SupportingMaterialsService.getContentType(supportingMaterials(), $scope.index) : undefined;
@@ -40,7 +39,6 @@ var controller = function(
     $scope.supportingUrl = $scope.getSupportingUrl();
     $scope.supportingMarkup = $scope.getSupportingMarkup();
     $scope.fileIndex = fileIndex();
-    log("fileIndex = " + $scope.fileIndex);
     $scope.previewable = SupportingMaterialsService.previewable(supportingMaterials(), $scope.index);
   });
 
