@@ -21,7 +21,7 @@ mixin helper_icons
 include ../templates/popups
 include ../templates/question-information-popup
 
-nav.row.navbar-default(ng-controller="NavController")
+nav.row.navbar-default(ng-controller="NavController", revert-item="revertItem")
   ul.list-inline
     li.title(ng-click="editTitle()", ng-class="{'Untitled': 'placeholder'}[title]", ng-bind-html-unsafe="title") 
     li
