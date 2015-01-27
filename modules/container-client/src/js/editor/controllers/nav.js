@@ -20,14 +20,12 @@ angular.module('corespring-editor.controllers').controller('NavController', [
       return _.map(s.split('-'), _titleCaseWord).join('');
     }
 
-    function launchModal(name, size, backdrop, resolve, okFn, dismissFn){
-
+    function launchModal(name, size, backdrop, resolve, okFn, dismissFn) {
+      var titleCaseName = titleCase(name);
       size = size || 'sm';
       backdrop = backdrop !== undefined ? backdrop : 'static';
-      var titleCaseName = titleCase(name);
 
-      return function(){
-
+      return function() {
         var modalInstance = $modal.open({
           templateUrl: '/templates/popups/' + name,
           controller: titleCaseName + 'PopupController',
@@ -36,11 +34,11 @@ angular.module('corespring-editor.controllers').controller('NavController', [
           resolve: resolve
         });
 
-        okFn = okFn || function(){
+        okFn = okFn || function() {
           logger.debug('ok!', arguments);
         };
 
-        dismissFn  = dismissFn|| function(){
+        dismissFn  = dismissFn|| function() {
           logger.debug('Modal dismissed at: ' + new Date());
         };
 
@@ -48,45 +46,52 @@ angular.module('corespring-editor.controllers').controller('NavController', [
       };
     }
 
-    $scope.$watch('item.profile.taskInfo.title', function(newValue, oldValue){
-      if(newValue === undefined || newValue === ""){
+    $scope.$watch('item.profile.taskInfo.title', function(newValue) {
+      if (newValue === undefined || newValue === "") {
         $scope.title = 'Untitled';
       } else {
         $scope.title = newValue;
       }
     });
 
-    ItemService.load(
-      function onItemLoadSuccess(item){
-        $scope.item = item;
-      },
-      function onItemLoadError(err){
-        logger.error('error loading item', err);
-      });
+    ItemService.load(function onItemLoadSuccess(item) {
+      $scope.item = item;
+    },
+    function onItemLoadError(err){
+      logger.error('error loading item', err);
+    });
 
 
     $scope.open = launchModal('open');
+
     $scope.editTitle = launchModal('edit-title', 'sm', 'static', {
-      title : function(){ return $scope.item.profile.taskInfo.title; }
-    }, function(title){
+      title : function() {
+        return $scope.item.profile.taskInfo.title;
+      }
+    }, function(title) {
       $scope.item.profile.taskInfo.title = title;
       ItemService.saveProfile($scope.item.profile);
     });
+
     $scope.copy = launchModal('copy');
     $scope['new'] = launchModal('new');
     $scope.archive = launchModal('archive');
     $scope.delete = launchModal('delete');
+
     $scope.questionInformation = launchModal('question-information', 'lg', undefined, {
       item: function() {
         return $scope.item;
       }
     });
+
     $scope.help = launchModal('help', 'lg', false);
 
     $scope.saveStatus = null;
+
     $scope.handleSaveMessage = function(msg){
       $scope.saveStatus = msg;
     };
+
     ItemService.addSaveListener('nav', $scope);
   }
 ]);
