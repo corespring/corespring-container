@@ -4,7 +4,8 @@ angular.module('corespring-dev-editor.controllers')
     'ItemService',
     'ComponentData',
     '$timeout',
-    function($scope, ItemService, ComponentData, $timeout) {
+    '$log',
+    function($scope, ItemService, ComponentData, $timeout, $log) {
 
       $scope.onItemLoaded = function(item) {
         $scope.item = item;
@@ -18,30 +19,28 @@ angular.module('corespring-dev-editor.controllers')
         if($scope.xhtml !== $scope.item.xhtml) {
           $scope.item.xhtml = $scope.xhtml;
           ItemService.saveXhtml($scope.item.xhtml, function(){
-            console.log('xhtml saved');
+            $log.info('xhtml saved');
           });
         }
 
-        if(!_.isEqual($scope.item.components, $scope.components)){
+        if(!_.isEqual($scope.item.components, $scope.components)) {
           $scope.item.components  = $scope.components;
-          ItemService.saveComponents($scope.item.components, function(){
-            console.log('components saved');
+          ItemService.saveComponents($scope.item.components, function() {
+            $log.info('components saved');
           });
         }
       };
 
 
-      $scope.aceJsonChanged = function(){
-
-        try{
+      $scope.aceJsonChanged = function() {
+        try {
           var update = JSON.parse($scope.json);
           $scope.components = update;
-
-          $timeout(function(){
+          $timeout(function() {
             $scope.$digest();
           });
         } catch(e) {
-          console.warn('bad json', e);
+          $log.error('There was a problem parsing $scope.json', e);
         }
       };
 
