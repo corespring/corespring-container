@@ -27,7 +27,7 @@ angular.module('corespring-common.directives').directive('summaryFeedback', [
         '      </h4>',
         '    </div>',
         '    <div class="panel-body feedback-text" ng-show="isSummaryFeedbackOpen"',
-        '        ng-bind-html-unsafe="ngModel">',
+        '        ng-bind-html-unsafe="item.summaryFeedback">',
         '    </div>',
         '  </div>',
         '</div>'

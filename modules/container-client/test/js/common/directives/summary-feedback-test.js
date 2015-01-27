@@ -2,6 +2,7 @@ describe('summaryFeedback', function() {
 
   var compile, scope, element;
 
+  beforeEach(angular.mock.module('corespring-templates'));
   beforeEach(angular.mock.module('corespring-common.directives'));
 
   beforeEach(inject(function($rootScope, $compile) {
@@ -9,10 +10,10 @@ describe('summaryFeedback', function() {
     compile = function(opts) {
       scope.feedback = opts.feedback;
       scope.sessionComplete = opts.sessionComplete;
-      element = angular.element('<summary-feedback ng-model="feedback" session-complete="sessionComplete"></summary-feedback>');
+      element = angular.element('<div summary-feedback="" ng-model="feedback" session-complete="sessionComplete"></div>');
       $compile(element)(scope);
+      element.scope().$apply();
       scope = element.isolateScope();
-      scope.$apply();
     }
   }));
 
