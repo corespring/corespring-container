@@ -4,4 +4,6 @@ angular.module('corespring-editor.controllers').controller('HelpPopupController'
   '$modal',
   function($scope, LogFactory, $modal){
 
+    $scope.unimplemented = 'remove me when implemented!';
+
   }]);
