@@ -4,6 +4,7 @@ describe('additionalCopyrightInformationForProfile', function() {
 
   var DataQueryService = {};
 
+  beforeEach(angular.mock.module('corespring-templates'));
   beforeEach(angular.mock.module('corespring-editor.directives'));
 
   beforeEach(module(function($provide) {
