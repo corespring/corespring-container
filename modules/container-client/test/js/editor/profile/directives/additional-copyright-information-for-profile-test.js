@@ -2,7 +2,9 @@ describe('additionalCopyrightInformationForProfile', function() {
 
   var scope, element;
 
-  var DataQueryService = {};
+  var DataQueryService = {
+    list: jasmine.createSpy('list')
+  };
 
   beforeEach(angular.mock.module('corespring-templates'));
   beforeEach(angular.mock.module('corespring-editor.directives'));
