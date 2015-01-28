@@ -3,7 +3,7 @@ angular.module('corespring-editor.directives')
   'DataQueryService',
   function(DataQueryService) {
     return {
-      restrict: 'E',
+      restrict: 'AE',
       scope: {
         copyrights: '=',
         prompt: '@'
