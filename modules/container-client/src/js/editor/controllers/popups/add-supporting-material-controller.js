@@ -31,17 +31,14 @@ angular.module('corespring-editor.controllers').controller('AddSupportingMateria
     $scope.cancel = function(){
       $modalInstance.dismiss();
     };
-  }]).directive('filechange', function () {
-    var linker = function ($scope, element, attributes) {
-      element.bind('change', function (event) {
-        $scope.$emit('fileChange', $(element)[0].files[0]);
-        $scope.$apply();
-      });
-    };
-
+  }]).directive('filechange', function() {
     return {
       restrict: 'A',
-      link: linker
+      link: function($scope, element) {
+        element.bind('change', function() {
+          $scope.$emit('fileChange', $(element)[0].files[0]);
+          $scope.$apply();
+        });
+      }
     };
-
   });
