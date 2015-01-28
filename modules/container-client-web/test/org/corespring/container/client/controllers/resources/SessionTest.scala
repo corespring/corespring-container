@@ -9,10 +9,13 @@ import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import play.api.libs.json.{ JsValue, Json }
 import play.api.mvc._
-import play.api.test.{ FakeHeaders, FakeRequest }
+import play.api.test.{FakeApplication, FakeHeaders, FakeRequest, WithApplication}
 import play.api.test.Helpers._
 
+
 import scala.concurrent.{ ExecutionContext, Future }
+
+object mockGlobalS extends play.api.GlobalSettings
 
 class SessionTest extends Specification with Mockito {
 
@@ -120,7 +123,7 @@ class SessionTest extends Specification with Mockito {
 
   }
 
-  class ActionBody(mode: SecureMode) extends org.specs2.specification.Before {
+  class ActionBody(mode: SecureMode) extends WithApplication(FakeApplication(withGlobal = Some(mockGlobalS))) with org.specs2.specification.Before {
 
     val session = new Session {
       def outcomeProcessor: OutcomeProcessor = {
@@ -163,6 +166,15 @@ class SessionTest extends Specification with Mockito {
       Right(m.asInstanceOf[SaveSession])
     }
 
+    override def loadItemAndSessionSync(sessionId: String)(implicit header: RequestHeader): Either[(Int, String), FullSession] = ???
+
+    override def saveSync(id: String)(implicit header: RequestHeader): Either[(Int, String), SaveSession] = Right(m.asInstanceOf[SaveSession])
+
+    override def getScoreSync(id: String)(implicit header: RequestHeader): Either[(Int, String), SessionOutcome] = Right(m.asInstanceOf[SessionOutcome])
+
+    override def loadSync(id: String)(implicit header: RequestHeader): Either[(Int, String), JsValue] = ???
+
+    override def loadOutcomeSync(id: String)(implicit header: RequestHeader): Either[(Int, String), SessionOutcome] = Right(m.asInstanceOf[SessionOutcome])
   }
 
 }
