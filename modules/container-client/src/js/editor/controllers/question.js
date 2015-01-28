@@ -10,10 +10,10 @@ angular.module('corespring-editor.controllers')
     'ComponentData',
     'ComponentPopups',
     'WiggiDialogLauncher',
-    'MainPopupTemplate',
     'AppState',
     'ScoringHandler',
     'MathJaxService',
+    'WIGGI_EVENTS',
     function($scope,
       $element,
       $timeout,
@@ -24,10 +24,10 @@ angular.module('corespring-editor.controllers')
       ComponentData,
       ComponentPopups,
       WiggiDialogLauncher,
-      MainPopupTemplate,
       AppState,
       ScoringHandler,
-      MathJaxService) {
+      MathJaxService, 
+      WIGGI_EVENTS) {
 
       var configPanels = {};
 
@@ -51,11 +51,37 @@ angular.module('corespring-editor.controllers')
         });
       };
 
-      $scope.dialogLauncher = function(){
-        return function($editorScope, applyUpdate){
-          return new WiggiDialogLauncher($editorScope, applyUpdate, MainPopupTemplate);
-        };
-      };
+      function dialogTemplate(title, content){
+
+        var header = [
+          '<div class="modal-header">',
+          '  <button class="close" type="button" ng-click="cancel()">',
+          '    <span>&times;</span>',
+          '    <span class="sr-only">Close</span>',
+          '  </button>',
+          '  <h4 class="modal-title">' + title + '</h4>',
+          '</div>'].join('\n');
+
+        var footer = [
+          '<div class="modal-footer right">',
+          ' <button class="btn btn-default" type="button" ng-click="ok(data)">Done</button>',
+          '</div>'
+        ].join('\n');
+
+        return [
+        header, 
+        '<div class="modal-body">',
+        content,
+        '</div>',
+        footer
+        ].join('\n');
+      }
+
+      $scope.$on(WIGGI_EVENTS.LAUNCH_DIALOG, function($event, data, title, body, callback, scopeProps, options){
+        var dialog = new WiggiDialogLauncher($event.targetScope);
+        var content = dialogTemplate(title, body);
+        dialog.launch(data, content, callback, scopeProps, options);
+      });
 
       $scope.$on('edit-node', function($event, id, model, config){
         ComponentPopups.launch($scope, id, model, config);

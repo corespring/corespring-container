@@ -1,53 +1,36 @@
 angular.module('corespring-editor.services')
-  .controller(
-    'ComponentPopupController',
-    ['$scope',
-      function($scope){
-
-   }
-  ]);
-
-angular.module('corespring-editor.services')
-  .service('MainPopupTemplate', [function(){
-
-    function template(title, content, omitHeader, omitFooter) {
-
-      var header = [
-        '<div class="modal-header">',
-        '  <button class="close" type="button" ng-click="$dismiss()">',
-        '    <span>&times;</span>',
-        '    <span class="sr-only">Close</span>',
-        '  </button>',
-        '  <h4 class="modal-title">' + title + '</h4>',
-        '</div>'].join('\n');
-
-
-      var footer = [
-        '<div class="modal-footer right">',
-        ' <button class="btn btn-default" type="button" ng-click="$dismiss()">Done</button>',
-        '</div>'
-      ].join('\n');
-
-      return [
-        omitHeader ? '' : header,
-        '<div class="modal-body">',
-        content,
-        '</div>',
-        omitFooter ? '' : footer
-      ].join('\n');
-    }
-
-    return template;
-  }]);
-
-angular.module('corespring-editor.services')
   .service('ComponentPopups', [
     '$modal',
     'LogFactory',
-    'MainPopupTemplate',
-    function($modal, LogFactory, mainTemplate) {
+    function($modal, LogFactory) {
 
       var logger = LogFactory.getLogger('component-popups');
+
+      function componentTemplate(title, content){
+
+        var header = [
+          '<div class="modal-header">',
+          '  <button class="close" type="button" ng-click="$dismiss()">',
+          '    <span>&times;</span>',
+          '    <span class="sr-only">Close</span>',
+          '  </button>',
+          '  <h4 class="modal-title">' + title + '</h4>',
+          '</div>'].join('\n');
+
+        var footer = [
+          '<div class="modal-footer right">',
+          ' <button class="btn btn-default" type="button" ng-click="$dismiss()">Done</button>',
+          '</div>'
+        ].join('\n');
+
+        return [
+        header, 
+        '<div class="modal-body">',
+        content,
+        '</div>',
+        footer
+        ].join('\n');
+      }
 
       function ComponentPopups() {
 
@@ -74,14 +57,14 @@ angular.module('corespring-editor.services')
             '    ' + tag(tagName, {id: id}),
             '  </div>'].join('\n');
 
-          var content = mainTemplate(getTitle(), body);
+          var content = componentTemplate(getTitle(model), body);
 
           $scope.data = _.cloneDeep(config);
 
           var modalInstance = $modal.open({
             template: content,
             scope: $scope,
-            controller: 'ComponentPopupController',
+            controller: function(){},
             size: 'lg',
             backdrop: 'static',
             resolve: {

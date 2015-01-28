@@ -28,11 +28,13 @@ angular.module('corespring.wiggi-wiz-features.mathjax').factory('WiggiMathJaxFea
           '<mathjax-dialog ng-model="data.originalMarkup"></mathjax-dialog>',
           function onUpdate(update) {
             if(!update.cancelled) {
-              $scope.originalMarkup = update.originalMarkup
+              $scope.originalMarkup = update.originalMarkup;
               $scope.$emit('save-data');
               MathJaxService.parseDomForMath(100);
             }
-          }
+          },
+          {},
+          {featureName: this.name}
         );
       };
 
