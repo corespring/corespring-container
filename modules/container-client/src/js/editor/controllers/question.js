@@ -130,7 +130,6 @@ angular.module('corespring-editor.controllers')
       };
 
       $scope.$watch('item.components', debounce(function(newComps, oldComps) {
-        throw 'test';
         if(_.isEqual(newComps, oldComps)) {
           logger.debug('they are the same - ignore...');
           return;
