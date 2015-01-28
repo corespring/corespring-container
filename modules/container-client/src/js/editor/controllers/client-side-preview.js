@@ -45,7 +45,7 @@ angular.module('corespring-editor.controllers')
       ComponentData.setEditable(isGatherMode());
     }
 
-    function isGatherMode(){
+    function isGatherMode() {
       return $scope.playerMode === 'gather';
     }
 
@@ -72,20 +72,20 @@ angular.module('corespring-editor.controllers')
     function submitSession() {
       var sessions = ComponentData.getSessions();
       PlayerService.submitSession({
-          components: sessions
-        },
-        function (everything) {
-          $scope.responses = everything.responses;
-          $scope.session = everything.session;
-          $scope.outcome = everything.outcome;
-          $scope.score = everything.score;
-          $log.info("onSessionLoaded", everything, $scope.score);
-          setMode('evaluate');
-          ComponentData.setOutcomes(everything.outcome);
-        },
-        function (err) {
-          $log.error("submitSession failed", err);
-        });
+        components: sessions
+      },
+      function(everything) {
+        $scope.responses = everything.responses;
+        $scope.session = everything.session;
+        $scope.outcome = everything.outcome;
+        $scope.score = everything.score;
+        $log.info("onSessionLoaded", everything, $scope.score);
+        setMode('evaluate');
+        ComponentData.setOutcomes(everything.outcome);
+      },
+      function (err) {
+        $log.error("submitSession failed", err);
+      });
     }
 
 }]);

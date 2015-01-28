@@ -47,10 +47,8 @@ angular.module('corespring-editor.controllers')
         function deleteSupportingMaterial(index) {
           $scope.item.supportingMaterials.splice(index, 1);
 
-          ItemService.saveSupportingMaterials(
-              $scope.item.supportingMaterials,
-            function () {
-            },
+          ItemService.saveSupportingMaterials($scope.item.supportingMaterials,
+            function() {},
             $scope.onSaveError, $scope.itemId
           );
         }
@@ -66,7 +64,7 @@ angular.module('corespring-editor.controllers')
         }
       });
 
-      $scope.onItemLoadSuccess = function(item){
+      $scope.onItemLoadSuccess = function(item) {
         $scope.item = item;
         preprocessComponents(item);
         $scope.lastId = findLastId(item);
@@ -89,8 +87,7 @@ angular.module('corespring-editor.controllers')
       }
 
       if(isInIframe()) {
-
-        Msgr.on('initialise', function (data) {
+        Msgr.on('initialise', function(data) {
           $log.log('on initialise', data);
           ConfigurationService.setConfig(data);
           Msgr.send('rendered');
@@ -103,6 +100,7 @@ angular.module('corespring-editor.controllers')
       } else {
         ConfigurationService.setConfig({});
       }
+
 
     }
   ]
