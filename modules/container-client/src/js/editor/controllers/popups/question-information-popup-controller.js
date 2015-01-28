@@ -9,6 +9,4 @@ angular.module('corespring-editor.controllers').controller('QuestionInformationP
     $scope.activeTab = 'question';
     $scope.playerMode = "gather";
     $scope.supportingMaterials = SupportingMaterialsService.getSupportingMaterialsByGroups(item.supportingMaterials);
-
-
   }]);
