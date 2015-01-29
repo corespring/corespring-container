@@ -79,15 +79,15 @@ angular.module('corespring-editor.controllers')
 				}
 			});
 
+			function onLaunchDialog($event, data, title, body, callback, scopeProps, options) {
+				var dialog = new WiggiDialogLauncher($event.targetScope);
+				var header = options.omitHeader ? '' : null;
+				var footer = options.omitFooter ? '' : null;
+				var content = EditorDialogTemplate.generate(title, body, header, footer);
+				dialog.launch(data, content, callback, scopeProps, options);
+			}
 
-			$scope.$on(WIGGI_EVENTS.LAUNCH_DIALOG,
-				function($event, data, title, body, callback, scopeProps, options) {
-					var dialog = new WiggiDialogLauncher($event.targetScope);
-					var header = options.omitHeader ? '' : null;
-					var footer = options.omitFooter ? '' : null;
-					var content = EditorDialogTemplate.generate(title, body, header, footer);
-					dialog.launch(data, content, callback, scopeProps, options);
-				});
+			$scope.$on(WIGGI_EVENTS.LAUNCH_DIALOG, onLaunchDialog);
 
 			$scope.onItemLoadSuccess = function(item) {
 				$scope.item = item;

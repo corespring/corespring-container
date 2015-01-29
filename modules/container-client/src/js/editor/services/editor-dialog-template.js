@@ -23,10 +23,14 @@ angular.module('corespring-editor.services')
 				].join('\n');
 			};
 
+			function isNullOrUndefined(v){
+				return _.isNull(v) || _.isUndefined(v);
+			} 
+			
 			this.generate = function(title, content, header, footer) {
 
-				header = header || this.header(title);
-				footer = footer || this.footer();
+				header = isNullOrUndefined(header) ? this.header(title) : header;
+				footer = isNullOrUndefined(footer) ? this.footer() : footer;
 
 				return [
 					header,
