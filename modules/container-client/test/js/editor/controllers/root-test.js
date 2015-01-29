@@ -2,6 +2,7 @@ describe('Root', function() {
 
   var scope, element;
 
+  beforeEach(angular.mock.module('wiggi-wiz.constants'));
   beforeEach(angular.mock.module('corespring-editor.controllers'));
 
   var $state = {
@@ -28,6 +29,15 @@ describe('Root', function() {
     send: jasmine.createSpy('send')
   };
 
+  var WiggiDialogLauncher = {
+
+
+  };
+  var EditorDialogTemplate = {
+
+
+  };
+
   beforeEach(module(function($provide) {
     $provide.value('$state', $state);
     $provide.value('ComponentRegister', ComponentRegister);
@@ -35,6 +45,8 @@ describe('Root', function() {
     $provide.value('ItemService', ItemService);
     $provide.value('LogFactory', LogFactory);
     $provide.value('Msgr', Msgr);
+    $provide.value('WiggiDialogLauncher',  WiggiDialogLauncher);
+    $provide.value('EditorDialogTemplate', EditorDialogTemplate);
   }));
 
   afterEach(function() {
