@@ -5,25 +5,49 @@
       "title" : "Ordering Interaction Example"
     }
   },
-  "xhtml" : "<div><corespring-ordering id='1' /></div>",
+  "xhtml" : "<div><corespring-ordering id='1'></corespring-ordering><br/><corespring-ordering id='2'></corespring-ordering></div>",
   "components" : {
     "1" : {
       "componentType" : "corespring-ordering",
       "title": "Ordering Sample",
       "weight" : 1,
-      "correctResponse" : ["a", "g", "q", "s"],
+      "correctResponse" : ["a", "b", "c", "d"],
       "feedback" : [
       ],
       "model" : {
         "prompt": "What is the correct order of the letters below?",
         "config": {
+          "choiceAreaLayout": "horizontal",
+          "choiceAreaLabel": "Label",
           "shuffle": true
         },
         "choices": [
-          {"label": "Q", "value": "q"},
-          {"label": "A", "value": "a"},
-          {"label": "G", "value": "g"},
-          {"label": "S", "value": "s"}
+          {"label": "<img src='http://localhost/~mikl/i1.png' />", "id": "c"},
+          {"label": "<img src='http://localhost/~mikl/i2.png' />", "id": "a"},
+          {"label": "<img src='http://localhost/~mikl/i3.png' />", "id": "b"},
+          {"label": "<img src='http://localhost/~mikl/i4.png' />", "id": "d"},
+          {"label": "<img src='http://localhost/~mikl/i4.png' />", "id": "e"}
+        ]
+      }
+    },
+    "2" : {
+      "componentType" : "corespring-ordering",
+      "title": "Ordering Sample",
+      "weight" : 1,
+      "correctResponse" : ["a", "b", "c", "d"],
+      "feedback" : [
+      ],
+      "model" : {
+        "prompt": "What is the correct order of the letters below?",
+        "config": {
+          "choiceAreaLabel": "Label",
+          "shuffle": true
+        },
+        "choices": [
+          {"label": "A", "id": "a"},
+          {"label": "B", "id": "b"},
+          {"label": "C", "id": "c"},
+          {"label": "D", "id": "d"}
         ]
       }
     }
