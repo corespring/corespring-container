@@ -7,11 +7,6 @@ angular.module('corespring-player.controllers')
       'iFrameService',
        function($scope, $log, $timeout, Msgr, iFrameService) {
 
-        function isInIframe(){
-          /** note use != to support ie8 instead of !== */  
-          return top != window; // jshint ignore:line
-        }
-
         function getQueryParams() {
 
           var queryString = (window && window.location &&
