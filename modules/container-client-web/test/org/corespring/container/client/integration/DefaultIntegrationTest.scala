@@ -33,8 +33,7 @@ class DefaultIntegrationTest extends Specification with Mockito with PlaySpecifi
 
       override def sessionHooks: SessionHooks = {
         val m = mock[SessionHooks]
-        m.loadItemAndSession(anyString)(any[Request[AnyContent]]) returns Future(Right(FullSession(json, false)))
-        m.loadItemAndSessionSync(anyString)(any[Request[AnyContent]]) returns Right(FullSession(json, false))
+        m.loadItemAndSession(anyString)(any[Request[AnyContent]]) returns Right(FullSession(json, false))
       }
 
       override def itemHooks: ItemHooks = mock[ItemHooks]

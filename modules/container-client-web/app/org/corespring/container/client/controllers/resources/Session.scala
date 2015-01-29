@@ -86,7 +86,7 @@ trait Session extends Controller with HasContext {
   }
 
   def loadItemAndSession(sessionId: String) = Action { implicit request =>
-    val reponse = hooks.loadItemAndSessionSync(sessionId)
+    val reponse = hooks.loadItemAndSession(sessionId)
 
     reponse match {
       case Left(err) => err
@@ -151,7 +151,7 @@ trait Session extends Controller with HasContext {
    */
   def loadOutcome(id: String) = Action {
     implicit request => {
-      val reponse = hooks.loadOutcomeSync(id)
+      val reponse = hooks.loadOutcome(id)
 
       reponse match {
         case Left(err) => InternalServerError(err._2)
@@ -188,7 +188,7 @@ trait Session extends Controller with HasContext {
    * @return
    */
   def getScore(id: String) = Action { implicit request =>
-    val response = hooks.getScoreSync(id)
+    val response = hooks.getScore(id)
 
     response match {
       case Left(err) => InternalServerError(err._2)

@@ -40,21 +40,12 @@ trait SessionHooks extends ContainerSessionHooks {
     }
   }
 
-  override def getScore(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, SessionOutcome]] =
-    Future { handleSessionOutcome(id)(header) }
+  override def getScore(id: String)(implicit header: RequestHeader): Either[StatusMessage, SessionOutcome] = handleSessionOutcome(id)(header)
 
-  override def getScoreSync(id: String)(implicit header: RequestHeader): Either[StatusMessage, SessionOutcome] = handleSessionOutcome(id)(header)
-
-  override def loadOutcome(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, SessionOutcome]] =
-    Future { handleSessionOutcome(id)(header) }
-
-  override def loadOutcomeSync(id: String)(implicit header: RequestHeader): Either[StatusMessage, SessionOutcome] =
+  override def loadOutcome(id: String)(implicit header: RequestHeader): Either[StatusMessage, SessionOutcome] =
     handleSessionOutcome(id)(header)
 
-  override def loadItemAndSession(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, FullSession]] =
-    Future { loadItemAndSessionSync(id) }
-
-  override def loadItemAndSessionSync(id: String)(implicit header: RequestHeader):Either[StatusMessage, FullSession] = {
+  override def loadItemAndSession(id: String)(implicit header: RequestHeader):Either[StatusMessage, FullSession] = {
     val result = for {
       session <- sessionService.load(id)
       itemId <- (session \ "itemId").asOpt[String]
@@ -68,22 +59,14 @@ trait SessionHooks extends ContainerSessionHooks {
 
 
 
-  override def loadSync(id: String)(implicit header: RequestHeader): Either[StatusMessage, JsValue] =
+  override def load(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]] = Future {
     sessionService.load(id).map {
       json =>
         Right(json)
     }.getOrElse(Left(NOT_FOUND -> s"Can't find a session with id: $id"))
-
-
-  override def load(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]] = Future {
-    loadSync(id: String)
   }
 
   override def save(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, SaveSession]] = Future {
-    saveSync(id)
-  }
-
-  override def saveSync(id: String)(implicit header: RequestHeader): Either[StatusMessage, SaveSession] = {
     logger.debug(s"save session: $id")
     val result = for {
       session <- sessionService.load(id)

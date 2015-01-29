@@ -150,15 +150,10 @@ class SessionTest extends Specification with Mockito {
 
   class MockBuilder(m: SecureMode) extends SessionHooks {
 
-    override def loadItemAndSession(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, FullSession]] = ???
+    override def loadItemAndSession(id: String)(implicit header: RequestHeader): Either[StatusMessage, FullSession] = ???
 
-    override def getScore(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, SessionOutcome]] = Future {
+    override def getScore(id: String)(implicit header: RequestHeader): Either[StatusMessage, SessionOutcome] =
       Right(m.asInstanceOf[SessionOutcome])
-    }
-
-    override def loadOutcome(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, SessionOutcome]] = Future {
-      Right(m.asInstanceOf[SessionOutcome])
-    }
 
     override def load(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]] = ???
 
@@ -166,15 +161,7 @@ class SessionTest extends Specification with Mockito {
       Right(m.asInstanceOf[SaveSession])
     }
 
-    override def loadItemAndSessionSync(sessionId: String)(implicit header: RequestHeader): Either[(Int, String), FullSession] = ???
-
-    override def saveSync(id: String)(implicit header: RequestHeader): Either[(Int, String), SaveSession] = Right(m.asInstanceOf[SaveSession])
-
-    override def getScoreSync(id: String)(implicit header: RequestHeader): Either[(Int, String), SessionOutcome] = Right(m.asInstanceOf[SessionOutcome])
-
-    override def loadSync(id: String)(implicit header: RequestHeader): Either[(Int, String), JsValue] = ???
-
-    override def loadOutcomeSync(id: String)(implicit header: RequestHeader): Either[(Int, String), SessionOutcome] = Right(m.asInstanceOf[SessionOutcome])
+    override def loadOutcome(id: String)(implicit header: RequestHeader): Either[(Int, String), SessionOutcome] = Right(m.asInstanceOf[SessionOutcome])
   }
 
 }

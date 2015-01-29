@@ -53,25 +53,15 @@ trait ItemHooks extends HasContext {
 
 trait SessionHooks extends HasContext {
 
-  def loadItemAndSessionSync(sessionId: String)(implicit header: RequestHeader): Either[StatusMessage, FullSession]
+  def loadItemAndSession(sessionId: String)(implicit header: RequestHeader): Either[StatusMessage, FullSession]
 
-  def loadItemAndSession(sessionId: String)(implicit header: RequestHeader): Future[Either[StatusMessage, FullSession]]
+  def loadOutcome(id: String)(implicit header: RequestHeader): Either[StatusMessage, SessionOutcome]
+
+  def getScore(id: String)(implicit header: RequestHeader): Either[StatusMessage, SessionOutcome]
 
   def load(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]]
 
-  def loadSync(id: String)(implicit header: RequestHeader): Either[StatusMessage, JsValue]
-
-  def loadOutcome(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, SessionOutcome]]
-
-  def loadOutcomeSync(id: String)(implicit header: RequestHeader): Either[StatusMessage, SessionOutcome]
-
-  def getScore(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, SessionOutcome]]
-
-  def getScoreSync(id: String)(implicit header: RequestHeader): Either[StatusMessage, SessionOutcome]
-
   def save(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, SaveSession]]
-
-  def saveSync(id: String)(implicit header: RequestHeader): Either[StatusMessage, SaveSession]
 }
 
 trait PlayerLauncherHooks extends HasContext {
