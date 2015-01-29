@@ -1,6 +1,7 @@
 describe('Root', function() {
 
   var scope, element;
+  var iFrame = false;
 
   beforeEach(angular.mock.module('corespring-editor.controllers'));
 
@@ -23,6 +24,11 @@ describe('Root', function() {
       error: mockError
     })
   };
+  var iFrameService = {
+    isInIFrame: function() {
+      return iFrame;
+    }
+  };
   var Msgr = {
     on: jasmine.createSpy('on'),
     send: jasmine.createSpy('send')
@@ -34,6 +40,7 @@ describe('Root', function() {
     $provide.value('ConfigurationService', ConfigurationService);
     $provide.value('ItemService', ItemService);
     $provide.value('LogFactory', LogFactory);
+    $provide.value('iFrameService', iFrameService);
     $provide.value('Msgr', Msgr);
   }));
 
@@ -71,7 +78,7 @@ describe('Root', function() {
     describe('when in iframe', function() {
       var oldTop = top;
       beforeEach(inject(function($rootScope, $compile) {
-        top = {};
+        iFrame = true;
         render();
       }));
 
@@ -80,7 +87,7 @@ describe('Root', function() {
       });
 
       afterEach(function() {
-        top = oldTop;
+        iFrame = false;
       });
 
     });

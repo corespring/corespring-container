@@ -4,7 +4,8 @@ angular.module('corespring-player.controllers')
       '$log',
       '$timeout',
       'Msgr',
-       function($scope, $log, $timeout, Msgr) {
+      'iFrameService',
+       function($scope, $log, $timeout, Msgr, iFrameService) {
 
         function isInIframe(){
           /** note use != to support ie8 instead of !== */  
@@ -32,7 +33,7 @@ angular.module('corespring-player.controllers')
           return params;
         }
 
-        if (isInIframe()) {
+        if (iFrameService.isInIFrame()) {
           Msgr.on('*', function(eventName, data, done){
             $log.info("[Root.broadcastToChildren] " + eventName);
             $scope.$broadcast(eventName, data, done);
