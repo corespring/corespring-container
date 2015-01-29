@@ -1,6 +1,7 @@
 describe('Root', function() {
 
   var scope, element;
+  var iFrame = false;
 
   var mockOn = jasmine.createSpy('on');
   var mockSend = jasmine.createSpy('send');
@@ -9,6 +10,12 @@ describe('Root', function() {
     this.on = mockOn;
     this.send = mockSend;
   }
+
+  var iFrameService = {
+    isInIFrame: function() {
+      return iFrame;
+    }
+  };
 
   afterEach(function() {
     mockOn.calls.reset();
@@ -20,6 +27,7 @@ describe('Root', function() {
   beforeEach(module(function($provide) {
     $provide.value('$log', function() {});
     $provide.value('Msgr', new MockMsgr());
+    $provide.value('iFrameService', iFrameService);
   }));
 
   function init($rootScope, $compile) {
@@ -83,7 +91,7 @@ describe('Root', function() {
   describe('loaded in iframe', function() {
 
     beforeEach(inject(function($rootScope, $compile) {
-      top = {};
+      iFrame = true;
       init($rootScope, $compile);
     }));
 
@@ -130,6 +138,10 @@ describe('Root', function() {
         expect(mockSend).toHaveBeenCalledWith('rendered');
       });
 
+    });
+
+    afterEach(function() {
+      iFrame = false;
     });
 
   });

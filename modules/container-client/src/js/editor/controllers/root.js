@@ -6,6 +6,7 @@ angular.module('corespring-editor.controllers')
     'ConfigurationService',
     'ItemService',
     'LogFactory',
+    'iFrameService',
     'Msgr',
     'WiggiDialogLauncher',
     'EditorDialogTemplate',
@@ -17,6 +18,7 @@ angular.module('corespring-editor.controllers')
       ConfigurationService,
       ItemService,
       LogFactory,
+      iFrameService,
       Msgr,
       WiggiDialogLauncher,
       EditorDialogTemplate,
@@ -106,12 +108,7 @@ angular.module('corespring-editor.controllers')
       // startup
       //----------------------------------------------------------------
 
-      function isInIframe() {
-        /** note use != to support ie8 instead of !== */
-        return top != window; // jshint ignore:line
-      }
-
-      if (isInIframe()) {
+      if (iFrameService.isInIFrame()) {
         Msgr.on('initialise', function(data) {
           $log.log('on initialise', data);
           ConfigurationService.setConfig(data);
