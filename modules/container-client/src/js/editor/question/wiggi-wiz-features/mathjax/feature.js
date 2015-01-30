@@ -20,15 +20,21 @@ angular.module('corespring.wiggi-wiz-features.mathjax').factory('WiggiMathJaxFea
 
       this.editNode = function($node, $scope, editor) {
 
-        editor.showEditPane($scope,
+        editor.launchDialog(
+          {
+            originalMarkup: $scope.originalMarkup || ''
+          },
           'Edit the Math',
           '<mathjax-dialog ng-model="data.originalMarkup"></mathjax-dialog>',
-          function onUpdate() {},
-          null,
-          function onClose() {
-            $scope.$emit('save-data');
-            MathJaxService.parseDomForMath(100);
-          }
+          function onUpdate(update) {
+            if(!update.cancelled) {
+              $scope.originalMarkup = update.originalMarkup;
+              $scope.$emit('save-data');
+              MathJaxService.parseDomForMath(100);
+            }
+          },
+          {},
+          {featureName: this.name}
         );
       };
 

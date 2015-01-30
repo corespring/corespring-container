@@ -1,8 +1,9 @@
 describe('Root', function() {
 
-  var scope, element;
+  var scope, element, EVENTS;
   var iFrame = false;
 
+  beforeEach(angular.mock.module('wiggi-wiz.constants'));
   beforeEach(angular.mock.module('corespring-editor.controllers'));
 
   var $state = {
@@ -34,6 +35,21 @@ describe('Root', function() {
     send: jasmine.createSpy('send')
   };
 
+  var launcher = {
+    launch : jasmine.createSpy('launch')
+  };
+  
+  function WiggiDialogLauncher(){
+    return launcher;
+  }
+
+  var EditorDialogTemplate = {
+    generate: jasmine.createSpy('generate').and.callFake(function(){
+      return Array.prototype.slice.call(arguments);
+    })
+  };
+
+
   beforeEach(module(function($provide) {
     $provide.value('$state', $state);
     $provide.value('ComponentRegister', ComponentRegister);
@@ -42,6 +58,8 @@ describe('Root', function() {
     $provide.value('LogFactory', LogFactory);
     $provide.value('iFrameService', iFrameService);
     $provide.value('Msgr', Msgr);
+    $provide.value('WiggiDialogLauncher',  WiggiDialogLauncher);
+    $provide.value('EditorDialogTemplate', EditorDialogTemplate);
   }));
 
   afterEach(function() {
@@ -51,7 +69,7 @@ describe('Root', function() {
           mock[key].calls.reset();
         }
       });
-    })
+    });
   });
 
   function render() {
@@ -60,9 +78,10 @@ describe('Root', function() {
     scope = element.scope();
   }
 
-  beforeEach(inject(function($rootScope, $compile) {
+  beforeEach(inject(function($rootScope, $compile, WIGGI_EVENTS) {
     rootScope = $rootScope;
     compile = $compile;
+    EVENTS = WIGGI_EVENTS;
     render();
   }));
 
@@ -170,7 +189,7 @@ describe('Root', function() {
       item = { components:
         (function() {
           var comps = {};
-          comps[index] = {'componentType': componentType}
+          comps[index] = {'componentType': componentType};
           return comps;
         }())
       };
@@ -211,6 +230,40 @@ describe('Root', function() {
     it('should log error with provided message', function() {
       expect(mockError).toHaveBeenCalledWith(jasmine.any(String), message);
     });
+  });
+
+  describe('onLaunchDialog', function(){
+    
+    function assertCallToLaunch(opts, expectedContent){
+
+      function prnArray(){
+        return _.map(expectedContent, function(v){
+          if(v === ''){
+            return 'empty-string';
+          } else if (!v){
+            return 'undefined';
+          } else {
+            return v;
+          }
+        });
+      }
+
+      it('should call launch with content: [' + prnArray() + '] when omitHeader: ' + opts.omitHeader + ' and omitFooter: ' + opts.omitFooter, function(){
+        var data = {};
+        var title = 'title';
+        var content = 'content';
+        var cb = function(){};
+        var scopeProps = {};
+        scope.$emit(EVENTS.LAUNCH_DIALOG, data, title, content, cb, scopeProps, opts);
+        expect(launcher.launch)
+          .toHaveBeenCalledWith(data, expectedContent, cb, scopeProps, opts);
+      });
+    }
+
+    assertCallToLaunch({}, ['title', 'content', null, null]);
+    assertCallToLaunch({omitHeader: true}, ['title', 'content', '', null]);
+    assertCallToLaunch({omitFooter: true}, ['title', 'content', null, '']);
+    assertCallToLaunch({omitHeader: true, omitFooter: true }, ['title', 'content', '', '']);
   });
 
 });

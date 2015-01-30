@@ -8,15 +8,28 @@ angular.module('corespring-editor.controllers')
     'LogFactory',
     'iFrameService',
     'Msgr',
-    function ($scope, $state, ComponentRegister, ConfigurationService, ItemService, LogFactory, iFrameService, Msgr) {
+    'WiggiDialogLauncher',
+    'EditorDialogTemplate',
+    'WIGGI_EVENTS',
+    function(
+      $scope,
+      $state,
+      ComponentRegister,
+      ConfigurationService,
+      ItemService,
+      LogFactory,
+      iFrameService,
+      Msgr,
+      WiggiDialogLauncher,
+      EditorDialogTemplate,
+      WIGGI_EVENTS) {
 
       "use strict";
 
       var $log = LogFactory.getLogger('RootController');
-      $log.debug('Root');
 
       function preprocessComponents(item) {
-        _.each(item.components, function (c, key) {
+        _.each(item.components, function(c, key) {
           var serverLogic = corespring.server.logic(c.componentType);
           if (serverLogic.preprocess) {
             //TODO: This is part of a larger task to add preprocess to the container
@@ -26,9 +39,10 @@ angular.module('corespring-editor.controllers')
         });
       }
 
-      function findLastId(item){
+      function findLastId(item) {
         var max = 0;
-        $('<div>' + item.xhtml + '</div>').find('[id]').each(function (idx, element) {
+        $('<div>' + item.xhtml + '</div>').find('[id]').each(function(idx,
+          element) {
           var id = Number($(element).attr('id'));
           if (id > max) {
             max = id;
@@ -37,12 +51,14 @@ angular.module('corespring-editor.controllers')
         return max;
       }
 
-      $scope.$on('deleteSupportingMaterial', function (event, data) {
+      $scope.$on('deleteSupportingMaterial', function(event, data) {
 
-        function showFirstItem(){
+        function showFirstItem() {
           $state.transitionTo('supporting-materials', {
             index: 0
-          }, {reload: true});
+          }, {
+            reload: true
+          });
         }
 
         function deleteSupportingMaterial(index) {
@@ -65,6 +81,16 @@ angular.module('corespring-editor.controllers')
         }
       });
 
+      function onLaunchDialog($event, data, title, body, callback, scopeProps, options) {
+        var dialog = new WiggiDialogLauncher($event.targetScope);
+        var header = options.omitHeader ? '' : null;
+        var footer = options.omitFooter ? '' : null;
+        var content = EditorDialogTemplate.generate(title, body, header, footer);
+        dialog.launch(data, content, callback, scopeProps, options);
+      }
+
+      $scope.$on(WIGGI_EVENTS.LAUNCH_DIALOG, onLaunchDialog);
+
       $scope.onItemLoadSuccess = function(item) {
         $scope.item = item;
         preprocessComponents(item);
@@ -72,7 +98,7 @@ angular.module('corespring-editor.controllers')
         $scope.$broadcast('itemLoaded', item);
       };
 
-      $scope.onItemLoadError = function(err){
+      $scope.onItemLoadError = function(err) {
         $log.error('error loading', err);
       };
 
@@ -96,8 +122,5 @@ angular.module('corespring-editor.controllers')
       } else {
         ConfigurationService.setConfig({});
       }
-
-
     }
-  ]
-);
+  ]);

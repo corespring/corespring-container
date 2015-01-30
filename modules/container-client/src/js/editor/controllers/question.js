@@ -31,7 +31,7 @@ angular.module('corespring-editor.controllers')
 
       $scope.previewOn = AppState.question.preview || false;
 
-      $scope.$watch('previewOn', function(){
+      $scope.$watch('previewOn', function() {
         AppState.question.preview = $scope.previewOn;
       });
 
@@ -41,13 +41,14 @@ angular.module('corespring-editor.controllers')
         $scope.previewOn = !$scope.previewOn;
       };
 
-      $scope.scoring = function(){
-        ScoringHandler.scoring($scope.item.components, $scope.item.xhtml, function(){
-          saveComponents();
-        });
+      $scope.scoring = function() {
+        ScoringHandler.scoring($scope.item.components, $scope.item.xhtml,
+          function() {
+            saveComponents();
+          });
       };
 
-      $scope.$on('edit-node', function($event, id, model, config){
+      $scope.$on('edit-node', function($event, id, model, config) {
         ComponentPopups.launch($scope, id, model, config);
       });
 
@@ -70,7 +71,8 @@ angular.module('corespring-editor.controllers')
 
       $scope.$on('fileSizeGreaterThanMax', EditorConfig.onFileSizeGreaterThanMax);
 
-      $scope.$on('registerComponent', function(event, id, componentBridge, componentElement) {
+      $scope.$on('registerComponent', function(event, id, componentBridge,
+        componentElement) {
         logger.debug('registerComponent ', id);
         ComponentData.registerComponent(id, componentBridge, componentElement);
       });
@@ -130,7 +132,7 @@ angular.module('corespring-editor.controllers')
       };
 
       $scope.$watch('item.components', debounce(function(newComps, oldComps) {
-        if(_.isEqual(newComps, oldComps)) {
+        if (_.isEqual(newComps, oldComps)) {
           logger.debug('they are the same - ignore...');
           return;
         }
