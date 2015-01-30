@@ -51,7 +51,7 @@ trait CustomScoringJs
     obj.asInstanceOf[Scriptable]
   }
 
-  def process(item: JsValue, answers: JsValue): JsValue = {
+  def process(item: JsValue, answers: JsValue, computedOutcomes: JsValue): JsValue = {
     val result = withJsContext[JsValue](libs) {
       (ctx: Context, scope: Scriptable) =>
         implicit val rootScope = scope
@@ -59,7 +59,7 @@ trait CustomScoringJs
         ctx.evaluateString(scope, wrapped, s"customScoring.process", 1, null)
         val scoringObject = getScoringObject(ctx, scope)
         val processFn = scoringObject.get("process", scoringObject).asInstanceOf[RhinoFunction]
-        callJsFunctionJson(wrapped, processFn, scoringObject, Array(item, answers))
+        callJsFunctionJson(wrapped, processFn, scoringObject, Array(item, answers, computedOutcomes))
     }
 
     result match {

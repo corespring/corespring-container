@@ -19,7 +19,7 @@ object CustomScoreProcessor extends ScoreProcessor {
           def js: String = jsDef
         }
         try {
-          val result = jsModuleWrapper.process(item, session)
+          val result = jsModuleWrapper.process(item, session, outcomes)
           logger.trace(Json.stringify(result))
           result
         } catch {
