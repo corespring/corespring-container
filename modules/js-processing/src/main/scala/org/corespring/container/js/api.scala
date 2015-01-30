@@ -33,7 +33,7 @@ object api {
      * @param session
      * @return json : { score: 0.0 - 1.0 }
      */
-    def process(item: JsValue, session: JsValue): JsValue
+    def process(item: JsValue, session: JsValue, computedOutcomes : JsValue): JsValue
   }
 
   trait GetServerLogic {
