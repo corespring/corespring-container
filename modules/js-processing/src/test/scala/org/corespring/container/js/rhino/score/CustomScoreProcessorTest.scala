@@ -2,6 +2,7 @@ package org.corespring.container.js.rhino.score
 
 import org.apache.commons.lang3.StringEscapeUtils
 import org.specs2.mutable.Specification
+import org.specs2.specification.Scope
 import play.api.libs.json.{ JsValue, Json }
 
 class CustomScoreProcessorTest extends Specification {
@@ -10,43 +11,36 @@ class CustomScoreProcessorTest extends Specification {
 
   "Custom Scoring" should {
 
-    val js =
+    val errorJs =
       """
-        exports.process = function(item, session){
+        exports.process = function(item, session, computedOutcomes){
+          throw new Error("Error!");
+        };
+      """
+
+    val okJs =
+      """
+        exports.process = function(item, session, computedOutcomes){
           return {
-            summary : {
-              score : 0.39
+            summary: {
+              score: 1.0
             }
           }
         };
       """
-    val item =
-      s"""{
-          "customScoring" : "${escapeEcmaScript(js)}",
-          "components" : {
-            "1" : {
-              "componentType" : "corespring-multiple-choice",
-              "correctResponse" : { "value" : ["2"] },
-              "model" : {
-                "prompt": "What is 1 + 1?",
-                "choices": [
-                  {"label": "1", "value": "1"},
-                  {"label": "2", "value": "2"},
-                  {"label": "3", "value": "3"},
-                  {"label": "4", "value": "4"}
-                ]
-              }
-            }
-          }
-         }"""
 
-    val session = """{}"""
+    "returns an empty object if there is no customScoring" in {
+      CustomScoreProcessor.score(Json.obj(), Json.obj(), Json.obj()) === Json.obj()
+    }
 
-    implicit def stringToJsValue(s: String): JsValue = Json.parse(s)
+    "returns an empty object if there is is an error with customScoring" in {
+      val item = Json.obj("customScoring" -> errorJs)
+      CustomScoreProcessor.score(item, Json.obj(), Json.obj()) === Json.obj()
+    }
 
-    "process using the js defined by the item" in {
-      val out = CustomScoreProcessor.score(item, session, Json.obj())
-      (out \ "summary" \ "score").asOpt[Double] === Some(0.39)
+    "returns a result from the js function" in {
+      val item = Json.obj("customScoring" -> okJs)
+      CustomScoreProcessor.score(item, Json.obj(), Json.obj()) === Json.obj("summary" -> Json.obj("score" -> 1.0))
     }
   }
 
