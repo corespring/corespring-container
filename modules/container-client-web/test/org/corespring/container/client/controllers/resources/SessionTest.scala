@@ -84,6 +84,14 @@ class SessionTest extends Specification with Mockito {
       }
     }
 
+    "when loading session and item" should {
+
+      "not allow load loadItemAndSession when session is complete, but there are no answers" in new ActionBody(outcome(isComplete = true)) {
+        val result = session.loadItemAndSession("id")(FakeRequest())
+        status(result) === BAD_REQUEST
+      }
+    }
+
     "not allow to reset session" in new ActionBody(saveSession(true)) {
       val result = session.resetSession("id")(FakeRequest())
       status(result) === BAD_REQUEST
@@ -150,7 +158,7 @@ class SessionTest extends Specification with Mockito {
 
   class MockBuilder(m: SecureMode) extends SessionHooks {
 
-    override def loadItemAndSession(id: String)(implicit header: RequestHeader): Either[StatusMessage, FullSession] = ???
+    override def loadItemAndSession(id: String)(implicit header: RequestHeader): Either[StatusMessage, FullSession] = Right(m.asInstanceOf[FullSession])
 
     override def getScore(id: String)(implicit header: RequestHeader): Either[StatusMessage, SessionOutcome] =
       Right(m.asInstanceOf[SessionOutcome])
