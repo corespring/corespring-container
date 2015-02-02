@@ -55,7 +55,6 @@ script(type="text/ng-template", id="/templates/question")
             h4.panel-title
               a(ng-click="showSummaryFeedback = !showSummaryFeedback")
                 | Add Feedback (optional)
-                i.fa.fa-comment-o
           .panel-body(collapse="!showSummaryFeedback")
             div(mini-wiggi-wiz="", 
               ng-model='item.summaryFeedback', 
