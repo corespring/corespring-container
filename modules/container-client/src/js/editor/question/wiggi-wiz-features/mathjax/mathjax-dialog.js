@@ -59,7 +59,7 @@ angular.module('corespring.wiggi-wiz-features.mathjax').directive('mathjaxDialog
         renderPreview(prepped);
       }
 
-      ngModel.$render = updateUI;//_.debounce(updateUI, {leading: false, trailing: true});
+      ngModel.$render = updateUI;
 
       function wrapMath(text, mathType) {
 
