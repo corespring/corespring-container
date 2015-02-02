@@ -3,7 +3,8 @@ angular.module('corespring.wiggi-wiz-features.mathjax').directive('mathjaxDialog
   '$log',
   '$timeout',
   'MathFormatUtils',
-  function($log, $timeout, MathFormatUtils) {
+  'MathJaxService',
+  function($log, $timeout, MathFormatUtils, MathJaxService) {
 
     var log = $log.debug.bind($log, '[mathjax-dialog]');
 
@@ -47,7 +48,8 @@ angular.module('corespring.wiggi-wiz-features.mathjax').directive('mathjaxDialog
       var renderPreview = _.debounce(function(math){
           log('renderPreview');
           $element.find('.preview-body').html(math);
-          MathJax.Hub.Queue(['Typeset', MathJax.Hub, $element.find('.preview-body')[0]]);
+          var $math = $element.find('.preview-body');
+          MathJaxService.parseDomForMath(0, $math);
         }, 200, {leading: false, trailing: true});
 
       function updateModel() {

@@ -35,6 +35,6 @@ describe('expander', function() {
     it('should render title', function() {
       expect(element.html()).toBe(title);
     });
-  })
+  });
 
 });
