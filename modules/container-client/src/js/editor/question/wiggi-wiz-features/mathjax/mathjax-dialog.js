@@ -97,29 +97,7 @@ angular.module('corespring.wiggi-wiz-features.mathjax').directive('mathjaxDialog
       link: link,
       require: 'ngModel',
       replace: true,
-      template: [
-        '<div class="mathjax-dialog-root">',
-        '  <div class="header">',
-        '    <div class="mj-dialog-content">' + content + '</div>',
-        '  </div>',
-        '  <div class="mj-math-type" ng-show="showDisplayMode()">',
-        '    <form  class="form-inline">Display mode for {{mathType}}:',
-        '      <span ng-show="mathType == \'LaTex\'"  class="display-type">',
-        radio('inline', 'Inline', 'displayType'),
-        radio('block', 'Block', 'displayType'),
-        '      </span>',
-        '      <span ng-show="mathType == \'MathML\'" class="display-type">',
-        '        Block',
-        '      </span>',
-        '    </form>',
-        '  </div>',
-        '  <div class="math-preview">',
-        '     <div class="preview-label">Preview</div>',
-        '     <div class="preview-body"></div>',
-        '  </div>',
-        '  <textarea class="math-textarea" ng-model="preppedMath" placeholder="Enter MathML or LaTex here..."></textarea>',
-        '</div>'
-      ].join('\n')
+      templateUrl: '/editor/question/wiggi-wiz-features/mathjax/mathjax-dialog.html',
     };
   }
 ]);

@@ -2,16 +2,32 @@
 @light-grey: #e4e4e4;
 @header-height: 80px;
 @sub-header-height: 30px;
-@preview-min-height: 80px;
+@preview-min-width: 160px;
 
+.modal.mathjax{
 
-.abs-full(@left: 0, @right: 0, @top: 0, @bottom: 0) {
-  position: absolute;
-  left: @left;
-  top: @top;
-  right: @right;
-  bottom: @bottom;
+  .modal-content{
+    min-height: 500px;
+    min-width: 433px;
+  }
+
+  .modal-body{
+    position: absolute;
+    left: 0;
+    top: 54px;
+    bottom: 153px;
+    right: 0;
+    padding: 0;
+  }
+
+  .modal-footer{
+    position: absolute;
+    bottom: 0px;
+    left: 0;
+    right: 0;
+  }
 }
+
 
 .math-sum {
   font-family: serif;
@@ -49,6 +65,10 @@
 .mathjax-dialog-root {
   display: flex;
   flex-direction: column;
+  position: absolute;
+  top: 0px;
+  bottom: 119px;
+
 
   .header {
     padding: 8px;
@@ -56,12 +76,23 @@
     border-left: none;
     border-bottom: solid 1px darken(@light-grey, 15%);
     font-size: 14px;
+    padding-bottom: 20px;
+  }
+
+  .main{
+    display: inherit;
+    border-bottom: solid 1px darken(@light-grey, 15%);
+    height: 100%;
   }
 
   .mj-math-type {
     padding: 8px;
     background-color: darken(@light-grey, 7%);
     border-bottom: solid 1px darken(@light-grey, 15%);
+
+    .display-type{
+      margin-left: 10px;
+    }
   }
 
   .mj-dialog-content {
@@ -73,10 +104,10 @@
 
   .math-preview {
     background-color: @light-grey;
-    min-height: @preview-min-height;
-    border-bottom: solid 1px darken(@light-grey, 15%);
+    overflow-x: auto;
     text-align: center;
     padding: 8px;
+    min-width: @preview-min-width;
 
     .preview-label {
       text-transform: uppercase;
