@@ -44,11 +44,11 @@ angular.module('corespring.wiggi-wiz-features.mathjax').directive('mathjaxDialog
         renderPreview(ngModel.$viewValue);
       }
 
-      function renderPreview(math) {
-        log('renderPreview');
-        $element.find('.preview-body').html(math);
-        MathJax.Hub.Queue(['Typeset', MathJax.Hub, $element.find('.preview-body')[0]]);
-      }
+      var renderPreview = _.debounce(function(math){
+          log('renderPreview');
+          $element.find('.preview-body').html(math);
+          MathJax.Hub.Queue(['Typeset', MathJax.Hub, $element.find('.preview-body')[0]]);
+        }, 200, {leading: false, trailing: true});
 
       function updateModel() {
         log('updateModel');
@@ -59,7 +59,7 @@ angular.module('corespring.wiggi-wiz-features.mathjax').directive('mathjaxDialog
         renderPreview(prepped);
       }
 
-      ngModel.$render = updateUI;
+      ngModel.$render = updateUI;//_.debounce(updateUI, {leading: false, trailing: true});
 
       function wrapMath(text, mathType) {
 
