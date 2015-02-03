@@ -85,7 +85,7 @@ module.exports = (grunt) ->
       jade: watchConfig('jade', ['copy:jade'])
       less: watchConfig('less', ['copy:less', 'less:dev'])
       directives:
-        files: ['<%= common.app %>/**/directives/*.jade']
+        files: ['<%= common.app %>/**/*.jade']
         tasks: ['directive-templates']
       components:
         files: ['<%= common.components %>/**/*.less']
@@ -156,7 +156,7 @@ module.exports = (grunt) ->
     jade:
       directives:
         cwd: '<%= common.app %>'
-        src:  '**/directives/**.jade'
+        src:  ['**/directives/**.jade', '**/wiggi-wiz-features/**/*.jade']
         dest: '<%= common.dist %>'
         ext: '.html'
         expand: true
@@ -165,7 +165,7 @@ module.exports = (grunt) ->
       all:
         cwd: '<%= common.dist %>'
         dest: '<%= common.dist %>'
-        src:  'js/**/directives/**.html'
+        src:  ['js/**/directives/**.html', 'js/**/wiggi-wiz-features/**/*.html']
         options:
           module: 'corespring-templates'
           url: (u) -> u.replace( common.dist + '/js', '')
