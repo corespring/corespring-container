@@ -31,6 +31,11 @@ describe('mathjax-dialog', function(){
   }));
 
   beforeEach(inject(function($rootScope, $compile, MathFormatUtils) {
+
+    spyOn(_, 'debounce').and.callFake(function(fn){
+      return fn;
+    });
+
     formatUtils = MathFormatUtils;
     spyOn(formatUtils, 'getMathInfo').and.callThrough();
     parentScope = $rootScope.$new();
@@ -38,6 +43,7 @@ describe('mathjax-dialog', function(){
     $compile(element)(parentScope);
     scope = element.scope();
     scope.$apply();
+
   }));
 
   it('compiles', function() {
@@ -46,12 +52,10 @@ describe('mathjax-dialog', function(){
   });
 
   function assertMathJaxServiceCalled(done, html){
-    setTimeout(function(){
-      expect(MathJaxService.parseDomForMath).toHaveBeenCalled();
-      var args = MathJaxService.parseDomForMath.calls.mostRecent().args;
-      expect(args[1].innerHTML).toEqual(html);
-      done();
-    }, 300);
+    expect(MathJaxService.parseDomForMath).toHaveBeenCalled();
+    var args = MathJaxService.parseDomForMath.calls.mostRecent().args;
+    expect(args[1].innerHTML).toEqual(html);
+    done();
   }
 
   describe('user update', function(){
