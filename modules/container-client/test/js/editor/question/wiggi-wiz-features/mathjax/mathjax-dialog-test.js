@@ -49,7 +49,7 @@ describe('mathjax-dialog', function(){
     setTimeout(function(){
       expect(MathJaxService.parseDomForMath).toHaveBeenCalled();
       var args = MathJaxService.parseDomForMath.calls.mostRecent().args;
-      expect(args[1].html()).toEqual(html);
+      expect(args[1].innerHTML).toEqual(html);
       done();
     }, 300);
   }
