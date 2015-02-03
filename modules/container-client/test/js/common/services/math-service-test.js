@@ -12,7 +12,7 @@ describe('MathJaxService', function() {
           onHubSignal = signal;
         }
       }
-    }
+    };
   }
 
   beforeEach(function() {
@@ -56,8 +56,17 @@ describe('MathJaxService', function() {
     it('should queue a MathJax typeset for the provided element', function() {
       expect(MathJax.Hub.Queue).toHaveBeenCalledWith(["Typeset", MathJax.Hub, element]);
     });
-
   });
+
+  describe('parseDomForMath - zero delay', function() {
+    var element = $("<div></div>");
+    it('should queue a MathJax typeset for the provided element immediately', function() {
+      mathJaxService.parseDomForMath(0, element);
+      expect(MathJax.Hub.Queue).toHaveBeenCalledWith(["Typeset", MathJax.Hub, element]);
+    });
+  });
+
+
 
   describe('onEndProcess', function() {
     var args = [1,2,3];

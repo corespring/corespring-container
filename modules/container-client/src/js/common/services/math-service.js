@@ -8,11 +8,18 @@
   var MathJaxService = function($timeout) {
 
     this.parseDomForMath = function(delay, element) {
-      $timeout(function () {
+
+      function renderMath(){
         if (typeof MathJax !== 'undefined' && !_.isUndefined(MathJax)) {
           MathJax.Hub.Queue(["Typeset", MathJax.Hub, element]);
         }
-      }, delay || 100);
+      }
+
+      if(delay === 0){
+        renderMath();
+      } else {
+        $timeout(renderMath, delay || 100);
+      }
     };
 
     var listeners = [];
