@@ -51,39 +51,38 @@ describe('mathjax-dialog', function(){
     expect(formatUtils.getMathInfo).toHaveBeenCalledWith('');
   });
 
-  function assertMathJaxServiceCalled(done, html){
+  function assertMathJaxServiceCalled(html){
     expect(MathJaxService.parseDomForMath).toHaveBeenCalled();
     var args = MathJaxService.parseDomForMath.calls.mostRecent().args;
     expect(args[1].innerHTML).toEqual(html);
-    done();
   }
 
   describe('user update', function(){
     
-    it('updates with LaTex - inline', function(done) {
+    it('updates with LaTex - inline', function() {
       scope.preppedMath = '1 == 3';
       scope.displayType = 'inline';
       scope.$digest();
       expect(scope.mathType).toEqual('LaTex');
       expect(scope.displayType).toEqual('inline');
-      assertMathJaxServiceCalled(done, '\\(1 == 3\\)');
+      assertMathJaxServiceCalled('\\(1 == 3\\)');
     });
 
-    it('updates with LaTex - block', function(done) {
+    it('updates with LaTex - block', function() {
       scope.preppedMath = '1 == 3';
       scope.displayType = 'block';
       scope.$digest();
       expect(scope.mathType).toEqual('LaTex');
       expect(scope.displayType).toEqual('block');
-      assertMathJaxServiceCalled(done, '\\[1 == 3\\]');
+      assertMathJaxServiceCalled('\\[1 == 3\\]');
     });
 
-    it('updates with MathML', function(done){
+    it('updates with MathML', function(){
       scope.preppedMath = math;
       scope.$digest();
       expect(scope.mathType).toEqual('MathML');
       expect(scope.displayType).toEqual('block');
-      assertMathJaxServiceCalled(done, math );
+      assertMathJaxServiceCalled(math);
     });
 
   });
