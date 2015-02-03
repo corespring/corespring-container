@@ -1,25 +1,15 @@
-/* global MathJax */
-angular.module('corespring.wiggi-wiz-features.mathjax').directive('mathjaxHolder', ['$log',
+angular.module('corespring.wiggi-wiz-features.mathjax')
+.directive('mathjaxHolder', 
+  ['$log',
+  '$templateCache',
   'MathFormatUtils',
-
-  function($log, MathFormatUtils) {
-
-    var template = [
-      '<div class="component-placeholder" contenteditable="false">',
-      '  <div class="blocker">',
-      '     <div class="bg"></div>',
-      '     <div class="edit-controls">',
-      '       <div class="edit-icon-button" tooltip="edit" tooltip-append-to-body="true" tooltip-placement="bottom">',
-      '         <i ng-click="editNode($event)" class="fa fa-pencil"></i>',
-      '       </div>',
-      '       <div class="delete-icon-button" tooltip="delete" tooltip-append-to-body="true" tooltip-placement="bottom">',
-      '         <i ng-click="deleteNode($event)" class="fa fa-trash-o"></i>',
-      '       </div>',
-      '     </div>',
-      '  </div>',
-      '  <div class="holder"></div>',
-      '</div>'
-    ].join('\n');
+  'MathJaxService',
+  'WIGGI_EVENTS',
+  function($log, 
+    $templateCache, 
+    MathFormatUtils, 
+    MathJaxService, 
+    WIGGI_EVENTS) {
 
     var log = $log.debug.bind($log, '[mathjax-holder]');
     var html;
@@ -27,6 +17,8 @@ angular.module('corespring.wiggi-wiz-features.mathjax').directive('mathjaxHolder
     function compile($element) {
       html = $element.html();
       $element.addClass('mathjax-holder');
+      var template = $templateCache.get('/editor/question/wiggi-wiz-features/mathjax/mathjax-holder.html');
+      console.log('template: ', template);
       $element.html(template);
       return link;
     }
@@ -42,13 +34,13 @@ angular.module('corespring.wiggi-wiz-features.mathjax').directive('mathjaxHolder
       $scope.deleteNode = function($event) {
         $event.stopPropagation();
         removeTooltip();
-        $scope.$emit('wiggi-wiz.delete-node', $element);
+        $scope.$emit(WIGGI_EVENTS.DELETE_NODE, $element);
       };
 
       $scope.editNode = function($event) {
         $event.stopPropagation();
         removeTooltip();
-        $scope.$emit('wiggi-wiz.call-feature-method', 'editNode', $element);
+        $scope.$emit(WIGGI_EVENTS.CALL_FEATURE_METHOD, 'editNode', $element);
       };
 
       /** Note: because we are not replacing the node - we are updating the class att
@@ -77,7 +69,7 @@ angular.module('corespring.wiggi-wiz-features.mathjax').directive('mathjaxHolder
           updateClass('inline');
         } else {
           $element.find('.holder').html(n);
-          MathJax.Hub.Queue(['Typeset', MathJax.Hub, $element[0]]);
+          MathJaxService.parseDomForMath(0, $element[0]);
         }
       });
     }

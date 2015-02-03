@@ -1,0 +1,9 @@
+.root(contenteditable='false')
+  .blocker
+    .bg
+    .edit-controls
+      .delete-icon-button(tooltip='delete', tooltip-append-to-body='true', tooltip-placement='bottom')
+        i.fa.fa-trash-o(ng-click='deleteNode($event)')
+      .edit-icon-button(tooltip='edit', tooltip-append-to-body='true', tooltip-placement='bottom')
+        i.fa.fa-pencil(ng-click='editNode($event)')
+  .holder
