@@ -8,22 +8,6 @@ angular.module('corespring.wiggi-wiz-features.mathjax').directive('mathjaxDialog
 
     var log = $log.debug.bind($log, '[mathjax-dialog]');
 
-    var content = [
-      'Use this window to add a math equation for your item.',
-      'Do this by authoring some math text in <a href="http://en.wikipedia.org/wiki/MathML" target="_blank">MathML</a>',
-      ' or <a href="http://en.wikipedia.org/wiki/LaTeX" target="_blank">LaTex</a> format in the window below.',
-      'If you need help authoring text, <a href="http://www.wiris.com/editor/demo/en/mathml-latex.html" target="_blank">this website</a> can help.',
-    ].join(' ');
-
-
-    function radio(t, label, ngModel) {
-      return [
-        '<label class="radio-inline">',
-        '  <input ng-disabled="mathType == \'MathML\'" type="radio" group="mathType" ng-model="' + ngModel + '" value="' + t + '"> ' + label,
-        '</label>'
-      ].join('\n');
-    }
-
     function link($scope, $element, $attrs, ngModel) {
 
       $scope.mathType = '?';

@@ -1,14 +1,19 @@
 describe('mathjax-dialog', function(){
 
-  var render, parentScope, scope, element;
+  var render, parentScope, scope, element, formatUtils;
 
-  var MathFormatUtils = {
-    getMathInfo: jasmine.createSpy('getMathInfo').and.returnValue('LaTex'),
-    wrapLatex:  jasmine.createSpy('wrapLatex')
-      .and.callFake(function(text, displayType){
-        return text;
-    })
-  };
+  var math = [
+    '<math>',
+    '  <msup>',
+    '    <msqrt>',
+    '      <mrow>',
+    '        <mi>a</mi>',
+    '      </mrow>',
+    '    </msqrt>',
+    '    <mn>27</mn>',
+    '  </msup>',
+    '</math>'
+  ].join('\n');
 
   var MathJaxService = {
     parseDomForMath: jasmine
@@ -22,11 +27,12 @@ describe('mathjax-dialog', function(){
   beforeEach(angular.mock.module('corespring.wiggi-wiz-features.mathjax'));
   
   beforeEach(module(function($provide) {
-    $provide.value('MathFormatUtils', MathFormatUtils);
     $provide.value('MathJaxService', MathJaxService);
   }));
 
-  beforeEach(inject(function($rootScope, $compile) {
+  beforeEach(inject(function($rootScope, $compile, MathFormatUtils) {
+    formatUtils = MathFormatUtils;
+    spyOn(formatUtils, 'getMathInfo').and.callThrough();
     parentScope = $rootScope.$new();
     element = angular.element('<mathjax-dialog ng-model="math"></mathjax-dialog>');
     $compile(element)(parentScope);
@@ -36,18 +42,46 @@ describe('mathjax-dialog', function(){
 
   it('compiles', function() {
     expect(element.hasClass('mathjax-dialog-root')).toBe(true);
-    expect(MathFormatUtils.getMathInfo).toHaveBeenCalledWith('');
+    expect(formatUtils.getMathInfo).toHaveBeenCalledWith('');
   });
 
-  it('calls MathJaxService on change', function(done) {
-    parentScope.math = '1 == 3';
-    parentScope.$digest();
+  function assertMathJaxServiceCalled(done, html){
     setTimeout(function(){
       expect(MathJaxService.parseDomForMath).toHaveBeenCalled();
       var args = MathJaxService.parseDomForMath.calls.mostRecent().args;
-      expect(args[1].html()).toEqual('1 == 3');
+      expect(args[1].html()).toEqual(html);
       done();
     }, 300);
+  }
+
+  describe('user update', function(){
+    
+    it('updates with LaTex - inline', function(done) {
+      scope.preppedMath = '1 == 3';
+      scope.displayType = 'inline';
+      scope.$digest();
+      expect(scope.mathType).toEqual('LaTex');
+      expect(scope.displayType).toEqual('inline');
+      assertMathJaxServiceCalled(done, '\\(1 == 3\\)');
+    });
+
+    it('updates with LaTex - block', function(done) {
+      scope.preppedMath = '1 == 3';
+      scope.displayType = 'block';
+      scope.$digest();
+      expect(scope.mathType).toEqual('LaTex');
+      expect(scope.displayType).toEqual('block');
+      assertMathJaxServiceCalled(done, '\\[1 == 3\\]');
+    });
+
+    it('updates with MathML', function(done){
+      scope.preppedMath = math;
+      scope.$digest();
+      expect(scope.mathType).toEqual('MathML');
+      expect(scope.displayType).toEqual('block');
+      assertMathJaxServiceCalled(done, math );
+    });
+
   });
 
 });
