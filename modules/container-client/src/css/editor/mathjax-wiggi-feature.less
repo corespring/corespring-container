@@ -44,19 +44,96 @@
   display: block;
 }
 
+
+@width: 74px;
+@height: 32px;
+
 .mathjax-holder {
   .user-select(none);
   padding: 0;
   transition: background-color 200ms;
-  border-radius: 4px;
-  background-color: lighten(@component-icon-bg, 50%);
-
+  
   &:hover {
     background-color: #ffffff;
   }
 
   .blocker .bg {
     border-radius: 4px;
+  }
+  
+  .root {
+      position: relative;
+      margin-left: 1px;
+      display: inline-block;
+      min-width: @width;
+      min-height: @height;
+      .border-radius(3px, 3px, 3px, 3px);
+      border: dotted 1px darken(@light-grey, 20%);
+
+      .blocker {
+
+        .content {
+          display: inline-flex;
+          align-items: center;
+          position: absolute;
+          left: 0;
+          right: 0;
+          top: 0;
+          bottom: 0;
+        }
+
+        .edit-controls { 
+          transition: opacity 200ms;
+          position: absolute;
+          z-index: 10;
+          padding: 5px 5px 5px 10px;
+          top: 1px;
+          right: 1px;
+          left: 1px;
+          bottom: 1px;
+          background: rgba(255, 255, 255, 0.7);
+          opacity: 0;
+          
+          &:hover{
+            opacity: 1.0;
+          }
+
+          .delete-icon-button, 
+          .edit-icon-button {
+            display: inline-block;
+            margin-left: 5px;
+            margin-right: 5px;
+            float: right;
+
+            &:hover {
+              cursor: pointer;
+            }
+
+            @close-icon-base-color: @component-icon-bg;
+     
+            i {
+              font-size: 22px;
+              color: darken(@close-icon-base-color, 10%);
+
+              &:hover {
+                color: darken(@close-icon-base-color, 16%);
+              }
+            }
+          }
+        }
+      }
+      
+      .holder{
+        .border-radius(3px);
+        position: inherit;
+        visibility: visible;
+        pointer-events: none;
+
+        &.nonvisible {
+          position: absolute;
+          visibility: hidden;
+        }
+      }
   }
 }
 
@@ -69,12 +146,12 @@
 
 
   .header {
-    padding: 8px;
-    background-color: @light-grey;
+    padding: 10px;
+    background-color: white;
     border-left: none;
     border-bottom: solid 1px darken(@light-grey, 15%);
     font-size: 14px;
-    padding-bottom: 20px;
+    padding-bottom: 25px;
   }
 
   .main{
@@ -85,17 +162,20 @@
 
   .mj-math-type {
     padding: 8px;
-    background-color: darken(@light-grey, 7%);
+    //Note: @state-warning are bootstrap variables
+    background-color: @state-warning-bg;
     border-bottom: solid 1px darken(@light-grey, 15%);
-
-    .display-type{
-      margin-left: 10px;
+    color: @state-warning-text;
+    padding-bottom: 12px;
+    .display-type {
+      padding-left: 10px;
     }
   }
 
+  
   .mj-dialog-content {
-    color: #00008b;
     a:hover {
+      color: #00008b;
       text-decoration: underline;
     }
   }
