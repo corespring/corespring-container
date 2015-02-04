@@ -1,18 +1,21 @@
 package org.corespring.container.client.controllers.resources
 
-import org.corespring.container.client.hooks.Hooks.StatusMessage
+import org.corespring.container.client.hooks.Hooks._
 import org.corespring.container.client.hooks._
 import org.corespring.container.components.outcome.ScoreProcessor
 import org.corespring.container.components.processing.PlayerItemPreProcessor
 import org.corespring.container.components.response.OutcomeProcessor
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
-import play.api.libs.json.{ JsValue, Json }
+import play.api.libs.json.{Json, JsValue}
 import play.api.mvc._
-import play.api.test.{ FakeHeaders, FakeRequest }
+import play.api.test.{FakeApplication, FakeHeaders, FakeRequest, WithApplication}
 import play.api.test.Helpers._
 
+
 import scala.concurrent.{ ExecutionContext, Future }
+
+object mockGlobalS extends play.api.GlobalSettings
 
 class SessionTest extends Specification with Mockito {
 
@@ -29,6 +32,14 @@ class SessionTest extends Specification with Mockito {
       itemSession,
       true,
       isComplete)
+
+    def fullSessionAndItem(isSesure:Boolean) = Right(FullSession(
+      Json.obj(
+        "item" -> Json.obj(),
+        "session" -> Json.obj()
+      ),
+      isSesure
+    ))
 
     "when saving" should {
 
@@ -81,6 +92,22 @@ class SessionTest extends Specification with Mockito {
       }
     }
 
+    "when loading session and item" should {
+
+      "return when session hooks returned failure" in new LoadItemAndSessionResponding(Left(BAD_REQUEST -> "")) {
+        val result = session.loadItemAndSession("id")(FakeRequest())
+        status(result) === BAD_REQUEST
+      }
+
+      "return session when session hooks succeeded" in new LoadItemAndSessionResponding(fullSessionAndItem(true)) {
+        val result = session.loadItemAndSession("id")(FakeRequest())
+        val asJson = contentAsJson(result)
+        (asJson \ "item") === Json.obj()
+        (asJson \ "session") === Json.obj()
+        status(result) === OK
+      }
+    }
+
     "not allow to reset session" in new ActionBody(saveSession(true)) {
       val result = session.resetSession("id")(FakeRequest())
       status(result) === BAD_REQUEST
@@ -120,7 +147,42 @@ class SessionTest extends Specification with Mockito {
 
   }
 
-  class ActionBody(mode: SecureMode) extends org.specs2.specification.Before {
+  class LoadItemAndSessionResponding(hooksResponse: Either[StatusMessage, FullSession]) extends WithApplication(FakeApplication(withGlobal = Some(mockGlobalS))) with org.specs2.specification.Before {
+
+    val session = new Session {
+      def outcomeProcessor: OutcomeProcessor = {
+        val mocked = mock[OutcomeProcessor]
+        mocked.createOutcome(any[JsValue], any[JsValue], any[JsValue]) returns Json.obj()
+        mocked
+      }
+
+      def scoreProcessor: ScoreProcessor = {
+        val mocked = mock[ScoreProcessor]
+        mocked.score(any[JsValue], any[JsValue], any[JsValue]) returns Json.obj()
+        mocked
+      }
+
+      def itemPreProcessor: PlayerItemPreProcessor = {
+        val mocked = mock[PlayerItemPreProcessor]
+        mocked.preProcessItemForPlayer(any[JsValue]) returns Json.obj()
+        mocked
+      }
+
+      override def hooks: SessionHooks = new SessionHooks {
+        override def loadItemAndSession(id: String)(implicit header: RequestHeader): Either[StatusMessage, FullSession] = hooksResponse
+        override def loadOutcome(id: String)(implicit header: RequestHeader): Either[(Int, String), SessionOutcome] = ???
+        override def getScore(id: String)(implicit header: RequestHeader): Either[(Int, String), SessionOutcome] = ???
+        override def load(id: String)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] = ???
+        override def save(id: String)(implicit header: RequestHeader): Future[Either[(Int, String), SaveSession]] = ???
+      }
+
+      override implicit def ec: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
+    }
+
+    def before = {}
+  }
+
+  class ActionBody(mode : SecureMode) extends WithApplication(FakeApplication(withGlobal = Some(mockGlobalS))) with org.specs2.specification.Before {
 
     val session = new Session {
       def outcomeProcessor: OutcomeProcessor = {
@@ -147,15 +209,10 @@ class SessionTest extends Specification with Mockito {
 
   class MockBuilder(m: SecureMode) extends SessionHooks {
 
-    override def loadItemAndSession(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, FullSession]] = ???
+    override def loadItemAndSession(id: String)(implicit header: RequestHeader): Either[StatusMessage, FullSession] = Right(m.asInstanceOf[FullSession])
 
-    override def getScore(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, SessionOutcome]] = Future {
+    override def getScore(id: String)(implicit header: RequestHeader): Either[StatusMessage, SessionOutcome] =
       Right(m.asInstanceOf[SessionOutcome])
-    }
-
-    override def loadOutcome(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, SessionOutcome]] = Future {
-      Right(m.asInstanceOf[SessionOutcome])
-    }
 
     override def load(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]] = ???
 
@@ -163,6 +220,7 @@ class SessionTest extends Specification with Mockito {
       Right(m.asInstanceOf[SaveSession])
     }
 
+    override def loadOutcome(id: String)(implicit header: RequestHeader): Either[(Int, String), SessionOutcome] = Right(m.asInstanceOf[SessionOutcome])
   }
 
 }

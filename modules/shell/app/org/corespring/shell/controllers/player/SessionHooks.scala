@@ -24,7 +24,7 @@ trait SessionHooks extends ContainerSessionHooks {
 
   private def isComplete(session: JsValue): Boolean = (session \ "isComplete").asOpt[Boolean].getOrElse(false)
 
-  private def handleSessionOutcome(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, SessionOutcome]] = Future {
+  private def handleSessionOutcome(id: String)(implicit header: RequestHeader): Either[StatusMessage, SessionOutcome] = {
     val result = for {
       session <- sessionService.load(id)
       itemId <- (session \ "itemId").asOpt[String]
@@ -40,11 +40,12 @@ trait SessionHooks extends ContainerSessionHooks {
     }
   }
 
-  override def getScore(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, SessionOutcome]] = handleSessionOutcome(id)(header)
+  override def getScore(id: String)(implicit header: RequestHeader): Either[StatusMessage, SessionOutcome] = handleSessionOutcome(id)(header)
 
-  override def loadOutcome(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, SessionOutcome]] = handleSessionOutcome(id)(header)
+  override def loadOutcome(id: String)(implicit header: RequestHeader): Either[StatusMessage, SessionOutcome] =
+    handleSessionOutcome(id)(header)
 
-  override def loadItemAndSession(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, FullSession]] = Future {
+  override def loadItemAndSession(id: String)(implicit header: RequestHeader):Either[StatusMessage, FullSession] = {
     val result = for {
       session <- sessionService.load(id)
       itemId <- (session \ "itemId").asOpt[String]
@@ -55,6 +56,8 @@ trait SessionHooks extends ContainerSessionHooks {
     }
     result.map(Right(_)).getOrElse(Left(BAD_REQUEST -> ""))
   }
+
+
 
   override def load(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]] = Future {
     sessionService.load(id).map {
