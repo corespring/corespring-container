@@ -6,16 +6,20 @@ import org.corespring.container.client.controllers.resources.Item.Errors
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
-import play.api.libs.json.{ JsString, JsValue, Json }
+import play.api.libs.json.{ JsValue, Json }
 import play.api.mvc._
 import play.api.test.Helpers._
-import play.api.test.{ FakeHeaders, FakeRequest }
+import play.api.test.{WithApplication, FakeApplication, FakeRequest}
 
 import scala.concurrent.{ ExecutionContext, Future }
 
+object mockGlobalq extends play.api.GlobalSettings
+
 class ItemTest extends Specification with Mockito {
 
-  class item(saveResult: Option[JsValue] = Some(Json.obj()), createError: Option[StatusMessage] = None) extends Scope {
+  class item(createError: Option[StatusMessage] = None, globalConf:Option[play.api.GlobalSettings] = Some(mockGlobalq))
+    extends WithApplication(FakeApplication(withGlobal = globalConf))
+    with Scope {
     val item = new Item {
 
       override def hooks: ItemHooks = new ItemHooks {
@@ -48,6 +52,7 @@ class ItemTest extends Specification with Mockito {
 
       override implicit def ec: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
     }
+
   }
 
   "Item" should {
@@ -61,7 +66,7 @@ class ItemTest extends Specification with Mockito {
       (contentAsJson(result) \ "error").as[String] === Errors.noJson
     }
 
-    "create returns error" in new item(createError = Some(UNAUTHORIZED -> "Error")) {
+    "create returns error" in new item(createError = Some(UNAUTHORIZED -> "Error"), globalConf = Some(mockGlobalq)){
       val result = item.create(FakeRequest("", ""))
       status(result) === UNAUTHORIZED
       contentAsJson(result) === Json.obj("error" -> "Error")

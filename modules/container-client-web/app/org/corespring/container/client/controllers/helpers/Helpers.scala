@@ -32,8 +32,6 @@ trait Helpers extends NameHelper {
 
   implicit def toJsString(s: String): JsValue = JsString(s)
 
-  implicit val versionInfoToJson: Writes[VersionInfo] = Json.writes[VersionInfo]
-
   def configJson(xhtml: String,
     dependencies: Seq[String],
     scriptPaths: Seq[String],
@@ -43,8 +41,7 @@ trait Helpers extends NameHelper {
       "xhtml" -> xhtml,
       "angular" -> Json.obj("dependencies" -> dependencies),
       "scripts" -> scriptPaths,
-      "css" -> cssPaths,
-      "versionInfo" -> Json.toJson(VersionInfo.make))
+      "css" -> cssPaths)
 
   protected def componentsToResource(components: Seq[Interaction], componentToString: Interaction => String,
     contentType: String): Result = {

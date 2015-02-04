@@ -5,12 +5,18 @@ html(xmlns="http://www.w3.org/1999/html")
     meta(http-equiv="X-UA-Compatible", content="IE=edge")
     title= title
 
+    // --- Version ---
+    
+    | <!-- 
+    |  !{versionInfo} 
+    | -->
+    
     block header-scripts
 
     for c in css
       link(rel='stylesheet',href='#{c}')
 
-  body(ng-app="corespring-#{appName}")
+  body(ng-app="corespring-#{appName}", class="corespring-#{appName}-body")
     .pre-loader
       #spinner
 

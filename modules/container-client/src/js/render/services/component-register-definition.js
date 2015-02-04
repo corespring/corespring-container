@@ -7,21 +7,10 @@ angular.module('corespring-player.services')
     var NewRegister = function(){
 
       var bridges = {};
-      var savedBridges = [];
 
       var answerChangedHandler = null;
 
       var isEditable = null;
-
-      this.saveState = function() {
-        savedBridges = _.cloneDeep(bridges);
-      };
-
-      this.restoreState = function() {
-        if (!_.isEmpty(savedBridges)) {
-          bridges = savedBridges;
-        }
-      };
 
       this.registerComponent = function(id, bridge) {
         bridges[id] = bridge;

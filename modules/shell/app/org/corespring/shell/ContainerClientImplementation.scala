@@ -4,10 +4,11 @@ import java.io.File
 
 import org.apache.commons.io.{ FileUtils, IOUtils }
 import org.corespring.container.logging.ContainerLogger
+import play.api.libs.json.JsObject
 import scala.concurrent.{ ExecutionContext, Future }
 import com.typesafe.config.ConfigFactory
 import org.corespring.amazon.s3.ConcreteS3Service
-import org.corespring.container.client.CompressedAndMinifiedComponentSets
+import org.corespring.container.client.{ VersionInfo, CompressedAndMinifiedComponentSets }
 import org.corespring.container.client.controllers._
 import org.corespring.container.client.hooks._
 import org.corespring.container.client.hooks.Hooks.StatusMessage
@@ -183,6 +184,7 @@ class ContainerClientImplementation(
     override implicit def ec: ExecutionContext = ContainerClientImplementation.this.ec
   }
 
+  override def versionInfo: JsObject = VersionInfo(Play.current.configuration)
 }
 
 /**

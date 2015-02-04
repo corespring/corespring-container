@@ -1,8 +1,10 @@
 package org.corespring.container.client.integration
 
+import grizzled.slf4j.Logger
 import org.corespring.container.client.V2PlayerConfig
 import org.corespring.container.client.component.ComponentUrls
 import org.corespring.container.client.controllers.apps._
+import org.corespring.container.client.controllers.resources.session.ItemPruner
 import org.corespring.container.client.controllers.resources.{ Item, Session }
 import org.corespring.container.client.controllers.{ ComponentsFileController, DataQuery, Icons, PlayerLauncher }
 import org.corespring.container.client.hooks._
@@ -17,7 +19,7 @@ import org.corespring.container.js.rhino.{ RhinoServerLogic, RhinoScopeBuilder, 
 import org.corespring.container.logging.ContainerLogger
 import play.api.Mode
 import play.api.Mode.Mode
-import play.api.libs.json.JsValue
+import play.api.libs.json.{ JsObject, JsValue }
 import play.api.{ Mode, Play }
 
 import scala.concurrent.ExecutionContext
@@ -28,6 +30,8 @@ trait DefaultIntegration
   with HasHooks
   with HasConfig
   with HasProcessors {
+
+  def versionInfo: JsObject
 
   /**
    * For a given resource path return a resolved path.
@@ -44,6 +48,16 @@ trait DefaultIntegration
   }
 
   implicit def ec: ExecutionContext
+
+  protected val internalProcessor: PlayerItemPreProcessor = new PlayerItemPreProcessor with ItemPruner {
+
+    override def preProcessItemForPlayer(item: JsValue): JsValue = {
+      val compProcessed = playerItemPreProcessor.preProcessItemForPlayer(item)
+      pruneItem(compProcessed)
+    }
+
+    override def logger: Logger = DefaultIntegration.this.logger
+  }
 
   override def playerItemPreProcessor: PlayerItemPreProcessor = new RhinoPlayerItemPreProcessor(DefaultIntegration.this.components, scopeBuilder.scope)
 
@@ -103,6 +117,9 @@ trait DefaultIntegration
   }
 
   lazy val editor = new Editor {
+
+    override def versionInfo: JsObject = DefaultIntegration.this.versionInfo
+
     override def mode: Mode = Play.current.mode
 
     override implicit def ec: ExecutionContext = DefaultIntegration.this.ec
@@ -137,6 +154,9 @@ trait DefaultIntegration
   }
 
   lazy val prodHtmlPlayer = new Player {
+
+    override def versionInfo: JsObject = DefaultIntegration.this.versionInfo
+
     override def mode: Mode = Play.current.mode
 
     override implicit def ec: ExecutionContext = DefaultIntegration.this.ec
@@ -151,7 +171,7 @@ trait DefaultIntegration
 
     override def resolveDomain(path: String): String = DefaultIntegration.this.resolveDomain(path)
 
-    override def itemPreProcessor: PlayerItemPreProcessor = DefaultIntegration.this.playerItemPreProcessor
+    override def itemPreProcessor: PlayerItemPreProcessor = DefaultIntegration.this.internalProcessor
   }
 
   lazy val item = new Item {
@@ -170,7 +190,7 @@ trait DefaultIntegration
 
     def outcomeProcessor = DefaultIntegration.this.outcomeProcessor
 
-    def itemPreProcessor: PlayerItemPreProcessor = DefaultIntegration.this.playerItemPreProcessor
+    def itemPreProcessor: PlayerItemPreProcessor = DefaultIntegration.this.internalProcessor
 
     def scoreProcessor: ScoreProcessor = DefaultIntegration.this.scoreProcessor
   }

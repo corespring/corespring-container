@@ -6,12 +6,6 @@ script( type="text/ng-template", id="/templates/popups/addSupportingMaterial")
 
     .add-supporting-material-popup
       div(supportingmetadata="", ng-model='supportingMaterial')
-      dl.dl-horizontal
-        dt Source
-        dd
-          radio(id='create', value='createHtml', ng-model='supportingMaterial.method') create your own
-          radio(id='upload', type='radio', value='uploadFile', ng-model='supportingMaterial.method') upload a file
-          input(type='file', fileChange="",ng-show="supportingMaterial.method == 'uploadFile'")
 
 // Upload progress popup
 script( type="text/ng-template", id="/templates/popups/uploadingSupportingMaterial")
@@ -44,8 +38,9 @@ script(type="text/ng-template", id="/templates/supporting-materials")
             ng-model="supportingMarkup",
             image-service="imageService",
             overrideFeatures="overrideFeatures",
-            features="extraFeatures")
-            toolbar(basic="bold italic underline", formatting="h1 h2 p")
+            features="extraFeatures",
+            dialog-launcher="external")
+            toolbar(basic="bold italic underline", media="", formatting="h1 h2 p")
             edit-pane-toolbar(alignment="bottom")
               .btn-group
                 button(ng-click="closePane()", class="btn btn-sm btn-success", style="float:right;") OK

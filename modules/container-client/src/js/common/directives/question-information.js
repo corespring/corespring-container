@@ -6,14 +6,15 @@ angular.module('corespring-common.directives')
     'ProfileFormatter',
     'ComponentService',
     'SupportingMaterialsService',
-    function($sce, $log, DataQueryService, ProfileFormatter, ComponentService, SupportingMaterialsService) {
+    'MathJaxService',
+    function($sce, $log, DataQueryService, ProfileFormatter, ComponentService, SupportingMaterialsService, MathJaxService) {
       return {
         restrict: 'EA',
         scope: {
           item: "=ngModel"
         },
         templateUrl: "/common/directives/question-information.html",
-        link: function($scope) {
+        link: function($scope, $element) {
 
           $scope.$watch('item', function(n) {
             if (n) {
@@ -36,6 +37,8 @@ angular.module('corespring-common.directives')
             $scope.selectedSupportingMaterialName = SupportingMaterialsService.getSupportingName($scope.item.supportingMaterials, smIndex);
             $scope.selectedSupportingMaterialUrl = SupportingMaterialsService.getSupportingUrl($scope.item.supportingMaterials, smIndex);
             $scope.selectedSupportingMaterialContent = SupportingMaterialsService.getContent($scope.item.supportingMaterials, smIndex);
+
+            MathJaxService.parseDomForMath(100, $element[0]);
           };
 
           $scope.getContentType = function() {

@@ -4,12 +4,8 @@ angular.module('corespring-player.controllers')
       '$log',
       '$timeout',
       'Msgr',
-       function($scope, $log, $timeout, Msgr) {
-
-        function isInIframe(){
-          /** note use != to support ie8 instead of !== */  
-          return top != window; // jshint ignore:line
-        }
+      'iFrameService',
+       function($scope, $log, $timeout, Msgr, iFrameService) {
 
         function getQueryParams() {
 
@@ -32,15 +28,14 @@ angular.module('corespring-player.controllers')
           return params;
         }
 
-        if(isInIframe()){
-
+        if (iFrameService.isInIFrame()) {
           Msgr.on('*', function(eventName, data, done){
             $log.info("[Root.broadcastToChildren] " + eventName);
             $scope.$broadcast(eventName, data, done);
           });
 
           $scope.$on("session-loaded", function(event, session) {
-            Msgr.send( "sessionCreated", {session: session});
+            Msgr.send("sessionCreated", {session: session});
           });
 
           $scope.$on("inputReceived", function(event, data) {
@@ -52,7 +47,6 @@ angular.module('corespring-player.controllers')
           });
 
           Msgr.send('ready');
-
         } else {
             $timeout(function() {
               var data = { mode: 'gather' };

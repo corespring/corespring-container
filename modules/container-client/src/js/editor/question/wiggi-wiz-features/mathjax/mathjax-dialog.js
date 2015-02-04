@@ -3,25 +3,10 @@ angular.module('corespring.wiggi-wiz-features.mathjax').directive('mathjaxDialog
   '$log',
   '$timeout',
   'MathFormatUtils',
-  function($log, $timeout, MathFormatUtils) {
+  'MathJaxService',
+  function($log, $timeout, MathFormatUtils, MathJaxService) {
 
     var log = $log.debug.bind($log, '[mathjax-dialog]');
-
-    var content = [
-      'Use this window to add a math equation for your item.',
-      'Do this by authoring some math text in <a href="http://en.wikipedia.org/wiki/MathML" target="_blank">MathML</a>',
-      ' or <a href="http://en.wikipedia.org/wiki/LaTeX" target="_blank">LaTex</a> format in the window below.',
-      'If you need help authoring text, <a href="http://www.wiris.com/editor/demo/en/mathml-latex.html" target="_blank">this website</a> can help.',
-    ].join(' ');
-
-
-    function radio(t, label, ngModel) {
-      return [
-        '<label class="radio-inline">',
-        '  <input ng-disabled="mathType == \'MathML\'" type="radio" group="mathType" ng-model="' + ngModel + '" value="' + t + '"> ' + label,
-        '</label>'
-      ].join('\n');
-    }
 
     function link($scope, $element, $attrs, ngModel) {
 
@@ -44,11 +29,12 @@ angular.module('corespring.wiggi-wiz-features.mathjax').directive('mathjaxDialog
         renderPreview(ngModel.$viewValue);
       }
 
-      function renderPreview(math) {
-        log('renderPreview');
-        $element.find('.preview-body').html(math);
-        MathJax.Hub.Queue(['Typeset', MathJax.Hub, $element.find('.preview-body')[0]]);
-      }
+      var renderPreview = _.debounce(function(math){
+          log('renderPreview');
+          $element.find('.preview-body').html(math);
+          var $math = $element.find('.preview-body');
+          MathJaxService.parseDomForMath(0, $math[0]);
+        }, 200, {leading: false, trailing: true});
 
       function updateModel() {
         log('updateModel');
@@ -97,31 +83,7 @@ angular.module('corespring.wiggi-wiz-features.mathjax').directive('mathjaxDialog
       link: link,
       require: 'ngModel',
       replace: true,
-      template: [
-        '<div class="mathjax-dialog-root">',
-        '  <div class="header">',
-        '    <div class="mj-dialog-title">Enter Math</div>',
-        '    <div class="mj-dialog-content">' + content + '</div>',
-        '  </div>',
-        '  <div class="mj-math-type">',
-        '    <span ng-show="!showDisplayMode()">Enter some math below</span>',
-        '    <form ng-show="showDisplayMode()" class="form-inline">Display mode for {{mathType}}:',
-        '      <span ng-show="mathType == \'LaTex\'"  class="display-type">',
-        radio('inline', 'Inline', 'displayType'),
-        radio('block', 'Block', 'displayType'),
-        '      </span>',
-        '      <span ng-show="mathType == \'MathML\'" class="display-type">',
-        '        Block',
-        '      </span>',
-        '    </form>',
-        '  </div>',
-        '  <div class="math-preview">',
-        '     <div class="preview-label">Preview</div>',
-        '     <div class="preview-body"></div>',
-        '  </div>',
-        '  <textarea class="math-textarea" ng-model="preppedMath" placeholder="Enter MathML or LaTex here..."></textarea>',
-        '</div>'
-      ].join('\n')
+      templateUrl: '/editor/question/wiggi-wiz-features/mathjax/mathjax-dialog.html',
     };
   }
 ]);

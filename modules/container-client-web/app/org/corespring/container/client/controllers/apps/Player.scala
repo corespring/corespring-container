@@ -33,6 +33,8 @@ trait Player
 
   override def context: String = "player"
 
+  def versionInfo: JsObject
+
   def itemPreProcessor: PlayerItemPreProcessor
 
   private def showControls(implicit r: RequestHeader): Boolean = {
@@ -85,7 +87,7 @@ trait Player
               servicesJs,
               showControls,
               Json.obj("session" -> session, "item" -> preprocessedItem),
-              VersionInfo.json,
+              versionInfo,
               newRelicRumConf != None,
               newRelicRumConf.getOrElse(Json.obj()))))
       }

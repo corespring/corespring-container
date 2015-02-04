@@ -20,7 +20,7 @@ object Session {
   }
 }
 
-trait Session extends Controller with ItemPruner with HasContext {
+trait Session extends Controller with HasContext {
 
   val logger = ContainerLogger.getLogger("Session")
 
@@ -85,26 +85,27 @@ trait Session extends Controller with ItemPruner with HasContext {
     })
   }
 
-  def loadItemAndSession(sessionId: String) = Action.async { implicit request =>
-    hooks.loadItemAndSession(sessionId).map(basicHandler { fs =>
+  def loadItemAndSession(sessionId: String) = Action { implicit request =>
+    val reponse = hooks.loadItemAndSession(sessionId)
 
-      val json = fs.everything
+    reponse match {
+      case Left(err) => err
+      case Right(fs) => {
+        val json = fs.everything
 
-      val itemJson = (json \ "item").as[JsObject]
+        val itemJson = (json \ "item").as[JsObject]
+        
+        val processedItem = itemPreProcessor.preProcessItemForPlayer(itemJson)
+        
+        val sessionJson = (json \ "session").as[JsObject]
 
-      //Note: We must run the itemProcessor with the complete data model as it depends on it.
-      val processedItem = itemPreProcessor.preProcessItemForPlayer(itemJson)
+        val base = Json.obj(
+          "item" -> processedItem,
+          "session" -> sessionJson)
 
-      //Note: we can now run the regular prune ...
-      val prunedItem = pruneItem(processedItem)
-      val sessionJson = (json \ "session").as[JsObject]
-
-      val base = Json.obj(
-        "item" -> prunedItem,
-        "session" -> sessionJson)
-
-      Ok(base)
-    })
+        Ok(base)
+      }
+    }
   }
 
   def saveSession(id: String) = Action.async { implicit request =>
@@ -148,28 +149,34 @@ trait Session extends Controller with ItemPruner with HasContext {
    * request body : json - a set of evaluation options to be passed in to the outcome processors
    * @return
    */
-  def loadOutcome(id: String) = Action.async { implicit request =>
-    hooks.loadOutcome(id).map(basicHandler { (so: SessionOutcome) =>
+  def loadOutcome(id: String) = Action {
+    implicit request => {
+      val reponse = hooks.loadOutcome(id)
 
-      logger.trace(s"[loadOutcome]: $id : ${Json.stringify(so.itemSession)}")
+      reponse match {
+        case Left(err) => InternalServerError(err._2)
+        case Right(so) => {
+          logger.trace(s"[loadOutcome]: $id : ${Json.stringify(so.itemSession)}")
 
-      def hasAnswers = (so.itemSession \ "components").asOpt[JsObject].isDefined
+          def hasAnswers = (so.itemSession \ "components").asOpt[JsObject].isDefined
 
-      if (so.isSecure && !so.isComplete) {
-        BadRequest(Json.obj("error" -> JsString("secure mode: can't load outcome - session isn't complete")))
-      } else {
-        request.body.asJson.map { settings =>
-          val outcome = outcomeProcessor.createOutcome(so.item, so.itemSession, settings)
-          val score = scoreProcessor.score(so.item, so.itemSession, outcome)
-          Ok(Json.obj("outcome" -> outcome) ++ Json.obj("score" -> score) ++ (hasAnswers match {
-            case false => Json.obj("warning" -> "this session contains no answers")
-            case true => Json.obj()
-          }))
-        }.getOrElse {
-          BadRequest(Json.obj("error" -> "No settings in request body"))
+          if (so.isSecure && !so.isComplete) {
+            BadRequest(Json.obj("error" -> JsString("secure mode: can't load outcome - session isn't complete")))
+          } else {
+            request.body.asJson.map { settings =>
+              val outcome = outcomeProcessor.createOutcome(so.item, so.itemSession, settings)
+              val score = scoreProcessor.score(so.item, so.itemSession, outcome)
+              Ok(Json.obj("outcome" -> outcome) ++ Json.obj("score" -> score) ++ (hasAnswers match {
+                case false => Json.obj("warning" -> "this session contains no answers")
+                case true => Json.obj()
+              }))
+            }.getOrElse {
+              BadRequest(Json.obj("error" -> "No settings in request body"))
+            }
+          }
         }
       }
-    })
+    }
   }
 
   /**
@@ -180,10 +187,12 @@ trait Session extends Controller with ItemPruner with HasContext {
    * @param id
    * @return
    */
-  def getScore(id: String) = Action.async { implicit request =>
-    hooks.getScore(id).map {
-      basicHandler({ (so: SessionOutcome) =>
+  def getScore(id: String) = Action { implicit request =>
+    val response = hooks.getScore(id)
 
+    response match {
+      case Left(err) => InternalServerError(err._2)
+      case Right(so) => {
         val answers: Either[String, JsValue] = {
 
           if (so.isSecure) {
@@ -210,7 +219,7 @@ trait Session extends Controller with ItemPruner with HasContext {
             val score = scoreProcessor.score(so.item, a, outcome)
             Ok(score)
         }
-      })
+      }
     }
   }
 

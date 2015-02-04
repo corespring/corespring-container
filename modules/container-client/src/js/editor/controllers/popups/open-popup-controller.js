@@ -3,8 +3,7 @@ angular.module('corespring-editor.controllers')
 [
   '$scope',
   '$modalInstance',
-   function ($scope, $modalInstance) {
-
+  function ($scope, $modalInstance) {
     $scope.ok = function () {
       $modalInstance.close($scope.selected.item);
     };
@@ -12,4 +11,5 @@ angular.module('corespring-editor.controllers')
     $scope.cancel = function () {
       $modalInstance.dismiss('cancel');
     };
-}]);
+
+  }]);

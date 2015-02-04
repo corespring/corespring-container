@@ -20,6 +20,8 @@ trait Editor
 
   override def context: String = "editor"
 
+  def versionInfo: JsObject
+
   private def toJson(ci: ComponentInfo): JsValue = {
     val tag = tagName(ci.id.org, ci.id.name)
     partialObj(
@@ -73,7 +75,8 @@ trait Editor
           domainResolvedJs,
           domainResolvedCss,
           jsSrc.ngModules ++ scriptInfo.ngDependencies,
-          servicesJs(itemId))))
+          servicesJs(itemId),
+          versionInfo)))
     }
 
     hooks.loadItem(itemId).map { e => e.fold(onError, onItem) }

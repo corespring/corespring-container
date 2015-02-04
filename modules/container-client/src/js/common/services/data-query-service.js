@@ -57,15 +57,15 @@
      */
     this.createQuery = function(searchTerm, fields, filters){
       var query = {};
-      if(searchTerm){
+      if (searchTerm) {
         query.searchTerm = searchTerm;
       }
-      if(fields && !_.isEmpty(fields)){
+      if (fields && !_.isEmpty(fields)) {
         query.fields = fields;
       }
-      if(filters && !_.isEmpty(filters)){
+      if (filters && !_.isEmpty(filters)) {
         query.filters = _.transform(filters,function(result, num, key){
-          result.push({field:key, value:filters[key]});
+          result.push({field: key, value: filters[key]});
         }, []);
       }
       return query;

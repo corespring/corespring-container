@@ -5,9 +5,9 @@ angular.module('corespring-editor.controllers').controller('ScoringPopupControll
   'DesignerService',
   'components',
   'xhtml',
-  function($scope, $modalInstance, LogFactory, DesignerService, components, xhtml){
+  function($scope, $modalInstance, LogFactory, DesignerService, components, xhtml) {
 
-    function sizeToString(size) {
+    $scope.sizeToString = function(size) {
       if (size > 1) {
         return 'many';
       } else if (size === 1) {
@@ -15,26 +15,27 @@ angular.module('corespring-editor.controllers').controller('ScoringPopupControll
       } else {
         return 'none';
       }
-    }
+    };
 
     var logger = LogFactory.getLogger('ScoringPopupController');
 
     $scope.components = components;
-    $scope.componentSize = sizeToString(_.keys(components).length);
+    $scope.componentSize = $scope.sizeToString(_.keys(components).length);
     $scope.xhtml = xhtml;
 
-    function onComponentsLoadError(error) {
+    $scope.onComponentsLoadError = function(error) {
       throw new Error("Error loading components");
-    }
+    };
 
-    function onComponentsLoaded(uiComponents) {
+    $scope.onComponentsLoaded = function(uiComponents) {
       $scope.interactions = uiComponents.interactions;
       $scope.widgets = uiComponents.widgets;
-    }
+    };
 
-    DesignerService.loadAvailableUiComponents(onComponentsLoaded, onComponentsLoadError);
+    DesignerService.loadAvailableUiComponents($scope.onComponentsLoaded, $scope.onComponentsLoadError);
 
-    $scope.close = function(){
+    $scope.close = function() {
       $modalInstance.close();
     };
+
   }]);

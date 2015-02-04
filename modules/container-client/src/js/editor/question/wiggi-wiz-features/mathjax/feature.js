@@ -1,6 +1,6 @@
-angular.module('corespring.wiggi-wiz-features.mathjax').factory('WiggiMathJaxFeatureDef', [
+angular.module('corespring.wiggi-wiz-features.mathjax').factory('WiggiMathJaxFeatureDef', ['MathJaxService',
 
-  function() {
+  function(MathJaxService) {
 
     function FeatureDef() {
       this.name = 'mathjax';
@@ -14,19 +14,27 @@ angular.module('corespring.wiggi-wiz-features.mathjax').factory('WiggiMathJaxFea
         var content = $node.html();
         var newNode = $('<div mathjax-holder contenteditable="false">');
         newNode.html(content);
+        MathJaxService.parseDomForMath(100);
         return replaceWith(newNode);
       };
 
       this.editNode = function($node, $scope, editor) {
 
-        editor.showEditPane($scope,
-          'Edit the Math',
+        editor.launchDialog(
+          {
+            originalMarkup: $scope.originalMarkup || ''
+          },
+          'Math',
           '<mathjax-dialog ng-model="data.originalMarkup"></mathjax-dialog>',
-          function onUpdate() {},
-          null,
-          function onClose() {
-            $scope.$emit('save-data');
-          }
+          function onUpdate(update) {
+            if(!update.cancelled) {
+              $scope.originalMarkup = update.originalMarkup;
+              $scope.$emit('save-data');
+              MathJaxService.parseDomForMath(100);
+            }
+          },
+          {},
+          {featureName: this.name}
         );
       };
 

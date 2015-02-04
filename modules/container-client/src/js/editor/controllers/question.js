@@ -11,6 +11,7 @@ angular.module('corespring-editor.controllers')
     'ComponentPopups',
     'AppState',
     'ScoringHandler',
+    'MathJaxService',
     function($scope,
       $element,
       $timeout,
@@ -21,7 +22,8 @@ angular.module('corespring-editor.controllers')
       ComponentData,
       ComponentPopups,
       AppState,
-      ScoringHandler) {
+      ScoringHandler,
+      MathJaxService) {
 
       var configPanels = {};
 
@@ -29,7 +31,7 @@ angular.module('corespring-editor.controllers')
 
       $scope.previewOn = AppState.question.preview || false;
 
-      $scope.$watch('previewOn', function(){
+      $scope.$watch('previewOn', function() {
         AppState.question.preview = $scope.previewOn;
       });
 
@@ -39,13 +41,14 @@ angular.module('corespring-editor.controllers')
         $scope.previewOn = !$scope.previewOn;
       };
 
-      $scope.scoring = function(){
-        ScoringHandler.scoring($scope.item.components, $scope.item.xhtml, function(){
-          saveComponents();
-        });
+      $scope.scoring = function() {
+        ScoringHandler.scoring($scope.item.components, $scope.item.xhtml,
+          function() {
+            saveComponents();
+          });
       };
 
-      $scope.$on('edit-node', function($event, id, model, config){
+      $scope.$on('edit-node', function($event, id, model, config) {
         ComponentPopups.launch($scope, id, model, config);
       });
 
@@ -59,19 +62,19 @@ angular.module('corespring-editor.controllers')
         $('.wiggi-wiz-toolbar button', $element).dropdown();
       });
 
-      $scope.getUploadUrl = function(file) {
+      function deprecated() {
         throw new Error('deprecated');
-      };
+      }
 
-      $scope.selectFile = function(file) {
-        throw new Error('deprecated');
-      };
+      $scope.getUploadUrl = deprecated;
+      $scope.selectFile = deprecated;
 
       $scope.$on('fileSizeGreaterThanMax', EditorConfig.onFileSizeGreaterThanMax);
 
-      $scope.$on('registerComponent', function(event, id, componentBridge) {
+      $scope.$on('registerComponent', function(event, id, componentBridge,
+        componentElement) {
         logger.debug('registerComponent ', id);
-        ComponentData.registerComponent(id, componentBridge);
+        ComponentData.registerComponent(id, componentBridge, componentElement);
       });
 
       $scope.$on('registerPlaceholder', function(event, id, placeholder) {
@@ -88,11 +91,9 @@ angular.module('corespring-editor.controllers')
         }
       });
 
-      $scope.onItemSaved = function(){
+      $scope.onItemSaved = function() {};
 
-      };
-
-      function saveComponents(){
+      function saveComponents() {
         logger.debug('[saveComponents]');
         ItemService.saveComponents(
           $scope.serialize($scope.item.components),
@@ -100,10 +101,14 @@ angular.module('corespring-editor.controllers')
           $scope.onItemSaveError);
       }
 
+      $scope.getWiggiWizElement = function() {
+        return angular.element('.wiggi-wiz', $element);
+      };
+
       $scope.$on('itemAdded', function(event, $node) {
         // This ends up in some weird race condition if we don't wrap it in a $timeout
         $timeout(function() {
-          angular.element('.wiggi-wiz', $element).scope().focusCaretAtEnd();
+          $scope.getWiggiWizElement().scope().focusCaretAtEnd();
         });
       });
 
@@ -126,9 +131,8 @@ angular.module('corespring-editor.controllers')
         return newModel;
       };
 
-      $scope.$watch('item.components', debounce(function(newComps, oldComps){
-
-        if(_.isEqual(newComps, oldComps)){
+      $scope.$watch('item.components', debounce(function(newComps, oldComps) {
+        if (_.isEqual(newComps, oldComps)) {
           logger.debug('they are the same - ignore...');
           return;
         }
@@ -142,8 +146,7 @@ angular.module('corespring-editor.controllers')
         }
       }));
 
-      $scope.$watch('item.summaryFeedback', debounce(function(oldValue,
-        newValue) {
+      $scope.$watch('item.summaryFeedback', debounce(function(oldValue, newValue) {
         logger.debug('old', oldValue);
         if (oldValue !== newValue) {
           ItemService.saveSummaryFeedback($scope.item.summaryFeedback);
@@ -157,9 +160,10 @@ angular.module('corespring-editor.controllers')
         });
       }
 
-      ItemService.load(function(item){
+      ItemService.load(function(item) {
         $scope.item = item;
         ComponentData.setModel(item.components);
+        MathJaxService.parseDomForMath(100);
       });
 
     }

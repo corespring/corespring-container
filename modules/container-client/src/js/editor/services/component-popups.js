@@ -1,19 +1,36 @@
 angular.module('corespring-editor.services')
-  .controller(
-    'ComponentPopupController',
-    ['$scope',
-      function($scope){
-
-   }
-  ]);
-
-angular.module('corespring-editor.services')
   .service('ComponentPopups', [
     '$modal',
     'LogFactory',
     function($modal, LogFactory) {
 
       var logger = LogFactory.getLogger('component-popups');
+
+      function componentTemplate(title, content){
+
+        var header = [
+          '<div class="modal-header">',
+          '  <button class="close" type="button" ng-click="$dismiss()">',
+          '    <span>&times;</span>',
+          '    <span class="sr-only">Close</span>',
+          '  </button>',
+          '  <h4 class="modal-title">' + title + '</h4>',
+          '</div>'].join('\n');
+
+        var footer = [
+          '<div class="modal-footer right">',
+          ' <button class="btn btn-default" type="button" ng-click="$dismiss()">Done</button>',
+          '</div>'
+        ].join('\n');
+
+        return [
+        header, 
+        '<div class="modal-body">',
+        content,
+        '</div>',
+        footer
+        ].join('\n');
+      }
 
       function ComponentPopups() {
 
@@ -35,30 +52,19 @@ angular.module('corespring-editor.services')
           var tagName = model.componentType + '-config';
 
 
-          var content = [
-            '<div class="modal-header">',
-            '  <button class="close" type="button" ng-click="$dismiss()">',
-            '    <span>&times;</span>',
-            '    <span class="sr-only">Close</span>',
-            '  </button>',
-            '  <h4 class="modal-title">' + getTitle(config) + '</h4>',
-            '</div>',
-            '<div class="modal-body">',
-            '  <div class="config-panel-container" navigator="">',
+          var body =
+            ['  <div class="config-panel-container" navigator="">',
             '    ' + tag(tagName, {id: id}),
-            '  </div>',
-            '</div>',
-            '<div class="modal-footer right">',
-            ' <button class="btn btn-default" type="button" ng-click="$dismiss()">Done</button>',
-            '</div>'
-          ].join('\n');
+            '  </div>'].join('\n');
+
+          var content = componentTemplate(getTitle(model), body);
 
           $scope.data = _.cloneDeep(config);
 
           var modalInstance = $modal.open({
             template: content,
             scope: $scope,
-            controller: 'ComponentPopupController',
+            controller: function(){},
             size: 'lg',
             backdrop: 'static',
             resolve: {
