@@ -24,7 +24,7 @@ trait Player
    */
   def processXhtml(maybeXhtml: Option[String]) = {
     import XhtmlProcessor._
-    maybeXhtml.map(_.tagNamesToAttributes.cleanXhtml).getOrElse("<div><h1>New Item</h1></div>")
+    maybeXhtml.map(_.toWellFormedXhtml).getOrElse("<div><h1>New Item</h1></div>")
   }
 
   lazy val controlsJsSrc: SourcePaths = SourcePaths.fromJsonResource(modulePath, s"container-client/$context-controls-js-report.json")

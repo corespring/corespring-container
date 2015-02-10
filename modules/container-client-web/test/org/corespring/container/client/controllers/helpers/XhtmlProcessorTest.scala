@@ -35,23 +35,23 @@ class XhtmlProcessorTest extends Specification {
 
   }
 
-  "cleanXhtml" should {
+  "translateParagraphsToDivs" should {
 
     "convert p tags to divs" in {
       val xhtml = "<p>Hello</p>"
-      xhtml.cleanXhtml.trim.removeNewlines ===
+      xhtml.translateParagraphsToDivs.trim.removeNewlines ===
         """<div class="para">Hello</div>""".removeNewlines
     }
 
     "convert p tags to divs and keep class" in {
       val xhtml = """<p class="p-intro2">Hello</p>"""
-      xhtml.cleanXhtml.trim.removeNewlines ===
+      xhtml.translateParagraphsToDivs.trim.removeNewlines ===
         """<div class="para p-intro2">Hello</div>""".removeNewlines
     }
 
     "not reformat whitespace within xhtml" in {
       val xhtml = """This is <i>emphasized</i> within the html."""
-      xhtml.cleanXhtml must beEqualTo(xhtml)
+      xhtml.translateParagraphsToDivs must beEqualTo(xhtml)
     }
 
   }

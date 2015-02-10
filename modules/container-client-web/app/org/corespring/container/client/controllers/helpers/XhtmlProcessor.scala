@@ -1,7 +1,9 @@
 package org.corespring.container.client.controllers.helpers
 
-import org.htmlcleaner._
-import scala.util.matching.Regex
+import org.xml.sax.SAXParseException
+
+import scala.xml.transform.{RewriteRule, RuleTransformer}
+import scala.xml._
 
 trait XhtmlProcessor {
 
@@ -17,37 +19,19 @@ trait XhtmlProcessor {
     replacements.foldLeft(xhtml)((replacement, acc) => acc(replacement))
   }
 
-  def cleanXhtml(xhtml: String) = {
+  def translateParagraphsToDivs(xhtml: String) = new RuleTransformer(new RewriteRule {
+    override def transform(n: Node) = n match {
+      case n: Elem if n.label == "p" => n.copy(label = "div") %
+        Attribute(null, "class",
+          s"para${n.attribute("class").map(c => if (c.text.isEmpty) "" else s" ${c.text}").getOrElse("")}",
+          Null)
+      case n => n
+    }
+  }).transform(stringToNodes(xhtml)).mkString
 
-    val cleaner: HtmlCleaner = new HtmlCleaner()
-    val transformations: CleanerTransformations = new CleanerTransformations()
-
-    val pToDiv = new TagTransformation("p", "div", true)
-    pToDiv.addAttributeTransformation("class", "para ${class}")
-    transformations.addTransformation(pToDiv)
-    cleaner.getProperties.setCleanerTransformations(transformations)
-
-    cleaner.getProperties.setUseEmptyElementTags(false)
-    cleaner.getProperties.setOmitXmlDeclaration(true)
-    cleaner.getProperties.setOmitHtmlEnvelope(true)
-
-    val n: TagNode = cleaner.clean(xhtml)
-    val serializer = new CompactXmlSerializer(cleaner.getProperties)
-    val cleanHtml = serializer.getAsString(n)
-
-    //the cleaner creates class="para " (with an extra blank) when the p does not have class
-    //the regexp below removes that blank
-    """class="para """".r.replaceAllIn(cleanHtml, {m => """class="para""""})
-  }
-
-  def toWellFormedXhtml(html: String): String = {
-    val cleaner: HtmlCleaner = new HtmlCleaner()
-    cleaner.getProperties.setUseEmptyElementTags(false)
-    cleaner.getProperties.setOmitXmlDeclaration(true)
-    cleaner.getProperties.setOmitHtmlEnvelope(false)
-    val n: TagNode = cleaner.clean(html)
-    val serializer = new CompactXmlSerializer(cleaner.getProperties)
-    serializer.getAsString(n)
+  private def stringToNodes(xhtml: String): NodeSeq = {
+    val wrapper = "div"
+    XML.loadString(s"<$wrapper>$xhtml</$wrapper>").child
   }
 
 }
@@ -56,8 +40,9 @@ object XhtmlProcessor extends XhtmlProcessor {
 
   implicit class StringWithProcessor(string: String) {
     def tagNamesToAttributes = XhtmlProcessor.super.tagNamesToAttributes(string)
-    def cleanXhtml = XhtmlProcessor.super.cleanXhtml(string)
-    def toWellFormedXhtml = XhtmlProcessor.super.toWellFormedXhtml(string)
+    def translateParagraphsToDivs = XhtmlProcessor.super.translateParagraphsToDivs(string)
+
+    def toWellFormedXhtml = string.tagNamesToAttributes.translateParagraphsToDivs
   }
 
 }
