@@ -18,7 +18,6 @@ angular.module('corespring.wiggi-wiz-features.mathjax')
       html = $element.html();
       $element.addClass('mathjax-holder');
       var template = $templateCache.get('/editor/question/wiggi-wiz-features/mathjax/mathjax-holder.html');
-      console.log('template: ', template);
       $element.html(template);
       return link;
     }
