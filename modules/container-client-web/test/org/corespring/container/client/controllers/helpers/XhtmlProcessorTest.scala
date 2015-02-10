@@ -49,6 +49,11 @@ class XhtmlProcessorTest extends Specification {
         """<div class="para p-intro2">Hello</div>""".removeNewlines
     }
 
+    "not reformat whitespace within xhtml" in {
+      val xhtml = """This is <i>emphasized</i> within the html."""
+      xhtml.cleanXhtml must beEqualTo(xhtml)
+    }
+
   }
 
 }
