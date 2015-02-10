@@ -1,8 +1,8 @@
 {
-  "_id": "533eb66423fd752c27a0874f",
+  "_id": "533eb66423fd754c27208044",
   "profile" : {
     "taskInfo" : {
-      "title": "Placement Ordering Example",
+      "title": "Placement Ordering Images Example",
       "gradeLevel" : ["01", "03"],
       "subjects" : {
         "primary" : {
@@ -23,7 +23,7 @@
     "1": {
       "componentType": "corespring-ordering",
       "title": "",
-      "correctResponse": ["c1","c2"],
+      "correctResponse": ["c3","c2","c1","c4"],
       "feedback": {
         "correctFeedbackType": "default",
         "partialFeedbackType": "default",
@@ -38,21 +38,27 @@
       "model": {
         "choices": [
           {
-            "label": "Apple",
+            "label": "<img src='http://www.turbolabracing.com/wp-content/uploads/sites/10/2013/02/Cats-150x150.jpg'></img>",
             "labelType": "text",
             "id": "c1",
             "moveOnDrag": true
           },
           {
-            "label": "Pear",
+            "label": "<img src='http://petcaregt.com/blog/wp-content/uploads/2010/05/cat-image-150x150.jpg'></img>",
             "labelType": "text",
             "id": "c2",
             "moveOnDrag": true
           },
           {
-            "label": "Banana",
+            "label": "<img src='http://petcaregt.com/blog/wp-content/uploads/2010/05/cat-image-150x150.jpg'>",
             "labelType": "text",
             "id": "c3",
+            "moveOnDrag": true
+          },
+          {
+            "label": "<img src='http://petcaregt.com/blog/wp-content/uploads/2010/05/cat-image-150x150.jpg'>",
+            "labelType": "text",
+            "id": "c4",
             "moveOnDrag": true
           }
         ],
