@@ -1,14 +1,14 @@
 package org.corespring.container.client.controllers.apps
 
-import org.corespring.container.client.VersionInfo
 import org.corespring.container.client.V2PlayerConfig
 import org.corespring.container.client.component.PlayerItemTypeReader
+import org.corespring.container.client.controllers.helpers.XhtmlProcessor
 import org.corespring.container.client.controllers.jade.Jade
 import org.corespring.container.client.hooks.PlayerHooks
 import org.corespring.container.client.views.txt.js.PlayerServices
 import org.corespring.container.components.processing.PlayerItemPreProcessor
-import play.api.libs.json.{ JsString, JsValue, JsObject, Json }
-import play.api.mvc.{ Action, AnyContent, RequestHeader }
+import play.api.libs.json._
+import play.api.mvc._
 
 trait Player
   extends App[PlayerHooks]
@@ -22,12 +22,10 @@ trait Player
    * So we need a way to get all potential component names from
    * each component, not just assume its the top level.
    */
-  def processXhtml(maybeXhtml: Option[String]) = maybeXhtml.map {
-    xhtml =>
-      tagNamesToAttributes(xhtml).getOrElse {
-        throw new RuntimeException(s"Error processing xhtml: $xhtml")
-      }
-  }.getOrElse("<div><h1>New Item</h1></div>")
+  def processXhtml(maybeXhtml: Option[String]) = {
+    import XhtmlProcessor._
+    maybeXhtml.map(_.tagNamesToAttributes.cleanXhtml).getOrElse("<div><h1>New Item</h1></div>")
+  }
 
   lazy val controlsJsSrc: SourcePaths = SourcePaths.fromJsonResource(modulePath, s"container-client/$context-controls-js-report.json")
 
