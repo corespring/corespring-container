@@ -50,8 +50,8 @@ describe('DataQueryService', function() {
     var uriEncodedQuery = "%7B%22description%22%3A%22some%20%26%20item%22%7D";
 
     beforeEach(function() {
-      spyOn(JSON, 'stringify').and.returnValue(stringified);
-      spyOn(window, 'encodeURIComponent').and.returnValue(uriEncoded);
+      spyOn(JSON, 'stringify').and.returnValue(stringifiedQuery);
+      spyOn(window, 'encodeURIComponent').and.returnValue(uriEncodedQuery);
 
       dataQueryService.query(topic, query, success);
     });
