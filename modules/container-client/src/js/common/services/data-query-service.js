@@ -6,8 +6,8 @@
     function _call(topic, query, onSuccess, onFailure){
       var url = baseUrl + topic;
 
-      if(query){
-       url += "?query=" + JSON.stringify(query);
+      if (query) {
+       url += "?query=" + encodeURI(JSON.stringify(query).replace(/&/g, "and"));
       }
 
       $http({method: 'GET', url: url})
@@ -55,7 +55,7 @@
      * @param filters Filters the results. Only items that have the same properties are returned.
      * @returns a query object that can be passed to the query function
      */
-    this.createQuery = function(searchTerm, fields, filters){
+    this.createQuery = function(searchTerm, fields, filters) {
       var query = {};
       if (searchTerm) {
         query.searchTerm = searchTerm;
