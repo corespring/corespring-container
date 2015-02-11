@@ -59,10 +59,9 @@ describe('DataQueryService', function() {
     });
 
     it('should stringify and URI encode query parameter in HTTP request', function() {
-      var stringifiedAndURIEncoded = encodeURIComponent(JSON.stringify(query));
       expect(http).toHaveBeenCalledWith({
         method: jasmine.any(String),
-        url: '../../data-query/' + topic + '?query=' + stringifiedAndURIEncoded
+        url: '../../data-query/' + topic + '?query=' + encodeURIComponent(JSON.stringify(query))
       })
     });
 
