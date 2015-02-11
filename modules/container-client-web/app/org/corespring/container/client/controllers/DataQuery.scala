@@ -45,13 +45,9 @@ trait DataQuery extends Controller with HasContext {
   def list(topic: String, query: Option[String] = None): Action[AnyContent] = Action.async { implicit request =>
 
     if (listTopics.contains(topic)) {
-      hooks.list(topic, query.map(_.replaceAll(" and ", " & "))).map {
-        case Left((code, msg)) => {
-          Status(code)(Json.obj("error" -> msg))
-        }
-        case Right(arr) => {
-          Ok(arr)
-        }
+      hooks.list(topic, query).map {
+        case Left((code, msg)) => Status(code)(Json.obj("error" -> msg))
+        case Right(arr) => Ok(arr)
       }
     } else {
       Future(BadRequest(Json.obj("error" -> s"$topic is not a valid topic from: ${listTopics.mkString(",")}")))

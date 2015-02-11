@@ -7,7 +7,7 @@
       var url = baseUrl + topic;
 
       if (query) {
-       url += "?query=" + encodeURI(JSON.stringify(query).replace(/&/g, "and"));
+       url += "?query=" + encodeURIComponent(JSON.stringify(query));
       }
 
       $http({method: 'GET', url: url})
