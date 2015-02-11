@@ -45,17 +45,25 @@ describe('DataQueryService', function() {
   });
 
   describe('query', function() {
-    var query = {'description' : 'some item'};
+    var query = {'description' : 'some & item'};
 
     beforeEach(function() {
       dataQueryService.query(topic, query, success);
     });
 
-    it('should call $http', function() {
+    it('should make an http GET request', function() {
       expect(http).toHaveBeenCalledWith({
         method: 'GET',
-        url: '../../data-query/' + topic + '?query=' + JSON.stringify(query)
+        url: jasmine.any(String)
       });
+    });
+
+    it('should stringify and URI encode query parameter in HTTP request', function() {
+      var stringifiedAndURIEncoded = encodeURIComponent(JSON.stringify(query));
+      expect(http).toHaveBeenCalledWith({
+        method: jasmine.any(String),
+        url: '../../data-query/' + topic + '?query=' + stringifiedAndURIEncoded
+      })
     });
 
     it('should call the success function with provided data', function() {
