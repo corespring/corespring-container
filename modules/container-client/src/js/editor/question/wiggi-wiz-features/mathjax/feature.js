@@ -1,29 +1,24 @@
-angular.module('corespring.wiggi-wiz-features.mathjax').factory('WiggiMathJaxFeatureDef', ['MathJaxService', '$timeout',
+angular.module('corespring.wiggi-wiz-features.mathjax').factory('WiggiMathJaxFeatureDef', ['MathJaxService',
 
-  function(MathJaxService, $timeout) {
+  function(MathJaxService) {
 
     function FeatureDef() {
+      var name = 'mathjax';
 
-      this.name = 'mathjax';
+      function dialog(editor, callback, $scope) {
+        editor.launchDialog({ originalMarkup: $scope ? ($scope.originalMarkup || '') : ''},
+          'Math',
+          '<mathjax-dialog ng-model="data.originalMarkup"></mathjax-dialog>',
+          callback,
+          {},
+          {featureName: name}
+        );
+      };
+
+      this.name = name;
       this.attributeName = 'mathjax';
       this.draggable = true;
       this.iconclass = 'fa math-sum';
-      this.addToEditor = function(editor, addContent) {
-        editor.launchDialog('',
-          'Math',
-          '<mathjax-dialog ng-model="data.originalMarkup"></mathjax-dialog>',
-          function(update) {
-            var $node;
-            if (!update.cancelled) {
-              $node = $('<mathjax-holder></mathjax-holder>');
-              $node.html(update.originalMarkup);
-              addContent($node);
-            }
-          },
-          {},
-          {featureName: this.name})
-      };
-
       this.compile = true;
 
       this.initialise = function($node, replaceWith) {
@@ -34,20 +29,25 @@ angular.module('corespring.wiggi-wiz-features.mathjax').factory('WiggiMathJaxFea
         return replaceWith(newNode);
       };
 
+      this.addToEditor = function(editor, addContent) {
+        dialog(editor, function(update) {
+          var $node;
+          if (!update.cancelled) {
+            $node = $('<mathjax-holder></mathjax-holder>');
+            $node.html(update.originalMarkup);
+            addContent($node);
+          }
+        });
+      };
+
       this.onClick = function($node, $scope, editor) {
-        editor.launchDialog({ originalMarkup: $scope.originalMarkup || '' },
-          'Math',
-          '<mathjax-dialog ng-model="data.originalMarkup"></mathjax-dialog>',
-          function onUpdate(update) {
-            if (!update.cancelled) {
-              $scope.originalMarkup = update.originalMarkup;
-              $scope.$emit('save-data');
-              MathJaxService.parseDomForMath(100);
-            }
-          },
-          {},
-          {featureName: this.name}
-        );
+        dialog(editor, function(update) {
+          if (!update.cancelled) {
+            $scope.originalMarkup = update.originalMarkup;
+            $scope.$emit('save-data');
+            MathJaxService.parseDomForMath(100);
+          }
+        }, $scope);
       };
 
       this.getMarkUp = function($node, $scope) {
