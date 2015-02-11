@@ -65,11 +65,11 @@ describe('DataQueryService', function() {
 
     it('should stringify and URI encode query parameter in HTTP request', function() {
       expect(JSON.stringify).toHaveBeenCalledWith(query);
-      expect(window.encodeURIComponent).toHaveBeenCalledWith(stringified);
+      expect(window.encodeURIComponent).toHaveBeenCalledWith(stringifiedQuery);
 
       expect(http).toHaveBeenCalledWith({
         method: jasmine.any(String),
-        url: '../../data-query/' + topic + '?query=' + uriEncoded
+        url: '../../data-query/' + topic + '?query=' + uriEncodedQuery
       });
     });
 
