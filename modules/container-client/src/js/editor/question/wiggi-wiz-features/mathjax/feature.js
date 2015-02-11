@@ -13,7 +13,7 @@ angular.module('corespring.wiggi-wiz-features.mathjax').factory('WiggiMathJaxFea
           {},
           {featureName: name}
         );
-      };
+      }
 
       this.name = name;
       this.attributeName = 'mathjax';
