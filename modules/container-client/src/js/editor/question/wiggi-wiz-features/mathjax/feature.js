@@ -3,12 +3,25 @@ angular.module('corespring.wiggi-wiz-features.mathjax').factory('WiggiMathJaxFea
   function(MathJaxService, $timeout) {
 
     function FeatureDef() {
+
       this.name = 'mathjax';
       this.attributeName = 'mathjax';
       this.draggable = true;
       this.iconclass = 'fa math-sum';
       this.addToEditor = function(editor, addContent) {
-        addContent($('<div mathjax-holder></div>'));
+        editor.launchDialog('',
+          'Math',
+          '<mathjax-dialog ng-model="data.originalMarkup"></mathjax-dialog>',
+          function(update) {
+            var $node;
+            if (!update.cancelled) {
+              $node = $('<mathjax-holder></mathjax-holder>');
+              $node.html(update.originalMarkup);
+              addContent($node);
+            }
+          },
+          {},
+          {featureName: this.name})
       };
 
       this.compile = true;
@@ -26,7 +39,7 @@ angular.module('corespring.wiggi-wiz-features.mathjax').factory('WiggiMathJaxFea
           'Math',
           '<mathjax-dialog ng-model="data.originalMarkup"></mathjax-dialog>',
           function onUpdate(update) {
-            if(!update.cancelled) {
+            if (!update.cancelled) {
               $scope.originalMarkup = update.originalMarkup;
               $scope.$emit('save-data');
               MathJaxService.parseDomForMath(100);
