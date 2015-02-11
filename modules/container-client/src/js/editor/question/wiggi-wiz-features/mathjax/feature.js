@@ -3,11 +3,22 @@ angular.module('corespring.wiggi-wiz-features.mathjax').factory('WiggiMathJaxFea
   function(MathJaxService) {
 
     function FeatureDef() {
-      this.name = 'mathjax';
+      var name = 'mathjax';
+
+      function dialog(editor, callback, $scope) {
+        editor.launchDialog({ originalMarkup: $scope ? ($scope.originalMarkup || '') : ''},
+          'Math',
+          '<mathjax-dialog ng-model="data.originalMarkup"></mathjax-dialog>',
+          callback,
+          {},
+          {featureName: name}
+        );
+      }
+
+      this.name = name;
       this.attributeName = 'mathjax';
       this.draggable = true;
       this.iconclass = 'fa math-sum';
-      this.addToEditor = '<div mathjax-holder></div>';
       this.compile = true;
 
       this.initialise = function($node, replaceWith) {
@@ -18,24 +29,25 @@ angular.module('corespring.wiggi-wiz-features.mathjax').factory('WiggiMathJaxFea
         return replaceWith(newNode);
       };
 
-      this.editNode = function($node, $scope, editor) {
+      this.addToEditor = function(editor, addContent) {
+        dialog(editor, function(update) {
+          var $node;
+          if (!update.cancelled) {
+            $node = $('<mathjax-holder></mathjax-holder>');
+            $node.html(update.originalMarkup);
+            addContent($node);
+          }
+        });
+      };
 
-        editor.launchDialog(
-          {
-            originalMarkup: $scope.originalMarkup || ''
-          },
-          'Math',
-          '<mathjax-dialog ng-model="data.originalMarkup"></mathjax-dialog>',
-          function onUpdate(update) {
-            if(!update.cancelled) {
-              $scope.originalMarkup = update.originalMarkup;
-              $scope.$emit('save-data');
-              MathJaxService.parseDomForMath(100);
-            }
-          },
-          {},
-          {featureName: this.name}
-        );
+      this.onClick = function($node, $scope, editor) {
+        dialog(editor, function(update) {
+          if (!update.cancelled) {
+            $scope.originalMarkup = update.originalMarkup;
+            $scope.$emit('save-data');
+            MathJaxService.parseDomForMath(100);
+          }
+        }, $scope);
       };
 
       this.getMarkUp = function($node, $scope) {
