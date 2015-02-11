@@ -117,7 +117,6 @@ angular.module('corespring.wiggi-wiz-features.cs-image').factory('ImageFeature',
       });
     };
 
-
     return csImage;
   }
 ]);
