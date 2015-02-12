@@ -56,4 +56,24 @@ class XhtmlProcessorTest extends Specification {
 
   }
 
+  "toWellFormedXhtml" should {
+    "be able to handle xhtml with multiple paragraphs as root nodes" in {
+      val xhtml = """<p>one</p><p>two</p>"""
+      xhtml.toWellFormedXhtml.trim.removeNewlines ===
+        """<div class="para">one</div><div class="para">two</div>""".removeNewlines
+    }
+
+    "be able to handle xhtml with mutiple nodes as root nodes" in {
+      val xhtml = """<h1>Regression test item multiple-choice.json</h1><corespring-multiple-choice id="3"></corespring-multiple-choice>"""
+      xhtml.toWellFormedXhtml.trim.removeNewlines ===
+        """<h1>Regression test item multiple-choice.json</h1><div id="3" corespring-multiple-choice="corespring-multiple-choice"/>""".removeNewlines
+    }
+
+    "be able to deal with open br tags" in {
+      val xhtml = """<p>line one<br>line two</p>"""
+      xhtml.toWellFormedXhtml.trim.removeNewlines ===
+        """<div class="para">line one<br/>line two</div>""".removeNewlines
+    }
+  }
+
 }
