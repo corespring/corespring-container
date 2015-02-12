@@ -7,8 +7,8 @@ angular.module('corespring-editor.controllers').controller('NavController', [
   function($scope, LogFactory, $modal, ItemService, ConfigurationService) {
 
     ConfigurationService.getConfig(function(config) {
-      $scope.showTitle = (config && config.profileConfig && config.profileConfig.title)
-        ? config.profileConfig.title.visible === true : true;
+      $scope.showTitle = (config && config.profileConfig && config.profileConfig.title) ?
+        config.profileConfig.title.visible === true : true;
     });
 
     var logger = LogFactory.getLogger('NavController');
