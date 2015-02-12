@@ -56,17 +56,21 @@ trait PlayerItemTypeReader
 
     import XhtmlProcessor._
 
-    //Note: the xhtml may not have a single root - so we wrap it
-    val xml = scala.xml.XML.loadString(xmlString.toWellFormedXhtml)
+    try {
+      //Note: the xhtml may not have a single root - so we wrap it
+      val xml = scala.xml.XML.loadString(s"<root>$xmlString</root>".toWellFormedXhtml)
+      val usedInXml = components.filter {
+        lc =>
+          val name = tagName(lc.org, lc.name)
+          val hasComponentAsAttribute = xml.child.exists(!_.attribute(name).isEmpty)
+          (xml \\ name).length > 0 || hasComponentAsAttribute
+      }
 
-    val usedInXml = components.filter {
-      lc =>
-        val name = tagName(lc.org, lc.name)
-        val hasComponentAsAttribute = xml.child.exists(!_.attribute(name).isEmpty)
-        (xml \\ name).length > 0 || hasComponentAsAttribute
+      usedInXml.map(lc => tagName(lc.org, lc.name))
+    } catch {
+      case e: Exception => throw new Exception(s"Error parsing string: $xmlString", e)
     }
 
-    usedInXml.map(lc => tagName(lc.org, lc.name))
   }
 
 }
