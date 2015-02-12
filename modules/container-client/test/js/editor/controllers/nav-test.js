@@ -20,6 +20,10 @@ describe('NavController', function() {
     })
   };
 
+  var ConfigurationService = {
+    getConfig: function() {}
+  };
+
   afterEach(function() {
     ItemService.load.calls.reset();
     ItemService.addSaveListener.calls.reset();
@@ -34,6 +38,7 @@ describe('NavController', function() {
     $provide.value('ItemService', ItemService);
     $provide.value('LogFactory', LogFactory);
     $provide.value('$modal', $modal);
+    $provide.value('ConfigurationService', ConfigurationService);
   }));
 
   beforeEach(inject(function($rootScope, $compile) {
