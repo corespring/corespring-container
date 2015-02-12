@@ -23,11 +23,11 @@
 
     var callbacks = [];
 
-    this.setConfig = function(value){
+    this.setConfig = function(value) {
       $log.log('setConfig', value);
       config = value;
       configHasBeenSet = true;
-      _.forEach(callbacks, function(callback){
+      _.forEach(callbacks, function(callback) {
         try {
           callback(config);
         } catch (err) {
@@ -36,8 +36,8 @@
       });
     };
 
-    this.getConfig = function(callback){
-      if(configHasBeenSet){
+    this.getConfig = function(callback) {
+      if (configHasBeenSet) {
         callback(config);
       } else {
         callbacks.push(callback);
