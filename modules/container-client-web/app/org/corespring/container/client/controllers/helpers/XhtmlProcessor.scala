@@ -1,11 +1,9 @@
 package org.corespring.container.client.controllers.helpers
 
-import org.xml.sax.SAXParseException
-
 import scala.xml.transform.{RewriteRule, RuleTransformer}
 import scala.xml._
 
-trait XhtmlProcessor {
+trait XhtmlProcessor extends TagSoupHTMLCleaner {
 
   /**
    * Converts xhtml by moving custom tag names to attributes instead
@@ -41,8 +39,8 @@ object XhtmlProcessor extends XhtmlProcessor {
   implicit class StringWithProcessor(string: String) {
     def tagNamesToAttributes = XhtmlProcessor.super.tagNamesToAttributes(string)
     def translateParagraphsToDivs = XhtmlProcessor.super.translateParagraphsToDivs(string)
-
-    def toWellFormedXhtml = string.tagNamesToAttributes.translateParagraphsToDivs
+    def clean = XhtmlProcessor.super.clean(string)
+    def toWellFormedXhtml = string.clean.tagNamesToAttributes.translateParagraphsToDivs
   }
 
 }

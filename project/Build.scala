@@ -32,6 +32,7 @@ object Build extends sbt.Build {
     val commonsIo = "commons-io" % "commons-io" % "2.4"
     val commonsLang = "org.apache.commons" % "commons-lang3" % "3.2.1" % "test"
     val dependencyUtils = "org.corespring" %% "dependency-utils" % "0.5"
+    val tagSoup = "org.ccil.cowan.tagsoup" % "tagsoup" % "1.2"
     val grizzled = "org.clapper" %% "grizzled-scala" % "1.2"
     val grizzledLog = "org.clapper" %% "grizzled-slf4j" % "1.0.2"
     val jade4j = "de.neuland-bfi" % "jade4j" % "0.4.2"
@@ -182,6 +183,7 @@ object Build extends sbt.Build {
       libraryDependencies ++= Seq(
         mockito,
         grizzled,
+        tagSoup,
         scalaz,
         jade4j,
         closureCompiler,
