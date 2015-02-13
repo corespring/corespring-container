@@ -29,7 +29,7 @@ trait XhtmlProcessor {
     cleaner.getProperties.setOmitHtmlEnvelope(true)
 
     val n: TagNode = cleaner.clean(substitutedOpeningTag)
-    val serializer = new CompactXmlSerializer(cleaner.getProperties)
+    val serializer = new SimpleHtmlSerializer(cleaner.getProperties)
     val cleanHtml = serializer.getAsString(n)
 
     //the cleaner creates class="para " (with an extra blank) when the p does not have class
@@ -43,7 +43,7 @@ trait XhtmlProcessor {
     cleaner.getProperties.setOmitXmlDeclaration(true)
     cleaner.getProperties.setOmitHtmlEnvelope(false)
     val n: TagNode = cleaner.clean(html)
-    val serializer = new CompactXmlSerializer(cleaner.getProperties)
+    val serializer = new SimpleHtmlSerializer(cleaner.getProperties)
     serializer.getAsString(n)
   }
 }
