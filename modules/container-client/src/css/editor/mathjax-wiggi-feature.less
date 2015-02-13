@@ -1,5 +1,4 @@
-@light-grey: #e4e4e4;
-@preview-min-width: 160px;
+@import "../common/colors";
 
 //The mathjax feature in wiggi adds 'mathjax' to the modal class
 //To allow us to use feature specific styles for the dialog.
@@ -45,8 +44,6 @@
 }
 
 
-@min-width: 30px;
-@height: 32px;
 
 .mathjax-holder {
   .user-select(none);
@@ -62,6 +59,9 @@
   }
   
   .root {
+      
+      @min-width: 30px;
+
       position: relative;
       margin-left: 1px;
       display: inline-block;
@@ -182,6 +182,7 @@
   }
 
   .math-preview {
+    @preview-min-width: 160px;
     background-color: @light-grey;
     overflow-x: auto;
     text-align: center;
