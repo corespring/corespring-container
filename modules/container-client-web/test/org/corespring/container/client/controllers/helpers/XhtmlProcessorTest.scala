@@ -73,10 +73,16 @@ class XhtmlProcessorTest extends Specification {
         """<div class="para">line one<br/>line two</div>""".removeNewlines
     }
 
-    "return valid open/close tag as-is" in {
+    "not convert empty tags to self-closing tags" in {
       val xhtml = """<div></div>"""
       XhtmlProcessor.toWellFormedXhtml(xhtml).trim.removeNewlines ===
         """<div></div>""".removeNewlines
+    }
+
+    "return input tag as-is" in {
+      val xhtml = """<input />"""
+      XhtmlProcessor.toWellFormedXhtml(xhtml).trim.removeNewlines ===
+        """<input />""".removeNewlines
     }
   }
 
