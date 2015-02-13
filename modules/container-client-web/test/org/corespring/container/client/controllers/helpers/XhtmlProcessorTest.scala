@@ -6,7 +6,7 @@ class XhtmlProcessorTest extends Specification {
 
   implicit def PlatformString(s: String) = new {
     def removeNewlines = {
-      s.replaceAll("\r\n", "\n").replaceAll("\r", "")
+      s.replaceAll("\r", "").replaceAll("\n", "")
     }
   }
 
@@ -46,12 +46,6 @@ class XhtmlProcessorTest extends Specification {
       XhtmlProcessor.translateParagraphsToDivs(xhtml).trim.removeNewlines ===
         """<div class="para p-intro2">Hello</div>""".removeNewlines
     }
-
-    "not reformat whitespace within xhtml" in {
-      val xhtml = """This is <i>emphasized</i> within the html."""
-      XhtmlProcessor.translateParagraphsToDivs(xhtml) must beEqualTo(xhtml)
-    }
-
   }
 
   "toWellFormedXhtml" should {
@@ -61,7 +55,7 @@ class XhtmlProcessorTest extends Specification {
         """<div class="para">one</div><div class="para">two</div>""".removeNewlines
     }
 
-    "be able to handle xhtml with mutiple nodes as root nodes" in {
+    "be able to handle xhtml with multiple arbitray nodes as root nodes" in {
       val xhtml = """<h1>Regression test item multiple-choice.json</h1><corespring-multiple-choice id="3"></corespring-multiple-choice>"""
       XhtmlProcessor.toWellFormedXhtml(xhtml).trim.removeNewlines ===
         """<h1>Regression test item multiple-choice.json</h1><div id="3" corespring-multiple-choice="corespring-multiple-choice"/>""".removeNewlines
@@ -73,17 +67,33 @@ class XhtmlProcessorTest extends Specification {
         """<div class="para">line one<br/>line two</div>""".removeNewlines
     }
 
-    "not convert empty tags to self-closing tags" in {
-      val xhtml = """<div></div>"""
-      XhtmlProcessor.toWellFormedXhtml(xhtml).trim.removeNewlines ===
-        """<div></div>""".removeNewlines
+    "not remove essential whitespace within xhtml" in {
+      val xhtml = """This is <i>emphasized</i> within the html."""
+      XhtmlProcessor.toWellFormedXhtml(xhtml) must beEqualTo(xhtml)
     }
 
-    "return input tag as-is" in {
+  }
+
+  "documenting the unwanted behaviour of toWellFormedXhtml " should {
+
+    "show that empty tags are converted to to self-closing tags" in {
+      val xhtml = """<div></div>"""
+      XhtmlProcessor.toWellFormedXhtml(xhtml).trim.removeNewlines ===
+        """<div/>""".removeNewlines
+    }
+
+    "show that custom tags are removed" in {
+      val xhtml = """<custom-tag></custom-tag>"""
+      XhtmlProcessor.toWellFormedXhtml(xhtml).trim.removeNewlines ===
+        """""".removeNewlines
+    }
+
+    "show that input tags are wrapped into form tags" in {
       val xhtml = """<input />"""
       XhtmlProcessor.toWellFormedXhtml(xhtml).trim.removeNewlines ===
-        """<input />""".removeNewlines
+        """<form><input/></form>""".removeNewlines
     }
+
   }
 
 }

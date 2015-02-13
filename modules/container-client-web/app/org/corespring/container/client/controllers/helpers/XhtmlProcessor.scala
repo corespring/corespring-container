@@ -1,6 +1,6 @@
 package org.corespring.container.client.controllers.helpers
 
-import scala.xml.transform.{RewriteRule, RuleTransformer}
+import scala.xml.transform.{ RewriteRule, RuleTransformer }
 import scala.xml._
 
 trait XhtmlProcessor extends TagSoupHTMLCleaner {
@@ -11,9 +11,8 @@ trait XhtmlProcessor extends TagSoupHTMLCleaner {
    */
   def tagNamesToAttributes(xhtml: String): String = {
     val replacements: Seq[String => String] = Seq(
-      s => "(?<=<\\/)(corespring-.*?)(?=>)".r.replaceAllIn(s, { m => "div"}),
-      s => "(?<=<)(corespring-.*?)(?=\\s|>)".r.replaceAllIn(s, { m => s"""div ${m.group(1)}="${m.group(1)}""""})
-    )
+      s => "(?<=<\\/)(corespring-.*?)(?=>)".r.replaceAllIn(s, { m => "div" }),
+      s => "(?<=<)(corespring-.*?)(?=\\s|>)".r.replaceAllIn(s, { m => s"""div ${m.group(1)}="${m.group(1)}"""" }))
     replacements.foldLeft(xhtml)((replacement, acc) => acc(replacement))
   }
 
@@ -27,6 +26,10 @@ trait XhtmlProcessor extends TagSoupHTMLCleaner {
     }
   }).transform(stringToNodes(xhtml)).mkString
 
+  def clean(string: String): String = {
+    cleanTagSoup(string)
+  }
+
   private def stringToNodes(xhtml: String): NodeSeq = {
     val wrapper = "div"
     XML.loadString(s"<$wrapper>$xhtml</$wrapper>").child
@@ -36,9 +39,7 @@ trait XhtmlProcessor extends TagSoupHTMLCleaner {
 
 object XhtmlProcessor extends XhtmlProcessor {
 
-    def toWellFormedXhtml(string:String) = translateParagraphsToDivs(tagNamesToAttributes(clean(string)))
+  def toWellFormedXhtml(string: String) = translateParagraphsToDivs(tagNamesToAttributes(clean(string)))
 
 }
-
-
 

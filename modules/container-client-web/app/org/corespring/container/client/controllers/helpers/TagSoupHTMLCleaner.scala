@@ -11,9 +11,9 @@ import org.xml.sax.InputSource
 
 import scala.xml._
 
-trait TagSoupHTMLCleaner extends HTMLCleaner {
+trait TagSoupHTMLCleaner {
 
-  def clean(xhtml: String) = {
+  def cleanTagSoup(xhtml: String) = {
     //Remove the namespace, and return the contents of the <body/>. For some reason TagSoup adds these things.
     (clearNamespace(sanitize(xhtml)) \ "body").map(_.child).flatten.mkString
   }
