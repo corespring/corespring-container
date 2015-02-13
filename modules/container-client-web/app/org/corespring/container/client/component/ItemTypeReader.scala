@@ -54,19 +54,20 @@ trait PlayerItemTypeReader
 
   private def layoutTypesInXml(xmlString: String, components: Seq[LayoutComponent]): Seq[String] = {
 
+    //Note: the xhtml may not have a single root - so we wrap it
+    val wrappedXmlString = s"<root>$xmlString</root>"
+
     try {
-      //Note: the xhtml may not have a single root - so we wrap it
-      val xml = scala.xml.XML.loadString(XhtmlProcessor.toWellFormedXhtml(s"<root>$xmlString</root>"))
+      val xml = scala.xml.XML.loadString(XhtmlProcessor.toWellFormedXhtml(wrappedXmlString))
       val usedInXml = components.filter {
         lc =>
           val name = tagName(lc.org, lc.name)
           val hasComponentAsAttribute = xml.child.exists(!_.attribute(name).isEmpty)
           (xml \\ name).length > 0 || hasComponentAsAttribute
       }
-
       usedInXml.map(lc => tagName(lc.org, lc.name))
     } catch {
-      case e: Exception => throw new Exception(s"Error parsing string: $xmlString", e)
+      case e: Exception => throw new Exception(s"Error parsing string: $wrappedXmlString", e)
     }
 
   }

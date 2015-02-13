@@ -72,6 +72,12 @@ class XhtmlProcessorTest extends Specification {
       XhtmlProcessor.toWellFormedXhtml(xhtml).trim.removeNewlines ===
         """<div class="para">line one<br/>line two</div>""".removeNewlines
     }
+
+    "return valid open/close tag as-is" in {
+      val xhtml = """<div></div>"""
+      XhtmlProcessor.toWellFormedXhtml(xhtml).trim.removeNewlines ===
+        """<div></div>""".removeNewlines
+    }
   }
 
 }

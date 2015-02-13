@@ -1,7 +1,7 @@
 package org.corespring.container.client.controllers.helpers
 
 import java.io.StringWriter
-import javax.xml.transform.TransformerFactory
+import javax.xml.transform.{OutputKeys, TransformerFactory}
 import javax.xml.transform.sax.SAXSource
 import javax.xml.transform.stream.StreamResult
 
@@ -25,6 +25,10 @@ trait TagSoupHTMLCleaner extends HTMLCleaner {
     val parser = new Parser()
     parser.setFeature(Parser.defaultAttributesFeature, false)
     val writer = new StringWriter()
+
+    //For configuration of the transformer see
+    //https://docs.oracle.com/javase/tutorial/jaxp/xslt/writingDom.html
+    //and http://www.w3.org/TR/xslt#output
     val transformer = TransformerFactory.newInstance().newTransformer()
     transformer.transform(new SAXSource(parser, new InputSource(IOUtils.toInputStream(xhtml))), new StreamResult(writer))
     XML.loadString(writer.toString)
