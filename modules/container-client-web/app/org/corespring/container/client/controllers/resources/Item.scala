@@ -65,8 +65,6 @@ trait Item extends Controller {
 
   def saveSubset(itemId: String, subset: String) = Action.async { implicit request: Request[AnyContent] =>
 
-    import XhtmlProcessor._
-
     logger.debug(s"function=saveSubset subset=$subset")
     def missingProperty(p: String) = (i: String) => Future(Left(BAD_REQUEST, s"Missing property $p in json request for $i"))
 

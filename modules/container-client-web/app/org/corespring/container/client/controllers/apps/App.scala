@@ -3,15 +3,13 @@ package org.corespring.container.client.controllers.apps
 import grizzled.slf4j.Logger
 import org.corespring.container.client.component.{ ComponentUrls, ItemTypeReader }
 import org.corespring.container.client.controllers.angular.AngularModules
-import org.corespring.container.client.controllers.helpers.{ Helpers, LoadClientSideDependencies, XhtmlProcessor }
+import org.corespring.container.client.controllers.helpers.{ Helpers, LoadClientSideDependencies }
 import org.corespring.container.client.hooks.ClientHooks
 import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.components.model.Id
 import org.corespring.container.components.model.dependencies.DependencyResolver
 import play.api.Mode.Mode
 import play.api.{ Mode }
-import play.api.http.ContentTypes
-import play.api.libs.json.{ JsValue, Json }
 import play.api.mvc._
 import org.corespring.container.logging.ContainerLogger
 
@@ -26,7 +24,6 @@ trait HasLogger {
 trait App[T <: ClientHooks]
   extends Controller
   with DependencyResolver
-  with XhtmlProcessor
   with Helpers
   with LoadClientSideDependencies
   with HasLogger {

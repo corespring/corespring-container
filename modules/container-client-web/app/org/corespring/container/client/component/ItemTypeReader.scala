@@ -54,11 +54,9 @@ trait PlayerItemTypeReader
 
   private def layoutTypesInXml(xmlString: String, components: Seq[LayoutComponent]): Seq[String] = {
 
-    import XhtmlProcessor._
-
     try {
       //Note: the xhtml may not have a single root - so we wrap it
-      val xml = scala.xml.XML.loadString(s"<root>$xmlString</root>".toWellFormedXhtml)
+      val xml = scala.xml.XML.loadString(XhtmlProcessor.toWellFormedXhtml(s"<root>$xmlString</root>"))
       val usedInXml = components.filter {
         lc =>
           val name = tagName(lc.org, lc.name)

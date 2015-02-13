@@ -36,12 +36,7 @@ trait XhtmlProcessor extends TagSoupHTMLCleaner {
 
 object XhtmlProcessor extends XhtmlProcessor {
 
-  implicit class StringWithProcessor(string: String) {
-    def tagNamesToAttributes = XhtmlProcessor.super.tagNamesToAttributes(string)
-    def translateParagraphsToDivs = XhtmlProcessor.super.translateParagraphsToDivs(string)
-    def clean = XhtmlProcessor.super.clean(string)
-    def toWellFormedXhtml = string.clean.tagNamesToAttributes.translateParagraphsToDivs
-  }
+    def toWellFormedXhtml(string:String) = translateParagraphsToDivs(tagNamesToAttributes(clean(string)))
 
 }
 
