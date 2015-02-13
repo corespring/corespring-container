@@ -944,7 +944,9 @@
           ConfigurationService.getConfig(function(config){
             $log.log('getConfig callback', config);
             updateFormModels(config.profileConfig);
-            $timeout(function(){setItem(item);}, 2000);
+            $timeout(function() {
+              setItem(item);
+            }, 2000);
           });
         } else {
           $log.error('error loading profile, item is null');

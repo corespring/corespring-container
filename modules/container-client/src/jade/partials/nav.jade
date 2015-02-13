@@ -22,8 +22,9 @@ include ../templates/popups
 include ../templates/question-information-popup
 
 nav.row.navbar-default(ng-controller="NavController")
-  ul.list-inline
-    li.title(ng-click="editTitle()", ng-class="{'Untitled': 'placeholder'}[title]", ng-bind-html-unsafe="title") 
+  ul.list-inline.title-and-save
+    li.title(ng-click="editTitle()", ng-show="showTitle", ng-class="{'Untitled': 'placeholder'}[title]",
+        ng-bind-html-unsafe="title")
     li
       span.save-msg(ng-switch on="saveStatus")
         span#saved(ng-switch-when="saved")

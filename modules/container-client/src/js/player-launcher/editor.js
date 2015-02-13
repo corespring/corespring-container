@@ -107,7 +107,7 @@ function EditorDefinition(element, options, errorCallback) {
       errorCallback(error);
     });
 
-    instance.on('ready', function () {
+    instance.on('ready', function() {
       if (isReady) {
         instance.removeChannel();
         errorCallback(errors.EDITOR_NOT_REMOVED);

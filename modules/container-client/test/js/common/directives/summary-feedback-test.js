@@ -5,6 +5,13 @@ describe('summaryFeedback', function() {
   beforeEach(angular.mock.module('corespring-templates'));
   beforeEach(angular.mock.module('corespring-common.directives'));
 
+  beforeEach(module(function($provide) {
+    $provide.value('MathJaxService', {
+      parseDomForMath: function() {
+      }
+    });
+  }));
+
   beforeEach(inject(function($rootScope, $compile) {
     scope = $rootScope.$new();
     compile = function(opts) {
