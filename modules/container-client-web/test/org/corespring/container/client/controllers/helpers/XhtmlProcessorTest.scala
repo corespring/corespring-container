@@ -38,7 +38,9 @@ class XhtmlProcessorTest extends Specification with XhtmlProcessor {
     }
 
     "does not split tags" in {
-      val xhtml = "<p>Hello<corespring-one><corespring-two>Content</corespring-two></corespring-one>World</p>"
+      val xhtml =
+        """<p>Hello
+          |<corespring-one><corespring-two>Content</corespring-two></corespring-one>World</p>""".stripMargin
       tagNamesToAttributes(xhtml).get.trim.toUnix ===
         """<div class="para">Hello
           |<div corespring-one="corespring-one"><div corespring-two="corespring-two">Content</div></div>World</div>""".stripMargin.toUnix
