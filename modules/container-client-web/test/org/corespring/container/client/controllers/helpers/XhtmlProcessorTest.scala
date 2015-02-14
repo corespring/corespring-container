@@ -13,18 +13,16 @@ class XhtmlProcessorTest extends Specification {
 
   import XhtmlProcessor._
 
-  case class wellFormed(s:String, expected:Option[String] = None) extends Scope{
-
+  case class assertWellFormed(s:String, expected:Option[String] = None) extends Scope{
     val e = expected.getOrElse(s)
     toWellFormedXhtml(s) === e
-
   }
 
   "XhtmlProcessor" should {
 
-    "toWellFormedXhtml" should {
+    "toassertWellFormedXhtml" should {
 
-      "not change valid xhtml" in wellFormed(
+      "not change valid xhtml" in assertWellFormed(
         """
           |<div>
           |  hello there
@@ -32,12 +30,12 @@ class XhtmlProcessorTest extends Specification {
         """.stripMargin
       )
 
-      "preserves white space" in wellFormed(" <br> ", Some(" <br /> "))
-      "preserves double white spaces" in wellFormed("  <br>  ", Some("  <br />  "))
-      "fixes brs" in wellFormed("<div><br> a</div>", Some("<div><br /> a</div>"))
-      "doesn't strip white space in <em>" in wellFormed("<div><br /><em>a</em> a</div>")
-      "doesn't strip white space in <i>" in wellFormed("<div>what does <i>extracting</i> mean</div>")
-      "wrap markup if needed" in wellFormed("apple <br/>", Some("<div>apple <br /></div>"))
+      "preserves white space" in assertWellFormed(" <br> ", Some(" <br /> "))
+      "preserves double white spaces" in assertWellFormed("  <br>  ", Some("  <br />  "))
+      "fixes brs" in assertWellFormed("<div><br> a</div>", Some("<div><br /> a</div>"))
+      "doesn't strip white space in <em>" in assertWellFormed("<div><br /><em>a</em> a</div>")
+      "doesn't strip white space in <i>" in assertWellFormed("<div>what does <i>extracting</i> mean</div>")
+      "wrap markup if needed" in assertWellFormed("apple <br/>", Some("<div>apple <br /></div>"))
     }
 
     "tagNamesToAttributes" should {
