@@ -1,8 +1,9 @@
 package org.corespring.container.client.controllers.helpers
 
 import org.specs2.mutable.Specification
+import org.specs2.specification.Scope
 
-class XhtmlProcessorTest extends Specification with XhtmlProcessor {
+class XhtmlProcessorTest extends Specification {
 
   implicit def PlattformString(s: String) = new {
     def toUnix = {
@@ -10,40 +11,70 @@ class XhtmlProcessorTest extends Specification with XhtmlProcessor {
     }
   }
 
+  import XhtmlProcessor._
+
+  case class wellFormed(s:String, expected:Option[String] = None) extends Scope{
+
+    val e = expected.getOrElse(s)
+    toWellFormedXhtml(s) === e
+
+  }
+
   "XhtmlProcessor" should {
 
-    "process" in {
+    "toWellFormedXhtml" should {
 
-      val xhtml = """<div><corespring-apple id="1"></corespring-apple><corespring-banana id="2"></corespring-banana></div>"""
-      tagNamesToAttributes(xhtml).get.trim.toUnix ===
-        """<div><div corespring-apple="corespring-apple" id="1"></div><div corespring-banana="corespring-banana" id="2"></div></div>""".toUnix
+      "not change valid xhtml" in wellFormed(
+        """
+          |<div>
+          |  hello there
+          |</div>
+        """.stripMargin
+      )
+
+      "preserves white space" in wellFormed(" <br> ", Some(" <br /> "))
+      "preserves double white spaces" in wellFormed("  <br>  ", Some("  <br />  "))
+      "fixes brs" in wellFormed("<div><br> a</div>", Some("<div><br /> a</div>"))
+      "doesn't strip white space in <em>" in wellFormed("<div><br /><em>a</em> a</div>")
+      "doesn't strip white space in <i>" in wellFormed("<div>what does <i>extracting</i> mean</div>")
+      "wrap markup if needed" in wellFormed("apple <br/>", Some("<div>apple <br /></div>"))
     }
 
-    "keep nested tag structure intact" in {
-      val xhtml = "<corespring-one><corespring-two>Content</corespring-two></corespring-one>"
-      tagNamesToAttributes(xhtml).get.trim.toUnix ===
-        """<div corespring-one="corespring-one"><div corespring-two="corespring-two">Content</div></div>""".toUnix
-    }
+    "tagNamesToAttributes" should {
 
-    "does convert p tags to divs" in {
-      val xhtml = "<p>Hello</p>"
-      tagNamesToAttributes(xhtml).get.trim.toUnix ===
-        """<div class="para">Hello</div>""".toUnix
-    }
 
-    "does convert p tags to divs and keeps class" in {
-      val xhtml = """<p class="p-intro2">Hello</p>"""
-      tagNamesToAttributes(xhtml).get.trim.toUnix ===
-        """<div class="para p-intro2">Hello</div>""".toUnix
-    }
+      "change the tags" in {
+        val xhtml = """<div><corespring-apple id="1"></corespring-apple><corespring-banana id="2"></corespring-banana></div>"""
+        tagNamesToAttributes(Seq("corespring-apple", "corespring-banana"))(xhtml).get.trim.toUnix ===
+          """<div><div id="1" corespring-apple=""></div><div id="2" corespring-banana=""></div></div>""".toUnix
+      }
 
-    "does not split tags" in {
-      val xhtml =
-        """<p>Hello
+      "keep nested tag structure intact" in {
+        val xhtml = "<corespring-one><corespring-two>Content</corespring-two></corespring-one>"
+        tagNamesToAttributes(Seq("corespring-one", "corespring-two"))(xhtml).get.trim.toUnix ===
+          """<div corespring-one=""><div corespring-two="">Content</div></div>""".toUnix
+      }
+
+      "does convert p tags to divs" in {
+        val xhtml = "<p>Hello</p>"
+        tagNamesToAttributes(Seq.empty)(xhtml).get.trim.toUnix ===
+          """<div class="para">Hello</div>""".toUnix
+      }
+
+      "does convert p tags to divs and keeps class" in {
+        val xhtml = """<p class="p-intro2">Hello</p>"""
+        tagNamesToAttributes(Seq.empty)(xhtml).get.trim.toUnix ===
+          """<div class="para p-intro2">Hello</div>""".toUnix
+      }
+
+      "does not split tags" in {
+        val xhtml =
+          """<p>Hello
           |<corespring-one><corespring-two>Content</corespring-two></corespring-one>World</p>""".stripMargin
-      tagNamesToAttributes(xhtml).get.trim.toUnix ===
-        """<div class="para">Hello
-          |<div corespring-one="corespring-one"><div corespring-two="corespring-two">Content</div></div>World</div>""".stripMargin.toUnix
+        tagNamesToAttributes(Seq("corespring-one", "corespring-two"))(xhtml).get.trim.toUnix ===
+          """<div class="para">Hello
+          |<div corespring-one=""><div corespring-two="">Content</div></div>World</div>""".stripMargin.toUnix
+      }
     }
   }
 

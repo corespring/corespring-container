@@ -1,13 +1,13 @@
 package org.corespring.container.client.controllers.apps
 
-import org.corespring.container.client.VersionInfo
+import org.corespring.container.client.controllers.helpers.XhtmlProcessor.tagNamesToAttributes
 import org.corespring.container.client.V2PlayerConfig
 import org.corespring.container.client.component.PlayerItemTypeReader
 import org.corespring.container.client.controllers.jade.Jade
 import org.corespring.container.client.hooks.PlayerHooks
 import org.corespring.container.client.views.txt.js.PlayerServices
 import org.corespring.container.components.processing.PlayerItemPreProcessor
-import play.api.libs.json.{ JsString, JsValue, JsObject, Json }
+import play.api.libs.json._
 import play.api.mvc.{ Action, AnyContent, RequestHeader }
 
 trait Player
@@ -24,7 +24,7 @@ trait Player
    */
   def processXhtml(maybeXhtml: Option[String]) = maybeXhtml.map {
     xhtml =>
-      tagNamesToAttributes(xhtml).getOrElse {
+      tagNamesToAttributes(components.map(_.componentType))(xhtml).getOrElse {
         throw new RuntimeException(s"Error processing xhtml: $xhtml")
       }
   }.getOrElse("<div><h1>New Item</h1></div>")
