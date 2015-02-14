@@ -13,19 +13,21 @@ object XhtmlProcessor {
     val transformations: CleanerTransformations = new CleanerTransformations()
 
     transformations.addTransformation(pToDiv)
-    tags.foreach{ t =>
+
+    def tagToAttribute(t:String) = {
       val transformation = new TagTransformation(t, "div", true)
       transformation.addAttributeTransformation(t, "")
       transformations.addTransformation(transformation)
     }
 
+    tags.foreach(tagToAttribute)
     cleaner.getProperties.setCleanerTransformations(transformations)
 
     val n: TagNode = cleaner.clean(xhtml)
 
-    val paras = n.evaluateXPath("//div")
+    val divs = n.evaluateXPath("//div")
 
-    paras.foreach(cleanParaSpace)
+    divs.foreach(cleanParaSpace)
 
     Some(serialize(n, cleaner))
   }

@@ -20,7 +20,7 @@ class XhtmlProcessorTest extends Specification {
 
   "XhtmlProcessor" should {
 
-    "toassertWellFormedXhtml" should {
+    "toWellFormedXhtml" should {
 
       "not change valid xhtml" in assertWellFormed(
         """
