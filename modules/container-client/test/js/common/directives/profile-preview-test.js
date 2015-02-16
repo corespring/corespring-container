@@ -20,7 +20,6 @@ describe('profile-preview', function(){
   });
 
   beforeEach(inject(function($rootScope, $compile) {
-
     $rootScope.mockItem = {
         profile: {
           contributorDetails: {}
@@ -32,8 +31,39 @@ describe('profile-preview', function(){
     scope = element.scope().$$childHead;
   }));
 
-  it('txt or n/a returns the correct value', function(){
-    expect(scope.textOrNA(null)).toEqual('No information available');
+  describe('textOrNA', function() {
+
+    it("returns 'No information available' for null", function(){
+      expect(scope.textOrNA(null)).toEqual('No information available');
+    });
+
   });
+
+  describe('getUrl', function() {
+    var url = "www.google.com";
+
+    it('adds http:// prefix when missing', function() {
+      expect(scope.getUrl(url)).toEqual('http://' + url);
+    });
+
+    it('does not add http:// prefix when not missing', function() {
+      expect(scope.getUrl('http://' + url)).toEqual('http://' + url);
+    });
+
+  });
+
+  describe('getDisplayUrl', function() {
+    var url = "www.google.com";
+
+    it('removes http:// prefix', function() {
+      expect(scope.getDisplayUrl("http://" + url)).toEqual(url);
+    });
+
+    it('removes https:// prefix', function() {
+      expect(scope.getDisplayUrl("https://" + url)).toEqual(url);
+    });
+
+  });
+
 
 });

@@ -55,6 +55,18 @@ angular.module('corespring-common.services')
           }
           return _.map(allReviews, toNameAndPassed);
         };
+
+        this.subjectText = function(subject) {
+          var text = subject.category;
+          if (!_.isEmpty(text) && !_.isEmpty(subject.subject)) {
+            text += ' — ' + subject.subject;
+          }
+          if (_.isEmpty(text)) {
+            text = subject.subject;
+          }
+          return text;
+        };
+
       }
       return new ProfileFormatter();
 
