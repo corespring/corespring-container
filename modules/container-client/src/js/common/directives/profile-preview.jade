@@ -118,7 +118,7 @@
           .field(ng-show="getUrl(item.profile.contributorDetails.sourceUrl)")
             .title Source
             .sub-content
-              a(href="{{getDisplayUrl(item.profile.contributorDetails.sourceUrl)}}", target="_blank")
-                .source-url-text{{getUrl(item.profile.contributorDetails.sourceUrl)}}
+              a(href="{{getUrl(item.profile.contributorDetails.sourceUrl)}}", target="_blank")
+                .source-url-text{{getDisplayUrl(item.profile.contributorDetails.sourceUrl)}}
   .footer
     .item-id Item ID: {{item.itemId}}
