@@ -64,7 +64,7 @@ angular.module('corespring-common.services')
           if (_.isEmpty(text)) {
             text = subject.subject;
           }
-          return text
+          return text;
         };
 
       }
