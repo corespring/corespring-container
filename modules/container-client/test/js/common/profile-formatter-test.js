@@ -127,5 +127,40 @@ describe('profile formatter', function() {
 
   });
 
+  describe('subjectText', function() {
+
+    it('should return only category when subject is undefined', function() {
+      var category = 'Pizza Making';
+      var subject = {
+        category: category
+      };
+      expect(formatter.subjectText(subject)).toEqual(category);
+    });
+
+    it('should return only subject when category is undefined', function() {
+      var subjectString = 'Pizza Making';
+      var subject = {
+        subject: subjectString
+      };
+      expect(formatter.subjectText(subject)).toEqual(subjectString);
+    });
+
+    it('should return undefined when neither subject nor category is defined', function() {
+      var subject = {};
+      expect(formatter.subjectText(subject) === undefined).toBe(true);
+    });
+
+    it('should return — separated category and subject when both are defined', function() {
+      var category = 'Culinary Arts';
+      var subjectString = 'Pizza Making';
+      var subject = {
+        category: category,
+        subject: subjectString
+      };
+      expect(formatter.subjectText(subject)).toEqual(category + " — " + subjectString);
+    });
+
+  });
+
 
 });

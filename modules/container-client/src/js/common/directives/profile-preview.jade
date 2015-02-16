@@ -3,11 +3,11 @@
   .round-border-container.clearfix
     .description(ng-if="isNonEmptyString(item.profile.taskInfo.description)") {{item.profile.taskInfo.description}}
 
-    .field
+    .field(ng-if="item.profile.taskInfo.subjects.primary")
       .info
         .label.label-info Primary Subject
       .content
-        span {{textOrNA(item.profile.taskInfo.subjects.primary.subject)}}
+        span {{subjectString(item.profile.taskInfo.subjects.primary)}}
 
     .field
       .info
@@ -15,11 +15,13 @@
       .content
         span {{arrayTextOrNA(item.profile.taskInfo.gradeLevel)}}
 
-    .field(ng-show="item.profile.taskInfo.subjects.related.subject")
+    .field.related-subjects(ng-if="item.profile.taskInfo.subjects.related")
       .info
-        .label.label-info Related Subject
+        .label.label-info Related Subject(s)
       .content
-        span {{item.profile.taskInfo.subjects.related.subject}}
+        ul
+          li(ng-repeat="related in item.profile.taskInfo.subjects.related")
+            span {{subjectString(related)}}
 
     .field(ng-show="isNonEmptyString(getPValueAsString(item.profile.pValue))")
       .info
@@ -29,7 +31,7 @@
 
     .field
       .info
-        .label.label-info Item Type
+        .label.label-info Interactions
       .content
         span {{arrayTextOrNA(componentTypeLabels)}}
 
@@ -72,17 +74,18 @@
         .label.label-warning Key Skills
       .content {{item.profile.otherAlignments.keySkills.join(", ")}}
 
-    .field
-      img(ng-if="copyrightOwnerUrl").copyright-image(ng-src="{{copyrightOwnerUrl}}",
-       alt="{{item.profile.contributorDetails.copyrightOwner}}",
-       title="{{item.profile.contributorDetails.copyrightOwner}}"
-       )
-      .courtesy(ng-show="item.profile.contributorDetails.copyrightOwner")
-        | This item was made available to CoreSpring users courtesy of {{item.profile.contributorDetails.copyrightOwner}}
+    .field.copyright(ng-show="item.profile.contributorDetails.copyrightOwner")
+      .info
+        .label.label-warning Copyright Owner
+      .content
+        img(ng-if="copyrightOwnerUrl").copyright-image(ng-src="{{copyrightOwnerUrl}}",
+          alt="{{item.profile.contributorDetails.copyrightOwner}}",
+          title="{{item.profile.contributorDetails.copyrightOwner}}")
+        | {{item.profile.contributorDetails.copyrightOwner}}
 
     .field
       .more-info-container.clearfix
-        a.show-more.clearfix(ng-click="showMore = !showMore", ng-show="isThereMoreData(item.profile)") {{showMore ? 'hide info' : 'more info'}}
+        a.show-more(ng-click="showMore = !showMore", ng-show="isThereMoreData(item.profile)") {{showMore ? 'hide info' : 'more info'}}
         .fields(ng-show="showMore")
           .field(ng-show="item.profile.contributorDetails.copyrightYear")
             .title Copyright Year
@@ -115,7 +118,7 @@
           .field(ng-show="getUrl(item.profile.contributorDetails.sourceUrl)")
             .title Source
             .sub-content
-              a(href="{{getUrl(item.profile.contributorDetails.sourceUrl)}}", target="_blank")
+              a(href="{{getDisplayUrl(item.profile.contributorDetails.sourceUrl)}}", target="_blank")
                 .source-url-text{{getUrl(item.profile.contributorDetails.sourceUrl)}}
   .footer
     .item-id Item ID: {{item.itemId}}
