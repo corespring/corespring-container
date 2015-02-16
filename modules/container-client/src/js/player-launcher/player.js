@@ -71,7 +71,7 @@ exports.define = function(isSecure) {
     };
 
     options.url = prepareUrl();
-    options.forceWidth = true;
+    options.forceWidth = options.forceWidth === undefined ? true : options.forceWidth;
 
     if (options.showPreview === true) {
       options.hash = '/?showPreviewButton';
