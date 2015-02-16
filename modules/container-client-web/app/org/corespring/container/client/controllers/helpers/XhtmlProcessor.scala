@@ -4,54 +4,17 @@ import org.htmlcleaner._
 
 object XhtmlProcessor {
 
-  /**
-   * Converts xhtml by moving custom tag names to attributes instead
-   */
-  def tagNamesToAttributes(tags:Seq[String])(xhtml: String): Option[String] = {
+  def process(transformations:Seq[TagTransformation],
+               postProcessors : Seq[TagNode => Unit],
+               xhtml:String) : String = {
 
     val cleaner: HtmlCleaner = getCleaner
-    val transformations: CleanerTransformations = new CleanerTransformations()
-
-    transformations.addTransformation(pToDiv)
-
-    def tagToAttribute(t:String) = {
-      val transformation = new TagTransformation(t, "div", true)
-      transformation.addAttributeTransformation(t, "")
-      transformations.addTransformation(transformation)
-    }
-
-    tags.foreach(tagToAttribute)
-    cleaner.getProperties.setCleanerTransformations(transformations)
-
+    val transformationHolder: CleanerTransformations = new CleanerTransformations()
+    transformations.foreach(transformationHolder.addTransformation)
+    cleaner.getProperties.setCleanerTransformations(transformationHolder)
     val n: TagNode = cleaner.clean(xhtml)
-
-    val divs = n.evaluateXPath("//div")
-
-    divs.foreach(cleanParaSpace)
-
-    Some(serialize(n, cleaner))
-  }
-
-  private def cleanParaSpace(n:Object) {
-    import scala.collection.JavaConversions._
-    val tag = n.asInstanceOf[TagNode]
-    if( tag.getAttributeByName("class") == "para "){
-      tag.setAttributes(Map[String,String]("class" -> "para"))
-    }
-  }
-
-  private def pToDiv = {
-    val pToDiv = new TagTransformation("p", "div", true)
-    pToDiv.addAttributeTransformation("class", "para ${class}")
-    pToDiv.addAttributePatternTransformation("class".r.pattern, "para ".r.pattern, "para")
-    pToDiv
-  }
-
-  private def isValidXml(html:String) : Boolean = try{
-    scala.xml.XML.loadString(html)
-    true
-  } catch {
-    case e : Throwable => false
+    postProcessors.foreach(pp => pp(n))
+    serialize(n, cleaner)
   }
 
   /**
@@ -69,8 +32,16 @@ object XhtmlProcessor {
     if(isValidXml(out)){
       out
     } else {
+      require(Seq("div", "span").contains(wrapperTag), "You can only wram in div or span")
       s"<$wrapperTag>$out</$wrapperTag>"
     }
+  }
+
+  def isValidXml(html:String) : Boolean = try{
+    scala.xml.XML.loadString(html)
+    true
+  } catch {
+    case e : Throwable => false
   }
 
   private def getCleaner = {
