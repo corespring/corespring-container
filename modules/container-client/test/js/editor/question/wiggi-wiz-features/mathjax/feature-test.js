@@ -70,6 +70,7 @@ describe('mathjax feature', function() {
         launchDialog: jasmine.createSpy('launchDialog')
       };
       addContent = jasmine.createSpy('addContent');
+      spyOn(scope, 'emit').and.callThrough();
       wiggiMathJaxFeatureDef.addToEditor(editor, addContent);
       callback = editor.launchDialog.calls.mostRecent().args[3];
     });
@@ -94,6 +95,10 @@ describe('mathjax feature', function() {
         expect(calledWithNode.outerHTML).toEqual('<mathjax-holder>' + markup + '</mathjax-holder>');
       });
 
+      it("should fire 'math-updated' event", function() {
+        expect($scope.emit).toHaveBeenCalledWith('math-updated');
+      });
+
     });
 
   });
@@ -110,6 +115,7 @@ describe('mathjax feature', function() {
         launchDialog: jasmine.createSpy('launchDialog')
       };
       spyOn(MathJaxService, 'parseDomForMath');
+      spyOn(scope, 'emit').and.callThrough();
       wiggiMathJaxFeatureDef.onClick($node, $scope, editor);
       callback = editor.launchDialog.calls.mostRecent().args[3];
     });
@@ -158,6 +164,10 @@ describe('mathjax feature', function() {
 
         it('should call MathJaxService.parseDomForMath', function() {
           expect(MathJaxService.parseDomForMath).toHaveBeenCalled();
+        });
+
+        it("should fire 'math-updated' event", function() {
+          expect($scope.emit).toHaveBeenCalledWith('math-updated');
         });
 
       });
