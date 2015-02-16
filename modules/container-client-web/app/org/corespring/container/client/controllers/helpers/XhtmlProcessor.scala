@@ -32,7 +32,7 @@ object XhtmlProcessor {
     if(isValidXml(out)){
       out
     } else {
-      require(Seq("div", "span").contains(wrapperTag), "You can only wram in div or span")
+      require(Seq("div", "span").contains(wrapperTag), s"You can only wrap in div or span - not: $wrapperTag")
       s"<$wrapperTag>$out</$wrapperTag>"
     }
   }
