@@ -1,14 +1,15 @@
 package org.corespring.container.client.controllers.apps
 
-import org.corespring.container.client.VersionInfo
 import org.corespring.container.client.V2PlayerConfig
 import org.corespring.container.client.component.PlayerItemTypeReader
+import org.corespring.container.client.controllers.helpers.PlayerXhtml
 import org.corespring.container.client.controllers.jade.Jade
 import org.corespring.container.client.hooks.PlayerHooks
 import org.corespring.container.client.views.txt.js.PlayerServices
 import org.corespring.container.components.processing.PlayerItemPreProcessor
-import play.api.libs.json.{ JsString, JsValue, JsObject, Json }
-import play.api.mvc.{ Action, AnyContent, RequestHeader }
+import play.api.libs.json._
+import play.api.mvc.{Action, AnyContent, RequestHeader}
+
 
 trait Player
   extends App[PlayerHooks]
@@ -24,9 +25,7 @@ trait Player
    */
   def processXhtml(maybeXhtml: Option[String]) = maybeXhtml.map {
     xhtml =>
-      tagNamesToAttributes(xhtml).getOrElse {
-        throw new RuntimeException(s"Error processing xhtml: $xhtml")
-      }
+      PlayerXhtml.mkXhtml(components.map(_.componentType), xhtml)
   }.getOrElse("<div><h1>New Item</h1></div>")
 
   lazy val controlsJsSrc: SourcePaths = SourcePaths.fromJsonResource(modulePath, s"container-client/$context-controls-js-report.json")
