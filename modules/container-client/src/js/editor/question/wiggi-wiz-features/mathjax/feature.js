@@ -37,6 +37,7 @@ angular.module('corespring.wiggi-wiz-features.mathjax').factory('WiggiMathJaxFea
             $node.html(update.originalMarkup);
             addContent($node);
           }
+          $scope.$emit('math-updated');
         });
       };
 
@@ -47,6 +48,7 @@ angular.module('corespring.wiggi-wiz-features.mathjax').factory('WiggiMathJaxFea
             $scope.$emit('save-data');
             MathJaxService.parseDomForMath(100);
           }
+          $scope.$emit('math-updated');
         }, $scope);
       };
 
