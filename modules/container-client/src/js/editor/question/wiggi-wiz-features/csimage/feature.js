@@ -12,7 +12,9 @@ angular.module('corespring.wiggi-wiz-features.cs-image').factory('ImageFeature',
       return $($node).find('img');
     };
 
-    csImage.onClick = function($node, $nodeScope, editor) {
+    csImage.onClick = undefined;
+
+    csImage.onMouseUp = function($node, $nodeScope, editor) {
       var buttons = [
         TemplateUtils.makeButton({
           html: '<span>25%</span>'
