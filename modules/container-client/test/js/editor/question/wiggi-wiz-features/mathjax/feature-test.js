@@ -1,6 +1,6 @@
 describe('mathjax feature', function() {
 
-  var wiggiMathJaxFeatureDef;
+  var wiggiMathJaxFeatureDef, rootScope;
 
   var MathJaxService = {
     parseDomForMath: function() {}
@@ -12,8 +12,9 @@ describe('mathjax feature', function() {
     $provide.value('MathJaxService', MathJaxService);
   }));
 
-  beforeEach(inject(function(WiggiMathJaxFeatureDef) {
+  beforeEach(inject(function(WiggiMathJaxFeatureDef, $rootScope) {
     wiggiMathJaxFeatureDef = new WiggiMathJaxFeatureDef();
+    rootScope = $rootScope;
   }));
 
   describe('initialization', function() {
@@ -70,7 +71,7 @@ describe('mathjax feature', function() {
         launchDialog: jasmine.createSpy('launchDialog')
       };
       addContent = jasmine.createSpy('addContent');
-      spyOn(scope, 'emit').and.callThrough();
+      spyOn(rootScope, '$emit').and.callThrough();
       wiggiMathJaxFeatureDef.addToEditor(editor, addContent);
       callback = editor.launchDialog.calls.mostRecent().args[3];
     });
@@ -96,7 +97,8 @@ describe('mathjax feature', function() {
       });
 
       it("should fire 'math-updated' event", function() {
-        expect($scope.emit).toHaveBeenCalledWith('math-updated');
+        callback({originalMarkup: markup});
+        expect(rootScope.$emit).toHaveBeenCalledWith('math-updated');
       });
 
     });
@@ -115,7 +117,6 @@ describe('mathjax feature', function() {
         launchDialog: jasmine.createSpy('launchDialog')
       };
       spyOn(MathJaxService, 'parseDomForMath');
-      spyOn(scope, 'emit').and.callThrough();
       wiggiMathJaxFeatureDef.onClick($node, $scope, editor);
       callback = editor.launchDialog.calls.mostRecent().args[3];
     });
@@ -167,7 +168,7 @@ describe('mathjax feature', function() {
         });
 
         it("should fire 'math-updated' event", function() {
-          expect($scope.emit).toHaveBeenCalledWith('math-updated');
+          expect($scope.$emit).toHaveBeenCalledWith('math-updated');
         });
 
       });
