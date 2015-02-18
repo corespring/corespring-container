@@ -2,7 +2,8 @@ angular.module('corespring-editor.services')
   .service('ComponentPopups', [
     '$modal',
     'LogFactory',
-    function($modal, LogFactory) {
+    'DesignerService',
+    function($modal, LogFactory, DesignerService) {
 
       var logger = LogFactory.getLogger('component-popups');
 
@@ -44,35 +45,51 @@ angular.module('corespring-editor.services')
           return result.join('');
         }
 
-        function getTitle(component) {
-          return _.isEmpty(component.title) ? component.name || 'no title provided' : component.title;
-        }
-
         function launchModal($scope, id, model, config){
           var tagName = model.componentType + '-config';
 
+          function launchDialog(title) {
+            var body =
+              ['  <div class="config-panel-container" navigator="">',
+                  '    ' + tag(tagName, {id: id}),
+                '  </div>'].join('\n');
 
-          var body =
-            ['  <div class="config-panel-container" navigator="">',
-            '    ' + tag(tagName, {id: id}),
-            '  </div>'].join('\n');
+            return $modal.open({
+              template: componentTemplate(title, body),
+              scope: $scope,
+              controller: function(){},
+              size: 'lg',
+              backdrop: 'static',
+              resolve: {
+              }
+            });
+          }
 
-          var content = componentTemplate(getTitle(model), body);
+          function titleFromModel(model) {
+            return _.isEmpty(model.title) ? model.name || 'no title provided' : model.title
+          }
+
+          DesignerService.loadAvailableUiComponents(
+            function success(components) {
+              function getTitle(components, model) {
+                var component = _(components.interactions, components.widgets).flatten().find(function (component) {
+                  return component.componentType === model.componentType;
+                });
+                return (component && component.title) ? component.title : titleFromModel(model);
+              }
+
+              launchDialog(getTitle(components, model));
+            },
+            function failure() {
+              launchDialog(titleFromModel(model));
+            }
+          );
 
           $scope.data = _.cloneDeep(config);
 
-          var modalInstance = $modal.open({
-            template: content,
-            scope: $scope,
-            controller: function(){},
-            size: 'lg',
-            backdrop: 'static',
-            resolve: {
-            }
-          });
         }
 
-        this.launch = function($scope, id, model, config){
+        this.launch = function($scope, id, model, config) {
           logger.debug('launch popup based on node: ', id, model, config);
           launchModal($scope, id, model, config);
         };
