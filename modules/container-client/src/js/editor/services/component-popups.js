@@ -38,9 +38,9 @@ angular.module('corespring-editor.services')
         function tag(name,attributes){
           var result = [];
           result.push('<' + name);
-          for(var prop in attributes){
-            result.push(' ' + prop + '="' + attributes[prop] + '"');
-          }
+          _.forEach(attributes, function(value, key){
+            result.push(' ' + key + '="' + value + '"');
+          });
           result.push('></' + name + '>');
           return result.join('');
         }
@@ -66,19 +66,23 @@ angular.module('corespring-editor.services')
           }
 
           function titleFromModel(model) {
-            return _.isEmpty(model.title) ? model.name || 'no title provided' : model.title
+            return _.isEmpty(model.title) ? model.name || 'no title provided' : model.title;
           }
 
           DesignerService.loadAvailableUiComponents(
             function success(components) {
-              function getTitle(components, model) {
+              function findComponent(componentType){
                 var component = _(components.interactions, components.widgets).flatten().find(function (component) {
-                  return component.componentType === model.componentType;
+                  return component.componentType === componentType;
                 });
+                return component;
+              }
+              function getTitle(model) {
+                var component = findComponent(model.componentType);
                 return (component && component.title) ? component.title : titleFromModel(model);
               }
 
-              launchDialog(getTitle(components, model));
+              launchDialog(getTitle(model));
             },
             function failure() {
               launchDialog(titleFromModel(model));

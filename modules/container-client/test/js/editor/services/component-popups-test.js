@@ -9,7 +9,7 @@ describe('ComponentPopups', function() {
     getLogger: function() {
       return {
         debug: function() {}
-      }
+      };
     }
   };
   var DesignerService = {
@@ -33,6 +33,7 @@ describe('ComponentPopups', function() {
     var $scope, id, model, config;
     var componentType = 'corespring-mock-component';
     var modelTitle = 'CoreSpring Mock Model Title';
+    var defaultTitle = 'no title provided';
     var success, failure;
 
     beforeEach(function() {
@@ -89,9 +90,7 @@ describe('ComponentPopups', function() {
         it('should launch dialog with title from model', function() {
           expect($template.find('.modal-title').text()).toEqual(modelTitle);
         });
-
       });
-
     });
 
     describe('DesignerService.loadAvailableUiComponents fails', function() {
@@ -108,6 +107,58 @@ describe('ComponentPopups', function() {
       });
 
     });
+
+    describe('returns default title if component and model do not have title', function() {
+      var $template;
+      var components = {
+        interactions: [
+          {
+            componentType: componentType,
+            title: modelTitle
+          }
+        ],
+        widgets: []
+      };
+
+      beforeEach(function() {
+        spyOn($modal, 'open');
+        delete model.title;
+        delete components.interactions[0].title;
+      });
+
+      describe('and model.name is undefined', function(){
+        it('and loadAvailableUiComponents fails', function() {
+          failure();
+          $template = $($modal.open.calls.mostRecent().args[0]['template']);
+          expect($template.find('.modal-title').text()).toEqual(defaultTitle);
+        });
+        it('and loadAvailableUiComponents succeeds', function() {
+          success(components);
+          $template = $($modal.open.calls.mostRecent().args[0]['template']);
+          expect($template.find('.modal-title').text()).toEqual(defaultTitle);
+        });
+      });
+
+      describe('and model.name is defined', function(){
+        var mockModelName = 'corespring mock model name';
+        beforeEach(function(){
+          model.name = mockModelName;
+        });
+        it('and loadAvailableUiComponents fails', function() {
+          failure();
+          $template = $($modal.open.calls.mostRecent().args[0]['template']);
+          expect($template.find('.modal-title').text()).toEqual(mockModelName);
+        });
+        it('and loadAvailableUiComponents succeeds', function() {
+          success(components);
+          $template = $($modal.open.calls.mostRecent().args[0]['template']);
+          expect($template.find('.modal-title').text()).toEqual(mockModelName);
+        });
+      });
+
+
+    });
+
 
   });
 
