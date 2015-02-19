@@ -29,6 +29,7 @@ angular.module('corespring-editor.services').service('EditorConfig', [
 
 
         function onComponentsLoaded(uiComponents) {
+          console.log("COMPS", uiComponents);
           interactions = uiComponents.interactions;
           widgets = uiComponents.widgets;
           initComponents.bind(this)();
