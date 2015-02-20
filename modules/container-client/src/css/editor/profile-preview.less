@@ -165,6 +165,35 @@
     }
   }
 
+  .related-subjects {
+    @padding: 4px;
+    ul {
+      margin: 0;
+      padding: 0;
+
+      li {
+        list-style-type: none;
+        padding: @padding 0 @padding 0;
+
+        &:first-child {
+          padding: 0 0 @padding 0;
+        }
+
+        &:last-child {
+          padding: @padding 0 0 0;
+        }
+
+        &:first-child:last-child {
+          padding: 0;
+        }
+      }
+    }
+  }
+
+  .copyright {
+    width: 100%;
+  }
+
   .more-info-container {
     padding: 0px;
 
