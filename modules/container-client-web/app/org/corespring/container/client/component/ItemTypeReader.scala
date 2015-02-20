@@ -24,7 +24,8 @@ trait AllItemTypesReader extends ItemTypeReader with ComponentSplitter { self: H
 trait PlayerItemTypeReader
   extends ItemTypeReader
   with ComponentSplitter
-  with NameHelper { self: HasLogger =>
+  with NameHelper
+  with XhtmlProcessor { self: HasLogger =>
 
   /** List components used in the model */
   override def componentTypes(json: JsValue): Seq[String] = {
@@ -54,10 +55,8 @@ trait PlayerItemTypeReader
 
   private def layoutTypesInXml(xmlString: String, components: Seq[LayoutComponent]): Seq[String] = {
 
-    import XhtmlProcessor._
-
     //Note: the xhtml may not have a single root - so we wrap it
-    val xml = scala.xml.XML.loadString(xmlString.toWellFormedXhtml)
+    val xml = scala.xml.XML.loadString(toWellFormedXhtml(xmlString))
 
     val usedInXml = components.filter {
       lc =>

@@ -1,8 +1,8 @@
 package org.corespring.container.client.controllers.resources
 
-import org.corespring.container.client.controllers.helpers.XhtmlProcessor
 import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.client.hooks._
+import org.corespring.container.client.controllers.helpers.XhtmlCleaner
 import org.corespring.container.logging.ContainerLogger
 import play.api.libs.json.{ JsObject, JsValue, Json }
 import play.api.mvc._
@@ -20,7 +20,7 @@ object Item {
   }
 }
 
-trait Item extends Controller {
+trait Item extends Controller with XhtmlCleaner {
 
   private lazy val logger = ContainerLogger.getLogger("Item")
 
@@ -65,8 +65,6 @@ trait Item extends Controller {
 
   def saveSubset(itemId: String, subset: String) = Action.async { implicit request: Request[AnyContent] =>
 
-    import XhtmlProcessor._
-
     logger.debug(s"function=saveSubset subset=$subset")
     def missingProperty(p: String) = (i: String) => Future(Left(BAD_REQUEST, s"Missing property $p in json request for $i"))
 
@@ -74,7 +72,10 @@ trait Item extends Controller {
       case "supporting-materials" => hooks.saveSupportingMaterials(_: String, json)
       case "xhtml" => (json \ "xhtml")
         .asOpt[String]
-        .map(xhtml => hooks.saveXhtml(_: String, xhtml))
+        .map { s =>
+          val validXhtml = cleanXhtml(s)
+          hooks.saveXhtml(_: String, validXhtml)
+        }
         .getOrElse(missingProperty("xhtml"))
       case "summary-feedback" => (json \ "summaryFeedback").asOpt[String].map(s => hooks.saveSummaryFeedback(_: String, s)).getOrElse(missingProperty("summaryFeedback"))
       case "profile" => hooks.saveProfile(_: String, json)

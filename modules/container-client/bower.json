@@ -29,7 +29,7 @@
     "jquery.browser": "~0.0.6",
     "less-elements": "https://github.com/dmitryf/elements.git",
     "lodash": "~2.4.1",
-    "mathjax": "https://github.com/mathjax/MathJax.git#2.3.0",
+    "mathjax": "https://github.com/mathjax/MathJax.git#2.4.0",
     "mathjs": "~0.18.0",
     "saxjs": "https://github.com/corespring/sax-js.git#v0.6.0-corespring",
     "select2": "~3.4.5",
@@ -87,6 +87,6 @@
     "bootstrap": "~3.2.0",
     "jquery": "1.11.0",
     "angular-bootstrap": "~0.12.0",
-    "bootstrap-multiselect" : "0.9.9"
+    "bootstrap-multiselect": "0.9.9"
   }
 }
