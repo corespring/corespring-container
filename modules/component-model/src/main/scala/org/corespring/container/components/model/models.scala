@@ -38,7 +38,7 @@ trait ComponentInfo {
   def defaultData: JsValue
   def packageInfo: JsValue
   def sampleData: Map[String, JsValue]
-  def hidden: Boolean
+  def released: Boolean
 }
 
 case class Widget(org: String,
@@ -46,7 +46,7 @@ case class Widget(org: String,
   title: Option[String],
   titleGroup: Option[String],
   client: Client,
-  hidden: Boolean,
+  released: Boolean,
   override val packageInfo: JsValue,
   defaultData: JsValue,
   icon: Option[Array[Byte]] = None,
@@ -60,7 +60,7 @@ case class Widget(org: String,
 case class Interaction(
   org: String,
   name: String,
-  hidden: Boolean,
+  released: Boolean,
   title: Option[String],
   titleGroup: Option[String],
   client: Client,
@@ -75,7 +75,7 @@ case class LayoutComponent(org: String,
   name: String,
   client: Seq[LibrarySource],
   css: Option[String],
-  hidden: Boolean,
+  released: Boolean,
   override val packageInfo: JsValue) extends Component(Id(org, name), packageInfo)
 
 case class Client(render: String, configure: String, css: Option[String])

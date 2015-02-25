@@ -95,6 +95,10 @@ angular.module('corespring-editor.services').service('EditorConfig', [
             return component.titleGroup === 'toolbar';
           }
 
+          function isReleased(component) {
+            return component.released;
+          }
+
           var videoComponent = componentToFeature(_.find(widgets,
             function(c) {
               return c.componentType === 'corespring-video';
@@ -131,6 +135,7 @@ angular.module('corespring-editor.services').service('EditorConfig', [
               dropdownTitle: 'Insert Interaction',
               buttons: _(interactions)
                 .reject(isToolbar)
+                .filter(isReleased)
                 .sortBy(orderList)
                 .map(componentToFeature)
                 .value()

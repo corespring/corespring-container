@@ -9,7 +9,7 @@ import org.corespring.container.utils.string.hyphenatedToTitleCase
 import org.corespring.container.logging.ContainerLogger
 import play.api.libs.json.{ JsValue, Json }
 
-class FileComponentLoader(paths: Seq[String], onlyProcessReleased: Boolean)
+class FileComponentLoader(paths: Seq[String], showNonReleased: Boolean)
   extends ComponentLoader
   with PackageJsonReading {
 
@@ -118,7 +118,7 @@ class FileComponentLoader(paths: Seq[String], onlyProcessReleased: Boolean)
       LayoutComponent(
         org = org,
         name = compRoot.getName,
-        hidden = false,
+        released = false,
         client = loadLibrarySources(compRoot.getPath, "client", createClientName(compRoot.getPath)),
         css = loadCss(s"${compRoot.getPath}/src/client"),
         packageInfo = packageJson))
@@ -127,16 +127,17 @@ class FileComponentLoader(paths: Seq[String], onlyProcessReleased: Boolean)
   private def loadWidget(org: String, packageJson: JsValue)(compRoot: File): Option[Widget] = load[Widget](org,
     packageJson, compRoot) { ld =>
       Widget(
-        ld.org,
-        ld.name,
-        ld.title,
-        ld.titleGroup,
-        ld.client,
-        packageJson,
-        ld.defaultData,
-        ld.icon,
-        ld.sampleData,
-        ld.libs)
+        org = ld.org,
+        name = ld.name,
+        title = ld.title,
+        titleGroup = ld.titleGroup,
+        client = ld.client,
+        released = false,
+        packageInfo = packageJson,
+        defaultData = ld.defaultData,
+        icon = ld.icon,
+        sampleData = ld.sampleData,
+        libraries = ld.libs)
     }
 
   /** a interim model for building interaction */
@@ -146,7 +147,7 @@ class FileComponentLoader(paths: Seq[String], onlyProcessReleased: Boolean)
     titleGroup: Option[String],
     client: Client,
     defaultData: JsValue,
-    hidden: Option[Boolean],
+    released: Option[Boolean],
     icon: Option[Array[Byte]],
     sampleData: Map[String, JsValue],
     libs: Seq[Id])
@@ -164,7 +165,7 @@ class FileComponentLoader(paths: Seq[String], onlyProcessReleased: Boolean)
         name = compRoot.getName,
         title = (packageJson \ "title").asOpt[String],
         titleGroup = (packageJson \ "titleGroup").asOpt[String],
-        hidden = (packageJson \ "hidden").asOpt[Boolean],
+        released = (packageJson \ "released").asOpt[Boolean],
         client = loadClient(clientFolder),
         defaultData = loadDefaultData(defaultDataJson),
         icon = loadIcon(icon),
@@ -173,16 +174,8 @@ class FileComponentLoader(paths: Seq[String], onlyProcessReleased: Boolean)
     }
   }
 
-  private def load[C <: Component](org: String, packageJson: JsValue, compRoot: File)(make: LoadedData => C): Option[C] = {
-
-    val released = (packageJson \ "released").asOpt[Boolean].getOrElse(false)
-
-    if (onlyProcessReleased && !released) {
-      None
-    } else {
-      Some(make(LoadedData(org, packageJson, compRoot)))
-    }
-  }
+  private def load[C <: Component](org: String, packageJson: JsValue, compRoot: File)(make: LoadedData => C): Option[C] =
+    Some(make(LoadedData(org, packageJson, compRoot)))
 
   private def loadInteraction(org: String, packageJson: JsValue)(compRoot: File): Option[Interaction] =
     load[Interaction](org, packageJson, compRoot) { ld =>
@@ -194,7 +187,7 @@ class FileComponentLoader(paths: Seq[String], onlyProcessReleased: Boolean)
         name = ld.name,
         title = ld.title,
         titleGroup = ld.titleGroup,
-        hidden = if (ld.hidden.isEmpty) false else ld.hidden.get,
+        released = showNonReleased || ld.released.getOrElse(false),
         client = ld.client,
         server = loadServer(serverFolder),
         packageInfo = packageJson,
