@@ -12,10 +12,10 @@ trait DependencyResolver extends ComponentSplitter {
   lazy val relationships: Seq[(Id, Seq[Id])] = {
     components.map { c =>
       c match {
-        case Interaction(org, name, _, _, _, _, _, _, _, _, libs) => (Id(org, name) -> libs)
-        case Widget(org, name, _, _, _, _, _, _, _, libs) => (Id(org, name) -> libs)
-        case Library(org, name, _, _, _, _, libs) => (Id(org, name) -> libs)
-        case LayoutComponent(org, name, _, _, _) => (Id(org, name) -> Seq.empty)
+        case i:Interaction => (Id(i.org, i.name) -> i.libraries)
+        case w:Widget => (Id(w.org, w.name) -> w.libraries)
+        case l:Library => (Id(l.org, l.name) -> l.libraries)
+        case lc:LayoutComponent => (Id(lc.org, lc.name) -> Seq.empty)
       }
     }
   }
