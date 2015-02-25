@@ -2,7 +2,7 @@ package org.corespring.container.client.controllers.resources
 
 import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.client.hooks._
-import org.corespring.container.client.controllers.helpers.XhtmlCleaner
+import org.corespring.container.client.controllers.helpers.XhtmlProcessor
 import org.corespring.container.logging.ContainerLogger
 import play.api.libs.json.{ JsObject, JsValue, Json }
 import play.api.mvc._
@@ -20,7 +20,7 @@ object Item {
   }
 }
 
-trait Item extends Controller with XhtmlCleaner {
+trait Item extends Controller {
 
   private lazy val logger = ContainerLogger.getLogger("Item")
 
@@ -73,7 +73,7 @@ trait Item extends Controller with XhtmlCleaner {
       case "xhtml" => (json \ "xhtml")
         .asOpt[String]
         .map { s =>
-          val validXhtml = cleanXhtml(s)
+          val validXhtml = XhtmlProcessor.toWellFormedXhtml(s)
           hooks.saveXhtml(_: String, validXhtml)
         }
         .getOrElse(missingProperty("xhtml"))

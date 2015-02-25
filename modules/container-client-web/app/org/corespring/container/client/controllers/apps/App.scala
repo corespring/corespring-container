@@ -26,7 +26,6 @@ trait HasLogger {
 trait App[T <: ClientHooks]
   extends Controller
   with DependencyResolver
-  with XhtmlProcessor
   with Helpers
   with LoadClientSideDependencies
   with HasLogger {

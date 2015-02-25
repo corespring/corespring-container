@@ -25,6 +25,10 @@ angular.module('corespring-common.directives')
             return txt ? txt : "No information available";
           };
 
+          $scope.subjectString = function(subject) {
+            return $scope.textOrNA(ProfileFormatter.subjectText(subject));
+          };
+
           $scope.arrayTextOrNA = function(arr) {
             if ($scope.isNonEmptyStringArray(arr)) {
               return _.reject(arr, _.isEmpty).join(", ");
@@ -52,8 +56,8 @@ angular.module('corespring-common.directives')
               isNonEmptyString(getOrNull($scope, "item", "collection", "name")));
           };
 
-          $scope.getUrl = function(src){
-            if (!isNonEmptyString(src)){
+          $scope.getUrl = function(src) {
+            if (!isNonEmptyString(src)) {
               return null;
             }
             if (src.indexOf('http://') === -1){
@@ -61,6 +65,17 @@ angular.module('corespring-common.directives')
             }
 
             return src;
+          };
+
+          $scope.getDisplayUrl = function(src) {
+            var arr = ['http://', 'https://'];
+            var url = $scope.getUrl(src);
+            if (url) {
+              for(var i = 0, len = arr.length; i < len; i++) {
+                url = url.replace(new RegExp("^" + arr[i]), '');
+              }
+            }
+            return url;
           };
 
           $scope.onComponentsLoaded = function(components) {

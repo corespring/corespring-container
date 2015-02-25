@@ -34,6 +34,14 @@ class ItemTypeReaderTest extends Specification with ComponentMaker with Mockito 
       layout("layout-1")) {
       reader.componentTypes(item) === Seq("org-layout-1")
     }
+
+    "work with multiple root nodes in xhtml" in new withReader(
+      layout("layout-1")) {
+      val itemWithMultipleRootNodesInXhtml = Json.obj(
+        "components" -> item \ "components",
+        "xhtml" -> "<h1>headline</h1><org-layout-1></org-layout-1>")
+      reader.componentTypes(itemWithMultipleRootNodesInXhtml) === Seq("org-layout-1")
+    }
   }
 
   class withReader(comps: Component*) extends Scope {

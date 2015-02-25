@@ -1,51 +1,62 @@
 package org.corespring.container.client.controllers.helpers
 
 import org.htmlcleaner._
-import scala.util.matching.Regex
 
-trait XhtmlProcessor {
+object XhtmlProcessor {
+
+  def process(transformations:Seq[TagTransformation],
+               postProcessors : Seq[TagNode => Unit],
+               xhtml:String) : String = {
+
+    val cleaner: HtmlCleaner = getCleaner
+    val transformationHolder: CleanerTransformations = new CleanerTransformations()
+    transformations.foreach(transformationHolder.addTransformation)
+    cleaner.getProperties.setCleanerTransformations(transformationHolder)
+    val n: TagNode = cleaner.clean(xhtml)
+    postProcessors.foreach(pp => pp(n))
+    serialize(n, cleaner)
+  }
 
   /**
-   * Converts xhtml by moving custom tag names to attributes instead
+   * Returns wellformed xhtml aka it is parseable by an xml parser
+   * Makes minimal changes and only wraps the content if it needs to
+   * @param html
+   * @param wrapperTag
+   * @return
    */
-  def tagNamesToAttributes(xhtml: String): Option[String] = {
+  def toWellFormedXhtml(html: String, wrapperTag: String = "div"): String = {
+    val cleaner = getCleaner
+    val n: TagNode = cleaner.clean(html)
+    val out = serialize(n, cleaner)
 
-    val substitutedClosingTag = "(?<=<\\/)(corespring-.*?)(?=>)".r
-      .replaceAllIn(xhtml,{m => "div"})
+    if(isValidXml(out)){
+      out
+    } else {
+      require(Seq("div", "span").contains(wrapperTag), s"You can only wrap in div or span - not: $wrapperTag")
+      s"<$wrapperTag>$out</$wrapperTag>"
+    }
+  }
 
-    val substitutedOpeningTag = "(?<=<)(corespring-.*?)(?=\\s|>)".r
-      .replaceAllIn(substitutedClosingTag,{m => s"""div ${m.group(1)}="${m.group(1)}""""})
+  def isValidXml(html:String) : Boolean = try{
+    scala.xml.XML.loadString(html)
+    true
+  } catch {
+    case e : Throwable => false
+  }
 
+  private def getCleaner = {
     val cleaner: HtmlCleaner = new HtmlCleaner()
-    val transformations: CleanerTransformations = new CleanerTransformations()
-
-    val pToDiv = new TagTransformation("p", "div", true)
-    pToDiv.addAttributeTransformation("class", "para ${class}")
-    transformations.addTransformation(pToDiv)
-    cleaner.getProperties.setCleanerTransformations(transformations)
-
     cleaner.getProperties.setUseEmptyElementTags(false)
     cleaner.getProperties.setOmitXmlDeclaration(true)
     cleaner.getProperties.setOmitHtmlEnvelope(true)
-
-    val n: TagNode = cleaner.clean(substitutedOpeningTag)
-    val serializer = new CompactXmlSerializer(cleaner.getProperties)
-    val cleanHtml = serializer.getAsString(n)
-
-    //the cleaner creates class="para " (with an extra blank) when the p does not have class
-    //the regexp below removes that blank
-    Some("""class="para """".r.replaceAllIn(cleanHtml, {m => """class="para""""}))
+    cleaner
   }
 
-  def toWellFormedXhtml(html: String): String = {
-    val cleaner: HtmlCleaner = new HtmlCleaner()
-    cleaner.getProperties.setUseEmptyElementTags(false)
-    cleaner.getProperties.setOmitXmlDeclaration(true)
-    cleaner.getProperties.setOmitHtmlEnvelope(false)
-    val n: TagNode = cleaner.clean(html)
-    val serializer = new CompactXmlSerializer(cleaner.getProperties)
+  private def serialize(n:TagNode, cleaner: HtmlCleaner) : String = {
+    val serializer = new SimpleHtmlSerializer(cleaner.getProperties)
     serializer.getAsString(n)
   }
+
 }
 
 
