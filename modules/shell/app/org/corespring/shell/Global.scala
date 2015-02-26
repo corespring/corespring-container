@@ -63,7 +63,7 @@ object Global extends WithFilters(AccessControlFilter, CallBlockOnHeaderFilter) 
   }
 
   private lazy val componentLoader = {
-    val showNonReleasedComponents = Play.current.mode == Mode.Dev
+    val showNonReleasedComponents = Play.current.configuration.getBoolean("components.showNonReleasedComponents").getOrElse(Play.current.mode == Mode.Dev)
     val out = new FileComponentLoader(Play.current.configuration.getString("components.path").toSeq, showNonReleasedComponents)
     out.reload
 
