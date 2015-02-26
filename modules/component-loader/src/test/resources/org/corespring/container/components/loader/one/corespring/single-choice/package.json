@@ -2,5 +2,6 @@
   "name" : "single-choice",
   "organization" : "corespring",
   "title" : "Single Choice",
-  "titleGroup" : "Fixed Choice"
+  "titleGroup" : "Fixed Choice",
+  "released": false
 }

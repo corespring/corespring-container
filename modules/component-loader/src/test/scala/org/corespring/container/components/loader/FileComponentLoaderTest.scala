@@ -19,6 +19,13 @@ class FileComponentLoaderTest extends Specification {
     "load all the components from the given file path" in {
       val loader = getLoader("one")
       loader.all.length === 1
+      loader.all(0) match {
+        case i:Interaction =>
+          i.released == true
+          success
+        case _ =>
+          failure
+      }
     }
 
     "load an interaction" in {
@@ -30,6 +37,7 @@ class FileComponentLoaderTest extends Specification {
 
       interaction.title.get === "Single Choice"
       interaction.titleGroup.get === "Fixed Choice"
+      interaction.released === false
     }
 
     "load a library" in {
@@ -65,10 +73,10 @@ class FileComponentLoaderTest extends Specification {
       val comp = loader.all(0)
 
       comp match {
-        case LayoutComponent(org, name, client, _, _) => {
-          org === "corespring"
-          name === "layout-comp"
-          client.length === 1
+        case l:LayoutComponent => {
+          l.org === "corespring"
+          l.name === "layout-comp"
+          l.client.length === 1
           success
         }
         case _ => failure("not a layout component")
@@ -80,11 +88,10 @@ class FileComponentLoaderTest extends Specification {
       val comp = loader.all(0)
 
       comp match {
-        case Widget(org, name, client, _, _, _, _, _, _, _) => {
-          org === "corespring"
-          name === "widget"
+        case w:Widget =>
+          w.org === "corespring"
+          w.name == "widget"
           success
-        }
         case _ => failure("not a widget")
       }
     }
