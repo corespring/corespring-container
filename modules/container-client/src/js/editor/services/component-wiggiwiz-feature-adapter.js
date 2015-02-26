@@ -45,6 +45,7 @@
     service.componentToWiggiwizFeature = function(component, addToEditorCallback, deleteComponentCallback, reAddComponentCallback) {
       var componentType = component.componentType;
       return {
+        attributeName: componentType,
         name: componentType,
         title: component.title,
         titleGroup: component.titleGroup,
