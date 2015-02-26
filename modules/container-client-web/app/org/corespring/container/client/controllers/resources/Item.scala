@@ -30,7 +30,8 @@ object ItemJson{
       throw new IllegalArgumentException("the Item json must contain 'xhtml'")
     }
 
-    rawJson.as[JsObject] + ("itemId" -> (rawJson \ "_id" \ "$oid").as[JsString]) + ("xhtml" -> JsString(processedXhtml))
+    val itemId =  (rawJson \ "_id" \ "$oid").asOpt[JsString].map(id => Json.obj("itemId" -> id)).getOrElse(Json.obj())
+    rawJson.as[JsObject] + ("xhtml" -> JsString(processedXhtml)) ++ itemId
   }
 }
 
