@@ -21,6 +21,7 @@ class PlayerItemPreProcessorTest extends Specification {
       val interaction = Interaction(
         "org",
         "name",
+        true,
         None,
         None,
         client = Client("", "", None),
@@ -53,6 +54,7 @@ class PlayerItemPreProcessorTest extends Specification {
       val interaction = Interaction(
         "org",
         "name",
+        true,
         None,
         None,
         client = Client("", "", None),
