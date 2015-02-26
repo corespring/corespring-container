@@ -2,9 +2,10 @@ package org.corespring.container.client.controllers.resources
 
 import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.client.hooks._
-import org.corespring.container.client.controllers.helpers.XhtmlProcessor
+import org.corespring.container.client.controllers.helpers.{PlayerXhtml, XhtmlProcessor}
+import org.corespring.container.components.model.Component
 import org.corespring.container.logging.ContainerLogger
-import play.api.libs.json.{ JsObject, JsValue, Json }
+import play.api.libs.json.{JsString, JsObject, JsValue, Json}
 import play.api.mvc._
 import scalaz.Scalaz._
 import scalaz._
@@ -20,6 +21,19 @@ object Item {
   }
 }
 
+
+object ItemJson{
+
+  def apply(components : Seq[String] , rawJson:JsValue) : JsObject = {
+
+    val processedXhtml = (rawJson \ "xhtml").asOpt[String].map(s => PlayerXhtml.mkXhtml(components, s)).getOrElse{
+      throw new IllegalArgumentException("the Item json must contain 'xhtml'")
+    }
+
+    rawJson.as[JsObject] + ("itemId" -> (rawJson \ "_id" \ "$oid").as[JsString]) + ("xhtml" -> JsString(processedXhtml))
+  }
+}
+
 trait Item extends Controller {
 
   private lazy val logger = ContainerLogger.getLogger("Item")
@@ -27,6 +41,12 @@ trait Item extends Controller {
   implicit def toResult(m: StatusMessage): SimpleResult = play.api.mvc.Results.Status(m._1)(Json.obj("error" -> m._2))
 
   implicit def ec: ExecutionContext
+
+  /**
+   * A list of all the component types in the container
+   * @return
+   */
+  protected def componentTypes : Seq[String]
 
   def hooks: ItemHooks
 
@@ -41,14 +61,7 @@ trait Item extends Controller {
       }
   }
 
-  def cleanUpRawItemJson(rawItem: JsValue): JsValue = {
-    val itemJson = rawItem.as[JsObject]
-
-    def addItemIdAndRemoveDbGarbage = (itemJson \ "_id" \ "$oid").asOpt[String]
-      .fold(rawItem)(itemId => itemJson - "_id" ++ Json.obj("itemId" -> Json.toJson(itemId)))
-
-    (itemJson \ "itemId").asOpt[String].fold(addItemIdAndRemoveDbGarbage)(_ => rawItem)
-  }
+  def cleanUpRawItemJson(rawItem: JsValue): JsValue = ItemJson(componentTypes, rawItem)
 
   def load(itemId: String) = Action.async {
     implicit request =>
