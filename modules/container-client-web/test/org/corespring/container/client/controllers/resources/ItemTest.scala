@@ -17,7 +17,10 @@ object mockGlobalq extends play.api.GlobalSettings
 
 class ItemTest extends Specification with Mockito {
 
-  class item(createError: Option[StatusMessage] = None, globalConf:Option[play.api.GlobalSettings] = Some(mockGlobalq))
+  class item(
+      createError: Option[StatusMessage] = None,
+      globalConf:Option[play.api.GlobalSettings] = Some(mockGlobalq),
+      loadResult : JsValue = Json.obj("_id" -> Json.obj("$oid" -> "1"), "xhtml" -> "<div></div>"))
     extends WithApplication(FakeApplication(withGlobal = globalConf))
     with Scope {
     val item = new Item {
@@ -35,7 +38,7 @@ class ItemTest extends Specification with Mockito {
 
         override def load(itemId: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]] = {
           Future {
-            Right(Json.obj())
+            Right(loadResult)
           }
         }
 
@@ -48,16 +51,32 @@ class ItemTest extends Specification with Mockito {
         override def saveComponents(itemId: String, json: JsValue)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] = Future(Right(Json.obj()))
 
         override def saveSummaryFeedback(itemId: String, feedback: String)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] = Future(Right(Json.obj()))
+
+        override implicit def ec: ExecutionContext = ExecutionContext.Implicits.global
       }
 
-      override implicit def ec: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
+      override implicit def ec: ExecutionContext = ExecutionContext.Implicits.global
+
+      override protected def componentTypes: Seq[String] = Seq.empty
     }
 
   }
 
   "Item" should {
-    "load" in new item {
-      status(item.load("x")(FakeRequest("", ""))) === OK
+
+
+    "load" should {
+      s"return $OK" in new item {
+        status(item.load("x")(FakeRequest("", ""))) === OK
+      }
+
+      "prep the json" in new item(loadResult = Json.obj( "_id" ->
+        Json.obj( "$oid" -> "1"), "xhtml" -> "<p>a</p>")
+      ){
+        val json = contentAsJson(item.load("x")(FakeRequest("", "")))
+        (json \ "itemId").as[String] === "1"
+        (json \ "xhtml").as[String] === """<div class="para">a</div>"""
+      }
     }
 
     "fail to save if no json is supplied" in new item {
