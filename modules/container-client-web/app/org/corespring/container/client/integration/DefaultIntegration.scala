@@ -182,6 +182,8 @@ trait DefaultIntegration
     override def hooks: ItemHooks = itemHooks
 
     override implicit def ec: ExecutionContext = DefaultIntegration.this.ec
+
+    override protected def componentTypes: Seq[String] = DefaultIntegration.this.components.map(_.componentType)
   }
 
   lazy val session = new Session {
