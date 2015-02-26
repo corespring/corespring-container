@@ -21,5 +21,10 @@ class ItemJsonTest extends Specification {
     "prep the xhtml" in {
       (itemJson \ "xhtml").as[String] === """<div class="para">hello</div>"""
     }
+
+    "not set itemId if _id.$oid is missing" in {
+      val out = ItemJson(Seq.empty, Json.obj("xhtml" -> "x"))
+      (out \ "itemId").asOpt[String] === None
+    }
   }
 }
