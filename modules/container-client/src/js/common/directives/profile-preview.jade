@@ -78,12 +78,9 @@
       .info
         .label.label-warning Copyright Owner
       .content
-        img(ng-if="copyrightOwnerUrl").copyright-image(ng-src="{{copyrightOwnerUrl}}",
-          alt="{{item.profile.contributorDetails.copyrightOwner}}",
-          title="{{item.profile.contributorDetails.copyrightOwner}}")
-        | {{item.profile.contributorDetails.copyrightOwner}}
+        {{item.profile.contributorDetails.copyrightOwner}}
 
-    .field
+    .field.pull-right
       .more-info-container.clearfix
         a.show-more(ng-click="showMore = !showMore", ng-show="isThereMoreData(item.profile)") {{showMore ? 'hide info' : 'more info'}}
         .fields(ng-show="showMore")
@@ -119,6 +116,6 @@
             .title Source
             .sub-content
               a(href="{{getUrl(item.profile.contributorDetails.sourceUrl)}}", target="_blank")
-                .source-url-text{{getDisplayUrl(item.profile.contributorDetails.sourceUrl)}}
+                .source-url-text{{item.profile.contributorDetails.copyrightOwner}}
   .footer
     .item-id Item ID: {{item.itemId}}
