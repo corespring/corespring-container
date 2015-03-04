@@ -61,6 +61,8 @@ class ContainerClientImplementation(
 
     override def editorJs(implicit header: RequestHeader): Future[PlayerJs] = loader.loadJs(header)
 
+    override def catalogJs(implicit header: RequestHeader): Future[PlayerJs] = loader.loadJs(header)
+
   }
 
   lazy val assets = new Assets {

@@ -68,6 +68,8 @@ trait PlayerLauncherHooks extends HasContext {
   def playerJs(implicit header: RequestHeader): Future[PlayerJs]
 
   def editorJs(implicit header: RequestHeader): Future[PlayerJs]
+
+  def catalogJs(implicit header: RequestHeader): Future[PlayerJs]
 }
 
 trait AssetHooks extends HasContext {
