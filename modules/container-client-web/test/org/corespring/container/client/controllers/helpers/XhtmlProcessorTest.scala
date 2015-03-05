@@ -42,6 +42,10 @@ class XhtmlProcessorTest extends Specification {
 
     }
 
+    "throw an error if you attempt to use a tag other than div or span" in {
+      toWellFormedXhtml("a", "blah") must throwA[IllegalArgumentException]
+    }
+
   }
 
 }
