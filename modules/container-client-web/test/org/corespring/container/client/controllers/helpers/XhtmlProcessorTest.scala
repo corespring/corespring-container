@@ -38,6 +38,7 @@ class XhtmlProcessorTest extends Specification {
       "doesn't strip white space in <em>" in assertWellFormed("<div><br /><em>a</em> a</div>")
       "doesn't strip white space in <i>" in assertWellFormed("<div>what does <i>extracting</i> mean</div>")
       "wrap markup if needed" in assertWellFormed("apple <br/>", Some("<div>apple <br /></div>"))
+//      "preserves style tags" in assertWellFormed("<div><style type='text/css'>body { color: #fff; }</style></div>")
 
       "throw an error if you attempt to use a tag other than div or span" in {
         toWellFormedXhtml("a", "blah") must throwA[IllegalArgumentException]
