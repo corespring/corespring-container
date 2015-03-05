@@ -3,7 +3,7 @@ describe('questionInformation', function () {
   beforeEach(angular.mock.module('corespring-common.directives'));
   beforeEach(angular.mock.module('corespring-templates'));
 
-  var scope, element, mathJaxService;
+  var scope, element, mathJaxService, model;
 
   var mockParseDomForMath = jasmine.createSpy('parseDomForMath');
 
@@ -59,7 +59,7 @@ describe('questionInformation', function () {
 
   beforeEach(inject(function ($rootScope, $compile) {
     scope = $rootScope.$new();
-    scope.model = {
+    model = scope.model = {
       profile: {
         contributorDetails: {}
       }
@@ -90,10 +90,18 @@ describe('questionInformation', function () {
       expect(scope.hideNav).toEqual(true);
     });
 
-    it('should not hide navigation if the only available tab is supporting materials', function () {
+    it('should not hide navigation if the only available tab is supporting materials and there is more than 1 supporting materials', function () {
       scope.tabs = {supportingMaterial: true};
+      model.supportingMaterials = ['s1','s2'];
       scope.$digest();
       expect(scope.hideNav).toEqual(false);
+    });
+
+    it('should hide navigation if the only available tab is supporting materials and there is only 1 supporting material', function () {
+      scope.tabs = {supportingMaterial: true};
+      model.supportingMaterials = ['s1'];
+      scope.$digest();
+      expect(scope.hideNav).toEqual(true);
     });
 
   });

@@ -23,6 +23,9 @@ angular.module('corespring-common.directives')
               if ($scope.activeTab === 'supportingMaterial') {
                 $scope.selectSupportingMaterial(0);
               }
+              if ($scope.availableTabs && $scope.availableTabs.supportingMaterial && $scope.item.supportingMaterials.length > 1) {
+                $scope.hideNav = false;
+              }
             }
           });
 
@@ -36,8 +39,10 @@ angular.module('corespring-common.directives')
                   tabCount++;
                 }
               }
-              $scope.hideNav = (tabCount === 1 && !newValue.supportingMaterial);
-
+              $scope.hideNav = tabCount === 1;
+              if ($scope.item && newValue.supportingMaterial && $scope.item.supportingMaterials.length > 1) {
+                $scope.hideNav = false;
+              }
               if (!$scope.availableTabs[$scope.activeTab]) {
                 $scope.activeTab = _.findKey($scope.availableTabs, function (t) {
                   return t;
