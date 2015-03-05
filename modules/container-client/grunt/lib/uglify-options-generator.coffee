@@ -49,6 +49,6 @@ exports.buildUglifyOptions = (grunt, name, jsIn, processFn) ->
 
   out = {}
   out["#{name}Libs"] = mkUglify(libs, false, processFn)
-  out["#{name}Srcs"] = mkUglify(srcs, true, processFn)
+  out["#{name}Srcs"] = mkUglify(srcs, {}, processFn)
   out["#{name}Final"] = mkUglify(final, false, processFn)
   out
