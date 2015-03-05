@@ -40,10 +40,10 @@ class XhtmlProcessorTest extends Specification {
       "wrap markup if needed" in assertWellFormed("apple <br/>", Some("<div>apple <br /></div>"))
       "preserves style tags" in assertWellFormed("""<div><style type="text/css">body { color: #fff; }</style></div>""")
 
-    }
+      "throw an error if you attempt to use a tag other than div or span" in {
+        toWellFormedXhtml("a", "blah") must throwA[IllegalArgumentException]
+      }
 
-    "throw an error if you attempt to use a tag other than div or span" in {
-      toWellFormedXhtml("a", "blah") must throwA[IllegalArgumentException]
     }
 
   }
