@@ -44,10 +44,7 @@ object XhtmlProcessor {
     scala.xml.XML.loadString(html)
     true
   } catch {
-    case e : Throwable => {
-      e.printStackTrace()
-      false
-    }
+    case e : Throwable => false
   }
 
   private def getCleaner = {
