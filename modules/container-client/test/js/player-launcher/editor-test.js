@@ -4,6 +4,7 @@ describe('editor launcher', function () {
 
   var EditorDefinition;
   var defaultOptions;
+  var originalDefaultOptions;
   var instanceCalls;
   var lastError;
   var launchErrors;
@@ -38,6 +39,7 @@ describe('editor launcher', function () {
     instanceCalls = [];
     lastError = null;
     defaultOptions = corespring.module("default-options").exports;
+    originalDefaultOptions = _.cloneDeep(defaultOptions);
     defaultOptions.corespringUrl = "http://blah.com";
     defaultOptions.paths = {};
     originalInstance = corespring.require("instance");
@@ -53,7 +55,9 @@ describe('editor launcher', function () {
 
   afterEach(function () {
     corespring.module("instance", originalInstance);
+    corespring.module("default-options").exports = originalDefaultOptions;
     window.console.warn = origWarn;
+
   });
 
   function create(options, playerErrors, queryParams) {
@@ -152,7 +156,7 @@ describe('editor launcher', function () {
 
     it("should invoke error callback if options.path does not contain 'editor'", function(){
       defaultOptions.paths = {};
-      var editor = create({});
+      var editor = create({itemId:'expected-item-id'});
       expect(lastError.code).toEqual(errors.EXTERNAL_ERROR("editor not part of options").code);
       expect(lastError.message).toEqual(errors.EXTERNAL_ERROR("editor not part of options").message);
     });

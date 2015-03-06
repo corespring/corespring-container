@@ -42,7 +42,7 @@ trait Catalog
         def ifEmpty = {
           logger.trace(s"[showCatalog]: $id")
 
-          val scriptInfo = componentScriptInfo(componentTypes(Json.obj()), false)
+          val scriptInfo = componentScriptInfo(componentTypes(Json.obj()), jsMode == "dev")
           val domainResolvedJs = buildJs(scriptInfo)
           val domainResolvedCss = buildCss(scriptInfo)
           Ok(

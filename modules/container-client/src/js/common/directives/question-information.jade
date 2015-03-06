@@ -1,11 +1,11 @@
 .question-information(ng-if="item")
-  .col-sm-3
+  .col-sm-3(ng-hide='hideNav')
     ul.nav.nav-pills.nav-stacked(role='tablist')
-      li(role='presentation',ng-class="{active: activeTab == 'question'}",ng-click="selectTab('question')")
+      li(role='presentation',ng-class="{active: activeTab == 'question'}",ng-click="selectTab('question')",ng-show="availableTabs.question")
         a Question
-      li(role='presentation',ng-class="{active: activeTab == 'profile'}",ng-click="selectTab('profile')")
+      li(role='presentation',ng-class="{active: activeTab == 'profile'}",ng-click="selectTab('profile')",ng-show="availableTabs.profile")
         a Profile Information
-      li(role='presentation', ng-show='item.supportingMaterials.length > 0')
+      li(role='presentation', ng-show='item.supportingMaterials.length > 0 && availableTabs.supportingMaterial')
         a.dropdown-toggle(data-toggle='dropdown')
           | Supporting Materials
           span.caret
@@ -18,8 +18,7 @@
     .player-container(ng-show="activeTab == 'question'")
       corespring-demo-player(
         player-markup="item.xhtml",
-        player-item="item",
-        player-mode="playerMode")
+        player-item="item")
 
     .profile(ng-show="activeTab == 'profile'")
       div(profile-preview="", ng-model="item")
