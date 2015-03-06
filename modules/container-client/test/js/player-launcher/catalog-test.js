@@ -1,6 +1,7 @@
 describe('catalog launcher', function () {
 
   var errors = corespring.require("errors");
+  var originalDefaultOptions;
 
   var CatalogDefinition;
   var defaultOptions;
@@ -38,6 +39,7 @@ describe('catalog launcher', function () {
     instanceCalls = [];
     lastError = null;
     defaultOptions = corespring.module("default-options").exports;
+    originalDefaultOptions = _.cloneDeep(defaultOptions);
     defaultOptions.corespringUrl = "http://blah.com";
     defaultOptions.paths = {};
     originalInstance = corespring.require("instance");
@@ -53,6 +55,7 @@ describe('catalog launcher', function () {
 
   afterEach(function () {
     corespring.module("instance", originalInstance);
+    corespring.module("default-options").exports = originalDefaultOptions;
     window.console.warn = origWarn;
   });
 
@@ -100,7 +103,7 @@ describe('catalog launcher', function () {
 
     it("should invoke error callback if options.path does not contain 'catalog'", function(){
       defaultOptions.paths = {};
-      create({});
+      create({itemId:'expected-item-id'}, null, {apiClient:123});
       expect(lastError.code).toEqual(errors.EXTERNAL_ERROR("catalog not part of options").code);
       expect(lastError.message).toEqual(errors.EXTERNAL_ERROR("catalog not part of options").message);
     });
