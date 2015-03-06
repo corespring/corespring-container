@@ -1,12 +1,12 @@
 extends layout
 
 block content
-  .root(ng-controller="CatalogRoot")
-    div(question-information="", ng-model="item") Boooo
+  .root(ng-controller="CatalogRoot", dimension-propagator='')
+    div(question-information="", tabs="tabs", ng-model="item")
 
 block after-main-script
-  
-  script(type="text/javascript"). 
+
+  script(type="text/javascript").
     angular.module('corespring-#{appName}');
 
 

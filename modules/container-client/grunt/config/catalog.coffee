@@ -25,7 +25,7 @@ exports.js =
   report: 'catalog-js-report.json'
 
 exports.css =
-  src: ['css/editor.css']
+  src: ['css/player.css','css/editor.css']
   dest: 'css/editor.min.css'
   libs: _.union(coreLibs.css, [
     'bower_components/select2/select2.css',
