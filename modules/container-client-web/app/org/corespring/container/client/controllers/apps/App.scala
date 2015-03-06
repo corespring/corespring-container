@@ -3,7 +3,7 @@ package org.corespring.container.client.controllers.apps
 import grizzled.slf4j.Logger
 import org.corespring.container.client.component.{ ComponentUrls, ItemTypeReader }
 import org.corespring.container.client.controllers.angular.AngularModules
-import org.corespring.container.client.controllers.helpers.{ Helpers, LoadClientSideDependencies, XhtmlProcessor }
+import org.corespring.container.client.controllers.helpers.{ Helpers, LoadClientSideDependencies }
 import org.corespring.container.client.hooks.ClientHooks
 import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.components.model.Id

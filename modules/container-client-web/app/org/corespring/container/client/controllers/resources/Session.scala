@@ -86,9 +86,9 @@ trait Session extends Controller with HasContext {
   }
 
   def loadItemAndSession(sessionId: String) = Action { implicit request =>
-    val reponse = hooks.loadItemAndSession(sessionId)
+    val response = hooks.loadItemAndSession(sessionId)
 
-    reponse match {
+    response match {
       case Left(err) => err
       case Right(fs) => {
         val json = fs.everything

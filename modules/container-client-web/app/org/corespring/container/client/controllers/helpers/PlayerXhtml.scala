@@ -2,7 +2,7 @@ package org.corespring.container.client.controllers.helpers
 
 import org.htmlcleaner.{TagNode, TagTransformation}
 
-object PlayerXhtml{
+object PlayerXhtml {
   def mkXhtml(components:Seq[String], xhtml:String) : String = {
 
     /** <p> -> <div class="para"/> */
