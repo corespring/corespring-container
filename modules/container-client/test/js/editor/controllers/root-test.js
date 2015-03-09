@@ -128,7 +128,7 @@ describe('Root', function() {
         render();
       }));
 
-      it('should bind to Msgr initialise', function() {
+      it('should not call Msgr.initialise', function() {
         expect(Msgr.on).not.toHaveBeenCalledWith('initialise', jasmine.any(Function));
       });
 
