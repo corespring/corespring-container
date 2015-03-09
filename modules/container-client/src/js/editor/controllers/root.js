@@ -2,6 +2,7 @@ angular.module('corespring-editor.controllers')
   .controller('Root', [
     '$scope',
     '$state',
+    '$window',
     'ComponentRegister',
     'ConfigurationService',
     'ItemService',
@@ -14,6 +15,7 @@ angular.module('corespring-editor.controllers')
     function(
       $scope,
       $state,
+      $window,
       ComponentRegister,
       ConfigurationService,
       ItemService,
@@ -108,7 +110,12 @@ angular.module('corespring-editor.controllers')
       // startup
       //----------------------------------------------------------------
 
-      if (iFrameService.isInIFrame()) {
+      function byPassIframeLaunchMechanism(){
+        var bypass = $window.location.search.indexOf('bypass-iframe-launch-mechanism') !== -1;
+        return bypass;
+      }
+
+      if (iFrameService.isInIFrame() && !byPassIframeLaunchMechanism()) {
         Msgr.on('initialise', function(data) {
           $log.log('on initialise', data);
           ConfigurationService.setConfig(data);
