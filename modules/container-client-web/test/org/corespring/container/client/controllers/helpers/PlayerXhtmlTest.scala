@@ -5,17 +5,14 @@ import org.specs2.specification.Scope
 
 class PlayerXhtmlTest extends Specification {
 
-
-  implicit def PlatformString(s: String) = new {
-    def toUnix = {
-      s.replaceAll("\r\n", "\n").replaceAll("\r", "")
-    }
+  implicit class WithoutCarriageReturn(s: String) {
+    def withoutCarriageReturn = s.replaceAll("\r", "")
   }
 
   val comps = Seq("corespring-apple", "corespring-banana", "corespring-one", "corespring-two")
 
   case class assertPlayerXhtml(in:String, expected:String) extends Scope{
-    PlayerXhtml.mkXhtml(comps, in).trim.toUnix === expected.toUnix
+    PlayerXhtml.mkXhtml(comps, in).trim.withoutCarriageReturn === expected.withoutCarriageReturn
   }
 
   "preparePlayerXhtml" should {

@@ -49,9 +49,15 @@ describe('Root', function() {
     })
   };
 
+  var mockWindow = {
+    location: {
+      search: 'query-string'
+    }
+  };
 
   beforeEach(module(function($provide) {
     $provide.value('$state', $state);
+    $provide.value('$window', mockWindow);
     $provide.value('ComponentRegister', ComponentRegister);
     $provide.value('ConfigurationService', ConfigurationService);
     $provide.value('ItemService', ItemService);
@@ -107,6 +113,28 @@ describe('Root', function() {
 
       afterEach(function() {
         iFrame = false;
+      });
+
+    });
+
+    describe('when in iframe, but bypassed', function() {
+      var oldTop = top;
+      var oldQueryString = mockWindow.location.search;
+
+      beforeEach(inject(function($rootScope, $compile) {
+        iFrame = true;
+        Msgr.on.calls.reset();
+        mockWindow.location.search = 'bypass-iframe-launch-mechanism';
+        render();
+      }));
+
+      it('should not call Msgr.initialise', function() {
+        expect(Msgr.on).not.toHaveBeenCalledWith('initialise', jasmine.any(Function));
+      });
+
+      afterEach(function() {
+        iFrame = false;
+        mockWindow.location.search = oldQueryString;
       });
 
     });

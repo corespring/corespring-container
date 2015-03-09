@@ -42,7 +42,7 @@ trait PlayerLauncher extends Controller {
     }
   }
 
-  import org.corespring.container.client.controllers.apps.routes.{ Editor, Player }
+  import org.corespring.container.client.controllers.apps.routes.{ Editor, Player, Catalog }
 
   val SecureMode = "corespring.player.secure"
 
@@ -50,6 +50,11 @@ trait PlayerLauncher extends Controller {
 
   lazy val editorNameAndSrc = {
     val jsPath = "container-client/js/player-launcher/editor.js"
+    pathToNameAndContents(jsPath)
+  }
+
+  lazy val catalogNameAndSrc = {
+    val jsPath = "container-client/js/player-launcher/catalog.js"
     pathToNameAndContents(jsPath)
   }
 
@@ -79,6 +84,23 @@ trait PlayerLauncher extends Controller {
             "url" -> create.url)))
       val bootstrap = "org.corespring.players.ItemEditor = corespring.require('editor');"
       make(editorNameAndSrc, defaultOptions, bootstrap)
+    }
+  }
+
+  def catalogJs = Action.async { implicit request =>
+    hooks.catalogJs.map { implicit js =>
+      val loadCatalogCall = Catalog.load(":itemId")
+      val rootUrl = playerConfig.rootUrl.getOrElse(BaseUrl(request))
+
+      val defaultOptions: JsValue = Json.obj(
+        "corespringUrl" -> rootUrl,
+        "paths" -> Json.obj(
+          "catalog" -> Json.obj(
+            "method" -> loadCatalogCall.method,
+            "url" -> loadCatalogCall.url)))
+
+      val bootstrap = "org.corespring.players.ItemCatalog = corespring.require('catalog');"
+      make(catalogNameAndSrc, defaultOptions, bootstrap)
     }
   }
 

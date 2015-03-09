@@ -186,8 +186,8 @@ class RhinoScopeBuilder(val components: Seq[Component])
 
   private def toWrappedJsSrcAndName(c: Component): Seq[(String, String)] = {
     c match {
-      case Interaction(org, name, _, _, _, server, _, _, _, _, _) => Seq(s"$org-$name" -> wrap(s"$org-$name", server.definition))
-      case Library(org, name, _, _, server, _, _) => toNameAndSource(server)
+      case i:Interaction => Seq(s"${i.org}-${i.name}" -> wrap(s"${i.org}-${i.name}", i.server.definition))
+      case l:Library => toNameAndSource(l.server)
       case _ => Seq.empty
     }
   }

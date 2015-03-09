@@ -24,6 +24,8 @@ class PlayerLauncherTest extends Specification with Mockito with PlaySpecificati
         override def editorJs(implicit header: RequestHeader): Future[PlayerJs] = Future(jsConfig)
 
         override def playerJs(implicit header: RequestHeader): Future[PlayerJs] = Future(jsConfig)
+
+        override def catalogJs(implicit header: RequestHeader): Future[PlayerJs] = Future(jsConfig)
       }
 
       override implicit def ec: ExecutionContext = ExecutionContext.Implicits.global

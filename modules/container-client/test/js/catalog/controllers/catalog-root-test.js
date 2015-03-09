@@ -22,6 +22,12 @@ describe('CatalogRoot', function() {
     this.load = mockLoad;
   }
 
+  function MockiFrameService() {
+    this.isInIFrame = function() {
+      return false;
+    };
+  }
+
   function MockSupportingMaterialsService() {
     this.getSupportingMaterialsByGroups = mockGetSupportingMaterialsByGroups;
   }
@@ -34,6 +40,8 @@ describe('CatalogRoot', function() {
     $provide.value('LogFactory', new MockLogFactory());
     $provide.value('SupportingMaterialsService', new MockSupportingMaterialsService());
     $provide.value('ItemService', new MockItemService());
+    $provide.value('iFrameService', new MockiFrameService());
+    $provide.value('Msgr', {});
   }));
 
   beforeEach(inject(function($rootScope, $compile) {
@@ -56,7 +64,7 @@ describe('CatalogRoot', function() {
     };
 
     beforeEach(function() {
-      scope.$emit('itemLoaded', item);
+      scope.onLoaded(item);
     });
 
     it('should set supportingMaterials to result of getSupportingMaterialsByGroups', function() {

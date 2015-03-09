@@ -35,6 +35,7 @@ trait Editor
         }
         case _ => None
       }),
+      "released" -> Some(JsBoolean(ci.released)),
       "componentType" -> Some(JsString(tag)),
       "defaultData" -> Some(ci.defaultData),
       "configuration" -> (ci.packageInfo \ "external-configuration").asOpt[JsObject])
