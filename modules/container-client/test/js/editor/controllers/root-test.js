@@ -124,7 +124,7 @@ describe('Root', function() {
       beforeEach(inject(function($rootScope, $compile) {
         iFrame = true;
         Msgr.on.calls.reset();
-        mockWindow.location.search = 'bypass-iframe-launch-mechanism=true';
+        mockWindow.location.search = 'bypass-iframe-launch-mechanism';
         render();
       }));
 
