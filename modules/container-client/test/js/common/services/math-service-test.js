@@ -6,7 +6,11 @@ describe('MathJaxService', function() {
   function MockMathJax() {
     this.Hub = {
       Config: function() {},
-      Queue: function() {},
+      Queue: function(params, callback) {
+        if (callback) {
+          callback();
+        }
+      },
       signal: {
         Interest: function(signal) {
           onHubSignal = signal;
@@ -46,27 +50,43 @@ describe('MathJaxService', function() {
 
   });
 
+  describe('flagRendered', function() {
+
+    describe('element that is a span[mathjax]', function() {
+
+    });
+
+  });
+
   describe('parseDomForMath', function() {
-    var element = $("<div></div>");
-    beforeEach(function() {
-      mathJaxService.parseDomForMath(100, element);
-      timeout.flush();
+    var element = $("<div><span mathjax></span></div>");
+
+    describe('with delay', function() {
+      beforeEach(function() {
+        mathJaxService.parseDomForMath(100, element);
+        timeout.flush();
+      });
+
+      it('should queue a MathJax typeset for the provided element', function() {
+        expect(MathJax.Hub.Queue).toHaveBeenCalledWith(["Typeset", MathJax.Hub, element], jasmine.any(Function));
+      });
     });
 
-    it('should queue a MathJax typeset for the provided element', function() {
-      expect(MathJax.Hub.Queue).toHaveBeenCalledWith(["Typeset", MathJax.Hub, element]);
+    describe('without delay', function() {
+      beforeEach(function() {
+        mathJaxService.parseDomForMath(0, element);
+      });
+
+      it('should queue a MathJax typeset for the provided element immediately', function() {
+        expect(MathJax.Hub.Queue).toHaveBeenCalledWith(["Typeset", MathJax.Hub, element], jasmine.any(Function));
+      });
+
+      it('should add class rendered to <span mathjax/>', function() {
+        expect($('span[mathjax]', element).hasClass('rendered')).toBe(true);
+      });
     });
+
   });
-
-  describe('parseDomForMath - zero delay', function() {
-    var element = $("<div></div>");
-    it('should queue a MathJax typeset for the provided element immediately', function() {
-      mathJaxService.parseDomForMath(0, element);
-      expect(MathJax.Hub.Queue).toHaveBeenCalledWith(["Typeset", MathJax.Hub, element]);
-    });
-  });
-
-
 
   describe('onEndProcess', function() {
     var args = [1,2,3];

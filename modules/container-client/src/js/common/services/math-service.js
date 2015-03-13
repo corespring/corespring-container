@@ -7,15 +7,33 @@
 
   var MathJaxService = function($timeout) {
 
+    var self = this;
+
+    this.flagRendered = function(element) {
+      var $element;
+      if (element) {
+        $element = $(element);
+        if ($element.attr('mathjax')) {
+          $element.addClass('rendered');
+        } else {
+          $element.find('span[mathjax]').addClass('rendered');
+        }
+      } else {
+        $('span[mathjax]').addClass('rendered');
+      }
+    };
+
     this.parseDomForMath = function(delay, element) {
 
-      function renderMath(){
+      function renderMath() {
         if (typeof MathJax !== 'undefined' && !_.isUndefined(MathJax)) {
-          MathJax.Hub.Queue(["Typeset", MathJax.Hub, element]);
+          MathJax.Hub.Queue(["Typeset", MathJax.Hub, element], function() {
+            self.flagRendered(element);
+          });
         }
       }
 
-      if(delay === 0){
+      if (delay === 0) {
         renderMath();
       } else {
         $timeout(renderMath, delay || 100);
