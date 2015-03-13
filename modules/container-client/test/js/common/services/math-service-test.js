@@ -50,14 +50,6 @@ describe('MathJaxService', function() {
 
   });
 
-  describe('flagRendered', function() {
-
-    describe('element that is a span[mathjax]', function() {
-
-    });
-
-  });
-
   describe('parseDomForMath', function() {
     var element = $("<div><span mathjax></span></div>");
 
