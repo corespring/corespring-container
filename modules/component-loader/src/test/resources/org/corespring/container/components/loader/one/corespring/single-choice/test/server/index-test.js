@@ -30,16 +30,16 @@ settings = (feedback = true, userResponse = true, correctResponse = true) ->
 
 describe 'single-choice server logic',  ->
 
-  describe 'respond', ->
+  describe 'createOutcome', ->
 
     it 'should not show any feedback', ->
-      response = server.respond(_.cloneDeep(component), answer("2"), settings(false, true, true))
+      response = server.createOutcome(_.cloneDeep(component), answer("2"), settings(false, true, true))
       expected =
         correctness: "correct"
       response.should.eql expected
 
     it 'should respond to a correct answer', ->
-      response = server.respond(_.cloneDeep(component), answer("2"), settings(true, true, true))
+      response = server.createOutcome(_.cloneDeep(component), answer("2"), settings(true, true, true))
       expected =
         correctness: "correct"
         feedback: [
@@ -48,7 +48,7 @@ describe 'single-choice server logic',  ->
       response.should.eql expected
 
     it 'should respond to an incorrect outcome (show correct too)', ->
-      response = server.respond(_.cloneDeep(component), answer("1"), settings(true, true, true))
+      response = server.createOutcome(_.cloneDeep(component), answer("1"), settings(true, true, true))
       expected =
         correctness: "incorrect"
         feedback: [
@@ -58,7 +58,7 @@ describe 'single-choice server logic',  ->
       response.should.eql expected
 
     it 'should respond to an incorrect outcome (do not show correct)', ->
-      response = server.respond(_.cloneDeep(component), answer("1"), settings(true, true, false))
+      response = server.createOutcome(_.cloneDeep(component), answer("1"), settings(true, true, false))
       expected =
         correctness: "incorrect"
         feedback: [
