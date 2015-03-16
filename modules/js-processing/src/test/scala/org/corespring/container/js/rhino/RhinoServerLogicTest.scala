@@ -18,9 +18,8 @@ class RhinoServerLogicTest extends Specification with ComponentMaker {
   val serverLogic = new RhinoServerLogic("org-test-comp", builder.scope)
 
   "server logic" should {
-    "work" in {
-      val result = serverLogic.createOutcome(Json.obj(), Json.obj(), Json.obj(), Json.obj())
-      (result \ "correctness").as[String] === "correct"
+    "throw" in {
+      serverLogic.createOutcome(Json.obj(), Json.obj(), Json.obj(), Json.obj()) must throwA[RuntimeException]
     }
   }
 

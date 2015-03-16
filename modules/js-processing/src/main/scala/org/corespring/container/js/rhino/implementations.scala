@@ -99,13 +99,7 @@ class RhinoServerLogic(componentType: String, scope: Scriptable)
 
       server.get("createOutcome", server) match {
         case fn: RhinoFunction => execute(fn)
-        case ut: UniqueTag => {
-          logger.warn(s"$componentType : Function 'createOutcome' not found, attempting with old name 'respond' - change this!")
-          server.get("respond", server) match {
-            case fn: RhinoFunction => execute(fn)
-            case uut: UniqueTag => throw new RuntimeException(s"$componentType : Error can't find function respond")
-          }
-        }
+        case ut: UniqueTag => throw new RuntimeException(s"$componentType : Error can't find function createOutcome")
       }
     } catch {
       case e: Throwable => {

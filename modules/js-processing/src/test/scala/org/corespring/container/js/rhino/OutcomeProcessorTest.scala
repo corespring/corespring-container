@@ -10,7 +10,7 @@ class OutcomeProcessorTest extends Specification with ComponentMaker {
 
   val interactionRespondJs =
     """
-      |exports.respond = function(question, answer, settings){
+      |exports.createOutcome = function(question, answer, settings){
       |
       |  if(!answer){
       |    return { correctness: 'incorrect', score: 0 }
@@ -22,7 +22,7 @@ class OutcomeProcessorTest extends Specification with ComponentMaker {
 
   val feedbackRespondJs =
     """
-      |exports.respond = function(question, answer, settings, targetOutcome){
+      |exports.createOutcome = function(question, answer, settings, targetOutcome){
       |  return { targetOutcome: targetOutcome };
       |}
     """.stripMargin
@@ -100,9 +100,9 @@ class OutcomeProcessorTest extends Specification with ComponentMaker {
       val oneJs =
         """
           |var a = require("a");
-          |exports.respond = function(question, answer, settings){
+          |exports.createOutcome = function(question, answer, settings){
           |  return {
-          |    a: a.respond(),
+          |    a: a.createOutcome(),
           |    oneJs: "hi from oneJs"
           |  }
           |}
@@ -111,9 +111,9 @@ class OutcomeProcessorTest extends Specification with ComponentMaker {
       val aJs =
         """
           |var b = require("b");
-          |exports.respond = function(){
+          |exports.createOutcome = function(){
           |  return {
-          |    b: b.respond(),
+          |    b: b.createOutcome(),
           |    a: "hi from a"
           |  }
           |}
@@ -122,14 +122,14 @@ class OutcomeProcessorTest extends Specification with ComponentMaker {
       val bJs =
         """
           |var c = require("c");
-          |exports.respond = function(){
-          | return { b:  "hi from b", c: c.respond() }
+          |exports.createOutcome = function(){
+          | return { b:  "hi from b", c: c.createOutcome() }
           |}
         """.stripMargin
 
       val cJs =
         """
-          |exports.respond = function(){
+          |exports.createOutcome = function(){
           | return { c : "hi from c" };
           |}
         """.stripMargin
@@ -166,7 +166,7 @@ class OutcomeProcessorTest extends Specification with ComponentMaker {
     lazy val interaction = uiComp("interaction", Seq(Id("org", "lib"))).copy(server = Server(
       """
         |var l = require('src-1');
-        |exports.respond = function(){
+        |exports.createOutcome = function(){
         |  return { msg: l.ping() }
         |}
       """.stripMargin))

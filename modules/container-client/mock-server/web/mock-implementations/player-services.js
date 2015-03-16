@@ -79,7 +79,7 @@ angular.module('mock.player.services').factory('ResponseProcessor', [
             result[id] = {};
           } else {
             if (answers[id]) {
-              var out = serverLogic.respond(comp, answers[id], settings);
+              var out = serverLogic.createOutcome(comp, answers[id], settings);
               result[id] = out;
             }
           }

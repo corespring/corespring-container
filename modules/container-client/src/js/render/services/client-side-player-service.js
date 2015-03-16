@@ -34,30 +34,34 @@ angular.module('corespring-player.services')
           var serverLogic, answer, id, question, out = {};
 
           function addResponse(id, question, targetOutcome) {
-            var answer = components[id].answers;
             serverLogic = corespring.server.logic(question.componentType);
-            if (serverLogic && serverLogic.respond) {
-              out[id] = serverLogic.respond(question, answer, settings, targetOutcome);
-              out[id].studentResponse = _.cloneDeep(answer);
-            } else {
+            if(!serverLogic) {
               console.warn('didn\'t find server logic for: ', question.componentType);
+              return;
             }
+            if(!serverLogic.createOutcome){
+              console.warn('didn\'t find serverLogic.createOutcome: ', question.componentType);
+              return
+            }
+            var answer = components[id].answers;
+            out[id] = serverLogic.createOutcome(question, answer, settings, targetOutcome);
+            out[id].studentResponse = _.cloneDeep(answer);
           }
 
           for (id in components) {
-            question = angular.copy(getQuestionFor(id));
+            question = getQuestionFor(id);
             if (!question.target) {
-              addResponse(id, question);
+              addResponse(id, angular.copy(question));
             }
           }
 
           for (id in components) {
-            question = angular.copy(getQuestionFor(id));
+            question = getQuestionFor(id);
             if (question.target) {
               var targetId = question.target.id;
               var targetOutcome = out[targetId];
 
-              addResponse(id, question, targetOutcome);
+              addResponse(id, angular.copy(question), targetOutcome);
             }
           }
 

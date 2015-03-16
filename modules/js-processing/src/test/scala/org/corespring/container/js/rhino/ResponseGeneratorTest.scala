@@ -14,7 +14,7 @@ class ResponseGeneratorTest extends Specification with ComponentMaker {
     """
       |var _ = require("underscore");
       |
-      |exports.respond = function(question, answer, settings){
+      |exports.createOutcome = function(question, answer, settings){
       |  var correct = question.correctResponse.value == answer.value;
       |  var feedback = [];
       |  var oneHundred = _.parseInt('100');
