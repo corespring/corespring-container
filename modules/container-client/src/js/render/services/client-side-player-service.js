@@ -41,7 +41,7 @@ angular.module('corespring-player.services')
             }
             if(!serverLogic.createOutcome){
               console.warn('didn\'t find serverLogic.createOutcome: ', question.componentType);
-              return
+              return;
             }
             var answer = components[id].answers;
             out[id] = serverLogic.createOutcome(question, answer, settings, targetOutcome);
