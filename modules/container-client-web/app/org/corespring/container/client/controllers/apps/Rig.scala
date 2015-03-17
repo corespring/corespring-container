@@ -39,7 +39,6 @@ trait Rig
     override implicit def ec: ExecutionContext = ExecutionContext.Implicits.global
 
     override def loadItem(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]] = Future {
-      //val componentType = s"corespring-$id"
       val componentType = id
       header.getQueryString("data").map { jsonFile =>
         Right((loadData(componentType, jsonFile) \ "item").as[JsValue])
