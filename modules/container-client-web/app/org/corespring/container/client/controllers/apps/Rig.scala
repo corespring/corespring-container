@@ -24,7 +24,7 @@ trait Rig
       Ok(loadData(componentType, dataName))
   }
 
-  def loadData(componentType: String, dataName: String): JsValue = {
+  private def loadData(componentType: String, dataName: String): JsValue = {
     val data = for {
       c <- component(componentType)
       filename <- Some(if (dataName.endsWith(".json")) dataName else s"$dataName.json")
@@ -33,7 +33,7 @@ trait Rig
     data.getOrElse(Json.obj())
   }
 
-  def component(componentType: String): Option[ComponentInfo] = (interactions ++ widgets).find(c => c.componentType == componentType)
+  private def component(componentType: String): Option[ComponentInfo] = (interactions ++ widgets).find(c => c.componentType == componentType)
 
   def asset(componentType: String, file: String) = controllers.Assets.at("/container-client", file)
 
@@ -44,8 +44,10 @@ trait Rig
     override implicit def ec: ExecutionContext = ExecutionContext.Implicits.global
 
     override def loadItem(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]] = Future {
+      //val componentType = s"corespring-$id"
+      val componentType = id
       header.getQueryString("data").map { jsonFile =>
-        Right((loadData(id, jsonFile) \ "item").as[JsValue])
+        Right((loadData(componentType, jsonFile) \ "item").as[JsValue])
       }.getOrElse(Left(BAD_REQUEST, "You need to specify a json file using 'data' query param"))
     }
   }
@@ -53,17 +55,24 @@ trait Rig
   override def ngModules: AngularModules = new AngularModules()
 
   override def load(componentType: String): Action[AnyContent] = Action.async { implicit request =>
-    val scriptInfo = componentScriptInfo(Seq(componentType), jsMode == "dev")
-    val js = buildJs(scriptInfo)
-    val css = buildCss(scriptInfo)
 
-    Future(
+    def onError(sm: StatusMessage) = BadRequest(s"Rig error: ${sm._2}")
+
+    def onItem(i: JsValue) = {
+      val comps = (componentTypes(i) :+ componentType).distinct
+      val scriptInfo = componentScriptInfo(comps, jsMode == "dev")
+      val js = buildJs(scriptInfo)
+      val css = buildCss(scriptInfo)
+
       Ok(renderJade(
         RigTemplateParams(
           context,
           js,
           css,
-          jsSrc.ngModules ++ scriptInfo.ngDependencies))))
+          jsSrc.ngModules ++ scriptInfo.ngDependencies)))
+    }
+
+    hooks.loadItem(componentType).map { e => e.fold(onError, onItem) }
   }
 
 }
