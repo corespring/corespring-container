@@ -17,12 +17,7 @@ trait Rig
   with PlayerItemTypeReader
   with Jade {
 
-  def index(componentType: String, data: Option[String] = None) = controllers.Assets.at("/container-client", s"rig.html")
-
-  def data(componentType: String, dataName: String) = Action {
-    request =>
-      Ok(loadData(componentType, dataName))
-  }
+  def index(componentType: String, data: Option[String] = None) = controllers.Assets.at("/container-client", "rig.html")
 
   private def loadData(componentType: String, dataName: String): JsValue = {
     val data = for {
@@ -63,13 +58,16 @@ trait Rig
       val scriptInfo = componentScriptInfo(comps, jsMode == "dev")
       val js = buildJs(scriptInfo)
       val css = buildCss(scriptInfo)
+      val itemJson = Json.prettyPrint(i)
 
       Ok(renderJade(
         RigTemplateParams(
           context,
           js,
           css,
-          jsSrc.ngModules ++ scriptInfo.ngDependencies)))
+          jsSrc.ngModules ++ scriptInfo.ngDependencies,
+          itemJson
+        )))
     }
 
     hooks.loadItem(componentType).map { e => e.fold(onError, onItem) }
