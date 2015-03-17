@@ -1,4 +1,4 @@
-describe('CatalogRoot', function() {
+describe('CatalogRoot', function () {
 
   var scope, element;
 
@@ -11,11 +11,12 @@ describe('CatalogRoot', function() {
     .and.returnValue(mockSupportingMaterialsByGroups);
 
   function MockLogFactory() {
-    this.getLogger = function() {
+    this.getLogger = function () {
       return {
-        debug: function() {}
+        debug: function () {
+        }
       };
-    }
+    };
   }
 
   function MockItemService() {
@@ -23,7 +24,7 @@ describe('CatalogRoot', function() {
   }
 
   function MockiFrameService() {
-    this.isInIFrame = function() {
+    this.isInIFrame = function () {
       return false;
     };
   }
@@ -32,11 +33,26 @@ describe('CatalogRoot', function() {
     this.getSupportingMaterialsByGroups = mockGetSupportingMaterialsByGroups;
   }
 
+  function MockCorespringServerLogic() {
+    this.server = {
+      logic: function (componentType) {
+        console.log("MockCorespringServerLogic.logic", componentType);
+        return {
+          preprocess: function(item){
+            console.log("preprocess", item);
+            item.preprocessed = true;
+            return item;
+          }
+        };
+      }
+    };
+  }
+
   function resetMocks() {
     mockLoad.calls.reset();
   }
 
-  beforeEach(module(function($provide) {
+  beforeEach(module(function ($provide) {
     $provide.value('LogFactory', new MockLogFactory());
     $provide.value('SupportingMaterialsService', new MockSupportingMaterialsService());
     $provide.value('ItemService', new MockItemService());
@@ -44,7 +60,7 @@ describe('CatalogRoot', function() {
     $provide.value('Msgr', {});
   }));
 
-  beforeEach(inject(function($rootScope, $compile) {
+  beforeEach(inject(function ($rootScope, $compile) {
     scope = $rootScope.$new();
     element = $compile('<div ng-controller="CatalogRoot"></div>')(scope);
     scope = element.scope();
@@ -52,35 +68,55 @@ describe('CatalogRoot', function() {
 
   afterEach(resetMocks);
 
-  describe('initialization', function() {
-    it('should call ItemService.load with onLoaded', function() {
+  describe('initialization', function () {
+    it('should call ItemService.load with onLoaded', function () {
       expect(mockLoad).toHaveBeenCalledWith(scope.onLoaded, scope.onUploadFailed);
     });
   });
 
-  describe('itemLoaded event', function() {
+  describe('itemLoaded event', function () {
     var item = {
       supportingMaterials: {these: 'are', supporting: 'materials'}
     };
 
-    beforeEach(function() {
+    beforeEach(function () {
       scope.onLoaded(item);
     });
 
-    it('should set supportingMaterials to result of getSupportingMaterialsByGroups', function() {
+    it('should set supportingMaterials to result of getSupportingMaterialsByGroups', function () {
       expect(mockGetSupportingMaterialsByGroups).toHaveBeenCalledWith(item.supportingMaterials);
       expect(scope.supportingMaterials).toEqual(mockSupportingMaterialsByGroups);
     });
   });
 
-  describe('onLoaded', function() {
-    var item = {it: 'is', an: 'item'};
-    beforeEach(function() {
+  describe('onLoaded', function () {
+    var safeCorespring;
+
+    var item = {
+      it: 'is', an: 'item',
+      components: {
+        "a": {componentType: "one"},
+        "b": {componentType: "two"}
+      }
+    };
+
+    beforeEach(function () {
+      safeCorespring = window.corespring;
+      window.corespring = new MockCorespringServerLogic();
       scope.onLoaded(item);
     });
 
-    it('should set item on scope', function() {
+    afterEach(function () {
+      window.corespring = safeCorespring;
+    });
+
+    it('should set item on scope', function () {
       expect(scope.item).toEqual(item);
+    });
+
+    it('should call preprocess for the components in item', function () {
+      expect(scope.item.components.a.preprocessed).toBe(true);
+      expect(scope.item.components.b.preprocessed).toBe(true);
     });
 
   });
