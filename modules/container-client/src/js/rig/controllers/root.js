@@ -101,10 +101,6 @@ var controller = function($scope,$http, $location, $timeout, $log, ComponentRegi
     }
   });
 
-  $scope.onSuccess = function(data) {
-    $scope.model = data;
-  };
-
   $scope.updatePreview = function() {
     try {
       $scope.model = JSON.parse($scope.componentJson);
@@ -143,9 +139,12 @@ var controller = function($scope,$http, $location, $timeout, $log, ComponentRegi
     console.log('Query variable %s not found', variable);
   }
 
-  var jsonFile = getQueryVariable("data");
-  $http.get(jsonFile)
-    .success($scope.onSuccess);
+  function prepareItemJson(){
+    var returnValue = {item: window.itemJson, session: {}};
+    return returnValue;
+  }
+
+  $scope.model = prepareItemJson();
 };
 
 angular.module('corespring-rig.controllers')

@@ -42,7 +42,6 @@ GET           /icon/:icon                                            @org.coresp
 
 # Rig
 GET          /rig/:componentType/index.html                         @org.corespring.container.client.controllers.apps.Rig.load(componentType)
-GET          /rig/:componentType/:dataName.json                     @org.corespring.container.client.controllers.apps.Rig.data(componentType, dataName)
 GET          /rig/:componentType/*file                              @org.corespring.container.client.controllers.apps.Rig.asset(componentType, file)
 
 # Catalog
