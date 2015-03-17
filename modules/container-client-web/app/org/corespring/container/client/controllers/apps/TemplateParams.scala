@@ -50,8 +50,14 @@ case class DevEditorTemplateParams(appName: String,
 case class RigTemplateParams(appName: String,
   js: Seq[String],
   css: Seq[String],
-  componentNgModules: Seq[String]) extends TemplateParams {
+  componentNgModules: Seq[String],
+  itemJson: String) extends TemplateParams {
   override def ngServiceLogic: String = ""
+  override def toJadeParams = {
+    super.toJadeParams ++ Map(
+      "itemJson" -> itemJson
+    )
+  }
 }
 
 case class PlayerTemplateParams(

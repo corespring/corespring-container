@@ -74,3 +74,10 @@ table tfoot td {
   -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
   opacity: 0;
 }
+
+span[mathjax] {
+  visibility: hidden;
+  &.rendered {
+    visibility: visible;
+  }
+}

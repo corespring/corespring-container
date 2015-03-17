@@ -6,6 +6,19 @@ angular.module('corespring-catalog.controllers')
 
       var log = LogFactory.getLogger('CatalogRoot');
 
+      function preprocessComponents(item) {
+        _.each(item.components, function(c, key) {
+          console.log("each", JSON.stringify(c), key);
+          var serverLogic = corespring.server.logic(c.componentType);
+          console.log("serverLogic", JSON.stringify(serverLogic));
+          if (serverLogic.preprocess) {
+            //TODO: This is part of a larger task to add preprocess to the container
+            //@see: https://thesib.atlassian.net/browse/CA-842
+            item.components[key] = serverLogic.preprocess(c);
+          }
+        });
+      }
+
       var tabs = $location.search().tabs;
 
       if (tabs) {
@@ -22,6 +35,7 @@ angular.module('corespring-catalog.controllers')
       $scope.onLoaded = function(item) {
         log.debug('loaded', arguments);
         $scope.item = item;
+        preprocessComponents(item);
         $scope.supportingMaterials = SupportingMaterialsService.getSupportingMaterialsByGroups(item.supportingMaterials);
 
       };
