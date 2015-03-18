@@ -42,20 +42,21 @@ trait ItemHooks extends HasContext {
   def load(itemId: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]]
   def create(json: Option[JsValue])(implicit header: RequestHeader): Future[Either[StatusMessage, String]]
 }
-
 trait ItemDraftHooks extends HasContext {
 
-  def load(draftId: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]]
+  type R[A] = Future[Either[StatusMessage, A]]
 
-  def saveProfile(draftId: String, json: JsValue)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]]
-  def saveSupportingMaterials(draftId: String, json: JsValue)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]]
-  def saveComponents(draftId: String, json: JsValue)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]]
-  def saveXhtml(draftId: String, xhtml: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]]
-  def saveSummaryFeedback(draftId: String, feedback: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]]
+  def load(draftId: String)(implicit header: RequestHeader): R[JsValue]
 
-  def create(itemId: String)(implicit header: RequestHeader): Future[Either[StatusMessage, String]]
-  def commit(draftId: String)(implicit h: RequestHeader): Future[Either[StatusMessage, JsValue]]
-  def delete(draftId: String)(implicit h: RequestHeader): Future[Either[StatusMessage, JsValue]]
+  def saveProfile(draftId: String, json: JsValue)(implicit h: RequestHeader): R[JsValue]
+  def saveSupportingMaterials(draftId: String, json: JsValue)(implicit h: RequestHeader): R[JsValue]
+  def saveComponents(draftId: String, json: JsValue)(implicit h: RequestHeader): R[JsValue]
+  def saveXhtml(draftId: String, xhtml: String)(implicit h: RequestHeader): R[JsValue]
+  def saveSummaryFeedback(draftId: String, feedback: String)(implicit h: RequestHeader): R[JsValue]
+
+  def create(itemId: String)(implicit h: RequestHeader): R[String]
+  def commit(draftId: String)(implicit h: RequestHeader): R[JsValue]
+  def delete(draftId: String)(implicit h: RequestHeader): R[JsValue]
 }
 
 trait SessionHooks extends HasContext {
