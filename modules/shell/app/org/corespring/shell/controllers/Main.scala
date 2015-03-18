@@ -1,6 +1,6 @@
 package org.corespring.shell.controllers
 
-import org.corespring.container.client.hooks.ItemHooks
+import org.corespring.container.client.hooks.ItemDraftHooks
 import org.corespring.mongo.json.services.MongoService
 import org.corespring.shell.{ IndexLink, SessionKeys }
 import org.corespring.container.logging.ContainerLogger
@@ -18,7 +18,7 @@ trait Main
 
   def sessionService: MongoService
 
-  def itemHooks : ItemHooks
+  def itemHooks: ItemDraftHooks
 
   def index = Action {
     request =>
@@ -71,7 +71,7 @@ trait Main
     request =>
 
       import scala.concurrent.ExecutionContext.Implicits.global
-      itemHooks.create(None)(request).map{
+      itemHooks.create(None)(request).map {
         case Left(err) => BadRequest("Error creating item")
         case Right(id) => Redirect(org.corespring.container.client.controllers.apps.routes.Editor.load(id.toString))
       }

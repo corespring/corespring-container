@@ -20,16 +20,16 @@ trait DevEditor
 
   import resources.{ routes => resourceRoutes }
 
-  def servicesJs(itemId: String) = {
+  def servicesJs(draftId: String) = {
     EditorServices(
       "dev-editor.services",
-      resourceRoutes.Item.load(itemId),
-      resourceRoutes.Item.saveSubset(itemId, ":subset"),
+      resourceRoutes.ItemDraft.load(draftId),
+      resourceRoutes.ItemDraft.saveSubset(draftId, ":subset"),
       Json.obj(),
       Json.obj()).toString
   }
 
-  override def load(itemId: String): Action[AnyContent] = Action.async { implicit request =>
+  override def load(draftId: String): Action[AnyContent] = Action.async { implicit request =>
     def onError(sm: StatusMessage) = {
       val (code, msg) = sm
       code match {
@@ -48,10 +48,10 @@ trait DevEditor
           domainResolvedJs,
           domainResolvedCss,
           jsSrc.ngModules ++ scriptInfo.ngDependencies,
-          servicesJs(itemId))))
+          servicesJs(draftId))))
     }
 
-    hooks.loadItem(itemId).map { e => e.fold(onError, onItem) }
+    hooks.loadItem(draftId).map { e => e.fold(onError, onItem) }
   }
 
 }

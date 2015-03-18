@@ -169,7 +169,7 @@ class ContainerClientImplementation(
     override implicit def ec: ExecutionContext = ContainerClientImplementation.this.ec
   }
 
-  override def itemHooks: ItemHooks = new ShellItemHooks {
+  override def itemHooks: ItemDraftHooks = new ShellItemHooks {
     override def itemService: MongoService = ContainerClientImplementation.this.itemService
 
   }

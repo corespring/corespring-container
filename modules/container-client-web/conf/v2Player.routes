@@ -32,11 +32,14 @@ PUT           /session/:id/score.json                                @org.coresp
 
 # Item
 GET           /item/:itemId.json                                     @org.corespring.container.client.controllers.resources.Item.load(itemId)
-GET           /item/:itemId/:name/*file                              @org.corespring.container.client.controllers.Assets.supportingMaterial(itemId, name, file)
-GET           /item/:itemId/*file                                    @org.corespring.container.client.controllers.Assets.item(itemId, file)
-PUT           /item/update/:subset/:itemId.json                      @org.corespring.container.client.controllers.resources.Item.saveSubset(itemId, subset)
 POST          /item/create                                           @org.corespring.container.client.controllers.resources.Item.create()
 
+# ItemDraft
+GET           /draft/:draftId.json                                   @org.corespring.container.client.controllers.resources.ItemDraft.load(draftId)
+GET           /draft/:draftId/:name/*file                            @org.corespring.container.client.controllers.Assets.supportingMaterial(draftId, name, file)
+GET           /draft/:draftId/*file                                  @org.corespring.container.client.controllers.Assets.item(draftId, file)
+PUT           /draft/update/:subset/:draftId.json                    @org.corespring.container.client.controllers.resources.ItemDraft.saveSubset(draftId, subset)
+POST          /draft/:itemId/create                                  @org.corespring.container.client.controllers.resources.ItemDraft.create(itemId)
 
 GET           /icon/:icon                                            @org.corespring.container.client.controllers.Icons.icon(icon)
 
@@ -49,12 +52,12 @@ GET           /catalog/:itemId/index.html                           @org.corespr
 GET           /catalog/:itemId/*file                                @org.corespring.container.client.controllers.Assets.item(itemId, file)
 
 # Editor: config, components
-GET           /editor/:itemId/index.html                            @org.corespring.container.client.controllers.apps.Editor.load(itemId)
-GET           /editor/:itemId/supporting-material/:name/*file       @org.corespring.container.client.controllers.Assets.supportingMaterial(itemId, name, file)
-GET           /editor/:itemId/*file                                 @org.corespring.container.client.controllers.Assets.item(itemId, file)
-POST          /editor/:itemId/*file                                 @org.corespring.container.client.controllers.Assets.upload(itemId, file)
-DELETE        /editor/:itemId/*file                                 @org.corespring.container.client.controllers.Assets.delete(itemId, file)
-GET           /dev-editor/:itemId/index.html                        @org.corespring.container.client.controllers.apps.DevEditor.load(itemId)
+GET           /editor/:draftId/index.html                            @org.corespring.container.client.controllers.apps.Editor.load(draftId)
+GET           /editor/:draftId/supporting-material/:name/*file       @org.corespring.container.client.controllers.Assets.supportingMaterial(draftId, name, file)
+GET           /editor/:draftId/*file                                 @org.corespring.container.client.controllers.Assets.item(draftId, file)
+POST          /editor/:draftId/*file                                 @org.corespring.container.client.controllers.Assets.upload(draftId, file)
+DELETE        /editor/:draftId/*file                                 @org.corespring.container.client.controllers.Assets.delete(draftId, file)
+GET           /dev-editor/:draftId/index.html                        @org.corespring.container.client.controllers.apps.DevEditor.load(draftId)
 
 GET           /data-query/:topic                                    @org.corespring.container.client.controllers.DataQuery.list(topic, query : Option[String] ?= None)
 GET           /data-query/:topic/:id                                @org.corespring.container.client.controllers.DataQuery.findOne(topic, id)

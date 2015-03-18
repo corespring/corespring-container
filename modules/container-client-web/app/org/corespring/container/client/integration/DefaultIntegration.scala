@@ -5,7 +5,7 @@ import org.corespring.container.client.V2PlayerConfig
 import org.corespring.container.client.component.ComponentUrls
 import org.corespring.container.client.controllers.apps._
 import org.corespring.container.client.controllers.resources.session.ItemPruner
-import org.corespring.container.client.controllers.resources.{ Item, Session }
+import org.corespring.container.client.controllers.resources.{ ItemDraft, ItemDraft$, Session }
 import org.corespring.container.client.controllers.{ ComponentsFileController, DataQuery, Icons, PlayerLauncher }
 import org.corespring.container.client.hooks._
 import org.corespring.container.client.integration.validation.Validator
@@ -174,12 +174,12 @@ trait DefaultIntegration
     override def itemPreProcessor: PlayerItemPreProcessor = DefaultIntegration.this.internalProcessor
   }
 
-  lazy val item = new Item {
+  lazy val item = new ItemDraft {
     def scoreProcessor: ScoreProcessor = DefaultIntegration.this.scoreProcessor
 
     def outcomeProcessor: OutcomeProcessor = DefaultIntegration.this.outcomeProcessor
 
-    override def hooks: ItemHooks = itemHooks
+    override def hooks: ItemDraftHooks = itemHooks
 
     override implicit def ec: ExecutionContext = DefaultIntegration.this.ec
 

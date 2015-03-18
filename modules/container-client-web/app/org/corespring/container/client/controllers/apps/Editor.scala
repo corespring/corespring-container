@@ -48,13 +48,13 @@ trait Editor
 
     EditorServices(
       s"$context.services",
-      resourceRoutes.Item.load(id),
-      resourceRoutes.Item.saveSubset(id, ":subset"),
+      resourceRoutes.ItemDraft.load(id),
+      resourceRoutes.ItemDraft.saveSubset(id, ":subset"),
       JsArray(componentJson),
       JsArray(widgetJson)).toString
   }
 
-  override def load(itemId: String): Action[AnyContent] = Action.async { implicit request =>
+  override def load(draftId: String): Action[AnyContent] = Action.async { implicit request =>
 
     import org.corespring.container.client.views.html.error
 
@@ -76,11 +76,11 @@ trait Editor
           domainResolvedJs,
           domainResolvedCss,
           jsSrc.ngModules ++ scriptInfo.ngDependencies,
-          servicesJs(itemId),
+          servicesJs(draftId),
           versionInfo)))
     }
 
-    hooks.loadItem(itemId).map { e => e.fold(onError, onItem) }
+    hooks.loadItem(draftId).map { e => e.fold(onError, onItem) }
   }
 
 }

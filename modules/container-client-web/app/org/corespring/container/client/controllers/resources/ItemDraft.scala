@@ -2,17 +2,17 @@ package org.corespring.container.client.controllers.resources
 
 import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.client.hooks._
-import org.corespring.container.client.controllers.helpers.{PlayerXhtml, XhtmlProcessor}
+import org.corespring.container.client.controllers.helpers.{ PlayerXhtml, XhtmlProcessor }
 import org.corespring.container.components.model.Component
 import org.corespring.container.logging.ContainerLogger
-import play.api.libs.json.{JsString, JsObject, JsValue, Json}
+import play.api.libs.json.{ JsString, JsObject, JsValue, Json }
 import play.api.mvc._
 import scalaz.Scalaz._
 import scalaz._
 
 import scala.concurrent.{ ExecutionContext, Future }
 
-object Item {
+object ItemDraft {
   object Errors {
     val noJson = "No json in request body"
     val unknownSubset = "unknown subset"
@@ -21,21 +21,52 @@ object Item {
   }
 }
 
+object ItemJson {
 
-object ItemJson{
+  def apply(components: Seq[String], rawJson: JsValue): JsObject = {
 
-  def apply(components : Seq[String] , rawJson:JsValue) : JsObject = {
-
-    val processedXhtml = (rawJson \ "xhtml").asOpt[String].map(s => PlayerXhtml.mkXhtml(components, s)).getOrElse{
+    val processedXhtml = (rawJson \ "xhtml").asOpt[String].map(s => PlayerXhtml.mkXhtml(components, s)).getOrElse {
       throw new IllegalArgumentException("the Item json must contain 'xhtml'")
     }
 
-    val itemId =  (rawJson \ "_id" \ "$oid").asOpt[JsString].map(id => Json.obj("itemId" -> id)).getOrElse(Json.obj())
+    val itemId = (rawJson \ "_id" \ "$oid").asOpt[JsString].map(id => Json.obj("itemId" -> id)).getOrElse(Json.obj())
     rawJson.as[JsObject] + ("xhtml" -> JsString(processedXhtml)) ++ itemId
   }
 }
 
 trait Item extends Controller {
+
+  implicit def toResult(m: StatusMessage): SimpleResult = play.api.mvc.Results.Status(m._1)(Json.obj("error" -> m._2))
+
+  def hooks: ItemHooks
+
+  def componentTypes: Seq[String]
+
+  implicit def ec: ExecutionContext
+
+  def load(itemId: String) = Action.async { implicit request =>
+    hooks.load(itemId).map {
+      either =>
+        either match {
+          case Left(sm) => sm
+          case Right(rawItem) => Ok(ItemJson(componentTypes, rawItem))
+        }
+    }
+  }
+
+  def create = Action.async {
+    implicit request =>
+      hooks.create(request.body.asJson).map {
+        either =>
+          either match {
+            case Left(sm) => sm
+            case Right(id) => Ok(Json.obj("itemId" -> id))
+          }
+      }
+  }
+}
+
+trait ItemDraft extends Controller {
 
   private lazy val logger = ContainerLogger.getLogger("Item")
 
@@ -47,17 +78,17 @@ trait Item extends Controller {
    * A list of all the component types in the container
    * @return
    */
-  protected def componentTypes : Seq[String]
+  protected def componentTypes: Seq[String]
 
-  def hooks: ItemHooks
+  def hooks: ItemDraftHooks
 
-  def create = Action.async {
+  def create(itemId: String) = Action.async {
     implicit request =>
-      hooks.create(request.body.asJson).map {
+      hooks.create(itemId).map {
         either =>
           either match {
-            case Left(sm) => sm //Status(code)(Json.obj("error" -> msg))
-            case Right(id) => Ok(Json.obj("itemId" -> id))
+            case Left(sm) => sm
+            case Right(id) => Ok(Json.obj("draftId" -> id))
           }
       }
   }
@@ -98,8 +129,8 @@ trait Item extends Controller {
     })
 
     val out: Validation[String, Future[Either[StatusMessage, JsValue]]] = for {
-      json <- request.body.asJson.toSuccess(Item.Errors.noJson)
-      fn <- saveFn(subset, json).toSuccess(Item.Errors.unknownSubset)
+      json <- request.body.asJson.toSuccess(ItemDraft.Errors.noJson)
+      fn <- saveFn(subset, json).toSuccess(ItemDraft.Errors.unknownSubset)
       result <- Success(fn(itemId))
     } yield result
 

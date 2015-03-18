@@ -11,7 +11,7 @@ trait HasHooks {
   def catalogHooks: CatalogHooks
   def playerHooks: PlayerHooks
   def playerLauncherHooks: PlayerLauncherHooks
-  def itemHooks: ItemHooks
+  def itemHooks: ItemDraftHooks
   def sessionHooks: SessionHooks
   def dataQueryHooks: DataQueryHooks
 }

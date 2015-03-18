@@ -1,7 +1,7 @@
 package org.corespring.shell
 
 import com.mongodb.casbah.{ MongoDB, MongoClientURI, MongoClient }
-import org.corespring.container.client.hooks.ItemHooks
+import org.corespring.container.client.hooks.ItemDraftHooks
 import org.corespring.container.components.loader.FileComponentLoader
 import org.corespring.mongo.json.services.MongoService
 import org.corespring.play.utils.{ CallBlockOnHeaderFilter, ControllerInstanceResolver }
@@ -37,7 +37,7 @@ object Global extends WithFilters(AccessControlFilter, CallBlockOnHeaderFilter) 
     Play.current.configuration)
 
   private lazy val home = new Main {
-    def itemHooks : ItemHooks = containerClient.itemHooks
+    def itemHooks: ItemDraftHooks = containerClient.itemHooks
     def itemService: MongoService = new MongoService(db("items"))
     def sessionService: MongoService = new MongoService(db("sessions"))
   }
