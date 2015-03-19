@@ -106,6 +106,15 @@ trait ItemDraft extends Controller {
       }
   }
 
+  def commit(draftId: String) = Action.async { implicit request =>
+    hooks.commit(draftId).map { e =>
+      e match {
+        case Left(sm) => sm
+        case Right(json) => Ok(json)
+      }
+    }
+  }
+
   type SaveSig = String => Future[Either[(Int, String), JsValue]]
 
   def saveSubset(itemId: String, subset: String) = Action.async { implicit request: Request[AnyContent] =>

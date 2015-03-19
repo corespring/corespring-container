@@ -40,6 +40,7 @@ GET           /draft/:draftId/:name/*file                            @org.coresp
 GET           /draft/:draftId/*file                                  @org.corespring.container.client.controllers.Assets.item(draftId, file)
 PUT           /draft/update/:subset/:draftId.json                    @org.corespring.container.client.controllers.resources.ItemDraft.saveSubset(draftId, subset)
 POST          /draft/:itemId/create                                  @org.corespring.container.client.controllers.resources.ItemDraft.create(itemId)
+PUT           /draft/:draftId/commit                                 @org.corespring.container.client.controllers.resources.ItemDraft.commit(draftId)
 
 GET           /icon/:icon                                            @org.corespring.container.client.controllers.Icons.icon(icon)
 

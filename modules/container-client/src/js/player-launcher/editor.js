@@ -1,15 +1,29 @@
 function EditorDefinition(element, options, errorCallback) {
 
   var isReady = false;
-  var errors = require("errors");
+  var errors = require('errors');
   var logger = options.logger || require('logger');
+  var builder = new (require('url-builder'))();
+  var queryParams = require('query-params');
+
+  var defaultOptions = require('default-options');
+  options = $.extend(defaultOptions, options);
+
+  var paths = defaultOptions.paths;
+  var InstanceDef = require('instance');
 
   errorCallback = errorCallback || function (error) {
-    throw "error occurred, code: " + error.code + ", message: " + error.message;
+    throw 'error occurred, code: ' + error.code + ', message: ' + error.message;
   };
 
+
+  function makeUrl(url, queryParams) {
+    return builder.build(url, queryParams);
+  }
+
+
   function hasLauncherErrors() {
-    var launcherErrors = require("launcher-errors");
+    var launcherErrors = require('launcher-errors');
     if (launcherErrors.hasErrors()) {
       for (var i = 0; i < launcherErrors.errors.length; i++) {
         errorCallback(errors.EXTERNAL_ERROR(launcherErrors.errors[i]));
@@ -19,54 +33,22 @@ function EditorDefinition(element, options, errorCallback) {
     return false;
   }
 
-  if (hasLauncherErrors()) {
-    return;
-  }
 
-  function hasInvalidOptions() {
-    var defaultOptions = require("default-options");
-    options = $.extend(defaultOptions, options);
-
-    function validateOptions(options) {
-      return [];
-    }
-
-    var result = validateOptions(options);
-
-    if (result.length > 0) {
-      for (var i = 0; i < result.length; i++) {
-        errorCallback(result[i]);
-      }
-      return true;
-    }
-    return false;
-  }
-
-  if (hasInvalidOptions()) {
-    return;
-  }
-
-
-  var InstanceDef = require("instance");
-
-  function loadPaths(options, name) {
+  function loadMethodAndUrl(options, name) {
     if (!options.paths || !options.paths[name]) {
       errorCallback({
         code: 105,
-        message: name + " not part of options"
+        message: name + ' not part of options'
       });
       return null;
     }
     return options.paths[name];
   }
 
-  function makeUrl(url, queryParams) {
-    var Builder = require('url-builder');
-    return new Builder().build(url, queryParams);
-  }
 
-  function createItem(options, onSuccess, onError) {
-    var createCall = loadPaths(options, "create");
+
+  function createItem(options, callback) {
+    var createCall = loadMethodAndUrl(options, 'create');
     if (!createCall) {
       return;
     }
@@ -79,12 +61,13 @@ function EditorDefinition(element, options, errorCallback) {
       data: options,
       success: onSuccess,
       error: onError,
-      dataType: "json"
+      dataType: 'json'
     });
   }
 
-  function loadItem(itemId, options) {
-    var loadCall = loadPaths(options, "editor");
+  function loadDraftItem(draftId, options) {
+    logger.log('load draft item')
+    var loadCall = loadMethodAndUrl(options, 'editor');
     if (!loadCall) {
       return;
     }
@@ -97,13 +80,13 @@ function EditorDefinition(element, options, errorCallback) {
       options.hash = '/supporting-materials/0';
     }
 
-    options.url = (options.corespringUrl + loadCall.url).replace(":itemId", itemId);
+    options.url = (options.corespringUrl + loadCall.url).replace(':draftId', itemId);
     options.queryParams = require('query-params');
 
     var instance = new InstanceDef(element, options, errorCallback, logger);
 
-    instance.on("launch-error", function (data) {
-      var error = errors.EXTERNAL_ERROR(data.code + ": " + data.detailedMessage);
+    instance.on('launch-error', function (data) {
+      var error = errors.EXTERNAL_ERROR(data.code + ': ' + data.detailedMessage);
       errorCallback(error);
     });
 
@@ -118,20 +101,68 @@ function EditorDefinition(element, options, errorCallback) {
     });
   }
 
-  if (options.itemId) {
-    logger.log("loading item");
-    loadItem(options.itemId, options);
-  } else {
-    createItem(options,
-      function (data) {
-        logger.log("item created");
-        options.itemId = data.itemId;
-        loadItem(data.itemId, options);
+  function createDraft(itemId, callback){
+     logger.log('create draft for item: ', itemId);
+
+     var call = loadMethodAndUrl('createDraft');
+     var url = call.url.replace(':itemId', itemId);
+     $.ajax({
+      type: call.method,
+      url: makeUrl(options.corespringUrl + url, queryParams),
+      success: function(result){
+        callback(null, result);
       },
-      function (err) {
-        logger.log(err);
-      });
+      error: function(err){
+        callback({code: 112, msg: 'Error creating draft'});
+      }
+     });
   }
+
+  function init(){
+    if (hasLauncherErrors()) {
+      return;
+    }
+
+    if(options.itemId){
+      createDraft(options.itemId, function(err, result){
+        loadDraftItem(result.id, options);
+      });
+    } else if(options.draftId){
+      loadDraftItem(options.draftId, options);
+    } else {
+      createItem(options, function(err, result){
+        createDraft(result.id, function(err, result){
+          loadDraftItem(result.id, options);
+        })
+      })
+    }
+  }
+
+  /** Public functions */
+  this.commitDraft = function(callback){
+    var call = loadMethodAndUrl('commitDraft');
+    var url = call.url.replace(':draftId', options.draftId);
+    var method = call.method;
+
+    function onSuccess(result){
+      callback(null) ;
+    }
+
+    function onError(err){
+      callback({code: 111, msg: 'Failed to commit draft: ' + options.draftId})
+    }
+
+    $.ajax({
+      type: method,
+      url: makeUrl(options.corespringUrl + url, queryParams),
+      data: options,
+      success: onSuccess,
+      error: onError,
+      dataType: 'json'
+    });
+  };
+
+  init();
 
 }
 
