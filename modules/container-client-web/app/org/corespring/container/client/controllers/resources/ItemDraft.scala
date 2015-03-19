@@ -88,20 +88,20 @@ trait ItemDraft extends Controller {
         either =>
           either match {
             case Left(sm) => sm
-            case Right(id) => Ok(Json.obj("draftId" -> id))
+            case Right(id) => Ok(Json.obj("id" -> id))
           }
       }
   }
 
   def cleanUpRawItemJson(rawItem: JsValue): JsValue = ItemJson(componentTypes, rawItem)
 
-  def load(itemId: String) = Action.async {
+  def load(draftId: String) = Action.async {
     implicit request =>
-      hooks.load(itemId).map {
+      hooks.load(draftId).map {
         either =>
           either match {
             case Left(sm) => sm
-            case Right(rawItem) => Ok(cleanUpRawItemJson(rawItem))
+            case Right(draft) => Ok(cleanUpRawItemJson(draft \ "item"))
           }
       }
   }

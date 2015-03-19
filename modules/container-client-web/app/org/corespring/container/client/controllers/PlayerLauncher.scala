@@ -43,7 +43,7 @@ trait PlayerLauncher extends Controller {
     }
   }
 
-  import org.corespring.container.client.controllers.apps.routes.{ Editor, Player, Catalog }
+  import org.corespring.container.client.controllers.apps.routes.{ Editor, DevEditor, Player, Catalog }
 
   val SecureMode = "corespring.player.secure"
 
@@ -66,20 +66,21 @@ trait PlayerLauncher extends Controller {
 
   implicit def callToJson(c: Call): JsValueWrapper = Json.obj("method" -> c.method, "url" -> c.url)
 
-  def editorJs = getEditorJs(Editor.load(":draftId"))
+  def editorJs = getEditorJs(Editor.load(":draftId"), DevEditor.load(":draftId"))
 
-  def getEditorJs(loadEditorCall: Call) = Action.async { implicit request =>
+  def getEditorJs(editor: Call, devEditor:Call) = Action.async { implicit request =>
     hooks.editorJs.map { implicit js =>
 
       val rootUrl = playerConfig.rootUrl.getOrElse(BaseUrl(request))
       val create = org.corespring.container.client.controllers.resources.routes.Item.create()
       val createDraft = org.corespring.container.client.controllers.resources.routes.ItemDraft.create(":itemId")
-      val commitDraft = org.corespring.container.client.controllers.resources.routes.ItemDraft.commit(":itemId")
+      val commitDraft = org.corespring.container.client.controllers.resources.routes.ItemDraft.commit(":draftId")
 
       val defaultOptions: JsValue = Json.obj(
         "corespringUrl" -> rootUrl,
         "paths" -> Json.obj(
-          "editor" -> loadEditorCall,
+          "editor" -> editor,
+          "devEditor" -> devEditor,
           "createItem" -> create,
           "createDraft" -> createDraft,
           "commitDraft" -> commitDraft))

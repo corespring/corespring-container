@@ -18,7 +18,7 @@ import org.corespring.container.components.model.dependencies.DependencyResolver
 import org.corespring.mongo.json.services.MongoService
 import org.corespring.shell.controllers.ShellDataQueryHooks
 import org.corespring.shell.controllers.catalog.actions.{ CatalogHooks => ShellCatalogHooks }
-import org.corespring.shell.controllers.editor.{ ItemHooks => ShellItemHooks }
+import org.corespring.shell.controllers.editor.{ ItemHooks => ShellItemHooks, ItemDraftHooks => ShellItemDraftHooks }
 import org.corespring.shell.controllers.editor.actions.{ EditorHooks => ShellEditorHooks }
 import org.corespring.shell.controllers.player.{ SessionHooks => ShellSessionHooks }
 import org.corespring.shell.controllers.player.actions.{ PlayerHooks => ShellPlayerHooks }
@@ -28,6 +28,7 @@ import play.api.mvc._
 class ContainerClientImplementation(
   val itemService: MongoService,
   val sessionService: MongoService,
+  val draftItemService : MongoService,
   componentsIn: => Seq[Component],
   val configuration: Configuration) extends DefaultIntegration {
 
@@ -154,7 +155,7 @@ class ContainerClientImplementation(
   }
 
   override def editorHooks: EditorHooks = new ShellEditorHooks {
-    override def itemService: MongoService = ContainerClientImplementation.this.itemService
+    override def draftItemService: MongoService = ContainerClientImplementation.this.draftItemService
   }
 
   override def catalogHooks: CatalogHooks = new ShellCatalogHooks {
@@ -169,9 +170,10 @@ class ContainerClientImplementation(
     override implicit def ec: ExecutionContext = ContainerClientImplementation.this.ec
   }
 
-  override def itemHooks: ItemDraftHooks = new ShellItemHooks {
+  override def itemDraftHooks: ItemDraftHooks = new ShellItemDraftHooks {
     override def itemService: MongoService = ContainerClientImplementation.this.itemService
 
+    override def draftItemService: MongoService = ContainerClientImplementation.this.draftItemService
   }
 
   override def playerHooks: PlayerHooks = new ShellPlayerHooks {
@@ -187,6 +189,10 @@ class ContainerClientImplementation(
   }
 
   override def versionInfo: JsObject = VersionInfo(Play.current.configuration)
+
+  override def itemHooks: ItemHooks = new ShellItemHooks{
+    override def itemService: MongoService = ContainerClientImplementation.this.itemService
+  }
 }
 
 /**

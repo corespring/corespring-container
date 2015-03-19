@@ -179,7 +179,7 @@ trait DefaultIntegration
 
     def outcomeProcessor: OutcomeProcessor = DefaultIntegration.this.outcomeProcessor
 
-    override def hooks: ItemDraftHooks = itemHooks
+    override def hooks: ItemDraftHooks = itemDraftHooks
 
     override implicit def ec: ExecutionContext = DefaultIntegration.this.ec
 

@@ -1,11 +1,11 @@
 package org.corespring.shell
 
-import com.mongodb.casbah.{ MongoDB, MongoClientURI, MongoClient }
-import org.corespring.container.client.hooks.ItemDraftHooks
+import com.mongodb.casbah.{MongoCollection, MongoDB, MongoClientURI, MongoClient}
+import org.corespring.container.client.hooks.{ItemHooks, ItemDraftHooks}
 import org.corespring.container.components.loader.FileComponentLoader
 import org.corespring.mongo.json.services.MongoService
 import org.corespring.play.utils.{ CallBlockOnHeaderFilter, ControllerInstanceResolver }
-import org.corespring.shell.controllers.Main
+import org.corespring.shell.controllers.{Launchers, Main}
 import org.corespring.shell.filters.AccessControlFilter
 import play.api.mvc.{ RequestHeader, WithFilters, Controller }
 import org.corespring.container.logging.ContainerLogger
@@ -15,7 +15,7 @@ object Global extends WithFilters(AccessControlFilter, CallBlockOnHeaderFilter) 
 
   private lazy val logger = ContainerLogger.getLogger("Global")
 
-  lazy val controllers: Seq[Controller] = containerClient.controllers :+ home
+  lazy val controllers: Seq[Controller] = containerClient.controllers ++ Seq(home, launchers)
 
   private lazy val mongoUri = {
     val uri = Play.current.configuration.getString("mongo.db").getOrElse("mongodb://localhost:27017/corespring-container")
@@ -33,13 +33,17 @@ object Global extends WithFilters(AccessControlFilter, CallBlockOnHeaderFilter) 
   private lazy val containerClient = new ContainerClientImplementation(
     new MongoService(db("items")),
     new MongoService(db("sessions")),
+    new MongoService(db("itemDrafts")),
     componentLoader.all,
     Play.current.configuration)
 
+  private lazy val launchers = new Launchers{}
+
   private lazy val home = new Main {
-    def itemHooks: ItemDraftHooks = containerClient.itemHooks
-    def itemService: MongoService = new MongoService(db("items"))
-    def sessionService: MongoService = new MongoService(db("sessions"))
+    override def itemHooks: ItemHooks = containerClient.itemHooks
+    override def sessionService: MongoService = new MongoService(db("sessions"))
+    override def items: MongoCollection = db("items")
+    override def itemDrafts: MongoCollection = db("itemDrafts")
   }
 
   override def onStart(app: play.api.Application): Unit = {

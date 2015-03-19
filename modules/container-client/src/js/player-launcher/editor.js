@@ -34,7 +34,7 @@ function EditorDefinition(element, options, errorCallback) {
   }
 
 
-  function loadMethodAndUrl(options, name) {
+  function loadMethodAndUrl(name) {
     if (!options.paths || !options.paths[name]) {
       errorCallback({
         code: 105,
@@ -48,7 +48,7 @@ function EditorDefinition(element, options, errorCallback) {
 
 
   function createItem(options, callback) {
-    var createCall = loadMethodAndUrl(options, 'create');
+    var createCall = loadMethodAndUrl('create');
     if (!createCall) {
       return;
     }
@@ -67,7 +67,12 @@ function EditorDefinition(element, options, errorCallback) {
 
   function loadDraftItem(draftId, options) {
     logger.log('load draft item')
-    var loadCall = loadMethodAndUrl(options, 'editor');
+
+    if(options.devEditor){
+      throw new Error('dev editor launching isn\'t ready');
+    }
+    
+    var loadCall = options.devEditor ? loadMethodAndUrl('devEditor') : loadMethodAndUrl('editor');
     if (!loadCall) {
       return;
     }
@@ -80,7 +85,7 @@ function EditorDefinition(element, options, errorCallback) {
       options.hash = '/supporting-materials/0';
     }
 
-    options.url = (options.corespringUrl + loadCall.url).replace(':draftId', itemId);
+    options.url = (options.corespringUrl + loadCall.url).replace(':draftId', draftId);
     options.queryParams = require('query-params');
 
     var instance = new InstanceDef(element, options, errorCallback, logger);
@@ -125,6 +130,7 @@ function EditorDefinition(element, options, errorCallback) {
 
     if(options.itemId){
       createDraft(options.itemId, function(err, result){
+        options.draftId = result.id;
         loadDraftItem(result.id, options);
       });
     } else if(options.draftId){
@@ -132,6 +138,7 @@ function EditorDefinition(element, options, errorCallback) {
     } else {
       createItem(options, function(err, result){
         createDraft(result.id, function(err, result){
+          options.draftId = result.id;
           loadDraftItem(result.id, options);
         })
       })
