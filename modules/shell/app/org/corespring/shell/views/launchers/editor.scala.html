@@ -14,7 +14,11 @@
 
        var commitBtn = document.querySelector('#commit');
        commitBtn.addEventListener('click', function(){
-         editor.commitDraft();
+         editor.commitDraft(function(err){
+          if(!err){
+            window.location.href = '/';
+          }
+         });
        });
      });
     </script>

@@ -20,7 +20,7 @@ object MongoServiceException {
 
 case class MongoServiceException(msg: String) extends RuntimeException(msg)
 
-class MongoService(collection: MongoCollection) {
+class MongoService(val collection: MongoCollection) {
 
   def logger = ContainerLogger.getLogger(s"MongoService.${collection.name}")
 

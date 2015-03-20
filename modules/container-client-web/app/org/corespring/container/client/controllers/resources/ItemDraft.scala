@@ -107,7 +107,8 @@ trait ItemDraft extends Controller {
   }
 
   def commit(draftId: String) = Action.async { implicit request =>
-    hooks.commit(draftId).map { e =>
+    val force = request.getQueryString("force").exists(_ == "true")
+    hooks.commit(draftId, force).map { e =>
       e match {
         case Left(sm) => sm
         case Right(json) => Ok(json)

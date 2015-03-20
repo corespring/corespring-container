@@ -55,7 +55,7 @@ trait ItemDraftHooks extends HasContext {
   def saveSummaryFeedback(draftId: String, feedback: String)(implicit h: RequestHeader): R[JsValue]
 
   def create(itemId: String)(implicit h: RequestHeader): R[String]
-  def commit(draftId: String)(implicit h: RequestHeader): R[JsValue]
+  def commit(draftId: String, force:Boolean)(implicit h: RequestHeader): R[JsValue]
   def delete(draftId: String)(implicit h: RequestHeader): R[JsValue]
 }
 

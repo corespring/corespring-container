@@ -152,11 +152,16 @@ function EditorDefinition(element, options, errorCallback) {
     var method = call.method;
 
     function onSuccess(result){
-      callback(null) ;
+      if(callback){
+        callback(null);
+      }
+
     }
 
     function onError(err){
-      callback({code: 111, msg: 'Failed to commit draft: ' + options.draftId})
+      if(callback){
+        callback({code: 111, msg: 'Failed to commit draft: ' + options.draftId})
+      }
     }
 
     $.ajax({

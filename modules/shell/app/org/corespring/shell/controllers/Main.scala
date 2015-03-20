@@ -103,11 +103,11 @@ trait Main
 
   def createItem = Action.async {
     request =>
-
+      import org.corespring.shell.controllers.routes.Launchers
       import scala.concurrent.ExecutionContext.Implicits.global
       itemHooks.create(None)(request).map {
         case Left(err) => BadRequest("Error creating item")
-        case Right(id) => Redirect(org.corespring.container.client.controllers.apps.routes.Editor.load(id.toString))
+        case Right(id) => Redirect(Launchers.editorFromItem(id.toString))
       }
   }
 
