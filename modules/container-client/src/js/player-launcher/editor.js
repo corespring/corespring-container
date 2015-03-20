@@ -146,7 +146,7 @@ function EditorDefinition(element, options, errorCallback) {
   }
 
   /** Public functions */
-  this.commitDraft = function(callback){
+  this.commitDraft = function(force, callback){
     var call = loadMethodAndUrl('commitDraft');
     var url = call.url.replace(':draftId', options.draftId);
     var method = call.method;
@@ -159,14 +159,15 @@ function EditorDefinition(element, options, errorCallback) {
     }
 
     function onError(err){
+      var msg = (err.responseJSON && err.responseJSON.error) ? err.responseJSON.error : 'Failed to commit draft: ' + options.draftId;
       if(callback){
-        callback({code: 111, msg: 'Failed to commit draft: ' + options.draftId})
+        callback({code: 111, msg: msg})
       }
     }
 
     $.ajax({
       type: method,
-      url: makeUrl(options.corespringUrl + url, queryParams),
+      url: makeUrl(options.corespringUrl + url, _.extend(queryParams, {force: force})),
       data: options,
       success: onSuccess,
       error: onError,
