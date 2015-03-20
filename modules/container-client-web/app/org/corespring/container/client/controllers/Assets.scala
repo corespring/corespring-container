@@ -1,16 +1,17 @@
 package org.corespring.container.client.controllers
 
-import com.amazonaws.{ AmazonServiceException, AmazonClientException }
-import com.amazonaws.auth.AWSCredentials
-import com.amazonaws.services.s3.transfer.TransferManager
 import org.corespring.container.client.HasContext
 import play.api.mvc._
 
 import scala.concurrent.Future
 
 object AssetType extends Enumeration {
-  type AssetType = Value
-  val Draft, Item, Player = Value
+
+  type AssetType = Val
+  protected case class Val(val folderName: String) extends super.Val
+  implicit def valueToVal(x: Value) = x.asInstanceOf[Val]
+  val Draft = Val("item-drafts")
+  val Item = Val("items")
 }
 
 trait Assets extends Controller with HasContext {

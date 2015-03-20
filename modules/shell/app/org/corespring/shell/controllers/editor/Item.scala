@@ -3,7 +3,7 @@ package org.corespring.shell.controllers.editor
 import com.mongodb.casbah.Imports._
 import org.bson.types.ObjectId
 import org.corespring.container.client.hooks.Hooks.StatusMessage
-import org.corespring.container.client.hooks.{ItemDraftHooks => ContainerItemDraftHooks, ItemHooks => ContainerItemHooks}
+import org.corespring.container.client.hooks.{ ItemDraftHooks => ContainerItemDraftHooks, ItemHooks => ContainerItemHooks }
 import org.corespring.mongo.json.services.MongoService
 import org.joda.time.DateTime
 import play.api.Logger
@@ -37,9 +37,17 @@ trait ItemHooks extends ContainerItemHooks {
 
 }
 
+trait ItemDraftAssets {
+  def copyItemToDraft(itemId: String, draftId: String)
+  def copyDraftToItem(draftId: String, itemId: String)
+  def deleteDraft(draftId: String)
+}
+
 trait ItemDraftHooks extends ContainerItemDraftHooks {
 
   val logger = Logger("ItemDraftHooks")
+
+  def assets: ItemDraftAssets
 
   import com.mongodb.casbah.commons.conversions.scala._
   RegisterJodaTimeConversionHelpers()
@@ -61,7 +69,7 @@ trait ItemDraftHooks extends ContainerItemDraftHooks {
     def addSupportingMaterialIds(sm: JsValue): JsArray = sm match {
       case JsArray(o) => JsArray(o.map({
         case obj: JsObject => obj ++ Json.obj("id" -> ObjectId.get.toString)
-        case other : JsValue => other
+        case other: JsValue => other
       }))
       case _ => JsArray(Seq.empty)
     }
@@ -88,7 +96,7 @@ trait ItemDraftHooks extends ContainerItemDraftHooks {
     }
   }
 
-  private def addDateModified(itemId:String) = {
+  private def addDateModified(itemId: String) = {
     val builder = DBObject.newBuilder
     builder += "_id" -> new ObjectId(itemId)
     builder += "dateModified" -> MongoDBObject("$exists" -> false)
@@ -97,22 +105,23 @@ trait ItemDraftHooks extends ContainerItemDraftHooks {
 
   override def create(itemId: String)(implicit h: RequestHeader): R[String] = Future {
     {
-
       addDateModified(itemId)
-
-      for{
+      for {
         item <- itemService.load(itemId)
         draftId <- draftItemService.create(Json.obj("item" -> item))
+        _ <- Some(assets.copyItemToDraft(itemId, draftId.toString))
       } yield Right(draftId.toString)
     }.getOrElse(Left(NOT_FOUND -> s"Can't find item by id: $itemId"))
   }
 
   override def delete(draftId: String)(implicit h: RequestHeader): R[JsValue] = Future {
     draftItemService.delete(draftId)
+    assets.deleteDraft(draftId)
     Right(Json.obj("id" -> draftId))
   }
 
-  private def okToCommit(draftId:String) : Boolean = {for{
+  private def okToCommit(draftId: String): Boolean = {
+    for {
       draft <- draftItemService.collection.findOneByID(new ObjectId(draftId), MongoDBObject("item.dateModified" -> 1, "item._id" -> 1))
       draftItem <- Some(draft.get("item").asInstanceOf[DBObject])
       draftDateModified <- Some(draftItem.get("dateModified").asInstanceOf[DateTime])
@@ -129,15 +138,16 @@ trait ItemDraftHooks extends ContainerItemDraftHooks {
     }
   }.getOrElse(true)
 
-  override def commit(draftId: String, force:Boolean)(implicit h: RequestHeader): R[JsValue] = Future {
+  override def commit(draftId: String, force: Boolean)(implicit h: RequestHeader): R[JsValue] = Future {
     draftItemService.load(draftId).map { draft =>
       val item = (draft \ "item").as[JsObject]
       val itemId = (item \ "_id" \ "$oid").as[String]
 
-      if(okToCommit(draftId) || force){
+      if (okToCommit(draftId) || force) {
         val updatedItem = item ++ Json.obj("dateModified" -> Json.obj("$date" -> new DateTime().getMillis()))
         itemService.save(itemId, updatedItem)
-        draftItemService.delete(draftId)
+        assets.copyDraftToItem(draftId.toString, itemId)
+        delete(draftId)
         Right(Json.obj("itemId" -> itemId, "draftId" -> draftId))
       } else {
         Left(BAD_REQUEST, "There has been a new commit since this draft was created")

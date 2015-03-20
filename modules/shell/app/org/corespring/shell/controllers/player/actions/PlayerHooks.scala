@@ -1,5 +1,7 @@
 package org.corespring.shell.controllers.player.actions
 
+import com.mongodb.casbah.commons.MongoDBObject
+import org.bson.types.ObjectId
 import org.corespring.container.client.controllers.{ AssetType, Assets }
 
 import scala.concurrent.Future
@@ -64,5 +66,14 @@ trait PlayerHooks extends ContainerPlayerHooks {
     out.map(Right(_)).getOrElse(Left(NOT_FOUND -> "Can't find item or session"))
   }
 
-  override def loadFile(id: String, path: String)(request: Request[AnyContent]): SimpleResult = assets.load(AssetType.Player, id, path)(request)
+  override def loadFile(id: String, path: String)(request: Request[AnyContent]): SimpleResult = {
+
+    val out = for {
+      dbo <- sessionService.collection.findOneByID(new ObjectId(id), MongoDBObject("itemId" -> 1))
+      itemId <- Some(dbo.get("itemId").asInstanceOf[String])
+      result <- Some(assets.load(AssetType.Item, itemId, path)(request))
+    } yield result
+    import Results.NotFound
+    out.getOrElse(NotFound(""))
+  }
 }

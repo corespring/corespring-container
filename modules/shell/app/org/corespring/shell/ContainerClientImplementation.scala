@@ -8,7 +8,7 @@ import org.corespring.amazon.s3.ConcreteS3Service
 import org.corespring.container.client.controllers.{ AssetType, _ }
 import org.corespring.container.client.hooks._
 import org.corespring.container.client.integration.DefaultIntegration
-import org.corespring.container.client.{ CompressedAndMinifiedComponentSets, VersionInfo }
+import org.corespring.container.client.{ AssetUtils, CompressedAndMinifiedComponentSets, VersionInfo }
 import org.corespring.container.components.model.Component
 import org.corespring.container.components.model.dependencies.DependencyResolver
 import org.corespring.container.logging.ContainerLogger
@@ -16,7 +16,7 @@ import org.corespring.mongo.json.services.MongoService
 import org.corespring.shell.controllers.ShellDataQueryHooks
 import org.corespring.shell.controllers.catalog.actions.{ CatalogHooks => ShellCatalogHooks }
 import org.corespring.shell.controllers.editor.actions.{ EditorHooks => ShellEditorHooks }
-import org.corespring.shell.controllers.editor.{ ItemDraftHooks => ShellItemDraftHooks, ItemHooks => ShellItemHooks }
+import org.corespring.shell.controllers.editor.{ ItemDraftHooks => ShellItemDraftHooks, ItemHooks => ShellItemHooks, ItemDraftAssets }
 import org.corespring.shell.controllers.player.actions.{ PlayerHooks => ShellPlayerHooks }
 import org.corespring.shell.controllers.player.{ SessionHooks => ShellSessionHooks }
 import play.api.libs.json.JsObject
@@ -66,18 +66,20 @@ class ContainerClientImplementation(
 
   }
 
-  lazy val assets = new Assets {
+  object s3 {
+    lazy val key = configuration.getString("amazon.s3.key")
+    lazy val secret = configuration.getString("amazon.s3.secret")
+    lazy val bucket = configuration.getString("amazon.s3.bucket").getOrElse(throw new RuntimeException("No bucket specified"))
+  }
 
-    private lazy val key = configuration.getString("amazon.s3.key")
-    private lazy val secret = configuration.getString("amazon.s3.secret")
-    private lazy val bucket = configuration.getString("amazon.s3.bucket").getOrElse(throw new RuntimeException("No bucket specified"))
+  lazy val assets = new Assets with ItemDraftAssets {
 
-    lazy val playS3 = {
+    lazy val (playS3, assetUtils) = {
       val out = for {
-        k <- key
-        s <- secret
+        k <- s3.key
+        s <- s3.secret
       } yield {
-        new ConcreteS3Service(k, s)
+        (new ConcreteS3Service(k, s), new AssetUtils(k, s, s3.bucket))
       }
       out.getOrElse(throw new RuntimeException("No amazon key/secret"))
     }
@@ -86,13 +88,13 @@ class ContainerClientImplementation(
 
     import AssetType._
 
-    private def finalPath(t: AssetType, id: String, path: String) = s"${t.toString.toLowerCase}/$id/$path"
+    private def mkPath(t: AssetType, rest: String*) = (t.folderName +: rest).mkString("/")
 
     override def load(t: AssetType, id: String, path: String)(implicit h: RequestHeader): SimpleResult =
-      playS3.download(bucket, finalPath(t, id, path), Some(h.headers))
+      playS3.download(s3.bucket, mkPath(t, id, path), Some(h.headers))
 
     override def delete(t: AssetType, id: String, path: String)(implicit h: RequestHeader): Future[Option[(Int, String)]] = Future {
-      val response = playS3.delete(bucket, finalPath(t, id, path))
+      val response = playS3.delete(s3.bucket, mkPath(t, id, path))
       if (response.success) {
         None
       } else {
@@ -101,7 +103,19 @@ class ContainerClientImplementation(
     }
 
     override def upload(t: AssetType, id: String, path: String)(block: (Request[Int]) => SimpleResult): Action[Int] = {
-      Action(playS3.upload(bucket, finalPath(t, id, path))) { r => block(r) }
+      Action(playS3.upload(s3.bucket, mkPath(t, id, path))) { r => block(r) }
+    }
+
+    override def copyItemToDraft(itemId: String, draftId: String): Unit = {
+      assetUtils.copyDir(mkPath(AssetType.Item, itemId), mkPath(AssetType.Draft, draftId))
+    }
+
+    override def deleteDraft(draftId: String): Unit = {
+      assetUtils.deleteDir(mkPath(AssetType.Draft, draftId))
+    }
+
+    override def copyDraftToItem(draftId: String, itemId: String): Unit = {
+      assetUtils.copyDir(mkPath(AssetType.Draft, draftId), mkPath(AssetType.Item, itemId))
     }
   }
 
@@ -172,6 +186,8 @@ class ContainerClientImplementation(
     override def itemService: MongoService = ContainerClientImplementation.this.itemService
 
     override def draftItemService: MongoService = ContainerClientImplementation.this.draftItemService
+
+    override def assets: ItemDraftAssets = ContainerClientImplementation.this.assets
   }
 
   override def playerHooks: PlayerHooks = new ShellPlayerHooks {
