@@ -18,8 +18,8 @@ GET           /component-single/:context/:componentType.:suffix      @org.coresp
 # Hooks for the player: config,  components
 
 GET           /player/session/:sessionId/index.html                  @org.corespring.container.client.controllers.apps.Player.load(sessionId:String)
+GET           /player/session/:sessionId/*file                       @org.corespring.container.client.controllers.apps.Player.getFile(sessionId, file)
 GET           /player/item/:itemId/index.html                        @org.corespring.container.client.controllers.apps.Player.createSessionForItem(itemId:String)
-GET           /player/session/:sessionId/*file                       @org.corespring.container.client.controllers.Assets.session(sessionId, file)
 
 # Session
 GET           /session/item-and-session/:id.json                     @org.corespring.container.client.controllers.resources.Session.loadItemAndSession(id)
@@ -36,8 +36,6 @@ POST          /item/create                                           @org.coresp
 
 # ItemDraft
 GET           /draft/:draftId.json                                   @org.corespring.container.client.controllers.resources.ItemDraft.load(draftId)
-GET           /draft/:draftId/:name/*file                            @org.corespring.container.client.controllers.Assets.supportingMaterial(draftId, name, file)
-GET           /draft/:draftId/*file                                  @org.corespring.container.client.controllers.Assets.item(draftId, file)
 PUT           /draft/update/:subset/:draftId.json                    @org.corespring.container.client.controllers.resources.ItemDraft.saveSubset(draftId, subset)
 POST          /draft/:itemId/create                                  @org.corespring.container.client.controllers.resources.ItemDraft.create(itemId)
 PUT           /draft/:draftId/commit                                 @org.corespring.container.client.controllers.resources.ItemDraft.commit(draftId)
@@ -50,14 +48,14 @@ GET          /rig/:componentType/*file                              @org.corespr
 
 # Catalog
 GET           /catalog/:itemId/index.html                           @org.corespring.container.client.controllers.apps.Catalog.load(itemId)
-GET           /catalog/:itemId/*file                                @org.corespring.container.client.controllers.Assets.item(itemId, file)
+GET           /catalog/:itemId/*file                                @org.corespring.container.client.controllers.apps.Catalog.getFile(itemId, file)
 
 # Editor: config, components
 GET           /editor/:draftId/index.html                            @org.corespring.container.client.controllers.apps.Editor.load(draftId)
-GET           /editor/:draftId/supporting-material/:name/*file       @org.corespring.container.client.controllers.Assets.supportingMaterial(draftId, name, file)
-GET           /editor/:draftId/*file                                 @org.corespring.container.client.controllers.Assets.item(draftId, file)
-POST          /editor/:draftId/*file                                 @org.corespring.container.client.controllers.Assets.upload(draftId, file)
-DELETE        /editor/:draftId/*file                                 @org.corespring.container.client.controllers.Assets.delete(draftId, file)
+#GET           /editor/:draftId/supporting-material/:name/*file       @org.corespring.container.client.controllers.apps.Editor.getFile(draftId, name, file)
+GET           /editor/:draftId/*file                                 @org.corespring.container.client.controllers.apps.Editor.getFile(draftId, file)
+POST          /editor/:draftId/*file                                 @org.corespring.container.client.controllers.apps.Editor.uploadFile(draftId, file)
+DELETE        /editor/:draftId/*file                                 @org.corespring.container.client.controllers.apps.Editor.deleteFile(draftId, file)
 GET           /dev-editor/:draftId/index.html                        @org.corespring.container.client.controllers.apps.DevEditor.load(draftId)
 
 GET           /data-query/:topic                                    @org.corespring.container.client.controllers.DataQuery.list(topic, query : Option[String] ?= None)

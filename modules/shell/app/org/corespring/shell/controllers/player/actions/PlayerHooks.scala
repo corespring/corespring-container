@@ -1,5 +1,7 @@
 package org.corespring.shell.controllers.player.actions
 
+import org.corespring.container.client.controllers.{ AssetType, Assets }
+
 import scala.concurrent.Future
 
 import org.corespring.container.client.hooks.{ PlayerHooks => ContainerPlayerHooks }
@@ -16,6 +18,7 @@ trait PlayerHooks extends ContainerPlayerHooks {
 
   def sessionService: MongoService
 
+  def assets: Assets
   def itemService: MongoService
 
   private def toItemId(json: JsValue): Option[String] = (json \ "itemId").asOpt[String]
@@ -60,4 +63,6 @@ trait PlayerHooks extends ContainerPlayerHooks {
 
     out.map(Right(_)).getOrElse(Left(NOT_FOUND -> "Can't find item or session"))
   }
+
+  override def loadFile(id: String, path: String)(request: Request[AnyContent]): SimpleResult = assets.load(AssetType.Player, id, path)(request)
 }

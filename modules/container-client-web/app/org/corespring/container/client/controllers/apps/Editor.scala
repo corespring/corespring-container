@@ -1,20 +1,24 @@
 package org.corespring.container.client.controllers.apps
 
 import org.corespring.container.client.component.AllItemTypesReader
+import org.corespring.container.client.controllers.AssetsController
 import org.corespring.container.client.controllers.helpers.JsonHelper
 import org.corespring.container.client.controllers.jade.Jade
-import org.corespring.container.client.hooks.EditorHooks
+import org.corespring.container.client.hooks.{ GetAssetHook, AssetHooks, EditorHooks }
 import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.client.views.txt.js.EditorServices
 import org.corespring.container.components.model.ComponentInfo
 import play.api.libs.json._
-import play.api.mvc.{ Action, AnyContent, SimpleResult }
+import play.api.mvc._
+
+import scala.concurrent.Future
 
 trait Editor
   extends AllItemTypesReader
   with App[EditorHooks]
   with JsonHelper
-  with Jade {
+  with Jade
+  with AssetsController[EditorHooks] {
 
   import org.corespring.container.client.controllers.resources.{ routes => resourceRoutes }
 
@@ -82,5 +86,5 @@ trait Editor
 
     hooks.loadItem(draftId).map { e => e.fold(onError, onItem) }
   }
-
 }
+

@@ -2,33 +2,33 @@ package org.corespring.shell
 
 import java.io.File
 
-import org.apache.commons.io.{ FileUtils, IOUtils }
-import org.corespring.container.logging.ContainerLogger
-import play.api.libs.json.JsObject
-import scala.concurrent.{ ExecutionContext, Future }
 import com.typesafe.config.ConfigFactory
+import org.apache.commons.io.{ FileUtils, IOUtils }
 import org.corespring.amazon.s3.ConcreteS3Service
-import org.corespring.container.client.{ VersionInfo, CompressedAndMinifiedComponentSets }
-import org.corespring.container.client.controllers._
+import org.corespring.container.client.controllers.{ AssetType, _ }
 import org.corespring.container.client.hooks._
-import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.client.integration.DefaultIntegration
+import org.corespring.container.client.{ CompressedAndMinifiedComponentSets, VersionInfo }
 import org.corespring.container.components.model.Component
 import org.corespring.container.components.model.dependencies.DependencyResolver
+import org.corespring.container.logging.ContainerLogger
 import org.corespring.mongo.json.services.MongoService
 import org.corespring.shell.controllers.ShellDataQueryHooks
 import org.corespring.shell.controllers.catalog.actions.{ CatalogHooks => ShellCatalogHooks }
-import org.corespring.shell.controllers.editor.{ ItemHooks => ShellItemHooks, ItemDraftHooks => ShellItemDraftHooks }
 import org.corespring.shell.controllers.editor.actions.{ EditorHooks => ShellEditorHooks }
-import org.corespring.shell.controllers.player.{ SessionHooks => ShellSessionHooks }
+import org.corespring.shell.controllers.editor.{ ItemDraftHooks => ShellItemDraftHooks, ItemHooks => ShellItemHooks }
 import org.corespring.shell.controllers.player.actions.{ PlayerHooks => ShellPlayerHooks }
-import play.api.{ Configuration, Mode, Play }
+import org.corespring.shell.controllers.player.{ SessionHooks => ShellSessionHooks }
+import play.api.libs.json.JsObject
 import play.api.mvc._
+import play.api.{ Configuration, Mode, Play }
+
+import scala.concurrent.{ ExecutionContext, Future }
 
 class ContainerClientImplementation(
   val itemService: MongoService,
   val sessionService: MongoService,
-  val draftItemService : MongoService,
+  val draftItemService: MongoService,
   componentsIn: => Seq[Component],
   val configuration: Configuration) extends DefaultIntegration {
 
@@ -82,32 +82,27 @@ class ContainerClientImplementation(
       out.getOrElse(throw new RuntimeException("No amazon key/secret"))
     }
 
-    override def loadAsset(id: String, name: String, file: String)(request: Request[AnyContent]): SimpleResult = {
-      playS3.download(bucket, s"$id/$name/$file", Some(request.headers))
-    }
-
-    override def getItemId(sessionId: String): Option[String] = ContainerClientImplementation.this.sessionService.load(sessionId).map {
-      json => (json \ "itemId").as[String]
-    }
-
-    override def hooks: AssetHooks = new AssetHooks {
-
-      override def delete(itemId: String, file: String)(implicit header: RequestHeader): Future[Option[StatusMessage]] = Future {
-        val response = playS3.delete(bucket, s"$itemId/data/$file")
-        if (response.success) {
-          None
-        } else {
-          Some(BAD_REQUEST -> s"${response.key}: ${response.msg}")
-        }
-      }
-
-      override def uploadAction(itemId: String, file: String)(block: (Request[Int]) => SimpleResult): Action[Int] =
-        Action(playS3.upload(bucket, s"$itemId/data/$file")) { r =>
-          block(r)
-        }
-    }
-
     override implicit def ec: ExecutionContext = ContainerClientImplementation.this.ec
+
+    import AssetType._
+
+    private def finalPath(t: AssetType, id: String, path: String) = s"${t.toString.toLowerCase}/$id/$path"
+
+    override def load(t: AssetType, id: String, path: String)(implicit h: RequestHeader): SimpleResult =
+      playS3.download(bucket, finalPath(t, id, path), Some(h.headers))
+
+    override def delete(t: AssetType, id: String, path: String)(implicit h: RequestHeader): Future[Option[(Int, String)]] = Future {
+      val response = playS3.delete(bucket, finalPath(t, id, path))
+      if (response.success) {
+        None
+      } else {
+        Some(BAD_REQUEST -> s"${response.key}: ${response.msg}")
+      }
+    }
+
+    override def upload(t: AssetType, id: String, path: String)(block: (Request[Int]) => SimpleResult): Action[Int] = {
+      Action(playS3.upload(bucket, finalPath(t, id, path))) { r => block(r) }
+    }
   }
 
   lazy val componentSets = new CompressedAndMinifiedComponentSets {
@@ -156,10 +151,13 @@ class ContainerClientImplementation(
 
   override def editorHooks: EditorHooks = new ShellEditorHooks {
     override def draftItemService: MongoService = ContainerClientImplementation.this.draftItemService
+
+    override def assets: Assets = ContainerClientImplementation.this.assets
   }
 
   override def catalogHooks: CatalogHooks = new ShellCatalogHooks {
     override def itemService: MongoService = ContainerClientImplementation.this.itemService
+    override def assets: Assets = ContainerClientImplementation.this.assets
   }
 
   override def sessionHooks: SessionHooks = new ShellSessionHooks {
@@ -178,6 +176,7 @@ class ContainerClientImplementation(
 
   override def playerHooks: PlayerHooks = new ShellPlayerHooks {
     override def sessionService: MongoService = ContainerClientImplementation.this.sessionService
+    override def assets: Assets = ContainerClientImplementation.this.assets
 
     override def itemService: MongoService = ContainerClientImplementation.this.itemService
 
@@ -190,7 +189,7 @@ class ContainerClientImplementation(
 
   override def versionInfo: JsObject = VersionInfo(Play.current.configuration)
 
-  override def itemHooks: ItemHooks = new ShellItemHooks{
+  override def itemHooks: ItemHooks = new ShellItemHooks {
     override def itemService: MongoService = ContainerClientImplementation.this.itemService
   }
 }

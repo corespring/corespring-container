@@ -26,15 +26,15 @@ trait ClientHooks extends HasContext {
   def loadItem(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]]
 }
 
-trait PlayerHooks extends ClientHooks {
+trait PlayerHooks extends ClientHooks with GetAssetHook {
   def createSessionForItem(itemId: String)(implicit header: RequestHeader): Future[Either[StatusMessage, String]]
   def loadSessionAndItem(sessionId: String)(implicit header: RequestHeader): Future[Either[StatusMessage, (JsValue, JsValue)]]
 }
 
-trait EditorHooks extends ClientHooks {
+trait EditorHooks extends ClientHooks with AssetHooks {
 }
 
-trait CatalogHooks extends ClientHooks {
+trait CatalogHooks extends ClientHooks with GetAssetHook {
   def showCatalog(itemId: String)(implicit header: RequestHeader): Future[Option[StatusMessage]]
 }
 
@@ -55,7 +55,7 @@ trait ItemDraftHooks extends HasContext {
   def saveSummaryFeedback(draftId: String, feedback: String)(implicit h: RequestHeader): R[JsValue]
 
   def create(itemId: String)(implicit h: RequestHeader): R[String]
-  def commit(draftId: String, force:Boolean)(implicit h: RequestHeader): R[JsValue]
+  def commit(draftId: String, force: Boolean)(implicit h: RequestHeader): R[JsValue]
   def delete(draftId: String)(implicit h: RequestHeader): R[JsValue]
 }
 
@@ -80,8 +80,12 @@ trait PlayerLauncherHooks extends HasContext {
   def catalogJs(implicit header: RequestHeader): Future[PlayerJs]
 }
 
-trait AssetHooks extends HasContext {
-  def delete(itemId: String, file: String)(implicit header: RequestHeader): Future[Option[StatusMessage]]
+trait GetAssetHook extends {
+  def loadFile(id: String, path: String)(request: Request[AnyContent]): SimpleResult
+}
+
+trait AssetHooks extends GetAssetHook {
+  def deleteFile(itemId: String, file: String)(implicit header: RequestHeader): Future[Option[StatusMessage]]
 
   /**
    * TODO: it would be preferable to have a signature as follows
