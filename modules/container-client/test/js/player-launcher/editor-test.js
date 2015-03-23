@@ -21,6 +21,9 @@ describe('editor launcher', function () {
     };
   }
 
+  /** Note: we make use of corespring.mock in these specs:
+   *  console.log(corespring.mock);
+   */
   function withRequire(obj, fn){
     
     var env = {
