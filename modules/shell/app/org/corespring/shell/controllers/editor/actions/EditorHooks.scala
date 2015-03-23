@@ -28,7 +28,9 @@ trait EditorHooks extends ContainerEditorHooks {
 
   override def loadItem(id: String)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] = load(id)
   override def deleteFile(id: String, path: String)(implicit header: RequestHeader): Future[Option[(Int, String)]] = assets.delete(AssetType.Draft, id, path)(header)
-  override def uploadAction(id: String, file: String)(block: (Request[Int]) => SimpleResult): Action[Int] = assets.upload(AssetType.Draft, id, file)(block)
+  override def uploadAction(id: String, file: String)(block: (Request[Int]) => SimpleResult): Action[Int] = {
+    assets.upload(AssetType.Draft, id, file, (_) => None)(block)
+  }
   override def loadFile(id: String, path: String)(request: Request[AnyContent]): SimpleResult = assets.load(AssetType.Draft, id, path)(request)
 }
 

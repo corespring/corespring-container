@@ -102,8 +102,8 @@ class ContainerClientImplementation(
       }
     }
 
-    override def upload(t: AssetType, id: String, path: String)(block: (Request[Int]) => SimpleResult): Action[Int] = {
-      Action(playS3.upload(s3.bucket, mkPath(t, id, path))) { r => block(r) }
+    override def upload(t: AssetType, id: String, path: String, predicate: RequestHeader => Option[SimpleResult])(block: (Request[Int]) => SimpleResult): Action[Int] = {
+      Action(playS3.upload(s3.bucket, mkPath(t, id, path), predicate)) { r => block(r) }
     }
 
     override def copyItemToDraft(itemId: String, draftId: String): Unit = {
