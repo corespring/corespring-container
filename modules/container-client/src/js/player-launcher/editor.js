@@ -16,11 +16,9 @@ function EditorDefinition(element, options, errorCallback) {
     throw 'error occurred, code: ' + error.code + ', message: ' + error.message;
   };
 
-
   function makeUrl(url, queryParams) {
     return builder.build(url, queryParams);
   }
-
 
   function hasLauncherErrors() {
     var launcherErrors = require('launcher-errors');
@@ -33,7 +31,6 @@ function EditorDefinition(element, options, errorCallback) {
     return false;
   }
 
-
   function loadMethodAndUrl(name) {
     if (!options.paths || !options.paths[name]) {
       errorCallback({
@@ -45,23 +42,53 @@ function EditorDefinition(element, options, errorCallback) {
     return options.paths[name];
   }
 
-
-
   function createItem(options, callback) {
     var createCall = loadMethodAndUrl('create');
     if (!createCall) {
       return;
     }
 
-    var queryParams = require('query-params');
+    callback = callback || function(){};
+
+    function onSuccess(result){
+      if(options.onItemCreated){
+        options.onItemCreated(result.id);
+        callback(null, result);
+      }
+    } 
 
     $.ajax({
       type: createCall.method,
       url: makeUrl(options.corespringUrl + createCall.url, queryParams),
       data: options,
-      success: callback.bind(this, null),
+      success: onSuccess,
       error: callback.bind(this),
       dataType: 'json'
+    });
+  }
+
+  function createDraft(itemId, callback){
+     logger.log('create draft for item: ', itemId);
+
+     var call = loadMethodAndUrl('createDraft');
+     var url = call.url.replace(':itemId', itemId);
+
+     callback = callback || function(){};
+
+    function onSuccess(result){
+      if(options.onDraftCreated){
+        options.onDraftCreated(result.id);
+        callback(null, result);
+      }
+    } 
+
+    $.ajax({
+      type: call.method,
+      url: makeUrl(options.corespringUrl + url, queryParams),
+      success: onSuccess,
+      error: function(err){
+        callback({code: 112, msg: 'Error creating draft'});
+      }
     });
   }
 
@@ -102,26 +129,13 @@ function EditorDefinition(element, options, errorCallback) {
       } else {
         isReady = true;
         instance.send('initialise', options);
+        if(options.onDraftLoaded){
+          options.onDraftLoaded();
+        }
       }
     });
   }
 
-  function createDraft(itemId, callback){
-     logger.log('create draft for item: ', itemId);
-
-     var call = loadMethodAndUrl('createDraft');
-     var url = call.url.replace(':itemId', itemId);
-     $.ajax({
-      type: call.method,
-      url: makeUrl(options.corespringUrl + url, queryParams),
-      success: function(result){
-        callback(null, result);
-      },
-      error: function(err){
-        callback({code: 112, msg: 'Error creating draft'});
-      }
-     });
-  }
 
   function init(){
     if (hasLauncherErrors()) {
@@ -161,7 +175,7 @@ function EditorDefinition(element, options, errorCallback) {
     function onError(err){
       var msg = (err.responseJSON && err.responseJSON.error) ? err.responseJSON.error : 'Failed to commit draft: ' + options.draftId;
       if(callback){
-        callback({code: 111, msg: msg})
+        callback({code: 111, msg: msg});
       }
     }
 

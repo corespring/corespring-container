@@ -13,14 +13,6 @@ describe('editor launcher', function () {
     return {method: name, url: name};
   }
 
-
-  function MockInstance(){
-    this.callbacks = {};
-    this.on = function(name, cb){
-      this.callbacks[name] = cb;
-    };
-  }
-
   /** Note: we make use of corespring.mock in these specs:
    *  console.log(corespring.mock);
    */
@@ -35,10 +27,13 @@ describe('editor launcher', function () {
         paths: {
           create: mkCall('create'),
           createDraft: mkCall('createDraft'),
-          editor: mkCall('editor/:draftId')
+          editor: mkCall('editor/:draftId'),
+          commitDraft: mkCall('commitDraft')
         }
       },
-      'instance' : MockInstance, 
+      instance : function(){
+        this.on = function(){};
+      },
       'launcher-errors' : new MockErrors([]) 
     };
 
@@ -56,6 +51,7 @@ describe('editor launcher', function () {
   });
 
   var errors = corespring.require('errors');
+
 
   describe('constructor', function(){
 
@@ -88,15 +84,24 @@ describe('editor launcher', function () {
 
       it('should create item', withRequire({}, 
         function(){
+
           spyOn($, 'ajax');
-          var editor = new (corespring.require('editor'))('blah', {}, onError);
+
+          var opts = {
+            onItemCreated: jasmine.createSpy('onItemCreated')
+          };
+
+          var editor = new (corespring.require('editor'))('blah', opts, onError);
           expect(onError).not.toHaveBeenCalled();
-          var opts = $.ajax.calls.mostRecent().args[0];
-          expect(opts.type).toEqual('create');
-          expect(opts.url).toEqual('http://base/create?a=a');
-          expect(opts.success).not.toBe(null);
-          expect(opts.error).not.toBe(null);
-          expect(opts.dataType).toEqual('json');
+          var ajax = $.ajax.calls.mostRecent().args[0];
+          expect(ajax.type).toEqual('create');
+          expect(ajax.url).toEqual('http://base/create?a=a');
+          expect(ajax.success).not.toBe(null);
+          expect(ajax.error).not.toBe(null);
+          expect(ajax.dataType).toEqual('json');
+
+          ajax.success({id: '1'});
+          expect(opts.onItemCreated).toHaveBeenCalledWith('1');
       }));
 
     });
@@ -104,16 +109,29 @@ describe('editor launcher', function () {
     describe('with itemId', function(){
       it('should call create draft',  withRequire({}, function(){
         spyOn($, 'ajax');
-        var editor = new (corespring.require('editor'))('blah', {itemId: 'itemId'}, onError);
-        expect($.ajax.calls.mostRecent().args[0].url).toEqual('http://base/createDraft?a=a');
+        var opts =  {
+          itemId: 'itemId',
+          onDraftCreated: jasmine.createSpy('onDraftCreated')
+        };
+
+        var editor = new (corespring.require('editor'))('blah', opts, onError);
+        var ajax = $.ajax.calls.mostRecent().args[0];
+        expect(ajax.url).toEqual('http://base/createDraft?a=a');
+        ajax.success({id: '2'});
+        expect(opts.onDraftCreated).toHaveBeenCalledWith('2');
       }));
     });
 
     describe('with draftId', function(){
 
+      var readyHandler = null;
       var instance = jasmine.createSpy('instance').and.callFake(function(){
         return {
-          on: jasmine.createSpy('on'),
+          on: jasmine.createSpy('on').and.callFake(function(name, cb){
+            if(name === 'ready'){
+              readyHandler = cb;
+            }
+          }),
           send: jasmine.createSpy('send')
         };
       });
@@ -123,12 +141,42 @@ describe('editor launcher', function () {
       }, function(){
         spyOn($, 'ajax');
         console.log(corespring.mock.modules);
-        var editor = new (corespring.require('editor'))('blah', {draftId: 'draftId'}, onError);
+        var opts = {
+          draftId: 'draftId',
+          onDraftLoaded: jasmine.createSpy('onDraftLoaded')
+        };
+        var editor = new (corespring.require('editor'))('blah', opts, onError);
         expect(instance).toHaveBeenCalled();
-        var opts = instance.calls.mostRecent().args[1];
-        expect(opts.url).toEqual('http://base/editor/draftId');
+        var constructorArgs = instance.calls.mostRecent().args[1];
+        expect(constructorArgs.url).toEqual('http://base/editor/draftId');
+
+        console.log('call readyHandler:', readyHandler);
+        readyHandler();
+        expect(opts.onDraftLoaded).toHaveBeenCalled();
       }));
     });
   });
 
+  describe('commitDraft', function(){
+    it('calls commitDraft endpoint and returns an error', withRequire({}, function(){
+      var editor = new (corespring.require('editor'))('blah', {draftId: 'draftId'}, function(){});
+      spyOn($, 'ajax').and.callFake(function(opts){
+        opts.error({responseJSON: { error: 'error!'}});
+      });
+      var callback = jasmine.createSpy('callback');
+      editor.commitDraft(false, callback);
+      expect(callback).toHaveBeenCalledWith({code: 111, msg: 'error!'});
+    })); 
+
+    it('calls commitDraft endpoint and returns success', withRequire({}, function(){
+      var editor = new (corespring.require('editor'))('blah', {draftId: 'draftId'}, function(){});
+      spyOn($, 'ajax').and.callFake(function(opts){
+        opts.success({});
+      });
+      var callback = jasmine.createSpy('callback');
+      editor.commitDraft(false, callback);
+      expect(callback).toHaveBeenCalledWith(null);
+    })); 
+
+  });
 });
