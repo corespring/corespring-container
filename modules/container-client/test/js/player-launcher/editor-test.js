@@ -9,7 +9,7 @@ describe('editor launcher', function () {
     };
   }
 
-  function p(name){
+  function mkCall(name){
     return {method: name, url: name};
   }
 
@@ -33,9 +33,9 @@ describe('editor launcher', function () {
       'default-options': {
         corespringUrl: 'http://base/',
         paths: {
-          create: p('create'),
-          createDraft: p('createDraft'),
-          editor: p('editor/:draftId')
+          create: mkCall('create'),
+          createDraft: mkCall('createDraft'),
+          editor: mkCall('editor/:draftId')
         }
       },
       'instance' : MockInstance, 
@@ -71,7 +71,7 @@ describe('editor launcher', function () {
           { 'launcher-errors': new MockErrors(['error one']) }, 
           function(){
             var editor = new (corespring.require('editor'))('blah', {}, onError);
-            expect(onError).toHaveBeenCalledWith(errors.EXTERNAL_ERROR("error one"));
+            expect(onError).toHaveBeenCalledWith(errors.EXTERNAL_ERROR('error one'));
       }));
 
 
@@ -79,12 +79,12 @@ describe('editor launcher', function () {
         { 'default-options' : { paths: {}}}, 
         function() {
           var editor = new (corespring.require('editor'))('blah', {}, onError);
-          expect(onError).toHaveBeenCalledWith(errors.EXTERNAL_ERROR("create not part of options"));
+          expect(onError).toHaveBeenCalledWith(errors.EXTERNAL_ERROR('create not part of options'));
       }));
 
     });
 
-    describe("with no options", function(){
+    describe('with no options', function(){
 
       it('should create item', withRequire({}, 
         function(){
@@ -101,7 +101,7 @@ describe('editor launcher', function () {
 
     });
 
-    describe("with itemId", function(){
+    describe('with itemId', function(){
       it('should call create draft',  withRequire({}, function(){
         spyOn($, 'ajax');
         var editor = new (corespring.require('editor'))('blah', {itemId: 'itemId'}, onError);
@@ -109,7 +109,7 @@ describe('editor launcher', function () {
       }));
     });
 
-    describe("with draftId", function(){
+    describe('with draftId', function(){
 
       var instance = jasmine.createSpy('instance').and.callFake(function(){
         return {
