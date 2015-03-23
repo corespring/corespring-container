@@ -3,6 +3,37 @@ path = require "path"
 fs = require "fs"
 mkdirp = require 'mkdirp'
 
+
+mock = ->
+  """
+  (function(){
+
+    console.log('%c coresping.mock created by prep-player-launcher.coffee', 'color: #cceeff; background-color: #440044;');
+    var orig = {
+      require: corespring.require,
+    }
+
+    function Mock(){
+      this.reset = function(){
+        this.modules = {};
+      }
+      this.modules = {};
+    }
+    
+    corespring.mock = new Mock()
+
+    //Override require to check mock before the real require.
+    corespring.require = function(name){
+      if(corespring.mock.modules[name]){
+        return corespring.mock.modules[name];
+      } else {
+        return orig.require(name);
+      }
+    }
+  })();
+"""
+
+
 ###
 Depends on the corespring core.js 
 ###
@@ -29,7 +60,7 @@ module.exports = (grunt) ->
         grunt.log.debug('src', JSON.stringify(f.src))
         grunt.log.debug('dest', JSON.stringify(f.dest))
         sumString = (sum, s) -> sum += "\n\n#{readAndWrap(s)}"
-        wrapped = _.reduce(f.src, sumString, "")
+        wrapped = "#{mock()}\n\n#{_.reduce(f.src, sumString, "")}"
         grunt.file.write(f.dest, wrapped)
 
       @files.forEach(writeWrapped)

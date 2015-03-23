@@ -59,14 +59,14 @@ function EditorDefinition(element, options, errorCallback) {
       type: createCall.method,
       url: makeUrl(options.corespringUrl + createCall.url, queryParams),
       data: options,
-      success: onSuccess,
-      error: onError,
+      success: callback.bind(this, null),
+      error: callback.bind(this),
       dataType: 'json'
     });
   }
 
   function loadDraftItem(draftId, options) {
-    logger.log('load draft item')
+    logger.log('load draft item');
 
     if(options.devEditor){
       throw new Error('dev editor launching isn\'t ready');
@@ -140,8 +140,8 @@ function EditorDefinition(element, options, errorCallback) {
         createDraft(result.id, function(err, result){
           options.draftId = result.id;
           loadDraftItem(result.id, options);
-        })
-      })
+        });
+      });
     }
   }
 
