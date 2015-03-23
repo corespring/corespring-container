@@ -47,6 +47,8 @@ class DefaultIntegrationTest extends Specification with Mockito with PlaySpecifi
 
       /** urls for component sets eg one or more components */
       override def componentSets: ComponentSets = mock[ComponentSets]
+
+      override def itemHooks: ItemHooks = mock[ItemHooks]
     }
   }
 

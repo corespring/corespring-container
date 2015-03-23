@@ -21,51 +21,6 @@ object ItemDraft {
   }
 }
 
-object ItemJson {
-
-  def apply(components: Seq[String], rawJson: JsValue): JsObject = {
-
-    val processedXhtml = (rawJson \ "xhtml").asOpt[String].map(s => PlayerXhtml.mkXhtml(components, s)).getOrElse {
-      throw new IllegalArgumentException("the Item json must contain 'xhtml'")
-    }
-
-    val itemId = (rawJson \ "_id" \ "$oid").asOpt[JsString].map(id => Json.obj("itemId" -> id)).getOrElse(Json.obj())
-    rawJson.as[JsObject] + ("xhtml" -> JsString(processedXhtml)) ++ itemId
-  }
-}
-
-trait Item extends Controller {
-
-  implicit def toResult(m: StatusMessage): SimpleResult = play.api.mvc.Results.Status(m._1)(Json.obj("error" -> m._2))
-
-  def hooks: ItemHooks
-
-  def componentTypes: Seq[String]
-
-  implicit def ec: ExecutionContext
-
-  def load(itemId: String) = Action.async { implicit request =>
-    hooks.load(itemId).map {
-      either =>
-        either match {
-          case Left(sm) => sm
-          case Right(rawItem) => Ok(ItemJson(componentTypes, rawItem))
-        }
-    }
-  }
-
-  def create = Action.async {
-    implicit request =>
-      hooks.create(request.body.asJson).map {
-        either =>
-          either match {
-            case Left(sm) => sm
-            case Right(id) => Ok(Json.obj("itemId" -> id))
-          }
-      }
-  }
-}
-
 trait ItemDraft extends Controller {
 
   private lazy val logger = ContainerLogger.getLogger("Item")
@@ -93,15 +48,13 @@ trait ItemDraft extends Controller {
       }
   }
 
-  def cleanUpRawItemJson(rawItem: JsValue): JsValue = ItemJson(componentTypes, rawItem)
-
   def load(draftId: String) = Action.async {
     implicit request =>
       hooks.load(draftId).map {
         either =>
           either match {
             case Left(sm) => sm
-            case Right(draft) => Ok(cleanUpRawItemJson(draft \ "item"))
+            case Right(draft) => Ok(ItemJson(componentTypes, draft \ "item"))
           }
       }
   }

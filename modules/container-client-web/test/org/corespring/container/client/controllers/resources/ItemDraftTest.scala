@@ -1,98 +1,135 @@
 package org.corespring.container.client.controllers.resources
 
+import org.corespring.container.client.controllers.resources.ItemDraft.Errors
 import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.client.hooks._
-import org.corespring.container.client.controllers.resources.ItemDraft.Errors
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
 import play.api.libs.json.{ JsValue, Json }
 import play.api.mvc._
+import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import play.api.test.{ WithApplication, FakeApplication, FakeRequest }
 
 import scala.concurrent.{ ExecutionContext, Future }
 
-object mockGlobalq extends play.api.GlobalSettings
-
 class ItemDraftTest extends Specification with Mockito {
 
-  class item(
-    createError: Option[StatusMessage] = None,
-    globalConf: Option[play.api.GlobalSettings] = Some(mockGlobalq),
-    loadResult: JsValue = Json.obj("_id" -> Json.obj("$oid" -> "1"), "xhtml" -> "<div></div>"))
-    extends WithApplication(FakeApplication(withGlobal = globalConf))
-    with Scope {
-    val item = new ItemDraft {
+  trait BaseDraft extends ItemDraft {
+    override implicit def ec: ExecutionContext = ExecutionContext.Implicits.global
 
-      override def hooks: ItemDraftHooks = new ItemDraftHooks {
-
-        override def create(json: Option[JsValue])(implicit header: RequestHeader): Future[Either[StatusMessage, String]] = {
-          Future {
-            createError.map {
-              e =>
-                Left(e)
-            }.getOrElse(Right("new_id"))
-          }
-        }
-
-        override def load(itemId: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]] = {
-          Future {
-            Right(loadResult)
-          }
-        }
-
-        override def saveProfile(itemId: String, json: JsValue)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] = Future(Right(Json.obj()))
-
-        override def saveXhtml(itemId: String, xhtml: String)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] = Future(Right(Json.obj()))
-
-        override def saveSupportingMaterials(itemId: String, json: JsValue)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] = Future(Right(Json.obj()))
-
-        override def saveComponents(itemId: String, json: JsValue)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] = Future(Right(Json.obj()))
-
-        override def saveSummaryFeedback(itemId: String, feedback: String)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] = Future(Right(Json.obj()))
-
-        override implicit def ec: ExecutionContext = ExecutionContext.Implicits.global
-      }
-
-      override implicit def ec: ExecutionContext = ExecutionContext.Implicits.global
-
-      override protected def componentTypes: Seq[String] = Seq.empty
-    }
-
+    override protected def componentTypes: Seq[String] = Seq.empty
   }
 
-  "Item" should {
+  import ExecutionContext.Implicits.global
+
+  "ItemDraft" should {
 
     "load" should {
-      s"return $OK" in new item {
-        status(item.load("x")(FakeRequest("", ""))) === OK
+
+      val json = Json.obj("item" ->
+        Json.obj("_id" ->
+          Json.obj("$oid" -> "1"),
+          "xhtml" -> "<div></div>"))
+
+      class load(loadResult: JsValue = json)
+        extends Scope {
+        val draft = new BaseDraft {
+          val hooks: ItemDraftHooks = {
+            val m = mock[ItemDraftHooks] //.verbose
+            m.load(anyString)(any[RequestHeader]) returns Future(Right(loadResult))
+            m
+          }
+        }
       }
 
-      "prep the json" in new item(loadResult = Json.obj("_id" ->
-        Json.obj("$oid" -> "1"), "xhtml" -> "<p>a</p>")) {
-        val json = contentAsJson(item.load("x")(FakeRequest("", "")))
+      s"return $OK" in new load {
+        status(draft.load("x")(FakeRequest("", ""))) === OK
+      }
+
+      val badJson = Json.obj("item" ->
+        Json.obj("_id" ->
+          Json.obj("$oid" -> "1"),
+          "xhtml" -> "<p>a</p>"))
+
+      "prep the json" in new load(loadResult = badJson) {
+        val json = contentAsJson(draft.load("x")(FakeRequest("", "")))
         (json \ "itemId").as[String] === "1"
         (json \ "xhtml").as[String] === """<div class="para">a</div>"""
       }
     }
 
-    "fail to save if no json is supplied" in new item {
-      val result = item.saveSubset("x", "xhtml")(FakeRequest())
-      status(result) === BAD_REQUEST
-      (contentAsJson(result) \ "error").as[String] === Errors.noJson
+    "saveSubset" should {
+
+      class save(saveResult: JsValue = Json.obj())
+        extends Scope {
+        val draft = new BaseDraft {
+          val hooks: ItemDraftHooks = {
+            val m = mock[ItemDraftHooks] //.verbose
+            m.saveXhtml(anyString, anyString)(any[RequestHeader]) returns Future(Right(saveResult))
+            m
+          }
+        }
+      }
+
+      "fail to save if no json is supplied" in new save() {
+        val result = draft.saveSubset("x", "xhtml")(FakeRequest())
+        status(result) === BAD_REQUEST
+        (contentAsJson(result) \ "error").as[String] === Errors.noJson
+      }
     }
 
-    "create returns error" in new item(createError = Some(UNAUTHORIZED -> "Error"), globalConf = Some(mockGlobalq)) {
-      val result = item.create(FakeRequest("", ""))
-      status(result) === UNAUTHORIZED
-      contentAsJson(result) === Json.obj("error" -> "Error")
+    "create" should {
+
+      class create(createResult: Either[(Int, String), String] = Right("???"))
+        extends Scope {
+        val draft = new BaseDraft {
+          val hooks: ItemDraftHooks = {
+            val m = mock[ItemDraftHooks] //.verbose
+            m.create(anyString)(any[RequestHeader]) returns Future(createResult)
+            m
+          }
+        }
+      }
+
+      "return error" in new create(createResult = Left(UNAUTHORIZED -> "Error")) {
+        val result = draft.create("itemId")(FakeRequest("", ""))
+        status(result) === UNAUTHORIZED
+        contentAsJson(result) === Json.obj("error" -> "Error")
+      }
+
+      "return id" in new create {
+        val result = draft.create("itemId")(FakeRequest("", ""))
+        status(result) === OK
+        contentAsJson(result) === Json.obj("id" -> "???")
+      }
     }
 
-    "create" in new item {
-      val result = item.create(FakeRequest("", ""))
-      status(result) === OK
-      contentAsJson(result) === Json.obj("itemId" -> "new_id")
+    "commit" should {
+
+      class commit(commitResult: Future[Either[StatusMessage, JsValue]] = Future(Right(Json.obj()))) extends Scope {
+        val draft = new BaseDraft {
+          val hooks: ItemDraftHooks = {
+            val m = mock[ItemDraftHooks]
+            m.commit(anyString, any[Boolean])(any[RequestHeader]) returns commitResult
+            m
+          }
+        }
+      }
+
+      "set force to false" in new commit() {
+        val fr = FakeRequest("", "")
+        draft.commit("draftId")(fr)
+        there was one(draft.hooks).commit("draftId", false)(fr)
+      }
+
+      "set force to true" in new commit() {
+        val fr = FakeRequest("", "?force=true")
+        draft.commit("draftId")(fr)
+        there was one(draft.hooks).commit("draftId", true)(fr)
+      }
+
     }
+
   }
 }
