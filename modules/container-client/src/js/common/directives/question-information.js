@@ -23,7 +23,7 @@ angular.module('corespring-common.directives')
               if ($scope.activeTab === 'supportingMaterial') {
                 $scope.selectSupportingMaterial(0);
               }
-              if ($scope.availableTabs && $scope.availableTabs.supportingMaterial && $scope.item.supportingMaterials.length > 1) {
+              if ($scope.availableTabs && $scope.availableTabs.supportingMaterial && $scope.item.supportingMaterials && $scope.item.supportingMaterials.length > 1) {
                 $scope.hideNav = false;
               }
             }

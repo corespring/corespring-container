@@ -75,7 +75,7 @@ describe('questionInformation', function () {
 
   describe('available tabs', function () {
     it('should default to all tabs being available', function () {
-      expect(scope.availableTabs).toEqual({ question: true, profile: true, supportingMaterials: true });
+      expect(scope.availableTabs).toEqual({ question: true, profile: true, supportingMaterial: true });
     });
 
     it('should respect tabs property', function () {
