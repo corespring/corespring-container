@@ -51,7 +51,7 @@ angular.module('corespring-common.directives')
             }
           });
 
-          $scope.availableTabs = {question: true, profile: true, supportingMaterials: true};
+          $scope.availableTabs = {question: true, profile: true, supportingMaterial: true};
           $scope.activeTab = 'question';
           $scope.playerMode = "gather";
 
