@@ -102,10 +102,11 @@ class ContainerClientImplementation(
       }
     }
 
-    override def upload(t: AssetType, id: String, path: String, predicate: RequestHeader => Option[SimpleResult])(block: (Request[Int]) => SimpleResult): Action[Int] = {
-      Action(playS3.upload(s3.bucket, mkPath(t, id, path), predicate)) { r => block(r) }
+    override def upload(t: AssetType, id: String, path: String)(predicate: (RequestHeader) => Option[SimpleResult]): BodyParser[Future[UploadResult]] = {
+      playS3.s3Object(s3.bucket, mkPath(t, id, path))(predicate).map { f =>
+        f.map { s3Object => UploadResult(s3Object.getKey) }
+      }
     }
-
     override def copyItemToDraft(itemId: String, draftId: String): Unit = {
       assetUtils.copyDir(mkPath(AssetType.Item, itemId), mkPath(AssetType.Draft, draftId))
     }
@@ -117,6 +118,7 @@ class ContainerClientImplementation(
     override def copyDraftToItem(draftId: String, itemId: String): Unit = {
       assetUtils.copyDir(mkPath(AssetType.Draft, draftId), mkPath(AssetType.Item, itemId))
     }
+
   }
 
   lazy val componentSets = new CompressedAndMinifiedComponentSets {

@@ -1,14 +1,13 @@
 package org.corespring.shell.controllers.editor.actions
 
 import org.corespring.container.client.controllers.{ AssetType, Assets }
+import org.corespring.container.client.hooks.{ EditorHooks => ContainerEditorHooks, UploadResult }
+import org.corespring.container.logging.ContainerLogger
+import org.corespring.mongo.json.services.MongoService
+import play.api.libs.json.JsValue
+import play.api.mvc._
 
 import scala.concurrent.Future
-
-import org.corespring.container.client.hooks.{ EditorHooks => ContainerEditorHooks, PlayerData }
-import org.corespring.mongo.json.services.MongoService
-import org.corespring.container.logging.ContainerLogger
-import play.api.libs.json.{ JsString, JsValue, Json }
-import play.api.mvc._
 
 trait EditorHooks extends ContainerEditorHooks {
 
@@ -28,8 +27,19 @@ trait EditorHooks extends ContainerEditorHooks {
 
   override def loadItem(id: String)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] = load(id)
   override def deleteFile(id: String, path: String)(implicit header: RequestHeader): Future[Option[(Int, String)]] = assets.delete(AssetType.Draft, id, path)(header)
-  override def uploadAction(id: String, file: String)(block: (Request[Int]) => SimpleResult): Action[Int] = {
-    assets.upload(AssetType.Draft, id, file, (_) => None)(block)
+
+  override def upload(draftId: String, file: String)(predicate: (RequestHeader) => Option[SimpleResult]): BodyParser[Future[UploadResult]] = {
+
+    def shellPredicate(rh: RequestHeader): Option[SimpleResult] = {
+      predicate(rh).orElse {
+        if (rh.getQueryString("fail").exists(_ == "true")) {
+          Some(Results.BadRequest("Fail is in the queryString"))
+        } else {
+          None
+        }
+      }
+    }
+    assets.upload(AssetType.Draft, draftId, file)(shellPredicate)
   }
   override def loadFile(id: String, path: String)(request: Request[AnyContent]): SimpleResult = assets.load(AssetType.Draft, id, path)(request)
 }

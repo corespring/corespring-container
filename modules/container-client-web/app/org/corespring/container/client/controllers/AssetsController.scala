@@ -22,7 +22,11 @@ trait AssetsController[H <: AssetHooks] extends GetAsset[H] {
 
   override def hooks: H
 
-  def uploadFile(id: String, path: String) = hooks.uploadAction(id, path) { r => Ok("") }
+  def uploadFile(id: String, path: String) = Action.async(hooks.upload(id, path)(rh => None)) { request =>
+    request.body.map { r =>
+      Ok(r.path)
+    }
+  }
 
   def deleteFile(id: String, path: String) = Action.async {
     implicit request =>

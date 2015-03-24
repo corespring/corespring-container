@@ -1,5 +1,8 @@
 package org.corespring.container.client.hooks
 
+import java.io.File
+
+import com.amazonaws.services.s3.model.S3Object
 import org.corespring.container.client.HasContext
 import org.corespring.container.client.hooks.Hooks.StatusMessage
 import play.api.libs.json.{ JsString, JsArray, JsValue }
@@ -84,16 +87,11 @@ trait GetAssetHook extends {
   def loadFile(id: String, path: String)(request: Request[AnyContent]): SimpleResult
 }
 
-trait AssetHooks extends GetAssetHook {
-  def deleteFile(itemId: String, file: String)(implicit header: RequestHeader): Future[Option[StatusMessage]]
+case class UploadResult(path: String)
 
-  /**
-   * TODO: it would be preferable to have a signature as follows
-   * {{{
-   * def upload(itemId: String, file: String)(implicit header: RequestHeader): Future[Option[StatusMessage]]
-   * }}}
-   */
-  def uploadAction(itemId: String, file: String)(block: Request[Int] => SimpleResult): Action[Int]
+trait AssetHooks extends GetAssetHook {
+  def deleteFile(id: String, file: String)(implicit header: RequestHeader): Future[Option[StatusMessage]]
+  def upload(id: String, file: String)(predicate: RequestHeader => Option[SimpleResult]): BodyParser[Future[UploadResult]]
 }
 
 trait DataQueryHooks extends HasContext {

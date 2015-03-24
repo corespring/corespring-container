@@ -53,8 +53,8 @@ function EditorDefinition(element, options, errorCallback) {
     function onSuccess(result){
       if(options.onItemCreated){
         options.onItemCreated(result.id);
-        callback(null, result);
       }
+      callback(null, result);
     } 
 
     $.ajax({
@@ -78,8 +78,8 @@ function EditorDefinition(element, options, errorCallback) {
     function onSuccess(result){
       if(options.onDraftCreated){
         options.onDraftCreated(result.id);
-        callback(null, result);
       }
+      callback(null, result);
     } 
 
     $.ajax({

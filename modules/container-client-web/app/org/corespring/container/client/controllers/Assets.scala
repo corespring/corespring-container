@@ -1,6 +1,9 @@
 package org.corespring.container.client.controllers
 
+import java.io.File
+
 import org.corespring.container.client.HasContext
+import org.corespring.container.client.hooks.UploadResult
 import play.api.mvc._
 
 import scala.concurrent.Future
@@ -18,6 +21,6 @@ trait Assets extends Controller with HasContext {
   import AssetType._
   def load(t: AssetType, id: String, path: String)(implicit h: RequestHeader): SimpleResult
   def delete(t: AssetType, id: String, path: String)(implicit h: RequestHeader): Future[Option[(Int, String)]]
-  def upload(t: AssetType, id: String, path: String, predicate: RequestHeader => Option[SimpleResult])(block: Request[Int] => SimpleResult): Action[Int]
+  def upload(t: AssetType, id: String, path: String)(predicate: RequestHeader => Option[SimpleResult]): BodyParser[Future[UploadResult]]
 }
 
