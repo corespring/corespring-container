@@ -25,7 +25,7 @@ trait PlayerHooks extends ContainerPlayerHooks {
 
   private def toItemId(json: JsValue): Option[String] = (json \ "itemId").asOpt[String]
 
-  private def load(id: String)(implicit header: RequestHeader) = Future {
+  override def load(id: String)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] = Future {
     val item: Validation[String, JsValue] = for {
       s <- sessionService.load(id).toSuccess(s"can't find session with id: $id")
       itemId <- toItemId(s).toSuccess(s"error converting string to item id: $s")
@@ -33,7 +33,6 @@ trait PlayerHooks extends ContainerPlayerHooks {
     } yield {
       i
     }
-
     item.leftMap(s => (500, s)).toEither
   }
 
@@ -53,8 +52,6 @@ trait PlayerHooks extends ContainerPlayerHooks {
         Right(oid.toString)
     }.getOrElse(Left(BAD_REQUEST -> "Error creating session"))
   }
-
-  override def loadItem(id: String)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] = load(id)
 
   override def loadSessionAndItem(sessionId: String)(implicit header: RequestHeader): Future[Either[(Int, String), (JsValue, JsValue)]] = Future {
     val out = for {
@@ -76,4 +73,5 @@ trait PlayerHooks extends ContainerPlayerHooks {
     import Results.NotFound
     out.getOrElse(NotFound(""))
   }
+
 }

@@ -2,7 +2,7 @@ package org.corespring.shell.controllers.editor
 
 import com.mongodb.casbah.Imports._
 import org.bson.types.ObjectId
-import org.corespring.container.client.hooks.Hooks.StatusMessage
+import org.corespring.container.client.hooks.Hooks.{R, StatusMessage}
 import org.corespring.container.client.hooks.{ ItemDraftHooks => ContainerItemDraftHooks, ItemHooks => ContainerItemHooks }
 import org.corespring.mongo.json.services.MongoService
 import org.joda.time.DateTime

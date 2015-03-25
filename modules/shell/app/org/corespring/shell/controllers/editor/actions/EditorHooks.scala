@@ -19,13 +19,12 @@ trait EditorHooks extends ContainerEditorHooks {
 
   import play.api.http.Status._
 
-  private def load(draftId: String)(implicit request: RequestHeader) = Future {
-    draftItemService.load(draftId).map { json =>
+  override def load(id: String)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] = Future{
+    draftItemService.load(id).map { json =>
       Right(json)
-    }.getOrElse(Left(NOT_FOUND -> draftId))
+    }.getOrElse(Left(NOT_FOUND -> id))
   }
 
-  override def loadItem(id: String)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] = load(id)
   override def deleteFile(id: String, path: String)(implicit header: RequestHeader): Future[Option[(Int, String)]] = assets.delete(AssetType.Draft, id, path)(header)
 
   override def upload(draftId: String, file: String)(predicate: (RequestHeader) => Option[SimpleResult]): BodyParser[Future[UploadResult]] = {
@@ -42,5 +41,6 @@ trait EditorHooks extends ContainerEditorHooks {
     assets.upload(AssetType.Draft, draftId, file)(shellPredicate)
   }
   override def loadFile(id: String, path: String)(request: Request[AnyContent]): SimpleResult = assets.load(AssetType.Draft, id, path)(request)
+
 }
 

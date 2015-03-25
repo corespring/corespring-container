@@ -6,14 +6,14 @@ import scala.concurrent.{ ExecutionContext, Future }
 
 import org.corespring.container.client.component.PlayerItemTypeReader
 import org.corespring.container.client.controllers.angular.AngularModules
-import org.corespring.container.client.hooks.ClientHooks
+import org.corespring.container.client.hooks.LoadHook
 import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.components.model.ComponentInfo
 import play.api.libs.json.{ JsValue, Json }
 import play.api.mvc.{ Action, AnyContent, RequestHeader }
 
 trait Rig
-  extends App[ClientHooks]
+  extends App[LoadHook]
   with PlayerItemTypeReader
   with Jade {
 
@@ -34,11 +34,11 @@ trait Rig
 
   override def context: String = "rig"
 
-  override def hooks: ClientHooks = new ClientHooks {
+  override def hooks: LoadHook = new LoadHook {
 
     override implicit def ec: ExecutionContext = ExecutionContext.Implicits.global
 
-    override def loadItem(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]] = Future {
+    override def load(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]] = Future {
       val componentType = id
       header.getQueryString("data").map { jsonFile =>
         Right((loadData(componentType, jsonFile) \ "item").as[JsValue])
@@ -69,7 +69,7 @@ trait Rig
         )))
     }
 
-    hooks.loadItem(componentType).map { e => e.fold(onError, onItem) }
+    hooks.load(componentType).map { e => e.fold(onError, onItem) }
   }
 
 }

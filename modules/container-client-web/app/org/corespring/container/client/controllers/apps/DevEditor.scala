@@ -13,7 +13,7 @@ import play.api.mvc._
 
 trait DevEditor
   extends AllItemTypesReader
-  with App[ClientHooks]
+  with App[LoadHook]
   with JsonHelper with Jade {
 
   override def context: String = "dev-editor"
@@ -51,7 +51,7 @@ trait DevEditor
           servicesJs(draftId))))
     }
 
-    hooks.loadItem(draftId).map { e => e.fold(onError, onItem) }
+    hooks.load(draftId).map { e => e.fold(onError, onItem) }
   }
 
 }
