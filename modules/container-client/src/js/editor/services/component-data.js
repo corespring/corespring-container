@@ -32,6 +32,22 @@ angular.module('corespring-editor.services')
           return id;
         }
 
+        function pruneItem(item){
+          if(item) {
+            //it is important to clone the item
+            //bc. otherwise the editor might save the
+            //changes thar we do to the item below
+            item = _.cloneDeep(item);
+            delete item.feedback;
+            delete item.correctResponse;
+          }
+          return item;
+        }
+
+        function setSingleDataAndSession(id, model, session){
+          ComponentRegister.setSingleDataAndSession(id, pruneItem(model), session);
+        }
+
         this.getSessions = function(){
           return ComponentRegister.getSessions();
         };
@@ -58,7 +74,7 @@ angular.module('corespring-editor.services')
             componentModels[id] = model;
           }
 
-          ComponentRegister.setSingleDataAndSession(id, model, mockSession[id]);
+          setSingleDataAndSession(id, model, mockSession[id]);
           if (elements[id]) {
             MathJaxService.parseDomForMath(10, elements[id]);
           }
@@ -84,7 +100,7 @@ angular.module('corespring-editor.services')
         this.registerComponent = function(id, bridge, element) {
           ComponentRegister.registerComponent(id, bridge);
           mockSession[id] = mockSession[id] || {};
-          ComponentRegister.setSingleDataAndSession(id, componentModels[id], mockSession[id]);
+          setSingleDataAndSession(id, componentModels[id], mockSession[id]);
           elements[id] = element;
         };
 
