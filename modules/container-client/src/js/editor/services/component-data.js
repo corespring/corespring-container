@@ -35,7 +35,8 @@ angular.module('corespring-editor.services')
         function pruneItem(item){
           if(item) {
             //it is important to clone the item
-            //bc. otherwise the editor might save the changes we do below
+            //bc. otherwise the editor might save the
+            //changes thar we do to the item below
             item = _.cloneDeep(item);
             delete item.feedback;
             delete item.correctResponse;

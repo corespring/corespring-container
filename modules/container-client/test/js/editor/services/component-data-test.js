@@ -119,4 +119,47 @@ describe('component data', function() {
     componentData.registerComponent(id, bridge);
     expect(_.keys(register.getSessions()).length).toEqual(1);
   });
+
+  describe("item pruning", function(){
+    it("does not pass feedback to setDataAndSession", function(){
+      var id = '1';
+      var bridge = new Bridge();
+      var model = { 1: {feedback:{}}};
+
+      componentData.setModel(model);
+      componentData.registerComponent(id, bridge);
+      expect(bridge.dataAndSession).toEqual({data:{},session:{}});
+    });
+    it("does not pass correctResponse to setDataAndSession", function(){
+      var id = '1';
+      var bridge = new Bridge();
+      var model = { 1: {correctResponse:{}}};
+
+      componentData.setModel(model);
+      componentData.registerComponent(id, bridge);
+      expect(bridge.dataAndSession).toEqual({data:{},session:{}});
+    });
+    it("does pass anything else to setDataAndSession", function(){
+      var id = '1';
+      var bridge = new Bridge();
+      var model = { 1: {anythingElse:{}}};
+
+      componentData.setModel(model);
+      componentData.registerComponent(id, bridge);
+      expect(bridge.dataAndSession).toEqual({data:{anythingElse:{}},session:{}});
+    });
+
+    it("does not change the original model", function(){
+      var id = '1';
+      var bridge = new Bridge();
+      var model = { 1: {correctResponse:{}}};
+      var saveModel = _.cloneDeep(model);
+
+      componentData.setModel(model);
+      componentData.registerComponent(id, bridge);
+      expect(model).toEqual(saveModel);
+    });
+
+  });
+
 });
