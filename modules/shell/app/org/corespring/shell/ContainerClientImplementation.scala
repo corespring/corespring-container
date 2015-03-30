@@ -79,7 +79,10 @@ class ContainerClientImplementation(
         k <- s3.key
         s <- s3.secret
       } yield {
-        (new ConcreteS3Service(k, s), new AssetUtils(k, s, s3.bucket))
+        val s3Service = new ConcreteS3Service(k, s)
+        val assetUtils = new AssetUtils(s3Service.client, s3.bucket)
+        (s3Service, assetUtils)
+
       }
       out.getOrElse(throw new RuntimeException("No amazon key/secret"))
     }
@@ -103,8 +106,12 @@ class ContainerClientImplementation(
     }
 
     override def upload(t: AssetType, id: String, path: String)(predicate: (RequestHeader) => Option[SimpleResult]): BodyParser[Future[UploadResult]] = {
-      playS3.s3Object(s3.bucket, mkPath(t, id, path))(predicate).map { f =>
-        f.map { s3Object => UploadResult(s3Object.getKey) }
+      playS3.s3ObjectAndData[Unit](s3.bucket, mkPath(t, id, path))((rh) => {
+        predicate(rh).map { err =>
+          Left(err)
+        }.getOrElse(Right(Unit))
+      }).map { f =>
+        f.map { tuple => UploadResult(tuple._1.getKey) }
       }
     }
     override def copyItemToDraft(itemId: String, draftId: String): Unit = {
