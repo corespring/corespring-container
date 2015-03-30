@@ -42,9 +42,6 @@ class DefaultIntegrationTest extends Specification with Mockito with PlaySpecifi
 
       override def components: Seq[Component] = Seq.empty
 
-      /** load assets for items (request may come from a session or item based app */
-      override def assets: Assets = mock[Assets]
-
       /** urls for component sets eg one or more components */
       override def componentSets: ComponentSets = mock[ComponentSets]
 

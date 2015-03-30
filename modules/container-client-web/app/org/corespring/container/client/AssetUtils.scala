@@ -3,23 +3,29 @@ package org.corespring.container.client
 import com.amazonaws.auth.AWSCredentials
 import com.amazonaws.services.s3.AmazonS3Client
 import grizzled.slf4j.Logger
-import org.corespring.container.client.controllers.AssetType.AssetType
 import org.corespring.container.logging.ContainerLogger
 
 import scala.collection.JavaConversions._
 import scala.util.{ Failure, Success, Try }
 
-class AssetUtils(key: String, secret: String, bucket: String) {
+
+object AssetUtils{
+  def apply(key:String, secret:String, bucket:String) = {
+    val s3: AmazonS3Client = {
+      new AmazonS3Client(new AWSCredentials {
+        override def getAWSAccessKeyId: String = key
+
+        override def getAWSSecretKey: String = secret
+      })
+    }
+
+    new AssetUtils(s3, bucket)
+  }
+}
+
+class AssetUtils(s3:AmazonS3Client, bucket:String) {
 
   private val logger: Logger = ContainerLogger.getLogger("AssetUtils")
-
-  private lazy val s3: AmazonS3Client = {
-    new AmazonS3Client(new AWSCredentials {
-      override def getAWSAccessKeyId: String = key
-
-      override def getAWSSecretKey: String = secret
-    })
-  }
 
   def run(fn: => Boolean): Boolean = {
     val out = Try(fn)

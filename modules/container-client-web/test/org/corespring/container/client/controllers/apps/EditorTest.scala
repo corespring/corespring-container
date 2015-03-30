@@ -26,7 +26,7 @@ class EditorTest extends Specification with Mockito {
 
       override def hooks: EditorHooks = {
         val m = mock[EditorHooks]
-        m.loadItem(anyString)(any[RequestHeader]) returns Future(hookResponse)
+        m.load(anyString)(any[RequestHeader]) returns Future(hookResponse)
         m
       }
 
