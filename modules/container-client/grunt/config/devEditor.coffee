@@ -41,7 +41,7 @@ exports.css =
   src: ['css/dev-editor.css']
   dest: 'css/dev-editor.min.css'
   libs: _.union(coreLibs.css, [
-    'bower_components/font-awesome/css/font-awesome.min.css',
+    'bower_components/components-font-awesome/css/font-awesome.min.css',
     '//fonts.googleapis.com/css?family=Ubuntu:300,400,500,500italic,700'
   ])
   report: 'dev-editor-css-report.json'
