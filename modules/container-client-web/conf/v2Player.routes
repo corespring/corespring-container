@@ -57,6 +57,9 @@ GET           /editor/:draftId/*file                                 @org.coresp
 POST          /editor/:draftId/*file                                 @org.corespring.container.client.controllers.apps.Editor.uploadFile(draftId, file)
 DELETE        /editor/:draftId/*file                                 @org.corespring.container.client.controllers.apps.Editor.deleteFile(draftId, file)
 GET           /dev-editor/:draftId/index.html                        @org.corespring.container.client.controllers.apps.DevEditor.load(draftId)
+GET           /dev-editor/:draftId/*file                                 @org.corespring.container.client.controllers.apps.DevEditor.getFile(draftId, file)
+POST          /dev-editor/:draftId/*file                                 @org.corespring.container.client.controllers.apps.DevEditor.uploadFile(draftId, file)
+DELETE        /dev-editor/:draftId/*file                                 @org.corespring.container.client.controllers.apps.DevEditor.deleteFile(draftId, file)
 
 GET           /data-query/:topic                                    @org.corespring.container.client.controllers.DataQuery.list(topic, query : Option[String] ?= None)
 GET           /data-query/:topic/:id                                @org.corespring.container.client.controllers.DataQuery.findOne(topic, id)

@@ -3,7 +3,7 @@ package org.corespring.container.client.controllers.apps
 import org.corespring.container.client.component.AllItemTypesReader
 import org.corespring.container.client.controllers.helpers.JsonHelper
 import org.corespring.container.client.controllers.jade.Jade
-import org.corespring.container.client.controllers.resources
+import org.corespring.container.client.controllers.{ AssetsController, resources }
 import org.corespring.container.client.hooks.Hooks._
 import org.corespring.container.client.hooks._
 import org.corespring.container.client.views.html.error
@@ -13,8 +13,10 @@ import play.api.mvc._
 
 trait DevEditor
   extends AllItemTypesReader
-  with App[LoadHook]
-  with JsonHelper with Jade {
+  with App[EditorHooks]
+  with JsonHelper
+  with Jade
+  with AssetsController[EditorHooks] {
 
   override def context: String = "dev-editor"
 
