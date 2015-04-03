@@ -18,6 +18,8 @@ angular.module('corespring-player.services')
             throw "Sessions is empty";
           }
 
+          var customScoringJs = getItem().customScoring;
+
           var out = {
             session: _.extend(_.cloneDeep(session))
           };
@@ -25,7 +27,18 @@ angular.module('corespring-player.services')
           out.session.attempts = 1;
           var outcomes = getOutcomes(session.components, settings);
           out.outcome = outcomes;
-          out.score = corespring.scoreProcessor.score(angular.copy(getItem()), {}, outcomes);
+          if (customScoringJs) {
+            var exports = {};
+            try {
+              eval(customScoringJs);
+              var score = exports.process(getItem(), session);
+              out.score = score;
+            } catch (e) {
+              console.warn('error while processing custom scoring: ', e);
+            }
+          } else {
+            out.score = corespring.scoreProcessor.score(angular.copy(getItem()), {}, outcomes);
+          }
           return out;
         }
 
