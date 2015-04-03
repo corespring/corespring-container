@@ -1,3 +1,4 @@
+/* jshint evil: true */
 angular.module('corespring-player.services')
   .factory('ClientSidePlayerService', [
     '$timeout',
