@@ -124,6 +124,10 @@ angular.module('corespring-editor.services').service('ItemService', [
         save('summary-feedback', {summaryFeedback: data}, onSuccess, onFailure);
       };
 
+      this.saveCustomScoring = function(data, onSuccess, onFailure){
+        save('custom-scoring', {customScoring: data}, onSuccess, onFailure);
+      };
+
       this.saveSupportingMaterials = function(data, onSuccess, onFailure) {
         save('supporting-materials', data, onSuccess, onFailure);
       };
