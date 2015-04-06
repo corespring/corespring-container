@@ -5,6 +5,7 @@ describe('DevEditorRoot', function() {
   var ItemService = {
     load: jasmine.createSpy('load'),
     saveXhtml: jasmine.createSpy('saveXhtml'),
+    saveCustomScoring: jasmine.createSpy('saveCustomScoring'),
     saveComponents: jasmine.createSpy('saveComponents')
   };
 
@@ -20,6 +21,7 @@ describe('DevEditorRoot', function() {
   afterEach(function() {
     ItemService.load.calls.reset();
     ItemService.saveXhtml.calls.reset();
+    ItemService.saveCustomScoring.calls.reset();
     ItemService.saveComponents.calls.reset();
     ComponentData.setModel.calls.reset();
     ComponentData.registerComponent.calls.reset();
@@ -111,6 +113,24 @@ describe('DevEditorRoot', function() {
 
         it('should save xhtml', function() {
           expect(ItemService.saveXhtml).toHaveBeenCalledWith(xhtml, jasmine.any(Function));
+        });
+
+      });
+
+      describe('customScoring has changed', function() {
+        var newCustomScoring = "new";
+        var item = {
+          customScoring: "original"
+        };
+
+        beforeEach(function() {
+          scope.item = item;
+          scope.customScoringJs = newCustomScoring;
+          scope.save();
+        });
+
+        it('should save custom scoring', function() {
+          expect(ItemService.saveCustomScoring).toHaveBeenCalledWith(newCustomScoring, jasmine.any(Function));
         });
 
       });

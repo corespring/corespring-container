@@ -2,10 +2,10 @@ package org.corespring.container.client.controllers.resources
 
 import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.client.hooks._
-import org.corespring.container.client.controllers.helpers.{PlayerXhtml, XhtmlProcessor}
+import org.corespring.container.client.controllers.helpers.{ PlayerXhtml, XhtmlProcessor }
 import org.corespring.container.components.model.Component
 import org.corespring.container.logging.ContainerLogger
-import play.api.libs.json.{JsString, JsObject, JsValue, Json}
+import play.api.libs.json.{ JsString, JsObject, JsValue, Json }
 import play.api.mvc._
 import scalaz.Scalaz._
 import scalaz._
@@ -21,16 +21,15 @@ object Item {
   }
 }
 
+object ItemJson {
 
-object ItemJson{
+  def apply(components: Seq[String], rawJson: JsValue): JsObject = {
 
-  def apply(components : Seq[String] , rawJson:JsValue) : JsObject = {
-
-    val processedXhtml = (rawJson \ "xhtml").asOpt[String].map(s => PlayerXhtml.mkXhtml(components, s)).getOrElse{
+    val processedXhtml = (rawJson \ "xhtml").asOpt[String].map(s => PlayerXhtml.mkXhtml(components, s)).getOrElse {
       throw new IllegalArgumentException("the Item json must contain 'xhtml'")
     }
 
-    val itemId =  (rawJson \ "_id" \ "$oid").asOpt[JsString].map(id => Json.obj("itemId" -> id)).getOrElse(Json.obj())
+    val itemId = (rawJson \ "_id" \ "$oid").asOpt[JsString].map(id => Json.obj("itemId" -> id)).getOrElse(Json.obj())
     rawJson.as[JsObject] + ("xhtml" -> JsString(processedXhtml)) ++ itemId
   }
 }
@@ -47,7 +46,7 @@ trait Item extends Controller {
    * A list of all the component types in the container
    * @return
    */
-  protected def componentTypes : Seq[String]
+  protected def componentTypes: Seq[String]
 
   def hooks: ItemHooks
 
@@ -91,6 +90,12 @@ trait Item extends Controller {
           hooks.saveXhtml(_: String, validXhtml)
         }
         .getOrElse(missingProperty("xhtml"))
+      case "custom-scoring" => (json \ "customScoring")
+        .asOpt[String]
+        .map { s =>
+          hooks.saveCustomScoring(_: String, s)
+        }
+        .getOrElse(missingProperty("customScoring"))
       case "summary-feedback" => (json \ "summaryFeedback").asOpt[String].map(s => hooks.saveSummaryFeedback(_: String, s)).getOrElse(missingProperty("summaryFeedback"))
       case "profile" => hooks.saveProfile(_: String, json)
       case "components" => hooks.saveComponents(_: String, json)
