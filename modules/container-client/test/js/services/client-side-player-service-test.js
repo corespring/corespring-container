@@ -70,11 +70,11 @@ describe('ClientSidePlayerService', function() {
       expect(callback.calls.mostRecent().args[0].score.summary.percentage).toBe(80);
     });
 
-    it('invalid scoring javascript results in empty score', function() {
+    it('invalid scoring javascript results in defalt score', function() {
       var session = {components: {RESPONSE: {answers: ["1", "2"]}}}, callback = jasmine.createSpy('callback');
       serviceWithInvalidCustomScoring.submitSession(session, callback);
       timeout.flush();
-      expect(callback.calls.mostRecent().args[0].score).not.toBeDefined;
+      expect(callback.calls.mostRecent().args[0].score.summary.points).toEqual(0);
     });
 
   });
