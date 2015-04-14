@@ -43,6 +43,7 @@ trait ItemHooks extends HasContext {
   def load(itemId: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]]
 
   def saveProfile(itemId: String, json: JsValue)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]]
+  def saveCustomScoring(itemId: String, customScoring: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]]
   def saveSupportingMaterials(itemId: String, json: JsValue)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]]
   def saveComponents(itemId: String, json: JsValue)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]]
   def saveXhtml(itemId: String, xhtml: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]]

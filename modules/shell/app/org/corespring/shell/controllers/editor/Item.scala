@@ -20,6 +20,9 @@ trait ItemHooks extends ContainerItemHooks {
   override def saveXhtml(itemId: String, xhtml: String)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] =
     fineGrainedSave(itemId, Json.obj("xhtml" -> xhtml))
 
+  override def saveCustomScoring(itemId: String, customScoring: String)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] =
+    fineGrainedSave(itemId, Json.obj("customScoring" -> customScoring))
+
   override def saveSummaryFeedback(itemId: String, fb: String)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] =
     fineGrainedSave(itemId, Json.obj("summaryFeedback" -> fb))
 

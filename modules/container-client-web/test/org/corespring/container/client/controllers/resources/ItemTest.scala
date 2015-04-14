@@ -9,7 +9,7 @@ import org.specs2.specification.Scope
 import play.api.libs.json.{ JsValue, Json }
 import play.api.mvc._
 import play.api.test.Helpers._
-import play.api.test.{WithApplication, FakeApplication, FakeRequest}
+import play.api.test.{ WithApplication, FakeApplication, FakeRequest }
 
 import scala.concurrent.{ ExecutionContext, Future }
 
@@ -18,9 +18,9 @@ object mockGlobalq extends play.api.GlobalSettings
 class ItemTest extends Specification with Mockito {
 
   class item(
-      createError: Option[StatusMessage] = None,
-      globalConf:Option[play.api.GlobalSettings] = Some(mockGlobalq),
-      loadResult : JsValue = Json.obj("_id" -> Json.obj("$oid" -> "1"), "xhtml" -> "<div></div>"))
+    createError: Option[StatusMessage] = None,
+    globalConf: Option[play.api.GlobalSettings] = Some(mockGlobalq),
+    loadResult: JsValue = Json.obj("_id" -> Json.obj("$oid" -> "1"), "xhtml" -> "<div></div>"))
     extends WithApplication(FakeApplication(withGlobal = globalConf))
     with Scope {
     val item = new Item {
@@ -46,6 +46,8 @@ class ItemTest extends Specification with Mockito {
 
         override def saveXhtml(itemId: String, xhtml: String)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] = Future(Right(Json.obj()))
 
+        override def saveCustomScoring(itemId: String, xhtml: String)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] = Future(Right(Json.obj()))
+
         override def saveSupportingMaterials(itemId: String, json: JsValue)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] = Future(Right(Json.obj()))
 
         override def saveComponents(itemId: String, json: JsValue)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] = Future(Right(Json.obj()))
@@ -64,15 +66,13 @@ class ItemTest extends Specification with Mockito {
 
   "Item" should {
 
-
     "load" should {
       s"return $OK" in new item {
         status(item.load("x")(FakeRequest("", ""))) === OK
       }
 
-      "prep the json" in new item(loadResult = Json.obj( "_id" ->
-        Json.obj( "$oid" -> "1"), "xhtml" -> "<p>a</p>")
-      ){
+      "prep the json" in new item(loadResult = Json.obj("_id" ->
+        Json.obj("$oid" -> "1"), "xhtml" -> "<p>a</p>")) {
         val json = contentAsJson(item.load("x")(FakeRequest("", "")))
         (json \ "itemId").as[String] === "1"
         (json \ "xhtml").as[String] === """<div class="para">a</div>"""
@@ -85,7 +85,7 @@ class ItemTest extends Specification with Mockito {
       (contentAsJson(result) \ "error").as[String] === Errors.noJson
     }
 
-    "create returns error" in new item(createError = Some(UNAUTHORIZED -> "Error"), globalConf = Some(mockGlobalq)){
+    "create returns error" in new item(createError = Some(UNAUTHORIZED -> "Error"), globalConf = Some(mockGlobalq)) {
       val result = item.create(FakeRequest("", ""))
       status(result) === UNAUTHORIZED
       contentAsJson(result) === Json.obj("error" -> "Error")
