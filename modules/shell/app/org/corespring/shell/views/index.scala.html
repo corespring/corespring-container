@@ -12,6 +12,7 @@
 
     @drafts.map{ d   =>
       <li>
+        <span>@d.name</span>
         @link("edit", d.edit, "btn-xs")
         @link("delete", d.delete, "btn-xs")
       </li>

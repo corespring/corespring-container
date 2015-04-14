@@ -42,77 +42,72 @@ function EditorDefinition(element, options, errorCallback) {
     return options.paths[name];
   }
 
-  function createItem(options, callback) {
-    var createCall = loadMethodAndUrl('create');
-    if (!createCall) {
-      return;
+  function createItemAndDraft(callback){
+    
+    var call = loadMethodAndUrl('createItemAndDraft');
+    
+    if (!call) {
+      throw new Error('can\'t find call named: createItemAndDraft');
     }
+
+    logger.log('create item and draft');
 
     callback = callback || function(){};
 
     function onSuccess(result){
+      
       if(options.onItemCreated){
-        options.onItemCreated(result.id);
+        options.onItemCreated(result.itemId);
       }
-      callback(null, result);
-    } 
-
-    $.ajax({
-      type: createCall.method,
-      url: makeUrl(options.corespringUrl + createCall.url, queryParams),
-      data: options,
-      success: onSuccess,
-      error: callback.bind(this),
-      dataType: 'json'
-    });
-  }
-
-  function createDraft(itemId, callback){
-     logger.log('create draft for item: ', itemId);
-
-     var call = loadMethodAndUrl('createDraft');
-     var url = call.url.replace(':itemId', itemId);
-
-     callback = callback || function(){};
-
-    function onSuccess(result){
+      
       if(options.onDraftCreated){
-        options.onDraftCreated(result.id);
+        options.onDraftCreated(result.itemId, result.draftName);
       }
+      
       callback(null, result);
     } 
 
     $.ajax({
       type: call.method,
-      url: makeUrl(options.corespringUrl + url, queryParams),
+      url: makeUrl(options.corespringUrl + call.url, queryParams),
+      data: options,
       success: onSuccess,
-      error: function(err){
-        callback({code: 112, msg: 'Error creating draft'});
-      }
-    });
+      error: callback.bind(this),
+      dataType: 'json'
+    }); 
   }
 
   function loadDraftItem(draftId, options) {
+
+    if(!draftId){
+      throw new Error('invalid draftId');
+    }
+    
     logger.log('load draft item');
 
     if(options.devEditor){
       throw new Error('dev editor launching isn\'t ready');
     }
     
-    var loadCall = options.devEditor ? loadMethodAndUrl('devEditor') : loadMethodAndUrl('editor');
-    if (!loadCall) {
-      return;
+    var call = options.devEditor ? loadMethodAndUrl('devEditor') : loadMethodAndUrl('editor');
+
+    if (!call) {
+      throw new Error('can\'t find call for editor');
     }
 
     var tab = options.selectedTab;
+    
     if ('profile' === tab) {
       options.hash = '/profile';
     }
+    
     if ('supporting-materials' === tab) {
       options.hash = '/supporting-materials/0';
     }
 
-    options.url = (options.corespringUrl + loadCall.url).replace(':draftId', draftId);
+    options.url = (options.corespringUrl + call.url)
+      .replace(':draftId', draftId);
+
     options.queryParams = require('query-params');
 
     var instance = new InstanceDef(element, options, errorCallback, logger);
@@ -130,31 +125,34 @@ function EditorDefinition(element, options, errorCallback) {
         isReady = true;
         instance.send('initialise', options);
         if(options.onDraftLoaded){
-          options.onDraftLoaded();
+          options.onDraftLoaded(options.itemId, options.draftName);
         }
       }
     });
   }
 
+  function DraftId(itemId,name){
+    this.toString = function(){
+      return itemId + '~' + name;
+    };
+  }
 
   function init(){
     if (hasLauncherErrors()) {
       return;
     }
 
+    options.draftName = options.draftName || msgr.utils.getUid(); //jshint ignore:line
+
     if(options.itemId){
-      createDraft(options.itemId, function(err, result){
-        options.draftId = result.id;
-        loadDraftItem(result.id, options);
-      });
-    } else if(options.draftId){
-      loadDraftItem(options.draftId, options);
+      var draftId = new DraftId(options.itemId, options.draftName);
+      loadDraftItem(draftId.toString(), options);
     } else {
-      createItem(options, function(err, result){
-        createDraft(result.id, function(err, result){
-          options.draftId = result.id;
-          loadDraftItem(result.id, options);
-        });
+      createItemAndDraft(function(err, result){
+        options.itemId = result.itemId;
+        options.draftName = result.draftName;
+        var draftId = new DraftId(options.itemId, options.draftName);
+        loadDraftItem(draftId.toString(), options);
       });
     }
   }
@@ -162,14 +160,16 @@ function EditorDefinition(element, options, errorCallback) {
   /** Public functions */
   this.commitDraft = function(force, callback){
     var call = loadMethodAndUrl('commitDraft');
-    var url = call.url.replace(':draftId', options.draftId);
+    var url = call.url
+      .replace(':draftId', options.draftId)
+      .replace(':itemId', options.itemId);
+
     var method = call.method;
 
     function onSuccess(result){
       if(callback){
         callback(null);
       }
-
     }
 
     function onError(err){

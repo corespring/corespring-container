@@ -61,8 +61,7 @@ trait ItemDraftHooks extends HasContext with LoadHook{
   def saveComponents(draftId: String, json: JsValue)(implicit h: RequestHeader): R[JsValue]
   def saveXhtml(draftId: String, xhtml: String)(implicit h: RequestHeader): R[JsValue]
   def saveSummaryFeedback(draftId: String, feedback: String)(implicit h: RequestHeader): R[JsValue]
-
-  def create(itemId: String)(implicit h: RequestHeader): R[String]
+  def createItemAndDraft()(implicit h:RequestHeader) : R[(String,String)]
   def commit(draftId: String, force: Boolean)(implicit h: RequestHeader): R[JsValue]
   def delete(draftId: String)(implicit h: RequestHeader): R[JsValue]
 }

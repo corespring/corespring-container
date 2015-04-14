@@ -72,17 +72,20 @@ trait PlayerLauncher extends Controller {
     hooks.editorJs.map { implicit js =>
 
       val rootUrl = playerConfig.rootUrl.getOrElse(BaseUrl(request))
-      val create = org.corespring.container.client.controllers.resources.routes.Item.create()
-      val createDraft = org.corespring.container.client.controllers.resources.routes.ItemDraft.create(":itemId")
-      val commitDraft = org.corespring.container.client.controllers.resources.routes.ItemDraft.commit(":draftId")
+
+      //val create = org.corespring.container.client.controllers.resources.routes.Item.create()
+
+      import org.corespring.container.client.controllers.resources.routes.ItemDraft
+
+      val commitDraft = ItemDraft.commit(":draftId")
+      val createItemAndDraft = ItemDraft.createItemAndDraft()
 
       val defaultOptions: JsValue = Json.obj(
         "corespringUrl" -> rootUrl,
         "paths" -> Json.obj(
           "editor" -> editor,
           "devEditor" -> devEditor,
-          "createItem" -> create,
-          "createDraft" -> createDraft,
+          "createItemAndDraft" -> createItemAndDraft,
           "commitDraft" -> commitDraft))
 
       val bootstrap = "org.corespring.players.ItemEditor = corespring.require('editor');"

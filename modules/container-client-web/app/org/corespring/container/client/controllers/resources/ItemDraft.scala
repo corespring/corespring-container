@@ -29,6 +29,17 @@ trait ItemDraft extends Controller {
 
   implicit def ec: ExecutionContext
 
+  def createItemAndDraft = Action.async{
+    implicit request =>
+      hooks.createItemAndDraft.map{ either =>
+        either match {
+          case Left(sm) => sm
+          case Right((itemId,draftName)) => Ok(Json.obj("itemId" -> itemId, "draftName" -> draftName))
+        }
+      }
+  }
+
+
   /**
    * A list of all the component types in the container
    * @return
@@ -37,7 +48,7 @@ trait ItemDraft extends Controller {
 
   def hooks: ItemDraftHooks
 
-  def create(itemId: String) = Action.async {
+  /*def create(itemId: String) = Action.async {
     implicit request =>
       hooks.create(itemId).map {
         either =>
@@ -46,7 +57,7 @@ trait ItemDraft extends Controller {
             case Right(id) => Ok(Json.obj("id" -> id))
           }
       }
-  }
+  }*/
 
   def load(draftId: String) = Action.async {
     implicit request =>

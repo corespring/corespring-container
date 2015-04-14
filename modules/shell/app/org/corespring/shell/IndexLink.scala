@@ -1,6 +1,6 @@
 package org.corespring.shell
 
-case class DraftLink(edit:String,delete:String)
+case class DraftLink(name:String, edit:String,delete:String)
 case class IndexLink(title: String,
                       createSession: String,
                       edit: String,

@@ -7,6 +7,7 @@ import org.corespring.mongo.json.services.MongoService
 import org.corespring.play.utils.{ CallBlockOnHeaderFilter, ControllerInstanceResolver }
 import org.corespring.shell.controllers.{Launchers, Main}
 import org.corespring.shell.filters.AccessControlFilter
+import org.corespring.shell.services.ItemDraftService
 import play.api.mvc.{ RequestHeader, WithFilters, Controller }
 import org.corespring.container.logging.ContainerLogger
 import play.api.{ Mode, GlobalSettings, Play }
@@ -33,7 +34,7 @@ object Global extends WithFilters(AccessControlFilter, CallBlockOnHeaderFilter) 
   private lazy val containerClient = new ContainerClientImplementation(
     new MongoService(db("items")),
     new MongoService(db("sessions")),
-    new MongoService(db("itemDrafts")),
+    new ItemDraftService(db("itemDrafts")),
     componentLoader.all,
     Play.current.configuration)
 
@@ -43,7 +44,7 @@ object Global extends WithFilters(AccessControlFilter, CallBlockOnHeaderFilter) 
     override def itemHooks: ItemHooks = containerClient.itemHooks
     override def sessionService: MongoService = new MongoService(db("sessions"))
     override def items: MongoCollection = db("items")
-    override def itemDrafts: MongoCollection = db("itemDrafts")
+    override def itemDrafts  = new ItemDraftService(db("itemDrafts"))
   }
 
   override def onStart(app: play.api.Application): Unit = {

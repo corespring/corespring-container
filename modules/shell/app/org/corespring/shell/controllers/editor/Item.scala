@@ -5,6 +5,7 @@ import org.bson.types.ObjectId
 import org.corespring.container.client.hooks.Hooks.{R, StatusMessage}
 import org.corespring.container.client.hooks.{ ItemDraftHooks => ContainerItemDraftHooks, ItemHooks => ContainerItemHooks }
 import org.corespring.mongo.json.services.MongoService
+import org.corespring.shell.services.ItemDraftService
 import org.joda.time.DateTime
 import play.api.Logger
 import play.api.http.Status._
@@ -12,6 +13,7 @@ import play.api.libs.json._
 import play.api.mvc._
 
 import scala.concurrent.Future
+import scala.util.Random
 
 trait ItemHooks extends ContainerItemHooks {
   def itemService: MongoService
@@ -38,7 +40,7 @@ trait ItemHooks extends ContainerItemHooks {
 }
 
 trait ItemDraftAssets {
-  def copyItemToDraft(itemId: String, draftId: String)
+  def copyItemToDraft(itemId: String, draftName: String)
   def copyDraftToItem(draftId: String, itemId: String)
   def deleteDraft(draftId: String)
 }
@@ -52,7 +54,7 @@ trait ItemDraftHooks extends ContainerItemDraftHooks {
   import com.mongodb.casbah.commons.conversions.scala._
   RegisterJodaTimeConversionHelpers()
 
-  def draftItemService: MongoService
+  def draftItemService:ItemDraftService
 
   def itemService: MongoService
 
@@ -92,7 +94,7 @@ trait ItemDraftHooks extends ContainerItemDraftHooks {
     Future {
       draftItemService.load(draftId).map {
         Right(_)
-      }.getOrElse(Left(NOT_FOUND -> ""))
+      }.getOrElse(Left(NOT_FOUND -> s"draftId: $draftId"))
     }
   }
 
@@ -103,16 +105,6 @@ trait ItemDraftHooks extends ContainerItemDraftHooks {
     itemService.collection.update(builder.result, $set("dateModified" -> DateTime.now), false, false)
   }
 
-  override def create(itemId: String)(implicit h: RequestHeader): R[String] = Future {
-    {
-      addDateModified(itemId)
-      for {
-        item <- itemService.load(itemId)
-        draftId <- draftItemService.create(Json.obj("item" -> item))
-        _ <- Some(assets.copyItemToDraft(itemId, draftId.toString))
-      } yield Right(draftId.toString)
-    }.getOrElse(Left(NOT_FOUND -> s"Can't find item by id: $itemId"))
-  }
 
   override def delete(draftId: String)(implicit h: RequestHeader): R[JsValue] = Future {
     draftItemService.delete(draftId)
@@ -157,5 +149,23 @@ trait ItemDraftHooks extends ContainerItemDraftHooks {
       Left((NOT_FOUND, s"Can't find draft by id: $draftId"))
     }
   }
+
+
+
+  override def createItemAndDraft()(implicit h: RequestHeader): R[(String, String)] = Future{
+     val out = for {
+       item <- Some(Json.obj("dateModified" -> DateTime.now, "xhtml" -> "", "components" -> Json.obj()))
+       itemId <- itemService.create(item)
+       tuple <- draftItemService.createDraft(itemId, None, item)
+       draftName <- Some(tuple._2)
+       _ <- Some(assets.copyItemToDraft(itemId.toString, draftName))
+     } yield (itemId.toString, draftName)
+
+     out match {
+       case None => Left(BAD_REQUEST,"Error creating item and draft")
+       case Some(tuple) => Right(tuple)
+     }
+  }
+
 }
 

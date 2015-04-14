@@ -19,6 +19,7 @@ import org.corespring.shell.controllers.editor.actions.{ EditorHooks => ShellEdi
 import org.corespring.shell.controllers.editor.{ ItemDraftHooks => ShellItemDraftHooks, ItemHooks => ShellItemHooks, ItemDraftAssets }
 import org.corespring.shell.controllers.player.actions.{ PlayerHooks => ShellPlayerHooks }
 import org.corespring.shell.controllers.player.{ SessionHooks => ShellSessionHooks }
+import org.corespring.shell.services.ItemDraftService
 import play.api.libs.json.JsObject
 import play.api.mvc._
 import play.api.{ Configuration, Mode, Play }
@@ -28,7 +29,7 @@ import scala.concurrent.{ ExecutionContext, Future }
 class ContainerClientImplementation(
   val itemService: MongoService,
   val sessionService: MongoService,
-  val draftItemService: MongoService,
+  val draftItemService: ItemDraftService,
   componentsIn: => Seq[Component],
   val configuration: Configuration) extends DefaultIntegration {
 
@@ -91,7 +92,7 @@ class ContainerClientImplementation(
 
     import AssetType._
 
-    private def mkPath(t: AssetType, rest: String*) = (t.folderName +: rest).mkString("/")
+    private def mkPath(t: AssetType, rest: String*) = (t.folderName +: rest).mkString("/").replace("~", "/")
 
     override def load(t: AssetType, id: String, path: String)(implicit h: RequestHeader): SimpleResult =
       playS3.download(s3.bucket, mkPath(t, id, path), Some(h.headers))
@@ -114,16 +115,16 @@ class ContainerClientImplementation(
         f.map { tuple => UploadResult(tuple._1.getKey) }
       }
     }
-    override def copyItemToDraft(itemId: String, draftId: String): Unit = {
-      assetUtils.copyDir(mkPath(AssetType.Item, itemId), mkPath(AssetType.Draft, draftId))
+    override def copyItemToDraft(itemId: String, draftName: String): Unit = {
+      assetUtils.copyDir(mkPath(AssetType.Item, itemId), mkPath(AssetType.Draft, itemId, draftName))
     }
 
     override def deleteDraft(draftId: String): Unit = {
       assetUtils.deleteDir(mkPath(AssetType.Draft, draftId))
     }
 
-    override def copyDraftToItem(draftId: String, itemId: String): Unit = {
-      assetUtils.copyDir(mkPath(AssetType.Draft, draftId), mkPath(AssetType.Item, itemId))
+    override def copyDraftToItem(draftName: String, itemId: String): Unit = {
+      assetUtils.copyDir(mkPath(AssetType.Draft, itemId, draftName), mkPath(AssetType.Item, itemId))
     }
 
   }
@@ -173,9 +174,11 @@ class ContainerClientImplementation(
   }
 
   override def editorHooks: EditorHooks = new ShellEditorHooks {
-    override def draftItemService: MongoService = ContainerClientImplementation.this.draftItemService
+    override def draftItemService = ContainerClientImplementation.this.draftItemService
 
     override def assets: Assets = ContainerClientImplementation.this.assets
+
+    override def itemService: MongoService = ContainerClientImplementation.this.itemService
   }
 
   override def catalogHooks: CatalogHooks = new ShellCatalogHooks {
@@ -194,7 +197,7 @@ class ContainerClientImplementation(
   override def itemDraftHooks: ItemDraftHooks = new ShellItemDraftHooks {
     override def itemService: MongoService = ContainerClientImplementation.this.itemService
 
-    override def draftItemService: MongoService = ContainerClientImplementation.this.draftItemService
+    override def draftItemService  = ContainerClientImplementation.this.draftItemService
 
     override def assets: ItemDraftAssets = ContainerClientImplementation.this.assets
   }

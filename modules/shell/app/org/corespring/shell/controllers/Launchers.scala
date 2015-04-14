@@ -17,6 +17,11 @@ trait Launchers extends Controller{
   def editorFromDraft(draftId:String) = Action{ request =>
     val url = org.corespring.container.client.controllers.routes.PlayerLauncher.editorJs().url
     val devEditor = request.getQueryString("devEditor").exists(_ == "true")
-    Ok(load(url, Json.obj("draftId" -> draftId, "devEditor" -> devEditor)))
+
+    val (itemId, draftName) = {
+      val Array(itemId, draftName) = draftId.split("~")
+      (itemId, draftName)
+    }
+    Ok(load(url, Json.obj("draftName" -> draftName, "itemId" -> itemId, "devEditor" -> devEditor)))
   }
 }

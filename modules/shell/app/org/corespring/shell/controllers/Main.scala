@@ -7,6 +7,7 @@ import org.bson.types.ObjectId
 import org.corespring.container.client.hooks.ItemHooks
 import org.corespring.container.logging.ContainerLogger
 import org.corespring.mongo.json.services.MongoService
+import org.corespring.shell.services.ItemDraftService
 import org.corespring.shell.{DraftLink, IndexLink, SessionKeys}
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc._
@@ -20,7 +21,7 @@ trait Main
 
   def items: MongoCollection
 
-  def itemDrafts:MongoCollection
+  def itemDrafts: ItemDraftService
 
   def sessionService: MongoService
 
@@ -48,10 +49,13 @@ trait Main
 
           import org.corespring.shell.controllers.routes.Launchers
 
-          val draftUrls = itemDrafts.find(MongoDBObject("item._id" -> itemId)).map{ draft =>
-            val oid = draft.get("_id").asInstanceOf[ObjectId]
-            val draftUrl = Launchers.editorFromDraft(oid.toString).url
-            DraftLink(draftUrl,routes.Main.deleteDraft(oid.toString).url)
+          val draftUrls = itemDrafts.collection.find(MongoDBObject("_id.itemId" -> itemId)).map{ draft =>
+            val id = draft.get("_id").asInstanceOf[DBObject]
+            val itemId = id.get("itemId").asInstanceOf[ObjectId]
+            val draftName = id.get("name").asInstanceOf[String]
+            val draftId = s"$itemId~$draftName"
+            val editDraftUrl = Launchers.editorFromDraft(draftId).url
+            DraftLink(draftName, editDraftUrl, routes.Main.deleteDraft(draftId).url)
           }.toSeq
 
           import org.corespring.container.client.controllers.apps.{routes => appRoutes}
@@ -91,7 +95,7 @@ trait Main
 
   def deleteDraft(draftId: String) = Action {
     request =>
-      itemDrafts.remove(MongoDBObject("_id" -> new ObjectId(draftId)))
+      itemDrafts.delete(draftId)
       Redirect("/")
   }
 

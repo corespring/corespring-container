@@ -1,12 +1,17 @@
 package org.corespring.mongo.json.services
 
+import com.mongodb.casbah.Imports._
 import com.mongodb.{ MongoException, DBObject }
 import com.mongodb.casbah.{ WriteConcern, MongoCollection }
 import com.mongodb.casbah.commons.MongoDBObject
 import com.mongodb.util.{ JSON => MongoJson }
 import org.bson.types.ObjectId
-import play.api.libs.json.{ Json => PlayJson, JsUndefined, JsArray, JsObject, JsValue }
+import org.joda.time.DateTime
+import play.api.http.Status._
+import play.api.libs.json.{Json => PlayJson, _}
 import org.corespring.container.logging.ContainerLogger
+
+import scala.util.Random
 
 object MongoServiceException {
 
@@ -19,6 +24,7 @@ object MongoServiceException {
 }
 
 case class MongoServiceException(msg: String) extends RuntimeException(msg)
+
 
 class MongoService(val collection: MongoCollection) {
 
@@ -37,10 +43,10 @@ class MongoService(val collection: MongoCollection) {
     }
   }
 
-  def load(id: String): Option[JsValue] = withOid(id) {
-    oid =>
+  def load(id: String): Option[JsValue] = withQuery(id) {
+    q =>
       logger.debug(s"[load]: $id")
-      val maybeDbo: Option[DBObject] = collection.findOneByID(oid)
+      val maybeDbo: Option[DBObject] = collection.findOne(q)
       maybeDbo.map {
         dbo =>
           val s = MongoJson.serialize(dbo)
@@ -77,16 +83,14 @@ class MongoService(val collection: MongoCollection) {
     }
   }
 
-  def delete(id: String): Unit = {
-    collection.findAndRemove(MongoDBObject("_id" -> new ObjectId(id)))
+  def delete(id: String): Unit = withQuery(id){ q =>
+    collection.findAndRemove(q).map(toJson)
   }
 
-  def fineGrainedSave(id: String, data: JsValue): Option[JsValue] = withOid(id) {
-    oid =>
+  def fineGrainedSave(id: String, data: JsValue): Option[JsValue] = withQuery(id) {
+    q =>
       logger.debug(s"[save]: $id")
       logger.trace(s"[save]: ${PlayJson.stringify(data)}")
-
-      val q = MongoDBObject("_id" -> new ObjectId(id))
 
       val setDbo = toDbo(data)
       setDbo.removeField("_id")
@@ -105,12 +109,10 @@ class MongoService(val collection: MongoCollection) {
   def toDbo(json: JsValue): DBObject = MongoJson.parse(PlayJson.stringify(json)).asInstanceOf[DBObject]
   def toJson(dbo: DBObject) = PlayJson.parse(MongoJson.serialize(dbo))
 
-  def save(id: String, data: JsValue): Option[JsValue] = withOid(id) {
-    oid =>
+  def save(id: String, data: JsValue): Option[JsValue] = withQuery(id) {
+    q =>
       logger.debug(s"[save]: $id")
       logger.trace(s"[save]: ${PlayJson.stringify(data)}")
-
-      val q = MongoDBObject("_id" -> new ObjectId(id))
 
       val setDbo = toDbo(data)
       setDbo.removeField("_id")
@@ -127,10 +129,12 @@ class MongoService(val collection: MongoCollection) {
       }
   }
 
-  private def withOid(id: String)(block: ObjectId => Option[JsValue]): Option[JsValue] = if (ObjectId.isValid(id)) {
-    val oid = new ObjectId(id)
-    block(oid)
-  } else None
+  protected def withQuery(id: String)(block: DBObject => Option[JsValue]): Option[JsValue] = {
+    if (ObjectId.isValid(id)) {
+      val oid = new ObjectId(id)
+      block(MongoDBObject("_id" -> oid))
+    } else None
+  }
 
 }
 

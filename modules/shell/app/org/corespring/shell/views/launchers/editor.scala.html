@@ -8,6 +8,21 @@
      document.addEventListener('DOMContentLoaded', function(){
        var holder = document.querySelector('.holder');
        var opts = @{Html(play.api.libs.json.Json.stringify(opts))};
+
+       opts.onDraftCreated = function(){
+         console.log('onDraftCreated', arguments);
+       }
+
+       opts.onDraftLoaded = function(itemId, draftName){
+         console.log('onDraftLoaded: itemId', itemId);
+         console.log('onDraftLoaded: draftName', draftName);
+       }
+
+       opts.onItemCreated = function(){
+         console.log('onItemCreated', arguments);
+       }
+       console.log('opts: ', opts);
+
        var editor = new org.corespring.players.ItemEditor(holder, opts, function(err){
           console.warn(err);
        });
