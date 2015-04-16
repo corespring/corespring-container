@@ -107,7 +107,7 @@ class ContainerClientImplementation(
     }
 
     override def upload(t: AssetType, id: String, path: String)(predicate: (RequestHeader) => Option[SimpleResult]): BodyParser[Future[UploadResult]] = {
-      playS3.s3ObjectAndData[Unit](s3.bucket, mkPath(t, id, path))((rh) => {
+      playS3.s3ObjectAndData[Unit](s3.bucket, _ => mkPath(t, id, path))((rh) => {
         predicate(rh).map { err =>
           Left(err)
         }.getOrElse(Right(Unit))
@@ -197,7 +197,7 @@ class ContainerClientImplementation(
   override def itemDraftHooks: ItemDraftHooks = new ShellItemDraftHooks {
     override def itemService: MongoService = ContainerClientImplementation.this.itemService
 
-    override def draftItemService  = ContainerClientImplementation.this.draftItemService
+    override def draftItemService = ContainerClientImplementation.this.draftItemService
 
     override def assets: ItemDraftAssets = ContainerClientImplementation.this.assets
   }
