@@ -22,10 +22,16 @@ angular.module('corespring.wiggi-wiz-features.cs-image').directive('imageHolder'
 
     function postLink($scope, $element) {
       $scope.delete = function(ev) {
+        removeTooltip();
         $scope.deleteNode($element, ImageFeature);
         ev.stopPropagation();
         ev.preventDefault();
       };
+
+      function removeTooltip(){
+        $scope.$broadcast('$destroy');
+      }
+
     }
 
     function compile($element, $attrs) {
