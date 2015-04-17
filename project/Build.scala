@@ -225,6 +225,8 @@ object Build extends sbt.Build {
     .settings(
       (resolvers in ThisBuild) ++= Resolvers.all,
       sbt.Keys.fork in Test := false,
+      //lock java and javac to 1.7
+      (javacOptions in Compile) ++= Seq("-source", "1.7", "-target", "1.7"),
       // Start grunt on play run
       playOnStarted <+= baseDirectory {
         base =>
