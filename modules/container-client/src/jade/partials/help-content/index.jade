@@ -31,6 +31,8 @@
       li(role='presentation')
         a(href='#multiple-choice', data-toggle='tab') Multiple Choice
       li(role='presentation')
+        a(href='#choice-matrix', data-toggle='tab') Choice Matrix
+      li(role='presentation')
         a(href='#short-answer', data-toggle='tab') Short Answer - Enter Text
       li(role='presentation')
         a(href='#fill-blank', data-toggle='tab') Short Answer - Drag & Drop Answer
@@ -105,6 +107,8 @@
         include interactions/interactions-introduction
       #multiple-choice.tab-pane(role='tabpanel')
         include interactions/multiple-choice
+      #choice-matrix.tab-pane(role='tabpanel')
+        include interactions/choice-matrix
       #short-answer.tab-pane(role='tabpanel')
         include interactions/short-answer
       #fill-blank.tab-pane(role='tabpanel')
