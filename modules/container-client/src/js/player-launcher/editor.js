@@ -47,7 +47,7 @@ function EditorDefinition(element, options, errorCallback) {
     var call = loadMethodAndUrl('createItemAndDraft');
     
     if (!call) {
-      throw new Error('can\'t find call named: createItemAndDraft');
+      return;
     }
 
     logger.log('create item and draft');
@@ -161,8 +161,7 @@ function EditorDefinition(element, options, errorCallback) {
   this.commitDraft = function(force, callback){
     var call = loadMethodAndUrl('commitDraft');
     var url = call.url
-      .replace(':draftId', options.draftId)
-      .replace(':itemId', options.itemId);
+      .replace(':draftId', new DraftId(options.itemId, options.draftName).toString());
 
     var method = call.method;
 

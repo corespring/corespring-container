@@ -1,16 +1,15 @@
 package org.corespring.container.client.controllers.resources
 
+import org.corespring.container.client.controllers.helpers.XhtmlProcessor
 import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.client.hooks._
-import org.corespring.container.client.controllers.helpers.{ PlayerXhtml, XhtmlProcessor }
-import org.corespring.container.components.model.Component
 import org.corespring.container.logging.ContainerLogger
-import play.api.libs.json.{ JsString, JsObject, JsValue, Json }
+import play.api.libs.json.{ JsValue, Json }
 import play.api.mvc._
-import scalaz.Scalaz._
-import scalaz._
 
 import scala.concurrent.{ ExecutionContext, Future }
+import scalaz.Scalaz._
+import scalaz._
 
 object ItemDraft {
   object Errors {
@@ -29,16 +28,15 @@ trait ItemDraft extends Controller {
 
   implicit def ec: ExecutionContext
 
-  def createItemAndDraft = Action.async{
+  def createItemAndDraft = Action.async {
     implicit request =>
-      hooks.createItemAndDraft.map{ either =>
+      hooks.createItemAndDraft.map { either =>
         either match {
           case Left(sm) => sm
-          case Right((itemId,draftName)) => Ok(Json.obj("itemId" -> itemId, "draftName" -> draftName))
+          case Right((itemId, draftName)) => Ok(Json.obj("itemId" -> itemId, "draftName" -> draftName))
         }
       }
   }
-
 
   /**
    * A list of all the component types in the container
@@ -47,17 +45,6 @@ trait ItemDraft extends Controller {
   protected def componentTypes: Seq[String]
 
   def hooks: ItemDraftHooks
-
-  /*def create(itemId: String) = Action.async {
-    implicit request =>
-      hooks.create(itemId).map {
-        either =>
-          either match {
-            case Left(sm) => sm
-            case Right(id) => Ok(Json.obj("id" -> id))
-          }
-      }
-  }*/
 
   def load(draftId: String) = Action.async {
     implicit request =>
@@ -89,6 +76,10 @@ trait ItemDraft extends Controller {
 
     def saveFn(subset: String, json: JsValue): Option[SaveSig] = Some(subset match {
       case "supporting-materials" => hooks.saveSupportingMaterials(_: String, json)
+      case "custom-scoring" => (json \ "customScoring")
+        .asOpt[String]
+        .map(cs => hooks.saveCustomScoring(_: String, cs))
+        .getOrElse(missingProperty("customScoring"))
       case "xhtml" => (json \ "xhtml")
         .asOpt[String]
         .map { s =>

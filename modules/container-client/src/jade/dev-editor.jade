@@ -9,10 +9,12 @@ block content
       .pull-right
         button.btn.btn-sm.btn-default(ng-click="save()") Save
     .bottom-row
-      
       .xhtml-pane(ui-ace,
           ng-model="xhtml",
           ui-ace="{mode: 'html', useWrapMode : true, onLoad: aceLoaded, onChange: aceChanged }")
+      .custom-js-pane(ui-ace,
+          ng-model="customScoringJs",
+          ui-ace="{mode: 'javascript', useWrapMode : true }")
       .json-pane(ui-ace
           ng-model="json",
           ui-ace="{mode: 'json', useWrapMode : true, onLoad: aceLoaded, onChange: aceJsonChanged }")

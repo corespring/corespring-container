@@ -1,7 +1,7 @@
 package org.corespring.container.client.hooks
 
 import org.corespring.container.client.HasContext
-import org.corespring.container.client.hooks.Hooks.{R, StatusMessage}
+import org.corespring.container.client.hooks.Hooks.{ R, StatusMessage }
 import play.api.libs.json.{ JsArray, JsValue }
 import play.api.mvc._
 
@@ -54,14 +54,14 @@ trait ItemHooks extends HasContext {
 
 trait EditorHooks extends LoadHook with AssetHooks
 
-trait ItemDraftHooks extends HasContext with LoadHook{
-
+trait ItemDraftHooks extends HasContext with LoadHook {
   def saveProfile(draftId: String, json: JsValue)(implicit h: RequestHeader): R[JsValue]
+  def saveCustomScoring(draftId: String, customScoring: String)(implicit header: RequestHeader): R[JsValue]
   def saveSupportingMaterials(draftId: String, json: JsValue)(implicit h: RequestHeader): R[JsValue]
   def saveComponents(draftId: String, json: JsValue)(implicit h: RequestHeader): R[JsValue]
   def saveXhtml(draftId: String, xhtml: String)(implicit h: RequestHeader): R[JsValue]
   def saveSummaryFeedback(draftId: String, feedback: String)(implicit h: RequestHeader): R[JsValue]
-  def createItemAndDraft()(implicit h:RequestHeader) : R[(String,String)]
+  def createItemAndDraft()(implicit h: RequestHeader): R[(String, String)]
   def commit(draftId: String, force: Boolean)(implicit h: RequestHeader): R[JsValue]
   def delete(draftId: String)(implicit h: RequestHeader): R[JsValue]
 }

@@ -1,7 +1,5 @@
 package org.corespring.container.client.controllers
 
-import java.io.File
-
 import org.corespring.container.client.HasContext
 import org.corespring.container.client.hooks.UploadResult
 import play.api.mvc._
@@ -9,7 +7,6 @@ import play.api.mvc._
 import scala.concurrent.Future
 
 object AssetType extends Enumeration {
-
   type AssetType = Val
   protected case class Val(val folderName: String) extends super.Val
   implicit def valueToVal(x: Value) = x.asInstanceOf[Val]

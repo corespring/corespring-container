@@ -2,9 +2,10 @@ package org.corespring.shell.controllers.editor
 
 import com.mongodb.casbah.Imports._
 import org.bson.types.ObjectId
-import org.corespring.container.client.hooks.Hooks.{R, StatusMessage}
+import org.corespring.container.client.hooks.Hooks.{ R, StatusMessage }
 import org.corespring.container.client.hooks.{ ItemDraftHooks => ContainerItemDraftHooks, ItemHooks => ContainerItemHooks }
 import org.corespring.mongo.json.services.MongoService
+import org.corespring.shell.controllers.editor.actions.{ DraftId, ContainerDraftId }
 import org.corespring.shell.services.ItemDraftService
 import org.joda.time.DateTime
 import play.api.Logger
@@ -13,7 +14,6 @@ import play.api.libs.json._
 import play.api.mvc._
 
 import scala.concurrent.Future
-import scala.util.Random
 
 trait ItemHooks extends ContainerItemHooks {
   def itemService: MongoService
@@ -54,7 +54,7 @@ trait ItemDraftHooks extends ContainerItemDraftHooks {
   import com.mongodb.casbah.commons.conversions.scala._
   RegisterJodaTimeConversionHelpers()
 
-  def draftItemService:ItemDraftService
+  def draftItemService: ItemDraftService
 
   def itemService: MongoService
 
@@ -81,6 +81,10 @@ trait ItemDraftHooks extends ContainerItemDraftHooks {
   override def saveComponents(draftId: String, json: JsValue)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] =
     fineGrainedSave(draftId, Json.obj("item.components" -> json))
 
+  override def saveCustomScoring(draftId: String, customScoring: String)(implicit header: RequestHeader): R[JsValue] = {
+    fineGrainedSave(draftId, Json.obj("item.customScoring" -> customScoring))
+  }
+
   private def fineGrainedSave(draftId: String, json: JsValue)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] = {
     Future {
       draftItemService.fineGrainedSave(draftId, json).map {
@@ -105,16 +109,18 @@ trait ItemDraftHooks extends ContainerItemDraftHooks {
     itemService.collection.update(builder.result, $set("dateModified" -> DateTime.now), false, false)
   }
 
-
   override def delete(draftId: String)(implicit h: RequestHeader): R[JsValue] = Future {
     draftItemService.delete(draftId)
     assets.deleteDraft(draftId)
     Right(Json.obj("id" -> draftId))
   }
 
-  private def okToCommit(draftId: String): Boolean = {
+  private def okToCommit(draftIdRaw: String): Boolean = {
+
+    val draftId: ContainerDraftId = DraftId.fromString[ObjectId, ContainerDraftId](draftIdRaw, (itemId, name) => ContainerDraftId(new ObjectId(itemId), name))
+
     for {
-      draft <- draftItemService.collection.findOneByID(new ObjectId(draftId), MongoDBObject("item.dateModified" -> 1, "item._id" -> 1))
+      draft <- draftItemService.collection.findOneByID(MongoDBObject("_id" -> DraftId.dbo[ObjectId](draftId)), MongoDBObject("item.dateModified" -> 1, "item._id" -> 1))
       draftItem <- Some(draft.get("item").asInstanceOf[DBObject])
       draftDateModified <- Some(draftItem.get("dateModified").asInstanceOf[DateTime])
       itemId <- Some(draftItem.get("_id").asInstanceOf[ObjectId])
@@ -150,21 +156,19 @@ trait ItemDraftHooks extends ContainerItemDraftHooks {
     }
   }
 
+  override def createItemAndDraft()(implicit h: RequestHeader): R[(String, String)] = Future {
+    val out = for {
+      item <- Some(Json.obj("dateModified" -> DateTime.now, "xhtml" -> "", "components" -> Json.obj()))
+      itemId <- itemService.create(item)
+      tuple <- draftItemService.createDraft(itemId, None, item)
+      draftName <- Some(tuple._2)
+      _ <- Some(assets.copyItemToDraft(itemId.toString, draftName))
+    } yield (itemId.toString, draftName)
 
-
-  override def createItemAndDraft()(implicit h: RequestHeader): R[(String, String)] = Future{
-     val out = for {
-       item <- Some(Json.obj("dateModified" -> DateTime.now, "xhtml" -> "", "components" -> Json.obj()))
-       itemId <- itemService.create(item)
-       tuple <- draftItemService.createDraft(itemId, None, item)
-       draftName <- Some(tuple._2)
-       _ <- Some(assets.copyItemToDraft(itemId.toString, draftName))
-     } yield (itemId.toString, draftName)
-
-     out match {
-       case None => Left(BAD_REQUEST,"Error creating item and draft")
-       case Some(tuple) => Right(tuple)
-     }
+    out match {
+      case None => Left(BAD_REQUEST, "Error creating item and draft")
+      case Some(tuple) => Right(tuple)
+    }
   }
 
 }

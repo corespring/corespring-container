@@ -79,32 +79,6 @@ class ItemDraftTest extends Specification with Mockito {
       }
     }
 
-    "create" should {
-
-      class create(createResult: Either[(Int, String), String] = Right("???"))
-        extends Scope {
-        val draft = new BaseDraft {
-          val hooks: ItemDraftHooks = {
-            val m = mock[ItemDraftHooks] //.verbose
-            m.create(anyString)(any[RequestHeader]) returns Future(createResult)
-            m
-          }
-        }
-      }
-
-      "return error" in new create(createResult = Left(UNAUTHORIZED -> "Error")) {
-        val result = draft.create("itemId")(FakeRequest("", ""))
-        status(result) === UNAUTHORIZED
-        contentAsJson(result) === Json.obj("error" -> "Error")
-      }
-
-      "return id" in new create {
-        val result = draft.create("itemId")(FakeRequest("", ""))
-        status(result) === OK
-        contentAsJson(result) === Json.obj("id" -> "???")
-      }
-    }
-
     "commit" should {
 
       class commit(commitResult: Future[Either[StatusMessage, JsValue]] = Future(Right(Json.obj()))) extends Scope {

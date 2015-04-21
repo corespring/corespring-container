@@ -71,7 +71,9 @@
           addToEditorCallback(editor, addContent, component);
         },
         getMarkUp: function($node, $scope) {
-          return tag(componentType, {id: $node.attr('id')});
+          var attributes = {id: $node.attr('id')};
+          attributes[componentType] = '';
+          return tag('div', attributes);
         }
       };
     };

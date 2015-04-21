@@ -3,8 +3,8 @@ package org.corespring.container.client.controllers.resources
 import org.corespring.container.client.controllers.helpers.PlayerXhtml
 import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.client.hooks.ItemHooks
-import play.api.libs.json.{ JsString, JsObject, JsValue, Json }
-import play.api.mvc.{ Action, SimpleResult, Controller }
+import play.api.libs.json.{ JsObject, JsString, JsValue, Json }
+import play.api.mvc.{ Action, Controller, SimpleResult }
 
 import scala.concurrent.ExecutionContext
 
@@ -27,6 +27,10 @@ trait Item extends Controller {
 
   def hooks: ItemHooks
 
+  /**
+   * A list of all the component types in the container
+   * @return
+   */
   protected def componentTypes: Seq[String]
 
   implicit def ec: ExecutionContext

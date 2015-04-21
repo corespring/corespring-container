@@ -25,9 +25,9 @@ describe('editor launcher', function () {
       'default-options': {
         corespringUrl: 'http://base/',
         paths: {
-          create: mkCall('create'),
-          createDraft: mkCall('createDraft'),
           editor: mkCall('editor/:draftId'),
+          devEditor: mkCall('dev-editor/:draftId'),
+          createItemAndDraft: mkCall('createItemAndDraft'),
           commitDraft: mkCall('commitDraft')
         }
       },
@@ -40,6 +40,7 @@ describe('editor launcher', function () {
     return function(){
       var e = _.assign(env,obj);
       _.map(e, function(value, key){
+        console.log('adding', key, 'to mock modules');
         corespring.mock.modules[key] = value;
       });
       fn();
@@ -75,54 +76,65 @@ describe('editor launcher', function () {
         { 'default-options' : { paths: {}}}, 
         function() {
           var editor = new (corespring.require('editor'))('blah', {}, onError);
-          expect(onError).toHaveBeenCalledWith(errors.EXTERNAL_ERROR('create not part of options'));
+          expect(onError).toHaveBeenCalledWith(errors.EXTERNAL_ERROR('createItemAndDraft not part of options'));
       }));
 
     });
 
     describe('with no options', function(){
 
-      it('should create item', withRequire({}, 
+      it('should create the item and draft', withRequire({}, 
         function(){
 
           spyOn($, 'ajax');
 
           var opts = {
-            onItemCreated: jasmine.createSpy('onItemCreated')
+            onItemCreated: jasmine.createSpy('onItemCreated'),
+            onDraftCreated: jasmine.createSpy('onDraftCreated')
           };
 
           var editor = new (corespring.require('editor'))('blah', opts, onError);
           expect(onError).not.toHaveBeenCalled();
           var ajax = $.ajax.calls.mostRecent().args[0];
-          expect(ajax.type).toEqual('create');
-          expect(ajax.url).toEqual('http://base/create?a=a');
+          expect(ajax.type).toEqual('createItemAndDraft');
+          expect(ajax.url).toEqual('http://base/createItemAndDraft?a=a');
           expect(ajax.success).not.toBe(null);
           expect(ajax.error).not.toBe(null);
           expect(ajax.dataType).toEqual('json');
 
-          ajax.success({id: '1'});
-          expect(opts.onItemCreated).toHaveBeenCalledWith('1');
+          ajax.success({itemId: '1', draftName: 'name'});
+          expect(opts.onDraftCreated).toHaveBeenCalledWith('1', 'name');
       }));
 
     });
 
     describe('with itemId', function(){
-      it('should call create draft',  withRequire({}, function(){
-        spyOn($, 'ajax');
+
+      var mockInstance;
+
+      beforeEach(function(){
+        mockInstance = jasmine.createSpy('mockInstance').and.callFake(function(){
+          return {
+            on: function(){},
+            send: function(){}
+          };
+        });
+      });
+
+      it('should load the editor',  withRequire({
+        'instance' : mockInstance 
+      }, function(){
         var opts =  {
           itemId: 'itemId',
           onDraftCreated: jasmine.createSpy('onDraftCreated')
         };
 
         var editor = new (corespring.require('editor'))('blah', opts, onError);
-        var ajax = $.ajax.calls.mostRecent().args[0];
-        expect(ajax.url).toEqual('http://base/createDraft?a=a');
-        ajax.success({id: '2'});
-        expect(opts.onDraftCreated).toHaveBeenCalledWith('2');
+        expect(mockInstance).toHaveBeenCalled();
       }));
     });
 
-    describe('with draftId', function(){
+    describe('with draftName', function(){
 
       var readyHandler = null;
       var instance = jasmine.createSpy('instance').and.callFake(function(){

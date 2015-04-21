@@ -12,10 +12,11 @@ angular.module('corespring-dev-editor.controllers')
         ComponentData.setModel(item.components);
         $scope.xhtml = item.xhtml;
         $scope.json = JSON.stringify(item.components, undefined, 2);
+        $scope.customScoringJs = item.customScoring;
+        $scope.components = _.cloneDeep(item.components);
       };
 
       $scope.save = function() {
-
         if($scope.xhtml !== $scope.item.xhtml) {
           $scope.item.xhtml = $scope.xhtml;
           ItemService.saveXhtml($scope.item.xhtml, function(){
@@ -23,14 +24,20 @@ angular.module('corespring-dev-editor.controllers')
           });
         }
 
-        if(!_.isEqual($scope.item.components, $scope.components)) {
+        if(!_.isUndefined($scope.components) && !_.isEqual($scope.item.components, $scope.components)) {
           $scope.item.components  = $scope.components;
           ItemService.saveComponents($scope.item.components, function() {
             $log.info('components saved');
           });
         }
-      };
 
+        if($scope.item.customScoring !== $scope.customScoringJs) {
+          $scope.item.customScoring = $scope.customScoringJs;
+          ItemService.saveCustomScoring($scope.item.customScoring, function() {
+            $log.info('custom scoring saved');
+          });
+        }
+      };
 
       $scope.aceJsonChanged = function() {
         try {
