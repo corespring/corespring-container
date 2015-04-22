@@ -33,6 +33,8 @@ describe('DevEditorRoot', function() {
   beforeEach(module(function($provide) {
     $provide.value('ItemService', ItemService);
     $provide.value('ComponentData', ComponentData);
+    $provide.value('iFrameService', {isInIFrame: function(){return false;}});
+    $provide.value('Msgr', {});
     $provide.value('$log', $log);
   }));
 
