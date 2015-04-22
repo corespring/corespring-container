@@ -8,7 +8,9 @@ mock = ->
   """
   (function(){
 
-    console.log('%c coresping.mock created by prep-player-launcher.coffee', 'color: #cceeff; background-color: #440044;');
+    var color = 'color: #cceeff; background-color: #440044;';
+
+    console.log('%c coresping.mock created by prep-player-launcher.coffee', color);
     var orig = {
       require: corespring.require,
     }
@@ -19,12 +21,13 @@ mock = ->
       }
       this.modules = {};
     }
-    
+
     corespring.mock = new Mock()
 
     //Override require to check mock before the real require.
     corespring.require = function(name){
       if(corespring.mock.modules[name]){
+        console.log('%c returning mock:' + name, color );
         return corespring.mock.modules[name];
       } else {
         return orig.require(name);
@@ -35,7 +38,7 @@ mock = ->
 
 
 ###
-Depends on the corespring core.js 
+Depends on the corespring core.js
 ###
 template = (name, contents) ->
   """
@@ -50,7 +53,7 @@ module.exports = (grunt) ->
   For each js file in 'src', wrap it and concat all to the 'dest'.
   ###
   grunt.registerMultiTask 'prepPlayerLauncher', 'Wrap player js so that exports and require will work', ->
-  
+
       readAndWrap = (p) ->
         js = grunt.file.read(p, {encoding:  'utf-8'})
         name = path.basename(p, ".js")

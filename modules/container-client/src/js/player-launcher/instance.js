@@ -101,6 +101,9 @@ var Instance = function(element, options, errorCallback, log) {
     channel.remove();
   };
 
+  this.css = function(key, value){
+    $('#' + iframeUid).css(key, value);
+  };
 
   initialize.bind(this)(element, options);
 };

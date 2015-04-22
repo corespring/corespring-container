@@ -13,11 +13,14 @@ describe('editor launcher', function () {
     return {method: name, url: name};
   }
 
-  /** Note: we make use of corespring.mock in these specs:
+  /**
+   * Mock some of the dependencies loaded by 'require' by using corespring.mock.
+   * Call the callback and pass the configured env.
+   * Note: we make use of corespring.mock in these specs:
    *  console.log(corespring.mock);
    */
   function withRequire(obj, fn){
-    
+
     var env = {
       'query-params' : {
         a: 'a'
@@ -34,7 +37,7 @@ describe('editor launcher', function () {
       instance : function(){
         this.on = function(){};
       },
-      'launcher-errors' : new MockErrors([]) 
+      'launcher-errors' : new MockErrors([])
     };
 
     return function(){
@@ -43,7 +46,7 @@ describe('editor launcher', function () {
         console.log('adding', key, 'to mock modules');
         corespring.mock.modules[key] = value;
       });
-      fn();
+      fn(e);
     };
   }
 
@@ -57,15 +60,15 @@ describe('editor launcher', function () {
   describe('constructor', function(){
 
     var onError;
-    
+
     beforeEach(function(){
       onError = jasmine.createSpy('onError');
-    }); 
+    });
 
     describe('launcherErrors', function(){
 
-      it('calls the error handler if there are launcher errors', withRequire( 
-          { 'launcher-errors': new MockErrors(['error one']) }, 
+      it('calls the error handler if there are launcher errors', withRequire(
+          { 'launcher-errors': new MockErrors(['error one']) },
           function(){
             var editor = new (corespring.require('editor'))('blah', {}, onError);
             expect(onError).toHaveBeenCalledWith(errors.EXTERNAL_ERROR('error one'));
@@ -73,7 +76,7 @@ describe('editor launcher', function () {
 
 
       it('calls error handler if options does not contain paths object', withRequire(
-        { 'default-options' : { paths: {}}}, 
+        { 'default-options' : { paths: {}}},
         function() {
           var editor = new (corespring.require('editor'))('blah', {}, onError);
           expect(onError).toHaveBeenCalledWith(errors.EXTERNAL_ERROR('createItemAndDraft not part of options'));
@@ -83,7 +86,7 @@ describe('editor launcher', function () {
 
     describe('with no options', function(){
 
-      it('should create the item and draft', withRequire({}, 
+      it('should create the item and draft', withRequire({},
         function(){
 
           spyOn($, 'ajax');
@@ -110,34 +113,32 @@ describe('editor launcher', function () {
 
     describe('with itemId', function(){
 
-      var mockInstance;
-
-      beforeEach(function(){
-        mockInstance = jasmine.createSpy('mockInstance').and.callFake(function(){
-          return {
-            on: function(){},
-            send: function(){}
-          };
-        });
+      var instance = jasmine.createSpy('instance-one').and.callFake(function(){
+        return {
+          on: jasmine.createSpy('on').and.callFake(function(name, cb){
+          }),
+          send: jasmine.createSpy('send')
+        };
       });
 
-      it('should load the editor',  withRequire({
-        'instance' : mockInstance 
-      }, function(){
+      it('should load the editor with itemId and a generated draftName',  withRequire({ 'instance' : instance },
+       function(env){
         var opts =  {
           itemId: 'itemId',
           onDraftCreated: jasmine.createSpy('onDraftCreated')
         };
-
         var editor = new (corespring.require('editor'))('blah', opts, onError);
-        expect(mockInstance).toHaveBeenCalled();
+        expect(instance).toHaveBeenCalled();
+        var constructorArgs = instance.calls.mostRecent().args[1];
+        expect(constructorArgs.itemId).toEqual('itemId');
+        expect(constructorArgs.url.indexOf('http://base/editor/itemId~')).toEqual(0);
       }));
     });
 
     describe('with draftName', function(){
 
       var readyHandler = null;
-      var instance = jasmine.createSpy('instance').and.callFake(function(){
+      var instance = jasmine.createSpy('instance!!').and.callFake(function(){
         return {
           on: jasmine.createSpy('on').and.callFake(function(name, cb){
             if(name === 'ready'){
@@ -148,21 +149,18 @@ describe('editor launcher', function () {
         };
       });
 
-      it('should call load draft',  withRequire({
+      it('should load the editor with itemId~draftName',  withRequire({
         instance: instance
       }, function(){
-        spyOn($, 'ajax');
-        console.log(corespring.mock.modules);
         var opts = {
-          draftId: 'draftId',
+          itemId: 'itemId',
+          draftName: 'draftName',
           onDraftLoaded: jasmine.createSpy('onDraftLoaded')
         };
         var editor = new (corespring.require('editor'))('blah', opts, onError);
         expect(instance).toHaveBeenCalled();
         var constructorArgs = instance.calls.mostRecent().args[1];
-        expect(constructorArgs.url).toEqual('http://base/editor/draftId');
-
-        console.log('call readyHandler:', readyHandler);
+        expect(constructorArgs.url).toEqual('http://base/editor/itemId~draftName');
         readyHandler();
         expect(opts.onDraftLoaded).toHaveBeenCalled();
       }));
@@ -178,7 +176,7 @@ describe('editor launcher', function () {
       var callback = jasmine.createSpy('callback');
       editor.commitDraft(false, callback);
       expect(callback).toHaveBeenCalledWith({code: 111, msg: 'error!'});
-    })); 
+    }));
 
     it('calls commitDraft endpoint and returns success', withRequire({}, function(){
       var editor = new (corespring.require('editor'))('blah', {draftId: 'draftId'}, function(){});
@@ -188,7 +186,7 @@ describe('editor launcher', function () {
       var callback = jasmine.createSpy('callback');
       editor.commitDraft(false, callback);
       expect(callback).toHaveBeenCalledWith(null);
-    })); 
+    }));
 
   });
 });
