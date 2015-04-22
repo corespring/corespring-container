@@ -47,7 +47,7 @@ trait ItemDraftAssets {
 
 trait ItemDraftHooks extends ContainerItemDraftHooks {
 
-  val logger = Logger("ItemDraftHooks")
+  val logger = Logger(classOf[ItemDraftHooks])
 
   def assets: ItemDraftAssets
 
@@ -118,14 +118,25 @@ trait ItemDraftHooks extends ContainerItemDraftHooks {
   private def okToCommit(draftIdRaw: String): Boolean = {
 
     val draftId: ContainerDraftId = DraftId.fromString[ObjectId, ContainerDraftId](draftIdRaw, (itemId, name) => ContainerDraftId(new ObjectId(itemId), name))
+    logger.trace(s"okToCommit draftId=$draftId")
+    val query =  DraftId.dbo[ObjectId](draftId)
+    logger.trace(s"okToCommit query=$query")
+    val count =  draftItemService.collection.count(MongoDBObject("_id" -> query))
+    logger.trace(s"okToCommit count=$count")
 
     for {
-      draft <- draftItemService.collection.findOneByID(MongoDBObject("_id" -> DraftId.dbo[ObjectId](draftId)), MongoDBObject("item.dateModified" -> 1, "item._id" -> 1))
+      draft <- draftItemService.collection.findOneByID(query, MongoDBObject("item.dateModified" -> 1, "item._id" -> 1))
+      _ <- Some(logger.debug(s"draft=$draft"))
       draftItem <- Some(draft.get("item").asInstanceOf[DBObject])
+      _ <- Some(logger.debug(s"draftItem=$draftItem"))
       draftDateModified <- Some(draftItem.get("dateModified").asInstanceOf[DateTime])
+      _ <- Some(logger.debug(s"draftDateModified=$draftDateModified"))
       itemId <- Some(draftItem.get("_id").asInstanceOf[ObjectId])
+      _ <- Some(logger.debug(s"itemId=$itemId"))
       item <- itemService.collection.findOneByID(itemId, MongoDBObject("dateModified" -> 1))
+      _ <- Some(logger.debug(s"item=$item"))
       itemDateModified <- Some(item.get("dateModified").asInstanceOf[DateTime])
+      _ <- Some(logger.debug(s"itemDateModified=$itemDateModified"))
     } yield {
       logger.trace(s"draft date modified: $draftDateModified")
       logger.trace(s"item date modified: $itemDateModified")
@@ -137,6 +148,7 @@ trait ItemDraftHooks extends ContainerItemDraftHooks {
   }.getOrElse(true)
 
   override def commit(draftId: String, force: Boolean)(implicit h: RequestHeader): R[JsValue] = Future {
+    logger.debug(s"commit draftId=$draftId, force=$force")
     draftItemService.load(draftId).map { draft =>
       val item = (draft \ "item").as[JsObject]
       val itemId = (item \ "_id" \ "$oid").as[String]
@@ -148,7 +160,7 @@ trait ItemDraftHooks extends ContainerItemDraftHooks {
         delete(draftId)
         Right(Json.obj("itemId" -> itemId, "draftId" -> draftId))
       } else {
-        Left(BAD_REQUEST, "There has been a new commit since this draft was created")
+        Left(CONFLICT, "There has been a new commit since this draft was created")
       }
 
     }.getOrElse {
