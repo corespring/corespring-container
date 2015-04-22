@@ -1,20 +1,32 @@
 package org.corespring.container.client.hooks
 
 import org.corespring.container.client.HasContext
-import org.corespring.container.client.hooks.Hooks.StatusMessage
-import play.api.libs.json.{ JsString, JsArray, JsValue }
+import org.corespring.container.client.hooks.Hooks.{ R, StatusMessage }
+import play.api.libs.json.{ JsArray, JsValue }
 import play.api.mvc._
 
 import scala.concurrent.Future
 
 object Hooks {
   type StatusMessage = (Int, String)
+  type R[A] = Future[Either[StatusMessage, A]]
+}
+
+trait GetAssetHook extends {
+  def loadFile(id: String, path: String)(request: Request[AnyContent]): SimpleResult
+}
+
+case class UploadResult(path: String)
+
+trait AssetHooks extends GetAssetHook {
+  def deleteFile(id: String, file: String)(implicit header: RequestHeader): Future[Option[StatusMessage]]
+  def upload(id: String, file: String)(predicate: RequestHeader => Option[SimpleResult]): BodyParser[Future[UploadResult]]
 }
 
 /**
  * Client side calls - each will call for config, services and components
  */
-trait ClientHooks extends HasContext {
+trait LoadHook extends HasContext {
 
   /**
    * load the item with the id into the editor, aka it will be read+write access.
@@ -23,33 +35,35 @@ trait ClientHooks extends HasContext {
    * @param header
    * @return
    */
-  def loadItem(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]]
+  def load(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]]
 }
 
-trait PlayerHooks extends ClientHooks {
+trait PlayerHooks extends LoadHook with GetAssetHook {
   def createSessionForItem(itemId: String)(implicit header: RequestHeader): Future[Either[StatusMessage, String]]
   def loadSessionAndItem(sessionId: String)(implicit header: RequestHeader): Future[Either[StatusMessage, (JsValue, JsValue)]]
 }
 
-trait EditorHooks extends ClientHooks {
-}
-
-trait CatalogHooks extends ClientHooks {
+trait CatalogHooks extends LoadHook with GetAssetHook {
   def showCatalog(itemId: String)(implicit header: RequestHeader): Future[Option[StatusMessage]]
 }
 
 trait ItemHooks extends HasContext {
-
   def load(itemId: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]]
-
-  def saveProfile(itemId: String, json: JsValue)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]]
-  def saveCustomScoring(itemId: String, customScoring: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]]
-  def saveSupportingMaterials(itemId: String, json: JsValue)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]]
-  def saveComponents(itemId: String, json: JsValue)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]]
-  def saveXhtml(itemId: String, xhtml: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]]
-  def saveSummaryFeedback(itemId: String, feedback: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]]
-
   def create(json: Option[JsValue])(implicit header: RequestHeader): Future[Either[StatusMessage, String]]
+}
+
+trait EditorHooks extends LoadHook with AssetHooks
+
+trait ItemDraftHooks extends HasContext with LoadHook {
+  def saveProfile(draftId: String, json: JsValue)(implicit h: RequestHeader): R[JsValue]
+  def saveCustomScoring(draftId: String, customScoring: String)(implicit header: RequestHeader): R[JsValue]
+  def saveSupportingMaterials(draftId: String, json: JsValue)(implicit h: RequestHeader): R[JsValue]
+  def saveComponents(draftId: String, json: JsValue)(implicit h: RequestHeader): R[JsValue]
+  def saveXhtml(draftId: String, xhtml: String)(implicit h: RequestHeader): R[JsValue]
+  def saveSummaryFeedback(draftId: String, feedback: String)(implicit h: RequestHeader): R[JsValue]
+  def createItemAndDraft()(implicit h: RequestHeader): R[(String, String)]
+  def commit(draftId: String, force: Boolean)(implicit h: RequestHeader): R[JsValue]
+  def delete(draftId: String)(implicit h: RequestHeader): R[JsValue]
 }
 
 trait SessionHooks extends HasContext {
@@ -71,18 +85,6 @@ trait PlayerLauncherHooks extends HasContext {
   def editorJs(implicit header: RequestHeader): Future[PlayerJs]
 
   def catalogJs(implicit header: RequestHeader): Future[PlayerJs]
-}
-
-trait AssetHooks extends HasContext {
-  def delete(itemId: String, file: String)(implicit header: RequestHeader): Future[Option[StatusMessage]]
-
-  /**
-   * TODO: it would be preferable to have a signature as follows
-   * {{{
-   * def upload(itemId: String, file: String)(implicit header: RequestHeader): Future[Option[StatusMessage]]
-   * }}}
-   */
-  def uploadAction(itemId: String, file: String)(block: Request[Int] => SimpleResult): Action[Int]
 }
 
 trait DataQueryHooks extends HasContext {

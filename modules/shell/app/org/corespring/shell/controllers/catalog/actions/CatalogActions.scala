@@ -1,5 +1,7 @@
 package org.corespring.shell.controllers.catalog.actions
 
+import org.corespring.container.client.controllers.{ AssetType, Assets }
+
 import scala.concurrent.Future
 
 import org.corespring.container.client.hooks.{ CatalogHooks => ContainerCatalogHooks }
@@ -16,9 +18,11 @@ trait CatalogHooks extends ContainerCatalogHooks {
 
   def itemService: MongoService
 
-  private def load(itemId: String)(implicit header: RequestHeader) = Future {
+  def assets: Assets
+
+  override def load(id: String)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] = Future {
     val item: Validation[String, JsValue] = for {
-      i <- itemService.load(itemId).toSuccess(s"can't load item with id: $itemId")
+      i <- itemService.load(id).toSuccess(s"can't load item with id: $id")
     } yield {
       i
     }
@@ -26,5 +30,7 @@ trait CatalogHooks extends ContainerCatalogHooks {
   }
   override def showCatalog(itemId: String)(implicit header: RequestHeader): Future[Option[(Int, String)]] = Future(None)
 
-  override def loadItem(id: String)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] = load(id)
+
+  override def loadFile(id: String, path: String)(request: Request[AnyContent]): SimpleResult = assets.load(AssetType.Item, id, path)(request)
+
 }

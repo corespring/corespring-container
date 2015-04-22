@@ -1,6 +1,7 @@
 package org.corespring.container.client.controllers.apps
 
 import org.corespring.container.client.component.AllItemTypesReader
+import org.corespring.container.client.controllers.GetAsset
 import org.corespring.container.client.controllers.jade.Jade
 import org.corespring.container.client.hooks.CatalogHooks
 import org.corespring.container.client.hooks.Hooks.StatusMessage
@@ -13,11 +14,12 @@ import scala.concurrent.{ Future }
 trait Catalog
   extends AllItemTypesReader
   with App[CatalogHooks]
-  with Jade {
+  with Jade
+  with GetAsset[CatalogHooks] {
 
   override def context: String = "catalog"
 
-  def servicesJs(itemId:String) = {
+  def servicesJs(itemId: String) = {
     import org.corespring.container.client.controllers.resources.routes._
 
     val componentJson: Seq[JsValue] = interactions.map {

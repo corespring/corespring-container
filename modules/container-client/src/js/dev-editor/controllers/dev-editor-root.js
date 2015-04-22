@@ -1,11 +1,22 @@
 angular.module('corespring-dev-editor.controllers')
   .controller('DevEditorRoot', [
     '$scope',
+    '$window',
     'ItemService',
     'ComponentData',
     '$timeout',
     '$log',
-    function($scope, ItemService, ComponentData, $timeout, $log) {
+    'iFrameService',
+    'Msgr',
+    function(
+      $scope,
+      $window,
+      ItemService,
+      ComponentData,
+      $timeout,
+      $log,
+      iFrameService,
+      Msgr) {
 
       $scope.onItemLoaded = function(item) {
         $scope.item = item;
@@ -60,6 +71,23 @@ angular.module('corespring-dev-editor.controllers')
       });
 
       ItemService.load($scope.onItemLoaded, $scope.onItemLoadError);
+
+      function byPassIframeLaunchMechanism(){
+        var bypass = $window.location.search.indexOf('bypass-iframe-launch-mechanism') !== -1;
+        return bypass;
+      }
+
+      if (iFrameService.isInIFrame() && !byPassIframeLaunchMechanism()) {
+        Msgr.on('initialise', function(data) {
+          $log.log('on initialise', data);
+          Msgr.send('rendered');
+        });
+
+        //send msg "ready" to instance
+        //this will result in msg "initialise" being sent back to us
+        $log.log('sending ready');
+        Msgr.send('ready');
+      }
     }
   ]
 );

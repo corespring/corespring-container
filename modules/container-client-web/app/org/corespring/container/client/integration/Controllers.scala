@@ -1,18 +1,14 @@
 package org.corespring.container.client.integration
 
-import org.corespring.container.client.controllers.apps._
-import org.corespring.container.client.component.ComponentUrls
-import org.corespring.container.client.controllers.resources.{ Session, Item }
 import org.corespring.container.client.controllers._
+import org.corespring.container.client.controllers.apps._
+import org.corespring.container.client.controllers.resources.{ Item, ItemDraft, Session }
 import play.api.mvc.Controller
 
 trait CommonControllers {
 
   /** urls for component sets eg one or more components */
   def componentSets: ComponentSets
-
-  /** load assets for items (request may come from a session or item based app */
-  def assets: Assets
 
   /** the 3rd party js launch api */
   def playerLauncher: PlayerLauncher
@@ -22,6 +18,9 @@ trait CommonControllers {
 }
 
 trait ResourceControllers {
+
+  /** item draft resource */
+  def itemDraft: ItemDraft
 
   /** item resource */
   def item: Item
@@ -67,10 +66,10 @@ trait ContainerControllers
   with CatalogControllers {
   def controllers: Seq[Controller] = Seq(
     componentSets,
-    assets,
     playerLauncher,
     libs,
     item,
+    itemDraft,
     session,
     rig,
     prodHtmlPlayer,

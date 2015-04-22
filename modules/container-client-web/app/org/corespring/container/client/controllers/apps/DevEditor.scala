@@ -3,7 +3,7 @@ package org.corespring.container.client.controllers.apps
 import org.corespring.container.client.component.AllItemTypesReader
 import org.corespring.container.client.controllers.helpers.JsonHelper
 import org.corespring.container.client.controllers.jade.Jade
-import org.corespring.container.client.controllers.resources
+import org.corespring.container.client.controllers.{ AssetsController, resources }
 import org.corespring.container.client.hooks.Hooks._
 import org.corespring.container.client.hooks._
 import org.corespring.container.client.views.html.error
@@ -13,23 +13,25 @@ import play.api.mvc._
 
 trait DevEditor
   extends AllItemTypesReader
-  with App[ClientHooks]
-  with JsonHelper with Jade {
+  with App[EditorHooks]
+  with JsonHelper
+  with Jade
+  with AssetsController[EditorHooks] {
 
   override def context: String = "dev-editor"
 
   import resources.{ routes => resourceRoutes }
 
-  def servicesJs(itemId: String) = {
+  def servicesJs(draftId: String) = {
     EditorServices(
       "dev-editor.services",
-      resourceRoutes.Item.load(itemId),
-      resourceRoutes.Item.saveSubset(itemId, ":subset"),
+      resourceRoutes.ItemDraft.load(draftId),
+      resourceRoutes.ItemDraft.saveSubset(draftId, ":subset"),
       Json.obj(),
       Json.obj()).toString
   }
 
-  override def load(itemId: String): Action[AnyContent] = Action.async { implicit request =>
+  override def load(draftId: String): Action[AnyContent] = Action.async { implicit request =>
     def onError(sm: StatusMessage) = {
       val (code, msg) = sm
       code match {
@@ -48,10 +50,10 @@ trait DevEditor
           domainResolvedJs,
           domainResolvedCss,
           jsSrc.ngModules ++ scriptInfo.ngDependencies,
-          servicesJs(itemId))))
+          servicesJs(draftId))))
     }
 
-    hooks.loadItem(itemId).map { e => e.fold(onError, onItem) }
+    hooks.load(draftId).map { e => e.fold(onError, onItem) }
   }
 
 }

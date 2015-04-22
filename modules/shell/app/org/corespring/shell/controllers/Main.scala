@@ -1,10 +1,15 @@
 package org.corespring.shell.controllers
 
+import com.mongodb.DBObject
+import com.mongodb.casbah.MongoCollection
+import com.mongodb.casbah.commons.MongoDBObject
+import org.bson.types.ObjectId
 import org.corespring.container.client.hooks.ItemHooks
-import org.corespring.mongo.json.services.MongoService
-import org.corespring.shell.{ IndexLink, SessionKeys }
 import org.corespring.container.logging.ContainerLogger
-import play.api.libs.json.{ JsObject, JsString, JsValue, Json }
+import org.corespring.mongo.json.services.MongoService
+import org.corespring.shell.services.ItemDraftService
+import org.corespring.shell.{DraftLink, IndexLink, SessionKeys}
+import play.api.libs.json.{JsValue, Json}
 import play.api.mvc._
 
 trait Main
@@ -14,36 +19,63 @@ trait Main
 
   val logger = ContainerLogger.getLogger("Main")
 
-  def itemService: MongoService
+  def items: MongoCollection
+
+  def itemDrafts: ItemDraftService
 
   def sessionService: MongoService
 
-  def itemHooks : ItemHooks
+  def itemHooks: ItemHooks
 
   def index = Action {
     request =>
 
       def failLoadPlayerForSession = request.getQueryString(SessionKeys.failLoadPlayer).isDefined
 
-      val items: Seq[IndexLink] = itemService.list("profile.taskInfo.title").sortBy(_.toString).map {
-        json: JsValue =>
-          val name = (json \ "profile" \ "taskInfo" \ "title").asOpt[String] match {
-            case Some(title) if title.trim().length() > 0 => title
-            case _ => "No title"
+      val links: Seq[IndexLink] = items.find(
+        MongoDBObject(),
+        MongoDBObject("profile.taskInfo.title" -> 1)).toSeq.map {
+        dbo: DBObject =>
+
+          val name = try {
+            dbo.get("profile").asInstanceOf[DBObject]
+              .get("taskInfo").asInstanceOf[DBObject]
+              .get("title").asInstanceOf[String]
+          } catch {
+            case _: Throwable => "No title"
           }
 
-          import org.corespring.container.client.controllers.apps.{ routes => appRoutes }
-          val id = (json \ "_id" \ "$oid").as[String]
+          val itemId = dbo.get("_id").asInstanceOf[ObjectId]
+
+          import org.corespring.shell.controllers.routes.Launchers
+
+          val draftUrls = itemDrafts.collection.find(MongoDBObject("_id.itemId" -> itemId)).map{ draft =>
+            val id = draft.get("_id").asInstanceOf[DBObject]
+            val itemId = id.get("itemId").asInstanceOf[ObjectId]
+            val draftName = id.get("name").asInstanceOf[String]
+            val draftId = s"$itemId~$draftName"
+            val editDraftUrl = Launchers.editorFromDraft(draftId).url
+            DraftLink(draftName, editDraftUrl, routes.Main.deleteDraft(draftId).url)
+          }.toSeq
+
+          import org.corespring.container.client.controllers.apps.{routes => appRoutes}
+          val id = itemId.toString
           val playerUrl = routes.Main.createSessionPage(id).url
           val deleteUrl = routes.Main.deleteItem(id).url
-          val editorUrl = appRoutes.Editor.load(id).url
+          val editorUrl = Launchers.editorFromItem(id).url
           val devEditorUrl = appRoutes.DevEditor.load(id).url
           val catalogUrl = appRoutes.Catalog.load(id).url
-          IndexLink(name, playerUrl, editorUrl, devEditorUrl, deleteUrl, catalogUrl)
+          IndexLink(name,
+            playerUrl,
+            editorUrl,
+            devEditorUrl,
+            draftUrls,
+            deleteUrl,
+            catalogUrl)
       }
 
       logger.debug(items.mkString(","))
-      val r: Result = Ok(html.index(items))
+      val r: Result = Ok(html.index(links))
 
       if (failLoadPlayerForSession)
         r.withSession(SessionKeys.failLoadPlayer -> "true")
@@ -61,19 +93,25 @@ trait Main
       Ok(html.createSession(itemId, finalUrl))
   }
 
+  def deleteDraft(draftId: String) = Action {
+    request =>
+      itemDrafts.delete(draftId)
+      Redirect("/")
+  }
+
   def deleteItem(itemId: String) = Action {
     request =>
-      itemService.delete(itemId)
+      items.remove(MongoDBObject("_id" -> new ObjectId(itemId)))
       Redirect("/")
   }
 
   def createItem = Action.async {
     request =>
-
+      import org.corespring.shell.controllers.routes.Launchers
       import scala.concurrent.ExecutionContext.Implicits.global
-      itemHooks.create(None)(request).map{
+      itemHooks.create(None)(request).map {
         case Left(err) => BadRequest("Error creating item")
-        case Right(id) => Redirect(org.corespring.container.client.controllers.apps.routes.Editor.load(id.toString))
+        case Right(id) => Redirect(Launchers.editorFromItem(id.toString))
       }
   }
 

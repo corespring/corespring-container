@@ -10,6 +10,7 @@ import org.corespring.container.client.views.txt.js.ServerLibraryWrapper
 import org.corespring.container.logging.ContainerLogger
 import play.api.Play
 import play.api.http.ContentTypes
+import play.api.libs.json.Json.JsValueWrapper
 import play.api.libs.json.{ JsValue, Json }
 import play.api.mvc._
 
@@ -42,7 +43,7 @@ trait PlayerLauncher extends Controller {
     }
   }
 
-  import org.corespring.container.client.controllers.apps.routes.{ Editor, Player, Catalog }
+  import org.corespring.container.client.controllers.apps.routes.{ Editor, DevEditor, Player, Catalog }
 
   val SecureMode = "corespring.player.secure"
 
@@ -63,25 +64,28 @@ trait PlayerLauncher extends Controller {
     pathToNameAndContents(jsPath)
   }
 
-  def editorJs = getEditorJs(Editor.load(":itemId"))
+  implicit def callToJson(c: Call): JsValueWrapper = Json.obj("method" -> c.method, "url" -> c.url)
 
-  def getEditorJs(loadEditorCall: Call) = Action.async { implicit request =>
+  def editorJs = getEditorJs(Editor.load(":draftId"), DevEditor.load(":draftId"))
+
+  def getEditorJs(editor: Call, devEditor:Call) = Action.async { implicit request =>
     hooks.editorJs.map { implicit js =>
 
       val rootUrl = playerConfig.rootUrl.getOrElse(BaseUrl(request))
-      val create = org.corespring.container.client.controllers.resources.routes.Item.create()
+
+      import org.corespring.container.client.controllers.resources.routes.ItemDraft
+
+      val commitDraft = ItemDraft.commit(":draftId")
+      val createItemAndDraft = ItemDraft.createItemAndDraft()
 
       val defaultOptions: JsValue = Json.obj(
         "corespringUrl" -> rootUrl,
         "paths" -> Json.obj(
+          "editor" -> editor,
+          "devEditor" -> devEditor,
+          "createItemAndDraft" -> createItemAndDraft,
+          "commitDraft" -> commitDraft))
 
-          "editor" -> Json.obj(
-            "method" -> loadEditorCall.method,
-            "url" -> loadEditorCall.url),
-
-          "create" -> Json.obj(
-            "method" -> create.method,
-            "url" -> create.url)))
       val bootstrap = "org.corespring.players.ItemEditor = corespring.require('editor');"
       make(editorNameAndSrc, defaultOptions, bootstrap)
     }
@@ -95,9 +99,7 @@ trait PlayerLauncher extends Controller {
       val defaultOptions: JsValue = Json.obj(
         "corespringUrl" -> rootUrl,
         "paths" -> Json.obj(
-          "catalog" -> Json.obj(
-            "method" -> loadCatalogCall.method,
-            "url" -> loadCatalogCall.url)))
+          "catalog" -> loadCatalogCall))
 
       val bootstrap = "org.corespring.players.ItemCatalog = corespring.require('catalog');"
       make(catalogNameAndSrc, defaultOptions, bootstrap)
