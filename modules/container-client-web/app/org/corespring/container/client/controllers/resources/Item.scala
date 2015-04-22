@@ -3,8 +3,8 @@ package org.corespring.container.client.controllers.resources
 import org.corespring.container.client.controllers.helpers.PlayerXhtml
 import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.client.hooks.ItemHooks
-import play.api.libs.json.{ JsObject, JsString, JsValue, Json }
-import play.api.mvc.{ Action, Controller, SimpleResult }
+import play.api.libs.json.{JsObject, JsString, JsValue, Json}
+import play.api.mvc.{Action, Controller, SimpleResult}
 
 import scala.concurrent.ExecutionContext
 
