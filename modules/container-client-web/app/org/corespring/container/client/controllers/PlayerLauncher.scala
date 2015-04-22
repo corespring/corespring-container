@@ -73,8 +73,6 @@ trait PlayerLauncher extends Controller {
 
       val rootUrl = playerConfig.rootUrl.getOrElse(BaseUrl(request))
 
-      //val create = org.corespring.container.client.controllers.resources.routes.Item.create()
-
       import org.corespring.container.client.controllers.resources.routes.ItemDraft
 
       val commitDraft = ItemDraft.commit(":draftId")
