@@ -85,10 +85,6 @@ function EditorDefinition(element, options, errorCallback) {
 
     logger.log('load draft item');
 
-    // if(options.devEditor){
-    //   throw new Error('dev editor launching isn\'t ready');
-    // }
-
     var call = options.devEditor ? loadMethodAndUrl('devEditor') : loadMethodAndUrl('editor');
 
     if (!call) {
