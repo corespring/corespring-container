@@ -1,4 +1,4 @@
-describe('editor launcher', function () {
+describe('player-launcher:editor-test', function () {
 
   var origRequire = corespring.require;
 

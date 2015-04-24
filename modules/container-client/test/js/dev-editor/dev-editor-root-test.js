@@ -18,6 +18,16 @@ describe('DevEditorRoot', function() {
     error: jasmine.createSpy('error')
   };
 
+  function makeMockTimeout(){
+    var timeout = function(fn){
+      fn();
+    };
+    timeout.cancel = function(){};
+    timeout.flush = function(){};
+    return timeout;
+  }
+
+
   afterEach(function() {
     ItemService.load.calls.reset();
     ItemService.saveXhtml.calls.reset();
@@ -36,6 +46,7 @@ describe('DevEditorRoot', function() {
     $provide.value('iFrameService', {isInIFrame: function(){return false;}});
     $provide.value('Msgr', {});
     $provide.value('$log', $log);
+    $provide.value('$timeout', makeMockTimeout() );
   }));
 
   beforeEach(inject(function($rootScope, $compile, $timeout) {
@@ -190,18 +201,12 @@ describe('DevEditorRoot', function() {
       var json = '{"valid":"json"}';
 
       beforeEach(function() {
-        spyOn(scope, '$digest').and.callThrough();
         scope.json = json;
         scope.aceJsonChanged();
-        timeout.flush();
       });
 
       it('should set components to parsed json', function() {
         expect(scope.components).toEqual(JSON.parse(json));
-      });
-
-      it('should call scope.digest', function() {
-        expect(scope.$digest).toHaveBeenCalled();
       });
 
     });
@@ -236,11 +241,11 @@ describe('DevEditorRoot', function() {
     var componentBridge = {'component': 'bridge'};
 
     beforeEach(function() {
-      scope.$broadcast('registerComponent', id, componentBridge);
+      scope.$broadcast('registerComponent', id, componentBridge, {});
     });
 
     it('should call ComponentData.registerComponent with id and componentBridge', function() {
-      expect(ComponentData.registerComponent).toHaveBeenCalledWith(id, componentBridge);
+      expect(ComponentData.registerComponent).toHaveBeenCalledWith(id, componentBridge, {});
     });
 
   });

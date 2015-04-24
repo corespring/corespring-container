@@ -1,27 +1,42 @@
 package org.corespring.shell.controllers
 
-import play.api.libs.json.{JsValue, Json}
-import play.api.mvc.{Action, Controller}
+import play.api.libs.json._
+import play.api.mvc.{ RequestHeader, Action, Controller }
 
+trait Launchers extends Controller {
 
-trait Launchers extends Controller{
+  def editorFromItem(itemId: String) = Action { request =>
 
-  private def load(url:String, opts:JsValue) = org.corespring.shell.views.html.launchers.editor(url, opts)
-
-  def editorFromItem(itemId:String) = Action{ request =>
-    val url = org.corespring.container.client.controllers.routes.PlayerLauncher.editorJs().url
-    val devEditor = request.getQueryString("devEditor").exists(_ == "true")
-    Ok(load(url, Json.obj("itemId" -> itemId, "devEditor" -> devEditor)))
+    Ok(loadPlayer(baseJson(request) ++ Json.obj(
+      "itemId" -> itemId)))
   }
 
-  def editorFromDraft(draftId:String) = Action{ request =>
-    val url = org.corespring.container.client.controllers.routes.PlayerLauncher.editorJs().url
-    val devEditor = request.getQueryString("devEditor").exists(_ == "true")
+  def editorFromDraft(draftId: String) = Action { request =>
+    val (itemId, draftName) = splitDraftId(draftId)
 
-    val (itemId, draftName) = {
-      val Array(itemId, draftName) = draftId.split("~")
-      (itemId, draftName)
-    }
-    Ok(load(url, Json.obj("draftName" -> draftName, "itemId" -> itemId, "devEditor" -> devEditor)))
+    Ok(loadPlayer(baseJson(request) ++ Json.obj(
+      "draftName" -> draftName,
+      "itemId" -> itemId)))
+  }
+
+  private def loadPlayer(opts: JsValue) = org.corespring.shell.views.html.launchers.editor(org.corespring.container.client.controllers.routes.PlayerLauncher.editorJs().url, opts)
+
+  private def splitDraftId(draftId: String) = {
+    val Array(itemId, draftName) = draftId.split("~")
+    (itemId, draftName)
+  }
+
+  private def baseJson(request: RequestHeader) = {
+    JsObject(
+      Seq[(String, JsValue)]() ++
+        request.getQueryString("devEditor").filter(_ == "true").map("devEditor" -> JsString(_)) ++
+        Some(("queryParams", queryParamJson(request))))
+  }
+
+  private def queryParamJson(request: RequestHeader) = {
+    JsObject(
+      Seq[(String, JsValue)]() ++
+        request.getQueryString("loggingEnabled").map("loggingEnabled" -> JsString(_)) ++
+        request.getQueryString("logCategory").map("logCategory" -> JsString(_)))
   }
 }
