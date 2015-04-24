@@ -20,12 +20,13 @@ angular.module('corespring-common.services').service('LogFactory', [
           logger[name] = sourceObj[name].bind(sourceObj, prefix);
         }
 
-        bindIfPropertyExists('log');
-        bindIfPropertyExists('info');
-        bindIfPropertyExists('warn');
+        bindIfPropertyExists('debug');
         bindIfPropertyExists('error');
         bindIfPropertyExists('fail');
-        bindIfPropertyExists('debug');
+        bindIfPropertyExists('info');
+        bindIfPropertyExists('log');
+        bindIfPropertyExists('trace');
+        bindIfPropertyExists('warn');
 
         return logger;
       };

@@ -8,7 +8,7 @@ angular.module('corespring-editor.services').service('ItemService', [
      */
     function ItemService() {
 
-      var logger = LogFactory.getLogger('ItemService');
+      var $log = LogFactory.getLogger('ItemService');
 
       var loadQueue = [];
       var loadedData = null;
@@ -31,7 +31,7 @@ angular.module('corespring-editor.services').service('ItemService', [
       }
 
       function loadItem(onSuccess, onFailure) {
-        logger.debug('load, loaded?', loadedData !== null);
+        $log.debug('load, loaded?', loadedData !== null);
 
         loadQueue.push({
           success: onSuccess,
@@ -44,7 +44,7 @@ angular.module('corespring-editor.services').service('ItemService', [
         }
 
         if (loadInProgress) {
-          logger.debug('load in progress - wait');
+          $log.debug('load in progress - wait');
           return;
         }
 
@@ -55,18 +55,20 @@ angular.module('corespring-editor.services').service('ItemService', [
             .success(loadItemSuccess)
             .error(loadItemError);
         } catch (e) {
-          logger.error(e);
+          $log.error(e);
           loadInProgress = false;
         }
 
         function loadItemSuccess(data, status, headers, config) {
           loadedData = data;
           loadInProgress = false;
+          $log.debug('loadItemSuccess');
           flushQueue(data, 'success');
         }
 
         function loadItemError(data, status, headers, config) {
           loadInProgress = false;
+          $log.debug('loadItemError');
           flushQueue(data, 'failure');
         }
       }
@@ -105,8 +107,8 @@ angular.module('corespring-editor.services').service('ItemService', [
         var method = ItemUrls.saveSubset.method;
         var url = ItemUrls.saveSubset.url.replace(':subset', set);
         url = addQueryParamsIfPresent(url);
-        logger.debug('save', data);
-        logger.debug('save - url:', url);
+        $log.debug('save', data);
+        $log.debug('save - url:', url);
 
         notifyListeners('saving');
 
@@ -119,7 +121,7 @@ angular.module('corespring-editor.services').service('ItemService', [
           if (onSuccess) {
             onSuccess(data);
           } else {
-            logger.warn('no onSuccess handler');
+            $log.warn('no onSuccess handler');
           }
         }
 
@@ -139,7 +141,7 @@ angular.module('corespring-editor.services').service('ItemService', [
           if (listener.handleSaveMessage) {
             listener.handleSaveMessage(message);
           } else {
-            logger.warn('listener with id:', key, 'has no function called handleSaveMessage');
+            $log.warn('listener with id:', key, 'has no function called handleSaveMessage');
           }
         });
       }
@@ -150,24 +152,29 @@ angular.module('corespring-editor.services').service('ItemService', [
       }
 
       function flushQueue(d, callbackName) {
-        logger.debug('flushQueue: ', callbackName, 'no of items:', loadQueue.length);
+        $log.debug('flushQueue: ', callbackName, 'no of items:', loadQueue.length);
 
-        callInSyncWithAngularDigestLoop(function() {
-          _.forEach(loadQueue, function(cbs) {
-            if (cbs[callbackName]) {
-              cbs[callbackName](d);
+        executeCallbacksInSyncWithAngularDigestLoop();
+
+        function executeCallbacksInSyncWithAngularDigestLoop() {
+          //$timeout calls $apply internally on the next occasion
+          $timeout(executeCallbacks);
+        }
+
+        function executeCallbacks() {
+          var callbacks = _(loadQueue).pluck(callbackName).filter(_.isFunction).value();
+          loadQueue = [];
+          callbacks.forEach(function(callback) {
+            try {
+              callback(d);
+            } catch (e) {
+              $log.warn('error in callback', e);
             }
           });
-          loadQueue = [];
-        });
-      }
-
-      function callInSyncWithAngularDigestLoop(fn) {
-        //$timeout calls $apply internally on the next occasion
-        $timeout(fn());
+        }
       }
 
     }
 
     return new ItemService();
-}]);
+  }]);
