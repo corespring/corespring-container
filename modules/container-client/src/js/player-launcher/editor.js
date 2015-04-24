@@ -4,7 +4,7 @@ function EditorDefinition(element, options, errorCallback) {
   var errors = require('errors');
   var logger = options.logger || require('logger');
   var builder = new (require('url-builder'))();
-  var queryParams = require('query-params');
+  var queryParams = $.extend({}, options.queryParams);
 
   var defaultOptions = require('default-options');
   options = $.extend(defaultOptions, options);
@@ -104,7 +104,7 @@ function EditorDefinition(element, options, errorCallback) {
     options.url = (options.corespringUrl + call.url)
       .replace(':draftId', draftId);
 
-    options.queryParams = require('query-params');
+    options.queryParams = queryParams;
 
     var instance = new InstanceDef(element, options, errorCallback, logger);
 
