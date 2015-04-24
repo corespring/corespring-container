@@ -13,6 +13,7 @@ angular.module('corespring-player.services')
       var isEditable = null;
 
       this.registerComponent = function(id, bridge) {
+        log("registerComponent", id, bridge);
         bridges[id] = bridge;
 
         if (bridge.answerChangedHandler && answerChangedHandler) {
@@ -30,7 +31,7 @@ angular.module('corespring-player.services')
       };
 
       this.setDataAndSession = function(allData) {
-        
+        log("setDataAndSession", allData);
         if(window.console && _.isFunction(window.console.warn)){
           console.warn('@deprecated: use "setDataAndSessions(data, sessions)" instead');
         }
@@ -43,6 +44,7 @@ angular.module('corespring-player.services')
       };
 
       this.setDataAndSessions = function (data, session){
+        log("setDataAndSessions", data, session);
         _.forIn(bridges, function(b, key){
           b.setDataAndSession({data: data[key], session: session[key]});
         });
@@ -50,6 +52,7 @@ angular.module('corespring-player.services')
 
       this.setSingleDataAndSession = function(id, data, session){
         if(bridges[id]){
+          log("setSingleDataAndSession", id, data, session);
           bridges[id].setDataAndSession({data: data, session: session});
         }
       };

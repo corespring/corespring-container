@@ -46,8 +46,8 @@ angular.module('corespring-dev-editor.controllers')
       }
 
       function onItemLoaded(item) {
-        $scope.item = item;
         ComponentData.setModel(item.components);
+        $scope.item = item;
         $scope.xhtml = item.xhtml;
         $scope.json = JSON.stringify(item.components, undefined, 2);
         $scope.customScoringJs = item.customScoring;

@@ -5,38 +5,31 @@ angular.module('corespring-editor.services')
     'MathJaxService',
     function(LogFactory, ComponentRegister, MathJaxService) {
 
-      var logger = LogFactory.getLogger('component-data');
+      var $log = LogFactory.getLogger('component-data');
 
       function ComponentData() {
         var componentModels,
           removedComponentModels = {},
           placeholders = {},
-          mockSession = {};
+          mockSession = {},
+          elements = {};
 
-        var elements = {};
-
-
-        function getNextAvailableId(){
-
-          var idFound = false;
-          var id = 0;
-
-          do{
-            if(!_.has(componentModels, id.toString()) && !_.has(removedComponentModels, id.toString())){
-              idFound = true;
-            } else {
-              id++;
+        function getNextAvailableId() {
+          var MAX_ID = 100;
+          for (var i = 0; i < MAX_ID; i++) {
+            var id = i.toString();
+            if (!_.has(componentModels, id) && !_.has(removedComponentModels, id)) {
+              return i;
             }
-          } while(!idFound && id < 100);
-
-          return id;
+          }
+          throw new Error("More than " + MAX_ID + " components used?");
         }
 
-        function pruneItem(item){
-          if(item) {
+        function pruneItem(item) {
+          if (item) {
             //it is important to clone the item
             //bc. otherwise the editor might save the
-            //changes thar we do to the item below
+            //changes that we do to the item in the component
             item = _.cloneDeep(item);
             delete item.feedback;
             delete item.correctResponse;
@@ -44,19 +37,19 @@ angular.module('corespring-editor.services')
           return item;
         }
 
-        function setSingleDataAndSession(id, model, session){
+        function setSingleDataAndSession(id, model, session) {
           ComponentRegister.setSingleDataAndSession(id, pruneItem(model), session);
         }
 
-        this.getSessions = function(){
+        this.getSessions = function() {
           return ComponentRegister.getSessions();
         };
 
-        this.setMode = function(mode){
+        this.setMode = function(mode) {
           ComponentRegister.setMode(mode);
         };
 
-        this.setEditable = function(isEditable){
+        this.setEditable = function(isEditable) {
           ComponentRegister.setEditable(isEditable);
         };
 
@@ -64,17 +57,17 @@ angular.module('corespring-editor.services')
           ComponentRegister.reset();
         };
 
-        this.updateComponent = function(id, model){
-
-          _.forIn(mockSession[id], function(value, key){
+        this.updateComponent = function(id, model) {
+          _.forIn(mockSession[id], function(value, key) {
             delete mockSession[id][key];
           });
 
-          if(componentModels[id]){
+          if (componentModels[id]) {
             componentModels[id] = model;
           }
 
           setSingleDataAndSession(id, model, mockSession[id]);
+
           if (elements[id]) {
             MathJaxService.parseDomForMath(10, elements[id]);
           }
@@ -85,8 +78,8 @@ angular.module('corespring-editor.services')
         };
 
         this.setModel = function(model) {
+          $log.debug("setModel", model);
           componentModels = model;
-
           _.forIn(placeholders, function(p, id) {
             p.setComponent(componentModels[id]);
           });
@@ -98,19 +91,20 @@ angular.module('corespring-editor.services')
         };
 
         this.registerComponent = function(id, bridge, element) {
-          ComponentRegister.registerComponent(id, bridge);
+          $log.debug("registerComponent", id, bridge, element);
           mockSession[id] = mockSession[id] || {};
-          setSingleDataAndSession(id, componentModels[id], mockSession[id]);
           elements[id] = element;
+          ComponentRegister.registerComponent(id, bridge);
+          setSingleDataAndSession(id, componentModels[id], mockSession[id]);
         };
 
-        this.addComponent = function(d){
+        this.addComponent = function(d) {
           console.warn('@deprecated use "addComponentModel" instead');
           return this.addComponentModel(d);
         };
 
-        this.addComponentModel = function(componentData){
-          if(!componentModels){
+        this.addComponentModel = function(componentData) {
+          if (!componentModels) {
             throw new Error('components aren\'t defined yet.');
           }
 
@@ -126,12 +120,12 @@ angular.module('corespring-editor.services')
           return id;
         };
 
-        this.deleteComponent = function(id){
-          if(!componentModels) {
+        this.deleteComponent = function(id) {
+          if (!componentModels) {
             throw new Error('no components');
           }
 
-          if(!componentModels[id]) {
+          if (!componentModels[id]) {
             throw new Error('no component with id', id);
           }
 
@@ -142,20 +136,20 @@ angular.module('corespring-editor.services')
           delete elements[id];
         };
 
-        this.restoreComponent = function(id){
-          if(!componentModels) {
+        this.restoreComponent = function(id) {
+          if (!componentModels) {
             throw new Error('no components');
           }
 
-          if(!removedComponentModels[id]) {
+          if (!removedComponentModels[id]) {
             throw new Error('no component with id', id);
           }
 
-          if(_.has(componentModels, id)){
+          if (_.has(componentModels, id)) {
             throw new Error('There is already a component with that id');
           }
 
-          if(!_.has(removedComponentModels, id)){
+          if (!_.has(removedComponentModels, id)) {
             throw new Error('There is no component with that id to restore');
           }
 
