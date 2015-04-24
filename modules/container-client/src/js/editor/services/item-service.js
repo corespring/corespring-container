@@ -154,26 +154,18 @@ angular.module('corespring-editor.services').service('ItemService', [
       function flushQueue(d, callbackName) {
         $log.debug('flushQueue: ', callbackName, 'no of items:', loadQueue.length);
 
-        executeCallbacksInSyncWithAngularDigestLoop();
-
-        function executeCallbacksInSyncWithAngularDigestLoop() {
-          //$timeout calls $apply internally on the next occasion
-          $timeout(executeCallbacks);
-        }
-
-        function executeCallbacks() {
-          var callbacks = _(loadQueue).pluck(callbackName).filter(_.isFunction).value();
-          loadQueue = [];
-          callbacks.forEach(function(callback) {
+        _(loadQueue)
+          .pluck(callbackName)
+          .filter(_.isFunction)
+          .forEach(function(callback) {
             try {
               callback(d);
             } catch (e) {
               $log.warn('error in callback', e);
             }
           });
-        }
+        loadQueue = [];
       }
-
     }
 
     return new ItemService();
