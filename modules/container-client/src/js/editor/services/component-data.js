@@ -1,9 +1,10 @@
 angular.module('corespring-editor.services')
   .service('ComponentData', [
+    '$timeout',
     'LogFactory',
     'ComponentRegister',
     'MathJaxService',
-    function(LogFactory, ComponentRegister, MathJaxService) {
+    function($timeout, LogFactory, ComponentRegister, MathJaxService) {
 
       var $log = LogFactory.getLogger('component-data');
 
@@ -38,7 +39,9 @@ angular.module('corespring-editor.services')
         }
 
         function setSingleDataAndSession(id, model, session) {
-          ComponentRegister.setSingleDataAndSession(id, pruneItem(model), session);
+          $timeout(function() {
+            ComponentRegister.setSingleDataAndSession(id, pruneItem(model), session);
+          });
         }
 
         this.getSessions = function() {
