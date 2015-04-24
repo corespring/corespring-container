@@ -62,13 +62,11 @@ angular.module('corespring-editor.services').service('ItemService', [
         function loadItemSuccess(data, status, headers, config) {
           loadedData = data;
           loadInProgress = false;
-          $log.debug('loadItemSuccess');
           flushQueue(data, 'success');
         }
 
         function loadItemError(data, status, headers, config) {
           loadInProgress = false;
-          $log.debug('loadItemError');
           flushQueue(data, 'failure');
         }
       }
@@ -152,8 +150,6 @@ angular.module('corespring-editor.services').service('ItemService', [
       }
 
       function flushQueue(d, callbackName) {
-        $log.debug('flushQueue: ', callbackName, 'no of items:', loadQueue.length);
-
         _(loadQueue)
           .pluck(callbackName)
           .filter(_.isFunction)

@@ -21,7 +21,6 @@ angular.module('corespring-player.services')
         }
 
         if (_.isBoolean(isEditable) && bridge.editable) {
-          $log.debug("init ", id, "to editable: ", isEditable);
           bridge.editable(isEditable);
         }
       };

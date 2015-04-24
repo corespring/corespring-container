@@ -81,7 +81,6 @@ angular.module('corespring-editor.services')
         };
 
         this.setModel = function(model) {
-          $log.debug("setModel", model);
           componentModels = model;
           _.forIn(placeholders, function(p, id) {
             p.setComponent(componentModels[id]);
@@ -94,7 +93,6 @@ angular.module('corespring-editor.services')
         };
 
         this.registerComponent = function(id, bridge, element) {
-          $log.debug("registerComponent", id, bridge, element);
           mockSession[id] = mockSession[id] || {};
           elements[id] = element;
           ComponentRegister.registerComponent(id, bridge);
