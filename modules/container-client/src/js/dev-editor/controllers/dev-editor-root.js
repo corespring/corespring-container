@@ -44,16 +44,12 @@ angular.module('corespring-dev-editor.controllers')
       }
 
       function onItemLoaded(item) {
-        //PE-221 This event may arrive outside of the angular update cycle
-        //The angular timeout calls apply on the next occasion
-        $timeout(function() {
-          $scope.item = item;
-          ComponentData.setModel(item.components);
-          $scope.xhtml = item.xhtml;
-          $scope.json = JSON.stringify(item.components, undefined, 2);
-          $scope.customScoringJs = item.customScoring;
-          $scope.components = _.cloneDeep(item.components);
-        });
+        $scope.item = item;
+        ComponentData.setModel(item.components);
+        $scope.xhtml = item.xhtml;
+        $scope.json = JSON.stringify(item.components, undefined, 2);
+        $scope.customScoringJs = item.customScoring;
+        $scope.components = _.cloneDeep(item.components);
       }
 
       function onItemLoadError(err) {
@@ -69,7 +65,7 @@ angular.module('corespring-dev-editor.controllers')
       function saveXhtmlIfChanged() {
         if ($scope.xhtml !== $scope.item.xhtml) {
           $scope.item.xhtml = $scope.xhtml;
-          ItemService.saveXhtml($scope.item.xhtml, function () {
+          ItemService.saveXhtml($scope.item.xhtml, function() {
             $log.info('xhtml saved');
           });
         }
@@ -78,13 +74,13 @@ angular.module('corespring-dev-editor.controllers')
       function saveComponentsIfChanged() {
         if (!_.isUndefined($scope.components) && !_.isEqual($scope.item.components, $scope.components)) {
           $scope.item.components = $scope.components;
-          ItemService.saveComponents($scope.item.components, function () {
+          ItemService.saveComponents($scope.item.components, function() {
             $log.info('components saved');
           });
         }
       }
 
-      function saveCustomScoringIfChanged(){
+      function saveCustomScoringIfChanged() {
         if ($scope.item.customScoring !== $scope.customScoringJs) {
           $scope.item.customScoring = $scope.customScoringJs;
           ItemService.saveCustomScoring($scope.item.customScoring, function() {
