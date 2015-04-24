@@ -4,7 +4,7 @@ function EditorDefinition(element, options, errorCallback) {
   var errors = require('errors');
   var logger = options.logger || require('logger');
   var builder = new (require('url-builder'))();
-  var queryParams = $.extend({}, options.queryParams);
+  var queryParams = $.extend({}, require('query-params'), options.queryParams);
 
   var defaultOptions = require('default-options');
   options = $.extend(defaultOptions, options);

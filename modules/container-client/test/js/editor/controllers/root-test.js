@@ -1,7 +1,7 @@
 describe('Root', function() {
 
   var scope, element, EVENTS;
-  var iFrame = false;
+  var iFrame = false, bypassIframeLaunchMechanism = false;
 
   beforeEach(angular.mock.module('wiggi-wiz.constants'));
   beforeEach(angular.mock.module('corespring-editor.controllers'));
@@ -28,6 +28,9 @@ describe('Root', function() {
   var iFrameService = {
     isInIFrame: function() {
       return iFrame;
+    },
+    bypassIframeLaunchMechanism: function(){
+      return bypassIframeLaunchMechanism;
     }
   };
   var Msgr = {
@@ -119,12 +122,11 @@ describe('Root', function() {
 
     describe('when in iframe, but bypassed', function() {
       var oldTop = top;
-      var oldQueryString = mockWindow.location.search;
 
       beforeEach(inject(function($rootScope, $compile) {
         iFrame = true;
+        bypassIframeLaunchMechanism = true;
         Msgr.on.calls.reset();
-        mockWindow.location.search = 'bypass-iframe-launch-mechanism';
         render();
       }));
 
@@ -134,7 +136,7 @@ describe('Root', function() {
 
       afterEach(function() {
         iFrame = false;
-        mockWindow.location.search = oldQueryString;
+        bypassIframeLaunchMechanism = false;
       });
 
     });
