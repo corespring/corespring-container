@@ -1,4 +1,4 @@
-describe('Root', function() {
+describe('editor root', function() {
 
   var scope, element, EVENTS;
   var iFrame = false, bypassIframeLaunchMechanism = false;
@@ -53,6 +53,9 @@ describe('Root', function() {
   };
 
   var mockWindow = {
+    confirm: function(msg){
+      return true;
+    },
     location: {
       search: 'query-string'
     }
@@ -159,12 +162,12 @@ describe('Root', function() {
 
     describe('unconfirmed delete', function() {
       beforeEach(function() {
-        spyOn(window, 'confirm').and.returnValue(false);
-        scope.item = item;
-        scope.$emit('deleteSupportingMaterial', data);
+        spyOn(mockWindow, 'confirm').and.returnValue(false);
         item = {
           supportingMaterials: _.clone(supportingMaterials)
         };
+        scope.item = item;
+        scope.$emit('deleteSupportingMaterial', data);
       });
 
       it('does not transition to another supportingMaterial', function() {
@@ -183,17 +186,17 @@ describe('Root', function() {
 
     describe('confirmed delete', function() {
       beforeEach(function() {
-        spyOn(window, 'confirm').and.returnValue(true);
-        scope.item = item;
-        scope.itemId = 123;
-        scope.$emit('deleteSupportingMaterial', data);
+        spyOn(mockWindow, 'confirm').and.returnValue(true);
         item = {
           supportingMaterials: _.clone(supportingMaterials)
         };
+        scope.item = item;
+        scope.itemId = 123;
+        scope.$emit('deleteSupportingMaterial', data);
       });
 
       it('transitions to first supportingMaterial', function() {
-        expect($state.transitionTo).toHaveBeenCalledWith('supporting-materials', {index: 0}, {reload: true});
+        expect($state.transitionTo).toHaveBeenCalledWith('supporting-materials', {index: '0'}, {reload: true});
       });
 
       it('removes supporting material at index from item.supportingMaterials', function() {

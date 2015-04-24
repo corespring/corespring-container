@@ -28,18 +28,20 @@ angular.module('corespring-dev-editor.controllers')
       //-----------------------------------------
 
       function init() {
-        ItemService.load($scope.onItemLoaded, $scope.onItemLoadError);
-
         if (iFrameService.isInIFrame() && !iFrameService.bypassIframeLaunchMechanism()) {
-          Msgr.on('initialise', function(data) {
-            $log.log('on initialise', data);
-            Msgr.send('rendered');
-          });
-
+          Msgr.on('initialise', onInitialise);
           //send msg "ready" to instance
           //this will result in msg "initialise" being sent back to us
           $log.log('sending ready');
           Msgr.send('ready');
+        } else {
+          ItemService.load($scope.onItemLoaded, $scope.onItemLoadError);
+        }
+
+        function onInitialise(data) {
+          $log.log('on initialise', data);
+          ItemService.load($scope.onItemLoaded, $scope.onItemLoadError);
+          Msgr.send('rendered');
         }
       }
 
