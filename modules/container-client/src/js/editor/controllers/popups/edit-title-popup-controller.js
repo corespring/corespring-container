@@ -14,4 +14,8 @@ angular.module('corespring-editor.controllers').controller('EditTitlePopupContro
       $modalInstance.dismiss('cancel') ;
     };
 
+    $scope.selectTitle = function(){
+      $('#title').select();
+    };
+
   }]);
