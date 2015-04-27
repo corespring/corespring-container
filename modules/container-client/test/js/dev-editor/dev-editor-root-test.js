@@ -40,11 +40,18 @@ describe('DevEditorRoot', function() {
 
   beforeEach(angular.mock.module('corespring-dev-editor.controllers'));
 
+  var Msgr;
+
   beforeEach(module(function($provide) {
+
+    Msgr = {
+      on: jasmine.createSpy('on'),
+      send: jasmine.createSpy('send')
+    };
     $provide.value('ItemService', ItemService);
     $provide.value('ComponentData', ComponentData);
     $provide.value('iFrameService', {isInIFrame: function(){return false;}});
-    $provide.value('Msgr', {});
+    $provide.value('Msgr', Msgr);
     $provide.value('$log', $log);
     $provide.value('$timeout', makeMockTimeout() );
   }));
@@ -124,8 +131,9 @@ describe('DevEditorRoot', function() {
           scope.save();
         });
 
-        it('should save xhtml', function() {
+        it('should save xhtml and post message', function() {
           expect(ItemService.saveXhtml).toHaveBeenCalledWith(xhtml, jasmine.any(Function));
+          expect(Msgr.send).toHaveBeenCalledWith('itemChanged', {partChanged: 'xhtml'});
         });
 
       });
@@ -144,10 +152,9 @@ describe('DevEditorRoot', function() {
 
         it('should save custom scoring', function() {
           expect(ItemService.saveCustomScoring).toHaveBeenCalledWith(newCustomScoring, jasmine.any(Function));
+          expect(Msgr.send).toHaveBeenCalledWith('itemChanged', {partChanged: 'customScoring'});
         });
-
       });
-
     });
 
     describe('components', function() {
@@ -187,8 +194,9 @@ describe('DevEditorRoot', function() {
           scope.save();
         });
 
-        it('should save components', function() {
+        it('should save components and post message', function() {
           expect(ItemService.saveComponents).toHaveBeenCalledWith(components, jasmine.any(Function));
+          expect(Msgr.send).toHaveBeenCalledWith('itemChanged', {partChanged: 'components'});
         });
       });
     });

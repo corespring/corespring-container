@@ -70,7 +70,7 @@ angular.module('corespring-dev-editor.controllers')
           ItemService.saveXhtml($scope.item.xhtml, function() {
             $log.info('xhtml saved');
           });
-          $scope.$emit('itemChanged', {partChanged: 'xhtml'});
+          Msgr.send('itemChanged', {partChanged: 'xhtml'});
         }
       }
 
@@ -80,7 +80,7 @@ angular.module('corespring-dev-editor.controllers')
           ItemService.saveComponents($scope.item.components, function() {
             $log.info('components saved');
           });
-          $scope.$emit('itemChanged', {partChanged: 'components'});
+          Msgr.send('itemChanged', {partChanged: 'components'});
         }
       }
 
@@ -90,7 +90,7 @@ angular.module('corespring-dev-editor.controllers')
           ItemService.saveCustomScoring($scope.item.customScoring, function() {
             $log.info('custom scoring saved');
           });
-          $scope.$emit('itemChanged', {partChanged: 'customScoring'});
+          Msgr.send('itemChanged', {partChanged: 'customScoring'});
         }
       }
 
