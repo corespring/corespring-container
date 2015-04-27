@@ -927,6 +927,7 @@
         return;
       }
       $scope.saveProfile();
+      $scope.$emit('itemChanged', {partChanged: 'profile'});
     }), true); //watch nestedProperties
 
     $scope.saveProfile = function() {

@@ -58,6 +58,10 @@ angular.module('corespring-editor.controllers')
 
         if (oldValue !== newValue) {
           ItemService.saveSupportingMaterials($scope.item.supportingMaterials);
+
+          if (oldValue) {
+            $scope.$emit('itemChanged', {partChanged: 'supportingMaterials'});
+          }
         }
       }, true);
 
