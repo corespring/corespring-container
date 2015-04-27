@@ -3,25 +3,25 @@ extends layout
 block content
 
   | <!-- 
-  |  !{versionInfo} 
+  |  !{versionInfo}
   | -->
 
-    
+
   include templates/question
   include templates/profile
   include templates/supporting-materials
 
   .root(ng-controller="Root", dimension-propagator='')
     .container-fluid
-      include partials/nav  
+      include partials/nav
     .main-content(ui-view="main")
-    
- 
+
+
 //After the angular module has been created.
 block after-main-script
 
   script(type="text/javascript").
-    
+
     (function(){
 
       function mkEditorState(name){
@@ -29,7 +29,7 @@ block after-main-script
           url: '/' + name,
           views: {
             main: {
-              templateUrl: '/templates/' + name 
+              templateUrl: '/templates/' + name
             }
           }
         }
@@ -43,7 +43,7 @@ block after-main-script
           'supporting-materials' : {
             url: '/supporting-materials/{index}',
             params: {
-              index: { value: 0 }
+              index: { value: '0' }
             },
             views: {
               main: {
@@ -53,14 +53,14 @@ block after-main-script
           }
         }
       };
-      
+
       function uiRouterConfig($provide, $stateProvider, $urlRouterProvider) {
         $urlRouterProvider.otherwise(appLoadConfig.defaultPath);
         for( var x in appLoadConfig.states){
           $stateProvider.state(x, appLoadConfig.states[x]);
         }
       }
-      
+
       angular.module('corespring-#{appName}').config(uiRouterConfig);
-      
+
     })(this);
