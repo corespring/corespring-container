@@ -253,6 +253,16 @@ describe('editor root', function() {
 
   });
 
+  describe('Item change event', function() {
+    beforeEach(function() {
+      Msgr.send = jasmine.createSpy('send');
+      scope.$emit('itemChanged');
+    });
+    it('should be forwarded to the outside world via Msgr', function() {
+      expect(Msgr.send).toHaveBeenCalledWith('itemChanged', undefined);
+    });
+  });
+
   describe('onItemLoadError', function() {
     var message = "hey there was an error";
 

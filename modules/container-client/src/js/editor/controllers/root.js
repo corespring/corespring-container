@@ -35,6 +35,7 @@ angular.module('corespring-editor.controllers')
 
       $scope.$on('deleteSupportingMaterial', onDeleteSupportingMaterial);
       $scope.$on(WIGGI_EVENTS.LAUNCH_DIALOG, onLaunchDialog);
+      $scope.$on('itemChanged', onItemChanged);
 
       init();
 
@@ -58,6 +59,10 @@ angular.module('corespring-editor.controllers')
           ItemService.load($scope.onItemLoadSuccess, $scope.onItemLoadError);
           Msgr.send('rendered');
         }
+      }
+
+      function onItemChanged(event, data) {
+        Msgr.send('itemChanged', data);
       }
 
       function onDeleteSupportingMaterial(event, data) {

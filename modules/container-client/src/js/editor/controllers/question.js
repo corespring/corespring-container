@@ -137,19 +137,28 @@ angular.module('corespring-editor.controllers')
           return;
         }
         saveComponents();
+        if (oldComps) {
+          $scope.$emit('itemChanged', {partChanged: 'components'});
+        }
       }), true);
 
-      $scope.$watch('item.xhtml', debounce(function(oldValue, newValue) {
+      $scope.$watch('item.xhtml', debounce(function(newValue, oldValue) {
         logger.debug('old', oldValue);
         if (oldValue !== newValue) {
           ItemService.saveXhtml($scope.item.xhtml);
+          if (oldValue) {
+            $scope.$emit('itemChanged', {partChanged: 'xhtml'});
+          }
         }
       }));
 
-      $scope.$watch('item.summaryFeedback', debounce(function(oldValue, newValue) {
+      $scope.$watch('item.summaryFeedback', debounce(function(newValue, oldValue) {
         logger.debug('old', oldValue);
         if (oldValue !== newValue) {
           ItemService.saveSummaryFeedback($scope.item.summaryFeedback);
+          if (oldValue) {
+            $scope.$emit('itemChanged', {partChanged: 'summaryFeedback'});
+          }
         }
       }));
 
