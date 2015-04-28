@@ -1,12 +1,49 @@
 @(items:Seq[org.corespring.shell.IndexLink])
 
 
+@link(label:String, href:String, cssClass:String = "") = @{
+  <a class={ s"btn btn-xs btn-default $cssClass" } href={href}>{label}</a>
+}
+
+@mkDrafts(drafts:Seq[org.corespring.shell.DraftLink]) = {
+  <div>
+    <div>Drafts:</div>
+    <ul>
+
+    @drafts.map{ d   =>
+      <li>
+        <span>@d.name</span>
+        @link("edit", d.edit, "btn-xs")
+        @link("dev-edit", s"${d.edit}?devEditor=true", "btn-xs")
+        @link("delete", d.delete, "btn-xs")
+      </li>
+      }
+    </ul>
+
+  </div>
+}
+
 <!DOCTYPE html>
 <html>
 <head>
   <title>Corespring Container Shell</title>
+  <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css" rel="stylesheet" type="text/css">
   <link href="http://fonts.googleapis.com/css?family=Ubuntu" rel="stylesheet" type="text/css">
   <link rel="stylesheet" href="/assets/css/homepage.css">
+  <style>
+    table{
+      vertical-align: top;
+    }
+
+    td, th{
+      vertical-align: top;
+      padding: 8px;
+    }
+
+    tr {
+      border-bottom: solid 1px #cccccc;
+    }
+  </style>
 </head>
 <body>
   <div class="container">
@@ -20,16 +57,39 @@
 
     <br/><br/>
 
-    @items.map{ i =>
-      @i.title :
-      <a href="@i.createSession?mode=dev&showControls=true">Run</a>
-      <a href="@i.createSession?mode=prod">[Run-Prod]</a>
-      <a href="@i.edit">Edit</a>
-      <a href="@i.devEdit">Dev-Edit</a>
-      <a href="@i.delete">Delete</a>
-      <a href="@i.catalog">Catalog</a>
-      <br/>
-    }
+    <table>
+      <tr>
+        <th>Title</th>
+        <th>Player</th>
+        <th>Catalog</th>
+        <th>Editor</th>
+        <th></th>
+      </tr>
+      @items.map{ i =>
+      <tr>
+        <td>@i.title</td>
+        <td>
+          @link("Run", s"${i.createSession}?mode=dev&showControls=true", "btn-success")
+          @link("Prod", s"${i.createSession}?mode=prod", "btn-primary")
+        </td>
+        <td>
+          @link("Catalog", i.catalog, "btn-info")
+        </td>
+        <td>
+          @link("New Draft", i.edit)
+          @link("New Draft DevEditor", s"${i.edit}?devEditor=true")
+          <br/>
+          @if(!i.drafts.isEmpty){
+            @mkDrafts(i.drafts)
+          }
+
+        </td>
+        <td>
+          @link("Delete", i.delete, "btn-danger")
+        </td>
+      </tr>
+      }
+    </table>
 
   </div>
 

@@ -1,4 +1,4 @@
-describe('Root', function() {
+describe('render root', function() {
 
   var scope, element;
   var iFrame = false;
@@ -45,7 +45,7 @@ describe('Root', function() {
     }));
 
     it('should broadcast initialise with mode gather', function() {
-      expect(scope.$broadcast).toHaveBeenCalledWith('initialise', { mode: 'gather' });
+      expect(scope.$broadcast).toHaveBeenCalledWith('initialise', jasmine.objectContaining({ mode: 'gather' }));
     });
 
     it('should not send ready event to Msgr', function() {

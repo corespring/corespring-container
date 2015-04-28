@@ -1,8 +1,13 @@
 GET         /                     @org.corespring.shell.controllers.Main.index
 GET         /create-item          @org.corespring.shell.controllers.Main.createItem
 GET         /delete-item/:id      @org.corespring.shell.controllers.Main.deleteItem(id)
+GET         /delete-draft/:id     @org.corespring.shell.controllers.Main.deleteDraft(id)
 GET         /:id/create-session   @org.corespring.shell.controllers.Main.createSessionPage(id)
 POST        /create-session       @org.corespring.shell.controllers.Main.createSession
+
+
+GET         /launch-editor/item/:id    @org.corespring.shell.controllers.Launchers.editorFromItem(id)
+GET         /launch-editor/draft/:id   @org.corespring.shell.controllers.Launchers.editorFromDraft(id)
 
 GET         /assets/*file        controllers.Assets.at(path="/container-client", file)
 

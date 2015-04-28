@@ -4,7 +4,7 @@ import grizzled.slf4j.Logger
 import org.corespring.container.client.component.{ ComponentUrls, ItemTypeReader }
 import org.corespring.container.client.controllers.angular.AngularModules
 import org.corespring.container.client.controllers.helpers.{ Helpers, LoadClientSideDependencies }
-import org.corespring.container.client.hooks.ClientHooks
+import org.corespring.container.client.hooks.LoadHook
 import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.components.model.Id
 import org.corespring.container.components.model.dependencies.DependencyResolver
@@ -23,7 +23,7 @@ trait HasLogger {
   def logger: Logger
 }
 
-trait App[T <: ClientHooks]
+trait App[T <: LoadHook]
   extends Controller
   with DependencyResolver
   with Helpers

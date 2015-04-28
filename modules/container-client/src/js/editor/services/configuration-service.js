@@ -29,16 +29,41 @@
       configHasBeenSet = true;
       _.forEach(callbacks, function(callback) {
         try {
-          callback(config);
+          callback(new NestedGetter(config));
         } catch (err) {
           $log.error("Error in callback", err);
         }
       });
     };
 
+     function NestedGetter(obj){
+
+      function getValueByArray(obj, parts, value){
+
+        if(!parts) {
+          return null;
+        }
+
+        if(parts.length === 1){
+          return obj[parts[0]];
+        } else {
+          var next = parts.shift();
+
+          if(!obj[next]){
+            return null;
+          }
+          return getValueByArray(obj[next], parts, value);
+        }
+      }
+
+      this.get = function(path, defaultValue){
+        return getValueByArray(obj, path.split('.')) || defaultValue;
+      };
+    }
+
     this.getConfig = function(callback) {
       if (configHasBeenSet) {
-        callback(config);
+        callback(new NestedGetter(config));
       } else {
         callbacks.push(callback);
       }

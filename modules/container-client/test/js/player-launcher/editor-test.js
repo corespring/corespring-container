@@ -1,32 +1,6 @@
-describe('editor launcher', function () {
+describe('player-launcher:editor-test', function () {
 
-  var errors = corespring.require("errors");
-
-  var EditorDefinition;
-  var defaultOptions;
-  var originalDefaultOptions;
-  var instanceCalls;
-  var lastError;
-  var launchErrors;
-  var mockInstance;
-  var originalInstance;
-  var origWarn;
-  var warnings;
-
-
-  function MockInstance(element, options, errorCallback, logger) {
-    instanceCalls.push({instance: this, element: element, options: options, errorCallback: errorCallback, log: logger});
-
-    this.on = function(name, cb) {
-      if (name == "ready") {
-        cb();
-      }
-    };
-
-    this.send = function() {
-    };
-  }
-
+  var origRequire = corespring.require;
 
   function MockErrors(errs) {
     this.errors = errs;
@@ -35,132 +9,184 @@ describe('editor launcher', function () {
     };
   }
 
-  beforeEach(function () {
-    instanceCalls = [];
-    lastError = null;
-    defaultOptions = corespring.module("default-options").exports;
-    originalDefaultOptions = _.cloneDeep(defaultOptions);
-    defaultOptions.corespringUrl = "http://blah.com";
-    defaultOptions.paths = {};
-    originalInstance = corespring.require("instance");
-    mockInstance = corespring.module("instance", MockInstance);
-    launchErrors = corespring.module("launcher-errors", new MockErrors());
-    EditorDefinition = corespring.require("editor");
-    warnings = [];
-    origWarn = window.console.warn;
-    window.console.warn = function (msg) {
-      warnings.push(msg);
-    };
-  });
-
-  afterEach(function () {
-    corespring.module("instance", originalInstance);
-    corespring.module("default-options").exports = originalDefaultOptions;
-    window.console.warn = origWarn;
-
-  });
-
-  function create(options, playerErrors, queryParams) {
-
-    corespring.module("launcher-errors", playerErrors || new MockErrors());
-    corespring.module("query-params", queryParams || {});
-
-    lastError = null;
-
-    //$("body").append("<div id='blah'></div>")
-    var editor = new EditorDefinition("dummy-element", options, function (err) {
-      lastError = err;
-    });
-
-    return editor;
+  function mkCall(name){
+    return {method: name, url: name};
   }
 
-  it('should invoke error callback if there are launcher-errors', function () {
-    var editor = create({}, new MockErrors(["error one"]));
+  /**
+   * Mock some of the dependencies loaded by 'require' by using corespring.mock.
+   * Call the callback and pass the configured env.
+   * Note: we make use of corespring.mock in these specs:
+   *  console.log(corespring.mock);
+   */
+  function withRequire(obj, fn){
 
-    expect(lastError.code).toEqual(errors.EXTERNAL_ERROR("error one").code);
-    expect(lastError.message).toEqual(errors.EXTERNAL_ERROR("error one").message);
-  });
+    var env = {
+      'query-params' : {
+        a: 'a'
+      },
+      'default-options': {
+        corespringUrl: 'http://base/',
+        paths: {
+          editor: mkCall('editor/:draftId'),
+          devEditor: mkCall('dev-editor/:draftId'),
+          createItemAndDraft: mkCall('createItemAndDraft'),
+          commitDraft: mkCall('commitDraft')
+        }
+      },
+      instance : function(){
+        this.on = function(){};
+      },
+      'launcher-errors' : new MockErrors([])
+    };
 
-  it('should invoke error callback if options does not contain paths object', function () {
-    delete defaultOptions.paths;
-    var editor = create({});
-    expect(lastError.code).toEqual(errors.EXTERNAL_ERROR("create not part of options").code);
-    expect(lastError.message).toEqual(errors.EXTERNAL_ERROR("create not part of options").message);
-  });
-
-  describe("create item", function(){
-
-    it('should create item if options does not have itemId', function () {
-      defaultOptions.paths.create = {url: "/expected-create-url", method: 'expected-method'};
-
-      var actualAjaxOptions = null;
-      $.ajax = function (ajaxOptions) {
-        actualAjaxOptions = ajaxOptions;
-      }
-
-      var editor = create({});
-      expect(lastError).toBe(null);
-      expect(actualAjaxOptions.type).toEqual('expected-method');
-      expect(actualAjaxOptions.url).toEqual('http://blah.com/expected-create-url');
-      expect(actualAjaxOptions.data).toEqual({
-        corespringUrl: 'http://blah.com',
-        paths: {create: {url: '/expected-create-url', method: 'expected-method'}}
+    return function(){
+      var e = _.assign(env,obj);
+      _.map(e, function(value, key){
+        console.log('adding', key, 'to mock modules');
+        corespring.mock.modules[key] = value;
       });
-      expect(actualAjaxOptions.success).not.toBe(null);
-      expect(actualAjaxOptions.error).not.toBe(null);
-      expect(actualAjaxOptions.dataType).toEqual('json');
-    });
+      fn(e);
+    };
+  }
 
-    it('should pass query params', function () {
-      defaultOptions.paths.create = {url: "/expected-create-url", method: 'expected-method'};
-
-      var actualAjaxOptions = null;
-      $.ajax = function (ajaxOptions) {
-        actualAjaxOptions = ajaxOptions;
-      };
-
-      var editor = create({}, null, {apiClient:123});
-      expect(actualAjaxOptions.url).toEqual('http://blah.com/expected-create-url?apiClient=123');
-    });
-
-    it("should invoke error callback if options.path does not contain 'create'", function(){
-      defaultOptions.paths = {};
-      var editor = create({});
-      expect(lastError.code).toEqual(errors.EXTERNAL_ERROR("create not part of options").code);
-      expect(lastError.message).toEqual(errors.EXTERNAL_ERROR("create not part of options").message);
-    });
-
+  afterEach(function(){
+    corespring.mock.reset();
   });
 
-  describe("load item", function(){
+  var errors = corespring.require('errors');
 
-    it('should create instance (which loads item) if options has itemId', function () {
-      defaultOptions.paths.editor = {url: "/expected-editor-url", method: 'expected-method'};
 
-      var editor = create({itemId:'expected-item-id'});
-      expect(lastError).toBe(null);
-      expect(instanceCalls.length).toEqual(1);
-      var call = instanceCalls.pop();
-      expect(call.options.url).toEqual('http://blah.com/expected-editor-url');
+  describe('constructor', function(){
+
+    var onError;
+
+    beforeEach(function(){
+      onError = jasmine.createSpy('onError');
     });
 
-    it('should pass queryParams in options', function () {
-      defaultOptions.paths.editor = {url: "/expected-editor-url", method: 'expected-method'};
+    describe('launcherErrors', function(){
 
-      var editor = create({itemId:'expected-item-id'}, null, {apiClient:123});
-      var call = instanceCalls.pop();
-      expect(call.options.queryParams).toEqual({apiClient:123});
+      it('calls the error handler if there are launcher errors', withRequire(
+          { 'launcher-errors': new MockErrors(['error one']) },
+          function(){
+            var editor = new (corespring.require('editor'))('blah', {}, onError);
+            expect(onError).toHaveBeenCalledWith(errors.EXTERNAL_ERROR('error one'));
+      }));
+
+
+      it('calls error handler if options does not contain paths object', withRequire(
+        { 'default-options' : { paths: {}}},
+        function() {
+          var editor = new (corespring.require('editor'))('blah', {}, onError);
+          expect(onError).toHaveBeenCalledWith(errors.EXTERNAL_ERROR('createItemAndDraft not part of options'));
+      }));
+
     });
 
+    describe('with no options', function(){
 
-    it("should invoke error callback if options.path does not contain 'editor'", function(){
-      defaultOptions.paths = {};
-      var editor = create({itemId:'expected-item-id'});
-      expect(lastError.code).toEqual(errors.EXTERNAL_ERROR("editor not part of options").code);
-      expect(lastError.message).toEqual(errors.EXTERNAL_ERROR("editor not part of options").message);
+      it('should create the item and draft', withRequire({},
+        function(){
+
+          spyOn($, 'ajax');
+
+          var opts = {
+            onItemCreated: jasmine.createSpy('onItemCreated'),
+            onDraftCreated: jasmine.createSpy('onDraftCreated')
+          };
+
+          var editor = new (corespring.require('editor'))('blah', opts, onError);
+          expect(onError).not.toHaveBeenCalled();
+          var ajax = $.ajax.calls.mostRecent().args[0];
+          expect(ajax.type).toEqual('createItemAndDraft');
+          expect(ajax.url).toEqual('http://base/createItemAndDraft?a=a');
+          expect(ajax.success).not.toBe(null);
+          expect(ajax.error).not.toBe(null);
+          expect(ajax.dataType).toEqual('json');
+
+          ajax.success({itemId: '1', draftName: 'name'});
+          expect(opts.onDraftCreated).toHaveBeenCalledWith('1', 'name');
+      }));
+
     });
 
+    describe('with itemId', function(){
+
+      var instance = jasmine.createSpy('instance-one').and.callFake(function(){
+        return {
+          on: jasmine.createSpy('on').and.callFake(function(name, cb){
+          }),
+          send: jasmine.createSpy('send')
+        };
+      });
+
+      it('should load the editor with itemId and a generated draftName',  withRequire({ 'instance' : instance },
+       function(env){
+        var opts =  {
+          itemId: 'itemId',
+          onDraftCreated: jasmine.createSpy('onDraftCreated')
+        };
+        var editor = new (corespring.require('editor'))('blah', opts, onError);
+        expect(instance).toHaveBeenCalled();
+        var constructorArgs = instance.calls.mostRecent().args[1];
+        expect(constructorArgs.itemId).toEqual('itemId');
+        expect(constructorArgs.url.indexOf('http://base/editor/itemId~')).toEqual(0);
+      }));
+    });
+
+    describe('with draftName', function(){
+
+      var readyHandler = null;
+      var instance = jasmine.createSpy('instance!!').and.callFake(function(){
+        return {
+          on: jasmine.createSpy('on').and.callFake(function(name, cb){
+            if(name === 'ready'){
+              readyHandler = cb;
+            }
+          }),
+          send: jasmine.createSpy('send')
+        };
+      });
+
+      it('should load the editor with itemId~draftName',  withRequire({
+        instance: instance
+      }, function(){
+        var opts = {
+          itemId: 'itemId',
+          draftName: 'draftName',
+          onDraftLoaded: jasmine.createSpy('onDraftLoaded')
+        };
+        var editor = new (corespring.require('editor'))('blah', opts, onError);
+        expect(instance).toHaveBeenCalled();
+        var constructorArgs = instance.calls.mostRecent().args[1];
+        expect(constructorArgs.url).toEqual('http://base/editor/itemId~draftName');
+        readyHandler();
+        expect(opts.onDraftLoaded).toHaveBeenCalled();
+      }));
+    });
   });
 
+  describe('commitDraft', function(){
+    it('calls commitDraft endpoint and returns an error', withRequire({}, function(){
+      var editor = new (corespring.require('editor'))('blah', {draftId: 'draftId'}, function(){});
+      spyOn($, 'ajax').and.callFake(function(opts){
+        opts.error({responseJSON: { error: 'error!'}});
+      });
+      var callback = jasmine.createSpy('callback');
+      editor.commitDraft(false, callback);
+      expect(callback).toHaveBeenCalledWith({code: 111, msg: 'error!'});
+    }));
+
+    it('calls commitDraft endpoint and returns success', withRequire({}, function(){
+      var editor = new (corespring.require('editor'))('blah', {draftId: 'draftId'}, function(){});
+      spyOn($, 'ajax').and.callFake(function(opts){
+        opts.success({});
+      });
+      var callback = jasmine.createSpy('callback');
+      editor.commitDraft(false, callback);
+      expect(callback).toHaveBeenCalledWith(null);
+    }));
+
+  });
 });

@@ -2,19 +2,20 @@ package org.corespring.container.client.controllers.apps
 
 import org.corespring.container.client.V2PlayerConfig
 import org.corespring.container.client.component.PlayerItemTypeReader
+import org.corespring.container.client.controllers.GetAsset
 import org.corespring.container.client.controllers.helpers.PlayerXhtml
 import org.corespring.container.client.controllers.jade.Jade
 import org.corespring.container.client.hooks.PlayerHooks
 import org.corespring.container.client.views.txt.js.PlayerServices
 import org.corespring.container.components.processing.PlayerItemPreProcessor
 import play.api.libs.json._
-import play.api.mvc.{Action, AnyContent, RequestHeader}
-
+import play.api.mvc.{ Action, AnyContent, RequestHeader }
 
 trait Player
   extends App[PlayerHooks]
   with PlayerItemTypeReader
-  with Jade {
+  with Jade
+  with GetAsset[PlayerHooks] {
 
   /**
    * Preprocess the xml so that it'll work in all browsers

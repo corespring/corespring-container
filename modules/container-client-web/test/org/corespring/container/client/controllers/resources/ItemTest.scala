@@ -1,28 +1,23 @@
 package org.corespring.container.client.controllers.resources
 
 import org.corespring.container.client.hooks.Hooks.StatusMessage
-import org.corespring.container.client.hooks._
-import org.corespring.container.client.controllers.resources.Item.Errors
+import org.corespring.container.client.hooks.ItemHooks
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
 import play.api.libs.json.{ JsValue, Json }
-import play.api.mvc._
+import play.api.mvc.RequestHeader
+import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import play.api.test.{ WithApplication, FakeApplication, FakeRequest }
 
 import scala.concurrent.{ ExecutionContext, Future }
-
-object mockGlobalq extends play.api.GlobalSettings
 
 class ItemTest extends Specification with Mockito {
 
   class item(
     createError: Option[StatusMessage] = None,
-    globalConf: Option[play.api.GlobalSettings] = Some(mockGlobalq),
     loadResult: JsValue = Json.obj("_id" -> Json.obj("$oid" -> "1"), "xhtml" -> "<div></div>"))
-    extends WithApplication(FakeApplication(withGlobal = globalConf))
-    with Scope {
+    extends Scope {
     val item = new Item {
 
       override def hooks: ItemHooks = new ItemHooks {
@@ -41,18 +36,6 @@ class ItemTest extends Specification with Mockito {
             Right(loadResult)
           }
         }
-
-        override def saveProfile(itemId: String, json: JsValue)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] = Future(Right(Json.obj()))
-
-        override def saveXhtml(itemId: String, xhtml: String)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] = Future(Right(Json.obj()))
-
-        override def saveCustomScoring(itemId: String, xhtml: String)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] = Future(Right(Json.obj()))
-
-        override def saveSupportingMaterials(itemId: String, json: JsValue)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] = Future(Right(Json.obj()))
-
-        override def saveComponents(itemId: String, json: JsValue)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] = Future(Right(Json.obj()))
-
-        override def saveSummaryFeedback(itemId: String, feedback: String)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] = Future(Right(Json.obj()))
 
         override implicit def ec: ExecutionContext = ExecutionContext.Implicits.global
       }
@@ -79,13 +62,7 @@ class ItemTest extends Specification with Mockito {
       }
     }
 
-    "fail to save if no json is supplied" in new item {
-      val result = item.saveSubset("x", "xhtml")(FakeRequest())
-      status(result) === BAD_REQUEST
-      (contentAsJson(result) \ "error").as[String] === Errors.noJson
-    }
-
-    "create returns error" in new item(createError = Some(UNAUTHORIZED -> "Error"), globalConf = Some(mockGlobalq)) {
+    "create returns error" in new item(createError = Some(UNAUTHORIZED -> "Error")) {
       val result = item.create(FakeRequest("", ""))
       status(result) === UNAUTHORIZED
       contentAsJson(result) === Json.obj("error" -> "Error")

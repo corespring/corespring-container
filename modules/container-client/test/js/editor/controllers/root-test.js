@@ -1,7 +1,7 @@
-describe('Root', function() {
+describe('editor root', function() {
 
   var scope, element, EVENTS;
-  var iFrame = false;
+  var iFrame = false, bypassIframeLaunchMechanism = false;
 
   beforeEach(angular.mock.module('wiggi-wiz.constants'));
   beforeEach(angular.mock.module('corespring-editor.controllers'));
@@ -28,6 +28,9 @@ describe('Root', function() {
   var iFrameService = {
     isInIFrame: function() {
       return iFrame;
+    },
+    bypassIframeLaunchMechanism: function(){
+      return bypassIframeLaunchMechanism;
     }
   };
   var Msgr = {
@@ -50,6 +53,9 @@ describe('Root', function() {
   };
 
   var mockWindow = {
+    confirm: function(msg){
+      return true;
+    },
     location: {
       search: 'query-string'
     }
@@ -119,12 +125,11 @@ describe('Root', function() {
 
     describe('when in iframe, but bypassed', function() {
       var oldTop = top;
-      var oldQueryString = mockWindow.location.search;
 
       beforeEach(inject(function($rootScope, $compile) {
         iFrame = true;
+        bypassIframeLaunchMechanism = true;
         Msgr.on.calls.reset();
-        mockWindow.location.search = 'bypass-iframe-launch-mechanism';
         render();
       }));
 
@@ -134,7 +139,7 @@ describe('Root', function() {
 
       afterEach(function() {
         iFrame = false;
-        mockWindow.location.search = oldQueryString;
+        bypassIframeLaunchMechanism = false;
       });
 
     });
@@ -157,12 +162,12 @@ describe('Root', function() {
 
     describe('unconfirmed delete', function() {
       beforeEach(function() {
-        spyOn(window, 'confirm').and.returnValue(false);
-        scope.item = item;
-        scope.$emit('deleteSupportingMaterial', data);
+        spyOn(mockWindow, 'confirm').and.returnValue(false);
         item = {
           supportingMaterials: _.clone(supportingMaterials)
         };
+        scope.item = item;
+        scope.$emit('deleteSupportingMaterial', data);
       });
 
       it('does not transition to another supportingMaterial', function() {
@@ -181,17 +186,17 @@ describe('Root', function() {
 
     describe('confirmed delete', function() {
       beforeEach(function() {
-        spyOn(window, 'confirm').and.returnValue(true);
-        scope.item = item;
-        scope.itemId = 123;
-        scope.$emit('deleteSupportingMaterial', data);
+        spyOn(mockWindow, 'confirm').and.returnValue(true);
         item = {
           supportingMaterials: _.clone(supportingMaterials)
         };
+        scope.item = item;
+        scope.itemId = 123;
+        scope.$emit('deleteSupportingMaterial', data);
       });
 
       it('transitions to first supportingMaterial', function() {
-        expect($state.transitionTo).toHaveBeenCalledWith('supporting-materials', {index: 0}, {reload: true});
+        expect($state.transitionTo).toHaveBeenCalledWith('supporting-materials', {index: '0'}, {reload: true});
       });
 
       it('removes supporting material at index from item.supportingMaterials', function() {
@@ -246,6 +251,16 @@ describe('Root', function() {
       expect(item.components[index]).toEqual(preprocessedComponent);
     });
 
+  });
+
+  describe('Item change event', function() {
+    beforeEach(function() {
+      Msgr.send = jasmine.createSpy('send');
+      scope.$emit('itemChanged');
+    });
+    it('should be forwarded to the outside world via Msgr', function() {
+      expect(Msgr.send).toHaveBeenCalledWith('itemChanged', undefined);
+    });
   });
 
   describe('onItemLoadError', function() {
