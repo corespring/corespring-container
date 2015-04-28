@@ -4,6 +4,7 @@ describe('NavController', function() {
 
   var ItemService = {
     load: jasmine.createSpy('load'),
+    saveProfile: jasmine.createSpy('saveProfile'),
     addSaveListener: jasmine.createSpy('addSaveListener')
   };
 
@@ -95,6 +96,20 @@ describe('NavController', function() {
         expectPopupFor('editTitle', {resolve: {title: jasmine.any(Function)}});
       });
     });
+
+    describe('updateTitle', function() {
+      beforeEach(function() {
+        spyOn(scope, '$emit');
+        scope.item = {profile: {taskInfo: {}}};
+        scope.updateTitle('new title');
+      });
+
+      it('should emit itemChanged event with new title', function() {
+        expect(scope.$emit).toHaveBeenCalledWith('itemChanged', {partChanged: 'profile'});
+      });
+    });
+
+
 
     describe('questionInformation', function() {
       beforeEach(function() {
