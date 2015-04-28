@@ -16,13 +16,18 @@ angular.module('corespring-editor.directives').directive('componentWeights', [
 
         //Wrap either find or filter - odd inconsistency across platforms here - need to find out why.
         var nodesOnly = (function() {
-
           var $markup = $('<div>').html($scope.markup);
           return $markup.find('[id]').size() > 0 ? $markup.find('[id]') : $markup.filter('[id]');
         })();
 
         function interactionsOnly(n) {
-          return _.contains($scope.componentSetTypes, n.tagName.toLowerCase());
+          var attributes = _.map(_.pluck(n.attributes, 'name').concat(n.tagName), function(s) {
+            return s.toLowerCase();
+          });
+
+          return _.find(attributes, function(attribute) {
+            return _.contains($scope.componentSetTypes, attribute);
+          }) !== undefined;
         }
 
         function weightableOnly(n) {
@@ -98,7 +103,7 @@ angular.module('corespring-editor.directives').directive('componentWeights', [
     }
 
     return {
-      restrict: 'E',
+      restrict: 'EA',
       link: link,
 
       replace: true,
