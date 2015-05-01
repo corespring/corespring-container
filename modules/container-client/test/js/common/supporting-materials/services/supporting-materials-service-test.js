@@ -17,7 +17,7 @@ describe('supporting materials service', function() {
       "name": "index.html",
       "contentType": "text/html",
       "content": "<h1>Sample Rubric</h1><br/><p>This is a rubric for scoring this item.</p>",
-      "default": true
+      "isMain": true
     }]
   }, {
     "name": "Student Work Example",
@@ -26,10 +26,14 @@ describe('supporting materials service', function() {
       "_t": "org.corespring.platform.core.models.item.resource.VirtualFile",
       "name": "student-work.pdf",
       "contentType": "application/pdf",
-      "default": true
+      "isMain": true
     }]
   }];
 
+
+  function isMain(f) {
+    return f && f.isMain;
+  }
 
   it('should init', function() {
     expect(supportingMaterialsService).not.toBe(null);
@@ -37,30 +41,24 @@ describe('supporting materials service', function() {
 
   describe('getSupportingMaterial', function() {
     it('should return main file at index', function() {
-      expect(supportingMaterialsService.getSupportingMaterialFile(supportingMaterials, 0)).toEqual(
-        _.find(supportingMaterials[0].files, function(file) {
-          return file.default === true;
-        }));
+      expect(
+        supportingMaterialsService.getSupportingMaterialFile(supportingMaterials, 0)).toEqual(
+        _.find(supportingMaterials[0].files, isMain )
+        );
     });
   });
 
   describe('getSupportingUrl', function() {
     it('should return trusted URL for supporting material', function() {
-      var supportingMaterial =
-        _.find(supportingMaterials[0].files, function(file) {
-          return file.default === true;
-        });
+      var supportingMaterial = _.find(supportingMaterials[0].files, isMain);
       expect(supportingMaterialsService.getSupportingUrl(supportingMaterials, 0).$$unwrapTrustedValue()).toEqual(
-          (supportingMaterials[0].id || supportingMaterials[0].name)+ "/" + supportingMaterial.name);
+          'materials/' + supportingMaterials[0].name + '/' + supportingMaterial.name);
     });
   });
 
   describe('getContentType', function() {
     it('should return the contentType for the supporting material', function() {
-      var supportingMaterial =
-        _.find(supportingMaterials[0].files, function(file) {
-          return file.default === true;
-        });
+      var supportingMaterial = _.find(supportingMaterials[0].files, isMain);
       expect(supportingMaterialsService.getContentType(supportingMaterials, 0)).toEqual(supportingMaterial.contentType);
     });
   });
