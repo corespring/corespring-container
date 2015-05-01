@@ -13,7 +13,12 @@ trait GetAsset[H <: GetAssetHook] extends Controller {
 
   def getFile(id: String, path: String) = Action.async { request =>
     Future {
+
+      //if(path.startsWith("supporting-materials")){
+      //  hooks.loadSupportingMaterialFile(id, path.replace("supporting-materials/", ""))(request)
+      //} else {
       hooks.loadFile(id, path)(request)
+      //}
     }
   }
 }

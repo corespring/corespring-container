@@ -1,6 +1,7 @@
 package org.corespring.shell
 
 import java.io.File
+import java.net.URLDecoder
 
 import com.typesafe.config.ConfigFactory
 import org.apache.commons.io.{ FileUtils, IOUtils }
@@ -94,8 +95,15 @@ class ContainerClientImplementation(
 
     private def mkPath(t: AssetType, rest: String*) = (t.folderName +: rest).mkString("/").replace("~", "/")
 
-    override def load(t: AssetType, id: String, path: String)(implicit h: RequestHeader): SimpleResult =
-      playS3.download(s3.bucket, mkPath(t, id, path), Some(h.headers))
+    override def load(t: AssetType, id: String, path: String)(implicit h: RequestHeader): SimpleResult = {
+      val result = playS3.download(s3.bucket, URLDecoder.decode(mkPath(t, id, path), "utf-8"), Some(h.headers))
+
+      if (result.header.status == OK || result.header.status == NOT_MODIFIED) {
+        result
+      } else {
+        playS3.download(s3.bucket, mkPath(t, id, path), Some(h.headers))
+      }
+    }
 
     override def delete(t: AssetType, id: String, path: String)(implicit h: RequestHeader): Future[Option[(Int, String)]] = Future {
       val response = playS3.delete(s3.bucket, mkPath(t, id, path))

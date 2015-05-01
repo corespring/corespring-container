@@ -18,6 +18,10 @@ trait CatalogHooks extends ContainerCatalogHooks {
 
   def itemService: MongoService
 
+  override def loadSupportingMaterialFile(id: String, path: String)(request: Request[AnyContent]): SimpleResult = {
+    loadFile(id, s"materials/$path")(request)
+  }
+
   def assets: Assets
 
   override def load(id: String)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] = Future {
@@ -29,7 +33,6 @@ trait CatalogHooks extends ContainerCatalogHooks {
     item.leftMap(s => (500, s)).toEither
   }
   override def showCatalog(itemId: String)(implicit header: RequestHeader): Future[Option[(Int, String)]] = Future(None)
-
 
   override def loadFile(id: String, path: String)(request: Request[AnyContent]): SimpleResult = assets.load(AssetType.Item, id, path)(request)
 

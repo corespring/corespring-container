@@ -8,7 +8,7 @@
         var material = supportingMaterials[index];
         var file = self.getSupportingMaterialFile(supportingMaterials, index);
         if (file) {
-          return (material.id || material.name) + "/" + file.name;
+          return 'materials/' + material.name + '/' + file.name;
         } else {
           return undefined;
         }
@@ -43,7 +43,7 @@
     }
 
     this.isDefault = function(file) {
-      return file['default']; //TODO ie8 doesn't like default, change to isMain?
+      return file && file.isMain;
     };
 
     this.validateMetadata = function(metadata, log) {
