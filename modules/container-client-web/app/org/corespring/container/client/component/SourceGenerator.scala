@@ -160,7 +160,7 @@ abstract class BaseGenerator
 
   def widgetToJs(ui: Widget): String = previewJs(ui.id, ui.client.render)
 
-  def interactionToJs(ui: Interaction): String = previewJs(ui.id, ui.client.render) +
+  def interactionToJs(ui: Interaction): String = previewJs(ui.id, ui.client.render) + "\n" +
     ui.client.renderLibs.map(wrapClientLibraryJs(moduleName(ui.id.org, ui.id.name))).mkString("\n")
 }
 
@@ -182,7 +182,7 @@ trait BaseWithWrappingGenerator extends BaseGenerator {
 
   override def interactionToJs(i: Interaction): String = {
     val base = super.interactionToJs(i)
-    val cfg = configJs(i.id, i.client.configure) +
+    val cfg = configJs(i.id, i.client.configure) + "\n" +
       i.client.configureLibs.map(wrapClientLibraryJs(moduleName(i.id.org, i.id.name))).mkString("\n")
     val server = serverJs(i.componentType, i.server.definition)
     s"""
