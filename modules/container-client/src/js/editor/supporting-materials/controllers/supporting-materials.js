@@ -230,6 +230,7 @@ angular.module('corespring-editor.controllers')
         if (!$scope.item || !$scope.item.supportingMaterials || $scope.index >= $scope.item.supportingMaterials.length) {
           return;
         }
+
         $scope.supportingMaterial = getSupportingMaterial();
         $scope.supportingMaterialFile = getSupportingMaterialFile();
         $scope.supportingMarkup = $scope.getSupportingMaterialMarkup();
@@ -326,7 +327,7 @@ angular.module('corespring-editor.controllers')
             "name": filename,
             "contentType": "application/pdf",
             "storageKey": $scope.itemId + "/" + supportingMaterial.id + "/" + filename,
-            "default": true
+            "isMain": true
           }];
           data.supportingMaterials[data.supportingMaterials.length - 1] = supportingMaterial;
           ItemService.saveSupportingMaterials(data.supportingMaterials,
@@ -375,7 +376,7 @@ angular.module('corespring-editor.controllers')
             "name": "index.html",
             "contentType": "text/html",
             "content": $scope.content,
-            "default": true
+            "isMain": true
           }]
         };
         
