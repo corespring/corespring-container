@@ -18,14 +18,14 @@ describe('SupportingMaterials', function() {
     this.index = index;
   }
 
-  var SupportingMaterialsService = {
+  var supportingMaterialsService = {
     getSupportingMaterialFile: function() {},
     getContentType: function() {},
     getSupportingUrl: function() {},
     getKBFileSize: function() {}
   };
 
-  var EditorConfig = {
+  var editorConfig = {
     mathJaxFeatureGroup: function() {
       return ['this', 'is', 'the', 'mathjax', 'feature', 'group'];
     },
@@ -35,13 +35,17 @@ describe('SupportingMaterials', function() {
     overrideFeatures: ['these', 'are', 'the', 'override', 'features']
   };
 
+  var itemService = {
+    saveSupportingMaterials: jasmine.createSpy('saveSupportingMaterials')
+  };
+
   beforeEach(module(function($provide) {
     $provide.value('$modal', $modal);
     $provide.value('$state', $state);
     $provide.value('$stateParams', new MockStateParams());
-    $provide.value('ItemService', function() {});
-    $provide.value('SupportingMaterialsService', SupportingMaterialsService);
-    $provide.value('EditorConfig', EditorConfig);
+    $provide.value('ItemService', itemService);
+    $provide.value('SupportingMaterialsService', supportingMaterialsService);
+    $provide.value('EditorConfig', editorConfig);
   }));
 
   beforeEach(inject(function($rootScope, $compile) {
@@ -63,14 +67,14 @@ describe('SupportingMaterials', function() {
     it('should set extra feature definitions to include mathjax and footnotes from EditorConfig', function() {
       expect(scope.extraFeatures).toEqual({
         definitions: [
-          EditorConfig.mathJaxFeatureGroup(),
-          EditorConfig.footnotesFeatureGroup()
+          editorConfig.mathJaxFeatureGroup(),
+          editorConfig.footnotesFeatureGroup()
         ]
-      })
+      });
     });
 
     it('should set overrideFeatures to EditorConfig.overrideFeatures', function() {
-      expect(scope.overrideFeatures).toEqual(EditorConfig.overrideFeatures);
+      expect(scope.overrideFeatures).toEqual(editorConfig.overrideFeatures);
     });
 
   });
@@ -221,13 +225,13 @@ describe('SupportingMaterials', function() {
 
     beforeEach(function() {
       spyOn(scope, 'getSupportingMaterials').and.returnValue(supportingMaterials);
-      spyOn(SupportingMaterialsService, 'getSupportingMaterialFile').and.returnValue({content: content});
+      spyOn(supportingMaterialsService, 'getSupportingMaterialFile').and.returnValue({content: content});
       scope.index = index;
     });
 
     it('should call SupportingMaterialsService with getSupportingMaterials and index', function() {
       var result = scope.getSupportingMaterialMarkup();
-      expect(SupportingMaterialsService.getSupportingMaterialFile).toHaveBeenCalledWith(
+      expect(supportingMaterialsService.getSupportingMaterialFile).toHaveBeenCalledWith(
         supportingMaterials, index
       );
       expect(result).toEqual(content);
@@ -242,7 +246,7 @@ describe('SupportingMaterials', function() {
     beforeEach(function() {
       scope.index = index;
       spyOn(scope, 'getSupportingMaterials').and.returnValue(supportingMaterials);
-      spyOn(SupportingMaterialsService, 'getContentType').and.returnValue(contentType);
+      spyOn(supportingMaterialsService, 'getContentType').and.returnValue(contentType);
     });
 
     it('should return true when contentType matches', function() {
@@ -263,12 +267,12 @@ describe('SupportingMaterials', function() {
     beforeEach(function() {
       scope.index = index;
       spyOn(scope, 'getSupportingMaterials').and.returnValue(supportingMaterials);
-      spyOn(SupportingMaterialsService, 'getSupportingUrl').and.returnValue(supportingUrl);
+      spyOn(supportingMaterialsService, 'getSupportingUrl').and.returnValue(supportingUrl);
     });
 
     it('should return the result from SupportingMaterialsService.getSupportingUrl', function() {
       var result = scope.getSupportingUrl();
-      expect(SupportingMaterialsService.getSupportingUrl).toHaveBeenCalledWith(supportingMaterials, index);
+      expect(supportingMaterialsService.getSupportingUrl).toHaveBeenCalledWith(supportingMaterials, index);
       expect(result).toEqual(supportingUrl);
     });
   });
@@ -287,11 +291,11 @@ describe('SupportingMaterials', function() {
     beforeEach(function() {
       scope.item = item;
       scope.index = index;
-      spyOn(SupportingMaterialsService, 'getSupportingMaterialFile').and.returnValue(supportingMaterialFile);
-      spyOn(SupportingMaterialsService, 'getKBFileSize');
+      spyOn(supportingMaterialsService, 'getSupportingMaterialFile').and.returnValue(supportingMaterialFile);
+      spyOn(supportingMaterialsService, 'getKBFileSize');
       scope.init();
       // Perform callback
-      SupportingMaterialsService.getKBFileSize.calls.mostRecent().args[2](fileSize);
+      supportingMaterialsService.getKBFileSize.calls.mostRecent().args[2](fileSize);
     });
 
     it('should set supportingMaterial to index of supportingMaterials', function() {
@@ -310,6 +314,22 @@ describe('SupportingMaterials', function() {
       expect(scope.materialType).toEqual(materialType);
     });
 
+  });
+
+  describe('createText', function(){
+    it('should call saveSupportingMaterials', function(){
+      scope.content = 'Hi';
+      scope.item = {};
+      scope.createText({name: 'new', materialType: 'type'});
+      var material = itemService.saveSupportingMaterials.calls.mostRecent().args[0][0];
+      console.log(material);
+      expect(material.name).toEqual('new');
+      expect(material.materialType).toEqual('type');
+      expect(material.files[0].isMain).toBe(true);
+      expect(material.files[0].contentType).toEqual('text/html');
+      expect(material.files[0].name).toEqual('index.html');
+      expect(material.files[0].content).toEqual(scope.content);
+    });
   });
 
 });
