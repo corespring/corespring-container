@@ -6,7 +6,7 @@ import com.mongodb.casbah.commons.MongoDBObject
 import org.bson.types.ObjectId
 import org.corespring.mongo.json.services.MongoService
 import org.corespring.shell.controllers.editor.actions.{ ContainerDraftId, DraftId }
-import play.api.libs.json.{ Json, JsValue }
+import play.api.libs.json.{ JsObject, Json, JsValue }
 import play.api.mvc.RequestHeader
 
 import scala.concurrent.Future
@@ -41,7 +41,7 @@ class ItemDraftService(override val collection: MongoCollection) extends MongoSe
     findDraft(draftId)
   }
 
-  override protected def withQuery(id: String)(block: DBObject => Option[JsValue]): Option[JsValue] = {
+  override protected def withQuery(id: String)(block: DBObject => Option[JsObject]): Option[JsObject] = {
     val draftId: ContainerDraftId = DraftId.fromString[ObjectId, ContainerDraftId](id, (itemId, name) => ContainerDraftId(new ObjectId(itemId), name))
     block(MongoDBObject("_id" -> DraftId.dbo(draftId)))
   }

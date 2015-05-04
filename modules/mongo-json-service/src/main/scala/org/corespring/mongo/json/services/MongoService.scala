@@ -8,7 +8,7 @@ import com.mongodb.util.{ JSON => MongoJson }
 import org.bson.types.ObjectId
 import org.joda.time.DateTime
 import play.api.http.Status._
-import play.api.libs.json.{Json => PlayJson, _}
+import play.api.libs.json.{ Json => PlayJson, _ }
 import org.corespring.container.logging.ContainerLogger
 
 import scala.util.Random
@@ -24,7 +24,6 @@ object MongoServiceException {
 }
 
 case class MongoServiceException(msg: String) extends RuntimeException(msg)
-
 
 class MongoService(val collection: MongoCollection) {
 
@@ -52,7 +51,7 @@ class MongoService(val collection: MongoCollection) {
           val s = MongoJson.serialize(dbo)
           val json = PlayJson.parse(s)
           logger.trace(s"[load]: $id : ${PlayJson.stringify(json)}")
-          json
+          json.as[JsObject]
       }
   }
 
@@ -83,11 +82,11 @@ class MongoService(val collection: MongoCollection) {
     }
   }
 
-  def delete(id: String): Unit = withQuery(id){ q =>
+  def delete(id: String): Unit = withQuery(id) { q =>
     collection.findAndRemove(q).map(toJson)
   }
 
-  def fineGrainedSave(id: String, data: JsValue): Option[JsValue] = withQuery(id) {
+  def fineGrainedSave(id: String, data: JsValue): Option[JsObject] = withQuery(id) {
     q =>
       logger.debug(s"[save]: $id")
       logger.trace(s"[save]: ${PlayJson.stringify(data)}")
@@ -99,7 +98,7 @@ class MongoService(val collection: MongoCollection) {
       val result = collection.update(q, d, false, false, WriteConcern.Safe)
 
       if (result.getLastError(WriteConcern.Safe).ok()) {
-        Some(data)
+        Some(data.as[JsObject])
       } else {
         logger.warn(s"Error saving: $id")
         None
@@ -107,7 +106,7 @@ class MongoService(val collection: MongoCollection) {
   }
 
   def toDbo(json: JsValue): DBObject = MongoJson.parse(PlayJson.stringify(json)).asInstanceOf[DBObject]
-  def toJson(dbo: DBObject) = PlayJson.parse(MongoJson.serialize(dbo))
+  def toJson(dbo: DBObject) = PlayJson.parse(MongoJson.serialize(dbo)).as[JsObject]
 
   def save(id: String, data: JsValue): Option[JsValue] = withQuery(id) {
     q =>
@@ -129,7 +128,7 @@ class MongoService(val collection: MongoCollection) {
       }
   }
 
-  protected def withQuery(id: String)(block: DBObject => Option[JsValue]): Option[JsValue] = {
+  protected def withQuery(id: String)(block: DBObject => Option[JsObject]): Option[JsObject] = {
     if (ObjectId.isValid(id)) {
       val oid = new ObjectId(id)
       block(MongoDBObject("_id" -> oid))

@@ -88,8 +88,12 @@ trait ItemDraftHooks extends ContainerItemDraftHooks {
   private def fineGrainedSave(draftId: String, json: JsValue)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] = {
     Future {
       draftItemService.fineGrainedSave(draftId, json).map {
-        json =>
-          Right(json)
+        result =>
+          val trimmed = result.fields.map { f =>
+            (f._1.replace("item.", "") -> f._2)
+          }.head
+          val out = Json.obj(trimmed._1 -> trimmed._2)
+          Right(out)
       }.getOrElse(Left(BAD_REQUEST -> "Error saving"))
     }
   }
@@ -119,9 +123,9 @@ trait ItemDraftHooks extends ContainerItemDraftHooks {
 
     val draftId: ContainerDraftId = DraftId.fromString[ObjectId, ContainerDraftId](draftIdRaw, (itemId, name) => ContainerDraftId(new ObjectId(itemId), name))
     logger.trace(s"okToCommit draftId=$draftId")
-    val query =  DraftId.dbo[ObjectId](draftId)
+    val query = DraftId.dbo[ObjectId](draftId)
     logger.trace(s"okToCommit query=$query")
-    val count =  draftItemService.collection.count(MongoDBObject("_id" -> query))
+    val count = draftItemService.collection.count(MongoDBObject("_id" -> query))
     logger.trace(s"okToCommit count=$count")
 
     for {
