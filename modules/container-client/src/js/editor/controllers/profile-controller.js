@@ -944,7 +944,7 @@
         if (item) {
           ConfigurationService.getConfig(function(config){
             $log.log('getConfig callback', config);
-            updateFormModels(config.profileConfig);
+            updateFormModels(config.get('profileConfig', {}));
             $timeout(function() {
               setItem(item);
             }, 2000);

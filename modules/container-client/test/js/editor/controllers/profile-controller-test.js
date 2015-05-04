@@ -1,7 +1,8 @@
 describe('profile controller', function () {
 
-  var scope, rootScope, controller, ctrl;
+  var scope, rootScope, controller, ctrl, config, configurationService;
 
+  config = {};
 
   function MockModal() {
   }
@@ -94,22 +95,14 @@ describe('profile controller', function () {
     };
   }
 
-  function MockConfigurationService(){
-    this.config = {};
-    this.getConfig = function(callback){
-      callback(this.config);
-      return this.config;
-    };
-  }
-
   beforeEach(angular.mock.module('corespring-editor.controllers'));
+  beforeEach(angular.mock.module('corespring-editor.services'));
 
   var mockLocation, mockDesignerService, mockItemService,mockConfigurationService,
     mockDataQueryService, mockProfileFormatter, mockStandardQueryCreator;
 
   beforeEach(function () {
     mockLocation = new MockLocation();
-    mockConfigurationService = new MockConfigurationService();
     mockDesignerService = new MockDesignerService();
     mockItemService = new MockItemService();
     mockDataQueryService = new MockDataQueryService();
@@ -121,7 +114,6 @@ describe('profile controller', function () {
       $provide.value('$location', mockLocation);
       $provide.value('$timeout', function(fn){fn();});
       $provide.value('throttle', _.identity);
-      $provide.value('ConfigurationService', mockConfigurationService);
       $provide.value('DataQueryService', mockDataQueryService);
       $provide.value('DesignerService', mockDesignerService);
       $provide.value('ItemService', mockItemService);
@@ -129,13 +121,16 @@ describe('profile controller', function () {
       $provide.value('StandardQueryCreator', mockStandardQueryCreator);
       $provide.value('ProfileFormatter', mockProfileFormatter);
     });
+
   });
 
-  beforeEach(inject(function ($rootScope, $controller) {
+  beforeEach(inject(function ($rootScope, $controller, ConfigurationService) {
     ctrl = null;
     scope = null;
     rootScope = $rootScope;
     controller = $controller;
+    configurationService = ConfigurationService;
+    configurationService.setConfig(config);
   }));
 
   function makeProfileController() {
@@ -624,97 +619,121 @@ describe('profile controller', function () {
           expect(key + ".readonly " + item.readonly).toEqual(key + ".readonly " + false);
         });
     });
-    describe("overrides values in profile", function(){
+
+    var overrideConfig = { 
+      profileConfig: {
+        title: {value: "some title"},
+        description: {value: "some description"},
+        gradeLevel: {value: ["01","03"]},
+        lexile: {value: 76},
+        depthOfKnowledge: {value: "some depth"},
+        bloomsTaxonomy: {value: "some blooms"},
+        keySkills: {value: ["one","two"]},
+        priorUse: {value: "some prior use"},
+        priorUseOther: {value: "some other prior use"},
+        priorGradeLevel: {value: ["02","04"]},
+        reviewsPassed: {value: ["r1","r2"]},
+        reviewsPassedOther: {value: "Other reviews passed"},
+        author: {value: "some author"},
+        credentials: {value: "some credentials"},
+        credentialsOther: {value: "some other credentials"},
+        copyrightOwner: {value: "some copyright owner"},
+        copyrightYear: {value: 1978},
+        copyrightExpirationDate: {value: 2020},
+        sourceUrl: {value: "some source url"},
+        additionalMediaCopyrights: {value: [
+          {author: "some author"}
+        ]}}
+      };
+
+    function assertOverrides(){
+      it("title", function(){
+        expect(scope.taskInfo.title).toEqual("some title");
+      });
+      it("description", function(){
+        expect(scope.taskInfo.description).toEqual("some description");
+      });
+      it("gradeLevel", function(){
+        expect(scope.taskInfo.gradeLevel).toEqual(["01","03"]);
+      });
+      it("lexile", function(){
+        expect(scope.profile.lexile).toEqual(76);
+      });
+      it("depthOfKnowledge", function(){
+        expect(scope.profile.otherAlignments.depthOfKnowledge).toEqual("some depth");
+      });
+      it("bloomsTaxonomy", function(){
+        expect(scope.profile.otherAlignments.bloomsTaxonomy).toEqual("some blooms");
+      });
+      it("keySkills", function(){
+        expect(scope.profile.otherAlignments.keySkills).toEqual(["one", "two"]);
+      });
+      it("priorUse", function(){
+        expect(scope.profile.priorUse).toEqual("some prior use");
+      });
+      it("priorUseOther", function(){
+        expect(scope.profile.priorUseOther).toEqual("some other prior use");
+      });
+      it("priorGradeLevel", function(){
+        expect(scope.profile.priorGradeLevel).toEqual(["02", "04"]);
+      });
+      it("reviewsPassed", function(){
+        expect(scope.profile.reviewsPassed).toEqual(["r1", "r2"]);
+      });
+      it("reviewsPassedOther", function(){
+        expect(scope.profile.reviewsPassedOther).toEqual("Other reviews passed");
+      });
+      it("author", function(){
+        expect(scope.contributorDetails.author).toEqual("some author");
+      });
+      it("credentials", function(){
+        expect(scope.contributorDetails.credentials).toEqual("some credentials");
+      });
+      it("credentialsOther", function(){
+        expect(scope.contributorDetails.credentialsOther).toEqual("some other credentials");
+      });
+      it("copyrightOwner", function(){
+        expect(scope.contributorDetails.copyrightOwner).toEqual("some copyright owner");
+      });
+      it("copyrightYear", function(){
+        expect(scope.contributorDetails.copyrightYear).toEqual(1978);
+      });
+      it("copyrightExpirationDate", function(){
+        expect(scope.contributorDetails.copyrightExpirationDate).toEqual(2020);
+      });
+      it("sourceUrl", function(){
+        expect(scope.contributorDetails.sourceUrl).toEqual("some source url");
+      });
+      it("additionalMediaCopyrights", function(){
+        expect(scope.contributorDetails.additionalCopyrights).toEqual([{author: "some author"}]);
+      });
+    }
+
+    describe('override values in profile from ConfigurationService', function(){
+      beforeEach(function(){
+        configurationService.setConfig(overrideConfig);
+        makeProfileController();
+      });
+
+      assertOverrides(); 
+
+      afterEach(function(){
+        configurationService.setConfig({});
+      });
+    });
+
+    describe("overrides values in profile from hash", function(){
+      
       describe("simple", function(){
         beforeEach(function(){
-          mockLocation.hashResult = {profileConfig: JSON.stringify({
-            title: {value: "some title"},
-            description: {value: "some description"},
-            gradeLevel: {value: ["01","03"]},
-            lexile: {value: 76},
-            depthOfKnowledge: {value: "some depth"},
-            bloomsTaxonomy: {value: "some blooms"},
-            keySkills: {value: ["one","two"]},
-            priorUse: {value: "some prior use"},
-            priorUseOther: {value: "some other prior use"},
-            priorGradeLevel: {value: ["02","04"]},
-            reviewsPassed: {value: ["r1","r2"]},
-            reviewsPassedOther: {value: "Other reviews passed"},
-            author: {value: "some author"},
-            credentials: {value: "some credentials"},
-            credentialsOther: {value: "some other credentials"},
-            copyrightOwner: {value: "some copyright owner"},
-            copyrightYear: {value: 1978},
-            copyrightExpirationDate: {value: 2020},
-            sourceUrl: {value: "some source url"},
-            additionalMediaCopyrights: {value: [
-              {author: "some author"}
-            ]}
-          })};
+          //need to set the root object 
+          mockLocation.hashResult = { profileConfig : JSON.stringify(overrideConfig.profileConfig) };
           makeProfileController();
+        });
 
-        });
-        it("title", function(){
-          expect(scope.taskInfo.title).toEqual("some title");
-        });
-        it("description", function(){
-          expect(scope.taskInfo.description).toEqual("some description");
-        });
-        it("gradeLevel", function(){
-          expect(scope.taskInfo.gradeLevel).toEqual(["01","03"]);
-        });
-        it("lexile", function(){
-          expect(scope.profile.lexile).toEqual(76);
-        });
-        it("depthOfKnowledge", function(){
-          expect(scope.profile.otherAlignments.depthOfKnowledge).toEqual("some depth");
-        });
-        it("bloomsTaxonomy", function(){
-          expect(scope.profile.otherAlignments.bloomsTaxonomy).toEqual("some blooms");
-        });
-        it("keySkills", function(){
-          expect(scope.profile.otherAlignments.keySkills).toEqual(["one", "two"]);
-        });
-        it("priorUse", function(){
-          expect(scope.profile.priorUse).toEqual("some prior use");
-        });
-        it("priorUseOther", function(){
-          expect(scope.profile.priorUseOther).toEqual("some other prior use");
-        });
-        it("priorGradeLevel", function(){
-          expect(scope.profile.priorGradeLevel).toEqual(["02", "04"]);
-        });
-        it("reviewsPassed", function(){
-          expect(scope.profile.reviewsPassed).toEqual(["r1", "r2"]);
-        });
-        it("reviewsPassedOther", function(){
-          expect(scope.profile.reviewsPassedOther).toEqual("Other reviews passed");
-        });
-        it("author", function(){
-          expect(scope.contributorDetails.author).toEqual("some author");
-        });
-        it("credentials", function(){
-          expect(scope.contributorDetails.credentials).toEqual("some credentials");
-        });
-        it("credentialsOther", function(){
-          expect(scope.contributorDetails.credentialsOther).toEqual("some other credentials");
-        });
-        it("copyrightOwner", function(){
-          expect(scope.contributorDetails.copyrightOwner).toEqual("some copyright owner");
-        });
-        it("copyrightYear", function(){
-          expect(scope.contributorDetails.copyrightYear).toEqual(1978);
-        });
-        it("copyrightExpirationDate", function(){
-          expect(scope.contributorDetails.copyrightExpirationDate).toEqual(2020);
-        });
-        it("sourceUrl", function(){
-          expect(scope.contributorDetails.sourceUrl).toEqual("some source url");
-        });
-        it("additionalMediaCopyrights", function(){
-          expect(scope.contributorDetails.additionalCopyrights).toEqual([{author: "some author"}]);
-        });
+        assertOverrides();
       });
+
       describe("subjects.primary", function(){
         beforeEach(function() {
           mockLocation.hashResult = {
@@ -725,11 +744,14 @@ describe('profile controller', function () {
           mockDataQueryService.queryResult = [{subject:"Sub1", category:"Cat1"}];
           makeProfileController();
         });
+
         it("should equal to the first result of the data query", function(){
           expect(scope.taskInfo.subjects.primary).toEqual({subject:"Sub1", category:"Cat1"});
         });
       });
+
       describe("subjects.related", function(){
+        
         beforeEach(function() {
           mockLocation.hashResult = {
             profileConfig: JSON.stringify({
@@ -739,11 +761,14 @@ describe('profile controller', function () {
           mockDataQueryService.queryResult = [{subject:"Sub1", category:"Cat1"}];
           makeProfileController();
         });
+        
         it("related subject", function(){
           expect(scope.taskInfo.subjects.related).toEqual([{subject:"Sub1", category:"Cat1"}]);
         });
       });
+
       describe("standards", function(){
+        
         beforeEach(function() {
           mockLocation.hashResult = {
             profileConfig: JSON.stringify({
@@ -753,6 +778,7 @@ describe('profile controller', function () {
           mockDataQueryService.queryResult = [{dotNotation:"RL.1.1"}];
           makeProfileController();
         });
+        
         it("standards", function(){
           expect(scope.profile.standards).toEqual([{dotNotation:"RL.1.1"}]);
         });
@@ -760,70 +786,87 @@ describe('profile controller', function () {
     });
 
     describe("options", function(){
+      
       beforeEach(makeProfileController);
 
       describe("bloomsTaxonomy", function(){
+        
         it("should not change dataProvider, when options are not defined", function(){
           delete scope.formModels.bloomsTaxonomy.options;
           var actual = _.filter(keyValueList(["one", "two", "three"]), scope.bloomsTaxonomyFilter);
           expect(actual).toEqual(keyValueList(["one","two", "three"]));
         });
+
         it("should remove items which are not in both, dataProvider and options", function(){
           scope.formModels.bloomsTaxonomy.options = ["one","two","not in dataProvider"];
           var actual = _.filter(keyValueList(["one", "two", "three"]), scope.bloomsTaxonomyFilter);
           expect(actual).toEqual(keyValueList(["one","two"]));
         });
+
       });
+      
       describe("copyrightYear", function(){
+     
         it("should remove items which are not in both, dataProvider and options", function(){
           scope.formModels.copyrightYear.options = ['1981', '1982', "not in dataProvider"];
           var actual = _.filter(scope.copyrightYearDataProvider, scope.copyrightYearFilter);
           expect(actual).toEqual(['1982', '1981']);
         });
+
       });
+      
       describe("copyrightExpirationDate", function(){
+        
         it("should remove items which are not in both, dataProvider and options", function(){
           scope.formModels.copyrightExpirationDate.options = ['2020', '2021', "not in dataProvider"];
           var actual = _.filter(scope.copyrightExpirationDateDataProvider, scope.copyrightExpirationDateFilter);
           expect(actual).toEqual(['2020', '2021']);
         });
+      
       });
+      
       describe("credentials", function(){
         it("should not change dataProvider, when options are not defined", function(){
           delete scope.formModels.credentials.options;
           var actual = _.filter(keyValueList(["one", "two", "three"]), scope.credentialsFilter);
           expect(actual).toEqual(keyValueList(["one","two", "three"]));
         });
+        
         it("should remove items which are not in both, dataProvider and options", function(){
           scope.formModels.credentials.options = ["one","two","not in dataProvider"];
           var actual = _.filter(keyValueList(["one", "two", "three"]), scope.credentialsFilter);
           expect(actual).toEqual(keyValueList(["one","two"]));
         });
       });
+      
       describe("depthOfKnowledge", function(){
         it("should not change dataProvider, when options are not defined", function(){
           delete scope.formModels.depthOfKnowledge.options;
           var actual = _.filter(keyValueList(["one", "two", "three"]), scope.depthOfKnowledgeFilter);
           expect(actual).toEqual(keyValueList(["one","two", "three"]));
         });
+        
         it("should remove items which are not in both, dataProvider and options", function(){
           scope.formModels.depthOfKnowledge.options = ["one","two","not in dataProvider"];
           var actual = _.filter(keyValueList(["one", "two", "three"]), scope.depthOfKnowledgeFilter);
           expect(actual).toEqual(keyValueList(["one","two"]));
         });
       });
+      
       describe("gradeLevel", function(){
         it("should not change dataProvider, when options are not defined", function(){
           delete scope.formModels.gradeLevel.options;
           var actual = _.filter(keyValueList(["01", "03", "05"]), scope.gradeLevelFilter);
           expect(actual).toEqual(keyValueList(["01", "03", "05"]));
         });
+        
         it("should remove items which are not in both, dataProvider and options", function(){
           scope.formModels.gradeLevel.options = ["01", "03","not in dataProvider"];
           var actual = _.filter(keyValueList(["01", "03", "not in options"]), scope.gradeLevelFilter);
           expect(actual).toEqual(keyValueList(["01","03"]));
         });
       });
+
       describe("primarySubject", function(){
         it("should not change dataProvider, when options are not defined", function(){
           delete scope.formModels.primarySubject.options;
@@ -835,6 +878,7 @@ describe('profile controller', function () {
           }});
           expect(actualResult).toEqual({results:inputData});
         });
+
         it("should remove items which are not in both, dataProvider and options", function(){
           scope.formModels.primarySubject.options = ['A: B','Something: Else'];
           var inputData = [{category:'A', subject:'B'},{category:'C', subject:'D'}];
@@ -846,30 +890,35 @@ describe('profile controller', function () {
           expect(actualResult).toEqual({results:[{category:'A',subject:'B'}]});
         });
       });
+
       describe("priorGradeLevel", function(){
         it("should not change dataProvider, when options are not defined", function(){
           delete scope.formModels.priorGradeLevel.options;
           var actual = _.filter(keyValueList(["01", "03", "05"]), scope.priorGradeLevelFilter);
           expect(actual).toEqual(keyValueList(["01", "03", "05"]));
         });
+
         it("should remove items which are not in both, dataProvider and options", function(){
           scope.formModels.priorGradeLevel.options = ["01", "03","not in dataProvider"];
           var actual = _.filter(keyValueList(["01", "03", "not in options"]), scope.priorGradeLevelFilter);
           expect(actual).toEqual(keyValueList(["01","03"]));
         });
       });
+      
       describe("priorUse", function(){
         it("should not change dataProvider, when options are not defined", function(){
           delete scope.formModels.priorUse.options;
           var actual = _.filter(keyValueList(["one", "two", "three"]), scope.priorUseFilter);
           expect(actual).toEqual(keyValueList(["one","two", "three"]));
         });
+        
         it("should remove items which are not in both, dataProvider and options", function(){
           scope.formModels.priorUse.options = ["one","two","not in dataProvider"];
           var actual = _.filter(keyValueList(["one", "two", "three"]), scope.priorUseFilter);
           expect(actual).toEqual(keyValueList(["one","two"]));
         });
       });
+      
       describe("relatedSubject", function(){
         it("should not change dataProvider, when options are not defined", function(){
           delete scope.formModels.relatedSubject.options;
@@ -881,6 +930,7 @@ describe('profile controller', function () {
           }});
           expect(actualResult).toEqual({results:inputData});
         });
+        
         it("should remove items which are not in both, dataProvider and options", function(){
           scope.formModels.relatedSubject.options = ['A: B','Something: Else'];
           var inputData = [{category:'A', subject:'B'},{category:'C', subject:'D'}];
@@ -892,6 +942,7 @@ describe('profile controller', function () {
           expect(actualResult).toEqual({results:[{category:'A',subject:'B'}]});
         });
       });
+      
       describe("standards", function(){
         it("should not change dataProvider, when options are not defined", function(){
           delete scope.formModels.standards.options;
@@ -903,6 +954,7 @@ describe('profile controller', function () {
           }});
           expect(actualResult).toEqual({results:inputData});
         });
+     
         it("should remove items which are not in both, dataProvider and options", function(){
           scope.formModels.standards.options = ['A','Something'];
           var inputData = [{dotNotation:'A'},{dotNotation:'B'}];
