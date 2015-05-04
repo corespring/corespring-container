@@ -57,6 +57,8 @@ angular.module('corespring-editor.controllers')
           $log.log('on initialise', data);
           ConfigurationService.setConfig(data);
           ItemService.load($scope.onItemLoadSuccess, $scope.onItemLoadError);
+          //We need to trigger an ng digest as this event is outside the app's scope.
+          $scope.$digest();
           Msgr.send('rendered');
         }
       }
