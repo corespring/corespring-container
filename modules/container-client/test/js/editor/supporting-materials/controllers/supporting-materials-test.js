@@ -332,4 +332,10 @@ describe('SupportingMaterials', function() {
     });
   });
 
+  describe('createFile', function(){
+    it('should call saveSupportingMaterials', function(){
+      pending();
+    });
+  });
+
 });
