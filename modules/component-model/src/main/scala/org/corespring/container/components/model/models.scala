@@ -81,8 +81,8 @@ case class LayoutComponent(org: String,
 case class Client(render: String,
   configure: String,
   css: Option[String],
-  renderLibs: Seq[LibrarySource],
-  configureLibs: Seq[LibrarySource])
+  renderLibs: Seq[LibrarySource] = Seq.empty,
+  configureLibs: Seq[LibrarySource] = Seq.empty)
 
 case class Server(definition: String)
 
