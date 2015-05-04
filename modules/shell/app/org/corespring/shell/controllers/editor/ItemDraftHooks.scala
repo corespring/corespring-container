@@ -89,10 +89,10 @@ trait ItemDraftHooks extends ContainerItemDraftHooks {
     Future {
       draftItemService.fineGrainedSave(draftId, json).map {
         result =>
-          val trimmed = result.fields.map { f =>
+          val withoutItemPrefix = result.fields.map { f =>
             (f._1.replace("item.", "") -> f._2)
           }.head
-          val out = Json.obj(trimmed._1 -> trimmed._2)
+          val out = Json.obj(withoutItemPrefix._1 -> withoutItemPrefix._2)
           Right(out)
       }.getOrElse(Left(BAD_REQUEST -> "Error saving"))
     }
