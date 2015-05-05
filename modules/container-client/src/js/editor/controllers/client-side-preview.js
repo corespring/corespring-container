@@ -57,7 +57,17 @@ angular.module('corespring-editor.controllers')
       }
     });
 
+    $scope.$on('editor.click', function () {
+      if (!isGatherMode()) {
+        resetPlayer();
+      }
+    });
+
     $scope.$on('playerControlPanel.reset', function () {
+      resetPlayer();      
+    });
+
+    function resetPlayer() {
       if ($scope.session) {
         $scope.session.isComplete = false;
         $scope.session.remainingAttempts = 1;
@@ -67,7 +77,7 @@ angular.module('corespring-editor.controllers')
       $scope.responses = {};
       ComponentData.reset();
       setMode('gather');
-    });
+    }
 
     function submitSession() {
       var sessions = ComponentData.getSessions();
