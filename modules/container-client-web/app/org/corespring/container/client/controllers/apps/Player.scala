@@ -9,13 +9,18 @@ import org.corespring.container.client.hooks.PlayerHooks
 import org.corespring.container.client.views.txt.js.PlayerServices
 import org.corespring.container.components.processing.PlayerItemPreProcessor
 import play.api.libs.json._
-import play.api.mvc.{ Action, AnyContent, RequestHeader }
+import play.api.mvc._
+
+import scala.concurrent._
+import scala.concurrent.duration._
 
 trait Player
   extends App[PlayerHooks]
   with PlayerItemTypeReader
   with Jade
   with GetAsset[PlayerHooks] {
+
+  import SessionRenderer._
 
   /**
    * Preprocess the xml so that it'll work in all browsers
@@ -43,63 +48,29 @@ trait Player
 
   def playerConfig: V2PlayerConfig
 
-  /**
-   * Query params:
-   * mode=prod|dev (default: whichever way the app is run)
-   * - dev mode loads all the js as separate files
-   * - prod mode loads minified + concatenated js/css
-   *
-   * showControls=true|false (default: false)
-   * - show simple player controls (for devs)
-   *
-   * loggingEnabled=true|false (default: false)
-   * - implemented in the jade - whether to allow ng logging.
-   *
-   * @param sessionId
-   * @return
-   */
-  override def load(sessionId: String) = Action.async { implicit request =>
-    hooks.loadSessionAndItem(sessionId).map {
-
-      case Left((code, msg)) => Status(code)(Json.obj("error" -> msg))
-      case Right((session, itemJson)) => {
-
-        val scriptInfo = componentScriptInfo(componentTypes(itemJson), jsMode == "dev")
-        val controlsJs = if (showControls) paths(controlsJsSrc) else Seq.empty
-        val domainResolvedJs = buildJs(scriptInfo, controlsJs)
-        val domainResolvedCss = buildCss(scriptInfo)
-
-        val processedXhtml = processXhtml((itemJson \ "xhtml").asOpt[String])
-        val preprocessedItem = itemPreProcessor.preProcessItemForPlayer(itemJson).as[JsObject] ++ Json.obj("xhtml" -> processedXhtml)
-
-        val newRelicRumConf: Option[JsValue] = playerConfig.newRelicRumConfig
-
-        logger.trace(s"function=load domainResolvedJs=$domainResolvedJs")
-        logger.trace(s"function=load domainResolvedCss=$domainResolvedCss")
-
-        Ok(
-          renderJade(
-            PlayerTemplateParams(
-              context,
-              domainResolvedJs,
-              domainResolvedCss,
-              jsSrc.ngModules ++ scriptInfo.ngDependencies,
-              servicesJs,
-              showControls,
-              Json.obj("session" -> session, "item" -> preprocessedItem),
-              versionInfo,
-              newRelicRumConf != None,
-              newRelicRumConf.getOrElse(Json.obj()))))
-      }
-    }
-  }
-
+  @deprecated("Do not call GETs to this route", "0.36.0")
   def createSessionForItem(itemId: String): Action[AnyContent] = Action.async { implicit request =>
     hooks.createSessionForItem(itemId).map(handleSuccess { sessionId =>
       val call = org.corespring.container.client.controllers.apps.routes.Player.load(sessionId)
       val url: String = s"${call.url}?${request.rawQueryString}"
       SeeOther(url)
     })
+  }
+
+  override def load(sessionId: String) = Action.async { implicit request => loadSession(sessionId) }
+
+  def createSession(itemId: String): Action[AnyContent] = Action.async { implicit request =>
+    hooks.createSessionForItem(itemId).flatMap(handleSuccess.async { loadSession })
+  }
+
+  private def loadSession(sessionId: String)(implicit request: RequestHeader) = request.path.endsWith("index.html") match {
+    case true => sessionAsHTML(sessionId)
+    case _ => render.async {
+      /** Always provide JSON, unless request accepts HTML and not JSON **/
+      case Accepts.Json() & Accepts.Html() => sessionAsJSON(sessionId)
+      case Accepts.Html() => sessionAsHTML(sessionId)
+      case _ => sessionAsJSON(sessionId)
+    }
   }
 
   lazy val servicesJs = {
@@ -114,4 +85,64 @@ trait Player
       Session.completeSession(":id"),
       Session.loadOutcome(":id")).toString
   }
+
+  private object SessionRenderer {
+
+    /**
+     * Query params:
+     * mode=prod|dev (default: whichever way the app is run)
+     * - dev mode loads all the js as separate files
+     * - prod mode loads minified + concatenated js/css
+     *
+     * showControls=true|false (default: false)
+     * - show simple player controls (for devs)
+     *
+     * loggingEnabled=true|false (default: false)
+     * - implemented in the jade - whether to allow ng logging.
+     *
+     * @param sessionId
+     * @return
+     */
+    def sessionAsHTML(sessionId: String)(implicit request: RequestHeader): Future[SimpleResult] =
+      hooks.loadSessionAndItem(sessionId).map {
+        case Left((code, msg)) => Status(code)(Json.obj("error" -> msg))
+        case Right((session, itemJson)) => {
+
+          val scriptInfo = componentScriptInfo(componentTypes(itemJson), jsMode == "dev")
+          val controlsJs = if (showControls) paths(controlsJsSrc) else Seq.empty
+          val domainResolvedJs = buildJs(scriptInfo, controlsJs)
+          val domainResolvedCss = buildCss(scriptInfo)
+
+          val processedXhtml = processXhtml((itemJson \ "xhtml").asOpt[String])
+          val preprocessedItem = itemPreProcessor.preProcessItemForPlayer(itemJson).as[JsObject] ++ Json.obj("xhtml" -> processedXhtml)
+
+          val newRelicRumConf: Option[JsValue] = playerConfig.newRelicRumConfig
+
+          logger.trace(s"function=load domainResolvedJs=$domainResolvedJs")
+          logger.trace(s"function=load domainResolvedCss=$domainResolvedCss")
+
+          Ok(
+            renderJade(
+              PlayerTemplateParams(
+                context,
+                domainResolvedJs,
+                domainResolvedCss,
+                jsSrc.ngModules ++ scriptInfo.ngDependencies,
+                servicesJs,
+                showControls,
+                Json.obj("session" -> session, "item" -> preprocessedItem),
+                versionInfo,
+                newRelicRumConf != None,
+                newRelicRumConf.getOrElse(Json.obj()))))
+        }
+      }
+
+    def sessionAsJSON(sessionId: String)(implicit request: RequestHeader): Future[SimpleResult] =
+      hooks.loadSessionAndItem(sessionId).map {
+        case Left((code, msg)) => Status(code)(Json.obj("error" -> msg))
+        case Right((session, _)) => Ok(Json.prettyPrint(session))
+      }
+
+  }
+
 }

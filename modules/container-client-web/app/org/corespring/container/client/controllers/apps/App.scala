@@ -15,7 +15,7 @@ import play.api.libs.json.{ JsValue, Json }
 import play.api.mvc._
 import org.corespring.container.logging.ContainerLogger
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent._
 
 case class ComponentScriptInfo(jsUrl: Seq[String], cssUrl: Seq[String], ngDependencies: Seq[String])
 
@@ -47,11 +47,22 @@ trait App[T <: LoadHook]
 
   def hooks: T
 
-  def handleSuccess[D](fn: (D) => SimpleResult)(e: Either[StatusMessage, D]): SimpleResult = {
-    e match {
-      case Left((code, msg)) => Status(code)(msg)
-      case Right(s) => fn(s)
+  object handleSuccess {
+
+    def apply[D](fn: (D) => SimpleResult)(e: Either[StatusMessage, D]): SimpleResult = {
+      e match {
+        case Left((code, msg)) => Status(code)(msg)
+        case Right(s) => fn(s)
+      }
     }
+
+    def async[D](fn: (D) => Future[SimpleResult])(e: Either[StatusMessage, D]): Future[SimpleResult] = {
+      e match {
+        case Left((code, msg)) => Future { Status(code)(msg) }
+        case Right(s) => fn(s)
+      }
+    }
+
   }
 
   def load(id: String): Action[AnyContent]
