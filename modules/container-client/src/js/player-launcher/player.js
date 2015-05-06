@@ -1,6 +1,8 @@
 exports.define = function(isSecure) {
   var PlayerDefinition = function(element, options, errorCallback) {
 
+    var UrlBuilder = require('url-builder');
+
     errorCallback = errorCallback || function(error) {
       throw "error occurred, code: " + error.code + ", message: " + error.message;
     };
@@ -71,7 +73,7 @@ exports.define = function(isSecure) {
 
     var prepareSessionUrl = function() {
       var id = options.itemId;
-      return (options.corespringUrl + options.paths.sessionUrl).replace(":id", id);
+      return new UrlBuilder(options.corespringUrl + options.paths.sessionUrl).interpolate('id', id).build();
     };
 
     options.url = prepareUrl();

@@ -73,7 +73,7 @@ var Instance = function(element, options, errorCallback, log) {
         new UrlBuilder(options.url)
           .params(options.queryParams)
           .hash(options.hash)
-          .interpolate(':sessionId', sessionId)
+          .interpolate('sessionId', sessionId)
           .build();
 
       var iframeTemplate = [
