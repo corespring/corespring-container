@@ -114,20 +114,25 @@ trait PlayerLauncher extends Controller {
 
       logger.debug(s"playerJs - isSecure=${js.isSecure}, path=${request.path}, queryString=${request.rawQueryString}")
 
-      val sessionIdPlayerUrl = Player.load(":id").url
+      val sessionIdPlayerUrl = Player.load(":sessionId").url
 
       val rootUrl = playerConfig.rootUrl.getOrElse(BaseUrl(request))
 
-      val itemUrl: String = Player.createSessionForItem(":id").url
+      val sessionUrl = Player.createSession(":id").url
 
       val defaultOptions: JsValue = Json.obj(
         "corespringUrl" -> rootUrl,
         "mode" -> "gather",
         "paths" -> Json.obj(
-          "gather" -> itemUrl,
-          "gatherSession" -> sessionIdPlayerUrl,
+          "sessionUrl" -> sessionUrl,
+          "gather" -> sessionIdPlayerUrl,
           "view" -> sessionIdPlayerUrl,
           "evaluate" -> sessionIdPlayerUrl))
+
+      for(i <- 0 to 200) {
+        println(Json.prettyPrint(defaultOptions))
+      }
+
       val bootstrap = s"org.corespring.players.ItemPlayer = corespring.require('player').define(${js.isSecure});"
       make(playerNameAndSrc, defaultOptions, bootstrap)
     }

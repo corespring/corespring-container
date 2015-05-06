@@ -62,15 +62,20 @@ exports.define = function(isSecure) {
     var InstanceDef = require('instance');
 
     var prepareUrl = function() {
-      var id = options.mode === 'gather' ? (options.sessionId || options.itemId) : options.sessionId;
       var path = options.paths[options.mode];
       if (options.mode === 'gather' && options.sessionId) {
-        path = options.paths.gatherSession;
+        path = options.paths.gather;
       }
-      return (options.corespringUrl + path).replace(':id', id);
+      return options.corespringUrl + path;
+    };
+
+    var prepareSessionUrl = function() {
+      var id = options.itemId;
+      return (options.corespringUrl + options.paths.sessionUrl).replace(":id", id);
     };
 
     options.url = prepareUrl();
+    options.sessionUrl = prepareSessionUrl();
     options.forceWidth = options.forceWidth === undefined ? true : options.forceWidth;
 
     if (options.showPreview === true) {

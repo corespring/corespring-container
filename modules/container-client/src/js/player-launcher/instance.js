@@ -1,10 +1,14 @@
 var Instance = function(element, options, errorCallback, log) {
 
-  /* global msgr */
+  /* global msgr, $ */
   /** msgr.Channel */
   var channel;
 
   var iframeUid = 'corespring-iframe-' + msgr.utils.getUid();
+
+  var self = this;
+
+  var UrlBuilder = require('url-builder');
 
   function $iframe() {
     var $node = $('#' + iframeUid);
@@ -20,10 +24,18 @@ var Instance = function(element, options, errorCallback, log) {
   log = log || require('logger');
 
   function initialize(e, options) {
+    if (!options || !options.sessionUrl) {
+      errorCallback({
+        code: 999,
+        message: "No session url specified"
+      });
+      return;
+    }
+
     if (!options || !options.url) {
       errorCallback({
         code: 999,
-        message: "No url specified"
+        message: "No item url specified"
       });
       return;
     }
@@ -32,16 +44,6 @@ var Instance = function(element, options, errorCallback, log) {
       errorCallback(errors.CANT_FIND_CONTAINER_FOR_PLAYER);
       return;
     }
-
-    function makeUrl(url, queryParams) {
-      var Builder = require('url-builder');
-      return new Builder().build(url, queryParams);
-    }
-
-    var url = makeUrl(options.url, options.queryParams);
-    if(options.hash){
-      url += '#' + options.hash;
-   }
 
     var iframeStyles = [
       '',
@@ -56,31 +58,52 @@ var Instance = function(element, options, errorCallback, log) {
       }
     })();
 
-    var iframeTemplate = [
-      '<iframe',
-      ' id="', iframeUid , '"',
-      ' frameborder="0"',
-      ' src="', url, '"',
-      ' class="player-loading"',
-      ' style="width: 100%; border: none;"></iframe>'
-    ].join('');
+    $.ajax({
+      url: options.sessionUrl,
+      async: false,
+      method: 'POST',
+      dataType: 'json'
+    }).done(loadSession);
 
-    $(e).html(iframeTemplate);
+    function loadSession(session) {
 
-    channel = new msgr.Channel(window, $iframe()[0].contentWindow, {enableLogging: false});
+      var sessionId = session._id['$oid'];
 
-    channel.on('dimensionsUpdate', function(data){
-      $iframe().height(data.h);
-    });
+      var url =
+        new UrlBuilder(options.url)
+          .params(options.queryParams)
+          .hash(options.hash)
+          .interpolate(':sessionId', sessionId)
+          .build();
 
-    channel.on('rendered', function() {
-      $iframe().removeClass("player-loading");
-      $iframe().addClass("player-loaded");
-    });
+      var iframeTemplate = [
+        '<iframe',
+        ' id="', iframeUid , '"',
+        ' frameborder="0"',
+        ' src="', url, '"',
+        ' class="player-loading"',
+        ' style="width: 100%; border: none;"></iframe>'
+      ].join('');
 
-    if (options.forceWidth) {
-      $(e).width(options.width ? options.width : "600px");
+      $(e).html(iframeTemplate);
+
+      channel = new msgr.Channel(window, $iframe()[0].contentWindow, {enableLogging: false});
+
+      channel.on('dimensionsUpdate', function(data){
+        $iframe().height(data.h);
+      });
+
+      channel.on('rendered', function() {
+        $iframe().removeClass("player-loading");
+        $iframe().addClass("player-loaded");
+      });
+
+      if (options.forceWidth) {
+        $(e).width(options.width ? options.width : "600px");
+      }
+
     }
+
   }
 
   this.send = function() {
