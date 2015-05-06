@@ -50,7 +50,7 @@ trait PlayerLauncher extends Controller {
   def hooks: PlayerLauncherHooks
 
   lazy val editorNameAndSrc = {
-    val jsPath = "container-client/js/player-launcher/editor.js"
+    val jsPath = "container-client/js/player-launcher/new-editor.js"
     pathToNameAndContents(jsPath)
   }
 
@@ -86,7 +86,7 @@ trait PlayerLauncher extends Controller {
           "createItemAndDraft" -> createItemAndDraft,
           "commitDraft" -> commitDraft))
 
-      val bootstrap = "org.corespring.players.ItemEditor = corespring.require('editor');"
+      val bootstrap = "org.corespring.players.ItemEditor = corespring.require('new-editor');"
       make(editorNameAndSrc, defaultOptions, bootstrap)
     }
   }
@@ -166,6 +166,7 @@ trait PlayerLauncher extends Controller {
       "container-client/js/player-launcher/logger.js",
       "container-client/js/player-launcher/errors.js",
       "container-client/js/player-launcher/instance.js",
+      "container-client/js/player-launcher/paths.js",
       "container-client/js/player-launcher/url-builder.js")
     val rawJs = pathToNameAndContents("container-client/js/corespring/core-library.js")._2
     val wrapped = corePaths.map(pathToNameAndContents).map(t => ServerLibraryWrapper(t._1, t._2))
