@@ -15,36 +15,6 @@ import play.api.mvc._
 
 import scala.concurrent.Future
 
-trait ItemHooks extends ContainerItemHooks {
-  def itemService: MongoService
-
-  override def load(itemId: String)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] = Future {
-    itemService.load(itemId).map { i =>
-      Right(i)
-    }.getOrElse(Left((NOT_FOUND, s"Can't find item with id: $itemId")))
-  }
-
-  override def create(json: Option[JsValue])(implicit header: RequestHeader): Future[Either[StatusMessage, String]] = Future {
-    val newItem = Json.obj(
-      "components" -> Json.obj(),
-      "profile" -> Json.obj("taskInfo" -> Json.obj("title" -> "Untitled")),
-      "metadata" -> Json.obj(),
-      "xhtml" -> "<div></div>")
-
-    itemService.create(newItem).map {
-      oid =>
-        Right(oid.toString)
-    }.getOrElse(Left(BAD_REQUEST -> "Error creating item"))
-  }
-
-}
-
-trait ItemDraftAssets {
-  def copyItemToDraft(itemId: String, draftName: String)
-  def copyDraftToItem(draftId: String, itemId: String)
-  def deleteDraft(draftId: String)
-}
-
 trait ItemDraftHooks extends ContainerItemDraftHooks {
 
   val logger = Logger(classOf[ItemDraftHooks])

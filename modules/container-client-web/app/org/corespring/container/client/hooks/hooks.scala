@@ -95,3 +95,7 @@ trait DataQueryHooks extends HasContext {
 
   def findOne(topic: String, id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, Option[JsValue]]]
 }
+
+trait CollectionHooks extends HasContext {
+  def list(query: Option[String] = None)(implicit header: RequestHeader): Future[Either[StatusMessage, JsArray]]
+}

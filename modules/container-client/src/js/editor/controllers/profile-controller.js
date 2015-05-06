@@ -29,7 +29,8 @@
     ItemService,
     LogFactory,
     ProfileFormatter,
-    StandardQueryCreator) {
+    StandardQueryCreator
+  ) {
 
     var $log = LogFactory.getLogger('ProfileController');
 
@@ -39,7 +40,7 @@
     // visible - hide/show a form element
     // readonly - make the element readonly/editable
     // value - set the value of the element. Multi select fields take an array as value.
-    // options - set the options for a element that allows selecting like a combo box.
+    // options - set the options for an element that allows selecting like a combo box.
     // collapse - collapse/expand an element, applies to elements in a collapsible container only, see jade
     //
     // The value for a form element is applied after the profile is loaded, thus it overrides the value
@@ -50,7 +51,7 @@
 
     /**
      * The default form models. Can be overridden by passing in values through the editor constructor.
-     * These values are accessible from here through the ConfigurationService.
+     * The values passed-in are accessible from here through the ConfigurationService.
      */
     $scope.formModels = {
       additionalMediaCopyrights: {
@@ -68,6 +69,10 @@
         collapse:true
       },
       componentTypes: {
+        visible:true,
+        readonly:false
+      },
+      collectionId: {
         visible:true,
         readonly:false
       },
