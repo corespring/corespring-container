@@ -35,7 +35,7 @@ var Instance = function(element, options, errorCallback, log) {
     if (!options || !options.url) {
       errorCallback({
         code: 999,
-        message: "No item url specified"
+        message: "No url specified"
       });
       return;
     }
@@ -60,7 +60,7 @@ var Instance = function(element, options, errorCallback, log) {
 
     $.ajax({
       url: options.sessionUrl,
-      async: false,
+      async: false, // refactor this so that it's asynchronous.
       method: 'POST',
       dataType: 'json'
     }).done(loadSession);

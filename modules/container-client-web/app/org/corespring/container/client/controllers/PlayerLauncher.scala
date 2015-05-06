@@ -129,10 +129,6 @@ trait PlayerLauncher extends Controller {
           "view" -> sessionIdPlayerUrl,
           "evaluate" -> sessionIdPlayerUrl))
 
-      for(i <- 0 to 200) {
-        println(Json.prettyPrint(defaultOptions))
-      }
-
       val bootstrap = s"org.corespring.players.ItemPlayer = corespring.require('player').define(${js.isSecure});"
       make(playerNameAndSrc, defaultOptions, bootstrap)
     }
