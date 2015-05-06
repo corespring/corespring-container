@@ -19,6 +19,19 @@ trait Launchers extends Controller {
       "itemId" -> itemId)))
   }
 
+  def catalog(itemId:String) = Action{ request =>
+    import org.corespring.shell.views.html.launchers
+    import org.corespring.container.client.controllers.routes.PlayerLauncher
+
+    val tabOpts = {
+      request.getQueryString("tabs").map{ tabs =>
+        Json.obj("tabs" -> JsObject(tabs.split(",").toSeq.map(_ -> JsBoolean(true))))
+      }.getOrElse(Json.obj())
+    }
+
+    Ok(launchers.catalog(PlayerLauncher.catalogJs().url, baseJson(request) ++ Json.obj("itemId" -> itemId) ++ tabOpts))
+  }
+
   private def loadPlayer(opts: JsValue) = org.corespring.shell.views.html.launchers.editor(org.corespring.container.client.controllers.routes.PlayerLauncher.editorJs().url, opts)
 
   private def splitDraftId(draftId: String) = {

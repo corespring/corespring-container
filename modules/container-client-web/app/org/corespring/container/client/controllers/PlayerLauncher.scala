@@ -55,12 +55,13 @@ trait PlayerLauncher extends Controller {
   }
 
   lazy val catalogNameAndSrc = {
-    val jsPath = "container-client/js/player-launcher/catalog.js"
+    val jsPath = "container-client/js/player-launcher/new-catalog.js"
     pathToNameAndContents(jsPath)
   }
 
   lazy val playerNameAndSrc = {
-    val jsPath = "container-client/js/player-launcher/player.js"
+    
+    val jsPath = "container-client/js/player-launcher/new-player.js"
     pathToNameAndContents(jsPath)
   }
 
@@ -101,7 +102,7 @@ trait PlayerLauncher extends Controller {
         "paths" -> Json.obj(
           "catalog" -> loadCatalogCall))
 
-      val bootstrap = "org.corespring.players.ItemCatalog = corespring.require('catalog');"
+      val bootstrap = "org.corespring.players.ItemCatalog = corespring.require('new-catalog');"
       make(catalogNameAndSrc, defaultOptions, bootstrap)
     }
   }
@@ -128,7 +129,7 @@ trait PlayerLauncher extends Controller {
           "gatherSession" -> sessionIdPlayerUrl,
           "view" -> sessionIdPlayerUrl,
           "evaluate" -> sessionIdPlayerUrl))
-      val bootstrap = s"org.corespring.players.ItemPlayer = corespring.require('player').define(${js.isSecure});"
+      val bootstrap = s"org.corespring.players.ItemPlayer = corespring.require('new-player').define(${js.isSecure});"
       make(playerNameAndSrc, defaultOptions, bootstrap)
     }
   }
@@ -168,7 +169,6 @@ trait PlayerLauncher extends Controller {
       "container-client/js/player-launcher/instance.js",
       "container-client/js/player-launcher/paths.js",
       "container-client/js/player-launcher/client-launcher.js",
-      "container-client/js/player-launcher/error-handler.js",
       "container-client/js/player-launcher/url-builder.js")
     val rawJs = pathToNameAndContents("container-client/js/corespring/core-library.js")._2
     val wrapped = corePaths.map(pathToNameAndContents).map(t => ServerLibraryWrapper(t._1, t._2))

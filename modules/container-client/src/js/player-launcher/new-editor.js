@@ -65,7 +65,10 @@ function EditorDefinition(element, options, errorCallback) {
     var url = call.url.replace(':draftId', draftId);
 
 
-    launcher.mkInstance(url, function onReady(instance){
+    launcher.mkInstance(url, null, function onReady(instance){
+
+      instance.send('initialise', options);
+
       if(options.devEditor){
         instance.css('height', '100%');
       }

@@ -8,6 +8,7 @@ POST        /create-session       @org.corespring.shell.controllers.Main.createS
 
 GET         /launch-editor/item/:id    @org.corespring.shell.controllers.Launchers.editorFromItem(id)
 GET         /launch-editor/draft/:id   @org.corespring.shell.controllers.Launchers.editorFromDraft(id)
+GET         /launch-catalog/:id        @org.corespring.shell.controllers.Launchers.catalog(id)
 
 GET         /assets/*file        controllers.Assets.at(path="/container-client", file)
 

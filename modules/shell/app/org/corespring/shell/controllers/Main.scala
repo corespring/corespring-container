@@ -64,7 +64,7 @@ trait Main
           val deleteUrl = routes.Main.deleteItem(id).url
           val editorUrl = Launchers.editorFromItem(id).url
           val devEditorUrl = appRoutes.DevEditor.load(id).url
-          val catalogUrl = appRoutes.Catalog.load(id).url
+          val catalogUrl = Launchers.catalog(id).url
           IndexLink(name,
             playerUrl,
             editorUrl,
