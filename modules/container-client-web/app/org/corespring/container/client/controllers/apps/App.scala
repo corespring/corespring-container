@@ -49,18 +49,14 @@ trait App[T <: LoadHook]
 
   object handleSuccess {
 
-    def apply[D](fn: (D) => SimpleResult)(e: Either[StatusMessage, D]): SimpleResult = {
-      e match {
-        case Left((code, msg)) => Status(code)(msg)
-        case Right(s) => fn(s)
-      }
+    def apply[D](fn: (D) => SimpleResult)(e: Either[StatusMessage, D]): SimpleResult = e match {
+      case Left((code, msg)) => Status(code)(msg)
+      case Right(s) => fn(s)
     }
 
-    def async[D](fn: (D) => Future[SimpleResult])(e: Either[StatusMessage, D]): Future[SimpleResult] = {
-      e match {
-        case Left((code, msg)) => Future { Status(code)(msg) }
-        case Right(s) => fn(s)
-      }
+    def async[D](fn: (D) => Future[SimpleResult])(e: Either[StatusMessage, D]): Future[SimpleResult] = e match {
+      case Left((code, msg)) => Future { Status(code)(msg) }
+      case Right(s) => fn(s)
     }
 
   }

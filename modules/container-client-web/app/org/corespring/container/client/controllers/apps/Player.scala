@@ -63,15 +63,17 @@ trait Player
     hooks.createSessionForItem(itemId).flatMap(handleSuccess.async { loadSession })
   }
 
-  private def loadSession(sessionId: String)(implicit request: RequestHeader) = request.path.endsWith("index.html") match {
-    case true => sessionAsHTML(sessionId)
-    case _ => render.async {
-      /** Always provide JSON, unless request accepts HTML and not JSON **/
-      case Accepts.Json() & Accepts.Html() => sessionAsJSON(sessionId)
-      case Accepts.Html() => sessionAsHTML(sessionId)
-      case _ => sessionAsJSON(sessionId)
+  private def loadSession(sessionId: String)(implicit request: RequestHeader) =
+    request.path.endsWith("index.html") match {
+      case true => sessionAsHTML(sessionId)
+      case _ => render.async {
+        /** Always provide JSON, unless request accepts HTML and not JSON **/
+        case Accepts.Json() & Accepts.Html() => sessionAsJSON(sessionId)
+        case Accepts.Json() => sessionAsJSON(sessionId)
+        case Accepts.Html() => sessionAsHTML(sessionId)
+        case _ => sessionAsJSON(sessionId)
+      }
     }
-  }
 
   lazy val servicesJs = {
     import org.corespring.container.client.controllers.resources.routes._
@@ -140,7 +142,7 @@ trait Player
     def sessionAsJSON(sessionId: String)(implicit request: RequestHeader): Future[SimpleResult] =
       hooks.loadSessionAndItem(sessionId).map {
         case Left((code, msg)) => Status(code)(Json.obj("error" -> msg))
-        case Right((session, _)) => Ok(Json.prettyPrint(session))
+        case Right((session, _)) => Ok(Json.prettyPrint(session)).as("application/json")
       }
 
   }

@@ -1,7 +1,6 @@
 package org.corespring.container.client.controllers
 
 import org.corespring.container.client.controllers.apps.routes._
-import play.api.libs.json.Json
 
 import scala.concurrent.{ ExecutionContext, Future }
 
@@ -34,21 +33,15 @@ class PlayerLauncherTest extends Specification with Mockito with PlaySpecificati
       override def playerConfig: V2PlayerConfig = V2PlayerConfig(mockConfig)
 
       override def hooks: PlayerLauncherHooks = new PlayerLauncherHooks {
-
         override def editorJs(implicit header: RequestHeader): Future[PlayerJs] = Future(jsConfig)
-
         override def playerJs(implicit header: RequestHeader): Future[PlayerJs] = Future(jsConfig)
-
         override def catalogJs(implicit header: RequestHeader): Future[PlayerJs] = Future(jsConfig)
       }
-
       override implicit def ec: ExecutionContext = ExecutionContext.Implicits.global
     }
   }
 
-  object MockGlobal extends GlobalSettings {
-
-  }
+  object MockGlobal extends GlobalSettings
 
   "playerJs" should {
 
