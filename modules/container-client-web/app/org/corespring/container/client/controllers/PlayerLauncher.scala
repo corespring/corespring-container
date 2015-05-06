@@ -26,7 +26,7 @@ trait PlayerLauncher extends Controller {
 
   //TODO: This is lifted from corespring-api -> move to a library
   object BaseUrl {
-    def apply(r: Request[AnyContent]): String = {
+    def apply(r: RequestHeader): String = {
 
       /**
        * Note: You can't check a request to see if its http or not in Play
@@ -106,31 +106,32 @@ trait PlayerLauncher extends Controller {
     }
   }
 
+  object defaultOptions {
+
+    def player(request: RequestHeader) = {
+      val corespringUrl: String = playerConfig.rootUrl.getOrElse(BaseUrl(request))
+      val sessionIdPlayerUrl = Player.load(":sessionId").url
+      Json.obj(
+        "corespringUrl" -> corespringUrl,
+        "mode" -> "gather",
+        "paths" -> Json.obj(
+          "sessionUrl" -> Player.createSession(":id").url,
+          "gather" -> sessionIdPlayerUrl,
+          "view" -> sessionIdPlayerUrl,
+          "evaluate" -> sessionIdPlayerUrl))
+    }
+
+  }
+
   /**
    * query: playerPage the player page to load (default: index.html), for a simple player you can pass in container-player.html
    */
   def playerJs = Action.async { implicit request =>
     hooks.playerJs.map { implicit js =>
-
       logger.debug(s"playerJs - isSecure=${js.isSecure}, path=${request.path}, queryString=${request.rawQueryString}")
 
-      val sessionIdPlayerUrl = Player.load(":sessionId").url
-
-      val rootUrl = playerConfig.rootUrl.getOrElse(BaseUrl(request))
-
-      val sessionUrl = Player.createSession(":id").url
-
-      val defaultOptions: JsValue = Json.obj(
-        "corespringUrl" -> rootUrl,
-        "mode" -> "gather",
-        "paths" -> Json.obj(
-          "sessionUrl" -> sessionUrl,
-          "gather" -> sessionIdPlayerUrl,
-          "view" -> sessionIdPlayerUrl,
-          "evaluate" -> sessionIdPlayerUrl))
-
       val bootstrap = s"org.corespring.players.ItemPlayer = corespring.require('player').define(${js.isSecure});"
-      make(playerNameAndSrc, defaultOptions, bootstrap)
+      make(playerNameAndSrc, defaultOptions.player(request), bootstrap)
     }
   }
 
