@@ -58,8 +58,6 @@ class PlayerTest extends Specification with PlaySpecification with Mockito {
     override implicit def ec: ExecutionContext = ExecutionContext.global
   }
 
-  val session = ""
-
   "load" should {
 
     "return session as JSON" in {
