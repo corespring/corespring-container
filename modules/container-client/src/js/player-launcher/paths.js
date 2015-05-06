@@ -1,6 +1,7 @@
-var options = require('default-options');
 
-module.export = function(errorCallback){
+module.exports = function(errorCallback){
+
+  var options = require('default-options');
 
   this.loadCall = function(key){
     if (!options.paths || !options.paths[name]) {

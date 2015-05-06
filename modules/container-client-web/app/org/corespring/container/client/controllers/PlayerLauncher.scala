@@ -167,6 +167,8 @@ trait PlayerLauncher extends Controller {
       "container-client/js/player-launcher/errors.js",
       "container-client/js/player-launcher/instance.js",
       "container-client/js/player-launcher/paths.js",
+      "container-client/js/player-launcher/client-launcher.js",
+      "container-client/js/player-launcher/error-handler.js",
       "container-client/js/player-launcher/url-builder.js")
     val rawJs = pathToNameAndContents("container-client/js/corespring/core-library.js")._2
     val wrapped = corePaths.map(pathToNameAndContents).map(t => ServerLibraryWrapper(t._1, t._2))
@@ -187,7 +189,7 @@ trait PlayerLauncher extends Controller {
     val launchErrors = ("launcher-errors" -> errorsToModule(js.errors))
     val launchWarnings = ("launcher-warnings" -> warningsToModule(js.warnings))
     val queryParams = ("query-params" -> makeQueryParams(request.queryString))
-    val wrappedNameAndContents = Seq(additionalJsNameAndSrc, defaultOptions, launchErrors, launchWarnings, queryParams)
+    val wrappedNameAndContents = Seq(defaultOptions, launchErrors, launchWarnings, queryParams, additionalJsNameAndSrc)
     val wrappedContents = wrappedNameAndContents.map(tuple => ServerLibraryWrapper(tuple._1, tuple._2))
     def sumSession(s: Session, keyValues: (String, String)*): Session = {
       keyValues.foldRight(s)((kv: (String, String), acc: Session) => acc + (kv._1, kv._2))
