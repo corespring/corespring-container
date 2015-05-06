@@ -4,9 +4,19 @@
 @import "app";
 @import "common/variables";
 @import "common/base";
-@import "player/control-panel";
 
-body{
+.playerholder {
+  @import "player/player-core";
+}
+
+body {
+  //moved here from player shared
+  font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+  color: #333;
+}
+
+
+body {
   font-size: 12px;
 }
 
