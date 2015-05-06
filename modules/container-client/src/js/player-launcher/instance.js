@@ -25,7 +25,6 @@ var Instance = function(element, options, errorCallback, log) {
 
   function initialize(e, options) {
     if (!options || !options.sessionUrl) {
-      throw 'e';
       errorCallback({
         code: 999,
         message: "No session url specified"
