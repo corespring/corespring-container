@@ -84,7 +84,6 @@ function ClientLauncher(element, options, errorCallback){
 
     function ErrorAndWarningHandler(){
       var errs = require('launcher-errors');
-      var launchWarnings = require('launcher-warnings');
 
       this.hasErrors = function(){
         return errs.errors.length === 0;
@@ -97,6 +96,12 @@ function ClientLauncher(element, options, errorCallback){
       };
 
       this.eachWarning = function(cb){
+        var launchWarnings;
+        try{
+          launchWarnings = require('launcher-warnings');
+        } catch(e){
+          launchWarnings = { warnings : [] };
+        }
         for(var i = 0; i < launchWarnings.warnings.length; i++){
           cb(launchWarnings.warnings[i]);
         }

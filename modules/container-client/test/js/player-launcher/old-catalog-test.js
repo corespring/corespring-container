@@ -1,6 +1,6 @@
-describe('new catalog launcher', function () {
+describe('catalog launcher', function () {
 
-  var errors = corespring.require('errors');
+  var errors = corespring.require("errors");
   var originalDefaultOptions;
 
   var CatalogDefinition;
@@ -18,7 +18,7 @@ describe('new catalog launcher', function () {
     instanceCalls.push({instance: this, element: element, options: options, errorCallback: errorCallback, log: logger});
 
     this.on = function(name, cb) {
-      if (name == 'ready') {
+      if (name == "ready") {
         cb();
       }
     };
@@ -38,14 +38,14 @@ describe('new catalog launcher', function () {
   beforeEach(function () {
     instanceCalls = [];
     lastError = null;
-    defaultOptions = corespring.module('default-options').exports;
+    defaultOptions = corespring.module("default-options").exports;
     originalDefaultOptions = _.cloneDeep(defaultOptions);
-    defaultOptions.corespringUrl = 'http://blah.com';
+    defaultOptions.corespringUrl = "http://blah.com";
     defaultOptions.paths = {};
-    originalInstance = corespring.require('instance');
-    mockInstance = corespring.module('instance', MockInstance);
-    launchErrors = corespring.module('launcher-errors', new MockErrors());
-    CatalogDefinition = corespring.require('new-catalog');
+    originalInstance = corespring.require("instance");
+    mockInstance = corespring.module("instance", MockInstance);
+    launchErrors = corespring.module("launcher-errors", new MockErrors());
+    CatalogDefinition = corespring.require("catalog");
     warnings = [];
     origWarn = window.console.warn;
     window.console.warn = function (msg) {
@@ -54,19 +54,19 @@ describe('new catalog launcher', function () {
   });
 
   afterEach(function () {
-    corespring.module('instance', originalInstance);
-    corespring.module('default-options').exports = originalDefaultOptions;
+    corespring.module("instance", originalInstance);
+    corespring.module("default-options").exports = originalDefaultOptions;
     window.console.warn = origWarn;
   });
 
   function create(options, playerErrors, queryParams) {
 
-    corespring.module('launcher-errors', playerErrors || new MockErrors());
-    corespring.module('query-params', queryParams || {});
+    corespring.module("launcher-errors", playerErrors || new MockErrors());
+    corespring.module("query-params", queryParams || {});
 
     lastError = null;
 
-    var catalog = new CatalogDefinition('dummy-element', options, function (err) {
+    var catalog = new CatalogDefinition("dummy-element", options, function (err) {
       lastError = err;
     });
 
@@ -74,16 +74,16 @@ describe('new catalog launcher', function () {
   }
 
   it('should invoke error callback if there are launcher-errors', function () {
-    create({}, new MockErrors(['error one']));
+    create({}, new MockErrors(["error one"]));
 
-    expect(lastError.code).toEqual(errors.EXTERNAL_ERROR('error one').code);
-    expect(lastError.message).toEqual(errors.EXTERNAL_ERROR('error one').message);
+    expect(lastError.code).toEqual(errors.EXTERNAL_ERROR("error one").code);
+    expect(lastError.message).toEqual(errors.EXTERNAL_ERROR("error one").message);
   });
 
-  describe('load item', function(){
+  describe("load item", function(){
 
     it('should create instance (which loads item) if options has itemId', function () {
-      defaultOptions.paths.catalog = {url: '/expected-catalog-url', method: 'expected-method'};
+      defaultOptions.paths.catalog = {url: "/expected-catalog-url", method: 'expected-method'};
 
       create({itemId:'expected-item-id'});
       expect(lastError).toBe(null);
@@ -93,7 +93,7 @@ describe('new catalog launcher', function () {
     });
 
     it('should pass queryParams in options', function () {
-      defaultOptions.paths.catalog = {url: '/expected-catalog-url', method: 'expected-method'};
+      defaultOptions.paths.catalog = {url: "/expected-catalog-url", method: 'expected-method'};
 
       create({itemId:'expected-item-id'}, null, {apiClient:123});
       var call = instanceCalls.pop();
@@ -101,11 +101,11 @@ describe('new catalog launcher', function () {
     });
 
 
-    it('should invoke error callback if options.path does not contain \'catalog\'', function(){
+    it("should invoke error callback if options.path does not contain 'catalog'", function(){
       defaultOptions.paths = {};
       create({itemId:'expected-item-id'}, null, {apiClient:123});
-      expect(lastError.code).toEqual(errors.EXTERNAL_ERROR('catalog not part of options').code);
-      expect(lastError.message).toEqual(errors.EXTERNAL_ERROR('catalog not part of options').message);
+      expect(lastError.code).toEqual(errors.EXTERNAL_ERROR("catalog not part of options").code);
+      expect(lastError.message).toEqual(errors.EXTERNAL_ERROR("catalog not part of options").message);
     });
 
   });
