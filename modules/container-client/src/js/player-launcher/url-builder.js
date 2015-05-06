@@ -1,7 +1,13 @@
+/**
+ * Using the builder pattern, this method provides several methods for building a URL.
+ */
 function UrlBuilder(baseUrl) {
 
   var url = baseUrl;
 
+  /**
+   * Converts a parameters object to a query string, and appends this to the URL.
+   */
   this.params = function(params) {
     var split = url.split('?');
     var base = split.shift();
@@ -19,12 +25,18 @@ function UrlBuilder(baseUrl) {
     return this;
   };
 
+  /**
+   * Replaces a colon-prefixed placeholder in the URL with a specified value.
+   */
   this.interpolate = function(placeholder, value) {
     placeholder = placeholder.startsWith(":") ? placeholder : (":" + placeholder);
     url = url.replace(placeholder, value);
     return this;
   };
 
+  /**
+   * Appends a hash to the URL.
+   */
   this.hash = function(hash) {
     if (hash) {
       url = url + ("#" + hash);
@@ -32,6 +44,9 @@ function UrlBuilder(baseUrl) {
     return this;
   };
 
+  /**
+   * Returns the current value of the mutable URL.
+   */
   this.build = function() {
     return url;
   };
