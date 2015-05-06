@@ -1,7 +1,7 @@
 function CatalogDefinition(element, options, errorCallback) {
 
   var Launcher = require('client-launcher');
-
+  var errors = require('errors');
   var launcher = new Launcher(element, options, errorCallback);
 
   function loadItem(itemId, options) {
@@ -26,7 +26,7 @@ function CatalogDefinition(element, options, errorCallback) {
     if (options.itemId) {
       loadItem(options.itemId, options);
     } else {
-      errorCallback({code: -1, message: 'no itemId'});
+      errorCallback(errors.NO_ITEM_ID);
     }
   };
 

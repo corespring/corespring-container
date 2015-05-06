@@ -60,7 +60,7 @@ trait PlayerLauncher extends Controller {
   }
 
   lazy val playerNameAndSrc = {
-    
+
     val jsPath = "container-client/js/player-launcher/new-player.js"
     pathToNameAndContents(jsPath)
   }
