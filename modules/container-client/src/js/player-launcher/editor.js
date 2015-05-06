@@ -3,7 +3,7 @@ function EditorDefinition(element, options, errorCallback) {
   var isReady = false;
   var errors = require('errors');
   var logger = options.logger || require('logger');
-  var builder = new (require('url-builder'))();
+  var UrlBuilder = require('url-builder');
   var queryParams = $.extend({}, require('query-params'), options.queryParams);
 
   var defaultOptions = require('default-options');
@@ -15,10 +15,6 @@ function EditorDefinition(element, options, errorCallback) {
   errorCallback = errorCallback || function (error) {
     throw 'error occurred, code: ' + error.code + ', message: ' + error.message;
   };
-
-  function makeUrl(url, queryParams) {
-    return builder.build(url, queryParams);
-  }
 
   function hasLauncherErrors() {
     var launcherErrors = require('launcher-errors');
@@ -69,7 +65,7 @@ function EditorDefinition(element, options, errorCallback) {
 
     $.ajax({
       type: call.method,
-      url: makeUrl(options.corespringUrl + call.url, queryParams),
+      url: new UrlBuilder(options.corespringUrl + call.url).params(queryParams).build(),
       data: options,
       success: onSuccess,
       error: callback.bind(this),
@@ -101,8 +97,13 @@ function EditorDefinition(element, options, errorCallback) {
       options.hash = '/supporting-materials/0';
     }
 
-    options.url = (options.corespringUrl + call.url)
-      .replace(':draftId', draftId);
+    var prepareSessionUrl = function() {
+      var id = options.itemId;
+      return new UrlBuilder(options.corespringUrl + options.paths.sessionUrl).interpolate('id', id).build();
+    };
+
+    options.url = new UrlBuilder(options.corespringUrl + call.url).interpolate('draftId', draftId).build();
+    options.sessionUrl = prepareSessionUrl();
 
     options.queryParams = queryParams;
 
@@ -161,10 +162,6 @@ function EditorDefinition(element, options, errorCallback) {
   /** Public functions */
   this.commitDraft = function(force, callback){
     var call = loadMethodAndUrl('commitDraft');
-    var url = call.url
-      .replace(':draftId', new DraftId(options.itemId, options.draftName).toString());
-
-    var method = call.method;
 
     function onSuccess(result){
       if(callback){
@@ -180,8 +177,11 @@ function EditorDefinition(element, options, errorCallback) {
     }
 
     $.ajax({
-      type: method,
-      url: makeUrl(options.corespringUrl + url, _.extend(queryParams, {force: force})),
+      type: call.method,
+      url: new UrlBuilder(options.corespringUrl + call.url)
+        .interpolate('draftId', new DraftId(options.itemId, options.draftName).toString())
+        .params(_.extend(queryParams, {force: force}))
+        .build(),
       data: options,
       success: onSuccess,
       error: onError,
