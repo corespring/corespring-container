@@ -1,6 +1,7 @@
 package org.corespring.container.client.controllers
 
 import org.corespring.container.client.controllers.apps.routes._
+import org.corespring.container.client.controllers.resources.routes._
 
 import scala.concurrent.{ ExecutionContext, Future }
 
@@ -66,7 +67,56 @@ class PlayerLauncherTest extends Specification with Mockito with PlaySpecificati
     var url = "http://localhost:9000"
 
     class defaultOptions extends launchScope(PlayerJs(false, Session())) {
+      val catalogOptions = launcher.defaultOptions.catalog(FakeRequest("GET", url))
+      val editorOptions = launcher.defaultOptions.editor(FakeRequest("GET", url))
       val playerOptions = launcher.defaultOptions.player(FakeRequest("GET", url))
+    }
+
+    "catalog" should {
+
+      "set corespringUrl from configuration" in new defaultOptions {
+        (catalogOptions \ "corespringUrl").asOpt[String] must be equalTo(config.get("rootUrl"))
+      }
+
+      "paths" should {
+
+        "direct catalog to Catalog.load" in new defaultOptions {
+          (catalogOptions \ "paths" \ "catalog").as[String] must be equalTo(Catalog.load(":itemId").url)
+        }
+
+      }
+
+    }
+
+    "editor" should {
+
+      "set corespringUrl from configuration" in new defaultOptions {
+        (editorOptions \ "corespringUrl").asOpt[String] must be equalTo(config.get("rootUrl"))
+      }
+
+      "paths" should {
+
+        "direct sessionUrl to Player.createSession" in new defaultOptions {
+          (editorOptions \ "paths" \ "sessionUrl").as[String] must be equalTo(Player.createSession(":id").url)
+        }
+
+        "direct editor to Editor.load" in new defaultOptions {
+          (editorOptions \ "paths" \ "editor").as[String] must be equalTo(Editor.load(":draftId").url)
+        }
+
+        "direct devEditor to DevEditor.load" in new defaultOptions {
+          (editorOptions \ "paths" \ "devEditor").as[String] must be equalTo(DevEditor.load(":draftId").url)
+        }
+
+        "direct createItemAndDraft to ItemDraft.createItemAndDraft" in new defaultOptions {
+          (editorOptions \ "paths" \ "createItemAndDraft").as[String] must be equalTo(ItemDraft.createItemAndDraft().url)
+        }
+
+        "direct commitDraft to ItemDraft.commit" in new defaultOptions {
+          (editorOptions \ "paths" \ "commitDraft").as[String] must be equalTo(ItemDraft.commit(":draftId").url)
+        }
+      }
+
     }
 
     "player" should {

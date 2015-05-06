@@ -68,12 +68,12 @@ trait PlayerLauncher extends Controller {
 
   implicit def callToJson(c: Call): JsValueWrapper = Json.obj("method" -> c.method, "url" -> c.url)
 
-  def editorJs = getEditorJs(Editor.load(":draftId"), DevEditor.load(":draftId"))
+  def editorJs = getEditorJs
 
-  def getEditorJs(editor: Call, devEditor:Call) = Action.async { implicit request =>
+  def getEditorJs = Action.async { implicit request =>
     hooks.editorJs.map { implicit js =>
       val bootstrap = "org.corespring.players.ItemEditor = corespring.require('editor');"
-      make(editorNameAndSrc, defaultOptions.editor(editor, devEditor), bootstrap)
+      make(editorNameAndSrc, defaultOptions.editor, bootstrap)
     }
   }
 
@@ -94,19 +94,19 @@ trait PlayerLauncher extends Controller {
     def catalog(implicit request: RequestHeader) = Json.obj(
       "corespringUrl" -> corespringUrl,
       "paths" -> Json.obj(
-        "catalog" -> Catalog.load(":itemId")
+        "catalog" -> Catalog.load(":itemId").url
       )
     )
 
-    def editor(editor: Call, devEditor: Call)(implicit request: RequestHeader) = {
+    def editor(implicit request: RequestHeader) = {
       Json.obj(
         "corespringUrl" -> corespringUrl,
         "paths" -> Json.obj(
           "sessionUrl" -> sessionUrl,
-          "editor" -> editor,
-          "devEditor" -> devEditor,
-          "createItemAndDraft" -> ItemDraft.createItemAndDraft(),
-          "commitDraft" -> ItemDraft.commit(":draftId")))
+          "editor" -> Editor.load(":draftId").url,
+          "devEditor" -> DevEditor.load(":draftId").url,
+          "createItemAndDraft" -> ItemDraft.createItemAndDraft().url,
+          "commitDraft" -> ItemDraft.commit(":draftId").url))
     }
 
     def player(implicit request: RequestHeader) = {
