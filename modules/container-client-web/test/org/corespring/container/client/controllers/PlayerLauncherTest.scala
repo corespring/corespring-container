@@ -36,8 +36,8 @@ class PlayerLauncherTest extends Specification with Mockito with PlaySpecificati
 
   }
 
-  "PlayerLauncher" should {
-    "playerJs" in new launchScope(PlayerJs(false, Session())) {
+  "playerJs" should {
+    "return 200" in new launchScope(PlayerJs(false, Session())) {
       running(FakeApplication(withGlobal = Some(MockGlobal))) {
         val result = launcher.playerJs(FakeRequest("", ""))
         status(result) === OK
