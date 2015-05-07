@@ -1,5 +1,6 @@
 package org.corespring.container.client.controllers.apps
 
+import org.apache.commons.io.IOUtils
 import org.corespring.container.client.V2PlayerConfig
 import org.corespring.container.client.component.PlayerItemTypeReader
 import org.corespring.container.client.controllers.GetAsset
@@ -9,6 +10,7 @@ import org.corespring.container.client.hooks.PlayerHooks
 import org.corespring.container.client.views.txt.js.PlayerServices
 import org.corespring.container.components.processing.PlayerItemPreProcessor
 import play.api.http.ContentTypes
+import play.api.libs.iteratee.Enumerator
 import play.api.libs.json._
 import play.api.mvc._
 
@@ -52,27 +54,25 @@ trait Player
   @deprecated("Do not call GETs to this route", "0.36.0")
   def createSessionForItem(itemId: String): Action[AnyContent] = Action.async { implicit request =>
     hooks.createSessionForItem(itemId).map(handleSuccess { sessionId =>
-      val call = org.corespring.container.client.controllers.apps.routes.Player.load(sessionId)
-      val url: String = s"${call.url}?${request.rawQueryString}"
-      SeeOther(url)
+      SeeOther(s"${routes.Player.load(sessionId).url}?${request.rawQueryString}")
     })
   }
 
   override def load(sessionId: String) = Action.async { implicit request => loadSession(sessionId) }
 
   def createSession(itemId: String): Action[AnyContent] = Action.async { implicit request =>
-    hooks.createSessionForItem(itemId).flatMap(handleSuccess.async { loadSession })
+    hooks.createSessionForItem(itemId).flatMap(handleSuccess.async { loadSession(_, status = Created) })
   }
 
-  private def loadSession(sessionId: String)(implicit request: RequestHeader) =
+  private def loadSession(sessionId: String, status: Status = Ok)(implicit request: RequestHeader) =
     request.path.endsWith("index.html") match {
       case true => sessionAsHTML(sessionId)
       case _ => render.async {
         /** Always provide JSON, unless request accepts HTML and not JSON **/
-        case Accepts.Json() & Accepts.Html() => sessionAsJSON(sessionId)
-        case Accepts.Json() => sessionAsJSON(sessionId)
-        case Accepts.Html() => sessionAsHTML(sessionId)
-        case _ => sessionAsJSON(sessionId)
+        case Accepts.Json() & Accepts.Html() => sessionAsJSON(sessionId, status)
+        case Accepts.Json() => sessionAsJSON(sessionId, status)
+        case Accepts.Html() => sessionAsHTML(sessionId, status)
+        case _ => sessionAsJSON(sessionId, status)
       }
     }
 
@@ -106,7 +106,7 @@ trait Player
      * @param sessionId
      * @return
      */
-    def sessionAsHTML(sessionId: String)(implicit request: RequestHeader): Future[SimpleResult] =
+    def sessionAsHTML(sessionId: String, status: Status = Ok)(implicit request: RequestHeader): Future[SimpleResult] =
       hooks.loadSessionAndItem(sessionId).map {
         case Left((code, msg)) => Status(code)(Json.obj("error" -> msg))
         case Right((session, itemJson)) => {
@@ -124,28 +124,28 @@ trait Player
           logger.trace(s"function=load domainResolvedJs=$domainResolvedJs")
           logger.trace(s"function=load domainResolvedCss=$domainResolvedCss")
 
-          Ok(
-            renderJade(
-              PlayerTemplateParams(
-                context,
-                domainResolvedJs,
-                domainResolvedCss,
-                jsSrc.ngModules ++ scriptInfo.ngDependencies,
-                servicesJs,
-                showControls,
-                Json.obj("session" -> session, "item" -> preprocessedItem),
-                versionInfo,
-                newRelicRumConf != None,
-                newRelicRumConf.getOrElse(Json.obj()))))
+          val result = renderJade(
+            PlayerTemplateParams(
+              context,
+              domainResolvedJs,
+              domainResolvedCss,
+              jsSrc.ngModules ++ scriptInfo.ngDependencies,
+              servicesJs,
+              showControls,
+              Json.obj("session" -> session, "item" -> preprocessedItem),
+              versionInfo,
+              newRelicRumConf != None,
+              newRelicRumConf.getOrElse(Json.obj())))
+
+          status(result).as(ContentTypes.HTML)
         }
       }
 
-    def sessionAsJSON(sessionId: String)(implicit request: RequestHeader): Future[SimpleResult] =
+    def sessionAsJSON(sessionId: String, status: Status = Ok)(implicit request: RequestHeader): Future[SimpleResult] =
       hooks.loadSessionAndItem(sessionId).map {
         case Left((code, msg)) => Status(code)(Json.obj("error" -> msg))
-        case Right((session, _)) => Ok(Json.prettyPrint(session)).as(ContentTypes.JSON)
+        case Right((session, _)) => status(Json.prettyPrint(session)).as(ContentTypes.JSON)
       }
-
   }
 
 }

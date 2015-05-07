@@ -70,13 +70,21 @@ class PlayerTest extends Specification with PlaySpecification with Mockito {
       }
     }
 
+    "return 200" in {
+      running(FakeApplication(withGlobal = Some(MockGlobal))) {
+        val request = FakeRequest("", "")
+        val result = player.load(validSessionId)(request)
+        status(result) must be equalTo(OK)
+      }
+    }
+
     "with Accepts text/html" should {
 
       "return session as HTML" in {
         running(FakeApplication(withGlobal = Some(MockGlobal))) {
           val request = FakeRequest("", "").withHeaders("Accept" -> ContentTypes.HTML)
           val result = player.load(validSessionId)(request)
-          header("Content-Type", result).get must contain("text/html")
+          header("Content-Type", result) must be equalTo(Some(ContentTypes.HTML))
         }
       }
     }
@@ -85,7 +93,7 @@ class PlayerTest extends Specification with PlaySpecification with Mockito {
       running(FakeApplication(withGlobal = Some(MockGlobal))) {
         val request = FakeRequest("", "").withHeaders("Accept" -> s"${ContentTypes.JSON} ${ContentTypes.HTML}")
         val result = player.load(validSessionId)(request)
-        header("Content-Type", result) must be equalTo(Some("application/json"))
+        header("Content-Type", result) must be equalTo(Some(ContentTypes.JSON))
         contentAsJson(result) must be equalTo(validSession)
       }
     }
@@ -100,6 +108,14 @@ class PlayerTest extends Specification with PlaySpecification with Mockito {
         val request = FakeRequest("", "")
         player.createSession(itemId)(request)
         there was one(mockCreateSession).apply(itemId)
+      }
+    }
+
+    "return 201" in {
+      running(FakeApplication(withGlobal = Some(MockGlobal))) {
+        val request = FakeRequest("", "")
+        val result = player.createSession(itemId)(request)
+        status(result) must be equalTo(CREATED)
       }
     }
 
@@ -118,7 +134,7 @@ class PlayerTest extends Specification with PlaySpecification with Mockito {
         running(FakeApplication(withGlobal = Some(MockGlobal))) {
           val request = FakeRequest("", "").withHeaders("Accept" -> ContentTypes.HTML)
           val result = player.createSession(itemId)(request)
-          header("Content-Type", result).get must contain(ContentTypes.HTML)
+          header("Content-Type", result) must be equalTo(Some(ContentTypes.HTML))
         }
       }
     }
