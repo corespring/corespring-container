@@ -59,51 +59,51 @@ var Instance = function(element, options, errorCallback, log) {
       }
     })();
 
-    $.ajax({
+    var response = $.ajax({
       url: options.sessionUrl,
       async: false, // refactor this so that it's asynchronous.
       method: 'POST',
       dataType: 'json'
-    }).done(loadSession);
+    }).responseText;
 
-    function loadSession(session) {
+    var session = JSON.parse(response);
 
-      var sessionId = new ObjectId(session._id).toString();
+    var sessionId = new ObjectId(session._id).toString();
 
-      var url =
-        new UrlBuilder(options.url)
-          .params(options.queryParams)
-          .hash(options.hash)
-          .interpolate('sessionId', sessionId)
-          .build();
+    var url =
+      new UrlBuilder(options.url)
+        .params(options.queryParams)
+        .hash(options.hash)
+        .interpolate('sessionId', sessionId)
+        .build();
 
-      var iframeTemplate = [
-        '<iframe',
-        ' id="', iframeUid , '"',
-        ' frameborder="0"',
-        ' src="', url, '"',
-        ' class="player-loading"',
-        ' style="width: 100%; border: none;"></iframe>'
-      ].join('');
+    var iframeTemplate = [
+      '<iframe',
+      ' id="', iframeUid , '"',
+      ' frameborder="0"',
+      ' src="', url, '"',
+      ' class="player-loading"',
+      ' style="width: 100%; border: none;"></iframe>'
+    ].join('');
 
-      $(e).html(iframeTemplate);
+    $(e).html(iframeTemplate);
 
-      channel = new msgr.Channel(window, $iframe()[0].contentWindow, {enableLogging: false});
+    channel = new msgr.Channel(window, $iframe()[0].contentWindow, {enableLogging: false});
 
-      channel.on('dimensionsUpdate', function(data){
-        $iframe().height(data.h);
-      });
+    channel.on('dimensionsUpdate', function(data){
+      $iframe().height(data.h);
+    });
 
-      channel.on('rendered', function() {
-        $iframe().removeClass("player-loading");
-        $iframe().addClass("player-loaded");
-      });
+    channel.on('rendered', function() {
+      $iframe().removeClass("player-loading");
+      $iframe().addClass("player-loaded");
+    });
 
-      if (options.forceWidth) {
-        $(e).width(options.width ? options.width : "600px");
-      }
-
+    if (options.forceWidth) {
+      $(e).width(options.width ? options.width : "600px");
     }
+
+
 
   }
 

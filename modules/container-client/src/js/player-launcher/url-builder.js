@@ -29,8 +29,10 @@ function UrlBuilder(baseUrl) {
    * Replaces a colon-prefixed placeholder in the URL with a specified value.
    */
   this.interpolate = function(placeholder, value) {
-    placeholder = placeholder.startsWith(":") ? placeholder : (":" + placeholder);
-    url = url.replace(placeholder, value);
+    if (typeof placeholder === 'string') {
+      placeholder = (placeholder[0] === ":") ? placeholder : (":" + placeholder);
+      url = url.replace(placeholder, value);
+    }
     return this;
   };
 
