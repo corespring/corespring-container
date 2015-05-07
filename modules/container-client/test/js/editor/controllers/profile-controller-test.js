@@ -263,6 +263,30 @@ describe('profile controller', function() {
       });
     });
 
+    describe("defaultCollection", function(){
+      beforeEach(function() {
+        mockCollectionService.listResult = [{key:'key-1', value:'val-1'}, {key:'default-id', value:'default'}, {key:'key-2', value:'val-2'}];
+      });
+      it("is selected if collectionId is not set in item", function() {
+        makeProfileController();
+        scope.$apply();
+        expect(scope.item.collectionId).toEqual('default-id');
+      });
+      it("is selected if collectionId can not be found in collections", function() {
+        mockItemService.loadResult = {collectionId:'non-existent-id'};
+        makeProfileController();
+        scope.$apply();
+        expect(scope.item.collectionId).toEqual('default-id');
+      });
+      it("is not selected if collectionId is set in item", function() {
+        mockItemService.loadResult = {collectionId:'key-1'};
+        makeProfileController();
+        scope.$apply();
+        expect(scope.item.collectionId).toEqual('key-1');
+      });
+
+    });
+
   });
 
   describe("standards", function() {

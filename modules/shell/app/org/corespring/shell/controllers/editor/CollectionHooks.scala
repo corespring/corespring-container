@@ -13,7 +13,7 @@ trait CollectionHooks extends ContainerCollectionHooks {
 
     val out = Json.arr(
       Json.obj(
-        "value" -> "Default",
+        "value" -> "default",
         "key" -> "col-0"),
       Json.obj(
         "value" -> "Collection One",

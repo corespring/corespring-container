@@ -57,102 +57,102 @@
      */
     $scope.formModels = {
       additionalMediaCopyrights: {
-        visible:true,
-        readonly:false,
-        collapse:true
+        visible: true,
+        readonly: false,
+        collapse: true
       },
       author: {
-        visible:true,
-        readonly:false
+        visible: true,
+        readonly: false
       },
       bloomsTaxonomy: {
-        visible:true,
-        readonly:false,
-        collapse:true
+        visible: true,
+        readonly: false,
+        collapse: true
       },
       componentTypes: {
-        visible:true,
-        readonly:false
+        visible: true,
+        readonly: false
       },
       collectionId: {
-        visible:true,
-        readonly:false
+        visible: true,
+        readonly: false
       },
       copyrightExpirationDate: {
-        visible:true,
-        readonly:false
+        visible: true,
+        readonly: false
       },
       copyrightInformationPanel: {
-        visible:true,
-        collapse:true
+        visible: true,
+        collapse: true
       },
       copyrightOwner: {
-        visible:true,
-        readonly:false
+        visible: true,
+        readonly: false
       },
       copyrightYear: {
-        visible:true,
-        readonly:false
+        visible: true,
+        readonly: false
       },
       credentials: {
-        visible:true,
-        readonly:false
+        visible: true,
+        readonly: false
       },
       credentialsOther: {
         //here you can only set the value if the value of credentials is 'Other'
         //visibility and readonly are controlled by the formModel for credentials
       },
       depthOfKnowledge: {
-        visible:true,
-        readonly:false,
-        collapse:true
+        visible: true,
+        readonly: false,
+        collapse: true
       },
       description: {
-        visible:true,
-        readonly:false
+        visible: true,
+        readonly: false
       },
       gradeLevel: {
-        visible:true,
-        readonly:false
+        visible: true,
+        readonly: false
       },
       keySkills: {
-        visible:true,
-        readonly:false,
-        collapse:true
+        visible: true,
+        readonly: false,
+        collapse: true
       },
       lexile: {
-        visible:true,
-        readonly:false,
-        collapse:true
+        visible: true,
+        readonly: false,
+        collapse: true
       },
       licenseType: {
-        visible:true,
-        readonly:false,
-        collapse:true
+        visible: true,
+        readonly: false,
+        collapse: true
       },
       primarySubject: {
-        visible:true,
-        readonly:false
+        visible: true,
+        readonly: false
       },
       priorGradeLevel: {
-        visible:true,
-        readonly:false
+        visible: true,
+        readonly: false
       },
       priorUse: {
-        visible:true,
-        readonly:false
+        visible: true,
+        readonly: false
       },
       priorUseOther: {
         //here you can only set the value if the value of priorUse is 'Other'
         //visibility and readonly are controlled by the formModel for priorUse
       },
       priorUsePanel: {
-        visible:true,
-        collapse:true
+        visible: true,
+        collapse: true
       },
       relatedSubject: {
-        visible:true,
-        readonly:false
+        visible: true,
+        readonly: false
       },
       reviewsPassed: {
         visible: true,
@@ -164,16 +164,16 @@
         //visibility and readonly are controlled by the formModel for reviewsPassed
       },
       sourceUrl: {
-        visible:true,
-        readonly:false
+        visible: true,
+        readonly: false
       },
       standards: {
-        visible:true,
-        readonly:false
+        visible: true,
+        readonly: false
       },
       title: {
-        visible:true,
-        readonly:false
+        visible: true,
+        readonly: false
       }
     };
 
@@ -182,23 +182,23 @@
      * @param model
      * @param config
      */
-    function updateFormModel(model, config){
-      if(!config){
+    function updateFormModel(model, config) {
+      if (!config) {
         return;
       }
-      if(config.hasOwnProperty("visible")){
+      if (config.hasOwnProperty("visible")) {
         model.visible = config.visible === true;
       }
-      if(config.hasOwnProperty("readonly")){
+      if (config.hasOwnProperty("readonly")) {
         model.readonly = config.readonly === true;
       }
-      if(config.hasOwnProperty("value")){
+      if (config.hasOwnProperty("value")) {
         model.value = config.value;
       }
-      if(config.hasOwnProperty("options")){
+      if (config.hasOwnProperty("options")) {
         model.options = config.options;
       }
-      if(config.hasOwnProperty("collapse")){
+      if (config.hasOwnProperty("collapse")) {
         model.collapse = config.collapse !== false;
       }
     }
@@ -208,11 +208,11 @@
      * @param formModels
      * @param config
      */
-    function updateFormModels(config){
-      if(!config){
+    function updateFormModels(config) {
+      if (!config) {
         return;
       }
-      _.forOwn($scope.formModels, function(value,key){
+      _.forOwn($scope.formModels, function(value, key) {
         updateFormModel(value, config[key]);
       });
     }
@@ -221,11 +221,11 @@
      * Get the json encoded configuration from the "config" query parameter
      * @returns {*}
      */
-    function getFormConfigFromUrl(){
+    function getFormConfigFromUrl() {
       var search = $location.search();
       var hash = $location.hash();
       var configJson = search.profileConfig || hash.profileConfig;
-      if(configJson) {
+      if (configJson) {
         try {
           var config = JSON.parse(configJson);
           return config;
@@ -245,7 +245,7 @@
      * @param profile
      * @param config
      */
-    function overrideProfileValuesWithConfig(item, config){
+    function overrideProfileValuesWithConfig(item, config) {
 
       var profile = item.profile;
 
@@ -288,9 +288,9 @@
        * @param name
        * @param sourceName
        */
-      function applyConfig(dest, name, sourceName){
+      function applyConfig(dest, name, sourceName) {
         var configItem = config[sourceName || name];
-        if(configItem && configItem.hasOwnProperty('value')){
+        if (configItem && configItem.hasOwnProperty('value')) {
           dest[name] = configItem.value;
           //TODO Do we need to check the value against the available options?
         }
@@ -310,7 +310,7 @@
           return;
         }
 
-        getAsyncValue(configItem.value, function (result) {
+        getAsyncValue(configItem.value, function(result) {
           dest[name] = result;
         });
       }
@@ -325,14 +325,13 @@
      * @param propertyName - pass in a truthy string if you want to compare item[propertyName] instead of the item
      * @returns a filter function
      */
-    function createOptionsFilter(formModel, propertyName){
-      return function(item,index){
+    function createOptionsFilter(formModel, propertyName) {
+      return function(item, index) {
         var value = propertyName ? item[propertyName] : item;
         //TODO As an optimisation we could create the filter functions after the formModels have been configured and
         //move that check for formModel.options out of the filter function. Only do that if you find it to be necessary.
         return _.isArray(formModel.options) ?
-          _.contains(formModel.options, value)
-          : true;
+          _.contains(formModel.options, value) : true;
       };
     }
 
@@ -365,36 +364,42 @@
       subCategory: 'Choose one'
     };
 
-    $scope.$watch('standardFilterOption', function(options){
-      if(!options.subject){
-        options.subject = {items:[]};
+    $scope.$watch('standardFilterOption', function(options) {
+      if (!options.subject) {
+        options.subject = {
+          items: []
+        };
       }
-      if(_.isEmpty(options.subject.items)){
-        options.category = {items:[]};
+      if (_.isEmpty(options.subject.items)) {
+        options.category = {
+          items: []
+        };
       }
-      if(_.isEmpty(options.category.items)){
-        options.subCategory = {items:[]};
+      if (_.isEmpty(options.category.items)) {
+        options.subCategory = {
+          items: []
+        };
       }
 
       $scope.standardFilterPlaceholder.category = _.isEmpty(options.subject.items) ? 'Not assigned' : 'Choose one';
-      $scope.standardFilterPlaceholder.subCategory = _.isEmpty(options.category.items)? 'Not assigned' : 'Choose one';
+      $scope.standardFilterPlaceholder.subCategory = _.isEmpty(options.category.items) ? 'Not assigned' : 'Choose one';
     }, true); //watch nested properties
 
     function createStandardQuery(searchText) {
       return StandardQueryCreator.createStandardQuery(
-          searchText,
-          $scope.standardFilterOption.subject,
-          $scope.standardFilterOption.category,
-          $scope.standardFilterOption.subCategory);
+        searchText,
+        $scope.standardFilterOption.subject,
+        $scope.standardFilterOption.category,
+        $scope.standardFilterOption.subCategory);
     }
 
-    function filterStandardsByConfig(standards){
+    function filterStandardsByConfig(standards) {
       var options = $scope.formModels.standards.options;
-      if(!_.isArray(options)){
+      if (!_.isArray(options)) {
         return standards;
       }
 
-      return _.filter(standards, function(item){
+      return _.filter(standards, function(item) {
         return -1 !== _.indexOf(options, item.dotNotation);
       });
     }
@@ -446,20 +451,22 @@
      * The config contains an array of standards in dotNotation.
      * For each item we need to load the full standard object
      */
-    function configToStandards(dotNotations, callback){
-      if(!_.isArray(dotNotations) || 0 === dotNotations.length){
+    function configToStandards(dotNotations, callback) {
+      if (!_.isArray(dotNotations) || 0 === dotNotations.length) {
         return;
       }
 
       var results = [];
       _.forEach(dotNotations, function(dotNotation) {
-          DataQueryService.query('standards', {searchTerm: dotNotation},
-            function(item) {
-              results.push(item[0]);
-              if (dotNotations.length === results.length) {
-                callback(results);
-              }
-            });
+        DataQueryService.query('standards', {
+            searchTerm: dotNotation
+          },
+          function(item) {
+            results.push(item[0]);
+            if (dotNotations.length === results.length) {
+              callback(results);
+            }
+          });
       });
     }
 
@@ -469,8 +476,8 @@
       });
     }
 
-    function getStandardDomain(item){
-      if(item && item.uri) {
+    function getStandardDomain(item) {
+      if (item && item.uri) {
         var parts = item.uri.toLowerCase().split('/');
         while (parts.length > 0) {
           var part = parts.shift();
@@ -482,42 +489,46 @@
       return 'standard';
     }
 
-    function getImageUrlForStandardDomain(domain){
+    function getImageUrlForStandardDomain(domain) {
       //TODO Get official logos
       return 'images/standards/common-core.png';
     }
 
-    function getStandardsGroups(){
+    function getStandardsGroups() {
       var results = [];
       var groups = _.groupBy($scope.profile.standards, getStandardDomain);
-      _.forEach(groups, function(item,key){
+      _.forEach(groups, function(item, key) {
         var imageUrl = getImageUrlForStandardDomain(key);
         results.push({
-          label:key,
-          standards: _.map(item, function(s){
-            return {id: s.id, text: s.dotNotation};
+          label: key,
+          standards: _.map(item, function(s) {
+            return {
+              id: s.id,
+              text: s.dotNotation
+            };
           }),
-          imageUrl:imageUrl,
-          hasImage:!!imageUrl});
+          imageUrl: imageUrl,
+          hasImage: !!imageUrl
+        });
       });
       return results;
     }
 
     $scope.$watch('profile.standards', function(newValue, oldValue) {
-      if($scope.profile && $scope.profile.standards) {
+      if ($scope.profile && $scope.profile.standards) {
         $scope.isLiteracyStandardSelected = containsLiteracyStandard(newValue);
         $scope.standardsGroups = getStandardsGroups();
       }
     });
 
     $scope.$watch('standardsGroups', function(newValue, oldValue) {
-      if($scope.profile && $scope.profile.standards && $scope.standardsGroups) {
+      if ($scope.profile && $scope.profile.standards && $scope.standardsGroups) {
         var newStandards = _.chain(newValue).pluck('standards').flatten().pluck('id').value();
         var oldStandards = _.chain($scope.profile.standards).pluck('id').value();
-        if(newStandards.length < oldStandards.length) {
-          var dif = _.difference(oldStandards,newStandards);
-          _.remove($scope.profile.standards, function(item){
-            return item && _.contains(dif,item.id);
+        if (newStandards.length < oldStandards.length) {
+          var dif = _.difference(oldStandards, newStandards);
+          _.remove($scope.profile.standards, function(item) {
+            return item && _.contains(dif, item.id);
           });
         }
       }
@@ -551,10 +562,32 @@
     //----------------------------------------------------------------
 
     CollectionService.list(function(collections) {
-      $scope.collectionIdDataProvider = collections;
+      $scope.collectionIdDataProvider = _.sortBy(collections, 'value');
     });
 
     $scope.collectionIdFilter = createOptionsFilter($scope.formModels.collectionId, 'key');
+
+    function setDefaultCollectionIfNoCollectionSelected() {
+      if ($scope.item && !collectionById($scope.item.collectionId)) {
+        var defaultCollection = collectionByName('default');
+        if (defaultCollection) {
+          $scope.item.collectionId = defaultCollection.key;
+        }
+      }
+    }
+
+    function collectionById(id) {
+      return _.find($scope.collectionIdDataProvider, {
+        key: id
+      });
+    }
+
+    function collectionByName(name) {
+      var lcName = _.isString(name) ? name.toLowerCase() : '';
+      return _.find($scope.collectionIdDataProvider, function(c) {
+        return c && _.isString(c.value) && c.value.toLowerCase() === lcName;
+      });
+    }
 
     //----------------------------------------------------------------
     // subject and related subject
@@ -565,22 +598,23 @@
       this.formatResult = subjectText;
       this.formatSelection = subjectText;
 
-      function filterSubjectsByConfig(subjects){
+      function filterSubjectsByConfig(subjects) {
         var options = formModel.options;
-        if(!_.isArray(options)){
+        if (!_.isArray(options)) {
           return subjects;
         }
         options = _.map(options, fromSubjectText);
-        return _.filter(subjects, function(item){
-          return -1 !== _.findIndex(options, function(o){
-              return item && o && item.category === o.category && item.subject === o.subject;
-            });
+        return _.filter(subjects, function(item) {
+          return -1 !== _.findIndex(options, function(o) {
+            return item && o && item.category === o.category && item.subject === o.subject;
+          });
         });
       }
 
       this.query = function(query) {
-        DataQueryService.query(topic,
-          {searchTerm: query.term},
+        DataQueryService.query(topic, {
+            searchTerm: query.term
+          },
           function(result) {
             query.callback({
               //Most other dataProviders are filtered through a ng filter function that is applied in jade
@@ -590,7 +624,7 @@
           });
       };
 
-      this.initSelection = function(){
+      this.initSelection = function() {
         //keep this to avoid exceptions in the select
       };
     }
@@ -599,19 +633,21 @@
       return s.category + ": " + s.subject;
     }
 
-    function fromSubjectText(categorySubject){
+    function fromSubjectText(categorySubject) {
       var parts = categorySubject.split(":");
       return {
-        category:parts[0].trim(),
-        subject:parts.length >= 2 ? parts[1].trim() : ''
+        category: parts[0].trim(),
+        subject: parts.length >= 2 ? parts[1].trim() : ''
       };
     }
 
     $scope.primarySubjectSelect2Adapter = new SubjectSelect2Adapter("subjects.primary", $scope.formModels.primarySubject);
     $scope.relatedSubjectSelect2Adapter = new SubjectSelect2Adapter("subjects.related", $scope.formModels.relatedSubject);
 
-    function findSubjectByCategorySubject(topic, categorySubject, callback){
-      var query = {filters:fromSubjectText(categorySubject)};
+    function findSubjectByCategorySubject(topic, categorySubject, callback) {
+      var query = {
+        filters: fromSubjectText(categorySubject)
+      };
       DataQueryService.query(
         topic,
         query,
@@ -623,8 +659,8 @@
     /**
      * The config is a category: subject string.
      */
-    function configToPrimarySubject(categorySubject, callback){
-      if(!_.isString(categorySubject)){
+    function configToPrimarySubject(categorySubject, callback) {
+      if (!_.isString(categorySubject)) {
         return;
       }
 
@@ -634,17 +670,17 @@
     /**
      * The config is a list of category: subject strings.
      */
-    function configToRelatedSubject(categorySubjectList, callback){
-      if(!_.isArray(categorySubjectList)){
+    function configToRelatedSubject(categorySubjectList, callback) {
+      if (!_.isArray(categorySubjectList)) {
         return;
       }
 
       var results = [];
-      _.forEach(categorySubjectList, function(categorySubject){
+      _.forEach(categorySubjectList, function(categorySubject) {
 
-        findSubjectByCategorySubject('subjects.related', categorySubject, function(result){
+        findSubjectByCategorySubject('subjects.related', categorySubject, function(result) {
           results.push(result);
-          if(results.length === categorySubjectList.length){
+          if (results.length === categorySubjectList.length) {
             callback(results);
           }
         });
@@ -657,17 +693,17 @@
 
     $scope.bloomsTaxonomyFilter = createOptionsFilter($scope.formModels.bloomsTaxonomy, 'key');
 
-    DataQueryService.list("bloomsTaxonomy", function (result) {
+    DataQueryService.list("bloomsTaxonomy", function(result) {
       $scope.bloomsTaxonomyDataProvider = result;
     });
 
     $scope.depthOfKnowledgeFilter = createOptionsFilter($scope.formModels.depthOfKnowledge, 'key');
 
-    DataQueryService.list("depthOfKnowledge", function (result) {
+    DataQueryService.list("depthOfKnowledge", function(result) {
       $scope.depthOfKnowledgeDataProvider = result;
     });
 
-    DataQueryService.list("gradeLevels", function (result) {
+    DataQueryService.list("gradeLevels", function(result) {
       $scope.gradeLevelDataProvider = result;
       $scope.gradeLevelFilter = createOptionsFilter($scope.formModels.gradeLevel, 'key');
       $scope.priorGradeLevelDataProvider = result;
@@ -684,9 +720,9 @@
      * @param toYear
      * @returns {*}
      */
-    function years(fromYear, toYear){
+    function years(fromYear, toYear) {
       var direction = fromYear > toYear ? -1 : 1;
-      return _.range( fromYear, toYear + 1 * direction, direction).map(function(year){
+      return _.range(fromYear, toYear + 1 * direction, direction).map(function(year) {
         return year.toString();
       });
     }
@@ -705,7 +741,7 @@
 
     $scope.credentialsFilter = createOptionsFilter($scope.formModels.credentials, 'key');
 
-    DataQueryService.list("credentials", function (result) {
+    DataQueryService.list("credentials", function(result) {
       $scope.credentialsDataProvider = result;
       updateCredentialsOtherSelected();
     });
@@ -729,48 +765,51 @@
     $scope.keySkillsFilter = createOptionsFilter($scope.formModels.keySkills, 'key');
 
     function initKeySkillsDataProvider() {
-      DataQueryService.list("keySkills", function (result) {
-        $scope.keySkillsDataProvider = _.chain(result).pluck('value').flatten().uniq().sort().map(function (item) {
-          return {key: item, value: item};
+      DataQueryService.list("keySkills", function(result) {
+        $scope.keySkillsDataProvider = _.chain(result).pluck('value').flatten().uniq().sort().map(function(item) {
+          return {
+            key: item,
+            value: item
+          };
         }).value();
         initKeySkillsSelection();
         updateKeySkillsTitle();
       });
     }
 
-    function initKeySkillsSelection(){
-      if(!$scope.keySkillsDataProvider || !$scope.otherAlignments){
+    function initKeySkillsSelection() {
+      if (!$scope.keySkillsDataProvider || !$scope.otherAlignments) {
         return;
       }
       var selectedKeySkills = _.isArray($scope.otherAlignments.keySkills) ? $scope.otherAlignments.keySkills : [];
 
-      _.forEach($scope.keySkillsDataProvider, function(item){
+      _.forEach($scope.keySkillsDataProvider, function(item) {
         var selected = _.contains(selectedKeySkills, item.key);
-        if(selected !== item.selected) {
+        if (selected !== item.selected) {
           item.selected = selected;
         }
       });
       $scope.keySkillsDataProvider = _.clone($scope.keySkillsDataProvider);
     }
 
-    function updateKeySkillsTitle(){
-      if( $scope.otherAlignments &&  $scope.otherAlignments.keySkills ) {
+    function updateKeySkillsTitle() {
+      if ($scope.otherAlignments && $scope.otherAlignments.keySkills) {
         $scope.keySkillsTitle = "<span class='key-skills'>Key Skills <span class='badge'>" + $scope.otherAlignments.keySkills.length + "</span> <span class='selected'>selected.</span></span>";
       }
     }
 
-    $scope.onChangeKeySkill = function(){
+    $scope.onChangeKeySkill = function() {
       updateKeySkillsInProfile();
       updateKeySkillsTitle();
     };
 
-    function updateKeySkillsInProfile(){
-      if(!$scope.keySkillsDataProvider || !$scope.otherAlignments){
+    function updateKeySkillsInProfile() {
+      if (!$scope.keySkillsDataProvider || !$scope.otherAlignments) {
         return;
       }
       var keySkills = [];
-      _.forEach($scope.keySkillsDataProvider, function(item){
-        if(item.selected){
+      _.forEach($scope.keySkillsDataProvider, function(item) {
+        if (item.selected) {
           keySkills.push(item.key);
         }
       });
@@ -787,7 +826,7 @@
       updatePriorUseOtherSelected();
     });
 
-    DataQueryService.list("priorUses", function (result) {
+    DataQueryService.list("priorUses", function(result) {
       $scope.priorUseDataProvider = result;
       updatePriorUseOtherSelected();
     });
@@ -806,7 +845,7 @@
 
     $scope.reviewsPassedFilter = createOptionsFilter($scope.formModels.reviewsPassed, 'key');
 
-    DataQueryService.list("reviewsPassed", function (result) {
+    DataQueryService.list("reviewsPassed", function(result) {
       $scope.reviewsPassedDataProvider = result;
       updateReviewsPassedOtherSelected();
     });
@@ -824,28 +863,28 @@
     }
 
     $scope.$watch('profile.reviewsPassed', function(newValue, oldValue) {
-      if(!$scope.profile || !$scope.reviewsPassedDataProvider){
+      if (!$scope.profile || !$scope.reviewsPassedDataProvider) {
         return;
       }
 
-      function noop(){}
+      function noop() {}
 
-      function setNone(){
+      function setNone() {
         $scope.profile.reviewsPassed = [];
       }
 
-      function setAll(){
+      function setAll() {
         $scope.profile.reviewsPassed = _.chain($scope.reviewsPassedDataProvider).pluck('value').without('Other')
           .union(newValue).without('None', 'All').value();
       }
 
       var updateAction = noop;
-      if(_.contains(newValue, 'None')) {
+      if (_.contains(newValue, 'None')) {
         updateAction = setNone;
-      } else if(_.contains(newValue, 'All')) {
+      } else if (_.contains(newValue, 'All')) {
         updateAction = setAll;
       }
-      $timeout(function(){
+      $timeout(function() {
         updateAction();
         updateReviewsPassedOtherSelected();
       });
@@ -929,14 +968,15 @@
       updateReviewsPassedOtherSelected();
       updatePriorUseOtherSelected();
       updateCredentialsOtherSelected();
+      setDefaultCollectionIfNoCollectionSelected();
     }
 
     function removeEmptyAdditionalCopyrightItems(copyrights) {
 
       function itemIsEmpty(item) {
         return !item || _.every(item, function(val) {
-            return !val;
-          });
+          return !val;
+        });
       }
 
       _.remove(copyrights, itemIsEmpty);
@@ -946,30 +986,32 @@
     // profile load and save
     //----------------------------------------------------------------
 
-    $scope.$watch('item.profile', throttle(function(newValue, oldValue){
-      if(undefined === oldValue){
+    $scope.$watch('item.profile', throttle(function(newValue, oldValue) {
+      if (undefined === oldValue) {
         return;
       }
-      if(_.isEqual(oldValue, newValue)) {
+      if (_.isEqual(oldValue, newValue)) {
         return;
       }
       $scope.saveProfile();
-      $scope.$emit('itemChanged', {partChanged: 'profile'});
+      $scope.$emit('itemChanged', {
+        partChanged: 'profile'
+      });
     }), true); //watch nestedProperties
 
     $scope.saveProfile = function() {
       $log.log("saving profile");
-      ItemService.saveProfile($scope.item.profile, function(result){
+      ItemService.saveProfile($scope.item.profile, function(result) {
         $log.log("profile saved result:", result);
       });
     };
 
-    $scope.loadProfile = function(){
+    $scope.loadProfile = function() {
       $log.log("loading profile");
-      ItemService.load(function(item){
+      ItemService.load(function(item) {
         $log.log('item loading success hasItem:' + (!!item), item);
         if (item) {
-          ConfigurationService.getConfig(function(config){
+          ConfigurationService.getConfig(function(config) {
             $log.log('getConfig callback', config);
             updateFormModels(config.get('profileConfig', {}));
             $timeout(function() {
@@ -979,7 +1021,7 @@
         } else {
           $log.error('error loading profile, item is null');
         }
-      },function(err){
+      }, function(err) {
         $log.error('error loading profile', err);
       });
     };
@@ -988,20 +1030,22 @@
     // collectionId load and save
     //----------------------------------------------------------------
 
-    $scope.$watch('item.collectionId', throttle(function(newValue, oldValue){
-      if(undefined === oldValue){
+    $scope.$watch('item.collectionId', throttle(function(newValue, oldValue) {
+      if (undefined === oldValue) {
         return;
       }
-      if(_.isEqual(oldValue, newValue)) {
+      if (_.isEqual(oldValue, newValue)) {
         return;
       }
       $scope.saveCollectionId();
-      $scope.$emit('itemChanged', {partChanged: 'collectionId'});
+      $scope.$emit('itemChanged', {
+        partChanged: 'collectionId'
+      });
     }));
 
     $scope.saveCollectionId = function() {
       $log.log("saving collectionId");
-      ItemService.saveCollectionId($scope.item.collectionId, function(result){
+      ItemService.saveCollectionId($scope.item.collectionId, function(result) {
         $log.log("collectionId saved result:", result);
       });
     };
