@@ -245,6 +245,14 @@ describe('profile controller', function() {
       expect(scope.collectionIdDataProvider).toEqual(expectedDataProvider);
     });
 
+    it("sort collections by name", function() {
+      var inputDataProvider = [{key:'key-1', value:'value-3'}, {key:'key-2', value:'value-1'},{key:'key-3', value:'value-2'}];
+      var expectedDataProvider = [{key:'key-2', value:'value-1'},{key:'key-3', value:'value-2'}, {key:'key-1', value:'value-3'}];
+      mockCollectionService.listResult = inputDataProvider;
+      makeProfileController();
+      expect(scope.collectionIdDataProvider).toEqual(expectedDataProvider);
+    });
+
     describe("save", function() {
       beforeEach(function() {
         makeProfileController();
