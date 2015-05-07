@@ -64,10 +64,14 @@ angular.module('corespring-player.controllers')
           );
         };
 
-        $scope.loadOutcome = function(options, cb) {
+        /** 
+         * load the outcome
+         * @param settings - an object that will be passed to the components' outcome generation
+         */
+        $scope.loadOutcome = function(settings, cb) {
           //TODO - need to fetch the player options
           //Passed in to the launcher
-          PlayerService.loadOutcome(options,
+          PlayerService.loadOutcome(settings,
             function(data) {
               $scope.onOutcomeLoaded(data);
               if (cb) {
@@ -187,7 +191,6 @@ angular.module('corespring-player.controllers')
          */
         $scope.$on('initialise', function(event, data) {
           $log.debug('[on initialise]', data);
-          PlayerService.setQueryParams(data.queryParams || {});
           PlayerService.loadItemAndSession(
             function(itemAndSession) {
               $scope.onItemAndSessionLoaded(itemAndSession);
@@ -200,7 +203,12 @@ angular.module('corespring-player.controllers')
               updateComponentsMode();
 
               if (data.mode === 'evaluate') {
-                $scope.loadOutcome(data.options, function() {
+
+                /**
+                 * settings passed to the components when they are creating the outcomes
+                 */
+                var settings = data.evaluate || {};
+                $scope.loadOutcome(settings, function() {
                   $log.debug("[Main] outcome received");
                 });
               }
@@ -282,6 +290,7 @@ angular.module('corespring-player.controllers')
             return;
           }
 
+
           currentMode = data.mode;
           updateComponentsMode();
 
@@ -310,7 +319,8 @@ angular.module('corespring-player.controllers')
           function loadOutcome() {
             $timeout(function() {
               $log.debug("[Main] load outcome!!!");
-              $scope.loadOutcome(data.options, function() {
+              var settings = data.evaluate || {};
+              $scope.loadOutcome(settings, function() {
                 $log.debug("[Main] score received");
               });
             });

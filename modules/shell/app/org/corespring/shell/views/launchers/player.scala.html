@@ -11,11 +11,23 @@
 
        console.log('opts: ', opts);
 
-       var catalog = new org.corespring.players.ItemPlayer(holder, opts, function(err){
+       opts.onPlayerRendered = function(){
+         console.log('onPlayerRendered', arguments);
+       }
+
+       var player = new org.corespring.players.ItemPlayer(holder, opts, function(err){
           console.warn(err);
+       });
+
+       $('#set-mode-evaluate').click(function(){
+        player.setMode('evaluate', function(err){
+          console.log(err);
+        });
        });
      });
     </script>
+
+<button class="button" id="set-mode-evaluate">evaluate</button>
 <div class="holder"></div>
 </body>
 </html>

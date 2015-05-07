@@ -1,112 +1,6 @@
 function ClientLauncher(element, options, errorCallback){
-
-
-  function Paths(){
-
-    var options = require('default-options');
-
-    this.corespringUrl = options.corespringUrl;
-    
-    this.loadCall = function(key){
-      if (!options.paths || !options.paths[key]) {
-        errorCallback({
-          code: 105,
-          message: key + ' not part of options'
-        });
-        return null;
-      }
-      return options.paths[key];
-    };
-  }
-
-  this.paths = new Paths();
-
-  /** called to load the iframe, launch errors have been checked */
-  this.loadClient = function(){
-    throw new Error('must be overridden');
-  };
-
-  /** return an array of errors after inspecting the options */
-  this.validateOptions = function(options){
-    return [];
-  };
-
-  errorCallback = errorCallback || function (error) {
-    throw 'error occurred, code: ' + error.code + ', message: ' + error.message;
-  };
-
-  this.isReady = false;
-  var errors = require('errors');
-  var logger = options.logger || require('logger');
-  var builder = new (require('url-builder'))();
-
-  this.log = function(){
-    logger.log.apply(logger, Array.prototype.slice(arguments));
-  };
-
-  var queryParams = $.extend({}, require('query-params'), options.queryParams);
-
-  /*this.prepareUrl = function(u, opts){
-    opts = opts || {};
-    return builder.build(u, $.extend(queryParams, opts));
-  };*/
-
-  this.loadCall = function(key, urlProcessor){
-    urlProcessor = urlProcessor || function(u){return u;};
-    var c = this.paths.loadCall(key);
-    return { method: c.method, url: urlProcessor( this.paths.corespringUrl + c.url)};
-  };
-
-  var InstanceDef = require('new-instance');
-
-  /**
-   * Create the Iframe Instance.
-   * If you implement onReady you must send the 'initialise' message.
-   * @param callOrUrl - either a string (we then assume a GET)
-   * or a {method:'', url:''}.
-   */
-  this.mkInstance = function(callOrUrl, opts){
-
-    callOrUrl = (typeof(callOrUrl) === 'string') ? { method: 'GET', url: callOrUrl} : callOrUrl;
-    opts = opts || {};
-
-    /*var instanceOpts = $.extend(opts, {
-      url: url,
-      queryParams: queryParams
-    });*/
-
-    var instance = new InstanceDef(callOrUrl, queryParams, element, errorCallback, logger);
-
-    instance.on('launch-error', function (data) {
-      var error = errors.EXTERNAL_ERROR(data.code + ': ' + data.detailedMessage);
-      errorCallback(error);
-    });
-
-    var readyHandler = function(){
-      if (this.isReady) {
-        instance.removeChannel();
-        errorCallback(errors.EDITOR_NOT_REMOVED);
-      } else {
-        this.isReady = true;
-
-        instance.ready();
-        /*if(onReady){
-          onReady(instance);
-        } else {
-          instance.send('initialise', options);
-        }*/
-      }
-    };
-
-    instance.on('ready', readyHandler.bind(this));
-
-    return instance;
-  };
-
-  function triggerErrorCallback(e){
-    errorCallback(errors.EXTERNAL_ERROR(e));
-  }
-
+  
+  /** error and warning handler */
   function ErrorAndWarningHandler(){
     var errs = require('launcher-errors');
 
@@ -132,6 +26,47 @@ function ClientLauncher(element, options, errorCallback){
       }
     };
   }
+  
+  function Paths(){
+
+    var options = require('default-options');
+
+    this.corespringUrl = options.corespringUrl;
+    
+    this.loadCall = function(key){
+      if (!options.paths || !options.paths[key]) {
+        errorCallback({
+          code: 105,
+          message: key + ' not part of options'
+        });
+        return null;
+      }
+      return options.paths[key];
+    };
+  }
+
+  var errors = require('errors');
+  var logger = options.logger || require('logger');
+  var builder = new (require('url-builder'))();
+  var queryParams = $.extend({}, require('query-params'), options.queryParams);
+  var InstanceDef = require('new-instance');
+  
+  errorCallback = errorCallback || function (error) {
+    throw 'error occurred, code: ' + error.code + ', message: ' + error.message;
+  };
+
+  this.paths = new Paths();
+  this.isReady = false;
+
+  this.loadCall = function(key, urlProcessor){
+    urlProcessor = urlProcessor || function(u){return u;};
+    var c = this.paths.loadCall(key);
+    return { method: c.method, url: urlProcessor( this.paths.corespringUrl + c.url)};
+  };
+
+  function triggerErrorCallback(e){
+    errorCallback(errors.EXTERNAL_ERROR(e));
+  }
 
   this.init = function(validateOptions){
     var handler = new ErrorAndWarningHandler();
@@ -154,6 +89,45 @@ function ClientLauncher(element, options, errorCallback){
     return true;
   };
 
+
+  /**
+   * @param call an object or a string. 
+   *   if an object: must have the form: { method: '', url: ''}
+   *   if a string: it'll be converted into { method: '', url: ''}
+   * @param params an object of params to pass when launching
+   * @param initialData an object that will be sent to the instance 'initialise' handler
+   */
+  this.loadInstance = function(call, params, initialData, onReady){
+
+    call = (typeof(call) === 'string') ? { method: 'GET', url: call} : call;
+    params = params || {};
+
+    var instance = new InstanceDef($.extend(call, {params: params}), element, errorCallback, logger);
+
+    instance.on('launch-error', function (data) {
+      var error = errors.EXTERNAL_ERROR(data.code + ': ' + data.detailedMessage);
+      errorCallback(error);
+    });
+
+    var readyHandler = function(){
+      logger.info('instance is ready');
+      if (this.isReady) {
+        instance.removeChannel();
+        errorCallback(errors.EDITOR_NOT_REMOVED);
+      } else {
+        this.isReady = true;
+        logger.debug('send initialise messsage with data', initialData);
+        instance.send('initialise', initialData);
+        if(onReady){
+          onReady(instance);
+        }
+
+      }
+    };
+
+    instance.on('ready', readyHandler.bind(this));
+    return instance;
+  };
 }
 
 module.exports = ClientLauncher;

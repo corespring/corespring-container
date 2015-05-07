@@ -41,10 +41,25 @@ trait Player
   def itemPreProcessor: PlayerItemPreProcessor
 
   private def showControls(implicit r: RequestHeader): Boolean = {
-    r.getQueryString("showControls").map(_ == "true").getOrElse(false)
+    val show = r.getQueryString("showControls").map(_ == "true").getOrElse(false)
+    logger.debug(s"showControls=$show")
+    show
   }
 
   def playerConfig: V2PlayerConfig
+
+  /**
+   * A set of player query string params, that should be set on the player, but can be removed therafter
+   */
+  val playerQueryStringParams = Seq(
+    /** show a simple submit button */
+    "showControls",
+    /** dev|prod - dev loads expanded js/css, prod loads minified */
+    "mode",
+    /** allow logging in the player */
+    "loggingEnabled",
+    /** if set log the category defined */
+    "logCategory")
 
   /**
    * Query params:
@@ -67,6 +82,8 @@ trait Player
       case Left((code, msg)) => Status(code)(Json.obj("error" -> msg))
       case Right((session, itemJson)) => {
 
+        logger.debug(s"function=load, queryString=${request.queryString}")
+
         val scriptInfo = componentScriptInfo(componentTypes(itemJson), jsMode == "dev")
         val controlsJs = if (showControls) paths(controlsJsSrc) else Seq.empty
         val domainResolvedJs = buildJs(scriptInfo, controlsJs)
@@ -80,6 +97,14 @@ trait Player
         logger.trace(s"function=load domainResolvedJs=$domainResolvedJs")
         logger.trace(s"function=load domainResolvedCss=$domainResolvedCss")
 
+        val queryParams = {
+          val trimmed = (request.queryString -- playerQueryStringParams).mapValues(s => s.mkString(""))
+          logger.trace(s"trimmed params: $trimmed")
+          val asJson = trimmed.map( t => t._1 -> JsString(t._2.mkString(""))).toSeq
+          logger.debug(s"service query params: $trimmed")
+          JsObject(asJson)
+        }
+
         Ok(
           renderJade(
             PlayerTemplateParams(
@@ -87,7 +112,7 @@ trait Player
               domainResolvedJs,
               domainResolvedCss,
               jsSrc.ngModules ++ scriptInfo.ngDependencies,
-              servicesJs,
+              servicesJs(queryParams),
               showControls,
               Json.obj("session" -> session, "item" -> preprocessedItem),
               versionInfo,
@@ -110,7 +135,7 @@ trait Player
     })
   }
 
-  lazy val servicesJs = {
+  def servicesJs(queryParams:JsObject) = {
     import org.corespring.container.client.controllers.resources.routes._
     PlayerServices(
       "player.services",
@@ -120,6 +145,7 @@ trait Player
       Session.saveSession(":id"),
       Session.getScore(":id"),
       Session.completeSession(":id"),
-      Session.loadOutcome(":id")).toString
+      Session.loadOutcome(":id"),
+      queryParams).toString
   }
 }

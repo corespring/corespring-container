@@ -1,6 +1,7 @@
 function EditorDefinition(element, options, errorCallback) {
 
-  var Launcher = require('client-launcher');
+  var Launcher = require('new-client-launcher');
+  
   var launcher = new Launcher(element, options, errorCallback);
 
   function createItemAndDraft(callback){
@@ -38,6 +39,8 @@ function EditorDefinition(element, options, errorCallback) {
     });
   }
 
+  var errors = require('errors');
+
   function loadDraftItem(draftId, options) {
 
     if(!draftId){
@@ -46,29 +49,28 @@ function EditorDefinition(element, options, errorCallback) {
 
     launcher.log('load draft item');
 
-    var call = options.devEditor ? launcher.loadCall('devEditor') : launcher.loadCall('editor');
+    var call = launcher.loadCall(options.devEditor ? 'devEditor' : 'editor', function(u){
+      return u.replace(':draftId', draftId);
+    });
 
     if (!call) {
-      throw new Error('can\'t find call for editor');
+      errorCallback(errors.NO_DRAFT_ID);
+      return;
     }
 
     var tab = options.selectedTab;
 
     if ('profile' === tab) {
-      options.hash = '/profile';
+      call.hash = '/profile';
     }
 
     if ('supporting-materials' === tab) {
-      options.hash = '/supporting-materials/0';
+      call.hash = '/supporting-materials/0';
     }
 
-    var url = call.url.replace(':draftId', draftId);
+    var initialData = {todo: true};
 
-
-    launcher.mkInstance(url, null, function onReady(instance){
-
-      instance.send('initialise', options);
-
+    function onReady(instance){
       if(options.devEditor){
         instance.css('height', '100%');
       }
@@ -76,11 +78,14 @@ function EditorDefinition(element, options, errorCallback) {
       if(options.onDraftLoaded){
         options.onDraftLoaded(options.itemId, options.draftName);
       }
-    });
+    }
+
+    var instance = launcher.loadInstance(call, options.queryParams, initialData, onReady);
   }
 
+  var ok = launcher.init();
 
-  launcher.loadClient = function(){
+  if(ok){
     options.draftName = options.draftName || msgr.utils.getUid(); //jshint ignore:line
 
     if(options.itemId){
@@ -94,10 +99,10 @@ function EditorDefinition(element, options, errorCallback) {
         loadDraftItem(draftId.toString(), options);
       });
     }
-  };
 
-
-  launcher.init();
+  } else {
+    return;
+  }
 
   function DraftId(itemId,name){
     this.toString = function(){

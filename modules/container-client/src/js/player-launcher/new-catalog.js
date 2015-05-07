@@ -1,36 +1,41 @@
 function CatalogDefinition(element, options, errorCallback) {
 
-  var Launcher = require('client-launcher');
+  var Launcher = require('new-client-launcher');
   var errors = require('errors');
   var launcher = new Launcher(element, options, errorCallback);
 
-  function loadItem(itemId, options) {
-    var loadCall = launcher.loadCall("catalog");
-    if (!loadCall) {
-      return;
-    }
+  var initOk = launcher.init();
 
-    var url = (loadCall.url).replace(":itemId", itemId);
-    var tabs = [];
-    for (var k in options.tabs) {
-      if (options.tabs[k]) {
-        tabs.push(k);
-      }
-    }
+  if(initOk){
 
-    var hashOpts = tabs.length > 0 ? { hash : '?tabs='+tabs.join(',') } : null;
-    launcher.mkInstance(url, hashOpts);
-  }
-
-  launcher.loadClient = function(){
     if (options.itemId) {
-      loadItem(options.itemId, options);
+      
+      var loadCall = launcher.loadCall('catalog', function(u){
+        return u.replace(':itemId', options.itemId);
+      });
+      
+      if (!loadCall) {
+        return;
+      }
+
+      var tabs = [];
+      for (var k in options.tabs) {
+        if (options.tabs[k]) {
+          tabs.push(k);
+        }
+      }
+
+      var hashOpts = tabs.length > 0 ? { hash : '?tabs='+tabs.join(',') } : null;
+      var call = $.extend(loadCall, hashOpts);
+      var instance = launcher.loadInstance(call, {});
+
     } else {
       errorCallback(errors.NO_ITEM_ID);
     }
-  };
 
-  launcher.init();
+  } else {
+    errorCallback(errors.INSTANCE_NOT_READY);
+  } 
 }
 
 module.exports = CatalogDefinition;

@@ -60,7 +60,11 @@ trait PlayerLauncher extends Controller {
   }
 
   lazy val playerNameAndSrc = {
+    val jsPath = "container-client/js/player-launcher/player.js"
+    pathToNameAndContents(jsPath)
+  }
 
+  lazy val newPlayerNameAndSrc = {
     val jsPath = "container-client/js/player-launcher/new-player.js"
     pathToNameAndContents(jsPath)
   }
@@ -115,6 +119,33 @@ trait PlayerLauncher extends Controller {
 
       logger.debug(s"playerJs - isSecure=${js.isSecure}, path=${request.path}, queryString=${request.rawQueryString}")
 
+      val sessionIdPlayerUrl = Player.load(":id").url
+
+      val rootUrl = playerConfig.rootUrl.getOrElse(BaseUrl(request))
+
+      val itemUrl: String = Player.createSessionForItem(":id").url
+
+      val defaultOptions: JsValue = Json.obj(
+        "corespringUrl" -> rootUrl,
+        "mode" -> "gather",
+        "paths" -> Json.obj(
+          "gather" -> itemUrl,
+          "gatherSession" -> sessionIdPlayerUrl,
+          "view" -> sessionIdPlayerUrl,
+          "evaluate" -> sessionIdPlayerUrl))
+      val bootstrap = s"org.corespring.players.ItemPlayer = corespring.require('player').define(${js.isSecure});"
+      make(playerNameAndSrc, defaultOptions, bootstrap)
+    }
+  }
+
+  /**
+   * query: playerPage the player page to load (default: index.html), for a simple player you can pass in container-player.html
+   */
+  def newPlayerJs = Action.async { implicit request =>
+    hooks.playerJs.map { implicit js =>
+
+      logger.debug(s"playerJs - isSecure=${js.isSecure}, path=${request.path}, queryString=${request.rawQueryString}")
+
       val rootUrl = playerConfig.rootUrl.getOrElse(BaseUrl(request))
       val loadCall = Player.load(":id")
 
@@ -128,7 +159,7 @@ trait PlayerLauncher extends Controller {
           "view" -> loadCall,
           "evaluate" -> loadCall))
       val bootstrap = s"org.corespring.players.ItemPlayer = corespring.require('new-player').define(${js.isSecure});"
-      make(playerNameAndSrc, defaultOptions, bootstrap)
+      make(newPlayerNameAndSrc, defaultOptions, bootstrap)
     }
   }
 

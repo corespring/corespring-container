@@ -156,12 +156,16 @@ exports.define = function(isSecure) {
         isComplete: false
       } : null;
 
-      instance.send( 'initialise', {
+      var data = {
         mode: mode,
         options: modeOptions,
         saveResponses: saveResponseOptions,
         queryParams: options.queryParams
-      });
+      };
+
+      logger.debug('init data:', data);
+      
+      instance.send( 'initialise', data );
     };
 
     var sendSetModeMessage = function(mode) {

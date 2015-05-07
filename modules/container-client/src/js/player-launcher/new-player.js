@@ -4,6 +4,29 @@ exports.define = function(isSecure) {
     var Launcher = require('new-client-launcher');
     var launcher = new Launcher(element, options, errorCallback);
     var errors = require('errors');
+    var instance = {
+      send: function(){
+        errorCallback(errors.INSTANCE_NOT_READY);
+      },
+      on: function(){
+        errorCallback(errors.INSTANCE_NOT_READY);
+      }
+    };
+
+    /**
+     * Utility that calls errorCallback if an error has occured.
+     * If there has been no error,
+     * then call the originalCallback with the result
+     */
+    function messageResultHandler(originalCallback){
+      return function(err, result) {
+        if(err){
+          errorCallback(errors.MESSAGE_ERROR(err));
+        } else {
+          originalCallback(result);
+        }
+      };
+    }
 
     function validateOptions(options){
       var out = [];
@@ -23,96 +46,57 @@ exports.define = function(isSecure) {
 
       return out;
     }
-
-    var prepareUrl = function() {
-      var id = options.mode === 'gather' ? (options.sessionId || options.itemId) : options.sessionId;
-      var path = launcher.loadCall(options.mode);
-      if (options.mode === 'gather' && options.sessionId) {
-        path = launcher.loadCall('gatherSession');
-      }
-      return path.replace(':id', id);
-    };
     
     function prepareCall() {
       options.mode = options.mode || 'gather';
       var id = options.mode === 'gather' ? (options.sessionId || options.itemId) : options.sessionId;
-      var call = launcher.loadCall('stub', function(url){
+      var call = launcher.loadCall('gather', function(url){
         return url.replace(':itemId', id);
       }); 
-      //options.mode);
-      /*if (options.mode === 'gather' && options.sessionId) {
-        path = launcher.loadCall('gatherSession');
-      }*/
       return call;
-      //path.replace(':id', id);
     }
 
-    var initialiseMessage = function(instance, mode) {
-      var modeOptions = options[mode] || {};
-      var saveResponseOptions = mode === 'evaluate' ? {
-        isAttempt: false,
-        isComplete: false
-      } : null;
-
-      instance.send( 'initialise', {
-        mode: mode,
-        options: modeOptions,
-        saveResponses: saveResponseOptions,
-        queryParams: options.queryParams
-      });
-    };
-    //1. allow launcher to run it's validations
-    //2. allow player to run it's init 
     var initOk = launcher.init(validateOptions);
 
     if(initOk){
       var call = prepareCall();
-      var params = {
-        forceWidth: options.forceWidth === undefined ? true : options.forceWidth,
-        hash : options.showPreview ? '/?showPreviewButton' : null
-      };
+      var params = options.queryParams; 
+      var initialData = {mode: options.mode};
+      initialData[options.mode] = options[options.mode] || {};
+      
+      console.debug('initial data: ', initialData);
 
-      var initialData = {};
-      launcher.load(call, params, initialData);
-    }
+      instance = launcher.loadInstance(call, params, initialData);
 
-    /*var instance = launcher.mkInstance(prepareCall(), {
-      forceWidth: options.forceWidth === undefined ? true : options.forceWidth,
-      hash : options.showPreview ? '/?showPreviewButton' : null
-    });
-    //, function onReady(instance){
-    //  initialiseMessage(instance, options.mode);
-    //});
-
-    instance.onReady(function(){
-      initialiseMessage(instance, options.mode);
-    });
-
-    instance.load();*/
-
-    var isValidMode = function(m) {
-      switch(m){
-        case 'gather':
-        case 'view':
-        case 'evaluate':
-          return true;
+      var forceWidth = options.forceWidth === undefined ? true : options.forceWidth;
+      
+      if(forceWidth){
+        instance.width(options.width || '600px');
       }
-      return false;
-    };
 
-    /**
-     * Utility that calls errorCallback if an error has occured.
-     * If there has been no error,
-     * then call the originalCallback with the result
-     */
-    function messageResultHandler(originalCallback){
-      return function(err, result) {
-        if(err){
-          errorCallback(errors.MESSAGE_ERROR(err));
-        } else {
-          originalCallback(result);
-        }
-      };
+      if (options.onSessionCreated) {
+        instance.on('sessionCreated', function(data) {
+          options.onSessionCreated(data.session._id.$oid);
+        });
+      }
+
+      if (options.onInputReceived) {
+        instance.on('inputReceived', function(sessionStatus) {
+          options.onInputReceived(sessionStatus);
+        });
+      }
+
+      if (options.onPlayerRendered) {
+        instance.on('rendered', function(data) {
+          options.onPlayerRendered();
+        });
+      }
+    } else {
+      return;
+    }
+      
+    function isValidMode(m) {
+      return ['gather', 'view', 'evaluate'].indexOf(m) !== -1;
     }
 
     var _isComplete = function(callback) {
@@ -134,34 +118,14 @@ exports.define = function(isSecure) {
         cb(true);
       }
     };
-
-    if (options.onSessionCreated) {
-      instance.on('sessionCreated', function(data) {
-        options.onSessionCreated(data.session._id.$oid);
-      });
-    }
-
-    if (options.onInputReceived) {
-      instance.on('inputReceived', function(sessionStatus) {
-        options.onInputReceived(sessionStatus);
-      });
-    }
-
-    if (options.onPlayerRendered) {
-      instance.on('rendered', function(data) {
-        options.onPlayerRendered();
-      });
-    }
-
+    
     var sendSetModeMessage = function(mode) {
-      var modeOptions = options[mode] || {};
       var saveResponseOptions = mode === 'evaluate' ? {
         isAttempt: false,
         isComplete: false
       } : null;
       instance.send('setMode', {
         mode: mode,
-        options: modeOptions,
         saveResponses: saveResponseOptions
       });
     };
@@ -233,7 +197,7 @@ exports.define = function(isSecure) {
     this.remove = function() {
       instance.remove();
     };
-
+      
   };
 
   return PlayerDefinition;

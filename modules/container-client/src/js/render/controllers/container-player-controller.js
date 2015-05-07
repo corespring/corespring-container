@@ -5,7 +5,11 @@ angular.module('corespring-player.controllers')
       '$scope',
       '$location',
       function($log, $scope, $location) {
-        $scope.showPreviewButton = ($location.search().showPreviewButton) ? 'true' : 'false';
+
+        var color = 'color: #00ef4f; background-color: #142811;';
+
+        console.warn('%c TODO - hook showPreviewButton backup with player launcher', color);
+        //$scope.showPreviewButton = ($location.search().showPreviewButton) ? 'true' : 'false';
 
         $scope.playerSettings = {
           maxNoOfAttempts: 1,
