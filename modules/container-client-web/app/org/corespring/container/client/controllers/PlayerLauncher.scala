@@ -168,7 +168,8 @@ trait PlayerLauncher extends Controller {
       "container-client/js/player-launcher/logger.js",
       "container-client/js/player-launcher/errors.js",
       "container-client/js/player-launcher/instance.js",
-      "container-client/js/player-launcher/url-builder.js")
+      "container-client/js/player-launcher/url-builder.js",
+      "container-client/js/player-launcher/object-id.js")
     val rawJs = pathToNameAndContents("container-client/js/corespring/core-library.js")._2
     val wrapped = corePaths.map(pathToNameAndContents).map(t => ServerLibraryWrapper(t._1, t._2))
     val bootstrap =

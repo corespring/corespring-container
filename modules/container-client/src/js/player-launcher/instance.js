@@ -9,6 +9,7 @@ var Instance = function(element, options, errorCallback, log) {
   var self = this;
 
   var UrlBuilder = require('url-builder');
+  var ObjectId = require('object-id');
 
   function $iframe() {
     var $node = $('#' + iframeUid);
@@ -67,7 +68,7 @@ var Instance = function(element, options, errorCallback, log) {
 
     function loadSession(session) {
 
-      var sessionId = session._id['$oid'];
+      var sessionId = new ObjectId(session._id).toString();
 
       var url =
         new UrlBuilder(options.url)
