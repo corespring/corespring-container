@@ -75,11 +75,15 @@ trait ItemDraft extends Controller {
     def missingProperty(p: String) = (i: String) => Future(Left(BAD_REQUEST, s"Missing property $p in json request for $i"))
 
     def saveFn(subset: String, json: JsValue): Option[SaveSig] = Some(subset match {
-      case "supporting-materials" => hooks.saveSupportingMaterials(_: String, json)
+      case "components" => hooks.saveComponents(_: String, json)
+      case "collection-id" => (json \ "collectionId").asOpt[String].map(s => hooks.saveCollectionId(_: String, s)).getOrElse(missingProperty("collectionId"))
       case "custom-scoring" => (json \ "customScoring")
         .asOpt[String]
         .map(cs => hooks.saveCustomScoring(_: String, cs))
         .getOrElse(missingProperty("customScoring"))
+      case "profile" => hooks.saveProfile(_: String, json)
+      case "supporting-materials" => hooks.saveSupportingMaterials(_: String, json)
+      case "summary-feedback" => (json \ "summaryFeedback").asOpt[String].map(s => hooks.saveSummaryFeedback(_: String, s)).getOrElse(missingProperty("summaryFeedback"))
       case "xhtml" => (json \ "xhtml")
         .asOpt[String]
         .map { s =>
@@ -87,9 +91,7 @@ trait ItemDraft extends Controller {
           hooks.saveXhtml(_: String, validXhtml)
         }
         .getOrElse(missingProperty("xhtml"))
-      case "summary-feedback" => (json \ "summaryFeedback").asOpt[String].map(s => hooks.saveSummaryFeedback(_: String, s)).getOrElse(missingProperty("summaryFeedback"))
-      case "profile" => hooks.saveProfile(_: String, json)
-      case "components" => hooks.saveComponents(_: String, json)
+
       case _ => (itemId: String) => Future(Left(BAD_REQUEST, s"Unknown subset: $subset"))
     })
 
