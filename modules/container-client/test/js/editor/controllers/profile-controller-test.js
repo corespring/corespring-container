@@ -7,6 +7,14 @@ describe('profile controller', function () {
   function MockModal() {
   }
 
+  function MockCollectionService() {
+    this.listResult = [];
+
+    this.list = function (callback) {
+      callback(_.cloneDeep(this.listResult));
+    };
+  }
+
   function MockDesignerService() {
     this.loadAvailableUiComponentsResult = {interactions: [], widgets: []};
 
@@ -28,6 +36,14 @@ describe('profile controller', function () {
     this.saveProfile = function (data, callback) {
       this.saveProfileCalls.push(arguments);
       callback(_.cloneDeep(this.saveProfileResult));
+    };
+
+    this.saveCollectionIdResult = "OK";
+    this.saveCollectionIdCalls = [];
+
+    this.saveCollectionId = function (data, callback) {
+      this.saveCollectionIdCalls.push(arguments);
+      callback(_.cloneDeep(this.saveCollectionIdResult));
     };
   }
 
@@ -98,14 +114,22 @@ describe('profile controller', function () {
   beforeEach(angular.mock.module('corespring-editor.controllers'));
   beforeEach(angular.mock.module('corespring-editor.services'));
 
-  var mockLocation, mockDesignerService, mockItemService,mockConfigurationService,
-    mockDataQueryService, mockProfileFormatter, mockStandardQueryCreator;
+  var
+    mockCollectionService,
+    mockConfigurationService,
+    mockDataQueryService,
+    mockDesignerService,
+    mockItemService,
+    mockLocation,
+    mockProfileFormatter,
+    mockStandardQueryCreator;
 
   beforeEach(function () {
-    mockLocation = new MockLocation();
+    mockCollectionService = new MockCollectionService();
+    mockDataQueryService = new MockDataQueryService();
     mockDesignerService = new MockDesignerService();
     mockItemService = new MockItemService();
-    mockDataQueryService = new MockDataQueryService();
+    mockLocation = new MockLocation();
     mockProfileFormatter = new MockProfileFormatter();
     mockStandardQueryCreator = new MockStandardQueryCreator();
 
@@ -113,13 +137,14 @@ describe('profile controller', function () {
     module(function ($provide) {
       $provide.value('$location', mockLocation);
       $provide.value('$timeout', function(fn){fn();});
-      $provide.value('throttle', _.identity);
+      $provide.value('CollectionService', mockCollectionService);
       $provide.value('DataQueryService', mockDataQueryService);
       $provide.value('DesignerService', mockDesignerService);
       $provide.value('ItemService', mockItemService);
       $provide.value('LogFactory', new MockLogFactory());
-      $provide.value('StandardQueryCreator', mockStandardQueryCreator);
       $provide.value('ProfileFormatter', mockProfileFormatter);
+      $provide.value('StandardQueryCreator', mockStandardQueryCreator);
+      $provide.value('throttle', _.identity);
     });
 
   });
@@ -198,6 +223,34 @@ describe('profile controller', function () {
       scope.$apply();
       expect(mockItemService.saveProfileCalls).toEqual([]);
     });
+  });
+
+  describe("collectionId", function(){
+    it("loads collections", function () {
+      var expectedDataProvider = randomArray();
+      mockCollectionService.listResult = expectedDataProvider;
+      makeProfileController();
+      expect(scope.collectionIdDataProvider).toEqual(expectedDataProvider);
+    });
+
+    describe("save", function(){
+      beforeEach(function () {
+        makeProfileController();
+        scope.$apply();
+        mockItemService.saveCollectionIdCalls = [];
+        scope.item.collectionId = "some value";
+        scope.$apply();
+      });
+      it("is not triggered when collectionId is set from item load", function () {
+        expect(mockItemService.saveCollectionIdCalls.length).toEqual(0);
+      });
+      it("is triggered when collectionId is changed", function () {
+        scope.item.collectionId = "some other value";
+        scope.$apply();
+        expect(mockItemService.saveCollectionIdCalls.length).toEqual(1);
+      });
+    });
+
   });
 
   describe("standards", function () {
@@ -397,7 +450,7 @@ describe('profile controller', function () {
   });
 
   describe('priorUse', function () {
-    var itemOne, itemTwo, itemOther;
+    var itemOne, itemTwo, itemOther, priorUseItems;
 
     beforeEach(function () {
       itemOne = keyValue("one");

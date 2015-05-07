@@ -5,17 +5,60 @@
 .profile{
   padding: 10px;
 
-  .panel {
-    margin-bottom: 5px;
+  a.tag-list-link {
+    padding: 3px;
+    float: left;
+    text-decoration: none;
   }
 
-  .panel-title {
-    * {
-      cursor: pointer;
+  a.tag-list-link.selected {
+    font-weight: bold;
+  }
+
+  .add-standards {
+    .select2-search-choice {
+      display: none;
     }
   }
-  .panel-body {
-    padding: 5px 15px 15px 15px;
+
+  .blooms-taxonomy {
+    .radio-input {
+      width: 50%;
+      display: inline-block;
+    }
+  }
+
+  .depth-of-knowledge {
+    .radio-input {
+      width: 50%;
+      display: inline-block;
+    }
+  }
+
+  .inline-help {
+    font-style: italic;
+  }
+
+  .key-skills {
+    .badge {
+      margin-left: 20px;
+    }
+    .selected {
+      font-style: italic;
+      font-size: 70%;
+    }
+  }
+
+  .lexile {
+    .form-control {
+      display: inline-block;
+      width: 60px;
+    }
+    .measure {
+      margin-left: 10px;
+      font-weight: bold;
+      font-size: 16px;
+    }
   }
 
   form{
@@ -28,6 +71,24 @@
       text-transform: uppercase;
       color: lighten(@cs-grey, 10%);
     }
+  }
+
+  .panel {
+    margin-bottom: 5px;
+  }
+
+  .panel-body {
+    padding: 5px 15px 15px 15px;
+  }
+
+  .panel-title {
+    * {
+      cursor: pointer;
+    }
+  }
+
+  select.collection-id {
+    margin-bottom: 5px;
   }
 
   .select2-container .select2-choice{
@@ -69,65 +130,6 @@
   }
 
 
-  .tag-list-header {
-    padding: 3px;
-    float: left;
-    font-weight: bold;
-    color: lighten(@cs-green, 5%);
-  }
-
-  a.tag-list-link {
-    padding: 3px;
-    float: left;
-    text-decoration: none;
-  }
-
-  a.tag-list-link.selected {
-    font-weight: bold;
-  }
-
-  .key-skills {
-    .badge {
-      margin-left: 20px;
-    }
-    .selected {
-      font-style: italic;
-      font-size: 70%;
-    }
-  }
-
-  .lexile {
-    .form-control {
-      display: inline-block;
-      width: 60px;
-    }
-    .measure {
-      margin-left: 10px;
-      font-weight: bold;
-      font-size: 16px;
-    }
-  }
-
-  .depth-of-knowledge {
-    .radio-input {
-      width: 50%;
-      display: inline-block;
-    }
-  }
-
-  .blooms-taxonomy {
-    .radio-input {
-      width: 50%;
-      display: inline-block;
-    }
-  }
-
-  .add-standards {
-    .select2-search-choice {
-      display: none;
-    }
-  }
-
   .standards {
     .no-input {
       input[type='text'] {
@@ -144,5 +146,13 @@
       padding: 1px 5px 1px 0px;
     }
   }
+
+  .tag-list-header {
+    padding: 3px;
+    float: left;
+    font-weight: bold;
+    color: lighten(@cs-green, 5%);
+  }
+
 
 }

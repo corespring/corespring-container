@@ -58,36 +58,30 @@ trait ItemHooks extends HasContext {
 trait EditorHooks extends LoadHook with AssetHooks
 
 trait ItemDraftHooks extends HasContext with LoadHook {
-  def saveProfile(draftId: String, json: JsValue)(implicit h: RequestHeader): R[JsValue]
-  def saveCustomScoring(draftId: String, customScoring: String)(implicit header: RequestHeader): R[JsValue]
-  def saveSupportingMaterials(draftId: String, json: JsValue)(implicit h: RequestHeader): R[JsValue]
-  def saveComponents(draftId: String, json: JsValue)(implicit h: RequestHeader): R[JsValue]
-  def saveXhtml(draftId: String, xhtml: String)(implicit h: RequestHeader): R[JsValue]
-  def saveSummaryFeedback(draftId: String, feedback: String)(implicit h: RequestHeader): R[JsValue]
-  def createItemAndDraft()(implicit h: RequestHeader): R[(String, String)]
   def commit(draftId: String, force: Boolean)(implicit h: RequestHeader): R[JsValue]
+  def createItemAndDraft()(implicit h: RequestHeader): R[(String, String)]
   def delete(draftId: String)(implicit h: RequestHeader): R[JsValue]
+  def saveCollectionId(draftId: String, collectionId: String)(implicit h: RequestHeader): R[JsValue]
+  def saveComponents(draftId: String, json: JsValue)(implicit h: RequestHeader): R[JsValue]
+  def saveCustomScoring(draftId: String, customScoring: String)(implicit header: RequestHeader): R[JsValue]
+  def saveProfile(draftId: String, json: JsValue)(implicit h: RequestHeader): R[JsValue]
+  def saveSummaryFeedback(draftId: String, feedback: String)(implicit h: RequestHeader): R[JsValue]
+  def saveSupportingMaterials(draftId: String, json: JsValue)(implicit h: RequestHeader): R[JsValue]
+  def saveXhtml(draftId: String, xhtml: String)(implicit h: RequestHeader): R[JsValue]
 }
 
 trait SessionHooks extends HasContext {
-
-  def loadItemAndSession(sessionId: String)(implicit header: RequestHeader): Either[StatusMessage, FullSession]
-
-  def loadOutcome(id: String)(implicit header: RequestHeader): Either[StatusMessage, SessionOutcome]
-
   def getScore(id: String)(implicit header: RequestHeader): Either[StatusMessage, SessionOutcome]
-
   def load(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]]
-
+  def loadItemAndSession(sessionId: String)(implicit header: RequestHeader): Either[StatusMessage, FullSession]
+  def loadOutcome(id: String)(implicit header: RequestHeader): Either[StatusMessage, SessionOutcome]
   def save(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, SaveSession]]
 }
 
 trait PlayerLauncherHooks extends HasContext {
-  def playerJs(implicit header: RequestHeader): Future[PlayerJs]
-
-  def editorJs(implicit header: RequestHeader): Future[PlayerJs]
-
   def catalogJs(implicit header: RequestHeader): Future[PlayerJs]
+  def editorJs(implicit header: RequestHeader): Future[PlayerJs]
+  def playerJs(implicit header: RequestHeader): Future[PlayerJs]
 }
 
 trait DataQueryHooks extends HasContext {
@@ -97,5 +91,5 @@ trait DataQueryHooks extends HasContext {
 }
 
 trait CollectionHooks extends HasContext {
-  def list(query: Option[String] = None)(implicit header: RequestHeader): Future[Either[StatusMessage, JsArray]]
+  def list()(implicit header: RequestHeader): Future[Either[StatusMessage, JsArray]]
 }

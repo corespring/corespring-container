@@ -8,6 +8,7 @@
       '$scope',
       '$timeout',
       'throttle',
+      'CollectionService',
       'ConfigurationService',
       'DataQueryService',
       'DesignerService',
@@ -23,6 +24,7 @@
     $scope,
     $timeout,
     throttle,
+    CollectionService,
     ConfigurationService,
     DataQueryService,
     DesignerService,
@@ -509,8 +511,6 @@
       }
     }, true); //watch nested properties
 
-
-
     //----------------------------------------------------------------
     // list of component types used in the item
     //----------------------------------------------------------------
@@ -534,6 +534,15 @@
         $scope.item.components, $scope.availableComponents, simpleFormat);
     }
 
+    //----------------------------------------------------------------
+    // list of collections
+    //----------------------------------------------------------------
+
+    CollectionService.list(function(collections) {
+      $scope.collectionIdDataProvider = collections;
+    });
+
+    $scope.collectionIdFilter = createOptionsFilter($scope.formModels.collectionId, 'key');
 
     //----------------------------------------------------------------
     // subject and related subject
@@ -901,6 +910,7 @@
       $scope.taskInfo = profile.taskInfo;
       $scope.otherAlignments = profile.otherAlignments;
       $scope.contributorDetails = profile.contributorDetails;
+      $scope.collectionId = item.collectionId;
 
       initComponentTypesUsed();
       initKeySkillsDataProvider();
@@ -961,6 +971,29 @@
         $log.error('error loading profile', err);
       });
     };
+
+    //----------------------------------------------------------------
+    // collectionId load and save
+    //----------------------------------------------------------------
+
+    $scope.$watch('item.collectionId', throttle(function(newValue, oldValue){
+      if(undefined === oldValue){
+        return;
+      }
+      if(_.isEqual(oldValue, newValue)) {
+        return;
+      }
+      $scope.saveCollectionId();
+      $scope.$emit('itemChanged', {partChanged: 'collectionId'});
+    }));
+
+    $scope.saveCollectionId = function() {
+      $log.log("saving collectionId");
+      ItemService.saveCollectionId($scope.item.collectionId, function(result){
+        $log.log("collectionId saved result:", result);
+      });
+    };
+
 
     //----------------------------------------------------------------
     // startup

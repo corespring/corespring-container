@@ -96,15 +96,12 @@ script(type="text/ng-template", id="/templates/profile")
               ul
                 li(ng-repeat="type in componentTypes") {{type}}
 
-        +h_form
-          h6 Collection
-          p You may add this item to a collection below. All items are added to the "Default" collection, unless another is selected.
-
-          +configurableField("collectionId","* Collection", "collectionId")
-            select.form-control(id="collectionId",ng-model="collectionId",
-              ng-options="c.key as c.value for c in collectionDataProvider | filter:collectionIdFilter",
+          +configurableField("collectionId","* Collection", "item.collectionId")
+            select.form-control.collection-id(id="collection-id",ng-model="item.collectionId",
+              ng-options="c.key as c.value for c in collectionIdDataProvider | filter:collectionIdFilter",
               ng-disabled="formModels.collectionId.readonly")
                   option(value="") Select ...
+            span.inline-help All items are added to the "Default" collection, unless another is selected.
 
         form.form-horizontal(role="form",ng-show="formModels.standards.visible")
           div.standard-filter(ng-show="!formModels.standards.readonly")

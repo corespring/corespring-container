@@ -18,6 +18,7 @@ angular.module('corespring-editor.services').service('ItemService', [
       this.addSaveListener = addSaveListener;
       this.load = loadItem;
       this.saveComponents = saveComponents;
+      this.saveCollectionId = saveCollectionId;
       this.saveCustomScoring = saveCustomScoring;
       this.saveProfile = saveProfile;
       this.saveSummaryFeedback = saveSummaryFeedback;
@@ -98,6 +99,12 @@ angular.module('corespring-editor.services').service('ItemService', [
       function saveXhtml(data, onSuccess, onFailure) {
         save('xhtml', {
           xhtml: data
+        }, onSuccess, onFailure);
+      }
+
+      function saveCollectionId(data, onSuccess, onFailure) {
+        save('collection-id', {
+          collectionId: data
         }, onSuccess, onFailure);
       }
 
