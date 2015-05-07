@@ -59,16 +59,22 @@ var Instance = function(element, options, errorCallback, log) {
       }
     })();
 
-    var response = $.ajax({
-      url: options.sessionUrl,
-      async: false, // refactor this so that it's asynchronous.
-      method: 'POST',
-      dataType: 'json'
-    }).responseText;
 
-    var session = JSON.parse(response);
 
-    var sessionId = new ObjectId(session._id).toString();
+    var sessionId = (function() {
+      if (options.sessionId !== undefined) {
+        return options.sessionId;
+      } else {
+        var response = $.ajax({
+          url: options.sessionUrl,
+          async: false, // refactor this so that it's asynchronous.
+          method: 'POST',
+          dataType: 'json'
+        }).responseText;
+        var session = JSON.parse(response);
+        return new ObjectId(session._id).toString();
+      }
+    })();
 
     var url =
       new UrlBuilder(options.url)
