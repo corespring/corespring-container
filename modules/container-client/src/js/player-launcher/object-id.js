@@ -4,7 +4,7 @@ function ObjectId(arg) {
     var string, error;
 
     function verify(string) {
-      if (string.length != 24) {
+      if (string.length !== 24) {
         throw new Error("ObjectId is not the right length");
       }
       if (!/^[a-zA-Z0-9]*$/.test(string)) {
