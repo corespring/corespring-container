@@ -8,8 +8,11 @@ import org.corespring.container.client.controllers.jade.Jade
 import org.corespring.container.client.hooks.PlayerHooks
 import org.corespring.container.client.views.txt.js.PlayerServices
 import org.corespring.container.components.processing.PlayerItemPreProcessor
+import play.api.http.ContentTypes
 import play.api.libs.json._
 import play.api.mvc.{ Action, AnyContent, RequestHeader }
+
+import scala.concurrent.Future
 
 trait Player
   extends App[PlayerHooks]
@@ -92,6 +95,11 @@ trait Player
               newRelicRumConf.getOrElse(Json.obj()))))
       }
     }
+  }
+
+
+  def stubPost(itemId:String) = Action.async { implicit request =>
+    Future(Ok(s"<html><body> >> $itemId</body></html>").as(ContentTypes.HTML))
   }
 
   def createSessionForItem(itemId: String): Action[AnyContent] = Action.async { implicit request =>

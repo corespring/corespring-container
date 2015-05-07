@@ -115,20 +115,18 @@ trait PlayerLauncher extends Controller {
 
       logger.debug(s"playerJs - isSecure=${js.isSecure}, path=${request.path}, queryString=${request.rawQueryString}")
 
-      val sessionIdPlayerUrl = Player.load(":id").url
-
       val rootUrl = playerConfig.rootUrl.getOrElse(BaseUrl(request))
-
-      val itemUrl: String = Player.createSessionForItem(":id").url
+      val loadCall = Player.load(":id")
 
       val defaultOptions: JsValue = Json.obj(
         "corespringUrl" -> rootUrl,
         "mode" -> "gather",
         "paths" -> Json.obj(
-          "gather" -> itemUrl,
-          "gatherSession" -> sessionIdPlayerUrl,
-          "view" -> sessionIdPlayerUrl,
-          "evaluate" -> sessionIdPlayerUrl))
+          "stub" -> Player.stubPost(":itemId"),
+          "gather" -> Player.createSessionForItem(":itemId"),
+          "gatherSession" -> loadCall,
+          "view" -> loadCall,
+          "evaluate" -> loadCall))
       val bootstrap = s"org.corespring.players.ItemPlayer = corespring.require('new-player').define(${js.isSecure});"
       make(playerNameAndSrc, defaultOptions, bootstrap)
     }
@@ -167,8 +165,9 @@ trait PlayerLauncher extends Controller {
       "container-client/js/player-launcher/logger.js",
       "container-client/js/player-launcher/errors.js",
       "container-client/js/player-launcher/instance.js",
-      "container-client/js/player-launcher/paths.js",
+      "container-client/js/player-launcher/new-instance.js",
       "container-client/js/player-launcher/client-launcher.js",
+      "container-client/js/player-launcher/new-client-launcher.js",
       "container-client/js/player-launcher/url-builder.js")
     val rawJs = pathToNameAndContents("container-client/js/corespring/core-library.js")._2
     val wrapped = corePaths.map(pathToNameAndContents).map(t => ServerLibraryWrapper(t._1, t._2))

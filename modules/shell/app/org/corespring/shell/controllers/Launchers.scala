@@ -7,16 +7,20 @@ trait Launchers extends Controller {
 
   def editorFromItem(itemId: String) = Action { request =>
 
-    Ok(loadPlayer(baseJson(request) ++ Json.obj(
+    Ok(loadEditorPage(baseJson(request) ++ Json.obj(
       "itemId" -> itemId)))
   }
 
   def editorFromDraft(draftId: String) = Action { request =>
     val (itemId, draftName) = splitDraftId(draftId)
 
-    Ok(loadPlayer(baseJson(request) ++ Json.obj(
+    Ok(loadEditorPage(baseJson(request) ++ Json.obj(
       "draftName" -> draftName,
       "itemId" -> itemId)))
+  }
+
+  def playerFromItem(itemId:String) = Action {request =>
+    Ok(loadPlayerPage(baseJson(request) ++ Json.obj("mode" -> "gather", "itemId" -> itemId)))
   }
 
   def catalog(itemId:String) = Action{ request =>
@@ -32,7 +36,8 @@ trait Launchers extends Controller {
     Ok(launchers.catalog(PlayerLauncher.catalogJs().url, baseJson(request) ++ Json.obj("itemId" -> itemId) ++ tabOpts))
   }
 
-  private def loadPlayer(opts: JsValue) = org.corespring.shell.views.html.launchers.editor(org.corespring.container.client.controllers.routes.PlayerLauncher.editorJs().url, opts)
+  private def loadEditorPage(opts: JsValue) = org.corespring.shell.views.html.launchers.editor(org.corespring.container.client.controllers.routes.PlayerLauncher.editorJs().url, opts)
+  private def loadPlayerPage(opts: JsValue) = org.corespring.shell.views.html.launchers.player(org.corespring.container.client.controllers.routes.PlayerLauncher.playerJs().url, opts)
 
   private def splitDraftId(draftId: String) = {
     val Array(itemId, draftName) = draftId.split("~")

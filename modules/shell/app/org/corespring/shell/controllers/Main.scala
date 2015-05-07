@@ -60,7 +60,7 @@ trait Main
 
           import org.corespring.container.client.controllers.apps.{routes => appRoutes}
           val id = itemId.toString
-          val playerUrl = routes.Main.createSessionPage(id).url
+          val playerUrl = Launchers.playerFromItem(id).url
           val deleteUrl = routes.Main.deleteItem(id).url
           val editorUrl = Launchers.editorFromItem(id).url
           val devEditorUrl = appRoutes.DevEditor.load(id).url

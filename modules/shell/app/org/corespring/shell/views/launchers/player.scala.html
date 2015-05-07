@@ -1,0 +1,21 @@
+@(js:String, opts : play.api.libs.json.JsValue)
+<html>
+<body>
+<script type="text/javascript" src="//code.jquery.com/jquery-2.1.3.min.js"></script>
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/lodash.js/3.5.0/lodash.min.js"></script>
+<script type="text/javascript" src="@js"></script>
+<script>
+     document.addEventListener('DOMContentLoaded', function(){
+       var holder = document.querySelector('.holder');
+       var opts = @{Html(play.api.libs.json.Json.stringify(opts))};
+
+       console.log('opts: ', opts);
+
+       var catalog = new org.corespring.players.ItemPlayer(holder, opts, function(err){
+          console.warn(err);
+       });
+     });
+    </script>
+<div class="holder"></div>
+</body>
+</html>

@@ -1,11 +1,11 @@
 exports.define = function(isSecure) {
   var PlayerDefinition = function(element, options, errorCallback) {
 
-    var Launcher = require('client-launcher');
+    var Launcher = require('new-client-launcher');
     var launcher = new Launcher(element, options, errorCallback);
     var errors = require('errors');
 
-    launcher.validateOptions = function(options){
+    function validateOptions(options){
       var out = [];
 
       if (!options.mode) {
@@ -22,7 +22,7 @@ exports.define = function(isSecure) {
       }
 
       return out;
-    };
+    }
 
     var prepareUrl = function() {
       var id = options.mode === 'gather' ? (options.sessionId || options.itemId) : options.sessionId;
@@ -32,6 +32,20 @@ exports.define = function(isSecure) {
       }
       return path.replace(':id', id);
     };
+    
+    function prepareCall() {
+      options.mode = options.mode || 'gather';
+      var id = options.mode === 'gather' ? (options.sessionId || options.itemId) : options.sessionId;
+      var call = launcher.loadCall('stub', function(url){
+        return url.replace(':itemId', id);
+      }); 
+      //options.mode);
+      /*if (options.mode === 'gather' && options.sessionId) {
+        path = launcher.loadCall('gatherSession');
+      }*/
+      return call;
+      //path.replace(':id', id);
+    }
 
     var initialiseMessage = function(instance, mode) {
       var modeOptions = options[mode] || {};
@@ -47,13 +61,34 @@ exports.define = function(isSecure) {
         queryParams: options.queryParams
       });
     };
+    //1. allow launcher to run it's validations
+    //2. allow player to run it's init 
+    var initOk = launcher.init(validateOptions);
 
-    var instance = launcher.mkInstance(prepareUrl(), {
+    if(initOk){
+      var call = prepareCall();
+      var params = {
+        forceWidth: options.forceWidth === undefined ? true : options.forceWidth,
+        hash : options.showPreview ? '/?showPreviewButton' : null
+      };
+
+      var initialData = {};
+      launcher.load(call, params, initialData);
+    }
+
+    /*var instance = launcher.mkInstance(prepareCall(), {
       forceWidth: options.forceWidth === undefined ? true : options.forceWidth,
       hash : options.showPreview ? '/?showPreviewButton' : null
-    }, function onReady(instance){
+    });
+    //, function onReady(instance){
+    //  initialiseMessage(instance, options.mode);
+    //});
+
+    instance.onReady(function(){
       initialiseMessage(instance, options.mode);
     });
+
+    instance.load();*/
 
     var isValidMode = function(m) {
       switch(m){
