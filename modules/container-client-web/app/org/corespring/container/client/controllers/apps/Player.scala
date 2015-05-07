@@ -8,6 +8,7 @@ import org.corespring.container.client.controllers.jade.Jade
 import org.corespring.container.client.hooks.PlayerHooks
 import org.corespring.container.client.views.txt.js.PlayerServices
 import org.corespring.container.components.processing.PlayerItemPreProcessor
+import play.api.http.ContentTypes
 import play.api.libs.json._
 import play.api.mvc._
 
@@ -142,7 +143,7 @@ trait Player
     def sessionAsJSON(sessionId: String)(implicit request: RequestHeader): Future[SimpleResult] =
       hooks.loadSessionAndItem(sessionId).map {
         case Left((code, msg)) => Status(code)(Json.obj("error" -> msg))
-        case Right((session, _)) => Ok(Json.prettyPrint(session)).as("application/json")
+        case Right((session, _)) => Ok(Json.prettyPrint(session)).as(ContentTypes.JSON)
       }
 
   }

@@ -7,6 +7,7 @@ import org.corespring.container.components.model.Component
 import org.corespring.container.components.processing.PlayerItemPreProcessor
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
+import play.api.http.ContentTypes
 import play.api.{GlobalSettings, Mode, Configuration}
 import play.api.libs.json.{Json, JsValue, JsObject}
 import play.api.mvc.{SimpleResult, AnyContent, Request, RequestHeader}
@@ -64,7 +65,7 @@ class PlayerTest extends Specification with PlaySpecification with Mockito {
       running(FakeApplication(withGlobal = Some(MockGlobal))) {
         val request = FakeRequest("", "")
         val result = player.load(validSessionId)(request)
-        header("Content-Type", result) must be equalTo(Some("application/json"))
+        header("Content-Type", result) must be equalTo(Some(ContentTypes.JSON))
         contentAsJson(result) must be equalTo(validSession)
       }
     }
@@ -73,7 +74,7 @@ class PlayerTest extends Specification with PlaySpecification with Mockito {
 
       "return session as HTML" in {
         running(FakeApplication(withGlobal = Some(MockGlobal))) {
-          val request = FakeRequest("", "").withHeaders("Accept" -> "text/html")
+          val request = FakeRequest("", "").withHeaders("Accept" -> ContentTypes.HTML)
           val result = player.load(validSessionId)(request)
           header("Content-Type", result).get must contain("text/html")
         }
@@ -82,7 +83,7 @@ class PlayerTest extends Specification with PlaySpecification with Mockito {
 
     "with Accepts application/json and text/html" in {
       running(FakeApplication(withGlobal = Some(MockGlobal))) {
-        val request = FakeRequest("", "").withHeaders("Accept" -> "application/json text/html")
+        val request = FakeRequest("", "").withHeaders("Accept" -> s"${ContentTypes.JSON} ${ContentTypes.HTML}")
         val result = player.load(validSessionId)(request)
         header("Content-Type", result) must be equalTo(Some("application/json"))
         contentAsJson(result) must be equalTo(validSession)
@@ -106,7 +107,7 @@ class PlayerTest extends Specification with PlaySpecification with Mockito {
       running(FakeApplication(withGlobal = Some(MockGlobal))) {
         val request = FakeRequest("", "")
         val result = player.createSession(itemId)(request)
-        header("Content-Type", result) must be equalTo(Some("application/json"))
+        header("Content-Type", result) must be equalTo(Some(ContentTypes.JSON))
         contentAsJson(result) must be equalTo(newSession)
       }
     }
@@ -115,9 +116,9 @@ class PlayerTest extends Specification with PlaySpecification with Mockito {
 
       "return new session as HTML" in {
         running(FakeApplication(withGlobal = Some(MockGlobal))) {
-          val request = FakeRequest("", "").withHeaders("Accept" -> "text/html")
+          val request = FakeRequest("", "").withHeaders("Accept" -> ContentTypes.HTML)
           val result = player.createSession(itemId)(request)
-          header("Content-Type", result).get must contain("text/html")
+          header("Content-Type", result).get must contain(ContentTypes.HTML)
         }
       }
     }
