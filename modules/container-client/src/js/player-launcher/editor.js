@@ -75,7 +75,7 @@ function EditorDefinition(element, options, errorCallback) {
 
   function loadDraftItem(draftId, options) {
 
-    if(!draftId){
+    if (!draftId) {
       throw new Error('invalid draftId');
     }
 
@@ -102,7 +102,7 @@ function EditorDefinition(element, options, errorCallback) {
       return new UrlBuilder(options.corespringUrl + options.paths.sessionUrl).interpolate('id', id).build();
     };
 
-    options.url = new UrlBuilder(options.corespringUrl + call.url).interpolate('draftId', draftId).build();
+    options.url = new UrlBuilder(options.corespringUrl + call).interpolate('draftId', draftId).build();
     options.sessionUrl = prepareSessionUrl();
 
     options.queryParams = queryParams;
@@ -133,24 +133,24 @@ function EditorDefinition(element, options, errorCallback) {
     });
   }
 
-  function DraftId(itemId,name){
-    this.toString = function(){
+  function DraftId(itemId,name) {
+    this.toString = function() {
       return itemId + '~' + name;
     };
   }
 
-  function init(){
+  function init() {
     if (hasLauncherErrors()) {
       return;
     }
 
     options.draftName = options.draftName || msgr.utils.getUid(); //jshint ignore:line
 
-    if(options.itemId){
+    if (options.itemId) {
       var draftId = new DraftId(options.itemId, options.draftName);
       loadDraftItem(draftId.toString(), options);
     } else {
-      createItemAndDraft(function(err, result){
+      createItemAndDraft(function(err, result) {
         options.itemId = result.itemId;
         options.draftName = result.draftName;
         var draftId = new DraftId(options.itemId, options.draftName);
@@ -160,7 +160,7 @@ function EditorDefinition(element, options, errorCallback) {
   }
 
   /** Public functions */
-  this.commitDraft = function(force, callback){
+  this.commitDraft = function(force, callback) {
     var call = loadMethodAndUrl('commitDraft');
 
     function onSuccess(result){
