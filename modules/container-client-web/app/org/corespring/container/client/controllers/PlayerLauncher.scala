@@ -5,6 +5,7 @@ import java.io.{ File, InputStream }
 import org.apache.commons.io.IOUtils
 import org.apache.commons.lang3.StringEscapeUtils
 import org.corespring.container.client.V2PlayerConfig
+import org.corespring.container.client.controllers.resources.routes._
 import org.corespring.container.client.hooks.{ PlayerJs, PlayerLauncherHooks }
 import org.corespring.container.client.views.txt.js.ServerLibraryWrapper
 import org.corespring.container.logging.ContainerLogger
@@ -12,6 +13,7 @@ import play.api.Play
 import play.api.http.ContentTypes
 import play.api.libs.json.Json.JsValueWrapper
 import play.api.libs.json.{ JsValue, Json }
+import play.api.mvc.Session
 import play.api.mvc._
 
 import scala.concurrent.ExecutionContext
@@ -26,7 +28,7 @@ trait PlayerLauncher extends Controller {
 
   //TODO: This is lifted from corespring-api -> move to a library
   object BaseUrl {
-    def apply(r: Request[AnyContent]): String = {
+    def apply(r: RequestHeader): String = {
 
       /**
        * Note: You can't check a request to see if its http or not in Play
@@ -66,44 +68,59 @@ trait PlayerLauncher extends Controller {
 
   implicit def callToJson(c: Call): JsValueWrapper = Json.obj("method" -> c.method, "url" -> c.url)
 
-  def editorJs = getEditorJs(Editor.load(":draftId"), DevEditor.load(":draftId"))
+  def editorJs = getEditorJs
 
-  def getEditorJs(editor: Call, devEditor:Call) = Action.async { implicit request =>
+  def getEditorJs = Action.async { implicit request =>
     hooks.editorJs.map { implicit js =>
-
-      val rootUrl = playerConfig.rootUrl.getOrElse(BaseUrl(request))
-
-      import org.corespring.container.client.controllers.resources.routes.ItemDraft
-
-      val commitDraft = ItemDraft.commit(":draftId")
-      val createItemAndDraft = ItemDraft.createItemAndDraft()
-
-      val defaultOptions: JsValue = Json.obj(
-        "corespringUrl" -> rootUrl,
-        "paths" -> Json.obj(
-          "editor" -> editor,
-          "devEditor" -> devEditor,
-          "createItemAndDraft" -> createItemAndDraft,
-          "commitDraft" -> commitDraft))
-
       val bootstrap = "org.corespring.players.ItemEditor = corespring.require('editor');"
-      make(editorNameAndSrc, defaultOptions, bootstrap)
+      make(editorNameAndSrc, defaultOptions.editor, bootstrap)
     }
   }
 
   def catalogJs = Action.async { implicit request =>
     hooks.catalogJs.map { implicit js =>
-      val loadCatalogCall = Catalog.load(":itemId")
-      val rootUrl = playerConfig.rootUrl.getOrElse(BaseUrl(request))
-
-      val defaultOptions: JsValue = Json.obj(
-        "corespringUrl" -> rootUrl,
-        "paths" -> Json.obj(
-          "catalog" -> loadCatalogCall))
-
       val bootstrap = "org.corespring.players.ItemCatalog = corespring.require('catalog');"
-      make(catalogNameAndSrc, defaultOptions, bootstrap)
+      make(catalogNameAndSrc, defaultOptions.catalog, bootstrap)
     }
+  }
+
+  object defaultOptions {
+
+    import org.corespring.container.client.controllers.resources.routes.ItemDraft
+
+    private def corespringUrl(implicit request: RequestHeader) = playerConfig.rootUrl.getOrElse(BaseUrl(request))
+    val sessionUrl = Player.createSession(":id").url
+
+    def catalog(implicit request: RequestHeader) = Json.obj(
+      "corespringUrl" -> corespringUrl,
+      "paths" -> Json.obj(
+        "catalog" -> Catalog.load(":itemId").url
+      )
+    )
+
+    def editor(implicit request: RequestHeader) = {
+      Json.obj(
+        "corespringUrl" -> corespringUrl,
+        "paths" -> Json.obj(
+          "sessionUrl" -> sessionUrl,
+          "editor" -> Editor.load(":draftId").url,
+          "devEditor" -> DevEditor.load(":draftId").url,
+          "createItemAndDraft" -> ItemDraft.createItemAndDraft().url,
+          "commitDraft" -> ItemDraft.commit(":draftId").url))
+    }
+
+    def player(implicit request: RequestHeader) = {
+      val sessionIdPlayerUrl = Player.load(":sessionId").url
+      Json.obj(
+        "corespringUrl" -> corespringUrl,
+        "mode" -> "gather",
+        "paths" -> Json.obj(
+          "sessionUrl" -> sessionUrl,
+          "gather" -> sessionIdPlayerUrl,
+          "view" -> sessionIdPlayerUrl,
+          "evaluate" -> sessionIdPlayerUrl))
+    }
+
   }
 
   /**
@@ -111,25 +128,10 @@ trait PlayerLauncher extends Controller {
    */
   def playerJs = Action.async { implicit request =>
     hooks.playerJs.map { implicit js =>
-
       logger.debug(s"playerJs - isSecure=${js.isSecure}, path=${request.path}, queryString=${request.rawQueryString}")
 
-      val sessionIdPlayerUrl = Player.load(":id").url
-
-      val rootUrl = playerConfig.rootUrl.getOrElse(BaseUrl(request))
-
-      val itemUrl: String = Player.createSessionForItem(":id").url
-
-      val defaultOptions: JsValue = Json.obj(
-        "corespringUrl" -> rootUrl,
-        "mode" -> "gather",
-        "paths" -> Json.obj(
-          "gather" -> itemUrl,
-          "gatherSession" -> sessionIdPlayerUrl,
-          "view" -> sessionIdPlayerUrl,
-          "evaluate" -> sessionIdPlayerUrl))
       val bootstrap = s"org.corespring.players.ItemPlayer = corespring.require('player').define(${js.isSecure});"
-      make(playerNameAndSrc, defaultOptions, bootstrap)
+      make(playerNameAndSrc, defaultOptions.player, bootstrap)
     }
   }
 
@@ -166,7 +168,8 @@ trait PlayerLauncher extends Controller {
       "container-client/js/player-launcher/logger.js",
       "container-client/js/player-launcher/errors.js",
       "container-client/js/player-launcher/instance.js",
-      "container-client/js/player-launcher/url-builder.js")
+      "container-client/js/player-launcher/url-builder.js",
+      "container-client/js/player-launcher/object-id.js")
     val rawJs = pathToNameAndContents("container-client/js/corespring/core-library.js")._2
     val wrapped = corePaths.map(pathToNameAndContents).map(t => ServerLibraryWrapper(t._1, t._2))
     val bootstrap =

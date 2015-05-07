@@ -1,10 +1,15 @@
 var Instance = function(element, options, errorCallback, log) {
 
-  /* global msgr */
+  /* global msgr, $ */
   /** msgr.Channel */
   var channel;
 
   var iframeUid = 'corespring-iframe-' + msgr.utils.getUid();
+
+  var self = this;
+
+  var UrlBuilder = require('url-builder');
+  var ObjectId = require('object-id');
 
   function $iframe() {
     var $node = $('#' + iframeUid);
@@ -20,6 +25,14 @@ var Instance = function(element, options, errorCallback, log) {
   log = log || require('logger');
 
   function initialize(e, options) {
+    if (!options || !options.sessionUrl) {
+      errorCallback({
+        code: 999,
+        message: "No session url specified"
+      });
+      return;
+    }
+
     if (!options || !options.url) {
       errorCallback({
         code: 999,
@@ -33,16 +46,6 @@ var Instance = function(element, options, errorCallback, log) {
       return;
     }
 
-    function makeUrl(url, queryParams) {
-      var Builder = require('url-builder');
-      return new Builder().build(url, queryParams);
-    }
-
-    var url = makeUrl(options.url, options.queryParams);
-    if(options.hash){
-      url += '#' + options.hash;
-   }
-
     var iframeStyles = [
       '',
       '.player-loading{visibility: hidden; position: absolute;}',
@@ -55,6 +58,24 @@ var Instance = function(element, options, errorCallback, log) {
         $('head').append('<style id="playerstyle" type="text/css">' + iframeStyles + '</style>');
       }
     })();
+
+    var response = $.ajax({
+      url: options.sessionUrl,
+      async: false, // refactor this so that it's asynchronous.
+      method: 'POST',
+      dataType: 'json'
+    }).responseText;
+
+    var session = JSON.parse(response);
+
+    var sessionId = new ObjectId(session._id).toString();
+
+    var url =
+      new UrlBuilder(options.url)
+        .params(options.queryParams)
+        .hash(options.hash)
+        .interpolate('sessionId', sessionId)
+        .build();
 
     var iframeTemplate = [
       '<iframe',
@@ -81,6 +102,9 @@ var Instance = function(element, options, errorCallback, log) {
     if (options.forceWidth) {
       $(e).width(options.width ? options.width : "600px");
     }
+
+
+
   }
 
   this.send = function() {

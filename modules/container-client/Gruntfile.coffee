@@ -129,6 +129,7 @@ module.exports = (grunt) ->
             'jquery/dist/jquery.js',
             'angular/angular.js',
             'angular-mocks/angular-mocks.js',
+            'jquery-mockjax/jquery.mockjax.js',
             'wiggi-wiz/dist/wiggi-wiz.js',
             'lodash/dist/lodash.js'
             'saxjs/lib/sax.js',
