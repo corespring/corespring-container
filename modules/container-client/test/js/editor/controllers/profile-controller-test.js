@@ -239,7 +239,7 @@ describe('profile controller', function() {
 
   describe("collectionId", function() {
     it("loads collections", function() {
-      var expectedDataProvider = randomArray();
+      var expectedDataProvider = [{key:'key-1', value:'value-1'},{key:'key-2', value:'value-2'}];
       mockCollectionService.listResult = expectedDataProvider;
       makeProfileController();
       expect(scope.collectionIdDataProvider).toEqual(expectedDataProvider);
