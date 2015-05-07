@@ -5,6 +5,11 @@ describe('instance', function() {
 
   var originalMsgr;
 
+  var sessionUrl = '/session/create';
+  var newSessionId = "554b66965d9ea8325264833b";
+
+  var baseUrl = "http://corespring.org";
+
   var log = {
     error: function(s) {
       console.error(s);
@@ -22,7 +27,7 @@ describe('instance', function() {
     return receivedErrors.length > 0;
   }
 
-  function MockChannel(){
+  function MockChannel() {
     console.log('new MockChannel');
     this.send = function(){
       console.log('mock:send', arguments);
@@ -40,8 +45,6 @@ describe('instance', function() {
   var ID = 'element-id';
 
   beforeEach(function() {
-
-
     var element = $('<div id="' + ID + '"></div>');
     $('body').append(element);
     originalMsgr = window.msgr;
@@ -49,6 +52,12 @@ describe('instance', function() {
 
     InstanceDef = new corespring.require("instance");
     receivedErrors = [];
+
+    var session = {"_id" : { "$oid" : newSessionId } };
+    $.mockjax({
+      url: sessionUrl,
+      responseText: JSON.stringify(session)
+    });
   });
 
   afterEach(function() {
@@ -77,7 +86,7 @@ describe('instance', function() {
 
   it('should report an error if element cannot be found', function() {
     instance = new InstanceDef('#bad-' + ID, {
-      url: "http://corespring.org"
+      url: baseUrl
     }, onError);
     expect(hasError()).toBeTruthy();
   });
@@ -90,7 +99,8 @@ describe('instance', function() {
   it('should not set the width if forceWidth is false', function() {
 
     instance = new InstanceDef('#' + ID, {
-      url: "http://corespring.org"
+      sessionUrl: sessionUrl,
+      url: baseUrl
     });
     expect($('#' + ID)[0].style.width).toBe('');
   });
@@ -98,7 +108,8 @@ describe('instance', function() {
   it('should set the width if forceWidth is true', function() {
 
     instance = new InstanceDef('#' + ID, {
-      url: "http://corespring.org",
+      sessionUrl: sessionUrl,
+      url: baseUrl,
       forceWidth: true
     });
     expect($('#' + ID)[0].style.width).toBe('600px');
@@ -107,7 +118,8 @@ describe('instance', function() {
   it('should set the custom width if forceWidth is true', function() {
 
     instance = new InstanceDef('#' + ID, {
-      url: "http://corespring.org",
+      sessionUrl: sessionUrl,
+      url: baseUrl,
       forceWidth: true,
       width: '11px'
     });
@@ -115,7 +127,8 @@ describe('instance', function() {
   });
 
   it('should be able to send a message', function() {
-    instance = new InstanceDef('#' + ID, {url: 'http://blah.com'}, onError);
+
+    instance = new InstanceDef('#' + ID, {sessionUrl: sessionUrl, url: 'http://blah.com'}, onError);
     var resultFromCallback = null;
     var callback = function(err, result) {
       resultFromCallback = result;
@@ -123,9 +136,8 @@ describe('instance', function() {
     mockResult = true;
 
     expect(receivedErrors.length).toBe(0);
-    instance.send( "isComplete", callback );
+    instance.send("isComplete", callback);
     expect(resultFromCallback).toBe(true);
   });
-
 
 });

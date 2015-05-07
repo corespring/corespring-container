@@ -36,6 +36,8 @@ class DefaultIntegrationTest extends Specification with Mockito with PlaySpecifi
         m.loadItemAndSession(anyString)(any[Request[AnyContent]]) returns Right(FullSession(json, false))
       }
 
+      override def collectionHooks: CollectionHooks = mock[CollectionHooks]
+
       override def itemDraftHooks: ItemDraftHooks = mock[ItemDraftHooks]
 
       override def configuration: Configuration = Configuration.empty

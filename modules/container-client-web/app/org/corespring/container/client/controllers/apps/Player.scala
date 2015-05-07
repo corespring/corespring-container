@@ -1,5 +1,6 @@
 package org.corespring.container.client.controllers.apps
 
+import org.apache.commons.io.IOUtils
 import org.corespring.container.client.V2PlayerConfig
 import org.corespring.container.client.component.PlayerItemTypeReader
 import org.corespring.container.client.controllers.GetAsset
@@ -10,7 +11,10 @@ import org.corespring.container.client.views.txt.js.PlayerServices
 import org.corespring.container.components.processing.PlayerItemPreProcessor
 import play.api.http.ContentTypes
 import play.api.libs.json._
-import play.api.mvc.{ Action, AnyContent, RequestHeader }
+import play.api.mvc._
+
+import scala.concurrent._
+import scala.concurrent.duration._
 
 import scala.concurrent.Future
 
@@ -19,6 +23,8 @@ trait Player
   with PlayerItemTypeReader
   with Jade
   with GetAsset[PlayerHooks] {
+
+  //import SessionRenderer._
 
   /**
    * Preprocess the xml so that it'll work in all browsers
@@ -48,6 +54,7 @@ trait Player
 
   def playerConfig: V2PlayerConfig
 
+//<<<<<<< HEAD
   /**
    * A set of player query string params, that should be set on the player, but can be removed therafter
    */
@@ -90,15 +97,47 @@ trait Player
         val controlsJs = if (showControls) paths(controlsJsSrc) else Seq.empty
         val domainResolvedJs = buildJs(scriptInfo, controlsJs)
         val domainResolvedCss = buildCss(scriptInfo)
+/*=======
+  @deprecated("Do not call GETs to this route", "0.36.0")
+  def createSessionForItem(itemId: String): Action[AnyContent] = Action.async { implicit request =>
+    hooks.createSessionForItem(itemId).map(handleSuccess { sessionId =>
+      SeeOther(s"${routes.Player.load(sessionId).url}?${request.rawQueryString}")
+    })
+  }
 
-        val processedXhtml = processXhtml((itemJson \ "xhtml").asOpt[String])
-        val preprocessedItem = itemPreProcessor.preProcessItemForPlayer(itemJson).as[JsObject] ++ Json.obj("xhtml" -> processedXhtml)
+  override def load(sessionId: String) = Action.async { implicit request => loadSession(sessionId) }
+>>>>>>> feature/PE-233 */
 
-        val newRelicRumConf: Option[JsValue] = playerConfig.newRelicRumConfig
+  def createSession(itemId: String): Action[AnyContent] = Action.async { implicit request =>
+    hooks.createSessionForItem(itemId).flatMap(handleSuccess.async { loadSession(_, status = Created) })
+  }
 
-        logger.trace(s"function=load domainResolvedJs=$domainResolvedJs")
-        logger.trace(s"function=load domainResolvedCss=$domainResolvedCss")
+  private def loadSession(sessionId: String, status: Status = Ok)(implicit request: RequestHeader) =
+    request.path.endsWith("index.html") match {
+      case true => sessionAsHTML(sessionId)
+      case _ => render.async {
+        /** Always provide JSON, unless request accepts HTML and not JSON **/
+        case Accepts.Json() & Accepts.Html() => sessionAsJSON(sessionId, status)
+        case Accepts.Json() => sessionAsJSON(sessionId, status)
+        case Accepts.Html() => sessionAsHTML(sessionId, status)
+        case _ => sessionAsJSON(sessionId, status)
+      }
+    }
 
+  lazy val servicesJs = {
+    import org.corespring.container.client.controllers.resources.routes._
+    PlayerServices(
+      "player.services",
+      Session.loadItemAndSession(":id"),
+      Session.reopenSession(":id"),
+      Session.resetSession(":id"),
+      Session.saveSession(":id"),
+      Session.getScore(":id"),
+      Session.completeSession(":id"),
+      Session.loadOutcome(":id")).toString
+  }
+
+//<<<<<<< HEAD
         val queryParams = {
           val trimmed = (request.queryString -- playerQueryStringParams).mapValues(s => s.mkString(""))
           logger.trace(s"trimmed params: $trimmed")
@@ -109,6 +148,44 @@ trait Player
 
         Ok(
           renderJade(
+/*=======
+  private object SessionRenderer {
+
+    /**
+     * Query params:
+     * mode=prod|dev (default: whichever way the app is run)
+     * - dev mode loads all the js as separate files
+     * - prod mode loads minified + concatenated js/css
+     *
+     * showControls=true|false (default: false)
+     * - show simple player controls (for devs)
+     *
+     * loggingEnabled=true|false (default: false)
+     * - implemented in the jade - whether to allow ng logging.
+     *
+     * @param sessionId
+     * @return
+     */
+    def sessionAsHTML(sessionId: String, status: Status = Ok)(implicit request: RequestHeader): Future[SimpleResult] =
+      hooks.loadSessionAndItem(sessionId).map {
+        case Left((code, msg)) => Status(code)(Json.obj("error" -> msg))
+        case Right((session, itemJson)) => {
+
+          val scriptInfo = componentScriptInfo(componentTypes(itemJson), jsMode == "dev")
+          val controlsJs = if (showControls) paths(controlsJsSrc) else Seq.empty
+          val domainResolvedJs = buildJs(scriptInfo, controlsJs)
+          val domainResolvedCss = buildCss(scriptInfo)
+
+          val processedXhtml = processXhtml((itemJson \ "xhtml").asOpt[String])
+          val preprocessedItem = itemPreProcessor.preProcessItemForPlayer(itemJson).as[JsObject] ++ Json.obj("xhtml" -> processedXhtml)
+
+          val newRelicRumConf: Option[JsValue] = playerConfig.newRelicRumConfig
+
+          logger.trace(s"function=load domainResolvedJs=$domainResolvedJs")
+          logger.trace(s"function=load domainResolvedCss=$domainResolvedCss")
+
+          val result = renderJade(
+>>>>>>> feature/PE-233 */
             PlayerTemplateParams(
               context,
               domainResolvedJs,
@@ -119,11 +196,13 @@ trait Player
               Json.obj("session" -> session, "item" -> preprocessedItem),
               versionInfo,
               newRelicRumConf != None,
-              newRelicRumConf.getOrElse(Json.obj()))))
-      }
-    }
-  }
+              newRelicRumConf.getOrElse(Json.obj())))
 
+          status(result).as(ContentTypes.HTML)
+        }
+      }
+
+//<<<<<<< HEAD
   def stubPost(itemId: String) = Action.async { implicit request =>
     Future(Ok(s"<html><body> >> $itemId</body></html>").as(ContentTypes.HTML))
   }
@@ -149,4 +228,13 @@ trait Player
       Session.loadOutcome(":id"),
       queryParams).toString
   }
+/*=======
+    def sessionAsJSON(sessionId: String, status: Status = Ok)(implicit request: RequestHeader): Future[SimpleResult] =
+      hooks.loadSessionAndItem(sessionId).map {
+        case Left((code, msg)) => Status(code)(Json.obj("error" -> msg))
+        case Right((session, _)) => status(Json.prettyPrint(session)).as(ContentTypes.JSON)
+      }
+  }
+
+>>>>>>> feature/PE-233*/
 }

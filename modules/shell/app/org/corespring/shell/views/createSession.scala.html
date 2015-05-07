@@ -68,7 +68,6 @@
         type: 'POST',
         url: '@Html(url)',
         contentType: 'application/json; charset=utf-8',
-        dataType: 'json',
         data: JSON.stringify(data)
       }).done(function(result) {
         window.location = result.url;

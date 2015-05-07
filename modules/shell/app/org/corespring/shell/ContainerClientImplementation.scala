@@ -17,7 +17,7 @@ import org.corespring.mongo.json.services.MongoService
 import org.corespring.shell.controllers.ShellDataQueryHooks
 import org.corespring.shell.controllers.catalog.actions.{ CatalogHooks => ShellCatalogHooks }
 import org.corespring.shell.controllers.editor.actions.{ EditorHooks => ShellEditorHooks }
-import org.corespring.shell.controllers.editor.{ ItemDraftHooks => ShellItemDraftHooks, ItemHooks => ShellItemHooks, ItemDraftAssets }
+import org.corespring.shell.controllers.editor.{ ItemDraftHooks => ShellItemDraftHooks, ItemHooks => ShellItemHooks, ItemDraftAssets, CollectionHooks => ShellCollectionHooks }
 import org.corespring.shell.controllers.player.actions.{ PlayerHooks => ShellPlayerHooks }
 import org.corespring.shell.controllers.player.{ SessionHooks => ShellSessionHooks }
 import org.corespring.shell.services.ItemDraftService
@@ -227,6 +227,10 @@ class ContainerClientImplementation(
 
   override def itemHooks: ItemHooks = new ShellItemHooks {
     override def itemService: MongoService = ContainerClientImplementation.this.itemService
+  }
+
+  override def collectionHooks: CollectionHooks = new ShellCollectionHooks {
+
   }
 }
 
