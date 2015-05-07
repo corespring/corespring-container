@@ -245,34 +245,11 @@
      * @param profile
      * @param config
      */
-    function overrideProfileValuesWithConfig(profile, config){
+    function overrideProfileValuesWithConfig(item, config){
 
-      function applyConfig(dest, name, sourceName){
-        var configItem = config[sourceName || name];
-        if(configItem && configItem.hasOwnProperty('value')){
-          dest[name] = configItem.value;
-          //TODO Do we need to check the value against the available options?
-        }
-      }
+      var profile = item.profile;
 
-      /**
-       * Some values are checked against an asynchronous service
-       * @param dest - the host object for the property to set
-       * @param name - the name of the property to set in the host
-       * @param configName - the name of the formModel in config
-       * @param getAsyncValue - a function, which uses the value in the formModel
-       * to retrieve a value that can be assigned to the host
-       */
-      function applyConfigAsynchronously(dest, name, configName, getAsyncValue) {
-        var configItem = config[configName];
-        if (!configItem || !configItem.hasOwnProperty('value')) {
-          return;
-        }
-
-        getAsyncValue(configItem.value, function (result) {
-          dest[name] = result;
-        });
-      }
+      applyConfig(item, "collectionId");
 
       applyConfig(profile.taskInfo, "title");
       applyConfig(profile.taskInfo, "description");
@@ -303,6 +280,41 @@
       applyConfig(profile.contributorDetails, "licenseType");
 
       applyConfig(profile.contributorDetails, "additionalCopyrights", 'additionalMediaCopyrights');
+
+
+      /**
+       * Assign the config value to the destination object
+       * @param dest
+       * @param name
+       * @param sourceName
+       */
+      function applyConfig(dest, name, sourceName){
+        var configItem = config[sourceName || name];
+        if(configItem && configItem.hasOwnProperty('value')){
+          dest[name] = configItem.value;
+          //TODO Do we need to check the value against the available options?
+        }
+      }
+
+      /**
+       * Some values are checked against an asynchronous service
+       * @param dest - the host object for the property to set
+       * @param name - the name of the property to set in the host
+       * @param configName - the name of the formModel in config
+       * @param getAsyncValue - a function, which uses the value in the formModel
+       * to retrieve a value that can be assigned to the host
+       */
+      function applyConfigAsynchronously(dest, name, configName, getAsyncValue) {
+        var configItem = config[configName];
+        if (!configItem || !configItem.hasOwnProperty('value')) {
+          return;
+        }
+
+        getAsyncValue(configItem.value, function (result) {
+          dest[name] = result;
+        });
+      }
+
     }
 
     /**
@@ -903,7 +915,7 @@
         contributorDetails.additionalCopyrights = [];
       }
 
-      overrideProfileValuesWithConfig(profile, $scope.formModels);
+      overrideProfileValuesWithConfig(item, $scope.formModels);
 
       $scope.item = item;
       $scope.profile = profile;
