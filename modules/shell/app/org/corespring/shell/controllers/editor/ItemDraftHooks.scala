@@ -15,36 +15,6 @@ import play.api.mvc._
 
 import scala.concurrent.Future
 
-trait ItemHooks extends ContainerItemHooks {
-  def itemService: MongoService
-
-  override def load(itemId: String)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] = Future {
-    itemService.load(itemId).map { i =>
-      Right(i)
-    }.getOrElse(Left((NOT_FOUND, s"Can't find item with id: $itemId")))
-  }
-
-  override def create(json: Option[JsValue])(implicit header: RequestHeader): Future[Either[StatusMessage, String]] = Future {
-    val newItem = Json.obj(
-      "components" -> Json.obj(),
-      "profile" -> Json.obj("taskInfo" -> Json.obj("title" -> "Untitled")),
-      "metadata" -> Json.obj(),
-      "xhtml" -> "<div></div>")
-
-    itemService.create(newItem).map {
-      oid =>
-        Right(oid.toString)
-    }.getOrElse(Left(BAD_REQUEST -> "Error creating item"))
-  }
-
-}
-
-trait ItemDraftAssets {
-  def copyItemToDraft(itemId: String, draftName: String)
-  def copyDraftToItem(draftId: String, itemId: String)
-  def deleteDraft(draftId: String)
-}
-
 trait ItemDraftHooks extends ContainerItemDraftHooks {
 
   val logger = Logger(classOf[ItemDraftHooks])
@@ -58,11 +28,18 @@ trait ItemDraftHooks extends ContainerItemDraftHooks {
 
   def itemService: MongoService
 
+  override def saveCollectionId(draftId: String, collectionId: String)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] =
+    fineGrainedSave(draftId, Json.obj("item.collectionId" -> collectionId))
+
+  override def saveComponents(draftId: String, json: JsValue)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] =
+    fineGrainedSave(draftId, Json.obj("item.components" -> json))
+
+  override def saveCustomScoring(draftId: String, customScoring: String)(implicit header: RequestHeader): R[JsValue] = {
+    fineGrainedSave(draftId, Json.obj("item.customScoring" -> customScoring))
+  }
+
   override def saveProfile(draftId: String, json: JsValue)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] =
     fineGrainedSave(draftId, Json.obj("item.profile" -> json))
-
-  override def saveXhtml(draftId: String, xhtml: String)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] =
-    fineGrainedSave(draftId, Json.obj("item.xhtml" -> xhtml))
 
   override def saveSummaryFeedback(draftId: String, fb: String)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] =
     fineGrainedSave(draftId, Json.obj("item.summaryFeedback" -> fb))
@@ -78,12 +55,9 @@ trait ItemDraftHooks extends ContainerItemDraftHooks {
     fineGrainedSave(draftId, Json.obj("item.supportingMaterials" -> addSupportingMaterialIds(json)))
   }
 
-  override def saveComponents(draftId: String, json: JsValue)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] =
-    fineGrainedSave(draftId, Json.obj("item.components" -> json))
+  override def saveXhtml(draftId: String, xhtml: String)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] =
+    fineGrainedSave(draftId, Json.obj("item.xhtml" -> xhtml))
 
-  override def saveCustomScoring(draftId: String, customScoring: String)(implicit header: RequestHeader): R[JsValue] = {
-    fineGrainedSave(draftId, Json.obj("item.customScoring" -> customScoring))
-  }
 
   private def fineGrainedSave(draftId: String, json: JsValue)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] = {
     Future {
@@ -120,7 +94,6 @@ trait ItemDraftHooks extends ContainerItemDraftHooks {
   }
 
   private def okToCommit(draftIdRaw: String): Boolean = {
-
     val draftId: ContainerDraftId = DraftId.fromString[ObjectId, ContainerDraftId](draftIdRaw, (itemId, name) => ContainerDraftId(new ObjectId(itemId), name))
     logger.trace(s"okToCommit draftId=$draftId")
     val query = DraftId.dbo[ObjectId](draftId)

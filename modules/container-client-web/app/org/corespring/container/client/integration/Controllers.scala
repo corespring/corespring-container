@@ -2,7 +2,7 @@ package org.corespring.container.client.integration
 
 import org.corespring.container.client.controllers._
 import org.corespring.container.client.controllers.apps._
-import org.corespring.container.client.controllers.resources.{ Item, ItemDraft, Session }
+import org.corespring.container.client.controllers.resources.{Collection, Item, ItemDraft, Session}
 import play.api.mvc.Controller
 
 trait CommonControllers {
@@ -19,6 +19,9 @@ trait CommonControllers {
 
 trait ResourceControllers {
 
+  /** collection resource */
+  def collection: Collection
+
   /** item draft resource */
   def itemDraft: ItemDraft
 
@@ -27,6 +30,8 @@ trait ResourceControllers {
 
   /** session resource */
   def session: Session
+
+
 }
 
 trait RigControllers extends CommonControllers {
@@ -68,6 +73,7 @@ trait ContainerControllers
     componentSets,
     playerLauncher,
     libs,
+    collection,
     item,
     itemDraft,
     session,

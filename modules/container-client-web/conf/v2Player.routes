@@ -36,6 +36,9 @@ PUT           /session/complete/:id.json                             @org.coresp
 PUT           /session/load-outcome/:id.json                         @org.corespring.container.client.controllers.resources.Session.loadOutcome(id)
 PUT           /session/:id/score.json                                @org.corespring.container.client.controllers.resources.Session.getScore(id)
 
+# Collection
+GET           /collection                                            @org.corespring.container.client.controllers.resources.Collection.list()
+
 # Item
 GET           /item/:itemId.json                                     @org.corespring.container.client.controllers.resources.Item.load(itemId)
 POST          /item/create                                           @org.corespring.container.client.controllers.resources.Item.create()
