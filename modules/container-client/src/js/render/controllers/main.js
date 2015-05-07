@@ -22,7 +22,7 @@ angular.module('corespring-player.controllers')
         };
 
         $scope.sessionId = (function() {
-          var match = $document.location.pathname.match(/.*session\/(.[a-z0-9]*).*/);
+          var match = $document[0].location.pathname.match(/.*session\/(.[a-z0-9]*).*/);
           return match ? match[1] : undefined;
         })();
 

@@ -70,17 +70,17 @@ describe('Main', function() {
     this.info = mockInfo;
   }
 
-  function MockDocument() {
-    this.location = {
+  var MockDocument = [{
+    location: {
       pathname: '/player/item/session/' + sessionId
-    };
-  }
+    }
+  }];
 
   beforeEach(angular.mock.module('corespring-player.controllers'));
 
   beforeEach(module(function($provide) {
     $provide.value('$log', new MockLog());
-    $provide.value('$document', new MockDocument());
+    $provide.value('$document', MockDocument);
     $provide.value('ComponentRegister', new MockComponentRegister());
     $provide.value('PlayerService', MockPlayerService);
   }));
