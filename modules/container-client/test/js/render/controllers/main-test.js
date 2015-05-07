@@ -8,6 +8,8 @@ describe('Main', function() {
   var mockSetEditable = jasmine.createSpy('setEditable');
   var mockSetMode = jasmine.createSpy('setMode');
 
+  var sessionId = "554b98d854b108ef2f4871e1";
+
   function MockComponentRegister() {
     this.setAnswerChangedHandler = function(callback) { callback(); };
     this.hasEmptyAnswers = function() { return hasEmptyAnswers; };
@@ -68,10 +70,17 @@ describe('Main', function() {
     this.info = mockInfo;
   }
 
+  function MockDocument() {
+    this.location = {
+      pathname: '/player/item/session/' + sessionId
+    };
+  }
+
   beforeEach(angular.mock.module('corespring-player.controllers'));
 
   beforeEach(module(function($provide) {
     $provide.value('$log', new MockLog());
+    $provide.value('$document', new MockDocument());
     $provide.value('ComponentRegister', new MockComponentRegister());
     $provide.value('PlayerService', MockPlayerService);
   }));
@@ -83,7 +92,6 @@ describe('Main', function() {
     scope = element.scope();
     spyOn(scope, "$emit").and.callThrough();
     spyOn(scope, "$broadcast").and.callThrough();
-
   }));
 
   describe('initialization', function() {
@@ -96,6 +104,12 @@ describe('Main', function() {
         highlightUserResponse: true
       });
     });
+
+    describe('sessionId', function() {
+      it('should be set from the pathname', function() {
+        expect(scope.sessionId).toEqual(sessionId);
+      });
+    })
 
   });
 

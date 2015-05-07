@@ -5,9 +5,10 @@ angular.module('corespring-player.controllers')
       '$log',
       '$scope',
       '$timeout',
+      '$document',
       'ComponentRegister',
       'PlayerService',
-      function($location, $log, $scope, $timeout, ComponentRegister, PlayerServiceDef) {
+      function($location, $log, $scope, $timeout, $document, ComponentRegister, PlayerServiceDef) {
 
         var PlayerService = new PlayerServiceDef();
 
@@ -21,8 +22,8 @@ angular.module('corespring-player.controllers')
         };
 
         $scope.sessionId = (function() {
-          //TODO: This is a temporary means of extracting the session id
-          return document.location.pathname.match(/.*\/(.*)\/.*/)[1];
+          var match = $document.location.pathname.match(/.*session\/(.[a-z0-9]*).*/);
+          return match ? match[1] : undefined;
         })();
 
         $scope.onAnswerChanged = function() {
