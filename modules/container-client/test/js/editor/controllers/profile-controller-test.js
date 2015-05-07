@@ -239,7 +239,7 @@ describe('profile controller', function() {
 
   describe("collectionId", function() {
     it("loads collections", function() {
-      var expectedDataProvider = randomArray();
+      var expectedDataProvider = [{key:'key-1', value:'value-1'},{key:'key-2', value:'value-2'}];
       mockCollectionService.listResult = expectedDataProvider;
       makeProfileController();
       expect(scope.collectionIdDataProvider).toEqual(expectedDataProvider);
@@ -261,6 +261,30 @@ describe('profile controller', function() {
         scope.$apply();
         expect(mockItemService.saveCollectionIdCalls.length).toEqual(1);
       });
+    });
+
+    describe("defaultCollection", function(){
+      beforeEach(function() {
+        mockCollectionService.listResult = [{key:'key-1', value:'val-1'}, {key:'default-id', value:'default'}, {key:'key-2', value:'val-2'}];
+      });
+      it("is selected if collectionId is not set in item", function() {
+        makeProfileController();
+        scope.$apply();
+        expect(scope.item.collectionId).toEqual('default-id');
+      });
+      it("is selected if collectionId can not be found in collections", function() {
+        mockItemService.loadResult = {collectionId:'non-existent-id'};
+        makeProfileController();
+        scope.$apply();
+        expect(scope.item.collectionId).toEqual('default-id');
+      });
+      it("is not selected if collectionId is set in item", function() {
+        mockItemService.loadResult = {collectionId:'key-1'};
+        makeProfileController();
+        scope.$apply();
+        expect(scope.item.collectionId).toEqual('key-1');
+      });
+
     });
 
   });
