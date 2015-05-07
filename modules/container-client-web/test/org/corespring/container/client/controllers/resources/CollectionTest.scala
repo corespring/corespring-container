@@ -20,16 +20,7 @@ class CollectionTest extends Specification with Mockito {
 
     val collection = new Collection {
 
-      override def hooks: CollectionHooks = new CollectionHooks {
-
-        override def list()(implicit header: RequestHeader): Future[Either[StatusMessage, JsArray]] = {
-          Future {
-            Right(listResult)
-          }
-        }
-
-        override implicit def ec: ExecutionContext = ExecutionContext.Implicits.global
-      }
+      override def hooks : CollectionHooks = mock[CollectionHooks].list()(any[RequestHeader]) returns Future(Right(listResult))
 
       override implicit def ec: ExecutionContext = ExecutionContext.Implicits.global
     }
