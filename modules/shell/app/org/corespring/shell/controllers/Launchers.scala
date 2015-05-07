@@ -2,6 +2,8 @@ package org.corespring.shell.controllers
 
 import play.api.libs.json._
 import play.api.mvc.{ RequestHeader, Action, Controller }
+import org.corespring.shell.views._
+import org.corespring.container.client.controllers.routes._
 
 trait Launchers extends Controller {
 
@@ -19,7 +21,7 @@ trait Launchers extends Controller {
       "itemId" -> itemId)))
   }
 
-  private def loadPlayer(opts: JsValue) = org.corespring.shell.views.html.launchers.editor(org.corespring.container.client.controllers.routes.PlayerLauncher.editorJs().url, opts)
+  private def loadPlayer(opts: JsValue) = html.launchers.editor(PlayerLauncher.editorJs().url, opts)
 
   private def splitDraftId(draftId: String) = {
     val Array(itemId, draftName) = draftId.split("~")
