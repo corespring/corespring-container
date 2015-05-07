@@ -87,6 +87,11 @@ function EditorDefinition(element, options, errorCallback) {
       throw new Error('can\'t find call for editor');
     }
 
+    // Not sure what's going on here.
+    function fixCall(call) {
+      return (typeof call === 'string') ? call : call.url;
+    }
+
     var tab = options.selectedTab;
 
     if ('profile' === tab) {
@@ -102,7 +107,7 @@ function EditorDefinition(element, options, errorCallback) {
       return new UrlBuilder(options.corespringUrl + options.paths.sessionUrl).interpolate('id', id).build();
     };
 
-    options.url = new UrlBuilder(options.corespringUrl + call).interpolate('draftId', draftId).build();
+    options.url = new UrlBuilder(options.corespringUrl + fixCall(call)).interpolate('draftId', draftId).build();
     options.sessionUrl = prepareSessionUrl();
 
     options.queryParams = queryParams;

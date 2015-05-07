@@ -149,7 +149,7 @@ describe('player-launcher:editor-test', function () {
         };
       });
 
-      it('should load the editor with itemId~draftName',  withRequire({
+      it('should load the editor with itemId~draftName', withRequire({
         instance: instance
       }, function(){
         var opts = {
