@@ -64,6 +64,12 @@ function ClientLauncher(element, options, errorCallback){
     return { method: c.method, url: urlProcessor( this.paths.corespringUrl + c.url)};
   };
 
+
+  this.prepareUrl = function(u, opts){
+    opts = opts || {};
+    return builder.build(u, $.extend(queryParams, opts));
+  };
+
   function triggerErrorCallback(e){
     errorCallback(errors.EXTERNAL_ERROR(e));
   }
@@ -96,6 +102,7 @@ function ClientLauncher(element, options, errorCallback){
    *   if a string: it'll be converted into { method: '', url: ''}
    * @param params an object of params to pass when launching
    * @param initialData an object that will be sent to the instance 'initialise' handler
+   * @param onReady called when instance is ready - function(instance){};
    */
   this.loadInstance = function(call, params, initialData, onReady){
 
@@ -121,7 +128,6 @@ function ClientLauncher(element, options, errorCallback){
         if(onReady){
           onReady(instance);
         }
-
       }
     };
 

@@ -52,30 +52,32 @@ trait Player
    * A set of player query string params, that should be set on the player, but can be removed therafter
    */
   val playerQueryStringParams = Seq(
-    /** show a simple submit button */
+
+    /**
+     * show a simple submit button
+     * showControls=true|false (default: false)
+     * - show simple player controls (for devs)
+     */
     "showControls",
-    /** dev|prod - dev loads expanded js/css, prod loads minified */
+
+    /**
+     * dev|prod - dev loads expanded js/css, prod loads minified
+     * mode=prod|dev (default: whichever way the app is run)
+     * - dev mode loads all the js as separate files
+     * - prod mode loads minified + concatenated js/css
+     */
     "mode",
-    /** allow logging in the player */
+
+    /**
+     * allow logging in the player
+     * loggingEnabled=true|false (default: false)
+     * - implemented in the jade - whether to allow ng logging.
+     */
     "loggingEnabled",
+
     /** if set log the category defined */
     "logCategory")
 
-  /**
-   * Query params:
-   * mode=prod|dev (default: whichever way the app is run)
-   * - dev mode loads all the js as separate files
-   * - prod mode loads minified + concatenated js/css
-   *
-   * showControls=true|false (default: false)
-   * - show simple player controls (for devs)
-   *
-   * loggingEnabled=true|false (default: false)
-   * - implemented in the jade - whether to allow ng logging.
-   *
-   * @param sessionId
-   * @return
-   */
   override def load(sessionId: String) = Action.async { implicit request =>
     hooks.loadSessionAndItem(sessionId).map {
 
@@ -100,7 +102,7 @@ trait Player
         val queryParams = {
           val trimmed = (request.queryString -- playerQueryStringParams).mapValues(s => s.mkString(""))
           logger.trace(s"trimmed params: $trimmed")
-          val asJson = trimmed.map( t => t._1 -> JsString(t._2.mkString(""))).toSeq
+          val asJson = trimmed.map(t => t._1 -> JsString(t._2.mkString(""))).toSeq
           logger.debug(s"service query params: $trimmed")
           JsObject(asJson)
         }
@@ -122,8 +124,7 @@ trait Player
     }
   }
 
-
-  def stubPost(itemId:String) = Action.async { implicit request =>
+  def stubPost(itemId: String) = Action.async { implicit request =>
     Future(Ok(s"<html><body> >> $itemId</body></html>").as(ContentTypes.HTML))
   }
 
@@ -135,7 +136,7 @@ trait Player
     })
   }
 
-  def servicesJs(queryParams:JsObject) = {
+  def servicesJs(queryParams: JsObject) = {
     import org.corespring.container.client.controllers.resources.routes._
     PlayerServices(
       "player.services",

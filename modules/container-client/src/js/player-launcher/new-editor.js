@@ -1,8 +1,9 @@
 function EditorDefinition(element, options, errorCallback) {
 
   var Launcher = require('new-client-launcher');
-  
   var launcher = new Launcher(element, options, errorCallback);
+  var UrlBuilder = require('url-builder');
+  var builder = new UrlBuilder();
 
   function createItemAndDraft(callback){
 
@@ -46,8 +47,6 @@ function EditorDefinition(element, options, errorCallback) {
     if(!draftId){
       throw new Error('invalid draftId');
     }
-
-    launcher.log('load draft item');
 
     var call = launcher.loadCall(options.devEditor ? 'devEditor' : 'editor', function(u){
       return u.replace(':draftId', draftId);
@@ -112,12 +111,10 @@ function EditorDefinition(element, options, errorCallback) {
 
   /** Public functions */
   this.commitDraft = function(force, callback){
-    var call = launcher.loadCall('commitDraft');
-    var url = call.url
-      .replace(':draftId', new DraftId(options.itemId, options.draftName).toString());
-
-    var method = call.method;
-
+    var call = launcher.loadCall('commitDraft', function(u){
+      return u.replace(':draftId',new DraftId(options.itemId, options.draftName).toString());
+    });
+    
     function onSuccess(result){
       if(callback){
         callback(null);
@@ -132,16 +129,14 @@ function EditorDefinition(element, options, errorCallback) {
     }
 
     $.ajax({
-      type: method,
-      url: launcher.prepareUrl({force: force}),
+      type: call.method,
+      url: builder.build(call.url, $.extend(options.queryParams, {force: force})),
       data: options,
       success: onSuccess,
       error: onError,
       dataType: 'json'
     });
   };
-
-
 }
 
 module.exports = EditorDefinition;

@@ -73,7 +73,7 @@ trait PlayerLauncher extends Controller {
 
   def editorJs = getEditorJs(Editor.load(":draftId"), DevEditor.load(":draftId"))
 
-  def getEditorJs(editor: Call, devEditor:Call) = Action.async { implicit request =>
+  def getEditorJs(editor: Call, devEditor: Call) = Action.async { implicit request =>
     hooks.editorJs.map { implicit js =>
 
       val rootUrl = playerConfig.rootUrl.getOrElse(BaseUrl(request))
@@ -197,7 +197,6 @@ trait PlayerLauncher extends Controller {
       "container-client/js/player-launcher/errors.js",
       "container-client/js/player-launcher/instance.js",
       "container-client/js/player-launcher/new-instance.js",
-      "container-client/js/player-launcher/client-launcher.js",
       "container-client/js/player-launcher/new-client-launcher.js",
       "container-client/js/player-launcher/url-builder.js")
     val rawJs = pathToNameAndContents("container-client/js/corespring/core-library.js")._2
