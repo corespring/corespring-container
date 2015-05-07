@@ -7,9 +7,6 @@
 @import "bootstrap-override";
 @import "common/base";
 
-@import "player/shared";
-@import "player/see-solution";
-@import "player/corespring-player";
 @import "editor/modal";
 @import "editor/nav";
 @import "editor/question";
@@ -31,6 +28,17 @@
 @import "editor/question-information";
 @import "editor/profile-preview";
 @import "editor/help";
+
+.wiggi-wiz-editable{
+  @import "player/player-core";
+}
+@import "player/player-container";
+
+body {
+  //moved here from player shared
+  font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+  color: #333;
+}
 
 @roboto: "Roboto", sans-serif;
 @font-family-sans-serif: @roboto;
