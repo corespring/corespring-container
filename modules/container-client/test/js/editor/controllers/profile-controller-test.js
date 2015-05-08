@@ -1,16 +1,21 @@
 describe('profile controller', function() {
 
-  var scope, rootScope, controller, ctrl, config, configurationService;
+  var scope, rootScope, controller, ctrl, config, configurationService, q;
 
   config = {};
 
   function MockModal() {}
 
   function MockCollectionService() {
-    this.listResult = [];
+    this.defer = null;
 
-    this.list = function(callback) {
-      callback(_.cloneDeep(this.listResult));
+    this.list = function() {
+      return this.defer.promise;
+    };
+
+    this.setListResult = function(listResult){
+      this.defer = q.defer();
+      this.defer.resolve(listResult);
     };
   }
 
@@ -110,6 +115,7 @@ describe('profile controller', function() {
     };
   }
 
+  beforeEach(angular.mock.module('corespring-common.services'));
   beforeEach(angular.mock.module('corespring-editor.controllers'));
   beforeEach(angular.mock.module('corespring-editor.services'));
 
@@ -142,7 +148,6 @@ describe('profile controller', function() {
       $provide.value('DataQueryService', mockDataQueryService);
       $provide.value('DesignerService', mockDesignerService);
       $provide.value('ItemService', mockItemService);
-      $provide.value('LogFactory', new MockLogFactory());
       $provide.value('ProfileFormatter', mockProfileFormatter);
       $provide.value('StandardQueryCreator', mockStandardQueryCreator);
       $provide.value('throttle', _.identity);
@@ -150,13 +155,15 @@ describe('profile controller', function() {
 
   });
 
-  beforeEach(inject(function($rootScope, $controller, ConfigurationService) {
+  beforeEach(inject(function($rootScope, $controller, $q, ConfigurationService) {
+    q = $q;
     ctrl = null;
     scope = null;
     rootScope = $rootScope;
     controller = $controller;
     configurationService = ConfigurationService;
     configurationService.setConfig(config);
+    mockCollectionService.setListResult([{key:'some collectionId', value:'some collection name'}]);
   }));
 
   function makeProfileController() {
@@ -165,6 +172,7 @@ describe('profile controller', function() {
       ctrl = controller('ProfileController', {
         $scope: scope
       });
+      rootScope.$apply();
     } catch (e) {
       throw ("Error with the controller: " + e);
     }
@@ -232,7 +240,6 @@ describe('profile controller', function() {
     });
 
     it("should not call save after loading an item", function() {
-      scope.$apply();
       expect(mockItemService.saveProfileCalls).toEqual([]);
     });
   });
@@ -240,7 +247,7 @@ describe('profile controller', function() {
   describe("collectionId", function() {
     it("loads collections", function() {
       var expectedDataProvider = [{key:'key-1', value:'value-1'},{key:'key-2', value:'value-2'}];
-      mockCollectionService.listResult = expectedDataProvider;
+      mockCollectionService.setListResult(expectedDataProvider);
       makeProfileController();
       expect(scope.collectionIdDataProvider).toEqual(expectedDataProvider);
     });
@@ -248,7 +255,7 @@ describe('profile controller', function() {
     it("sort collections by name", function() {
       var inputDataProvider = [{key:'key-1', value:'value-3'}, {key:'key-2', value:'value-1'},{key:'key-3', value:'value-2'}];
       var expectedDataProvider = [{key:'key-2', value:'value-1'},{key:'key-3', value:'value-2'}, {key:'key-1', value:'value-3'}];
-      mockCollectionService.listResult = inputDataProvider;
+      mockCollectionService.setListResult(inputDataProvider);
       makeProfileController();
       expect(scope.collectionIdDataProvider).toEqual(expectedDataProvider);
     });
@@ -256,7 +263,6 @@ describe('profile controller', function() {
     describe("save", function() {
       beforeEach(function() {
         makeProfileController();
-        scope.$apply();
         mockItemService.saveCollectionIdCalls = [];
         scope.item.collectionId = "some value";
         scope.$apply();
@@ -273,28 +279,24 @@ describe('profile controller', function() {
 
     describe("defaultCollection", function(){
       beforeEach(function() {
-        mockCollectionService.listResult = [{key:'key-1', value:'val-1'}, {key:'default-id', value:'default'}, {key:'key-2', value:'val-2'}];
+        mockCollectionService.setListResult([{key:'key-1', value:'val-1'}, {key:'default-id', value:'default'}, {key:'key-2', value:'val-2'}]);
       });
       it("is selected if collectionId is not set in item", function() {
         makeProfileController();
-        scope.$apply();
         expect(scope.item.collectionId).toEqual('default-id');
       });
       it("is selected if collectionId can not be found in collections", function() {
         mockItemService.loadResult = {collectionId:'non-existent-id'};
         makeProfileController();
-        scope.$apply();
         expect(scope.item.collectionId).toEqual('default-id');
       });
       it("is not selected if collectionId is set in item", function() {
         mockItemService.loadResult = {collectionId:'key-1'};
         makeProfileController();
-        scope.$apply();
         expect(scope.item.collectionId).toEqual('key-1');
       });
       it("trigger save when default collectionId is set", function() {
         makeProfileController();
-        scope.$apply();
         expect(scope.item.collectionId).toEqual('default-id');
         expect(mockItemService.saveCollectionIdCalls.length).toEqual(1);
       });
