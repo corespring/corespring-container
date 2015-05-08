@@ -15,7 +15,7 @@ describe('CollectionService', function() {
     $provide.value('$http', http);
   }));
 
-  beforeEach(inject(function(CollectionService) {
+  beforeEach(inject(function($rootScope, CollectionService) {
     collectionService = CollectionService;
   }));
 
@@ -26,9 +26,10 @@ describe('CollectionService', function() {
 
   describe('list', function() {
 
-    beforeEach(function() {
-      collectionService.list(success);
-    });
+    beforeEach(inject(function($rootScope) {
+      collectionService.list().then(success);
+      $rootScope.$apply();
+    }));
 
     it('should call $http', function() {
       expect(http).toHaveBeenCalledWith({

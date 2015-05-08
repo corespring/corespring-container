@@ -249,15 +249,15 @@
 
       var profile = item.profile;
 
-      applyConfig(item, "collectionId");
+      applyConfig(item, "collectionId", "collectionId", configToCollectionId);
 
       applyConfig(profile.taskInfo, "title");
       applyConfig(profile.taskInfo, "description");
-      applyConfigAsynchronously(profile.taskInfo.subjects, 'primary', 'primarySubject', configToPrimarySubject);
-      applyConfigAsynchronously(profile.taskInfo.subjects, 'related', 'relatedSubject', configToRelatedSubject);
+      applyConfig(profile.taskInfo.subjects, 'primary', 'primarySubject', configToPrimarySubject);
+      applyConfig(profile.taskInfo.subjects, 'related', 'relatedSubject', configToRelatedSubject);
       applyConfig(profile.taskInfo, "gradeLevel");
 
-      applyConfigAsynchronously(profile, 'standards', 'standards', configToStandards);
+      applyConfig(profile, 'standards', 'standards', configToStandards);
       applyConfig(profile, "lexile");
 
       applyConfig(profile.otherAlignments, "depthOfKnowledge");
@@ -283,38 +283,30 @@
 
 
       /**
-       * Assign the config value to the destination object
-       * @param dest
-       * @param name
-       * @param sourceName
-       */
-      function applyConfig(dest, name, sourceName) {
-        var configItem = config[sourceName || name];
-        if (configItem && configItem.hasOwnProperty('value')) {
-          dest[name] = configItem.value;
-          //TODO Do we need to check the value against the available options?
-        }
-      }
-
-      /**
-       * Some values are checked against an asynchronous service
+       * Apply the configured value to the destination object
        * @param dest - the host object for the property to set
        * @param name - the name of the property to set in the host
-       * @param configName - the name of the formModel in config
-       * @param getAsyncValue - a function, which uses the value in the formModel
-       * to retrieve a value that can be assigned to the host
+       * @param configName - the name of the formModel in config, optional, uses name instead, if not set
+       * @param getValue - an optional function(configuredValue, callback) to get the real value
+       * for the configuredValue. The function passes the real value to the callback, which then assigns
+       * it to the destination.
        */
-      function applyConfigAsynchronously(dest, name, configName, getAsyncValue) {
+      function applyConfig(dest, name, configName, getValue) {
+        configName = configName || name;
+
         var configItem = config[configName];
         if (!configItem || !configItem.hasOwnProperty('value')) {
           return;
         }
 
-        getAsyncValue(configItem.value, function(result) {
-          dest[name] = result;
-        });
+        if (_.isFunction(getValue)) {
+          getValue(configItem.value, function(result) {
+            dest[name] = result;
+          });
+        } else {
+          dest[name] = configItem.value;
+        }
       }
-
     }
 
     /**
@@ -357,7 +349,7 @@
     function createMultiplePropertiesOptionsFilter(formModel, properties) {
       return function(item, index) {
         return _.isArray(formModel.options) ?
-          _.some(properties, function(property){
+          _.some(properties, function(property) {
             return _.contains(formModel.options, item[property]);
           }) : true;
       };
@@ -589,31 +581,47 @@
     // list of collections
     //----------------------------------------------------------------
 
-    CollectionService.list(function(collections) {
-      $scope.collectionIdDataProvider = _.sortBy(collections, 'value');
-    });
-
     $scope.collectionIdFilter = createMultiplePropertiesOptionsFilter($scope.formModels.collectionId, ['key', 'value']);
+    CollectionService.list().then(setCollectionIdDataProvider);
 
-    function setDefaultCollectionIfNoCollectionSelected() {
-      if ($scope.item && !collectionById($scope.item.collectionId)) {
-        var defaultCollection = collectionByName('default');
-        if (defaultCollection) {
-          $scope.item.collectionId = defaultCollection.key;
-          $scope.saveCollectionId();
+    function setCollectionIdDataProvider(collections) {
+      $scope.collectionIdDataProvider = _.sortBy(collections, 'value');
+    }
+
+    function configToCollectionId(configuredValue, callback) {
+      CollectionService.list().then(setCollectionForConfig);
+
+      function setCollectionForConfig(collections) {
+        var configuredCollection = _.find(collections, function(item) {
+          return item && (item.key === configuredValue || item.value === configuredValue);
+        });
+        if (configuredCollection) {
+          callback(configuredCollection.key);
         }
       }
     }
 
-    function collectionById(id) {
-      return _.find($scope.collectionIdDataProvider, {
+    function setDefaultCollectionIfNoCollectionSelected() {
+      CollectionService.list().then(function(collections) {
+        if (!collectionById(collections, $scope.item.collectionId)) {
+          var defaultCollection = collectionByName(collections, 'default');
+          if (defaultCollection) {
+            $scope.item.collectionId = defaultCollection.key;
+            $scope.saveCollectionId();
+          }
+        }
+      });
+    }
+
+    function collectionById(collections, id) {
+      return _.find(collections, {
         key: id
       });
     }
 
-    function collectionByName(name) {
+    function collectionByName(collections, name) {
       var lcName = _.isString(name) ? name.toLowerCase() : '';
-      return _.find($scope.collectionIdDataProvider, function(c) {
+      return _.find(collections, function(c) {
         return c && _.isString(c.value) && c.value.toLowerCase() === lcName;
       });
     }
