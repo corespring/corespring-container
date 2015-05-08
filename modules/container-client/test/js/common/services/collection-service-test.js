@@ -15,7 +15,7 @@ describe('CollectionService', function() {
     $provide.value('$http', http);
   }));
 
-  beforeEach(inject(function($rootScope, CollectionService) {
+  beforeEach(inject(function(CollectionService) {
     collectionService = CollectionService;
   }));
 

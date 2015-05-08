@@ -33,7 +33,7 @@
       $http({method: 'GET', url: url})
         .success( 
           function success(data, status, headers, config){
-            $log.debug("success", data, onSuccess);
+            $log.debug("success", data);
             onSuccess(data);
 
         })
