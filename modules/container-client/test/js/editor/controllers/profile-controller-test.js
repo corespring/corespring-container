@@ -292,6 +292,12 @@ describe('profile controller', function() {
         scope.$apply();
         expect(scope.item.collectionId).toEqual('key-1');
       });
+      it("trigger save when default collectionId is set", function() {
+        makeProfileController();
+        scope.$apply();
+        expect(scope.item.collectionId).toEqual('default-id');
+        expect(mockItemService.saveCollectionIdCalls.length).toEqual(1);
+      });
 
     });
 
@@ -1109,6 +1115,12 @@ describe('profile controller', function() {
           scope.formModels.collectionId.options = ["one", "two", "not in dataProvider"];
           var actual = _.filter(keyValueList(["one", "two", "three"]), scope.collectionIdFilter);
           expect(actual).toEqual(keyValueList(["one", "two"]));
+        });
+
+        it("should filter items by key or value", function(){
+          scope.formModels.collectionId.options = ["k1", "v2"];
+          var actual = _.filter([{key:'k1', value:'v1'},{key:'k2', value:'v2'},{key:'k3', value:'v3'}], scope.collectionIdFilter);
+          expect(actual).toEqual([{key:'k1', value:'v1'},{key:'k2', value:'v2'}]);
         });
 
       });

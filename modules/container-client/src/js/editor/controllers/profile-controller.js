@@ -322,16 +322,44 @@
      * This filter returns true if the item can be found in formModel.options
      * or if there are no options
      * @param formModel - holds the options that are used for filtering
-     * @param propertyName - pass in a truthy string if you want to compare item[propertyName] instead of the item
      * @returns a filter function
      */
-    function createOptionsFilter(formModel, propertyName) {
+    function createSimpleOptionsFilter(formModel) {
       return function(item, index) {
-        var value = propertyName ? item[propertyName] : item;
-        //TODO As an optimisation we could create the filter functions after the formModels have been configured and
-        //move that check for formModel.options out of the filter function. Only do that if you find it to be necessary.
         return _.isArray(formModel.options) ?
-          _.contains(formModel.options, value) : true;
+          _.contains(formModel.options, item) : true;
+      };
+    }
+
+    /**
+     * Create a ng filter function for a formModel/dataProvider
+     * This filter returns true if the item can be found in formModel.options
+     * or if there are no options
+     * @param formModel - holds the options that are used for filtering
+     * @param property - pass in a string if you want to compare item[property]
+     * @returns a filter function
+     */
+    function createPropertyOptionsFilter(formModel, property) {
+      return function(item, index) {
+        return _.isArray(formModel.options) ?
+          _.contains(formModel.options, item[property]) : true;
+      };
+    }
+
+    /**
+     * Create a ng filter function for a formModel/dataProvider
+     * This filter returns true if the item can be found in formModel.options
+     * or if there are no options
+     * @param formModel - holds the options that are used for filtering
+     * @param properties - pass in an array of strings to compare item[properties[0]] OR item[properties[1]]
+     * @returns a filter function
+     */
+    function createMultiplePropertiesOptionsFilter(formModel, properties) {
+      return function(item, index) {
+        return _.isArray(formModel.options) ?
+          _.some(properties, function(property){
+            return _.contains(formModel.options, item[property]);
+          }) : true;
       };
     }
 
@@ -565,13 +593,14 @@
       $scope.collectionIdDataProvider = _.sortBy(collections, 'value');
     });
 
-    $scope.collectionIdFilter = createOptionsFilter($scope.formModels.collectionId, 'key');
+    $scope.collectionIdFilter = createMultiplePropertiesOptionsFilter($scope.formModels.collectionId, ['key', 'value']);
 
     function setDefaultCollectionIfNoCollectionSelected() {
       if ($scope.item && !collectionById($scope.item.collectionId)) {
         var defaultCollection = collectionByName('default');
         if (defaultCollection) {
           $scope.item.collectionId = defaultCollection.key;
+          $scope.saveCollectionId();
         }
       }
     }
@@ -691,13 +720,13 @@
     // some dataProviders for selects
     //----------------------------------------------------------------
 
-    $scope.bloomsTaxonomyFilter = createOptionsFilter($scope.formModels.bloomsTaxonomy, 'key');
+    $scope.bloomsTaxonomyFilter = createPropertyOptionsFilter($scope.formModels.bloomsTaxonomy, 'key');
 
     DataQueryService.list("bloomsTaxonomy", function(result) {
       $scope.bloomsTaxonomyDataProvider = result;
     });
 
-    $scope.depthOfKnowledgeFilter = createOptionsFilter($scope.formModels.depthOfKnowledge, 'key');
+    $scope.depthOfKnowledgeFilter = createPropertyOptionsFilter($scope.formModels.depthOfKnowledge, 'key');
 
     DataQueryService.list("depthOfKnowledge", function(result) {
       $scope.depthOfKnowledgeDataProvider = result;
@@ -705,9 +734,9 @@
 
     DataQueryService.list("gradeLevels", function(result) {
       $scope.gradeLevelDataProvider = result;
-      $scope.gradeLevelFilter = createOptionsFilter($scope.formModels.gradeLevel, 'key');
+      $scope.gradeLevelFilter = createPropertyOptionsFilter($scope.formModels.gradeLevel, 'key');
       $scope.priorGradeLevelDataProvider = result;
-      $scope.priorGradeLevelFilter = createOptionsFilter($scope.formModels.priorGradeLevel, 'key');
+      $scope.priorGradeLevelFilter = createPropertyOptionsFilter($scope.formModels.priorGradeLevel, 'key');
     });
 
     //----------------------------------------------------------------
@@ -727,11 +756,11 @@
       });
     }
 
-    $scope.copyrightExpirationDateFilter = createOptionsFilter($scope.formModels.copyrightExpirationDate);
+    $scope.copyrightExpirationDateFilter = createSimpleOptionsFilter($scope.formModels.copyrightExpirationDate);
 
     $scope.copyrightExpirationDateDataProvider = years(new Date().getFullYear(), new Date().getFullYear() + 20).concat(['Never']);
 
-    $scope.copyrightYearFilter = createOptionsFilter($scope.formModels.copyrightYear);
+    $scope.copyrightYearFilter = createSimpleOptionsFilter($scope.formModels.copyrightYear);
 
     $scope.copyrightYearDataProvider = years(new Date().getFullYear(), new Date().getFullYear() - 120);
 
@@ -739,7 +768,7 @@
     // credentials
     //----------------------------------------------------------------
 
-    $scope.credentialsFilter = createOptionsFilter($scope.formModels.credentials, 'key');
+    $scope.credentialsFilter = createPropertyOptionsFilter($scope.formModels.credentials, 'key');
 
     DataQueryService.list("credentials", function(result) {
       $scope.credentialsDataProvider = result;
@@ -762,7 +791,7 @@
     // key skills
     //----------------------------------------------------------------
 
-    $scope.keySkillsFilter = createOptionsFilter($scope.formModels.keySkills, 'key');
+    $scope.keySkillsFilter = createPropertyOptionsFilter($scope.formModels.keySkills, 'key');
 
     function initKeySkillsDataProvider() {
       DataQueryService.list("keySkills", function(result) {
@@ -820,7 +849,7 @@
     // prior use
     //----------------------------------------------------------------
 
-    $scope.priorUseFilter = createOptionsFilter($scope.formModels.priorUse, 'key');
+    $scope.priorUseFilter = createPropertyOptionsFilter($scope.formModels.priorUse, 'key');
 
     $scope.$watch('profile.priorUse', function() {
       updatePriorUseOtherSelected();
@@ -843,7 +872,7 @@
     // reviews passed
     //----------------------------------------------------------------
 
-    $scope.reviewsPassedFilter = createOptionsFilter($scope.formModels.reviewsPassed, 'key');
+    $scope.reviewsPassedFilter = createPropertyOptionsFilter($scope.formModels.reviewsPassed, 'key');
 
     DataQueryService.list("reviewsPassed", function(result) {
       $scope.reviewsPassedDataProvider = result;
@@ -894,7 +923,7 @@
     // show image for license type
     //----------------------------------------------------------------
 
-    $scope.licenseTypeFilter = createOptionsFilter($scope.formModels.licenseType, 'key');
+    $scope.licenseTypeFilter = createPropertyOptionsFilter($scope.formModels.licenseType, 'key');
 
     DataQueryService.list("licenseTypes", function(result) {
       $scope.licenseTypeDataProvider = result;
