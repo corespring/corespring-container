@@ -5,14 +5,13 @@ import java.io.{ File, InputStream }
 import org.apache.commons.io.IOUtils
 import org.apache.commons.lang3.StringEscapeUtils
 import org.corespring.container.client.V2PlayerConfig
-import org.corespring.container.client.controllers.resources.routes._
 import org.corespring.container.client.hooks.{ PlayerJs, PlayerLauncherHooks }
 import org.corespring.container.client.views.txt.js.ServerLibraryWrapper
 import org.corespring.container.logging.ContainerLogger
 import play.api.Play
 import play.api.http.ContentTypes
 import play.api.libs.json.Json.JsValueWrapper
-import play.api.libs.json.{JsObject, JsValue, Json}
+import play.api.libs.json.{JsObject, Json}
 import play.api.mvc.Session
 import play.api.mvc._
 
@@ -52,22 +51,17 @@ trait PlayerLauncher extends Controller {
   def hooks: PlayerLauncherHooks
 
   lazy val editorNameAndSrc = {
-    val jsPath = "container-client/js/player-launcher/new-editor.js"
+    val jsPath = "container-client/js/player-launcher/editor.js"
     pathToNameAndContents(jsPath)
   }
 
   lazy val catalogNameAndSrc = {
-    val jsPath = "container-client/js/player-launcher/new-catalog.js"
+    val jsPath = "container-client/js/player-launcher/catalog.js"
     pathToNameAndContents(jsPath)
   }
 
   lazy val playerNameAndSrc = {
     val jsPath = "container-client/js/player-launcher/player.js"
-    pathToNameAndContents(jsPath)
-  }
-
-  lazy val newPlayerNameAndSrc = {
-    val jsPath = "container-client/js/player-launcher/new-player.js"
     pathToNameAndContents(jsPath)
   }
 
@@ -103,33 +97,32 @@ trait PlayerLauncher extends Controller {
           "view" -> loadSession,
           "evaluate" -> loadSession))
     }
-
-    val newPlayer = {
-      val loadSession = Player.load(":id")
-      Json.obj(
-        "mode" -> "gather",
-        "paths" -> Json.obj(
-          "createSession" -> Player.createSessionForItem(":id"),
-          "gather" -> loadSession,
-          "view" -> loadSession,
-          "evaluate" -> loadSession))
-    }
-
   }
 
   def editorJs = Action.async { implicit request =>
     hooks.editorJs.map { implicit js =>
-      val bootstrap = "org.corespring.players.ItemEditor = corespring.require('new-editor');"
+      val bootstrap = "org.corespring.players.ItemEditor = corespring.require('editor');"
       make(editorNameAndSrc, LaunchOptions.editor, bootstrap)
     }
   }
 
   def catalogJs = Action.async { implicit request =>
     hooks.catalogJs.map { implicit js =>
-      val bootstrap = "org.corespring.players.ItemCatalog = corespring.require('new-catalog');"
+      val bootstrap = "org.corespring.players.ItemCatalog = corespring.require('catalog');"
       make(catalogNameAndSrc, LaunchOptions.catalog, bootstrap)
     }
   }
+
+  /**
+   * query: playerPage the player page to load (default: index.html), for a simple player you can pass in container-player.html
+  def playerJs = Action.async { implicit request =>
+    hooks.playerJs.map { implicit js =>
+      logger.debug(s"playerJs - isSecure=${js.isSecure}, path=${request.path}, queryString=${request.rawQueryString}")
+      val bootstrap = s"org.corespring.players.ItemPlayer = corespring.require('player').define(${js.isSecure});"
+      make(playerNameAndSrc, LaunchOptions.player, bootstrap)
+    }
+  }
+   */
 
   /**
    * query: playerPage the player page to load (default: index.html), for a simple player you can pass in container-player.html
@@ -139,17 +132,6 @@ trait PlayerLauncher extends Controller {
       logger.debug(s"playerJs - isSecure=${js.isSecure}, path=${request.path}, queryString=${request.rawQueryString}")
       val bootstrap = s"org.corespring.players.ItemPlayer = corespring.require('player').define(${js.isSecure});"
       make(playerNameAndSrc, LaunchOptions.player, bootstrap)
-    }
-  }
-
-  /**
-   * query: playerPage the player page to load (default: index.html), for a simple player you can pass in container-player.html
-   */
-  def newPlayerJs = Action.async { implicit request =>
-    hooks.playerJs.map { implicit js =>
-      logger.debug(s"playerJs - isSecure=${js.isSecure}, path=${request.path}, queryString=${request.rawQueryString}")
-      val bootstrap = s"org.corespring.players.ItemPlayer = corespring.require('new-player').define(${js.isSecure});"
-      make(newPlayerNameAndSrc, LaunchOptions.newPlayer, bootstrap)
     }
   }
 
@@ -186,8 +168,7 @@ trait PlayerLauncher extends Controller {
       "container-client/js/player-launcher/logger.js",
       "container-client/js/player-launcher/errors.js",
       "container-client/js/player-launcher/instance.js",
-      "container-client/js/player-launcher/new-instance.js",
-      "container-client/js/player-launcher/new-client-launcher.js",
+      "container-client/js/player-launcher/client-launcher.js",
       "container-client/js/player-launcher/url-builder.js",
       "container-client/js/player-launcher/object-id.js")
     val rawJs = pathToNameAndContents("container-client/js/corespring/core-library.js")._2

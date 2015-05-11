@@ -1,7 +1,6 @@
 # Note: The order is important - there are some asset calls that we want to intercept before they hit the *file
 
 GET           /player.js                                               @org.corespring.container.client.controllers.PlayerLauncher.playerJs
-GET           /new-player.js                                           @org.corespring.container.client.controllers.PlayerLauncher.newPlayerJs
 GET           /editor.js                                               @org.corespring.container.client.controllers.PlayerLauncher.editorJs
 GET           /catalog.js                                              @org.corespring.container.client.controllers.PlayerLauncher.catalogJs
 

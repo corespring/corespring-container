@@ -20,10 +20,9 @@ trait Launchers extends Controller {
   }
 
   def playerFromItem(itemId:String) = Action {request =>
-    val newPlayer = request.getQueryString("new-player").exists(_ == "true")
     import org.corespring.container.client.controllers.routes.PlayerLauncher
-    val jsCall = if(newPlayer) PlayerLauncher.newPlayerJs() else PlayerLauncher.playerJs()
-    Ok(loadPlayerPage(Json.obj("mode" -> "gather", "itemId" -> itemId, "queryParams" -> queryStringToJson(request, "new-player") ), jsCall.url))
+    val jsCall = PlayerLauncher.playerJs()
+    Ok(loadPlayerPage(Json.obj("mode" -> "gather", "itemId" -> itemId, "queryParams" -> queryStringToJson(request) ), jsCall.url))
   }
 
   def queryStringToJson(rh:RequestHeader, ignoreKeys:String*) : JsObject = {
