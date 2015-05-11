@@ -8,11 +8,10 @@ import org.corespring.container.client.controllers.jade.Jade
 import org.corespring.container.client.hooks.PlayerHooks
 import org.corespring.container.client.views.txt.js.PlayerServices
 import org.corespring.container.components.processing.PlayerItemPreProcessor
-import play.api.http.{ContentTypes}
+import play.api.http.{ ContentTypes }
 import play.api.libs.json._
-import play.api.mvc.{Action, AnyContent, RequestHeader}
+import play.api.mvc.{ Action, AnyContent, RequestHeader }
 import play.api.templates.Html
-
 
 trait Player
   extends App[PlayerHooks]
@@ -34,7 +33,7 @@ trait Player
         PlayerXhtml.mkXhtml(components.map(_.componentType), xhtml)
     }.getOrElse("<div><h1>New Item</h1></div>")
 
-    def createPlayerHtml(sessionId:String, session: JsValue, itemJson:JsValue, serviceParams:JsObject)(implicit rh : RequestHeader) : Html = {
+    def createPlayerHtml(sessionId: String, session: JsValue, itemJson: JsValue, serviceParams: JsObject)(implicit rh: RequestHeader): Html = {
 
       val scriptInfo = componentScriptInfo(componentTypes(itemJson), jsMode == "dev")
       val controlsJs = if (showControls) paths(controlsJsSrc) else Seq.empty
@@ -64,7 +63,6 @@ trait Player
 
     }
   }
-
 
   lazy val controlsJsSrc: SourcePaths = SourcePaths.fromJsonResource(modulePath, s"container-client/$context-controls-js-report.json")
 
@@ -114,39 +112,42 @@ trait Player
     /** if set log the category defined */
     "logCategory")
 
-  override def load(sessionId: String) = Action.async { implicit request =>
-    hooks.loadSessionAndItem(sessionId).map{ handleSuccess { (tuple) =>
-      val (session, item) = tuple
-      require((session \"id").asOpt[String].isDefined, "The session model must specify an 'id'")
-      Ok(createPlayerHtml((session \"id").as[String],session, item, queryParams(mapToJson))).as(ContentTypes.HTML)
-    }}
+  def load(sessionId: String) = Action.async { implicit request =>
+    hooks.loadSessionAndItem(sessionId).map {
+      handleSuccess { (tuple) =>
+        val (session, item) = tuple
+        require((session \ "id").asOpt[String].isDefined, "The session model must specify an 'id'")
+        Ok(createPlayerHtml((session \ "id").as[String], session, item, queryParams(mapToJson))).as(ContentTypes.HTML)
+      }
+    }
   }
 
-  def mapToParamString (m : Map[String,String]) : String = m.toSeq.map{ t => s"${t._1}=${t._2}}" }.mkString("&")
-  def mapToJson (m : Map[String,String]) : JsObject = JsObject(m.map(t => t._1 -> JsString(t._2.mkString(""))).toSeq)
+  def mapToParamString(m: Map[String, String]): String = m.toSeq.map { t => s"${t._1}=${t._2}}" }.mkString("&")
+  def mapToJson(m: Map[String, String]): JsObject = JsObject(m.map(t => t._1 -> JsString(t._2.mkString(""))).toSeq)
 
-  private def queryParams[A](build : (Map[String,String] => A) = mapToParamString _)(implicit rh:RequestHeader) : A = {
+  private def queryParams[A](build: (Map[String, String] => A) = mapToParamString _)(implicit rh: RequestHeader): A = {
     val trimmed = (rh.queryString -- playerQueryStringParams).mapValues(s => s.mkString(""))
     build(trimmed)
   }
 
   def createSessionForItem(itemId: String): Action[AnyContent] = Action.async { implicit request =>
-    hooks.createSessionForItem(itemId).map{ handleSuccess{ (tuple) =>
-      val (session, item) = tuple
-      require((session \"id").asOpt[String].isDefined, "The session model must specify an 'id'")
-      val call = org.corespring.container.client.controllers.apps.routes.Player.load((session \ "id").as[String])
-      val location = {
-        val params = queryParams[String]()
-        s"${call.url}${if(params.isEmpty) "" else s"?$params" }"
+    hooks.createSessionForItem(itemId).map {
+      handleSuccess { (tuple) =>
+        val (session, item) = tuple
+        require((session \ "id").asOpt[String].isDefined, "The session model must specify an 'id'")
+        val call = org.corespring.container.client.controllers.apps.routes.Player.load((session \ "id").as[String])
+        val location = {
+          val params = queryParams[String]()
+          s"${call.url}${if (params.isEmpty) "" else s"?$params"}"
+        }
+        Created(createPlayerHtml((session \ "id").as[String], session, item, queryParams(mapToJson)))
+          .as(ContentTypes.HTML)
+          .withHeaders(LOCATION -> location)
       }
-      Created(createPlayerHtml((session\"id").as[String], session, item, queryParams(mapToJson)))
-        .as(ContentTypes.HTML)
-        .withHeaders(LOCATION -> location)
-    }
     }
   }
 
-  def servicesJs(sessionId:String, queryParams: JsObject) = {
+  def servicesJs(sessionId: String, queryParams: JsObject) = {
     import org.corespring.container.client.controllers.resources.routes._
     PlayerServices(
       "player.services",

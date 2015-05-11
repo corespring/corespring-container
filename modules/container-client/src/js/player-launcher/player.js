@@ -57,7 +57,7 @@ exports.define = function(isSecure) {
       } else {
         options.mode = options.mode || 'gather';
         return launcher.loadCall(options.mode, function(url){
-          return url.replace(':id', options.sessionId);
+          return url.replace(':sessionId', options.sessionId);
         }); 
       }
     }
@@ -80,7 +80,7 @@ exports.define = function(isSecure) {
 
       if (options.onSessionCreated) {
         instance.on('sessionCreated', function(data) {
-          options.onSessionCreated(data.session._id.$oid);
+          options.onSessionCreated(data.session.id);
         });
       }
 

@@ -23,7 +23,7 @@ trait HasLogger {
   def logger: Logger
 }
 
-trait App[T <: LoadHook]
+trait App[T]
   extends Controller
   with DependencyResolver
   with Helpers
@@ -61,7 +61,7 @@ trait App[T <: LoadHook]
 
   }
 
-  def load(id: String): Action[AnyContent]
+  //def load(id: String): Action[AnyContent]
 
   val typeRegex = "(.*?)-(.*)".r
 
