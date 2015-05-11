@@ -46,12 +46,12 @@ angular.module('corespring-dev-editor.controllers')
       }
 
       function onItemLoaded(item) {
-        ComponentData.setModel(item.components);
         $scope.item = item;
         $scope.xhtml = item.xhtml;
         $scope.json = JSON.stringify(item.components, undefined, 2);
         $scope.customScoringJs = item.customScoring;
         $scope.components = _.cloneDeep(item.components);
+        ComponentData.setModel($scope.components);
       }
 
       function onItemLoadError(err) {
