@@ -36,7 +36,7 @@ trait PlayerHooks extends ContainerPlayerHooks {
     item.leftMap(s => (500, s)).toEither
   }
 
-  override def createSessionForItem(itemId: String)(implicit header: RequestHeader): Future[Either[(Int, String), String]] = Future {
+  override def createSessionForItem(itemId: String)(implicit header: RequestHeader): Future[Either[(Int, String), (JsValue,JsValue)]] = Future {
 
     val settings = Json.obj(
       "maxNoOfAttempts" -> JsNumber(2),
@@ -49,7 +49,10 @@ trait PlayerHooks extends ContainerPlayerHooks {
 
     sessionService.create(session).map {
       oid =>
-        Right(oid.toString)
+        itemService.load(itemId).map{ item =>
+          val withId = session ++ Json.obj("id" -> oid.toString)
+          Right((withId, item))
+        }.getOrElse(Left(NOT_FOUND -> s"Can't find item with id $itemId"))
     }.getOrElse(Left(BAD_REQUEST -> "Error creating session"))
   }
 

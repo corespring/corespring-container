@@ -20,11 +20,6 @@ angular.module('corespring-player.controllers')
           highlightUserResponse: true
         };
 
-        $scope.sessionId = (function() {
-          //TODO: This is a temporary means of extracting the session id
-          return document.location.pathname.match(/.*\/(.*)\/.*/)[1];
-        })();
-
         $scope.onAnswerChanged = function() {
           $scope.$emit("inputReceived", {
             sessionStatus: getSessionStatus()
@@ -59,8 +54,7 @@ angular.module('corespring-player.controllers')
               if (cb) {
                 cb(e);
               }
-            },
-            $scope.sessionId
+            }
           );
         };
 
@@ -82,8 +76,7 @@ angular.module('corespring-player.controllers')
               if (cb) {
                 cb(err);
               }
-            },
-            $scope.sessionId
+            }
           );
         };
 
@@ -101,8 +94,7 @@ angular.module('corespring-player.controllers')
               components: ComponentRegister.getComponentSessions()
             },
             onSuccess,
-            onError,
-            $scope.sessionId
+            onError
           );
         };
 
@@ -116,8 +108,7 @@ angular.module('corespring-player.controllers')
               $scope.isComplete = false;
               $log.error(err);
               callback(err, $scope.isComplete);
-            },
-            $scope.sessionId
+            }
           );
         };
 

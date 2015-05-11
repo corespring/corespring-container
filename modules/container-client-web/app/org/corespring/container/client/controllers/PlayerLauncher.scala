@@ -78,9 +78,6 @@ trait PlayerLauncher extends Controller {
 
     import org.corespring.container.client.controllers.resources.routes.ItemDraft
 
-    //private def corespringUrl(implicit request: RequestHeader) = playerConfig.rootUrl.getOrElse(BaseUrl(request))
-    //val sessionUrl = Player.createSession(":id").url
-
     val catalog = Json.obj(
       "paths" -> Json.obj(
         "catalog" -> Catalog.load(":itemId").url
@@ -97,27 +94,25 @@ trait PlayerLauncher extends Controller {
     }
 
     val player = {
-      val sessionUrl = Player.createSession(":id").url
-      val sessionIdPlayerUrl = Player.load(":sessionId").url
+      val loadSession = Player.load(":sessionId")
       Json.obj(
         "mode" -> "gather",
         "paths" -> Json.obj(
-          "sessionUrl" -> sessionUrl,
-          "gather" -> sessionIdPlayerUrl,
-          "view" -> sessionIdPlayerUrl,
-          "evaluate" -> sessionIdPlayerUrl))
+          "createSession" -> Player.createSessionForItem(":id"),
+          "gather" -> loadSession,
+          "view" -> loadSession,
+          "evaluate" -> loadSession))
     }
 
     val newPlayer = {
-      val loadCall = Player.load(":id")
+      val loadSession = Player.load(":id")
       Json.obj(
         "mode" -> "gather",
         "paths" -> Json.obj(
-          "stub" -> Player.stubPost(":itemId"),
-          "gather" -> Player.createSessionForItem(":itemId"),
-          "gatherSession" -> loadCall,
-          "view" -> loadCall,
-          "evaluate" -> loadCall))
+          "createSession" -> Player.createSessionForItem(":id"),
+          "gather" -> loadSession,
+          "view" -> loadSession,
+          "evaluate" -> loadSession))
     }
 
   }
@@ -135,7 +130,6 @@ trait PlayerLauncher extends Controller {
       make(catalogNameAndSrc, LaunchOptions.catalog, bootstrap)
     }
   }
-
 
   /**
    * query: playerPage the player page to load (default: index.html), for a simple player you can pass in container-player.html
@@ -211,7 +205,8 @@ trait PlayerLauncher extends Controller {
   }
 
   private def make(additionalJsNameAndSrc: (String, String), options: JsObject, bootstrapLine: String)(implicit request: Request[AnyContent], js: PlayerJs): SimpleResult = {
-    val withUrl = Json.obj("corespringUrl" ->  playerConfig.rootUrl.getOrElse(BaseUrl(request))) ++ options
+    val corespringUrl = playerConfig.rootUrl.getOrElse(BaseUrl(request))
+    val withUrl = Json.obj("corespringUrl" ->  corespringUrl) ++ options
     val defaultOptions = ("default-options" -> s"module.exports = ${Json.stringify(withUrl)}")
     val launchErrors = ("launcher-errors" -> errorsToModule(js.errors))
     val launchWarnings = ("launcher-warnings" -> warningsToModule(js.warnings))

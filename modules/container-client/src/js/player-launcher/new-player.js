@@ -48,12 +48,16 @@ exports.define = function(isSecure) {
     }
     
     function prepareCall() {
-      options.mode = options.mode || 'gather';
-      var id = options.mode === 'gather' ? (options.sessionId || options.itemId) : options.sessionId;
-      var call = launcher.loadCall('gather', function(url){
-        return url.replace(':itemId', id);
-      }); 
-      return call;
+      if(options.itemId){
+        return launcher.loadCall('createSession', function(url){
+          return url.replace(':id', options.itemId);
+        }); 
+      } else {
+        options.mode = options.mode || 'gather';
+        return launcher.loadCall(options.mode, function(url){
+          return url.replace(':id', options.sessionId);
+        }); 
+      }
     }
 
     var initOk = launcher.init(validateOptions);

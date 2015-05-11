@@ -1,9 +1,44 @@
 /**
  * @param call: { url: '', method: '', params: {}, hash: ''}
  */
+
 var Instance = function(call,  element, errorCallback, log) {
   log.info('--> new instance');
   log.info('call', call);
+
+  function PostForm(url){
+
+    var formName = iframeUid + '-form';
+    
+    function addForm(){
+      var form = [
+        '<form ',
+        '  target="', iframeUid, '"',
+        '  id="', formName, '"',
+        '  name="', formName, '"',
+        '  method="POST" ',
+        '  action="', url, '">',
+        '</form>'
+      ].join('');
+
+      $('body').append(form);
+    }
+
+    function submitForm(){
+      var form = document.forms[formName];
+      form.submit();
+    }
+
+    function removeForm(){
+      $('#' + formName).remove();
+    }
+
+    this.load = function(){
+      addForm();
+      submitForm();
+      removeForm();
+    }; 
+  }
 
   /* global msgr */
   /** msgr.Channel */
@@ -36,7 +71,7 @@ var Instance = function(call,  element, errorCallback, log) {
 
     function makeUrl() {
       var Builder = require('url-builder');
-      return new Builder().build(call.url, call.params);
+      return new Builder(call.url).params(call.params).build(); 
     }
 
     var url = makeUrl();
@@ -58,16 +93,28 @@ var Instance = function(call,  element, errorCallback, log) {
       }
     })();
 
-    var iframeTemplate = [
+    var iframeOpen = [
       '<iframe',
       ' id="', iframeUid , '"',
+      ' name="', iframeUid ,'"',
       ' frameborder="0"',
-      ' src="', url, '"',
       ' class="player-loading"',
-      ' style="width: 100%; border: none;"></iframe>'
+      ' style="width: 100%; border: none;" ',
     ].join('');
 
-    $(e).html(iframeTemplate);
+    if(call.method === 'GET'){
+      iframeOpen += 'src="'+url+'"';
+    }
+
+    var iframeClose = '></iframe>';
+
+    $(e).html(iframeOpen + iframeClose);
+
+    
+    if(call.method === 'POST'){
+      var post = new PostForm(url);
+      post.load();
+    } 
 
     channel = new msgr.Channel(window, $iframe()[0].contentWindow, {enableLogging: false});
 
