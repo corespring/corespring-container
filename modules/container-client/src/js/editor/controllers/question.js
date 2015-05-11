@@ -29,7 +29,7 @@ angular.module('corespring-editor.controllers')
 
       var logger = LogFactory.getLogger('question-controller');
 
-      $scope.previewOn = AppState.question.preview || false;
+      $scope.previewOn = AppState.question.preview || true;
 
       $scope.$watch('previewOn', function() {
         AppState.question.preview = $scope.previewOn;
