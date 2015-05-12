@@ -155,4 +155,59 @@ describe('ClientSidePreview', function() {
 
   });
 
+  describe('editor.click event', function() {
+
+    describe('gather mode', function() {
+      beforeEach(function() {
+        scope.mode = 'gather';
+        scope.$broadcast('editor.click');
+      });
+
+      it('should not call ComponentData.reset', function() {
+        expect(ComponentData.reset).not.toHaveBeenCalled();
+      });
+    });
+
+    describe('not gather mode', function() {
+      beforeEach(function() {
+        scope.playerMode = 'not gather';
+        scope.$broadcast('editor.click');
+      });
+
+      it('should set session.isComplete to false', function() {
+      expect(scope.session.isComplete).toBe(false);
+    });
+
+    it('should set session.remainingAttempts to 1', function() {
+      expect(scope.session.remainingAttempts).toEqual(1);
+    });
+
+    it('should set score to be undefined', function() {
+      expect(scope.score).toBeUndefined();
+    });
+
+    it('should set outcome to be undefined', function() {
+      expect(scope.outcome).toBeUndefined();
+    });
+
+    it('should set responses to be empty object', function() {
+      expect(scope.responses).toEqual({});
+    });
+
+    it('should call ComponentData.reset', function() {
+      expect(ComponentData.reset).toHaveBeenCalled();
+    });
+
+    it('should set mode to gather', function() {
+      expect(scope.playerMode).toEqual('gather');
+      expect(ComponentData.setMode).toHaveBeenCalledWith('gather');
+    });
+
+    it('should set ComponentData to editable', function() {
+      expect(ComponentData.setEditable).toHaveBeenCalledWith(true);
+    });
+    });
+
+  });
+
 });
