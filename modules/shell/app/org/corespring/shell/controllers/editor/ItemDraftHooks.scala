@@ -29,7 +29,7 @@ trait ItemDraftHooks extends ContainerItemDraftHooks {
   def itemService: MongoService
 
   override def saveCollectionId(draftId: String, collectionId: String)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] =
-    fineGrainedSave(draftId, Json.obj("item.collection.id" -> collectionId))
+    fineGrainedSave(draftId, Json.obj("item.collection" -> Json.obj("id" -> collectionId)))
 
   override def saveComponents(draftId: String, json: JsValue)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] =
     fineGrainedSave(draftId, Json.obj("item.components" -> json))

@@ -1003,7 +1003,7 @@
       $scope.taskInfo = profile.taskInfo;
       $scope.otherAlignments = profile.otherAlignments;
       $scope.contributorDetails = profile.contributorDetails;
-      $scope.collectionId = item.collection ? item.collection.id :'';
+      $scope.collectionId = item.collection ? item.collection.id : '';
 
       initComponentTypesUsed();
       initKeySkillsDataProvider();
