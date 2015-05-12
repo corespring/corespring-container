@@ -11,7 +11,7 @@ import org.corespring.container.logging.ContainerLogger
 import play.api.Play
 import play.api.http.ContentTypes
 import play.api.libs.json.Json.JsValueWrapper
-import play.api.libs.json.{JsObject, Json}
+import play.api.libs.json.{JsString, JsObject, Json}
 import play.api.mvc.Session
 import play.api.mvc._
 
@@ -74,7 +74,7 @@ trait PlayerLauncher extends Controller {
 
     val catalog = Json.obj(
       "paths" -> Json.obj(
-        "catalog" -> Catalog.load(":itemId").url
+        "catalog" -> Catalog.load(":itemId")
       )
     )
 
@@ -166,7 +166,7 @@ trait PlayerLauncher extends Controller {
     val corePaths = Seq(
       "container-client/bower_components/msgr.js/dist/msgr.js",
       "container-client/js/player-launcher/logger.js",
-      "container-client/js/player-launcher/errors.js",
+      "container-client/js/player-launcher/error-codes.js",
       "container-client/js/player-launcher/instance.js",
       "container-client/js/player-launcher/client-launcher.js",
       "container-client/js/player-launcher/url-builder.js",
@@ -185,15 +185,19 @@ trait PlayerLauncher extends Controller {
       """
   }
 
+  private def queryStringToJson(implicit rh:RequestHeader) = JsObject(rh.queryString.mapValues{ v => JsString(v.mkString)}.toSeq)
+
   private def make(additionalJsNameAndSrc: (String, String), options: JsObject, bootstrapLine: String)(implicit request: Request[AnyContent], js: PlayerJs): SimpleResult = {
     val corespringUrl = playerConfig.rootUrl.getOrElse(BaseUrl(request))
-    val withUrl = Json.obj("corespringUrl" ->  corespringUrl) ++ options
-    val defaultOptions = ("default-options" -> s"module.exports = ${Json.stringify(withUrl)}")
-    val launchErrors = ("launcher-errors" -> errorsToModule(js.errors))
-    val launchWarnings = ("launcher-warnings" -> warningsToModule(js.warnings))
-    val queryParams = ("query-params" -> makeQueryParams(request.queryString))
-    val wrappedNameAndContents = Seq(defaultOptions, launchErrors, launchWarnings, queryParams, additionalJsNameAndSrc)
+    val fullConfig = Json.obj(
+      "corespringUrl" ->  corespringUrl,
+      "queryParams" -> queryStringToJson,
+      "errors" -> js.errors,
+      "warnings" -> js.warnings) ++ options
+    val fullConfigJs = ("launch-config" -> s"module.exports = ${Json.stringify(fullConfig)}")
+    val wrappedNameAndContents = Seq(fullConfigJs, additionalJsNameAndSrc)
     val wrappedContents = wrappedNameAndContents.map(tuple => ServerLibraryWrapper(tuple._1, tuple._2))
+
     def sumSession(s: Session, keyValues: (String, String)*): Session = {
       keyValues.foldRight(s)((kv: (String, String), acc: Session) => acc + (kv._1, kv._2))
     }
@@ -207,28 +211,5 @@ trait PlayerLauncher extends Controller {
        $bootstrapLine""")
       .as(ContentTypes.JAVASCRIPT)
       .withSession(finalSession)
-  }
-
-  private def makeQueryParams(qp: Map[String, Seq[String]]): String = {
-    val js = qp.foldRight[String]("") { (m: (String, Seq[String]), acc: String) =>
-      acc ++ s"\nexports.${m._1} = '${m._2.head}';"
-    }
-    js
-  }
-
-  private def errorsToModule(errors: Seq[String]): String = msgToModule(errors, "errors")
-
-  private def warningsToModule(warnings: Seq[String]): String = msgToModule(warnings, "warnings")
-
-  private def msgToModule(msgs: Seq[String], msgType: String): String = {
-    val cleaned = msgs.map(StringEscapeUtils.escapeEcmaScript)
-
-    s"""
-     |exports.has${msgType.capitalize} = function(){
-     |  return exports.$msgType.length > 0;
-     |}
-     |
-     |exports.$msgType = ${if (msgs.length == 0) "[];" else s"['${cleaned.mkString("','")}'];"}
-     """.stripMargin
   }
 }

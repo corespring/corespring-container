@@ -1,61 +1,56 @@
 function ClientLauncher(element, options, errorCallback){
   
-  /** error and warning handler */
-  function ErrorAndWarningHandler(){
-    var errs = require('launcher-errors');
-
-    this.hasErrors = function(){
-      return errs.errors.length === 0;
-    };
-
-    this.eachError = function(cb){
-      for(var i = 0; i < errs.length; i++){
-        cb(errs.errors[i]);
-      }
-    };
-
-    this.eachWarning = function(cb){
-      var launchWarnings;
-      try{
-        launchWarnings = require('launcher-warnings');
-      } catch(e){
-        launchWarnings = { warnings : [] };
-      }
-      for(var i = 0; i < launchWarnings.warnings.length; i++){
-        cb(launchWarnings.warnings[i]);
-      }
-    };
-  }
-  
-  function Paths(){
-
-    var options = require('default-options');
-
-    this.corespringUrl = options.corespringUrl;
-    
-    this.loadCall = function(key){
-      if (!options.paths || !options.paths[key]) {
-        errorCallback({
-          code: 105,
-          message: key + ' not part of options'
-        });
-        return null;
-      }
-      return options.paths[key];
-    };
-  }
-
-  var errors = require('errors');
+  var launchConfig = require('launch-config');
+  var errorCodes = require('error-codes');
   var logger = options.logger || require('logger');
-  var builder = new (require('url-builder'))();
-  var queryParams = $.extend({}, require('query-params'), options.queryParams);
+  var UrlBuilder = require('url-builder');
   var InstanceDef = require('instance');
   
   errorCallback = errorCallback || function (error) {
     throw 'error occurred, code: ' + error.code + ', message: ' + error.message;
   };
+  
+  /** error and warning handler */
+  function ErrorAndWarningHandler(errors, warnings){
 
-  this.paths = new Paths();
+    errors = errors || [];
+    warnings = warnings || [];
+
+    this.hasErrors = function(){
+      return errors.length === 0;
+    };
+
+    this.eachError = function(cb){
+      for(var i = 0; i < errors.length; i++){
+        cb(errors.errors[i]);
+      }
+    };
+
+    this.eachWarning = function(cb){
+      for(var i = 0; i < warnings.length; i++){
+        cb(warnings[i]);
+      }
+    };
+  }
+  
+  
+  function Paths(pathsConfig){
+
+    this.corespringUrl = launchConfig.corespringUrl;
+    
+    this.loadCall = function(key){
+      if (!pathsConfig || !pathsConfig[key]) {
+        errorCallback({
+          code: 105,
+          message: key + ' not part of paths config'
+        });
+        return null;
+      }
+      return pathsConfig[key];
+    };
+  }
+
+  this.paths = new Paths(launchConfig.paths);
   this.isReady = false;
 
   this.loadCall = function(key, urlProcessor){
@@ -64,18 +59,21 @@ function ClientLauncher(element, options, errorCallback){
     return { method: c.method, url: urlProcessor( this.paths.corespringUrl + c.url)};
   };
 
+  this.buildParams = function(p){
+    return $.extend(launchConfig.queryParams, p);
+  };
 
-  this.prepareUrl = function(u, opts){
-    opts = opts || {};
-    return builder.build(u, $.extend(queryParams, opts));
+  this.prepareUrl = function(u, params){
+    params = this.buildParams(params); 
+    return new UrlBuilder(u).params(params).build(); 
   };
 
   function triggerErrorCallback(e){
-    errorCallback(errors.EXTERNAL_ERROR(e));
+    errorCallback(errorCodes.EXTERNAL_ERROR(e));
   }
 
   this.init = function(validateOptions){
-    var handler = new ErrorAndWarningHandler();
+    var handler = new ErrorAndWarningHandler(launchConfig.errors, launchConfig.warnings);
 
     handler.eachWarning(logger.warn);
 
@@ -107,12 +105,11 @@ function ClientLauncher(element, options, errorCallback){
   this.loadInstance = function(call, params, initialData, onReady){
 
     call = (typeof(call) === 'string') ? { method: 'GET', url: call} : call;
-    params = params || {};
-
+    params = this.buildParams(params); 
     var instance = new InstanceDef($.extend(call, {params: params}), element, errorCallback, logger);
 
     instance.on('launch-error', function (data) {
-      var error = errors.EXTERNAL_ERROR(data.code + ': ' + data.detailedMessage);
+      var error = errorCodes.EXTERNAL_ERROR(data.code + ': ' + data.detailedMessage);
       errorCallback(error);
     });
 
@@ -120,7 +117,7 @@ function ClientLauncher(element, options, errorCallback){
       logger.info('instance is ready');
       if (this.isReady) {
         instance.removeChannel();
-        errorCallback(errors.EDITOR_NOT_REMOVED);
+        errorCallback(errorCodes.EDITOR_NOT_REMOVED);
       } else {
         this.isReady = true;
         instance.send('initialise', initialData);

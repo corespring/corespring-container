@@ -1,7 +1,7 @@
 function CatalogDefinition(element, options, errorCallback) {
 
   var Launcher = require('client-launcher');
-  var errors = require('errors');
+  var errorCodes = require('error-codes');
   var launcher = new Launcher(element, options, errorCallback);
 
   var initOk = launcher.init();
@@ -30,11 +30,10 @@ function CatalogDefinition(element, options, errorCallback) {
       var instance = launcher.loadInstance(call, {});
 
     } else {
-      errorCallback(errors.NO_ITEM_ID);
+      errorCallback(errorCodes.NO_ITEM_ID);
     }
-
   } else {
-    errorCallback(errors.INSTANCE_NOT_READY);
+    errorCallback(errorCodes.INSTANCE_NOT_READY);
   } 
 }
 

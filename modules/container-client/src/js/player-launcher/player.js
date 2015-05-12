@@ -3,13 +3,13 @@ exports.define = function(isSecure) {
 
     var Launcher = require('client-launcher');
     var launcher = new Launcher(element, options, errorCallback);
-    var errors = require('errors');
+    var errorCodes = require('error-codes');
     var instance = {
       send: function(){
-        errorCallback(errors.INSTANCE_NOT_READY);
+        errorCallback(errorCodes.INSTANCE_NOT_READY);
       },
       on: function(){
-        errorCallback(errors.INSTANCE_NOT_READY);
+        errorCallback(errorCodes.INSTANCE_NOT_READY);
       }
     };
 
@@ -21,7 +21,7 @@ exports.define = function(isSecure) {
     function messageResultHandler(originalCallback){
       return function(err, result) {
         if(err){
-          errorCallback(errors.MESSAGE_ERROR(err));
+          errorCallback(errorCodes.MESSAGE_ERROR(err));
         } else {
           originalCallback(result);
         }
@@ -34,16 +34,16 @@ exports.define = function(isSecure) {
       //TODO - hook in bens object id util...
 
       if (!options.mode) {
-        out.push(errors.INVALID_MODE);
+        out.push(errorCodes.INVALID_MODE);
         return out;
       }
 
       if (!options.itemId && !options.sessionId) {
-        out.push(errors.NO_ITEM_OR_SESSION_ID);
+        out.push(errorCodes.NO_ITEM_OR_SESSION_ID);
       }
 
       if (!options.sessionId && options.mode !== 'gather') {
-        out.push(errors.NO_SESSION_ID);
+        out.push(errorCodes.NO_SESSION_ID);
       }
 
       return out;
@@ -150,14 +150,14 @@ exports.define = function(isSecure) {
               callback(null);
             }
           } else {
-            errorCallback(errors.NOT_ALLOWED);
+            errorCallback(errorCodes.NOT_ALLOWED);
             if (callback) {
-              callback(errors.NOT_ALLOWED);
+              callback(errorCodes.NOT_ALLOWED);
             }
           }
         });
       } else {
-        errorCallback(errors.INVALID_MODE);
+        errorCallback(errorCodes.INVALID_MODE);
       }
     };
 

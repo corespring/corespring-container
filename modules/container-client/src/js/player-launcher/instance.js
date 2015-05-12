@@ -44,12 +44,12 @@ var Instance = function(call,  element, errorCallback, log) {
   /** msgr.Channel */
   var channel;
   var iframeUid = 'corespring-iframe-' + msgr.utils.getUid();
-  var errors = require('errors');
+  var errorCodes = require('error-codes');
 
   function $iframe() {
     var $node = $('#' + iframeUid);
     if($node.size() !== 1){
-      var err = errors.CANT_FIND_IFRAME(iframeUid);
+      var err = errorCodes.CANT_FIND_IFRAME(iframeUid);
       errorCallback(err);
     }
     return $node;
@@ -65,7 +65,7 @@ var Instance = function(call,  element, errorCallback, log) {
     }
 
     if ($(e).length === 0) {
-      errorCallback(errors.CANT_FIND_CONTAINER_FOR_PLAYER);
+      errorCallback(errorCodes.CANT_FIND_CONTAINER_FOR_PLAYER);
       return;
     }
 

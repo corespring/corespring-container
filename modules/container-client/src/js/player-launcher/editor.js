@@ -2,8 +2,6 @@ function EditorDefinition(element, options, errorCallback) {
 
   var Launcher = require('client-launcher');
   var launcher = new Launcher(element, options, errorCallback);
-  var UrlBuilder = require('url-builder');
-  var builder = new UrlBuilder();
 
   function createItemAndDraft(callback){
 
@@ -40,7 +38,7 @@ function EditorDefinition(element, options, errorCallback) {
     });
   }
 
-  var errors = require('errors');
+  var errorCodes = require('error-codes');
 
   function loadDraftItem(draftId, options) {
 
@@ -53,7 +51,7 @@ function EditorDefinition(element, options, errorCallback) {
     });
 
     if (!call) {
-      errorCallback(errors.NO_DRAFT_ID);
+      errorCallback(errorCodes.NO_DRAFT_ID);
       return;
     }
 
@@ -67,7 +65,7 @@ function EditorDefinition(element, options, errorCallback) {
       call.hash = '/supporting-materials/0';
     }
 
-    var initialData = {todo: true};
+    var initialData = {profileConfig: options.profileConfig};
 
     function onReady(instance){
       if(options.devEditor){
@@ -130,7 +128,7 @@ function EditorDefinition(element, options, errorCallback) {
 
     $.ajax({
       type: call.method,
-      url: builder.build(call.url, $.extend(options.queryParams, {force: force})),
+      url: launcher.prepareUrl(call.url, {force: force}),
       data: options,
       success: onSuccess,
       error: onError,
