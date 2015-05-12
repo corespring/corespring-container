@@ -5,6 +5,7 @@
   angular.module('corespring-editor.controllers')
     .controller('ProfileController', [
       '$location',
+      '$q',
       '$scope',
       '$timeout',
       'throttle',
@@ -21,6 +22,7 @@
 
   function ProfileController(
     $location,
+    $q,
     $scope,
     $timeout,
     throttle,
@@ -601,13 +603,16 @@
       }
     }
 
-    function setDefaultCollectionIfNoCollectionSelected() {
+    function setDefaultCollectionIfNoCollectionSelected(collectionId) {
       CollectionService.list().then(function(collections) {
-        if (!collectionById(collections, $scope.item.collectionId)) {
+        $log.log("setDefaultCollectionIfNoCollectionSelected", collectionId, collections);
+        if (!collectionById(collections, collectionId)) {
+          $log.log("setDefaultCollectionIfNoCollectionSelected id not found", collectionId);
           var defaultCollection = collectionByName(collections, 'default');
+          $log.log("setDefaultCollectionIfNoCollectionSelected defaultCollection", defaultCollection);
           if (defaultCollection) {
-            $scope.item.collectionId = defaultCollection.key;
-            $scope.saveCollectionId();
+            $log.log("setDefaultCollectionIfNoCollectionSelected saving");
+            $scope.saveCollectionId(defaultCollection.key);
           }
         }
       });
@@ -998,14 +1003,14 @@
       $scope.taskInfo = profile.taskInfo;
       $scope.otherAlignments = profile.otherAlignments;
       $scope.contributorDetails = profile.contributorDetails;
-      $scope.collectionId = item.collectionId;
+      $scope.collectionId = item.collection ? item.collection.id :'';
 
       initComponentTypesUsed();
       initKeySkillsDataProvider();
       updateReviewsPassedOtherSelected();
       updatePriorUseOtherSelected();
       updateCredentialsOtherSelected();
-      setDefaultCollectionIfNoCollectionSelected();
+      setDefaultCollectionIfNoCollectionSelected($scope.collectionId);
     }
 
     function removeEmptyAdditionalCopyrightItems(copyrights) {
@@ -1067,25 +1072,53 @@
     // collectionId load and save
     //----------------------------------------------------------------
 
-    $scope.$watch('item.collectionId', throttle(function(newValue, oldValue) {
+    $scope.$watch('collectionId', function(newValue, oldValue) {
+      $log.log("$watch collectionId", newValue);
       if (undefined === oldValue) {
         return;
       }
       if (_.isEqual(oldValue, newValue)) {
         return;
       }
-      $scope.saveCollectionId();
+      $scope.saveCollectionId(newValue);
+    });
+
+    $scope.saveCollectionId = function(collectionId) {
+      $log.log("saving collectionId", collectionId);
+      ifCollectionIdIsValid(collectionId).then(function(collection) {
+        $log.log("id is valid", collectionId, collection);
+        updateItemCollection(collection);
+        $scope.collectionId = collection.key;
+        ItemService.saveCollectionId(collectionId, function(result) {
+          $log.log("collectionId saved result:", result);
+        });
+      });
+    };
+
+    function ifCollectionIdIsValid(collectionId){
+      var defer = $q.defer();
+      CollectionService.list().then(function(collections) {
+        var collection = _.find(collections, {key:collectionId});
+        $log.log("ifCollectionIdIsValid collections", collectionId, collection, collections);
+        if (collection) {
+          defer.resolve(collection);
+        } else {
+          defer.reject(collectionId);
+        }
+      });
+      return defer.promise;
+    }
+
+    function updateItemCollection(collection){
+      $scope.item.collection = {
+        id: collection.key,
+        name: collection.value
+      };
       $scope.$emit('itemChanged', {
         partChanged: 'collectionId'
       });
-    }));
+    }
 
-    $scope.saveCollectionId = function() {
-      $log.log("saving collectionId");
-      ItemService.saveCollectionId($scope.item.collectionId, function(result) {
-        $log.log("collectionId saved result:", result);
-      });
-    };
 
 
     //----------------------------------------------------------------
