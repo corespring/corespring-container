@@ -1,195 +1,325 @@
-describe('player-launcher.editor', function () {
+describe('player-launcher.editor', function() {
 
-  var origRequire = corespring.require;
+	var origRequire = corespring.require;
 
-  function MockErrors(errs) {
-    this.errors = errs;
-    this.hasErrors = function () {
-      return this.errors && this.errors.length > 0;
-    };
-  }
+	function MockErrors(errs) {
+		this.errors = errs;
+		this.hasErrors = function() {
+			return this.errors && this.errors.length > 0;
+		};
+	}
 
-  function mkCall(name){
-    return {method: name, url: name};
-  }
-  
-  var mockLauncher, mockInstance;
+	function mkCall(name) {
+		return {
+			method: name,
+			url: name
+		};
+	}
 
-  function MockLauncher(){
+	var mockLauncher, mockInstance;
+	var errorCodes = corespring.require('error-codes');
+	var onError, editor, Editor;
 
-    this.init = jasmine.createSpy('init').and.returnValue(true);
+	beforeEach(function() {
 
-    this.loadInstance = jasmine.createSpy('loadInstance').and.returnValue(mockInstance);
-    
-    this.loadCall = jasmine.createSpy('loadCall').and.callFake(function(){
-      return {method: 'GET', url: 'catalog/:itemId'};
-    });
+		$.ajax = jasmine.createSpy('$.ajax');
 
-    this.mkInstance = jasmine.createSpy('mkInstance').and.callFake(function(){
-      return mockInstance;
-    });
+		console.log('new launcher and instance..');
+		mockInstance = new org.corespring.mocks.launcher.MockInstance();
+    var MockLauncher = org.corespring.mocks.launcher.MockLauncher(mockInstance);
+		mockLauncher = new MockLauncher();
 
-    this.prepareUrl = jasmine.createSpy('prepareUrl').and.callFake(function(){
-      return Array.prototype.join.call(arguments, '-');
-    });
+		corespring.mock.modules['client-launcher'] = function() {
+			return mockLauncher;
+		};
+		onError = jasmine.createSpy('onError');
+		Editor = new corespring.require('editor');
+	});
 
-    this.log = function(){};
-  }
-
-
-  /**
-   * Mock some of the dependencies loaded by 'require' by using corespring.mock.
-   * Call the callback and pass the configured env.
-   * Note: we make use of corespring.mock in these specs:
-   *  console.log(corespring.mock);
-   */
-  function withRequire(obj, fn){
-
-    mockLauncher = new MockLauncher();
-
-    var env = {
-      'client-launcher' : function(){
-        return mockLauncher;
-      }
-    };
-
-    return function(){
-      var e = _.assign(env,obj);
-      _.map(e, function(value, key){
-        console.log('adding', key, 'to mock modules');
-        corespring.mock.modules[key] = value;
-      });
-      fn(e);
-    };
-  }
-
-  afterEach(function(){
-    corespring.mock.reset();
-  });
-
-  var errorCodes = corespring.require('error-codes');
+	afterEach(function() {
+		corespring.mock.reset();
+    $.ajax.calls.reset();
+	});
 
 
-  describe('constructor', function(){
+	describe('constructor', function() {
 
-    describe('init', function(){
+		it('calls launcher.init', function() {
+			var editor = new Editor('element', {}, onError);
+			expect(mockLauncher.init).toHaveBeenCalled();
+		});
 
-      var onError;
-      var editor;
-      beforeEach(function(){
-        onError = jasmine.createSpy('onError');
-        var Editor = new corespring.require('editor');
+
+		describe('loadDraftItem', function() {
+			it('calls loadCall(editor)', function() {
+				var editor = new Editor('element', {
+					itemId: 'itemId'
+				}, onError);
+				expect(mockLauncher.loadCall).toHaveBeenCalled();
+				var key = mockLauncher.loadCall.calls.mostRecent().args[0];
+				expect(key).toEqual('editor');
+			});
+
+			it('calls loadCall(devEditor)', function() {
+				var editor = new Editor('element', {
+					itemId: 'itemId',
+					devEditor: true
+				}, onError);
+				expect(mockLauncher.loadCall).toHaveBeenCalled();
+				var key = mockLauncher.loadCall.calls.mostRecent().args[0];
+				expect(key).toEqual('devEditor');
+			});
+
+			it('triggers an error if there is no call found', function() {
+				mockLauncher.loadCall.and.returnValue(null);
+				var editor = new Editor('element', {
+					itemId: 'itemId'
+				}, onError);
+				expect(onError).toHaveBeenCalled();
+			});
+
+			describe('loadInstance', function() {
+
+				function assertLoadInstance(opts, cb) {
+					return function() {
+						var call = {
+							method: 'GET',
+							url: '/url'
+						};
+						mockLauncher.loadCall.and.returnValue(call);
+						mockLauncher.loadInstance.and.callFake(function(call, params,
+							initData, onReady) {
+							onReady(mockInstance);
+						});
+						_.assign(opts, {
+							itemId: 'itemId'
+						});
+						var editor = new Editor('element', opts, onError);
+						cb(call, opts);
+					};
+				}
+
+				it('calls loadInstance with hash /supporting-materials/0',
+					assertLoadInstance({
+							selectedTab: 'supporting-materials'
+						},
+						function(call) {
+							expect(mockLauncher.loadInstance).toHaveBeenCalledWith({
+									method: 'GET',
+									url: '/url',
+									hash: '/supporting-materials/0'
+								},
+								undefined, {
+									profileConfig: undefined
+								},
+								jasmine.any(Function));
+						}));
+
+				it('calls loadInstance with hash /profile', assertLoadInstance({
+						selectedTab: 'profile'
+					},
+					function(call) {
+						expect(mockLauncher.loadInstance).toHaveBeenCalledWith({
+								method: 'GET',
+								url: '/url',
+								hash: '/profile'
+							},
+							undefined,
+							jasmine.any(Object),
+							jasmine.any(Function));
+					}));
+
+				it('calls loadInstance with profileConfig', assertLoadInstance({
+						profileConfig: {
+							profile: 'profile'
+						}
+					},
+					function(call) {
+						expect(mockLauncher.loadInstance).toHaveBeenCalledWith(
+							jasmine.any(Object),
+							undefined, {
+								profileConfig: {
+									profile: 'profile'
+								}
+							},
+							jasmine.any(Function));
+					}));
+
+				it('calls loadInstance with queryParams', assertLoadInstance({
+						queryParams: {
+							a: 'a'
+						}
+					},
+					function(call) {
+						expect(mockLauncher.loadInstance).toHaveBeenCalledWith(
+							jasmine.any(Object), {
+								a: 'a'
+							},
+							jasmine.any(Object),
+							jasmine.any(Function));
+					}));
+
+				it(
+					'loadInstance.onReady handler calls instance.css when loading devEditor',
+					assertLoadInstance({
+							devEditor: true
+						},
+						function(call) {
+							expect(mockInstance.css).toHaveBeenCalledWith('height', '100%');
+						}));
+
+				it(
+					'loadInstance.onReady handler does not call instance.css when loading devEditor',
+					assertLoadInstance({
+							devEditor: false
+						},
+						function(call) {
+							expect(mockInstance.css).not.toHaveBeenCalled();
+						}));
+
+				it('loadInstance.onReady handler calls onDraftLoaded',
+					assertLoadInstance({
+							onDraftLoaded: jasmine.createSpy('onDraftLoaded'),
+							itemId: 'itemId'
+						},
+						function(call, opts) {
+							expect(opts.onDraftLoaded).toHaveBeenCalledWith('itemId',
+								jasmine.any(String));
+						}));
+			});
+		});
+
+		describe('createItemAndDraft', function() {
+
+			it('calls launcher.loadCall(createItemAndDraft)', function() {
+				var editor = new Editor('element', {}, function() {});
+				expect(mockLauncher.loadCall).toHaveBeenCalledWith(
+					'createItemAndDraft');
+			});
+
+			it('calls $.ajax', function() {
+				mockLauncher.loadCall.and.returnValue({
+					method: 'GET',
+					url: 'createItemAndSession'
+				});
+				var editor = new Editor('element', {}, function() {});
+				expect($.ajax).toHaveBeenCalledWith({
+					type: 'GET',
+					url: 'createItemAndSession',
+					data: {
+						draftName: jasmine.any(String)
+					},
+					success: jasmine.any(Function),
+					error: jasmine.any(Function),
+					dataType: 'json'
+				});
+			});
+
+			it('calls errorCallback when an $.ajax error occurs', function() {
+				mockLauncher.loadCall.and.returnValue({
+					method: 'GET',
+					url: 'createItemAndSession'
+				});
+				$.ajax.and.callFake(function(opts) {
+					opts.error({
+						responseJSON: {
+							error: 'e'
+						}
+					});
+				});
+
+				var editor = new Editor('element', {}, onError);
+				expect(onError).toHaveBeenCalledWith({
+					code: 113,
+					msg: 'e'
+				});
+			});
+
+			describe('when there is a createItemAndSesson ajax call', function() {
+
+				var opts;
+
+				beforeEach(function() {
+					mockLauncher.loadCall.and.returnValue({
+						method: 'GET',
+						url: 'createItemAndSession'
+					});
+					$.ajax.and.callFake(function(opts) {
+						opts.success({
+							itemId: 'itemId',
+							draftName: 'draftName'
+						});
+					});
+
+					opts = {
+						onItemCreated: jasmine.createSpy('onItemCreated'),
+						onDraftCreated: jasmine.createSpy('onDraftCreated')
+					};
+					var editor = new Editor('element', opts, onError);
+				});
+
+				it('calls options.onItemCreated when $.ajax is successful',
+					function() {
+						expect(opts.onItemCreated).toHaveBeenCalledWith('itemId');
+					});
+
+				it('calls options.onDraftCreated when $.ajax is successful',
+					function() {
+						expect(opts.onDraftCreated).toHaveBeenCalledWith('itemId',
+							'draftName');
+					});
+
+				it('calls launcher.loadCall', function() {
+					expect(mockLauncher.loadCall).toHaveBeenCalledWith('editor',
+						jasmine.any(Function));
+				});
+
+				it('calls launcher.loadInstance', function() {
+					expect(mockLauncher.loadInstance).toHaveBeenCalled();
+				});
+
+			});
+
+		});
+
+
+	});
+
+	describe('commitDraft', function() {
+
+		it('calls commitDraft endpoint', function(){
+
         var editor = new Editor('element', {}, onError);
-      });
-
-      it('calls launcher.init', function(){
-        expect(true).toEqual(false);
-      });
+        var cb = jasmine.createSpy('cb');
+        editor.commitDraft(false, cb);
+        expect($.ajax).toHaveBeenCalledWith({
+          type: 'GET',
+          url: 'createItemAndDraft',
+          data: { draftName: jasmine.any(String)},
+          success: jasmine.any(Function),
+          error: jasmine.any(Function),
+          dataType: 'json'
+        });
     });
 
-    /*describe('with no options', function(){
-
-      it('should create the item and draft', withRequire({},
-        function(){
-
-          spyOn($, 'ajax');
-
-          var opts = {
-            onItemCreated: jasmine.createSpy('onItemCreated'),
-            onDraftCreated: jasmine.createSpy('onDraftCreated')
-          };
-
-          var editor = new (corespring.require('editor'))('blah', opts, onError);
-          expect(onError).not.toHaveBeenCalled();
-          var ajax = $.ajax.calls.mostRecent().args[0];
-          expect(ajax.type).toEqual('createItemAndDraft');
-          expect(ajax.url).toEqual('http://base/createItemAndDraft?a=a');
-          expect(ajax.success).not.toBe(null);
-          expect(ajax.error).not.toBe(null);
-          expect(ajax.dataType).toEqual('json');
-
-          ajax.success({itemId: '1', draftName: 'name'});
-          expect(opts.onDraftCreated).toHaveBeenCalledWith('1', 'name');
-      }));*/
-
+    it('calls callback with err if the commitDraft endpoint returns an error', function(){
+        var editor = new Editor('element', {}, onError);
+        $.ajax.and.callFake(function(opts){
+          opts.error({responseJSON: { error: 'failed'}});
+        });
+        var cb = jasmine.createSpy('cb');
+        editor.commitDraft(false, cb);
+        expect(cb).toHaveBeenCalledWith(errorCodes.COMMIT_DRAFT_FAILED('failed'));
     });
 
-    /*describe('with itemId', function(){
-
-      var instance = jasmine.createSpy('instance-one').and.callFake(function(){
-        return {
-          on: jasmine.createSpy('on').and.callFake(function(name, cb){
-          }),
-          send: jasmine.createSpy('send')
-        };
-      });
-
-      it('should load the editor with itemId and a generated draftName',  withRequire({ 'instance' : instance },
-       function(env){
-        var opts =  {
-          itemId: 'itemId',
-          onDraftCreated: jasmine.createSpy('onDraftCreated')
-        };
-        var editor = new (corespring.require('editor'))('blah', opts, onError);
-        expect(instance).toHaveBeenCalled();
-        var constructorArgs = instance.calls.mostRecent().args[1];
-        expect(constructorArgs.itemId).toEqual('itemId');
-        expect(constructorArgs.url.indexOf('http://base/editor/itemId~')).toEqual(0);
-      }));
-    });
-
-    describe('with draftName', function(){
-
-      var readyHandler = null;
-      var instance = jasmine.createSpy('instance!!').and.callFake(function(){
-        return {
-          on: jasmine.createSpy('on').and.callFake(function(name, cb){
-            if(name === 'ready'){
-              readyHandler = cb;
-            }
-          }),
-          send: jasmine.createSpy('send')
-        };
-      });
-
-      it('should load the editor with itemId~draftName',  withRequire({
-        instance: instance
-      }, function(){
-        var opts = {
-          itemId: 'itemId',
-          draftName: 'draftName',
-          onDraftLoaded: jasmine.createSpy('onDraftLoaded')
-        };
-        var editor = new (corespring.require('editor'))('blah', opts, onError);
-        expect(instance).toHaveBeenCalled();
-        var constructorArgs = instance.calls.mostRecent().args[1];
-        expect(constructorArgs.url).toEqual('http://base/editor/itemId~draftName');
-        readyHandler();
-        expect(opts.onDraftLoaded).toHaveBeenCalled();
-      }));
-    });
-  });
-
-  describe('commitDraft', function(){
-    it('calls commitDraft endpoint and returns an error', withRequire({}, function(){
-      var editor = new (corespring.require('editor'))('blah', {draftId: 'draftId'}, function(){});
-      spyOn($, 'ajax').and.callFake(function(opts){
-        opts.error({responseJSON: { error: 'error!'}});
-      });
-      var callback = jasmine.createSpy('callback');
-      editor.commitDraft(false, callback);
-      expect(callback).toHaveBeenCalledWith({code: 111, msg: 'error!'});
-    }));
-
-    it('calls commitDraft endpoint and returns success', withRequire({}, function(){
-      var editor = new (corespring.require('editor'))('blah', {draftId: 'draftId'}, function(){});
-      spyOn($, 'ajax').and.callFake(function(opts){
-        opts.success({});
-      });
-      var callback = jasmine.createSpy('callback');
-      editor.commitDraft(false, callback);
-      expect(callback).toHaveBeenCalledWith(null);
-    }));
-  });
-  */
+		it('calls callback with no err if the commitDraft endpoint returns success', function(){
+        var editor = new Editor('element', {}, onError);
+        $.ajax.and.callFake(function(opts){
+          opts.success();
+        });
+        var cb = jasmine.createSpy('cb');
+        editor.commitDraft(false, cb);
+        expect(cb).toHaveBeenCalledWith(null);
+			});
+	});
 });

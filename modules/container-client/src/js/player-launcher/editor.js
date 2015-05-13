@@ -2,6 +2,7 @@ function EditorDefinition(element, options, errorCallback) {
 
   var Launcher = require('client-launcher');
   var launcher = new Launcher(element, options, errorCallback);
+  var errorCodes = require('error-codes');
 
   function createItemAndDraft(callback){
 
@@ -28,17 +29,20 @@ function EditorDefinition(element, options, errorCallback) {
       callback(null, result);
     }
 
+    function onError(xhrErr){
+      var msg = (xhrErr.responseJSON && xhrErr.responseJSON.error) ? xhrErr.responseJSON.error : 'Failed to commit draft: ' + options.draftId;
+      callback(msg);
+    }
+
     $.ajax({
       type: call.method,
       url: launcher.prepareUrl(call.url),
       data: options,
       success: onSuccess,
-      error: callback.bind(this),
+      error: onError.bind(this),
       dataType: 'json'
     });
   }
-
-  var errorCodes = require('error-codes');
 
   function loadDraftItem(draftId, options) {
 
@@ -90,10 +94,15 @@ function EditorDefinition(element, options, errorCallback) {
       loadDraftItem(draftId.toString(), options);
     } else {
       createItemAndDraft(function(err, result){
-        options.itemId = result.itemId;
-        options.draftName = result.draftName;
-        var draftId = new DraftId(options.itemId, options.draftName);
-        loadDraftItem(draftId.toString(), options);
+
+        if(err){
+          errorCallback(errorCodes.CREATE_ITEM_AND_DRAFT_FAILED(err));
+        } else {
+          options.itemId = result.itemId;
+          options.draftName = result.draftName;
+          var draftId = new DraftId(options.itemId, options.draftName);
+          loadDraftItem(draftId.toString(), options);
+        }
       });
     }
 
@@ -112,7 +121,7 @@ function EditorDefinition(element, options, errorCallback) {
     var call = launcher.loadCall('commitDraft', function(u){
       return u.replace(':draftId',new DraftId(options.itemId, options.draftName).toString());
     });
-    
+
     function onSuccess(result){
       if(callback){
         callback(null);
@@ -122,7 +131,7 @@ function EditorDefinition(element, options, errorCallback) {
     function onError(err){
       var msg = (err.responseJSON && err.responseJSON.error) ? err.responseJSON.error : 'Failed to commit draft: ' + options.draftId;
       if(callback){
-        callback({code: 111, msg: msg});
+        callback(errorCodes.COMMIT_DRAFT_FAILED(msg));
       }
     }
 

@@ -11,3 +11,5 @@ exports.MESSAGE_ERROR = function(msg){ return {code: 109, message: msg}; };
 exports.PLAYER_NOT_REMOVED = {code: 110, message: 'Unexpected re-initialisation of the player. Call player.remove() before creating a new player instance.'};
 exports.EDITOR_NOT_REMOVED = {code: 111, message: 'Unexpected re-initialisation of the editor. Call editor.remove() before creating a new editor instance.'};
 exports.INSTANCE_NOT_READY = { code: 112, message: 'Instance not ready yet'};
+exports.CREATE_ITEM_AND_DRAFT_FAILED = function(msg){ return {code: 113, msg: msg};};
+exports.COMMIT_DRAFT_FAILED = function(msg){ return {code: 114, msg: msg};};
