@@ -1,4 +1,4 @@
-describe('player-launcher:editor-test', function () {
+describe('player-launcher.editor', function () {
 
   var origRequire = corespring.require;
 
@@ -12,6 +12,30 @@ describe('player-launcher:editor-test', function () {
   function mkCall(name){
     return {method: name, url: name};
   }
+  
+  var mockLauncher, mockInstance;
+
+  function MockLauncher(){
+
+    this.init = jasmine.createSpy('init').and.returnValue(true);
+
+    this.loadInstance = jasmine.createSpy('loadInstance').and.returnValue(mockInstance);
+    
+    this.loadCall = jasmine.createSpy('loadCall').and.callFake(function(){
+      return {method: 'GET', url: 'catalog/:itemId'};
+    });
+
+    this.mkInstance = jasmine.createSpy('mkInstance').and.callFake(function(){
+      return mockInstance;
+    });
+
+    this.prepareUrl = jasmine.createSpy('prepareUrl').and.callFake(function(){
+      return Array.prototype.join.call(arguments, '-');
+    });
+
+    this.log = function(){};
+  }
+
 
   /**
    * Mock some of the dependencies loaded by 'require' by using corespring.mock.
@@ -21,23 +45,12 @@ describe('player-launcher:editor-test', function () {
    */
   function withRequire(obj, fn){
 
+    mockLauncher = new MockLauncher();
+
     var env = {
-      'query-params' : {
-        a: 'a'
-      },
-      'default-options': {
-        corespringUrl: 'http://base/',
-        paths: {
-          editor: mkCall('editor/:draftId'),
-          devEditor: mkCall('dev-editor/:draftId'),
-          createItemAndDraft: mkCall('createItemAndDraft'),
-          commitDraft: mkCall('commitDraft')
-        }
-      },
-      instance : function(){
-        this.on = function(){};
-      },
-      'launcher-errors' : new MockErrors([])
+      'client-launcher' : function(){
+        return mockLauncher;
+      }
     };
 
     return function(){
@@ -54,37 +67,27 @@ describe('player-launcher:editor-test', function () {
     corespring.mock.reset();
   });
 
-  var errors = corespring.require('errors');
+  var errorCodes = corespring.require('error-codes');
 
 
   describe('constructor', function(){
 
-    var onError;
+    describe('init', function(){
 
-    beforeEach(function(){
-      onError = jasmine.createSpy('onError');
+      var onError;
+      var editor;
+      beforeEach(function(){
+        onError = jasmine.createSpy('onError');
+        var Editor = new corespring.require('editor');
+        var editor = new Editor('element', {}, onError);
+      });
+
+      it('calls launcher.init', function(){
+        expect(true).toEqual(false);
+      });
     });
 
-    describe('launcherErrors', function(){
-
-      it('calls the error handler if there are launcher errors', withRequire(
-          { 'launcher-errors': new MockErrors(['error one']) },
-          function(){
-            var editor = new (corespring.require('editor'))('blah', {}, onError);
-            expect(onError).toHaveBeenCalledWith(errors.EXTERNAL_ERROR('error one'));
-      }));
-
-
-      it('calls error handler if options does not contain paths object', withRequire(
-        { 'default-options' : { paths: {}}},
-        function() {
-          var editor = new (corespring.require('editor'))('blah', {}, onError);
-          expect(onError).toHaveBeenCalledWith(errors.EXTERNAL_ERROR('createItemAndDraft not part of options'));
-      }));
-
-    });
-
-    describe('with no options', function(){
+    /*describe('with no options', function(){
 
       it('should create the item and draft', withRequire({},
         function(){
@@ -107,11 +110,11 @@ describe('player-launcher:editor-test', function () {
 
           ajax.success({itemId: '1', draftName: 'name'});
           expect(opts.onDraftCreated).toHaveBeenCalledWith('1', 'name');
-      }));
+      }));*/
 
     });
 
-    describe('with itemId', function(){
+    /*describe('with itemId', function(){
 
       var instance = jasmine.createSpy('instance-one').and.callFake(function(){
         return {
@@ -187,6 +190,6 @@ describe('player-launcher:editor-test', function () {
       editor.commitDraft(false, callback);
       expect(callback).toHaveBeenCalledWith(null);
     }));
-
   });
+  */
 });

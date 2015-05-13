@@ -1,17 +1,16 @@
-describe('new catalog launcher', function () {
+describe('catalog launcher', function () {
 
-  var errors = corespring.require('errors');
+  var errorCodes = corespring.require('error-codes');
   var CatalogDefinition;
   var errorCallback;
   var mockInstance;
 
   function MockLauncher(){
 
-    this.mockInit = function(){
-      this.loadClient();
-    };
-    this.init = jasmine.createSpy('init').and.callFake(this.mockInit);
+    this.init = jasmine.createSpy('init').and.returnValue(true);
 
+    this.loadInstance = jasmine.createSpy('loadInstance').and.returnValue(mockInstance);
+    
     this.loadCall = jasmine.createSpy('loadCall').and.callFake(function(){
       return {method: 'GET', url: 'catalog/:itemId'};
     });
@@ -27,7 +26,7 @@ describe('new catalog launcher', function () {
     corespring.mock.modules['client-launcher'] = function(){
       return mockLauncher;
     };
-    CatalogDefinition = corespring.require('new-catalog');
+    CatalogDefinition = corespring.require('catalog');
   });
 
   afterEach(function () {
@@ -43,22 +42,23 @@ describe('new catalog launcher', function () {
   describe('loadClient -> loadItem', function(){
     it('should invoke error callback with NO_ITEM_ID if there is no itemId', function () {
       create({});
-      expect(errorCallback).toHaveBeenCalledWith(errors.NO_ITEM_ID);
+      expect(errorCallback).toHaveBeenCalledWith(errorCodes.NO_ITEM_ID);
     });
 
     it('should not invoke an error if there is itemId', function () {
       create({itemId: '1'});
-      expect(errorCallback).not.toHaveBeenCalledWith(errors.NO_ITEM_ID);
+      expect(errorCallback).not.toHaveBeenCalledWith(errorCodes.NO_ITEM_ID);
     });
 
     it('should call loadCall(\'catalog\') if there is itemId', function () {
       create({itemId: '1'});
-      expect(mockLauncher.loadCall).toHaveBeenCalledWith('catalog');
+      var firstParam = mockLauncher.loadCall.calls.mostRecent().args[0];
+      expect(firstParam).toEqual('catalog');
     });
 
     it('should call mkInstance if there is itemId', function () {
       create({itemId: '1'});
-      expect(mockLauncher.mkInstance).toHaveBeenCalledWith('catalog/1', null);
+      expect(mockLauncher.loadInstance).toHaveBeenCalledWith({method: 'GET', url: 'catalog/:itemId'},{});
     });
   });
 

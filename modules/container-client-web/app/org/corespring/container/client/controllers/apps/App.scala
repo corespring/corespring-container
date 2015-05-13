@@ -61,8 +61,6 @@ trait App[T]
 
   }
 
-  //def load(id: String): Action[AnyContent]
-
   val typeRegex = "(.*?)-(.*)".r
 
   /**
@@ -97,7 +95,7 @@ trait App[T]
   protected def buildJs(scriptInfo: ComponentScriptInfo,
     extras: Seq[String] = Seq.empty)(implicit rh: RequestHeader) = {
     val mainJs = paths(jsSrc)
-    val js = mainJs ++ jsSrc.otherLibs ++ scriptInfo.jsUrl.toSeq ++ extras
+    val js = mainJs ++ jsSrc.otherLibs ++ scriptInfo.jsUrl ++ extras
     js.distinct.map(resolvePath)
   }
 

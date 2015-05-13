@@ -1,18 +1,13 @@
 package org.corespring.container.client.controllers
 
-import java.io.{ File, InputStream }
-
-import org.apache.commons.io.IOUtils
 import org.corespring.container.client.V2PlayerConfig
+import org.corespring.container.client.controllers.launcher.{ JsBuilder, JsResource }
 import org.corespring.container.client.hooks.{ PlayerJs, PlayerLauncherHooks }
-import org.corespring.container.client.views.txt.js.ServerLibraryWrapper
 import org.corespring.container.logging.ContainerLogger
-import play.api.Play
 import play.api.http.ContentTypes
 import play.api.libs.json.Json.JsValueWrapper
-import play.api.libs.json.{ JsString, JsObject, Json }
-import play.api.mvc.Session
-import play.api.mvc._
+import play.api.libs.json.{ JsObject, Json }
+import play.api.mvc.{ Session, _ }
 
 import scala.concurrent.ExecutionContext
 
@@ -43,7 +38,8 @@ trait PlayerLauncher extends Controller {
     }
   }
 
-  import org.corespring.container.client.controllers.apps.routes.{ Editor, DevEditor, Player, Catalog }
+  import JsResource._
+  import org.corespring.container.client.controllers.apps.routes.{ Catalog, DevEditor, Editor, Player }
 
   def hooks: PlayerLauncherHooks
 
@@ -62,34 +58,35 @@ trait PlayerLauncher extends Controller {
     pathToNameAndContents(jsPath)
   }
 
-  implicit def callToJson(c: Call): JsValueWrapper = Json.obj("method" -> c.method, "url" -> c.url)
+  implicit def callToJson(c: Call): JsObject = Json.obj("method" -> c.method, "url" -> c.url)
 
   object LaunchOptions {
 
     import org.corespring.container.client.controllers.resources.routes.ItemDraft
 
     val catalog = Json.obj(
-      "paths" -> Json.obj(
-        "catalog" -> Catalog.load(":itemId")))
+      "paths" -> JsObject(
+        Seq(
+          "catalog" -> Catalog.load(":itemId"))))
 
     val editor = {
       Json.obj(
-        "paths" -> Json.obj(
+        "paths" -> JsObject(Seq(
           "editor" -> Editor.load(":draftId"),
           "devEditor" -> DevEditor.load(":draftId"),
           "createItemAndDraft" -> ItemDraft.createItemAndDraft(),
-          "commitDraft" -> ItemDraft.commit(":draftId")))
+          "commitDraft" -> ItemDraft.commit(":draftId"))))
     }
 
     val player = {
       val loadSession = Player.load(":sessionId")
       Json.obj(
         "mode" -> "gather",
-        "paths" -> Json.obj(
+        "paths" -> JsObject(Seq(
           "createSession" -> Player.createSessionForItem(":id"),
           "gather" -> loadSession,
           "view" -> loadSession,
-          "evaluate" -> loadSession))
+          "evaluate" -> loadSession)))
     }
   }
 
@@ -118,33 +115,6 @@ trait PlayerLauncher extends Controller {
     }
   }
 
-  /**
-   * Read a js resource from the classpath
-   * @param p
-   * @return name (without suffix) -> source
-   */
-  private def pathToNameAndContents(p: String): (String, String) = {
-    import grizzled.file.GrizzledFile._
-    import Play.current
-    Play.resource(p).map {
-      r =>
-        val name = new File(r.getFile).basename.getName.replace(".js", "")
-
-        val input = r.getContent().asInstanceOf[InputStream]
-        try {
-          val contents = IOUtils.toString(input)
-          input.close()
-          (name, contents)
-        } catch {
-          case e: Throwable => throw new RuntimeException("Error converting input to string", e)
-        } finally {
-          IOUtils.closeQuietly(input)
-        }
-    }.getOrElse {
-      throw new RuntimeException(s"Can't find resource for path: $p")
-    }
-  }
-
   val SecureMode = "corespring.player.secure"
 
   private def sumSession(s: Session, keyValues: (String, String)*): Session = {
@@ -162,77 +132,3 @@ trait PlayerLauncher extends Controller {
   }
 }
 
-class JsBuilder(corespringUrl: String) {
-
-  lazy val coreJs: String = {
-    val corePaths = Seq(
-      "container-client/bower_components/msgr.js/dist/msgr.js",
-      "container-client/js/player-launcher/logger.js",
-      "container-client/js/player-launcher/error-codes.js",
-      "container-client/js/player-launcher/instance.js",
-      "container-client/js/player-launcher/client-launcher.js",
-      "container-client/js/player-launcher/url-builder.js",
-      "container-client/js/player-launcher/object-id.js")
-    val rawJs = pathToNameAndContents("container-client/js/corespring/core-library.js")._2
-    val wrapped = corePaths.map(pathToNameAndContents).map(t => ServerLibraryWrapper(t._1, t._2))
-    val bootstrap =
-      s"""
-         |window.org = window.org || {};
-         |org.corespring = org.corespring || {};
-         |org.corespring.players = org.corespring.players || {};
-      """.stripMargin
-    s"""$bootstrap
-        $rawJs
-        ${wrapped.mkString("\n")}
-      """
-  }
-
-  /**
-   * Read a js resource from the classpath
-   * @param p
-   * @return name (without suffix) -> source
-   */
-  private def pathToNameAndContents(p: String): (String, String) = {
-    import grizzled.file.GrizzledFile._
-    import Play.current
-    Play.resource(p).map {
-      r =>
-        val name = new File(r.getFile).basename.getName.replace(".js", "")
-
-        val input = r.getContent().asInstanceOf[InputStream]
-        try {
-          val contents = IOUtils.toString(input)
-          input.close()
-          (name, contents)
-        } catch {
-          case e: Throwable => throw new RuntimeException("Error converting input to string", e)
-        } finally {
-          IOUtils.closeQuietly(input)
-        }
-    }.getOrElse {
-      throw new RuntimeException(s"Can't find resource for path: $p")
-    }
-  }
-
-  private def queryStringToJson(implicit rh: RequestHeader) = JsObject(rh.queryString.mapValues { v => JsString(v.mkString) }.toSeq)
-
-  def build(additionalJsNameAndSrc: (String, String), options: JsObject, bootstrapLine: String)(implicit request: Request[AnyContent], js: PlayerJs): String = {
-    val fullConfig = Json.obj(
-      "corespringUrl" -> corespringUrl,
-      "queryParams" -> queryStringToJson,
-      "errors" -> js.errors,
-      "warnings" -> js.warnings) ++ options
-    val fullConfigJs = ("launch-config" -> s"module.exports = ${Json.stringify(fullConfig)}")
-    val wrappedNameAndContents = Seq(fullConfigJs, additionalJsNameAndSrc)
-    val wrappedContents = wrappedNameAndContents.map(tuple => ServerLibraryWrapper(tuple._1, tuple._2))
-
-    def sumSession(s: Session, keyValues: (String, String)*): Session = {
-      keyValues.foldRight(s)((kv: (String, String), acc: Session) => acc + (kv._1, kv._2))
-    }
-
-    s"""
-       $coreJs
-       ${wrappedContents.mkString("\n")}
-       $bootstrapLine"""
-  }
-}
