@@ -97,42 +97,14 @@ describe('player launcher', function() {
       return out;
     }
 
-    /*function createModeChangeResultMessage(modeChangeResult) {
-      return "Change mode" +
-        " from " + modeChangeResult.fromMode +
-        " to " + modeChangeResult.toMode +
-        " with complete = " + modeChangeResult.complete +
-        " and secure = " + modeChangeResult.secure;
-    }*/
-
     beforeEach(function() {
 
       modeErrorCallback = jasmine.createSpy('modeErrorCallback');
 
-      /*function mkCompareFn(expectSuccess, successMsg, failedMsg) {
-        return function(actual, expected){
-          var testResult = actual.do();
-          var pass = expectSuccess ? !testResult.lastError : testResult.lastError;
-          var message = createModeChangeResultMessage(testResult) +
-            " " + (pass ? successMsg : failedMsg );
-          return { pass: pass, message: message};
-        };
-      }*/
-
-      function compareFn(count, label){
-        return function(mc){
-          function createMessage(mc, pass) {
-            return label + 'Change mode ' + mc.from + '->' + mc.to +
-              ' with complete: ' + mc.complete +
-              ' and secure: ' + mc.secure + ' passed? ' + pass;
-          }
-          
-          var pass = mc.errorCount === 0;
-          return {
-            pass: pass,
-            message: createMessage(mc, pass)
-          };
-        };
+      function createMessage(mc, pass) {
+        return 'Change mode ' + mc.from + '->' + mc.to +
+          ' with complete: ' + mc.complete +
+          ' and secure: ' + mc.secure + ' passed? ' + pass;
       }
 
       jasmine.addMatchers({
@@ -142,18 +114,7 @@ describe('player launcher', function() {
               var pass = mc.errorCount === 0;
               return {
                 pass: pass,
-                message: createMessage(mc, pass) //'standard message'
-              };
-            }
-          };
-        },
-        toFail: function(util, customEqualityTesters) {
-          return {
-            compare: function(mc){
-              var pass = mc.errorCount === 1;
-              return{
-                pass: pass,
-                message: createMessage(mc, pass)
+                message: createMessage(mc, pass) 
               };
             }
           };
@@ -205,9 +166,9 @@ describe('player launcher', function() {
     it("should work as expected when complete is false and secure is true", function() {
       var opts = {complete: false, secure: true};
       expect(setMode('gather->view', opts)).toSucceed();
-      expect(setMode('gather->evaluate', opts)).toFail();
+      expect(setMode('gather->evaluate', opts)).not.toSucceed();
       expect(setMode('view->gather', opts)).toSucceed();
-      expect(setMode('view->evaluate', opts)).toFail();
+      expect(setMode('view->evaluate', opts)).not.toSucceed();
       expect(setMode('evaluate->gather', opts)).toSucceed();
       expect(setMode('evaluate->view', opts)).toSucceed();
     });
@@ -216,9 +177,9 @@ describe('player launcher', function() {
       var opts = {complete: true, secure: true};
       expect(setMode('gather->view', opts)).toSucceed();
       expect(setMode('gather->evaluate', opts)).toSucceed();
-      expect(setMode('view->gather', opts)).toFail();
+      expect(setMode('view->gather', opts)).not.toSucceed();
       expect(setMode('view->evaluate', opts)).toSucceed();
-      expect(setMode('evaluate->gather', opts)).toFail();
+      expect(setMode('evaluate->gather', opts)).not.toSucceed();
       expect(setMode('evaluate->view', opts)).toSucceed();
     });
   });

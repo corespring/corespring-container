@@ -3,6 +3,8 @@
  */
 
 var Instance = function(call,  element, errorCallback, log) {
+
+  log = log || require('logger');
   log.info('--> new instance');
   log.info('call', call);
 
