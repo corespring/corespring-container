@@ -6,11 +6,6 @@ angular.module('corespring-player.controllers')
       '$location',
       function($log, $scope, $location) {
 
-        var color = 'color: #00ef4f; background-color: #142811;';
-
-        console.warn('%c TODO - hook showPreviewButton backup with player launcher', color);
-        //$scope.showPreviewButton = ($location.search().showPreviewButton) ? 'true' : 'false';
-
         $scope.playerSettings = {
           maxNoOfAttempts: 1,
           highlightUserResponse: true,

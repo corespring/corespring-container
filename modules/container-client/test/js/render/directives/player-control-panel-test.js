@@ -37,58 +37,6 @@ describe('playerControlPanel', function() {
 
   });
 
-  describe('showPreviewButton attribute', function() {
-
-    describe('undefined', function() {
-      var scope, element;
-
-      beforeEach(function() {
-        scope = rootScope.$new();
-        element = compile('<div player-control-panel=""></div>')(scope);
-        scope = element.isolateScope();
-        scope.$digest();
-      });
-
-      it('should hide preview button', function() {
-        expect($('.preview-holder', element).hasClass('ng-hide')).toBe(true);
-      });
-
-    });
-
-    describe('true', function() {
-      var scope, element;
-
-      beforeEach(function() {
-        scope = rootScope.$new();
-        element = compile('<div player-control-panel="" show-preview-button="true"></div>')(scope);
-        scope = element.isolateScope();
-        scope.$digest();
-      });
-
-      it('should show preview button', function() {
-        expect($('.preview-holder', element).hasClass('ng-hide')).toBe(false);
-      });
-
-    });
-
-    describe('false', function() {
-      var scope, element;
-
-      beforeEach(function() {
-        scope = rootScope.$new();
-        element = compile('<div player-control-panel="" show-preview-button="false"></div>')(scope);
-        scope = element.isolateScope();
-        scope.$digest();
-      });
-
-      it('should hide preview button', function() {
-        expect($('.preview-holder', element).hasClass('ng-hide')).toBe(true);
-      });
-
-    });
-
-  });
-
   describe('showSettingsButton attribute', function() {
 
     describe('undefined', function() {

@@ -66,6 +66,7 @@ exports.define = function(isSecure) {
 
     if(initOk){
       var call = prepareCall();
+
       var params = options.queryParams; 
       var initialData = {mode: options.mode};
       initialData[options.mode] = options[options.mode] || {};
