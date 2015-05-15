@@ -3,7 +3,7 @@ package org.corespring.container.client.controllers.apps
 import org.corespring.container.client.component.AllItemTypesReader
 import org.corespring.container.client.controllers.GetAsset
 import org.corespring.container.client.controllers.jade.Jade
-import org.corespring.container.client.hooks.CatalogHooks
+import org.corespring.container.client.hooks.{ LoadHook, CatalogHooks }
 import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.client.views.txt.js.CatalogServices
 import play.api.libs.json.{ JsArray, JsString, JsValue, Json }
@@ -41,7 +41,7 @@ trait Catalog
     implicit request => Future { hooks.loadSupportingMaterialFile(itemId, path)(request) }
   }
 
-  override def load(id: String): Action[AnyContent] = Action.async {
+  def load(id: String): Action[AnyContent] = Action.async {
     implicit request =>
       hooks.showCatalog(id).flatMap { e =>
 

@@ -129,6 +129,8 @@ trait DefaultIntegration
     override def components: Seq[Component] = DefaultIntegration.this.components
 
     override def hooks = editorHooks
+
+    override def resolveDomain(path: String): String = DefaultIntegration.this.resolveDomain(path)
   }
 
   lazy val devEditor = new DevEditor {
@@ -141,6 +143,8 @@ trait DefaultIntegration
     override def components: Seq[Component] = DefaultIntegration.this.components
 
     override def hooks = editorHooks
+
+    override def resolveDomain(path: String): String = DefaultIntegration.this.resolveDomain(path)
   }
 
   lazy val catalog = new Catalog {

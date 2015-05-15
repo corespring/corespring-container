@@ -137,6 +137,7 @@ module.exports = (grunt) ->
             'angular-ui-bootstrap-bower/ui-bootstrap-tpls.js',
             'msgr.js/dist/msgr.js'], comps)
           specs: [
+            '<%= common.test %>/js/**/*-mocks.js',
             '<%= common.test %>/js/**/*-test.js',
             '!<%= common.test %>/js/old-*/**/*-test.js'
             ]
@@ -241,7 +242,7 @@ module.exports = (grunt) ->
     ['bower_clean',
     'shell:mathjax_rm_pngs',
     'shell:mathjax_rm_fonts'])
-  
+
   ###
   Result handler for spawned grunt tasks
   ###
@@ -273,5 +274,3 @@ module.exports = (grunt) ->
   grunt.registerTask 'component-less', ->
     done = @async()
     runComponentGrunt('less', done)
-
-

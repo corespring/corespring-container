@@ -6,7 +6,7 @@ import org.corespring.container.client.controllers.{ AssetType, Assets }
 
 import scala.concurrent.Future
 
-import org.corespring.container.client.hooks.{ PlayerHooks => ContainerPlayerHooks }
+import org.corespring.container.client.hooks.{ PlayerHooks => ContainerPlayerHooks, LoadHook }
 import org.corespring.mongo.json.services.MongoService
 import play.api.libs.json._
 import play.api.mvc._
@@ -23,20 +23,7 @@ trait PlayerHooks extends ContainerPlayerHooks {
   def assets: Assets
   def itemService: MongoService
 
-  private def toItemId(json: JsValue): Option[String] = (json \ "itemId").asOpt[String]
-
-  override def load(id: String)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] = Future {
-    val item: Validation[String, JsValue] = for {
-      s <- sessionService.load(id).toSuccess(s"can't find session with id: $id")
-      itemId <- toItemId(s).toSuccess(s"error converting string to item id: $s")
-      i <- itemService.load(itemId).toSuccess(s"can't load item with id: $itemId")
-    } yield {
-      i
-    }
-    item.leftMap(s => (500, s)).toEither
-  }
-
-  override def createSessionForItem(itemId: String)(implicit header: RequestHeader): Future[Either[(Int, String), String]] = Future {
+  override def createSessionForItem(itemId: String)(implicit header: RequestHeader): Future[Either[(Int, String), (JsValue, JsValue)]] = Future {
 
     val settings = Json.obj(
       "maxNoOfAttempts" -> JsNumber(2),
@@ -49,7 +36,10 @@ trait PlayerHooks extends ContainerPlayerHooks {
 
     sessionService.create(session).map {
       oid =>
-        Right(oid.toString)
+        itemService.load(itemId).map { item =>
+          val withId = session ++ Json.obj("id" -> oid.toString)
+          Right((withId, item))
+        }.getOrElse(Left(NOT_FOUND -> s"Can't find item with id $itemId"))
     }.getOrElse(Left(BAD_REQUEST -> "Error creating session"))
   }
 
@@ -58,7 +48,9 @@ trait PlayerHooks extends ContainerPlayerHooks {
       session <- sessionService.load(sessionId)
       itemId <- (session \ "itemId").asOpt[String]
       item <- itemService.load(itemId)
-    } yield (session -> item)
+    } yield {
+      (session.as[JsObject] ++ Json.obj("id" -> sessionId), item)
+    }
 
     out.map(Right(_)).getOrElse(Left(NOT_FOUND -> "Can't find item or session"))
   }

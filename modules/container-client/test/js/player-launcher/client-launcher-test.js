@@ -1,0 +1,130 @@
+describe('client-launcher', function(){
+
+
+  var ClientLauncher = corespring.require('client-launcher');
+  var errorCodes = corespring.require('error-codes');
+  var onError;
+  var mockInstance; 
+  var mockConfig = {};
+
+  beforeEach(function(){
+    corespring.mock.modules['launch-config'] = {};
+    corespring.mock.modules.instance = org.corespring.mocks.launcher.MockInstance;
+    onError = jasmine.createSpy('onError');
+  });
+
+  afterEach(function(){
+    corespring.mock.reset();
+  });
+
+  describe('init', function(){
+
+   var c = { 'launch-config' : {
+      'errors' : ['error one']
+    }};
+
+    it('triggers an error if there are launchConfig errors', function(){
+      corespring.mock.modules['launch-config'] = {errors: ['error one']};
+      var launcher = new ClientLauncher('e', {}, onError);
+      var ok = launcher.init();
+      expect(ok).toBe(false);
+      expect(onError).toHaveBeenCalledWith(errorCodes.EXTERNAL_ERROR('error one'));
+      expect(onError.calls.count()).toEqual(1);
+    });
+    
+    it('triggers 2 errors if there are launchConfig errors', function(){
+      corespring.mock.modules['launch-config'] = {errors: ['error one', 'error two']};
+      var launcher = new ClientLauncher('e', {}, onError);
+      var ok = launcher.init();
+      expect(ok).toBe(false);
+      expect(onError).toHaveBeenCalledWith(errorCodes.EXTERNAL_ERROR('error two'));
+      expect(onError.calls.count()).toEqual(2);
+    });
+
+    it('should return true if the validation function returns an empty array', function(){
+      var launcher = new ClientLauncher('e', {}, onError);
+      var ok = launcher.init(function (opts){
+        return null; 
+      });
+      expect(ok).toEqual(true);
+    });
+
+    it('should return true if the validation function returns an empty array', function(){
+      var launcher = new ClientLauncher('e', {}, onError);
+      var ok = launcher.init(function (opts){
+        return []; 
+      });
+      expect(ok).toEqual(true);
+    });
+    
+    it('should return false if the validation returns an non empty array', function(){
+      var launcher = new ClientLauncher('e', {}, onError);
+      var ok = launcher.init(function (opts){
+        return [{code: 1, message: 'msg'}]; 
+      });
+      expect(ok).toEqual(false);
+    });
+    
+    it('should return call the errorCallback for a non empty array', function(){
+      var launcher = new ClientLauncher('e', {}, onError);
+      var ok = launcher.init(function (opts){
+        return [{code: 1, message: 'msg'}]; 
+      });
+      expect(onError.calls.count()).toEqual(1);
+    });
+
+    it('logs warnings', function(){
+      pending();
+    });
+  });
+
+
+  describe('loadInstance', function(){
+
+    var launcher;
+    var instance; 
+
+    var onReady;
+
+    beforeEach(function(){
+      onReady = jasmine.createSpy('onReady');
+      launcher = new ClientLauncher('e', {}, onError);
+      instance = launcher.loadInstance({}, {}, { init: true }, onReady);
+    });
+
+    it('creates the instance', function(){
+      expect(instance).toBeDefined();
+    });
+    
+    it('adds launch-error handler', function(){
+      expect(instance.on).toHaveBeenCalledWith('launch-error', jasmine.any(Function));
+    });
+    
+    it('calls the ready handler', function(){
+      instance.trigger('ready');
+      expect(onReady).toHaveBeenCalled();
+    });
+    
+    it('sends \'initialise\' message', function(){
+      instance.trigger('ready');
+      expect(instance.send).toHaveBeenCalledWith('initialise', {init: true});
+    });
+
+    it('adds launch-config params', function(){
+      corespring.mock.modules['launch-config'] = { queryParams: { a : 'a'}};
+      launcher = new ClientLauncher('e', {}, onError);
+      instance = launcher.loadInstance({url: 'url'}, {}, {}, function(){});
+      expect(instance.constructorArgs[0]).toEqual({url: 'url', params: {a: 'a'}});
+      expect(instance.constructorArgs[1]).toEqual('e');
+    });
+    
+    it('calls the errorCallback if ready before loadInstance is called', function(){
+      launcher = new ClientLauncher('e', {}, onError);
+      instance = launcher.loadInstance({url: 'url'}, {}, {}, function(){});
+      launcher.isReady = true;
+      instance.trigger('ready');
+      expect(onError).toHaveBeenCalled();  
+      expect(instance.removeChannel).toHaveBeenCalled();  
+    });
+  });
+});

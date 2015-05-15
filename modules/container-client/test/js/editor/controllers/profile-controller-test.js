@@ -262,17 +262,20 @@ describe('profile controller', function() {
 
     describe("save", function() {
       beforeEach(function() {
+        var collections = [{key:'key-1', value:'value-1'}, {key:'key-2', value:'value-2'},{key:'key-3', value:'value-3'}];
+        mockCollectionService.setListResult(collections);
+        mockItemService.loadResult = {collection:{id:'key-1'}};
         makeProfileController();
         mockItemService.saveCollectionIdCalls = [];
-        scope.item.collectionId = "some value";
         scope.$apply();
       });
       it("is not triggered when collectionId is set from item load", function() {
         expect(mockItemService.saveCollectionIdCalls.length).toEqual(0);
       });
       it("is triggered when collectionId is changed", function() {
-        scope.item.collectionId = "some other value";
-        scope.$apply();
+        mockItemService.saveCollectionIdCalls = [];
+        scope.collectionId = "key-2";
+        rootScope.$apply();
         expect(mockItemService.saveCollectionIdCalls.length).toEqual(1);
       });
     });
@@ -283,21 +286,21 @@ describe('profile controller', function() {
       });
       it("is selected if collectionId is not set in item", function() {
         makeProfileController();
-        expect(scope.item.collectionId).toEqual('default-id');
+        expect(scope.collectionId).toEqual('default-id');
       });
       it("is selected if collectionId can not be found in collections", function() {
-        mockItemService.loadResult = {collectionId:'non-existent-id'};
+        mockItemService.loadResult = {collection:{id:'non-existent-id'}};
         makeProfileController();
-        expect(scope.item.collectionId).toEqual('default-id');
+        expect(scope.collectionId).toEqual('default-id');
       });
       it("is not selected if collectionId is set in item", function() {
-        mockItemService.loadResult = {collectionId:'key-1'};
+        mockItemService.loadResult = {collection:{id:'key-1'}};
         makeProfileController();
-        expect(scope.item.collectionId).toEqual('key-1');
+        expect(scope.collectionId).toEqual('key-1');
       });
       it("trigger save when default collectionId is set", function() {
         makeProfileController();
-        expect(scope.item.collectionId).toEqual('default-id');
+        expect(scope.item.collection.id).toEqual('default-id');
         expect(mockItemService.saveCollectionIdCalls.length).toEqual(1);
       });
 

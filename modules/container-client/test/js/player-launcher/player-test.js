@@ -1,262 +1,198 @@
 describe('player launcher', function() {
 
-  var errors = corespring.require("errors");
 
-  var launcher = null;
+  var errorCodes = corespring.require('error-codes');
+  var validationErrors;
+  var PlayerFactory, player, mockLauncher, onError;
 
-  var MockInstance = function() {
+  beforeEach(function(){
+    onError = jasmine.createSpy('onError');
+    validationErrors = [];
+    mockInstance = new org.corespring.mocks.launcher.MockInstance();
+    var MockLauncher = org.corespring.mocks.launcher.MockLauncher(mockInstance);
+    mockLauncher = new MockLauncher();
 
-    this.isComplete = false;
+    corespring.mock.modules['client-launcher'] = function(){
+      return mockLauncher;
+    };
 
-    this.send = function() {
-      var args = Array.prototype.slice.call(arguments);
-      var message = args[0];
-      var cb = typeof(args[1] == 'function') ? args[1] : args[2];
-      var data = typeof(args[1] == 'function') ? null : args[1];
+    PlayerFactory = corespring.require('player');
+  });
 
-      if (message === "isComplete") {
-        cb(null, this.isComplete);
-      } else if (message === "completeResponse") {
-        this.isComplete = true;
+  afterEach(function(){
+    corespring.mock.reset();
+  });
+
+
+
+  function create(opts, isSecure, isComplete){
+    isComplete = isComplete === true;
+
+    mockLauncher.init.and.callFake(function(v){
+      validationErrors = v(opts);
+      return !validationErrors || validationErrors.length === 0;
+    });
+
+    mockInstance.send.and.callFake(function(t,cb){
+      if(t === 'isComplete'){
+        cb(null, isComplete);
       }
-    };
+    });
 
-    this.on = function(name, cb) {
-      if (name == "ready") {
-        cb();
-      }
-    };
-    return this;
-  };
-
-
-  function MockErrors(errs){
-    this.errors = errs;
-    this.hasErrors = function(){
-      return this.errors && this.errors.length > 0;
-    };
+    var Player = PlayerFactory.define(isSecure);
+    var out = new Player('element', opts, onError);
+    return out;
   }
 
-  function MockWarnings(wrns){
-    this.warnings = wrns;
-    this.hasWarnings = function(){
-      return this.warnings && this.warnings.length > 0;
-    };
-  }
-
-  var mockInstance = null;
-  var originalInstance = null;
-  var lastError = null;
-  var warnings = [];
-
-  var origWarn = window.console.warn;
-
-
-  var defaultOptions = corespring.module("default-options").exports;
-  defaultOptions.corespringUrl = "http://blah.com";
-
-  beforeEach(function() {
-    originalInstance = corespring.require("instance");
-    mockInstance = corespring.module("instance", MockInstance);
-    launchErrors = corespring.module("launcher-errors", new MockErrors());
-    launcher = corespring.require("player");
-    warnings = [];
-    window.console.warn = function(msg){
-      warnings.push(msg);
-    };
-  });
-
-  afterEach(function() {
-    corespring.module("instance", originalInstance);
-    window.console.warn = origWarn;
-  });
-
-  var create = function(options, secureMode, playerErrors, warnings) {
-
-    corespring.module("launcher-errors", playerErrors || new MockErrors());
-    corespring.module("launcher-warnings", warnings || new MockWarnings());
-    corespring.module("query-params", {});
-
-    secureMode = secureMode !== undefined ? secureMode : true;
-    lastError = null;
-
-    var Player = launcher.define(secureMode);
-
-
-    //$("body").append("<div id='blah'></div>")
-    var player = new Player("blah", options, function(err) {
-      lastError = err;
+  describe('validateOptions', function(){
+    
+    it('should return mode error if the mode is null', function() {
+      create({mode: null}, false);
+      expect(validationErrors[0].code).toEqual(errorCodes.INVALID_MODE.code);
     });
 
-    return player;
-  };
-
-  it('should invoke error callback if there are launcher-errors', function() {
-    var player = create({
-      mode: null
-      },
-      false,
-      new MockErrors(["error one"])
-    );
-
-    expect(lastError.code).toEqual(errors.EXTERNAL_ERROR("error one").code);
-    expect(lastError.message).toEqual(errors.EXTERNAL_ERROR("error one").message);
-  });
-
-  it('should log warnings if there are warnings', function(){
-    var player = create({
-      mode: null
-      },
-      false,
-      null,
-      new MockWarnings(['warning one'])
-    );
-    expect(warnings.length).toEqual(1);
-  });
-
-  it('should invoke error callback with invalid mode', function() {
-    var player = create({
-      mode: null
+    it('should invoke error callback when mode is gather and there is no itemId/sessionId', function() {
+      create({
+        mode: 'gather',
+        itemId: null,
+        sessionId: null
+      },false);
+      expect(validationErrors[0].code).toEqual(errorCodes.NO_ITEM_OR_SESSION_ID.code);
     });
-    expect(lastError.code).toEqual(errors.INVALID_MODE.code);
+
+    it('should invoke error callback when changing mode from view => gather and session is complete in secure mode', function() {
+      var player = create({
+        sessionId: '1',
+        mode: 'view',
+        paths: {}
+      }, true, true);
+      expect(validationErrors).toEqual([]);
+      player.completeResponse();
+      player.setMode('gather');
+      expect(onError).toHaveBeenCalledWith(errorCodes.NOT_ALLOWED);
+    });
+
   });
 
+  describe('init', function(){
 
-  it('should invoke error callback when mode is gather and there is no itemId/sessionId', function() {
-    var player = create({
-      mode: "gather",
-      itemId: null,
-      sessionId: null
+    describe('forceWidth', function(){
+      it('should call width on the instance with the default width if forceWidth == true', function(){
+        var player = create({ itemId: '1', mode: 'gather', forceWidth: true });
+        expect(mockInstance.width).toHaveBeenCalledWith('600px');
+      });
+      
+      it('should call width on the instance with a custom width if forceWidth == true', function(){
+        var player = create({ itemId: '1', mode: 'gather', width: '1000px', forceWidth: true });
+        expect(mockInstance.width).toHaveBeenCalledWith('1000px');
+      });
     });
-    expect(lastError.code).toEqual(errors.NO_ITEM_OR_SESSION_ID.code);
-  });
-
-  it('should construct', function() {
-    var player = create({
-      mode: "gather",
-      itemId: "1",
-      paths: {}
-    });
-    expect(player).not.toBe(null);
-    expect(lastError).toBe(null);
-  });
-
-  it('should invoke error callback when changing mode from view => gather and session is complete', function() {
-    var player = create({
-      sessionId: "1",
-      mode: "view",
-      paths: {}
-    });
-    player.completeResponse();
-    player.setMode("gather");
-    expect(lastError.code).toEqual(errors.NOT_ALLOWED.code);
   });
 
   describe('setMode', function() {
 
-    function ModeChangeTest() {
-      this.lastError = {};
-      this.from = function(value) {
-        this.fromMode = value;
-        return this;
-      };
-      this.to = function(value) {
-        this.toMode = value;
-        return this;
-      };
-      this.withComplete = function(value) {
-        this.complete = value;
-        return this;
-      };
-      this.andSecure = function(value) {
-        this.secure = value;
-        return this;
-      };
-      this.do = function() {
-        var player = create({
-          sessionId: "1",
-          mode: this.fromMode,
-          paths: {}
-        }, this.secure);
-        this.complete && player.completeResponse();
-        player.setMode(this.toMode);
-        this.lastError = lastError;
-        return this;
-      };
-    }
+    var lastError;
 
-    function createModeChangeResultMessage(modeChangeResult) {
-      return "Change mode" +
-        " from " + modeChangeResult.fromMode +
-        " to " + modeChangeResult.toMode +
-        " with complete = " + modeChangeResult.complete +
-        " and secure = " + modeChangeResult.secure;
+    var modeErrorCallback;
+
+    function create(opts, isSecure, isComplete){
+      isComplete = isComplete === true;
+      mockLauncher.init.and.returnValue(true);
+      mockInstance.send.and.callFake(function(t,cb){
+        if(t === 'isComplete'){
+          cb(null, isComplete);
+        }
+      });
+
+      var Player = PlayerFactory.define(isSecure);
+      var out = new Player('element', opts, modeErrorCallback);
+      return out;
     }
 
     beforeEach(function() {
 
-      function mkCompareFn(expectSuccess, successMsg, failedMsg) {
-        return function(actual, expected){
-          var testResult = actual.do();
-          var pass = expectSuccess ? !testResult.lastError : testResult.lastError;
-          var message = createModeChangeResultMessage(testResult) +
-            " " + (pass ? successMsg : failedMsg );
-          return { pass: pass, message: message};
-        };
+      modeErrorCallback = jasmine.createSpy('modeErrorCallback');
+
+      function createMessage(mc, pass) {
+        return 'Change mode ' + mc.from + '->' + mc.to +
+          ' with complete: ' + mc.complete +
+          ' and secure: ' + mc.secure + ' passed? ' + pass;
       }
 
       jasmine.addMatchers({
         toSucceed: function(util, customEqualityTesters) {
           return {
-            compare: mkCompareFn(true, 'succeeded', 'failed')
-          };
-        },
-        toFail: function(util, customEqualityTesters) {
-          return {
-            compare: mkCompareFn(false, 'should have failed', 'did not fail as expected')
+            compare: function(mc){
+              var pass = mc.errorCount === 0;
+              return {
+                pass: pass,
+                message: createMessage(mc, pass) 
+              };
+            }
           };
         }
       });
     });
 
+    afterEach(function() {
+      modeErrorCallback.calls.reset();
+    });
+
+    function setMode(fromAndTo, opts){
+      var arr = fromAndTo.split('->');
+      var fromMode = arr[0];
+      var toMode = arr[1];
+      var player = create({mode: fromMode}, opts.secure, opts.complete);
+      player.setMode(toMode);
+      var errorCount = modeErrorCallback.calls.count();
+      modeErrorCallback.calls.reset();
+      return {
+        errorCount: errorCount,
+        from: fromMode,
+        to: toMode,
+        secure: opts.secure,
+        complete: opts.complete
+      };
+    }
+
     it("should work as expected when complete is false and secure is false", function() {
-      var modeChange = new ModeChangeTest().withComplete(false).andSecure(false);
-      expect(modeChange.from("gather").to("view")).toSucceed();
-      expect(modeChange.from("gather").to("evaluate")).toSucceed();
-      expect(modeChange.from("view").to("gather")).toSucceed();
-      expect(modeChange.from("view").to("evaluate")).toSucceed();
-      expect(modeChange.from("evaluate").to("gather")).toSucceed();
-      expect(modeChange.from("evaluate").to("view")).toSucceed();
+      var opts = {complete: false, secure: false};
+      expect(setMode('gather->view', opts)).toSucceed();
+      expect(setMode('gather->evaluate', opts)).toSucceed();
+      expect(setMode('view->gather', opts)).toSucceed();
+      expect(setMode('view->evaluate', opts)).toSucceed();
+      expect(setMode('evaluate->gather', opts)).toSucceed();
+      expect(setMode('evaluate->view', opts)).toSucceed();
     });
 
     it("should work as expected when complete is true and secure is false", function() {
-      var modeChange = new ModeChangeTest().withComplete(true).andSecure(false);
-      expect(modeChange.from("gather").to("view")).toSucceed();
-      expect(modeChange.from("gather").to("evaluate")).toSucceed();
-      expect(modeChange.from("view").to("gather")).toSucceed();
-      expect(modeChange.from("view").to("evaluate")).toSucceed();
-      expect(modeChange.from("evaluate").to("gather")).toSucceed();
-      expect(modeChange.from("evaluate").to("view")).toSucceed();
+      var opts = {complete: true, secure: false};
+      expect(setMode('gather->view', opts)).toSucceed();
+      expect(setMode('gather->evaluate', opts)).toSucceed();
+      expect(setMode('view->gather', opts)).toSucceed();
+      expect(setMode('view->evaluate', opts)).toSucceed();
+      expect(setMode('evaluate->gather', opts)).toSucceed();
+      expect(setMode('evaluate->view', opts)).toSucceed();
     });
 
     it("should work as expected when complete is false and secure is true", function() {
-      var modeChange = new ModeChangeTest().withComplete(false).andSecure(true);
-      expect(modeChange.from("gather").to("view")).toSucceed();
-      expect(modeChange.from("gather").to("evaluate")).toFail();
-      expect(modeChange.from("view").to("gather")).toSucceed();
-      expect(modeChange.from("view").to("evaluate")).toFail();
-      expect(modeChange.from("evaluate").to("gather")).toSucceed();
-      expect(modeChange.from("evaluate").to("view")).toSucceed();
+      var opts = {complete: false, secure: true};
+      expect(setMode('gather->view', opts)).toSucceed();
+      expect(setMode('gather->evaluate', opts)).not.toSucceed();
+      expect(setMode('view->gather', opts)).toSucceed();
+      expect(setMode('view->evaluate', opts)).not.toSucceed();
+      expect(setMode('evaluate->gather', opts)).toSucceed();
+      expect(setMode('evaluate->view', opts)).toSucceed();
     });
 
     it("should work as expected when complete is true and secure is true", function() {
-      var modeChange = new ModeChangeTest().withComplete(true).andSecure(true);
-      expect(modeChange.from("gather").to("view")).toSucceed();
-      expect(modeChange.from("gather").to("evaluate")).toSucceed();
-      expect(modeChange.from("view").to("gather")).toFail();
-      expect(modeChange.from("view").to("evaluate")).toSucceed();
-      expect(modeChange.from("evaluate").to("gather")).toFail();
-      expect(modeChange.from("evaluate").to("view")).toSucceed();
+      var opts = {complete: true, secure: true};
+      expect(setMode('gather->view', opts)).toSucceed();
+      expect(setMode('gather->evaluate', opts)).toSucceed();
+      expect(setMode('view->gather', opts)).not.toSucceed();
+      expect(setMode('view->evaluate', opts)).toSucceed();
+      expect(setMode('evaluate->gather', opts)).not.toSucceed();
+      expect(setMode('evaluate->view', opts)).toSucceed();
     });
   });
 });

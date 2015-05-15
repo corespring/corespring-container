@@ -1,49 +1,82 @@
-var Instance = function(element, options, errorCallback, log) {
+/**
+ * @param call: { url: '', method: '', params: {}, hash: ''}
+ */
 
-  /* global msgr, $ */
+var Instance = function(call,  element, errorCallback, log) {
+
+  log = log || require('logger');
+  log.info('--> new instance');
+  log.info('call', call);
+
+  function PostForm(url){
+
+    var formName = iframeUid + '-form';
+    
+    function addForm(){
+      var form = [
+        '<form ',
+        '  target="', iframeUid, '"',
+        '  id="', formName, '"',
+        '  name="', formName, '"',
+        '  method="POST" ',
+        '  action="', url, '">',
+        '</form>'
+      ].join('');
+
+      $('body').append(form);
+    }
+
+    function submitForm(){
+      var form = document.forms[formName];
+      form.submit();
+    }
+
+    function removeForm(){
+      $('#' + formName).remove();
+    }
+
+    this.load = function(){
+      addForm();
+      submitForm();
+      removeForm();
+    }; 
+  }
+
+  /* global msgr */
   /** msgr.Channel */
   var channel;
-
   var iframeUid = 'corespring-iframe-' + msgr.utils.getUid();
-
-  var self = this;
-
-  var UrlBuilder = require('url-builder');
-  var ObjectId = require('object-id');
+  var errorCodes = require('error-codes');
 
   function $iframe() {
     var $node = $('#' + iframeUid);
     if($node.size() !== 1){
-      var err = errors.CANT_FIND_IFRAME(iframeUid);
+      var err = errorCodes.CANT_FIND_IFRAME(iframeUid);
       errorCallback(err);
     }
     return $node;
   }
 
-  var errors = require("errors");
-
-  log = log || require('logger');
-
-  function initialize(e, options) {
-    if (!options || !options.sessionUrl) {
-      errorCallback({
-        code: 999,
-        message: "No session url specified"
-      });
-      return;
-    }
-
-    if (!options || !options.url) {
-      errorCallback({
-        code: 999,
-        message: "No url specified"
-      });
+  function initialize(e) {
+    if (!call || !call.url) {
+      errorCallback(errorCodes.NO_URL_SPECIFIED);
       return;
     }
 
     if ($(e).length === 0) {
-      errorCallback(errors.CANT_FIND_CONTAINER_FOR_PLAYER);
+      errorCallback(errorCodes.CANT_FIND_CONTAINER_FOR_PLAYER);
       return;
+    }
+
+    function makeUrl() {
+      var Builder = require('url-builder');
+      return new Builder(call.url).params(call.params).build(); 
+    }
+
+    var url = makeUrl();
+
+    if(call.hash){
+      url += '#' + call.hash;
     }
 
     var iframeStyles = [
@@ -59,40 +92,28 @@ var Instance = function(element, options, errorCallback, log) {
       }
     })();
 
-
-
-    var sessionId = (function() {
-      if (options.sessionId !== undefined) {
-        return options.sessionId;
-      } else {
-        var response = $.ajax({
-          url: options.sessionUrl,
-          async: false, // refactor this so that it's asynchronous.
-          method: 'POST',
-          dataType: 'json'
-        }).responseText;
-        var session = JSON.parse(response);
-        return new ObjectId(session._id).toString();
-      }
-    })();
-
-    var url =
-      new UrlBuilder(options.url)
-        .params(options.queryParams)
-        .hash(options.hash)
-        .interpolate('sessionId', sessionId)
-        .build();
-
-    var iframeTemplate = [
+    var iframeOpen = [
       '<iframe',
       ' id="', iframeUid , '"',
+      ' name="', iframeUid ,'"',
       ' frameborder="0"',
-      ' src="', url, '"',
       ' class="player-loading"',
-      ' style="width: 100%; border: none;"></iframe>'
+      ' style="width: 100%; border: none;" ',
     ].join('');
 
-    $(e).html(iframeTemplate);
+    if(call.method === 'GET'){
+      iframeOpen += 'src="'+url+'"';
+    }
+
+    var iframeClose = '></iframe>';
+
+    $(e).html(iframeOpen + iframeClose);
+
+    
+    if(call.method === 'POST'){
+      var post = new PostForm(url);
+      post.load();
+    } 
 
     channel = new msgr.Channel(window, $iframe()[0].contentWindow, {enableLogging: false});
 
@@ -104,14 +125,9 @@ var Instance = function(element, options, errorCallback, log) {
       $iframe().removeClass("player-loading");
       $iframe().addClass("player-loaded");
     });
-
-    if (options.forceWidth) {
-      $(e).width(options.width ? options.width : "600px");
-    }
-
-
-
   }
+
+  initialize.bind(this)(element);
 
   this.send = function() {
     var args = Array.prototype.slice.call(arguments);
@@ -131,11 +147,14 @@ var Instance = function(element, options, errorCallback, log) {
     channel.remove();
   };
 
+  this.width = function(w){
+    $('#' + iframeUid).width(w);
+  };
+
   this.css = function(key, value){
     $('#' + iframeUid).css(key, value);
   };
 
-  initialize.bind(this)(element, options);
 };
 
-module.exports = Instance;
+ module.exports = Instance;
