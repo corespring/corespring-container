@@ -46,8 +46,8 @@ describe('player launcher', function() {
 
   describe('validateOptions', function(){
     
-    it('should return mode error if the mode is null', function() {
-      create({mode: null}, false);
+    it('should return mode error if the mode is unknown', function() {
+      create({mode: 'blah'}, false);
       expect(validationErrors[0].code).toEqual(errorCodes.INVALID_MODE.code);
     });
 
@@ -86,6 +86,12 @@ describe('player launcher', function() {
         var player = create({ itemId: '1', mode: 'gather', width: '1000px', forceWidth: true });
         expect(mockInstance.width).toHaveBeenCalledWith('1000px');
       });
+
+    });
+    
+    it('calls loadInstance with mode \'gather\' if it\'s not defined', function(){
+      var player = create({ itemId: '1' });
+      expect(mockLauncher.loadInstance).toHaveBeenCalledWith(jasmine.any(Object), undefined, {mode: 'gather', gather: {}});
     });
   });
 

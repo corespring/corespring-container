@@ -13,6 +13,8 @@ exports.define = function(isSecure) {
       }
     };
 
+    options.mode = options.mode || 'gather';
+
     /**
      * Utility that calls errorCallback if an error has occured.
      * If there has been no error,
@@ -28,12 +30,16 @@ exports.define = function(isSecure) {
       };
     }
 
+    function isValidMode(m) {
+      return ['gather', 'view', 'evaluate'].indexOf(m) !== -1;
+    }
+
     function validateOptions(options){
       var out = [];
       
       //TODO - hook in bens object id util...
 
-      if (!options.mode) {
+      if (!options.mode || !isValidMode(options.mode)) {
         out.push(errorCodes.INVALID_MODE);
         return out;
       }
@@ -100,9 +106,7 @@ exports.define = function(isSecure) {
       return;
     }
       
-    function isValidMode(m) {
-      return ['gather', 'view', 'evaluate'].indexOf(m) !== -1;
-    }
+    
 
     var _isComplete = function(callback) {
       instance.send( 'isComplete', messageResultHandler(callback));
