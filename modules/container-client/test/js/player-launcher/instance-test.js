@@ -70,6 +70,11 @@ describe('instance', function() {
     expect(instance.hasOwnProperty('send')).toBeTruthy();
   });
 
+  it('should submit a form if method is POST', function(){
+    //how to intercept the form.submit();
+    pending();
+  });
+
 
   describe('send', function(){
     it('should be able to send a message', function() {

@@ -117,11 +117,9 @@ trait PlayerLauncher extends Controller {
 
   val SecureMode = "corespring.player.secure"
 
-  private def sumSession(s: Session, keyValues: (String, String)*): Session = {
-    keyValues.foldRight(s)((kv: (String, String), acc: Session) => acc + (kv._1, kv._2))
-  }
+  private def sumSession(s: Session, keyValues: (String, String)*): Session = keyValues.foldRight(s) { case ((key, value), acc) => acc + (key -> value) }
 
-  private def make(additionalJsNameAndSrc: (String, String), options: JsObject, bootstrapLine: String)(implicit request: Request[AnyContent], js: PlayerJs): SimpleResult = {
+  private def make(additionalJsNameAndSrc: (String, String), options: JsObject, bootstrapLine: String)(implicit request: RequestHeader, js: PlayerJs): SimpleResult = {
     val corespringUrl = playerConfig.rootUrl.getOrElse(BaseUrl(request))
     val builder = new JsBuilder(corespringUrl)
     val finalSession = sumSession(js.session, (SecureMode, js.isSecure.toString))

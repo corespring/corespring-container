@@ -1,5 +1,7 @@
 package org.corespring.container.client.controllers.apps
 
+import java.net.URLEncoder
+
 import org.corespring.container.client.V2PlayerConfig
 import org.corespring.container.client.component.PlayerItemTypeReader
 import org.corespring.container.client.controllers.GetAsset
@@ -122,8 +124,16 @@ trait Player
     }
   }
 
-  def mapToParamString(m: Map[String, String]): String = m.toSeq.map { t => s"${t._1}=${t._2}}" }.mkString("&")
-  def mapToJson(m: Map[String, String]): JsObject = JsObject(m.map(t => t._1 -> JsString(t._2.mkString(""))).toSeq)
+  def mapToParamString(m: Map[String, String]): String = m.toSeq.map { t =>
+    val (key, value) = t
+    val encodedValue = URLEncoder.encode(value, "utf-8")
+    s"$key=$encodedValue"
+  }.mkString("&")
+
+  def mapToJson(m: Map[String, String]): JsObject = {
+    import play.api.libs.json._
+    Json.toJson(m).asInstanceOf[JsObject]
+  }
 
   private def queryParams[A](build: (Map[String, String] => A) = mapToParamString _)(implicit rh: RequestHeader): A = {
     val trimmed = (rh.queryString -- playerQueryStringParams).mapValues(s => s.mkString(""))

@@ -34,7 +34,7 @@ class JsBuilder(corespringUrl: String) {
 
   private def queryStringToJson(implicit rh: RequestHeader) = JsObject(rh.queryString.mapValues { v => JsString(v.mkString) }.toSeq)
 
-  def build(additionalJsNameAndSrc: (String, String), options: JsObject, bootstrapLine: String)(implicit request: Request[AnyContent], js: PlayerJs): String = {
+  def build(additionalJsNameAndSrc: (String, String), options: JsObject, bootstrapLine: String)(implicit request: RequestHeader, js: PlayerJs): String = {
     val fullConfig = Json.obj(
       "corespringUrl" -> corespringUrl,
       "queryParams" -> queryStringToJson,
