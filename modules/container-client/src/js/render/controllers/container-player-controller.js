@@ -5,7 +5,6 @@ angular.module('corespring-player.controllers')
       '$scope',
       '$location',
       function($log, $scope, $location) {
-        $scope.showPreviewButton = ($location.search().showPreviewButton) ? 'true' : 'false';
 
         $scope.playerSettings = {
           maxNoOfAttempts: 1,

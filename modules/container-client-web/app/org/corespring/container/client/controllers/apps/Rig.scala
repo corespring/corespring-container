@@ -48,7 +48,7 @@ trait Rig
 
   override def ngModules: AngularModules = new AngularModules()
 
-  override def load(componentType: String): Action[AnyContent] = Action.async { implicit request =>
+  def load(componentType: String): Action[AnyContent] = Action.async { implicit request =>
 
     def onError(sm: StatusMessage) = BadRequest(s"Rig error: ${sm._2}")
 
@@ -65,8 +65,7 @@ trait Rig
           js,
           css,
           jsSrc.ngModules ++ scriptInfo.ngDependencies,
-          itemJson
-        )))
+          itemJson)))
     }
 
     hooks.load(componentType).map { e => e.fold(onError, onItem) }

@@ -58,7 +58,7 @@ trait Editor
       JsArray(widgetJson)).toString
   }
 
-  override def load(draftId: String): Action[AnyContent] = Action.async { implicit request =>
+  def load(draftId: String): Action[AnyContent] = Action.async { implicit request =>
 
     import org.corespring.container.client.views.html.error
 

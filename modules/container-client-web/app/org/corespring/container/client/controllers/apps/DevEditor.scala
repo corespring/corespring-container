@@ -31,7 +31,7 @@ trait DevEditor
       Json.obj()).toString
   }
 
-  override def load(draftId: String): Action[AnyContent] = Action.async { implicit request =>
+  def load(draftId: String): Action[AnyContent] = Action.async { implicit request =>
     def onError(sm: StatusMessage) = {
       val (code, msg) = sm
       code match {

@@ -13,21 +13,21 @@ describe('ObjectId', function() {
     describe('length is too short', function() {
       var id = validId.substr(1, 4);
       it('should raise an error', function() {
-        expect(function() { new ObjectId(id) }).toThrow();
+        expect(function() { new ObjectId(id); }).toThrow();
       });
     });
 
     describe("length is too long", function() {
       var id = validId + validId;
       it('should raise an error', function() {
-        expect(function() { new ObjectId(id) }).toThrow();
+        expect(function() { new ObjectId(id); }).toThrow();
       });
     });
 
     describe("contains non-alphanumeric characters", function() {
       var id = "554b61*4ec431_a431e79254";
       it('should raise an error', function() {
-        expect(function() { new ObjectId(id) }).toThrow();
+        expect(function() { new ObjectId(id); }).toThrow();
       });
     });
 
@@ -37,7 +37,7 @@ describe('ObjectId', function() {
         var id = {
           "$oid": validId
         };
-        expect(function() { new ObjectId(id) }).not.toThrow();
+        expect(function() { new ObjectId(id); }).not.toThrow();
       });
 
       describe('does not contain $oid key', function() {

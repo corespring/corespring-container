@@ -58,7 +58,6 @@ trait ItemDraftHooks extends ContainerItemDraftHooks {
   override def saveXhtml(draftId: String, xhtml: String)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] =
     fineGrainedSave(draftId, Json.obj("item.xhtml" -> xhtml))
 
-
   private def fineGrainedSave(draftId: String, json: JsValue)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] = {
     Future {
       draftItemService.fineGrainedSave(draftId, json).map {

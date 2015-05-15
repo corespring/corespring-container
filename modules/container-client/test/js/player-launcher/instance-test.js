@@ -2,39 +2,16 @@ describe('instance', function() {
 
   var InstanceDef, instance, receivedErrors, listeners, mockResult;
   var originalRootLevelListenerDef, originalPostMessage;
-
   var originalMsgr;
-
   var sessionUrl = '/session/create';
   var newSessionId = "554b66965d9ea8325264833b";
-
   var baseUrl = "http://corespring.org";
-
-  var log = {
-    error: function(s) {
-      console.error(s);
-    },
-    warn: function(s) {
-      console.warn(s);
-    }
-  };
-
-  function onError(err) {
-    receivedErrors.push(err);
-  }
-
-  function hasError() {
-    return receivedErrors.length > 0;
-  }
+  var errorCodes = corespring.require('error-codes');
+  var onError = jasmine.createSpy('onError');
 
   function MockChannel() {
     console.log('new MockChannel');
-    this.send = function(){
-      console.log('mock:send', arguments);
-      var args = Array.prototype.slice.call(arguments);
-      var callback = typeof(args[1] === 'function') ? args[1] : args[2];
-      callback(null, mockResult);
-    };
+    this.send = jasmine.createSpy('send');
     this.on = function(){
       console.log('mock:on', arguments);
     };
@@ -42,22 +19,20 @@ describe('instance', function() {
     this.remove = function(){};
   }
 
-  var ID = 'element-id';
+  var mockChannel;
+  var ID = 'instance-test-element-id';
+  var call = { url: '/url'};
 
   beforeEach(function() {
+    onError.calls.reset();
     var element = $('<div id="' + ID + '"></div>');
     $('body').append(element);
     originalMsgr = window.msgr;
-    window.msgr.Channel = MockChannel;
-
+    mockChannel = new MockChannel();
+    window.msgr.Channel = function(){
+      return mockChannel;
+    };
     InstanceDef = new corespring.require("instance");
-    receivedErrors = [];
-
-    var session = {"_id" : { "$oid" : newSessionId } };
-    $.mockjax({
-      url: sessionUrl,
-      responseText: JSON.stringify(session)
-    });
   });
 
   afterEach(function() {
@@ -70,74 +45,61 @@ describe('instance', function() {
   });
 
   it('should be possible to create an instance', function() {
-    instance = new InstanceDef('#' + ID, {}, function() {});
+    instance = new InstanceDef( call, '#' + ID, function() {});
     expect(instance).toBeTruthy();
   });
-
-  it('should report an error if options is missing', function() {
-    instance = new InstanceDef('#' + ID, null, onError);
-    expect(hasError()).toBeTruthy();
+  
+  it('should report an error if call is missing', function() {
+    instance = new InstanceDef(null, '#' + ID, onError);
+    expect(onError).toHaveBeenCalledWith(errorCodes.NO_URL_SPECIFIED);
   });
 
-  it('should report an error if options.url is missing', function() {
-    instance = new InstanceDef('#' + ID, {}, onError);
-    expect(hasError()).toBeTruthy();
+  it('should report an error if call.url is missing', function() {
+    instance = new InstanceDef({}, '#' + ID, onError);
+    expect(onError).toHaveBeenCalledWith(errorCodes.NO_URL_SPECIFIED);
   });
 
   it('should report an error if element cannot be found', function() {
-    instance = new InstanceDef('#bad-' + ID, {
-      url: baseUrl
-    }, onError);
-    expect(hasError()).toBeTruthy();
+    instance = new InstanceDef(call, '#bad-' + ID, onError);
+    expect(onError).toHaveBeenCalled();
   });
 
   it('should have a sendMessage method', function() {
-    instance = new InstanceDef('#' + ID, {}, onError);
+    instance = new InstanceDef(call, '#' + ID, onError);
     expect(instance.hasOwnProperty('send')).toBeTruthy();
   });
 
-  it('should not set the width if forceWidth is false', function() {
+  it('should submit a form if method is POST', function(){
+    //how to intercept the form.submit();
+    pending();
+  });
 
-    instance = new InstanceDef('#' + ID, {
-      sessionUrl: sessionUrl,
-      url: baseUrl
+
+  describe('send', function(){
+
+    it('should call channel.send', function() {
+      var instance = new InstanceDef({url: '/url'}, '#' + ID, onError);
+      instance.send('isComplete', function(){});
+      expect(mockChannel.send).toHaveBeenCalledWith('isComplete', jasmine.any(Function));
     });
-    expect($('#' + ID)[0].style.width).toBe('');
   });
 
-  it('should set the width if forceWidth is true', function() {
-
-    instance = new InstanceDef('#' + ID, {
-      sessionUrl: sessionUrl,
-      url: baseUrl,
-      forceWidth: true
+  describe('width', function(){
+    it('calls $(element).width', function(){
+      var el = $('#' + ID);
+      instance = new InstanceDef({url: '/url'}, el, onError);
+      instance.width('100px');
+      expect($('#' + ID + '').find('iframe').width()).toEqual(100);
     });
-    expect($('#' + ID)[0].style.width).toBe('600px');
+
   });
-
-  it('should set the custom width if forceWidth is true', function() {
-
-    instance = new InstanceDef('#' + ID, {
-      sessionUrl: sessionUrl,
-      url: baseUrl,
-      forceWidth: true,
-      width: '11px'
+  
+  describe('css', function(){
+    it('calls $(element).css', function(){
+      var el = $('#' + ID);
+      instance = new InstanceDef({url: '/url'}, el, onError);
+      instance.css('color', 'red');
+      expect($('#' + ID + '').find('iframe').css('color')).toEqual('rgb(255, 0, 0)');
     });
-    expect($('#' + ID)[0].style.width).toBe('11px');
   });
-
-  it('should be able to send a message', function() {
-
-    instance = new InstanceDef('#' + ID, {sessionUrl: sessionUrl, url: 'http://blah.com'}, onError);
-    var resultFromCallback = null;
-    var callback = function(err, result) {
-      resultFromCallback = result;
-    };
-    mockResult = true;
-
-    expect(receivedErrors.length).toBe(0);
-    instance.send("isComplete", callback);
-    expect(resultFromCallback).toBe(true);
-  });
-
 });

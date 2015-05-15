@@ -14,7 +14,7 @@ describe('Main', function() {
     this.setAnswerChangedHandler = function(callback) { callback(); };
     this.hasEmptyAnswers = function() { return hasEmptyAnswers; };
     this.interactionCount = function() { return interactionCount; };
-    this.interactionsWithResponseCount = function() { return interactionsWithResponseCount };
+    this.interactionsWithResponseCount = function() { return interactionsWithResponseCount; };
     this.getComponentSessions = function() { return []; };
     this.setEditable = mockSetEditable;
     this.reset = mockReset;
@@ -70,11 +70,7 @@ describe('Main', function() {
     this.info = mockInfo;
   }
 
-  var MockDocument = [{
-    location: {
-      pathname: '/player/item/session/' + sessionId
-    }
-  }];
+  var MockDocument = [{}];
 
   beforeEach(angular.mock.module('corespring-player.controllers'));
 
@@ -104,12 +100,6 @@ describe('Main', function() {
         highlightUserResponse: true
       });
     });
-
-    describe('sessionId', function() {
-      it('should be set from the pathname', function() {
-        expect(scope.sessionId).toEqual(sessionId);
-      });
-    })
 
   });
 
@@ -429,10 +419,6 @@ describe('Main', function() {
       scope.$emit('initialise', data);
     });
 
-    it('should call PlayerService.setQueryParams with data.queryParams', function() {
-      expect(mockSetQueryParams).toHaveBeenCalledWith(data.queryParams);
-    });
-
     it('should call PlayerService.loadItemAndSession', function() {
       expect(mockLoadItemAndSession).toHaveBeenCalled();
     });
@@ -564,7 +550,7 @@ describe('Main', function() {
         allInteractionsHaveResponse: !hasEmptyAnswers,
         interactionCount: interactionCount,
         interactionsWithResponseCount: interactionsWithResponseCount
-      })
+      });
     });
 
   });
@@ -661,6 +647,5 @@ describe('Main', function() {
     });
 
   });
-
 
 });

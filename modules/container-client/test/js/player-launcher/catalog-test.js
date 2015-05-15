@@ -1,113 +1,64 @@
 describe('catalog launcher', function () {
 
-  var errors = corespring.require("errors");
-  var originalDefaultOptions;
-
+  var errorCodes = corespring.require('error-codes');
   var CatalogDefinition;
-  var defaultOptions;
-  var instanceCalls;
-  var lastError;
-  var launchErrors;
+  var errorCallback;
   var mockInstance;
-  var originalInstance;
-  var origWarn;
-  var warnings;
 
+  function MockLauncher(){
 
-  function MockInstance(element, options, errorCallback, logger) {
-    instanceCalls.push({instance: this, element: element, options: options, errorCallback: errorCallback, log: logger});
+    this.init = jasmine.createSpy('init').and.returnValue(true);
 
-    this.on = function(name, cb) {
-      if (name == "ready") {
-        cb();
-      }
-    };
+    this.loadInstance = jasmine.createSpy('loadInstance').and.returnValue(mockInstance);
+    
+    this.loadCall = jasmine.createSpy('loadCall').and.callFake(function(){
+      return {method: 'GET', url: 'catalog/:itemId'};
+    });
 
-    this.send = function() {
-    };
-  }
-
-
-  function MockErrors(errs) {
-    this.errors = errs;
-    this.hasErrors = function () {
-      return this.errors && this.errors.length > 0;
-    };
+    this.mkInstance = jasmine.createSpy('mkInstance').and.callFake(function(){
+        return mockInstance;
+    });
   }
 
   beforeEach(function () {
-    instanceCalls = [];
-    lastError = null;
-    defaultOptions = corespring.module("default-options").exports;
-    originalDefaultOptions = _.cloneDeep(defaultOptions);
-    defaultOptions.corespringUrl = "http://blah.com";
-    defaultOptions.paths = {};
-    originalInstance = corespring.require("instance");
-    mockInstance = corespring.module("instance", MockInstance);
-    launchErrors = corespring.module("launcher-errors", new MockErrors());
-    CatalogDefinition = corespring.require("catalog");
-    warnings = [];
-    origWarn = window.console.warn;
-    window.console.warn = function (msg) {
-      warnings.push(msg);
+    mockInstance = {};
+    mockLauncher = new MockLauncher();
+    corespring.mock.modules['client-launcher'] = function(){
+      return mockLauncher;
     };
+    CatalogDefinition = corespring.require('catalog');
   });
 
   afterEach(function () {
-    corespring.module("instance", originalInstance);
-    corespring.module("default-options").exports = originalDefaultOptions;
-    window.console.warn = origWarn;
+    corespring.mock.reset();
   });
 
-  function create(options, playerErrors, queryParams) {
-
-    corespring.module("launcher-errors", playerErrors || new MockErrors());
-    corespring.module("query-params", queryParams || {});
-
-    lastError = null;
-
-    var catalog = new CatalogDefinition("dummy-element", options, function (err) {
-      lastError = err;
-    });
-
+  function create(options) {
+    errorCallback = jasmine.createSpy('errorCallback');
+    var catalog = new CatalogDefinition('dummy-element', options, errorCallback);
     return catalog;
   }
 
-  it('should invoke error callback if there are launcher-errors', function () {
-    create({}, new MockErrors(["error one"]));
-
-    expect(lastError.code).toEqual(errors.EXTERNAL_ERROR("error one").code);
-    expect(lastError.message).toEqual(errors.EXTERNAL_ERROR("error one").message);
-  });
-
-  describe("load item", function(){
-
-    it('should create instance (which loads item) if options has itemId', function () {
-      defaultOptions.paths.catalog = {url: "/expected-catalog-url", method: 'expected-method'};
-
-      create({itemId:'expected-item-id'});
-      expect(lastError).toBe(null);
-      expect(instanceCalls.length).toEqual(1);
-      var call = instanceCalls.pop();
-      expect(call.options.url).toEqual('http://blah.com/expected-catalog-url');
+  describe('loadClient -> loadItem', function(){
+    it('should invoke error callback with NO_ITEM_ID if there is no itemId', function () {
+      create({});
+      expect(errorCallback).toHaveBeenCalledWith(errorCodes.NO_ITEM_ID);
     });
 
-    it('should pass queryParams in options', function () {
-      defaultOptions.paths.catalog = {url: "/expected-catalog-url", method: 'expected-method'};
-
-      create({itemId:'expected-item-id'}, null, {apiClient:123});
-      var call = instanceCalls.pop();
-      expect(call.options.queryParams).toEqual({apiClient:123});
+    it('should not invoke an error if there is itemId', function () {
+      create({itemId: '1'});
+      expect(errorCallback).not.toHaveBeenCalledWith(errorCodes.NO_ITEM_ID);
     });
 
-
-    it("should invoke error callback if options.path does not contain 'catalog'", function(){
-      defaultOptions.paths = {};
-      create({itemId:'expected-item-id'}, null, {apiClient:123});
-      expect(lastError.code).toEqual(errors.EXTERNAL_ERROR("catalog not part of options").code);
-      expect(lastError.message).toEqual(errors.EXTERNAL_ERROR("catalog not part of options").message);
+    it('should call loadCall(\'catalog\') if there is itemId', function () {
+      create({itemId: '1'});
+      expect(mockLauncher.loadCall).toHaveBeenCalledWith('catalog', jasmine.any(Function));
     });
 
+    it('should call mkInstance if there is itemId', function () {
+      create({itemId: '1'});
+      expect(mockLauncher.loadInstance).toHaveBeenCalledWith({method: 'GET', url: 'catalog/:itemId'},{});
+    });
   });
 
 });
