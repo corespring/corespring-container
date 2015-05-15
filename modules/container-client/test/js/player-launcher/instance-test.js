@@ -11,12 +11,7 @@ describe('instance', function() {
 
   function MockChannel() {
     console.log('new MockChannel');
-    this.send = function(){
-      console.log('mock:send', arguments);
-      var args = Array.prototype.slice.call(arguments);
-      var callback = typeof(args[1] === 'function') ? args[1] : args[2];
-      callback(null, mockResult);
-    };
+    this.send = jasmine.createSpy('send');
     this.on = function(){
       console.log('mock:on', arguments);
     };
@@ -24,6 +19,7 @@ describe('instance', function() {
     this.remove = function(){};
   }
 
+  var mockChannel;
   var ID = 'instance-test-element-id';
   var call = { url: '/url'};
 
@@ -32,7 +28,10 @@ describe('instance', function() {
     var element = $('<div id="' + ID + '"></div>');
     $('body').append(element);
     originalMsgr = window.msgr;
-    window.msgr.Channel = MockChannel;
+    mockChannel = new MockChannel();
+    window.msgr.Channel = function(){
+      return mockChannel;
+    };
     InstanceDef = new corespring.require("instance");
   });
 
@@ -77,16 +76,11 @@ describe('instance', function() {
 
 
   describe('send', function(){
-    it('should be able to send a message', function() {
-      instance = new InstanceDef({url: '/url'}, '#' + ID, onError);
-      var resultFromCallback = null;
-      var callback = function(err, result) {
-        resultFromCallback = result;
-      };
-      mockResult = true;
-      expect(onError).not.toHaveBeenCalled();
-      instance.send('isComplete', callback);
-      expect(resultFromCallback).toBe(true);
+
+    it('should call channel.send', function() {
+      var instance = new InstanceDef({url: '/url'}, '#' + ID, onError);
+      instance.send('isComplete', function(){});
+      expect(mockChannel.send).toHaveBeenCalledWith('isComplete', jasmine.any(Function));
     });
   });
 
