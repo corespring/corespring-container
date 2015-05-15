@@ -59,10 +59,7 @@ var Instance = function(call,  element, errorCallback, log) {
 
   function initialize(e) {
     if (!call || !call.url) {
-      errorCallback({
-        code: 999,
-        message: "No url specified"
-      });
+      errorCallback(errorCodes.NO_URL_SPECIFIED);
       return;
     }
 

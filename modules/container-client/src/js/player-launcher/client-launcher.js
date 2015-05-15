@@ -22,7 +22,7 @@ function ClientLauncher(element, options, errorCallback){
 
     this.eachError = function(cb){
       for(var i = 0; i < errors.length; i++){
-        cb(errors.errors[i]);
+        cb(errors[i]);
       }
     };
 
@@ -32,7 +32,6 @@ function ClientLauncher(element, options, errorCallback){
       }
     };
   }
-  
   
   function Paths(pathsConfig){
 
@@ -84,7 +83,7 @@ function ClientLauncher(element, options, errorCallback){
 
     var validationResults = validateOptions ? validateOptions(options) : [];
 
-    if (validationResults.length > 0) {
+    if (validationResults && validationResults.length > 0) {
       for(var x = 0; x < validationResults.length; x++){
         errorCallback(validationResults[x]);
       }
@@ -92,7 +91,6 @@ function ClientLauncher(element, options, errorCallback){
     }
     return true;
   };
-
 
   /**
    * @param call an object or a string. 
@@ -113,8 +111,9 @@ function ClientLauncher(element, options, errorCallback){
       errorCallback(error);
     });
 
-    var readyHandler = function(){
+    var readyHandler = (function(){
       logger.info('instance is ready');
+
       if (this.isReady) {
         instance.removeChannel();
         errorCallback(errorCodes.EDITOR_NOT_REMOVED);
@@ -125,9 +124,11 @@ function ClientLauncher(element, options, errorCallback){
           onReady(instance);
         }
       }
-    };
+    }).bind(this);
 
-    instance.on('ready', readyHandler.bind(this));
+    instance.on('ready', function(){
+      readyHandler();
+    });
     return instance;
   };
 }

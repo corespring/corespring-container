@@ -52,8 +52,7 @@ describe('catalog launcher', function () {
 
     it('should call loadCall(\'catalog\') if there is itemId', function () {
       create({itemId: '1'});
-      var firstParam = mockLauncher.loadCall.calls.mostRecent().args[0];
-      expect(firstParam).toEqual('catalog');
+      expect(mockLauncher.loadCall).toHaveBeenCalledWith('catalog', jasmine.any(Function));
     });
 
     it('should call mkInstance if there is itemId', function () {

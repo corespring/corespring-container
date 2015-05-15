@@ -13,3 +13,4 @@ exports.EDITOR_NOT_REMOVED = {code: 111, message: 'Unexpected re-initialisation 
 exports.INSTANCE_NOT_READY = { code: 112, message: 'Instance not ready yet'};
 exports.CREATE_ITEM_AND_DRAFT_FAILED = function(msg){ return {code: 113, msg: msg};};
 exports.COMMIT_DRAFT_FAILED = function(msg){ return {code: 114, msg: msg};};
+exports.NO_URL_SPECIFIED = {code: 115, message: 'no url specified'};

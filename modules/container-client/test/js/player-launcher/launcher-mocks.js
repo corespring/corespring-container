@@ -4,11 +4,30 @@ org.corespring.mocks = org.corespring.mocks || {};
 org.corespring.mocks.launcher = org.corespring.mocks.launcher || {};
 
 org.corespring.mocks.launcher.MockInstance = function(){
-		this.css = jasmine.createSpy('css');
 
-    this.width = jasmine.createSpy('width');
+  var onHandlers = {};
 
-    this.send = jasmine.createSpy('send');
+  this.constructorArgs = Array.prototype.slice.call(arguments);
+
+	this.css = jasmine.createSpy('css');
+
+  this.width = jasmine.createSpy('width');
+
+  this.send = jasmine.createSpy('send');
+  
+  this.on = jasmine.createSpy('on').and.callFake(function(t, handler){
+    onHandlers[t] = handler;
+  });
+
+  this.removeChannel = jasmine.createSpy('removeChannel');
+
+  this.trigger = function(t){
+    var handler = onHandlers[t];
+    if(handler){
+      console.log('trigger: ', t);
+      handler.bind(this)(this);
+    }
+  };
 };
 
 org.corespring.mocks.launcher.MockLauncher = function(mockInstance){
@@ -36,6 +55,7 @@ org.corespring.mocks.launcher.MockLauncher = function(mockInstance){
     this.prepareUrl = jasmine.createSpy('prepareUrl').and.callFake(function() {
       return Array.prototype.join.call(arguments, '-');
     });
+
 
     this.log = function() {};
   };

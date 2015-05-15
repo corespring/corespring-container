@@ -5,12 +5,15 @@
 </head>
 <body>
 
-<script type="text/javascript" src="//code.jquery.com/jquery-2.1.3.min.js"></script>
+<!-- while we support ie8 we must use jquery 1.x -->
+<script type="text/javascript" src="/client/components/console-polyfill/index.js"></script>
+<script type="text/javascript" src="//code.jquery.com/jquery-1.11.3.min.js"></script>
 <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/lodash.js/3.5.0/lodash.min.js"></script>
 <script type="text/javascript" src="@js"></script>
 <script>
-     document.addEventListener('DOMContentLoaded', function(){
-       var holder = document.querySelector('.holder');
+
+     $(document).ready(function(){
+       var holder = $('.holder');
        var opts = @{Html(play.api.libs.json.Json.stringify(opts))};
 
        console.log('opts: ', opts);

@@ -2,11 +2,12 @@ describe('player launcher', function() {
 
 
   var errorCodes = corespring.require('error-codes');
-
+  var validationErrors;
   var PlayerFactory, player, mockLauncher, onError;
 
   beforeEach(function(){
     onError = jasmine.createSpy('onError');
+    validationErrors = [];
     mockInstance = new org.corespring.mocks.launcher.MockInstance();
     var MockLauncher = org.corespring.mocks.launcher.MockLauncher(mockInstance);
     mockLauncher = new MockLauncher();
@@ -23,35 +24,31 @@ describe('player launcher', function() {
   });
 
 
-  describe('validateOptions', function(){
 
-    var errors;
-    beforeEach(function(){
-      errors = [];
+  function create(opts, isSecure, isComplete){
+    isComplete = isComplete === true;
+
+    mockLauncher.init.and.callFake(function(v){
+      validationErrors = v(opts);
+      return !validationErrors || validationErrors.length === 0;
     });
 
-    function create(opts, isSecure, isComplete){
-      isComplete = isComplete === true;
+    mockInstance.send.and.callFake(function(t,cb){
+      if(t === 'isComplete'){
+        cb(null, isComplete);
+      }
+    });
 
-      mockLauncher.init.and.callFake(function(v){
-        errors = v(opts);
-        return true;
-      });
+    var Player = PlayerFactory.define(isSecure);
+    var out = new Player('element', opts, onError);
+    return out;
+  }
 
-      mockInstance.send.and.callFake(function(t,cb){
-        if(t === 'isComplete'){
-          cb(null, isComplete);
-        }
-      });
-
-      var Player = PlayerFactory.define(isSecure);
-      var out = new Player('element', {}, onError);
-      return out;
-    }
-
+  describe('validateOptions', function(){
+    
     it('should return mode error if the mode is null', function() {
       create({mode: null}, false);
-      expect(errors[0].code).toEqual(errorCodes.INVALID_MODE.code);
+      expect(validationErrors[0].code).toEqual(errorCodes.INVALID_MODE.code);
     });
 
     it('should invoke error callback when mode is gather and there is no itemId/sessionId', function() {
@@ -60,7 +57,7 @@ describe('player launcher', function() {
         itemId: null,
         sessionId: null
       },false);
-      expect(errors[0].code).toEqual(errorCodes.NO_ITEM_OR_SESSION_ID.code);
+      expect(validationErrors[0].code).toEqual(errorCodes.NO_ITEM_OR_SESSION_ID.code);
     });
 
     it('should invoke error callback when changing mode from view => gather and session is complete in secure mode', function() {
@@ -69,12 +66,27 @@ describe('player launcher', function() {
         mode: 'view',
         paths: {}
       }, true, true);
-      expect(errors).toEqual([]);
+      expect(validationErrors).toEqual([]);
       player.completeResponse();
       player.setMode('gather');
       expect(onError).toHaveBeenCalledWith(errorCodes.NOT_ALLOWED);
     });
 
+  });
+
+  describe('init', function(){
+
+    describe('forceWidth', function(){
+      it('should call width on the instance with the default width if forceWidth == true', function(){
+        var player = create({ itemId: '1', mode: 'gather', forceWidth: true });
+        expect(mockInstance.width).toHaveBeenCalledWith('600px');
+      });
+      
+      it('should call width on the instance with a custom width if forceWidth == true', function(){
+        var player = create({ itemId: '1', mode: 'gather', width: '1000px', forceWidth: true });
+        expect(mockInstance.width).toHaveBeenCalledWith('1000px');
+      });
+    });
   });
 
   describe('setMode', function() {
