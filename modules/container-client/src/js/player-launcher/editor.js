@@ -46,7 +46,7 @@ function EditorDefinition(element, options, errorCallback) {
 
   function loadDraftItem(draftId, options) {
 
-    if(!draftId){
+    if (!draftId) {
       throw new Error('invalid draftId');
     }
 
@@ -57,6 +57,11 @@ function EditorDefinition(element, options, errorCallback) {
     if (!call) {
       errorCallback(errorCodes.NO_DRAFT_ID);
       return;
+    }
+
+    // Not sure what's going on here.
+    function fixCall(call) {
+      return (typeof call === 'string') ? call : call.url;
     }
 
     var tab = options.selectedTab;
@@ -89,7 +94,7 @@ function EditorDefinition(element, options, errorCallback) {
   if(ok){
     options.draftName = options.draftName || msgr.utils.getUid(); //jshint ignore:line
 
-    if(options.itemId){
+    if (options.itemId) {
       var draftId = new DraftId(options.itemId, options.draftName);
       loadDraftItem(draftId.toString(), options);
     } else {

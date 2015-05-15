@@ -96,8 +96,8 @@ script(type="text/ng-template", id="/templates/profile")
               ul
                 li(ng-repeat="type in componentTypes") {{type}}
 
-          +configurableField("collectionId","* Collection", "item.collectionId")
-            select.form-control.collection-id(id="collection-id",ng-model="item.collectionId",
+          +configurableField("collectionId","* Collection", "collectionId")
+            select.form-control.collection-id(id="collectionId",ng-model="collectionId",
               ng-options="c.key as c.value for c in collectionIdDataProvider | filter:collectionIdFilter",
               ng-disabled="formModels.collectionId.readonly")
             span.inline-help All items are added to the "Default" collection, unless another is selected.

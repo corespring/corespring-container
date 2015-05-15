@@ -52,7 +52,7 @@ trait ItemDraft extends Controller {
         either =>
           either match {
             case Left(sm) => sm
-            case Right(draft) => Ok(ItemJson(componentTypes, draft \ "item"))
+            case Right(draft) => Ok(ItemJson(componentTypes, draft \ "item")).withHeaders("Cache-Control" -> "no-cache, no-store, must-revalidate", "Expires" -> "0")
           }
       }
   }

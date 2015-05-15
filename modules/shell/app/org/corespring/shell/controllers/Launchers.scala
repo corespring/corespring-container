@@ -2,6 +2,8 @@ package org.corespring.shell.controllers
 
 import play.api.libs.json._
 import play.api.mvc.{ RequestHeader, Action, Controller }
+import org.corespring.shell.views._
+import org.corespring.container.client.controllers.routes._
 
 trait Launchers extends Controller {
 
@@ -19,29 +21,30 @@ trait Launchers extends Controller {
       "itemId" -> itemId)))
   }
 
-  def playerFromItem(itemId:String) = Action {request =>
+  def playerFromItem(itemId: String) = Action { request =>
     import org.corespring.container.client.controllers.routes.PlayerLauncher
     val jsCall = PlayerLauncher.playerJs()
-    Ok(loadPlayerPage(Json.obj("mode" -> "gather", "itemId" -> itemId, "queryParams" -> queryStringToJson(request) ), jsCall.url))
+    Ok(loadPlayerPage(Json.obj("mode" -> "gather", "itemId" -> itemId, "queryParams" -> queryStringToJson(request)), jsCall.url))
   }
 
-  def queryStringToJson(rh:RequestHeader, ignoreKeys:String*) : JsObject = {
+  def queryStringToJson(rh: RequestHeader, ignoreKeys: String*): JsObject = {
     val trimmed = rh.queryString -- ignoreKeys
-    JsObject(trimmed.mapValues{v =>
+    JsObject(trimmed.mapValues { v =>
       val joined = v.mkString("")
       joined match {
         case "true" => JsBoolean(true)
         case "false" => JsBoolean(false)
         case _ => JsString(joined)
-      }}.toSeq)
+      }
+    }.toSeq)
   }
 
-  def catalog(itemId:String) = Action{ request =>
+  def catalog(itemId: String) = Action { request =>
     import org.corespring.shell.views.html.launchers
     import org.corespring.container.client.controllers.routes.PlayerLauncher
 
     val tabOpts = {
-      request.getQueryString("tabs").map{ tabs =>
+      request.getQueryString("tabs").map { tabs =>
         Json.obj("tabs" -> JsObject(tabs.split(",").toSeq.map(_ -> JsBoolean(true))))
       }.getOrElse(Json.obj())
     }
@@ -50,7 +53,7 @@ trait Launchers extends Controller {
   }
 
   private def loadEditorPage(opts: JsValue) = org.corespring.shell.views.html.launchers.editor(org.corespring.container.client.controllers.routes.PlayerLauncher.editorJs().url, opts)
-  private def loadPlayerPage(opts: JsValue, jsUrl:String) = org.corespring.shell.views.html.launchers.player(jsUrl, opts)
+  private def loadPlayerPage(opts: JsValue, jsUrl: String) = org.corespring.shell.views.html.launchers.player(jsUrl, opts)
 
   private def splitDraftId(draftId: String) = {
     val Array(itemId, draftName) = draftId.split("~")

@@ -75,8 +75,8 @@ describe('QuestionController', function() {
 
     describe('previewOn', function() {
 
-      it('should be false', function() {
-        expect(scope.previewOn).toBe(false);
+      it('should be true', function() {
+        expect(scope.previewOn).toBe(true);
       });
 
       describe('AppState question preview is true', function() {

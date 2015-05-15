@@ -5,9 +5,10 @@ angular.module('corespring-player.controllers')
       '$log',
       '$scope',
       '$timeout',
+      '$document',
       'ComponentRegister',
       'PlayerService',
-      function($location, $log, $scope, $timeout, ComponentRegister, PlayerServiceDef) {
+      function($location, $log, $scope, $timeout, $document, ComponentRegister, PlayerServiceDef) {
 
         var PlayerService = new PlayerServiceDef();
 

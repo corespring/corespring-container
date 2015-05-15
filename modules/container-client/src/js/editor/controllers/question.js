@@ -29,7 +29,7 @@ angular.module('corespring-editor.controllers')
 
       var logger = LogFactory.getLogger('question-controller');
 
-      $scope.previewOn = AppState.question.preview || false;
+      $scope.previewOn = AppState.question.preview || true;
 
       $scope.$watch('previewOn', function() {
         AppState.question.preview = $scope.previewOn;
@@ -55,7 +55,7 @@ angular.module('corespring-editor.controllers')
       $scope.imageService = ComponentImageService;
       $scope.overrideFeatures = EditorConfig.overrideFeatures;
       $scope.extraFeatures = EditorConfig.extraFeatures;
-
+      $scope.onEditorClick = onEditorClick;
 
       // Dropdowns in wiggi-wiz toolbar don't trigger when bootstrap is imported?
       $timeout(function() {
@@ -68,6 +68,10 @@ angular.module('corespring-editor.controllers')
 
       $scope.getUploadUrl = deprecated;
       $scope.selectFile = deprecated;
+
+      function onEditorClick() {
+        $scope.$broadcast('editor.click');
+      }
 
       $scope.$on('fileSizeGreaterThanMax', EditorConfig.onFileSizeGreaterThanMax);
 

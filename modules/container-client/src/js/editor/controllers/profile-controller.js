@@ -5,6 +5,7 @@
   angular.module('corespring-editor.controllers')
     .controller('ProfileController', [
       '$location',
+      '$q',
       '$scope',
       '$timeout',
       'throttle',
@@ -21,6 +22,7 @@
 
   function ProfileController(
     $location,
+    $q,
     $scope,
     $timeout,
     throttle,
@@ -249,15 +251,15 @@
 
       var profile = item.profile;
 
-      applyConfig(item, "collectionId");
+      applyConfig(item, "collectionId", "collectionId", configToCollectionId);
 
       applyConfig(profile.taskInfo, "title");
       applyConfig(profile.taskInfo, "description");
-      applyConfigAsynchronously(profile.taskInfo.subjects, 'primary', 'primarySubject', configToPrimarySubject);
-      applyConfigAsynchronously(profile.taskInfo.subjects, 'related', 'relatedSubject', configToRelatedSubject);
+      applyConfig(profile.taskInfo.subjects, 'primary', 'primarySubject', configToPrimarySubject);
+      applyConfig(profile.taskInfo.subjects, 'related', 'relatedSubject', configToRelatedSubject);
       applyConfig(profile.taskInfo, "gradeLevel");
 
-      applyConfigAsynchronously(profile, 'standards', 'standards', configToStandards);
+      applyConfig(profile, 'standards', 'standards', configToStandards);
       applyConfig(profile, "lexile");
 
       applyConfig(profile.otherAlignments, "depthOfKnowledge");
@@ -283,38 +285,30 @@
 
 
       /**
-       * Assign the config value to the destination object
-       * @param dest
-       * @param name
-       * @param sourceName
-       */
-      function applyConfig(dest, name, sourceName) {
-        var configItem = config[sourceName || name];
-        if (configItem && configItem.hasOwnProperty('value')) {
-          dest[name] = configItem.value;
-          //TODO Do we need to check the value against the available options?
-        }
-      }
-
-      /**
-       * Some values are checked against an asynchronous service
+       * Apply the configured value to the destination object
        * @param dest - the host object for the property to set
        * @param name - the name of the property to set in the host
-       * @param configName - the name of the formModel in config
-       * @param getAsyncValue - a function, which uses the value in the formModel
-       * to retrieve a value that can be assigned to the host
+       * @param configName - the name of the formModel in config, optional, uses name instead, if not set
+       * @param getValue - an optional function(configuredValue, callback) to get the real value
+       * for the configuredValue. The function passes the real value to the callback, which then assigns
+       * it to the destination.
        */
-      function applyConfigAsynchronously(dest, name, configName, getAsyncValue) {
+      function applyConfig(dest, name, configName, getValue) {
+        configName = configName || name;
+
         var configItem = config[configName];
         if (!configItem || !configItem.hasOwnProperty('value')) {
           return;
         }
 
-        getAsyncValue(configItem.value, function(result) {
-          dest[name] = result;
-        });
+        if (_.isFunction(getValue)) {
+          getValue(configItem.value, function(result) {
+            dest[name] = result;
+          });
+        } else {
+          dest[name] = configItem.value;
+        }
       }
-
     }
 
     /**
@@ -322,16 +316,44 @@
      * This filter returns true if the item can be found in formModel.options
      * or if there are no options
      * @param formModel - holds the options that are used for filtering
-     * @param propertyName - pass in a truthy string if you want to compare item[propertyName] instead of the item
      * @returns a filter function
      */
-    function createOptionsFilter(formModel, propertyName) {
+    function createSimpleOptionsFilter(formModel) {
       return function(item, index) {
-        var value = propertyName ? item[propertyName] : item;
-        //TODO As an optimisation we could create the filter functions after the formModels have been configured and
-        //move that check for formModel.options out of the filter function. Only do that if you find it to be necessary.
         return _.isArray(formModel.options) ?
-          _.contains(formModel.options, value) : true;
+          _.contains(formModel.options, item) : true;
+      };
+    }
+
+    /**
+     * Create a ng filter function for a formModel/dataProvider
+     * This filter returns true if the item can be found in formModel.options
+     * or if there are no options
+     * @param formModel - holds the options that are used for filtering
+     * @param property - pass in a string if you want to compare item[property]
+     * @returns a filter function
+     */
+    function createPropertyOptionsFilter(formModel, property) {
+      return function(item, index) {
+        return _.isArray(formModel.options) ?
+          _.contains(formModel.options, item[property]) : true;
+      };
+    }
+
+    /**
+     * Create a ng filter function for a formModel/dataProvider
+     * This filter returns true if the item can be found in formModel.options
+     * or if there are no options
+     * @param formModel - holds the options that are used for filtering
+     * @param properties - pass in an array of strings to compare item[properties[0]] OR item[properties[1]]
+     * @returns a filter function
+     */
+    function createMultiplePropertiesOptionsFilter(formModel, properties) {
+      return function(item, index) {
+        return _.isArray(formModel.options) ?
+          _.some(properties, function(property) {
+            return _.contains(formModel.options, item[property]);
+          }) : true;
       };
     }
 
@@ -561,30 +583,50 @@
     // list of collections
     //----------------------------------------------------------------
 
-    CollectionService.list(function(collections) {
+    $scope.collectionIdFilter = createMultiplePropertiesOptionsFilter($scope.formModels.collectionId, ['key', 'value']);
+    CollectionService.list().then(setCollectionIdDataProvider);
+
+    function setCollectionIdDataProvider(collections) {
       $scope.collectionIdDataProvider = _.sortBy(collections, 'value');
-    });
+    }
 
-    $scope.collectionIdFilter = createOptionsFilter($scope.formModels.collectionId, 'key');
+    function configToCollectionId(configuredValue, callback) {
+      CollectionService.list().then(setCollectionForConfig);
 
-    function setDefaultCollectionIfNoCollectionSelected() {
-      if ($scope.item && !collectionById($scope.item.collectionId)) {
-        var defaultCollection = collectionByName('default');
-        if (defaultCollection) {
-          $scope.item.collectionId = defaultCollection.key;
+      function setCollectionForConfig(collections) {
+        var configuredCollection = _.find(collections, function(item) {
+          return item && (item.key === configuredValue || item.value === configuredValue);
+        });
+        if (configuredCollection) {
+          callback(configuredCollection.key);
         }
       }
     }
 
-    function collectionById(id) {
-      return _.find($scope.collectionIdDataProvider, {
+    function setDefaultCollectionIfNoCollectionSelected(collectionId) {
+      CollectionService.list().then(function(collections) {
+        $log.log("setDefaultCollectionIfNoCollectionSelected", collectionId, collections);
+        if (!collectionById(collections, collectionId)) {
+          $log.log("setDefaultCollectionIfNoCollectionSelected id not found", collectionId);
+          var defaultCollection = collectionByName(collections, 'default');
+          $log.log("setDefaultCollectionIfNoCollectionSelected defaultCollection", defaultCollection);
+          if (defaultCollection) {
+            $log.log("setDefaultCollectionIfNoCollectionSelected saving");
+            $scope.saveCollectionId(defaultCollection.key);
+          }
+        }
+      });
+    }
+
+    function collectionById(collections, id) {
+      return _.find(collections, {
         key: id
       });
     }
 
-    function collectionByName(name) {
+    function collectionByName(collections, name) {
       var lcName = _.isString(name) ? name.toLowerCase() : '';
-      return _.find($scope.collectionIdDataProvider, function(c) {
+      return _.find(collections, function(c) {
         return c && _.isString(c.value) && c.value.toLowerCase() === lcName;
       });
     }
@@ -691,13 +733,13 @@
     // some dataProviders for selects
     //----------------------------------------------------------------
 
-    $scope.bloomsTaxonomyFilter = createOptionsFilter($scope.formModels.bloomsTaxonomy, 'key');
+    $scope.bloomsTaxonomyFilter = createPropertyOptionsFilter($scope.formModels.bloomsTaxonomy, 'key');
 
     DataQueryService.list("bloomsTaxonomy", function(result) {
       $scope.bloomsTaxonomyDataProvider = result;
     });
 
-    $scope.depthOfKnowledgeFilter = createOptionsFilter($scope.formModels.depthOfKnowledge, 'key');
+    $scope.depthOfKnowledgeFilter = createPropertyOptionsFilter($scope.formModels.depthOfKnowledge, 'key');
 
     DataQueryService.list("depthOfKnowledge", function(result) {
       $scope.depthOfKnowledgeDataProvider = result;
@@ -705,9 +747,9 @@
 
     DataQueryService.list("gradeLevels", function(result) {
       $scope.gradeLevelDataProvider = result;
-      $scope.gradeLevelFilter = createOptionsFilter($scope.formModels.gradeLevel, 'key');
+      $scope.gradeLevelFilter = createPropertyOptionsFilter($scope.formModels.gradeLevel, 'key');
       $scope.priorGradeLevelDataProvider = result;
-      $scope.priorGradeLevelFilter = createOptionsFilter($scope.formModels.priorGradeLevel, 'key');
+      $scope.priorGradeLevelFilter = createPropertyOptionsFilter($scope.formModels.priorGradeLevel, 'key');
     });
 
     //----------------------------------------------------------------
@@ -727,11 +769,11 @@
       });
     }
 
-    $scope.copyrightExpirationDateFilter = createOptionsFilter($scope.formModels.copyrightExpirationDate);
+    $scope.copyrightExpirationDateFilter = createSimpleOptionsFilter($scope.formModels.copyrightExpirationDate);
 
     $scope.copyrightExpirationDateDataProvider = years(new Date().getFullYear(), new Date().getFullYear() + 20).concat(['Never']);
 
-    $scope.copyrightYearFilter = createOptionsFilter($scope.formModels.copyrightYear);
+    $scope.copyrightYearFilter = createSimpleOptionsFilter($scope.formModels.copyrightYear);
 
     $scope.copyrightYearDataProvider = years(new Date().getFullYear(), new Date().getFullYear() - 120);
 
@@ -739,7 +781,7 @@
     // credentials
     //----------------------------------------------------------------
 
-    $scope.credentialsFilter = createOptionsFilter($scope.formModels.credentials, 'key');
+    $scope.credentialsFilter = createPropertyOptionsFilter($scope.formModels.credentials, 'key');
 
     DataQueryService.list("credentials", function(result) {
       $scope.credentialsDataProvider = result;
@@ -762,7 +804,7 @@
     // key skills
     //----------------------------------------------------------------
 
-    $scope.keySkillsFilter = createOptionsFilter($scope.formModels.keySkills, 'key');
+    $scope.keySkillsFilter = createPropertyOptionsFilter($scope.formModels.keySkills, 'key');
 
     function initKeySkillsDataProvider() {
       DataQueryService.list("keySkills", function(result) {
@@ -820,7 +862,7 @@
     // prior use
     //----------------------------------------------------------------
 
-    $scope.priorUseFilter = createOptionsFilter($scope.formModels.priorUse, 'key');
+    $scope.priorUseFilter = createPropertyOptionsFilter($scope.formModels.priorUse, 'key');
 
     $scope.$watch('profile.priorUse', function() {
       updatePriorUseOtherSelected();
@@ -843,7 +885,7 @@
     // reviews passed
     //----------------------------------------------------------------
 
-    $scope.reviewsPassedFilter = createOptionsFilter($scope.formModels.reviewsPassed, 'key');
+    $scope.reviewsPassedFilter = createPropertyOptionsFilter($scope.formModels.reviewsPassed, 'key');
 
     DataQueryService.list("reviewsPassed", function(result) {
       $scope.reviewsPassedDataProvider = result;
@@ -894,7 +936,7 @@
     // show image for license type
     //----------------------------------------------------------------
 
-    $scope.licenseTypeFilter = createOptionsFilter($scope.formModels.licenseType, 'key');
+    $scope.licenseTypeFilter = createPropertyOptionsFilter($scope.formModels.licenseType, 'key');
 
     DataQueryService.list("licenseTypes", function(result) {
       $scope.licenseTypeDataProvider = result;
@@ -961,14 +1003,14 @@
       $scope.taskInfo = profile.taskInfo;
       $scope.otherAlignments = profile.otherAlignments;
       $scope.contributorDetails = profile.contributorDetails;
-      $scope.collectionId = item.collectionId;
+      $scope.collectionId = item.collection ? item.collection.id : '';
 
       initComponentTypesUsed();
       initKeySkillsDataProvider();
       updateReviewsPassedOtherSelected();
       updatePriorUseOtherSelected();
       updateCredentialsOtherSelected();
-      setDefaultCollectionIfNoCollectionSelected();
+      setDefaultCollectionIfNoCollectionSelected($scope.collectionId);
     }
 
     function removeEmptyAdditionalCopyrightItems(copyrights) {
@@ -1030,25 +1072,53 @@
     // collectionId load and save
     //----------------------------------------------------------------
 
-    $scope.$watch('item.collectionId', throttle(function(newValue, oldValue) {
+    $scope.$watch('collectionId', function(newValue, oldValue) {
+      $log.log("$watch collectionId", newValue);
       if (undefined === oldValue) {
         return;
       }
       if (_.isEqual(oldValue, newValue)) {
         return;
       }
-      $scope.saveCollectionId();
+      $scope.saveCollectionId(newValue);
+    });
+
+    $scope.saveCollectionId = function(collectionId) {
+      $log.log("saving collectionId", collectionId);
+      ifCollectionIdIsValid(collectionId).then(function(collection) {
+        $log.log("id is valid", collectionId, collection);
+        updateItemCollection(collection);
+        $scope.collectionId = collection.key;
+        ItemService.saveCollectionId(collectionId, function(result) {
+          $log.log("collectionId saved result:", result);
+        });
+      });
+    };
+
+    function ifCollectionIdIsValid(collectionId){
+      var defer = $q.defer();
+      CollectionService.list().then(function(collections) {
+        var collection = _.find(collections, {key:collectionId});
+        $log.log("ifCollectionIdIsValid collections", collectionId, collection, collections);
+        if (collection) {
+          defer.resolve(collection);
+        } else {
+          defer.reject(collectionId);
+        }
+      });
+      return defer.promise;
+    }
+
+    function updateItemCollection(collection){
+      $scope.item.collection = {
+        id: collection.key,
+        name: collection.value
+      };
       $scope.$emit('itemChanged', {
         partChanged: 'collectionId'
       });
-    }));
+    }
 
-    $scope.saveCollectionId = function() {
-      $log.log("saving collectionId");
-      ItemService.saveCollectionId($scope.item.collectionId, function(result) {
-        $log.log("collectionId saved result:", result);
-      });
-    };
 
 
     //----------------------------------------------------------------
