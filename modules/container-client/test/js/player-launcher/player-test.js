@@ -45,9 +45,9 @@ describe('player launcher', function() {
   }
 
   describe('validateOptions', function(){
-    
+
     it('should return mode error if the mode is unknown', function() {
-      create({mode: 'blah'}, false);
+      create({mode: 'blah', itemId: 'itemId'}, false);
       expect(validationErrors[0].code).toEqual(errorCodes.INVALID_MODE.code);
     });
 
@@ -81,14 +81,14 @@ describe('player launcher', function() {
         var player = create({ itemId: '1', mode: 'gather', forceWidth: true });
         expect(mockInstance.width).toHaveBeenCalledWith('600px');
       });
-      
+
       it('should call width on the instance with a custom width if forceWidth == true', function(){
         var player = create({ itemId: '1', mode: 'gather', width: '1000px', forceWidth: true });
         expect(mockInstance.width).toHaveBeenCalledWith('1000px');
       });
 
     });
-    
+
     it('calls loadInstance with mode \'gather\' if it\'s not defined', function(){
       var player = create({ itemId: '1' });
       expect(mockLauncher.loadInstance).toHaveBeenCalledWith(jasmine.any(Object), undefined, {mode: 'gather', gather: {}});
@@ -132,7 +132,7 @@ describe('player launcher', function() {
               var pass = mc.errorCount === 0;
               return {
                 pass: pass,
-                message: createMessage(mc, pass) 
+                message: createMessage(mc, pass)
               };
             }
           };
@@ -160,6 +160,43 @@ describe('player launcher', function() {
         complete: opts.complete
       };
     }
+
+    describe('pass mode options', function(){
+
+      var player;
+      var opts = {
+        mode: 'gather',
+        gather: { g : 'g'},
+        view: { v: 'v'},
+        evaluate: { e: 'e'}
+      };
+
+      beforeEach(function(){
+        player = create(opts, false, function(){});
+        mockInstance.send.calls.reset();
+      });
+
+      it('should pass the mode options', function(){
+        player.setMode('evaluate');
+        expect(mockInstance.send).toHaveBeenCalledWith('setMode',
+        {
+          mode: 'evaluate',
+          options: opts.evaluate,
+          saveResponses: {isAttempt: false, isComplete: false}
+        });
+      });
+
+      it('should pass the view mode options', function(){
+        player.setMode('view');
+        expect(mockInstance.send).toHaveBeenCalledWith('setMode',
+        {
+          mode: 'view',
+          options: opts.view,
+          saveResponses: null
+        });
+      });
+
+    });
 
     it("should work as expected when complete is false and secure is false", function() {
       var opts = {complete: false, secure: false};

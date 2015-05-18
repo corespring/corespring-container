@@ -33,7 +33,7 @@ describe('SupportingMaterialPreview', function() {
     this.getSupportingMaterialFile = mockGetSupportingMaterialFile;
     this.isDefault = function() {
       return true;
-    }
+    };
   }
 
   beforeEach(angular.mock.module('corespring-common.supporting-materials.controllers'));

@@ -52,7 +52,7 @@ describe('NavController', function() {
 
     function expectPopupFor(name, options) {
       function dash(name) {
-        return name.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()
+        return name.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
       }
       expect($modal.open).toHaveBeenCalledWith({
         templateUrl: '/templates/popups/' + dash(name),

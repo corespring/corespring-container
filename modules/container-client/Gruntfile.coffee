@@ -101,9 +101,8 @@ module.exports = (grunt) ->
         process: tidyPaths
 
     jshint:
-      options:
-        jshintrc: '.jshintrc'
       main: ['<%= common.app %>/js/**/*.js', '!<%= common.app %>/**/*.min.js']
+      test: ['<%= common.test %>/js/**/*.js']
 
     prepPlayerLauncher:
       files:
@@ -227,7 +226,7 @@ module.exports = (grunt) ->
   grunt.registerTask('mk-css', ['copy:less', 'less', 'component-less'])
   grunt.registerTask('default', ['stage'])
   grunt.registerTask('directive-templates', ['jade:directives', 'ngtemplates'])
-  grunt.registerTask('test', ['lcd', 'prepPlayerLauncher', 'directive-templates', 'jasmine:unit'])
+  grunt.registerTask('test', ['lcd', 'prepPlayerLauncher', 'directive-templates', 'jshint', 'jasmine:unit'])
   grunt.registerTask('stage', 'Work with the play stage task',
     ['mk-css',
     'component-version-info'

@@ -36,7 +36,7 @@ exports.define = function(isSecure) {
 
     function validateOptions(options){
       var out = [];
-      
+
       //TODO - hook in bens object id util...
 
       if (!options.mode || !isValidMode(options.mode)) {
@@ -54,17 +54,17 @@ exports.define = function(isSecure) {
 
       return out;
     }
-    
+
     function prepareCall() {
       if(options.itemId){
         return launcher.loadCall('createSession', function(url){
           return url.replace(':id', options.itemId);
-        }); 
+        });
       } else {
         options.mode = options.mode || 'gather';
         return launcher.loadCall(options.mode, function(url){
           return url.replace(':sessionId', options.sessionId);
-        }); 
+        });
       }
     }
 
@@ -73,14 +73,14 @@ exports.define = function(isSecure) {
     if(initOk){
       var call = prepareCall();
 
-      var params = options.queryParams; 
+      var params = options.queryParams;
       var initialData = {mode: options.mode};
       initialData[options.mode] = options[options.mode] || {};
-      
+
       instance = launcher.loadInstance(call, params, initialData);
 
       var forceWidth = options.forceWidth === undefined ? true : options.forceWidth;
-      
+
       if(forceWidth){
         instance.width(options.width || '600px');
       }
@@ -105,8 +105,6 @@ exports.define = function(isSecure) {
     } else {
       return;
     }
-      
-    
 
     var _isComplete = function(callback) {
       instance.send( 'isComplete', messageResultHandler(callback));
@@ -127,14 +125,16 @@ exports.define = function(isSecure) {
         cb(true);
       }
     };
-    
+
     var sendSetModeMessage = function(mode) {
+      var modeOptions = options[mode] || {};
       var saveResponseOptions = mode === 'evaluate' ? {
         isAttempt: false,
         isComplete: false
       } : null;
       instance.send('setMode', {
         mode: mode,
+        options: modeOptions,
         saveResponses: saveResponseOptions
       });
     };
@@ -206,7 +206,7 @@ exports.define = function(isSecure) {
     this.remove = function() {
       instance.remove();
     };
-      
+
   };
 
   return PlayerDefinition;
