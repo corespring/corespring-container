@@ -68,14 +68,21 @@ exports.define = function(isSecure) {
       }
     }
 
+
+    function buildModeData(mode){
+      var data = {mode: mode};
+      data[mode] = options[mode] || {};
+      return data;
+    }
+
+
     var initOk = launcher.init(validateOptions);
 
     if(initOk){
       var call = prepareCall();
 
       var params = options.queryParams;
-      var initialData = {mode: options.mode};
-      initialData[options.mode] = options[options.mode] || {};
+      var initialData = buildModeData(options.mode);
 
       instance = launcher.loadInstance(call, params, initialData);
 
@@ -127,16 +134,13 @@ exports.define = function(isSecure) {
     };
 
     var sendSetModeMessage = function(mode) {
-      var modeOptions = options[mode] || {};
-      var saveResponseOptions = mode === 'evaluate' ? {
-        isAttempt: false,
-        isComplete: false
-      } : null;
-      instance.send('setMode', {
-        mode: mode,
-        options: modeOptions,
-        saveResponses: saveResponseOptions
-      });
+      var data = buildModeData(mode);
+
+      if(mode === 'evaluate'){
+        data.saveResponses = { isAttempt: false, isComplete: false };
+      }
+
+      instance.send('setMode', data);
     };
 
     /* API methods */

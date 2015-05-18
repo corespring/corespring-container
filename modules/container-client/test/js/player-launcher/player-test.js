@@ -90,7 +90,7 @@ describe('player launcher', function() {
     });
 
     it('calls loadInstance with mode \'gather\' if it\'s not defined', function(){
-      var player = create({ itemId: '1' });
+      var player = create({ itemId: '1', gather: {} });
       expect(mockLauncher.loadInstance).toHaveBeenCalledWith(jasmine.any(Object), undefined, {mode: 'gather', gather: {}});
     });
   });
@@ -181,19 +181,15 @@ describe('player launcher', function() {
         expect(mockInstance.send).toHaveBeenCalledWith('setMode',
         {
           mode: 'evaluate',
-          options: opts.evaluate,
+          evaluate: opts.evaluate,
           saveResponses: {isAttempt: false, isComplete: false}
         });
       });
 
       it('should pass the view mode options', function(){
         player.setMode('view');
-        expect(mockInstance.send).toHaveBeenCalledWith('setMode',
-        {
-          mode: 'view',
-          options: opts.view,
-          saveResponses: null
-        });
+        expect(mockInstance.send)
+          .toHaveBeenCalledWith('setMode', { mode: 'view', view: opts.view });
       });
 
     });
