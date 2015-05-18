@@ -1,5 +1,6 @@
 function MockLogger(){
   this.log = function(){};
+  this.info = function(){};
   this.debug = function(){};
   this.warning = function(){};
   this.error = function(){};
