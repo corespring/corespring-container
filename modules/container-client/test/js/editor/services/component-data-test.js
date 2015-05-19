@@ -1,6 +1,7 @@
 describe('component data', function() {
 
   var componentData, register;
+
   window.MathJax = {
     Hub: {
       signal: {
@@ -10,6 +11,39 @@ describe('component data', function() {
       Config: function() {}
     }
   };
+
+  var MockBridge = function(){
+
+    var isEditable;
+
+    this.setDataAndSession = function(s){
+      this.dataAndSession = s;
+    };
+
+    this.setResponse = function(r){
+    };
+
+    this.getSession = function(){
+      return this.dataAndSession;
+    };
+
+    this.isAnswerEmpty = function(){
+      return false;
+    };
+
+    this.editable = function(e){
+    };
+
+    this.setMode = function(mode){
+    };
+
+    this.reset = function(){
+    };
+
+    this.answerChangedHandler = function(){
+    };
+  };
+
   beforeEach(angular.mock.module('corespring-player.services'));
   beforeEach(angular.mock.module('corespring-common.services'));
   beforeEach(angular.mock.module('corespring-editor.services'));
@@ -77,42 +111,24 @@ describe('component data', function() {
   it('allows component registration', function() {
     var id = componentData.addComponentModel({ compData: 'comp-data'});
     var result = null;
-    var bridge = {
-      setDataAndSession: function(dataAndSession) {
-        result = dataAndSession;
-      }
-    };
+    var bridge = new MockBridge();
     componentData.registerComponent(id, bridge);
-    expect(result).toEqual({data: { weight: 1, clean: true, compData: 'comp-data'}, session: {}});
+    expect(bridge.dataAndSession).toEqual({data: { weight: 1, clean: true, compData: 'comp-data'}, session: {}});
   });
 
   it('allows component updates', function() {
     var id = componentData.addComponentModel({ compData: 'comp-data'});
     var result = null;
-    var bridge = {
-      setDataAndSession: function(dataAndSession) {
-        result = dataAndSession;
-      }
-    };
+    var bridge = new MockBridge();
     componentData.registerComponent(id, bridge);
     componentData.updateComponent(id, { clean: false, compData: 'new data'});
-    expect(result).toEqual({data: {clean: false, compData: 'new data'}, session: {}});
+    expect(bridge.dataAndSession).toEqual({data: {clean: false, compData: 'new data'}, session: {}});
   });
-
-  var Bridge = function() {
-    this.dataAndSession = null;
-    this.setDataAndSession = function(ds) {
-      this.dataAndSession = ds;
-    };
-    this.getSession = function() {
-      return this.dataAndSession;
-    };
-  };
 
   it('adds and removes the component from the register', function() {
 
     var id = '1';
-    var bridge = new Bridge();
+    var bridge = new MockBridge();
 
     componentData.setModel({ 1: {}});
     componentData.registerComponent(id, bridge);
@@ -129,7 +145,7 @@ describe('component data', function() {
   describe("item pruning", function(){
     it("does not pass feedback to setDataAndSession", function(){
       var id = '1';
-      var bridge = new Bridge();
+      var bridge = new MockBridge();
       var model = { 1: {feedback:{}}};
 
       componentData.setModel(model);
@@ -138,7 +154,7 @@ describe('component data', function() {
     });
     it("does not pass correctResponse to setDataAndSession", function(){
       var id = '1';
-      var bridge = new Bridge();
+      var bridge = new MockBridge();
       var model = { 1: {correctResponse:{}}};
 
       componentData.setModel(model);
@@ -147,7 +163,7 @@ describe('component data', function() {
     });
     it("does pass anything else to setDataAndSession", function(){
       var id = '1';
-      var bridge = new Bridge();
+      var bridge = new MockBridge();
       var model = { 1: {anythingElse:{}}};
 
       componentData.setModel(model);
@@ -157,7 +173,7 @@ describe('component data', function() {
 
     it("does not change the original model", function(){
       var id = '1';
-      var bridge = new Bridge();
+      var bridge = new MockBridge();
       var model = { 1: {correctResponse:{}}};
       var saveModel = _.cloneDeep(model);
 

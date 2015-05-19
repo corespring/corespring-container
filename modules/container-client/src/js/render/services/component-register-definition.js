@@ -14,6 +14,9 @@ angular.module('corespring-player.services')
 
       this.registerComponent = function(id, bridge) {
         log("registerComponent", id, bridge);
+
+        assertBridgeHasExpectedMethods(bridge);
+
         bridges[id] = bridge;
 
         if (bridge.answerChangedHandler && answerChangedHandler) {
@@ -22,6 +25,24 @@ angular.module('corespring-player.services')
 
         if (_.isBoolean(isEditable) && bridge.editable) {
           bridge.editable(isEditable);
+        }
+
+        function assertBridgeHasExpectedMethods(bridge){
+          var missingMethods = _.filter([
+            'answerChangedHandler',
+            'editable',
+            'getSession',
+            'isAnswerEmpty',
+            'reset',
+            'setDataAndSession',
+            'setMode',
+            'setResponse'
+          ], function(methodName){
+            return !_.isFunction(bridge[methodName]);
+          });
+          if(missingMethods.length > 0){
+            throw "Bridge does not have expected methods: " + missingMethods;
+          }
         }
       };
 
@@ -77,6 +98,7 @@ angular.module('corespring-player.services')
       };
 
       this.resetStash = function() {
+        $log.warn('@deprecated - soon to be removed');
         _.forIn(bridges, fn('resetStash'));
       };
 
@@ -117,9 +139,7 @@ angular.module('corespring-player.services')
       };
 
       this.setEditable = function(e) {
-
         isEditable = e;
-
         _.forIn(bridges, function(b){
           if(b.editable){
             b.editable(isEditable);

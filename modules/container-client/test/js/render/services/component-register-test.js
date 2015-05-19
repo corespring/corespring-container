@@ -31,6 +31,18 @@ describe('component-register', function(){
         return isEditable;
       } 
     };
+
+    this.setMode = function(mode){
+
+    };
+
+    this.reset = function(){
+
+    };
+
+    this.answerChangedHandler = function(){
+
+    };
   };
 
   beforeEach(angular.mock.module('corespring-player.services'));
