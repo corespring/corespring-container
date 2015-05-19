@@ -21,7 +21,7 @@ describe('summaryFeedback', function() {
       $compile(element)(scope);
       element.scope().$apply();
       scope = element.isolateScope();
-    }
+    };
   }));
 
   it('should be hidden when summary feedback is missing, session is complete', function() {

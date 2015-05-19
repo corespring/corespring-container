@@ -20,7 +20,7 @@ describe('render root', function() {
   afterEach(function() {
     mockOn.calls.reset();
     mockSend.calls.reset();
-  })
+  });
 
   beforeEach(angular.mock.module('corespring-player.controllers'));
 

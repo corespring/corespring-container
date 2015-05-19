@@ -67,7 +67,7 @@ describe('ComponentPopups', function() {
         beforeEach(function() {
           spyOn($modal, 'open');
           success(components);
-          $template = $($modal.open.calls.mostRecent().args[0]['template']);
+          $template = $($modal.open.calls.mostRecent().args[0].template);
         });
 
         it('should launch dialog with title from component', function() {
@@ -84,7 +84,7 @@ describe('ComponentPopups', function() {
         beforeEach(function() {
           spyOn($modal, 'open');
           success(components);
-          $template = $($modal.open.calls.mostRecent().args[0]['template']);
+          $template = $($modal.open.calls.mostRecent().args[0].template);
         });
 
         it('should launch dialog with title from model', function() {
@@ -99,7 +99,7 @@ describe('ComponentPopups', function() {
       beforeEach(function() {
         spyOn($modal, 'open');
         failure();
-        $template = $($modal.open.calls.mostRecent().args[0]['template']);
+        $template = $($modal.open.calls.mostRecent().args[0].template);
       });
 
       it('should launch dialog with title from model', function() {
@@ -129,12 +129,12 @@ describe('ComponentPopups', function() {
       describe('and model.name is undefined', function(){
         it('and loadAvailableUiComponents fails', function() {
           failure();
-          $template = $($modal.open.calls.mostRecent().args[0]['template']);
+          $template = $($modal.open.calls.mostRecent().args[0].template);
           expect($template.find('.modal-title').text()).toEqual(defaultTitle);
         });
         it('and loadAvailableUiComponents succeeds', function() {
           success(components);
-          $template = $($modal.open.calls.mostRecent().args[0]['template']);
+          $template = $($modal.open.calls.mostRecent().args[0].template);
           expect($template.find('.modal-title').text()).toEqual(defaultTitle);
         });
       });
@@ -146,12 +146,12 @@ describe('ComponentPopups', function() {
         });
         it('and loadAvailableUiComponents fails', function() {
           failure();
-          $template = $($modal.open.calls.mostRecent().args[0]['template']);
+          $template = $($modal.open.calls.mostRecent().args[0].template);
           expect($template.find('.modal-title').text()).toEqual(mockModelName);
         });
         it('and loadAvailableUiComponents succeeds', function() {
           success(components);
-          $template = $($modal.open.calls.mostRecent().args[0]['template']);
+          $template = $($modal.open.calls.mostRecent().args[0].template);
           expect($template.find('.modal-title').text()).toEqual(mockModelName);
         });
       });

@@ -5,13 +5,11 @@
 var Instance = function(call,  element, errorCallback, log) {
 
   log = log || require('logger');
-  log.info('--> new instance');
-  log.info('call', call);
 
   function PostForm(url){
 
     var formName = iframeUid + '-form';
-    
+
     function addForm(){
       var form = [
         '<form ',
@@ -39,7 +37,7 @@ var Instance = function(call,  element, errorCallback, log) {
       addForm();
       submitForm();
       removeForm();
-    }; 
+    };
   }
 
   /* global msgr */
@@ -70,7 +68,7 @@ var Instance = function(call,  element, errorCallback, log) {
 
     function makeUrl() {
       var Builder = require('url-builder');
-      return new Builder(call.url).params(call.params).build(); 
+      return new Builder(call.url).params(call.params).build();
     }
 
     var url = makeUrl();
@@ -109,11 +107,11 @@ var Instance = function(call,  element, errorCallback, log) {
 
     $(e).html(iframeOpen + iframeClose);
 
-    
+
     if(call.method === 'POST'){
       var post = new PostForm(url);
       post.load();
-    } 
+    }
 
     channel = new msgr.Channel(window, $iframe()[0].contentWindow, {enableLogging: false});
 

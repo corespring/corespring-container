@@ -58,7 +58,7 @@ describe('additionalCopyrightInformationForProfile', function() {
 
       it('should be true', function() {
         expect(scope.hasCopyrightItems()).toBe(true);
-      })
+      });
     });
 
   });

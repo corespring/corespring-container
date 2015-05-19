@@ -50,7 +50,7 @@ describe('QuestionController', function() {
           mock[key].calls.reset();
         }
       });
-    })
+    });
   });
 
   function render() {
@@ -185,7 +185,7 @@ describe('QuestionController', function() {
         return t;
       })(),
       profile: profile
-    }
+    };
 
     beforeEach(function() {
       scope.item = item;
@@ -210,7 +210,7 @@ describe('QuestionController', function() {
         scope: function() {
           return {
             focusCaretAtEnd: focusCaretAtEnd
-          }
+          };
         }
       });
       scope.$emit('itemAdded');

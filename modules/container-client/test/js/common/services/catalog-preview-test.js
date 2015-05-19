@@ -17,7 +17,7 @@ describe('CatalogPreview', function() {
     beforeEach(function() {
       spyOn(modal, 'open');
       catalogPreview.launch(id);
-    })
+    });
 
     it('should call $modal.open', function() {
       expect(modal.open).toHaveBeenCalledWith({

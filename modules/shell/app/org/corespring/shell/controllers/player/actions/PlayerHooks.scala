@@ -66,4 +66,7 @@ trait PlayerHooks extends ContainerPlayerHooks {
     out.getOrElse(NotFound(""))
   }
 
+  override def loadItemFile(itemId: String, file: String)(implicit header: RequestHeader): SimpleResult = {
+    assets.load(AssetType.Item, itemId, file)(header)
+  }
 }

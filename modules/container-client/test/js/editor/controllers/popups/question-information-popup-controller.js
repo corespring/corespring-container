@@ -46,7 +46,7 @@ describe('QuestionInformationPopupController', function() {
     it("should set supportingMaterials to result of SupportingMaterialsService.getSupportingMaterialsByGroups", function() {
       expect(SupportingMaterials.getSupportingMaterialsByGroups.toHaveBeenCalledWith(item.supportingMaterials));
       expect(scope.supportingMaterials).toEqual(materialsByGroups);
-    })
+    });
 
   });
 
