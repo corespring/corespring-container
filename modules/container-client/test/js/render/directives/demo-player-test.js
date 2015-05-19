@@ -9,7 +9,7 @@ describe('corespringDemoPlayer', function() {
   function MockLog() {
     this.debug = {
       bind: function() {}
-    }
+    };
   }
 
   var mockSubmitSession = jasmine.createSpy('submitSession');
@@ -50,7 +50,7 @@ describe('corespringDemoPlayer', function() {
     mockSetMode.calls.reset();
     mockSetEditable.calls.reset();
     mockReset.calls.reset();
-  };
+  }
 
   afterEach(resetMocks);
 

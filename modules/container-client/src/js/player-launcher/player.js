@@ -1,4 +1,32 @@
 exports.define = function(isSecure) {
+
+
+  /** IE8 Support */
+  /* jshint ignore:start */
+  if (!Array.prototype.indexOf)
+  {
+    Array.prototype.indexOf = function(elt /*, from*/)
+    {
+      var len = this.length >>> 0;
+
+      var from = Number(arguments[1]) || 0;
+      from = (from < 0)
+           ? Math.ceil(from)
+           : Math.floor(from);
+      if (from < 0)
+        from += len;
+
+      for (; from < len; from++)
+      {
+        if (from in this &&
+            this[from] === elt)
+          return from;
+      }
+      return -1;
+    };
+  }
+  /* jshint ignore:end */
+
   var PlayerDefinition = function(element, options, errorCallback) {
 
     var Launcher = require('client-launcher');
@@ -12,6 +40,8 @@ exports.define = function(isSecure) {
         errorCallback(errorCodes.INSTANCE_NOT_READY);
       }
     };
+
+    options.mode = options.mode || 'gather';
 
     /**
      * Utility that calls errorCallback if an error has occured.
@@ -28,12 +58,16 @@ exports.define = function(isSecure) {
       };
     }
 
+    function isValidMode(m) {
+      return ['gather', 'view', 'evaluate'].indexOf(m) !== -1;
+    }
+
     function validateOptions(options){
       var out = [];
-      
+
       //TODO - hook in bens object id util...
 
-      if (!options.mode) {
+      if (!options.mode || !isValidMode(options.mode)) {
         out.push(errorCodes.INVALID_MODE);
         return out;
       }
@@ -48,33 +82,40 @@ exports.define = function(isSecure) {
 
       return out;
     }
-    
+
     function prepareCall() {
       if(options.itemId){
         return launcher.loadCall('createSession', function(url){
           return url.replace(':id', options.itemId);
-        }); 
+        });
       } else {
         options.mode = options.mode || 'gather';
         return launcher.loadCall(options.mode, function(url){
           return url.replace(':sessionId', options.sessionId);
-        }); 
+        });
       }
     }
+
+
+    function buildModeData(mode){
+      var data = {mode: mode};
+      data[mode] = options[mode] || {};
+      return data;
+    }
+
 
     var initOk = launcher.init(validateOptions);
 
     if(initOk){
       var call = prepareCall();
 
-      var params = options.queryParams; 
-      var initialData = {mode: options.mode};
-      initialData[options.mode] = options[options.mode] || {};
-      
+      var params = options.queryParams;
+      var initialData = buildModeData(options.mode);
+
       instance = launcher.loadInstance(call, params, initialData);
 
       var forceWidth = options.forceWidth === undefined ? true : options.forceWidth;
-      
+
       if(forceWidth){
         instance.width(options.width || '600px');
       }
@@ -99,10 +140,6 @@ exports.define = function(isSecure) {
     } else {
       return;
     }
-      
-    function isValidMode(m) {
-      return ['gather', 'view', 'evaluate'].indexOf(m) !== -1;
-    }
 
     var _isComplete = function(callback) {
       instance.send( 'isComplete', messageResultHandler(callback));
@@ -123,16 +160,15 @@ exports.define = function(isSecure) {
         cb(true);
       }
     };
-    
+
     var sendSetModeMessage = function(mode) {
-      var saveResponseOptions = mode === 'evaluate' ? {
-        isAttempt: false,
-        isComplete: false
-      } : null;
-      instance.send('setMode', {
-        mode: mode,
-        saveResponses: saveResponseOptions
-      });
+      var data = buildModeData(mode);
+
+      if(mode === 'evaluate'){
+        data.saveResponses = { isAttempt: false, isComplete: false };
+      }
+
+      instance.send('setMode', data);
     };
 
     /* API methods */
@@ -202,7 +238,7 @@ exports.define = function(isSecure) {
     this.remove = function() {
       instance.remove();
     };
-      
+
   };
 
   return PlayerDefinition;

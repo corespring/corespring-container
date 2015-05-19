@@ -59,7 +59,7 @@ describe('UrlBuilder', function() {
     });
 
     describe('value is undefined', function() {
-      var hash = undefined;
+      var hash;
 
       it('should not append anything to URL', function() {
         var url = new UrlBuilder(baseUrl).hash(hash).build();
