@@ -156,7 +156,7 @@
             showSubmitButton: '@'
           },
           template: [
-            '<div class="control-panel">',
+            '<div class="corespring-player-control-panel">',
             '  <div class="header-container">',
             '    <div class="header action-holder score-holder pull-right" ng-show="showScore">',
             '      <div class="score">',
