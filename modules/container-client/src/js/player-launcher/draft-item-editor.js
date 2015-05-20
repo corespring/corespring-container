@@ -30,7 +30,8 @@ function EditorDefinition(element, options, errorCallback) {
     }
 
     function onError(xhrErr){
-      var msg = (xhrErr.responseJSON && xhrErr.responseJSON.error) ? xhrErr.responseJSON.error : 'Failed to commit draft: ' + options.draftId;
+      var msg = (xhrErr.responseJSON && xhrErr.responseJSON.error) ?
+        xhrErr.responseJSON.error : 'Failed to create item and draft: ' + options.draftId;
       callback(msg);
     }
 
@@ -57,11 +58,6 @@ function EditorDefinition(element, options, errorCallback) {
     if (!call) {
       errorCallback(errorCodes.NO_DRAFT_ID);
       return;
-    }
-
-    // Not sure what's going on here.
-    function fixCall(call) {
-      return (typeof call === 'string') ? call : call.url;
     }
 
     var tab = options.selectedTab;
