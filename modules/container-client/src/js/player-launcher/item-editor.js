@@ -49,12 +49,14 @@ function EditorDefinition(element, options, errorCallback) {
       throw new Error('invalid itemId');
     }
 
-    var call = launcher.loadCall(options.devEditor ? 'devEditor' : 'editor', function(u){
+    var callKey = options.devEditor ? 'devEditor' : 'editor';
+
+    var call = launcher.loadCall(callKey, function(u){
       return u.replace(':itemId', itemId);
     });
 
     if (!call) {
-      errorCallback(errorCodes.NO_DRAFT_ID);
+      errorCallback(errorCodes.CANT_FIND_URL('cant find a url for key: ' + callKey));
       return;
     }
 
@@ -68,7 +70,7 @@ function EditorDefinition(element, options, errorCallback) {
       call.hash = '/supporting-materials/0';
     }
 
-    var initialData = {profileConfig: options.profileConfig};
+    var initialData = options.profileConfig ? {profileConfig: options.profileConfig} : {};
 
     function onReady(instance){
       if(options.devEditor){
