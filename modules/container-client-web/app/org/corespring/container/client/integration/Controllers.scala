@@ -45,10 +45,10 @@ trait PlayerControllers extends CommonControllers with ResourceControllers {
 
 trait EditorControllers extends CommonControllers with ResourceControllers {
   /** The editor */
-  def editor: Editor
+  def editor: DraftEditor
 
   /** The dev editor */
-  def devEditor: DevEditor
+  def devEditor: DraftDevEditor
 
   /** icons are only used in the editor */
   def icons: Icons

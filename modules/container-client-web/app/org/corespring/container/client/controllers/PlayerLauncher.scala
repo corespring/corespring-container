@@ -39,12 +39,17 @@ trait PlayerLauncher extends Controller {
   }
 
   import JsResource._
-  import org.corespring.container.client.controllers.apps.routes.{ Catalog, DevEditor, Editor, Player }
-
+  import org.corespring.container.client.controllers.apps.routes.{ Catalog, DraftEditor, DraftDevEditor, ItemEditor, ItemDevEditor, Player }
+  import org.corespring.container.client.controllers.resources.routes.Item
   def hooks: PlayerLauncherHooks
 
-  lazy val editorNameAndSrc = {
-    val jsPath = "container-client/js/player-launcher/editor.js"
+  lazy val itemEditorNameAndSrc = {
+    val jsPath = "container-client/js/player-launcher/item-editor.js"
+    pathToNameAndContents(jsPath)
+  }
+
+  lazy val draftEditorNameAndSrc = {
+    val jsPath = "container-client/js/player-launcher/item-draft-editor.js"
     pathToNameAndContents(jsPath)
   }
 
@@ -69,13 +74,21 @@ trait PlayerLauncher extends Controller {
         Seq(
           "catalog" -> Catalog.load(":itemId"))))
 
-    val editor = {
+    val draftEditor = {
       Json.obj(
         "paths" -> JsObject(Seq(
-          "editor" -> Editor.load(":draftId"),
-          "devEditor" -> DevEditor.load(":draftId"),
+          "editor" -> DraftEditor.load(":draftId"),
+          "devEditor" -> DraftDevEditor.load(":draftId"),
           "createItemAndDraft" -> ItemDraft.createItemAndDraft(),
           "commitDraft" -> ItemDraft.commit(":draftId"))))
+    }
+
+    val itemEditor = {
+      Json.obj(
+        "paths" -> JsObject(Seq(
+          "editor" -> ItemEditor.load(":itemId"),
+          "devEditor" -> ItemDevEditor.load(":itemId"),
+          "createItemAndDraft" -> Item.create())))
     }
 
     val player = {
@@ -98,7 +111,18 @@ trait PlayerLauncher extends Controller {
 
   def editorJs = Action.async { implicit request =>
     hooks.editorJs.map { implicit js =>
-      make(editorNameAndSrc, LaunchOptions.editor, Definitions.editor)
+
+      val combinedJs = ("editor" ->
+        s"""
+           |${draftEditorNameAndSrc._2}
+           |${itemEditorNameAndSrc._2}
+         """.stripMargin)
+
+      val combinedOptions = Json.obj(
+        "itemEditor" -> LaunchOptions.itemEditor,
+        "draftEditor" -> LaunchOptions.draftEditor)
+
+      make(combinedJs, combinedOptions, Definitions.editor)
     }
   }
 

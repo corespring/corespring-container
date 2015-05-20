@@ -116,7 +116,7 @@ trait DefaultIntegration
     def defaultCharSet: String = configuration.getString("default.charset").getOrElse("utf-8")
   }
 
-  lazy val editor = new Editor {
+  lazy val editor = new DraftEditor {
 
     override def versionInfo: JsObject = DefaultIntegration.this.versionInfo
 
@@ -133,7 +133,7 @@ trait DefaultIntegration
     override def resolveDomain(path: String): String = DefaultIntegration.this.resolveDomain(path)
   }
 
-  lazy val devEditor = new DevEditor {
+  lazy val devEditor = new DraftDevEditor {
     override def mode: Mode = Play.current.mode
 
     override implicit def ec: ExecutionContext = DefaultIntegration.this.ec
