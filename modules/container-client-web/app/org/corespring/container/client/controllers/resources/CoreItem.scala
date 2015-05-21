@@ -57,7 +57,7 @@ trait CoreItem extends Controller {
     }
   }
 
-  def saveSubset(itemId: String, subset: String) = Action.async { implicit request: Request[AnyContent] =>
+  def saveSubset(id: String, subset: String) = Action.async { implicit request: Request[AnyContent] =>
 
     logger.debug(s"function=saveSubset subset=$subset")
     def missingProperty(p: String) = (i: String) => Future(Left(BAD_REQUEST, s"Missing property $p in json request for $i"))
@@ -86,7 +86,7 @@ trait CoreItem extends Controller {
     val out: Validation[String, Future[Either[StatusMessage, JsValue]]] = for {
       json <- request.body.asJson.toSuccess(ItemDraft.Errors.noJson)
       fn <- saveFn(subset, json).toSuccess(ItemDraft.Errors.unknownSubset)
-      result <- Success(fn(itemId))
+      result <- Success(fn(id))
     } yield result
 
     out match {
