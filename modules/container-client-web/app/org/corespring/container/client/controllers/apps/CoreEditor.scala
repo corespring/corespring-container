@@ -6,12 +6,9 @@ import org.corespring.container.client.controllers.helpers.JsonHelper
 import org.corespring.container.client.controllers.jade.Jade
 import org.corespring.container.client.hooks.EditorHooks
 import org.corespring.container.client.hooks.Hooks.StatusMessage
-import org.corespring.container.client.views.txt.js.EditorServices
 import org.corespring.container.components.model.ComponentInfo
 import play.api.libs.json._
 import play.api.mvc._
-
-import scala.concurrent.Future
 
 trait CoreEditor
   extends AllItemTypesReader
@@ -43,7 +40,7 @@ trait CoreEditor
       "configuration" -> (ci.packageInfo \ "external-configuration").asOpt[JsObject])
   }
 
-  def servicesJs(id: String, components:JsArray, widgets:JsArray): String
+  def servicesJs(id: String, components: JsArray, widgets: JsArray): String
 
   def load(id: String): Action[AnyContent] = Action.async { implicit request =>
 
@@ -62,7 +59,7 @@ trait CoreEditor
       val domainResolvedJs = buildJs(scriptInfo)
       val domainResolvedCss = buildCss(scriptInfo)
       val componentsArray: JsArray = JsArray(interactions.map(toJson))
-      val widgetsArray:  JsArray = JsArray(widgets.map(toJson))
+      val widgetsArray: JsArray = JsArray(widgets.map(toJson))
       Ok(renderJade(
         EditorTemplateParams(
           context,
@@ -76,5 +73,4 @@ trait CoreEditor
     hooks.load(id).map { e => e.fold(onError, onItem) }
   }
 }
-
 
