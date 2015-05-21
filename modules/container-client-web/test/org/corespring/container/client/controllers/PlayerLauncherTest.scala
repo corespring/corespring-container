@@ -46,22 +46,36 @@ class PlayerLauncherTest extends Specification with Mockito with PlaySpecificati
 
   object MockGlobal extends GlobalSettings
 
+  implicit val r = FakeRequest("", "")
+
   "playerJs" should {
 
     "return non - secured player js" in new launchScope(PlayerJs(false, Session())) {
       running(FakeApplication(withGlobal = Some(MockGlobal))) {
-        val result: Future[SimpleResult] = playerJs(FakeRequest("", ""))
+        val result: Future[SimpleResult] = playerJs(r)
 
-        contentAsString(result) must_== new JsBuilder(playerConfig.rootUrl.get).build(playerNameAndSrc, mkPaths(Paths.player), Definitions.player(jsConfig.isSecure))(FakeRequest("", ""), jsConfig)
+        contentAsString(result) must_== new JsBuilder(playerConfig.rootUrl.get).build(playerNameAndSrc, mkPaths(Paths.player), Definitions.player(jsConfig.isSecure))(r, jsConfig)
         Helpers.session(result).get(SecureMode) must_== Some("false")
       }
     }
 
     "return secured player js" in new launchScope(PlayerJs(true, Session())) {
       running(FakeApplication(withGlobal = Some(MockGlobal))) {
-        val result: Future[SimpleResult] = playerJs(FakeRequest("", ""))
-        contentAsString(result) must_== new JsBuilder(playerConfig.rootUrl.get).build(playerNameAndSrc, mkPaths(Paths.player), Definitions.player(jsConfig.isSecure))(FakeRequest("", ""), jsConfig)
+        val result: Future[SimpleResult] = playerJs(r)
+        contentAsString(result) must_== new JsBuilder(playerConfig.rootUrl.get).build(playerNameAndSrc, mkPaths(Paths.player), Definitions.player(jsConfig.isSecure))(r, jsConfig)
         Helpers.session(result).get(SecureMode) must_== Some("true")
+      }
+    }
+  }
+
+  "editorJs" should {
+
+    "return itemEditor and draftEditor definitions" in new launchScope(PlayerJs(false, Session())) {
+      running(FakeApplication(withGlobal = Some(MockGlobal))) {
+        val result = editorJs(r)
+        val nameAndSrc = Seq(draftEditorNameAndSrc, itemEditorNameAndSrc)
+        val config = mkPaths(Paths.editors)
+        contentAsString(result) must_== new JsBuilder(playerConfig.rootUrl.get).build(nameAndSrc, config, Definitions.editors)(r, jsConfig)
       }
     }
   }

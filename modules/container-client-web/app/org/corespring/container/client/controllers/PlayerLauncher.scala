@@ -5,7 +5,6 @@ import org.corespring.container.client.controllers.launcher.{ JsBuilder, JsResou
 import org.corespring.container.client.hooks.{ PlayerJs, PlayerLauncherHooks }
 import org.corespring.container.logging.ContainerLogger
 import play.api.http.ContentTypes
-import play.api.libs.json.Json.JsValueWrapper
 import play.api.libs.json.{ JsObject, Json }
 import play.api.mvc.{ Session, _ }
 
@@ -69,18 +68,18 @@ trait PlayerLauncher extends Controller {
 
     import org.corespring.container.client.controllers.resources.routes.ItemDraft
 
-    val catalog = JsObject( Seq( "catalog" -> Catalog.load(":itemId")))
+    val catalog = JsObject(Seq("catalog" -> Catalog.load(":itemId")))
 
     val draftEditor = JsObject(Seq(
-          "editor" -> DraftEditor.load(":draftId"),
-          "devEditor" -> DraftDevEditor.load(":draftId"),
-          "createItemAndDraft" -> ItemDraft.createItemAndDraft(),
-          "commitDraft" -> ItemDraft.commit(":draftId")))
+      "editor" -> DraftEditor.load(":draftId"),
+      "devEditor" -> DraftDevEditor.load(":draftId"),
+      "createItemAndDraft" -> ItemDraft.createItemAndDraft(),
+      "commitDraft" -> ItemDraft.commit(":draftId")))
 
-    val itemEditor =  JsObject(Seq(
-          "editor" -> ItemEditor.load(":itemId"),
-          "devEditor" -> ItemDevEditor.load(":itemId"),
-          "createItem" -> Item.create()))
+    val itemEditor = JsObject(Seq(
+      "editor" -> ItemEditor.load(":itemId"),
+      "devEditor" -> ItemDevEditor.load(":itemId"),
+      "createItem" -> Item.create()))
 
     val player = {
       val loadSession = Player.load(":sessionId")
@@ -90,6 +89,10 @@ trait PlayerLauncher extends Controller {
         "view" -> loadSession,
         "evaluate" -> loadSession))
     }
+
+    val editors = Json.obj(
+      "itemEditor" -> itemEditor,
+      "draftEditor" -> draftEditor)
   }
 
   object Definitions {
@@ -97,24 +100,20 @@ trait PlayerLauncher extends Controller {
     val itemEditor = "org.corespring.players.ItemEditor = corespring.require('item-editor');"
     val draftEditor = "org.corespring.players.DraftEditor = corespring.require('draft-editor');"
     val catalog = "org.corespring.players.ItemCatalog = corespring.require('catalog');"
+
+    val editors =
+      s"""
+         |$itemEditor
+         |$draftEditor
+       """.stripMargin
   }
 
-  def mkPaths(paths:JsObject) = Json.obj("paths" -> paths)
+  def mkPaths(paths: JsObject) = Json.obj("paths" -> paths)
 
   def editorJs = Action.async { implicit request =>
     hooks.editorJs.map { implicit js =>
-
-      val config =  mkPaths(Json.obj(
-        "itemEditor" -> Paths.itemEditor,
-        "draftEditor" -> Paths.draftEditor))
-
-      val combinedBootstrap =
-        s"""
-           |${Definitions.itemEditor}
-            |${Definitions.draftEditor}
-         """.stripMargin
-
-      make(Seq(draftEditorNameAndSrc, itemEditorNameAndSrc), config, combinedBootstrap)
+      val config = mkPaths(Paths.editors)
+      make(Seq(draftEditorNameAndSrc, itemEditorNameAndSrc), config, Definitions.editors)
     }
   }
 
