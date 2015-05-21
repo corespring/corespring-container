@@ -6,7 +6,7 @@ function EditorDefinition(element, options, errorCallback) {
 
   function createItem(callback){
 
-    var call = launcher.loadCall('createItem');
+    var call = launcher.loadCall('itemEditor.createItem');
 
     if (!call) {
       return;
@@ -49,7 +49,7 @@ function EditorDefinition(element, options, errorCallback) {
       throw new Error('invalid itemId');
     }
 
-    var callKey = options.devEditor ? 'devEditor' : 'editor';
+    var callKey = 'itemEditor.' + (options.devEditor ? 'devEditor' : 'editor');
 
     var call = launcher.loadCall(callKey, function(u){
       return u.replace(':itemId', itemId);

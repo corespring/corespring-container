@@ -4,7 +4,7 @@ import com.mongodb.DBObject
 import com.mongodb.casbah.MongoCollection
 import com.mongodb.casbah.commons.MongoDBObject
 import org.bson.types.ObjectId
-import org.corespring.container.client.hooks.{CollectionHooks, ItemHooks}
+import org.corespring.container.client.hooks.{CollectionHooks}
 import org.corespring.container.logging.ContainerLogger
 import org.corespring.mongo.json.services.MongoService
 import org.corespring.shell.services.ItemDraftService
@@ -25,7 +25,6 @@ trait Main
 
   def sessionService: MongoService
 
-  def itemHooks: ItemHooks
 
   def index = Action {
     request =>
@@ -54,7 +53,7 @@ trait Main
             val itemId = id.get("itemId").asInstanceOf[ObjectId]
             val draftName = id.get("name").asInstanceOf[String]
             val draftId = s"$itemId~$draftName"
-            val editDraftUrl = Launchers.editorFromDraft(draftId).url
+            val editDraftUrl = Launchers.draftEditor(draftId).url
             DraftLink(draftName, editDraftUrl, routes.Main.deleteDraft(draftId).url)
           }.toSeq
 
@@ -62,13 +61,13 @@ trait Main
           val id = itemId.toString
           val playerUrl = Launchers.playerFromItem(id).url
           val deleteUrl = routes.Main.deleteItem(id).url
-          val editorUrl = Launchers.editorFromItem(id).url
-          val devEditorUrl = appRoutes.DevEditor.load(id).url
+          val draftEditorUrl = Launchers.draftEditorFromItem(id).url
+          val itemEditorUrl = Launchers.itemEditor(id).url
           val catalogUrl = Launchers.catalog(id).url
           IndexLink(name,
             playerUrl,
-            editorUrl,
-            devEditorUrl,
+            draftEditorUrl,
+            itemEditorUrl,
             draftUrls,
             deleteUrl,
             catalogUrl)
@@ -103,16 +102,6 @@ trait Main
     request =>
       items.remove(MongoDBObject("_id" -> new ObjectId(itemId)))
       Redirect("/")
-  }
-
-  def createItem = Action.async {
-    request =>
-      import org.corespring.shell.controllers.routes.Launchers
-      import scala.concurrent.ExecutionContext.Implicits.global
-      itemHooks.create(None)(request).map {
-        case Left(err) => BadRequest("Error creating item")
-        case Right(id) => Redirect(Launchers.editorFromItem(id.toString))
-      }
   }
 
   def createSession = Action {

@@ -3,7 +3,7 @@ package org.corespring.container.client.controllers.apps
 import org.corespring.container.client.views.txt.js.EditorServices
 import play.api.libs.json._
 
-trait ItemEditor extends CoreEditor {
+trait BaseDraftEditor extends CoreEditor {
 
   import org.corespring.container.client.controllers.resources.{ routes => resourceRoutes }
 
@@ -16,3 +16,10 @@ trait ItemEditor extends CoreEditor {
   }
 }
 
+trait DraftEditor extends BaseDraftEditor{
+  override def context = "editor"
+}
+
+trait DraftDevEditor extends BaseDraftEditor{
+  override def context = "dev-editor"
+}

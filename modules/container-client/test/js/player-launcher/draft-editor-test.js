@@ -1,4 +1,4 @@
-describe('draft-item-editor', function() {
+describe('draft-editor', function() {
 
   var mockLauncher, mockInstance;
   var errorCodes = corespring.require('error-codes');
@@ -17,7 +17,7 @@ describe('draft-item-editor', function() {
       return mockLauncher;
     };
     onError = jasmine.createSpy('onError');
-    DraftEditor = new corespring.require('draft-item-editor');
+    DraftEditor = new corespring.require('draft-editor');
   });
 
   afterEach(function() {
@@ -39,9 +39,7 @@ describe('draft-item-editor', function() {
         var editor = new DraftEditor('element', {
           itemId: 'itemId'
         }, onError);
-        expect(mockLauncher.loadCall).toHaveBeenCalled();
-        var key = mockLauncher.loadCall.calls.mostRecent().args[0];
-        expect(key).toEqual('editor');
+        expect(mockLauncher.loadCall).toHaveBeenCalledWith('draftEditor.editor', jasmine.any(Function));
       });
 
       it('calls loadCall(devEditor)', function() {
@@ -49,9 +47,7 @@ describe('draft-item-editor', function() {
           itemId: 'itemId',
           devEditor: true
         }, onError);
-        expect(mockLauncher.loadCall).toHaveBeenCalled();
-        var key = mockLauncher.loadCall.calls.mostRecent().args[0];
-        expect(key).toEqual('devEditor');
+        expect(mockLauncher.loadCall).toHaveBeenCalledWith('draftEditor.devEditor', jasmine.any(Function));
       });
 
       it('triggers an error if there is no call found', function() {
@@ -178,7 +174,7 @@ describe('draft-item-editor', function() {
       it('calls launcher.loadCall(createItemAndDraft)', function() {
         var editor = new DraftEditor('element', {}, function() {});
         expect(mockLauncher.loadCall).toHaveBeenCalledWith(
-          'createItemAndDraft');
+          'draftEditor.createItemAndDraft');
       });
 
       it('calls $.ajax', function() {
@@ -254,7 +250,7 @@ describe('draft-item-editor', function() {
           });
 
         it('calls launcher.loadCall', function() {
-          expect(mockLauncher.loadCall).toHaveBeenCalledWith('editor',
+          expect(mockLauncher.loadCall).toHaveBeenCalledWith('draftEditor.editor',
             jasmine.any(Function));
         });
 
@@ -273,12 +269,19 @@ describe('draft-item-editor', function() {
 
     it('calls commitDraft endpoint', function() {
 
+      /**
+
+       [ { type: 'GET', url: 'createItemAndDraft', data: { draftName: <jasmine.any(function String() { [native code] })> }, success: <jasmine.any(function Function() { [native code] })>, error: <jasmine.any(function Function() { [native code] })>, dataType: 'json' } ] 
+       but actual calls were 
+       [ { type: 'GET', url: 'draftEditor.createItemAndDraft', data: { draftName: 'ca5af71db362' }, success: Function, error: Function, dataType: 'json' } ], [ { type: 'GET', url: 'draftEditor.commitDraft?params={"force":false}', data: { draftName: 'ca5af71db362' }, success: Function, error: Function, dataType: 'json' } ].
+
+      */
       var editor = new DraftEditor('element', {}, onError);
       var cb = jasmine.createSpy('cb');
       editor.commitDraft(false, cb);
       expect($.ajax).toHaveBeenCalledWith({
         type: 'GET',
-        url: 'createItemAndDraft',
+        url: 'draftEditor.createItemAndDraft',
         data: {
           draftName: jasmine.any(String)
         },

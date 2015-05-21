@@ -49,7 +49,7 @@ trait PlayerLauncher extends Controller {
   }
 
   lazy val draftEditorNameAndSrc = {
-    val jsPath = "container-client/js/player-launcher/item-draft-editor.js"
+    val jsPath = "container-client/js/player-launcher/draft-editor.js"
     pathToNameAndContents(jsPath)
   }
 
@@ -65,77 +65,69 @@ trait PlayerLauncher extends Controller {
 
   implicit def callToJson(c: Call): JsObject = Json.obj("method" -> c.method, "url" -> c.url)
 
-  object LaunchOptions {
+  object Paths {
 
     import org.corespring.container.client.controllers.resources.routes.ItemDraft
 
-    val catalog = Json.obj(
-      "paths" -> JsObject(
-        Seq(
-          "catalog" -> Catalog.load(":itemId"))))
+    val catalog = JsObject( Seq( "catalog" -> Catalog.load(":itemId")))
 
-    val draftEditor = {
-      Json.obj(
-        "paths" -> JsObject(Seq(
+    val draftEditor = JsObject(Seq(
           "editor" -> DraftEditor.load(":draftId"),
           "devEditor" -> DraftDevEditor.load(":draftId"),
           "createItemAndDraft" -> ItemDraft.createItemAndDraft(),
-          "commitDraft" -> ItemDraft.commit(":draftId"))))
-    }
+          "commitDraft" -> ItemDraft.commit(":draftId")))
 
-    val itemEditor = {
-      Json.obj(
-        "paths" -> JsObject(Seq(
+    val itemEditor =  JsObject(Seq(
           "editor" -> ItemEditor.load(":itemId"),
           "devEditor" -> ItemDevEditor.load(":itemId"),
-          "createItemAndDraft" -> Item.create())))
-    }
+          "createItem" -> Item.create()))
 
     val player = {
       val loadSession = Player.load(":sessionId")
-      Json.obj(
-        "mode" -> "gather",
-        "paths" -> JsObject(Seq(
-          "createSession" -> Player.createSessionForItem(":id"),
-          "gather" -> loadSession,
-          "view" -> loadSession,
-          "evaluate" -> loadSession)))
+      JsObject(Seq(
+        "createSession" -> Player.createSessionForItem(":id"),
+        "gather" -> loadSession,
+        "view" -> loadSession,
+        "evaluate" -> loadSession))
     }
   }
 
   object Definitions {
     def player(isSecure: Boolean) = s"org.corespring.players.ItemPlayer = corespring.require('player').define($isSecure);"
-    val editor = "org.corespring.players.ItemEditor = corespring.require('editor');"
+    val itemEditor = "org.corespring.players.ItemEditor = corespring.require('item-editor');"
+    val draftEditor = "org.corespring.players.DraftEditor = corespring.require('draft-editor');"
     val catalog = "org.corespring.players.ItemCatalog = corespring.require('catalog');"
   }
+
+  def mkPaths(paths:JsObject) = Json.obj("paths" -> paths)
 
   def editorJs = Action.async { implicit request =>
     hooks.editorJs.map { implicit js =>
 
-      val combinedJs = ("editor" ->
+      val config =  mkPaths(Json.obj(
+        "itemEditor" -> Paths.itemEditor,
+        "draftEditor" -> Paths.draftEditor))
+
+      val combinedBootstrap =
         s"""
-           |${draftEditorNameAndSrc._2}
-           |${itemEditorNameAndSrc._2}
-         """.stripMargin)
+           |${Definitions.itemEditor}
+            |${Definitions.draftEditor}
+         """.stripMargin
 
-      val combinedOptions = Json.obj(
-        "itemEditor" -> LaunchOptions.itemEditor,
-        "draftEditor" -> LaunchOptions.draftEditor)
-
-      make(combinedJs, combinedOptions, Definitions.editor)
+      make(Seq(draftEditorNameAndSrc, itemEditorNameAndSrc), config, combinedBootstrap)
     }
   }
 
   def catalogJs = Action.async { implicit request =>
     hooks.catalogJs.map { implicit js =>
-      make(catalogNameAndSrc, LaunchOptions.catalog, Definitions.catalog)
+      make(catalogNameAndSrc, mkPaths(Paths.catalog), Definitions.catalog)
     }
   }
 
   def playerJs = Action.async { implicit request =>
     hooks.playerJs.map { implicit js =>
       logger.debug(s"playerJs - isSecure=${js.isSecure}, path=${request.path}, queryString=${request.rawQueryString}")
-      make(playerNameAndSrc, LaunchOptions.player, Definitions.player(js.isSecure))
+      make(playerNameAndSrc, mkPaths(Paths.player), Definitions.player(js.isSecure))
     }
   }
 
@@ -143,7 +135,7 @@ trait PlayerLauncher extends Controller {
 
   private def sumSession(s: Session, keyValues: (String, String)*): Session = keyValues.foldRight(s) { case ((key, value), acc) => acc + (key -> value) }
 
-  private def make(additionalJsNameAndSrc: (String, String), options: JsObject, bootstrapLine: String)(implicit request: RequestHeader, js: PlayerJs): SimpleResult = {
+  private def make(additionalJsNameAndSrc: Seq[(String, String)], options: JsObject, bootstrapLine: String)(implicit request: RequestHeader, js: PlayerJs): SimpleResult = {
     val corespringUrl = playerConfig.rootUrl.getOrElse(BaseUrl(request))
     val builder = new JsBuilder(corespringUrl)
     val finalSession = sumSession(js.session, (SecureMode, js.isSecure.toString))
@@ -151,6 +143,10 @@ trait PlayerLauncher extends Controller {
     Ok(builder.build(additionalJsNameAndSrc, options, bootstrapLine)(request, js))
       .as(ContentTypes.JAVASCRIPT)
       .withSession(finalSession)
+  }
+
+  private def make(additionalJsNameAndSrc: (String, String), options: JsObject, bootstrapLine: String)(implicit request: RequestHeader, js: PlayerJs): SimpleResult = {
+    make(Seq(additionalJsNameAndSrc), options, bootstrapLine)
   }
 }
 

@@ -27,18 +27,20 @@ class DefaultIntegrationTest extends Specification with Mockito with PlaySpecifi
 
       override def catalogHooks: CatalogHooks = mock[CatalogHooks]
 
-      override def editorHooks: EditorHooks = mock[EditorHooks]
+      override def draftEditorHooks: EditorHooks = mock[EditorHooks]
+      override def itemEditorHooks: EditorHooks = mock[EditorHooks]
 
       override def dataQueryHooks: DataQueryHooks = mock[DataQueryHooks]
 
       override def sessionHooks: SessionHooks = {
         val m = mock[SessionHooks]
         m.loadItemAndSession(anyString)(any[Request[AnyContent]]) returns Right(FullSession(json, false))
+        m
       }
 
       override def collectionHooks: CollectionHooks = mock[CollectionHooks]
 
-      override def itemDraftHooks: ItemDraftHooks = mock[ItemDraftHooks]
+      override def itemDraftHooks: CoreItemHooks with DraftHooks = mock[CoreItemHooks with DraftHooks]
 
       override def configuration: Configuration = Configuration.empty
 
@@ -47,7 +49,7 @@ class DefaultIntegrationTest extends Specification with Mockito with PlaySpecifi
       /** urls for component sets eg one or more components */
       override def componentSets: ComponentSets = mock[ComponentSets]
 
-      override def itemHooks: ItemHooks = mock[ItemHooks]
+      override def itemHooks: CoreItemHooks with CreateItemHook = mock[CoreItemHooks with CreateItemHook]
     }
   }
 

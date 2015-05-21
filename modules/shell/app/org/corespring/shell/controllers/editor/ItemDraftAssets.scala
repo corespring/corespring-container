@@ -5,3 +5,7 @@ trait ItemDraftAssets {
   def copyDraftToItem(draftId: String, itemId: String)
   def deleteDraft(draftId: String)
 }
+
+trait ItemAssets {
+  def deleteItem(id:String) : Unit
+}

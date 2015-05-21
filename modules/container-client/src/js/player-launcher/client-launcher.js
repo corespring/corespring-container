@@ -35,17 +35,59 @@ function ClientLauncher(element, options, errorCallback){
   
   function Paths(pathsConfig){
 
+    /** 
+     * Get nested values by dot delimited string.
+     * this.get('a.b.c', '??');
+     */
+    function NestedGetter(obj){
+
+      function getValueByArray(obj, parts, value){
+
+        if(!parts) {
+          return null;
+        }
+
+        if(parts.length === 1){
+          return obj[parts[0]];
+        } else {
+          var next = parts.shift();
+
+          if(!obj[next]){
+            return null;
+          }
+          return getValueByArray(obj[next], parts, value);
+        }
+      }
+
+      this.get = function(path, defaultValue){
+        return getValueByArray(obj, path.split('.')) || defaultValue;
+      };
+    }
+
     this.corespringUrl = launchConfig.corespringUrl;
     
+    var getter = new NestedGetter(pathsConfig);
+    
     this.loadCall = function(key){
-      if (!pathsConfig || !pathsConfig[key]) {
+
+      if (!pathsConfig) {
         errorCallback({
           code: 105,
           message: key + ' not part of paths config'
         });
         return null;
       }
-      return pathsConfig[key];
+
+      var result = getter.get(key, 'not-found');
+
+      if(result === 'not-found'){
+        errorCallback({
+          code: 105,
+          message: key + ' not part of paths config'
+        });
+        return null;
+      }
+      return result;
     };
   }
 

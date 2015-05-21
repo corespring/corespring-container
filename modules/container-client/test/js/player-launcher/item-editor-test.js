@@ -34,7 +34,7 @@ describe('item-editor', function(){
         var editor = new Editor('element', {}, onError);
         expect($.ajax).toHaveBeenCalledWith({
           type: 'GET',
-          url: 'createItem',
+          url: 'itemEditor.createItem',
           data: {},
           success: jasmine.any(Function),
           error: jasmine.any(Function),
@@ -71,13 +71,13 @@ describe('item-editor', function(){
     it('calls launcher.loadInstance', function(){
       var editor = new Editor('element', {itemId: 'itemId'}, onError);
       expect(mockLauncher.loadInstance)
-      .toHaveBeenCalledWith({method: 'GET', url: 'editor'}, undefined, {}, jasmine.any(Function));
+      .toHaveBeenCalledWith({method: 'GET', url: 'itemEditor.editor'}, undefined, {}, jasmine.any(Function));
     });
 
     it('calls launcher.loadInstance with hash set to profile', function(){
       var editor = new Editor('element', {selectedTab: 'profile', itemId: 'itemId'}, onError);
       expect(mockLauncher.loadInstance)
-        .toHaveBeenCalledWith({method: 'GET', url: 'editor', hash: '/profile'},
+        .toHaveBeenCalledWith({method: 'GET', url: 'itemEditor.editor', hash: '/profile'},
         undefined, jasmine.any(Object), jasmine.any(Function));
     });
 
@@ -85,7 +85,7 @@ describe('item-editor', function(){
       var editor = new Editor('element', {selectedTab: 'supporting-materials', itemId: 'itemId'}, onError);
       expect(mockLauncher.loadInstance)
         .toHaveBeenCalledWith(
-          {method: 'GET', url: 'editor', hash: '/supporting-materials/0'},
+          {method: 'GET', url: 'itemEditor.editor', hash: '/supporting-materials/0'},
            undefined, jasmine.any(Object), jasmine.any(Function));
     });
 

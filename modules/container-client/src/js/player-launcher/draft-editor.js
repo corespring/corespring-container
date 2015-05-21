@@ -6,7 +6,7 @@ function EditorDefinition(element, options, errorCallback) {
 
   function createItemAndDraft(callback){
 
-    var call = launcher.loadCall('createItemAndDraft');
+    var call = launcher.loadCall('draftEditor.createItemAndDraft');
 
     if (!call) {
       return;
@@ -51,7 +51,7 @@ function EditorDefinition(element, options, errorCallback) {
       throw new Error('invalid draftId');
     }
 
-    var call = launcher.loadCall(options.devEditor ? 'devEditor' : 'editor', function(u){
+    var call = launcher.loadCall(options.devEditor ? 'draftEditor.devEditor' : 'draftEditor.editor', function(u){
       return u.replace(':draftId', draftId);
     });
 
@@ -119,7 +119,7 @@ function EditorDefinition(element, options, errorCallback) {
 
   /** Public functions */
   this.commitDraft = function(force, callback){
-    var call = launcher.loadCall('commitDraft', function(u){
+    var call = launcher.loadCall('draftEditor.commitDraft', function(u){
       return u.replace(':draftId',new DraftId(options.itemId, options.draftName).toString());
     });
 

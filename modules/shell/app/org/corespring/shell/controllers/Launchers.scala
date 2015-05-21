@@ -7,18 +7,23 @@ import org.corespring.container.client.controllers.routes._
 
 trait Launchers extends Controller {
 
-  def editorFromItem(itemId: String) = Action { request =>
+  def draftEditorFromItem(itemId: String, devEditor : Boolean) = Action { request =>
 
-    Ok(loadEditorPage(baseJson(request) ++ Json.obj(
-      "itemId" -> itemId)))
+    Ok(loadDraftEditorPage(baseJson(request) ++ Json.obj(
+      "itemId" -> itemId, "devEditor" -> devEditor)))
   }
 
-  def editorFromDraft(draftId: String) = Action { request =>
+  def draftEditor(draftId: String, devEditor : Boolean ) = Action { request =>
     val (itemId, draftName) = splitDraftId(draftId)
 
-    Ok(loadEditorPage(baseJson(request) ++ Json.obj(
+    Ok(loadDraftEditorPage(baseJson(request) ++ Json.obj(
       "draftName" -> draftName,
-      "itemId" -> itemId)))
+      "itemId" -> itemId,
+      "devEditor" -> devEditor)))
+  }
+
+  def itemEditor(itemId: String, devEditor : Boolean ) = Action { request =>
+    Ok(loadItemEditorPage(baseJson(request) ++ Json.obj("itemId" -> itemId, "devEditor" -> devEditor)))
   }
 
   def playerFromItem(itemId: String) = Action { request =>
@@ -51,8 +56,12 @@ trait Launchers extends Controller {
 
     Ok(launchers.catalog(PlayerLauncher.catalogJs().url, baseJson(request) ++ Json.obj("itemId" -> itemId) ++ tabOpts))
   }
+  import org.corespring.shell.views.html._
 
-  private def loadEditorPage(opts: JsValue) = org.corespring.shell.views.html.launchers.editor(org.corespring.container.client.controllers.routes.PlayerLauncher.editorJs().url, opts)
+  lazy val editorJsUrl = org.corespring.container.client.controllers.routes.PlayerLauncher.editorJs().url
+
+  private def loadDraftEditorPage(opts: JsValue) = launchers.draftEditor(editorJsUrl, opts)
+  private def loadItemEditorPage(opts: JsValue) = launchers.itemEditor(editorJsUrl, opts)
   private def loadPlayerPage(opts: JsValue, jsUrl: String) = org.corespring.shell.views.html.launchers.player(jsUrl, opts)
 
   private def splitDraftId(draftId: String) = {

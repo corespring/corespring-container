@@ -1,7 +1,7 @@
 package org.corespring.container.client.controllers.resources
 
-import org.corespring.container.client.hooks.Hooks.StatusMessage
-import org.corespring.container.client.hooks.ItemHooks
+import org.corespring.container.client.hooks.Hooks.{R, StatusMessage}
+import org.corespring.container.client.hooks.{CoreItemHooks, CreateItemHook }
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
@@ -14,15 +14,17 @@ import scala.concurrent.{ ExecutionContext, Future }
 
 class ItemTest extends Specification with Mockito {
 
+  trait IH extends CoreItemHooks with CreateItemHook
+
   class item(
     createError: Option[StatusMessage] = None,
     loadResult: JsValue = Json.obj("_id" -> Json.obj("$oid" -> "1"), "xhtml" -> "<div></div>"))
     extends Scope {
     val item = new Item {
 
-      override def hooks: ItemHooks = new ItemHooks {
+      override def hooks: IH = new IH {
 
-        override def create(json: Option[JsValue])(implicit header: RequestHeader): Future[Either[StatusMessage, String]] = {
+        override def createItem(json: Option[JsValue])(implicit header: RequestHeader): Future[Either[StatusMessage, String]] = {
           Future {
             createError.map {
               e =>
@@ -38,6 +40,22 @@ class ItemTest extends Specification with Mockito {
         }
 
         override implicit def ec: ExecutionContext = ExecutionContext.Implicits.global
+
+        override def delete(id: String)(implicit h: RequestHeader): R[JsValue] = ???
+
+        override def saveXhtml(id: String, xhtml: String)(implicit h: RequestHeader): R[JsValue] = ???
+
+        override def saveCustomScoring(id: String, customScoring: String)(implicit header: RequestHeader): R[JsValue] = ???
+
+        override def saveSupportingMaterials(id: String, json: JsValue)(implicit h: RequestHeader): R[JsValue] = ???
+
+        override def saveCollectionId(id: String, collectionId: String)(implicit h: RequestHeader): R[JsValue] = ???
+
+        override def saveComponents(id: String, json: JsValue)(implicit h: RequestHeader): R[JsValue] = ???
+
+        override def saveSummaryFeedback(id: String, feedback: String)(implicit h: RequestHeader): R[JsValue] = ???
+
+        override def saveProfile(id: String, json: JsValue)(implicit h: RequestHeader): R[JsValue] = ???
       }
 
       override implicit def ec: ExecutionContext = ExecutionContext.Implicits.global
