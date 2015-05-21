@@ -3,7 +3,7 @@ package org.corespring.shell.controllers.editor
 import com.mongodb.casbah.Imports._
 import org.bson.types.ObjectId
 import org.corespring.container.client.hooks.Hooks.{ R, StatusMessage }
-import org.corespring.container.client.{hooks => containerHooks}
+import org.corespring.container.client.{ hooks => containerHooks }
 import org.corespring.mongo.json.services.MongoService
 import org.corespring.shell.controllers.editor.actions.{ DraftId, ContainerDraftId }
 import org.corespring.shell.services.ItemDraftService
@@ -18,7 +18,7 @@ import scala.concurrent.Future
 trait ItemDraftHooks
   extends containerHooks.CoreItemHooks
   with containerHooks.DraftHooks
-  with ItemHooksHelper{
+  with ItemHooksHelper {
 
   val logger = Logger(classOf[ItemDraftHooks])
 
@@ -56,7 +56,7 @@ trait ItemDraftHooks
   override def saveXhtml(draftId: String, xhtml: String)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] =
     draftFineGrainedSave(draftId, Json.obj("item.xhtml" -> xhtml))
 
-  def processResultJson(result:JsObject) : JsObject = {
+  def processResultJson(result: JsObject): JsObject = {
     val withoutItemPrefix = result.fields.map { f =>
       (f._1.replace("item.", "") -> f._2)
     }.head
@@ -66,8 +66,8 @@ trait ItemDraftHooks
 
   override def load(draftId: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]] = {
     Future {
-      draftItemService.load(draftId).map {
-        Right(_)
+      draftItemService.load(draftId).map { json =>
+        Right(json \ "draft")
       }.getOrElse(Left(NOT_FOUND -> s"draftId: $draftId"))
     }
   }

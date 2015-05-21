@@ -1,14 +1,14 @@
 package org.corespring.container.client.controllers.resources
 
-import org.corespring.container.client.controllers.helpers.{PlayerXhtml, XhtmlProcessor}
+import org.corespring.container.client.controllers.helpers.{ PlayerXhtml, XhtmlProcessor }
 import org.corespring.container.client.hooks.Hooks.StatusMessage
-import org.corespring.container.client.hooks.{CoreItemHooks}
+import org.corespring.container.client.hooks.{ CoreItemHooks }
 import play.api.Logger
-import play.api.libs.json.{JsString, JsObject, JsValue, Json}
+import play.api.libs.json.{ JsString, JsObject, JsValue, Json }
 import play.api.mvc._
 
-import scala.concurrent.{ExecutionContext, Future}
-import scalaz.{Failure, Success, Validation}
+import scala.concurrent.{ ExecutionContext, Future }
+import scalaz.{ Failure, Success, Validation }
 import scalaz.Scalaz._
 
 object ItemJson {
@@ -42,27 +42,17 @@ trait CoreItem extends Controller {
 
   type SaveSig = String => Future[Either[(Int, String), JsValue]]
 
-
-  /** Draft load logic */
-  /*
-
-  def load(draftId: String) = Action.async {
-    implicit request =>
-      hooks.load(draftId).map {
-        either =>
-          either match {
-            case Left(sm) => sm
-            case Right(draft) => Ok(ItemJson(componentTypes, draft \ "item")).withHeaders("Cache-Control" -> "no-cache, no-store, must-revalidate", "Expires" -> "0")
-          }
-      }
-  }*/
-
   def load(itemId: String) = Action.async { implicit request =>
     hooks.load(itemId).map {
       either =>
         either match {
           case Left(sm) => sm
-          case Right(rawItem) => Ok(ItemJson(componentTypes, rawItem))
+          case Right(rawItem) => {
+            Ok(ItemJson(componentTypes, rawItem))
+              .withHeaders(
+                "Cache-Control" -> "no-cache, no-store, must-revalidate",
+                "Expires" -> "0")
+          }
         }
     }
   }
@@ -85,9 +75,9 @@ trait CoreItem extends Controller {
       case "xhtml" => (json \ "xhtml")
         .asOpt[String]
         .map { s =>
-        val validXhtml = XhtmlProcessor.toWellFormedXhtml(s)
-        hooks.saveXhtml(_: String, validXhtml)
-      }
+          val validXhtml = XhtmlProcessor.toWellFormedXhtml(s)
+          hooks.saveXhtml(_: String, validXhtml)
+        }
         .getOrElse(missingProperty("xhtml"))
 
       case _ => (itemId: String) => Future(Left(BAD_REQUEST, s"Unknown subset: $subset"))
