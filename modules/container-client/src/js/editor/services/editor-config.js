@@ -105,6 +105,21 @@ angular.module('corespring-editor.services').service('EditorConfig', [
 
           videoComponent.iconclass = "fa fa-film";
 
+          var calculatorComponent = componentToFeature(_.find(widgets,
+            function(c) {
+              return c.componentType === 'corespring-calculator';
+            }));
+
+          var rulerComponent = componentToFeature(_.find(widgets,
+            function(c) {
+              return c.componentType === 'corespring-ruler';
+            }));
+
+          var protractorComponent = componentToFeature(_.find(widgets,
+            function(c) {
+              return c.componentType === 'corespring-protractor';
+            }));
+          
           this.overrideFeatures = [
             ImageFeature
           ];
@@ -146,6 +161,19 @@ angular.module('corespring-editor.services').service('EditorConfig', [
               buttons: [
                 videoComponent
               ]
+            },
+            {
+              name: 'tools',
+              type: 'dropdown',
+              class: 'tools',
+              dropdownTitle: 'Tools',
+              buttons: _([
+                  calculatorComponent,
+                  rulerComponent,
+                  protractorComponent
+                ])
+                .sortBy(orderList)
+                .value()
             }]
           };
         }
