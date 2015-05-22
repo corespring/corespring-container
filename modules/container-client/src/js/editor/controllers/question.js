@@ -86,13 +86,13 @@ angular.module('corespring-editor.controllers')
         ComponentData.registerPlaceholder(id, placeholder);
       });
 
-      $scope.$on('registerConfigPanel', function(a, id, componentBridge) {
+      $scope.$on('registerConfigPanel', function(a, id, configPanelBridge) {
         logger.debug('registerConfigPanel', id);
-        configPanels[id] = componentBridge;
+        configPanels[id] = configPanelBridge;
         var componentModel = $scope.item.components[id];
-        componentBridge.setModel(componentModel, ComponentData.getDefaultData(componentModel.componentType));
-        if (_.isFunction(componentBridge.setProfile)) {
-          componentBridge.setProfile($scope.item.profile);
+        configPanelBridge.setModel(componentModel);
+        if (_.isFunction(configPanelBridge.setProfile)) {
+          configPanelBridge.setProfile($scope.item.profile);
         }
       });
 

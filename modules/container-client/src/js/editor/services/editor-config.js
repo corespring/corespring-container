@@ -1,23 +1,26 @@
 angular.module('corespring-editor.services').service('EditorConfig', [
-    'ItemService',
-    'LogFactory',
+    'ComponentData',
+    'ComponentDefaultData',
+    'ComponentToWiggiwizFeatureAdapter',
     'DesignerService',
     'ImageFeature',
+    'ItemService',
+    'LogFactory',
     'WiggiFootnotesFeatureDef',
-    'WiggiMathJaxFeatureDef',
     'WiggiLinkFeatureDef',
-    'ComponentToWiggiwizFeatureAdapter',
-    'ComponentData',
+    'WiggiMathJaxFeatureDef',
     function(
-      ItemService,
-      LogFactory,
+      ComponentData,
+      ComponentDefaultData,
+      ComponentToWiggiwizFeatureAdapter,
       DesignerService,
       ImageFeature,
+      ItemService,
+      LogFactory,
       WiggiFootnotesFeatureDef,
-      WiggiMathJaxFeatureDef,
       WiggiLinkFeatureDef,
-      ComponentToWiggiwizFeatureAdapter,
-      ComponentData) {
+      WiggiMathJaxFeatureDef
+    ) {
 
       function EditorConfig(){
 
@@ -118,7 +121,7 @@ angular.module('corespring-editor.services').service('EditorConfig', [
           //------------------------------------
 
           function storeDefaultData(comp){
-            ComponentData.setDefaultData(comp.componentType, comp.defaultData);
+            ComponentDefaultData.setDefaultData(comp.componentType, comp.defaultData);
           }
 
           function addToEditor(editor, addContent, component) {
