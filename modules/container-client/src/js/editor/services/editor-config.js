@@ -24,8 +24,7 @@ angular.module('corespring-editor.services').service('EditorConfig', [
 
       function EditorConfig(){
 
-        var
-          configPanels = {},
+        var configPanels = {},
           interactions = null,
           widgets = null,
           logger = LogFactory.getLogger('editor-config');
@@ -52,7 +51,6 @@ angular.module('corespring-editor.services').service('EditorConfig', [
         }
 
         function initComponents() {
-
           if (!interactions || !widgets) {
             return;
           }
