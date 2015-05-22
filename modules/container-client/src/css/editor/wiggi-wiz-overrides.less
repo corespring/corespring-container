@@ -35,3 +35,28 @@
 .hide-overlay{
   opacity: 0.0;
 }
+
+
+.mini-wiggi-wiz{
+    border:1px solid #ccc;
+    border-radius: 4px;
+    margin-bottom: 2px;
+
+    .wiggi-wiz-editable{
+      background: none;
+    }
+
+  &.active{
+    .wiggi-wiz-editable{
+      background: #fcf8e3;
+      border-top-left-radius: 4px;
+      border-top-right-radius: 4px;
+      border-color: rgba(82,168,236,.8);
+      box-shadow: 0 0 8px rgba(82,168,236,.6);
+
+      .toolbar{
+        border-top:1px solid rgba(82,168,236,.8);
+      }
+    }
+  }
+}
