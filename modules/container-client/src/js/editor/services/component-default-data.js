@@ -12,7 +12,7 @@ angular.module('corespring-editor.services')
           if (!componentDefaultData) {
             componentDefaultData = {};
           }
-          componentDefaultData[componentType, defaultData];
+          componentDefaultData[componentType] = defaultData;
         };
 
         this.getDefaultData = function(componentType, path) {
@@ -21,10 +21,21 @@ angular.module('corespring-editor.services')
           var parts = path ? path.split('.') : [];
 
           while(p && resultObj[p] && parts.length){
+            resultObj = resultObj[p];
             p = parts.shift();
           }
 
-          return resultObj[p] || {};
+          if(!resultObj[p]) {
+            var msg = 'Default data is empty for component: ' + componentType;
+            if(path){
+              msg += ' at path: ' + path;
+            }
+            msg += '.';
+            $log.warn(msg);
+            return {};
+          }
+
+          return resultObj[p];
         };
       }
 
