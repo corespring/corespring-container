@@ -26,6 +26,10 @@ trait Launchers extends Controller {
     Ok(loadItemEditorPage(baseJson(request) ++ Json.obj("itemId" -> itemId, "devEditor" -> devEditor)))
   }
 
+  def newItemEditor(devEditor : Boolean ) = Action { request =>
+    Ok(loadItemEditorPage(baseJson(request) ++ Json.obj("devEditor" -> devEditor)))
+  }
+
   def playerFromItem(itemId: String) = Action { request =>
     import org.corespring.container.client.controllers.routes.PlayerLauncher
     val jsCall = PlayerLauncher.playerJs()

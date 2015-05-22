@@ -57,7 +57,7 @@
     </div>
 
     <br/>
-    <a href="/create-item">Create a new item</a>
+    <a href="/launch/item-editor/new-item">Create a new item</a>
 
     <br/><br/>
 
@@ -82,8 +82,8 @@
           @link("Catalog (Profile Only)", s"${i.catalog}?tabs=profile", "btn-info")
         </td>
         <td class="inner">
-          @link("New Item", i.itemEdit)
-          @link("New Item DevEditor", s"${i.itemEdit}?devEditor=true")
+          @link("Edit Item", i.itemEdit)
+          @link("Edit Item DevEditor", s"${i.itemEdit}?devEditor=true")
         </td>
         <td class="inner">
           @link("New Draft", i.draftEdit)

@@ -42,6 +42,8 @@ trait CoreItem extends Controller {
 
   type SaveSig = String => Future[Either[(Int, String), JsValue]]
 
+  val noCacheHeader = "no-cache, no-store, must-revalidate"
+
   def load(itemId: String) = Action.async { implicit request =>
     hooks.load(itemId).map {
       either =>
@@ -50,7 +52,7 @@ trait CoreItem extends Controller {
           case Right(rawItem) => {
             Ok(ItemJson(componentTypes, rawItem))
               .withHeaders(
-                "Cache-Control" -> "no-cache, no-store, must-revalidate",
+                "Cache-Control" -> noCacheHeader,
                 "Expires" -> "0")
           }
         }

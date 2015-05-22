@@ -12,8 +12,6 @@ function EditorDefinition(element, options, errorCallback) {
       return;
     }
 
-    launcher.log('create item and draft');
-
     callback = callback || function(){};
 
     function onSuccess(result){

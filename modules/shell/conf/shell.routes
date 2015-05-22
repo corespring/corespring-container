@@ -7,9 +7,10 @@ POST        /create-session       @org.corespring.shell.controllers.Main.createS
 
 GET         /launch/draft-editor/item/:id     @org.corespring.shell.controllers.Launchers.draftEditorFromItem(id, devEditor : Boolean ?= false )
 GET         /launch/draft-editor/draft/:id    @org.corespring.shell.controllers.Launchers.draftEditor(id, devEditor : Boolean ?= false)
-GET         /launch/item-editor/item/:id     @org.corespring.shell.controllers.Launchers.itemEditor(id, devEditor : Boolean ?= false)
-GET         /launch-catalog/:id         @org.corespring.shell.controllers.Launchers.catalog(id)
-GET         /launch-player/item/:itemId @org.corespring.shell.controllers.Launchers.playerFromItem(itemId)
+GET         /launch/item-editor/item/:id      @org.corespring.shell.controllers.Launchers.itemEditor(id, devEditor : Boolean ?= false)
+GET         /launch/item-editor/new-item      @org.corespring.shell.controllers.Launchers.newItemEditor(devEditor : Boolean ?= false)
+GET         /launch-catalog/:id               @org.corespring.shell.controllers.Launchers.catalog(id)
+GET         /launch-player/item/:itemId       @org.corespring.shell.controllers.Launchers.playerFromItem(itemId)
 
 GET         /assets/*file        controllers.Assets.at(path="/container-client", file)
 

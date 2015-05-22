@@ -67,7 +67,7 @@ trait ItemDraftHooks
   override def load(draftId: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]] = {
     Future {
       draftItemService.load(draftId).map { json =>
-        Right(json \ "draft")
+        Right(json \ "item")
       }.getOrElse(Left(NOT_FOUND -> s"draftId: $draftId"))
     }
   }
@@ -102,10 +102,14 @@ trait ItemDraftHooks
     } yield {
       logger.trace(s"draft date modified: $draftDateModified")
       logger.trace(s"item date modified: $itemDateModified")
-      val isEqual = draftDateModified.isEqual(itemDateModified.getMillis)
-      val draftIsBefore = draftDateModified.isBefore(itemDateModified.getMillis)
-      logger.trace(s"isEqual: $isEqual, is draft before: $draftIsBefore")
-      isEqual || !draftIsBefore
+      if(itemDateModified == null || draftDateModified == null){
+        true
+      } else {
+        val isEqual = draftDateModified.isEqual(itemDateModified.getMillis)
+        val draftIsBefore = draftDateModified.isBefore(itemDateModified.getMillis)
+        logger.trace(s"isEqual: $isEqual, is draft before: $draftIsBefore")
+        isEqual || !draftIsBefore
+      }
     }
   }.getOrElse(true)
 
