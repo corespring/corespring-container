@@ -10,6 +10,7 @@ angular.module('corespring-editor.services')
 
       function ComponentData() {
         var componentModels,
+          componentDefaultData,
           removedComponentModels = {},
           placeholders = {},
           mockSession = {},
@@ -157,6 +158,17 @@ angular.module('corespring-editor.services')
           componentModels[id] = removedComponentModels[id];
 
           delete removedComponentModels[id];
+        };
+
+        this.setDefaultData = function(componentType, defaultData) {
+          if (!componentDefaultData) {
+            componentDefaultData = {};
+          }
+          componentDefaultData[componentType, defaultData];
+        };
+
+        this.getDefaultData = function(componentType) {
+          return componentDefaultData ? componentDefaultData[componentType] : {};
         };
       }
 
