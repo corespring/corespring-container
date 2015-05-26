@@ -1,7 +1,8 @@
 (function(){
   function DataQueryService ($http, $log) {
 
-    var baseUrl = "../../data-query/";
+    //TODO: Should come from the server?
+    var baseUrl = '../../../data-query/';
 
     function _call(topic, query, onSuccess, onFailure){
       var url = baseUrl + topic;

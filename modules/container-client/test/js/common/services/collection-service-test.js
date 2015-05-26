@@ -34,7 +34,7 @@ describe('CollectionService', function() {
     it('should call $http', function() {
       expect(http).toHaveBeenCalledWith({
         method: 'GET',
-        url: '../../collection'
+        url: '../../../collection'
       });
     });
 

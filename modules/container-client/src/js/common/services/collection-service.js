@@ -13,7 +13,9 @@
   function CollectionService ($http, $q, LogFactory) {
 
     var $log = LogFactory.getLogger('CollectionService');
-    var baseUrl = "../../collection";
+
+    //TODO: Should come from the server?
+    var baseUrl = "../../../collection";
 
     this.list = list;
     this.listPromise = null;

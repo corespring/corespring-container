@@ -10,6 +10,8 @@ describe('DataQueryService', function() {
   var success = jasmine.createSpy('success');
   var topic = 'items';
 
+  var baseUrl = '../../../data-query/';
+
   beforeEach(angular.mock.module('corespring-common.services'));
 
   beforeEach(module(function($provide) {
@@ -34,7 +36,7 @@ describe('DataQueryService', function() {
     it('should call $http', function() {
       expect(http).toHaveBeenCalledWith({
         method: 'GET',
-        url: '../../data-query/' + topic
+        url: baseUrl + topic
       });
     });
 
@@ -47,7 +49,7 @@ describe('DataQueryService', function() {
   describe('query', function() {
     var query = {'description' : 'some & item'};
     var stringifiedQuery = '{"description":"some & item"}';
-    var uriEncodedQuery = "%7B%22description%22%3A%22some%20%26%20item%22%7D";
+    var uriEncodedQuery = '%7B%22description%22%3A%22some%20%26%20item%22%7D';
 
     beforeEach(function() {
       spyOn(JSON, 'stringify').and.returnValue(stringifiedQuery);
@@ -69,7 +71,7 @@ describe('DataQueryService', function() {
 
       expect(http).toHaveBeenCalledWith({
         method: jasmine.any(String),
-        url: '../../data-query/' + topic + '?query=' + uriEncodedQuery
+        url: baseUrl + topic + '?query=' + uriEncodedQuery
       });
     });
 
@@ -89,7 +91,7 @@ describe('DataQueryService', function() {
     it('should call $http', function() {
       expect(http).toHaveBeenCalledWith({
         method: 'GET',
-        url: '../../data-query/' + topic + "/" + id
+        url: baseUrl + topic + '/' + id
       });
     });
 
