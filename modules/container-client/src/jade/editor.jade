@@ -61,7 +61,6 @@ block after-main-script
         }
       }
       
-      console.log(!{staticPaths});
       angular.module('corespring-#{appName}').constant("STATIC_PATHS", !{staticPaths} ); 
       angular.module('corespring-#{appName}').config(uiRouterConfig);
 
