@@ -60,7 +60,9 @@ block after-main-script
           $stateProvider.state(x, appLoadConfig.states[x]);
         }
       }
-
+      
+      console.log(!{staticPaths});
+      angular.module('corespring-#{appName}').constant("STATIC_PATHS", !{staticPaths} ); 
       angular.module('corespring-#{appName}').config(uiRouterConfig);
 
     })(this);

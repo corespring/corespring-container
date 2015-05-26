@@ -9,13 +9,13 @@ describe('DataQueryService', function() {
   });
   var success = jasmine.createSpy('success');
   var topic = 'items';
-
-  var baseUrl = '../../../data-query/';
+  var dataQueryPath = 'data-query-path';
 
   beforeEach(angular.mock.module('corespring-common.services'));
 
   beforeEach(module(function($provide) {
     $provide.value('$http', http);
+    $provide.constant('STATIC_PATHS', {dataQuery: dataQueryPath});
   }));
 
   beforeEach(inject(function(DataQueryService) {
@@ -36,7 +36,7 @@ describe('DataQueryService', function() {
     it('should call $http', function() {
       expect(http).toHaveBeenCalledWith({
         method: 'GET',
-        url: baseUrl + topic
+        url: dataQueryPath + '/' + topic
       });
     });
 
@@ -71,7 +71,7 @@ describe('DataQueryService', function() {
 
       expect(http).toHaveBeenCalledWith({
         method: jasmine.any(String),
-        url: baseUrl + topic + '?query=' + uriEncodedQuery
+        url: dataQueryPath + '/' + topic + '?query=' + uriEncodedQuery
       });
     });
 
@@ -91,7 +91,7 @@ describe('DataQueryService', function() {
     it('should call $http', function() {
       expect(http).toHaveBeenCalledWith({
         method: 'GET',
-        url: baseUrl + topic + '/' + id
+        url: dataQueryPath + '/' + topic + '/' + id
       });
     });
 

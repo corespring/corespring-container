@@ -34,10 +34,12 @@ case class EditorTemplateParams(appName: String,
   css: Seq[String],
   componentNgModules: Seq[String],
   ngServiceLogic: String,
-  versionInfo: JsValue) extends TemplateParams {
+  versionInfo: JsValue,
+  staticPaths: JsValue) extends TemplateParams {
   override def toJadeParams = {
     super.toJadeParams ++ Map(
-      "versionInfo" -> Json.stringify(versionInfo))
+      "versionInfo" -> Json.stringify(versionInfo),
+      "staticPaths" -> staticPaths)
   }
 }
 
@@ -55,8 +57,7 @@ case class RigTemplateParams(appName: String,
   override def ngServiceLogic: String = ""
   override def toJadeParams = {
     super.toJadeParams ++ Map(
-      "itemJson" -> itemJson
-    )
+      "itemJson" -> itemJson)
   }
 }
 

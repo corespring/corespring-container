@@ -17,6 +17,7 @@
       'LogFactory',
       'ProfileFormatter',
       'StandardQueryCreator',
+      'STATIC_PATHS',
       ProfileController
     ]);
 
@@ -33,7 +34,8 @@
     ItemService,
     LogFactory,
     ProfileFormatter,
-    StandardQueryCreator
+    StandardQueryCreator,
+    STATIC_PATHS
   ) {
 
     var $log = LogFactory.getLogger('ProfileController');
@@ -513,7 +515,7 @@
 
     function getImageUrlForStandardDomain(domain) {
       //TODO Get official logos
-      return 'images/standards/common-core.png';
+      return STATIC_PATHS.assets + '/standards/common-core.png';
     }
 
     function getStandardsGroups() {
@@ -943,7 +945,7 @@
     });
 
     $scope.getLicenseTypeUrl = function(licenseType) {
-      return licenseType ? "/assets/images/licenseTypes/" + licenseType.replace(" ", "-") + ".png" : undefined;
+      return licenseType ? STATIC_PATHS.assets + '/licenseTypes/' + licenseType.replace(" ", "-") + '.png' : undefined;
     };
 
     $scope.togglePreview = function() {

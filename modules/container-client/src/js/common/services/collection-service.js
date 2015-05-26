@@ -6,16 +6,14 @@
       '$http',
       '$q',
       'LogFactory',
+      'STATIC_PATHS',
       CollectionService
     ]
   );
 
-  function CollectionService ($http, $q, LogFactory) {
+  function CollectionService ($http, $q, LogFactory, STATIC_PATHS) {
 
     var $log = LogFactory.getLogger('CollectionService');
-
-    //TODO: Should come from the server?
-    var baseUrl = "../../../collection";
 
     this.list = list;
     this.listPromise = null;
@@ -26,7 +24,7 @@
       if(!this.listPromise){
         var defer = $q.defer();
         this.listPromise = defer.promise;
-        _call(baseUrl, defer.resolve, defer.reject);
+        _call(STATIC_PATHS.collection, defer.resolve, defer.reject);
       }
       return this.listPromise;
     }

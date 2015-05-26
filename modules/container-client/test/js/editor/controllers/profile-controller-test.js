@@ -127,7 +127,8 @@ describe('profile controller', function() {
     mockItemService,
     mockLocation,
     mockProfileFormatter,
-    mockStandardQueryCreator;
+    mockStandardQueryCreator,
+    imagePath = '/image-path';
 
   beforeEach(function() {
     mockCollectionService = new MockCollectionService();
@@ -151,6 +152,7 @@ describe('profile controller', function() {
       $provide.value('ProfileFormatter', mockProfileFormatter);
       $provide.value('StandardQueryCreator', mockStandardQueryCreator);
       $provide.value('throttle', _.identity);
+      $provide.constant('STATIC_PATHS', {assets: imagePath});
     });
 
   });
@@ -649,7 +651,7 @@ describe('profile controller', function() {
         expect(scope.getLicenseTypeUrl("")).toEqual(undefined);
       });
       it("returns licenseType url if licenseType is string", function() {
-        expect(scope.getLicenseTypeUrl("CC")).toEqual("/assets/images/licenseTypes/CC.png");
+        expect(scope.getLicenseTypeUrl("CC")).toEqual(imagePath + '/licenseTypes/CC.png');
       });
     });
   });

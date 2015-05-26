@@ -1,25 +1,22 @@
 (function(){
-  function DataQueryService ($http, $log) {
-
-    //TODO: Should come from the server?
-    var baseUrl = '../../../data-query/';
+  function DataQueryService ($http, $log, STATIC_PATHS) {
 
     function _call(topic, query, onSuccess, onFailure){
-      var url = baseUrl + topic;
+      var url = STATIC_PATHS.dataQuery + '/' + topic;
 
       if (query) {
-       url += "?query=" + encodeURIComponent(JSON.stringify(query));
+       url += '?query=' + encodeURIComponent(JSON.stringify(query));
       }
 
       $http({method: 'GET', url: url})
         .success( 
           function success(data, status, headers, config){
-            $log.debug("success", data);
+            $log.debug('success', data);
             onSuccess(data);
         })
         .error(
           function rr(e){
-            $log.warn("err: ", e);
+            $log.warn('err: ', e);
             if(onFailure){
               onFailure(e);
             }
@@ -42,7 +39,7 @@
 
     this.findOne = function(topic, id, onSuccess, onError){
 
-      var url = baseUrl + topic + "/" + id;
+      var url = STATIC_PATHS.dataQuery + '/' + topic + '/' + id;
 
       $http({method: 'GET', url: url})
         .success(onSuccess)
@@ -78,6 +75,7 @@
       [
       '$http',
       '$log',
+      'STATIC_PATHS',
        DataQueryService 
       ]
     );

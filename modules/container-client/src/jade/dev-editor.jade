@@ -21,7 +21,7 @@ block content
       .preview(ng-controller="ClientSidePreview")
         .item-preview-wrapper
           .player-label
-            img(src='../../../images/item-player-label.png')
+            img(ng-src='{{playerLabelImg}}')
           .player-container
             optimized-preview-player(
               data-jade-template='dev-editor',

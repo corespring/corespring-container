@@ -36,7 +36,7 @@ function EditorDefinition(element, options, errorCallback) {
     $.ajax({
       type: call.method,
       url: launcher.prepareUrl(call.url),
-      data: options,
+      data: { draftName: options.draftName },
       success: onSuccess,
       error: onError.bind(this),
       dataType: 'json'
@@ -137,7 +137,7 @@ function EditorDefinition(element, options, errorCallback) {
     $.ajax({
       type: call.method,
       url: launcher.prepareUrl(call.url, {force: force}),
-      data: options,
+      data: {},
       success: onSuccess,
       error: onError,
       dataType: 'json'
