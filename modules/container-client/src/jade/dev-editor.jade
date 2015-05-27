@@ -1,5 +1,11 @@
 extends layout
 
+//After the angular module has been created.
+block after-main-script
+
+  script.
+    angular.module('corespring-#{appName}').constant("STATIC_PATHS", !{staticPaths} ); 
+    
 block content
   style
 
