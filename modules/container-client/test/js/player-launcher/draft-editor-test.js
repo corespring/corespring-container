@@ -269,13 +269,6 @@ describe('draft-editor', function() {
 
     it('calls commitDraft endpoint', function() {
 
-      /**
-
-       [ { type: 'GET', url: 'createItemAndDraft', data: { draftName: <jasmine.any(function String() { [native code] })> }, success: <jasmine.any(function Function() { [native code] })>, error: <jasmine.any(function Function() { [native code] })>, dataType: 'json' } ] 
-       but actual calls were 
-       [ { type: 'GET', url: 'draftEditor.createItemAndDraft', data: { draftName: 'ca5af71db362' }, success: Function, error: Function, dataType: 'json' } ], [ { type: 'GET', url: 'draftEditor.commitDraft?params={"force":false}', data: { draftName: 'ca5af71db362' }, success: Function, error: Function, dataType: 'json' } ].
-
-      */
       var editor = new DraftEditor('element', {}, onError);
       var cb = jasmine.createSpy('cb');
       editor.commitDraft(false, cb);
