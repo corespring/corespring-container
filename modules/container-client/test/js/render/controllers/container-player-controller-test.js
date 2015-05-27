@@ -38,7 +38,7 @@ describe('corespring-player-controller', function() {
       it('should set mode to evaluate and save responses', function() {
         expect(scope.playerMode).toBe('evaluate');
         expect(scope.$broadcast).toHaveBeenCalledWith('setMode', _.extend(
-          { options : scope.playerSettings, saveResponses: { isAttempt: true, isComplete: true }},
+          { evaluate : scope.playerSettings, saveResponses: { isAttempt: true, isComplete: true }},
           { mode : 'evaluate'})
         );
       });
