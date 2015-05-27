@@ -127,4 +127,30 @@ describe('client-launcher', function(){
       expect(instance.removeChannel).toHaveBeenCalled();  
     });
   });
+
+  describe('loadCall', function(){
+
+    var launcher;
+
+    it('fails if the path does not exist', function(){
+      launcher = new ClientLauncher('e', {}, onError);
+      var call = launcher.loadCall('apple');
+      expect(onError).toHaveBeenCalledWith(errorCodes.CANT_FIND_URL('can not find url for key: apple'));  
+    });
+    
+    it('fails if the path does not exist in the launch config', function(){
+      launcher = new ClientLauncher('e', {}, onError);
+      var call = launcher.loadCall('apple.banana' );
+      expect(onError).toHaveBeenCalledWith(errorCodes.CANT_FIND_URL('can not find url for key: apple.banana'));  
+    });
+    
+    it('returns the call if it exists in the config', function(){
+      var launchConfig = { corespringUrl: 'corespring.org/', paths : { apple: { banana: { method: 'GET', url: '/banana'}}}};
+      corespring.mock.modules['launch-config'] = launchConfig;
+      launcher = new ClientLauncher('e', {}, onError);
+      var call = launcher.loadCall('apple.banana');
+      var banana = launchConfig.paths.apple.banana;
+      expect(call).toEqual({method: banana.method, url: launchConfig.corespringUrl + banana.url});
+    });
+  });
 });

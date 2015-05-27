@@ -44,7 +44,7 @@ function ClientLauncher(element, options, errorCallback){
       function getValueByArray(obj, parts, value){
 
         if(!parts) {
-          return null;
+          return value;
         }
 
         if(parts.length === 1){
@@ -53,7 +53,7 @@ function ClientLauncher(element, options, errorCallback){
           var next = parts.shift();
 
           if(!obj[next]){
-            return null;
+            return value;
           }
           return getValueByArray(obj[next], parts, value);
         }
@@ -64,27 +64,21 @@ function ClientLauncher(element, options, errorCallback){
       };
     }
 
-    this.corespringUrl = launchConfig.corespringUrl;
+    this.corespringUrl = launchConfig.corespringUrl || '';
     
     var getter = new NestedGetter(pathsConfig);
     
     this.loadCall = function(key){
 
       if (!pathsConfig) {
-        errorCallback({
-          code: 105,
-          message: key + ' not part of paths config'
-        });
+        errorCallback(errorCodes.CANT_FIND_URL('can not find url for key: ' + key));
         return null;
       }
 
       var result = getter.get(key, 'not-found');
 
       if(result === 'not-found'){
-        errorCallback({
-          code: 105,
-          message: key + ' not part of paths config'
-        });
+        errorCallback(errorCodes.CANT_FIND_URL('can not find url for key: ' + key));
         return null;
       }
       return result;
@@ -97,7 +91,11 @@ function ClientLauncher(element, options, errorCallback){
   this.loadCall = function(key, urlProcessor){
     urlProcessor = urlProcessor || function(u){return u;};
     var c = this.paths.loadCall(key);
-    return { method: c.method, url: urlProcessor( this.paths.corespringUrl + c.url)};
+    if(c){
+      return { method: c.method, url: urlProcessor( this.paths.corespringUrl + c.url)};
+    } else {
+      return null;
+    }
   };
 
   this.buildParams = function(p){
