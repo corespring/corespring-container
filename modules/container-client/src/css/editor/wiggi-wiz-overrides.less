@@ -37,6 +37,20 @@
   opacity: 0.0;
 }
 
+#answerAreaWiggi{
+  .mini-wiggi-wiz{
+    &.active {
+        .wiggi-wiz-editable {
+          background: transparent;
+          box-shadow: none;
+          &:focus{
+            background: #fcf8e3;
+            box-shadow: 0 0 8px rgba(82,168,236,.6);
+          }
+        }
+    }
+  }
+}
 .mini-wiggi-wiz {
 
   .toolbar-radius {
