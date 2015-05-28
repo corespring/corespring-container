@@ -68,8 +68,14 @@ function EditorDefinition(element, options, errorCallback) {
       call.hash = '/supporting-materials/0';
     }
 
-    var initialData = {profileConfig: options.profileConfig};
+    var initialData = {
+      showSaveMessage: options.showSaveMessage
+    };
 
+    if(options.profileConfig){
+      initialData.profileConfig = options.profileConfig;
+    }
+    
     function onReady(instance){
       if(options.devEditor){
         instance.css('height', '100%');
