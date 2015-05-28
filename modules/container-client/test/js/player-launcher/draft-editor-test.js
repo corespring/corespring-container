@@ -89,9 +89,7 @@ describe('draft-editor', function() {
                   url: '/url',
                   hash: '/supporting-materials/0'
                 },
-                undefined, {
-                  profileConfig: undefined
-                },
+                undefined, {},
                 jasmine.any(Function));
             }));
 
@@ -122,6 +120,17 @@ describe('draft-editor', function() {
                   profile: 'profile'
                 }
               },
+              jasmine.any(Function));
+          }));
+
+        it('calls loadInstance with showSaveMessage', assertLoadInstance({
+            showSaveMessage: true
+          },
+          function(call) {
+            expect(mockLauncher.loadInstance).toHaveBeenCalledWith(
+              jasmine.any(Object),
+              undefined,
+              { showSaveMessage: true },
               jasmine.any(Function));
           }));
 

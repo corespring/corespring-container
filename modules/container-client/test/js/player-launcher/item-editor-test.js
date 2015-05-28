@@ -89,6 +89,14 @@ describe('item-editor', function(){
            undefined, jasmine.any(Object), jasmine.any(Function));
     });
 
+    it('calls launcher.loadInstance with showSaveMessage ', function(){
+      var editor = new Editor('element', { showSaveMessage: true, itemId: 'itemId'}, onError);
+      expect(mockLauncher.loadInstance)
+        .toHaveBeenCalledWith(
+          {method: 'GET', url: 'itemEditor.editor'},
+           undefined, {showSaveMessage: true}, jasmine.any(Function));
+    });
+
     it('calls options.onItemLoaded in the onReady callback', function(){
 
       mockLauncher.loadInstance.and.callFake(function(call, qp, init, cb){
