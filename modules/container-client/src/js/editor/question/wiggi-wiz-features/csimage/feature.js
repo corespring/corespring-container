@@ -15,16 +15,7 @@ angular.module('corespring.wiggi-wiz-features.cs-image').factory('ImageFeature',
     csImage.onClick = undefined;
 
     csImage.onMouseUp = function($node, $nodeScope, editor) {
-      if (isInMiniWiggi()){
-        if(!miniWiggiIsActive()) {
-          return;
-        }
-        if(!mouseIsOverImage()){
-          removePopover();
-          return;
-        }
-      }
-
+      console.log('image.onMouseUp');
       var buttons = [
           TemplateUtils.makeButton({
           html: '<span>25%</span>'
@@ -50,23 +41,6 @@ angular.module('corespring.wiggi-wiz-features.cs-image').factory('ImageFeature',
         ].join('\n');
 
       editor.togglePopover($node, $nodeScope, buttons, $node.find('img'));
-
-      function isInMiniWiggi() {
-        return $node.parents('.mini-wiggi-wiz').length > 0;
-      }
-
-      function miniWiggiIsActive() {
-        return $node.parents('.mini-wiggi-wiz').is('.active');
-      }
-
-      function mouseIsOverImage(){
-        return $node.find('.image-holder').is(':hover');
-      }
-
-      function removePopover(){
-        var $img = $node.find('img');
-        if($img.popover) $img.popover('destroy');
-      }
     };
 
 
