@@ -15,31 +15,58 @@ angular.module('corespring.wiggi-wiz-features.cs-image').factory('ImageFeature',
     csImage.onClick = undefined;
 
     csImage.onMouseUp = function($node, $nodeScope, editor) {
+      if (isInMiniWiggi()){
+        if(!miniWiggiIsActive()) {
+          return;
+        }
+        if(!mouseIsOverImage()){
+          removePopover();
+          return;
+        }
+      }
+
       var buttons = [
-        TemplateUtils.makeButton({
+          TemplateUtils.makeButton({
           html: '<span>25%</span>'
         }, '0.25'),
-        TemplateUtils.makeButton({
+          TemplateUtils.makeButton({
           html: '<span>50%</span>'
         }, '0.5'),
-        TemplateUtils.makeButton({
+          TemplateUtils.makeButton({
           html: '<span>75%</span>'
         }, '0.75'),
-        TemplateUtils.makeButton({
+          TemplateUtils.makeButton({
           html: '<span>100%</span>'
         }, '1.0'),
-        TemplateUtils.makeButton({
+          TemplateUtils.makeButton({
           icon: 'fa-align-left'
         }, 'align:left'),
-        TemplateUtils.makeButton({
+          TemplateUtils.makeButton({
           icon: 'fa-align-right'
         }, 'align:right'),
-        TemplateUtils.makeButton({
+          TemplateUtils.makeButton({
           icon: 'fa-align-center'
         }, 'align:center')
-      ].join('\n');
+        ].join('\n');
 
       editor.togglePopover($node, $nodeScope, buttons, $node.find('img'));
+
+      function isInMiniWiggi() {
+        return $node.parents('.mini-wiggi-wiz').length > 0;
+      }
+
+      function miniWiggiIsActive() {
+        return $node.parents('.mini-wiggi-wiz').is('.active');
+      }
+
+      function mouseIsOverImage(){
+        return $node.find('.image-holder').is(':hover');
+      }
+
+      function removePopover(){
+        var $img = $node.find('img');
+        if($img.popover) $img.popover('destroy');
+      }
     };
 
 
@@ -49,7 +76,7 @@ angular.module('corespring.wiggi-wiz-features.cs-image').factory('ImageFeature',
       if (imageSrc) {
         var divStyle = $node.attr('style');
         var imageStyle = $node.find('img').attr('style');
-        var clone = $('<div style="'+divStyle+'" image-holder image-src="' + imageSrc + '" image-style="' + imageStyle + '"></div>');
+        var clone = $('<div style="' + divStyle + '" image-holder image-src="' + imageSrc + '" image-style="' + imageStyle + '"></div>');
         return replaceWith(clone);
       } else {
         return $node;
@@ -90,7 +117,7 @@ angular.module('corespring.wiggi-wiz-features.cs-image').factory('ImageFeature',
       }
 
       var dialogTemplate = [
-        '<div class="file-upload-modal">',
+        '<div class="file-upload-modal" ng-mousedown="$event.stopPropagation()" ng-mouseup="$event.stopPropagation()">',
         '  <div class="alert alert-danger wiggi-wiz-alert ng-hide" ng-show="error"  ng-bind="error"></div>',
         '  <div class="alert alert-success wiggi-wiz-alert ng-hide" ng-show="fileName"><strong>Upload successful.</strong><br/>You have successfully uploaded: {{fileName}}</div>',
         '  <div class="center-container">',
