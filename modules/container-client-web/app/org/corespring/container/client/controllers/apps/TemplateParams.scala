@@ -27,7 +27,12 @@ case class CatalogTemplateParams(appName: String,
   js: Seq[String],
   css: Seq[String],
   componentNgModules: Seq[String],
-  ngServiceLogic: String) extends TemplateParams
+  ngServiceLogic: String,
+  staticPaths: JsValue) extends TemplateParams{
+  override def toJadeParams = {
+    super.toJadeParams ++ Map("staticPaths" -> staticPaths)
+  }
+}
 
 case class EditorTemplateParams(appName: String,
   js: Seq[String],

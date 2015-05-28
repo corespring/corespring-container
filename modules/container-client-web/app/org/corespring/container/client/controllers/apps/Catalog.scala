@@ -58,7 +58,8 @@ trait Catalog
                 domainResolvedJs,
                 domainResolvedCss,
                 jsSrc.ngModules ++ scriptInfo.ngDependencies,
-                servicesJs(id))))
+                servicesJs(id),
+                StaticPaths.staticPaths)))
         }
 
         def onError(sm: StatusMessage) = {

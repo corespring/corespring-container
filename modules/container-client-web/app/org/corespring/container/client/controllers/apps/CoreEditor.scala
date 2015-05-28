@@ -11,6 +11,15 @@ import play.api.libs.json._
 import play.api.mvc._
 import v2Player.Routes
 
+object StaticPaths{
+  val assetUrl = Routes.prefix + "/images"
+
+  val staticPaths = Json.obj(
+    "assets" -> assetUrl,
+    "dataQuery" -> org.corespring.container.client.controllers.routes.DataQuery.list(":topic").url.replace("/:topic", ""),
+    "collection" -> org.corespring.container.client.controllers.resources.routes.Collection.list().url)
+}
+
 trait CoreEditor
   extends AllItemTypesReader
   with App[EditorHooks]
@@ -62,12 +71,6 @@ trait CoreEditor
       val componentsArray: JsArray = JsArray(interactions.map(toJson))
       val widgetsArray: JsArray = JsArray(widgets.map(toJson))
 
-      val assetUrl = Routes.prefix + "/images"
-
-      val staticPaths = Json.obj(
-        "assets" -> assetUrl,
-        "dataQuery" -> org.corespring.container.client.controllers.routes.DataQuery.list(":topic").url.replace("/:topic", ""),
-        "collection" -> org.corespring.container.client.controllers.resources.routes.Collection.list().url)
 
       Ok(renderJade(
         EditorTemplateParams(
@@ -77,7 +80,7 @@ trait CoreEditor
           jsSrc.ngModules ++ scriptInfo.ngDependencies,
           servicesJs(id, componentsArray, widgetsArray),
           versionInfo,
-          staticPaths)))
+          StaticPaths.staticPaths)))
     }
 
     hooks.load(id).map { e => e.fold(onError, onItem) }
