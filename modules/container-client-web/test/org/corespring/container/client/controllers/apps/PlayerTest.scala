@@ -58,6 +58,10 @@ class PlayerTest extends Specification with PlaySpecification with Mockito {
     override def urls: ComponentUrls = {
       mock[ComponentUrls]
     }
+
+    override def jsSrc: NgSourcePaths = {
+      new NgSourcePaths(Seq.empty, "", Seq.empty, Seq.empty)
+    }
   }
 
   "load" should {
