@@ -1,9 +1,10 @@
-#!/usr/bin/env coffee
+#!/usr/bin/env node
 
-seeder = require 'mongo-seeder'
-path = require 'path'
-uri = process.argv[2] || 'mongodb://localhost:27017/corespring-container'
-console.log("uri #{uri}")
-folder = path.resolve('mock-data')
-seeder uri, folder,  (err) -> 
-  console.log('done!')
+var seeder = require('mongo-seeder');
+var path = require('path');
+var uri = process.argv[2] || 'mongodb://localhost:27017/corespring-container';
+var folder = path.resolve('mock-data');
+
+seeder(uri, folder,  function(err){
+  console.log('done!');
+}); 

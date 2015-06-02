@@ -81,10 +81,12 @@ class ContainerClientImplementation(
         k <- s3.key
         s <- s3.secret
       } yield {
-        val s3Service = new ConcreteS3Service(k, s)
+
+        val fakeEndpoint = configuration.getString("amazon.s3.fake-endpoint")
+        logger.trace(s"fakeEndpoint: $fakeEndpoint")
+        val s3Service = new ConcreteS3Service(k, s, fakeEndpoint)
         val assetUtils = new AssetUtils(s3Service.client, s3.bucket)
         (s3Service, assetUtils)
-
       }
       out.getOrElse(throw new RuntimeException("No amazon key/secret"))
     }
