@@ -116,9 +116,9 @@ exports.define = function(isSecure) {
 
       var forceWidth = options.forceWidth === undefined ? true : options.forceWidth;
 
-      if(forceWidth){
-        instance.width(options.width || '600px');
-      }
+      //if(forceWidth){
+      //  instance.width(options.width || '600px');
+      //}
 
       if (options.onSessionCreated) {
         instance.on('sessionCreated', function(data) {

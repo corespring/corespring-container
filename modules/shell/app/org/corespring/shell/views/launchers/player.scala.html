@@ -3,6 +3,9 @@
 <head>
     <meta http-equiv="X-UA-Compatible" content="IE=edge;" />
 </head>
+  <style>
+    .holder { border: 1px dashed grey; }
+  </style>
 <body>
 
 <!-- while we support ie8 we must use jquery 1.x -->
@@ -17,6 +20,7 @@
 <script>
 
      $(document).ready(function(){
+       var initialPlayerSize = 500;
        var holder = $('.holder');
        var opts = @{Html(play.api.libs.json.Json.stringify(opts))};
 
@@ -35,10 +39,19 @@
           console.log(err);
         });
        });
+
+       $('#player-width-input').change(function(){
+         $('.holder').css('width', $('#player-width-input').val()+"px");
+       });
+
+       $('#player-width-input').val(initialPlayerSize);
+       $('.holder').css('width', initialPlayerSize+"px");
+
      });
     </script>
 
 <button class="button" id="set-mode-evaluate">evaluate</button>
+<div>Player width: <input type="text" id="player-width-input"/></div>
 <div class="holder"></div>
 </body>
 </html>
