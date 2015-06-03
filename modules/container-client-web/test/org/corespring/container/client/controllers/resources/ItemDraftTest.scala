@@ -20,6 +20,8 @@ class ItemDraftTest extends Specification with Mockito {
 
     override protected def componentTypes: Seq[String] = Seq.empty
   }
+  
+  trait DH extends CoreItemHooks with DraftHooks
 
   import ExecutionContext.Implicits.global
 
@@ -27,16 +29,15 @@ class ItemDraftTest extends Specification with Mockito {
 
     "load" should {
 
-      val json = Json.obj("item" ->
-        Json.obj("_id" ->
-          Json.obj("$oid" -> "1"),
-          "xhtml" -> "<div></div>"))
+      val json = Json.obj(
+        "_id" -> Json.obj("$oid" -> "1"),
+        "xhtml" -> "<div></div>")
 
       class load(loadResult: JsValue = json)
         extends Scope {
         val draft = new BaseDraft {
-          val hooks: ItemDraftHooks = {
-            val m = mock[ItemDraftHooks] //.verbose
+          val hooks: DH = {
+            val m = mock[DH] //.verbose
             m.load(anyString)(any[RequestHeader]) returns Future(Right(loadResult))
             m
           }
@@ -47,10 +48,9 @@ class ItemDraftTest extends Specification with Mockito {
         status(draft.load("x")(FakeRequest("", ""))) === OK
       }
 
-      val badJson = Json.obj("item" ->
-        Json.obj("_id" ->
+      val badJson = Json.obj("_id" ->
           Json.obj("$oid" -> "1"),
-          "xhtml" -> "<p>a</p>"))
+          "xhtml" -> "<p>a</p>")
 
       "prep the json" in new load(loadResult = badJson) {
         val json = contentAsJson(draft.load("x")(FakeRequest("", "")))
@@ -64,8 +64,8 @@ class ItemDraftTest extends Specification with Mockito {
       class save(saveResult: JsValue = Json.obj())
         extends Scope {
         val draft = new BaseDraft {
-          val hooks: ItemDraftHooks = {
-            val m = mock[ItemDraftHooks] //.verbose
+          val hooks: DH = {
+            val m = mock[DH]
             m.saveXhtml(anyString, anyString)(any[RequestHeader]) returns Future(Right(saveResult))
             m
           }
@@ -83,8 +83,8 @@ class ItemDraftTest extends Specification with Mockito {
 
       class commit(commitResult: Future[Either[StatusMessage, JsValue]] = Future(Right(Json.obj()))) extends Scope {
         val draft = new BaseDraft {
-          val hooks: ItemDraftHooks = {
-            val m = mock[ItemDraftHooks]
+          val hooks: DH = {
+            val m = mock[DH]
             m.commit(anyString, any[Boolean])(any[RequestHeader]) returns commitResult
             m
           }

@@ -116,7 +116,39 @@ trait DefaultIntegration
     def defaultCharSet: String = configuration.getString("default.charset").getOrElse("utf-8")
   }
 
-  lazy val editor = new Editor {
+  lazy val itemEditor = new ItemEditor{
+    override def versionInfo: JsObject = DefaultIntegration.this.versionInfo
+
+    override def mode: Mode = Play.current.mode
+
+    override implicit def ec: ExecutionContext = DefaultIntegration.this.ec
+
+    override def urls: ComponentUrls = componentSets
+
+    override def components: Seq[Component] = DefaultIntegration.this.components
+
+    override def resolveDomain(path: String): String = DefaultIntegration.this.resolveDomain(path)
+
+    override def hooks: EditorHooks = itemEditorHooks
+  }
+
+  lazy val itemDevEditor = new ItemDevEditor {
+    override def versionInfo: JsObject = DefaultIntegration.this.versionInfo
+
+    override def mode: Mode = Play.current.mode
+
+    override implicit def ec: ExecutionContext = DefaultIntegration.this.ec
+
+    override def urls: ComponentUrls = componentSets
+
+    override def components: Seq[Component] = DefaultIntegration.this.components
+
+    override def resolveDomain(path: String): String = DefaultIntegration.this.resolveDomain(path)
+
+    override def hooks: EditorHooks = itemEditorHooks
+  }
+
+  lazy val draftEditor = new DraftEditor {
 
     override def versionInfo: JsObject = DefaultIntegration.this.versionInfo
 
@@ -128,12 +160,12 @@ trait DefaultIntegration
 
     override def components: Seq[Component] = DefaultIntegration.this.components
 
-    override def hooks = editorHooks
+    override def hooks = draftEditorHooks
 
     override def resolveDomain(path: String): String = DefaultIntegration.this.resolveDomain(path)
   }
 
-  lazy val devEditor = new DevEditor {
+  lazy val draftDevEditor = new DraftDevEditor {
     override def mode: Mode = Play.current.mode
 
     override implicit def ec: ExecutionContext = DefaultIntegration.this.ec
@@ -142,9 +174,11 @@ trait DefaultIntegration
 
     override def components: Seq[Component] = DefaultIntegration.this.components
 
-    override def hooks = editorHooks
+    override def hooks = draftEditorHooks
 
     override def resolveDomain(path: String): String = DefaultIntegration.this.resolveDomain(path)
+
+    override def versionInfo: JsObject = DefaultIntegration.this.versionInfo
   }
 
   lazy val catalog = new Catalog {
@@ -185,7 +219,7 @@ trait DefaultIntegration
   }
 
   lazy val item = new Item {
-    override def hooks: ItemHooks = itemHooks
+    override def hooks: CoreItemHooks with CreateItemHook = itemHooks
 
     override def componentTypes: Seq[String] = DefaultIntegration.this.components.map(_.componentType)
 
@@ -197,7 +231,7 @@ trait DefaultIntegration
 
     def outcomeProcessor: OutcomeProcessor = DefaultIntegration.this.outcomeProcessor
 
-    override def hooks: ItemDraftHooks = itemDraftHooks
+    override def hooks: CoreItemHooks with DraftHooks = itemDraftHooks
 
     override implicit def ec: ExecutionContext = DefaultIntegration.this.ec
 

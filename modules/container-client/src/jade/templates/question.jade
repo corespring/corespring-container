@@ -70,7 +70,7 @@ script(type="text/ng-template", id="/templates/question")
           ng-controller="ClientSidePreview")
         .item-preview-wrapper
           .player-label
-            img(src='../../images/item-player-label.png')
+            img(ng-src='{{playerLabelImg}}')
           .player-container
             preview-player(
               data-jade-template='templates/question',

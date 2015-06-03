@@ -4,11 +4,15 @@ angular.module('corespring-editor.controllers')
     '$scope',
     'ComponentData',
     'ClientSidePlayerService',
+    'STATIC_PATHS',
     function ClientSidePreview(
       $log,
       $scope,
       ComponentData,
-      ClientSidePlayerServiceDef) {
+      ClientSidePlayerServiceDef, 
+      STATIC_PATHS) {
+
+    $scope.playerLabelImg = STATIC_PATHS.assets + '/item-player-label.png';
 
     $scope.playerMode = 'gather';
 

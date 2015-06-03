@@ -51,24 +51,31 @@ trait CatalogHooks extends LoadHook with GetAssetHook with GetSupportingMaterial
   def showCatalog(itemId: String)(implicit header: RequestHeader): Future[Option[StatusMessage]]
 }
 
-trait ItemHooks extends HasContext {
+/*trait ItemHooks extends HasContext {
   def load(itemId: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]]
   def create(json: Option[JsValue])(implicit header: RequestHeader): Future[Either[StatusMessage, String]]
-}
+}*/
 
 trait EditorHooks extends LoadHook with AssetHooks
 
-trait ItemDraftHooks extends HasContext with LoadHook {
-  def commit(draftId: String, force: Boolean)(implicit h: RequestHeader): R[JsValue]
+trait CoreItemHooks extends HasContext with LoadHook {
+  def delete(id: String)(implicit h: RequestHeader): R[JsValue]
+  def saveCollectionId(id: String, collectionId: String)(implicit h: RequestHeader): R[JsValue]
+  def saveComponents(id: String, json: JsValue)(implicit h: RequestHeader): R[JsValue]
+  def saveCustomScoring(id: String, customScoring: String)(implicit header: RequestHeader): R[JsValue]
+  def saveProfile(id: String, json: JsValue)(implicit h: RequestHeader): R[JsValue]
+  def saveSummaryFeedback(id: String, feedback: String)(implicit h: RequestHeader): R[JsValue]
+  def saveSupportingMaterials(id: String, json: JsValue)(implicit h: RequestHeader): R[JsValue]
+  def saveXhtml(id: String, xhtml: String)(implicit h: RequestHeader): R[JsValue]
+}
+
+trait DraftHooks {
   def createItemAndDraft()(implicit h: RequestHeader): R[(String, String)]
-  def delete(draftId: String)(implicit h: RequestHeader): R[JsValue]
-  def saveCollectionId(draftId: String, collectionId: String)(implicit h: RequestHeader): R[JsValue]
-  def saveComponents(draftId: String, json: JsValue)(implicit h: RequestHeader): R[JsValue]
-  def saveCustomScoring(draftId: String, customScoring: String)(implicit header: RequestHeader): R[JsValue]
-  def saveProfile(draftId: String, json: JsValue)(implicit h: RequestHeader): R[JsValue]
-  def saveSummaryFeedback(draftId: String, feedback: String)(implicit h: RequestHeader): R[JsValue]
-  def saveSupportingMaterials(draftId: String, json: JsValue)(implicit h: RequestHeader): R[JsValue]
-  def saveXhtml(draftId: String, xhtml: String)(implicit h: RequestHeader): R[JsValue]
+  def commit(id: String, force: Boolean)(implicit h: RequestHeader): R[JsValue]
+}
+
+trait CreateItemHook{
+  def createItem(json:Option[JsValue])(implicit h: RequestHeader): R[String]
 }
 
 trait SessionHooks extends HasContext {

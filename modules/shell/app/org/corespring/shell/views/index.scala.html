@@ -40,6 +40,10 @@
       padding: 8px;
     }
 
+    td.inner{
+      border-left: dashed 1px #cccccc;
+    }
+
     tr {
       border-bottom: solid 1px #cccccc;
     }
@@ -53,7 +57,7 @@
     </div>
 
     <br/>
-    <a href="/create-item">Create a new item</a>
+    <a href="/launch/item-editor/new-item">Create a new item</a>
 
     <br/><br/>
 
@@ -62,30 +66,35 @@
         <th>Title</th>
         <th>Player</th>
         <th>Catalog</th>
-        <th>Editor</th>
+        <th>Item Editor</th>
+        <th>Draft Editor</th>
         <th></th>
       </tr>
       @items.map{ i =>
       <tr>
         <td>@i.title</td>
-        <td>
+        <td class="inner">
           @link("Run", s"${i.createSession}?mode=dev&showControls=true", "btn-success")
           @link("Prod", s"${i.createSession}?mode=prod", "btn-primary")
         </td>
-        <td>
+        <td class="inner">
           @link("Catalog", i.catalog, "btn-info")
           @link("Catalog (Profile Only)", s"${i.catalog}?tabs=profile", "btn-info")
         </td>
-        <td>
-          @link("New Draft", i.edit)
-          @link("New Draft DevEditor", s"${i.edit}?devEditor=true")
+        <td class="inner">
+          @link("Edit Item", i.itemEdit)
+          @link("Edit Item DevEditor", s"${i.itemEdit}?devEditor=true")
+        </td>
+        <td class="inner">
+          @link("New Draft", i.draftEdit)
+          @link("New Draft DevEditor", s"${i.draftEdit}?devEditor=true")
           <br/>
           @if(!i.drafts.isEmpty){
             @mkDrafts(i.drafts)
           }
 
         </td>
-        <td>
+        <td class="inner">
           @link("Delete", i.delete, "btn-danger")
         </td>
       </tr>

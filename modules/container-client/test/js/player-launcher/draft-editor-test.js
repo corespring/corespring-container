@@ -1,24 +1,8 @@
-describe('player-launcher.editor', function() {
-
-  var origRequire = corespring.require;
-
-  function MockErrors(errs) {
-    this.errors = errs;
-    this.hasErrors = function() {
-      return this.errors && this.errors.length > 0;
-    };
-  }
-
-  function mkCall(name) {
-    return {
-      method: name,
-      url: name
-    };
-  }
+describe('draft-editor', function() {
 
   var mockLauncher, mockInstance;
   var errorCodes = corespring.require('error-codes');
-  var onError, editor, Editor;
+  var onError, editor, DraftEditor;
 
   beforeEach(function() {
 
@@ -33,7 +17,7 @@ describe('player-launcher.editor', function() {
       return mockLauncher;
     };
     onError = jasmine.createSpy('onError');
-    Editor = new corespring.require('editor');
+    DraftEditor = new corespring.require('draft-editor');
   });
 
   afterEach(function() {
@@ -45,34 +29,30 @@ describe('player-launcher.editor', function() {
   describe('constructor', function() {
 
     it('calls launcher.init', function() {
-      var editor = new Editor('element', {}, onError);
+      var editor = new DraftEditor('element', {}, onError);
       expect(mockLauncher.init).toHaveBeenCalled();
     });
 
 
     describe('loadDraftItem', function() {
       it('calls loadCall(editor)', function() {
-        var editor = new Editor('element', {
+        var editor = new DraftEditor('element', {
           itemId: 'itemId'
         }, onError);
-        expect(mockLauncher.loadCall).toHaveBeenCalled();
-        var key = mockLauncher.loadCall.calls.mostRecent().args[0];
-        expect(key).toEqual('editor');
+        expect(mockLauncher.loadCall).toHaveBeenCalledWith('draftEditor.editor', jasmine.any(Function));
       });
 
       it('calls loadCall(devEditor)', function() {
-        var editor = new Editor('element', {
+        var editor = new DraftEditor('element', {
           itemId: 'itemId',
           devEditor: true
         }, onError);
-        expect(mockLauncher.loadCall).toHaveBeenCalled();
-        var key = mockLauncher.loadCall.calls.mostRecent().args[0];
-        expect(key).toEqual('devEditor');
+        expect(mockLauncher.loadCall).toHaveBeenCalledWith('draftEditor.devEditor', jasmine.any(Function));
       });
 
       it('triggers an error if there is no call found', function() {
         mockLauncher.loadCall.and.returnValue(null);
-        var editor = new Editor('element', {
+        var editor = new DraftEditor('element', {
           itemId: 'itemId'
         }, onError);
         expect(onError).toHaveBeenCalled();
@@ -94,7 +74,7 @@ describe('player-launcher.editor', function() {
             _.assign(opts, {
               itemId: 'itemId'
             });
-            var editor = new Editor('element', opts, onError);
+            var editor = new DraftEditor('element', opts, onError);
             cb(call, opts);
           };
         }
@@ -109,9 +89,7 @@ describe('player-launcher.editor', function() {
                   url: '/url',
                   hash: '/supporting-materials/0'
                 },
-                undefined, {
-                  profileConfig: undefined
-                },
+                undefined, {},
                 jasmine.any(Function));
             }));
 
@@ -142,6 +120,17 @@ describe('player-launcher.editor', function() {
                   profile: 'profile'
                 }
               },
+              jasmine.any(Function));
+          }));
+
+        it('calls loadInstance with showSaveMessage', assertLoadInstance({
+            showSaveMessage: true
+          },
+          function(call) {
+            expect(mockLauncher.loadInstance).toHaveBeenCalledWith(
+              jasmine.any(Object),
+              undefined,
+              { showSaveMessage: true },
               jasmine.any(Function));
           }));
 
@@ -192,9 +181,9 @@ describe('player-launcher.editor', function() {
     describe('createItemAndDraft', function() {
 
       it('calls launcher.loadCall(createItemAndDraft)', function() {
-        var editor = new Editor('element', {}, function() {});
+        var editor = new DraftEditor('element', {}, function() {});
         expect(mockLauncher.loadCall).toHaveBeenCalledWith(
-          'createItemAndDraft');
+          'draftEditor.createItemAndDraft');
       });
 
       it('calls $.ajax', function() {
@@ -202,7 +191,7 @@ describe('player-launcher.editor', function() {
           method: 'GET',
           url: 'createItemAndSession'
         });
-        var editor = new Editor('element', {}, function() {});
+        var editor = new DraftEditor('element', {}, function() {});
         expect($.ajax).toHaveBeenCalledWith({
           type: 'GET',
           url: 'createItemAndSession',
@@ -228,7 +217,7 @@ describe('player-launcher.editor', function() {
           });
         });
 
-        var editor = new Editor('element', {}, onError);
+        var editor = new DraftEditor('element', {}, onError);
         expect(onError).toHaveBeenCalledWith({
           code: 113,
           msg: 'e'
@@ -255,7 +244,7 @@ describe('player-launcher.editor', function() {
             onItemCreated: jasmine.createSpy('onItemCreated'),
             onDraftCreated: jasmine.createSpy('onDraftCreated')
           };
-          var editor = new Editor('element', opts, onError);
+          var editor = new DraftEditor('element', opts, onError);
         });
 
         it('calls options.onItemCreated when $.ajax is successful',
@@ -270,7 +259,7 @@ describe('player-launcher.editor', function() {
           });
 
         it('calls launcher.loadCall', function() {
-          expect(mockLauncher.loadCall).toHaveBeenCalledWith('editor',
+          expect(mockLauncher.loadCall).toHaveBeenCalledWith('draftEditor.editor',
             jasmine.any(Function));
         });
 
@@ -289,12 +278,12 @@ describe('player-launcher.editor', function() {
 
     it('calls commitDraft endpoint', function() {
 
-      var editor = new Editor('element', {}, onError);
+      var editor = new DraftEditor('element', {}, onError);
       var cb = jasmine.createSpy('cb');
       editor.commitDraft(false, cb);
       expect($.ajax).toHaveBeenCalledWith({
         type: 'GET',
-        url: 'createItemAndDraft',
+        url: 'draftEditor.createItemAndDraft',
         data: {
           draftName: jasmine.any(String)
         },
@@ -305,7 +294,7 @@ describe('player-launcher.editor', function() {
     });
 
     it('calls callback with err if the commitDraft endpoint returns an error', function() {
-      var editor = new Editor('element', {}, onError);
+      var editor = new DraftEditor('element', {}, onError);
       $.ajax.and.callFake(function(opts) {
         opts.error({
           responseJSON: {
@@ -319,7 +308,7 @@ describe('player-launcher.editor', function() {
     });
 
     it('calls callback with no err if the commitDraft endpoint returns success', function() {
-      var editor = new Editor('element', {}, onError);
+      var editor = new DraftEditor('element', {}, onError);
       $.ajax.and.callFake(function(opts) {
         opts.success();
       });
