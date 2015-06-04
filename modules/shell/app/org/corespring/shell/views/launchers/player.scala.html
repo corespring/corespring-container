@@ -24,11 +24,13 @@
        var holder = $('.holder');
        var opts = @{Html(play.api.libs.json.Json.stringify(opts))};
 
+       opts.width = initialPlayerSize+"px";
+
        console.log('opts: ', opts);
 
        opts.onPlayerRendered = function(){
          console.log('onPlayerRendered', arguments);
-       }
+       };
 
        var player = new org.corespring.players.ItemPlayer(holder, opts, function(err){
           console.warn(err);
@@ -51,7 +53,7 @@
     </script>
 
 <button class="button" id="set-mode-evaluate">evaluate</button>
-<div>Player width: <input type="text" id="player-width-input"/></div>
+Player width: <input type="text" id="player-width-input"/>
 <div class="holder"></div>
 </body>
 </html>
