@@ -72,7 +72,7 @@ trait App[T]
       "components/",
       "component-sets/",
       "editor",
-      "player-prod",
+      "-prod",
       "player.min").exists(s.contains)
     if (needsResolution) resolveDomain(s) else s
   }
