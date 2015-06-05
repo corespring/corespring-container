@@ -189,6 +189,8 @@ trait DefaultIntegration
     override def urls: ComponentUrls = componentSets
     override def components = DefaultIntegration.this.components
     override def hooks = catalogHooks
+
+    override def resolveDomain(path:String) : String = DefaultIntegration.this.resolveDomain(path)
   }
 
   lazy val prodHtmlPlayer = new Player {
