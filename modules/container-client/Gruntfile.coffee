@@ -120,7 +120,8 @@ module.exports = (grunt) ->
           '<%= common.dist %>/js/**/*.tpl.js',
           '!<%= common.app %>/js/player-launcher/**/*.js',
           '!<%= common.app %>/js/old-*/**/*.js',
-          '<%= common.tmp %>/wrapped/player-launcher-wrapped.js'
+          '<%= common.tmp %>/wrapped/player-launcher-wrapped.js',
+          '<%= common.test %>/js/**/*-mocks.js'
           ]
         options:
           keepRunner: true
@@ -134,9 +135,9 @@ module.exports = (grunt) ->
             'saxjs/lib/sax.js',
             'bootstrap/dist/js/bootstrap.min.js',
             'angular-ui-bootstrap-bower/ui-bootstrap-tpls.js',
-            'msgr.js/dist/msgr.js'], comps)
+            'msgr.js/dist/msgr.js'
+            ], comps)
           specs: [
-            '<%= common.test %>/js/**/*-mocks.js',
             '<%= common.test %>/js/**/*-test.js',
             '!<%= common.test %>/js/old-*/**/*-test.js'
             ]
