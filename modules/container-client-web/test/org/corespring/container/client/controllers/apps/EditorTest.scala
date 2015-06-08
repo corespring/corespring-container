@@ -20,7 +20,7 @@ class EditorTest extends Specification with Mockito {
 
   class editorScope(val hookResponse: Either[StatusMessage, JsValue]) extends Scope {
 
-    val editor = new Editor {
+    val editor = new DraftEditor {
 
       override def versionInfo: JsObject = Json.obj()
 

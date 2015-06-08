@@ -6,13 +6,11 @@ function EditorDefinition(element, options, errorCallback) {
 
   function createItemAndDraft(callback){
 
-    var call = launcher.loadCall('createItemAndDraft');
+    var call = launcher.loadCall('draftEditor.createItemAndDraft');
 
     if (!call) {
       return;
     }
-
-    launcher.log('create item and draft');
 
     callback = callback || function(){};
 
@@ -30,14 +28,15 @@ function EditorDefinition(element, options, errorCallback) {
     }
 
     function onError(xhrErr){
-      var msg = (xhrErr.responseJSON && xhrErr.responseJSON.error) ? xhrErr.responseJSON.error : 'Failed to commit draft: ' + options.draftId;
+      var msg = (xhrErr.responseJSON && xhrErr.responseJSON.error) ?
+        xhrErr.responseJSON.error : 'Failed to create item and draft: ' + options.draftId;
       callback(msg);
     }
 
     $.ajax({
       type: call.method,
       url: launcher.prepareUrl(call.url),
-      data: options,
+      data: { draftName: options.draftName },
       success: onSuccess,
       error: onError.bind(this),
       dataType: 'json'
@@ -50,18 +49,13 @@ function EditorDefinition(element, options, errorCallback) {
       throw new Error('invalid draftId');
     }
 
-    var call = launcher.loadCall(options.devEditor ? 'devEditor' : 'editor', function(u){
+    var call = launcher.loadCall(options.devEditor ? 'draftEditor.devEditor' : 'draftEditor.editor', function(u){
       return u.replace(':draftId', draftId);
     });
 
     if (!call) {
       errorCallback(errorCodes.NO_DRAFT_ID);
       return;
-    }
-
-    // Not sure what's going on here.
-    function fixCall(call) {
-      return (typeof call === 'string') ? call : call.url;
     }
 
     var tab = options.selectedTab;
@@ -74,7 +68,15 @@ function EditorDefinition(element, options, errorCallback) {
       call.hash = '/supporting-materials/0';
     }
 
-    var initialData = {profileConfig: options.profileConfig};
+    var initialData = {};
+
+    if(options.showSaveMessage){
+      initialData.showSaveMessage = options.showSaveMessage;
+    }
+
+    if(options.profileConfig){
+      initialData.profileConfig = options.profileConfig;
+    }
 
     function onReady(instance){
       if(options.devEditor){
@@ -123,7 +125,7 @@ function EditorDefinition(element, options, errorCallback) {
 
   /** Public functions */
   this.commitDraft = function(force, callback){
-    var call = launcher.loadCall('commitDraft', function(u){
+    var call = launcher.loadCall('draftEditor.commitDraft', function(u){
       return u.replace(':draftId',new DraftId(options.itemId, options.draftName).toString());
     });
 
@@ -143,7 +145,7 @@ function EditorDefinition(element, options, errorCallback) {
     $.ajax({
       type: call.method,
       url: launcher.prepareUrl(call.url, {force: force}),
-      data: options,
+      data: {},
       success: onSuccess,
       error: onError,
       dataType: 'json'

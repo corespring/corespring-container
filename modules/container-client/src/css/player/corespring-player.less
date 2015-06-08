@@ -1,3 +1,5 @@
+@import "player-core-mixin";
+
 @corespring-player-width: 600px;
 
 .corespring-player {
@@ -5,27 +7,27 @@
   max-width: @corespring-player-width;
   width: @corespring-player-width;
 
-  @import "player-core";
+  .player-core-mixin();
 
   .see-solution {
 
-    .modal-body{
+    .modal-body {
       height: 100%;
     }
     .modal-header {
-      background:@new-blue;
+      background: @new-blue;
       color: white;
       border-radius: 4px 4px 0 0;
-      &:hover{
+      &:hover {
         cursor: pointer;
       }
     }
-    .modal-footer{
+    .modal-footer {
       text-align: left;
       border: none;
     }
 
-    .right{
+    .right {
       text-align: right;
     }
   }

@@ -52,8 +52,12 @@ org.corespring.mocks.launcher.MockLauncher = function(mockInstance){
       return mockInstance;
     });
 
-    this.prepareUrl = jasmine.createSpy('prepareUrl').and.callFake(function() {
-      return Array.prototype.join.call(arguments, '-');
+    this.prepareUrl = jasmine.createSpy('prepareUrl').and.callFake(function(url,params) {
+      if(params){
+        return url + '?params=' + JSON.stringify(params);
+      } else {
+        return url;
+      }
     });
 
 

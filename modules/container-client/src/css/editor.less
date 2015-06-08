@@ -29,8 +29,10 @@
 @import "editor/profile-preview";
 @import "editor/help";
 
+@import "player/player-core-mixin";
+
 .wiggi-wiz-editable{
-  @import "player/player-core";
+  .player-core-mixin();
 }
 @import "player/player-container";
 @import "player/corespring-player";

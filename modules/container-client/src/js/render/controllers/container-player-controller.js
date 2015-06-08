@@ -41,7 +41,7 @@ angular.module('corespring-player.controllers')
               isAttempt: true,
               isComplete: true
             },
-            options: $scope.playerSettings
+            evaluate: $scope.playerSettings
           });
         }
 

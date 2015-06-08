@@ -15,29 +15,30 @@ angular.module('corespring.wiggi-wiz-features.cs-image').factory('ImageFeature',
     csImage.onClick = undefined;
 
     csImage.onMouseUp = function($node, $nodeScope, editor) {
+      console.log('image.onMouseUp');
       var buttons = [
-        TemplateUtils.makeButton({
+          TemplateUtils.makeButton({
           html: '<span>25%</span>'
         }, '0.25'),
-        TemplateUtils.makeButton({
+          TemplateUtils.makeButton({
           html: '<span>50%</span>'
         }, '0.5'),
-        TemplateUtils.makeButton({
+          TemplateUtils.makeButton({
           html: '<span>75%</span>'
         }, '0.75'),
-        TemplateUtils.makeButton({
+          TemplateUtils.makeButton({
           html: '<span>100%</span>'
         }, '1.0'),
-        TemplateUtils.makeButton({
+          TemplateUtils.makeButton({
           icon: 'fa-align-left'
         }, 'align:left'),
-        TemplateUtils.makeButton({
+          TemplateUtils.makeButton({
           icon: 'fa-align-right'
         }, 'align:right'),
-        TemplateUtils.makeButton({
+          TemplateUtils.makeButton({
           icon: 'fa-align-center'
         }, 'align:center')
-      ].join('\n');
+        ].join('\n');
 
       editor.togglePopover($node, $nodeScope, buttons, $node.find('img'));
     };
@@ -49,7 +50,7 @@ angular.module('corespring.wiggi-wiz-features.cs-image').factory('ImageFeature',
       if (imageSrc) {
         var divStyle = $node.attr('style');
         var imageStyle = $node.find('img').attr('style');
-        var clone = $('<div style="'+divStyle+'" image-holder image-src="' + imageSrc + '" image-style="' + imageStyle + '"></div>');
+        var clone = $('<div style="' + divStyle + '" image-holder image-src="' + imageSrc + '" image-style="' + imageStyle + '"></div>');
         return replaceWith(clone);
       } else {
         return $node;
@@ -90,7 +91,7 @@ angular.module('corespring.wiggi-wiz-features.cs-image').factory('ImageFeature',
       }
 
       var dialogTemplate = [
-        '<div class="file-upload-modal">',
+        '<div class="file-upload-modal" ng-mousedown="$event.stopPropagation()" ng-mouseup="$event.stopPropagation()">',
         '  <div class="alert alert-danger wiggi-wiz-alert ng-hide" ng-show="error"  ng-bind="error"></div>',
         '  <div class="alert alert-success wiggi-wiz-alert ng-hide" ng-show="fileName"><strong>Upload successful.</strong><br/>You have successfully uploaded: {{fileName}}</div>',
         '  <div class="center-container">',

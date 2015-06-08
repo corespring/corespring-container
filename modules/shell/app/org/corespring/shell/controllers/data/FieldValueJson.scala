@@ -6,6 +6,13 @@ object FieldValueJson {
 
   def apply(): JsValue = fieldValues
 
+  var depthOfKnowledge = Json.parse(
+    """[
+      |{"key":"Recall & Reproduction","value":"Recall & Reproduction"},
+      |{"key":"Strategic Thinking & Reasoning","value":"Strategic Thinking & Reasoning"},
+      |{"key":"Skills & Concepts","value":"Skills & Concepts"},
+      |{"key":"Extended Thinking","value":"Extended Thinking"},
+      |{"key":"None","value":"None"}]""".stripMargin)
   val fieldValues = Json.obj(
     "version" -> "0.0.3",
     "mediaType" -> Json.arr(
@@ -40,19 +47,7 @@ object FieldValueJson {
       Json.obj(
         "key" -> "Creating",
         "value" -> "Creating")),
-    "depthOfKnowledge" -> Json.arr(
-      Json.obj(
-        "key" -> "1",
-        "value" -> "Level 1 Recall & Reproduction"),
-      Json.obj(
-        "key" -> "2",
-        "value" -> "Level 2 Skills & Concepts"),
-      Json.obj(
-        "key" -> "3",
-        "value" -> "Level 3 Strategic Thinking/Reasoning"),
-      Json.obj(
-        "key" -> "4",
-        "value" -> "Level 4 Extended Thinking")),
+    "depthOfKnowledge" -> depthOfKnowledge,
     "demonstratedKnowledge" -> Json.arr(
       Json.obj(
         "key" -> "Factual",

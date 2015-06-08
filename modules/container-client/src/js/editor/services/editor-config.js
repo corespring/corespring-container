@@ -1,32 +1,44 @@
 angular.module('corespring-editor.services').service('EditorConfig', [
-    'ItemService',
-    'LogFactory',
+    'ComponentData',
+    'ComponentDefaultData',
+    'ComponentToWiggiwizFeatureAdapter',
     'DesignerService',
     'ImageFeature',
+    'ItemService',
+    'LogFactory',
     'WiggiFootnotesFeatureDef',
-    'WiggiMathJaxFeatureDef',
     'WiggiLinkFeatureDef',
-    'ComponentToWiggiwizFeatureAdapter',
-    'ComponentData',
+    'WiggiMathJaxFeatureDef',
     function(
-      ItemService,
-      LogFactory,
+      ComponentData,
+      ComponentDefaultData,
+      ComponentToWiggiwizFeatureAdapter,
       DesignerService,
       ImageFeature,
+      ItemService,
+      LogFactory,
       WiggiFootnotesFeatureDef,
-      WiggiMathJaxFeatureDef,
       WiggiLinkFeatureDef,
-      ComponentToWiggiwizFeatureAdapter,
-      ComponentData) {
+      WiggiMathJaxFeatureDef
+    ) {
 
       function EditorConfig(){
 
-        var
-          configPanels = {},
+        var configPanels = {},
           interactions = null,
           widgets = null,
           logger = LogFactory.getLogger('editor-config');
 
+        this.onFileSizeGreaterThanMax = function($event){
+          logger.warn('file too big');
+        };
+
+        DesignerService
+            .loadAvailableUiComponents(
+            onComponentsLoaded.bind(this),
+            onComponentsLoadError);
+
+        //--------------------------------------------------------------
 
         function onComponentsLoaded(uiComponents) {
           interactions = uiComponents.interactions;
@@ -34,42 +46,17 @@ angular.module('corespring-editor.services').service('EditorConfig', [
           initComponents.bind(this)();
         }
 
-        function initComponents() {
+        function onComponentsLoadError(error) {
+          throw new Error("Error loading components");
+        }
 
+        function initComponents() {
           if (!interactions || !widgets) {
             return;
           }
 
-          function addToEditor(editor, addContent, component) {
-
-            var newComponentId = ComponentData.addComponent(component.defaultData);
-
-            addContent($([
-              '<placeholder',
-              ' id="' + newComponentId + '"',
-              ' component-type="' + component.componentType + '"',
-              ' label="' + component.name + '"',
-              '>'
-            ].join('')));
-          }
-
-          function deleteComponent(id) {
-            ComponentData.deleteComponent(id);
-          }
-
-          function reAddToEditor($node) {
-            var id = $($node).attr('id');
-            ComponentData.restoreComponent(id);
-          }
-
-          function componentToFeature(component) {
-            return ComponentToWiggiwizFeatureAdapter.componentToWiggiwizFeature(
-              component,
-              addToEditor,
-              deleteComponent,
-              reAddToEditor
-            );
-          }
+          _.forEach(interactions, storeDefaultData);
+          _.forEach(widgets, storeDefaultData);
 
           var orderedComponents = [
             "corespring-multiple-choice",
@@ -85,25 +72,22 @@ angular.module('corespring-editor.services').service('EditorConfig', [
             "corespring-select-text"
           ];
 
-          function orderList(component) {
-            var idx = _.indexOf(orderedComponents, component.componentType);
-            return idx >= 0 ? idx : 1000;
-          }
-
-          function isToolbar(component) {
-            return component.titleGroup === 'toolbar';
-          }
-
-          function isReleased(component) {
-            return component.released;
-          }
-
           var videoComponent = componentToFeature(_.find(widgets,
-            function(c) {
-              return c.componentType === 'corespring-video';
-            }));
+              function(c) {
+                return c.componentType === 'corespring-video';
+              }));
 
           videoComponent.iconclass = "fa fa-film";
+
+          var calculatorComponent = componentToFeature(_.find(widgets,
+            function(c) {
+              return c.componentType === 'corespring-calculator';
+            }));
+
+          var rulerComponent = componentToFeature(_.find(widgets,
+            function(c) {
+              return c.componentType === 'corespring-ruler';
+            }));
 
           var calculatorComponent = componentToFeature(_.find(widgets,
             function(c) {
@@ -124,19 +108,12 @@ angular.module('corespring-editor.services').service('EditorConfig', [
             ImageFeature
           ];
 
-          function mkGroup(){
-            return {
-              type: 'group',
-              buttons: Array.prototype.slice.call(arguments)
-            };
-          }
-
           var linkFeatureGroup = mkGroup(new WiggiLinkFeatureDef());
 
           this.mathJaxFeatureGroup =  function(){
             return mkGroup(new WiggiMathJaxFeatureDef());
           };
-          
+
           this.footnotesFeatureGroup = function(){
             return mkGroup(new WiggiFootnotesFeatureDef());
           };
@@ -148,13 +125,13 @@ angular.module('corespring-editor.services').service('EditorConfig', [
               class: 'external',
               dropdownTitle: 'Insert Interaction',
               buttons: _(interactions)
-                .reject(isToolbar)
-                .filter(isReleased)
-                .sortBy(orderList)
-                .map(componentToFeature)
-                .value()
-            }, 
-            this.mathJaxFeatureGroup(), 
+                  .reject(isToolbar)
+                  .filter(isReleased)
+                  .sortBy(orderList)
+                  .map(componentToFeature)
+                  .value()
+            },
+            this.mathJaxFeatureGroup(),
             this.footnotesFeatureGroup(),
             {
               type: 'group',
@@ -176,22 +153,64 @@ angular.module('corespring-editor.services').service('EditorConfig', [
                 .value()
             }]
           };
+
+          //------------------------------------
+
+          function storeDefaultData(comp){
+            ComponentDefaultData.setDefaultData(comp.componentType, comp.defaultData);
+          }
+
+          function addToEditor(editor, addContent, component) {
+            var newComponentId = ComponentData.addComponentModel(component.defaultData);
+
+            addContent($([
+              '<placeholder',
+              ' id="' + newComponentId + '"',
+              ' component-type="' + component.componentType + '"',
+              ' label="' + component.name + '"',
+              '>'
+            ].join('')));
+          }
+
+          function componentToFeature(component) {
+            return ComponentToWiggiwizFeatureAdapter.componentToWiggiwizFeature(
+                component,
+                addToEditor,
+                deleteComponent,
+                reAddToEditor
+            );
+          }
+
+          function deleteComponent(id) {
+            ComponentData.deleteComponent(id);
+          }
+
+          function reAddToEditor($node) {
+            var id = $($node).attr('id');
+            ComponentData.restoreComponent(id);
+          }
+
+          function orderList(component) {
+            var idx = _.indexOf(orderedComponents, component.componentType);
+            return idx >= 0 ? idx : 1000;
+          }
+
+          function isToolbar(component) {
+            return component.titleGroup === 'toolbar';
+          }
+
+          function isReleased(component) {
+            return component.released;
+          }
+
+          function mkGroup(){
+            return {
+              type: 'group',
+              buttons: Array.prototype.slice.call(arguments)
+            };
+          }
         }
-
-        this.onFileSizeGreaterThanMax = function($event){
-          logger.warn('file too big');
-        };
-
-        function onComponentsLoadError(error) {
-          throw new Error("Error loading components");
-        }
-
-        DesignerService
-          .loadAvailableUiComponents(
-            onComponentsLoaded.bind(this),
-            onComponentsLoadError);
       }
-
 
       return new EditorConfig();
 
