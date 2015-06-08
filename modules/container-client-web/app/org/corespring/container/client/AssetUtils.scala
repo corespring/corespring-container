@@ -1,66 +1,60 @@
 package org.corespring.container.client
 
-import com.amazonaws.auth.AWSCredentials
-import com.amazonaws.services.s3.AmazonS3Client
+import com.amazonaws.services.s3.model.{ ObjectListing, AmazonS3Exception }
+import com.amazonaws.services.s3.{ AmazonS3 }
 import grizzled.slf4j.Logger
 import org.corespring.container.logging.ContainerLogger
 
 import scala.collection.JavaConversions._
 import scala.util.{ Failure, Success, Try }
 
+class AssetUtils(s3: AmazonS3, bucket: String) {
 
-object AssetUtils{
-  def apply(key:String, secret:String, bucket:String) = {
-    val s3: AmazonS3Client = {
-      new AmazonS3Client(new AWSCredentials {
-        override def getAWSAccessKeyId: String = key
-
-        override def getAWSSecretKey: String = secret
-      })
+  private def listObjects(bucket: String, key: String): Either[Throwable, ObjectListing] = {
+    Try(s3.listObjects(bucket, key)) match {
+      case Success(ol) => Right(ol)
+      case Failure(e) => Left(e)
     }
-
-    new AssetUtils(s3, bucket)
   }
-}
-
-class AssetUtils(s3:AmazonS3Client, bucket:String) {
 
   private val logger: Logger = ContainerLogger.getLogger("AssetUtils")
 
-  def run(fn: => Boolean): Boolean = {
-    val out = Try(fn)
-    out match {
-      case Success(b) => b
-      case Failure(e) => {
-        e.printStackTrace
-        false
+  def withListing(bucket: String, key: String, fn: ObjectListing => Boolean): Boolean = {
+    listObjects(bucket, key) match {
+      case Left(e) => e match {
+        case s3: AmazonS3Exception => s3.getStatusCode == 404
+        case t: Throwable => {
+          t.printStackTrace
+          false
+        }
       }
+      case Right(listing) => fn(listing)
     }
   }
 
-  def copyDir(from: String, to: String): Boolean = run {
+  def copyDir(from: String, to: String): Boolean = {
     logger.debug(s"function=copyDir from=$from to=$to")
 
-    val listing = s3.listObjects(bucket, from)
-    listing.getObjectSummaries.foreach { s =>
-      val destination = s.getKey.replace(from, to)
-      logger.trace(s"function=copyDir, copyObject, from=${s.getKey} to=$destination")
-      s3.copyObject(bucket, s.getKey, bucket, destination)
-    }
-    true
+    withListing(bucket, from, (listing) => {
+      listing.getObjectSummaries.foreach { s =>
+        val destination = s.getKey.replace(from, to)
+        logger.trace(s"function=copyDir, copyObject, from=${s.getKey} to=$destination")
+        s3.copyObject(bucket, s.getKey, bucket, destination)
+      }
+      true
+    })
   }
 
-  def deleteDir(path: String): Boolean = run {
+  def deleteDir(path: String): Boolean = {
     logger.debug(s"function=deleteDir from=$path")
-    val listing = s3.listObjects(bucket, path)
-    val keys = listing.getObjectSummaries.map { s =>
-      s.getKey
-    }
-
-    keys.foreach { k =>
-      logger.trace(s"function=deleteDir, delete=$k")
-      s3.deleteObject(bucket, k)
-    }
-    true
+    withListing(bucket, path, (listing) => {
+      val keys = listing.getObjectSummaries.map(_.getKey)
+      keys.foreach { k =>
+        logger.trace(s"function=deleteDir, delete=$k")
+        s3.deleteObject(bucket, k)
+      }
+      true
+    })
   }
+
 }
