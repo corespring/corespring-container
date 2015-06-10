@@ -83,7 +83,7 @@ angular.module('corespring-editor.directives')
               $element.find('[tooltip]').trigger('close');
               $timeout(callback, 10);
             }, 10);
-          }
+          };
         }
 
         $scope.deleteNode = afterTooltipRemoved(function() {

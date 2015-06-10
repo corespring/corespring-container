@@ -141,6 +141,8 @@ html(xmlns="http://www.w3.org/1999/html")
           });
 
 
+          //add close as an event to close the tooltip
+          //this enables you to hide the tooltip by calling elem.trigger('close');
           $tooltipProvider.setTriggers({
             'mouseenter': 'mouseleave close',
             'click': 'click close',
