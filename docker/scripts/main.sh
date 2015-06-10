@@ -1,6 +1,5 @@
 #!/bin/bash
-
-env
+set -e
 
 echo " -- starting mongo"
 mongod --fork --dbpath /var/lib/mongodb/ --smallfiles --logpath /var/log/mongodb.log --logappend
@@ -17,8 +16,5 @@ fakes3 -r /opt/fake-s3-root -p 4567 &
 cd /opt
 
 echo "-- boot play app..."
-
 ./corespring-container/bin/root
-
-$RUN_SCRIPT
 
