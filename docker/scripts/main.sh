@@ -16,8 +16,9 @@ fakes3 -r /opt/fake-s3-root -p 4567 &
 
 cd /opt
 
-RUN_SCRIPT=$(find . -name "root")
-echo "Found run script: $RUN_SCRIPT"
+echo "-- boot play app..."
+
+./corespring-container/bin/root
 
 $RUN_SCRIPT
 

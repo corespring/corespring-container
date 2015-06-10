@@ -42,7 +42,7 @@ ADD mock-data /opt/utils/mock-data
 ADD corespring-components/components /opt/components
 ENV CONTAINER_COMPONENTS_PATH="/opt/components"
 
-ADD target/universal/*.tgz /opt/
+ADD target/universal/stage /opt/corespring-container
 
 CMD ["/data/main.sh" ] 
 
