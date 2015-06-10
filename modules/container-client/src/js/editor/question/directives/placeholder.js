@@ -79,8 +79,9 @@ angular.module('corespring-editor.directives')
           return function($event) {
             $event.stopPropagation();
             $timeout(function () {
-              //this requires to add close as an event to the triggers for tooltip, see layout.jade
-              $element.find('[tooltip]').trigger('close');
+              //the angular-ui bootstrap tooltip has no api to close it
+              //this requires to add an event to the triggers for tooltip, see layout.jade
+              $element.find('[tooltip]').trigger('ng-ui-tooltip-close');
               $timeout(callback, 10);
             }, 10);
           };
