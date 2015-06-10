@@ -5,10 +5,12 @@
 angular.module('corespring-editor.directives')
   .directive('placeholder', [
     '$compile',
+    '$timeout',
     'LogFactory',
     'ComponentConfig',
     function(
       $compile,
+      $timeout,
       LogFactory,
       ComponentConfig) {
 
@@ -73,22 +75,25 @@ angular.module('corespring-editor.directives')
           }
         }
 
-        function removeTooltip() {
-          $scope.$broadcast('$destroy');
+        function afterTooltipRemoved(callback) {
+          return function($event) {
+            $event.stopPropagation();
+            $timeout(function () {
+              //this requires to add close as an event to the triggers for tooltip, see layout.jade
+              $element.find('[tooltip]').trigger('close');
+              $timeout(callback, 10);
+            }, 10);
+          }
         }
 
-        $scope.deleteNode = function($event) {
-          $event.stopPropagation();
-          removeTooltip();
-          $scope.$emit('wiggi-wiz.delete-node', $element);
-        };
+        $scope.deleteNode = afterTooltipRemoved(function() {
+           $scope.$emit('wiggi-wiz.delete-node', $element);
+        });
 
-        $scope.editNode = function($event) {
+        $scope.editNode = afterTooltipRemoved(function() {
           markDirty();
-          $event.stopPropagation();
-          removeTooltip();
           $scope.$emit( 'edit-node', $scope.id, $scope.componentModel, $scope.config);
-        };
+        });
 
         /**
          * The placeholder intercepts the 'registerComponent' event from

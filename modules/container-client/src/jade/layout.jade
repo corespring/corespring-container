@@ -103,7 +103,7 @@ html(xmlns="http://www.w3.org/1999/html")
 
       }
       
-      angular.module( 'corespring-#{appName}', allNgModules ).config(['$provide', function($provide) {
+      angular.module( 'corespring-#{appName}', allNgModules ).config(['$provide', '$tooltipProvider', function($provide, $tooltipProvider) {
 
           var params = getParams();
           
@@ -138,6 +138,13 @@ html(xmlns="http://www.w3.org/1999/html")
 
           $provide.decorator('$log', function($delegate, $sniffer) {
             return logFn($delegate);
+          });
+
+
+          $tooltipProvider.setTriggers({
+            'mouseenter': 'mouseleave close',
+            'click': 'click close',
+            'focus': 'blur close'
           });
 
         }]);
