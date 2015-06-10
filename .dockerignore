@@ -7,7 +7,6 @@ hooks
 .git
 .gitmodules
 .idea*
-target/universal/stage
 regression-tests
 prototype
 logs
