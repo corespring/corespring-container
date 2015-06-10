@@ -6,6 +6,7 @@ import java.net.URLDecoder
 import com.typesafe.config.ConfigFactory
 import org.apache.commons.io.{ FileUtils, IOUtils }
 import org.corespring.amazon.s3.ConcreteS3Service
+import org.corespring.container.client.controllers.apps.{ItemEditor, ItemDevEditor}
 import org.corespring.container.client.controllers.{ AssetType, _ }
 import org.corespring.container.client.hooks._
 import org.corespring.container.client.integration.DefaultIntegration
@@ -16,8 +17,8 @@ import org.corespring.container.logging.ContainerLogger
 import org.corespring.mongo.json.services.MongoService
 import org.corespring.shell.controllers.ShellDataQueryHooks
 import org.corespring.shell.controllers.catalog.actions.{ CatalogHooks => ShellCatalogHooks }
-import org.corespring.shell.controllers.editor.actions.{ EditorHooks => ShellEditorHooks }
-import org.corespring.shell.controllers.editor.{ ItemDraftHooks => ShellItemDraftHooks, ItemHooks => ShellItemHooks, ItemDraftAssets, CollectionHooks => ShellCollectionHooks }
+import org.corespring.shell.controllers.editor.actions.{ DraftEditorHooks => ShellDraftEditorHooks, ItemEditorHooks => ShellItemEditorHooks }
+import org.corespring.shell.controllers.editor.{ItemDraftHooks => ShellItemDraftHooks, ItemHooks => ShellItemHooks, CollectionHooks => ShellCollectionHooks, ItemAssets, ItemDraftAssets}
 import org.corespring.shell.controllers.player.actions.{ PlayerHooks => ShellPlayerHooks }
 import org.corespring.shell.controllers.player.{ SessionHooks => ShellSessionHooks }
 import org.corespring.shell.services.ItemDraftService
@@ -74,7 +75,7 @@ class ContainerClientImplementation(
     lazy val bucket = configuration.getString("amazon.s3.bucket").getOrElse(throw new RuntimeException("No bucket specified"))
   }
 
-  lazy val assets = new Assets with ItemDraftAssets {
+  lazy val assets = new Assets with ItemDraftAssets with ItemAssets {
 
     lazy val (playS3, assetUtils) = {
       val out = for {
@@ -137,6 +138,7 @@ class ContainerClientImplementation(
       assetUtils.copyDir(mkPath(AssetType.Draft, itemId, draftName), mkPath(AssetType.Item, itemId))
     }
 
+    override def deleteItem(id: String): Unit = assetUtils.deleteDir(mkPath(AssetType.Item, id))
   }
 
   lazy val componentSets = new CompressedAndMinifiedComponentSets {
@@ -183,9 +185,15 @@ class ContainerClientImplementation(
     }
   }
 
-  override def editorHooks: EditorHooks = new ShellEditorHooks {
+  override def draftEditorHooks: EditorHooks = new ShellDraftEditorHooks {
     override def draftItemService = ContainerClientImplementation.this.draftItemService
 
+    override def assets: Assets = ContainerClientImplementation.this.assets
+
+    override def itemService: MongoService = ContainerClientImplementation.this.itemService
+  }
+
+  override def itemEditorHooks: EditorHooks = new ShellItemEditorHooks {
     override def assets: Assets = ContainerClientImplementation.this.assets
 
     override def itemService: MongoService = ContainerClientImplementation.this.itemService
@@ -204,12 +212,18 @@ class ContainerClientImplementation(
     override implicit def ec: ExecutionContext = ContainerClientImplementation.this.ec
   }
 
-  override def itemDraftHooks: ItemDraftHooks = new ShellItemDraftHooks {
+  override def itemDraftHooks: CoreItemHooks with DraftHooks = new ShellItemDraftHooks {
     override def itemService: MongoService = ContainerClientImplementation.this.itemService
 
     override def draftItemService = ContainerClientImplementation.this.draftItemService
 
     override def assets: ItemDraftAssets = ContainerClientImplementation.this.assets
+  }
+
+  override def itemHooks: CoreItemHooks with CreateItemHook = new ShellItemHooks {
+    override def itemService: MongoService = ContainerClientImplementation.this.itemService
+
+    override def assets: ItemAssets = ContainerClientImplementation.this.assets
   }
 
   override def playerHooks: PlayerHooks = new ShellPlayerHooks {
@@ -227,13 +241,11 @@ class ContainerClientImplementation(
 
   override def versionInfo: JsObject = VersionInfo(Play.current.configuration)
 
-  override def itemHooks: ItemHooks = new ShellItemHooks {
-    override def itemService: MongoService = ContainerClientImplementation.this.itemService
-  }
 
   override def collectionHooks: CollectionHooks = new ShellCollectionHooks {
 
   }
+
 }
 
 /**

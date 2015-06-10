@@ -46,70 +46,99 @@ class PlayerLauncherTest extends Specification with Mockito with PlaySpecificati
 
   object MockGlobal extends GlobalSettings
 
+  implicit val r = FakeRequest("", "")
+
   "playerJs" should {
 
     "return non - secured player js" in new launchScope(PlayerJs(false, Session())) {
       running(FakeApplication(withGlobal = Some(MockGlobal))) {
-        val result: Future[SimpleResult] = playerJs(FakeRequest("", ""))
-        contentAsString(result) must_== new JsBuilder(playerConfig.rootUrl.get).build(playerNameAndSrc, LaunchOptions.player, Definitions.player(jsConfig.isSecure))(FakeRequest("", ""), jsConfig)
+        val result: Future[SimpleResult] = playerJs(r)
+
+        contentAsString(result) must_== new JsBuilder(playerConfig.rootUrl.get).build(playerNameAndSrc, mkPaths(Paths.player), Definitions.player(jsConfig.isSecure))(r, jsConfig)
         Helpers.session(result).get(SecureMode) must_== Some("false")
       }
     }
 
     "return secured player js" in new launchScope(PlayerJs(true, Session())) {
       running(FakeApplication(withGlobal = Some(MockGlobal))) {
-        val result: Future[SimpleResult] = playerJs(FakeRequest("", ""))
-        contentAsString(result) must_== new JsBuilder(playerConfig.rootUrl.get).build(playerNameAndSrc, LaunchOptions.player, Definitions.player(jsConfig.isSecure))(FakeRequest("", ""), jsConfig)
+        val result: Future[SimpleResult] = playerJs(r)
+        contentAsString(result) must_== new JsBuilder(playerConfig.rootUrl.get).build(playerNameAndSrc, mkPaths(Paths.player), Definitions.player(jsConfig.isSecure))(r, jsConfig)
         Helpers.session(result).get(SecureMode) must_== Some("true")
       }
     }
   }
 
-  "LaunchOptions" should {
+  "editorJs" should {
+
+    "return itemEditor and draftEditor definitions" in new launchScope(PlayerJs(false, Session())) {
+      running(FakeApplication(withGlobal = Some(MockGlobal))) {
+        val result = editorJs(r)
+        val nameAndSrc = Seq(draftEditorNameAndSrc, itemEditorNameAndSrc)
+        val config = mkPaths(Paths.editors)
+        contentAsString(result) must_== new JsBuilder(playerConfig.rootUrl.get).build(nameAndSrc, config, Definitions.editors)(r, jsConfig)
+      }
+    }
+  }
+
+  "Paths" should {
 
     class pathScope extends launchScope {
-      def pathJson(config: JsObject, path: String) = (config \ "paths" \ path).as[JsObject]
+      def pathJson(config: JsObject, path: String) = (config \ path).as[JsObject]
     }
 
     "catalog paths" should {
       "point to load" in new pathScope() {
-        pathJson(LaunchOptions.catalog, "catalog") === callToJson(Catalog.load(":itemId"))
+        pathJson(Paths.catalog, "catalog") === callToJson(Catalog.load(":itemId"))
       }
     }
 
-    "editor paths" should {
+    "itemEditor paths" should {
       "point to editor" in new pathScope() {
-        pathJson(LaunchOptions.editor, "editor") === callToJson(Editor.load(":draftId"))
+        pathJson(Paths.itemEditor, "editor") === callToJson(ItemEditor.load(":itemId"))
       }
 
       "point to devEditor" in new pathScope() {
-        pathJson(LaunchOptions.editor, "devEditor") === callToJson(DevEditor.load(":draftId"))
+        pathJson(Paths.itemEditor, "devEditor") === callToJson(ItemDevEditor.load(":itemId"))
+      }
+
+      "point to createItem" in new pathScope() {
+        pathJson(Paths.itemEditor, "createItem") === callToJson(Item.create())
+      }
+    }
+
+    "draftEditor paths" should {
+      "point to editor" in new pathScope() {
+        pathJson(Paths.draftEditor, "editor") === callToJson(DraftEditor.load(":draftId"))
+      }
+
+      "point to devEditor" in new pathScope() {
+        pathJson(Paths.draftEditor, "devEditor") === callToJson(DraftDevEditor.load(":draftId"))
       }
 
       "point to createItemAndDraft" in new pathScope() {
-        pathJson(LaunchOptions.editor, "createItemAndDraft") === callToJson(ItemDraft.createItemAndDraft())
+        pathJson(Paths.draftEditor, "createItemAndDraft") === callToJson(ItemDraft.createItemAndDraft())
       }
 
       "point to commitDraft" in new pathScope() {
-        pathJson(LaunchOptions.editor, "commitDraft") === callToJson(ItemDraft.commit(":draftId"))
+        pathJson(Paths.draftEditor, "commitDraft") === callToJson(ItemDraft.commit(":draftId"))
       }
     }
 
     "player paths" should {
       "point to createSession" in new pathScope() {
-        pathJson(LaunchOptions.player, "createSession") === callToJson(Player.createSessionForItem(":id"))
+        pathJson(Paths.player, "createSession") === callToJson(Player.createSessionForItem(":id"))
       }
 
       "point to gather" in new pathScope() {
-        pathJson(LaunchOptions.player, "gather") === callToJson(Player.load(":sessionId"))
+        pathJson(Paths.player, "gather") === callToJson(Player.load(":sessionId"))
       }
 
       "point to view" in new pathScope() {
-        pathJson(LaunchOptions.player, "view") === callToJson(Player.load(":sessionId"))
+        pathJson(Paths.player, "view") === callToJson(Player.load(":sessionId"))
       }
 
       "point to evaluate" in new pathScope() {
-        pathJson(LaunchOptions.player, "evaluate") === callToJson(Player.load(":sessionId"))
+        pathJson(Paths.player, "evaluate") === callToJson(Player.load(":sessionId"))
       }
     }
   }

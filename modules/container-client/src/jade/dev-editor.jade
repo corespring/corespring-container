@@ -1,5 +1,11 @@
 extends layout
 
+//After the angular module has been created.
+block after-main-script
+
+  script.
+    angular.module('corespring-#{appName}').constant("STATIC_PATHS", !{staticPaths} ); 
+    
 block content
   style
 
@@ -21,7 +27,7 @@ block content
       .preview(ng-controller="ClientSidePreview")
         .item-preview-wrapper
           .player-label
-            img(src='../../images/item-player-label.png')
+            img(ng-src='{{playerLabelImg}}')
           .player-container
             optimized-preview-player(
               data-jade-template='dev-editor',

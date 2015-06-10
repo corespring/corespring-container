@@ -45,10 +45,16 @@ trait PlayerControllers extends CommonControllers with ResourceControllers {
 
 trait EditorControllers extends CommonControllers with ResourceControllers {
   /** The editor */
-  def editor: Editor
+  def draftEditor: DraftEditor
 
   /** The dev editor */
-  def devEditor: DevEditor
+  def draftDevEditor: DraftDevEditor
+
+  /** The editor */
+  def itemEditor: ItemEditor
+
+  /** The dev editor */
+  def itemDevEditor: ItemDevEditor
 
   /** icons are only used in the editor */
   def icons: Icons
@@ -79,8 +85,10 @@ trait ContainerControllers
     session,
     rig,
     prodHtmlPlayer,
-    editor,
-    devEditor,
+    draftEditor,
+    draftDevEditor,
+    itemEditor,
+    itemDevEditor,
     catalog,
     icons,
     dataQuery)

@@ -14,6 +14,8 @@ angular.module('corespring-editor.controllers')
     'ItemService',
     'SupportingMaterialsService',
     'EditorConfig',
+    '$timeout',
+    '$element',
     function(
       $filter,
       $http,
@@ -26,10 +28,17 @@ angular.module('corespring-editor.controllers')
       ImageUtils,
       ItemService,
       SupportingMaterialsService,
-      EditorConfig){
+      EditorConfig,
+      $timeout,
+      $element){
 
       $scope.index = parseInt($stateParams.index, 10);
       $scope.editing = false;
+
+      // Dropdowns in wiggi-wiz toolbar don't trigger when bootstrap is imported?
+      $timeout(function() {
+        $('.wiggi-wiz-toolbar button', $element).dropdown();
+      });
 
       $scope.addNew = function() {
         var modalInstance = $modal.open({

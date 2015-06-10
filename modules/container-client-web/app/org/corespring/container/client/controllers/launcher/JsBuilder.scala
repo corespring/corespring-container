@@ -4,6 +4,7 @@ import org.corespring.container.client.hooks.PlayerJs
 import org.corespring.container.client.views.txt.js.ServerLibraryWrapper
 import play.api.libs.json.{ Json, JsString, JsObject }
 import play.api.mvc.{ AnyContent, Request, RequestHeader }
+import play.api.templates.TxtFormat
 
 class JsBuilder(corespringUrl: String) {
 
@@ -34,19 +35,26 @@ class JsBuilder(corespringUrl: String) {
 
   private def queryStringToJson(implicit rh: RequestHeader) = Json.toJson(rh.queryString.mapValues(_.mkString))
 
-  def build(additionalJsNameAndSrc: (String, String), options: JsObject, bootstrapLine: String)(implicit request: RequestHeader, js: PlayerJs): String = {
+  def build(additionalJsNameAndSrc: Seq[(String, String)], options: JsObject, bootstrapLine: String)(implicit request: RequestHeader, js: PlayerJs): String = {
     val fullConfig = Json.obj(
       "corespringUrl" -> corespringUrl,
       "queryParams" -> queryStringToJson,
       "errors" -> js.errors,
       "warnings" -> js.warnings) ++ options
     val fullConfigJs = ("launch-config" -> s"module.exports = ${Json.stringify(fullConfig)}")
-    val wrappedNameAndContents = Seq(fullConfigJs, additionalJsNameAndSrc)
-    val wrappedContents = wrappedNameAndContents.map(tuple => ServerLibraryWrapper(tuple._1, tuple._2))
+    val wrappedNameAndContents = fullConfigJs +: additionalJsNameAndSrc
+    val wrappedContents : Seq[TxtFormat.Appendable] = wrappedNameAndContents.map{
+      case (name, content) => ServerLibraryWrapper(name, content)
+    }
 
     s"""
        $coreJs
        ${wrappedContents.mkString("\n")}
        $bootstrapLine"""
+  }
+
+
+  def build(additionalJsNameAndSrc: (String, String), options: JsObject, bootstrapLine: String)(implicit request: RequestHeader, js: PlayerJs): String = {
+    build(Seq(additionalJsNameAndSrc), options, bootstrapLine)
   }
 }
