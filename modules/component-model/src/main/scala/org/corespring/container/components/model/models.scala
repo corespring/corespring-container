@@ -78,7 +78,11 @@ case class LayoutComponent(org: String,
   released: Boolean,
   override val packageInfo: JsValue) extends Component(Id(org, name), packageInfo)
 
-case class Client(render: String, configure: String, css: Option[String])
+case class Client(render: String,
+  configure: String,
+  css: Option[String],
+  renderLibs: Seq[LibrarySource] = Seq.empty,
+  configureLibs: Seq[LibrarySource] = Seq.empty)
 
 case class Server(definition: String)
 
