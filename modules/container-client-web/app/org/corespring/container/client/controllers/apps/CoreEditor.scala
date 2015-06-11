@@ -6,27 +6,32 @@ import org.corespring.container.client.controllers.helpers.JsonHelper
 import org.corespring.container.client.controllers.jade.Jade
 import org.corespring.container.client.hooks.EditorHooks
 import org.corespring.container.client.hooks.Hooks.StatusMessage
-import org.corespring.container.client.views.txt.js.EditorServices
 import org.corespring.container.components.model.ComponentInfo
 import play.api.libs.json._
 import play.api.mvc._
+import v2Player.Routes
 
-import scala.concurrent.Future
+object StaticPaths{
+  val assetUrl = Routes.prefix + "/images"
 
-trait Editor
+  val staticPaths = Json.obj(
+    "assets" -> assetUrl,
+    "dataQuery" -> org.corespring.container.client.controllers.routes.DataQuery.list(":topic").url.replace("/:topic", ""),
+    "collection" -> org.corespring.container.client.controllers.resources.routes.Collection.list().url)
+}
+
+trait CoreEditor
   extends AllItemTypesReader
   with App[EditorHooks]
   with JsonHelper
   with Jade
   with AssetsController[EditorHooks] {
 
-  import org.corespring.container.client.controllers.resources.{ routes => resourceRoutes }
-
   override def context: String = "editor"
 
   def versionInfo: JsObject
 
-  private def toJson(ci: ComponentInfo): JsValue = {
+  protected def toJson(ci: ComponentInfo): JsValue = {
     val tag = tagName(ci.id.org, ci.id.name)
     partialObj(
       "name" -> Some(JsString(ci.id.name)),
@@ -45,20 +50,9 @@ trait Editor
       "configuration" -> (ci.packageInfo \ "external-configuration").asOpt[JsObject])
   }
 
-  def servicesJs(id: String): String = {
+  def servicesJs(id: String, components: JsArray, widgets: JsArray): String
 
-    val componentJson: Seq[JsValue] = interactions.map(toJson)
-    val widgetJson: Seq[JsValue] = widgets.map(toJson)
-
-    EditorServices(
-      s"$context.services",
-      resourceRoutes.ItemDraft.load(id),
-      resourceRoutes.ItemDraft.saveSubset(id, ":subset"),
-      JsArray(componentJson),
-      JsArray(widgetJson)).toString
-  }
-
-  def load(draftId: String): Action[AnyContent] = Action.async { implicit request =>
+  def load(id: String): Action[AnyContent] = Action.async { implicit request =>
 
     import org.corespring.container.client.views.html.error
 
@@ -74,17 +68,22 @@ trait Editor
       val scriptInfo = componentScriptInfo(componentTypes(i), jsMode == "dev")
       val domainResolvedJs = buildJs(scriptInfo)
       val domainResolvedCss = buildCss(scriptInfo)
+      val componentsArray: JsArray = JsArray(interactions.map(toJson))
+      val widgetsArray: JsArray = JsArray(widgets.map(toJson))
+
+
       Ok(renderJade(
         EditorTemplateParams(
           context,
           domainResolvedJs,
           domainResolvedCss,
           jsSrc.ngModules ++ scriptInfo.ngDependencies,
-          servicesJs(draftId),
-          versionInfo)))
+          servicesJs(id, componentsArray, widgetsArray),
+          versionInfo,
+          StaticPaths.staticPaths)))
     }
 
-    hooks.load(draftId).map { e => e.fold(onError, onItem) }
+    hooks.load(id).map { e => e.fold(onError, onItem) }
   }
 }
 

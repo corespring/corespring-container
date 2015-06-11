@@ -5,8 +5,8 @@ block content
     div(question-information="", tabs="tabs", ng-model="item")
 
 block after-main-script
-
+  
   script(type="text/javascript").
-    angular.module('corespring-#{appName}');
+    angular.module('corespring-#{appName}').constant("STATIC_PATHS", !{staticPaths} ); 
 
 

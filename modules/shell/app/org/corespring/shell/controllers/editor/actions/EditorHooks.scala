@@ -32,7 +32,51 @@ object DraftId {
   }
 }
 
-trait EditorHooks extends ContainerEditorHooks {
+trait ItemEditorHooks extends ContainerEditorHooks {
+
+  lazy val logger = ContainerLogger.getLogger("EditorHooks")
+
+  def itemService: MongoService
+
+  def assets: Assets
+
+  import play.api.http.Status._
+
+  override def load(id: String)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] = Future {
+    itemService.load(id).map { json =>
+      Right(json)
+    }.getOrElse {
+      val newId = ObjectId.get
+      val data = Json.obj("_id" -> Json.obj("$oid" -> newId.toString))
+      val oid = itemService.create(data).get
+      require(newId == oid, "the created oid must match the new id")
+      Right(Json.obj("item" -> data))
+    }
+  }
+
+  override def deleteFile(id: String, path: String)(implicit header: RequestHeader): Future[Option[(Int, String)]] = assets.delete(AssetType.Item, id, path)(header)
+
+  override def upload(itemId: String, file: String)(predicate: (RequestHeader) => Option[SimpleResult]): BodyParser[Future[UploadResult]] = {
+
+    def shellPredicate(rh: RequestHeader): Option[SimpleResult] = {
+      predicate(rh).orElse {
+        if (rh.getQueryString("fail").exists(_ == "true")) {
+          Some(Results.BadRequest("Fail is in the queryString"))
+        } else {
+          None
+        }
+      }
+    }
+
+    //TODO: Mimic cs-api and add file to files array?
+    assets.upload(AssetType.Item, itemId, file)(shellPredicate)
+  }
+
+  override def loadFile(id: String, path: String)(request: Request[AnyContent]): SimpleResult = assets.load(AssetType.Item, id, path)(request)
+
+}
+
+trait DraftEditorHooks extends ContainerEditorHooks {
 
   lazy val logger = ContainerLogger.getLogger("EditorHooks")
 

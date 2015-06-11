@@ -9,10 +9,13 @@ describe('CollectionService', function() {
   });
   var success = jasmine.createSpy('success');
 
+  var collectionPath = 'collection-path';
+
   beforeEach(angular.mock.module('corespring-common.services'));
 
   beforeEach(module(function($provide) {
     $provide.value('$http', http);
+    $provide.constant('STATIC_PATHS', { collection: collectionPath});
   }));
 
   beforeEach(inject(function(CollectionService) {
@@ -34,7 +37,7 @@ describe('CollectionService', function() {
     it('should call $http', function() {
       expect(http).toHaveBeenCalledWith({
         method: 'GET',
-        url: '../../collection'
+        url: collectionPath 
       });
     });
 

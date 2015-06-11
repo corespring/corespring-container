@@ -1,6 +1,6 @@
 describe('ClientSidePreview', function() {
 
-  var scope, element;
+  var scope, element, imagePath = '/image-path';
 
   var mockSubmitSession = jasmine.createSpy('submitSession');
 
@@ -30,6 +30,7 @@ describe('ClientSidePreview', function() {
   beforeEach(module(function($provide) {
     $provide.value('ComponentData', ComponentData);
     $provide.value('ClientSidePlayerService', ClientSidePlayerService);
+    $provide.constant('STATIC_PATHS', {assets: imagePath});
   }));
 
   beforeEach(inject(function($rootScope, $compile) {

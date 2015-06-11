@@ -1,11 +1,10 @@
 package org.corespring.container.client.controllers.resources
 
-import org.corespring.container.client.hooks.Hooks.StatusMessage
-import org.corespring.container.client.hooks.{ CollectionHooks, ItemHooks }
+import org.corespring.container.client.hooks.{ CollectionHooks }
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
-import play.api.libs.json.{JsArray, JsValue, Json}
+import play.api.libs.json.{JsArray, Json}
 import play.api.mvc.RequestHeader
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -16,14 +15,16 @@ class CollectionTest extends Specification with Mockito {
 
   class collection(
     listResult: JsArray = Json.arr(Json.obj("key" -> "1", "value" -> "one"), Json.obj("key" -> "2", "value" -> "two")))
-    extends Scope {
+    extends Scope with Collection{
 
-    val collection = new Collection {
 
-      override def hooks : CollectionHooks = mock[CollectionHooks].list()(any[RequestHeader]) returns Future(Right(listResult))
+      override def hooks : CollectionHooks = {
+        val m = mock[CollectionHooks]
+        m.list()(any[RequestHeader]) returns Future(Right(listResult))
+        m
+      }
 
       override implicit def ec: ExecutionContext = ExecutionContext.Implicits.global
-    }
 
   }
 
@@ -31,7 +32,7 @@ class CollectionTest extends Specification with Mockito {
 
     "list" should {
       s"return $OK" in new collection {
-        status(collection.list()(FakeRequest("", ""))) === OK
+        status(list()(FakeRequest("", ""))) === OK
       }
     }
 
