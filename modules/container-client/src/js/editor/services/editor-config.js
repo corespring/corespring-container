@@ -89,16 +89,6 @@ angular.module('corespring-editor.services').service('EditorConfig', [
               return c.componentType === 'corespring-ruler';
             }));
 
-          var calculatorComponent = componentToFeature(_.find(widgets,
-            function(c) {
-              return c.componentType === 'corespring-calculator';
-            }));
-
-          var rulerComponent = componentToFeature(_.find(widgets,
-            function(c) {
-              return c.componentType === 'corespring-ruler';
-            }));
-
           var protractorComponent = componentToFeature(_.find(widgets,
             function(c) {
               return c.componentType === 'corespring-protractor';
