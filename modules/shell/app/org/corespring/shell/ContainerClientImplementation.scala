@@ -5,7 +5,7 @@ import java.net.URLDecoder
 
 import com.typesafe.config.ConfigFactory
 import org.apache.commons.io.{ FileUtils, IOUtils }
-import org.corespring.amazon.s3.ConcreteS3Service
+import org.corespring.amazon.s3.{S3Service, ConcreteS3Service}
 import org.corespring.container.client.controllers.apps.{ItemEditor, ItemDevEditor}
 import org.corespring.container.client.controllers.{ AssetType, _ }
 import org.corespring.container.client.hooks._
@@ -82,10 +82,13 @@ class ContainerClientImplementation(
         k <- s3.key
         s <- s3.secret
       } yield {
-        val s3Service = new ConcreteS3Service(k, s)
-        val assetUtils = new AssetUtils(s3Service.client, s3.bucket)
-        (s3Service, assetUtils)
 
+        val fakeEndpoint = configuration.getString("amazon.s3.fake-endpoint")
+        logger.trace(s"fakeEndpoint: $fakeEndpoint")
+        val client = S3Service.mkClient(k, s, fakeEndpoint)
+        val s3Service = new ConcreteS3Service(client)
+        val assetUtils = new AssetUtils(client, s3.bucket)
+        (s3Service, assetUtils)
       }
       out.getOrElse(throw new RuntimeException("No amazon key/secret"))
     }
