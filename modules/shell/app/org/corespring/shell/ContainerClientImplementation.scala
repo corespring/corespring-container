@@ -5,8 +5,8 @@ import java.net.URLDecoder
 
 import com.typesafe.config.ConfigFactory
 import org.apache.commons.io.{ FileUtils, IOUtils }
-import org.corespring.amazon.s3.ConcreteS3Service
-import org.corespring.container.client.controllers.apps.{ItemEditor, ItemDevEditor}
+import org.corespring.amazon.s3.{ S3Service, ConcreteS3Service }
+import org.corespring.container.client.controllers.apps.{ ItemEditor, ItemDevEditor }
 import org.corespring.container.client.controllers.{ AssetType, _ }
 import org.corespring.container.client.hooks._
 import org.corespring.container.client.integration.DefaultIntegration
@@ -18,7 +18,7 @@ import org.corespring.mongo.json.services.MongoService
 import org.corespring.shell.controllers.ShellDataQueryHooks
 import org.corespring.shell.controllers.catalog.actions.{ CatalogHooks => ShellCatalogHooks }
 import org.corespring.shell.controllers.editor.actions.{ DraftEditorHooks => ShellDraftEditorHooks, ItemEditorHooks => ShellItemEditorHooks }
-import org.corespring.shell.controllers.editor.{ItemDraftHooks => ShellItemDraftHooks, ItemHooks => ShellItemHooks, CollectionHooks => ShellCollectionHooks, ItemAssets, ItemDraftAssets}
+import org.corespring.shell.controllers.editor.{ ItemDraftHooks => ShellItemDraftHooks, ItemHooks => ShellItemHooks, CollectionHooks => ShellCollectionHooks, ItemAssets, ItemDraftAssets }
 import org.corespring.shell.controllers.player.actions.{ PlayerHooks => ShellPlayerHooks }
 import org.corespring.shell.controllers.player.{ SessionHooks => ShellSessionHooks }
 import org.corespring.shell.services.ItemDraftService
@@ -82,10 +82,13 @@ class ContainerClientImplementation(
         k <- s3.key
         s <- s3.secret
       } yield {
-        val s3Service = new ConcreteS3Service(k, s)
-        val assetUtils = new AssetUtils(s3Service.client, s3.bucket)
-        (s3Service, assetUtils)
 
+        val fakeEndpoint = configuration.getString("amazon.s3.fake-endpoint")
+        logger.trace(s"fakeEndpoint: $fakeEndpoint")
+        val client = S3Service.mkClient(k, s, fakeEndpoint)
+        val s3Service = new ConcreteS3Service(client)
+        val assetUtils = new AssetUtils(client, s3.bucket)
+        (s3Service, assetUtils)
       }
       out.getOrElse(throw new RuntimeException("No amazon key/secret"))
     }
@@ -238,7 +241,6 @@ class ContainerClientImplementation(
   }
 
   override def versionInfo: JsObject = VersionInfo(Play.current.configuration)
-
 
   override def collectionHooks: CollectionHooks = new ShellCollectionHooks {
 

@@ -1,7 +1,7 @@
 package org.corespring.container.client
 
-import com.amazonaws.services.s3.model.{ ObjectListing, AmazonS3Exception }
-import com.amazonaws.services.s3.{ AmazonS3 }
+import com.amazonaws.services.s3.AmazonS3
+import com.amazonaws.services.s3.model.{ AmazonS3Exception, ObjectListing }
 import grizzled.slf4j.Logger
 import org.corespring.container.logging.ContainerLogger
 
