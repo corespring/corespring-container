@@ -103,7 +103,7 @@ html(xmlns="http://www.w3.org/1999/html")
 
       }
       
-      angular.module( 'corespring-#{appName}', allNgModules ).config(['$provide', function($provide) {
+      angular.module( 'corespring-#{appName}', allNgModules ).config(['$provide', '$tooltipProvider', function($provide, $tooltipProvider) {
 
           var params = getParams();
           
@@ -138,6 +138,15 @@ html(xmlns="http://www.w3.org/1999/html")
 
           $provide.decorator('$log', function($delegate, $sniffer) {
             return logFn($delegate);
+          });
+
+
+          //add ng-ui-tooltip-close as an event to close the tooltip
+          //this enables you to hide the tooltip by calling elem.trigger('ng-ui-tooltip-close');
+          $tooltipProvider.setTriggers({
+            'mouseenter': 'mouseleave ng-ui-tooltip-close',
+            'click': 'click ng-ui-tooltip-close',
+            'focus': 'blur ng-ui-tooltip-close'
           });
 
         }]);
