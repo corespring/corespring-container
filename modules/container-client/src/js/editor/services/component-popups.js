@@ -11,7 +11,7 @@ angular.module('corespring-editor.services')
 
         var header = [
           '<div class="modal-header">',
-          '  <button class="close" type="button" ng-click="closeModal(\'close\'); $dismiss();">',
+          '  <button class="close" type="button" ng-click="closeModal(\'close\')">',
           '    <span>&times;</span>',
           '    <span class="sr-only">Close</span>',
           '  </button>',
@@ -20,7 +20,7 @@ angular.module('corespring-editor.services')
 
         var footer = [
           '<div class="modal-footer right">',
-          ' <button class="btn btn-default" type="button" ng-click="closeModal(\'done\'); $dismiss();">Done</button>',
+          ' <button class="btn btn-default" type="button" ng-click="closeModal(\'done\')">Done</button>',
           '</div>'
         ].join('\n');
 
@@ -56,6 +56,7 @@ angular.module('corespring-editor.services')
 
             $scope.closeModal = function(action){
               $scope.$broadcast("closeModal", {action:action});
+              this.$dismiss();
             };
 
             return $modal.open({
