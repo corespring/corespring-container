@@ -103,7 +103,7 @@ html(xmlns="http://www.w3.org/1999/html")
 
       }
       
-      angular.module( 'corespring-#{appName}', allNgModules ).config(['$provide', '$tooltipProvider', function($provide, $tooltipProvider) {
+      angular.module( 'corespring-#{appName}', allNgModules ).config(['$provide', function($provide) {
 
           var params = getParams();
           
