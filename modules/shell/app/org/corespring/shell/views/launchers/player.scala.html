@@ -3,6 +3,15 @@
 <head>
     <meta http-equiv="X-UA-Compatible" content="IE=edge;" />
 </head>
+  <style>
+    .holder {
+      border: 1px dashed grey;
+      overflow: scroll;
+    }
+    .corespring-player-body {
+      border: 1px dashed red;
+    }
+  </style>
 <body>
 
 <!-- while we support ie8 we must use jquery 1.x -->
@@ -17,6 +26,8 @@
 <script>
 
      $(document).ready(function(){
+       var playerHolderWidth = 500;
+       var playerWidth = undefined;
        var holder = $('.holder');
        var opts = @{Html(play.api.libs.json.Json.stringify(opts))};
 
@@ -24,21 +35,46 @@
 
        opts.onPlayerRendered = function(){
          console.log('onPlayerRendered', arguments);
+       };
+
+       var player;
+       function addPlayer() {
+         if (player) {
+           player.remove();
+         }
+         var playerWidth = $('#player-width-input').val();
+         opts.width = playerWidth.length > 0 ? playerWidth+'px' : undefined;
+         player = new org.corespring.players.ItemPlayer(holder, opts, function(err){
+            console.warn(err);
+         });
        }
 
-       var player = new org.corespring.players.ItemPlayer(holder, opts, function(err){
-          console.warn(err);
-       });
+       addPlayer();
 
        $('#set-mode-evaluate').click(function(){
         player.setMode('evaluate', function(err){
           console.log(err);
         });
        });
+
+       $('#player-container-width-input').change(function(){
+         $('.holder').css('width', $('#player-container-width-input').val()+"px");
+       });
+
+       $('#player-width-input').change(function(){
+         addPlayer();
+       });
+
+       $('#player-container-width-input').val(playerHolderWidth);
+       $('.holder').css('width', playerHolderWidth+"px");
+
      });
     </script>
 
 <button class="button" id="set-mode-evaluate">evaluate</button>
+  Container width: <input type="text" id="player-container-width-input"/>
+  Player width: <input type="text" id="player-width-input"/>
+
 <div class="holder"></div>
 </body>
 </html>
