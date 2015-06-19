@@ -10,30 +10,32 @@ block content
   style
 
   .root(ng-controller="DevEditorRoot")
-    .top-row
-      span Dev Editor
-      .pane-buttons.btn-group
-        label.btn.btn-default(btn-checkbox="true", ng-model="panes.html") html
-        label.btn.btn-default(btn-checkbox="true", ng-model="panes.json") json
-        label.btn.btn-default(btn-checkbox="true", ng-model="panes.scoring") scoring
-        label.btn.btn-default(btn-checkbox="true", ng-model="panes.player") player
-      .pull-right
-        button.btn.btn-sm.btn-default(ng-click="save()") Save
     table.panes
       tr
-        td(ng-show="panes.html")
+        td.top(colspan="4")
+          span Dev Editor
+          .pane-buttons.btn-group
+            label.btn.btn-default(btn-checkbox="true", ng-model="panes.html") html
+            label.btn.btn-default(btn-checkbox="true", ng-model="panes.json") json
+            label.btn.btn-default(btn-checkbox="true", ng-model="panes.scoring") scoring
+            label.btn.btn-default(btn-checkbox="true", ng-model="panes.player") player
+          .pull-right
+            button.btn.btn-sm.btn-default(ng-click="save()") Save
+
+      tr
+        td.main(ng-show="panes.html")
           .xhtml-pane(ui-ace,
               ng-model="xhtml",
               ui-ace="{mode: 'html', useWrapMode : true, onLoad: aceLoaded, onChange: aceChanged }")
-        td(ng-show="panes.json")
+        td.main(ng-show="panes.json")
           .json-pane(ui-ace
               ng-model="json",
               ui-ace="{mode: 'json', useWrapMode : true, onLoad: aceLoaded, onChange: aceJsonChanged }")
-        td(ng-show="panes.scoring")
+        td.main(ng-show="panes.scoring")
           .custom-js-pane(ui-ace,
               ng-model="customScoringJs",
               ui-ace="{mode: 'javascript', useWrapMode : true }")
-        td(ng-show="panes.player")
+        td.main(ng-show="panes.player")
           .preview(ng-controller="ClientSidePreview")
             .item-preview-wrapper
               .player-label

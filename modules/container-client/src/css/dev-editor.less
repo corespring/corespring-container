@@ -4,64 +4,55 @@
 @import "player/corespring-player";
 
 html, body, .main, .root {
-  height: 100%;
-}
-
-body {
   overflow: hidden;
-}
-
-.root {
-  display: flex;
-  flex-direction: column;
-}
-
-.top-row {
-  .drop-shadow(0, 1px, 2px, 0.2);
-
-  background-color: #ececec;
-  height: 50px;
-  padding: 10px;
-  width: 100%;
-  z-index: 101;
-
-  .pull-right {
-    float: right;
-  }
-
-  .pane-buttons {
-    left: 33%;
-  }
+  height: 100%;
 }
 
 table.panes {
   width: 100%;
   height: 100%;
 
-  td {
+  td.top {
+    border-bottom: solid 1px #ccc;
+    height: 50px;
+    background-color: #ececec;
+    padding: 10px;
+
+    .pane-buttons {
+      left: 33%;
+    }
+  }
+
+  td.main {
     width: 25%;
+    height:100%;
+  }
+
+  .pane-defaults(){
+    display:inline-block;
+    height: 100%;
+    width: 100%;
+
+    .ace_scroller {
+      padding-top: 5px;
+    }
   }
 
   .xhtml-pane {
-    height: 100%;
-    width: 100%;
+    .pane-defaults();
   }
 
   .custom-js-pane {
-    height: 100%;
-    width: 100%;
+    .pane-defaults();
   }
 
   .json-pane {
-    height: 100%;
-    width: 100%;
+    .pane-defaults();
   }
   .preview {
+    .pane-defaults();
     background-color: #fff;
-    height: 100%;
-    overflow: auto;
     padding: 15px;
-    width: 100%;
   }
 }
 
