@@ -22,7 +22,7 @@ angular.module('corespring-dev-editor.controllers')
         json: false,
         scoring:false,
         player:true
-      }
+      };
 
       $scope.aceJsonChanged = aceJsonChanged;
       $scope.onItemLoaded = onItemLoaded;
