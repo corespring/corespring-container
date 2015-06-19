@@ -14,12 +14,22 @@ angular.module('corespring-dev-editor.controllers')
       ComponentData,
       iFrameService,
       ItemService,
-      Msgr) {
+      Msgr
+    ) {
+
+      $scope.panes = {
+        html: true,
+        json: false,
+        scoring:false,
+        player:true
+      }
 
       $scope.aceJsonChanged = aceJsonChanged;
       $scope.onItemLoaded = onItemLoaded;
       $scope.onItemLoadError = onItemLoadError;
       $scope.save = save;
+
+
 
       $scope.$on('registerComponent', registerComponent);
 
