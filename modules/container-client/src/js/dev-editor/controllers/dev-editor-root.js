@@ -24,7 +24,6 @@ angular.module('corespring-dev-editor.controllers')
         player:true
       }
 
-      $scope.aceLoaded = aceLoaded;
       $scope.aceJsonChanged = aceJsonChanged;
       $scope.onItemLoaded = onItemLoaded;
       $scope.onItemLoadError = onItemLoadError;
@@ -103,10 +102,6 @@ angular.module('corespring-dev-editor.controllers')
           });
           Msgr.send('itemChanged', {partChanged: 'customScoring'});
         }
-      }
-
-      function aceLoaded() {
-        $log.info('ace loaded', arguments);
       }
 
       function aceJsonChanged() {
