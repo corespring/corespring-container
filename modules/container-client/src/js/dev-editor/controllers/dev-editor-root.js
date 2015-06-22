@@ -32,7 +32,6 @@ angular.module('corespring-dev-editor.controllers')
       $scope.$on('registerComponent', registerComponent);
 
       init();
-      startUpdatingPlayerSize();
 
       //-----------------------------------------
 
@@ -51,24 +50,6 @@ angular.module('corespring-dev-editor.controllers')
           $log.log('on initialise', data);
           ItemService.load($scope.onItemLoaded, $scope.onItemLoadError);
           Msgr.send('rendered');
-        }
-      }
-
-      function startUpdatingPlayerSize(){
-        var lastHeight = 0;
-        var updatePlayerSizeDelay = 0;
-
-        updatePlayerSize();
-
-        function updatePlayerSize() {
-          var newHeight = $('.panes').height() - 90;
-          if (newHeight != lastHeight) {
-            lastHeight = newHeight;
-            updatePlayerSizeDelay = 0;
-            $('.panes .pane .preview').height(newHeight);
-          }
-          updatePlayerSizeDelay = Math.min( updatePlayerSizeDelay + 100, 500);
-          $timeout(updatePlayerSize, updatePlayerSizeDelay);
         }
       }
 

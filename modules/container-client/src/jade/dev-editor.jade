@@ -35,7 +35,7 @@ block content
           .custom-js-pane(ui-ace,
               ng-model="customScoringJs",
               ui-ace="{mode: 'javascript', useWrapMode : true }")
-        td.pane(ng-show="panes.player")
+        td.pane(ng-show="panes.player", keep-updating-player-size="true")
           .preview(ng-controller="ClientSidePreview")
             .item-preview-wrapper
               .player-label
