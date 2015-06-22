@@ -23,19 +23,19 @@ block content
             button.btn.btn-sm.btn-default(ng-click="save()") Save
 
       tr
-        td.main(ng-show="panes.html")
+        td.pane(ng-show="panes.html")
           .xhtml-pane(ui-ace,
               ng-model="xhtml",
               ui-ace="{mode: 'html', useWrapMode : true, onLoad: aceLoaded, onChange: aceChanged }")
-        td.main(ng-show="panes.json")
+        td.pane(ng-show="panes.json")
           .json-pane(ui-ace
               ng-model="json",
               ui-ace="{mode: 'json', useWrapMode : true, onLoad: aceLoaded, onChange: aceJsonChanged }")
-        td.main(ng-show="panes.scoring")
+        td.pane(ng-show="panes.scoring")
           .custom-js-pane(ui-ace,
               ng-model="customScoringJs",
               ui-ace="{mode: 'javascript', useWrapMode : true }")
-        td.main(ng-show="panes.player")
+        td.pane(ng-show="panes.player")
           .preview(ng-controller="ClientSidePreview")
             .item-preview-wrapper
               .player-label
