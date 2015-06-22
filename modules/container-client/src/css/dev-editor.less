@@ -4,8 +4,11 @@
 @import "player/corespring-player";
 
 html, body, .main, .root {
-  overflow: hidden;
   height: 100%;
+}
+
+html {
+  overflow: hidden;
 }
 
 table.panes {
@@ -23,13 +26,12 @@ table.panes {
     }
   }
 
-  td.main {
+  td.pane {
     width: 25%;
-    height:100%;
+    height: 100%;
   }
 
-  .pane-defaults(){
-    display:inline-block;
+  .pane-defaults() {
     height: 100%;
     width: 100%;
 
@@ -53,6 +55,7 @@ table.panes {
     .pane-defaults();
     background-color: #fff;
     padding: 15px;
+    overflow-y: auto;
   }
 }
 
