@@ -1,8 +1,8 @@
 @(js:String, opts : play.api.libs.json.JsValue)
 <html>
 <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge;" />
-</head>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge;" />
+
   <style>
     .holder {
       border: 1px dashed grey;
@@ -12,6 +12,7 @@
       border: 1px dashed red;
     }
   </style>
+</head>
 <body>
 
 <!-- while we support ie8 we must use jquery 1.x -->
@@ -37,6 +38,7 @@
        };
 
        var player;
+
        function addPlayer() {
          if (player) {
            player.remove();

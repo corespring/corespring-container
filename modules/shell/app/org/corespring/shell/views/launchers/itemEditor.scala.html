@@ -1,5 +1,12 @@
 @(editorJs:String, opts : play.api.libs.json.JsValue)
 <html>
+  <head>
+    <style type="text/css">
+      body {
+        margin: 0;
+      }
+    </style>
+  </head>
   <body>
     <script type="text/javascript" src="//code.jquery.com/jquery-2.1.3.min.js"></script>
     <script type="text/javascript" src="@editorJs"></script>
@@ -10,7 +17,7 @@
 
        opts.onItemCreated = function(){
          console.log('onItemCreated', arguments);
-       }
+       };
 
        console.log('opts: ', opts);
 

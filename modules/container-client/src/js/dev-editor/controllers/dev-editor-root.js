@@ -29,8 +29,6 @@ angular.module('corespring-dev-editor.controllers')
       $scope.onItemLoadError = onItemLoadError;
       $scope.save = save;
 
-
-
       $scope.$on('registerComponent', registerComponent);
 
       init();
