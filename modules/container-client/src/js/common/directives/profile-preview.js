@@ -147,7 +147,7 @@ angular.module('corespring-common.directives')
           }
 
           function imageUrl(folder, name, fallback) {
-            return name ? '../../images/' + folder + '/' + name.replace(" ", "-") + ".png" : fallback;
+            return name ? '../../../images/' + folder + '/' + name.replace(" ", "-") + ".png" : fallback;
           }
 
           function licenseTypeUrl(licenseType) {
