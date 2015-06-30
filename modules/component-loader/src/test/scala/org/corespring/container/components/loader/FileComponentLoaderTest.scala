@@ -20,7 +20,7 @@ class FileComponentLoaderTest extends Specification {
       val loader = getLoader("one")
       loader.all.length === 1
       loader.all(0) match {
-        case i:Interaction =>
+        case i: Interaction =>
           i.released == true
           success
         case _ =>
@@ -75,7 +75,7 @@ class FileComponentLoaderTest extends Specification {
       val comp = loader.all(0)
 
       comp match {
-        case l:LayoutComponent => {
+        case l: LayoutComponent => {
           l.org === "corespring"
           l.name === "layout-comp"
           l.client.length === 1
@@ -90,7 +90,7 @@ class FileComponentLoaderTest extends Specification {
       val comp = loader.all(0)
 
       comp match {
-        case w:Widget =>
+        case w: Widget =>
           w.org === "corespring"
           w.name == "widget"
           success

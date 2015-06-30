@@ -76,14 +76,14 @@ describe('player launcher', function() {
 
   describe('init', function(){
 
-    describe('forceWidth', function(){
-      it('should call width on the instance with the default width if forceWidth == true', function(){
-        var player = create({ itemId: '1', mode: 'gather', forceWidth: true });
-        expect(mockInstance.width).toHaveBeenCalledWith('600px');
+    describe('width', function(){
+      it('should not call width on the instance if explicit width is not set', function(){
+        var player = create({ itemId: '1', mode: 'gather' });
+        expect(mockInstance.width).not.toHaveBeenCalled();
       });
 
-      it('should call width on the instance with a custom width if forceWidth == true', function(){
-        var player = create({ itemId: '1', mode: 'gather', width: '1000px', forceWidth: true });
+      it('should not call width on the instance if explicit width is set', function(){
+        var player = create({ itemId: '1', mode: 'gather', width: '1000px' });
         expect(mockInstance.width).toHaveBeenCalledWith('1000px');
       });
 
