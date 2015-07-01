@@ -29,6 +29,9 @@ describe('QuestionController', function() {
   var ScoringHandler = {};
   var MathJaxService = {};
 
+  var wiggiMathJaxFeatureDef = {};
+  var wiggiLinkFeatureDef = {};
+
   beforeEach(angular.mock.module('corespring-editor.controllers'));
 
   beforeEach(module(function($provide) {
@@ -41,6 +44,12 @@ describe('QuestionController', function() {
     $provide.value('AppState', AppState);
     $provide.value('ScoringHandler', ScoringHandler);
     $provide.value('MathJaxService', MathJaxService);
+    $provide.value('WiggiMathJaxFeatureDef', function(){ 
+      return wiggiMathJaxFeatureDef; 
+    });
+    $provide.value('WiggiLinkFeatureDef', function(){
+      return wiggiLinkFeatureDef;
+    });
   }));
 
   afterEach(function() {
@@ -116,6 +125,17 @@ describe('QuestionController', function() {
     describe('extraFeatures', function() {
       it('should be EditorConfig.extraFeatures', function() {
         expect(scope.extraFeatures).toBe(EditorConfig.extraFeatures);
+      });
+    });
+
+    describe('extraFeaturesForFeedback', function(){
+      it('should be WiggiMathJaxFeatureDef and WiggiLinkFeatureDef', function(){
+        expect(scope.extraFeaturesForFeedback).toEqual({
+          definitions: [
+          wiggiMathJaxFeatureDef,
+          wiggiLinkFeatureDef
+          ]
+        });
       });
     });
 
