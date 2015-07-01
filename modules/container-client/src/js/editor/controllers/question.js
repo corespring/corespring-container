@@ -12,6 +12,8 @@ angular.module('corespring-editor.controllers')
     'AppState',
     'ScoringHandler',
     'MathJaxService',
+    'WiggiLinkFeatureDef',
+    'WiggiMathJaxFeatureDef',
     function($scope,
       $element,
       $timeout,
@@ -23,7 +25,9 @@ angular.module('corespring-editor.controllers')
       ComponentPopups,
       AppState,
       ScoringHandler,
-      MathJaxService) {
+      MathJaxService,
+      WiggiLinkFeatureDef,
+      WiggiMathJaxFeatureDef) {
 
       var configPanels = {};
 
@@ -55,6 +59,12 @@ angular.module('corespring-editor.controllers')
       $scope.imageService = ComponentImageService;
       $scope.overrideFeatures = EditorConfig.overrideFeatures;
       $scope.extraFeatures = EditorConfig.extraFeatures;
+      $scope.extraFeaturesForFeedback = {
+        definitions: [
+            new WiggiMathJaxFeatureDef(),
+            new WiggiLinkFeatureDef()
+        ]
+      };
       $scope.onEditorClick = onEditorClick;
 
       // Dropdowns in wiggi-wiz toolbar don't trigger when bootstrap is imported?
