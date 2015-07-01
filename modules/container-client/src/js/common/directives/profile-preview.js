@@ -5,7 +5,10 @@ angular.module('corespring-common.directives')
     'DataQueryService',
     'ProfileFormatter',
     'ComponentService',
-    function($sce, $log, DataQueryService, ProfileFormatter, ComponentService) {
+    'STATIC_PATHS',
+    function($sce, $log, DataQueryService, ProfileFormatter, ComponentService, STATIC_PATHS) {
+      var assetsPath = STATIC_PATHS.assets ;
+
       return {
         restrict: 'A',
         scope: {
@@ -147,7 +150,7 @@ angular.module('corespring-common.directives')
           }
 
           function imageUrl(folder, name, fallback) {
-            return name ? '../../images/' + folder + '/' + name.replace(" ", "-") + ".png" : fallback;
+            return name ? assetsPath + '/' + folder + '/' + name.replace(" ", "-") + ".png" : fallback;
           }
 
           function licenseTypeUrl(licenseType) {
