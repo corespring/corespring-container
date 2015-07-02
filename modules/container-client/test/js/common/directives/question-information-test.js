@@ -7,9 +7,10 @@ describe('questionInformation', function () {
 
   var mockParseDomForMath = jasmine.createSpy('parseDomForMath');
 
-  var supportingName = "This is the name of the supporting material.";
-  var url = "http://supporting-material-url.com/";
-  var content = "This is the content of the supporting material.";
+  var content;
+  var contentType;
+  var supportingName;
+  var url;
 
   function MockDataQueryService() {
     this.list = function () {
@@ -28,6 +29,7 @@ describe('questionInformation', function () {
       return supportingName;
     };
     this.getContentType = function () {
+      return contentType;
     };
     this.getSupportingUrl = function () {
       return url;
@@ -46,6 +48,13 @@ describe('questionInformation', function () {
   }
 
   beforeEach(angular.mock.module('corespring-common.directives'));
+
+  beforeEach(function(){
+    supportingName = "This is the name of the supporting material.";
+    url = "http://supporting-material-url.com/";
+    content = "This is the content of the supporting material.";
+    contentType = "This is the content type of the supporting material.";
+  });
 
   beforeEach(module(function ($provide) {
     mathJaxService = new MockMathJaxService();
@@ -104,14 +113,20 @@ describe('questionInformation', function () {
       expect(scope.hideNav).toEqual(true);
     });
 
+    it('should select first available tab if current tab is not available', function(){
+      scope.activeTab = "supportingMaterial";
+      scope.tabs = { question: false, profile: true, supportingMaterial: false };
+      scope.$digest();
+      expect(scope.activeTab).toEqual("profile");
+    });
+
   });
 
   describe('selectTab', function () {
     var tab = "this is a tab";
 
     beforeEach(function () {
-      scope.activeSmIndex = "not undefined!";
-      scope.selectedSupportingMaterialContent = "not undefined!";
+      scope.selectedMaterial = {};
       scope.selectTab(tab);
     });
 
@@ -119,12 +134,8 @@ describe('questionInformation', function () {
       expect(scope.activeTab).toEqual(tab);
     });
 
-    it('should set activeSmIndex to undefined', function () {
-      expect(scope.activeSmIndex).toBeUndefined();
-    });
-
-    it('should set selectedSupportingMaterialContent to undefined', function () {
-      expect(scope.selectedSupportingMaterialContent).toBeUndefined();
+    it('should set selectedMaterial to undefined', function () {
+      expect(scope.selectedMaterial).toBeUndefined();
     });
 
   });
@@ -141,25 +152,53 @@ describe('questionInformation', function () {
     });
 
     it('should set activeSmIndex to provided index', function () {
-      expect(scope.activeSmIndex).toEqual(index);
+      expect(scope.selectedMaterial.index).toEqual(index);
     });
 
     it('should set selected supporting material name to value returned by SupportingMaterialsService', function () {
-      expect(scope.selectedSupportingMaterialName).toEqual(supportingName);
+      expect(scope.selectedMaterial.name).toEqual(supportingName);
     });
 
     it('should set selected supporting material url to value returned by SupportingMaterialsService', function () {
-      expect(scope.selectedSupportingMaterialUrl).toEqual(url);
+      expect(scope.selectedMaterial.url).toEqual(url);
     });
 
     it('should set selected supporting material content to value returned by SupportingMaterialsService', function () {
-      expect(scope.selectedSupportingMaterialContent).toEqual(content);
+      expect(scope.selectedMaterial.content).toEqual(content);
+    });
+
+    it('should set selected supporting material contentType to value returned by SupportingMaterialsService', function () {
+      expect(scope.selectedMaterial.contentType).toEqual(contentType);
     });
 
     it('should call MathJaxService.parseDomForMath with element', function () {
       expect(mathJaxService.parseDomForMath).toHaveBeenCalledWith(100, element[0]);
     });
 
+  });
+
+  describe("supporting material content (AC-189)", function(){
+    it('should add material/[supportingMaterialName] as path to image urls in content', function(){
+      supportingName = "test name";
+      content = '<div><img src="image.jpg"></div>';
+      scope.selectSupportingMaterial(0);
+      expect(scope.selectedMaterial.content).toEqual('<div><img src="materials/test name/image.jpg"></div>');
+    });
+    it('should not crash if content is null', function(){
+      content = null;
+      scope.selectSupportingMaterial(0);
+      expect(scope.selectedMaterial.content).toEqual(content);
+    });
+    it('should not crash if content is undefined', function(){
+      content = undefined;
+      scope.selectSupportingMaterial(0);
+      expect(scope.selectedMaterial.content).toEqual(content);
+    });
+    it('should not change a content that does not have an image in it', function(){
+      content = '<div>No image here</div>';
+      scope.selectSupportingMaterial(0);
+      expect(scope.selectedMaterial.content).toEqual(content);
+    });
   });
 
 });
