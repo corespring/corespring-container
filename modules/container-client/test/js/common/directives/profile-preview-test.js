@@ -1,29 +1,31 @@
-describe('profile-preview', function(){
-  
+describe('profile-preview', function() {
+
   beforeEach(angular.mock.module('corespring-templates'));
   beforeEach(angular.mock.module('corespring-common.directives'));
 
-  var scope = null, template = null;
+  var scope = null,
+    template = null;
 
   beforeEach(angular.mock.module('corespring-templates'));
 
-  beforeEach(function () {
-    module(function ($provide) {
+  beforeEach(function() {
+    module(function($provide) {
+      $provide.value('ComponentService', {
+        loadAvailableComponents: function() {}
+      });
       $provide.value('DataQueryService', {
-        list: function(){}
+        list: function() {}
       });
       $provide.value('ProfileFormatter', {});
-      $provide.value('ComponentService', {
-        loadAvailableComponents: function(){}
-      });
+      $provide.value('STATIC_PATHS', {});
     });
   });
 
   beforeEach(inject(function($rootScope, $compile) {
     $rootScope.mockItem = {
-        profile: {
-          contributorDetails: {}
-        }
+      profile: {
+        contributorDetails: {}
+      }
     };
     element = angular.element('<div profile-preview="" ng-model="mockItem"></div>');
     $compile(element)($rootScope.$new());
@@ -33,7 +35,7 @@ describe('profile-preview', function(){
 
   describe('textOrNA', function() {
 
-    it("returns 'No information available' for null", function(){
+    it("returns 'No information available' for null", function() {
       expect(scope.textOrNA(null)).toEqual('No information available');
     });
 
