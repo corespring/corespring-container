@@ -81,15 +81,17 @@ angular.module('corespring-common.directives')
         }
 
         function addPathToImageUrls(html, smName) {
-          if(!html){
+          var $html = $('<span>' + html + '</span>');
+          var $images = $html.find('img');
+          if($images.length > 0) {
+            $images.each(function (index, img) {
+              var src = $(img).attr('src').split('/').pop();
+              $(img).attr('src', 'materials/' + smName + '/' + src);
+            });
+            return $html.html();
+          } else {
             return html;
           }
-          var $html = $('<span>' + html + '</span>');
-          $html.find('img').each(function(index, img) {
-            var src = $(img).attr('src').split('/').pop();
-            $(img).attr('src', 'materials/' + smName + '/' + src);
-          });
-          return $html.html();
         }
 
         function hideNav(hide) {
