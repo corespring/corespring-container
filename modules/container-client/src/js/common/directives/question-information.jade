@@ -25,10 +25,10 @@
       div(profile-preview="", ng-model="item")
 
     .supporting-material(ng-show="activeTab == 'supportingMaterial'")
-      h3 {{selectedSupportingMaterialName}}
-      div(style="height: 400px;", ng-if="getContentType() != 'text/html'")
-        iframe(ng-src="{{selectedSupportingMaterialUrl}}")
-      div(ng-if="getContentType() == 'text/html'")
-        div(ng-bind-html-unsafe='selectedSupportingMaterialContent')
+      h3 {{selectedMaterial.name}}
+      div(style="height: 400px;", ng-if="selectedMaterial.contentType != 'text/html'")
+        iframe(ng-src="{{selectedMaterial.url}}")
+      div(ng-if="selectedMaterial.contentType == 'text/html'")
+        div(ng-bind-html-unsafe='selectedMaterial.content')
 
   .clearfix
