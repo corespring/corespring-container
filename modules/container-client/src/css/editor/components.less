@@ -97,4 +97,37 @@
       visibility: hidden;
     }
   }
+
+  &.tool-placeholder {
+    height: 60px;
+    width: auto;
+    min-width: 105px;
+    vertical-align: middle;
+    display: inline-block;
+    .blocker {
+      .edit-controls {
+        width: auto;
+        right: 0;
+        top: 0;
+        background-color: transparent;
+        padding: 3px 0 0;
+        li {
+          i {
+            font-size: 15px;
+          }
+        }
+      }
+      .holder {
+        display: none;
+      }
+    }
+    .icon-holder {
+      height: 60px;
+      width: 105px;
+      background-position: 6% 50%;
+      .title {
+        display: none;
+      }
+    }
+  }
 }
