@@ -76,17 +76,17 @@ angular.module('corespring-common.directives')
             content: SupportingMaterialsService.getContent(scope.item.supportingMaterials, smIndex),
             contentType: SupportingMaterialsService.getContentType(scope.item.supportingMaterials, smIndex)
           };
-          item.content = addPathToImageUrls(item.content, item.name);
+          item.content = addPathToImageUrls(item.content, 'materials/' + item.name + '/');
           return item;
         }
 
-        function addPathToImageUrls(html, smName) {
+        function addPathToImageUrls(html, path) {
           var $html = $('<span>' + html + '</span>');
           var $images = $html.find('img');
           if($images.length > 0) {
             $images.each(function (index, img) {
               var src = $(img).attr('src').split('/').pop();
-              $(img).attr('src', 'materials/' + smName + '/' + src);
+              $(img).attr('src', path + src);
             });
             return $html.html();
           } else {
