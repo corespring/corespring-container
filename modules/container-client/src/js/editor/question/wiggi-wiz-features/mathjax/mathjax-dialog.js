@@ -34,6 +34,7 @@ angular.module('corespring.wiggi-wiz-features.mathjax').directive('mathjaxDialog
           $element.find('.preview-body').html(math);
           var $math = $element.find('.preview-body');
           MathJaxService.parseDomForMath(0, $math[0]);
+          $('.math-textarea').focus();
         }, 200, {leading: false, trailing: true});
 
       function updateModel() {
