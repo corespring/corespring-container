@@ -107,7 +107,6 @@ describe('player launcher', function() {
     it('resumes session and calls errorcallback if sessionId and itemId are both passed in', function(){
       var player = create({ itemId: '1', sessionId: '1', mode: 'view', gather: {} });
       expect(mockLauncher.loadCall).toHaveBeenCalledWith('view', jasmine.any(Function));
-      expect(onError).toHaveBeenCalledWith(errorCodes.BOTH_ITEM_AND_SESSION_ID_PRESENT);
     });
   });
 
