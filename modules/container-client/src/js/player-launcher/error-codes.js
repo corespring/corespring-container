@@ -16,3 +16,4 @@ exports.COMMIT_DRAFT_FAILED = function(msg){ return {code: 114, msg: msg};};
 exports.NO_URL_SPECIFIED = {code: 115, message: 'no url specified'};
 exports.CREATE_ITEM_FAILED = function(msg){ return {code: 116, msg: msg};};
 exports.CANT_FIND_URL = function(msg){ return {code: 117, msg: msg};};
+exports.BOTH_ITEM_AND_SESSION_ID_PRESENT = {code: 118, msg: "itemId should not be set when sessionId is present"};

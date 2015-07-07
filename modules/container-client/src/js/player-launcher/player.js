@@ -84,14 +84,17 @@ exports.define = function(isSecure) {
     }
 
     function prepareCall() {
-      if(options.itemId){
-        return launcher.loadCall('createSession', function(url){
-          return url.replace(':id', options.itemId);
-        });
-      } else {
+      if(options.sessionId){
+        if (options.itemId) {
+          errorCallback(errorCodes.BOTH_ITEM_AND_SESSION_ID_PRESENT);
+        }
         options.mode = options.mode || 'gather';
         return launcher.loadCall(options.mode, function(url){
           return url.replace(':sessionId', options.sessionId);
+        });
+      } else if(options.itemId){
+        return launcher.loadCall('createSession', function(url){
+          return url.replace(':id', options.itemId);
         });
       }
     }
