@@ -194,7 +194,7 @@ object StandardsTreeJson {
             "Understand and apply the Pythagorean Theorem.",
             "Solve real-world and mathematical problems involving volume of cylinders, cones, and spheres.")),
         Json.obj(
-          "name" -> "Number & Operationsâ€”FractionsÂ¹",
+          "name" -> "Number & Operations Fractions¹",
           "items" -> Json.arr(
             "All",
             "Develop understanding of fractions as numbers.",
@@ -202,13 +202,13 @@ object StandardsTreeJson {
             "Build fractions from unit fractions",
             "Understand decimal notation for fractions, and compare decimal fractions.")),
         Json.obj(
-          "name" -> "Number & Operations in Base TenÂ¹",
+          "name" -> "Number & Operations in Base Ten¹",
           "items" -> Json.arr(
             "All",
             "Generalize place value understanding for multi-digit whole numbers.",
             "Use place value understanding and properties of operations to perform multi-digit arithmetic.")),
         Json.obj(
-          "name" -> "Number & Operationsâ€”Fractions",
+          "name" -> "Number & Operations Fractions",
           "items" -> Json.arr(
             "All",
             "Use equivalent fractions as a strategy to add and subtract fractions.",
