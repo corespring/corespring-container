@@ -84,14 +84,14 @@ exports.define = function(isSecure) {
     }
 
     function prepareCall() {
-      if(options.itemId){
-        return launcher.loadCall('createSession', function(url){
-          return url.replace(':id', options.itemId);
-        });
-      } else {
+      if(options.sessionId){
         options.mode = options.mode || 'gather';
         return launcher.loadCall(options.mode, function(url){
           return url.replace(':sessionId', options.sessionId);
+        });
+      } else if(options.itemId){
+        return launcher.loadCall('createSession', function(url){
+          return url.replace(':id', options.itemId);
         });
       }
     }

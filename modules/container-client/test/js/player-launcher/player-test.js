@@ -93,6 +93,21 @@ describe('player launcher', function() {
       var player = create({ itemId: '1', gather: {} });
       expect(mockLauncher.loadInstance).toHaveBeenCalledWith(jasmine.any(Object), undefined, {mode: 'gather', gather: {}});
     });
+
+    it('creates new session if itemId is passed in and sessionId is not', function(){
+      var player = create({ itemId: '1', mode: 'gather', gather: {} });
+      expect(mockLauncher.loadCall).toHaveBeenCalledWith('createSession', jasmine.any(Function));
+    });
+
+    it('resumes session if sessionId is passed in', function(){
+      var player = create({ sessionId: '1', mode: 'view', gather: {} });
+      expect(mockLauncher.loadCall).toHaveBeenCalledWith('view', jasmine.any(Function));
+    });
+
+    it('resumes session and calls errorcallback if sessionId and itemId are both passed in', function(){
+      var player = create({ itemId: '1', sessionId: '1', mode: 'view', gather: {} });
+      expect(mockLauncher.loadCall).toHaveBeenCalledWith('view', jasmine.any(Function));
+    });
   });
 
   describe('setMode', function() {
