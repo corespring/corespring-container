@@ -19,7 +19,7 @@ object Build extends sbt.Build {
   val bowerCmd = "node ./node_modules/bower/bin/bower"
 
   object Dependencies {
-    val aws = "com.amazonaws" % "aws-java-sdk" % "1.9.25"
+    val aws = "com.amazonaws" % "aws-java-sdk" % "1.10.0"
     val casbah = "org.mongodb" %% "casbah" % "2.6.3"
     //The closure compiler that play uses - we expect this to be provided by the play app.
     val closureCompiler = ("com.google.javascript" % "closure-compiler" % "rr2079.1")
@@ -40,7 +40,7 @@ object Build extends sbt.Build {
     val logbackClassic = "ch.qos.logback" % "logback-classic" % "1.0.7"
     val logbackCore = "ch.qos.logback" % "logback-core" % "1.0.7"
     val mockito = "org.mockito" % "mockito-all" % "1.9.5" % "test"
-    val playS3 = "org.corespring" %% "s3-play-plugin" % "1.0.0"
+    val playS3 = "org.corespring" %% "s3-play-plugin" % "1.1.0"
     val rhinoJs = "org.mozilla" % "rhino" % "1.7R4"
     val scalaz = "org.scalaz" %% "scalaz-core" % "7.0.6"
     val specs2 = "org.specs2" %% "specs2" % "2.2.2" % "test"
