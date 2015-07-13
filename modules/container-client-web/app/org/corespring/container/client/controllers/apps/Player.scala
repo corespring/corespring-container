@@ -35,11 +35,12 @@ trait Player
         PlayerXhtml.mkXhtml(components.map(_.componentType), xhtml)
     }.getOrElse("<div><h1>New Item</h1></div>")
 
-    def createPlayerHtml(sessionId: String, session: JsValue, itemJson: JsValue, serviceParams: JsObject)(implicit rh: RequestHeader): Html = {
+    def createPlayerHtml(sessionId: String, session: JsValue, itemJson: JsValue, serviceParams: JsObject, orgOptions: JsValue)(implicit rh: RequestHeader): Html = {
 
       val scriptInfo = componentScriptInfo(componentTypes(itemJson), jsMode == "dev")
       val controlsJs = if (showControls) paths(controlsJsSrc) else Seq.empty
       val domainResolvedJs = buildJs(scriptInfo, controlsJs)
+      val domainResolvedLess = buildLess(scriptInfo)
       val domainResolvedCss = buildCss(scriptInfo)
 
       val processedXhtml = processXhtml((itemJson \ "xhtml").asOpt[String])
@@ -49,6 +50,8 @@ trait Player
 
       logger.trace(s"function=load domainResolvedJs=$domainResolvedJs")
       logger.trace(s"function=load domainResolvedCss=$domainResolvedCss")
+      val colors = (orgOptions \ "colors")
+      println("Colors:" + colors)
 
       renderJade(
         PlayerTemplateParams(
@@ -61,7 +64,9 @@ trait Player
           Json.obj("session" -> session, "item" -> preprocessedItem),
           versionInfo,
           newRelicRumConf != None,
-          newRelicRumConf.getOrElse(Json.obj())))
+          newRelicRumConf.getOrElse(Json.obj()),
+          domainResolvedLess,
+          colors))
 
     }
   }
@@ -119,7 +124,7 @@ trait Player
       handleSuccess { (tuple) =>
         val (session, item) = tuple
         require((session \ "id").asOpt[String].isDefined, "The session model must specify an 'id'")
-        Ok(createPlayerHtml((session \ "id").as[String], session, item, queryParams(mapToJson))).as(ContentTypes.HTML)
+        Ok(createPlayerHtml((session \ "id").as[String], session, item, queryParams(mapToJson), Json.obj())).as(ContentTypes.HTML)
       }
     }
   }
@@ -143,21 +148,21 @@ trait Player
   def createSessionForItem(itemId: String): Action[AnyContent] = Action.async { implicit request =>
     hooks.createSessionForItem(itemId).map {
       handleSuccess { (tuple) =>
-        val (session, item) = tuple
+        val (session, item, orgOptions) = tuple
         require((session \ "id").asOpt[String].isDefined, "The session model must specify an 'id'")
         val call = org.corespring.container.client.controllers.apps.routes.Player.load((session \ "id").as[String])
         val location = {
           val params = queryParams[String]()
           s"${call.url}${if (params.isEmpty) "" else s"?$params"}"
         }
-        Created(createPlayerHtml((session \ "id").as[String], session, item, queryParams(mapToJson)))
+        Created(createPlayerHtml((session \ "id").as[String], session, item, queryParams(mapToJson), orgOptions))
           .as(ContentTypes.HTML)
           .withHeaders(LOCATION -> location)
       }
     }
   }
 
-  def getFileByItemId(itemId:String, file:String) = Action{ request => hooks.loadItemFile(itemId, file)(request)}
+  def getFileByItemId(itemId: String, file: String) = Action { request => hooks.loadItemFile(itemId, file)(request) }
 
   private def servicesJs(sessionId: String, queryParams: JsObject) = {
     import org.corespring.container.client.controllers.resources.routes._

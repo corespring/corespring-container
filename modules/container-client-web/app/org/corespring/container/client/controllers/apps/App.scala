@@ -99,8 +99,13 @@ trait App[T]
     js.distinct.map(resolvePath)
   }
 
+  protected def buildLess(scriptInfo: ComponentScriptInfo)(implicit rh: RequestHeader) = {
+    val css = scriptInfo.cssUrl
+    css.map(resolvePath)
+  }
+
   protected def buildCss(scriptInfo: ComponentScriptInfo)(implicit rh: RequestHeader) = {
-    val css = paths(cssSrc) ++ cssSrc.otherLibs ++ scriptInfo.cssUrl.toSeq
+    val css = paths(cssSrc) ++ cssSrc.otherLibs
     css.map(resolvePath)
   }
 
