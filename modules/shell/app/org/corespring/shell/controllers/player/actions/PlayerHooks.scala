@@ -39,7 +39,8 @@ trait PlayerHooks extends ContainerPlayerHooks {
         itemService.load(itemId).map { item =>
           val withId = session ++ Json.obj("id" -> oid.toString)
           val orgOptions = Json.obj("colors" -> Json.obj(
-            "incorrect-color" -> "#00ff00"))
+            "incorrect-color" -> "#ff0000",
+            "correct-color" -> "#00ff00"))
           Right((withId, item, orgOptions))
         }.getOrElse(Left(NOT_FOUND -> s"Can't find item with id $itemId"))
     }.getOrElse(Left(BAD_REQUEST -> "Error creating session"))

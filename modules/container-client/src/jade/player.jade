@@ -10,7 +10,16 @@ block header-scripts
       NREUM.info!= newRelicRumConfig
 
   script.
-    var less = {globalVars: !{colors}};
+    var less = {env: "production", globalVars: !{colors}};
+    var defaultColors = {
+      "incorrect-color":  "#EC971F",
+      "correct-color":  "#3c763d",
+      "partial-color":  "#3a87ad",
+      "warning-color":  "#a94442"
+    };
+    for (var c in defaultColors) {
+      less.globalVars[c] = less.globalVars[c] || defaultColors[c];
+    }
 
 block content
 
