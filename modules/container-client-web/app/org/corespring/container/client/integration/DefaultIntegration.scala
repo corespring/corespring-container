@@ -31,6 +31,8 @@ trait DefaultIntegration
   with HasConfig
   with HasProcessors {
 
+  val debounceInMillis : Long = configuration.getLong("editor.debounceInMillis").getOrElse(5000)
+
   def versionInfo: JsObject
 
   /**
@@ -117,6 +119,9 @@ trait DefaultIntegration
   }
 
   lazy val itemEditor = new ItemEditor{
+
+    override val debounceInMillis = DefaultIntegration.this.debounceInMillis
+
     override def versionInfo: JsObject = DefaultIntegration.this.versionInfo
 
     override def mode: Mode = Play.current.mode
@@ -149,6 +154,8 @@ trait DefaultIntegration
   }
 
   lazy val draftEditor = new DraftEditor {
+
+    override val debounceInMillis = DefaultIntegration.this.debounceInMillis
 
     override def versionInfo: JsObject = DefaultIntegration.this.versionInfo
 

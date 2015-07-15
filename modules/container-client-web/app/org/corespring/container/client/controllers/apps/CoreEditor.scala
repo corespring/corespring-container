@@ -31,6 +31,8 @@ trait CoreEditor
 
   def versionInfo: JsObject
 
+  def debounceInMillis:Long = 5000
+
   protected def toJson(ci: ComponentInfo): JsValue = {
     val tag = tagName(ci.id.org, ci.id.name)
     partialObj(
@@ -71,6 +73,10 @@ trait CoreEditor
       val componentsArray: JsArray = JsArray(interactions.map(toJson))
       val widgetsArray: JsArray = JsArray(widgets.map(toJson))
 
+      val options = EditorClientOptions(
+        debounceInMillis,
+        StaticPaths.staticPaths
+      )
 
       Ok(renderJade(
         EditorTemplateParams(
@@ -80,7 +86,7 @@ trait CoreEditor
           jsSrc.ngModules ++ scriptInfo.ngDependencies,
           servicesJs(id, componentsArray, widgetsArray),
           versionInfo,
-          StaticPaths.staticPaths)))
+          options)))
     }
 
     hooks.load(id).map { e => e.fold(onError, onItem) }

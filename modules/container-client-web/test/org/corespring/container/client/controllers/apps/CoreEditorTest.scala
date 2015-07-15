@@ -1,5 +1,7 @@
 package org.corespring.container.client.controllers.apps
 
+import java.util.concurrent.TimeUnit
+
 import org.corespring.container.client.component.ComponentUrls
 import org.corespring.container.client.hooks.EditorHooks
 import org.corespring.container.components.model.{ Widget, Client, Component }
@@ -13,7 +15,8 @@ import play.api.mvc.RequestHeader
 import play.api.templates.Html
 import play.api.test.FakeRequest
 
-import scala.concurrent.{ Future, ExecutionContext }
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, Future, ExecutionContext}
 import play.api.test.Helpers._
 
 class CoreEditorTest extends Specification with Mockito {
@@ -26,8 +29,6 @@ class CoreEditorTest extends Specification with Mockito {
 
     override def jsSrc: NgSourcePaths = NgSourcePaths(Seq.empty, "", Seq.empty, Seq.empty)
     override def cssSrc: CssSourcePaths = CssSourcePaths(Seq.empty, "", Seq.empty)
-
-    override def renderJade(params: TemplateParams): Html = Html("")
 
     implicit val r = FakeRequest("", "")
     override def versionInfo: JsObject = Json.obj()
@@ -53,6 +54,13 @@ class CoreEditorTest extends Specification with Mockito {
 
     override def mode: Mode = Mode.Dev
 
+    protected var templateParams : TemplateParams = null
+
+    override def renderJade(params:TemplateParams) : Html = {
+      templateParams = params
+      Html("hi")
+    }
+
   }
 
   "load" should {
@@ -67,6 +75,14 @@ class CoreEditorTest extends Specification with Mockito {
       val result = load("id")(r)
       status(result) === SEE_OTHER
     }
+
+    "pass EditorTemplateParams.options.debounceInMillis to renderJade" in new scope{
+      mockHooks.load(any[String])(any[RequestHeader]) returns Future(Right(Json.obj()))
+      override def debounceInMillis = 5001
+      Await.result(load("id")(r), Duration(1, TimeUnit.SECONDS))
+      templateParams.asInstanceOf[EditorTemplateParams].options.debounceInMillis === 5001
+    }
+
   }
 
   "toJson" should {
