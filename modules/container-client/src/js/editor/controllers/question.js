@@ -14,6 +14,7 @@ angular.module('corespring-editor.controllers')
     'MathJaxService',
     'WiggiLinkFeatureDef',
     'WiggiMathJaxFeatureDef',
+    'DEBOUNCE_IN_MILLIS',
     function($scope,
       $element,
       $timeout,
@@ -27,7 +28,8 @@ angular.module('corespring-editor.controllers')
       ScoringHandler,
       MathJaxService,
       WiggiLinkFeatureDef,
-      WiggiMathJaxFeatureDef) {
+      WiggiMathJaxFeatureDef,
+      DEBOUNCE_IN_MILLIS) {
 
       var configPanels = {};
 
@@ -178,7 +180,7 @@ angular.module('corespring-editor.controllers')
       }));
 
       function debounce(fn) {
-        return _.debounce(fn, 500, {
+        return _.debounce(fn, DEBOUNCE_IN_MILLIS || 5000, {
           trailing: true,
           leading: false
         });
