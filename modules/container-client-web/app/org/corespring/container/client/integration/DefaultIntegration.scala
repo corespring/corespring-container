@@ -31,7 +31,7 @@ trait DefaultIntegration
   with HasConfig
   with HasProcessors {
 
-  val debounceInMillis : Long = configuration.getLong("editor.debounceInMillis").getOrElse(5000)
+  val debounceInMillis: Long = configuration.getLong("editor.autosave.debounceInMillis").getOrElse(5000)
 
   def versionInfo: JsObject
 
@@ -118,7 +118,7 @@ trait DefaultIntegration
     def defaultCharSet: String = configuration.getString("default.charset").getOrElse("utf-8")
   }
 
-  lazy val itemEditor = new ItemEditor{
+  lazy val itemEditor = new ItemEditor {
 
     override val debounceInMillis = DefaultIntegration.this.debounceInMillis
 
@@ -197,7 +197,7 @@ trait DefaultIntegration
     override def components = DefaultIntegration.this.components
     override def hooks = catalogHooks
 
-    override def resolveDomain(path:String) : String = DefaultIntegration.this.resolveDomain(path)
+    override def resolveDomain(path: String): String = DefaultIntegration.this.resolveDomain(path)
   }
 
   lazy val prodHtmlPlayer = new Player {
