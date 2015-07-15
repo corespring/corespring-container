@@ -44,6 +44,7 @@ describe('QuestionController', function() {
     $provide.value('AppState', AppState);
     $provide.value('ScoringHandler', ScoringHandler);
     $provide.value('MathJaxService', MathJaxService);
+    $provide.value('DEBOUNCE_IN_MILLIS', 0);
     $provide.value('WiggiMathJaxFeatureDef', function(){
         return wiggiMathJaxFeatureDef;
     });
