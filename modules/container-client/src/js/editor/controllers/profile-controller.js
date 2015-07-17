@@ -941,6 +941,12 @@
     $scope.licenseTypeFilter = createPropertyOptionsFilter($scope.formModels.licenseType, 'key');
 
     DataQueryService.list("licenseTypes", function(result) {
+      var obj = {
+        key: "Other",
+        value: "Other"
+      };
+
+      result.push(obj);
       $scope.licenseTypeDataProvider = result;
     });
 
