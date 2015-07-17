@@ -4,7 +4,7 @@
    */
   angular.module('corespring-editor.directives')
     .directive('previewPlayer', ['$log', 'ComponentRegister', 'ComponentData',
-      function($log, ComponentRegister, ComponentData) {
+      function($log, ComponentRegister, ComponentData)  {
 
         var linkFn = function($scope) {
 
@@ -61,7 +61,13 @@
 
 
           var xhtmlChange = function(c, prev) {
-            $scope.slowXhtml = c;
+            try{
+              $scope.$apply(function(){
+                $scope.slowXhtml = c;
+              });
+            } catch(e){
+              $log.warn('error applying xhtml change');
+            }
           };
 
           $scope.$watch('xhtml', _.debounce(xhtmlChange, 200, {leading: false, trailing: true}));
