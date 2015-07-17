@@ -32,6 +32,7 @@ trait ComponentSets extends Controller with ComponentUrls {
     def gen(generator: SourceGenerator): String = suffix match {
       case "js" => generator.js(resolvedComponents)
       case "css" => generator.css(resolvedComponents)
+      case "less" => generator.css(resolvedComponents)
       case _ => ""
     }
 
@@ -46,6 +47,7 @@ trait ComponentSets extends Controller with ComponentUrls {
     val contentType = suffix match {
       case "js" => ContentTypes.JAVASCRIPT
       case "css" => ContentTypes.CSS
+      case "less" => ContentTypes.CSS
       case _ => throw new RuntimeException(s"Unknown suffix: $suffix")
     }
 
@@ -61,6 +63,8 @@ trait ComponentSets extends Controller with ComponentUrls {
   }
 
   override def cssUrl(context: String, components: Seq[Component], separatePaths: Boolean): Seq[String] = url(context, components, "css", separatePaths)
+
+  override def lessUrl(context: String, components: Seq[Component], separatePaths: Boolean): Seq[String] = url(context, components, "less", separatePaths)
 
   override def jsUrl(context: String, components: Seq[Component], separatePaths: Boolean): Seq[String] = url(context, components, "js", separatePaths)
 

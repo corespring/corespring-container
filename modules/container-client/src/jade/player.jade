@@ -10,7 +10,8 @@ block header-scripts
       NREUM.info!= newRelicRumConfig
 
   script.
-    var less = {env: "production", globalVars: !{colors}};
+    var less = {env: "development", globalVars: !{colors}};
+    less.globalVars = less.globalVars || {};
     var defaultColors = {
       "incorrect-color":  "#EC971F",
       "correct-color":  "#3c763d",
@@ -22,7 +23,6 @@ block header-scripts
     }
 
 block content
-
 
   mixin player
     div(corespring-player='corespring-player',

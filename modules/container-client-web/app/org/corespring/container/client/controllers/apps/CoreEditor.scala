@@ -11,7 +11,7 @@ import play.api.libs.json._
 import play.api.mvc._
 import v2Player.Routes
 
-object StaticPaths{
+object StaticPaths {
   val assetUrl = Routes.prefix + "/images"
 
   val staticPaths = Json.obj(
@@ -65,18 +65,21 @@ trait CoreEditor
     }
 
     def onItem(i: JsValue): SimpleResult = {
+
       val scriptInfo = componentScriptInfo(componentTypes(i), jsMode == "dev")
+      println("lalacoco" + componentTypes(i))
       val domainResolvedJs = buildJs(scriptInfo)
       val domainResolvedCss = buildCss(scriptInfo)
+      val domainResolvedLess = buildLess(scriptInfo)
       val componentsArray: JsArray = JsArray(interactions.map(toJson))
       val widgetsArray: JsArray = JsArray(widgets.map(toJson))
-
 
       Ok(renderJade(
         EditorTemplateParams(
           context,
           domainResolvedJs,
           domainResolvedCss,
+          domainResolvedLess,
           jsSrc.ngModules ++ scriptInfo.ngDependencies,
           servicesJs(id, componentsArray, widgetsArray),
           versionInfo,

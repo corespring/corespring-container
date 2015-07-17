@@ -38,6 +38,7 @@ trait Player
     def createPlayerHtml(sessionId: String, session: JsValue, itemJson: JsValue, serviceParams: JsObject, orgOptions: JsValue)(implicit rh: RequestHeader): Html = {
 
       val scriptInfo = componentScriptInfo(componentTypes(itemJson), jsMode == "dev")
+      println("lalacoco" + componentTypes(itemJson))
       val controlsJs = if (showControls) paths(controlsJsSrc) else Seq.empty
       val domainResolvedJs = buildJs(scriptInfo, controlsJs)
       val domainResolvedLess = buildLess(scriptInfo)
@@ -50,14 +51,13 @@ trait Player
 
       logger.trace(s"function=load domainResolvedJs=$domainResolvedJs")
       logger.trace(s"function=load domainResolvedCss=$domainResolvedCss")
-      val colors = (orgOptions \ "colors")
-      println("Colors:" + colors)
 
       renderJade(
         PlayerTemplateParams(
           context,
           domainResolvedJs,
           domainResolvedCss,
+          domainResolvedLess,
           jsSrc.ngModules ++ scriptInfo.ngDependencies,
           servicesJs(sessionId, serviceParams),
           showControls,
@@ -65,8 +65,7 @@ trait Player
           versionInfo,
           newRelicRumConf != None,
           newRelicRumConf.getOrElse(Json.obj()),
-          domainResolvedLess,
-          colors))
+          orgOptions))
 
     }
   }

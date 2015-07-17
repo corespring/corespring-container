@@ -29,9 +29,10 @@ trait TemplateParams {
 case class CatalogTemplateParams(appName: String,
   js: Seq[String],
   css: Seq[String],
+  less: Seq[String] = Seq(),
   componentNgModules: Seq[String],
   ngServiceLogic: String,
-  staticPaths: JsValue, less: Seq[String] = Seq()) extends TemplateParams {
+  staticPaths: JsValue) extends TemplateParams {
   override def toJadeParams = {
     super.toJadeParams ++ Map("staticPaths" -> staticPaths)
   }
@@ -40,10 +41,11 @@ case class CatalogTemplateParams(appName: String,
 case class EditorTemplateParams(appName: String,
   js: Seq[String],
   css: Seq[String],
+  less: Seq[String] = Seq(),
   componentNgModules: Seq[String],
   ngServiceLogic: String,
   versionInfo: JsValue,
-  staticPaths: JsValue, less: Seq[String] = Seq()) extends TemplateParams {
+  staticPaths: JsValue) extends TemplateParams {
   override def toJadeParams = {
     super.toJadeParams ++ Map(
       "versionInfo" -> Json.stringify(versionInfo),
@@ -54,14 +56,16 @@ case class EditorTemplateParams(appName: String,
 case class DevEditorTemplateParams(appName: String,
   js: Seq[String],
   css: Seq[String],
+  less: Seq[String] = Seq(),
   componentNgModules: Seq[String],
-  ngServiceLogic: String, less: Seq[String] = Seq()) extends TemplateParams
+  ngServiceLogic: String) extends TemplateParams
 
 case class RigTemplateParams(appName: String,
   js: Seq[String],
   css: Seq[String],
+  less: Seq[String] = Seq(),
   componentNgModules: Seq[String],
-  itemJson: String, less: Seq[String] = Seq()) extends TemplateParams {
+  itemJson: String) extends TemplateParams {
   override def ngServiceLogic: String = ""
   override def toJadeParams = {
     super.toJadeParams ++ Map(
@@ -73,6 +77,7 @@ case class PlayerTemplateParams(
   appName: String,
   js: Seq[String],
   css: Seq[String],
+  less: Seq[String],
   componentNgModules: Seq[String],
   ngServiceLogic: String,
   showControls: Boolean,
@@ -80,8 +85,7 @@ case class PlayerTemplateParams(
   versionInfo: JsValue,
   useNewRelicRum: Boolean,
   newRelicRumConfig: JsValue,
-  less: Seq[String],
-  colors: JsValue) extends TemplateParams {
+  orgOptions: JsValue) extends TemplateParams {
   override def toJadeParams = {
     super.toJadeParams ++ Map(
       "showControls" -> new java.lang.Boolean(showControls),
@@ -89,6 +93,6 @@ case class PlayerTemplateParams(
       "versionInfo" -> Json.stringify(versionInfo),
       "useNewRelicRum" -> new java.lang.Boolean(useNewRelicRum),
       "newRelicRumConfig" -> Json.stringify(newRelicRumConfig),
-      "colors" -> Json.stringify(colors))
+      "colors" -> Json.stringify(orgOptions \ "colors"))
   }
 }

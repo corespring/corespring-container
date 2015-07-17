@@ -57,6 +57,7 @@ trait Rig
       val scriptInfo = componentScriptInfo(comps, jsMode == "dev")
       val js = buildJs(scriptInfo)
       val css = buildCss(scriptInfo)
+      val less = buildLess(scriptInfo)
       val itemJson = Json.prettyPrint(i)
 
       Ok(renderJade(
@@ -64,6 +65,7 @@ trait Rig
           context,
           js,
           css,
+          less,
           jsSrc.ngModules ++ scriptInfo.ngDependencies,
           itemJson)))
     }
