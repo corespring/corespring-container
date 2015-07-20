@@ -324,7 +324,7 @@ describe('profile controller', function() {
       scope.standardFilterOption.subject = "subject";
       scope.standardFilterOption.category = "category";
       scope.standardFilterOption.subCategory = "subCategory";
-      scope.standardsAdapter.query({
+      scope.filterStandardsAdapter.query({
         term: "searchterm",
         callback: function() {}
       });
