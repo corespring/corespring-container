@@ -491,7 +491,7 @@
           results: filterStandardsByConfig(results)
         });
       });
-    },
+    };
 
     /**
      * The config contains an array of standards in dotNotation.
