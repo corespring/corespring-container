@@ -34,6 +34,22 @@ describe('QuestionController', function() {
 
   beforeEach(angular.mock.module('corespring-editor.controllers'));
 
+  beforeEach(function(){
+
+    spyOn(_, 'debounce').and.callFake(function(fn){
+
+      return function(){
+        if(_.isFunction(fn)){
+          fn.call(Array.prototype.slice.call(arguments));
+        }
+      };
+    });
+  });
+
+  afterEach(function(){
+    _.debounce.isSpy = false;
+  });
+
   beforeEach(module(function($provide) {
     $provide.value('ItemService', ItemService);
     $provide.value('EditorConfig', EditorConfig);

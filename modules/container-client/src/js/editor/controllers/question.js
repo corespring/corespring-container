@@ -85,6 +85,14 @@ angular.module('corespring-editor.controllers')
         $scope.$broadcast('editor.click');
       }
 
+      var debounceInMillis = DEBOUNCE_IN_MILLIS || 5000;
+
+      var debouncedServiceCalls = {
+        saveSummaryFeedback: debounce(ItemService.saveSummaryFeedback, debounceInMillis),
+        saveXhtml: debounce(ItemService.saveXhtml, debounceInMillis),
+        saveComponents: debounce(saveComponents, debounceInMillis)
+      };
+
       $scope.$on('fileSizeGreaterThanMax', EditorConfig.onFileSizeGreaterThanMax);
 
       $scope.$on('registerComponent', function(event, id, componentBridge,
@@ -153,7 +161,7 @@ angular.module('corespring-editor.controllers')
           logger.debug('they are the same - ignore...');
           return;
         }
-        saveComponents();
+        debouncedServiceCalls.saveComponents();
         if (oldComps) {
           $scope.$emit('itemChanged', {partChanged: 'components'});
         }
@@ -162,7 +170,7 @@ angular.module('corespring-editor.controllers')
       $scope.$watch('item.xhtml', debounce(function(newValue, oldValue) {
         logger.debug('old', oldValue);
         if (oldValue !== newValue) {
-          ItemService.saveXhtml($scope.item.xhtml);
+          debouncedServiceCalls.saveXhtml($scope.item.xhtml);
           if (oldValue) {
             $scope.$emit('itemChanged', {partChanged: 'xhtml'});
           }
@@ -172,15 +180,16 @@ angular.module('corespring-editor.controllers')
       $scope.$watch('item.summaryFeedback', debounce(function(newValue, oldValue) {
         logger.debug('old', oldValue);
         if (oldValue !== newValue) {
-          ItemService.saveSummaryFeedback($scope.item.summaryFeedback);
+          debouncedServiceCalls.saveSummaryFeedback($scope.item.summaryFeedback);
           if (oldValue) {
             $scope.$emit('itemChanged', {partChanged: 'summaryFeedback'});
           }
         }
       }));
 
-      function debounce(fn) {
-        return _.debounce(fn, DEBOUNCE_IN_MILLIS || 5000, {
+      function debounce(fn, delay) {
+        delay = delay || 300;
+        return _.debounce(fn, delay, {
           trailing: true,
           leading: false
         });
