@@ -247,7 +247,7 @@ script(type="text/ng-template", id="/templates/profile")
               additional-copyright-information-for-profile(copyrights="contributorDetails.additionalCopyrights",
               prompt="Does this item contain any other copyrighted materials? E.g. book passage, image, etc.")
 
-          +panel("licenseType", "Creative Commons License")
+          +panel("licenseType", "License")
             .panel-body
               +field("licenseType","Make this available via a")
                 table.license
@@ -257,11 +257,12 @@ script(type="text/ng-template", id="/templates/profile")
                       ng-disabled="formModels.licenseType.readonly"
                       ng-options="c.key as c.value for c in licenseTypeDataProvider | filter:licenseTypeFilter")
                         option(value="") Select ...
-                    td
+
+                    td(ng-if="contributorDetails.licenseType != 'Other'")
                       span(ng-show="!contributorDetails.licenseType",style="color: #888; font-style: italic;")
                         | Not Assigned
                       img(ng-show="contributorDetails.licenseType",ng-src="{{getLicenseTypeUrl(contributorDetails.licenseType)}}")
-                    td
+                    td(ng-if="contributorDetails.licenseType != 'Other'")
                       a(href="http://creativecommons.org/licenses/",target="_blank") Learn More
 
     .col-md-6
