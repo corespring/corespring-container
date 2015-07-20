@@ -81,6 +81,11 @@
         .label.label-warning Copyright Owner
       .content
         {{item.profile.contributorDetails.copyrightOwner}}
+    .field.copyright(ng-show="item.profile.contributorDetails.contributor")
+      .info
+        .label.label-warning Contributor
+      .content
+        {{item.profile.contributorDetails.contributor}}
 
     .field.pull-right
       .more-info-container.clearfix

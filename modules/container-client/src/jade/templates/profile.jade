@@ -228,6 +228,7 @@ script(type="text/ng-template", id="/templates/profile")
           +panel("copyrightInformationPanel", "Copyright Information")
             .panel-body
               +configurableField("author","* Author", "contributorDetails.author")
+              +configurableField("contributor","Contributor", "contributorDetails.contributor")
 
               +configurableField("credentials","Credentials","contributorDetails.credentials")
                 select.form-control(id="credentials",ng-model="contributorDetails.credentials",

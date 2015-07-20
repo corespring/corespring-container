@@ -69,6 +69,10 @@
         visible: true,
         readonly: false
       },
+      contributor: {
+        visible: true,
+        readonly: false
+      },
       bloomsTaxonomy: {
         visible: true,
         readonly: false,
@@ -276,6 +280,7 @@
       applyConfig(profile, "reviewsPassedOther");
 
       applyConfig(profile.contributorDetails, "author");
+      applyConfig(profile.contributorDetails, "contributor");
       applyConfig(profile.contributorDetails, "credentials");
       applyConfig(profile.contributorDetails, "credentialsOther");
       applyConfig(profile.contributorDetails, "copyrightOwner");
@@ -1005,6 +1010,7 @@
       }
 
       var contributorDetails = profile.contributorDetails;
+        console.log("contributorDetails ",contributorDetails);
 
       if (!(contributorDetails.licenseType)) {
         contributorDetails.licenseType = "CC BY";
