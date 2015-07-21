@@ -51,6 +51,7 @@ angular.module('corespring-common.directives')
           $scope.isThereMoreData = function(profile) {
             return (
               isNonEmptyString(getOrNull(profile, "contributorDetails", "copyrightOwner")) ||
+              isNonEmptyString(getOrNull(profile, "contributorDetails", "contributor")) ||
               isNonEmptyString(getOrNull(profile, "contributorDetails", "copyrightYear")) ||
               isNonEmptyString(getOrNull(profile, "contributorDetails", "copyrightExpirationDate")) ||
               isNonEmptyString(getOrNull(profile, "contributorDetails", "credentials")) ||

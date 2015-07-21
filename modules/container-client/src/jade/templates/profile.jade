@@ -227,6 +227,7 @@ script(type="text/ng-template", id="/templates/profile")
 
           +panel("copyrightInformationPanel", "Copyright Information")
             .panel-body
+              +configurableField("contributor","Contributor", "contributorDetails.contributor")
               +configurableField("author","* Author", "contributorDetails.author")
 
               +configurableField("credentials","Credentials","contributorDetails.credentials")
@@ -262,7 +263,7 @@ script(type="text/ng-template", id="/templates/profile")
 
           +panel("licenseType", "License")
             .panel-body
-              +field("licenseType","Make this available via a")
+              +field("licenseType","Choose a License")
                 table.license
                   tr
                     td

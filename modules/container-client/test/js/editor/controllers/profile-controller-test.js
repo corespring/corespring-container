@@ -929,6 +929,9 @@ describe('profile controller', function() {
         it("author", function() {
           expect(scope.contributorDetails.author).toEqual("some author");
         });
+        it("contributor", function() {
+          expect(scope.contributorDetails.contributor).toEqual("some contributor");
+        });
         it("bloomsTaxonomy", function() {
           expect(scope.profile.otherAlignments.bloomsTaxonomy).toEqual("some blooms");
         });
