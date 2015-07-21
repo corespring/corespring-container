@@ -3,6 +3,7 @@ package org.corespring.shell.controllers.editor
 import com.mongodb.casbah.Imports._
 import org.bson.types.ObjectId
 import org.corespring.container.client.hooks.Hooks.{ R, StatusMessage }
+import org.corespring.container.client.hooks.LoadResponse
 import org.corespring.container.client.{ hooks => containerHooks }
 import org.corespring.mongo.json.services.MongoService
 import org.corespring.shell.controllers.editor.actions.{ DraftId, ContainerDraftId }
@@ -64,10 +65,10 @@ trait ItemDraftHooks
     out
   }
 
-  override def load(draftId: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]] = {
+  override def load(draftId: String)(implicit header: RequestHeader): Future[Either[StatusMessage, LoadResponse]] = {
     Future {
       draftItemService.load(draftId).map { json =>
-        Right(json \ "item")
+        Right(LoadResponse(json \ "item", Json.obj()))
       }.getOrElse(Left(NOT_FOUND -> s"draftId: $draftId"))
     }
   }
@@ -102,7 +103,7 @@ trait ItemDraftHooks
     } yield {
       logger.trace(s"draft date modified: $draftDateModified")
       logger.trace(s"item date modified: $itemDateModified")
-      if(itemDateModified == null || draftDateModified == null){
+      if (itemDateModified == null || draftDateModified == null) {
         true
       } else {
         val isEqual = draftDateModified.isEqual(itemDateModified.getMillis)

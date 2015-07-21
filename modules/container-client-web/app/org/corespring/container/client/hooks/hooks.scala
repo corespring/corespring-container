@@ -6,6 +6,7 @@ import play.api.libs.json.{ JsArray, JsValue }
 import play.api.mvc._
 
 import scala.concurrent.Future
+import play.api.libs.json.{ JsValue, Json }
 
 object Hooks {
   type StatusMessage = (Int, String)
@@ -29,6 +30,8 @@ trait AssetHooks extends GetAssetHook {
 /**
  * Client side calls - each will call for config, services and components
  */
+case class LoadResponse(item: JsValue, orgOptions: JsValue = Json.obj())
+
 trait LoadHook extends HasContext {
 
   /**
@@ -38,7 +41,7 @@ trait LoadHook extends HasContext {
    * @param header
    * @return
    */
-  def load(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]]
+  def load(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, LoadResponse]]
 }
 
 trait PlayerHooks extends GetAssetHook with HasContext {

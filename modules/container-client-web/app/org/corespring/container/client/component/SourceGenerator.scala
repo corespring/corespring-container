@@ -26,6 +26,8 @@ trait SourceGenerator
 
   def css(components: Seq[Component]): String
 
+  def less(components: Seq[Component]): String
+
   protected def wrapComponent(moduleName: String, directiveName: String, src: String) = {
     ComponentWrapper(moduleName, directiveName, src).toString
   }
@@ -117,6 +119,27 @@ abstract class BaseGenerator
     |$layoutCss
     |$libraryCss
     """.stripMargin
+  }
+
+  override def less(components: Seq[Component]): String = {
+    val fileUrl: java.net.URL = this.getClass().getResource("/public/cucu.less")
+    val common = scala.io.Source.fromFile(fileUrl.toURI())
+    val kaka = common.mkString
+    println("kaka" + common.mkString)
+    val (libraries, uiComps, layoutComps, widgets) = splitComponents(components)
+    val uiCss = uiComps.map(_.client.less.getOrElse("")).mkString("\n")
+    val widgetCss = widgets.map(_.client.less.getOrElse("")).mkString("\n")
+    val layoutCss = layoutComps.map(_.less.getOrElse("")).mkString("\n")
+    val libraryCss = libraries.map(_.less.getOrElse("")).mkString("\n")
+    val res = s"""
+    |$kaka
+    |$uiCss
+    |$widgetCss
+    |$layoutCss
+    |$libraryCss
+    """.stripMargin
+    println("qaqa" + res)
+    res
   }
 
   override def js(components: Seq[Component]): String = {

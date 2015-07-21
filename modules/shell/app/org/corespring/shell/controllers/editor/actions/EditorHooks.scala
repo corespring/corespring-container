@@ -3,7 +3,7 @@ package org.corespring.shell.controllers.editor.actions
 import com.mongodb.casbah.commons.MongoDBObject
 import org.bson.types.ObjectId
 import org.corespring.container.client.controllers.{ AssetType, Assets }
-import org.corespring.container.client.hooks.{ EditorHooks => ContainerEditorHooks, UploadResult }
+import org.corespring.container.client.hooks.{ EditorHooks => ContainerEditorHooks, LoadResponse, UploadResult }
 import org.corespring.container.logging.ContainerLogger
 import org.corespring.mongo.json.services.MongoService
 import org.corespring.shell.services.ItemDraftService
@@ -42,15 +42,15 @@ trait ItemEditorHooks extends ContainerEditorHooks {
 
   import play.api.http.Status._
 
-  override def load(id: String)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] = Future {
+  override def load(id: String)(implicit header: RequestHeader): Future[Either[(Int, String), LoadResponse]] = Future {
     itemService.load(id).map { json =>
-      Right(json)
+      Right(LoadResponse(json))
     }.getOrElse {
       val newId = ObjectId.get
       val data = Json.obj("_id" -> Json.obj("$oid" -> newId.toString))
       val oid = itemService.create(data).get
       require(newId == oid, "the created oid must match the new id")
-      Right(Json.obj("item" -> data))
+      Right(LoadResponse(Json.obj("item" -> data)))
     }
   }
 
@@ -88,14 +88,14 @@ trait DraftEditorHooks extends ContainerEditorHooks {
 
   import play.api.http.Status._
 
-  override def load(id: String)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] = Future {
+  override def load(id: String)(implicit header: RequestHeader): Future[Either[(Int, String), LoadResponse]] = Future {
     draftItemService.load(id).map { json =>
-      Right(json)
+      Right(LoadResponse(json))
     }.getOrElse {
       val draftId: ContainerDraftId = DraftId.fromString[ObjectId, ContainerDraftId](id, (itemId, name) => ContainerDraftId(new ObjectId(itemId), name))
       val item = itemService.load(draftId.itemId.toString).get
       draftItemService.createDraft(draftId.itemId, Some(draftId.name), item)
-      Right(Json.obj("item" -> item))
+      Right(LoadResponse(Json.obj("item" -> item)))
     }
   }
 

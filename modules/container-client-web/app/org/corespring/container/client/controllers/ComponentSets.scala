@@ -8,6 +8,7 @@ import org.corespring.container.components.model.dependencies.DependencyResolver
 import org.corespring.container.logging.ContainerLogger
 import play.api.http.ContentTypes
 import play.api.mvc._
+import org.lesscss.LessCompiler
 
 trait ComponentSets extends Controller with ComponentUrls {
 
@@ -32,7 +33,11 @@ trait ComponentSets extends Controller with ComponentUrls {
     def gen(generator: SourceGenerator): String = suffix match {
       case "js" => generator.js(resolvedComponents)
       case "css" => generator.css(resolvedComponents)
-      case "less" => generator.css(resolvedComponents)
+      case "less" =>
+        val res = generator.less(resolvedComponents)
+        //        val c = new LessCompiler()
+        //        c.compile(res)
+        res
       case _ => ""
     }
 

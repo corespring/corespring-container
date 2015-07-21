@@ -2,7 +2,7 @@ extends layout
 
 block header-scripts
   script.
-    var less = {env: "development", globalVars: {}};
+    var less = {env: "development", globalVars: !{colors}};
     less.globalVars = less.globalVars || {};
     var defaultColors = {
       "incorrect-color": "#EC971F",

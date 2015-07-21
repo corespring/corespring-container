@@ -14,6 +14,7 @@ import play.api.http.{ ContentTypes }
 import play.api.libs.json._
 import play.api.mvc.{ Action, AnyContent, RequestHeader }
 import play.api.templates.Html
+import org.lesscss.LessCompiler
 
 trait Player
   extends App[PlayerHooks]
@@ -42,6 +43,7 @@ trait Player
       val controlsJs = if (showControls) paths(controlsJsSrc) else Seq.empty
       val domainResolvedJs = buildJs(scriptInfo, controlsJs)
       val domainResolvedLess = buildLess(scriptInfo)
+
       val domainResolvedCss = buildCss(scriptInfo)
 
       val processedXhtml = processXhtml((itemJson \ "xhtml").asOpt[String])

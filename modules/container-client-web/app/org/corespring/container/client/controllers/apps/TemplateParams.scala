@@ -45,11 +45,13 @@ case class EditorTemplateParams(appName: String,
   componentNgModules: Seq[String],
   ngServiceLogic: String,
   versionInfo: JsValue,
-  staticPaths: JsValue) extends TemplateParams {
+  staticPaths: JsValue,
+  orgOptions: JsValue) extends TemplateParams {
   override def toJadeParams = {
     super.toJadeParams ++ Map(
       "versionInfo" -> Json.stringify(versionInfo),
-      "staticPaths" -> staticPaths)
+      "staticPaths" -> staticPaths,
+      "colors" -> Json.stringify(orgOptions \ "colors"))
   }
 }
 
