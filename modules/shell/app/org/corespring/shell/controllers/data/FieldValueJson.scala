@@ -129,7 +129,10 @@ object FieldValueJson {
         "value" -> "CC BY-ND"),
       Json.obj(
         "key" -> "CC BY-NC-SA",
-        "value" -> "CC BY-NC-SA")),
+        "value" -> "CC BY-NC-SA"),
+      Json.obj(
+        "key" -> "Other",
+        "value" -> "Other")),
     "itemTypes" -> Json.arr(
       Json.obj(
         "key" -> "Fixed Choice",

@@ -324,7 +324,7 @@ describe('profile controller', function() {
       scope.standardFilterOption.subject = "subject";
       scope.standardFilterOption.category = "category";
       scope.standardFilterOption.subCategory = "subCategory";
-      scope.standardsAdapter.query({
+      scope.filterStandardsAdapter.query({
         term: "searchterm",
         callback: function() {}
       });
@@ -928,6 +928,9 @@ describe('profile controller', function() {
         });
         it("author", function() {
           expect(scope.contributorDetails.author).toEqual("some author");
+        });
+        it("contributor", function() {
+          expect(scope.contributorDetails.contributor).toEqual("some contributor");
         });
         it("bloomsTaxonomy", function() {
           expect(scope.profile.otherAlignments.bloomsTaxonomy).toEqual("some blooms");

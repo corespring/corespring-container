@@ -69,6 +69,10 @@
         visible: true,
         readonly: false
       },
+      contributor: {
+        visible: true,
+        readonly: false
+      },
       bloomsTaxonomy: {
         visible: true,
         readonly: false,
@@ -173,7 +177,8 @@
       },
       standards: {
         visible: true,
-        readonly: false
+        readonly: false,
+        collapse: true
       },
       title: {
         visible: true,
@@ -275,6 +280,7 @@
       applyConfig(profile, "reviewsPassedOther");
 
       applyConfig(profile.contributorDetails, "author");
+      applyConfig(profile.contributorDetails, "contributor");
       applyConfig(profile.contributorDetails, "credentials");
       applyConfig(profile.contributorDetails, "credentialsOther");
       applyConfig(profile.contributorDetails, "copyrightOwner");
@@ -410,6 +416,10 @@
     }, true); //watch nested properties
 
     function createStandardQuery(searchText) {
+      return StandardQueryCreator.createStandardQuery(searchText);
+    }
+
+    function createFilteredStandardQuery(searchText) {
       return StandardQueryCreator.createStandardQuery(
         searchText,
         $scope.standardFilterOption.subject,
@@ -427,7 +437,6 @@
         return -1 !== _.indexOf(options, item.dotNotation);
       });
     }
-
 
     $scope.standardsAdapter = {
       tags: [],
@@ -470,6 +479,24 @@
     };
 
     $scope.standardsAdapter.initSelection = $scope.standardsAdapter.initSelection.bind($scope.standardsAdapter);
+
+    $scope.filterStandardsAdapter = _.clone($scope.standardsAdapter);
+    $scope.filterStandardsAdapter.placeholder = '';
+    $scope.filterStandardsAdapter.minimumInputLength = 0;
+    $scope.filterStandardsAdapter.initSelection = function(element, callback) {
+      DataQueryService.query("standards", createFilteredStandardQuery(""), function(results) {
+        query.callback({
+          results: filterStandardsByConfig(results)
+        });
+      });
+    };
+    $scope.filterStandardsAdapter.query = function(query) {
+      DataQueryService.query("standards", createFilteredStandardQuery(query.term), function(results) {
+        query.callback({
+          results: filterStandardsByConfig(results)
+        });
+      });
+    };
 
     /**
      * The config contains an array of standards in dotNotation.
@@ -983,6 +1010,7 @@
       }
 
       var contributorDetails = profile.contributorDetails;
+        console.log("contributorDetails ",contributorDetails);
 
       if (!(contributorDetails.licenseType)) {
         contributorDetails.licenseType = "CC BY";
