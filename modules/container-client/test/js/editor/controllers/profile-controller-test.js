@@ -860,6 +860,9 @@ describe('profile controller', function() {
           author: {
             value: "some author"
           },
+          contributor: {
+            value: "some contributor"
+          },
           bloomsTaxonomy: {
             value: "some blooms"
           },
