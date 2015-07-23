@@ -8,7 +8,6 @@
 
   var link =  function($compile, $timeout){
       return function ($scope, $elem, attrs) {
-        console.log("file preview");
 
         $scope.$watch('selectedFile', function(newFile){
 
