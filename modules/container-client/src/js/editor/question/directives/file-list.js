@@ -6,7 +6,6 @@
   "use strict";
 
   var link = function ($scope, $elem, attrs) {
-   console.log("file preview");
   };
 
   angular.module('corespring-editor.directives').directive('fileList', [

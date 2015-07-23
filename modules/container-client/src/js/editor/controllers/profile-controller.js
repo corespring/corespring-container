@@ -1010,7 +1010,6 @@
       }
 
       var contributorDetails = profile.contributorDetails;
-        console.log("contributorDetails ",contributorDetails);
 
       if (!(contributorDetails.licenseType)) {
         contributorDetails.licenseType = "CC BY";
