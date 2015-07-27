@@ -121,14 +121,6 @@ angular.module('corespring-editor.services').service('EditorConfig', [
                   .map(componentToFeature)
                   .value()
             },
-            this.mathJaxFeatureGroup(),
-            this.footnotesFeatureGroup(),
-            {
-              type: 'group',
-              buttons: [
-                videoComponent
-              ]
-            },
             {
               name: 'tools',
               type: 'dropdown',
@@ -141,6 +133,14 @@ angular.module('corespring-editor.services').service('EditorConfig', [
                 ])
                 .sortBy(orderList)
                 .value()
+            },
+            this.mathJaxFeatureGroup(),
+            this.footnotesFeatureGroup(),
+            {
+              type: 'group',
+              buttons: [
+                videoComponent
+              ]
             }]
           };
 
