@@ -56,6 +56,8 @@ class ItemTest extends Specification with Mockito {
         override def saveSummaryFeedback(id: String, feedback: String)(implicit h: RequestHeader): R[JsValue] = ???
 
         override def saveProfile(id: String, json: JsValue)(implicit h: RequestHeader): R[JsValue] = ???
+
+        override def save(itemId: String)(implicit request: RequestHeader): R[JsValue] = ???
       }
 
       override implicit def ec: ExecutionContext = ExecutionContext.Implicits.global
