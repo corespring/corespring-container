@@ -131,12 +131,10 @@ function EditorDefinition(element, options, errorCallback) {
     channel =
       new msgr.Channel(window, options.iframe ? options.iframe.contentWindow : $('iframe')[0].contentWindow, {enableLogging: true});
     channel.on('savedAll', function() {
-      self.commitDraft(false, function() {
-        if (saveCallback) {
-          saveCallback();
-          saveCallback = undefined;
-        }
-      });
+      if (saveCallback) {
+        saveCallback();
+        saveCallback = undefined;
+      }
     });
   });
 
@@ -147,30 +145,33 @@ function EditorDefinition(element, options, errorCallback) {
   };
 
   this.commitDraft = function(force, callback) {
-    var call = launcher.loadCall('draftEditor.commitDraft', function(u){
-      return u.replace(':draftId',new DraftId(options.itemId, options.draftName).toString());
-    });
+    self.forceSave(function() {
+      var call = launcher.loadCall('draftEditor.commitDraft', function(u){
+        return u.replace(':draftId',new DraftId(options.itemId, options.draftName).toString());
+      });
 
-    function onSuccess(result){
-      if(callback){
-        callback(null);
+      function onSuccess(result){
+        if (callback) {
+          saveCallback = callback;
+          callback(null);
+        }
       }
-    }
 
-    function onError(err){
-      var msg = (err.responseJSON && err.responseJSON.error) ? err.responseJSON.error : 'Failed to commit draft: ' + options.draftId;
-      if(callback){
-        callback(errorCodes.COMMIT_DRAFT_FAILED(msg));
+      function onError(err){
+        var msg = (err.responseJSON && err.responseJSON.error) ? err.responseJSON.error : 'Failed to commit draft: ' + options.draftId;
+        if(callback){
+          callback(errorCodes.COMMIT_DRAFT_FAILED(msg));
+        }
       }
-    }
 
-    $.ajax({
-      type: call.method,
-      url: launcher.prepareUrl(call.url, {force: force}),
-      data: {},
-      success: onSuccess,
-      error: onError,
-      dataType: 'json'
+      $.ajax({
+        type: call.method,
+        url: launcher.prepareUrl(call.url, {force: force}),
+        data: {},
+        success: onSuccess,
+        error: onError,
+        dataType: 'json'
+      });
     });
   };
 
