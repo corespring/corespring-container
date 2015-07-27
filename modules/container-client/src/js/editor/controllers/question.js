@@ -129,6 +129,12 @@ angular.module('corespring-editor.controllers')
         });
       });
 
+      $scope.$on('saveAll', function() {
+        ItemService.saveAll($scope.item, function() {
+          $scope.$emit('savedAll');
+        });
+      });
+
       $scope.serialize = function(comps) {
         if (!configPanels) {
           return comps;

@@ -8,6 +8,7 @@ import org.apache.commons.io.{ FileUtils, IOUtils }
 import org.corespring.amazon.s3.{ S3Service, ConcreteS3Service }
 import org.corespring.container.client.controllers.apps.{ ItemEditor, ItemDevEditor }
 import org.corespring.container.client.controllers.{ AssetType, _ }
+import org.corespring.container.client.hooks.Hooks.R
 import org.corespring.container.client.hooks._
 import org.corespring.container.client.integration.DefaultIntegration
 import org.corespring.container.client.{ AssetUtils, CompressedAndMinifiedComponentSets, VersionInfo }
@@ -22,7 +23,7 @@ import org.corespring.shell.controllers.editor.{ ItemDraftHooks => ShellItemDraf
 import org.corespring.shell.controllers.player.actions.{ PlayerHooks => ShellPlayerHooks }
 import org.corespring.shell.controllers.player.{ SessionHooks => ShellSessionHooks }
 import org.corespring.shell.services.ItemDraftService
-import play.api.libs.json.JsObject
+import play.api.libs.json.{JsValue, JsObject}
 import play.api.mvc._
 import play.api.{ Configuration, Mode, Play }
 

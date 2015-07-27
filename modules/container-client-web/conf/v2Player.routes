@@ -42,6 +42,7 @@ PUT           /item/update/:subset/:itemId.json                      @org.coresp
 # ItemDraft
 POST          /draft/create-item-and-draft                           @org.corespring.container.client.controllers.resources.ItemDraft.createItemAndDraft()
 GET           /draft/:draftId.json                                   @org.corespring.container.client.controllers.resources.ItemDraft.load(draftId)
+PUT           /draft/update/:draftId                                 @org.corespring.container.client.controllers.resources.ItemDraft.save(draftId)
 PUT           /draft/update/:subset/:draftId.json                    @org.corespring.container.client.controllers.resources.ItemDraft.saveSubset(draftId, subset)
 PUT           /draft/:draftId/commit                                 @org.corespring.container.client.controllers.resources.ItemDraft.commit(draftId)
 

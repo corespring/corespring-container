@@ -36,8 +36,9 @@
 
        var commitBtn = document.querySelector('#commit');
        var forceCommitBtn = document.querySelector('#force-commit');
+       var forceSaveButton = document.querySelector('#force-save');
 
-       function commit( force ){
+       function commit(force) {
          editor.commitDraft(force, function(err){
           if(err){
             alert(err.code + ', ' + err.msg);
@@ -47,12 +48,24 @@
          });
        }
 
-       commitBtn.addEventListener('click', commit.bind(this, null) );
+       function forceSave() {
+         editor.forceSave(function(err) {
+           if (err) {
+             alert(err.code + ', ' + err.msg);
+             return;
+           }
+           window.location.href = '/';
+         });
+       }
+
+       commitBtn.addEventListener('click', commit.bind(this, null));
        forceCommitBtn.addEventListener('click', commit.bind(this, true));
+       forceSaveButton.addEventListener('click', forceSave.bind(this));
      });
     </script>
     <button id="commit">Commit</button>
     <button id="force-commit">Force Commit</button>
+    <button id="force-save">Force Save</button>
     <div class="holder"></div>
   </body>
 </html>

@@ -4,6 +4,10 @@ function EditorDefinition(element, options, errorCallback) {
   var launcher = new Launcher(element, options, errorCallback);
   var errorCodes = require('error-codes');
 
+  var self = this;
+  var saveCallback;
+  var channel;
+
   function createItemAndDraft(callback){
 
     var call = launcher.loadCall('draftEditor.createItemAndDraft');
@@ -123,8 +127,26 @@ function EditorDefinition(element, options, errorCallback) {
     };
   }
 
+  $(function() {
+    channel =
+      new msgr.Channel(window, options.iframe ? options.iframe.contentWindow : $('iframe')[0].contentWindow, {enableLogging: true});
+    channel.on('savedAll', function() {
+      self.commitDraft(false, function() {
+        if (saveCallback) {
+          saveCallback();
+          saveCallback = undefined;
+        }
+      });
+    });
+  });
+
   /** Public functions */
-  this.commitDraft = function(force, callback){
+  this.forceSave = function(callback) {
+    saveCallback = callback;
+    channel.send('saveAll');
+  };
+
+  this.commitDraft = function(force, callback) {
     var call = launcher.loadCall('draftEditor.commitDraft', function(u){
       return u.replace(':draftId',new DraftId(options.itemId, options.draftName).toString());
     });
@@ -151,6 +173,7 @@ function EditorDefinition(element, options, errorCallback) {
       dataType: 'json'
     });
   };
+
 }
 
 module.exports = EditorDefinition;

@@ -1,4 +1,4 @@
-@(namespace:String, load : Call, saveSubset : Call, componentSet : JsValue, widgets : JsValue)
+@(namespace: String, load: Call, saveSubset: Call, save: Option[Call], componentSet: JsValue, widgets: JsValue)
 
 (function(){
   "use strict";
@@ -11,6 +11,12 @@
         method : '@load.method.toLowerCase',
         url: '@load.url'
       },
+      @save.map { save =>
+        save: {
+          method: '@save.method.toLowerCase',
+          url: '@save.url'
+        },
+      }
       saveSubset: {
         method : '@saveSubset.method.toLowerCase',
         url: '@saveSubset.url'
