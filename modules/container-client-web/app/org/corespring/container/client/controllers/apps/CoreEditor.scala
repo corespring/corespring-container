@@ -4,7 +4,7 @@ import org.corespring.container.client.component.AllItemTypesReader
 import org.corespring.container.client.controllers.AssetsController
 import org.corespring.container.client.controllers.helpers.JsonHelper
 import org.corespring.container.client.controllers.jade.Jade
-import org.corespring.container.client.hooks.{ LoadResponse, EditorHooks }
+import org.corespring.container.client.hooks.{ EditorHooks }
 import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.components.model.ComponentInfo
 import play.api.libs.json._
@@ -64,9 +64,9 @@ trait CoreEditor
       }
     }
 
-    def onItem(i: LoadResponse): SimpleResult = {
+    def onItem(i: JsValue): SimpleResult = {
 
-      val scriptInfo = componentScriptInfo(componentTypes(i.item), jsMode == "dev")
+      val scriptInfo = componentScriptInfo(componentTypes(i), jsMode == "dev")
       val domainResolvedJs = buildJs(scriptInfo)
       val domainResolvedCss = buildCss(scriptInfo)
       val domainResolvedLess = buildLess(scriptInfo)
@@ -82,8 +82,7 @@ trait CoreEditor
           jsSrc.ngModules ++ scriptInfo.ngDependencies,
           servicesJs(id, componentsArray, widgetsArray),
           versionInfo,
-          StaticPaths.staticPaths,
-          i.orgOptions)))
+          StaticPaths.staticPaths)))
     }
 
     hooks.load(id).map { e => e.fold(onError, onItem) }

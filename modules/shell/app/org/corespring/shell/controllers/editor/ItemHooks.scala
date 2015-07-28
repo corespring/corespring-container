@@ -1,7 +1,6 @@
 package org.corespring.shell.controllers.editor
 
 import org.corespring.container.client.hooks.Hooks.R
-import org.corespring.container.client.hooks.LoadResponse
 import org.corespring.container.client.{ hooks => containerHooks }
 import org.corespring.mongo.json.services.MongoService
 import play.api.http.Status._
@@ -18,9 +17,9 @@ trait ItemHooks
 
   def assets: ItemAssets
 
-  override def load(itemId: String)(implicit header: RequestHeader): Future[Either[(Int, String), LoadResponse]] = Future {
+  override def load(itemId: String)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] = Future {
     itemService.load(itemId).map { i =>
-      Right(LoadResponse(i, Json.obj()))
+      Right(i)
     }.getOrElse(Left((NOT_FOUND, s"Can't find item with id: $itemId")))
   }
 

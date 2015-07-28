@@ -4,7 +4,7 @@ import org.corespring.container.client.controllers.{ AssetType, Assets }
 
 import scala.concurrent.Future
 
-import org.corespring.container.client.hooks.{ CatalogHooks => ContainerCatalogHooks, LoadResponse }
+import org.corespring.container.client.hooks.{ CatalogHooks => ContainerCatalogHooks }
 import org.corespring.mongo.json.services.MongoService
 import org.corespring.container.logging.ContainerLogger
 import play.api.libs.json.JsValue
@@ -25,11 +25,11 @@ trait CatalogHooks extends ContainerCatalogHooks {
 
   def assets: Assets
 
-  override def load(id: String)(implicit header: RequestHeader): Future[Either[(Int, String), LoadResponse]] = Future {
-    val item: Validation[String, LoadResponse] = for {
+  override def load(id: String)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] = Future {
+    val item: Validation[String, JsValue] = for {
       i <- itemService.load(id).toSuccess(s"can't load item with id: $id")
     } yield {
-      LoadResponse(i, Json.obj())
+      i
     }
     item.leftMap(s => (500, s)).toEither
   }

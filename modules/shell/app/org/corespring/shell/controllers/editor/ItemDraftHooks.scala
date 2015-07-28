@@ -3,7 +3,6 @@ package org.corespring.shell.controllers.editor
 import com.mongodb.casbah.Imports._
 import org.bson.types.ObjectId
 import org.corespring.container.client.hooks.Hooks.{ R, StatusMessage }
-import org.corespring.container.client.hooks.LoadResponse
 import org.corespring.container.client.{ hooks => containerHooks }
 import org.corespring.mongo.json.services.MongoService
 import org.corespring.shell.controllers.editor.actions.{ DraftId, ContainerDraftId }
@@ -65,10 +64,10 @@ trait ItemDraftHooks
     out
   }
 
-  override def load(draftId: String)(implicit header: RequestHeader): Future[Either[StatusMessage, LoadResponse]] = {
+  override def load(draftId: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]] = {
     Future {
       draftItemService.load(draftId).map { json =>
-        Right(LoadResponse(json \ "item", Json.obj()))
+        Right(json \ "item")
       }.getOrElse(Left(NOT_FOUND -> s"draftId: $draftId"))
     }
   }

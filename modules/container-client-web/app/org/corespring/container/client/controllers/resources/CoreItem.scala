@@ -2,7 +2,7 @@ package org.corespring.container.client.controllers.resources
 
 import org.corespring.container.client.controllers.helpers.{ PlayerXhtml, XhtmlProcessor }
 import org.corespring.container.client.hooks.Hooks.StatusMessage
-import org.corespring.container.client.hooks.{ LoadResponse, CoreItemHooks }
+import org.corespring.container.client.hooks.{ CoreItemHooks }
 import play.api.Logger
 import play.api.libs.json.{ JsString, JsObject, JsValue, Json }
 import play.api.mvc._
@@ -50,7 +50,7 @@ trait CoreItem extends Controller {
         either match {
           case Left(sm) => sm
           case Right(response) => {
-            Ok(ItemJson(componentTypes, response.item))
+            Ok(ItemJson(componentTypes, response))
               .withHeaders(
                 "Cache-Control" -> noCacheHeader,
                 "Expires" -> "0")

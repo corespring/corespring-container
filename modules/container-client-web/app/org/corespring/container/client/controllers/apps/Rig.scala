@@ -6,7 +6,7 @@ import scala.concurrent.{ ExecutionContext, Future }
 
 import org.corespring.container.client.component.PlayerItemTypeReader
 import org.corespring.container.client.controllers.angular.AngularModules
-import org.corespring.container.client.hooks.{ LoadResponse, LoadHook }
+import org.corespring.container.client.hooks.{ LoadHook }
 import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.components.model.ComponentInfo
 import play.api.libs.json.{ JsValue, Json }
@@ -38,10 +38,10 @@ trait Rig
 
     override implicit def ec: ExecutionContext = ExecutionContext.Implicits.global
 
-    override def load(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, LoadResponse]] = Future {
+    override def load(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]] = Future {
       val componentType = id
       header.getQueryString("data").map { jsonFile =>
-        Right(LoadResponse((loadData(componentType, jsonFile) \ "item").as[JsValue], Json.obj()))
+        Right((loadData(componentType, jsonFile) \ "item").as[JsValue])
       }.getOrElse(Left(BAD_REQUEST, "You need to specify a json file using 'data' query param"))
     }
   }
@@ -52,13 +52,13 @@ trait Rig
 
     def onError(sm: StatusMessage) = BadRequest(s"Rig error: ${sm._2}")
 
-    def onItem(i: LoadResponse) = {
-      val comps = (componentTypes(i.item) :+ componentType).distinct
+    def onItem(i: JsValue) = {
+      val comps = (componentTypes(i) :+ componentType).distinct
       val scriptInfo = componentScriptInfo(comps, jsMode == "dev")
       val js = buildJs(scriptInfo)
       val css = buildCss(scriptInfo)
       val less = buildLess(scriptInfo)
-      val itemJson = Json.prettyPrint(i.item)
+      val itemJson = Json.prettyPrint(i)
 
       Ok(renderJade(
         RigTemplateParams(

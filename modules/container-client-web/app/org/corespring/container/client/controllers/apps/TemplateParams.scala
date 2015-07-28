@@ -45,13 +45,11 @@ case class EditorTemplateParams(appName: String,
   componentNgModules: Seq[String],
   ngServiceLogic: String,
   versionInfo: JsValue,
-  staticPaths: JsValue,
-  orgOptions: JsValue) extends TemplateParams {
+  staticPaths: JsValue) extends TemplateParams {
   override def toJadeParams = {
     super.toJadeParams ++ Map(
       "versionInfo" -> Json.stringify(versionInfo),
-      "staticPaths" -> staticPaths,
-      "colors" -> Json.stringify(orgOptions \ "colors"))
+      "staticPaths" -> staticPaths)
   }
 }
 
@@ -94,7 +92,6 @@ case class PlayerTemplateParams(
       "sessionJson" -> Json.stringify(sessionJson),
       "versionInfo" -> Json.stringify(versionInfo),
       "useNewRelicRum" -> new java.lang.Boolean(useNewRelicRum),
-      "newRelicRumConfig" -> Json.stringify(newRelicRumConfig),
-      "colors" -> Json.stringify(orgOptions \ "colors"))
+      "newRelicRumConfig" -> Json.stringify(newRelicRumConfig))
   }
 }

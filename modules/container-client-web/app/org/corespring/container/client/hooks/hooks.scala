@@ -30,8 +30,6 @@ trait AssetHooks extends GetAssetHook {
 /**
  * Client side calls - each will call for config, services and components
  */
-case class LoadResponse(item: JsValue, orgOptions: JsValue = Json.obj())
-
 trait LoadHook extends HasContext {
 
   /**
@@ -41,7 +39,7 @@ trait LoadHook extends HasContext {
    * @param header
    * @return
    */
-  def load(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, LoadResponse]]
+  def load(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]]
 }
 
 trait PlayerHooks extends GetAssetHook with HasContext {

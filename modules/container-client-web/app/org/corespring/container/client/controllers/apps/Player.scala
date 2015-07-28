@@ -15,7 +15,6 @@ import play.api.http.{ ContentTypes }
 import play.api.libs.json._
 import play.api.mvc.{ Action, AnyContent, RequestHeader }
 import play.api.templates.Html
-import org.lesscss.LessCompiler
 
 trait Player
   extends App[PlayerHooks]
@@ -155,7 +154,6 @@ trait Player
           val params = queryParams[String]()
           s"${call.url}${if (params.isEmpty) "" else s"?$params"}"
         }
-        println("KabocaParams" + queryParams(mapToJson))
         Created(createPlayerHtml((session \ "id").as[String], session, item, queryParams(mapToJson)))
           .as(ContentTypes.HTML)
           .withHeaders(LOCATION -> location)
