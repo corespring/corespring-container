@@ -186,7 +186,7 @@ class ContainerClientImplementation(
     }
   }
 
-  override def draftEditorHooks: EditorHooks = new ShellDraftEditorHooks {
+  override def draftEditorHooks: DraftEditorHooks = new ShellDraftEditorHooks {
     override def draftItemService = ContainerClientImplementation.this.draftItemService
 
     override def assets: Assets = ContainerClientImplementation.this.assets
@@ -194,7 +194,7 @@ class ContainerClientImplementation(
     override def itemService: MongoService = ContainerClientImplementation.this.itemService
   }
 
-  override def itemEditorHooks: EditorHooks = new ShellItemEditorHooks {
+  override def itemEditorHooks: ItemEditorHooks = new ShellItemEditorHooks {
     override def assets: Assets = ContainerClientImplementation.this.assets
 
     override def itemService: MongoService = ContainerClientImplementation.this.itemService
@@ -213,7 +213,7 @@ class ContainerClientImplementation(
     override implicit def ec: ExecutionContext = ContainerClientImplementation.this.ec
   }
 
-  override def itemDraftHooks: CoreItemHooks with DraftHooks = new ShellItemDraftHooks {
+  override def itemDraftHooks: DraftHooks = new ShellItemDraftHooks {
     override def itemService: MongoService = ContainerClientImplementation.this.itemService
 
     override def draftItemService = ContainerClientImplementation.this.draftItemService
@@ -221,7 +221,7 @@ class ContainerClientImplementation(
     override def assets: ItemDraftAssets = ContainerClientImplementation.this.assets
   }
 
-  override def itemHooks: CoreItemHooks with CreateItemHook = new ShellItemHooks {
+  override def itemHooks: ItemHooks = new ShellItemHooks {
     override def itemService: MongoService = ContainerClientImplementation.this.itemService
 
     override def assets: ItemAssets = ContainerClientImplementation.this.assets

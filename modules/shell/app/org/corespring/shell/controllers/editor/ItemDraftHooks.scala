@@ -16,8 +16,7 @@ import play.api.mvc._
 import scala.concurrent.Future
 
 trait ItemDraftHooks
-  extends containerHooks.CoreItemHooks
-  with containerHooks.DraftHooks
+  extends containerHooks.DraftHooks
   with ItemHooksHelper {
 
   val logger = Logger(classOf[ItemDraftHooks])

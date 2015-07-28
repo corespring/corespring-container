@@ -10,8 +10,7 @@ import play.api.mvc._
 import scala.concurrent.Future
 
 trait ItemHooks
-  extends containerHooks.CoreItemHooks
-  with containerHooks.CreateItemHook
+  extends containerHooks.ItemHooks
   with ItemHooksHelper {
   def itemService: MongoService
 

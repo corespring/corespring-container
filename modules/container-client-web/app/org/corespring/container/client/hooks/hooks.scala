@@ -71,7 +71,7 @@ trait CoreItemHooks extends HasContext with LoadHook {
   def saveXhtml(id: String, xhtml: String)(implicit h: RequestHeader): R[JsValue]
 }
 
-trait DraftHooks {
+trait DraftHooks extends CoreItemHooks {
   def createItemAndDraft()(implicit h: RequestHeader): R[(String, String)]
   def commit(id: String, force: Boolean)(implicit h: RequestHeader): R[JsValue]
 }
@@ -79,6 +79,9 @@ trait DraftHooks {
 trait CreateItemHook{
   def createItem(json:Option[JsValue])(implicit h: RequestHeader): R[String]
 }
+
+trait ItemHooks extends CoreItemHooks with CreateItemHook
+
 
 trait SessionHooks extends HasContext {
   def getScore(id: String)(implicit header: RequestHeader): Either[StatusMessage, SessionOutcome]
