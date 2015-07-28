@@ -100,8 +100,8 @@ trait App[T]
   }
 
   protected def buildLess(scriptInfo: ComponentScriptInfo)(implicit rh: RequestHeader) = {
-    val css = scriptInfo.lessUrl
-    css.map(resolvePath)
+    val less = scriptInfo.lessUrl
+    less.map(resolvePath)
   }
 
   protected def buildCss(scriptInfo: ComponentScriptInfo, withComponents: Boolean = false)(implicit rh: RequestHeader) = {
@@ -109,7 +109,7 @@ trait App[T]
     css.map(resolvePath)
   }
 
-  protected def componentScriptInfo(components: Seq[String], separatePaths: Boolean): ComponentScriptInfo = {
+  protected def componentScriptInfo(components: Seq[String], separatePaths: Boolean, customColorsEncoded: String = ""): ComponentScriptInfo = {
 
     val typeIds = components.map {
       t =>
@@ -121,7 +121,7 @@ trait App[T]
     val resolvedComponents = resolveComponents(typeIds, Some(context))
     val jsUrl = urls.jsUrl(context, resolvedComponents, separatePaths)
     val cssUrl = urls.cssUrl(context, resolvedComponents, separatePaths)
-    val lessUrl = urls.lessUrl(context, resolvedComponents, separatePaths)
+    val lessUrl = urls.lessUrl(context, resolvedComponents, separatePaths, customColorsEncoded)
     val clientSideDependencies = getClientSideDependencies(resolvedComponents)
     val dependencies = ngModules.createAngularModules(resolvedComponents, clientSideDependencies)
     ComponentScriptInfo(jsUrl, cssUrl, lessUrl, dependencies)

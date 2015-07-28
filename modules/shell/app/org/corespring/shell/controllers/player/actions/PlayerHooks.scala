@@ -23,7 +23,7 @@ trait PlayerHooks extends ContainerPlayerHooks {
   def assets: Assets
   def itemService: MongoService
 
-  override def createSessionForItem(itemId: String)(implicit header: RequestHeader): Future[Either[(Int, String), (JsValue, JsValue, JsValue)]] = Future {
+  override def createSessionForItem(itemId: String)(implicit header: RequestHeader): Future[Either[(Int, String), (JsValue, JsValue)]] = Future {
 
     val settings = Json.obj(
       "maxNoOfAttempts" -> JsNumber(2),
@@ -38,10 +38,7 @@ trait PlayerHooks extends ContainerPlayerHooks {
       oid =>
         itemService.load(itemId).map { item =>
           val withId = session ++ Json.obj("id" -> oid.toString)
-          val orgOptions = Json.obj("colors" -> Json.obj(
-            "incorrect-color" -> "#ff0000",
-            "correct-color" -> "#00ff00"))
-          Right((withId, item, orgOptions))
+          Right((withId, item))
         }.getOrElse(Left(NOT_FOUND -> s"Can't find item with id $itemId"))
     }.getOrElse(Left(BAD_REQUEST -> "Error creating session"))
   }

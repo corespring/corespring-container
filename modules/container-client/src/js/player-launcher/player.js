@@ -110,6 +110,10 @@ exports.define = function(isSecure) {
       var call = prepareCall();
 
       var params = options.queryParams;
+      if (options.customColors) {
+        params = params || {};
+        params.colors = window.btoa(JSON.stringify({colors: options.customColors}));
+      }
       var initialData = buildModeData(options.mode);
 
       instance = launcher.loadInstance(call, params, initialData);

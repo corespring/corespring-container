@@ -1,6 +1,7 @@
 package org.corespring.container.client.controllers.apps
 
 import java.net.URLEncoder
+import javax.xml.bind.DatatypeConverter
 
 import org.corespring.container.client.V2PlayerConfig
 import org.corespring.container.client.component.PlayerItemTypeReader
@@ -36,14 +37,12 @@ trait Player
         PlayerXhtml.mkXhtml(components.map(_.componentType), xhtml)
     }.getOrElse("<div><h1>New Item</h1></div>")
 
-    def createPlayerHtml(sessionId: String, session: JsValue, itemJson: JsValue, serviceParams: JsObject, orgOptions: JsValue)(implicit rh: RequestHeader): Html = {
-
-      val scriptInfo = componentScriptInfo(componentTypes(itemJson), jsMode == "dev")
-      println("lalacoco" + componentTypes(itemJson))
+    def createPlayerHtml(sessionId: String, session: JsValue, itemJson: JsValue, serviceParams: JsObject)(implicit rh: RequestHeader): Html = {
+      val colors = (serviceParams \ "colors").asOpt[String].getOrElse("default")
+      val scriptInfo = componentScriptInfo(componentTypes(itemJson), jsMode == "dev", colors)
       val controlsJs = if (showControls) paths(controlsJsSrc) else Seq.empty
       val domainResolvedJs = buildJs(scriptInfo, controlsJs)
       val domainResolvedLess = buildLess(scriptInfo)
-
       val domainResolvedCss = buildCss(scriptInfo)
 
       val processedXhtml = processXhtml((itemJson \ "xhtml").asOpt[String])
@@ -67,7 +66,7 @@ trait Player
           versionInfo,
           newRelicRumConf != None,
           newRelicRumConf.getOrElse(Json.obj()),
-          orgOptions))
+          Json.obj("colors" -> Json.obj())))
 
     }
   }
@@ -125,7 +124,7 @@ trait Player
       handleSuccess { (tuple) =>
         val (session, item) = tuple
         require((session \ "id").asOpt[String].isDefined, "The session model must specify an 'id'")
-        Ok(createPlayerHtml((session \ "id").as[String], session, item, queryParams(mapToJson), Json.obj())).as(ContentTypes.HTML)
+        Ok(createPlayerHtml((session \ "id").as[String], session, item, queryParams(mapToJson))).as(ContentTypes.HTML)
       }
     }
   }
@@ -149,14 +148,15 @@ trait Player
   def createSessionForItem(itemId: String): Action[AnyContent] = Action.async { implicit request =>
     hooks.createSessionForItem(itemId).map {
       handleSuccess { (tuple) =>
-        val (session, item, orgOptions) = tuple
+        val (session, item) = tuple
         require((session \ "id").asOpt[String].isDefined, "The session model must specify an 'id'")
         val call = org.corespring.container.client.controllers.apps.routes.Player.load((session \ "id").as[String])
         val location = {
           val params = queryParams[String]()
           s"${call.url}${if (params.isEmpty) "" else s"?$params"}"
         }
-        Created(createPlayerHtml((session \ "id").as[String], session, item, queryParams(mapToJson), orgOptions))
+        println("KabocaParams" + queryParams(mapToJson))
+        Created(createPlayerHtml((session \ "id").as[String], session, item, queryParams(mapToJson)))
           .as(ContentTypes.HTML)
           .withHeaders(LOCATION -> location)
       }

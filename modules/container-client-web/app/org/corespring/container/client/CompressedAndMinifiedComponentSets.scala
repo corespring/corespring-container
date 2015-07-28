@@ -1,10 +1,13 @@
 package org.corespring.container.client
 
+import javax.xml.bind.DatatypeConverter
+
 import org.corespring.container.client.controllers.DefaultComponentSets
 import org.corespring.container.client.processing.{ CssMinifier, Gzipper, JsMinifier }
 import org.corespring.container.logging.ContainerLogger
 import play.api.Configuration
 import play.api.http.ContentTypes
+import play.api.libs.json.{ JsObject, Json }
 import play.api.mvc.{ Action, EssentialAction, RequestHeader, Result }
 
 trait CompressedAndMinifiedComponentSets extends DefaultComponentSets
@@ -43,13 +46,34 @@ trait CompressedAndMinifiedComponentSets extends DefaultComponentSets
     }
   }
 
-  override def singleResource[A >: EssentialAction](context: String, componentType: String, suffix: String): A = Action { implicit request =>
-    val (body, ct) = generate(context, allComponents.find(_.matchesType(componentType)).toSeq, suffix)
+  override def singleResource[A >: EssentialAction](context: String, componentType: String, suffix: String, resourceToken: String = "default"): A = Action { implicit request =>
+    val colorsJson = resourceToken match {
+      case "default" => Json.obj()
+      case _ =>
+        val decodedColorString = DatatypeConverter.parseBase64Binary(resourceToken).map(_.toChar).mkString
+        try {
+          Json.parse(decodedColorString).as[JsObject]
+        } catch {
+          case _ => Json.obj()
+        }
+    }
+    val (body, ct) = generate(context, allComponents.find(_.matchesType(componentType)).toSeq, suffix, colorsJson)
     process(body, ct)
   }
 
-  override def resource[A >: EssentialAction](context: String, directive: String, suffix: String) = Action { implicit request =>
-    val (body, ct) = generateBodyAndContentType(context, directive, suffix)
+  override def resource[A >: EssentialAction](context: String, directive: String, suffix: String, resourceToken: String = "default") = Action { implicit request =>
+    val colorsJson = resourceToken match {
+      case "default" => Json.obj()
+      case _ =>
+        val decodedColorString = DatatypeConverter.parseBase64Binary(resourceToken).map(_.toChar).mkString
+        try {
+          Json.parse(decodedColorString).as[JsObject]
+        } catch {
+          case _ => Json.obj()
+        }
+    }
+
+    val (body, ct) = generateBodyAndContentType(context, directive, suffix, colorsJson)
     process(body, ct)
   }
 
