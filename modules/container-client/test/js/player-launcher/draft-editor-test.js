@@ -4,6 +4,31 @@ describe('draft-editor', function() {
   var errorCodes = corespring.require('error-codes');
   var onError, editor, DraftEditor;
 
+  var mockChannel;
+
+  function MockChannel() {
+    var callbacks = {};
+    var bindings = {};
+    console.log('new MockChannel');
+    this.send = jasmine.createSpy('send');
+    this.on = function(msg, callback) {
+      callbacks[msg] = callback;
+    };
+    this.delegate = function(from) {
+      return {
+        to: function(to) {
+          bindings[from] = to;
+        }
+      };
+    };
+    this.send = function(msg) {
+      if (bindings[msg]) {
+        callbacks[bindings[msg]]();
+      }
+    };
+    this.remove = function(){};
+  }
+
   beforeEach(function() {
 
     $.ajax = jasmine.createSpy('$.ajax');
@@ -18,6 +43,14 @@ describe('draft-editor', function() {
     };
     onError = jasmine.createSpy('onError');
     DraftEditor = new corespring.require('draft-editor');
+
+    mockChannel = new MockChannel();
+    mockChannel.delegate('saveAll').to('savedAll');
+
+    window.msgr.Channel = function(){
+      return mockChannel;
+    };
+
   });
 
   afterEach(function() {
@@ -29,7 +62,7 @@ describe('draft-editor', function() {
   describe('constructor', function() {
 
     it('calls launcher.init', function() {
-      var editor = new DraftEditor('element', {}, onError);
+      var editor = new DraftEditor('element', {iframe: { contentWindow: {}}}, onError);
       expect(mockLauncher.init).toHaveBeenCalled();
     });
 
@@ -37,23 +70,28 @@ describe('draft-editor', function() {
     describe('loadDraftItem', function() {
       it('calls loadCall(editor)', function() {
         var editor = new DraftEditor('element', {
-          itemId: 'itemId'
+          itemId: 'itemId',
+          iframe: { contentWindow: {} }
         }, onError);
+        editor.init();
         expect(mockLauncher.loadCall).toHaveBeenCalledWith('draftEditor.editor', jasmine.any(Function));
       });
 
       it('calls loadCall(devEditor)', function() {
         var editor = new DraftEditor('element', {
           itemId: 'itemId',
-          devEditor: true
+          devEditor: true,
+          iframe: { contentWindow: {} }
         }, onError);
+        editor.init();
         expect(mockLauncher.loadCall).toHaveBeenCalledWith('draftEditor.devEditor', jasmine.any(Function));
       });
 
       it('triggers an error if there is no call found', function() {
         mockLauncher.loadCall.and.returnValue(null);
         var editor = new DraftEditor('element', {
-          itemId: 'itemId'
+          itemId: 'itemId',
+          iframe: { contentWindow: {} }
         }, onError);
         expect(onError).toHaveBeenCalled();
       });
@@ -61,6 +99,7 @@ describe('draft-editor', function() {
       describe('loadInstance', function() {
 
         function assertLoadInstance(opts, cb) {
+          opts.iframe = { contentWindow: {} };
           return function() {
             var call = {
               method: 'GET',
@@ -75,6 +114,7 @@ describe('draft-editor', function() {
               itemId: 'itemId'
             });
             var editor = new DraftEditor('element', opts, onError);
+            editor.init();
             cb(call, opts);
           };
         }
@@ -181,7 +221,8 @@ describe('draft-editor', function() {
     describe('createItemAndDraft', function() {
 
       it('calls launcher.loadCall(createItemAndDraft)', function() {
-        var editor = new DraftEditor('element', {}, function() {});
+        var editor = new DraftEditor('element', {iframe: {contentWindow: {}}}, function() {});
+        editor.init();
         expect(mockLauncher.loadCall).toHaveBeenCalledWith(
           'draftEditor.createItemAndDraft');
       });
@@ -191,7 +232,8 @@ describe('draft-editor', function() {
           method: 'GET',
           url: 'createItemAndSession'
         });
-        var editor = new DraftEditor('element', {}, function() {});
+        var editor = new DraftEditor('element', {iframe: {contentWindow: {}}}, function() {});
+        editor.init();
         expect($.ajax).toHaveBeenCalledWith({
           type: 'GET',
           url: 'createItemAndSession',
@@ -217,7 +259,8 @@ describe('draft-editor', function() {
           });
         });
 
-        var editor = new DraftEditor('element', {}, onError);
+        var editor = new DraftEditor('element', {iframe: {contentWindow: {}}}, onError);
+        editor.init();
         expect(onError).toHaveBeenCalledWith({
           code: 113,
           msg: 'e'
@@ -242,9 +285,11 @@ describe('draft-editor', function() {
 
           opts = {
             onItemCreated: jasmine.createSpy('onItemCreated'),
-            onDraftCreated: jasmine.createSpy('onDraftCreated')
+            onDraftCreated: jasmine.createSpy('onDraftCreated'),
+            iframe: {contentWindow: {}}
           };
           var editor = new DraftEditor('element', opts, onError);
+          editor.init();
         });
 
         it('calls options.onItemCreated when $.ajax is successful',
@@ -278,7 +323,8 @@ describe('draft-editor', function() {
 
     it('calls commitDraft endpoint', function() {
 
-      var editor = new DraftEditor('element', {}, onError);
+      var editor = new DraftEditor('element', {iframe: { contentWindow: {}}}, onError);
+      editor.init();
       var cb = jasmine.createSpy('cb');
       editor.commitDraft(false, cb);
       expect($.ajax).toHaveBeenCalledWith({
@@ -294,7 +340,8 @@ describe('draft-editor', function() {
     });
 
     it('calls callback with err if the commitDraft endpoint returns an error', function() {
-      var editor = new DraftEditor('element', {}, onError);
+      var editor = new DraftEditor('element', {iframe: { contentWindow: {}}}, onError);
+      editor.init();
       $.ajax.and.callFake(function(opts) {
         opts.error({
           responseJSON: {
@@ -308,7 +355,8 @@ describe('draft-editor', function() {
     });
 
     it('calls callback with no err if the commitDraft endpoint returns success', function() {
-      var editor = new DraftEditor('element', {}, onError);
+      var editor = new DraftEditor('element', {iframe: { contentWindow: {}}}, onError);
+      editor.init();
       $.ajax.and.callFake(function(opts) {
         opts.success();
       });
