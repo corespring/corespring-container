@@ -79,6 +79,39 @@ class ItemDraftTest extends Specification with Mockito {
       }
     }
 
+    "save" should {
+
+      class save(saveResult: JsValue = Json.obj())
+        extends Scope {
+        val draft = new BaseDraft {
+          val hooks: DH = {
+            val m = mock[DH]
+            m.save(anyString, any[JsValue])(any[RequestHeader]) returns Future(Right(saveResult))
+            m
+          }
+        }
+      }
+
+      "fail to save if no json is supplied" in new save() {
+        val result = draft.save("x")(FakeRequest())
+        status(result) must be equalTo(BAD_REQUEST)
+        (contentAsJson(result) \ "error").as[String] must be equalTo(Errors.noJson)
+      }
+
+      val json = Json.obj("this" -> "is", "item" -> "json")
+
+      "return 200 on success" in new save(json) {
+        val result = draft.save("x")(FakeRequest().withJsonBody(json))
+        status(result) must be equalTo(OK)
+      }
+
+      "return result from DraftHooks#save on success" in new save(json) {
+        val result = draft.save("x")(FakeRequest().withJsonBody(json))
+        contentAsJson(result) must be equalTo(json)
+      }
+
+    }
+
     "commit" should {
 
       class commit(commitResult: Future[Either[StatusMessage, JsValue]] = Future(Right(Json.obj()))) extends Scope {
