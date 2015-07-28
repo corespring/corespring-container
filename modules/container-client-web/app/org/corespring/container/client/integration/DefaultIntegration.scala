@@ -31,7 +31,7 @@ trait DefaultIntegration
   with HasConfig
   with HasProcessors {
 
-  val debounceInMillis: Long = configuration.getLong("editor.autosave.debounceInMillis").getOrElse(5000)
+  private[DefaultIntegration] val debounceInMillis: Long = configuration.getLong("editor.autosave.debounceInMillis").getOrElse(5000)
 
   def versionInfo: JsObject
 
@@ -66,18 +66,18 @@ trait DefaultIntegration
   /**
    * Plug isScoreable into the components js server logic.
    */
-  private lazy val mainScoreProcessor = new DefaultScoreProcessor {
+  private[DefaultIntegration] lazy val mainScoreProcessor = new DefaultScoreProcessor {
     override def isComponentScoreable(compType: String, comp: JsValue, session: JsValue, outcome: JsValue): Boolean = {
       val serverLogic = new RhinoServerLogic(compType, scopeBuilder.scope)
       serverLogic.isScoreable(comp, session, outcome)
     }
   }
 
-  override def scoreProcessor: ScoreProcessor = new ScoreProcessorSequence(mainScoreProcessor, CustomScoreProcessor)
+  override lazy val scoreProcessor: ScoreProcessor = new ScoreProcessorSequence(mainScoreProcessor, CustomScoreProcessor)
 
-  private lazy val prodScopeBuilder = new RhinoScopeBuilder(DefaultIntegration.this.components)
+  private[DefaultIntegration] lazy val prodScopeBuilder = new RhinoScopeBuilder(DefaultIntegration.this.components)
 
-  private lazy val prodProcessor = new RhinoOutcomeProcessor(DefaultIntegration.this.components, scopeBuilder.scope)
+  private[DefaultIntegration] lazy val prodProcessor = new RhinoOutcomeProcessor(DefaultIntegration.this.components, scopeBuilder.scope)
 
   private lazy val playerConfig: V2PlayerConfig = V2PlayerConfig(configuration)
 
