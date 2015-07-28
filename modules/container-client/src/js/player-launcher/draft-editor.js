@@ -127,7 +127,7 @@ function EditorDefinition(element, options, errorCallback) {
     };
   }
 
-  $(function() {
+  this.init = function() {
     channel =
       new msgr.Channel(window, options.iframe ? options.iframe.contentWindow : $('iframe')[0].contentWindow, {enableLogging: true});
     channel.on('savedAll', function() {
@@ -136,7 +136,9 @@ function EditorDefinition(element, options, errorCallback) {
         saveCallback = undefined;
       }
     });
-  });
+  };
+
+  $(this.init);
 
   /** Public functions */
   this.forceSave = function(callback) {
