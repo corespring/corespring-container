@@ -57,6 +57,8 @@ trait CatalogHooks extends LoadHook with GetAssetHook with GetSupportingMaterial
 }*/
 
 trait EditorHooks extends LoadHook with AssetHooks
+trait DraftEditorHooks extends EditorHooks
+trait ItemEditorHooks extends EditorHooks
 
 trait CoreItemHooks extends HasContext with LoadHook {
   def delete(id: String)(implicit h: RequestHeader): R[JsValue]

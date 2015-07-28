@@ -7,8 +7,8 @@ import org.corespring.container.components.response.OutcomeProcessor
 import play.api.Configuration
 
 trait HasHooks {
-  def draftEditorHooks: EditorHooks
-  def itemEditorHooks: EditorHooks
+  def draftEditorHooks: DraftEditorHooks
+  def itemEditorHooks: ItemEditorHooks
   def catalogHooks: CatalogHooks
   def playerHooks: PlayerHooks
   def playerLauncherHooks: PlayerLauncherHooks
