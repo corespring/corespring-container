@@ -37,7 +37,7 @@ trait ItemDraft extends CoreItem {
         case Left(sm) => sm
         case Right(json) => Ok(json)
       }}
-      case _ => Future { BadRequest(ItemDraft.Errors.noJson) }
+      case _ => Future { BadRequest(Json.obj("error" -> ItemDraft.Errors.noJson)) }
     }
   }
 
