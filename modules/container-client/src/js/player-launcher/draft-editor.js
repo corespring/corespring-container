@@ -88,7 +88,12 @@ function EditorDefinition(element, options, errorCallback) {
       }
     }
 
-    var instance = launcher.loadInstance(call, options.queryParams, initialData, onReady);
+    var params = options.queryParams;
+    if (options.customColors) {
+      params = params || {};
+      params.colors = window.btoa(JSON.stringify({colors: options.customColors}));
+    }
+    var instance = launcher.loadInstance(call, params, initialData, onReady);
   }
 
   var ok = launcher.init();

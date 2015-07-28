@@ -9,19 +9,6 @@ block header-scripts
 
       NREUM.info!= newRelicRumConfig
 
-  script.
-    var less = {env: "development", globalVars: !{colors}};
-    less.globalVars = less.globalVars || {};
-    var defaultColors = {
-      "incorrect-color":  "#EC971F",
-      "correct-color":  "#3c763d",
-      "partial-color":  "#3a87ad",
-      "warning-color":  "#a94442"
-    };
-    for (var c in defaultColors) {
-      less.globalVars[c] = less.globalVars[c] || defaultColors[c];
-    }
-
 block content
 
   mixin player

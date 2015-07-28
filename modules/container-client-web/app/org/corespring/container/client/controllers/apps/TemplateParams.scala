@@ -84,8 +84,7 @@ case class PlayerTemplateParams(
   sessionJson: JsValue,
   versionInfo: JsValue,
   useNewRelicRum: Boolean,
-  newRelicRumConfig: JsValue,
-  orgOptions: JsValue) extends TemplateParams {
+  newRelicRumConfig: JsValue) extends TemplateParams {
   override def toJadeParams = {
     super.toJadeParams ++ Map(
       "showControls" -> new java.lang.Boolean(showControls),

@@ -1,8 +1,10 @@
 package org.corespring.container.client.controllers.apps
 
+import java.net.URLEncoder
+
 import org.corespring.container.client.component.AllItemTypesReader
 import org.corespring.container.client.controllers.AssetsController
-import org.corespring.container.client.controllers.helpers.JsonHelper
+import org.corespring.container.client.controllers.helpers.{ QueryHelper, JsonHelper }
 import org.corespring.container.client.controllers.jade.Jade
 import org.corespring.container.client.hooks.{ EditorHooks }
 import org.corespring.container.client.hooks.Hooks.StatusMessage
@@ -25,7 +27,8 @@ trait CoreEditor
   with App[EditorHooks]
   with JsonHelper
   with Jade
-  with AssetsController[EditorHooks] {
+  with AssetsController[EditorHooks]
+  with QueryHelper {
 
   override def context: String = "editor"
 
@@ -52,6 +55,8 @@ trait CoreEditor
 
   def servicesJs(id: String, components: JsArray, widgets: JsArray): String
 
+  def removableQueryStringParams = Seq[String]()
+
   def load(id: String): Action[AnyContent] = Action.async { implicit request =>
 
     import org.corespring.container.client.views.html.error
@@ -65,8 +70,11 @@ trait CoreEditor
     }
 
     def onItem(i: JsValue): SimpleResult = {
+      val serviceParams = queryParams(mapToJson)
+      val colors = (serviceParams \ "colors").asOpt[String].getOrElse("default")
+      println("COL:" + colors)
 
-      val scriptInfo = componentScriptInfo(componentTypes(i), jsMode == "dev")
+      val scriptInfo = componentScriptInfo(componentTypes(i), jsMode == "dev", colors)
       val domainResolvedJs = buildJs(scriptInfo)
       val domainResolvedCss = buildCss(scriptInfo)
       val domainResolvedLess = buildLess(scriptInfo)

@@ -6,7 +6,7 @@ import javax.xml.bind.DatatypeConverter
 import org.corespring.container.client.V2PlayerConfig
 import org.corespring.container.client.component.PlayerItemTypeReader
 import org.corespring.container.client.controllers.GetAsset
-import org.corespring.container.client.controllers.helpers.PlayerXhtml
+import org.corespring.container.client.controllers.helpers.{ QueryHelper, PlayerXhtml }
 import org.corespring.container.client.controllers.jade.Jade
 import org.corespring.container.client.hooks.PlayerHooks
 import org.corespring.container.client.views.txt.js.PlayerServices
@@ -20,7 +20,8 @@ trait Player
   extends App[PlayerHooks]
   with PlayerItemTypeReader
   with Jade
-  with GetAsset[PlayerHooks] {
+  with GetAsset[PlayerHooks]
+  with QueryHelper {
 
   private object SessionRenderer {
 
@@ -64,8 +65,7 @@ trait Player
           Json.obj("session" -> session, "item" -> preprocessedItem),
           versionInfo,
           newRelicRumConf != None,
-          newRelicRumConf.getOrElse(Json.obj()),
-          Json.obj("colors" -> Json.obj())))
+          newRelicRumConf.getOrElse(Json.obj())))
 
     }
   }
@@ -91,7 +91,7 @@ trait Player
   /**
    * A set of player query string params, that should be set on the player, but can be removed therafter
    */
-  val playerQueryStringParams = Seq(
+  def removableQueryStringParams = Seq(
 
     /**
      * show a simple submit button
@@ -126,22 +126,6 @@ trait Player
         Ok(createPlayerHtml((session \ "id").as[String], session, item, queryParams(mapToJson))).as(ContentTypes.HTML)
       }
     }
-  }
-
-  def mapToParamString(m: Map[String, String]): String = m.toSeq.map { t =>
-    val (key, value) = t
-    val encodedValue = URLEncoder.encode(value, "utf-8")
-    s"$key=$encodedValue"
-  }.mkString("&")
-
-  def mapToJson(m: Map[String, String]): JsObject = {
-    import play.api.libs.json._
-    Json.toJson(m).asInstanceOf[JsObject]
-  }
-
-  private def queryParams[A](build: (Map[String, String] => A) = mapToParamString _)(implicit rh: RequestHeader): A = {
-    val trimmed = (rh.queryString -- playerQueryStringParams).mapValues(s => s.mkString(""))
-    build(trimmed)
   }
 
   def createSessionForItem(itemId: String): Action[AnyContent] = Action.async { implicit request =>
