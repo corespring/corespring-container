@@ -96,6 +96,14 @@ class FileComponentLoader(paths: Seq[String], showNonReleased: Boolean)
       .find(!_.isEmpty).flatten
   }
 
+  private def loadLess(root: String): Option[String] = {
+    val maybeFiles = Seq("styles.less")
+
+    maybeFiles
+      .map(filename => readMaybeFile(new File(s"${if (root.endsWith("/")) root else s"$root/"}$filename")))
+      .find(!_.isEmpty).flatten
+  }
+
   private def loadLibrary(org: String, packageJson: JsValue)(compRoot: File): Option[Component] = {
 
     def createServerName(n: String) = s"$org.${compRoot.getName}.server${if (n == "index") "" else s".$n"}"
@@ -108,6 +116,7 @@ class FileComponentLoader(paths: Seq[String], showNonReleased: Boolean)
         loadLibrarySources(compRoot.getPath, "client", createClientName(compRoot.getName)),
         loadLibrarySources(compRoot.getPath, "server", createServerName),
         loadCss(s"${compRoot.getPath}/src/client"),
+        loadLess(s"${compRoot.getPath}/src/client"),
         loadLibraries(packageJson)))
   }
 
@@ -121,6 +130,7 @@ class FileComponentLoader(paths: Seq[String], showNonReleased: Boolean)
         released = false,
         client = loadLibrarySources(compRoot.getPath, "client", createClientName(compRoot.getPath)),
         css = loadCss(s"${compRoot.getPath}/src/client"),
+        less = loadLess(s"${compRoot.getPath}/src/client"),
         packageInfo = packageJson))
   }
 
@@ -251,7 +261,8 @@ class FileComponentLoader(paths: Seq[String], showNonReleased: Boolean)
     val renderJs = getJsFromFile(client.getPath + "/render")
     val configureJs = getJsFromFile(client.getPath + "/configure")
     val styleCss = loadCss(client.getPath)
-    Client(renderJs, configureJs, styleCss, renderLibs, configureLibs)
+    val styleLess = loadLess(client.getPath)
+    Client(renderJs, configureJs, styleCss, styleLess, renderLibs, configureLibs)
   }
 
   private def loadServer(server: File): Server = if (!server.exists()) {

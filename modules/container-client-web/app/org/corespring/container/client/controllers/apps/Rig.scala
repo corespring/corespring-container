@@ -6,7 +6,7 @@ import scala.concurrent.{ ExecutionContext, Future }
 
 import org.corespring.container.client.component.PlayerItemTypeReader
 import org.corespring.container.client.controllers.angular.AngularModules
-import org.corespring.container.client.hooks.LoadHook
+import org.corespring.container.client.hooks.{ LoadHook }
 import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.components.model.ComponentInfo
 import play.api.libs.json.{ JsValue, Json }
@@ -57,6 +57,7 @@ trait Rig
       val scriptInfo = componentScriptInfo(comps, jsMode == "dev")
       val js = buildJs(scriptInfo)
       val css = buildCss(scriptInfo)
+      val less = buildLess(scriptInfo)
       val itemJson = Json.prettyPrint(i)
 
       Ok(renderJade(
@@ -64,6 +65,7 @@ trait Rig
           context,
           js,
           css,
+          less,
           jsSrc.ngModules ++ scriptInfo.ngDependencies,
           itemJson)))
     }

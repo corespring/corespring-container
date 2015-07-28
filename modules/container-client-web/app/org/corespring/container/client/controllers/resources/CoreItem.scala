@@ -49,8 +49,8 @@ trait CoreItem extends Controller {
       either =>
         either match {
           case Left(sm) => sm
-          case Right(rawItem) => {
-            Ok(ItemJson(componentTypes, rawItem))
+          case Right(response) => {
+            Ok(ItemJson(componentTypes, response))
               .withHeaders(
                 "Cache-Control" -> noCacheHeader,
                 "Expires" -> "0")

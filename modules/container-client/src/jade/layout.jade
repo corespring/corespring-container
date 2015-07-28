@@ -16,13 +16,15 @@ html(xmlns="http://www.w3.org/1999/html")
     for c in css
       link(rel='stylesheet',href='#{c}')
 
+    for l in less
+      link(rel='stylesheet',href='#{l}')
+
   body(ng-app="corespring-#{appName}", class="corespring-#{appName}-body")
     .pre-loader
       #spinner
 
   .main.hide-body
     block content
-
     for j in js
       script(type='text/javascript', src='#{j}')
 

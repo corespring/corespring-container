@@ -1,0 +1,117 @@
+@correct-color: #3c763d;
+@incorrect-color: #EC971F;
+@partial-color: #3a87ad;
+@warning-color: #a94442;
+@learn-more-color: #008bc9;
+
+@warning-color-border: #ebccd1;
+@warning-color-background: #f2dede;
+
+@warning-character: '\f071';
+@correct-character: '\f058';
+@incorrect-character: '\f057';
+@partial-character: '\f05c';
+
+.correct-input() {
+  border: 1px solid @correct-color;
+  -moz-box-shadow: 0px 0px 6px 0px #3C763D, inset 0px 1px 0px 0px #ECECEC;
+  box-shadow: 0px 0px 6px 0px #3C763D, inset 0px 1px 0px 0px #ECECEC;
+}
+
+.incorrect-input() {
+  border: 1px solid @incorrect-color;
+  -moz-box-shadow: 0px 0px 6px 0px #979797, inset 0px 1px 0px 0px #ECECEC;
+  box-shadow: 0px 0px 6px 0px #979797, inset 0px 1px 0px 0px #ECECEC;
+}
+
+.partial-input() {
+  border: 1px solid @partial-color;
+  -moz-box-shadow: 0px 0px 6px 0px #3A87AD, inset 0px 1px 0px 0px #ECECEC;
+  box-shadow: 0px 0px 6px 0px #3A87AD, inset 0px 1px 0px 0px #ECECEC;
+}
+
+.warning-input() {
+  .warning-border();
+}
+
+.warning-border() {
+  border: 2px solid @warning-color;
+}
+
+.warning-shadow(){
+  -moz-box-shadow: 0px 0px 6px 0px #CE8483, inset 0px 1px 0px 0px #ECECEC;
+  box-shadow: 0px 0px 6px 0px #CE8483, inset 0px 1px 0px 0px #ECECEC;
+}
+.warning-panel(){
+  box-shadow: none;
+  .panel-heading{
+    background:@warning-color-background;
+    border: 1px solid @warning-color-border;
+  }
+  .panel-body{
+    border: 1px solid @warning-color-border;
+  }
+}
+
+.color-panel(@color) {
+  box-shadow: none;
+  .panel-heading {
+    background-color: @color;
+    border: 1px solid @color;
+  }
+
+  .panel-body {
+    border: 1px solid @color;
+  }
+}
+
+
+.rounded-inputs {
+  @border-radius: 4px;
+
+  .select2-choices {
+    border: 1px solid #cccccc;
+    border-radius: @border-radius;
+    background-image: none;
+    box-shadow: inset 0px 1px 0px 0px #ececec;
+  }
+
+  .select2-container.select2-dropdown-open {
+    .select2-choices {
+      border-radius: @border-radius @border-radius 0 0;
+    }
+  }
+
+  .select2-search-choice {
+    margin-top: 6px !important;
+  }
+
+  input[type=text],
+  input[type=number],
+  .mini-wiggi-wiz {
+    width: 100%;
+    min-height: 28px;
+    border-radius: @border-radius;
+    border: 1px solid #cccccc;
+    box-shadow: inset 0px 1px 0px 0px #ececec;
+    margin-bottom: 5px;
+
+    &[disabled] {
+      background-color: #eeeeee;
+    }
+
+    .wiggi-wiz-editable {
+      padding: 6px 12px !important;
+    }
+
+    .toolbar {
+      border-radius: 0 0 @border-radius @border-radius;
+    }
+  }
+
+  input[type=text],
+  input[type=number] {
+    padding: 6px 12px;
+  }
+
+}

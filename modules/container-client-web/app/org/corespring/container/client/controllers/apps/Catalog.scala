@@ -51,12 +51,14 @@ trait Catalog
           val scriptInfo = componentScriptInfo(componentTypes(Json.obj()), jsMode == "dev")
           val domainResolvedJs = buildJs(scriptInfo)
           val domainResolvedCss = buildCss(scriptInfo)
+          val domainResolvedLess = buildCss(scriptInfo)
           Ok(
             renderJade(
               CatalogTemplateParams(
                 context,
                 domainResolvedJs,
                 domainResolvedCss,
+                domainResolvedLess,
                 jsSrc.ngModules ++ scriptInfo.ngDependencies,
                 servicesJs(id),
                 StaticPaths.staticPaths)))

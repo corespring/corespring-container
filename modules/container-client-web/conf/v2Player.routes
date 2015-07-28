@@ -11,9 +11,10 @@ GET           /components/*file                                      controllers
 GET           /public/:orgName/:componentName/*file                  @org.corespring.container.client.controllers.ComponentsFileController.at(orgName, componentName, file)
 
 # Component sets js/css
-GET           /component-sets/:context/:directive.:suffix            @org.corespring.container.client.controllers.ComponentSets.resource(context, directive, suffix)
+GET           /component-sets/:context/:resourceToken/:directive.:suffix            @org.corespring.container.client.controllers.ComponentSets.resource(context, directive, suffix, resourceToken)
+
 # Component single js/css
-GET           /component-single/:context/:componentType.:suffix      @org.corespring.container.client.controllers.ComponentSets.singleResource(context, componentType, suffix)
+GET           /component-single/:context/:resourceToken/:componentType.:suffix      @org.corespring.container.client.controllers.ComponentSets.singleResource(context, componentType, suffix, resourceToken)
 
 # Hooks for the player: config,  components
 

@@ -5,7 +5,7 @@ import org.corespring.container.client.views.txt.js.{ ComponentServerWrapper, Co
 import org.corespring.container.components.model._
 import org.corespring.container.components.model.dependencies.ComponentTypeFilter
 import org.corespring.container.components.model.packaging.ClientSideDependency
-import play.api.libs.json.JsObject
+import play.api.libs.json.{ Json, JsValue, JsObject }
 
 object SourceGenerator {
   object Keys {
@@ -25,6 +25,8 @@ trait SourceGenerator
   def js(components: Seq[Component]): String
 
   def css(components: Seq[Component]): String
+
+  def less(components: Seq[Component], customColors: JsObject = Json.obj()): String
 
   protected def wrapComponent(moduleName: String, directiveName: String, src: String) = {
     ComponentWrapper(moduleName, directiveName, src).toString
@@ -117,6 +119,30 @@ abstract class BaseGenerator
     |$layoutCss
     |$libraryCss
     """.stripMargin
+  }
+
+  override def less(components: Seq[Component], customColors: JsObject = Json.obj()): String = {
+    val fileUrl: java.net.URL = this.getClass().getResource("/public/common.less")
+    val common = scala.io.Source.fromFile(fileUrl.toURI())
+    val commonLess = common.mkString
+    val (libraries, uiComps, layoutComps, widgets) = splitComponents(components)
+    val uiLess = uiComps.map(_.client.less.getOrElse("")).mkString("\n")
+    val widgetLess = widgets.map(_.client.less.getOrElse("")).mkString("\n")
+    val layoutLess = layoutComps.map(_.less.getOrElse("")).mkString("\n")
+    val libraryLess = libraries.map(_.less.getOrElse("")).mkString("\n")
+    val dynamicColors = customColors.asOpt[Map[String, String]] match {
+      case Some(cols) => cols.map { case (a, b) => s"@$a: $b;" }.mkString("\n")
+      case _ => ""
+    }
+    val res = s"""
+    |$commonLess
+    |$dynamicColors
+    |$uiLess
+    |$widgetLess
+    |$layoutLess
+    |$libraryLess
+    """.stripMargin
+    res
   }
 
   override def js(components: Seq[Component]): String = {

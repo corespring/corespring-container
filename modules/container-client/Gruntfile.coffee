@@ -87,9 +87,6 @@ module.exports = (grunt) ->
       directives:
         files: ['<%= common.app %>/**/*.jade']
         tasks: ['directive-templates']
-      components:
-        files: ['<%= common.components %>/**/*.less']
-        tasks: ['component-less']
 
     copy:
       less: copyConfig('less')
@@ -222,8 +219,8 @@ module.exports = (grunt) ->
   grunt.registerTask('write-config', '',writeConfig)
   grunt.registerTask('lcd', ['loadComponentDependencies'])
   grunt.registerTask('loadComponentDependencies', 'Load client side dependencies for the components', componentDependencies(grunt))
-  grunt.registerTask('run', ['mk-css', 'directive-templates','pathReporter', 'component-less', 'watch'])
-  grunt.registerTask('mk-css', ['copy:less', 'less', 'component-less'])
+  grunt.registerTask('run', ['mk-css', 'directive-templates','pathReporter', 'watch'])
+  grunt.registerTask('mk-css', ['copy:less', 'less'])
   grunt.registerTask('default', ['stage'])
   grunt.registerTask('directive-templates', ['jade:directives', 'ngtemplates'])
   grunt.registerTask('test', ['lcd', 'prepPlayerLauncher', 'directive-templates', 'jshint', 'jasmine:unit'])
@@ -270,6 +267,3 @@ module.exports = (grunt) ->
     done = @async()
     runComponentGrunt('version-info', done)
 
-  grunt.registerTask 'component-less', ->
-    done = @async()
-    runComponentGrunt('less', done)

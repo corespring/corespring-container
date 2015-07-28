@@ -1,11 +1,12 @@
 package org.corespring.container.client.controllers.apps
 
 import java.net.URLEncoder
+import javax.xml.bind.DatatypeConverter
 
 import org.corespring.container.client.V2PlayerConfig
 import org.corespring.container.client.component.PlayerItemTypeReader
 import org.corespring.container.client.controllers.GetAsset
-import org.corespring.container.client.controllers.helpers.PlayerXhtml
+import org.corespring.container.client.controllers.helpers.{ QueryHelper, PlayerXhtml }
 import org.corespring.container.client.controllers.jade.Jade
 import org.corespring.container.client.hooks.PlayerHooks
 import org.corespring.container.client.views.txt.js.PlayerServices
@@ -19,7 +20,8 @@ trait Player
   extends App[PlayerHooks]
   with PlayerItemTypeReader
   with Jade
-  with GetAsset[PlayerHooks] {
+  with GetAsset[PlayerHooks]
+  with QueryHelper {
 
   private object SessionRenderer {
 
@@ -36,10 +38,11 @@ trait Player
     }.getOrElse("<div><h1>New Item</h1></div>")
 
     def createPlayerHtml(sessionId: String, session: JsValue, itemJson: JsValue, serviceParams: JsObject)(implicit rh: RequestHeader): Html = {
-
-      val scriptInfo = componentScriptInfo(componentTypes(itemJson), jsMode == "dev")
+      val colors = (serviceParams \ "colors").asOpt[String].getOrElse("default")
+      val scriptInfo = componentScriptInfo(componentTypes(itemJson), jsMode == "dev", colors)
       val controlsJs = if (showControls) paths(controlsJsSrc) else Seq.empty
       val domainResolvedJs = buildJs(scriptInfo, controlsJs)
+      val domainResolvedLess = buildLess(scriptInfo)
       val domainResolvedCss = buildCss(scriptInfo)
 
       val processedXhtml = processXhtml((itemJson \ "xhtml").asOpt[String])
@@ -55,6 +58,7 @@ trait Player
           context,
           domainResolvedJs,
           domainResolvedCss,
+          domainResolvedLess,
           jsSrc.ngModules ++ scriptInfo.ngDependencies,
           servicesJs(sessionId, serviceParams),
           showControls,
@@ -87,7 +91,7 @@ trait Player
   /**
    * A set of player query string params, that should be set on the player, but can be removed therafter
    */
-  val playerQueryStringParams = Seq(
+  def removableQueryStringParams = Seq(
 
     /**
      * show a simple submit button
@@ -124,22 +128,6 @@ trait Player
     }
   }
 
-  def mapToParamString(m: Map[String, String]): String = m.toSeq.map { t =>
-    val (key, value) = t
-    val encodedValue = URLEncoder.encode(value, "utf-8")
-    s"$key=$encodedValue"
-  }.mkString("&")
-
-  def mapToJson(m: Map[String, String]): JsObject = {
-    import play.api.libs.json._
-    Json.toJson(m).asInstanceOf[JsObject]
-  }
-
-  private def queryParams[A](build: (Map[String, String] => A) = mapToParamString _)(implicit rh: RequestHeader): A = {
-    val trimmed = (rh.queryString -- playerQueryStringParams).mapValues(s => s.mkString(""))
-    build(trimmed)
-  }
-
   def createSessionForItem(itemId: String): Action[AnyContent] = Action.async { implicit request =>
     hooks.createSessionForItem(itemId).map {
       handleSuccess { (tuple) =>
@@ -157,7 +145,7 @@ trait Player
     }
   }
 
-  def getFileByItemId(itemId:String, file:String) = Action{ request => hooks.loadItemFile(itemId, file)(request)}
+  def getFileByItemId(itemId: String, file: String) = Action { request => hooks.loadItemFile(itemId, file)(request) }
 
   private def servicesJs(sessionId: String, queryParams: JsObject) = {
     import org.corespring.container.client.controllers.resources.routes._
