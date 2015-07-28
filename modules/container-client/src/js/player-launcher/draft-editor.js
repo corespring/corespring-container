@@ -4,6 +4,10 @@ function EditorDefinition(element, options, errorCallback) {
   var launcher = new Launcher(element, options, errorCallback);
   var errorCodes = require('error-codes');
 
+  var self = this;
+  var saveCallback;
+  var channel;
+
   function createItemAndDraft(callback){
 
     var call = launcher.loadCall('draftEditor.createItemAndDraft');
@@ -123,34 +127,56 @@ function EditorDefinition(element, options, errorCallback) {
     };
   }
 
-  /** Public functions */
-  this.commitDraft = function(force, callback){
-    var call = launcher.loadCall('draftEditor.commitDraft', function(u){
-      return u.replace(':draftId',new DraftId(options.itemId, options.draftName).toString());
-    });
-
-    function onSuccess(result){
-      if(callback){
-        callback(null);
+  this.init = function() {
+    channel =
+      new msgr.Channel(window, options.iframe ? options.iframe.contentWindow : $('iframe')[0].contentWindow, {enableLogging: true});
+    channel.on('savedAll', function() {
+      if (saveCallback) {
+        saveCallback();
+        saveCallback = undefined;
       }
-    }
-
-    function onError(err){
-      var msg = (err.responseJSON && err.responseJSON.error) ? err.responseJSON.error : 'Failed to commit draft: ' + options.draftId;
-      if(callback){
-        callback(errorCodes.COMMIT_DRAFT_FAILED(msg));
-      }
-    }
-
-    $.ajax({
-      type: call.method,
-      url: launcher.prepareUrl(call.url, {force: force}),
-      data: {},
-      success: onSuccess,
-      error: onError,
-      dataType: 'json'
     });
   };
+
+  $(this.init);
+
+  /** Public functions */
+  this.forceSave = function(callback) {
+    saveCallback = callback;
+    channel.send('saveAll');
+  };
+
+  this.commitDraft = function(force, callback) {
+    self.forceSave(function() {
+      var call = launcher.loadCall('draftEditor.commitDraft', function(u){
+        return u.replace(':draftId',new DraftId(options.itemId, options.draftName).toString());
+      });
+
+      function onSuccess(result){
+        if (callback) {
+          saveCallback = callback;
+          callback(null);
+        }
+      }
+
+      function onError(err){
+        var msg = (err.responseJSON && err.responseJSON.error) ? err.responseJSON.error : 'Failed to commit draft: ' + options.draftId;
+        if(callback){
+          callback(errorCodes.COMMIT_DRAFT_FAILED(msg));
+        }
+      }
+
+      $.ajax({
+        type: call.method,
+        url: launcher.prepareUrl(call.url, {force: force}),
+        data: {},
+        success: onSuccess,
+        error: onError,
+        dataType: 'json'
+      });
+    });
+  };
+
 }
 
 module.exports = EditorDefinition;
