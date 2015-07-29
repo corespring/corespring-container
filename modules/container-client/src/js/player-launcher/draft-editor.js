@@ -4,7 +4,6 @@ function EditorDefinition(element, options, errorCallback) {
   var launcher = new Launcher(element, options, errorCallback);
   var errorCodes = require('error-codes');
 
-  var self = this;
   var saveCallback;
   var channel;
 
@@ -147,7 +146,7 @@ function EditorDefinition(element, options, errorCallback) {
   };
 
   this.commitDraft = function(force, callback) {
-    self.forceSave(function() {
+    this.forceSave(function() {
       var call = launcher.loadCall('draftEditor.commitDraft', function(u){
         return u.replace(':draftId',new DraftId(options.itemId, options.draftName).toString());
       });
