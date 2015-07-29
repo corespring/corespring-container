@@ -3,6 +3,7 @@ angular.module('corespring-editor.controllers')
     '$scope',
     '$element',
     '$timeout',
+    'debounce',
     'ItemService',
     'EditorConfig',
     'LogFactory',
@@ -14,10 +15,10 @@ angular.module('corespring-editor.controllers')
     'MathJaxService',
     'WiggiLinkFeatureDef',
     'WiggiMathJaxFeatureDef',
-    'DEBOUNCE_IN_MILLIS',
     function($scope,
       $element,
       $timeout,
+      debounce,
       ItemService,
       EditorConfig,
       LogFactory,
@@ -28,8 +29,7 @@ angular.module('corespring-editor.controllers')
       ScoringHandler,
       MathJaxService,
       WiggiLinkFeatureDef,
-      WiggiMathJaxFeatureDef,
-      DEBOUNCE_IN_MILLIS) {
+      WiggiMathJaxFeatureDef) {
 
       var configPanels = {};
 
@@ -154,7 +154,7 @@ angular.module('corespring-editor.controllers')
         return newModel;
       };
 
-      var debouncedSaveComponents = debounce(function(newValue, oldValue) {
+      var debouncedSaveComponents = debounce(function(newComps, oldComps) {
         saveComponents();
         if (oldComps) {
           $scope.$emit('itemChanged', {
@@ -186,7 +186,7 @@ angular.module('corespring-editor.controllers')
           logger.debug('they are the same - ignore...');
           return;
         }
-        debouncedSaveComponents(newValue,oldValue);
+        debouncedSaveComponents(newComps, oldComps);
       }, true);
 
       $scope.$watch('item.xhtml', function(newValue, oldValue) {
@@ -202,13 +202,6 @@ angular.module('corespring-editor.controllers')
           debouncedSaveSummaryFeedback(newValue, oldValue);
         }
       });
-
-      function debounce(fn) {
-        return _.debounce(fn, DEBOUNCE_IN_MILLIS || 5000, {
-          trailing: true,
-          leading: false
-        });
-      }
 
       ItemService.load(function(item) {
         $scope.item = item;
