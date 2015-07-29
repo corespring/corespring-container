@@ -14,7 +14,7 @@ trait ComponentMaker {
       title = title,
       titleGroup = titleGroup,
       released = released,
-      client = Client("", "", None),
+      client = Client("", "", None, None),
       server = Server(""),
       packageInfo = Json.obj("name" -> name, "org" -> org),
       defaultData = Json.obj(),
@@ -24,16 +24,16 @@ trait ComponentMaker {
   }
 
   def widget(name: String, libs: Seq[Id] = Seq.empty, title: Option[String] = None, titleGroup: Option[String] = None, org: String = defaultOrg) = {
-    Widget(org, name, title, titleGroup, Client("", "", None), true, Json.obj("name" -> name, "org" -> org),
+    Widget(org, name, title, titleGroup, Client("", "", None, None), true, Json.obj("name" -> name, "org" -> org),
       Json.obj(), None, Map(), libs)
   }
 
   def lib(name: String, libraries: Seq[Id] = Seq.empty, org: String = defaultOrg): Library = {
-    Library(org, name, Json.obj("name" -> name), Seq.empty, Seq.empty, None, libraries)
+    Library(org, name, Json.obj("name" -> name), Seq.empty, Seq.empty, None, None, libraries)
   }
 
   def id(name: String, scope: Option[String] = None, org: String = defaultOrg) = Id(org, name, scope)
 
-  def layout(name: String, org: String = defaultOrg) = LayoutComponent(org, name, Seq.empty, None, true, Json.obj("name" -> name, "org" -> org))
+  def layout(name: String, org: String = defaultOrg) = LayoutComponent(org, name, Seq.empty, None, None, true, Json.obj("name" -> name, "org" -> org))
 
 }

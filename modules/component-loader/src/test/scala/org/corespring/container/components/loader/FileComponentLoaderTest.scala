@@ -54,6 +54,7 @@ class FileComponentLoaderTest extends Specification {
       lib.server.map(_.name).contains("corespring.my-lib.server") === true
       lib.server.map(_.name).contains("corespring.my-lib.server.other") === true
       lib.css.get.startsWith("body") mustEqual true
+      lib.less.get.startsWith("body") mustEqual true
     }
 
     "an interaction can specify a library" in {

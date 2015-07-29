@@ -16,7 +16,7 @@ import play.api.templates.Html
 import play.api.test.FakeRequest
 
 import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, Future, ExecutionContext}
+import scala.concurrent.{ Await, Future, ExecutionContext }
 import play.api.test.Helpers._
 
 class CoreEditorTest extends Specification with Mockito {
@@ -25,7 +25,9 @@ class CoreEditorTest extends Specification with Mockito {
 
     override protected def buildJs(scriptInfo: ComponentScriptInfo, extras: Seq[String])(implicit rh: RequestHeader): Seq[String] = Seq.empty
 
-    override protected def buildCss(scriptInfo: ComponentScriptInfo)(implicit rh: RequestHeader): Seq[String] = Seq.empty
+    override protected def buildCss(scriptInfo: ComponentScriptInfo, withComponents: Boolean = false)(implicit rh: RequestHeader): Seq[String] = Seq.empty
+
+    override protected def buildLess(scriptInfo: ComponentScriptInfo)(implicit rh: RequestHeader): Seq[String] = Seq.empty
 
     override def jsSrc: NgSourcePaths = NgSourcePaths(Seq.empty, "", Seq.empty, Seq.empty)
     override def cssSrc: CssSourcePaths = CssSourcePaths(Seq.empty, "", Seq.empty)
@@ -54,9 +56,9 @@ class CoreEditorTest extends Specification with Mockito {
 
     override def mode: Mode = Mode.Dev
 
-    protected var templateParams : TemplateParams = null
+    protected var templateParams: TemplateParams = null
 
-    override def renderJade(params:TemplateParams) : Html = {
+    override def renderJade(params: TemplateParams): Html = {
       templateParams = params
       Html("hi")
     }
@@ -76,7 +78,7 @@ class CoreEditorTest extends Specification with Mockito {
       status(result) === SEE_OTHER
     }
 
-    "pass EditorTemplateParams.options.debounceInMillis to renderJade" in new scope{
+    "pass EditorTemplateParams.options.debounceInMillis to renderJade" in new scope {
       mockHooks.load(any[String])(any[RequestHeader]) returns Future(Right(Json.obj()))
       override def debounceInMillis = 5001
       Await.result(load("id")(r), Duration(1, TimeUnit.SECONDS))
@@ -87,7 +89,7 @@ class CoreEditorTest extends Specification with Mockito {
 
   "toJson" should {
     "convert ComponentInfo to json" in new scope {
-      val componentInfo = Widget("org", "widget", None, None, Client("render", "configure", None), false, Json.obj(
+      val componentInfo = Widget("org", "widget", None, None, Client("render", "configure", None, None), false, Json.obj(
         "external-configuration" -> Json.obj("config" -> "a")), Json.obj("data" -> "data"))
       val json = toJson(componentInfo)
       (json \ "name").as[String] === "widget"

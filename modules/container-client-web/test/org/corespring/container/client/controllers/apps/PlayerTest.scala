@@ -45,7 +45,10 @@ class PlayerTest extends Specification with PlaySpecification with Mockito {
     }
 
     override protected def buildJs(scriptInfo: ComponentScriptInfo, extras: Seq[String])(implicit rh: RequestHeader) = Seq.empty
-    override protected def buildCss(scriptInfo: ComponentScriptInfo)(implicit rh: RequestHeader) = Seq.empty
+
+    override protected def buildCss(scriptInfo: ComponentScriptInfo, withComponents: Boolean = false)(implicit rh: RequestHeader) = Seq.empty
+
+    override protected def buildLess(scriptInfo: ComponentScriptInfo)(implicit rh: RequestHeader) = Seq.empty
 
     override def playerConfig: V2PlayerConfig = V2PlayerConfig(Configuration.empty)
 

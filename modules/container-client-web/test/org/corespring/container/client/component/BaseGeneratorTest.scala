@@ -29,8 +29,8 @@ class BaseGeneratorTest extends Specification with ComponentMaker {
     "with 1 interaction, 1 widget and 1 layout components" in new generatorScope() {
 
       val comps = Seq(
-        uiComp("one", Seq.empty).copy(client = Client("render", "configure", None)),
-        widget("two", Seq.empty).copy(client = Client("render", "configure", None)),
+        uiComp("one", Seq.empty).copy(client = Client("render", "configure", None, None)),
+        widget("two", Seq.empty).copy(client = Client("render", "configure", None, None)),
         layout("three").copy(client = Seq(LibrarySource("a", "a"))))
       generator.js(comps) === generator.buildJsString(
         LocalLibs -> "",
@@ -44,7 +44,7 @@ class BaseGeneratorTest extends Specification with ComponentMaker {
     "work with external srcs" in new generatorScope() {
 
       val comp = uiComp("one", Seq.empty)
-        .copy(client = Client("render", "configure", None),
+        .copy(client = Client("render", "configure", None, None),
           packageInfo = Json.obj(
             "dependencies" -> Json.obj(
               "client" -> Json.obj(
@@ -68,7 +68,7 @@ class BaseGeneratorTest extends Specification with ComponentMaker {
     "only loads libs and dependencies once - if the paths are the same" in new generatorScope() {
 
       val comp = uiComp("one", Seq.empty)
-        .copy(client = Client("render", "configure", None),
+        .copy(client = Client("render", "configure", None, None),
           packageInfo = Json.obj(
             "dependencies" -> Json.obj(
               "client" -> Json.obj(
