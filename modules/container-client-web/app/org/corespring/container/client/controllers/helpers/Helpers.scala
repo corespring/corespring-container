@@ -63,7 +63,7 @@ trait JsonHelper {
 }
 
 trait QueryHelper {
-  def removableQueryStringParams: Seq[String]
+  def removableQueryStringParams: Seq[String] = Seq()
 
   def mapToParamString(m: Map[String, String]): String = m.toSeq.map { t =>
     val (key, value) = t

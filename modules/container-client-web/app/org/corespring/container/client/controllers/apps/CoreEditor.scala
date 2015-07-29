@@ -57,8 +57,6 @@ trait CoreEditor
 
   def servicesJs(id: String, components: JsArray, widgets: JsArray): String
 
-  def removableQueryStringParams = Seq[String]()
-
   def load(id: String): Action[AnyContent] = Action.async { implicit request =>
 
     import org.corespring.container.client.views.html.error
@@ -74,12 +72,9 @@ trait CoreEditor
     def onItem(i: JsValue): SimpleResult = {
       val serviceParams = queryParams(mapToJson)
       val colors = (serviceParams \ "colors").asOpt[String].getOrElse("default")
-      println("COL:" + colors)
-
       val scriptInfo = componentScriptInfo(componentTypes(i), jsMode == "dev", colors)
       val domainResolvedJs = buildJs(scriptInfo)
-      val domainResolvedCss = buildCss(scriptInfo)
-      val domainResolvedLess = buildLess(scriptInfo)
+      val domainResolvedCss = buildCss(scriptInfo) ++ buildLess(scriptInfo)
       val componentsArray: JsArray = JsArray(interactions.map(toJson))
       val widgetsArray: JsArray = JsArray(widgets.map(toJson))
 
@@ -92,7 +87,6 @@ trait CoreEditor
           context,
           domainResolvedJs,
           domainResolvedCss,
-          domainResolvedLess,
           jsSrc.ngModules ++ scriptInfo.ngDependencies,
           servicesJs(id, componentsArray, widgetsArray),
           versionInfo,

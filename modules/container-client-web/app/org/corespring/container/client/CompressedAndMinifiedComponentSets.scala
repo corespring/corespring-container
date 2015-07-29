@@ -47,7 +47,7 @@ trait CompressedAndMinifiedComponentSets extends DefaultComponentSets
   }
 
   override def singleResource[A >: EssentialAction](context: String, componentType: String, suffix: String, resourceToken: String = "default"): A = Action { implicit request =>
-    val colorsJson = resourceToken match {
+    val paramsJson = resourceToken match {
       case "default" => Json.obj()
       case _ =>
         val decodedColorString = DatatypeConverter.parseBase64Binary(resourceToken).map(_.toChar).mkString
@@ -57,12 +57,12 @@ trait CompressedAndMinifiedComponentSets extends DefaultComponentSets
           case _ => Json.obj()
         }
     }
-    val (body, ct) = generate(context, allComponents.find(_.matchesType(componentType)).toSeq, suffix, colorsJson)
+    val (body, ct) = generate(context, allComponents.find(_.matchesType(componentType)).toSeq, suffix, paramsJson)
     process(body, ct)
   }
 
   override def resource[A >: EssentialAction](context: String, directive: String, suffix: String, resourceToken: String = "default") = Action { implicit request =>
-    val colorsJson = resourceToken match {
+    val paramsJson = resourceToken match {
       case "default" => Json.obj()
       case _ =>
         val decodedColorString = DatatypeConverter.parseBase64Binary(resourceToken).map(_.toChar).mkString
@@ -73,7 +73,7 @@ trait CompressedAndMinifiedComponentSets extends DefaultComponentSets
         }
     }
 
-    val (body, ct) = generateBodyAndContentType(context, directive, suffix, colorsJson)
+    val (body, ct) = generateBodyAndContentType(context, directive, suffix, paramsJson)
     process(body, ct)
   }
 

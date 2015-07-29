@@ -42,8 +42,7 @@ trait Player
       val scriptInfo = componentScriptInfo(componentTypes(itemJson), jsMode == "dev", colors)
       val controlsJs = if (showControls) paths(controlsJsSrc) else Seq.empty
       val domainResolvedJs = buildJs(scriptInfo, controlsJs)
-      val domainResolvedLess = buildLess(scriptInfo)
-      val domainResolvedCss = buildCss(scriptInfo)
+      val domainResolvedCss = buildCss(scriptInfo) ++ buildLess(scriptInfo)
 
       val processedXhtml = processXhtml((itemJson \ "xhtml").asOpt[String])
       val preprocessedItem = itemPreProcessor.preProcessItemForPlayer(itemJson).as[JsObject] ++ Json.obj("xhtml" -> processedXhtml)
@@ -58,7 +57,6 @@ trait Player
           context,
           domainResolvedJs,
           domainResolvedCss,
-          domainResolvedLess,
           jsSrc.ngModules ++ scriptInfo.ngDependencies,
           servicesJs(sessionId, serviceParams),
           showControls,
@@ -91,7 +89,7 @@ trait Player
   /**
    * A set of player query string params, that should be set on the player, but can be removed therafter
    */
-  def removableQueryStringParams = Seq(
+  override def removableQueryStringParams = Seq(
 
     /**
      * show a simple submit button

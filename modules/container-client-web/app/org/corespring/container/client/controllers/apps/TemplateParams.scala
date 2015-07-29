@@ -9,8 +9,6 @@ trait TemplateParams {
 
   def css: Seq[String]
 
-  def less: Seq[String]
-
   def componentNgModules: Seq[String]
 
   def ngServiceLogic: String
@@ -20,7 +18,6 @@ trait TemplateParams {
       "appName" -> appName,
       "js" -> js.toArray,
       "css" -> css.toArray,
-      "less" -> less.toArray,
       "componentNgModules" -> s"${componentNgModules.map { m => s"'$m'" }.mkString(",")}",
       "ngServiceLogic" -> ngServiceLogic)
   }
@@ -29,7 +26,6 @@ trait TemplateParams {
 case class CatalogTemplateParams(appName: String,
   js: Seq[String],
   css: Seq[String],
-  less: Seq[String] = Seq(),
   componentNgModules: Seq[String],
   ngServiceLogic: String,
   staticPaths: JsValue) extends TemplateParams {
@@ -45,7 +41,6 @@ case class EditorClientOptions(debounceInMillis: Long, staticPaths: JsObject) {
 case class EditorTemplateParams(appName: String,
   js: Seq[String],
   css: Seq[String],
-  less: Seq[String] = Seq(),
   componentNgModules: Seq[String],
   ngServiceLogic: String,
   versionInfo: JsValue,
@@ -60,14 +55,12 @@ case class EditorTemplateParams(appName: String,
 case class DevEditorTemplateParams(appName: String,
   js: Seq[String],
   css: Seq[String],
-  less: Seq[String] = Seq(),
   componentNgModules: Seq[String],
   ngServiceLogic: String) extends TemplateParams
 
 case class RigTemplateParams(appName: String,
   js: Seq[String],
   css: Seq[String],
-  less: Seq[String] = Seq(),
   componentNgModules: Seq[String],
   itemJson: String) extends TemplateParams {
   override def ngServiceLogic: String = ""
@@ -81,7 +74,6 @@ case class PlayerTemplateParams(
   appName: String,
   js: Seq[String],
   css: Seq[String],
-  less: Seq[String],
   componentNgModules: Seq[String],
   ngServiceLogic: String,
   showControls: Boolean,
