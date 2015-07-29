@@ -5,7 +5,9 @@ describe('QuestionController', function() {
   var ItemService = {
     saveAll: jasmine.createSpy('saveAll'),
     load: jasmine.createSpy('load'),
-    saveComponents: jasmine.createSpy('saveComponents')
+    saveComponents: jasmine.createSpy('saveComponents'),
+    saveXhtml: jasmine.createSpy('saveXhtml'),
+    saveSummaryFeedback: jasmine.createSpy('saveSummaryFeedback')
   };
   var EditorConfig = {
     overrideFeatures: {'override' : 'features'},
@@ -51,6 +53,12 @@ describe('QuestionController', function() {
     });
     $provide.value('WiggiLinkFeatureDef', function(){
         return wiggiLinkFeatureDef;
+    });
+    $provide.value('debounce', function(fn){
+      return function(){
+        var args = Array.prototype.slice.call(arguments);
+        fn.apply(null, args);
+      };
     });
   }));
 
@@ -263,6 +271,47 @@ describe('QuestionController', function() {
     });
 
   });
+
+  describe('$watch item.xhtml', function(){
+    beforeEach(function(){
+      scope.item = {xhtml:""};
+      scope.$digest();
+      ItemService.saveXhtml.calls.reset();
+    });
+    it('should save a change to xhtml', function(){
+      scope.item.xhtml = "abc";
+      scope.$digest();
+      expect(ItemService.saveXhtml).toHaveBeenCalled();
+    });
+  });
+
+  describe('$watch item.summaryFeedback', function(){
+    beforeEach(function(){
+      scope.item = {summaryFeedback:""};
+      scope.$digest();
+      ItemService.saveSummaryFeedback.calls.reset();
+    });
+    it('should save a change to summaryFeedback', function(){
+      scope.item.summaryFeedback = "abc";
+      scope.$digest();
+      expect(ItemService.saveSummaryFeedback).toHaveBeenCalled();
+    });
+  });
+
+  describe('$watch item.components', function(){
+    beforeEach(function(){
+      scope.item = {components:[]};
+      scope.$digest();
+      ItemService.saveComponents.calls.reset();
+    });
+    it('should save a change to summaryFeedback', function(){
+      scope.item.components = [{'a' : 'component'}];
+      scope.$digest();
+      expect(ItemService.saveComponents).toHaveBeenCalled();
+    });
+  });
+
+
 
 
 
