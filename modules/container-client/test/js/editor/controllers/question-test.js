@@ -274,40 +274,56 @@ describe('QuestionController', function() {
 
   describe('$watch item.xhtml', function(){
     beforeEach(function(){
-      scope.item = {xhtml:""};
+      scope.item = {xhtml:"abc"};
       scope.$digest();
       ItemService.saveXhtml.calls.reset();
     });
     it('should save a change to xhtml', function(){
-      scope.item.xhtml = "abc";
+      scope.item.xhtml = "def";
       scope.$digest();
       expect(ItemService.saveXhtml).toHaveBeenCalled();
+    });
+    it('should not save when there was no change', function(){
+      scope.item.xhtml = "abc";
+      scope.$digest();
+      expect(ItemService.saveXhtml).not.toHaveBeenCalled();
     });
   });
 
   describe('$watch item.summaryFeedback', function(){
     beforeEach(function(){
-      scope.item = {summaryFeedback:""};
+      scope.item = {summaryFeedback:"abc"};
       scope.$digest();
       ItemService.saveSummaryFeedback.calls.reset();
     });
     it('should save a change to summaryFeedback', function(){
-      scope.item.summaryFeedback = "abc";
+      scope.item.summaryFeedback = "def";
       scope.$digest();
       expect(ItemService.saveSummaryFeedback).toHaveBeenCalled();
+    });
+
+    it('should not save when there was no change', function(){
+      scope.item.summaryFeedback = "abc";
+      scope.$digest();
+      expect(ItemService.saveSummaryFeedback).not.toHaveBeenCalled();
     });
   });
 
   describe('$watch item.components', function(){
     beforeEach(function(){
-      scope.item = {components:[]};
+      scope.item = {components:[{'a' : 'component'}]};
       scope.$digest();
       ItemService.saveComponents.calls.reset();
     });
-    it('should save a change to summaryFeedback', function(){
-      scope.item.components = [{'a' : 'component'}];
+    it('should save a change to components', function(){
+      scope.item.components = [{'b' : 'component'}];
       scope.$digest();
       expect(ItemService.saveComponents).toHaveBeenCalled();
+    });
+    it('should not save when there was no change ', function(){
+      scope.item.components = [{'a' : 'component'}];
+      scope.$digest();
+      expect(ItemService.saveComponents).not.toHaveBeenCalled();
     });
   });
 
