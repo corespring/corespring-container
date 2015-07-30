@@ -148,6 +148,20 @@ describe('draft-editor', function() {
               jasmine.any(Function));
           }));
 
+        it('calls loadInstance with customColors', assertLoadInstance({
+            customColors: {
+              "incorrect-color": "#ff22aa"
+            }
+          },
+          function(call) {
+            expect(mockLauncher.loadInstance).toHaveBeenCalledWith(
+              jasmine.any(Object),
+              { colors: 'eyJjb2xvcnMiOnsiaW5jb3JyZWN0LWNvbG9yIjoiI2ZmMjJhYSJ9fQ==' },
+              jasmine.any(Object),
+              jasmine.any(Function));
+          })
+        );
+
         it(
           'loadInstance.onReady handler calls instance.css when loading devEditor',
           assertLoadInstance({

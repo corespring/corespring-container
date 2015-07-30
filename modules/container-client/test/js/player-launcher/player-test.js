@@ -89,6 +89,12 @@ describe('player launcher', function() {
 
     });
 
+    it('should pass custom colors', function(){
+      var player = create({ itemId: '1', mode: 'gather', customColors: {"incorrect-color": "#ff22aa"}});
+      expect(mockLauncher.loadInstance).toHaveBeenCalledWith(jasmine.any(Object), {colors: 'eyJjb2xvcnMiOnsiaW5jb3JyZWN0LWNvbG9yIjoiI2ZmMjJhYSJ9fQ=='}, {mode: 'gather', gather: {}});
+    });
+
+
     it('calls loadInstance with mode \'gather\' if it\'s not defined', function(){
       var player = create({ itemId: '1', gather: {} });
       expect(mockLauncher.loadInstance).toHaveBeenCalledWith(jasmine.any(Object), undefined, {mode: 'gather', gather: {}});

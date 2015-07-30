@@ -86,6 +86,10 @@ class ComponentSetsTest extends Specification with ComponentMaker {
       sets.cssUrl("player", Seq(uiComp("name", Seq.empty)), false) === Seq(org.corespring.container.client.controllers.routes.ComponentSets.resource("player", "org[all]", "css", "default").url)
     }
 
+    "return less urls" in {
+      sets.lessUrl("player", Seq(uiComp("name", Seq.empty)), false, "encodedColors") === Seq(org.corespring.container.client.controllers.routes.ComponentSets.resource("player", "org[all]", "less", "encodedColors").url)
+    }
+
     "returns no url if no comps" in {
       sets.jsUrl("editor", Seq.empty, false) === Seq.empty
     }

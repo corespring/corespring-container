@@ -108,6 +108,15 @@ describe('item-editor', function(){
       expect(onItemLoaded).toHaveBeenCalledWith('itemId');
     });
 
+    it('calls loadInstance with customColors', function() {
+      var editor = new Editor('element', {customColors: {"incorrect-color": "#ff22aa"},  itemId: 'itemId'}, onError);
+      expect(mockLauncher.loadInstance).toHaveBeenCalledWith(
+        jasmine.any(Object),
+        {colors: 'eyJjb2xvcnMiOnsiaW5jb3JyZWN0LWNvbG9yIjoiI2ZmMjJhYSJ9fQ=='},
+        jasmine.any(Object),
+        jasmine.any(Function));
+    });
+
     it('calls instance.css when devEditor is true in the onReady callback', function(){
 
       mockLauncher.loadInstance.and.callFake(function(call, qp, init, cb){
