@@ -122,9 +122,8 @@ abstract class BaseGenerator
   }
 
   override def less(components: Seq[Component], customColors: JsObject = Json.obj()): String = {
-    val fileUrl: java.net.URL = this.getClass().getResource("/public/common.less")
-    val common = scala.io.Source.fromFile(fileUrl.toURI())
-    val commonLess = common.mkString
+    val commonLessSource = scala.io.Source.fromURL(this.getClass().getResource("/public/components-common.less"))
+    val commonLess = commonLessSource.mkString
     val (libraries, uiComps, layoutComps, widgets) = splitComponents(components)
     val uiLess = uiComps.map(_.client.less.getOrElse("")).mkString("\n")
     val widgetLess = widgets.map(_.client.less.getOrElse("")).mkString("\n")
