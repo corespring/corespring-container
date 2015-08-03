@@ -3,6 +3,7 @@ angular.module('corespring-editor.controllers')
     '$scope',
     '$element',
     '$timeout',
+    'debounce',
     'ItemService',
     'EditorConfig',
     'LogFactory',
@@ -14,10 +15,10 @@ angular.module('corespring-editor.controllers')
     'MathJaxService',
     'WiggiLinkFeatureDef',
     'WiggiMathJaxFeatureDef',
-    'DEBOUNCE_IN_MILLIS',
     function($scope,
       $element,
       $timeout,
+      debounce,
       ItemService,
       EditorConfig,
       LogFactory,
@@ -28,8 +29,7 @@ angular.module('corespring-editor.controllers')
       ScoringHandler,
       MathJaxService,
       WiggiLinkFeatureDef,
-      WiggiMathJaxFeatureDef,
-      DEBOUNCE_IN_MILLIS) {
+      WiggiMathJaxFeatureDef) {
 
       var configPanels = {};
 
@@ -129,11 +129,17 @@ angular.module('corespring-editor.controllers')
         });
       });
 
+<<<<<<< HEAD
       $scope.$on('saveAll', function(event, data, callback) {
         logger.debug('received \'saveAll\' event');
         ItemService.saveAll($scope.item, function() {
           logger.debug('call \'saveAll\' callback...');
           callback(null, {saved: true});
+=======
+      $scope.$on('saveAll', function() {
+        ItemService.saveAll($scope.item, function() {
+          $scope.$emit('savedAll');
+>>>>>>> develop
         });
       });
 
@@ -156,43 +162,54 @@ angular.module('corespring-editor.controllers')
         return newModel;
       };
 
-      $scope.$watch('item.components', debounce(function(newComps, oldComps) {
+      var debouncedSaveComponents = debounce(function(newComps, oldComps) {
+        saveComponents();
+        if (oldComps) {
+          $scope.$emit('itemChanged', {
+            partChanged: 'components'
+          });
+        }
+      });
+
+      var debouncedSaveXhtml = debounce(function(newValue, oldValue) {
+        ItemService.saveXhtml(newValue);
+        if (oldValue) {
+          $scope.$emit('itemChanged', {
+            partChanged: 'xhtml'
+          });
+        }
+      });
+
+      var debouncedSaveSummaryFeedback = debounce(function(newValue, oldValue) {
+        ItemService.saveSummaryFeedback(newValue);
+        if (oldValue) {
+          $scope.$emit('itemChanged', {
+            partChanged: 'summaryFeedback'
+          });
+        }
+      });
+
+      $scope.$watch('item.components', function(newComps, oldComps) {
         if (_.isEqual(newComps, oldComps)) {
           logger.debug('they are the same - ignore...');
           return;
         }
-        saveComponents();
-        if (oldComps) {
-          $scope.$emit('itemChanged', {partChanged: 'components'});
-        }
-      }), true);
+        debouncedSaveComponents(newComps, oldComps);
+      }, true);
 
-      $scope.$watch('item.xhtml', debounce(function(newValue, oldValue) {
+      $scope.$watch('item.xhtml', function(newValue, oldValue) {
         logger.debug('old', oldValue);
         if (oldValue !== newValue) {
-          ItemService.saveXhtml($scope.item.xhtml);
-          if (oldValue) {
-            $scope.$emit('itemChanged', {partChanged: 'xhtml'});
-          }
+          debouncedSaveXhtml(newValue, oldValue);
         }
-      }));
+      });
 
-      $scope.$watch('item.summaryFeedback', debounce(function(newValue, oldValue) {
+      $scope.$watch('item.summaryFeedback', function(newValue, oldValue) {
         logger.debug('old', oldValue);
         if (oldValue !== newValue) {
-          ItemService.saveSummaryFeedback($scope.item.summaryFeedback);
-          if (oldValue) {
-            $scope.$emit('itemChanged', {partChanged: 'summaryFeedback'});
-          }
+          debouncedSaveSummaryFeedback(newValue, oldValue);
         }
-      }));
-
-      function debounce(fn) {
-        return _.debounce(fn, DEBOUNCE_IN_MILLIS || 5000, {
-          trailing: true,
-          leading: false
-        });
-      }
+      });
 
       ItemService.load(function(item) {
         $scope.item = item;

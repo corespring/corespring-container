@@ -33,6 +33,9 @@ trait ItemDraftHooks
   def itemService: MongoService
 
   lazy val draftFineGrainedSave = fineGrainedSave(draftItemService, processResultJson) _
+  lazy val draftSave = save(draftItemService) _
+
+  override def save(draftId: String, json: JsValue)(implicit request: RequestHeader): Future[Either[(Int, String), JsValue]] = draftSave(draftId, json)
 
   override def save(draftId: String, json: JsValue)(implicit request: RequestHeader): Future[Either[(Int, String), JsValue]] = Future {
     logger.trace(s"save --> $json")

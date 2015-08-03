@@ -30,7 +30,7 @@ describe('draft-editor', function() {
   describe('constructor', function() {
 
     it('calls launcher.init', function() {
-      var editor = new DraftEditor('element', {}, onError);
+      var editor = new DraftEditor('element', {iframe: { contentWindow: {}}}, onError);
       expect(mockLauncher.init).toHaveBeenCalled();
     });
 
@@ -41,6 +41,7 @@ describe('draft-editor', function() {
           itemId: 'itemId',
           iframe: { contentWindow: {} }
         }, onError);
+        editor.init();
         expect(mockLauncher.loadCall).toHaveBeenCalledWith('draftEditor.editor', jasmine.any(Function));
       });
 
@@ -50,6 +51,7 @@ describe('draft-editor', function() {
           devEditor: true,
           iframe: { contentWindow: {} }
         }, onError);
+        editor.init();
         expect(mockLauncher.loadCall).toHaveBeenCalledWith('draftEditor.devEditor', jasmine.any(Function));
       });
 
@@ -80,6 +82,7 @@ describe('draft-editor', function() {
               itemId: 'itemId'
             });
             var editor = new DraftEditor('element', opts, onError);
+            editor.init();
             cb(call, opts);
           };
         }
@@ -254,7 +257,6 @@ describe('draft-editor', function() {
             iframe: {contentWindow: {}}
           };
           var editor = new DraftEditor('element', opts, onError);
-          
         });
 
         it('calls options.onItemCreated when $.ajax is successful',
