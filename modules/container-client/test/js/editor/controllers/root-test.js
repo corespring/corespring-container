@@ -111,10 +111,15 @@ describe('editor root', function() {
       beforeEach(inject(function($rootScope, $compile) {
         iFrame = true;
         render();
+        spyOn(scope, '$broadcast');
       }));
 
       it('should bind to Msgr initialise', function() {
         expect(Msgr.on).toHaveBeenCalledWith('initialise', jasmine.any(Function));
+      });
+
+      it("should bind to Msgr '*'", function() {
+        expect(Msgr.on).toHaveBeenCalledWith('*', jasmine.any(Function));
       });
 
       afterEach(function() {

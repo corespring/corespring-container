@@ -18,6 +18,7 @@ describe('draft-editor', function() {
     };
     onError = jasmine.createSpy('onError');
     DraftEditor = new corespring.require('draft-editor');
+
   });
 
   afterEach(function() {
@@ -37,7 +38,8 @@ describe('draft-editor', function() {
     describe('loadDraftItem', function() {
       it('calls loadCall(editor)', function() {
         var editor = new DraftEditor('element', {
-          itemId: 'itemId'
+          itemId: 'itemId',
+          iframe: { contentWindow: {} }
         }, onError);
         expect(mockLauncher.loadCall).toHaveBeenCalledWith('draftEditor.editor', jasmine.any(Function));
       });
@@ -45,7 +47,8 @@ describe('draft-editor', function() {
       it('calls loadCall(devEditor)', function() {
         var editor = new DraftEditor('element', {
           itemId: 'itemId',
-          devEditor: true
+          devEditor: true,
+          iframe: { contentWindow: {} }
         }, onError);
         expect(mockLauncher.loadCall).toHaveBeenCalledWith('draftEditor.devEditor', jasmine.any(Function));
       });
@@ -53,7 +56,8 @@ describe('draft-editor', function() {
       it('triggers an error if there is no call found', function() {
         mockLauncher.loadCall.and.returnValue(null);
         var editor = new DraftEditor('element', {
-          itemId: 'itemId'
+          itemId: 'itemId',
+          iframe: { contentWindow: {} }
         }, onError);
         expect(onError).toHaveBeenCalled();
       });
@@ -61,6 +65,7 @@ describe('draft-editor', function() {
       describe('loadInstance', function() {
 
         function assertLoadInstance(opts, cb) {
+          opts.iframe = { contentWindow: {} };
           return function() {
             var call = {
               method: 'GET',
@@ -182,6 +187,7 @@ describe('draft-editor', function() {
 
       it('calls launcher.loadCall(createItemAndDraft)', function() {
         var editor = new DraftEditor('element', {}, function() {});
+        
         expect(mockLauncher.loadCall).toHaveBeenCalledWith(
           'draftEditor.createItemAndDraft');
       });
@@ -192,6 +198,7 @@ describe('draft-editor', function() {
           url: 'createItemAndSession'
         });
         var editor = new DraftEditor('element', {}, function() {});
+        
         expect($.ajax).toHaveBeenCalledWith({
           type: 'GET',
           url: 'createItemAndSession',
@@ -218,6 +225,7 @@ describe('draft-editor', function() {
         });
 
         var editor = new DraftEditor('element', {}, onError);
+        
         expect(onError).toHaveBeenCalledWith({
           code: 113,
           msg: 'e'
@@ -242,9 +250,11 @@ describe('draft-editor', function() {
 
           opts = {
             onItemCreated: jasmine.createSpy('onItemCreated'),
-            onDraftCreated: jasmine.createSpy('onDraftCreated')
+            onDraftCreated: jasmine.createSpy('onDraftCreated'),
+            iframe: {contentWindow: {}}
           };
           var editor = new DraftEditor('element', opts, onError);
+          
         });
 
         it('calls options.onItemCreated when $.ajax is successful',
@@ -278,7 +288,12 @@ describe('draft-editor', function() {
 
     it('calls commitDraft endpoint', function() {
 
+      $.ajax.and.callFake(function(opts) {
+          opts.success({});
+        });
+
       var editor = new DraftEditor('element', {}, onError);
+      
       var cb = jasmine.createSpy('cb');
       editor.commitDraft(false, cb);
       expect($.ajax).toHaveBeenCalledWith({
@@ -294,7 +309,12 @@ describe('draft-editor', function() {
     });
 
     it('calls callback with err if the commitDraft endpoint returns an error', function() {
-      var editor = new DraftEditor('element', {}, onError);
+      
+      mockInstance.send.and.callFake(function(e, cb){
+        cb(null);
+      });
+      var editor = new DraftEditor('element', {itemId: 'itemId'}, onError);
+
       $.ajax.and.callFake(function(opts) {
         opts.error({
           responseJSON: {
@@ -308,7 +328,13 @@ describe('draft-editor', function() {
     });
 
     it('calls callback with no err if the commitDraft endpoint returns success', function() {
-      var editor = new DraftEditor('element', {}, onError);
+      
+      mockInstance.send.and.callFake(function(e, cb){
+        cb(null);
+      });
+
+      var editor = new DraftEditor('element', {itemId: 'itemId'}, onError);
+      
       $.ajax.and.callFake(function(opts) {
         opts.success();
       });

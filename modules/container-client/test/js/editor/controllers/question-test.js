@@ -3,6 +3,7 @@ describe('QuestionController', function() {
   var scope, element, rootScope, compile, timeout;
 
   var ItemService = {
+    saveAll: jasmine.createSpy('saveAll'),
     load: jasmine.createSpy('load'),
     saveComponents: jasmine.createSpy('saveComponents')
   };
@@ -240,6 +241,26 @@ describe('QuestionController', function() {
 
     it("should call focusCaretAtEnd on wiggi-wiz element's scope", function() {
       expect(focusCaretAtEnd).toHaveBeenCalled();
+    });
+
+  });
+
+  describe('saveAll event', function() {
+    var callback;
+    var clientCallback;
+    beforeEach(function() {
+      clientCallback = jasmine.createSpy('clientCallback');
+      scope.$emit('saveAll', {}, clientCallback);
+      callback = ItemService.saveAll.calls.mostRecent().args[1];
+    });
+
+    it('should call ItemService#saveAll', function() {
+      expect(ItemService.saveAll).toHaveBeenCalled();
+    });
+
+    it('should call the event caller\'s callback', function() {
+      callback();
+      expect(clientCallback).toHaveBeenCalledWith(null, {saved: true});
     });
 
   });

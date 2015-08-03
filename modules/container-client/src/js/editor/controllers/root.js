@@ -44,6 +44,18 @@ angular.module('corespring-editor.controllers')
       function init() {
         if (iFrameService.isInIFrame() && !iFrameService.bypassIframeLaunchMechanism()) {
           Msgr.on('initialise', onInitialise);
+          
+          Msgr.on('*', function(eventName, data, done){
+            $log.info("[Root.broadcastToChildren] " + eventName);
+            $scope.$broadcast(eventName, data, done);
+          });
+
+          /*Msgr.on('saveAll', function() {
+            $scope.$broadcast('saveAll');
+          });*/
+          /*$scope.$on('savedAll', function() {
+            Msgr.send('savedAll');
+          });*/
           //send msg "ready" to instance
           //this will result in msg "initialise" being sent back to us
           $log.log('sending ready');
