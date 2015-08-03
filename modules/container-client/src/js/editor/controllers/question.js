@@ -129,9 +129,11 @@ angular.module('corespring-editor.controllers')
         });
       });
 
-      $scope.$on('saveAll', function() {
+      $scope.$on('saveAll', function(event, data, callback) {
+        logger.debug('received \'saveAll\' event');
         ItemService.saveAll($scope.item, function() {
-          $scope.$emit('savedAll');
+          logger.debug('call \'saveAll\' callback...');
+          callback(null, {saved: true});
         });
       });
 

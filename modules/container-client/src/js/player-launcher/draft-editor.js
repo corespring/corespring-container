@@ -6,7 +6,7 @@ function EditorDefinition(element, options, errorCallback) {
 
   var self = this;
   var saveCallback;
-  var channel;
+  var instance;
 
   function createItemAndDraft(callback){
 
@@ -92,7 +92,7 @@ function EditorDefinition(element, options, errorCallback) {
       }
     }
 
-    var instance = launcher.loadInstance(call, options.queryParams, initialData, onReady);
+    instance = launcher.loadInstance(call, options.queryParams, initialData, onReady);
   }
 
   var ok = launcher.init();
@@ -127,23 +127,25 @@ function EditorDefinition(element, options, errorCallback) {
     };
   }
 
-  this.init = function() {
-    channel =
+  //this.init = function() {
+    /*channel =
       new msgr.Channel(window, options.iframe ? options.iframe.contentWindow : $('iframe')[0].contentWindow, {enableLogging: true});
     channel.on('savedAll', function() {
       if (saveCallback) {
         saveCallback();
         saveCallback = undefined;
       }
-    });
-  };
+    });*/
+  //};
 
-  $(this.init);
+  //$(this.init);
 
   /** Public functions */
   this.forceSave = function(callback) {
     saveCallback = callback;
-    channel.send('saveAll');
+    instance.send('saveAll', function(){
+      console.log('save all response: ', arguments);
+    });
   };
 
   this.commitDraft = function(force, callback) {
