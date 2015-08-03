@@ -2,7 +2,8 @@ angular.module('corespring-editor.controllers').controller('EditTitlePopupContro
   '$scope',
   '$modalInstance',
   'title',
-  function($scope, $modalInstance, title){
+  '$timeout',
+  function($scope, $modalInstance, title, $timeout){
 
     $scope.title = title;
 
@@ -14,8 +15,47 @@ angular.module('corespring-editor.controllers').controller('EditTitlePopupContro
       $modalInstance.dismiss('cancel') ;
     };
 
-    $scope.selectTitle = function(){
-      $('#title').select();
-    };
+    $scope.$on('edit-title-enter-key', function(){
+      $scope.ok();
+    });
 
+    $modalInstance.opened.then(function(){
+      $scope.ready = true;
+    });
+
+  }]);
+
+angular.module('corespring-editor.controllers')
+.directive('editTitleInput', ['$timeout', function($timeout){
+
+    return {
+      restrict: 'C',
+      link: function($scope, $element){
+        
+        function onKeydown(e){
+          $scope.$apply(function(){
+            if(e.keyCode === 13){
+              e.preventDefault();
+              $scope.$emit('edit-title-enter-key');
+            }
+          });
+        }
+
+        $scope.selectTitle = function(){
+          $timeout(function(){
+            $element.select();
+          });
+        };
+
+        $element
+          .off('keydown')
+          .on('keydown', onKeydown);
+
+        $scope.$watch('ready', function(ready){
+          if(ready){
+            $scope.selectTitle();
+          }
+        });
+      }
+    };
   }]);

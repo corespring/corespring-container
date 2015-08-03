@@ -15,8 +15,9 @@
    * then the metadata will be two-way bound, and the caller is responsible for validation (probably using
    * SupportingMaterialService#validateMetadata).
    */
-  angular.module('corespring-editor.directives').directive('supportingmetadata', ['SupportingMaterialsService',
-    function(SupportingMaterialsService) {
+  angular.module('corespring-editor.directives')
+    .directive('supportingmetadata', ['$timeout','SupportingMaterialsService',
+    function($timeout, SupportingMaterialsService) {
       var otherType = 'Other';
 
       return {
@@ -24,10 +25,11 @@
         scope: {
           metadata: '=ngModel',
           persist: '=',
-          bind: '@'
+          bind: '@',
+          focusTitle: '='
         },
 
-        link: function($scope) {
+        link: function($scope, $element) {
 
           $scope.materialTypes = ['none selected', 'Rubric', 'Scoring Guide', 'Student Materials',
             'Student Work Examples', otherType
@@ -102,6 +104,12 @@
               $scope.textMaterialType = isOther() ? $scope.metadata.materialType : undefined;
             }
             $scope.displayOther = isOther();
+
+            if($scope.focusTitle){
+              $timeout(function(){
+                $element.find('#title').select();
+              });
+            }
 
           };
 

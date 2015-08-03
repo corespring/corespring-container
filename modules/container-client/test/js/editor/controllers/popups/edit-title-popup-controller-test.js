@@ -5,7 +5,12 @@ describe('EditTitlePopupController', function() {
 
   var $modalInstance = {
     close: jasmine.createSpy('close'),
-    dismiss: jasmine.createSpy('dismiss')
+    dismiss: jasmine.createSpy('dismiss'),
+    opened: {
+      then: jasmine.createSpy('opened.then').and.callFake(function(cb){
+        cb();
+      })
+    }
   };
 
   afterEach(function() {
@@ -53,4 +58,62 @@ describe('EditTitlePopupController', function() {
     });
   });
 
+});
+
+describe('editTitleInput', function(){
+
+  var scope, element, keyDownHandler;
+
+  beforeEach(angular.mock.module('corespring-editor.controllers'));
+
+  beforeEach(inject(function($rootScope, $compile) {
+    $.fn.off = jasmine.createSpy('off').and.callFake(function(){
+      return this;
+    });
+    $.fn.on = jasmine.createSpy('on').and.callFake(function(t, handler){
+      keyDownHandler = handler;
+      return this;
+    });
+
+    element = '<input class="edit-title-input" ready="ready" type="text"/>';
+    scope = $rootScope.$new();
+    scope.ready = false;
+    $compile(element)(scope);
+  }));
+
+  describe('initialization', function(){
+
+    it('has selectTitle function', function(){
+      expect(scope.selectTitle).not.toBe(null);
+    });
+  });
+
+  describe('ready', function(){
+    it('calls selectTitle', function(){
+      spyOn(scope, 'selectTitle');
+      scope.ready = true;
+      scope.$digest();
+      expect(scope.selectTitle).toHaveBeenCalled();
+    });
+  });
+
+  describe('keydown', function(){
+
+    it('emits edit-title-enter-key', function(done){
+      setTimeout(function(){
+        var handlers = {
+          on: jasmine.createSpy('on'),
+          preventDefault: jasmine.createSpy('preventDefault')
+        };
+
+        scope.$on('edit-title-enter-key', handlers.on);
+        scope.$digest();
+        keyDownHandler({keyCode: 13, preventDefault: handlers.preventDefault});
+        expect(handlers.on).toHaveBeenCalled();
+        expect(handlers.preventDefault).toHaveBeenCalled();
+        done();
+      }, 400);
+    }); 
+
+  });
 });
