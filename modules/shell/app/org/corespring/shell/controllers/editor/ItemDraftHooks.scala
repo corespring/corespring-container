@@ -14,7 +14,6 @@ import play.api.libs.json._
 import play.api.mvc._
 
 import scala.concurrent.Future
-import scalaz.Success
 
 trait ItemDraftHooks
   extends containerHooks.CoreItemHooks
@@ -33,12 +32,9 @@ trait ItemDraftHooks
   def itemService: MongoService
 
   lazy val draftFineGrainedSave = fineGrainedSave(draftItemService, processResultJson) _
-  lazy val draftSave = save(draftItemService) _
-
-  override def save(draftId: String, json: JsValue)(implicit request: RequestHeader): Future[Either[(Int, String), JsValue]] = draftSave(draftId, json)
 
   override def save(draftId: String, json: JsValue)(implicit request: RequestHeader): Future[Either[(Int, String), JsValue]] = Future {
-    logger.trace(s"save --> $json")
+    logger.trace(s"save json=$json")
 
     val toSave = json.as[JsObject] ++ Json.obj("dateModified" -> Json.obj("$date" -> DateTime.now))
 

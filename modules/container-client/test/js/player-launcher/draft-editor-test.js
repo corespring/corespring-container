@@ -41,7 +41,6 @@ describe('draft-editor', function() {
           itemId: 'itemId',
           iframe: { contentWindow: {} }
         }, onError);
-        editor.init();
         expect(mockLauncher.loadCall).toHaveBeenCalledWith('draftEditor.editor', jasmine.any(Function));
       });
 
@@ -51,7 +50,7 @@ describe('draft-editor', function() {
           devEditor: true,
           iframe: { contentWindow: {} }
         }, onError);
-        editor.init();
+        
         expect(mockLauncher.loadCall).toHaveBeenCalledWith('draftEditor.devEditor', jasmine.any(Function));
       });
 
@@ -82,7 +81,7 @@ describe('draft-editor', function() {
               itemId: 'itemId'
             });
             var editor = new DraftEditor('element', opts, onError);
-            editor.init();
+            
             cb(call, opts);
           };
         }

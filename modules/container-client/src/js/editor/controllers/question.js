@@ -129,17 +129,11 @@ angular.module('corespring-editor.controllers')
         });
       });
 
-<<<<<<< HEAD
       $scope.$on('saveAll', function(event, data, callback) {
         logger.debug('received \'saveAll\' event');
         ItemService.saveAll($scope.item, function() {
           logger.debug('call \'saveAll\' callback...');
           callback(null, {saved: true});
-=======
-      $scope.$on('saveAll', function() {
-        ItemService.saveAll($scope.item, function() {
-          $scope.$emit('savedAll');
->>>>>>> develop
         });
       });
 
