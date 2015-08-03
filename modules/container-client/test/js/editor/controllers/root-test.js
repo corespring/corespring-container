@@ -118,8 +118,8 @@ describe('editor root', function() {
         expect(Msgr.on).toHaveBeenCalledWith('initialise', jasmine.any(Function));
       });
 
-      it("should bind to Msgr 'saveAll'", function() {
-        expect(Msgr.on).toHaveBeenCalledWith('saveAll', jasmine.any(Function));
+      it("should bind to Msgr '*'", function() {
+        expect(Msgr.on).toHaveBeenCalledWith('*', jasmine.any(Function));
       });
 
       afterEach(function() {

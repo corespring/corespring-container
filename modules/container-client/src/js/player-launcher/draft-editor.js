@@ -3,9 +3,6 @@ function EditorDefinition(element, options, errorCallback) {
   var Launcher = require('client-launcher');
   var launcher = new Launcher(element, options, errorCallback);
   var errorCodes = require('error-codes');
-
-  var self = this;
-  var saveCallback;
   var instance;
 
   function createItemAndDraft(callback){
@@ -118,6 +115,7 @@ function EditorDefinition(element, options, errorCallback) {
     }
 
   } else {
+    errorCallback(errorCodes.INITIALISATION_FAILED);
     return;
   }
 
@@ -127,36 +125,27 @@ function EditorDefinition(element, options, errorCallback) {
     };
   }
 
-  //this.init = function() {
-    /*channel =
-      new msgr.Channel(window, options.iframe ? options.iframe.contentWindow : $('iframe')[0].contentWindow, {enableLogging: true});
-    channel.on('savedAll', function() {
-      if (saveCallback) {
-        saveCallback();
-        saveCallback = undefined;
-      }
-    });*/
-  //};
-
-  //$(this.init);
-
   /** Public functions */
   this.forceSave = function(callback) {
-    saveCallback = callback;
-    instance.send('saveAll', function(){
-      console.log('save all response: ', arguments);
+    instance.send('saveAll', function(err, data){
+      callback(err, data);
     });
   };
 
   this.commitDraft = function(force, callback) {
-    self.forceSave(function() {
+    this.forceSave(function(err, data) {
+
+      if(err){
+        callback(err);
+        return;
+      } 
+
       var call = launcher.loadCall('draftEditor.commitDraft', function(u){
         return u.replace(':draftId',new DraftId(options.itemId, options.draftName).toString());
       });
 
       function onSuccess(result){
         if (callback) {
-          saveCallback = callback;
           callback(null);
         }
       }
