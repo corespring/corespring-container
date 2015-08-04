@@ -16,7 +16,7 @@ angular.module('corespring-editor.controllers')
     'EditorConfig',
     '$timeout',
     '$element',
-    'debounce',
+    'EditorChangeWatcher',
     function(
       $filter,
       $http,
@@ -32,7 +32,7 @@ angular.module('corespring-editor.controllers')
       EditorConfig,
       $timeout,
       $element,
-      debounce){
+      EditorChangeWatcher){
 
       $scope.index = parseInt($stateParams.index, 10);
       $scope.editing = false;
@@ -62,22 +62,25 @@ angular.module('corespring-editor.controllers')
         ev.stopPropagation();
       };
 
-      var saveSupportingMaterials = debounce(function(){
+      var saveSupportingMaterials = function(){
         ItemService.saveSupportingMaterials($scope.item.supportingMaterials);
-      });
+      };
 
-      $scope.$watch('item.supportingMaterials', function(newValue, oldValue) {
-        if (newValue) {
+      var watcher = EditorChangeWatcher.makeWatcher(
+          'supportingMaterials',
+          saveSupportingMaterials,
+          $scope);
+
+      $scope.$watch(
+        'item.supportingMaterials', 
+        watcher,
+        true);
+
+      $scope.$watch('item.supportingMaterials', function(newValue){
+        if(newValue){
           updateSupportingMaterialsList($scope.item);
         }
-
-        if (oldValue !== newValue) {
-          saveSupportingMaterials();
-          if (oldValue) {
-            $scope.$emit('itemChanged', {partChanged: 'supportingMaterials'});
-          }
-        }
-      }, true);
+      });
 
       $scope.$watch('supportingMarkup', function(newValue) {
         if ($scope.item) {
@@ -163,7 +166,7 @@ angular.module('corespring-editor.controllers')
         $state.transitionTo('supporting-materials', {
           index: idx
         }, {
-          reload: true
+          reload: true 
         });
       };
 

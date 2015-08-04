@@ -27,6 +27,10 @@
        opts.onItemCreated = function(){
          console.log('onItemCreated', arguments);
        };
+       
+       opts.onItemChanged = function(){
+         console.log('onItemChanged', arguments);
+       };
 
        console.log('opts: ', opts);
 

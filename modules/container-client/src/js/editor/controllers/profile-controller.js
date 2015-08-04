@@ -18,7 +18,7 @@
       'ProfileFormatter',
       'StandardQueryCreator',
       'STATIC_PATHS',
-      'debounce',
+      'EditorChangeWatcher',
       ProfileController
     ]);
 
@@ -37,7 +37,7 @@
     ProfileFormatter,
     StandardQueryCreator,
     STATIC_PATHS,
-    debounce
+    EditorChangeWatcher
   ) {
 
     var $log = LogFactory.getLogger('ProfileController');
@@ -1058,33 +1058,19 @@
     //----------------------------------------------------------------
     // profile load and save
     //----------------------------------------------------------------
-
-    $scope.$watch('item.profile', throttle(function(newValue, oldValue) {
-      if (undefined === oldValue) {
-        return;
-      }
-      if (_.isEqual(oldValue, newValue)) {
-        return;
-      }
-      $scope.saveProfile();
-      $scope.$emit('itemChanged', {
-        partChanged: 'profile'
-      });
-    }), true); //watch nestedProperties
-
-    $scope.saveProfile = debounce(function(){
+    
+    $scope.saveProfile = function(){
       $log.log("saving profile");
       ItemService.saveProfile($scope.item.profile, function(result) {
         $log.log("profile saved result:", result);
       });
-    });
+    };
 
-    /*$scope.saveProfile = debouncedSaveProfile;function() {
-      $log.log("saving profile");
-      ItemService.saveProfile($scope.item.profile, function(result) {
-        $log.log("profile saved result:", result);
-      });
-    };*/
+    $scope.$watch('item.profile', EditorChangeWatcher.makeWatcher(
+      'profile', 
+      $scope.saveProfile,
+      $scope), true);
+
 
     $scope.loadProfile = function() {
       $log.log("loading profile");
