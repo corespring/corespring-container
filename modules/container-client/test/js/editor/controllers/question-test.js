@@ -59,7 +59,8 @@ describe('QuestionController', function() {
     $provide.value('WiggiLinkFeatureDef', function(){
         return wiggiLinkFeatureDef;
     });
-    $provide.value('debounce', org.corespring.mocks.editor.debounce);
+
+    $provide.value('EditorChangeWatcher', new org.corespring.mocks.editor.EditorChangeWatcher());
   }));
 
   afterEach(function() {
