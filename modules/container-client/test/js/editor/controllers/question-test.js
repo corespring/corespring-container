@@ -63,7 +63,6 @@ describe('QuestionController', function() {
     });
 
     $provide.value('EditorChangeWatcher', new org.corespring.mocks.editor.EditorChangeWatcher());
-
   }));
 
   afterEach(function() {
@@ -256,7 +255,6 @@ describe('QuestionController', function() {
     });
 
   });
-
 
   describe('$watch item.xhtml', function(){
     beforeEach(function(){
