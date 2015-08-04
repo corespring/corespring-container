@@ -174,6 +174,13 @@ function EditorDefinition(element, options, errorCallback) {
     });
   };
 
+  this.remove = function() {
+    if(instance){
+      instance.remove();
+    }
+  };
+
+
 }
 
 module.exports = EditorDefinition;
