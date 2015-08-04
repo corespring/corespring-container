@@ -21,16 +21,6 @@ trait ItemHooksHelper {
 
   def passThrough(json: JsObject) = json
 
-  def save(service: MongoService,
-    resultProcessor: JsObject => JsObject = passThrough)(id: String, json: JsValue): Future[Either[(Int, String), JsValue]] = Future {
-    service.save(id, json).map {
-      _ match {
-        case jsObject: JsObject => Some(Right(resultProcessor(jsObject)))
-        case _ => None
-      }
-    }.flatten.getOrElse(Left(BAD_REQUEST -> "Error saving"))
-  }
-
   def fineGrainedSave(service: MongoService, resultProcessor: JsObject => JsObject = passThrough)(id: String, json: JsValue): Future[Either[(Int, String), JsValue]] = Future {
     service.fineGrainedSave(id, json).map {
       result =>

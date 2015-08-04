@@ -5,9 +5,6 @@ function EditorDefinition(element, options, errorCallback) {
   var errorCodes = require('error-codes');
   var instance;
 
-  var saveCallback;
-  var channel;
-
   function createItemAndDraft(callback){
 
     var call = launcher.loadCall('draftEditor.createItemAndDraft');
