@@ -14,7 +14,7 @@ angular.module('corespring-editor.controllers')
     'MathJaxService',
     'WiggiLinkFeatureDef',
     'WiggiMathJaxFeatureDef',
-    'DEBOUNCE_IN_MILLIS',
+    'debounce',
     function($scope,
       $element,
       $timeout,
@@ -29,7 +29,7 @@ angular.module('corespring-editor.controllers')
       MathJaxService,
       WiggiLinkFeatureDef,
       WiggiMathJaxFeatureDef,
-      DEBOUNCE_IN_MILLIS) {
+      debounce) {
 
       var configPanels = {};
 
@@ -129,14 +129,6 @@ angular.module('corespring-editor.controllers')
         });
       });
 
-      // $scope.$on('saveAll', function(event, data, callback) {
-      //   logger.debug('received \'saveAll\' event');
-      //   ItemService.saveAll($scope.item, function() {
-      //     logger.debug('call \'saveAll\' callback...');
-      //     callback(null, {saved: true});
-      //   });
-      // });
-
       $scope.serialize = function(comps) {
         if (!configPanels) {
           return comps;
@@ -186,13 +178,6 @@ angular.module('corespring-editor.controllers')
           }
         }
       }));
-
-      function debounce(fn) {
-        return _.debounce(fn, DEBOUNCE_IN_MILLIS || 5000, {
-          trailing: true,
-          leading: false
-        });
-      }
 
       ItemService.load(function(item) {
         $scope.item = item;
