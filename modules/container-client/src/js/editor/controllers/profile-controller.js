@@ -18,6 +18,7 @@
       'ProfileFormatter',
       'StandardQueryCreator',
       'STATIC_PATHS',
+      'debounce',
       ProfileController
     ]);
 
@@ -35,7 +36,8 @@
     LogFactory,
     ProfileFormatter,
     StandardQueryCreator,
-    STATIC_PATHS
+    STATIC_PATHS,
+    debounce
   ) {
 
     var $log = LogFactory.getLogger('ProfileController');
@@ -1070,12 +1072,19 @@
       });
     }), true); //watch nestedProperties
 
-    $scope.saveProfile = function() {
+    $scope.saveProfile = debounce(function(){
       $log.log("saving profile");
       ItemService.saveProfile($scope.item.profile, function(result) {
         $log.log("profile saved result:", result);
       });
-    };
+    });
+
+    /*$scope.saveProfile = debouncedSaveProfile;function() {
+      $log.log("saving profile");
+      ItemService.saveProfile($scope.item.profile, function(result) {
+        $log.log("profile saved result:", result);
+      });
+    };*/
 
     $scope.loadProfile = function() {
       $log.log("loading profile");
