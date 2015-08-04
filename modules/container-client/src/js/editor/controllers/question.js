@@ -3,10 +3,7 @@ angular.module('corespring-editor.controllers')
     '$scope',
     '$element',
     '$timeout',
-<<<<<<< HEAD
-=======
     'EditorChangeWatcher',
->>>>>>> 0f63444... reload false
     'ItemService',
     'EditorConfig',
     'LogFactory',
@@ -18,14 +15,10 @@ angular.module('corespring-editor.controllers')
     'MathJaxService',
     'WiggiLinkFeatureDef',
     'WiggiMathJaxFeatureDef',
-    'debounce',
     function($scope,
       $element,
       $timeout,
-<<<<<<< HEAD
-=======
       EditorChangeWatcher,
->>>>>>> 0f63444... reload false
       ItemService,
       EditorConfig,
       LogFactory,
@@ -36,8 +29,7 @@ angular.module('corespring-editor.controllers')
       ScoringHandler,
       MathJaxService,
       WiggiLinkFeatureDef,
-      WiggiMathJaxFeatureDef,
-      debounce) {
+      WiggiMathJaxFeatureDef) {
 
       var configPanels = {};
 
