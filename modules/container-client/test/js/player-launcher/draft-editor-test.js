@@ -130,7 +130,8 @@ describe('draft-editor', function() {
                   hash: '/supporting-materials/0'
                 },
                 undefined, {},
-                jasmine.any(Function));
+                jasmine.any(Function),
+                undefined);
             }));
 
         it('calls loadInstance with hash /profile', assertLoadInstance({
@@ -144,7 +145,8 @@ describe('draft-editor', function() {
               },
               undefined,
               jasmine.any(Object),
-              jasmine.any(Function));
+              jasmine.any(Function),
+              undefined);
           }));
 
         it('calls loadInstance with profileConfig', assertLoadInstance({
@@ -160,7 +162,8 @@ describe('draft-editor', function() {
                   profile: 'profile'
                 }
               },
-              jasmine.any(Function));
+              jasmine.any(Function),
+              undefined);
           }));
 
         it('calls loadInstance with showSaveMessage', assertLoadInstance({
@@ -171,7 +174,8 @@ describe('draft-editor', function() {
               jasmine.any(Object),
               undefined,
               { showSaveMessage: true },
-              jasmine.any(Function));
+              jasmine.any(Function),
+              undefined);
           }));
 
         it('calls loadInstance with queryParams', assertLoadInstance({
@@ -185,7 +189,8 @@ describe('draft-editor', function() {
                 a: 'a'
               },
               jasmine.any(Object),
-              jasmine.any(Function));
+              jasmine.any(Function),
+              undefined);
           }));
 
         it(

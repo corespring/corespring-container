@@ -17,7 +17,7 @@ import org.corespring.container.logging.ContainerLogger
 
 import scala.concurrent._
 
-case class ComponentScriptInfo(jsUrl: Seq[String], cssUrl: Seq[String], ngDependencies: Seq[String])
+case class ComponentScriptInfo(jsUrl: Seq[String], cssUrl: Seq[String], lessUrl: Seq[String], ngDependencies: Seq[String])
 
 trait HasLogger {
   def logger: Logger
@@ -99,12 +99,17 @@ trait App[T]
     js.distinct.map(resolvePath)
   }
 
-  protected def buildCss(scriptInfo: ComponentScriptInfo)(implicit rh: RequestHeader) = {
-    val css = paths(cssSrc) ++ cssSrc.otherLibs ++ scriptInfo.cssUrl.toSeq
+  protected def buildLess(scriptInfo: ComponentScriptInfo)(implicit rh: RequestHeader) = {
+    val less = scriptInfo.lessUrl
+    less.map(resolvePath)
+  }
+
+  protected def buildCss(scriptInfo: ComponentScriptInfo, withComponents: Boolean = false)(implicit rh: RequestHeader) = {
+    val css = paths(cssSrc) ++ cssSrc.otherLibs ++ (if (withComponents) scriptInfo.cssUrl else Seq())
     css.map(resolvePath)
   }
 
-  protected def componentScriptInfo(components: Seq[String], separatePaths: Boolean): ComponentScriptInfo = {
+  protected def componentScriptInfo(components: Seq[String], separatePaths: Boolean, customColorsEncoded: Option[String] = None): ComponentScriptInfo = {
 
     val typeIds = components.map {
       t =>
@@ -116,9 +121,10 @@ trait App[T]
     val resolvedComponents = resolveComponents(typeIds, Some(context))
     val jsUrl = urls.jsUrl(context, resolvedComponents, separatePaths)
     val cssUrl = urls.cssUrl(context, resolvedComponents, separatePaths)
+    val lessUrl = urls.lessUrl(context, resolvedComponents, separatePaths, customColorsEncoded)
     val clientSideDependencies = getClientSideDependencies(resolvedComponents)
     val dependencies = ngModules.createAngularModules(resolvedComponents, clientSideDependencies)
-    ComponentScriptInfo(jsUrl, cssUrl, dependencies)
+    ComponentScriptInfo(jsUrl, cssUrl, lessUrl, dependencies)
   }
 
   /** Allow external domains to be configured */

@@ -6,6 +6,7 @@ import play.api.libs.json.{ JsArray, JsValue }
 import play.api.mvc._
 
 import scala.concurrent.Future
+import play.api.libs.json.{ JsValue, Json }
 
 object Hooks {
   type StatusMessage = (Int, String)
@@ -44,7 +45,7 @@ trait LoadHook extends HasContext {
 trait PlayerHooks extends GetAssetHook with HasContext {
   def createSessionForItem(itemId: String)(implicit header: RequestHeader): Future[Either[StatusMessage, (JsValue, JsValue)]]
   def loadSessionAndItem(sessionId: String)(implicit header: RequestHeader): Future[Either[StatusMessage, (JsValue, JsValue)]]
-  def loadItemFile(itemId:String, file:String)(implicit header: RequestHeader) : SimpleResult
+  def loadItemFile(itemId: String, file: String)(implicit header: RequestHeader): SimpleResult
 }
 
 trait CatalogHooks extends LoadHook with GetAssetHook with GetSupportingMaterialAssetHook {
@@ -75,8 +76,8 @@ trait DraftHooks {
   def commit(id: String, force: Boolean)(implicit h: RequestHeader): R[JsValue]
 }
 
-trait CreateItemHook{
-  def createItem(json:Option[JsValue])(implicit h: RequestHeader): R[String]
+trait CreateItemHook {
+  def createItem(json: Option[JsValue])(implicit h: RequestHeader): R[String]
 }
 
 trait SessionHooks extends HasContext {

@@ -91,7 +91,7 @@ function EditorDefinition(element, options, errorCallback) {
       }
     }
 
-    var instance = launcher.loadInstance(call, options.queryParams, initialData, onReady);
+    var instance = launcher.loadInstance(call, options.queryParams, initialData, onReady, options.customColors);
   }
 
   var ok = launcher.init();

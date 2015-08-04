@@ -10,9 +10,10 @@ GET           /images/*file                                          controllers
 GET           /components/*file                                      controllers.Assets.at(path="/container-client/bower_components", file)
 GET           /public/:orgName/:componentName/*file                  @org.corespring.container.client.controllers.ComponentsFileController.at(orgName, componentName, file)
 
-# Component sets js/css
+# Component sets js/css/less
 GET           /component-sets/:context/:directive.:suffix            @org.corespring.container.client.controllers.ComponentSets.resource(context, directive, suffix)
-# Component single js/css
+
+# Component single js/css/ess
 GET           /component-single/:context/:componentType.:suffix      @org.corespring.container.client.controllers.ComponentSets.singleResource(context, componentType, suffix)
 
 # Hooks for the player: config,  components

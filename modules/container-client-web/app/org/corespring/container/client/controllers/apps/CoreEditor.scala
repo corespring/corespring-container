@@ -1,17 +1,19 @@
 package org.corespring.container.client.controllers.apps
 
+import java.net.URLEncoder
+
 import org.corespring.container.client.component.AllItemTypesReader
 import org.corespring.container.client.controllers.AssetsController
-import org.corespring.container.client.controllers.helpers.JsonHelper
+import org.corespring.container.client.controllers.helpers.{ QueryHelper, JsonHelper }
 import org.corespring.container.client.controllers.jade.Jade
-import org.corespring.container.client.hooks.EditorHooks
+import org.corespring.container.client.hooks.{ EditorHooks }
 import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.components.model.ComponentInfo
 import play.api.libs.json._
 import play.api.mvc._
 import v2Player.Routes
 
-object StaticPaths{
+object StaticPaths {
   val assetUrl = Routes.prefix + "/images"
 
   val staticPaths = Json.obj(
@@ -25,13 +27,14 @@ trait CoreEditor
   with App[EditorHooks]
   with JsonHelper
   with Jade
-  with AssetsController[EditorHooks] {
+  with AssetsController[EditorHooks]
+  with QueryHelper {
 
   override def context: String = "editor"
 
   def versionInfo: JsObject
 
-  def debounceInMillis:Long = 5000
+  def debounceInMillis: Long = 5000
 
   protected def toJson(ci: ComponentInfo): JsValue = {
     val tag = tagName(ci.id.org, ci.id.name)
@@ -67,16 +70,17 @@ trait CoreEditor
     }
 
     def onItem(i: JsValue): SimpleResult = {
-      val scriptInfo = componentScriptInfo(componentTypes(i), jsMode == "dev")
+      val serviceParams = queryParams(mapToJson)
+      val colors = (serviceParams \ "colors").asOpt[String]
+      val scriptInfo = componentScriptInfo(componentTypes(i), jsMode == "dev", colors)
       val domainResolvedJs = buildJs(scriptInfo)
-      val domainResolvedCss = buildCss(scriptInfo)
+      val domainResolvedCss = buildCss(scriptInfo) ++ buildLess(scriptInfo)
       val componentsArray: JsArray = JsArray(interactions.map(toJson))
       val widgetsArray: JsArray = JsArray(widgets.map(toJson))
 
       val options = EditorClientOptions(
         debounceInMillis,
-        StaticPaths.staticPaths
-      )
+        StaticPaths.staticPaths)
 
       Ok(renderJade(
         EditorTemplateParams(

@@ -2,6 +2,7 @@ package org.corespring.container.client.controllers.apps
 
 import org.corespring.container.client.component.AllItemTypesReader
 import org.corespring.container.client.controllers.GetAsset
+import org.corespring.container.client.controllers.helpers.QueryHelper
 import org.corespring.container.client.controllers.jade.Jade
 import org.corespring.container.client.hooks.{ LoadHook, CatalogHooks }
 import org.corespring.container.client.hooks.Hooks.StatusMessage
@@ -15,7 +16,8 @@ trait Catalog
   extends AllItemTypesReader
   with App[CatalogHooks]
   with Jade
-  with GetAsset[CatalogHooks] {
+  with GetAsset[CatalogHooks]
+  with QueryHelper {
 
   override def context: String = "catalog"
 
@@ -47,10 +49,11 @@ trait Catalog
 
         def ifEmpty = {
           logger.trace(s"[showCatalog]: $id")
-
+          val serviceParams = queryParams(mapToJson)
+          val colors = (serviceParams \ "colors").asOpt[String].getOrElse("default")
           val scriptInfo = componentScriptInfo(componentTypes(Json.obj()), jsMode == "dev")
           val domainResolvedJs = buildJs(scriptInfo)
-          val domainResolvedCss = buildCss(scriptInfo)
+          val domainResolvedCss = buildCss(scriptInfo) ++ buildLess(scriptInfo)
           Ok(
             renderJade(
               CatalogTemplateParams(

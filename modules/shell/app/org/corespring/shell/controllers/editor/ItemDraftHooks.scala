@@ -106,7 +106,7 @@ trait ItemDraftHooks
     } yield {
       logger.trace(s"draft date modified: $draftDateModified")
       logger.trace(s"item date modified: $itemDateModified")
-      if(itemDateModified == null || draftDateModified == null){
+      if (itemDateModified == null || draftDateModified == null) {
         true
       } else {
         val isEqual = draftDateModified.isEqual(itemDateModified.getMillis)

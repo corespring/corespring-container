@@ -5,6 +5,7 @@ import org.corespring.container.components.model.{ Library, Component }
 import org.corespring.container.components.model.dependencies.{ DependencyResolver, ComponentMaker }
 import org.specs2.mutable.Specification
 import play.api.GlobalSettings
+import play.api.libs.json.{ Json, JsObject }
 import play.api.mvc.{ Action, EssentialAction, SimpleResult }
 import play.api.test.Helpers._
 import play.api.test.{ FakeApplication, FakeRequest }
@@ -16,6 +17,8 @@ class ComponentSetsTest extends Specification with ComponentMaker {
 
   class MockSourceGenerator(name: String) extends SourceGenerator {
     override def css(components: Seq[Component]): String = s"$name - css - ${components.map(_.componentType).mkString(",")}"
+
+    override def less(components: Seq[Component], customColors: JsObject): String = s"$name - less - ${components.map(_.componentType).mkString(",")}"
 
     override def js(components: Seq[Component]): String = s"$name - js - ${components.map(_.componentType).mkString(",")}"
 
@@ -81,6 +84,10 @@ class ComponentSetsTest extends Specification with ComponentMaker {
 
     "return css urls" in {
       sets.cssUrl("player", Seq(uiComp("name", Seq.empty)), false) === Seq(org.corespring.container.client.controllers.routes.ComponentSets.resource("player", "org[all]", "css").url)
+    }
+
+    "return less urls" in {
+      sets.lessUrl("player", Seq(uiComp("name", Seq.empty)), false, None) === Seq(org.corespring.container.client.controllers.routes.ComponentSets.resource("player", "org[all]", "less").url)
     }
 
     "returns no url if no comps" in {

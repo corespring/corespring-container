@@ -40,6 +40,7 @@ object Build extends sbt.Build {
     val logbackClassic = "ch.qos.logback" % "logback-classic" % "1.0.7"
     val logbackCore = "ch.qos.logback" % "logback-core" % "1.0.7"
     val mockito = "org.mockito" % "mockito-all" % "1.9.5" % "test"
+    val lessCss = "org.lesscss" % "lesscss" % "1.7.0.1.1"
     val playS3 = "org.corespring" %% "s3-play-plugin" % "1.1.0"
     val rhinoJs = "org.mozilla" % "rhino" % "1.7R4"
     val scalaz = "org.scalaz" %% "scalaz-core" % "7.0.6"
@@ -185,6 +186,7 @@ object Build extends sbt.Build {
         mockito,
         grizzled,
         htmlCleaner,
+        lessCss,
         scalaz,
         jade4j,
         closureCompiler,

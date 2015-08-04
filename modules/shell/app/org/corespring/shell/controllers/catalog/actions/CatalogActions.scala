@@ -11,6 +11,7 @@ import play.api.libs.json.JsValue
 import play.api.mvc._
 import scalaz.Validation
 import scalaz.Scalaz._
+import play.api.libs.json.{ JsValue, Json }
 
 trait CatalogHooks extends ContainerCatalogHooks {
 

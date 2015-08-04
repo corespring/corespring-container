@@ -1,10 +1,13 @@
 package org.corespring.container.client
 
+import javax.xml.bind.DatatypeConverter
+
 import org.corespring.container.client.controllers.DefaultComponentSets
 import org.corespring.container.client.processing.{ CssMinifier, Gzipper, JsMinifier }
 import org.corespring.container.logging.ContainerLogger
 import play.api.Configuration
 import play.api.http.ContentTypes
+import play.api.libs.json.{ JsObject, Json }
 import play.api.mvc.{ Action, EssentialAction, RequestHeader, Result }
 
 trait CompressedAndMinifiedComponentSets extends DefaultComponentSets
@@ -43,13 +46,32 @@ trait CompressedAndMinifiedComponentSets extends DefaultComponentSets
     }
   }
 
+  private def tokenToJson(token: String): JsObject = {
+    val decodedColorString = DatatypeConverter.parseBase64Binary(token).map(_.toChar).mkString
+    try {
+      Json.parse(decodedColorString).as[JsObject]
+    } catch {
+      case _ => Json.obj()
+    }
+  }
+
   override def singleResource[A >: EssentialAction](context: String, componentType: String, suffix: String): A = Action { implicit request =>
-    val (body, ct) = generate(context, allComponents.find(_.matchesType(componentType)).toSeq, suffix)
+    val resourceToken = request.queryString.get("resourceToken")
+    val paramsJson = resourceToken match {
+      case Some(token) if (token.length > 0) => tokenToJson(token(0))
+      case _ => Json.obj()
+    }
+    val (body, ct) = generate(context, allComponents.find(_.matchesType(componentType)).toSeq, suffix, paramsJson)
     process(body, ct)
   }
 
   override def resource[A >: EssentialAction](context: String, directive: String, suffix: String) = Action { implicit request =>
-    val (body, ct) = generateBodyAndContentType(context, directive, suffix)
+    val resourceToken = request.queryString.get("resourceToken")
+    val paramsJson = resourceToken match {
+      case Some(token) if (token.length > 0) => tokenToJson(token(0))
+      case _ => Json.obj()
+    }
+    val (body, ct) = generateBodyAndContentType(context, directive, suffix, paramsJson)
     process(body, ct)
   }
 
