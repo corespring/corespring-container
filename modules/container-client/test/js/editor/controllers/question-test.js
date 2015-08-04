@@ -3,34 +3,42 @@ describe('QuestionController', function() {
   var scope, element, rootScope, compile, timeout;
 
   var ItemService = {
-    saveAll: jasmine.createSpy('saveAll'),
     load: jasmine.createSpy('load'),
     saveComponents: jasmine.createSpy('saveComponents')
   };
+
   var EditorConfig = {
     overrideFeatures: {'override' : 'features'},
     extraFeatures: {'extra' : 'features'}
   };
+  
   var LogFactory = {
     getLogger: jasmine.createSpy('getLogger').and.returnValue({
       debug: function() {}
     })
   };
+  
   var ComponentImageService = {};
+  
   var ComponentData = {
     registerComponent: jasmine.createSpy('registerComponent'),
     registerPlaceholder: jasmine.createSpy('registerPlaceholder')
   };
+  
   var ComponentPopups = {};
+  
   var AppState = {
     question: {
       preview: undefined
     }
   };
+  
   var ScoringHandler = {};
+  
   var MathJaxService = {};
 
   var wiggiMathJaxFeatureDef = {};
+  
   var wiggiLinkFeatureDef = {};
 
   beforeEach(angular.mock.module('corespring-editor.controllers'));
@@ -45,13 +53,13 @@ describe('QuestionController', function() {
     $provide.value('AppState', AppState);
     $provide.value('ScoringHandler', ScoringHandler);
     $provide.value('MathJaxService', MathJaxService);
-    $provide.value('DEBOUNCE_IN_MILLIS', 0);
     $provide.value('WiggiMathJaxFeatureDef', function(){
         return wiggiMathJaxFeatureDef;
     });
     $provide.value('WiggiLinkFeatureDef', function(){
         return wiggiLinkFeatureDef;
     });
+    $provide.value('debounce', org.corespring.mocks.editor.debounce);
   }));
 
   afterEach(function() {
@@ -244,27 +252,4 @@ describe('QuestionController', function() {
     });
 
   });
-
-  describe('saveAll event', function() {
-    var callback;
-    var clientCallback;
-    beforeEach(function() {
-      clientCallback = jasmine.createSpy('clientCallback');
-      scope.$emit('saveAll', {}, clientCallback);
-      callback = ItemService.saveAll.calls.mostRecent().args[1];
-    });
-
-    it('should call ItemService#saveAll', function() {
-      expect(ItemService.saveAll).toHaveBeenCalled();
-    });
-
-    it('should call the event caller\'s callback', function() {
-      callback();
-      expect(clientCallback).toHaveBeenCalledWith(null, {saved: true});
-    });
-
-  });
-
-
-
 });
