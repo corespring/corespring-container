@@ -90,6 +90,12 @@ function EditorDefinition(element, options, errorCallback) {
     }
 
     instance = launcher.loadInstance(call, options.queryParams, initialData, onReady);
+
+    if(options && typeof(options.onItemChanged) === 'function'){
+      instance.on('itemChanged', function(data){
+        options.onItemChanged(data);
+      });
+    }
   }
 
   var ok = launcher.init();
