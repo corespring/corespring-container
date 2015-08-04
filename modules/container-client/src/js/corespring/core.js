@@ -93,8 +93,6 @@
      */
     this.logic = function(componentType) {
 
-      //console.log("[logic]" + componentType);
-
       serverLogic[componentType] = serverLogic[componentType] || {};
       return serverLogic[componentType];
     };

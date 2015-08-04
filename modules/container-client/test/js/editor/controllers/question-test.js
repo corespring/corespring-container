@@ -255,9 +255,10 @@ describe('QuestionController', function() {
 
   describe('saveAll event', function() {
     var callback;
+    var clientCallback;
     beforeEach(function() {
-      spyOn(scope, '$emit').and.callThrough();
-      scope.$emit('saveAll');
+      clientCallback = jasmine.createSpy('clientCallback');
+      scope.$emit('saveAll', {}, clientCallback);
       callback = ItemService.saveAll.calls.mostRecent().args[1];
     });
 
@@ -265,9 +266,9 @@ describe('QuestionController', function() {
       expect(ItemService.saveAll).toHaveBeenCalled();
     });
 
-    it("should $emit a 'savedAll' event from the callback", function() {
+    it('should call the event caller\'s callback', function() {
       callback();
-      expect(scope.$emit).toHaveBeenCalledWith('savedAll');
+      expect(clientCallback).toHaveBeenCalledWith(null, {saved: true});
     });
 
   });
@@ -326,9 +327,5 @@ describe('QuestionController', function() {
       expect(ItemService.saveComponents).not.toHaveBeenCalled();
     });
   });
-
-
-
-
 
 });

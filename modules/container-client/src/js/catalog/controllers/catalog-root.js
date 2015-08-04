@@ -8,9 +8,7 @@ angular.module('corespring-catalog.controllers')
 
       function preprocessComponents(item) {
         _.each(item.components, function(c, key) {
-          console.log("each", JSON.stringify(c), key);
           var serverLogic = corespring.server.logic(c.componentType);
-          console.log("serverLogic", JSON.stringify(serverLogic));
           if (serverLogic.preprocess) {
             //TODO: This is part of a larger task to add preprocess to the container
             //@see: https://thesib.atlassian.net/browse/CA-842

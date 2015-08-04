@@ -33,9 +33,17 @@ trait ItemDraftHooks
   def itemService: MongoService
 
   lazy val draftFineGrainedSave = fineGrainedSave(draftItemService, processResultJson) _
-  lazy val draftSave = save(draftItemService) _
 
-  override def save(draftId: String, json: JsValue)(implicit request: RequestHeader): Future[Either[(Int, String), JsValue]] = draftSave(draftId, json)
+  override def save(draftId: String, json: JsValue)(implicit request: RequestHeader): Future[Either[(Int, String), JsValue]] = Future {
+    logger.trace(s"save json=$json")
+
+    val toSave = json.as[JsObject] ++ Json.obj("dateModified" -> Json.obj("$date" -> DateTime.now))
+
+    draftItemService.save(draftId, Json.obj("item" -> toSave)) match {
+      case None => Left(BAD_REQUEST -> "Error Saving")
+      case Some(json) => Right(json)
+    }
+  }
 
   override def saveCollectionId(draftId: String, collectionId: String)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] =
     draftFineGrainedSave(draftId, Json.obj("item.collection" -> Json.obj("id" -> collectionId)))
@@ -97,7 +105,7 @@ trait ItemDraftHooks
       _ <- Some(logger.debug(s"draftItem=$draftItem"))
       draftDateModified <- Some(draftItem.get("dateModified").asInstanceOf[DateTime])
       _ <- Some(logger.debug(s"draftDateModified=$draftDateModified"))
-      itemId <- Some(draftItem.get("_id").asInstanceOf[ObjectId])
+      itemId <- Some(draftId.itemId)
       _ <- Some(logger.debug(s"itemId=$itemId"))
       item <- itemService.collection.findOneByID(itemId, MongoDBObject("dateModified" -> 1))
       _ <- Some(logger.debug(s"item=$item"))
@@ -106,7 +114,7 @@ trait ItemDraftHooks
     } yield {
       logger.trace(s"draft date modified: $draftDateModified")
       logger.trace(s"item date modified: $itemDateModified")
-      if(itemDateModified == null || draftDateModified == null){
+      if (itemDateModified == null || draftDateModified == null) {
         true
       } else {
         val isEqual = draftDateModified.isEqual(itemDateModified.getMillis)
@@ -121,18 +129,18 @@ trait ItemDraftHooks
     logger.debug(s"commit draftId=$draftId, force=$force")
     draftItemService.load(draftId).map { draft =>
       val item = (draft \ "item").as[JsObject]
-      val itemId = (item \ "_id" \ "$oid").as[String]
+      logger.trace(s"commit item: ${item}")
+      val itemId = (draft \ "_id" \ "itemId" \ "$oid").as[String] //draftId.itemId
 
       if (okToCommit(draftId) || force) {
         val updatedItem = item ++ Json.obj("dateModified" -> Json.obj("$date" -> new DateTime().getMillis()))
-        itemService.save(itemId, updatedItem)
-        assets.copyDraftToItem(draftId.toString, itemId)
+        itemService.save(itemId.toString, updatedItem)
+        assets.copyDraftToItem(draftId.toString, itemId.toString)
         delete(draftId)
-        Right(Json.obj("itemId" -> itemId, "draftId" -> draftId))
+        Right(Json.obj("itemId" -> itemId.toString, "draftId" -> draftId))
       } else {
         Left(CONFLICT, "There has been a new commit since this draft was created")
       }
-
     }.getOrElse {
       Left((NOT_FOUND, s"Can't find draft by id: $draftId"))
     }
