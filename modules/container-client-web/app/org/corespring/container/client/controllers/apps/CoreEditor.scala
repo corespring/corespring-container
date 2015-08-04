@@ -71,7 +71,7 @@ trait CoreEditor
 
     def onItem(i: JsValue): SimpleResult = {
       val serviceParams = queryParams(mapToJson)
-      val colors = (serviceParams \ "colors").asOpt[String].getOrElse("default")
+      val colors = (serviceParams \ "colors").asOpt[String]
       val scriptInfo = componentScriptInfo(componentTypes(i), jsMode == "dev", colors)
       val domainResolvedJs = buildJs(scriptInfo)
       val domainResolvedCss = buildCss(scriptInfo) ++ buildLess(scriptInfo)

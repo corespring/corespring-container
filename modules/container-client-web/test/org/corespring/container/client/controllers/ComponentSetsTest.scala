@@ -39,12 +39,12 @@ class ComponentSetsTest extends Specification with ComponentMaker {
       override def components: Seq[Component] = allComponents
     }
 
-    override def resource[A >: EssentialAction](context: String, directive: String, suffix: String, resourceToken: String = "default"): A = Action {
+    override def resource[A >: EssentialAction](context: String, directive: String, suffix: String): A = Action {
       val (body, ct) = generateBodyAndContentType(context, directive, suffix)
       Ok(body).as(ct)
     }
 
-    override def singleResource[A >: EssentialAction](context: String, componentType: String, suffix: String, resourceToken: String = "default"): A = Action {
+    override def singleResource[A >: EssentialAction](context: String, componentType: String, suffix: String): A = Action {
       val (body, ct) = generate(context, Seq.empty, suffix)
       Ok(body).as(ct)
     }
@@ -71,23 +71,23 @@ class ComponentSetsTest extends Specification with ComponentMaker {
     }
 
     "return js urls" in {
-      sets.jsUrl("editor", Seq(uiComp("name", Seq.empty)), false) === Seq(org.corespring.container.client.controllers.routes.ComponentSets.resource("editor", "org[all]", "js", "default").url)
+      sets.jsUrl("editor", Seq(uiComp("name", Seq.empty)), false) === Seq(org.corespring.container.client.controllers.routes.ComponentSets.resource("editor", "org[all]", "js").url)
     }
 
     "return js urls as a single resource" in {
-      sets.jsUrl("editor", Seq(uiComp("name", Seq.empty)), true) === Seq(org.corespring.container.client.controllers.routes.ComponentSets.singleResource("editor", "org-name", "js", "default").url)
+      sets.jsUrl("editor", Seq(uiComp("name", Seq.empty)), true) === Seq(org.corespring.container.client.controllers.routes.ComponentSets.singleResource("editor", "org-name", "js").url)
     }
 
     "return js urls" in {
-      sets.jsUrl("editor", Seq(uiComp("name", Seq.empty)), false) === Seq(org.corespring.container.client.controllers.routes.ComponentSets.resource("editor", "org[all]", "js", "default").url)
+      sets.jsUrl("editor", Seq(uiComp("name", Seq.empty)), false) === Seq(org.corespring.container.client.controllers.routes.ComponentSets.resource("editor", "org[all]", "js").url)
     }
 
     "return css urls" in {
-      sets.cssUrl("player", Seq(uiComp("name", Seq.empty)), false) === Seq(org.corespring.container.client.controllers.routes.ComponentSets.resource("player", "org[all]", "css", "default").url)
+      sets.cssUrl("player", Seq(uiComp("name", Seq.empty)), false) === Seq(org.corespring.container.client.controllers.routes.ComponentSets.resource("player", "org[all]", "css").url)
     }
 
     "return less urls" in {
-      sets.lessUrl("player", Seq(uiComp("name", Seq.empty)), false, "encodedColors") === Seq(org.corespring.container.client.controllers.routes.ComponentSets.resource("player", "org[all]", "less", "encodedColors").url)
+      sets.lessUrl("player", Seq(uiComp("name", Seq.empty)), false, None) === Seq(org.corespring.container.client.controllers.routes.ComponentSets.resource("player", "org[all]", "less").url)
     }
 
     "returns no url if no comps" in {

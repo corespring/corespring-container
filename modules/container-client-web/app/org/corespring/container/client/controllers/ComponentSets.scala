@@ -27,9 +27,9 @@ trait ComponentSets extends Controller with ComponentUrls {
 
   def dependencyResolver: DependencyResolver
 
-  def resource[A >: EssentialAction](context: String, directive: String, suffix: String, resourceToken: String = "default"): A
+  def resource[A >: EssentialAction](context: String, directive: String, suffix: String): A
 
-  def singleResource[A >: EssentialAction](context: String, componentType: String, suffix: String, resourceToken: String = "default"): A
+  def singleResource[A >: EssentialAction](context: String, componentType: String, suffix: String): A
 
   protected final def generate(context: String, resolvedComponents: Seq[Component], suffix: String, parameters: JsObject = Json.obj()): (String, String) = {
 
@@ -70,29 +70,34 @@ trait ComponentSets extends Controller with ComponentUrls {
 
   override def cssUrl(context: String, components: Seq[Component], separatePaths: Boolean): Seq[String] = url(context, components, "css", separatePaths)
 
-  override def lessUrl(context: String, components: Seq[Component], separatePaths: Boolean, encodedCustomColors: String): Seq[String] = url(context, components, "less", separatePaths, encodedCustomColors)
+  override def lessUrl(context: String, components: Seq[Component], separatePaths: Boolean, encodedCustomColors: Option[String]): Seq[String] = url(context, components, "less", separatePaths, encodedCustomColors)
 
   override def jsUrl(context: String, components: Seq[Component], separatePaths: Boolean): Seq[String] = url(context, components, "js", separatePaths)
 
-  private def url(context: String, components: Seq[Component], suffix: String, separatePaths: Boolean, resourceToken: String = "default"): Seq[String] = {
-
+  private def url(context: String, components: Seq[Component], suffix: String, separatePaths: Boolean, resourceToken: Option[String] = None): Seq[String] = {
     require(allComponents.length > 0, "Can't load components")
 
     if (separatePaths) {
       val resolvedComponents = dependencyResolver.resolveComponents(components.map(_.id), Some(context))
-      resolvedComponents.map { c => routes.ComponentSets.singleResource(context, c.componentType, suffix, resourceToken).url }
+      resolvedComponents.map { c =>
+        routes.ComponentSets.singleResource(context, c.componentType, suffix).url + (resourceToken match {
+          case Some(token) => s"?resourceToken=$token"
+          case None => ""
+        })
+      }
     } else {
       components match {
         case Nil => Seq.empty
         case _ => {
           ComponentUrlDirective.unapply(components.map(_.componentType), allComponents).map { path =>
-            routes.ComponentSets.resource(context, path, suffix, resourceToken).url
+            routes.ComponentSets.resource(context, path, suffix).url + (resourceToken match {
+              case Some(token) => s"?resourceToken=$token"
+              case None => ""
+            })
           }.toSeq
         }
       }
-
     }
-
   }
 }
 

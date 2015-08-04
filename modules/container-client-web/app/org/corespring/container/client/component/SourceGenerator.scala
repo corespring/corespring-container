@@ -6,6 +6,7 @@ import org.corespring.container.components.model._
 import org.corespring.container.components.model.dependencies.ComponentTypeFilter
 import org.corespring.container.components.model.packaging.ClientSideDependency
 import play.api.libs.json.{ Json, JsValue, JsObject }
+import org.apache.commons.io.IOUtils
 
 object SourceGenerator {
   object Keys {
@@ -122,7 +123,9 @@ abstract class BaseGenerator
   }
 
   override def less(components: Seq[Component], customColors: JsObject = Json.obj()): String = {
-    val commonLessSource = scala.io.Source.fromURL(this.getClass().getResource("/public/components-common.less"))
+    val inputStream = this.getClass().getResourceAsStream("/public/components-common.less")
+    val commonLessSource = IOUtils.toString(inputStream)
+    inputStream.close
     val commonLess = commonLessSource.mkString
     val (libraries, uiComps, layoutComps, widgets) = splitComponents(components)
     val uiLess = uiComps.map(_.client.less.getOrElse("")).mkString("\n")
@@ -133,7 +136,7 @@ abstract class BaseGenerator
       case Some(cols) => cols.map { case (a, b) => s"@$a: $b;" }.mkString("\n")
       case _ => ""
     }
-    val res = s"""
+    s"""
     |$commonLess
     |$dynamicColors
     |$uiLess
@@ -141,7 +144,6 @@ abstract class BaseGenerator
     |$layoutLess
     |$libraryLess
     """.stripMargin
-    res
   }
 
   override def js(components: Seq[Component]): String = {

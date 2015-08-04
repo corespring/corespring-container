@@ -140,10 +140,14 @@ function ClientLauncher(element, options, errorCallback){
    * @param initialData an object that will be sent to the instance 'initialise' handler
    * @param onReady called when instance is ready - function(instance){};
    */
-  this.loadInstance = function(call, params, initialData, onReady){
+  this.loadInstance = function(call, params, initialData, onReady, customColors){
 
     call = (typeof(call) === 'string') ? { method: 'GET', url: call} : call;
-    params = this.buildParams(params); 
+    params = this.buildParams(params);
+    if (customColors) {
+      params = params || {};
+      params.colors = window.btoa(JSON.stringify({colors: customColors}));
+    }
     var instance = new InstanceDef($.extend(call, {params: params}), element, errorCallback, logger);
 
     instance.on('launch-error', function (data) {

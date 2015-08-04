@@ -71,14 +71,14 @@ describe('item-editor', function(){
     it('calls launcher.loadInstance', function(){
       var editor = new Editor('element', {itemId: 'itemId'}, onError);
       expect(mockLauncher.loadInstance)
-      .toHaveBeenCalledWith({method: 'GET', url: 'itemEditor.editor'}, undefined, {}, jasmine.any(Function));
+      .toHaveBeenCalledWith({method: 'GET', url: 'itemEditor.editor'}, undefined, {}, jasmine.any(Function), undefined);
     });
 
     it('calls launcher.loadInstance with hash set to profile', function(){
       var editor = new Editor('element', {selectedTab: 'profile', itemId: 'itemId'}, onError);
       expect(mockLauncher.loadInstance)
         .toHaveBeenCalledWith({method: 'GET', url: 'itemEditor.editor', hash: '/profile'},
-        undefined, jasmine.any(Object), jasmine.any(Function));
+        undefined, jasmine.any(Object), jasmine.any(Function), undefined);
     });
 
     it('calls launcher.loadInstance with hash set to supporting-materials', function(){
@@ -86,7 +86,7 @@ describe('item-editor', function(){
       expect(mockLauncher.loadInstance)
         .toHaveBeenCalledWith(
           {method: 'GET', url: 'itemEditor.editor', hash: '/supporting-materials/0'},
-           undefined, jasmine.any(Object), jasmine.any(Function));
+           undefined, jasmine.any(Object), jasmine.any(Function), undefined);
     });
 
     it('calls launcher.loadInstance with showSaveMessage ', function(){
@@ -94,7 +94,7 @@ describe('item-editor', function(){
       expect(mockLauncher.loadInstance)
         .toHaveBeenCalledWith(
           {method: 'GET', url: 'itemEditor.editor'},
-           undefined, {showSaveMessage: true}, jasmine.any(Function));
+           undefined, {showSaveMessage: true}, jasmine.any(Function), undefined);
     });
 
     it('calls options.onItemLoaded in the onReady callback', function(){
@@ -106,15 +106,6 @@ describe('item-editor', function(){
       var onItemLoaded = jasmine.createSpy('onItemLoaded');
       var editor = new Editor('element', {onItemLoaded: onItemLoaded, itemId: 'itemId'}, onError);
       expect(onItemLoaded).toHaveBeenCalledWith('itemId');
-    });
-
-    it('calls loadInstance with customColors', function() {
-      var editor = new Editor('element', {customColors: {"incorrect-color": "#ff22aa"},  itemId: 'itemId'}, onError);
-      expect(mockLauncher.loadInstance).toHaveBeenCalledWith(
-        jasmine.any(Object),
-        {colors: 'eyJjb2xvcnMiOnsiaW5jb3JyZWN0LWNvbG9yIjoiI2ZmMjJhYSJ9fQ=='},
-        jasmine.any(Object),
-        jasmine.any(Function));
     });
 
     it('calls instance.css when devEditor is true in the onReady callback', function(){

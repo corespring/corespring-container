@@ -46,33 +46,31 @@ trait CompressedAndMinifiedComponentSets extends DefaultComponentSets
     }
   }
 
-  override def singleResource[A >: EssentialAction](context: String, componentType: String, suffix: String, resourceToken: String = "default"): A = Action { implicit request =>
+  private def tokenToJson(token: String): JsObject = {
+    val decodedColorString = DatatypeConverter.parseBase64Binary(token).map(_.toChar).mkString
+    try {
+      Json.parse(decodedColorString).as[JsObject]
+    } catch {
+      case _ => Json.obj()
+    }
+  }
+
+  override def singleResource[A >: EssentialAction](context: String, componentType: String, suffix: String): A = Action { implicit request =>
+    val resourceToken = request.queryString.get("resourceToken")
     val paramsJson = resourceToken match {
-      case "default" => Json.obj()
-      case _ =>
-        val decodedColorString = DatatypeConverter.parseBase64Binary(resourceToken).map(_.toChar).mkString
-        try {
-          Json.parse(decodedColorString).as[JsObject]
-        } catch {
-          case _ => Json.obj()
-        }
+      case Some(token) if (token.length > 0) => tokenToJson(token(0))
+      case _ => Json.obj()
     }
     val (body, ct) = generate(context, allComponents.find(_.matchesType(componentType)).toSeq, suffix, paramsJson)
     process(body, ct)
   }
 
-  override def resource[A >: EssentialAction](context: String, directive: String, suffix: String, resourceToken: String = "default") = Action { implicit request =>
+  override def resource[A >: EssentialAction](context: String, directive: String, suffix: String) = Action { implicit request =>
+    val resourceToken = request.queryString.get("resourceToken")
     val paramsJson = resourceToken match {
-      case "default" => Json.obj()
-      case _ =>
-        val decodedColorString = DatatypeConverter.parseBase64Binary(resourceToken).map(_.toChar).mkString
-        try {
-          Json.parse(decodedColorString).as[JsObject]
-        } catch {
-          case _ => Json.obj()
-        }
+      case Some(token) if (token.length > 0) => tokenToJson(token(0))
+      case _ => Json.obj()
     }
-
     val (body, ct) = generateBodyAndContentType(context, directive, suffix, paramsJson)
     process(body, ct)
   }

@@ -109,7 +109,7 @@ trait App[T]
     css.map(resolvePath)
   }
 
-  protected def componentScriptInfo(components: Seq[String], separatePaths: Boolean, customColorsEncoded: String = "default"): ComponentScriptInfo = {
+  protected def componentScriptInfo(components: Seq[String], separatePaths: Boolean, customColorsEncoded: Option[String] = None): ComponentScriptInfo = {
 
     val typeIds = components.map {
       t =>

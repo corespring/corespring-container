@@ -38,7 +38,7 @@ trait Player
     }.getOrElse("<div><h1>New Item</h1></div>")
 
     def createPlayerHtml(sessionId: String, session: JsValue, itemJson: JsValue, serviceParams: JsObject)(implicit rh: RequestHeader): Html = {
-      val colors = (serviceParams \ "colors").asOpt[String].getOrElse("default")
+      val colors = (serviceParams \ "colors").asOpt[String]
       val scriptInfo = componentScriptInfo(componentTypes(itemJson), jsMode == "dev", colors)
       val controlsJs = if (showControls) paths(controlsJsSrc) else Seq.empty
       val domainResolvedJs = buildJs(scriptInfo, controlsJs)

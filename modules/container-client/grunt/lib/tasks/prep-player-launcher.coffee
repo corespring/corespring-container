@@ -27,7 +27,6 @@ mock = ->
     //Override require to check mock before the real require.
     corespring.require = function(name){
       if(corespring.mock.modules[name]){
-        console.log('%c returning mock:' + name, color );
         return corespring.mock.modules[name];
       } else {
         return orig.require(name);

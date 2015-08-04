@@ -57,7 +57,7 @@ describe('catalog launcher', function () {
 
     it('should call mkInstance if there is itemId', function () {
       create({itemId: '1'});
-      expect(mockLauncher.loadInstance).toHaveBeenCalledWith({method: 'GET', url: 'catalog/:itemId'},{});
+      expect(mockLauncher.loadInstance).toHaveBeenCalledWith({method: 'GET', url: 'catalog/:itemId'},undefined, undefined, undefined, undefined);
     });
   });
 

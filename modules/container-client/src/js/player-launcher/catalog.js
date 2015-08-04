@@ -28,13 +28,7 @@ function CatalogDefinition(element, options, errorCallback) {
       var hashOpts = tabs.length > 0 ? { hash : '?tabs='+tabs.join(',') } : null;
       var call = $.extend(loadCall, hashOpts);
 
-      var params = options.queryParams;
-      if (options.customColors) {
-        params = params || {};
-        params.colors = window.btoa(JSON.stringify({colors: options.customColors}));
-      }
-
-      var instance = launcher.loadInstance(call, params);
+      var instance = launcher.loadInstance(call, options.queryParams, undefined, undefined, options.customColors);
 
     } else {
       errorCallback(errorCodes.NO_ITEM_ID);

@@ -117,7 +117,14 @@ describe('client-launcher', function(){
       expect(instance.constructorArgs[0]).toEqual({url: 'url', params: {a: 'a'}});
       expect(instance.constructorArgs[1]).toEqual('e');
     });
-    
+
+    it('encodes custom colors into params', function(){
+      corespring.mock.modules['launch-config'] = { queryParams: { a : 'a'}};
+      launcher = new ClientLauncher('e', {}, onError);
+      instance = launcher.loadInstance({url: 'url'}, {}, {}, function(){}, {"incorrect-color": "#ff22aa"});
+      expect(instance.constructorArgs[0]).toEqual({url: 'url', params: {a: 'a', colors: 'eyJjb2xvcnMiOnsiaW5jb3JyZWN0LWNvbG9yIjoiI2ZmMjJhYSJ9fQ=='}});
+    });
+
     it('calls the errorCallback if ready before loadInstance is called', function(){
       launcher = new ClientLauncher('e', {}, onError);
       instance = launcher.loadInstance({url: 'url'}, {}, {}, function(){});

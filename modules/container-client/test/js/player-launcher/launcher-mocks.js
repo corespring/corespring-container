@@ -24,7 +24,6 @@ org.corespring.mocks.launcher.MockInstance = function(){
   this.trigger = function(t){
     var handler = onHandlers[t];
     if(handler){
-      console.log('trigger: ', t);
       handler.bind(this)(this);
     }
   };

@@ -2,6 +2,7 @@ describe('editor config', function() {
 
   var editorConfig, designerService,componentDefaultData;
 
+  var MathJaxService = {};
   beforeEach(angular.mock.module('corespring-common.services'));
   beforeEach(angular.mock.module('corespring-editor.services'));
   beforeEach(angular.mock.module('corespring-player.services'));
@@ -19,6 +20,7 @@ describe('editor config', function() {
 
   beforeEach(module(function($provide) {
     designerService = new MockDesignerService();
+    $provide.value('MathJaxService', MathJaxService);
     $provide.value('DesignerService', designerService);
     $provide.value('ImageFeature', {});
     $provide.value('ItemUrls', {});
