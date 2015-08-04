@@ -10,4 +10,14 @@
       fn.apply(null, args);
     };
   };
+
+  e.EditorChangeWatcher = function(){ 
+    this.makeWatcher = jasmine.createSpy('makeWatcher').and.callFake(function(part, fn, scope){
+      return function(newValue, oldValue){
+        if(newValue){
+          fn(newValue, oldValue);
+        }
+      };
+    });
+  };
 })();

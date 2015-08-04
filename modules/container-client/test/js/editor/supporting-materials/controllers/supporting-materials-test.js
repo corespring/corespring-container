@@ -46,7 +46,7 @@ describe('SupportingMaterials', function() {
     $provide.value('ItemService', itemService);
     $provide.value('SupportingMaterialsService', supportingMaterialsService);
     $provide.value('EditorConfig', editorConfig);
-    $provide.value('debounce', org.corespring.mocks.editor.debounce);
+    $provide.value('EditorChangeWatcher', new org.corespring.mocks.editor.EditorChangeWatcher());
   }));
 
   beforeEach(inject(function($rootScope, $compile) {
