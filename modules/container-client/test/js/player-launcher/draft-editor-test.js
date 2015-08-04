@@ -41,7 +41,7 @@ describe('draft-editor', function() {
           itemId: 'itemId',
           iframe: { contentWindow: {} }
         }, onError);
-        editor.init();
+        
         expect(mockLauncher.loadCall).toHaveBeenCalledWith('draftEditor.editor', jasmine.any(Function));
       });
 
@@ -255,7 +255,7 @@ describe('draft-editor', function() {
             iframe: {contentWindow: {}}
           };
           var editor = new DraftEditor('element', opts, onError);
-          editor.init();
+          
         });
 
         it('calls options.onItemCreated when $.ajax is successful',
