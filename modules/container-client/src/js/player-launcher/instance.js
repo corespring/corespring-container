@@ -2,7 +2,9 @@
  * @param call: { url: '', method: '', params: {}, hash: ''}
  */
 
-var Instance = function(call,  element, errorCallback, log) {
+var Instance = function(call,  element, errorCallback, log, autosizeEnabled) {
+
+  autosizeEnabled = autosizeEnabled || true;
 
   log = log || require('logger');
 
@@ -115,9 +117,11 @@ var Instance = function(call,  element, errorCallback, log) {
 
     channel = new msgr.Channel(window, $iframe()[0].contentWindow, {enableLogging: false});
 
-    channel.on('dimensionsUpdate', function(data){
-      $iframe().height(data.h);
-    });
+    if(autosizeEnabled){
+      channel.on('dimensionsUpdate', function(data){
+        $iframe().height(data.h);
+      });
+    }
 
     channel.on('rendered', function() {
       $iframe().removeClass("player-loading");
