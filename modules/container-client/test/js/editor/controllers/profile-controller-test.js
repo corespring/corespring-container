@@ -153,6 +153,7 @@ describe('profile controller', function() {
       $provide.value('StandardQueryCreator', mockStandardQueryCreator);
       $provide.value('throttle', _.identity);
       $provide.constant('STATIC_PATHS', {assets: imagePath});
+      $provide.value('debounce', org.corespring.mocks.editor.debounce);
     });
 
   });

@@ -9,22 +9,17 @@ describe('editor root', function() {
   var $state = {
     transitionTo: jasmine.createSpy('transitionTo')
   };
+  
   var ComponentRegister = {};
+  
   var ConfigurationService = {
     setConfig: jasmine.createSpy('setConfig')
   };
-  var ItemService = {
-    load: jasmine.createSpy('load'),
-    saveSupportingMaterials: jasmine.createSpy('saveSupportingMaterials')
-  };
+  
+  var ItemService;
   var mockError = jasmine.createSpy('error');
-  var LogFactory = {
-    getLogger: jasmine.createSpy('getLogger').and.returnValue({
-      debug: function() {},
-      log: function() {},
-      error: mockError
-    })
-  };
+  var LogFactory;
+
   var iFrameService = {
     isInIFrame: function() {
       return iFrame;
@@ -33,10 +28,10 @@ describe('editor root', function() {
       return bypassIframeLaunchMechanism;
     }
   };
-  var Msgr = {
-    on: jasmine.createSpy('on'),
-    send: jasmine.createSpy('send')
-  };
+
+  var msgrOnHandlers;
+
+  var Msgr;
 
   var launcher = {
     launch : jasmine.createSpy('launch')
@@ -62,6 +57,29 @@ describe('editor root', function() {
   };
 
   beforeEach(module(function($provide) {
+    msgrOnHandlers = {};
+    
+    Msgr = {
+      on: jasmine.createSpy('on').and.callFake(function(e,handler){
+        msgrOnHandlers[e] = handler;
+      }),
+      send: jasmine.createSpy('send')
+    };
+ 
+    ItemService = {
+      load: jasmine.createSpy('load'),
+      saveAll: jasmine.createSpy('saveAll'),
+      saveSupportingMaterials: jasmine.createSpy('saveSupportingMaterials')
+    };
+
+    LogFactory = {
+      getLogger: jasmine.createSpy('getLogger').and.returnValue({
+        debug: function() {},
+        log: function() {},
+        error: mockError
+      })
+    };
+
     $provide.value('$state', $state);
     $provide.value('$window', mockWindow);
     $provide.value('ComponentRegister', ComponentRegister);
@@ -73,16 +91,6 @@ describe('editor root', function() {
     $provide.value('WiggiDialogLauncher',  WiggiDialogLauncher);
     $provide.value('EditorDialogTemplate', EditorDialogTemplate);
   }));
-
-  afterEach(function() {
-    _.each([ItemService, LogFactory], function(mock) {
-      _.keys(mock, function(key) {
-        if (_.isFunction(mock[key])) {
-          mock[key].calls.reset();
-        }
-      });
-    });
-  });
 
   function render() {
     scope = rootScope.$new();
@@ -279,6 +287,29 @@ describe('editor root', function() {
       expect(mockError).toHaveBeenCalledWith(jasmine.any(String), message);
     });
   });
+
+  describe('saveAll', function() {
+    var callback;
+    var clientCallback;
+    
+    beforeEach(function(){
+      iFrame = true;
+      render();
+      clientCallback = jasmine.createSpy('clientCallback');
+      msgrOnHandlers.saveAll(null, clientCallback);
+      callback = ItemService.saveAll.calls.mostRecent().args[1];
+    });
+
+    it('should call ItemService#saveAll', function() {
+      expect(ItemService.saveAll).toHaveBeenCalled();
+    });
+
+    it('should call the event caller\'s callback', function() {
+      callback();
+      expect(clientCallback).toHaveBeenCalledWith(null, {saved: true});
+    });
+  });
+
 
   describe('onLaunchDialog', function(){
     

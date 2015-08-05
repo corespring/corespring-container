@@ -28,7 +28,7 @@ angular.module('corespring-editor.controllers')
 
       "use strict";
 
-      var $log = LogFactory.getLogger('RootController');
+      var logger = LogFactory.getLogger('root-controller');
 
       $scope.onItemLoadSuccess = onItemLoadSuccess;
       $scope.onItemLoadError = onItemLoadError;
@@ -39,20 +39,27 @@ angular.module('corespring-editor.controllers')
 
       init();
 
-      //----------------------------------------------
+
+      function saveAll(done){
+        logger.debug('saveAll...');
+        ItemService.saveAll($scope.item, function() {
+          logger.debug('call \'saveAll\' callback...');
+          done(null, {saved: true});
+        });
+      }
 
       function init() {
         if (iFrameService.isInIFrame() && !iFrameService.bypassIframeLaunchMechanism()) {
           Msgr.on('initialise', onInitialise);
-          Msgr.on('saveAll', function() {
-            $scope.$broadcast('saveAll');
+          
+          Msgr.on('saveAll', function(data, done){
+            logger.debug('received \'saveAll\' event');
+            saveAll(done || function(){});
           });
-          $scope.$on('savedAll', function() {
-            Msgr.send('savedAll');
-          });
+
           //send msg "ready" to instance
           //this will result in msg "initialise" being sent back to us
-          $log.log('sending ready');
+          logger.log('sending ready');
           Msgr.send('ready');
         } else {
           ConfigurationService.setConfig({});
@@ -60,7 +67,7 @@ angular.module('corespring-editor.controllers')
         }
 
         function onInitialise(data) {
-          $log.log('on initialise', data);
+          logger.log('on initialise', data);
           ConfigurationService.setConfig(data);
           ItemService.load($scope.onItemLoadSuccess, $scope.onItemLoadError);
           //We need to trigger an ng digest as this event is outside the app's scope.
@@ -143,8 +150,10 @@ angular.module('corespring-editor.controllers')
       }
 
       function onItemLoadError(err) {
-        $log.error('error loading', err);
+        logger.error('error loading', err);
       }
+
+     
 
     }
   ]);
