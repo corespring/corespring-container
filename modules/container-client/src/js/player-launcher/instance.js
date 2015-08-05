@@ -4,7 +4,7 @@
 
 var Instance = function(call,  element, errorCallback, log, autosizeEnabled) {
 
-  autosizeEnabled = autosizeEnabled || true;
+  autosizeEnabled = autosizeEnabled !== false;
 
   log = log || require('logger');
 
@@ -117,7 +117,9 @@ var Instance = function(call,  element, errorCallback, log, autosizeEnabled) {
 
     channel = new msgr.Channel(window, $iframe()[0].contentWindow, {enableLogging: false});
 
+    console.log('?', autosizeEnabled);
     if(autosizeEnabled){
+      console.log('call.on....', autosizeEnabled);
       channel.on('dimensionsUpdate', function(data){
         $iframe().height(data.h);
       });
