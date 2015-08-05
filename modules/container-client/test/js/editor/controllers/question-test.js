@@ -3,36 +3,44 @@ describe('QuestionController', function() {
   var scope, element, rootScope, compile, timeout;
 
   var ItemService = {
-    saveAll: jasmine.createSpy('saveAll'),
     load: jasmine.createSpy('load'),
     saveComponents: jasmine.createSpy('saveComponents'),
     saveXhtml: jasmine.createSpy('saveXhtml'),
     saveSummaryFeedback: jasmine.createSpy('saveSummaryFeedback')
   };
+
   var EditorConfig = {
     overrideFeatures: {'override' : 'features'},
     extraFeatures: {'extra' : 'features'}
   };
+  
   var LogFactory = {
     getLogger: jasmine.createSpy('getLogger').and.returnValue({
       debug: function() {}
     })
   };
+  
   var ComponentImageService = {};
+  
   var ComponentData = {
     registerComponent: jasmine.createSpy('registerComponent'),
     registerPlaceholder: jasmine.createSpy('registerPlaceholder')
   };
+  
   var ComponentPopups = {};
+  
   var AppState = {
     question: {
       preview: undefined
     }
   };
+  
   var ScoringHandler = {};
+  
   var MathJaxService = {};
 
   var wiggiMathJaxFeatureDef = {};
+  
   var wiggiLinkFeatureDef = {};
 
   beforeEach(angular.mock.module('corespring-editor.controllers'));
@@ -47,19 +55,14 @@ describe('QuestionController', function() {
     $provide.value('AppState', AppState);
     $provide.value('ScoringHandler', ScoringHandler);
     $provide.value('MathJaxService', MathJaxService);
-    $provide.value('DEBOUNCE_IN_MILLIS', 0);
     $provide.value('WiggiMathJaxFeatureDef', function(){
         return wiggiMathJaxFeatureDef;
     });
     $provide.value('WiggiLinkFeatureDef', function(){
         return wiggiLinkFeatureDef;
     });
-    $provide.value('debounce', function(fn){
-      return function(){
-        var args = Array.prototype.slice.call(arguments);
-        fn.apply(null, args);
-      };
-    });
+
+    $provide.value('EditorChangeWatcher', new org.corespring.mocks.editor.EditorChangeWatcher());
   }));
 
   afterEach(function() {
@@ -253,25 +256,6 @@ describe('QuestionController', function() {
 
   });
 
-  describe('saveAll event', function() {
-    var callback;
-    beforeEach(function() {
-      spyOn(scope, '$emit').and.callThrough();
-      scope.$emit('saveAll');
-      callback = ItemService.saveAll.calls.mostRecent().args[1];
-    });
-
-    it('should call ItemService#saveAll', function() {
-      expect(ItemService.saveAll).toHaveBeenCalled();
-    });
-
-    it("should $emit a 'savedAll' event from the callback", function() {
-      callback();
-      expect(scope.$emit).toHaveBeenCalledWith('savedAll');
-    });
-
-  });
-
   describe('$watch item.xhtml', function(){
     beforeEach(function(){
       scope.item = {xhtml:"abc"};
@@ -326,9 +310,5 @@ describe('QuestionController', function() {
       expect(ItemService.saveComponents).not.toHaveBeenCalled();
     });
   });
-
-
-
-
 
 });

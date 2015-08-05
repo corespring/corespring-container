@@ -3,7 +3,7 @@ angular.module('corespring-editor.controllers')
     '$scope',
     '$element',
     '$timeout',
-    'debounce',
+    'EditorChangeWatcher',
     'ItemService',
     'EditorConfig',
     'LogFactory',
@@ -18,7 +18,7 @@ angular.module('corespring-editor.controllers')
     function($scope,
       $element,
       $timeout,
-      debounce,
+      EditorChangeWatcher,
       ItemService,
       EditorConfig,
       LogFactory,
@@ -129,12 +129,6 @@ angular.module('corespring-editor.controllers')
         });
       });
 
-      $scope.$on('saveAll', function() {
-        ItemService.saveAll($scope.item, function() {
-          $scope.$emit('savedAll');
-        });
-      });
-
       $scope.serialize = function(comps) {
         if (!configPanels) {
           return comps;
@@ -154,54 +148,24 @@ angular.module('corespring-editor.controllers')
         return newModel;
       };
 
-      var debouncedSaveComponents = debounce(function(newComps, oldComps) {
-        saveComponents();
-        if (oldComps) {
-          $scope.$emit('itemChanged', {
-            partChanged: 'components'
-          });
-        }
-      });
+      var makeWatcher = EditorChangeWatcher.makeWatcher;
 
-      var debouncedSaveXhtml = debounce(function(newValue, oldValue) {
-        ItemService.saveXhtml(newValue);
-        if (oldValue) {
-          $scope.$emit('itemChanged', {
-            partChanged: 'xhtml'
-          });
-        }
-      });
+      $scope.$watch(
+        'item.components', 
+        makeWatcher('components', saveComponents, $scope),
+        true);
 
-      var debouncedSaveSummaryFeedback = debounce(function(newValue, oldValue) {
-        ItemService.saveSummaryFeedback(newValue);
-        if (oldValue) {
-          $scope.$emit('itemChanged', {
-            partChanged: 'summaryFeedback'
-          });
-        }
-      });
+      $scope.$watch(
+        'item.xhtml', 
+        makeWatcher('xhtml', function(n,o){
+          ItemService.saveXhtml(n);
+        }, $scope)); 
 
-      $scope.$watch('item.components', function(newComps, oldComps) {
-        if (_.isEqual(newComps, oldComps)) {
-          logger.debug('they are the same - ignore...');
-          return;
-        }
-        debouncedSaveComponents(newComps, oldComps);
-      }, true);
-
-      $scope.$watch('item.xhtml', function(newValue, oldValue) {
-        logger.debug('old', oldValue);
-        if (oldValue !== newValue) {
-          debouncedSaveXhtml(newValue, oldValue);
-        }
-      });
-
-      $scope.$watch('item.summaryFeedback', function(newValue, oldValue) {
-        logger.debug('old', oldValue);
-        if (oldValue !== newValue) {
-          debouncedSaveSummaryFeedback(newValue, oldValue);
-        }
-      });
+      $scope.$watch(
+        'item.summaryFeedback', 
+        makeWatcher('summaryFeedback', function(n,o){
+          ItemService.saveSummaryFeedback(n);
+        }, $scope));
 
       ItemService.load(function(item) {
         $scope.item = item;
