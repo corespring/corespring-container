@@ -98,7 +98,7 @@ var Instance = function(call,  element, errorCallback, log, autosizeEnabled) {
       ' name="', iframeUid ,'"',
       ' frameborder="0"',
       ' class="player-loading"',
-      ' style="border:none;'+ autosizeEnabled ? ' width:100%;' : '' + '"'
+      ' style="border:none;' + (autosizeEnabled ? ' width:100%;' : '') + '" '
     ].join('');
 
     if(call.method === 'GET'){
