@@ -1,7 +1,7 @@
 function EditorDefinition(element, options, errorCallback) {
 
   var Launcher = require('client-launcher');
-  var launcher = new Launcher(element, options, errorCallback);
+  var launcher = new Launcher(element, options, errorCallback, options.autosizeEnabled);
   var errorCodes = require('error-codes');
   var instance;
   
