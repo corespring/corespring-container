@@ -98,7 +98,7 @@ var Instance = function(call,  element, errorCallback, log, autosizeEnabled) {
       ' name="', iframeUid ,'"',
       ' frameborder="0"',
       ' class="player-loading"',
-      ' style="width: 100%; border: none;" ',
+      ' style="border:none;'+ autosizeEnabled ? ' width:100%;' : '' + '"'
     ].join('');
 
     if(call.method === 'GET'){
@@ -117,9 +117,7 @@ var Instance = function(call,  element, errorCallback, log, autosizeEnabled) {
 
     channel = new msgr.Channel(window, $iframe()[0].contentWindow, {enableLogging: false});
 
-    console.log('?', autosizeEnabled);
     if(autosizeEnabled){
-      console.log('call.on....', autosizeEnabled);
       channel.on('dimensionsUpdate', function(data){
         $iframe().height(data.h);
       });
