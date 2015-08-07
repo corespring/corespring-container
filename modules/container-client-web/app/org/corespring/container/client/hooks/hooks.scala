@@ -67,6 +67,7 @@ trait CoreItemHooks extends HasContext with LoadHook {
   def saveSummaryFeedback(id: String, feedback: String)(implicit h: RequestHeader): R[JsValue]
   def saveSupportingMaterials(id: String, json: JsValue)(implicit h: RequestHeader): R[JsValue]
   def saveXhtml(id: String, xhtml: String)(implicit h: RequestHeader): R[JsValue]
+  def createSupportingMaterial(sm:SupportingMaterial[File]) : R[Seq[SupportingMaterial[File]]]
 }
 
 trait DraftHooks {

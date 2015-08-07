@@ -45,3 +45,29 @@ case class PlayerJs(
   queryParams: Seq[(String, String)] = Seq.empty)
 
 case class DeleteAsset(error: Option[String])
+
+
+trait File{
+  def name:String
+  def contentType:String
+}
+
+case class Binary(name:String, contentType:String, data: => Array[Byte]) extends File
+
+case class Html(name:String, content:String) extends File{
+  override def contentType: String = "text/html"
+}
+
+trait SupportingMaterial[F<:File] {
+  def name: String
+  def materialType: String
+  def main: F
+}
+
+case class BinarySupportingMaterial(
+                                     name:String,
+                                     materialType:String,
+                                     main: Binary) extends SupportingMaterial[Binary]
+
+case class HtmlSupportingMaterial(name:String,materialType:String,main:Html, assets : Seq[Binary]) extends SupportingMaterial[Html]
+
