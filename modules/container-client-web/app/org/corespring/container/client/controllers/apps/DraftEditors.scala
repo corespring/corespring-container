@@ -13,6 +13,7 @@ trait BaseDraftEditor extends CoreEditor {
       resourceRoutes.ItemDraft.load(id),
       resourceRoutes.ItemDraft.saveSubset(id, ":subset"),
       Some(resourceRoutes.ItemDraft.save(id)),
+      resourceRoutes.ItemDraft.createSupportingMaterial(id),
       components, widgets).toString
   }
 }

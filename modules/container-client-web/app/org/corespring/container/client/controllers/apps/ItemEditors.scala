@@ -8,12 +8,13 @@ trait BaseItemEditor extends CoreEditor {
 
   import resources.{ routes => resourceRoutes }
 
-  override def servicesJs(draftId: String, components: JsArray, widgets:JsArray) = {
+  override def servicesJs(itemId: String, components: JsArray, widgets:JsArray) = {
     EditorServices(
       s"$context.services",
-      resourceRoutes.Item.load(draftId),
-      resourceRoutes.Item.saveSubset(draftId, ":subset"),
+      resourceRoutes.Item.load(itemId),
+      resourceRoutes.Item.saveSubset(itemId, ":subset"),
       None,
+      resourceRoutes.Item.createSupportingMaterial(itemId),
       components,
       widgets).toString
   }

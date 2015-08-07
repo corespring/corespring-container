@@ -37,10 +37,12 @@ GET           /collection                                            @org.coresp
 # Item
 GET           /item/:itemId.json                                     @org.corespring.container.client.controllers.resources.Item.load(itemId)
 POST          /item/create                                           @org.corespring.container.client.controllers.resources.Item.create()
+POST          /item/:itemId/supporting-material                      @org.corespring.container.client.controllers.resources.Item.createSupportingMaterial(itemId)
 PUT           /item/update/:subset/:itemId.json                      @org.corespring.container.client.controllers.resources.Item.saveSubset(itemId, subset)
 
 # ItemDraft
 POST          /draft/create-item-and-draft                           @org.corespring.container.client.controllers.resources.ItemDraft.createItemAndDraft()
+POST          /draft/:draftId/supporting-material                    @org.corespring.container.client.controllers.resources.ItemDraft.createSupportingMaterial(draftId)
 GET           /draft/:draftId.json                                   @org.corespring.container.client.controllers.resources.ItemDraft.load(draftId)
 PUT           /draft/update/:draftId                                 @org.corespring.container.client.controllers.resources.ItemDraft.save(draftId)
 PUT           /draft/update/:subset/:draftId.json                    @org.corespring.container.client.controllers.resources.ItemDraft.saveSubset(draftId, subset)

@@ -44,6 +44,24 @@ trait CoreItem extends Controller {
 
   val noCacheHeader = "no-cache, no-store, must-revalidate"
 
+  //
+  def createSupportingMaterial(id:String) = Action.async{ request => 
+
+    val createResult : Option[Either[(Int,String), JsValue]] = request.body.asJson{ json => 
+      val title = (json \ "title")
+      val materialType = (json \ "materialType")
+      val html = (json \ "html")
+      hooks.createSupportingMaterial(title, materialType, html)
+      }.orElse{
+        request.body.asRaw{ bytes => 
+          val title = request.queryString.get('title')
+          val materialType = request.queryString.get('materialType')
+          hooks.createSupportingMaterial(title, materialType, bytes)
+        }
+      }
+    //Future(Ok(""))
+  }
+
   def load(itemId: String) = Action.async { implicit request =>
     hooks.load(itemId).map {
       either =>
