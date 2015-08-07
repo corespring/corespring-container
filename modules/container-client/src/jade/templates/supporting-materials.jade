@@ -18,8 +18,13 @@ script(type="text/ng-template", id="/templates/supporting-materials")
   .supporting-materials(ng-controller="SupportingMaterials")
     .col-md-4.row
       .add-new-block
-        button.btn.btn-default(id="addNewButton",ng-click="addNew()")
+        button.btn.btn-default(ng-click="addNew()")
           i.fa.fa-plus
           | &nbsp;add new supporting material
 
-      .supporting-materials-list(ng-model="supportingMaterials")
+      .supporting-materials-list(
+        sm-list, 
+        group-by="section",
+        delete-item="deleteItem",
+        choose-item="chooseItem",
+        ng-model="supportingMaterials")
