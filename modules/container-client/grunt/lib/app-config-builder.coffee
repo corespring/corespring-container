@@ -47,5 +47,5 @@ exports.build = (name, grunt, js, css, ngModules, processFn) ->
   out.pathReporter["#{name}Js"] = buildPathReporterJs('rig', js, processFn, ngModules)
   out.pathReporter["#{name}Css"] = buildPathReporterCss('rig', css, processFn) if css?
 
-  grunt.log.debug(name + ' app config out: ', JSON.stringify(out, null, '  '))
+  #grunt.log.debug(name + ' app config out: ', JSON.stringify(out, null, '  '))
   out

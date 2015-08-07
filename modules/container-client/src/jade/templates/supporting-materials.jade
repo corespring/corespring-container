@@ -5,7 +5,12 @@ script( type="text/ng-template", id="/templates/popups/addSupportingMaterial")
         | When composing an assessment item, it can be useful to include supplemental materials to assist in scoring or classroom discussion.
 
     .add-supporting-material-popup
-      div(supportingmetadata="", focus-title="true", ng-model='supportingMaterial')
+      div(
+        supportingmetadata, 
+        focus-title="true", 
+        ng-model='supportingMaterial',
+        is-valid='metadataIsValid',
+        existing-names='materialNames')
 
 // Upload progress popup
 script( type="text/ng-template", id="/templates/popups/uploadingSupportingMaterial")
@@ -24,7 +29,7 @@ script(type="text/ng-template", id="/templates/supporting-materials")
 
       .supporting-materials-list(
         sm-list, 
-        group-by="section",
+        group-by="materialType",
         delete-item="deleteItem",
         choose-item="chooseItem",
-        ng-model="supportingMaterials")
+        ng-model="item.supportingMaterials")

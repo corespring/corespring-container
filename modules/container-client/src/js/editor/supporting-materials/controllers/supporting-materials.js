@@ -3,42 +3,72 @@
 angular.module('corespring-editor.controllers')
   .controller('SupportingMaterials', [
     '$scope',
+    '$modal',
     'ImageUtils',
     'ItemService',
-    'SupportingMaterialsService',
+    'MaterialsService',
+    'LogFactory',
     function(
       $scope,
+      $modal,
       ImageUtils,
       ItemService,
-      SupportingMaterialsService){
+      MaterialsService,
+      LogFactory)
+      {
+
+        var logger  = LogFactory.getLogger('supporting-materials');
 
         $scope.deleteItem = function(data){
           console.log('deleteItem : ', data);
-        }
+        };
 
         $scope.chooseItem = function(data){
+          console.log('chooseItem : ', data);
+        };
 
-        }
+        $scope.addNew = function() {
+          var modalInstance = $modal.open({
+            templateUrl: '/templates/popups/addSupportingMaterial',
+            controller: 'AddSupportingMaterialPopupController',
+            backdrop: 'static',
+            resolve: {
+              materialNames: function(){
+                return _.pluck($scope.item.supportingMaterials, 'name');
+              } 
+            }
+          });
 
-        $scope.addNew = function(){
-          $scope.supportingMaterials[0].items.push({name: '??'});
-        }
+          modalInstance.result.then(function(newMaterial) {
 
-        $scope.supportingMaterials = [
-          {
-            name: 'Section 2',
-            items: [
-              {name: 'carrot'},
-              {name: 'pear'}
-            ]
-          },
-          {
-            name: 'Section 1',
-            items: [
-              {name: 'apple'},
-              {name: 'banana'}
-            ]
+            function onCreate(updatedMaterials){
+              $scope.item.supportingMaterials = updatedMaterials;
+            }
+
+            function onError(err){
+              logger.warn(err);
+            }
+
+            MaterialsService.create(newMaterial, onCreate, onError);
+          });
+        };
+
+        function onLoad(data){
+          $scope.item = data;
+
+          if(!$scope.item.supportingMaterials){
+            $scope.item.supportingMaterials = [];
           }
-        ]
+        }
+
+        function onError(err){
+          logger.error(err);
+        }
+
+        function init(){
+          ItemService.load(onLoad,onError);
+        }
+
+        init();
 
     }]);

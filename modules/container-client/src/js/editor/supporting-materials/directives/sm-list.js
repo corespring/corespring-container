@@ -1,27 +1,40 @@
  angular.module('corespring-editor.directives')
-    .directive('smList', [function(){
+    .directive('smList', ['LogFactory', 'SmUtils', function(LogFactory, SmUtils){
 
-      function link($scope, $element, $attrs){
+      var logger = LogFactory.getLogger('sm-list');
 
-        $scope.$on('sm.deleteItem', function($event, ngModel){
-          $scope.deleteItem()(ngModel);
-        });
+      function link($scope, $element, $attrs, ngModel){
 
-        $scope.$on('sm.chooseItem', function($event, ngModel){
-          $scope.chooseItem()(ngModel);
-        });
+        ngModel.$render = function() {
+          logger.debug('$render', ngModel.$viewValue);
+          $scope.sections = SmUtils.group(ngModel.$viewValue, $attrs.groupBy || 'materialType');
+        };
+      }
+
+      function SmListController($scope){
+
+        this.chooseItem = function(item){
+          $scope.chooseItem()(item);
+        };
+
+        this.deleteItem = function(item){
+          $scope.deleteItem()(item);
+        };
       }
 
       return {
         restrict: 'A',
+        controller: SmListController,
+        require: '^ngModel',
         scope: {
           ngModel: '=',
-          deleteItem: '&'
+          deleteItem: '&',
+          chooseItem: '&'
         },
         link: link,
         template: ['<div class="sm-list">',
                    '  <ul class="ul-sections">',
-                   '    <li ng-repeat="s in ngModel" ng-model="s" sm-section>',
+                   '    <li ng-repeat="s in sections" ng-model="s" sm-section>',
                    '    </li>',
                    '  </ul>',
                    '</div>'].join('')
@@ -34,7 +47,6 @@
   .directive('smSection', [function(){
       function link($scope, $element, $attrs){
         console.log('smSection');
-        console.log()
       }
 
       return {
@@ -54,22 +66,20 @@
 
  angular.module('corespring-editor.directives')
   .directive('smItem', [function(){
-      function link($scope, $element, $attrs){
-
-        console.log('smItem');
+      function link($scope, $element, $attrs, smListController){
 
         $scope.deleteItem = function($event){
-          console.log('d', arguments);
-          $scope.$emit('sm.deleteItem', $scope.ngModel);
-        }
+          smListController.deleteItem($scope.ngModel);
+        };
 
         $scope.chooseItem = function(){
-          $scope.$emit('sm.chooseItem', $scope.ngModel);
-        }
+          smListController.chooseItem($scope.ngModel);
+        };
       }
 
       return {
         restrict: 'A',
+        require: '^smList',
         scope: {
           ngModel: '=',
         },

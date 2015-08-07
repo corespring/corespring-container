@@ -60,6 +60,16 @@ module.exports = (grunt) ->
     .replace('bower_components', 'components')
     .replace('///', '//')
 
+  expandJsPathsForRig = (p) ->
+    p.replace(/^\/js/, common.dist + '/js')
+     .replace(/^\/components/, common.dist + '/bower_components')
+
+  expandCssPathsForRig = (p) -> 
+    out = p.replace(/^\/css/, common.dist + '/css')
+     .replace(/^\/components/, common.dist + '/bower_components')
+    console.log('in: ', p, 'out: ', out)
+    out
+
   prepend = (pre, s) -> "#{pre}#{s}"
 
   comps = prepend.bind( null, '<%= common.dist %>/bower_components/')
@@ -72,6 +82,14 @@ module.exports = (grunt) ->
       dev: lessConfig(false)
       production: lessConfig(true)
 
+    mkNgRig: 
+      editor:
+        js: 
+          report: '<%= common.dist %>/editor-js-report.json'
+          expand: expandJsPathsForRig
+        css:
+          report: '<%= common.dist %>/editor-css-report.json'
+          expand: expandCssPathsForRig
 
     watch:
       options:
@@ -193,7 +211,7 @@ module.exports = (grunt) ->
     mkConfig('playerControls', playerControls)
   )
 
-  grunt.log.debug(JSON.stringify(fullConfig, null, "  "))
+  #grunt.log.debug(JSON.stringify(fullConfig, null, "  "))
 
   grunt.initConfig(fullConfig)
 
@@ -221,6 +239,7 @@ module.exports = (grunt) ->
   grunt.registerTask('none', [])
   grunt.registerTask('write-config', '',writeConfig)
   grunt.registerTask('lcd', ['loadComponentDependencies'])
+  grunt.registerTask('ng-rig', ['pathReporter','mkNgRig'])
   grunt.registerTask('loadComponentDependencies', 'Load client side dependencies for the components', componentDependencies(grunt))
   grunt.registerTask('run', ['mk-css', 'directive-templates','pathReporter', 'component-less', 'watch'])
   grunt.registerTask('mk-css', ['copy:less', 'less', 'component-less'])

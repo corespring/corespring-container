@@ -1,0 +1,38 @@
+doctype html
+html(lang="en")
+  head 
+    for c in css
+      link( rel="stylesheet", href=c)
+  body
+    
+    for s in js
+      script(type="text/javascript", src=s)
+
+    script.
+
+      var modules = !{ngModules};
+      modules.push('corespring-templates');
+      modules.push('corespring.input.radio');
+
+      angular.module('rig-app', modules);
+
+      angular.module('rig-app').factory('DesignerService', [function(){
+        return {
+          loadAvailableUiComponents: function(onSuccess, onFailure){
+            onSuccess({ interactions: [], widgets: [] });
+          }
+        };
+      }]);
+
+      angular.module('rig-app').controller('Root', ['$scope', function($scope){
+        $scope.message = 'hi';
+      }]);
+
+    div(ng-app="rig-app" ng-controller="Root")
+      h1 a rig {{message}} 
+      div(supportingmetadata="",
+          focus-title="true",
+          ng-model='supportingMaterial',
+          is-valid='metadataIsValid',
+          existing-names='materialNames')
+      

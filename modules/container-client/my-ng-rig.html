@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head> 
+    <link rel="stylesheet" href="target/scala-2.10/classes/container-client/bower_components/jquery-ui/themes/base/resizable.css">
+    <link rel="stylesheet" href="target/scala-2.10/classes/container-client/bower_components/select2/select2.css">
+    <link rel="stylesheet" href="target/scala-2.10/classes/container-client/bower_components/components-font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Ubuntu:300,400,500,500italic,700">
+    <link rel="stylesheet" href="target/scala-2.10/classes/container-client/css/editor.css">
+  </head>
+  <body>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/bower_components/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/bower_components/spin.js/spin.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/bower_components/es5-shim/es5-shim.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/bower_components/console-polyfill/index.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/bower_components/jquery/dist/jquery.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/bower_components/jquery-ui/jquery-ui.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/bower_components/angular/angular.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/bower_components/lodash/dist/lodash.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/bower_components/angular-ui-sortable/sortable.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/bower_components/mathjs/dist/math.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/bower_components/saxjs/lib/sax.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/bower_components/bootstrap/dist/js/bootstrap.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/bower_components/msgr.js/dist/msgr.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/bower_components/corespring-ng-components/build/corespring-ng-components.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/corespring/core.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/corespring/core-library.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/corespring/server/init-core-library.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/corespring/lodash-mixins.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/common/directives/_declaration.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/common/directives/ng-bind-html-unsafe.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/common/directives/profile-preview.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/common/directives/profile-preview.tpl.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/common/directives/question-information.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/common/directives/question-information.tpl.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/common/directives/summary-feedback.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/common/services/_declaration.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/common/services/catalog-preview.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/common/services/collection-service.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/common/services/data-query-service.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/common/services/iframe-service.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/common/services/log-factory.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/common/services/math-service.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/common/services/message-bridge.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/common/services/profile-formatter.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/common/services/score-processor.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/common/services/standard-query-creator.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/common/supporting-materials/_declaration.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/common/supporting-materials/controllers/_declaration.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/common/supporting-materials/controllers/supporting-material-preview.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/common/supporting-materials/services/_declaration.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/common/supporting-materials/services/sm-utils.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/common/supporting-materials/services/supporting-materials-service.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/bower_components/angular-animate/angular-animate.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/bower_components/angular-route/angular-route.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/bower_components/angular-ui-router/release/angular-ui-router.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/bower_components/wiggi-wiz/dist/wiggi-wiz.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/bower_components/select2/select2.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/bower_components/angular-ui-select2/src/select2.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/bower_components/angular-ui/build/angular-ui.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/bower_components/jquery.browser/dist/jquery.browser.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/bower_components/undo.js/undo.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/bower_components/corespring-checkbox/src/directive.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/bower_components/corespring-radio/src/directive.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/editor/_declarations.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/editor/controllers/_declaration.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/editor/controllers/client-side-preview.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/editor/controllers/nav.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/editor/controllers/popups/add-supporting-material-controller.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/editor/controllers/popups/archive-popup-controller.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/editor/controllers/popups/copy-popup-controller.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/editor/controllers/popups/delete-popup-controller.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/editor/controllers/popups/edit-title-popup-controller.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/editor/controllers/popups/help-popup-controller.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/editor/controllers/popups/new-popup-controller.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/editor/controllers/popups/open-popup-controller.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/editor/controllers/popups/question-information-popup-controller.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/editor/controllers/popups/scoring-popup-controller.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/editor/controllers/profile-controller.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/editor/controllers/question.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/editor/controllers/root.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/editor/designer/directives/_declaration.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/editor/designer/services/_declaration.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/editor/designer/wiggi-wiz-features/_declaration.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/editor/designer/wiggi-wiz-features/csimage/_declaration.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/editor/designer/wiggi-wiz-features/footnotes/_declaration.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/editor/designer/wiggi-wiz-features/link/_declaration.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/editor/designer/wiggi-wiz-features/mathjax/_declaration.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/editor/profile/directives/additional-copyright-information-for-profile.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/editor/profile/directives/additional-copyright-information-for-profile.tpl.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/editor/profile/directives/expander.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/editor/question/directives/component-weighter.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/editor/question/directives/component-weighter.tpl.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/editor/question/directives/corespring-tooltip.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/editor/question/directives/file-list.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/editor/question/directives/file-preview.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/editor/question/directives/model-saver.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/editor/question/directives/optimized-preview-player.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/editor/question/directives/placeholder.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/editor/question/directives/placeholder.tpl.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/editor/question/directives/preview-player-control-panel.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/editor/question/directives/preview-player-control-panel.tpl.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/editor/question/directives/preview-player.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/editor/question/wiggi-wiz-features/_declaration.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/editor/question/wiggi-wiz-features/csimage/_declaration.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/editor/question/wiggi-wiz-features/csimage/feature.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/editor/question/wiggi-wiz-features/csimage/image-holder.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/editor/question/wiggi-wiz-features/footnotes/_declaration.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/editor/question/wiggi-wiz-features/footnotes/feature.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/editor/question/wiggi-wiz-features/footnotes/footnotes-dialog.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/editor/question/wiggi-wiz-features/footnotes/footnotes-holder.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/editor/question/wiggi-wiz-features/link/_declaration.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/editor/question/wiggi-wiz-features/link/feature.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/editor/question/wiggi-wiz-features/link/link-holder.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/editor/question/wiggi-wiz-features/mathjax/_declaration.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/editor/question/wiggi-wiz-features/mathjax/feature.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/editor/question/wiggi-wiz-features/mathjax/mathformat-utils.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/editor/question/wiggi-wiz-features/mathjax/mathjax-dialog.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/editor/question/wiggi-wiz-features/mathjax/mathjax-dialog.tpl.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/editor/question/wiggi-wiz-features/mathjax/mathjax-holder.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/editor/question/wiggi-wiz-features/mathjax/mathjax-holder.tpl.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/editor/services/_declaration.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/editor/services/app-state.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/editor/services/component-config.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/editor/services/component-data.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/editor/services/component-default-data.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/editor/services/component-popups.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/editor/services/component-wiggiwiz-feature-adapter.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/editor/services/configuration-service.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/editor/services/debounce.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/editor/services/editor-change-watcher.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/editor/services/editor-config.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/editor/services/editor-dialog-template.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/editor/services/item-service.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/editor/services/scoring-handler.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/editor/services/throttle.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/editor/supporting-materials/controllers/old-supporting-materials.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/editor/supporting-materials/controllers/supporting-materials.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/editor/supporting-materials/directives/_declaration.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/editor/supporting-materials/directives/sm-item.tpl.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/editor/supporting-materials/directives/sm-list.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/editor/supporting-materials/directives/supporting-materials-list.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/editor/supporting-materials/directives/supporting-materials-list.tpl.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/editor/supporting-materials/directives/supporting-metadata.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/editor/supporting-materials/directives/supporting-metadata.tpl.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/editor/supporting-materials/sm-utils.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/editor/vdom/vdom-virtualize.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/editor/vdom/virtual-dom.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/editor/vdom/virtual-patch.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/catalog/controllers/_declaration.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/catalog/controllers/catalog-root.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/render/services/_declaration.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/render/services/client-side-player-service.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/render/services/component-register-definition.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/render/services/component-register.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/render/services/corespring-player-definition.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/render/services/dimension-calculator.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/render/services/msgr-wrapper.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/render/services/player-utils.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/render/services/server-logic.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/render/directives/_declaration.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/render/directives/corespring-player.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/render/directives/demo-player.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/render/directives/dimension-propagator.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/render/directives/passage.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/render/directives/player-control-panel.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/render/controllers/_declaration.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/render/controllers/container-player-controller.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/render/controllers/main.js"></script>
+    <script type="text/javascript" src="target/scala-2.10/classes/container-client/js/render/controllers/root.js"></script>
+    <script>
+      var modules = ["corespring-common.services","corespring-common.directives","corespring-player.controllers","corespring-player.directives","corespring-player.services","ngAnimate","corespring-common.supporting-materials","corespring-editor.services","corespring-editor.controllers","corespring-editor.directives","ui.sortable","ui.bootstrap","ui.router","cs.directives","ngRoute","ui.select2","corespring.wiggi-wiz"];
+      modules.push('corespring-templates');
+      modules.push('corespring.input.radio');
+      
+      angular.module('rig-app', modules);
+      
+      angular.module('rig-app').factory('DesignerService', [function(){
+        return {
+          loadAvailableUiComponents: function(onSuccess, onFailure){
+            onSuccess({ interactions: [], widgets: [] });
+          }
+        };
+      }]);
+      
+      angular.module('rig-app').controller('Root', ['$scope', function($scope){
+        $scope.message = 'hi';
+        $scope.materialNames = ['apple'];
+
+        $scope.modelOne = {
+          title: 'hi',
+          materialType: 'Some other type',
+          source: 'html'
+        };
+
+        $scope.$watch('supportingMaterial', function(n){
+          $scope.j = JSON.stringify(n);
+          console.log(j);
+        });
+      }]);
+      
+    </script>
+    <div ng-app="rig-app" ng-controller="Root">
+      <h1>a rig {{message}} </h1>
+      <label>is valid {{metadataIsValid}}</label>
+      <div>{{j}}
+      <div supportingmetadata="" focus-title="true" ng-model="supportingMaterial" source-is-editable="true" is-valid="metadataIsValid" existing-names="materialNames"></div>
+      <hr/>
+     <div supportingmetadata="" 
+        ng-model="modelOne" focus-title="true" source-is-editable="false" existing-names="materialNames"></div>  
+    </div>
+  </body>
+</html>

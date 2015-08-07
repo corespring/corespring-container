@@ -1,5 +1,5 @@
-describe('SupportingMaterials', function() {
-
+xdescribe('SupportingMaterials', function() {
+  
   var scope, element;
 
   var index = 0;
@@ -338,5 +338,5 @@ describe('SupportingMaterials', function() {
       pending();
     });
   });
-
+  
 });
