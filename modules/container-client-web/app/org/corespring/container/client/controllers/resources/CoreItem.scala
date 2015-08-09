@@ -3,10 +3,12 @@ package org.corespring.container.client.controllers.resources
 import java.io.{ByteArrayInputStream, IOException}
 import java.net.URLConnection
 
+import grizzled.file.GrizzledFile
 import org.corespring.container.client.controllers.helpers.{ PlayerXhtml, XhtmlProcessor }
 import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.client.hooks._
 import play.api.Logger
+import play.api.http.MimeTypes
 import play.api.libs.json.{ JsString, JsObject, JsValue, Json }
 import play.api.mvc._
 
@@ -28,6 +30,13 @@ object ItemJson {
 }
 
 trait CoreItem extends Controller {
+
+  val acceptableTypes = Seq(
+    "application/pdf",
+    "image/png",
+    "image/gif",
+    "image/jpeg"
+  )
 
   lazy val logger = Logger(classOf[CoreItem])
 
@@ -56,6 +65,61 @@ trait CoreItem extends Controller {
       case t : Throwable => None
     }
 
+  def createSupportingMaterialFromFile(id:String, materialType:String, filename:String) = Action.async { request =>
+
+    lazy val extension:Option[String] = if(filename.contains("."))
+      Some(filename.split("\\.").last)
+    else None
+
+    lazy val basename : String = if(filename.contains("."))
+      filename.split("\\.").init.mkString(".")
+    else
+      filename
+
+    def accept(mimeType:String) = {
+      if(acceptableTypes.contains(mimeType)){
+        Success(true)
+      } else {
+        Failure(s"not acceptable only types supported: ${acceptableTypes.mkString(",")}")
+      }
+    }
+
+    def createFromRaw(raw:RawBuffer) : Validation[String,SupportingMaterial[File]] = {
+      for{
+        extension <- extension.toSuccess("can't read extension")
+        mimeType <- play.api.libs.MimeTypes.forFileName(filename).toSuccess("can't guess mimeType")
+        acceptable <- accept(mimeType)
+        bytes <- raw.asBytes(raw.size.toInt)
+      } yield {
+
+        val name = request.getQueryString("name").getOrElse(basename)
+
+        BinarySupportingMaterial(
+          name,
+          materialType,
+          Binary(s"main.$extension",
+            mimeType,
+            bytes)
+        )
+      }
+    }
+
+    create( (body) => for{
+      raw <- request.body.asRaw.toSuccess("no bytes in request body")
+      sm <- createFromRaw(raw)
+    } yield sm
+    )(id, request)
+  }
+
+  private def create[F<:File, SM <: SupportingMaterial[F]](mkC: AnyContent => Validation[String, SM])(id:String, r:Request[AnyContent]) = {
+    mkC(r.body).map{ sm =>
+      hooks.createSupportingMaterial(id, sm).map {
+        case ((err, msg)) => Status(err)(msg)
+        case head :: xs => Status(CREATED)(Json.obj("msg" -> "ok"))
+      }
+    }.getOrElse(Future(BadRequest("?")))
+  }
+
   def createSupportingMaterial(id:String) = Action.async{ request =>
 
     def createFromJson(json:JsValue) : Validation[String,HtmlSupportingMaterial] = {
@@ -72,39 +136,12 @@ trait CoreItem extends Controller {
       }
     }
 
-    def createFromRaw(raw:RawBuffer) : Validation[String,SupportingMaterial[File]] = {
-      for{
-        title <- request.getQueryString("title").toSuccess("no title")
-        materialType <- request.getQueryString("materialType").toSuccess("no material type")
-        bytes <- raw.asBytes(raw.size.toInt)
-        contentType <- getContentType(bytes).toSuccess("can't guess contentType")
-    } yield {
-       BinarySupportingMaterial(
-         title,
-         materialType,
-         Binary(s"main.$contentType",
-           contentType,
-           bytes)
-       )
-      }
-    }
+    create( (body) => for{
+        json <- body.asJson.toSuccess("no json in request body")
+        sm <- createFromJson(json)
+      } yield sm
+    )(id, request)
 
-    val maybeMaterial = request.body.asJson.map(createFromJson).orElse(request.body.asRaw.map(createFromRaw))
-
-    maybeMaterial.map{ v =>
-      v match {
-        case Failure(err) => Future(BadRequest(err))
-        case Success(sm) => {
-          hooks.createSupportingMaterial(sm).map { e => e match {
-            case ((err, msg)) => Status(err)(msg)
-            case head :: xs => Status(CREATED)(Json.obj("ok"))
-          }
-          }
-        }
-      }
-    }.getOrElse{
-      Future(BadRequest("neither bytes nor json sent"))
-    }
   }
 
 def load(itemId: String) = Action.async { implicit request =>

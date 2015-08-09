@@ -49,13 +49,13 @@ case class DeleteAsset(error: Option[String])
 
 trait File{
   def name:String
-  def contentType:String
+  def mimeType:String
 }
 
-case class Binary(name:String, contentType:String, data: => Array[Byte]) extends File
+case class Binary(name:String, mimeType:String, data: => Array[Byte]) extends File
 
 case class Html(name:String, content:String) extends File{
-  override def contentType: String = "text/html"
+  override def mimeType: String = "text/html"
 }
 
 trait SupportingMaterial[F<:File] {
