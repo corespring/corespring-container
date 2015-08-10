@@ -15,6 +15,7 @@ trait BaseItemEditor extends CoreEditor {
       resourceRoutes.Item.saveSubset(itemId, ":subset"),
       None,
       resourceRoutes.Item.createSupportingMaterial(itemId),
+      resourceRoutes.Item.createSupportingMaterialFromFile(itemId, ":materialType", ":filename"),
       components,
       widgets).toString
   }

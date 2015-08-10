@@ -1,5 +1,8 @@
 package org.corespring.shell.controllers.editor
 
+import com.mongodb.casbah.commons.MongoDBObject
+import org.bson.types.ObjectId
+import org.corespring.container.client.hooks.{Binary, SupportingMaterial, File}
 import org.corespring.container.client.hooks.Hooks.R
 import org.corespring.container.client.{hooks => containerHooks}
 import org.corespring.mongo.json.services.MongoService
@@ -70,6 +73,17 @@ trait ItemHooks
       oid =>
         Right(oid.toString)
     }.getOrElse(Left(BAD_REQUEST -> "Error creating item"))
+  }
+
+  override def createSupportingMaterial[F <: File](id: String, sm: SupportingMaterial[F])(implicit h: RequestHeader): R[Seq[SupportingMaterial[File]]] = Future{
+    {
+      val query = MongoDBObject("_id" -> new ObjectId(id))
+      def upload(b: Binary) = assets.uploadSupportingMaterialBinary(id, b).bimap(
+        (e: String) => (INTERNAL_SERVER_ERROR -> e),
+        (s: String) => Seq.empty[SupportingMaterial[File]]
+      )
+      updateDBAndUploadBinary(itemService.collection, query, sm, upload)
+    }.toEither
   }
 
 }

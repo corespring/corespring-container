@@ -52,7 +52,7 @@ trait File{
   def mimeType:String
 }
 
-case class Binary(name:String, mimeType:String, data: => Array[Byte]) extends File
+case class Binary(name:String, mimeType:String, data: Array[Byte]) extends File
 
 case class Html(name:String, content:String) extends File{
   override def mimeType: String = "text/html"

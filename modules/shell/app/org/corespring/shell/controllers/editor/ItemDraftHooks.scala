@@ -2,6 +2,7 @@ package org.corespring.shell.controllers.editor
 
 import com.mongodb.casbah.Imports._
 import org.bson.types.ObjectId
+import org.corespring.container.client.hooks._
 import org.corespring.container.client.hooks.Hooks.{ R, StatusMessage }
 import org.corespring.container.client.{ hooks => containerHooks }
 import org.corespring.mongo.json.services.MongoService
@@ -14,7 +15,7 @@ import play.api.libs.json._
 import play.api.mvc._
 
 import scala.concurrent.Future
-import scalaz.Success
+import scalaz.{Failure, Success}
 
 trait ItemDraftHooks
   extends containerHooks.CoreItemHooks
@@ -159,6 +160,22 @@ trait ItemDraftHooks
       case None => Left(BAD_REQUEST, "Error creating item and draft")
       case Some(tuple) => Right(tuple)
     }
+  }
+
+  override def createSupportingMaterial[F <: File](id: String, sm: SupportingMaterial[F])(implicit h: RequestHeader): R[Seq[SupportingMaterial[File]]] = Future {
+
+    ContainerDraftId.fromString(id).map{ draftId =>
+
+      def upload(binary:Binary) = assets.uploadSupportingMaterialBinary(draftId, binary).bimap(
+        (e:String) => (INTERNAL_SERVER_ERROR -> e),
+        (s:String) => Seq.empty[SupportingMaterial[File]]
+      )
+
+      val query = MongoDBObject("_id" -> DraftId.dbo(draftId))
+      updateDBAndUploadBinary(draftItemService.collection, query, sm, upload)
+    }.getOrElse(
+      Failure((BAD_REQUEST, s"invalid draft id: $id"))
+    ).toEither
   }
 
 }

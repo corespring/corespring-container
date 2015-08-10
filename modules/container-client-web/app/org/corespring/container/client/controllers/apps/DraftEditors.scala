@@ -14,6 +14,7 @@ trait BaseDraftEditor extends CoreEditor {
       resourceRoutes.ItemDraft.saveSubset(id, ":subset"),
       Some(resourceRoutes.ItemDraft.save(id)),
       resourceRoutes.ItemDraft.createSupportingMaterial(id),
+      resourceRoutes.ItemDraft.createSupportingMaterialFromFile(id, ":materialType", ":filename"),
       components, widgets).toString
   }
 }

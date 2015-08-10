@@ -1,4 +1,4 @@
-@(namespace: String, load: Call, saveSubset: Call, save: Option[Call], createSupportingMaterial: Call, componentSet: JsValue, widgets: JsValue)
+@(namespace: String, load: Call, saveSubset: Call, save: Option[Call], createSupportingMaterial: Call, createSupportingMaterialFromFile:Call, componentSet: JsValue, widgets: JsValue)
 
 @toMethodAndUrl(c:Call) = @{
   s"{ method: '${c.method.toLowerCase}', url: '${c.url}'}"  
@@ -16,7 +16,8 @@
         save: @toMethodAndUrl(save),
       }
       saveSubset: @toMethodAndUrl(saveSubset),
-      createSupportingMaterial: @toMethodAndUrl(createSupportingMaterial)
+      createSupportingMaterial: @toMethodAndUrl(createSupportingMaterial),
+      createSupportingMaterialFromFile: @toMethodAndUrl(createSupportingMaterialFromFile)
     }
   }]);
 

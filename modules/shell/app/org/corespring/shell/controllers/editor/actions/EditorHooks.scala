@@ -11,11 +11,20 @@ import play.api.libs.json.{ Json, JsValue }
 import play.api.mvc._
 
 import scala.concurrent.Future
+import scala.util.Try
 
 abstract class DraftId[A](val itemId: A, val name: String)
 
 case class ContainerDraftId(override val itemId: ObjectId, override val name: String)
   extends DraftId[ObjectId](itemId, name)
+
+object ContainerDraftId{
+  def fromString(s:String) : Option[ContainerDraftId] = {
+    Try{ DraftId.fromString[ObjectId,ContainerDraftId](s, (id,name) => {
+      ContainerDraftId(new ObjectId(id), name)
+    })}.toOption
+  }
+}
 
 object DraftId {
   def fromString[A, D <: DraftId[A]](s: String, build: (String, String) => D): D = {

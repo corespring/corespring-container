@@ -84,12 +84,12 @@ trait CoreItem extends Controller {
       }
     }
 
-    def createFromRaw(raw:RawBuffer) : Validation[String,SupportingMaterial[File]] = {
+    def createFromRaw(raw:RawBuffer) : Validation[String,BinarySupportingMaterial] = {
       for{
         extension <- extension.toSuccess("can't read extension")
         mimeType <- play.api.libs.MimeTypes.forFileName(filename).toSuccess("can't guess mimeType")
         acceptable <- accept(mimeType)
-        bytes <- raw.asBytes(raw.size.toInt)
+        bytes <- raw.asBytes(raw.size.toInt).toSuccess("can't load bytes")
       } yield {
 
         val name = request.getQueryString("name").getOrElse(basename)
@@ -111,13 +111,18 @@ trait CoreItem extends Controller {
     )(id, request)
   }
 
-  private def create[F<:File, SM <: SupportingMaterial[F]](mkC: AnyContent => Validation[String, SM])(id:String, r:Request[AnyContent]) = {
-    mkC(r.body).map{ sm =>
-      hooks.createSupportingMaterial(id, sm).map {
-        case ((err, msg)) => Status(err)(msg)
-        case head :: xs => Status(CREATED)(Json.obj("msg" -> "ok"))
+  private def create[F<:File](mk: AnyContent => Validation[String, SupportingMaterial[F]])(id:String, r:Request[AnyContent]) : Future[SimpleResult] = {
+    mk(r.body) match {
+      case Success(sm) => {
+        val f: Future[Either[(Int, String), Seq[SupportingMaterial[File]]]] = hooks.createSupportingMaterial(id, sm)(r)
+        f.map { e => e match {
+          case Left((err, msg)) => Status(err)(msg)
+          case Right(list) => Status(CREATED)(Json.obj("msg" -> "ok"))
+        }
+        }
       }
-    }.getOrElse(Future(BadRequest("?")))
+      case Failure(e) => Future(BadRequest(Json.obj("error" -> e)))
+    }
   }
 
   def createSupportingMaterial(id:String) = Action.async{ request =>

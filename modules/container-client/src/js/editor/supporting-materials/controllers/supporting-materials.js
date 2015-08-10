@@ -6,14 +6,12 @@ angular.module('corespring-editor.controllers')
     '$modal',
     'ImageUtils',
     'ItemService',
-    'MaterialsService',
     'LogFactory',
     function(
       $scope,
       $modal,
       ImageUtils,
       ItemService,
-      MaterialsService,
       LogFactory)
       {
 
@@ -42,14 +40,14 @@ angular.module('corespring-editor.controllers')
           modalInstance.result.then(function(newMaterial) {
 
             function onCreate(updatedMaterials){
-              $scope.item.supportingMaterials = updatedMaterials;
+              $scope.item.supportingMaterials.push(newMaterial);
             }
 
             function onError(err){
               logger.warn(err);
             }
 
-            MaterialsService.create(newMaterial, onCreate, onError);
+            ItemService.createSupportingMaterial(newMaterial, onCreate, onError);
           });
         };
 
