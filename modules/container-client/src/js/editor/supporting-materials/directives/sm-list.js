@@ -5,10 +5,10 @@
 
       function link($scope, $element, $attrs, ngModel){
 
-        ngModel.$render = function() {
-          logger.debug('$render', ngModel.$viewValue);
+        $scope.$watch('ngModel', function(update){
+          logger.debug('$watch', ngModel.$viewValue);
           $scope.sections = SmUtils.group(ngModel.$viewValue, $attrs.groupBy || 'materialType');
-        };
+        }, true);
       }
 
       function SmListController($scope){

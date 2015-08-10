@@ -14,11 +14,15 @@ angular.module('corespring-editor.controllers')
       ItemService,
       LogFactory)
       {
-
         var logger  = LogFactory.getLogger('supporting-materials');
 
         $scope.deleteItem = function(data){
-          console.log('deleteItem : ', data);
+          
+          $scope.item.supportingMaterials = _.reject($scope.item.supportingMaterials, function(o){
+            return o === data;
+          });
+
+          ItemService.saveSupportingMaterials($scope.item.supportingMaterials);
         };
 
         $scope.chooseItem = function(data){
@@ -37,17 +41,17 @@ angular.module('corespring-editor.controllers')
             }
           });
 
-          modalInstance.result.then(function(newMaterial) {
+          modalInstance.result.then(function(createRequest) {
 
-            function onCreate(updatedMaterials){
-              $scope.item.supportingMaterials.push(newMaterial);
+            function onCreate(newSupportingMaterial){
+              $scope.item.supportingMaterials.push(newSupportingMaterial);
             }
 
             function onError(err){
               logger.warn(err);
             }
 
-            ItemService.createSupportingMaterial(newMaterial, onCreate, onError);
+            ItemService.createSupportingMaterial(createRequest, onCreate, onError);
           });
         };
 

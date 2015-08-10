@@ -13,19 +13,19 @@ angular.module('corespring-editor.directives')
 
         var other = $scope.other = 'Other';
         var none = 'none selected';
-        $scope.metadataForm.title.$error = null;
+        $scope.metadataForm.name.$error = null;
 
         function nameIsTaken() {
-          return _.contains($scope.existingNames, $scope.title);
+          return _.contains($scope.existingNames, $scope.name);
         }
 
-        $scope.checkTitleIsAvailable = function() {
+        $scope.checkNameIsAvailable = function() {
           if (nameIsTaken()) {
-            $scope.metadataForm.title.$valid = false;
-            $scope.metadataForm.title.$error = 'That title already exists';
+            $scope.metadataForm.name.$valid = false;
+            $scope.metadataForm.name.$error = 'That name already exists';
           } else {
-            $scope.metadataForm.title.$valid = true;
-            $scope.metadataForm.title.$error = null;
+            $scope.metadataForm.name.$valid = true;
+            $scope.metadataForm.name.$error = null;
           }
         };
 
@@ -53,8 +53,7 @@ angular.module('corespring-editor.directives')
 
         function isFormValid() {
 
-
-          if (_.isEmpty($scope.title)) {
+          if (_.isEmpty($scope.name)) {
             return false;
           }
 
@@ -100,7 +99,7 @@ angular.module('corespring-editor.directives')
 
           if($scope.isValid){
             var out = {
-              title: $scope.title,
+              name: $scope.name,
               materialType: getMaterialType(),
               source: $scope.source
             };
@@ -113,7 +112,7 @@ angular.module('corespring-editor.directives')
           }
         }
 
-        $scope.$watch('title', function() {
+        $scope.$watch('name', function() {
           updateModel();
         });
 

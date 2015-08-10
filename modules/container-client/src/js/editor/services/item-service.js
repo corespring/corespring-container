@@ -30,8 +30,7 @@ angular.module('corespring-editor.services').service('ItemService', [
           .replace(':filename', m.file.name);
 
         url = addQueryParamsIfPresent(url);
-        var token = url.indexOf('?' === -1) ? '?' : '&';
-        url += token +'=' + m.name;
+        url += getToken(url) +'name=' + m.name;
 
         RawFileUploader.upload(url, m.file, function(err, url){
           onSuccess(url);
@@ -41,13 +40,22 @@ angular.module('corespring-editor.services').service('ItemService', [
         });
       }
 
+      function getToken(url){
+        return url.indexOf('?' === -1) ? '?' : '&';
+      }
+
       this.createSupportingMaterial = function(m, onSuccess, onFailure){
         if(m.file){
           uploadFile(m, onSuccess, onFailure);
         } else {
           var c = ItemUrls.createSupportingMaterial;
           var url = addQueryParamsIfPresent(c.url);
-          $http[c.method](url, m, onSuccess, onFailure);
+          m.html = '<div>' + m.name + '</div>';
+          $http[c.method](url, m)
+            .success(onSuccess)
+            .error(onFailure || function(){
+              logger.error(arguments);
+            });
         }
       };
 

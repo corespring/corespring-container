@@ -4,16 +4,16 @@ dl.dl-horizontal.supporting-material-metadata(ng-form, name="metadataForm")
     div.form-horizontal
       label.control-label Title 
   
-  dd(ng-class="{'has-error': metadataForm.title.$error}")
+  dd(ng-class="{'has-error': metadataForm.name.$error}")
     input.form-control(
-      id='title', 
-      name='title',
+      id='name', 
+      name='name',
       type='text', 
-      ng-model='title',
-      ng-change="checkTitleIsAvailable()"
+      ng-model='name',
+      ng-change="checkNameIsAvailable()"
       placeholder='enter title', 
       required='required')
-    span.error(ng-show="metadataForm.title.$error") {{metadataForm.title.$error}} 
+    span.error(ng-show="metadataForm.name.$error") {{metadataForm.name.$error}} 
 
   dt
     div.form-horizontal
