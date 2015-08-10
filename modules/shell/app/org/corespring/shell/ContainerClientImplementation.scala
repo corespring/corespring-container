@@ -1,6 +1,6 @@
 package org.corespring.shell
 
-import java.io.{ByteArrayInputStream, File}
+import java.io.{ ByteArrayInputStream, File }
 import java.net.URLDecoder
 
 import com.amazonaws.services.s3.AmazonS3
@@ -21,17 +21,17 @@ import org.corespring.container.logging.ContainerLogger
 import org.corespring.mongo.json.services.MongoService
 import org.corespring.shell.controllers.ShellDataQueryHooks
 import org.corespring.shell.controllers.catalog.actions.{ CatalogHooks => ShellCatalogHooks }
-import org.corespring.shell.controllers.editor.actions.{DraftEditorHooks => ShellDraftEditorHooks, ItemEditorHooks => ShellItemEditorHooks, DraftId}
+import org.corespring.shell.controllers.editor.actions.{ DraftEditorHooks => ShellDraftEditorHooks, ItemEditorHooks => ShellItemEditorHooks, DraftId }
 import org.corespring.shell.controllers.editor.{ ItemDraftHooks => ShellItemDraftHooks, ItemHooks => ShellItemHooks, CollectionHooks => ShellCollectionHooks, ItemAssets, ItemDraftAssets }
 import org.corespring.shell.controllers.player.actions.{ PlayerHooks => ShellPlayerHooks }
 import org.corespring.shell.controllers.player.{ SessionHooks => ShellSessionHooks }
 import org.corespring.shell.services.ItemDraftService
-import play.api.libs.json.{JsValue, JsObject}
+import play.api.libs.json.{ JsValue, JsObject }
 import play.api.mvc._
-import play.api.{ Configuration, Mode, Play }
+import play.api.{ Logger, Configuration, Mode, Play }
 
 import scala.concurrent.{ ExecutionContext, Future }
-import scalaz.{Failure, Success, Validation}
+import scalaz.{ Failure, Success, Validation }
 
 class ContainerClientImplementation(
   val itemService: MongoService,
@@ -48,7 +48,7 @@ class ContainerClientImplementation(
     }.getOrElse(path)
   }
 
-  lazy val logger = ContainerLogger.getLogger("ContainerClientImplementation")
+  lazy val logger = Logger(classOf[ContainerClientImplementation])
 
   override def components: Seq[Component] = componentsIn
 
@@ -82,7 +82,7 @@ class ContainerClientImplementation(
 
   lazy val assets = new Assets with ItemDraftAssets with ItemAssets {
 
-    lazy val s3Client : AmazonS3 = {
+    lazy val s3Client: AmazonS3 = {
       for {
         k <- s3.key
         s <- s3.secret
@@ -90,8 +90,8 @@ class ContainerClientImplementation(
         val fakeEndpoint = configuration.getString("amazon.s3.fake-endpoint")
         logger.trace(s"fakeEndpoint: $fakeEndpoint")
         S3Service.mkClient(k, s, fakeEndpoint)
-      }}.getOrElse(throw new RuntimeException("no s3 client "))
-
+      }
+    }.getOrElse(throw new RuntimeException("no s3 client "))
 
     lazy val (playS3, assetUtils) = {
       val s3Service = new ConcreteS3Service(s3Client)
@@ -103,8 +103,8 @@ class ContainerClientImplementation(
 
     import AssetType._
 
-    private def mkPath(t: AssetType, id:String, rest:String*) = (t.folderName +: id :+ rest).mkString("/").replace("~", "/")
-    private def mkSupportingMaterialPath(t: AssetType, id:String, rest:String*) = {
+    private def mkPath(t: AssetType, id: String, rest: String*) = (t.folderName +: id :+ rest).mkString("/").replace("~", "/")
+    private def mkSupportingMaterialPath(t: AssetType, id: String, rest: String*) = {
       (t.folderName +: id +: "materials" :+ rest).mkString("/").replace("~", "/")
     }
 
@@ -150,23 +150,25 @@ class ContainerClientImplementation(
 
     override def deleteItem(id: String): Unit = assetUtils.deleteDir(mkPath(AssetType.Item, id))
 
-    override def uploadSupportingMaterialBinary(draftId: DraftId[ObjectId], binary: Binary): Validation[String,String] = {
+    override def uploadSupportingMaterialBinary(draftId: DraftId[ObjectId], binary: Binary): Validation[String, String] = {
       val key = mkSupportingMaterialPath(AssetType.Draft, draftId.toString, binary.name)
       logger.trace(s"[upload material] key: $key")
       uploadSupportingMaterialBinaryToPath(key, binary)
     }
 
-    private def uploadSupportingMaterialBinaryToPath(key:String, binary: Binary): Validation[String,String] = {
+    private def uploadSupportingMaterialBinaryToPath(key: String, binary: Binary): Validation[String, String] = {
       val is = new ByteArrayInputStream(binary.data)
       val metadata = new ObjectMetadata()
       metadata.setContentType(binary.mimeType)
+      metadata.setContentLength(binary.data.length)
+
       logger.trace(s"[upload material] key: $key")
       try {
         s3Client.putObject(s3.bucket, key, is, metadata)
         Success(key)
       } catch {
-        case t : Throwable => {
-          if(logger.isDebugEnabled){
+        case t: Throwable => {
+          if (logger.isDebugEnabled) {
             t.printStackTrace()
           }
           Failure(t.getMessage)

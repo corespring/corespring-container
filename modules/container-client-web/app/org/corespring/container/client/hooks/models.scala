@@ -46,28 +46,41 @@ case class PlayerJs(
 
 case class DeleteAsset(error: Option[String])
 
-
-trait File{
-  def name:String
-  def mimeType:String
+trait File {
+  def name: String
+  def mimeType: String
 }
 
-case class Binary(name:String, mimeType:String, data: Array[Byte]) extends File
+case class Binary(name: String, mimeType: String, data: Array[Byte]) extends File
 
-case class Html(name:String, content:String) extends File{
+case class Html(name: String, content: String) extends File {
   override def mimeType: String = "text/html"
 }
 
-trait SupportingMaterial[F<:File] {
+trait CreateNewMaterialRequest[F <: File] {
   def name: String
   def materialType: String
   def main: F
 }
 
-case class BinarySupportingMaterial(
-                                     name:String,
-                                     materialType:String,
-                                     main: Binary) extends SupportingMaterial[Binary]
+case class CreateBinaryMaterial(
+  name: String,
+  materialType: String,
+  main: Binary) extends CreateNewMaterialRequest[Binary]
 
-case class HtmlSupportingMaterial(name:String,materialType:String,main:Html, assets : Seq[Binary]) extends SupportingMaterial[Html]
+case class CreateHtmlMaterial(name: String, materialType: String, main: Html, assets: Seq[Binary]) extends CreateNewMaterialRequest[Html]
 
+/*
+case class TaskInfo(title:String)
+case class Profile(taskInfo:TaskInfo)
+case class ComponentData(componentType:String, weight:Int, title:String, correctResponse: ???, model: ???)
+case class ContainerItem[A](
+                        id:A,
+                           components: Map[String,ComponentData],
+                           profile: Profile,
+                           supportingMaterials : Seq[SupportingMaterial[File]],
+                           xhtml:String,
+                           customScoring:String,
+                           summaryFeedback:String
+                          )
+*/ 

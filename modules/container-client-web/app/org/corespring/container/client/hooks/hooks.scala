@@ -44,7 +44,7 @@ trait LoadHook extends HasContext {
 trait PlayerHooks extends GetAssetHook with HasContext {
   def createSessionForItem(itemId: String)(implicit header: RequestHeader): Future[Either[StatusMessage, (JsValue, JsValue)]]
   def loadSessionAndItem(sessionId: String)(implicit header: RequestHeader): Future[Either[StatusMessage, (JsValue, JsValue)]]
-  def loadItemFile(itemId:String, file:String)(implicit header: RequestHeader) : SimpleResult
+  def loadItemFile(itemId: String, file: String)(implicit header: RequestHeader): SimpleResult
 }
 
 trait CatalogHooks extends LoadHook with GetAssetHook with GetSupportingMaterialAssetHook {
@@ -67,7 +67,7 @@ trait CoreItemHooks extends HasContext with LoadHook {
   def saveSummaryFeedback(id: String, feedback: String)(implicit h: RequestHeader): R[JsValue]
   def saveSupportingMaterials(id: String, json: JsValue)(implicit h: RequestHeader): R[JsValue]
   def saveXhtml(id: String, xhtml: String)(implicit h: RequestHeader): R[JsValue]
-  def createSupportingMaterial[F<: File](id:String, sm:SupportingMaterial[F])(implicit h : RequestHeader) : R[Seq[SupportingMaterial[File]]]
+  def createSupportingMaterial[F <: File](id: String, sm: CreateNewMaterialRequest[F])(implicit h: RequestHeader): R[JsValue]
 }
 
 trait DraftHooks {
@@ -76,8 +76,8 @@ trait DraftHooks {
   def commit(id: String, force: Boolean)(implicit h: RequestHeader): R[JsValue]
 }
 
-trait CreateItemHook{
-  def createItem(json:Option[JsValue])(implicit h: RequestHeader): R[String]
+trait CreateItemHook {
+  def createItem(json: Option[JsValue])(implicit h: RequestHeader): R[String]
 }
 
 trait SessionHooks extends HasContext {

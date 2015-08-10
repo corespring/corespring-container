@@ -2,9 +2,9 @@ package org.corespring.shell.controllers.editor
 
 import com.mongodb.casbah.commons.MongoDBObject
 import org.bson.types.ObjectId
-import org.corespring.container.client.hooks.{Binary, SupportingMaterial, File}
+import org.corespring.container.client.hooks.{ Binary, CreateNewMaterialRequest, File }
 import org.corespring.container.client.hooks.Hooks.R
-import org.corespring.container.client.{hooks => containerHooks}
+import org.corespring.container.client.{ hooks => containerHooks }
 import org.corespring.mongo.json.services.MongoService
 import play.api.http.Status._
 import play.api.libs.json._
@@ -18,7 +18,7 @@ trait ItemHooks
   with ItemHooksHelper {
   def itemService: MongoService
 
-  def assets : ItemAssets
+  def assets: ItemAssets
 
   override def load(itemId: String)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] = Future {
     itemService.load(itemId).map { i =>
@@ -26,7 +26,7 @@ trait ItemHooks
     }.getOrElse(Left((NOT_FOUND, s"Can't find item with id: $itemId")))
   }
 
-  override def delete(id: String)(implicit h: RequestHeader): R[JsValue] = Future{
+  override def delete(id: String)(implicit h: RequestHeader): R[JsValue] = Future {
     itemService.delete(id)
     assets.deleteItem(id)
     Right(Json.obj("id" -> id))
@@ -75,13 +75,12 @@ trait ItemHooks
     }.getOrElse(Left(BAD_REQUEST -> "Error creating item"))
   }
 
-  override def createSupportingMaterial[F <: File](id: String, sm: SupportingMaterial[F])(implicit h: RequestHeader): R[Seq[SupportingMaterial[File]]] = Future{
+  override def createSupportingMaterial[F <: File](id: String, sm: CreateNewMaterialRequest[F])(implicit h: RequestHeader): R[JsValue] = Future {
     {
       val query = MongoDBObject("_id" -> new ObjectId(id))
       def upload(b: Binary) = assets.uploadSupportingMaterialBinary(id, b).bimap(
         (e: String) => (INTERNAL_SERVER_ERROR -> e),
-        (s: String) => Seq.empty[SupportingMaterial[File]]
-      )
+        (s: String) => sm)
       updateDBAndUploadBinary(itemService.collection, query, sm, upload)
     }.toEither
   }

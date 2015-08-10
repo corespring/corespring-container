@@ -6,13 +6,12 @@ angular.module('corespring-editor.services').service('RawFileUploader', [
       
       var logger = LogFactory.getLogger('raw-file-uploader');
 
-
       this.upload = function(url, file, onSuccess, onFailure){
 
         var opts = {
           onUploadComplete: function(body, status) {
             logger.debug('done: ', body, status);
-            onSuccess(url);
+            onSuccess(JSON.parse(body));
           },
           onUploadFailed: function() {
             logger.debug('failed', arguments);

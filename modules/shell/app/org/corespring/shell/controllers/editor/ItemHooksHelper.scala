@@ -2,7 +2,7 @@ package org.corespring.shell.controllers.editor
 
 import com.mongodb.DBObject
 import com.mongodb.casbah.MongoCollection
-import com.mongodb.casbah.commons.{MongoDBList, MongoDBObject}
+import com.mongodb.casbah.commons.{ MongoDBList, MongoDBObject }
 import org.bson.types.ObjectId
 import org.corespring.container.client.hooks._
 import org.corespring.mongo.json.services.MongoService
@@ -10,7 +10,7 @@ import play.api.http.Status._
 import play.api.libs.json.{ Json, JsObject, JsArray, JsValue }
 
 import scala.concurrent.Future
-import scalaz.{Failure, Success, Validation}
+import scalaz.{ Failure, Success, Validation }
 
 trait ItemHooksHelper {
 
@@ -34,53 +34,49 @@ trait ItemHooksHelper {
     }.getOrElse(Left(BAD_REQUEST -> "Error saving"))
   }
 
+  private def materialToDbo[F <: File](sm: CreateNewMaterialRequest[F]): DBObject = sm match {
+    case CreateHtmlMaterial(name, materialType, markup, _) => {
+      MongoDBObject(
+        "name" -> name,
+        "materialType" -> materialType,
+        "files" -> MongoDBList(
+          MongoDBObject(
+            "_t" -> "org.corespring.platform.core.models.item.resource.VirtualFile",
+            "name" -> "index.html",
+            "isMain" -> true,
+            "contentType" -> "text/html")))
+    }
+    case CreateBinaryMaterial(name, materialType, binary) => {
+      MongoDBObject(
+        "name" -> name,
+        "materialType" -> materialType,
+        "files" -> MongoDBList(
+          MongoDBObject(
+            "_t" -> "org.corespring.platform.core.models.item.resource.StoredFile",
+            "name" -> binary.name,
+            "isMain" -> true,
+            "contentType" -> binary.mimeType)))
+    }
+  }
+
   protected def updateDBAndUploadBinary[F <: File](
-                                          collection:MongoCollection,
-                                          query:DBObject,
-                                          sm:SupportingMaterial[F],
-                                          upload: Binary => Validation[(Int,String),Seq[SupportingMaterial[File]]]) : Validation[(Int,String), Seq[SupportingMaterial[File]]]= {
+    collection: MongoCollection,
+    query: DBObject,
+    sm: CreateNewMaterialRequest[F],
+    upload: Binary => Validation[(Int, String), CreateNewMaterialRequest[F]]): Validation[(Int, String), JsValue] = {
+    val dbo = materialToDbo(sm)
+    lazy val json = Json.parse(com.mongodb.util.JSON.serialize(dbo))
+    val update = MongoDBObject("$push" -> MongoDBObject("supportingMaterials" -> dbo))
+    val wr = collection.update(query, update, false, false)
 
-      val dbo = sm match {
-        case HtmlSupportingMaterial(name, materialType, markup, _) => {
-          MongoDBObject(
-            "name" -> name,
-            "materialType" -> materialType,
-            "files" ->  MongoDBList(
-              MongoDBObject(
-                "_t" -> "org.corespring.platform.core.models.item.resource.VirtualFile",
-                "name" -> "index.html",
-                "isMain" -> true,
-                "contentType" -> "text/html"
-              )
-            )
-          )
-        }
-        case BinarySupportingMaterial(name, materialType, binary) => {
-
-          MongoDBObject(
-            "name" -> name,
-            "materialType" -> materialType,
-            "files" -> MongoDBList(
-              "_t" -> "org.corespring.platform.core.models.item.resource.StoredFile",
-              "name" -> binary.name,
-              "isMain" -> true,
-              "contentType" -> binary.mimeType
-            )
-          )
-        }
+    if (wr.getN == 1) {
+      sm match {
+        case CreateBinaryMaterial(_, _, binary) => upload(binary).map { sm => json }
+        case _ => Success(json)
       }
-      val update = MongoDBObject("$push" -> MongoDBObject("supportingMaterials" -> dbo ))
-      val wr = collection.update(query, update, false, false)
-
-      if(wr.getN == 1){
-
-        sm match {
-          case BinarySupportingMaterial(_,_,binary) => upload(binary)
-          case _ => Success(Seq.empty)
-        }
-      } else {
-        Failure((500, "Update failed"))
-      }
+    } else {
+      Failure((500, "Update failed"))
+    }
   }
 
 }

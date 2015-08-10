@@ -15,7 +15,7 @@ import play.api.libs.json._
 import play.api.mvc._
 
 import scala.concurrent.Future
-import scalaz.{Failure, Success}
+import scalaz.{ Failure, Success }
 
 trait ItemDraftHooks
   extends containerHooks.CoreItemHooks
@@ -162,20 +162,18 @@ trait ItemDraftHooks
     }
   }
 
-  override def createSupportingMaterial[F <: File](id: String, sm: SupportingMaterial[F])(implicit h: RequestHeader): R[Seq[SupportingMaterial[File]]] = Future {
+  override def createSupportingMaterial[F <: File](id: String, sm: CreateNewMaterialRequest[F])(implicit h: RequestHeader): R[JsValue] = Future {
 
-    ContainerDraftId.fromString(id).map{ draftId =>
+    ContainerDraftId.fromString(id).map { draftId =>
 
-      def upload(binary:Binary) = assets.uploadSupportingMaterialBinary(draftId, binary).bimap(
-        (e:String) => (INTERNAL_SERVER_ERROR -> e),
-        (s:String) => Seq.empty[SupportingMaterial[File]]
-      )
+      def upload(binary: Binary) = assets.uploadSupportingMaterialBinary(draftId, binary).bimap(
+        (e: String) => (INTERNAL_SERVER_ERROR -> e),
+        (s: String) => sm)
 
       val query = MongoDBObject("_id" -> DraftId.dbo(draftId))
       updateDBAndUploadBinary(draftItemService.collection, query, sm, upload)
     }.getOrElse(
-      Failure((BAD_REQUEST, s"invalid draft id: $id"))
-    ).toEither
+      Failure((BAD_REQUEST, s"invalid draft id: $id"))).toEither
   }
 
 }

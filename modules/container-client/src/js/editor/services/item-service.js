@@ -32,8 +32,8 @@ angular.module('corespring-editor.services').service('ItemService', [
         url = addQueryParamsIfPresent(url);
         url += getToken(url) +'name=' + m.name;
 
-        RawFileUploader.upload(url, m.file, function(err, url){
-          onSuccess(url);
+        RawFileUploader.upload(url, m.file, function(newMaterial){
+          onSuccess(newMaterial);
         }, function(err){
           logger.error(err);
           onFailure(err);
