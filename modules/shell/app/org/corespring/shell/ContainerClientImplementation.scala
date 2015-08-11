@@ -103,9 +103,12 @@ class ContainerClientImplementation(
 
     import AssetType._
 
-    private def mkPath(t: AssetType, id: String, rest: String*) = (t.folderName +: id :+ rest).mkString("/").replace("~", "/")
+    private def mkPath(t: AssetType, id: String, rest: String*) = {
+      (t.folderName +: id +: rest).mkString("/").replace("~", "/")
+    }
+
     private def mkSupportingMaterialPath(t: AssetType, id: String, rest: String*) = {
-      (t.folderName +: id +: "materials" :+ rest).mkString("/").replace("~", "/")
+      mkPath(t, id, ("materials" +: rest): _*)
     }
 
     override def load(t: AssetType, id: String, path: String)(implicit h: RequestHeader): SimpleResult = {
