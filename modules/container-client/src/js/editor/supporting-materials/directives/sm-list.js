@@ -38,7 +38,6 @@
                    '    </li>',
                    '  </ul>',
                    '</div>'].join('')
-        //templateUrl: '/editor/supporting-materials/directives/sm-list.html'
       };
     }
   ]);
@@ -59,7 +58,6 @@
                   '  <li class="sm-section-header">{{ngModel.name}}</li>',
                   '  <li class="sm-item" ng-repeat="i in ngModel.items" sm-item ng-model="i"></li>',
                   '</ul>'].join('')
-        //templateUrl: '/editor/supporting-materials/directives/sm-section.html'
       };
 
   }]);

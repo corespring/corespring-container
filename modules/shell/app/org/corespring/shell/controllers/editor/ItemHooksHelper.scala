@@ -23,7 +23,7 @@ trait SupportingMaterialHooksHelper {
   }
 
   private def materialToDbo[F <: File](sm: CreateNewMaterialRequest[F]): DBObject = sm match {
-    case CreateHtmlMaterial(name, materialType, markup, _) => {
+    case CreateHtmlMaterial(name, materialType, html, _) => {
       MongoDBObject(
         "name" -> name,
         "materialType" -> materialType,
@@ -32,6 +32,7 @@ trait SupportingMaterialHooksHelper {
             "_t" -> "org.corespring.platform.core.models.item.resource.VirtualFile",
             "name" -> "index.html",
             "isMain" -> true,
+            "content" -> html.content,
             "contentType" -> "text/html")))
     }
     case CreateBinaryMaterial(name, materialType, binary) => {

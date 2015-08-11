@@ -31,7 +31,7 @@ trait ItemDraftSupportingMaterialHooks
   override def create[F <: File](id: String, sm: CreateNewMaterialRequest[F])(implicit h: RequestHeader): R[JsValue] = withDraftId(id) { (draftId) =>
     Future {
 
-      def upload(binary: Binary) = assets.uploadSupportingMaterialBinary(draftId, binary).bimap(
+      def upload(binary: Binary) = assets.uploadSupportingMaterialBinary(draftId, sm.name, binary).bimap(
         (e: String) => (INTERNAL_SERVER_ERROR -> e),
         (s: String) => sm)
 

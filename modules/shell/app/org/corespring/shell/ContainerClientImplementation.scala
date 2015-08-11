@@ -21,7 +21,7 @@ import org.corespring.container.logging.ContainerLogger
 import org.corespring.mongo.json.services.MongoService
 import org.corespring.shell.controllers.ShellDataQueryHooks
 import org.corespring.shell.controllers.catalog.actions.{ CatalogHooks => ShellCatalogHooks }
-import org.corespring.shell.controllers.editor.{ SupportingMaterialAssets, ItemDraftAssets, ItemAssets }
+import org.corespring.shell.controllers.editor.{ ContainerSupportingMaterialAssets, SupportingMaterialAssets, ItemDraftAssets, ItemAssets }
 import org.corespring.shell.controllers.editor.actions.{ DraftEditorHooks => ShellDraftEditorHooks, ItemEditorHooks => ShellItemEditorHooks, DraftId }
 import org.corespring.shell.controllers.{ editor => shellEditor }
 //.{ ItemDraftHooks => ShellItemDraftHooks, ItemHooks => ShellItemHooks, ItemSupportingMaterialHooks => Shel CollectionHooks => ShellCollectionHooks, ItemAssets, ItemDraftAssets }
@@ -99,19 +99,17 @@ class ContainerClientImplementation(
     (s3Service, assetUtils)
   }
 
-  lazy val itemSupportingMaterialAssets = new SupportingMaterialAssets[String] {
-    override def uploadSupportingMaterialBinary(id: String, binary: Binary): Validation[String, String] = {
+  lazy val itemSupportingMaterialAssets = new ContainerSupportingMaterialAssets[String](
+    s3.bucket,
+    s3Client,
+    playS3,
+    (id: String, rest: Seq[String]) => ("items" +: id +: rest).mkString("/").replace("~", "/"))
 
-    }
-
-    override def deleteSupportingMaterialBinary(id: String, material: String): Validation[String, String] = ???
-
-    override def getAssetFromSupportingMaterial(id: String, material: String, name: String): SimpleResult = ???
-
-    override def deleteAssetFromSupportingMaterial(id: String, material: String, name: String): Validation[String, String] = ???
-
-    override def uploadAssetToSupportingMaterial(id: String, material: String, binary: Binary): Validation[String, String] = ???
-  }
+  lazy val itemDraftSupportingMaterialAssets = new ContainerSupportingMaterialAssets[DraftId[ObjectId]](
+    s3.bucket,
+    s3Client,
+    playS3,
+    (id: DraftId[ObjectId], rest: Seq[String]) => ("item-drafts" +: id +: "materials" +: rest).mkString("/").replace("~", "/"))
 
   lazy val assets = new Assets with ItemDraftAssets with ItemAssets {
 
@@ -282,9 +280,10 @@ class ContainerClientImplementation(
   }
 
   override def itemDraftSupportingMaterialHooks: SupportingMaterialHooks = new shellEditor.ItemDraftSupportingMaterialHooks {
-    override def assets: ItemAssets = ContainerClientImplementation.this.assets
 
     override def draftItemService: ItemDraftService = ContainerClientImplementation.this.draftItemService
+
+    override def assets: SupportingMaterialAssets[DraftId[ObjectId]] = itemDraftSupportingMaterialAssets
   }
 
   override def itemHooks: CoreItemHooks with CreateItemHook = new shellEditor.ItemHooks {
@@ -294,9 +293,10 @@ class ContainerClientImplementation(
   }
 
   override def itemSupportingMaterialHooks: SupportingMaterialHooks = new shellEditor.ItemSupportingMaterialHooks {
-    override def assets: ItemAssets = ContainerClientImplementation.this.assets
 
     override def itemService: MongoService = ContainerClientImplementation.this.itemService
+
+    override def assets: SupportingMaterialAssets[String] = itemSupportingMaterialAssets
   }
 
   override def playerHooks: PlayerHooks = new ShellPlayerHooks {

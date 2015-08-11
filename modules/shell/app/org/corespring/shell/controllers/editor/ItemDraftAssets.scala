@@ -4,7 +4,7 @@ import java.io.ByteArrayInputStream
 
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.s3.model.ObjectMetadata
-import org.corespring.container.client.controllers.AssetType
+import org.corespring.amazon.s3.S3Service
 import org.corespring.container.client.hooks.Binary
 import play.api.Logger
 import play.api.mvc.SimpleResult
@@ -19,14 +19,13 @@ trait SupportingMaterialAssets[A] {
   def getAssetFromSupportingMaterial(id: A, material: String, name: String): SimpleResult
 }
 
-trait Hm[A] extends SupportingMaterialAssets[A] {
+class ContainerSupportingMaterialAssets[A](
+  bucket: String,
+  s3Client: AmazonS3,
+  s3Service: S3Service,
+  mkKey: (A, Seq[String]) => String) extends SupportingMaterialAssets[A] {
 
-  def s3Client: AmazonS3
-
-  def bucket: String
-  lazy val logger = Logger(classOf[Hm[A]])
-
-  def mkKey(id: A, rest: String*): String
+  lazy val logger = Logger(classOf[ContainerSupportingMaterialAssets[A]])
 
   private def uploadSupportingMaterialBinaryToPath(key: String, binary: Binary): Validation[String, String] = {
     val is = new ByteArrayInputStream(binary.data)
@@ -48,8 +47,19 @@ trait Hm[A] extends SupportingMaterialAssets[A] {
     }
   }
 
+  override def getAssetFromSupportingMaterial(id: A, material: String, name: String): SimpleResult = {
+    val key = mkKey(id, Seq(material, name))
+    s3Service.download(bucket, key)
+  }
+
+  override def deleteAssetFromSupportingMaterial(id: A, material: String, name: String): Validation[String, String] = {
+    val key = mkKey(id, Seq(material, name))
+    s3Client.deleteObject(bucket, key)
+    Success("ok")
+  }
+
   override def deleteSupportingMaterialBinary(id: A, material: String): Validation[String, String] = {
-    val key = mkKey(id, material)
+    val key = mkKey(id, Seq(material))
     import scala.collection.JavaConversions._
     s3Client.listObjects(key).getObjectSummaries().foreach { s =>
       s3Client.deleteObject(bucket, s.getKey)
@@ -59,12 +69,12 @@ trait Hm[A] extends SupportingMaterialAssets[A] {
   }
 
   override def uploadAssetToSupportingMaterial(id: A, material: String, binary: Binary): Validation[String, String] = {
-    val key = mkKey(id, material, binary.name)
+    val key = mkKey(id, Seq(material, binary.name))
     uploadSupportingMaterialBinaryToPath(key, binary)
   }
 
   override def uploadSupportingMaterialBinary(id: A, material: String, binary: Binary): Validation[String, String] = {
-    val key = mkKey(id, material, binary.name)
+    val key = mkKey(id, Seq(material, binary.name))
     uploadSupportingMaterialBinaryToPath(key, binary)
   }
 }

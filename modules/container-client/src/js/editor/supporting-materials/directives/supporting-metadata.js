@@ -40,6 +40,8 @@ angular.module('corespring-editor.directives')
         ngModel.$render = function(){
           var data = ngModel.$viewValue || {};
 
+          $scope.name = data.name;
+
           if(!data.materialType){
             $scope.materialType = none;
           } else {

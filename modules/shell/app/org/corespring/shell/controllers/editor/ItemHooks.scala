@@ -24,7 +24,7 @@ trait ItemSupportingMaterialHooks
   override def create[F <: File](id: String, sm: CreateNewMaterialRequest[F])(implicit h: RequestHeader): R[JsValue] = Future {
     {
       val query = MongoDBObject("_id" -> new ObjectId(id))
-      def upload(b: Binary) = assets.uploadSupportingMaterialBinary(id, b).bimap(
+      def upload(b: Binary) = assets.uploadSupportingMaterialBinary(id, sm.name, b).bimap(
         (e: String) => (INTERNAL_SERVER_ERROR -> e),
         (s: String) => sm)
       updateDBAndUploadBinary(itemService.collection, query, sm, upload)

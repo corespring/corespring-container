@@ -16,6 +16,12 @@ angular.module('corespring-common.supporting-materials.services')
           return path + (href.indexOf('?') === -1 ? '' : '?' + href.split('?')[1]);
         }
 
+        this.getBinaryUrl = function(m, file){
+          return Urls.getAsset.url
+            .replace(':name', m.name)
+            .replace(':filename', file.name);
+        };
+        
         this.create = function(m, onSuccess, onFailure) {
           if (m.file) {
             uploadFile(m, onSuccess, onFailure);
@@ -46,6 +52,17 @@ angular.module('corespring-common.supporting-materials.services')
           });
         }
 
+        this.delete = function(m, onSuccess, onFailure){
+          var call = Urls.delete;
+          var url = addQueryParamsIfPresent(call.url);
+          url = url.replace(':name', m.name);
+
+          logger.debug('url: ', url);
+          
+          $http[call.method](url)
+            .success(onSuccess)
+            .error(onFailure);
+        };
       }
 
       return new SupportingMaterialsService();
