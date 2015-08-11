@@ -6,12 +6,14 @@ angular.module('corespring-editor.controllers')
     '$modal',
     'ImageUtils',
     'ItemService',
+    'SupportingMaterialsService',
     'LogFactory',
     function(
       $scope,
       $modal,
       ImageUtils,
       ItemService,
+      SupportingMaterialsService,
       LogFactory)
       {
         var logger  = LogFactory.getLogger('supporting-materials');
@@ -51,7 +53,7 @@ angular.module('corespring-editor.controllers')
               logger.warn(err);
             }
 
-            ItemService.createSupportingMaterial(createRequest, onCreate, onError);
+            SupportingMaterialsService.create(createRequest, onCreate, onError);
           });
         };
 

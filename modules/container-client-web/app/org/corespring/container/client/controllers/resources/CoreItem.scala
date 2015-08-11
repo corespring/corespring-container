@@ -1,12 +1,13 @@
 package org.corespring.container.client.controllers.resources
 
-import java.io.{ ByteArrayInputStream }
-import java.net.URLConnection
+import java.io.{FileInputStream}
 
+import org.apache.commons.io.IOUtils
 import org.corespring.container.client.controllers.helpers.{ PlayerXhtml, XhtmlProcessor }
 import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.client.hooks._
 import play.api.Logger
+import play.api.libs.{Files, MimeTypes}
 import play.api.libs.json.{ JsString, JsObject, JsValue, Json }
 import play.api.mvc._
 
@@ -27,7 +28,11 @@ object ItemJson {
   }
 }
 
-trait CoreItem extends Controller {
+trait CoreSupportingMaterials extends Controller {
+
+  implicit def ec : ExecutionContext
+
+  def materialHooks : SupportingMaterialHooks
 
   val acceptableTypes = Seq(
     "application/pdf",
@@ -35,81 +40,36 @@ trait CoreItem extends Controller {
     "image/gif",
     "image/jpeg")
 
-  lazy val logger = Logger(classOf[CoreItem])
-
-  implicit def toResult(m: StatusMessage): SimpleResult = play.api.mvc.Results.Status(m._1)(Json.obj("error" -> m._2))
-
-  implicit def ec: ExecutionContext
-
-  /**
-   * A list of all the component types in the container
-   * @return
-   */
-  protected def componentTypes: Seq[String]
-
-  def hooks: CoreItemHooks
-
-  type SaveSig = String => Future[Either[(Int, String), JsValue]]
-
-  val noCacheHeader = "no-cache, no-store, must-revalidate"
-
-  def getContentType(bytes: Array[Byte]): Option[String] = try {
-    val ba = new ByteArrayInputStream(bytes)
-    val out = URLConnection.guessContentTypeFromStream(ba)
-    ba.close()
-    Some(out)
-  } catch {
-    case t: Throwable => None
+  private def accept(types:Seq[String])(mimeType: String) = {
+    if (types.contains(mimeType)) {
+      Success(true)
+    } else {
+      Failure(s"not acceptable only types supported: ${types.mkString(",")}")
+    }
   }
 
-  def createSupportingMaterialFromFile(id: String, materialType: String, filename: String) = Action.async { request =>
+  def createSupportingMaterialFromFile(id: String) = Action.async { request =>
 
-    lazy val extension: Option[String] = if (filename.contains("."))
-      Some(filename.split("\\.").last)
-    else None
-
-    lazy val basename: String = if (filename.contains("."))
-      filename.split("\\.").init.mkString(".")
-    else
-      filename
-
-    def accept(mimeType: String) = {
-      if (acceptableTypes.contains(mimeType)) {
-        Success(true)
-      } else {
-        Failure(s"not acceptable only types supported: ${acceptableTypes.mkString(",")}")
-      }
-    }
-
-    def createFromRaw(raw: RawBuffer): Validation[String, CreateBinaryMaterial] = {
+    def createFromMultipartForm(form: MultipartFormData[Files.TemporaryFile]): Validation[String, CreateBinaryMaterial] = {
       for {
-        extension <- extension.toSuccess("can't read extension")
-        mimeType <- play.api.libs.MimeTypes.forFileName(filename).toSuccess("can't guess mimeType")
-        acceptable <- accept(mimeType)
-        bytes <- raw.asBytes(raw.size.toInt).toSuccess("can't load bytes")
+        binary <- formToBinary(form, acceptableTypes)
+        name <- Success(form.asFormUrlEncoded.get("name").map(_.mkString).getOrElse(binary.name))
+        materialType <- form.asFormUrlEncoded.get("materialType").map(_.mkString).toSuccess("materialType not specified")
       } yield {
-
-        val name = request.getQueryString("name").getOrElse(basename)
-
-        CreateBinaryMaterial(
-          name,
-          materialType,
-          Binary(s"main.$extension",
-            mimeType,
-            bytes))
+        CreateBinaryMaterial(name, materialType, binary)
       }
     }
 
     create((body) => for {
-      raw <- request.body.asRaw.toSuccess("no bytes in request body")
-      sm <- createFromRaw(raw)
+      multipart <- request.body.asMultipartFormData.toSuccess("no bytes in request body")
+      sm <- createFromMultipartForm(multipart)
     } yield sm)(id, request)
   }
 
   private def create[F <: File](mk: AnyContent => Validation[String, CreateNewMaterialRequest[F]])(id: String, r: Request[AnyContent]): Future[SimpleResult] = {
     mk(r.body) match {
       case Success(sm) => {
-        val f: Future[Either[(Int, String), JsValue]] = hooks.createSupportingMaterial(id, sm)(r)
+        val f: Future[Either[(Int, String), JsValue]] = materialHooks.create(id, sm)(r)
         f.map { e =>
           e match {
             case Left((err, msg)) => Status(err)(msg)
@@ -141,8 +101,77 @@ trait CoreItem extends Controller {
       json <- body.asJson.toSuccess("no json in request body")
       sm <- createFromJson(json)
     } yield sm)(id, request)
-
   }
+
+  private implicit class ToR(in:Hooks.R[JsValue]) {
+    def toResult: Future[SimpleResult] = {
+      in.map { e =>
+        e match {
+          case Left((code, msg)) => Status(code)(msg)
+          case Right(json) => Ok(json)
+        }
+      }
+    }
+  }
+
+  def deleteSupportingMaterial(id:String, name:String) = Action.async{ implicit request =>
+    materialHooks.delete(id, name).toResult
+  }
+
+  private def formToBinary(form:MultipartFormData[Files.TemporaryFile], types:Seq[String]) : Validation[String,Binary] = {
+    for{
+      file <- form.file("file").toSuccess("can't find form parameter named 'file' that contains the file reference")
+      mimeType <- file.contentType.orElse(MimeTypes.forFileName(file.filename)).toSuccess("can't get filename")
+      acceptable <- accept(types)(mimeType)
+    } yield {
+        val stream = new FileInputStream(file.ref.file)
+        val bytes = IOUtils.toByteArray(stream)
+        IOUtils.closeQuietly(stream)
+        Binary(file.filename, mimeType, bytes)
+      }
+  }
+
+  def addAssetToSupportingMaterial(id:String, name:String) = Action.async{ implicit request =>
+    val v = for{
+      form <- request.body.asMultipartFormData.toSuccess("must be multipart formdata")
+      binary <- formToBinary(form, acceptableTypes.filterNot( _ == "application/pdf"))
+    } yield materialHooks.addAsset(id, name, binary).toResult
+
+    v match {
+      case Failure(e) => Future(BadRequest(e))
+      case Success(r) => r
+    }
+  }
+
+  def deleteAssetFromSupportingMaterial(id:String, name:String, filename:String) = Action.async{ request =>
+    materialHooks.deleteAsset(id, name, filename).toResult
+  }
+
+  def getAssetFromSupportingMaterial(id:String, name:String, filename:String) = Action.async { request =>
+    Future(materialHooks.getAsset(id, name, filename))
+  }
+}
+
+trait CoreItem extends CoreSupportingMaterials with Controller {
+
+  lazy val logger = Logger(classOf[CoreItem])
+
+  implicit def toResult(m: StatusMessage): SimpleResult = play.api.mvc.Results.Status(m._1)(Json.obj("error" -> m._2))
+
+  implicit def ec: ExecutionContext
+
+  /**
+   * A list of all the component types in the container
+   * @return
+   */
+  protected def componentTypes: Seq[String]
+
+  def hooks: CoreItemHooks
+
+  type SaveSig = String => Future[Either[(Int, String), JsValue]]
+
+  val noCacheHeader = "no-cache, no-store, must-revalidate"
+
 
   def load(itemId: String) = Action.async { implicit request =>
     hooks.load(itemId).map {

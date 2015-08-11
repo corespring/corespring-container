@@ -1,6 +1,7 @@
 package org.corespring.shell.controllers.editor
 
 import com.mongodb.casbah.Imports._
+import com.mongodb.casbah.commons.MongoDBObject
 import org.bson.types.ObjectId
 import org.corespring.container.client.hooks._
 import org.corespring.container.client.hooks.Hooks.{ R, StatusMessage }
@@ -16,6 +17,39 @@ import play.api.mvc._
 
 import scala.concurrent.Future
 import scalaz.{ Failure, Success }
+
+
+trait ItemDraftSupportingMaterialHooks
+  extends containerHooks.SupportingMaterialHooks
+  with SupportingMaterialHooksHelper{
+
+  import scala.concurrent.ExecutionContext.Implicits.global
+
+  def assets : ItemAssets
+  def draftItemService : ItemDraftService
+
+  override def create[F <: File](id: String, sm: CreateNewMaterialRequest[F])(implicit h: RequestHeader): R[JsValue] = Future {
+
+    ContainerDraftId.fromString(id).map { draftId =>
+
+      def upload(binary: Binary) = assets.uploadSupportingMaterialBinary(id, binary).bimap(
+        (e: String) => (INTERNAL_SERVER_ERROR -> e),
+        (s: String) => sm)
+
+      val query = MongoDBObject("_id" -> DraftId.dbo(draftId))
+      updateDBAndUploadBinary(draftItemService.collection, query, sm, upload)
+    }.getOrElse(
+      Failure((BAD_REQUEST, s"invalid draft id: $id"))).toEither
+  }
+
+  override def deleteAsset(id: String, name: String, filename: String)(implicit h: RequestHeader): R[JsValue] = ???
+
+  override def addAsset(id: String, name: String, binary: Binary)(implicit h: RequestHeader): R[JsValue] = ???
+
+  override def delete(id: String, name: String)(implicit h: RequestHeader): R[JsValue] = ???
+
+  override def getAsset(id: String, name: String, filename: String)(implicit h: RequestHeader): SimpleResult = ???
+}
 
 trait ItemDraftHooks
   extends containerHooks.CoreItemHooks
@@ -162,19 +196,6 @@ trait ItemDraftHooks
     }
   }
 
-  override def createSupportingMaterial[F <: File](id: String, sm: CreateNewMaterialRequest[F])(implicit h: RequestHeader): R[JsValue] = Future {
-
-    ContainerDraftId.fromString(id).map { draftId =>
-
-      def upload(binary: Binary) = assets.uploadSupportingMaterialBinary(draftId, binary).bimap(
-        (e: String) => (INTERNAL_SERVER_ERROR -> e),
-        (s: String) => sm)
-
-      val query = MongoDBObject("_id" -> DraftId.dbo(draftId))
-      updateDBAndUploadBinary(draftItemService.collection, query, sm, upload)
-    }.getOrElse(
-      Failure((BAD_REQUEST, s"invalid draft id: $id"))).toEither
-  }
 
 }
 

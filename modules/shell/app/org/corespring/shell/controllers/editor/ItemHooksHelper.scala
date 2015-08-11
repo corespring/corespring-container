@@ -12,27 +12,7 @@ import play.api.libs.json.{ Json, JsObject, JsArray, JsValue }
 import scala.concurrent.Future
 import scalaz.{ Failure, Success, Validation }
 
-trait ItemHooksHelper {
-
-  import scala.concurrent.ExecutionContext.Implicits.global
-
-  def addSupportingMaterialIds(sm: JsValue): JsArray = sm match {
-    case JsArray(o) => JsArray(o.map({
-      case obj: JsObject => obj ++ Json.obj("id" -> ObjectId.get.toString)
-      case other: JsValue => other
-    }))
-    case _ => JsArray(Seq.empty)
-  }
-
-  def passThrough(json: JsObject) = json
-
-  def fineGrainedSave(service: MongoService, resultProcessor: JsObject => JsObject = passThrough)(id: String, json: JsValue): Future[Either[(Int, String), JsValue]] = Future {
-    service.fineGrainedSave(id, json).map {
-      result =>
-        val out = resultProcessor(result)
-        Right(out)
-    }.getOrElse(Left(BAD_REQUEST -> "Error saving"))
-  }
+trait SupportingMaterialHooksHelper{
 
   private def materialToDbo[F <: File](sm: CreateNewMaterialRequest[F]): DBObject = sm match {
     case CreateHtmlMaterial(name, materialType, markup, _) => {
@@ -60,10 +40,10 @@ trait ItemHooksHelper {
   }
 
   protected def updateDBAndUploadBinary[F <: File](
-    collection: MongoCollection,
-    query: DBObject,
-    sm: CreateNewMaterialRequest[F],
-    upload: Binary => Validation[(Int, String), CreateNewMaterialRequest[F]]): Validation[(Int, String), JsValue] = {
+                                                    collection: MongoCollection,
+                                                    query: DBObject,
+                                                    sm: CreateNewMaterialRequest[F],
+                                                    upload: Binary => Validation[(Int, String), CreateNewMaterialRequest[F]]): Validation[(Int, String), JsValue] = {
     val dbo = materialToDbo(sm)
     lazy val json = Json.parse(com.mongodb.util.JSON.serialize(dbo))
     val update = MongoDBObject("$push" -> MongoDBObject("supportingMaterials" -> dbo))
@@ -78,5 +58,29 @@ trait ItemHooksHelper {
       Failure((500, "Update failed"))
     }
   }
+
+}
+trait ItemHooksHelper {
+
+  import scala.concurrent.ExecutionContext.Implicits.global
+
+  def addSupportingMaterialIds(sm: JsValue): JsArray = sm match {
+    case JsArray(o) => JsArray(o.map({
+      case obj: JsObject => obj ++ Json.obj("id" -> ObjectId.get.toString)
+      case other: JsValue => other
+    }))
+    case _ => JsArray(Seq.empty)
+  }
+
+  def passThrough(json: JsObject) = json
+
+  def fineGrainedSave(service: MongoService, resultProcessor: JsObject => JsObject = passThrough)(id: String, json: JsValue): Future[Either[(Int, String), JsValue]] = Future {
+    service.fineGrainedSave(id, json).map {
+      result =>
+        val out = resultProcessor(result)
+        Right(out)
+    }.getOrElse(Left(BAD_REQUEST -> "Error saving"))
+  }
+
 
 }

@@ -21,8 +21,10 @@ import org.corespring.container.logging.ContainerLogger
 import org.corespring.mongo.json.services.MongoService
 import org.corespring.shell.controllers.ShellDataQueryHooks
 import org.corespring.shell.controllers.catalog.actions.{ CatalogHooks => ShellCatalogHooks }
+import org.corespring.shell.controllers.editor.{ItemDraftAssets, ItemAssets}
 import org.corespring.shell.controllers.editor.actions.{ DraftEditorHooks => ShellDraftEditorHooks, ItemEditorHooks => ShellItemEditorHooks, DraftId }
-import org.corespring.shell.controllers.editor.{ ItemDraftHooks => ShellItemDraftHooks, ItemHooks => ShellItemHooks, CollectionHooks => ShellCollectionHooks, ItemAssets, ItemDraftAssets }
+import org.corespring.shell.controllers.{editor => shellEditor}
+//.{ ItemDraftHooks => ShellItemDraftHooks, ItemHooks => ShellItemHooks, ItemSupportingMaterialHooks => Shel CollectionHooks => ShellCollectionHooks, ItemAssets, ItemDraftAssets }
 import org.corespring.shell.controllers.player.actions.{ PlayerHooks => ShellPlayerHooks }
 import org.corespring.shell.controllers.player.{ SessionHooks => ShellSessionHooks }
 import org.corespring.shell.services.ItemDraftService
@@ -257,7 +259,7 @@ class ContainerClientImplementation(
     override implicit def ec: ExecutionContext = ContainerClientImplementation.this.ec
   }
 
-  override def itemDraftHooks: CoreItemHooks with DraftHooks = new ShellItemDraftHooks {
+  override def itemDraftHooks: CoreItemHooks with DraftHooks = new shellEditor.ItemDraftHooks {
     override def itemService: MongoService = ContainerClientImplementation.this.itemService
 
     override def draftItemService = ContainerClientImplementation.this.draftItemService
@@ -265,10 +267,22 @@ class ContainerClientImplementation(
     override def assets: ItemDraftAssets = ContainerClientImplementation.this.assets
   }
 
-  override def itemHooks: CoreItemHooks with CreateItemHook = new ShellItemHooks {
+  override def itemDraftSupportingMaterialHooks: SupportingMaterialHooks = new shellEditor.ItemDraftSupportingMaterialHooks{
+    override def assets: ItemAssets = ContainerClientImplementation.this.assets
+
+    override def draftItemService: ItemDraftService = ContainerClientImplementation.this.draftItemService
+  }
+
+  override def itemHooks: CoreItemHooks with CreateItemHook = new shellEditor.ItemHooks {
     override def itemService: MongoService = ContainerClientImplementation.this.itemService
 
     override def assets: ItemAssets = ContainerClientImplementation.this.assets
+  }
+
+  override def itemSupportingMaterialHooks: SupportingMaterialHooks = new shellEditor.ItemSupportingMaterialHooks{
+    override def assets: ItemAssets = ContainerClientImplementation.this.assets
+
+    override def itemService: MongoService = ContainerClientImplementation.this.itemService
   }
 
   override def playerHooks: PlayerHooks = new ShellPlayerHooks {
@@ -286,7 +300,7 @@ class ContainerClientImplementation(
 
   override def versionInfo: JsObject = VersionInfo(Play.current.configuration)
 
-  override def collectionHooks: CollectionHooks = new ShellCollectionHooks {
+  override def collectionHooks: CollectionHooks = new shellEditor.CollectionHooks {
 
   }
 

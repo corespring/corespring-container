@@ -12,6 +12,36 @@ import play.api.mvc._
 
 import scala.concurrent.Future
 
+trait ItemSupportingMaterialHooks
+  extends containerHooks.SupportingMaterialHooks
+  with SupportingMaterialHooksHelper{
+
+  import scala.concurrent.ExecutionContext.Implicits.global
+
+  def assets : ItemAssets
+  def itemService : MongoService
+
+  override def create[F <: File](id: String, sm: CreateNewMaterialRequest[F])(implicit h: RequestHeader): R[JsValue] = Future {
+    {
+      val query = MongoDBObject("_id" -> new ObjectId(id))
+      def upload(b: Binary) = assets.uploadSupportingMaterialBinary(id, b).bimap(
+        (e: String) => (INTERNAL_SERVER_ERROR -> e),
+        (s: String) => sm)
+      updateDBAndUploadBinary(itemService.collection, query, sm, upload)
+    }.toEither
+  }
+
+
+  override def deleteAsset(id: String, name: String, filename: String)(implicit h: RequestHeader): R[JsValue] = ???
+
+  override def addAsset(id: String, name: String, binary: Binary)(implicit h: RequestHeader): R[JsValue] = ???
+
+  override def delete(id: String, name: String)(implicit h: RequestHeader): R[JsValue] = ???
+
+  override def getAsset(id: String, name: String, filename: String)(implicit h: RequestHeader): SimpleResult = ???
+}
+
+
 trait ItemHooks
   extends containerHooks.CoreItemHooks
   with containerHooks.CreateItemHook
@@ -73,16 +103,6 @@ trait ItemHooks
       oid =>
         Right(oid.toString)
     }.getOrElse(Left(BAD_REQUEST -> "Error creating item"))
-  }
-
-  override def createSupportingMaterial[F <: File](id: String, sm: CreateNewMaterialRequest[F])(implicit h: RequestHeader): R[JsValue] = Future {
-    {
-      val query = MongoDBObject("_id" -> new ObjectId(id))
-      def upload(b: Binary) = assets.uploadSupportingMaterialBinary(id, b).bimap(
-        (e: String) => (INTERNAL_SERVER_ERROR -> e),
-        (s: String) => sm)
-      updateDBAndUploadBinary(itemService.collection, query, sm, upload)
-    }.toEither
   }
 
 }
