@@ -1,13 +1,13 @@
 package org.corespring.container.client.controllers.resources
 
-import java.io.{FileInputStream}
+import java.io.{ FileInputStream }
 
 import org.apache.commons.io.IOUtils
 import org.corespring.container.client.controllers.helpers.{ PlayerXhtml, XhtmlProcessor }
 import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.client.hooks._
 import play.api.Logger
-import play.api.libs.{Files, MimeTypes}
+import play.api.libs.{ Files, MimeTypes }
 import play.api.libs.json.{ JsString, JsObject, JsValue, Json }
 import play.api.mvc._
 
@@ -30,9 +30,9 @@ object ItemJson {
 
 trait CoreSupportingMaterials extends Controller {
 
-  implicit def ec : ExecutionContext
+  implicit def ec: ExecutionContext
 
-  def materialHooks : SupportingMaterialHooks
+  def materialHooks: SupportingMaterialHooks
 
   val acceptableTypes = Seq(
     "application/pdf",
@@ -40,7 +40,7 @@ trait CoreSupportingMaterials extends Controller {
     "image/gif",
     "image/jpeg")
 
-  private def accept(types:Seq[String])(mimeType: String) = {
+  private def accept(types: Seq[String])(mimeType: String) = {
     if (types.contains(mimeType)) {
       Success(true)
     } else {
@@ -103,7 +103,7 @@ trait CoreSupportingMaterials extends Controller {
     } yield sm)(id, request)
   }
 
-  private implicit class ToR(in:Hooks.R[JsValue]) {
+  private implicit class ToR(in: Hooks.R[JsValue]) {
     def toResult: Future[SimpleResult] = {
       in.map { e =>
         e match {
@@ -114,27 +114,27 @@ trait CoreSupportingMaterials extends Controller {
     }
   }
 
-  def deleteSupportingMaterial(id:String, name:String) = Action.async{ implicit request =>
+  def deleteSupportingMaterial(id: String, name: String) = Action.async { implicit request =>
     materialHooks.delete(id, name).toResult
   }
 
-  private def formToBinary(form:MultipartFormData[Files.TemporaryFile], types:Seq[String]) : Validation[String,Binary] = {
-    for{
+  private def formToBinary(form: MultipartFormData[Files.TemporaryFile], types: Seq[String]): Validation[String, Binary] = {
+    for {
       file <- form.file("file").toSuccess("can't find form parameter named 'file' that contains the file reference")
       mimeType <- file.contentType.orElse(MimeTypes.forFileName(file.filename)).toSuccess("can't get filename")
       acceptable <- accept(types)(mimeType)
     } yield {
-        val stream = new FileInputStream(file.ref.file)
-        val bytes = IOUtils.toByteArray(stream)
-        IOUtils.closeQuietly(stream)
-        Binary(file.filename, mimeType, bytes)
-      }
+      val stream = new FileInputStream(file.ref.file)
+      val bytes = IOUtils.toByteArray(stream)
+      IOUtils.closeQuietly(stream)
+      Binary(file.filename, mimeType, bytes)
+    }
   }
 
-  def addAssetToSupportingMaterial(id:String, name:String) = Action.async{ implicit request =>
-    val v = for{
+  def addAssetToSupportingMaterial(id: String, name: String) = Action.async { implicit request =>
+    val v = for {
       form <- request.body.asMultipartFormData.toSuccess("must be multipart formdata")
-      binary <- formToBinary(form, acceptableTypes.filterNot( _ == "application/pdf"))
+      binary <- formToBinary(form, acceptableTypes.filterNot(_ == "application/pdf"))
     } yield materialHooks.addAsset(id, name, binary).toResult
 
     v match {
@@ -143,11 +143,11 @@ trait CoreSupportingMaterials extends Controller {
     }
   }
 
-  def deleteAssetFromSupportingMaterial(id:String, name:String, filename:String) = Action.async{ request =>
+  def deleteAssetFromSupportingMaterial(id: String, name: String, filename: String) = Action.async { implicit request =>
     materialHooks.deleteAsset(id, name, filename).toResult
   }
 
-  def getAssetFromSupportingMaterial(id:String, name:String, filename:String) = Action.async { request =>
+  def getAssetFromSupportingMaterial(id: String, name: String, filename: String) = Action.async { implicit request =>
     Future(materialHooks.getAsset(id, name, filename))
   }
 }
@@ -171,7 +171,6 @@ trait CoreItem extends CoreSupportingMaterials with Controller {
   type SaveSig = String => Future[Either[(Int, String), JsValue]]
 
   val noCacheHeader = "no-cache, no-store, must-revalidate"
-
 
   def load(itemId: String) = Action.async { implicit request =>
     hooks.load(itemId).map {

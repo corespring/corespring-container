@@ -18,35 +18,91 @@ import play.api.mvc._
 import scala.concurrent.Future
 import scalaz.{ Failure, Success }
 
-
 trait ItemDraftSupportingMaterialHooks
   extends containerHooks.SupportingMaterialHooks
-  with SupportingMaterialHooksHelper{
+  with SupportingMaterialHooksHelper {
 
   import scala.concurrent.ExecutionContext.Implicits.global
 
-  def assets : ItemAssets
-  def draftItemService : ItemDraftService
+  def assets: SupportingMaterialAssets[DraftId[ObjectId]]
 
-  override def create[F <: File](id: String, sm: CreateNewMaterialRequest[F])(implicit h: RequestHeader): R[JsValue] = Future {
+  def draftItemService: ItemDraftService
 
-    ContainerDraftId.fromString(id).map { draftId =>
+  override def create[F <: File](id: String, sm: CreateNewMaterialRequest[F])(implicit h: RequestHeader): R[JsValue] = withDraftId(id) { (draftId) =>
+    Future {
 
-      def upload(binary: Binary) = assets.uploadSupportingMaterialBinary(id, binary).bimap(
+      def upload(binary: Binary) = assets.uploadSupportingMaterialBinary(draftId, binary).bimap(
         (e: String) => (INTERNAL_SERVER_ERROR -> e),
         (s: String) => sm)
 
       val query = MongoDBObject("_id" -> DraftId.dbo(draftId))
-      updateDBAndUploadBinary(draftItemService.collection, query, sm, upload)
-    }.getOrElse(
-      Failure((BAD_REQUEST, s"invalid draft id: $id"))).toEither
+      updateDBAndUploadBinary(draftItemService.collection, query, sm, upload).toEither
+    }
   }
 
-  override def deleteAsset(id: String, name: String, filename: String)(implicit h: RequestHeader): R[JsValue] = ???
+  override def deleteAsset(id: String, name: String, filename: String)(implicit h: RequestHeader): R[JsValue] = withDraftId(id) { (draftId) =>
+    Future {
 
-  override def addAsset(id: String, name: String, binary: Binary)(implicit h: RequestHeader): R[JsValue] = ???
+      val query = MongoDBObject("_id" -> DraftId.dbo(draftId), "item.supportingMaterials.name" -> name)
 
-  override def delete(id: String, name: String)(implicit h: RequestHeader): R[JsValue] = ???
+      val update = MongoDBObject(
+        "$pull" -> MongoDBObject(
+          "item.supportingMaterials.$.files" -> MongoDBObject(
+            "name" -> filename))) ++ dm
+
+      val wr = draftItemService.collection.update(query, update, false, false)
+
+      if (wr.getN == 1) {
+        assets.deleteAssetFromSupportingMaterial(draftId, name, filename)
+        Right(Json.obj())
+      } else {
+        Left((BAD_REQUEST, "Failed to remove the asset"))
+      }
+    }
+  }
+
+  private def dm = MongoDBObject("$set" -> MongoDBObject("item.dateModified" -> DateTime.now))
+
+  override def addAsset(id: String, name: String, binary: Binary)(implicit h: RequestHeader): R[JsValue] = withDraftId(id) { (draftId) =>
+    Future {
+      ContainerDraftId.fromString(id).map { draftId =>
+        val query = MongoDBObject("_id" -> DraftId.dbo(draftId), "item.supportingMaterials.name" -> name)
+        val update = MongoDBObject(
+          "$push" -> MongoDBObject("item.supportingMaterials.$.files" -> binaryToDbo(binary))) ++ dm
+
+        val wr = draftItemService.collection.update(query, update, false, false)
+
+        if (wr.getN == 1) {
+          assets.uploadAssetToSupportingMaterial(draftId, name, binary)
+          Right(Json.obj())
+        } else {
+          Left((BAD_REQUEST, "Failed to remove the asset"))
+        }
+      }.getOrElse(Left(BAD_REQUEST -> "Can't parse draft id"))
+    }
+  }
+
+  private def withDraftId(id: String)(fn: DraftId[ObjectId] => R[JsValue]): R[JsValue] = {
+    ContainerDraftId.fromString(id).map { draftId =>
+      fn(draftId)
+    }.getOrElse(Future(Left(BAD_REQUEST -> "Can't parse draft id")))
+  }
+
+  override def delete(id: String, name: String)(implicit h: RequestHeader): R[JsValue] = withDraftId(id) { (draftId: DraftId[ObjectId]) =>
+    Future {
+      val query = MongoDBObject("_id" -> DraftId.dbo(draftId))
+      val update = MongoDBObject(
+        "$pull" -> MongoDBObject("item.supportingMaterials" -> MongoDBObject("name" -> name))) ++ dm
+      val wr = draftItemService.collection.update(query, update)
+
+      if (wr.getN == 1) {
+        //in the main app we'd remove any assets too
+        Right(Json.obj())
+      } else {
+        Left((BAD_REQUEST, "Failed to remove the asset"))
+      }
+    }
+  }
 
   override def getAsset(id: String, name: String, filename: String)(implicit h: RequestHeader): SimpleResult = ???
 }
@@ -195,7 +251,6 @@ trait ItemDraftHooks
       case Some(tuple) => Right(tuple)
     }
   }
-
 
 }
 

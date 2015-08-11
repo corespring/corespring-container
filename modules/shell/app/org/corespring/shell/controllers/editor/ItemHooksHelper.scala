@@ -12,7 +12,15 @@ import play.api.libs.json.{ Json, JsObject, JsArray, JsValue }
 import scala.concurrent.Future
 import scalaz.{ Failure, Success, Validation }
 
-trait SupportingMaterialHooksHelper{
+trait SupportingMaterialHooksHelper {
+
+  protected def binaryToDbo(binary: Binary): DBObject = {
+    MongoDBObject(
+      "_t" -> "org.corespring.platform.core.models.item.resource.StoredFile",
+      "name" -> binary.name,
+      "isMain" -> true,
+      "contentType" -> binary.mimeType)
+  }
 
   private def materialToDbo[F <: File](sm: CreateNewMaterialRequest[F]): DBObject = sm match {
     case CreateHtmlMaterial(name, materialType, markup, _) => {
@@ -30,20 +38,15 @@ trait SupportingMaterialHooksHelper{
       MongoDBObject(
         "name" -> name,
         "materialType" -> materialType,
-        "files" -> MongoDBList(
-          MongoDBObject(
-            "_t" -> "org.corespring.platform.core.models.item.resource.StoredFile",
-            "name" -> binary.name,
-            "isMain" -> true,
-            "contentType" -> binary.mimeType)))
+        "files" -> MongoDBList(binaryToDbo(binary)))
     }
   }
 
   protected def updateDBAndUploadBinary[F <: File](
-                                                    collection: MongoCollection,
-                                                    query: DBObject,
-                                                    sm: CreateNewMaterialRequest[F],
-                                                    upload: Binary => Validation[(Int, String), CreateNewMaterialRequest[F]]): Validation[(Int, String), JsValue] = {
+    collection: MongoCollection,
+    query: DBObject,
+    sm: CreateNewMaterialRequest[F],
+    upload: Binary => Validation[(Int, String), CreateNewMaterialRequest[F]]): Validation[(Int, String), JsValue] = {
     val dbo = materialToDbo(sm)
     lazy val json = Json.parse(com.mongodb.util.JSON.serialize(dbo))
     val update = MongoDBObject("$push" -> MongoDBObject("supportingMaterials" -> dbo))
@@ -81,6 +84,5 @@ trait ItemHooksHelper {
         Right(out)
     }.getOrElse(Left(BAD_REQUEST -> "Error saving"))
   }
-
 
 }

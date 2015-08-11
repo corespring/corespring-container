@@ -21,9 +21,9 @@ import org.corespring.container.logging.ContainerLogger
 import org.corespring.mongo.json.services.MongoService
 import org.corespring.shell.controllers.ShellDataQueryHooks
 import org.corespring.shell.controllers.catalog.actions.{ CatalogHooks => ShellCatalogHooks }
-import org.corespring.shell.controllers.editor.{ItemDraftAssets, ItemAssets}
+import org.corespring.shell.controllers.editor.{ SupportingMaterialAssets, ItemDraftAssets, ItemAssets }
 import org.corespring.shell.controllers.editor.actions.{ DraftEditorHooks => ShellDraftEditorHooks, ItemEditorHooks => ShellItemEditorHooks, DraftId }
-import org.corespring.shell.controllers.{editor => shellEditor}
+import org.corespring.shell.controllers.{ editor => shellEditor }
 //.{ ItemDraftHooks => ShellItemDraftHooks, ItemHooks => ShellItemHooks, ItemSupportingMaterialHooks => Shel CollectionHooks => ShellCollectionHooks, ItemAssets, ItemDraftAssets }
 import org.corespring.shell.controllers.player.actions.{ PlayerHooks => ShellPlayerHooks }
 import org.corespring.shell.controllers.player.{ SessionHooks => ShellSessionHooks }
@@ -82,24 +82,38 @@ class ContainerClientImplementation(
     lazy val bucket = configuration.getString("amazon.s3.bucket").getOrElse(throw new RuntimeException("No bucket specified"))
   }
 
-  lazy val assets = new Assets with ItemDraftAssets with ItemAssets {
-
-    lazy val s3Client: AmazonS3 = {
-      for {
-        k <- s3.key
-        s <- s3.secret
-      } yield {
-        val fakeEndpoint = configuration.getString("amazon.s3.fake-endpoint")
-        logger.trace(s"fakeEndpoint: $fakeEndpoint")
-        S3Service.mkClient(k, s, fakeEndpoint)
-      }
-    }.getOrElse(throw new RuntimeException("no s3 client "))
-
-    lazy val (playS3, assetUtils) = {
-      val s3Service = new ConcreteS3Service(s3Client)
-      val assetUtils = new AssetUtils(s3Client, s3.bucket)
-      (s3Service, assetUtils)
+  lazy val s3Client: AmazonS3 = {
+    for {
+      k <- s3.key
+      s <- s3.secret
+    } yield {
+      val fakeEndpoint = configuration.getString("amazon.s3.fake-endpoint")
+      logger.trace(s"fakeEndpoint: $fakeEndpoint")
+      S3Service.mkClient(k, s, fakeEndpoint)
     }
+  }.getOrElse(throw new RuntimeException("no s3 client "))
+
+  lazy val (playS3, assetUtils) = {
+    val s3Service = new ConcreteS3Service(s3Client)
+    val assetUtils = new AssetUtils(s3Client, s3.bucket)
+    (s3Service, assetUtils)
+  }
+
+  lazy val itemSupportingMaterialAssets = new SupportingMaterialAssets[String] {
+    override def uploadSupportingMaterialBinary(id: String, binary: Binary): Validation[String, String] = {
+
+    }
+
+    override def deleteSupportingMaterialBinary(id: String, material: String): Validation[String, String] = ???
+
+    override def getAssetFromSupportingMaterial(id: String, material: String, name: String): SimpleResult = ???
+
+    override def deleteAssetFromSupportingMaterial(id: String, material: String, name: String): Validation[String, String] = ???
+
+    override def uploadAssetToSupportingMaterial(id: String, material: String, binary: Binary): Validation[String, String] = ???
+  }
+
+  lazy val assets = new Assets with ItemDraftAssets with ItemAssets {
 
     override implicit def ec: ExecutionContext = ContainerClientImplementation.this.ec
 
@@ -155,11 +169,11 @@ class ContainerClientImplementation(
 
     override def deleteItem(id: String): Unit = assetUtils.deleteDir(mkPath(AssetType.Item, id))
 
-    override def uploadSupportingMaterialBinary(draftId: DraftId[ObjectId], binary: Binary): Validation[String, String] = {
+    /*override def uploadSupportingMaterialBinary(draftId: DraftId[ObjectId], binary: Binary): Validation[String, String] = {
       val key = mkSupportingMaterialPath(AssetType.Draft, draftId.toString, binary.name)
       logger.trace(s"[upload material] key: $key")
       uploadSupportingMaterialBinaryToPath(key, binary)
-    }
+    }*/
 
     private def uploadSupportingMaterialBinaryToPath(key: String, binary: Binary): Validation[String, String] = {
       val is = new ByteArrayInputStream(binary.data)
@@ -267,7 +281,7 @@ class ContainerClientImplementation(
     override def assets: ItemDraftAssets = ContainerClientImplementation.this.assets
   }
 
-  override def itemDraftSupportingMaterialHooks: SupportingMaterialHooks = new shellEditor.ItemDraftSupportingMaterialHooks{
+  override def itemDraftSupportingMaterialHooks: SupportingMaterialHooks = new shellEditor.ItemDraftSupportingMaterialHooks {
     override def assets: ItemAssets = ContainerClientImplementation.this.assets
 
     override def draftItemService: ItemDraftService = ContainerClientImplementation.this.draftItemService
@@ -279,7 +293,7 @@ class ContainerClientImplementation(
     override def assets: ItemAssets = ContainerClientImplementation.this.assets
   }
 
-  override def itemSupportingMaterialHooks: SupportingMaterialHooks = new shellEditor.ItemSupportingMaterialHooks{
+  override def itemSupportingMaterialHooks: SupportingMaterialHooks = new shellEditor.ItemSupportingMaterialHooks {
     override def assets: ItemAssets = ContainerClientImplementation.this.assets
 
     override def itemService: MongoService = ContainerClientImplementation.this.itemService
