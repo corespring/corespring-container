@@ -22,6 +22,9 @@ angular.module('corespring-editor.services')
               logger.debug('done: ', body, status);
               onSuccess(JSON.parse(body));
             },
+            onUploadProgress: function(){
+              console.log('upload progress: ', arguments);
+            },
             onUploadFailed: function() {
               logger.debug('failed', arguments);
               onFailure({

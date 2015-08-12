@@ -1,5 +1,4 @@
 /* global AddContentModalController, com */
-
 angular.module('corespring-editor.controllers')
   .controller('SupportingMaterials', [
     '$scope',
@@ -17,6 +16,28 @@ angular.module('corespring-editor.controllers')
       LogFactory)
       {
         var logger  = LogFactory.getLogger('supporting-materials');
+
+        $scope.imageService = {
+
+          addFile: function(file, onComplete, onProgress){
+            SupportingMaterialsService.addAsset(
+              file, 
+              $scope.selectedMaterial.name,
+              onComplete, 
+              onProgress);
+          },
+          changeSrcPath: function(src){
+            return SupportingMaterialsService.getAssetUrl(
+              src,
+              $scope.selectedMaterial.name);
+          },
+          deleteFile: function(assetName){
+            SupportingMaterialsService.deleteAsset(
+              assetName,
+              $scope.selectedMaterial.name
+              );
+          }
+        };
 
         $scope.deleteItem = function(data){
           

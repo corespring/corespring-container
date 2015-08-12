@@ -14,11 +14,11 @@ import scalaz.{ Failure, Success, Validation }
 
 trait SupportingMaterialHooksHelper {
 
-  protected def binaryToDbo(binary: Binary): DBObject = {
+  protected def binaryToDbo(binary: Binary, isMain:Boolean): DBObject = {
     MongoDBObject(
       "_t" -> "org.corespring.platform.core.models.item.resource.StoredFile",
       "name" -> binary.name,
-      "isMain" -> true,
+      "isMain" -> isMain,
       "contentType" -> binary.mimeType)
   }
 
@@ -39,7 +39,7 @@ trait SupportingMaterialHooksHelper {
       MongoDBObject(
         "name" -> name,
         "materialType" -> materialType,
-        "files" -> MongoDBList(binaryToDbo(binary)))
+        "files" -> MongoDBList(binaryToDbo(binary, true)))
     }
   }
 

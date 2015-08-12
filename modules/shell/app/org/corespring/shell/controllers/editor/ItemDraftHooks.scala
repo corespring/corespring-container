@@ -68,7 +68,7 @@ trait ItemDraftSupportingMaterialHooks
       ContainerDraftId.fromString(id).map { draftId =>
         val query = MongoDBObject("_id" -> DraftId.dbo(draftId), "item.supportingMaterials.name" -> name)
         val update = MongoDBObject(
-          "$push" -> MongoDBObject("item.supportingMaterials.$.files" -> binaryToDbo(binary))) ++ dm
+          "$push" -> MongoDBObject("item.supportingMaterials.$.files" -> binaryToDbo(binary, false))) ++ dm
 
         val wr = draftItemService.collection.update(query, update, false, false)
 

@@ -17,11 +17,32 @@ angular.module('corespring-common.supporting-materials.services')
         }
 
         this.getBinaryUrl = function(m, file){
-          return Urls.getAsset.url
+          return addQueryParamsIfPresent(Urls.getAsset.url
             .replace(':name', m.name)
-            .replace(':filename', file.name);
+            .replace(':filename', file.name));
+        };
+
+        this.getAssetUrl = function(name, materialName) {
+          return this.getBinaryUrl({name: materialName}, {name: name});
         };
         
+        this.deleteAsset = function(name, materialName) {
+          var call = Urls.deleteAsset;
+          var url = addQueryParamsIfPresent(call.url.replace(':name', materialName).replace(':filename', name));
+          $http[call.method](url);
+        };
+
+        this.addAsset = function(file, materialName, onComplete, onProgress){
+          var call = Urls.addAsset;
+          var url = addQueryParamsIfPresent(call.url.replace(':name', materialName));
+          MultipartFileUploader.upload(url, file, {}, function(update){
+            console.log('success: ', update);
+            onComplete(null, file.name);
+          }, function(err){
+            console.error(err);
+          });
+        };
+
         this.create = function(m, onSuccess, onFailure) {
           if (m.file) {
             uploadFile(m, onSuccess, onFailure);

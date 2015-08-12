@@ -52,7 +52,7 @@ trait ItemSupportingMaterialHooks
 
   override def addAsset(id: String, name: String, binary: Binary)(implicit h: RequestHeader): R[JsValue] = Future {
     val query = MongoDBObject("_id" -> new ObjectId(id), "supportingMaterials.name" -> name)
-    val update = MongoDBObject("$push" -> MongoDBObject("supportingMaterials.$.files" -> binaryToDbo(binary)))
+    val update = MongoDBObject("$push" -> MongoDBObject("supportingMaterials.$.files" -> binaryToDbo(binary, false)))
     val wr = itemService.collection.update(query, update, false, false)
 
     if (wr.getN == 1) {
