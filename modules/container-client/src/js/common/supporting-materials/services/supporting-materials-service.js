@@ -16,6 +16,16 @@ angular.module('corespring-common.supporting-materials.services')
           return path + (href.indexOf('?') === -1 ? '' : '?' + href.split('?')[1]);
         }
 
+        this.saveHtml = function(materialName, filename, markup){
+          var call = Urls.saveContent;
+
+          var url = addQueryParamsIfPresent(call.url
+           .replace(':name', materialName)
+           .replace(':filename', filename));
+
+          $http[call.method](url, {content: markup, name: filename});
+        };
+
         this.getBinaryUrl = function(m, file){
           return addQueryParamsIfPresent(Urls.getAsset.url
             .replace(':name', m.name)

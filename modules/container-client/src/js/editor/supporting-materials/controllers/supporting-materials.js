@@ -7,13 +7,15 @@ angular.module('corespring-editor.controllers')
     'ItemService',
     'SupportingMaterialsService',
     'LogFactory',
+    'debounce',
     function(
       $scope,
       $modal,
       ImageUtils,
       ItemService,
       SupportingMaterialsService,
-      LogFactory)
+      LogFactory,
+      debounce)
       {
         var logger  = LogFactory.getLogger('supporting-materials');
 
@@ -94,6 +96,14 @@ angular.module('corespring-editor.controllers')
           if($scope.isBinary && $scope.mainFile){
             $scope.binaryPreviewUrl = SupportingMaterialsService.getBinaryUrl(m, $scope.mainFile);
           }
+        });
+
+        var saveHtmlDebounced = debounce(function(markup){
+          SupportingMaterialsService.updateHtml($scope.selectedMaterial, markup);
+        }, 200);
+
+        $scope.$watch('mainFile.content', function(markup){
+          saveHtmlDebounced(markup);
         });
 
         $scope.$watch('selectedMetadata', function(newValue){
