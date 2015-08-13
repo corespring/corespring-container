@@ -6,6 +6,7 @@ angular.module('corespring-common.directives')
     'DataQueryService',
     'MathJaxService',
     'ProfileFormatter',
+    'SmUtils',
     'SupportingMaterialsService',
     function(
       $log,
@@ -14,6 +15,7 @@ angular.module('corespring-common.directives')
       DataQueryService,
       MathJaxService,
       ProfileFormatter,
+      SmUtils,
       SupportingMaterialsService
     ) {
       return {
@@ -40,11 +42,13 @@ angular.module('corespring-common.directives')
 
         scope.$watch('item', function onChangeItem(item) {
           if (item) {
-            getSupportingMaterials(item);
-            if (isShowingSupportingMaterials()) {
-              scope.selectSupportingMaterial(0);
-            }
-            showNavIfMoreThanOneSupportingMaterialsAvailable();
+
+            scope.sections = SmUtils.group(item.supportingMaterials, 'materialType');
+            //getSupportingMaterials(item);
+            //if (isShowingSupportingMaterials()) {
+              //scope.selectSupportingMaterial(0);
+            //}
+            //showNavIfMoreThanOneSupportingMaterialsAvailable();
           }
         });
 
@@ -62,31 +66,21 @@ angular.module('corespring-common.directives')
           scope.selectedMaterial = undefined;
         };
 
-        scope.selectSupportingMaterial = function(smIndex) {
+        scope.selectSupportingMaterial = function(material) {
           scope.activeTab = 'supportingMaterial';
-          scope.selectedMaterial = makeSelectedMaterial(smIndex);
+          scope.selectedMaterial = material;
+          scope.mainFile = prepareMainFile(material);
+          scope.binaryUrl = SupportingMaterialsService.getBinaryUrl(material, scope.mainFile);
           MathJaxService.parseDomForMath(100, $element[0]);
         };
-
-        function makeSelectedMaterial(smIndex){
-          var item = {
-            index: smIndex,
-            name: SupportingMaterialsService.getSupportingName(scope.item.supportingMaterials, smIndex),
-            url: SupportingMaterialsService.getSupportingUrl(scope.item.supportingMaterials, smIndex),
-            content: SupportingMaterialsService.getContent(scope.item.supportingMaterials, smIndex),
-            contentType: SupportingMaterialsService.getContentType(scope.item.supportingMaterials, smIndex)
-          };
-          item.content = addPathToImageUrls(item.content, 'materials/' + item.name + '/');
-          return item;
-        }
-
-        function addPathToImageUrls(html, path) {
+        
+        function addPathToImageUrls(html, process) {
           var $html = $('<span>' + html + '</span>');
           var $images = $html.find('img');
           if($images.length > 0) {
             $images.each(function (index, img) {
               var src = $(img).attr('src').split('/').pop();
-              $(img).attr('src', path + src);
+              $(img).attr('src', process(src));
             });
             return $html.html();
           } else {
@@ -94,13 +88,28 @@ angular.module('corespring-common.directives')
           }
         }
 
+        function prepareMainFile(m){
+          var main = SmUtils.mainFile(m);
+
+          if(main && main.contentType === 'text/html'){
+            var clone = _.clone(main);
+            var path = SupportingMaterialsService.getBinaryUrl(m, {name: ':filename'});
+            clone.content = addPathToImageUrls(main.content, function(asset){
+              return SupportingMaterialsService.getBinaryUrl(m, {name: asset});
+            });
+            return clone;
+          } else {
+            return main;
+          }
+        }
+
         function hideNav(hide) {
           scope.hideNav = hide;
         }
 
-        function getSupportingMaterials(item) {
+        /*function getSupportingMaterials(item) {
           scope.supportingMaterials = SupportingMaterialsService.getSupportingMaterialsByGroups(item.supportingMaterials);
-        }
+        }*/
 
         function isShowingSupportingMaterials() {
           return scope.activeTab === 'supportingMaterial';

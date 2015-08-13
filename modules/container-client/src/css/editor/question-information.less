@@ -8,6 +8,41 @@
     outline: none;
   }
 
+  ul.dropdown-menu > li{
+    border-bottom: solid 1px #bcbcbc;
+    &.last{
+      border-bottom: none; 
+    }
+  }
+
+  ul.section-menu{
+    padding-left: 0;
+    margin-left: 0;
+
+    li{
+      padding: 0;
+      margin: 0;
+      list-style: none;
+      
+      &.dropdown-header{
+        padding: 7px;
+      } 
+      
+      a {
+        padding: 7px;
+        display: block;
+        text-decoration: none;
+        color: #555;
+      }
+
+      &.active, a:hover{
+        background-color: #f6f6f6;
+        color: #555;
+        outline: none;
+      }
+    }
+  }
+
   li.dropdown-header {
     text-transform: uppercase;
   }

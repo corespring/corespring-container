@@ -8,6 +8,7 @@ angular.module('corespring-editor.controllers')
     'SupportingMaterialsService',
     'LogFactory',
     'editorDebounce',
+    'SmUtils',
     function(
       $scope,
       $modal,
@@ -15,7 +16,8 @@ angular.module('corespring-editor.controllers')
       ItemService,
       SupportingMaterialsService,
       LogFactory,
-      debounce)
+      debounce,
+      SmUtils)
       {
         var logger  = LogFactory.getLogger('supporting-materials');
 
@@ -58,17 +60,13 @@ angular.module('corespring-editor.controllers')
           SupportingMaterialsService.delete(data, onDelete, onError);
         };
 
-        function mainFile(m){
-          return _.find(m.files, function(f){
-            return f.isMain === true;
-          });
-        }
+       
         
         function isMainHtml(selected){
           if(!selected){
             return false;
           }
-          var main = mainFile(selected);
+          var main = SmUtils.mainFile(selected);
           return main && main.content !== undefined;
         }
 
@@ -88,7 +86,7 @@ angular.module('corespring-editor.controllers')
             return;
           }
 
-          $scope.mainFile = mainFile(m);
+          $scope.mainFile = SmUtils.mainFile(m);
           $scope.isHtml = isMainHtml(m);
           $scope.isBinary = !$scope.isHtml;
           $scope.selectedMetadata = mkMetadata(m);

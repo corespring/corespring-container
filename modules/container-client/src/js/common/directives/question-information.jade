@@ -11,8 +11,11 @@
           span.caret
 
         ul.dropdown-menu(role='menu')
-          li(ng-repeat="s in supportingMaterials",ng-model="s",ng-class="{divider: s.type == 'divider', data: s.type == 'data', active: s.index == activeSmIndex, 'dropdown-header': s.type == 'header'}") {{s.type == 'header' ? s.label : ''}}
-            a(ng-if="s.type == 'data'",ng-click="selectSupportingMaterial(s.index)") {{s.label}}
+          li(ng-repeat="section in sections", ng-class="{last: $last}")
+            ul.section-menu
+              li.dropdown-header {{section.name}}
+              li(ng-repeat="sm in section.items")
+                a(ng-click="selectSupportingMaterial(sm)") {{sm.name}}
 
   .col-sm-8
     .player-container(ng-show="activeTab == 'question'")
@@ -26,9 +29,9 @@
 
     .supporting-material(ng-show="activeTab == 'supportingMaterial'")
       h3 {{selectedMaterial.name}}
-      div(style="height: 400px;", ng-if="selectedMaterial.contentType != 'text/html'")
-        iframe(ng-src="{{selectedMaterial.url}}")
-      div(ng-if="selectedMaterial.contentType == 'text/html'")
-        div(ng-bind-html-unsafe='selectedMaterial.content')
+      div(style="height: 400px;", ng-if="mainFile.contentType != 'text/html'")
+        iframe(ng-src="{{binaryUrl}}")
+      div(ng-if="mainFile.contentType == 'text/html'")
+        div(ng-bind-html-unsafe='mainFile.content')
 
   .clearfix
