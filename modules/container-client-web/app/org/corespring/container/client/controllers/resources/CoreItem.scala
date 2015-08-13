@@ -131,6 +131,12 @@ trait CoreSupportingMaterials extends Controller {
     }
   }
 
+  def updateSupportingMaterialContent(id: String, materialName: String, filename: String) = Action.async { implicit request =>
+    request.body.asText.map { content =>
+      materialHooks.updateContent(id, materialName, filename, content).toResult
+    }.getOrElse(Future(BadRequest("No text content in request body")))
+  }
+
   def addAssetToSupportingMaterial(id: String, name: String) = Action.async { implicit request =>
     val v = for {
       form <- request.body.asMultipartFormData.toSuccess("must be multipart formdata")

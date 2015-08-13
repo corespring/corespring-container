@@ -3,13 +3,13 @@ package org.corespring.container.client.controllers.apps
 import org.corespring.container.client.controllers.resources
 import org.corespring.container.client.views.models.SupportingMaterialsEndpoints
 import org.corespring.container.client.views.txt.js.EditorServices
-import play.api.libs.json.{JsArray}
+import play.api.libs.json.{ JsArray }
 
 trait BaseItemEditor extends CoreEditor {
 
   import resources.{ routes => resourceRoutes }
 
-  override def servicesJs(itemId: String, components: JsArray, widgets:JsArray) = {
+  override def servicesJs(itemId: String, components: JsArray, widgets: JsArray) = {
 
     val smEndpoints = SupportingMaterialsEndpoints(
       resourceRoutes.Item.createSupportingMaterial(itemId),
@@ -17,8 +17,8 @@ trait BaseItemEditor extends CoreEditor {
       resourceRoutes.Item.deleteSupportingMaterial(itemId, ":name"),
       resourceRoutes.Item.addAssetToSupportingMaterial(itemId, ":name"),
       resourceRoutes.Item.deleteAssetFromSupportingMaterial(itemId, ":name", ":filename"),
-      resourceRoutes.Item.getAssetFromSupportingMaterial(itemId,":name", ":filename")
-    )
+      resourceRoutes.Item.getAssetFromSupportingMaterial(itemId, ":name", ":filename"),
+      resourceRoutes.Item.updateSupportingMaterialContent(itemId, ":name", ":filename"))
 
     EditorServices(
       s"$context.services",
@@ -31,12 +31,10 @@ trait BaseItemEditor extends CoreEditor {
   }
 }
 
-trait ItemDevEditor extends BaseItemEditor
-{
+trait ItemDevEditor extends BaseItemEditor {
   override def context: String = "dev-editor"
 }
 
-trait ItemEditor extends BaseItemEditor
-{
+trait ItemEditor extends BaseItemEditor {
   override def context: String = "editor"
 }

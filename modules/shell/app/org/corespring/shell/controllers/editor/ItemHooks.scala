@@ -1,6 +1,6 @@
 package org.corespring.shell.controllers.editor
 
-import com.mongodb.casbah.commons.MongoDBObject
+import com.mongodb.casbah.Imports._
 import org.bson.types.ObjectId
 import org.corespring.container.client.hooks.{ Binary, CreateNewMaterialRequest, File }
 import org.corespring.container.client.hooks.Hooks.R
@@ -11,6 +11,7 @@ import play.api.libs.json._
 import play.api.mvc._
 
 import scala.concurrent.Future
+import scala.util.Try
 
 trait ItemSupportingMaterialHooks
   extends containerHooks.SupportingMaterialHooks
@@ -78,6 +79,46 @@ trait ItemSupportingMaterialHooks
 
   override def getAsset(id: String, name: String, filename: String)(implicit h: RequestHeader): SimpleResult = {
     assets.getAssetFromSupportingMaterial(id, name, filename)
+  }
+
+  private def getFiles(dbo: DBObject): Option[BasicDBList] = Try {
+    val materials = dbo.get("supportingMaterials").asInstanceOf[BasicDBList]
+    val m = materials.get(0).asInstanceOf[BasicDBObject]
+    m.get("files").asInstanceOf[BasicDBList]
+  }.toOption
+
+  private def updateFile(filename: String, content: String)(f: Any) = {
+    val dbo = f.asInstanceOf[BasicDBObject]
+    if (dbo.getString("name") == filename) {
+      dbo.put("content", content)
+    }
+    dbo
+  }
+
+  override def updateContent(id: String, name: String, filename: String, content: String)(implicit h: RequestHeader): R[JsValue] = Future {
+    val query = MongoDBObject(
+      "_id" -> new ObjectId(id),
+      "supportingMaterials.name" -> name,
+      "supportingMaterials.files.name" -> filename)
+
+    val fields = MongoDBObject("supportingMaterials.$.files" -> 1)
+    val rawDbo = itemService.collection.findOne(query, fields)
+    val result = for {
+      dbo <- rawDbo
+      files <- getFiles(dbo)
+    } yield {
+      val updatedFiles = files.map(updateFile(filename, content))
+      val filesUpdate = MongoDBObject("$set" -> MongoDBObject("supportingMaterials.$.files" -> updatedFiles))
+      itemService.collection.update(query, filesUpdate)
+    }
+
+    result.map { wr =>
+      if (wr.getN == 1) {
+        Right(Json.obj("todo" -> true))
+      } else {
+        Left(BAD_REQUEST -> "Failed to update")
+      }
+    }.getOrElse(Left(BAD_REQUEST -> "Can't find field to update"))
   }
 }
 

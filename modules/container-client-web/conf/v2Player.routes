@@ -42,6 +42,7 @@ POST          /item/:itemId/supporting-material/upload               @org.coresp
 DELETE        /item/:itemId/supporting-material/:name                @org.corespring.container.client.controllers.resources.Item.deleteSupportingMaterial(itemId, name)
 POST          /item/:itemId/supporting-material/:name/upload         @org.corespring.container.client.controllers.resources.Item.addAssetToSupportingMaterial(itemId, name)
 DELETE        /item/:itemId/supporting-material/:name/:filename      @org.corespring.container.client.controllers.resources.Item.deleteAssetFromSupportingMaterial(itemId, name, filename)
+PUT           /item/:itemId/supporting-material/:name/:filename      @org.corespring.container.client.controllers.resources.Item.updateSupportingMaterialContent(itemId, name, filename)
 GET           /item/:itemId/supporting-material/:name/:filename      @org.corespring.container.client.controllers.resources.Item.getAssetFromSupportingMaterial(itemId, name, filename)
 PUT           /item/update/:subset/:itemId.json                      @org.corespring.container.client.controllers.resources.Item.saveSubset(itemId, subset)
 
@@ -53,6 +54,7 @@ DELETE        /draft/:draftId/supporting-material/:name              @org.coresp
 POST          /draft/:draftId/supporting-material/:name/upload       @org.corespring.container.client.controllers.resources.ItemDraft.addAssetToSupportingMaterial(draftId, name)
 DELETE        /draft/:draftId/supporting-material/:name/:filename    @org.corespring.container.client.controllers.resources.ItemDraft.deleteAssetFromSupportingMaterial(draftId, name, filename)
 GET           /draft/:draftId/supporting-material/:name/:filename    @org.corespring.container.client.controllers.resources.ItemDraft.getAssetFromSupportingMaterial(draftId, name, filename)
+PUT           /draft/:draftId/supporting-material/:name/:filename    @org.corespring.container.client.controllers.resources.ItemDraft.updateSupportingMaterialContent(draftId, name, filename)
 GET           /draft/:draftId.json                                   @org.corespring.container.client.controllers.resources.ItemDraft.load(draftId)
 PUT           /draft/update/:draftId                                 @org.corespring.container.client.controllers.resources.ItemDraft.save(draftId)
 PUT           /draft/update/:subset/:draftId.json                    @org.corespring.container.client.controllers.resources.ItemDraft.saveSubset(draftId, subset)

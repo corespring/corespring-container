@@ -59,11 +59,12 @@ trait CatalogHooks extends LoadHook with GetAssetHook with GetSupportingMaterial
 trait EditorHooks extends LoadHook with AssetHooks
 
 trait SupportingMaterialHooks {
-  def create[F<:File](id:String, sm:CreateNewMaterialRequest[F])(implicit h : RequestHeader) : R[JsValue]
-  def delete(id:String, name:String)(implicit h : RequestHeader) : R[JsValue]
-  def addAsset(id:String, name:String, binary: Binary)(implicit h : RequestHeader) : R[JsValue]
-  def deleteAsset(id:String, name:String, filename:String)(implicit h : RequestHeader) : R[JsValue]
-  def getAsset(id:String, name:String, filename:String)(implicit h : RequestHeader) : SimpleResult
+  def create[F <: File](id: String, sm: CreateNewMaterialRequest[F])(implicit h: RequestHeader): R[JsValue]
+  def delete(id: String, name: String)(implicit h: RequestHeader): R[JsValue]
+  def addAsset(id: String, name: String, binary: Binary)(implicit h: RequestHeader): R[JsValue]
+  def deleteAsset(id: String, name: String, filename: String)(implicit h: RequestHeader): R[JsValue]
+  def getAsset(id: String, name: String, filename: String)(implicit h: RequestHeader): SimpleResult
+  def updateContent(id: String, name: String, filename: String, content: String)(implicit h: RequestHeader): R[JsValue]
 }
 
 trait CoreItemHooks extends HasContext with LoadHook {

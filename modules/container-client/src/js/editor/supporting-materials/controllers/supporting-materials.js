@@ -7,7 +7,7 @@ angular.module('corespring-editor.controllers')
     'ItemService',
     'SupportingMaterialsService',
     'LogFactory',
-    'debounce',
+    'editorDebounce',
     function(
       $scope,
       $modal,
@@ -99,11 +99,27 @@ angular.module('corespring-editor.controllers')
         });
 
         var saveHtmlDebounced = debounce(function(markup){
-          SupportingMaterialsService.updateHtml($scope.selectedMaterial, markup);
-        }, 200);
+          SupportingMaterialsService.updateContent($scope.selectedMaterial.name, $scope.mainFile.name, markup, 
+            function(){
+              console.log('update content ok');
+            }, 
+            function(){
+              console.error('update content not ok', arguments);
+            });
+        }, 400, true);
 
-        $scope.$watch('mainFile.content', function(markup){
-          saveHtmlDebounced(markup);
+        $scope.$watch('mainFile.content', function(markup, oldMarkup){
+
+          console.log('markup: ', markup);
+          console.log('old: ', oldMarkup);
+          
+          if($scope.mainFile){
+            console.log('scoped: ', $scope.mainFile.content);
+          }
+
+          if($scope.selectedMaterial && $scope.mainFile && markup && oldMarkup){
+            saveHtmlDebounced(markup);
+          }
         });
 
         $scope.$watch('selectedMetadata', function(newValue){

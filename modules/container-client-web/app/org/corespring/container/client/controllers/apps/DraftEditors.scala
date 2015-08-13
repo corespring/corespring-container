@@ -8,8 +8,7 @@ trait BaseDraftEditor extends CoreEditor {
 
   import org.corespring.container.client.controllers.resources.{ routes => resourceRoutes }
 
-  override def servicesJs(id: String, components:JsArray, widgets:JsArray): String = {
-
+  override def servicesJs(id: String, components: JsArray, widgets: JsArray): String = {
 
     val smEndpoints = SupportingMaterialsEndpoints(
       resourceRoutes.ItemDraft.createSupportingMaterial(id),
@@ -17,8 +16,8 @@ trait BaseDraftEditor extends CoreEditor {
       resourceRoutes.ItemDraft.deleteSupportingMaterial(id, ":name"),
       resourceRoutes.ItemDraft.addAssetToSupportingMaterial(id, ":name"),
       resourceRoutes.ItemDraft.deleteAssetFromSupportingMaterial(id, ":name", ":filename"),
-      resourceRoutes.ItemDraft.getAssetFromSupportingMaterial(id, ":name", ":filename")
-    )
+      resourceRoutes.ItemDraft.getAssetFromSupportingMaterial(id, ":name", ":filename"),
+      resourceRoutes.ItemDraft.updateSupportingMaterialContent(id, ":name", ":filename"))
 
     EditorServices(
       s"$context.services",
@@ -30,10 +29,10 @@ trait BaseDraftEditor extends CoreEditor {
   }
 }
 
-trait DraftEditor extends BaseDraftEditor{
+trait DraftEditor extends BaseDraftEditor {
   override def context = "editor"
 }
 
-trait DraftDevEditor extends BaseDraftEditor{
+trait DraftDevEditor extends BaseDraftEditor {
   override def context = "dev-editor"
 }

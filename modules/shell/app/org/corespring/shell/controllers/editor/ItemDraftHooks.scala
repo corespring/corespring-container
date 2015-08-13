@@ -105,6 +105,8 @@ trait ItemDraftSupportingMaterialHooks
   }
 
   override def getAsset(id: String, name: String, filename: String)(implicit h: RequestHeader): SimpleResult = ???
+
+  override def updateContent(id: String, name: String, filename: String, content: String)(implicit h: RequestHeader): R[JsValue] = ???
 }
 
 trait ItemDraftHooks

@@ -12,6 +12,7 @@ editorSrcs = [
   'bower_components/angular-ui-select2/src/select2.js',
   'bower_components/angular-ui/build/angular-ui(.min).js',
   'bower_components/angular-bootstrap/ui-bootstrap-tpls(.min).js',
+  'bower_components/angular-debounce/dist/angular-debounce(.min).js',
   'bower_components/jquery.browser/dist/jquery.browser(.min).js',
   'bower_components/undo.js/undo.js',
   'bower_components/corespring-checkbox/src/directive.js',
@@ -56,4 +57,5 @@ exports.ngModules = _.union(player.ngModules, [
   'cs.directives',
   'ngRoute',
   'ui.select2',
-  'corespring.wiggi-wiz' ])
+  'corespring.wiggi-wiz',
+  'rt.debounce' ])

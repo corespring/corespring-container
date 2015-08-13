@@ -1,3 +1,26 @@
+### saveAll + supporting materials
+
+we have added a `saveAll` method to the editor. The purpose of which is to allow the editor to send it's entire data model to the server.
+
+This isn't a great fit for supporting materials, because we are dealing with assets which need to update the db aswell as uploading the content.
+
+so as an example: 
+- a user creates a html based supporting material.
+- a user uploads an image called 'dog.jpg'
+
+When this image is uploaded - the server will do 2 things: 
+- put the image on s3
+- update the db with a reference to the file: 'dog.jpg'.
+
+So if we call saveAll - there is a risk that the json that we send up may overwrite the file reference aka we'd be dependent on the client not to screw up the data model, when really the data model doesn't need to be updated at this point.
+The server already took care of it.
+
+so the options are: 
+
+* allow saveAll to continue as is and make sure that the client doesn't send in out of synch data
+* in saveAll ignore supporting materials - and add add the specific endpoints for updating supporting materials
+
+
 ### ability to rename a supporting material
 
 Example: 

@@ -3,6 +3,7 @@ angular.module('corespring-editor.controllers')
     '$scope',
     '$state',
     '$window',
+    '$timeout',
     'ComponentRegister',
     'ConfigurationService',
     'EditorDialogTemplate',
@@ -12,10 +13,12 @@ angular.module('corespring-editor.controllers')
     'Msgr',
     'WIGGI_EVENTS',
     'WiggiDialogLauncher',
+    'editorDebounce',
     function(
       $scope,
       $state,
       $window,
+      $timeout,
       ComponentRegister,
       ConfigurationService,
       EditorDialogTemplate,
@@ -24,7 +27,8 @@ angular.module('corespring-editor.controllers')
       LogFactory,
       Msgr,
       WIGGI_EVENTS,
-      WiggiDialogLauncher) {
+      WiggiDialogLauncher,
+      debounce) {
 
       "use strict";
 
@@ -39,12 +43,15 @@ angular.module('corespring-editor.controllers')
 
       init();
 
-
       function saveAll(done){
         logger.debug('saveAll...');
+
         ItemService.saveAll($scope.item, function() {
           logger.debug('call \'saveAll\' callback...');
-          done(null, {saved: true});
+          debounce.flush();
+          $timeout(function(){
+            done(null, {saved: true});
+          }, 300);
         });
       }
 

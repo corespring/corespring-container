@@ -1,5 +1,5 @@
 angular.module('corespring-editor.services')
-  .factory('EditorChangeWatcher', ['LogFactory', 'debounce', function(LogFactory, debounce) {
+  .factory('EditorChangeWatcher', ['LogFactory', 'editorDebounce', function(LogFactory, debounce) {
 
     var logger = LogFactory.getLogger('editor-change-watcher');
 
