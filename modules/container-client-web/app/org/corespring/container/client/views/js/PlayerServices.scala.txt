@@ -1,4 +1,4 @@
-@(namespace : String, loadSession : Call, reopenSession: Call, resetSession: Call, saveSession: Call, getScore: Call, completeResponse:Call, loadOutcome: Call, queryParams : play.api.libs.json.JsValue)
+@(namespace : String, loadSession : Call, reopenSession: Call, resetSession: Call, saveSession: Call, getScore: Call, completeResponse:Call, loadOutcome: Call, loadInstructorData: Call, queryParams : play.api.libs.json.JsValue)
 
 angular.module('@namespace', []);
 
@@ -65,6 +65,7 @@ angular.module('@namespace').factory('PlayerService', ['$http',
       this.completeResponse = callWithNoData('@completeResponse.method.toLowerCase', '@completeResponse.url');
       this.loadItemAndSession = callWithNoData('@loadSession.method.toLowerCase', '@loadSession.url');
       this.loadOutcome = callWithData('@loadOutcome.method.toLowerCase', '@loadOutcome.url');
+      this.loadInstructorData = callWithData('@loadInstructorData.method.toLowerCase', '@loadInstructorData.url');
     }
 
 

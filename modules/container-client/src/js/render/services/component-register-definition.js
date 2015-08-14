@@ -123,6 +123,10 @@ angular.module('corespring-player.services')
         _.forIn(bridges, fn('setResponse', outcomes));
       };
 
+      this.setInstructorData = function(data) {
+        _.forIn(bridges, fn('setInstructorData', data));
+      };
+
       this.reset = function() {
         _.forIn(bridges, fn('reset'));
       };
@@ -148,6 +152,7 @@ angular.module('corespring-player.services')
       };
 
       this.setMode = function(mode) {
+        console.log("Setting mode to ",mode," in ", _.keys(bridges).length);
         _.forIn(bridges, function(b){
           if(b.setMode){
             b.setMode(mode);

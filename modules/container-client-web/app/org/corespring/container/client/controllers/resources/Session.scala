@@ -178,6 +178,29 @@ trait Session extends Controller with HasContext {
       }
     }
   }
+  /**
+   * Load instructor data for a session.
+   * @param id
+   * @return
+   */
+  def loadInstructorData(id: String) = Action {
+    implicit request => {
+      val reponse = hooks.loadOutcome(id)
+
+      reponse match {
+        case Left(err) => InternalServerError(err._2)
+        case Right(so) => {
+          logger.trace(s"[loadAnswerKey]: $id : ${Json.stringify(so.item)} : ${Json.stringify(so.itemSession)}")
+
+          if (so.isSecure && !so.isComplete) {
+            BadRequest(Json.obj("error" -> JsString("secure mode: can't load instructor data - session isn't complete")))
+          } else {
+            Ok(Json.obj("item" -> so.item, "session" -> so.itemSession))
+          }
+        }
+      }
+    }
+  }
 
   /**
    * Be aware that this is two different implementations melted into one api.

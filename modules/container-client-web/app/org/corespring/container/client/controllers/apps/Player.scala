@@ -170,6 +170,7 @@ trait Player
       Session.getScore(sessionId),
       Session.completeSession(sessionId),
       Session.loadOutcome(sessionId),
+      Session.loadInstructorData(sessionId),
       queryParams).toString
   }
 }

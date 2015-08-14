@@ -59,7 +59,11 @@ exports.define = function(isSecure) {
     }
 
     function isValidMode(m) {
-      return ['gather', 'view', 'evaluate'].indexOf(m) !== -1;
+      return ['gather', 'view', 'evaluate', 'instructor'].indexOf(m) !== -1;
+    }
+
+    function requiresSessionId(m) {
+      return ['view', 'evaluate'].indexOf(m) !== -1;
     }
 
     function validateOptions(options){
@@ -76,7 +80,7 @@ exports.define = function(isSecure) {
         out.push(errorCodes.NO_ITEM_OR_SESSION_ID);
       }
 
-      if (!options.sessionId && options.mode !== 'gather') {
+      if (!options.sessionId && requiresSessionId(options.mode)) {
         out.push(errorCodes.NO_SESSION_ID);
       }
 
@@ -171,7 +175,7 @@ exports.define = function(isSecure) {
 
     /* API methods */
     this.setMode = function(mode, callback) {
-
+      console.log("Setting mode to ", mode);
       if (!launcher.isReady) {
         //no callback bc it results in a stack overflow
         return;
