@@ -5,6 +5,7 @@ import org.corespring.container.client.controllers.GetAsset
 import org.corespring.container.client.controllers.jade.Jade
 import org.corespring.container.client.hooks.{ LoadHook, CatalogHooks }
 import org.corespring.container.client.hooks.Hooks.StatusMessage
+import org.corespring.container.client.views.models.SupportingMaterialsEndpoints
 import org.corespring.container.client.views.txt.js.CatalogServices
 import play.api.libs.json.{ JsArray, JsString, JsValue, Json }
 import play.api.mvc.{ Action, AnyContent }
@@ -34,7 +35,18 @@ trait Catalog
           "defaultData" -> c.defaultData)
     }
 
-    CatalogServices("catalog.services", Item.load(itemId), JsArray(componentJson)).toString
+    import org.corespring.container.client.controllers.resources.routes
+
+    val smEndpoints = SupportingMaterialsEndpoints(
+      routes.Item.createSupportingMaterial(itemId),
+      routes.Item.createSupportingMaterialFromFile(itemId),
+      routes.Item.deleteSupportingMaterial(itemId, ":name"),
+      routes.Item.addAssetToSupportingMaterial(itemId, ":name"),
+      routes.Item.deleteAssetFromSupportingMaterial(itemId, ":name", ":filename"),
+      routes.Item.getAssetFromSupportingMaterial(itemId, ":name", ":filename"),
+      routes.Item.updateSupportingMaterialContent(itemId, ":name", ":filename"))
+
+    CatalogServices("catalog.services", Item.load(itemId), JsArray(componentJson), smEndpoints).toString
   }
 
   def getSupportingMaterialFile(itemId: String, path: String) = Action.async {

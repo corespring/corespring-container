@@ -5,21 +5,17 @@ angular.module('corespring-common.supporting-materials.services')
     'MultipartFileUploader',
     'LogFactory',
     'SupportingMaterialUrls',
-    function($http, $document, MultipartFileUploader, LogFactory, Urls) {
+    'SmUtils',
+    function($http, $document, MultipartFileUploader, LogFactory, Urls, Utils) {
 
       var logger = LogFactory.getLogger('supporting-materials-service');
 
       function SupportingMaterialsService() {
 
-        function addQueryParamsIfPresent(path) {
-          var href = $document[0].location.href;
-          return path + (href.indexOf('?') === -1 ? '' : '?' + href.split('?')[1]);
-        }
-
         this.updateContent = function(materialName, filename, content, onSuccess, onFailure){
           var call = Urls.updateContent;
 
-          var url = addQueryParamsIfPresent(call.url
+          var url = Utils.addQueryParamsIfPresent(call.url
            .replace(':name', materialName)
            .replace(':filename', filename));
 
@@ -38,9 +34,7 @@ angular.module('corespring-common.supporting-materials.services')
         };
 
         this.getBinaryUrl = function(m, file){
-          return addQueryParamsIfPresent(Urls.getAsset.url
-            .replace(':name', m.name)
-            .replace(':filename', file.name));
+          return Utils.getBinaryUrl(m, file);
         };
 
         this.getAssetUrl = function(name, materialName) {
@@ -49,13 +43,13 @@ angular.module('corespring-common.supporting-materials.services')
         
         this.deleteAsset = function(name, materialName) {
           var call = Urls.deleteAsset;
-          var url = addQueryParamsIfPresent(call.url.replace(':name', materialName).replace(':filename', name));
+          var url = Utils.addQueryParamsIfPresent(call.url.replace(':name', materialName).replace(':filename', name));
           $http[call.method](url);
         };
 
         this.addAsset = function(file, materialName, onComplete, onProgress){
           var call = Urls.addAsset;
-          var url = addQueryParamsIfPresent(call.url.replace(':name', materialName));
+          var url = Utils.addQueryParamsIfPresent(call.url.replace(':name', materialName));
           MultipartFileUploader.upload(url, file, {}, function(update){
             console.log('success: ', update);
             onComplete(null, file.name);
@@ -69,7 +63,7 @@ angular.module('corespring-common.supporting-materials.services')
             uploadFile(m, onSuccess, onFailure);
           } else {
             var c = Urls.create;
-            var url = addQueryParamsIfPresent(c.url);
+            var url = Utils.addQueryParamsIfPresent(c.url);
             m.html = '<div>' + m.name + '</div>';
             $http[c.method](url, m)
               .success(onSuccess)
@@ -81,7 +75,7 @@ angular.module('corespring-common.supporting-materials.services')
 
         function uploadFile(m, onSuccess, onFailure) {
           var url = Urls.createFromFile.url;
-          url = addQueryParamsIfPresent(url);
+          url = Utils.addQueryParamsIfPresent(url);
 
           MultipartFileUploader.upload(url, m.file, {
             name: m.name,
@@ -96,7 +90,7 @@ angular.module('corespring-common.supporting-materials.services')
 
         this.delete = function(m, onSuccess, onFailure){
           var call = Urls.delete;
-          var url = addQueryParamsIfPresent(call.url);
+          var url = Utils.addQueryParamsIfPresent(call.url);
           url = url.replace(':name', m.name);
 
           logger.debug('url: ', url);

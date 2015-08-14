@@ -2,11 +2,8 @@ angular.module('corespring-editor.controllers').controller('QuestionInformationP
   '$scope',
   'LogFactory',
   '$modal',
-  'SupportingMaterialsService',
   'item',
-  function($scope, LogFactory, $modal, SupportingMaterialsService, item) {
+  function($scope, LogFactory, $modal,item) {
     $scope.item = item;
-    $scope.activeTab = 'question';
-    $scope.playerMode = "gather";
-    //$scope.supportingMaterials = SupportingMaterialsService.getSupportingMaterialsByGroups(item.supportingMaterials);
+    $scope.tabs = { question: true, profile: true, supportingMaterial: true};
   }]);

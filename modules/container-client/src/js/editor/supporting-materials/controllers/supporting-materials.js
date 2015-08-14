@@ -107,14 +107,6 @@ angular.module('corespring-editor.controllers')
         }, 400, true);
 
         $scope.$watch('mainFile.content', function(markup, oldMarkup){
-
-          console.log('markup: ', markup);
-          console.log('old: ', oldMarkup);
-          
-          if($scope.mainFile){
-            console.log('scoped: ', $scope.mainFile.content);
-          }
-
           if($scope.selectedMaterial && $scope.mainFile && markup && oldMarkup){
             saveHtmlDebounced(markup);
           }
