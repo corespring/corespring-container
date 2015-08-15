@@ -79,20 +79,9 @@ angular.module('corespring-editor.services').service('EditorConfig', [
 
           videoComponent.iconclass = "fa fa-film";
 
-          var calculatorComponent = componentToFeature(_.find(widgets,
-            function(c) {
-              return c.componentType === 'corespring-calculator';
-            }));
-
-          var rulerComponent = componentToFeature(_.find(widgets,
-            function(c) {
-              return c.componentType === 'corespring-ruler';
-            }));
-
-          var protractorComponent = componentToFeature(_.find(widgets,
-            function(c) {
-              return c.componentType === 'corespring-protractor';
-            }));
+          var calculatorFeature = widgetToFeature('corespring-calculator');
+          var rulerFeature = widgetToFeature('corespring-ruler');
+          var protractorFeature = widgetToFeature('corespring-protractor');
           
           this.overrideFeatures = [
             ImageFeature
@@ -127,9 +116,9 @@ angular.module('corespring-editor.services').service('EditorConfig', [
               class: 'tools',
               dropdownTitle: 'Tools',
               buttons: _([
-                  calculatorComponent,
-                  rulerComponent,
-                  protractorComponent
+                  calculatorFeature,
+                  rulerFeature,
+                  protractorFeature
                 ])
                 .sortBy(orderList)
                 .value()
@@ -169,6 +158,13 @@ angular.module('corespring-editor.services').service('EditorConfig', [
                 deleteComponent,
                 reAddToEditor
             );
+          }
+
+          function widgetToFeature(t) {
+            var target = _.find(widgets, function(w) {
+              return w.componentType === t;
+            });
+            return componentToFeature(target);
           }
 
           function deleteComponent(id) {
