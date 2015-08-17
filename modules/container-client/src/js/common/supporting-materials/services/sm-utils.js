@@ -4,15 +4,14 @@
 
         function SmUtils() {
           
-          this.formatKB = function(kb, decimalPlaces) {
-            decimalPlaces = decimalPlaces || 2;
+          this.formatKB = function(kb) {
             if (isNaN(kb)) {
               return '--';
             } else if(kb < 1024){
-              return kb.toFixed(decimalPlaces) + 'kb'; 
+              return kb.toFixed(0) + 'kb'; 
             } else {
               var mb = kb / 1024;
-              return mb.toFixed(decimalPlaces) + 'mb';
+              return mb.toFixed(1) + 'mb';
             }
           };
 
@@ -44,7 +43,8 @@
               };
             }
 
-            return _(keyMap).keys().map(toObject).value();
+            var sortedKeys = _.keys(keyMap).sort();
+            return _.map(sortedKeys, toObject);
           };
         }
 
