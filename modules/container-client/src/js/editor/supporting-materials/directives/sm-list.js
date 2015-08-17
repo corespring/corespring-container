@@ -1,34 +1,59 @@
  angular.module('corespring-editor.directives')
-   .directive('smList', ['LogFactory', 'SmUtils', function(LogFactory, SmUtils) {
+   .directive('smList', ['$timeout', 'LogFactory', 'SmUtils', function($timeout, LogFactory, SmUtils) {
 
      var logger = LogFactory.getLogger('sm-list');
 
      function link($scope, $element, $attrs, ngModel) {
 
-        function watchOnlyNameAndType($scope){
-          return $scope.ngModel.map(function(m) {
-            return {name: m.name, materialType: m.materialType};
+       function watchOnlyNameAndType($scope) {
+         return $scope.ngModel.map(function(m) {
+           return {
+             name: m.name,
+             materialType: m.materialType
+           };
          });
-        }
+       }
 
-        function onUpdate(update){
-          logger.debug('$watch', ngModel.$viewValue);
-          $scope.sections = SmUtils.group(ngModel.$viewValue, $attrs.groupBy || 'materialType');
-        }
+       function onUpdate(update) {
+         logger.debug('$watch', ngModel.$viewValue);
+         $scope.sections = SmUtils.group(ngModel.$viewValue, $attrs.groupBy || 'materialType');
+       }
 
-        $scope.$watch(watchOnlyNameAndType, onUpdate, true);
+       $scope.$watch(watchOnlyNameAndType, onUpdate, true);
+
+       $scope.$watch('selectedItem', function(i){
+          $timeout(function(){
+            $scope.$broadcast('itemSelected', i);
+          });
+       });
      }
 
-     function SmListController($scope) {
+    function SmListController($scope) {
 
-       this.chooseItem = function(item) {
-         $scope.chooseItem()(item);
-       };
+      this.chooseItem = function(item) {
+        $scope.chooseItem()(item);
+        $scope.$broadcast('itemSelected', item);
+      };
 
-       this.deleteItem = function(item) {
-         $scope.deleteItem()(item);
-       };
-     }
+      this.deleteItem = function(item) {
+        
+        $scope.deleteItem()(item, function(){
+          var nextItem;
+          if ($scope.ngModel && $scope.ngModel.length > 0) {
+            nextItem = $scope.ngModel[0];
+          } else {
+            nextItem = null;
+          }
+
+          $timeout(function(){
+            this.chooseItem(nextItem);
+          }.bind(this));
+        }.bind(this));
+
+        $scope.$broadcast('itemSelected', null);
+
+      };
+    }
 
      return {
        restrict: 'A',
@@ -36,6 +61,7 @@
        require: '^ngModel',
        scope: {
          ngModel: '=',
+         selectedItem: '=',
          deleteItem: '&',
          chooseItem: '&'
        },
@@ -53,17 +79,22 @@
      return {
        restrict: 'A',
        scope: {
-         ngModel: '=',
+         ngModel: '='
        },
        template: ['<ul>',
          '  <li class="sm-section-header">{{ngModel.name}}</li>',
-         '  <li class="sm-item" ng-repeat="i in ngModel.items" sm-item ng-model="i"></li>',
+         '  <li class="sm-item" ng-repeat="i in ngModel.items"',
+         '     sm-item ng-model="i"></li>',
          '</ul>'
        ].join('')
      };
    }])
    .directive('smItem', [function() {
      function link($scope, $element, $attrs, smListController) {
+
+       $scope.$on('itemSelected', function($event, item) {
+         $scope.selected = item === $scope.ngModel;
+       });
 
        $scope.deleteItem = function($event) {
          smListController.deleteItem($scope.ngModel);
@@ -77,8 +108,9 @@
      return {
        restrict: 'A',
        require: '^smList',
+       replace: true,
        scope: {
-         ngModel: '=',
+         ngModel: '='
        },
        link: link,
        templateUrl: '/editor/supporting-materials/directives/sm-item.html'

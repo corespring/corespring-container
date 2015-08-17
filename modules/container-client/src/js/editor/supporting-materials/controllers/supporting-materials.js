@@ -38,12 +38,11 @@ angular.module('corespring-editor.controllers')
           deleteFile: function(assetName){
             SupportingMaterialsService.deleteAsset(
               assetName,
-              $scope.selectedMaterial.name
-              );
+              $scope.selectedMaterial.name);
           }
         };
 
-        $scope.deleteItem = function(data){
+        $scope.deleteItem = function(data, done){
           
           $scope.item.supportingMaterials = _.reject($scope.item.supportingMaterials, function(o){
             return o === data;
@@ -51,6 +50,9 @@ angular.module('corespring-editor.controllers')
 
           function onDelete(){
             logger.info('delete complete');
+            $scope.selectedMaterial = null;
+            $scope.binaryPreviewUrl = null;
+            done();
           }
 
           function onError(){
@@ -60,8 +62,6 @@ angular.module('corespring-editor.controllers')
           SupportingMaterialsService.delete(data, onDelete, onError);
         };
 
-       
-        
         function isMainHtml(selected){
           if(!selected){
             return false;
@@ -74,13 +74,6 @@ angular.module('corespring-editor.controllers')
           $scope.selectedMaterial = data;
         };
 
-        function mkMetadata(m){
-          return {
-            name: m.name,
-            materialType: m.materialType
-          };
-        }
-
         $scope.$watch('selectedMaterial', function(m){
           if(!m){
             return;
@@ -89,7 +82,6 @@ angular.module('corespring-editor.controllers')
           $scope.mainFile = SmUtils.mainFile(m);
           $scope.isHtml = isMainHtml(m);
           $scope.isBinary = !$scope.isHtml;
-          $scope.selectedMetadata = mkMetadata(m);
 
           if($scope.isBinary && $scope.mainFile){
             $scope.binaryPreviewUrl = SupportingMaterialsService.getBinaryUrl(m, $scope.mainFile);
@@ -112,14 +104,6 @@ angular.module('corespring-editor.controllers')
           }
         });
 
-        $scope.$watch('selectedMetadata', function(newValue){
-          if(newValue){
-            $scope.selectedMaterial.name = newValue.name;
-            $scope.selectedMaterial.materialType = newValue.materialType;
-          }
-        }, true);
-
-
         $scope.addNew = function() {
           var modalInstance = $modal.open({
             templateUrl: '/templates/popups/addSupportingMaterial',
@@ -136,6 +120,7 @@ angular.module('corespring-editor.controllers')
 
             function onCreate(newSupportingMaterial){
               $scope.item.supportingMaterials.push(newSupportingMaterial);
+              $scope.choose(newSupportingMaterial);
             }
 
             function onError(err){
@@ -166,10 +151,6 @@ angular.module('corespring-editor.controllers')
           logger.error(err);
         }
 
-        function init(){
-          ItemService.load(onLoad,onError);
-        }
-
-        init();
+        ItemService.load(onLoad,onError);
 
     }]);

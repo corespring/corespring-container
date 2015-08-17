@@ -3,6 +3,18 @@
       function($document, SupportingMaterialUrls) {
 
         function SmUtils() {
+          
+          this.formatKB = function(kb, decimalPlaces) {
+            decimalPlaces = decimalPlaces || 2;
+            if (isNaN(kb)) {
+              return '--';
+            } else if(kb < 1024){
+              return kb.toFixed(decimalPlaces) + 'kb'; 
+            } else {
+              var mb = kb / 1024;
+              return mb.toFixed(decimalPlaces) + 'mb';
+            }
+          };
 
           this.mainFile = function(m) {
             return _.find(m.files, function(f) {

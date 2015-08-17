@@ -32,13 +32,12 @@ script(type="text/ng-template", id="/templates/supporting-materials")
         group-by="materialType",
         delete-item="deleteItem",
         choose-item="choose",
+        selected-item="selectedMaterial",
         ng-model="item.supportingMaterials")
     .col-md-6
       .supporting-material(ng-show="selectedMaterial")
-        div(supportingmetadata="", 
-          existing-names="materialNames",
-          ng-model="selectedMetadata", 
-          source-is-editable="false")
+        div(supporting-material-info, ng-model="selectedMaterial") 
+
         .editor-container(ng-class="editorMode", ng-show="isHtml")
           wiggi-wiz(
             formatting-display="dropdown",
@@ -54,10 +53,6 @@ script(type="text/ng-template", id="/templates/supporting-materials")
 
         .file-upload-info(ng-show="isBinary")
           dl.dl-horizontal
-            dt File Size
-            dd(id="fileSizeInfo") {{formatKB(supportingMaterialFileSize)}}
-            //dt(ng-show='hasDate(supportingMaterial)') Date
-            //dd(ng-show='hasDate(supportingMaterial)') {{formatDate(supportingMaterial.dateModified)}}
             div.preview-file
               iframe(frameborder="0", ng-src="{{binaryPreviewUrl}}", width="100%", height="100%")
 

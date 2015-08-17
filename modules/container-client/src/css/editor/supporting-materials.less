@@ -123,12 +123,13 @@
     li.sm-item {
       border: 1px solid #ffffff;
       border-radius: 4px;
-      &:hover {
+      &:hover, &.active {
         border:1px dashed #ddd;
         cursor: pointer;
       }
       a{
         padding-left: 20px;
+        .user-select(none);
       }
     }
     li.sm-item.selected {
