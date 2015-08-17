@@ -12,8 +12,8 @@
       }
     ])
 
-    .directive('corespringDemoPlayer', ['$log', 'DemoComponentRegister', 'ClientSidePlayerService',
-      function($log, ComponentRegister, ClientSidePlayerServiceDef) {
+    .directive('corespringDemoPlayer', ['$log', '$timeout', 'DemoComponentRegister', 'ClientSidePlayerService',
+      function($log, $timeout, ComponentRegister, ClientSidePlayerServiceDef) {
 
         var linkFn = function($scope) {
 
@@ -52,6 +52,14 @@
             $scope.playerMode = mode;
             ComponentRegister.setMode(mode);
             ComponentRegister.setEditable(isGatherMode());
+
+            if (mode == 'instructor') {
+
+              $timeout(function() {
+                ComponentRegister.setInstructorData($scope.item.components);
+                ComponentRegister.setMode('instructor');
+              }, 100);
+            }
           }
 
           function isGatherMode() {
@@ -89,7 +97,16 @@
             }
           };
 
+          $scope.buttonLabel = function() {
+            return {gather: "Submit Answer", instructor: "Try It"}[$scope.playerMode] || "Reset";
+          };
+
+          $scope.buttonClass = function() {
+            return {gather: "info", instructor: "default"}[$scope.playerMode] || "danger";
+          };
+
           setMode($scope.playerMode);
+
         };
 
         return {
@@ -101,15 +118,15 @@
           },
           link: linkFn,
           template: [
-            '<div>{{playerMode}}',
+            '<div>',
             '  <corespring-isolate-player',
-            '    player-mode="mode"',
+            '    player-mode="playerMode"',
             '    player-markup="xhtml"',
             '    player-item="item"',
             '    player-outcomes="outcome"',
             '    player-session="itemSession"></corespring-isolate-player>',
-            '  <a class="pull-right btn btn-{{playerMode == \'gather\' ? \'info\' : \'danger\'}}" ng-click="submitOrReset()">',
-            '    {{playerMode == \'gather\' ? \'Submit Answer\' : \'Reset\'}}',
+            '  <a class="pull-right btn btn-{{buttonClass()}}" ng-click="submitOrReset()">',
+            '    {{buttonLabel()}}',
             '  </a>',
             '</div>'
           ].join("\n")
