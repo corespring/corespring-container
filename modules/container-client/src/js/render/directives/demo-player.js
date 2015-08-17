@@ -17,7 +17,7 @@
 
         var linkFn = function($scope) {
 
-          $scope.playerMode = 'gather';
+          //$scope.playerMode = $scope.mode;
 
           $scope.playerSettings = {
             maxNoOfAttempts: 1,
@@ -89,7 +89,7 @@
             }
           };
 
-          setMode('gather');
+          setMode($scope.playerMode);
         };
 
         return {
@@ -97,11 +97,11 @@
           scope: {
             xhtml: '=playerMarkup',
             item: '=playerItem',
-            mode: '=playerMode'
+            playerMode: '@playerMode'
           },
           link: linkFn,
           template: [
-            '<div>',
+            '<div>{{playerMode}}',
             '  <corespring-isolate-player',
             '    player-mode="mode"',
             '    player-markup="xhtml"',

@@ -352,7 +352,7 @@ angular.module('corespring-player.controllers')
             $timeout(function() {
               $log.debug("[Main] load instructor data");
               $scope.loadInstructorData(function() {
-                $log.debug("[Main] score received");
+                $log.debug("[Main] instructor data received");
               });
             });
           }
