@@ -147,10 +147,14 @@ exports.define = function(isSecure) {
       instance.send( 'isComplete', messageResultHandler(callback));
     };
 
+    var isProtectedMode = function(mode) {
+      return ["evaluate","instructor"].indexOf(mode) >= 0;
+    };
+
     var isAllowed = function(mode, cb) {
       if (isSecure) {
         _isComplete(function(c) {
-          if (mode === 'evaluate' && !c) {
+          if (isProtectedMode(mode) && !c) {
             cb(false);
           } else if (mode === 'gather' && c) {
             cb(false);
