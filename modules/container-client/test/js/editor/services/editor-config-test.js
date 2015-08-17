@@ -9,7 +9,12 @@ describe('editor config', function() {
   function MockDesignerService() {
     this.loadAvailableUiComponentsResult = {
       interactions: [],
-      widgets: [{componentType:'corespring-video', defaultData:'corespring-video default data'}]
+      widgets: [
+        {componentType:'corespring-video', defaultData:'corespring-video default data'},
+        {componentType:'corespring-calculator', defaultData:'corespring-calculator default data'},
+        {componentType:'corespring-protractor', defaultData:'corespring-protractor default data'},
+        {componentType:'corespring-ruler', defaultData:'corespring-ruler default data'},
+      ]
     };
 
     this.loadAvailableUiComponents = function(onSuccess, onError) {
@@ -39,6 +44,9 @@ describe('editor config', function() {
 
   it('should store the default data', function(){
     expect(componentDefaultData.getDefaultData('corespring-video')).toEqual('corespring-video default data');
+    expect(componentDefaultData.getDefaultData('corespring-calculator')).toEqual('corespring-calculator default data');
+    expect(componentDefaultData.getDefaultData('corespring-protractor')).toEqual('corespring-protractor default data');
+    expect(componentDefaultData.getDefaultData('corespring-ruler')).toEqual('corespring-ruler default data');
   });
 
 });
