@@ -8,7 +8,8 @@ describe('corespringDemoPlayer', function() {
 
   function MockLog() {
     this.debug = {
-      bind: function() {}
+      bind: function() {
+      }
     };
   }
 
@@ -24,7 +25,9 @@ describe('corespringDemoPlayer', function() {
   function MockComponentRegister() {
     this.setMode = mockSetMode;
     this.setEditable = mockSetEditable;
-    this.getComponentSessions = function() { return componentSessions; };
+    this.getComponentSessions = function() {
+      return componentSessions;
+    };
     this.reset = mockReset;
   }
 
@@ -89,6 +92,44 @@ describe('corespringDemoPlayer', function() {
 
     it('should set itemSession to be {}', function() {
       expect(scope.itemSession).toEqual({});
+    });
+
+  });
+
+  describe('button label and class', function() {
+
+    it('default button label in gather mode is Submit Answer', function() {
+      scope.playerMode = 'gather';
+      expect(scope.buttonLabel()).toEqual('Submit Answer');
+    });
+
+    it('default button class in gather mode is info', function() {
+      scope.playerMode = 'gather';
+      expect(scope.buttonClass()).toEqual('info');
+    });
+
+    it('default button label in instructor mode is Try It', function() {
+      scope.playerMode = 'instructor';
+      expect(scope.buttonLabel()).toEqual('Try It');
+    });
+
+    it('default button class in instructor mode is primary', function() {
+      scope.playerMode = 'instructor';
+      expect(scope.buttonClass()).toEqual('primary');
+    });
+
+    it('default button label in view/eval mode is Reset', function() {
+      scope.playerMode = 'evaluate';
+      expect(scope.buttonLabel()).toEqual('Reset');
+      scope.playerMode = 'view';
+      expect(scope.buttonLabel()).toEqual('Reset');
+    });
+
+    it('default button class in view/eval mode is danger', function() {
+      scope.playerMode = 'evaluate';
+      expect(scope.buttonClass()).toEqual('danger');
+      scope.playerMode = 'view';
+      expect(scope.buttonClass()).toEqual('danger');
     });
 
   });

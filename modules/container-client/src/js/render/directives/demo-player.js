@@ -17,7 +17,7 @@
 
         var linkFn = function($scope) {
 
-          //$scope.playerMode = $scope.mode;
+          $scope.playerMode = $scope.mode || 'gather';
 
           $scope.playerSettings = {
             maxNoOfAttempts: 1,
@@ -54,7 +54,6 @@
             ComponentRegister.setEditable(isGatherMode());
 
             if (mode == 'instructor') {
-
               $timeout(function() {
                 ComponentRegister.setInstructorData($scope.item.components);
                 ComponentRegister.setMode('instructor');
@@ -102,7 +101,7 @@
           };
 
           $scope.buttonClass = function() {
-            return {gather: "info", instructor: "default"}[$scope.playerMode] || "danger";
+            return {gather: "info", instructor: "primary"}[$scope.playerMode] || "danger";
           };
 
           setMode($scope.playerMode);
@@ -114,7 +113,7 @@
           scope: {
             xhtml: '=playerMarkup',
             item: '=playerItem',
-            playerMode: '@playerMode'
+            mode: '@playerMode'
           },
           link: linkFn,
           template: [
