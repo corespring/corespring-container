@@ -152,7 +152,6 @@ angular.module('corespring-player.services')
       };
 
       this.setMode = function(mode) {
-        console.log("Setting mode to ",mode," in ", _.keys(bridges).length);
         _.forIn(bridges, function(b){
           if(b.setMode){
             b.setMode(mode);

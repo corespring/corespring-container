@@ -216,7 +216,6 @@ angular.module('corespring-player.controllers')
               currentMode = data.mode;
               updateComponentsMode();
 
-              console.log("mode is ", data.mode);
               if (data.mode === 'instructor') {
                 $scope.loadInstructorData();
               }

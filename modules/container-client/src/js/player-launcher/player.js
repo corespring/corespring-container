@@ -179,7 +179,6 @@ exports.define = function(isSecure) {
 
     /* API methods */
     this.setMode = function(mode, callback) {
-      console.log("Setting mode to ", mode);
       if (!launcher.isReady) {
         //no callback bc it results in a stack overflow
         return;
