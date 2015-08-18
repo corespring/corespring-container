@@ -72,7 +72,7 @@ trait ItemSupportingMaterialHooks
 
     if (wr.getN == 1) {
       //in the main app we'd remove any assets too
-      assets.deleteSupportingMaterialBinary(id,name)
+      assets.deleteSupportingMaterialBinary(id, name)
       Right(Json.obj())
     } else {
       Left((BAD_REQUEST, "Failed to remove the asset"))
@@ -97,31 +97,13 @@ trait ItemSupportingMaterialHooks
     dbo
   }
 
-  override def updateContent(id: String, name: String, filename: String, content: String)(implicit h: RequestHeader): R[JsValue] = Future {
-    val query = MongoDBObject(
-      "_id" -> new ObjectId(id),
-      "supportingMaterials.name" -> name,
-      "supportingMaterials.files.name" -> filename)
-
-    val fields = MongoDBObject("supportingMaterials.$.files" -> 1)
-    val rawDbo = itemService.collection.findOne(query, fields)
-    val result = for {
-      dbo <- rawDbo
-      files <- getFiles(dbo)
-    } yield {
-      val updatedFiles = files.map(updateFile(filename, content))
-      val filesUpdate = MongoDBObject("$set" -> MongoDBObject("supportingMaterials.$.files" -> updatedFiles))
-      itemService.collection.update(query, filesUpdate)
-    }
-
-    result.map { wr =>
-      if (wr.getN == 1) {
-        Right(Json.obj("todo" -> true))
-      } else {
-        Left(BAD_REQUEST -> "Failed to update")
-      }
-    }.getOrElse(Left(BAD_REQUEST -> "Can't find field to update"))
+  override def updateContent(id: String, name: String, filename: String, content: String)(implicit h: RequestHeader): R[JsValue] = {
+    val fn = mkUpdateContentFunction(
+      (id) => MongoDBObject("_id" -> new ObjectId(id)),
+      itemService.collection) _
+    fn(id, name, filename, content)
   }
+
 }
 
 trait ItemHooks

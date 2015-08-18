@@ -6,6 +6,7 @@ import org.corespring.container.client.controllers.{ AssetType, Assets }
 import org.corespring.container.client.hooks.{ EditorHooks => ContainerEditorHooks, UploadResult }
 import org.corespring.container.logging.ContainerLogger
 import org.corespring.mongo.json.services.MongoService
+import org.corespring.shell.controllers.editor.ItemDraftAssets
 import org.corespring.shell.services.ItemDraftService
 import play.api.libs.json.{ Json, JsValue }
 import play.api.mvc._
@@ -18,11 +19,13 @@ abstract class DraftId[A](val itemId: A, val name: String)
 case class ContainerDraftId(override val itemId: ObjectId, override val name: String)
   extends DraftId[ObjectId](itemId, name)
 
-object ContainerDraftId{
-  def fromString(s:String) : Option[ContainerDraftId] = {
-    Try{ DraftId.fromString[ObjectId,ContainerDraftId](s, (id,name) => {
-      ContainerDraftId(new ObjectId(id), name)
-    })}.toOption
+object ContainerDraftId {
+  def fromString(s: String): Option[ContainerDraftId] = {
+    Try {
+      DraftId.fromString[ObjectId, ContainerDraftId](s, (id, name) => {
+        ContainerDraftId(new ObjectId(id), name)
+      })
+    }.toOption
   }
 }
 
@@ -93,7 +96,7 @@ trait DraftEditorHooks extends ContainerEditorHooks {
 
   def itemService: MongoService
 
-  def assets: Assets
+  def assets: Assets with ItemDraftAssets
 
   import play.api.http.Status._
 
@@ -104,6 +107,7 @@ trait DraftEditorHooks extends ContainerEditorHooks {
       val draftId: ContainerDraftId = DraftId.fromString[ObjectId, ContainerDraftId](id, (itemId, name) => ContainerDraftId(new ObjectId(itemId), name))
       val item = itemService.load(draftId.itemId.toString).get
       draftItemService.createDraft(draftId.itemId, Some(draftId.name), item)
+      assets.copyItemToDraft(draftId.itemId.toString, draftId.name)
       Right(Json.obj("item" -> item))
     }
   }

@@ -82,7 +82,7 @@ class ContainerSupportingMaterialAssets[A](
 
 trait ItemDraftAssets {
   def copyItemToDraft(itemId: String, draftName: String)
-  def copyDraftToItem(draftId: String, itemId: String)
+  def copyDraftToItem(draftName: String, itemId: String)
   def deleteDraft(draftId: String)
 }
 

@@ -16,7 +16,6 @@ import play.api.libs.json._
 import play.api.mvc._
 
 import scala.concurrent.Future
-import scalaz.{ Failure, Success }
 
 trait ItemDraftSupportingMaterialHooks
   extends containerHooks.SupportingMaterialHooks
@@ -27,6 +26,8 @@ trait ItemDraftSupportingMaterialHooks
   def assets: SupportingMaterialAssets[DraftId[ObjectId]]
 
   def draftItemService: ItemDraftService
+
+  override def prefix(s: String) = s"item.$s"
 
   override def create[F <: File](id: String, sm: CreateNewMaterialRequest[F])(implicit h: RequestHeader): R[JsValue] = withDraftId(id) { (draftId) =>
     Future {
@@ -82,10 +83,14 @@ trait ItemDraftSupportingMaterialHooks
     }
   }
 
-  private def withDraftId(id: String)(fn: DraftId[ObjectId] => R[JsValue]): R[JsValue] = {
+  private def parseId[A](id: String)(ok: DraftId[ObjectId] => A, notOk: => A): A = {
     ContainerDraftId.fromString(id).map { draftId =>
-      fn(draftId)
-    }.getOrElse(Future(Left(BAD_REQUEST -> "Can't parse draft id")))
+      ok(draftId)
+    }.getOrElse(notOk)
+  }
+
+  private def withDraftId(id: String)(fn: DraftId[ObjectId] => R[JsValue]): R[JsValue] = {
+    parseId[R[JsValue]](id)(fn, Future(Left(BAD_REQUEST -> "Can't parse draftId")))
   }
 
   override def delete(id: String, name: String)(implicit h: RequestHeader): R[JsValue] = withDraftId(id) { (draftId: DraftId[ObjectId]) =>
@@ -97,6 +102,7 @@ trait ItemDraftSupportingMaterialHooks
 
       if (wr.getN == 1) {
         //in the main app we'd remove any assets too
+        assets.deleteSupportingMaterialBinary(draftId, name)
         Right(Json.obj())
       } else {
         Left((BAD_REQUEST, "Failed to remove the asset"))
@@ -104,9 +110,20 @@ trait ItemDraftSupportingMaterialHooks
     }
   }
 
-  override def getAsset(id: String, name: String, filename: String)(implicit h: RequestHeader): SimpleResult = ???
+  override def getAsset(id: String, name: String, filename: String)(implicit h: RequestHeader): SimpleResult = parseId(id)((draftId: DraftId[ObjectId]) => {
+    assets.getAssetFromSupportingMaterial(draftId, name, filename)
+  }, play.api.mvc.Results.BadRequest("Can't parse DraftId"))
 
-  override def updateContent(id: String, name: String, filename: String, content: String)(implicit h: RequestHeader): R[JsValue] = ???
+  override def updateContent(id: String, name: String, filename: String, content: String)(implicit h: RequestHeader): R[JsValue] = {
+    withDraftId(id) { (draftId) =>
+      val fn = mkUpdateContentFunction(
+        (id) => MongoDBObject("_id" -> DraftId.dbo(draftId)),
+        draftItemService.collection) _
+
+      fn(id, name, filename, content)
+    }
+  }
+
 }
 
 trait ItemDraftHooks
@@ -224,11 +241,12 @@ trait ItemDraftHooks
       val item = (draft \ "item").as[JsObject]
       logger.trace(s"commit item: ${item}")
       val itemId = (draft \ "_id" \ "itemId" \ "$oid").as[String] //draftId.itemId
+      val draftName = (draft \ "_id" \ "name").as[String] //draftId.itemId
 
       if (okToCommit(draftId) || force) {
         val updatedItem = item ++ Json.obj("dateModified" -> Json.obj("$date" -> new DateTime().getMillis()))
         itemService.save(itemId.toString, updatedItem)
-        assets.copyDraftToItem(draftId.toString, itemId.toString)
+        assets.copyDraftToItem(draftName, itemId.toString)
         delete(draftId)
         Right(Json.obj("itemId" -> itemId.toString, "draftId" -> draftId))
       } else {

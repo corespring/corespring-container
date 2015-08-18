@@ -5,27 +5,30 @@
 
      function link($scope, $element, $attrs, ngModel) {
 
-       function watchOnlyNameAndType($scope) {
-         return $scope.ngModel.map(function(m) {
-           return {
-             name: m.name,
-             materialType: m.materialType
-           };
-         });
-       }
+      function watchOnlyNameAndType($scope) {
+        if(!$scope.ngModel){
+          return;
+        }
+        return $scope.ngModel.map(function(m) {
+         return {
+           name: m.name,
+           materialType: m.materialType
+         };
+        });
+      }
 
-       function onUpdate(update) {
-         logger.debug('$watch', ngModel.$viewValue);
-         $scope.sections = SmUtils.group(ngModel.$viewValue, $attrs.groupBy || 'materialType');
-       }
+      function onUpdate(update) {
+        logger.debug('$watch', ngModel.$viewValue);
+        $scope.sections = SmUtils.group(ngModel.$viewValue, $attrs.groupBy || 'materialType');
+      }
 
-       $scope.$watch(watchOnlyNameAndType, onUpdate, true);
+      $scope.$watch(watchOnlyNameAndType, onUpdate, true);
 
-       $scope.$watch('selectedItem', function(i){
-          $timeout(function(){
-            $scope.$broadcast('itemSelected', i);
-          });
-       });
+      $scope.$watch('selectedItem', function(i){
+        $timeout(function(){
+          $scope.$broadcast('itemSelected', i);
+        });
+      });
      }
 
     function SmListController($scope) {
