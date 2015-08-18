@@ -1,8 +1,8 @@
 angular.module('corespring-catalog.controllers')
   .controller('CatalogRoot', [
-    '$scope', 'LogFactory', 'SmUtils', 'ItemService', 'iFrameService', 'Msgr', '$location',
+    '$scope', 'LogFactory', 'ItemService', 'iFrameService', 'Msgr', '$location',
 
-    function($scope, LogFactory, SmUtils, ItemService, iFrameService, Msgr, $location) {
+    function($scope, LogFactory, ItemService, iFrameService, Msgr, $location) {
 
       var log = LogFactory.getLogger('CatalogRoot');
 

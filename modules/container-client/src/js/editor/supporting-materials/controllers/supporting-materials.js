@@ -25,20 +25,21 @@ angular.module('corespring-editor.controllers')
 
           addFile: function(file, onComplete, onProgress){
             SupportingMaterialsService.addAsset(
-              file, 
               $scope.selectedMaterial.name,
+              file, 
               onComplete, 
               onProgress);
           },
           changeSrcPath: function(src){
             return SupportingMaterialsService.getAssetUrl(
-              src,
-              $scope.selectedMaterial.name);
+              $scope.selectedMaterial.name,
+              src);
           },
           deleteFile: function(assetName){
             SupportingMaterialsService.deleteAsset(
-              assetName,
-              $scope.selectedMaterial.name);
+              $scope.selectedMaterial.name,
+              assetName
+              );
           }
         };
 

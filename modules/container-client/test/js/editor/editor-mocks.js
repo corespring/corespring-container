@@ -3,6 +3,38 @@
   org.corespring = org.corespring || {};
   org.corespring.mocks = org.corespring.mocks || {};
   var e = org.corespring.mocks.editor = org.corespring.mocks.editor || {};
+ 
+
+  e.MockPromise = function(){
+    var onSuccess,onError;
+    this.success = function(cb){
+      onSuccess = cb;
+      return this;
+    };
+    
+    this.error = function(cb){
+      onError = cb;
+      return this;
+    };
+
+    this.triggerSuccess = function(){
+      onSuccess.apply(null, Array.prototype.slice.call(arguments));
+    };
+    this.triggerError = function(){
+      onError.apply(null, Array.prototype.slice.call(arguments));
+    };
+  };
+
+  e.LogFactory = {
+    getLogger: function(){
+      return {
+        debug: function(){},
+        info: function(){},
+        warn: function(){},
+        error: function(){}
+      };
+    }
+  };
 
   e.debounce = function(fn){
     return function(){
