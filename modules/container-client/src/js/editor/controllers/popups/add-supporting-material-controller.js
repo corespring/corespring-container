@@ -1,9 +1,10 @@
 angular.module('corespring-editor.controllers').controller('AddSupportingMaterialPopupController', [
+  '$timeout',
   '$scope',
   '$modalInstance',
   'LogFactory',
   'materialNames',
-  function($scope, $modalInstance, LogFactory, materialNames){
+  function($timeout, $scope, $modalInstance, LogFactory, materialNames){
 
     var logger = LogFactory.getLogger('AddSupportingMaterialPopupController');
 
@@ -24,4 +25,11 @@ angular.module('corespring-editor.controllers').controller('AddSupportingMateria
     $scope.cancel = function(){
       $modalInstance.dismiss();
     };
+
+    //Note: rendered would be preferable but is only in later versions of bootstrap-modal
+    $modalInstance.opened.then(function(){
+      $timeout(function(){
+        $scope.$broadcast('metadata.focus-title');
+      }, 200);
+    });
   }]);

@@ -139,6 +139,10 @@ angular.module('corespring-editor.directives')
           updateModel();
         });
 
+        $scope.$on('metadata.focus-title', function(){
+          $element.find('#name').select();
+        });
+
       }
 
       return {
@@ -147,7 +151,6 @@ angular.module('corespring-editor.directives')
         link: link,
         scope: {
           ngModel: '=',
-          focusTitle: '=',
           existingNames: '=',
           isValid: '=?'
         },

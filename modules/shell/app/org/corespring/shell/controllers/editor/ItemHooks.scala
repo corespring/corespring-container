@@ -72,6 +72,7 @@ trait ItemSupportingMaterialHooks
 
     if (wr.getN == 1) {
       //in the main app we'd remove any assets too
+      assets.deleteSupportingMaterialBinary(id,name)
       Right(Json.obj())
     } else {
       Left((BAD_REQUEST, "Failed to remove the asset"))

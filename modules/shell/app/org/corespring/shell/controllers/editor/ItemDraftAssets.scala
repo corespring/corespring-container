@@ -61,7 +61,8 @@ class ContainerSupportingMaterialAssets[A](
   override def deleteSupportingMaterialBinary(id: A, material: String): Validation[String, String] = {
     val key = mkKey(id, Seq(material))
     import scala.collection.JavaConversions._
-    s3Client.listObjects(key).getObjectSummaries().foreach { s =>
+    val listResult = s3Client.listObjects(bucket, key)
+    listResult.getObjectSummaries().foreach { s =>
       s3Client.deleteObject(bucket, s.getKey)
     }
     s3Client.deleteObject(bucket, key)

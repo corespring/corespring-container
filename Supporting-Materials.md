@@ -1,13 +1,13 @@
 ## todos..
 
 
-- assets returned as type document
-- routes support
+- ~~assets returned as type document~~
+- routes support i.e #/supporting-materials ? check player launcher..
 - return file json on creation
-- save material type
-- disable material name
-- sort types alphabetically
-- sort names alphabetically
+- ~~save material type~~
+- ~~disable material name~~
+- ~~sort types alphabetically~~
+- ~~sort names alphabetically~~
 
 
 ### saveAll + supporting materials
