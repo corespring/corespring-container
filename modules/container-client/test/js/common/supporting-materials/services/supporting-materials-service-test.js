@@ -3,6 +3,7 @@ describe('supporting materials service', function() {
   var service;
 
   var mockHttp, innerHttp, mockSmUtils, mockUrls, mockMultipartFileUploader;
+  var onSuccess, onError;
 
   beforeEach(angular.mock.module('corespring-common.supporting-materials.services'));
 
@@ -31,6 +32,7 @@ describe('supporting materials service', function() {
     } 
 
     mockHttp.get = spyWithPromise('get');
+    mockHttp.post = spyWithPromise('post');
     mockHttp['delete'] = spyWithPromise('delete'); 
 
     jasmine.createSpy('delete').and.callFake(function(){
@@ -52,6 +54,9 @@ describe('supporting materials service', function() {
     mockMultipartFileUploader = {
       upload: jasmine.createSpy('upload')
     };
+    
+    onSuccess = jasmine.createSpy('onSuccess');
+    onError = jasmine.createSpy('onError');
 
     $provide.value('$http', mockHttp);
     $provide.value('MultipartFileUploader', mockMultipartFileUploader);
@@ -63,12 +68,6 @@ describe('supporting materials service', function() {
   beforeEach(inject(function(SupportingMaterialsService) {
     service = SupportingMaterialsService;
   }));
-
-  it('should init', function() {
-    expect(service).not.toBe(null);
-  });
-
-  var onSuccess, onError;
   
   describe('updateContent', function() {
     beforeEach(function(){
@@ -183,8 +182,29 @@ describe('supporting materials service', function() {
       expect(onSuccess).toHaveBeenCalledWith(null, 'file');
     });
   });
+    
+  function addQueryParamsCalledWith(url){
+    return function(){
+      expect(mockSmUtils.addQueryParamsIfPresent).toHaveBeenCalledWith(url);
+    };
+  }
+
+  function successHandlerCalled(method){
+    return function(){
+      mockHttp[method].promise.triggerSuccess('ok');
+      expect(onSuccess).toHaveBeenCalledWith('ok');
+    };
+  }
+
+  function errorHandlerCalled(method){
+    return function(){
+      mockHttp[method].promise.triggerError('not ok');
+      expect(onError).toHaveBeenCalledWith('not ok') ;
+    };
+  }
   
   describe('create', function() {
+
 
     describe('create from file', function(){
 
@@ -208,6 +228,8 @@ describe('supporting materials service', function() {
           jasmine.any(Function),
           jasmine.any(Function));
       });
+      
+      it('calls SmUtils.addQueryParamsIfPresent', addQueryParamsCalledWith('create-from-file'));
 
       it('calls success handler', function(){
         uploadSuccess({name: 'new material'});
@@ -220,11 +242,43 @@ describe('supporting materials service', function() {
       });
     });
 
-    xdescribe('create from markup', function(){
+    describe('create from markup', function(){
+
+      var call = {url: 'create', method: 'post'};
+      var data = {name: 'material', materialType: 'materialType'};
+
+      beforeEach(function(){
+        mockUrls.create = call ;
+        service.create( data, onSuccess, onError );
+      });
+
+      it('calls create', function(){
+        expect(mockHttp.post)
+          .toHaveBeenCalledWith(
+          mockUrls.create.url, {name: 'material', materialType: 'materialType', html: '<div>material</div>'});
+      });
+    
+      it('calls SmUtils.addQueryParamsIfPresent', addQueryParamsCalledWith('create'));
+      it('calls success handler', successHandlerCalled('post'));
+      it('calls error handler', errorHandlerCalled('post'));
     });
   });
   
   describe('delete', function() {
+
+    beforeEach(function(){
+      mockUrls.delete = {method: 'delete', url: 'delete/:name'};
+      service.delete({name:'material'}, onSuccess, onError);
+    });
+
+    it('calls $http.delete', function(){
+      expect(mockHttp.delete).toHaveBeenCalledWith('delete/material');
+    });
+
+    it('calls SmUtils.addQueryParamsIfPresent', addQueryParamsCalledWith('delete/:name'));
+    it('calls success handler', successHandlerCalled('delete'));
+    it('calls error handler', errorHandlerCalled('delete'));
+
   });
 
 });
