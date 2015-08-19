@@ -11,6 +11,11 @@ script( type="text/ng-template", id="/templates/popups/addSupportingMaterial")
         ng-model='supportingMaterial',
         is-valid='metadataIsValid',
         existing-names='materialNames')
+//Remove popup
+script( type="text/ng-template", id="/templates/popups/removeSupportingMaterial")
+  +modal('Remove Supporting Material', 'Submit')
+    .alert.title
+        | You are about to delete <b>{{name}}</b>. Are you sure you want to do this?
 
 // Upload progress popup
 script( type="text/ng-template", id="/templates/popups/uploadingSupportingMaterial")

@@ -59,9 +59,8 @@ angular.module('corespring-editor.controllers')
               );
           }
         };
-
-        $scope.deleteMaterial = function(m, done){
           
+        function removeMaterial(m, done){
           $scope.item.supportingMaterials = _.reject($scope.item.supportingMaterials, function(o){
             return o === m;
           });
@@ -78,14 +77,31 @@ angular.module('corespring-editor.controllers')
           }
 
           SupportingMaterialsService.delete(m, onDelete, onError);
+        }
+
+        $scope.deleteMaterial = function(m, done){
+
+          var modalInstance = $modal.open({
+            templateUrl: '/templates/popups/removeSupportingMaterial',
+            controller: 'RemoveSupportingMaterialPopupController',
+            backdrop: 'static',
+            resolve: {
+              name: function(){
+                return m.name;
+              }
+            }
+          });
+
+          modalInstance.result.then(function(removeConfirmed) {
+            removeMaterial(m, done);
+          });
         };
 
-        function isMainHtml(selected){
-          if(!selected){
+        function isMainHtml(main){
+          if(!main){
             return false;
           }
-          var main = SmUtils.mainFile(selected);
-          return main && main.content !== undefined;
+          return main.contentType === 'text/html';
         }
 
         $scope.chooseMaterial = function(m){
@@ -98,10 +114,10 @@ angular.module('corespring-editor.controllers')
           }
 
           $scope.mainFile = SmUtils.mainFile(m);
-          $scope.isHtml = isMainHtml(m);
+          $scope.isHtml = isMainHtml($scope.mainFile);
           $scope.isBinary = !$scope.isHtml;
 
-          if($scope.isBinary && $scope.mainFile){
+          if($scope.mainFile && $scope.isBinary){
             $scope.binaryPreviewUrl = SupportingMaterialsService.getBinaryUrl(m, $scope.mainFile);
           }
         });

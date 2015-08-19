@@ -5,8 +5,7 @@ angular.module('corespring-common.supporting-materials.services')
     'LogFactory',
     'SupportingMaterialUrls',
     'SmUtils',
-    'ImageUtils',
-    function($http, MultipartFileUploader, LogFactory, Urls, SmUtils, ImageUtils) {
+    function($http, MultipartFileUploader, LogFactory, Urls, SmUtils) {
 
       var logger = LogFactory.getLogger('supporting-materials-service');
 
