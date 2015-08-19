@@ -66,72 +66,59 @@
 
   
 
-xdescribe('SupportingMaterials', function() {
+describe('SupportingMaterials', function() {
   
-  var scope, element;
-
-  var index = 0;
+  var scope, $modal, itemService, supportingMaterialsService;
 
   beforeEach(angular.mock.module('corespring-editor.controllers'));
 
-  var $modal = {
-    open: function() {}
-  };
-
-  var $state = {
-    transitionTo: function() {}
-  };
-
-  function MockStateParams() {
-    this.index = index;
-  }
-
-  var supportingMaterialsService = {
-    getSupportingMaterialFile: function() {},
-    getContentType: function() {},
-    getSupportingUrl: function() {},
-    getKBFileSize: function() {}
-  };
-
-  var editorConfig = {
-    mathJaxFeatureGroup: function() {
-      return ['this', 'is', 'the', 'mathjax', 'feature', 'group'];
-    },
-    footnotesFeatureGroup: function() {
-      return ['this', 'is', 'the', 'footnotes', 'feature', 'group'];
-    },
-    overrideFeatures: ['these', 'are', 'the', 'override', 'features']
-  };
-
-  var itemService = {
-    saveSupportingMaterials: jasmine.createSpy('saveSupportingMaterials')
-  };
-
   beforeEach(module(function($provide) {
+
+    $modal = {
+      open: jasmine.createSpy('open')
+    };
+
+    supportingMaterialsService = {
+      delete: jasmine.createSpy('delete')
+    };
+
+    editorConfig = {
+      mathJaxFeatureGroup: function() {
+        return ['mathjax'];
+      },
+      footnotesFeatureGroup: function() {
+        return ['footnotes'];
+      },
+      overrideFeatures: ['overrideFeatures']
+    };
+
+    itemService = {
+      saveSupportingMaterials: jasmine.createSpy('saveSupportingMaterials'),
+      load: jasmine.createSpy('load').and.callFake(function(onLoad, onError){
+        onLoad({ supportingMaterials: []});
+      })
+    };
+
+    smUtils = {
+
+    };
+
+    $provide.value('LogFactory', new org.corespring.mocks.editor.LogFactory());
     $provide.value('$modal', $modal);
-    $provide.value('$state', $state);
-    $provide.value('$stateParams', new MockStateParams());
     $provide.value('ItemService', itemService);
     $provide.value('SupportingMaterialsService', supportingMaterialsService);
     $provide.value('EditorConfig', editorConfig);
     $provide.value('EditorChangeWatcher', new org.corespring.mocks.editor.EditorChangeWatcher());
+    $provide.value('editorDebounce', org.corespring.mocks.editor.debounce);
+    $provide.value('SmUtils', smUtils);
   }));
 
-  beforeEach(inject(function($rootScope, $compile) {
+  beforeEach(inject(function($rootScope, $controller) {
     scope = $rootScope.$new();
-    element = $compile('<div ng-controller="SupportingMaterials"></div>')(scope);
-    scope = element.scope();
+    $controller('SupportingMaterials', {$scope: scope});
   }));
 
   describe('initialization', function() {
-
-    it('should set index to $stateParams.index', function() {
-      expect(scope.index).toEqual(index);
-    });
-
-    it('should set editing to false', function() {
-      expect(scope.editing).toBe(false);
-    });
 
     it('should set extra feature definitions to include mathjax and footnotes from EditorConfig', function() {
       expect(scope.extraFeatures).toEqual({
@@ -146,13 +133,22 @@ xdescribe('SupportingMaterials', function() {
       expect(scope.overrideFeatures).toEqual(editorConfig.overrideFeatures);
     });
 
+    describe('ItemService.load -> onLoad', function() {
+      it('should set the item', function() {
+        expect(scope.item).not.toBe(null);
+      });
+      
+      it('should set the item.supportingMaterials', function() {
+        expect(scope.item.supportingMaterials).not.toBe(null);
+      });
+    });
   });
 
   describe('addNew', function() {
     var callback;
     beforeEach(function() {
       callback = jasmine.createSpy('callback');
-      spyOn($modal, 'open').and.returnValue({
+      $modal.open.and.returnValue({
         result: {
           then: callback
         }
@@ -164,60 +160,53 @@ xdescribe('SupportingMaterials', function() {
       expect($modal.open).toHaveBeenCalledWith({
         templateUrl: '/templates/popups/addSupportingMaterial',
         controller: 'AddSupportingMaterialPopupController',
-        backdrop: 'static'
+        backdrop: 'static',
+        resolve: {
+          materialNames: jasmine.any(Function)
+        }
       });
     });
 
-    describe('callback', function() {
-      var supportingMaterial;
-    });
-
   });
 
-  describe('deleteSupportingMaterial', function() {
-    var index = 0, event = {
-      preventDefault: function() {},
-      stopPropagation: function() {}
-    };
+  describe('deleteMaterial', function() {
+    
+    var onSuccess, onError, material, done; 
     beforeEach(function() {
-      spyOn(scope, '$emit');
-      spyOn(event, 'preventDefault');
-      spyOn(event, 'stopPropagation');
-      scope.deleteSupportingMaterial(index, event);
+      material = {name: 'delete-me'};
+      done = jasmine.createSpy('done');
+      supportingMaterialsService.delete.and.callFake(function(m, success, error){
+        onSuccess = success;
+        onError = error;
+      });
+      scope.deleteMaterial(material, done);
     });
 
-    it('should $emit a deleteSupportingMaterial event', function() {
-      expect(scope.$emit).toHaveBeenCalledWith('deleteSupportingMaterial', {index: index});
+    it('should call SupportingMaterialsService.delete', function() {
+      expect(supportingMaterialsService.delete).toHaveBeenCalledWith(material, jasmine.any(Function), jasmine.any(Function));
     });
 
-    it('should cancel the provided event', function() {
-      expect(event.preventDefault).toHaveBeenCalled();
-      expect(event.stopPropagation).toHaveBeenCalled();
+    describe('on success', function(){
+
+      beforeEach(function(){
+        onSuccess();
+      });
+
+      it('should deselect the selected material', function(){
+        expect(scope.selectedMaterial).toBe(null);
+      });
+      
+      it('should deselect the preview url', function(){
+        expect(scope.binaryPreviewUrl).toBe(null);
+      });
+
+      it('should call the done callback', function(){
+        expect(done).toHaveBeenCalled();
+      });
     });
 
   });
 
-  describe('fileSizeGreaterThanMax event', function() {
-    beforeEach(function() {
-      spyOn(console, 'warn');
-      scope.$broadcast('fileSizeGreaterThanMax');
-    });
-
-    it('should warn that file is too big', function() {
-      expect(console.warn).toHaveBeenCalledWith('file too big');
-    });
-  });
-
-  describe('itemLoaded event', function() {
-    beforeEach(function() {
-      spyOn(scope, 'init');
-      scope.$broadcast('itemLoaded');
-    });
-
-    it('should call the init method', function() {
-      expect(scope.init).toHaveBeenCalled();
-    });
-  });
 
   describe('onNewSupportingMaterialSaveSuccess', function() {
     var data = {

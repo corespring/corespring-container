@@ -5,16 +5,21 @@ angular.module('corespring-common.supporting-materials.services')
     'LogFactory',
     'SupportingMaterialUrls',
     'SmUtils',
-    function($http, MultipartFileUploader, LogFactory, Urls, Utils) {
+    'ImageUtils',
+    function($http, MultipartFileUploader, LogFactory, Urls, SmUtils, ImageUtils) {
 
       var logger = LogFactory.getLogger('supporting-materials-service');
 
       function SupportingMaterialsService() {
 
+        function addParams(url){
+          return SmUtils.addQueryParamsIfPresent(url);
+        }
+
         this.updateContent = function(materialName, filename, content, onSuccess, onFailure){
           var call = Urls.updateContent;
 
-          var url = Utils.addQueryParamsIfPresent(call.url
+          var url = addParams(call.url
            .replace(':name', materialName)
            .replace(':filename', filename));
 
@@ -47,7 +52,7 @@ angular.module('corespring-common.supporting-materials.services')
         };
 
         this.getBinaryUrl = function(m, file){
-          return Utils.getBinaryUrl(m, file);
+          return SmUtils.getBinaryUrl(m, file);
         };
 
         this.getAssetUrl = function(materialName, name) {
@@ -56,13 +61,13 @@ angular.module('corespring-common.supporting-materials.services')
         
         this.deleteAsset = function(materialName, name) {
           var call = Urls.deleteAsset;
-          var url = Utils.addQueryParamsIfPresent(call.url.replace(':name', materialName).replace(':filename', name));
+          var url = addParams(call.url.replace(':name', materialName).replace(':filename', name));
           $http[call.method](url);
         };
 
         this.addAsset = function(materialName, file, onComplete, onProgress){
           var call = Urls.addAsset;
-          var url = Utils.addQueryParamsIfPresent(call.url.replace(':name', materialName));
+          var url = addParams(call.url.replace(':name', materialName));
           MultipartFileUploader.upload(url, file, {}, function(update){
             onComplete(null, file.name);
           }, function(err){
@@ -75,7 +80,7 @@ angular.module('corespring-common.supporting-materials.services')
             uploadFile(m, onSuccess, onFailure);
           } else {
             var c = Urls.create;
-            var url = Utils.addQueryParamsIfPresent(c.url);
+            var url = addParams(c.url);
             m.html = '<div>' + m.name + '</div>';
             $http[c.method](url, m)
               .success(onSuccess)
@@ -87,7 +92,7 @@ angular.module('corespring-common.supporting-materials.services')
 
         function uploadFile(m, onSuccess, onFailure) {
           var url = Urls.createFromFile.url;
-          url = Utils.addQueryParamsIfPresent(url);
+          url = addParams(url);
 
           MultipartFileUploader.upload(url, m.file, {
             name: m.name,
@@ -102,7 +107,7 @@ angular.module('corespring-common.supporting-materials.services')
 
         this.delete = function(m, onSuccess, onFailure){
           var call = Urls.delete;
-          var url = Utils.addQueryParamsIfPresent(call.url);
+          var url = addParams(call.url);
           url = url.replace(':name', m.name);
 
           logger.debug('url: ', url);

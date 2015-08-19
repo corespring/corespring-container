@@ -66,7 +66,7 @@
   e.EditorChangeWatcher = function(){ 
     this.makeWatcher = jasmine.createSpy('makeWatcher').and.callFake(function(part, fn, scope){
       return function(newValue, oldValue){
-        if(newValue){
+        if(newValue && newValue !== oldValue){
           fn(newValue, oldValue);
         }
       };

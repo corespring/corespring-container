@@ -28,9 +28,17 @@ dl.dl-horizontal.supporting-material-metadata(ng-form, name="metadataForm")
     dd
       input.form-control(name='others', type='text', ng-model='otherMaterialType', required='required')
    
-  dt(ng-show="sourceIsEditable") Source
+  dt Source
   
-  dd(ng-show="sourceIsEditable")
+  dd
     radio(id='create', value='html', ng-model='source') create your own
     radio(id='upload', type='radio', value='binary', ng-model='source') upload a file
-    input(type='file', fileChange="", ng-show="source == 'binary'")
+    br/
+    span.btn.btn-default.btn-file(ng-show="source == 'binary'")
+      | Choose...
+      input(type='file', name='fileToUpload', file-change="")/
+    
+    span.file-name {{fileToUpload.name || ''}} 
+    
+    br/
+    span.error(ng-show="metadataForm.fileToUpload.$error") {{metadataForm.fileToUpload.$error}} 

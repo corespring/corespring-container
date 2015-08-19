@@ -3,17 +3,20 @@ angular.module('corespring-editor.directives')
     '$timeout', 
     'SupportingMaterialsService',
     'LogFactory',
-    function($timeout, SupportingMaterialsService, LogFactory) {
+    'ImageUtils',
+    function($timeout, SupportingMaterialsService, LogFactory, ImageUtils) {
 
       var logger = LogFactory.getLogger('supportingmetadata');
 
       function link($scope, $element, $attr, ngModel) {
 
-        $scope.sourceIsEditable = $attr.sourceIsEditable !== 'false';
-
         var other = $scope.other = 'Other';
         var none = 'none selected';
         $scope.metadataForm.name.$error = null;
+        $scope.metadataForm.fileToUpload = {
+          $error : null,
+          $valid: true
+        };
 
         function nameIsTaken() {
           return _.contains($scope.existingNames, $scope.name);
@@ -75,16 +78,18 @@ angular.module('corespring-editor.directives')
             return false;
           }
 
-          if(!$scope.sourceIsEditable){
-            return true;
-          }
-
           if (!$scope.source) {
             return false;
           }
 
-          if ($scope.source === 'binary' && !$scope.fileToUpload) {
-            return false;
+          if ($scope.source === 'binary'){
+            if(!$scope.fileToUpload) {
+              return false;
+            }
+            
+            if (fileTooBig($scope.fileToUpload)){
+              return false;
+            }
           }
 
           return true;
@@ -106,7 +111,7 @@ angular.module('corespring-editor.directives')
               source: $scope.source
             };
             
-            if($scope.source === 'binary' && $scope.sourceIsEditable){
+            if($scope.source === 'binary'){
               out.file = $scope.fileToUpload;
             }
 
@@ -130,12 +135,29 @@ angular.module('corespring-editor.directives')
           if (src === 'html') {
             $scope.fileToUpload = null;
             $scope.$broadcast('clearFile');
-          }
+          } 
+          updateFileUi(null);
           updateModel();
         });
 
+        function fileTooBig(f){
+          return ImageUtils.bytesToKb($scope.fileToUpload.size) > 500;
+        }
+
+        function updateFileUi(f){
+          if(f && fileTooBig(f)){
+            $scope.metadataForm.fileToUpload.$valid = false;
+            var err = ImageUtils.fileTooBigError(f.size, 500);
+            $scope.metadataForm.fileToUpload.$error = err.message;
+          } else {
+            $scope.metadataForm.fileToUpload.$valid = true;
+            $scope.metadataForm.fileToUpload.$error = null;
+          }
+        }
+
         $scope.$on('fileChange', function(ev, file) {
           $scope.fileToUpload = file;
+          updateFileUi(file);
           updateModel();
         });
 
@@ -154,12 +176,11 @@ angular.module('corespring-editor.directives')
           existingNames: '=',
           isValid: '=?'
         },
-
         templateUrl: "/editor/supporting-materials/directives/supporting-metadata.html"
       };
     }
   ])
-  .directive('filechange', function() {
+  .directive('fileChange', function() {
     return {
       restrict: 'A',
       link: function($scope, element) {

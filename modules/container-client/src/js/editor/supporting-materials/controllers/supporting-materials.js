@@ -6,6 +6,7 @@ angular.module('corespring-editor.controllers')
     'ImageUtils',
     'ItemService',
     'SupportingMaterialsService',
+    'EditorConfig',
     'LogFactory',
     'editorDebounce',
     'SmUtils',
@@ -15,15 +16,31 @@ angular.module('corespring-editor.controllers')
       ImageUtils,
       ItemService,
       SupportingMaterialsService,
+      EditorConfig,
       LogFactory,
-      debounce,
+      editorDebounce,
       SmUtils)
       {
         var logger  = LogFactory.getLogger('supporting-materials');
 
+        $scope.extraFeatures = {
+          definitions: [
+            EditorConfig.mathJaxFeatureGroup(),
+            EditorConfig.footnotesFeatureGroup()
+          ]
+        };
+
+        $scope.overrideFeatures = EditorConfig.overrideFeatures;
+        
         $scope.imageService = {
 
           addFile: function(file, onComplete, onProgress){
+
+            if (ImageUtils.bytesToKb(file.size) > 500) {
+              onComplete(ImageUtils.fileTooBigError(file.size, 500));
+              return;
+            }
+
             SupportingMaterialsService.addAsset(
               $scope.selectedMaterial.name,
               file, 
@@ -43,10 +60,10 @@ angular.module('corespring-editor.controllers')
           }
         };
 
-        $scope.deleteItem = function(data, done){
+        $scope.deleteMaterial = function(m, done){
           
           $scope.item.supportingMaterials = _.reject($scope.item.supportingMaterials, function(o){
-            return o === data;
+            return o === m;
           });
 
           function onDelete(){
@@ -60,7 +77,7 @@ angular.module('corespring-editor.controllers')
             logger.error('delete failed');
           }
 
-          SupportingMaterialsService.delete(data, onDelete, onError);
+          SupportingMaterialsService.delete(m, onDelete, onError);
         };
 
         function isMainHtml(selected){
@@ -71,8 +88,8 @@ angular.module('corespring-editor.controllers')
           return main && main.content !== undefined;
         }
 
-        $scope.choose = function(data){
-          $scope.selectedMaterial = data;
+        $scope.chooseMaterial = function(m){
+          $scope.selectedMaterial = m;
         };
 
         $scope.$watch('selectedMaterial', function(m){
@@ -89,7 +106,7 @@ angular.module('corespring-editor.controllers')
           }
         });
 
-        var saveHtmlDebounced = debounce(function(markup){
+        var saveHtmlDebounced = editorDebounce(function(markup){
           SupportingMaterialsService.updateContent($scope.selectedMaterial.name, $scope.mainFile.name, markup, 
             function(){
               console.log('update content ok');
@@ -121,7 +138,7 @@ angular.module('corespring-editor.controllers')
 
             function onCreate(newSupportingMaterial){
               $scope.item.supportingMaterials.push(newSupportingMaterial);
-              $scope.choose(newSupportingMaterial);
+              $scope.chooseMaterial(newSupportingMaterial);
             }
 
             function onError(err){
