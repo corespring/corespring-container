@@ -22,8 +22,7 @@ describe('CatalogRoot', function () {
     mockLocation = {
       search: jasmine.createSpy('search').and.returnValue(mockTabs)
     };
-
-    $provide.value('LogFactory', org.corespring.mocks.editor.LogFactory);
+    $provide.value('LogFactory', new org.corespring.mocks.editor.LogFactory());
     $provide.value('ItemService', new MockItemService());
     $provide.value('iFrameService', new MockiFrameService());
     $provide.value('Msgr', {});

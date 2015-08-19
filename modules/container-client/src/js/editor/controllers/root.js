@@ -1,10 +1,7 @@
 angular.module('corespring-editor.controllers')
   .controller('Root', [
     '$scope',
-    '$state',
-    '$window',
     '$timeout',
-    'ComponentRegister',
     'ConfigurationService',
     'EditorDialogTemplate',
     'iFrameService',
@@ -16,10 +13,7 @@ angular.module('corespring-editor.controllers')
     'editorDebounce',
     function(
       $scope,
-      $state,
-      $window,
       $timeout,
-      ComponentRegister,
       ConfigurationService,
       EditorDialogTemplate,
       iFrameService,
@@ -28,7 +22,7 @@ angular.module('corespring-editor.controllers')
       Msgr,
       WIGGI_EVENTS,
       WiggiDialogLauncher,
-      debounce) {
+      editorDebounce) {
 
       "use strict";
 
@@ -37,7 +31,7 @@ angular.module('corespring-editor.controllers')
       $scope.onItemLoadSuccess = onItemLoadSuccess;
       $scope.onItemLoadError = onItemLoadError;
 
-      $scope.$on('deleteSupportingMaterial', onDeleteSupportingMaterial);
+      //$scope.$on('deleteSupportingMaterial', onDeleteSupportingMaterial);
       $scope.$on(WIGGI_EVENTS.LAUNCH_DIALOG, onLaunchDialog);
       $scope.$on('itemChanged', onItemChanged);
 
@@ -48,7 +42,7 @@ angular.module('corespring-editor.controllers')
 
         ItemService.saveAll($scope.item, function() {
           logger.debug('call \'saveAll\' callback...');
-          debounce.flush();
+          editorDebounce.flush();
           $timeout(function(){
             done(null, {saved: true});
           }, 300);
@@ -87,7 +81,7 @@ angular.module('corespring-editor.controllers')
         Msgr.send('itemChanged', data);
       }
 
-      function onDeleteSupportingMaterial(event, data) {
+      /*function onDeleteSupportingMaterial(event, data) {
 
         var confirmationMessage = [
           "You are about to delete this file.",
@@ -106,16 +100,16 @@ angular.module('corespring-editor.controllers')
         }, {
           reload: true
         });
-      }
+      }*/
 
-      function deleteSupportingMaterial(index) {
+      /*function deleteSupportingMaterial(index) {
         $scope.item.supportingMaterials.splice(index, 1);
 
         ItemService.saveSupportingMaterials($scope.item.supportingMaterials,
           function() {},
           $scope.onSaveError, $scope.itemId
         );
-      }
+      }*/
 
       function preprocessComponents(item) {
         _.each(item.components, function(c, key) {

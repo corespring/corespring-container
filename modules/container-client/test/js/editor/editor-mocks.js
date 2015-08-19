@@ -5,6 +5,23 @@
   var e = org.corespring.mocks.editor = org.corespring.mocks.editor || {};
  
 
+  e.$modalInstance = function(){
+
+    this.reset = function(){
+      this.close.calls.reset();
+      this.dismiss.calls.reset();
+      this.opened.then.calls.reset();
+    };
+
+    this.close = jasmine.createSpy('close');
+    this.dismiss = jasmine.createSpy('dismiss');
+    this.opened = {
+      then: jasmine.createSpy('opened.then').and.callFake(function(cb){
+        cb();
+      })
+    };
+  };
+
   e.MockPromise = function(){
     var onSuccess,onError;
     this.success = function(cb){
@@ -25,15 +42,18 @@
     };
   };
 
-  e.LogFactory = {
-    getLogger: function(){
-      return {
-        debug: function(){},
-        info: function(){},
-        warn: function(){},
-        error: function(){}
+  e.LogFactory = function(){
+
+    this.getLogger = function(){
+      this.logger = {
+        debug: jasmine.createSpy('debug'),
+        log: jasmine.createSpy('log'),
+        info: jasmine.createSpy('info'),
+        warn: jasmine.createSpy('warn'),
+        error: jasmine.createSpy('error')
       };
-    }
+      return this.logger;
+    };
   };
 
   e.debounce = function(fn){

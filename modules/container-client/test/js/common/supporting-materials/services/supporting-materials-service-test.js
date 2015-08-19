@@ -60,7 +60,7 @@ describe('supporting materials service', function() {
 
     $provide.value('$http', mockHttp);
     $provide.value('MultipartFileUploader', mockMultipartFileUploader);
-    $provide.value('LogFactory', org.corespring.mocks.editor.LogFactory);
+    $provide.value('LogFactory', new org.corespring.mocks.editor.LogFactory());
     $provide.value('SupportingMaterialUrls', mockUrls);
     $provide.value('SmUtils', mockSmUtils);
   }));
@@ -202,6 +202,16 @@ describe('supporting materials service', function() {
       expect(onError).toHaveBeenCalledWith('not ok') ;
     };
   }
+
+  function httpCalled(){
+    var args = Array.prototype.slice.call(arguments);
+    var method = args.shift(); 
+    return function(){
+      var spy = mockHttp[method];
+      var expectation = expect(spy);
+      expectation.toHaveBeenCalledWith.apply(expectation, args);
+    };
+  }
   
   describe('create', function() {
 
@@ -252,11 +262,9 @@ describe('supporting materials service', function() {
         service.create( data, onSuccess, onError );
       });
 
-      it('calls create', function(){
-        expect(mockHttp.post)
-          .toHaveBeenCalledWith(
-          mockUrls.create.url, {name: 'material', materialType: 'materialType', html: '<div>material</div>'});
-      });
+      it('calls $http.post', httpCalled('post', call.url, 
+           {name: 'material', materialType: 'materialType', html: '<div>material</div>'}
+      ));
     
       it('calls SmUtils.addQueryParamsIfPresent', addQueryParamsCalledWith('create'));
       it('calls success handler', successHandlerCalled('post'));
@@ -271,10 +279,7 @@ describe('supporting materials service', function() {
       service.delete({name:'material'}, onSuccess, onError);
     });
 
-    it('calls $http.delete', function(){
-      expect(mockHttp.delete).toHaveBeenCalledWith('delete/material');
-    });
-
+    it('calls $http.delete', httpCalled('delete', 'delete/material'));
     it('calls SmUtils.addQueryParamsIfPresent', addQueryParamsCalledWith('delete/:name'));
     it('calls success handler', successHandlerCalled('delete'));
     it('calls error handler', errorHandlerCalled('delete'));

@@ -6,7 +6,7 @@ describe('editor-change-watcher', function(){
 
   beforeEach(module(function($provide){
     $provide.value('LogFactory', { getLogger: function(){ return { debug: jasmine.createSpy()};}});
-    $provide.value('debounce', org.corespring.mocks.editor.debounce);
+    $provide.value('editorDebounce', org.corespring.mocks.editor.debounce);
   }));
 
   beforeEach(inject(function(EditorChangeWatcher){
