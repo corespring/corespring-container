@@ -1,10 +1,9 @@
 angular.module('corespring-editor.directives')
   .directive('supportingmetadata', [
     '$timeout', 
-    'SupportingMaterialsService',
     'LogFactory',
     'ImageUtils',
-    function($timeout, SupportingMaterialsService, LogFactory, ImageUtils) {
+    function($timeout, LogFactory, ImageUtils) {
 
       var logger = LogFactory.getLogger('supportingmetadata');
 

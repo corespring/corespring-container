@@ -1,4 +1,29 @@
  angular.module('corespring-editor.directives')
+   .controller('SmListController', ['$scope', '$timeout', function SmListController($scope, $timeout){
+      this.chooseItem = function(item) {
+        $scope.chooseItem()(item);
+        $scope.$broadcast('itemSelected', item);
+      };
+
+      this.deleteItem = function(item) {
+        
+        $scope.deleteItem()(item, function(){
+          var nextItem;
+          if ($scope.ngModel && $scope.ngModel.length > 0) {
+            nextItem = $scope.ngModel[0];
+          } else {
+            nextItem = null;
+          }
+
+          $timeout(function(){
+            this.chooseItem(nextItem);
+          }.bind(this));
+        }.bind(this));
+
+        $scope.$broadcast('sm-list.itemSelected', null);
+
+      };
+   }])
    .directive('smList', ['$timeout', 'LogFactory', 'SmUtils', function($timeout, LogFactory, SmUtils) {
 
      var logger = LogFactory.getLogger('sm-list');
@@ -31,36 +56,9 @@
       });
      }
 
-    function SmListController($scope) {
-
-      this.chooseItem = function(item) {
-        $scope.chooseItem()(item);
-        $scope.$broadcast('itemSelected', item);
-      };
-
-      this.deleteItem = function(item) {
-        
-        $scope.deleteItem()(item, function(){
-          var nextItem;
-          if ($scope.ngModel && $scope.ngModel.length > 0) {
-            nextItem = $scope.ngModel[0];
-          } else {
-            nextItem = null;
-          }
-
-          $timeout(function(){
-            this.chooseItem(nextItem);
-          }.bind(this));
-        }.bind(this));
-
-        $scope.$broadcast('itemSelected', null);
-
-      };
-    }
-
      return {
        restrict: 'A',
-       controller: SmListController,
+       controller: 'SmListController',
        require: '^ngModel',
        scope: {
          ngModel: '=',
@@ -95,7 +93,7 @@
    .directive('smItem', [function() {
      function link($scope, $element, $attrs, smListController) {
 
-       $scope.$on('itemSelected', function($event, item) {
+       $scope.$on('sm-list.itemSelected', function($event, item) {
          $scope.selected = item === $scope.ngModel;
        });
 
@@ -116,7 +114,12 @@
          ngModel: '='
        },
        link: link,
-       templateUrl: '/editor/supporting-materials/directives/sm-item.html'
+       template: [
+            '<li ng-class="{active: selected}" class="sm-item">',
+            '  <a ng-click="chooseItem()">{{ngModel.name}}</a>',
+            '  <i ng-click="deleteItem()" class="fa fa-trash-o pull-right"></i>',
+            '</li>'
+       ].join('')
      };
 
    }]);
