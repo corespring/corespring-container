@@ -206,7 +206,6 @@ trait CoreItem extends CoreSupportingMaterials with Controller {
         .map(cs => hooks.saveCustomScoring(_: String, cs))
         .getOrElse(missingProperty("customScoring"))
       case "profile" => hooks.saveProfile(_: String, json)
-      case "supporting-materials" => hooks.saveSupportingMaterials(_: String, json)
       case "summary-feedback" => (json \ "summaryFeedback").asOpt[String].map(s => hooks.saveSummaryFeedback(_: String, s)).getOrElse(missingProperty("summaryFeedback"))
       case "xhtml" => (json \ "xhtml")
         .asOpt[String]

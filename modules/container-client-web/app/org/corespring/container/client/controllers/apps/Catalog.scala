@@ -49,10 +49,6 @@ trait Catalog
     CatalogServices("catalog.services", Item.load(itemId), JsArray(componentJson), smEndpoints).toString
   }
 
-  def getSupportingMaterialFile(itemId: String, path: String) = Action.async {
-    implicit request => Future { hooks.loadSupportingMaterialFile(itemId, path)(request) }
-  }
-
   def load(id: String): Action[AnyContent] = Action.async {
     implicit request =>
       hooks.showCatalog(id).flatMap { e =>

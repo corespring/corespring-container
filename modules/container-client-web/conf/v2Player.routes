@@ -68,7 +68,6 @@ GET          /rig/:componentType/*file                              @org.corespr
 
 # Catalog
 GET           /catalog/:itemId/index.html                           @org.corespring.container.client.controllers.apps.Catalog.load(itemId)
-GET           /catalog/:itemId/materials/*file                      @org.corespring.container.client.controllers.apps.Catalog.getSupportingMaterialFile(itemId, file)
 GET           /catalog/:itemId/*file                                @org.corespring.container.client.controllers.apps.Catalog.getFile(itemId, file)
 
 # Draft Editor: config, components

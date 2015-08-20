@@ -11,9 +11,6 @@ object Hooks {
   type StatusMessage = (Int, String)
   type R[A] = Future[Either[StatusMessage, A]]
 }
-trait GetSupportingMaterialAssetHook {
-  def loadSupportingMaterialFile(id: String, path: String)(request: Request[AnyContent]): SimpleResult
-}
 
 trait GetAssetHook {
   def loadFile(id: String, path: String)(request: Request[AnyContent]): SimpleResult
@@ -47,14 +44,9 @@ trait PlayerHooks extends GetAssetHook with HasContext {
   def loadItemFile(itemId: String, file: String)(implicit header: RequestHeader): SimpleResult
 }
 
-trait CatalogHooks extends LoadHook with GetAssetHook with GetSupportingMaterialAssetHook {
+trait CatalogHooks extends LoadHook with GetAssetHook {
   def showCatalog(itemId: String)(implicit header: RequestHeader): Future[Option[StatusMessage]]
 }
-
-/*trait ItemHooks extends HasContext {
-  def load(itemId: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]]
-  def create(json: Option[JsValue])(implicit header: RequestHeader): Future[Either[StatusMessage, String]]
-}*/
 
 trait EditorHooks extends LoadHook with AssetHooks
 
