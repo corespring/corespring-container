@@ -3,7 +3,7 @@ package org.corespring.shell.controllers.editor
 import org.bson.types.ObjectId
 import org.corespring.mongo.json.services.MongoService
 import play.api.http.Status._
-import play.api.libs.json.{Json, JsObject, JsArray, JsValue}
+import play.api.libs.json.{ Json, JsObject, JsArray, JsValue }
 
 import scala.concurrent.Future
 

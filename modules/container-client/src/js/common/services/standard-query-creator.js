@@ -14,7 +14,7 @@
       $log.debug("StandardQueryCreator.createStandardQuery", searchText, subjectOption, categoryOption, subCategoryOption);
 
       function createQuery(searchTerm) {
-        var result = {
+        var result = _.isEmpty(searchTerm) ? {} : {
           searchTerm: searchTerm
         };
         return result;

@@ -1,6 +1,6 @@
 package org.corespring.container.client.controllers.apps
 
-import play.api.libs.json.{ JsValue, Json }
+import play.api.libs.json.{JsObject, JsValue, Json}
 
 trait TemplateParams {
   def appName: String
@@ -34,17 +34,21 @@ case class CatalogTemplateParams(appName: String,
   }
 }
 
+case class EditorClientOptions(debounceInMillis:Long, staticPaths:JsObject) {
+  def toJson = Json.format[EditorClientOptions].writes(this)
+}
+
 case class EditorTemplateParams(appName: String,
   js: Seq[String],
   css: Seq[String],
   componentNgModules: Seq[String],
   ngServiceLogic: String,
   versionInfo: JsValue,
-  staticPaths: JsValue) extends TemplateParams {
+  options: EditorClientOptions) extends TemplateParams {
   override def toJadeParams = {
     super.toJadeParams ++ Map(
       "versionInfo" -> Json.stringify(versionInfo),
-      "staticPaths" -> staticPaths)
+      "options" -> Json.stringify(options.toJson))
   }
 }
 

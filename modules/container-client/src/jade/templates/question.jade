@@ -61,8 +61,9 @@ script(type="text/ng-template", id="/templates/question")
               ng-model='item.summaryFeedback', 
               placeholder='Type here',
               feature-overrides="overrideFeatures",
-              image-service="imageService", 
-              features="linkFeature")
+              image-service="imageService",
+              dialog-launcher="external",
+              features="extraFeaturesForFeedback")
 
     .col-md-6
 

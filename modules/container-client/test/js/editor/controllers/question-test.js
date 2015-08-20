@@ -4,30 +4,44 @@ describe('QuestionController', function() {
 
   var ItemService = {
     load: jasmine.createSpy('load'),
-    saveComponents: jasmine.createSpy('saveComponents')
+    saveComponents: jasmine.createSpy('saveComponents'),
+    saveXhtml: jasmine.createSpy('saveXhtml'),
+    saveSummaryFeedback: jasmine.createSpy('saveSummaryFeedback')
   };
+
   var EditorConfig = {
     overrideFeatures: {'override' : 'features'},
     extraFeatures: {'extra' : 'features'}
   };
+  
   var LogFactory = {
     getLogger: jasmine.createSpy('getLogger').and.returnValue({
       debug: function() {}
     })
   };
+  
   var ComponentImageService = {};
+  
   var ComponentData = {
     registerComponent: jasmine.createSpy('registerComponent'),
     registerPlaceholder: jasmine.createSpy('registerPlaceholder')
   };
+  
   var ComponentPopups = {};
+  
   var AppState = {
     question: {
       preview: undefined
     }
   };
+  
   var ScoringHandler = {};
+  
   var MathJaxService = {};
+
+  var wiggiMathJaxFeatureDef = {};
+  
+  var wiggiLinkFeatureDef = {};
 
   beforeEach(angular.mock.module('corespring-editor.controllers'));
 
@@ -41,6 +55,14 @@ describe('QuestionController', function() {
     $provide.value('AppState', AppState);
     $provide.value('ScoringHandler', ScoringHandler);
     $provide.value('MathJaxService', MathJaxService);
+    $provide.value('WiggiMathJaxFeatureDef', function(){
+        return wiggiMathJaxFeatureDef;
+    });
+    $provide.value('WiggiLinkFeatureDef', function(){
+        return wiggiLinkFeatureDef;
+    });
+
+    $provide.value('EditorChangeWatcher', new org.corespring.mocks.editor.EditorChangeWatcher());
   }));
 
   afterEach(function() {
@@ -116,6 +138,17 @@ describe('QuestionController', function() {
     describe('extraFeatures', function() {
       it('should be EditorConfig.extraFeatures', function() {
         expect(scope.extraFeatures).toBe(EditorConfig.extraFeatures);
+      });
+    });
+
+    describe('extraFeaturesForFeedback', function(){
+      it('should be WiggiMathJaxFeatureDef and WiggiLinkFeatureDef', function(){
+        expect(scope.extraFeaturesForFeedback).toEqual({
+            definitions: [
+                  wiggiMathJaxFeatureDef,
+                  wiggiLinkFeatureDef
+            ]
+        });
       });
     });
 
@@ -223,6 +256,59 @@ describe('QuestionController', function() {
 
   });
 
+  describe('$watch item.xhtml', function(){
+    beforeEach(function(){
+      scope.item = {xhtml:"abc"};
+      scope.$digest();
+      ItemService.saveXhtml.calls.reset();
+    });
+    it('should save a change to xhtml', function(){
+      scope.item.xhtml = "def";
+      scope.$digest();
+      expect(ItemService.saveXhtml).toHaveBeenCalled();
+    });
+    it('should not save when there was no change', function(){
+      scope.item.xhtml = "abc";
+      scope.$digest();
+      expect(ItemService.saveXhtml).not.toHaveBeenCalled();
+    });
+  });
 
+  describe('$watch item.summaryFeedback', function(){
+    beforeEach(function(){
+      scope.item = {summaryFeedback:"abc"};
+      scope.$digest();
+      ItemService.saveSummaryFeedback.calls.reset();
+    });
+    it('should save a change to summaryFeedback', function(){
+      scope.item.summaryFeedback = "def";
+      scope.$digest();
+      expect(ItemService.saveSummaryFeedback).toHaveBeenCalled();
+    });
+
+    it('should not save when there was no change', function(){
+      scope.item.summaryFeedback = "abc";
+      scope.$digest();
+      expect(ItemService.saveSummaryFeedback).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('$watch item.components', function(){
+    beforeEach(function(){
+      scope.item = {components:[{'a' : 'component'}]};
+      scope.$digest();
+      ItemService.saveComponents.calls.reset();
+    });
+    it('should save a change to components', function(){
+      scope.item.components = [{'b' : 'component'}];
+      scope.$digest();
+      expect(ItemService.saveComponents).toHaveBeenCalled();
+    });
+    it('should not save when there was no change ', function(){
+      scope.item.components = [{'a' : 'component'}];
+      scope.$digest();
+      expect(ItemService.saveComponents).not.toHaveBeenCalled();
+    });
+  });
 
 });

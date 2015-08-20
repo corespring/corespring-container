@@ -15,7 +15,6 @@ angular.module('corespring.wiggi-wiz-features.cs-image').factory('ImageFeature',
     csImage.onClick = undefined;
 
     csImage.onMouseUp = function($node, $nodeScope, editor) {
-      console.log('image.onMouseUp');
       var buttons = [
           TemplateUtils.makeButton({
           html: '<span>25%</span>'
@@ -33,11 +32,11 @@ angular.module('corespring.wiggi-wiz-features.cs-image').factory('ImageFeature',
           icon: 'fa-align-left'
         }, 'align:left'),
           TemplateUtils.makeButton({
-          icon: 'fa-align-right'
-        }, 'align:right'),
-          TemplateUtils.makeButton({
           icon: 'fa-align-center'
-        }, 'align:center')
+        }, 'align:center'),
+          TemplateUtils.makeButton({
+          icon: 'fa-align-right'
+        }, 'align:right')
         ].join('\n');
 
       editor.togglePopover($node, $nodeScope, buttons, $node.find('img'));
@@ -83,9 +82,7 @@ angular.module('corespring.wiggi-wiz-features.cs-image').factory('ImageFeature',
         }
 
         if (update.imageUrl) {
-          console.log("Adding Image: ", update.imageUrl);
           var img = '<div image-holder="" image-src="' + update.imageUrl + '" style="text-align: left;"></div>';
-          console.log(img);
           addContent($(img));
         }
       }

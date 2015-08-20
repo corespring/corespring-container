@@ -61,7 +61,19 @@ block after-main-script
         }
       }
       
-      angular.module('corespring-#{appName}').constant("STATIC_PATHS", !{staticPaths} ); 
+      var editorOptions = !{options}; 
+      angular.module('corespring-#{appName}').constant('STATIC_PATHS', editorOptions.staticPaths); 
+      angular.module('corespring-#{appName}').constant('DEBOUNCE_IN_MILLIS', editorOptions.debounceInMillis || 5000 ); 
       angular.module('corespring-#{appName}').config(uiRouterConfig);
-
+      
+      angular.module('corespring-#{appName}')
+        .config(['$tooltipProvider', function($tooltipProvider) {
+          //add ng-ui-tooltip-close as an event to close the tooltip
+          //this enables you to hide the tooltip by calling elem.trigger('ng-ui-tooltip-close');
+          $tooltipProvider.setTriggers({
+            mouseenter: 'mouseleave ng-ui-tooltip-close',
+            click: 'click ng-ui-tooltip-close',
+            focus: 'blur ng-ui-tooltip-close'
+          });
+        }]);
     })(this);

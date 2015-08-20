@@ -18,6 +18,7 @@
       'ProfileFormatter',
       'StandardQueryCreator',
       'STATIC_PATHS',
+      'EditorChangeWatcher',
       ProfileController
     ]);
 
@@ -35,7 +36,8 @@
     LogFactory,
     ProfileFormatter,
     StandardQueryCreator,
-    STATIC_PATHS
+    STATIC_PATHS,
+    EditorChangeWatcher
   ) {
 
     var $log = LogFactory.getLogger('ProfileController');
@@ -66,6 +68,10 @@
         collapse: true
       },
       author: {
+        visible: true,
+        readonly: false
+      },
+      contributor: {
         visible: true,
         readonly: false
       },
@@ -173,7 +179,8 @@
       },
       standards: {
         visible: true,
-        readonly: false
+        readonly: false,
+        collapse: true
       },
       title: {
         visible: true,
@@ -275,6 +282,7 @@
       applyConfig(profile, "reviewsPassedOther");
 
       applyConfig(profile.contributorDetails, "author");
+      applyConfig(profile.contributorDetails, "contributor");
       applyConfig(profile.contributorDetails, "credentials");
       applyConfig(profile.contributorDetails, "credentialsOther");
       applyConfig(profile.contributorDetails, "copyrightOwner");
@@ -410,6 +418,10 @@
     }, true); //watch nested properties
 
     function createStandardQuery(searchText) {
+      return StandardQueryCreator.createStandardQuery(searchText);
+    }
+
+    function createFilteredStandardQuery(searchText) {
       return StandardQueryCreator.createStandardQuery(
         searchText,
         $scope.standardFilterOption.subject,
@@ -427,7 +439,6 @@
         return -1 !== _.indexOf(options, item.dotNotation);
       });
     }
-
 
     $scope.standardsAdapter = {
       tags: [],
@@ -470,6 +481,24 @@
     };
 
     $scope.standardsAdapter.initSelection = $scope.standardsAdapter.initSelection.bind($scope.standardsAdapter);
+
+    $scope.filterStandardsAdapter = _.clone($scope.standardsAdapter);
+    $scope.filterStandardsAdapter.placeholder = '';
+    $scope.filterStandardsAdapter.minimumInputLength = 0;
+    $scope.filterStandardsAdapter.initSelection = function(element, callback) {
+      DataQueryService.query("standards", createFilteredStandardQuery(""), function(results) {
+        query.callback({
+          results: filterStandardsByConfig(results)
+        });
+      });
+    };
+    $scope.filterStandardsAdapter.query = function(query) {
+      DataQueryService.query("standards", createFilteredStandardQuery(query.term), function(results) {
+        query.callback({
+          results: filterStandardsByConfig(results)
+        });
+      });
+    };
 
     /**
      * The config contains an array of standards in dotNotation.
@@ -1029,26 +1058,19 @@
     //----------------------------------------------------------------
     // profile load and save
     //----------------------------------------------------------------
-
-    $scope.$watch('item.profile', throttle(function(newValue, oldValue) {
-      if (undefined === oldValue) {
-        return;
-      }
-      if (_.isEqual(oldValue, newValue)) {
-        return;
-      }
-      $scope.saveProfile();
-      $scope.$emit('itemChanged', {
-        partChanged: 'profile'
-      });
-    }), true); //watch nestedProperties
-
-    $scope.saveProfile = function() {
+    
+    $scope.saveProfile = function(){
       $log.log("saving profile");
       ItemService.saveProfile($scope.item.profile, function(result) {
         $log.log("profile saved result:", result);
       });
     };
+
+    $scope.$watch('item.profile', EditorChangeWatcher.makeWatcher(
+      'profile', 
+      $scope.saveProfile,
+      $scope), true);
+
 
     $scope.loadProfile = function() {
       $log.log("loading profile");

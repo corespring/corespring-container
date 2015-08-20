@@ -3,9 +3,12 @@ mixin h_form
     block
     br/
 
-mixin field(id, label, ngModel)
+mixin field(id, label, ngModel, subLabel)
   .form-group
-    label.col-sm-4.control-label(for=id)= label
+    label.col-sm-4.control-label(for=id)
+      = label
+      if subLabel
+        small= subLabel
     .col-sm-8
       if block
         block
@@ -105,23 +108,6 @@ script(type="text/ng-template", id="/templates/profile")
         form.form-horizontal(role="form",ng-show="formModels.standards.visible")
           div.standard-filter(ng-show="!formModels.standards.readonly")
             h6 Add the Standards
-            +field("standard-filter-subject","Subject")
-              select.form-control(id="standard-filter-subject",
-              ng-model="standardFilterOption.subject",
-              ng-options="c.name for c in standardsTree")
-                option(value="") {{standardFilterPlaceholder.subject}}
-
-            +field("standard-filter-category","Category")
-              select.form-control(id="standard-filter-category",
-              ng-model="standardFilterOption.category",
-              ng-options="p.name for p in standardFilterOption.subject.items")
-                option(value="") {{standardFilterPlaceholder.category}}
-
-            +field("standard-filter-sub-category","Sub-Category")
-              select.form-control(id="standard-filter-sub-category",
-              ng-model="standardFilterOption.subCategory",
-              ng-options="z for z in standardFilterOption.category.items")
-                option(value="") {{standardFilterPlaceholder.subCategory}}
             +field("standard-filter-search","Standards")
               input(id="standard-filter-search",
               class="add-standards",
@@ -130,10 +116,37 @@ script(type="text/ng-template", id="/templates/profile")
               ng-model="profile.standards",
               style="width: 100%;")
               span Begin entering standard codes
+
+            +panel("standards", "Filter")
+              .panel-body
+                +field("standard-filter-subject","Subject")
+                  select.form-control(id="standard-filter-subject",
+                  ng-model="standardFilterOption.subject",
+                  ng-options="c.name for c in standardsTree")
+                    option(value="") {{standardFilterPlaceholder.subject}}
+
+                +field("standard-filter-category","Category")
+                  select.form-control(id="standard-filter-category",
+                  ng-model="standardFilterOption.category",
+                  ng-options="p.name for p in standardFilterOption.subject.items")
+                    option(value="") {{standardFilterPlaceholder.category}}
+
+                +field("standard-filter-sub-category","Sub-Category")
+                  select.form-control(id="standard-filter-sub-category",
+                  ng-model="standardFilterOption.subCategory",
+                  ng-options="z for z in standardFilterOption.category.items")
+                    option(value="") {{standardFilterPlaceholder.subCategory}}
+
+                +field("standard-filter-search","Filter Results",undefined,"Click to select")
+                  input(id="standard-filter-search",
+                  class="add-standards",
+                  type="text",
+                  ui-select2="filterStandardsAdapter",
+                  ng-model="profile.standards",
+                  style="width: 100%;")
             hr/
 
           h6 Standards
-
           .form-group(ng-repeat="c in standardsGroups",class="standards")
             .col-sm-3
               image(ng-src="{{c.imageUrl}}", ng-if="c.hasImage")
@@ -214,6 +227,7 @@ script(type="text/ng-template", id="/templates/profile")
 
           +panel("copyrightInformationPanel", "Copyright Information")
             .panel-body
+              +configurableField("contributor","Contributor", "contributorDetails.contributor")
               +configurableField("author","* Author", "contributorDetails.author")
 
               +configurableField("credentials","Credentials","contributorDetails.credentials")
@@ -247,9 +261,9 @@ script(type="text/ng-template", id="/templates/profile")
               additional-copyright-information-for-profile(copyrights="contributorDetails.additionalCopyrights",
               prompt="Does this item contain any other copyrighted materials? E.g. book passage, image, etc.")
 
-          +panel("licenseType", "Creative Commons License")
+          +panel("licenseType", "License")
             .panel-body
-              +field("licenseType","Make this available via a")
+              +field("licenseType","Choose a License")
                 table.license
                   tr
                     td
@@ -257,11 +271,12 @@ script(type="text/ng-template", id="/templates/profile")
                       ng-disabled="formModels.licenseType.readonly"
                       ng-options="c.key as c.value for c in licenseTypeDataProvider | filter:licenseTypeFilter")
                         option(value="") Select ...
-                    td
+
+                    td(ng-if="contributorDetails.licenseType != 'Other'")
                       span(ng-show="!contributorDetails.licenseType",style="color: #888; font-style: italic;")
                         | Not Assigned
                       img(ng-show="contributorDetails.licenseType",ng-src="{{getLicenseTypeUrl(contributorDetails.licenseType)}}")
-                    td
+                    td(ng-if="contributorDetails.licenseType != 'Other'")
                       a(href="http://creativecommons.org/licenses/",target="_blank") Learn More
 
     .col-md-6

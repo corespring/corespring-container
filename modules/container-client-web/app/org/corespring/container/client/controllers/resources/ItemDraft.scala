@@ -4,7 +4,7 @@ import org.corespring.container.client.hooks._
 import play.api.Logger
 import play.api.libs.json.{ Json }
 import play.api.mvc._
-import scala.concurrent.{ ExecutionContext }
+import scala.concurrent.{Future, ExecutionContext}
 
 object ItemDraft {
   object Errors {
@@ -31,16 +31,15 @@ trait ItemDraft extends CoreItem {
 
   override def hooks: CoreItemHooks with DraftHooks
 
-  /*def load(draftId: String) = Action.async {
-    implicit request =>
-      hooks.load(draftId).map {
-        either =>
-          either match {
-            case Left(sm) => sm
-            case Right(draft) => Ok(ItemJson(componentTypes, draft \ "item")).withHeaders("Cache-Control" -> "no-cache, no-store, must-revalidate", "Expires" -> "0")
-          }
-      }
-  }*/
+  def save(draftId: String) = Action.async { implicit request: Request[AnyContent] =>
+    request.body.asJson match {
+      case Some(json) => hooks.save(draftId, json).map { _ match {
+        case Left(sm) => sm
+        case Right(json) => Ok(json)
+      }}
+      case _ => Future { BadRequest(Json.obj("error" -> ItemDraft.Errors.noJson)) }
+    }
+  }
 
   def commit(draftId: String) = Action.async { implicit request =>
     val force = request.getQueryString("force").exists(_ == "true")

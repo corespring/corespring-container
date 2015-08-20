@@ -44,8 +44,10 @@
     .field(ng-show="licenseTypeUrl")
       .info
         .label.label-info License
-      .content
+      .content(ng-show="item.profile.contributorDetails.licenseType!='Other'")
         img.license-type(ng-src="{{licenseTypeUrl}}")
+      .content(ng-show="item.profile.contributorDetails.licenseType=='Other'")
+        span Other
 
 
   .borderless-container.clearfix

@@ -84,14 +84,14 @@ exports.define = function(isSecure) {
     }
 
     function prepareCall() {
-      if(options.itemId){
-        return launcher.loadCall('createSession', function(url){
-          return url.replace(':id', options.itemId);
-        });
-      } else {
+      if(options.sessionId){
         options.mode = options.mode || 'gather';
         return launcher.loadCall(options.mode, function(url){
           return url.replace(':sessionId', options.sessionId);
+        });
+      } else if(options.itemId){
+        return launcher.loadCall('createSession', function(url){
+          return url.replace(':id', options.itemId);
         });
       }
     }
@@ -114,10 +114,8 @@ exports.define = function(isSecure) {
 
       instance = launcher.loadInstance(call, params, initialData);
 
-      var forceWidth = options.forceWidth === undefined ? true : options.forceWidth;
-
-      if(forceWidth){
-        instance.width(options.width || '600px');
+      if (options.width) {
+        instance.width(options.width);
       }
 
       if (options.onSessionCreated) {

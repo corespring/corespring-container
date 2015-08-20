@@ -1,5 +1,12 @@
 @(editorJs:String, opts : play.api.libs.json.JsValue)
 <html>
+  <head>
+    <style type="text/css">
+      body {
+        margin: 0;
+      }
+    </style>
+  </head>
   <body>
     <script type="text/javascript" src="//code.jquery.com/jquery-2.1.3.min.js"></script>
     <script type="text/javascript" src="@editorJs"></script>
@@ -10,16 +17,21 @@
 
        opts.onDraftCreated = function(){
          console.log('onDraftCreated', arguments);
-       }
+       };
 
        opts.onDraftLoaded = function(itemId, draftName){
          console.log('onDraftLoaded: itemId', itemId);
          console.log('onDraftLoaded: draftName', draftName);
-       }
+       };
 
        opts.onItemCreated = function(){
          console.log('onItemCreated', arguments);
-       }
+       };
+       
+       opts.onItemChanged = function(){
+         console.log('onItemChanged', arguments);
+       };
+
        console.log('opts: ', opts);
 
        var editor = new org.corespring.players.DraftEditor(holder, opts, function(err){
@@ -28,8 +40,9 @@
 
        var commitBtn = document.querySelector('#commit');
        var forceCommitBtn = document.querySelector('#force-commit');
+       var saveAllBtn = document.querySelector('#save-all');
 
-       function commit( force ){
+       function commit(force) {
          editor.commitDraft(force, function(err){
           if(err){
             alert(err.code + ', ' + err.msg);
@@ -39,12 +52,20 @@
          });
        }
 
-       commitBtn.addEventListener('click', commit.bind(this, null) );
+       function saveAll(){
+        editor.forceSave(function(result){
+          console.log('saveAll complete, arguments: ', arguments);
+        });
+       }
+
+       commitBtn.addEventListener('click', commit.bind(this, null));
        forceCommitBtn.addEventListener('click', commit.bind(this, true));
+       saveAllBtn.addEventListener('click', saveAll);
      });
     </script>
     <button id="commit">Commit</button>
     <button id="force-commit">Force Commit</button>
+    <button id="save-all">Save All</button>
     <div class="holder"></div>
   </body>
 </html>

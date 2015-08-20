@@ -1,7 +1,57 @@
-angular.module('corespring-player.directives').directive('dimensionPropagator',
-  ['$log', 'Msgr', function($log, Msgr) {
+angular.module('corespring-player.directives')
+  .directive('dimensionPropagator', ['$log', '$timeout', 'DimensionCalculator', 'Msgr', DimensionPropagator]);
 
-    function calculateContentHeight() {
+function DimensionPropagator($log, $timeout, DimensionCalculator, Msgr) {
+
+  return {
+    link: link
+  };
+
+  function link(scope, $element) {
+
+    var highFrequencyDelay = 10;
+    var lowFrequencyDelay = 100;
+    var frequencyChangesAt = 2000;
+
+    var counter = 0;
+    var timeoutHandle;
+
+    var calculator = new DimensionCalculator();
+
+    var $body = $element.parents('body');
+
+    scope.$on('$destroy', function() {
+      $timeout.cancel(timeoutHandle);
+    });
+
+    checkDimensions();
+
+    //-----------------------------------------------------
+
+    function checkDimensions() {
+      var b = $body[0];
+      if (b) {
+        var updatedSize = calculator.calcUpdatedDimensions(calculateSize(b));
+        if (updatedSize) {
+          Msgr.send('dimensionsUpdate', updatedSize);
+          counter = 0;
+        } else {
+          counter++;
+        }
+      }
+      var delay = (counter * highFrequencyDelay < frequencyChangesAt) ? highFrequencyDelay : lowFrequencyDelay;
+      timeoutHandle = $timeout(checkDimensions, delay);
+    }
+
+    function calculateSize(b) {
+      var size = {
+        w: b.clientWidth,
+        h: calculateHeight()
+      };
+      return size;
+    }
+
+    function calculateHeight() {
       var visible = $("body :visible");
       var max = 0;
       visible.each(function() {
@@ -11,46 +61,7 @@ angular.module('corespring-player.directives').directive('dimensionPropagator',
       return max;
     }
 
-    return {
 
-      link: function($scope, $element) {
 
-        var $body = $element.parents('body');
-
-        var lastW, lastH;
-        var counter = 0;
-        var highFrequencyDelay = 10;
-        var lowFrequencyDelay = 100;
-        var frequencyChangesAt = 2000;
-
-        function different(w, h) {
-          return lastH !== h || lastW !== w;
-        }
-
-        function dispatchDimensions() {
-          var b = $body[0];
-          if (!b) {
-            return;
-          }
-
-          var w = b.clientWidth;
-          var h = calculateContentHeight();
-
-          if (different(w, h)) {
-            lastW = w;
-            lastH = h;
-            Msgr.send('dimensionsUpdate', {w: w, h: h});
-
-            counter = 0;
-          }
-          var delay = (counter * highFrequencyDelay < frequencyChangesAt) ? highFrequencyDelay : lowFrequencyDelay;
-          counter = counter + 1;
-          clearTimeout(timeout);
-          timeout = setTimeout(dispatchDimensions, delay);
-        }
-
-        var timeout = setTimeout(dispatchDimensions, 1);
-        dispatchDimensions();
-      }
-    };
-  }]);
+  }
+}

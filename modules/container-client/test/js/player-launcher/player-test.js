@@ -76,14 +76,14 @@ describe('player launcher', function() {
 
   describe('init', function(){
 
-    describe('forceWidth', function(){
-      it('should call width on the instance with the default width if forceWidth == true', function(){
-        var player = create({ itemId: '1', mode: 'gather', forceWidth: true });
-        expect(mockInstance.width).toHaveBeenCalledWith('600px');
+    describe('width', function(){
+      it('should not call width on the instance if explicit width is not set', function(){
+        var player = create({ itemId: '1', mode: 'gather' });
+        expect(mockInstance.width).not.toHaveBeenCalled();
       });
 
-      it('should call width on the instance with a custom width if forceWidth == true', function(){
-        var player = create({ itemId: '1', mode: 'gather', width: '1000px', forceWidth: true });
+      it('should not call width on the instance if explicit width is set', function(){
+        var player = create({ itemId: '1', mode: 'gather', width: '1000px' });
         expect(mockInstance.width).toHaveBeenCalledWith('1000px');
       });
 
@@ -92,6 +92,21 @@ describe('player launcher', function() {
     it('calls loadInstance with mode \'gather\' if it\'s not defined', function(){
       var player = create({ itemId: '1', gather: {} });
       expect(mockLauncher.loadInstance).toHaveBeenCalledWith(jasmine.any(Object), undefined, {mode: 'gather', gather: {}});
+    });
+
+    it('creates new session if itemId is passed in and sessionId is not', function(){
+      var player = create({ itemId: '1', mode: 'gather', gather: {} });
+      expect(mockLauncher.loadCall).toHaveBeenCalledWith('createSession', jasmine.any(Function));
+    });
+
+    it('resumes session if sessionId is passed in', function(){
+      var player = create({ sessionId: '1', mode: 'view', gather: {} });
+      expect(mockLauncher.loadCall).toHaveBeenCalledWith('view', jasmine.any(Function));
+    });
+
+    it('resumes session and calls errorcallback if sessionId and itemId are both passed in', function(){
+      var player = create({ itemId: '1', sessionId: '1', mode: 'view', gather: {} });
+      expect(mockLauncher.loadCall).toHaveBeenCalledWith('view', jasmine.any(Function));
     });
   });
 

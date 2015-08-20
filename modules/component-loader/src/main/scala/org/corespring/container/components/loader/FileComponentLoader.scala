@@ -166,7 +166,9 @@ class FileComponentLoader(paths: Seq[String], showNonReleased: Boolean)
         title = (packageJson \ "title").asOpt[String],
         titleGroup = (packageJson \ "titleGroup").asOpt[String],
         released = (packageJson \ "released").asOpt[Boolean],
-        client = loadClient(clientFolder),
+        client = loadClient(clientFolder,
+          loadLibrarySources(compRoot.getPath, "client/render-lib", createClientName(compRoot.getPath)),
+          loadLibrarySources(compRoot.getPath, "client/configure-lib", createClientName(compRoot.getPath))),
         defaultData = loadDefaultData(defaultDataJson),
         icon = loadIcon(icon),
         sampleData = loadSampleData(sampleDataFolder) ++ loadSampleData(regressionDataFolder, Some("regression_")),
@@ -243,13 +245,13 @@ class FileComponentLoader(paths: Seq[String], showNonReleased: Boolean)
     Json.parse(s)
   }
 
-  private def loadClient(client: File): Client = if (!client.exists()) {
+  private def loadClient(client: File, renderLibs: Seq[LibrarySource], configureLibs: Seq[LibrarySource]): Client = if (!client.exists()) {
     throw new ComponentLoaderException(s"Can't find client file: ${client.getAbsolutePath}")
   } else {
     val renderJs = getJsFromFile(client.getPath + "/render")
     val configureJs = getJsFromFile(client.getPath + "/configure")
     val styleCss = loadCss(client.getPath)
-    Client(renderJs, configureJs, styleCss)
+    Client(renderJs, configureJs, styleCss, renderLibs, configureLibs)
   }
 
   private def loadServer(server: File): Server = if (!server.exists()) {

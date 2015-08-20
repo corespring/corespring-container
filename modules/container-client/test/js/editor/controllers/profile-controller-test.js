@@ -153,6 +153,7 @@ describe('profile controller', function() {
       $provide.value('StandardQueryCreator', mockStandardQueryCreator);
       $provide.value('throttle', _.identity);
       $provide.constant('STATIC_PATHS', {assets: imagePath});
+      $provide.value('debounce', org.corespring.mocks.editor.debounce);
     });
 
   });
@@ -324,7 +325,7 @@ describe('profile controller', function() {
       scope.standardFilterOption.subject = "subject";
       scope.standardFilterOption.category = "category";
       scope.standardFilterOption.subCategory = "subCategory";
-      scope.standardsAdapter.query({
+      scope.filterStandardsAdapter.query({
         term: "searchterm",
         callback: function() {}
       });
@@ -860,6 +861,9 @@ describe('profile controller', function() {
           author: {
             value: "some author"
           },
+          contributor: {
+            value: "some contributor"
+          },
           bloomsTaxonomy: {
             value: "some blooms"
           },
@@ -928,6 +932,9 @@ describe('profile controller', function() {
         });
         it("author", function() {
           expect(scope.contributorDetails.author).toEqual("some author");
+        });
+        it("contributor", function() {
+          expect(scope.contributorDetails.contributor).toEqual("some contributor");
         });
         it("bloomsTaxonomy", function() {
           expect(scope.profile.otherAlignments.bloomsTaxonomy).toEqual("some blooms");

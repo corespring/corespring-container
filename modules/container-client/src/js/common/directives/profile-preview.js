@@ -5,7 +5,10 @@ angular.module('corespring-common.directives')
     'DataQueryService',
     'ProfileFormatter',
     'ComponentService',
-    function($sce, $log, DataQueryService, ProfileFormatter, ComponentService) {
+    'STATIC_PATHS',
+    function($sce, $log, DataQueryService, ProfileFormatter, ComponentService, STATIC_PATHS) {
+      var assetsPath = STATIC_PATHS.assets;
+
       return {
         restrict: 'A',
         scope: {
@@ -48,6 +51,7 @@ angular.module('corespring-common.directives')
           $scope.isThereMoreData = function(profile) {
             return (
               isNonEmptyString(getOrNull(profile, "contributorDetails", "copyrightOwner")) ||
+              isNonEmptyString(getOrNull(profile, "contributorDetails", "contributor")) ||
               isNonEmptyString(getOrNull(profile, "contributorDetails", "copyrightYear")) ||
               isNonEmptyString(getOrNull(profile, "contributorDetails", "copyrightExpirationDate")) ||
               isNonEmptyString(getOrNull(profile, "contributorDetails", "credentials")) ||
@@ -147,7 +151,7 @@ angular.module('corespring-common.directives')
           }
 
           function imageUrl(folder, name, fallback) {
-            return name ? '../../images/' + folder + '/' + name.replace(" ", "-") + ".png" : fallback;
+            return name ? assetsPath + '/' + folder + '/' + name.replace(" ", "-") + ".png" : fallback;
           }
 
           function licenseTypeUrl(licenseType) {

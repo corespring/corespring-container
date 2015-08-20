@@ -24,7 +24,7 @@ block content
       != xhtml
     summary-feedback(ng-model='item.summaryFeedback', session-complete='session.isComplete')
 
-  .root.container(ng-controller='Root', dimension-propagator='')
+  .root(ng-controller='Root', dimension-propagator='')
 
     if showControls
       div(ng-controller="ContainerPlayerController")

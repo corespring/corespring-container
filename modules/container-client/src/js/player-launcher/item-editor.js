@@ -1,9 +1,10 @@
 function EditorDefinition(element, options, errorCallback) {
 
   var Launcher = require('client-launcher');
-  var launcher = new Launcher(element, options, errorCallback);
+  var launcher = new Launcher(element, options, errorCallback, options.autosizeEnabled);
   var errorCodes = require('error-codes');
-
+  var instance;
+  
   function createItem(callback){
 
     var call = launcher.loadCall('itemEditor.createItem');
@@ -88,7 +89,7 @@ function EditorDefinition(element, options, errorCallback) {
       }
     }
 
-    var instance = launcher.loadInstance(call, options.queryParams, initialData, onReady);
+    instance = launcher.loadInstance(call, options.queryParams, initialData, onReady);
   }
 
   var ok = launcher.init();
@@ -111,6 +112,12 @@ function EditorDefinition(element, options, errorCallback) {
   } else {
     return;
   }
+
+  this.remove = function() {
+    if(instance){
+      instance.remove();
+    }
+  };
 }
 
 module.exports = EditorDefinition;

@@ -4,38 +4,52 @@ extends layout
 block after-main-script
 
   script.
-    angular.module('corespring-#{appName}').constant("STATIC_PATHS", !{staticPaths} ); 
-    
+    var editorOptions = !{options};
+    angular.module('corespring-#{appName}').constant('STATIC_PATHS', editorOptions.staticPaths);
+    angular.module('corespring-#{appName}').constant('DEBOUNCE_IN_MILLIS', editorOptions.debounceInMillis || 5000 );
+
 block content
   style
 
   .root(ng-controller="DevEditorRoot")
-    .top-row
-      span Dev Editor
-      .pull-right
-        button.btn.btn-sm.btn-default(ng-click="save()") Save
-    .bottom-row
-      .xhtml-pane(ui-ace,
-          ng-model="xhtml",
-          ui-ace="{mode: 'html', useWrapMode : true, onLoad: aceLoaded, onChange: aceChanged }")
-      .custom-js-pane(ui-ace,
-          ng-model="customScoringJs",
-          ui-ace="{mode: 'javascript', useWrapMode : true }")
-      .json-pane(ui-ace
-          ng-model="json",
-          ui-ace="{mode: 'json', useWrapMode : true, onLoad: aceLoaded, onChange: aceJsonChanged }")
-      .preview(ng-controller="ClientSidePreview")
-        .item-preview-wrapper
-          .player-label
-            img(ng-src='{{playerLabelImg}}')
-          .player-container
-            optimized-preview-player(
-              data-jade-template='dev-editor',
+    table.panes
+      tr
+        td.top(colspan="4")
+          span Dev Editor
+          .pane-buttons.btn-group
+            label.btn.btn-default(btn-checkbox="true", ng-model="panes.html") html
+            label.btn.btn-default(btn-checkbox="true", ng-model="panes.json") json
+            label.btn.btn-default(btn-checkbox="true", ng-model="panes.scoring") scoring
+            label.btn.btn-default(btn-checkbox="true", ng-model="panes.player") player
+          .pull-right
+            button.btn.btn-sm.btn-default(ng-click="save()") Save
+
+      tr
+        td.pane(ng-show="panes.html")
+          .xhtml-pane(ui-ace,
               ng-model="xhtml",
-              player-components="components",
-              player-outcomes="outcome")
-            summary-feedback(ng-model="item.summaryFeedback", session-complete="session.isComplete")
-          preview-player-control-panel(
-            data-mode='playerMode', 
-            data-settings='playerSettings', 
-            data-score="score")
+              ui-ace="{mode: 'html', useWrapMode : true, onLoad: aceLoaded, onChange: aceChanged }")
+        td.pane(ng-show="panes.json")
+          .json-pane(ui-ace
+              ng-model="json",
+              ui-ace="{mode: 'json', useWrapMode : true, onLoad: aceLoaded, onChange: aceJsonChanged }")
+        td.pane(ng-show="panes.scoring")
+          .custom-js-pane(ui-ace,
+              ng-model="customScoringJs",
+              ui-ace="{mode: 'javascript', useWrapMode : true }")
+        td.pane(ng-show="panes.player", keep-updating-player-size="true")
+          .preview(ng-controller="ClientSidePreview")
+            .item-preview-wrapper
+              .player-label
+                img(ng-src='{{playerLabelImg}}')
+              .player-container
+                optimized-preview-player(
+                  data-jade-template='dev-editor',
+                  ng-model="xhtml",
+                  player-components="components",
+                  player-outcomes="outcome")
+                summary-feedback(ng-model="item.summaryFeedback", session-complete="session.isComplete")
+              preview-player-control-panel(
+                data-mode='playerMode',
+                data-settings='playerSettings',
+                data-score="score")

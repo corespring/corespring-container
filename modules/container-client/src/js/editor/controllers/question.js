@@ -3,6 +3,7 @@ angular.module('corespring-editor.controllers')
     '$scope',
     '$element',
     '$timeout',
+    'EditorChangeWatcher',
     'ItemService',
     'EditorConfig',
     'LogFactory',
@@ -12,9 +13,12 @@ angular.module('corespring-editor.controllers')
     'AppState',
     'ScoringHandler',
     'MathJaxService',
+    'WiggiLinkFeatureDef',
+    'WiggiMathJaxFeatureDef',
     function($scope,
       $element,
       $timeout,
+      EditorChangeWatcher,
       ItemService,
       EditorConfig,
       LogFactory,
@@ -23,7 +27,9 @@ angular.module('corespring-editor.controllers')
       ComponentPopups,
       AppState,
       ScoringHandler,
-      MathJaxService) {
+      MathJaxService,
+      WiggiLinkFeatureDef,
+      WiggiMathJaxFeatureDef) {
 
       var configPanels = {};
 
@@ -55,6 +61,12 @@ angular.module('corespring-editor.controllers')
       $scope.imageService = ComponentImageService;
       $scope.overrideFeatures = EditorConfig.overrideFeatures;
       $scope.extraFeatures = EditorConfig.extraFeatures;
+      $scope.extraFeaturesForFeedback = {
+        definitions: [
+            new WiggiMathJaxFeatureDef(),
+            new WiggiLinkFeatureDef()
+        ]
+      };
       $scope.onEditorClick = onEditorClick;
 
       // Dropdowns in wiggi-wiz toolbar don't trigger when bootstrap is imported?
@@ -136,43 +148,24 @@ angular.module('corespring-editor.controllers')
         return newModel;
       };
 
-      $scope.$watch('item.components', debounce(function(newComps, oldComps) {
-        if (_.isEqual(newComps, oldComps)) {
-          logger.debug('they are the same - ignore...');
-          return;
-        }
-        saveComponents();
-        if (oldComps) {
-          $scope.$emit('itemChanged', {partChanged: 'components'});
-        }
-      }), true);
+      var makeWatcher = EditorChangeWatcher.makeWatcher;
 
-      $scope.$watch('item.xhtml', debounce(function(newValue, oldValue) {
-        logger.debug('old', oldValue);
-        if (oldValue !== newValue) {
-          ItemService.saveXhtml($scope.item.xhtml);
-          if (oldValue) {
-            $scope.$emit('itemChanged', {partChanged: 'xhtml'});
-          }
-        }
-      }));
+      $scope.$watch(
+        'item.components', 
+        makeWatcher('components', saveComponents, $scope),
+        true);
 
-      $scope.$watch('item.summaryFeedback', debounce(function(newValue, oldValue) {
-        logger.debug('old', oldValue);
-        if (oldValue !== newValue) {
-          ItemService.saveSummaryFeedback($scope.item.summaryFeedback);
-          if (oldValue) {
-            $scope.$emit('itemChanged', {partChanged: 'summaryFeedback'});
-          }
-        }
-      }));
+      $scope.$watch(
+        'item.xhtml', 
+        makeWatcher('xhtml', function(n,o){
+          ItemService.saveXhtml(n);
+        }, $scope)); 
 
-      function debounce(fn) {
-        return _.debounce(fn, 500, {
-          trailing: true,
-          leading: false
-        });
-      }
+      $scope.$watch(
+        'item.summaryFeedback', 
+        makeWatcher('summaryFeedback', function(n,o){
+          ItemService.saveSummaryFeedback(n);
+        }, $scope));
 
       ItemService.load(function(item) {
         $scope.item = item;

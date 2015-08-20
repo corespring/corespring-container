@@ -155,7 +155,8 @@ object StandardsTreeJson {
             "Extend the counting sequence.",
             "Understand place value.",
             "Use place value understanding and properties of operations to add and subtract.",
-            "Use place value understanding and properties of operations to perform multi-digit arithmetic.1",
+            "Use place value understanding and properties of operations to perform multi-digit arithmetic.",
+            "Generalize place value understanding for multi-digit whole numbers.",
             "Understand the place value system.",
             "Perform operations with multi-digit whole numbers and with decimals to hundredths.")),
         Json.obj(
@@ -193,24 +194,14 @@ object StandardsTreeJson {
             "Understand congruence and similarity using physical models, transparencies, or geometry software.",
             "Understand and apply the Pythagorean Theorem.",
             "Solve real-world and mathematical problems involving volume of cylinders, cones, and spheres.")),
-        Json.obj(
-          "name" -> "Number & Operationsâ€”FractionsÂ¹",
+         Json.obj(
+          "name" -> "Number & Operations Fractions",
           "items" -> Json.arr(
             "All",
             "Develop understanding of fractions as numbers.",
             "Extend understanding of fraction equivalence and ordering.",
             "Build fractions from unit fractions",
-            "Understand decimal notation for fractions, and compare decimal fractions.")),
-        Json.obj(
-          "name" -> "Number & Operations in Base TenÂ¹",
-          "items" -> Json.arr(
-            "All",
-            "Generalize place value understanding for multi-digit whole numbers.",
-            "Use place value understanding and properties of operations to perform multi-digit arithmetic.")),
-        Json.obj(
-          "name" -> "Number & Operationsâ€”Fractions",
-          "items" -> Json.arr(
-            "All",
+            "Understand decimal notation for fractions, and compare decimal fractions.",
             "Use equivalent fractions as a strategy to add and subtract fractions.",
             "Apply and extend previous understandings of multiplication and division.")),
         Json.obj(

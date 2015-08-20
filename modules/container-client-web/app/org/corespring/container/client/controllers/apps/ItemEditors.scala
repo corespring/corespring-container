@@ -13,6 +13,7 @@ trait BaseItemEditor extends CoreEditor {
       s"$context.services",
       resourceRoutes.Item.load(draftId),
       resourceRoutes.Item.saveSubset(draftId, ":subset"),
+      None,
       components,
       widgets).toString
   }

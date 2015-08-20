@@ -64,6 +64,7 @@
             'component-type': component.componentType,
             'label': component.title + ': ' + id,
             'id': id,
+            'class': component.componentType,
             'contenteditable': false
           }));
         },

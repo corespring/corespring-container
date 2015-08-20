@@ -17,6 +17,7 @@ angular.module('corespring-editor.services').service('ItemService', [
 
       this.addSaveListener = addSaveListener;
       this.load = loadItem;
+      this.saveAll = saveAll;
       this.saveComponents = saveComponents;
       this.saveCollectionId = saveCollectionId;
       this.saveCustomScoring = saveCustomScoring;
@@ -108,6 +109,39 @@ angular.module('corespring-editor.services').service('ItemService', [
         }, onSuccess, onFailure);
       }
 
+      function saveAll(data, onSuccess, onFailure) {
+        var method = ItemUrls.save.method;
+        var url = ItemUrls.save.url;
+        url = addQueryParamsIfPresent(url);
+        $log.debug('saveAll', data);
+        $log.debug('saveAll - url:', url);
+
+        notifyListeners('saving');
+
+        $http[method](url, data)
+          .success(saveSuccess)
+          .error(saveError);
+
+        function saveSuccess(data) {
+          notifyListeners('saved');
+          if (onSuccess) {
+            onSuccess(data);
+          } else {
+            $log.warn('no onSuccess handler');
+          }
+        }
+
+        function saveError(data, status) {
+          notifyListeners('error');
+          if (onFailure) {
+            data = data || {
+              error: status + ": an unknown error occurred"
+            };
+            onFailure(data);
+          }
+        }
+      }
+
       function save(set, data, onSuccess, onFailure) {
         var method = ItemUrls.saveSubset.method;
         var url = ItemUrls.saveSubset.url.replace(':subset', set);
@@ -134,7 +168,7 @@ angular.module('corespring-editor.services').service('ItemService', [
           notifyListeners('error');
           if (onFailure) {
             data = data || {
-              error: status + ": an unknown error occured"
+              error: status + ": an unknown error occurred"
             };
             onFailure(data);
           }
