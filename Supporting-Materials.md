@@ -1,6 +1,7 @@
 ## todos..
 
-
+- bypass iframe mechanism?
+- main asset route no longer needs to handle supporting materials
 - ~~assets returned as type document~~
 - routes support i.e #/supporting-materials ? check player launcher..
 - return file json on creation

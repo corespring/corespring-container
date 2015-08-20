@@ -143,3 +143,49 @@ describe('sm-list-controller', function(){
     });
   });
 });
+
+describe('smItem', function(){
+  
+  var controller; 
+  beforeEach(angular.mock.module('corespring-editor.directives'));
+
+  beforeEach(inject(function($rootScope, $compile) {
+    
+    controller = {
+      deleteItem : jasmine.createSpy('deleteItem'),
+      chooseItem : jasmine.createSpy('chooseItem')
+    };
+
+    element = angular.element('<ul class="fake"><li sm-item ng-model="item"></li></ul>');
+    element.data('$smListController', controller); 
+    scope = $rootScope.$new();
+    scope.item = { name: 'my-item'};
+
+    element = $compile(element)(scope);
+    scope.$digest();
+    scope = element.find('[sm-item]').isolateScope();
+  }));
+
+  describe('initialization', function(){
+    it('inits', function(){
+      expect(scope).not.toBe(null);
+    });
+  });
+
+  describe('deleteItem', function(){
+    it('calls controller.deleteItem', function(){
+      scope.deleteItem({});
+      expect(controller.deleteItem).toHaveBeenCalledWith({name: 'my-item'});
+    });
+  });
+
+  describe('chooseItem', function(){
+
+    it('calls controller.chooseItem', function(){
+      scope.chooseItem({});
+      expect(controller.chooseItem).toHaveBeenCalledWith({name: 'my-item'});
+    });
+  });
+
+
+});
