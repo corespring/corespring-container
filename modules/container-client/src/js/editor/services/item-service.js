@@ -23,41 +23,9 @@ angular.module('corespring-editor.services').service('ItemService', [
         saveListeners[id] = handler;
       };
 
-      function uploadFile(m, onSuccess, onFailure){
-        var url = ItemUrls.createSupportingMaterialFromFile.url;
-        url = url
-          .replace(':materialType', m.materialType)
-          .replace(':filename', m.file.name);
-
-        url = addQueryParamsIfPresent(url);
-        url += getToken(url) +'name=' + m.name;
-
-        RawFileUploader.upload(url, m.file, function(newMaterial){
-          onSuccess(newMaterial);
-        }, function(err){
-          logger.error(err);
-          onFailure(err);
-        });
-      }
-
       function getToken(url){
         return url.indexOf('?' === -1) ? '?' : '&';
       }
-
-      this.createSupportingMaterial = function(m, onSuccess, onFailure){
-        if(m.file){
-          uploadFile(m, onSuccess, onFailure);
-        } else {
-          var c = ItemUrls.createSupportingMaterial;
-          var url = addQueryParamsIfPresent(c.url);
-          m.html = '<div>' + m.name + '</div>';
-          $http[c.method](url, m)
-            .success(onSuccess)
-            .error(onFailure || function(){
-              logger.error(arguments);
-            });
-        }
-      };
 
       this.load = function(onSuccess, onFailure) {
         logger.debug('load, loaded?', loadedData !== null);
@@ -118,10 +86,6 @@ angular.module('corespring-editor.services').service('ItemService', [
         save('summary-feedback', {
           summaryFeedback: data
         }, onSuccess, onFailure);
-      };
-
-      this.saveSupportingMaterials = function(data, onSuccess, onFailure) {
-        save('supporting-materials', data, onSuccess, onFailure);
       };
 
       this.saveXhtml = function(data, onSuccess, onFailure) {

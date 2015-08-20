@@ -31,7 +31,6 @@ angular.module('corespring-editor.controllers')
       $scope.onItemLoadSuccess = onItemLoadSuccess;
       $scope.onItemLoadError = onItemLoadError;
 
-      //$scope.$on('deleteSupportingMaterial', onDeleteSupportingMaterial);
       $scope.$on(WIGGI_EVENTS.LAUNCH_DIALOG, onLaunchDialog);
       $scope.$on('itemChanged', onItemChanged);
 
@@ -81,36 +80,6 @@ angular.module('corespring-editor.controllers')
         Msgr.send('itemChanged', data);
       }
 
-      /*function onDeleteSupportingMaterial(event, data) {
-
-        var confirmationMessage = [
-          "You are about to delete this file.",
-          "Are you sure you want to do this?"
-        ].join('\n');
-
-        if ($window.confirm(confirmationMessage)) {
-          showFirstItem();
-          deleteSupportingMaterial(data.index);
-        }
-      }
-
-      function showFirstItem() {
-        $state.transitionTo('supporting-materials', {
-          index: "0"
-        }, {
-          reload: true
-        });
-      }*/
-
-      /*function deleteSupportingMaterial(index) {
-        $scope.item.supportingMaterials.splice(index, 1);
-
-        ItemService.saveSupportingMaterials($scope.item.supportingMaterials,
-          function() {},
-          $scope.onSaveError, $scope.itemId
-        );
-      }*/
-
       function preprocessComponents(item) {
         _.each(item.components, function(c, key) {
           var serverLogic = corespring.server.logic(c.componentType);
@@ -153,8 +122,6 @@ angular.module('corespring-editor.controllers')
       function onItemLoadError(err) {
         logger.error('error loading', err);
       }
-
-     
 
     }
   ]);

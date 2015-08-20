@@ -70,17 +70,3 @@ case class CreateBinaryMaterial(
 
 case class CreateHtmlMaterial(name: String, materialType: String, main: Html, assets: Seq[Binary]) extends CreateNewMaterialRequest[Html]
 
-/*
-case class TaskInfo(title:String)
-case class Profile(taskInfo:TaskInfo)
-case class ComponentData(componentType:String, weight:Int, title:String, correctResponse: ???, model: ???)
-case class ContainerItem[A](
-                        id:A,
-                           components: Map[String,ComponentData],
-                           profile: Profile,
-                           supportingMaterials : Seq[SupportingMaterial[File]],
-                           xhtml:String,
-                           customScoring:String,
-                           summaryFeedback:String
-                          )
-*/ 
