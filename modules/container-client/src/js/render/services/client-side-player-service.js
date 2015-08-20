@@ -33,7 +33,7 @@ angular.module('corespring-player.services')
             var exports = {};
             try {
               eval(customScoringJs);
-              var score = exports.process(getItem(), session);
+              var score = exports.process(getItem(), session, outcomes);
               out.score = score;
             } catch (e) {
               console.warn('error while processing custom scoring: ', e);
