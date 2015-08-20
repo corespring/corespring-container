@@ -293,7 +293,6 @@ describe('supportingmetadata', function() {
       expect(selectFn).toHaveBeenCalled();
     });
   });
-
 });
 
 describe('filechange', function() {

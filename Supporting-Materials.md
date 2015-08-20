@@ -10,7 +10,6 @@
 - ~~sort types alphabetically~~
 - ~~sort names alphabetically~~
 
-
 ### saveAll + supporting materials
 
 we have added a `saveAll` method to the editor. The purpose of which is to allow the editor to send it's entire data model to the server.
