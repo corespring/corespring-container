@@ -65,6 +65,11 @@
             return $scope.playerMode === 'gather';
           }
 
+          $scope.tryIt = function() {
+            ComponentRegister.reset();
+            setMode('gather');
+          };
+
           $scope.submitOrReset = function() {
             if (isGatherMode()) {
               var components = ComponentRegister.getComponentSessions();
@@ -118,6 +123,9 @@
           link: linkFn,
           template: [
             '<div>',
+            '  <a class="pull-right btn btn-primary" ng-click="tryIt()">',
+            '    Try It',
+            '  </a>',
             '  <corespring-isolate-player',
             '    player-mode="playerMode"',
             '    player-markup="xhtml"',
