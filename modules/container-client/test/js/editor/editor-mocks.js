@@ -22,6 +22,19 @@
     };
   };
 
+
+  e.Stash = function Stash(holder, name, mock){
+
+    var stashed;
+
+    stashed = holder[name];
+    holder[name] = mock;
+    
+    this.unstash = function(){
+      holder[name]= stashed;
+    };
+  };
+
   e.MockPromise = function(){
     var onSuccess,onError;
     this.success = function(cb){

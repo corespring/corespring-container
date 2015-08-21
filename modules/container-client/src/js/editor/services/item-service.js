@@ -3,8 +3,7 @@ angular.module('corespring-editor.services').service('ItemService', [
   '$timeout', 
   'ItemUrls', 
   'LogFactory',
-  'RawFileUploader',
-  function($http, $timeout, ItemUrls, LogFactory, RawFileUploader) {
+  function($http, $timeout, ItemUrls, LogFactory) {
 
     /**
      * Service that contains xhr calls to the server.
