@@ -110,9 +110,11 @@ trait ItemDraftSupportingMaterialHooks
     }
   }
 
-  override def getAsset(id: String, name: String, filename: String)(implicit h: RequestHeader): SimpleResult = parseId(id)((draftId: DraftId[ObjectId]) => {
-    assets.getAssetFromSupportingMaterial(draftId, name, filename)
-  }, play.api.mvc.Results.BadRequest("Can't parse DraftId"))
+  override def getAsset(id: String, name: String, filename: String)(implicit h: RequestHeader): Future[Either[StatusMessage, FileDataStream]] = Future {
+    parseId(id)((draftId: DraftId[ObjectId]) => {
+      assets.getAsset(draftId, name, filename).leftMap(e => (BAD_REQUEST -> e)).toEither
+    }, Left(BAD_REQUEST -> s"Can't parse DraftId: $id"))
+  }
 
   override def updateContent(id: String, name: String, filename: String, content: String)(implicit h: RequestHeader): R[JsValue] = {
     withDraftId(id) { (draftId) =>

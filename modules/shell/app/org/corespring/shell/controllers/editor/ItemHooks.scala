@@ -2,8 +2,8 @@ package org.corespring.shell.controllers.editor
 
 import com.mongodb.casbah.Imports._
 import org.bson.types.ObjectId
-import org.corespring.container.client.hooks.{ Binary, CreateNewMaterialRequest, File }
-import org.corespring.container.client.hooks.Hooks.R
+import org.corespring.container.client.hooks.{ FileDataStream, Binary, CreateNewMaterialRequest, File }
+import org.corespring.container.client.hooks.Hooks.{ StatusMessage, R }
 import org.corespring.container.client.{ hooks => containerHooks }
 import org.corespring.mongo.json.services.MongoService
 import play.api.http.Status._
@@ -79,8 +79,8 @@ trait ItemSupportingMaterialHooks
     }
   }
 
-  override def getAsset(id: String, name: String, filename: String)(implicit h: RequestHeader): SimpleResult = {
-    assets.getAssetFromSupportingMaterial(id, name, filename)
+  override def getAsset(id: String, name: String, filename: String)(implicit h: RequestHeader): Future[Either[StatusMessage, FileDataStream]] = Future {
+    assets.getAsset(id, name, filename).leftMap(e => (BAD_REQUEST -> e)).toEither
   }
 
   private def getFiles(dbo: DBObject): Option[BasicDBList] = Try {

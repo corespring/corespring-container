@@ -1,5 +1,7 @@
 package org.corespring.container.client.hooks
 
+import java.io.InputStream
+
 import org.corespring.container.client.HasContext
 import org.corespring.container.client.hooks.Hooks.{ R, StatusMessage }
 import play.api.libs.json.{ JsArray, JsValue }
@@ -50,12 +52,19 @@ trait CatalogHooks extends LoadHook with GetAssetHook {
 
 trait EditorHooks extends LoadHook with AssetHooks
 
+case class FileDataStream(stream: InputStream, contentLength: Long, contentType: String, metadata: Map[String, String])
+
 trait SupportingMaterialHooks {
+  /**
+   * Return the resource json
+   * Note: once we refactor cs-api, we should have api data models available.
+   * So can use these instead of JsValue
+   */
   def create[F <: File](id: String, sm: CreateNewMaterialRequest[F])(implicit h: RequestHeader): R[JsValue]
   def delete(id: String, name: String)(implicit h: RequestHeader): R[JsValue]
   def addAsset(id: String, name: String, binary: Binary)(implicit h: RequestHeader): R[JsValue]
   def deleteAsset(id: String, name: String, filename: String)(implicit h: RequestHeader): R[JsValue]
-  def getAsset(id: String, name: String, filename: String)(implicit h: RequestHeader): SimpleResult
+  def getAsset(id: String, name: String, filename: String)(implicit h: RequestHeader): Future[Either[StatusMessage, FileDataStream]]
   def updateContent(id: String, name: String, filename: String, content: String)(implicit h: RequestHeader): R[JsValue]
 }
 

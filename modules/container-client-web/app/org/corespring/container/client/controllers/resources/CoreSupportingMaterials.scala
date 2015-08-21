@@ -5,6 +5,7 @@ import java.io.FileInputStream
 import org.apache.commons.io.IOUtils
 import org.corespring.container.client.controllers.resources.CoreSupportingMaterials.Errors
 import org.corespring.container.client.hooks._
+import play.api.libs.iteratee.Enumerator
 import play.api.libs.{ MimeTypes, Files }
 import play.api.libs.json.{ Json, JsValue }
 import play.api.mvc._
@@ -160,6 +161,21 @@ private[resources] trait CoreSupportingMaterials extends Controller {
   }
 
   def getAssetFromSupportingMaterial(id: String, name: String, filename: String) = Action.async { implicit request =>
-    Future(materialHooks.getAsset(id, name, filename))
+
+    materialHooks.getAsset(id, name, filename).map { e =>
+      e match {
+        case Left((code, msg)) => Status(code)(msg)
+        case Right(fd) => {
+          val objContent: Enumerator[Array[Byte]] = Enumerator.fromStream(fd.stream)
+          val headers = {
+            val main = Map(
+              CONTENT_TYPE -> (if (fd.contentType != null) fd.contentType else "application/octet-stream"),
+              CONTENT_LENGTH.toString -> fd.contentLength.toString)
+            main ++ fd.metadata.get(ETAG).map { ETAG -> _ }
+          }
+          SimpleResult(header = ResponseHeader(200, headers), body = objContent)
+        }
+      }
+    }
   }
 }

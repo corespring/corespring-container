@@ -5,8 +5,9 @@ import java.io.ByteArrayInputStream
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.s3.model.ObjectMetadata
 import org.corespring.amazon.s3.S3Service
-import org.corespring.container.client.hooks.Binary
+import org.corespring.container.client.hooks.{ FileDataStream, Binary }
 import play.api.Logger
+import play.api.http.HeaderNames
 import play.api.mvc.SimpleResult
 
 import scalaz.{ Failure, Success, Validation }
@@ -16,7 +17,7 @@ trait SupportingMaterialAssets[A] {
   def deleteSupportingMaterialBinary(id: A, material: String): Validation[String, String]
   def uploadAssetToSupportingMaterial(id: A, material: String, binary: Binary): Validation[String, String]
   def deleteAssetFromSupportingMaterial(id: A, material: String, name: String): Validation[String, String]
-  def getAssetFromSupportingMaterial(id: A, material: String, name: String): SimpleResult
+  def getAsset(id: A, material: String, name: String): Validation[String, FileDataStream]
 }
 
 class ContainerSupportingMaterialAssets[A](
@@ -47,9 +48,20 @@ class ContainerSupportingMaterialAssets[A](
     }
   }
 
-  override def getAssetFromSupportingMaterial(id: A, material: String, name: String): SimpleResult = {
+  override def getAsset(id: A, material: String, name: String): Validation[String, FileDataStream] = {
     val key = mkKey(id, Seq(material, name))
-    s3Service.download(bucket, key)
+    try {
+      val s3Object = s3Client.getObject(bucket, key)
+
+      Success(
+        FileDataStream(s3Object.getObjectContent,
+          s3Object.getObjectMetadata.getContentLength,
+          s3Object.getObjectMetadata.getContentType,
+          Map(HeaderNames.ETAG -> s3Object.getObjectMetadata.getETag)))
+    } catch {
+      case t: Throwable => Failure(s"Error thrown: ${t.getMessage}")
+    }
+
   }
 
   override def deleteAssetFromSupportingMaterial(id: A, material: String, name: String): Validation[String, String] = {
