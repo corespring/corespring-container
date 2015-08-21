@@ -1,5 +1,8 @@
  angular.module('corespring-editor.directives')
-   .controller('SmListController', ['$scope', '$timeout', function SmListController($scope, $timeout){
+  .constant('SM_LIST_EVENTS', {
+    ITEM_SELECTED: 'sm-list.item-selected' 
+  })
+  .controller('SmListController', ['$scope', '$timeout', 'SM_LIST_EVENTS',function SmListController($scope, $timeout, EVENTS){
       this.chooseItem = function(item) {
         $scope.chooseItem()(item);
         $scope.$broadcast('itemSelected', item);
@@ -20,11 +23,11 @@
           }.bind(this));
         }.bind(this));
 
-        $scope.$broadcast('sm-list.itemSelected', null);
+        $scope.$broadcast( EVENTS.ITEM_SELECTED, null);
 
       };
    }])
-   .directive('smList', ['$timeout', 'LogFactory', 'SmUtils', function($timeout, LogFactory, SmUtils) {
+   .directive('smList', ['$timeout', 'LogFactory', 'SmUtils', 'SM_LIST_EVENTS',function($timeout, LogFactory, SmUtils, EVENTS) {
 
      var logger = LogFactory.getLogger('sm-list');
 
@@ -51,7 +54,7 @@
 
       $scope.$watch('selectedItem', function(i){
         $timeout(function(){
-          $scope.$broadcast('itemSelected', i);
+          $scope.$broadcast(EVENTS.ITEM_SELECTED, i);
         });
       });
      }
@@ -90,10 +93,10 @@
        ].join('')
      };
    }])
-   .directive('smItem', [function() {
+   .directive('smItem', ['SM_LIST_EVENTS',function(EVENTS) {
      function link($scope, $element, $attrs, smListController) {
 
-       $scope.$on('sm-list.itemSelected', function($event, item) {
+       $scope.$on(EVENTS.ITEM_SELECTED, function($event, item) {
          $scope.selected = item === $scope.ngModel;
        });
 
