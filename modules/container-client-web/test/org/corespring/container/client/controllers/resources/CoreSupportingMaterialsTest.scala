@@ -1,8 +1,9 @@
 package org.corespring.container.client.controllers.resources
 
-import java.io.{ FileInputStream, File }
+import java.io.{ByteArrayInputStream, BufferedInputStream, FileInputStream, File}
+import java.nio.charset.Charset
 
-import org.apache.commons.io.IOUtils
+import org.apache.commons.io.{Charsets, IOUtils}
 import org.corespring.container.client.controllers.resources.CoreSupportingMaterials.Errors
 import org.corespring.container.client.hooks._
 import org.mockito.Matchers.{ eq => e }
@@ -269,7 +270,8 @@ class CoreSupportingMaterialsTest extends Specification with Mockito with PlaySp
 
   "getAssetFromSupportingMaterial" should {
     class getAsset extends testScope {
-      mockHooks.getAsset(any[String], any[String], any[String])(any[RequestHeader]) returns Ok("")
+      val fd = FileDataStream(new ByteArrayInputStream("".getBytes(Charsets.UTF_8)),0,"none", Map.empty)
+      mockHooks.getAsset(any[String], any[String], any[String])(any[RequestHeader]) returns Future(Right(fd))
     }
 
     "call hooks.getAsset" in new getAsset {
