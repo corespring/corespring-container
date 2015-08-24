@@ -5,6 +5,7 @@ describe('DevEditorRoot', function() {
   var ItemService = {
     load: jasmine.createSpy('load'),
     saveXhtml: jasmine.createSpy('saveXhtml'),
+    saveAll: jasmine.createSpy('saveAll'),
     saveCustomScoring: jasmine.createSpy('saveCustomScoring'),
     saveComponents: jasmine.createSpy('saveComponents')
   };
@@ -15,6 +16,7 @@ describe('DevEditorRoot', function() {
   };
 
   var $log = {
+    debug: jasmine.createSpy('debug'),
     error: jasmine.createSpy('error')
   };
 
@@ -66,6 +68,18 @@ describe('DevEditorRoot', function() {
   describe('initialization', function() {
     it('should call ItemService.load', function() {
       expect(ItemService.load).toHaveBeenCalledWith(scope.onItemLoaded, scope.onItemLoadError);
+    });
+
+    it('should listen to saveAll message', function() {
+      expect(Msgr.on).toHaveBeenCalledWith('saveAll', jasmine.any(Function));
+    });
+
+  });
+
+  describe('saveAll', function() {
+    it('on receiving saveAll message item should be saved via ItemService', function() {
+      scope.saveAll();
+      expect(ItemService.saveAll).toHaveBeenCalled();
     });
   });
 

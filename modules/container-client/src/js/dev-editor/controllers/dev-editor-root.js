@@ -28,6 +28,7 @@ angular.module('corespring-dev-editor.controllers')
       $scope.onItemLoaded = onItemLoaded;
       $scope.onItemLoadError = onItemLoadError;
       $scope.save = save;
+      $scope.saveAll = saveAll;
 
       $scope.$on('registerComponent', registerComponent);
 
@@ -45,6 +46,12 @@ angular.module('corespring-dev-editor.controllers')
         } else {
           ItemService.load($scope.onItemLoaded, $scope.onItemLoadError);
         }
+
+        Msgr.on('saveAll', function(data, done){
+          $log.debug('received \'saveAll\' event');
+          saveAll(done || function(){});
+        });
+
 
         function onInitialise(data) {
           $log.log('on initialise', data);
@@ -64,6 +71,14 @@ angular.module('corespring-dev-editor.controllers')
 
       function onItemLoadError(err) {
         window.alert("There was an error. Please try later. Thanks!");
+      }
+
+      function saveAll(done){
+        $log.debug('saveAll...');
+        ItemService.saveAll($scope.item, function() {
+          $log.debug('call \'saveAll\' callback...');
+          done(null, {saved: true});
+        });
       }
 
       function save() {
