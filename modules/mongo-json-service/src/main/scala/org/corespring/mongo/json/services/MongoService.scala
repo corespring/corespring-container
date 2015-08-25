@@ -108,21 +108,16 @@ class MongoService(val collection: MongoCollection) {
   def toDbo(json: JsValue): DBObject = MongoJson.parse(PlayJson.stringify(json)).asInstanceOf[DBObject]
   def toJson(dbo: DBObject) = PlayJson.parse(MongoJson.serialize(dbo)).as[JsObject]
 
-  def save(id: String, data: JsValue, upsert: Boolean = false): Option[JsValue] = withQuery(id) {
+  def save(id: String, data: JsValue): Option[JsValue] = withQuery(id) {
     q =>
       logger.debug(s"[save]: $id")
       logger.trace(s"[save]: ${PlayJson.stringify(data)}")
 
-      val setDbo = upsert match {
-        case true => toDbo(data) ++ DBObject("_id" -> id)
-        case false => {
-          val dbo = toDbo(data)
-          dbo.removeField("_id")
-        }
-      }
+      val setDbo = toDbo(data)
+      setDbo.removeField("_id")
       logger.trace(s"set dbo: $setDbo")
       val d = MongoDBObject("$set" -> setDbo)
-      val result = collection.update(q, d, upsert, false, WriteConcern.Safe)
+      val result = collection.update(q, d, true, false, WriteConcern.Safe)
 
       if (result.getLastError(WriteConcern.Safe).ok()) {
         Some(data.as[JsObject])
