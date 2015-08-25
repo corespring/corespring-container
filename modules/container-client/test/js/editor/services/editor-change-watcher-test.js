@@ -36,6 +36,11 @@ describe('editor-change-watcher', function(){
       watcherFn('a', 'a');
       expect(saveFn).not.toHaveBeenCalled();
     });
+
+    it('does nothing if the previous value was undefined (initialization)', function() {
+      watcherFn('a', undefined);
+      expect(saveFn).not.toHaveBeenCalled();
+    });
     
     it('calls $emit', function(){
       watcherFn('a', 'b');
