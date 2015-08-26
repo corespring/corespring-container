@@ -96,6 +96,13 @@ function EditorDefinition(element, options, errorCallback) {
         options.onItemChanged(data);
       });
     }
+
+    if(options && typeof(options.onProfileSaved) === 'function'){
+      instance.on('onProfileSaved', function(data) {
+        options.onProfileSaved(data);
+      });
+    }
+
   }
 
   var ok = launcher.init();

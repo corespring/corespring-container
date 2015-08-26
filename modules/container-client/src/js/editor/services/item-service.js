@@ -1,6 +1,6 @@
 angular.module('corespring-editor.services').service('ItemService', [
-  '$http', '$timeout', 'ItemUrls', 'LogFactory',
-  function($http, $timeout, ItemUrls, LogFactory) {
+  '$http', '$timeout', 'ItemUrls', 'LogFactory', 'Msgr',
+  function($http, $timeout, ItemUrls, LogFactory, Msgr) {
 
     /**
      * Service that contains xhr calls to the server.
@@ -84,7 +84,10 @@ angular.module('corespring-editor.services').service('ItemService', [
       }
 
       function saveProfile(data, onSuccess, onFailure) {
-        save('profile', data, onSuccess, onFailure);
+        save('profile', data, function() {
+          Msgr.send('profileSaved');
+          onSuccess.apply(this, arguments);
+        }, onFailure);
       }
 
       function saveSummaryFeedback(data, onSuccess, onFailure) {
