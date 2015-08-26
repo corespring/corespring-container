@@ -16,3 +16,5 @@ node_modules
 target
 Thumbs.db
 aws.zip
+
+modules/container-client/src/jade/partials/help-content/tools/tools-introduction.jade
