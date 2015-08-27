@@ -2,5 +2,6 @@
   span.score(ng-show="score")
    label Score: &nbsp;
    {{score.summary.percentage}}%&nbsp;&nbsp;
-  button.btn.btn-info(ng-click="submit()", ng-disabled="mode == 'evaluate'") Submit Answer 
-  button.btn.btn-danger(ng-click="reset()", ng-disabled="mode != 'evaluate'") Reset 
+  .control-buttons
+    button.btn-submit(ng-click="submit()", ng-disabled="mode == 'evaluate'") Submit Answer
+    button.btn-reset(ng-click="reset()", ng-disabled="mode != 'evaluate'") Reset
