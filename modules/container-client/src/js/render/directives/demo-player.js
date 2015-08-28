@@ -65,10 +65,11 @@
             return $scope.playerMode === 'gather';
           }
 
-          $scope.tryIt = function() {
+          $scope.tryOrGoBack = function() {
             ComponentRegister.reset();
-            setMode('gather');
+            setMode($scope.playerMode != 'instructor' ? 'instructor' : 'gather');
           };
+
 
           $scope.submitOrReset = function() {
             if (isGatherMode()) {
@@ -101,8 +102,12 @@
             }
           };
 
-          $scope.buttonLabel = function() {
-            return {gather: "Submit Answer", instructor: "Try It"}[$scope.playerMode] || "Reset";
+          $scope.tryButtonLabel = function() {
+            return {instructor: "Try It"}[$scope.playerMode] || "<";
+          };
+
+          $scope.submitButtonLabel = function() {
+            return {gather: "Submit Answer"}[$scope.playerMode] || "Reset";
           };
 
           $scope.buttonClass = function() {
@@ -123,18 +128,22 @@
           link: linkFn,
           template: [
             '<div>',
-            '  <a class="pull-right btn btn-primary" ng-click="tryIt()">',
-            '    Try It',
-            '  </a>',
             '  <corespring-isolate-player',
             '    player-mode="playerMode"',
             '    player-markup="xhtml"',
             '    player-item="item"',
             '    player-outcomes="outcome"',
             '    player-session="itemSession"></corespring-isolate-player>',
-            '  <a class="pull-right btn btn-{{buttonClass()}}" ng-click="submitOrReset()">',
-            '    {{buttonLabel()}}',
-            '  </a>',
+            '  <div style="text-align: center">',
+            '  <span ng-hide="playerMode == \'instructor\'">',
+            '    <button class="btn btn-submit" ng-click="submitOrReset()">',
+            '      {{submitButtonLabel()}}',
+            '    </button>',
+            '  </span>',
+            '  <button class="pull-right btn btn-submit" ng-click="tryOrGoBack()">',
+            '    {{tryButtonLabel()}}',
+            '  </button>',
+            '  </div>',
             '</div>'
           ].join("\n")
         };
