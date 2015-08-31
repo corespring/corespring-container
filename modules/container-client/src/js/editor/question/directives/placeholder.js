@@ -119,9 +119,9 @@ angular.module('corespring-editor.directives')
           setDataAndSession();
         }, true);
 
-        $scope.$watch('componentModel.clean', function(clean){
-          $scope.showIcon = $scope.config && $scope.config.icon && clean;
-        }); 
+        $scope.$watch('componentModel.clean', function(clean) {
+          $scope.showIcon = $scope.componentModel.isTool || ($scope.config && $scope.config.icon && clean);
+        });
 
         /* expected by the handler for registerPlaceholder */
         $scope.setComponent = function(componentModel) {

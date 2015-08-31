@@ -1,13 +1,13 @@
 .component-placeholder(
   data-component-id='{{id}}', 
-  ng-class="{\'show-icon\': showIcon}"
+  ng-class="{\'show-icon\': showIcon, \'tool-placeholder\': componentModel.isTool, \'no-edit\': componentModel.noEdit}"
   )
   //ng-if="configurable"
   .blocker
     .bg
     .content
     ul.edit-controls
-      li.edit-icon-button(tooltip='edit', tooltip-append-to-body='true', tooltip-placement='bottom')
+      li.edit-icon-button(tooltip='edit', tooltip-append-to-body='true', tooltip-placement='bottom' ng-hide="componentModel.noEdit")
         i.fa.fa-pencil(ng-click='editNode($event)')
       li.delete-icon-button(tooltip='delete', tooltip-append-to-body='true', tooltip-placement='bottom')
         i.fa.fa-trash-o(ng-click='deleteNode($event)')

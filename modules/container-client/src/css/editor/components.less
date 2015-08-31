@@ -97,6 +97,47 @@
       visibility: hidden;
     }
   }
+
+  &.tool-placeholder {
+    height: 30px;
+    width: auto;
+    min-width: 75px;
+    vertical-align: middle;
+    display: inline-block;
+    &.no-edit {
+      min-width: 55px;
+      .icon-holder {
+        width: 55px;
+      }
+    }
+    .blocker {
+      .edit-controls {
+        width: auto;
+        right: 0;
+        top: 0;
+        background-color: transparent;
+        padding: 0;
+        li {
+          margin-left: 3px;
+          margin-right: 3px;
+          i {
+            font-size: 15px;
+          }
+        }
+      }
+      .holder {
+        display: none;
+      }
+    }
+    .icon-holder {
+      height: 30px;
+      width: 75px;
+      background-position: 6% 50%;
+      .title {
+        display: none;
+      }
+    }    
+  }
 }
 
 .corespring-inline-choice {

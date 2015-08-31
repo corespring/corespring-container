@@ -117,7 +117,7 @@ class MongoService(val collection: MongoCollection) {
       setDbo.removeField("_id")
       logger.trace(s"set dbo: $setDbo")
       val d = MongoDBObject("$set" -> setDbo)
-      val result = collection.update(q, d, false, false, WriteConcern.Safe)
+      val result = collection.update(q, d, true, false, WriteConcern.Safe)
 
       if (result.getLastError(WriteConcern.Safe).ok()) {
         Some(data.as[JsObject])
