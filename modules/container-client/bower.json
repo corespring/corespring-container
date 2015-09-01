@@ -35,7 +35,7 @@
     "select2": "~3.4.5",
     "spin.js": "~2.0.0",
     "undo.js": "git@github.com:jzaefferer/undo.git",
-    "wiggi-wiz": "git@github.com:corespring/wiggi-wiz.git#0.1.62",
+    "wiggi-wiz": "git@github.com:corespring/wiggi-wiz.git#0.1.66",
     "jquery-mockjax": "~1.6.2"
   },
   "devDependencies": {
