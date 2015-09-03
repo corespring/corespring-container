@@ -14,7 +14,7 @@ angular.module('corespring-editor.directives')
 
         $scope.isNumber= function (n) {
           return !isNaN(parseFloat(n)) && isFinite(n);
-        }
+        };
       }
 
     return {
