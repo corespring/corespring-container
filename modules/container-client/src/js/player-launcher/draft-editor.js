@@ -75,6 +75,10 @@ function EditorDefinition(element, options, errorCallback) {
       initialData.showSaveMessage = options.showSaveMessage;
     }
 
+    if(options.hideSaveButton){
+      initialData.hideSaveButton = options.hideSaveButton;
+    }
+
     if(options.profileConfig){
       initialData.profileConfig = options.profileConfig;
     }
