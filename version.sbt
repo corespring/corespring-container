@@ -1,1 +1,1 @@
-version in ThisBuild := "0.45.0-SNAPSHOT-PE-358-saving-cleanup"
+version in ThisBuild := "0.46.0-SNAPSHOT"

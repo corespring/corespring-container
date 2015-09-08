@@ -93,7 +93,7 @@ describe('draft-editor', function() {
               expect(mockLauncher.loadInstance).toHaveBeenCalledWith({
                   method: 'GET',
                   url: '/url',
-                  hash: '/supporting-materials/0'
+                  hash: '/supporting-materials'
                 },
                 undefined, {},
                 jasmine.any(Function));

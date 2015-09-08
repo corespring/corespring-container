@@ -40,17 +40,7 @@ block after-main-script
         states: {
           question : mkEditorState('question'),
           profile : mkEditorState('profile'),
-          'supporting-materials' : {
-            url: '/supporting-materials/{index}',
-            params: {
-              index: { value: '0' }
-            },
-            views: {
-              main: {
-                templateUrl: '/templates/supporting-materials'
-              }
-            }
-          }
+          'supporting-materials' : mkEditorState('supporting-materials')
         }
       };
 

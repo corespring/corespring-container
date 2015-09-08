@@ -1,153 +1,122 @@
-(function() {
-  function SupportingMaterialsService($sce, $http) {
+angular.module('corespring-common.supporting-materials.services')
+  .service('SupportingMaterialsService', [
+    '$http',
+    'MultipartFileUploader',
+    'LogFactory',
+    'SupportingMaterialUrls',
+    'SmUtils',
+    function($http, MultipartFileUploader, LogFactory, Urls, SmUtils) {
 
-    var self = this;
+      var logger = LogFactory.getLogger('supporting-materials-service');
 
-    function getUrl(supportingMaterials, index) {
-      if (supportingMaterials) {
-        var material = supportingMaterials[index];
-        var file = self.getSupportingMaterialFile(supportingMaterials, index);
-        if (file) {
-          return 'materials/' + material.name + '/' + file.name;
-        } else {
-          return undefined;
+      function SupportingMaterialsService() {
+
+        function addParams(url){
+          return SmUtils.addQueryParamsIfPresent(url);
         }
-      } else {
-        return undefined;
-      }
-    }
 
-    function getName(supportingMaterials, index) {
-      if (supportingMaterials) {
-        var material = supportingMaterials[index];
-        var file = self.getSupportingMaterialFile(supportingMaterials, index);
-        if (file) {
-          return material.name;
-        } else {
-          return undefined;
-        }
-      } else {
-        return undefined;
-      }
-    }
+        this.updateContent = function(materialName, filename, content, onSuccess, onFailure){
+          var call = Urls.updateContent;
 
-    function lengthInUtf8Bytes(str) {
-      var m;
-      if (str) {
-        // Matches only the 10.. bytes that are non-initial characters in a multi-byte sequence.
-        m = encodeURIComponent(str).match(/%[89ABab]/g);
-        return str.length + (m ? m.length : 0);
-      } else {
-        return 0;
-      }
-    }
+          var url = addParams(call.url
+           .replace(':name', materialName)
+           .replace(':filename', filename));
 
-    this.isDefault = function(file) {
-      return file && file.isMain;
-    };
+          var req = {
+            method: call.method.toUpperCase(),
+            url: url,
+            headers: {
+             'Content-Type': 'text/plain; charset=utf-8' 
+            },
+            data: content
+          };
 
-    this.validateMetadata = function(metadata, log) {
-      log = log || function() {};
-      if (_.isEmpty(metadata.title)) {
-        log("Please enter a title for the supporting material.");
-        return false;
-      } else if (_.isEmpty(metadata.materialType)) {
-        log("Please select a type for the supporting material.");
-        return false;
-      } else {
-        return true;
-      }
-    };
+          $http(req)
+            .success(onSuccess)
+            .error(onFailure);
+        };
 
-    this.getSupportingMaterialFile = function(supportingMaterials, index) {
-      if (supportingMaterials && supportingMaterials[index]) {
-        var fileIndex = _.findIndex(supportingMaterials[index].files, this.isDefault);
-        return supportingMaterials[index].files[fileIndex];
-      } else {
-        return undefined;
-      }
-    };
+        this.getFileSizeInKB = function(m, file, success, error){
 
-    /**
-     * Returns the file size of the supporting material for item at index in KB to the provided callback.
-     */
-    this.getKBFileSize = function(supportingMaterials, index, callback) {
-      var url;
-      var supportingMaterial;
-      if (supportingMaterials) {
-        supportingMaterial = self.getSupportingMaterialFile(supportingMaterials, index);
-        if (supportingMaterial && supportingMaterial.contentType === 'text/html') {
-          callback(lengthInUtf8Bytes(supportingMaterial.content) / 1024);
-        } else {
-          url = getUrl(supportingMaterials, index);
-          $http({
-            method: 'GET',
-            url: url
-          }).success(function(data, status, headers) {
-            callback(headers('content-length') / 1024);
+          var url =  this.getBinaryUrl(m, file);
+
+          $http.get(url)
+            .success(function(data, status, headers){
+              success(headers('content-length')/1024);
+            })
+            .error(function(err){
+              logger.warn(err);
+              error();
+            });
+        };
+
+        this.getBinaryUrl = function(m, file){
+          return SmUtils.getBinaryUrl(m, file);
+        };
+
+        this.getAssetUrl = function(materialName, name) {
+          return this.getBinaryUrl({name: materialName}, {name: name});
+        };
+        
+        this.deleteAsset = function(materialName, name) {
+          var call = Urls.deleteAsset;
+          var url = addParams(call.url.replace(':name', materialName).replace(':filename', name));
+          $http[call.method](url);
+        };
+
+        this.addAsset = function(materialName, file, onComplete, onProgress){
+          var call = Urls.addAsset;
+          var url = addParams(call.url.replace(':name', materialName));
+          MultipartFileUploader.upload(url, file, {}, function(update){
+            onComplete(null, file.name);
+          }, function(err){
+            logger.error(err);
+          });
+        };
+
+        this.create = function(m, onSuccess, onFailure) {
+          if (m.file) {
+            uploadFile(m, onSuccess, onFailure);
+          } else {
+            var c = Urls.create;
+            var url = addParams(c.url);
+            m.html = '<div>' + m.name + '</div>';
+            $http[c.method](url, m)
+              .success(onSuccess)
+              .error(onFailure || function() {
+                logger.error(arguments);
+              });
+          }
+        };
+
+        function uploadFile(m, onSuccess, onFailure) {
+          var url = Urls.createFromFile.url;
+          url = addParams(url);
+
+          MultipartFileUploader.upload(url, m.file, {
+            name: m.name,
+            materialType: m.materialType
+          }, function(newMaterial) {
+            onSuccess(newMaterial);
+          }, function(err) {
+            logger.error(err);
+            onFailure(err);
           });
         }
-      } else {
-        callback(undefined);
+
+        this.delete = function(m, onSuccess, onFailure){
+          var call = Urls.delete;
+          var url = addParams(call.url);
+          url = url.replace(':name', m.name);
+
+          logger.debug('url: ', url);
+          
+          $http[call.method](url)
+            .success(onSuccess)
+            .error(onFailure);
+        };
       }
-    };
 
-    this.getSupportingUrl = function(supportingMaterials, index) {
-      return $sce.trustAsResourceUrl(getUrl(supportingMaterials, index));
-    };
-
-    this.getSupportingName = function(supportingMaterials,index){
-      return $sce.trustAsResourceUrl(getName(supportingMaterials, index));
-    };
-
-
-    this.getContentType = function(supportingMaterials, index) {
-      var file = self.getSupportingMaterialFile(supportingMaterials, index);
-      return file ? file.contentType : undefined;
-    };
-
-    this.getContent = function(supportingMaterials, index) {
-      var file = self.getSupportingMaterialFile(supportingMaterials, index);
-      return file ? file.content : undefined;
-    };
-
-    /**
-     * Return true if we should display a preview for the supporting material.
-     */
-    this.previewable = function(supportingMaterials, index) {
-      return true;
-    };
-
-    function isContentType(supportingMaterials, index, contentType) {
-      var supportingMaterial = self.getSupportingMaterial(supportingMaterials, index);
-      return (supportingMaterial && contentType) ?
-        supportingMaterial.contentType === contentType : false;
+      return new SupportingMaterialsService();
     }
-
-    this.getSupportingMaterialsByGroups = function(supportingMaterials) {
-      var groupedSupportingMaterials = _.groupBy(supportingMaterials, "materialType");
-      var result = [];
-      var insertSupportingMaterialsForType = function(supMat) {
-        var index = _.indexOf(supportingMaterials, supMat);
-        result.push({label: supMat.name, type: "data", index: index});
-      };
-      for (var key in groupedSupportingMaterials) {
-        if (key !== "undefined") {
-          result.push({label: key, type: "header"});
-        }
-        _.each(groupedSupportingMaterials[key], insertSupportingMaterialsForType);
-        result.push({type: "divider"});
-      }
-      return _.initial(result);
-    };
-
-  }
-
-  angular.module('corespring-common.supporting-materials.services')
-    .service('SupportingMaterialsService', [
-      '$sce',
-      '$http',
-      SupportingMaterialsService
-    ]);
-
-})();
+  ]);

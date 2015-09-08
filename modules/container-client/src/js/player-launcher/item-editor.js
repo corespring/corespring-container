@@ -66,7 +66,7 @@ function EditorDefinition(element, options, errorCallback) {
     }
 
     if ('supporting-materials' === tab) {
-      call.hash = '/supporting-materials/0';
+      call.hash = '/supporting-materials';
     }
 
     var initialData = {};
