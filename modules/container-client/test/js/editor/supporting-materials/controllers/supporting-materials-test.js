@@ -51,8 +51,19 @@ describe('SupportingMaterials', function() {
   beforeEach(inject(function($rootScope, $controller, ImageUtils) {
     scope = $rootScope.$new();
     $controller('SupportingMaterials', {$scope: scope});
+    spyOn(scope, '$emit');
     imageUtils = ImageUtils;
   }));
+  
+
+  function assertItemChangedEmitted(before){
+    return function(){
+      if(before){
+        before();
+      }
+      expect(scope.$emit).toHaveBeenCalledWith('itemChanged', {partChanged: 'supporting-materials'});
+    };
+  }
 
   describe('initialization', function() {
 
@@ -120,7 +131,12 @@ describe('SupportingMaterials', function() {
       expect(scope.selectedMaterial).toEqual({name: 'new-material'});
     });
 
+    it('should call scope.$emit with itemChanged', assertItemChangedEmitted(function(){
+      callback({source: 'html'});
+    }));
+
   });
+
 
   describe('deleteMaterial', function() {
     
@@ -182,6 +198,8 @@ describe('SupportingMaterials', function() {
       it('should call the done callback', function(){
         expect(done).toHaveBeenCalled();
       });
+    
+      it('call scope.$emit with itemChanged', assertItemChangedEmitted());
     });
   });
 
@@ -221,7 +239,8 @@ describe('SupportingMaterials', function() {
           if(scope.isBinary){
             expect(scope.binaryPreviewUrl).toEqual('url');
           } else {
-
+            //just to keep jasmine happy we return a successful assertion
+            expect(true).toBe(true); 
           }
         }); 
       };
@@ -229,6 +248,42 @@ describe('SupportingMaterials', function() {
 
     describe('html', describeSelectedMaterial({name: 'index.html', contentType: 'text/html'})); 
     describe('binary', describeSelectedMaterial({name: 'index.png', contentType: 'image/png'})); 
+  });
+
+
+  describe('$watch(mainFile.content)', function(){
+    var onSuccess, onError, file;
+    beforeEach(function(){
+      supportingMaterialsService.updateContent.and.callFake(function(materialName,
+        filename, content, success, error){
+        onSuccess = success;
+        onError = error;
+      });
+
+      file = {name: 'index.html', contentType: 'text/html', content: 'hi', isMain: true};
+      scope.selectedMaterial = { name: 'material', files:  [file] };
+      scope.$apply();
+    });
+    
+    it('content with no change doesn\'t call SupportingMaterialsService.updateContent', function(){
+      scope.mainFile.content = 'hi';
+      scope.$apply();
+      expect(supportingMaterialsService.updateContent).not.toHaveBeenCalled();
+    });
+
+    it('content change calls SupportingMaterialsService.updateContent', function(){
+      scope.mainFile.content = 'hi!';
+      scope.$apply();
+      expect(supportingMaterialsService.updateContent)
+        .toHaveBeenCalledWith('material', 'index.html', 'hi!', jasmine.any(Function), jasmine.any(Function));
+    });
+    
+    it('success callback calls $emit with itemChanged', assertItemChangedEmitted(function(){
+      scope.mainFile.content = 'hi!';
+      scope.$apply();
+      onSuccess();
+    }));
+
   });
 
 
@@ -241,9 +296,13 @@ describe('SupportingMaterials', function() {
     describe('addFile', function(){
 
       var onComplete,onProgress;
-      
+      var onCompleteCallback; 
       beforeEach(function(){
-        supportingMaterialsService.addAsset = jasmine.createSpy('addAsset');
+        supportingMaterialsService.addAsset = jasmine.createSpy('addAsset')
+          .and
+          .callFake(function(materialName, file , onComplete, onProgress){
+            onCompleteCallback = onComplete;
+        });
         onComplete = jasmine.createSpy('onComplete');
         onProgress = jasmine.createSpy('onProgress');
       });
@@ -259,6 +318,11 @@ describe('SupportingMaterials', function() {
         scope.imageService.addFile({size: 10}, onComplete, onProgress);
         expect(supportingMaterialsService.addAsset).toHaveBeenCalledWith('material', {size:10}, jasmine.any(Function), jasmine.any(Function));
       });
+
+      it('calls scope.$emit with itemChanged', assertItemChangedEmitted(function(){
+        scope.imageService.addFile({size: 10}, onComplete, onProgress);
+        onCompleteCallback();
+      }));
 
     });
 

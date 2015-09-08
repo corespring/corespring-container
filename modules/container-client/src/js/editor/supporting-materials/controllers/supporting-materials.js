@@ -44,7 +44,10 @@ angular.module('corespring-editor.controllers')
             SupportingMaterialsService.addAsset(
               $scope.selectedMaterial.name,
               file, 
-              onComplete, 
+              function(err, data){
+                emitItemChanged();
+                onComplete(err, data);
+              },
               onProgress);
           },
           changeSrcPath: function(src){
@@ -69,6 +72,7 @@ angular.module('corespring-editor.controllers')
             logger.info('delete complete');
             $scope.selectedMaterial = null;
             $scope.binaryPreviewUrl = null;
+            emitItemChanged(); 
             done();
           }
 
@@ -97,6 +101,10 @@ angular.module('corespring-editor.controllers')
           });
         };
 
+        function emitItemChanged(){
+          $scope.$emit('itemChanged', {partChanged: 'supporting-materials'});
+        }
+
         function isMainHtml(main){
           if(!main){
             return false;
@@ -123,9 +131,10 @@ angular.module('corespring-editor.controllers')
         });
 
         var saveHtmlDebounced = editorDebounce(function(markup){
-          SupportingMaterialsService.updateContent($scope.selectedMaterial.name, $scope.mainFile.name, markup, 
+          SupportingMaterialsService.updateContent($scope.selectedMaterial.name,
+            $scope.mainFile.name, markup, 
             function(){
-              console.log('update content ok');
+              emitItemChanged(); 
             }, 
             function(){
               console.error('update content not ok', arguments);
@@ -133,7 +142,7 @@ angular.module('corespring-editor.controllers')
         }, 400, true);
 
         $scope.$watch('mainFile.content', function(markup, oldMarkup){
-          if($scope.selectedMaterial && $scope.mainFile && markup && oldMarkup){
+          if($scope.selectedMaterial && $scope.mainFile && markup && oldMarkup && markup !== oldMarkup){
             saveHtmlDebounced(markup);
           }
         });
@@ -155,6 +164,7 @@ angular.module('corespring-editor.controllers')
             function onCreate(newSupportingMaterial){
               $scope.item.supportingMaterials.push(newSupportingMaterial);
               $scope.chooseMaterial(newSupportingMaterial);
+              emitItemChanged(); 
             }
 
             function onError(err){
