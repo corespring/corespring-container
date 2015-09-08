@@ -3,19 +3,10 @@ describe('EditTitlePopupController', function() {
   var scope, element;
   var title = "This is the title";
 
-  var $modalInstance = {
-    close: jasmine.createSpy('close'),
-    dismiss: jasmine.createSpy('dismiss'),
-    opened: {
-      then: jasmine.createSpy('opened.then').and.callFake(function(cb){
-        cb();
-      })
-    }
-  };
+  var $modalInstance = new org.corespring.mocks.editor.$modalInstance(); 
 
   afterEach(function() {
-    $modalInstance.close.calls.reset();
-    $modalInstance.dismiss.calls.reset();
+    $modalInstance.reset();
   });
 
   beforeEach(angular.mock.module('corespring-editor.controllers'));

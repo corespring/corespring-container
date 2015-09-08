@@ -85,7 +85,7 @@ describe('item-editor', function(){
       var editor = new Editor('element', {selectedTab: 'supporting-materials', itemId: 'itemId'}, onError);
       expect(mockLauncher.loadInstance)
         .toHaveBeenCalledWith(
-          {method: 'GET', url: 'itemEditor.editor', hash: '/supporting-materials/0'},
+          {method: 'GET', url: 'itemEditor.editor', hash: '/supporting-materials'},
            undefined, jasmine.any(Object), jasmine.any(Function));
     });
 

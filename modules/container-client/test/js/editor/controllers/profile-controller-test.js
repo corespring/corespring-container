@@ -128,6 +128,7 @@ describe('profile controller', function() {
     mockLocation,
     mockProfileFormatter,
     mockStandardQueryCreator,
+    mockEditorChangeWatcher,
     imagePath = '/image-path';
 
   beforeEach(function() {
@@ -138,7 +139,15 @@ describe('profile controller', function() {
     mockLocation = new MockLocation();
     mockProfileFormatter = new MockProfileFormatter();
     mockStandardQueryCreator = new MockStandardQueryCreator();
-
+    mockEditorChangeWatcher = {
+      makeWatcher: jasmine.createSpy('makeWatcher').and.callFake(function(name, fn, scope){
+        return function(n,o){
+          if(n && n !== o){
+            fn(n);
+          }
+        };
+      })
+    };
 
     module(function($provide) {
       $provide.value('$location', mockLocation);
@@ -151,9 +160,8 @@ describe('profile controller', function() {
       $provide.value('ItemService', mockItemService);
       $provide.value('ProfileFormatter', mockProfileFormatter);
       $provide.value('StandardQueryCreator', mockStandardQueryCreator);
-      $provide.value('throttle', _.identity);
       $provide.constant('STATIC_PATHS', {assets: imagePath});
-      $provide.value('debounce', org.corespring.mocks.editor.debounce);
+      $provide.value('EditorChangeWatcher', mockEditorChangeWatcher);
     });
 
   });

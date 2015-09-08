@@ -2,19 +2,13 @@ angular.module('corespring-common.directives')
   .directive('questionInformation', [
     '$log',
     '$sce',
-    'ComponentService',
-    'DataQueryService',
     'MathJaxService',
-    'ProfileFormatter',
-    'SupportingMaterialsService',
+    'SmUtils',
     function(
       $log,
       $sce,
-      ComponentService,
-      DataQueryService,
       MathJaxService,
-      ProfileFormatter,
-      SupportingMaterialsService
+      SmUtils
     ) {
       return {
         restrict: 'EA',
@@ -30,63 +24,97 @@ angular.module('corespring-common.directives')
 
         scope.playerMode = 'gather';
 
-        scope.availableTabs = {
-          question: true,
-          profile: true,
-          supportingMaterial: true
-        };
+        var defaultTabs = ['question', 'profile', 'supportingMaterial'];
+
         scope.activeTab = 'question';
         scope.selectedMaterial = undefined;
 
+        function availableTabs(){
+          return _(scope.tabs).keys().filter(function(k){
+            return scope.tabs[k];
+          }).value();
+        }
+
+        function availableTabCount(){
+          return availableTabs().length;
+        }
+
+        function shouldHideNav(){
+          var count = availableTabCount();
+          
+          if(count > 1){
+            return false;
+          }
+
+          if(count === 1 && availableTabs()[0] === 'supportingMaterial'){
+            return false;
+          }
+
+          return true;
+        }
+
+        function setActiveTab(tab) {
+          if(scope.tabs && scope.tabs[tab]){
+            return tab;
+          }
+
+          return _.find(_.pull(defaultTabs, tab), function(t) {
+            return scope.tabs[t];
+          });
+        }
+
+        function selectFirstSupportingMaterial(){
+          if(scope.item && 
+            scope.item.supportingMaterials && 
+            scope.item.supportingMaterials.length > 0){
+            scope.selectSupportingMaterial(scope.item.supportingMaterials[0]);
+          }
+        }
+
+        function updateNav(){
+          if(!scope.tabs){
+            return;
+          }
+
+          scope.activeTab = setActiveTab(scope.activeTab);
+          scope.hideNav = shouldHideNav();
+          
+          if(scope.activeTab === 'supportingMaterial'){
+            selectFirstSupportingMaterial();
+          }
+        }
+
         scope.$watch('item', function onChangeItem(item) {
           if (item) {
-            getSupportingMaterials(item);
-            if (isShowingSupportingMaterials()) {
-              scope.selectSupportingMaterial(0);
-            }
-            showNavIfMoreThanOneSupportingMaterialsAvailable();
+            scope.sections = SmUtils.group(item.supportingMaterials, 'materialType');
+            updateNav();
           }
         });
 
         scope.$watch('tabs', function onChangeTabs(tabs) {
-          if (tabs) {
-            assignAvailableTabs(tabs);
-            hideNav(numberOfAvailableTabs(tabs) === 1);
-            showNavIfMoreThanOneSupportingMaterialsAvailable();
-            activateFirstAvailableTabIfCurrentTabDoesNotExist();
-          }
-        });
+          updateNav();
+        }, true);
 
         scope.selectTab = function(tab) {
           scope.activeTab = tab;
           scope.selectedMaterial = undefined;
         };
 
-        scope.selectSupportingMaterial = function(smIndex) {
+        scope.selectSupportingMaterial = function(material) {
           scope.activeTab = 'supportingMaterial';
-          scope.selectedMaterial = makeSelectedMaterial(smIndex);
+          scope.selectedMaterial = material;
+          scope.mainFile = prepareMainFile(material);
+          scope.binaryUrl = SmUtils.getBinaryUrl(material, scope.mainFile);
           MathJaxService.parseDomForMath(100, $element[0]);
         };
-
-        function makeSelectedMaterial(smIndex){
-          var item = {
-            index: smIndex,
-            name: SupportingMaterialsService.getSupportingName(scope.item.supportingMaterials, smIndex),
-            url: SupportingMaterialsService.getSupportingUrl(scope.item.supportingMaterials, smIndex),
-            content: SupportingMaterialsService.getContent(scope.item.supportingMaterials, smIndex),
-            contentType: SupportingMaterialsService.getContentType(scope.item.supportingMaterials, smIndex)
-          };
-          item.content = addPathToImageUrls(item.content, 'materials/' + item.name + '/');
-          return item;
-        }
-
-        function addPathToImageUrls(html, path) {
+        
+        function addPathToImageUrls(html, process) {
           var $html = $('<span>' + html + '</span>');
           var $images = $html.find('img');
           if($images.length > 0) {
             $images.each(function (index, img) {
               var src = $(img).attr('src').split('/').pop();
-              $(img).attr('src', path + src);
+              $(img).attr('src', process(src));
             });
             return $html.html();
           } else {
@@ -94,46 +122,20 @@ angular.module('corespring-common.directives')
           }
         }
 
-        function hideNav(hide) {
-          scope.hideNav = hide;
-        }
+        function prepareMainFile(m){
+          var main = SmUtils.mainFile(m);
 
-        function getSupportingMaterials(item) {
-          scope.supportingMaterials = SupportingMaterialsService.getSupportingMaterialsByGroups(item.supportingMaterials);
-        }
-
-        function isShowingSupportingMaterials() {
-          return scope.activeTab === 'supportingMaterial';
-        }
-
-        function showNavIfMoreThanOneSupportingMaterialsAvailable() {
-          if (scope.availableTabs && scope.availableTabs.supportingMaterial && scope.item.supportingMaterials && scope.item.supportingMaterials.length > 1) {
-            hideNav(false);
-          }
-        }
-
-        function assignAvailableTabs(tabs) {
-          scope.availableTabs = tabs;
-        }
-
-        function numberOfAvailableTabs(tabs) {
-          var tabCount = 0;
-          for (var tabKey in tabs) {
-            if (tabs[tabKey]) {
-              tabCount++;
-            }
-          }
-          return tabCount;
-        }
-
-        function activateFirstAvailableTabIfCurrentTabDoesNotExist() {
-          if (!scope.availableTabs[scope.activeTab]) {
-            var orderedTabs = ['question', 'profile', 'supportingMaterial'];
-            scope.activeTab = _.find(orderedTabs, function(t) {
-              return scope.availableTabs[t];
+          if(main && main.contentType === 'text/html'){
+            var clone = _.clone(main);
+            clone.content = addPathToImageUrls(main.content, function(asset){
+              return SmUtils.getBinaryUrl(m, {name: asset});
             });
+            return clone;
+          } else {
+            return main;
           }
         }
+       
       }
   }
 ]);
