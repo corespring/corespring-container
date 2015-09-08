@@ -48,8 +48,8 @@ describe('ClientSidePreview', function() {
       allowEmptyResponses: false
     };
 
-    it('should set playerMode to gather', function() {
-      expect(scope.playerMode).toEqual('gather');
+    it('should set playerMode to disable', function() {
+      expect(scope.playerMode).toEqual('disable');
     });
 
     it('should set playerSettings to default', function() {
@@ -77,11 +77,12 @@ describe('ClientSidePreview', function() {
 
     describe('gather mode', function() {
       beforeEach(function() {
-        scope.mode = 'gather';
+        scope.playerMode = 'gather';
         scope.$broadcast('playerControlPanel.submit');
       });
 
       it('should submit session', function() {
+        expect(scope.playerMode).toEqual('gather');
         expect(mockSubmitSession).toHaveBeenCalledWith(
           {components: componentSessions}, jasmine.any(Function), jasmine.any(Function));
       });
@@ -160,11 +161,12 @@ describe('ClientSidePreview', function() {
 
     describe('gather mode', function() {
       beforeEach(function() {
-        scope.mode = 'gather';
+        scope.playerMode = 'gather';
         scope.$broadcast('editor.click');
       });
 
       it('should not call ComponentData.reset', function() {
+        expect(scope.playerMode).toEqual('gather');
         expect(ComponentData.reset).not.toHaveBeenCalled();
       });
     });
@@ -211,4 +213,17 @@ describe('ClientSidePreview', function() {
 
   });
 
+  describe('editor.added event', function() {
+
+    describe('gather mode', function() {
+      beforeEach(function() {
+        scope.mode = 'gather';
+        scope.$broadcast('editor.added');
+      });
+      it('should set mode to gather', function() {
+        expect(scope.mode).toEqual('gather');
+        expect(ComponentData.setMode).toHaveBeenCalledWith('gather');
+      });
+    });
+  });
 });

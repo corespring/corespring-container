@@ -123,6 +123,7 @@ angular.module('corespring-editor.controllers')
       };
 
       $scope.$on('itemAdded', function(event, $node) {
+        $scope.$broadcast('editor.added');
         // This ends up in some weird race condition if we don't wrap it in a $timeout
         $timeout(function() {
           $scope.getWiggiWizElement().scope().focusCaretAtEnd();
