@@ -5,6 +5,7 @@ import java.io.FileInputStream
 import org.apache.commons.io.IOUtils
 import org.corespring.container.client.controllers.resources.CoreSupportingMaterials.Errors
 import org.corespring.container.client.hooks._
+import play.api.Logger
 import play.api.libs.iteratee.Enumerator
 import play.api.libs.{ MimeTypes, Files }
 import play.api.libs.json.{ Json, JsValue }
@@ -29,6 +30,7 @@ private[resources] object CoreSupportingMaterials {
     def cantFindParameter(name: String) = Error(BAD_REQUEST, s"Can't find parameter $name")
     def mimeTypeNotAcceptable(mimeType: String, types: Seq[String]) = Error(BAD_REQUEST, s"mimeType: $mimeType not acceptable. must be one of the following mimeTypes: ${types.mkString(",")}")
     def cantDetectMimeType(name: String, contentType: Option[String]) = Error(BAD_REQUEST, s"can't detect mimeType for file: $name, contentType set to: ${contentType.getOrElse("nothing")}")
+    def throwableError(t: Throwable) = Error(INTERNAL_SERVER_ERROR, s"A server side error occured: ${t.getMessage}")
   }
 }
 
@@ -36,6 +38,8 @@ private[resources] trait CoreSupportingMaterials extends Controller {
 
   type E = CoreSupportingMaterials.Error
   import Errors._
+
+  private val logger = Logger(classOf[CoreSupportingMaterials])
 
   implicit def ec: ExecutionContext
 
@@ -130,8 +134,13 @@ private[resources] trait CoreSupportingMaterials extends Controller {
       file <- form.file("file").toSuccess(cantFindParameter("file"))
       mimeType <- file.contentType.orElse(MimeTypes.forFileName(file.filename)).toSuccess(cantDetectMimeType(file.filename, file.contentType))
       acceptable <- accept(types)(mimeType)
+      stream <- Validation.fromTryCatch(new FileInputStream(file.ref.file)).leftMap { t =>
+        if (logger.isDebugEnabled) {
+          t.printStackTrace
+        }
+        throwableError(t)
+      }
     } yield {
-      val stream = new FileInputStream(file.ref.file)
       val bytes = IOUtils.toByteArray(stream)
       IOUtils.closeQuietly(stream)
       Binary(file.filename, mimeType, bytes)

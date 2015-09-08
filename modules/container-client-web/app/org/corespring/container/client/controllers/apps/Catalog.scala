@@ -38,13 +38,13 @@ trait Catalog
     import org.corespring.container.client.controllers.resources.routes
 
     val smEndpoints = SupportingMaterialsEndpoints(
-      routes.Item.createSupportingMaterial(itemId),
-      routes.Item.createSupportingMaterialFromFile(itemId),
-      routes.Item.deleteSupportingMaterial(itemId, ":name"),
-      routes.Item.addAssetToSupportingMaterial(itemId, ":name"),
-      routes.Item.deleteAssetFromSupportingMaterial(itemId, ":name", ":filename"),
-      routes.Item.getAssetFromSupportingMaterial(itemId, ":name", ":filename"),
-      routes.Item.updateSupportingMaterialContent(itemId, ":name", ":filename"))
+      create = routes.Item.createSupportingMaterial(itemId),
+      createFromFile = routes.Item.createSupportingMaterialFromFile(itemId),
+      delete = routes.Item.deleteSupportingMaterial(itemId, ":name"),
+      addAsset = routes.Item.addAssetToSupportingMaterial(itemId, ":name"),
+      deleteAsset = routes.Item.deleteAssetFromSupportingMaterial(itemId, ":name", ":filename"),
+      getAsset = routes.Item.getAssetFromSupportingMaterial(itemId, ":name", ":filename"),
+      updateContent = routes.Item.updateSupportingMaterialContent(itemId, ":name", ":filename"))
 
     CatalogServices("catalog.services", Item.load(itemId), JsArray(componentJson), smEndpoints).toString
   }

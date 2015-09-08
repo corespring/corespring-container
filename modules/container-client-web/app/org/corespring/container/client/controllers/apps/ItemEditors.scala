@@ -12,13 +12,13 @@ trait BaseItemEditor extends CoreEditor {
   override def servicesJs(itemId: String, components: JsArray, widgets: JsArray) = {
 
     val smEndpoints = SupportingMaterialsEndpoints(
-      resourceRoutes.Item.createSupportingMaterial(itemId),
-      resourceRoutes.Item.createSupportingMaterialFromFile(itemId),
-      resourceRoutes.Item.deleteSupportingMaterial(itemId, ":name"),
-      resourceRoutes.Item.addAssetToSupportingMaterial(itemId, ":name"),
-      resourceRoutes.Item.deleteAssetFromSupportingMaterial(itemId, ":name", ":filename"),
-      resourceRoutes.Item.getAssetFromSupportingMaterial(itemId, ":name", ":filename"),
-      resourceRoutes.Item.updateSupportingMaterialContent(itemId, ":name", ":filename"))
+      create = resourceRoutes.Item.createSupportingMaterial(itemId),
+      createFromFile = resourceRoutes.Item.createSupportingMaterialFromFile(itemId),
+      delete = resourceRoutes.Item.deleteSupportingMaterial(itemId, ":name"),
+      addAsset = resourceRoutes.Item.addAssetToSupportingMaterial(itemId, ":name"),
+      deleteAsset = resourceRoutes.Item.deleteAssetFromSupportingMaterial(itemId, ":name", ":filename"),
+      getAsset = resourceRoutes.Item.getAssetFromSupportingMaterial(itemId, ":name", ":filename"),
+      updateContent = resourceRoutes.Item.updateSupportingMaterialContent(itemId, ":name", ":filename"))
 
     EditorServices(
       s"$context.services",
