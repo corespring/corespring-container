@@ -93,7 +93,7 @@ describe('draft-editor', function() {
               expect(mockLauncher.loadInstance).toHaveBeenCalledWith({
                   method: 'GET',
                   url: '/url',
-                  hash: '/supporting-materials/0'
+                  hash: '/supporting-materials'
                 },
                 undefined, {},
                 jasmine.any(Function));
@@ -137,6 +137,17 @@ describe('draft-editor', function() {
               jasmine.any(Object),
               undefined,
               { showSaveMessage: true },
+              jasmine.any(Function));
+          }));
+
+        it('calls loadInstance with hideSaveButton', assertLoadInstance({
+            hideSaveButton: true
+          },
+          function(call) {
+            expect(mockLauncher.loadInstance).toHaveBeenCalledWith(
+              jasmine.any(Object),
+              undefined,
+              { hideSaveButton: true },
               jasmine.any(Function));
           }));
 
@@ -233,7 +244,7 @@ describe('draft-editor', function() {
         });
       });
 
-      describe('when there is a createItemAndSesson ajax call', function() {
+      describe('when there is a createItemAndSession ajax call', function() {
 
         var opts;
 
@@ -281,8 +292,6 @@ describe('draft-editor', function() {
       });
 
     });
-
-
   });
 
   describe('commitDraft', function() {
@@ -344,4 +353,5 @@ describe('draft-editor', function() {
       expect(cb).toHaveBeenCalledWith(null);
     });
   });
+
 });

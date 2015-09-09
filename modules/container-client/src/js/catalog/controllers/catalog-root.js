@@ -1,8 +1,8 @@
 angular.module('corespring-catalog.controllers')
   .controller('CatalogRoot', [
-    '$scope', 'LogFactory', 'SupportingMaterialsService', 'ItemService', 'iFrameService', 'Msgr', '$location',
+    '$scope', 'LogFactory', 'ItemService', 'iFrameService', 'Msgr', '$location',
 
-    function($scope, LogFactory, SupportingMaterialsService, ItemService, iFrameService, Msgr, $location) {
+    function($scope, LogFactory, ItemService, iFrameService, Msgr, $location) {
 
       var log = LogFactory.getLogger('CatalogRoot');
 
@@ -19,23 +19,20 @@ angular.module('corespring-catalog.controllers')
 
       var tabs = $location.search().tabs;
 
-      if (tabs) {
-        var tabsArray = tabs.split(',');
-        var available = [];
-        _.each(tabsArray, function (t) {
-          available[t] = true;
-        });
-        $scope.tabs = available;
+      function toPair(k){
+        return [k, true];
       }
 
-
+      if (tabs) {
+        $scope.tabs = _(tabs.split(',')).map(toPair).zipObject().value();
+      } else {
+        $scope.tabs = {profile: true, question: true, supportingMaterial: true};
+      }
 
       $scope.onLoaded = function(item) {
         log.debug('loaded', arguments);
         $scope.item = item;
         preprocessComponents(item);
-        $scope.supportingMaterials = SupportingMaterialsService.getSupportingMaterialsByGroups(item.supportingMaterials);
-
       };
 
       $scope.onLoadFailed = function() {

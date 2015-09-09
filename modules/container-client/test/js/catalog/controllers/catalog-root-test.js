@@ -1,23 +1,9 @@
 describe('CatalogRoot', function () {
 
-  var scope, element;
+  var scope, controller;
+  var mockLoad, mockLocation, mockTabs;
 
   beforeEach(angular.mock.module('corespring-catalog.controllers'));
-
-  var mockSupportingMaterialsByGroups = {supporting: 'materials', by: 'groups'};
-
-  var mockLoad = jasmine.createSpy('load');
-  var mockGetSupportingMaterialsByGroups = jasmine.createSpy('getSupportingMaterialsByGroups')
-    .and.returnValue(mockSupportingMaterialsByGroups);
-
-  function MockLogFactory() {
-    this.getLogger = function () {
-      return {
-        debug: function () {
-        }
-      };
-    };
-  }
 
   function MockItemService() {
     this.load = mockLoad;
@@ -29,85 +15,81 @@ describe('CatalogRoot', function () {
     };
   }
 
-  function MockSupportingMaterialsService() {
-    this.getSupportingMaterialsByGroups = mockGetSupportingMaterialsByGroups;
-  }
-
-  function MockCorespringServerLogic() {
-    this.server = {
-      logic: function (componentType) {
-        console.log("MockCorespringServerLogic.logic", componentType);
-        return {
-          preprocess: function(item){
-            console.log("preprocess", item);
-            item.preprocessed = true;
-            return item;
-          }
-        };
-      }
-    };
-  }
-
-  function resetMocks() {
-    mockLoad.calls.reset();
-  }
-
   beforeEach(module(function ($provide) {
-    $provide.value('LogFactory', new MockLogFactory());
-    $provide.value('SupportingMaterialsService', new MockSupportingMaterialsService());
+    
+    mockLoad = jasmine.createSpy('load');
+    mockTabs = '';
+    mockLocation = {
+      search: jasmine.createSpy('search').and.returnValue(mockTabs)
+    };
+    $provide.value('LogFactory', new org.corespring.mocks.editor.LogFactory());
     $provide.value('ItemService', new MockItemService());
     $provide.value('iFrameService', new MockiFrameService());
     $provide.value('Msgr', {});
+    $provide.value('$location', mockLocation);
   }));
 
-  beforeEach(inject(function ($rootScope, $compile) {
+  beforeEach(inject(function ($rootScope, $controller) {
+    controller = $controller;
     scope = $rootScope.$new();
-    element = $compile('<div ng-controller="CatalogRoot"></div>')(scope);
-    scope = element.scope();
+    controller('CatalogRoot', {$scope: scope});
   }));
-
-  afterEach(resetMocks);
 
   describe('initialization', function () {
     it('should call ItemService.load with onLoaded', function () {
       expect(mockLoad).toHaveBeenCalledWith(scope.onLoaded, scope.onUploadFailed);
     });
   });
+  
+  describe('tabs initialization', function(){
 
-  describe('itemLoaded event', function () {
-    var item = {
-      supportingMaterials: {these: 'are', supporting: 'materials'}
-    };
+    function mkLocation(tabs){
+      return {
+        search: jasmine.createSpy('search').and.returnValue({tabs: tabs})
+      };
+    }
 
-    beforeEach(function () {
-      scope.onLoaded(item);
-    });
-
-    it('should set supportingMaterials to result of getSupportingMaterialsByGroups', function () {
-      expect(mockGetSupportingMaterialsByGroups).toHaveBeenCalledWith(item.supportingMaterials);
-      expect(scope.supportingMaterials).toEqual(mockSupportingMaterialsByGroups);
-    });
-  });
+    function assertTabs(tabs, expected){
+      return function(){
+        controller('CatalogRoot', {$scope: scope, $location: mkLocation(tabs)});
+        expect(scope.tabs).toEqual(expected);
+      };
+    }
+    
+    it('should set to profile,question,supportingMaterial', assertTabs('profile,question,supportingMaterial', {profile: true, question:true, supportingMaterial: true}));
+    it('should set to profile,question', assertTabs('profile,question', {profile: true, question:true}));
+    it('should set to question', assertTabs('question', {question:true}));
+    it('should set to profile', assertTabs('profile', {profile:true}));
+    it('should set to supportindMaterial', assertTabs('supportingMaterial', {supportingMaterial:true}));
+    it('should set to empty to profile,question,supportingMaterial', assertTabs(null, {profile: true, question:true, supportingMaterial: true}));
+  }); 
 
   describe('onLoaded', function () {
-    var safeCorespring;
 
     var item = {
-      it: 'is', an: 'item',
       components: {
-        "a": {componentType: "one"},
-        "b": {componentType: "two"}
+        a: {componentType: 'one'},
+        b: {componentType: 'two'}
       }
     };
 
+    var logic, server;
+
     beforeEach(function () {
-      safeCorespring = window.corespring;
-      window.corespring = new MockCorespringServerLogic();
+      server = corespring.server;
+      logic = {
+        preprocess: jasmine.createSpy('preprocess').and.callFake(function(i){
+          return i;
+        })
+      };
+      corespring.server = {
+        logic: jasmine.createSpy('logic').and.returnValue(logic)
+      };
       scope.onLoaded(item);
     });
 
     afterEach(function () {
-      window.corespring = safeCorespring;
+      corespring.server = server;
     });
 
     it('should set item on scope', function () {
@@ -115,8 +97,8 @@ describe('CatalogRoot', function () {
     });
 
     it('should call preprocess for the components in item', function () {
-      expect(scope.item.components.a.preprocessed).toBe(true);
-      expect(scope.item.components.b.preprocessed).toBe(true);
+      expect(logic.preprocess).toHaveBeenCalledWith(scope.item.components.a);
+      expect(logic.preprocess).toHaveBeenCalledWith(scope.item.components.b);
     });
 
   });

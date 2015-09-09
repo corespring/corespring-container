@@ -1,1 +1,1 @@
-angular.module('corespring-editor.services', []);
+angular.module('corespring-editor.services', ['rt.debounce']);

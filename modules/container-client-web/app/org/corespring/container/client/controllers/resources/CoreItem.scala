@@ -1,9 +1,13 @@
 package org.corespring.container.client.controllers.resources
 
+import java.io.{ FileInputStream }
+
+import org.apache.commons.io.IOUtils
 import org.corespring.container.client.controllers.helpers.{ PlayerXhtml, XhtmlProcessor }
 import org.corespring.container.client.hooks.Hooks.StatusMessage
-import org.corespring.container.client.hooks.{ CoreItemHooks }
+import org.corespring.container.client.hooks._
 import play.api.Logger
+import play.api.libs.{ Files, MimeTypes }
 import play.api.libs.json.{ JsString, JsObject, JsValue, Json }
 import play.api.mvc._
 
@@ -24,7 +28,7 @@ object ItemJson {
   }
 }
 
-trait CoreItem extends Controller {
+trait CoreItem extends CoreSupportingMaterials with Controller {
 
   lazy val logger = Logger(classOf[CoreItem])
 
@@ -72,7 +76,6 @@ trait CoreItem extends Controller {
         .map(cs => hooks.saveCustomScoring(_: String, cs))
         .getOrElse(missingProperty("customScoring"))
       case "profile" => hooks.saveProfile(_: String, json)
-      case "supporting-materials" => hooks.saveSupportingMaterials(_: String, json)
       case "summary-feedback" => (json \ "summaryFeedback").asOpt[String].map(s => hooks.saveSummaryFeedback(_: String, s)).getOrElse(missingProperty("summaryFeedback"))
       case "xhtml" => (json \ "xhtml")
         .asOpt[String]

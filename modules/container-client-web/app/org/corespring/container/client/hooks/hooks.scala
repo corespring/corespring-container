@@ -1,5 +1,7 @@
 package org.corespring.container.client.hooks
 
+import java.io.InputStream
+
 import org.corespring.container.client.HasContext
 import org.corespring.container.client.hooks.Hooks.{ R, StatusMessage }
 import play.api.libs.json.{ JsArray, JsValue }
@@ -10,9 +12,6 @@ import scala.concurrent.Future
 object Hooks {
   type StatusMessage = (Int, String)
   type R[A] = Future[Either[StatusMessage, A]]
-}
-trait GetSupportingMaterialAssetHook {
-  def loadSupportingMaterialFile(id: String, path: String)(request: Request[AnyContent]): SimpleResult
 }
 
 trait GetAssetHook {
@@ -44,19 +43,30 @@ trait LoadHook extends HasContext {
 trait PlayerHooks extends GetAssetHook with HasContext {
   def createSessionForItem(itemId: String)(implicit header: RequestHeader): Future[Either[StatusMessage, (JsValue, JsValue)]]
   def loadSessionAndItem(sessionId: String)(implicit header: RequestHeader): Future[Either[StatusMessage, (JsValue, JsValue)]]
-  def loadItemFile(itemId:String, file:String)(implicit header: RequestHeader) : SimpleResult
+  def loadItemFile(itemId: String, file: String)(implicit header: RequestHeader): SimpleResult
 }
 
-trait CatalogHooks extends LoadHook with GetAssetHook with GetSupportingMaterialAssetHook {
+trait CatalogHooks extends LoadHook with GetAssetHook {
   def showCatalog(itemId: String)(implicit header: RequestHeader): Future[Option[StatusMessage]]
 }
 
-/*trait ItemHooks extends HasContext {
-  def load(itemId: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]]
-  def create(json: Option[JsValue])(implicit header: RequestHeader): Future[Either[StatusMessage, String]]
-}*/
-
 trait EditorHooks extends LoadHook with AssetHooks
+
+case class FileDataStream(stream: InputStream, contentLength: Long, contentType: String, metadata: Map[String, String])
+
+trait SupportingMaterialHooks {
+  /**
+   * Return the resource json
+   * Note: once we refactor cs-api, we should have api data models available.
+   * So can use these instead of JsValue
+   */
+  def create[F <: File](id: String, sm: CreateNewMaterialRequest[F])(implicit h: RequestHeader): R[JsValue]
+  def delete(id: String, name: String)(implicit h: RequestHeader): R[JsValue]
+  def addAsset(id: String, name: String, binary: Binary)(implicit h: RequestHeader): R[JsValue]
+  def deleteAsset(id: String, name: String, filename: String)(implicit h: RequestHeader): R[JsValue]
+  def getAsset(id: String, name: String, filename: String)(implicit h: RequestHeader): Future[Either[StatusMessage, FileDataStream]]
+  def updateContent(id: String, name: String, filename: String, content: String)(implicit h: RequestHeader): R[JsValue]
+}
 
 trait CoreItemHooks extends HasContext with LoadHook {
   def delete(id: String)(implicit h: RequestHeader): R[JsValue]
@@ -75,8 +85,8 @@ trait DraftHooks {
   def commit(id: String, force: Boolean)(implicit h: RequestHeader): R[JsValue]
 }
 
-trait CreateItemHook{
-  def createItem(json:Option[JsValue])(implicit h: RequestHeader): R[String]
+trait CreateItemHook {
+  def createItem(json: Option[JsValue])(implicit h: RequestHeader): R[String]
 }
 
 trait SessionHooks extends HasContext {

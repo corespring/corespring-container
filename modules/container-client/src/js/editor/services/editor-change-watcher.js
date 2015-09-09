@@ -1,5 +1,5 @@
 angular.module('corespring-editor.services')
-  .factory('EditorChangeWatcher', ['LogFactory', 'debounce', function(LogFactory, debounce) {
+  .factory('EditorChangeWatcher', ['LogFactory', 'editorDebounce', function(LogFactory, editorDebounce) {
 
     var logger = LogFactory.getLogger('editor-change-watcher');
 
@@ -24,11 +24,11 @@ angular.module('corespring-editor.services')
         }
 
 
-        var debouncedFn = debounce(saveFn);
+        var debouncedFn = editorDebounce(saveFn);
 
         //emit the itemChanged event quickly so that clients know
         //that the data has been updated.
-        var debouncedEmit = debounce(function(){
+        var debouncedEmit = editorDebounce(function(){
           scope.$emit('itemChanged', {partChanged: partName});
         }, 200);
 
