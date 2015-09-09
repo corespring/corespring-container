@@ -240,8 +240,9 @@ class CoreSupportingMaterialsTest extends Specification with Mockito with PlaySp
     "call hooks.addAsset" in new addAsset {
       val form = mkFormWithFile(Map.empty)
       val request = req(form)
-      addAssetToSupportingMaterial("id", "name")(request)
+      val result = addAssetToSupportingMaterial("id", "name")(request)
       val captor = capture[Binary]
+      status(result) === OK
       there was one(materialHooks).addAsset(e("id"), e("name"), captor)(any[RequestHeader])
       captor.value.name === "image.png"
       captor.value.mimeType === "image/png"
