@@ -36,16 +36,18 @@ angular.module('corespring-editor.services')
           
           logger.debug(partName + ' new:' + newValue + ' old: ' + oldValue);
 
-          if (_.isEqual(newValue, oldValue)) {
-            logger.debug( partName + 'they are the same - ignore...');
-            return;
-          }
-          
-          if (oldValue) {
-            debouncedEmit();
-          }
+          if (oldValue !== undefined) {
+            if (_.isEqual(newValue, oldValue)) {
+              logger.debug( partName + 'they are the same - ignore...');
+              return;
+            }
 
-          debouncedFn(newValue, oldValue);
+            if (oldValue) {
+              debouncedEmit();
+            }
+
+            debouncedFn(newValue, oldValue);
+          }
         };
       };
     }

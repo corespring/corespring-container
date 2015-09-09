@@ -1,7 +1,7 @@
 angular.module('corespring-editor.services').service('ItemService', [
-  '$http', 
-  '$timeout', 
-  'ItemUrls', 
+  '$http',
+  '$timeout',
+  'ItemUrls',
   'LogFactory',
   function($http, $timeout, ItemUrls, LogFactory) {
 
