@@ -46,7 +46,7 @@ angular.module('corespring-dev-editor.controllers')
 
           //send msg "ready" to instance
           //this will result in msg "initialise" being sent back to us
-          $log.log('sending ready');
+          $log.debug('sending ready');
           Msgr.send('ready');
         } else {
           ItemService.load($scope.onItemLoaded, $scope.onItemLoadError);
@@ -58,7 +58,7 @@ angular.module('corespring-dev-editor.controllers')
         });
 
         function onInitialise(data) {
-          $log.log('on initialise', data);
+          $log.debug('on initialise', data);
           $scope.initialData = data;
           ItemService.load($scope.onItemLoaded, $scope.onItemLoadError);
           Msgr.send('rendered');
@@ -71,7 +71,7 @@ angular.module('corespring-dev-editor.controllers')
           partsChanged.push('components');
         }
         if (customScoringHasBeenChanged()) {
-          partsChanged.push('customScoringJs');
+          partsChanged.push('customScoring');
         }
         if (xhtmlHasBeenChanged()) {
           partsChanged.push('xhtml');
@@ -96,11 +96,11 @@ angular.module('corespring-dev-editor.controllers')
 
       function saveAll(done){
         $log.debug('saveAll...');
-        if (customScoringHasBeenChanged()) {
-          $scope.item.customScoring = $scope.customScoringJs;
-        }
         if (componentsHaveBeenChanged()) {
           $scope.item.components = $scope.components;
+        }
+        if (customScoringHasBeenChanged()) {
+          $scope.item.customScoring = $scope.customScoringJs;
         }
         if (xhtmlHasBeenChanged()) {
           $scope.item.xhtml = $scope.xhtml;
