@@ -16,7 +16,7 @@ include ../mixins/modal
 +ng_popup_template("edit-title")
   +modal('Rename Question', 'Ok')
     label Enter a new name:
-    input.form-control#title(type="text", ng-model="title", placeholder="Untitled", ng-focus="selectTitle()")
+    input.form-control.edit-title-input(type="text", ready="ready", ng-model="title", placeholder="Untitled")
 
 +ng_popup_template("help")
   +modal('Help', null, false)

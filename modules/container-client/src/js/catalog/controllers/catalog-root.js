@@ -1,16 +1,14 @@
 angular.module('corespring-catalog.controllers')
   .controller('CatalogRoot', [
-    '$scope', 'LogFactory', 'SupportingMaterialsService', 'ItemService', 'iFrameService', 'Msgr', '$location',
+    '$scope', 'LogFactory', 'ItemService', 'iFrameService', 'Msgr', '$location',
 
-    function($scope, LogFactory, SupportingMaterialsService, ItemService, iFrameService, Msgr, $location) {
+    function($scope, LogFactory, ItemService, iFrameService, Msgr, $location) {
 
       var log = LogFactory.getLogger('CatalogRoot');
 
       function preprocessComponents(item) {
         _.each(item.components, function(c, key) {
-          console.log("each", JSON.stringify(c), key);
           var serverLogic = corespring.server.logic(c.componentType);
-          console.log("serverLogic", JSON.stringify(serverLogic));
           if (serverLogic.preprocess) {
             //TODO: This is part of a larger task to add preprocess to the container
             //@see: https://thesib.atlassian.net/browse/CA-842
@@ -21,23 +19,20 @@ angular.module('corespring-catalog.controllers')
 
       var tabs = $location.search().tabs;
 
-      if (tabs) {
-        var tabsArray = tabs.split(',');
-        var available = [];
-        _.each(tabsArray, function (t) {
-          available[t] = true;
-        });
-        $scope.tabs = available;
+      function toPair(k){
+        return [k, true];
       }
 
-
+      if (tabs) {
+        $scope.tabs = _(tabs.split(',')).map(toPair).zipObject().value();
+      } else {
+        $scope.tabs = {profile: true, question: true, supportingMaterial: true};
+      }
 
       $scope.onLoaded = function(item) {
         log.debug('loaded', arguments);
         $scope.item = item;
         preprocessComponents(item);
-        $scope.supportingMaterials = SupportingMaterialsService.getSupportingMaterialsByGroups(item.supportingMaterials);
-
       };
 
       $scope.onLoadFailed = function() {

@@ -27,6 +27,10 @@
        opts.onItemCreated = function(){
          console.log('onItemCreated', arguments);
        };
+       
+       opts.onItemChanged = function(){
+         console.log('onItemChanged', arguments);
+       };
 
        console.log('opts: ', opts);
 
@@ -36,8 +40,9 @@
 
        var commitBtn = document.querySelector('#commit');
        var forceCommitBtn = document.querySelector('#force-commit');
+       var saveAllBtn = document.querySelector('#save-all');
 
-       function commit( force ){
+       function commit(force) {
          editor.commitDraft(force, function(err){
           if(err){
             alert(err.code + ', ' + err.msg);
@@ -47,12 +52,20 @@
          });
        }
 
-       commitBtn.addEventListener('click', commit.bind(this, null) );
+       function saveAll(){
+        editor.forceSave(function(result){
+          console.log('saveAll complete, arguments: ', arguments);
+        });
+       }
+
+       commitBtn.addEventListener('click', commit.bind(this, null));
        forceCommitBtn.addEventListener('click', commit.bind(this, true));
+       saveAllBtn.addEventListener('click', saveAll);
      });
     </script>
     <button id="commit">Commit</button>
     <button id="force-commit">Force Commit</button>
-    <div class="holder"></div>
+    <button id="save-all">Save All</button>
+    <div class="holder" style="height:100%; width: 100%;"></div>
   </body>
 </html>

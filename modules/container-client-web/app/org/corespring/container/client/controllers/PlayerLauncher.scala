@@ -74,7 +74,8 @@ trait PlayerLauncher extends Controller {
       "editor" -> DraftEditor.load(":draftId"),
       "devEditor" -> DraftDevEditor.load(":draftId"),
       "createItemAndDraft" -> ItemDraft.createItemAndDraft(),
-      "commitDraft" -> ItemDraft.commit(":draftId")))
+      "commitDraft" -> ItemDraft.commit(":draftId"),
+      "save" -> ItemDraft.save(":draftId")))
 
     val itemEditor = JsObject(Seq(
       "editor" -> ItemEditor.load(":itemId"),

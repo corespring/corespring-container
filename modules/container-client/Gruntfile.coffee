@@ -72,7 +72,6 @@ module.exports = (grunt) ->
       dev: lessConfig(false)
       production: lessConfig(true)
 
-
     watch:
       options:
         livereload: true
@@ -193,7 +192,7 @@ module.exports = (grunt) ->
     mkConfig('playerControls', playerControls)
   )
 
-  grunt.log.debug(JSON.stringify(fullConfig, null, "  "))
+  #grunt.log.debug(JSON.stringify(fullConfig, null, "  "))
 
   grunt.initConfig(fullConfig)
 

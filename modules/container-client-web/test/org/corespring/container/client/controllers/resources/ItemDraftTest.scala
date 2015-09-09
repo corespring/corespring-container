@@ -19,8 +19,13 @@ class ItemDraftTest extends Specification with Mockito {
     override implicit def ec: ExecutionContext = ExecutionContext.Implicits.global
 
     override protected def componentTypes: Seq[String] = Seq.empty
+
+    override def materialHooks: SupportingMaterialHooks = {
+      val m = mock[SupportingMaterialHooks]
+      m
+    }
   }
-  
+
   trait DH extends CoreItemHooks with DraftHooks
 
   import ExecutionContext.Implicits.global
@@ -41,6 +46,7 @@ class ItemDraftTest extends Specification with Mockito {
             m.load(anyString)(any[RequestHeader]) returns Future(Right(loadResult))
             m
           }
+
         }
       }
 
@@ -49,8 +55,8 @@ class ItemDraftTest extends Specification with Mockito {
       }
 
       val badJson = Json.obj("_id" ->
-          Json.obj("$oid" -> "1"),
-          "xhtml" -> "<p>a</p>")
+        Json.obj("$oid" -> "1"),
+        "xhtml" -> "<p>a</p>")
 
       "prep the json" in new load(loadResult = badJson) {
         val json = contentAsJson(draft.load("x")(FakeRequest("", "")))
@@ -77,6 +83,39 @@ class ItemDraftTest extends Specification with Mockito {
         status(result) === BAD_REQUEST
         (contentAsJson(result) \ "error").as[String] === Errors.noJson
       }
+    }
+
+    "save" should {
+
+      class save(saveResult: JsValue = Json.obj())
+        extends Scope {
+        val draft = new BaseDraft {
+          val hooks: DH = {
+            val m = mock[DH]
+            m.save(anyString, any[JsValue])(any[RequestHeader]) returns Future(Right(saveResult))
+            m
+          }
+        }
+      }
+
+      "fail to save if no json is supplied" in new save() {
+        val result = draft.save("x")(FakeRequest())
+        status(result) must be equalTo (BAD_REQUEST)
+        (contentAsJson(result) \ "error").as[String] must be equalTo (Errors.noJson)
+      }
+
+      val json = Json.obj("this" -> "is", "item" -> "json")
+
+      "return 200 on success" in new save(json) {
+        val result = draft.save("x")(FakeRequest().withJsonBody(json))
+        status(result) must be equalTo (OK)
+      }
+
+      "return result from DraftHooks#save on success" in new save(json) {
+        val result = draft.save("x")(FakeRequest().withJsonBody(json))
+        contentAsJson(result) must be equalTo (json)
+      }
+
     }
 
     "commit" should {

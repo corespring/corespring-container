@@ -8,7 +8,6 @@
       '$q',
       '$scope',
       '$timeout',
-      'throttle',
       'CollectionService',
       'ConfigurationService',
       'DataQueryService',
@@ -18,6 +17,7 @@
       'ProfileFormatter',
       'StandardQueryCreator',
       'STATIC_PATHS',
+      'EditorChangeWatcher',
       ProfileController
     ]);
 
@@ -26,7 +26,6 @@
     $q,
     $scope,
     $timeout,
-    throttle,
     CollectionService,
     ConfigurationService,
     DataQueryService,
@@ -35,7 +34,8 @@
     LogFactory,
     ProfileFormatter,
     StandardQueryCreator,
-    STATIC_PATHS
+    STATIC_PATHS,
+    EditorChangeWatcher
   ) {
 
     var $log = LogFactory.getLogger('ProfileController');
@@ -1010,7 +1010,6 @@
       }
 
       var contributorDetails = profile.contributorDetails;
-        console.log("contributorDetails ",contributorDetails);
 
       if (!(contributorDetails.licenseType)) {
         contributorDetails.licenseType = "CC BY";
@@ -1057,26 +1056,19 @@
     //----------------------------------------------------------------
     // profile load and save
     //----------------------------------------------------------------
-
-    $scope.$watch('item.profile', throttle(function(newValue, oldValue) {
-      if (undefined === oldValue) {
-        return;
-      }
-      if (_.isEqual(oldValue, newValue)) {
-        return;
-      }
-      $scope.saveProfile();
-      $scope.$emit('itemChanged', {
-        partChanged: 'profile'
-      });
-    }), true); //watch nestedProperties
-
-    $scope.saveProfile = function() {
+    
+    $scope.saveProfile = function(){
       $log.log("saving profile");
       ItemService.saveProfile($scope.item.profile, function(result) {
         $log.log("profile saved result:", result);
       });
     };
+
+    $scope.$watch('item.profile', EditorChangeWatcher.makeWatcher(
+      'profile', 
+      $scope.saveProfile,
+      $scope), true);
+
 
     $scope.loadProfile = function() {
       $log.log("loading profile");

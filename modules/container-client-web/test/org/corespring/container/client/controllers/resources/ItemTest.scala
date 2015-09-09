@@ -1,7 +1,7 @@
 package org.corespring.container.client.controllers.resources
 
-import org.corespring.container.client.hooks.Hooks.{R, StatusMessage}
-import org.corespring.container.client.hooks.{CoreItemHooks, CreateItemHook }
+import org.corespring.container.client.hooks.Hooks.{ R, StatusMessage }
+import org.corespring.container.client.hooks.{ SupportingMaterialHooks, CoreItemHooks, CreateItemHook }
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
@@ -61,6 +61,11 @@ class ItemTest extends Specification with Mockito {
       override implicit def ec: ExecutionContext = ExecutionContext.Implicits.global
 
       override protected def componentTypes: Seq[String] = Seq.empty
+
+      override def materialHooks: SupportingMaterialHooks = {
+        val m = mock[SupportingMaterialHooks]
+        m
+      }
     }
 
   }

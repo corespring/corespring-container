@@ -1,9 +1,7 @@
 angular.module('corespring-editor.controllers')
   .controller('Root', [
     '$scope',
-    '$state',
-    '$window',
-    'ComponentRegister',
+    '$timeout',
     'ConfigurationService',
     'EditorDialogTemplate',
     'iFrameService',
@@ -12,11 +10,10 @@ angular.module('corespring-editor.controllers')
     'Msgr',
     'WIGGI_EVENTS',
     'WiggiDialogLauncher',
+    'editorDebounce',
     function(
       $scope,
-      $state,
-      $window,
-      ComponentRegister,
+      $timeout,
       ConfigurationService,
       EditorDialogTemplate,
       iFrameService,
@@ -24,29 +21,45 @@ angular.module('corespring-editor.controllers')
       LogFactory,
       Msgr,
       WIGGI_EVENTS,
-      WiggiDialogLauncher) {
+      WiggiDialogLauncher,
+      editorDebounce) {
 
       "use strict";
 
-      var $log = LogFactory.getLogger('RootController');
+      var logger = LogFactory.getLogger('root-controller');
 
       $scope.onItemLoadSuccess = onItemLoadSuccess;
       $scope.onItemLoadError = onItemLoadError;
 
-      $scope.$on('deleteSupportingMaterial', onDeleteSupportingMaterial);
       $scope.$on(WIGGI_EVENTS.LAUNCH_DIALOG, onLaunchDialog);
       $scope.$on('itemChanged', onItemChanged);
 
       init();
 
-      //----------------------------------------------
+      function saveAll(done){
+        logger.debug('saveAll...');
+
+        ItemService.saveAll($scope.item, function() {
+          logger.debug('call \'saveAll\' callback...');
+          editorDebounce.flush();
+          $timeout(function(){
+            done(null, {saved: true});
+          }, 300);
+        });
+      }
 
       function init() {
         if (iFrameService.isInIFrame() && !iFrameService.bypassIframeLaunchMechanism()) {
           Msgr.on('initialise', onInitialise);
+          
+          Msgr.on('saveAll', function(data, done){
+            logger.debug('received \'saveAll\' event');
+            saveAll(done || function(){});
+          });
+
           //send msg "ready" to instance
           //this will result in msg "initialise" being sent back to us
-          $log.log('sending ready');
+          logger.log('sending ready');
           Msgr.send('ready');
         } else {
           ConfigurationService.setConfig({});
@@ -54,7 +67,7 @@ angular.module('corespring-editor.controllers')
         }
 
         function onInitialise(data) {
-          $log.log('on initialise', data);
+          logger.log('on initialise', data);
           ConfigurationService.setConfig(data);
           ItemService.load($scope.onItemLoadSuccess, $scope.onItemLoadError);
           //We need to trigger an ng digest as this event is outside the app's scope.
@@ -65,36 +78,6 @@ angular.module('corespring-editor.controllers')
 
       function onItemChanged(event, data) {
         Msgr.send('itemChanged', data);
-      }
-
-      function onDeleteSupportingMaterial(event, data) {
-
-        var confirmationMessage = [
-          "You are about to delete this file.",
-          "Are you sure you want to do this?"
-        ].join('\n');
-
-        if ($window.confirm(confirmationMessage)) {
-          showFirstItem();
-          deleteSupportingMaterial(data.index);
-        }
-      }
-
-      function showFirstItem() {
-        $state.transitionTo('supporting-materials', {
-          index: "0"
-        }, {
-          reload: true
-        });
-      }
-
-      function deleteSupportingMaterial(index) {
-        $scope.item.supportingMaterials.splice(index, 1);
-
-        ItemService.saveSupportingMaterials($scope.item.supportingMaterials,
-          function() {},
-          $scope.onSaveError, $scope.itemId
-        );
       }
 
       function preprocessComponents(item) {
@@ -137,7 +120,7 @@ angular.module('corespring-editor.controllers')
       }
 
       function onItemLoadError(err) {
-        $log.error('error loading', err);
+        logger.error('error loading', err);
       }
 
     }

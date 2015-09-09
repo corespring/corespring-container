@@ -117,11 +117,10 @@ class MongoService(val collection: MongoCollection) {
       setDbo.removeField("_id")
       logger.trace(s"set dbo: $setDbo")
       val d = MongoDBObject("$set" -> setDbo)
-      val result = collection.update(q, d, false, false, WriteConcern.Safe)
+      val result = collection.update(q, d, true, false, WriteConcern.Safe)
 
       if (result.getLastError(WriteConcern.Safe).ok()) {
-        val dbo = collection.findOneByID(new ObjectId(id))
-        dbo.map(toJson)
+        Some(data.as[JsObject])
       } else {
         logger.warn(s"Error saving: $id")
         None

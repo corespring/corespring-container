@@ -16,3 +16,5 @@ exports.COMMIT_DRAFT_FAILED = function(msg){ return {code: 114, msg: msg};};
 exports.NO_URL_SPECIFIED = {code: 115, message: 'no url specified'};
 exports.CREATE_ITEM_FAILED = function(msg){ return {code: 116, msg: msg};};
 exports.CANT_FIND_URL = function(msg){ return {code: 117, msg: msg};};
+exports.SAVE_ALL_FAILED = function(msg) { return {code: 118, msg: msg}; };
+exports.INITIALISATION_FAILED = {code: 119, msg: 'initialisation failed.'};
