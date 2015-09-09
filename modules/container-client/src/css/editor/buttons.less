@@ -33,7 +33,18 @@
   text-align:center;
   white-space: normal;
   margin: 0 20px 0 0;
-  box-shadow: 1px 1px 1px 1px rgba(96, 86, 75, 0.25);
-  -moz-box-shadow: 1px 1px 1px 1px rgba(96, 86, 75, 0.25);
-  -webkit-box-shadow: 1px 1px 1px 1px rgba(96, 86, 75, 0.25);
+  box-shadow: 1px 1px 1px 1px rgba(102, 93, 77, 0.25);
+  -moz-box-shadow: 1px 1px 1px 1px rgba(102, 93, 77, 0.25);
+  -webkit-box-shadow: 1px 1px 1px 1px rgba(102, 93, 77, 0.25);
+  &[disabled] {
+    color: #E0DEE0;
+    border-color: #E0DEE0;
+    box-shadow: none;
+  }
+  &:active {
+    color: #FFF;
+    background-color: #1a9cff;
+    border-color: #1a9cff;
+    box-shadow: none;
+  }
 }

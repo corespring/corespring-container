@@ -233,9 +233,14 @@ trait DefaultIntegration
     override def componentTypes: Seq[String] = DefaultIntegration.this.components.map(_.componentType)
 
     override implicit def ec: ExecutionContext = DefaultIntegration.this.ec
+
+    override def materialHooks: SupportingMaterialHooks = DefaultIntegration.this.itemSupportingMaterialHooks
   }
 
   lazy val itemDraft = new ItemDraft {
+
+    override def materialHooks: SupportingMaterialHooks = DefaultIntegration.this.itemDraftSupportingMaterialHooks
+
     def scoreProcessor: ScoreProcessor = DefaultIntegration.this.scoreProcessor
 
     def outcomeProcessor: OutcomeProcessor = DefaultIntegration.this.outcomeProcessor

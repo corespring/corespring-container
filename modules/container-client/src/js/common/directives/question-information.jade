@@ -1,18 +1,24 @@
 .question-information(ng-if="item")
   .col-sm-3(ng-hide='hideNav')
     ul.nav.nav-pills.nav-stacked(role='tablist')
-      li(role='presentation',ng-class="{active: activeTab == 'question'}",ng-click="selectTab('question')",ng-show="availableTabs.question")
+      li(role='presentation',
+        ng-class="{active: activeTab == 'question'}", 
+        ng-click="selectTab('question')", ng-show="tabs.question")
         a Question
-      li(role='presentation',ng-class="{active: activeTab == 'profile'}",ng-click="selectTab('profile')",ng-show="availableTabs.profile")
+      li(role='presentation',
+        ng-class="{active: activeTab == 'profile'}", 
+        ng-click="selectTab('profile')", ng-show="tabs.profile")
         a Profile Information
-      li(role='presentation', ng-show='item.supportingMaterials.length > 0 && availableTabs.supportingMaterial')
+      li(role='presentation', ng-show='item.supportingMaterials.length > 0 && tabs.supportingMaterial')
         a.dropdown-toggle(data-toggle='dropdown')
           | Supporting Materials
           span.caret
-
         ul.dropdown-menu(role='menu')
-          li(ng-repeat="s in supportingMaterials",ng-model="s",ng-class="{divider: s.type == 'divider', data: s.type == 'data', active: s.index == activeSmIndex, 'dropdown-header': s.type == 'header'}") {{s.type == 'header' ? s.label : ''}}
-            a(ng-if="s.type == 'data'",ng-click="selectSupportingMaterial(s.index)") {{s.label}}
+          li(ng-repeat="section in sections", ng-class="{last: $last}")
+            ul.section-menu
+              li.dropdown-header {{section.name}}
+              li(ng-repeat="sm in section.items", ng-class="{active: selectedMaterial == sm}")
+                a(ng-click="selectSupportingMaterial(sm)") {{sm.name}}
 
   .col-sm-8
     .player-container(ng-show="activeTab == 'question'")
@@ -27,9 +33,9 @@
 
     .supporting-material(ng-show="activeTab == 'supportingMaterial'")
       h3 {{selectedMaterial.name}}
-      div(style="height: 400px;", ng-if="selectedMaterial.contentType != 'text/html'")
-        iframe(ng-src="{{selectedMaterial.url}}")
-      div(ng-if="selectedMaterial.contentType == 'text/html'")
-        div(ng-bind-html-unsafe='selectedMaterial.content')
+      div(style="height: 400px;", ng-if="mainFile.contentType != 'text/html'")
+        iframe(ng-src="{{binaryUrl}}")
+      div(ng-if="mainFile.contentType == 'text/html'")
+        div(ng-bind-html-unsafe='mainFile.content')
 
   .clearfix
