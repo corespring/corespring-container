@@ -215,12 +215,11 @@ describe('ClientSidePreview', function() {
   describe('content.added.to.editor event', function() {
 
     describe('gather mode', function() {
-      beforeEach(function() {
-        scope.mode = 'gather';
-        scope.$broadcast('content.added.to.editor');
-      });
+      beforeEach(inject(function(EDITOR_EVENTS) {
+         scope.$broadcast(EDITOR_EVENTS.CONTENT_ADDED_TO_EDITOR);
+      }));
       it('should set mode to gather', function() {
-        expect(scope.mode).toEqual('gather');
+        expect(scope.playerMode).toEqual('gather');
         expect(ComponentData.setMode).toHaveBeenCalledWith('gather');
       });
     });

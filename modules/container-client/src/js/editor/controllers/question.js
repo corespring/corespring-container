@@ -124,7 +124,7 @@ angular.module('corespring-editor.controllers')
         return angular.element('.wiggi-wiz', $element);
       };
 
-      $scope.$on('itemAdded', function(event, $node) {
+      $scope.$on('itemChanged', function(event, $node) {
         $scope.$broadcast(EDITOR_EVENTS.CONTENT_ADDED_TO_EDITOR);
         // This ends up in some weird race condition if we don't wrap it in a $timeout
         $timeout(function() {

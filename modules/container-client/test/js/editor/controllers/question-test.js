@@ -235,7 +235,7 @@ describe('QuestionController', function() {
 
   });
 
-  describe('itemAdded event', function() {
+  describe('itemChanged event', function() {
     var focusCaretAtEnd = jasmine.createSpy('focusCaretAtEnd');
 
     beforeEach(function() {
@@ -246,7 +246,7 @@ describe('QuestionController', function() {
           };
         }
       });
-      scope.$emit('itemAdded');
+      scope.$emit('itemChanged');
       timeout.flush();
     });
 
