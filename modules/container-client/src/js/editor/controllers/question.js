@@ -15,6 +15,7 @@ angular.module('corespring-editor.controllers')
     'MathJaxService',
     'WiggiLinkFeatureDef',
     'WiggiMathJaxFeatureDef',
+    'EDITOR_EVENTS',
     function($scope,
       $element,
       $timeout,
@@ -29,7 +30,8 @@ angular.module('corespring-editor.controllers')
       ScoringHandler,
       MathJaxService,
       WiggiLinkFeatureDef,
-      WiggiMathJaxFeatureDef) {
+      WiggiMathJaxFeatureDef,
+      EDITOR_EVENTS) {
 
       var configPanels = {};
 
@@ -123,7 +125,7 @@ angular.module('corespring-editor.controllers')
       };
 
       $scope.$on('itemAdded', function(event, $node) {
-        $scope.$broadcast('editor.added');
+        $scope.$broadcast(EDITOR_EVENTS.CONTENT_ADDED_TO_EDITOR);
         // This ends up in some weird race condition if we don't wrap it in a $timeout
         $timeout(function() {
           $scope.getWiggiWizElement().scope().focusCaretAtEnd();

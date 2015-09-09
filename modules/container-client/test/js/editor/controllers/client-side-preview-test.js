@@ -31,6 +31,7 @@ describe('ClientSidePreview', function() {
     $provide.value('ComponentData', ComponentData);
     $provide.value('ClientSidePlayerService', ClientSidePlayerService);
     $provide.constant('STATIC_PATHS', {assets: imagePath});
+    $provide.constant('EDITOR_EVENTS', {CONTENT_ADDED_TO_EDITOR: 'content.added.to.editor'});
   }));
 
   beforeEach(inject(function($rootScope, $compile) {
@@ -82,7 +83,6 @@ describe('ClientSidePreview', function() {
       });
 
       it('should submit session', function() {
-        expect(scope.playerMode).toEqual('gather');
         expect(mockSubmitSession).toHaveBeenCalledWith(
           {components: componentSessions}, jasmine.any(Function), jasmine.any(Function));
       });
@@ -166,7 +166,6 @@ describe('ClientSidePreview', function() {
       });
 
       it('should not call ComponentData.reset', function() {
-        expect(scope.playerMode).toEqual('gather');
         expect(ComponentData.reset).not.toHaveBeenCalled();
       });
     });
@@ -213,12 +212,12 @@ describe('ClientSidePreview', function() {
 
   });
 
-  describe('editor.added event', function() {
+  describe('content.added.to.editor event', function() {
 
     describe('gather mode', function() {
       beforeEach(function() {
         scope.mode = 'gather';
-        scope.$broadcast('editor.added');
+        scope.$broadcast('content.added.to.editor');
       });
       it('should set mode to gather', function() {
         expect(scope.mode).toEqual('gather');
