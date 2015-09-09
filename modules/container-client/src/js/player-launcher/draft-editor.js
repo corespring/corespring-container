@@ -5,43 +5,44 @@ function EditorDefinition(element, options, errorCallback) {
   var errorCodes = require('error-codes');
   var instance;
 
-  function createItemAndDraft(callback){
+  function createItemAndDraft(callback) {
 
     var call = launcher.loadCall('draftEditor.createItemAndDraft');
-
     if (!call) {
       return;
     }
 
-    callback = callback || function(){};
+    callback = callback || function() {};
 
-    function onSuccess(result){
+    $.ajax({
+      type: call.method,
+      url: launcher.prepareUrl(call.url),
+      data: {
+        draftName: options.draftName
+      },
+      success: onSuccess,
+      error: onError.bind(this),
+      dataType: 'json'
+    });
 
-      if(options.onItemCreated){
+    function onSuccess(result) {
+      if (options.onItemCreated) {
         options.onItemCreated(result.itemId);
       }
 
-      if(options.onDraftCreated){
+      if (options.onDraftCreated) {
         options.onDraftCreated(result.itemId, result.draftName);
       }
 
       callback(null, result);
     }
 
-    function onError(xhrErr){
+    function onError(xhrErr) {
       var msg = (xhrErr.responseJSON && xhrErr.responseJSON.error) ?
         xhrErr.responseJSON.error : 'Failed to create item and draft: ' + options.draftId;
       callback(msg);
     }
 
-    $.ajax({
-      type: call.method,
-      url: launcher.prepareUrl(call.url),
-      data: { draftName: options.draftName },
-      success: onSuccess,
-      error: onError.bind(this),
-      dataType: 'json'
-    });
   }
 
   function loadDraftItem(draftId, options) {
@@ -50,7 +51,7 @@ function EditorDefinition(element, options, errorCallback) {
       throw new Error('invalid draftId');
     }
 
-    var call = launcher.loadCall(options.devEditor ? 'draftEditor.devEditor' : 'draftEditor.editor', function(u){
+    var call = launcher.loadCall(options.devEditor ? 'draftEditor.devEditor' : 'draftEditor.editor', function(u) {
       return u.replace(':draftId', draftId);
     });
 
@@ -70,50 +71,52 @@ function EditorDefinition(element, options, errorCallback) {
     }
 
     var initialData = {};
+    options = options || {};
 
-    if(options.showSaveMessage){
+    if (options.showSaveMessage) {
       initialData.showSaveMessage = options.showSaveMessage;
     }
 
-    if(options.hideSaveButton){
+    if (options.hideSaveButton) {
       initialData.hideSaveButton = options.hideSaveButton;
     }
 
-    if(options.profileConfig){
+    if (options.profileConfig) {
       initialData.profileConfig = options.profileConfig;
-    }
-
-    function onReady(instance){
-      if(options.devEditor){
-        instance.css('height', '100%');
-      }
-
-      if(options.onDraftLoaded){
-        options.onDraftLoaded(options.itemId, options.draftName);
-      }
     }
 
     instance = launcher.loadInstance(call, options.queryParams, initialData, onReady);
 
-    if(options && typeof(options.onItemChanged) === 'function'){
-      instance.on('itemChanged', function(data){
+    if (typeof(options.onItemChanged) === 'function') {
+      instance.on('itemChanged', function(data) {
         options.onItemChanged(data);
       });
     }
+
+    function onReady(instance) {
+      if (options.devEditor) {
+        instance.css('height', '100%');
+      }
+
+      if (options.onDraftLoaded) {
+        options.onDraftLoaded(options.itemId, options.draftName);
+      }
+    }
+
   }
 
   var ok = launcher.init();
 
-  if(ok){
+  if (ok) {
     options.draftName = options.draftName || msgr.utils.getUid(); //jshint ignore:line
 
     if (options.itemId) {
       var draftId = new DraftId(options.itemId, options.draftName);
       loadDraftItem(draftId.toString(), options);
     } else {
-      createItemAndDraft(function(err, result){
+      createItemAndDraft(function(err, result) {
 
-        if(err){
+        if (err) {
           errorCallback(errorCodes.CREATE_ITEM_AND_DRAFT_FAILED(err));
         } else {
           options.itemId = result.itemId;
@@ -129,15 +132,15 @@ function EditorDefinition(element, options, errorCallback) {
     return;
   }
 
-  function DraftId(itemId,name){
-    this.toString = function(){
+  function DraftId(itemId, name) {
+    this.toString = function() {
       return itemId + '~' + name;
     };
   }
 
   /** Public functions */
   this.forceSave = function(callback) {
-    instance.send('saveAll', function(err, data){
+    instance.send('saveAll', function(err, data) {
       callback(err, data);
     });
   };
@@ -145,31 +148,33 @@ function EditorDefinition(element, options, errorCallback) {
   this.commitDraft = function(force, callback) {
     this.forceSave(function(err, data) {
 
-      if(err){
+      if (err) {
         callback(err);
         return;
-      } 
+      }
 
-      var call = launcher.loadCall('draftEditor.commitDraft', function(u){
-        return u.replace(':draftId',new DraftId(options.itemId, options.draftName).toString());
+      var call = launcher.loadCall('draftEditor.commitDraft', function(u) {
+        return u.replace(':draftId', new DraftId(options.itemId, options.draftName).toString());
       });
 
-      function onSuccess(result){
+      function onSuccess(result) {
         if (callback) {
           callback(null);
         }
       }
 
-      function onError(err){
+      function onError(err) {
         var msg = (err.responseJSON && err.responseJSON.error) ? err.responseJSON.error : 'Failed to commit draft: ' + options.draftId;
-        if(callback){
+        if (callback) {
           callback(errorCodes.COMMIT_DRAFT_FAILED(msg));
         }
       }
 
       $.ajax({
         type: call.method,
-        url: launcher.prepareUrl(call.url, {force: force}),
+        url: launcher.prepareUrl(call.url, {
+          force: force
+        }),
         data: {},
         success: onSuccess,
         error: onError,
@@ -179,7 +184,7 @@ function EditorDefinition(element, options, errorCallback) {
   };
 
   this.remove = function() {
-    if(instance){
+    if (instance) {
       instance.remove();
     }
   };
