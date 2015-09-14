@@ -1,6 +1,8 @@
 package org.corespring.container.client.controllers.apps
 
+import org.corespring.container.client.HasContext
 import org.corespring.container.client.controllers.jade.Jade
+import org.corespring.container.client.integration.ContainerExecutionContext
 
 import scala.concurrent.{ ExecutionContext, Future }
 
@@ -15,7 +17,8 @@ import play.api.mvc.{ Action, AnyContent, RequestHeader }
 trait Rig
   extends App[LoadHook]
   with PlayerItemTypeReader
-  with Jade {
+  with Jade
+  with HasContext {
 
   def index(componentType: String, data: Option[String] = None) = controllers.Assets.at("/container-client", "rig.html")
 
@@ -36,7 +39,7 @@ trait Rig
 
   override def hooks: LoadHook = new LoadHook {
 
-    override implicit def ec: ExecutionContext = ExecutionContext.Implicits.global
+    override implicit def ec: ContainerExecutionContext = Rig.this.ec
 
     override def load(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]] = Future {
       val componentType = id

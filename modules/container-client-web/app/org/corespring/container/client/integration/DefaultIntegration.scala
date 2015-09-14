@@ -24,6 +24,14 @@ import play.api.{ Mode, Play }
 
 import scala.concurrent.ExecutionContext
 
+class ContainerExecutionContext(underlying: ExecutionContext) extends ExecutionContext {
+  require(underlying != null, "underlying execution context must not be null")
+
+  override def execute(runnable: Runnable): Unit = underlying.execute(runnable)
+
+  override def reportFailure(t: Throwable): Unit = underlying.reportFailure(t)
+}
+
 trait DefaultIntegration
   extends ContainerControllers
   with ComponentSplitter
@@ -35,6 +43,7 @@ trait DefaultIntegration
 
   def versionInfo: JsObject
 
+  def ec: ContainerExecutionContext
   /**
    * For a given resource path return a resolved path.
    * By default this just returns the path, so no domain is used.
@@ -48,8 +57,6 @@ trait DefaultIntegration
     val componentsPath = configuration.getString("components.path").getOrElse("components")
     Validator.absolutePathInProdMode(componentsPath)
   }
-
-  implicit def ec: ExecutionContext
 
   protected val internalProcessor: PlayerItemPreProcessor = new PlayerItemPreProcessor with ItemPruner {
 
@@ -101,7 +108,7 @@ trait DefaultIntegration
 
     override def mode: Mode = Play.current.mode
 
-    override implicit def ec: ExecutionContext = DefaultIntegration.this.ec
+    override implicit def ec = DefaultIntegration.this.ec
 
     override def components = DefaultIntegration.this.components
 
@@ -113,9 +120,12 @@ trait DefaultIntegration
   }
 
   lazy val libs = new ComponentsFileController {
+
     def componentsPath: String = configuration.getString("components.path").getOrElse("components")
 
     def defaultCharSet: String = configuration.getString("default.charset").getOrElse("utf-8")
+
+    override implicit def ec: ContainerExecutionContext = DefaultIntegration.this.ec
   }
 
   lazy val itemEditor = new ItemEditor {
@@ -224,7 +234,7 @@ trait DefaultIntegration
   lazy val collection = new Collection {
     override def hooks: CollectionHooks = collectionHooks
 
-    override implicit def ec: ExecutionContext = DefaultIntegration.this.ec
+    override implicit def ec = DefaultIntegration.this.ec
   }
 
   lazy val item = new Item {
@@ -232,7 +242,7 @@ trait DefaultIntegration
 
     override def componentTypes: Seq[String] = DefaultIntegration.this.components.map(_.componentType)
 
-    override implicit def ec: ExecutionContext = DefaultIntegration.this.ec
+    override implicit def ec = DefaultIntegration.this.ec
   }
 
   lazy val itemDraft = new ItemDraft {
@@ -242,12 +252,14 @@ trait DefaultIntegration
 
     override def hooks: CoreItemHooks with DraftHooks = itemDraftHooks
 
-    override implicit def ec: ExecutionContext = DefaultIntegration.this.ec
+    override implicit def ec = DefaultIntegration.this.ec
 
     override protected def componentTypes: Seq[String] = DefaultIntegration.this.components.map(_.componentType)
   }
 
   lazy val session = new Session {
+
+    override implicit def ec = DefaultIntegration.this.ec
 
     override def hooks: SessionHooks = sessionHooks
 
@@ -259,7 +271,7 @@ trait DefaultIntegration
   }
 
   lazy val playerLauncher = new PlayerLauncher {
-    override implicit def ec: ExecutionContext = DefaultIntegration.this.ec
+    override implicit def ec = DefaultIntegration.this.ec
 
     def hooks = playerLauncherHooks
 
@@ -268,5 +280,7 @@ trait DefaultIntegration
 
   override def dataQuery: DataQuery = new DataQuery {
     override def hooks: DataQueryHooks = dataQueryHooks
+
+    override implicit def ec = DefaultIntegration.this.ec
   }
 }

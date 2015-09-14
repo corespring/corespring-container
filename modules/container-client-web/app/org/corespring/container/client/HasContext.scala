@@ -1,11 +1,7 @@
 package org.corespring.container.client
 
-import play.api.libs.concurrent.Akka
-
-import scala.concurrent.ExecutionContext
-
-import play.api.Play.current
+import org.corespring.container.client.integration.ContainerExecutionContext
 
 trait HasContext {
-  implicit def ec: ExecutionContext = Akka.system.dispatchers.lookup("akka.actor.item-session-api")
+  implicit def ec: ContainerExecutionContext
 }

@@ -2,7 +2,6 @@ package org.corespring.container.client.controllers.resources
 
 import org.corespring.container.client.HasContext
 import org.corespring.container.client.controllers.resources.Session.Errors
-import org.corespring.container.client.controllers.resources.session.ItemPruner
 import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.client.hooks._
 import org.corespring.container.components.outcome.ScoreProcessor
@@ -94,9 +93,9 @@ trait Session extends Controller with HasContext {
         val json = fs.everything
 
         val itemJson = (json \ "item").as[JsObject]
-        
+
         val processedItem = itemPreProcessor.preProcessItemForPlayer(itemJson)
-        
+
         val sessionJson = (json \ "session").as[JsObject]
 
         val base = Json.obj(
@@ -150,33 +149,34 @@ trait Session extends Controller with HasContext {
    * @return
    */
   def loadOutcome(id: String) = Action {
-    implicit request => {
-      val reponse = hooks.loadOutcome(id)
+    implicit request =>
+      {
+        val reponse = hooks.loadOutcome(id)
 
-      reponse match {
-        case Left(err) => InternalServerError(err._2)
-        case Right(so) => {
-          logger.trace(s"[loadOutcome]: $id : ${Json.stringify(so.itemSession)}")
+        reponse match {
+          case Left(err) => InternalServerError(err._2)
+          case Right(so) => {
+            logger.trace(s"[loadOutcome]: $id : ${Json.stringify(so.itemSession)}")
 
-          def hasAnswers = (so.itemSession \ "components").asOpt[JsObject].isDefined
+            def hasAnswers = (so.itemSession \ "components").asOpt[JsObject].isDefined
 
-          if (so.isSecure && !so.isComplete) {
-            BadRequest(Json.obj("error" -> JsString("secure mode: can't load outcome - session isn't complete")))
-          } else {
-            request.body.asJson.map { settings =>
-              val outcome = outcomeProcessor.createOutcome(so.item, so.itemSession, settings)
-              val score = scoreProcessor.score(so.item, so.itemSession, outcome)
-              Ok(Json.obj("outcome" -> outcome) ++ Json.obj("score" -> score) ++ (hasAnswers match {
-                case false => Json.obj("warning" -> "this session contains no answers")
-                case true => Json.obj()
-              }))
-            }.getOrElse {
-              BadRequest(Json.obj("error" -> "No settings in request body"))
+            if (so.isSecure && !so.isComplete) {
+              BadRequest(Json.obj("error" -> JsString("secure mode: can't load outcome - session isn't complete")))
+            } else {
+              request.body.asJson.map { settings =>
+                val outcome = outcomeProcessor.createOutcome(so.item, so.itemSession, settings)
+                val score = scoreProcessor.score(so.item, so.itemSession, outcome)
+                Ok(Json.obj("outcome" -> outcome) ++ Json.obj("score" -> score) ++ (hasAnswers match {
+                  case false => Json.obj("warning" -> "this session contains no answers")
+                  case true => Json.obj()
+                }))
+              }.getOrElse {
+                BadRequest(Json.obj("error" -> "No settings in request body"))
+              }
             }
           }
         }
       }
-    }
   }
 
   /**

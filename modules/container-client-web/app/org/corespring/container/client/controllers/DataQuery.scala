@@ -39,8 +39,6 @@ trait DataQuery extends Controller with HasContext {
 
   def hooks: DataQueryHooks
 
-  implicit def ec: ExecutionContext
-
   /** list all that match the query - if there's no query list all */
   def list(topic: String, query: Option[String] = None): Action[AnyContent] = Action.async { implicit request =>
 

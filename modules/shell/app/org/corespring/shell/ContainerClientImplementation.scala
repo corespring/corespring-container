@@ -5,12 +5,11 @@ import java.net.URLDecoder
 
 import com.typesafe.config.ConfigFactory
 import org.apache.commons.io.{ FileUtils, IOUtils }
-import org.corespring.amazon.s3.{ S3Service, ConcreteS3Service }
-import org.corespring.container.client.controllers.apps.{ ItemEditor, ItemDevEditor }
+import org.corespring.amazon.s3.{ ConcreteS3Service, S3Service }
 import org.corespring.container.client.controllers.{ AssetType, _ }
 import org.corespring.container.client.hooks._
-import org.corespring.container.client.integration.DefaultIntegration
-import org.corespring.container.client.{ AssetUtils, CompressedAndMinifiedComponentSets, VersionInfo }
+import org.corespring.container.client.integration.{ ContainerExecutionContext, DefaultIntegration }
+import org.corespring.container.client.{ AssetUtils, CompressedAndMinifiedComponentSets, HasContext, VersionInfo }
 import org.corespring.container.components.model.Component
 import org.corespring.container.components.model.dependencies.DependencyResolver
 import org.corespring.container.logging.ContainerLogger
@@ -18,7 +17,7 @@ import org.corespring.mongo.json.services.MongoService
 import org.corespring.shell.controllers.ShellDataQueryHooks
 import org.corespring.shell.controllers.catalog.actions.{ CatalogHooks => ShellCatalogHooks }
 import org.corespring.shell.controllers.editor.actions.{ DraftEditorHooks => ShellDraftEditorHooks, ItemEditorHooks => ShellItemEditorHooks }
-import org.corespring.shell.controllers.editor.{ ItemDraftHooks => ShellItemDraftHooks, ItemHooks => ShellItemHooks, CollectionHooks => ShellCollectionHooks, ItemAssets, ItemDraftAssets }
+import org.corespring.shell.controllers.editor.{ CollectionHooks => ShellCollectionHooks, ItemAssets, ItemDraftAssets, ItemDraftHooks => ShellItemDraftHooks, ItemHooks => ShellItemHooks }
 import org.corespring.shell.controllers.player.actions.{ PlayerHooks => ShellPlayerHooks }
 import org.corespring.shell.controllers.player.{ SessionHooks => ShellSessionHooks }
 import org.corespring.shell.services.ItemDraftService
@@ -47,7 +46,7 @@ class ContainerClientImplementation(
 
   override def components: Seq[Component] = componentsIn
 
-  override implicit def ec: ExecutionContext = ExecutionContext.Implicits.global
+  override implicit def ec = new ContainerExecutionContext(ExecutionContext.global)
 
   override def playerLauncherHooks: PlayerLauncherHooks = new PlayerLauncherHooks {
 
@@ -67,6 +66,7 @@ class ContainerClientImplementation(
 
     override def catalogJs(implicit header: RequestHeader): Future[PlayerJs] = loader.loadJs(header)
 
+    override implicit def ec: ContainerExecutionContext = ContainerClientImplementation.this.ec
   }
 
   object s3 {
@@ -75,7 +75,7 @@ class ContainerClientImplementation(
     lazy val bucket = configuration.getString("amazon.s3.bucket").getOrElse(throw new RuntimeException("No bucket specified"))
   }
 
-  lazy val assets = new Assets with ItemDraftAssets with ItemAssets {
+  lazy val assets = new Assets with ItemDraftAssets with ItemAssets with withContext {
 
     lazy val (playS3, assetUtils) = {
       val out = for {
@@ -92,8 +92,6 @@ class ContainerClientImplementation(
       }
       out.getOrElse(throw new RuntimeException("No amazon key/secret"))
     }
-
-    override implicit def ec: ExecutionContext = ContainerClientImplementation.this.ec
 
     import AssetType._
 
@@ -192,59 +190,62 @@ class ContainerClientImplementation(
     override def assets: Assets = ContainerClientImplementation.this.assets
 
     override def itemService: MongoService = ContainerClientImplementation.this.itemService
+
+    override implicit def ec: ContainerExecutionContext = ContainerClientImplementation.this.ec
   }
 
   override def itemEditorHooks: ItemEditorHooks = new ShellItemEditorHooks {
     override def assets: Assets = ContainerClientImplementation.this.assets
 
     override def itemService: MongoService = ContainerClientImplementation.this.itemService
+
+    override implicit def ec: ContainerExecutionContext = ContainerClientImplementation.this.ec
   }
 
   override def catalogHooks: CatalogHooks = new ShellCatalogHooks {
     override def itemService: MongoService = ContainerClientImplementation.this.itemService
     override def assets: Assets = ContainerClientImplementation.this.assets
+
+    override implicit def ec: ContainerExecutionContext = ???
   }
 
-  override def sessionHooks: SessionHooks = new ShellSessionHooks {
+  private[ContainerClientImplementation] trait withContext extends HasContext {
+    override implicit def ec = ContainerClientImplementation.this.ec
+  }
+
+  override def sessionHooks: SessionHooks = new ShellSessionHooks with withContext {
     override def itemService: MongoService = ContainerClientImplementation.this.itemService
 
     override def sessionService: MongoService = ContainerClientImplementation.this.sessionService
-
-    override implicit def ec: ExecutionContext = ContainerClientImplementation.this.ec
   }
 
-  override def itemDraftHooks: DraftHooks = new ShellItemDraftHooks {
+  override def itemDraftHooks: DraftHooks = new ShellItemDraftHooks with withContext {
     override def itemService: MongoService = ContainerClientImplementation.this.itemService
 
     override def draftItemService = ContainerClientImplementation.this.draftItemService
 
     override def assets: ItemDraftAssets = ContainerClientImplementation.this.assets
+
   }
 
-  override def itemHooks: ItemHooks = new ShellItemHooks {
+  override def itemHooks: ItemHooks = new ShellItemHooks with withContext {
     override def itemService: MongoService = ContainerClientImplementation.this.itemService
 
     override def assets: ItemAssets = ContainerClientImplementation.this.assets
   }
 
-  override def playerHooks: PlayerHooks = new ShellPlayerHooks {
+  override def playerHooks: PlayerHooks = new ShellPlayerHooks with withContext {
     override def sessionService: MongoService = ContainerClientImplementation.this.sessionService
     override def assets: Assets = ContainerClientImplementation.this.assets
 
     override def itemService: MongoService = ContainerClientImplementation.this.itemService
-
-    override implicit def ec: ExecutionContext = ContainerClientImplementation.this.ec
   }
 
-  override def dataQueryHooks: DataQueryHooks = new ShellDataQueryHooks {
-    override implicit def ec: ExecutionContext = ContainerClientImplementation.this.ec
-  }
+  override def dataQueryHooks: DataQueryHooks = new ShellDataQueryHooks with withContext
 
   override def versionInfo: JsObject = VersionInfo(Play.current.configuration)
 
-  override def collectionHooks: CollectionHooks = new ShellCollectionHooks {
-
-  }
+  override def collectionHooks: CollectionHooks = new ShellCollectionHooks with withContext
 
 }
 
