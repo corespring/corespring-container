@@ -124,14 +124,14 @@
 
         function tryButtonLabel() {
           return {
-            instructor: "Try It"
-          }[$scope.playerMode] || "<";
+            instructor: "try It"
+          }[$scope.playerMode] || "back";
         }
 
         function submitButtonLabel() {
           return {
-            gather: "Submit Answer"
-          }[$scope.playerMode] || "Reset";
+            gather: "submit answer"
+          }[$scope.playerMode] || "reset";
         }
 
         function buttonClass() {
@@ -152,21 +152,24 @@
         link: linkFn,
         template: [
             '<div>',
+            '  <div class="btn-try-holder">',
+            '    <button class="btn btn-try" ng-click="tryOrGoBack()">',
+            '      {{tryButtonLabel()}}',
+            '    </button>',
+            '  </div>',
             '  <corespring-isolate-player',
             '    player-mode="playerMode"',
             '    player-markup="xhtml"',
             '    player-item="item"',
             '    player-outcomes="outcome"',
-            '    player-session="itemSession"></corespring-isolate-player>',
-            '  <div style="text-align: center">',
+            '    player-session="itemSession">',
+            '  </corespring-isolate-player>',
+            '  <div class="btn-submit-holder">',
             '    <span ng-hide="playerMode == \'instructor\'">',
             '      <button class="btn btn-submit" ng-click="submitOrReset()">',
             '        {{submitButtonLabel()}}',
             '      </button>',
             '    </span>',
-            '    <button class="pull-right btn btn-submit" ng-click="tryOrGoBack()">',
-            '      {{tryButtonLabel()}}',
-            '    </button>',
             '  </div>',
             '</div>'
           ].join("\n")

@@ -1,7 +1,15 @@
 .question-information {
-  
-  @very-light-grey: #f6f6f6;  
-  @mid-grey: #555;  
+
+  @very-light-grey: #f6f6f6;
+  @mid-grey: #555;
+
+  padding: 20px;
+
+  .grey-bg {
+    background-color: @very-light-grey;
+    color: @mid-grey;
+    outline: none;
+  }
 
   iframe {
     border: none;
@@ -9,37 +17,57 @@
     height: 100%;
   }
 
-  .grey-bg{
-    background-color: @very-light-grey;
-    color: @mid-grey;
-    outline: none;
+  .nav-pills > li.active > a,
+  .nav-pills > li.active > a:hover,
+  .nav-pills > li.active > a:focus {
+    .grey-bg();
   }
 
-  .nav-pills > li.active > a, .nav-pills > li.active > a:hover, .nav-pills > li.active > a:focus {
-    .grey-bg(); 
+  .btn-try-holder {
+    height: 60px;
+    position: relative;
+
+    .btn-try {
+      position: absolute;
+      right: 50px;
+    }
   }
 
-  padding:20px;
+  .btn-submit-holder {
+    height: 60px;
+    padding-top: 10px;
+    position: relative;
+    .btn-submit {
+      position: absolute;
+      right: 50px;
+    }
+  }
 
-  ul.dropdown-menu{
+  .corespring-player {
+    border: dashed 1px @light-grey;
+    padding-top: 10px;
+    border-radius: 16px;
+  }
+
+  ul.dropdown-menu {
     margin: 0;
     padding: 0;
   }
 
-  ul.dropdown-menu > li{
-    border-bottom: solid 1px rgba(0, 0, 0, 0.15); 
-    &.last{
-      border-bottom: none; 
+  ul.dropdown-menu > li {
+    border-bottom: solid 1px rgba(0, 0, 0, 0.15);
+    &.last {
+      border-bottom: none;
     }
   }
 
-  ul.section-menu{
-    
-    .dropdown-header{
+  ul.section-menu {
+
+    .dropdown-header {
       padding: 13px 15px 7px 19px;
       text-transform: uppercase;
     }
-    
+
     li {
       a {
         display: block;
@@ -48,13 +76,14 @@
         color: @mid-grey;
       }
 
-      &.active, a:hover{
+      &.active,
+      a:hover {
         .grey-bg();
       }
     }
   }
-  
-  ul{
+
+  ul {
     padding-left: 0;
     margin-left: 0;
 
