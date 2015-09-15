@@ -97,32 +97,6 @@ describe('supporting materials service', function() {
     });
   });
 
-  describe('getFileSizeInKB', function() {
-    
-    var headers;
-
-    beforeEach(function(){
-      onSuccess = jasmine.createSpy('onSuccess');
-      onError = jasmine.createSpy('onError');
-      service.getFileSizeInKB({name:'name'}, {name:'filename'}, onSuccess, onError);
-      headers = jasmine.createSpy('headers').and.returnValue(1024);
-      mockHttp.get.promise.triggerSuccess('data', 200, headers);
-      mockHttp.get.promise.triggerError('not ok');
-    });
-
-    it('calls $http.get', function(){
-      expect(mockHttp.get).toHaveBeenCalledWith(mockSmUtils.getBinaryUrl());       
-    });
-
-    it('calls success', function(){
-      expect(onSuccess).toHaveBeenCalledWith(1);
-    });
-    
-    it('calls error', function(){
-      expect(onError).toHaveBeenCalledWith();
-    });
-  });
-
   describe('getBinaryUrl', function() {
     it('calls SmUtils.getBinaryUrl', function(){
       service.getBinaryUrl({name:'material'}, {name: 'filename'});

@@ -36,20 +36,6 @@ angular.module('corespring-common.supporting-materials.services')
             .error(onFailure);
         };
 
-        this.getFileSizeInKB = function(m, file, success, error){
-
-          var url =  this.getBinaryUrl(m, file);
-
-          $http.get(url)
-            .success(function(data, status, headers){
-              success(headers('content-length')/1024);
-            })
-            .error(function(err){
-              logger.warn(err);
-              error();
-            });
-        };
-
         this.getBinaryUrl = function(m, file){
           return SmUtils.getBinaryUrl(m, file);
         };
