@@ -235,27 +235,6 @@ describe('QuestionController', function() {
 
   });
 
-  describe('itemChanged event', function() {
-    var focusCaretAtEnd = jasmine.createSpy('focusCaretAtEnd');
-
-    beforeEach(function() {
-      spyOn(scope, 'getWiggiWizElement').and.returnValue({
-        scope: function() {
-          return {
-            focusCaretAtEnd: focusCaretAtEnd
-          };
-        }
-      });
-      scope.$emit('itemChanged');
-      timeout.flush();
-    });
-
-    it("should call focusCaretAtEnd on wiggi-wiz element's scope", function() {
-      expect(focusCaretAtEnd).toHaveBeenCalled();
-    });
-
-  });
-
   describe('$watch item.xhtml', function(){
     beforeEach(function(){
       scope.item = {xhtml:"abc"};
