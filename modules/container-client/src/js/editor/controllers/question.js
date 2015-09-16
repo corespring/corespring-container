@@ -126,10 +126,6 @@ angular.module('corespring-editor.controllers')
 
       $scope.$on('itemChanged', function(event, $node) {
         $scope.$broadcast(EDITOR_EVENTS.CONTENT_ADDED_TO_EDITOR);
-        // This ends up in some weird race condition if we don't wrap it in a $timeout
-        $timeout(function() {
-          $scope.getWiggiWizElement().scope().focusCaretAtEnd();
-        });
       });
 
       $scope.serialize = function(comps) {
