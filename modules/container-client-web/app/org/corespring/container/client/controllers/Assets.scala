@@ -16,7 +16,7 @@ object AssetType extends Enumeration {
 
 trait Assets extends Controller with HasContext {
   import AssetType._
-  def load(t: AssetType, id: String, path: String)(implicit h: RequestHeader): SimpleResult
+  def load(t: AssetType, id: String, path: String)(implicit h: RequestHeader): Future[SimpleResult]
   def delete(t: AssetType, id: String, path: String)(implicit h: RequestHeader): Future[Option[(Int, String)]]
   def upload(t: AssetType, id: String, path: String)(predicate: RequestHeader => Option[SimpleResult]): BodyParser[Future[UploadResult]]
 }

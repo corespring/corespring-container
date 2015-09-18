@@ -121,14 +121,13 @@ class ContainerClientImplementation(
       mkPath(t, id, ("materials" +: rest): _*)
     }
 
-    override def load(t: AssetType, id: String, path: String)(implicit h: RequestHeader): SimpleResult = {
+    override def load(t: AssetType, id: String, path: String)(implicit h: RequestHeader): Future[SimpleResult] = {
       val result = playS3.download(s3.bucket, URLDecoder.decode(mkPath(t, id, path), "utf-8"), Some(h.headers))
 
-      if (result.header.status == OK || result.header.status == NOT_MODIFIED) {
-        result
-      } else {
-        playS3.download(s3.bucket, mkPath(t, id, path), Some(h.headers))
-      }
+      Future.successful((result.header.status == OK || result.header.status == NOT_MODIFIED) match {
+        case true => result
+        case false => playS3.download(s3.bucket, mkPath(t, id, path), Some(h.headers))
+      })
     }
 
     override def delete(t: AssetType, id: String, path: String)(implicit h: RequestHeader): Future[Option[(Int, String)]] = Future {

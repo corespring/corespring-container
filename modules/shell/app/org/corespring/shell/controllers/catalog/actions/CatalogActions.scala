@@ -30,6 +30,7 @@ trait CatalogHooks extends ContainerCatalogHooks {
   }
   override def showCatalog(itemId: String)(implicit header: RequestHeader): Future[Option[(Int, String)]] = Future(None)
 
-  override def loadFile(id: String, path: String)(request: Request[AnyContent]): SimpleResult = assets.load(AssetType.Item, id, path)(request)
+  override def loadFile(id: String, path: String)(request: Request[AnyContent]): Future[SimpleResult] =
+    assets.load(AssetType.Item, id, path)(request)
 
 }

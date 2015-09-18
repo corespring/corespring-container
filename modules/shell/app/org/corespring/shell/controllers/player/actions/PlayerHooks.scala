@@ -55,7 +55,7 @@ trait PlayerHooks extends ContainerPlayerHooks {
     out.map(Right(_)).getOrElse(Left(NOT_FOUND -> "Can't find item or session"))
   }
 
-  override def loadFile(id: String, path: String)(request: Request[AnyContent]): SimpleResult = {
+  override def loadFile(id: String, path: String)(request: Request[AnyContent]): Future[SimpleResult] = {
 
     val out = for {
       dbo <- sessionService.collection.findOneByID(new ObjectId(id), MongoDBObject("itemId" -> 1))
@@ -63,10 +63,10 @@ trait PlayerHooks extends ContainerPlayerHooks {
       result <- Some(assets.load(AssetType.Item, itemId, path)(request))
     } yield result
     import Results.NotFound
-    out.getOrElse(NotFound(""))
+    out.getOrElse(Future.successful(NotFound("")))
   }
 
-  override def loadItemFile(itemId: String, file: String)(implicit header: RequestHeader): SimpleResult = {
+  override def loadItemFile(itemId: String, file: String)(implicit header: RequestHeader): Future[SimpleResult] = {
     assets.load(AssetType.Item, itemId, file)(header)
   }
 }

@@ -84,7 +84,8 @@ trait ItemEditorHooks extends ContainerEditorHooks {
     assets.upload(AssetType.Item, itemId, file)(shellPredicate)
   }
 
-  override def loadFile(id: String, path: String)(request: Request[AnyContent]): SimpleResult = assets.load(AssetType.Item, id, path)(request)
+  override def loadFile(id: String, path: String)(request: Request[AnyContent]): Future[SimpleResult] =
+    assets.load(AssetType.Item, id, path)(request)
 
 }
 
@@ -127,7 +128,8 @@ trait DraftEditorHooks extends ContainerEditorHooks {
     }
     assets.upload(AssetType.Draft, draftId, file)(shellPredicate)
   }
-  override def loadFile(id: String, path: String)(request: Request[AnyContent]): SimpleResult = assets.load(AssetType.Draft, id, path)(request)
+  override def loadFile(id: String, path: String)(request: Request[AnyContent]): Future[SimpleResult] =
+    assets.load(AssetType.Draft, id, path)(request)
 
 }
 

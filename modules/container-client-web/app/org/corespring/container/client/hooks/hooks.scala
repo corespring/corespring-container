@@ -15,7 +15,7 @@ object Hooks {
 }
 
 trait GetAssetHook {
-  def loadFile(id: String, path: String)(request: Request[AnyContent]): SimpleResult
+  def loadFile(id: String, path: String)(request: Request[AnyContent]): Future[SimpleResult]
 }
 
 case class UploadResult(path: String)
@@ -43,7 +43,7 @@ trait LoadHook extends HasContext {
 trait PlayerHooks extends GetAssetHook with HasContext {
   def createSessionForItem(itemId: String)(implicit header: RequestHeader): Future[Either[StatusMessage, (JsValue, JsValue)]]
   def loadSessionAndItem(sessionId: String)(implicit header: RequestHeader): Future[Either[StatusMessage, (JsValue, JsValue)]]
-  def loadItemFile(itemId: String, file: String)(implicit header: RequestHeader): SimpleResult
+  def loadItemFile(itemId: String, file: String)(implicit header: RequestHeader): Future[SimpleResult]
 }
 
 trait CatalogHooks extends LoadHook with GetAssetHook {

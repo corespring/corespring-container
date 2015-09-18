@@ -157,7 +157,7 @@ trait Player
     }
   }
 
-  def getFileByItemId(itemId:String, file:String) = Action{ request => hooks.loadItemFile(itemId, file)(request)}
+  def getFileByItemId(itemId:String, file:String) = Action.async { request => hooks.loadItemFile(itemId, file)(request)}
 
   private def servicesJs(sessionId: String, queryParams: JsObject) = {
     import org.corespring.container.client.controllers.resources.routes._
