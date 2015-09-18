@@ -39,11 +39,8 @@
 
         $scope.itemSession = undefined;
 
-        $scope.tryOrGoBack = tryOrGoBack;
         $scope.submitOrReset = submitOrReset;
-        $scope.tryButtonLabel = tryButtonLabel;
         $scope.submitButtonLabel = submitButtonLabel;
-        $scope.buttonClass = buttonClass;
 
         setMode($scope.playerMode);
 
@@ -72,11 +69,6 @@
 
         function isGatherMode() {
           return $scope.playerMode === 'gather';
-        }
-
-        function tryOrGoBack() {
-          ComponentRegister.reset();
-          setMode($scope.playerMode != 'instructor' ? 'instructor' : 'gather');
         }
 
         function submitOrReset() {
@@ -122,24 +114,12 @@
           setMode('gather');
         }
 
-        function tryButtonLabel() {
-          return {
-            instructor: "try It"
-          }[$scope.playerMode] || "back";
-        }
-
         function submitButtonLabel() {
           return {
             gather: "submit answer"
           }[$scope.playerMode] || "reset";
         }
 
-        function buttonClass() {
-          return {
-            gather: "info",
-            instructor: "primary"
-          }[$scope.playerMode] || "danger";
-        }
       }
 
       return {
@@ -152,11 +132,6 @@
         link: linkFn,
         template: [
             '<div>',
-            '  <div class="btn-try-holder">',
-            '    <button class="btn btn-try" ng-click="tryOrGoBack()">',
-            '      {{tryButtonLabel()}}',
-            '    </button>',
-            '  </div>',
             '  <corespring-isolate-player',
             '    player-mode="playerMode"',
             '    player-markup="xhtml"',

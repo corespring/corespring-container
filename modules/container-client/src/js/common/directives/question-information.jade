@@ -1,16 +1,32 @@
 .question-information(ng-if="item")
   .col-sm-3(ng-hide='hideNav')
-    ul.nav.nav-pills.nav-stacked(role='tablist')
+    ul(role='tablist')
+      li.header(role='presentation')
+        h5 Version
+
       li(role='presentation',
-        ng-class="{active: activeTab == 'question'}", 
-        ng-click="selectTab('question')", ng-show="tabs.question")
-        a Question
+        ng-class="{active: activeTab == 'teacher'}",
+        ng-click="selectTab('teacher')", ng-show="tabs.question")
+        i.fa.fa-circle.bullet
+        a Teacher
+
+      li(role='presentation',
+        ng-class="{active: activeTab == 'student'}",
+        ng-click="selectTab('student')", ng-show="tabs.question")
+        i.fa.fa-circle.bullet
+        a Student
+
+      li.header.resources(role='presentation')
+        h5 Resources
+
       li(role='presentation',
         ng-class="{active: activeTab == 'profile'}", 
         ng-click="selectTab('profile')", ng-show="tabs.profile")
+        i.fa.fa-circle.bullet
         a Profile Information
       li(role='presentation', ng-show='item.supportingMaterials.length > 0 && tabs.supportingMaterial')
         a.dropdown-toggle(data-toggle='dropdown')
+          i.fa.fa-circle.bullet
           | Supporting Materials
           span.caret
         ul.dropdown-menu(role='menu')
@@ -18,13 +34,21 @@
             ul.section-menu
               li.dropdown-header {{section.name}}
               li(ng-repeat="sm in section.items", ng-class="{active: selectedMaterial == sm}")
+                i.fa.fa-circle.bullet
                 a(ng-click="selectSupportingMaterial(sm)") {{sm.name}}
 
   .col-sm-8
-    .player-container(ng-show="activeTab == 'question'")
+    .player-container(ng-if="activeTab == 'teacher'")
       corespring-demo-player(
         data-jade-template='question-information',
         player-mode="instructor",
+        player-markup="item.xhtml",
+        player-item="item")
+
+    .player-container(ng-if="activeTab == 'student'")
+      corespring-demo-player(
+        data-jade-template='question-information',
+        player-mode="gather",
         player-markup="item.xhtml",
         player-item="item")
 

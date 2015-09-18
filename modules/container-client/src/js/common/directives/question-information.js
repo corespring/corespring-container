@@ -26,7 +26,7 @@ angular.module('corespring-common.directives')
 
         var defaultTabs = ['question', 'profile', 'supportingMaterial'];
 
-        scope.activeTab = 'question';
+        scope.activeTab = 'teacher';
         scope.selectedMaterial = undefined;
 
         function availableTabs(){
@@ -55,6 +55,10 @@ angular.module('corespring-common.directives')
 
         function setActiveTab(tab) {
           if(scope.tabs && scope.tabs[tab]){
+            return tab;
+          }
+
+          if ((tab === 'teacher' || tab === 'student') && scope.tabs && scope.tabs['question']) {
             return tab;
           }
 
