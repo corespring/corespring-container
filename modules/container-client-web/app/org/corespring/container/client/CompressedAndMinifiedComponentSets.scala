@@ -24,6 +24,7 @@ trait CompressedAndMinifiedComponentSets extends DefaultComponentSets
 
   def process(s: String, contentType: String)(implicit rh: RequestHeader): Result = {
 
+    logger.warn(s"function=process - this is an expensive operation! use sparingly.")
     logger.trace(s"process minify? $minifyEnabled, gzip? $gzipEnabled")
 
     val out: Either[String, String] = contentType match {
@@ -34,9 +35,10 @@ trait CompressedAndMinifiedComponentSets extends DefaultComponentSets
     out match {
       case Right(s) => {
         if (gzipEnabled && acceptsGzip) {
-          Ok(gzip(s)).as(contentType).withHeaders(CONTENT_ENCODING -> "gzip")
+          val zipped = gzip(s)
+          Ok(zipped).as(contentType).withHeaders(CONTENT_ENCODING -> "gzip", CONTENT_LENGTH -> zipped.length.toString)
         } else {
-          Ok(s).as(contentType)
+          Ok(s).as(contentType).withHeaders(CONTENT_LENGTH -> s.getBytes("UTF-8").length.toString)
         }
       }
       case Left(err) => BadRequest(err)
