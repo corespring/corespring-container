@@ -12,6 +12,15 @@ import play.api.mvc.{ Filter, RequestHeader, ResponseHeader, SimpleResult }
 import play.api.http.HeaderNames._
 import scala.concurrent.{ ExecutionContext, Future }
 
+/**
+ * This filter intercepts calls to paths containing 'component-sets'.
+ * It check to see it the result of the request is on S3.
+ * - if there is an etag present it just checks for that and returns a 304 if it matches
+ * - if there's no etag it just returns the s3 data (with etag).
+ *
+ * - if the data isn't on s3, it invokes the underlying request, puts the result on s3,
+ * then adds the etag to that result.
+ */
 trait ComponentSetsFilter extends Filter {
 
   lazy val logger = Logger(classOf[ComponentSetsFilter])
@@ -87,7 +96,9 @@ trait ComponentSetsFilter extends Filter {
 
   override def apply(f: (RequestHeader) => Future[SimpleResult])(rh: RequestHeader): Future[SimpleResult] = {
 
-    logger.trace(s"function=apply, enabled=$enabled")
+    if (rh.path.contains("component-sets")) {
+      logger.trace(s"function=apply, enabled=$enabled")
+    }
 
     if (rh.path.contains("component-sets") && enabled) {
 
@@ -132,7 +143,7 @@ trait ComponentSetsFilter extends Filter {
 
           val o: Future[SimpleResult] = f.andThen {
             case result =>
-              logger.debug(s"function=apply, close the output stream")
+              logger.debug(s"function=apply, close the output and input streams")
               // Close the output stream whether there was an error or not
               outputStream.close()
               inputStream.close()
