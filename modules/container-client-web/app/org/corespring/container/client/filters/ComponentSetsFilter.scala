@@ -37,6 +37,8 @@ trait ComponentSetsFilter extends Filter {
 
   logger.info(s"enabled=$enabled")
 
+  val blockingRunner = new BlockingFutureRunner
+
   private def acceptsGzip(implicit rh: RequestHeader): Boolean = {
     rh.headers.get(ACCEPT_ENCODING).map(_.split(',').exists(_.trim == "gzip")).getOrElse(false)
   }
@@ -97,7 +99,7 @@ trait ComponentSetsFilter extends Filter {
   override def apply(f: (RequestHeader) => Future[SimpleResult])(rh: RequestHeader): Future[SimpleResult] = {
 
     if (rh.path.contains("component-sets")) {
-      logger.trace(s"function=apply, enabled=$enabled")
+      logger.trace(s"function=apply, enabled=$enabled, id=${rh.id}")
     }
 
     if (rh.path.contains("component-sets") && enabled) {
@@ -113,9 +115,9 @@ trait ComponentSetsFilter extends Filter {
 
       logger.debug(s"function=apply, path=$path, bucket=$bucket")
 
-      tryToLoadFromS3(path, rh.headers.get(IF_NONE_MATCH), {
+      tryToLoadFromS3(path, rh.headers.get(IF_NONE_MATCH), blockingRunner.run( _ => {
 
-        logger.warn(s"function=tryToLoadFromS3 - about to call an asset compilation operation")
+        logger.warn(s"function=tryToLoadFromS3, id=${rh.id} - about to call an asset compilation operation")
         val futureAssetResult = f(rh)
 
         futureAssetResult.flatMap { res =>
@@ -135,15 +137,17 @@ trait ComponentSetsFilter extends Filter {
           res.header.headers.get(CONTENT_ENCODING).map { e =>
             metadata.setContentEncoding(e)
           }
-
-          logger.debug(s"function=apply, put response on s3")
+          //Note: My guess is that if we slam the server
+          //A tonne of threads all attempt to put the object,
+          //and the streams aren't closing or the request never completes
+          //and you get a tonne of timeouts.
+          logger.debug(s"function=apply, id=${rh.id}, put response on s3")
           // Feed the body into the iteratee
           val f: Future[Unit] = (res.body |>>> iteratee)
           val putResult = s3.putObject(bucket, path, inputStream, metadata)
-
           val o: Future[SimpleResult] = f.andThen {
             case result =>
-              logger.debug(s"function=apply, close the output and input streams")
+              logger.debug(s"function=apply, id=${rh.id} close the output and input streams")
               // Close the output stream whether there was an error or not
               outputStream.close()
               inputStream.close()
@@ -152,7 +156,7 @@ trait ComponentSetsFilter extends Filter {
           }.map(_ => res.withHeaders(ETAG -> putResult.getETag))
           o
         }
-      })
+      }, rh))
     } else {
       f(rh)
     }
