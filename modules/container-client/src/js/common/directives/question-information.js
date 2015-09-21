@@ -58,7 +58,7 @@ angular.module('corespring-common.directives')
             return tab;
           }
 
-          if ((tab === 'teacher' || tab === 'student') && scope.tabs && scope.tabs['question']) {
+          if ((tab === 'teacher' || tab === 'student') && scope.tabs && scope.tabs.question) {
             return tab;
           }
 
