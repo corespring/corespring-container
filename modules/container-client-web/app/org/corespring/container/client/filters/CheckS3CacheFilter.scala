@@ -13,17 +13,18 @@ import play.api.http.HeaderNames._
 import scala.concurrent.{ ExecutionContext, Future }
 
 /**
- * This filter intercepts calls to paths containing 'component-sets'.
- * It check to see it the result of the request is on S3.
+ * This filter intercepts calls to paths that cause intercept(path) to return true.
+ *
+ * It checks to see it the result of the request is on S3 at the given path.
  * - if there is an etag present it just checks for that and returns a 304 if it matches
  * - if there's no etag it just returns the s3 data (with etag).
  *
  * - if the data isn't on s3, it invokes the underlying request, puts the result on s3,
  * then adds the etag to that result.
  */
-trait ComponentSetsFilter extends Filter {
+trait CheckS3CacheFilter extends Filter {
 
-  lazy val logger = Logger(classOf[ComponentSetsFilter])
+  lazy val logger = Logger(classOf[CheckS3CacheFilter])
 
   implicit def ec: ExecutionContext
 
@@ -33,11 +34,9 @@ trait ComponentSetsFilter extends Filter {
 
   def bucket: String
 
-  def enabled: Boolean
+  def intercept(path: String): Boolean
 
-  logger.info(s"enabled=$enabled")
-
-  val blockingRunner = new BlockingFutureRunner
+  def blockingRunner: BlockingFutureRunner
 
   private def acceptsGzip(implicit rh: RequestHeader): Boolean = {
     rh.headers.get(ACCEPT_ENCODING).map(_.split(',').exists(_.trim == "gzip")).getOrElse(false)
@@ -76,6 +75,7 @@ trait ComponentSetsFilter extends Filter {
       tryS3 {
         logger.debug(s"function=tryToLoadFromS3, key=$key, bucket=$bucket - try to load metadata")
         val metadata = s3.getObjectMetadata(bucket, key)
+        println(s"metadata: $metadata")
         if (metadata.getETag == e) {
           logger.debug(s"function=tryToLoadFromS3, key=$key, bucket=$bucket - etag == metadata.etag - return $NOT_MODIFIED")
           Future(NotModified)
@@ -96,13 +96,16 @@ trait ComponentSetsFilter extends Filter {
     }
   }
 
+  private def getHeader(rh: SimpleResult, key: String): String = {
+    val headers = rh.header.headers
+    headers.get(key).getOrElse {
+      throw new RuntimeException(s"Response is missing $key header. This must be supplied.")
+    }
+  }
+
   override def apply(f: (RequestHeader) => Future[SimpleResult])(rh: RequestHeader): Future[SimpleResult] = {
 
-    if (rh.path.contains("component-sets")) {
-      logger.trace(s"function=apply, enabled=$enabled, id=${rh.id}")
-    }
-
-    if (rh.path.contains("component-sets") && enabled) {
+    if (intercept(rh.path)) {
 
       val path = {
         val base = s"components/$appVersion/${rh.path}"
@@ -115,9 +118,9 @@ trait ComponentSetsFilter extends Filter {
 
       logger.debug(s"function=apply, path=$path, bucket=$bucket")
 
-      tryToLoadFromS3(path, rh.headers.get(IF_NONE_MATCH), blockingRunner.run( _ => {
+      tryToLoadFromS3(path, rh.headers.get(IF_NONE_MATCH), blockingRunner.run(_ => {
 
-        logger.warn(s"function=tryToLoadFromS3, id=${rh.id} - about to call an asset compilation operation")
+        logger.warn(s"function=tryToLoadFromS3, path=${rh.path}, id=${rh.id} - about to call the underlying (and expensive) operation")
         val futureAssetResult = f(rh)
 
         futureAssetResult.flatMap { res =>
@@ -125,23 +128,20 @@ trait ComponentSetsFilter extends Filter {
           val outputStream = new PipedOutputStream()
           val inputStream = new PipedInputStream(outputStream)
 
-          // The iteratee that writes to the output stream
           val iteratee = Iteratee.foreach[Array[Byte]] { bytes =>
-            logger.trace("write bytes..")
             outputStream.write(bytes)
           }
 
           val metadata = new ObjectMetadata()
-          metadata.setContentLength(res.header.headers.get(CONTENT_LENGTH).get.toLong)
-          metadata.setContentType(res.header.headers.get(CONTENT_TYPE).get)
+
+          metadata.setContentLength(getHeader(res, CONTENT_LENGTH).toLong)
+          metadata.setContentType(getHeader(res, CONTENT_TYPE))
+
           res.header.headers.get(CONTENT_ENCODING).map { e =>
             metadata.setContentEncoding(e)
           }
-          //Note: My guess is that if we slam the server
-          //A tonne of threads all attempt to put the object,
-          //and the streams aren't closing or the request never completes
-          //and you get a tonne of timeouts.
-          logger.debug(s"function=apply, id=${rh.id}, put response on s3")
+
+          logger.debug(s"function=apply, path=${rh.path}, id=${rh.id}, put response on s3")
           // Feed the body into the iteratee
           val f: Future[Unit] = (res.body |>>> iteratee)
           val putResult = s3.putObject(bucket, path, inputStream, metadata)
