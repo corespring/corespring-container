@@ -38,7 +38,7 @@ trait CheckS3CacheFilter extends Filter {
 
   def intercept(path: String): Boolean
 
-  def blockingRunner: BlockingFutureRunner
+  private val blockingRunner: BlockingFutureRunner = new BlockingFutureRunner
 
   private def acceptsGzip(implicit rh: RequestHeader): Boolean = {
     rh.headers.get(ACCEPT_ENCODING).map(_.split(',').exists(_.trim == "gzip")).getOrElse(false)

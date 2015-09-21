@@ -35,8 +35,6 @@ object Global extends WithFilters(AccessControlFilter, CallBlockOnHeaderFilter) 
       }
       out
     }
-
-    override lazy val blockingRunner: BlockingFutureRunner = new BlockingFutureRunner
   }
 
   override def doFilter(a: EssentialAction): EssentialAction = {
