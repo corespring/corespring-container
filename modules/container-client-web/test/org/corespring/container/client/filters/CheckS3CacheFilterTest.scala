@@ -59,7 +59,7 @@ class CheckS3CacheFilterTest extends PlaySpecification with Mockito {
 
     def intercept: Boolean = true
 
-    def fr = FakeRequest()
+    def fr = FakeRequest("GET", "path")
 
     lazy val filter = new CheckS3CacheFilter {
       override def blockingRunner: BlockingFutureRunner = mockRunner
@@ -100,7 +100,7 @@ class CheckS3CacheFilterTest extends PlaySpecification with Mockito {
 
       "intercept and call s3.getObject" in new intercepted {
         status(result) must_== OK
-        there was one(mockS3).getObject(any[String], any[String])
+        there was one(mockS3).getObject("bucket", "cache-filter/version/path")
       }
 
       "set the encoding from the s3 object" in new intercepted {
@@ -130,9 +130,9 @@ class CheckS3CacheFilterTest extends PlaySpecification with Mockito {
 
         "call s3.getObjectMetadata" in new intercepted {
           mockMetadata.getETag returns "my-other-etag"
-          override val fr = FakeRequest().withHeaders(IF_NONE_MATCH -> "my-etag")
+          override val fr = FakeRequest("GET", "path").withHeaders(IF_NONE_MATCH -> "my-etag")
           status(result) must_== OK
-          there was one(mockS3).getObjectMetadata(any[String], any[String])
+          there was one(mockS3).getObjectMetadata("bucket", "cache-filter/version/path")
         }
 
         "return NotModified it the etag matches" in new intercepted {

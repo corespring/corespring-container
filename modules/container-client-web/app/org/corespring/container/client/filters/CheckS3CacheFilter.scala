@@ -28,6 +28,8 @@ trait CheckS3CacheFilter extends Filter {
 
   implicit def ec: ExecutionContext
 
+  def s3CacheDir: String = "cache-filter"
+
   def s3: AmazonS3
 
   def appVersion: String
@@ -108,7 +110,7 @@ trait CheckS3CacheFilter extends Filter {
     if (intercept(rh.path)) {
 
       val path = {
-        val base = s"components/$appVersion/${rh.path}"
+        val base = s"$s3CacheDir/$appVersion/${rh.path}"
         if (acceptsGzip(rh)) {
           s"$base.gz"
         } else {
