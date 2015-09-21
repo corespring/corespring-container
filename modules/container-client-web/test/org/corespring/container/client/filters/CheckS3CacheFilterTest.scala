@@ -7,7 +7,6 @@ import com.amazonaws.services.s3.model.{ PutObjectResult, ObjectMetadata, S3Obje
 import org.specs2.mock.Mockito
 import org.specs2.specification.Scope
 import play.api.mvc.Results._
-import play.api.mvc.{ RequestHeader, SimpleResult }
 import play.api.test.{ FakeRequest, PlaySpecification }
 
 import scala.concurrent.{ ExecutionContext, Future }
@@ -17,19 +16,6 @@ class CheckS3CacheFilterTest extends PlaySpecification with Mockito {
   import ExecutionContext.Implicits.global
 
   private trait scope extends Scope {
-
-    val mockRunner = {
-      val m = mock[BlockingFutureRunner]
-      m.run(any[RequestHeader => Future[SimpleResult]], any[RequestHeader]).answers { (args, mock) =>
-        {
-          val arr = args.asInstanceOf[Array[Any]]
-          val f = arr(0).asInstanceOf[RequestHeader => Future[SimpleResult]]
-          val rh = arr(1).asInstanceOf[RequestHeader]
-          f(rh)
-        }
-      }
-      m
-    }
 
     val mockMetadata = {
       val m = mock[ObjectMetadata]
@@ -62,7 +48,6 @@ class CheckS3CacheFilterTest extends PlaySpecification with Mockito {
     def fr = FakeRequest("GET", "path")
 
     lazy val filter = new CheckS3CacheFilter {
-      override def blockingRunner: BlockingFutureRunner = mockRunner
 
       override def bucket: String = "bucket"
 
@@ -91,7 +76,6 @@ class CheckS3CacheFilterTest extends PlaySpecification with Mockito {
       status(result) must_== OK
       there was no(mockS3).getObjectMetadata(any[String], any[String])
       there was no(mockS3).getObject(any[String], any[String])
-      there was no(mockRunner).run(any[RequestHeader => Future[SimpleResult]], any[RequestHeader])
     }
 
     "when intercepted" should {
