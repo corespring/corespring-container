@@ -9,7 +9,9 @@ trait ItemPruner {
 
   val pruneFeedback = (__ \ "feedback").json.prune
   val pruneCorrectResponse = (__ \ "correctResponse").json.prune
-  val pruneBoth = pruneFeedback andThen pruneCorrectResponse
+  val pruneRationales = (__ \ "rationales").json.prune
+  val pruneTeacherInstructions = (__ \ "teacherInstructions").json.prune
+  val pruneAll = pruneFeedback andThen pruneCorrectResponse andThen pruneRationales andThen pruneTeacherInstructions
 
   def pruneItem(item: JsValue): JsValue = {
     val comps = (item \ "components").as[JsObject]
@@ -17,7 +19,7 @@ trait ItemPruner {
     val trimmedComponents: Seq[(String, JsValue)] = comps.fields.map {
       (tuple: (String, JsValue)) =>
         val (key, json) = tuple
-        val pruned = json.transform(pruneBoth)
+        val pruned = json.transform(pruneAll)
         pruned match {
           case JsSuccess(updated, _) => (key, updated)
           case JsError(error) => (key, Json.obj())
