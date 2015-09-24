@@ -103,7 +103,7 @@ describe('ClientSidePlayerService', function() {
       };
       
       beforeEach(inject(function(ClientSidePlayerService) {
-        service = new ClientSidePlayerService(function(){return {};}, function(){
+        service = new ClientSidePlayerService(jasmine.createSpy(), function(){
           return item;
         });
       }));
