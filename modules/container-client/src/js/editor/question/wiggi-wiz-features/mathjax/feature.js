@@ -8,7 +8,7 @@ angular.module('corespring.wiggi-wiz-features.mathjax').factory('WiggiMathJaxFea
 
       function dialog(editor, callback, $scope) {
         editor.launchDialog({ originalMarkup: $scope ? ($scope.originalMarkup || '') : ''},
-          'Math',
+          'Math Symbols and Equations',
           '<mathjax-dialog ng-model="data.originalMarkup"></mathjax-dialog>',
           callback,
           {},

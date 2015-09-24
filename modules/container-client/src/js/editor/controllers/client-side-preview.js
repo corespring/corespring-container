@@ -5,16 +5,18 @@ angular.module('corespring-editor.controllers')
     'ComponentData',
     'ClientSidePlayerService',
     'STATIC_PATHS',
+    'EDITOR_EVENTS',
     function ClientSidePreview(
       $log,
       $scope,
       ComponentData,
       ClientSidePlayerServiceDef, 
-      STATIC_PATHS) {
+      STATIC_PATHS,
+      EDITOR_EVENTS) {
 
     $scope.playerLabelImg = STATIC_PATHS.assets + '/item-player-label.png';
 
-    $scope.playerMode = 'gather';
+    $scope.playerMode = 'disable';
 
     $scope.playerSettings = {
       maxNoOfAttempts: 1,
@@ -67,6 +69,10 @@ angular.module('corespring-editor.controllers')
       }
     });
 
+    $scope.$on(EDITOR_EVENTS.CONTENT_ADDED_TO_EDITOR, function () {
+        setMode('gather');
+    });
+
     $scope.$on('playerControlPanel.reset', function () {
       resetPlayer();      
     });
@@ -103,3 +109,7 @@ angular.module('corespring-editor.controllers')
     }
 
 }]);
+
+angular.module('corespring-editor.controllers').constant('EDITOR_EVENTS', {
+    CONTENT_ADDED_TO_EDITOR: 'content.added.to.editor'
+});
