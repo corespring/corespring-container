@@ -2,7 +2,7 @@ package org.corespring.shell
 
 import com.amazonaws.services.s3.AmazonS3
 import com.mongodb.casbah.{ MongoCollection, MongoDB, MongoClientURI, MongoClient }
-import org.corespring.container.client.filters.ComponentSetsFilter
+import org.corespring.container.client.filters.{ BlockingFutureRunner, CheckS3CacheFilter }
 import org.corespring.container.components.loader.FileComponentLoader
 import org.corespring.mongo.json.services.MongoService
 import org.corespring.play.utils.{ CallBlockOnHeaderFilter, ControllerInstanceResolver }
@@ -17,7 +17,7 @@ import scala.concurrent.ExecutionContext
 
 object Global extends WithFilters(AccessControlFilter, CallBlockOnHeaderFilter) with ControllerInstanceResolver with GlobalSettings {
 
-  lazy val componentSetFilter = new ComponentSetsFilter {
+  lazy val componentSetFilter = new CheckS3CacheFilter {
     override implicit def ec: ExecutionContext = ExecutionContext.global
 
     override lazy val bucket: String = Play.current.configuration.getString("amazon.s3.bucket").getOrElse("bucket")
@@ -26,7 +26,15 @@ object Global extends WithFilters(AccessControlFilter, CallBlockOnHeaderFilter) 
 
     override def s3: AmazonS3 = containerClient.s3Client
 
-    override lazy val enabled: Boolean = Play.current.configuration.getBoolean("components.filter.enabled").getOrElse(false)
+    override def intercept(path: String): Boolean = {
+      val enabled: Boolean = Play.current.configuration.getBoolean("components.filter.enabled").getOrElse(false)
+      val out = path.contains("components-sets") && enabled
+
+      if (out) {
+        logger.debug(s"Intercept: $path")
+      }
+      out
+    }
   }
 
   override def doFilter(a: EssentialAction): EssentialAction = {
