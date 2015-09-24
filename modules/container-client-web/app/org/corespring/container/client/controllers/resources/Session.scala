@@ -89,24 +89,25 @@ trait Session extends Controller with HasContext {
 
   def loadItemAndSession(sessionId: String) = Action.async {
     implicit request => Future {
-    val response = hooks.loadItemAndSession(sessionId)
+      val response = hooks.loadItemAndSession(sessionId)
 
-    response match {
-      case Left(err) => err
-      case Right(fs) => {
-        val json = fs.everything
+      response match {
+        case Left(err) => err
+        case Right(fs) => {
+          val json = fs.everything
 
-        val itemJson = (json \ "item").as[JsObject]
-        
-        val processedItem = itemPreProcessor.preProcessItemForPlayer(itemJson)
-        
-        val sessionJson = (json \ "session").as[JsObject]
+          val itemJson = (json \ "item").as[JsObject]
 
-        val base = Json.obj(
-          "item" -> processedItem,
-          "session" -> sessionJson)
+          val processedItem = itemPreProcessor.preProcessItemForPlayer(itemJson)
 
-        Ok(base)
+          val sessionJson = (json \ "session").as[JsObject]
+
+          val base = Json.obj(
+            "item" -> processedItem,
+            "session" -> sessionJson)
+
+          Ok(base)
+        }
       }
     }
   }
