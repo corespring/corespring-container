@@ -1,18 +1,21 @@
 package org.corespring.container.client.controllers
 
+import org.corespring.container.client.HasContext
 import org.corespring.container.components.model.dependencies.ComponentSplitter
 import org.corespring.container.components.model.{ ComponentInfo, Widget, Interaction }
 import org.corespring.container.logging.ContainerLogger
 import play.api.mvc.{ Action, Controller }
 
-trait Icons extends Controller with ComponentSplitter {
+import scala.concurrent.Future
+
+trait Icons extends Controller with ComponentSplitter with HasContext {
 
   private lazy val logger = ContainerLogger.getLogger("Icons")
 
   val Split = """(.*?)-(.*)""".r
 
-  def icon(iconName: String) = Action {
-    request =>
+  def icon(iconName: String) = Action.async {
+    implicit request => Future {
 
       def matchingComponentInfo(c: ComponentInfo) = {
         val Split(org, name) = iconName
@@ -31,5 +34,6 @@ trait Icons extends Controller with ComponentSplitter {
         b =>
           Ok(b).as("image/png")
       }.getOrElse(NotFound(""))
+    }
   }
 }

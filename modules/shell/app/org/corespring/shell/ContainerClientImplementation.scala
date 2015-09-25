@@ -194,6 +194,8 @@ class ContainerClientImplementation(
 
     import play.api.Play.current
 
+    override implicit def ec: ExecutionContext = concurrent.ExecutionContext.global
+
     override def allComponents: Seq[Component] = ContainerClientImplementation.this.components
 
     override def configuration = {
