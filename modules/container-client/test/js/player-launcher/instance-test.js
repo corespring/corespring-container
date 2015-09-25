@@ -12,11 +12,8 @@ describe('instance', function() {
   function MockChannel() {
     console.log('new MockChannel');
     this.send = jasmine.createSpy('send');
-    this.on = function(){
-      console.log('mock:on', arguments);
-    };
-
-    this.remove = function(){};
+    this.on = jasmine.createSpy('on');
+    this.remove = jasmine.createSpy('remove');
   }
 
   var mockChannel;
@@ -74,6 +71,15 @@ describe('instance', function() {
     pending();
   });
 
+  it('should not register handler for dimensionsUpdate', function(){
+    instance = new InstanceDef(call, '#' + ID, onError, {}, false);
+    expect(mockChannel.on).not.toHaveBeenCalledWith('dimensionsUpdate', jasmine.any(Function));
+  });
+  
+  it('should register handler for dimensionsUpdate', function(){
+    instance = new InstanceDef(call, '#' + ID, onError, {});
+    expect(mockChannel.on).toHaveBeenCalledWith('dimensionsUpdate', jasmine.any(Function));
+  });
 
   describe('send', function(){
 

@@ -3,18 +3,18 @@ package org.corespring.container.client.controllers
 import org.corespring.container.client.V2PlayerConfig
 import org.corespring.container.client.controllers.launcher.{ JsBuilder, JsResource }
 import org.corespring.container.client.hooks.{ PlayerJs, PlayerLauncherHooks }
+import org.corespring.container.client.integration.ContainerExecutionContext
 import org.corespring.container.logging.ContainerLogger
 import play.api.http.ContentTypes
 import play.api.libs.json.{ JsObject, Json }
 import play.api.mvc.{ Session, _ }
 
-import scala.concurrent.ExecutionContext
 
 trait PlayerLauncher extends Controller {
 
   def playerConfig: V2PlayerConfig
 
-  implicit def ec: ExecutionContext
+  implicit def ec: ContainerExecutionContext
 
   lazy val logger = ContainerLogger.getLogger("PlayerLauncher")
 
@@ -74,7 +74,8 @@ trait PlayerLauncher extends Controller {
       "editor" -> DraftEditor.load(":draftId"),
       "devEditor" -> DraftDevEditor.load(":draftId"),
       "createItemAndDraft" -> ItemDraft.createItemAndDraft(),
-      "commitDraft" -> ItemDraft.commit(":draftId")))
+      "commitDraft" -> ItemDraft.commit(":draftId"),
+      "save" -> ItemDraft.save(":draftId")))
 
     val itemEditor = JsObject(Seq(
       "editor" -> ItemEditor.load(":itemId"),

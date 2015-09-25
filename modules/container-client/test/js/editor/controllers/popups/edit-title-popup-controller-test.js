@@ -3,14 +3,10 @@ describe('EditTitlePopupController', function() {
   var scope, element;
   var title = "This is the title";
 
-  var $modalInstance = {
-    close: jasmine.createSpy('close'),
-    dismiss: jasmine.createSpy('dismiss')
-  };
+  var $modalInstance = new org.corespring.mocks.editor.$modalInstance(); 
 
   afterEach(function() {
-    $modalInstance.close.calls.reset();
-    $modalInstance.dismiss.calls.reset();
+    $modalInstance.reset();
   });
 
   beforeEach(angular.mock.module('corespring-editor.controllers'));
@@ -53,4 +49,62 @@ describe('EditTitlePopupController', function() {
     });
   });
 
+});
+
+describe('editTitleInput', function(){
+
+  var scope, element, keyDownHandler;
+
+  beforeEach(angular.mock.module('corespring-editor.controllers'));
+
+  beforeEach(inject(function($rootScope, $compile) {
+    $.fn.off = jasmine.createSpy('off').and.callFake(function(){
+      return this;
+    });
+    $.fn.on = jasmine.createSpy('on').and.callFake(function(t, handler){
+      keyDownHandler = handler;
+      return this;
+    });
+
+    element = '<input class="edit-title-input" ready="ready" type="text"/>';
+    scope = $rootScope.$new();
+    scope.ready = false;
+    $compile(element)(scope);
+  }));
+
+  describe('initialization', function(){
+
+    it('has selectTitle function', function(){
+      expect(scope.selectTitle).not.toBe(null);
+    });
+  });
+
+  describe('ready', function(){
+    it('calls selectTitle', function(){
+      spyOn(scope, 'selectTitle');
+      scope.ready = true;
+      scope.$digest();
+      expect(scope.selectTitle).toHaveBeenCalled();
+    });
+  });
+
+  describe('keydown', function(){
+
+    it('emits edit-title-enter-key', function(done){
+      setTimeout(function(){
+        var handlers = {
+          on: jasmine.createSpy('on'),
+          preventDefault: jasmine.createSpy('preventDefault')
+        };
+
+        scope.$on('edit-title-enter-key', handlers.on);
+        scope.$digest();
+        keyDownHandler({keyCode: 13, preventDefault: handlers.preventDefault});
+        expect(handlers.on).toHaveBeenCalled();
+        expect(handlers.preventDefault).toHaveBeenCalled();
+        done();
+      }, 400);
+    }); 
+
+  });
 });

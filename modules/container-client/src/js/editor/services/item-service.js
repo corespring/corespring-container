@@ -1,5 +1,8 @@
 angular.module('corespring-editor.services').service('ItemService', [
-  '$http', '$timeout', 'ItemUrls', 'LogFactory',
+  '$http', 
+  '$timeout', 
+  'ItemUrls', 
+  'LogFactory',
   function($http, $timeout, ItemUrls, LogFactory) {
 
     /**
@@ -8,31 +11,23 @@ angular.module('corespring-editor.services').service('ItemService', [
      */
     function ItemService() {
 
-      var $log = LogFactory.getLogger('ItemService');
+      var logger = LogFactory.getLogger('item-service');
 
       var loadQueue = [];
       var loadedData = null;
       var loadInProgress = false;
       var saveListeners = {};
 
-      this.addSaveListener = addSaveListener;
-      this.load = loadItem;
-      this.saveComponents = saveComponents;
-      this.saveCollectionId = saveCollectionId;
-      this.saveCustomScoring = saveCustomScoring;
-      this.saveProfile = saveProfile;
-      this.saveSummaryFeedback = saveSummaryFeedback;
-      this.saveSupportingMaterials = saveSupportingMaterials;
-      this.saveXhtml = saveXhtml;
-
-      //--------------------------------------
-
-      function addSaveListener(id, handler) {
+      this.addSaveListener = function(id, handler) {
         saveListeners[id] = handler;
+      };
+
+      function getToken(url){
+        return url.indexOf('?' === -1) ? '?' : '&';
       }
 
-      function loadItem(onSuccess, onFailure) {
-        $log.debug('load, loaded?', loadedData !== null);
+      this.load = function(onSuccess, onFailure) {
+        logger.debug('load, loaded?', loadedData !== null);
 
         loadQueue.push({
           success: onSuccess,
@@ -45,7 +40,7 @@ angular.module('corespring-editor.services').service('ItemService', [
         }
 
         if (loadInProgress) {
-          $log.debug('load in progress - wait');
+          logger.debug('load in progress - wait');
           return;
         }
 
@@ -56,7 +51,7 @@ angular.module('corespring-editor.services').service('ItemService', [
             .success(loadItemSuccess)
             .error(loadItemError);
         } catch (e) {
-          $log.error(e);
+          logger.error(e);
           loadInProgress = false;
         }
 
@@ -70,50 +65,79 @@ angular.module('corespring-editor.services').service('ItemService', [
           loadInProgress = false;
           flushQueue(data, 'failure');
         }
-      }
+      };
 
-      function saveComponents(data, onSuccess, onFailure) {
+      this.saveComponents = function(data, onSuccess, onFailure) {
         save('components', data, onSuccess, onFailure);
-      }
+      };
 
-      function saveCustomScoring(data, onSuccess, onFailure) {
+      this.saveCustomScoring = function(data, onSuccess, onFailure) {
         save('custom-scoring', {
           customScoring: data
         }, onSuccess, onFailure);
-      }
+      };
 
-      function saveProfile(data, onSuccess, onFailure) {
+      this.saveProfile = function(data, onSuccess, onFailure) {
         save('profile', data, onSuccess, onFailure);
-      }
+      };
 
-      function saveSummaryFeedback(data, onSuccess, onFailure) {
+      this.saveSummaryFeedback = function(data, onSuccess, onFailure) {
         save('summary-feedback', {
           summaryFeedback: data
         }, onSuccess, onFailure);
-      }
+      };
 
-      function saveSupportingMaterials(data, onSuccess, onFailure) {
-        save('supporting-materials', data, onSuccess, onFailure);
-      }
-
-      function saveXhtml(data, onSuccess, onFailure) {
+      this.saveXhtml = function(data, onSuccess, onFailure) {
         save('xhtml', {
           xhtml: data
         }, onSuccess, onFailure);
-      }
+      };
 
-      function saveCollectionId(data, onSuccess, onFailure) {
+      this.saveCollectionId = function(data, onSuccess, onFailure) {
         save('collection-id', {
           collectionId: data
         }, onSuccess, onFailure);
-      }
+      };
+
+      this.saveAll = function(data, onSuccess, onFailure) {
+        var method = ItemUrls.save.method;
+        var url = ItemUrls.save.url;
+        url = addQueryParamsIfPresent(url);
+        logger.debug('saveAll', data);
+        logger.debug('saveAll - url:', url);
+
+        notifyListeners('saving');
+
+        $http[method](url, data)
+          .success(saveSuccess)
+          .error(saveError);
+
+        function saveSuccess(data) {
+          notifyListeners('saved');
+          if (onSuccess) {
+            onSuccess(data);
+          } else {
+            logger.warn('no onSuccess handler');
+          }
+        }
+
+        function saveError(data, status) {
+          notifyListeners('error');
+          if (onFailure) {
+            data = data || {
+              error: status + ": an unknown error occurred"
+            };
+            onFailure(data);
+          }
+        }
+      };
 
       function save(set, data, onSuccess, onFailure) {
         var method = ItemUrls.saveSubset.method;
         var url = ItemUrls.saveSubset.url.replace(':subset', set);
         url = addQueryParamsIfPresent(url);
-        $log.debug('save', data);
-        $log.debug('save - url:', url);
+        logger.debug('save', data);
+        logger.debug('save - url:', url);
 
         notifyListeners('saving');
 
@@ -126,7 +150,7 @@ angular.module('corespring-editor.services').service('ItemService', [
           if (onSuccess) {
             onSuccess(data);
           } else {
-            $log.warn('no onSuccess handler');
+            logger.warn('no onSuccess handler');
           }
         }
 
@@ -134,7 +158,7 @@ angular.module('corespring-editor.services').service('ItemService', [
           notifyListeners('error');
           if (onFailure) {
             data = data || {
-              error: status + ": an unknown error occured"
+              error: status + ": an unknown error occurred"
             };
             onFailure(data);
           }
@@ -146,7 +170,7 @@ angular.module('corespring-editor.services').service('ItemService', [
           if (listener.handleSaveMessage) {
             listener.handleSaveMessage(message);
           } else {
-            $log.warn('listener with id:', key, 'has no function called handleSaveMessage');
+            logger.warn('listener with id:', key, 'has no function called handleSaveMessage');
           }
         });
       }
@@ -164,7 +188,7 @@ angular.module('corespring-editor.services').service('ItemService', [
             try {
               callback(d);
             } catch (e) {
-              $log.warn('error in callback', e);
+              logger.warn('error in callback', e);
             }
           });
         loadQueue = [];

@@ -1,4 +1,14 @@
-@(namespace:String, load : Call, saveSubset : Call, componentSet : JsValue, widgets : JsValue)
+@(namespace: String,
+load: Call,
+saveSubset: Call,
+save: Option[Call],
+smEndpoints: org.corespring.container.client.views.models.SupportingMaterialsEndpoints,
+componentSet: JsValue,
+widgets: JsValue)
+
+@toMethodAndUrl(c:Call) = @{
+  s"{ method: '${c.method.toLowerCase}', url: '${c.url}'}"  
+}
 
 (function(){
   "use strict";
@@ -7,15 +17,16 @@
 
   angular.module('@namespace').factory('ItemUrls', [ function($http){
     return {
-      load: {
-        method : '@load.method.toLowerCase',
-        url: '@load.url'
-      },
-      saveSubset: {
-        method : '@saveSubset.method.toLowerCase',
-        url: '@saveSubset.url'
+      load: @toMethodAndUrl(load),
+      @save.map { save =>
+        save: @toMethodAndUrl(save),
       }
+      saveSubset: @toMethodAndUrl(saveSubset)
     }
+  }]);
+
+  angular.module('@namespace').factory('SupportingMaterialUrls', [function(){
+    return @smEndpoints.toJsonString;
   }]);
 
   angular.module('@namespace').factory('ComponentService', [function(){

@@ -136,7 +136,6 @@ var controller = function($scope,$http, $location, $timeout, $log, ComponentRegi
         return decodeURIComponent(pair[1]);
       }
     }
-    console.log('Query variable %s not found', variable);
   }
 
   function prepareItemJson(){

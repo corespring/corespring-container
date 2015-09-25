@@ -1,20 +1,119 @@
 package org.corespring.shell.controllers.editor
 
-import org.corespring.container.client.hooks.Hooks.R
-import org.corespring.container.client.{hooks => containerHooks}
+import com.mongodb.casbah.Imports._
+import org.bson.types.ObjectId
+import org.corespring.container.client.controllers.resources.CoreItem
+import org.corespring.container.client.hooks._
+import org.corespring.container.client.hooks.Hooks.{ StatusMessage, R }
+import org.corespring.container.client.{ hooks => containerHooks }
 import org.corespring.mongo.json.services.MongoService
 import play.api.http.Status._
 import play.api.libs.json._
 import play.api.mvc._
 
 import scala.concurrent.Future
+import scala.util.Try
+
+trait ItemSupportingMaterialHooks
+  extends containerHooks.SupportingMaterialHooks
+  with SupportingMaterialHooksHelper {
+
+  import scala.concurrent.ExecutionContext.Implicits.global
+
+  def assets: SupportingMaterialAssets[String]
+  def itemService: MongoService
+
+  override def create[F <: File](id: String, sm: CreateNewMaterialRequest[F])(implicit h: RequestHeader): R[JsValue] = Future {
+    {
+      val query = MongoDBObject("_id" -> new ObjectId(id))
+      def upload(b: Binary) = assets.uploadSupportingMaterialBinary(id, sm.name, b).bimap(
+        (e: String) => (INTERNAL_SERVER_ERROR -> e),
+        (s: String) => sm)
+      updateDBAndUploadBinary(itemService.collection, query, sm, upload)
+    }.toEither
+  }
+
+  override def deleteAsset(id: String, name: String, filename: String)(implicit h: RequestHeader): R[JsValue] = Future {
+
+    val query = MongoDBObject("_id" -> new ObjectId(id), "supportingMaterials.name" -> name)
+
+    val update = MongoDBObject(
+      "$pull" -> MongoDBObject(
+        "supportingMaterials.$.files" -> MongoDBObject(
+          "name" -> filename)))
+
+    val wr = itemService.collection.update(query, update, false, false)
+
+    if (wr.getN == 1) {
+      assets.deleteAssetFromSupportingMaterial(id, name, filename)
+      Right(Json.obj())
+    } else {
+      Left((BAD_REQUEST, "Failed to remove the asset"))
+    }
+  }
+
+  override def addAsset(id: String, name: String, binary: Binary)(implicit h: RequestHeader): R[JsValue] = Future {
+    val query = MongoDBObject("_id" -> new ObjectId(id), "supportingMaterials.name" -> name)
+    val binaryDbo = binaryToDbo(binary, false)
+    val update = MongoDBObject("$push" -> MongoDBObject("supportingMaterials.$.files" -> binaryDbo))
+    val wr = itemService.collection.update(query, update, false, false)
+
+    if (wr.getN == 1) {
+      assets.uploadAssetToSupportingMaterial(id, name, binary)
+      Right(Json.parse(com.mongodb.util.JSON.serialize(binaryDbo)))
+    } else {
+      Left((BAD_REQUEST, "Failed to remove the asset"))
+    }
+  }
+
+  override def delete(id: String, name: String)(implicit h: RequestHeader): R[JsValue] = Future {
+    val query = MongoDBObject("_id" -> new ObjectId(id))
+    val update = MongoDBObject("$pull" -> MongoDBObject("supportingMaterials" -> MongoDBObject("name" -> name)))
+    val wr = itemService.collection.update(query, update)
+
+    if (wr.getN == 1) {
+      //in the main app we'd remove any assets too
+      assets.deleteSupportingMaterialBinary(id, name)
+      Right(Json.obj())
+    } else {
+      Left((BAD_REQUEST, "Failed to remove the asset"))
+    }
+  }
+
+  override def getAsset(id: String, name: String, filename: String)(implicit h: RequestHeader): Future[Either[StatusMessage, FileDataStream]] = Future {
+    assets.getAsset(id, name, filename).leftMap(e => (BAD_REQUEST -> e)).toEither
+  }
+
+  private def getFiles(dbo: DBObject): Option[BasicDBList] = Try {
+    val materials = dbo.get("supportingMaterials").asInstanceOf[BasicDBList]
+    val m = materials.get(0).asInstanceOf[BasicDBObject]
+    m.get("files").asInstanceOf[BasicDBList]
+  }.toOption
+
+  private def updateFile(filename: String, content: String)(f: Any) = {
+    val dbo = f.asInstanceOf[BasicDBObject]
+    if (dbo.getString("name") == filename) {
+      dbo.put("content", content)
+    }
+    dbo
+  }
+
+  override def updateContent(id: String, name: String, filename: String, content: String)(implicit h: RequestHeader): R[JsValue] = {
+    val fn = mkUpdateContentFunction(
+      (id) => MongoDBObject("_id" -> new ObjectId(id)),
+      itemService.collection) _
+    fn(id, name, filename, content)
+  }
+
+}
 
 trait ItemHooks
   extends containerHooks.ItemHooks
+  //with CoreItemHooks
   with ItemHooksHelper {
   def itemService: MongoService
 
-  def assets : ItemAssets
+  def assets: ItemAssets
 
   override def load(itemId: String)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] = Future {
     itemService.load(itemId).map { i =>
@@ -22,7 +121,7 @@ trait ItemHooks
     }.getOrElse(Left((NOT_FOUND, s"Can't find item with id: $itemId")))
   }
 
-  override def delete(id: String)(implicit h: RequestHeader): R[JsValue] = Future{
+  override def delete(id: String)(implicit h: RequestHeader): R[JsValue] = Future {
     itemService.delete(id)
     assets.deleteItem(id)
     Right(Json.obj("id" -> id))

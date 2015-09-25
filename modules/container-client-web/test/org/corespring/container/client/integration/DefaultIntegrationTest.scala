@@ -1,25 +1,22 @@
 package org.corespring.container.client.integration
 
-import org.corespring.container.client.controllers.{ Assets, ComponentSets }
+import org.corespring.container.client.controllers.ComponentSets
 import org.corespring.container.client.hooks._
 import org.corespring.container.components.model.Component
+import org.corespring.test.TestContext
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
-import play.api.{ GlobalSettings, Configuration }
-import play.api.libs.json.{ Json, JsObject }
-import play.api.mvc.{ AnyContent, Request }
-import play.api.test.{ FakeApplication, PlaySpecification, FakeRequest }
-
-import scala.concurrent.{ Future, ExecutionContext }
+import play.api.libs.json.{JsObject, Json}
+import play.api.mvc.{AnyContent, Request}
+import play.api.test.{FakeApplication, FakeRequest, PlaySpecification}
+import play.api.{Configuration, GlobalSettings}
 
 class DefaultIntegrationTest extends Specification with Mockito with PlaySpecification {
 
   def mkDefaultIntegration(json: JsObject) = {
-    new DefaultIntegration {
+    new DefaultIntegration with TestContext{
 
       override def versionInfo: JsObject = Json.obj()
-
-      override implicit def ec: ExecutionContext = ExecutionContext.Implicits.global
 
       override def playerHooks: PlayerHooks = mock[PlayerHooks]
 
@@ -27,8 +24,9 @@ class DefaultIntegrationTest extends Specification with Mockito with PlaySpecifi
 
       override def catalogHooks: CatalogHooks = mock[CatalogHooks]
 
-      override def draftEditorHooks: EditorHooks = mock[EditorHooks]
-      override def itemEditorHooks: EditorHooks = mock[EditorHooks]
+      override def draftEditorHooks: DraftEditorHooks = mock[DraftEditorHooks]
+
+      override def itemEditorHooks: ItemEditorHooks = mock[ItemEditorHooks]
 
       override def dataQueryHooks: DataQueryHooks = mock[DataQueryHooks]
 
@@ -50,6 +48,10 @@ class DefaultIntegrationTest extends Specification with Mockito with PlaySpecifi
       override def componentSets: ComponentSets = mock[ComponentSets]
 
       override def itemHooks: CoreItemHooks with CreateItemHook = mock[CoreItemHooks with CreateItemHook]
+
+      override def itemDraftSupportingMaterialHooks: SupportingMaterialHooks = mock[SupportingMaterialHooks]
+
+      override def itemSupportingMaterialHooks: SupportingMaterialHooks = mock[SupportingMaterialHooks]
     }
   }
 

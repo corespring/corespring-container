@@ -22,7 +22,7 @@ block content
             label.btn.btn-default(btn-checkbox="true", ng-model="panes.scoring") scoring
             label.btn.btn-default(btn-checkbox="true", ng-model="panes.player") player
           .pull-right
-            button.btn.btn-sm.btn-default(ng-click="save()") Save
+            button.btn.btn-sm.btn-default(ng-click="save()", ng-hide="initialData.hideSaveButton") Save
 
       tr
         td.pane(ng-show="panes.html")

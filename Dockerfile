@@ -47,6 +47,9 @@ ENV CONTAINER_COMPONENTS_PATH="/opt/components"
 
 ADD target/universal/stage /opt/corespring-container
 
+# Default to UTF-8 file.encoding
+ENV LANG C.UTF-8
+
 CMD ["/data/main.sh" ] 
 
 # Clean up APT when done.

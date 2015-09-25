@@ -3,6 +3,7 @@ angular.module('corespring-editor.controllers')
     '$scope',
     '$element',
     '$timeout',
+    'EditorChangeWatcher',
     'ItemService',
     'EditorConfig',
     'LogFactory',
@@ -14,10 +15,11 @@ angular.module('corespring-editor.controllers')
     'MathJaxService',
     'WiggiLinkFeatureDef',
     'WiggiMathJaxFeatureDef',
-    'DEBOUNCE_IN_MILLIS',
+    'EDITOR_EVENTS',
     function($scope,
       $element,
       $timeout,
+      EditorChangeWatcher,
       ItemService,
       EditorConfig,
       LogFactory,
@@ -29,7 +31,7 @@ angular.module('corespring-editor.controllers')
       MathJaxService,
       WiggiLinkFeatureDef,
       WiggiMathJaxFeatureDef,
-      DEBOUNCE_IN_MILLIS) {
+      EDITOR_EVENTS) {
 
       var configPanels = {};
 
@@ -122,11 +124,8 @@ angular.module('corespring-editor.controllers')
         return angular.element('.wiggi-wiz', $element);
       };
 
-      $scope.$on('itemAdded', function(event, $node) {
-        // This ends up in some weird race condition if we don't wrap it in a $timeout
-        $timeout(function() {
-          $scope.getWiggiWizElement().scope().focusCaretAtEnd();
-        });
+      $scope.$on('itemChanged', function(event, $node) {
+        $scope.$broadcast(EDITOR_EVENTS.CONTENT_ADDED_TO_EDITOR);
       });
 
       $scope.serialize = function(comps) {
@@ -148,43 +147,24 @@ angular.module('corespring-editor.controllers')
         return newModel;
       };
 
-      $scope.$watch('item.components', debounce(function(newComps, oldComps) {
-        if (_.isEqual(newComps, oldComps)) {
-          logger.debug('they are the same - ignore...');
-          return;
-        }
-        saveComponents();
-        if (oldComps) {
-          $scope.$emit('itemChanged', {partChanged: 'components'});
-        }
-      }), true);
+      var makeWatcher = EditorChangeWatcher.makeWatcher;
 
-      $scope.$watch('item.xhtml', debounce(function(newValue, oldValue) {
-        logger.debug('old', oldValue);
-        if (oldValue !== newValue) {
-          ItemService.saveXhtml($scope.item.xhtml);
-          if (oldValue) {
-            $scope.$emit('itemChanged', {partChanged: 'xhtml'});
-          }
-        }
-      }));
+      $scope.$watch(
+        'item.components', 
+        makeWatcher('components', saveComponents, $scope),
+        true);
 
-      $scope.$watch('item.summaryFeedback', debounce(function(newValue, oldValue) {
-        logger.debug('old', oldValue);
-        if (oldValue !== newValue) {
-          ItemService.saveSummaryFeedback($scope.item.summaryFeedback);
-          if (oldValue) {
-            $scope.$emit('itemChanged', {partChanged: 'summaryFeedback'});
-          }
-        }
-      }));
+      $scope.$watch(
+        'item.xhtml', 
+        makeWatcher('xhtml', function(n,o){
+          ItemService.saveXhtml(n);
+        }, $scope)); 
 
-      function debounce(fn) {
-        return _.debounce(fn, DEBOUNCE_IN_MILLIS || 5000, {
-          trailing: true,
-          leading: false
-        });
-      }
+      $scope.$watch(
+        'item.summaryFeedback', 
+        makeWatcher('summaryFeedback', function(n,o){
+          ItemService.saveSummaryFeedback(n);
+        }, $scope));
 
       ItemService.load(function(item) {
         $scope.item = item;

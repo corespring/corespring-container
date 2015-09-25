@@ -5,7 +5,7 @@
 .modal.mathjax{
 
   .modal-content{
-    min-height: 500px;
+    min-height: 530px;
     min-width: 433px;
   }
 
@@ -139,11 +139,14 @@
 }
 
 .mathjax-dialog-root {
+  display: -webkit-flex; /* Safari */
   display: flex;
+  -webkit-flex-direction: column; /* Safari 6.1+ */
   flex-direction: column;
   position: absolute;
   top: 0px;
   bottom: 119px;
+  width: 100%;
 
 
   .header {
@@ -153,11 +156,12 @@
     border-bottom: solid 1px darken(@light-grey, 15%);
     font-size: 14px;
     padding-bottom: 25px;
+    display: table;
+    width: 100%;
   }
 
   .main{
     display: inherit;
-    border-bottom: solid 1px darken(@light-grey, 15%);
     height: 100%;
   }
 
@@ -168,6 +172,8 @@
     border-bottom: solid 1px darken(@light-grey, 15%);
     color: @state-warning-text;
     padding-bottom: 12px;
+    display: table;
+    width: 100%;
     .display-type {
       padding-left: 10px;
     }
@@ -175,15 +181,36 @@
 
   
   .mj-dialog-content {
-    a:hover {
-      color: #00008b;
+    a {
+      color: #0099cc;
       text-decoration: underline;
+      &:hover {
+        color: #00008b;
+      }
+    }
+    i.sample {
+      margin: 20px 0 0 0;
+      display: table;
+      .fraction {
+        display: inline-block;
+        vertical-align: middle;
+        margin: 0 0.2em 0.4ex;
+        text-align: center;
+        width: 15px;
+        font-size: 12px;
+        font-style: normal;
+      }
+      .fraction > span {
+        display: block;
+        padding-top: 0.15em;
+      }
+      .fraction span.fdn {border-top: thin solid black;}
+      .fraction span.bar {display: none;}
     }
   }
 
   .math-preview {
     @preview-min-width: 160px;
-    background-color: @light-grey;
     overflow-x: auto;
     text-align: center;
     padding: 8px;
@@ -191,21 +218,28 @@
     max-width: @preview-min-width * 2;
 
     .preview-label {
-      text-transform: uppercase;
-      color: darken(@light-grey, 20%);
-      padding-bottom: 5px;
+      line-height: 22px;
+    }
+    .preview-body {
+      border: 1px solid #bebebe;
+      height: 120px;
+      width: 240px;
+      border-radius: 4px;
     }
   }
 
   .math-textarea {
-    flex: 1;
-    border:0 solid #cecaca;
+    border: solid 1px #bebebe;
+    border-radius: 4px;
     background-color: #ffffff;
     padding: 10px;
     font-family: monospace;
     overflow:auto;
     outline:none;
     resize:none;
+    width: 640px;
+    height: 120px;
+    margin: 30px 10px 10px 10px;
   }
 
 }

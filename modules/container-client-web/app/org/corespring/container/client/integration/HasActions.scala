@@ -13,8 +13,10 @@ trait HasHooks {
   def playerHooks: PlayerHooks
   def playerLauncherHooks: PlayerLauncherHooks
   def collectionHooks: CollectionHooks
-  def itemDraftHooks: DraftHooks
-  def itemHooks: ItemHooks
+  def itemDraftHooks: CoreItemHooks with DraftHooks
+  def itemDraftSupportingMaterialHooks : SupportingMaterialHooks
+  def itemHooks: CoreItemHooks with CreateItemHook
+  def itemSupportingMaterialHooks : SupportingMaterialHooks
   def sessionHooks: SessionHooks
   def dataQueryHooks: DataQueryHooks
 }

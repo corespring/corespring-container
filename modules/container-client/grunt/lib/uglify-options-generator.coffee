@@ -30,8 +30,8 @@ They'll all be joined at the end.
 exports.buildUglifyOptions = (grunt, name, jsIn, processFn) ->
 
   splitPaths = _.groupBy jsIn.src, (p) -> if hasMinInPath(p) then 'min' else 'normal'
-  grunt.log.debug('split paths min: ', splitPaths.min)
-  grunt.log.debug('split paths normal: ', splitPaths.normal)
+  #grunt.log.debug('split paths min: ', splitPaths.min)
+  #grunt.log.debug('split paths normal: ', splitPaths.normal)
 
   cleanSplit = _.map(splitPaths.min, (p) -> p.replace("(.min)", ".min"))
 

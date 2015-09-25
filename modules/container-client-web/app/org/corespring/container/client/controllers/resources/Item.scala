@@ -3,6 +3,13 @@ package org.corespring.container.client.controllers.resources
 import org.corespring.container.client.hooks.{ CoreItemHooks, CreateItemHook }
 import play.api.libs.json.Json
 import play.api.mvc.Action
+import org.corespring.container.client.controllers.helpers.PlayerXhtml
+import org.corespring.container.client.hooks.{CoreItemHooks, CreateItemHook}
+import play.api.libs.json.{JsObject, JsString, JsValue, Json}
+import play.api.mvc._
+
+import scala.concurrent.Future
+
 
 trait Item extends CoreItem {
 

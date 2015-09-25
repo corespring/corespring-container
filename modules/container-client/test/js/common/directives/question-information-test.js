@@ -3,64 +3,24 @@ describe('questionInformation', function() {
   beforeEach(angular.mock.module('corespring-common.directives'));
   beforeEach(angular.mock.module('corespring-templates'));
 
-  var scope, element, mathJaxService, model;
-
-  var mockParseDomForMath = jasmine.createSpy('parseDomForMath');
-
-  var content;
-  var contentType;
-  var supportingName;
-  var url;
-
-  function MockDataQueryService() {
-    this.list = function() {};
-  }
-
-  function MockComponentService() {
-    this.loadAvailableComponents = function() {};
-  }
-
-  function MockSupportingMaterialsService() {
-    this.getSupportingMaterialsByGroups = function() {};
-    this.getSupportingName = function() {
-      return supportingName;
-    };
-    this.getContentType = function() {
-      return contentType;
-    };
-    this.getSupportingUrl = function() {
-      return url;
-    };
-    this.getContent = function() {
-      return content;
-    };
-  }
-
-  function MockMathJaxService() {
-    this.parseDomForMath = mockParseDomForMath;
-  }
-
-  function resetMocks() {
-    mockParseDomForMath.calls.reset();
-  }
+  var scope, element, mockMathJaxService, mockSmUtils, model;
 
   beforeEach(angular.mock.module('corespring-common.directives'));
-
-  beforeEach(function() {
-    supportingName = "This is the name of the supporting material.";
-    url = "http://supporting-material-url.com/";
-    content = "This is the content of the supporting material.";
-    contentType = "This is the content type of the supporting material.";
-  });
-
   beforeEach(module(function($provide) {
-    mathJaxService = new MockMathJaxService();
-    $provide.value('ComponentService', new MockComponentService());
-    $provide.value('DataQueryService', new MockDataQueryService());
-    $provide.value('MathJaxService', mathJaxService);
-    $provide.value('ProfileFormatter', function() {});
-    $provide.value('STATIC_PATHS', {});
-    $provide.value('SupportingMaterialsService', new MockSupportingMaterialsService());
+    
+    mockMathJaxService = {
+      parseDomForMath: jasmine.createSpy('parseDomForMath')
+    };
+
+    mockSmUtils = {
+      group: jasmine.createSpy('group').and.returnValue([]),
+      mainFile: jasmine.createSpy('mainFile').and.returnValue({}),
+      getBinaryUrl: jasmine.createSpy('getBinaryUrl').and.returnValue('binaryUrl')
+    };
+
+    $provide.value('MathJaxService', mockMathJaxService, mockSmUtils);
+    $provide.value('SmUtils', mockSmUtils);
+    $provide.value('profilePreviewDirective', {});
   }));
 
   beforeEach(inject(function($rootScope, $compile) {
@@ -70,30 +30,25 @@ describe('questionInformation', function() {
         contributorDetails: {}
       }
     };
+    scope.tabs = { 
+      profile: true,
+      question: true, 
+      supportingMaterial: true};
+
     element = angular.element('<div question-information="" ng-model="model" tabs="tabs"></div>');
     $compile(element)(scope);
-
     element.scope().$apply();
     scope = element.isolateScope();
   }));
 
-  afterEach(resetMocks);
-
-  describe('available tabs', function() {
-    it('should default to all tabs being available', function() {
-      expect(scope.availableTabs).toEqual({
-        question: true,
-        profile: true,
-        supportingMaterial: true
-      });
-    });
+  describe('tabs', function() {
 
     it('should respect tabs property', function() {
       scope.tabs = {
         question: true
       };
       scope.$digest();
-      expect(scope.availableTabs).toEqual({
+      expect(scope.tabs).toEqual({
         question: true
       });
     });
@@ -115,13 +70,13 @@ describe('questionInformation', function() {
       expect(scope.hideNav).toEqual(false);
     });
 
-    it('should hide navigation if the only available tab is supporting materials and there is only 1 supporting material', function() {
+    it('should not hide navigation if the only available tab is supporting materials and there is only 1 supporting material', function() {
       scope.tabs = {
         supportingMaterial: true
       };
       model.supportingMaterials = ['s1'];
       scope.$digest();
-      expect(scope.hideNav).toEqual(true);
+      expect(scope.hideNav).toEqual(false);
     });
 
     it('should select first available tab if current tab is not available', function() {
@@ -156,63 +111,70 @@ describe('questionInformation', function() {
   });
 
   describe('selectSupportingMaterial', function() {
-    var index = 0;
 
     beforeEach(function() {
-      scope.selectSupportingMaterial(index);
+
+      mockSmUtils.mainFile.and.returnValue({name: 'main-file'});
+      mockSmUtils.getBinaryUrl.and.returnValue('url');
+
+      var material = {
+        name: 'material',
+      };
+
+      scope.selectSupportingMaterial(material);
     });
 
     it('should set activeTab to supportingMaterial', function() {
       expect(scope.activeTab).toEqual('supportingMaterial');
     });
 
-    it('should set activeSmIndex to provided index', function() {
-      expect(scope.selectedMaterial.index).toEqual(index);
+    it('should set the main file', function(){
+      expect(mockSmUtils.mainFile).toHaveBeenCalledWith({name: 'material'});
+      expect(scope.mainFile).toEqual({name: 'main-file'});
     });
 
-    it('should set selected supporting material name to value returned by SupportingMaterialsService', function() {
-      expect(scope.selectedMaterial.name).toEqual(supportingName);
-    });
-
-    it('should set selected supporting material url to value returned by SupportingMaterialsService', function() {
-      expect(scope.selectedMaterial.url).toEqual(url);
-    });
-
-    it('should set selected supporting material content to value returned by SupportingMaterialsService', function() {
-      expect(scope.selectedMaterial.content).toEqual(content);
-    });
-
-    it('should set selected supporting material contentType to value returned by SupportingMaterialsService', function() {
-      expect(scope.selectedMaterial.contentType).toEqual(contentType);
+    it('should set the binaryUrl', function(){
+      expect(mockSmUtils.getBinaryUrl).toHaveBeenCalledWith({name: 'material'}, {name: 'main-file'});
+      expect(scope.binaryUrl).toEqual('url');
     });
 
     it('should call MathJaxService.parseDomForMath with element', function() {
-      expect(mathJaxService.parseDomForMath).toHaveBeenCalledWith(100, element[0]);
+      expect(mockMathJaxService.parseDomForMath).toHaveBeenCalledWith(100, element[0]);
     });
 
   });
 
   describe("supporting material content (AC-189)", function() {
+    
+    var content = '<div><img src="image.jpg"></div>';
+    beforeEach(function(){
+      mockSmUtils.getBinaryUrl.and.returnValue('some/binary/url');
+      mockSmUtils.mainFile.and.callFake(function(){ return { contentType: 'text/html', content: content};});
+    }); 
+
     it('should add material/[supportingMaterialName] as path to image urls in content', function() {
       supportingName = "test name";
-      content = '<div><img src="image.jpg"></div>';
-      scope.selectSupportingMaterial(0);
-      expect(scope.selectedMaterial.content).toEqual('<div><img src="materials/test name/image.jpg"></div>');
+      scope.selectSupportingMaterial({name: 'test name'});
+      expect(mockSmUtils.getBinaryUrl).toHaveBeenCalledWith({name: 'test name'}, {name: 'image.jpg'});
+      expect(scope.mainFile.content).toEqual('<div><img src="some/binary/url"></div>');
     });
+
     it('should not crash if content is null', function() {
       content = null;
-      scope.selectSupportingMaterial(0);
-      expect(scope.selectedMaterial.content).toEqual(content);
+      scope.selectSupportingMaterial({});
+      expect(scope.mainFile.content).toEqual(content);
     });
+    
     it('should not crash if content is undefined', function() {
       content = undefined;
-      scope.selectSupportingMaterial(0);
-      expect(scope.selectedMaterial.content).toEqual(content);
+      scope.selectSupportingMaterial({});
+      expect(scope.mainFile.content).toEqual(content);
     });
+    
     it('should not change a content that does not have an image in it', function() {
       content = '<div>No image here</div>';
-      scope.selectSupportingMaterial(0);
-      expect(scope.selectedMaterial.content).toEqual(content);
+      scope.selectSupportingMaterial({});
+      expect(scope.mainFile.content).toEqual(content);
     });
   });
 

@@ -1,89 +1,54 @@
 describe('AddSupportingMaterialPopupController', function() {
 
-  var scope, element;
+  var scope, controllerFn, $modalInstance;
 
   beforeEach(angular.mock.module('corespring-editor.controllers'));
-
-  var $modalInstance = {
-    close: jasmine.createSpy('close'),
-    dismiss: jasmine.createSpy('dismiss')
-  };
+  
+  var materialNames = ['apple', 'banana'];
   var LogFactory = {
     getLogger: function() {}
   };
+  
+  function mkController(s){
+    controllerFn('AddSupportingMaterialPopupController', {
+      $scope: s,
+      materialNames: materialNames
+    });
+  }
 
   beforeEach(module(function($provide) {
+    $modalInstance = new org.corespring.mocks.editor.$modalInstance();
+    $provide.value('$timeout', function(fn){ fn(); });
     $provide.value('$modalInstance', $modalInstance);
     $provide.value('LogFactory', LogFactory);
   }));
-
-  beforeEach(inject(function($rootScope, $compile) {
+  
+  beforeEach(inject(function($rootScope, $controller) {
     scope = $rootScope.$new();
-    element = $compile('<div ng-controller="AddSupportingMaterialPopupController"></div>')(scope);
-    scope = element.scope();
+    controllerFn = $controller;
+    spyOn(scope, '$broadcast');
+    mkController(scope);
   }));
-
-  afterEach(function() {
-    $modalInstance.close.calls.reset();
-    $modalInstance.dismiss.calls.reset();
-  });
 
   describe('initialization', function() {
     var defaultSupportingMaterial = {
-      method: 'createHtml'
+      source: 'html'
     };
 
     it('should set supportingMaterial to default', function() {
       expect(scope.supportingMaterial).toEqual(defaultSupportingMaterial);
     });
+
+    it('should set materialNames', function(){
+      expect(scope.materialNames).toEqual(materialNames);
+    });
   });
 
-  describe('isSubmitDisabled', function() {
 
-    describe('supporting material has no name', function() {
-      beforeEach(function() {
-        scope.supportingMaterial.name = undefined;
-      });
-
-      it('should return true', function() {
-        expect(scope.isSubmitDisabled()).toBe(true);
-      });
-
+  describe('opened', function(){
+    it('calls $broadcast with metadata.focus-title', function(){
+      expect(scope.$broadcast).toHaveBeenCalledWith('metadata.focus-title');
     });
-
-    describe('supporting material has a name', function() {
-      beforeEach(function() {
-        scope.supportingMaterial.name = "my sweet rubric";
-      });
-
-      it('should return false', function() {
-        expect(scope.isSubmitDisabled()).toBe(false);
-      });
-
-      describe('upload file is empty', function() {
-        beforeEach(function() {
-          scope.supportingMaterial.method = 'uploadFile';
-        });
-
-        it('should return true', function() {
-          expect(scope.isSubmitDisabled()).toBe(true);
-        });
-      });
-
-    });
-
-  });
-
-  describe('fileChange event', function() {
-    var file = "hey this is a file!";
-    beforeEach(function() {
-      scope.$emit('fileChange', file);
-    });
-
-    it('should set supportingMaterial.fileToUpload to be file', function() {
-      expect(scope.supportingMaterial.fileToUpload).toEqual(file);
-    });
-
   });
 
   describe('ok', function() {
@@ -103,35 +68,6 @@ describe('AddSupportingMaterialPopupController', function() {
 
     it('should call $modalInstance.dismiss', function() {
       expect($modalInstance.dismiss).toHaveBeenCalled();
-    });
-
-  });
-
-});
-
-describe('filechange', function() {
-
-  beforeEach(angular.mock.module('corespring-editor.controllers'));
-
-  beforeEach(inject(function($rootScope, $compile) {
-    scope = $rootScope.$new();
-    element = $compile('<input type="file" filechange="" />')(scope);
-    scope = element.scope();
-  }));
-
-  describe('change event on element', function() {
-    beforeEach(function() {
-      spyOn(scope, '$apply').and.callThrough();
-      spyOn(scope, '$emit');
-      element.change();
-    });
-
-    it('should $emit a fileChange event', function() {
-      expect(scope.$emit).toHaveBeenCalledWith('fileChange', undefined);
-    });
-
-    it('should call scope.$apply', function() {
-      expect(scope.$apply).toHaveBeenCalled();
     });
 
   });
