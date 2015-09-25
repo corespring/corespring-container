@@ -5,10 +5,12 @@ import org.corespring.container.client.processing.{ CssMinifier, Gzipper, JsMini
 import org.corespring.container.logging.ContainerLogger
 import play.api.Configuration
 import play.api.http.ContentTypes
-import play.api.mvc.{ Action, EssentialAction, RequestHeader, Result }
+import play.api.mvc._
+
+import scala.concurrent.Future
 
 trait CompressedAndMinifiedComponentSets extends DefaultComponentSets
-  with JsMinifier with CssMinifier with Gzipper {
+  with JsMinifier with CssMinifier with Gzipper with HasContext {
 
   lazy val logger = ContainerLogger.getLogger("CompressedComponentSets")
 
@@ -22,7 +24,7 @@ trait CompressedAndMinifiedComponentSets extends DefaultComponentSets
     rh.headers.get(ACCEPT_ENCODING).map(_.split(',').exists(_.trim == "gzip")).getOrElse(false)
   }
 
-  def process(s: String, contentType: String)(implicit rh: RequestHeader): Result = {
+  def process(s: String, contentType: String)(implicit rh: RequestHeader): SimpleResult = {
 
     logger.warn(s"function=process - this is an expensive operation! use sparingly.")
     logger.trace(s"process minify? $minifyEnabled, gzip? $gzipEnabled")
@@ -45,14 +47,18 @@ trait CompressedAndMinifiedComponentSets extends DefaultComponentSets
     }
   }
 
-  override def singleResource[A >: EssentialAction](context: String, componentType: String, suffix: String): A = Action { implicit request =>
-    val (body, ct) = generate(context, allComponents.find(_.matchesType(componentType)).toSeq, suffix)
-    process(body, ct)
+  override def singleResource[A >: EssentialAction](context: String, componentType: String, suffix: String): A = Action.async {
+    implicit request => Future {
+      val (body, ct) = generate(context, allComponents.find(_.matchesType(componentType)).toSeq, suffix)
+      process(body, ct)
+    }
   }
 
-  override def resource[A >: EssentialAction](context: String, directive: String, suffix: String) = Action { implicit request =>
-    val (body, ct) = generateBodyAndContentType(context, directive, suffix)
-    process(body, ct)
+  override def resource[A >: EssentialAction](context: String, directive: String, suffix: String) = Action.async {
+    implicit request => Future {
+      val (body, ct) = generateBodyAndContentType(context, directive, suffix)
+      process(body, ct)
+    }
   }
 
 }
