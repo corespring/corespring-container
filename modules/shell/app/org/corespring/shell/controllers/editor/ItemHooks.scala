@@ -15,7 +15,7 @@ import scala.concurrent.Future
 import scala.util.Try
 
 trait ItemSupportingMaterialHooks
-  extends containerHooks.SupportingMaterialHooks
+  extends containerHooks.ItemSupportingMaterialHooks
   with SupportingMaterialHooksHelper {
 
   import scala.concurrent.ExecutionContext.Implicits.global

@@ -70,6 +70,9 @@ trait SupportingMaterialHooks {
   def updateContent(id: String, name: String, filename: String, content: String)(implicit h: RequestHeader): R[JsValue]
 }
 
+trait ItemSupportingMaterialHooks extends SupportingMaterialHooks
+trait ItemDraftSupportingMaterialHooks extends SupportingMaterialHooks
+
 trait CoreItemHooks extends HasContext with LoadHook {
   def delete(id: String)(implicit h: RequestHeader): R[JsValue]
   def saveCollectionId(id: String, collectionId: String)(implicit h: RequestHeader): R[JsValue]
@@ -92,7 +95,6 @@ trait CreateItemHook {
 }
 
 trait ItemHooks extends CoreItemHooks with CreateItemHook
-
 
 trait SessionHooks extends HasContext {
   def getScore(id: String)(implicit header: RequestHeader): Either[StatusMessage, SessionOutcome]

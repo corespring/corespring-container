@@ -18,7 +18,7 @@ import play.api.mvc._
 import scala.concurrent.Future
 
 trait ItemDraftSupportingMaterialHooks
-  extends containerHooks.SupportingMaterialHooks
+  extends containerHooks.ItemDraftSupportingMaterialHooks
   with SupportingMaterialHooksHelper {
 
   import scala.concurrent.ExecutionContext.Implicits.global

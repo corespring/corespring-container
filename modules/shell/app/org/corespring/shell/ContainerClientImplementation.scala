@@ -52,7 +52,7 @@ class ContainerClientImplementation(
 
   override def components: Seq[Component] = componentsIn
 
-  override implicit def ec : ContainerExecutionContext = new ContainerExecutionContext(ExecutionContext.global)
+  override implicit def ec: ContainerExecutionContext = new ContainerExecutionContext(ExecutionContext.global)
 
   override def playerLauncherHooks: PlayerLauncherHooks = new PlayerLauncherHooks {
 
@@ -274,7 +274,6 @@ class ContainerClientImplementation(
     override def sessionService: MongoService = ContainerClientImplementation.this.sessionService
   }
 
-
   override def itemDraftHooks: CoreItemHooks with DraftHooks = new shellEditor.ItemDraftHooks {
     override def itemService: MongoService = ContainerClientImplementation.this.itemService
 
@@ -285,7 +284,7 @@ class ContainerClientImplementation(
     override implicit def ec: ContainerExecutionContext = ContainerClientImplementation.this.ec
   }
 
-  override def itemDraftSupportingMaterialHooks: SupportingMaterialHooks = new shellEditor.ItemDraftSupportingMaterialHooks {
+  override def itemDraftSupportingMaterialHooks: ItemDraftSupportingMaterialHooks = new shellEditor.ItemDraftSupportingMaterialHooks {
 
     override def draftItemService: ItemDraftService = ContainerClientImplementation.this.draftItemService
 
@@ -300,7 +299,7 @@ class ContainerClientImplementation(
     override implicit def ec: ContainerExecutionContext = ContainerClientImplementation.this.ec
   }
 
-  override def itemSupportingMaterialHooks: SupportingMaterialHooks = new shellEditor.ItemSupportingMaterialHooks {
+  override def itemSupportingMaterialHooks: ItemSupportingMaterialHooks = new shellEditor.ItemSupportingMaterialHooks {
 
     override def itemService: MongoService = ContainerClientImplementation.this.itemService
 
