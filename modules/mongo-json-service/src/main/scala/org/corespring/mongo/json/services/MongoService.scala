@@ -58,10 +58,7 @@ class MongoService(val collection: MongoCollection) {
   def create(data: JsValue, id: Option[ObjectId] = None): Option[ObjectId] = {
 
     logger.debug("[create]")
-    val oid = id match {
-      case Some(id) => id
-      case _ => ObjectId.get
-    }
+    val oid = id.getOrElse(ObjectId.get())
     val jsonString = PlayJson.stringify(data)
     logger.trace(s"[create]: $jsonString")
     val dbo = MongoJson.parse(jsonString).asInstanceOf[DBObject]
