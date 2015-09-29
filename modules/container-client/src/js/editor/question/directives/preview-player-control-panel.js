@@ -17,8 +17,8 @@ angular.module('corespring-editor.directives')
         };
 
         $scope.$watch('mode', function(newValue, oldValue){
-          $scope.showSubmit = newValue !== 'evaluate';
-          $scope.showReset = newValue === 'evaluate';
+          $scope.showSubmit = newValue === 'gather';
+          $scope.showReset = newValue !== 'gather';
         });
       }
 
