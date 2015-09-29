@@ -49,8 +49,8 @@ describe('ClientSidePreview', function() {
       allowEmptyResponses: false
     };
 
-    it('should set playerMode to disable', function() {
-      expect(scope.playerMode).toEqual('disable');
+    it('should set playerMode to gather', function() {
+      expect(scope.playerMode).toEqual('gather');
     });
 
     it('should set playerSettings to default', function() {
