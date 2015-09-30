@@ -47,6 +47,7 @@ trait CoreEditor
         case _ => None
       }),
       "released" -> Some(JsBoolean(ci.released)),
+      "insertInline" -> Some(JsBoolean(ci.insertInline)),
       "componentType" -> Some(JsString(tag)),
       "defaultData" -> Some(ci.defaultData),
       "configuration" -> (ci.packageInfo \ "external-configuration").asOpt[JsObject])
