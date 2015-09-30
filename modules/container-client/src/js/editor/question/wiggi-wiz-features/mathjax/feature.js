@@ -18,6 +18,7 @@ angular.module('corespring.wiggi-wiz-features.mathjax').factory('WiggiMathJaxFea
 
       this.name = name;
       this.attributeName = 'mathjax';
+      this.insertInline = true;
       this.draggable = true;
       this.iconclass = 'fa math-sum';
       this.compile = true;
