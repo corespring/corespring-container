@@ -39,6 +39,7 @@ trait ComponentInfo {
   def packageInfo: JsValue
   def sampleData: Map[String, JsValue]
   def released: Boolean
+  def insertInline: Boolean
 }
 
 case class Widget(org: String,
@@ -47,6 +48,7 @@ case class Widget(org: String,
   titleGroup: Option[String],
   client: Client,
   released: Boolean,
+  insertInline: Boolean,
   override val packageInfo: JsValue,
   defaultData: JsValue,
   icon: Option[Array[Byte]] = None,
@@ -61,6 +63,7 @@ case class Interaction(
   org: String,
   name: String,
   released: Boolean,
+  insertInline: Boolean,
   title: Option[String],
   titleGroup: Option[String],
   client: Client,
@@ -76,6 +79,7 @@ case class LayoutComponent(org: String,
   client: Seq[LibrarySource],
   css: Option[String],
   released: Boolean,
+  insertInline: Boolean,
   override val packageInfo: JsValue) extends Component(Id(org, name), packageInfo)
 
 case class Client(render: String,
