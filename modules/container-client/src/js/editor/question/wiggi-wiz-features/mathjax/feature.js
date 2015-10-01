@@ -8,7 +8,7 @@ angular.module('corespring.wiggi-wiz-features.mathjax').factory('WiggiMathJaxFea
 
       function dialog(editor, callback, $scope) {
         editor.launchDialog({ originalMarkup: $scope ? ($scope.originalMarkup || '') : ''},
-          'Math',
+          'Mathematical Notation',
           '<mathjax-dialog ng-model="data.originalMarkup"></mathjax-dialog>',
           callback,
           {},
@@ -18,6 +18,7 @@ angular.module('corespring.wiggi-wiz-features.mathjax').factory('WiggiMathJaxFea
 
       this.name = name;
       this.attributeName = 'mathjax';
+      this.insertInline = true;
       this.draggable = true;
       this.iconclass = 'fa math-sum';
       this.compile = true;

@@ -1,17 +1,45 @@
 package org.corespring.shell
 
-import com.mongodb.casbah.{MongoCollection, MongoDB, MongoClientURI, MongoClient}
+import com.amazonaws.services.s3.AmazonS3
+import com.mongodb.casbah.{ MongoCollection, MongoDB, MongoClientURI, MongoClient }
+import org.corespring.container.client.filters.{ BlockingFutureRunner, CheckS3CacheFilter }
 import org.corespring.container.components.loader.FileComponentLoader
 import org.corespring.mongo.json.services.MongoService
 import org.corespring.play.utils.{ CallBlockOnHeaderFilter, ControllerInstanceResolver }
-import org.corespring.shell.controllers.{Launchers, Main}
+import org.corespring.shell.controllers.{ Launchers, Main }
 import org.corespring.shell.filters.AccessControlFilter
 import org.corespring.shell.services.ItemDraftService
-import play.api.mvc.{ RequestHeader, WithFilters, Controller }
+import play.api.mvc._
 import org.corespring.container.logging.ContainerLogger
 import play.api.{ Mode, GlobalSettings, Play }
 
+import scala.concurrent.ExecutionContext
+
 object Global extends WithFilters(AccessControlFilter, CallBlockOnHeaderFilter) with ControllerInstanceResolver with GlobalSettings {
+
+  lazy val componentSetFilter = new CheckS3CacheFilter {
+    override implicit def ec: ExecutionContext = ExecutionContext.global
+
+    override lazy val bucket: String = Play.current.configuration.getString("amazon.s3.bucket").getOrElse("bucket")
+
+    override def appVersion: String = (containerClient.versionInfo \ "commitHash").as[String]
+
+    override def s3: AmazonS3 = containerClient.s3Client
+
+    override def intercept(path: String): Boolean = {
+      val enabled: Boolean = Play.current.configuration.getBoolean("components.filter.enabled").getOrElse(false)
+      val out = path.contains("components-sets") && enabled
+
+      if (out) {
+        logger.debug(s"Intercept: $path")
+      }
+      out
+    }
+  }
+
+  override def doFilter(a: EssentialAction): EssentialAction = {
+    Filters(super.doFilter(a), Seq(componentSetFilter): _*)
+  }
 
   private lazy val logger = ContainerLogger.getLogger("Global")
 
@@ -37,12 +65,12 @@ object Global extends WithFilters(AccessControlFilter, CallBlockOnHeaderFilter) 
     componentLoader.all,
     Play.current.configuration)
 
-  private lazy val launchers = new Launchers{}
+  private lazy val launchers = new Launchers {}
 
   private lazy val home = new Main {
     override def sessionService: MongoService = new MongoService(db("sessions"))
     override def items: MongoCollection = db("items")
-    override def itemDrafts  = new ItemDraftService(db("itemDrafts"))
+    override def itemDrafts = new ItemDraftService(db("itemDrafts"))
   }
 
   override def onStart(app: play.api.Application): Unit = {

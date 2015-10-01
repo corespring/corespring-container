@@ -15,6 +15,8 @@ import play.api.libs.json._
 import play.api.mvc.{ Action, AnyContent, RequestHeader }
 import play.api.templates.Html
 
+import scala.concurrent.Future
+
 trait Player
   extends App[PlayerHooks]
   with PlayerItemTypeReader
@@ -157,7 +159,12 @@ trait Player
     }
   }
 
-  def getFileByItemId(itemId:String, file:String) = Action{ request => hooks.loadItemFile(itemId, file)(request)}
+  def getFileByItemId(itemId: String, file: String) = Action.async {
+    implicit request =>
+      Future {
+        hooks.loadItemFile(itemId, file)(request)
+      }
+  }
 
   private def servicesJs(sessionId: String, queryParams: JsObject) = {
     import org.corespring.container.client.controllers.resources.routes._

@@ -31,6 +31,7 @@ describe('ClientSidePreview', function() {
     $provide.value('ComponentData', ComponentData);
     $provide.value('ClientSidePlayerService', ClientSidePlayerService);
     $provide.constant('STATIC_PATHS', {assets: imagePath});
+    $provide.constant('EDITOR_EVENTS', {CONTENT_ADDED_TO_EDITOR: 'content.added.to.editor'});
   }));
 
   beforeEach(inject(function($rootScope, $compile) {
@@ -77,7 +78,7 @@ describe('ClientSidePreview', function() {
 
     describe('gather mode', function() {
       beforeEach(function() {
-        scope.mode = 'gather';
+        scope.playerMode = 'gather';
         scope.$broadcast('playerControlPanel.submit');
       });
 
@@ -160,7 +161,7 @@ describe('ClientSidePreview', function() {
 
     describe('gather mode', function() {
       beforeEach(function() {
-        scope.mode = 'gather';
+        scope.playerMode = 'gather';
         scope.$broadcast('editor.click');
       });
 
@@ -211,4 +212,16 @@ describe('ClientSidePreview', function() {
 
   });
 
+  describe('content.added.to.editor event', function() {
+
+    describe('gather mode', function() {
+      beforeEach(inject(function(EDITOR_EVENTS) {
+         scope.$broadcast(EDITOR_EVENTS.CONTENT_ADDED_TO_EDITOR);
+      }));
+      it('should set mode to gather', function() {
+        expect(scope.playerMode).toEqual('gather');
+        expect(ComponentData.setMode).toHaveBeenCalledWith('gather');
+      });
+    });
+  });
 });

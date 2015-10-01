@@ -10,6 +10,8 @@ import play.api.libs.MimeTypes
 import play.api.libs.iteratee.Enumerator
 import play.api.mvc._
 
+import scala.concurrent.Future
+
 /** A very simple file asset loader for now */
 trait ComponentsFileController extends Controller with HasContext {
 
@@ -32,47 +34,52 @@ trait ComponentsFileController extends Controller with HasContext {
     else {
       val file = new File(p)
       if (file.exists)
-        Some((file, Map.empty[String,String]))
+        Some((file, Map.empty[String, String]))
       else
         None
     }
   }
 
-  def at(org: String, component: String, filename: String): Action[AnyContent] = Action { request =>
+  def at(org: String, component: String, filename: String) = Action.async {
+    implicit request =>
+      Future {
 
-    require(Validator.absolutePathInProdMode(componentsPath).isRight, s"The component path ($componentsPath) is relative - this can cause unpredictable behaviour when running in Prod Mode. see: https://github.com/playframework/playframework/issues/2411")
+        require(Validator.absolutePathInProdMode(componentsPath).isRight, s"The component path ($componentsPath) is relative - this can cause unpredictable behaviour when running in Prod Mode. see: https://github.com/playframework/playframework/issues/2411")
 
-    val fullPath = s"$componentsPath/$org/$component/public/$filename"
-    log.trace(s"fullPath: $fullPath")
-    loadFile(fullPath).map {
-      tuple =>
-        val (file, headers) = tuple
-        val url = file.toURI().toURL()
+        val fullPath = s"$componentsPath/$org/$component/public/$filename"
+        log.trace(s"fullPath: $fullPath")
+        loadFile(fullPath).map {
+          tuple =>
+            val (file, headers) = tuple
+            val url = file.toURI().toURL()
 
-        lazy val (length, resourceData) = {
-          val stream = url.openStream()
-          try {
-            (stream.available, Enumerator.fromStream(stream))
-          } catch {
-            case e: Throwable => (-1, Enumerator[Array[Byte]]())
-          }
-        }
+            lazy val (length, resourceData) = {
+              val stream = url.openStream()
+              try {
+                (stream.available, Enumerator.fromStream(stream))
+              } catch {
+                case e: Throwable => (-1, Enumerator[Array[Byte]]())
+              }
+            }
 
-        def addCharsetIfNeeded(mimeType: String): String = if (MimeTypes.isText(mimeType))
-          "; charset=" + defaultCharSet
-        else ""
+            def addCharsetIfNeeded(mimeType: String): String = if (MimeTypes.isText(mimeType))
+              "; charset=" + defaultCharSet
+            else ""
 
-        val response = SimpleResult(
-          header = ResponseHeader(OK, headers ++ Map(
-            CONTENT_LENGTH -> length.toString,
-            CONTENT_TYPE -> MimeTypes.forFileName(filename).map(m => m + addCharsetIfNeeded(m)).getOrElse(BINARY),
-            DATE -> df.print({ new java.util.Date }.getTime))),
-          resourceData,
-          HttpConnection.KeepAlive)
+            val response = SimpleResult(
+              header = ResponseHeader(OK, headers ++ Map(
+                CONTENT_LENGTH -> length.toString,
+                CONTENT_TYPE -> MimeTypes.forFileName(filename).map(m => m + addCharsetIfNeeded(m)).getOrElse(BINARY),
+                DATE -> df.print({
+                  new java.util.Date
+                }.getTime))),
+              resourceData,
+              HttpConnection.KeepAlive)
 
-        response
+            response
 
-    }.getOrElse(NotFound)
+        }.getOrElse(NotFound)
+      }
   }
 
 }
