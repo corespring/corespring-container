@@ -34,7 +34,7 @@ class ItemDraftService(override val collection: MongoCollection) extends MongoSe
       if (result.getLastError().ok)
     } yield (itemId.toString, draftName)
 
-  override def create(data: JsValue, id: Option[ObjectId] = None) = throw new RuntimeException("ItemDraftService doesn't support create, use createDraft")
+  override def create(data: JsValue) = throw new RuntimeException("ItemDraftService doesn't support create, use createDraft")
 
   override def load(id: String) = {
     val draftId: ContainerDraftId = DraftId.fromString[ObjectId, ContainerDraftId](id, (itemId, name) => ContainerDraftId(new ObjectId(itemId), name))
