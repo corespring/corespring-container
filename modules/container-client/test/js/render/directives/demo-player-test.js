@@ -100,36 +100,14 @@ describe('corespringDemoPlayer', function() {
 
     it('default button label in gather mode is Submit Answer', function() {
       scope.playerMode = 'gather';
-      expect(scope.submitButtonLabel()).toEqual('Submit Answer');
-    });
-
-    it('default button class in gather mode is info', function() {
-      scope.playerMode = 'gather';
-      expect(scope.buttonClass()).toEqual('info');
-    });
-
-    it('default button label in instructor mode is Try It', function() {
-      scope.playerMode = 'instructor';
-      expect(scope.tryButtonLabel()).toEqual('Try It');
-    });
-
-    it('default button class in instructor mode is primary', function() {
-      scope.playerMode = 'instructor';
-      expect(scope.buttonClass()).toEqual('primary');
+      expect(scope.submitButtonLabel()).toEqual('submit answer');
     });
 
     it('default button label in view/eval mode is Reset', function() {
       scope.playerMode = 'evaluate';
-      expect(scope.submitButtonLabel()).toEqual('Reset');
+      expect(scope.submitButtonLabel()).toEqual('reset');
       scope.playerMode = 'view';
-      expect(scope.submitButtonLabel()).toEqual('Reset');
-    });
-
-    it('default button class in view/eval mode is danger', function() {
-      scope.playerMode = 'evaluate';
-      expect(scope.buttonClass()).toEqual('danger');
-      scope.playerMode = 'view';
-      expect(scope.buttonClass()).toEqual('danger');
+      expect(scope.submitButtonLabel()).toEqual('reset');
     });
 
   });
