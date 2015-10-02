@@ -160,9 +160,10 @@ trait Player
   }
 
   def getFileByItemId(itemId: String, file: String) = Action.async {
-    implicit request => Future {
-      hooks.loadItemFile(itemId, file)(request)
-    }
+    implicit request =>
+      Future {
+        hooks.loadItemFile(itemId, file)(request)
+      }
   }
 
   private def servicesJs(sessionId: String, queryParams: JsObject) = {
@@ -176,6 +177,7 @@ trait Player
       Session.getScore(sessionId),
       Session.completeSession(sessionId),
       Session.loadOutcome(sessionId),
+      Session.loadInstructorData(sessionId),
       queryParams).toString
   }
 }

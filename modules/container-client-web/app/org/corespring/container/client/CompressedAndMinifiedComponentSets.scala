@@ -48,17 +48,19 @@ trait CompressedAndMinifiedComponentSets extends DefaultComponentSets
   }
 
   override def singleResource[A >: EssentialAction](context: String, componentType: String, suffix: String): A = Action.async {
-    implicit request => Future {
-      val (body, ct) = generate(context, allComponents.find(_.matchesType(componentType)).toSeq, suffix)
-      process(body, ct)
-    }
+    implicit request =>
+      Future {
+        val (body, ct) = generate(context, allComponents.find(_.matchesType(componentType)).toSeq, suffix)
+        process(body, ct)
+      }
   }
 
   override def resource[A >: EssentialAction](context: String, directive: String, suffix: String) = Action.async {
-    implicit request => Future {
-      val (body, ct) = generateBodyAndContentType(context, directive, suffix)
-      process(body, ct)
-    }
+    implicit request =>
+      Future {
+        val (body, ct) = generateBodyAndContentType(context, directive, suffix)
+        process(body, ct)
+      }
   }
 
 }

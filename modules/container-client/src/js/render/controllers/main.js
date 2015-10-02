@@ -59,6 +59,23 @@ angular.module('corespring-player.controllers')
           );
         };
 
+
+        $scope.loadInstructorData = function(cb) {
+          PlayerService.loadInstructorData({},
+            function(data) {
+              $scope.onInstructorDataLoaded(data);
+              if (cb) {
+                cb(null, data);
+              }
+            }, function(err) {
+              $log.error(err);
+              if (cb) {
+                cb(err);
+              }
+            }
+          );
+        };
+
         /** 
          * load the outcome
          * @param settings - an object that will be passed to the components' outcome generation
@@ -84,6 +101,11 @@ angular.module('corespring-player.controllers')
         $scope.onOutcomeLoaded = function(data) {
           $scope.outcome = data.outcome;
           $scope.score = data.score;
+        };
+
+        $scope.onInstructorDataLoaded = function(data) {
+          $log.debug("[Main] answer key result");
+          ComponentRegister.setInstructorData(data.item.components);
         };
 
         $scope.loadOutcomeError = function(err) {
@@ -182,7 +204,7 @@ angular.module('corespring-player.controllers')
          * Initialise the controller - this has to be the 1st thing you call
          */
         $scope.$on('initialise', function(event, data) {
-          $log.debug('[on initialise]', data);
+          $log.debug("[Main] initialise");
           PlayerService.loadItemAndSession(
             function(itemAndSession) {
               $scope.onItemAndSessionLoaded(itemAndSession);
@@ -193,6 +215,10 @@ angular.module('corespring-player.controllers')
 
               currentMode = data.mode;
               updateComponentsMode();
+
+              if (data.mode === 'instructor') {
+                $scope.loadInstructorData();
+              }
 
               if (data.mode === 'evaluate') {
 
@@ -260,7 +286,7 @@ angular.module('corespring-player.controllers')
             $log.debug("[Main] $timeout: set mode: ", currentMode);
             ComponentRegister.setEditable(editable);
             ComponentRegister.setMode(currentMode);
-          });
+          }, 10);
         }
 
         /** Set mode to view, gather or evaluate
@@ -268,7 +294,7 @@ angular.module('corespring-player.controllers')
          * Optionally save the responses too.
          * The data object contains:
          * ```
-         * mode : view|gather|evaluate //required
+         * mode : view|gather|evaluate|instructor //required
          * saveResponses : { isAttempt : true|false, isComplete: true|false}
          * ```
          * saveResponses will save the client side data. Its optional - if not present nothing will be saved.
@@ -305,6 +331,9 @@ angular.module('corespring-player.controllers')
               loadOutcome();
             } else {
               clearOutcome();
+              if (data.mode === 'instructor') {
+                loadInstructorData();
+              }
             }
           }
 
@@ -314,6 +343,15 @@ angular.module('corespring-player.controllers')
               var settings = data.evaluate || {};
               $scope.loadOutcome(settings, function() {
                 $log.debug("[Main] score received");
+              });
+            });
+          }
+
+          function loadInstructorData() {
+            $timeout(function() {
+              $log.debug("[Main] load instructor data");
+              $scope.loadInstructorData(function() {
+                $log.debug("[Main] instructor data received");
               });
             });
           }

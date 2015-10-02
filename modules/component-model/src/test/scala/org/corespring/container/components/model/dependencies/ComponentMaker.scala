@@ -8,7 +8,7 @@ trait ComponentMaker {
   private lazy val defaultOrg = "org"
 
   def uiComp(name: String, libs: Seq[Id], title: Option[String] = None, titleGroup: Option[String] = None,
-             org: String = defaultOrg, released: Boolean = false, insertInline: Boolean = false) = {
+    org: String = defaultOrg, released: Boolean = false, insertInline: Boolean = false) = {
     Interaction(
       org = org,
       name = name,

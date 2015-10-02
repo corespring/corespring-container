@@ -21,6 +21,7 @@
           };
 
           $scope.responses = {};
+          ComponentRegister.setEditable(true);
 
           var debouncedUpdateComponents = debounce(updateRenderedComponents);
 

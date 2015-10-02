@@ -16,7 +16,7 @@ import play.api.templates.Html
 import play.api.test.FakeRequest
 
 import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, Future, ExecutionContext}
+import scala.concurrent.{ Await, Future, ExecutionContext }
 import play.api.test.Helpers._
 
 class CoreEditorTest extends Specification with Mockito {
@@ -54,9 +54,9 @@ class CoreEditorTest extends Specification with Mockito {
 
     override def mode: Mode = Mode.Dev
 
-    protected var templateParams : TemplateParams = null
+    protected var templateParams: TemplateParams = null
 
-    override def renderJade(params:TemplateParams) : Html = {
+    override def renderJade(params: TemplateParams): Html = {
       templateParams = params
       Html("hi")
     }
@@ -76,7 +76,7 @@ class CoreEditorTest extends Specification with Mockito {
       status(result) === SEE_OTHER
     }
 
-    "pass EditorTemplateParams.options.debounceInMillis to renderJade" in new scope{
+    "pass EditorTemplateParams.options.debounceInMillis to renderJade" in new scope {
       mockHooks.load(any[String])(any[RequestHeader]) returns Future(Right(Json.obj()))
       override def debounceInMillis = 5001
       Await.result(load("id")(r), Duration(1, TimeUnit.SECONDS))
