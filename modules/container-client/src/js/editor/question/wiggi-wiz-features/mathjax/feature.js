@@ -1,18 +1,20 @@
 angular.module('corespring.wiggi-wiz-features.mathjax').factory('WiggiMathJaxFeatureDef', ['MathJaxService',
-  '$rootScope',
+  '$rootScope', '$log',
 
-  function(MathJaxService, $rootScope) {
+  function(MathJaxService, $rootScope, $log) {
 
     function FeatureDef() {
       var name = 'mathjax';
 
       function dialog(editor, callback, $scope) {
-        editor.launchDialog({ originalMarkup: $scope ? ($scope.originalMarkup || '') : ''},
+        editor.launchDialog({
+            originalMarkup: $scope ? ($scope.originalMarkup || '') : ''
+          },
           'Mathematical Notation',
           '<mathjax-dialog ng-model="data.originalMarkup"></mathjax-dialog>',
-          callback,
-          {},
-          {featureName: name}
+          callback, {}, {
+            featureName: name
+          }
         );
       }
 
@@ -55,7 +57,14 @@ angular.module('corespring.wiggi-wiz-features.mathjax').factory('WiggiMathJaxFea
       };
 
       this.getMarkUp = function($node, $scope) {
-        return '<span mathjax>' + $scope.originalMarkup + '</span>';
+        if (!$scope) {
+          $log.warn('[mathjax-feature].getMarkUp: Parameter $scope no set.');
+        }
+        if (!$scope.originalMarkup) {
+          $log.warn('[mathjax-feature].getMarkUp: $scope.originalMarkup not set.');
+        }
+        var markup = $scope ? $scope.originalMarkup : '';
+        return '<span mathjax>' + markup + '</span>';
       };
     }
     return FeatureDef;
