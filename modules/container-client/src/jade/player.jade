@@ -11,6 +11,13 @@ block header-scripts
 
       NREUM.info!= newRelicRumConfig
 
+  if warnings
+    script(type="text/javascript")
+      var warnings = !{warnings};
+      for (var i in warnings) {
+        console.warn(warnings[i]);
+      }
+
 block content
 
   mixin player
