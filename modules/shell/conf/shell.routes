@@ -15,5 +15,6 @@ GET         /launch-player/item/:itemId       @org.corespring.shell.controllers.
 GET         /assets/*file        controllers.Assets.at(path="/container-client", file)
 
 ->          /client              v2Player.Routes
+->          /editor  			 v2Editor.Routes
 
 ->          /docs                docs.Routes
