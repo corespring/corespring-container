@@ -123,6 +123,10 @@ angular.module('corespring-player.services')
         _.forIn(bridges, fn('setResponse', outcomes));
       };
 
+      this.setInstructorData = function(data) {
+        _.forIn(bridges, fn('setInstructorData', data));
+      };
+
       this.reset = function() {
         _.forIn(bridges, fn('reset'));
       };

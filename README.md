@@ -139,3 +139,4 @@ Then go to [http://localhost:9000](http://localhost:9000)
 * `grunt` `npm` and `bower` are all available as commands within the play console. 
 * When you start the play server you trigger the grunt run task. This will set up a watch on the container-client's
 client side resources.
+

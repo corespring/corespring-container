@@ -29,6 +29,7 @@ GET           /session/reset/:id.json                                @org.coresp
 PUT           /session/save/:id.json                                 @org.corespring.container.client.controllers.resources.Session.saveSession(id)
 PUT           /session/complete/:id.json                             @org.corespring.container.client.controllers.resources.Session.completeSession(id)
 PUT           /session/load-outcome/:id.json                         @org.corespring.container.client.controllers.resources.Session.loadOutcome(id)
+GET           /session/load-instructor-data/:id.json                 @org.corespring.container.client.controllers.resources.Session.loadInstructorData(id)
 PUT           /session/:id/score.json                                @org.corespring.container.client.controllers.resources.Session.getScore(id)
 
 # Collection

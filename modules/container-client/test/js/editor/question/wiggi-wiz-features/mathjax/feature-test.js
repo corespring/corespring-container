@@ -30,6 +30,10 @@ describe('mathjax feature', function() {
       expect(wiggiMathJaxFeatureDef.draggable).toEqual(true);
     });
 
+    it('should set insertInline to be true', function() {
+      expect(wiggiMathJaxFeatureDef.insertInline).toEqual(true);
+    });
+
     it('should set icon class', function() {
       expect(wiggiMathJaxFeatureDef.iconclass).toEqual('fa math-sum');
     });

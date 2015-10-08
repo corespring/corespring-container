@@ -11,7 +11,7 @@ import play.api.libs.json._
 import play.api.mvc._
 import v2Player.Routes
 
-object StaticPaths{
+object StaticPaths {
   val assetUrl = Routes.prefix + "/images"
 
   val staticPaths = Json.obj(
@@ -31,7 +31,7 @@ trait CoreEditor
 
   def versionInfo: JsObject
 
-  def debounceInMillis:Long = 5000
+  def debounceInMillis: Long = 5000
 
   protected def toJson(ci: ComponentInfo): JsValue = {
     val tag = tagName(ci.id.org, ci.id.name)
@@ -47,6 +47,7 @@ trait CoreEditor
         case _ => None
       }),
       "released" -> Some(JsBoolean(ci.released)),
+      "insertInline" -> Some(JsBoolean(ci.insertInline)),
       "componentType" -> Some(JsString(tag)),
       "defaultData" -> Some(ci.defaultData),
       "configuration" -> (ci.packageInfo \ "external-configuration").asOpt[JsObject])
@@ -75,8 +76,7 @@ trait CoreEditor
 
       val options = EditorClientOptions(
         debounceInMillis,
-        StaticPaths.staticPaths
-      )
+        StaticPaths.staticPaths)
 
       Ok(renderJade(
         EditorTemplateParams(

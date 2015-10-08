@@ -16,7 +16,7 @@ angular.module('corespring-editor.controllers')
 
     $scope.playerLabelImg = STATIC_PATHS.assets + '/item-player-label.png';
 
-    $scope.playerMode = 'disable';
+    $scope.playerMode = 'gather';
 
     $scope.playerSettings = {
       maxNoOfAttempts: 1,

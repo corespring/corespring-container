@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
 
 s3cmd put images/cute-puppy.jpg s3://corespring-container-test-bucket/522267c2554f43f858000001/cute-puppy.jpg
+s3cmd put images/map.png s3://corespring-container-test-bucket/533eb66423fd754c272282ae/map.png
 

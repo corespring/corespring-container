@@ -49,9 +49,9 @@ class DefaultIntegrationTest extends Specification with Mockito with PlaySpecifi
 
       override def itemHooks: CoreItemHooks with CreateItemHook = mock[CoreItemHooks with CreateItemHook]
 
-      override def itemDraftSupportingMaterialHooks: SupportingMaterialHooks = mock[SupportingMaterialHooks]
+      override def itemDraftSupportingMaterialHooks: ItemDraftSupportingMaterialHooks = mock[ItemDraftSupportingMaterialHooks]
 
-      override def itemSupportingMaterialHooks: SupportingMaterialHooks = mock[SupportingMaterialHooks]
+      override def itemSupportingMaterialHooks: ItemSupportingMaterialHooks = mock[ItemSupportingMaterialHooks]
     }
   }
 

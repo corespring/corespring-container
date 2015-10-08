@@ -213,40 +213,58 @@ describe('player launcher', function() {
       var opts = {complete: false, secure: false};
       expect(setMode('gather->view', opts)).toSucceed();
       expect(setMode('gather->evaluate', opts)).toSucceed();
+      expect(setMode('gather->instructor', opts)).toSucceed();
       expect(setMode('view->gather', opts)).toSucceed();
       expect(setMode('view->evaluate', opts)).toSucceed();
+      expect(setMode('view->instructor', opts)).toSucceed();
       expect(setMode('evaluate->gather', opts)).toSucceed();
       expect(setMode('evaluate->view', opts)).toSucceed();
+      expect(setMode('evaluate->instructor', opts)).toSucceed();
+      expect(setMode('instructor->view', opts)).toSucceed();
+      expect(setMode('instructor->gather', opts)).toSucceed();
+      expect(setMode('instructor->evaluate', opts)).toSucceed();
     });
 
     it("should work as expected when complete is true and secure is false", function() {
       var opts = {complete: true, secure: false};
       expect(setMode('gather->view', opts)).toSucceed();
       expect(setMode('gather->evaluate', opts)).toSucceed();
+      expect(setMode('gather->instructor', opts)).toSucceed();
       expect(setMode('view->gather', opts)).toSucceed();
       expect(setMode('view->evaluate', opts)).toSucceed();
+      expect(setMode('view->instructor', opts)).toSucceed();
       expect(setMode('evaluate->gather', opts)).toSucceed();
       expect(setMode('evaluate->view', opts)).toSucceed();
+      expect(setMode('evaluate->instructor', opts)).toSucceed();
+      expect(setMode('instructor->view', opts)).toSucceed();
+      expect(setMode('instructor->gather', opts)).toSucceed();
+      expect(setMode('instructor->evaluate', opts)).toSucceed();
     });
 
     it("should work as expected when complete is false and secure is true", function() {
       var opts = {complete: false, secure: true};
       expect(setMode('gather->view', opts)).toSucceed();
       expect(setMode('gather->evaluate', opts)).not.toSucceed();
+      expect(setMode('gather->instructor', opts)).not.toSucceed();
       expect(setMode('view->gather', opts)).toSucceed();
       expect(setMode('view->evaluate', opts)).not.toSucceed();
+      expect(setMode('view->instructor', opts)).not.toSucceed();
       expect(setMode('evaluate->gather', opts)).toSucceed();
       expect(setMode('evaluate->view', opts)).toSucceed();
+      expect(setMode('evaluate->instructor', opts)).not.toSucceed();
     });
 
     it("should work as expected when complete is true and secure is true", function() {
       var opts = {complete: true, secure: true};
       expect(setMode('gather->view', opts)).toSucceed();
       expect(setMode('gather->evaluate', opts)).toSucceed();
+      expect(setMode('gather->instructor', opts)).toSucceed();
       expect(setMode('view->gather', opts)).not.toSucceed();
       expect(setMode('view->evaluate', opts)).toSucceed();
+      expect(setMode('view->instructor', opts)).toSucceed();
       expect(setMode('evaluate->gather', opts)).not.toSucceed();
       expect(setMode('evaluate->view', opts)).toSucceed();
+      expect(setMode('evaluate->instructor', opts)).toSucceed();
     });
   });
 });

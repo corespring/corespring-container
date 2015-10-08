@@ -6,7 +6,7 @@ import org.corespring.container.client.component.ComponentUrls
 import org.corespring.container.client.controllers.apps._
 import org.corespring.container.client.controllers.resources.session.ItemPruner
 import org.corespring.container.client.controllers.resources._
-import org.corespring.container.client.controllers.{ ComponentsFileController, DataQuery, Icons, PlayerLauncher }
+import org.corespring.container.client.controllers._
 import org.corespring.container.client.hooks._
 import org.corespring.container.client.integration.validation.Validator
 import org.corespring.container.components.model.Component
@@ -282,6 +282,12 @@ trait DefaultIntegration
 
     def hooks = playerLauncherHooks
 
+    override def playerConfig: V2PlayerConfig = DefaultIntegration.this.playerConfig
+  }
+
+  lazy val editorLauncher = new EditorLauncher {
+    override implicit def ec = DefaultIntegration.this.ec
+    def hooks = playerLauncherHooks
     override def playerConfig: V2PlayerConfig = DefaultIntegration.this.playerConfig
   }
 

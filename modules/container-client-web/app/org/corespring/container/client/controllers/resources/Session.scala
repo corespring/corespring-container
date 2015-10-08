@@ -87,26 +87,27 @@ trait Session extends Controller with HasContext {
   }
 
   def loadItemAndSession(sessionId: String) = Action.async {
-    implicit request => Future {
-      val response = hooks.loadItemAndSession(sessionId)
+    implicit request =>
+      Future {
+        val response = hooks.loadItemAndSession(sessionId)
 
-      response match {
-        case Left(err) => err
-        case Right(fs) => {
-          val json = fs.everything
+        response match {
+          case Left(err) => err
+          case Right(fs) => {
+            val json = fs.everything
 
           val itemJson = (json \ "item").as[JsObject]
           val processedItem = itemPreProcessor.preProcessItemForPlayer(itemJson)
           val sessionJson = (json \ "session").as[JsObject]
 
           val base = Json.obj(
-            "item" -> processedItem,
-            "session" -> sessionJson)
+              "item" -> processedItem,
+              "session" -> sessionJson)
 
-          Ok(base)
+            Ok(base)
+          }
         }
       }
-    }
   }
 
   def saveSession(id: String) = Action.async { implicit request =>
@@ -179,6 +180,30 @@ trait Session extends Controller with HasContext {
         }
       }
   }
+  /**
+   * Load instructor data for a session.
+   * @param id
+   * @return
+   */
+  def loadInstructorData(id: String) = Action {
+    implicit request =>
+      {
+        val reponse = hooks.loadOutcome(id)
+
+        reponse match {
+          case Left(err) => InternalServerError(err._2)
+          case Right(so) => {
+            logger.trace(s"[loadAnswerKey]: $id : ${Json.stringify(so.item)} : ${Json.stringify(so.itemSession)}")
+
+            if (so.isSecure && !so.isComplete) {
+              BadRequest(Json.obj("error" -> JsString("secure mode: can't load instructor data - session isn't complete")))
+            } else {
+              Ok(Json.obj("item" -> so.item, "session" -> so.itemSession))
+            }
+          }
+        }
+      }
+  }
 
   /**
    * Be aware that this is two different implementations melted into one api.
@@ -189,41 +214,42 @@ trait Session extends Controller with HasContext {
    * @return
    */
   def getScore(id: String) = Action.async {
-    implicit request => Future {
-      val response = hooks.getScore(id)
+    implicit request =>
+      Future {
+        val response = hooks.getScore(id)
 
-      response match {
-        case Left(err) => InternalServerError(err._2)
-        case Right(so) => {
-          val answers: Either[String, JsValue] = {
+        response match {
+          case Left(err) => InternalServerError(err._2)
+          case Right(so) => {
+            val answers: Either[String, JsValue] = {
 
-            if (so.isSecure) {
-              if (!so.isComplete) {
-                Left("Can't get score if session has not been completed")
+              if (so.isSecure) {
+                if (!so.isComplete) {
+                  Left("Can't get score if session has not been completed")
+                } else {
+                  (so.itemSession \ "components").asOpt[JsValue].map { _ =>
+                    Right(so.itemSession)
+                  }.getOrElse(Left("Can't calculate a score if there are no saved answers"))
+                }
               } else {
-                (so.itemSession \ "components").asOpt[JsValue].map { _ =>
-                  Right(so.itemSession)
-                }.getOrElse(Left("Can't calculate a score if there are no saved answers"))
+                request.body.asJson
+                  .orElse((so.itemSession \ "components").asOpt[JsValue].map(_ => so.itemSession))
+                  .map(Right(_))
+                  .getOrElse(Left("Can't find answers in request body or in the db"))
               }
-            } else {
-              request.body.asJson
-                .orElse((so.itemSession \ "components").asOpt[JsValue].map(_ => so.itemSession))
-                .map(Right(_))
-                .getOrElse(Left("Can't find answers in request body or in the db"))
             }
-          }
 
-          answers match {
-            case Left(err) => BadRequest(Json.obj("error" -> err))
-            case Right(a) =>
-              logger.trace(s"[getScore]: $id : ${Json.stringify(a)}")
-              val outcome = outcomeProcessor.createOutcome(so.item, a, Json.obj())
-              val score = scoreProcessor.score(so.item, a, outcome)
-              Ok(score)
+            answers match {
+              case Left(err) => BadRequest(Json.obj("error" -> err))
+              case Right(a) =>
+                logger.trace(s"[getScore]: $id : ${Json.stringify(a)}")
+                val outcome = outcomeProcessor.createOutcome(so.item, a, Json.obj())
+                val score = scoreProcessor.score(so.item, a, outcome)
+                Ok(score)
+            }
           }
         }
       }
-    }
   }
 
   def completeSession(id: String) = Action.async { implicit request =>

@@ -25,6 +25,8 @@ trait Player
 
   private object SessionRenderer {
 
+    private val archiveCollId = "52e68c0bd455283f1744a721"
+
     /**
      * Preprocess the xml so that it'll work in all browsers
      * aka: convert tagNames -> attributes for ie 8 support
@@ -36,6 +38,9 @@ trait Player
       xhtml =>
         PlayerXhtml.mkXhtml(components.map(_.componentType), xhtml)
     }.getOrElse("<div><h1>New Item</h1></div>")
+
+    def hasBeenArchived(itemJson: JsValue) =
+      (itemJson \ "collectionId").asOpt[String].map(_ == archiveCollId).getOrElse(false)
 
     def createPlayerHtml(sessionId: String, session: JsValue, itemJson: JsValue, serviceParams: JsObject)(implicit rh: RequestHeader): Html = {
 
@@ -63,7 +68,9 @@ trait Player
           Json.obj("session" -> session, "item" -> preprocessedItem),
           versionInfo,
           newRelicRumConf != None,
-          newRelicRumConf.getOrElse(Json.obj())))
+          newRelicRumConf.getOrElse(Json.obj()),
+          if (hasBeenArchived(itemJson)) Seq(s"Warning: This item has been deleted.") else Seq.empty)
+      )
 
     }
   }
@@ -160,9 +167,10 @@ trait Player
   }
 
   def getFileByItemId(itemId: String, file: String) = Action.async {
-    implicit request => Future {
-      hooks.loadItemFile(itemId, file)(request)
-    }
+    implicit request =>
+      Future {
+        hooks.loadItemFile(itemId, file)(request)
+      }
   }
 
   private def servicesJs(sessionId: String, queryParams: JsObject) = {
@@ -176,6 +184,7 @@ trait Player
       Session.getScore(sessionId),
       Session.completeSession(sessionId),
       Session.loadOutcome(sessionId),
+      Session.loadInstructorData(sessionId),
       queryParams).toString
   }
 }

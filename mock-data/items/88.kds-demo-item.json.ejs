@@ -1,0 +1,133 @@
+{
+  "profile" : {
+    "taskInfo" : {
+      "title" : "669734 Demo"
+    }
+  },
+  "xhtml" : "<%- helper.read('../xml/88.xhtml') %>",
+  "components" : {
+    "1" : {
+      "componentType" : "corespring-teacher-instructions",
+      "teacherInstructions": "<strong>TEACHER READS:</strong><br /><br />Read the question to yourself and select the best answer(s)."
+    },
+    "2": {
+      "componentType": "corespring-multiple-choice",
+      "model": {
+        "config": {
+          "shuffle": "true",
+          "orientation": "vertical",
+          "choiceType": "radio",
+          "choiceLabels": "letters",
+          "choiceStyle": "",
+          "showCorrectAnswer": "inline"
+        },
+        "choices": [
+          {
+            "label": "&quot;The Corps of Discovery Expedition&quot; shows a universally peaceful relationship with the Native Americans, but the journals show a tense relationship where the Native Americans dominate.",
+            "value": "1"
+
+          },
+          {
+            "label": "&quot;The Corps of Discovery Expedition&quot; explains how prepared Lewis and Clark were to fight, but the journals show no fear or expectation of fighting with Native Americans.",
+            "value": "2"
+          },
+          {
+            "label": "&quot;The Corps of Discovery Expedition&quot; points out ways that Lewis and Clark's team dominated the Native Americans and forced them to help out, but the journals claim that the Native Americans helped only because they wanted to.",
+            "value": "3"
+          },
+          {
+            "label": "&quot;The Corps of Discovery Expedition&quot; describes how the relationship between Lewis and Clark's team and the Native Americans was mutually beneficial, but the journals explain that it only benefitted the Native Americans.",
+            "value": "4"
+          }
+        ],
+        "shuffle": false
+      },
+      "feedback": [],
+      "rationales": [
+        {
+          "choice": "1",
+          "rationale": "Student(s) may have mistakenly thought that \"The Corps of Discovery Expedition\" described a universally peaceful relationship because it discussed how Lewis and Clark established peaceful relationships with some tribes. Student(s) may have also misunderstood what the journals described about who dominated whom."
+        },
+        {
+          "choice": "2",
+          "rationale": "Correct answer"
+        },
+        {
+          "choice": "3",
+          "rationale": "Student(s) may have misunderstood information in the journals and thought that the Native Americans helped only because they wanted to."
+        },
+        {
+          "choice": "4",
+          "rationale": "Student(s) may have misinterpreted the information from the texts and thought that only Native Americans benefitted."
+        }
+      ],
+      "correctResponse": {
+        "value": [
+          "2"
+        ]
+      }
+    },
+    "3": {
+      "componentType": "corespring-multiple-choice",
+      "model": {
+        "config": {
+          "shuffle": "true",
+          "orientation": "vertical",
+          "choiceType": "radio",
+          "choiceLabels": "letters",
+          "choiceStyle": "",
+          "showCorrectAnswer": "inline"
+        },
+        "choices": [
+          {
+            "label": "Lewis and Clark prepared themselves for the possibility of skirmishes with the Native American tribes... &#160;In case of resistance, Lewis and Clark had numerous weapons.<br></br>(The Corps of Discovery Expedition)",
+            "value": "1"
+          },
+          {
+            "label": "Second, it established positive relationships with over two dozen Native American nations.<br></br>(The Corps of Discovery Expedition)",
+            "value": "2"
+          },
+          {
+            "label": "...purchased some Wapto roots for which was given, brass armbans and rings of which the Squars were fond.<br></br>(Lewis and Clark: Journal Entries)",
+            "value": "3"
+          },
+          {
+            "label": "...it would be madness for us to attempt to proceede untill April, as the indians inform us that the snows lye knee deep in the plains of Columbia during the winter...<br></br>(Lewis and Clark: Journal Entries)",
+            "value": "4"
+          }
+        ],
+        "shuffle": false
+      },
+      "feedback": [],
+      "correctResponse": {
+        "value": [
+          "1"
+        ]
+      },
+      "rationales": [
+        {
+          "choice": "1",
+          "rationale": "Correct answer"
+        },
+        {
+          "choice": "2",
+          "rationale": "Student(s) may have assumed that this meant that \"The Corps of Discovery\" described universal peace with Native American tribes."
+        },
+        {
+          "choice": "3",
+          "rationale": "Student(s) may have assumed that since Clark was describing how they were \"fond\" of what they got from him, they were the only ones benefitting."
+        },
+        {
+          "choice": "4",
+          "rationale": "Student(s) may have mistaken the fact that Lewis was following the advice of the Native Americans for Lewis being dominated by the Native Americans."
+        }
+      ]
+    }
+  },
+  "_id" : "522267c2554f43f858aa2202",
+  "org": {
+    "components": [
+      "corespring/*"
+    ]
+  }
+}

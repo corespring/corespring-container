@@ -38,6 +38,7 @@ class FileComponentLoaderTest extends Specification {
       interaction.title.get === "Single Choice"
       interaction.titleGroup.get === "Fixed Choice"
       interaction.released === false
+      interaction.insertInline === false
       interaction.client.renderLibs.length === 2
       interaction.client.configureLibs.length === 1
     }
