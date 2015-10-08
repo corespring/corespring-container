@@ -6,6 +6,7 @@ import java.nio.charset.Charset
 import org.apache.commons.io.{Charsets, IOUtils}
 import org.corespring.container.client.controllers.resources.CoreSupportingMaterials.Errors
 import org.corespring.container.client.hooks._
+import org.corespring.test.TestContext
 import org.mockito.Matchers.{ eq => e }
 import org.specs2.matcher.{ Expectable, Matcher }
 import org.specs2.mock.Mockito
@@ -41,8 +42,7 @@ class CoreSupportingMaterialsTest extends Specification with Mockito with PlaySp
     bytes
   }
 
-  class testScope extends Scope with CoreSupportingMaterials {
-    override implicit def ec: ExecutionContext = ExecutionContext.Implicits.global
+  class testScope extends Scope with CoreSupportingMaterials with TestContext{
 
     lazy val mockHooks = {
       val m = mock[SupportingMaterialHooks]

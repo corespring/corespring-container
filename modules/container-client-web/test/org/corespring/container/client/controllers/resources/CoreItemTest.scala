@@ -1,6 +1,7 @@
 package org.corespring.container.client.controllers.resources
 
 import org.corespring.container.client.hooks.{ SupportingMaterialHooks, CoreItemHooks }
+import org.corespring.test.TestContext
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
@@ -14,8 +15,7 @@ import scala.concurrent.{ Future, ExecutionContext }
 
 class CoreItemTest extends Specification with Mockito {
 
-  class scope extends Scope with CoreItem {
-    override implicit def ec: ExecutionContext = ExecutionContext.Implicits.global
+  class scope extends Scope with CoreItem with TestContext{
 
     override protected def componentTypes: Seq[String] = Seq.empty
 

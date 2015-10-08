@@ -1,6 +1,6 @@
 package org.corespring.container.client.controllers.apps
 
-import org.corespring.container.client.HasContext
+import org.corespring.container.client.HasContainerContext
 import org.corespring.container.client.controllers.jade.Jade
 import org.corespring.container.client.integration.ContainerExecutionContext
 
@@ -18,7 +18,7 @@ trait Rig
   extends App[LoadHook]
   with PlayerItemTypeReader
   with Jade
-  with HasContext {
+  with HasContainerContext {
 
   def index(componentType: String, data: Option[String] = None) = controllers.Assets.at("/container-client", "rig.html")
 
@@ -39,7 +39,7 @@ trait Rig
 
   override def hooks: LoadHook = new LoadHook {
 
-    override implicit def ec: ContainerExecutionContext = Rig.this.ec
+    override implicit def containerContext: ContainerExecutionContext = Rig.this.containerContext
 
     override def load(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]] = Future {
       val componentType = id

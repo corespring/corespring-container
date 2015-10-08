@@ -3,6 +3,7 @@ package org.corespring.container.client.controllers.resources
 import java.io.{ FileInputStream }
 
 import org.apache.commons.io.IOUtils
+import org.corespring.container.client.HasContainerContext
 import org.corespring.container.client.controllers.helpers.{ PlayerXhtml, XhtmlProcessor }
 import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.client.hooks._
@@ -28,13 +29,11 @@ object ItemJson {
   }
 }
 
-trait CoreItem extends CoreSupportingMaterials with Controller {
+trait CoreItem extends CoreSupportingMaterials with Controller with HasContainerContext{
 
   lazy val logger = Logger(classOf[CoreItem])
 
   implicit def toResult(m: StatusMessage): SimpleResult = play.api.mvc.Results.Status(m._1)(Json.obj("error" -> m._2))
-
-  implicit def ec: ExecutionContext
 
   /**
    * A list of all the component types in the container

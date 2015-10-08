@@ -17,20 +17,13 @@ import org.corespring.container.components.response.OutcomeProcessor
 import org.corespring.container.js.rhino.score.CustomScoreProcessor
 import org.corespring.container.js.rhino.{ RhinoServerLogic, RhinoScopeBuilder, RhinoOutcomeProcessor, RhinoPlayerItemPreProcessor }
 import org.corespring.container.logging.ContainerLogger
-import play.api.Mode
 import play.api.Mode.Mode
 import play.api.libs.json.{ JsObject, JsValue }
 import play.api.{ Mode, Play }
 
 import scala.concurrent.ExecutionContext
 
-class ContainerExecutionContext(underlying: ExecutionContext) extends ExecutionContext {
-  require(underlying != null, "underlying execution context must not be null")
-
-  override def execute(runnable: Runnable): Unit = underlying.execute(runnable)
-
-  override def reportFailure(t: Throwable): Unit = underlying.reportFailure(t)
-}
+case class ContainerExecutionContext(context: ExecutionContext)
 
 trait DefaultIntegration
   extends ContainerControllers
@@ -43,7 +36,7 @@ trait DefaultIntegration
 
   def versionInfo: JsObject
 
-  def ec: ContainerExecutionContext
+  def containerContext: ContainerExecutionContext
   /**
    * For a given resource path return a resolved path.
    * By default this just returns the path, so no domain is used.
@@ -108,7 +101,7 @@ trait DefaultIntegration
 
     override def mode: Mode = Play.current.mode
 
-    override implicit def ec = DefaultIntegration.this.ec
+    override def containerContext  = DefaultIntegration.this.containerContext
 
     override def components = DefaultIntegration.this.components
 
@@ -118,7 +111,7 @@ trait DefaultIntegration
   lazy val icons = new Icons {
     def components: Seq[Component] = DefaultIntegration.this.components
 
-    override implicit def ec: ContainerExecutionContext = DefaultIntegration.this.ec
+    override def containerContext: ContainerExecutionContext = DefaultIntegration.this.containerContext
   }
 
   lazy val libs = new ComponentsFileController {
@@ -127,7 +120,7 @@ trait DefaultIntegration
 
     def defaultCharSet: String = configuration.getString("default.charset").getOrElse("utf-8")
 
-    override implicit def ec: ContainerExecutionContext = DefaultIntegration.this.ec
+    override def containerContext: ContainerExecutionContext = DefaultIntegration.this.containerContext
   }
 
   lazy val itemEditor = new ItemEditor {
@@ -138,7 +131,7 @@ trait DefaultIntegration
 
     override def mode: Mode = Play.current.mode
 
-    override implicit def ec: ExecutionContext = DefaultIntegration.this.ec
+    override def containerContext  = DefaultIntegration.this.containerContext
 
     override def urls: ComponentUrls = componentSets
 
@@ -154,7 +147,7 @@ trait DefaultIntegration
 
     override def mode: Mode = Play.current.mode
 
-    override implicit def ec: ExecutionContext = DefaultIntegration.this.ec
+    override def containerContext  = DefaultIntegration.this.containerContext
 
     override def urls: ComponentUrls = componentSets
 
@@ -173,7 +166,7 @@ trait DefaultIntegration
 
     override def mode: Mode = Play.current.mode
 
-    override implicit def ec: ExecutionContext = DefaultIntegration.this.ec
+    override def containerContext = DefaultIntegration.this.containerContext
 
     override def urls: ComponentUrls = componentSets
 
@@ -187,7 +180,7 @@ trait DefaultIntegration
   lazy val draftDevEditor = new DraftDevEditor {
     override def mode: Mode = Play.current.mode
 
-    override implicit def ec: ExecutionContext = DefaultIntegration.this.ec
+    override def containerContext  = DefaultIntegration.this.containerContext
 
     override def urls: ComponentUrls = componentSets
 
@@ -203,7 +196,7 @@ trait DefaultIntegration
   lazy val catalog = new Catalog {
     override def mode: Mode = Play.current.mode
 
-    override implicit def ec: ExecutionContext = DefaultIntegration.this.ec
+    override def containerContext = DefaultIntegration.this.containerContext
 
     override def urls: ComponentUrls = componentSets
     override def components = DefaultIntegration.this.components
@@ -218,7 +211,7 @@ trait DefaultIntegration
 
     override def mode: Mode = Play.current.mode
 
-    override implicit def ec: ExecutionContext = DefaultIntegration.this.ec
+    override def containerContext  = DefaultIntegration.this.containerContext
 
     override def urls: ComponentUrls = componentSets
 
@@ -236,7 +229,7 @@ trait DefaultIntegration
   lazy val collection = new Collection {
     override def hooks: CollectionHooks = collectionHooks
 
-    override implicit def ec = DefaultIntegration.this.ec
+    override def containerContext = DefaultIntegration.this.containerContext
   }
 
   lazy val item = new Item {
@@ -244,7 +237,7 @@ trait DefaultIntegration
 
     override def componentTypes: Seq[String] = DefaultIntegration.this.components.map(_.componentType)
 
-    override implicit def ec = DefaultIntegration.this.ec
+    override def containerContext = DefaultIntegration.this.containerContext
 
     override def materialHooks: SupportingMaterialHooks = DefaultIntegration.this.itemSupportingMaterialHooks
   }
@@ -259,14 +252,14 @@ trait DefaultIntegration
 
     override def hooks: CoreItemHooks with DraftHooks = itemDraftHooks
 
-    override implicit def ec = DefaultIntegration.this.ec
+    override def containerContext = DefaultIntegration.this.containerContext
 
     override protected def componentTypes: Seq[String] = DefaultIntegration.this.components.map(_.componentType)
   }
 
   lazy val session = new Session {
 
-    override implicit def ec = DefaultIntegration.this.ec
+    override def containerContext = DefaultIntegration.this.containerContext
 
     override def hooks: SessionHooks = sessionHooks
 
@@ -278,7 +271,7 @@ trait DefaultIntegration
   }
 
   lazy val playerLauncher = new PlayerLauncher {
-    override implicit def ec = DefaultIntegration.this.ec
+    override def containerContext = DefaultIntegration.this.containerContext
 
     def hooks = playerLauncherHooks
 
@@ -286,7 +279,7 @@ trait DefaultIntegration
   }
 
   lazy val editorLauncher = new EditorLauncher {
-    override implicit def ec = DefaultIntegration.this.ec
+    override def containerContext = DefaultIntegration.this.containerContext
     def hooks = playerLauncherHooks
     override def playerConfig: V2PlayerConfig = DefaultIntegration.this.playerConfig
   }
@@ -294,6 +287,6 @@ trait DefaultIntegration
   override def dataQuery: DataQuery = new DataQuery {
     override def hooks: DataQueryHooks = dataQueryHooks
 
-    override implicit def ec = DefaultIntegration.this.ec
+    override def containerContext = DefaultIntegration.this.containerContext
   }
 }

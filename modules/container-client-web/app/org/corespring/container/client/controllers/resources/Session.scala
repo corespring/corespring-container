@@ -1,6 +1,6 @@
 package org.corespring.container.client.controllers.resources
 
-import org.corespring.container.client.HasContext
+import org.corespring.container.client.HasContainerContext
 import org.corespring.container.client.controllers.resources.Session.Errors
 import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.client.hooks._
@@ -21,7 +21,7 @@ object Session {
   }
 }
 
-trait Session extends Controller with HasContext {
+trait Session extends Controller with HasContainerContext {
 
   val logger = ContainerLogger.getLogger("Session")
 

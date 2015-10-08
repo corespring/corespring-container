@@ -12,7 +12,7 @@ import org.corespring.amazon.s3.{ S3Service, ConcreteS3Service }
 import org.corespring.container.client.controllers.{ AssetType, _ }
 import org.corespring.container.client.hooks._
 import org.corespring.container.client.integration.{ ContainerExecutionContext, DefaultIntegration }
-import org.corespring.container.client.{ AssetUtils, CompressedAndMinifiedComponentSets, HasContext, VersionInfo }
+import org.corespring.container.client.{ AssetUtils, CompressedAndMinifiedComponentSets, HasContainerContext, VersionInfo }
 import org.corespring.container.components.model.Component
 import org.corespring.container.components.model.dependencies.DependencyResolver
 import org.corespring.mongo.json.services.MongoService
@@ -52,7 +52,7 @@ class ContainerClientImplementation(
 
   override def components: Seq[Component] = componentsIn
 
-  override implicit def ec: ContainerExecutionContext = new ContainerExecutionContext(ExecutionContext.global)
+  override def containerContext: ContainerExecutionContext = new ContainerExecutionContext(ExecutionContext.global)
 
   override def playerLauncherHooks: PlayerLauncherHooks = new PlayerLauncherHooks {
 
@@ -72,7 +72,7 @@ class ContainerClientImplementation(
 
     override def catalogJs(implicit header: RequestHeader): Future[PlayerJs] = loader.loadJs(header)
 
-    override implicit def ec: ContainerExecutionContext = ContainerClientImplementation.this.ec
+    override def containerContext: ContainerExecutionContext = ContainerClientImplementation.this.containerContext
   }
 
   object s3 {
@@ -190,14 +190,14 @@ class ContainerClientImplementation(
       uploadSupportingMaterialBinaryToPath(key, binary)
     }
 
-    override implicit def ec: ContainerExecutionContext = ContainerClientImplementation.this.ec
+    override def containerContext: ContainerExecutionContext = ContainerClientImplementation.this.containerContext
   }
 
   lazy val componentSets = new CompressedAndMinifiedComponentSets {
 
     import play.api.Play.current
 
-    override implicit def ec = ContainerClientImplementation.this.ec
+    override def containerContext = ContainerClientImplementation.this.containerContext
 
     override def allComponents: Seq[Component] = ContainerClientImplementation.this.components
 
@@ -246,7 +246,7 @@ class ContainerClientImplementation(
 
     override def itemService: MongoService = ContainerClientImplementation.this.itemService
 
-    override implicit def ec: ContainerExecutionContext = ContainerClientImplementation.this.ec
+    override def containerContext: ContainerExecutionContext = ContainerClientImplementation.this.containerContext
   }
 
   override def itemEditorHooks: ItemEditorHooks = new ShellItemEditorHooks {
@@ -254,18 +254,18 @@ class ContainerClientImplementation(
 
     override def itemService: MongoService = ContainerClientImplementation.this.itemService
 
-    override implicit def ec: ContainerExecutionContext = ContainerClientImplementation.this.ec
+    override def containerContext: ContainerExecutionContext = ContainerClientImplementation.this.containerContext
   }
 
   override def catalogHooks: CatalogHooks = new ShellCatalogHooks {
     override def itemService: MongoService = ContainerClientImplementation.this.itemService
     override def assets: Assets = ContainerClientImplementation.this.assets
 
-    override implicit def ec: ContainerExecutionContext = ???
+    override def containerContext: ContainerExecutionContext = ???
   }
 
-  private[ContainerClientImplementation] trait withContext extends HasContext {
-    override implicit def ec = ContainerClientImplementation.this.ec
+  private[ContainerClientImplementation] trait withContext extends HasContainerContext {
+    override def containerContext = ContainerClientImplementation.this.containerContext
   }
 
   override def sessionHooks: SessionHooks = new ShellSessionHooks with withContext {
@@ -281,7 +281,7 @@ class ContainerClientImplementation(
 
     override def assets: ItemDraftAssets = ContainerClientImplementation.this.assets
 
-    override implicit def ec: ContainerExecutionContext = ContainerClientImplementation.this.ec
+    override def containerContext: ContainerExecutionContext = ContainerClientImplementation.this.containerContext
   }
 
   override def itemDraftSupportingMaterialHooks: ItemDraftSupportingMaterialHooks = new shellEditor.ItemDraftSupportingMaterialHooks {
@@ -296,7 +296,7 @@ class ContainerClientImplementation(
 
     override def assets: ItemAssets = ContainerClientImplementation.this.assets
 
-    override implicit def ec: ContainerExecutionContext = ContainerClientImplementation.this.ec
+    override def containerContext: ContainerExecutionContext = ContainerClientImplementation.this.containerContext
   }
 
   override def itemSupportingMaterialHooks: ItemSupportingMaterialHooks = new shellEditor.ItemSupportingMaterialHooks {
@@ -312,7 +312,7 @@ class ContainerClientImplementation(
 
     override def itemService: MongoService = ContainerClientImplementation.this.itemService
 
-    override implicit def ec: ContainerExecutionContext = ContainerClientImplementation.this.ec
+    override def containerContext: ContainerExecutionContext = ContainerClientImplementation.this.containerContext
   }
 
   override def dataQueryHooks: DataQueryHooks = new ShellDataQueryHooks with withContext
@@ -320,7 +320,7 @@ class ContainerClientImplementation(
   override def versionInfo: JsObject = VersionInfo(Play.current.configuration)
 
   override def collectionHooks: CollectionHooks = new shellEditor.CollectionHooks {
-    override implicit def ec: ContainerExecutionContext = ContainerClientImplementation.this.ec
+    override def containerContext: ContainerExecutionContext = ContainerClientImplementation.this.containerContext
   }
 
 }

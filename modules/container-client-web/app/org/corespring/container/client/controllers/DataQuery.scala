@@ -1,6 +1,6 @@
 package org.corespring.container.client.controllers
 
-import org.corespring.container.client.HasContext
+import org.corespring.container.client.HasContainerContext
 
 import scala.concurrent.{ ExecutionContext, Future }
 
@@ -33,7 +33,7 @@ object DataQuery {
 }
 
 /** Query service for static data, eg: subject, gradelevel, etc */
-trait DataQuery extends Controller with HasContext {
+trait DataQuery extends Controller with HasContainerContext {
 
   import org.corespring.container.client.controllers.DataQuery._
 
