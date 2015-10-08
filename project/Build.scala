@@ -20,7 +20,7 @@ object Build extends sbt.Build {
 
   object Dependencies {
     val aws = "com.amazonaws" % "aws-java-sdk" % "1.10.0"
-    val casbah = "org.mongodb" %% "casbah" % "2.8.2"
+    val casbah = "org.mongodb" %% "casbah" % "2.6.3"
     //The closure compiler that play uses - we expect this to be provided by the play app.
     val closureCompiler = ("com.google.javascript" % "closure-compiler" % "rr2079.1")
       .exclude("args4j", "args4j")
