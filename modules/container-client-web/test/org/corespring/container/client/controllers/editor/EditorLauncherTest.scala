@@ -1,9 +1,8 @@
 package org.corespring.container.client.controllers.editor
 
 import org.corespring.container.client.V2PlayerConfig
-import org.corespring.container.client.controllers.EditorLauncher
 import org.corespring.container.client.controllers.launcher.JsBuilder
-import org.corespring.container.client.hooks.{PlayerJs, PlayerLauncherHooks}
+import org.corespring.container.client.hooks.{ PlayerLauncherHooks, PlayerJs }
 import org.corespring.test.TestContext
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
@@ -12,13 +11,13 @@ import play.api.mvc.{RequestHeader, Session}
 import play.api.test.{FakeApplication, FakeRequest, PlaySpecification}
 import play.api.{Configuration, GlobalSettings}
 
-import scala.concurrent.Future
+import scala.concurrent.{ ExecutionContext, Future }
 
 class EditorLauncherTest extends Specification with Mockito with PlaySpecification {
 
   val config = Map("rootUrl" -> "http://corespring.edu")
 
-  class launchScope(val jsConfig: PlayerJs = PlayerJs(false, Session())) extends Scope with EditorLauncher with TestContext{
+  class launchScope(val jsConfig: PlayerJs = PlayerJs(false, Session())) extends Scope with EditorLauncher with TestContext {
 
     val mockConfig = mock[Configuration]
     mockConfig.getConfig("corespring.v2player").returns({
@@ -33,7 +32,7 @@ class EditorLauncherTest extends Specification with Mockito with PlaySpecificati
 
     override def playerConfig: V2PlayerConfig = V2PlayerConfig(mockConfig)
 
-    override def hooks: PlayerLauncherHooks = new PlayerLauncherHooks with TestContext{
+    override def hooks: PlayerLauncherHooks = new PlayerLauncherHooks with TestContext {
       override def editorJs(implicit header: RequestHeader): Future[PlayerJs] = Future(jsConfig)
       override def playerJs(implicit header: RequestHeader): Future[PlayerJs] = Future(jsConfig)
       override def catalogJs(implicit header: RequestHeader): Future[PlayerJs] = Future(jsConfig)
@@ -55,6 +54,5 @@ class EditorLauncherTest extends Specification with Mockito with PlaySpecificati
       }
     }
   }
-
 
 }
