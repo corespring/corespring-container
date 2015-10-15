@@ -4,6 +4,7 @@ import grizzled.slf4j.Logger
 import org.corespring.container.client.V2PlayerConfig
 import org.corespring.container.client.component.ComponentUrls
 import org.corespring.container.client.controllers.apps._
+import org.corespring.container.client.controllers.editor.EditorLauncher
 import org.corespring.container.client.controllers.resources.session.ItemPruner
 import org.corespring.container.client.controllers.resources._
 import org.corespring.container.client.controllers._
@@ -101,7 +102,7 @@ trait DefaultIntegration
 
     override def mode: Mode = Play.current.mode
 
-    override def containerContext  = DefaultIntegration.this.containerContext
+    override def containerContext = DefaultIntegration.this.containerContext
 
     override def components = DefaultIntegration.this.components
 
@@ -131,7 +132,7 @@ trait DefaultIntegration
 
     override def mode: Mode = Play.current.mode
 
-    override def containerContext  = DefaultIntegration.this.containerContext
+    override def containerContext = DefaultIntegration.this.containerContext
 
     override def urls: ComponentUrls = componentSets
 
@@ -147,7 +148,7 @@ trait DefaultIntegration
 
     override def mode: Mode = Play.current.mode
 
-    override def containerContext  = DefaultIntegration.this.containerContext
+    override def containerContext = DefaultIntegration.this.containerContext
 
     override def urls: ComponentUrls = componentSets
 
@@ -180,7 +181,7 @@ trait DefaultIntegration
   lazy val draftDevEditor = new DraftDevEditor {
     override def mode: Mode = Play.current.mode
 
-    override def containerContext  = DefaultIntegration.this.containerContext
+    override def containerContext = DefaultIntegration.this.containerContext
 
     override def urls: ComponentUrls = componentSets
 
@@ -211,7 +212,7 @@ trait DefaultIntegration
 
     override def mode: Mode = Play.current.mode
 
-    override def containerContext  = DefaultIntegration.this.containerContext
+    override def containerContext = DefaultIntegration.this.containerContext
 
     override def urls: ComponentUrls = componentSets
 

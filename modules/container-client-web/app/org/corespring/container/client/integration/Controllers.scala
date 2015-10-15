@@ -2,7 +2,8 @@ package org.corespring.container.client.integration
 
 import org.corespring.container.client.controllers._
 import org.corespring.container.client.controllers.apps._
-import org.corespring.container.client.controllers.resources.{Collection, Item, ItemDraft, Session}
+import org.corespring.container.client.controllers.editor.EditorLauncher
+import org.corespring.container.client.controllers.resources.{ Collection, Item, ItemDraft, Session }
 import play.api.mvc.Controller
 
 trait CommonControllers {
@@ -32,7 +33,6 @@ trait ResourceControllers {
 
   /** session resource */
   def session: Session
-
 
 }
 

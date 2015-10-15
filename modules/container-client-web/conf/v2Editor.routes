@@ -1,1 +1,1 @@
-GET           /editor.js                                               @org.corespring.container.client.controllers.EditorLauncher.editorJs
+GET           /editor.js                                               @org.corespring.container.client.controllers.editor.EditorLauncher.editorJs
