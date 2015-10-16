@@ -565,10 +565,25 @@
       return results;
     }
 
+    function getStandardsClusters() {
+      console.log($scope.profile.standards);
+      return _($scope.profile.standards).map(function(s) {
+         switch (s.subject) {
+           case "Math":
+             return s.category;
+           case "ELA":
+           case "ELA-Literacy":
+             return s.subCategory;
+         }
+      }).uniq().value();
+    }
+
+
     $scope.$watch('profile.standards', function(newValue, oldValue) {
       if ($scope.profile && $scope.profile.standards) {
         $scope.isLiteracyStandardSelected = containsLiteracyStandard(newValue);
         $scope.standardsGroups = getStandardsGroups();
+        $scope.standardsClusters = getStandardsClusters();
       }
     });
 
