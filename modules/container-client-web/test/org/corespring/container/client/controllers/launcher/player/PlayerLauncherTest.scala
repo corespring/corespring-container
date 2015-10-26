@@ -5,6 +5,8 @@ import org.corespring.container.client.controllers.apps.routes._
 import org.corespring.container.client.controllers.launcher.JsBuilder
 import org.corespring.container.client.controllers.resources.routes._
 import org.corespring.container.client.hooks.{ PlayerJs, PlayerLauncherHooks }
+import org.corespring.container.client.integration.ContainerExecutionContext
+import org.corespring.test.TestContext
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
@@ -19,7 +21,7 @@ class PlayerLauncherTest extends Specification with Mockito with PlaySpecificati
 
   val config = Map("rootUrl" -> "http://corespring.edu")
 
-  class launchScope(val jsConfig: PlayerJs = PlayerJs(false, Session())) extends Scope with PlayerLauncher {
+  class launchScope(val jsConfig: PlayerJs = PlayerJs(false, Session())) extends Scope with PlayerLauncher with TestContext {
 
     val mockConfig = mock[Configuration]
     mockConfig.getConfig("corespring.v2player").returns({
@@ -34,12 +36,12 @@ class PlayerLauncherTest extends Specification with Mockito with PlaySpecificati
 
     override def playerConfig: V2PlayerConfig = V2PlayerConfig(mockConfig)
 
-    override def hooks: PlayerLauncherHooks = new PlayerLauncherHooks {
+    override def hooks: PlayerLauncherHooks = new PlayerLauncherHooks with TestContext {
       override def editorJs(implicit header: RequestHeader): Future[PlayerJs] = Future(jsConfig)
       override def playerJs(implicit header: RequestHeader): Future[PlayerJs] = Future(jsConfig)
       override def catalogJs(implicit header: RequestHeader): Future[PlayerJs] = Future(jsConfig)
+
     }
-    override implicit def ec: ExecutionContext = ExecutionContext.Implicits.global
   }
 
   object MockGlobal extends GlobalSettings

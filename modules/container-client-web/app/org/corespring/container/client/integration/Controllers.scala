@@ -2,12 +2,8 @@ package org.corespring.container.client.integration
 
 import org.corespring.container.client.controllers._
 import org.corespring.container.client.controllers.apps._
-<<<<<<< Updated upstream
-import org.corespring.container.client.controllers.editor.EditorLauncher
-=======
 import org.corespring.container.client.controllers.launcher.editor.EditorLauncher
 import org.corespring.container.client.controllers.launcher.player.PlayerLauncher
->>>>>>> Stashed changes
 import org.corespring.container.client.controllers.resources.{ Collection, Item, ItemDraft, Session }
 import play.api.mvc.Controller
 

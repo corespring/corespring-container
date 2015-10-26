@@ -4,12 +4,8 @@ import grizzled.slf4j.Logger
 import org.corespring.container.client.V2PlayerConfig
 import org.corespring.container.client.component.ComponentUrls
 import org.corespring.container.client.controllers.apps._
-<<<<<<< Updated upstream
-import org.corespring.container.client.controllers.editor.EditorLauncher
-=======
 import org.corespring.container.client.controllers.launcher.editor.EditorLauncher
 import org.corespring.container.client.controllers.launcher.player.PlayerLauncher
->>>>>>> Stashed changes
 import org.corespring.container.client.controllers.resources.session.ItemPruner
 import org.corespring.container.client.controllers.resources._
 import org.corespring.container.client.controllers._
