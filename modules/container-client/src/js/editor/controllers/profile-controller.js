@@ -195,6 +195,10 @@
       title: {
         visible: true,
         readonly: false
+      },
+      workflow: {
+        visible: true,
+        readonly: false
       }
     };
 
@@ -283,6 +287,7 @@
       applyConfig(profile, "pValue");
       applyConfig(profile, "relatedCurriculum");
       applyConfig(profile, "costForResource");
+      applyConfig(profile, "workflow");
 
       applyConfig(profile.otherAlignments, "depthOfKnowledge");
       applyConfig(profile.otherAlignments, "bloomsTaxonomy");
@@ -1037,6 +1042,8 @@
       if (!(profile.contributorDetails)) {
         profile.contributorDetails = {};
       }
+
+      profile.workflow = profile.workflow || {};
 
       var contributorDetails = profile.contributorDetails;
 

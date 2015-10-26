@@ -938,6 +938,9 @@ describe('profile controller', function() {
           },
           title: {
             value: "some title"
+          },
+          workflow: {
+            value: {setup: true}
           }
         }
       };
@@ -1019,6 +1022,9 @@ describe('profile controller', function() {
         });
         it("title", function() {
           expect(scope.taskInfo.title).toEqual("some title");
+        });
+        it("workflow", function() {
+          expect(scope.profile.workflow).toEqual({setup: true});
         });
       }
 

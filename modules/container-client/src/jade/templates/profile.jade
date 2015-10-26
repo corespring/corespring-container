@@ -120,9 +120,25 @@ script(type="text/ng-template", id="/templates/profile")
                 type="text",
                 ng-model="profile.relatedCurriculum")
 
+          .form-group(ng-shwow="formModels.workflow.visible && 0 < componentTypes.length")
+            label.col-sm-3.control-label Workflow
+            .col-sm-9
+              div
+                input(id="workflow-setup",type="checkbox",ng-model="profile.workflow.setup")
+                label(for="workflow-setup") Setup
+              div
+                input(id="workflow-tagged",type="checkbox",ng-model="profile.workflow.tagged")
+                label(for="workflow-tagged") Tagged
+              div
+                input(id="workflow-standards",type="checkbox",ng-model="profile.workflow.standardsAligned")
+                label(for="workflow-standards") Standards Aligned
+              div
+                input(id="workflow-qa",type="checkbox",ng-model="profile.workflow.qaReview")
+                label(for="workflow-qa") Qa Review
 
 
-        form.form-horizontal(role="form",ng-show="formModels.standards.visible")
+
+  form.form-horizontal(role="form",ng-show="formModels.standards.visible")
           div.standard-filter(ng-show="!formModels.standards.readonly")
             h6 Add the Standards
             +field("standard-filter-search","Standards")
