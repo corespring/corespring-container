@@ -56,7 +56,7 @@ describe('profile controller', function() {
 
   function MockLogFactory() {
     this.getLogger = function(id) {
-      return window.console || {
+      return {
         log: function() {},
         warn: function() {},
         error: function() {}
@@ -154,6 +154,7 @@ describe('profile controller', function() {
       $provide.value('$timeout', function(fn) {
         fn();
       });
+      $provide.value('LogFactory', new MockLogFactory());
       $provide.value('CollectionService', mockCollectionService);
       $provide.value('DataQueryService', mockDataQueryService);
       $provide.value('DesignerService', mockDesignerService);
@@ -893,6 +894,9 @@ describe('profile controller', function() {
           copyrightExpirationDate: {
             value: 2020
           },
+          costForResource: {
+            value: 178
+          },
           depthOfKnowledge: {
             value: "some depth"
           },
@@ -905,6 +909,9 @@ describe('profile controller', function() {
           lexile: {
             value: 76
           },
+          pValue: {
+            value: 20
+          },
           keySkills: {
             value: ["one", "two"]
           },
@@ -916,6 +923,9 @@ describe('profile controller', function() {
           },
           priorUseOther: {
             value: "some other prior use"
+          },
+          relatedCurriculum: {
+            value: "related test"
           },
           reviewsPassed: {
             value: ["r1", "r2"]
@@ -962,6 +972,9 @@ describe('profile controller', function() {
         it("copyrightYear", function() {
           expect(scope.contributorDetails.copyrightYear).toEqual(1978);
         });
+        it("costForResource", function() {
+          expect(scope.profile.costForResource).toEqual(178);
+        });
         it("copyrightExpirationDate", function() {
           expect(scope.contributorDetails.copyrightExpirationDate).toEqual(2020);
         });
@@ -976,6 +989,9 @@ describe('profile controller', function() {
         });
         it("lexile", function() {
           expect(scope.profile.lexile).toEqual(76);
+        });
+        it("difficulty", function() {
+          expect(scope.profile.pValue).toEqual(20);
         });
         it("keySkills", function() {
           expect(scope.profile.otherAlignments.keySkills).toEqual(["one", "two"]);
@@ -994,6 +1010,9 @@ describe('profile controller', function() {
         });
         it("reviewsPassedOther", function() {
           expect(scope.profile.reviewsPassedOther).toEqual("Other reviews passed");
+        });
+        it("costForResource", function() {
+          expect(scope.profile.relatedCurriculum).toEqual("related test");
         });
         it("sourceUrl", function() {
           expect(scope.contributorDetails.sourceUrl).toEqual("some source url");

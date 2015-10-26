@@ -102,6 +102,10 @@
         visible: true,
         readonly: false
       },
+      costForResource: {
+        visible: true,
+        readonly: false
+      },
       credentials: {
         visible: true,
         readonly: false
@@ -158,7 +162,15 @@
         visible: true,
         collapse: true
       },
+      pValue: {
+        visible: true,
+        readonly: false,
+      },
       relatedSubject: {
+        visible: true,
+        readonly: false
+      },
+      relatedCurriculum: {
         visible: true,
         readonly: false
       },
@@ -268,6 +280,9 @@
 
       applyConfig(profile, 'standards', 'standards', configToStandards);
       applyConfig(profile, "lexile");
+      applyConfig(profile, "pValue");
+      applyConfig(profile, "relatedCurriculum");
+      applyConfig(profile, "costForResource");
 
       applyConfig(profile.otherAlignments, "depthOfKnowledge");
       applyConfig(profile.otherAlignments, "bloomsTaxonomy");
@@ -566,7 +581,6 @@
     }
 
     function getStandardsClusters() {
-      console.log($scope.profile.standards);
       return _($scope.profile.standards).map(function(s) {
          switch (s.subject) {
            case "Math":
@@ -1104,6 +1118,29 @@
         $log.error('error loading profile', err);
       });
     };
+
+    //----------------------------------------------------------------
+    // difficulty
+    //----------------------------------------------------------------
+    $scope.difficultyNameForValue = function(value) {
+      var vals = {
+        "NO_VALUE": 0,
+        "Very Hard": 20,
+        "Moderately Hard": 40,
+        "Moderate": 60,
+        "Easy": 80,
+        "Very Easy": 100 };
+
+      var getLabelFromValue = function (numberArray, valueToCheck) {
+        for (var x in numberArray) {
+          if (valueToCheck <= numberArray[x]) {
+            return x == "NO_VALUE" ? "" : x;
+          }
+        }
+      };
+      return getLabelFromValue(vals, value);
+    };
+
 
     //----------------------------------------------------------------
     // collectionId load and save

@@ -105,6 +105,23 @@ script(type="text/ng-template", id="/templates/profile")
               ng-disabled="formModels.collectionId.readonly")
             span.inline-help All items are added to the "Default" collection, unless another is selected.
 
+          .form-group.difficulty(ng-show="formModels.pValue.visible && 0 < componentTypes.length")
+            label.col-sm-3.control-label Difficulty
+            .col-sm-9
+              input.form-control(id="pValue",
+                type="text",
+                ng-model="profile.pValue")
+              span.measure {{difficultyNameForValue(profile.pValue)}}
+
+          .form-group(ng-show="formModels.relatedCurriculum.visible && 0 < componentTypes.length")
+            label.col-sm-3.control-label Related Curriculum
+            .col-sm-9
+              input.form-control(id="relatedCurriculum",
+                type="text",
+                ng-model="profile.relatedCurriculum")
+
+
+
         form.form-horizontal(role="form",ng-show="formModels.standards.visible")
           div.standard-filter(ng-show="!formModels.standards.readonly")
             h6 Add the Standards
@@ -159,7 +176,6 @@ script(type="text/ng-template", id="/templates/profile")
           .controls.select2-container-multi
             ul.select2-choices
               li.select2-search-choice(ng-repeat="cluster in standardsClusters",style="padding-left: 5px") {{cluster}}
-          h6 Additional Standard Clusters
           br/
 
         +h_form
@@ -261,6 +277,14 @@ script(type="text/ng-template", id="/templates/profile")
                   option(value="") Select ...
 
               +configurableField("sourceUrl","Website URL", "contributorDetails.sourceUrl")
+
+              .form-group(ng-show="formModels.costForResource.visible && 0 < componentTypes.length")
+                label.col-sm-3.control-label Cost For Resource
+                .col-sm-9
+                  input.form-control(id="costForResource",
+                  type="text",
+                  ng-model="profile.costForResource")
+
 
           +panel("additionalMediaCopyrights", "Additional Media Copyright")
             .panel-body
