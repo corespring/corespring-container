@@ -1,7 +1,7 @@
-package org.corespring.container.client.controllers
+package org.corespring.container.client.controllers.launcher.player
 
+import org.corespring.container.client.controllers.launcher.Launcher
 import play.api.mvc._
-
 
 trait PlayerLauncher extends Launcher {
 

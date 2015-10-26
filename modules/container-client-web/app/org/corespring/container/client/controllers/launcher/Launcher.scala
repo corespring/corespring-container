@@ -1,12 +1,14 @@
-package org.corespring.container.client.controllers
+package org.corespring.container.client.controllers.launcher
 
-import org.corespring.container.client.{HasContainerContext, V2PlayerConfig}
-import org.corespring.container.client.controllers.launcher.{ JsBuilder, JsResource }
+import org.corespring.container.client.{ HasContainerContext, V2PlayerConfig }
 import org.corespring.container.client.hooks.{ PlayerJs, PlayerLauncherHooks }
+import org.corespring.container.client.integration.ContainerExecutionContext
 import org.corespring.container.logging.ContainerLogger
 import play.api.http.ContentTypes
 import play.api.libs.json.{ JsObject, Json }
 import play.api.mvc.{ Session, _ }
+
+import scala.concurrent.ExecutionContext
 
 trait Launcher extends Controller with HasContainerContext {
 
@@ -34,7 +36,7 @@ trait Launcher extends Controller with HasContainerContext {
   }
 
   import JsResource._
-  import org.corespring.container.client.controllers.apps.routes.{ Catalog, DraftEditor, DraftDevEditor, ItemEditor, ItemDevEditor, Player }
+  import org.corespring.container.client.controllers.apps.routes.{ Catalog, DraftDevEditor, DraftEditor, ItemDevEditor, ItemEditor, Player }
   import org.corespring.container.client.controllers.resources.routes.Item
   def hooks: PlayerLauncherHooks
 
@@ -106,7 +108,6 @@ trait Launcher extends Controller with HasContainerContext {
       "itemEditor" -> itemEditor,
       "draftEditor" -> draftEditor)
   }
-
 
   val SecureMode = "corespring.player.secure"
 
