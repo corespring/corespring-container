@@ -165,6 +165,7 @@
       pValue: {
         visible: true,
         readonly: false,
+        collapse: true
       },
       relatedSubject: {
         visible: true,
@@ -172,7 +173,8 @@
       },
       relatedCurriculum: {
         visible: true,
-        readonly: false
+        readonly: false,
+        collapse: true
       },
       reviewsPassed: {
         visible: true,
