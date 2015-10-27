@@ -909,9 +909,6 @@ describe('profile controller', function() {
           lexile: {
             value: 76
           },
-          pValue: {
-            value: 20
-          },
           keySkills: {
             value: ["one", "two"]
           },
@@ -992,9 +989,6 @@ describe('profile controller', function() {
         });
         it("lexile", function() {
           expect(scope.profile.lexile).toEqual(76);
-        });
-        it("difficulty", function() {
-          expect(scope.profile.pValue).toEqual(20);
         });
         it("keySkills", function() {
           expect(scope.profile.otherAlignments.keySkills).toEqual(["one", "two"]);

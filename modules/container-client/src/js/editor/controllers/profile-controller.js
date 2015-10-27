@@ -162,11 +162,6 @@
         visible: true,
         collapse: true
       },
-      pValue: {
-        visible: true,
-        readonly: false,
-        collapse: true
-      },
       relatedSubject: {
         visible: true,
         readonly: false
@@ -286,7 +281,6 @@
 
       applyConfig(profile, 'standards', 'standards', configToStandards);
       applyConfig(profile, "lexile");
-      applyConfig(profile, "pValue");
       applyConfig(profile, "relatedCurriculum");
       applyConfig(profile, "costForResource");
       applyConfig(profile, "workflow");

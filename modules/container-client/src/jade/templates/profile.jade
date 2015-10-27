@@ -198,15 +198,6 @@ script(type="text/ng-template", id="/templates/profile")
                 ng-readonly="formModels.lexile.readonly")
                 span.measure L
 
-
-          +panel("pValue", "Difficulty Level")
-            .panel-body.difficulty
-              +field("pValue", "Difficulty level")
-                input.form-control(id="pValue",
-                type="text",
-                ng-model="profile.pValue")
-                span.measure {{difficultyNameForValue(profile.pValue)}}
-
           +panel("relatedCurriculum", "Related Curriculum")
             .panel-body
               +field("relatedCurriculum", "Related Curriculum")
