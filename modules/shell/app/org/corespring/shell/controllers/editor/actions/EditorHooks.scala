@@ -3,7 +3,7 @@ package org.corespring.shell.controllers.editor.actions
 import com.mongodb.casbah.commons.MongoDBObject
 import org.bson.types.ObjectId
 import org.corespring.container.client.controllers.{ AssetType, Assets }
-import org.corespring.container.client.hooks.{ EditorHooks => ContainerEditorHooks, UploadResult }
+import org.corespring.container.client.hooks.{ DraftEditorHooks => ContainerDraftEditorHooks, ItemEditorHooks => ContainerItemEditorHooks, UploadResult }
 import org.corespring.container.logging.ContainerLogger
 import org.corespring.mongo.json.services.MongoService
 import org.corespring.shell.controllers.editor.ItemDraftAssets
@@ -44,7 +44,7 @@ object DraftId {
   }
 }
 
-trait ItemEditorHooks extends ContainerEditorHooks {
+trait ItemEditorHooks extends ContainerItemEditorHooks {
 
   lazy val logger = ContainerLogger.getLogger("EditorHooks")
 
@@ -88,7 +88,7 @@ trait ItemEditorHooks extends ContainerEditorHooks {
 
 }
 
-trait DraftEditorHooks extends ContainerEditorHooks {
+trait DraftEditorHooks extends ContainerDraftEditorHooks {
 
   lazy val logger = ContainerLogger.getLogger("EditorHooks")
 

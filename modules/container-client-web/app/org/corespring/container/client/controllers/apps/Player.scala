@@ -25,7 +25,7 @@ trait Player
 
   private object SessionRenderer {
 
-    private val archiveCollId = "52e68c0bd455283f1744a721"
+    private val archiveCollId = "500ecfc1036471f538f24bdc"
 
     /**
      * Preprocess the xml so that it'll work in all browsers
@@ -39,8 +39,8 @@ trait Player
         PlayerXhtml.mkXhtml(components.map(_.componentType), xhtml)
     }.getOrElse("<div><h1>New Item</h1></div>")
 
-    def hasBeenArchived(itemJson: JsValue) =
-      (itemJson \ "collectionId").asOpt[String].map(_ == archiveCollId).getOrElse(false)
+    def hasBeenArchived(session: JsValue) =
+      (session \ "collectionId").asOpt[String].map(_ == archiveCollId).getOrElse(false)
 
     def createPlayerHtml(sessionId: String, session: JsValue, itemJson: JsValue, serviceParams: JsObject)(implicit rh: RequestHeader): Html = {
 
@@ -69,7 +69,7 @@ trait Player
           versionInfo,
           newRelicRumConf != None,
           newRelicRumConf.getOrElse(Json.obj()),
-          if (hasBeenArchived(itemJson)) Seq(s"Warning: This item has been deleted.") else Seq.empty)
+          if (hasBeenArchived(session)) Seq(s"Warning: This item has been deleted.") else Seq.empty)
       )
 
     }

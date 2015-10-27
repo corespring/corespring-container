@@ -1,0 +1,120 @@
+{
+  "_id": "533eb66423fd754c2712820f",
+  "profile" : {
+    "taskInfo" : {
+      "title": "Choice matrix example",
+      "gradeLevel" : ["01", "03"],
+      "itemType" : "Constructed Response - Matrix"
+    }
+  },
+  "components": {
+    "0": {
+      "weight": 4,
+      "componentType": "corespring-match",
+      "title": "Match component sample item",
+      "minimumWidth": 300,
+      "correctResponse": [
+        {
+          "id": "row-1",
+          "matchSet": [
+            false,
+            false,
+            false
+          ]
+        },
+        {
+          "id": "row-2",
+          "matchSet": [
+            true,
+            true,
+            true
+
+          ]
+        },
+        {
+          "id": "row-3",
+          "matchSet": [
+            false,
+            true,
+            false
+          ]
+        }
+      ],
+      "allowPartialScoring": true,
+      "partialScoring": {
+        "sections": [
+          {
+            "catId": "row_1",
+            "label": "Row 1",
+            "numberOfCorrectResponses": 3,
+            "partialScoring": [
+              {
+                "numberOfCorrect": 1,
+                "scorePercentage": 10
+              }
+            ]
+          },
+          {
+            "catId": "row_2",
+            "label": "Row 2",
+            "numberOfCorrectResponses": 3,
+            "partialScoring": [
+              {
+                "numberOfCorrect": 1,
+                "scorePercentage": 20
+              }
+            ]
+          }
+        ]
+      },
+
+      "feedback": {
+        "correctFeedbackType": "none",
+        "partialFeedbackType": "none",
+        "incorrectFeedbackType": "none"
+      },
+      "model": {
+        "columns": [
+          {
+            "labelHtml": "Custom header"
+          },
+          {
+            "labelHtml": "Column 1"
+          },
+          {
+            "labelHtml": "Column 2"
+          },
+          {
+            "labelHtml": "Column 3"
+          }
+        ],
+        "rows": [
+          {
+            "id": "row-1",
+            "labelHtml": "Question text 1"
+          },
+          {
+            "id": "row-2",
+            "labelHtml": "Question text 2"
+          },
+          {
+            "id": "row-3",
+            "labelHtml": "Question text 3"
+          }
+        ],
+        "config": {
+          "inputType": "checkbox",
+          "layout": "four-columns",
+          "shuffle": false
+        }
+      }
+    }
+  },
+ 
+  "org": {
+    "components": [
+      "corespring/*"
+    ]
+  },
+  "xhtml": "<div><corespring-match id='0'></corespring-match><br/></div>"
+}

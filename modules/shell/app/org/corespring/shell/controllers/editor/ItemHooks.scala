@@ -2,7 +2,8 @@ package org.corespring.shell.controllers.editor
 
 import com.mongodb.casbah.Imports._
 import org.bson.types.ObjectId
-import org.corespring.container.client.hooks.{ FileDataStream, Binary, CreateNewMaterialRequest, File }
+import org.corespring.container.client.controllers.resources.CoreItem
+import org.corespring.container.client.hooks._
 import org.corespring.container.client.hooks.Hooks.{ StatusMessage, R }
 import org.corespring.container.client.{ hooks => containerHooks }
 import org.corespring.mongo.json.services.MongoService
@@ -14,7 +15,7 @@ import scala.concurrent.Future
 import scala.util.Try
 
 trait ItemSupportingMaterialHooks
-  extends containerHooks.SupportingMaterialHooks
+  extends containerHooks.ItemSupportingMaterialHooks
   with SupportingMaterialHooksHelper {
 
   import scala.concurrent.ExecutionContext.Implicits.global
@@ -107,8 +108,8 @@ trait ItemSupportingMaterialHooks
 }
 
 trait ItemHooks
-  extends containerHooks.CoreItemHooks
-  with containerHooks.CreateItemHook
+  extends containerHooks.ItemHooks
+  //with CoreItemHooks
   with ItemHooksHelper {
   def itemService: MongoService
 

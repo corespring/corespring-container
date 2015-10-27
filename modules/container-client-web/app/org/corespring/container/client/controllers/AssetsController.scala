@@ -1,13 +1,12 @@
 package org.corespring.container.client.controllers
 
+import org.corespring.container.client.HasContainerContext
 import org.corespring.container.client.hooks.{ AssetHooks, GetAssetHook }
 import play.api.mvc.{ Action, Controller }
 
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.{ Future }
 
-trait GetAsset[H <: GetAssetHook] extends Controller {
-
-  implicit def ec: ExecutionContext
+trait GetAsset[H <: GetAssetHook] extends Controller with HasContainerContext {
 
   def hooks: H
 
