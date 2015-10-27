@@ -268,7 +268,7 @@ script(type="text/ng-template", id="/templates/profile")
 
               +configurableField("sourceUrl","Website URL", "contributorDetails.sourceUrl")
 
-              .form-group(ng-show="formModels.costForResource.visible && 0 < componentTypes.length")
+              .form-group(ng-show="formModels.costForResource.visible")
                 label.col-sm-3.control-label Cost For Resource
                 .col-sm-9
                   .input-group.cost-for-resource
@@ -305,7 +305,7 @@ script(type="text/ng-template", id="/templates/profile")
         +h_form
           h6 Status
           .panel-body
-            .form-group(ng-show="formModels.workflow.visible && 0 < componentTypes.length")
+            .form-group(ng-show="formModels.workflow.visible")
               .col-sm-9
                 div
                   input(id="workflow-setup",type="checkbox",ng-model="profile.workflow.setup")
