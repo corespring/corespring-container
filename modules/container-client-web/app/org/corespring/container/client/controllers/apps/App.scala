@@ -95,7 +95,7 @@ trait App[T]
   protected def buildJs(scriptInfo: ComponentScriptInfo,
     extras: Seq[String] = Seq.empty)(implicit rh: RequestHeader) = {
     val mainJs = paths(jsSrc)
-    val js = mainJs ++ jsSrc.otherLibs ++ scriptInfo.jsUrl ++ extras
+    val js = jsSrc.otherLibs ++ mainJs ++ scriptInfo.jsUrl ++ extras
     js.distinct.map(resolvePath)
   }
 
