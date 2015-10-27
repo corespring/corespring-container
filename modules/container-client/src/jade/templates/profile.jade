@@ -306,7 +306,7 @@ script(type="text/ng-template", id="/templates/profile")
           h6 Status
           .panel-body
             .form-group(ng-show="formModels.workflow.visible")
-              .col-sm-9
+              .col-sm-9.workflow
                 div
                   input(id="workflow-setup",type="checkbox",ng-model="profile.workflow.setup")
                   label(for="workflow-setup") Setup
@@ -318,7 +318,7 @@ script(type="text/ng-template", id="/templates/profile")
                   label(for="workflow-standards") Standards Aligned
                 div
                   input(id="workflow-qa",type="checkbox",ng-model="profile.workflow.qaReview")
-                  label(for="workflow-qa") Qa Review
+                  label(for="workflow-qa") QA Review
 
 
     .col-md-6
