@@ -1,7 +1,8 @@
 package org.corespring.container.client.controllers.apps
 
-import org.corespring.container.client.component.{ComponentUrls, ItemTypeReader}
+import org.corespring.container.client.component.{ ComponentUrls, ItemTypeReader }
 import org.corespring.container.components.model.Component
+import org.corespring.test.TestContext
 import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
 import play.api.Mode
@@ -13,13 +14,10 @@ import scala.concurrent.ExecutionContext
 
 class AppTest extends Specification {
 
-
-  trait scope extends Scope with App[String] with ItemTypeReader{
+  trait scope extends Scope with App[String] with ItemTypeReader with TestContext {
     override def mode: Mode = Mode.Prod
 
     override def hooks: String = "hooks"
-
-    override implicit def ec: ExecutionContext = ExecutionContext.global
 
     override def urls: ComponentUrls = ???
 
@@ -31,7 +29,7 @@ class AppTest extends Specification {
     override def components: Seq[Component] = Seq.empty
   }
 
-  "buildJs" should{
+  "buildJs" should {
 
     trait stubPaths extends scope {
       override def jsSrc: NgSourcePaths = NgSourcePaths(Seq.empty, "prod.js", Seq("other-libs.js"), Seq("ng-module-one"))
