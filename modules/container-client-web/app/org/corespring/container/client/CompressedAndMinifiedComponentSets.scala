@@ -10,7 +10,7 @@ import play.api.mvc._
 import scala.concurrent.Future
 
 trait CompressedAndMinifiedComponentSets extends DefaultComponentSets
-  with JsMinifier with CssMinifier with Gzipper with HasContext {
+  with JsMinifier with CssMinifier with Gzipper with HasContainerContext {
 
   lazy val logger = ContainerLogger.getLogger("CompressedComponentSets")
 

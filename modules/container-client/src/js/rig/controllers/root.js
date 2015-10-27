@@ -144,6 +144,7 @@ var controller = function($scope,$http, $location, $timeout, $log, ComponentRegi
   }
 
   $scope.model = prepareItemJson();
+  ComponentRegister.setEditable(true);
 };
 
 angular.module('corespring-rig.controllers')

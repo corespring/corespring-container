@@ -1,6 +1,6 @@
 package org.corespring.container.client.controllers
 
-import org.corespring.container.client.HasContext
+import org.corespring.container.client.HasContainerContext
 import org.corespring.container.components.model.dependencies.ComponentSplitter
 import org.corespring.container.components.model.{ ComponentInfo, Widget, Interaction }
 import org.corespring.container.logging.ContainerLogger
@@ -8,7 +8,7 @@ import play.api.mvc.{ Action, Controller }
 
 import scala.concurrent.Future
 
-trait Icons extends Controller with ComponentSplitter with HasContext {
+trait Icons extends Controller with ComponentSplitter with HasContainerContext {
 
   private lazy val logger = ContainerLogger.getLogger("Icons")
 

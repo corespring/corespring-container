@@ -1,8 +1,7 @@
-package org.corespring.container.client.controllers
+package org.corespring.container.client.controllers.launcher.player
 
+import org.corespring.container.client.controllers.launcher.Launcher
 import play.api.mvc._
-
-import scala.concurrent.ExecutionContext
 
 trait PlayerLauncher extends Launcher {
 

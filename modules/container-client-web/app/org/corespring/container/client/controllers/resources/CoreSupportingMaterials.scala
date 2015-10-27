@@ -3,6 +3,7 @@ package org.corespring.container.client.controllers.resources
 import java.io.FileInputStream
 
 import org.apache.commons.io.IOUtils
+import org.corespring.container.client.HasContainerContext
 import org.corespring.container.client.controllers.resources.CoreSupportingMaterials.Errors
 import org.corespring.container.client.hooks._
 import play.api.Logger
@@ -34,14 +35,12 @@ private[resources] object CoreSupportingMaterials {
   }
 }
 
-private[resources] trait CoreSupportingMaterials extends Controller {
+private[resources] trait CoreSupportingMaterials extends Controller with HasContainerContext {
 
   type E = CoreSupportingMaterials.Error
   import Errors._
 
   private val logger = Logger(classOf[CoreSupportingMaterials])
-
-  implicit def ec: ExecutionContext
 
   def materialHooks: SupportingMaterialHooks
 

@@ -1,8 +1,7 @@
 package org.corespring.container.client.controllers.resources
 
-import org.corespring.container.client.HasContext
+import org.corespring.container.client.HasContainerContext
 import org.corespring.container.client.controllers.resources.Session.Errors
-import org.corespring.container.client.controllers.resources.session.ItemPruner
 import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.client.hooks._
 import org.corespring.container.components.outcome.ScoreProcessor
@@ -22,7 +21,7 @@ object Session {
   }
 }
 
-trait Session extends Controller with HasContext {
+trait Session extends Controller with HasContainerContext {
 
   val logger = ContainerLogger.getLogger("Session")
 
@@ -97,13 +96,11 @@ trait Session extends Controller with HasContext {
           case Right(fs) => {
             val json = fs.everything
 
-            val itemJson = (json \ "item").as[JsObject]
+          val itemJson = (json \ "item").as[JsObject]
+          val processedItem = itemPreProcessor.preProcessItemForPlayer(itemJson)
+          val sessionJson = (json \ "session").as[JsObject]
 
-            val processedItem = itemPreProcessor.preProcessItemForPlayer(itemJson)
-
-            val sessionJson = (json \ "session").as[JsObject]
-
-            val base = Json.obj(
+          val base = Json.obj(
               "item" -> processedItem,
               "session" -> sessionJson)
 
@@ -155,9 +152,8 @@ trait Session extends Controller with HasContext {
    * @return
    */
   def loadOutcome(id: String) = Action.async {
-    implicit request =>
-      Future {
-        val reponse = hooks.loadOutcome(id)
+    implicit request => Future {
+      val reponse = hooks.loadOutcome(id)
 
         reponse match {
           case Left(err) => InternalServerError(err._2)
