@@ -1008,7 +1008,7 @@ describe('profile controller', function() {
         it("reviewsPassedOther", function() {
           expect(scope.profile.reviewsPassedOther).toEqual("Other reviews passed");
         });
-        it("costForResource", function() {
+        it("relatedCurriculum", function() {
           expect(scope.profile.relatedCurriculum).toEqual("related test");
         });
         it("sourceUrl", function() {

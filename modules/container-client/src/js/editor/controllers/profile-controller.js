@@ -1123,29 +1123,6 @@
     };
 
     //----------------------------------------------------------------
-    // difficulty
-    //----------------------------------------------------------------
-    $scope.difficultyNameForValue = function(value) {
-      var vals = {
-        "NO_VALUE": 0,
-        "Very Hard": 20,
-        "Moderately Hard": 40,
-        "Moderate": 60,
-        "Easy": 80,
-        "Very Easy": 100 };
-
-      var getLabelFromValue = function (numberArray, valueToCheck) {
-        for (var x in numberArray) {
-          if (valueToCheck <= numberArray[x]) {
-            return x == "NO_VALUE" ? "" : x;
-          }
-        }
-      };
-      return getLabelFromValue(vals, value);
-    };
-
-
-    //----------------------------------------------------------------
     // collectionId load and save
     //----------------------------------------------------------------
 
