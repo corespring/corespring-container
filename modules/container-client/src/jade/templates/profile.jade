@@ -203,7 +203,7 @@ script(type="text/ng-template", id="/templates/profile")
               +field("relatedCurriculum", "Related Curriculum")
                 input.form-control(id="relatedCurriculum",
                 type="text",
-                ng-model="profile.relatedCurriculum")
+                ng-model="otherAlignments.relatedCurriculum")
 
         +h_form
           h6 History
@@ -274,8 +274,8 @@ script(type="text/ng-template", id="/templates/profile")
                   .input-group.cost-for-resource
                     .input-group-addon $
                     input.form-control(id="costForResource",
-                    type="text",
-                    ng-model="profile.costForResource")
+                    type="number",
+                    ng-model="contributorDetails.costForResource")
                     .input-group-addon .00
 
 
