@@ -1,7 +1,10 @@
-angular.module('corespring.wiggi-wiz-features.mathjax').factory('WiggiMathJaxFeatureDef', ['MathJaxService',
-  '$rootScope', '$log',
+angular.module('corespring.wiggi-wiz-features.mathjax').factory('WiggiMathJaxFeatureDef', [
+  'MathJaxService',
+  'MathFormatUtils',
+  '$rootScope', 
+  '$log',
 
-  function(MathJaxService, $rootScope, $log) {
+  function(MathJaxService, MathFormatUtils, $rootScope, $log) {
 
     function FeatureDef() {
       var name = 'mathjax';
@@ -47,11 +50,9 @@ angular.module('corespring.wiggi-wiz-features.mathjax').factory('WiggiMathJaxFea
 
       this.onClick = function($node, $scope, editor) {
         dialog(editor, function(update) {
-          if (!update.cancelled) {
-            $scope.originalMarkup = update.originalMarkup;
-            $scope.$emit('save-data');
-            MathJaxService.parseDomForMath(100);
-          }
+          $scope.originalMarkup = update.originalMarkup;
+          $scope.$emit('save-data');
+          MathJaxService.parseDomForMath(100);
           $scope.$emit('math-updated');
         }, $scope);
       };
