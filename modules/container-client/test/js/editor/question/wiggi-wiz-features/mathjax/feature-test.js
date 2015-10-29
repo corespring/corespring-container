@@ -134,19 +134,19 @@ describe('mathjax feature', function() {
       describe('cancelled', function() {
 
         beforeEach(function() {
-          callback({cancelled: true});
+          callback({cancelled: true, originalMarkup: 'some markup'});
         });
 
-        it('should not change $scope.originalMarkup when cancelled', function() {
-          expect($scope.originalMarkup).toBeUndefined();
+        it('should change $scope.originalMarkup when cancelled', function() {
+          expect($scope.originalMarkup).toBe('some markup');
         });
 
-        it('should not $emit saveData', function() {
-          expect($scope.$emit).not.toHaveBeenCalledWith('save-data');
+        it('should $emit saveData', function() {
+          expect($scope.$emit).toHaveBeenCalledWith('save-data');
         });
 
-        it('should not call MathJaxService.parseDomForMath', function() {
-          expect(MathJaxService.parseDomForMath).not.toHaveBeenCalled();
+        it('should call MathJaxService.parseDomForMath', function() {
+          expect(MathJaxService.parseDomForMath).toHaveBeenCalled();
         });
 
       });
