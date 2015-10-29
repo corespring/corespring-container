@@ -228,6 +228,12 @@ trait DefaultIntegration
     override def itemPreProcessor: PlayerItemPreProcessor = DefaultIntegration.this.internalProcessor
   }
 
+  lazy val metadata = new ItemMetadata {
+    override def hooks: ItemMetadataHooks = itemMetadataHooks
+
+    override def containerContext = DefaultIntegration.this.containerContext
+  }
+
   lazy val collection = new Collection {
     override def hooks: CollectionHooks = collectionHooks
 
@@ -291,4 +297,5 @@ trait DefaultIntegration
 
     override def containerContext = DefaultIntegration.this.containerContext
   }
+
 }

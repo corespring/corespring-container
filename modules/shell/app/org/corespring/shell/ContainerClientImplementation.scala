@@ -16,6 +16,7 @@ import org.corespring.container.client.{ AssetUtils, CompressedAndMinifiedCompon
 import org.corespring.container.components.model.Component
 import org.corespring.container.components.model.dependencies.DependencyResolver
 import org.corespring.mongo.json.services.MongoService
+import org.corespring.shell.controllers
 import org.corespring.shell.controllers.ShellDataQueryHooks
 import org.corespring.shell.controllers.catalog.actions.{ CatalogHooks => ShellCatalogHooks }
 import org.corespring.shell.controllers.editor.actions.{ DraftEditorHooks => ShellDraftEditorHooks, ItemEditorHooks => ShellItemEditorHooks }
@@ -320,6 +321,10 @@ class ContainerClientImplementation(
   override def versionInfo: JsObject = VersionInfo(Play.current.configuration)
 
   override def collectionHooks: CollectionHooks = new shellEditor.CollectionHooks {
+    override def containerContext: ContainerExecutionContext = ContainerClientImplementation.this.containerContext
+  }
+
+  override def itemMetadataHooks: ItemMetadataHooks = new shellEditor.ItemMetadataHooks {
     override def containerContext: ContainerExecutionContext = ContainerClientImplementation.this.containerContext
   }
 

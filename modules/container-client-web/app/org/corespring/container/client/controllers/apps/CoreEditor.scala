@@ -17,7 +17,8 @@ object StaticPaths {
   val staticPaths = Json.obj(
     "assets" -> assetUrl,
     "dataQuery" -> org.corespring.container.client.controllers.routes.DataQuery.list(":topic").url.replace("/:topic", ""),
-    "collection" -> org.corespring.container.client.controllers.resources.routes.Collection.list().url)
+    "collection" -> org.corespring.container.client.controllers.resources.routes.Collection.list().url,
+    "metadata" -> org.corespring.container.client.controllers.resources.routes.ItemMetadata.get(":id").url)
 }
 
 trait CoreEditor

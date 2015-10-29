@@ -11,6 +11,7 @@ angular.module('corespring-editor.controllers')
     'WIGGI_EVENTS',
     'WiggiDialogLauncher',
     'editorDebounce',
+    'MetadataService',
     function(
       $scope,
       $timeout,
@@ -22,7 +23,8 @@ angular.module('corespring-editor.controllers')
       Msgr,
       WIGGI_EVENTS,
       WiggiDialogLauncher,
-      editorDebounce) {
+      editorDebounce,
+      MetadataService) {
 
       "use strict";
 
