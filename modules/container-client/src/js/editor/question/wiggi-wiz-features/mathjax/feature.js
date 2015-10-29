@@ -1,7 +1,10 @@
-angular.module('corespring.wiggi-wiz-features.mathjax').factory('WiggiMathJaxFeatureDef', ['MathJaxService',
-  '$rootScope', '$log',
+angular.module('corespring.wiggi-wiz-features.mathjax').factory('WiggiMathJaxFeatureDef', [
+  'MathJaxService',
+  'MathFormatUtils',
+  '$rootScope', 
+  '$log',
 
-  function(MathJaxService, $rootScope, $log) {
+  function(MathJaxService, MathFormatUtils, $rootScope, $log) {
 
     function FeatureDef() {
       var name = 'mathjax';
@@ -20,7 +23,11 @@ angular.module('corespring.wiggi-wiz-features.mathjax').factory('WiggiMathJaxFea
 
       this.name = name;
       this.attributeName = 'mathjax';
-      this.insertInline = true;
+      this.insertInline = function($node){
+        var info = MathFormatUtils.getMathInfo($node.html());
+        return info && info.displayMode === 'inline'; 
+      };
+
       this.draggable = true;
       this.iconclass = 'fa math-sum';
       this.compile = true;
