@@ -36,7 +36,7 @@
     "spin.js": "~2.0.0",
     "undo.js": "git@github.com:jzaefferer/undo.git",
     "angular-debounce": "~1.0.3",
-    "wiggi-wiz": "git@github.com:corespring/wiggi-wiz.git#0.1.74",
+    "wiggi-wiz": "git@github.com:corespring/wiggi-wiz.git#0.1.75",
     "jquery-mockjax": "~1.6.2"
   },
   "devDependencies": {
