@@ -144,10 +144,18 @@ angular.module('corespring-editor.directives')
         }
 
         function updateFileUi(f){
-          if(f && fileTooBig(f)){
-            $scope.metadataForm.fileToUpload.$valid = false;
-            var err = ImageUtils.fileTooBigError(f.size, 500);
-            $scope.metadataForm.fileToUpload.$error = err.message;
+          if(f){
+            var fileTypeError = ImageUtils.acceptableType(f.type, acceptableTypes);
+
+           if(fileTooBig(f)){
+              $scope.metadataForm.fileToUpload.$valid = false;
+              var err = ImageUtils.fileTooBigError(f.size, 500);
+              $scope.metadataForm.fileToUpload.$error = err.message;
+            } else if(fileTypeError){
+              $scope.metadataForm.fileToUpload.$valid = false;
+              var err = ImageUtils.fileTooBigError(f.size, 500);
+              $scope.metadataForm.fileToUpload.$error = err.message;
+            }
           } else {
             $scope.metadataForm.fileToUpload.$valid = true;
             $scope.metadataForm.fileToUpload.$error = null;
