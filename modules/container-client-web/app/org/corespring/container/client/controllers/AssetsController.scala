@@ -29,7 +29,7 @@ trait AssetsController[H <: AssetHooks] extends GetAsset[H] {
 
       suffix match {
         case None => Some(BadRequest(s"Unknown file suffix for path: ${rh.path}"))
-        case Some(s) => if (acceptableSuffixes.contains(s)) {
+        case Some(s) => if (acceptableSuffixes.contains(s.toLowerCase)) {
           None
         } else {
           Some(BadRequest(s"Unsupported suffix: $s"))

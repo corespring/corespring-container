@@ -44,5 +44,9 @@ class AssetsControllerTest extends PlaySpecification with Mockito {
     s"return an None if the suffix is acceptable" in new scope {
       controller.acceptableType(FakeRequest("", "path.png")) must_== None
     }
+
+    s"return an None if the suffix is upppercase and acceptable" in new scope {
+      controller.acceptableType(FakeRequest("", "path.PNG")) must_== None
+    }
   }
 }
