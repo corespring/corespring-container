@@ -86,9 +86,9 @@ describe('mathjax feature', function() {
 
     describe('callback', function() {
 
-      it('should not add content when cancelled', function() {
+      it('should add content when cancelled', function() {
         callback({cancelled: true});
-        expect(addContent).not.toHaveBeenCalled();
+        expect(addContent).toHaveBeenCalled();
       });
 
       it('should call addContent with a mathjax-holder containing markup', function() {

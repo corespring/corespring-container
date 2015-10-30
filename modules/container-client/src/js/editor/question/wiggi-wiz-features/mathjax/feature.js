@@ -43,11 +43,9 @@ angular.module('corespring.wiggi-wiz-features.mathjax').factory('WiggiMathJaxFea
       this.addToEditor = function(editor, addContent) {
         dialog(editor, function(update) {
           var $node;
-          if (!update.cancelled) {
-            $node = $('<mathjax-holder></mathjax-holder>');
-            $node.html(update.originalMarkup);
-            addContent($node);
-          }
+          $node = $('<mathjax-holder></mathjax-holder>');
+          $node.html(update.originalMarkup);
+          addContent($node);
           $rootScope.$emit('math-updated');
         });
       };
