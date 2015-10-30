@@ -56,7 +56,7 @@ angular.module('corespring-common.supporting-materials.services')
           MultipartFileUploader.upload(url, file, {}, function(update){
             onComplete(null, file.name);
           }, function(err){
-            logger.error(err);
+            onComplete(err);
           });
         };
 
