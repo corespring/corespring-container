@@ -143,7 +143,16 @@ angular.module('corespring-editor.directives')
           return ImageUtils.bytesToKb($scope.fileToUpload.size) > 500;
         }
 
+
+        var acceptableTypes = ImageUtils.imageTypes().concat(['application/pdf']);
+        
         function updateFileUi(f){
+
+          function clear(){
+            $scope.metadataForm.fileToUpload.$valid = true;
+            $scope.metadataForm.fileToUpload.$error = null;
+          }
+
           if(f){
             var fileTypeError = ImageUtils.acceptableType(f.type, acceptableTypes);
 
@@ -153,12 +162,12 @@ angular.module('corespring-editor.directives')
               $scope.metadataForm.fileToUpload.$error = err.message;
             } else if(fileTypeError){
               $scope.metadataForm.fileToUpload.$valid = false;
-              var err = ImageUtils.fileTooBigError(f.size, 500);
-              $scope.metadataForm.fileToUpload.$error = err.message;
+              $scope.metadataForm.fileToUpload.$error = fileTypeError.message;
+            } else {
+              clear();
             }
           } else {
-            $scope.metadataForm.fileToUpload.$valid = true;
-            $scope.metadataForm.fileToUpload.$error = null;
+            clear();
           }
         }
 

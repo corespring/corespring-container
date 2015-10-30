@@ -2,7 +2,7 @@ package org.corespring.container.client.controllers
 
 import org.corespring.container.client.HasContainerContext
 import org.corespring.container.client.hooks.{ AssetHooks, GetAssetHook }
-import play.api.mvc.{ Action, Controller }
+import play.api.mvc.{ RequestHeader, SimpleResult, Action, Controller }
 
 import scala.concurrent.{ Future }
 
@@ -19,7 +19,26 @@ trait AssetsController[H <: AssetHooks] extends GetAsset[H] {
 
   override def hooks: H
 
-  def uploadFile(id: String, path: String) = Action.async(hooks.upload(id, path)(rh => None)) { request =>
+  def acceptableSuffixes: Seq[String] = Seq("png", "gif", "jpeg", "jpg")
+
+  def acceptableType(rh: RequestHeader): Option[SimpleResult] = {
+    if (acceptableSuffixes.isEmpty) {
+      None
+    } else {
+      val suffix = if (rh.path.contains(".")) rh.path.split("\\.").lastOption else None
+
+      suffix match {
+        case None => Some(BadRequest(s"Unknown file suffix for path: ${rh.path}"))
+        case Some(s) => if (acceptableSuffixes.contains(s)) {
+          None
+        } else {
+          Some(BadRequest(s"Unsupported suffix: $s"))
+        }
+      }
+    }
+  }
+
+  def uploadFile(id: String, path: String) = Action.async(hooks.upload(id, path)(acceptableType)) { request =>
     request.body.map { r =>
       Ok(r.path)
     }
