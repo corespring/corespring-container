@@ -17,7 +17,7 @@ function ClientLauncher(element, options, errorCallback){
     warnings = warnings || [];
 
     this.hasErrors = function(){
-      return errors.length === 0;
+      return errors.length > 0;
     };
 
     this.eachError = function(cb){
@@ -116,7 +116,7 @@ function ClientLauncher(element, options, errorCallback){
 
     handler.eachWarning(logger.warn);
 
-    if(!handler.hasErrors()){
+    if(handler.hasErrors()){
       handler.eachError(triggerErrorCallback);
       return false;
     }
