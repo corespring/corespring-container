@@ -27,7 +27,7 @@
         var url = STATIC_PATHS.metadata.replace(/:id/, id);
         _call(url, defer.resolve, defer.reject);
       }
-      return this.listPromise;
+      return this.getPromise;
     }
 
     function _call(url, onSuccess, onFailure){
