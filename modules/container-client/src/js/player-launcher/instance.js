@@ -97,6 +97,7 @@ var Instance = function(call,  element, errorCallback, log, autosizeEnabled) {
       ' id="', iframeUid , '"',
       ' name="', iframeUid ,'"',
       ' frameborder="0"',
+      ' scrolling="no"',
       ' class="player-loading"',
       ' style="border:none;' + (autosizeEnabled ? ' width:100%;' : '') + '" '
     ].join('');
