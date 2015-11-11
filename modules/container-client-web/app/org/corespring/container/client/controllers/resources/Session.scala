@@ -9,7 +9,7 @@ import org.corespring.container.components.processing.PlayerItemPreProcessor
 import org.corespring.container.components.response.OutcomeProcessor
 import org.corespring.container.logging.ContainerLogger
 import play.api.libs.json._
-import play.api.mvc.{ Action, Controller, SimpleResult }
+import play.api.mvc.{Action, Controller, SimpleResult}
 
 import scala.concurrent.Future
 
@@ -178,7 +178,7 @@ trait Session extends Controller with HasContainerContext {
             }
           }
         }
-      }
+      }(containerContextById(ContainerContextId.OUTCOME))
   }
   /**
    * Load instructor data for a session.
@@ -249,7 +249,7 @@ trait Session extends Controller with HasContainerContext {
             }
           }
         }
-      }
+      }(containerContextById(ContainerContextId.OUTCOME))
   }
 
   def completeSession(id: String) = Action.async { implicit request =>
