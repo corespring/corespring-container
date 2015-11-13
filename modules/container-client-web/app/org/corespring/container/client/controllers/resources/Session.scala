@@ -21,9 +21,7 @@ object Session {
   }
 }
 
-case class SessionContexts(default: ExecutionContext, outcome: ExecutionContext)
-
-trait Session extends Controller {
+trait Session extends Controller with HasContainerContext {
 
   val logger = ContainerLogger.getLogger("Session")
 
@@ -35,9 +33,7 @@ trait Session extends Controller {
 
   def hooks: SessionHooks
 
-  def contexts: SessionContexts
-
-  implicit val executionContext = contexts.default
+  def outcomeExecutionContext: ExecutionContext = containerContext.context
 
 
   implicit def toResult(m: StatusMessage): SimpleResult = play.api.mvc.Results.Status(m._1)(Json.obj("error" -> m._2))
@@ -185,7 +181,7 @@ trait Session extends Controller {
             }
           }
         }
-      } (contexts.outcome)
+      } (outcomeExecutionContext)
   }
   /**
    * Load instructor data for a session.
@@ -256,7 +252,7 @@ trait Session extends Controller {
             }
           }
         }
-      }(contexts.outcome)
+      }(outcomeExecutionContext)
   }
 
   def completeSession(id: String) = Action.async { implicit request =>
