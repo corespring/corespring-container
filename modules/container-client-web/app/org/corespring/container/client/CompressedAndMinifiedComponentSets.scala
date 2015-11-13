@@ -9,12 +9,19 @@ import play.api.mvc._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait CompressedAndMinifiedComponentSets extends DefaultComponentSets with HasContainerContext
+//case class to enable auto wiring
+case class ComponentSetsContext(default: ExecutionContext, heavyLoad: ExecutionContext)
+
+trait CompressedAndMinifiedComponentSets extends DefaultComponentSets
   with JsMinifier with CssMinifier with Gzipper  {
 
   lazy val logger = ContainerLogger.getLogger("CompressedComponentSets")
 
   def configuration: Configuration
+
+  def componentSetsContext: ComponentSetsContext
+
+  implicit val ec: ExecutionContext = componentSetsContext.default
 
   private val minifyEnabled = configuration.getBoolean("minify").getOrElse(false)
 
@@ -52,7 +59,7 @@ trait CompressedAndMinifiedComponentSets extends DefaultComponentSets with HasCo
       Future {
         val (body, ct) = generate(context, allComponents.find(_.matchesType(componentType)).toSeq, suffix)
         process(body, ct)
-      }
+      }(componentSetsContext.heavyLoad)
   }
 
   override def resource[A >: EssentialAction](context: String, directive: String, suffix: String) = Action.async {
@@ -60,7 +67,7 @@ trait CompressedAndMinifiedComponentSets extends DefaultComponentSets with HasCo
       Future {
         val (body, ct) = generateBodyAndContentType(context, directive, suffix)
         process(body, ct)
-      }
+      }(componentSetsContext.heavyLoad)
   }
 
 }

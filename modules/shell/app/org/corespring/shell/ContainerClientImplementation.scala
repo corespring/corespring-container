@@ -12,7 +12,7 @@ import org.corespring.amazon.s3.{ S3Service, ConcreteS3Service }
 import org.corespring.container.client.controllers.{ AssetType, _ }
 import org.corespring.container.client.hooks._
 import org.corespring.container.client.integration.{ ContainerExecutionContext, DefaultIntegration }
-import org.corespring.container.client.{ AssetUtils, CompressedAndMinifiedComponentSets, HasContainerContext, VersionInfo }
+import org.corespring.container.client._
 import org.corespring.container.components.model.Component
 import org.corespring.container.components.model.dependencies.DependencyResolver
 import org.corespring.mongo.json.services.MongoService
@@ -197,7 +197,9 @@ class ContainerClientImplementation(
 
     import play.api.Play.current
 
-    override def containerContext = ContainerClientImplementation.this.containerContext
+    override def componentSetsContext = ComponentSetsContext(
+      ContainerClientImplementation.this.containerContext.context,
+      ContainerClientImplementation.this.containerContext.context)
 
     override def allComponents: Seq[Component] = ContainerClientImplementation.this.components
 

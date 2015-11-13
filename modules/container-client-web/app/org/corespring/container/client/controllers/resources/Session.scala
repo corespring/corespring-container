@@ -21,7 +21,10 @@ object Session {
   }
 }
 
-trait Session extends Controller with HasContainerContext {
+//case class to enable auto wiring
+case class SessionContext(default:ExecutionContext, heavyLoad: ExecutionContext)
+
+trait Session extends Controller {
 
   val logger = ContainerLogger.getLogger("Session")
 
@@ -33,7 +36,9 @@ trait Session extends Controller with HasContainerContext {
 
   def hooks: SessionHooks
 
-  def outcomeExecutionContext: ExecutionContext = containerContext.context
+  def sessionContext: SessionContext
+
+  implicit val ec: ExecutionContext = sessionContext.default
 
 
   implicit def toResult(m: StatusMessage): SimpleResult = play.api.mvc.Results.Status(m._1)(Json.obj("error" -> m._2))
@@ -181,7 +186,7 @@ trait Session extends Controller with HasContainerContext {
             }
           }
         }
-      } (outcomeExecutionContext)
+      } (sessionContext.heavyLoad)
   }
   /**
    * Load instructor data for a session.
@@ -252,7 +257,7 @@ trait Session extends Controller with HasContainerContext {
             }
           }
         }
-      }(outcomeExecutionContext)
+      }(sessionContext.heavyLoad)
   }
 
   def completeSession(id: String) = Action.async { implicit request =>
