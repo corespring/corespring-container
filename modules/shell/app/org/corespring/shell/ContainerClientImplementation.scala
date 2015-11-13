@@ -1,33 +1,33 @@
 package org.corespring.shell
 
-import java.io.{ByteArrayInputStream, File}
+import java.io.{ ByteArrayInputStream, File }
 import java.net.URLDecoder
 
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.s3.model.ObjectMetadata
-import org.apache.commons.io.{FileUtils, IOUtils}
+import org.apache.commons.io.{ FileUtils, IOUtils }
 import org.bson.types.ObjectId
-import org.corespring.amazon.s3.{ConcreteS3Service, S3Service}
+import org.corespring.amazon.s3.{ ConcreteS3Service, S3Service }
 import org.corespring.container.client._
-import org.corespring.container.client.controllers.{AssetType, _}
+import org.corespring.container.client.controllers.{ AssetType, _ }
 import org.corespring.container.client.hooks._
-import org.corespring.container.client.integration.{ContainerExecutionContext, DefaultIntegration}
+import org.corespring.container.client.integration.{ ContainerExecutionContext, DefaultIntegration }
 import org.corespring.container.components.model.Component
 import org.corespring.container.components.model.dependencies.DependencyResolver
 import org.corespring.mongo.json.services.MongoService
-import org.corespring.shell.controllers.catalog.actions.{CatalogHooks => ShellCatalogHooks}
-import org.corespring.shell.controllers.editor.actions.{DraftEditorHooks => ShellDraftEditorHooks, DraftId, ItemEditorHooks => ShellItemEditorHooks}
-import org.corespring.shell.controllers.editor.{CollectionHooks => ShellCollectionHooks, ContainerSupportingMaterialAssets, ItemAssets, ItemDraftAssets, ItemDraftHooks => ShellItemDraftHooks, ItemHooks => ShellItemHooks, SupportingMaterialAssets}
-import org.corespring.shell.controllers.player.actions.{PlayerHooks => ShellPlayerHooks}
-import org.corespring.shell.controllers.player.{SessionHooks => ShellSessionHooks}
-import org.corespring.shell.controllers.{ShellDataQueryHooks, editor => shellEditor}
+import org.corespring.shell.controllers.catalog.actions.{ CatalogHooks => ShellCatalogHooks }
+import org.corespring.shell.controllers.editor.actions.{ DraftEditorHooks => ShellDraftEditorHooks, DraftId, ItemEditorHooks => ShellItemEditorHooks }
+import org.corespring.shell.controllers.editor.{ CollectionHooks => ShellCollectionHooks, ContainerSupportingMaterialAssets, ItemAssets, ItemDraftAssets, ItemDraftHooks => ShellItemDraftHooks, ItemHooks => ShellItemHooks, SupportingMaterialAssets }
+import org.corespring.shell.controllers.player.actions.{ PlayerHooks => ShellPlayerHooks }
+import org.corespring.shell.controllers.player.{ SessionHooks => ShellSessionHooks }
+import org.corespring.shell.controllers.{ ShellDataQueryHooks, editor => shellEditor }
 import org.corespring.shell.services.ItemDraftService
 import play.api.libs.json.JsObject
 import play.api.mvc._
-import play.api.{Configuration, Logger, Mode, Play}
+import play.api.{ Configuration, Logger, Mode, Play }
 
-import scala.concurrent.{ExecutionContext, Future}
-import scalaz.{Failure, Success, Validation}
+import scala.concurrent.{ ExecutionContext, Future }
+import scalaz.{ Failure, Success, Validation }
 
 class ContainerClientImplementation(
   val itemService: MongoService,
@@ -194,7 +194,6 @@ class ContainerClientImplementation(
     import play.api.Play.current
 
     override def componentSetContext = ComponentSetExecutionContext(
-      ContainerClientImplementation.this.containerContext.context,
       ContainerClientImplementation.this.containerContext.context)
 
     override def allComponents: Seq[Component] = ContainerClientImplementation.this.components
@@ -202,9 +201,9 @@ class ContainerClientImplementation(
     override def configuration = {
       val rc = ContainerClientImplementation.this.configuration
       Configuration.from(Map(
-          "minify" -> rc.getBoolean("components.minify").getOrElse(Play.mode == Mode.Prod),
-          "gzip" -> rc.getBoolean("components.gzip").getOrElse(Play.mode == Mode.Prod),
-          "path" -> rc.getBoolean("components.path").getOrElse("?")))
+        "minify" -> rc.getBoolean("components.minify").getOrElse(Play.mode == Mode.Prod),
+        "gzip" -> rc.getBoolean("components.gzip").getOrElse(Play.mode == Mode.Prod),
+        "path" -> rc.getBoolean("components.path").getOrElse("?")))
     }
 
     override def dependencyResolver: DependencyResolver = new DependencyResolver {
