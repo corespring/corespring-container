@@ -9,9 +9,9 @@ import org.corespring.container.components.processing.PlayerItemPreProcessor
 import org.corespring.container.components.response.OutcomeProcessor
 import org.corespring.container.logging.ContainerLogger
 import play.api.libs.json._
-import play.api.mvc.{ Action, Controller, SimpleResult }
+import play.api.mvc.{Action, Controller, SimpleResult}
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 object Session {
   object Errors {
@@ -21,7 +21,10 @@ object Session {
   }
 }
 
-trait Session extends Controller with HasContainerContext {
+//case class to enable auto wiring
+case class SessionExecutionContext(default:ExecutionContext, heavyLoad: ExecutionContext)
+
+trait Session extends Controller {
 
   val logger = ContainerLogger.getLogger("Session")
 
@@ -32,6 +35,11 @@ trait Session extends Controller with HasContainerContext {
   def scoreProcessor: ScoreProcessor
 
   def hooks: SessionHooks
+
+  def sessionContext: SessionExecutionContext
+
+  implicit val ec: ExecutionContext = sessionContext.default
+
 
   implicit def toResult(m: StatusMessage): SimpleResult = play.api.mvc.Results.Status(m._1)(Json.obj("error" -> m._2))
 
@@ -178,7 +186,7 @@ trait Session extends Controller with HasContainerContext {
             }
           }
         }
-      }
+      } (sessionContext.heavyLoad)
   }
   /**
    * Load instructor data for a session.
@@ -249,7 +257,7 @@ trait Session extends Controller with HasContainerContext {
             }
           }
         }
-      }
+      }(sessionContext.heavyLoad)
   }
 
   def completeSession(id: String) = Action.async { implicit request =>
