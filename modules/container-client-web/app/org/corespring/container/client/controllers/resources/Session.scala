@@ -11,7 +11,7 @@ import org.corespring.container.logging.ContainerLogger
 import play.api.libs.json._
 import play.api.mvc.{Action, Controller, SimpleResult}
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 object Session {
   object Errors {
@@ -21,7 +21,9 @@ object Session {
   }
 }
 
-trait Session extends Controller with HasContainerContext {
+case class SessionContexts(default: ExecutionContext, outcome: ExecutionContext)
+
+trait Session extends Controller {
 
   val logger = ContainerLogger.getLogger("Session")
 
@@ -32,6 +34,11 @@ trait Session extends Controller with HasContainerContext {
   def scoreProcessor: ScoreProcessor
 
   def hooks: SessionHooks
+
+  def contexts: SessionContexts
+
+  implicit val executionContext = contexts.default
+
 
   implicit def toResult(m: StatusMessage): SimpleResult = play.api.mvc.Results.Status(m._1)(Json.obj("error" -> m._2))
 
@@ -178,7 +185,7 @@ trait Session extends Controller with HasContainerContext {
             }
           }
         }
-      }(containerContextById(ContainerContextId.OUTCOME))
+      } (contexts.outcome)
   }
   /**
    * Load instructor data for a session.
@@ -249,7 +256,7 @@ trait Session extends Controller with HasContainerContext {
             }
           }
         }
-      }(containerContextById(ContainerContextId.OUTCOME))
+      }(contexts.outcome)
   }
 
   def completeSession(id: String) = Action.async { implicit request =>

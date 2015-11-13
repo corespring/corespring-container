@@ -7,10 +7,10 @@ import play.api.Configuration
 import play.api.http.ContentTypes
 import play.api.mvc._
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-trait CompressedAndMinifiedComponentSets extends DefaultComponentSets
-  with JsMinifier with CssMinifier with Gzipper with HasContainerContext {
+trait CompressedAndMinifiedComponentSets extends DefaultComponentSets with HasContainerContext
+  with JsMinifier with CssMinifier with Gzipper  {
 
   lazy val logger = ContainerLogger.getLogger("CompressedComponentSets")
 
@@ -52,7 +52,7 @@ trait CompressedAndMinifiedComponentSets extends DefaultComponentSets
       Future {
         val (body, ct) = generate(context, allComponents.find(_.matchesType(componentType)).toSeq, suffix)
         process(body, ct)
-      }(containerContextById(ContainerContextId.COMPONENT_SETS))
+      }
   }
 
   override def resource[A >: EssentialAction](context: String, directive: String, suffix: String) = Action.async {
@@ -60,7 +60,7 @@ trait CompressedAndMinifiedComponentSets extends DefaultComponentSets
       Future {
         val (body, ct) = generateBodyAndContentType(context, directive, suffix)
         process(body, ct)
-      }(containerContextById(ContainerContextId.COMPONENT_SETS))
+      }
   }
 
 }
