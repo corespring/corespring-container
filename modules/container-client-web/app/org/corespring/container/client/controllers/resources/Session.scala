@@ -22,7 +22,7 @@ object Session {
 }
 
 //case class to enable auto wiring
-case class SessionContext(default:ExecutionContext, heavyLoad: ExecutionContext)
+case class SessionExecutionContext(default:ExecutionContext, heavyLoad: ExecutionContext)
 
 trait Session extends Controller {
 
@@ -36,7 +36,7 @@ trait Session extends Controller {
 
   def hooks: SessionHooks
 
-  def sessionContext: SessionContext
+  def sessionContext: SessionExecutionContext
 
   implicit val ec: ExecutionContext = sessionContext.default
 

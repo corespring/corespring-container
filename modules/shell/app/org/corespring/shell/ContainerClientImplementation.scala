@@ -1,37 +1,33 @@
 package org.corespring.shell
 
-import java.io.{ ByteArrayInputStream, File }
+import java.io.{ByteArrayInputStream, File}
 import java.net.URLDecoder
 
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.s3.model.ObjectMetadata
-import com.typesafe.config.ConfigFactory
-import org.apache.commons.io.{ FileUtils, IOUtils }
+import org.apache.commons.io.{FileUtils, IOUtils}
 import org.bson.types.ObjectId
-import org.corespring.amazon.s3.{ S3Service, ConcreteS3Service }
-import org.corespring.container.client.controllers.{ AssetType, _ }
-import org.corespring.container.client.hooks._
-import org.corespring.container.client.integration.{ ContainerExecutionContext, DefaultIntegration }
+import org.corespring.amazon.s3.{ConcreteS3Service, S3Service}
 import org.corespring.container.client._
+import org.corespring.container.client.controllers.{AssetType, _}
+import org.corespring.container.client.hooks._
+import org.corespring.container.client.integration.{ContainerExecutionContext, DefaultIntegration}
 import org.corespring.container.components.model.Component
 import org.corespring.container.components.model.dependencies.DependencyResolver
 import org.corespring.mongo.json.services.MongoService
-import org.corespring.shell.controllers.ShellDataQueryHooks
-import org.corespring.shell.controllers.catalog.actions.{ CatalogHooks => ShellCatalogHooks }
-import org.corespring.shell.controllers.editor.actions.{ DraftEditorHooks => ShellDraftEditorHooks, ItemEditorHooks => ShellItemEditorHooks }
-import org.corespring.shell.controllers.editor.{ CollectionHooks => ShellCollectionHooks, ItemAssets, ItemDraftAssets, ItemDraftHooks => ShellItemDraftHooks, ItemHooks => ShellItemHooks }
-import org.corespring.shell.controllers.editor.{ ContainerSupportingMaterialAssets, SupportingMaterialAssets, ItemDraftAssets, ItemAssets }
-import org.corespring.shell.controllers.editor.actions.{ DraftEditorHooks => ShellDraftEditorHooks, ItemEditorHooks => ShellItemEditorHooks, DraftId }
-import org.corespring.shell.controllers.{ editor => shellEditor }
-import org.corespring.shell.controllers.player.actions.{ PlayerHooks => ShellPlayerHooks }
-import org.corespring.shell.controllers.player.{ SessionHooks => ShellSessionHooks }
+import org.corespring.shell.controllers.catalog.actions.{CatalogHooks => ShellCatalogHooks}
+import org.corespring.shell.controllers.editor.actions.{DraftEditorHooks => ShellDraftEditorHooks, DraftId, ItemEditorHooks => ShellItemEditorHooks}
+import org.corespring.shell.controllers.editor.{CollectionHooks => ShellCollectionHooks, ContainerSupportingMaterialAssets, ItemAssets, ItemDraftAssets, ItemDraftHooks => ShellItemDraftHooks, ItemHooks => ShellItemHooks, SupportingMaterialAssets}
+import org.corespring.shell.controllers.player.actions.{PlayerHooks => ShellPlayerHooks}
+import org.corespring.shell.controllers.player.{SessionHooks => ShellSessionHooks}
+import org.corespring.shell.controllers.{ShellDataQueryHooks, editor => shellEditor}
 import org.corespring.shell.services.ItemDraftService
-import play.api.libs.json.{ JsValue, JsObject }
+import play.api.libs.json.JsObject
 import play.api.mvc._
-import play.api.{ Logger, Configuration, Mode, Play }
+import play.api.{Configuration, Logger, Mode, Play}
 
-import scala.concurrent.{ ExecutionContext, Future }
-import scalaz.{ Failure, Success, Validation }
+import scala.concurrent.{ExecutionContext, Future}
+import scalaz.{Failure, Success, Validation}
 
 class ContainerClientImplementation(
   val itemService: MongoService,
@@ -197,7 +193,7 @@ class ContainerClientImplementation(
 
     import play.api.Play.current
 
-    override def componentSetsContext = ComponentSetsContext(
+    override def componentSetContext = ComponentSetExecutionContext(
       ContainerClientImplementation.this.containerContext.context,
       ContainerClientImplementation.this.containerContext.context)
 
@@ -205,14 +201,10 @@ class ContainerClientImplementation(
 
     override def configuration = {
       val rc = ContainerClientImplementation.this.configuration
-      val c = ConfigFactory.parseString(
-        s"""
-             |minify: ${rc.getBoolean("components.minify").getOrElse(Play.mode == Mode.Prod)}
-             |gzip: ${rc.getBoolean("components.gzip").getOrElse(Play.mode == Mode.Prod)}
-             |path: ${rc.getString("components.path").getOrElse("?")}
-           """.stripMargin)
-
-      new Configuration(c)
+      Configuration.from(Map(
+          "minify" -> rc.getBoolean("components.minify").getOrElse(Play.mode == Mode.Prod),
+          "gzip" -> rc.getBoolean("components.gzip").getOrElse(Play.mode == Mode.Prod),
+          "path" -> rc.getBoolean("components.path").getOrElse("?")))
     }
 
     override def dependencyResolver: DependencyResolver = new DependencyResolver {

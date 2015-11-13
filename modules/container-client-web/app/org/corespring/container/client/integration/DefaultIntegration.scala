@@ -261,7 +261,7 @@ trait DefaultIntegration
 
   lazy val session = new Session {
 
-    override def sessionContext = SessionContext(
+    override def sessionContext = SessionExecutionContext(
       DefaultIntegration.this.containerContext.context,
       DefaultIntegration.this.containerContext.context)
 
