@@ -11,17 +11,32 @@
       "title": "Less Fruits",
       "weight" : 1,
       "correctResponse" : { "value" : ["carrot"] },
+      "comments": "Go to the shop and buy some bananas",
+      "rationales": [
+        {
+          "choice": "banana",
+          "rationale": "Banana rationale"
+        },
+        {
+          "choice": "carrot",
+          "rationale": "Carrot rationale"
+        },
+        {
+          "choice": "apple",
+          "rationale": "Apple rationale"
+        }
+      ],
       "feedback" : [
-        { "value" : "banana", "feedback" : "Incorrect"},
-        { "value" : "carrot", "feedback" : "Correct", "notChosenFeedback" : "This was the correct one."},
-        { "value" : "apple", "feedback" : "Incorrect"}
+        { "value" : "banana", "feedback" : "Banana Incorrect"},
+        { "value" : "carrot", "feedback" : "Correct", "notChosenFeedback" : "This was the correct one."}
       ],
       "model" : {
         "prompt": "Which of these is a vegetable?",
         "config": {
           "orientation": "vertical",
           "shuffle": true,
-          "singleChoice" : true
+          "singleChoice" : true,
+          "showCorrectAnswer": "separately"
         },
         "choices": [
           {"label": "Banana Banana Banana Banana Banana Banana Banana Banana Banana Banana Banana Banana Banana Banana", "value": "banana"},
