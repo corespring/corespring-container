@@ -203,7 +203,7 @@ class ContainerClientImplementation(
       Configuration.from(Map(
         "minify" -> rc.getBoolean("components.minify").getOrElse(Play.mode == Mode.Prod),
         "gzip" -> rc.getBoolean("components.gzip").getOrElse(Play.mode == Mode.Prod),
-        "path" -> rc.getBoolean("components.path").getOrElse("?")))
+        "path" -> rc.getString("components.path").getOrElse("?")))
     }
 
     override def dependencyResolver: DependencyResolver = new DependencyResolver {
