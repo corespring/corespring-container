@@ -11,9 +11,13 @@ describe('corespringDemoPlayer', function() {
       bind: function() {
       }
     };
+    this.info = function(){};
   }
 
-  var mockSubmitSession = jasmine.createSpy('submitSession');
+  var mockSubmitSession = jasmine.createSpy('submitSession').and.callFake(function(){
+    var onSuccess = mockSubmitSession.calls.mostRecent().args[1];
+    onSuccess({score: {summary: {percentage: 75}}});
+  });
   var mockSetMode = jasmine.createSpy('setMode');
   var mockSetEditable = jasmine.createSpy('setEditable');
   var mockReset = jasmine.createSpy('reset');
@@ -124,6 +128,10 @@ describe('corespringDemoPlayer', function() {
       it('should submit session', function() {
         expect(mockSubmitSession)
           .toHaveBeenCalledWith({components: componentSessions}, jasmine.any(Function), jasmine.any(Function));
+      });
+
+      it('should set the score', function() {
+        expect(scope.score).toEqual({summary:{percentage: 75}});
       });
 
     });
