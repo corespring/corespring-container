@@ -60,8 +60,15 @@ module.exports = (grunt) ->
     .replace('bower_components', 'components')
     .replace('///', '//')
 
-  prepend = (pre, s) -> "#{pre}#{s}"
+  ###
+  Remove grunt-contrib paths from stacktrace output
+  ###
+  gruntLogWriteln = grunt.log.writeln
+  grunt.log.writeln = (s) ->
+    if(!(s && s.indexOf('  at ') >= 0 && s.indexOf('grunt-contrib') >= 0))
+      gruntLogWriteln(s || '')
 
+  prepend = (pre, s) -> "#{pre}#{s}"
   comps = prepend.bind( null, '<%= common.dist %>/bower_components/')
 
   config =
@@ -123,6 +130,7 @@ module.exports = (grunt) ->
           '<%= common.test %>/js/**/*-mocks.js',
           ]
         options:
+          summary: true
           keepRunner: true
           vendor: _.map([
             'jquery/dist/jquery.js',
