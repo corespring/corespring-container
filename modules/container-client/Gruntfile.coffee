@@ -62,6 +62,7 @@ module.exports = (grunt) ->
 
   ###
   Remove grunt-contrib paths from stacktrace output
+  This is a hack to make the summary output of the jasmine tests more useful
   ###
   gruntLogWriteln = grunt.log.writeln
   grunt.log.writeln = (s) ->
