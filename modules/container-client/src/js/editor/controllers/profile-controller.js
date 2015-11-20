@@ -12,12 +12,12 @@
       'ConfigurationService',
       'DataQueryService',
       'DesignerService',
+      'EditorChangeWatcher',
       'ItemService',
       'LogFactory',
       'ProfileFormatter',
       'StandardQueryCreator',
       'STATIC_PATHS',
-      'EditorChangeWatcher',
       ProfileController
     ]);
 
@@ -30,12 +30,12 @@
     ConfigurationService,
     DataQueryService,
     DesignerService,
+    EditorChangeWatcher,
     ItemService,
     LogFactory,
     ProfileFormatter,
     StandardQueryCreator,
-    STATIC_PATHS,
-    EditorChangeWatcher
+    STATIC_PATHS
   ) {
 
     var $log = LogFactory.getLogger('ProfileController');
@@ -583,13 +583,13 @@
 
     function getStandardsClusters() {
       return _($scope.profile.standards).map(function(s) {
-         switch (s.subject) {
-           case "Math":
-             return s.category;
-           case "ELA":
-           case "ELA-Literacy":
-             return s.subCategory;
-         }
+        switch (s.subject) {
+          case "Math":
+            return s.category;
+          case "ELA":
+          case "ELA-Literacy":
+            return s.subCategory;
+        }
       }).uniq().value();
     }
 
@@ -1088,8 +1088,8 @@
     //----------------------------------------------------------------
     // profile load and save
     //----------------------------------------------------------------
-    
-    $scope.saveProfile = function(){
+
+    $scope.saveProfile = function() {
       $log.log("saving profile");
       ItemService.saveProfile($scope.item.profile, function(result) {
         $log.log("profile saved result:", result);
@@ -1097,7 +1097,7 @@
     };
 
     $scope.$watch('item.profile', EditorChangeWatcher.makeWatcher(
-      'profile', 
+      'profile',
       $scope.saveProfile,
       $scope), true);
 
@@ -1149,10 +1149,12 @@
       });
     };
 
-    function ifCollectionIdIsValid(collectionId){
+    function ifCollectionIdIsValid(collectionId) {
       var defer = $q.defer();
       CollectionService.list().then(function(collections) {
-        var collection = _.find(collections, {key:collectionId});
+        var collection = _.find(collections, {
+          key: collectionId
+        });
         $log.log("ifCollectionIdIsValid collections", collectionId, collection, collections);
         if (collection) {
           defer.resolve(collection);
@@ -1163,7 +1165,7 @@
       return defer.promise;
     }
 
-    function updateItemCollection(collection){
+    function updateItemCollection(collection) {
       $scope.item.collection = {
         id: collection.key,
         name: collection.value
