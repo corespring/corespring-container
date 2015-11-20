@@ -120,7 +120,7 @@ We use [sbt-release](https://github.com/sbt/sbt-release) to create releases. See
     
 ### version.sbt - always keep it as a SNAPSHOT version
 
-Because we are using sbt-release, we should keep the version as a SNAPSHOT always. the plugin will the manage creating the appropriate release and publish it for us.
+Because we are using sbt-release, we should keep the version as a SNAPSHOT always. The plugin will the manage creating the appropriate release and publish it for us.
 
     
 Then go to [http://localhost:9000](http://localhost:9000)
