@@ -4,7 +4,6 @@
 
   angular.module('corespring-editor.controllers')
     .controller('ProfileController', [
-      '$location',
       '$q',
       '$scope',
       '$timeout',
@@ -22,7 +21,6 @@
     ]);
 
   function ProfileController(
-    $location,
     $q,
     $scope,
     $timeout,
@@ -240,28 +238,6 @@
     }
 
     /**
-     * Get the json encoded configuration from the "config" query parameter
-     * @returns {*}
-     */
-    function getFormConfigFromUrl() {
-      var search = $location.search();
-      var hash = $location.hash();
-      var configJson = search.profileConfig || hash.profileConfig;
-      if (configJson) {
-        try {
-          var config = JSON.parse(configJson);
-          return config;
-        } catch (e) {
-          $log.warn("error parsing config json", configJson, e);
-        }
-      }
-      return null;
-    }
-
-    //We are loading config from the url. Might not be necessary, but doesn't hurt.
-    updateFormModels(getFormConfigFromUrl());
-
-    /**
      * Once the profile is loaded, we can use the formModels
      * to update the profile with the configured values
      * @param profile
@@ -337,46 +313,54 @@
 
     /**
      * Create a ng filter function for a formModel/dataProvider
-     * This filter returns true if the item can be found in formModel.options
-     * or if there are no options
+     * When formModel.options is not set, this filter does not remove anything
+     * When formModel.options is set, this filter removes all options, which cannot be found
+     * in formModel.options
      * @param formModel - holds the options that are used for filtering
      * @returns a filter function
      */
     function createSimpleOptionsFilter(formModel) {
-      return function(item, index) {
+      return function(option, index) {
         return _.isArray(formModel.options) ?
-          _.contains(formModel.options, item) : true;
+          _.contains(formModel.options, option) : true;
       };
     }
 
     /**
      * Create a ng filter function for a formModel/dataProvider
-     * This filter returns true if the item can be found in formModel.options
-     * or if there are no options
+     * When formModel.options is not set, this filter does not remove anything
+     * When formModel.options is set, this filter removes all options, which cannot be found
+     * in formModel.options
+     * The options are filtered by a property of the actual option, eg. if you pass in
+     * 'key' as property, the option.key is compared to the value in formModel.options
      * @param formModel - holds the options that are used for filtering
      * @param property - pass in a string if you want to compare item[property]
      * @returns a filter function
      */
     function createPropertyOptionsFilter(formModel, property) {
-      return function(item, index) {
+      return function(option, index) {
         return _.isArray(formModel.options) ?
-          _.contains(formModel.options, item[property]) : true;
+          _.contains(formModel.options, option[property]) : true;
       };
     }
 
     /**
      * Create a ng filter function for a formModel/dataProvider
-     * This filter returns true if the item can be found in formModel.options
-     * or if there are no options
+     * When formModel.options is not set, this filter does not remove anything
+     * When formModel.options is set, this filter removes all options, which cannot be found
+     * in formModel.options
+     * The options are filtered by one ore more properties of the actual option. eg.
+     * if you pass in ['key','value'] as properties, option.key and option.value are compared
+     * to the value in formModel.options
      * @param formModel - holds the options that are used for filtering
      * @param properties - pass in an array of strings to compare item[properties[0]] OR item[properties[1]]
      * @returns a filter function
      */
     function createMultiplePropertiesOptionsFilter(formModel, properties) {
-      return function(item, index) {
+      return function(option, index) {
         return _.isArray(formModel.options) ?
           _.some(properties, function(property) {
-            return _.contains(formModel.options, item[property]);
+            return _.contains(formModel.options, option[property]);
           }) : true;
       };
     }
@@ -463,8 +447,8 @@
       query: function(query) {
         DataQueryService.query("standards", createStandardQuery(query.term), function(results) {
           query.callback({
-            //Most other dataProviders are filtered through a ng filter function that is applied in jade
-            //This filter here is applied directly bc. in jade we don't have access to the dataProvider.
+            //Most other dataProviders are filtered through a ng filter that is applied in jade.
+            //This filter is applied here bc. in jade we don't have access to the dataProvider.
             results: filterStandardsByConfig(results)
           });
         });
@@ -494,16 +478,13 @@
       }
     };
 
-    $scope.standardsAdapter.initSelection = $scope.standardsAdapter.initSelection.bind($scope.standardsAdapter);
-
+    //for the
     $scope.filterStandardsAdapter = _.clone($scope.standardsAdapter);
     $scope.filterStandardsAdapter.placeholder = '';
     $scope.filterStandardsAdapter.minimumInputLength = 0;
     $scope.filterStandardsAdapter.initSelection = function(element, callback) {
       DataQueryService.query("standards", createFilteredStandardQuery(""), function(results) {
-        query.callback({
-          results: filterStandardsByConfig(results)
-        });
+        //callback(filterStandardsByConfig(results));
       });
     };
     $scope.filterStandardsAdapter.query = function(query) {
@@ -516,36 +497,51 @@
 
     /**
      * The config contains an array of standards in dotNotation.
-     * For each item we need to load the full standard object
+     * For each dotNotation we are loading the full standard object
      */
     function configToStandards(dotNotations, callback) {
       if (!_.isArray(dotNotations) || 0 === dotNotations.length) {
+        callback([]);
         return;
       }
 
       var results = [];
+      var count = dotNotations.length;
+
+      function callbackWhenDone() {
+        if (--count <= 0) {
+          callback(results);
+        }
+      }
+
+      function onSuccess(item) {
+        results.push(item[0]);
+        callbackWhenDone();
+      }
+
+      function onError() {
+        callbackWhenDone();
+      }
+
       _.forEach(dotNotations, function(dotNotation) {
-        DataQueryService.query('standards', {
+        DataQueryService.query(
+          'standards', {
             searchTerm: dotNotation
           },
-          function(item) {
-            results.push(item[0]);
-            if (dotNotations.length === results.length) {
-              callback(results);
-            }
-          });
+          onSuccess,
+          onError);
       });
     }
 
     function containsLiteracyStandard(standards) {
-      return -1 !== _.findIndex(standards, function(item) {
-        return item && item.subject && item.subject.toLowerCase().indexOf("literacy") >= 0;
+      return -1 !== _.findIndex(standards, function(standard) {
+        return standard && standard.subject && standard.subject.toLowerCase().indexOf("literacy") >= 0;
       });
     }
 
-    function getStandardDomain(item) {
-      if (item && item.uri) {
-        var parts = item.uri.toLowerCase().split('/');
+    function getStandardDomain(standard) {
+      if (standard && standard.uri) {
+        var parts = standard.uri.toLowerCase().split('/');
         while (parts.length > 0) {
           var part = parts.shift();
           if (part !== '' && part !== 'http:' && part !== 'https:') {
@@ -557,18 +553,17 @@
     }
 
     function getImageUrlForStandardDomain(domain) {
-      //TODO Get official logos
       return STATIC_PATHS.assets + '/standards/common-core.png';
     }
 
     function getStandardsGroups() {
       var results = [];
       var groups = _.groupBy($scope.profile.standards, getStandardDomain);
-      _.forEach(groups, function(item, key) {
+      _.forEach(groups, function(standard, key) {
         var imageUrl = getImageUrlForStandardDomain(key);
         results.push({
           label: key,
-          standards: _.map(item, function(s) {
+          standards: _.map(standard, function(s) {
             return {
               id: s.id,
               text: s.dotNotation
@@ -590,26 +585,44 @@
           case "ELA-Literacy":
             return s.subCategory;
         }
-      }).uniq().value();
+      }).uniq().without(undefined).value();
     }
-
 
     $scope.$watch('profile.standards', function(newValue, oldValue) {
       if ($scope.profile && $scope.profile.standards) {
-        $scope.isLiteracyStandardSelected = containsLiteracyStandard(newValue);
+        $scope.isLiteracyStandardSelected = containsLiteracyStandard($scope.profile.standards);
         $scope.standardsGroups = getStandardsGroups();
         $scope.standardsClusters = getStandardsClusters();
       }
     });
 
+    function onStandardsUpdated(){
+      if ($scope.profile && $scope.profile.standards) {
+        $scope.isLiteracyStandardSelected = containsLiteracyStandard($scope.profile.standards);
+        $scope.standardsGroups = getStandardsGroups();
+        $scope.standardsClusters = getStandardsClusters();
+      }
+    }
+
+    /**
+     * The selected standards are displayed in groups
+     * Only here we can remove standards.
+     * When one of the standards from the groups is removed,
+     * we need to update the original standards collection
+     * and dependent properties
+     */
     $scope.$watch('standardsGroups', function(newValue, oldValue) {
       if ($scope.profile && $scope.profile.standards && $scope.standardsGroups) {
         var newStandards = _.chain(newValue).pluck('standards').flatten().pluck('id').value();
         var oldStandards = _.chain($scope.profile.standards).pluck('id').value();
         if (newStandards.length < oldStandards.length) {
-          var dif = _.difference(oldStandards, newStandards);
-          _.remove($scope.profile.standards, function(item) {
-            return item && _.contains(dif, item.id);
+          _.remove($scope.profile.standards, function(standard) {
+            return !(standard && _.contains(newStandards, standard.id));
+          });
+          $scope.isLiteracyStandardSelected = containsLiteracyStandard($scope.profile.standards);
+          var standardClusters = getStandardsClusters();
+          _.remove($scope.standardsClusters, function(cluster){
+            return !_.contains(standardClusters, cluster);
           });
         }
       }
@@ -629,7 +642,7 @@
         return;
       }
 
-      //As per request from Gwen we only display the name, not the count
+      //As per request from Gwen, we only display the name, not the count
       function simpleFormat(name, count) {
         return name;
       }
@@ -664,13 +677,9 @@
 
     function setDefaultCollectionIfNoCollectionSelected(collectionId) {
       CollectionService.list().then(function(collections) {
-        $log.log("setDefaultCollectionIfNoCollectionSelected", collectionId, collections);
         if (!collectionById(collections, collectionId)) {
-          $log.log("setDefaultCollectionIfNoCollectionSelected id not found", collectionId);
           var defaultCollection = collectionByName(collections, 'default');
-          $log.log("setDefaultCollectionIfNoCollectionSelected defaultCollection", defaultCollection);
           if (defaultCollection) {
-            $log.log("setDefaultCollectionIfNoCollectionSelected saving");
             $scope.saveCollectionId(defaultCollection.key);
           }
         }
@@ -718,8 +727,8 @@
           },
           function(result) {
             query.callback({
-              //Most other dataProviders are filtered through a ng filter function that is applied in jade
-              //This filter here is applied directly bc. in jade we don't have access to the dataProvider.
+              //Most other dataProviders are filtered through a ng filter that is applied in jade
+              //This filter is applied here bc. in jade we don't have access to the dataProvider.
               results: filterSubjectsByConfig(result)
             });
           });
@@ -745,7 +754,7 @@
     $scope.primarySubjectSelect2Adapter = new SubjectSelect2Adapter("subjects.primary", $scope.formModels.primarySubject);
     $scope.relatedSubjectSelect2Adapter = new SubjectSelect2Adapter("subjects.related", $scope.formModels.relatedSubject);
 
-    function findSubjectByCategorySubject(topic, categorySubject, callback) {
+    function findSubjectByCategorySubject(topic, categorySubject, onSuccess, onError) {
       var query = {
         filters: fromSubjectText(categorySubject)
       };
@@ -753,8 +762,9 @@
         topic,
         query,
         function(item) {
-          callback(item[0]);
-        });
+          onSuccess(item[0]);
+        },
+        onError);
     }
 
     /**
@@ -779,12 +789,24 @@
       var results = [];
       _.forEach(categorySubjectList, function(categorySubject) {
 
-        findSubjectByCategorySubject('subjects.related', categorySubject, function(result) {
-          results.push(result);
-          if (results.length === categorySubjectList.length) {
+        var count = categorySubjectList.length;
+
+        function callbackWhenDone(){
+          if(--count <= 0){
             callback(results);
           }
-        });
+        }
+
+        function onSuccess(result){
+          results.push(result);
+          callbackWhenDone();
+        }
+
+        function onError(err){
+          callbackWhenDone();
+        }
+
+        findSubjectByCategorySubject('subjects.related', categorySubject, onSuccess, onError);
       });
     }
 
@@ -823,7 +845,7 @@
      */
     function years(fromYear, toYear) {
       var direction = fromYear > toYear ? -1 : 1;
-      return _.range(fromYear, toYear + 1 * direction, direction).map(function(year) {
+      return _.range(fromYear, toYear + direction, direction).map(function(year) {
         return year.toString();
       });
     }
@@ -867,7 +889,7 @@
 
     function initKeySkillsDataProvider() {
       DataQueryService.list("keySkills", function(result) {
-        $scope.keySkillsDataProvider = _.chain(result).pluck('value').flatten().uniq().sort().map(function(item) {
+        $scope.keySkillsDataProvider = _(result).pluck('value').flatten().uniq().sort().map(function(item) {
           return {
             key: item,
             value: item
@@ -1002,7 +1024,10 @@
     });
 
     $scope.getLicenseTypeUrl = function(licenseType) {
-      return licenseType ? STATIC_PATHS.assets + '/licenseTypes/' + licenseType.replace(" ", "-") + '.png' : undefined;
+      if(!_.isString(licenseType) || _.isEmpty(licenseType)){
+        return undefined;
+      }
+      return STATIC_PATHS.assets + '/licenseTypes/' + licenseType.replace(" ", "-") + '.png';
     };
 
     $scope.togglePreview = function() {
@@ -1127,7 +1152,6 @@
     //----------------------------------------------------------------
 
     $scope.$watch('collectionId', function(newValue, oldValue) {
-      $log.log("$watch collectionId", newValue);
       if (undefined === oldValue) {
         return;
       }
@@ -1138,13 +1162,10 @@
     });
 
     $scope.saveCollectionId = function(collectionId) {
-      $log.log("saving collectionId", collectionId);
       ifCollectionIdIsValid(collectionId).then(function(collection) {
-        $log.log("id is valid", collectionId, collection);
         updateItemCollection(collection);
         $scope.collectionId = collection.key;
         ItemService.saveCollectionId(collectionId, function(result) {
-          $log.log("collectionId saved result:", result);
         });
       });
     };
@@ -1155,7 +1176,6 @@
         var collection = _.find(collections, {
           key: collectionId
         });
-        $log.log("ifCollectionIdIsValid collections", collectionId, collection, collections);
         if (collection) {
           defer.resolve(collection);
         } else {
@@ -1174,8 +1194,6 @@
         partChanged: 'collectionId'
       });
     }
-
-
 
     //----------------------------------------------------------------
     // startup
