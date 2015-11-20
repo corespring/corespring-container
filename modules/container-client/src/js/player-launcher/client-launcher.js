@@ -143,8 +143,9 @@ function ClientLauncher(element, options, errorCallback){
   this.loadInstance = function(call, params, initialData, onReady){
 
     call = (typeof(call) === 'string') ? { method: 'GET', url: call} : call;
-    params = this.buildParams(params); 
-    var instance = new InstanceDef($.extend(call, {params: params}), element, errorCallback, logger, options.autosizeEnabled);
+    params = this.buildParams(params);
+    var instance = new InstanceDef($.extend(call, {params: params}), element, errorCallback, logger, options.autosizeEnabled, options.iframeScrollingEnabled);
+
 
     instance.on('launch-error', function (data) {
       var error = errorCodes.EXTERNAL_ERROR(data.code + ': ' + data.detailedMessage);
