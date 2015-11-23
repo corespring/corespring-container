@@ -81,6 +81,16 @@ describe('instance', function() {
     expect(mockChannel.on).toHaveBeenCalledWith('dimensionsUpdate', jasmine.any(Function));
   });
 
+  it('should not enable iframe scrolling if iframeScrollingEnabled is false', function(){
+    instance = new InstanceDef(call, '#' + ID, onError, {}, false, false);
+    expect($('#' + ID).html()).toMatch("scrolling=\"no\"");
+  });
+
+  it('should enable iframe scrolling if iframeScrollingEnabled is true', function(){
+    instance = new InstanceDef(call, '#' + ID, onError, {}, false, true);
+    expect($('#' + ID).html()).not.toMatch("scrolling=\"no\"");
+  });
+
   describe('send', function(){
 
     it('should call channel.send', function() {
