@@ -9,13 +9,12 @@ class Builders(org: String, rootScalaVersion: String) {
 
   Keys.fork in ThisBuild := false
 
-  val sharedSettings = releaseSettings ++ Seq(
-    //By default always bump the minor for a release
-    ReleaseKeys.versionBump := Version.Bump.Minor,
+  val sharedSettings = Seq(
+    shellPrompt := ShellPrompt.buildShellPrompt,
     Keys.fork in Test := false,
     Keys.parallelExecution in Test := false,
     scalaVersion := rootScalaVersion,
-    publishTo := version authPublishTo.value)
+    publishTo := authPublishTo.value)
 
   def lib(name: String, rootFile: Option[String] = None) = {
     val root = file(rootFile.getOrElse(s"modules/$name"))
