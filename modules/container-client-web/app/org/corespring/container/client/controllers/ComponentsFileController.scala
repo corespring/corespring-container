@@ -1,7 +1,7 @@
 package org.corespring.container.client.controllers
 
 import java.io.File
-import org.corespring.container.client.HasContext
+import org.corespring.container.client.HasContainerContext
 import org.corespring.container.client.integration.validation.Validator
 import org.joda.time.DateTimeZone
 import org.joda.time.format.{ DateTimeFormat, DateTimeFormatter }
@@ -13,7 +13,7 @@ import play.api.mvc._
 import scala.concurrent.Future
 
 /** A very simple file asset loader for now */
-trait ComponentsFileController extends Controller with HasContext {
+trait ComponentsFileController extends Controller with HasContainerContext {
 
   val log = ContainerLogger.getLogger("ComponentsFileController")
 

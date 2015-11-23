@@ -2,9 +2,11 @@ package org.corespring.container.client.controllers.resources
 
 import org.corespring.container.client.hooks.Hooks._
 import org.corespring.container.client.hooks._
+import org.corespring.container.client.integration.ContainerExecutionContext
 import org.corespring.container.components.outcome.ScoreProcessor
 import org.corespring.container.components.processing.PlayerItemPreProcessor
 import org.corespring.container.components.response.OutcomeProcessor
+import org.corespring.test.TestContext
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import play.api.libs.json.{Json, JsValue}
@@ -33,12 +35,12 @@ class SessionTest extends Specification with Mockito {
       true,
       isComplete)
 
-    def fullSessionAndItem(isSesure:Boolean) = Right(FullSession(
+    def fullSessionAndItem(isSecure:Boolean) = Right(FullSession(
       Json.obj(
         "item" -> Json.obj(),
         "session" -> Json.obj()
       ),
-      isSesure
+      isSecure
     ))
 
     "when saving" should {
@@ -149,7 +151,7 @@ class SessionTest extends Specification with Mockito {
 
   class LoadItemAndSessionResponding(hooksResponse: Either[StatusMessage, FullSession]) extends WithApplication(FakeApplication(withGlobal = Some(mockGlobalS))) with org.specs2.specification.Before {
 
-    val session = new Session {
+    val session = new Session with TestContext {
       def outcomeProcessor: OutcomeProcessor = {
         val mocked = mock[OutcomeProcessor]
         mocked.createOutcome(any[JsValue], any[JsValue], any[JsValue]) returns Json.obj()
@@ -168,7 +170,7 @@ class SessionTest extends Specification with Mockito {
         mocked
       }
 
-      override def hooks: SessionHooks = new SessionHooks {
+      override def hooks: SessionHooks = new SessionHooks with TestContext{
         override def loadItemAndSession(id: String)(implicit header: RequestHeader): Either[StatusMessage, FullSession] = hooksResponse
         override def loadOutcome(id: String)(implicit header: RequestHeader): Either[(Int, String), SessionOutcome] = ???
         override def getScore(id: String)(implicit header: RequestHeader): Either[(Int, String), SessionOutcome] = ???
@@ -176,7 +178,6 @@ class SessionTest extends Specification with Mockito {
         override def save(id: String)(implicit header: RequestHeader): Future[Either[(Int, String), SaveSession]] = ???
       }
 
-      override implicit def ec: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
     }
 
     def before = {}
@@ -184,7 +185,7 @@ class SessionTest extends Specification with Mockito {
 
   class ActionBody(mode : SecureMode) extends WithApplication(FakeApplication(withGlobal = Some(mockGlobalS))) with org.specs2.specification.Before {
 
-    val session = new Session {
+    val session = new Session with TestContext{
       def outcomeProcessor: OutcomeProcessor = {
         val mocked = mock[OutcomeProcessor]
         mocked.createOutcome(any[JsValue], any[JsValue], any[JsValue]) returns Json.obj()
@@ -201,13 +202,12 @@ class SessionTest extends Specification with Mockito {
 
       override def hooks: SessionHooks = new MockBuilder(mode)
 
-      override implicit def ec: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
     }
 
     def before = {}
   }
 
-  class MockBuilder(m: SecureMode) extends SessionHooks {
+  class MockBuilder(m: SecureMode) extends SessionHooks with TestContext{
 
     override def loadItemAndSession(id: String)(implicit header: RequestHeader): Either[StatusMessage, FullSession] = Right(m.asInstanceOf[FullSession])
 

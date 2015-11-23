@@ -1,6 +1,7 @@
 package org.corespring.container.client.controllers.apps
 
 import grizzled.slf4j.Logger
+import org.corespring.container.client.HasContainerContext
 import org.corespring.container.client.component.{ ComponentUrls, ItemTypeReader }
 import org.corespring.container.client.controllers.angular.AngularModules
 import org.corespring.container.client.controllers.helpers.{ Helpers, LoadClientSideDependencies }
@@ -28,7 +29,8 @@ trait App[T]
   with DependencyResolver
   with Helpers
   with LoadClientSideDependencies
-  with HasLogger {
+  with HasLogger
+  with HasContainerContext {
   self: ItemTypeReader =>
 
   def mode: Mode
@@ -36,8 +38,6 @@ trait App[T]
   override lazy val logger = ContainerLogger.getLogger(context)
 
   def showErrorInUi(implicit rh: RequestHeader): Boolean = jsMode(rh) == "dev"
-
-  implicit def ec: ExecutionContext
 
   def context: String
 
@@ -95,7 +95,7 @@ trait App[T]
   protected def buildJs(scriptInfo: ComponentScriptInfo,
     extras: Seq[String] = Seq.empty)(implicit rh: RequestHeader) = {
     val mainJs = paths(jsSrc)
-    val js = mainJs ++ jsSrc.otherLibs ++ scriptInfo.jsUrl ++ extras
+    val js = jsSrc.otherLibs ++ mainJs ++ scriptInfo.jsUrl ++ extras
     js.distinct.map(resolvePath)
   }
 

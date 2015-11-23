@@ -1,6 +1,6 @@
 package org.corespring.container.client.controllers
 
-import org.corespring.container.client.HasContext
+import org.corespring.container.client.HasContainerContext
 import org.corespring.container.client.hooks.UploadResult
 import play.api.mvc._
 
@@ -14,7 +14,7 @@ object AssetType extends Enumeration {
   val Item = Val("items")
 }
 
-trait Assets extends Controller with HasContext {
+trait Assets extends Controller with HasContainerContext {
   import AssetType._
   def load(t: AssetType, id: String, path: String)(implicit h: RequestHeader): SimpleResult
   def delete(t: AssetType, id: String, path: String)(implicit h: RequestHeader): Future[Option[(Int, String)]]

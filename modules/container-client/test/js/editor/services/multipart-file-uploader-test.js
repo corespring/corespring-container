@@ -86,6 +86,13 @@ describe('multipart-file-uploader', function(){
         code: 'UPLOAD_FAILED', message: 'upload failed!'
       });
     });
+    
+    it('calls onFailure with the xhr response if it is a json string with an \'error\' property', function(){
+      uploadOpts.onUploadFailed({response: '{"error": "custom"}'});
+      expect(onFailure).toHaveBeenCalledWith({
+        code: 'UPLOAD_FAILED', message: 'custom'
+      });
+    });
 
   });
 });

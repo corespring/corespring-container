@@ -1,8 +1,7 @@
 package org.corespring.container.client.controllers.resources
 
-import org.corespring.container.client.HasContext
+import org.corespring.container.client.HasContainerContext
 import org.corespring.container.client.controllers.resources.Session.Errors
-import org.corespring.container.client.controllers.resources.session.ItemPruner
 import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.client.hooks._
 import org.corespring.container.components.outcome.ScoreProcessor
@@ -10,9 +9,9 @@ import org.corespring.container.components.processing.PlayerItemPreProcessor
 import org.corespring.container.components.response.OutcomeProcessor
 import org.corespring.container.logging.ContainerLogger
 import play.api.libs.json._
-import play.api.mvc.{ Action, Controller, SimpleResult }
+import play.api.mvc.{Action, Controller, SimpleResult}
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 object Session {
   object Errors {
@@ -22,7 +21,10 @@ object Session {
   }
 }
 
-trait Session extends Controller with HasContext {
+//case class to enable auto wiring
+case class SessionExecutionContext(default:ExecutionContext, heavyLoad: ExecutionContext)
+
+trait Session extends Controller {
 
   val logger = ContainerLogger.getLogger("Session")
 
@@ -33,6 +35,11 @@ trait Session extends Controller with HasContext {
   def scoreProcessor: ScoreProcessor
 
   def hooks: SessionHooks
+
+  def sessionContext: SessionExecutionContext
+
+  implicit val ec: ExecutionContext = sessionContext.default
+
 
   implicit def toResult(m: StatusMessage): SimpleResult = play.api.mvc.Results.Status(m._1)(Json.obj("error" -> m._2))
 
@@ -97,13 +104,11 @@ trait Session extends Controller with HasContext {
           case Right(fs) => {
             val json = fs.everything
 
-            val itemJson = (json \ "item").as[JsObject]
+          val itemJson = (json \ "item").as[JsObject]
+          val processedItem = itemPreProcessor.preProcessItemForPlayer(itemJson)
+          val sessionJson = (json \ "session").as[JsObject]
 
-            val processedItem = itemPreProcessor.preProcessItemForPlayer(itemJson)
-
-            val sessionJson = (json \ "session").as[JsObject]
-
-            val base = Json.obj(
+          val base = Json.obj(
               "item" -> processedItem,
               "session" -> sessionJson)
 
@@ -155,9 +160,8 @@ trait Session extends Controller with HasContext {
    * @return
    */
   def loadOutcome(id: String) = Action.async {
-    implicit request =>
-      Future {
-        val reponse = hooks.loadOutcome(id)
+    implicit request => Future {
+      val reponse = hooks.loadOutcome(id)
 
         reponse match {
           case Left(err) => InternalServerError(err._2)
@@ -182,7 +186,7 @@ trait Session extends Controller with HasContext {
             }
           }
         }
-      }
+      } (sessionContext.heavyLoad)
   }
   /**
    * Load instructor data for a session.
@@ -253,7 +257,7 @@ trait Session extends Controller with HasContext {
             }
           }
         }
-      }
+      }(sessionContext.heavyLoad)
   }
 
   def completeSession(id: String) = Action.async { implicit request =>

@@ -39,6 +39,7 @@
 
         $scope.itemSession = undefined;
 
+        $scope.scoreToString = scoreToString;
         $scope.submitOrReset = submitOrReset;
         $scope.submitButtonLabel = submitButtonLabel;
 
@@ -120,6 +121,10 @@
           }[$scope.playerMode] || "reset";
         }
 
+        function scoreToString(score) {
+          var percentage = score && score.summary ? score.summary.percentage : NaN;
+          return isNaN(percentage) ? '' : 'Score: ' + percentage + '%';
+        }
       }
 
       return {
@@ -139,13 +144,16 @@
             '    player-outcomes="outcome"',
             '    player-session="itemSession">',
             '  </corespring-isolate-player>',
-            '  <div class="btn-submit-holder">',
-            '    <span ng-hide="playerMode == \'instructor\'">',
-            '      <button class="btn btn-submit" ng-click="submitOrReset()">',
-            '        {{submitButtonLabel()}}',
-            '      </button>',
-            '    </span>',
-            '  </div>',
+            '    <div class="btn-submit-holder" ng-hide="playerMode == \'instructor\'">',
+            '      <div class="score">',
+            '        <span>{{scoreToString(score)}}</span>',
+            '      </div>',
+            '      <span>',
+            '        <button class="btn btn-submit" ng-click="submitOrReset()">',
+            '          {{submitButtonLabel()}}',
+            '        </button>',
+            '      </span>',
+            '    </div>',
             '</div>'
           ].join("\n")
       };

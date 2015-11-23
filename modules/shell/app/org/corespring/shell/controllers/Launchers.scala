@@ -2,18 +2,17 @@ package org.corespring.shell.controllers
 
 import play.api.libs.json._
 import play.api.mvc.{ RequestHeader, Action, Controller }
-import org.corespring.shell.views._
-import org.corespring.container.client.controllers.routes._
+import org.corespring.container.client.controllers.launcher.player.routes.PlayerLauncher
 
 trait Launchers extends Controller {
 
-  def draftEditorFromItem(itemId: String, devEditor : Boolean) = Action { request =>
+  def draftEditorFromItem(itemId: String, devEditor: Boolean) = Action { request =>
 
     Ok(loadDraftEditorPage(baseJson(request) ++ Json.obj(
       "itemId" -> itemId, "devEditor" -> devEditor)))
   }
 
-  def draftEditor(draftId: String, devEditor : Boolean ) = Action { request =>
+  def draftEditor(draftId: String, devEditor: Boolean) = Action { request =>
     val (itemId, draftName) = splitDraftId(draftId)
 
     Ok(loadDraftEditorPage(baseJson(request) ++ Json.obj(
@@ -22,16 +21,15 @@ trait Launchers extends Controller {
       "devEditor" -> devEditor)))
   }
 
-  def itemEditor(itemId: String, devEditor : Boolean ) = Action { request =>
+  def itemEditor(itemId: String, devEditor: Boolean) = Action { request =>
     Ok(loadItemEditorPage(baseJson(request) ++ Json.obj("itemId" -> itemId, "devEditor" -> devEditor)))
   }
 
-  def newItemEditor(devEditor : Boolean ) = Action { request =>
+  def newItemEditor(devEditor: Boolean) = Action { request =>
     Ok(loadItemEditorPage(baseJson(request) ++ Json.obj("devEditor" -> devEditor)))
   }
 
   def playerFromItem(itemId: String) = Action { request =>
-    import org.corespring.container.client.controllers.routes.PlayerLauncher
     val jsCall = PlayerLauncher.playerJs()
     Ok(loadPlayerPage(Json.obj("mode" -> "gather", "itemId" -> itemId, "queryParams" -> queryStringToJson(request)), jsCall.url))
   }
@@ -50,7 +48,6 @@ trait Launchers extends Controller {
 
   def catalog(itemId: String) = Action { request =>
     import org.corespring.shell.views.html.launchers
-    import org.corespring.container.client.controllers.routes.PlayerLauncher
 
     val tabOpts = {
       request.getQueryString("tabs").map { tabs =>
@@ -62,7 +59,7 @@ trait Launchers extends Controller {
   }
   import org.corespring.shell.views.html._
 
-  lazy val editorJsUrl = org.corespring.container.client.controllers.routes.PlayerLauncher.editorJs().url
+  lazy val editorJsUrl = PlayerLauncher.editorJs().url
 
   private def loadDraftEditorPage(opts: JsValue) = launchers.draftEditor(editorJsUrl, opts)
   private def loadItemEditorPage(opts: JsValue) = launchers.itemEditor(editorJsUrl, opts)

@@ -102,6 +102,10 @@
         visible: true,
         readonly: false
       },
+      costForResource: {
+        visible: true,
+        readonly: false
+      },
       credentials: {
         visible: true,
         readonly: false
@@ -162,6 +166,11 @@
         visible: true,
         readonly: false
       },
+      relatedCurriculum: {
+        visible: true,
+        readonly: false,
+        collapse: true
+      },
       reviewsPassed: {
         visible: true,
         readonly: false,
@@ -181,6 +190,10 @@
         collapse: true
       },
       title: {
+        visible: true,
+        readonly: false
+      },
+      workflow: {
         visible: true,
         readonly: false
       }
@@ -268,6 +281,9 @@
 
       applyConfig(profile, 'standards', 'standards', configToStandards);
       applyConfig(profile, "lexile");
+      applyConfig(profile, "relatedCurriculum");
+      applyConfig(profile, "costForResource");
+      applyConfig(profile, "workflow");
 
       applyConfig(profile.otherAlignments, "depthOfKnowledge");
       applyConfig(profile.otherAlignments, "bloomsTaxonomy");
@@ -565,10 +581,24 @@
       return results;
     }
 
+    function getStandardsClusters() {
+      return _($scope.profile.standards).map(function(s) {
+         switch (s.subject) {
+           case "Math":
+             return s.category;
+           case "ELA":
+           case "ELA-Literacy":
+             return s.subCategory;
+         }
+      }).uniq().value();
+    }
+
+
     $scope.$watch('profile.standards', function(newValue, oldValue) {
       if ($scope.profile && $scope.profile.standards) {
         $scope.isLiteracyStandardSelected = containsLiteracyStandard(newValue);
         $scope.standardsGroups = getStandardsGroups();
+        $scope.standardsClusters = getStandardsClusters();
       }
     });
 
@@ -1008,6 +1038,8 @@
       if (!(profile.contributorDetails)) {
         profile.contributorDetails = {};
       }
+
+      profile.workflow = profile.workflow || {};
 
       var contributorDetails = profile.contributorDetails;
 

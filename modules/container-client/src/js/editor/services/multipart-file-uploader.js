@@ -25,12 +25,22 @@ angular.module('corespring-editor.services')
             onUploadProgress: function(){
               console.log('upload progress: ', arguments);
             },
-            onUploadFailed: function() {
-              logger.debug('failed', arguments);
-              onFailure({
+            onUploadFailed: function(xhr) {
+              
+              var error = {
                 code: 'UPLOAD_FAILED',
                 message: 'upload failed!'
-              });
+              };
+
+              try{
+                logger.debug('failed', xhr.response);
+                var response = JSON.parse(xhr.response);
+                error.message = response.error  || 'upload failed';
+              } catch(e) {
+                // do nothing
+              }
+
+              onFailure(error);
             }
           };
 

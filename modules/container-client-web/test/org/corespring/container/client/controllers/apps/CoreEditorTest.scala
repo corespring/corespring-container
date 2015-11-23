@@ -5,6 +5,7 @@ import java.util.concurrent.TimeUnit
 import org.corespring.container.client.component.ComponentUrls
 import org.corespring.container.client.hooks.EditorHooks
 import org.corespring.container.components.model.{ Widget, Client, Component }
+import org.corespring.test.TestContext
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
@@ -21,7 +22,8 @@ import play.api.test.Helpers._
 
 class CoreEditorTest extends Specification with Mockito {
 
-  class scope extends Scope with CoreEditor {
+
+  class scope extends Scope with CoreEditor with TestContext {
 
     override protected def buildJs(scriptInfo: ComponentScriptInfo, extras: Seq[String])(implicit rh: RequestHeader): Seq[String] = Seq.empty
 
@@ -50,7 +52,6 @@ class CoreEditorTest extends Specification with Mockito {
 
     override def hooks: EditorHooks = mockHooks
 
-    override implicit def ec: ExecutionContext = ExecutionContext.Implicits.global
 
     override def mode: Mode = Mode.Dev
 
