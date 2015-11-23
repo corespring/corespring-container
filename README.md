@@ -140,4 +140,3 @@ Then go to [http://localhost:9000](http://localhost:9000)
 * When you start the play server you trigger the grunt run task. This will set up a watch on the container-client's
 client side resources.
 
-
