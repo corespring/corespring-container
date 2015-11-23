@@ -147,18 +147,34 @@ script(type="text/ng-template", id="/templates/profile")
             hr/
 
           h6 Standards
-          .form-group(ng-repeat="c in standardsGroups",class="standards")
+          .form-group.standards(ng-repeat="c in standardsGroups")
             .col-sm-3
               image(ng-src="{{c.imageUrl}}", ng-if="c.hasImage")
               label(ng-if="!c.hasImage") {{ c.label }}
             .col-sm-9.no-input
-              input(type="hidden", multiple, ui-select2="{tags:[],dropdownCss:{display:'none'}}",
-              ng-model="c.standards", style="width: 100%;")
+              input(
+                type="hidden",
+                multiple,
+                ui-select2="{tags:[],dropdownCss:{display:'none'}}",
+                ng-model="c.standards",
+                style="width: 100%;")
           br/
           h6 Standard Clusters
-          .controls.select2-container-multi
-            ul.select2-choices
-              li.select2-search-choice(ng-repeat="cluster in standardsClusters",style="padding-left: 5px") {{cluster}}
+          .form-group.standards
+            .col-sm-12.no-input
+              input(
+                type="hidden",
+                multiple,
+                ui-select2="{tags:[],dropdownCss:{display:'none'}}",
+                ng-model="clusters",
+                style="width: 100%;")
+
+            .controls.select2-container-multi
+              ul.select2-choices
+                li.select2-search-choice(
+                  ng-repeat="cluster in clusters",
+                  style="padding-left: 5px") {{cluster.text}}
+
           br/
 
         +h_form

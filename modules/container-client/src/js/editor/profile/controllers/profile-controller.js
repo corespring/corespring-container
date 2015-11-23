@@ -2,11 +2,12 @@
 
   "use strict";
 
-  angular.module('corespring-editor.controllers')
+  angular.module('corespring-editor.profile.controllers')
     .controller('ProfileController', [
       '$q',
       '$scope',
       '$timeout',
+      'ClusterHelper',
       'CollectionService',
       'ConfigurationService',
       'DataQueryService',
@@ -24,6 +25,7 @@
     $q,
     $scope,
     $timeout,
+    ClusterHelper,
     CollectionService,
     ConfigurationService,
     DataQueryService,
@@ -175,7 +177,7 @@
         collapse: true
       },
       reviewsPassedOther: {
-        //here you can only set the value if the value of reviewsPassed is 'Other'
+        //here you can only set the "value" if the value of reviewsPassed is 'Other'
         //visibility and readonly are controlled by the formModel for reviewsPassed
       },
       sourceUrl: {
@@ -446,6 +448,7 @@
 
       query: function(query) {
         DataQueryService.query("standards", createStandardQuery(query.term), function(results) {
+          console.log("standardsAdapter.query", results);
           query.callback({
             //Most other dataProviders are filtered through a ng filter that is applied in jade.
             //This filter is applied here bc. in jade we don't have access to the dataProvider.
@@ -455,7 +458,7 @@
       },
 
       initSelection: function(element, callback) {
-
+        console.log("standardsAdapter.initSelection");
       },
 
       formatSelection: function(standard) {
@@ -478,17 +481,15 @@
       }
     };
 
-    //for the
     $scope.filterStandardsAdapter = _.clone($scope.standardsAdapter);
     $scope.filterStandardsAdapter.placeholder = '';
     $scope.filterStandardsAdapter.minimumInputLength = 0;
     $scope.filterStandardsAdapter.initSelection = function(element, callback) {
-      DataQueryService.query("standards", createFilteredStandardQuery(""), function(results) {
-        //callback(filterStandardsByConfig(results));
-      });
+
     };
     $scope.filterStandardsAdapter.query = function(query) {
       DataQueryService.query("standards", createFilteredStandardQuery(query.term), function(results) {
+        console.log("filterStandardsAdapter.query", results);
         query.callback({
           results: filterStandardsByConfig(results)
         });
@@ -576,33 +577,13 @@
       return results;
     }
 
-    function getStandardsClusters() {
-      return _($scope.profile.standards).map(function(s) {
-        switch (s.subject) {
-          case "Math":
-            return s.category;
-          case "ELA":
-          case "ELA-Literacy":
-            return s.subCategory;
-        }
-      }).uniq().without(undefined).value();
-    }
-
     $scope.$watch('profile.standards', function(newValue, oldValue) {
       if ($scope.profile && $scope.profile.standards) {
         $scope.isLiteracyStandardSelected = containsLiteracyStandard($scope.profile.standards);
         $scope.standardsGroups = getStandardsGroups();
-        $scope.standardsClusters = getStandardsClusters();
+        updateClusters();
       }
     });
-
-    function onStandardsUpdated(){
-      if ($scope.profile && $scope.profile.standards) {
-        $scope.isLiteracyStandardSelected = containsLiteracyStandard($scope.profile.standards);
-        $scope.standardsGroups = getStandardsGroups();
-        $scope.standardsClusters = getStandardsClusters();
-      }
-    }
 
     /**
      * The selected standards are displayed in groups
@@ -612,6 +593,7 @@
      * and dependent properties
      */
     $scope.$watch('standardsGroups', function(newValue, oldValue) {
+      console.log("standardsGroups", newValue);
       if ($scope.profile && $scope.profile.standards && $scope.standardsGroups) {
         var newStandards = _.chain(newValue).pluck('standards').flatten().pluck('id').value();
         var oldStandards = _.chain($scope.profile.standards).pluck('id').value();
@@ -620,13 +602,24 @@
             return !(standard && _.contains(newStandards, standard.id));
           });
           $scope.isLiteracyStandardSelected = containsLiteracyStandard($scope.profile.standards);
-          var standardClusters = getStandardsClusters();
-          _.remove($scope.standardsClusters, function(cluster){
-            return !_.contains(standardClusters, cluster);
-          });
+          updateClusters();
         }
       }
     }, true); //watch nested properties
+
+    function updateClusters() {
+      ClusterHelper.updateClusters($scope.profile.clusters, $scope.profile.standards);
+      $scope.clusters = ClusterHelper.getClustersForUi($scope.profile.clusters);
+    }
+
+    $scope.$watchCollection('clusters', function(newValue, oldValue) {
+      if (_.isArray(newValue) && _.isArray(oldValue)) {
+        if (newValue.length < oldValue.length) {
+          var dif = _.difference(oldValue, newValue);
+          ClusterHelper.hideCluster($scope.profile.clusters, dif.pop());
+        }
+      }
+    });
 
     //----------------------------------------------------------------
     // list of component types used in the item
@@ -791,18 +784,18 @@
 
         var count = categorySubjectList.length;
 
-        function callbackWhenDone(){
-          if(--count <= 0){
+        function callbackWhenDone() {
+          if (--count <= 0) {
             callback(results);
           }
         }
 
-        function onSuccess(result){
+        function onSuccess(result) {
           results.push(result);
           callbackWhenDone();
         }
 
-        function onError(err){
+        function onError(err) {
           callbackWhenDone();
         }
 
@@ -1024,7 +1017,7 @@
     });
 
     $scope.getLicenseTypeUrl = function(licenseType) {
-      if(!_.isString(licenseType) || _.isEmpty(licenseType)){
+      if (!_.isString(licenseType) || _.isEmpty(licenseType)) {
         return undefined;
       }
       return STATIC_PATHS.assets + '/licenseTypes/' + licenseType.replace(" ", "-") + '.png';
@@ -1052,6 +1045,9 @@
       }
       if (!_.isArray(profile.standards)) {
         profile.standards = [];
+      }
+      if (!_.isArray(profile.clusters)) {
+        profile.clusters = [];
       }
       if (!(profile.otherAlignments)) {
         profile.otherAlignments = {};
@@ -1165,8 +1161,7 @@
       ifCollectionIdIsValid(collectionId).then(function(collection) {
         updateItemCollection(collection);
         $scope.collectionId = collection.key;
-        ItemService.saveCollectionId(collectionId, function(result) {
-        });
+        ItemService.saveCollectionId(collectionId, function(result) {});
       });
     };
 

@@ -102,8 +102,9 @@ describe('profile controller', function() {
   }
 
   beforeEach(angular.mock.module('corespring-common.services'));
-  beforeEach(angular.mock.module('corespring-editor.controllers'));
   beforeEach(angular.mock.module('corespring-editor.services'));
+  beforeEach(angular.mock.module('corespring-editor.profile.services'));
+  beforeEach(angular.mock.module('corespring-editor.profile.controllers'));
 
   var
     mockCollectionService,
@@ -213,6 +214,8 @@ describe('profile controller', function() {
 
     it("initialises empty sub-properties", function() {
       expect(scope.item.profile).not.toBe(null);
+      expect(scope.item.profile.clusters).not.toBe(null);
+      expect(scope.item.profile.standards).not.toBe(null);
       expect(scope.item.profile.taskInfo).toEqual({
         subjects: {}
       });
@@ -346,29 +349,16 @@ describe('profile controller', function() {
 
     describe('standardsClusters', function(){
       beforeEach(makeProfileController);
-      function addStandard(subject){
+      function addStandard(){
         scope.item.profile.standards = [{
-          subject: subject,
-          category: "category-value",
-          subCategory: "sub-category-value"
+          cluster: 'some cluster text',
+          dotNotation: 'A.B.C'
         }];
         scope.$apply();
       }
-      it('should add sub-category as cluster, if ELA standard is selected', function(){
-        addStandard("ELA");
-        expect(scope.standardsClusters).toEqual(['sub-category-value']);
-      });
-      it('should add sub-category as cluster, if ELA-Literacy standard is selected', function(){
-        addStandard("ELA-Literacy");
-        expect(scope.standardsClusters).toEqual(['sub-category-value']);
-      });
-      it('should add category as cluster, if Math standard is selected', function(){
-        addStandard("Math");
-        expect(scope.standardsClusters).toEqual(['category-value']);
-      });
-      it('should not add any cluster, if any other standard is selected', function(){
-        addStandard("Any");
-        expect(scope.standardsClusters).toEqual([]);
+      it('should add standard.cluster as cluster', function(){
+        addStandard();
+        expect(scope.profile.clusters).toEqual([{text: 'some cluster text', source:'A.B.C', hidden: false}]);
       });
     });
   });

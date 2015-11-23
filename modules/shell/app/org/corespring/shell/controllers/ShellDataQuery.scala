@@ -54,12 +54,29 @@ trait ShellDataQueryHooks extends ContainerDataQueryHooks {
       case "mediaType" => Json.toJson(mediaType)
       case "priorUses" => Json.toJson(priorUses)
       case "reviewsPassed" => Json.toJson(reviewsPassed)
-      case "standards" => Json.toJson(StandardsDataQuery.list(standards, query))
+      case "standards" => Json.toJson(addCluster(StandardsDataQuery.list(standards, query)))
       case "standardsTree" => Json.toJson(standardsTree)
       case "subjects.primary" => Json.toJson(StandardsDataQuery.list(subjects, query))
       case "subjects.related" => Json.toJson(StandardsDataQuery.list(subjects, query))
     }
     Right(out.as[JsArray])
+  }
+
+  private def addCluster(standards: Seq[JsValue]) = {
+    def getCluster(standard: JsValue, property: String) = {
+      (standard \ property).asOpt[String] match {
+        case Some(s) => Json.obj("cluster" -> s)
+        case _ => Json.obj("cluster" -> "")
+      }
+    }
+    standards. map(s => {
+      (s \ "subject").asOpt[String] match {
+        case Some("ELA") => s.as[JsObject] ++ getCluster(s, "subCategory")
+        case Some("ELA-Literacy") => s.as[JsObject] ++ getCluster(s, "subCategory")
+        case Some("Math") => s.as[JsObject] ++ getCluster(s, "category")
+        case _ => s
+      }
+    })
   }
 
   override def findOne(topic: String, id: String)(implicit header: RequestHeader): Future[Either[(Int, String), Option[JsValue]]] = Future {

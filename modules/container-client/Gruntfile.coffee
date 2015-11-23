@@ -61,8 +61,11 @@ module.exports = (grunt) ->
     .replace('///', '//')
 
   ###
-  Remove grunt-contrib paths from stacktrace output
-  This is a hack to clean up the summary output of jasmine
+  Clean up the summary output of jasmine
+  by removing grunt-contrib-jasmine paths from stacktrace output
+  This is a hack of course, but helpful.
+  Unfortunately grunt-contrib-jasmine doesn't allow us to replace
+  the reporter
   ###
   gruntLogWriteln = grunt.log.writeln
   grunt.log.writeln = (s) ->
