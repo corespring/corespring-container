@@ -606,6 +606,31 @@
       }
     }, true); //watch nested properties
 
+
+    //----------------------------------------------------------------
+    // standard clusters
+    //----------------------------------------------------------------
+
+    DataQueryService.list("standardClusters", function(result) {
+      $scope.mathClusterOptions = getGroupOptions(result, /Math/i);
+      $scope.elaClusterOptions = getGroupOptions(result, /(ELA|ELA-Literacy)/i);
+
+      function getGroupOptions(results, groupRegExp){
+        return _(results)
+          .filter(function(c){
+            return groupRegExp.test(c.subject);
+          })
+          .sortBy("cluster")
+          .map(function(groupAndCluster){
+            return {
+              id: groupAndCluster.cluster,
+              key: groupAndCluster.cluster
+            };
+          })
+          .value();
+      }
+    });
+
     function updateClusters() {
       ClusterHelper.updateClustersFromStandards($scope.profile.standardClusters, $scope.profile.standards);
       $scope.clusters = addIdForSelect2(ClusterHelper.getClustersForUi($scope.profile.standardClusters));
@@ -632,26 +657,6 @@
         }
       }
     }
-
-    DataQueryService.list("standardClusters", function(result) {
-      $scope.mathClusterOptions = getGroupOptions(result, /Math/i);
-      $scope.elaClusterOptions = getGroupOptions(result, /(ELA|ELA-Literacy)/i);
-
-      function getGroupOptions(results, groupRegExp){
-        return _(results)
-          .filter(function(c){
-            return groupRegExp.test(c.subject);
-          })
-          .sortBy("cluster")
-          .map(function(groupAndCluster){
-            return {
-              id: _.uniqueId(),
-              key: groupAndCluster.cluster
-            };
-          })
-          .value();
-      }
-    });
 
     $scope.$watch('additionalCluster', addClusterToProfile);
 

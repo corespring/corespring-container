@@ -11,7 +11,7 @@ describe('profile controller', function() {
       return this.defer.promise;
     };
 
-    this.setListResult = function(listResult){
+    this.setListResult = function(listResult) {
       this.defer = q.defer();
       this.defer.resolve(listResult);
     };
@@ -124,9 +124,9 @@ describe('profile controller', function() {
     mockProfileFormatter = new MockProfileFormatter();
     mockStandardQueryCreator = new MockStandardQueryCreator();
     mockEditorChangeWatcher = {
-      makeWatcher: jasmine.createSpy('makeWatcher').and.callFake(function(name, fn, scope){
-        return function(n,o){
-          if(n && n !== o){
+      makeWatcher: jasmine.createSpy('makeWatcher').and.callFake(function(name, fn, scope) {
+        return function(n, o) {
+          if (n && n !== o) {
             fn(n);
           }
         };
@@ -144,7 +144,9 @@ describe('profile controller', function() {
       $provide.value('ItemService', mockItemService);
       $provide.value('ProfileFormatter', mockProfileFormatter);
       $provide.value('StandardQueryCreator', mockStandardQueryCreator);
-      $provide.constant('STATIC_PATHS', {assets: imagePath});
+      $provide.constant('STATIC_PATHS', {
+        assets: imagePath
+      });
       $provide.value('EditorChangeWatcher', mockEditorChangeWatcher);
     });
 
@@ -158,7 +160,10 @@ describe('profile controller', function() {
     controller = $controller;
     configurationService = ConfigurationService;
     configurationService.setConfig(config);
-    mockCollectionService.setListResult([{key:'some collectionId', value:'some collection name'}]);
+    mockCollectionService.setListResult([{
+      key: 'some collectionId',
+      value: 'some collection name'
+    }]);
   }));
 
   function makeProfileController() {
@@ -203,19 +208,17 @@ describe('profile controller', function() {
     beforeEach(makeProfileController);
 
     it('should init', function() {
-      expect(ctrl).not.toBe(null);
-      expect(ctrl).not.toBe(undefined);
+      expect(ctrl).toBeTruthy();
     });
 
     it("loads item on init", function() {
-      expect(scope.item).not.toBe(null);
-      expect(scope.item).not.toBe(undefined);
+      expect(scope.item).toBeTruthy();
     });
 
     it("initialises empty sub-properties", function() {
-      expect(scope.item.profile).not.toBe(null);
-      expect(scope.item.profile.clusters).not.toBe(null);
-      expect(scope.item.profile.standards).not.toBe(null);
+      expect(scope.item.profile).toBeTruthy();
+      expect(scope.item.profile.standardClusters).toBeTruthy();
+      expect(scope.item.profile.standards).toBeTruthy();
       expect(scope.item.profile.taskInfo).toEqual({
         subjects: {}
       });
@@ -243,15 +246,39 @@ describe('profile controller', function() {
 
   describe("collectionId", function() {
     it("loads collections", function() {
-      var expectedDataProvider = [{key:'key-1', value:'value-1'},{key:'key-2', value:'value-2'}];
+      var expectedDataProvider = [{
+        key: 'key-1',
+        value: 'value-1'
+      }, {
+        key: 'key-2',
+        value: 'value-2'
+      }];
       mockCollectionService.setListResult(expectedDataProvider);
       makeProfileController();
       expect(scope.collectionIdDataProvider).toEqual(expectedDataProvider);
     });
 
     it("sort collections by name", function() {
-      var inputDataProvider = [{key:'key-1', value:'value-3'}, {key:'key-2', value:'value-1'},{key:'key-3', value:'value-2'}];
-      var expectedDataProvider = [{key:'key-2', value:'value-1'},{key:'key-3', value:'value-2'}, {key:'key-1', value:'value-3'}];
+      var inputDataProvider = [{
+        key: 'key-1',
+        value: 'value-3'
+      }, {
+        key: 'key-2',
+        value: 'value-1'
+      }, {
+        key: 'key-3',
+        value: 'value-2'
+      }];
+      var expectedDataProvider = [{
+        key: 'key-2',
+        value: 'value-1'
+      }, {
+        key: 'key-3',
+        value: 'value-2'
+      }, {
+        key: 'key-1',
+        value: 'value-3'
+      }];
       mockCollectionService.setListResult(inputDataProvider);
       makeProfileController();
       expect(scope.collectionIdDataProvider).toEqual(expectedDataProvider);
@@ -259,9 +286,22 @@ describe('profile controller', function() {
 
     describe("save", function() {
       beforeEach(function() {
-        var collections = [{key:'key-1', value:'value-1'}, {key:'key-2', value:'value-2'},{key:'key-3', value:'value-3'}];
+        var collections = [{
+          key: 'key-1',
+          value: 'value-1'
+        }, {
+          key: 'key-2',
+          value: 'value-2'
+        }, {
+          key: 'key-3',
+          value: 'value-3'
+        }];
         mockCollectionService.setListResult(collections);
-        mockItemService.loadResult = {collection:{id:'key-1'}};
+        mockItemService.loadResult = {
+          collection: {
+            id: 'key-1'
+          }
+        };
         makeProfileController();
         mockItemService.saveCollectionIdCalls = [];
         scope.$apply();
@@ -277,21 +317,38 @@ describe('profile controller', function() {
       });
     });
 
-    describe("defaultCollection", function(){
+    describe("defaultCollection", function() {
       beforeEach(function() {
-        mockCollectionService.setListResult([{key:'key-1', value:'val-1'}, {key:'default-id', value:'default'}, {key:'key-2', value:'val-2'}]);
+        mockCollectionService.setListResult([{
+          key: 'key-1',
+          value: 'val-1'
+        }, {
+          key: 'default-id',
+          value: 'default'
+        }, {
+          key: 'key-2',
+          value: 'val-2'
+        }]);
       });
       it("is selected if collectionId is not set in item", function() {
         makeProfileController();
         expect(scope.collectionId).toEqual('default-id');
       });
       it("is selected if collectionId can not be found in collections", function() {
-        mockItemService.loadResult = {collection:{id:'non-existent-id'}};
+        mockItemService.loadResult = {
+          collection: {
+            id: 'non-existent-id'
+          }
+        };
         makeProfileController();
         expect(scope.collectionId).toEqual('default-id');
       });
       it("is not selected if collectionId is set in item", function() {
-        mockItemService.loadResult = {collection:{id:'key-1'}};
+        mockItemService.loadResult = {
+          collection: {
+            id: 'key-1'
+          }
+        };
         makeProfileController();
         expect(scope.collectionId).toEqual('key-1');
       });
@@ -344,21 +401,6 @@ describe('profile controller', function() {
         }];
         scope.$apply();
         expect(scope.isLiteracyStandardSelected).toEqual(false);
-      });
-    });
-
-    describe('standardsClusters', function(){
-      beforeEach(makeProfileController);
-      function addStandard(){
-        scope.item.profile.standards = [{
-          cluster: 'some cluster text',
-          dotNotation: 'A.B.C'
-        }];
-        scope.$apply();
-      }
-      it('should add standard.cluster as cluster', function(){
-        addStandard();
-        expect(scope.profile.standardClusters).toEqual([{text: 'some cluster text', source:'A.B.C', hidden: false}]);
       });
     });
   });
@@ -445,7 +487,122 @@ describe('profile controller', function() {
         expect(scope.depthOfKnowledgeDataProvider).toEqual(expectedDataProvider);
       });
     });
+  });
 
+  describe('standard clusters', function() {
+
+    describe('auto tagging', function() {
+      beforeEach(makeProfileController);
+
+      it('should add cluster for a standard', function() {
+        scope.item.profile.standards = [{
+          cluster: 'some cluster text',
+          dotNotation: 'A.B.C'
+        }];
+        scope.$apply();
+        expect(scope.profile.standardClusters).toEqual([{
+          text: 'some cluster text',
+          source: 'A.B.C',
+          hidden: false
+        }]);
+      });
+
+      it('should remove cluster if related standard is removed from standards', function() {
+        scope.item.profile.standards = [{
+          cluster: 'some cluster text',
+          dotNotation: 'A.B.C'
+        }];
+        scope.$apply();
+        scope.item.profile.standards = [];
+        scope.$apply();
+        expect(scope.profile.standardClusters).toEqual([]);
+      });
+    });
+
+    describe('manual clusters', function() {
+      describe("clusterOptions", function() {
+
+        beforeEach(function() {
+          mockDataQueryService.listResult = [
+            {
+              subject: 'ELA',
+              cluster: 'cluster-a'
+            },
+            {
+              subject: 'ELA-Literacy',
+              cluster: 'cluster-b'
+            },
+            {
+              subject: 'Math',
+              cluster: 'cluster-c'
+            },
+            {
+              subject: 'Other',
+              cluster: 'cluster-d'
+            }
+          ];
+          makeProfileController();
+        });
+
+        function keyId(value) {
+          return {
+            id: value,
+            key: value
+          };
+        }
+
+        describe("ela", function() {
+          it("loads data", function() {
+            expect(scope.elaClusterOptions).toEqual([keyId('cluster-a'), keyId('cluster-b')]);
+          });
+        });
+
+        describe("math", function() {
+          it("loads data", function() {
+            expect(scope.mathClusterOptions).toEqual([keyId('cluster-c')
+            ]);
+          });
+        });
+      });
+
+      describe('selectedClusterFilter', function() {
+        var cluster;
+        var option;
+
+        beforeEach(function() {
+          cluster = {
+            text: "some cluster"
+          };
+          option = {
+            key: "some cluster"
+          };
+          makeProfileController();
+        });
+        it('should return false if the cluster can be found in the profile', function() {
+          scope.profile.standardClusters = [cluster];
+          expect(scope.selectedClusterFilter(option)).toBe(false);
+        });
+        it('should return true if the cluster cannot be found in the profile', function() {
+          scope.profile.standardClusters = [];
+          expect(scope.selectedClusterFilter(option)).toBe(true);
+        });
+      });
+
+      describe('additionalCluster', function() {
+        beforeEach(makeProfileController);
+        it('setting it to a string should add a manual cluster to the profile ', function() {
+          scope.additionalCluster = ['some cluster'];
+          scope.$apply();
+          expect(scope.profile.standardClusters).toEqual([
+            {
+              text: 'some cluster',
+              source: 'manual',
+              hidden: false
+            }
+          ]);
+        });
+      });
+    });
   });
 
   describe("copyright related dates", function() {
@@ -936,7 +1093,9 @@ describe('profile controller', function() {
             value: "some title"
           },
           workflow: {
-            value: {setup: true}
+            value: {
+              setup: true
+            }
           }
         }
       };
@@ -1017,7 +1176,9 @@ describe('profile controller', function() {
           expect(scope.taskInfo.title).toEqual("some title");
         });
         it("workflow", function() {
-          expect(scope.profile.workflow).toEqual({setup: true});
+          expect(scope.profile.workflow).toEqual({
+            setup: true
+          });
         });
       }
 
@@ -1142,10 +1303,25 @@ describe('profile controller', function() {
           expect(actual).toEqual(keyValueList(["one", "two"]));
         });
 
-        it("should filter items by key or value", function(){
+        it("should filter items by key or value", function() {
           scope.formModels.collectionId.options = ["k1", "v2"];
-          var actual = _.filter([{key:'k1', value:'v1'},{key:'k2', value:'v2'},{key:'k3', value:'v3'}], scope.collectionIdFilter);
-          expect(actual).toEqual([{key:'k1', value:'v1'},{key:'k2', value:'v2'}]);
+          var actual = _.filter([{
+            key: 'k1',
+            value: 'v1'
+          }, {
+            key: 'k2',
+            value: 'v2'
+          }, {
+            key: 'k3',
+            value: 'v3'
+          }], scope.collectionIdFilter);
+          expect(actual).toEqual([{
+            key: 'k1',
+            value: 'v1'
+          }, {
+            key: 'k2',
+            value: 'v2'
+          }]);
         });
 
       });
