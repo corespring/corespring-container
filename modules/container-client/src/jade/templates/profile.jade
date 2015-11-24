@@ -155,6 +155,11 @@ script(type="text/ng-template", id="/templates/profile")
               input(type="hidden", multiple, ui-select2="{tags:[],dropdownCss:{display:'none'}}",
               ng-model="c.standards", style="width: 100%;")
           br/
+          h6 Standard Clusters
+          .controls.select2-container-multi
+            ul.select2-choices
+              li.select2-search-choice(ng-repeat="cluster in standardsClusters",style="padding-left: 5px") {{cluster}}
+          br/
 
         +h_form
           h6 Other Alignments
@@ -192,6 +197,13 @@ script(type="text/ng-template", id="/templates/profile")
                 input.form-control(id="lexile", ng-model="profile.lexile",
                 ng-readonly="formModels.lexile.readonly")
                 span.measure L
+
+          +panel("relatedCurriculum", "Related Curriculum")
+            .panel-body
+              +field("relatedCurriculum", "Related Curriculum")
+                input.form-control(id="relatedCurriculum",
+                type="text",
+                ng-model="otherAlignments.relatedCurriculum")
 
         +h_form
           h6 History
@@ -256,6 +268,17 @@ script(type="text/ng-template", id="/templates/profile")
 
               +configurableField("sourceUrl","Website URL", "contributorDetails.sourceUrl")
 
+              .form-group(ng-show="formModels.costForResource.visible")
+                label.col-sm-3.control-label Cost For Resource
+                .col-sm-9
+                  .input-group.cost-for-resource
+                    .input-group-addon $
+                    input.form-control(id="costForResource",
+                    type="number",
+                    ng-model="contributorDetails.costForResource")
+                    .input-group-addon .00
+
+
           +panel("additionalMediaCopyrights", "Additional Media Copyright")
             .panel-body
               additional-copyright-information-for-profile(copyrights="contributorDetails.additionalCopyrights",
@@ -278,6 +301,25 @@ script(type="text/ng-template", id="/templates/profile")
                       img(ng-show="contributorDetails.licenseType",ng-src="{{getLicenseTypeUrl(contributorDetails.licenseType)}}")
                     td(ng-if="contributorDetails.licenseType != 'Other'")
                       a(href="http://creativecommons.org/licenses/",target="_blank") Learn More
+
+        +h_form
+          h6 Status
+          .panel-body
+            .form-group(ng-show="formModels.workflow.visible")
+              .col-sm-9.workflow
+                div
+                  input(id="workflow-setup",type="checkbox",ng-model="profile.workflow.setup")
+                  label(for="workflow-setup") Setup
+                div
+                  input(id="workflow-tagged",type="checkbox",ng-model="profile.workflow.tagged")
+                  label(for="workflow-tagged") Tagged
+                div
+                  input(id="workflow-standards",type="checkbox",ng-model="profile.workflow.standardsAligned")
+                  label(for="workflow-standards") Standards Aligned
+                div
+                  input(id="workflow-qa",type="checkbox",ng-model="profile.workflow.qaReview")
+                  label(for="workflow-qa") QA Review
+
 
     .col-md-6
       div(ng-if="previewOn", profile-preview="", ng-model="item")

@@ -1,6 +1,6 @@
 package org.corespring.container.client.controllers
 
-import org.corespring.container.client.V2PlayerConfig
+import org.corespring.container.client.{HasContainerContext, V2PlayerConfig}
 import org.corespring.container.client.controllers.launcher.{ JsBuilder, JsResource }
 import org.corespring.container.client.hooks.{ PlayerJs, PlayerLauncherHooks }
 import org.corespring.container.logging.ContainerLogger
@@ -8,13 +8,9 @@ import play.api.http.ContentTypes
 import play.api.libs.json.{ JsObject, Json }
 import play.api.mvc.{ Session, _ }
 
-import scala.concurrent.ExecutionContext
-
-trait Launcher extends Controller {
+trait Launcher extends Controller with HasContainerContext {
 
   def playerConfig: V2PlayerConfig
-
-  implicit def ec: ExecutionContext
 
   lazy val logger = ContainerLogger.getLogger("PlayerLauncher")
 

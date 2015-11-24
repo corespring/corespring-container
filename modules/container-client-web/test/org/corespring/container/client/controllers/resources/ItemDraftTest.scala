@@ -3,6 +3,7 @@ package org.corespring.container.client.controllers.resources
 import org.corespring.container.client.controllers.resources.ItemDraft.Errors
 import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.client.hooks._
+import org.corespring.container.client.integration.ContainerExecutionContext
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
@@ -16,7 +17,8 @@ import scala.concurrent.{ ExecutionContext, Future }
 class ItemDraftTest extends Specification with Mockito {
 
   trait BaseDraft extends ItemDraft {
-    override implicit def ec: ExecutionContext = ExecutionContext.Implicits.global
+
+    override def containerContext: ContainerExecutionContext = new ContainerExecutionContext(ExecutionContext.global)
 
     override protected def componentTypes: Seq[String] = Seq.empty
 

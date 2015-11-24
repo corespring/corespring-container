@@ -309,18 +309,26 @@ describe('SupportingMaterials', function() {
 
       it('returns error if file is too big', function(){
         var size = 1000000;
-        scope.imageService.addFile({size: size}, onComplete, onProgress);
+        scope.imageService.addFile({size: size, type: 'image/png'}, onComplete, onProgress);
         expect(onComplete).toHaveBeenCalledWith(imageUtils.fileTooBigError(size, 500));
         expect(supportingMaterialsService.addAsset).not.toHaveBeenCalled();
       });
 
-      it('calls SupportingMaterialsService.addAsset', function(){
+      it('returns error if type is not acceptable', function(){
         scope.imageService.addFile({size: 10}, onComplete, onProgress);
-        expect(supportingMaterialsService.addAsset).toHaveBeenCalledWith('material', {size:10}, jasmine.any(Function), jasmine.any(Function));
+        expect(onComplete).toHaveBeenCalledWith({
+         code: imageUtils.errors.UNACCEPTABLE_TYPE,
+         message: jasmine.any(String) 
+        });
+      });
+
+      it('calls SupportingMaterialsService.addAsset', function(){
+        scope.imageService.addFile({size: 10, type: 'image/png'}, onComplete, onProgress);
+        expect(supportingMaterialsService.addAsset).toHaveBeenCalledWith('material', {size:10, type: 'image/png'}, jasmine.any(Function), jasmine.any(Function));
       });
 
       it('calls scope.$emit with itemChanged', assertItemChangedEmitted(function(){
-        scope.imageService.addFile({size: 10}, onComplete, onProgress);
+        scope.imageService.addFile({size: 10, type: 'image/png'}, onComplete, onProgress);
         onCompleteCallback();
       }));
 

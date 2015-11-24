@@ -68,7 +68,11 @@ trait CheckS3CacheFilter extends Filter {
       body
     } catch {
       case t: Throwable => {
-        logger.info(s"function=tryToLoadFromS3#tryS3 - an error occured in the body")
+        logger.info(s"function=tryToLoadFromS3#tryS3 - an error occured in the body: ${t.getMessage}")
+        if(logger.isTraceEnabled){
+          t.printStackTrace()
+        }
+        logger.info(s"function=tryToLoadFromS3#tryS3 - call fallback")
         fallback
       }
     }
@@ -131,6 +135,7 @@ trait CheckS3CacheFilter extends Filter {
           val inputStream = new PipedInputStream(outputStream)
 
           val iteratee = Iteratee.foreach[Array[Byte]] { bytes =>
+            logger.trace(s"iteratee - write bytes...")
             outputStream.write(bytes)
           }
 
@@ -149,6 +154,7 @@ trait CheckS3CacheFilter extends Filter {
           val putResult = s3.putObject(bucket, path, inputStream, metadata)
           val o: Future[SimpleResult] = f.andThen {
             case result =>
+              logger.trace(s"function=apply, result=$result")
               logger.debug(s"function=apply, id=${rh.id} close the output and input streams")
               // Close the output stream whether there was an error or not
               outputStream.close()
@@ -157,6 +163,7 @@ trait CheckS3CacheFilter extends Filter {
               result.get
           }.map(_ => res.withHeaders(ETAG -> putResult.getETag))
           o
+
         }
       }, rh))
     } else {

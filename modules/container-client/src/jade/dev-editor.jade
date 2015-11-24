@@ -26,15 +26,15 @@ block content
 
       tr
         td.pane(ng-show="panes.html")
-          .xhtml-pane(ui-ace,
+          .xhtml-pane(
               ng-model="xhtml",
               ui-ace="{mode: 'html', useWrapMode : true, onLoad: aceLoaded, onChange: aceChanged }")
         td.pane(ng-show="panes.json")
-          .json-pane(ui-ace
+          .json-pane(
               ng-model="json",
               ui-ace="{mode: 'json', useWrapMode : true, onLoad: aceLoaded, onChange: aceJsonChanged }")
         td.pane(ng-show="panes.scoring")
-          .custom-js-pane(ui-ace,
+          .custom-js-pane(
               ng-model="customScoringJs",
               ui-ace="{mode: 'javascript', useWrapMode : true }")
         td.pane(ng-show="panes.player", keep-updating-player-size="true")

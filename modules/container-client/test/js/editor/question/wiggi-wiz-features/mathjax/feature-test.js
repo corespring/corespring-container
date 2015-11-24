@@ -1,6 +1,6 @@
 describe('mathjax feature', function() {
 
-  var wiggiMathJaxFeatureDef, rootScope;
+  var feature, rootScope;
 
   var MathJaxService = {
     parseDomForMath: function() {}
@@ -13,33 +13,33 @@ describe('mathjax feature', function() {
   }));
 
   beforeEach(inject(function(WiggiMathJaxFeatureDef, $rootScope) {
-    wiggiMathJaxFeatureDef = new WiggiMathJaxFeatureDef();
+    feature = new WiggiMathJaxFeatureDef();
     rootScope = $rootScope;
   }));
 
   describe('initialization', function() {
     it('should set name', function() {
-      expect(wiggiMathJaxFeatureDef.name).toEqual('mathjax');
+      expect(feature.name).toEqual('mathjax');
     });
 
     it('should set attribute name', function() {
-      expect(wiggiMathJaxFeatureDef.attributeName).toEqual('mathjax');
+      expect(feature.attributeName).toEqual('mathjax');
     });
 
     it('should set draggable to be true', function() {
-      expect(wiggiMathJaxFeatureDef.draggable).toEqual(true);
+      expect(feature.draggable).toEqual(true);
     });
 
     it('should set insertInline to be true', function() {
-      expect(wiggiMathJaxFeatureDef.insertInline).toEqual(true);
+      expect(feature.insertInline).toEqual(jasmine.any(Function));
     });
 
     it('should set icon class', function() {
-      expect(wiggiMathJaxFeatureDef.iconclass).toEqual('fa math-sum');
+      expect(feature.iconclass).toEqual('fa math-sum');
     });
 
     it('should set compile to be true', function() {
-      expect(wiggiMathJaxFeatureDef.compile).toEqual(true);
+      expect(feature.compile).toEqual(true);
     });
 
   });
@@ -52,7 +52,7 @@ describe('mathjax feature', function() {
       replaceWith = jasmine.createSpy('replaceWith');
       spyOn(MathJaxService, 'parseDomForMath');
 
-      wiggiMathJaxFeatureDef.initialise($node, replaceWith);
+      feature.initialise($node, replaceWith);
     });
 
     it('should call MathJaxService.parseDomForMath', function() {
@@ -76,7 +76,7 @@ describe('mathjax feature', function() {
       };
       addContent = jasmine.createSpy('addContent');
       spyOn(rootScope, '$emit').and.callThrough();
-      wiggiMathJaxFeatureDef.addToEditor(editor, addContent);
+      feature.addToEditor(editor, addContent);
       callback = editor.launchDialog.calls.mostRecent().args[3];
     });
 
@@ -86,9 +86,9 @@ describe('mathjax feature', function() {
 
     describe('callback', function() {
 
-      it('should not add content when cancelled', function() {
+      it('should add content when cancelled', function() {
         callback({cancelled: true});
-        expect(addContent).not.toHaveBeenCalled();
+        expect(addContent).toHaveBeenCalled();
       });
 
       it('should call addContent with a mathjax-holder containing markup', function() {
@@ -121,7 +121,7 @@ describe('mathjax feature', function() {
         launchDialog: jasmine.createSpy('launchDialog')
       };
       spyOn(MathJaxService, 'parseDomForMath');
-      wiggiMathJaxFeatureDef.onClick($node, $scope, editor);
+      feature.onClick($node, $scope, editor);
       callback = editor.launchDialog.calls.mostRecent().args[3];
     });
 
@@ -134,19 +134,19 @@ describe('mathjax feature', function() {
       describe('cancelled', function() {
 
         beforeEach(function() {
-          callback({cancelled: true});
+          callback({cancelled: true, originalMarkup: 'some markup'});
         });
 
-        it('should not change $scope.originalMarkup when cancelled', function() {
-          expect($scope.originalMarkup).toBeUndefined();
+        it('should change $scope.originalMarkup when cancelled', function() {
+          expect($scope.originalMarkup).toBe('some markup');
         });
 
-        it('should not $emit saveData', function() {
-          expect($scope.$emit).not.toHaveBeenCalledWith('save-data');
+        it('should $emit saveData', function() {
+          expect($scope.$emit).toHaveBeenCalledWith('save-data');
         });
 
-        it('should not call MathJaxService.parseDomForMath', function() {
-          expect(MathJaxService.parseDomForMath).not.toHaveBeenCalled();
+        it('should call MathJaxService.parseDomForMath', function() {
+          expect(MathJaxService.parseDomForMath).toHaveBeenCalled();
         });
 
       });
@@ -188,10 +188,22 @@ describe('mathjax feature', function() {
     };
 
     it('should return $scope.originalMarkup wrapped in a <span mathjax/>', function() {
-      expect(wiggiMathJaxFeatureDef.getMarkUp($node, $scope))
+      expect(feature.getMarkUp($node, $scope))
         .toEqual('<span mathjax>' + $scope.originalMarkup + '</span>');
     });
 
   });
 
+
+  describe('insertInline', function(){
+    it('should return true for inline latex', function(){
+      expect(feature.insertInline($('<div>\\(inline\\)</div>'))).toBe(true);
+    });
+    it('should return false for block latex', function(){
+      expect(feature.insertInline($('<div>\\[inline\\]</div>'))).toBe(false);
+    });
+    it('should return false for mathml', function(){
+      expect(feature.insertInline($('<div><math/></div>'))).toBe(false);
+    });
+  });
 });

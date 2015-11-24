@@ -40,8 +40,8 @@ object Build extends sbt.Build {
     val logbackClassic = "ch.qos.logback" % "logback-classic" % "1.0.7"
     val logbackCore = "ch.qos.logback" % "logback-core" % "1.0.7"
     val mockito = "org.mockito" % "mockito-all" % "1.9.5" % "test"
+    val rhinoJs = "org.mozilla" % "rhino" % "1.7.6"
     val playS3 = "org.corespring" %% "s3-play-plugin" % "1.2.0"
-    val rhinoJs = "org.mozilla" % "rhino" % "1.7R4"
     val scalaz = "org.scalaz" %% "scalaz-core" % "7.0.6"
     val specs2 = "org.specs2" %% "specs2" % "2.2.2" % "test"
     val yuiCompressor = "com.yahoo.platform.yui" % "yuicompressor" % "2.4.7"
@@ -223,6 +223,7 @@ object Build extends sbt.Build {
 
   val root = builder.playApp("root", Some("."))
     .settings(
+      shellPrompt := ShellPrompt.buildShellPrompt,
       (resolvers in ThisBuild) ++= Resolvers.all,
       sbt.Keys.fork in Test := false,
       //lock java and javac to 1.7
@@ -251,6 +252,7 @@ object Build extends sbt.Build {
             cmd("bower", "./node_modules/bower/bin/bower", s"$clientDir\\cmds\\bower.cmd", Seq(clientDir, componentsDir)),
             cmd("npm", "npm", "npm.cmd", Seq(clientDir, componentsDir)))
       })
+    .settings(CustomRelease.settings)
     .dependsOn(shell)
     .aggregate(shell)
 
