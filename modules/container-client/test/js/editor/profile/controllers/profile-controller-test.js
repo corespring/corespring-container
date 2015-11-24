@@ -428,7 +428,7 @@ describe('profile controller', function() {
       makeProfileController();
     });
 
-    describe("bloom's taxononmy", function() {
+    describe("bloom's taxonomy", function() {
       it("loads data", function() {
         expect(scope.bloomsTaxonomyDataProvider).toEqual(expectedDataProvider);
       });
