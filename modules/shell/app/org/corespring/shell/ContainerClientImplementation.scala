@@ -254,7 +254,7 @@ class ContainerClientImplementation(
     override def itemService: MongoService = ContainerClientImplementation.this.itemService
     override def assets: Assets = ContainerClientImplementation.this.assets
 
-    override def containerContext: ContainerExecutionContext = ???
+    override def containerContext: ContainerExecutionContext = ContainerClientImplementation.this.containerContext
   }
 
   private[ContainerClientImplementation] trait withContext extends HasContainerContext {
