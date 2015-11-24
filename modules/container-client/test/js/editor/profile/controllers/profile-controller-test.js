@@ -358,7 +358,7 @@ describe('profile controller', function() {
       }
       it('should add standard.cluster as cluster', function(){
         addStandard();
-        expect(scope.profile.clusters).toEqual([{text: 'some cluster text', source:'A.B.C', hidden: false}]);
+        expect(scope.profile.standardClusters).toEqual([{text: 'some cluster text', source:'A.B.C', hidden: false}]);
       });
     });
   });

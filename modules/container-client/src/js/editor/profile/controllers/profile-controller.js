@@ -541,7 +541,7 @@
     }
 
     function getStandardDomain(standard) {
-      if (standard && standard.uri) {
+      if (standard && _.isString(standard.uri)) {
         var parts = standard.uri.toLowerCase().split('/');
         while (parts.length > 0) {
           var part = parts.shift();
@@ -593,7 +593,6 @@
      * and dependent properties
      */
     $scope.$watch('standardsGroups', function(newValue, oldValue) {
-      console.log("standardsGroups", newValue);
       if ($scope.profile && $scope.profile.standards && $scope.standardsGroups) {
         var newStandards = _.chain(newValue).pluck('standards').flatten().pluck('id').value();
         var oldStandards = _.chain($scope.profile.standards).pluck('id').value();
@@ -608,18 +607,72 @@
     }, true); //watch nested properties
 
     function updateClusters() {
-      ClusterHelper.updateClusters($scope.profile.clusters, $scope.profile.standards);
-      $scope.clusters = ClusterHelper.getClustersForUi($scope.profile.clusters);
+      ClusterHelper.updateClustersFromStandards($scope.profile.standardClusters, $scope.profile.standards);
+      $scope.clusters = addIdForSelect2(ClusterHelper.getClustersForUi($scope.profile.standardClusters));
+
+      function addIdForSelect2(clusters){
+        //select2 expects an id, otherwise it doesn't display more than one item
+        return _.map(clusters, function(c){
+          return {
+            id: _.uniqueId(),
+            text: c.text,
+            source: c.source
+          };
+        });
+      }
     }
 
-    $scope.$watchCollection('clusters', function(newValue, oldValue) {
+    $scope.$watchCollection('clusters', hideClusterInProfile);
+
+    function hideClusterInProfile(newValue, oldValue) {
       if (_.isArray(newValue) && _.isArray(oldValue)) {
         if (newValue.length < oldValue.length) {
           var dif = _.difference(oldValue, newValue);
-          ClusterHelper.hideCluster($scope.profile.clusters, dif.pop());
+          ClusterHelper.hideCluster($scope.profile.standardClusters, dif.pop());
         }
       }
+    }
+
+    DataQueryService.list("standardClusters", function(result) {
+      $scope.mathClusterOptions = getGroupOptions(result, /Math/i);
+      $scope.elaClusterOptions = getGroupOptions(result, /(ELA|ELA-Literacy)/i);
+
+      function getGroupOptions(results, groupRegExp){
+        return _(results)
+          .filter(function(c){
+            return groupRegExp.test(c.subject);
+          })
+          .sortBy("cluster")
+          .map(function(groupAndCluster){
+            return {
+              id: _.uniqueId(),
+              key: groupAndCluster.cluster
+            };
+          })
+          .value();
+      }
     });
+
+    $scope.$watch('additionalCluster', addClusterToProfile);
+
+    function addClusterToProfile(newValue, oldValue){
+      if(_.isArray(newValue) && newValue.length > 0){
+        var cluster = newValue.pop();
+        if(!_.isEmpty(cluster)){
+          ClusterHelper.addManualCluster($scope.profile.standardClusters, cluster);
+          updateClusters();
+        }
+        $scope.additionalCluster = [];
+      }
+    }
+
+    $scope.selectedClusterFilter = selectedClusterFilter;
+
+    function selectedClusterFilter(option, index) {
+      return $scope.profile &&
+        $scope.profile.standardClusters &&
+        -1 === _.findIndex($scope.profile.standardClusters, {text: option.key});
+    }
 
     //----------------------------------------------------------------
     // list of component types used in the item
@@ -1046,8 +1099,8 @@
       if (!_.isArray(profile.standards)) {
         profile.standards = [];
       }
-      if (!_.isArray(profile.clusters)) {
-        profile.clusters = [];
+      if (!_.isArray(profile.standardClusters)) {
+        profile.standardClusters = [];
       }
       if (!(profile.otherAlignments)) {
         profile.otherAlignments = {};

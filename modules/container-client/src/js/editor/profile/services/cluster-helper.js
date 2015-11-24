@@ -2,9 +2,6 @@
 
   "use strict";
 
-  /**
-   * Model the standards cluster of an item
-   */
   angular.module('corespring-editor.profile.services')
     .service('ClusterHelper', [
       'LogFactory',
@@ -20,7 +17,7 @@
     this.addManualCluster = addManualCluster;
     this.getClustersForUi = getClustersForUi;
     this.hideCluster = hideCluster;
-    this.updateClusters = updateClusters;
+    this.updateClustersFromStandards = updateClustersFromStandards;
 
     //--------------------------------------------
 
@@ -40,6 +37,7 @@
         .filter(function(c) {
           return !c.hidden;
         })
+        .sortBy('text')
         .value();
     }
 
@@ -54,7 +52,7 @@
       });
     }
 
-    function updateClusters(clusters, standards) {
+    function updateClustersFromStandards(clusters, standards) {
       removeClustersWithoutStandard();
       addClustersForNewStandards();
 

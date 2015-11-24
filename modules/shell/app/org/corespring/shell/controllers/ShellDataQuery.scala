@@ -1,5 +1,6 @@
 package org.corespring.shell.controllers
 
+import scala.collection.mutable.HashSet
 import scala.concurrent.Future
 
 import org.corespring.container.client.hooks.{ DataQueryHooks => ContainerDataQueryHooks }
@@ -36,7 +37,9 @@ trait ShellDataQueryHooks extends ContainerDataQueryHooks {
 
   lazy val subjects: Seq[JsObject] = SubjectJson()
 
-  lazy val standards: Seq[JsObject] = StandardsJson()
+  lazy val standardClusters = clustersFrom(standards)
+
+  lazy val standards: Seq[JsObject] = addCluster(StandardsJson())
 
   lazy val standardsTree: Seq[JsObject] = StandardsTreeJson()
 
@@ -54,7 +57,8 @@ trait ShellDataQueryHooks extends ContainerDataQueryHooks {
       case "mediaType" => Json.toJson(mediaType)
       case "priorUses" => Json.toJson(priorUses)
       case "reviewsPassed" => Json.toJson(reviewsPassed)
-      case "standards" => Json.toJson(addCluster(StandardsDataQuery.list(standards, query)))
+      case "standardClusters" => Json.toJson(standardClusters)
+      case "standards" => Json.toJson(StandardsDataQuery.list(standards, query))
       case "standardsTree" => Json.toJson(standardsTree)
       case "subjects.primary" => Json.toJson(StandardsDataQuery.list(subjects, query))
       case "subjects.related" => Json.toJson(StandardsDataQuery.list(subjects, query))
@@ -62,14 +66,26 @@ trait ShellDataQueryHooks extends ContainerDataQueryHooks {
     Right(out.as[JsArray])
   }
 
-  private def addCluster(standards: Seq[JsValue]) = {
+  private def clustersFrom(standards: Seq[JsObject]) = {
+    standards
+      .map(s => (
+        (s \ "cluster").asOpt[String],
+        (s \ "subject").asOpt[String]))
+      .toMap
+      .toSeq
+      .map(p => Json.obj(
+        "subject" -> p._2,
+        "cluster" -> p._1))
+  }
+
+  private def addCluster(standards: Seq[JsObject]) = {
     def getCluster(standard: JsValue, property: String) = {
       (standard \ property).asOpt[String] match {
         case Some(s) => Json.obj("cluster" -> s)
         case _ => Json.obj("cluster" -> "")
       }
     }
-    standards. map(s => {
+    standards.map(s => {
       (s \ "subject").asOpt[String] match {
         case Some("ELA") => s.as[JsObject] ++ getCluster(s, "subCategory")
         case Some("ELA-Literacy") => s.as[JsObject] ++ getCluster(s, "subCategory")
