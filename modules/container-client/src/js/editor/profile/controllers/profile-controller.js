@@ -7,7 +7,7 @@
       '$q',
       '$scope',
       '$timeout',
-      'ClusterHelper',
+      'ClusterFeature',
       'CollectionService',
       'ConfigurationService',
       'DataQueryService',
@@ -25,7 +25,7 @@
     $q,
     $scope,
     $timeout,
-    ClusterHelper,
+    ClusterFeature,
     CollectionService,
     ConfigurationService,
     DataQueryService,
@@ -39,6 +39,8 @@
   ) {
 
     var $log = LogFactory.getLogger('ProfileController');
+
+    ClusterFeature.extendScope($scope);
 
     //----------------------------------------------------------------
     // Form configuration
@@ -581,7 +583,6 @@
       if ($scope.profile && $scope.profile.standards) {
         $scope.isLiteracyStandardSelected = containsLiteracyStandard($scope.profile.standards);
         $scope.standardsGroups = getStandardsGroups();
-        updateClusters();
       }
     });
 
@@ -601,83 +602,10 @@
             return !(standard && _.contains(newStandards, standard.id));
           });
           $scope.isLiteracyStandardSelected = containsLiteracyStandard($scope.profile.standards);
-          updateClusters();
         }
       }
     }, true); //watch nested properties
 
-
-    //----------------------------------------------------------------
-    // standard clusters
-    //----------------------------------------------------------------
-
-    DataQueryService.list("standardClusters", function(result) {
-      $scope.mathClusterOptions = getGroupOptions(result, /Math/i);
-      $scope.elaClusterOptions = getGroupOptions(result, /(ELA|ELA-Literacy)/i);
-
-      function getGroupOptions(results, groupRegExp){
-        return _(results)
-          .filter(function(c){
-            return groupRegExp.test(c.subject);
-          })
-          .sortBy("cluster")
-          .map(function(groupAndCluster){
-            return {
-              id: groupAndCluster.cluster,
-              key: groupAndCluster.cluster
-            };
-          })
-          .value();
-      }
-    });
-
-    function updateClusters() {
-      ClusterHelper.updateClustersFromStandards($scope.profile.standardClusters, $scope.profile.standards);
-      $scope.clusters = addIdForSelect2(ClusterHelper.getClustersForUi($scope.profile.standardClusters));
-
-      function addIdForSelect2(clusters){
-        //select2 expects an id, otherwise it doesn't display more than one item
-        return _.map(clusters, function(c){
-          return {
-            id: _.uniqueId(),
-            text: c.text,
-            source: c.source
-          };
-        });
-      }
-    }
-
-    $scope.$watchCollection('clusters', hideClusterInProfile);
-
-    function hideClusterInProfile(newValue, oldValue) {
-      if (_.isArray(newValue) && _.isArray(oldValue)) {
-        if (newValue.length < oldValue.length) {
-          var dif = _.difference(oldValue, newValue);
-          ClusterHelper.hideCluster($scope.profile.standardClusters, dif.pop());
-        }
-      }
-    }
-
-    $scope.$watch('additionalCluster', addClusterToProfile);
-
-    function addClusterToProfile(newValue, oldValue){
-      if(_.isArray(newValue) && newValue.length > 0){
-        var cluster = newValue.pop();
-        if(!_.isEmpty(cluster)){
-          ClusterHelper.addManualCluster($scope.profile.standardClusters, cluster);
-          updateClusters();
-        }
-        $scope.additionalCluster = [];
-      }
-    }
-
-    $scope.selectedClusterFilter = selectedClusterFilter;
-
-    function selectedClusterFilter(option, index) {
-      return $scope.profile &&
-        $scope.profile.standardClusters &&
-        -1 === _.findIndex($scope.profile.standardClusters, {text: option.key});
-    }
 
     //----------------------------------------------------------------
     // list of component types used in the item

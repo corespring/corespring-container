@@ -107,6 +107,7 @@ describe('profile controller', function() {
   beforeEach(angular.mock.module('corespring-editor.profile.controllers'));
 
   var
+    mockClusterFeature,
     mockCollectionService,
     mockDataQueryService,
     mockDesignerService,
@@ -117,6 +118,9 @@ describe('profile controller', function() {
     imagePath = '/image-path';
 
   beforeEach(function() {
+    mockClusterFeature = {
+      extendScope: jasmine.createSpy('extendScope')
+    };
     mockCollectionService = new MockCollectionService();
     mockDataQueryService = new MockDataQueryService();
     mockDesignerService = new MockDesignerService();
@@ -138,6 +142,7 @@ describe('profile controller', function() {
         fn();
       });
       $provide.value('LogFactory', new MockLogFactory());
+      $provide.value('ClusterFeature', mockClusterFeature);
       $provide.value('CollectionService', mockCollectionService);
       $provide.value('DataQueryService', mockDataQueryService);
       $provide.value('DesignerService', mockDesignerService);
@@ -241,6 +246,10 @@ describe('profile controller', function() {
 
     it("should not call save after loading an item", function() {
       expect(mockItemService.saveProfileCalls).toEqual([]);
+    });
+
+    it('should call ClusterFeature.extendScope', function(){
+      expect(mockClusterFeature.extendScope).toHaveBeenCalled();
     });
   });
 
@@ -485,122 +494,6 @@ describe('profile controller', function() {
     describe("depth of knowledge", function() {
       it("loads data", function() {
         expect(scope.depthOfKnowledgeDataProvider).toEqual(expectedDataProvider);
-      });
-    });
-  });
-
-  describe('standard clusters', function() {
-
-    describe('auto tagging', function() {
-      beforeEach(makeProfileController);
-
-      it('should add cluster for a standard', function() {
-        scope.item.profile.standards = [{
-          cluster: 'some cluster text',
-          dotNotation: 'A.B.C'
-        }];
-        scope.$apply();
-        expect(scope.profile.standardClusters).toEqual([{
-          text: 'some cluster text',
-          source: 'A.B.C',
-          hidden: false
-        }]);
-      });
-
-      it('should remove cluster if related standard is removed from standards', function() {
-        scope.item.profile.standards = [{
-          cluster: 'some cluster text',
-          dotNotation: 'A.B.C'
-        }];
-        scope.$apply();
-        scope.item.profile.standards = [];
-        scope.$apply();
-        expect(scope.profile.standardClusters).toEqual([]);
-      });
-    });
-
-    describe('manual clusters', function() {
-      describe("clusterOptions", function() {
-
-        beforeEach(function() {
-          mockDataQueryService.listResult = [
-            {
-              subject: 'ELA',
-              cluster: 'cluster-a'
-            },
-            {
-              subject: 'ELA-Literacy',
-              cluster: 'cluster-b'
-            },
-            {
-              subject: 'Math',
-              cluster: 'cluster-c'
-            },
-            {
-              subject: 'Other',
-              cluster: 'cluster-d'
-            }
-          ];
-          makeProfileController();
-        });
-
-        function keyId(value) {
-          return {
-            id: value,
-            key: value
-          };
-        }
-
-        describe("ela", function() {
-          it("loads data", function() {
-            expect(scope.elaClusterOptions).toEqual([keyId('cluster-a'), keyId('cluster-b')]);
-          });
-        });
-
-        describe("math", function() {
-          it("loads data", function() {
-            expect(scope.mathClusterOptions).toEqual([keyId('cluster-c')
-            ]);
-          });
-        });
-      });
-
-      describe('selectedClusterFilter', function() {
-        var cluster;
-        var option;
-
-        beforeEach(function() {
-          cluster = {
-            text: "some cluster"
-          };
-          option = {
-            key: "some cluster"
-          };
-          makeProfileController();
-        });
-        it('should return false if the cluster can be found in the profile', function() {
-          scope.profile.standardClusters = [cluster];
-          expect(scope.selectedClusterFilter(option)).toBe(false);
-        });
-        it('should return true if the cluster cannot be found in the profile', function() {
-          scope.profile.standardClusters = [];
-          expect(scope.selectedClusterFilter(option)).toBe(true);
-        });
-      });
-
-      describe('additionalCluster', function() {
-        beforeEach(makeProfileController);
-        it('setting it to a string should add a manual cluster to the profile ', function() {
-          scope.additionalCluster = ['some cluster'];
-          scope.$apply();
-          expect(scope.profile.standardClusters).toEqual([
-            {
-              text: 'some cluster',
-              source: 'manual',
-              hidden: false
-            }
-          ]);
-        });
       });
     });
   });
