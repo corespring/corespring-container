@@ -39,7 +39,7 @@ trait ShellDataQueryHooks extends ContainerDataQueryHooks {
 
   lazy val standardClusters = clustersFrom(standards)
 
-  lazy val standards: Seq[JsObject] = addCluster(StandardsJson())
+  lazy val standards: Seq[JsObject] = addDomain(StandardsJson())
 
   lazy val standardsTree: Seq[JsObject] = StandardsTreeJson()
 
@@ -69,20 +69,20 @@ trait ShellDataQueryHooks extends ContainerDataQueryHooks {
   private def clustersFrom(standards: Seq[JsObject]) = {
     standards
       .map(s => (
-        (s \ "cluster").asOpt[String],
+        (s \ "domain").asOpt[String],
         (s \ "subject").asOpt[String]))
       .toMap
       .toSeq
       .map(p => Json.obj(
         "subject" -> p._2,
-        "cluster" -> p._1))
+        "domain" -> p._1))
   }
 
-  private def addCluster(standards: Seq[JsObject]) = {
+  private def addDomain(standards: Seq[JsObject]) = {
     def getCluster(standard: JsValue, property: String) = {
       (standard \ property).asOpt[String] match {
-        case Some(s) => Json.obj("cluster" -> s)
-        case _ => Json.obj("cluster" -> "")
+        case Some(s) => Json.obj("domain" -> s)
+        case _ => Json.obj("domain" -> "")
       }
     }
     standards.map(s => {

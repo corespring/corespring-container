@@ -222,10 +222,10 @@ describe('profile controller', function() {
 
     it("initialises empty sub-properties", function() {
       expect(scope.item.profile).toBeTruthy();
-      expect(scope.item.profile.standardClusters).toBeTruthy();
       expect(scope.item.profile.standards).toBeTruthy();
       expect(scope.item.profile.taskInfo).toEqual({
-        subjects: {}
+        subjects: {},
+        standardClusters: []
       });
       expect(scope.item.profile.otherAlignments).toEqual({
         keySkills: []

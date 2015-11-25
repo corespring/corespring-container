@@ -1026,14 +1026,14 @@
       if (!(profile.taskInfo.subjects)) {
         profile.taskInfo.subjects = {};
       }
+      if (!_.isArray(profile.taskInfo.standardClusters)) {
+        profile.taskInfo.standardClusters = [];
+      }
       if (!_.isArray(profile.reviewsPassed)) {
         profile.reviewsPassed = [];
       }
       if (!_.isArray(profile.standards)) {
         profile.standards = [];
-      }
-      if (!_.isArray(profile.standardClusters)) {
-        profile.standardClusters = [];
       }
       if (!(profile.otherAlignments)) {
         profile.otherAlignments = {};
@@ -1041,7 +1041,6 @@
       if (!_.isArray(profile.otherAlignments.keySkills)) {
         profile.otherAlignments.keySkills = [];
       }
-
       if (!(profile.contributorDetails)) {
         profile.contributorDetails = {};
       }

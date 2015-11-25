@@ -25,12 +25,15 @@
     function extendScope(scope) {
       //select2 model for manually selected clusters
       scope.additionalCluster = [];
+
       //the list of clusters shown in the ui
       scope.clusters = [];
+
       //the options for selecting cluster manually
       scope.elaClusterOptions = [];
       scope.mathClusterOptions = [];
-      //ths filter for the cluster selector removes clusters that are selected already
+
+      //this filter removes clusters that are selected already
       scope.selectedClusterFilter = selectedClusterFilter;
 
       //fires when the user clicks an x button to remove a cluster
@@ -52,15 +55,26 @@
       }
 
       function updateClusters() {
-        updateClustersFromStandards(scope.profile.standardClusters, scope.profile.standards);
-        scope.clusters = addIdForSelect2(getClustersForUi(scope.profile.standardClusters));
+        if(scope.profile && scope.profile.taskInfo) {
+          updateClustersFromStandards(scope.profile.taskInfo.standardClusters, scope.profile.standards);
+          updateUi();
+        }
+      }
+
+      function updateUi(){
+        if(scope.profile && scope.profile.taskInfo) {
+          scope.clusters = addIdForSelect2(getClustersForUi(scope.profile.taskInfo.standardClusters));
+        }
       }
 
       function hideClusterInProfile(newValue, oldValue) {
         if (_.isArray(newValue) && _.isArray(oldValue)) {
           if (newValue.length < oldValue.length) {
             var dif = _.difference(oldValue, newValue);
-            hideCluster(scope.profile.standardClusters, dif.pop());
+            if(scope.profile && scope.profile.taskInfo) {
+              hideCluster(scope.profile.taskInfo.standardClusters, dif.pop());
+              updateUi();
+            }
           }
         }
       }
@@ -69,17 +83,18 @@
         if (_.isArray(newValue) && newValue.length > 0) {
           var cluster = newValue.pop();
           if (!_.isEmpty(cluster)) {
-            addManualCluster(scope.profile.standardClusters, cluster);
-            updateClusters();
+            if(scope.profile && scope.profile.taskInfo) {
+              addManualCluster(scope.profile.taskInfo.standardClusters, cluster);
+              updateUi();
+            }
           }
           scope.additionalCluster = [];
         }
       }
 
       function selectedClusterFilter(option, index) {
-        return scope.profile &&
-          scope.profile.standardClusters &&
-          -1 === _.findIndex(scope.profile.standardClusters, {
+        return scope.profile && scope.profile.taskInfo &&
+          -1 === _.findIndex(scope.profile.taskInfo.standardClusters, {
             text: option.key
           });
       }
@@ -145,7 +160,7 @@
           if (-1 === _.findIndex(clusters, {
               source: s.dotNotation
             })) {
-            clusters.push(mkCluster(s.cluster, s.dotNotation, false));
+            clusters.push(mkCluster(s.domain, s.dotNotation, false));
           }
         });
       }
@@ -170,11 +185,11 @@
         .filter(function(c) {
           return groupRegExp.test(c.subject);
         })
-        .sortBy("cluster")
-        .map(function(groupAndCluster) {
+        .sortBy("domain")
+        .map(function(groupAndDomain) {
           return {
-            id: groupAndCluster.cluster,
-            key: groupAndCluster.cluster
+            id: groupAndDomain.domain,
+            key: groupAndDomain.domain
           };
         })
         .value();

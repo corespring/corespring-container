@@ -25,7 +25,9 @@ describe('cluster feature', function() {
     sut = ClusterFeature;
     scope = $rootScope.$new();
     scope.profile = {
-      standardClusters: []
+      taskInfo: {
+        standardClusters: []
+      }
     };
   }));
 
@@ -33,10 +35,10 @@ describe('cluster feature', function() {
     sut.extendScope(scope);
   }
 
-  function mkStandard(dotNotation, cluster) {
+  function mkStandard(dotNotation, domain) {
     return {
       dotNotation: dotNotation,
-      cluster: cluster
+      domain: domain
     };
   }
 
@@ -45,6 +47,20 @@ describe('cluster feature', function() {
       text: text,
       source: source,
       hidden: hidden
+    };
+  }
+
+  function mkClusterOption(subject, domain) {
+    return {
+      subject: subject,
+      domain: domain
+    };
+  }
+
+  function mkKeyId(value) {
+    return {
+      id: value,
+      key: value
     };
   }
 
@@ -59,27 +75,18 @@ describe('cluster feature', function() {
     beforeEach(initClusterFeature);
 
     it('should add cluster for a standard', function() {
-      scope.profile.standards = [{
-        cluster: 'some cluster text',
-        dotNotation: 'A.B.C'
-        }];
+      scope.profile.standards = [mkStandard('A.B.C','some cluster text')];
       scope.$apply();
-      expect(scope.profile.standardClusters).toEqual([{
-        text: 'some cluster text',
-        source: 'A.B.C',
-        hidden: false
-        }]);
+      expect(scope.profile.taskInfo.standardClusters).toEqual([
+        mkCluster('some cluster text','A.B.C',false)]);
     });
 
     it('should remove cluster if related standard is removed from standards', function() {
-      scope.profile.standards = [{
-        cluster: 'some cluster text',
-        dotNotation: 'A.B.C'
-        }];
+      scope.profile.standards = [mkStandard('A.B.C','some cluster text')];
       scope.$apply();
       scope.profile.standards = [];
       scope.$apply();
-      expect(scope.profile.standardClusters).toEqual([]);
+      expect(scope.profile.taskInfo.standardClusters).toEqual([]);
     });
   });
 
@@ -87,43 +94,25 @@ describe('cluster feature', function() {
     describe("clusterOptions", function() {
 
       beforeEach(function() {
+
         mockDataQueryService.listResult = [
-          {
-            subject: 'ELA',
-            cluster: 'cluster-a'
-            },
-          {
-            subject: 'ELA-Literacy',
-            cluster: 'cluster-b'
-            },
-          {
-            subject: 'Math',
-            cluster: 'cluster-c'
-            },
-          {
-            subject: 'Other',
-            cluster: 'cluster-d'
-            }
+          mkClusterOption('ELA','cluster-a'),
+          mkClusterOption('ELA-Literacy','cluster-b'),
+          mkClusterOption('Math','cluster-c'),
+          mkClusterOption('Other','cluster-d')
           ];
         initClusterFeature();
       });
 
-      function keyId(value) {
-        return {
-          id: value,
-          key: value
-        };
-      }
-
       describe("ela", function() {
         it("loads data", function() {
-          expect(scope.elaClusterOptions).toEqual([keyId('cluster-a'), keyId('cluster-b')]);
+          expect(scope.elaClusterOptions).toEqual([mkKeyId('cluster-a'), mkKeyId('cluster-b')]);
         });
       });
 
       describe("math", function() {
         it("loads data", function() {
-          expect(scope.mathClusterOptions).toEqual([keyId('cluster-c')
+          expect(scope.mathClusterOptions).toEqual([mkKeyId('cluster-c')
             ]);
         });
       });
@@ -134,20 +123,16 @@ describe('cluster feature', function() {
       var option;
 
       beforeEach(function() {
-        cluster = {
-          text: "some cluster"
-        };
-        option = {
-          key: "some cluster"
-        };
+        cluster = mkCluster("some cluster", "A.B.C", false);
+        option = mkKeyId("some cluster");
         initClusterFeature();
       });
       it('should return false if the cluster can be found in the profile', function() {
-        scope.profile.standardClusters = [cluster];
+        scope.profile.taskInfo.standardClusters = [cluster];
         expect(scope.selectedClusterFilter(option)).toBe(false);
       });
       it('should return true if the cluster cannot be found in the profile', function() {
-        scope.profile.standardClusters = [];
+        scope.profile.taskInfo.standardClusters = [];
         expect(scope.selectedClusterFilter(option)).toBe(true);
       });
     });
@@ -157,13 +142,8 @@ describe('cluster feature', function() {
       it('setting it to a string should add a manual cluster to the profile ', function() {
         scope.additionalCluster = ['some cluster'];
         scope.$apply();
-        expect(scope.profile.standardClusters).toEqual([
-          {
-            text: 'some cluster',
-            source: 'manual',
-            hidden: false
-            }
-          ]);
+        expect(scope.profile.taskInfo.standardClusters).toEqual([
+          mkCluster('some cluster','manual',false)]);
       });
     });
   });
