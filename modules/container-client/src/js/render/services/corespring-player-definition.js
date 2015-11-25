@@ -170,6 +170,7 @@ angular.module('corespring-player.services').factory('CorespringPlayerDefinition
       this.template = [
         '<div class="corespring-player">',
         '  <div class="player-body hidden-player-body" id="{{domId}}"></div>',
+        '  <summary-feedback ng-model="item.summaryFeedback" session-complete="session.isComplete"></summary-feedback>',
         '</div>'
       ].join("\n");
     }
