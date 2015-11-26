@@ -33,5 +33,6 @@ exports.css =
 exports.ngModules = _.union( core.ngModules, [
     'corespring-player.controllers',
     'corespring-player.directives',
-    'corespring-player.services'
+    'corespring-player.services',
+    'ngAnimate'
   ])
