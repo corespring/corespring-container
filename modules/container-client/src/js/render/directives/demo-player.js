@@ -37,7 +37,7 @@
           settings: _.cloneDeep($scope.playerSettings)
         };
 
-        $scope.itemSession = undefined;
+        $scope.itemSession = {};
 
         $scope.scoreToString = scoreToString;
         $scope.submitOrReset = submitOrReset;
@@ -142,7 +142,7 @@
             '    player-markup="xhtml"',
             '    player-item="item"',
             '    player-outcomes="outcome"',
-            '    player-session="itemSession">',
+            '    player-session="session">',
             '  </corespring-isolate-player>',
             '    <div class="btn-submit-holder" ng-hide="playerMode == \'instructor\'">',
             '      <div class="score">',
