@@ -25,22 +25,31 @@ private object HyphenNameConverter extends BranchNameConverter {
 }
 
 object CustomRelease {
+
+  lazy val logReleaseVersion = ReleaseStep(action = (st:State) => {
+    val extracted = Project.extract(st)
+    st.log.info(">>> version now set to: ${extracted.get(version)}")
+    st
+  })
+
   lazy val settings = Seq(
     branchNameConverter := HyphenNameConverter,
     releaseVersionBump := Bump.Minor,
     releaseProcess <<= thisProjectRef.apply { ref =>
       Seq(
-        checkBranchVersion,
+        checkBranchName("rc"),
+        //TODO - ensureVersionEndsWith("-SNAPSHOT")?
         checkSnapshotDependencies,
         runClean,
         runTest,
         prepareReleaseVersion,
         setReleaseVersion,
         commitReleaseVersion,
+        pushBranchChanges,
         mergeCurrentBranchTo("master"),
         tagBranchWithReleaseTag("master"),
-        //Note: this requires that you run release with defaults `--with-defaults`
-        pushChanges,
-        publishArtifacts)
+        pushBranchChanges,
+        pushTags,
+	      publishArtifacts) 
     })
 }

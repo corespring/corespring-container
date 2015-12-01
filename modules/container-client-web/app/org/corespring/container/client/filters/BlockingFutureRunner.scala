@@ -6,6 +6,7 @@ import scala.collection.mutable
 
 import scala.concurrent.{ ExecutionContext, Future }
 
+@deprecated("see cs-api BlockingFutureQueuer", "5.0.0")
 class BlockingFutureRunner(implicit val ec: ExecutionContext) {
 
   private val futureResults: mutable.Map[String, Future[SimpleResult]] = mutable.Map()
@@ -23,7 +24,7 @@ class BlockingFutureRunner(implicit val ec: ExecutionContext) {
    */
   def run(fn: RequestHeader => Future[SimpleResult], rh: RequestHeader): Future[SimpleResult] = synchronized {
 
-    futureResults.get(rh.path).foreach{ _ =>
+    futureResults.get(rh.path).foreach { _ =>
       logger.debug(s"found future for ${rh.path}")
     }
 
