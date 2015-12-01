@@ -49,6 +49,7 @@ object CustomRelease {
         mergeCurrentBranchTo("master"),
         tagBranchWithReleaseTag("master"),
         pushBranchChanges,
-        pushTags) 
+        pushTags,
+	publishArtifacts) 
     })
 }
