@@ -1,9 +1,9 @@
 package org.corespring.container.client.controllers.resources
 
-import java.io.{ByteArrayInputStream, BufferedInputStream, FileInputStream, File}
+import java.io.{ ByteArrayInputStream, BufferedInputStream, FileInputStream, File }
 import java.nio.charset.Charset
 
-import org.apache.commons.io.{Charsets, IOUtils}
+import org.apache.commons.io.{ Charsets, IOUtils }
 import org.corespring.container.client.controllers.resources.CoreSupportingMaterials.Errors
 import org.corespring.container.client.hooks._
 import org.corespring.test.TestContext
@@ -42,7 +42,7 @@ class CoreSupportingMaterialsTest extends Specification with Mockito with PlaySp
     bytes
   }
 
-  class testScope extends Scope with CoreSupportingMaterials with TestContext{
+  class testScope extends Scope with CoreSupportingMaterials with TestContext {
 
     lazy val mockHooks = {
       val m = mock[SupportingMaterialHooks]
@@ -271,7 +271,17 @@ class CoreSupportingMaterialsTest extends Specification with Mockito with PlaySp
 
   "getAssetFromSupportingMaterial" should {
     class getAsset extends testScope {
-      val fd = FileDataStream(new ByteArrayInputStream("".getBytes(Charsets.UTF_8)),0,"none", Map.empty)
+      val fd = FileDataStream(new ByteArrayInputStream("".getBytes(Charsets.UTF_8)), 0, "none", Map.empty)
+      mockHooks.getAsset(any[String], any[String], any[String])(any[RequestHeader]) returns Future(Right(fd))
+    }
+
+    class getAssetOctetStream extends testScope {
+      val fd = FileDataStream(new ByteArrayInputStream("".getBytes(Charsets.UTF_8)), 0, "application/octet-stream", Map.empty)
+      mockHooks.getAsset(any[String], any[String], any[String])(any[RequestHeader]) returns Future(Right(fd))
+    }
+
+    class getAssetImage extends testScope {
+      val fd = FileDataStream(new ByteArrayInputStream("".getBytes(Charsets.UTF_8)), 0, "image/png", Map.empty)
       mockHooks.getAsset(any[String], any[String], any[String])(any[RequestHeader]) returns Future(Right(fd))
     }
 
@@ -279,6 +289,16 @@ class CoreSupportingMaterialsTest extends Specification with Mockito with PlaySp
       val result = getAssetFromSupportingMaterial("id", "name", "filename")(FakeRequest("", ""))
       status(result) === OK
       there was one(materialHooks).getAsset("id", "name", "filename")(FakeRequest("", ""))
+    }
+
+    "octet stream content type will not be used in the header" in new getAssetOctetStream {
+      val result = getAssetFromSupportingMaterial("id", "name", "filename")(FakeRequest("", ""))
+      contentType(result) === None
+    }
+
+    "image content type will be used in the header" in new getAssetImage {
+      val result = getAssetFromSupportingMaterial("id", "name", "filename")(FakeRequest("", ""))
+      contentType(result) === Some("image/png")
     }
   }
 }
