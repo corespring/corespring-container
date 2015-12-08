@@ -13,6 +13,10 @@ describe('supportingmetadata', function() {
       bytesToKb: jasmine.createSpy('bytesToKb').and.callFake(function(b) {
         return Math.floor(b / 1024);
       }),
+      imageTypes: function(){
+        return ['image/png'];
+      },
+      acceptableType: jasmine.createSpy('acceptableType').and.returnValue(undefined),
       fileTooBigError: jasmine.createSpy('fileToBigError')
     };
 
@@ -274,6 +278,17 @@ describe('supportingmetadata', function() {
       expect(scope.metadataForm.fileToUpload.$valid).toEqual(false);
       expect(scope.metadataForm.fileToUpload.$error).toBe('file too big');
     });
+
+     it('updates the file ui for an unacceptable file type', function() {
+
+      imageUtils.acceptableType.and.returnValue({code: 'code',message: 'unacceptableType'});
+      scope.$broadcast('fileChange', {
+        size: 100
+      });
+      expect(scope.metadataForm.fileToUpload.$valid).toEqual(false);
+      expect(scope.metadataForm.fileToUpload.$error).toBe('unacceptableType');
+    });
+
 
   });
 

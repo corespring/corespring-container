@@ -1,7 +1,5 @@
 package org.corespring.container.client.controllers
 
-import java.net.URL
-
 import org.corespring.container.client.component._
 import org.corespring.container.components.model.Component
 import org.corespring.container.components.model.dependencies.DependencyResolver

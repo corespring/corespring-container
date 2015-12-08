@@ -1,7 +1,10 @@
-angular.module('corespring.wiggi-wiz-features.mathjax').factory('WiggiMathJaxFeatureDef', ['MathJaxService',
-  '$rootScope', '$log',
+angular.module('corespring.wiggi-wiz-features.mathjax').factory('WiggiMathJaxFeatureDef', [
+  'MathJaxService',
+  'MathFormatUtils',
+  '$rootScope', 
+  '$log',
 
-  function(MathJaxService, $rootScope, $log) {
+  function(MathJaxService, MathFormatUtils, $rootScope, $log) {
 
     function FeatureDef() {
       var name = 'mathjax';
@@ -20,7 +23,11 @@ angular.module('corespring.wiggi-wiz-features.mathjax').factory('WiggiMathJaxFea
 
       this.name = name;
       this.attributeName = 'mathjax';
-      this.insertInline = true;
+      this.insertInline = function($node){
+        var info = MathFormatUtils.getMathInfo($node.html());
+        return info && info.displayMode === 'inline'; 
+      };
+
       this.draggable = true;
       this.iconclass = 'fa math-sum';
       this.compile = true;
@@ -36,22 +43,18 @@ angular.module('corespring.wiggi-wiz-features.mathjax').factory('WiggiMathJaxFea
       this.addToEditor = function(editor, addContent) {
         dialog(editor, function(update) {
           var $node;
-          if (!update.cancelled) {
-            $node = $('<mathjax-holder></mathjax-holder>');
-            $node.html(update.originalMarkup);
-            addContent($node);
-          }
+          $node = $('<mathjax-holder></mathjax-holder>');
+          $node.html(update.originalMarkup);
+          addContent($node);
           $rootScope.$emit('math-updated');
         });
       };
 
       this.onClick = function($node, $scope, editor) {
         dialog(editor, function(update) {
-          if (!update.cancelled) {
-            $scope.originalMarkup = update.originalMarkup;
-            $scope.$emit('save-data');
-            MathJaxService.parseDomForMath(100);
-          }
+          $scope.originalMarkup = update.originalMarkup;
+          $scope.$emit('save-data');
+          MathJaxService.parseDomForMath(100);
           $scope.$emit('math-updated');
         }, $scope);
       };

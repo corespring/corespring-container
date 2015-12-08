@@ -36,6 +36,16 @@ angular.module('corespring-editor.controllers')
 
           addFile: function(file, onComplete, onProgress){
 
+            var typeError = ImageUtils.acceptableType(
+              file.type, 
+              ImageUtils.imageTypes()
+            );
+            
+            if(typeError){ 
+              onComplete(typeError);
+              return;
+            }
+
             if (ImageUtils.bytesToKb(file.size) > 500) {
               onComplete(ImageUtils.fileTooBigError(file.size, 500));
               return;
