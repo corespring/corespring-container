@@ -460,7 +460,7 @@
       },
 
       initSelection: function(element, callback) {
-        console.log("standardsAdapter.initSelection");
+        //nothing to do here, still we need it, so it doesn't crash
       },
 
       formatSelection: function(standard) {
