@@ -85,19 +85,14 @@ abstract class BaseGenerator
   with JsStringBuilder {
 
   protected def get3rdPartyScripts(dependencies: Seq[ClientSideDependency]): Seq[String] = {
-    /* TODO ben
     val paths: Seq[String] = dependencies.map(d => d.jsFiles.map { name => s"${d.name}/$name" }).flatten.distinct
-    */
-    val paths: Seq[String] = dependencies.map(d => d.files.map { name => s"${d.name}/$name" }).flatten.distinct
     paths.flatMap(resource)
   }
 
-  /* TODO ben
   protected def getStyles(dependencies: Seq[ClientSideDependency]): Seq[String] = {
     val paths: Seq[String] = dependencies.map(d => d.cssFiles.map { name => s"${d.name}/$name" }).flatten.distinct
     paths.flatMap(resource)
   }
-  */
 
   protected def getLibScripts(components: Seq[Component]): Seq[String] = {
 
@@ -121,17 +116,15 @@ abstract class BaseGenerator
     val widgetCss = widgets.map(_.client.css.getOrElse("")).mkString("\n")
     val layoutCss = layoutComps.map(_.css.getOrElse("")).mkString("\n")
     val libraryCss = libraries.map(_.css.getOrElse("")).mkString("\n")
-    //TODO ben val dependencies = getClientSideDependencies(components)
-    //TODO ben val styles = getStyles(dependencies).mkString("\n")
+    val dependencies = getClientSideDependencies(components)
+    val styles = getStyles(dependencies).mkString("\n")
     s"""
     |$uiCss
     |$widgetCss
     |$layoutCss
     |$libraryCss
+    |$styles
     """.stripMargin
-
-    //TODO ben |$styles
-
   }
 
   override def js(components: Seq[Component]): String = {
