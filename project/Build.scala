@@ -223,6 +223,7 @@ object Build extends sbt.Build {
 
   val root = builder.playApp("root", Some("."))
     .settings(
+      shellPrompt := ShellPrompt.buildShellPrompt,
       (resolvers in ThisBuild) ++= Resolvers.all,
       sbt.Keys.fork in Test := false,
       //lock java and javac to 1.7
@@ -251,6 +252,7 @@ object Build extends sbt.Build {
             cmd("bower", "./node_modules/bower/bin/bower", s"$clientDir\\cmds\\bower.cmd", Seq(clientDir, componentsDir)),
             cmd("npm", "npm", "npm.cmd", Seq(clientDir, componentsDir)))
       })
+    .settings(CustomRelease.settings)
     .dependsOn(shell)
     .aggregate(shell)
 

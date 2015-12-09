@@ -22,6 +22,7 @@ import scala.concurrent.{ ExecutionContext, Future }
  * - if the data isn't on s3, it invokes the underlying request, puts the result on s3,
  * then adds the etag to that result.
  */
+@deprecated("See corespring-api CacheFilter", "5.0.0")
 trait CheckS3CacheFilter extends Filter {
 
   lazy val logger = Logger(classOf[CheckS3CacheFilter])
@@ -69,7 +70,7 @@ trait CheckS3CacheFilter extends Filter {
     } catch {
       case t: Throwable => {
         logger.info(s"function=tryToLoadFromS3#tryS3 - an error occured in the body: ${t.getMessage}")
-        if(logger.isTraceEnabled){
+        if (logger.isTraceEnabled) {
           t.printStackTrace()
         }
         logger.info(s"function=tryToLoadFromS3#tryS3 - call fallback")
