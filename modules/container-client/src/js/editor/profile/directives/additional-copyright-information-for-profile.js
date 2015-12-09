@@ -1,4 +1,4 @@
-angular.module('corespring-editor.directives')
+angular.module('corespring-editor.profile.directives')
   .directive('additionalCopyrightInformationForProfile', [
   'DataQueryService',
   function(DataQueryService) {

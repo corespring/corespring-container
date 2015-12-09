@@ -4,7 +4,7 @@ describe('expander', function() {
 
   var DataQueryService = {};
 
-  beforeEach(angular.mock.module('corespring-editor.directives'));
+  beforeEach(angular.mock.module('corespring-editor.profile.directives'));
 
   beforeEach(module(function($provide) {
     $provide.value('LogFactory', {
