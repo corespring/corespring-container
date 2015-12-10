@@ -1,6 +1,6 @@
 script(type="text/ng-template", id="/templates/metadata")
-  .joco(ng-controller="MetadataController")
-    ul
+  .metadata-form(ng-controller="MetadataController")
+    ul.metadata-sets
       li(ng-repeat="s in metadataSets")
         a(ng-click="selectMetadata(s)") {{s.editorLabel}}
-    iframe(ng-src="{{selectedMetadataUrl}}",style="width: 100%; height: 400px")
+    iframe.metadata-iframe(ng-src="{{selectedMetadataUrl}}")
