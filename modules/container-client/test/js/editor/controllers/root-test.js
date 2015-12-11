@@ -10,7 +10,7 @@ describe('editor root', function() {
     setConfig: jasmine.createSpy('setConfig')
   };
   
-  var ItemService, LogFactory, msgrOnHandlers, Msgr;
+  var ItemService, MetadataService, LogFactory, msgrOnHandlers, Msgr;
 
   var iFrameService = {
     isInIFrame: function() {
@@ -50,6 +50,10 @@ describe('editor root', function() {
       saveAll: jasmine.createSpy('saveAll')
     };
 
+    MetadataService = {
+      get: jasmine.createSpy('load')
+    };
+
     LogFactory = new org.corespring.mocks.editor.LogFactory();
     editorDebounce = {
       flush: jasmine.createSpy('flush')
@@ -58,6 +62,7 @@ describe('editor root', function() {
     $provide.value('$timeout', function(fn){fn();});
     $provide.value('ConfigurationService', ConfigurationService);
     $provide.value('ItemService', ItemService);
+    $provide.value('MetadataService', MetadataService);
     $provide.value('LogFactory', LogFactory);
     $provide.value('iFrameService', iFrameService);
     $provide.value('Msgr', Msgr);
