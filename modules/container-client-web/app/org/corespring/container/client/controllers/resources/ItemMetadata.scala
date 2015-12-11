@@ -5,7 +5,7 @@ import org.corespring.container.client.hooks.{ ItemMetadataHooks, CollectionHook
 import play.api.libs.json.Json
 import play.api.mvc.{ Action, AnyContent, Controller }
 
-/** Query service for collection objects */
+/** Query service for item metadata */
 trait ItemMetadata extends Controller with HasContainerContext {
 
   def hooks: ItemMetadataHooks

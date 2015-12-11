@@ -6,11 +6,10 @@ angular.module('corespring-editor.controllers')
     '$timeout',
     '$sce',
     '$window',
-    'MessageBridge',
     'MetadataService',
     'EditorChangeWatcher',
     'ItemService',
-    function($log, $scope, $element, $timeout, $sce, $window, MessageBridge, MetadataService, EditorChangeWatcher, ItemService) {
+    function($log, $scope, $element, $timeout, $sce, $window, MetadataService, EditorChangeWatcher, ItemService) {
 
       var addMessageListener = function(fn, host) {
         var eventMethod = host.addEventListener ? "addEventListener" : "attachEvent";
@@ -20,12 +19,12 @@ angular.module('corespring-editor.controllers')
           fn(e);
         }, false);
       };
+
       var $iframe = $element.find('iframe');
-      var target = $iframe[0].contentWindow;
+      var target = ($iframe.length > 0 && $iframe[0].contentWindow) || $window.top;
       var sendMessage = function(msg, host) {
         host.postMessage(msg, "*");
       };
-
 
       addMessageListener(function(msg) {
         var msgType = msg && msg.data && msg.data.type;
@@ -42,7 +41,7 @@ angular.module('corespring-editor.controllers')
           $scope.item.profile.taskInfo.extended = $scope.item.profile.taskInfo.extended || {};
           $scope.item.profile.taskInfo.extended[$scope.selectedMetadata.metadataKey] = metadata;
         }
-      }, window.top);
+      }, $window.top);
 
       $scope.saveProfile = function(){
         $log.log("saving profile due to metadata change");
@@ -64,7 +63,6 @@ angular.module('corespring-editor.controllers')
       };
       MetadataService.get($scope.item.itemId).then(function(result) {
         $scope.metadataSets = result;
-        $scope.metadataSets.push(_.cloneDeep($scope.metadataSets[0]));
       });
     }
   ]
