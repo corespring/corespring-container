@@ -28,7 +28,6 @@ import play.api.{ Configuration, Logger, Mode, Play }
 import play.api.libs.json._
 import play.api.libs.json.Reads._
 
-
 import scala.concurrent.{ ExecutionContext, Future }
 import scalaz.{ Failure, Success, Validation }
 
@@ -142,8 +141,15 @@ class ContainerClientImplementation(
 
     override def upload(t: AssetType, id: String, path: String)(predicate: (RequestHeader) => Option[SimpleResult]): BodyParser[Future[UploadResult]] = {
 
-      def contentType(s:String) = s match {
-
+      def contentType(s: String) = {
+        val regexp = """\.*.?$""".r
+        regexp.findFirstIn(s.toLowerCase) match {
+          case Some(".png") => "image/png"
+          case Some(".jpg") => "image/jpeg"
+          case Some(".jpeg") => "image/jpeg"
+          case Some(".gif") => "image/gif"
+          case _ => "image/png"
+        }
       }
       playS3.s3ObjectAndData[Unit](s3.bucket, _ => mkPath(t, id, path))((rh) => {
         predicate(rh).map { err =>
@@ -155,13 +161,11 @@ class ContainerClientImplementation(
             case Some(item) =>
               val fileObj = Json.obj(
                 "name" -> tuple._1.getKey.substring(tuple._1.getKey.lastIndexOf('/') + 1),
-                "contentType" -> "image/jpeg"
-              )
-              val transformer =  (__ \ "files").json.update(
-                of[JsArray].map{ case JsArray(arr) => JsArray(arr :+ fileObj) }
-              )
+                "contentType" -> contentType(tuple._1.getKey))
+              val transformer = (__ \ "files").json.update(
+                of[JsArray].map { case JsArray(arr) => JsArray(arr :+ fileObj) })
               val fallback = __.json.update((__ \ "files").json.put(JsArray(Seq(fileObj))))
-              item.transform(transformer).orElse(item.transform(fallback)) match{
+              item.transform(transformer).orElse(item.transform(fallback)) match {
                 case succ: JsSuccess[JsObject] =>
                   itemService.save(id, succ.get)
                 case _ =>
