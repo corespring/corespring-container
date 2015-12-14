@@ -3,7 +3,9 @@ package org.corespring.container.client.controllers.apps
 
 trait ItemAssetResolver {
 
-  def resolve(itemId:String)(file:String):String
+  def resolve(itemId:String)(file:String):String = {
+    mkPath(itemId)(file)
+  }
 
   protected def mkPath(itemId: String)(imageSrc: String): String = {
     val plainImageSrc = imageSrc.split('/').last
