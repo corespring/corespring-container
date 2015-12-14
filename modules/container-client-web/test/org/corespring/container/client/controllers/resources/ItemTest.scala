@@ -1,5 +1,6 @@
 package org.corespring.container.client.controllers.resources
 
+import org.corespring.container.client.ItemAssetResolver
 import org.corespring.container.client.hooks.Hooks.{R, StatusMessage}
 import org.corespring.container.client.hooks.{CoreItemHooks, CreateItemHook, SupportingMaterialHooks}
 import org.corespring.test.TestContext
@@ -22,6 +23,8 @@ class ItemTest extends Specification with Mockito {
     loadResult: JsValue = Json.obj("_id" -> Json.obj("$oid" -> "1"), "xhtml" -> "<div></div>"))
     extends Scope {
     val item = new Item with TestContext{
+
+      override def itemAssetResolver : ItemAssetResolver = new ItemAssetResolver{}
 
       override def hooks: IH = new IH with TestContext{
 
@@ -77,10 +80,9 @@ class ItemTest extends Specification with Mockito {
         status(item.load("x")(FakeRequest("", ""))) === OK
       }
 
-      "prep the json" in new item(loadResult = Json.obj("_id" ->
-        Json.obj("$oid" -> "1"), "xhtml" -> "<p>a</p>")) {
+      "prep the json" in new item(loadResult = Json.obj("xhtml" -> "<p>a</p>")) {
         val json = contentAsJson(item.load("x")(FakeRequest("", "")))
-        (json \ "itemId").as[String] === "1"
+        (json \ "itemId").as[String] === "x"
         (json \ "xhtml").as[String] === """<div class="para">a</div>"""
       }
     }

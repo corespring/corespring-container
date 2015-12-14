@@ -1,7 +1,7 @@
 package org.corespring.container.client.integration
 
 import grizzled.slf4j.Logger
-import org.corespring.container.client.V2PlayerConfig
+import org.corespring.container.client.{ItemAssetResolver, V2PlayerConfig}
 import org.corespring.container.client.component.ComponentUrls
 import org.corespring.container.client.controllers.apps._
 import org.corespring.container.client.controllers.launcher.editor.EditorLauncher
@@ -39,12 +39,15 @@ trait DefaultIntegration
   def versionInfo: JsObject
 
   def containerContext: ContainerExecutionContext
+
   /**
    * For a given resource path return a resolved path.
    * By default this just returns the path, so no domain is used.
    * Override it if you want to make use of it.
    */
   def resolveDomain(path: String): String = path
+
+  def itemAssetResolver: ItemAssetResolver
 
   private lazy val logger = ContainerLogger.getLogger("DefaultIntegration")
 
@@ -97,12 +100,6 @@ trait DefaultIntegration
   } else {
     logger.trace("Dev OutcomeProcessor")
     new RhinoOutcomeProcessor(DefaultIntegration.this.components, scopeBuilder.scope)
-  }
-
-  lazy val itemAssetResolver = new ItemAssetResolver {
-    override def resolve(itemId:String)(file:String): String = {
-      resolveDomain(mkPath(itemId)(file))
-    }
   }
 
   lazy val rig = new Rig {

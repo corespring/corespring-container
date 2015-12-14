@@ -1,5 +1,4 @@
-package org.corespring.container.client.controllers.apps
-
+package org.corespring.container.client
 
 trait ItemAssetResolver {
 

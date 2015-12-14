@@ -6,10 +6,11 @@ import play.api.libs.json.Json
 class ItemDraftJsonTest extends Specification {
 
   val json = Json.obj(
-    "_id" -> Json.obj("$oid" -> "1"),
     "xhtml" -> "<p>hello</p>")
 
-  val itemJson = ItemJson(Seq.empty, json)
+  def resolveAsset(s:String) = s
+
+  val itemJson = ItemJson("1", resolveAsset, json)
   "ItemJson" should {
 
     "add itemId" in {
@@ -20,9 +21,5 @@ class ItemDraftJsonTest extends Specification {
       (itemJson \ "xhtml").as[String] === """<div class="para">hello</div>"""
     }
 
-    "not set itemId if _id.$oid is missing" in {
-      val out = ItemJson(Seq.empty, Json.obj("xhtml" -> "x"))
-      (out \ "itemId").asOpt[String] === None
-    }
   }
 }

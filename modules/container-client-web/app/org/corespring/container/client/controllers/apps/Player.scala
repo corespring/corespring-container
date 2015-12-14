@@ -2,10 +2,10 @@ package org.corespring.container.client.controllers.apps
 
 import java.net.URLEncoder
 
-import org.corespring.container.client.V2PlayerConfig
+import org.corespring.container.client.{ItemAssetResolver, V2PlayerConfig}
 import org.corespring.container.client.component.PlayerItemTypeReader
 import org.corespring.container.client.controllers.GetAsset
-import org.corespring.container.client.controllers.helpers.{PlayerXhtml}
+import org.corespring.container.client.controllers.helpers.PlayerXhtml
 import org.corespring.container.client.controllers.jade.Jade
 import org.corespring.container.client.hooks.PlayerHooks
 import org.corespring.container.client.views.txt.js.PlayerServices
@@ -50,7 +50,7 @@ trait Player
       val controlsJs = if (showControls) paths(controlsJsSrc) else Seq.empty
       val domainResolvedJs = buildJs(scriptInfo, controlsJs)
       val domainResolvedCss = buildCss(scriptInfo)
-      val itemId = (session \ "itemId").as[String]
+      val itemId = (session \ "itemId").asOpt[String].getOrElse(throw new RuntimeException("No itemId in session"))
       val processedXhtml = processXhtml(itemId, itemJson)
       val preprocessedItem = itemPreProcessor.preProcessItemForPlayer(itemJson).as[JsObject] ++ Json.obj("xhtml" -> processedXhtml)
 

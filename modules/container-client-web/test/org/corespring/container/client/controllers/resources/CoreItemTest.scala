@@ -1,5 +1,6 @@
 package org.corespring.container.client.controllers.resources
 
+import org.corespring.container.client.ItemAssetResolver
 import org.corespring.container.client.hooks.{ SupportingMaterialHooks, CoreItemHooks }
 import org.corespring.test.TestContext
 import org.specs2.mock.Mockito
@@ -37,6 +38,8 @@ class CoreItemTest extends Specification with Mockito {
       val m = mock[SupportingMaterialHooks]
       m
     }
+
+    override def itemAssetResolver : ItemAssetResolver = new ItemAssetResolver{}
   }
 
   def req(json: JsObject) = FakeRequest("", "", FakeHeaders(), AnyContentAsJson(json))

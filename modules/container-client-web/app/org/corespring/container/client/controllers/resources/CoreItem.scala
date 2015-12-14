@@ -1,9 +1,8 @@
 package org.corespring.container.client.controllers.resources
 
 
-import org.corespring.container.client.HasContainerContext
-import org.corespring.container.client.controllers.apps.ItemAssetResolver
-import org.corespring.container.client.controllers.helpers.{ PlayerXhtml, XhtmlProcessor }
+import org.corespring.container.client.{ItemAssetResolver, HasContainerContext}
+import org.corespring.container.client.controllers.helpers.{PlayerXhtml, XhtmlProcessor}
 import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.client.hooks._
 import play.api.Logger

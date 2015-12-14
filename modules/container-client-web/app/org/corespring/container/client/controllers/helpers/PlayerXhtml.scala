@@ -29,9 +29,9 @@ object PlayerXhtml {
     val setImagePath = (xhtml: TagNode) => {
       val divs = xhtml.getElementsByName("img", true)
       divs.foreach((tag: TagNode) => {
-        import scala.collection.JavaConversions._
-        val imageSrc = tag.getAttributeByName("src")
-        tag.setAttributes(Map[String, String]("src" -> resolveImagePath(imageSrc)))
+        val attributes = tag.getAttributes
+        attributes.put("src", resolveImagePath(tag.getAttributeByName("src")))
+        tag.setAttributes(attributes)
       })
     }
 

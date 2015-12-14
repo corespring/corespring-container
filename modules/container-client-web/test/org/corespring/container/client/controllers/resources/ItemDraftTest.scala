@@ -1,5 +1,6 @@
 package org.corespring.container.client.controllers.resources
 
+import org.corespring.container.client.ItemAssetResolver
 import org.corespring.container.client.controllers.resources.ItemDraft.Errors
 import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.client.hooks._
@@ -26,6 +27,8 @@ class ItemDraftTest extends Specification with Mockito {
       val m = mock[SupportingMaterialHooks]
       m
     }
+
+    override def itemAssetResolver : ItemAssetResolver = new ItemAssetResolver{}
   }
 
   trait DH extends CoreItemHooks with DraftHooks
@@ -48,7 +51,6 @@ class ItemDraftTest extends Specification with Mockito {
             m.load(anyString)(any[RequestHeader]) returns Future(Right(loadResult))
             m
           }
-
         }
       }
 
@@ -56,13 +58,12 @@ class ItemDraftTest extends Specification with Mockito {
         status(draft.load("x")(FakeRequest("", ""))) === OK
       }
 
-      val badJson = Json.obj("_id" ->
-        Json.obj("$oid" -> "1"),
+      val badJson = Json.obj(
         "xhtml" -> "<p>a</p>")
 
       "prep the json" in new load(loadResult = badJson) {
         val json = contentAsJson(draft.load("x")(FakeRequest("", "")))
-        (json \ "itemId").as[String] === "1"
+        (json \ "itemId").as[String] === "x"
         (json \ "xhtml").as[String] === """<div class="para">a</div>"""
       }
     }
