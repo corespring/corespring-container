@@ -99,6 +99,12 @@ trait DefaultIntegration
     new RhinoOutcomeProcessor(DefaultIntegration.this.components, scopeBuilder.scope)
   }
 
+  lazy val itemAssetResolver = new ItemAssetResolver {
+    override def resolve(itemId:String)(file:String): String = {
+      resolveDomain(mkPath(itemId)(file))
+    }
+  }
+
   lazy val rig = new Rig {
 
     override def mode: Mode = Play.current.mode
@@ -225,6 +231,8 @@ trait DefaultIntegration
 
     override def resolveDomain(path: String): String = DefaultIntegration.this.resolveDomain(path)
 
+    override def itemAssetResolver: ItemAssetResolver = DefaultIntegration.this.itemAssetResolver
+
     override def itemPreProcessor: PlayerItemPreProcessor = DefaultIntegration.this.internalProcessor
   }
 
@@ -242,6 +250,8 @@ trait DefaultIntegration
     override def containerContext = DefaultIntegration.this.containerContext
 
     override def materialHooks: SupportingMaterialHooks = DefaultIntegration.this.itemSupportingMaterialHooks
+
+    override def itemAssetResolver: ItemAssetResolver = DefaultIntegration.this.itemAssetResolver
   }
 
   lazy val itemDraft = new ItemDraft {
@@ -257,6 +267,8 @@ trait DefaultIntegration
     override def containerContext = DefaultIntegration.this.containerContext
 
     override protected def componentTypes: Seq[String] = DefaultIntegration.this.components.map(_.componentType)
+
+    override def itemAssetResolver: ItemAssetResolver = DefaultIntegration.this.itemAssetResolver
   }
 
   lazy val session = new Session {

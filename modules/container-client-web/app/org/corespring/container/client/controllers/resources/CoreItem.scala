@@ -1,14 +1,12 @@
 package org.corespring.container.client.controllers.resources
 
-import java.io.{ FileInputStream }
 
-import org.apache.commons.io.IOUtils
 import org.corespring.container.client.HasContainerContext
+import org.corespring.container.client.controllers.apps.ItemAssetResolver
 import org.corespring.container.client.controllers.helpers.{ PlayerXhtml, XhtmlProcessor }
 import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.client.hooks._
 import play.api.Logger
-import play.api.libs.{ Files, MimeTypes }
 import play.api.libs.json.{ JsString, JsObject, JsValue, Json }
 import play.api.mvc._
 
@@ -18,18 +16,17 @@ import scalaz.Scalaz._
 
 object ItemJson {
 
-  def apply(components: Seq[String], rawJson: JsValue): JsObject = {
+  def apply(itemId: String, resolveImagePath:(String => String), rawJson: JsValue): JsObject = {
 
-    val processedXhtml = (rawJson \ "xhtml").asOpt[String].map(s => PlayerXhtml.mkXhtml(components, s)).getOrElse {
+    val processedXhtml = (rawJson \ "xhtml").asOpt[String].map(s => PlayerXhtml.mkXhtml(resolveImagePath, s)).getOrElse {
       throw new IllegalArgumentException(s"the Item json must contain 'xhtml'\n ${Json.stringify(rawJson)}")
     }
 
-    val itemId = (rawJson \ "_id" \ "$oid").asOpt[JsString].map(id => Json.obj("itemId" -> id)).getOrElse(Json.obj())
-    rawJson.as[JsObject] + ("xhtml" -> JsString(processedXhtml)) ++ itemId
+    rawJson.as[JsObject] + ("xhtml" -> JsString(processedXhtml)) ++  Json.obj("itemId" -> itemId)
   }
 }
 
-trait CoreItem extends CoreSupportingMaterials with Controller with HasContainerContext{
+trait CoreItem extends CoreSupportingMaterials with Controller with HasContainerContext {
 
   lazy val logger = Logger(classOf[CoreItem])
 
@@ -40,6 +37,8 @@ trait CoreItem extends CoreSupportingMaterials with Controller with HasContainer
    * @return
    */
   protected def componentTypes: Seq[String]
+
+  def itemAssetResolver: ItemAssetResolver
 
   def hooks: CoreItemHooks
 
@@ -53,7 +52,7 @@ trait CoreItem extends CoreSupportingMaterials with Controller with HasContainer
         either match {
           case Left(sm) => sm
           case Right(rawItem) => {
-            Ok(ItemJson(componentTypes, rawItem))
+            Ok(ItemJson(itemId, itemAssetResolver.resolve(itemId)_, rawItem))
               .withHeaders(
                 "Cache-Control" -> noCacheHeader,
                 "Expires" -> "0")

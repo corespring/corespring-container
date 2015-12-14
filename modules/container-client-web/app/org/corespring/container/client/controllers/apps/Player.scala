@@ -5,7 +5,7 @@ import java.net.URLEncoder
 import org.corespring.container.client.V2PlayerConfig
 import org.corespring.container.client.component.PlayerItemTypeReader
 import org.corespring.container.client.controllers.GetAsset
-import org.corespring.container.client.controllers.helpers.PlayerXhtml
+import org.corespring.container.client.controllers.helpers.{PlayerXhtml}
 import org.corespring.container.client.controllers.jade.Jade
 import org.corespring.container.client.hooks.PlayerHooks
 import org.corespring.container.client.views.txt.js.PlayerServices
@@ -29,15 +29,17 @@ trait Player
 
     /**
      * Preprocess the xml so that it'll work in all browsers
-     * aka: convert tagNames -> attributes for ie 8 support
      * TODO: A layout component may have multiple elements
      * So we need a way to get all potential component names from
      * each component, not just assume its the top level.
      */
-    private def processXhtml(maybeXhtml: Option[String]) = maybeXhtml.map {
-      xhtml =>
-        PlayerXhtml.mkXhtml(components.map(_.componentType), xhtml)
-    }.getOrElse("<div><h1>New Item</h1></div>")
+    private def processXhtml(itemId: String, itemJson: JsValue) = {
+
+      val resolveImagePath = itemAssetResolver.resolve(itemId)_
+      val maybeXhtml = (itemJson \ "xhtml").asOpt[String]
+      maybeXhtml.map(xhtml => PlayerXhtml.mkXhtml(resolveImagePath, xhtml))
+        .getOrElse("<div><h1>New Item</h1></div>")
+    }
 
     def hasBeenArchived(session: JsValue) =
       (session \ "collectionId").asOpt[String].map(_ == archiveCollId).getOrElse(false)
@@ -48,8 +50,8 @@ trait Player
       val controlsJs = if (showControls) paths(controlsJsSrc) else Seq.empty
       val domainResolvedJs = buildJs(scriptInfo, controlsJs)
       val domainResolvedCss = buildCss(scriptInfo)
-
-      val processedXhtml = processXhtml((itemJson \ "xhtml").asOpt[String])
+      val itemId = (session \ "itemId").as[String]
+      val processedXhtml = processXhtml(itemId, itemJson)
       val preprocessedItem = itemPreProcessor.preProcessItemForPlayer(itemJson).as[JsObject] ++ Json.obj("xhtml" -> processedXhtml)
 
       val newRelicRumConf: Option[JsValue] = playerConfig.newRelicRumConfig
@@ -80,6 +82,8 @@ trait Player
   override def context: String = "player"
 
   def versionInfo: JsObject
+
+  def itemAssetResolver: ItemAssetResolver
 
   def itemPreProcessor: PlayerItemPreProcessor
 
