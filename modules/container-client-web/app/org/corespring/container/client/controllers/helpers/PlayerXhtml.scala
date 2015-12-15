@@ -1,9 +1,13 @@
 package org.corespring.container.client.controllers.helpers
 
-import org.htmlcleaner.{TagNode, TagTransformation}
+import org.corespring.container.client.ItemAssetResolver
+import org.htmlcleaner.{ TagNode, TagTransformation }
 
-object PlayerXhtml {
-  def mkXhtml(components:Seq[String], xhtml:String) : String = {
+trait PlayerXhtml {
+
+  def itemAssetResolver: ItemAssetResolver
+
+  def mkXhtml(itemId: String, xhtml: String): String = {
 
     /** <p> -> <div class="para"/> */
     def pToDiv = {
@@ -12,28 +16,31 @@ object PlayerXhtml {
       pToDiv
     }
 
-    /** For IE8 support:  <custom-tag ...> -> <div custom-tag="" ...> */
-    def tagToAttribute(t:String) = {
-      val out = new TagTransformation(t, "div", true)
-      out.addAttributeTransformation(t, "")
-      out
-    }
-
     /** a post processor to turn "para " to "para" */
-    val cleanSpaceAfterPara = (n:TagNode) => {
+    val cleanSpaceAfterPara = (n: TagNode) => {
       val divs = n.evaluateXPath("//div")
-      divs.foreach((n:Object)=> {
+      divs.foreach((n: Object) => {
         import scala.collection.JavaConversions._
         val tag = n.asInstanceOf[TagNode]
-        if( tag.getAttributeByName("class") == "para "){
-          tag.setAttributes(Map[String,String]("class" -> "para"))
+        if (tag.getAttributeByName("class") == "para ") {
+          tag.setAttributes(Map[String, String]("class" -> "para"))
         }
       })
     }
 
-    val customTagToDivs = components.map(tagToAttribute)
-    val postProcessors = Seq(cleanSpaceAfterPara)
-    XhtmlProcessor.process(customTagToDivs :+ pToDiv, postProcessors, xhtml)
+    /** a post processor to add the image path */
+    val setImagePath = (xhtml: TagNode) => {
+      val resolveItemAsset = itemAssetResolver.resolve(itemId)_
+      val divs = xhtml.getElementsByName("img", true)
+      divs.foreach((tag: TagNode) => {
+        val attributes = tag.getAttributes
+        attributes.put("src", resolveItemAsset(tag.getAttributeByName("src")))
+        tag.setAttributes(attributes)
+      })
+    }
+
+    val postProcessors = Seq(cleanSpaceAfterPara, setImagePath)
+    XhtmlProcessor.process(Seq(pToDiv), postProcessors, xhtml)
   }
 }
 
