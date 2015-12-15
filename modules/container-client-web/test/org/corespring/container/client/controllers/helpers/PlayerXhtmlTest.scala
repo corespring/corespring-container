@@ -15,7 +15,11 @@ class PlayerXhtmlTest extends Specification {
   }
 
   case class assertPlayerXhtml(in:String, expected:String) extends Scope{
-    playerXhtml.mkXhtml("123", in).trim.withoutCarriageReturn === expected.withoutCarriageReturn
+    playerXhtml.mkXhtml(Some("123"), in).trim.withoutCarriageReturn === expected.withoutCarriageReturn
+  }
+
+  case class assertPlayerXhtmlWithoutItemId(in:String, expected:String) extends Scope{
+    playerXhtml.mkXhtml(None, in).trim.withoutCarriageReturn === expected.withoutCarriageReturn
   }
 
   "preparePlayerXhtml" should {
@@ -35,9 +39,14 @@ class PlayerXhtmlTest extends Specification {
       """<div class="para p-intro2">Hello</div>"""
     )
 
-    "insert image anchor" in assertPlayerXhtml(
+    "insert image anchor when itemId is Some(id)" in assertPlayerXhtml(
       """<img src="test" width="7px" height="8px"/>""",
       """<img src="/player/item/123/test" width="7px" height="8px" />"""
+    )
+
+    "not insert image anchor when itemId is None" in assertPlayerXhtmlWithoutItemId(
+      """<img src="test" width="7px" height="8px"/>""",
+      """<img src="test" width="7px" height="8px" />"""
     )
 
   }

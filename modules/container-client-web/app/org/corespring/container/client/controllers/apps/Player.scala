@@ -33,7 +33,7 @@ trait Player
      * So we need a way to get all potential component names from
      * each component, not just assume its the top level.
      */
-    private def processXhtml(itemId: String, itemJson: JsValue) = {
+    private def processXhtml(itemId: Option[String], itemJson: JsValue) = {
       val maybeXhtml = (itemJson \ "xhtml").asOpt[String]
       maybeXhtml.map(xhtml => playerXhtml.mkXhtml(itemId, xhtml))
         .getOrElse("<div><h1>New Item</h1></div>")
@@ -48,7 +48,7 @@ trait Player
       val controlsJs = if (showControls) paths(controlsJsSrc) else Seq.empty
       val domainResolvedJs = buildJs(scriptInfo, controlsJs)
       val domainResolvedCss = buildCss(scriptInfo)
-      val itemId = (session \ "itemId").asOpt[String].getOrElse("?") //A session from ExternalLaunchApi does not not have an itemId
+      val itemId = (session \ "itemId").asOpt[String] //A session from ExternalLaunchApi does not not have an itemId
       val processedXhtml = processXhtml(itemId, itemJson)
       val preprocessedItem = itemPreProcessor.preProcessItemForPlayer(itemJson).as[JsObject] ++ Json.obj("xhtml" -> processedXhtml)
 
