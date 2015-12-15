@@ -1,15 +1,20 @@
 package org.corespring.container.client.controllers.resources
 
+import org.corespring.container.client.ItemAssetResolver
+import org.corespring.container.client.controllers.helpers.PlayerXhtml
 import org.specs2.mutable.Specification
 import play.api.libs.json.Json
 
 class ItemDraftJsonTest extends Specification {
 
+  val playerXhtml = new PlayerXhtml {
+    override def itemAssetResolver = new ItemAssetResolver{}
+  }
+
   val json = Json.obj(
-    "_id" -> Json.obj("$oid" -> "1"),
     "xhtml" -> "<p>hello</p>")
 
-  val itemJson = ItemJson(Seq.empty, json)
+  val itemJson = ItemJson("1", json, playerXhtml)
   "ItemJson" should {
 
     "add itemId" in {
@@ -20,9 +25,5 @@ class ItemDraftJsonTest extends Specification {
       (itemJson \ "xhtml").as[String] === """<div class="para">hello</div>"""
     }
 
-    "not set itemId if _id.$oid is missing" in {
-      val out = ItemJson(Seq.empty, Json.obj("xhtml" -> "x"))
-      (out \ "itemId").asOpt[String] === None
-    }
   }
 }
