@@ -18,7 +18,7 @@ object ItemJson {
   def apply(itemId: String, rawJson: JsValue, playerXhtml: PlayerXhtml): JsObject = {
 
     val xhtml = (rawJson \ "xhtml").asOpt[String].getOrElse(throw new IllegalArgumentException(s"the Item json must contain 'xhtml'\n ${Json.stringify(rawJson)}"))
-    val processedXhtml = playerXhtml.mkXhtml(itemId, xhtml)
+    val processedXhtml = playerXhtml.mkXhtml(None, xhtml)
     rawJson.as[JsObject] + ("xhtml" -> JsString(processedXhtml)) ++  Json.obj("itemId" -> itemId)
   }
 }

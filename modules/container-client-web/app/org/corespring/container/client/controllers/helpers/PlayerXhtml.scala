@@ -7,7 +7,7 @@ trait PlayerXhtml {
 
   def itemAssetResolver: ItemAssetResolver
 
-  def mkXhtml(itemId: String, xhtml: String): String = {
+  def mkXhtml(itemId: Option[String], xhtml: String): String = {
 
     /** <p> -> <div class="para"/> */
     def pToDiv = {
@@ -30,13 +30,15 @@ trait PlayerXhtml {
 
     /** a post processor to add the image path */
     val setImagePath = (xhtml: TagNode) => {
-      val resolveItemAsset = itemAssetResolver.resolve(itemId)_
-      val divs = xhtml.getElementsByName("img", true)
-      divs.foreach((tag: TagNode) => {
-        val attributes = tag.getAttributes
-        attributes.put("src", resolveItemAsset(tag.getAttributeByName("src")))
-        tag.setAttributes(attributes)
-      })
+      if (itemId.isDefined) {
+        val resolveItemAsset = itemAssetResolver.resolve(itemId.get) _
+        val divs = xhtml.getElementsByName("img", true)
+        divs.foreach((tag: TagNode) => {
+          val attributes = tag.getAttributes
+          attributes.put("src", resolveItemAsset(tag.getAttributeByName("src")))
+          tag.setAttributes(attributes)
+        })
+      }
     }
 
     val postProcessors = Seq(cleanSpaceAfterPara, setImagePath)
