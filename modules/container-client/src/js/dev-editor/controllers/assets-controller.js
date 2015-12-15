@@ -9,10 +9,10 @@ angular.module('corespring-dev-editor.controllers')
         console.log(file);
         if (confirm('Are you sure you want to remove ' + file)) {
           $http.delete(file).then(function(res) {
-            console.log("Delete Res: ", res);
             $scope.item.files = _.reject($scope.item.files, function(f) {
               return f.name === file;
             });
+            $scope.$emit('assetDeleteCompleted');
           }, function() {
             alert('An error occured whilst deleting ' + file);
           });
@@ -20,7 +20,7 @@ angular.module('corespring-dev-editor.controllers')
       };
 
       $scope.onFileUploadCompleted = function(file) {
-        $scope.$emit('reloadItem');
+        $scope.$emit('assetUploadCompleted');
       };
 
       $scope.calculateUrl = function(file) {
