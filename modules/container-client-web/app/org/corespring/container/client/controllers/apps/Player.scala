@@ -48,7 +48,7 @@ trait Player
       val controlsJs = if (showControls) paths(controlsJsSrc) else Seq.empty
       val domainResolvedJs = buildJs(scriptInfo, controlsJs)
       val domainResolvedCss = buildCss(scriptInfo)
-      val itemId = (session \ "itemId").asOpt[String].getOrElse(throw new RuntimeException("No itemId in session"))
+      val itemId = (session \ "itemId").asOpt[String].getOrElse("?") //A session from ExternalLaunchApi does not not have an itemId
       val processedXhtml = processXhtml(itemId, itemJson)
       val preprocessedItem = itemPreProcessor.preProcessItemForPlayer(itemJson).as[JsObject] ++ Json.obj("xhtml" -> processedXhtml)
 
