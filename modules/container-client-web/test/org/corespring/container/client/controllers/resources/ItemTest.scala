@@ -1,6 +1,7 @@
 package org.corespring.container.client.controllers.resources
 
 import org.corespring.container.client.ItemAssetResolver
+import org.corespring.container.client.controllers.helpers.PlayerXhtml
 import org.corespring.container.client.hooks.Hooks.{R, StatusMessage}
 import org.corespring.container.client.hooks.{CoreItemHooks, CreateItemHook, SupportingMaterialHooks}
 import org.corespring.test.TestContext
@@ -24,7 +25,9 @@ class ItemTest extends Specification with Mockito {
     extends Scope {
     val item = new Item with TestContext{
 
-      override def itemAssetResolver : ItemAssetResolver = new ItemAssetResolver{}
+      override def  playerXhtml = new PlayerXhtml {
+        override def itemAssetResolver = new ItemAssetResolver{}
+      }
 
       override def hooks: IH = new IH with TestContext{
 

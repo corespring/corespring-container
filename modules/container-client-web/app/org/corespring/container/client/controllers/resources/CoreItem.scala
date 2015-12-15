@@ -15,12 +15,10 @@ import scalaz.Scalaz._
 
 object ItemJson {
 
-  def apply(itemId: String, resolveImagePath:(String => String), rawJson: JsValue): JsObject = {
+  def apply(itemId: String, rawJson: JsValue, playerXhtml: PlayerXhtml): JsObject = {
 
-    val processedXhtml = (rawJson \ "xhtml").asOpt[String].map(s => PlayerXhtml.mkXhtml(resolveImagePath, s)).getOrElse {
-      throw new IllegalArgumentException(s"the Item json must contain 'xhtml'\n ${Json.stringify(rawJson)}")
-    }
-
+    val xhtml = (rawJson \ "xhtml").asOpt[String].getOrElse(throw new IllegalArgumentException(s"the Item json must contain 'xhtml'\n ${Json.stringify(rawJson)}"))
+    val processedXhtml = playerXhtml.mkXhtml(itemId, xhtml)
     rawJson.as[JsObject] + ("xhtml" -> JsString(processedXhtml)) ++  Json.obj("itemId" -> itemId)
   }
 }
@@ -37,7 +35,7 @@ trait CoreItem extends CoreSupportingMaterials with Controller with HasContainer
    */
   protected def componentTypes: Seq[String]
 
-  def itemAssetResolver: ItemAssetResolver
+  def playerXhtml: PlayerXhtml
 
   def hooks: CoreItemHooks
 
@@ -51,7 +49,7 @@ trait CoreItem extends CoreSupportingMaterials with Controller with HasContainer
         either match {
           case Left(sm) => sm
           case Right(rawItem) => {
-            Ok(ItemJson(itemId, itemAssetResolver.resolve(itemId)_, rawItem))
+            Ok(ItemJson(itemId, rawItem, playerXhtml))
               .withHeaders(
                 "Cache-Control" -> noCacheHeader,
                 "Expires" -> "0")

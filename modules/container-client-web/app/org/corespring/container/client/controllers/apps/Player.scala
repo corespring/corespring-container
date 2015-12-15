@@ -34,10 +34,8 @@ trait Player
      * each component, not just assume its the top level.
      */
     private def processXhtml(itemId: String, itemJson: JsValue) = {
-
-      val resolveImagePath = itemAssetResolver.resolve(itemId)_
       val maybeXhtml = (itemJson \ "xhtml").asOpt[String]
-      maybeXhtml.map(xhtml => PlayerXhtml.mkXhtml(resolveImagePath, xhtml))
+      maybeXhtml.map(xhtml => playerXhtml.mkXhtml(itemId, xhtml))
         .getOrElse("<div><h1>New Item</h1></div>")
     }
 
@@ -83,7 +81,7 @@ trait Player
 
   def versionInfo: JsObject
 
-  def itemAssetResolver: ItemAssetResolver
+  def playerXhtml: PlayerXhtml
 
   def itemPreProcessor: PlayerItemPreProcessor
 

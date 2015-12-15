@@ -1,10 +1,13 @@
 package org.corespring.container.client.controllers.helpers
 
+import org.corespring.container.client.ItemAssetResolver
 import org.htmlcleaner.{ TagNode, TagTransformation }
-import play.api.libs.json.JsValue
 
-object PlayerXhtml {
-  def mkXhtml(resolveImagePath:(String => String), xhtml: String): String = {
+trait PlayerXhtml {
+
+  def itemAssetResolver: ItemAssetResolver
+
+  def mkXhtml(itemId: String, xhtml: String): String = {
 
     /** <p> -> <div class="para"/> */
     def pToDiv = {
@@ -27,10 +30,11 @@ object PlayerXhtml {
 
     /** a post processor to add the image path */
     val setImagePath = (xhtml: TagNode) => {
+      val resolveItemAsset = itemAssetResolver.resolve(itemId)_
       val divs = xhtml.getElementsByName("img", true)
       divs.foreach((tag: TagNode) => {
         val attributes = tag.getAttributes
-        attributes.put("src", resolveImagePath(tag.getAttributeByName("src")))
+        attributes.put("src", resolveItemAsset(tag.getAttributeByName("src")))
         tag.setAttributes(attributes)
       })
     }

@@ -1,6 +1,7 @@
 package org.corespring.container.client.controllers.resources
 
 import org.corespring.container.client.ItemAssetResolver
+import org.corespring.container.client.controllers.helpers.PlayerXhtml
 import org.corespring.container.client.controllers.resources.ItemDraft.Errors
 import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.client.hooks._
@@ -28,7 +29,9 @@ class ItemDraftTest extends Specification with Mockito {
       m
     }
 
-    override def itemAssetResolver : ItemAssetResolver = new ItemAssetResolver{}
+    override def playerXhtml = new PlayerXhtml {
+      override def itemAssetResolver = new ItemAssetResolver{}
+    }
   }
 
   trait DH extends CoreItemHooks with DraftHooks

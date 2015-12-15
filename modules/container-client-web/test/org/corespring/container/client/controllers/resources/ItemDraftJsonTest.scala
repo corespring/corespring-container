@@ -1,16 +1,20 @@
 package org.corespring.container.client.controllers.resources
 
+import org.corespring.container.client.ItemAssetResolver
+import org.corespring.container.client.controllers.helpers.PlayerXhtml
 import org.specs2.mutable.Specification
 import play.api.libs.json.Json
 
 class ItemDraftJsonTest extends Specification {
 
+  val playerXhtml = new PlayerXhtml {
+    override def itemAssetResolver = new ItemAssetResolver{}
+  }
+
   val json = Json.obj(
     "xhtml" -> "<p>hello</p>")
 
-  def resolveAsset(s:String) = s
-
-  val itemJson = ItemJson("1", resolveAsset, json)
+  val itemJson = ItemJson("1", json, playerXhtml)
   "ItemJson" should {
 
     "add itemId" in {

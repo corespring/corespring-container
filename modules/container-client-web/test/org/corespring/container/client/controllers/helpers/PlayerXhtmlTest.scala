@@ -1,5 +1,6 @@
 package org.corespring.container.client.controllers.helpers
 
+import org.corespring.container.client.ItemAssetResolver
 import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
 
@@ -9,12 +10,12 @@ class PlayerXhtmlTest extends Specification {
     def withoutCarriageReturn = s.replaceAll("\r", "")
   }
 
-  def addImagePath(imageSrc:String):String = {
-    "anchor/" + imageSrc
+  val playerXhtml = new PlayerXhtml {
+    override def itemAssetResolver = new ItemAssetResolver{}
   }
 
   case class assertPlayerXhtml(in:String, expected:String) extends Scope{
-    PlayerXhtml.mkXhtml(addImagePath, in).trim.withoutCarriageReturn === expected.withoutCarriageReturn
+    playerXhtml.mkXhtml("123", in).trim.withoutCarriageReturn === expected.withoutCarriageReturn
   }
 
   "preparePlayerXhtml" should {
@@ -36,7 +37,7 @@ class PlayerXhtmlTest extends Specification {
 
     "insert image anchor" in assertPlayerXhtml(
       """<img src="test" width="7px" height="8px"/>""",
-      """<img src="anchor/test" width="7px" height="8px" />"""
+      """<img src="/player/item/123/test" width="7px" height="8px" />"""
     )
 
   }

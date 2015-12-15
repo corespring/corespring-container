@@ -1,6 +1,7 @@
 package org.corespring.container.client.integration
 
 import grizzled.slf4j.Logger
+import org.corespring.container.client.controllers.helpers.PlayerXhtml
 import org.corespring.container.client.{ItemAssetResolver, V2PlayerConfig}
 import org.corespring.container.client.component.ComponentUrls
 import org.corespring.container.client.controllers.apps._
@@ -48,6 +49,10 @@ trait DefaultIntegration
   def resolveDomain(path: String): String = path
 
   def itemAssetResolver: ItemAssetResolver
+
+  def playerXhtml: PlayerXhtml = new PlayerXhtml {
+    override def itemAssetResolver: ItemAssetResolver = DefaultIntegration.this.itemAssetResolver
+  }
 
   private lazy val logger = ContainerLogger.getLogger("DefaultIntegration")
 
@@ -228,7 +233,7 @@ trait DefaultIntegration
 
     override def resolveDomain(path: String): String = DefaultIntegration.this.resolveDomain(path)
 
-    override def itemAssetResolver: ItemAssetResolver = DefaultIntegration.this.itemAssetResolver
+    override def playerXhtml: PlayerXhtml = DefaultIntegration.this.playerXhtml
 
     override def itemPreProcessor: PlayerItemPreProcessor = DefaultIntegration.this.internalProcessor
   }
@@ -248,7 +253,7 @@ trait DefaultIntegration
 
     override def materialHooks: SupportingMaterialHooks = DefaultIntegration.this.itemSupportingMaterialHooks
 
-    override def itemAssetResolver: ItemAssetResolver = DefaultIntegration.this.itemAssetResolver
+    override def playerXhtml: PlayerXhtml = DefaultIntegration.this.playerXhtml
   }
 
   lazy val itemDraft = new ItemDraft {
@@ -265,7 +270,7 @@ trait DefaultIntegration
 
     override protected def componentTypes: Seq[String] = DefaultIntegration.this.components.map(_.componentType)
 
-    override def itemAssetResolver: ItemAssetResolver = DefaultIntegration.this.itemAssetResolver
+    override def playerXhtml: PlayerXhtml = DefaultIntegration.this.playerXhtml
   }
 
   lazy val session = new Session {

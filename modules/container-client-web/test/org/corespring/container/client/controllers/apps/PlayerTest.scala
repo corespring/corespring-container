@@ -2,6 +2,7 @@ package org.corespring.container.client.controllers.apps
 
 import java.util.concurrent.TimeUnit
 
+import org.corespring.container.client.controllers.helpers.PlayerXhtml
 import org.corespring.container.client.{ItemAssetResolver, V2PlayerConfig}
 import org.corespring.container.client.component.ComponentUrls
 import org.corespring.container.client.hooks.PlayerHooks
@@ -66,7 +67,9 @@ class PlayerTest extends Specification with PlaySpecification with Mockito {
       new NgSourcePaths(Seq.empty, "", Seq.empty, Seq.empty)
     }
 
-    override def itemAssetResolver : ItemAssetResolver = new ItemAssetResolver{}
+    override def  playerXhtml = new PlayerXhtml {
+      override def itemAssetResolver = new ItemAssetResolver{}
+    }
   }
 
   "load" should {
