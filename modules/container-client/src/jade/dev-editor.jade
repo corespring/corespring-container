@@ -20,6 +20,7 @@ block content
             label.btn.btn-default(btn-checkbox="true", ng-model="panes.html") html
             label.btn.btn-default(btn-checkbox="true", ng-model="panes.json") json
             label.btn.btn-default(btn-checkbox="true", ng-model="panes.scoring") scoring
+            label.btn.btn-default(btn-checkbox="true", ng-model="panes.files") files
             label.btn.btn-default(btn-checkbox="true", ng-model="panes.player") player
           .pull-right
             button.btn.btn-sm.btn-default(ng-click="save()", ng-hide="initialData.hideSaveButton") Save
@@ -33,6 +34,21 @@ block content
           .json-pane(
               ng-model="json",
               ui-ace="{mode: 'json', useWrapMode : true, onLoad: aceLoaded, onChange: aceJsonChanged }")
+        td.pane(ng-show="panes.files")
+          .files-pane(ng-controller="AssetsController")
+            table
+              tr
+                td
+                  div.file-item(ng-repeat="f in item.files",ng-class="{selected: $parent.selected == f.name}")
+                    a(ng-click="$parent.selected = f.name") {{f.name}}
+                    i.fa.fa-remove(ng-click="removeFile(f.name)")
+                  button.btn.btn-info(file-uploader="", fu-url="calculateUrl()", fu-upload-completed="onFileUploadCompleted", fu-mode="raw")
+                    span
+                      i.fa.fa-upload
+                      | Upload Image
+                td
+                  img(src="{{selected}}")
+
         td.pane(ng-show="panes.scoring")
           .custom-js-pane(
               ng-model="customScoringJs",

@@ -26,7 +26,7 @@ angular.module('corespring-editor.services').service('ItemService', [
         return url.indexOf('?' === -1) ? '?' : '&';
       }
 
-      this.load = function(onSuccess, onFailure) {
+      this.load = function(onSuccess, onFailure, force) {
         logger.debug('load, loaded?', loadedData !== null);
 
         loadQueue.push({
@@ -34,7 +34,7 @@ angular.module('corespring-editor.services').service('ItemService', [
           failure: onFailure
         });
 
-        if (loadedData) {
+        if (loadedData && !force) {
           flushQueue(loadedData, 'success');
           return;
         }

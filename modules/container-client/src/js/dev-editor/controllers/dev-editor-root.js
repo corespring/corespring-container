@@ -20,8 +20,9 @@ angular.module('corespring-dev-editor.controllers')
       $scope.panes = {
         html: true,
         json: false,
-        scoring:false,
-        player:true
+        scoring: false,
+        files: true,
+        player: false
       };
 
       $scope.aceJsonChanged = aceJsonChanged;
@@ -35,6 +36,14 @@ angular.module('corespring-dev-editor.controllers')
       $scope.$watch('xhtml', updateItemChanged);
 
       $scope.$on('registerComponent', registerComponent);
+
+      $scope.$on('reloadItem', function() {
+        ItemService.load($scope.onItemLoaded, $scope.onItemLoadError, true);
+      });
+
+      $scope.$on('saveItem', function() {
+        saveAll(_.identity);
+      });
 
       init();
 
@@ -82,6 +91,7 @@ angular.module('corespring-dev-editor.controllers')
       }
 
       function onItemLoaded(item) {
+        console.log("item: ", item);
         $scope.item = item;
         $scope.xhtml = item.xhtml;
         $scope.json = JSON.stringify(item.components, undefined, 2);

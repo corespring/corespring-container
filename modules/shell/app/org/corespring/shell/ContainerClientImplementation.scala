@@ -133,6 +133,19 @@ class ContainerClientImplementation(
     override def delete(t: AssetType, id: String, path: String)(implicit h: RequestHeader): Future[Option[(Int, String)]] = Future {
       val response = playS3.delete(s3.bucket, mkPath(t, id, path))
       if (response.success) {
+        val fileName = path.substring(path.lastIndexOf('/') + 1)
+        itemService.load(id) match {
+          case Some(item) =>
+            val transformer = (__ \ "files").json.update(
+              of[JsArray].map { case JsArray(arr) => JsArray(arr.filterNot(_ \ "name" == JsString(fileName))) })
+            val fallback = __.json.update((__ \ "files").json.put(JsArray(Seq())))
+            item.transform(transformer).orElse(item.transform(fallback)) match {
+              case succ: JsSuccess[JsObject] =>
+                itemService.save(id, succ.get)
+              case _ =>
+            }
+          case _ =>
+        }
         None
       } else {
         Some(BAD_REQUEST -> s"${response.key}: ${response.msg}")
