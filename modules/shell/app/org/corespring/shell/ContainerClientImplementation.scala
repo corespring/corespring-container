@@ -322,6 +322,10 @@ class ContainerClientImplementation(
     override def containerContext: ContainerExecutionContext = ContainerClientImplementation.this.containerContext
   }
 
+  override def itemMetadataHooks: ItemMetadataHooks = new shellEditor.ItemMetadataHooks {
+    override def containerContext: ContainerExecutionContext = ContainerClientImplementation.this.containerContext
+  }
+
 }
 
 /**
