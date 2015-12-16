@@ -26,6 +26,7 @@ describe('MetadataController', function() {
   beforeEach(angular.mock.module('corespring-editor.controllers'));
 
   beforeEach(module(function($provide) {
+    $provide.value('LogFactory', new org.corespring.mocks.editor.LogFactory());
     $provide.value('$window', $window);
     $provide.value('$stateParams', {key: 'key'});
     $provide.value('ItemService', ItemService);

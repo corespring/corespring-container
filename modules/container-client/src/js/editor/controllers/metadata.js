@@ -1,15 +1,17 @@
 angular.module('corespring-editor.controllers')
   .controller('MetadataController', [
-    '$log',
     '$scope',
     '$element',
     '$timeout',
     '$sce',
     '$window',
     '$stateParams',
+    'LogFactory',
     'EditorChangeWatcher',
     'ItemService',
-    function($log, $scope, $element, $timeout, $sce, $window, $stateParams, EditorChangeWatcher, ItemService) {
+    function($scope, $element, $timeout, $sce, $window, $stateParams, LogFactory, EditorChangeWatcher, ItemService) {
+
+      var $log = LogFactory.getLogger('MetadataController');
 
       var addMessageListener = function(fn, host) {
         var eventMethod = host.addEventListener ? "addEventListener" : "attachEvent";
@@ -48,9 +50,9 @@ angular.module('corespring-editor.controllers')
       }, $window.top);
 
       $scope.saveProfile = function(){
-        $log.log("saving profile due to metadata change");
+        $log.debug("saving profile due to metadata change");
         ItemService.saveProfile($scope.item.profile, function(result) {
-          $log.log("profile saved result:", result);
+          $log.debug("profile saved result:", result);
         });
       };
 
