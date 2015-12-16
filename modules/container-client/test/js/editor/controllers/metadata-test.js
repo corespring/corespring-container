@@ -16,11 +16,6 @@ describe('MetadataController', function() {
     }
   };
 
-  var MetadataService = {
-    get: function() {
-    }
-  };
-
   var LogFactory = {
     getLogger: jasmine.createSpy('getLogger').and.returnValue({
       debug: function() {
@@ -32,8 +27,8 @@ describe('MetadataController', function() {
 
   beforeEach(module(function($provide) {
     $provide.value('$window', $window);
+    $provide.value('$stateParams', {key: 'key'});
     $provide.value('ItemService', ItemService);
-    $provide.value('MetadataService', MetadataService);
     $provide.value('LogFactory', LogFactory);
     $provide.value('EditorChangeWatcher', new org.corespring.mocks.editor.EditorChangeWatcher());
   }));
@@ -51,15 +46,12 @@ describe('MetadataController', function() {
   function render() {
     scope = rootScope.$new();
     scope.item = {itemId: itemId};
+    scope.metadataSets = [{metadataKey: 'key'}];
     element = compile('<div ng-controller="MetadataController"></div>')(scope);
     scope = element.scope();
   }
 
   beforeEach(inject(function($rootScope, $compile, $timeout) {
-    spyOn(MetadataService, 'get').and.returnValue({
-      then: function() {
-      }
-    });
     spyOn($window.top, 'addEventListener').and.callFake(function(msg, fn) {
       mockListener = fn;
     });
@@ -72,7 +64,7 @@ describe('MetadataController', function() {
 
   describe('initialization', function() {
     it('should request metadata for item', function() {
-      expect(MetadataService.get).toHaveBeenCalledWith(itemId);
+      expect(scope.selectedMetadata).toEqual(scope.metadataSets[0]);
     });
   });
 

@@ -42,7 +42,17 @@ block after-main-script
           question : mkEditorState('question'),
           profile : mkEditorState('profile'),
           'supporting-materials' : mkEditorState('supporting-materials'),
-          metadata : mkEditorState('metadata')
+          metadata : {
+            url: '/metadata',
+            params: {
+              key: 'key'
+            },
+            views: {
+              main: {
+                templateUrl: '/templates/metadata'
+              }
+            }
+          }
         }
       };
 

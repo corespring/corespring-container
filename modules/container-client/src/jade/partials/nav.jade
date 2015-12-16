@@ -40,6 +40,7 @@ nav.row.navbar-default(ng-controller="NavController")
       +tab('Question', 'question')
       +tab('Profile', 'profile')
       +tab('Supporting Materials', 'supporting-materials')
-      +tab('Metadata', 'metadata')
+      li(ui-sref-active="active",ng-repeat="ms in metadataSets")
+        a(ui-sref="metadata({key: ms.metadataKey})", role='tab') {{ms.editorLabel}}
 
     +helper_icons

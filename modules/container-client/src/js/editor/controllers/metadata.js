@@ -6,10 +6,10 @@ angular.module('corespring-editor.controllers')
     '$timeout',
     '$sce',
     '$window',
-    'MetadataService',
+    '$stateParams',
     'EditorChangeWatcher',
     'ItemService',
-    function($log, $scope, $element, $timeout, $sce, $window, MetadataService, EditorChangeWatcher, ItemService) {
+    function($log, $scope, $element, $timeout, $sce, $window, $stateParams, EditorChangeWatcher, ItemService) {
 
       var addMessageListener = function(fn, host) {
         var eventMethod = host.addEventListener ? "addEventListener" : "attachEvent";
@@ -30,10 +30,14 @@ angular.module('corespring-editor.controllers')
         var msgType = msg && msg.data && msg.data.type;
         if (msgType == 'requestMetadata') {
           $log.debug("requesting metadata");
-          sendMessage({
-            type: 'currentMetadata',
-            message: $scope.item.profile.taskInfo.extended[$scope.selectedMetadata.metadataKey]
-          }, target);
+          var extended = $scope.item.profile.taskInfo && $scope.item.profile.taskInfo.extended;
+          var message = extended && extended[$scope.selectedMetadata.metadataKey];
+          if (message) {
+            sendMessage({
+              type: 'currentMetadata',
+              message: message
+            }, target);
+          }
         }
         if (msgType == 'updateMetadata') {
           var metadata = msg.data.message;
@@ -55,15 +59,19 @@ angular.module('corespring-editor.controllers')
         $scope.saveProfile,
         $scope), true);
 
-
       $scope.selectedMetadataUrl = "";
       $scope.selectMetadata = function(s) {
         $scope.selectedMetadataUrl = $sce.trustAsResourceUrl(s.editorUrl);
         $scope.selectedMetadata = s;
       };
-      MetadataService.get($scope.item.itemId).then(function(result) {
-        $scope.metadataSets = result;
+
+      var selected = _.find($scope.metadataSets, function(m) {
+        return m.metadataKey === $stateParams.key;
       });
+      if (selected) {
+        $scope.selectMetadata(selected);
+      }
+
     }
   ]
 );

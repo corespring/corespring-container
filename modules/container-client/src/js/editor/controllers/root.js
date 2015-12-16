@@ -68,6 +68,7 @@ angular.module('corespring-editor.controllers')
           ItemService.load($scope.onItemLoadSuccess, $scope.onItemLoadError);
         }
 
+
         function onInitialise(data) {
           logger.log('on initialise', data);
           ConfigurationService.setConfig(data);
@@ -119,6 +120,9 @@ angular.module('corespring-editor.controllers')
         preprocessComponents(item);
         $scope.lastId = findLastId(item);
         $scope.$broadcast('itemLoaded', item);
+        MetadataService.get($scope.item.itemId).then(function(result) {
+          $scope.metadataSets = result;
+        });
       }
 
       function onItemLoadError(err) {

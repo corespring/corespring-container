@@ -51,7 +51,7 @@ describe('editor root', function() {
     };
 
     MetadataService = {
-      get: jasmine.createSpy('load')
+      get: function() {}
     };
 
     LogFactory = new org.corespring.mocks.editor.LogFactory();
@@ -69,6 +69,7 @@ describe('editor root', function() {
     $provide.value('WiggiDialogLauncher',  WiggiDialogLauncher);
     $provide.value('EditorDialogTemplate', EditorDialogTemplate);
     $provide.value('editorDebounce', editorDebounce);
+
   }));
 
   function render() {
@@ -80,6 +81,12 @@ describe('editor root', function() {
     rootScope = $rootScope;
     controllerFn = $controller;
     EVENTS = WIGGI_EVENTS;
+
+    spyOn(MetadataService, 'get').and.returnValue({
+      then: function() {
+      }
+    });
+
     render();
   }));
 
@@ -176,6 +183,10 @@ describe('editor root', function() {
 
     it('should set item components to preprocessed components', function() {
       expect(item.components[index]).toEqual(preprocessedComponent);
+    });
+
+    it('should request metadata sets', function() {
+      expect(MetadataService.get).toHaveBeenCalled();
     });
 
   });

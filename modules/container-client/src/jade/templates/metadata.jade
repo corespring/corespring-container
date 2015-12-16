@@ -1,6 +1,3 @@
 script(type="text/ng-template", id="/templates/metadata")
   .metadata-form(ng-controller="MetadataController")
-    ul.metadata-sets
-      li(ng-repeat="s in metadataSets")
-        a(ng-click="selectMetadata(s)") {{s.editorLabel}}
     iframe.metadata-iframe(ng-src="{{selectedMetadataUrl}}")
