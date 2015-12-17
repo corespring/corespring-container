@@ -21,7 +21,7 @@ angular.module('corespring-dev-editor.controllers')
         html: true,
         json: false,
         scoring: false,
-        files: true,
+        files: false,
         player: true
       };
 

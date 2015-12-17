@@ -41,11 +41,11 @@ block content
                 td
                   div.file-item(ng-repeat="f in item.files",ng-class="{selected: $parent.selected == f.name}")
                     a(ng-click="$parent.selected = f.name") {{f.name}}
-                    i.fa.fa-remove(ng-click="removeFile(f.name)")
-                  button.btn.btn-info(file-uploader="", fu-url="calculateUrl()", fu-upload-completed="onFileUploadCompleted", fu-mode="raw")
+                    i.fa.fa-trash(ng-click="removeFile(f.name)")
+                  button.btn.btn-info.upload-button(file-uploader="", fu-url="calculateUrl()", fu-upload-completed="onFileUploadCompleted", fu-mode="raw")
                     span
                       i.fa.fa-upload
-                      | Upload Image
+                      | &nbsp;Upload Image
                 td
                   img(src="{{selected}}")
 
