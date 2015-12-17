@@ -1,4 +1,4 @@
-fdescribe('AssetsController', function() {
+describe('AssetsController', function() {
 
   var scope, element, rootScope, compile, timeout;
 
