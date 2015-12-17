@@ -1,4 +1,4 @@
-fdescribe('MetadataController', function() {
+describe('MetadataController', function() {
 
   var scope, element, rootScope, compile, timeout;
   var itemId = 1;
