@@ -1,4 +1,4 @@
-describe('MetadataController', function() {
+fdescribe('MetadataController', function() {
 
   var scope, element, rootScope, compile, timeout;
   var itemId = 1;
@@ -8,6 +8,11 @@ describe('MetadataController', function() {
   };
 
   var mockListener;
+  var mockMessageListener = function() {
+    this.add = function(fn) {
+      mockListener = fn;
+    };
+  };
 
   var $window = {
     top: {
@@ -30,6 +35,8 @@ describe('MetadataController', function() {
     $provide.value('$window', $window);
     $provide.value('$stateParams', {key: 'key'});
     $provide.value('ItemService', ItemService);
+    $provide.value('MsgrMessageListener', mockMessageListener);
+    $provide.value('LogFactory', LogFactory);
     $provide.value('LogFactory', LogFactory);
     $provide.value('EditorChangeWatcher', new org.corespring.mocks.editor.EditorChangeWatcher());
   }));
@@ -53,9 +60,7 @@ describe('MetadataController', function() {
   }
 
   beforeEach(inject(function($rootScope, $compile, $timeout) {
-    spyOn($window.top, 'addEventListener').and.callFake(function(msg, fn) {
-      mockListener = fn;
-    });
+    spyOn($window.top, 'addEventListener');
     spyOn($window.top, 'postMessage');
     rootScope = $rootScope;
     compile = $compile;
@@ -71,7 +76,7 @@ describe('MetadataController', function() {
 
   describe('messaging', function() {
     it('adds listener', function() {
-      expect($window.top.addEventListener).toHaveBeenCalled();
+      expect(mockListener).not.toBeNull();
     });
     it('requests metadata on requestMetadata', function() {
       scope.selectedMetadata = {metadataKey: 'k'};

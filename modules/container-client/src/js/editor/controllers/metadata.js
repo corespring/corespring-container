@@ -6,21 +6,13 @@ angular.module('corespring-editor.controllers')
     '$sce',
     '$window',
     '$stateParams',
+    'MsgrMessageListener',
     'LogFactory',
     'EditorChangeWatcher',
     'ItemService',
-    function($scope, $element, $timeout, $sce, $window, $stateParams, LogFactory, EditorChangeWatcher, ItemService) {
+    function($scope, $element, $timeout, $sce, $window, $stateParams, MsgrMessageListener, LogFactory, EditorChangeWatcher, ItemService) {
 
       var $log = LogFactory.getLogger('MetadataController');
-
-      var addMessageListener = function(fn, host) {
-        var eventMethod = host.addEventListener ? "addEventListener" : "attachEvent";
-        var eventer = host[eventMethod];
-        var messageEvent = eventMethod === "attachEvent" ? "onmessage" : "message";
-        eventer(messageEvent, function(e) {
-          fn(e);
-        }, false);
-      };
 
       var $iframe = $element.find('iframe');
       var target = ($iframe.length > 0 && $iframe[0].contentWindow) || $window.top;
@@ -28,7 +20,8 @@ angular.module('corespring-editor.controllers')
         host.postMessage(msg, "*");
       };
 
-      addMessageListener(function(msg) {
+      var messageListener = new MsgrMessageListener($window.top);
+      messageListener.add(function(msg) {
         var msgType = msg && msg.data && msg.data.type;
         if (msgType == 'requestMetadata') {
           $log.debug("requesting metadata");
