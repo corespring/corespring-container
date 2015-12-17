@@ -22,9 +22,12 @@ import org.corespring.shell.controllers.player.actions.{ PlayerHooks => ShellPla
 import org.corespring.shell.controllers.player.{ SessionHooks => ShellSessionHooks }
 import org.corespring.shell.controllers.{ ShellDataQueryHooks, editor => shellEditor }
 import org.corespring.shell.services.ItemDraftService
+import play.api.libs.MimeTypes
 import play.api.libs.json.JsObject
 import play.api.mvc._
 import play.api.{ Configuration, Logger, Mode, Play }
+import play.api.libs.json._
+import play.api.libs.json.Reads._
 
 import scala.concurrent.{ ExecutionContext, Future }
 import scalaz.{ Failure, Success, Validation }
@@ -45,8 +48,8 @@ class ContainerClientImplementation(
   }
 
   override def itemAssetResolver: ItemAssetResolver = new ItemAssetResolver {
-    override def resolve(itemId:String)(file:String):String ={
-       resolveDomain(super.resolve(itemId)(file))
+    override def resolve(itemId: String)(file: String): String = {
+      resolveDomain(super.resolve(itemId)(file))
     }
   }
 
@@ -137,6 +140,19 @@ class ContainerClientImplementation(
     override def delete(t: AssetType, id: String, path: String)(implicit h: RequestHeader): Future[Option[(Int, String)]] = Future {
       val response = playS3.delete(s3.bucket, mkPath(t, id, path))
       if (response.success) {
+        val fileName = path.substring(path.lastIndexOf('/') + 1)
+        itemService.load(id) match {
+          case Some(item) =>
+            val transformer = (__ \ "files").json.update(
+              of[JsArray].map { case JsArray(arr) => JsArray(arr.filterNot(_ \ "name" == JsString(fileName))) })
+            val fallback = __.json.update((__ \ "files").json.put(JsArray(Seq())))
+            item.transform(transformer).orElse(item.transform(fallback)) match {
+              case succ: JsSuccess[JsObject] =>
+                itemService.save(id, succ.get)
+              case _ =>
+            }
+          case _ =>
+        }
         None
       } else {
         Some(BAD_REQUEST -> s"${response.key}: ${response.msg}")
@@ -144,12 +160,38 @@ class ContainerClientImplementation(
     }
 
     override def upload(t: AssetType, id: String, path: String)(predicate: (RequestHeader) => Option[SimpleResult]): BodyParser[Future[UploadResult]] = {
+
+      def contentType(s: String) = {
+        val regexp = """\.(\w+?)$""".r
+        regexp.findFirstMatchIn(s.toLowerCase) match {
+          case Some(res) => MimeTypes.forExtension(res.group(0)).getOrElse("image/png")
+          case _ => "image/png"
+        }
+      }
+
       playS3.s3ObjectAndData[Unit](s3.bucket, _ => mkPath(t, id, path))((rh) => {
         predicate(rh).map { err =>
           Left(err)
         }.getOrElse(Right(Unit))
       }).map { f =>
-        f.map { tuple => UploadResult(tuple._1.getKey) }
+        f.map { tuple =>
+          itemService.load(id) match {
+            case Some(item) =>
+              val fileObj = Json.obj(
+                "name" -> tuple._1.getKey.substring(tuple._1.getKey.lastIndexOf('/') + 1),
+                "contentType" -> contentType(tuple._1.getKey))
+              val transformer = (__ \ "files").json.update(
+                of[JsArray].map { case JsArray(arr) => JsArray(arr :+ fileObj) })
+              val fallback = __.json.update((__ \ "files").json.put(JsArray(Seq(fileObj))))
+              item.transform(transformer).orElse(item.transform(fallback)) match {
+                case succ: JsSuccess[JsObject] =>
+                  itemService.save(id, succ.get)
+                case _ =>
+              }
+            case _ =>
+          }
+          UploadResult(tuple._1.getKey)
+        }
       }
     }
     override def copyItemToDraft(itemId: String, draftName: String): Unit = {

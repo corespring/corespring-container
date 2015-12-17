@@ -80,7 +80,6 @@ trait ItemEditorHooks extends ContainerItemEditorHooks {
       }
     }
 
-    //TODO: Mimic cs-api and add file to files array?
     assets.upload(AssetType.Item, itemId, file)(shellPredicate)
   }
 

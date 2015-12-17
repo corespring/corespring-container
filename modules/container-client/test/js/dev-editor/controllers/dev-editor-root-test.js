@@ -1,6 +1,6 @@
 describe('DevEditorRoot', function() {
 
-  var scope, element;
+  var scope, element, rootScope;
 
   var ItemService = {
     load: jasmine.createSpy('load'),
@@ -66,6 +66,7 @@ describe('DevEditorRoot', function() {
 
   beforeEach(inject(function($rootScope, $compile) {
     createController = function() {
+      rootScope = $rootScope;
       scope = $rootScope.$new();
       element = $compile('<div ng-controller="DevEditorRoot"></div>')(scope);
       scope = element.scope();
@@ -356,6 +357,33 @@ describe('DevEditorRoot', function() {
       expect(ComponentData.registerComponent).toHaveBeenCalledWith(id, componentBridge, {});
     });
 
+  });
+
+  describe('assets', function(){
+    var id = 1234;
+    var componentBridge = {'component': 'bridge'};
+
+    beforeEach(function() {
+      createController();
+      scope.$broadcast('registerComponent', id, componentBridge, {});
+    });
+
+    it('should reload the item after an asset has been uploaded', function() {
+      scope.item = {files: []};
+      ItemService.load.and.callFake(function(loadCallback) {
+        loadCallback({files: ['f']});
+      });
+      rootScope.$broadcast('assetUploadCompleted');
+      expect(Msgr.send).toHaveBeenCalledWith('itemChanged', {partChanged: 'item'});
+      expect(ItemService.load).toHaveBeenCalled();
+      expect(scope.item.files).toEqual(['f']);
+      ItemService.load.and.stub();
+    });
+
+    it('should notify of item changed after asset has been deleted', function() {
+      rootScope.$broadcast('assetDeleteCompleted');
+      expect(Msgr.send).toHaveBeenCalledWith('itemChanged', {partChanged: 'item'});
+    });
   });
 
   describe('in iframe', function(){
