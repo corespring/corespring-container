@@ -22,6 +22,7 @@ import org.corespring.shell.controllers.player.actions.{ PlayerHooks => ShellPla
 import org.corespring.shell.controllers.player.{ SessionHooks => ShellSessionHooks }
 import org.corespring.shell.controllers.{ ShellDataQueryHooks, editor => shellEditor }
 import org.corespring.shell.services.ItemDraftService
+import play.api.libs.MimeTypes
 import play.api.libs.json.JsObject
 import play.api.mvc._
 import play.api.{ Configuration, Logger, Mode, Play }
@@ -47,8 +48,8 @@ class ContainerClientImplementation(
   }
 
   override def itemAssetResolver: ItemAssetResolver = new ItemAssetResolver {
-    override def resolve(itemId:String)(file:String):String ={
-       resolveDomain(super.resolve(itemId)(file))
+    override def resolve(itemId: String)(file: String): String = {
+      resolveDomain(super.resolve(itemId)(file))
     }
   }
 
@@ -161,15 +162,13 @@ class ContainerClientImplementation(
     override def upload(t: AssetType, id: String, path: String)(predicate: (RequestHeader) => Option[SimpleResult]): BodyParser[Future[UploadResult]] = {
 
       def contentType(s: String) = {
-        val regexp = """\.*.?$""".r
-        regexp.findFirstIn(s.toLowerCase) match {
-          case Some(".png") => "image/png"
-          case Some(".jpg") => "image/jpeg"
-          case Some(".jpeg") => "image/jpeg"
-          case Some(".gif") => "image/gif"
+        val regexp = """\.(\w+?)$""".r
+        regexp.findFirstMatchIn(s.toLowerCase) match {
+          case Some(res) => MimeTypes.forExtension(res.group(0)).getOrElse("image/png")
           case _ => "image/png"
         }
       }
+
       playS3.s3ObjectAndData[Unit](s3.bucket, _ => mkPath(t, id, path))((rh) => {
         predicate(rh).map { err =>
           Left(err)
