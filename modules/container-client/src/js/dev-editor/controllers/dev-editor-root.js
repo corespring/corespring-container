@@ -48,10 +48,6 @@ angular.module('corespring-dev-editor.controllers')
         Msgr.send('itemChanged', {partChanged: 'item'});
       });
 
-      $scope.$on('saveItem', function() {
-        saveAll(_.identity);
-      });
-
       init();
 
       //-----------------------------------------
@@ -98,7 +94,6 @@ angular.module('corespring-dev-editor.controllers')
       }
 
       function onItemLoaded(item) {
-        console.log("item: ", item);
         $scope.item = item;
         $scope.xhtml = item.xhtml;
         $scope.json = JSON.stringify(item.components, undefined, 2);
