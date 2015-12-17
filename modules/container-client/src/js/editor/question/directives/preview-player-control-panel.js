@@ -12,6 +12,14 @@ angular.module('corespring-editor.directives')
           $scope.$emit('playerControlPanel.reset');
         };
 
+        $scope.isNumber= function (n) {
+          return !isNaN(parseFloat(n)) && isFinite(n);
+        };
+
+        $scope.$watch('mode', function(newValue, oldValue){
+          $scope.showSubmit = newValue === 'gather';
+          $scope.showReset = newValue !== 'gather';
+        });
       }
 
     return {

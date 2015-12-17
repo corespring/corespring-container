@@ -1,23 +1,54 @@
 .question-information(ng-if="item")
   .col-sm-3(ng-hide='hideNav')
-    ul.nav.nav-pills.nav-stacked(role='tablist')
-      li(role='presentation',ng-class="{active: activeTab == 'question'}",ng-click="selectTab('question')",ng-show="availableTabs.question")
-        a Question
-      li(role='presentation',ng-class="{active: activeTab == 'profile'}",ng-click="selectTab('profile')",ng-show="availableTabs.profile")
+    ul.nav-list(role='tablist')
+      li.header(role='presentation')
+        h5 Version
+
+      li(role='presentation',
+        ng-class="{active: activeTab == 'teacher'}",
+        ng-click="selectTab('teacher')", ng-show="tabs.question")
+        i.fa.fa-circle.bullet
+        a Teacher
+
+      li(role='presentation',
+        ng-class="{active: activeTab == 'student'}",
+        ng-click="selectTab('student')", ng-show="tabs.question")
+        i.fa.fa-circle.bullet
+        a Student
+
+      li.header.resources(role='presentation')
+        h5 Resources
+
+      li(role='presentation',
+        ng-class="{active: activeTab == 'profile'}", 
+        ng-click="selectTab('profile')", ng-show="tabs.profile")
+        i.fa.fa-circle.bullet
         a Profile Information
-      li(role='presentation', ng-show='item.supportingMaterials.length > 0 && availableTabs.supportingMaterial')
+      li(role='presentation', ng-show='item.supportingMaterials.length > 0 && tabs.supportingMaterial')
         a.dropdown-toggle(data-toggle='dropdown')
+          i.fa.fa-circle.bullet
           | Supporting Materials
           span.caret
-
         ul.dropdown-menu(role='menu')
-          li(ng-repeat="s in supportingMaterials",ng-model="s",ng-class="{divider: s.type == 'divider', data: s.type == 'data', active: s.index == activeSmIndex, 'dropdown-header': s.type == 'header'}") {{s.type == 'header' ? s.label : ''}}
-            a(ng-if="s.type == 'data'",ng-click="selectSupportingMaterial(s.index)") {{s.label}}
+          li(ng-repeat="section in sections", ng-class="{last: $last}")
+            ul.section-menu
+              li.dropdown-header {{section.name}}
+              li(ng-repeat="sm in section.items", ng-class="{active: selectedMaterial == sm}")
+                i.fa.fa-circle.bullet
+                a(ng-click="selectSupportingMaterial(sm)") {{sm.name}}
 
   .col-sm-8
-    .player-container(ng-show="activeTab == 'question'")
+    .player-container(ng-if="activeTab == 'teacher'")
       corespring-demo-player(
         data-jade-template='question-information',
+        player-mode="instructor",
+        player-markup="item.xhtml",
+        player-item="item")
+
+    .player-container(ng-if="activeTab == 'student'")
+      corespring-demo-player(
+        data-jade-template='question-information',
+        player-mode="gather",
         player-markup="item.xhtml",
         player-item="item")
 
@@ -26,9 +57,9 @@
 
     .supporting-material(ng-show="activeTab == 'supportingMaterial'")
       h3 {{selectedMaterial.name}}
-      div(style="height: 400px;", ng-if="selectedMaterial.contentType != 'text/html'")
-        iframe(ng-src="{{selectedMaterial.url}}")
-      div(ng-if="selectedMaterial.contentType == 'text/html'")
-        div(ng-bind-html-unsafe='selectedMaterial.content')
+      div(style="height: 400px;", ng-if="mainFile.contentType != 'text/html'")
+        iframe(ng-src="{{binaryUrl}}")
+      div(ng-if="mainFile.contentType == 'text/html'")
+        div(ng-bind-html-unsafe='mainFile.content')
 
   .clearfix

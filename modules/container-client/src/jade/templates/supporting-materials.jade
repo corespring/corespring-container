@@ -5,7 +5,16 @@ script( type="text/ng-template", id="/templates/popups/addSupportingMaterial")
         | When composing an assessment item, it can be useful to include supplemental materials to assist in scoring or classroom discussion.
 
     .add-supporting-material-popup
-      div(supportingmetadata="", focus-title="true", ng-model='supportingMaterial')
+      div(
+        supportingmetadata, 
+        ng-model='supportingMaterial',
+        is-valid='metadataIsValid',
+        existing-names='materialNames')
+//Remove popup
+script( type="text/ng-template", id="/templates/popups/removeSupportingMaterial")
+  +modal('Remove Supporting Material', 'Submit')
+    .alert.title
+        | You are about to delete <b>{{name}}</b>. Are you sure you want to do this?
 
 // Upload progress popup
 script( type="text/ng-template", id="/templates/popups/uploadingSupportingMaterial")
@@ -18,39 +27,41 @@ script(type="text/ng-template", id="/templates/supporting-materials")
   .supporting-materials(ng-controller="SupportingMaterials")
     .col-md-4.row
       .add-new-block
-        button.btn.btn-default(id="addNewButton",ng-click="addNew()")
-            i.fa.fa-plus
-            | &nbsp;add new supporting material
-      ul.supporting-materials-list
-        li(ng-repeat="s in supportingMaterials",
-          ng-model="s",
-          ng-class="{divider: s.type == 'divider', data: s.type == 'data', selected: s.index == index}", 
-          ui-sref="supporting-materials({index: s.index})")
-          h4(ng-if="s.type == 'header'") {{s.label}}
-          a(ng-if="s.type == 'data'") {{s.label}}
-          i.fa.fa-trash-o.pull-right(ng-if="s.type == 'data'", ng-click="deleteSupportingMaterial(s.index, $event)")
-    .col-md-6
-      .supporting-material(ng-show='supportingMaterial')
-        div(supportingmetadata="", ng-model='supportingMaterial')
-        .editor-container(ng-class="editorMode", ng-show="isContentType('text/html')")
+        button.btn.btn-default(ng-click="addNew()")
+          i.fa.fa-plus
+          | &nbsp;add new supporting material
+
+      .supporting-materials-list(
+        sm-list, 
+        group-by="materialType",
+        delete-item="deleteMaterial",
+        choose-item="chooseMaterial",
+        selected-item="selectedMaterial",
+        ng-model="item.supportingMaterials")
+    .col-md-7
+      .help-text(ng-hide="selectedMaterial")
+        | &nbsp;Use this area to add supporting materials (e.g. scoring guides, examples and/or rubrics) that may assist
+        | </br> an educator to administer or review this item.
+
+      .supporting-material(ng-show="selectedMaterial")
+        div(supporting-material-info, ng-model="selectedMaterial") 
+
+        .editor-container(ng-class="editorMode", ng-show="isHtml")
           wiggi-wiz(
             formatting-display="dropdown",
-            ng-model="supportingMarkup",
+            ng-model="mainFile.content",
             image-service="imageService",
             overrideFeatures="overrideFeatures",
             features="extraFeatures",
             dialog-launcher="external")
-            toolbar(basic="bold italic underline", media="", formatting="blockquote h1 h2 h3")
+            toolbar(basic="bold italic underline", media="image", formatting="blockquote h1 h2 h3")
             edit-pane-toolbar(alignment="bottom")
               .btn-group
                 button(ng-click="closePane()", class="btn btn-sm btn-success", style="float:right;") OK
 
-        .file-upload-info(ng-show="!isContentType('text/html')")
+        .file-upload-info(ng-show="isBinary")
           dl.dl-horizontal
-            dt File Size
-            dd(id="fileSizeInfo") {{formatKB(supportingMaterialFileSize)}}
-            dt(ng-show='hasDate(supportingMaterial)') Date
-            dd(ng-show='hasDate(supportingMaterial)') {{formatDate(supportingMaterial.dateModified)}}
+            div.preview-file
+              iframe(frameborder="0", ng-src="{{binaryPreviewUrl}}", width="100%", height="100%")
 
-            div.preview-file(ng-if="!isContentType('text/html')")
-              iframe(frameborder="0", ng-src="{{getSupportingUrl()}}", width="100%", height="100%")
+

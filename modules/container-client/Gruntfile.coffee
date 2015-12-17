@@ -60,8 +60,19 @@ module.exports = (grunt) ->
     .replace('bower_components', 'components')
     .replace('///', '//')
 
-  prepend = (pre, s) -> "#{pre}#{s}"
+  ###
+  Clean up the summary output of jasmine
+  by removing grunt-contrib-jasmine paths from stacktrace output
+  This is a hack of course, but helpful.
+  Unfortunately grunt-contrib-jasmine doesn't allow us to replace
+  the reporter
+  ###
+  gruntLogWriteln = grunt.log.writeln
+  grunt.log.writeln = (s) ->
+    if(!(s && s.indexOf('  at ') >= 0 && s.indexOf('grunt-contrib-jasmine') >= 0))
+      gruntLogWriteln(s || '')
 
+  prepend = (pre, s) -> "#{pre}#{s}"
   comps = prepend.bind( null, '<%= common.dist %>/bower_components/')
 
   config =
@@ -71,7 +82,6 @@ module.exports = (grunt) ->
     less:
       dev: lessConfig(false)
       production: lessConfig(true)
-
 
     watch:
       options:
@@ -124,6 +134,7 @@ module.exports = (grunt) ->
           '<%= common.test %>/js/**/*-mocks.js',
           ]
         options:
+          summary: true
           keepRunner: true
           vendor: _.map([
             'jquery/dist/jquery.js',
@@ -193,7 +204,7 @@ module.exports = (grunt) ->
     mkConfig('playerControls', playerControls)
   )
 
-  grunt.log.debug(JSON.stringify(fullConfig, null, "  "))
+  #grunt.log.debug(JSON.stringify(fullConfig, null, "  "))
 
   grunt.initConfig(fullConfig)
 

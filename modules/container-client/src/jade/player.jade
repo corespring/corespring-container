@@ -11,6 +11,13 @@ block header-scripts
 
       NREUM.info!= newRelicRumConfig
 
+  if warnings
+    script(type="text/javascript")
+      var warnings = !{warnings};
+      for (var i in warnings) {
+        console.warn(warnings[i]);
+      }
+
 block content
 
   mixin player
@@ -22,7 +29,6 @@ block content
       player-session='session',
       player-outcomes='outcome')
       != xhtml
-    summary-feedback(ng-model='item.summaryFeedback', session-complete='session.isComplete')
 
   .root(ng-controller='Root', dimension-propagator='')
 

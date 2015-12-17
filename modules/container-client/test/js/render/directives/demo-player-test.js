@@ -8,11 +8,16 @@ describe('corespringDemoPlayer', function() {
 
   function MockLog() {
     this.debug = {
-      bind: function() {}
+      bind: function() {
+      }
     };
+    this.info = function(){};
   }
 
-  var mockSubmitSession = jasmine.createSpy('submitSession');
+  var mockSubmitSession = jasmine.createSpy('submitSession').and.callFake(function(){
+    var onSuccess = mockSubmitSession.calls.mostRecent().args[1];
+    onSuccess({score: {summary: {percentage: 75}}});
+  });
   var mockSetMode = jasmine.createSpy('setMode');
   var mockSetEditable = jasmine.createSpy('setEditable');
   var mockReset = jasmine.createSpy('reset');
@@ -24,7 +29,9 @@ describe('corespringDemoPlayer', function() {
   function MockComponentRegister() {
     this.setMode = mockSetMode;
     this.setEditable = mockSetEditable;
-    this.getComponentSessions = function() { return componentSessions; };
+    this.getComponentSessions = function() {
+      return componentSessions;
+    };
     this.reset = mockReset;
   }
 
@@ -93,6 +100,22 @@ describe('corespringDemoPlayer', function() {
 
   });
 
+  describe('button label and class', function() {
+
+    it('default button label in gather mode is Submit Answer', function() {
+      scope.playerMode = 'gather';
+      expect(scope.submitButtonLabel()).toEqual('submit answer');
+    });
+
+    it('default button label in view/eval mode is Reset', function() {
+      scope.playerMode = 'evaluate';
+      expect(scope.submitButtonLabel()).toEqual('reset');
+      scope.playerMode = 'view';
+      expect(scope.submitButtonLabel()).toEqual('reset');
+    });
+
+  });
+
   describe('submitOrReset', function() {
 
     describe("mode === 'gather'", function() {
@@ -105,6 +128,10 @@ describe('corespringDemoPlayer', function() {
       it('should submit session', function() {
         expect(mockSubmitSession)
           .toHaveBeenCalledWith({components: componentSessions}, jasmine.any(Function), jasmine.any(Function));
+      });
+
+      it('should set the score', function() {
+        expect(scope.score).toEqual({summary:{percentage: 75}});
       });
 
     });

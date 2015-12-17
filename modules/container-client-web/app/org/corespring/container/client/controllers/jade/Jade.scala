@@ -2,6 +2,7 @@ package org.corespring.container.client.controllers.jade
 
 import java.io.{ BufferedReader, InputStreamReader, Reader }
 
+import de.neuland.jade4j.exceptions.JadeLexerException
 import de.neuland.jade4j.template.{ JadeTemplate, TemplateLoader }
 import de.neuland.jade4j.{ Jade4J, JadeConfiguration }
 import grizzled.slf4j.Logger
@@ -55,7 +56,7 @@ trait Jade {
   }
 
   private def cleanupReaders() = {
-    readers.foreach{ r =>
+    readers.foreach { r =>
       IOUtils.closeQuietly(r)
     }
     readers.clear()
@@ -63,11 +64,17 @@ trait Jade {
 
   private def loadTemplate(name: String): JadeTemplate = {
 
-    def readIn = {
+    def readIn = try {
       val out = jadeConfig.getTemplate(name)
-      templates.put(name, jadeConfig.getTemplate(name))
+      templates.put(name, out)
       cleanupReaders()
       out
+    } catch {
+      case jle: JadeLexerException => {
+        logger.error(s"jade error: ${jle.getFilename}, line no: ${jle.getLineNumber}")
+        throw jle
+      }
+      case t: Throwable => throw t
     }
 
     if (mode == Mode.Dev) {

@@ -17,7 +17,7 @@ function ClientLauncher(element, options, errorCallback){
     warnings = warnings || [];
 
     this.hasErrors = function(){
-      return errors.length === 0;
+      return errors.length > 0;
     };
 
     this.eachError = function(cb){
@@ -116,7 +116,7 @@ function ClientLauncher(element, options, errorCallback){
 
     handler.eachWarning(logger.warn);
 
-    if(!handler.hasErrors()){
+    if(handler.hasErrors()){
       handler.eachError(triggerErrorCallback);
       return false;
     }
@@ -143,8 +143,9 @@ function ClientLauncher(element, options, errorCallback){
   this.loadInstance = function(call, params, initialData, onReady){
 
     call = (typeof(call) === 'string') ? { method: 'GET', url: call} : call;
-    params = this.buildParams(params); 
-    var instance = new InstanceDef($.extend(call, {params: params}), element, errorCallback, logger, options.autosizeEnabled);
+    params = this.buildParams(params);
+    var instance = new InstanceDef($.extend(call, {params: params}), element, errorCallback, logger, options.autosizeEnabled, options.iframeScrollingEnabled);
+
 
     instance.on('launch-error', function (data) {
       var error = errorCodes.EXTERNAL_ERROR(data.code + ': ' + data.detailedMessage);

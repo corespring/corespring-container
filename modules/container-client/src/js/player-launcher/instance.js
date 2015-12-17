@@ -2,7 +2,7 @@
  * @param call: { url: '', method: '', params: {}, hash: ''}
  */
 
-var Instance = function(call,  element, errorCallback, log, autosizeEnabled) {
+var Instance = function(call,  element, errorCallback, log, autosizeEnabled, iframeScrollingEnabled) {
 
   autosizeEnabled = autosizeEnabled !== false;
 
@@ -97,6 +97,7 @@ var Instance = function(call,  element, errorCallback, log, autosizeEnabled) {
       ' id="', iframeUid , '"',
       ' name="', iframeUid ,'"',
       ' frameborder="0"',
+      iframeScrollingEnabled ? '' : ' scrolling="no"',
       ' class="player-loading"',
       ' style="border:none;' + (autosizeEnabled ? ' width:100%;' : '') + '" '
     ].join('');

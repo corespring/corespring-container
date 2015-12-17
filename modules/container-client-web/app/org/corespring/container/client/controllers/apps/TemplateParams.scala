@@ -1,6 +1,6 @@
 package org.corespring.container.client.controllers.apps
 
-import play.api.libs.json.{JsObject, JsValue, Json}
+import play.api.libs.json._
 
 trait TemplateParams {
   def appName: String
@@ -80,13 +80,15 @@ case class PlayerTemplateParams(
   sessionJson: JsValue,
   versionInfo: JsValue,
   useNewRelicRum: Boolean,
-  newRelicRumConfig: JsValue) extends TemplateParams {
+  newRelicRumConfig: JsValue,
+  warnings: Seq[String] = Seq.empty) extends TemplateParams {
   override def toJadeParams = {
     super.toJadeParams ++ Map(
       "showControls" -> new java.lang.Boolean(showControls),
       "sessionJson" -> Json.stringify(sessionJson),
       "versionInfo" -> Json.stringify(versionInfo),
       "useNewRelicRum" -> new java.lang.Boolean(useNewRelicRum),
-      "newRelicRumConfig" -> Json.stringify(newRelicRumConfig))
+      "newRelicRumConfig" -> Json.stringify(newRelicRumConfig),
+      "warnings" -> Json.stringify(JsArray(warnings.map(JsString(_)))))
   }
 }

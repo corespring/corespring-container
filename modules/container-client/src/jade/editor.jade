@@ -10,6 +10,7 @@ block content
   include templates/question
   include templates/profile
   include templates/supporting-materials
+  include templates/metadata
 
   .root(ng-controller="Root", dimension-propagator='')
     .container-fluid
@@ -40,14 +41,15 @@ block after-main-script
         states: {
           question : mkEditorState('question'),
           profile : mkEditorState('profile'),
-          'supporting-materials' : {
-            url: '/supporting-materials/{index}',
+          'supporting-materials' : mkEditorState('supporting-materials'),
+          metadata : {
+            url: '/metadata',
             params: {
-              index: { value: '0' }
+              key: 'key'
             },
             views: {
               main: {
-                templateUrl: '/templates/supporting-materials'
+                templateUrl: '/templates/metadata'
               }
             }
           }

@@ -1,7 +1,7 @@
 /** 
  * TODO: see:  http://missdemilo.com/cs/des-12/
  */
-angular.module('corespring-editor.directives').directive('expander', [
+angular.module('corespring-editor.profile.directives').directive('expander', [
   'LogFactory',
   function(LogFactory){
     var logger = LogFactory.getLogger('expander');

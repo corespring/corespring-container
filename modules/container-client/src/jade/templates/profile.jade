@@ -101,8 +101,8 @@ script(type="text/ng-template", id="/templates/profile")
 
           +configurableField("collectionId","* Collection", "collectionId")
             select.form-control.collection-id(id="collectionId",ng-model="collectionId",
-              ng-options="c.key as c.value for c in collectionIdDataProvider | filter:collectionIdFilter",
-              ng-disabled="formModels.collectionId.readonly")
+            ng-options="c.key as c.value for c in collectionIdDataProvider | filter:collectionIdFilter",
+            ng-disabled="formModels.collectionId.readonly")
             span.inline-help All items are added to the "Default" collection, unless another is selected.
 
         form.form-horizontal(role="form",ng-show="formModels.standards.visible")
@@ -147,13 +147,34 @@ script(type="text/ng-template", id="/templates/profile")
             hr/
 
           h6 Standards
-          .form-group(ng-repeat="c in standardsGroups",class="standards")
+          .form-group.standards(ng-repeat="c in standardsGroups")
             .col-sm-3
               image(ng-src="{{c.imageUrl}}", ng-if="c.hasImage")
               label(ng-if="!c.hasImage") {{ c.label }}
             .col-sm-9.no-input
-              input(type="hidden", multiple, ui-select2="{tags:[],dropdownCss:{display:'none'}}",
-              ng-model="c.standards", style="width: 100%;")
+              input(
+              type="hidden",
+              multiple,
+              ui-select2="{tags:[],dropdownCss:{display:'none'}}",
+              ng-model="c.standards",
+              style="width: 100%;")
+          br/
+          h6 Standard Clusters
+          .form-group.standards
+            .col-sm-12.no-input
+              input(
+              type="hidden",
+              multiple,
+              ui-select2="{tags:[],dropdownCss:{display:'none'}}",
+              ng-model="clusters",
+              style="width: 100%;")
+
+          br/
+          h6 Additional Clusters
+          +field("mathClusterSelector","Math")
+            +multipleValueSelector("mathClusterSelector","additionalCluster","mathClusterOptions | filter:selectedClusterFilter","Select...")
+          +field("elaClusterSelector","Ela")
+            +multipleValueSelector("elaClusterSelector","additionalCluster","elaClusterOptions | filter:selectedClusterFilter","Select...")
           br/
 
         +h_form
@@ -192,6 +213,13 @@ script(type="text/ng-template", id="/templates/profile")
                 input.form-control(id="lexile", ng-model="profile.lexile",
                 ng-readonly="formModels.lexile.readonly")
                 span.measure L
+
+          +panel("relatedCurriculum", "Related Curriculum")
+            .panel-body
+              +field("relatedCurriculum", "Related Curriculum")
+                input.form-control(id="relatedCurriculum",
+                type="text",
+                ng-model="otherAlignments.relatedCurriculum")
 
         +h_form
           h6 History
@@ -256,6 +284,17 @@ script(type="text/ng-template", id="/templates/profile")
 
               +configurableField("sourceUrl","Website URL", "contributorDetails.sourceUrl")
 
+              .form-group(ng-show="formModels.costForResource.visible")
+                label.col-sm-3.control-label Cost For Resource
+                .col-sm-9
+                  .input-group.cost-for-resource
+                    .input-group-addon $
+                    input.form-control(id="costForResource",
+                    type="number",
+                    ng-model="contributorDetails.costForResource")
+                    .input-group-addon .00
+
+
           +panel("additionalMediaCopyrights", "Additional Media Copyright")
             .panel-body
               additional-copyright-information-for-profile(copyrights="contributorDetails.additionalCopyrights",
@@ -278,6 +317,25 @@ script(type="text/ng-template", id="/templates/profile")
                       img(ng-show="contributorDetails.licenseType",ng-src="{{getLicenseTypeUrl(contributorDetails.licenseType)}}")
                     td(ng-if="contributorDetails.licenseType != 'Other'")
                       a(href="http://creativecommons.org/licenses/",target="_blank") Learn More
+
+        +h_form
+          h6 Status
+          .panel-body
+            .form-group(ng-show="formModels.workflow.visible")
+              .col-sm-9.workflow
+                div
+                  input(id="workflow-setup",type="checkbox",ng-model="profile.workflow.setup")
+                  label(for="workflow-setup") Setup
+                div
+                  input(id="workflow-tagged",type="checkbox",ng-model="profile.workflow.tagged")
+                  label(for="workflow-tagged") Tagged
+                div
+                  input(id="workflow-standards",type="checkbox",ng-model="profile.workflow.standardsAligned")
+                  label(for="workflow-standards") Standards Aligned
+                div
+                  input(id="workflow-qa",type="checkbox",ng-model="profile.workflow.qaReview")
+                  label(for="workflow-qa") QA Review
+
 
     .col-md-6
       div(ng-if="previewOn", profile-preview="", ng-model="item")

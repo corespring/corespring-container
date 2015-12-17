@@ -1,4 +1,4 @@
-.cs-btn{
+.cs-btn {
   padding-left: 40px;
   padding-right: 20px;
   padding-top: 10px;
@@ -10,12 +10,54 @@
   background-repeat: no-repeat;
 }
 
-.tight{
+.tight {
   padding-left: 7px;
   padding-right: 7px;
 }
 
+.btn-info {
+  background: #008BC9;
+}
 
-.btn-info{
-  background:#008BC9;
+.btn-reset,
+.btn-submit,
+.btn-try {
+  color: #1a9cff;
+  font-size: 10pt;
+  border: 1px solid #bce2ff;
+  background-color: #fff;
+  text-align: center;
+  white-space: normal;
+  margin: 0 20px 0 0;
+  box-shadow: 1px 1px 1px 1px rgba(102, 93, 77, 0.25);
+  -moz-box-shadow: 1px 1px 1px 1px rgba(102, 93, 77, 0.25);
+  -webkit-box-shadow: 1px 1px 1px 1px rgba(102, 93, 77, 0.25);
+  &[disabled] {
+    color: #E0DEE0;
+    border-color: #E0DEE0;
+    box-shadow: none;
+  }
+  &:active {
+    color: #FFF;
+    background-color: #1a9cff;
+    border-color: #1a9cff;
+    box-shadow: none;
+  }
+}
+
+.btn-try {
+  font-size: 10pt;
+  line-height: 10pt;
+  width: 80px;
+  height: 46px;
+  border-radius: 4px;
+}
+
+.btn-submit,
+.btn-reset {
+  font-size: 10pt;
+  line-height: 7pt;
+  width:64px;
+  height:64px;
+  border-radius:50px;
 }

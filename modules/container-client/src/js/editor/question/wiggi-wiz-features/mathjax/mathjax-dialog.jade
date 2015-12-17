@@ -10,16 +10,26 @@ mixin radio(value, label, ngModel)
 .mathjax-dialog-root
   .header
     .mj-dialog-content
-      | Use this window to add a math equation for your item.
-      | Do this by authoring some math text in 
-      a(href="http://en.wikipedia.org/wiki/MathML", target="_blank") MathML
-      | &nbsp;or 
-      a(href="http://en.wikipedia.org/wiki/LaTeX", target="_blank") LaTex
-      | &nbsp;format in the window below.
-      | If you need help authoring text, 
-      a(href="http://www.wiris.com/editor/demo/en/mathml-latex.html", target="_blank") this website
-      | &nbsp;can help.
-    
+      p
+        | Use this window to add math symbols and/or equations to your item using MathML and LaTex code.
+      p
+        | For help with writing the code, go to&nbsp;
+        a(href="http://www.wiris.com/editor/demo/en/mathml-latex.html", target="_blank") this site.
+        | &nbsp;Copy and paste the code into the window below.
+      i.sample
+        p
+          | Sample code for &nbsp;
+          span.fraction
+            span.fup
+            | 1
+            span.bar
+            | &nbsp;
+            span.fdn
+            | 2
+        p
+          | MathML: &lt;math xmlns=&quot;http://www.w3.org/1998/Math/MathML&quot;&gt;&lt;mfrac&gt;&lt;mn&gt;1&lt;/mn&gt;&lt;mn&gt;2&lt;/mn&gt;&lt;/mfrac&gt;&lt;/math&gt;
+        p
+          | LaTex: \frac12
   .mj-math-type
     form.form-inline(ng-show="!showDisplayMode()")
       | Display mode unknown
@@ -30,7 +40,7 @@ mixin radio(value, label, ngModel)
         +radio('block', 'Block', 'displayType')
       span.display-type(ng-show="mathType == \'MathML\'") Block
   .main
-    textarea.math-textarea(ng-model="preppedMath",  placeholder="Enter MathML or LaTex here...")
+    textarea.math-textarea(ng-model="preppedMath",  placeholder="Type or Cut/Paste MathML or LaTex here...")
     .math-preview
       .preview-label Preview
       .preview-body

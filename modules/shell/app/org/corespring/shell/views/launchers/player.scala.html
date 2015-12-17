@@ -58,6 +58,12 @@
         });
        });
 
+       $('#set-mode-instructor').click(function(){
+        player.setMode('instructor', function(err){
+          console.log(err);
+        });
+       });
+
        $('#player-container-width-input').change(function(){
          $('.holder').css('width', $('#player-container-width-input').val()+"px");
        });
@@ -72,10 +78,11 @@
      });
     </script>
 
-<button class="button" id="set-mode-evaluate">evaluate</button>
-  Container width: <input type="text" id="player-container-width-input"/>
-  Player width: <input type="text" id="player-width-input"/>
+  <button class="button" id="set-mode-evaluate">evaluate</button>
+  <button class="button" id="set-mode-instructor">instructor</button>
+  Container width: <input type="text" id="player-container-width-input" style="width:100px;"/>
+  Player width: <input type="text" id="player-width-input" style="width:100px;"/>
 
-<div class="holder"></div>
+  <div class="holder"></div>
 </body>
 </html>

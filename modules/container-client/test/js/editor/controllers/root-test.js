@@ -1,24 +1,16 @@
 describe('editor root', function() {
 
-  var scope, element, EVENTS;
+  var scope, EVENTS, controllerFn;
   var iFrame = false, bypassIframeLaunchMechanism = false;
 
   beforeEach(angular.mock.module('wiggi-wiz.constants'));
   beforeEach(angular.mock.module('corespring-editor.controllers'));
 
-  var $state = {
-    transitionTo: jasmine.createSpy('transitionTo')
-  };
-  
-  var ComponentRegister = {};
-  
   var ConfigurationService = {
     setConfig: jasmine.createSpy('setConfig')
   };
   
-  var ItemService;
-  var mockError = jasmine.createSpy('error');
-  var LogFactory;
+  var ItemService, MetadataService, LogFactory, msgrOnHandlers, Msgr;
 
   var iFrameService = {
     isInIFrame: function() {
@@ -28,10 +20,6 @@ describe('editor root', function() {
       return bypassIframeLaunchMechanism;
     }
   };
-
-  var msgrOnHandlers;
-
-  var Msgr;
 
   var launcher = {
     launch : jasmine.createSpy('launch')
@@ -47,15 +35,6 @@ describe('editor root', function() {
     })
   };
 
-  var mockWindow = {
-    confirm: function(msg){
-      return true;
-    },
-    location: {
-      search: 'query-string'
-    }
-  };
-
   beforeEach(module(function($provide) {
     msgrOnHandlers = {};
     
@@ -68,40 +47,46 @@ describe('editor root', function() {
  
     ItemService = {
       load: jasmine.createSpy('load'),
-      saveAll: jasmine.createSpy('saveAll'),
-      saveSupportingMaterials: jasmine.createSpy('saveSupportingMaterials')
+      saveAll: jasmine.createSpy('saveAll')
     };
 
-    LogFactory = {
-      getLogger: jasmine.createSpy('getLogger').and.returnValue({
-        debug: function() {},
-        log: function() {},
-        error: mockError
-      })
+    MetadataService = {
+      get: function() {}
     };
 
-    $provide.value('$state', $state);
-    $provide.value('$window', mockWindow);
-    $provide.value('ComponentRegister', ComponentRegister);
+    LogFactory = new org.corespring.mocks.editor.LogFactory();
+    editorDebounce = {
+      flush: jasmine.createSpy('flush')
+    };
+
+    $provide.value('$timeout', function(fn){fn();});
     $provide.value('ConfigurationService', ConfigurationService);
     $provide.value('ItemService', ItemService);
+    $provide.value('MetadataService', MetadataService);
     $provide.value('LogFactory', LogFactory);
     $provide.value('iFrameService', iFrameService);
     $provide.value('Msgr', Msgr);
     $provide.value('WiggiDialogLauncher',  WiggiDialogLauncher);
     $provide.value('EditorDialogTemplate', EditorDialogTemplate);
+    $provide.value('editorDebounce', editorDebounce);
+
   }));
 
   function render() {
     scope = rootScope.$new();
-    element = compile('<div ng-controller="Root"></div>')(scope);
-    scope = element.scope();
+    controllerFn('Root', {$scope: scope});
   }
 
-  beforeEach(inject(function($rootScope, $compile, WIGGI_EVENTS) {
+  beforeEach(inject(function($rootScope, $controller, WIGGI_EVENTS) {
     rootScope = $rootScope;
-    compile = $compile;
+    controllerFn = $controller;
     EVENTS = WIGGI_EVENTS;
+
+    spyOn(MetadataService, 'get').and.returnValue({
+      then: function() {
+      }
+    });
+
     render();
   }));
 
@@ -159,71 +144,7 @@ describe('editor root', function() {
 
   });
 
-  describe('deleteSupportingMaterial event', function() {
-    var index = 1;
-    var data = {
-      index: index
-    };
-    var supportingMaterials = ['these', 'are', 'supporting', 'materials'];
-    var withoutSupportingMaterial = (function() {
-      var arr = _.clone(supportingMaterials);
-      arr.splice(index, 1);
-      return arr;
-    })();
-    var item;
-    var itemId = 123;
-
-    describe('unconfirmed delete', function() {
-      beforeEach(function() {
-        spyOn(mockWindow, 'confirm').and.returnValue(false);
-        item = {
-          supportingMaterials: _.clone(supportingMaterials)
-        };
-        scope.item = item;
-        scope.$emit('deleteSupportingMaterial', data);
-      });
-
-      it('does not transition to another supportingMaterial', function() {
-        expect($state.transitionTo).not.toHaveBeenCalled();
-      });
-
-      it('does not change item.supportingMaterials', function() {
-        expect(scope.item.supportingMaterials).toEqual(supportingMaterials);
-      });
-
-      it('does not call ItemService.saveSupportingMaterials', function() {
-        expect(ItemService.saveSupportingMaterials).not.toHaveBeenCalled();
-      });
-
-    });
-
-    describe('confirmed delete', function() {
-      beforeEach(function() {
-        spyOn(mockWindow, 'confirm').and.returnValue(true);
-        item = {
-          supportingMaterials: _.clone(supportingMaterials)
-        };
-        scope.item = item;
-        scope.itemId = 123;
-        scope.$emit('deleteSupportingMaterial', data);
-      });
-
-      it('transitions to first supportingMaterial', function() {
-        expect($state.transitionTo).toHaveBeenCalledWith('supporting-materials', {index: '0'}, {reload: true});
-      });
-
-      it('removes supporting material at index from item.supportingMaterials', function() {
-        expect(scope.item.supportingMaterials).toEqual(withoutSupportingMaterial);
-      });
-
-      it('calls ItemService.saveSupportingMaterials with supporting material at index removed', function() {
-        expect(ItemService.saveSupportingMaterials)
-          .toHaveBeenCalledWith(withoutSupportingMaterial, jasmine.any(Function), scope.onSaveError, scope.itemId);
-      });
-
-    });
-
-  });
+ 
 
   describe('onItemLoadSuccess', function() {
     var componentType = 'component';
@@ -264,6 +185,10 @@ describe('editor root', function() {
       expect(item.components[index]).toEqual(preprocessedComponent);
     });
 
+    it('should request metadata sets', function() {
+      expect(MetadataService.get).toHaveBeenCalled();
+    });
+
   });
 
   describe('Item change event', function() {
@@ -284,7 +209,7 @@ describe('editor root', function() {
     });
 
     it('should log error with provided message', function() {
-      expect(mockError).toHaveBeenCalledWith(jasmine.any(String), message);
+      expect(LogFactory.logger.error).toHaveBeenCalledWith(jasmine.any(String), message);
     });
   });
 
@@ -302,6 +227,11 @@ describe('editor root', function() {
 
     it('should call ItemService#saveAll', function() {
       expect(ItemService.saveAll).toHaveBeenCalled();
+    });
+
+    it('should call editorDebounce.flush', function(){
+      callback();
+      expect(editorDebounce.flush).toHaveBeenCalled();
     });
 
     it('should call the event caller\'s callback', function() {

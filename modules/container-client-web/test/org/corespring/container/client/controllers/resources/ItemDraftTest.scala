@@ -1,8 +1,11 @@
 package org.corespring.container.client.controllers.resources
 
+import org.corespring.container.client.ItemAssetResolver
+import org.corespring.container.client.controllers.helpers.PlayerXhtml
 import org.corespring.container.client.controllers.resources.ItemDraft.Errors
 import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.client.hooks._
+import org.corespring.container.client.integration.ContainerExecutionContext
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
@@ -16,11 +19,21 @@ import scala.concurrent.{ ExecutionContext, Future }
 class ItemDraftTest extends Specification with Mockito {
 
   trait BaseDraft extends ItemDraft {
-    override implicit def ec: ExecutionContext = ExecutionContext.Implicits.global
+
+    override def containerContext: ContainerExecutionContext = new ContainerExecutionContext(ExecutionContext.global)
 
     override protected def componentTypes: Seq[String] = Seq.empty
+
+    override def materialHooks: SupportingMaterialHooks = {
+      val m = mock[SupportingMaterialHooks]
+      m
+    }
+
+    override def playerXhtml = new PlayerXhtml {
+      override def itemAssetResolver = new ItemAssetResolver{}
+    }
   }
-  
+
   trait DH extends CoreItemHooks with DraftHooks
 
   import ExecutionContext.Implicits.global
@@ -48,13 +61,12 @@ class ItemDraftTest extends Specification with Mockito {
         status(draft.load("x")(FakeRequest("", ""))) === OK
       }
 
-      val badJson = Json.obj("_id" ->
-          Json.obj("$oid" -> "1"),
-          "xhtml" -> "<p>a</p>")
+      val badJson = Json.obj(
+        "xhtml" -> "<p>a</p>")
 
       "prep the json" in new load(loadResult = badJson) {
         val json = contentAsJson(draft.load("x")(FakeRequest("", "")))
-        (json \ "itemId").as[String] === "1"
+        (json \ "itemId").as[String] === "x"
         (json \ "xhtml").as[String] === """<div class="para">a</div>"""
       }
     }
@@ -94,20 +106,20 @@ class ItemDraftTest extends Specification with Mockito {
 
       "fail to save if no json is supplied" in new save() {
         val result = draft.save("x")(FakeRequest())
-        status(result) must be equalTo(BAD_REQUEST)
-        (contentAsJson(result) \ "error").as[String] must be equalTo(Errors.noJson)
+        status(result) must be equalTo (BAD_REQUEST)
+        (contentAsJson(result) \ "error").as[String] must be equalTo (Errors.noJson)
       }
 
       val json = Json.obj("this" -> "is", "item" -> "json")
 
       "return 200 on success" in new save(json) {
         val result = draft.save("x")(FakeRequest().withJsonBody(json))
-        status(result) must be equalTo(OK)
+        status(result) must be equalTo (OK)
       }
 
       "return result from DraftHooks#save on success" in new save(json) {
         val result = draft.save("x")(FakeRequest().withJsonBody(json))
-        contentAsJson(result) must be equalTo(json)
+        contentAsJson(result) must be equalTo (json)
       }
 
     }

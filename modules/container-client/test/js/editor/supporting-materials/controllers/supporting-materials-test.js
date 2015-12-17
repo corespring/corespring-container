@@ -1,69 +1,71 @@
 describe('SupportingMaterials', function() {
+  
+  var scope, $modal, itemService, supportingMaterialsService, imageUtils;
 
-  var scope, element;
-
-  var index = 0;
-
+  beforeEach(angular.mock.module('corespring-common.supporting-materials.services'));
   beforeEach(angular.mock.module('corespring-editor.controllers'));
 
-  var $modal = {
-    open: function() {}
-  };
-
-  var $state = {
-    transitionTo: function() {}
-  };
-
-  function MockStateParams() {
-    this.index = index;
-  }
-
-  var supportingMaterialsService = {
-    getSupportingMaterialFile: function() {},
-    getContentType: function() {},
-    getSupportingUrl: function() {},
-    getKBFileSize: function() {}
-  };
-
-  var editorConfig = {
-    mathJaxFeatureGroup: function() {
-      return ['this', 'is', 'the', 'mathjax', 'feature', 'group'];
-    },
-    footnotesFeatureGroup: function() {
-      return ['this', 'is', 'the', 'footnotes', 'feature', 'group'];
-    },
-    overrideFeatures: ['these', 'are', 'the', 'override', 'features']
-  };
-
-  var itemService = {
-    saveSupportingMaterials: jasmine.createSpy('saveSupportingMaterials')
-  };
-
   beforeEach(module(function($provide) {
+
+    $modal = {
+      open: jasmine.createSpy('open')
+    };
+
+    supportingMaterialsService = {
+      delete: jasmine.createSpy('delete'),
+      getBinaryUrl: jasmine.createSpy('getBinaryUrl'),
+      updateContent: jasmine.createSpy('updateContent'),
+      create: jasmine.createSpy('create')
+    };
+
+    editorConfig = {
+      mathJaxFeatureGroup: function() {
+        return ['mathjax'];
+      },
+      footnotesFeatureGroup: function() {
+        return ['footnotes'];
+      },
+      overrideFeatures: ['overrideFeatures']
+    };
+
+    itemService = {
+      saveSupportingMaterials: jasmine.createSpy('saveSupportingMaterials'),
+      load: jasmine.createSpy('load').and.callFake(function(onLoad, onError){
+        onLoad({ supportingMaterials: []});
+      })
+    };
+
+
+    $provide.value('LogFactory', new org.corespring.mocks.editor.LogFactory());
     $provide.value('$modal', $modal);
-    $provide.value('$state', $state);
-    $provide.value('$stateParams', new MockStateParams());
     $provide.value('ItemService', itemService);
     $provide.value('SupportingMaterialsService', supportingMaterialsService);
     $provide.value('EditorConfig', editorConfig);
     $provide.value('EditorChangeWatcher', new org.corespring.mocks.editor.EditorChangeWatcher());
+    $provide.value('editorDebounce', org.corespring.mocks.editor.debounce);
+
+    //For SmUtils
+    $provide.value('SupportingMaterialUrls', {});
   }));
 
-  beforeEach(inject(function($rootScope, $compile) {
+  beforeEach(inject(function($rootScope, $controller, ImageUtils) {
     scope = $rootScope.$new();
-    element = $compile('<div ng-controller="SupportingMaterials"></div>')(scope);
-    scope = element.scope();
+    $controller('SupportingMaterials', {$scope: scope});
+    spyOn(scope, '$emit');
+    imageUtils = ImageUtils;
   }));
+  
+
+  function assertItemChangedEmitted(before){
+    return function(){
+      if(before){
+        before();
+      }
+      expect(scope.$emit).toHaveBeenCalledWith('itemChanged', {partChanged: 'supporting-materials'});
+    };
+  }
 
   describe('initialization', function() {
-
-    it('should set index to $stateParams.index', function() {
-      expect(scope.index).toEqual(index);
-    });
-
-    it('should set editing to false', function() {
-      expect(scope.editing).toBe(false);
-    });
 
     it('should set extra feature definitions to include mathjax and footnotes from EditorConfig', function() {
       expect(scope.extraFeatures).toEqual({
@@ -78,15 +80,30 @@ describe('SupportingMaterials', function() {
       expect(scope.overrideFeatures).toEqual(editorConfig.overrideFeatures);
     });
 
+    describe('ItemService.load -> onLoad', function() {
+      it('should set the item', function() {
+        expect(scope.item).not.toBe(null);
+      });
+      
+      it('should set the item.supportingMaterials', function() {
+        expect(scope.item.supportingMaterials).not.toBe(null);
+      });
+    });
   });
 
   describe('addNew', function() {
     var callback;
     beforeEach(function() {
-      callback = jasmine.createSpy('callback');
-      spyOn($modal, 'open').and.returnValue({
+
+      supportingMaterialsService.create.and.callFake(function(req, onCreate, onError){
+        onCreate({name: 'new-material'});
+      });
+
+      $modal.open.and.returnValue({
         result: {
-          then: callback
+          then: function(cb){
+            callback = cb;
+          } 
         }
       });
       scope.addNew();
@@ -96,247 +113,248 @@ describe('SupportingMaterials', function() {
       expect($modal.open).toHaveBeenCalledWith({
         templateUrl: '/templates/popups/addSupportingMaterial',
         controller: 'AddSupportingMaterialPopupController',
-        backdrop: 'static'
+        backdrop: 'static',
+        resolve: {
+          materialNames: jasmine.any(Function)
+        }
       });
     });
 
-    describe('callback', function() {
-      var supportingMaterial;
+    it('should call SupportingMaterialsService.create', function(){
+      callback({source: 'html'});
+      expect(supportingMaterialsService.create).toHaveBeenCalledWith({source:'html'}, jasmine.any(Function), jasmine.any(Function));
     });
+
+    it('should call onCreate callack', function(){
+      callback({source: 'html'});
+      expect(scope.item.supportingMaterials.length).toBe(1);
+      expect(scope.selectedMaterial).toEqual({name: 'new-material'});
+    });
+
+    it('should call scope.$emit with itemChanged', assertItemChangedEmitted(function(){
+      callback({source: 'html'});
+    }));
 
   });
 
-  describe('deleteSupportingMaterial', function() {
-    var index = 0, event = {
-      preventDefault: function() {},
-      stopPropagation: function() {}
-    };
+
+  describe('deleteMaterial', function() {
+    
+    var onSuccess, onError, material, done, confirmRemove; 
     beforeEach(function() {
-      spyOn(scope, '$emit');
-      spyOn(event, 'preventDefault');
-      spyOn(event, 'stopPropagation');
-      scope.deleteSupportingMaterial(index, event);
+      material = {name: 'delete-me'};
+      done = jasmine.createSpy('done');
+      $modal.open.and.returnValue({
+        result: {
+          then: function(cb){
+            confirmRemove = cb;
+          }
+        }
+      });
+      supportingMaterialsService.delete.and.callFake(function(m, success, error){
+        onSuccess = success;
+        onError = error;
+      });
+
+      scope.item.supportingMaterials = [material];
+      scope.deleteMaterial(material, done);
+      confirmRemove();
     });
 
-    it('should $emit a deleteSupportingMaterial event', function() {
-      expect(scope.$emit).toHaveBeenCalledWith('deleteSupportingMaterial', {index: index});
+    it('should call SupportingMaterialsService.delete', function() {
+      expect(supportingMaterialsService.delete).toHaveBeenCalledWith(material, jasmine.any(Function), jasmine.any(Function));
     });
 
-    it('should cancel the provided event', function() {
-      expect(event.preventDefault).toHaveBeenCalled();
-      expect(event.stopPropagation).toHaveBeenCalled();
+    it('should call $modal.open', function(){
+      expect($modal.open).toHaveBeenCalledWith(
+        {
+          templateUrl: '/templates/popups/removeSupportingMaterial',
+          controller: 'RemoveSupportingMaterialPopupController',
+          backdrop: 'static',
+          resolve: {
+            name: jasmine.any(Function)
+          }
+        });
     });
 
+    it('should remove the material from the item', function(){
+      expect(scope.item.supportingMaterials).toEqual([]);
+    });
+
+    describe('on success', function(){
+
+      beforeEach(function(){
+        onSuccess();
+      });
+
+      it('should deselect the selected material', function(){
+        expect(scope.selectedMaterial).toBe(null);
+      });
+      
+      it('should deselect the preview url', function(){
+        expect(scope.binaryPreviewUrl).toBe(null);
+      });
+
+      it('should call the done callback', function(){
+        expect(done).toHaveBeenCalled();
+      });
+    
+      it('call scope.$emit with itemChanged', assertItemChangedEmitted());
+    });
   });
 
-  describe('fileSizeGreaterThanMax event', function() {
-    beforeEach(function() {
-      spyOn(console, 'warn');
-      scope.$broadcast('fileSizeGreaterThanMax');
-    });
-
-    it('should warn that file is too big', function() {
-      expect(console.warn).toHaveBeenCalledWith('file too big');
+  describe('chooseMaterial', function(){
+    it('sets the selectedMaterial', function(){
+      scope.chooseMaterial({name: 'm'});
+      expect(scope.selectedMaterial).toEqual({name: 'm'});
     });
   });
+  
+  describe('$watch(selectedMaterial)', function(){
 
-  describe('itemLoaded event', function() {
-    beforeEach(function() {
-      spyOn(scope, 'init');
-      scope.$broadcast('itemLoaded');
-    });
 
-    it('should call the init method', function() {
-      expect(scope.init).toHaveBeenCalled();
-    });
-  });
+    function describeSelectedMaterial(file){
+      file.isMain = true;
+      return function(){
 
-  describe('onNewSupportingMaterialSaveSuccess', function() {
-    var data = {
-      supportingMaterials: ['these', 'are', 'supporting', 'materials']
-    };
+        beforeEach(function(){
+          supportingMaterialsService.getBinaryUrl.and.returnValue('url');
+          scope.selectedMaterial = { files: [file]};
+          scope.$apply();
+        });
 
-    beforeEach(function() {
-      spyOn($state, 'transitionTo');
-      scope.item = {};
-      scope.onNewSupportingMaterialSaveSuccess(data);
-    });
+        it('sets mainFile', function(){
+          expect(scope.mainFile).toBe(file);
+        }); 
 
-    it('should set the item.supportingMaterials to the supportingMaterials from the parameter', function() {
-      expect(scope.item.supportingMaterials).toEqual(data.supportingMaterials);
-    });
+        it('sets isHtml', function(){
+          expect(scope.isHtml).toEqual(file.contentType === 'text/html');
+        });
+        
+        it('sets isBinary', function(){
+          expect(scope.isBinary).toEqual(file.contentType !== 'text/html');
+        });
 
-    it('should transition to the new supporting material', function() {
-      expect($state.transitionTo)
-        .toHaveBeenCalledWith('supporting-materials', {index: jasmine.any(Number)}, {reload: true});
-    });
-
-  });
-
-  describe('formatKB', function() {
-
-    it("should return '--' for NaN", function() {
-      expect(scope.formatKB(NaN)).toEqual('--');
-    });
-
-    it('should return 1.5mb for 1536', function() {
-      expect(scope.formatKB(1536)).toEqual('1.5mb');
-    });
-
-    it('should return 512kb for 512', function() {
-      expect(scope.formatKB(512)).toEqual('512kb');
-    });
-
-  });
-
-  describe('getSupportingMaterials', function() {
-
-    var item = {
-      supportingMaterials: ['these', 'are', 'supporting', 'materials']
-    };
-
-    beforeEach(function() {
-      scope.item = item;
-    });
-
-    it('should return scope.item.supportingMaterials', function() {
-      expect(scope.getSupportingMaterials()).toEqual(item.supportingMaterials);
-    });
-
-  });
-
-  describe('hasDate', function() {
-    it ('should return true if supportingMaterial.dateModified is defined', function() {
-      var supportingMaterial = {
-        dateModified: "I'm defined!"
+        it('sets binaryPreviewUrl', function(){
+          if(scope.isBinary){
+            expect(scope.binaryPreviewUrl).toEqual('url');
+          } else {
+            //just to keep jasmine happy we return a successful assertion
+            expect(true).toBe(true); 
+          }
+        }); 
       };
-      expect(scope.hasDate(supportingMaterial)).toBe(true);
-    });
+    }
 
-    it('should return false if supportingMaterial.dateModified is not defined', function() {
-      var supportingMaterial = {};
-      expect(scope.hasDate(supportingMaterial)).toBe(false);
-    });
+    describe('html', describeSelectedMaterial({name: 'index.html', contentType: 'text/html'})); 
+    describe('binary', describeSelectedMaterial({name: 'index.png', contentType: 'image/png'})); 
   });
 
-  describe('getSupportingMaterialMarkup', function() {
-    var supportingMaterials = ['these', 'are', 'supporting', 'materials'];
-    var index = 0;
-    var content = 'content!';
 
-    beforeEach(function() {
-      spyOn(scope, 'getSupportingMaterials').and.returnValue(supportingMaterials);
-      spyOn(supportingMaterialsService, 'getSupportingMaterialFile').and.returnValue({content: content});
-      scope.index = index;
+  describe('$watch(mainFile.content)', function(){
+    var onSuccess, onError, file;
+    beforeEach(function(){
+      supportingMaterialsService.updateContent.and.callFake(function(materialName,
+        filename, content, success, error){
+        onSuccess = success;
+        onError = error;
+      });
+
+      file = {name: 'index.html', contentType: 'text/html', content: 'hi', isMain: true};
+      scope.selectedMaterial = { name: 'material', files:  [file] };
+      scope.$apply();
+    });
+    
+    it('content with no change doesn\'t call SupportingMaterialsService.updateContent', function(){
+      scope.mainFile.content = 'hi';
+      scope.$apply();
+      expect(supportingMaterialsService.updateContent).not.toHaveBeenCalled();
     });
 
-    it('should call SupportingMaterialsService with getSupportingMaterials and index', function() {
-      var result = scope.getSupportingMaterialMarkup();
-      expect(supportingMaterialsService.getSupportingMaterialFile).toHaveBeenCalledWith(
-        supportingMaterials, index
-      );
-      expect(result).toEqual(content);
+    it('content change calls SupportingMaterialsService.updateContent', function(){
+      scope.mainFile.content = 'hi!';
+      scope.$apply();
+      expect(supportingMaterialsService.updateContent)
+        .toHaveBeenCalledWith('material', 'index.html', 'hi!', jasmine.any(Function), jasmine.any(Function));
     });
-  });
-
-  describe('isContentType', function() {
-    var supportingMaterials = ['these', 'are', 'supporting', 'materials'];
-    var index = 0;
-    var contentType = 'application/json';
-
-    beforeEach(function() {
-      scope.index = index;
-      spyOn(scope, 'getSupportingMaterials').and.returnValue(supportingMaterials);
-      spyOn(supportingMaterialsService, 'getContentType').and.returnValue(contentType);
-    });
-
-    it('should return true when contentType matches', function() {
-      expect(scope.isContentType(contentType)).toBe(true);
-    });
-
-    it("should return false when contentType doesn't match", function() {
-      expect(scope.isContentType('application/xml')).toBe(false);
-    });
+    
+    it('success callback calls $emit with itemChanged', assertItemChangedEmitted(function(){
+      scope.mainFile.content = 'hi!';
+      scope.$apply();
+      onSuccess();
+    }));
 
   });
 
-  describe('getSupportingUrl', function() {
-    var supportingMaterials = ['these', 'are', 'supporting', 'materials'];
-    var index = 0;
-    var supportingUrl = "http://www.google.com";
 
-    beforeEach(function() {
-      scope.index = index;
-      spyOn(scope, 'getSupportingMaterials').and.returnValue(supportingMaterials);
-      spyOn(supportingMaterialsService, 'getSupportingUrl').and.returnValue(supportingUrl);
+  describe('imageService', function(){
+      
+    beforeEach(function(){
+      scope.selectedMaterial = {name: 'material'}; 
     });
 
-    it('should return the result from SupportingMaterialsService.getSupportingUrl', function() {
-      var result = scope.getSupportingUrl();
-      expect(supportingMaterialsService.getSupportingUrl).toHaveBeenCalledWith(supportingMaterials, index);
-      expect(result).toEqual(supportingUrl);
-    });
-  });
+    describe('addFile', function(){
 
-  describe('init', function() {
-    var materialType = 'good one';
-    var item = {
-      supportingMaterials: [
-        {'these': 'are', materialType: materialType}, {'supporting': 'materials', materialType: materialType}
-      ]
-    };
-    var index = 0;
-    var supportingMaterialFile = {content: 'content!'};
-    var fileSize = 1024;
+      var onComplete,onProgress;
+      var onCompleteCallback; 
+      beforeEach(function(){
+        supportingMaterialsService.addAsset = jasmine.createSpy('addAsset')
+          .and
+          .callFake(function(materialName, file , onComplete, onProgress){
+            onCompleteCallback = onComplete;
+        });
+        onComplete = jasmine.createSpy('onComplete');
+        onProgress = jasmine.createSpy('onProgress');
+      });
 
-    beforeEach(function() {
-      scope.item = item;
-      scope.index = index;
-      spyOn(supportingMaterialsService, 'getSupportingMaterialFile').and.returnValue(supportingMaterialFile);
-      spyOn(supportingMaterialsService, 'getKBFileSize');
-      scope.init();
-      // Perform callback
-      supportingMaterialsService.getKBFileSize.calls.mostRecent().args[2](fileSize);
-    });
+      it('returns error if file is too big', function(){
+        var size = 1000000;
+        scope.imageService.addFile({size: size, type: 'image/png'}, onComplete, onProgress);
+        expect(onComplete).toHaveBeenCalledWith(imageUtils.fileTooBigError(size, 500));
+        expect(supportingMaterialsService.addAsset).not.toHaveBeenCalled();
+      });
 
-    it('should set supportingMaterial to index of supportingMaterials', function() {
-      expect(scope.supportingMaterial).toEqual(item.supportingMaterials[index]);
-    });
+      it('returns error if type is not acceptable', function(){
+        scope.imageService.addFile({size: 10}, onComplete, onProgress);
+        expect(onComplete).toHaveBeenCalledWith({
+         code: imageUtils.errors.UNACCEPTABLE_TYPE,
+         message: jasmine.any(String) 
+        });
+      });
 
-    it('should set supportingMaterialFile file to supportingMaterial content', function() {
-      expect(scope.supportingMaterialFile).toEqual(supportingMaterialFile);
-    });
+      it('calls SupportingMaterialsService.addAsset', function(){
+        scope.imageService.addFile({size: 10, type: 'image/png'}, onComplete, onProgress);
+        expect(supportingMaterialsService.addAsset).toHaveBeenCalledWith('material', {size:10, type: 'image/png'}, jasmine.any(Function), jasmine.any(Function));
+      });
 
-    it('should set supportingMaterialFileSize to supportingMaterial file size', function() {
-      expect(scope.supportingMaterialFileSize).toEqual(fileSize);
-    });
+      it('calls scope.$emit with itemChanged', assertItemChangedEmitted(function(){
+        scope.imageService.addFile({size: 10, type: 'image/png'}, onComplete, onProgress);
+        onCompleteCallback();
+      }));
 
-    it('should set materialType to supportingMaterial type', function() {
-      expect(scope.materialType).toEqual(materialType);
     });
 
-  });
+    describe('changeSrcPath', function(){
+      beforeEach(function(){
+        supportingMaterialsService.getAssetUrl = jasmine.createSpy('getAssetUrl');
+      });
 
-  describe('createText', function(){
-    it('should call saveSupportingMaterials', function(){
-      scope.content = 'Hi';
-      scope.item = {};
-      scope.createText({name: 'new', materialType: 'type'});
-      var material = itemService.saveSupportingMaterials.calls.mostRecent().args[0][0];
-      console.log(material);
-      expect(material.name).toEqual('new');
-      expect(material.materialType).toEqual('type');
-      expect(material.files[0].isMain).toBe(true);
-      expect(material.files[0].contentType).toEqual('text/html');
-      expect(material.files[0].name).toEqual('index.html');
-      expect(material.files[0].content).toEqual(scope.content);
+      it('calls SupportingMaterialsService.getAssetUrl', function(){
+        scope.imageService.changeSrcPath('src');
+        expect(supportingMaterialsService.getAssetUrl).toHaveBeenCalledWith('material', 'src') ;
+      });
     });
-  });
 
-  describe('createFile', function(){
-    it('should call saveSupportingMaterials', function(){
-      pending();
+    describe('deleteFile', function(){
+
+      beforeEach(function(){
+        supportingMaterialsService.deleteAsset = jasmine.createSpy('deleteAsset');
+      });
+
+      it('calls SupportingMaterialsService.deleteAsset', function(){
+        scope.imageService.deleteFile('asset');
+        expect(supportingMaterialsService.deleteAsset).toHaveBeenCalledWith('material', 'asset');
+      });
     });
   });
-
 });

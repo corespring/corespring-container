@@ -8,7 +8,7 @@ import com.mongodb.util.{ JSON => MongoJson }
 import org.bson.types.ObjectId
 import org.joda.time.DateTime
 import play.api.http.Status._
-import play.api.libs.json.{Json => PlayJson, _}
+import play.api.libs.json.{ Json => PlayJson, _ }
 import org.corespring.container.logging.ContainerLogger
 
 import scala.util.Random

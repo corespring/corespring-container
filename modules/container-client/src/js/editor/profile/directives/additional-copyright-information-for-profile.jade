@@ -27,6 +27,13 @@ mixin field(label, ngModel)
       select.form-control(id="item.mediaType",ng-model="item.mediaType",ng-options="c.key as c.value for c in mediaTypeDataProvider")
         option(value='') Select ...
     +field('Website','item.sourceUrl')
+    +field('Cost For Resource','item.costForResource')
+      .input-group.cost-for-resource
+        .input-group-addon $
+        input.form-control(id="costForResource",
+        type="number",
+        ng-model="item.costForResource")
+        .input-group-addon .00
 
     .form-group
       .col-sm-3

@@ -2,7 +2,7 @@ package org.corespring.container.client.controllers.apps
 
 import java.net.URLEncoder
 
-import org.corespring.container.client.V2PlayerConfig
+import org.corespring.container.client.{ItemAssetResolver, V2PlayerConfig}
 import org.corespring.container.client.component.PlayerItemTypeReader
 import org.corespring.container.client.controllers.GetAsset
 import org.corespring.container.client.controllers.helpers.PlayerXhtml
@@ -15,6 +15,8 @@ import play.api.libs.json._
 import play.api.mvc.{ Action, AnyContent, RequestHeader }
 import play.api.templates.Html
 
+import scala.concurrent.Future
+
 trait Player
   extends App[PlayerHooks]
   with PlayerItemTypeReader
@@ -23,17 +25,22 @@ trait Player
 
   private object SessionRenderer {
 
+    private val archiveCollId = "500ecfc1036471f538f24bdc"
+
     /**
      * Preprocess the xml so that it'll work in all browsers
-     * aka: convert tagNames -> attributes for ie 8 support
      * TODO: A layout component may have multiple elements
      * So we need a way to get all potential component names from
      * each component, not just assume its the top level.
      */
-    private def processXhtml(maybeXhtml: Option[String]) = maybeXhtml.map {
-      xhtml =>
-        PlayerXhtml.mkXhtml(components.map(_.componentType), xhtml)
-    }.getOrElse("<div><h1>New Item</h1></div>")
+    private def processXhtml(itemId: Option[String], itemJson: JsValue) = {
+      val maybeXhtml = (itemJson \ "xhtml").asOpt[String]
+      maybeXhtml.map(xhtml => playerXhtml.mkXhtml(itemId, xhtml))
+        .getOrElse("<div><h1>New Item</h1></div>")
+    }
+
+    def hasBeenArchived(session: JsValue) =
+      (session \ "collectionId").asOpt[String].map(_ == archiveCollId).getOrElse(false)
 
     def createPlayerHtml(sessionId: String, session: JsValue, itemJson: JsValue, serviceParams: JsObject)(implicit rh: RequestHeader): Html = {
 
@@ -41,8 +48,8 @@ trait Player
       val controlsJs = if (showControls) paths(controlsJsSrc) else Seq.empty
       val domainResolvedJs = buildJs(scriptInfo, controlsJs)
       val domainResolvedCss = buildCss(scriptInfo)
-
-      val processedXhtml = processXhtml((itemJson \ "xhtml").asOpt[String])
+      val itemId = (session \ "itemId").asOpt[String] //A session from ExternalLaunchApi does not not have an itemId
+      val processedXhtml = processXhtml(itemId, itemJson)
       val preprocessedItem = itemPreProcessor.preProcessItemForPlayer(itemJson).as[JsObject] ++ Json.obj("xhtml" -> processedXhtml)
 
       val newRelicRumConf: Option[JsValue] = playerConfig.newRelicRumConfig
@@ -61,7 +68,9 @@ trait Player
           Json.obj("session" -> session, "item" -> preprocessedItem),
           versionInfo,
           newRelicRumConf != None,
-          newRelicRumConf.getOrElse(Json.obj())))
+          newRelicRumConf.getOrElse(Json.obj()),
+          if (hasBeenArchived(session)) Seq(s"Warning: This item has been deleted.") else Seq.empty)
+      )
 
     }
   }
@@ -71,6 +80,8 @@ trait Player
   override def context: String = "player"
 
   def versionInfo: JsObject
+
+  def playerXhtml: PlayerXhtml
 
   def itemPreProcessor: PlayerItemPreProcessor
 
@@ -157,7 +168,12 @@ trait Player
     }
   }
 
-  def getFileByItemId(itemId:String, file:String) = Action{ request => hooks.loadItemFile(itemId, file)(request)}
+  def getFileByItemId(itemId: String, file: String) = Action.async {
+    implicit request =>
+      Future {
+        hooks.loadItemFile(itemId, file)(request)
+      }
+  }
 
   private def servicesJs(sessionId: String, queryParams: JsObject) = {
     import org.corespring.container.client.controllers.resources.routes._
@@ -170,6 +186,7 @@ trait Player
       Session.getScore(sessionId),
       Session.completeSession(sessionId),
       Session.loadOutcome(sessionId),
+      Session.loadInstructorData(sessionId),
       queryParams).toString
   }
 }

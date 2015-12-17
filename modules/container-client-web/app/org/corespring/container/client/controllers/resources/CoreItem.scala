@@ -1,8 +1,10 @@
 package org.corespring.container.client.controllers.resources
 
-import org.corespring.container.client.controllers.helpers.{ PlayerXhtml, XhtmlProcessor }
+
+import org.corespring.container.client.{ItemAssetResolver, HasContainerContext}
+import org.corespring.container.client.controllers.helpers.{PlayerXhtml, XhtmlProcessor}
 import org.corespring.container.client.hooks.Hooks.StatusMessage
-import org.corespring.container.client.hooks.{ CoreItemHooks }
+import org.corespring.container.client.hooks._
 import play.api.Logger
 import play.api.libs.json.{ JsString, JsObject, JsValue, Json }
 import play.api.mvc._
@@ -13,30 +15,27 @@ import scalaz.Scalaz._
 
 object ItemJson {
 
-  def apply(components: Seq[String], rawJson: JsValue): JsObject = {
+  def apply(itemId: String, rawJson: JsValue, playerXhtml: PlayerXhtml): JsObject = {
 
-    val processedXhtml = (rawJson \ "xhtml").asOpt[String].map(s => PlayerXhtml.mkXhtml(components, s)).getOrElse {
-      throw new IllegalArgumentException(s"the Item json must contain 'xhtml'\n ${Json.stringify(rawJson)}")
-    }
-
-    val itemId = (rawJson \ "_id" \ "$oid").asOpt[JsString].map(id => Json.obj("itemId" -> id)).getOrElse(Json.obj())
-    rawJson.as[JsObject] + ("xhtml" -> JsString(processedXhtml)) ++ itemId
+    val xhtml = (rawJson \ "xhtml").asOpt[String].getOrElse(throw new IllegalArgumentException(s"the Item json must contain 'xhtml'\n ${Json.stringify(rawJson)}"))
+    val processedXhtml = playerXhtml.mkXhtml(None, xhtml)
+    rawJson.as[JsObject] + ("xhtml" -> JsString(processedXhtml)) ++  Json.obj("itemId" -> itemId)
   }
 }
 
-trait CoreItem extends Controller {
+trait CoreItem extends CoreSupportingMaterials with Controller with HasContainerContext {
 
   lazy val logger = Logger(classOf[CoreItem])
 
   implicit def toResult(m: StatusMessage): SimpleResult = play.api.mvc.Results.Status(m._1)(Json.obj("error" -> m._2))
-
-  implicit def ec: ExecutionContext
 
   /**
    * A list of all the component types in the container
    * @return
    */
   protected def componentTypes: Seq[String]
+
+  def playerXhtml: PlayerXhtml
 
   def hooks: CoreItemHooks
 
@@ -50,7 +49,7 @@ trait CoreItem extends Controller {
         either match {
           case Left(sm) => sm
           case Right(rawItem) => {
-            Ok(ItemJson(componentTypes, rawItem))
+            Ok(ItemJson(itemId, rawItem, playerXhtml))
               .withHeaders(
                 "Cache-Control" -> noCacheHeader,
                 "Expires" -> "0")
@@ -72,7 +71,6 @@ trait CoreItem extends Controller {
         .map(cs => hooks.saveCustomScoring(_: String, cs))
         .getOrElse(missingProperty("customScoring"))
       case "profile" => hooks.saveProfile(_: String, json)
-      case "supporting-materials" => hooks.saveSupportingMaterials(_: String, json)
       case "summary-feedback" => (json \ "summaryFeedback").asOpt[String].map(s => hooks.saveSummaryFeedback(_: String, s)).getOrElse(missingProperty("summaryFeedback"))
       case "xhtml" => (json \ "xhtml")
         .asOpt[String]

@@ -1,9 +1,7 @@
 angular.module('corespring-editor.controllers')
   .controller('Root', [
     '$scope',
-    '$state',
-    '$window',
-    'ComponentRegister',
+    '$timeout',
     'ConfigurationService',
     'EditorDialogTemplate',
     'iFrameService',
@@ -12,11 +10,11 @@ angular.module('corespring-editor.controllers')
     'Msgr',
     'WIGGI_EVENTS',
     'WiggiDialogLauncher',
+    'editorDebounce',
+    'MetadataService',
     function(
       $scope,
-      $state,
-      $window,
-      ComponentRegister,
+      $timeout,
       ConfigurationService,
       EditorDialogTemplate,
       iFrameService,
@@ -24,7 +22,9 @@ angular.module('corespring-editor.controllers')
       LogFactory,
       Msgr,
       WIGGI_EVENTS,
-      WiggiDialogLauncher) {
+      WiggiDialogLauncher,
+      editorDebounce,
+      MetadataService) {
 
       "use strict";
 
@@ -33,18 +33,20 @@ angular.module('corespring-editor.controllers')
       $scope.onItemLoadSuccess = onItemLoadSuccess;
       $scope.onItemLoadError = onItemLoadError;
 
-      $scope.$on('deleteSupportingMaterial', onDeleteSupportingMaterial);
       $scope.$on(WIGGI_EVENTS.LAUNCH_DIALOG, onLaunchDialog);
       $scope.$on('itemChanged', onItemChanged);
 
       init();
 
-
       function saveAll(done){
         logger.debug('saveAll...');
+
         ItemService.saveAll($scope.item, function() {
           logger.debug('call \'saveAll\' callback...');
-          done(null, {saved: true});
+          editorDebounce.flush();
+          $timeout(function(){
+            done(null, {saved: true});
+          }, 300);
         });
       }
 
@@ -66,6 +68,7 @@ angular.module('corespring-editor.controllers')
           ItemService.load($scope.onItemLoadSuccess, $scope.onItemLoadError);
         }
 
+
         function onInitialise(data) {
           logger.log('on initialise', data);
           ConfigurationService.setConfig(data);
@@ -78,36 +81,6 @@ angular.module('corespring-editor.controllers')
 
       function onItemChanged(event, data) {
         Msgr.send('itemChanged', data);
-      }
-
-      function onDeleteSupportingMaterial(event, data) {
-
-        var confirmationMessage = [
-          "You are about to delete this file.",
-          "Are you sure you want to do this?"
-        ].join('\n');
-
-        if ($window.confirm(confirmationMessage)) {
-          showFirstItem();
-          deleteSupportingMaterial(data.index);
-        }
-      }
-
-      function showFirstItem() {
-        $state.transitionTo('supporting-materials', {
-          index: "0"
-        }, {
-          reload: true
-        });
-      }
-
-      function deleteSupportingMaterial(index) {
-        $scope.item.supportingMaterials.splice(index, 1);
-
-        ItemService.saveSupportingMaterials($scope.item.supportingMaterials,
-          function() {},
-          $scope.onSaveError, $scope.itemId
-        );
       }
 
       function preprocessComponents(item) {
@@ -147,13 +120,14 @@ angular.module('corespring-editor.controllers')
         preprocessComponents(item);
         $scope.lastId = findLastId(item);
         $scope.$broadcast('itemLoaded', item);
+        MetadataService.get($scope.item.itemId).then(function(result) {
+          $scope.metadataSets = result;
+        });
       }
 
       function onItemLoadError(err) {
         logger.error('error loading', err);
       }
-
-     
 
     }
   ]);

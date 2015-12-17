@@ -1,11 +1,22 @@
 @player-width: 613px;
 
 .preview-player-control-panel{
-  text-align: right;
+  text-align: center;
   padding: 10px;
   * {
     margin-left: 5px;
     text-transform: lowercase;
+  }
+  .score {
+    display: inline-block;
+    width: 100px;
+  }
+
+  .control-buttons {
+    height: 64px;
+    display: -webkit-inline-flex;
+    display: -ms-inline-flexbox;
+    display: inline-flex;
   }
 }
 
@@ -61,44 +72,10 @@
       img{
         border: dashed #cccccc 1px;
         position: absolute;
-        bottom: 45px;
+        bottom: 75px;
         left: 10px;
         height: 20px;
       }
-    }
-  }
-
-  .summary-feedback-panel,
-  .summary-feedback-panel-preview {
-    border: solid 2px @feedback-bg;
-    width: 100%;
-    .panel-heading {
-      a {
-        cursor: pointer;
-      }
-      background-color: @feedback-bg;
-      color: white;
-    }
-  }
-
-  .summary-feedback-panel-preview{
-    .panel-body{
-      .ng-binding{
-        border: none;
-      }
-    }
-    .panel-heading{
-      :hover{
-        cursor: pointer;
-      }
-    }
-
-    .panel-heading i{
-      font-size: 30px;
-    }
-
-    .panel-title{
-      line-height: 30px;
     }
   }
 }

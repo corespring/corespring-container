@@ -1,6 +1,6 @@
 package org.corespring.container.client.controllers
 
-import org.corespring.container.client.HasContext
+import org.corespring.container.client.HasContainerContext
 
 import scala.concurrent.{ ExecutionContext, Future }
 
@@ -26,6 +26,7 @@ object DataQuery {
     "mediaType",
     "priorUses",
     "reviewsPassed",
+    "standardClusters",
     "standards",
     "standardsTree",
     "subjects.primary",
@@ -33,13 +34,11 @@ object DataQuery {
 }
 
 /** Query service for static data, eg: subject, gradelevel, etc */
-trait DataQuery extends Controller with HasContext {
+trait DataQuery extends Controller with HasContainerContext {
 
   import org.corespring.container.client.controllers.DataQuery._
 
   def hooks: DataQueryHooks
-
-  implicit def ec: ExecutionContext
 
   /** list all that match the query - if there's no query list all */
   def list(topic: String, query: Option[String] = None): Action[AnyContent] = Action.async { implicit request =>

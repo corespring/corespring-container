@@ -15,6 +15,10 @@
        var holder = document.querySelector('.holder');
        var opts = @{Html(play.api.libs.json.Json.stringify(opts))};
 
+       console.log(document.location.href);
+       opts.autosizeEnabled = document.location.href.indexOf('as=false') === -1;
+       opts.iframeScrollingEnabled = document.location.href.indexOf('ifs=false') === -1;
+
        opts.onItemCreated = function(){
          console.log('onItemCreated', arguments);
        };
@@ -27,6 +31,6 @@
 
      });
     </script>
-    <div class="holder"></div>
+    <div class="holder" style="height:100%; width: 100%;"></div>
   </body>
 </html>

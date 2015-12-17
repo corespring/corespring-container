@@ -87,6 +87,37 @@
 }
 
 .supporting-material-metadata {
+
+  .error{
+    color: red;
+    font-size: 11px;
+  }
+  
+  .file-name{
+    padding-left: 13px;
+  }
+
+  .btn-file { 
+    position: relative;
+    overflow: hidden;
+
+    input[type=file] {
+      position: absolute;
+      top: 0;
+      right: 0;
+      min-width: 100%;
+      min-height: 100%;
+      font-size: 100px;
+      text-align: right;
+      filter: alpha(opacity=0);
+      opacity: 0;
+      outline: none;
+      background: white;
+      cursor: inherit;
+      display: block;
+    }
+  }
+
   .select2-container .select2-choice {
     background-image: none;
     height: 34px;
@@ -109,15 +140,58 @@
 
 }
 
+.sm-list{
+
+  ul{
+    line-height: 220%;
+    list-style-type: none;
+    margin-left: 0px;
+    padding-left: 0px;
+    li.sm-section-header{
+      font-size: 15px;
+      text-transform: uppercase;
+    }
+    li.sm-item {
+      border: 1px solid #ffffff;
+      border-radius: 4px;
+      &:hover, &.active {
+        border:1px dashed #ddd;
+        cursor: pointer;
+      }
+      a{
+        padding-left: 20px;
+        .user-select(none);
+        display: block;
+      }
+    }
+    li.sm-item.selected {
+      border:1px dashed #ddd;
+      background-color:#f9f9f9;
+    }
+    li{
+      list-style-type: none;
+      margin-left: 0px;
+      padding-left: 0px;
+    }
+  }
+}
+
 .supporting-materials {
   height: 100%;
   margin-left: 20px;
-
 
   .add-new-block {
     padding-bottom: 9px;
     margin-top: 20px;
     border-bottom: 1px solid #eee;
+  }
+
+  .help-text {
+    color: #555;
+    font-size: 13px;
+    font-style: italic;
+    line-height: 24px;
+    margin: 25px 0 0 20px;
   }
 
   ul.supporting-materials-list {
@@ -179,4 +253,3 @@
   }
 
 }
-

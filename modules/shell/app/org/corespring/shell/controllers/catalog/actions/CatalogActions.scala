@@ -18,10 +18,6 @@ trait CatalogHooks extends ContainerCatalogHooks {
 
   def itemService: MongoService
 
-  override def loadSupportingMaterialFile(id: String, path: String)(request: Request[AnyContent]): SimpleResult = {
-    loadFile(id, s"materials/$path")(request)
-  }
-
   def assets: Assets
 
   override def load(id: String)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] = Future {

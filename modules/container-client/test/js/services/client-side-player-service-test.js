@@ -85,6 +85,35 @@ describe('ClientSidePlayerService', function() {
       expect(callback.calls.mostRecent().args[0].score.summary.points).toEqual(0);
     });
 
+    describe('item manipulation in custom scoring', function(){
+
+      var service;
+      var customScoring = [
+        'exports.process = function(item){',
+        '  item.components["1"].foo = "bar";',
+        '  return {};',
+        '};'
+      ].join('\n');
+      
+      var item = {
+        components: { 
+          '1' : {} 
+        },
+        customScoring: customScoring
+      };
+      
+      beforeEach(inject(function(ClientSidePlayerService) {
+        service = new ClientSidePlayerService(jasmine.createSpy(), function(){
+          return item;
+        });
+      }));
+
+      it('does not affect the original item model', function(){
+        service.submitSession({}, jasmine.createSpy('callback')); 
+        timeout.flush();
+        expect(item.components).toEqual({'1': {}});
+      });
+    });
   });
 
   describe('submitSession', function() {

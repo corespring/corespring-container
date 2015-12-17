@@ -1,20 +1,44 @@
-dl.dl-horizontal.supporting-material-metadata
-    dt
-        div.form-horizontal
-          label.control-label Title 
-      dd
-        input.form-control(id='title', type='text', ng-model='title',placeholder='enter title', required='required')
-    dt
-        div.form-horizontal
-          label.control-label Type
-      dd
-        select(id='type', ui-select2='{minimumResultsForSearch: -1}', style='width: 200px;', ng-model='materialTypeProxy')
-          option(ng-repeat='materialType in materialTypes') {{materialType}}
-          
-      div(ng-show='displayOther')
-        dt
-          label.control-label(for='supporting-material-type-text') Other
-        dd
-          input.form-control(name='others', type='text', ng-model='textMaterialType', ng-focus='setActiveCtrl($event)', ng-blur='setActiveCtrl(null)', required='required')
+dl.dl-horizontal.supporting-material-metadata(ng-form, name="metadataForm")
 
-      button.btn.btn-small(ng-show='persist', ng-click='forceUpdate()') Update
+  dt
+    div.form-horizontal
+      label.control-label Title 
+  
+  dd(ng-class="{'has-error': metadataForm.name.$error}")
+    input.form-control(
+      id='name', 
+      name='name',
+      type='text', 
+      ng-model='name',
+      ng-change="checkNameIsAvailable()"
+      placeholder='enter title', 
+      required='required')
+    span.error(ng-show="metadataForm.name.$error") {{metadataForm.name.$error}} 
+
+  dt
+    div.form-horizontal
+      label.control-label Type
+  dd
+    select(id='type', ui-select2='{minimumResultsForSearch: -1}', style='width: 200px;', ng-model='materialType')
+      option(ng-repeat='materialType in materialTypes') {{materialType}}
+          
+  div(ng-show='materialType == other')
+    dt
+      label.control-label(for='supporting-material-type-text') Other
+    dd
+      input.form-control(name='others', type='text', ng-model='otherMaterialType', required='required')
+   
+  dt Source
+  
+  dd
+    radio(id='create', value='html', ng-model='source') create your own
+    radio(id='upload', type='radio', value='binary', ng-model='source') upload a file
+    br/
+    span.btn.btn-default.btn-file(ng-show="source == 'binary'")
+      | Choose...
+      input(type='file', name='fileToUpload', file-change="")/
+    
+    span.file-name {{fileToUpload.name || ''}} 
+    
+    br/
+    span.error(ng-show="metadataForm.fileToUpload.$error") {{metadataForm.fileToUpload.$error}} 

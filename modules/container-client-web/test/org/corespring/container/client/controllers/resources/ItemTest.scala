@@ -1,16 +1,19 @@
 package org.corespring.container.client.controllers.resources
 
+import org.corespring.container.client.ItemAssetResolver
+import org.corespring.container.client.controllers.helpers.PlayerXhtml
 import org.corespring.container.client.hooks.Hooks.{R, StatusMessage}
-import org.corespring.container.client.hooks.{CoreItemHooks, CreateItemHook }
+import org.corespring.container.client.hooks.{CoreItemHooks, CreateItemHook, SupportingMaterialHooks}
+import org.corespring.test.TestContext
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
-import play.api.libs.json.{ JsValue, Json }
+import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.RequestHeader
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.Future
 
 class ItemTest extends Specification with Mockito {
 
@@ -20,9 +23,13 @@ class ItemTest extends Specification with Mockito {
     createError: Option[StatusMessage] = None,
     loadResult: JsValue = Json.obj("_id" -> Json.obj("$oid" -> "1"), "xhtml" -> "<div></div>"))
     extends Scope {
-    val item = new Item {
+    val item = new Item with TestContext{
 
-      override def hooks: IH = new IH {
+      override def  playerXhtml = new PlayerXhtml {
+        override def itemAssetResolver = new ItemAssetResolver{}
+      }
+
+      override def hooks: IH = new IH with TestContext{
 
         override def createItem(json: Option[JsValue])(implicit header: RequestHeader): Future[Either[StatusMessage, String]] = {
           Future {
@@ -39,7 +46,6 @@ class ItemTest extends Specification with Mockito {
           }
         }
 
-        override implicit def ec: ExecutionContext = ExecutionContext.Implicits.global
 
         override def delete(id: String)(implicit h: RequestHeader): R[JsValue] = ???
 
@@ -56,11 +62,16 @@ class ItemTest extends Specification with Mockito {
         override def saveSummaryFeedback(id: String, feedback: String)(implicit h: RequestHeader): R[JsValue] = ???
 
         override def saveProfile(id: String, json: JsValue)(implicit h: RequestHeader): R[JsValue] = ???
+
       }
 
-      override implicit def ec: ExecutionContext = ExecutionContext.Implicits.global
 
       override protected def componentTypes: Seq[String] = Seq.empty
+
+      override def materialHooks: SupportingMaterialHooks = {
+        val m = mock[SupportingMaterialHooks]
+        m
+      }
     }
 
   }
@@ -72,10 +83,9 @@ class ItemTest extends Specification with Mockito {
         status(item.load("x")(FakeRequest("", ""))) === OK
       }
 
-      "prep the json" in new item(loadResult = Json.obj("_id" ->
-        Json.obj("$oid" -> "1"), "xhtml" -> "<p>a</p>")) {
+      "prep the json" in new item(loadResult = Json.obj("xhtml" -> "<p>a</p>")) {
         val json = contentAsJson(item.load("x")(FakeRequest("", "")))
-        (json \ "itemId").as[String] === "1"
+        (json \ "itemId").as[String] === "x"
         (json \ "xhtml").as[String] === """<div class="para">a</div>"""
       }
     }

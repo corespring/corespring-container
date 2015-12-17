@@ -4,6 +4,7 @@ import org.corespring.container.client.component.ComponentUrls
 import org.corespring.container.client.hooks.EditorHooks
 import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.components.model.Component
+import org.corespring.test.TestContext
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
@@ -18,9 +19,9 @@ import scala.concurrent.{ Future, ExecutionContext }
 
 class EditorTest extends Specification with Mockito {
 
-  class editorScope(val hookResponse: Either[StatusMessage, JsValue]) extends Scope {
+  class editorScope(val hookResponse: Either[StatusMessage, JsValue]) extends Scope with TestContext{
 
-    val editor = new DraftEditor {
+    val editor = new DraftEditor with TestContext{
 
       override def versionInfo: JsObject = Json.obj()
 
@@ -29,8 +30,6 @@ class EditorTest extends Specification with Mockito {
         m.load(anyString)(any[RequestHeader]) returns Future(hookResponse)
         m
       }
-
-      override implicit def ec: ExecutionContext = ExecutionContext.Implicits.global
 
       override def urls: ComponentUrls = {
         val m = mock[ComponentUrls]

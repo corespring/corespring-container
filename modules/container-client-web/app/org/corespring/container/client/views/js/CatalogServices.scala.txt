@@ -1,4 +1,4 @@
-@(namespace : String, load : Call, componentSet : JsValue)
+@(namespace : String, load : Call, componentSet : JsValue, smEndpoints: org.corespring.container.client.views.models.SupportingMaterialsEndpoints)
 
 (function(){
   "use strict";
@@ -14,6 +14,10 @@
           onSuccess(components);
         }
     };
+  }]);
+
+  angular.module('@namespace').factory('SupportingMaterialUrls', [function(){
+    return @smEndpoints.toJsonString;
   }]);
 
   angular.module('@namespace').factory('ItemService', ['BaseService', function(BaseService){
