@@ -25,7 +25,7 @@ angular.module('corespring-editor.profile.directives')
         };
 
         $scope.removeCopyrightItem = function(item) {
-          $scope.copyrights = _.remove($scope.copyrights, item);
+          _.remove($scope.copyrights, item);
           if (0 === $scope.copyrights.length) {
             $scope.required = 'no';
           }
