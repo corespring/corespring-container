@@ -253,6 +253,7 @@ object Build extends sbt.Build {
             cmd("npm", "npm", "npm.cmd", Seq(clientDir, componentsDir)))
       })
     .settings(CustomRelease.settings)
+    .settings(Tgz.settings)
     .dependsOn(shell)
     .aggregate(shell)
 
