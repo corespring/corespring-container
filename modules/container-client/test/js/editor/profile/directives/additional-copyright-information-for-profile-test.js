@@ -91,7 +91,7 @@ describe('additionalCopyrightInformationForProfile', function() {
     });
 
     it('should remove the specified item', function() {
-      expect(scope.copyrights).toEqual(_.remove(newCopyrights, toRemove));
+      expect(scope.copyrights).toEqual(['one','two']);
     });
 
     describe('removes the final copyright', function() {
