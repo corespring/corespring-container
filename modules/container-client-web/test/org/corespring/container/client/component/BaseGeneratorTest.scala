@@ -48,16 +48,16 @@ class BaseGeneratorTest extends Specification with ComponentMaker {
           packageInfo = Json.obj(
             "dependencies" -> Json.obj(
               "client" -> Json.obj(
-                "dep-1" -> Json.obj("file" -> "path/to/dep-1"))),
+                "dep-1" -> Json.obj("file" -> "path/to/dep-1.js"))),
             "libs" -> Json.obj(
               "client" -> Json.obj(
-                "local-lib" -> Json.arr("a")))))
+                "local-lib" -> Json.arr("a.js")))))
 
       val comps = Seq(comp)
 
       generator.js(comps) === generator.buildJsString(
-        LocalLibs -> generator.loadLibrarySource("org/one/libs/a").get,
-        ThirdParty -> generator.resource("dep-1/path/to/dep-1").get,
+        LocalLibs -> generator.loadLibrarySource("org/one/libs/a.js").get,
+        ThirdParty -> generator.resource("dep-1/path/to/dep-1.js").get,
         Libraries -> "",
         Interactions -> generator.interactionToJs(comps(0)),
         Widgets -> "",
@@ -72,18 +72,18 @@ class BaseGeneratorTest extends Specification with ComponentMaker {
           packageInfo = Json.obj(
             "dependencies" -> Json.obj(
               "client" -> Json.obj(
-                "dep-1" -> Json.obj("file" -> "path/to/dep-1"))),
+                "dep-1" -> Json.obj("file" -> "path/to/dep-1.js"))),
             "libs" -> Json.obj(
               "client" -> Json.obj(
-                "local-lib" -> Json.arr("a")))))
+                "local-lib" -> Json.arr("a.js")))))
 
       val comps = Seq(comp, comp)
 
       val interactionJs = generator.interactionToJs(comps(0))
 
       generator.js(comps) === generator.buildJsString(
-        LocalLibs -> generator.loadLibrarySource("org/one/libs/a").get,
-        ThirdParty -> generator.resource("dep-1/path/to/dep-1").get,
+        LocalLibs -> generator.loadLibrarySource("org/one/libs/a.js").get,
+        ThirdParty -> generator.resource("dep-1/path/to/dep-1.js").get,
         Libraries -> "",
         Interactions -> s"$interactionJs\n$interactionJs",
         Widgets -> "",

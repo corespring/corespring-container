@@ -66,13 +66,12 @@ script(type="text/ng-template", id="/templates/profile")
       .row
         h2 Item Profile
         p Profile contains information used to store and find an item (e.g., Common Core State Standard alignment, Bloom's Taxonomy assignment, key skills, and copyright information). Authors are encouraged to include as much information as possible.
-        p * Required
 
         +h_form
-          +configurableField("title", "* Title", "taskInfo.title")
+          +configurableField("title", "Title", "taskInfo.title")
           +configurableField("description","Description", "taskInfo.description")
 
-          +configurableField("primarySubject","* Primary Subject", "taskInfo.subjects.primary")
+          +configurableField("primarySubject","Primary Subject", "taskInfo.subjects.primary")
             input(id="primarySubject",
             ng-model="taskInfo.subjects.primary",
             type="text",
@@ -99,10 +98,10 @@ script(type="text/ng-template", id="/templates/profile")
               ul
                 li(ng-repeat="type in componentTypes") {{type}}
 
-          +configurableField("collectionId","* Collection", "collectionId")
+          +configurableField("collectionId","Collection", "collectionId")
             select.form-control.collection-id(id="collectionId",ng-model="collectionId",
-              ng-options="c.key as c.value for c in collectionIdDataProvider | filter:collectionIdFilter",
-              ng-disabled="formModels.collectionId.readonly")
+            ng-options="c.key as c.value for c in collectionIdDataProvider | filter:collectionIdFilter",
+            ng-disabled="formModels.collectionId.readonly")
             span.inline-help All items are added to the "Default" collection, unless another is selected.
 
         form.form-horizontal(role="form",ng-show="formModels.standards.visible")
@@ -147,18 +146,34 @@ script(type="text/ng-template", id="/templates/profile")
             hr/
 
           h6 Standards
-          .form-group(ng-repeat="c in standardsGroups",class="standards")
+          .form-group.standards(ng-repeat="c in standardsGroups")
             .col-sm-3
               image(ng-src="{{c.imageUrl}}", ng-if="c.hasImage")
               label(ng-if="!c.hasImage") {{ c.label }}
             .col-sm-9.no-input
-              input(type="hidden", multiple, ui-select2="{tags:[],dropdownCss:{display:'none'}}",
-              ng-model="c.standards", style="width: 100%;")
+              input(
+              type="hidden",
+              multiple,
+              ui-select2="{tags:[],dropdownCss:{display:'none'}}",
+              ng-model="c.standards",
+              style="width: 100%;")
           br/
           h6 Standard Clusters
-          .controls.select2-container-multi
-            ul.select2-choices
-              li.select2-search-choice(ng-repeat="cluster in standardsClusters",style="padding-left: 5px") {{cluster}}
+          .form-group.standards
+            .col-sm-12.no-input
+              input(
+              type="hidden",
+              multiple,
+              ui-select2="{tags:[],dropdownCss:{display:'none'}}",
+              ng-model="clusters",
+              style="width: 100%;")
+
+          br/
+          h6 Additional Clusters
+          +field("mathClusterSelector","Math")
+            +multipleValueSelector("mathClusterSelector","additionalCluster","mathClusterOptions | filter:selectedClusterFilter","Select...")
+          +field("elaClusterSelector","Ela")
+            +multipleValueSelector("elaClusterSelector","additionalCluster","elaClusterOptions | filter:selectedClusterFilter","Select...")
           br/
 
         +h_form
@@ -240,7 +255,7 @@ script(type="text/ng-template", id="/templates/profile")
           +panel("copyrightInformationPanel", "Copyright Information")
             .panel-body
               +configurableField("contributor","Contributor", "contributorDetails.contributor")
-              +configurableField("author","* Author", "contributorDetails.author")
+              +configurableField("author","Author", "contributorDetails.author")
 
               +configurableField("credentials","Credentials","contributorDetails.credentials")
                 select.form-control(id="credentials",ng-model="contributorDetails.credentials",
@@ -252,15 +267,15 @@ script(type="text/ng-template", id="/templates/profile")
                 placeholder="Enter credentials...", ng-model="contributorDetails.credentialsOther",
                 ng-readonly="formModels.credentials.readonly")
 
-              +configurableField("copyrightOwner","* Copyright Owner","contributorDetails.copyrightOwner")
+              +configurableField("copyrightOwner","Copyright Owner","contributorDetails.copyrightOwner")
 
-              +configurableField("copyrightYear","* Copyright Year","contributorDetails.copyrightYear")
+              +configurableField("copyrightYear","Copyright Year","contributorDetails.copyrightYear")
                 select.form-control(id="copyrightYear",ng-model="contributorDetails.copyrightYear",
                 ng-options="c for c in copyrightYearDataProvider | filter:copyrightYearFilter", style="width:170px;",
                 ng-disabled="formModels.copyrightYear.readonly")
                   option(value="") Select ...
 
-              +configurableField("copyrightExpirationDate","* Copyright Expiration","contributorDetails.copyrightExpirationDate")
+              +configurableField("copyrightExpirationDate","Copyright Expiration","contributorDetails.copyrightExpirationDate")
                 select.form-control(id="copyrightExpirationDate",ng-model="contributorDetails.copyrightExpirationDate",
                 ng-options="c for c in copyrightExpirationDateDataProvider | filter:copyrightExpirationDateFilter",
                 style="width:170px;", ng-disabled="formModels.copyrightExpirationDate.readonly")

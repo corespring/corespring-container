@@ -1,6 +1,5 @@
 (function(){
   function DataQueryService ($http, $log, STATIC_PATHS) {
-
     function _call(topic, query, onSuccess, onFailure){
       var url = STATIC_PATHS.dataQuery + '/' + topic;
 

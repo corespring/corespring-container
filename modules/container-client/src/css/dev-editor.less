@@ -51,9 +51,41 @@ table.panes {
   .custom-js-pane {
     .pane-defaults();
   }
-
   .json-pane {
     .pane-defaults();
+  }
+  .files-pane {
+    .pane-defaults();
+    background-color: #f4f3f4;
+    padding: 10px;
+    .file-item {
+      color: @cs-green;
+      cursor: pointer;
+      a {
+        margin-right: 5px;
+      }
+      &.selected {
+        font-weight: bold;
+      }
+      &:hover {
+        i {
+          visibility: visible;
+        }
+      }
+      i {
+        visibility: hidden;
+      }
+    }
+    .upload-button {
+      margin-top: 10px;
+    }
+    table {
+      width: 100%;
+      td {
+        width: 50%;
+        vertical-align: top;
+      }
+    }
   }
   .preview {
     .pane-defaults();
