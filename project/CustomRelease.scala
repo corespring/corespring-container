@@ -32,6 +32,13 @@ object CustomRelease {
     st
   })
 
+  lazy val buildTgz = ReleaseStep(action = (st:State)=> {
+    val extracted = Project.extract(st)
+    import com.typesafe.sbt.packager.universal.Keys.packageZipTarball
+    val (newState, _) = extracted.runTask(packageZipTarball, st)
+    newState
+  })
+
   lazy val settings = Seq(
     branchNameConverter := HyphenNameConverter,
     releaseVersionBump := Bump.Minor,
@@ -39,17 +46,18 @@ object CustomRelease {
       Seq(
         checkBranchName("rc"),
         //TODO - ensureVersionEndsWith("-SNAPSHOT")?
-        checkSnapshotDependencies,
-        runClean,
-        runTest,
-        prepareReleaseVersion,
-        setReleaseVersion,
-        commitReleaseVersion,
-        pushBranchChanges,
-        mergeCurrentBranchTo("master"),
-        tagBranchWithReleaseTag("master"),
-        pushBranchChanges,
-        pushTags,
-	      publishArtifacts) 
+//        checkSnapshotDependencies,
+//        runClean,
+//        runTest,
+//        prepareReleaseVersion,
+//        setReleaseVersion,
+//        commitReleaseVersion,
+//        pushBranchChanges,
+//        mergeCurrentBranchTo("master"),
+//        tagBranchWithReleaseTag("master"),
+//        pushBranchChanges,
+//        pushTags,
+//	      publishArtifacts,
+        buildTgz)
     })
 }
