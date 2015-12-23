@@ -58,13 +58,11 @@ object CustomRelease {
         checkSnapshotDependencies,
         runClean,
         runTest,
-        runIntegrationTest,
         prepareReleaseVersion,
         setReleaseVersion,
         commitReleaseVersion)
 
       val regularRelease = shared("rc") ++ Seq(
-        pushBranchChanges,
         mergeCurrentBranchTo("master"),
         tagBranchWithReleaseTag("master"),
         pushBranchChanges,
