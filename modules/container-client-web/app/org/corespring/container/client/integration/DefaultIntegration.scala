@@ -1,7 +1,8 @@
 package org.corespring.container.client.integration
 
 import grizzled.slf4j.Logger
-import org.corespring.container.client.V2PlayerConfig
+import org.corespring.container.client.controllers.helpers.PlayerXhtml
+import org.corespring.container.client.{ItemAssetResolver, V2PlayerConfig}
 import org.corespring.container.client.component.ComponentUrls
 import org.corespring.container.client.controllers.apps._
 import org.corespring.container.client.controllers.launcher.editor.EditorLauncher
@@ -39,12 +40,19 @@ trait DefaultIntegration
   def versionInfo: JsObject
 
   def containerContext: ContainerExecutionContext
+
   /**
    * For a given resource path return a resolved path.
    * By default this just returns the path, so no domain is used.
    * Override it if you want to make use of it.
    */
   def resolveDomain(path: String): String = path
+
+  def itemAssetResolver: ItemAssetResolver
+
+  def playerXhtml: PlayerXhtml = new PlayerXhtml {
+    override def itemAssetResolver: ItemAssetResolver = DefaultIntegration.this.itemAssetResolver
+  }
 
   private lazy val logger = ContainerLogger.getLogger("DefaultIntegration")
 
@@ -225,7 +233,15 @@ trait DefaultIntegration
 
     override def resolveDomain(path: String): String = DefaultIntegration.this.resolveDomain(path)
 
+    override def playerXhtml: PlayerXhtml = DefaultIntegration.this.playerXhtml
+
     override def itemPreProcessor: PlayerItemPreProcessor = DefaultIntegration.this.internalProcessor
+  }
+
+  lazy val metadata = new ItemMetadata {
+    override def hooks: ItemMetadataHooks = itemMetadataHooks
+
+    override def containerContext = DefaultIntegration.this.containerContext
   }
 
   lazy val collection = new Collection {
@@ -242,6 +258,8 @@ trait DefaultIntegration
     override def containerContext = DefaultIntegration.this.containerContext
 
     override def materialHooks: SupportingMaterialHooks = DefaultIntegration.this.itemSupportingMaterialHooks
+
+    override def playerXhtml: PlayerXhtml = DefaultIntegration.this.playerXhtml
   }
 
   lazy val itemDraft = new ItemDraft {
@@ -257,6 +275,8 @@ trait DefaultIntegration
     override def containerContext = DefaultIntegration.this.containerContext
 
     override protected def componentTypes: Seq[String] = DefaultIntegration.this.components.map(_.componentType)
+
+    override def playerXhtml: PlayerXhtml = DefaultIntegration.this.playerXhtml
   }
 
   lazy val session = new Session {
@@ -293,4 +313,5 @@ trait DefaultIntegration
 
     override def containerContext = DefaultIntegration.this.containerContext
   }
+
 }

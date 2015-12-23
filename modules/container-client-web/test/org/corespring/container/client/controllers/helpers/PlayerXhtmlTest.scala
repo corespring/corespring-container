@@ -1,5 +1,6 @@
 package org.corespring.container.client.controllers.helpers
 
+import org.corespring.container.client.ItemAssetResolver
 import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
 
@@ -9,10 +10,16 @@ class PlayerXhtmlTest extends Specification {
     def withoutCarriageReturn = s.replaceAll("\r", "")
   }
 
-  val comps = Seq("corespring-apple", "corespring-banana", "corespring-one", "corespring-two")
+  val playerXhtml = new PlayerXhtml {
+    override def itemAssetResolver = new ItemAssetResolver{}
+  }
 
   case class assertPlayerXhtml(in:String, expected:String) extends Scope{
-    PlayerXhtml.mkXhtml(comps, in).trim.withoutCarriageReturn === expected.withoutCarriageReturn
+    playerXhtml.mkXhtml(Some("123"), in).trim.withoutCarriageReturn === expected.withoutCarriageReturn
+  }
+
+  case class assertPlayerXhtmlWithoutItemId(in:String, expected:String) extends Scope{
+    playerXhtml.mkXhtml(None, in).trim.withoutCarriageReturn === expected.withoutCarriageReturn
   }
 
   "preparePlayerXhtml" should {
@@ -22,26 +29,6 @@ class PlayerXhtmlTest extends Specification {
     "not strip space after <i>" in assertPlayerXhtml("<i>a</i> a", "<i>a</i> a")
 
 
-    "when changing the custom tags to divs with an attribute" should {
-      "change the <tag> to <div tag=''>" in assertPlayerXhtml(
-        """<corespring-apple id="1"></corespring-apple><corespring-banana id="2"></corespring-banana>""",
-        """<div id="1" corespring-apple=""></div><div id="2" corespring-banana=""></div>"""
-      )
-
-      "change nested tags" in assertPlayerXhtml(
-        "<corespring-one><corespring-two>Content</corespring-two></corespring-one>",
-        """<div corespring-one=""><div corespring-two="">Content</div></div>"""
-      )
-
-      "not split tags" in assertPlayerXhtml(
-        """<p>Hello
-          |<corespring-one><corespring-two>Content</corespring-two></corespring-one>World</p>""".stripMargin,
-        """<div class="para">Hello
-          |<div corespring-one=""><div corespring-two="">Content</div></div>World</div>""".stripMargin
-
-      )
-    }
-
     "convert <p> to <div class=\"para\">" in assertPlayerXhtml(
       "<p>Hello</p>",
       """<div class="para">Hello</div>"""
@@ -50,6 +37,16 @@ class PlayerXhtmlTest extends Specification {
     "convert <p class='a'> to <div class='para a'>" in assertPlayerXhtml(
       """<p class="p-intro2">Hello</p>""",
       """<div class="para p-intro2">Hello</div>"""
+    )
+
+    "insert image anchor when itemId is Some(id)" in assertPlayerXhtml(
+      """<img src="test" width="7px" height="8px"/>""",
+      """<img src="/player/item/123/test" width="7px" height="8px" />"""
+    )
+
+    "not insert image anchor when itemId is None" in assertPlayerXhtmlWithoutItemId(
+      """<img src="test" width="7px" height="8px"/>""",
+      """<img src="test" width="7px" height="8px" />"""
     )
 
   }

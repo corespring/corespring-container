@@ -11,6 +11,7 @@ angular.module('corespring-editor.controllers')
     'WIGGI_EVENTS',
     'WiggiDialogLauncher',
     'editorDebounce',
+    'MetadataService',
     function(
       $scope,
       $timeout,
@@ -22,7 +23,8 @@ angular.module('corespring-editor.controllers')
       Msgr,
       WIGGI_EVENTS,
       WiggiDialogLauncher,
-      editorDebounce) {
+      editorDebounce,
+      MetadataService) {
 
       "use strict";
 
@@ -65,6 +67,7 @@ angular.module('corespring-editor.controllers')
           ConfigurationService.setConfig({});
           ItemService.load($scope.onItemLoadSuccess, $scope.onItemLoadError);
         }
+
 
         function onInitialise(data) {
           logger.log('on initialise', data);
@@ -117,6 +120,9 @@ angular.module('corespring-editor.controllers')
         preprocessComponents(item);
         $scope.lastId = findLastId(item);
         $scope.$broadcast('itemLoaded', item);
+        MetadataService.get($scope.item.itemId).then(function(result) {
+          $scope.metadataSets = result;
+        });
       }
 
       function onItemLoadError(err) {

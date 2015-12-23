@@ -119,3 +119,8 @@ trait DataQueryHooks extends HasContainerContext {
 trait CollectionHooks extends HasContainerContext {
   def list()(implicit header: RequestHeader): Future[Either[StatusMessage, JsArray]]
 }
+
+trait ItemMetadataHooks extends HasContainerContext {
+  def get(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]]
+}
+

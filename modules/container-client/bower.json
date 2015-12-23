@@ -30,13 +30,13 @@
     "lodash": "~2.4.1",
     "mathjax": "https://github.com/mathjax/MathJax.git#2.5.3",
     "mathjs": "~0.18.0",
-    "msgr.js": "git@github.com:corespring/msgr.js.git#v0.0.8",
+    "msgr.js": "git@github.com:corespring/msgr.js.git#v0.0.9",
     "saxjs": "https://github.com/corespring/sax-js.git#v0.6.0-corespring",
     "select2": "~3.4.5",
     "spin.js": "~2.0.0",
     "undo.js": "git@github.com:jzaefferer/undo.git",
     "angular-debounce": "~1.0.3",
-    "wiggi-wiz": "git@github.com:corespring/wiggi-wiz.git#0.1.77",
+    "wiggi-wiz": "git@github.com:corespring/wiggi-wiz.git#0.1.81",
     "jquery-mockjax": "~1.6.2"
   },
   "devDependencies": {
