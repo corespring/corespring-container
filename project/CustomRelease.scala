@@ -34,8 +34,9 @@ object CustomRelease {
 
   lazy val buildTgz = ReleaseStep(action = (st:State)=> {
     val extracted = Project.extract(st)
-    import com.typesafe.sbt.packager.universal.Keys.packageZipTarball
-    val (newState, _) = extracted.runTask(packageZipTarball, st)
+    import com.typesafe.sbt.SbtNativePackager._
+    import com.typesafe.sbt.packager.Keys._
+    val (newState, _) = extracted.runTask(packageZipTarball in Universal, st)
     newState
   })
 
