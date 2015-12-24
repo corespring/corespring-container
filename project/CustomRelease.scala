@@ -64,20 +64,17 @@ object CustomRelease {
         commitReleaseVersion)
 
       val regularRelease = shared("rc") ++ Seq(
-        pushBranchChanges,
         mergeCurrentBranchTo("master"),
         tagBranchWithReleaseTag("master"),
         pushBranchChanges,
         pushTags,
-        publishArtifacts,
-        buildTgz)
+        publishArtifacts)
 
       val hotfixRelease = shared("hf") ++ Seq(
         tagBranchWithReleaseTag("hf"),
         pushBranchChanges,
         pushTags,
-        publishArtifacts,
-        buildTgz)
+        publishArtifacts)
 
       Git(bd).currentBranch match {
         case "rc" => regularRelease
