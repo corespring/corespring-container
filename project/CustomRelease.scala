@@ -1,6 +1,7 @@
 import org.corespring.sbtrelease.ReleaseSteps._
 import org.corespring.sbtrelease.ReleaseExtrasPlugin._
-import org.corespring.sbtrelease.{Git, PrefixAndVersion, BranchNameConverter, FolderStyleConverter}
+import org.corespring.sbtrelease.{ Git, PrefixAndVersion, BranchNameConverter, FolderStyleConverter }
+import sbt.Keys._
 import sbt.Keys._
 import sbt._
 import sbtrelease.ReleaseStateTransformations._
@@ -8,10 +9,9 @@ import sbtrelease.ReleasePlugin.autoImport._
 import sbtrelease.Version.Bump
 import sbtrelease.Version
 
-
 /**
-  * Whilst testing happens map hotfix and release branches to cr-hotfix/0.0.0 or cr-release/0.0.0
-  */
+ * Whilst testing happens map hotfix and release branches to cr-hotfix/0.0.0 or cr-release/0.0.0
+ */
 private object HyphenNameConverter extends BranchNameConverter {
   val pattern = """^([^-]+)-([^-]+)$""".r
 
@@ -43,8 +43,15 @@ object CustomRelease {
     newState
   })
 
+  def prepareComponents = ReleaseStep(action = (st: State) => {
+    val extracted = Project.extract(st)
+    val bd = extracted.get(baseDirectory)
+    Process("git submodule update --init --recursive", bd).!
+    Process("npm install", (bd / "corespring-components")).!
+    st
+  })
 
-  def unsupportedBranch(b:String) = ReleaseStep(action = st => {
+  def unsupportedBranch(b: String) = ReleaseStep(action = st => {
     sys.error(s"Unsupported branch for releasing: $b, must be 'rc' for releases or 'hotfix' for hotfixes")
   })
 
@@ -53,6 +60,7 @@ object CustomRelease {
     releaseVersionBump := Bump.Minor,
     releaseProcess <<= baseDirectory.apply { bd =>
 
+      /*
       def shared(branchName:String) = Seq(
         checkBranchName(branchName),
         checkSnapshotDependencies,
@@ -81,6 +89,8 @@ object CustomRelease {
         case "hf" => hotfixRelease
         case branch => Seq(unsupportedBranch(branch))
       }
+        */
+      Seq(prepareComponents)
     })
 
 }
