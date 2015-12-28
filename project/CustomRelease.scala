@@ -43,14 +43,6 @@ object CustomRelease {
     newState
   })
 
-  def prepareComponents = ReleaseStep(action = (st: State) => {
-    val extracted = Project.extract(st)
-    val bd = extracted.get(baseDirectory)
-    Process("git submodule update --init --recursive", bd).!
-    Process("npm install", (bd / "corespring-components")).!
-    st
-  })
-
   def unsupportedBranch(b: String) = ReleaseStep(action = st => {
     sys.error(s"Unsupported branch for releasing: $b, must be 'rc' for releases or 'hotfix' for hotfixes")
   })
@@ -60,8 +52,7 @@ object CustomRelease {
     releaseVersionBump := Bump.Minor,
     releaseProcess <<= baseDirectory.apply { bd =>
 
-      /*
-      def shared(branchName:String) = Seq(
+      def shared(branchName: String) = Seq(
         checkBranchName(branchName),
         checkSnapshotDependencies,
         runClean,
@@ -88,8 +79,6 @@ object CustomRelease {
         case "hf" => hotfixRelease
         case branch => Seq(unsupportedBranch(branch))
       }
-        */
-      Seq(prepareComponents)
     })
 
 }
