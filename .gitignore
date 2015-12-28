@@ -16,3 +16,4 @@ node_modules
 target
 Thumbs.db
 aws.zip
+.test-scripts

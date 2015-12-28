@@ -1,20 +1,21 @@
 package org.corespring.container.client.integration
 
+import org.corespring.container.client.ItemAssetResolver
 import org.corespring.container.client.controllers.ComponentSets
 import org.corespring.container.client.hooks._
 import org.corespring.container.components.model.Component
 import org.corespring.test.TestContext
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
-import play.api.libs.json.{JsObject, Json}
-import play.api.mvc.{AnyContent, Request}
-import play.api.test.{FakeApplication, FakeRequest, PlaySpecification}
-import play.api.{Configuration, GlobalSettings}
+import play.api.libs.json.{ JsObject, Json }
+import play.api.mvc.{ AnyContent, Request }
+import play.api.test.{ FakeApplication, FakeRequest, PlaySpecification }
+import play.api.{ Configuration, GlobalSettings }
 
 class DefaultIntegrationTest extends Specification with Mockito with PlaySpecification {
 
   def mkDefaultIntegration(json: JsObject) = {
-    new DefaultIntegration with TestContext{
+    new DefaultIntegration with TestContext {
 
       override def versionInfo: JsObject = Json.obj()
 
@@ -29,6 +30,8 @@ class DefaultIntegrationTest extends Specification with Mockito with PlaySpecifi
       override def itemEditorHooks: ItemEditorHooks = mock[ItemEditorHooks]
 
       override def dataQueryHooks: DataQueryHooks = mock[DataQueryHooks]
+
+      override def itemMetadataHooks: ItemMetadataHooks = mock[ItemMetadataHooks]
 
       override def sessionHooks: SessionHooks = {
         val m = mock[SessionHooks]
@@ -52,6 +55,8 @@ class DefaultIntegrationTest extends Specification with Mockito with PlaySpecifi
       override def itemDraftSupportingMaterialHooks: ItemDraftSupportingMaterialHooks = mock[ItemDraftSupportingMaterialHooks]
 
       override def itemSupportingMaterialHooks: ItemSupportingMaterialHooks = mock[ItemSupportingMaterialHooks]
+
+      override def itemAssetResolver : ItemAssetResolver = mock[ItemAssetResolver]
     }
   }
 

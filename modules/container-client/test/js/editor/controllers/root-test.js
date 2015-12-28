@@ -10,7 +10,7 @@ describe('editor root', function() {
     setConfig: jasmine.createSpy('setConfig')
   };
   
-  var ItemService, LogFactory, msgrOnHandlers, Msgr;
+  var ItemService, MetadataService, LogFactory, msgrOnHandlers, Msgr;
 
   var iFrameService = {
     isInIFrame: function() {
@@ -50,6 +50,10 @@ describe('editor root', function() {
       saveAll: jasmine.createSpy('saveAll')
     };
 
+    MetadataService = {
+      get: function() {}
+    };
+
     LogFactory = new org.corespring.mocks.editor.LogFactory();
     editorDebounce = {
       flush: jasmine.createSpy('flush')
@@ -58,12 +62,14 @@ describe('editor root', function() {
     $provide.value('$timeout', function(fn){fn();});
     $provide.value('ConfigurationService', ConfigurationService);
     $provide.value('ItemService', ItemService);
+    $provide.value('MetadataService', MetadataService);
     $provide.value('LogFactory', LogFactory);
     $provide.value('iFrameService', iFrameService);
     $provide.value('Msgr', Msgr);
     $provide.value('WiggiDialogLauncher',  WiggiDialogLauncher);
     $provide.value('EditorDialogTemplate', EditorDialogTemplate);
     $provide.value('editorDebounce', editorDebounce);
+
   }));
 
   function render() {
@@ -75,6 +81,12 @@ describe('editor root', function() {
     rootScope = $rootScope;
     controllerFn = $controller;
     EVENTS = WIGGI_EVENTS;
+
+    spyOn(MetadataService, 'get').and.returnValue({
+      then: function() {
+      }
+    });
+
     render();
   }));
 
@@ -171,6 +183,10 @@ describe('editor root', function() {
 
     it('should set item components to preprocessed components', function() {
       expect(item.components[index]).toEqual(preprocessedComponent);
+    });
+
+    it('should request metadata sets', function() {
+      expect(MetadataService.get).toHaveBeenCalled();
     });
 
   });

@@ -177,9 +177,15 @@ private[resources] trait CoreSupportingMaterials extends Controller with HasCont
           val objContent: Enumerator[Array[Byte]] = Enumerator.fromStream(fd.stream)
           val headers = {
             val main = Map(
-              CONTENT_TYPE -> (if (fd.contentType != null) fd.contentType else "application/octet-stream"),
-              CONTENT_LENGTH.toString -> fd.contentLength.toString)
-            main ++ fd.metadata.get(ETAG).map { ETAG -> _ }
+              CONTENT_LENGTH.toString -> fd.contentLength.toString,
+              CONTENT_DISPOSITION.toString -> "inline")
+
+            val contentType = fd.contentType match {
+              case null => Map()
+              case "application/octet-stream" => Map()
+              case _ => Map(CONTENT_TYPE -> fd.contentType)
+            }
+            main ++ contentType ++ fd.metadata.get(ETAG).map { ETAG -> _ }
           }
           SimpleResult(header = ResponseHeader(200, headers), body = objContent)
         }

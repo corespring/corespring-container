@@ -12,9 +12,9 @@ import play.api.test.Helpers._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-object mockGlobal extends play.api.GlobalSettings
-
 class DataQueryTest extends Specification with Mockito {
+
+  object mockGlobal extends play.api.GlobalSettings
 
   "data query" should {
 
@@ -24,7 +24,6 @@ class DataQueryTest extends Specification with Mockito {
         m.list(anyString, any[Option[String]])(any[RequestHeader]) returns Future(Right(JsArray(Seq.empty)))
         m
       }
-
     }
 
     "return an error for an invalid topic" in running(FakeApplication(withGlobal = Some(mockGlobal))){

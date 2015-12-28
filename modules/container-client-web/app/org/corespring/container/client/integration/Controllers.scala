@@ -4,7 +4,7 @@ import org.corespring.container.client.controllers._
 import org.corespring.container.client.controllers.apps._
 import org.corespring.container.client.controllers.launcher.editor.EditorLauncher
 import org.corespring.container.client.controllers.launcher.player.PlayerLauncher
-import org.corespring.container.client.controllers.resources.{ Collection, Item, ItemDraft, Session }
+import org.corespring.container.client.controllers.resources._
 import play.api.mvc.Controller
 
 trait CommonControllers {
@@ -25,6 +25,9 @@ trait ResourceControllers {
 
   /** collection resource */
   def collection: Collection
+
+  /** metadata resource */
+  def metadata: ItemMetadata
 
   /** item draft resource */
   def itemDraft: ItemDraft
@@ -84,6 +87,7 @@ trait ContainerControllers
     editorLauncher,
     libs,
     collection,
+    metadata,
     item,
     itemDraft,
     session,

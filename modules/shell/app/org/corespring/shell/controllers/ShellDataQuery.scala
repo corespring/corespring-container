@@ -1,5 +1,6 @@
 package org.corespring.shell.controllers
 
+import scala.collection.mutable.HashSet
 import scala.concurrent.Future
 
 import org.corespring.container.client.hooks.{ DataQueryHooks => ContainerDataQueryHooks }
@@ -36,7 +37,9 @@ trait ShellDataQueryHooks extends ContainerDataQueryHooks {
 
   lazy val subjects: Seq[JsObject] = SubjectJson()
 
-  lazy val standards: Seq[JsObject] = StandardsJson()
+  lazy val standardClusters = uniqueClustersFrom(standards)
+
+  lazy val standards: Seq[JsObject] = addDomain(StandardsJson())
 
   lazy val standardsTree: Seq[JsObject] = StandardsTreeJson()
 
@@ -54,12 +57,44 @@ trait ShellDataQueryHooks extends ContainerDataQueryHooks {
       case "mediaType" => Json.toJson(mediaType)
       case "priorUses" => Json.toJson(priorUses)
       case "reviewsPassed" => Json.toJson(reviewsPassed)
+      case "standardClusters" => Json.toJson(standardClusters)
       case "standards" => Json.toJson(StandardsDataQuery.list(standards, query))
       case "standardsTree" => Json.toJson(standardsTree)
       case "subjects.primary" => Json.toJson(StandardsDataQuery.list(subjects, query))
       case "subjects.related" => Json.toJson(StandardsDataQuery.list(subjects, query))
     }
     Right(out.as[JsArray])
+  }
+
+  private def uniqueClustersFrom(standards: Seq[JsObject]) = {
+    standards
+      .map(s => (
+        (s \ "domain").asOpt[String],
+        (s \ "subject").asOpt[String]))
+      .toMap
+      .toSeq
+      .map(p => Json.obj(
+        "subject" -> p._2,
+        "domain" -> p._1))
+  }
+
+  private def addDomain(standards: Seq[JsObject]) = {
+
+    def getCluster(standard: JsValue, property: String) = {
+      (standard \ property).asOpt[String] match {
+        case Some(s) => Json.obj("domain" -> s)
+        case _ => Json.obj("domain" -> "")
+      }
+    }
+
+    standards.map(s => {
+      (s \ "subject").asOpt[String] match {
+        case Some("ELA") => s.as[JsObject] ++ getCluster(s, "subCategory")
+        case Some("ELA-Literacy") => s.as[JsObject] ++ getCluster(s, "subCategory")
+        case Some("Math") => s.as[JsObject] ++ getCluster(s, "category")
+        case _ => s
+      }
+    })
   }
 
   override def findOne(topic: String, id: String)(implicit header: RequestHeader): Future[Either[(Int, String), Option[JsValue]]] = Future {

@@ -26,6 +26,7 @@ object DataQuery {
     "mediaType",
     "priorUses",
     "reviewsPassed",
+    "standardClusters",
     "standards",
     "standardsTree",
     "subjects.primary",
