@@ -80,6 +80,28 @@ object Build extends sbt.Build {
     lessEntryPoints := Nil,
     javascriptEntryPoints := Nil)
 
+  val installComponents = TaskKey[Unit]("install-components", "install the corespring-components submodule and run `npm install`")
+
+  private def runCmd(log: Logger)(cmd: String, root: sbt.File) = {
+
+    log.info(s"[runCmd]: cmd: $cmd, root: ${root.getPath}")
+    val exitCode = Process(cmd, root).!
+
+    if (exitCode != 0) {
+      sys.error(s"The following process failed: $cmd, folder: ${root.getPath}")
+    }
+  }
+
+  val installComponentsTask = installComponents <<= (baseDirectory, streams).map {
+    (bd, s) =>
+      val root = bd / ".." / ".."
+      s.log.info("[install-components] running - install components...")
+      s.log.info("[install-components] running - git submodule update...")
+      runCmd(s.log)("git submodule update --init --recursive", root)
+      s.log.info("[install-components] running - npm install...")
+      runCmd(s.log)("npm install", root / "corespring-components")
+  }
+
   val buildClient = TaskKey[Unit]("build-client", "runs client installation commands")
 
   val buildClientTask = buildClient <<= (baseDirectory, streams) map {
@@ -99,16 +121,7 @@ object Build extends sbt.Build {
         (gruntCmd, "loadComponentDependencies"),
         (gruntCmd, "stage"))
 
-      commands.foreach {
-        c =>
-          s.log.info(s"[>> $c] on " + clientRoot)
-          val (cmd, args) = c
-          val exitCode = sbt.Process(s"$cmd $args", clientRoot).!
-          if (exitCode != 0) {
-            throw new RuntimeException(s"The following commands failed: $c")
-          }
-      }
-
+      commands.foreach { case (cmd, args) => runCmd(s.log)(s"$cmd $args", clientRoot) }
   }
 
   val buildInfo = TaskKey[Unit]("build-client", "runs client installation commands")
@@ -152,6 +165,8 @@ object Build extends sbt.Build {
     .settings(
       buildClientTask,
       runClientTestsTask,
+      installComponentsTask,
+      buildClient <<= (buildClient).dependsOn(installComponents),
       (test in Test) <<= (test in Test) dependsOn runClientTests,
       //This task is called by the play stage task
       (packagedArtifacts) <<= (packagedArtifacts) dependsOn buildClient)
