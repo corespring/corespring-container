@@ -146,7 +146,7 @@ script(type="text/ng-template", id="/templates/profile")
             .col-sm-3
               image(ng-src="{{c.imageUrl}}", ng-if="c.hasImage")
               label(ng-if="!c.hasImage") {{ c.label }}
-            .col-sm-9.no-input
+            .col-sm-9.hide-input
               input.full-width(
               type="hidden",
               multiple,
@@ -155,7 +155,7 @@ script(type="text/ng-template", id="/templates/profile")
           br/
           h6 Standard Clusters
           .form-group.standards
-            .col-sm-12.no-input
+            .col-sm-12.hide-input
               input.full-width(
               type="hidden",
               multiple,
