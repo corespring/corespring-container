@@ -25,13 +25,12 @@ mixin configurableField(id, label, ngModel)
         input.form-control(id=id, ng-model=ngModel, ng-readonly="formModels.#{id}.readonly")
 
 mixin multipleValueSelector(id, ngModel, dataProvider, msg)
-  select(id=id,
+  select.full-width(id=id,
   ng-model=ngModel,
   ui-select2,
   multiple,
   data-placeholder=msg,
-  ng-readonly="formModels.#{id}.readonly",
-  style="width:100%;")
+  ng-readonly="formModels.#{id}.readonly")
     option(ng-repeat="c in #{dataProvider}",value="{{c.key}}") {{c.key}}
 
 mixin panelHeader(id)
@@ -72,7 +71,7 @@ script(type="text/ng-template", id="/templates/profile")
           +configurableField("description","Description", "taskInfo.description")
 
           +configurableField("primarySubject","Primary Subject", "taskInfo.subjects.primary")
-            input(id="primarySubject",
+            input.full-width(id="primarySubject",
             ng-model="taskInfo.subjects.primary",
             type="text",
             ui-select2="primarySubjectSelect2Adapter",
@@ -80,14 +79,13 @@ script(type="text/ng-template", id="/templates/profile")
             ng-readonly="formModels.primarySubject.readonly")
 
           +configurableField("relatedSubject","Related Subject", "taskInfo.subjects.related")
-            input(id="relatedSubject",
+            input.full-width(id="relatedSubject",
             ng-model="taskInfo.subjects.related",
             type="hidden",
             multiple="multiple",
             ui-select2="relatedSubjectSelect2Adapter",
             data-placeholder="Choose a subject...",
-            ng-readonly="formModels.relatedSubject.readonly",
-            style="width:100%;")
+            ng-readonly="formModels.relatedSubject.readonly")
 
           +configurableField("gradeLevel","Grade Level", "taskInfo.gradeLevel")
             +multipleValueSelector("gradeLevel","taskInfo.gradeLevel","gradeLevelDataProvider | filter:gradeLevelFilter","Choose a grade level...")
@@ -108,12 +106,11 @@ script(type="text/ng-template", id="/templates/profile")
           div.standard-filter(ng-show="!formModels.standards.readonly")
             h6 Add the Standards
             +field("standard-filter-search","Standards")
-              input(id="standard-filter-search",
+              input.full-width(id="standard-filter-search",
               class="add-standards",
               type="text",
               ui-select2="standardsAdapter",
-              ng-model="profile.standards",
-              style="width: 100%;")
+              ng-model="profile.standards")
               span Begin entering standard codes
 
             +panel("standards", "Filter")
@@ -137,12 +134,11 @@ script(type="text/ng-template", id="/templates/profile")
                     option(value="") {{standardFilterPlaceholder.subCategory}}
 
                 +field("standard-filter-search","Filter Results",undefined,"Click to select")
-                  input(id="standard-filter-search",
+                  input.full-width(id="standard-filter-search",
                   class="add-standards",
                   type="text",
                   ui-select2="filterStandardsAdapter",
-                  ng-model="profile.standards",
-                  style="width: 100%;")
+                  ng-model="profile.standards")
             hr/
 
           h6 Standards
@@ -150,29 +146,27 @@ script(type="text/ng-template", id="/templates/profile")
             .col-sm-3
               image(ng-src="{{c.imageUrl}}", ng-if="c.hasImage")
               label(ng-if="!c.hasImage") {{ c.label }}
-            .col-sm-9.no-input
-              input(
+            .col-sm-9.hide-input
+              input.full-width(
               type="hidden",
               multiple,
               ui-select2="{tags:[],dropdownCss:{display:'none'}}",
-              ng-model="c.standards",
-              style="width: 100%;")
+              ng-model="c.standards")
           br/
           h6 Standard Clusters
           .form-group.standards
-            .col-sm-12.no-input
-              input(
+            .col-sm-12.hide-input
+              input.full-width(
               type="hidden",
               multiple,
               ui-select2="{tags:[],dropdownCss:{display:'none'}}",
-              ng-model="clusters",
-              style="width: 100%;")
+              ng-model="clusters")
 
           br/
           h6 Additional Clusters
           +field("mathClusterSelector","Math")
             +multipleValueSelector("mathClusterSelector","additionalCluster","mathClusterOptions | filter:selectedClusterFilter","Select...")
-          +field("elaClusterSelector","Ela")
+          +field("elaClusterSelector","ELA")
             +multipleValueSelector("elaClusterSelector","additionalCluster","elaClusterOptions | filter:selectedClusterFilter","Select...")
           br/
 
