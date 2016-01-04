@@ -35,6 +35,34 @@
     }
   }
 
+  .difficulty {
+    .form-control {
+      display: inline-block;
+      width: 60px;
+    }
+    .measure {
+      margin-left: 10px;
+      font-weight: bold;
+      font-size: 16px;
+    }
+  }
+
+  form {
+    border: solid lighten(@cs-grey, 34%) 1px;
+    border-radius: 4px;
+    padding: 10px;
+    margin-bottom: 1em;
+
+    h4, h5, h6 {
+      text-transform: uppercase;
+      color: lighten(@cs-grey, 10%);
+    }
+  }
+
+  .full-width {
+    width: 100%;
+  }
+
   .inline-help {
     font-style: italic;
   }
@@ -49,18 +77,6 @@
     }
   }
 
-  .difficulty {
-    .form-control {
-      display: inline-block;
-      width: 60px;
-    }
-    .measure {
-      margin-left: 10px;
-      font-weight: bold;
-      font-size: 16px;
-    }
-  }
-
   .lexile {
     .form-control {
       display: inline-block;
@@ -70,29 +86,6 @@
       margin-left: 10px;
       font-weight: bold;
       font-size: 16px;
-    }
-  }
-
-  .cost-for-resource {
-    width: 154px;
-  }
-
-  .workflow {
-    label {
-      padding-left: 10px;
-      font-weight: normal;
-    }
-  }
-
-  form {
-    border: solid lighten(@cs-grey, 34%) 1px;
-    border-radius: 4px;
-    padding: 10px;
-    margin-bottom: 1em;
-
-    h4, h5, h6 {
-      text-transform: uppercase;
-      color: lighten(@cs-grey, 10%);
     }
   }
 
@@ -120,10 +113,9 @@
     height: 34px;
     line-height: 34px;
   }
+
   .select2-container-multi {
-
     .select2-choices {
-
       display: block;
       width: 100%;
       height: 34px;
@@ -134,16 +126,22 @@
       background-image: none;
       border: 1px solid #cccccc;
       border-radius: 4px;
-      -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
-      -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
-      box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
-      -webkit-transition: all border-color ease-in-out .15s, box-shadow ease-in-out .15s ease-out;
-      -moz-transition: all border-color ease-in-out .15s, box-shadow ease-in-out .15s ease-out;
-      -o-transition: all border-color ease-in-out .15s, box-shadow ease-in-out .15s ease-out;
-      transition: all border-color ease-in-out .15s, box-shadow ease-in-out .15s ease-out;
-      -webkit-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
-      -o-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
-      transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+
+      @box-shadow-settings: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+      -moz-box-shadow: @box-shadow-settings;
+      -webkit-box-shadow: @box-shadow-settings;
+      box-shadow: @box-shadow-settings;
+
+      @transition-all-settings: all border-color ease-in-out .15s, box-shadow ease-in-out .15s ease-out;
+      -webkit-transition: @transition-all-settings;
+      -moz-transition: @transition-all-settings;
+      -o-transition: @transition-all-settings;
+      transition: @transition-all-settings;
+
+      @transition-settings: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+      -webkit-transition: @transition-settings;
+      -o-transition: @transition-settings;
+      transition: @transition-settings;
 
       .select2-search-choice {
         background-image: none;
@@ -188,6 +186,13 @@
     float: left;
     font-weight: bold;
     color: lighten(@cs-green, 5%);
+  }
+
+  .workflow {
+    label {
+      padding-left: 10px;
+      font-weight: normal;
+    }
   }
 
 }
