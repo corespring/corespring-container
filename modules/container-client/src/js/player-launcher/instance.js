@@ -2,17 +2,17 @@
  * @param call: { url: '', method: '', params: {}, hash: ''}
  */
 
-var Instance = function(call,  element, errorCallback, log, autosizeEnabled, iframeScrollingEnabled) {
+var Instance = function(call, element, errorCallback, log, autosizeEnabled, iframeScrollingEnabled) {
 
   autosizeEnabled = autosizeEnabled !== false;
 
   log = log || require('logger');
 
-  function PostForm(url){
+  function PostForm(url) {
 
     var formName = iframeUid + '-form';
 
-    function addForm(){
+    function addForm() {
       var form = [
         '<form ',
         '  target="', iframeUid, '"',
@@ -26,16 +26,16 @@ var Instance = function(call,  element, errorCallback, log, autosizeEnabled, ifr
       $('body').append(form);
     }
 
-    function submitForm(){
+    function submitForm() {
       var form = document.forms[formName];
       form.submit();
     }
 
-    function removeForm(){
+    function removeForm() {
       $('#' + formName).remove();
     }
 
-    this.load = function(){
+    this.load = function() {
       addForm();
       submitForm();
       removeForm();
@@ -50,7 +50,7 @@ var Instance = function(call,  element, errorCallback, log, autosizeEnabled, ifr
 
   function $iframe() {
     var $node = $('#' + iframeUid);
-    if($node.size() !== 1){
+    if ($node.size() !== 1) {
       var err = errorCodes.CANT_FIND_IFRAME(iframeUid);
       errorCallback(err);
     }
@@ -75,7 +75,7 @@ var Instance = function(call,  element, errorCallback, log, autosizeEnabled, ifr
 
     var url = makeUrl();
 
-    if(call.hash){
+    if (call.hash) {
       url += '#' + call.hash;
     }
 
@@ -86,24 +86,24 @@ var Instance = function(call,  element, errorCallback, log, autosizeEnabled, ifr
     ].join('\n');
 
     // This is a workaround for IE* because $(iframe).css("absolute","initial") is not working
-    (function injectPlayerStyles(){
-      if ($('head #playerstyle').length === 0){
+    (function injectPlayerStyles() {
+      if ($('head #playerstyle').length === 0) {
         $('head').append('<style id="playerstyle" type="text/css">' + iframeStyles + '</style>');
       }
     })();
 
     var iframeOpen = [
       '<iframe',
-      ' id="', iframeUid , '"',
-      ' name="', iframeUid ,'"',
+      ' id="', iframeUid, '"',
+      ' name="', iframeUid, '"',
       ' frameborder="0"',
       iframeScrollingEnabled ? '' : ' scrolling="no"',
       ' class="player-loading"',
       ' style="border:none;' + (autosizeEnabled ? ' width:100%;' : '') + '" '
     ].join('');
 
-    if(call.method === 'GET'){
-      iframeOpen += 'src="'+url+'"';
+    if (call.method === 'GET') {
+      iframeOpen += 'src="' + url + '"';
     }
 
     var iframeClose = '></iframe>';
@@ -111,15 +111,17 @@ var Instance = function(call,  element, errorCallback, log, autosizeEnabled, ifr
     $(e).html(iframeOpen + iframeClose);
 
 
-    if(call.method === 'POST'){
+    if (call.method === 'POST') {
       var post = new PostForm(url);
       post.load();
     }
 
-    channel = new msgr.Channel(window, $iframe()[0].contentWindow, {enableLogging: false});
+    channel = new msgr.Channel(window, $iframe()[0].contentWindow, {
+      enableLogging: false
+    });
 
-    if(autosizeEnabled){
-      channel.on('dimensionsUpdate', function(data){
+    if (autosizeEnabled) {
+      channel.on('dimensionsUpdate', function(data) {
         $iframe().height(data.h);
       });
     }
@@ -128,6 +130,28 @@ var Instance = function(call,  element, errorCallback, log, autosizeEnabled, ifr
       $iframe().removeClass("player-loading");
       $iframe().addClass("player-loaded");
     });
+
+    /**
+     * If you want the main window to scroll,
+     * send message "autoScroll" with the clientX/Y position
+     * of the dragged element.
+     */
+    channel.on('autoScroll', function(clientPos) {
+      var scrollAmount = 5;
+      var sensitiveAreaHeight = 200;
+
+      var $scrollable = $('body');
+      var scrollTop = $scrollable.scrollTop();
+      var viewportTop = 0;
+      var viewportBottom = $scrollable.height();
+      var y = clientPos.y - scrollTop;
+      if (y < viewportTop + sensitiveAreaHeight) {
+        $scrollable.scrollTop(scrollTop - scrollAmount);
+      } else if (y > viewportBottom - sensitiveAreaHeight) {
+        $scrollable.scrollTop(scrollTop + scrollAmount);
+      }
+    });
+
   }
 
   initialize.bind(this)(element);
@@ -150,14 +174,14 @@ var Instance = function(call,  element, errorCallback, log, autosizeEnabled, ifr
     channel.remove();
   };
 
-  this.width = function(w){
+  this.width = function(w) {
     $('#' + iframeUid).width(w);
   };
 
-  this.css = function(key, value){
+  this.css = function(key, value) {
     $('#' + iframeUid).css(key, value);
   };
 
 };
 
- module.exports = Instance;
+module.exports = Instance;
