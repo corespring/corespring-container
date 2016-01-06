@@ -11,6 +11,7 @@
 
       function renderMath() {
         if (typeof MathJax !== 'undefined' && !_.isUndefined(MathJax)) {
+          element = undefined;
           MathJax.Hub.Queue(["Typeset", MathJax.Hub, element], function() {
             var $element;
             if (element) {
@@ -27,6 +28,9 @@
         }
       }
 
+      //don't use the element, bc. it slows rendering down
+      //TODO Clean up the code once we decide to use that 'fix'
+      element = undefined
       if (delay === 0) {
         renderMath();
       } else {
@@ -43,7 +47,7 @@
           if (listener && listener.type === type) {
             try {
               listener.callback.apply(null, _.rest(message));
-            } catch(e) {}
+            } catch (e) {}
           }
         }
       });
@@ -75,10 +79,8 @@
   };
 
   angular.module('corespring-common.services')
-    .service('MathJaxService',
-      [
+    .service('MathJaxService', [
         '$timeout',
         MathJaxService
-      ]
-    );
+      ]);
 })();
