@@ -59,7 +59,7 @@ describe('MathJaxService', function() {
         timeout.flush();
       });
 
-      it('should queue a MathJax typeset for the provided element', function() {
+      xit('should queue a MathJax typeset for the provided element', function() {
         expect(MathJax.Hub.Queue).toHaveBeenCalledWith(["Typeset", MathJax.Hub, element], jasmine.any(Function));
       });
     });
@@ -69,11 +69,11 @@ describe('MathJaxService', function() {
         mathJaxService.parseDomForMath(0, element);
       });
 
-      it('should queue a MathJax typeset for the provided element immediately', function() {
+      xit('should queue a MathJax typeset for the provided element immediately', function() {
         expect(MathJax.Hub.Queue).toHaveBeenCalledWith(["Typeset", MathJax.Hub, element], jasmine.any(Function));
       });
 
-      it('should add class rendered to <span mathjax/>', function() {
+      xit('should add class rendered to <span mathjax/>', function() {
         expect($('span[mathjax]', element).hasClass('rendered')).toBe(true);
       });
     });
