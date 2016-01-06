@@ -1,4 +1,4 @@
-fdescribe('DevEditorRoot', function() {
+describe('DevEditorRoot', function() {
 
   var scope, element, rootScope;
 
