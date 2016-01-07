@@ -59,9 +59,10 @@ block content
               .player-label
                 img(ng-src='{{playerLabelImg}}')
               .player-container
-                optimized-preview-player(
+                preview-player(
                   data-jade-template='dev-editor',
-                  ng-model="xhtml",
+                  player-item="item",
+                  player-markup="xhtml",
                   player-components="components",
                   player-outcomes="outcome")
                 summary-feedback(ng-model="item.summaryFeedback", session-complete="session.isComplete")
