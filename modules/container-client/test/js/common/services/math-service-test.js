@@ -51,30 +51,24 @@ describe('MathJaxService', function() {
   });
 
   describe('parseDomForMath', function() {
-    var element = $("<div><span mathjax></span></div>");
-
     describe('with delay', function() {
       beforeEach(function() {
-        mathJaxService.parseDomForMath(100, element);
+        mathJaxService.parseDomForMath(100);
         timeout.flush();
       });
 
-      xit('should queue a MathJax typeset for the provided element', function() {
-        expect(MathJax.Hub.Queue).toHaveBeenCalledWith(["Typeset", MathJax.Hub, element], jasmine.any(Function));
+      it('should queue a MathJax typeset', function() {
+        expect(MathJax.Hub.Queue).toHaveBeenCalledWith(["Typeset", MathJax.Hub], jasmine.any(Function));
       });
     });
 
     describe('without delay', function() {
       beforeEach(function() {
-        mathJaxService.parseDomForMath(0, element);
+        mathJaxService.parseDomForMath(0);
       });
 
-      xit('should queue a MathJax typeset for the provided element immediately', function() {
-        expect(MathJax.Hub.Queue).toHaveBeenCalledWith(["Typeset", MathJax.Hub, element], jasmine.any(Function));
-      });
-
-      xit('should add class rendered to <span mathjax/>', function() {
-        expect($('span[mathjax]', element).hasClass('rendered')).toBe(true);
+      it('should queue a MathJax typeset immediately', function() {
+        expect(MathJax.Hub.Queue).toHaveBeenCalledWith(["Typeset", MathJax.Hub], jasmine.any(Function));
       });
     });
 
