@@ -12,7 +12,8 @@ describe('DevEditorRoot', function() {
 
   var ComponentData = {
     setModel: jasmine.createSpy('setModel'),
-    registerComponent: jasmine.createSpy('registerComponent')
+    registerComponent: jasmine.createSpy('registerComponent'),
+    setEditable: jasmine.createSpy('setEditable')
   };
 
   var $log = {
@@ -22,7 +23,7 @@ describe('DevEditorRoot', function() {
 
   var iFrameService = {
     isInIFrame: jasmine.createSpy('isInIFrame'),
-    bypassIframeLaunchMechanism: jasmine.createSpy('bypassIframeLaunchMechanism'),
+    bypassIframeLaunchMechanism: jasmine.createSpy('bypassIframeLaunchMechanism')
   };
 
   function makeMockTimeout(){
@@ -42,6 +43,7 @@ describe('DevEditorRoot', function() {
     ItemService.saveComponents.calls.reset();
     ComponentData.setModel.calls.reset();
     ComponentData.registerComponent.calls.reset();
+    ComponentData.setEditable.calls.reset();
     $log.error.calls.reset();
   });
 
@@ -62,19 +64,15 @@ describe('DevEditorRoot', function() {
     $provide.value('$timeout', makeMockTimeout() );
   }));
 
-  var createController;
 
   beforeEach(inject(function($rootScope, $compile) {
-    createController = function() {
       rootScope = $rootScope;
       scope = $rootScope.$new();
       element = $compile('<div ng-controller="DevEditorRoot"></div>')(scope);
       scope = element.scope();
-    };
   }));
 
   describe('initialization', function() {
-    beforeEach(createController);
     it('should call ItemService.load', function() {
       expect(ItemService.load).toHaveBeenCalledWith(scope.onItemLoaded, scope.onItemLoadError);
     });
@@ -86,7 +84,6 @@ describe('DevEditorRoot', function() {
   });
 
   describe('saveAll', function() {
-    beforeEach(createController);
 
     describe('should save local changes before calling service', function() {
 
@@ -143,12 +140,15 @@ describe('DevEditorRoot', function() {
     };
 
     beforeEach(function() {
-      createController();
       scope.onItemLoaded(item);
     });
 
     it('should set item', function() {
       expect(scope.item).toEqual(item);
+    });
+
+    it('set editable to true on the item', function() {
+      expect(ComponentData.setEditable).toHaveBeenCalled();
     });
 
     it('should call ComponentData.setModel with item.components', function() {
@@ -164,7 +164,7 @@ describe('DevEditorRoot', function() {
     });
 
   });
-
+  //
   describe('dispatch itemChanged', function(){
     beforeEach(function(){
       var item = {
@@ -172,7 +172,6 @@ describe('DevEditorRoot', function() {
         customJs: '',
         xhtml: '<div>foo</div>'
       };
-      createController();
       scope.onItemLoaded(item);
       Msgr.send.calls.reset();
     });
@@ -195,7 +194,6 @@ describe('DevEditorRoot', function() {
 
   describe('save', function() {
 
-    beforeEach(createController);
 
     describe('xhtml', function() {
 
@@ -302,7 +300,6 @@ describe('DevEditorRoot', function() {
 
   describe('aceJsonChanged', function() {
 
-    beforeEach(createController);
 
     describe('valid json', function() {
       var json = '{"valid":"json"}';
@@ -335,7 +332,6 @@ describe('DevEditorRoot', function() {
   describe('onItemLoadError', function() {
     beforeEach(function() {
       spyOn(window, 'alert');
-      createController();
       scope.onItemLoadError();
     });
 
@@ -349,7 +345,6 @@ describe('DevEditorRoot', function() {
     var componentBridge = {'component': 'bridge'};
 
     beforeEach(function() {
-      createController();
       scope.$broadcast('registerComponent', id, componentBridge, {});
     });
 
@@ -364,7 +359,6 @@ describe('DevEditorRoot', function() {
     var componentBridge = {'component': 'bridge'};
 
     beforeEach(function() {
-      createController();
       scope.$broadcast('registerComponent', id, componentBridge, {});
     });
 
@@ -390,7 +384,11 @@ describe('DevEditorRoot', function() {
 
     beforeEach(function(){
       iFrameService.isInIFrame.and.returnValue(true);
-      createController();
+      iFrameService.bypassIframeLaunchMechanism.and.returnValue(false);
+    });
+
+    it("should call saveAll", function(){
+      expect(Msgr.on).toHaveBeenCalledWith('saveAll', jasmine.any(Function));
     });
 
     it("should listen to initialise", function(){

@@ -100,6 +100,7 @@ angular.module('corespring-dev-editor.controllers')
         $scope.customScoringJs = item.customScoring;
         $scope.components = _.cloneDeep(item.components);
         ComponentData.setModel($scope.components);
+        ComponentData.setEditable(true);
       }
 
       function onItemLoadError(err) {
