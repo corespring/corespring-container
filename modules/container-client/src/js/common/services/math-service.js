@@ -11,25 +11,12 @@
 
       function renderMath() {
         if (typeof MathJax !== 'undefined' && !_.isUndefined(MathJax)) {
-          MathJax.Hub.Queue(["Typeset", MathJax.Hub, element], function() {
-            var $element;
-            if (element) {
-              $element = $(element);
-              if ($element.attr('mathjax')) {
-                $element.addClass('rendered');
-              } else {
-                $element.find('span[mathjax]').addClass('rendered');
-              }
-            } else {
-              $('span[mathjax]').addClass('rendered');
-            }
+          MathJax.Hub.Queue(["Typeset", MathJax.Hub], function() {
+             $('span[mathjax]').addClass('rendered');
           });
         }
       }
 
-      //TODO Clean up the code once we decide to use that 'fix'
-      //Don't use the element, bc. it slows rendering down
-      element = undefined;
       if (delay === 0) {
         renderMath();
       } else {
