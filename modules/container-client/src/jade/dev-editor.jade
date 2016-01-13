@@ -47,7 +47,7 @@ block content
                       i.fa.fa-upload
                       | &nbsp;Upload Image
                 td
-                  img(src="{{selected}}")
+                  img(ng-show="selected", ng-src="{{selected}}")
 
         td.pane(ng-show="panes.scoring")
           .custom-js-pane(

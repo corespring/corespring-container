@@ -12,6 +12,9 @@ angular.module('corespring-dev-editor.controllers')
             $scope.item.files = _.reject($scope.item.files, function(f) {
               return f.name === file;
             });
+            if ($scope.selected === file) {
+              $scope.selected = undefined;
+            }
             $scope.$emit('assetDeleteCompleted');
           }, function() {
             alert('An error occured whilst deleting ' + file);
