@@ -28,9 +28,11 @@ describe('AssetsController', function() {
   describe('remove file', function() {
     it('removes file', inject(function($httpBackend) {
       $httpBackend.expect('DELETE', '').respond(200);
+      scope.selected = 'file1';
       scope.removeFile("file1");
       expect($httpBackend.flush).not.toThrow();
       expect(scope.item.files).toEqual([]);
+      expect(scope.selected).toBeUndefined();
     }));
   });
 
