@@ -39,7 +39,6 @@ ENV ENV_AMAZON_ENDPOINT="http://localhost:4567"
 
 EXPOSE 9000
 
-RUN mkdir /data
 ADD docker/scripts/main.sh /data/main.sh
 RUN chmod +x /data/main.sh
 
