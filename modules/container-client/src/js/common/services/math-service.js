@@ -11,18 +11,8 @@
 
       function renderMath() {
         if (typeof MathJax !== 'undefined' && !_.isUndefined(MathJax)) {
-          MathJax.Hub.Queue(["Typeset", MathJax.Hub, element], function() {
-            var $element;
-            if (element) {
-              $element = $(element);
-              if ($element.attr('mathjax')) {
-                $element.addClass('rendered');
-              } else {
-                $element.find('span[mathjax]').addClass('rendered');
-              }
-            } else {
-              $('span[mathjax]').addClass('rendered');
-            }
+          MathJax.Hub.Queue(["Typeset", MathJax.Hub], function() {
+             $('span[mathjax]').addClass('rendered');
           });
         }
       }
@@ -43,7 +33,7 @@
           if (listener && listener.type === type) {
             try {
               listener.callback.apply(null, _.rest(message));
-            } catch(e) {}
+            } catch (e) {}
           }
         }
       });
@@ -75,10 +65,8 @@
   };
 
   angular.module('corespring-common.services')
-    .service('MathJaxService',
-      [
+    .service('MathJaxService', [
         '$timeout',
         MathJaxService
-      ]
-    );
+      ]);
 })();
