@@ -57,6 +57,7 @@ object CustomRelease {
         checkSnapshotDependencies,
         runClean,
         runTest,
+        runIntegrationTest,
         prepareReleaseVersion,
         setReleaseVersion,
         commitReleaseVersion)
@@ -82,3 +83,4 @@ object CustomRelease {
     })
 
 }
+
