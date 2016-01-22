@@ -130,7 +130,7 @@ Once you are happy with your release branch - merge it to `rc` (short for releas
 ### create-hotfix-branch
 If you want to create a hotfix, from `master`, call `create-hotfix-branch`, you'll be prompted to choose the parent tag for your hotfix.
 
-As above, once you are happy with your hotfix branch - merge it to `rc`.  This will automatically build a release candidate slug and deploy it to QA.
+As above, once you are happy with your hotfix branch - merge it to `hf`.  This will automatically build a release candidate slug and deploy it to QA.
 
 ### build/publish the release
 Once you are happy with the release - we can build the release on CI. This will call the `release` task that is configured in `project/CustomRelease.scala`.
