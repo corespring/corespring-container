@@ -7,7 +7,7 @@ angular.module('corespring-editor.services')
 
       var logger = LogFactory.getLogger('component-popups');
 
-      function componentTemplate(title, content){
+      function componentTemplate(title, content) {
 
         var header = [
           '<div class="modal-header">',
@@ -25,7 +25,7 @@ angular.module('corespring-editor.services')
         ].join('\n');
 
         return [
-        header, 
+        header,
         '<div class="modal-body">',
         content,
         '</div>',
@@ -35,38 +35,39 @@ angular.module('corespring-editor.services')
 
       function ComponentPopups() {
 
-        function tag(name,attributes){
+        function tag(name, id) {
           var result = [];
           result.push('<' + name);
-          _.forEach(attributes, function(value, key){
-            result.push(' ' + key + '="' + value + '"');
-          });
+          result.push(' id="' + id + '"');
           result.push('></' + name + '>');
           return result.join('');
         }
 
-        function launchModal($scope, id, model, config){
+        function launchModal($scope, id, model, config) {
           var tagName = model.componentType + '-config';
 
           function launchDialog(title) {
-            var body =
-              ['  <div class="config-panel-container" navigator="">',
-                  '    ' + tag(tagName, {id: id}),
-                '  </div>'].join('\n');
+            var body = [
+              '<div class="config-panel-container" navigator="">',
+                  tag(tagName, id),
+              '</div>'
+            ].join('\n');
 
-            $scope.closeModal = function(action){
-              $scope.$broadcast("closeModal", {action:action});
+            $scope.closeModal = function(action) {
+              $scope.$broadcast("closeModal", {
+                action: action
+              });
               this.$dismiss();
             };
 
             return $modal.open({
-              template: componentTemplate(title, body),
-              scope: $scope,
-              controller: function(){},
-              size: 'lg',
               backdrop: 'static',
-              resolve: {
-              }
+              controller: function() {},
+              resolve: {},
+              scope: $scope,
+              size: 'lg',
+              template: componentTemplate(title, body),
+              windowClass: tagName
             });
           }
 
@@ -76,12 +77,13 @@ angular.module('corespring-editor.services')
 
           DesignerService.loadAvailableUiComponents(
             function success(components) {
-              function findComponent(componentType){
-                var component = _(components.interactions, components.widgets).flatten().find(function (component) {
+              function findComponent(componentType) {
+                var component = _(components.interactions, components.widgets).flatten().find(function(component) {
                   return component.componentType === componentType;
                 });
                 return component;
               }
+
               function getTitle(model) {
                 var component = findComponent(model.componentType);
                 return (component && component.title) ? component.title : titleFromModel(model);
