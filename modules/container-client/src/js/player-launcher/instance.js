@@ -140,7 +140,11 @@ var Instance = function(call, element, errorCallback, log, autosizeEnabled, ifra
       var scrollAmount = 5;
       var sensitiveAreaHeight = 200;
 
-      var $scrollable = $('body');
+      var $scrollable = $('.item-iframe-container');
+      if($scrollable.length === 0){
+
+        $scrollable = $('body');
+      }
       var scrollTop = $scrollable.scrollTop();
       var viewportTop = 0;
       var viewportBottom = $scrollable.height();
