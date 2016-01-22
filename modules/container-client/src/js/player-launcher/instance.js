@@ -142,6 +142,7 @@ var Instance = function(call, element, errorCallback, log, autosizeEnabled, ifra
 
       var $scrollable = $('.item-iframe-container');
       if($scrollable.length === 0){
+
         $scrollable = $('body');
       }
       var scrollTop = $scrollable.scrollTop();
