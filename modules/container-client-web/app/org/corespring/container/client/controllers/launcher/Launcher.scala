@@ -93,7 +93,11 @@ trait Launcher extends Controller with HasContainerContext {
     val itemEditor = JsObject(Seq(
       "editor" -> ItemEditor.load(":itemId"),
       "devEditor" -> ItemDevEditor.load(":itemId"),
-      "createItem" -> Item.create()))
+      "createItem" -> Item.create(),
+      "singleComponent" -> JsObject(Seq(
+        "create" -> Item.createWithSingleComponent(),
+        "load" -> ItemEditor.loadSingleComponent(":itemId")
+      ))))
 
     val player = {
       val loadSession = Player.load(":sessionId")
