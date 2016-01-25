@@ -1,6 +1,6 @@
 package org.corespring.container.client.controllers.editor
 
-import org.corespring.container.client.controllers.Launcher
+import org.corespring.container.client.controllers.launcher.Launcher
 import play.api.mvc.Action
 
 trait EditorLauncher extends Launcher {
