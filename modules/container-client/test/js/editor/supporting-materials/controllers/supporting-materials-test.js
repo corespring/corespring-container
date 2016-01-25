@@ -284,6 +284,14 @@ describe('SupportingMaterials', function() {
       onSuccess();
     }));
 
+    it('sets updateFailed to true on an error', function(){
+
+      scope.mainFile.content = 'Hi!';
+      scope.$apply();
+      onError('error');
+      expect(scope.updateFailed).toBe(true);
+    });
+
   });
 
 
