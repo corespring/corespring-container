@@ -92,6 +92,7 @@ trait DraftHooks {
 
 trait CreateItemHook {
   def createItem(json: Option[JsValue])(implicit h: RequestHeader): R[String]
+  def createSingleComponentItem(componentType: String)(implicit h: RequestHeader): R[String]
 }
 
 trait ItemHooks extends CoreItemHooks with CreateItemHook

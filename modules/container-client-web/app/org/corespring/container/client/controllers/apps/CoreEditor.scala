@@ -34,6 +34,9 @@ trait CoreEditor
 
   def debounceInMillis: Long = 5000
 
+  lazy val componentsArray: JsArray = JsArray(interactions.map(toJson))
+  lazy val widgetsArray: JsArray = JsArray(widgets.map(toJson))
+
   protected def toJson(ci: ComponentInfo): JsValue = {
     val tag = tagName(ci.id.org, ci.id.name)
     partialObj(
@@ -56,44 +59,7 @@ trait CoreEditor
 
   def servicesJs(id: String, components: JsArray, widgets: JsArray): String
 
-
-  def loadSingleComponent(id: String): Action[AnyContent] = Action.async { implicit request =>
-
-    import org.corespring.container.client.views.html.error
-
-    def onError(sm: StatusMessage) = {
-      val (code, msg) = sm
-      code match {
-        case SEE_OTHER => SeeOther(msg)
-        case _ => Status(code)(error.main(code, msg, showErrorInUi))
-      }
-    }
-
-    def onItem(i: JsValue): SimpleResult = {
-      val scriptInfo = componentScriptInfo(componentTypes(i), jsMode == "dev")
-      val domainResolvedJs = buildJs(scriptInfo)
-      val domainResolvedCss = buildCss(scriptInfo)
-//      val componentsArray: JsArray = JsArray(interactions.map(toJson))
-//      val widgetsArray: JsArray = JsArray(widgets.map(toJson))
-
-//      val options = EditorClientOptions(
-//        debounceInMillis,
-//        StaticPaths.staticPaths)
-
-      Ok(renderJade(
-        ComponentEditorTemplateParams(
-          context,
-          domainResolvedJs,
-          domainResolvedCss,
-          jsSrc.ngModules ++ scriptInfo.ngDependencies,
-          servicesJs(id, componentsArray, widgetsArray),
-          versionInfo,
-          options)))
-    }
-  }
-
-
-  def load(id: String): Action[AnyContent] = Action.async { implicit request =>
+  private def loadItem(appContext: AppContext, componentsJson: JsArray, widgetsJson: JsArray)(id: String): Action[AnyContent] = Action.async { implicit request =>
 
     import org.corespring.container.client.views.html.error
 
@@ -106,11 +72,9 @@ trait CoreEditor
     }
 
     def onItem(i: JsValue): SimpleResult = {
-      val scriptInfo = componentScriptInfo(componentTypes(i), jsMode == "dev")
+      val scriptInfo = componentScriptInfo(appContext, componentTypes(i), jsMode == "dev")
       val domainResolvedJs = buildJs(scriptInfo)
       val domainResolvedCss = buildCss(scriptInfo)
-      val componentsArray: JsArray = JsArray(interactions.map(toJson))
-      val widgetsArray: JsArray = JsArray(widgets.map(toJson))
 
       val options = EditorClientOptions(
         debounceInMillis,
@@ -121,13 +85,16 @@ trait CoreEditor
           context,
           domainResolvedJs,
           domainResolvedCss,
-          jsSrc.ngModules ++ scriptInfo.ngDependencies,
-          servicesJs(id, componentsArray, widgetsArray),
+          jsSrc(appContext).ngModules ++ scriptInfo.ngDependencies,
+          servicesJs(id, componentsJson, widgetsJson),
           versionInfo,
           options)))
     }
 
     hooks.load(id).map { e => e.fold(onError, onItem) }
   }
+
+  def load(id: String): Action[AnyContent] = loadItem(AppContext(context, None), componentsArray, widgetsArray)(id)
+  def loadSingleComponent(id: String): Action[AnyContent] = loadItem(AppContext(context, Some("singleComponentEditor")), JsArray(), JsArray())(id)
 }
 

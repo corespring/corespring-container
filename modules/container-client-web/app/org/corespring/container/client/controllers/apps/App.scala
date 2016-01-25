@@ -18,10 +18,18 @@ import org.corespring.container.logging.ContainerLogger
 
 import scala.concurrent._
 
-case class ComponentScriptInfo(jsUrl: Seq[String], cssUrl: Seq[String], ngDependencies: Seq[String])
+case class AppContext(main: String, sub: Option[String] = None)
+case class ComponentScriptInfo(context: AppContext,
+  jsUrl: Seq[String],
+  cssUrl: Seq[String],
+  ngDependencies: Seq[String])
 
 trait HasLogger {
   def logger: Logger
+}
+
+trait SourcePathsService {
+  def load[A <: SourcePaths](name: String): A
 }
 
 trait App[T]
@@ -46,6 +54,8 @@ trait App[T]
   def urls: ComponentUrls
 
   def hooks: T
+
+  def sourcePaths: SourcePathsService
 
   object handleSuccess {
 
@@ -94,17 +104,19 @@ trait App[T]
 
   protected def buildJs(scriptInfo: ComponentScriptInfo,
     extras: Seq[String] = Seq.empty)(implicit rh: RequestHeader) = {
-    val mainJs = paths(jsSrc)
-    val js = jsSrc.otherLibs ++ mainJs ++ scriptInfo.jsUrl ++ extras
+    val jsSourcePaths = jsSrc(scriptInfo.context)
+    val mainJs = paths(jsSourcePaths)
+    val js = jsSourcePaths.otherLibs ++ mainJs ++ scriptInfo.jsUrl ++ extras
     js.distinct.map(resolvePath)
   }
 
   protected def buildCss(scriptInfo: ComponentScriptInfo)(implicit rh: RequestHeader) = {
-    val css = paths(cssSrc) ++ cssSrc.otherLibs ++ scriptInfo.cssUrl.toSeq
-    css.map(resolvePath)
+    val cssSourcePaths = cssSrc(scriptInfo.context)
+    val out = paths(cssSourcePaths) ++ cssSourcePaths.otherLibs ++ scriptInfo.cssUrl
+    out.map(resolvePath)
   }
 
-  protected def componentScriptInfo(components: Seq[String], separatePaths: Boolean): ComponentScriptInfo = {
+  protected def componentScriptInfo(appContext: AppContext, components: Seq[String], separatePaths: Boolean, reportName: Option[String] = None): ComponentScriptInfo = {
 
     val typeIds = components.map {
       t =>
@@ -113,24 +125,24 @@ trait App[T]
     }
 
     logger.trace(s"function=componentScriptInfo typeIds=$typeIds")
-    val resolvedComponents = resolveComponents(typeIds, Some(context))
-    val jsUrl = urls.jsUrl(context, resolvedComponents, separatePaths)
-    val cssUrl = urls.cssUrl(context, resolvedComponents, separatePaths)
+    val resolvedComponents = resolveComponents(typeIds, Some(appContext.main))
+    val jsUrl = urls.jsUrl(appContext.main, resolvedComponents, separatePaths)
+    val cssUrl = urls.cssUrl(appContext.main, resolvedComponents, separatePaths)
     val clientSideDependencies = getClientSideDependencies(resolvedComponents)
     val dependencies = ngModules.createAngularModules(resolvedComponents, clientSideDependencies)
-    ComponentScriptInfo(jsUrl, cssUrl, dependencies)
+    ComponentScriptInfo(appContext, jsUrl, cssUrl, dependencies)
   }
 
   /** Allow external domains to be configured */
   def resolveDomain(path: String): String = path
 
   /** Read in the src report from the client side build */
-  lazy val loadedJsSrc: NgSourcePaths = NgSourcePaths.fromJsonResource(modulePath, s"container-client/$context-js-report.json")
+  //  lazy val loadedJsSrc: NgSourcePaths = NgSourcePaths.fromJsonResource(modulePath, s"container-client/$context-js-report.json")
 
-  lazy val jsPathHolder = new PathHolder[NgSourcePaths](modulePath, context, "js", NgSourcePaths.fromJsonResource _)
-  lazy val cssPathHolder = new PathHolder[CssSourcePaths](modulePath, context, "css", CssSourcePaths.fromJsonResource _)
-  def jsSrc: NgSourcePaths = jsPathHolder.src(mode)
-  def cssSrc: CssSourcePaths = cssPathHolder.src(mode)
+  //  lazy val jsPathHolder = new PathHolder[NgSourcePaths](modulePath, context, "js", NgSourcePaths.fromJsonResource _)
+  //  lazy val cssPathHolder = new PathHolder[CssSourcePaths](modulePath, context, "css", CssSourcePaths.fromJsonResource _)
+  def jsSrc(appContext: AppContext): NgSourcePaths = sourcePaths.load[NgSourcePaths](appContext.sub.getOrElse(appContext.main)) //jsPathHolder.src(mode)
+  def cssSrc(appContext: AppContext): CssSourcePaths = sourcePaths.load[CssSourcePaths](appContext.sub.getOrElse(appContext.main)) //cssPathHolder.src(mode)
 }
 
 /**
