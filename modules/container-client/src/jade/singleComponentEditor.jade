@@ -15,7 +15,13 @@ block content
         .configuration
         hr/
         .bar
-          button.btn.btn-primary(ng-click="save()") Save  
+          button.save-button(ng-disabled="saving").btn.btn-primary(ng-click="save()") Save
+          .alert-holder
+            alert.alert-danger(ng-show="saveError", ng-click="closeError()")
+              button.close(type="button", aria-label="Close")
+                span(aria-hidden="true") &times;
+              | {{saveError}}
+
 
       tab(heading="Preview") 
         .preview

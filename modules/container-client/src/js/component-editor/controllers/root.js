@@ -24,8 +24,39 @@ angular.module('corespring-singleComponentEditor.controllers')
 
       $scope.showNav = true;
       
+      $scope.closeError = function(){
+        $scope.saveError = null;
+      } 
+
+      $scope.save = function(){
+        logger.debug('save...');
+
+        var model = configPanel.getModel();
+
+        logger.debug('model: ', JSON.stringify(model, null, '  ' ));
+        var key = _($scope.item.components).keys().first();
+        var data = {};
+        data[key] = model;
+
+        $scope.saveError = null;
+
+        $scope.saving = true;
+        ItemService.save(data, function(success){
+          logger.debug('success:', arguments);
+          $scope.saving = false;
+        }, 
+        function(err){
+          logger.error('error', arguments);
+          $scope.saveError = 'There was an error saving';
+          $scope.saving = false;
+        })
+      } 
+
+
       $scope.onItemLoadSuccess = function(item) {
         $scope.item = item;
+
+        //TODO: UI if item.components has more than one key
         comp = _($scope.item.components).values().first();
         var ct = comp.componentType;
 
