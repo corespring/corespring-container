@@ -2,7 +2,7 @@ package org.corespring.container.client.controllers.apps
 
 import java.net.URLEncoder
 
-import org.corespring.container.client.{ItemAssetResolver, V2PlayerConfig}
+import org.corespring.container.client.{ ItemAssetResolver, V2PlayerConfig }
 import org.corespring.container.client.component.PlayerItemTypeReader
 import org.corespring.container.client.controllers.GetAsset
 import org.corespring.container.client.controllers.helpers.PlayerXhtml
@@ -27,6 +27,8 @@ trait Player
 
     private val archiveCollId = "500ecfc1036471f538f24bdc"
 
+    private lazy val appContext = AppContext(context, None)
+
     /**
      * Preprocess the xml so that it'll work in all browsers
      * TODO: A layout component may have multiple elements
@@ -44,7 +46,7 @@ trait Player
 
     def createPlayerHtml(sessionId: String, session: JsValue, itemJson: JsValue, serviceParams: JsObject)(implicit rh: RequestHeader): Html = {
 
-      val scriptInfo = componentScriptInfo(componentTypes(itemJson), jsMode == "dev")
+      val scriptInfo = componentScriptInfo(appContext, componentTypes(itemJson), jsMode == "dev")
       val controlsJs = if (showControls) paths(controlsJsSrc) else Seq.empty
       val domainResolvedJs = buildJs(scriptInfo, controlsJs)
       val domainResolvedCss = buildCss(scriptInfo)
@@ -62,15 +64,14 @@ trait Player
           context,
           domainResolvedJs,
           domainResolvedCss,
-          jsSrc.ngModules ++ scriptInfo.ngDependencies,
+          jsSrc(appContext).ngModules ++ scriptInfo.ngDependencies,
           servicesJs(sessionId, serviceParams),
           showControls,
           Json.obj("session" -> session, "item" -> preprocessedItem),
           versionInfo,
           newRelicRumConf != None,
           newRelicRumConf.getOrElse(Json.obj()),
-          if (hasBeenArchived(session)) Seq(s"Warning: This item has been deleted.") else Seq.empty)
-      )
+          if (hasBeenArchived(session)) Seq(s"Warning: This item has been deleted.") else Seq.empty))
 
     }
   }

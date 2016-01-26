@@ -20,6 +20,8 @@ trait Rig
   with Jade
   with HasContainerContext {
 
+  private lazy val appContext = AppContext(context, None)
+
   def index(componentType: String, data: Option[String] = None) = controllers.Assets.at("/container-client", "rig.html")
 
   private def loadData(componentType: String, dataName: String): JsValue = {
@@ -57,7 +59,7 @@ trait Rig
 
     def onItem(i: JsValue) = {
       val comps = (componentTypes(i) :+ componentType).distinct
-      val scriptInfo = componentScriptInfo(comps, jsMode == "dev")
+      val scriptInfo = componentScriptInfo(appContext, comps, jsMode == "dev")
       val js = buildJs(scriptInfo)
       val css = buildCss(scriptInfo)
       val itemJson = Json.prettyPrint(i)
@@ -67,7 +69,7 @@ trait Rig
           context,
           js,
           css,
-          jsSrc.ngModules ++ scriptInfo.ngDependencies,
+          jsSrc(appContext).ngModules ++ scriptInfo.ngDependencies,
           itemJson)))
     }
 

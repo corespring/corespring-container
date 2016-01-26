@@ -5,16 +5,12 @@ import org.corespring.container.client.HasContainerContext
 import org.corespring.container.client.component.{ ComponentUrls, ItemTypeReader }
 import org.corespring.container.client.controllers.angular.AngularModules
 import org.corespring.container.client.controllers.helpers.{ Helpers, LoadClientSideDependencies }
-import org.corespring.container.client.hooks.LoadHook
 import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.components.model.Id
 import org.corespring.container.components.model.dependencies.DependencyResolver
-import play.api.Mode.Mode
-import play.api.{ Mode }
-import play.api.http.ContentTypes
-import play.api.libs.json.{ JsValue, Json }
-import play.api.mvc._
 import org.corespring.container.logging.ContainerLogger
+import play.api.Mode.Mode
+import play.api.mvc._
 
 import scala.concurrent._
 
@@ -26,10 +22,6 @@ case class ComponentScriptInfo(context: AppContext,
 
 trait HasLogger {
   def logger: Logger
-}
-
-trait SourcePathsService {
-  def load[A <: SourcePaths](name: String): A
 }
 
 trait App[T]
@@ -136,33 +128,12 @@ trait App[T]
   /** Allow external domains to be configured */
   def resolveDomain(path: String): String = path
 
-  /** Read in the src report from the client side build */
-  //  lazy val loadedJsSrc: NgSourcePaths = NgSourcePaths.fromJsonResource(modulePath, s"container-client/$context-js-report.json")
-
-  //  lazy val jsPathHolder = new PathHolder[NgSourcePaths](modulePath, context, "js", NgSourcePaths.fromJsonResource _)
-  //  lazy val cssPathHolder = new PathHolder[CssSourcePaths](modulePath, context, "css", CssSourcePaths.fromJsonResource _)
-  def jsSrc(appContext: AppContext): NgSourcePaths = sourcePaths.load[NgSourcePaths](appContext.sub.getOrElse(appContext.main)) //jsPathHolder.src(mode)
-  def cssSrc(appContext: AppContext): CssSourcePaths = sourcePaths.load[CssSourcePaths](appContext.sub.getOrElse(appContext.main)) //cssPathHolder.src(mode)
-}
-
-/**
- * Loads in a source path, if Play.current.mode == Dev it reloads it each time
- */
-private[apps] class PathHolder[A <: SourcePaths](path: String, context: String, suffix: String, loadFn: (String, String) => A) {
-
-  private val reportName = s"container-client/$context-$suffix-report.json"
-
-  /** Read in the src report from the client side build */
-  private lazy val loaded: A = loadFn(path, reportName)
-
-  private def load = loadFn(path, reportName)
-
-  def src(mode: Mode): A = {
-    if (mode == Mode.Dev) {
-      load
-    } else {
-      loaded
-    }
+  def jsSrc(appContext: AppContext): NgSourcePaths = {
+    sourcePaths.load[NgSourcePaths](ContextAndSuffix(appContext, "js"), NgSourcePaths.fromJsonResource(modulePath, _))
   }
 
+  def cssSrc(appContext: AppContext): CssSourcePaths = {
+    sourcePaths.load[CssSourcePaths](ContextAndSuffix(appContext, "css"), CssSourcePaths.fromJsonResource(modulePath, _))
+  }
 }
+

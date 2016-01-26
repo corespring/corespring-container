@@ -2,7 +2,7 @@ package org.corespring.container.client.integration
 
 import grizzled.slf4j.Logger
 import org.corespring.container.client.controllers.helpers.PlayerXhtml
-import org.corespring.container.client.{ItemAssetResolver, V2PlayerConfig}
+import org.corespring.container.client.{ ItemAssetResolver, V2PlayerConfig }
 import org.corespring.container.client.component.ComponentUrls
 import org.corespring.container.client.controllers.apps._
 import org.corespring.container.client.controllers.launcher.editor.EditorLauncher
@@ -40,6 +40,8 @@ trait DefaultIntegration
   def versionInfo: JsObject
 
   def containerContext: ContainerExecutionContext
+
+  lazy val sourcePathsService = new JsonReportSourcePathsService(Play.current.mode == Mode.Dev)
 
   /**
    * For a given resource path return a resolved path.
@@ -109,6 +111,8 @@ trait DefaultIntegration
 
   lazy val rig = new Rig {
 
+    override val sourcePaths: SourcePathsService = DefaultIntegration.this.sourcePathsService
+
     override def mode: Mode = Play.current.mode
 
     override def containerContext = DefaultIntegration.this.containerContext
@@ -135,6 +139,8 @@ trait DefaultIntegration
 
   lazy val itemEditor = new ItemEditor {
 
+    override val sourcePaths: SourcePathsService = DefaultIntegration.this.sourcePathsService
+
     override val debounceInMillis = DefaultIntegration.this.debounceInMillis
 
     override def versionInfo: JsObject = DefaultIntegration.this.versionInfo
@@ -153,6 +159,7 @@ trait DefaultIntegration
   }
 
   lazy val itemDevEditor = new ItemDevEditor {
+    override val sourcePaths: SourcePathsService = DefaultIntegration.this.sourcePathsService
     override def versionInfo: JsObject = DefaultIntegration.this.versionInfo
 
     override def mode: Mode = Play.current.mode
@@ -169,6 +176,7 @@ trait DefaultIntegration
   }
 
   lazy val draftEditor = new DraftEditor {
+    override val sourcePaths: SourcePathsService = DefaultIntegration.this.sourcePathsService
 
     override val debounceInMillis = DefaultIntegration.this.debounceInMillis
 
@@ -188,6 +196,7 @@ trait DefaultIntegration
   }
 
   lazy val draftDevEditor = new DraftDevEditor {
+    override val sourcePaths: SourcePathsService = DefaultIntegration.this.sourcePathsService
     override def mode: Mode = Play.current.mode
 
     override def containerContext = DefaultIntegration.this.containerContext
@@ -204,6 +213,7 @@ trait DefaultIntegration
   }
 
   lazy val catalog = new Catalog {
+    override val sourcePaths: SourcePathsService = DefaultIntegration.this.sourcePathsService
     override def mode: Mode = Play.current.mode
 
     override def containerContext = DefaultIntegration.this.containerContext
@@ -216,6 +226,7 @@ trait DefaultIntegration
   }
 
   lazy val prodHtmlPlayer = new Player {
+    override val sourcePaths: SourcePathsService = DefaultIntegration.this.sourcePathsService
 
     override def versionInfo: JsObject = DefaultIntegration.this.versionInfo
 

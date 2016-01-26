@@ -83,14 +83,15 @@ POST          /draft/dev-editor/:draftId/*file                           @org.co
 DELETE        /draft/dev-editor/:draftId/*file                           @org.corespring.container.client.controllers.apps.DraftDevEditor.deleteFile(draftId, file)
 
 # Item Editor: config, components
-GET           /item/editor/:draftId/index.html                           @org.corespring.container.client.controllers.apps.ItemEditor.load(draftId)
-GET           /item/editor/:draftId/*file                                @org.corespring.container.client.controllers.apps.ItemEditor.getFile(draftId, file)
-POST          /item/editor/:draftId/*file                                @org.corespring.container.client.controllers.apps.ItemEditor.uploadFile(draftId, file)
-DELETE        /item/editor/:draftId/*file                                @org.corespring.container.client.controllers.apps.ItemEditor.deleteFile(draftId, file)
-GET           /item/dev-editor/:draftId/index.html                       @org.corespring.container.client.controllers.apps.ItemDevEditor.load(draftId)
-GET           /item/dev-editor/:draftId/*file                            @org.corespring.container.client.controllers.apps.ItemDevEditor.getFile(draftId, file)
-POST          /item/dev-editor/:draftId/*file                            @org.corespring.container.client.controllers.apps.ItemDevEditor.uploadFile(draftId, file)
-DELETE        /item/dev-editor/:draftId/*file                            @org.corespring.container.client.controllers.apps.ItemDevEditor.deleteFile(draftId, file)
+GET           /item/editor/:itemId/index.html                           @org.corespring.container.client.controllers.apps.ItemEditor.load(itemId)
+GET           /item/editor/:itemId/index.html                           @org.corespring.container.client.controllers.apps.ItemEditor.loadSingleComponent(itemId)
+GET           /item/editor/:itemId/*file                                @org.corespring.container.client.controllers.apps.ItemEditor.getFile(itemId, file)
+POST          /item/editor/:itemId/*file                                @org.corespring.container.client.controllers.apps.ItemEditor.uploadFile(itemId, file)
+DELETE        /item/editor/:itemId/*file                                @org.corespring.container.client.controllers.apps.ItemEditor.deleteFile(itemId, file)
+GET           /item/dev-editor/:itemId/index.html                       @org.corespring.container.client.controllers.apps.ItemDevEditor.load(itemId)
+GET           /item/dev-editor/:itemId/*file                            @org.corespring.container.client.controllers.apps.ItemDevEditor.getFile(itemId, file)
+POST          /item/dev-editor/:itemId/*file                            @org.corespring.container.client.controllers.apps.ItemDevEditor.uploadFile(itemId, file)
+DELETE        /item/dev-editor/:itemId/*file                            @org.corespring.container.client.controllers.apps.ItemDevEditor.deleteFile(itemId, file)
 
 # Data Query
 GET           /data-query/:topic                                         @org.corespring.container.client.controllers.DataQuery.list(topic, query : Option[String] ?= None)
