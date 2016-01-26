@@ -46,7 +46,8 @@ exports.css =
   report: "#{baseName}-css-report.json"
 
 exports.ngModules = _.union(player.ngModules, [
- 'corespring.wiggi-wiz',
+  'corespring.wiggi-wiz',
+  'ui.bootstrap.tabs',
   'wiggi-wiz.features.core',
   'corespring.wiggi-wiz-features.mathjax',
   'corespring.wiggi-wiz-features.link',

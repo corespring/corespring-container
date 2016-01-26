@@ -22,6 +22,8 @@ angular.module('corespring-singleComponentEditor.controllers')
       
       var comp, configPanel;
 
+      $scope.showNav = true;
+      
       $scope.onItemLoadSuccess = function(item) {
         $scope.item = item;
         comp = _($scope.item.components).values().first();
@@ -32,8 +34,8 @@ angular.module('corespring-singleComponentEditor.controllers')
             '<' + ct + '-config id="1"></' + ct + '>',
           '</div>'].join('\n');
 
-        $('.main-content').html(html);
-        $compile($('.main-content'))($scope.$new());
+        $('.configuration').html(html);
+        $compile($('.configuration'))($scope.$new());
       }
 
       $scope.onItemLoadError = function(err) {
