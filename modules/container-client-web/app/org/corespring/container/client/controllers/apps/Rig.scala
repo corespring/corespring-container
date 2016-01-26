@@ -51,7 +51,7 @@ trait Rig
     }
   }
 
-  override def ngModules: AngularModules = new AngularModules()
+  override def ngModules(appContext:AppContext): AngularModules = new AngularModules()
 
   def load(componentType: String): Action[AnyContent] = Action.async { implicit request =>
 

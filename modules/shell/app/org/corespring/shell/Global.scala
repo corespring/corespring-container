@@ -4,6 +4,7 @@ import com.amazonaws.services.s3.AmazonS3
 import com.mongodb.casbah.{ MongoCollection, MongoDB, MongoClientURI, MongoClient }
 import org.corespring.container.client.filters.{ BlockingFutureRunner, CheckS3CacheFilter }
 import org.corespring.container.components.loader.FileComponentLoader
+import org.corespring.container.components.model.{Interaction, Component}
 import org.corespring.mongo.json.services.MongoService
 import org.corespring.play.utils.{ CallBlockOnHeaderFilter, ControllerInstanceResolver }
 import org.corespring.shell.controllers.{ Launchers, Main }
@@ -65,7 +66,9 @@ object Global extends WithFilters(AccessControlFilter, CallBlockOnHeaderFilter) 
     componentLoader.all,
     Play.current.configuration)
 
-  private lazy val launchers = new Launchers {}
+  private lazy val launchers = new Launchers {
+    override def components: Seq[Component] = componentLoader.all.filter(_.isInstanceOf[Interaction])
+  }
 
   private lazy val home = new Main {
     override def sessionService: MongoService = new MongoService(db("sessions"))

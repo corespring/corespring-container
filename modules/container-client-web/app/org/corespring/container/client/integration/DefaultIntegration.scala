@@ -262,6 +262,9 @@ trait DefaultIntegration
   }
 
   lazy val item = new Item {
+
+    override def components: Seq[Component] = DefaultIntegration.this.components
+
     override def hooks: CoreItemHooks with CreateItemHook = itemHooks
 
     override def componentTypes: Seq[String] = DefaultIntegration.this.components.map(_.componentType)

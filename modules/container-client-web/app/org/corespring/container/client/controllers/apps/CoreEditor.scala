@@ -1,12 +1,13 @@
 package org.corespring.container.client.controllers.apps
 
-import org.corespring.container.client.component.AllItemTypesReader
+import grizzled.slf4j.Logger
+import org.corespring.container.client.component.{PlayerItemTypeReader, AllItemTypesReader}
 import org.corespring.container.client.controllers.AssetsController
 import org.corespring.container.client.controllers.helpers.JsonHelper
 import org.corespring.container.client.controllers.jade.Jade
 import org.corespring.container.client.hooks.EditorHooks
 import org.corespring.container.client.hooks.Hooks.StatusMessage
-import org.corespring.container.components.model.ComponentInfo
+import org.corespring.container.components.model.{Component, ComponentInfo}
 import play.api.libs.json._
 import play.api.mvc._
 import v2Player.Routes
@@ -27,6 +28,8 @@ trait CoreEditor
   with JsonHelper
   with Jade
   with AssetsController[EditorHooks] {
+
+  override lazy val logger = Logger(classOf[CoreEditor])
 
   override def context: String = "editor"
 
@@ -57,9 +60,15 @@ trait CoreEditor
       "configuration" -> (ci.packageInfo \ "external-configuration").asOpt[JsObject])
   }
 
+  def componentEditorServices(id:String) : String
+
   def servicesJs(id: String, components: JsArray, widgets: JsArray): String
 
-  private def loadItem(appContext: AppContext, componentsJson: JsArray, widgetsJson: JsArray)(id: String): Action[AnyContent] = Action.async { implicit request =>
+  private def loadItem(appContext: AppContext,
+                       componentsJson: JsArray,
+                       widgetsJson: JsArray,
+                       loadComponentTypes: JsValue => Seq[String],
+                       servicesJsSrc:String)(id: String): Action[AnyContent] = Action.async { implicit request =>
 
     import org.corespring.container.client.views.html.error
 
@@ -72,7 +81,7 @@ trait CoreEditor
     }
 
     def onItem(i: JsValue): SimpleResult = {
-      val scriptInfo = componentScriptInfo(appContext, componentTypes(i), jsMode == "dev")
+      val scriptInfo = componentScriptInfo(appContext, loadComponentTypes(i), jsMode == "dev")
       val domainResolvedJs = buildJs(scriptInfo)
       val domainResolvedCss = buildCss(scriptInfo)
 
@@ -80,13 +89,16 @@ trait CoreEditor
         debounceInMillis,
         StaticPaths.staticPaths)
 
+
+      val jsSrcPaths = jsSrc(appContext)
+
       Ok(renderJade(
         EditorTemplateParams(
-          context,
+          appContext.sub.getOrElse(appContext.main),
           domainResolvedJs,
           domainResolvedCss,
-          jsSrc(appContext).ngModules ++ scriptInfo.ngDependencies,
-          servicesJs(id, componentsJson, widgetsJson),
+          jsSrcPaths.ngModules ++ scriptInfo.ngDependencies,
+          servicesJsSrc,
           versionInfo,
           options)))
     }
@@ -94,7 +106,23 @@ trait CoreEditor
     hooks.load(id).map { e => e.fold(onError, onItem) }
   }
 
-  def load(id: String): Action[AnyContent] = loadItem(AppContext(context, None), componentsArray, widgetsArray)(id)
-  def loadSingleComponent(id: String): Action[AnyContent] = loadItem(AppContext(context, Some("singleComponentEditor")), JsArray(), JsArray())(id)
+  def load(id: String): Action[AnyContent] = {
+    loadItem(
+      AppContext(context, None),
+      componentsArray,
+      widgetsArray,
+      componentTypes _,
+      servicesJs(id, componentsArray, widgetsArray)
+    )(id)
+  }
+  def loadSingleComponent(id: String): Action[AnyContent] = {
+    loadItem(
+      AppContext(context, Some("singleComponentEditor")),
+      JsArray(),
+      JsArray(),
+      (i) => (i \ "components" \\ "componentType").map(_.as[String]).take(1),
+      componentEditorServices(id)
+    )(id)
+  }
 }
 

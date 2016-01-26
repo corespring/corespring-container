@@ -1,10 +1,14 @@
 package org.corespring.shell.controllers
 
+import org.corespring.container.components.model.Component
 import play.api.libs.json._
 import play.api.mvc.{ RequestHeader, Action, Controller }
 import org.corespring.container.client.controllers.launcher.player.routes.PlayerLauncher
+import org.corespring.shell.views.html._
 
 trait Launchers extends Controller {
+
+  def components : Seq[Component]
 
   def draftEditorFromItem(itemId: String, devEditor: Boolean) = Action { request =>
 
@@ -27,6 +31,11 @@ trait Launchers extends Controller {
 
   def newItemEditor(devEditor: Boolean) = Action { request =>
     Ok(loadItemEditorPage(baseJson(request) ++ Json.obj("devEditor" -> devEditor)))
+  }
+
+  def newSingleComponentEditor() = Action { request =>
+    val html = launchers.singleComponentEditor(editorJsUrl, components.map(_.componentType), Json.obj())
+    Ok(html)
   }
 
   def playerFromItem(itemId: String) = Action { request =>
@@ -57,7 +66,6 @@ trait Launchers extends Controller {
 
     Ok(launchers.catalog(PlayerLauncher.catalogJs().url, baseJson(request) ++ Json.obj("itemId" -> itemId) ++ tabOpts))
   }
-  import org.corespring.shell.views.html._
 
   lazy val editorJsUrl = PlayerLauncher.editorJs().url
 

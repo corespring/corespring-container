@@ -1,0 +1,64 @@
+@import "../bower_components/less-elements/elements";
+@import "../bower_components/bootstrap/less/bootstrap";
+@import "../components/wiggi-wiz/dist/wiggi-wiz.css";
+@import "../components/components-font-awesome/css/font-awesome.css";
+
+@import "app";
+@import "bootstrap-override";
+@import "common/base";
+
+@import "editor/modal";
+@import "editor/nav";
+@import "editor/question";
+@import "editor/metadata";
+@import "editor/buttons";
+@import "editor/menus";
+@import "editor/inputs";
+@import "editor/components";
+@import "editor/additional-copyright-information-for-profile";
+@import "editor/profile";
+@import "editor/config";
+@import "editor/catalog-preview";
+@import "editor/overview";
+@import "editor/wiggi-wiz-overrides";
+@import "editor/footnotes-wiggi-feature";
+@import "editor/image-wiggi-feature";
+@import "editor/mathjax-wiggi-feature";
+@import "editor/link-wiggi-feature";
+@import "editor/supporting-materials";
+@import "editor/question-information";
+@import "editor/profile-preview";
+@import "editor/help";
+
+@import "player/player-core-mixin";
+
+.wiggi-wiz-editable{
+  .player-core-mixin();
+}
+@import "player/player-container";
+@import "player/corespring-player";
+
+body {
+  //moved here from player shared
+  font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+  color: #333;
+}
+
+@roboto: "Roboto", sans-serif;
+@font-family-sans-serif: @roboto;
+@new-blue: #4da7c1;
+@darker-blue: #008BC9;
+@component-icon-bg: #707070;
+@help-text: @new-blue;
+@cs-green: @new-blue;
+@cs-grey: #777777;
+@cs-pink: #DA1C5C;
+@feedback-bg: #533b91;
+
+@profile-summary-feedback-panel-bg: @darker-blue;
+
+.btn{
+  &:focus, &:active:focus, &:active{
+    outline:none;
+  }
+}

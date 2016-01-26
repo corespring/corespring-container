@@ -40,24 +40,19 @@ trait Launcher extends Controller with HasContainerContext {
   import org.corespring.container.client.controllers.resources.routes.Item
   def hooks: PlayerLauncherHooks
 
-  lazy val itemEditorNameAndSrc = {
-    val jsPath = "container-client/js/player-launcher/item-editor.js"
-    pathToNameAndContents(jsPath)
-  }
 
-  lazy val draftEditorNameAndSrc = {
-    val jsPath = "container-client/js/player-launcher/draft-editor.js"
-    pathToNameAndContents(jsPath)
-  }
+  object NameAndSrc {
 
-  lazy val catalogNameAndSrc = {
-    val jsPath = "container-client/js/player-launcher/catalog.js"
-    pathToNameAndContents(jsPath)
-  }
+    private def mk(name:String) = {
+      val jsPath = s"container-client/js/player-launcher/$name.js"
+      pathToNameAndContents(jsPath)
+    }
 
-  lazy val playerNameAndSrc = {
-    val jsPath = "container-client/js/player-launcher/player.js"
-    pathToNameAndContents(jsPath)
+    lazy val itemEditor = mk("item-editor")
+    lazy val componentEditor = mk("component-editor")
+    lazy val draftEditor = mk("draft-editor")
+    lazy val catalog = mk("catalog")
+    lazy val player = mk("player")
   }
 
   implicit def callToJson(c: Call): JsObject = Json.obj("method" -> c.method, "url" -> c.url)
@@ -65,13 +60,15 @@ trait Launcher extends Controller with HasContainerContext {
   object Definitions {
     def player(isSecure: Boolean) = s"org.corespring.players.ItemPlayer = corespring.require('player').define($isSecure);"
     val itemEditor = "org.corespring.players.ItemEditor = corespring.require('item-editor');"
+    val singleComponentEditor = "org.corespring.players.SingleComponentEditor = corespring.require('component-editor');"
     val draftEditor = "org.corespring.players.DraftEditor = corespring.require('draft-editor');"
     val catalog = "org.corespring.players.ItemCatalog = corespring.require('catalog');"
 
     val editors =
       s"""
          |$itemEditor
-          |$draftEditor
+         |$draftEditor
+         |$singleComponentEditor
        """.stripMargin
   }
 

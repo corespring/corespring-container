@@ -1,0 +1,19 @@
+@(namespace: String, load: Call, saveSubset: Call)
+
+@toMethodAndUrl(c:Call) = @{
+  s"{ method: '${c.method.toLowerCase}', url: '${c.url}'}"  
+}
+
+(function(){
+  "use strict";
+
+  angular.module('@namespace', []);
+
+  angular.module('@namespace').factory('ItemUrls', [ function($http){
+    return {
+      load: @toMethodAndUrl(load),
+      saveSubset: @toMethodAndUrl(saveSubset)
+    }
+  }]);
+
+})(this);

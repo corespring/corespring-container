@@ -8,7 +8,6 @@ import org.corespring.container.client.controllers.helpers.{ Helpers, LoadClient
 import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.components.model.Id
 import org.corespring.container.components.model.dependencies.DependencyResolver
-import org.corespring.container.logging.ContainerLogger
 import play.api.Mode.Mode
 import play.api.mvc._
 
@@ -35,7 +34,7 @@ trait App[T]
 
   def mode: Mode
 
-  override lazy val logger = ContainerLogger.getLogger(context)
+  override lazy val logger = Logger(classOf[App[T]])
 
   def showErrorInUi(implicit rh: RequestHeader): Boolean = jsMode(rh) == "dev"
 
@@ -79,7 +78,7 @@ trait App[T]
     if (needsResolution) resolveDomain(s) else s
   }
 
-  def ngModules: AngularModules = new AngularModules(s"$context.services")
+  def ngModules(appContext:AppContext): AngularModules = new AngularModules(s"${appContext.sub.getOrElse(appContext.main)}.services")
 
   protected def jsMode(implicit r: RequestHeader): String = {
     r.getQueryString("mode").getOrElse(mode.toString.toLowerCase)
@@ -121,7 +120,7 @@ trait App[T]
     val jsUrl = urls.jsUrl(appContext.main, resolvedComponents, separatePaths)
     val cssUrl = urls.cssUrl(appContext.main, resolvedComponents, separatePaths)
     val clientSideDependencies = getClientSideDependencies(resolvedComponents)
-    val dependencies = ngModules.createAngularModules(resolvedComponents, clientSideDependencies)
+    val dependencies = ngModules(appContext).createAngularModules(resolvedComponents, clientSideDependencies)
     ComponentScriptInfo(appContext, jsUrl, cssUrl, dependencies)
   }
 

@@ -2,12 +2,19 @@ package org.corespring.container.client.controllers.apps
 
 import org.corespring.container.client.controllers.resources
 import org.corespring.container.client.views.models.SupportingMaterialsEndpoints
-import org.corespring.container.client.views.txt.js.EditorServices
+import org.corespring.container.client.views.txt.js.{ComponentEditorServices, EditorServices}
 import play.api.libs.json.{ JsArray }
 
 trait BaseItemEditor extends CoreEditor {
 
   import resources.{ routes => resourceRoutes }
+
+  override def componentEditorServices(itemId: String): String = {
+    ComponentEditorServices(s"singleComponentEditor.services",
+      resourceRoutes.Item.load(itemId),
+      resourceRoutes.Item.saveSubset(itemId, ":subset")
+    ).toString
+  }
 
   override def servicesJs(itemId: String, components: JsArray, widgets: JsArray) = {
 

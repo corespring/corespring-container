@@ -33,7 +33,14 @@ lessConfig = (cleancss) ->
     cleancss: cleancss
   expand: true
   cwd: '<%= common.dist %>/css'
-  src: ['**/rig.less', '**/player.less', '**/editor.less', '**/dev-editor.less',  '**/homepage.less']
+  src: [
+    '**/rig.less', 
+    '**/player.less', 
+    '**/editor.less', 
+    '**/dev-editor.less',  
+    '**/homepage.less', 
+    '**/single-component-editor.less'
+  ]
   dest: '<%= common.dist %>/css/'
   ext: suffix
   flatten: false

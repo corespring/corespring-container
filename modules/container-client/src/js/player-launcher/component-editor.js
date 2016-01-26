@@ -7,7 +7,7 @@ function ComponentEditor(element, options, errorCallback) {
   
   function createItem(componentType, callback){
 
-    var call = launcher.loadCall('itemEditor.createItemWithSingleComponent');
+    var call = launcher.loadCall('itemEditor.singleComponent.create');
 
     if (!call) {
       return;
@@ -35,7 +35,8 @@ function ComponentEditor(element, options, errorCallback) {
     $.ajax({
       type: call.method,
       url: launcher.prepareUrl(call.url),
-      data: {componentType: componentType},
+      contentType: 'application/json',
+      data: JSON.stringify({componentType: componentType}),
       success: onSuccess,
       error: onError.bind(this),
       dataType: 'json'
@@ -48,7 +49,7 @@ function ComponentEditor(element, options, errorCallback) {
       throw new Error('invalid itemId');
     }
 
-    var callKey = 'itemEditor.singleComponent';// + (options.devEditor ? 'devEditor' : 'editor');
+    var callKey = 'itemEditor.singleComponent.load';
 
     var call = launcher.loadCall(callKey, function(u){
       return u.replace(':itemId', itemId);
