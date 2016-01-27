@@ -28,7 +28,7 @@
     "jquery.browser": "~0.0.6",
     "less-elements": "https://github.com/dmitryf/elements.git",
     "lodash": "~2.4.1",
-    "mathjax": "https://github.com/mathjax/MathJax.git#2.5.3",
+    "mathjax": "https://github.com/mathjax/MathJax.git#2.6.0",
     "mathjs": "~0.18.0",
     "msgr.js": "git@github.com:corespring/msgr.js.git#v0.0.9",
     "saxjs": "https://github.com/corespring/sax-js.git#v0.6.0-corespring",
