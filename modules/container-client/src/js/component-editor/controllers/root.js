@@ -8,6 +8,7 @@ angular.module('corespring-singleComponentEditor.controllers')
     'Msgr',
     'DesignerService',
     'ComponentDefaultData',
+    'ComponentData',
     function(
       $scope,
       $compile,
@@ -16,7 +17,8 @@ angular.module('corespring-singleComponentEditor.controllers')
       ItemService,
       Msgr, 
       DesignerService,
-      ComponentDefaultData) {
+      ComponentDefaultData,
+      ComponentData) {
 
       "use strict";
 
@@ -36,7 +38,7 @@ angular.module('corespring-singleComponentEditor.controllers')
       
       var comp, configPanel;
 
-      $scope.playerMode = 'rig';
+      $scope.playerMode = 'gather';
 
       $scope.showNavigation = true;
 
@@ -49,6 +51,16 @@ angular.module('corespring-singleComponentEditor.controllers')
         $scope.activePane = 'config';
         done();
       };
+
+      $scope.$watch('activePane', function(a){
+        if(a === 'config'){
+          $scope.configActive = true;
+          $scope.previewActive = false;
+        } else {
+          $scope.configActive = false;
+          $scope.previewActive = true;
+        }
+      });
 
       $scope.showPreview = function(done){
         done = done || function(){};
@@ -104,7 +116,7 @@ angular.module('corespring-singleComponentEditor.controllers')
 
       $scope.onItemLoadSuccess = function(item) {
         $scope.item = item;
-        // ComponentData.setModel(item.components);
+        ComponentData.setModel(item.components);
 
         //TODO: UI if item.components has more than one key
         comp = _($scope.item.components).values().first();

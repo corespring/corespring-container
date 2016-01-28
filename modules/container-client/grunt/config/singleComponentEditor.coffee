@@ -50,6 +50,7 @@ exports.css =
 exports.ngModules = _.union(player.ngModules, [
   'corespring.wiggi-wiz',
   'corespring-editor.directives',
+  'corespring-editor.controllers',
   'corespring-rig.directives',
   'corespring-editor.services',
   'ui.bootstrap.tabs',
