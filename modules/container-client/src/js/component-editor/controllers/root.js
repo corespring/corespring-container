@@ -26,7 +26,7 @@ angular.module('corespring-singleComponentEditor.controllers')
       
       $scope.closeError = function(){
         $scope.saveError = null;
-      } 
+      }; 
 
       $scope.save = function(){
         logger.debug('save...');
@@ -49,8 +49,8 @@ angular.module('corespring-singleComponentEditor.controllers')
           logger.error('error', arguments);
           $scope.saveError = 'There was an error saving';
           $scope.saving = false;
-        })
-      } 
+        });
+      };
 
 
       $scope.onItemLoadSuccess = function(item) {
@@ -67,12 +67,12 @@ angular.module('corespring-singleComponentEditor.controllers')
 
         $('.configuration').html(html);
         $compile($('.configuration'))($scope.$new());
-      }
+      };
 
       $scope.onItemLoadError = function(err) {
         logger.error('error loading', err);
         alert('Error loading the item');
-      }
+      };
 
       $scope.$on('registerConfigPanel', function(a, id, configPanelBridge) {
         logger.debug('registerConfigPanel', id);
