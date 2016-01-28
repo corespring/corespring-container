@@ -1,13 +1,13 @@
 package org.corespring.container.client.controllers.apps
 
 import grizzled.slf4j.Logger
-import org.corespring.container.client.component.{PlayerItemTypeReader, AllItemTypesReader}
+import org.corespring.container.client.component.AllItemTypesReader
 import org.corespring.container.client.controllers.AssetsController
 import org.corespring.container.client.controllers.helpers.JsonHelper
 import org.corespring.container.client.controllers.jade.Jade
 import org.corespring.container.client.hooks.EditorHooks
 import org.corespring.container.client.hooks.Hooks.StatusMessage
-import org.corespring.container.components.model.{Component, ComponentInfo}
+import org.corespring.container.components.model.ComponentInfo
 import play.api.libs.json._
 import play.api.mvc._
 import v2Player.Routes
@@ -60,7 +60,7 @@ trait CoreEditor
       "configuration" -> (ci.packageInfo \ "external-configuration").asOpt[JsObject])
   }
 
-  def componentEditorServices(id:String) : String
+  def componentEditorServices(id:String, components: JsArray) : String
 
   def servicesJs(id: String, components: JsArray, widgets: JsArray): String
 
@@ -121,7 +121,7 @@ trait CoreEditor
       JsArray(),
       JsArray(),
       (i) => (i \ "components" \\ "componentType").map(_.as[String]).take(1),
-      componentEditorServices(id)
+      componentEditorServices(id, componentsArray)
     )(id)
   }
 }

@@ -1,4 +1,4 @@
-@(namespace: String, load: Call, saveSubset: Call)
+@(namespace: String, load: Call, saveSubset: Call, componentSet: JsValue)
 
 @toMethodAndUrl(c:Call) = @{
   s"{ method: '${c.method.toLowerCase}', url: '${c.url}'}"  
@@ -14,6 +14,17 @@
       load: @toMethodAndUrl(load),
       saveSubset: @toMethodAndUrl(saveSubset)
     }
+  }]);
+
+
+  //TODO: need to load this up - cos of the tangled dependencies...
+  angular.module('@namespace').factory('DesignerService', ['$http', function($http){
+    return {
+      loadAvailableUiComponents: function(onSuccess, onFailure){
+        var interactions = @{Json.stringify(componentSet)};
+        onSuccess({interactions: interactions, widgets: []});
+      }
+    };
   }]);
 
 })(this);

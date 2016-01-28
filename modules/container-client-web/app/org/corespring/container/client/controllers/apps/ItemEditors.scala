@@ -9,10 +9,11 @@ trait BaseItemEditor extends CoreEditor {
 
   import resources.{ routes => resourceRoutes }
 
-  override def componentEditorServices(itemId: String): String = {
+  override def componentEditorServices(itemId: String, components: JsArray): String = {
     ComponentEditorServices(s"singleComponentEditor.services",
       resourceRoutes.Item.load(itemId),
-      resourceRoutes.Item.saveSubset(itemId, ":subset")
+      resourceRoutes.Item.saveSubset(itemId, ":subset"),
+      components
     ).toString
   }
 

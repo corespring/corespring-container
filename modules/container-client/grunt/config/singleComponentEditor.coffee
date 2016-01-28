@@ -21,7 +21,9 @@ editorSrcs = [
   'js/corespring/core-library.js',
   'js/corespring/server/init-core-library.js',
   'js/common/**/*.js',
-  'js/editor/question/wiggi-wiz-features/**/*.js',
+  # it would be better to pull out the js we need here instead
+  'js/rig/**/*.js',
+  'js/editor/**/*.js',
   'js/component-editor/**/*.js',
   'js/render/services/**/*.js',
   'js/render/directives/**/*.js',
@@ -47,6 +49,9 @@ exports.css =
 
 exports.ngModules = _.union(player.ngModules, [
   'corespring.wiggi-wiz',
+  'corespring-editor.directives',
+  'corespring-rig.directives',
+  'corespring-editor.services',
   'ui.bootstrap.tabs',
   'wiggi-wiz.features.core',
   'corespring.wiggi-wiz-features.mathjax',

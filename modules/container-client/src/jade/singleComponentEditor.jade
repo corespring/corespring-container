@@ -1,5 +1,3 @@
-// singleComponentEditor
-
 extends layout
 
 block content
@@ -10,21 +8,36 @@ block content
 
   .root(ng-controller="Root", dimension-propagator='')
 
-    tabset
-      tab(heading="Configuration") 
-        .configuration
-        hr/
-        .bar
-          button.save-button(ng-disabled="saving").btn.btn-primary(ng-click="save()") Save
-          .alert-holder
-            alert.alert-danger(ng-show="saveError", ng-click="closeError()")
-              button.close(type="button", aria-label="Close")
-                span(aria-hidden="true") &times;
-              | {{saveError}}
+    div.single-component-editor(show)
+
+    tabset(ng-show="showNavigation")
+      tab(heading="Configuration", select="showConfig()") 
+      tab(heading="Preview", ng-show="previewEnabled", select="showPreview()") 
+
+    .config(ng-show="activePane == 'config'")
+      .configuration
+      hr/
+      .bar
+        button.save-button(ng-show="showSaveButton", ng-disabled="saving").btn.btn-primary(ng-click="save()") Save
+        .alert-holder
+          alert.alert-danger(ng-show="saveError", ng-click="closeError()")
+            button.close(type="button", aria-label="Close")
+              span(aria-hidden="true") &times;
+            | {{saveError}}
 
 
-      tab(heading="Preview") 
-        .preview
+    .preview(ng-show="activePane == 'preview'")
+      corespring-rig-player(
+        player-markup="item.xhtml",
+        player-item="item",
+        player-outcomes="outcome",
+        player-session="itemSession")
+      //- preview-player(
+      //-   data-jade-template='templates/question',
+      //-   player-markup="item.xhtml",
+      //-   player-item="item",
+      //-   player-components="item.components",
+      //-   player-outcomes="outcome")
     
 
 //After the angular module has been created.

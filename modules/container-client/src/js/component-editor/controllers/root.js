@@ -6,15 +6,29 @@ angular.module('corespring-singleComponentEditor.controllers')
     'iFrameService',
     'ItemService',
     'Msgr',
+    'DesignerService',
+    'ComponentDefaultData',
     function(
       $scope,
       $compile,
       LogFactory,
       iFrameService,
       ItemService,
-      Msgr) {
+      Msgr, 
+      DesignerService,
+      ComponentDefaultData) {
 
       "use strict";
+
+      function storeDefaultData(comp){
+        ComponentDefaultData.setDefaultData(comp.componentType, comp.defaultData);
+      }
+
+      //TODO: Some components are calling ComponentDefaultData - they shouldn't be
+      //cos it's breaking the contract between the components and the container.
+      DesignerService.loadAvailableUiComponents(function(data){
+        _.forEach(data.interactions, storeDefaultData);
+      });
 
       var logger = LogFactory.getLogger('root-controller');
 
@@ -22,16 +36,45 @@ angular.module('corespring-singleComponentEditor.controllers')
       
       var comp, configPanel;
 
-      $scope.showNav = true;
+      $scope.playerMode = 'rig';
+
+      $scope.showNavigation = true;
+
+      $scope.activePane = 'config';
+
+      $scope.previewEnabled = true; 
       
+      $scope.showConfig = function(done){
+        done = done || function(){};
+        $scope.activePane = 'config';
+        done();
+      };
+
+      $scope.showPreview = function(done){
+        done = done || function(){};
+
+        $scope.item.components['1'] = $scope.getData();
+
+        if($scope.previewEnabled){
+          $scope.activePane = 'preview';
+          done();
+        } else {
+          done('Preview is disabled');
+        }
+      };
+
       $scope.closeError = function(){
         $scope.saveError = null;
       }; 
 
-      $scope.save = function(){
+      $scope.save = function(onSuccess, onError){
+
+        onSuccess = onSuccess || function(){};
+        onError = onError || function(){};
+
         logger.debug('save...');
 
-        var model = configPanel.getModel();
+        var model = $scope.getData();
 
         logger.debug('model: ', JSON.stringify(model, null, '  ' ));
         var key = _($scope.item.components).keys().first();
@@ -44,17 +87,24 @@ angular.module('corespring-singleComponentEditor.controllers')
         ItemService.save(data, function(success){
           logger.debug('success:', arguments);
           $scope.saving = false;
+          onSuccess();
         }, 
         function(err){
           logger.error('error', arguments);
           $scope.saveError = 'There was an error saving';
           $scope.saving = false;
+          onError(err);
         });
+      };
+
+      $scope.getData = function(){
+        return angular.copy(configPanel.getModel());
       };
 
 
       $scope.onItemLoadSuccess = function(item) {
         $scope.item = item;
+        // ComponentData.setModel(item.components);
 
         //TODO: UI if item.components has more than one key
         comp = _($scope.item.components).values().first();
@@ -87,11 +137,6 @@ angular.module('corespring-singleComponentEditor.controllers')
         if (iFrameService.isInIFrame() && !iFrameService.bypassIframeLaunchMechanism()) {
           Msgr.on('initialise', onInitialise);
           
-          Msgr.on('saveAll', function(data, done){
-            logger.debug('received \'saveAll\' event');
-            saveAll(done || function(){});
-          });
-
           //send msg "ready" to instance
           //this will result in msg "initialise" being sent back to us
           logger.log('sending ready');
@@ -107,7 +152,42 @@ angular.module('corespring-singleComponentEditor.controllers')
           ItemService.load($scope.onItemLoadSuccess, $scope.onItemLoadError);
           //We need to trigger an ng digest as this event is outside the app's scope.
           $scope.$digest();
+
+          Msgr.on('showNavigation', function(showNavigation){
+            $scope.showNavigation = showNavigation;
+          });
+
+          Msgr.on('showSaveButton', function(show){
+            $scope.showSaveButton = show;
+          });
+          
+          Msgr.on('previewEnabled', function(previewEnabled){
+            $scope.previewEnabled = previewEnabled;
+          });
+          
+          Msgr.on('showPane', function(pane, done){
+            if(pane === 'config'){
+              $scope.showConfig(done);
+            } else if(pane === 'preview'){
+              $scope.showPreview(done);
+            }
+          });
+
+          Msgr.on('save', function(err, done){
+            $scope.save(function(){
+              done(null);
+            }, function(err){
+              done('Save failed');
+            });
+          });
+
+          Msgr.on('getData', function(err, done){
+            done(null, $scope.getData());
+          });
+
           Msgr.send('rendered');
+
+          //Draft functions??
         }
       }
 

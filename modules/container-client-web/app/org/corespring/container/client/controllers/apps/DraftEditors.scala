@@ -8,7 +8,7 @@ trait BaseDraftEditor extends CoreEditor {
 
   import org.corespring.container.client.controllers.resources.{ routes => resourceRoutes }
 
-  override def componentEditorServices(id: String): String = "alert('todo - componentEditorServices');"
+  override def componentEditorServices(id: String, components:JsArray): String = "alert('todo - componentEditorServices');"
 
   override def servicesJs(id: String, components: JsArray, widgets: JsArray): String = {
 
