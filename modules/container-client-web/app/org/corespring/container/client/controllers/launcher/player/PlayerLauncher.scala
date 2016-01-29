@@ -5,14 +5,20 @@ import play.api.mvc._
 
 trait PlayerLauncher extends Launcher {
 
+  def componentEditorJs = Action.async { implicit request =>
+    hooks.componentEditorJs.map { implicit js =>
+      val config = mkPaths(Paths.componentEditor)
+      make(Seq(NameAndSrc.componentEditor), config, Definitions.singleComponentEditor)
+    }
+  }
+
   def editorJs = Action.async { implicit request =>
     hooks.editorJs.map { implicit js =>
       val config = mkPaths(Paths.editors)
       make(Seq(
         NameAndSrc.draftEditor,
         NameAndSrc.itemEditor,
-        NameAndSrc.componentEditor
-      ), config, Definitions.editors)
+        NameAndSrc.componentEditor), config, Definitions.editors)
     }
   }
 

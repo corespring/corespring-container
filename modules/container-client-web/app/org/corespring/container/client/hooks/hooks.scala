@@ -4,7 +4,7 @@ import java.io.InputStream
 
 import org.corespring.container.client.HasContainerContext
 import org.corespring.container.client.hooks.Hooks.{ R, StatusMessage }
-import play.api.libs.json.{JsObject, JsArray, JsValue}
+import play.api.libs.json.{ JsObject, JsArray, JsValue }
 import play.api.mvc._
 
 import scala.concurrent.Future
@@ -92,7 +92,7 @@ trait DraftHooks {
 
 trait CreateItemHook {
   def createItem(json: Option[JsValue])(implicit h: RequestHeader): R[String]
-  def createSingleComponentItem(componentType: String, defaultData:JsObject)(implicit h: RequestHeader): R[String]
+  def createSingleComponentItem(componentType: String, defaultData: JsObject)(implicit h: RequestHeader): R[String]
 }
 
 trait ItemHooks extends CoreItemHooks with CreateItemHook
@@ -108,6 +108,7 @@ trait SessionHooks extends HasContainerContext {
 trait PlayerLauncherHooks extends HasContainerContext {
   def catalogJs(implicit header: RequestHeader): Future[PlayerJs]
   def editorJs(implicit header: RequestHeader): Future[PlayerJs]
+  def componentEditorJs(implicit header: RequestHeader): Future[Option[String]]
   def playerJs(implicit header: RequestHeader): Future[PlayerJs]
 }
 

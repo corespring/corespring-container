@@ -40,10 +40,9 @@ trait Launcher extends Controller with HasContainerContext {
   import org.corespring.container.client.controllers.resources.routes.Item
   def hooks: PlayerLauncherHooks
 
-
   object NameAndSrc {
 
-    private def mk(name:String) = {
+    private def mk(name: String) = {
       val jsPath = s"container-client/js/player-launcher/$name.js"
       pathToNameAndContents(jsPath)
     }
@@ -90,11 +89,10 @@ trait Launcher extends Controller with HasContainerContext {
     val itemEditor = JsObject(Seq(
       "editor" -> ItemEditor.load(":itemId"),
       "devEditor" -> ItemDevEditor.load(":itemId"),
-      "createItem" -> Item.create(),
-      "singleComponent" -> JsObject(Seq(
-        "create" -> Item.createWithSingleComponent(),
-        "load" -> ItemEditor.loadSingleComponent(":itemId")
-      ))))
+      "createItem" -> Item.create()))
+
+    val componentEditor = JsObject(Seq(
+      "load" -> ComponentEditor.load(":componentType")))
 
     val player = {
       val loadSession = Player.load(":sessionId")
@@ -113,6 +111,13 @@ trait Launcher extends Controller with HasContainerContext {
   val SecureMode = "corespring.player.secure"
 
   protected def sumSession(s: Session, keyValues: (String, String)*): Session = keyValues.foldRight(s) { case ((key, value), acc) => acc + (key -> value) }
+
+  protected def make(additionalJsNameAndSrc: Seq[(String, String)], options: JsObject, bootstrapLine: String)(implicit request: RequestHeader): SimpleResult = {
+    val corespringUrl = playerConfig.rootUrl.getOrElse(BaseUrl(request))
+    val builder = new JsBuilder(corespringUrl)
+    Ok(builder.build(additionalJsNameAndSrc, options, bootstrapLine))
+      .as(ContentTypes.JAVASCRIPT)
+  }
 
   protected def make(additionalJsNameAndSrc: Seq[(String, String)], options: JsObject, bootstrapLine: String)(implicit request: RequestHeader, js: PlayerJs): SimpleResult = {
     val corespringUrl = playerConfig.rootUrl.getOrElse(BaseUrl(request))

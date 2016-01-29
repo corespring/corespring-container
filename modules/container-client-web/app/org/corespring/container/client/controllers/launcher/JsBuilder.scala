@@ -35,15 +35,13 @@ class JsBuilder(corespringUrl: String) {
 
   private def queryStringToJson(implicit rh: RequestHeader) = Json.toJson(rh.queryString.mapValues(_.mkString))
 
-  def build(additionalJsNameAndSrc: Seq[(String, String)], options: JsObject, bootstrapLine: String)(implicit request: RequestHeader, js: PlayerJs): String = {
+  def buildJs(additionalJsNameAndSrc: Seq[(String, String)], options: JsObject, bootstrapLine: String): String = {
     val fullConfig = Json.obj(
       "corespringUrl" -> corespringUrl,
-      "queryParams" -> queryStringToJson,
-      "errors" -> js.errors,
-      "warnings" -> js.warnings) ++ options
+      "queryParams" -> queryStringToJson) ++ options
     val fullConfigJs = ("launch-config" -> s"module.exports = ${Json.stringify(fullConfig)}")
     val wrappedNameAndContents = fullConfigJs +: additionalJsNameAndSrc
-    val wrappedContents : Seq[TxtFormat.Appendable] = wrappedNameAndContents.map{
+    val wrappedContents: Seq[TxtFormat.Appendable] = wrappedNameAndContents.map {
       case (name, content) => ServerLibraryWrapper(name, content)
     }
 
@@ -53,8 +51,12 @@ class JsBuilder(corespringUrl: String) {
        $bootstrapLine"""
   }
 
+  def build(additionalJsNameAndSrc: Seq[(String, String)], options: JsObject, bootstrapLine: String)(implicit request: RequestHeader, js: PlayerJs): String = {
+    val errorsAndWarnings = Json.obj("errors" -> js.errors, "warnings" -> js.warnings)
+    buildJs(additionalJsNameAndSrc, options.deepMerge(errorsAndWarnings), bootstrapLine)
+  }
 
   def build(additionalJsNameAndSrc: (String, String), options: JsObject, bootstrapLine: String)(implicit request: RequestHeader, js: PlayerJs): String = {
-    build(Seq(additionalJsNameAndSrc), options, bootstrapLine)
+    buildJs(Seq(additionalJsNameAndSrc), options, bootstrapLine)
   }
 }
