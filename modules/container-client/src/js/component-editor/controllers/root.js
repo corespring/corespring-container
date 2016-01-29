@@ -121,6 +121,12 @@ angular.module('corespring-singleComponentEditor.controllers')
             done(null, $scope.getData());
           });
 
+          Msgr.on('setData', function(data, done){
+            $scope.item.components['1'] = data;
+            configPanel.setModel($scope.item.components['1']);
+            done(null);
+          });
+
           Msgr.send('rendered');
         }        
 

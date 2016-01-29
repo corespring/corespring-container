@@ -25,12 +25,6 @@
        var opts = @{Html(play.api.libs.json.Json.stringify(opts))};
 
        console.log(document.location.href);
-
-       opts.onItemCreated = function(id){
-         console.log('onItemCreated', arguments);
-         $('.item-id').html(id);
-       };
-
        console.log('opts: ', opts);
 
        opts.queryParams = {
@@ -54,17 +48,22 @@
          editor.showNavigation(this.checked);
        });
 
-       $('.save-btn').click(function(){
-          //result - has {error: , data: }
-          editor.save(function(result){
-            console.log(result);
+       $('.get-data').click(function(){
+          editor.getData(function(result){
+            $('.data-text-area').html(JSON.stringify(result.result, null, '  '));
           });
        });
 
-       $('.get-data').click(function(){
-          editor.getData(function(result){
-            console.log(result);
-            alert(JSON.stringify(result, null, '  '));
+       $('.set-data').click(function(){
+          var data;
+          try {
+            data = JSON.parse($('.data-text-area').val());
+          } catch (e){
+            console.error('bad json');
+          }
+
+          editor.setData(data, function(result){
+            console.log('data set...');
           });
        });
 
@@ -88,15 +87,12 @@
     <button class="btn btn-primary create">Create</button>
   </div>
 
-  <label>ItemId: <span class="item-id"></span></label>
-
   <div class="external-controls navbar nav" style="display: none;">
 
     <label>External controls: </label>
     |
-    <button class="btn btn-sm btn-success save-btn">Save</button>
-    |
     <button class="btn btn-sm btn-primary get-data">Get Data</button>
+    <button class="btn btn-sm btn-success set-data">Set Data</button>
     |
     <span>
       Tab:
@@ -107,19 +103,14 @@
         <input type="radio" name="tab" id="inlineRadio2" value="preview"> Preview
       </label>
     </span>
-
     |
     <span>
       <label class="checkbox-inline">
         <input class="show-tabs-checkbox" type="checkbox" name="showTabs" value="true"> Show Tabs
       </label>
     </span>
-    |
-    <span>
-      <label class="checkbox-inline">
-        <input class="show-save-button-checkbox" type="checkbox" name="showSaveButton" value="true"> Show Save Button
-      </label>
-    </span>
+    <hr/>
+    <textarea class="data-text-area form-control" style="height: 100px;"></textarea>
   </div>
   <hr/>
   <div class="holder" style="height:100%; width: 100%;"></div>

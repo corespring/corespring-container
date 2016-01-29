@@ -83,6 +83,10 @@ function ComponentEditor(element, options, errorCallback) {
     instance.send('showSaveButton', show);
   };
 
+  this.setData = function(data, done){
+    instance.send('setData', data, instanceCallbackHandler(done));
+  };
+
   // this.save = function(done){
   //   instance.send('save', instanceCallbackHandler(done));
   // };
