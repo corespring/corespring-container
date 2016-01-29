@@ -1,4 +1,4 @@
-@(namespace: String, load: Call, saveSubset: Call, componentSet: JsValue)
+@(namespace: String, componentSet: JsValue, componentType:String)
 
 @toMethodAndUrl(c:Call) = @{
   s"{ method: '${c.method.toLowerCase}', url: '${c.url}'}"  
@@ -9,11 +9,10 @@
 
   angular.module('@namespace', []);
 
+  angular.module('@namespace').constant('COMPONENT_EDITOR', {componentType: '@componentType'});
+
   angular.module('@namespace').factory('ItemUrls', [ function($http){
-    return {
-      load: @toMethodAndUrl(load),
-      saveSubset: @toMethodAndUrl(saveSubset)
-    }
+    return {}
   }]);
 
 

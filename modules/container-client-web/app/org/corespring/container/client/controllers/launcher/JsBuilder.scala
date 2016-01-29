@@ -1,14 +1,10 @@
 package org.corespring.container.client.controllers.launcher
 
-import org.corespring.container.client.hooks.PlayerJs
 import org.corespring.container.client.views.txt.js.ServerLibraryWrapper
-import play.api.libs.json.{ Json, JsString, JsObject }
-import play.api.mvc.{ AnyContent, Request, RequestHeader }
+import play.api.libs.json.{JsObject, Json}
 import play.api.templates.TxtFormat
 
-class JsBuilder(corespringUrl: String) {
-
-  import JsResource._
+private[launcher] class JsBuilder(corespringUrl: String, val load : String => Option[String]) extends JsResource{
 
   lazy val coreJs: String = {
     val corePaths = Seq(
@@ -33,12 +29,10 @@ class JsBuilder(corespringUrl: String) {
       """
   }
 
-  private def queryStringToJson(implicit rh: RequestHeader) = Json.toJson(rh.queryString.mapValues(_.mkString))
-
-  def buildJs(additionalJsNameAndSrc: Seq[(String, String)], options: JsObject, bootstrapLine: String): String = {
+  def buildJs(additionalJsNameAndSrc: Seq[(String, String)], options: JsObject, bootstrapLine: String, queryParams: Map[String,String]): String = {
     val fullConfig = Json.obj(
       "corespringUrl" -> corespringUrl,
-      "queryParams" -> queryStringToJson) ++ options
+      "queryParams" -> queryParams) ++ options
     val fullConfigJs = ("launch-config" -> s"module.exports = ${Json.stringify(fullConfig)}")
     val wrappedNameAndContents = fullConfigJs +: additionalJsNameAndSrc
     val wrappedContents: Seq[TxtFormat.Appendable] = wrappedNameAndContents.map {
@@ -49,14 +43,5 @@ class JsBuilder(corespringUrl: String) {
        $coreJs
        ${wrappedContents.mkString("\n")}
        $bootstrapLine"""
-  }
-
-  def build(additionalJsNameAndSrc: Seq[(String, String)], options: JsObject, bootstrapLine: String)(implicit request: RequestHeader, js: PlayerJs): String = {
-    val errorsAndWarnings = Json.obj("errors" -> js.errors, "warnings" -> js.warnings)
-    buildJs(additionalJsNameAndSrc, options.deepMerge(errorsAndWarnings), bootstrapLine)
-  }
-
-  def build(additionalJsNameAndSrc: (String, String), options: JsObject, bootstrapLine: String)(implicit request: RequestHeader, js: PlayerJs): String = {
-    buildJs(Seq(additionalJsNameAndSrc), options, bootstrapLine)
   }
 }

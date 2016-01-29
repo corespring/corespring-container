@@ -137,6 +137,13 @@ trait DefaultIntegration
     override def containerContext: ContainerExecutionContext = DefaultIntegration.this.containerContext
   }
 
+  lazy val componentEditor = new ComponentEditor(
+    containerContext,
+    components,
+    Play.current.mode,
+    sourcePathsService,
+    componentSets)
+
   lazy val itemEditor = new ItemEditor {
 
     override val sourcePaths: SourcePathsService = DefaultIntegration.this.sourcePathsService

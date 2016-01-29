@@ -4,11 +4,12 @@ import grizzled.slf4j.Logger
 import org.corespring.container.client.HasContainerContext
 import org.corespring.container.client.component.{ ComponentUrls, ItemTypeReader }
 import org.corespring.container.client.controllers.angular.AngularModules
-import org.corespring.container.client.controllers.helpers.{ Helpers, LoadClientSideDependencies }
+import org.corespring.container.client.controllers.helpers.{JsonHelper, NameHelper, Helpers, LoadClientSideDependencies}
 import org.corespring.container.client.hooks.Hooks.StatusMessage
-import org.corespring.container.components.model.Id
+import org.corespring.container.components.model._
 import org.corespring.container.components.model.dependencies.DependencyResolver
 import play.api.Mode.Mode
+import play.api.libs.json.{JsObject, JsBoolean, JsString, JsValue}
 import play.api.mvc._
 
 import scala.concurrent._
@@ -29,7 +30,8 @@ trait App[T]
   with Helpers
   with LoadClientSideDependencies
   with HasLogger
-  with HasContainerContext {
+  with HasContainerContext
+  with ComponentScriptPrep {
   self: ItemTypeReader =>
 
   def mode: Mode
@@ -39,8 +41,6 @@ trait App[T]
   def showErrorInUi(implicit rh: RequestHeader): Boolean = jsMode(rh) == "dev"
 
   def context: String
-
-  def modulePath = v2Player.Routes.prefix
 
   def urls: ComponentUrls
 
@@ -62,23 +62,43 @@ trait App[T]
 
   }
 
-  val typeRegex = "(.*?)-(.*)".r
 
-  /**
-   * A temporary means of defining paths that may be resolved
-   */
-  protected def resolvePath(s: String): String = {
+}
 
-    val needsResolution = Seq(
-      "components/",
-      "component-sets/",
-      "editor",
-      "-prod",
-      "player.min").exists(s.contains)
-    if (needsResolution) resolveDomain(s) else s
+trait ComponentInfoJson extends NameHelper with JsonHelper{
+
+  protected def componentInfoToJson(modulePath:String, interactions:Seq[Interaction], widgets:Seq[Widget])(ci: ComponentInfo): JsValue = {
+    val tag = tagName(ci.id.org, ci.id.name)
+
+    val icon = (interactions ++ widgets).find(_.componentType == tag).map(_.icon) match {
+      case Some(iconBytes) => iconBytes match {
+        case Some(thing) => Some(JsString(s"$modulePath/icon/$tag"))
+        case _ => None
+      }
+      case _ => None
+    }
+
+    partialObj(
+      "name" -> Some(JsString(ci.id.name)),
+      "title" -> Some(JsString(ci.title.getOrElse(""))),
+      "titleGroup" -> Some(JsString(ci.titleGroup.getOrElse(""))),
+      "icon" ->  icon,
+      "released" -> Some(JsBoolean(ci.released)),
+      "insertInline" -> Some(JsBoolean(ci.insertInline)),
+      "componentType" -> Some(JsString(tag)),
+      "defaultData" -> Some(ci.defaultData),
+      "configuration" -> (ci.packageInfo \ "external-configuration").asOpt[JsObject])
   }
+}
 
+trait ComponentScriptPrep extends DependencyResolver
+  with LoadClientSideDependencies {
   def ngModules(appContext:AppContext): AngularModules = new AngularModules(s"${appContext.sub.getOrElse(appContext.main)}.services")
+
+  private val typeRegex = "(.*?)-(.*)".r
+  def urls: ComponentUrls
+
+  def mode: Mode
 
   protected def jsMode(implicit r: RequestHeader): String = {
     r.getQueryString("mode").getOrElse(mode.toString.toLowerCase)
@@ -93,8 +113,37 @@ trait App[T]
     }
   }
 
+  def modulePath = v2Player.Routes.prefix
+
+  def sourcePaths: SourcePathsService
+
+  /** Allow external domains to be configured */
+  def resolveDomain(path: String): String = path
+
+  /**
+    * A temporary means of defining paths that may be resolved
+    */
+  protected def resolvePath(s: String): String = {
+
+    val needsResolution = Seq(
+      "components/",
+      "component-sets/",
+      "editor",
+      "-prod",
+      "player.min").exists(s.contains)
+    if (needsResolution) resolveDomain(s) else s
+  }
+
+  def jsSrc(appContext: AppContext): NgSourcePaths = {
+    sourcePaths.load[NgSourcePaths](ContextAndSuffix(appContext, "js"), NgSourcePaths.fromJsonResource(modulePath, _))
+  }
+
+  def cssSrc(appContext: AppContext): CssSourcePaths = {
+    sourcePaths.load[CssSourcePaths](ContextAndSuffix(appContext, "css"), CssSourcePaths.fromJsonResource(modulePath, _))
+  }
+
   protected def buildJs(scriptInfo: ComponentScriptInfo,
-    extras: Seq[String] = Seq.empty)(implicit rh: RequestHeader) = {
+                        extras: Seq[String] = Seq.empty)(implicit rh: RequestHeader) = {
     val jsSourcePaths = jsSrc(scriptInfo.context)
     val mainJs = paths(jsSourcePaths)
     val js = jsSourcePaths.otherLibs ++ mainJs ++ scriptInfo.jsUrl ++ extras
@@ -122,17 +171,6 @@ trait App[T]
     val clientSideDependencies = getClientSideDependencies(resolvedComponents)
     val dependencies = ngModules(appContext).createAngularModules(resolvedComponents, clientSideDependencies)
     ComponentScriptInfo(appContext, jsUrl, cssUrl, dependencies)
-  }
-
-  /** Allow external domains to be configured */
-  def resolveDomain(path: String): String = path
-
-  def jsSrc(appContext: AppContext): NgSourcePaths = {
-    sourcePaths.load[NgSourcePaths](ContextAndSuffix(appContext, "js"), NgSourcePaths.fromJsonResource(modulePath, _))
-  }
-
-  def cssSrc(appContext: AppContext): CssSourcePaths = {
-    sourcePaths.load[CssSourcePaths](ContextAndSuffix(appContext, "css"), CssSourcePaths.fromJsonResource(modulePath, _))
   }
 }
 

@@ -60,7 +60,7 @@ trait CoreEditor
       "configuration" -> (ci.packageInfo \ "external-configuration").asOpt[JsObject])
   }
 
-  def componentEditorServices(id:String, components: JsArray) : String
+//  def componentEditorServices(id:String, components: JsArray) : String
 
   def servicesJs(id: String, components: JsArray, widgets: JsArray): String
 
@@ -115,14 +115,14 @@ trait CoreEditor
       servicesJs(id, componentsArray, widgetsArray)
     )(id)
   }
-  def loadSingleComponent(id: String): Action[AnyContent] = {
-    loadItem(
-      AppContext(context, Some("singleComponentEditor")),
-      JsArray(),
-      JsArray(),
-      (i) => (i \ "components" \\ "componentType").map(_.as[String]).take(1),
-      componentEditorServices(id, componentsArray)
-    )(id)
-  }
+//  def loadSingleComponent(id: String): Action[AnyContent] = {
+//    loadItem(
+//      AppContext(context, Some("singleComponentEditor")),
+//      JsArray(),
+//      JsArray(),
+//      (i) => (i \ "components" \\ "componentType").map(_.as[String]).take(1),
+//      componentEditorServices(id, componentsArray)
+//    )(id)
+//  }
 }
 

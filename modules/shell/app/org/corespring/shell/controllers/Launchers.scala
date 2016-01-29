@@ -34,7 +34,7 @@ trait Launchers extends Controller {
   }
 
   def newSingleComponentEditor() = Action { request =>
-    val html = launchers.singleComponentEditor(editorJsUrl, components.map(_.componentType), Json.obj())
+    val html = launchers.singleComponentEditor(componentEditorJsUrl, components.map(_.componentType), Json.obj())
     Ok(html)
   }
 
@@ -68,6 +68,7 @@ trait Launchers extends Controller {
   }
 
   lazy val editorJsUrl = PlayerLauncher.editorJs().url
+  lazy val componentEditorJsUrl = PlayerLauncher.componentEditorJs().url
 
   private def loadDraftEditorPage(opts: JsValue) = launchers.draftEditor(editorJsUrl, opts)
   private def loadItemEditorPage(opts: JsValue) = launchers.itemEditor(editorJsUrl, opts)

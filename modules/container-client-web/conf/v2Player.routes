@@ -2,6 +2,7 @@
 
 GET           /player.js                                                 @org.corespring.container.client.controllers.launcher.player.PlayerLauncher.playerJs
 GET           /editor.js                                                 @org.corespring.container.client.controllers.launcher.player.PlayerLauncher.editorJs
+GET           /component-editor.js                                       @org.corespring.container.client.controllers.launcher.player.PlayerLauncher.componentEditorJs
 GET           /catalog.js                                                @org.corespring.container.client.controllers.launcher.player.PlayerLauncher.catalogJs
 
 GET           /js/*file                                                  controllers.Assets.at(path="/container-client/js", file)
@@ -82,9 +83,10 @@ GET           /draft/dev-editor/:draftId/*file                           @org.co
 POST          /draft/dev-editor/:draftId/*file                           @org.corespring.container.client.controllers.apps.DraftDevEditor.uploadFile(draftId, file)
 DELETE        /draft/dev-editor/:draftId/*file                           @org.corespring.container.client.controllers.apps.DraftDevEditor.deleteFile(draftId, file)
 
+GET           /component/editor/:componentType/index.html                @org.corespring.container.client.controllers.apps.ComponentEditor.load(componentType)
+
 # Item Editor: config, components
 GET           /item/editor/:itemId/index.html                           @org.corespring.container.client.controllers.apps.ItemEditor.load(itemId)
-GET           /item/component-editor/:itemId/index.html                 @org.corespring.container.client.controllers.apps.ItemEditor.loadSingleComponent(itemId)
 GET           /item/editor/:itemId/*file                                @org.corespring.container.client.controllers.apps.ItemEditor.getFile(itemId, file)
 POST          /item/editor/:itemId/*file                                @org.corespring.container.client.controllers.apps.ItemEditor.uploadFile(itemId, file)
 DELETE        /item/editor/:itemId/*file                                @org.corespring.container.client.controllers.apps.ItemEditor.deleteFile(itemId, file)

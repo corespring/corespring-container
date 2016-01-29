@@ -36,17 +36,20 @@ block content
     .preview(ng-show="activePane == 'preview'",
       ng-controller="ClientSidePreview")
       .item-preview-wrapper
-        .player-label
-          img(ng-src='{{playerLabelImg}}')
+        //- .player-label
+        //-   img(ng-src='{{playerLabelImg}}')
         .player-container
           preview-player(
+            player-mode="playerMode",
             data-jade-template='templates/question',
             player-markup="item.xhtml",
             player-item="item",
             player-components="item.components",
             player-outcomes="outcome")
 
-          summary-feedback(ng-model='item.summaryFeedback', session-complete='session.isComplete')
+          summary-feedback(
+            ng-model='item.summaryFeedback', 
+            session-complete='session.isComplete')
         .row
           preview-player-control-panel(
             data-mode='playerMode', 

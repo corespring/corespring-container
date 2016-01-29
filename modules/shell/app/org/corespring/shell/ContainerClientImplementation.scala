@@ -68,6 +68,7 @@ class ContainerClientImplementation(
      * ?secure - a secure request
      * ?jsErrors  - throw errors when loading the player js
      * ?pageErrors - throw errors when loading the player page
+ *
      * @return
      */
 
@@ -78,7 +79,18 @@ class ContainerClientImplementation(
     override def catalogJs(implicit header: RequestHeader): Future[PlayerJs] = loader.loadJs(header)
 
     override def containerContext: ContainerExecutionContext = ContainerClientImplementation.this.containerContext
-  }
+
+    override def componentEditorJs(implicit header: RequestHeader): Future[Option[String]] = {
+      loader.loadJs(header).map{ pj =>
+        //TODO: what are the restrictions on loading a standalone component editor?
+        if(pj.errors.length > 0){
+          Some(pj.errors.mkString(","))
+        }  else {
+          None
+        }
+      }
+    }
+    }
 
   object s3 {
     lazy val key = configuration.getString("amazon.s3.key")
