@@ -9,7 +9,10 @@ angular.module('corespring-singleComponentEditor.controllers')
     'DesignerService',
     'ComponentDefaultData',
     'ComponentData',
+    'WiggiDialogLauncher',
+    'EditorDialogTemplate',
     'COMPONENT_EDITOR',
+    'WIGGI_EVENTS',    
     function(
       $scope,
       $timeout,
@@ -20,7 +23,10 @@ angular.module('corespring-singleComponentEditor.controllers')
       DesignerService,
       ComponentDefaultData,
       ComponentData,
-      COMPONENT_EDITOR) {
+      WiggiDialogLauncher,
+      EditorDialogTemplate,
+      COMPONENT_EDITOR,
+      WIGGI_EVENTS) {
 
       "use strict";
 
@@ -73,6 +79,18 @@ angular.module('corespring-singleComponentEditor.controllers')
         configPanel = configPanelBridge;
         configPanel.setModel($scope.item.components['1']);
       });
+
+      function onLaunchDialog($event, data, title, body, callback, scopeProps, options) {
+        var dialog = new WiggiDialogLauncher($event.targetScope);
+        var header = options.omitHeader ? '' : null;
+        var footer = options.omitFooter ? '' : null;
+        var content = EditorDialogTemplate.generate(title, body, header, footer);
+        dialog.launch(data, content, callback, scopeProps, options);
+      }
+
+
+      $scope.$on(WIGGI_EVENTS.LAUNCH_DIALOG, onLaunchDialog);
+      
 
       function init() {
 
