@@ -16,31 +16,23 @@ function ComponentEditor(element, options, errorCallback) {
     }
 
     function onReady(instance){
-
+      console.log('onReady...', instance); 
     }
 
-    instance = launcher.loadInstance(call, options.queryParams, {}, onReady);
-  }
+    var initialData = {
+      activePane: options.activePane || 'config',
+      showNavigation: options.showNavigation === true || false,
+      componentModel: options.data,
+      xhtml: options.markup 
+    };
 
+    instance = launcher.loadInstance(call, options.queryParams, initialData, onReady);
+  }
 
   var ok = launcher.init();
 
   if(ok){
-
     loadConfigPanel(options.componentType);
-    // if (options.itemId) {
-    //   loadItem(options.itemId, options);
-    // } else {
-    //   createItem(options.componentType, function(err, result){
-    //     if(err){
-    //       errorCallback(errorCodes.CREATE_ITEM_FAILED(err));
-    //     } else {
-    //       options.itemId = result.itemId;
-    //       loadItem(options.itemId, options);
-    //     }
-    //   });
-    // }
-
   } else {
     return;
   }
@@ -87,10 +79,6 @@ function ComponentEditor(element, options, errorCallback) {
     instance.send('setData', data, instanceCallbackHandler(done));
   };
 
-  // this.save = function(done){
-  //   instance.send('save', instanceCallbackHandler(done));
-  // };
-  
   this.remove = function() {
     if(instance){
       instance.remove();

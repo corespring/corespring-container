@@ -38,8 +38,6 @@ angular.module('corespring-singleComponentEditor.controllers')
 
       $scope.activePane = 'config';
 
-      $scope.previewEnabled = true; 
-      
       $scope.showConfig = function(done){
         done = done || function(){};
         $scope.activePane = 'config';
@@ -58,15 +56,8 @@ angular.module('corespring-singleComponentEditor.controllers')
 
       $scope.showPreview = function(done){
         done = done || function(){};
-
         $scope.item.components['1'] = $scope.getData();
-
-        if($scope.previewEnabled){
-          $scope.activePane = 'preview';
-          done();
-        } else {
-          done('Preview is disabled');
-        }
+        $scope.activePane = 'preview';
       };
 
       $scope.closeError = function(){
@@ -103,10 +94,6 @@ angular.module('corespring-singleComponentEditor.controllers')
         function initMsgrListeners(){
           Msgr.on('showNavigation', function(showNavigation){
             $scope.showNavigation = showNavigation;
-          });
-          
-          Msgr.on('previewEnabled', function(previewEnabled){
-            $scope.previewEnabled = previewEnabled;
           });
           
           Msgr.on('showPane', function(pane, done){
@@ -155,6 +142,7 @@ angular.module('corespring-singleComponentEditor.controllers')
           initialData.xhtml = data.xhtml ? data.xhtml : initialData.xhtml;
           initialData.components['1'] = data.componentModel ? data.componentModel : initialData.components['1'];
           
+          $scope.showNavigation = data.showNavigation === true ? true : false;
           $scope.item = angular.copy(initialData);
 
           ComponentData.setModel($scope.item.components);
