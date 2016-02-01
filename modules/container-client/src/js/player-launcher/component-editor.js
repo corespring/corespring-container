@@ -16,20 +16,29 @@ function ComponentEditor(element, options, errorCallback) {
     }
 
     function onReady(instance){
-      console.log('onReady...', instance); 
+      // console.log('onReady...', instance); 
     }
 
     var initialData = {
       activePane: options.activePane || 'config',
       showNavigation: options.showNavigation === true || false,
       componentModel: options.data,
-      xhtml: options.markup 
+      xhtml: options.markup,
+      assets: options.assets,
+      uploadUrl: options.uploadUrl,
+      uploadMethod: options.uploadMethod || 'POST'
     };
 
     instance = launcher.loadInstance(call, options.queryParams, initialData, onReady);
   }
 
-  var ok = launcher.init();
+  var ok = launcher.init(function(){
+    if(options.uploadUrl && options.uploadUrl.indexOf(':filename') === -1){
+      return [{code: 333, msg: 'url must have :filename'}];
+    } else {
+      return [];
+    }
+  });
 
   if(ok){
     loadConfigPanel(options.componentType);

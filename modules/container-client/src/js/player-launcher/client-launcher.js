@@ -136,16 +136,19 @@ function ClientLauncher(element, options, errorCallback){
    * @param call an object or a string. 
    *   if an object: must have the form: { method: '', url: ''}
    *   if a string: it'll be converted into { method: '', url: ''}
-   * @param params an object of params to pass when launching
+   * @param queryParams an object of queryParams to pass when launching
    * @param initialData an object that will be sent to the instance 'initialise' handler
    * @param onReady called when instance is ready - function(instance){};
    */
-  this.loadInstance = function(call, params, initialData, onReady){
+  this.loadInstance = function(call, queryParams, initialData, onReady){
 
-    call = (typeof(call) === 'string') ? { method: 'GET', url: call} : call;
-    params = this.buildParams(params);
-    var instance = new InstanceDef($.extend(call, {params: params}), element, errorCallback, logger, options.autosizeEnabled, options.iframeScrollingEnabled);
-
+    call = (typeof(call) === 'string') ? {method: 'GET', url: call} : call;
+    
+    queryParams = this.buildParams(queryParams);
+    
+    var launchOpts = {call: call, queryParams: queryParams, data: initialData};
+    
+    var instance = new InstanceDef(launchOpts, element, errorCallback, logger, options.autosizeEnabled, options.iframeScrollingEnabled);
 
     instance.on('launch-error', function (data) {
       var error = errorCodes.EXTERNAL_ERROR(data.code + ': ' + data.detailedMessage);
@@ -160,7 +163,6 @@ function ClientLauncher(element, options, errorCallback){
         errorCallback(errorCodes.EDITOR_NOT_REMOVED);
       } else {
         this.isReady = true;
-        instance.send('initialise', initialData);
         if(onReady){
           onReady(instance);
         }

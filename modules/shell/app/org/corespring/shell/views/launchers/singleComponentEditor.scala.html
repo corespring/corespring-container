@@ -26,6 +26,11 @@
 
        opts.showNavigation = false;
 
+       //This upload url will return the path to the file as the result body
+       opts.uploadUrl = 'http://www.google.com/upload/:filename';
+       // opts.uploadMethod = 'POST';
+       // opts.assetAuthorization = '???'; ??
+
        opts.activePane = 'config';
        $('input[value="config"]').prop('checked', true);
 

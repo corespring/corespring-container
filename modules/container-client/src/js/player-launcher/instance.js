@@ -2,7 +2,11 @@
  * @param call: { url: '', method: '', params: {}, hash: ''}
  */
 
-var Instance = function(call, element, errorCallback, log, autosizeEnabled, iframeScrollingEnabled) {
+var Instance = function(launchOpts, element, errorCallback, log, autosizeEnabled, iframeScrollingEnabled) {
+
+  var call = launchOpts.call;
+  var queryParams = launchOpts.queryParams;
+  var data = launchOpts.data || {};
 
   autosizeEnabled = autosizeEnabled !== false;
 
@@ -13,6 +17,24 @@ var Instance = function(call, element, errorCallback, log, autosizeEnabled, ifra
     var formName = iframeUid + '-form';
 
     function addForm() {
+
+      var formParams = [];
+      
+      for(var x in data){
+
+        if(data[x] !== undefined){
+
+          var d = data[x];
+          
+          if(typeof(d) === 'object'){
+            d = JSON.stringify(d);
+          } 
+
+          var p = '<input type="hidden" name="'+x+'" value="'+d+'"></input>';
+          formParams.push(p);
+        }
+      }
+
       var form = [
         '<form ',
         '  target="', iframeUid, '"',
@@ -20,6 +42,7 @@ var Instance = function(call, element, errorCallback, log, autosizeEnabled, ifra
         '  name="', formName, '"',
         '  method="POST" ',
         '  action="', url, '">',
+        formParams.join(''),
         '</form>'
       ].join('');
 
@@ -70,7 +93,7 @@ var Instance = function(call, element, errorCallback, log, autosizeEnabled, ifra
 
     function makeUrl() {
       var Builder = require('url-builder');
-      return new Builder(call.url).params(call.params).build();
+      return new Builder(call.url).params(queryParams).build();
     }
 
     var url = makeUrl();
@@ -129,6 +152,10 @@ var Instance = function(call, element, errorCallback, log, autosizeEnabled, ifra
     channel.on('rendered', function() {
       $iframe().removeClass("player-loading");
       $iframe().addClass("player-loaded");
+    });
+
+    channel.on('ready', function(){
+      channel.send('initialise', data);
     });
 
     /**

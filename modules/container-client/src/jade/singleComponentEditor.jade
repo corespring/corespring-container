@@ -30,8 +30,6 @@ block content
             | {{saveError}}
 
 
-    //- .preview(ng-show="activePane == 'preview'")
-
     .preview(ng-show="activePane == 'preview'",
       ng-controller="ClientSidePreview")
       .item-preview-wrapper
@@ -61,8 +59,32 @@ block after-main-script
   script(type="text/javascript").
 
     (function(){
+
+      var app = 'corespring-#{appName}';
+
       var editorOptions = !{options}; 
-      angular.module('corespring-#{appName}').constant('STATIC_PATHS', editorOptions.staticPaths); 
-      angular.module('corespring-#{appName}').constant('DEBOUNCE_IN_MILLIS', editorOptions.debounceInMillis || 5000 ); 
-      angular.module('corespring-#{appName}')
+
+      var uploadEndpoint = {};
+      uploadEndpoint.url = editorOptions.uploadUrl;
+      uploadEndpoint.method = editorOptions.uploadMethod;
+
+      angular.module(app)
+        //TODO: STATIC_PATHS isnt relevent to the component editor
+        .constant('STATIC_PATHS', editorOptions.staticPaths || {}) 
+        //TODO:  DEBOUNCE_IN_MILLIS isnt relevent to the component editor
+        .constant('DEBOUNCE_IN_MILLIS', editorOptions.debounceInMillis || 0 ) 
+        .constant('UPLOAD_ENDPOINT', uploadEndpoint)
+        .config([
+          'wiggiWizConfigProvider', 
+          'UPLOAD_ENDPOINT',
+          function(wiggiWizConfigProvider, 
+            UPLOAD_ENDPOINT){
+
+            if(UPLOAD_ENDPOINT.url && UPLOAD_ENDPOINT.method){
+              wiggiWizConfigProvider.add({
+                imageService: 'ExternalEndpointsImageService'
+              });
+            }
+          }]);
+
     })(this);

@@ -38,6 +38,30 @@ case class EditorClientOptions(debounceInMillis:Long, staticPaths:JsObject) {
   def toJson = Json.format[EditorClientOptions].writes(this)
 }
 
+case class ComponentEditorOptions(activePane:Option[String],showNavigation:Option[Boolean], uploadUrl:Option[String], uploadMethod:Option[String]) {
+  def toJson = Json.format[ComponentEditorOptions].writes(this)
+}
+
+object ComponentEditorOptions{
+  def empty = ComponentEditorOptions(None, None, None, None)
+}
+
+case class ComponentEditorTemplateParams(appName:String,
+                                         js : Seq[String],
+                                         css: Seq[String],
+                                         componentNgModules: Seq[String],
+                                         ngServiceLogic:String,
+                                         versionInfo:JsValue,
+                                         options: ComponentEditorOptions
+                                        ) extends TemplateParams {
+  override def toJadeParams = {
+    super.toJadeParams ++ Map(
+      "versionInfo" -> versionInfo,
+      "options" -> Json.stringify(options.toJson)
+    )
+  }
+}
+
 case class EditorTemplateParams(appName: String,
   js: Seq[String],
   css: Seq[String],

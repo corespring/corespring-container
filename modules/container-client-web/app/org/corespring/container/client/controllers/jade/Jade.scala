@@ -71,7 +71,8 @@ trait Jade {
       out
     } catch {
       case jle: JadeLexerException => {
-        logger.error(s"jade error: ${jle.getFilename}, line no: ${jle.getLineNumber}")
+        val line = jle.getTemplateLines.get(jle.getLineNumber)
+        logger.error(s"jade error: ${jle.getFilename}, line no: ${jle.getLineNumber}\n> $line")
         throw jle
       }
       case t: Throwable => throw t
