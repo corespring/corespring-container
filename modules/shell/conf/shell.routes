@@ -9,7 +9,8 @@ GET         /launch/draft-editor/item/:id     @org.corespring.shell.controllers.
 GET         /launch/draft-editor/draft/:id    @org.corespring.shell.controllers.Launchers.draftEditor(id, devEditor : Boolean ?= false)
 GET         /launch/item-editor/item/:id      @org.corespring.shell.controllers.Launchers.itemEditor(id, devEditor : Boolean ?= false)
 GET         /launch/item-editor/new-item      @org.corespring.shell.controllers.Launchers.newItemEditor(devEditor : Boolean ?= false)
-GET         /launch/item-editor/new-single-component-item    @org.corespring.shell.controllers.Launchers.newSingleComponentEditor()
+GET         /launch/component-editor/standalone   @org.corespring.shell.controllers.Launchers.standaloneComponentEditor()
+GET         /launch/component-editor/item     @org.corespring.shell.controllers.Launchers.itemComponentEditor()
 GET         /launch-catalog/:id               @org.corespring.shell.controllers.Launchers.catalog(id)
 GET         /launch-player/item/:itemId       @org.corespring.shell.controllers.Launchers.playerFromItem(itemId)
 

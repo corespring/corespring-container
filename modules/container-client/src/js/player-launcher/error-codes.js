@@ -38,7 +38,8 @@ exports.COMPONENT_EDITOR_WRONG_METHOD = function(allowed, defined){
 
 exports.COMPONENT_EDITOR_MISSING_URL = function(key){
   return {
-    code: 121,
+    code: 122,
     msg: 'No url defined for: ' + key
   };
 };
+exports.LOAD_ITEM_FAILED = function(msg){ return {code: 123, msg: msg};};

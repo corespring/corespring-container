@@ -39,7 +39,7 @@ GET           /collection                                                @org.co
 # Item
 GET           /item/:itemId.json                                         @org.corespring.container.client.controllers.resources.Item.load(itemId)
 POST          /item/create                                               @org.corespring.container.client.controllers.resources.Item.create()
-POST          /item/create-with-single-component                         @org.corespring.container.client.controllers.resources.Item.createWithSingleComponent()
+POST          /item/create/single/:componentType                         @org.corespring.container.client.controllers.resources.Item.createWithSingleComponent(componentType:String)
 POST          /item/:itemId/supporting-material                          @org.corespring.container.client.controllers.resources.Item.createSupportingMaterial(itemId)
 POST          /item/:itemId/supporting-material/upload                   @org.corespring.container.client.controllers.resources.Item.createSupportingMaterialFromFile(itemId)
 DELETE        /item/:itemId/supporting-material/:name                    @org.corespring.container.client.controllers.resources.Item.deleteSupportingMaterial(itemId, name)

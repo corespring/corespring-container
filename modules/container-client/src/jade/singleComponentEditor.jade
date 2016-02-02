@@ -79,7 +79,7 @@ block after-main-script
           'UPLOAD_ENDPOINT',
           function(wiggiWizConfigProvider, 
             UPLOAD_ENDPOINT){
-
+            UPLOAD_ENDPOINT.method = UPLOAD_ENDPOINT.method || 'POST';
             if(UPLOAD_ENDPOINT.url && UPLOAD_ENDPOINT.method){
               wiggiWizConfigProvider.add({
                 imageService: 'ExternalEndpointsImageService'

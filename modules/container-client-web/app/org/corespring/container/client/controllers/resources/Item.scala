@@ -3,6 +3,7 @@ package org.corespring.container.client.controllers.resources
 import org.corespring.container.client.hooks.{ CoreItemHooks, CreateItemHook }
 import org.corespring.container.components.model.{Interaction, Component}
 import play.api.libs.json.{JsObject, JsValue, Json}
+import play.api.libs.json.Json._
 import play.api.mvc.{ Action, _ }
 
 import scala.concurrent.Future
@@ -13,33 +14,21 @@ trait Item extends CoreItem {
 
   def components : Seq[Component]
 
-  def createWithSingleComponent = Action.async { implicit request =>
-    request.body.asJson.map { json =>
-      (json \ "componentType").asOpt[String].map { ct =>
+  def createWithSingleComponent(componentType:String) = Action.async { implicit request =>
 
-        logger.info(s"function=createWithSingleComponent, componentType=$ct")
-        println(s"function=createWithSingleComponent, componentType=$ct")
+    val defaultData = components
+      .find(_.componentType == componentType)
+      .map { case Interaction(_,_,_,_,_,_,_,_,_,defaultData,_,_,_) => defaultData }
+      .map{ case o : JsObject => o }
 
-        val defaultData = components
-          .find(_.componentType == ct)
-          .map { case Interaction(_,_,_,_,_,_,_,_,_,defaultData,_,_,_) => defaultData }
-          .getOrElse(Json.obj("config" -> Json.obj(), "componentType" -> ct))
-          .asInstanceOf[JsObject]
-
-        logger.debug(s"function=createWithSingleComponent, componentType=$ct, defaultData=$defaultData")
-
-        hooks.createSingleComponentItem(ct, defaultData).map { either =>
-          either match {
-            case Left(sm) => toResult(sm)
-            case Right(id) => Ok(Json.obj("itemId" -> id))
-          }
+    defaultData.map{ d =>
+      hooks.createSingleComponentItem(componentType, d).map { either =>
+        either match {
+          case Left(sm) => toResult(sm)
+          case Right(id) => Created(Json.obj("itemId" -> id))
         }
-      }.getOrElse {
-        Future(BadRequest(Json.obj("error" -> "You must specify a 'componentType'")))
       }
-    }.getOrElse {
-      Future(BadRequest(Json.obj("error" -> "No json in request body - must be: { \"componentType\": \"...\"} ")))
-    }
+    }.getOrElse(Future.successful(NotFound(obj("error" -> s"unknown componentType: $componentType"))))
   }
 
   def create = Action.async { implicit request =>

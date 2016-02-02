@@ -6,7 +6,7 @@ function ComponentEditor(element, options, errorCallback) {
   var instance;
 
   function loadConfigPanel(componentType){
-    var call = launcher.loadCall('load', function(u){
+    var call = launcher.loadCall('standaloneEditor', function(u){
       return u.replace(':componentType', componentType);
     });
 
@@ -24,9 +24,7 @@ function ComponentEditor(element, options, errorCallback) {
       showNavigation: options.showNavigation === true || false,
       componentModel: options.data,
       xhtml: options.markup,
-      assets: options.assets,
-      uploadUrl: options.uploadUrl,
-      uploadMethod: options.uploadMethod || 'POST'
+      uploadUrl: options.uploadUrl
     };
 
     instance = launcher.loadInstance(call, options.queryParams, initialData, onReady);

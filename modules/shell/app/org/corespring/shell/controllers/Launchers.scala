@@ -33,8 +33,13 @@ trait Launchers extends Controller {
     Ok(loadItemEditorPage(baseJson(request) ++ Json.obj("devEditor" -> devEditor)))
   }
 
-  def newSingleComponentEditor() = Action { request =>
-    val html = launchers.singleComponentEditor(componentEditorJsUrl, components.map(_.componentType), Json.obj())
+  def standaloneComponentEditor() = Action { request =>
+    val html = launchers.standaloneComponentEditor(componentEditorJsUrl, components.map(_.componentType), Json.obj())
+    Ok(html)
+  }
+
+  def itemComponentEditor() = Action { request =>
+    val html = launchers.itemComponentEditor(componentEditorJsUrl, components.map(_.componentType), Json.obj())
     Ok(html)
   }
 
