@@ -77,5 +77,13 @@ block after-main-script
             click: 'click ng-ui-tooltip-close',
             focus: 'blur ng-ui-tooltip-close'
           });
-        }]);
+        }])
+        .config([
+          'wiggiWizConfigProvider', 
+          function(wiggiWizConfigProvider){
+            wiggiWizConfigProvider.add({
+              imageService: 'ComponentImageService'
+            });
+          }
+        ]);
     })(this);
