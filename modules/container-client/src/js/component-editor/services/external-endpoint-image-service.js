@@ -14,20 +14,13 @@ angular.module('corespring-singleComponentEditor.services')
           var opts = {
             onUploadComplete: function(body, status) {
               $log.info('done: ', body, status);
-              //TODO: Return body
-              var resultObject;
-              if(_.isObject(body)){
-                resultObject = body;
-              } else {
-                try {
-                  resultObject = JSON.parse(body);
-                }
-                catch (e){} 
-              }
+              var resultObject = {};
 
-              if(resultObject.error){
-                onComplete(resultObject.error);
-              } else if(_.isString(resultObject.url)){
+              if(_.isString(body)){
+                resultObject.url = body;
+              } 
+
+              if(_.isString(resultObject.url)){
                 onComplete(null, resultObject.url);
               } else {
                 onComplete('No url provided in response: ' + JSON.stringify(body));
@@ -37,9 +30,9 @@ angular.module('corespring-singleComponentEditor.services')
               $log.info('progress', arguments);
               onProgress(null, progress);
             },
-            onUploadFailed: function() {
+            onUploadFailed: function(err) {
               $log.info('failed', arguments);
-              onComplete('Upload failed for: ' + url);
+              onComplete('Upload failed for: ' + url + ': ' + err);
             }.bind(this)
           };
 
