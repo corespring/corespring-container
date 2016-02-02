@@ -105,6 +105,29 @@ function ItemComponentEditor(element, options, errorCallback) {
     componentEditor = new ComponentEditor(element, editorOpts, errorCallback);  
   }
 
+
+  function saveComponent(id, data, done){
+
+    var key = 'itemEditor.singleComponent.saveComponent';
+    var call = launcher.loadCall(key, function(u){
+      return u.replace(':itemId', id);
+    });
+
+    var componentData = {
+      1: data
+    };
+
+    $.ajax({
+      type: call.method,
+      url: launcher.prepareUrl(call.url),
+      data: JSON.stringify(componentData),
+      contentType: 'application/json',
+      success: done.bind(this, null),
+      error: done,
+      dataType: 'json'
+    });
+  }
+
   var ok = launcher.init();
     
   function onItemLoaded(err, item){
@@ -151,8 +174,13 @@ function ItemComponentEditor(element, options, errorCallback) {
   };
 
   this.save = function(done){
-    //todo...
-    //componentEditor.save(done);
+    componentEditor.getData(function(data){
+      console.log('data: ', data);
+
+      saveComponent(options.itemId, data.result, function(err,saveResult){
+        done({error: err, result: saveResult});
+      });
+    });
   };
   
   this.remove = function() {

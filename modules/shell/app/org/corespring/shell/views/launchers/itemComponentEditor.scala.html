@@ -32,6 +32,10 @@
        console.log(document.location.href);
        console.log('opts: ', opts);
 
+       opts.onItemCreated = function(itemId){
+         console.log('item created: ' + itemId);
+       };
+
        opts.queryParams = {
          loggingEnabled: true
        };
@@ -66,22 +70,10 @@
           });
        });
 
-       $('.set-data').click(function(){
-          var data;
-          try {
-            data = JSON.parse($('.data-text-area').val());
-          } catch (e){
-            console.error('bad json');
-            return;
-          }
-
-          if(editor){
-            editor.setData(data, function(result){
-              console.log('data set...');
-            });
-          } else {
-            opts.data = data;
-          }
+       $('.save').click(function(){
+          editor.save(function(result){
+            console.log('>> save: ', result);
+          });
        });
 
        $('.create').click(function(){
@@ -108,7 +100,7 @@
     <label>External controls: </label>
     |
     <button class="btn btn-sm btn-primary get-data">Get Data</button>
-    <button class="btn btn-sm btn-success set-data">Set Data</button>
+    <button class="btn btn-sm btn-success save">Save</button>
     |
     <span>
       Tab:

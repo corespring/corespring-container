@@ -163,7 +163,8 @@ private[launcher] case class ComponentEditor(corespringUrl:String, load:String=>
         "singleComponent" -> obj(
           "createWithSingleComponent" -> resourceRoutes.Item.createWithSingleComponent(":componentType"),
           "loadData" -> resourceRoutes.Item.load(":itemId"),
-          "upload" -> appRoutes.ItemEditor.uploadFile(":itemId", ":filename")
+          "upload" -> appRoutes.ItemEditor.uploadFile(":itemId", ":filename"),
+          "saveComponent" -> resourceRoutes.Item.saveSubset(":itemId", "components")
         )
       )
     )
