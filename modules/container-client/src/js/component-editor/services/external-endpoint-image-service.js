@@ -15,7 +15,23 @@ angular.module('corespring-singleComponentEditor.services')
             onUploadComplete: function(body, status) {
               $log.info('done: ', body, status);
               //TODO: Return body
-              onComplete(null, body);
+              var resultObject;
+              if(_.isObject(body)){
+                resultObject = body;
+              } else {
+                try {
+                  resultObject = JSON.parse(body);
+                }
+                catch (e){} 
+              }
+
+              if(resultObject.error){
+                onComplete(resultObject.error);
+              } else if(_.isString(resultObject.url)){
+                onComplete(null, resultObject.url);
+              } else {
+                onComplete('No url provided in response: ' + JSON.stringify(body));
+              }
             },
             onUploadProgress: function(progress) {
               $log.info('progress', arguments);
