@@ -54,7 +54,8 @@ trait Main
             val draftName = id.get("name").asInstanceOf[String]
             val draftId = s"$itemId~$draftName"
             val editDraftUrl = Launchers.draftEditor(draftId).url
-            DraftLink(draftName, editDraftUrl, routes.Main.deleteDraft(draftId).url)
+            val componentEditUrl = Launchers.draftComponentEditor(Some(itemId.toString), Some(draftName)).url
+            DraftLink(draftName, editDraftUrl, componentEditUrl, routes.Main.deleteDraft(draftId).url)
           }.toSeq
 
           import org.corespring.container.client.controllers.apps.{routes => appRoutes}
@@ -64,10 +65,16 @@ trait Main
           val draftEditorUrl = Launchers.draftEditorFromItem(id).url
           val itemEditorUrl = Launchers.itemEditor(id).url
           val catalogUrl = Launchers.catalog(id).url
+
+          val itemComponentEditorUrl = Launchers.itemComponentEditor(Some(id)).url
+          val draftComponentEditorUrl = Launchers.draftComponentEditor(Some(id)).url
+
           IndexLink(name,
             playerUrl,
             draftEditorUrl,
             itemEditorUrl,
+            itemComponentEditorUrl,
+            draftComponentEditorUrl,
             draftUrls,
             deleteUrl,
             catalogUrl)

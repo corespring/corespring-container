@@ -24,6 +24,21 @@ trait ItemDraft extends CoreItem with ComponentSplitter{
 
   def components : Seq[Component]
 
+
+//  override def load(id:String) : Action[AnyContent] = Action.async{ implicit request =>
+//    hooks.load(id).map{ e =>
+//
+//      e match {
+//        case Left(sm) => {
+//          hooks.createDraft(id)
+//        }
+//        case Right(json) => json
+//      }
+//
+//    }
+//    Future.successful(Ok(""))
+//  }
+
   def createItemAndDraft = Action.async {
     implicit request =>
       hooks.createItemAndDraft.map { either =>

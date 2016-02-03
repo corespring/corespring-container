@@ -111,7 +111,9 @@ function DraftComponentEditor(element, options, errorCallback) {
     var initialData = {
       activePane: options.activePane || 'config',
       showNavigation: options.showNavigation === true || false,
-      uploadUrl: uploadUrl 
+      uploadUrl: uploadUrl,
+      xhtml: item.xhtml,
+      componentModel: item.components['1']
     };
 
     instance = launcher.loadInstance(call, options.queryParams, initialData, onReady);

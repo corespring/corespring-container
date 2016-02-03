@@ -176,7 +176,7 @@ trait ItemHooks
       "components" -> Json.obj("1" -> Json.obj("componentType" -> componentType).deepMerge(defaultData)),
       "profile" -> Json.obj("taskInfo" -> Json.obj("title" -> "Untitled")),
       "metadata" -> Json.obj(),
-      "xhtml" -> s"<div><$componentType id='1'></$componentType></div>")
+      "xhtml" -> s"<div><div $componentType='' id='1'></div></div>")
 
     itemService.create(newItem).map {
       oid =>

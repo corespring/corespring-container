@@ -151,7 +151,7 @@ angular.module('corespring-singleComponentEditor.controllers')
           logger.log('on initialise', data);
           
           var initialData = { 
-            xhtml: '<div><'+ componentType + ' id="1"></'+ componentType +'></div>',
+            xhtml: '<div><div '+ componentType + '="" id="1"></div></div>',
             components: { 
               '1': ComponentDefaultData.getDefaultData(COMPONENT_EDITOR.componentType)
             }

@@ -1,4 +1,5 @@
 @(componentEditorJs:String, types: Seq[String], opts : play.api.libs.json.JsValue)
+
 <html>
 <head>
   <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"/>
@@ -40,6 +41,7 @@
          loggingEnabled: true
        };
 
+
        $('input[name="tab"]').change(function(){
          var tab = $('input[name="tab"]').groupVal();
 
@@ -76,24 +78,32 @@
           });
        });
 
-       $('.create').click(function(){
-         var t = $('.component-type').find(":selected").val();
-         opts.componentType = t;
+       if(opts.itemId){
          editor = new org.corespring.players.ItemComponentEditor(holder, opts, function(err){
            console.warn(err);
          });
-       });
+       } else {
+         $('.create').click(function(){
+           var t = $('.component-type').find(":selected").val();
+           opts.componentType = t;
+           editor = new org.corespring.players.ItemComponentEditor(holder, opts, function(err){
+             console.warn(err);
+           });
+         });
+       }
      });
     </script>
 
 <div class="container">
 
-  <div class="navbar nav">
-    <select class="form-control component-type" style="float:left; width: 200px;" prompt="choose a component type...">
-      @types.map{ t => <option name="@t">@t</option> }
-    </select>
-    <button class="btn btn-primary create">Create</button>
-  </div>
+  @if( (opts \ "itemId").asOpt[String].isEmpty ){
+    <div class="navbar nav">
+      <select class="form-control component-type" style="float:left; width: 200px;" prompt="choose a component type...">
+        @types.map{ t => <option name="@t">@t</option> }
+      </select>
+      <button class="btn btn-primary create">Create</button>
+    </div>
+    }
 
   <div class="external-controls navbar nav">
 

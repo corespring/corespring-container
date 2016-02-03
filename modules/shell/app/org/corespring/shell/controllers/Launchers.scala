@@ -38,13 +38,17 @@ trait Launchers extends Controller {
     Ok(html)
   }
 
-  def itemComponentEditor() = Action { request =>
-    val html = launchers.itemComponentEditor(componentEditorJsUrl, components.map(_.componentType), Json.obj())
+  def itemComponentEditor(itemId: Option[String] = None) = Action { request =>
+    val opts = itemId.map{ i => Json.obj("itemId" -> i)}.getOrElse(Json.obj())
+    val html = launchers.itemComponentEditor(componentEditorJsUrl, components.map(_.componentType), opts)
     Ok(html)
   }
 
-  def draftComponentEditor() = Action { request =>
-    val html = launchers.draftComponentEditor(componentEditorJsUrl, components.map(_.componentType), Json.obj())
+  def draftComponentEditor(itemId : Option[String], draftName : Option[String] = None) = Action { request =>
+    val itemIdOpts = itemId.map{ i => Json.obj("itemId" -> i)}.getOrElse(Json.obj())
+    val draftNameOpts = itemId.map{ i => Json.obj("draftName" -> i)}.getOrElse(Json.obj())
+    val opts = itemIdOpts.deepMerge(draftNameOpts)
+    val html = launchers.draftComponentEditor(componentEditorJsUrl, components.map(_.componentType), opts)
     Ok(html)
   }
 

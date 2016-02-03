@@ -188,11 +188,24 @@ trait ItemDraftHooks
     out
   }
 
+  /**
+    * If the draft isn't found create it.
+    * @param draftId
+    * @param header
+    * @return
+    */
   override def load(draftId: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]] = {
     Future {
       draftItemService.load(draftId).map { json =>
         Right(json \ "item")
-      }.getOrElse(Left(NOT_FOUND -> s"draftId: $draftId"))
+      }.getOrElse{
+        val itemId = draftId.split("~")(0)
+        (for{
+          item <- itemService.load(itemId)
+          tuple <- draftItemService.createDraft(new ObjectId(itemId), None, item)
+          json <- draftItemService.load(s"${tuple._1}~${tuple._2}")
+        } yield Right(json \ "item")).getOrElse(Left(BAD_REQUEST -> "Can't create draft"))
+      }
     }
   }
 
@@ -264,7 +277,7 @@ trait ItemDraftHooks
   }
 
   override def createSingleComponentItemDraft(componentType: String, defaultData: JsObject)(implicit r: RequestHeader): R[(String, String)] = Future {
-    val xhtml = s"<div><$componentType id='1'></$componentType></div>"
+    val xhtml = s"<div><div $componentType='' id='1'></div></div>"
     val components = Json.obj("1" -> defaultData)
     create(xhtml, components)
   }

@@ -43,3 +43,4 @@ exports.COMPONENT_EDITOR_MISSING_URL = function(key){
   };
 };
 exports.LOAD_ITEM_FAILED = function(msg){ return {code: 123, msg: msg};};
+exports.LOAD_DRAFT_FAILED = function(msg){ return {code: 124, msg: msg};};
