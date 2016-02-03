@@ -285,6 +285,8 @@ trait DefaultIntegration
 
   lazy val itemDraft = new ItemDraft {
 
+    override def components: Seq[Component] = DefaultIntegration.this.components
+
     override def materialHooks: SupportingMaterialHooks = DefaultIntegration.this.itemDraftSupportingMaterialHooks
 
     def scoreProcessor: ScoreProcessor = DefaultIntegration.this.scoreProcessor

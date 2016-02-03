@@ -145,26 +145,45 @@ private[launcher] object ComponentEditor extends LaunchCompanionUtils{
 
 private[launcher] case class ComponentEditor(corespringUrl:String, load:String=>Option[String], queryParams: Map[String,String]) extends CorespringJsClient {
 
-  override val fileNames = Seq("component-editor.js", "item-component-editor.js")
+  override val fileNames = Seq(
+    "component-editor.js",
+    "item-component-editor.js",
+    "draft-component-editor.js"
+  )
+
   override val bootstrap =
     """
       |org.corespring.players.ComponentEditor = corespring.require('component-editor');
       |org.corespring.players.ItemComponentEditor = corespring.require('item-component-editor');
+      |org.corespring.players.DraftComponentEditor = corespring.require('draft-component-editor');
     """.stripMargin
 
-  import org.corespring.container.client.controllers.apps.routes.{ComponentEditor => Routes}
-  import org.corespring.container.client.controllers.apps.{routes=>appRoutes}//.{ItemDevEditor => ItemDevEditorRoutes, ItemEditor => ItemEditorRoutes}
-  import org.corespring.container.client.controllers.resources.{routes=>resourceRoutes} //.{Item => ItemRoutes, ItemDraft => ItemDraftRoutes}
+  private object r {
+    import org.corespring.container.client.controllers.{apps, resources}
+    val componentEditor = apps.routes.ComponentEditor
+    val itemEditor = apps.routes.ItemEditor
+    val draftEditor = apps.routes.DraftEditor
+    val item = resources.routes.Item
+    val draft = resources.routes.ItemDraft
+  }
 
   override lazy val options: JsObject = obj(
     "paths" -> obj(
-      "standaloneEditor" -> Routes.load(":componentType"),
+      "standaloneEditor" -> r.componentEditor.load(":componentType"),
       "itemEditor" -> obj(
         "singleComponent" -> obj(
-          "createWithSingleComponent" -> resourceRoutes.Item.createWithSingleComponent(":componentType"),
-          "loadData" -> resourceRoutes.Item.load(":itemId"),
-          "upload" -> appRoutes.ItemEditor.uploadFile(":itemId", ":filename"),
-          "saveComponent" -> resourceRoutes.Item.saveSubset(":itemId", "components")
+          "createWithSingleComponent" -> r.item.createWithSingleComponent(":componentType"),
+          "loadData" -> r.item.load(":itemId"),
+          "upload" -> r.itemEditor.uploadFile(":itemId", ":filename"),
+          "saveComponents" -> r.item.saveSubset(":itemId", "components")
+        )
+      ),
+      "draftEditor" -> obj(
+        "singleComponent" -> obj(
+          "createWithSingleComponent" -> r.draft.createWithSingleComponent(":componentType"),
+          "loadData" -> r.draft.load(":draftId"),
+          "upload" -> r.draftEditor.uploadFile(":draftId", ":filename"),
+          "saveComponents" -> r.draft.saveSubset(":draftId", "components")
         )
       )
     )

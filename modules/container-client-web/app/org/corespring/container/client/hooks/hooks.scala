@@ -87,6 +87,7 @@ trait CoreItemHooks extends HasContainerContext with LoadHook {
 trait DraftHooks {
   def save(draftId: String, json: JsValue)(implicit request: RequestHeader): R[JsValue]
   def createItemAndDraft()(implicit h: RequestHeader): R[(String, String)]
+  def createSingleComponentItemDraft(componentType:String, defaultData: JsObject)(implicit r : RequestHeader) : R[(String,String)]
   def commit(id: String, force: Boolean)(implicit h: RequestHeader): R[JsValue]
 }
 

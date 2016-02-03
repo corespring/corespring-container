@@ -43,6 +43,11 @@ trait Launchers extends Controller {
     Ok(html)
   }
 
+  def draftComponentEditor() = Action { request =>
+    val html = launchers.draftComponentEditor(componentEditorJsUrl, components.map(_.componentType), Json.obj())
+    Ok(html)
+  }
+
   def playerFromItem(itemId: String) = Action { request =>
     val jsCall = PlayerLauncher.playerJs()
     Ok(loadPlayerPage(Json.obj("mode" -> "gather", "itemId" -> itemId, "queryParams" -> queryStringToJson(request)), jsCall.url))

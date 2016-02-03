@@ -51,6 +51,7 @@ PUT           /item/update/:subset/:itemId.json                          @org.co
 
 # ItemDraft
 POST          /draft/create-item-and-draft                               @org.corespring.container.client.controllers.resources.ItemDraft.createItemAndDraft()
+POST          /draft/create-item-and-draft/single/:componentType         @org.corespring.container.client.controllers.resources.ItemDraft.createWithSingleComponent(componentType:String)
 POST          /draft/:draftId/supporting-material                        @org.corespring.container.client.controllers.resources.ItemDraft.createSupportingMaterial(draftId)
 POST          /draft/:draftId/supporting-material/upload                 @org.corespring.container.client.controllers.resources.ItemDraft.createSupportingMaterialFromFile(draftId)
 DELETE        /draft/:draftId/supporting-material/:name                  @org.corespring.container.client.controllers.resources.ItemDraft.deleteSupportingMaterial(draftId, name)
@@ -74,6 +75,7 @@ GET           /catalog/:itemId/index.html                                @org.co
 GET           /catalog/:itemId/*file                                     @org.corespring.container.client.controllers.apps.Catalog.getFile(itemId, file)
 
 # Draft Editor: config, components
+GET           /draft/editor/:draftId/component-editor.html               @org.corespring.container.client.controllers.apps.DraftEditor.componentEditor(draftId)
 GET           /draft/editor/:draftId/index.html                          @org.corespring.container.client.controllers.apps.DraftEditor.load(draftId)
 GET           /draft/editor/:draftId/*file                               @org.corespring.container.client.controllers.apps.DraftEditor.getFile(draftId, file)
 POST          /draft/editor/:draftId/*file                               @org.corespring.container.client.controllers.apps.DraftEditor.uploadFile(draftId, file)
@@ -86,6 +88,7 @@ DELETE        /draft/dev-editor/:draftId/*file                           @org.co
 POST          /component/editor/:componentType/index.html                @org.corespring.container.client.controllers.apps.ComponentEditor.load(componentType)
 
 # Item Editor: config, components
+GET           /item/editor/:itemId/component-editor.html                @org.corespring.container.client.controllers.apps.ItemEditor.componentEditor(itemId)
 GET           /item/editor/:itemId/index.html                           @org.corespring.container.client.controllers.apps.ItemEditor.load(itemId)
 GET           /item/editor/:itemId/*file                                @org.corespring.container.client.controllers.apps.ItemEditor.getFile(itemId, file)
 POST          /item/editor/:itemId/*file                                @org.corespring.container.client.controllers.apps.ItemEditor.uploadFile(itemId, file)

@@ -1,15 +1,14 @@
-function ItemComponentEditor(element, options, errorCallback) {
+function DraftComponentEditor(element, options, errorCallback) {
 
   var Launcher = require('client-launcher');
   var launcher = new Launcher(element, options, errorCallback, options.autosizeEnabled);
   var errorCodes = require('error-codes');
+  var DraftId = require('draft-id');
+  var instance;
   
-  var ComponentEditor = require('component-editor');
-  var componentEditor;
+  function createItemAndDraft(componentType, callback){
 
-  function createItem(componentType, callback){
-
-    var key = 'itemEditor.singleComponent.createWithSingleComponent';
+    var key = 'draftEditor.singleComponent.createWithSingleComponent';
 
     var call = launcher.loadCall(key, function(u){
       return u.replace(':componentType', componentType);
@@ -49,16 +48,16 @@ function ItemComponentEditor(element, options, errorCallback) {
     });
   }
 
-  function loadItemData(itemId, callback) {
+  function loadDraftData(draftId, callback) {
 
-    if (!itemId) {
-      throw new Error('invalid itemId');
+    if (!draftId) {
+      throw new Error('invalid draftId');
     }
 
-    var callKey = 'itemEditor.singleComponent.loadData';
+    var callKey = 'draftEditor.singleComponent.loadData';
 
     var call = launcher.loadCall(callKey, function(u){
-      return u.replace(':itemId', itemId);
+      return u.replace(':draftId', draftId);
     });
 
     if (!call) {
@@ -69,7 +68,7 @@ function ItemComponentEditor(element, options, errorCallback) {
     function onError(xhrErr){
       var msg = (xhrErr.responseJSON && xhrErr.responseJSON.error) ?
         xhrErr.responseJSON.error :
-       'Failed to load item.';
+       'Failed load draft.';
       callback(msg);
     }
 
@@ -92,25 +91,46 @@ function ItemComponentEditor(element, options, errorCallback) {
       }
     }
 
-    var uploadUrl = launcher.loadCall('itemEditor.singleComponent.upload', function(u){
-      return u.replace(':itemId', item.itemId);
+    var uploadUrl = launcher.loadCall('draftEditor.singleComponent.upload', function(u){
+      return u.replace(':draftId', options.draftId);
     }).url;
 
-    var editorOpts = {
-      componentType: comp.componentType,
-      componentModel: comp,
-      xhtml: item.xhtml,
-      uploadUrl: uploadUrl 
+    // var editorOpts = {
+    //   componentType: comp.componentType,
+    //   componentModel: comp,
+    //   xhtml: item.xhtml,
+    //   uploadUrl: uploadUrl 
+    // };
+
+    ////
+     var call = launcher.loadCall('draftEditor.singleComponent.load', function(u){
+      return u.replace(':draftId', options.draftId);
+    });
+
+    if(!call){
+      errorCallback('???');
+      return;
+    }
+
+    function onReady(instance){
+      // console.log('onReady...', instance); 
+    }
+
+    var initialData = {
+      activePane: options.activePane || 'config',
+      showNavigation: options.showNavigation === true || false,
+      uploadUrl: options.uploadUrl
     };
-    componentEditor = new ComponentEditor(element, editorOpts, errorCallback);  
+
+    instance = launcher.loadInstance(call, options.queryParams, initialData, onReady);
   }
 
 
-  function saveComponent(id, data, done){
+  function saveComponent(draftId, data, done){
 
-    var key = 'itemEditor.singleComponent.saveComponents';
+    var key = 'draftEditor.singleComponent.saveComponents';
     var call = launcher.loadCall(key, function(u){
-      return u.replace(':itemId', id);
+      return u.replace(':draftId', draftId);
     });
 
     var componentData = {
@@ -130,32 +150,35 @@ function ItemComponentEditor(element, options, errorCallback) {
 
   var ok = launcher.init();
     
-  function onItemLoaded(err, item){
+  function onDraftLoaded(err, draft){
     if(err){
-      errorCallback(errorCodes.LOAD_ITEM_FAILED(err));
+      errorCallback(errorCodes.LOAD_DRAFT_FAILED(err));
     } else { 
-      launchComponentEditor(item);
+      launchComponentEditor(draft);
     }
   }
 
   if(ok){
 
     if (options.itemId) {
-      loadItemData(options.itemId, onItemLoaded);
+      options.draftName = options.draftName || msgr.utils.getUid(); //jshint ignore:line
+      options.draftId = new DraftId(options.itemId, options.draftName);
+      loadDraftData(options.draftId.toString(), onDraftLoaded);
     } else {
-      createItem(options.componentType, function(err, result){
+      createItemAndDraft(options.componentType, function(err, result){
         if(err){
-          errorCallback(errorCodes.CREATE_ITEM_FAILED(err));
+          errorCallback(errorCodes.CREATE_DRAFT_FAILED(err));
         } else {
           options.itemId = result.itemId;
-          loadItemData(options.itemId, onItemLoaded);
+          options.draftName = result.draftName;
+          options.draftId = new DraftId(options.itemId, options.draftName);
+          loadDraftData(options.draftId.toString(), onDraftLoaded);
         }
       });
     }
   } else {
     return;
   }
-
 
   this.showNavigation = function(show){
     componentEditor.showNavigation(show);
@@ -175,9 +198,7 @@ function ItemComponentEditor(element, options, errorCallback) {
 
   this.save = function(done){
     componentEditor.getData(function(data){
-      console.log('data: ', data);
-
-      saveComponent(options.itemId, data.result, function(err,saveResult){
+      saveComponent(options.draftId, data.result, function(err,saveResult){
         done({error: err, result: saveResult});
       });
     });
@@ -188,4 +209,4 @@ function ItemComponentEditor(element, options, errorCallback) {
   };
 }
 
-module.exports = ItemComponentEditor;
+module.exports = DraftComponentEditor;

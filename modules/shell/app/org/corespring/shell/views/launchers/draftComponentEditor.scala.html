@@ -1,0 +1,134 @@
+@(componentEditorJs:String, types: Seq[String], opts : play.api.libs.json.JsValue)
+<html>
+<head>
+  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"/>
+  <style type="text/css">
+    body {
+    margin: 0;
+    }
+  </style>
+</head>
+<body>
+<script type="text/javascript" src="//code.jquery.com/jquery-2.1.3.min.js"></script>
+<script type="text/javascript" src="@componentEditorJs"></script>
+<script type="text/javascript">
+
+     jQuery.fn.extend({
+       groupVal: function() {
+         return $(this).filter(':checked').val();
+       }
+     });
+
+     document.addEventListener('DOMContentLoaded', function(){
+       var editor;
+       var holder = document.querySelector('.holder');
+       var opts = @{Html(play.api.libs.json.Json.stringify(opts))};
+
+       opts.showNavigation = false;
+       opts.activePane = 'config';
+
+       $('input[value="config"]').prop('checked', true);
+
+       console.log(document.location.href);
+       console.log('opts: ', opts);
+
+       opts.onItemCreated = function(itemId){
+         console.log('item created: ' + itemId);
+       };
+
+       opts.queryParams = {
+         loggingEnabled: true
+       };
+
+       $('input[name="tab"]').change(function(){
+         var tab = $('input[name="tab"]').groupVal();
+
+         if(editor){
+           editor.showPane(tab, function(result){
+              if(result.error){
+                alert(result.error);
+              }
+           });
+         } else {
+           opts.activePane = tab;
+         }
+       });
+
+       $('.show-tabs-checkbox').change(function() {
+         if(editor){
+           editor.showNavigation(this.checked);
+         } else {
+           opts.showNavigation = this.checked;
+         }
+         });
+
+       $('.get-data').click(function(){
+          editor.getData(function(result){
+            var data = result.result;
+            var jsonString = JSON.stringify(result.result, null, '  ');
+            $('.data-text-area').val(jsonString);
+          });
+       });
+
+       $('.save').click(function(){
+          editor.save(function(result){
+            console.log('>> save: ', result);
+          });
+       });
+
+       $('.commit').click(function(){
+          editor.commit(false, function(result){
+            console.log('>> commit: ', result);
+          });
+       });
+
+       $('.create').click(function(){
+         var t = $('.component-type').find(":selected").val();
+         opts.componentType = t;
+         editor = new org.corespring.players.DraftComponentEditor(holder, opts, function(err){
+           console.warn(err);
+         });
+       });
+     });
+    </script>
+
+<div class="container">
+
+  <div class="navbar nav">
+    <select class="form-control component-type" style="float:left; width: 200px;" prompt="choose a component type...">
+      @types.map{ t => <option name="@t">@t</option> }
+    </select>
+    <button class="btn btn-primary create">Create</button>
+  </div>
+
+  <div class="external-controls navbar nav">
+
+    <label>External controls: </label>
+    |
+    <button class="btn btn-sm btn-primary get-data">Get Data</button>
+    <button class="btn btn-sm btn-success save">Save</button>
+    <button class="btn btn-sm btn-success commit">Commit</button>
+    |
+    <span>
+      Tab:
+      <label class="radio-inline">
+        <input type="radio" name="tab" id="inlineRadio1" value="config"> Config
+      </label>
+      <label class="radio-inline">
+        <input type="radio" name="tab" id="inlineRadio2" value="preview"> Preview
+      </label>
+    </span>
+    |
+    <span>
+      <label class="checkbox-inline">
+        <input class="show-tabs-checkbox" type="checkbox" name="showTabs" value="true"> Show Tabs
+      </label>
+    </span>
+    <hr/>
+    <textarea class="data-text-area form-control" style="height: 100px;"></textarea>
+  </div>
+  <hr/>
+  <div class="holder" style="height:100%; width: 100%;"></div>
+</div>
+</body>
+</html>

@@ -7,14 +7,14 @@ import play.api.templates.TxtFormat
 private[launcher] class JsBuilder(corespringUrl: String, val load : String => Option[String]) extends JsResource{
 
   lazy val coreJs: String = {
-    val corePaths = Seq(
-      "container-client/bower_components/msgr.js/dist/msgr.js",
-      "container-client/js/player-launcher/logger.js",
-      "container-client/js/player-launcher/error-codes.js",
-      "container-client/js/player-launcher/instance.js",
-      "container-client/js/player-launcher/client-launcher.js",
-      "container-client/js/player-launcher/url-builder.js",
-      "container-client/js/player-launcher/object-id.js")
+
+    def lib(n:String) = s"container-client/js/player-launcher/$n.js"
+
+    val corePaths = {
+      Some("container-client/bower_components/msgr.js/dist/msgr.js") ++
+      Seq("logger", "error-codes", "instance", "client-launcher", "url-builder", "object-id", "draft-id").map(lib)
+    }
+
     val rawJs = pathToNameAndContents("container-client/js/corespring/core-library.js")._2
     val wrapped = corePaths.map(pathToNameAndContents).map(t => ServerLibraryWrapper(t._1, t._2))
     val bootstrap =

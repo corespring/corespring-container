@@ -260,8 +260,18 @@ trait ItemDraftHooks
   }
 
   override def createItemAndDraft()(implicit h: RequestHeader): R[(String, String)] = Future {
+    create("", Json.obj())
+  }
+
+  override def createSingleComponentItemDraft(componentType: String, defaultData: JsObject)(implicit r: RequestHeader): R[(String, String)] = Future {
+    val xhtml = s"<div><$componentType id='1'></$componentType></div>"
+    val components = Json.obj("1" -> defaultData)
+    create(xhtml, components)
+  }
+
+  private def create(xhtml:String, components: JsObject) = {
     val out = for {
-      item <- Some(Json.obj("dateModified" -> DateTime.now, "xhtml" -> "", "components" -> Json.obj()))
+      item <- Some(Json.obj("dateModified" -> DateTime.now, "xhtml" -> xhtml, "components" -> components))
       itemId <- itemService.create(item)
       tuple <- draftItemService.createDraft(itemId, None, item)
       draftName <- Some(tuple._2)
@@ -273,6 +283,5 @@ trait ItemDraftHooks
       case Some(tuple) => Right(tuple)
     }
   }
-
 }
 

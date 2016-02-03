@@ -3,6 +3,7 @@ function EditorDefinition(element, options, errorCallback) {
   var Launcher = require('client-launcher');
   var launcher = new Launcher(element, options, errorCallback, options.autosizeEnabled);
   var errorCodes = require('error-codes');
+  var DraftId = require('draft-id');
   var instance;
 
   function createItemAndDraft(callback) {
@@ -102,7 +103,6 @@ function EditorDefinition(element, options, errorCallback) {
         options.onDraftLoaded(options.itemId, options.draftName);
       }
     }
-
   }
 
   var ok = launcher.init();
@@ -132,12 +132,7 @@ function EditorDefinition(element, options, errorCallback) {
     return;
   }
 
-  function DraftId(itemId, name) {
-    this.toString = function() {
-      return itemId + '~' + name;
-    };
-  }
-
+  
   /** Public functions */
   this.forceSave = function(callback) {
     instance.send('saveAll', function(err, data) {

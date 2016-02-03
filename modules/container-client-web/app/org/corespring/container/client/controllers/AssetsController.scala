@@ -40,7 +40,7 @@ trait AssetsController[H <: AssetHooks] extends GetAsset[H] {
 
   def uploadFile(id: String, path: String) = Action.async(hooks.upload(id, path)(acceptableType)) { request =>
     request.body.map { r =>
-      Ok(request.path)
+      Ok(path)
     }
   }
 
