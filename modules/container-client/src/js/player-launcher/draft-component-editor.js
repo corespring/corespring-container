@@ -173,7 +173,6 @@ function DraftComponentEditor(element, options, errorCallback) {
   }
 
   var callbackUtils = require('callback-utils');
-
   var instanceCallbackHandler = callbackUtils.instanceCallbackHandler;
 
   this.showNavigation = function(show){
@@ -184,16 +183,16 @@ function DraftComponentEditor(element, options, errorCallback) {
     instance.send('showPane', pane, instanceCallbackHandler(done));
   };
 
-  this.getData = function(done){
-    instance.send('getData', instanceCallbackHandler(done));
-  };
-
   this.save = function(done){
     instance.send('getData', function(err, data){
       saveComponent(options.draftId, data, function(err,saveResult){
         done({error: err, result: saveResult});
       });
     });
+  };
+
+  this.commit = function(done){
+    done({error: 'todo'});
   };
   
   this.remove = function() {

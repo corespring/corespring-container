@@ -3,9 +3,8 @@ function ItemComponentEditor(element, options, errorCallback) {
   var Launcher = require('client-launcher');
   var launcher = new Launcher(element, options, errorCallback, options.autosizeEnabled);
   var errorCodes = require('error-codes');
-  
-  var ComponentEditor = require('component-editor');
-  var componentEditor;
+  var callbackUtils = require('callback-utils');
+  var instance;
 
   function createItem(componentType, callback){
 
@@ -93,16 +92,29 @@ function ItemComponentEditor(element, options, errorCallback) {
     }
 
     var uploadUrl = launcher.loadCall('itemEditor.singleComponent.upload', function(u){
-      return u.replace(':itemId', item.itemId);
+      return u.replace(':itemId', options.itemId);
     }).url;
 
-    var editorOpts = {
-      componentType: comp.componentType,
-      componentModel: comp,
-      xhtml: item.xhtml,
+    var call = launcher.loadCall('itemEditor.singleComponent.loadEditor', function(u){
+      return u.replace(':itemId', options.itemId);
+    });
+
+    if(!call){
+      errorCallback('???');
+      return;
+    }
+
+    function onReady(instance){
+      // console.log('onReady...', instance); 
+    }
+
+    var initialData = {
+      activePane: options.activePane || 'config',
+      showNavigation: options.showNavigation === true || false,
       uploadUrl: uploadUrl 
     };
-    componentEditor = new ComponentEditor(element, editorOpts, errorCallback);  
+
+    instance = launcher.loadInstance(call, options.queryParams, initialData, onReady);
   }
 
 
@@ -156,35 +168,26 @@ function ItemComponentEditor(element, options, errorCallback) {
     return;
   }
 
+  var instanceCallbackHandler = callbackUtils.instanceCallbackHandler;
 
   this.showNavigation = function(show){
-    componentEditor.showNavigation(show);
-  };
-
-  this.previewEnabled = function(enabled){
-    componentEditor.previewEnabled(enabled);
+    instance.send('showNavigation', show);
   };
 
   this.showPane = function(pane, done){
-    componentEditor.showPane(pane, done);
-  };
-
-  this.getData = function(done){
-    componentEditor.getData(done);
+    instance.send('showPane', pane, instanceCallbackHandler(done));
   };
 
   this.save = function(done){
-    componentEditor.getData(function(data){
-      console.log('data: ', data);
-
-      saveComponent(options.itemId, data.result, function(err,saveResult){
+    instance.send('getData', function(err, data){
+      saveComponent(options.itemId, data, function(err,saveResult){
         done({error: err, result: saveResult});
       });
     });
   };
-  
+
   this.remove = function() {
-    componentEditor.remove();
+    instance.remove();
   };
 }
 
