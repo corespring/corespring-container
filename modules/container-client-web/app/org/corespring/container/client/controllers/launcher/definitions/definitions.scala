@@ -174,6 +174,7 @@ private[launcher] case class ComponentEditor(corespringUrl:String, load:String=>
         "singleComponent" -> obj(
           "createWithSingleComponent" -> r.item.createWithSingleComponent(":componentType"),
           "loadData" -> r.item.load(":itemId"),
+          "loadEditor" -> r.itemEditor.componentEditor(":itemId"),
           "upload" -> r.itemEditor.uploadFile(":itemId", ":filename"),
           "saveComponents" -> r.item.saveSubset(":itemId", "components")
         )
@@ -182,6 +183,7 @@ private[launcher] case class ComponentEditor(corespringUrl:String, load:String=>
         "singleComponent" -> obj(
           "createWithSingleComponent" -> r.draft.createWithSingleComponent(":componentType"),
           "loadData" -> r.draft.load(":draftId"),
+          "loadEditor" -> r.draftEditor.componentEditor(":draftId"),
           "upload" -> r.draftEditor.uploadFile(":draftId", ":filename"),
           "saveComponents" -> r.draft.saveSubset(":draftId", "components")
         )

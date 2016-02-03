@@ -12,7 +12,7 @@ private[launcher] class JsBuilder(corespringUrl: String, val load : String => Op
 
     val corePaths = {
       Some("container-client/bower_components/msgr.js/dist/msgr.js") ++
-      Seq("logger", "error-codes", "instance", "client-launcher", "url-builder", "object-id", "draft-id").map(lib)
+      Seq("logger", "callback-utils", "error-codes", "instance", "client-launcher", "url-builder", "object-id", "draft-id").map(lib)
     }
 
     val rawJs = pathToNameAndContents("container-client/js/corespring/core-library.js")._2

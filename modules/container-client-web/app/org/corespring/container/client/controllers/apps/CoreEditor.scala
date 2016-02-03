@@ -10,7 +10,10 @@ import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.components.model.ComponentInfo
 import play.api.libs.json._
 import play.api.mvc._
+import play.api.templates.Html
 import v2Player.Routes
+
+import scala.concurrent.Future
 
 object StaticPaths {
   val assetUrl = Routes.prefix + "/images"
@@ -24,6 +27,7 @@ object StaticPaths {
 
 trait CoreEditor
   extends AllItemTypesReader
+  with ComponentEditorLaunching
   with App[EditorHooks]
   with JsonHelper
   with Jade
@@ -64,21 +68,23 @@ trait CoreEditor
 
   def servicesJs(id: String, components: JsArray, widgets: JsArray): String
 
+
+  private def onError(sm: StatusMessage)(implicit rh : RequestHeader) = {
+    import org.corespring.container.client.views.html.error
+    val (code, msg) = sm
+    code match {
+      case SEE_OTHER => SeeOther(msg)
+      case _ => Status(code)(error.main(code, msg, showErrorInUi))
+    }
+  }
+
   private def loadItem(appContext: AppContext,
                        componentsJson: JsArray,
                        widgetsJson: JsArray,
                        loadComponentTypes: JsValue => Seq[String],
                        servicesJsSrc:String)(id: String): Action[AnyContent] = Action.async { implicit request =>
 
-    import org.corespring.container.client.views.html.error
 
-    def onError(sm: StatusMessage) = {
-      val (code, msg) = sm
-      code match {
-        case SEE_OTHER => SeeOther(msg)
-        case _ => Status(code)(error.main(code, msg, showErrorInUi))
-      }
-    }
 
     def onItem(i: JsValue): SimpleResult = {
       val scriptInfo = componentScriptInfo(appContext, loadComponentTypes(i), jsMode == "dev")
@@ -115,14 +121,20 @@ trait CoreEditor
       servicesJs(id, componentsArray, widgetsArray)
     )(id)
   }
-//  def loadSingleComponent(id: String): Action[AnyContent] = {
-//    loadItem(
-//      AppContext(context, Some("singleComponentEditor")),
-//      JsArray(),
-//      JsArray(),
-//      (i) => (i \ "components" \\ "componentType").map(_.as[String]).take(1),
-//      componentEditorServices(id, componentsArray)
-//    )(id)
-//  }
+
+  def componentEditor(id:String) : Action[AnyContent] = Action.async{implicit request =>
+    def loadEditor(json:JsValue) : Future[SimpleResult] = {
+      val componentType = (json \ "item" \ "components" \\ "componentType").map(_.as[String]).headOption
+      componentType match {
+        case Some(ct) => loadComponentEditorHtml(ct)(request).map(Ok(_))
+        case _ => Future.successful(BadRequest("Can't find a component type"))
+      }
+    }
+
+    for{
+      e <- hooks.load(id)
+      result <- e.fold(e => Future.successful(onError(e)), (json) => loadEditor(json))
+    } yield result
+  }
 }
 

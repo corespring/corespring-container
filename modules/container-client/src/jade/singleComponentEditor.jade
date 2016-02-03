@@ -64,9 +64,10 @@ block after-main-script
 
       var editorOptions = !{options}; 
 
-      var uploadEndpoint = {};
-      uploadEndpoint.url = editorOptions.uploadUrl;
-      uploadEndpoint.method = editorOptions.uploadMethod;
+      var uploadEndpoint = {
+        url: editorOptions.uploadUrl,
+        method: editorOptions.uploadMethod
+      };
 
       angular.module(app)
         //TODO: STATIC_PATHS isnt relevent to the component editor

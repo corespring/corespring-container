@@ -14,6 +14,15 @@ import play.api.templates.Html
 
 import scala.collection.mutable
 
+
+trait GetParams{
+  def params: Map[String,Any]
+}
+
+trait Renderer {
+  def render(template:String, params: GetParams) : Html
+}
+
 trait Jade {
 
   def logger: Logger

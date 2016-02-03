@@ -95,15 +95,7 @@ function DraftComponentEditor(element, options, errorCallback) {
       return u.replace(':draftId', options.draftId);
     }).url;
 
-    // var editorOpts = {
-    //   componentType: comp.componentType,
-    //   componentModel: comp,
-    //   xhtml: item.xhtml,
-    //   uploadUrl: uploadUrl 
-    // };
-
-    ////
-     var call = launcher.loadCall('draftEditor.singleComponent.load', function(u){
+    var call = launcher.loadCall('draftEditor.singleComponent.loadEditor', function(u){
       return u.replace(':draftId', options.draftId);
     });
 
@@ -119,7 +111,7 @@ function DraftComponentEditor(element, options, errorCallback) {
     var initialData = {
       activePane: options.activePane || 'config',
       showNavigation: options.showNavigation === true || false,
-      uploadUrl: options.uploadUrl
+      uploadUrl: uploadUrl 
     };
 
     instance = launcher.loadInstance(call, options.queryParams, initialData, onReady);
@@ -180,32 +172,32 @@ function DraftComponentEditor(element, options, errorCallback) {
     return;
   }
 
-  this.showNavigation = function(show){
-    componentEditor.showNavigation(show);
-  };
+  var callbackUtils = require('callback-utils');
 
-  this.previewEnabled = function(enabled){
-    componentEditor.previewEnabled(enabled);
+  var instanceCallbackHandler = callbackUtils.instanceCallbackHandler;
+
+  this.showNavigation = function(show){
+    instance.send('showNavigation', show);
   };
 
   this.showPane = function(pane, done){
-    componentEditor.showPane(pane, done);
+    instance.send('showPane', pane, instanceCallbackHandler(done));
   };
 
   this.getData = function(done){
-    componentEditor.getData(done);
+    instance.send('getData', instanceCallbackHandler(done));
   };
 
   this.save = function(done){
-    componentEditor.getData(function(data){
-      saveComponent(options.draftId, data.result, function(err,saveResult){
+    instance.send('getData', function(err, data){
+      saveComponent(options.draftId, data, function(err,saveResult){
         done({error: err, result: saveResult});
       });
     });
   };
   
   this.remove = function() {
-    componentEditor.remove();
+    instance.remove();
   };
 }
 

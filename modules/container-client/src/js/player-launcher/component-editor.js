@@ -44,30 +44,10 @@ function ComponentEditor(element, options, errorCallback) {
     return;
   }
 
-
-  /**
-   * Note - our external api has a universal callback that should 
-   * handle an object in the following form: 
-   * { error: , result: } - where error may or may not be there.
-   * This function creates a callback that Msgr.js expects: function(err, data) 
-   * and converts the result to {error: err, result: data}
-   */
-  function instanceCallbackHandler(cb){
-    return function(err, data){
-      if(err){
-        cb({error: err});
-      } else {
-        cb({result: data});
-      }
-    };
-  }
+  var instanceCallbackHandler = require('callback-utils').instanceCallbackHandler; 
 
   this.showNavigation = function(show){
     instance.send('showNavigation', show);
-  };
-
-  this.previewEnabled = function(enabled){
-    instance.send('previewEnabled', enabled);
   };
 
   this.showPane = function(pane, done){
@@ -76,10 +56,6 @@ function ComponentEditor(element, options, errorCallback) {
 
   this.getData = function(done){
     instance.send('getData', instanceCallbackHandler(done));
-  };
-
-  this.showSaveButton = function(show){
-    instance.send('showSaveButton', show);
   };
 
   this.setData = function(data, done){
