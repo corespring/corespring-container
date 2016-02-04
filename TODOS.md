@@ -1,6 +1,8 @@
 * rm duplication in component-editor, draft-component-editor, item-component-editor
 * testing - js/scala
 * error if there are more than one components in the item model
-* solidify the update and the component id (aka atm we use '1' as the id)
 
+#### The item model from the server has a map of components we are defaulting to the model in '1'.
+Is there a more stable way of working with the server?
 
+* add commit

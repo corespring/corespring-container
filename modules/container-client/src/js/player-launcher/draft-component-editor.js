@@ -113,6 +113,11 @@ function DraftComponentEditor(element, options, errorCallback) {
       showNavigation: options.showNavigation === true || false,
       uploadUrl: uploadUrl,
       xhtml: item.xhtml,
+      /**
+       * TODO: The item model from the server has a map of components
+       * - we are defaulting to the model in '1'.
+       * Is there a more stable way of working with the server?
+       */
       componentModel: item.components['1']
     };
 
@@ -193,8 +198,28 @@ function DraftComponentEditor(element, options, errorCallback) {
     });
   };
 
-  this.commit = function(done){
-    done({error: 'todo'});
+  this.commitDraft = function(force, done){
+
+    var key = 'draftEditor.singleComponent.commit';
+    var call = launcher.loadCall(key, function(u){
+      return u.replace(':draftId', options.draftId.toString());
+    });
+    
+    function onError(err) {
+      var msg = (err.responseJSON && err.responseJSON.error) ? err.responseJSON.error : 'Failed to commit draft: ' + options.draftId;
+      if (done) {
+        done(errorCodes.COMMIT_DRAFT_FAILED(msg));
+      }
+    }
+
+    $.ajax({
+      type: call.method,
+      url: launcher.prepareUrl(call.url, {force: force}),
+      data: {},
+      success: done.bind(this, null),
+      error: onError,
+      dataType: 'json'
+    });  
   };
   
   this.remove = function() {
