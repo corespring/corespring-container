@@ -130,15 +130,15 @@ class PlayerLauncherTest extends Specification with Mockito with PlaySpecificati
       }
 
       "point to gather" in new pathScope() {
-        pathJson(Paths.player, "gather") === callToJson(Player.load(":sessionId"))
+        pathJson(Paths.player, "gather") === callToJson(Player.loadWithItemId(":itemId", ":sessionId"))
       }
 
       "point to view" in new pathScope() {
-        pathJson(Paths.player, "view") === callToJson(Player.load(":sessionId"))
+        pathJson(Paths.player, "view") === callToJson(Player.loadWithItemId(":itemId", ":sessionId"))
       }
 
       "point to evaluate" in new pathScope() {
-        pathJson(Paths.player, "evaluate") === callToJson(Player.load(":sessionId"))
+        pathJson(Paths.player, "evaluate") === callToJson(Player.loadWithItemId(":itemId", ":sessionId"))
       }
     }
   }

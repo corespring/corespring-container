@@ -129,12 +129,12 @@ class PlayerTest extends Specification with PlaySpecification with Mockito {
       }
     }
 
-    "sets the Location header to Player.load(sessionId)" in new playerScope {
+    "sets the Location header to Player.load(itemId, sessionId)" in new playerScope {
       running(FakeApplication(withGlobal = Some(MockGlobal))) {
         val request = FakeRequest("", "")
         val result = createSessionForItem(itemId)(request)
         import org.corespring.container.client.controllers.apps.routes.Player
-        header(HeaderNames.LOCATION, result) must be equalTo (Some(Player.load(sessionId).url))
+        header(HeaderNames.LOCATION, result) must be equalTo (Some(Player.loadWithItemId(itemId, sessionId).url))
       }
     }
   }

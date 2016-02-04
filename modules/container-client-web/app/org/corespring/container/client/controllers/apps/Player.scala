@@ -126,7 +126,13 @@ trait Player
     /** if set log the category defined */
     "logCategory")
 
-  def load(sessionId: String) = Action.async { implicit request =>
+  def load(sessionId: String) = doLoad(sessionId)
+
+  //we have two methods calling the same function because we need the itemId
+  //for the images in this page
+  def loadWithItemId(itemId: String, sessionId: String) = doLoad(sessionId)
+
+  private def doLoad(sessionId: String) = Action.async { implicit request =>
     hooks.loadSessionAndItem(sessionId).map {
       handleSuccess { (tuple) =>
         val (session, item) = tuple
@@ -157,7 +163,7 @@ trait Player
       handleSuccess { (tuple) =>
         val (session, item) = tuple
         require((session \ "id").asOpt[String].isDefined, "The session model must specify an 'id'")
-        val call = org.corespring.container.client.controllers.apps.routes.Player.load((session \ "id").as[String])
+        val call = org.corespring.container.client.controllers.apps.routes.Player.loadWithItemId(itemId, (session \ "id").as[String])
         val location = {
           val params = queryParams[String]()
           s"${call.url}${if (params.isEmpty) "" else s"?$params"}"

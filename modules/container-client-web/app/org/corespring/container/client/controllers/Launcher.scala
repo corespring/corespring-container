@@ -94,7 +94,7 @@ trait Launcher extends Controller with HasContainerContext {
       "createItem" -> Item.create()))
 
     val player = {
-      val loadSession = Player.load(":sessionId")
+      val loadSession = Player.loadWithItemId(":itemId", ":sessionId")
       JsObject(Seq(
         "createSession" -> Player.createSessionForItem(":id"),
         "gather" -> loadSession,
