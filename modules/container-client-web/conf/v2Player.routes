@@ -19,6 +19,7 @@ GET           /component-single/:context/:componentType.:suffix          @org.co
 
 GET           /player/session/:sessionId/index.html                      @org.corespring.container.client.controllers.apps.Player.load(sessionId: String)
 GET           /player/session/:sessionId/*file                           @org.corespring.container.client.controllers.apps.Player.getFile(sessionId, file)
+GET           /player/item/:itemId/:sessionId/*file                      @org.corespring.container.client.controllers.apps.Player.getFileWithItemId(itemId, sessionId, file)
 POST          /player/item/:itemId/index.html                            @org.corespring.container.client.controllers.apps.Player.createSessionForItem(itemId: String)
 GET           /player/item/:itemId/*file                                 @org.corespring.container.client.controllers.apps.Player.getFileByItemId(itemId: String, file:String)
 

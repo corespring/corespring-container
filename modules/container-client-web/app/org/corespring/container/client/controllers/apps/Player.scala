@@ -4,7 +4,7 @@ import java.net.URLEncoder
 
 import org.corespring.container.client.{ItemAssetResolver, V2PlayerConfig}
 import org.corespring.container.client.component.PlayerItemTypeReader
-import org.corespring.container.client.controllers.GetAsset
+import org.corespring.container.client.controllers.{GetAssetWithItemId, GetAsset}
 import org.corespring.container.client.controllers.helpers.PlayerXhtml
 import org.corespring.container.client.controllers.jade.Jade
 import org.corespring.container.client.hooks.PlayerHooks
@@ -21,7 +21,8 @@ trait Player
   extends App[PlayerHooks]
   with PlayerItemTypeReader
   with Jade
-  with GetAsset[PlayerHooks] {
+  with GetAsset[PlayerHooks]
+  with GetAssetWithItemId[PlayerHooks] {
 
   private object SessionRenderer {
 

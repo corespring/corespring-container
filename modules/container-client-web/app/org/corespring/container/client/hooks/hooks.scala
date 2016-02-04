@@ -18,6 +18,10 @@ trait GetAssetHook {
   def loadFile(id: String, path: String)(request: Request[AnyContent]): SimpleResult
 }
 
+trait GetAssetWithItemIdHook {
+  def loadFileWithItemId(itemId: String, sessionId: String, path: String)(request: Request[AnyContent]): SimpleResult
+}
+
 case class UploadResult(path: String)
 
 trait AssetHooks extends GetAssetHook {
@@ -40,7 +44,7 @@ trait LoadHook extends HasContainerContext {
   def load(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]]
 }
 
-trait PlayerHooks extends GetAssetHook with HasContainerContext {
+trait PlayerHooks extends GetAssetHook with GetAssetWithItemIdHook with HasContainerContext {
   def createSessionForItem(itemId: String)(implicit header: RequestHeader): Future[Either[StatusMessage, (JsValue, JsValue)]]
   def loadSessionAndItem(sessionId: String)(implicit header: RequestHeader): Future[Either[StatusMessage, (JsValue, JsValue)]]
   def loadItemFile(itemId: String, file: String)(implicit header: RequestHeader): SimpleResult

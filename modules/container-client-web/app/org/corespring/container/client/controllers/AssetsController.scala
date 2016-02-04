@@ -1,7 +1,7 @@
 package org.corespring.container.client.controllers
 
 import org.corespring.container.client.HasContainerContext
-import org.corespring.container.client.hooks.{ AssetHooks, GetAssetHook }
+import org.corespring.container.client.hooks.{GetAssetWithItemIdHook, AssetHooks, GetAssetHook}
 import play.api.mvc.{ RequestHeader, SimpleResult, Action, Controller }
 
 import scala.concurrent.{ Future }
@@ -12,6 +12,15 @@ trait GetAsset[H <: GetAssetHook] extends Controller with HasContainerContext {
 
   def getFile(id: String, path: String) = Action.async { request =>
     Future { hooks.loadFile(id, path)(request) }
+  }
+}
+
+trait GetAssetWithItemId[H <: GetAssetWithItemIdHook] extends Controller with HasContainerContext {
+
+  def hooks: H
+
+  def getFileWithItemId(itemId: String, sessionId: String, path: String) = Action.async { request =>
+    Future { hooks.loadFileWithItemId(itemId, sessionId, path)(request) }
   }
 }
 

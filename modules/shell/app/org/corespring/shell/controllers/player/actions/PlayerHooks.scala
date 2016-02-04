@@ -56,7 +56,6 @@ trait PlayerHooks extends ContainerPlayerHooks {
   }
 
   override def loadFile(id: String, path: String)(request: Request[AnyContent]): SimpleResult = {
-
     val out = for {
       dbo <- sessionService.collection.findOneByID(new ObjectId(id), MongoDBObject("itemId" -> 1))
       itemId <- Some(dbo.get("itemId").asInstanceOf[String])
@@ -65,6 +64,15 @@ trait PlayerHooks extends ContainerPlayerHooks {
     import Results.NotFound
     out.getOrElse(NotFound(""))
   }
+
+  override def loadFileWithItemId(itemId: String, sessionId: String, path: String)(request: Request[AnyContent]): SimpleResult = {
+    val out = for {
+      result <- Some(assets.load(AssetType.Item, itemId, path)(request))
+    } yield result
+    import Results.NotFound
+    out.getOrElse(NotFound(""))
+  }
+
 
   override def loadItemFile(itemId: String, file: String)(implicit header: RequestHeader): SimpleResult = {
     assets.load(AssetType.Item, itemId, file)(header)
