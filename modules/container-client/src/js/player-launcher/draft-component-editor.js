@@ -199,11 +199,6 @@ function DraftComponentEditor(element, options, errorCallback) {
   };
 
   this.commitDraft = function(force, done){
-
-    var key = 'draftEditor.singleComponent.commit';
-    var call = launcher.loadCall(key, function(u){
-      return u.replace(':draftId', options.draftId.toString());
-    });
     
     function onError(err) {
       var msg = (err.responseJSON && err.responseJSON.error) ? err.responseJSON.error : 'Failed to commit draft: ' + options.draftId;
@@ -212,14 +207,29 @@ function DraftComponentEditor(element, options, errorCallback) {
       }
     }
 
-    $.ajax({
-      type: call.method,
-      url: launcher.prepareUrl(call.url, {force: force}),
-      data: {},
-      success: done.bind(this, null),
-      error: onError,
-      dataType: 'json'
-    });  
+    function onSuccess(result, msg, xhr){
+      done(null, result);
+    }
+
+    this.save(function(result){
+      if(result.error){
+        done(result.error);
+      } else {
+        var key = 'draftEditor.singleComponent.commit';
+        var call = launcher.loadCall(key, function(u){
+          return u.replace(':draftId', options.draftId.toString());
+        });
+
+        $.ajax({
+          type: call.method,
+          url: launcher.prepareUrl(call.url, {force: force}),
+          data: {},
+          success: onSuccess,
+          error: onError,
+          dataType: 'json'
+        });  
+      }
+    });
   };
   
   this.remove = function() {

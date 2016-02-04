@@ -228,7 +228,7 @@ trait ItemDraftHooks
       _ <- Some(logger.debug(s"draft=$draft"))
       draftItem <- Some(draft.get("item").asInstanceOf[DBObject])
       _ <- Some(logger.debug(s"draftItem=$draftItem"))
-      draftDateModified <- Some(draftItem.get("dateModified").asInstanceOf[DateTime])
+      draftDateModified <- draftItem.expand[DateTime]("dateModified")
       _ <- Some(logger.debug(s"draftDateModified=$draftDateModified"))
       itemId <- Some(draftId.itemId)
       _ <- Some(logger.debug(s"itemId=$itemId"))
@@ -284,7 +284,7 @@ trait ItemDraftHooks
 
   private def create(xhtml:String, components: JsObject) = {
     val out = for {
-      item <- Some(Json.obj("dateModified" -> DateTime.now, "xhtml" -> xhtml, "components" -> components))
+      item <- Some(Json.obj("dateModified" -> Json.obj("$date" -> DateTime.now), "xhtml" -> xhtml, "components" -> components))
       itemId <- itemService.create(item)
       tuple <- draftItemService.createDraft(itemId, None, item)
       draftName <- Some(tuple._2)

@@ -77,7 +77,7 @@
        });
 
        $('.commit').click(function(){
-          editor.commit(false, function(result){
+          editor.commitDraft(false, function(err, result){
             console.log('>> commit: ', result);
           });
        });

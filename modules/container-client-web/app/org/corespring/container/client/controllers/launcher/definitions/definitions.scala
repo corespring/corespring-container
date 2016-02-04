@@ -182,6 +182,7 @@ private[launcher] case class ComponentEditor(corespringUrl:String, load:String=>
       "draftEditor" -> obj(
         "singleComponent" -> obj(
           "createWithSingleComponent" -> r.draft.createWithSingleComponent(":componentType"),
+          "commit" -> r.draft.commit(":draftId"),
           "loadData" -> r.draft.load(":draftId"),
           "loadEditor" -> r.draftEditor.componentEditor(":draftId"),
           "upload" -> r.draftEditor.uploadFile(":draftId", ":filename"),
