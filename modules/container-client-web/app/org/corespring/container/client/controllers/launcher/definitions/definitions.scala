@@ -5,28 +5,27 @@ import org.corespring.container.client.hooks.PlayerJs
 import play.api.http.ContentTypes
 import play.api.libs.json.JsObject
 import play.api.libs.json.Json._
-import play.api.mvc.{Call, RequestHeader, Session, SimpleResult}
+import play.api.mvc.{ Call, RequestHeader, Session, SimpleResult }
 
-
-private[launcher] trait LaunchCompanionUtils{
-  def params(rh:RequestHeader) = rh.queryString.mapValues(_.mkString(""))
-  def url(cfg:V2PlayerConfig, rh:RequestHeader) = cfg.rootUrl.getOrElse(BaseUrl(rh))
-  def resourceToString(s:String) : Option[String] = PlayResourceToString(s)
+private[launcher] trait LaunchCompanionUtils {
+  def params(rh: RequestHeader) = rh.queryString.mapValues(_.mkString(""))
+  def url(cfg: V2PlayerConfig, rh: RequestHeader) = cfg.rootUrl.getOrElse(BaseUrl(rh))
+  def resourceToString(s: String): Option[String] = PlayResourceToString(s)
 }
 
-private[launcher] trait FullPath{
-  def fullPath(n:String) = s"container-client/js/player-launcher/$n"
+private[launcher] trait FullPath {
+  def fullPath(n: String) = s"container-client/js/player-launcher/$n"
 }
 
-trait CorespringJsClient extends JsResource with FullPath{
+trait CorespringJsClient extends JsResource with FullPath {
 
   implicit def callToJsv(c: Call): JsValueWrapper = toJsFieldJsValueWrapper(obj("method" -> c.method, "url" -> c.url))
 
-  def corespringUrl : String
-  def fileNames : Seq[String]
-  def bootstrap : String
-  def options : JsObject
-  def queryParams : Map[String,String]
+  def corespringUrl: String
+  def fileNames: Seq[String]
+  def bootstrap: String
+  def options: JsObject
+  def queryParams: Map[String, String]
 
   lazy val src = {
     val builder = new JsBuilder(corespringUrl, load)
@@ -34,19 +33,19 @@ trait CorespringJsClient extends JsResource with FullPath{
     builder.buildJs(nameAndContents, options, bootstrap, queryParams)
   }
 
-  def result : SimpleResult = {
+  def result: SimpleResult = {
     import play.api.mvc.Results.Ok
     Ok(src).as(ContentTypes.JAVASCRIPT)
   }
 }
 
-private[launcher] object Catalog extends LaunchCompanionUtils{
-  def apply(playerConfig: V2PlayerConfig, rh:RequestHeader) : Catalog = {
-    Catalog(url(playerConfig,rh), resourceToString(_), params(rh))
+private[launcher] object Catalog extends LaunchCompanionUtils {
+  def apply(playerConfig: V2PlayerConfig, rh: RequestHeader): Catalog = {
+    Catalog(url(playerConfig, rh), resourceToString(_), params(rh))
   }
 }
 
-private[launcher] case class Catalog(corespringUrl:String, load:String=>Option[String], queryParams : Map[String,String]) extends CorespringJsClient{
+private[launcher] case class Catalog(corespringUrl: String, load: String => Option[String], queryParams: Map[String, String]) extends CorespringJsClient {
   override def fileNames: Seq[String] = Seq("catalog.js")
 
   override def bootstrap: String =
@@ -54,23 +53,20 @@ private[launcher] case class Catalog(corespringUrl:String, load:String=>Option[S
       |org.corespring.players.ItemCatalog = corespring.require('catalog');
     """.stripMargin
 
-  import org.corespring.container.client.controllers.apps.routes.{Catalog => Routes}
+  import org.corespring.container.client.controllers.apps.routes.{ Catalog => Routes }
 
   override def options: JsObject = obj(
     "paths" -> obj(
-      "catalog" -> Routes.load(":itemId")
-    )
-  )
+      "catalog" -> Routes.load(":itemId")))
 }
 
-
-private[launcher] object Player extends LaunchCompanionUtils{
-  def apply(playerConfig: V2PlayerConfig, rh:RequestHeader, playerJs: PlayerJs) : Player = {
+private[launcher] object Player extends LaunchCompanionUtils {
+  def apply(playerConfig: V2PlayerConfig, rh: RequestHeader, playerJs: PlayerJs): Player = {
     Player(url(playerConfig, rh), resourceToString(_), params(rh), playerJs)
   }
 }
 
-private[launcher] case class Player(corespringUrl:String, load:String=>Option[String], queryParams:Map[String,String], playerJs:PlayerJs) extends CorespringJsClient{
+private[launcher] case class Player(corespringUrl: String, load: String => Option[String], queryParams: Map[String, String], playerJs: PlayerJs) extends CorespringJsClient {
   override lazy val fileNames: Seq[String] = Seq("player.js")
 
   override lazy val bootstrap: String =
@@ -82,7 +78,7 @@ private[launcher] case class Player(corespringUrl:String, load:String=>Option[St
 
     val errorsAndWarnings = obj("errors" -> playerJs.errors, "warnings" -> playerJs.warnings)
 
-    import org.corespring.container.client.controllers.apps.routes.{Player => Routes}
+    import org.corespring.container.client.controllers.apps.routes.{ Player => Routes }
 
     val loadSession = Routes.load(":sessionId")
     val paths = obj("paths" -> obj(
@@ -97,19 +93,19 @@ private[launcher] case class Player(corespringUrl:String, load:String=>Option[St
   protected def sumSession(s: Session, keyValues: (String, String)*): Session = keyValues.foldRight(s) { case ((key, value), acc) => acc + (key -> value) }
   val SecureMode = "corespring.player.secure"
 
-  override val result : SimpleResult = {
+  override val result: SimpleResult = {
     val finalSession = sumSession(playerJs.session, (SecureMode, playerJs.isSecure.toString))
     super.result.withSession(finalSession)
   }
 }
 
-private[launcher] object ItemEditors extends LaunchCompanionUtils{
-  def apply(playerConfig: V2PlayerConfig, rh: RequestHeader) : ItemEditors = {
-    ItemEditors( url(playerConfig, rh), resourceToString(_), params(rh))
+private[launcher] object ItemEditors extends LaunchCompanionUtils {
+  def apply(playerConfig: V2PlayerConfig, rh: RequestHeader): ItemEditors = {
+    ItemEditors(url(playerConfig, rh), resourceToString(_), params(rh))
   }
 }
 
-private[launcher] case class ItemEditors(corespringUrl:String, load:String=> Option[String], queryParams:Map[String,String]) extends CorespringJsClient {
+private[launcher] case class ItemEditors(corespringUrl: String, load: String => Option[String], queryParams: Map[String, String]) extends CorespringJsClient {
   override lazy val fileNames: Seq[String] = Seq("item-editor.js", "draft-editor.js")
   override lazy val bootstrap: String =
     """
@@ -118,8 +114,8 @@ private[launcher] case class ItemEditors(corespringUrl:String, load:String=> Opt
       |
     """.stripMargin
 
-  import org.corespring.container.client.controllers.apps.routes.{DraftDevEditor => DraftDevEditorRoutes, DraftEditor => DraftEditorRoutes, ItemDevEditor => ItemDevEditorRoutes, ItemEditor => ItemEditorRoutes}
-  import org.corespring.container.client.controllers.resources.routes.{Item => ItemRoutes, ItemDraft => ItemDraftRoutes}
+  import org.corespring.container.client.controllers.apps.routes.{ DraftDevEditor => DraftDevEditorRoutes, DraftEditor => DraftEditorRoutes, ItemDevEditor => ItemDevEditorRoutes, ItemEditor => ItemEditorRoutes }
+  import org.corespring.container.client.controllers.resources.routes.{ Item => ItemRoutes, ItemDraft => ItemDraftRoutes }
   override def options: JsObject = obj(
     "paths" -> obj(
       "itemEditor" -> obj(
@@ -131,35 +127,29 @@ private[launcher] case class ItemEditors(corespringUrl:String, load:String=> Opt
         "devEditor" -> DraftDevEditorRoutes.load(":draftId"),
         "createItemAndDraft" -> ItemDraftRoutes.createItemAndDraft(),
         "commitDraft" -> ItemDraftRoutes.commit(":draftId"),
-        "save" -> ItemDraftRoutes.save(":draftId")
-      )
-    )
-  )
+        "save" -> ItemDraftRoutes.save(":draftId"))))
 }
 
-private[launcher] object ComponentEditor extends LaunchCompanionUtils{
-  def apply(playerConfig: V2PlayerConfig, rh: RequestHeader) : ComponentEditor = {
+private[launcher] object ComponentEditor extends LaunchCompanionUtils {
+  def apply(playerConfig: V2PlayerConfig, rh: RequestHeader): ComponentEditor = {
     ComponentEditor(url(playerConfig, rh), resourceToString(_), params(rh))
   }
 }
 
-private[launcher] case class ComponentEditor(corespringUrl:String, load:String=>Option[String], queryParams: Map[String,String]) extends CorespringJsClient {
+private[launcher] case class ComponentEditor(corespringUrl: String, load: String => Option[String], queryParams: Map[String, String]) extends CorespringJsClient {
 
-  override val fileNames = Seq(
-    "component-editor.js",
-    "item-component-editor.js",
-    "draft-component-editor.js"
-  )
+  override val fileNames = Seq("component-editor.js")
 
   override val bootstrap =
     """
-      |org.corespring.players.ComponentEditor = corespring.require('component-editor');
-      |org.corespring.players.ItemComponentEditor = corespring.require('item-component-editor');
-      |org.corespring.players.DraftComponentEditor = corespring.require('draft-component-editor');
+      |var modules = corespring.require('component-editor');
+      |org.corespring.players.ComponentEditor = modules.Standalone;
+      |org.corespring.players.ItemComponentEditor = modules.Item;
+      |org.corespring.players.DraftComponentEditor = modules.Draft;
     """.stripMargin
 
   private object r {
-    import org.corespring.container.client.controllers.{apps, resources}
+    import org.corespring.container.client.controllers.{ apps, resources }
     val componentEditor = apps.routes.ComponentEditor
     val itemEditor = apps.routes.ItemEditor
     val draftEditor = apps.routes.DraftEditor
@@ -176,9 +166,7 @@ private[launcher] case class ComponentEditor(corespringUrl:String, load:String=>
           "loadData" -> r.item.load(":itemId"),
           "loadEditor" -> r.itemEditor.componentEditor(":itemId"),
           "upload" -> r.itemEditor.uploadFile(":itemId", ":filename"),
-          "saveComponents" -> r.item.saveSubset(":itemId", "components")
-        )
-      ),
+          "saveComponents" -> r.item.saveSubset(":itemId", "components"))),
       "draftEditor" -> obj(
         "singleComponent" -> obj(
           "createWithSingleComponent" -> r.draft.createWithSingleComponent(":componentType"),
@@ -186,9 +174,5 @@ private[launcher] case class ComponentEditor(corespringUrl:String, load:String=>
           "loadData" -> r.draft.load(":draftId"),
           "loadEditor" -> r.draftEditor.componentEditor(":draftId"),
           "upload" -> r.draftEditor.uploadFile(":draftId", ":filename"),
-          "saveComponents" -> r.draft.saveSubset(":draftId", "components")
-        )
-      )
-    )
-  )
+          "saveComponents" -> r.draft.saveSubset(":draftId", "components")))))
 }
