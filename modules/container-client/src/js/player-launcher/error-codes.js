@@ -44,3 +44,4 @@ exports.COMPONENT_EDITOR_MISSING_URL = function(key){
 };
 exports.LOAD_ITEM_FAILED = function(msg){ return {code: 123, msg: msg};};
 exports.LOAD_DRAFT_FAILED = function(msg){ return {code: 124, msg: msg};};
+exports.UPLOAD_URL_MISSING_FILENAME = {code: 125, msg: 'the upload url needs to have \':filename\'.'};

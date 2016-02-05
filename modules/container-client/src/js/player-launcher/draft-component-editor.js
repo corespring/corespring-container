@@ -4,48 +4,18 @@ function DraftComponentEditor(element, options, errorCallback) {
   var launcher = new Launcher(element, options, errorCallback, options.autosizeEnabled);
   var errorCodes = require('error-codes');
   var DraftId = require('draft-id');
+  var helper = require('./component-editor/helper');
+  var draft = require('draft');
+
   var instance;
   
   function createItemAndDraft(componentType, callback){
-
     var key = 'draftEditor.singleComponent.createWithSingleComponent';
-
     var call = launcher.loadCall(key, function(u){
       return u.replace(':componentType', componentType);
     });
-
-    if (!call) {
-      return;
-    }
-
-    callback = callback || function(){};
-
-    function onSuccess(result){
-
-      if(options.onItemCreated){
-        options.onItemCreated(result.itemId);
-      }
-
-      callback(null, result);
-    }
-
-    function onError(xhrErr){
-      var msg = (xhrErr.responseJSON && xhrErr.responseJSON.error) ?
-        xhrErr.responseJSON.error :
-       'Failed to create item.';
-
-      callback(msg);
-    }
-
-    $.ajax({
-      type: call.method,
-      url: launcher.prepareUrl(call.url),
-      contentType: 'application/json',
-      data: JSON.stringify({}),
-      success: onSuccess,
-      error: onError.bind(this),
-      dataType: 'json'
-    });
+    call.url = launcher.prepareUrl(call.url);
+    draft.createItemAndDraft(call, options, callback);
   }
 
   function loadDraftData(draftId, callback) {
@@ -82,7 +52,7 @@ function DraftComponentEditor(element, options, errorCallback) {
     });
   }
 
-  function launchComponentEditor(item){
+  function launchComponentEditorInstance(item){
 
     var comp;
     for(var i  in item.components){
@@ -91,39 +61,21 @@ function DraftComponentEditor(element, options, errorCallback) {
       }
     }
 
-    var uploadUrl = launcher.loadCall('draftEditor.singleComponent.upload', function(u){
+    function addDraftId(u){
       return u.replace(':draftId', options.draftId);
-    }).url;
+    }
 
-    var call = launcher.loadCall('draftEditor.singleComponent.loadEditor', function(u){
-      return u.replace(':draftId', options.draftId);
-    });
+    var uploadUrl = launcher.loadCall('draftEditor.singleComponent.upload', addDraftId);
+    var call = launcher.loadCall('draftEditor.singleComponent.loadEditor', addDraftId); 
 
     if(!call){
-      errorCallback('???');
+      errorCallback(errorCodes.CANT_FIND_URL('draftEditor.singleComponent.loadEditor'));
       return;
     }
 
-    function onReady(instance){
-      // console.log('onReady...', instance); 
-    }
-
-    var initialData = {
-      activePane: options.activePane || 'config',
-      showNavigation: options.showNavigation === true || false,
-      uploadUrl: uploadUrl,
-      xhtml: item.xhtml,
-      /**
-       * TODO: The item model from the server has a map of components
-       * - we are defaulting to the model in '1'.
-       * Is there a more stable way of working with the server?
-       */
-      componentModel: item.components['1']
-    };
-
-    instance = launcher.loadInstance(call, options.queryParams, initialData, onReady);
+    var initialData = helper.launchData(options, uploadUrl, item.xhtml, item.components['1']);
+    instance = launcher.loadInstance(call, options.queryParams, initialData);
   }
-
 
   function saveComponent(draftId, data, done){
 
@@ -153,7 +105,7 @@ function DraftComponentEditor(element, options, errorCallback) {
     if(err){
       errorCallback(errorCodes.LOAD_DRAFT_FAILED(err));
     } else { 
-      launchComponentEditor(draft);
+      launchComponentEditorInstance(draft);
     }
   }
 

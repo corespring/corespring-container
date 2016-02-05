@@ -4,46 +4,13 @@ function EditorDefinition(element, options, errorCallback) {
   var launcher = new Launcher(element, options, errorCallback, options.autosizeEnabled);
   var errorCodes = require('error-codes');
   var DraftId = require('draft-id');
+  var draft = require('draft');
   var instance;
 
   function createItemAndDraft(callback) {
-
     var call = launcher.loadCall('draftEditor.createItemAndDraft');
-    if (!call) {
-      return;
-    }
-
-    callback = callback || function() {};
-
-    $.ajax({
-      type: call.method,
-      url: launcher.prepareUrl(call.url),
-      data: {
-        draftName: options.draftName
-      },
-      success: onSuccess,
-      error: onError.bind(this),
-      dataType: 'json'
-    });
-
-    function onSuccess(result) {
-      if (options.onItemCreated) {
-        options.onItemCreated(result.itemId);
-      }
-
-      if (options.onDraftCreated) {
-        options.onDraftCreated(result.itemId, result.draftName);
-      }
-
-      callback(null, result);
-    }
-
-    function onError(xhrErr) {
-      var msg = (xhrErr.responseJSON && xhrErr.responseJSON.error) ?
-        xhrErr.responseJSON.error : 'Failed to create item and draft: ' + options.draftId;
-      callback(msg);
-    }
-
+    call.url = launcher.prepareUrl(call.url) ;
+    draft.createItemAndDraft(call, options, callback);
   }
 
   function loadDraftItem(draftId, options) {
