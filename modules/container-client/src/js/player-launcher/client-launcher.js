@@ -92,9 +92,14 @@ function ClientLauncher(element, options, errorCallback){
     urlProcessor = urlProcessor || function(u){return u;};
     var c = this.paths.loadCall(key);
     if(c){
-      return { method: c.method, url: urlProcessor( this.paths.corespringUrl + c.url)};
+      return { 
+        key: key,
+        method: c.method, 
+        url: urlProcessor(this.paths.corespringUrl + c.url),
+        queryParams: options.queryParams
+      };
     } else {
-      return null;
+      return {key: key};
     }
   };
 

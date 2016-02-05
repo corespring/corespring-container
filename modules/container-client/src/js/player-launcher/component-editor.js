@@ -1,3 +1,5 @@
+var UrlBuilder = require('url-builder');
+
 function Helper(){
   var instanceCallbackHandler = require('callback-utils').instanceCallbackHandler; 
   this.instanceCallbackHandler = instanceCallbackHandler;
@@ -20,6 +22,23 @@ function Helper(){
 
   this.jsonXhr = function(call, data, done, defaultErrorMsg){
 
+    if (!call) {
+      done(errorCodes.CALL_IS_UNDEFINED);
+      return;
+    }
+    
+    if (!call.url) {
+      done(errorCodes.CANT_FIND_URL('cant find a url for key: ' + call.key));
+      return;
+    }
+
+    function prepareUrl(u, params){
+      params = $.extend(call.queryParams, params); 
+      return new UrlBuilder(u).params(params).build(); 
+    }
+
+    defaultErrorMsg = defaultErrorMsg || 'Call to: ' + call.url + ' failed';
+
     function onError(xhrErr){
       var msg = (xhrErr.responseJSON && xhrErr.responseJSON.error) ?
         xhrErr.responseJSON.error : defaultErrorMsg;
@@ -28,7 +47,7 @@ function Helper(){
 
     $.ajax({
         type: call.method,
-        url: call.url,
+        url: prepareUrl(call.url),
         contentType: 'application/json',
         data: JSON.stringify(data),
         success: done.bind(this, null),
@@ -97,9 +116,57 @@ function Standalone(element, options, errorCallback) {
   };
 }
 
+function CorespringBound(bindType, options, errorCallback){
+
+  this.launchComponentEditorInstance = function(item, launcher){
+    var comp;
+    for(var i  in item.components){
+      if(!comp){
+        comp = item.components[i];
+      }
+    }
+
+    function addId(u){
+      return u.replace(':' + bindType + 'Id', options[bindType + 'Id']);
+    }
+
+    var uploadCall = launcher.loadCall( bindType + 'Editor.singleComponent.upload', addId);
+
+    if(!uploadCall.url){
+      errorCallback(errorCodes.CANT_FIND_URL('upload'));
+      return;
+    }
+
+    var call = launcher.loadCall( bindType + 'Editor.singleComponent.loadEditor', addId);
+
+    if(!call){
+      errorCallback(errorCodes.CANT_FIND_URL('loadEditor'));
+      return;
+    }
+
+    var initialData = helper.launchData(options, uploadCall.url, item.xhtml, item.components['1']);
+    return launcher.loadInstance(call, options.queryParams, initialData);
+  };
+
+  this.saveComponents = function(launcher, id, data, done) {
+
+    var key = bindType + 'Editor.singleComponent.saveComponents';
+    var call = launcher.loadCall(key, function(u){
+      return u.replace(':' + bindType + 'Id', id);
+    });
+
+    var componentData = {
+      1: data
+    };
+
+    helper.jsonXhr(call, componentData, done);
+  };
+}
+
 function Item(element, options, errorCallback) {
 
   var launcher = new Launcher(element, options, errorCallback, options.autosizeEnabled);
+  var itemBound = new CorespringBound('item', options, errorCallback);
   var instance;
 
   function createItem(componentType, done){
@@ -110,16 +177,9 @@ function Item(element, options, errorCallback) {
       return u.replace(':componentType', componentType);
     });
 
-    if (!call) {
-      return;
-    }
-
     done = done || function(){};
 
-    call.url = launcher.prepareUrl(call.url); 
-    
     helper.jsonXhr(call, {}, function(err, result){
-
       if(err){
         done(err);
       } else {
@@ -131,10 +191,11 @@ function Item(element, options, errorCallback) {
     }, 'Failed to create item.');
   }
 
-  function loadItemData(itemId, callback) {
+  function loadItemData(itemId, done) {
 
     if (!itemId) {
-      throw new Error('invalid itemId');
+      done(errorCallback.INVALID_ITEM_ID(itemId));
+      return;
     }
 
     var callKey = 'itemEditor.singleComponent.loadData';
@@ -143,86 +204,15 @@ function Item(element, options, errorCallback) {
       return u.replace(':itemId', itemId);
     });
 
-    if (!call) {
-      errorCallback(errorCodes.CANT_FIND_URL('cant find a url for key: ' + callKey));
-      return;
-    }
-
-    function onError(xhrErr){
-      var msg = (xhrErr.responseJSON && xhrErr.responseJSON.error) ?
-        xhrErr.responseJSON.error :
-       'Failed to load item.';
-      callback(msg);
-    }
-
-    $.ajax({
-      type: call.method,
-      url: launcher.prepareUrl(call.url),
-      contentType: 'application/json',
-      success: callback.bind(this, null),
-      error: onError.bind(this),
-      dataType: 'json'
-    });
+    helper.jsonXhr(call, {}, done, 'Failed to load item.');
   }
 
-  function launchComponentEditor(item){
-
-    var comp;
-    for(var i  in item.components){
-      if(!comp){
-        comp = item.components[i];
-      }
-    }
-
-    var uploadUrl = launcher.loadCall('itemEditor.singleComponent.upload', function(u){
-      return u.replace(':itemId', options.itemId);
-    }).url;
-
-    var call = launcher.loadCall('itemEditor.singleComponent.loadEditor', function(u){
-      return u.replace(':itemId', options.itemId);
-    });
-
-    if(!call){
-      errorCallback('???');
-      return;
-    }
-
-    function onReady(instance){
-      // console.log('onReady...', instance); 
-    }
-
-    var initialData = {
-      activePane: options.activePane || 'config',
-      showNavigation: options.showNavigation === true || false,
-      uploadUrl: uploadUrl,
-      xhtml: item.xhtml,
-      componentModel: item.components['1']
-    };
-
-    instance = launcher.loadInstance(call, options.queryParams, initialData, onReady);
+  function launchComponentEditorInstance(item){
+    instance = itemBound.launchComponentEditorInstance(item, launcher);
   }
 
-
-  function saveComponent(id, data, done){
-
-    var key = 'itemEditor.singleComponent.saveComponents';
-    var call = launcher.loadCall(key, function(u){
-      return u.replace(':itemId', id);
-    });
-
-    var componentData = {
-      1: data
-    };
-
-    $.ajax({
-      type: call.method,
-      url: launcher.prepareUrl(call.url),
-      data: JSON.stringify(componentData),
-      contentType: 'application/json',
-      success: done.bind(this, null),
-      error: done,
-      dataType: 'json'
-    });
+  function saveComponents(id, data, done){
+    itemBound.saveComponents(launcher, id, data, done);
   }
 
   var ok = launcher.init();
@@ -231,12 +221,11 @@ function Item(element, options, errorCallback) {
     if(err){
       errorCallback(errorCodes.LOAD_ITEM_FAILED(err));
     } else { 
-      launchComponentEditor(item);
+      launchComponentEditorInstance(item);
     }
   }
 
   if(ok){
-
     if (options.itemId) {
       loadItemData(options.itemId, onItemLoaded);
     } else {
@@ -253,33 +242,136 @@ function Item(element, options, errorCallback) {
     return;
   }
 
-  var instanceCallbackHandler = callbackUtils.instanceCallbackHandler;
-
-  this.showNavigation = function(show){
-    instance.send('showNavigation', show);
-  };
-
-  this.showPane = function(pane, done){
-    instance.send('showPane', pane, instanceCallbackHandler(done));
-  };
+  helper.addCoreMethods(instance).bind(this);
 
   this.save = function(done){
     instance.send('getData', function(err, data){
-      saveComponent(options.itemId, data, function(err,saveResult){
+      saveComponents(options.itemId, data, function(err,saveResult){
+        done({error: err, result: saveResult});
+      });
+    });
+  };
+}
+
+function Draft(element, options, errorCallback) {
+
+  var launcher = new Launcher(element, options, errorCallback, options.autosizeEnabled);
+  var DraftId = require('draft-id');
+  var draftBound = new CorespringBound('draft', options, errorCallback);
+  var draft = require('draft');
+  var instance;
+  
+  function createItemAndDraft(componentType, callback){
+    var key = 'draftEditor.singleComponent.createWithSingleComponent';
+    var call = launcher.loadCall(key, function(u){
+      return u.replace(':componentType', componentType);
+    });
+    call.url = launcher.prepareUrl(call.url);
+    draft.createItemAndDraft(call, options, callback);
+  }
+
+  function loadDraftData(draftId, done) {
+
+    if (!draftId) {
+      errorCodes.INVALID_DRAFT_ID(draftId);
+      return;
+    }
+
+    var callKey = 'draftEditor.singleComponent.loadData';
+
+    var call = launcher.loadCall(callKey, function(u){
+      return u.replace(':draftId', draftId);
+    });
+
+    helper.jsonXhr(call, {}, done, 'Failed to load draft');
+  }
+
+  function launchComponentEditorInstance(item){
+    instance = draftBound.launchComponentEditorInstance(item, launcher);
+  }
+
+  function saveComponents(draftId, data, done){
+    draftBound.saveComponents(launcher, draftId, data, done);
+  }
+
+  var ok = launcher.init();
+    
+  function onDraftLoaded(err, draft){
+    if(err){
+      errorCallback(errorCodes.LOAD_DRAFT_FAILED(err));
+    } else { 
+      launchComponentEditorInstance(draft);
+    }
+  }
+
+  if(ok){
+    if (options.itemId) {
+      options.draftName = options.draftName || msgr.utils.getUid(); //jshint ignore:line
+      options.draftId = new DraftId(options.itemId, options.draftName);
+      loadDraftData(options.draftId.toString(), onDraftLoaded);
+    } else {
+      createItemAndDraft(options.componentType, function(err, result){
+        if(err){
+          errorCallback(errorCodes.CREATE_DRAFT_FAILED(err));
+        } else {
+          options.itemId = result.itemId;
+          options.draftName = result.draftName;
+          options.draftId = new DraftId(options.itemId, options.draftName);
+          loadDraftData(options.draftId.toString(), onDraftLoaded);
+        }
+      });
+    }
+  } else {
+    return;
+  }
+
+  helper.addCoreMethods(instance).bind(this);
+
+  this.save = function(done){
+    instance.send('getData', function(err, data){
+      saveComponents(options.draftId, data, function(err,saveResult){
         done({error: err, result: saveResult});
       });
     });
   };
 
-  this.remove = function() {
-    instance.remove();
+  this.commitDraft = function(force, done){
+    
+    function onError(err) {
+      var msg = (err.responseJSON && err.responseJSON.error) ? err.responseJSON.error : 'Failed to commit draft: ' + options.draftId;
+      if (done) {
+        done(errorCodes.COMMIT_DRAFT_FAILED(msg));
+      }
+    }
+
+    function onSuccess(result, msg, xhr){
+      done(null, result);
+    }
+
+    this.save(function(result){
+      if(result.error){
+        done(result.error);
+      } else {
+        var key = 'draftEditor.singleComponent.commit';
+        var call = launcher.loadCall(key, function(u){
+          return u.replace(':draftId', options.draftId.toString());
+        });
+
+        $.ajax({
+          type: call.method,
+          url: launcher.prepareUrl(call.url, {force: force}),
+          data: {},
+          success: onSuccess,
+          error: onError,
+          dataType: 'json'
+        });  
+      }
+    });
   };
 }
 
-module.exports = ItemComponentEditor;
-
 exports.Standalone = Standalone;
 exports.Draft = Draft;
-exports.Item= Item;
+exports.Item = Item;
 
 
