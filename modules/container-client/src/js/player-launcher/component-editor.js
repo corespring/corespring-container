@@ -77,7 +77,7 @@ function Standalone(element, options, errorCallback) {
   var launcher = new Launcher(element, options, errorCallback, options.autosizeEnabled);
   var instance;
 
-  function loadConfigPanel(componentType){
+  function launchComponentEditorInstance(componentType){
     var call = launcher.loadCall('standaloneEditor', function(u){
       return u.replace(':componentType', componentType);
     });
@@ -100,7 +100,7 @@ function Standalone(element, options, errorCallback) {
   });
 
   if(ok){
-    loadConfigPanel(options.componentType);
+    launchComponentEditorInstance(options.componentType);
   } else {
     return;
   }
