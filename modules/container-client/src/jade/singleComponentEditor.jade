@@ -81,11 +81,16 @@ block after-main-script
           function(wiggiWizConfigProvider, 
             UPLOAD_ENDPOINT){
             UPLOAD_ENDPOINT.method = UPLOAD_ENDPOINT.method || 'POST';
+            
+            var config = {
+              dialogLaunchMode: 'external'
+            };
+
             if(UPLOAD_ENDPOINT.url && UPLOAD_ENDPOINT.method){
-              wiggiWizConfigProvider.add({
-                imageService: 'ExternalEndpointsImageService'
-              });
+              config.imageService = 'ExternalEndpointsImageService';
             }
+            
+            wiggiWizConfigProvider.add(config);
           }]);
 
     })(this);
