@@ -28,12 +28,12 @@ exports.js =
   src: _.union(coreLibs.js, core.src, editorSrcs)
   dest: 'js/dev-editor-prod.js'
   libs: [
-    'bower_components/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML',
     'bower_components/ace-builds/src-min-noconflict/ace.js',
-    'bower_components/ace-builds/src-min-noconflict/theme-twilight.js',
+    'bower_components/ace-builds/src-min-noconflict/mode-json.js',
     'bower_components/ace-builds/src-min-noconflict/mode-xml.js',
+    'bower_components/ace-builds/src-min-noconflict/theme-twilight.js',
     'bower_components/ace-builds/src-min-noconflict/worker-json.js',
-    'bower_components/ace-builds/src-min-noconflict/mode-json.js'
+    'bower_components/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML'
   ]
   report: 'dev-editor-js-report.json'
 
@@ -47,19 +47,20 @@ exports.css =
   report: 'dev-editor-css-report.json'
 
 exports.ngModules = _.union(player.ngModules, [
-  'ngAnimate',
   'corespring-common.supporting-materials',
-  'corespring-dev-editor.services',
   'corespring-dev-editor.controllers',
   'corespring-dev-editor.directives',
+  'corespring-dev-editor.services',
+  'corespring-editor.controllers',
   'corespring-editor.directives',
   'corespring-editor.services',
-  'corespring-editor.controllers',
-  'ui.sortable',
-  'ui.bootstrap',
-  'ui.ace',
-  'ui.router',
+  'corespring.wiggi-wiz',
   'cs.directives',
+  'ngAnimate',
   'ngRoute',
+  'ui.ace',
+  'ui.bootstrap',
+  'ui.router',
   'ui.select2',
-  'corespring.wiggi-wiz' ])
+  'ui.sortable'
+])
