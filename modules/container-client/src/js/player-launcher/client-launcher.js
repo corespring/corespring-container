@@ -96,7 +96,7 @@ function ClientLauncher(element, options, errorCallback){
         key: key,
         method: c.method, 
         url: urlProcessor(this.paths.corespringUrl + c.url),
-        queryParams: options.queryParams
+        queryParams: options.queryParams || {}
       };
     } else {
       return {key: key};

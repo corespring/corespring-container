@@ -46,14 +46,14 @@ function Helper(){
     }
 
     $.ajax({
-        type: call.method,
-        url: prepareUrl(call.url),
-        contentType: 'application/json',
-        data: JSON.stringify(data),
-        success: done.bind(this, null),
-        error: onError,
-        dataType: 'json'
-      });
+      type: call.method,
+      url: prepareUrl(call.url),
+      contentType: 'application/json',
+      data: JSON.stringify(data),
+      success: done.bind(this, null),
+      error: onError,
+      dataType: 'json'
+    });
   };
 
   this.launchData = function(options, uploadUrl, xhtml, componentModel){
@@ -68,11 +68,11 @@ function Helper(){
 }
 
 var errorCodes = require('error-codes');
-var Launcher = require('client-launcher');
 var helper = new Helper();
 
 function Standalone(element, options, errorCallback) {
 
+  var Launcher = require('client-launcher');
   var launcher = new Launcher(element, options, errorCallback, options.autosizeEnabled);
   var instance;
 
@@ -81,7 +81,7 @@ function Standalone(element, options, errorCallback) {
       return u.replace(':componentType', componentType);
     });
 
-    if(!call){
+    if(!call || !call.url){
       errorCallback(errorCodes.CANT_FIND_URL('standaloneEditor'));
       return;
     }
@@ -90,17 +90,21 @@ function Standalone(element, options, errorCallback) {
     instance = launcher.loadInstance(call, options.queryParams, initialData);
     helper.addCoreMethods.bind(this)(instance);
   }
+  
+  if(!options.componentType) {
+    errorCallback(errorCodes.NO_COMPONENT_TYPE);
+    return;
+  }
 
-  var ok = launcher.init(function(){
-    if(options.uploadUrl && options.uploadUrl.indexOf(':filename') === -1){
-      return [errorCodes.UPLOAD_URL_MISSING_FILENAME];
-    } else {
-      return [];
-    }
-  });
+  if(options.uploadUrl && options.uploadUrl.indexOf(':filename') === -1){
+    errorCallback(errorCodes.UPLOAD_URL_MISSING_FILENAME);
+    return;
+  } 
+
+  var ok = launcher.init();
 
   if(ok){
-    launchComponentEditorInstance(options.componentType);
+    launchComponentEditorInstance.bind(this)(options.componentType);
   } else {
     return;
   }
@@ -115,19 +119,21 @@ function Standalone(element, options, errorCallback) {
 }
 
 function CorespringBound(bindType, options, errorCallback){
+    
+  function addId(u){
+    return u.replace(':' + bindType + 'Id', options[bindType + 'Id']);
+  }
 
-  this.launchComponentEditorInstance = function(item, launcher){
-    var comp;
-    for(var i  in item.components){
-      if(!comp){
-        comp = item.components[i];
-      }
+  this.launchComponentEditorInstance = function(item, launcher, done){
+
+    var keys = Object.keys(item.components || {});
+
+    if(keys.length > 1 || keys.length === 0){
+      errorCallback(errorCodes.ONLY_ONE_COMPONENT_ALLOWED);
+      return;
     }
 
-    function addId(u){
-      return u.replace(':' + bindType + 'Id', options[bindType + 'Id']);
-    }
-
+    var comp = item.components[keys[0]];
     var uploadCall = launcher.loadCall( bindType + 'Editor.singleComponent.upload', addId);
 
     if(!uploadCall.url){
@@ -142,30 +148,37 @@ function CorespringBound(bindType, options, errorCallback){
       return;
     }
 
-    var initialData = helper.launchData(options, uploadCall.url, item.xhtml, item.components['1']);
-    return launcher.loadInstance(call, options.queryParams, initialData);
+    var initialData = helper.launchData(options, uploadCall.url, item.xhtml, comp);
+    
+    var instance = launcher.loadInstance(call, options.queryParams, initialData, function(instance){
+      instance.send('getComponentKey', function(err, key){
+        if(err){
+          errorCallback(errorCodes.INTERNAL_ERROR('getComponentKey'));
+        } else {
+          done(null, {instance: instance, componentKey: key});
+        }
+      });
+    });
+    return instance;
   };
 
-  this.saveComponents = function(launcher, id, data, done) {
-
+  this.saveComponents = function(launcher, id, componentKey, data, done) {
     var key = bindType + 'Editor.singleComponent.saveComponents';
     var call = launcher.loadCall(key, function(u){
       return u.replace(':' + bindType + 'Id', id);
     });
 
-    var componentData = {
-      1: data
-    };
-
+    var componentData = {};
+    componentData[componentKey] = data;
     helper.jsonXhr(call, componentData, done);
   };
 }
 
 function Item(element, options, errorCallback) {
-
+  var Launcher = require('client-launcher');
   var launcher = new Launcher(element, options, errorCallback, options.autosizeEnabled);
   var itemBound = new CorespringBound('item', options, errorCallback);
-  var instance;
+  var instance, componentKey;
 
   function createItem(componentType, done){
 
@@ -206,12 +219,14 @@ function Item(element, options, errorCallback) {
   }
 
   function launchComponentEditorInstance(item){
-    instance = itemBound.launchComponentEditorInstance(item, launcher);
+    instance = itemBound.launchComponentEditorInstance(item, launcher, function(err, data){
+      componentKey = data.componentKey;
+    });
     helper.addCoreMethods.bind(this)(instance);
   }
 
   function saveComponents(id, data, done){
-    itemBound.saveComponents(launcher, id, data, done);
+    itemBound.saveComponents(launcher, id, componentKey, data, done);
   }
 
   var ok = launcher.init();
@@ -220,22 +235,22 @@ function Item(element, options, errorCallback) {
     if(err){
       errorCallback(errorCodes.LOAD_ITEM_FAILED(err));
     } else { 
-      launchComponentEditorInstance(item);
+      launchComponentEditorInstance.bind(this)(item);
     }
   }
 
   if(ok){
     if (options.itemId) {
-      loadItemData(options.itemId, onItemLoaded);
+      loadItemData.bind(this)(options.itemId, onItemLoaded);
     } else {
       createItem(options.componentType, function(err, result){
         if(err){
           errorCallback(errorCodes.CREATE_ITEM_FAILED(err));
         } else {
           options.itemId = result.itemId;
-          loadItemData(options.itemId, onItemLoaded);
+          loadItemData(options.itemId, onItemLoaded.bind(this));
         }
-      });
+      }.bind(this));
     }
   } else {
     return;
@@ -253,11 +268,12 @@ function Item(element, options, errorCallback) {
 
 function Draft(element, options, errorCallback) {
 
+  var Launcher = require('client-launcher');
   var launcher = new Launcher(element, options, errorCallback, options.autosizeEnabled);
   var DraftId = require('draft-id');
   var draftBound = new CorespringBound('draft', options, errorCallback);
   var draft = require('draft');
-  var instance;
+  var instance, componentKey;
   
   function createItemAndDraft(componentType, callback){
     var key = 'draftEditor.singleComponent.createWithSingleComponent';
@@ -285,12 +301,14 @@ function Draft(element, options, errorCallback) {
   }
 
   function launchComponentEditorInstance(item){
-    instance = draftBound.launchComponentEditorInstance(item, launcher);
+    instance = draftBound.launchComponentEditorInstance(item, launcher, function(err, data){
+        componentKey = data.componentKey;
+    });
     helper.addCoreMethods.bind(this)(instance);
   }
 
   function saveComponents(draftId, data, done){
-    draftBound.saveComponents(launcher, draftId, data, done);
+    draftBound.saveComponents(launcher, draftId, componentKey, data, done);
   }
 
   var ok = launcher.init();
@@ -299,7 +317,7 @@ function Draft(element, options, errorCallback) {
     if(err){
       errorCallback(errorCodes.LOAD_DRAFT_FAILED(err));
     } else { 
-      launchComponentEditorInstance(draft);
+      launchComponentEditorInstance.bind(this)(draft);
     }
   }
 
@@ -349,6 +367,11 @@ function Draft(element, options, errorCallback) {
   };
 }
 
+//Private - exposed for testing
+exports._CorespringBound = CorespringBound;
+exports._Helper = Helper;
+
+//Public
 exports.Standalone = Standalone;
 exports.Draft = Draft;
 exports.Item = Item;

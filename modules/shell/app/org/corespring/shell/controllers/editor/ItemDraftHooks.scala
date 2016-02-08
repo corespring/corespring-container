@@ -276,9 +276,9 @@ trait ItemDraftHooks
     create("", Json.obj())
   }
 
-  override def createSingleComponentItemDraft(componentType: String, defaultData: JsObject)(implicit r: RequestHeader): R[(String, String)] = Future {
-    val xhtml = s"<div><div $componentType='' id='1'></div></div>"
-    val components = Json.obj("1" -> defaultData)
+  override def createSingleComponentItemDraft(componentType: String, key:String, defaultData: JsObject)(implicit r: RequestHeader): R[(String, String)] = Future {
+    val xhtml = s"<div><div $componentType='' id='$key'></div></div>"
+    val components = Json.obj(key -> defaultData)
     create(xhtml, components)
   }
 

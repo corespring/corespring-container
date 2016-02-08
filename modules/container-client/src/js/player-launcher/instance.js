@@ -4,6 +4,8 @@
 
 var Instance = function(launchOpts, element, errorCallback, log, autosizeEnabled, iframeScrollingEnabled) {
 
+  launchOpts = launchOpts || {};
+
   var call = launchOpts.call;
   var queryParams = launchOpts.queryParams;
   var data = launchOpts.data || {};

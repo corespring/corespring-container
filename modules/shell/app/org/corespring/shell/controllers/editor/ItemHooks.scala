@@ -170,13 +170,13 @@ trait ItemHooks
     }.getOrElse(Left(BAD_REQUEST -> "Error creating item"))
   }
 
-  override def createSingleComponentItem(componentType: String, defaultData: JsObject)(implicit h: RequestHeader): R[String] = Future {
+  override def createSingleComponentItem(componentType: String, key:String, defaultData: JsObject)(implicit h: RequestHeader): R[String] = Future {
 
     val newItem = Json.obj(
-      "components" -> Json.obj("1" -> Json.obj("componentType" -> componentType).deepMerge(defaultData)),
+      "components" -> Json.obj(key -> Json.obj("componentType" -> componentType).deepMerge(defaultData)),
       "profile" -> Json.obj("taskInfo" -> Json.obj("title" -> "Untitled")),
       "metadata" -> Json.obj(),
-      "xhtml" -> s"<div><div $componentType='' id='1'></div></div>")
+      "xhtml" -> s"<div><div $componentType='' id='$key'></div></div>")
 
     itemService.create(newItem).map {
       oid =>

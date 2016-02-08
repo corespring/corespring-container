@@ -126,6 +126,8 @@ module.exports = (grunt) ->
       files:
         src: [
           '<%= common.dist %>/bower_components/msgr.js/dist/msgr.js',
+          '<%= common.app %>/**/player-launcher/error-codes.js',
+          '<%= common.app %>/**/player-launcher/url-builder.js',
           '<%= common.app %>/**/player-launcher/*.js'
         ]
         dest: '<%= common.tmp %>/wrapped/player-launcher-wrapped.js'

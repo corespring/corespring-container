@@ -105,16 +105,11 @@ describe('client-launcher', function(){
       expect(onReady).toHaveBeenCalled();
     });
     
-    it('sends \'initialise\' message', function(){
-      instance.trigger('ready');
-      expect(instance.send).toHaveBeenCalledWith('initialise', {init: true});
-    });
-
     it('adds launch-config params', function(){
       corespring.mock.modules['launch-config'] = { queryParams: { a : 'a'}};
       launcher = new ClientLauncher('e', {}, onError);
       instance = launcher.loadInstance({url: 'url'}, {}, {}, function(){});
-      expect(instance.constructorArgs[0]).toEqual({url: 'url', params: {a: 'a'}});
+      expect(instance.constructorArgs[0]).toEqual( { call: {url: 'url'}, queryParams: {a: 'a'}, data: {}});
       expect(instance.constructorArgs[1]).toEqual('e');
     });
     
@@ -150,7 +145,12 @@ describe('client-launcher', function(){
       launcher = new ClientLauncher('e', {}, onError);
       var call = launcher.loadCall('apple.banana');
       var banana = launchConfig.paths.apple.banana;
-      expect(call).toEqual({method: banana.method, url: launchConfig.corespringUrl + banana.url});
+      expect(call).toEqual(
+        { method: banana.method, 
+          url: launchConfig.corespringUrl + banana.url,
+          key: 'apple.banana',
+          queryParams: {}
+        });
     });
   });
 });

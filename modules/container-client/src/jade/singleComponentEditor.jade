@@ -33,8 +33,6 @@ block content
     .preview(ng-show="activePane == 'preview'",
       ng-controller="ClientSidePreview")
       .item-preview-wrapper
-        //- .player-label
-        //-   img(ng-src='{{playerLabelImg}}')
         .player-container
           preview-player(
             player-mode="playerMode",
@@ -75,6 +73,7 @@ block after-main-script
         //TODO:  DEBOUNCE_IN_MILLIS isnt relevent to the component editor
         .constant('DEBOUNCE_IN_MILLIS', editorOptions.debounceInMillis || 0 ) 
         .constant('UPLOAD_ENDPOINT', uploadEndpoint)
+        .constant('SINGLE_COMPONENT_KEY', editorOptions.singleComponentKey)
         .config([
           'wiggiWizConfigProvider', 
           'UPLOAD_ENDPOINT',

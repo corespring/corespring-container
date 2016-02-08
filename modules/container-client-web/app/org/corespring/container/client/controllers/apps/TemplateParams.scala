@@ -1,5 +1,6 @@
 package org.corespring.container.client.controllers.apps
 
+import org.corespring.container.client.controllers.resources.SingleComponent
 import play.api.libs.json._
 
 trait TemplateParams {
@@ -38,7 +39,12 @@ case class EditorClientOptions(debounceInMillis:Long, staticPaths:JsObject) {
   def toJson = Json.format[EditorClientOptions].writes(this)
 }
 
-case class ComponentEditorOptions(activePane:Option[String],showNavigation:Option[Boolean], uploadUrl:Option[String], uploadMethod:Option[String]) {
+case class ComponentEditorOptions(
+                                   activePane:Option[String],
+                                   showNavigation:Option[Boolean],
+                                   uploadUrl:Option[String],
+                                   uploadMethod:Option[String],
+                                   singleComponentKey:String = SingleComponent.Key) {
   def toJson = Json.format[ComponentEditorOptions].writes(this)
 }
 

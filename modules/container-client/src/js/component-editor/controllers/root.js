@@ -12,7 +12,8 @@ angular.module('corespring-singleComponentEditor.controllers')
     'WiggiDialogLauncher',
     'EditorDialogTemplate',
     'COMPONENT_EDITOR',
-    'WIGGI_EVENTS',    
+    'WIGGI_EVENTS',
+    'SINGLE_COMPONENT_KEY',    
     function(
       $scope,
       $timeout,
@@ -26,7 +27,8 @@ angular.module('corespring-singleComponentEditor.controllers')
       WiggiDialogLauncher,
       EditorDialogTemplate,
       COMPONENT_EDITOR,
-      WIGGI_EVENTS) {
+      WIGGI_EVENTS, 
+      SINGLE_COMPONENT_KEY) {
 
       "use strict";
 
@@ -34,11 +36,14 @@ angular.module('corespring-singleComponentEditor.controllers')
 
       var logger = LogFactory.getLogger('root-controller');
 
-      logger.log('@@ - root');
-      
       var configPanel;
 
       $scope.playerMode = 'gather';
+
+      /**
+       * A key for use in the item model.
+       */
+      $scope.componentKey = SINGLE_COMPONENT_KEY;
 
       $scope.showNavigation = true;
 
@@ -62,7 +67,7 @@ angular.module('corespring-singleComponentEditor.controllers')
 
       $scope.showPreview = function(done){
         done = done || function(){};
-        $scope.item.components['1'] = $scope.getData();
+        $scope.item.components[$scope.componentKey] = $scope.getData();
         $scope.activePane = 'preview';
       };
 
@@ -77,7 +82,7 @@ angular.module('corespring-singleComponentEditor.controllers')
       $scope.$on('registerConfigPanel', function(a, id, configPanelBridge) {
         logger.debug('registerConfigPanel', id);
         configPanel = configPanelBridge;
-        configPanel.setModel($scope.item.components['1']);
+        configPanel.setModel($scope.item.components[$scope.componentKey]);
       });
 
       function onLaunchDialog($event, data, title, body, callback, scopeProps, options) {
@@ -88,9 +93,7 @@ angular.module('corespring-singleComponentEditor.controllers')
         dialog.launch(data, content, callback, scopeProps, options);
       }
 
-
       $scope.$on(WIGGI_EVENTS.LAUNCH_DIALOG, onLaunchDialog);
-      
 
       function init() {
 
@@ -127,9 +130,13 @@ angular.module('corespring-singleComponentEditor.controllers')
           });
 
           Msgr.on('setData', function(data, done){
-            $scope.item.components['1'] = data;
-            configPanel.setModel($scope.item.components['1']);
+            $scope.item.components[$scope.componentKey] = data;
+            configPanel.setModel($scope.item.components[$scope.componentKey]);
             done(null);
+          });
+
+          Msgr.on('getComponentKey', function(err, done){
+            done(null, $scope.componentKey);
           });
 
           Msgr.send('rendered');
@@ -151,14 +158,13 @@ angular.module('corespring-singleComponentEditor.controllers')
           logger.log('on initialise', data);
           
           var initialData = { 
-            xhtml: '<div><div '+ componentType + '="" id="1"></div></div>',
-            components: { 
-              '1': ComponentDefaultData.getDefaultData(COMPONENT_EDITOR.componentType)
-            }
+            xhtml: '<div><div '+ componentType + '="" id="' + $scope.componentKey +'"></div></div>',
+            components: {} 
           };
 
           initialData.xhtml = data.xhtml ? data.xhtml : initialData.xhtml;
-          initialData.components['1'] = data.componentModel ? data.componentModel : initialData.components['1'];
+          var defaultData = ComponentDefaultData.getDefaultData(COMPONENT_EDITOR.componentType);
+          initialData.components[$scope.componentKey] = data.componentModel ? data.componentModel : defaultData;
           
           $scope.showNavigation = data.showNavigation === true ? true : false;
           $scope.item = angular.copy(initialData);
@@ -167,7 +173,7 @@ angular.module('corespring-singleComponentEditor.controllers')
 
           var html = [
             '<div class="config-panel-container" navigator="">',
-              '<' + componentType + '-config id="1"></' + componentType + '>',
+              '<' + componentType + '-config id="' + $scope.componentKey +'"></' + componentType +'-config>',
             '</div>'].join('\n');
 
           $('.configuration').html(html);

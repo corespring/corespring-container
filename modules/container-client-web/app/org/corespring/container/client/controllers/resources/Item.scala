@@ -9,6 +9,10 @@ import play.api.mvc.{ Action, _ }
 
 import scala.concurrent.Future
 
+object SingleComponent{
+  val Key = "singleComponent"
+}
+
 trait Item extends CoreItem with ComponentSplitter {
 
   def hooks: CoreItemHooks with CreateItemHook
@@ -23,7 +27,7 @@ trait Item extends CoreItem with ComponentSplitter {
       .flatMap{ case o : JsObject => Some(o); case _ => None }
 
     defaultData.map{ d =>
-      hooks.createSingleComponentItem(componentType, d).map { either =>
+      hooks.createSingleComponentItem(componentType, SingleComponent.Key, d).map { either =>
         either match {
           case Left(sm) => toResult(sm)
           case Right(id) => Created(Json.obj("itemId" -> id))
