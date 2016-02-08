@@ -143,14 +143,14 @@ function CorespringBound(bindType, options, errorCallback){
 
     var call = launcher.loadCall( bindType + 'Editor.singleComponent.loadEditor', addId);
 
-    if(!call){
+    if(!call || !call.url){
       errorCallback(errorCodes.CANT_FIND_URL('loadEditor'));
       return;
     }
 
     var initialData = helper.launchData(options, uploadCall.url, item.xhtml, comp);
     
-    var instance = launcher.loadInstance(call, options.queryParams, initialData, function(instance){
+    var instance = launcher.loadInstance(call, options.queryParams || {}, initialData, function(instance){
       instance.send('getComponentKey', function(err, key){
         if(err){
           errorCallback(errorCodes.INTERNAL_ERROR('getComponentKey'));
@@ -241,7 +241,7 @@ function Item(element, options, errorCallback) {
 
   if(ok){
     if (options.itemId) {
-      loadItemData.bind(this)(options.itemId, onItemLoaded);
+      loadItemData.bind(this)(options.itemId, onItemLoaded.bind(this));
     } else {
       createItem(options.componentType, function(err, result){
         if(err){

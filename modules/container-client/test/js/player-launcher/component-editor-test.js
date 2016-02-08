@@ -1,54 +1,57 @@
 describe('component-editor', function () {
+    
+  var launcher, instance, Def, errorCodes, modules; 
+
+  function MockLauncher(){
+
+    this.init = jasmine.createSpy('init').and.returnValue(true);
+
+    this.loadInstance = jasmine.createSpy('loadInstance').and.callFake(function(){
+      return instance;
+    });
+
+    this.loadCall = jasmine.createSpy('loadCall').and.callFake(function(){
+      return {method: 'GET', url: 'catalog/:itemId'};
+    });
+
+    this.mkInstance = jasmine.createSpy('mkInstance').and.callFake(function(){
+        return instance;
+    });
+  }
+
+  beforeEach(function () {
+    corespring.mock.modules['launch-config'] = {};
+    instance = {
+      send: jasmine.createSpy('send')
+    };
+    launcher = new MockLauncher();
+    corespring.mock.modules['client-launcher'] = function(){
+      return launcher;
+    };
+    modules = corespring.require('component-editor');
+    errorCodes = corespring.require('error-codes');
+   
+    errorCallback = jasmine.createSpy('errorCallback');
+  });
+
+  afterEach(function () {
+    corespring.mock.reset();
+  });
 
   describe('standalone', function(){
 
-    var mockLauncher, mockInstance, standalone, Def, errorCodes; 
+    var standalone;
+    
+    beforeEach(function(){
 
-    function MockLauncher(){
+      launcher.loadCall.and.returnValue({
+        method: 'GET', url: 'standalone'
+      }); 
 
-      this.init = jasmine.createSpy('init').and.returnValue(true);
-
-      this.loadInstance = jasmine.createSpy('loadInstance').and.callFake(function(){
-        return mockInstance;
-      });
-
-      this.loadCall = jasmine.createSpy('loadCall').and.callFake(function(){
-        return {method: 'GET', url: 'catalog/:itemId'};
-      });
-
-      this.mkInstance = jasmine.createSpy('mkInstance').and.callFake(function(){
-          return mockInstance;
-      });
-    }
-
-    beforeEach(function () {
-      corespring.mock.modules['launch-config'] = {};
-      mockInstance = {
-        send: jasmine.createSpy('send')
-      };
-      mockLauncher = new MockLauncher();
-      corespring.mock.modules['client-launcher'] = function(){
-        return mockLauncher;
-      };
-      var modules = corespring.require('component-editor');
       Def = modules.Standalone;
-      errorCodes = corespring.require('error-codes');
-    });
-
-    afterEach(function () {
-      corespring.mock.reset();
     });
 
     describe('constructor', function(){
-
-      var errorCallback;
-      
-      beforeEach(function(){
-        mockLauncher.loadCall.and.returnValue({
-          method: 'GET', url: 'standalone'
-        });
-        errorCallback = jasmine.createSpy('errorCallback');
-      });
 
       it('should create a new instance', function(){
         standalone = new Def('element', {}, errorCallback);
@@ -56,7 +59,7 @@ describe('component-editor', function () {
       });
       
       it('should call the errorCallback - if it can\'t find a url in the launch config', function(){
-        mockLauncher.loadCall.and.returnValue({});
+        launcher.loadCall.and.returnValue({});
         standalone = new Def('element', {componentType: 't'}, errorCallback);
         expect(errorCallback).toHaveBeenCalledWith(errorCodes.CANT_FIND_URL('standaloneEditor'));
       });
@@ -91,13 +94,88 @@ describe('component-editor', function () {
 
       it('should call instance.send(getData)', function(){
         standalone.getData();
-        expect(mockInstance.send).toHaveBeenCalledWith('getData', jasmine.any(Function));
+        expect(instance.send).toHaveBeenCalledWith('getData', jasmine.any(Function));
       });
 
       it('should call instance.send(setData, data)', function(){
         standalone.setData(data, jasmine.createSpy('onSetData'));
-        expect(mockInstance.send).toHaveBeenCalledWith('setData', data, jasmine.any(Function));
+        expect(instance.send).toHaveBeenCalledWith('setData', data, jasmine.any(Function));
       });
+    });
+  });
+
+  describe('item', function(){
+
+    var item;
+    
+    function ajaxFail(e, opts){
+      opts.error({responseJSON: {error: e}});
+    } 
+
+    beforeEach(function(){
+
+      launcher.loadCall.and.returnValue({
+        method: 'GET', url: 'item'
+      }); 
+
+      Def = modules.Item;
+      
+      $.ajax = jasmine.createSpy('ajax').and.callFake(function(opts){
+        opts.success({});
+      });
+    });
+
+    describe('init', function(){
+
+      it('calls errorCallback if createItem fails', function(){
+        $.ajax.and.callFake(ajaxFail.bind(this, 'create failed'));
+        item = new Def('element', {}, errorCallback);
+        expect(errorCallback).toHaveBeenCalledWith(errorCodes.CREATE_ITEM_FAILED('create failed'));
+      });
+
+      it('calls errorCallback if load item fails', function(){
+        $.ajax.and.callFake(ajaxFail.bind(this, 'load failed'));
+        item = new Def('element', {itemId: 'itemId'}, errorCallback);
+        expect(errorCallback).toHaveBeenCalledWith(errorCodes.LOAD_ITEM_FAILED('load failed'));
+      });
+    });
+    
+    it('calls errorCallback if item has no compoents', function(){
+      $.ajax.and.callFake(function(opts){
+        opts.success({components: {}});
+      });
+      item = new Def('element', {itemId: 'itemId'}, errorCallback);
+      expect(errorCallback).toHaveBeenCalledWith(errorCodes.ONLY_ONE_COMPONENT_ALLOWED);
+    });
+
+    it('calls errorCallback if item has more than one component', function(){
+      $.ajax.and.callFake(function(opts){
+        opts.success({components: { 1: {}, 2: {}}});
+      });
+      item = new Def('element', {itemId: 'itemId'}, errorCallback);
+      expect(errorCallback).toHaveBeenCalledWith(errorCodes.ONLY_ONE_COMPONENT_ALLOWED);
+    });
+
+    it('calls launcher.loadInstance', function(){
+      $.ajax.and.callFake(function(opts){
+        opts.success({components: { 1: {}}});
+      });
+      item = new Def('element', {itemId: 'itemId'}, errorCallback);
+
+      /** Object(
+      { method: 'GET', url: 'item' }), 
+      Object({  }), 
+      Object({ activePane: 'config', showNavigation: false, uploadUrl: 'item', 
+      xhtml: undefined, componentModel: Object({  }) }), Function ].*/
+      expect(launcher.loadInstance).toHaveBeenCalledWith(
+        {method: 'GET', url: 'item'},
+        jasmine.any(Object),
+        {activePane: 'config', 
+        showNavigation: false, 
+        uploadUrl: 'item', 
+        xhtml: undefined, 
+        componentModel: {}}, 
+        jasmine.any(Function));
     });
   });
 });
