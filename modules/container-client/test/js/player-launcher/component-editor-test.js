@@ -14,6 +14,10 @@ describe('component-editor', function () {
       return {method: 'GET', url: 'catalog/:itemId'};
     });
 
+    this.prepareUrl = jasmine.createSpy('prepareUrl').and.callFake(function(url){
+      return url;
+    });
+
     this.mkInstance = jasmine.createSpy('mkInstance').and.callFake(function(){
         return instance;
     });
@@ -103,14 +107,14 @@ describe('component-editor', function () {
       });
     });
   });
+    
+  function ajaxFail(e, opts){
+    opts.error({responseJSON: {error: e}});
+  } 
 
   describe('item', function(){
 
     var item;
-    
-    function ajaxFail(e, opts){
-      opts.error({responseJSON: {error: e}});
-    } 
 
     beforeEach(function(){
 
@@ -162,11 +166,6 @@ describe('component-editor', function () {
       });
       item = new Def('element', {itemId: 'itemId'}, errorCallback);
 
-      /** Object(
-      { method: 'GET', url: 'item' }), 
-      Object({  }), 
-      Object({ activePane: 'config', showNavigation: false, uploadUrl: 'item', 
-      xhtml: undefined, componentModel: Object({  }) }), Function ].*/
       expect(launcher.loadInstance).toHaveBeenCalledWith(
         {method: 'GET', url: 'item'},
         jasmine.any(Object),
@@ -176,6 +175,31 @@ describe('component-editor', function () {
         xhtml: undefined, 
         componentModel: {}}, 
         jasmine.any(Function));
+    });
+  });
+
+  describe('draft', function(){
+    var item;
+
+    beforeEach(function(){
+
+      launcher.loadCall.and.returnValue({
+        method: 'GET', url: 'item'
+      }); 
+
+      Def = modules.Draft;
+      
+      $.ajax = jasmine.createSpy('ajax').and.callFake(function(opts){
+        opts.success({});
+      });
+    });
+
+    describe('init', function(){
+      it('calls errorCallback if createItemAndDraft fails', function(){
+        $.ajax.and.callFake(ajaxFail.bind(this, 'create failed'));
+        item = new Def('element', {}, errorCallback);
+        expect(errorCallback).toHaveBeenCalledWith(errorCodes.CREATE_ITEM_AND_DRAFT_FAILED('create failed'));
+      });
     });
   });
 });

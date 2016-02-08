@@ -329,7 +329,7 @@ function Draft(element, options, errorCallback) {
     } else {
       createItemAndDraft(options.componentType, function(err, result){
         if(err){
-          errorCallback(errorCodes.CREATE_DRAFT_FAILED(err));
+          errorCallback(errorCodes.CREATE_ITEM_AND_DRAFT_FAILED(err));
         } else {
           options.itemId = result.itemId;
           options.draftName = result.draftName;
