@@ -176,6 +176,9 @@ describe('component-editor', function () {
         componentModel: {}}, 
         jasmine.any(Function));
     });
+    
+    describe('save', function(){});
+    
   });
 
   describe('draft', function(){
@@ -226,5 +229,8 @@ describe('component-editor', function () {
       });
 
     });
+
+    describe('save', function(){});
+    describe('commitDraft', function(){});
   });
 });
