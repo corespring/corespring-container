@@ -71,7 +71,6 @@ var errorCodes = require('error-codes');
 var Launcher = require('client-launcher');
 var helper = new Helper();
 
-
 function Standalone(element, options, errorCallback) {
 
   var launcher = new Launcher(element, options, errorCallback, options.autosizeEnabled);
@@ -89,6 +88,7 @@ function Standalone(element, options, errorCallback) {
 
     var initialData = helper.launchData(options, options.uploadUrl, options.markup, options.data);
     instance = launcher.loadInstance(call, options.queryParams, initialData);
+    helper.addCoreMethods.bind(this)(instance);
   }
 
   var ok = launcher.init(function(){
@@ -104,8 +104,6 @@ function Standalone(element, options, errorCallback) {
   } else {
     return;
   }
-
-  helper.addCoreMethods(instance).bind(this);
 
   this.getData = function(done){
     instance.send('getData', helper.instanceCallbackHandler(done));
@@ -209,6 +207,7 @@ function Item(element, options, errorCallback) {
 
   function launchComponentEditorInstance(item){
     instance = itemBound.launchComponentEditorInstance(item, launcher);
+    helper.addCoreMethods.bind(this)(instance);
   }
 
   function saveComponents(id, data, done){
@@ -242,7 +241,6 @@ function Item(element, options, errorCallback) {
     return;
   }
 
-  helper.addCoreMethods(instance).bind(this);
 
   this.save = function(done){
     instance.send('getData', function(err, data){
@@ -288,6 +286,7 @@ function Draft(element, options, errorCallback) {
 
   function launchComponentEditorInstance(item){
     instance = draftBound.launchComponentEditorInstance(item, launcher);
+    helper.addCoreMethods.bind(this)(instance);
   }
 
   function saveComponents(draftId, data, done){
@@ -325,7 +324,6 @@ function Draft(element, options, errorCallback) {
     return;
   }
 
-  helper.addCoreMethods(instance).bind(this);
 
   this.save = function(done){
     instance.send('getData', function(err, data){
@@ -336,18 +334,6 @@ function Draft(element, options, errorCallback) {
   };
 
   this.commitDraft = function(force, done){
-    
-    function onError(err) {
-      var msg = (err.responseJSON && err.responseJSON.error) ? err.responseJSON.error : 'Failed to commit draft: ' + options.draftId;
-      if (done) {
-        done(errorCodes.COMMIT_DRAFT_FAILED(msg));
-      }
-    }
-
-    function onSuccess(result, msg, xhr){
-      done(null, result);
-    }
-
     this.save(function(result){
       if(result.error){
         done(result.error);
@@ -356,15 +342,8 @@ function Draft(element, options, errorCallback) {
         var call = launcher.loadCall(key, function(u){
           return u.replace(':draftId', options.draftId.toString());
         });
-
-        $.ajax({
-          type: call.method,
-          url: launcher.prepareUrl(call.url, {force: force}),
-          data: {},
-          success: onSuccess,
-          error: onError,
-          dataType: 'json'
-        });  
+        var url = launcher.prepareUrl(call.url, {force: force});
+        draft.xhrCommitDraft(call.method, url, options.draftId, done);
       }
     });
   };

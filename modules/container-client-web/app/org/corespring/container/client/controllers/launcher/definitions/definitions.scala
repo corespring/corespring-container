@@ -106,7 +106,7 @@ private[launcher] object ItemEditors extends LaunchCompanionUtils {
 }
 
 private[launcher] case class ItemEditors(corespringUrl: String, load: String => Option[String], queryParams: Map[String, String]) extends CorespringJsClient {
-  override lazy val fileNames: Seq[String] = Seq("item-editor.js", "draft-editor.js")
+  override lazy val fileNames: Seq[String] = Seq("item-editor.js", "draft.js", "draft-editor.js")
   override lazy val bootstrap: String =
     """
       |org.corespring.players.ItemEditor = corespring.require('item-editor');
@@ -138,7 +138,7 @@ private[launcher] object ComponentEditor extends LaunchCompanionUtils {
 
 private[launcher] case class ComponentEditor(corespringUrl: String, load: String => Option[String], queryParams: Map[String, String]) extends CorespringJsClient {
 
-  override val fileNames = Seq("component-editor.js")
+  override val fileNames = Seq("draft.js", "component-editor.js")
 
   override val bootstrap =
     """

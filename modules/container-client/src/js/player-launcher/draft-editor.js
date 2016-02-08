@@ -78,27 +78,25 @@ function EditorDefinition(element, options, errorCallback) {
     options.draftName = options.draftName || msgr.utils.getUid(); //jshint ignore:line
 
     if (options.itemId) {
-      var draftId = new DraftId(options.itemId, options.draftName);
-      loadDraftItem(draftId.toString(), options);
+      options.draftId = new DraftId(options.itemId, options.draftName);
+
+      loadDraftItem(options.draftId.toString(), options);
     } else {
       createItemAndDraft(function(err, result) {
-
         if (err) {
           errorCallback(errorCodes.CREATE_ITEM_AND_DRAFT_FAILED(err));
         } else {
           options.itemId = result.itemId;
           options.draftName = result.draftName;
-          var draftId = new DraftId(options.itemId, options.draftName);
-          loadDraftItem(draftId.toString(), options);
+          options.draftId = new DraftId(options.itemId, options.draftName);
+          loadDraftItem(options.draftId.toString(), options);
         }
       });
     }
-
   } else {
     errorCallback(errorCodes.INITIALISATION_FAILED);
     return;
   }
-
   
   /** Public functions */
   this.forceSave = function(callback) {
@@ -115,34 +113,16 @@ function EditorDefinition(element, options, errorCallback) {
         return;
       }
 
+      var draftId =  new DraftId(options.itemId, options.draftName);
       var call = launcher.loadCall('draftEditor.commitDraft', function(u) {
-        return u.replace(':draftId', new DraftId(options.itemId, options.draftName).toString());
+        return u.replace(':draftId', draftId.toString());
       });
 
-      function onSuccess(result) {
-        if (callback) {
-          callback(null);
-        }
-      }
+      var url = launcher.prepareUrl(call.url, {force: force});
 
-      function onError(err) {
-        var msg = (err.responseJSON && err.responseJSON.error) ? err.responseJSON.error : 'Failed to commit draft: ' + options.draftId;
-        if (callback) {
-          callback(errorCodes.COMMIT_DRAFT_FAILED(msg));
-        }
-      }
-
-      $.ajax({
-        type: call.method,
-        url: launcher.prepareUrl(call.url, {
-          force: force
-        }),
-        data: {},
-        success: onSuccess,
-        error: onError,
-        dataType: 'json'
-      });
+      draft.xhrCommitDraft(call.method, url, options.draftId, callback);
     });
+
   };
 
   this.remove = function() {

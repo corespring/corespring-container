@@ -30,5 +30,26 @@ exports.createItemAndDraft = function(call, options, callback) {
         xhrErr.responseJSON.error : 'Failed to create item and draft: ' + options.draftId;
       callback(msg);
     }
+};
+
+var errorCodes = require('error-codes');
+
+exports.xhrCommitDraft = function(method, url, draftId, callback){
+
+  function onError(err) {
+    var msg = (err.responseJSON && err.responseJSON.error) ? err.responseJSON.error : 'Failed to commit draft: ' + draftId.toString();
+    if (callback) {
+      callback(errorCodes.COMMIT_DRAFT_FAILED(msg));
+    }
+  }
+
+  $.ajax({
+    type: method,
+    url: url, 
+    data: {},
+    success: callback.bind(null, null),
+    error: onError,
+    dataType: 'json'
+  });
 
 };

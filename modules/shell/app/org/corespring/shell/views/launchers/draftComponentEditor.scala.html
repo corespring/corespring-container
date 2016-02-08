@@ -29,11 +29,12 @@
 
        $('input[value="config"]').prop('checked', true);
 
-       console.log(document.location.href);
-       console.log('opts: ', opts);
-
        opts.onItemCreated = function(itemId){
          console.log('item created: ' + itemId);
+       };
+
+       opts.onDraftCreated = function(itemId, draftName){
+         console.log('draft created: ', itemId, ' draftName: ', draftName);
        };
 
        opts.queryParams = {
@@ -62,14 +63,6 @@
          }
          });
 
-       $('.get-data').click(function(){
-          editor.getData(function(result){
-            var data = result.result;
-            var jsonString = JSON.stringify(result.result, null, '  ');
-            $('.data-text-area').val(jsonString);
-          });
-       });
-
        $('.save').click(function(){
           editor.save(function(result){
             console.log('>> save: ', result);
@@ -78,7 +71,12 @@
 
        $('.commit').click(function(){
           editor.commitDraft(false, function(err, result){
-            console.log('>> commit: ', result);
+            if(err){
+              console.error(err);
+            } else {
+              console.log('>> commit: ', result);
+            }
+
           });
        });
 
@@ -115,7 +113,6 @@
 
     <label>External controls: </label>
     |
-    <button class="btn btn-sm btn-primary get-data">Get Data</button>
     <button class="btn btn-sm btn-success save">Save</button>
     <button class="btn btn-sm btn-success commit">Commit</button>
     |
