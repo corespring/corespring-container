@@ -334,9 +334,9 @@ function Draft(element, options, errorCallback) {
           options.itemId = result.itemId;
           options.draftName = result.draftName;
           options.draftId = new DraftId(options.itemId, options.draftName);
-          loadDraftData(options.draftId.toString(), onDraftLoaded);
+          loadDraftData.bind(this)(options.draftId.toString(), onDraftLoaded.bind(this));
         }
-      });
+      }.bind(this));
     }
   } else {
     return;

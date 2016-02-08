@@ -23,3 +23,4 @@ exports.LOAD_DRAFT_FAILED = function(msg){ return {code: 121, msg: msg};};
 exports.UPLOAD_URL_MISSING_FILENAME = {code: 122, msg: 'the upload url needs to have \':filename\'.'};
 exports.NO_COMPONENT_TYPE = {code: 123, msg: 'no \'componentType\' specified.'};
 exports.INTERNAL_ERROR = function(msg){return {code: 124, msg: msg};};
+exports.CALL_IS_UNDEFINED = {code: 125, msg: 'code is undefined'};
