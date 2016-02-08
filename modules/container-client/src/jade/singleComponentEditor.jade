@@ -82,7 +82,10 @@ block after-main-script
             UPLOAD_ENDPOINT.method = UPLOAD_ENDPOINT.method || 'POST';
             
             var config = {
-              dialogLaunchMode: 'external'
+              dialogLaunchMode: 'external',
+              defaultImageService: {
+                maxSize: 200
+              }
             };
 
             if(UPLOAD_ENDPOINT.url && UPLOAD_ENDPOINT.method){
