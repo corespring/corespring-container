@@ -352,5 +352,3 @@ function Draft(element, options, errorCallback) {
 exports.Standalone = Standalone;
 exports.Draft = Draft;
 exports.Item = Item;
-
-

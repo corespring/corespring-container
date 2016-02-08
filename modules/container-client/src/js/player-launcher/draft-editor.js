@@ -122,7 +122,6 @@ function EditorDefinition(element, options, errorCallback) {
 
       draft.xhrCommitDraft(call.method, url, options.draftId, callback);
     });
-
   };
 
   this.remove = function() {
@@ -130,8 +129,6 @@ function EditorDefinition(element, options, errorCallback) {
       instance.remove();
     }
   };
-
-
 }
 
 module.exports = EditorDefinition;

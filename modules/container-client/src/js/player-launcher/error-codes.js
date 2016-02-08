@@ -18,30 +18,6 @@ exports.CREATE_ITEM_FAILED = function(msg){ return {code: 116, msg: msg};};
 exports.CANT_FIND_URL = function(msg){ return {code: 117, msg: msg};};
 exports.SAVE_ALL_FAILED = function(msg) { return {code: 118, msg: msg}; };
 exports.INITIALISATION_FAILED = {code: 119, msg: 'initialisation failed.'};
-exports.COMPONENT_EDITOR_MISSING_ASSET_ENDPOINTS = {
-  code: 120, 
-  msg: [
-  'Missing asset urls, you must provide them in the options object:',
-  '  { assets: { upload: {}, remove: {} }',
-  'Where upload/remove have the following structure: ',
-  '  { method: "POST|PUT|DELETE", url: "your-url" }'
-  ].join('\n')
-};
-
-
-exports.COMPONENT_EDITOR_WRONG_METHOD = function(allowed, defined){
-  return {
-    code: 121,
-    msg: 'Wrong method: ' + defined + ' allowed methods: ' + allowed
-  };
-};
-
-exports.COMPONENT_EDITOR_MISSING_URL = function(key){
-  return {
-    code: 122,
-    msg: 'No url defined for: ' + key
-  };
-};
-exports.LOAD_ITEM_FAILED = function(msg){ return {code: 123, msg: msg};};
-exports.LOAD_DRAFT_FAILED = function(msg){ return {code: 124, msg: msg};};
-exports.UPLOAD_URL_MISSING_FILENAME = {code: 125, msg: 'the upload url needs to have \':filename\'.'};
+exports.LOAD_ITEM_FAILED = function(msg){ return {code: 120, msg: msg};};
+exports.LOAD_DRAFT_FAILED = function(msg){ return {code: 121, msg: msg};};
+exports.UPLOAD_URL_MISSING_FILENAME = {code: 122, msg: 'the upload url needs to have \':filename\'.'};
