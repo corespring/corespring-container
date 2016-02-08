@@ -28,7 +28,6 @@
     "jquery-mockjax": "~1.6.2",
     "jquery-ui": "1.11.0",
     "jquery.browser": "~0.0.6",
-    "less-elements": "https://github.com/dmitryf/elements.git",
     "lodash": "~2.4.1",
     "mathjax": "https://github.com/mathjax/MathJax.git#2.6",
     "mathjs": "~0.18.0",
