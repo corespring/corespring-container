@@ -30,9 +30,6 @@
 
        $('input[value="config"]').prop('checked', true);
 
-       console.log(document.location.href);
-       console.log('opts: ', opts);
-
        opts.onItemCreated = function(itemId){
          console.log('item created: ' + itemId);
        };
@@ -63,14 +60,6 @@
            opts.showNavigation = this.checked;
          }
          });
-
-       $('.get-data').click(function(){
-          editor.getData(function(result){
-            var data = result.result;
-            var jsonString = JSON.stringify(result.result, null, '  ');
-            $('.data-text-area').val(jsonString);
-          });
-       });
 
        $('.save').click(function(){
           editor.save(function(result){
@@ -108,8 +97,6 @@
   <div class="external-controls navbar nav">
 
     <label>External controls: </label>
-    |
-    <button class="btn btn-sm btn-primary get-data">Get Data</button>
     <button class="btn btn-sm btn-success save">Save</button>
     |
     <span>
