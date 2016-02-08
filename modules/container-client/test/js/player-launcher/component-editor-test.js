@@ -184,7 +184,7 @@ describe('component-editor', function () {
     beforeEach(function(){
 
       launcher.loadCall.and.returnValue({
-        method: 'GET', url: 'item'
+        method: 'GET', url: 'draft'
       }); 
 
       Def = modules.Draft;
@@ -200,6 +200,31 @@ describe('component-editor', function () {
         item = new Def('element', {}, errorCallback);
         expect(errorCallback).toHaveBeenCalledWith(errorCodes.CREATE_ITEM_AND_DRAFT_FAILED('create failed'));
       });
+      
+      it('calls errorCallback if  loadDraft fails', function(){
+        $.ajax.and.callFake(ajaxFail.bind(this, 'load draft failed'));
+        item = new Def('element', {itemId: 'itemId'}, errorCallback);
+        expect(errorCallback).toHaveBeenCalledWith(errorCodes.LOAD_DRAFT_FAILED('load draft failed'));
+      });
+
+      it('calls launcher.loadInstance', function(){
+        $.ajax.and.callFake(function(opts){
+          opts.success({components: { 1: {}}});
+        });
+
+        item = new Def('element', {itemId: 'itemId'}, errorCallback);
+
+        expect(launcher.loadInstance).toHaveBeenCalledWith(
+          {method: 'GET', url: 'draft'},
+          jasmine.any(Object),
+          {activePane: 'config', 
+          showNavigation: false, 
+          uploadUrl: 'draft', 
+          xhtml: undefined, 
+          componentModel: {}}, 
+          jasmine.any(Function));
+      });
+
     });
   });
 });
