@@ -103,7 +103,7 @@
   @if( (opts \ "itemId").asOpt[String].isEmpty){
     <div class="navbar nav">
       <select class="form-control component-type" style="float:left; width: 200px;" prompt="choose a component type...">
-        @types.map{ t => <option name="@t._1">@t._1 (release: @t._2)</option> }
+        @types.map{ t => <option name="@t._1">@t._1 (released: @t._2)</option> }
       </select>
       <button class="btn btn-primary create">Create</button>
     </div>
