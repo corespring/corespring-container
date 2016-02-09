@@ -1,4 +1,4 @@
-@(componentEditorJs:String, types: Seq[String], opts : play.api.libs.json.JsValue)
+@(componentEditorJs:String, types: Seq[(String,Boolean)], opts : play.api.libs.json.JsValue)
 <html>
 <head>
   <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"/>
@@ -103,7 +103,7 @@
   @if( (opts \ "itemId").asOpt[String].isEmpty){
     <div class="navbar nav">
       <select class="form-control component-type" style="float:left; width: 200px;" prompt="choose a component type...">
-        @types.map{ t => <option name="@t">@t</option> }
+        @types.map{ t => <option name="@t._1">@t._1 (release: @t._2)</option> }
       </select>
       <button class="btn btn-primary create">Create</button>
     </div>

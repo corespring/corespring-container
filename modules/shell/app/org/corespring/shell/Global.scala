@@ -59,15 +59,32 @@ object Global extends WithFilters(AccessControlFilter, CallBlockOnHeaderFilter) 
     mongoClient(mongoUri.database.getOrElse("corespring-container-devt"))
   }
 
+  private lazy val showNonReleasedComponents = Play.current.configuration.getBoolean("components.showNonReleasedComponents").getOrElse(Play.current.mode == Mode.Dev)
+
   private lazy val containerClient = new ContainerClientImplementation(
     new MongoService(db("items")),
     new MongoService(db("sessions")),
     new ItemDraftService(db("itemDrafts")),
-    componentLoader.all,
+    {
+      if(showNonReleasedComponents){
+        componentLoader.all
+      } else {
+        componentLoader.all.filter{ c =>
+          if(c.isInstanceOf[Interaction]){
+            c.asInstanceOf[Interaction].released
+          } else {
+            true
+          }
+        }
+      }
+    },
     Play.current.configuration)
 
   private lazy val launchers = new Launchers {
-    override def components: Seq[Component] = componentLoader.all.filter(_.isInstanceOf[Interaction])
+    override def interactions: Seq[Interaction] = componentLoader.all.flatMap{
+      case i : Interaction => Some(i)
+      case _ => None
+    }
   }
 
   private lazy val home = new Main {
@@ -97,14 +114,11 @@ object Global extends WithFilters(AccessControlFilter, CallBlockOnHeaderFilter) 
   }
 
   private lazy val componentLoader = {
-    val showNonReleasedComponents = Play.current.configuration.getBoolean("components.showNonReleasedComponents").getOrElse(Play.current.mode == Mode.Dev)
-    val out = new FileComponentLoader(Play.current.configuration.getString("components.path").toSeq, showNonReleasedComponents)
+    val out = new FileComponentLoader(Play.current.configuration.getString("components.path").toSeq)
     out.reload
-
     if (out.all.length == 0) {
       throw new RuntimeException("Can't load any components - check the path!")
     }
-
     out
   }
 
