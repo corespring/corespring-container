@@ -22,6 +22,49 @@
     };
   };
 
+  e.Msgr = function(){ 
+    return {
+      on: jasmine.createSpy('on'),
+      send: jasmine.createSpy('send')
+    };
+  };
+
+  e.DesignerService = function(){ return { 
+    loadAvailableUiComponents: jasmine.createSpy('loadAvailableUiComponents')
+      .and.callFake(function(done){
+      done([]);
+    })};
+  };
+
+  e.ComponentDefaultData = function(){
+    return {
+      getDefaultData: jasmine.createSpy('getDefaultData').and.returnValue({})
+    };
+  };
+
+  e.ComponentData = function(){ 
+    return {
+      setModel: jasmine.createSpy('setModel'),
+      registerComponent: jasmine.createSpy('registerComponent'),
+      setEditable: jasmine.createSpy('setEditable')
+    };
+  };
+
+  e.iFrameService = function(){
+    return {
+      isInIFrame: jasmine.createSpy('isInIFrame'),
+      bypassIframeLaunchMechanism: jasmine.createSpy('bypassIframeLaunchMechanism')
+    };
+  };
+
+  e.$timeout =  function() {
+    var timeout = function(fn){
+      fn();
+    };
+    timeout.cancel = function(){};
+    timeout.flush = function(){};
+    return timeout; 
+  };
 
   e.Stash = function Stash(holder, name, mock){
 
@@ -52,6 +95,14 @@
     };
     this.triggerError = function(){
       onError.apply(null, Array.prototype.slice.call(arguments));
+    };
+  };
+
+
+  e.$log = function(){ 
+    return {
+      debug: jasmine.createSpy('debug'),
+      error: jasmine.createSpy('error')
     };
   };
 

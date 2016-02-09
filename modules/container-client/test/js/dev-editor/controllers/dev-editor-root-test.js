@@ -1,75 +1,42 @@
 describe('DevEditorRoot', function() {
 
-  var scope, element, rootScope;
-
-  var ItemService = {
-    load: jasmine.createSpy('load'),
-    saveXhtml: jasmine.createSpy('saveXhtml'),
-    saveAll: jasmine.createSpy('saveAll'),
-    saveCustomScoring: jasmine.createSpy('saveCustomScoring'),
-    saveComponents: jasmine.createSpy('saveComponents')
-  };
-
-  var ComponentData = {
-    setModel: jasmine.createSpy('setModel'),
-    registerComponent: jasmine.createSpy('registerComponent'),
-    setEditable: jasmine.createSpy('setEditable')
-  };
-
-  var $log = {
-    debug: jasmine.createSpy('debug'),
-    error: jasmine.createSpy('error')
-  };
-
-  var iFrameService = {
-    isInIFrame: jasmine.createSpy('isInIFrame'),
-    bypassIframeLaunchMechanism: jasmine.createSpy('bypassIframeLaunchMechanism')
-  };
-
-  function makeMockTimeout(){
-    var timeout = function(fn){
-      fn();
-    };
-    timeout.cancel = function(){};
-    timeout.flush = function(){};
-    return timeout;
-  }
-
-
-  afterEach(function() {
-    ItemService.load.calls.reset();
-    ItemService.saveXhtml.calls.reset();
-    ItemService.saveCustomScoring.calls.reset();
-    ItemService.saveComponents.calls.reset();
-    ComponentData.setModel.calls.reset();
-    ComponentData.registerComponent.calls.reset();
-    ComponentData.setEditable.calls.reset();
-    $log.error.calls.reset();
-  });
+  var scope, rootScope, controller;
+  var ItemService, ComponentData, $log, iFrameService, Msgr;
 
   beforeEach(angular.mock.module('corespring-dev-editor.controllers'));
 
-  var Msgr;
-
   beforeEach(module(function($provide) {
-    Msgr = {
-      on: jasmine.createSpy('on'),
-      send: jasmine.createSpy('send')
+
+    var mocks = org.corespring.mocks.editor;
+
+    Msgr = mocks.Msgr();
+
+    ItemService = {
+      load: jasmine.createSpy('load'),
+      saveXhtml: jasmine.createSpy('saveXhtml'),
+      saveAll: jasmine.createSpy('saveAll'),
+      saveCustomScoring: jasmine.createSpy('saveCustomScoring'),
+      saveComponents: jasmine.createSpy('saveComponents')
     };
+
+    ComponentData = mocks.ComponentData();
+    $log = mocks.$log();
+    iFrameService = mocks.iFrameService();
+
     $provide.value('ItemService', ItemService);
     $provide.value('ComponentData', ComponentData);
     $provide.value('iFrameService', iFrameService);
     $provide.value('Msgr', Msgr);
     $provide.value('$log', $log);
-    $provide.value('$timeout', makeMockTimeout() );
+    $provide.value('$timeout', org.corespring.mocks.editor.$timeout());
   }));
 
 
-  beforeEach(inject(function($rootScope, $compile) {
+  beforeEach(inject(function($rootScope, $controller) {
       rootScope = $rootScope;
+      controller = $controller;
       scope = $rootScope.$new();
-      element = $compile('<div ng-controller="DevEditorRoot"></div>')(scope);
-      scope = element.scope();
+      controller('DevEditorRoot', {$scope: scope});
   }));
 
   describe('initialization', function() {
@@ -102,7 +69,7 @@ describe('DevEditorRoot', function() {
         return args[0];
       }
 
-      it("should save change to components", function () {
+      it('should save change to components', function () {
         var changedValue = {
           1: 'component!'
         };
@@ -111,15 +78,15 @@ describe('DevEditorRoot', function() {
         expect(getItemPassedToService().components).toEqual(changedValue);
       });
 
-      it("should save change to customScoringJs", function () {
-        var changedValue = "var someVar='some value'";
+      it('should save change to customScoringJs', function () {
+        var changedValue = 'var someVar="some value"';
         scope.customScoringJs = changedValue;
         scope.saveAll();
         expect(getItemPassedToService().customScoring).toEqual(changedValue);
       });
 
-      it("should save change to xhtml", function () {
-        var changedValue = "<div>bar</div>";
+      it('should save change to xhtml', function () {
+        var changedValue = '<div>bar</div>';
         scope.xhtml = changedValue;
         scope.saveAll();
         expect(getItemPassedToService().xhtml).toEqual(changedValue);
@@ -175,17 +142,17 @@ describe('DevEditorRoot', function() {
       scope.onItemLoaded(item);
       Msgr.send.calls.reset();
     });
-    it("when components have been changed", function(){
-      scope.components = {1:"component!"};
+    it('when components have been changed', function(){
+      scope.components = {1:'component!'};
       scope.$digest();
       expect(Msgr.send).toHaveBeenCalledWith('itemChanged', {partsChanged:['components']});
     });
-    it("when customScoring has been changed", function(){
-      scope.customScoringJs = "var s = 'something';";
+    it('when customScoring has been changed', function(){
+      scope.customScoringJs = 'var s = "something";';
       scope.$digest();
       expect(Msgr.send).toHaveBeenCalledWith('itemChanged', {partsChanged:['customScoring']});
     });
-    it("when xhtml has been changed", function(){
+    it('when xhtml has been changed', function(){
       scope.xhtml = '<div>bar</div>';
       scope.$digest();
       expect(Msgr.send).toHaveBeenCalledWith('itemChanged', {partsChanged:['xhtml']});
@@ -198,7 +165,7 @@ describe('DevEditorRoot', function() {
     describe('xhtml', function() {
 
       describe('xhtml has not changed', function() {
-        var xhtml = "<div>unchanged!</div>";
+        var xhtml = '<div>unchanged!</div>';
         var item = {
           xhtml: xhtml
         };
@@ -215,9 +182,9 @@ describe('DevEditorRoot', function() {
       });
 
       describe('xhtml has changed', function() {
-        var xhtml = "<div>new</div>";
+        var xhtml = '<div>new</div>';
         var item = {
-          xhtml: "<div>original</div>"
+          xhtml: '<div>original</div>'
         };
 
         beforeEach(function() {
@@ -234,9 +201,9 @@ describe('DevEditorRoot', function() {
       });
 
       describe('customScoring has changed', function() {
-        var newCustomScoring = "new";
+        var newCustomScoring = 'new';
         var item = {
-          customScoring: "original"
+          customScoring: 'original'
         };
 
         beforeEach(function() {
@@ -316,7 +283,7 @@ describe('DevEditorRoot', function() {
     });
 
     describe('invalid json', function() {
-      var json = "this is not valid json";
+      var json = 'this is not valid json';
       beforeEach(function() {
         scope.json = json;
         scope.aceJsonChanged();
@@ -385,17 +352,18 @@ describe('DevEditorRoot', function() {
     beforeEach(function(){
       iFrameService.isInIFrame.and.returnValue(true);
       iFrameService.bypassIframeLaunchMechanism.and.returnValue(false);
+      controller('DevEditorRoot', {$scope: scope});
     });
 
-    it("should call saveAll", function(){
+    it('should call saveAll', function(){
       expect(Msgr.on).toHaveBeenCalledWith('saveAll', jasmine.any(Function));
     });
 
-    it("should listen to initialise", function(){
+    it('should listen to initialise', function(){
       expect(Msgr.on).toHaveBeenCalledWith('initialise', jasmine.any(Function));
     });
 
-    it("should send the ready message", function(){
+    it('should send the ready message', function(){
       expect(Msgr.send).toHaveBeenCalledWith('ready');
     });
 
@@ -403,26 +371,30 @@ describe('DevEditorRoot', function() {
 
       var onInitialise;
 
-      beforeEach(function(){
-        onInitialise = Msgr.on.calls.first().args[1];
-        ItemService.load.calls.reset();
-        Msgr.on.calls.reset();
-        Msgr.send.calls.reset();
-      });
+      function handleOnInitialize(data){
+        return function(key, handler){
+          if(key === 'initialise'){
+            handler(data);
+          }
+        };
+      }
 
-      it("should set the initialData", function(){
+      it('should set the initialData', function(){
         var initialData = {hideSaveButton: true};
-        onInitialise(initialData);
+        Msgr.on.and.callFake(handleOnInitialize(initialData));
+        controller('DevEditorRoot', {$scope: scope});
         expect(scope.initialData).toEqual(initialData);
       });
 
-      it("should call ItemService.load", function(){
-        onInitialise({});
+      it('should call ItemService.load', function(){
+        Msgr.on.and.callFake(handleOnInitialize({}));
+        controller('DevEditorRoot', {$scope: scope});
         expect(ItemService.load).toHaveBeenCalled();
       });
 
-      it("should send 'rendered' message", function(){
-        onInitialise({});
+      it('should send "rendered" message', function(){
+        Msgr.on.and.callFake(handleOnInitialize({}));
+        controller('DevEditorRoot', {$scope: scope});
         expect(Msgr.send).toHaveBeenCalledWith('rendered');
       });
 
