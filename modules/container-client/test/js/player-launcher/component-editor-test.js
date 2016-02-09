@@ -125,7 +125,7 @@ describe('component-editor', function () {
       Def = modules.Item;
       
       $.ajax = jasmine.createSpy('ajax').and.callFake(function(opts){
-        opts.success({});
+        opts.success({components: {singleComponent: {}}});
       });
     });
 
@@ -161,9 +161,6 @@ describe('component-editor', function () {
     });
 
     it('calls launcher.loadInstance', function(){
-      $.ajax.and.callFake(function(opts){
-        opts.success({components: { 1: {}}});
-      });
       item = new Def('element', {itemId: 'itemId'}, errorCallback);
 
       expect(launcher.loadInstance).toHaveBeenCalledWith(
@@ -177,8 +174,49 @@ describe('component-editor', function () {
         jasmine.any(Function));
     });
     
-    describe('save', function(){});
-    
+    describe('save', function(){
+
+      var onSaved;
+      
+      var callKeys = {
+
+      };
+
+      beforeEach(function(){
+
+        launcher.loadCall.and.callFake(function(key){
+          console.log('key: ', key);
+          return {method: 'GET', url: key};
+        });
+
+        $.ajax.and.callFake(function(opts){
+          console.log('?? ', opts.url);
+          data = {};
+          data['itemEditor.singleComponent.loadData'] = { components: {
+            singleComponent: {}
+          }};
+          opts.success(data[opts.url] || {});
+        });
+        
+        instance.send.and.callFake(function(key, done){
+          done(null, {componentType: 'type'});
+        });
+        onSaved = jasmine.createSpy('onSaved');
+      });
+
+      it('calls getData', function(){
+        item = new Def('element', {itemId: 'itemId'}, errorCallback);
+        item.save(onSaved);
+        expect(instance.send).toHaveBeenCalledWith('getData', jasmine.any(Function));
+      });
+      
+      it('calls $.ajax', function(){
+        item = new Def('element', {itemId: 'itemId'}, errorCallback);
+        item.save(onSaved);
+        var expected = { type: 'GET', url: 'itemEditor.singleComponent.saveComponents', contentType: 'application/json', data: '{"undefined":{"componentType":"type"}}', success: jasmine.any(Function), error: jasmine.any(Function), dataType: 'json' };
+        expect($.ajax).toHaveBeenCalledWith(expected);
+      });
+    });
   });
 
   describe('draft', function(){
