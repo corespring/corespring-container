@@ -73,7 +73,7 @@
          });
        } else {
          $('.create').click(function(){
-           var t = $('.component-type').find(":selected").val();
+           var t = $('.component-type').find(":selected").attr('name');
            opts.componentType = t;
            editor = new org.corespring.players.ItemComponentEditor(holder, opts, function(err){
              console.warn(err);

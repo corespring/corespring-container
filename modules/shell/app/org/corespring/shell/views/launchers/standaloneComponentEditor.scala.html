@@ -89,7 +89,7 @@
        });
 
        $('.create').click(function(){
-         var t = $('.component-type').find(":selected").val();
+         var t = $('.component-type').find(":selected").attr('name');
          opts.componentType = t;
          editor = new org.corespring.players.ComponentEditor(holder, opts, function(err){
            console.warn(err);
