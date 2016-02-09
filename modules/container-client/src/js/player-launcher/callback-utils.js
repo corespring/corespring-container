@@ -6,11 +6,18 @@
  * and converts the result to {error: err, result: data}
  */
 exports.instanceCallbackHandler = function(cb){
-  return function(err, data){
-    if(err){
-      cb({error: err});
-    } else {
-      cb({result: data});
+  if(!cb){
+    if(console && console.warn){
+      console.warn('no callback provided to instanceCallbackHandler'); 
     }
-  };
+    return function(){};
+  } else {
+    return function(err, data){
+      if(err){
+        cb({error: err});
+      } else {
+        cb({result: data});
+      }
+    };
+  }
 };
