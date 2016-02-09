@@ -8,7 +8,6 @@ describe('component-editor Root', function(){
   beforeEach(module(function($provide) {
     
     var mocks = org.corespring.mocks.editor;
-    
    
     $provide.value('ComponentData', mocks.ComponentData());
     $provide.value('iFrameService', mocks.iFrameService());
@@ -33,8 +32,20 @@ describe('component-editor Root', function(){
 
   describe('initialization', function(){
 
-    it('has componentKey', function(){
+    it('sets componentKey', function(){
       expect(scope.componentKey).toEqual('compKey');
+    });
+    
+    it('sets componentType', function(){
+      expect(scope.componentType).toEqual('componentType');
+    });
+    
+    it('sets activePane', function(){
+      expect(scope.activePane).toEqual('config');
+    });
+    
+    it('sets showNavigation', function(){
+      expect(scope.showNavigation).toEqual(true);
     });
   });
 
