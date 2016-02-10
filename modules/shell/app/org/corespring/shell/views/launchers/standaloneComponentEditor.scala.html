@@ -20,6 +20,9 @@
      });
 
      document.addEventListener('DOMContentLoaded', function(){
+       $('.preview-on-right-opts').hide();
+       $('.tab-options').hide();
+
        var editor;
        var holder = document.querySelector('.holder');
        var opts = @{Html(play.api.libs.json.Json.stringify(opts))};
@@ -58,14 +61,20 @@
            opts.activePane = tab;
          }
        });
+       
+       $('.show-preview-checkbox').change(function() {
+         if(editor){
+           editor.showPreview(this.checked);
+         } else {
+           opts.showPreview = this.checked;
+         }});
 
        $('.show-tabs-checkbox').change(function() {
          if(editor){
            editor.showNavigation(this.checked);
          } else {
            opts.showNavigation = this.checked;
-         }
-         });
+         }});
 
        $('.get-data').click(function(){
           editor.getData(function(result){
@@ -101,7 +110,10 @@
          opts.previewMode = previewMode;
 
          if(previewMode === 'preview-right'){
-           $('.tab-options').hide();
+           $('.preview-on-right-opts').show();
+           //$('.show-preview-checkbox').attr('value', true);
+         } else {
+           $('.tab-options').show();
          }
 
          $('.create-opts').hide();
@@ -141,12 +153,18 @@
       <label class="radio-inline">
         <input type="radio" name="tab" id="inlineRadio2" value="preview"> Preview
       </label>
+      |
+      <span>
+        <label class="checkbox-inline">
+          <input class="show-tabs-checkbox" type="checkbox" name="showTabs" value="true"> Show Tabs
+        </label>
+      </span>
     </span>
-    |
-    <span>
-      <label class="checkbox-inline">
-        <input class="show-tabs-checkbox" type="checkbox" name="showTabs" value="true"> Show Tabs
-      </label>
+
+    <span class="preview-on-right-opts">
+        <label class="checkbox-inline">
+          <input class="show-preview-checkbox" type="checkbox" name="showPreview" checked="true"> Show Preview
+        </label>
     </span>
     <hr/>
     <textarea class="data-text-area form-control" style="height: 100px;"></textarea>

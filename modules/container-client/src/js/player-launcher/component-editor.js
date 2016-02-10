@@ -13,8 +13,8 @@ function Helper(){
       instance.send('showPane', pane, instanceCallbackHandler(done));
     };
 
-    this.previewMode = function(mode){
-      instance.send('previewMode', mode);
+    this.showPreview = function(show){
+      instance.send('showPreview', show);
     };
 
     this.remove = function() {

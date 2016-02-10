@@ -47,32 +47,6 @@ angular.module('corespring-singleComponentEditor.controllers')
        */
       $scope.componentKey = SINGLE_COMPONENT_KEY;
 
-      $scope.showNavigation = true;
-
-      $scope.activePane = 'config';
-
-      $scope.showConfig = function(done){
-        done = done || function(){};
-        $scope.activePane = 'config';
-        done();
-      };
-
-      $scope.$watch('activePane', function(a){
-        if(a === 'config'){
-          $scope.configActive = true;
-          $scope.previewActive = false;
-        } else {
-          $scope.configActive = false;
-          $scope.previewActive = true;
-        }
-      });
-
-      $scope.showPreview = function(done){
-        done = done || function(){};
-        $scope.item.components[$scope.componentKey] = $scope.getData();
-        $scope.activePane = 'preview';
-      };
-
       $scope.closeError = function(){
         $scope.saveError = null;
       }; 
@@ -85,6 +59,10 @@ angular.module('corespring-singleComponentEditor.controllers')
         logger.debug('registerConfigPanel', id);
         configPanel = configPanelBridge;
         configPanel.setModel($scope.item.components[$scope.componentKey]);
+        ComponentData.setModel($scope.item.components);
+        $timeout(function(){ 
+          ComponentData.setModel($scope.item.components);
+        });
       });
 
       function onLaunchDialog($event, data, title, body, callback, scopeProps, options) {
@@ -97,19 +75,10 @@ angular.module('corespring-singleComponentEditor.controllers')
 
       $scope.$on(WIGGI_EVENTS.LAUNCH_DIALOG, onLaunchDialog);
 
-      $scope.$watch('previewMode', function(newMode){
-        if(newMode){
-          $state.go(newMode);
-        }
-      });
-
       function init() {
 
-        logger.debug("init...");
-      
         function storeDefaultData(comp){
           logger.debug('set default data', comp.componentType, comp.defaultData);
-
           ComponentDefaultData.setDefaultData(comp.componentType, comp.defaultData);
         }
 
@@ -121,25 +90,6 @@ angular.module('corespring-singleComponentEditor.controllers')
   
 
         function initMsgrListeners(){
-          Msgr.on('showNavigation', function(showNavigation){
-            $scope.showNavigation = showNavigation;
-          });
-          
-          Msgr.on('previewMode', function(previewMode){
-
-            if(_.contains(['tabs', 'preview-right'], previewMode)){
-              $scope.previewMode = previewMode; 
-            }
-          }); 
-
-          Msgr.on('showPane', function(pane, done){
-            if(pane === 'config'){
-              $scope.showConfig(done);
-            } else if(pane === 'preview'){
-              $scope.showPreview(done);
-            }
-          });
-
           Msgr.on('getData', function(err, done){
             done(null, $scope.getData());
           });
@@ -153,6 +103,8 @@ angular.module('corespring-singleComponentEditor.controllers')
           Msgr.on('getComponentKey', function(err, done){
             done(null, $scope.componentKey);
           });
+
+          $scope.$broadcast('initMsgrHandlers');
 
           Msgr.send('rendered');
         }        
@@ -183,8 +135,6 @@ angular.module('corespring-singleComponentEditor.controllers')
           
           $scope.showNavigation = data.showNavigation === true ? true : false;
           $scope.item = angular.copy(initialData);
-
-          ComponentData.setModel($scope.item.components);
 
           var html = [
             '<div class="config-panel-container" navigator="">',

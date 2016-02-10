@@ -42,14 +42,14 @@ case class EditorClientOptions(debounceInMillis:Long, staticPaths:JsObject) {
 trait ComponentEditorOptions{
   def uploadUrl:Option[String]
   def uploadMethod:Option[String]
-  def singleComponentKey:String = SingleComponent.Key
   def toJson:JsValue
 }
 
 case class PreviewRightComponentEditorOptions(
                                      showPreview:Option[Boolean],
                                      uploadUrl:Option[String],
-                                     uploadMethod:Option[String])
+                                     uploadMethod:Option[String],
+                                     singleComponentKey : String = SingleComponent.Key)
   extends ComponentEditorOptions{
   override def toJson = Json.format[PreviewRightComponentEditorOptions].writes(this)
 
@@ -58,7 +58,8 @@ case class PreviewRightComponentEditorOptions(
 case class TabComponentEditorOptions(activePane : Option[String],
                                    showNavigation:Option[Boolean],
                                    uploadUrl:Option[String],
-                                   uploadMethod:Option[String])
+                                   uploadMethod:Option[String],
+                                     singleComponentKey : String = SingleComponent.Key)
   extends ComponentEditorOptions{
   override def toJson = Json.format[TabComponentEditorOptions].writes(this)
 }
