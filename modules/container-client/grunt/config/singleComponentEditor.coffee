@@ -8,6 +8,7 @@ baseName = "singleComponentEditor"
 editorSrcs = [
   'bower_components/angular-animate/angular-animate(.min).js',
   'bower_components/wiggi-wiz/dist/wiggi-wiz.js',
+  'bower_components/angular-ui-router/release/angular-ui-router(.min).js',
   'bower_components/undo.js/undo.js',
   'bower_components/select2/select2(.min).js',
   'bower_components/angular-ui-select2/src/select2.js',
@@ -48,6 +49,7 @@ exports.css =
   report: "#{baseName}-css-report.json"
 
 exports.ngModules = _.union(player.ngModules, [
+  'ui.router',
   'corespring.wiggi-wiz',
   'corespring-editor.directives',
   'corespring-editor.controllers',

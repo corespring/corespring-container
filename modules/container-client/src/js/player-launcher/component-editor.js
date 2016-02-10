@@ -13,6 +13,10 @@ function Helper(){
       instance.send('showPane', pane, instanceCallbackHandler(done));
     };
 
+    this.previewMode = function(mode){
+      instance.send('previewMode', mode);
+    };
+
     this.remove = function() {
       if(instance){
         instance.remove();
@@ -58,6 +62,7 @@ function Helper(){
 
   this.launchData = function(options, uploadUrl, xhtml, componentModel){
     return {
+      previewMode: options.previewMode,
       activePane: options.activePane || 'config',
       showNavigation: options.showNavigation === true || false,
       uploadUrl: uploadUrl,

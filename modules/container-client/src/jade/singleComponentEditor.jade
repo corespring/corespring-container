@@ -2,55 +2,69 @@ extends layout
 
 block content
 
+  include templates/component-editor/tabs
+  include templates/component-editor/preview-right
+
   | <!-- 
   |  !{versionInfo}
   | -->
 
   .root(ng-controller="Root", dimension-propagator='')
 
-    div.single-component-editor(show)
+    h1.debug
+      | opts: 
+    if previewMode == "preview-right"
+      h1 Preview Right!!!
+      .preview-right(ng-controller="PreviewRight")
 
-    tabset(ng-show="showNavigation")
-      tab(heading="Configuration", 
-        select="showConfig()", 
-        active="configActive") 
-      tab(heading="Preview", 
-        select="showPreview()", 
-        active="previewActive") 
+        .config-pane
+          .configuration
+        .preview-pane
+    else
+      .tabbed(ng-controller="Tabbed")
+        tabset(ng-show="showNavigation")
+          tab(heading="Configuration", 
+            select="showConfig()", 
+            active="configActive") 
+          tab(heading="Preview", 
+            select="showPreview()", 
+            active="previewActive") 
 
-    .config(ng-show="activePane == 'config'")
-      .configuration
-      hr/
-      .bar
-        button.save-button(ng-show="showSaveButton", ng-disabled="saving").btn.btn-primary(ng-click="save()") Save
-        .alert-holder
-          alert.alert-danger(ng-show="saveError", ng-click="closeError()")
-            button.close(type="button", aria-label="Close")
-              span(aria-hidden="true") &times;
-            | {{saveError}}
+      .config(ng-show="activePane == 'config'")
+        .configuration
+        hr/
+        .bar
+          button.save-button(ng-show="showSaveButton", ng-disabled="saving").btn.btn-primary(ng-click="save()") Save
+          .alert-holder
+            alert.alert-danger(ng-show="saveError", ng-click="closeError()")
+              button.close(type="button", aria-label="Close")
+                span(aria-hidden="true") &times;
+              | {{saveError}}
 
 
-    .preview(ng-show="activePane == 'preview'",
-      ng-controller="ClientSidePreview")
-      .item-preview-wrapper
-        .player-container
-          preview-player(
-            player-mode="playerMode",
-            data-jade-template='templates/question',
-            player-markup="item.xhtml",
-            player-item="item",
-            player-components="item.components",
-            player-outcomes="outcome")
+      .preview(ng-show="activePane == 'preview'",
+        ng-controller="ClientSidePreview")
+        .item-preview-wrapper
+          .player-container
+            preview-player(
+              player-mode="playerMode",
+              data-jade-template='templates/question',
+              player-markup="item.xhtml",
+              player-item="item",
+              player-components="item.components",
+              player-outcomes="outcome")
 
-          summary-feedback(
-            ng-model='item.summaryFeedback', 
-            session-complete='session.isComplete')
-        .row
-          preview-player-control-panel(
-            data-mode='playerMode', 
-            data-settings='playerSettings', 
-            data-score="score")
+            summary-feedback(
+              ng-model='item.summaryFeedback', 
+              session-complete='session.isComplete')
+          .row
+            preview-player-control-panel(
+              data-mode='playerMode', 
+              data-settings='playerSettings', 
+              data-score="score")
 
+
+   
 //After the angular module has been created.
 block after-main-script
 
@@ -62,10 +76,28 @@ block after-main-script
 
       var editorOptions = !{options}; 
 
+      console.log(editorOptions);
       var uploadEndpoint = {
         url: editorOptions.uploadUrl,
         method: editorOptions.uploadMethod
       };
+
+      function setUpWiggiWiz(wiggiWizConfigProvider, UPLOAD_ENDPOINT){
+        UPLOAD_ENDPOINT.method = UPLOAD_ENDPOINT.method || 'POST';
+        
+        var config = {
+          dialogLaunchMode: 'external',
+          defaultImageService: {
+            maxSize: 200
+          }
+        };
+
+        if(UPLOAD_ENDPOINT.url && UPLOAD_ENDPOINT.method){
+          config.imageService = 'ExternalEndpointsImageService';
+        }
+        
+        wiggiWizConfigProvider.add(config);
+      }
 
       angular.module(app)
         //TODO: STATIC_PATHS isnt relevent to the component editor
@@ -74,25 +106,5 @@ block after-main-script
         .constant('DEBOUNCE_IN_MILLIS', editorOptions.debounceInMillis || 0 ) 
         .constant('UPLOAD_ENDPOINT', uploadEndpoint)
         .constant('SINGLE_COMPONENT_KEY', editorOptions.singleComponentKey)
-        .config([
-          'wiggiWizConfigProvider', 
-          'UPLOAD_ENDPOINT',
-          function(wiggiWizConfigProvider, 
-            UPLOAD_ENDPOINT){
-            UPLOAD_ENDPOINT.method = UPLOAD_ENDPOINT.method || 'POST';
-            
-            var config = {
-              dialogLaunchMode: 'external',
-              defaultImageService: {
-                maxSize: 200
-              }
-            };
-
-            if(UPLOAD_ENDPOINT.url && UPLOAD_ENDPOINT.method){
-              config.imageService = 'ExternalEndpointsImageService';
-            }
-            
-            wiggiWizConfigProvider.add(config);
-          }]);
-
+        .config(['wiggiWizConfigProvider', 'UPLOAD_ENDPOINT', setUpWiggiWiz]);
     })(this);

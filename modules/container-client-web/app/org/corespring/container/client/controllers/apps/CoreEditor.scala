@@ -122,7 +122,7 @@ trait CoreEditor
   def componentEditor(id: String): Action[AnyContent] = Action.async { implicit request =>
     def loadEditor(json: JsValue): Future[SimpleResult] = {
       findComponentType(json) match {
-        case Some(ct) => loadComponentEditorHtml(ct)(request).map(Ok(_))
+        case Some(ct) => loadComponentEditorHtmlFromForm(ct)(request).map(Ok(_))
         case _ => Future.successful(BadRequest("Can't find a component type"))
       }
     }

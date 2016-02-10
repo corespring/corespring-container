@@ -14,8 +14,8 @@
 
     <logger name="tests" level="TRACE" />
     <logger name="js" level="TRACE" />
-    <logger name="org.corespring.container.client.controllers.jade.Jade" level="WARN" />
-    <logger name="org.corespring.container.client.controllers.apps" level="WARN"/>
+    <logger name="org.corespring.container.client.controllers.jade.Jade" level="TRACE" />
+    <logger name="org.corespring.container.client.controllers.apps.CoreEditor" level="TRACE"/>
     <logger name="org.corespring.shell.controllers" level="TRACE"/>
 
     <root level="ERROR">

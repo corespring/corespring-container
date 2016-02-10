@@ -15,52 +15,72 @@ import play.api.templates.Html
 import scala.concurrent.Future
 
 trait ComponentEditorLaunching
-    extends Jade
+  extends Jade
     with ComponentScriptPrep
     with ComponentInfoJson
-    with HasContainerContext{
+    with HasContainerContext {
 
-  def loadComponentEditorHtml(componentType:String)(request:Request[AnyContent]) : Future[Html] =
-    Future{
-      val componentEditorOptions : ComponentEditorOptions = request.body.asFormUrlEncoded.map{ f =>
+
+  private def loadComponentEditorHtml(reqToOptions: Request[AnyContent] => Option[(String, ComponentEditorOptions)])(componentType: String, req: Request[AnyContent]): Future[Html] = Future {
+    val (previewMode, options) = reqToOptions(req).getOrElse("tabs" -> ComponentEditorOptions.default)
+
+    logger.debug(s"function=loadComponentEditorHtml, componentEditorOptions=$options")
+
+    val appContext = AppContext("editor", Some("singleComponentEditor"))
+    val scriptInfo = componentScriptInfo(appContext, Seq(componentType), jsMode(req) == "dev")
+    val domainResolvedJs = buildJs(scriptInfo)(req)
+    val domainResolvedCss = buildCss(scriptInfo)(req)
+    val jsSrcPaths = jsSrc(appContext)
+    val arr: JsValue = JsArray(interactions.map(componentInfoToJson(modulePath, interactions, widgets)(_)))
+    renderJade(
+      ComponentEditorTemplateParams(
+        "singleComponentEditor",
+        domainResolvedJs,
+        domainResolvedCss,
+        jsSrcPaths.ngModules ++ scriptInfo.ngDependencies,
+        ComponentEditorServices("singleComponentEditor.services", arr, componentType).toString,
+        obj(),
+        options,
+        previewMode))
+  }
+
+  def loadComponentEditorHtmlFromForm(componentType: String)(request: Request[AnyContent]): Future[Html] = {
+    loadComponentEditorHtml(formToOptions)(componentType, request)
+  }
+
+  private def formToOptions(request: Request[AnyContent]): Option[(String, ComponentEditorOptions)] = {
+    request.body.asFormUrlEncoded.map { f =>
+      val previewMode = f.get("previewMode").flatMap(_.headOption).find(m => m == "tabs" || m == "preview-right").getOrElse("tabs")
+
+      val uploadUrl = f.get("uploadUrl").flatMap(_.headOption)
+      val uploadMethod = f.get("uploadMethod").flatMap(_.headOption)
+
+      val options = if (previewMode == "preview-right") {
+        val showPreview: Option[Boolean] = f.get("showPreview").map(_.exists(_ == "true"))
+        PreviewRightComponentEditorOptions(showPreview, uploadUrl, uploadMethod)
+      } else {
         val activePane = f.get("activePane").flatMap(_.headOption)
-        val showNavigation : Option[Boolean] = f.get("showNavigation").map(_.exists(_ == "true"))
-        val uploadUrl = f.get("uploadUrl").flatMap(_.headOption)
-        val uploadMethod = f.get("uploadMethod").flatMap(_.headOption)
-        ComponentEditorOptions(activePane, showNavigation, uploadUrl, uploadMethod)
-      }.getOrElse(ComponentEditorOptions.empty)
-
-      val appContext = AppContext("editor", Some("singleComponentEditor"))
-      val scriptInfo = componentScriptInfo(appContext, Seq(componentType), jsMode(request) == "dev")
-      val domainResolvedJs = buildJs(scriptInfo)(request)
-      val domainResolvedCss = buildCss(scriptInfo)(request)
-      val jsSrcPaths = jsSrc(appContext)
-      val arr : JsValue = JsArray(interactions.map(componentInfoToJson(modulePath, interactions, widgets)(_)))
-      renderJade(
-        ComponentEditorTemplateParams(
-          "singleComponentEditor",
-          domainResolvedJs,
-          domainResolvedCss,
-          jsSrcPaths.ngModules ++ scriptInfo.ngDependencies,
-          ComponentEditorServices("singleComponentEditor.services", arr, componentType).toString,
-          obj(),
-          componentEditorOptions))
+        val showNavigation: Option[Boolean] = f.get("showNavigation").map(_.exists(_ == "true"))
+        TabComponentEditorOptions(activePane, showNavigation, uploadUrl, uploadMethod)
+      }
+      previewMode -> options
     }
+  }
 }
 
 class ComponentEditor(val containerContext: ContainerExecutionContext,
-                       val components: Seq[Component],
-                       val mode:Mode,
-                       val sourcePaths: SourcePathsService,
-                       val urls:ComponentUrls)
+                      val components: Seq[Component],
+                      val mode: Mode,
+                      val sourcePaths: SourcePathsService,
+                      val urls: ComponentUrls)
   extends Controller
     with ComponentEditorLaunching
     with Jade
     with ComponentScriptPrep
-    with ComponentInfoJson{
+    with ComponentInfoJson {
 
-  def load(componentType:String) = Action.async{ request =>
-    loadComponentEditorHtml(componentType)(request).map(Ok(_))
+  def load(componentType: String) = Action.async { request =>
+    loadComponentEditorHtmlFromForm(componentType)(request).map(Ok(_))
   }
 
 }

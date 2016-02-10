@@ -1,6 +1,7 @@
 angular.module('corespring-singleComponentEditor.controllers')
   .controller('Root', [
     '$scope',
+    '$state',
     '$timeout',
     '$compile',
     'LogFactory',
@@ -16,6 +17,7 @@ angular.module('corespring-singleComponentEditor.controllers')
     'SINGLE_COMPONENT_KEY',    
     function(
       $scope,
+      $state,
       $timeout,
       $compile,
       LogFactory,
@@ -95,6 +97,12 @@ angular.module('corespring-singleComponentEditor.controllers')
 
       $scope.$on(WIGGI_EVENTS.LAUNCH_DIALOG, onLaunchDialog);
 
+      $scope.$watch('previewMode', function(newMode){
+        if(newMode){
+          $state.go(newMode);
+        }
+      });
+
       function init() {
 
         logger.debug("init...");
@@ -117,6 +125,13 @@ angular.module('corespring-singleComponentEditor.controllers')
             $scope.showNavigation = showNavigation;
           });
           
+          Msgr.on('previewMode', function(previewMode){
+
+            if(_.contains(['tabs', 'preview-right'], previewMode)){
+              $scope.previewMode = previewMode; 
+            }
+          }); 
+
           Msgr.on('showPane', function(pane, done){
             if(pane === 'config'){
               $scope.showConfig(done);
