@@ -1,7 +1,7 @@
 package org.corespring.container.client.integration
 
 import grizzled.slf4j.Logger
-import org.corespring.container.client.{V2PlayerConfig}
+import org.corespring.container.client.V2PlayerConfig
 import org.corespring.container.client.component.ComponentUrls
 import org.corespring.container.client.controllers.apps._
 import org.corespring.container.client.controllers.launcher.editor.EditorLauncher
@@ -39,7 +39,6 @@ trait DefaultIntegration
   def versionInfo: JsObject
 
   def containerContext: ContainerExecutionContext
-
   /**
    * For a given resource path return a resolved path.
    * By default this just returns the path, so no domain is used.
@@ -264,7 +263,6 @@ trait DefaultIntegration
     override def containerContext = DefaultIntegration.this.containerContext
 
     override protected def componentTypes: Seq[String] = DefaultIntegration.this.components.map(_.componentType)
-
   }
 
   lazy val session = new Session {
