@@ -8,39 +8,21 @@ angular.module('corespring-singleComponentEditor.controllers')
       $scope.activePane = 'config';
 
       $scope.$watch('activePane', function(a){
-        if(a === 'config'){
-          $scope.configActive = true;
-          $scope.previewActive = false;
-        } else {
+        if(a === 'preview'){
           $scope.configActive = false;
           $scope.previewActive = true;
+        } else {
+          $scope.configActive = true;
+          $scope.previewActive = false;
         }
       });
 
-      $scope.showConfig = function(done){
-        done = done || function(){};
-        $scope.activePane = 'config';
-        done();
-      };
+      $scope.$on('showPane', function(event, pane){
+        $scope.activePane = pane;
+      });
 
-      $scope.showPreview = function(done){
-        done = done || function(){};
-        $scope.item.components[$scope.componentKey] = $scope.getData();
-        $scope.activePane = 'preview';
-      };
-
-      $scope.$on('initMsgrHandlers', function(){
-        Msgr.on('showNavigation', function(showNavigation){
-          $scope.showNavigation = showNavigation;
-        });
-
-        Msgr.on('showPane', function(pane, done){
-          if(pane === 'config'){
-            $scope.showConfig();
-          } else if(pane === 'preview'){
-            $scope.showPreview();
-          }
-        });
+      $scope.$on('showNavigation', function(event, showNavigation){
+        $scope.showNavigation = showNavigation;
       });
 
     }]);

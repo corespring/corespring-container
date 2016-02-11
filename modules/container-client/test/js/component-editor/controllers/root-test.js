@@ -81,8 +81,8 @@ describe('component-editor Root', function(){
       
       assertMsgrOn('initialise');
       assertMsgrOn('getData');
-      // assertMsgrOn('showNavigation');
-      // assertMsgrOn('showPane');
+      assertMsgrOn('showNavigation');
+      assertMsgrOn('showPane');
       assertMsgrOn('getComponentKey');
       assertMsgrOn('setData');
       

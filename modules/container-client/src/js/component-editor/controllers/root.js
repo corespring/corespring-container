@@ -102,7 +102,21 @@ angular.module('corespring-singleComponentEditor.controllers')
             done(null, $scope.componentKey);
           });
 
-          $scope.$broadcast('initMsgrHandlers');
+          //Preview mode
+          Msgr.on('showPreview', function(show){
+            $scope.item.components[$scope.componentKey] = $scope.getData();
+            $scope.$broadcast('showPreview', show);
+          });
+          
+          //Tabs mode 
+          Msgr.on('showPane', function(pane){
+            $scope.item.components[$scope.componentKey] = $scope.getData();
+            $scope.$broadcast('showPane', pane);
+          });
+          
+          Msgr.on('showNavigation', function(show){
+            $scope.$broadcast('showNavigation', show);
+          });
 
           Msgr.send('rendered');
         }        
