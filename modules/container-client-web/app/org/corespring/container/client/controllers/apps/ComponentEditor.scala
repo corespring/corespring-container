@@ -23,18 +23,16 @@ trait ComponentEditorLaunching
 
   private def loadComponentEditorHtml(reqToOptions: Request[AnyContent] => Option[(String, ComponentEditorOptions)])(componentType: String, req: Request[AnyContent]): Future[Html] = Future {
     val (previewMode, options) = reqToOptions(req).getOrElse("tabs" -> ComponentEditorOptions.default)
-
     logger.debug(s"function=loadComponentEditorHtml, componentEditorOptions=$options")
-
-    val appContext = AppContext("editor", Some("singleComponentEditor"))
-    val scriptInfo = componentScriptInfo(appContext, Seq(componentType), jsMode(req) == "dev")
+    val context = "singleComponentEditor"
+    val scriptInfo = componentScriptInfo(context, Seq(componentType), jsMode(req) == "dev")
     val domainResolvedJs = buildJs(scriptInfo)(req)
     val domainResolvedCss = buildCss(scriptInfo)(req)
-    val jsSrcPaths = jsSrc(appContext)
+    val jsSrcPaths = jsSrc(context)
     val arr: JsValue = JsArray(interactions.map(componentInfoToJson(modulePath, interactions, widgets)(_)))
     renderJade(
       ComponentEditorTemplateParams(
-        "singleComponentEditor",
+        context,
         domainResolvedJs,
         domainResolvedCss,
         jsSrcPaths.ngModules ++ scriptInfo.ngDependencies,

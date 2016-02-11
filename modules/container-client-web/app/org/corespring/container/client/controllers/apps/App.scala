@@ -14,9 +14,7 @@ import play.api.mvc._
 
 import scala.concurrent._
 
-case class AppContext(main: String, sub: Option[String] = None)
-case class ComponentScriptInfo(context: AppContext,
-  jsUrl: Seq[String],
+case class ComponentScriptInfo(context:String, jsUrl: Seq[String],
   cssUrl: Seq[String],
   ngDependencies: Seq[String])
 
@@ -93,7 +91,7 @@ trait ComponentInfoJson extends NameHelper with JsonHelper{
 
 trait ComponentScriptPrep extends DependencyResolver
   with LoadClientSideDependencies {
-  def ngModules(appContext:AppContext): AngularModules = new AngularModules(s"${appContext.sub.getOrElse(appContext.main)}.services")
+  def ngModules(context:String): AngularModules = new AngularModules(s"$context.services")
 
   private val typeRegex = "(.*?)-(.*)".r
   def urls: ComponentUrls
@@ -134,12 +132,12 @@ trait ComponentScriptPrep extends DependencyResolver
     if (needsResolution) resolveDomain(s) else s
   }
 
-  def jsSrc(appContext: AppContext): NgSourcePaths = {
-    sourcePaths.load[NgSourcePaths](ContextAndSuffix(appContext, "js"), NgSourcePaths.fromJsonResource(modulePath, _))
+  def jsSrc(context: String): NgSourcePaths = {
+    sourcePaths.load[NgSourcePaths](ContextAndSuffix(context, "js"), NgSourcePaths.fromJsonResource(modulePath, _))
   }
 
-  def cssSrc(appContext: AppContext): CssSourcePaths = {
-    sourcePaths.load[CssSourcePaths](ContextAndSuffix(appContext, "css"), CssSourcePaths.fromJsonResource(modulePath, _))
+  def cssSrc(context: String): CssSourcePaths = {
+    sourcePaths.load[CssSourcePaths](ContextAndSuffix(context, "css"), CssSourcePaths.fromJsonResource(modulePath, _))
   }
 
   protected def buildJs(scriptInfo: ComponentScriptInfo,
@@ -156,7 +154,7 @@ trait ComponentScriptPrep extends DependencyResolver
     out.map(resolvePath)
   }
 
-  protected def componentScriptInfo(appContext: AppContext, components: Seq[String], separatePaths: Boolean, reportName: Option[String] = None): ComponentScriptInfo = {
+  protected def componentScriptInfo(context:String, components: Seq[String], separatePaths: Boolean, reportName: Option[String] = None): ComponentScriptInfo = {
 
     val typeIds = components.map {
       t =>
@@ -165,12 +163,12 @@ trait ComponentScriptPrep extends DependencyResolver
     }
 
     logger.trace(s"function=componentScriptInfo typeIds=$typeIds")
-    val resolvedComponents = resolveComponents(typeIds, Some(appContext.main))
-    val jsUrl = urls.jsUrl(appContext.main, resolvedComponents, separatePaths)
-    val cssUrl = urls.cssUrl(appContext.main, resolvedComponents, separatePaths)
+    val resolvedComponents = resolveComponents(typeIds, Some(context))
+    val jsUrl = urls.jsUrl(context, resolvedComponents, separatePaths)
+    val cssUrl = urls.cssUrl(context, resolvedComponents, separatePaths)
     val clientSideDependencies = getClientSideDependencies(resolvedComponents)
-    val dependencies = ngModules(appContext).createAngularModules(resolvedComponents, clientSideDependencies)
-    ComponentScriptInfo(appContext, jsUrl, cssUrl, dependencies)
+    val dependencies = ngModules(context).createAngularModules(resolvedComponents, clientSideDependencies)
+    ComponentScriptInfo(context, jsUrl, cssUrl, dependencies)
   }
 }
 

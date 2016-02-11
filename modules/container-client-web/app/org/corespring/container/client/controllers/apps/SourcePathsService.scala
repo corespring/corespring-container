@@ -1,6 +1,6 @@
 package org.corespring.container.client.controllers.apps
 
-case class ContextAndSuffix(context: AppContext, suffix: String)
+case class ContextAndSuffix(context: String, suffix: String)
 
 trait SourcePathsService {
   def load[A <: SourcePaths](contextAndSuffix: ContextAndSuffix, load: String => A): A
@@ -17,8 +17,8 @@ class JsonReportSourcePathsService(reload: Boolean = false) extends SourcePathsS
   private val reports: mutable.Map[ContextAndSuffix, SourcePaths] = mutable.Map.empty
 
   def reportName(contextAndSuffix: ContextAndSuffix): String = {
-    val context = contextAndSuffix.context.sub.getOrElse(contextAndSuffix.context.main)
     val suffix = contextAndSuffix.suffix
+    val context = contextAndSuffix.context
     val out = s"container-client/$context-$suffix-report.json"
     logger.debug(s"function=reportName, contextAndSuffix=$contextAndSuffix, out=$out")
     out

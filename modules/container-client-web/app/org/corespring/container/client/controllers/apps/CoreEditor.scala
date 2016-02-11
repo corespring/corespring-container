@@ -10,7 +10,6 @@ import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.components.model.ComponentInfo
 import play.api.libs.json._
 import play.api.mvc._
-import play.api.templates.Html
 import v2Player.Routes
 
 import scala.concurrent.Future
@@ -64,8 +63,6 @@ trait CoreEditor
       "configuration" -> (ci.packageInfo \ "external-configuration").asOpt[JsObject])
   }
 
-  //  def componentEditorServices(id:String, components: JsArray) : String
-
   def servicesJs(id: String, components: JsArray, widgets: JsArray): String
 
   private def onError(sm: StatusMessage)(implicit rh: RequestHeader) = {
@@ -77,14 +74,13 @@ trait CoreEditor
     }
   }
 
-  private def loadItem(appContext: AppContext,
-    componentsJson: JsArray,
+  private def loadItem(componentsJson: JsArray,
     widgetsJson: JsArray,
     loadComponentTypes: JsValue => Seq[String],
     servicesJsSrc: String)(id: String): Action[AnyContent] = Action.async { implicit request =>
 
     def onItem(i: JsValue): SimpleResult = {
-      val scriptInfo = componentScriptInfo(appContext, loadComponentTypes(i), jsMode == "dev")
+      val scriptInfo = componentScriptInfo(context, loadComponentTypes(i), jsMode == "dev")
       val domainResolvedJs = buildJs(scriptInfo)
       val domainResolvedCss = buildCss(scriptInfo)
 
@@ -92,11 +88,11 @@ trait CoreEditor
         debounceInMillis,
         StaticPaths.staticPaths)
 
-      val jsSrcPaths = jsSrc(appContext)
+      val jsSrcPaths = jsSrc(context)
 
       Ok(renderJade(
         EditorTemplateParams(
-          appContext.sub.getOrElse(appContext.main),
+          context,
           domainResolvedJs,
           domainResolvedCss,
           jsSrcPaths.ngModules ++ scriptInfo.ngDependencies,
@@ -109,9 +105,7 @@ trait CoreEditor
   }
 
   def load(id: String): Action[AnyContent] = {
-    loadItem(
-      AppContext(context, None),
-      componentsArray,
+    loadItem(componentsArray,
       widgetsArray,
       componentTypes _,
       servicesJs(id, componentsArray, widgetsArray))(id)
