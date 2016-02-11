@@ -1,126 +1,40 @@
+
 @(componentEditorJs:String, types: Seq[(String,Boolean)], opts : play.api.libs.json.JsValue)
 
-<html>
-<head>
-  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"/>
-  <style type="text/css">
-    body {
-    margin: 0;
-    }
-  </style>
-</head>
-<body>
-<script type="text/javascript" src="//code.jquery.com/jquery-2.1.3.min.js"></script>
-<script type="text/javascript" src="@componentEditorJs"></script>
-<script type="text/javascript">
+@org.corespring.shell.views.html.launchers.coreLauncher(componentEditorJs, types, opts){
 
-     jQuery.fn.extend({
-       groupVal: function() {
-         return $(this).filter(':checked').val();
-       }
-     });
+  <button class="btn btn-sm btn-success save">Save</button>
+  <script type="text/javascript">
+    $('.save').click(function(){
+      editor.save(function(result){
+        console.log('>> save: ', result);
+      });
+    });
+  </script>
+}{
+  <script type="text/javascript">
 
-     document.addEventListener('DOMContentLoaded', function(){
-       var editor;
-       var holder = document.querySelector('.holder');
-       var opts = @{Html(play.api.libs.json.Json.stringify(opts))};
+    document.addEventListener('DOMContentLoaded', function(){
 
-       opts.showNavigation = false;
-       opts.activePane = 'config';
+      var holder = document.querySelector('.holder');
 
-       $('input[value="config"]').prop('checked', true);
+      opts.onItemCreated = function(itemId){
+        console.log('item created: ' + itemId);
+      };
 
-       opts.onItemCreated = function(itemId){
-         console.log('item created: ' + itemId);
-       };
+      if(opts.itemId){
+        editor = new org.corespring.players.ItemComponentEditor(holder, opts, function(err){
+          console.warn(err);
+        });
 
-       opts.queryParams = {
-         loggingEnabled: true
-       };
+        window.updateControls("tabs");
 
+      } else {
+        $('.create').click(function(){
+          window.createEditor(this, 'ItemComponentEditor');
+        });
+      }
+    });
+  </script>
+}
 
-       $('input[name="tab"]').change(function(){
-         var tab = $('input[name="tab"]').groupVal();
-
-         if(editor){
-           editor.showPane(tab, function(result){
-              if(result.error){
-                alert(result.error);
-              }
-           });
-         } else {
-           opts.activePane = tab;
-         }
-       });
-
-       $('.show-tabs-checkbox').change(function() {
-         if(editor){
-           editor.showNavigation(this.checked);
-         } else {
-           opts.showNavigation = this.checked;
-         }
-         });
-
-       $('.save').click(function(){
-          editor.save(function(result){
-            console.log('>> save: ', result);
-          });
-       });
-
-       if(opts.itemId){
-         editor = new org.corespring.players.ItemComponentEditor(holder, opts, function(err){
-           console.warn(err);
-         });
-       } else {
-         $('.create').click(function(){
-           var t = $('.component-type').find(":selected").attr('name');
-           opts.componentType = t;
-           editor = new org.corespring.players.ItemComponentEditor(holder, opts, function(err){
-             console.warn(err);
-           });
-
-           console.log(editor);
-         });
-       }
-     });
-    </script>
-
-<div class="container">
-
-  @if( (opts \ "itemId").asOpt[String].isEmpty ){
-    <div class="navbar nav">
-      <select class="form-control component-type" style="float:left; width: 200px;" prompt="choose a component type...">
-        @types.map{ t => <option name="@t._1">@t._1 (released: @t._2)</option> }
-      </select>
-      <button class="btn btn-primary create">Create</button>
-    </div>
-    }
-
-  <div class="external-controls navbar nav">
-
-    <label>External controls: </label>
-    <button class="btn btn-sm btn-success save">Save</button>
-    |
-    <span>
-      Tab:
-      <label class="radio-inline">
-        <input type="radio" name="tab" id="inlineRadio1" value="config"> Config
-      </label>
-      <label class="radio-inline">
-        <input type="radio" name="tab" id="inlineRadio2" value="preview"> Preview
-      </label>
-    </span>
-    |
-    <span>
-      <label class="checkbox-inline">
-        <input class="show-tabs-checkbox" type="checkbox" name="showTabs" value="true"> Show Tabs
-      </label>
-    </span>
-    <hr/>
-    <textarea class="data-text-area form-control" style="height: 100px;"></textarea>
-  </div>
-  <hr/>
-  <div class="holder" style="height:100%; width: 100%;"></div>
-</div>
-</body>
-</html>
