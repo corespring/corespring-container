@@ -124,11 +124,25 @@ trait Player
     "logCategory")
 
   def load(sessionId: String) = Action.async { implicit request =>
+    hooks.loadSession(sessionId).map {
+      handleSuccess { session =>
+        require((session \ "id").asOpt[String].isDefined, "The session model must specify an 'id'")
+        require((session \ "itemId").asOpt[String].isDefined, "The session model must specify an 'itemId'")
+        val sessionId = (session \ "id").as[String]
+        val itemId = (session \ "itemId").as[String]
+        val call = org.corespring.container.client.controllers.apps.routes.Player.loadItem( itemId, sessionId )
+        val url = call.url + "&" + mapToParamString(queryParams)
+        Redirect(url)
+      }
+    }
+  }
+
+  def loadItem(itemId: String, sessionId: String) = Action.async { implicit request =>
     hooks.loadSessionAndItem(sessionId).map {
       handleSuccess { (tuple) =>
         val (session, item) = tuple
         require((session \ "id").asOpt[String].isDefined, "The session model must specify an 'id'")
-        Ok(createPlayerHtml((session \ "id").as[String], session, item, queryParams(mapToJson))).as(ContentTypes.HTML)
+        Ok(createPlayerHtml((session \ "id").as[String], session, item, mapToJson(queryParams))).as(ContentTypes.HTML)
       }
     }
   }
@@ -139,14 +153,14 @@ trait Player
     s"$key=$encodedValue"
   }.mkString("&")
 
+
   def mapToJson(m: Map[String, String]): JsObject = {
     import play.api.libs.json._
     Json.toJson(m).asInstanceOf[JsObject]
   }
 
-  private def queryParams[A](build: (Map[String, String] => A) = mapToParamString _)(implicit rh: RequestHeader): A = {
-    val trimmed = (rh.queryString -- playerQueryStringParams).mapValues(s => s.mkString(""))
-    build(trimmed)
+  private def queryParams(implicit rh: RequestHeader): Map[String, String] = {
+    (rh.queryString -- playerQueryStringParams).mapValues(s => s.mkString(""))
   }
 
   def createSessionForItem(itemId: String): Action[AnyContent] = Action.async { implicit request =>
@@ -156,10 +170,10 @@ trait Player
         require((session \ "id").asOpt[String].isDefined, "The session model must specify an 'id'")
         val call = org.corespring.container.client.controllers.apps.routes.Player.load((session \ "id").as[String])
         val location = {
-          val params = queryParams[String]()
+          val params = mapToParamString(queryParams)
           s"${call.url}${if (params.isEmpty) "" else s"?$params"}"
         }
-        Created(createPlayerHtml((session \ "id").as[String], session, item, queryParams(mapToJson)))
+        Created(createPlayerHtml((session \ "id").as[String], session, item, mapToJson(queryParams)))
           .as(ContentTypes.HTML)
           .withHeaders(LOCATION -> location)
       }

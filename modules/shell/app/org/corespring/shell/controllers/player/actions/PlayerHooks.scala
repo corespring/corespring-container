@@ -43,6 +43,16 @@ trait PlayerHooks extends ContainerPlayerHooks {
     }.getOrElse(Left(BAD_REQUEST -> "Error creating session"))
   }
 
+  override def loadSession(sessionId: String)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] = Future {
+    val out = for {
+      session <- sessionService.load(sessionId)
+    } yield {
+        session
+      }
+
+    out.map(Right(_)).getOrElse(Left(NOT_FOUND -> "Can't find item or session"))
+  }
+
   override def loadSessionAndItem(sessionId: String)(implicit header: RequestHeader): Future[Either[(Int, String), (JsValue, JsValue)]] = Future {
     val out = for {
       session <- sessionService.load(sessionId)

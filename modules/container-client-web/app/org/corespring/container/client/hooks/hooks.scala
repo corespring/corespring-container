@@ -42,6 +42,7 @@ trait LoadHook extends HasContainerContext {
 
 trait PlayerHooks extends GetAssetHook with HasContainerContext {
   def createSessionForItem(itemId: String)(implicit header: RequestHeader): Future[Either[StatusMessage, (JsValue, JsValue)]]
+  def loadSession(sessionId: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]]
   def loadSessionAndItem(sessionId: String)(implicit header: RequestHeader): Future[Either[StatusMessage, (JsValue, JsValue)]]
   def loadItemFile(itemId: String, file: String)(implicit header: RequestHeader): SimpleResult
 }

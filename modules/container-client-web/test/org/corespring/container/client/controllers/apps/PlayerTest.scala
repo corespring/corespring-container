@@ -24,15 +24,17 @@ import scala.concurrent.duration.Duration
 class PlayerTest extends Specification with PlaySpecification with Mockito {
 
   val sessionId = "sessionId"
+  val itemId = "itemId"
 
   object MockGlobal extends GlobalSettings
 
-  class playerScope(sessionAndItem: Either[(Int, String), (JsValue, JsValue)] = Right(Json.obj("id" -> sessionId), Json.obj()))
+  class playerScope(sessionAndItem: Either[(Int, String), (JsValue, JsValue)] = Right(Json.obj("id" -> sessionId, "itemId" -> itemId), Json.obj()))
     extends Scope
     with Player
     with TestContext{
     lazy val mockHooks = {
       val m = mock[PlayerHooks]
+      m.loadSession(any[String])(any[RequestHeader]) returns Future(sessionAndItem.right.map(_._1))
       m.loadSessionAndItem(any[String])(any[RequestHeader]) returns Future(sessionAndItem)
       m.createSessionForItem(any[String])(any[RequestHeader]) returns Future(sessionAndItem)
       m
@@ -75,9 +77,34 @@ class PlayerTest extends Specification with PlaySpecification with Mockito {
       }
     }
 
-    "return 200" in new playerScope {
+    "redirect to loadItem" in new playerScope {
       running(FakeApplication(withGlobal = Some(MockGlobal))) {
         val result = load(sessionId)(FakeRequest("", ""))
+        status(result) must_== SEE_OTHER
+        redirectLocation(result) must_== Some("/player/item/itemId/index.html?sessionId=sessionId&")
+      }
+    }
+
+    "pass through query params" in new playerScope {
+      running(FakeApplication(withGlobal = Some(MockGlobal))) {
+        val result = load(sessionId)(FakeRequest("", "?test=hooray"))
+        redirectLocation(result) must_== Some("/player/item/itemId/index.html?sessionId=sessionId&test=hooray")
+      }
+    }
+
+  }
+
+  "loadItem" should {
+
+    "throw an error if the session id isn't defined" in new playerScope(Right(Json.obj(), Json.obj())) {
+      running(FakeApplication(withGlobal = Some(MockGlobal))) {
+        Await.result(loadItem(itemId, sessionId)(FakeRequest("", "")), Duration(1, TimeUnit.SECONDS)) must throwA[IllegalArgumentException]
+      }
+    }
+
+    "return 200" in new playerScope {
+      running(FakeApplication(withGlobal = Some(MockGlobal))) {
+        val result = loadItem(itemId, sessionId)(FakeRequest("", ""))
         status(result) must_== OK
         there was one(mockHooks).loadSessionAndItem(sessionId)(FakeRequest("", ""))
       }
@@ -85,14 +112,14 @@ class PlayerTest extends Specification with PlaySpecification with Mockito {
 
     "call hooks.loadSessionAndItem" in new playerScope {
       running(FakeApplication(withGlobal = Some(MockGlobal))) {
-        val result = load(sessionId)(FakeRequest("", ""))
+        val result = loadItem(itemId, sessionId)(FakeRequest("", ""))
         there was one(mockHooks).loadSessionAndItem(sessionId)(FakeRequest("", ""))
       }
     }
 
     "return session as HTML" in new playerScope {
       running(FakeApplication(withGlobal = Some(MockGlobal))) {
-        val result = load(sessionId)(FakeRequest("", ""))
+        val result = loadItem(itemId, sessionId)(FakeRequest("", ""))
         header(HeaderNames.CONTENT_TYPE, result) must_== Some(ContentTypes.HTML)
       }
     }
