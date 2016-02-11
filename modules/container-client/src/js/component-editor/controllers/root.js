@@ -1,7 +1,6 @@
 angular.module('corespring-singleComponentEditor.controllers')
   .controller('Root', [
     '$scope',
-    '$state',
     '$timeout',
     '$compile',
     'LogFactory',
@@ -17,7 +16,6 @@ angular.module('corespring-singleComponentEditor.controllers')
     'SINGLE_COMPONENT_KEY',    
     function(
       $scope,
-      $state,
       $timeout,
       $compile,
       LogFactory,

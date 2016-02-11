@@ -1,0 +1,146 @@
+@(componentEditorJs:String, types: Seq[(String,Boolean)], opts : play.api.libs.json.JsValue)
+<html>
+<head>
+  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"/>
+  <style type="text/css">
+    body {
+    margin: 0;
+    }
+  </style>
+</head>
+<body>
+<script type="text/javascript" src="//code.jquery.com/jquery-2.1.3.min.js"></script>
+<script type="text/javascript" src="@componentEditorJs"></script>
+<script type="text/javascript">
+
+     jQuery.fn.extend({
+       groupVal: function() {
+         return $(this).filter(':checked').val();
+       }
+     });
+
+     document.addEventListener('DOMContentLoaded', function(){
+       $('.preview-on-right-opts').hide();
+       $('.tab-options').hide();
+
+       var editor;
+       var holder = document.querySelector('.holder');
+       var opts = @{Html(play.api.libs.json.Json.stringify(opts))};
+
+       opts.showNavigation = false;
+
+       opts.activePane = 'config';
+       $('input[value="config"]').prop('checked', true);
+
+       opts.queryParams = {
+         loggingEnabled: true
+       };
+
+       $('input[name="previewMode"]').change(function(){
+         var mode = $('input[name="previewMode"]').groupVal();
+         opts.previewMode = tab;
+       });
+
+
+       // -- tabs mode
+       $('input[name="tab"]').change(function(){
+         var tab = $('input[name="tab"]').groupVal();
+
+         if(editor){
+           editor.showPane(tab, function(result){
+              if(result.error){
+                alert(result.error);
+              }
+           });
+         } else {
+           opts.activePane = tab;
+         }
+       });
+
+       $('.show-tabs-checkbox').change(function() {
+         if(editor){
+           editor.showNavigation(this.checked);
+         } else {
+           opts.showNavigation = this.checked;
+         }});
+
+        // -- preview-right mode
+       $('.show-preview-checkbox').change(function() {
+         if(editor){
+           editor.showPreview(this.checked);
+         } else {
+           opts.showPreview = this.checked;
+         }});
+
+       $('.create').click(function(){
+
+         var previewMode = $(this).attr('data-option');
+         var t = $('.component-type').find(":selected").attr('name');
+         opts.componentType = t;
+         opts.previewMode = previewMode;
+
+         if(previewMode === 'preview-right'){
+           $('.preview-on-right-opts').show();
+           //$('.show-preview-checkbox').attr('value', true);
+         } else {
+           $('.tab-options').show();
+         }
+
+         $('.create-opts').hide();
+
+         editor = new org.corespring.players.ComponentEditor(holder, opts, function(err){
+           console.warn(err);
+         });
+       });
+     });
+    </script>
+
+<div class="container">
+
+  <div class="navbar nav create-opts">
+    <select class="form-control component-type" style="float:left; width: 200px;" prompt="choose a component type...">
+      @types.map{ t => <option name="@t._1">@t._1 (released: @t._2)</option> }
+    </select>
+    <button class="btn btn-primary create" data-option="tabs">Create (w/ Tabs)</button>
+    <button class="btn btn-primary create" data-option="preview-right">Create (Preview on the right)</button>
+  </div>
+
+  <div class="external-controls navbar nav">
+
+
+
+
+    <label>External controls: </label>
+    |
+    <button class="btn btn-sm btn-primary get-data">Get Data</button>
+    <button class="btn btn-sm btn-success set-data">Set Data</button>
+    |
+    <span class="tab-options">
+      Tab:
+      <label class="radio-inline">
+        <input type="radio" name="tab" id="inlineRadio1" value="config"> Config
+      </label>
+      <label class="radio-inline">
+        <input type="radio" name="tab" id="inlineRadio2" value="preview"> Preview
+      </label>
+      |
+      <span>
+        <label class="checkbox-inline">
+          <input class="show-tabs-checkbox" type="checkbox" name="showTabs" value="true"> Show Tabs
+        </label>
+      </span>
+    </span>
+
+    <span class="preview-on-right-opts">
+        <label class="checkbox-inline">
+          <input class="show-preview-checkbox" type="checkbox" name="showPreview" checked="true"> Show Preview
+        </label>
+    </span>
+    <hr/>
+    <textarea class="data-text-area form-control" style="height: 100px;"></textarea>
+  </div>
+  <hr/>
+  <div class="holder" style="height:100%; width: 100%;"></div>
+</div>
+</body>
+</html>
