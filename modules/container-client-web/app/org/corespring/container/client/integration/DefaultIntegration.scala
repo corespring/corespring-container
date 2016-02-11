@@ -39,6 +39,7 @@ trait DefaultIntegration
   def versionInfo: JsObject
 
   def containerContext: ContainerExecutionContext
+
   /**
    * For a given resource path return a resolved path.
    * By default this just returns the path, so no domain is used.
