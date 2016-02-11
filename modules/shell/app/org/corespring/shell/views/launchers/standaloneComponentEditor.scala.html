@@ -37,8 +37,11 @@
 </script>
 }{
 <script type="text/javascript">
-   $('.create').click(function(){
-     window.createEditor(this, 'ComponentEditor');
+
+   document.addEventListener('DOMContentLoaded', function(){
+     $('.create').click(function(){
+       window.createEditor(this, 'ComponentEditor');
+     });
    });
  </script>
 }

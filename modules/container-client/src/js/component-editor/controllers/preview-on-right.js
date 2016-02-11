@@ -5,7 +5,7 @@ angular.module('corespring-singleComponentEditor.controllers')
 
       $scope.showPreview = true;
 
-      $scope.$on('showPreview', function(show){
+      $scope.$on('showPreview', function(event, show){
         $scope.showPreview = show;
       });
 }]);
