@@ -89,11 +89,23 @@ body {
 
 .config-pane{
   min-width: 500px;
+  flex-grow: 1;
 }
 
 .preview-right{
   display: flex;
   display: -webkit-flex;
   display: -ms-flex;
+
+  .preview-pane{
+    max-width: 600px;
+    min-width: 400px;
+
+    .player-container {
+      max-width: 600px;
+      min-width: 400px;
+    }
+  
+  }
 }
 

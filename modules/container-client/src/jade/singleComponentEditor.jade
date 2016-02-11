@@ -39,13 +39,16 @@ block content
           +preview
     else
       .tabbed(ng-controller="Tabbed")
-        tabset(ng-show="showNavigation")
-          tab(heading="Configuration", 
-            select="showConfig()", 
-            active="configActive") 
-          tab(heading="Preview", 
-            select="showPreview()", 
-            active="previewActive") 
+
+        ul.nav.nav-tabs(ng-show="showNavigation")
+          li(role="presentation", 
+            ng-class="{active: activePane == 'config'}",
+            ng-click="showPane('config')")
+            a(href="") Configuration 
+          li(role="presentation", 
+            ng-class="{active: activePane == 'preview'}",
+            ng-click="showPane('preview')")
+            a(href="") Preview
 
         .config(ng-show="activePane == 'config'")
           .configuration

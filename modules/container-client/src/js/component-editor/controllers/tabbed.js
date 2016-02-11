@@ -1,24 +1,18 @@
 angular.module('corespring-singleComponentEditor.controllers')
   .controller('Tabbed', [
     '$scope',
-    'Msgr',
-    function($scope, Msgr) {
+    '$timeout',
+    function($scope, $timeout) {
 
       $scope.showNavigation = false;
       $scope.activePane = 'config';
 
-      $scope.$watch('activePane', function(a){
-        if(a === 'preview'){
-          $scope.configActive = false;
-          $scope.previewActive = true;
-        } else {
-          $scope.configActive = true;
-          $scope.previewActive = false;
-        }
-      });
+      $scope.showPane = function(pane){
+        $scope.activePane = pane;
+      };
 
       $scope.$on('showPane', function(event, pane){
-        $scope.activePane = pane;
+        $scope.showPane(pane);
       });
 
       $scope.$on('showNavigation', function(event, showNavigation){
