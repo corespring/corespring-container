@@ -278,11 +278,14 @@ describe('component-editor', function () {
       expect(launcher.loadInstance).toHaveBeenCalledWith(
         {method: 'GET', url: 'item'},
         jasmine.any(Object),
-        {activePane: 'config', 
-        showNavigation: false, 
-        uploadUrl: 'item', 
-        xhtml: undefined, 
-        componentModel: {}}, 
+        {
+          previewMode: 'tabs',
+          activePane: 'config', 
+          showNavigation: false, 
+          uploadUrl: 'item', 
+          xhtml: undefined, 
+          componentModel: {}
+        }, 
         jasmine.any(Function));
     });
     
@@ -301,7 +304,7 @@ describe('component-editor', function () {
 
       Def = modules.Draft;
       
-      $.ajax.and.callFake(function(opts){
+      $.ajax = jasmine.createSpy('$.ajax').and.callFake(function(opts){
         opts.success({components: { 1: {}}});
       });
     });
@@ -326,7 +329,8 @@ describe('component-editor', function () {
         expect(launcher.loadInstance).toHaveBeenCalledWith(
           {method: 'GET', url: 'draft'},
           jasmine.any(Object),
-          {activePane: 'config', 
+          {previewMode: 'tabs',
+          activePane: 'config', 
           showNavigation: false, 
           uploadUrl: 'draft', 
           xhtml: undefined, 

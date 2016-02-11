@@ -42,13 +42,13 @@ describe('component-editor Root', function(){
       expect(scope.componentKey).toEqual('compKey');
     });
     
-    it('sets activePane', function(){
-      expect(scope.activePane).toEqual('config');
-    });
+    // it('sets activePane', function(){
+    //   expect(scope.activePane).toEqual('config');
+    // });
     
-    it('sets showNavigation', function(){
-      expect(scope.showNavigation).toEqual(false);
-    });
+    // it('sets showNavigation', function(){
+    //   expect(scope.showNavigation).toEqual(false);
+    // });
   });
 
   describe('in iframe', function(){
@@ -81,8 +81,8 @@ describe('component-editor Root', function(){
       
       assertMsgrOn('initialise');
       assertMsgrOn('getData');
-      assertMsgrOn('showNavigation');
-      assertMsgrOn('showPane');
+      // assertMsgrOn('showNavigation');
+      // assertMsgrOn('showPane');
       assertMsgrOn('getComponentKey');
       assertMsgrOn('setData');
       

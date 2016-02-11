@@ -62,7 +62,7 @@ function Helper(){
 
   this.launchData = function(options, uploadUrl, xhtml, componentModel){
     return {
-      previewMode: options.previewMode,
+      previewMode: options.previewMode || 'tabs',
       activePane: options.activePane || 'config',
       showNavigation: options.showNavigation === true || false,
       uploadUrl: uploadUrl,
