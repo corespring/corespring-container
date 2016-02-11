@@ -25,7 +25,7 @@ trait Player
 
   private object SessionRenderer {
 
-    private val archiveCollId = "52e68c0bd455283f1744a721"
+    private val archiveCollId = "500ecfc1036471f538f24bdc"
 
     /**
      * Preprocess the xml so that it'll work in all browsers
