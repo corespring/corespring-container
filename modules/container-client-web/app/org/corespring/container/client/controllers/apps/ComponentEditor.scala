@@ -8,7 +8,7 @@ import org.corespring.container.client.views.txt.js.ComponentEditorServices
 import org.corespring.container.components.model.Component
 import play.api.Mode.Mode
 import play.api.libs.json.Json._
-import play.api.libs.json.{JsArray, JsValue}
+import play.api.libs.json.{ JsArray, JsValue }
 import play.api.mvc._
 import play.api.templates.Html
 
@@ -16,23 +16,21 @@ import scala.concurrent.Future
 
 trait ComponentEditorLaunching
   extends Jade
-    with ComponentScriptPrep
-    with ComponentInfoJson
-    with HasContainerContext {
-
+  with ComponentScriptPrep
+  with ComponentInfoJson
+  with HasContainerContext {
 
   private def loadComponentEditorHtml(reqToOptions: Request[AnyContent] => Option[(String, ComponentEditorOptions)])(componentType: String, req: Request[AnyContent]): Future[Html] = Future {
     val (previewMode, options) = reqToOptions(req).getOrElse("tabs" -> ComponentEditorOptions.default)
     logger.debug(s"function=loadComponentEditorHtml, componentEditorOptions=$options")
-    val context = "singleComponentEditor"
-    val scriptInfo = componentScriptInfo(context, Seq(componentType), jsMode(req) == "dev")
+    val scriptInfo = componentScriptInfo("editor", Seq(componentType), jsMode(req) == "dev")
     val domainResolvedJs = buildJs(scriptInfo)(req)
     val domainResolvedCss = buildCss(scriptInfo)(req)
-    val jsSrcPaths = jsSrc(context)
+    val jsSrcPaths = jsSrc("singleComponentEditor")
     val arr: JsValue = JsArray(interactions.map(componentInfoToJson(modulePath, interactions, widgets)(_)))
     renderJade(
       ComponentEditorTemplateParams(
-        context,
+        "singleComponentEditor",
         domainResolvedJs,
         domainResolvedCss,
         jsSrcPaths.ngModules ++ scriptInfo.ngDependencies,
@@ -67,15 +65,15 @@ trait ComponentEditorLaunching
 }
 
 class ComponentEditor(val containerContext: ContainerExecutionContext,
-                      val components: Seq[Component],
-                      val mode: Mode,
-                      val sourcePaths: SourcePathsService,
-                      val urls: ComponentUrls)
+  val components: Seq[Component],
+  val mode: Mode,
+  val sourcePaths: SourcePathsService,
+  val urls: ComponentUrls)
   extends Controller
-    with ComponentEditorLaunching
-    with Jade
-    with ComponentScriptPrep
-    with ComponentInfoJson {
+  with ComponentEditorLaunching
+  with Jade
+  with ComponentScriptPrep
+  with ComponentInfoJson {
 
   def load(componentType: String) = Action.async { request =>
     loadComponentEditorHtmlFromForm(componentType)(request).map(Ok(_))

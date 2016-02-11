@@ -2,7 +2,7 @@ package org.corespring.container.client.controllers.apps
 
 import java.net.URLEncoder
 
-import org.corespring.container.client.{ ItemAssetResolver, V2PlayerConfig }
+import org.corespring.container.client.V2PlayerConfig
 import org.corespring.container.client.component.PlayerItemTypeReader
 import org.corespring.container.client.controllers.GetAsset
 import org.corespring.container.client.controllers.helpers.PlayerXhtml
@@ -10,7 +10,7 @@ import org.corespring.container.client.controllers.jade.Jade
 import org.corespring.container.client.hooks.PlayerHooks
 import org.corespring.container.client.views.txt.js.PlayerServices
 import org.corespring.container.components.processing.PlayerItemPreProcessor
-import play.api.http.{ ContentTypes }
+import play.api.http.ContentTypes
 import play.api.libs.json._
 import play.api.mvc.{ Action, AnyContent, RequestHeader }
 import play.api.templates.Html
@@ -25,10 +25,6 @@ trait Player
 
   private object SessionRenderer {
 
-    private val archiveCollId = "500ecfc1036471f538f24bdc"
-
-    private lazy val appContext = AppContext(context, None)
-
     /**
      * Preprocess the xml so that it'll work in all browsers
      * TODO: A layout component may have multiple elements
@@ -41,12 +37,10 @@ trait Player
         .getOrElse("<div><h1>New Item</h1></div>")
     }
 
-    def hasBeenArchived(session: JsValue) =
-      (session \ "collectionId").asOpt[String].map(_ == archiveCollId).getOrElse(false)
-
     def createPlayerHtml(sessionId: String, session: JsValue, itemJson: JsValue, serviceParams: JsObject)(implicit rh: RequestHeader): Html = {
 
-      val scriptInfo = componentScriptInfo(appContext, componentTypes(itemJson), jsMode == "dev")
+      val hasBeenArchived = (session \ "collectionId").asOpt[String].exists(_ == hooks.archiveCollectionId)
+      val scriptInfo = componentScriptInfo(context, componentTypes(itemJson), jsMode == "dev")
       val controlsJs = if (showControls) paths(controlsJsSrc) else Seq.empty
       val domainResolvedJs = buildJs(scriptInfo, controlsJs)
       val domainResolvedCss = buildCss(scriptInfo)
@@ -64,14 +58,14 @@ trait Player
           context,
           domainResolvedJs,
           domainResolvedCss,
-          jsSrc(appContext).ngModules ++ scriptInfo.ngDependencies,
+          jsSrc(context).ngModules ++ scriptInfo.ngDependencies,
           servicesJs(sessionId, serviceParams),
           showControls,
           Json.obj("session" -> session, "item" -> preprocessedItem),
           versionInfo,
           newRelicRumConf != None,
           newRelicRumConf.getOrElse(Json.obj()),
-          if (hasBeenArchived(session)) Seq(s"Warning: This item has been deleted.") else Seq.empty))
+          if (hasBeenArchived) Seq(s"Warning: This item has been deleted.") else Seq.empty))
 
     }
   }

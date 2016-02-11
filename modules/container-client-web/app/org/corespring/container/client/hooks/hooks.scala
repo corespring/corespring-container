@@ -44,6 +44,7 @@ trait PlayerHooks extends GetAssetHook with HasContainerContext {
   def createSessionForItem(itemId: String)(implicit header: RequestHeader): Future[Either[StatusMessage, (JsValue, JsValue)]]
   def loadSessionAndItem(sessionId: String)(implicit header: RequestHeader): Future[Either[StatusMessage, (JsValue, JsValue)]]
   def loadItemFile(itemId: String, file: String)(implicit header: RequestHeader): SimpleResult
+  def archiveCollectionId: String
 }
 
 trait CatalogHooks extends LoadHook with GetAssetHook {
@@ -87,13 +88,13 @@ trait CoreItemHooks extends HasContainerContext with LoadHook {
 trait DraftHooks {
   def save(draftId: String, json: JsValue)(implicit request: RequestHeader): R[JsValue]
   def createItemAndDraft()(implicit h: RequestHeader): R[(String, String)]
-  def createSingleComponentItemDraft(componentType:String, key:String, defaultData: JsObject)(implicit r : RequestHeader) : R[(String,String)]
+  def createSingleComponentItemDraft(componentType: String, key: String, defaultData: JsObject)(implicit r: RequestHeader): R[(String, String)]
   def commit(id: String, force: Boolean)(implicit h: RequestHeader): R[JsValue]
 }
 
 trait CreateItemHook {
   def createItem(json: Option[JsValue])(implicit h: RequestHeader): R[String]
-  def createSingleComponentItem(componentType: String, key:String, defaultData: JsObject)(implicit h: RequestHeader): R[String]
+  def createSingleComponentItem(componentType: String, key: String, defaultData: JsObject)(implicit h: RequestHeader): R[String]
 }
 
 trait ItemHooks extends CoreItemHooks with CreateItemHook

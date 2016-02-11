@@ -49,8 +49,6 @@ trait Catalog
     CatalogServices("catalog.services", Item.load(itemId), JsArray(componentJson), smEndpoints).toString
   }
 
-  private lazy val appContext = AppContext(context, None)
-
   def load(id: String): Action[AnyContent] = Action.async {
     implicit request =>
       hooks.showCatalog(id).flatMap { e =>
@@ -58,7 +56,7 @@ trait Catalog
         def ifEmpty = {
           logger.trace(s"[showCatalog]: $id")
 
-          val scriptInfo = componentScriptInfo(appContext, componentTypes(Json.obj()), jsMode == "dev")
+          val scriptInfo = componentScriptInfo(context, componentTypes(Json.obj()), jsMode == "dev")
           val domainResolvedJs = buildJs(scriptInfo)
           val domainResolvedCss = buildCss(scriptInfo)
           Ok(
@@ -67,7 +65,7 @@ trait Catalog
                 context,
                 domainResolvedJs,
                 domainResolvedCss,
-                jsSrc(appContext).ngModules ++ scriptInfo.ngDependencies,
+                jsSrc(context).ngModules ++ scriptInfo.ngDependencies,
                 servicesJs(id),
                 StaticPaths.staticPaths)))
         }
