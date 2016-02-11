@@ -34,8 +34,12 @@ block content
     if previewMode == "preview-right"
       .preview-right(ng-controller="PreviewOnRight")
         .config-pane
+          .h4 Configuration
+          hr/
           .configuration
         .preview-pane(ng-show="showPreview")
+          .h4 Preview
+          hr/
           +preview
     else
       .tabbed(ng-controller="Tabbed")
