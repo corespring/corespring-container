@@ -85,7 +85,7 @@ GET           /draft/dev-editor/:draftId/*file                           @org.co
 POST          /draft/dev-editor/:draftId/*file                           @org.corespring.container.client.controllers.apps.DraftDevEditor.uploadFile(draftId, file)
 DELETE        /draft/dev-editor/:draftId/*file                           @org.corespring.container.client.controllers.apps.DraftDevEditor.deleteFile(draftId, file)
 
-POST          /component/editor/:componentType/index.html                @org.corespring.container.client.controllers.apps.ComponentEditor.load(componentType)
+POST          /component/editor/:componentType/index.html                @org.corespring.container.client.controllers.apps.ComponentEditorController.load(componentType)
 
 # Item Editor: config, components
 POST          /item/editor/:itemId/component-editor.html                @org.corespring.container.client.controllers.apps.ItemEditor.componentEditor(itemId)

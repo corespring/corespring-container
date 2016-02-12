@@ -1,16 +1,18 @@
 package org.corespring.container.client.controllers.apps
 
-import org.corespring.container.client.apps.ComponentEditor
+import org.corespring.container.client.integration.ContainerExecutionContext
+import org.corespring.container.client.pages.componentEditor.ComponentEditorRenderer
 import play.api.mvc.{ Action, Controller }
 
-import scala.concurrent.Future
+class ComponentEditorController(
+  containerExecutionContext: ContainerExecutionContext,
+  renderer: ComponentEditorRenderer) extends Controller {
 
-class ComponentEditorController extends Controller {
+  implicit val ec = containerExecutionContext.context
 
   def load(componentType: String) = Action.async { request =>
-    Future {
-      val componentEditor = ComponentEditor(componentType)
-      Ok(componentEditor.html)
+    renderer.render.map { html =>
+      Ok(html)
     }
   }
 }

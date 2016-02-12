@@ -1,4 +1,4 @@
-package org.corespring.container.client.render.jade
+package org.corespring.container.client.pages.engine
 
 import java.io.{ BufferedReader, InputStreamReader, Reader }
 import java.net.URL
@@ -8,20 +8,11 @@ import de.neuland.jade4j.template.{ JadeTemplate, TemplateLoader }
 import de.neuland.jade4j.{ Jade4J, JadeConfiguration }
 import grizzled.slf4j.Logger
 import org.apache.commons.io.IOUtils
-import org.corespring.container.client.controllers.apps.TemplateParams
+import play.api.Mode
 import play.api.Mode.Mode
-import play.api.{ Mode, Play }
 import play.api.templates.Html
 
 import scala.collection.mutable
-
-trait GetParams {
-  def params: Map[String, Any]
-}
-
-trait Renderer {
-  def render(template: String, params: GetParams): Html
-}
 
 class Jade(root: String, mode: Mode, resource: String => Option[URL]) {
 
@@ -37,7 +28,7 @@ class Jade(root: String, mode: Mode, resource: String => Option[URL]) {
       s"$root/$name${if (name.endsWith(".jade")) "" else ".jade"}"
     }
 
-    override def getLastModified(name: String): Long = Play.resource(toPath(name)).map { url =>
+    override def getLastModified(name: String): Long = resource(toPath(name)).map { url =>
       url.openConnection().getLastModified
     }.getOrElse { throw new RuntimeException(s"getLastModified - Unable to load jade file as a resource from: ${toPath(name)}") }
 
@@ -68,7 +59,6 @@ class Jade(root: String, mode: Mode, resource: String => Option[URL]) {
   }
 
   private def loadTemplate(name: String): JadeTemplate = {
-
     def readIn = try {
       val out = jadeConfig.getTemplate(name)
       templates.put(name, out)
@@ -89,13 +79,13 @@ class Jade(root: String, mode: Mode, resource: String => Option[URL]) {
     } else templates.get(name).getOrElse { readIn }
   }
 
-  def renderJade(params: TemplateParams): Html = {
+  def renderJade(name: String, params: Map[String, Any]): Html = {
     require(params != null, "params is null")
     import scala.collection.JavaConversions._
-    val template = loadTemplate(params.appName)
+    val template = loadTemplate(name)
     logger.trace(s"function=renderJade template=$template")
     logger.trace(s"function=renderJade params=$params")
-    val rendered = jadeConfig.renderTemplate(template, params.toJadeParams)
+    val rendered = jadeConfig.renderTemplate(template, params.asInstanceOf[Map[String, AnyRef]])
     Html(new StringBuilder(rendered).toString)
   }
 }
