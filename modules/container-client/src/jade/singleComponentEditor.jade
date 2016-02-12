@@ -6,7 +6,7 @@ block content
   include templates/component-editor/preview-right
 
   mixin preview
-    .item-preview-wrapper
+    .item-preview-wrapper(ng-controller="ClientSidePreview")
       .player-container
         preview-player(
           player-mode="playerMode",
@@ -40,6 +40,7 @@ block content
         .preview-pane(ng-show="showPreview")
           .h4 Preview
           hr/
+
           +preview
     else
       .tabbed(ng-controller="Tabbed")
@@ -66,8 +67,7 @@ block content
                 | {{saveError}}
 
 
-        .preview(ng-show="activePane == 'preview'", 
-          ng-controller="ClientSidePreview")
+        .preview(ng-show="activePane == 'preview'")
           +preview
 
 
