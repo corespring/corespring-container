@@ -47,12 +47,6 @@ class ContainerClientImplementation(
     }.getOrElse(path)
   }
 
-  override def itemAssetResolver: ItemAssetResolver = new ItemAssetResolver {
-    override def resolve(itemId: String)(file: String): String = {
-      resolveDomain(super.resolve(itemId)(file))
-    }
-  }
-
   lazy val logger = Logger(classOf[ContainerClientImplementation])
 
   override def components: Seq[Component] = componentsIn
