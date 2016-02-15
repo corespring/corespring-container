@@ -34,14 +34,32 @@ block content
     if previewMode == "preview-right"
       .preview-right(ng-controller="PreviewOnRight")
         .config-pane
-          .h4 Configuration
+          span.pane-header Configuration
           hr/
           .configuration
-        .preview-pane(ng-show="showPreview")
-          .h4 Preview
+        .preview-pane(ng-show="showPreview", ng-controller="ClientSidePreview")
+          ul.nav 
+            li
+              span.pane-header Preview
+            li.player-btn-holder
+              span(simple-player-button="", mode="playerMode") 
           hr/
+          .player-container
+            preview-player(
+              player-mode="playerMode",
+              data-jade-template='templates/question',
+              player-markup="item.xhtml",
+              player-item="item",
+              player-components="item.components",
+              player-outcomes="outcome")
 
-          +preview
+            summary-feedback(
+              ng-model='item.summaryFeedback', 
+              session-complete='session.isComplete')
+              hr/
+
+          //+preview
+
     else
       .tabbed(ng-controller="Tabbed")
 

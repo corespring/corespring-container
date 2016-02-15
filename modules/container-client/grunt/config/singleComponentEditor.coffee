@@ -59,5 +59,6 @@ exports.ngModules = _.union(player.ngModules, [
   'corespring.wiggi-wiz-features.link',
   'corespring.wiggi-wiz-features.cs-image',
   'corespring-singleComponentEditor.controllers',
-  'corespring-singleComponentEditor.services'
+  'corespring-singleComponentEditor.services',
+  'corespring-singleComponentEditor.directives'
 ])
