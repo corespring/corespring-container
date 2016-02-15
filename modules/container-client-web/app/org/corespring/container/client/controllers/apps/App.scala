@@ -4,17 +4,17 @@ import grizzled.slf4j.Logger
 import org.corespring.container.client.HasContainerContext
 import org.corespring.container.client.component.{ ComponentUrls, ItemTypeReader }
 import org.corespring.container.client.controllers.angular.AngularModules
-import org.corespring.container.client.controllers.helpers.{JsonHelper, NameHelper, Helpers, LoadClientSideDependencies}
+import org.corespring.container.client.controllers.helpers.{ JsonHelper, NameHelper, Helpers, LoadClientSideDependencies }
 import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.components.model._
 import org.corespring.container.components.model.dependencies.DependencyResolver
 import play.api.Mode.Mode
-import play.api.libs.json.{JsObject, JsBoolean, JsString, JsValue}
+import play.api.libs.json.{ JsObject, JsBoolean, JsString, JsValue }
 import play.api.mvc._
 
 import scala.concurrent._
 
-case class ComponentScriptInfo(context:String, jsUrl: Seq[String],
+case class ComponentScriptInfo(context: String, jsUrl: Seq[String],
   cssUrl: Seq[String],
   ngDependencies: Seq[String])
 
@@ -60,12 +60,11 @@ trait App[T]
 
   }
 
-
 }
 
-trait ComponentInfoJson extends NameHelper with JsonHelper{
+trait ComponentInfoJson extends NameHelper with JsonHelper {
 
-  protected def componentInfoToJson(modulePath:String, interactions:Seq[Interaction], widgets:Seq[Widget])(ci: ComponentInfo): JsValue = {
+  protected def componentInfoToJson(modulePath: String, interactions: Seq[Interaction], widgets: Seq[Widget])(ci: ComponentInfo): JsValue = {
     val tag = tagName(ci.id.org, ci.id.name)
 
     val icon = (interactions ++ widgets).find(_.componentType == tag).map(_.icon) match {
@@ -80,7 +79,7 @@ trait ComponentInfoJson extends NameHelper with JsonHelper{
       "name" -> Some(JsString(ci.id.name)),
       "title" -> Some(JsString(ci.title.getOrElse(""))),
       "titleGroup" -> Some(JsString(ci.titleGroup.getOrElse(""))),
-      "icon" ->  icon,
+      "icon" -> icon,
       "released" -> Some(JsBoolean(ci.released)),
       "insertInline" -> Some(JsBoolean(ci.insertInline)),
       "componentType" -> Some(JsString(tag)),
@@ -91,7 +90,7 @@ trait ComponentInfoJson extends NameHelper with JsonHelper{
 
 trait ComponentScriptPrep extends DependencyResolver
   with LoadClientSideDependencies {
-  def ngModules(context:String): AngularModules = new AngularModules(s"$context.services")
+  def ngModules(context: String): AngularModules = new AngularModules(s"$context.services")
 
   private val typeRegex = "(.*?)-(.*)".r
   def urls: ComponentUrls
@@ -119,8 +118,8 @@ trait ComponentScriptPrep extends DependencyResolver
   def resolveDomain(path: String): String = path
 
   /**
-    * A temporary means of defining paths that may be resolved
-    */
+   * A temporary means of defining paths that may be resolved
+   */
   protected def resolvePath(s: String): String = {
 
     val needsResolution = Seq(
@@ -132,16 +131,18 @@ trait ComponentScriptPrep extends DependencyResolver
     if (needsResolution) resolveDomain(s) else s
   }
 
-  def jsSrc(context: String): NgSourcePaths = {
-    sourcePaths.load[NgSourcePaths](ContextAndSuffix(context, "js"), NgSourcePaths.fromJsonResource(modulePath, _))
-  }
+  def jsSrc(context: String): NgSourcePaths = ???
+  //  {
+  //    sourcePaths.load[NgSourcePaths](ContextAndSuffix(context, "js"), NgSourcePaths.fromJsonResource(modulePath, _))
+  //  }
 
-  def cssSrc(context: String): CssSourcePaths = {
-    sourcePaths.load[CssSourcePaths](ContextAndSuffix(context, "css"), CssSourcePaths.fromJsonResource(modulePath, _))
-  }
+  def cssSrc(context: String): CssSourcePaths = ???
+  //  {
+  //    sourcePaths.load[CssSourcePaths](ContextAndSuffix(context, "css"), CssSourcePaths.fromJsonResource(modulePath, _))
+  //  }
 
   protected def buildJs(scriptInfo: ComponentScriptInfo,
-                        extras: Seq[String] = Seq.empty)(implicit rh: RequestHeader) = {
+    extras: Seq[String] = Seq.empty)(implicit rh: RequestHeader) = {
     val jsSourcePaths = jsSrc(scriptInfo.context)
     val mainJs = paths(jsSourcePaths)
     val js = jsSourcePaths.otherLibs ++ mainJs ++ scriptInfo.jsUrl ++ extras
@@ -154,7 +155,7 @@ trait ComponentScriptPrep extends DependencyResolver
     out.map(resolvePath)
   }
 
-  protected def componentScriptInfo(context:String, components: Seq[String], separatePaths: Boolean, reportName: Option[String] = None): ComponentScriptInfo = {
+  protected def componentScriptInfo(context: String, components: Seq[String], separatePaths: Boolean, reportName: Option[String] = None): ComponentScriptInfo = {
 
     val typeIds = components.map {
       t =>

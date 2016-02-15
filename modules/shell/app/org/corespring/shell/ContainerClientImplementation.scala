@@ -9,9 +9,11 @@ import org.apache.commons.io.{ FileUtils, IOUtils }
 import org.bson.types.ObjectId
 import org.corespring.amazon.s3.{ ConcreteS3Service, S3Service }
 import org.corespring.container.client._
+import org.corespring.container.client.controllers.apps.{ PageSourceServiceConfig }
 import org.corespring.container.client.controllers.{ AssetType, _ }
 import org.corespring.container.client.hooks._
 import org.corespring.container.client.integration.{ ContainerExecutionContext, DefaultIntegration }
+import org.corespring.container.client.pages.engine.JadeEngineConfig
 import org.corespring.container.components.model.Component
 import org.corespring.container.components.model.dependencies.DependencyResolver
 import org.corespring.mongo.json.services.MongoService
@@ -382,6 +384,14 @@ class ContainerClientImplementation(
     override def containerContext: ContainerExecutionContext = ContainerClientImplementation.this.containerContext
   }
 
+  import play.api.Play.current
+
+  override lazy val pageSourceServiceConfig: PageSourceServiceConfig = PageSourceServiceConfig(
+    v2Player.Routes.prefix,
+    Play.mode == Mode.Dev,
+    Play.resource(_))
+
+  override lazy val jadeEngineConfig: JadeEngineConfig = JadeEngineConfig("container-client/jade", Play.current.mode, Play.resource _)
 }
 
 /**

@@ -11,7 +11,7 @@ class ComponentEditorController(
   implicit val ec = containerExecutionContext.context
 
   def load(componentType: String) = Action.async { request =>
-    renderer.render.map { html =>
+    renderer.render().map { html =>
       Ok(html)
     }
   }

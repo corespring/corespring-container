@@ -50,7 +50,9 @@ html(xmlns="http://www.w3.org/1999/html")
         }, 100);
       });
       
-      var allNgModules = ['corespring-templates'].concat([#{componentNgModules}]);
+      var allNgModules = ['corespring-templates']
+        .concat([#{ngModules}])
+        .concat([#{componentNgModules}]);
 
       function getParams(){
         var nameValueStrings = document.location.search.replace('?', '').split('&');

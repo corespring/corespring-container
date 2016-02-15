@@ -7,5 +7,4 @@ import scala.concurrent.Future
 
 class Pages(componentEditorRenderer: ComponentEditorRenderer) {
 
-  def componentEditor: Future[Html] = componentEditorRenderer.render
 }

@@ -14,9 +14,15 @@ import play.api.templates.Html
 
 import scala.collection.mutable
 
-class Jade(root: String, mode: Mode, resource: String => Option[URL]) {
+case class JadeEngineConfig(root: String, mode: Mode, resource: String => Option[URL])
 
-  private lazy val logger = Logger(classOf[Jade])
+class JadeEngine(config: JadeEngineConfig) {
+
+  private def resource = config.resource
+  private def mode = config.mode
+  private def root = config.root
+
+  private lazy val logger = Logger(classOf[JadeEngine])
 
   private val templates: mutable.Map[String, JadeTemplate] = mutable.Map()
 
@@ -85,7 +91,8 @@ class Jade(root: String, mode: Mode, resource: String => Option[URL]) {
     val template = loadTemplate(name)
     logger.trace(s"function=renderJade template=$template")
     logger.trace(s"function=renderJade params=$params")
-    val rendered = jadeConfig.renderTemplate(template, params.asInstanceOf[Map[String, AnyRef]])
+    val jadeParams = params.asInstanceOf[Map[String, AnyRef]]
+    val rendered = jadeConfig.renderTemplate(template, jadeParams)
     Html(new StringBuilder(rendered).toString)
   }
 }

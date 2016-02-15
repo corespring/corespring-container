@@ -39,6 +39,8 @@ object Build extends sbt.Build {
     val jade4j = "de.neuland-bfi" % "jade4j" % "0.4.2"
     val logbackClassic = "ch.qos.logback" % "logback-classic" % "1.0.7"
     val logbackCore = "ch.qos.logback" % "logback-core" % "1.0.7"
+    val macWireMacro = "com.softwaremill.macwire" %% "macros" % "0.7.3"
+    val macWireRuntime = "com.softwaremill.macwire" %% "runtime" % "0.7.3"
     val mockito = "org.mockito" % "mockito-all" % "1.9.5" % "test"
     val rhinoJs = "org.mozilla" % "rhino" % "1.7.6"
     val playS3 = "org.corespring" %% "s3-play-plugin" % "1.2.0"
@@ -205,7 +207,8 @@ object Build extends sbt.Build {
         closureCompiler,
         yuiCompressor,
         commonsIo,
-        aws),
+        aws,
+        macWireMacro),
       templatesImport ++= Seq("play.api.libs.json.JsValue", "play.api.libs.json.Json"))
     .dependsOn(
       componentModel % "compile->compile;test->test",

@@ -1,7 +1,10 @@
 package org.corespring.container.client.integration
 
+import com.softwaremill.macwire.MacwireMacros.wire
 import grizzled.slf4j.Logger
 import org.corespring.container.client.controllers.helpers.PlayerXhtml
+import org.corespring.container.client.pages.componentEditor.ComponentEditorRenderer
+import org.corespring.container.client.pages.engine.{ JadeEngineConfig, JadeEngine }
 import org.corespring.container.client.{ ItemAssetResolver, V2PlayerConfig }
 import org.corespring.container.client.component.ComponentUrls
 import org.corespring.container.client.controllers.apps._
@@ -40,8 +43,6 @@ trait DefaultIntegration
   def versionInfo: JsObject
 
   def containerContext: ContainerExecutionContext
-
-  lazy val sourcePathsService = new JsonReportSourcePathsService(Play.current.mode == Mode.Dev)
 
   /**
    * For a given resource path return a resolved path.
@@ -137,12 +138,23 @@ trait DefaultIntegration
     override def containerContext: ContainerExecutionContext = DefaultIntegration.this.containerContext
   }
 
-  lazy val componentEditor = new ComponentEditor(
-    containerContext,
-    components,
-    Play.current.mode,
-    sourcePathsService,
-    componentSets)
+  def pageSourceServiceConfig: PageSourceServiceConfig //= wire[PageSourceServiceConfig]
+
+  lazy val pageSourceService: PageSourceService = wire[JsonPageSourceService]
+
+  lazy val sourcePathsService: SourcePathsService = new SourcePathsService {
+    override def load[A <: SourcePaths](contextAndSuffix: ContextAndSuffix, load: (String) => A): A = {
+      throw new NotImplementedError("To be removed")
+    }
+  }
+
+  def jadeEngineConfig: JadeEngineConfig
+
+  lazy val jadeEngine = wire[JadeEngine]
+
+  lazy val componentEditorRenderer = wire[ComponentEditorRenderer]
+
+  lazy val componentEditor = wire[ComponentEditorController]
 
   lazy val itemEditor = new ItemEditor {
 
