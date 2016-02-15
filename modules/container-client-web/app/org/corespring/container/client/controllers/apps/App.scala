@@ -14,6 +14,13 @@ import play.api.mvc._
 
 import scala.concurrent._
 
+case class ComponentScriptBundle(component: Component,
+  js: Seq[String],
+  css: Seq[String],
+  ngModules: Seq[String]) {
+  def componentType: String = component.componentType
+}
+
 case class ComponentScriptInfo(context: String, jsUrl: Seq[String],
   cssUrl: Seq[String],
   ngDependencies: Seq[String])
@@ -64,14 +71,13 @@ trait App[T]
 
 trait ComponentInfoJson extends NameHelper with JsonHelper {
 
-  protected def componentInfoToJson(modulePath: String, interactions: Seq[Interaction], widgets: Seq[Widget])(ci: ComponentInfo): JsValue = {
+  protected def toJson(iconPath: String => String)(ci: ComponentInfo) = {
+
     val tag = tagName(ci.id.org, ci.id.name)
 
-    val icon = (interactions ++ widgets).find(_.componentType == tag).map(_.icon) match {
-      case Some(iconBytes) => iconBytes match {
-        case Some(thing) => Some(JsString(s"$modulePath/icon/$tag"))
-        case _ => None
-      }
+    val icon = ci match {
+      case i: Interaction if i.icon.isDefined => Some(JsString(iconPath(tag)))
+      case w: Widget if w.icon.isDefined => Some(JsString(iconPath(tag)))
       case _ => None
     }
 
@@ -85,6 +91,10 @@ trait ComponentInfoJson extends NameHelper with JsonHelper {
       "componentType" -> Some(JsString(tag)),
       "defaultData" -> Some(ci.defaultData),
       "configuration" -> (ci.packageInfo \ "external-configuration").asOpt[JsObject])
+  }
+
+  protected def componentInfoToJson(modulePath: String)(ci: ComponentInfo): JsValue = {
+    toJson((tag) => s"$modulePath/icon/$tag")(ci)
   }
 }
 
