@@ -7,6 +7,7 @@ import org.corespring.container.client.hooks.{ LoadHook, CatalogHooks }
 import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.client.views.models.SupportingMaterialsEndpoints
 import org.corespring.container.client.views.txt.js.CatalogServices
+import play.api.Logger
 import play.api.libs.json.{ JsArray, JsString, JsValue, Json }
 import play.api.mvc.{ Action, AnyContent }
 
@@ -17,6 +18,8 @@ trait Catalog
   with App[CatalogHooks]
   with Jade
   with GetAsset[CatalogHooks] {
+
+  private lazy val logger = Logger(classOf[Catalog])
 
   override def context: String = "catalog"
 

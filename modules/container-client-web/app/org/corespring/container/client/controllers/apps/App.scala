@@ -4,21 +4,27 @@ import grizzled.slf4j.Logger
 import org.corespring.container.client.HasContainerContext
 import org.corespring.container.client.component.{ ComponentUrls, ItemTypeReader }
 import org.corespring.container.client.controllers.angular.AngularModules
-import org.corespring.container.client.controllers.helpers.{ JsonHelper, NameHelper, Helpers, LoadClientSideDependencies }
+import org.corespring.container.client.controllers.helpers.{ Helpers, LoadClientSideDependencies }
 import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.components.model._
 import org.corespring.container.components.model.dependencies.DependencyResolver
 import play.api.Mode.Mode
-import play.api.libs.json.{ JsObject, JsBoolean, JsString, JsValue }
 import play.api.mvc._
 
 import scala.concurrent._
 
-case class ComponentScriptBundle(component: Component,
+case class SingleComponentScriptBundle(component: ComponentInfo,
   js: Seq[String],
   css: Seq[String],
   ngModules: Seq[String]) {
   def componentType: String = component.componentType
+}
+
+case class ComponentScriptBundle(components: Seq[Component],
+  js: Seq[String],
+  css: Seq[String],
+  ngModules: Seq[String]) {
+  def componentTypes: Seq[String] = components.map(_.componentType)
 }
 
 case class ComponentScriptInfo(context: String, jsUrl: Seq[String],
@@ -34,14 +40,13 @@ trait App[T]
   with DependencyResolver
   with Helpers
   with LoadClientSideDependencies
-  with HasLogger
   with HasContainerContext
   with ComponentScriptPrep {
   self: ItemTypeReader =>
 
   def mode: Mode
 
-  override lazy val logger = Logger(classOf[App[T]])
+  private lazy val logger = Logger(classOf[App[T]])
 
   def showErrorInUi(implicit rh: RequestHeader): Boolean = jsMode(rh) == "dev"
 
@@ -69,38 +74,11 @@ trait App[T]
 
 }
 
-trait ComponentInfoJson extends NameHelper with JsonHelper {
-
-  protected def toJson(iconPath: String => String)(ci: ComponentInfo) = {
-
-    val tag = tagName(ci.id.org, ci.id.name)
-
-    val icon = ci match {
-      case i: Interaction if i.icon.isDefined => Some(JsString(iconPath(tag)))
-      case w: Widget if w.icon.isDefined => Some(JsString(iconPath(tag)))
-      case _ => None
-    }
-
-    partialObj(
-      "name" -> Some(JsString(ci.id.name)),
-      "title" -> Some(JsString(ci.title.getOrElse(""))),
-      "titleGroup" -> Some(JsString(ci.titleGroup.getOrElse(""))),
-      "icon" -> icon,
-      "released" -> Some(JsBoolean(ci.released)),
-      "insertInline" -> Some(JsBoolean(ci.insertInline)),
-      "componentType" -> Some(JsString(tag)),
-      "defaultData" -> Some(ci.defaultData),
-      "configuration" -> (ci.packageInfo \ "external-configuration").asOpt[JsObject])
-  }
-
-  protected def componentInfoToJson(modulePath: String)(ci: ComponentInfo): JsValue = {
-    toJson((tag) => s"$modulePath/icon/$tag")(ci)
-  }
-}
-
 trait ComponentScriptPrep extends DependencyResolver
   with LoadClientSideDependencies {
   def ngModules(context: String): AngularModules = new AngularModules(s"$context.services")
+
+  private lazy val logger = Logger(classOf[ComponentScriptPrep])
 
   private val typeRegex = "(.*?)-(.*)".r
   def urls: ComponentUrls

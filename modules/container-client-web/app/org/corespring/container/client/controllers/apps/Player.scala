@@ -10,6 +10,7 @@ import org.corespring.container.client.controllers.jade.Jade
 import org.corespring.container.client.hooks.PlayerHooks
 import org.corespring.container.client.views.txt.js.PlayerServices
 import org.corespring.container.components.processing.PlayerItemPreProcessor
+import play.api.Logger
 import play.api.http.ContentTypes
 import play.api.libs.json._
 import play.api.mvc.{ Action, AnyContent, RequestHeader }
@@ -22,6 +23,8 @@ trait Player
   with PlayerItemTypeReader
   with Jade
   with GetAsset[PlayerHooks] {
+
+  private lazy val logger = Logger(classOf[Player])
 
   private object SessionRenderer {
 

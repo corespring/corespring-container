@@ -18,7 +18,7 @@
     <logger name="org.corespring.container.client.controllers.apps.CoreEditor" level="TRACE"/>
     <logger name="org.corespring.shell.controllers" level="TRACE"/>
 
-    <root level="ERROR">
+    <root level="DEBUG">
         <appender-ref ref="STDOUT" />
     </root>
 </configuration>

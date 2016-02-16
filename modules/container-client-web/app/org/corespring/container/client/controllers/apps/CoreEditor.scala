@@ -26,13 +26,13 @@ object StaticPaths {
 
 trait CoreEditor
   extends AllItemTypesReader
-  with ComponentEditorLaunching
+  with ComponentEditorLaunchingController
   with App[EditorHooks]
   with JsonHelper
   with Jade
   with AssetsController[EditorHooks] {
 
-  override lazy val logger = Logger(classOf[CoreEditor])
+  private lazy val logger = Logger(classOf[CoreEditor])
 
   override def context: String = "editor"
 
@@ -116,7 +116,7 @@ trait CoreEditor
   def componentEditor(id: String): Action[AnyContent] = Action.async { implicit request =>
     def loadEditor(json: JsValue): Future[SimpleResult] = {
       findComponentType(json) match {
-        case Some(ct) => loadComponentEditorHtmlFromForm(ct)(request).map(Ok(_))
+        case Some(ct) => componentEditorResult(ct, request)
         case _ => Future.successful(BadRequest("Can't find a component type"))
       }
     }

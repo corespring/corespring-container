@@ -2,11 +2,11 @@ package org.corespring.container.client.integration
 
 import com.softwaremill.macwire.MacwireMacros.wire
 import grizzled.slf4j.Logger
-import org.corespring.container.client.controllers.helpers.PlayerXhtml
+import org.corespring.container.client.controllers.helpers.{ LoadClientSideDependencies, PlayerXhtml }
 import org.corespring.container.client.pages.componentEditor.ComponentEditorRenderer
 import org.corespring.container.client.pages.engine.{ JadeEngineConfig, JadeEngine }
 import org.corespring.container.client.{ ItemAssetResolver, V2PlayerConfig }
-import org.corespring.container.client.component.ComponentUrls
+import org.corespring.container.client.component._
 import org.corespring.container.client.controllers.apps._
 import org.corespring.container.client.controllers.launcher.editor.EditorLauncher
 import org.corespring.container.client.controllers.launcher.player.PlayerLauncher
@@ -16,7 +16,7 @@ import org.corespring.container.client.controllers._
 import org.corespring.container.client.hooks._
 import org.corespring.container.client.integration.validation.Validator
 import org.corespring.container.components.model.Component
-import org.corespring.container.components.model.dependencies.ComponentSplitter
+import org.corespring.container.components.model.dependencies.{ DependencyResolver, ComponentSplitter }
 import org.corespring.container.components.outcome.{ DefaultScoreProcessor, ScoreProcessor, ScoreProcessorSequence }
 import org.corespring.container.components.processing.PlayerItemPreProcessor
 import org.corespring.container.components.response.OutcomeProcessor
@@ -150,13 +150,27 @@ trait DefaultIntegration
 
   def jadeEngineConfig: JadeEngineConfig
 
+  lazy val componentJson: ComponentJson = new ComponentInfoJson(v2Player.Routes.prefix)
+
+  lazy val dependencyResolver: DependencyResolver = new DependencyResolver {
+    override def components: Seq[Component] = DefaultIntegration.this.components
+  }
+
+  lazy val clientSideDependencies: LoadClientSideDependencies = new LoadClientSideDependencies {}
+
+  lazy val componentBundler: ComponentBundler = new DefaultComponentBundler(dependencyResolver, clientSideDependencies, componentSets)
+
   lazy val jadeEngine = wire[JadeEngine]
 
-  lazy val componentEditorRenderer = wire[ComponentEditorRenderer]
+  lazy val componentEditorRenderer: ComponentEditorRenderer = wire[ComponentEditorRenderer]
 
   lazy val componentEditor = wire[ComponentEditorController]
 
   lazy val itemEditor = new ItemEditor {
+
+    override def renderer: ComponentEditorRenderer = DefaultIntegration.this.componentEditorRenderer
+
+    override def bundler: ComponentBundler = DefaultIntegration.this.componentBundler
 
     override val sourcePaths: SourcePathsService = DefaultIntegration.this.sourcePathsService
 
@@ -178,6 +192,9 @@ trait DefaultIntegration
   }
 
   lazy val itemDevEditor = new ItemDevEditor {
+    override def renderer: ComponentEditorRenderer = DefaultIntegration.this.componentEditorRenderer
+
+    override def bundler: ComponentBundler = DefaultIntegration.this.componentBundler
     override val sourcePaths: SourcePathsService = DefaultIntegration.this.sourcePathsService
     override def versionInfo: JsObject = DefaultIntegration.this.versionInfo
 
@@ -195,6 +212,9 @@ trait DefaultIntegration
   }
 
   lazy val draftEditor = new DraftEditor {
+    override def renderer: ComponentEditorRenderer = DefaultIntegration.this.componentEditorRenderer
+
+    override def bundler: ComponentBundler = DefaultIntegration.this.componentBundler
     override val sourcePaths: SourcePathsService = DefaultIntegration.this.sourcePathsService
 
     override val debounceInMillis = DefaultIntegration.this.debounceInMillis
@@ -215,6 +235,9 @@ trait DefaultIntegration
   }
 
   lazy val draftDevEditor = new DraftDevEditor {
+    override def renderer: ComponentEditorRenderer = DefaultIntegration.this.componentEditorRenderer
+
+    override def bundler: ComponentBundler = DefaultIntegration.this.componentBundler
     override val sourcePaths: SourcePathsService = DefaultIntegration.this.sourcePathsService
     override def mode: Mode = Play.current.mode
 

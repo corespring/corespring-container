@@ -1,7 +1,8 @@
 package org.corespring.container.client.controllers.apps
 
+/*
 import org.corespring.container.client.HasContainerContext
-import org.corespring.container.client.component.ComponentUrls
+import org.corespring.container.client.component.{ComponentJson, ComponentUrls}
 import org.corespring.container.client.controllers.jade.Jade
 import org.corespring.container.client.integration.ContainerExecutionContext
 import org.corespring.container.client.views.txt.js.ComponentEditorServices
@@ -13,12 +14,13 @@ import play.api.mvc._
 import play.api.templates.Html
 
 import scala.concurrent.Future
-
 trait ComponentEditorLaunching
   extends Jade
   with ComponentScriptPrep
-  with ComponentInfoJson
   with HasContainerContext {
+
+
+  def componentJson:ComponentJson
 
   private def loadComponentEditorHtml(reqToOptions: Request[AnyContent] => Option[(String, ComponentEditorOptions)])(componentType: String, req: Request[AnyContent]): Future[Html] = Future {
     val (previewMode, options) = reqToOptions(req).getOrElse("tabs" -> ComponentEditorOptions.default)
@@ -27,7 +29,7 @@ trait ComponentEditorLaunching
     val domainResolvedJs = buildJs(scriptInfo)(req)
     val domainResolvedCss = buildCss(scriptInfo)(req)
     val jsSrcPaths = jsSrc("singleComponentEditor")
-    val arr: JsValue = JsArray(interactions.map(componentInfoToJson(modulePath, interactions, widgets)(_)))
+    val arr: JsValue = JsArray(interactions.map(componentJson.toJson(_)))
     renderJade(
       ComponentEditorTemplateParams(
         "singleComponentEditor",
@@ -68,15 +70,15 @@ class ComponentEditor(val containerContext: ContainerExecutionContext,
   val components: Seq[Component],
   val mode: Mode,
   val sourcePaths: SourcePathsService,
-  val urls: ComponentUrls)
+  val urls: ComponentUrls,
+  val componentJson : ComponentJson)
   extends Controller
   with ComponentEditorLaunching
   with Jade
-  with ComponentScriptPrep
-  with ComponentInfoJson {
+  with ComponentScriptPrep {
 
   def load(componentType: String) = Action.async { request =>
     loadComponentEditorHtmlFromForm(componentType)(request).map(Ok(_))
   }
 
-}
+}*/
