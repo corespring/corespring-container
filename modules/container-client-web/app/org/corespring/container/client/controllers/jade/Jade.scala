@@ -14,14 +14,6 @@ import play.api.templates.Html
 
 import scala.collection.mutable
 
-trait GetParams {
-  def params: Map[String, Any]
-}
-
-trait Renderer {
-  def render(template: String, params: GetParams): Html
-}
-
 //TODO: @deprecated("use JadeEngine instead", "0.63.0")
 trait Jade {
 

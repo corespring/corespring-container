@@ -53,9 +53,9 @@
           }
 
           $scope.$watch('components', function(c, prev) {
-            // if (!c || !prev) {
-            //   return;
-            // }
+            if (!c || !prev) {
+              return;
+            }
 
             debouncedUpdateComponents();
           }, true);
