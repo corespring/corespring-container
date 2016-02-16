@@ -56,8 +56,6 @@ trait App[T]
 
   def hooks: T
 
-  def sourcePaths: SourcePathsService
-
   object handleSuccess {
 
     def apply[D](fn: (D) => SimpleResult)(e: Either[StatusMessage, D]): SimpleResult = e match {
@@ -100,8 +98,6 @@ trait ComponentScriptPrep extends DependencyResolver
 
   def modulePath = v2Player.Routes.prefix
 
-  def sourcePaths: SourcePathsService
-
   /** Allow external domains to be configured */
   def resolveDomain(path: String): String = path
 
@@ -119,15 +115,9 @@ trait ComponentScriptPrep extends DependencyResolver
     if (needsResolution) resolveDomain(s) else s
   }
 
-  def jsSrc(context: String): NgSourcePaths = ???
-  //  {
-  //    sourcePaths.load[NgSourcePaths](ContextAndSuffix(context, "js"), NgSourcePaths.fromJsonResource(modulePath, _))
-  //  }
-
-  def cssSrc(context: String): CssSourcePaths = ???
-  //  {
-  //    sourcePaths.load[CssSourcePaths](ContextAndSuffix(context, "css"), CssSourcePaths.fromJsonResource(modulePath, _))
-  //  }
+  def pageSourceService : PageSourceService
+  def jsSrc(context: String): NgSourcePaths =  pageSourceService.loadJs(context)
+  def cssSrc(context: String): CssSourcePaths = pageSourceService.loadCss(context)
 
   protected def buildJs(scriptInfo: ComponentScriptInfo,
     extras: Seq[String] = Seq.empty)(implicit rh: RequestHeader) = {

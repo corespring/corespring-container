@@ -111,8 +111,7 @@ trait DefaultIntegration
   }
 
   lazy val rig = new Rig {
-
-    override val sourcePaths: SourcePathsService = DefaultIntegration.this.sourcePathsService
+    override def pageSourceService: PageSourceService = DefaultIntegration.this.pageSourceService
 
     override def mode: Mode = Play.current.mode
 
@@ -138,15 +137,9 @@ trait DefaultIntegration
     override def containerContext: ContainerExecutionContext = DefaultIntegration.this.containerContext
   }
 
-  def pageSourceServiceConfig: PageSourceServiceConfig //= wire[PageSourceServiceConfig]
+  def pageSourceServiceConfig: PageSourceServiceConfig
 
   lazy val pageSourceService: PageSourceService = wire[JsonPageSourceService]
-
-  lazy val sourcePathsService: SourcePathsService = new SourcePathsService {
-    override def load[A <: SourcePaths](contextAndSuffix: ContextAndSuffix, load: (String) => A): A = {
-      throw new NotImplementedError("To be removed")
-    }
-  }
 
   def jadeEngineConfig: JadeEngineConfig
 
@@ -167,12 +160,11 @@ trait DefaultIntegration
   lazy val componentEditor = wire[ComponentEditorController]
 
   lazy val itemEditor = new ItemEditor {
+    override def pageSourceService: PageSourceService = DefaultIntegration.this.pageSourceService
 
     override def renderer: ComponentEditorRenderer = DefaultIntegration.this.componentEditorRenderer
 
     override def bundler: ComponentBundler = DefaultIntegration.this.componentBundler
-
-    override val sourcePaths: SourcePathsService = DefaultIntegration.this.sourcePathsService
 
     override val debounceInMillis = DefaultIntegration.this.debounceInMillis
 
@@ -192,10 +184,11 @@ trait DefaultIntegration
   }
 
   lazy val itemDevEditor = new ItemDevEditor {
+    override def pageSourceService: PageSourceService = DefaultIntegration.this.pageSourceService
+
     override def renderer: ComponentEditorRenderer = DefaultIntegration.this.componentEditorRenderer
 
     override def bundler: ComponentBundler = DefaultIntegration.this.componentBundler
-    override val sourcePaths: SourcePathsService = DefaultIntegration.this.sourcePathsService
     override def versionInfo: JsObject = DefaultIntegration.this.versionInfo
 
     override def mode: Mode = Play.current.mode
@@ -212,10 +205,10 @@ trait DefaultIntegration
   }
 
   lazy val draftEditor = new DraftEditor {
+    override def pageSourceService: PageSourceService = DefaultIntegration.this.pageSourceService
     override def renderer: ComponentEditorRenderer = DefaultIntegration.this.componentEditorRenderer
 
     override def bundler: ComponentBundler = DefaultIntegration.this.componentBundler
-    override val sourcePaths: SourcePathsService = DefaultIntegration.this.sourcePathsService
 
     override val debounceInMillis = DefaultIntegration.this.debounceInMillis
 
@@ -235,10 +228,10 @@ trait DefaultIntegration
   }
 
   lazy val draftDevEditor = new DraftDevEditor {
+    override def pageSourceService: PageSourceService = DefaultIntegration.this.pageSourceService
     override def renderer: ComponentEditorRenderer = DefaultIntegration.this.componentEditorRenderer
 
     override def bundler: ComponentBundler = DefaultIntegration.this.componentBundler
-    override val sourcePaths: SourcePathsService = DefaultIntegration.this.sourcePathsService
     override def mode: Mode = Play.current.mode
 
     override def containerContext = DefaultIntegration.this.containerContext
@@ -255,7 +248,7 @@ trait DefaultIntegration
   }
 
   lazy val catalog = new Catalog {
-    override val sourcePaths: SourcePathsService = DefaultIntegration.this.sourcePathsService
+    override def pageSourceService: PageSourceService = DefaultIntegration.this.pageSourceService
     override def mode: Mode = Play.current.mode
 
     override def containerContext = DefaultIntegration.this.containerContext
@@ -268,7 +261,7 @@ trait DefaultIntegration
   }
 
   lazy val prodHtmlPlayer = new Player {
-    override val sourcePaths: SourcePathsService = DefaultIntegration.this.sourcePathsService
+    override def pageSourceService: PageSourceService = DefaultIntegration.this.pageSourceService
 
     override def versionInfo: JsObject = DefaultIntegration.this.versionInfo
 

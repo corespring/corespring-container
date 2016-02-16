@@ -7,10 +7,6 @@ trait PageSourceService {
   def loadCss(key: String): CssSourcePaths
 }
 
-trait SourcePathsService {
-  def load[A <: SourcePaths](contextAndSuffix: ContextAndSuffix, load: String => A): A
-}
-
 import java.net.URL
 
 import play.api.Logger

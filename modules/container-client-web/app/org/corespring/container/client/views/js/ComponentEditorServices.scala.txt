@@ -7,7 +7,11 @@
 (function(){
   "use strict";
 
-  angular.module('@namespace', []);
+  try {
+    angular.module('@namespace');
+  } catch (e) {
+    angular.module('@namespace', []);
+  }
 
   angular.module('@namespace').constant('COMPONENT_EDITOR', {componentType: '@componentType'});
 
