@@ -22,6 +22,7 @@ trait Renderer {
   def render(template: String, params: GetParams): Html
 }
 
+//TODO: @deprecated("use JadeEngine instead", "0.63.0")
 trait Jade {
 
   private lazy val logger: Logger = Logger(classOf[Jade])
