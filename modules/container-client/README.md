@@ -76,5 +76,3 @@ Scoring Override js Impl - from Client side Player Services.js
       }
       */
 
-
-

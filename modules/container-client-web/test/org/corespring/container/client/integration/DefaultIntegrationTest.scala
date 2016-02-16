@@ -1,6 +1,5 @@
 package org.corespring.container.client.integration
 
-import org.corespring.container.client.ItemAssetResolver
 import org.corespring.container.client.controllers.ComponentSets
 import org.corespring.container.client.hooks._
 import org.corespring.container.components.model.Component
@@ -56,7 +55,6 @@ class DefaultIntegrationTest extends Specification with Mockito with PlaySpecifi
 
       override def itemSupportingMaterialHooks: ItemSupportingMaterialHooks = mock[ItemSupportingMaterialHooks]
 
-      override def itemAssetResolver : ItemAssetResolver = mock[ItemAssetResolver]
     }
   }
 

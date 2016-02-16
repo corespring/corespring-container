@@ -30,15 +30,15 @@ trait Player
 
     /**
      * Preprocess the xml so that it'll work in all browsers
+     * aka: convert tagNames -> attributes for ie 8 support
      * TODO: A layout component may have multiple elements
      * So we need a way to get all potential component names from
      * each component, not just assume its the top level.
      */
-    private def processXhtml(itemId: Option[String], itemJson: JsValue) = {
-      val maybeXhtml = (itemJson \ "xhtml").asOpt[String]
-      maybeXhtml.map(xhtml => playerXhtml.mkXhtml(itemId, xhtml))
-        .getOrElse("<div><h1>New Item</h1></div>")
-    }
+    private def processXhtml(maybeXhtml: Option[String]) = maybeXhtml.map {
+      xhtml =>
+        PlayerXhtml.mkXhtml(components.map(_.componentType), xhtml)
+    }.getOrElse("<div><h1>New Item</h1></div>")
 
     def createPlayerHtml(sessionId: String, session: JsValue, itemJson: JsValue, serviceParams: JsObject)(implicit rh: RequestHeader): Html = {
 
@@ -47,8 +47,8 @@ trait Player
       val controlsJs = if (showControls) paths(controlsJsSrc) else Seq.empty
       val domainResolvedJs = buildJs(scriptInfo, controlsJs)
       val domainResolvedCss = buildCss(scriptInfo)
-      val itemId = (session \ "itemId").asOpt[String] //A session from ExternalLaunchApi does not not have an itemId
-      val processedXhtml = processXhtml(itemId, itemJson)
+
+      val processedXhtml = processXhtml((itemJson \ "xhtml").asOpt[String])
       val preprocessedItem = itemPreProcessor.preProcessItemForPlayer(itemJson).as[JsObject] ++ Json.obj("xhtml" -> processedXhtml)
 
       val newRelicRumConf: Option[JsValue] = playerConfig.newRelicRumConfig
@@ -78,8 +78,6 @@ trait Player
   override def context: String = "player"
 
   def versionInfo: JsObject
-
-  def playerXhtml: PlayerXhtml
 
   def itemPreProcessor: PlayerItemPreProcessor
 

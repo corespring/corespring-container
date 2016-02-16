@@ -1,7 +1,5 @@
 package org.corespring.container.client.controllers.resources
 
-import org.corespring.container.client.ItemAssetResolver
-import org.corespring.container.client.controllers.helpers.PlayerXhtml
 import org.corespring.container.client.hooks.{ SupportingMaterialHooks, CoreItemHooks }
 import org.corespring.test.TestContext
 import org.specs2.mock.Mockito
@@ -17,7 +15,7 @@ import scala.concurrent.{ Future, ExecutionContext }
 
 class CoreItemTest extends Specification with Mockito {
 
-  class scope extends Scope with CoreItem with TestContext{
+  class scope extends Scope with CoreItem with TestContext {
 
     override protected def componentTypes: Seq[String] = Seq.empty
 
@@ -38,10 +36,6 @@ class CoreItemTest extends Specification with Mockito {
     override def materialHooks: SupportingMaterialHooks = {
       val m = mock[SupportingMaterialHooks]
       m
-    }
-
-    override def  playerXhtml = new PlayerXhtml {
-      override def itemAssetResolver = new ItemAssetResolver{}
     }
   }
 

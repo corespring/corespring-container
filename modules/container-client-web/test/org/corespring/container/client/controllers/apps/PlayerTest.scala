@@ -2,8 +2,7 @@ package org.corespring.container.client.controllers.apps
 
 import java.util.concurrent.TimeUnit
 
-import org.corespring.container.client.controllers.helpers.PlayerXhtml
-import org.corespring.container.client.{ItemAssetResolver, V2PlayerConfig}
+import org.corespring.container.client.V2PlayerConfig
 import org.corespring.container.client.component.ComponentUrls
 import org.corespring.container.client.hooks.PlayerHooks
 import org.corespring.container.components.model.Component
@@ -28,10 +27,10 @@ class PlayerTest extends Specification with PlaySpecification with Mockito {
 
   object MockGlobal extends GlobalSettings
 
-  class playerScope(sessionAndItem: Either[(Int, String), (JsValue, JsValue)] = Right(Json.obj("id" -> sessionId, "itemId" -> "123"), Json.obj()))
+  class playerScope(sessionAndItem: Either[(Int, String), (JsValue, JsValue)] = Right(Json.obj("id" -> sessionId), Json.obj()))
     extends Scope
     with Player
-    with TestContext{
+    with TestContext {
     lazy val mockHooks = {
       val m = mock[PlayerHooks]
       m.loadSessionAndItem(any[String])(any[RequestHeader]) returns Future(sessionAndItem)
@@ -56,7 +55,6 @@ class PlayerTest extends Specification with PlaySpecification with Mockito {
 
     override def components: Seq[Component] = Seq.empty
 
-
     override def mode: Mode = Mode.Dev
 
     override def urls: ComponentUrls = {
@@ -65,10 +63,6 @@ class PlayerTest extends Specification with PlaySpecification with Mockito {
 
     override def jsSrc: NgSourcePaths = {
       new NgSourcePaths(Seq.empty, "", Seq.empty, Seq.empty)
-    }
-
-    override def  playerXhtml = new PlayerXhtml {
-      override def itemAssetResolver = new ItemAssetResolver{}
     }
   }
 
