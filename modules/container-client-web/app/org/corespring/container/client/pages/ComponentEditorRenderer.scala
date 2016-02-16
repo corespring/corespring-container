@@ -1,12 +1,13 @@
-package org.corespring.container.client.pages.componentEditor
+package org.corespring.container.client.pages
 
 import org.corespring.container.client.component.ComponentJson
 import org.corespring.container.client.controllers.apps.{ ComponentEditorOptions, PageSourceService, SingleComponentScriptBundle }
 import org.corespring.container.client.integration.ContainerExecutionContext
 import org.corespring.container.client.pages.engine.JadeEngine
+import org.corespring.container.client.pages.processing.AssetPathProcessor
 import org.corespring.container.client.views.txt.js.ComponentEditorServices
 import play.api.Logger
-import play.api.libs.json.{ JsValue, Json, JsArray }
+import play.api.libs.json.{ JsArray, JsValue, Json }
 import play.api.templates.Html
 
 import scala.concurrent.Future
@@ -16,6 +17,7 @@ class ComponentEditorRenderer(
   jade: JadeEngine,
   pageSourceService: PageSourceService,
   componentJson: ComponentJson,
+  assetPathProcessor: AssetPathProcessor,
   versionInfo: JsValue = Json.obj()) {
 
   private val logger = Logger(classOf[ComponentEditorRenderer])
@@ -41,11 +43,14 @@ class ComponentEditorRenderer(
     val arr: JsArray = JsArray(Seq(componentBundle.component).map(componentJson.toJson(_)))
     val inlineJs = ComponentEditorServices(s"corespring-$name.services", arr, componentBundle.componentType).toString
 
+    val processedCss = (css ++ componentBundle.css).map(assetPathProcessor.process)
+    val processedJs = (sources.js.otherLibs ++ js ++ componentBundle.js).map(assetPathProcessor.process)
+
     val params: Map[String, Any] = Map(
       "appName" -> name,
       "previewMode" -> previewMode,
-      "css" -> (css ++ componentBundle.css).toArray,
-      "js" -> (sources.js.otherLibs ++ js ++ componentBundle.js).toArray,
+      "css" -> processedCss.toArray,
+      "js" -> processedJs.toArray,
       "ngModules" -> (sources.js.ngModules ++ componentBundle.ngModules).map(s => s"'$s'").mkString(","),
       "ngServiceLogic" -> inlineJs,
       "componentNgModules" -> "",

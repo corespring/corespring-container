@@ -150,7 +150,7 @@ private[launcher] case class ComponentEditor(corespringUrl: String, load: String
 
   private object r {
     import org.corespring.container.client.controllers.{ apps, resources }
-    val componentEditor = apps.routes.ComponentEditorController
+    val componentEditor = apps.routes.ComponentEditor
     val itemEditor = apps.routes.ItemEditor
     val draftEditor = apps.routes.DraftEditor
     val item = resources.routes.Item

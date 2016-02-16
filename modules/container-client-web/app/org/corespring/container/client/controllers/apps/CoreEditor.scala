@@ -3,6 +3,7 @@ package org.corespring.container.client.controllers.apps
 import grizzled.slf4j.Logger
 import org.corespring.container.client.component.AllItemTypesReader
 import org.corespring.container.client.controllers.AssetsController
+import org.corespring.container.client.controllers.apps.componentEditor.ComponentEditorLaunchingController
 import org.corespring.container.client.controllers.helpers.JsonHelper
 import org.corespring.container.client.controllers.jade.Jade
 import org.corespring.container.client.hooks.EditorHooks

@@ -2,26 +2,27 @@ package org.corespring.container.client.integration
 
 import com.softwaremill.macwire.MacwireMacros.wire
 import grizzled.slf4j.Logger
-import org.corespring.container.client.controllers.helpers.{ LoadClientSideDependencies, PlayerXhtml }
-import org.corespring.container.client.pages.componentEditor.ComponentEditorRenderer
-import org.corespring.container.client.pages.engine.{ JadeEngineConfig, JadeEngine }
-import org.corespring.container.client.{ ItemAssetResolver, V2PlayerConfig }
 import org.corespring.container.client.component._
+import org.corespring.container.client.controllers._
 import org.corespring.container.client.controllers.apps._
+import org.corespring.container.client.controllers.helpers.{ LoadClientSideDependencies, PlayerXhtml }
 import org.corespring.container.client.controllers.launcher.editor.EditorLauncher
 import org.corespring.container.client.controllers.launcher.player.PlayerLauncher
-import org.corespring.container.client.controllers.resources.session.ItemPruner
 import org.corespring.container.client.controllers.resources._
-import org.corespring.container.client.controllers._
+import org.corespring.container.client.controllers.resources.session.ItemPruner
 import org.corespring.container.client.hooks._
 import org.corespring.container.client.integration.validation.Validator
+import org.corespring.container.client.pages.ComponentEditorRenderer
+import org.corespring.container.client.pages.engine.{ JadeEngine, JadeEngineConfig }
+import org.corespring.container.client.pages.processing.AssetPathProcessor
+import org.corespring.container.client.{ ItemAssetResolver, V2PlayerConfig }
 import org.corespring.container.components.model.Component
-import org.corespring.container.components.model.dependencies.{ DependencyResolver, ComponentSplitter }
+import org.corespring.container.components.model.dependencies.{ ComponentSplitter, DependencyResolver }
 import org.corespring.container.components.outcome.{ DefaultScoreProcessor, ScoreProcessor, ScoreProcessorSequence }
 import org.corespring.container.components.processing.PlayerItemPreProcessor
 import org.corespring.container.components.response.OutcomeProcessor
 import org.corespring.container.js.rhino.score.CustomScoreProcessor
-import org.corespring.container.js.rhino.{ RhinoServerLogic, RhinoScopeBuilder, RhinoOutcomeProcessor, RhinoPlayerItemPreProcessor }
+import org.corespring.container.js.rhino.{ RhinoOutcomeProcessor, RhinoPlayerItemPreProcessor, RhinoScopeBuilder, RhinoServerLogic }
 import org.corespring.container.logging.ContainerLogger
 import play.api.Mode.Mode
 import play.api.libs.json.{ JsObject, JsValue }
@@ -111,6 +112,8 @@ trait DefaultIntegration
   }
 
   lazy val rig = new Rig {
+    override def assetPathProcessor: AssetPathProcessor = DefaultIntegration.this.assetPathProcessor
+
     override def pageSourceService: PageSourceService = DefaultIntegration.this.pageSourceService
 
     override def mode: Mode = Play.current.mode
@@ -139,6 +142,20 @@ trait DefaultIntegration
 
   def pageSourceServiceConfig: PageSourceServiceConfig
 
+  lazy val assetPathProcessor = new AssetPathProcessor {
+
+    val needsResolution = Seq(
+      "components/",
+      "component-sets/",
+      "editor",
+      "-prod",
+      "player.min")
+
+    override def process(s: String): String = {
+      if (needsResolution.exists(s.contains(_))) resolveDomain(s) else s
+    }
+  }
+
   lazy val pageSourceService: PageSourceService = wire[JsonPageSourceService]
 
   def jadeEngineConfig: JadeEngineConfig
@@ -157,7 +174,7 @@ trait DefaultIntegration
 
   lazy val componentEditorRenderer: ComponentEditorRenderer = wire[ComponentEditorRenderer]
 
-  lazy val componentEditor = wire[ComponentEditorController]
+  lazy val componentEditor = wire[ComponentEditor]
 
   lazy val itemEditor = new ItemEditor {
     override def pageSourceService: PageSourceService = DefaultIntegration.this.pageSourceService
@@ -167,6 +184,7 @@ trait DefaultIntegration
     override def bundler: ComponentBundler = DefaultIntegration.this.componentBundler
 
     override val debounceInMillis = DefaultIntegration.this.debounceInMillis
+    override def assetPathProcessor: AssetPathProcessor = DefaultIntegration.this.assetPathProcessor
 
     override def versionInfo: JsObject = DefaultIntegration.this.versionInfo
 
@@ -184,6 +202,7 @@ trait DefaultIntegration
   }
 
   lazy val itemDevEditor = new ItemDevEditor {
+    override def assetPathProcessor: AssetPathProcessor = DefaultIntegration.this.assetPathProcessor
     override def pageSourceService: PageSourceService = DefaultIntegration.this.pageSourceService
 
     override def renderer: ComponentEditorRenderer = DefaultIntegration.this.componentEditorRenderer
@@ -205,6 +224,7 @@ trait DefaultIntegration
   }
 
   lazy val draftEditor = new DraftEditor {
+    override def assetPathProcessor: AssetPathProcessor = DefaultIntegration.this.assetPathProcessor
     override def pageSourceService: PageSourceService = DefaultIntegration.this.pageSourceService
     override def renderer: ComponentEditorRenderer = DefaultIntegration.this.componentEditorRenderer
 
@@ -228,6 +248,7 @@ trait DefaultIntegration
   }
 
   lazy val draftDevEditor = new DraftDevEditor {
+    override def assetPathProcessor: AssetPathProcessor = DefaultIntegration.this.assetPathProcessor
     override def pageSourceService: PageSourceService = DefaultIntegration.this.pageSourceService
     override def renderer: ComponentEditorRenderer = DefaultIntegration.this.componentEditorRenderer
 
@@ -248,6 +269,7 @@ trait DefaultIntegration
   }
 
   lazy val catalog = new Catalog {
+    override def assetPathProcessor: AssetPathProcessor = DefaultIntegration.this.assetPathProcessor
     override def pageSourceService: PageSourceService = DefaultIntegration.this.pageSourceService
     override def mode: Mode = Play.current.mode
 
@@ -261,6 +283,7 @@ trait DefaultIntegration
   }
 
   lazy val prodHtmlPlayer = new Player {
+    override def assetPathProcessor: AssetPathProcessor = DefaultIntegration.this.assetPathProcessor
     override def pageSourceService: PageSourceService = DefaultIntegration.this.pageSourceService
 
     override def versionInfo: JsObject = DefaultIntegration.this.versionInfo

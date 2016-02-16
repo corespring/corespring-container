@@ -6,6 +6,7 @@ import org.corespring.container.client.component.{ ComponentUrls, ItemTypeReader
 import org.corespring.container.client.controllers.angular.AngularModules
 import org.corespring.container.client.controllers.helpers.{ Helpers, LoadClientSideDependencies }
 import org.corespring.container.client.hooks.Hooks.StatusMessage
+import org.corespring.container.client.pages.processing.AssetPathProcessor
 import org.corespring.container.components.model._
 import org.corespring.container.components.model.dependencies.DependencyResolver
 import play.api.Mode.Mode
@@ -18,13 +19,6 @@ case class SingleComponentScriptBundle(component: ComponentInfo,
   css: Seq[String],
   ngModules: Seq[String]) {
   def componentType: String = component.componentType
-}
-
-case class ComponentScriptBundle(components: Seq[Component],
-  js: Seq[String],
-  css: Seq[String],
-  ngModules: Seq[String]) {
-  def componentTypes: Seq[String] = components.map(_.componentType)
 }
 
 case class ComponentScriptInfo(context: String, jsUrl: Seq[String],
@@ -45,8 +39,6 @@ trait App[T]
   self: ItemTypeReader =>
 
   def mode: Mode
-
-  private lazy val logger = Logger(classOf[App[T]])
 
   def showErrorInUi(implicit rh: RequestHeader): Boolean = jsMode(rh) == "dev"
 
@@ -101,22 +93,15 @@ trait ComponentScriptPrep extends DependencyResolver
   /** Allow external domains to be configured */
   def resolveDomain(path: String): String = path
 
+  def assetPathProcessor: AssetPathProcessor
+
   /**
    * A temporary means of defining paths that may be resolved
    */
-  protected def resolvePath(s: String): String = {
+  protected def resolvePath(s: String): String = assetPathProcessor.process(s)
 
-    val needsResolution = Seq(
-      "components/",
-      "component-sets/",
-      "editor",
-      "-prod",
-      "player.min").exists(s.contains)
-    if (needsResolution) resolveDomain(s) else s
-  }
-
-  def pageSourceService : PageSourceService
-  def jsSrc(context: String): NgSourcePaths =  pageSourceService.loadJs(context)
+  def pageSourceService: PageSourceService
+  def jsSrc(context: String): NgSourcePaths = pageSourceService.loadJs(context)
   def cssSrc(context: String): CssSourcePaths = pageSourceService.loadCss(context)
 
   protected def buildJs(scriptInfo: ComponentScriptInfo,

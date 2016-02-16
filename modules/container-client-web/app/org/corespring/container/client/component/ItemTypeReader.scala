@@ -1,11 +1,10 @@
 package org.corespring.container.client.component
 
-import org.corespring.container.client.controllers.apps.HasLogger
+import org.corespring.container.client.controllers.helpers.{ NameHelper, XhtmlProcessor }
+import org.corespring.container.components.model.dependencies.ComponentSplitter
+import org.corespring.container.components.model.{ ComponentInfo, LayoutComponent }
 import play.api.Logger
 import play.api.libs.json.JsValue
-import org.corespring.container.client.controllers.helpers.{ XhtmlProcessor, NameHelper }
-import org.corespring.container.components.model.{ ComponentInfo, LayoutComponent }
-import org.corespring.container.components.model.dependencies.ComponentSplitter
 
 trait ItemTypeReader {
   /** for an item - return all the components in use */
