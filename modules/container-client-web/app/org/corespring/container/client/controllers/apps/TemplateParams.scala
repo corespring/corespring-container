@@ -29,56 +29,56 @@ case class CatalogTemplateParams(appName: String,
   css: Seq[String],
   componentNgModules: Seq[String],
   ngServiceLogic: String,
-  staticPaths: JsValue) extends TemplateParams{
+  staticPaths: JsValue) extends TemplateParams {
   override def toJadeParams = {
     super.toJadeParams ++ Map("staticPaths" -> staticPaths)
   }
 }
 
-case class EditorClientOptions(debounceInMillis:Long, staticPaths:JsObject) {
+case class EditorClientOptions(debounceInMillis: Long, staticPaths: JsObject) {
   def toJson = Json.format[EditorClientOptions].writes(this)
 }
 
-trait ComponentEditorOptions{
-  def uploadUrl:Option[String]
-  def uploadMethod:Option[String]
-  def toJson:JsValue
+trait ComponentEditorOptions {
+  def uploadUrl: Option[String]
+  def uploadMethod: Option[String]
+  def toJson: JsValue
 }
 
 case class PreviewRightComponentEditorOptions(
-                                     showPreview:Option[Boolean],
-                                     uploadUrl:Option[String],
-                                     uploadMethod:Option[String],
-                                     singleComponentKey : String = SingleComponent.Key)
-  extends ComponentEditorOptions{
+  showPreview: Option[Boolean],
+  previewWidth: Option[String],
+  uploadUrl: Option[String],
+  uploadMethod: Option[String],
+  singleComponentKey: String = SingleComponent.Key)
+  extends ComponentEditorOptions {
   override def toJson = Json.format[PreviewRightComponentEditorOptions].writes(this)
 
 }
 
-case class TabComponentEditorOptions(activePane : Option[String],
-                                   showNavigation:Option[Boolean],
-                                   uploadUrl:Option[String],
-                                   uploadMethod:Option[String],
-                                     singleComponentKey : String = SingleComponent.Key)
-  extends ComponentEditorOptions{
+case class TabComponentEditorOptions(activePane: Option[String],
+  showNavigation: Option[Boolean],
+  uploadUrl: Option[String],
+  uploadMethod: Option[String],
+  singleComponentKey: String = SingleComponent.Key)
+  extends ComponentEditorOptions {
   override def toJson = Json.format[TabComponentEditorOptions].writes(this)
 }
 
-object ComponentEditorOptions{
+object ComponentEditorOptions {
   def default = TabComponentEditorOptions(None, None, None, None)
 }
 
-case class ComponentEditorTemplateParams(appName:String,
-                                         js : Seq[String],
-                                         css: Seq[String],
-                                         componentNgModules: Seq[String],
-                                         ngServiceLogic:String,
-                                         versionInfo:JsValue,
-                                         options: ComponentEditorOptions,
-                                         previewMode : String
-                                        ) extends TemplateParams {
+case class ComponentEditorTemplateParams(appName: String,
+  js: Seq[String],
+  css: Seq[String],
+  componentNgModules: Seq[String],
+  ngServiceLogic: String,
+  versionInfo: JsValue,
+  options: ComponentEditorOptions,
+  previewMode: String) extends TemplateParams {
   override def toJadeParams = {
-    val extras = Map( "versionInfo" -> versionInfo, "previewMode" -> previewMode, "options" -> Json.stringify(options.toJson))
+    val extras = Map("versionInfo" -> versionInfo, "previewMode" -> previewMode, "options" -> Json.stringify(options.toJson))
     super.toJadeParams ++ extras
   }
 }

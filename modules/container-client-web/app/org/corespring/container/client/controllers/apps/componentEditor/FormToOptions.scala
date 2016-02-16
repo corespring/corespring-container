@@ -13,7 +13,8 @@ private[controllers] object FormToOptions {
 
       val options = if (previewMode == "preview-right") {
         val showPreview: Option[Boolean] = f.get("showPreview").map(_.exists(_ == "true"))
-        PreviewRightComponentEditorOptions(showPreview, uploadUrl, uploadMethod)
+        val previewWidth = f.get("previewWidth").flatMap(_.headOption)
+        PreviewRightComponentEditorOptions(showPreview, previewWidth, uploadUrl, uploadMethod)
       } else {
         val activePane = f.get("activePane").flatMap(_.headOption)
         val showNavigation: Option[Boolean] = f.get("showNavigation").map(_.exists(_ == "true"))

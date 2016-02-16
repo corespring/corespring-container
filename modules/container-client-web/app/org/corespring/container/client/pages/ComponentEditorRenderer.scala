@@ -1,7 +1,7 @@
 package org.corespring.container.client.pages
 
 import org.corespring.container.client.component.{ SingleComponentScriptBundle, ComponentJson }
-import org.corespring.container.client.controllers.apps.{ ComponentEditorOptions, PageSourceService }
+import org.corespring.container.client.controllers.apps.{ PreviewRightComponentEditorOptions, ComponentEditorOptions, PageSourceService }
 import org.corespring.container.client.integration.ContainerExecutionContext
 import org.corespring.container.client.pages.engine.JadeEngine
 import org.corespring.container.client.pages.processing.AssetPathProcessor
@@ -46,9 +46,14 @@ class ComponentEditorRenderer(
     val processedCss = (css ++ componentBundle.css).map(assetPathProcessor.process)
     val processedJs = (sources.js.otherLibs ++ js ++ componentBundle.js).map(assetPathProcessor.process)
 
+    val previewWidth = if (clientOptions.isInstanceOf[PreviewRightComponentEditorOptions]) {
+      clientOptions.asInstanceOf[PreviewRightComponentEditorOptions].previewWidth
+    } else None
+
     val params: Map[String, Any] = Map(
       "appName" -> name,
       "previewMode" -> previewMode,
+      "previewWidth" -> previewWidth,
       "css" -> processedCss.toArray,
       "js" -> processedJs.toArray,
       "ngModules" -> (sources.js.ngModules ++ componentBundle.ngModules).map(s => s"'$s'").mkString(","),

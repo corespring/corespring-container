@@ -32,12 +32,17 @@ block content
   .root(ng-controller="Root", dimension-propagator='')
 
     if previewMode == "preview-right"
+
+      - var extras = previewWidth ? { style: previewWidth + ";"} :  {};
+
       .preview-right(ng-controller="PreviewOnRight")
         .config-pane
           span.pane-header Configuration
           hr/
           .configuration
-        .preview-pane(ng-show="showPreview", ng-controller="ClientSidePreview")
+        .preview-pane(
+          ng-show="showPreview"
+          ng-controller="ClientSidePreview")&attributes(extras)
           ul.nav.preview-nav 
             li
               span.pane-header Preview
