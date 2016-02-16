@@ -1,7 +1,7 @@
 package org.corespring.container.client.pages
 
-import org.corespring.container.client.component.ComponentJson
-import org.corespring.container.client.controllers.apps.{ ComponentEditorOptions, PageSourceService, SingleComponentScriptBundle }
+import org.corespring.container.client.component.{ SingleComponentScriptBundle, ComponentJson }
+import org.corespring.container.client.controllers.apps.{ ComponentEditorOptions, PageSourceService }
 import org.corespring.container.client.integration.ContainerExecutionContext
 import org.corespring.container.client.pages.engine.JadeEngine
 import org.corespring.container.client.pages.processing.AssetPathProcessor

@@ -1,7 +1,6 @@
 package org.corespring.container.client.component
 
 import org.corespring.container.client.controllers.angular.AngularModules
-import org.corespring.container.client.controllers.apps.SingleComponentScriptBundle
 import org.corespring.container.client.controllers.helpers.LoadClientSideDependencies
 import org.corespring.container.components.model.ComponentInfo
 import org.corespring.container.components.model.dependencies.DependencyResolver

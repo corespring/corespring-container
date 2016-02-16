@@ -1,7 +1,9 @@
 package org.corespring.container.client.integration
 
 import org.corespring.container.client.controllers.ComponentSets
+import org.corespring.container.client.controllers.apps.PageSourceServiceConfig
 import org.corespring.container.client.hooks._
+import org.corespring.container.client.pages.engine.JadeEngineConfig
 import org.corespring.container.components.model.Component
 import org.corespring.test.TestContext
 import org.specs2.mock.Mockito
@@ -55,6 +57,9 @@ class DefaultIntegrationTest extends Specification with Mockito with PlaySpecifi
 
       override def itemSupportingMaterialHooks: ItemSupportingMaterialHooks = mock[ItemSupportingMaterialHooks]
 
+      override def pageSourceServiceConfig: PageSourceServiceConfig = mock[PageSourceServiceConfig]
+
+      override def jadeEngineConfig: JadeEngineConfig = mock[JadeEngineConfig]
     }
   }
 

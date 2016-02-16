@@ -1,8 +1,10 @@
 package org.corespring.container.client.controllers.apps
 
-import org.corespring.container.client.component.ComponentUrls
+import org.corespring.container.client.component.{ ComponentBundler, ComponentUrls }
 import org.corespring.container.client.hooks.EditorHooks
 import org.corespring.container.client.hooks.Hooks.StatusMessage
+import org.corespring.container.client.pages.ComponentEditorRenderer
+import org.corespring.container.client.pages.processing.AssetPathProcessor
 import org.corespring.container.components.model.Component
 import org.corespring.test.TestContext
 import org.specs2.mock.Mockito
@@ -19,9 +21,9 @@ import scala.concurrent.{ Future, ExecutionContext }
 
 class EditorTest extends Specification with Mockito {
 
-  class editorScope(val hookResponse: Either[StatusMessage, JsValue]) extends Scope with TestContext{
+  class editorScope(val hookResponse: Either[StatusMessage, JsValue]) extends Scope with TestContext {
 
-    val editor = new DraftEditor with TestContext{
+    val editor = new DraftEditor with TestContext {
 
       override def versionInfo: JsObject = Json.obj()
 
@@ -41,6 +43,14 @@ class EditorTest extends Specification with Mockito {
       override def components: Seq[Component] = Seq.empty
 
       override def mode: Mode = Mode.Dev
+
+      override def renderer: ComponentEditorRenderer = mock[ComponentEditorRenderer]
+
+      override def bundler: ComponentBundler = mock[ComponentBundler]
+
+      override def assetPathProcessor: AssetPathProcessor = mock[AssetPathProcessor]
+
+      override def pageSourceService: PageSourceService = mock[PageSourceService]
     }
   }
 

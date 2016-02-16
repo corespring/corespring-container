@@ -1,7 +1,6 @@
 package org.corespring.container.client.component
 
 import grizzled.slf4j.Logger
-import org.corespring.container.client.controllers.apps.HasLogger
 import org.corespring.container.components.model.Component
 import org.corespring.container.components.model.dependencies.ComponentMaker
 import org.specs2.mock.Mockito
@@ -17,9 +16,7 @@ class PlayerItemTypeReaderTest extends Specification with ComponentMaker with Mo
 
     implicit val h: RequestHeader = FakeRequest("", "")
 
-    val reader = new PlayerItemTypeReader with HasLogger {
-      override def logger: Logger = Logger("test-logger")
-
+    val reader = new PlayerItemTypeReader {
       override def components: Seq[Component] = comps
     }
   }

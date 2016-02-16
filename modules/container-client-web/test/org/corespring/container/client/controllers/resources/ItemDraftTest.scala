@@ -4,6 +4,7 @@ import org.corespring.container.client.controllers.resources.ItemDraft.Errors
 import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.client.hooks._
 import org.corespring.container.client.integration.ContainerExecutionContext
+import org.corespring.container.components.model.Component
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
@@ -26,6 +27,9 @@ class ItemDraftTest extends Specification with Mockito {
       val m = mock[SupportingMaterialHooks]
       m
     }
+
+    override def components: Seq[Component] = Seq.empty
+
   }
 
   trait DH extends CoreItemHooks with DraftHooks

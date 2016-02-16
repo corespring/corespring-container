@@ -1,46 +1,18 @@
 package org.corespring.shell
 
-import com.amazonaws.services.s3.AmazonS3
-import com.mongodb.casbah.{ MongoCollection, MongoDB, MongoClientURI, MongoClient }
-import org.corespring.container.client.filters.{ BlockingFutureRunner, CheckS3CacheFilter }
+import com.mongodb.casbah.{ MongoClient, MongoClientURI, MongoCollection, MongoDB }
 import org.corespring.container.components.loader.FileComponentLoader
-import org.corespring.container.components.model.{Interaction, Component}
+import org.corespring.container.components.model.Interaction
+import org.corespring.container.logging.ContainerLogger
 import org.corespring.mongo.json.services.MongoService
 import org.corespring.play.utils.{ CallBlockOnHeaderFilter, ControllerInstanceResolver }
 import org.corespring.shell.controllers.{ Launchers, Main }
 import org.corespring.shell.filters.AccessControlFilter
 import org.corespring.shell.services.ItemDraftService
 import play.api.mvc._
-import org.corespring.container.logging.ContainerLogger
-import play.api.{ Mode, GlobalSettings, Play }
-
-import scala.concurrent.ExecutionContext
+import play.api.{ GlobalSettings, Mode, Play }
 
 object Global extends WithFilters(AccessControlFilter, CallBlockOnHeaderFilter) with ControllerInstanceResolver with GlobalSettings {
-
-  lazy val componentSetFilter = new CheckS3CacheFilter {
-    override implicit def ec: ExecutionContext = ExecutionContext.global
-
-    override lazy val bucket: String = Play.current.configuration.getString("amazon.s3.bucket").getOrElse("bucket")
-
-    override def appVersion: String = (containerClient.versionInfo \ "commitHash").as[String]
-
-    override def s3: AmazonS3 = containerClient.s3Client
-
-    override def intercept(path: String): Boolean = {
-      val enabled: Boolean = Play.current.configuration.getBoolean("components.filter.enabled").getOrElse(false)
-      val out = path.contains("components-sets") && enabled
-
-      if (out) {
-        logger.debug(s"Intercept: $path")
-      }
-      out
-    }
-  }
-
-  override def doFilter(a: EssentialAction): EssentialAction = {
-    Filters(super.doFilter(a), Seq(componentSetFilter): _*)
-  }
 
   private lazy val logger = ContainerLogger.getLogger("Global")
 
@@ -66,11 +38,11 @@ object Global extends WithFilters(AccessControlFilter, CallBlockOnHeaderFilter) 
     new MongoService(db("sessions")),
     new ItemDraftService(db("itemDrafts")),
     {
-      if(showNonReleasedComponents){
+      if (showNonReleasedComponents) {
         componentLoader.all
       } else {
-        componentLoader.all.filter{ c =>
-          if(c.isInstanceOf[Interaction]){
+        componentLoader.all.filter { c =>
+          if (c.isInstanceOf[Interaction]) {
             c.asInstanceOf[Interaction].released
           } else {
             true
@@ -81,8 +53,8 @@ object Global extends WithFilters(AccessControlFilter, CallBlockOnHeaderFilter) 
     Play.current.configuration)
 
   private lazy val launchers = new Launchers {
-    override def interactions: Seq[Interaction] = componentLoader.all.flatMap{
-      case i : Interaction => Some(i)
+    override def interactions: Seq[Interaction] = componentLoader.all.flatMap {
+      case i: Interaction => Some(i)
       case _ => None
     }
   }

@@ -2,8 +2,10 @@ package org.corespring.container.client.controllers.apps
 
 import java.util.concurrent.TimeUnit
 
-import org.corespring.container.client.component.ComponentUrls
+import org.corespring.container.client.component.{ ComponentBundler, ComponentScriptInfo, ComponentUrls }
 import org.corespring.container.client.hooks.EditorHooks
+import org.corespring.container.client.pages.ComponentEditorRenderer
+import org.corespring.container.client.pages.processing.AssetPathProcessor
 import org.corespring.container.components.model.{ Widget, Client, Component }
 import org.corespring.test.TestContext
 import org.specs2.mock.Mockito
@@ -11,7 +13,7 @@ import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
 import play.api.Mode
 import play.api.Mode.Mode
-import play.api.libs.json.{ Json, JsObject, JsArray }
+import play.api.libs.json.{ JsValue, Json, JsObject, JsArray }
 import play.api.mvc.RequestHeader
 import play.api.templates.Html
 import play.api.test.FakeRequest
@@ -22,15 +24,14 @@ import play.api.test.Helpers._
 
 class CoreEditorTest extends Specification with Mockito {
 
-
   class scope extends Scope with CoreEditor with TestContext {
 
     override protected def buildJs(scriptInfo: ComponentScriptInfo, extras: Seq[String])(implicit rh: RequestHeader): Seq[String] = Seq.empty
 
     override protected def buildCss(scriptInfo: ComponentScriptInfo)(implicit rh: RequestHeader): Seq[String] = Seq.empty
 
-    override def jsSrc: NgSourcePaths = NgSourcePaths(Seq.empty, "", Seq.empty, Seq.empty)
-    override def cssSrc: CssSourcePaths = CssSourcePaths(Seq.empty, "", Seq.empty)
+    override def jsSrc(context: String): NgSourcePaths = NgSourcePaths(Seq.empty, "", Seq.empty, Seq.empty)
+    override def cssSrc(context: String): CssSourcePaths = CssSourcePaths(Seq.empty, "", Seq.empty)
 
     implicit val r = FakeRequest("", "")
     override def versionInfo: JsObject = Json.obj()
@@ -52,7 +53,6 @@ class CoreEditorTest extends Specification with Mockito {
 
     override def hooks: EditorHooks = mockHooks
 
-
     override def mode: Mode = Mode.Dev
 
     protected var templateParams: TemplateParams = null
@@ -62,6 +62,15 @@ class CoreEditorTest extends Specification with Mockito {
       Html("hi")
     }
 
+    override def findComponentType(json: JsValue): Option[String] = None
+
+    override def renderer: ComponentEditorRenderer = mock[ComponentEditorRenderer]
+
+    override def bundler: ComponentBundler = mock[ComponentBundler]
+
+    override def assetPathProcessor: AssetPathProcessor = mock[AssetPathProcessor]
+
+    override def pageSourceService: PageSourceService = mock[PageSourceService]
   }
 
   "load" should {

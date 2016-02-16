@@ -2,11 +2,12 @@ package org.corespring.container.client.controllers.resources
 
 import org.corespring.container.client.hooks.Hooks.{ R, StatusMessage }
 import org.corespring.container.client.hooks.{ CoreItemHooks, CreateItemHook, SupportingMaterialHooks }
+import org.corespring.container.components.model.Component
 import org.corespring.test.TestContext
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
-import play.api.libs.json.{ JsValue, Json }
+import play.api.libs.json.{ JsObject, JsValue, Json }
 import play.api.mvc.RequestHeader
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -56,6 +57,7 @@ class ItemTest extends Specification with Mockito {
 
         override def saveProfile(id: String, json: JsValue)(implicit h: RequestHeader): R[JsValue] = ???
 
+        override def createSingleComponentItem(componentType: String, key: String, defaultData: JsObject)(implicit h: RequestHeader): R[String] = ???
       }
 
       override protected def componentTypes: Seq[String] = Seq.empty
@@ -64,6 +66,8 @@ class ItemTest extends Specification with Mockito {
         val m = mock[SupportingMaterialHooks]
         m
       }
+
+      override def components: Seq[Component] = Seq.empty
     }
 
   }
