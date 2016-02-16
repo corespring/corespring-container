@@ -53,7 +53,7 @@ class ComponentEditorRenderer(
     val params: Map[String, Any] = Map(
       "appName" -> name,
       "previewMode" -> previewMode,
-      "previewWidth" -> previewWidth,
+      "previewWidth" -> previewWidth.getOrElse(null),
       "css" -> processedCss.toArray,
       "js" -> processedJs.toArray,
       "ngModules" -> (sources.js.ngModules ++ componentBundle.ngModules).map(s => s"'$s'").mkString(","),

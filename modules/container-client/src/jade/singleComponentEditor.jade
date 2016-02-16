@@ -33,16 +33,23 @@ block content
 
     if previewMode == "preview-right"
 
-      - var extras = previewWidth ? { style: previewWidth + ";"} :  {};
+      - var previewStyle 
+      
+      if previewWidth
+        - previewStyle = "max-width: " + previewWidth + "; min-width: " + previewWidth + "; width: " + previewWidth + ";"
+      else
+        - previewStyle = "" 
 
       .preview-right(ng-controller="PreviewOnRight")
         .config-pane
           span.pane-header Configuration
           hr/
           .configuration
+        //.preview-pane(ng-show="showPreview", ng-controller="ClientSidePreview", style="!{previewStyle}") 
         .preview-pane(
-          ng-show="showPreview"
-          ng-controller="ClientSidePreview")&attributes(extras)
+         style="!{previewStyle}",
+          ng-show="showPreview", 
+          ng-controller="ClientSidePreview") 
           ul.nav.preview-nav 
             li
               span.pane-header Preview

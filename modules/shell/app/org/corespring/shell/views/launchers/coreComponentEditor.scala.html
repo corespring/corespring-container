@@ -43,6 +43,7 @@
          var t = $('.component-type').find(":selected").attr('name');
          opts.componentType = t;
          opts.previewMode = previewMode;
+         //opts.previewWidth = "1000px;";
          window.updateControls(previewMode);
 
          window.editor = new org.corespring.players[editorName](holder, opts, function(err){
