@@ -176,6 +176,7 @@ trait DefaultIntegration
 
   lazy val componentEditor = wire[ComponentEditor]
 
+  /** TODO: Use macwire for the dependencies below.*/
   lazy val itemEditor = new ItemEditor {
     override def pageSourceService: PageSourceService = DefaultIntegration.this.pageSourceService
 
