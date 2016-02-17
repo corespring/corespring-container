@@ -280,6 +280,7 @@ describe('component-editor', function () {
         jasmine.any(Object),
         {
           previewMode: 'tabs',
+          previewWidth: undefined,
           activePane: 'config', 
           showNavigation: false, 
           uploadUrl: 'item', 
@@ -330,6 +331,7 @@ describe('component-editor', function () {
           {method: 'GET', url: 'draft'},
           jasmine.any(Object),
           {previewMode: 'tabs',
+          previewWidth: undefined,
           activePane: 'config', 
           showNavigation: false, 
           uploadUrl: 'draft', 
