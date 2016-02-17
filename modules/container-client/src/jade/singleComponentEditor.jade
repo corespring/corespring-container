@@ -2,6 +2,9 @@ extends layout
 
 block extra-css
 
+
+  link(rel="stylesheet", type="text/css", href="//cloud.typography.com/6067912/767344/css/fonts.css")
+
   // hi
 
   if previewMode == "preview-right" && previewWidth
@@ -46,20 +49,28 @@ block content
     if previewMode == "preview-right"
 
       .preview-right(ng-controller="PreviewOnRight")
+        
         .config-pane
           span.pane-header Configuration
+          br/
+          span.pane-sub-header Use the configuration panel to set up the interaction
           hr/
           .configuration
         
+        .vertical-divider
+
         .preview-pane(
           ng-show="showPreview", 
           ng-controller="ClientSidePreview") 
           ul.nav.preview-nav 
-            li
-              span.pane-header Preview
-            li.player-btn-holder
-              span(simple-player-button="", mode="playerMode") 
+            span.pane-header Preview
+            br/
+            span.pane-sub-header This is how the interaction will appear to students 
           hr/
+          span(
+            simple-player-button="", 
+            class="player-btn-holder", 
+            mode="playerMode") 
           .player-container-holder
             .player-container
               preview-player(

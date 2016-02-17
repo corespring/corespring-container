@@ -4,9 +4,9 @@ angular.module('corespring-singleComponentEditor.directives')
   function link($scope, $elem, $attrs){
 
     var labels = {
-      gather: 'Submit',
-      view: 'Reset',
-      evaluate: 'Reset'
+      gather: 'Submit Answer',
+      view: 'Reset Answer',
+      evaluate: 'Reset Answer'
     };
 
     $scope.$watch('mode', function(m){

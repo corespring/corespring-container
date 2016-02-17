@@ -41,7 +41,7 @@ angular.module('corespring-editor.services')
         function setSingleDataAndSession(id, model, session) {
           $timeout(function() {
             ComponentRegister.setSingleDataAndSession(id, pruneItem(model), session);
-          }, 200);
+          }, 10);
         }
 
         this.getSessions = function() {
