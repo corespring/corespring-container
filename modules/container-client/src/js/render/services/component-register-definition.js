@@ -8,6 +8,8 @@ angular.module('corespring-player.services')
 
       var bridges = {};
 
+      var pending = {};
+
       var answerChangedHandler = null;
 
       var isEditable = null;
@@ -44,6 +46,11 @@ angular.module('corespring-player.services')
             throw "Bridge does not have expected methods: " + missingMethods;
           }
         }
+
+        if(pending[id]){
+          bridges[id].setDataAndSession(pending[id]);
+          pending[id] = null;
+        }
       };
 
       this.setAnswerChangedHandler = function(cb) {
@@ -59,6 +66,8 @@ angular.module('corespring-player.services')
         _.forIn(allData, function(ds, id){
           if(bridges[id]){
             bridges[id].setDataAndSession(ds);
+          } else {
+            pending[id] = ds;
           }
         });
       };
