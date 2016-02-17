@@ -14,9 +14,9 @@ private[controllers] object FormToOptions {
       val options = if (previewMode == "preview-right") {
         val showPreview: Option[Boolean] = f.get("showPreview").map(_.exists(_ == "true"))
 
-        val previewWidth = f.get("previewWidth").flatMap(_.headOption).flatMap{ s =>
+        val previewWidth = f.get("previewWidth").flatMap(_.headOption).flatMap { s =>
           try { Some(s.toInt) } catch {
-            case _ => None
+            case _: Throwable => None
           }
         }
 
