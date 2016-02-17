@@ -60,13 +60,14 @@ function Helper(){
     });
   };
 
-  this.launchData = function(options, uploadUrl, xhtml, componentModel){
+  this.launchData = function(options, upload, xhtml, componentModel){
     return {
       previewMode: options.previewMode || 'tabs',
       previewWidth: options.previewWidth,
       activePane: options.activePane || 'config',
       showNavigation: options.showNavigation === true || false,
-      uploadUrl: uploadUrl,
+      uploadUrl: upload.url,
+      uploadMethod: upload.method, 
       xhtml: xhtml,
       componentModel: componentModel
     };
@@ -92,7 +93,7 @@ function Standalone(element, options, errorCallback) {
       return;
     }
 
-    var initialData = helper.launchData(options, options.uploadUrl, options.markup, options.data);
+    var initialData = helper.launchData(options, {url: options.uploadUrl, method: options.uploadMethod}, options.markup, options.data);
     instance = launcher.loadInstance(call, options.queryParams, initialData);
     helper.addCoreMethods.bind(this)(instance);
   }
@@ -154,7 +155,7 @@ function CorespringBound(bindType, options, errorCallback){
       return;
     }
 
-    var initialData = helper.launchData(options, uploadCall.url, item.xhtml, comp);
+    var initialData = helper.launchData(options, uploadCall, item.xhtml, comp);
     
     var instance = launcher.loadInstance(call, options.queryParams || {}, initialData, function(instance){
       instance.send('getComponentKey', function(err, key){

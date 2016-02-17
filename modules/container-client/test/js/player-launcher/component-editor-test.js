@@ -143,7 +143,6 @@ describe('component-editor', function () {
       beforeEach(function(){
 
         launcher.loadCall.and.callFake(function(key){
-          console.log('key: ', key);
           return {method: 'GET', url: key};
         });
         
@@ -283,7 +282,8 @@ describe('component-editor', function () {
           previewWidth: undefined,
           activePane: 'config', 
           showNavigation: false, 
-          uploadUrl: 'item', 
+          uploadUrl: 'item',
+          uploadMethod: 'GET', 
           xhtml: undefined, 
           componentModel: {}
         }, 
@@ -335,6 +335,7 @@ describe('component-editor', function () {
           activePane: 'config', 
           showNavigation: false, 
           uploadUrl: 'draft', 
+          uploadMethod: 'GET',
           xhtml: undefined, 
           componentModel: {}}, 
           jasmine.any(Function));
