@@ -1,7 +1,7 @@
 package org.corespring.container.client.pages
 
 import org.corespring.container.client.component.{ SingleComponentScriptBundle, ComponentJson }
-import org.corespring.container.client.controllers.apps.{ ComponentEditorOptions, EditorClientOptions, TabComponentEditorOptions, PageSourceService }
+import org.corespring.container.client.controllers.apps._
 import org.corespring.container.client.integration.ContainerExecutionContext
 import org.corespring.container.client.pages.engine.JadeEngine
 import org.corespring.container.client.pages.processing.AssetPathProcessor
@@ -26,6 +26,8 @@ class ComponentEditorRendererTest extends Specification with Mockito {
 
     val pageSourceService = {
       val m = mock[PageSourceService]
+      m.loadJs(any[String]) returns NgSourcePaths(Nil, "", Nil, Nil)
+      m.loadCss(any[String]) returns CssSourcePaths(Nil, "", Nil)
       m
     }
 
@@ -36,6 +38,7 @@ class ComponentEditorRendererTest extends Specification with Mockito {
 
     val assetPathProcessor = {
       val m = mock[AssetPathProcessor]
+      m.process(any[String]) answers{ (s) => s }
       m
     }
 
@@ -60,6 +63,9 @@ class ComponentEditorRendererTest extends Specification with Mockito {
       val bundle = SingleComponentScriptBundle(component, Seq.empty, Seq.empty, Seq.empty)
       val clientOptions = ComponentEditorOptions.default
       renderer.render(bundle, "tabs", clientOptions)
+
+      import org.mockito.Matchers.{eq => meq}
+      there was one(jade).renderJade(meq("singleComponentEditor"), any[Map[String,Any]])
     }
   }
 }
