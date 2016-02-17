@@ -1,6 +1,6 @@
 package org.corespring.container.client.component
 
-import org.corespring.container.client.controllers.apps.{ PageSourceService, NgSourcePaths, CssSourcePaths }
+import org.corespring.container.client.controllers.apps.{ CssSourcePaths, NgSourcePaths, PageSourceService }
 import org.corespring.container.client.pages.processing.AssetPathProcessor
 import org.corespring.container.components.model.Component
 import org.corespring.test.TestContext
@@ -8,7 +8,6 @@ import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
 import play.api.Mode
-import play.api.Mode.Mode
 import play.api.Mode.Mode
 import play.api.test.FakeRequest
 

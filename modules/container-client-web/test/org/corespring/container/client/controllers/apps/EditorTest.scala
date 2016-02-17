@@ -1,6 +1,6 @@
 package org.corespring.container.client.controllers.apps
 
-import org.corespring.container.client.component.{ ComponentBundler, ComponentUrls }
+import org.corespring.container.client.component.{ ComponentInfoJson, ComponentJson, ComponentBundler, ComponentUrls }
 import org.corespring.container.client.hooks.EditorHooks
 import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.client.pages.ComponentEditorRenderer
@@ -26,6 +26,8 @@ class EditorTest extends Specification with Mockito {
     val editor = new DraftEditor with TestContext {
 
       override def versionInfo: JsObject = Json.obj()
+
+      override def componentJson: ComponentJson = new ComponentInfoJson("path")
 
       override def hooks: EditorHooks = {
         val m = mock[EditorHooks]

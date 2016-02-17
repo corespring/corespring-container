@@ -2,7 +2,7 @@ package org.corespring.container.client.controllers.apps
 
 import java.util.concurrent.TimeUnit
 
-import org.corespring.container.client.component.{ ComponentBundler, ComponentScriptInfo, ComponentUrls }
+import org.corespring.container.client.component._
 import org.corespring.container.client.hooks.EditorHooks
 import org.corespring.container.client.pages.ComponentEditorRenderer
 import org.corespring.container.client.pages.processing.AssetPathProcessor
@@ -71,6 +71,8 @@ class CoreEditorTest extends Specification with Mockito {
     override def assetPathProcessor: AssetPathProcessor = mock[AssetPathProcessor]
 
     override def pageSourceService: PageSourceService = mock[PageSourceService]
+
+    override def componentJson: ComponentJson = new ComponentInfoJson("path")
   }
 
   "load" should {
@@ -91,21 +93,6 @@ class CoreEditorTest extends Specification with Mockito {
       override def debounceInMillis = 5001
       Await.result(load("id")(r), Duration(1, TimeUnit.SECONDS))
       templateParams.asInstanceOf[EditorTemplateParams].options.debounceInMillis === 5001
-    }
-
-  }
-
-  "toJson" should {
-    "convert ComponentInfo to json" in new scope {
-      val componentInfo = Widget("org", "widget", None, None, Client("render", "configure", None), false, true, Json.obj(
-        "external-configuration" -> Json.obj("config" -> "a")), Json.obj("data" -> "data"))
-      val json = toJson(componentInfo)
-      (json \ "name").as[String] === "widget"
-      (json \ "released").as[Boolean] === false
-      (json \ "insertInline").as[Boolean] === true
-      (json \ "componentType").as[String] === "org-widget"
-      (json \ "defaultData").as[JsObject] === componentInfo.defaultData
-      (json \ "configuration").as[JsObject] === componentInfo.packageInfo \ "external-configuration"
     }
   }
 }

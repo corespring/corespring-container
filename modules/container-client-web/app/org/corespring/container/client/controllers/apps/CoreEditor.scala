@@ -1,7 +1,7 @@
 package org.corespring.container.client.controllers.apps
 
 import grizzled.slf4j.Logger
-import org.corespring.container.client.component.AllItemTypesReader
+import org.corespring.container.client.component.{ ComponentJson, AllItemTypesReader }
 import org.corespring.container.client.controllers.AssetsController
 import org.corespring.container.client.controllers.apps.componentEditor.ComponentEditorLaunchingController
 import org.corespring.container.client.controllers.helpers.JsonHelper
@@ -41,28 +41,10 @@ trait CoreEditor
 
   def debounceInMillis: Long = 5000
 
-  lazy val componentsArray: JsArray = JsArray(interactions.map(toJson))
-  lazy val widgetsArray: JsArray = JsArray(widgets.map(toJson))
+  def componentJson: ComponentJson
 
-  protected def toJson(ci: ComponentInfo): JsValue = {
-    val tag = tagName(ci.id.org, ci.id.name)
-    partialObj(
-      "name" -> Some(JsString(ci.id.name)),
-      "title" -> Some(JsString(ci.title.getOrElse(""))),
-      "titleGroup" -> Some(JsString(ci.titleGroup.getOrElse(""))),
-      "icon" -> ((interactions ++ widgets).find(_.componentType == tag).map(_.icon) match {
-        case Some(iconBytes) => iconBytes match {
-          case Some(thing) => Some(JsString(s"$modulePath/icon/$tag"))
-          case _ => None
-        }
-        case _ => None
-      }),
-      "released" -> Some(JsBoolean(ci.released)),
-      "insertInline" -> Some(JsBoolean(ci.insertInline)),
-      "componentType" -> Some(JsString(tag)),
-      "defaultData" -> Some(ci.defaultData),
-      "configuration" -> (ci.packageInfo \ "external-configuration").asOpt[JsObject])
-  }
+  lazy val componentsArray: JsArray = JsArray(interactions.map(componentJson.toJson))
+  lazy val widgetsArray: JsArray = JsArray(widgets.map(componentJson.toJson))
 
   def servicesJs(id: String, components: JsArray, widgets: JsArray): String
 

@@ -172,6 +172,9 @@ trait DefaultIntegration
 
   /** TODO: Use macwire for the dependencies below.*/
   lazy val itemEditor = new ItemEditor {
+
+    override def componentJson = DefaultIntegration.this.componentJson
+
     override def pageSourceService: PageSourceService = DefaultIntegration.this.pageSourceService
 
     override def renderer: ComponentEditorRenderer = DefaultIntegration.this.componentEditorRenderer
@@ -197,6 +200,7 @@ trait DefaultIntegration
   }
 
   lazy val itemDevEditor = new ItemDevEditor {
+    override def componentJson = DefaultIntegration.this.componentJson
     override def assetPathProcessor: AssetPathProcessor = DefaultIntegration.this.assetPathProcessor
     override def pageSourceService: PageSourceService = DefaultIntegration.this.pageSourceService
 
@@ -219,6 +223,7 @@ trait DefaultIntegration
   }
 
   lazy val draftEditor = new DraftEditor {
+    override def componentJson = DefaultIntegration.this.componentJson
     override def assetPathProcessor: AssetPathProcessor = DefaultIntegration.this.assetPathProcessor
     override def pageSourceService: PageSourceService = DefaultIntegration.this.pageSourceService
     override def renderer: ComponentEditorRenderer = DefaultIntegration.this.componentEditorRenderer
@@ -243,6 +248,7 @@ trait DefaultIntegration
   }
 
   lazy val draftDevEditor = new DraftDevEditor {
+    override def componentJson = DefaultIntegration.this.componentJson
     override def assetPathProcessor: AssetPathProcessor = DefaultIntegration.this.assetPathProcessor
     override def pageSourceService: PageSourceService = DefaultIntegration.this.pageSourceService
     override def renderer: ComponentEditorRenderer = DefaultIntegration.this.componentEditorRenderer
