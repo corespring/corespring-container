@@ -16,6 +16,8 @@ html(xmlns="http://www.w3.org/1999/html")
     for c in css
       link(rel='stylesheet',href='#{c}')
 
+    block extra-css
+      
   body(ng-app="corespring-#{appName}", class="corespring-#{appName}-body")
     .pre-loader
       #spinner

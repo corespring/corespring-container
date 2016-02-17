@@ -1,5 +1,21 @@
 extends layout
 
+block extra-css
+
+  // hi
+
+  if previewMode == "preview-right" && previewWidth
+    style(type="text/css")
+      .player-container {
+        max-width: !{previewWidth}px;
+        width: !{previewWidth}px;
+        min-width: !{previewWidth}px;
+      }
+
+      .config-pane{
+        min-width: auto;
+      }
+
 block content
 
   include templates/component-editor/tabs
@@ -33,21 +49,13 @@ block content
 
     if previewMode == "preview-right"
 
-      - var previewStyle 
-      
-      if previewWidth
-        - previewStyle = "max-width: " + previewWidth + "; min-width: " + previewWidth + "; width: " + previewWidth + ";"
-      else
-        - previewStyle = "" 
-
       .preview-right(ng-controller="PreviewOnRight")
         .config-pane
           span.pane-header Configuration
           hr/
           .configuration
-        //.preview-pane(ng-show="showPreview", ng-controller="ClientSidePreview", style="!{previewStyle}") 
+        
         .preview-pane(
-         style="!{previewStyle}",
           ng-show="showPreview", 
           ng-controller="ClientSidePreview") 
           ul.nav.preview-nav 
@@ -56,19 +64,20 @@ block content
             li.player-btn-holder
               span(simple-player-button="", mode="playerMode") 
           hr/
-          .player-container
-            preview-player(
-              player-mode="playerMode",
-              data-jade-template='templates/question',
-              player-markup="item.xhtml",
-              player-item="item",
-              player-components="item.components",
-              player-outcomes="outcome")
+          .player-container-holder
+            .player-container
+              preview-player(
+                player-mode="playerMode",
+                data-jade-template='templates/question',
+                player-markup="item.xhtml",
+                player-item="item",
+                player-components="item.components",
+                player-outcomes="outcome")
 
-            summary-feedback(
-              ng-model='item.summaryFeedback', 
-              session-complete='session.isComplete')
-              hr/
+              summary-feedback(
+                ng-model='item.summaryFeedback', 
+                session-complete='session.isComplete')
+                hr/
 
           //+preview
 

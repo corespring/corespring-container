@@ -43,7 +43,7 @@
          var t = $('.component-type').find(":selected").attr('name');
          opts.componentType = t;
          opts.previewMode = previewMode;
-         //opts.previewWidth = "1000px;";
+         opts.previewWidth = $('.preview-width').val();
          window.updateControls(previewMode);
 
          window.editor = new org.corespring.players[editorName](holder, opts, function(err){
@@ -109,6 +109,7 @@
     </select>
     <button class="btn btn-primary create" data-option="tabs">Create (w/ Tabs)</button>
     <button class="btn btn-primary create" data-option="preview-right">Create (Preview on the right)</button>
+    <input type="text" maxlength="3" class="preview-width" placeholder="width.."/>
   </div>
 
   <div class="external-controls navbar nav">

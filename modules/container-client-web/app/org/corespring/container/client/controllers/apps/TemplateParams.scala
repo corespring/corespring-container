@@ -47,7 +47,7 @@ trait ComponentEditorOptions {
 
 case class PreviewRightComponentEditorOptions(
   showPreview: Option[Boolean],
-  previewWidth: Option[String],
+  previewWidth: Option[Int],
   uploadUrl: Option[String],
   uploadMethod: Option[String],
   singleComponentKey: String = SingleComponent.Key)
