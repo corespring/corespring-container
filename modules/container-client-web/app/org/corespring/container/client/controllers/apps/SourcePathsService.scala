@@ -7,15 +7,12 @@ trait PageSourceService {
   def loadCss(key: String): CssSourcePaths
 }
 
-import java.net.URL
-
 import play.api.Logger
-import play.api.libs.json.JsValue
-import play.api.libs.json.Json
+import play.api.libs.json.{ JsValue, Json }
 
 import scala.collection.mutable
 
-case class PageSourceServiceConfig(prefix: String, reload: Boolean, load: String => Option[URL])
+case class PageSourceServiceConfig(prefix: String, reload: Boolean, load: String => Option[String])
 
 class JsonPageSourceService(config: PageSourceServiceConfig) extends PageSourceService {
 
@@ -45,12 +42,12 @@ class JsonPageSourceService(config: PageSourceServiceConfig) extends PageSourceS
   }
 
   private def pathToJson(path: String): Option[JsValue] = {
-    config.load(path).map { url =>
-      val bs = scala.io.Source.fromURL(url)
-      val jsonString: String = bs.getLines().mkString("\n")
-      bs.close()
-      val json = Json.parse(jsonString)
-      json
+    config.load(path).flatMap { jsonString =>
+      try {
+        Some(Json.parse(jsonString))
+      } catch {
+        case _: Throwable => None
+      }
     }
   }
 

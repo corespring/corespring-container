@@ -1,5 +1,7 @@
 package org.corespring.container.client.integration
 
+import java.net.URL
+
 import org.corespring.container.client.controllers.ComponentSets
 import org.corespring.container.client.controllers.apps.PageSourceServiceConfig
 import org.corespring.container.client.hooks._
@@ -60,6 +62,8 @@ class DefaultIntegrationTest extends Specification with Mockito with PlaySpecifi
       override def pageSourceServiceConfig: PageSourceServiceConfig = mock[PageSourceServiceConfig]
 
       override def jadeEngineConfig: JadeEngineConfig = mock[JadeEngineConfig]
+
+      override def loadResource: (String) => Option[URL] = _ => None
     }
   }
 

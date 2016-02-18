@@ -1,15 +1,15 @@
 package org.corespring.shell
 
 import java.io.{ ByteArrayInputStream, File }
-import java.net.URLDecoder
+import java.net.{ URL, URLDecoder }
 
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.s3.model.ObjectMetadata
-import org.apache.commons.io.{ FileUtils, IOUtils }
+import org.apache.commons.io.FileUtils
 import org.bson.types.ObjectId
 import org.corespring.amazon.s3.{ ConcreteS3Service, S3Service }
 import org.corespring.container.client._
-import org.corespring.container.client.controllers.apps.{ PageSourceServiceConfig }
+import org.corespring.container.client.controllers.apps.PageSourceServiceConfig
 import org.corespring.container.client.controllers.{ AssetType, _ }
 import org.corespring.container.client.hooks._
 import org.corespring.container.client.integration.{ ContainerExecutionContext, DefaultIntegration }
@@ -24,12 +24,12 @@ import org.corespring.shell.controllers.player.actions.{ PlayerHooks => ShellPla
 import org.corespring.shell.controllers.player.{ SessionHooks => ShellSessionHooks }
 import org.corespring.shell.controllers.{ ShellDataQueryHooks, editor => shellEditor }
 import org.corespring.shell.services.ItemDraftService
+import play.api.Play.current
 import play.api.libs.MimeTypes
-import play.api.libs.json.JsObject
+import play.api.libs.json.Reads._
+import play.api.libs.json.{ JsObject, _ }
 import play.api.mvc._
 import play.api.{ Configuration, Logger, Mode, Play }
-import play.api.libs.json._
-import play.api.libs.json.Reads._
 
 import scala.concurrent.{ ExecutionContext, Future }
 import scalaz.{ Failure, Success, Validation }
@@ -266,13 +266,7 @@ class ContainerClientImplementation(
       override def components: Seq[Component] = allComponents
     }
 
-    override def resource(path: String): Option[String] = Play.resource(s"container-client/bower_components/$path").map { url =>
-      logger.trace(s"load resource $path")
-      val input = url.openStream()
-      val content = IOUtils.toString(input, "UTF-8")
-      IOUtils.closeQuietly(input)
-      content
-    }
+    override def resource(path: String): Option[String] = resourceLoader.loadPath(s"container-client/bower_components/$path")
 
     override def loadLibrarySource(path: String): Option[String] = {
       val componentsPath = configuration.getString("path").getOrElse("?")
@@ -378,14 +372,16 @@ class ContainerClientImplementation(
     override def containerContext: ContainerExecutionContext = ContainerClientImplementation.this.containerContext
   }
 
-  import play.api.Play.current
+  override val loadResource: (String) => Option[URL] = {
+    Play.resource(_)
+  }
 
   override lazy val pageSourceServiceConfig: PageSourceServiceConfig = PageSourceServiceConfig(
     v2Player.Routes.prefix,
     Play.mode == Mode.Dev,
-    Play.resource(_))
+    resourceLoader.loadPath(_))
 
-  override lazy val jadeEngineConfig: JadeEngineConfig = JadeEngineConfig("container-client/jade", Play.current.mode, Play.resource _)
+  override lazy val jadeEngineConfig: JadeEngineConfig = JadeEngineConfig("container-client/jade", Play.current.mode, resourceLoader.loadPath(_), resourceLoader.lastModified(_))
 }
 
 /**

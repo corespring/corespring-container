@@ -1,5 +1,7 @@
 package org.corespring.container.client.integration
 
+import java.net.URL
+
 import com.softwaremill.macwire.MacwireMacros.wire
 import grizzled.slf4j.Logger
 import org.corespring.container.client.V2PlayerConfig
@@ -13,6 +15,7 @@ import org.corespring.container.client.controllers.resources._
 import org.corespring.container.client.controllers.resources.session.ItemPruner
 import org.corespring.container.client.hooks._
 import org.corespring.container.client.integration.validation.Validator
+import org.corespring.container.client.io.ResourcePath
 import org.corespring.container.client.pages.ComponentEditorRenderer
 import org.corespring.container.client.pages.engine.{ JadeEngine, JadeEngineConfig }
 import org.corespring.container.client.pages.processing.AssetPathProcessor
@@ -45,6 +48,8 @@ trait DefaultIntegration
 
   def containerContext: ContainerExecutionContext
 
+  def loadResource: String => Option[URL]
+  val resourceLoader = new ResourcePath(loadResource)
   /**
    * For a given resource path return a resolved path.
    * By default this just returns the path, so no domain is used.
