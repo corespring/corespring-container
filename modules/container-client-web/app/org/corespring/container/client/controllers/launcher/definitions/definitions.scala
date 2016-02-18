@@ -2,8 +2,6 @@ package org.corespring.container.client.controllers.launcher
 
 import org.corespring.container.client.V2PlayerConfig
 import org.corespring.container.client.hooks.PlayerJs
-import org.corespring.container.client.io.ResourcePath
-import play.api.Play
 import play.api.http.ContentTypes
 import play.api.libs.json.JsObject
 import play.api.libs.json.Json._
@@ -12,11 +10,6 @@ import play.api.mvc.{ Call, RequestHeader, Session, SimpleResult }
 private[launcher] trait LaunchCompanionUtils {
   def params(rh: RequestHeader) = rh.queryString.mapValues(_.mkString(""))
   def url(cfg: V2PlayerConfig, rh: RequestHeader) = cfg.rootUrl.getOrElse(BaseUrl(rh))
-  import play.api.Play.current
-  val loader = new ResourcePath(Play.resource(_))
-  def resourceToString(s: String): Option[String] = {
-    loader.loadPath(s)
-  }
 }
 
 private[launcher] trait FullPath {
@@ -64,8 +57,8 @@ private[launcher] case class Catalog(corespringUrl: String, val builder: JsBuild
 }
 
 private[launcher] object Player extends LaunchCompanionUtils {
-  def apply(playerConfig: V2PlayerConfig, rh: RequestHeader, playerJs: PlayerJs): Player = {
-    Player(url(playerConfig, rh), resourceToString(_), params(rh), playerJs)
+  def apply(playerConfig: V2PlayerConfig, rh: RequestHeader, playerJs: PlayerJs, builder: JsBuilder): Player = {
+    Player(url(playerConfig, rh), builder, params(rh), playerJs)
   }
 }
 
@@ -103,8 +96,8 @@ private[launcher] case class Player(corespringUrl: String, builder: JsBuilder, q
 }
 
 private[launcher] object ItemEditors extends LaunchCompanionUtils {
-  def apply(playerConfig: V2PlayerConfig, rh: RequestHeader): ItemEditors = {
-    ItemEditors(url(playerConfig, rh), resourceToString(_), params(rh))
+  def apply(playerConfig: V2PlayerConfig, rh: RequestHeader, builder: JsBuilder): ItemEditors = {
+    ItemEditors(url(playerConfig, rh), builder, params(rh))
   }
 }
 

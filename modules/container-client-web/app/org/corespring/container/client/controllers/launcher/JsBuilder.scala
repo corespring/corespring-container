@@ -31,6 +31,8 @@ private[launcher] class JsBuilder(corespringUrl: String, val load: String => Opt
 
   def buildJs(files: Seq[String], options: JsObject, bootstrapLine: String, queryParams: Map[String, String]): String = {
 
+    val additionalJsNameAndSrc = files.map(pathToNameAndContents)
+
     val fullConfig = Json.obj(
       "corespringUrl" -> corespringUrl,
       "queryParams" -> queryParams) ++ options
