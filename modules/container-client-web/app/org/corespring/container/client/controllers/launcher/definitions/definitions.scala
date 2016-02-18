@@ -23,21 +23,18 @@ private[launcher] trait FullPath {
   def fullPath(n: String) = s"container-client/js/player-launcher/$n"
 }
 
-trait CorespringJsClient extends JsResource with FullPath {
+trait CorespringJsClient extends FullPath {
 
   implicit def callToJsv(c: Call): JsValueWrapper = toJsFieldJsValueWrapper(obj("method" -> c.method, "url" -> c.url))
 
+  def builder: JsBuilder
   def corespringUrl: String
   def fileNames: Seq[String]
   def bootstrap: String
   def options: JsObject
   def queryParams: Map[String, String]
 
-  lazy val src = {
-    val builder = new JsBuilder(corespringUrl, load)
-    val nameAndContents = fileNames.map(n => pathToNameAndContents(fullPath(n)))
-    builder.buildJs(nameAndContents, options, bootstrap, queryParams)
-  }
+  lazy val src = builder.buildJs(fileNames, options, bootstrap, queryParams)
 
   def result: SimpleResult = {
     import play.api.mvc.Results.Ok
@@ -46,12 +43,12 @@ trait CorespringJsClient extends JsResource with FullPath {
 }
 
 private[launcher] object Catalog extends LaunchCompanionUtils {
-  def apply(playerConfig: V2PlayerConfig, rh: RequestHeader): Catalog = {
-    Catalog(url(playerConfig, rh), resourceToString(_), params(rh))
+  def apply(playerConfig: V2PlayerConfig, rh: RequestHeader, builder: JsBuilder): Catalog = {
+    Catalog(url(playerConfig, rh), builder, params(rh))
   }
 }
 
-private[launcher] case class Catalog(corespringUrl: String, load: String => Option[String], queryParams: Map[String, String]) extends CorespringJsClient {
+private[launcher] case class Catalog(corespringUrl: String, val builder: JsBuilder, queryParams: Map[String, String]) extends CorespringJsClient {
   override def fileNames: Seq[String] = Seq("catalog.js")
 
   override def bootstrap: String =
@@ -72,7 +69,7 @@ private[launcher] object Player extends LaunchCompanionUtils {
   }
 }
 
-private[launcher] case class Player(corespringUrl: String, load: String => Option[String], queryParams: Map[String, String], playerJs: PlayerJs) extends CorespringJsClient {
+private[launcher] case class Player(corespringUrl: String, builder: JsBuilder, queryParams: Map[String, String], playerJs: PlayerJs) extends CorespringJsClient {
   override lazy val fileNames: Seq[String] = Seq("player.js")
 
   override lazy val bootstrap: String =
@@ -111,7 +108,7 @@ private[launcher] object ItemEditors extends LaunchCompanionUtils {
   }
 }
 
-private[launcher] case class ItemEditors(corespringUrl: String, load: String => Option[String], queryParams: Map[String, String]) extends CorespringJsClient {
+private[launcher] case class ItemEditors(corespringUrl: String, builder: JsBuilder, queryParams: Map[String, String]) extends CorespringJsClient {
   override lazy val fileNames: Seq[String] = Seq("item-editor.js", "draft.js", "draft-editor.js")
   override lazy val bootstrap: String =
     """
@@ -137,12 +134,12 @@ private[launcher] case class ItemEditors(corespringUrl: String, load: String => 
 }
 
 private[launcher] object ComponentEditor extends LaunchCompanionUtils {
-  def apply(playerConfig: V2PlayerConfig, rh: RequestHeader): ComponentEditor = {
-    ComponentEditor(url(playerConfig, rh), resourceToString(_), params(rh))
+  def apply(playerConfig: V2PlayerConfig, rh: RequestHeader, builder: JsBuilder): ComponentEditor = {
+    ComponentEditor(url(playerConfig, rh), builder, params(rh))
   }
 }
 
-private[launcher] case class ComponentEditor(corespringUrl: String, load: String => Option[String], queryParams: Map[String, String]) extends CorespringJsClient {
+private[launcher] case class ComponentEditor(corespringUrl: String, builder: JsBuilder, queryParams: Map[String, String]) extends CorespringJsClient {
 
   override val fileNames = Seq("draft.js", "component-editor.js")
 
