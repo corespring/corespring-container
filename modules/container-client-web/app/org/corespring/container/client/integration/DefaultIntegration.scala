@@ -49,7 +49,7 @@ trait DefaultIntegration
   def containerContext: ContainerExecutionContext
 
   def loadResource: String => Option[URL]
-  val resourceLoader = new ResourcePath(loadResource)
+  lazy val resourceLoader = new ResourcePath(loadResource)
   /**
    * For a given resource path return a resolved path.
    * By default this just returns the path, so no domain is used.
