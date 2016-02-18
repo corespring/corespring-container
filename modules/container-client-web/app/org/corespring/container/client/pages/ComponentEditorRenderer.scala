@@ -18,7 +18,7 @@ class ComponentEditorRenderer(
   pageSourceService: PageSourceService,
   componentJson: ComponentJson,
   assetPathProcessor: AssetPathProcessor,
-  versionInfo: JsValue = Json.obj()) {
+  versionInfo: JsValue) {
 
   private val logger = Logger(classOf[ComponentEditorRenderer])
 
