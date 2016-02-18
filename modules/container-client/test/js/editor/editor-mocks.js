@@ -136,4 +136,59 @@
       };
     });
   };
+
+
+  e.withWindowMocks = function(mocks, fn){
+
+    function getTargetObject(root, key){
+
+      function _getTarget(root, steps){
+        if(steps.length === 1){
+          return { target: root, key: steps[0]};
+        } else {
+          var subKey = steps.shift();
+          root[subKey] = root[subKey] || {};
+          return _getTarget(root[subKey], steps.slice());
+        }
+      }
+      return _getTarget(root, key.split('.'));
+    }
+
+    var stash = {};
+    beforeEach(function(){
+      for(var x in mocks){
+        var targetAndKey = getTargetObject(window, x);
+        stash[x] = targetAndKey.target[targetAndKey.key];
+        targetAndKey.target[targetAndKey.key] = mocks[x];
+      }
+    });
+
+    fn(mocks);
+
+    afterEach(function(){
+      for(var x in stash){
+        var tk = getTargetObject(window, x);
+        tk.target[tk.key] = stash[x];
+      }
+    });
+  };
+
+  e['com.ee.RawFileUploader'] = function(){
+    return function(file, result, url, name, opts){
+      var uploadOpts = opts;
+      this.beginUpload = jasmine.createSpy('beginUpload').and.callFake(function(){
+        uploadOpts.onUploadComplete({}, 200);
+      });
+    };
+  };
+
+  e.FileReader = function(){
+    return function(){
+      var out = {};
+      out.readAsBinaryString =  jasmine.createSpy('readAsBinaryString').and.callFake(function(){
+        out.onloadend();
+      });
+      return out;
+    };
+  };
 })();
