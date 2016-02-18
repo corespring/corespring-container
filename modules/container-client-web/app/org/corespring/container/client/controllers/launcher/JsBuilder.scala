@@ -6,15 +6,15 @@ import play.api.templates.TxtFormat
 
 private[corespring] class JsBuilder(val load: String => Option[String]) extends JsResource {
 
-  def lib(n: String) = s"container-client/js/player-launcher/$n"
+  private def lib(n: String) = s"container-client/js/player-launcher/$n"
 
   lazy val coreJs: String = {
 
     val corePaths = {
       Some("container-client/bower_components/msgr.js/dist/msgr.js") ++
         Seq("logger", "callback-utils", "error-codes", "instance", "client-launcher", "url-builder", "object-id", "draft-id")
-          .map(s => s"$s.js")
-          .map(lib)
+        .map(s => s"$s.js")
+        .map(lib)
     }
 
     val rawJs = pathToNameAndContents("container-client/js/corespring/core-library.js")._2
@@ -31,7 +31,7 @@ private[corespring] class JsBuilder(val load: String => Option[String]) extends 
       """
   }
 
-  def buildJs(corespringUrl:String, files: Seq[String], options: JsObject, bootstrapLine: String, queryParams: Map[String, String]): String = {
+  def buildJs(corespringUrl: String, files: Seq[String], options: JsObject, bootstrapLine: String, queryParams: Map[String, String]): String = {
 
     val additionalJsNameAndSrc = files.map(lib(_)).map(pathToNameAndContents)
 
