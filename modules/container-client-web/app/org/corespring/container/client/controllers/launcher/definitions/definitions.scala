@@ -9,39 +9,35 @@ import play.api.mvc.{ Call, RequestHeader, Session, SimpleResult }
 
 private[launcher] trait LaunchCompanionUtils {
   def params(rh: RequestHeader) = rh.queryString.mapValues(_.mkString(""))
-  def url(cfg: V2PlayerConfig, rh: RequestHeader) = cfg.rootUrl.getOrElse(BaseUrl(rh))
 }
 
-private[launcher] trait FullPath {
-  def fullPath(n: String) = s"container-client/js/player-launcher/$n"
-}
-
-trait CorespringJsClient extends FullPath {
+trait CorespringJsClient {
 
   implicit def callToJsv(c: Call): JsValueWrapper = toJsFieldJsValueWrapper(obj("method" -> c.method, "url" -> c.url))
 
   def builder: JsBuilder
-  def corespringUrl: String
   def fileNames: Seq[String]
   def bootstrap: String
   def options: JsObject
   def queryParams: Map[String, String]
 
-  lazy val src = builder.buildJs(fileNames, options, bootstrap, queryParams)
+  def src(corespringUrl:String) = {
+    builder.buildJs(corespringUrl, fileNames, options, bootstrap, queryParams)
+  }
 
-  def result: SimpleResult = {
+  def result(corespringUrl:String): SimpleResult = {
     import play.api.mvc.Results.Ok
-    Ok(src).as(ContentTypes.JAVASCRIPT)
+    Ok(src(corespringUrl)).as(ContentTypes.JAVASCRIPT)
   }
 }
 
 private[launcher] object Catalog extends LaunchCompanionUtils {
   def apply(playerConfig: V2PlayerConfig, rh: RequestHeader, builder: JsBuilder): Catalog = {
-    Catalog(url(playerConfig, rh), builder, params(rh))
+    Catalog(builder, params(rh))
   }
 }
 
-private[launcher] case class Catalog(corespringUrl: String, val builder: JsBuilder, queryParams: Map[String, String]) extends CorespringJsClient {
+private[launcher] case class Catalog(val builder: JsBuilder, queryParams: Map[String, String]) extends CorespringJsClient {
   override def fileNames: Seq[String] = Seq("catalog.js")
 
   override def bootstrap: String =
@@ -58,11 +54,11 @@ private[launcher] case class Catalog(corespringUrl: String, val builder: JsBuild
 
 private[launcher] object Player extends LaunchCompanionUtils {
   def apply(playerConfig: V2PlayerConfig, rh: RequestHeader, playerJs: PlayerJs, builder: JsBuilder): Player = {
-    Player(url(playerConfig, rh), builder, params(rh), playerJs)
+    Player(builder, params(rh), playerJs)
   }
 }
 
-private[launcher] case class Player(corespringUrl: String, builder: JsBuilder, queryParams: Map[String, String], playerJs: PlayerJs) extends CorespringJsClient {
+private[launcher] case class Player(builder: JsBuilder, queryParams: Map[String, String], playerJs: PlayerJs) extends CorespringJsClient {
   override lazy val fileNames: Seq[String] = Seq("player.js")
 
   override lazy val bootstrap: String =
@@ -89,19 +85,19 @@ private[launcher] case class Player(corespringUrl: String, builder: JsBuilder, q
   protected def sumSession(s: Session, keyValues: (String, String)*): Session = keyValues.foldRight(s) { case ((key, value), acc) => acc + (key -> value) }
   val SecureMode = "corespring.player.secure"
 
-  override val result: SimpleResult = {
+  override def result(corespringUrl:String): SimpleResult = {
     val finalSession = sumSession(playerJs.session, (SecureMode, playerJs.isSecure.toString))
-    super.result.withSession(finalSession)
+    super.result(corespringUrl).withSession(finalSession)
   }
 }
 
 private[launcher] object ItemEditors extends LaunchCompanionUtils {
   def apply(playerConfig: V2PlayerConfig, rh: RequestHeader, builder: JsBuilder): ItemEditors = {
-    ItemEditors(url(playerConfig, rh), builder, params(rh))
+    ItemEditors(builder, params(rh))
   }
 }
 
-private[launcher] case class ItemEditors(corespringUrl: String, builder: JsBuilder, queryParams: Map[String, String]) extends CorespringJsClient {
+private[launcher] case class ItemEditors(builder: JsBuilder, queryParams: Map[String, String]) extends CorespringJsClient {
   override lazy val fileNames: Seq[String] = Seq("item-editor.js", "draft.js", "draft-editor.js")
   override lazy val bootstrap: String =
     """
@@ -128,11 +124,11 @@ private[launcher] case class ItemEditors(corespringUrl: String, builder: JsBuild
 
 private[launcher] object ComponentEditor extends LaunchCompanionUtils {
   def apply(playerConfig: V2PlayerConfig, rh: RequestHeader, builder: JsBuilder): ComponentEditor = {
-    ComponentEditor(url(playerConfig, rh), builder, params(rh))
+    ComponentEditor(builder, params(rh))
   }
 }
 
-private[launcher] case class ComponentEditor(corespringUrl: String, builder: JsBuilder, queryParams: Map[String, String]) extends CorespringJsClient {
+private[launcher] case class ComponentEditor(builder: JsBuilder, queryParams: Map[String, String]) extends CorespringJsClient {
 
   override val fileNames = Seq("draft.js", "component-editor.js")
 

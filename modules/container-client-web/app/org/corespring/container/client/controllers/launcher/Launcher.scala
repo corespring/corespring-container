@@ -28,6 +28,10 @@ trait Launcher extends Controller with HasContainerContext {
   def hooks: PlayerLauncherHooks
   def playerConfig: V2PlayerConfig
 
+  def corespringUrl(request:RequestHeader) = {
+    playerConfig.rootUrl.getOrElse(BaseUrl(request))
+  }
+
   lazy val logger = ContainerLogger.getLogger("PlayerLauncher")
 
 }

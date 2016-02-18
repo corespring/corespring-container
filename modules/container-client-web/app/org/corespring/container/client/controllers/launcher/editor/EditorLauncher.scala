@@ -9,7 +9,7 @@ trait EditorLauncher extends Launcher {
 
   def editorJs = Action.async { implicit request =>
     hooks.editorJs.map { implicit js =>
-      ItemEditors(playerConfig, request, builder).result
+      ItemEditors(playerConfig, request, builder).result(corespringUrl(request))
     }
   }
 }

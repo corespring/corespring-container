@@ -4,15 +4,17 @@ import org.corespring.container.client.views.txt.js.ServerLibraryWrapper
 import play.api.libs.json.{ JsObject, Json }
 import play.api.templates.TxtFormat
 
-private[launcher] class JsBuilder(corespringUrl: String, val load: String => Option[String]) extends JsResource {
+private[corespring] class JsBuilder(val load: String => Option[String]) extends JsResource {
+
+  def lib(n: String) = s"container-client/js/player-launcher/$n"
 
   lazy val coreJs: String = {
 
-    def lib(n: String) = s"container-client/js/player-launcher/$n.js"
-
     val corePaths = {
       Some("container-client/bower_components/msgr.js/dist/msgr.js") ++
-        Seq("logger", "callback-utils", "error-codes", "instance", "client-launcher", "url-builder", "object-id", "draft-id").map(lib)
+        Seq("logger", "callback-utils", "error-codes", "instance", "client-launcher", "url-builder", "object-id", "draft-id")
+          .map(s => s"$s.js")
+          .map(lib)
     }
 
     val rawJs = pathToNameAndContents("container-client/js/corespring/core-library.js")._2
@@ -29,9 +31,9 @@ private[launcher] class JsBuilder(corespringUrl: String, val load: String => Opt
       """
   }
 
-  def buildJs(files: Seq[String], options: JsObject, bootstrapLine: String, queryParams: Map[String, String]): String = {
+  def buildJs(corespringUrl:String, files: Seq[String], options: JsObject, bootstrapLine: String, queryParams: Map[String, String]): String = {
 
-    val additionalJsNameAndSrc = files.map(pathToNameAndContents)
+    val additionalJsNameAndSrc = files.map(lib(_)).map(pathToNameAndContents)
 
     val fullConfig = Json.obj(
       "corespringUrl" -> corespringUrl,

@@ -36,7 +36,7 @@ class ComponentEditorRenderer(
     }
   }
 
-  def render(componentBundle: SingleComponentScriptBundle, previewMode: String, clientOptions: ComponentEditorOptions, prodMode: Boolean = false): Future[Html] = Future {
+  def render(componentBundle: SingleComponentScriptBundle, previewMode: String, clientOptions: ComponentEditorOptions, prodMode: Boolean): Future[Html] = Future {
 
     logger.info(s"function=render, componentBundle=$componentBundle")
 

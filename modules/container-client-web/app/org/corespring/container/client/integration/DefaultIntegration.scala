@@ -9,6 +9,7 @@ import org.corespring.container.client.component.{ ComponentUrls, _ }
 import org.corespring.container.client.controllers._
 import org.corespring.container.client.controllers.apps._
 import org.corespring.container.client.controllers.helpers.LoadClientSideDependencies
+import org.corespring.container.client.controllers.launcher.JsBuilder
 import org.corespring.container.client.controllers.launcher.editor.EditorLauncher
 import org.corespring.container.client.controllers.launcher.player.PlayerLauncher
 import org.corespring.container.client.controllers.resources._
@@ -45,6 +46,8 @@ trait DefaultIntegration
   private[DefaultIntegration] val debounceInMillis: Long = configuration.getLong("editor.autosave.debounceInMillis").getOrElse(5000)
 
   def versionInfo: JsObject
+
+  val mode = Play.current.mode
 
   def containerContext: ContainerExecutionContext
 
@@ -94,7 +97,7 @@ trait DefaultIntegration
 
   private lazy val playerConfig: V2PlayerConfig = V2PlayerConfig(configuration)
 
-  def scopeBuilder = if (Play.current.mode == Mode.Prod) {
+  def scopeBuilder = if (mode == Mode.Prod) {
     logger.trace("Prod RhinoScopeBuilder")
     prodScopeBuilder
   } else {
@@ -115,7 +118,7 @@ trait DefaultIntegration
 
     override def pageSourceService: PageSourceService = DefaultIntegration.this.pageSourceService
 
-    override def mode: Mode = Play.current.mode
+    override def mode: Mode = DefaultIntegration.this.mode
 
     override def containerContext = DefaultIntegration.this.containerContext
 
@@ -175,6 +178,9 @@ trait DefaultIntegration
 
   lazy val componentEditor = wire[ComponentEditor]
 
+
+  lazy val jsBuilder = new JsBuilder(resourceLoader.loadPath(_))
+
   /** TODO: Use macwire for the dependencies below.*/
   lazy val itemEditor = new ItemEditor {
 
@@ -191,7 +197,7 @@ trait DefaultIntegration
 
     override def versionInfo: JsObject = DefaultIntegration.this.versionInfo
 
-    override def mode: Mode = Play.current.mode
+    override def mode: Mode = DefaultIntegration.this.mode
 
     override def containerContext = DefaultIntegration.this.containerContext
 
@@ -214,7 +220,7 @@ trait DefaultIntegration
     override def bundler: ComponentBundler = DefaultIntegration.this.componentBundler
     override def versionInfo: JsObject = DefaultIntegration.this.versionInfo
 
-    override def mode: Mode = Play.current.mode
+    override def mode: Mode = DefaultIntegration.this.mode
 
     override def containerContext = DefaultIntegration.this.containerContext
 
@@ -239,7 +245,7 @@ trait DefaultIntegration
 
     override def versionInfo: JsObject = DefaultIntegration.this.versionInfo
 
-    override def mode: Mode = Play.current.mode
+    override def mode: Mode = DefaultIntegration.this.mode
 
     override def containerContext = DefaultIntegration.this.containerContext
 
@@ -259,7 +265,7 @@ trait DefaultIntegration
     override def renderer: ComponentEditorRenderer = DefaultIntegration.this.componentEditorRenderer
 
     override def bundler: ComponentBundler = DefaultIntegration.this.componentBundler
-    override def mode: Mode = Play.current.mode
+    override def mode: Mode = DefaultIntegration.this.mode
 
     override def containerContext = DefaultIntegration.this.containerContext
 
@@ -277,8 +283,8 @@ trait DefaultIntegration
   lazy val catalog = new Catalog {
     override def assetPathProcessor: AssetPathProcessor = DefaultIntegration.this.assetPathProcessor
     override def pageSourceService: PageSourceService = DefaultIntegration.this.pageSourceService
-    override def mode: Mode = Play.current.mode
 
+    override def mode: Mode = DefaultIntegration.this.mode
     override def containerContext = DefaultIntegration.this.containerContext
 
     override def urls: ComponentUrls = componentSets
@@ -294,7 +300,7 @@ trait DefaultIntegration
 
     override def versionInfo: JsObject = DefaultIntegration.this.versionInfo
 
-    override def mode: Mode = Play.current.mode
+    override def mode: Mode = DefaultIntegration.this.mode
 
     override def containerContext = DefaultIntegration.this.containerContext
 
@@ -369,6 +375,10 @@ trait DefaultIntegration
   }
 
   lazy val playerLauncher = new PlayerLauncher {
+
+
+    override def builder: JsBuilder = DefaultIntegration.this.jsBuilder
+
     override def containerContext = DefaultIntegration.this.containerContext
 
     def hooks = playerLauncherHooks
@@ -377,6 +387,7 @@ trait DefaultIntegration
   }
 
   lazy val editorLauncher = new EditorLauncher {
+    override def builder: JsBuilder = DefaultIntegration.this.jsBuilder
     override def containerContext = DefaultIntegration.this.containerContext
     def hooks = playerLauncherHooks
     override def playerConfig: V2PlayerConfig = DefaultIntegration.this.playerConfig
