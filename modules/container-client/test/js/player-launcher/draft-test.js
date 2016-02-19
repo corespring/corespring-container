@@ -66,4 +66,54 @@ describe('draft', function() {
     });
   });
 
+
+  describe('xhrCommitDraft', function(){
+
+    beforeEach(function(){
+      done = jasmine.createSpy('done');
+    });
+
+    describe('when successful', function(){
+
+      beforeEach(function(){
+        $.ajax.and.callFake(function(opts){
+          opts.success();
+        });
+        draft.xhrCommitDraft('POST', 'url', 'draftId', done);
+      });
+
+      it('call $.ajax', function(){
+        expect($.ajax).toHaveBeenCalledWith({
+          type: 'POST',
+          url: 'url', 
+          data: jasmine.any(Object),
+          success: jasmine.any(Function),
+          error: jasmine.any(Function),
+          dataType: 'json'
+        });
+      });
+
+      it('calls the callback', function(){
+        expect(done).toHaveBeenCalledWith(null);
+      });
+    });
+
+    describe('when it fails', function(){
+      beforeEach(function(){
+        $.ajax.and.callFake(function(opts){
+          opts.error({
+            responseJSON: {
+              error: 'error'
+            }
+          });
+        });
+        draft.xhrCommitDraft('POST', 'url', 'draftId', done);
+      });
+
+      it('calls the callback', function(){
+        expect(done).toHaveBeenCalledWith(errorCodes.COMMIT_DRAFT_FAILED('error'));
+      });
+    });
+  });
+
 });
