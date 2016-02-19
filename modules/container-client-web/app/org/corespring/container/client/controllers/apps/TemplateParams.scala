@@ -53,7 +53,6 @@ case class PreviewRightComponentEditorOptions(
   singleComponentKey: String = SingleComponent.Key)
   extends ComponentEditorOptions {
   override def toJson = Json.format[PreviewRightComponentEditorOptions].writes(this)
-
 }
 
 case class TabComponentEditorOptions(activePane: Option[String],
@@ -67,20 +66,6 @@ case class TabComponentEditorOptions(activePane: Option[String],
 
 object ComponentEditorOptions {
   def default = TabComponentEditorOptions(None, None, None, None)
-}
-
-case class ComponentEditorTemplateParams(appName: String,
-  js: Seq[String],
-  css: Seq[String],
-  componentNgModules: Seq[String],
-  ngServiceLogic: String,
-  versionInfo: JsValue,
-  options: ComponentEditorOptions,
-  previewMode: String) extends TemplateParams {
-  override def toJadeParams = {
-    val extras = Map("versionInfo" -> versionInfo, "previewMode" -> previewMode, "options" -> Json.stringify(options.toJson))
-    super.toJadeParams ++ extras
-  }
 }
 
 case class EditorTemplateParams(appName: String,

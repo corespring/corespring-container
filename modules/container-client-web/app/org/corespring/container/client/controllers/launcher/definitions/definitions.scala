@@ -11,9 +11,13 @@ private[launcher] trait LaunchCompanionUtils {
   def params(rh: RequestHeader) = rh.queryString.mapValues(_.mkString(""))
 }
 
-trait CorespringJsClient {
-
+private object Implicits {
   implicit def callToJsv(c: Call): JsValueWrapper = toJsFieldJsValueWrapper(obj("method" -> c.method, "url" -> c.url))
+}
+
+import org.corespring.container.client.controllers.launcher.Implicits._
+
+trait CorespringJsClient {
 
   def builder: JsBuilder
   def fileNames: Seq[String]
@@ -21,11 +25,11 @@ trait CorespringJsClient {
   def options: JsObject
   def queryParams: Map[String, String]
 
-  def src(corespringUrl:String) = {
+  def src(corespringUrl: String) = {
     builder.buildJs(corespringUrl, fileNames, options, bootstrap, queryParams)
   }
 
-  def result(corespringUrl:String): SimpleResult = {
+  def result(corespringUrl: String): SimpleResult = {
     import play.api.mvc.Results.Ok
     Ok(src(corespringUrl)).as(ContentTypes.JAVASCRIPT)
   }
@@ -85,41 +89,45 @@ private[launcher] case class Player(builder: JsBuilder, queryParams: Map[String,
   protected def sumSession(s: Session, keyValues: (String, String)*): Session = keyValues.foldRight(s) { case ((key, value), acc) => acc + (key -> value) }
   val SecureMode = "corespring.player.secure"
 
-  override def result(corespringUrl:String): SimpleResult = {
+  override def result(corespringUrl: String): SimpleResult = {
     val finalSession = sumSession(playerJs.session, (SecureMode, playerJs.isSecure.toString))
     super.result(corespringUrl).withSession(finalSession)
   }
 }
 
 private[launcher] object ItemEditors extends LaunchCompanionUtils {
+
   def apply(playerConfig: V2PlayerConfig, rh: RequestHeader, builder: JsBuilder): ItemEditors = {
     ItemEditors(builder, params(rh))
   }
 }
 
 private[launcher] case class ItemEditors(builder: JsBuilder, queryParams: Map[String, String]) extends CorespringJsClient {
-  override lazy val fileNames: Seq[String] = Seq("item-editor.js", "draft.js", "draft-editor.js")
-  override lazy val bootstrap: String =
+  import org.corespring.container.client.controllers.apps.routes.{ DraftDevEditor => DraftDevEditorRoutes, DraftEditor => DraftEditorRoutes, ItemDevEditor => ItemDevEditorRoutes, ItemEditor => ItemEditorRoutes }
+  import org.corespring.container.client.controllers.resources.routes.{ Item => ItemRoutes, ItemDraft => ItemDraftRoutes }
+
+  val paths: JsObject = obj(
+    "itemEditor" -> obj(
+      "editor" -> ItemEditorRoutes.load(":itemId"),
+      "devEditor" -> ItemDevEditorRoutes.load(":itemId"),
+      "createItem" -> ItemRoutes.create()),
+    "draftEditor" -> obj(
+      "editor" -> DraftEditorRoutes.load(":draftId"),
+      "devEditor" -> DraftDevEditorRoutes.load(":draftId"),
+      "createItemAndDraft" -> ItemDraftRoutes.createItemAndDraft(),
+      "commitDraft" -> ItemDraftRoutes.commit(":draftId"),
+      "save" -> ItemDraftRoutes.save(":draftId")))
+
+  override lazy val options: JsObject = obj("paths" -> paths)
+
+  override val fileNames: Seq[String] = Seq("item-editor.js", "draft.js", "draft-editor.js")
+
+  override val bootstrap: String =
     """
       |org.corespring.players.ItemEditor = corespring.require('item-editor');
       |org.corespring.players.DraftEditor = corespring.require('draft-editor');
       |
     """.stripMargin
-
-  import org.corespring.container.client.controllers.apps.routes.{ DraftDevEditor => DraftDevEditorRoutes, DraftEditor => DraftEditorRoutes, ItemDevEditor => ItemDevEditorRoutes, ItemEditor => ItemEditorRoutes }
-  import org.corespring.container.client.controllers.resources.routes.{ Item => ItemRoutes, ItemDraft => ItemDraftRoutes }
-  override def options: JsObject = obj(
-    "paths" -> obj(
-      "itemEditor" -> obj(
-        "editor" -> ItemEditorRoutes.load(":itemId"),
-        "devEditor" -> ItemDevEditorRoutes.load(":itemId"),
-        "createItem" -> ItemRoutes.create()),
-      "draftEditor" -> obj(
-        "editor" -> DraftEditorRoutes.load(":draftId"),
-        "devEditor" -> DraftDevEditorRoutes.load(":draftId"),
-        "createItemAndDraft" -> ItemDraftRoutes.createItemAndDraft(),
-        "commitDraft" -> ItemDraftRoutes.commit(":draftId"),
-        "save" -> ItemDraftRoutes.save(":draftId"))))
 }
 
 private[launcher] object ComponentEditor extends LaunchCompanionUtils {
@@ -141,7 +149,9 @@ private[launcher] case class ComponentEditor(builder: JsBuilder, queryParams: Ma
     """.stripMargin
 
   private object r {
+
     import org.corespring.container.client.controllers.{ apps, resources }
+
     val componentEditor = apps.routes.ComponentEditor
     val itemEditor = apps.routes.ItemEditor
     val draftEditor = apps.routes.DraftEditor
@@ -167,4 +177,5 @@ private[launcher] case class ComponentEditor(builder: JsBuilder, queryParams: Ma
           "loadEditor" -> r.draftEditor.componentEditor(":draftId"),
           "upload" -> r.draftEditor.uploadFile(":draftId", ":filename"),
           "saveComponents" -> r.draft.saveSubset(":draftId", "components")))))
+
 }
