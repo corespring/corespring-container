@@ -1,30 +1,6 @@
 describe('component-editor', function () {
     
-  var launcher, instance, Def, errorCodes, modules; 
-
-  function MockLauncher(){
-
-    this.init = jasmine.createSpy('init').and.returnValue(true);
-
-    this.loadInstance = jasmine.createSpy('loadInstance').and.callFake(function(call, queryParams, initialData, onReady){
-      if(onReady){ 
-        onReady(instance); 
-      }
-      return instance;
-    });
-
-    this.loadCall = jasmine.createSpy('loadCall').and.callFake(function(){
-      return {method: 'GET', url: 'catalog/:itemId'};
-    });
-
-    this.prepareUrl = jasmine.createSpy('prepareUrl').and.callFake(function(url){
-      return url;
-    });
-
-    this.mkInstance = jasmine.createSpy('mkInstance').and.callFake(function(){
-        return instance;
-    });
-  }
+  var launcherFn, instance, Def, errorCodes, modules; 
 
   beforeEach(function () {
     corespring.mock.modules['launch-config'] = {};
@@ -33,24 +9,22 @@ describe('component-editor', function () {
       getComponentKey: 'singleComponent'
     };
 
-    instance = {
-      send: jasmine.createSpy('send').and.callFake(function(){
-        var args = Array.prototype.slice.call(arguments);
-        var done = args[args.length -1];
-        var key = args[0];
-        done = _.isFunction(done) ? done : null;
-        if(done){
-          done(null, sendResults[key] || {});
-        }
-      })
-    };
-    launcher = new MockLauncher();
-    corespring.mock.modules['client-launcher'] = function(){
-      return launcher;
-    };
+    instance = new org.corespring.mocks.launcher.MockInstance();
+
+    instance.send = jasmine.createSpy('send').and.callFake(function(){
+      var args = Array.prototype.slice.call(arguments);
+      var done = args[args.length -1];
+      var key = args[0];
+      done = _.isFunction(done) ? done : null;
+      if(done){
+        done(null, sendResults[key] || {});
+      }
+    });
+
+    launcherFn = new org.corespring.mocks.launcher.MockLauncher(instance);
+    corespring.mock.modules['client-launcher'] = launcherFn; 
     modules = corespring.require('component-editor');
     errorCodes = corespring.require('error-codes');
-   
     errorCallback = jasmine.createSpy('errorCallback');
   });
 
