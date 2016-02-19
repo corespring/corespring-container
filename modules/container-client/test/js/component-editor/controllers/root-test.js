@@ -42,13 +42,6 @@ describe('component-editor Root', function(){
       expect(scope.componentKey).toEqual('compKey');
     });
     
-    // it('sets activePane', function(){
-    //   expect(scope.activePane).toEqual('config');
-    // });
-    
-    // it('sets showNavigation', function(){
-    //   expect(scope.showNavigation).toEqual(false);
-    // });
   });
 
   describe('in iframe', function(){
