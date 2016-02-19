@@ -1,6 +1,6 @@
 describe('component-editor', function () {
     
-  var launcherFn, instance, Def, errorCodes, modules; 
+  var launcher, instance, Def, errorCodes, modules; 
 
   beforeEach(function () {
     corespring.mock.modules['launch-config'] = {};
@@ -11,7 +11,7 @@ describe('component-editor', function () {
 
     instance = new org.corespring.mocks.launcher.MockInstance();
 
-    instance.send = jasmine.createSpy('send').and.callFake(function(){
+    instance.send.and.callFake(function(){
       var args = Array.prototype.slice.call(arguments);
       var done = args[args.length -1];
       var key = args[0];
@@ -21,8 +21,11 @@ describe('component-editor', function () {
       }
     });
 
-    launcherFn = new org.corespring.mocks.launcher.MockLauncher(instance);
-    corespring.mock.modules['client-launcher'] = launcherFn; 
+    var launcherFn = org.corespring.mocks.launcher.MockLauncher(instance);
+    launcher = new launcherFn();
+    corespring.mock.modules['client-launcher'] = function(){
+      return launcher;
+    }; 
     modules = corespring.require('component-editor');
     errorCodes = corespring.require('error-codes');
     errorCallback = jasmine.createSpy('errorCallback');
@@ -30,6 +33,35 @@ describe('component-editor', function () {
 
   afterEach(function () {
     corespring.mock.reset();
+  });
+
+  describe('QuestionComponentEditor', function(){
+
+    beforeEach(function(){
+      spyOn(modules, 'Draft');
+      spyOn(modules, 'Item');
+      spyOn(modules, 'Standalone');
+    });
+
+    it('defaults to item', function(){
+      new modules.QuestionComponentEditor('el', {}, jasmine.createSpy());
+      expect(modules.Item).toHaveBeenCalled();
+    }); 
+    
+    it('creates to Item editor if contentStorage: item', function(){
+      new modules.QuestionComponentEditor('el', {contentStorage: 'item'}, jasmine.createSpy());
+      expect(modules.Item).toHaveBeenCalled();
+    }); 
+    
+    it('creates to Standalone editor if contentStorage: none', function(){
+      new modules.QuestionComponentEditor('el', {contentStorage: 'none'}, jasmine.createSpy());
+      expect(modules.Standalone).toHaveBeenCalled();
+    }); 
+    
+    it('creates to Draft editor if contentStorage: draft', function(){
+      new modules.QuestionComponentEditor('el', {contentStorage: 'draft'}, jasmine.createSpy());
+      expect(modules.Draft).toHaveBeenCalled();
+    }); 
   });
 
   describe('standalone', function(){
@@ -349,7 +381,7 @@ describe('component-editor', function () {
       
       it('calls draft.xhrCommitDraft', function(){
         draft.commitDraft(false, jasmine.createSpy('onDone'));
-        expect(draftHelper.xhrCommitDraft).toHaveBeenCalledWith('GET', 'draft', jasmine.any(Object), jasmine.any(Function));
+        expect(draftHelper.xhrCommitDraft).toHaveBeenCalledWith('GET', 'draft?params={"force":false}', jasmine.any(Object), jasmine.any(Function));
       });
       
       it('calls done', function(){

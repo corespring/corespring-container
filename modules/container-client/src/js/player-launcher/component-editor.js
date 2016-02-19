@@ -336,7 +336,7 @@ function Draft(element, options, errorCallback) {
     } else {
       createItemAndDraft(options.componentType, function(err, result){
         if(err){
-          errorCallback(errorCodes.CREATE_ITEM_AND_DRAFT_FAILED(err));
+          errorCallback(err);
         } else {
           options.itemId = result.itemId;
           options.draftName = result.draftName;
@@ -383,7 +383,7 @@ exports.Standalone = Standalone;
 exports.Draft = Draft;
 exports.Item = Item;
 
-exports. QuestionComponentEditor = function(el, options, errorCallback){
+exports.QuestionComponentEditor = function(el, options, errorCallback){
   options = options || {};
   if(options.contentStorage === 'draft'){
     return new exports.Draft(el, options, errorCallback);
