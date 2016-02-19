@@ -84,7 +84,7 @@ function EditorDefinition(element, options, errorCallback) {
     } else {
       createItemAndDraft(function(err, result) {
         if (err) {
-          errorCallback(errorCodes.CREATE_ITEM_AND_DRAFT_FAILED(err));
+          errorCallback(err);
         } else {
           options.itemId = result.itemId;
           options.draftName = result.draftName;

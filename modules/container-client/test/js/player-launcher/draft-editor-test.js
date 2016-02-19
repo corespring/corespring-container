@@ -237,11 +237,7 @@ describe('draft-editor', function() {
         });
 
         var editor = new DraftEditor('element', {}, onError);
-        
-        expect(onError).toHaveBeenCalledWith({
-          code: 113,
-          msg: 'e'
-        });
+        expect(onError).toHaveBeenCalledWith(errorCodes.CREATE_ITEM_AND_DRAFT_FAILED('e'));
       });
 
       describe('when there is a createItemAndSession ajax call', function() {

@@ -73,7 +73,7 @@ trait Player
     }
   }
 
-  lazy val controlsJsSrc: SourcePaths = ??? //SourcePaths.fromJsonResource(modulePath, s"container-client/$context-controls-js-report.json")
+  lazy val controlsJsSrc: SourcePaths = pageSourceService.loadJs(s"player-controls")
 
   override def context: String = "player"
 
