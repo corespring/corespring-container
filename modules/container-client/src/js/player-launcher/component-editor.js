@@ -382,3 +382,14 @@ exports._Helper = Helper;
 exports.Standalone = Standalone;
 exports.Draft = Draft;
 exports.Item = Item;
+
+exports. QuestionComponentEditor = function(el, options, errorCallback){
+  options = options || {};
+  if(options.contentStorage === 'draft'){
+    return new exports.Draft(el, options, errorCallback);
+  } else if(options.contentStorage === 'none'){
+    return new exports.Standalone(el, options, errorCallback);
+  } else {
+    return new exports.Item(el, options, errorCallback);
+  } 
+};

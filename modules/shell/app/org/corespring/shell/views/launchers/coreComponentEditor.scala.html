@@ -37,16 +37,17 @@
          $('.create-opts').hide();
        }
 
-       window.createEditor = function(btn, editorName){
+       window.createEditor = function(btn, contentStorage){
 
          var previewMode = $(btn).attr('data-option');
          var t = $('.component-type').find(":selected").attr('name');
          opts.componentType = t;
+         opts.contentStorage = contentStorage;
          opts.previewMode = previewMode;
          opts.previewWidth = $('.preview-width').val();
          window.updateControls(previewMode);
 
-         window.editor = new org.corespring.players[editorName](holder, opts, function(err){
+         window.editor = new org.corespring.editors.QuestionComponentEditor(holder, opts, function(err){
            console.warn(err);
          });
        };

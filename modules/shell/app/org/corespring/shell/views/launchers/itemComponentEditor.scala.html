@@ -23,7 +23,8 @@
       };
 
       if(opts.itemId){
-        editor = new org.corespring.players.ItemComponentEditor(holder, opts, function(err){
+        opts.contentStorage = 'item';
+        editor = new org.corespring.editors.QuestionComponentEditor(holder, opts, function(err){
           console.warn(err);
         });
 
@@ -31,7 +32,7 @@
 
       } else {
         $('.create').click(function(){
-          window.createEditor(this, 'ItemComponentEditor');
+          window.createEditor(this, 'item');
         });
       }
     });

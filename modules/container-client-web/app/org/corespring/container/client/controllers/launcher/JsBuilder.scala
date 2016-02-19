@@ -24,6 +24,7 @@ private[corespring] class JsBuilder(val load: String => Option[String]) extends 
          |window.org = window.org || {};
          |org.corespring = org.corespring || {};
          |org.corespring.players = org.corespring.players || {};
+         |org.corespring.editors = org.corespring.editors || {};
       """.stripMargin
     s"""$bootstrap
         $rawJs

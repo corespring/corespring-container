@@ -39,13 +39,14 @@
       };
 
       if(opts.itemId){
-        editor = new org.corespring.players.ItemComponentEditor(holder, opts, function(err){
+        opts.contentStorage = 'draft';
+        editor = new org.corespring.editors.QuestionComponentEditor(holder, opts, function(err){
           console.warn(err);
         });
         window.updateControls("tabs");
       } else {
         $('.create').click(function(){
-          window.createEditor(this, 'DraftComponentEditor');
+          window.createEditor(this, 'draft');
         });
       }
     });

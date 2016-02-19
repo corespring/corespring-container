@@ -126,6 +126,8 @@ private[launcher] case class ItemEditors(builder: JsBuilder, queryParams: Map[St
     """
       |org.corespring.players.ItemEditor = corespring.require('item-editor');
       |org.corespring.players.DraftEditor = corespring.require('draft-editor');
+      |org.corespring.editors.ItemEditor = corespring.require('item-editor');
+      |org.corespring.editors.DraftEditor = corespring.require('draft-editor');
       |
     """.stripMargin
 }
@@ -143,9 +145,8 @@ private[launcher] case class ComponentEditor(builder: JsBuilder, queryParams: Ma
   override val bootstrap =
     """
       |var modules = corespring.require('component-editor');
-      |org.corespring.players.ComponentEditor = modules.Standalone;
-      |org.corespring.players.ItemComponentEditor = modules.Item;
-      |org.corespring.players.DraftComponentEditor = modules.Draft;
+      |org.corespring.players.QuestionComponentEditor = modules.QuestionComponentEditor;
+      |org.corespring.editors.QuestionComponentEditor = modules.QuestionComponentEditor;
     """.stripMargin
 
   private object r {
