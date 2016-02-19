@@ -145,7 +145,13 @@ private[launcher] case class ComponentEditor(builder: JsBuilder, queryParams: Ma
   override val bootstrap =
     """
       |var modules = corespring.require('component-editor');
+      |org.corespring.players.ComponentEditor = modules.Standalone;
+      |org.corespring.players.ItemComponentEditor = modules.Item;
+      |org.corespring.players.DraftComponentEditor = modules.Draft;
       |org.corespring.players.QuestionComponentEditor = modules.QuestionComponentEditor;
+      |org.corespring.editors.ComponentEditor = modules.Standalone;
+      |org.corespring.editors.ItemComponentEditor = modules.Item;
+      |org.corespring.editors.DraftComponentEditor = modules.Draft;
       |org.corespring.editors.QuestionComponentEditor = modules.QuestionComponentEditor;
     """.stripMargin
 
