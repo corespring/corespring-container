@@ -142,8 +142,6 @@ trait DefaultIntegration
     override def containerContext: ContainerExecutionContext = DefaultIntegration.this.containerContext
   }
 
-  def pageSourceServiceConfig: PageSourceServiceConfig
-
   lazy val assetPathProcessor = new AssetPathProcessor {
 
     val needsResolution = Seq(
@@ -157,6 +155,11 @@ trait DefaultIntegration
       if (needsResolution.exists(s.contains(_))) resolveDomain(s) else s
     }
   }
+
+  lazy val pageSourceServiceConfig: PageSourceServiceConfig = PageSourceServiceConfig(
+    v2Player.Routes.prefix,
+    mode == Mode.Dev,
+    resourceLoader.loadPath(_))
 
   lazy val pageSourceService: PageSourceService = wire[JsonPageSourceService]
 
@@ -177,7 +180,6 @@ trait DefaultIntegration
   lazy val componentEditorRenderer: ComponentEditorRenderer = wire[ComponentEditorRenderer]
 
   lazy val componentEditor = wire[ComponentEditor]
-
 
   lazy val jsBuilder = new JsBuilder(resourceLoader.loadPath(_))
 
@@ -375,7 +377,6 @@ trait DefaultIntegration
   }
 
   lazy val playerLauncher = new PlayerLauncher {
-
 
     override def builder: JsBuilder = DefaultIntegration.this.jsBuilder
 

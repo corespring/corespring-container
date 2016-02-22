@@ -376,11 +376,6 @@ class ContainerClientImplementation(
     Play.resource(_)
   }
 
-  override lazy val pageSourceServiceConfig: PageSourceServiceConfig = PageSourceServiceConfig(
-    v2Player.Routes.prefix,
-    Play.mode == Mode.Dev,
-    resourceLoader.loadPath(_))
-
   override lazy val jadeEngineConfig: JadeEngineConfig = JadeEngineConfig("container-client/jade", Play.current.mode, resourceLoader.loadPath(_), resourceLoader.lastModified(_))
 }
 
