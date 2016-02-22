@@ -48,17 +48,17 @@ describe('component-editor', function () {
       expect(modules.Item).toHaveBeenCalled();
     }); 
     
-    it('creates to Item editor if contentStorage: item', function(){
+    it('creates Item editor if contentStorage: item', function(){
       new modules.QuestionComponentEditor('el', {contentStorage: 'item'}, jasmine.createSpy());
       expect(modules.Item).toHaveBeenCalled();
     }); 
     
-    it('creates to Standalone editor if contentStorage: none', function(){
+    it('creates Standalone editor if contentStorage: none', function(){
       new modules.QuestionComponentEditor('el', {contentStorage: 'none'}, jasmine.createSpy());
       expect(modules.Standalone).toHaveBeenCalled();
     }); 
     
-    it('creates to Draft editor if contentStorage: draft', function(){
+    it('creates Draft editor if contentStorage: draft', function(){
       new modules.QuestionComponentEditor('el', {contentStorage: 'draft'}, jasmine.createSpy());
       expect(modules.Draft).toHaveBeenCalled();
     }); 
