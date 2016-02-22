@@ -45,13 +45,16 @@ trait DefaultIntegration
 
   private[DefaultIntegration] val debounceInMillis: Long = configuration.getLong("editor.autosave.debounceInMillis").getOrElse(5000)
 
+  def jadeEngineConfig: JadeEngineConfig = JadeEngineConfig("container-client/jade", mode, resourceLoader.loadPath(_), resourceLoader.lastModified(_))
+
   def versionInfo: JsObject
 
   val mode = Play.current.mode
 
   def containerContext: ContainerExecutionContext
 
-  def loadResource: String => Option[URL]
+  val loadResource: String => Option[URL]
+
   lazy val resourceLoader = new ResourcePath(loadResource)
   /**
    * For a given resource path return a resolved path.
@@ -162,8 +165,6 @@ trait DefaultIntegration
     resourceLoader.loadPath(_))
 
   lazy val pageSourceService: PageSourceService = wire[JsonPageSourceService]
-
-  def jadeEngineConfig: JadeEngineConfig
 
   lazy val componentJson: ComponentJson = new ComponentInfoJson(v2Player.Routes.prefix)
 

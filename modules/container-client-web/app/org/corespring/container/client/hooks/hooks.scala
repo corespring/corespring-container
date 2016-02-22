@@ -87,14 +87,14 @@ trait CoreItemHooks extends HasContainerContext with LoadHook {
 
 trait DraftHooks {
   def save(draftId: String, json: JsValue)(implicit request: RequestHeader): R[JsValue]
-  def createItemAndDraft()(implicit h: RequestHeader): R[(String, String)]
-  def createSingleComponentItemDraft(componentType: String, key: String, defaultData: JsObject)(implicit r: RequestHeader): R[(String, String)]
+  def createItemAndDraft(collectionId: Option[String])(implicit h: RequestHeader): R[(String, String)]
+  def createSingleComponentItemDraft(collectionId: Option[String], componentType: String, key: String, defaultData: JsObject)(implicit r: RequestHeader): R[(String, String)]
   def commit(id: String, force: Boolean)(implicit h: RequestHeader): R[JsValue]
 }
 
 trait CreateItemHook {
-  def createItem(json: Option[JsValue])(implicit h: RequestHeader): R[String]
-  def createSingleComponentItem(componentType: String, key: String, defaultData: JsObject)(implicit h: RequestHeader): R[String]
+  def createItem(collectionId: Option[String])(implicit h: RequestHeader): R[String]
+  def createSingleComponentItem(collectionId: Option[String], componentType: String, key: String, defaultData: JsObject)(implicit h: RequestHeader): R[String]
 }
 
 trait ItemHooks extends CoreItemHooks with CreateItemHook
@@ -110,7 +110,7 @@ trait SessionHooks extends HasContainerContext {
 trait PlayerLauncherHooks extends HasContainerContext {
   def catalogJs(implicit header: RequestHeader): Future[PlayerJs]
   def editorJs(implicit header: RequestHeader): Future[PlayerJs]
-  def componentEditorJs(implicit header: RequestHeader): Future[Option[String]]
+  def componentEditorJs(implicit header: RequestHeader): Future[PlayerJs]
   def playerJs(implicit header: RequestHeader): Future[PlayerJs]
 }
 
