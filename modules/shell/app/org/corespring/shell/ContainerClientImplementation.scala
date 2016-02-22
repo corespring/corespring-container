@@ -381,7 +381,6 @@ class ContainerClientImplementation(
     Play.mode == Mode.Dev,
     resourceLoader.loadPath(_))
 
-  override lazy val jadeEngineConfig: JadeEngineConfig = JadeEngineConfig("container-client/jade", Play.current.mode, resourceLoader.loadPath(_), resourceLoader.lastModified(_))
 }
 
 /**
