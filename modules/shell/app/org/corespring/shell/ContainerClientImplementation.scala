@@ -76,16 +76,7 @@ class ContainerClientImplementation(
 
     override def containerContext: ContainerExecutionContext = ContainerClientImplementation.this.containerContext
 
-    override def componentEditorJs(implicit header: RequestHeader): Future[Option[String]] = {
-      loader.loadJs(header).map { pj =>
-        //TODO: what are the restrictions on loading a standalone component editor?
-        if (pj.errors.length > 0) {
-          Some(pj.errors.mkString(","))
-        } else {
-          None
-        }
-      }
-    }
+    override def componentEditorJs(implicit header: RequestHeader): Future[PlayerJs] = loader.loadJs(header)
   }
 
   object s3 {

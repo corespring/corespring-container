@@ -128,7 +128,7 @@ function Standalone(element, options, errorCallback) {
 function CorespringBound(bindType, options, errorCallback){
     
   function addId(u){
-    return u.replace(':' + bindType + 'Id', options[bindType + 'Id']);
+    return u.replace(':' + bindType + 'Id', options[bindType + 'Id'].toString());
   }
 
   this.launchComponentEditorInstance = function(item, launcher, done){
