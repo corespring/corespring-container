@@ -10,7 +10,7 @@ import sbt._
 object Build extends sbt.Build {
 
   val org = "org.corespring"
-  val ScalaVersion = "2.10.3"
+  val ScalaVersion = "2.10.6"
 
   def isWindows = System.getProperty("os.name").toLowerCase().contains("windows")
 
