@@ -168,6 +168,9 @@ function ClientLauncher(element, options, errorCallback){
         errorCallback(errorCodes.EDITOR_NOT_REMOVED);
       } else {
         this.isReady = true;
+        if (options.onClientReady) {
+          options.onClientReady();
+        }
         if(onReady){
           onReady(instance);
         }
