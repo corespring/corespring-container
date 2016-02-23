@@ -14,14 +14,15 @@ angular.module('corespring-player.services').factory('PlayerServiceDefinition', 
         throw new Error('no longer supported');
       };
 
-      this.saveSession = callWithData(PlayerServiceEndpoints.urls.saveSession);
+      this.loadItemAndSession = loadItemAndSession;
+
+      this.completeResponse = callWithNoData(PlayerServiceEndpoints.urls.completeResponse);
+      this.getScore = callWithData(PlayerServiceEndpoints.urls.getScore);
+      this.loadInstructorData = callWithData(PlayerServiceEndpoints.urls.loadInstructorData);
+      this.loadOutcome = callWithData(PlayerServiceEndpoints.urls.loadOutcome);
       this.reopenSession = callWithNoData(PlayerServiceEndpoints.urls.reopenSession);
       this.resetSession = callWithNoData(PlayerServiceEndpoints.urls.resetSession);
-      this.getScore = callWithData(PlayerServiceEndpoints.urls.getScore);
-      this.completeResponse = callWithNoData(PlayerServiceEndpoints.urls.completeResponse);
-      this.loadItemAndSession = callWithNoData(PlayerServiceEndpoints.urls.loadSession, true);
-      this.loadOutcome = callWithData(PlayerServiceEndpoints.urls.loadOutcome);
-      this.loadInstructorData = callWithData(PlayerServiceEndpoints.urls.loadInstructorData);
+      this.saveSession = callWithData(PlayerServiceEndpoints.urls.saveSession);
 
       //-----------------------------------------------------------------
 
@@ -36,14 +37,14 @@ angular.module('corespring-player.services').factory('PlayerServiceDefinition', 
         return path + (path.indexOf('?') == -1 ? '?' : '&') + qs;
       }
 
-      function _call(call, data, isCallToLoadItemAndSession) {
+      function loadItemAndSession(onSuccess, onFailure){
+        onSuccess(EmbeddedItemAndSession);
+        isItemAndSessionLoaded = true;
+      }
+
+      function _call(call, data) {
 
         return function(onSuccess, onFailure) {
-          if(isCallToLoadItemAndSession){
-            onSuccess(EmbeddedItemAndSession);
-            isItemAndSessionLoaded = true;
-            return;
-          }
           if(!isItemAndSessionLoaded){
             if(onFailure){
               var e = '[PlayerService] Error: Not ready to make call to ' + call.method + '.';
@@ -72,15 +73,15 @@ angular.module('corespring-player.services').factory('PlayerServiceDefinition', 
         };
       }
 
-      function callWithData(call, isCallToLoadItemAndSession) {
+      function callWithData(call) {
         return function(data, onSuccess, onFailure, id) {
-          _call(call, data, isCallToLoadItemAndSession)(onSuccess, onFailure);
+          _call(call, data)(onSuccess, onFailure);
         };
       }
 
-      function callWithNoData(call, isCallToLoadItemAndSession) {
+      function callWithNoData(call) {
         return function(onSuccess, onFailure, id) {
-          _call(call, null, isCallToLoadItemAndSession)(onSuccess, onFailure);
+          _call(call, null)(onSuccess, onFailure);
         };
       }
     }
