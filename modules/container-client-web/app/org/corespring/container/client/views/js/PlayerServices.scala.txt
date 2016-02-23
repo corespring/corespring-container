@@ -4,10 +4,8 @@ queryParams : play.api.libs.json.JsValue)
 
 angular.module('@namespace', []);
 
-angular.module('@namespace').factory('PlayerService', ['PlayerServiceDefinition',
-  function(PlayerServiceDefinition) {
-    var params = @{Html(play.api.libs.json.Json.stringify(queryParams))};
-    var urls = @psEndpoints.toJsonString;
-    return new PlayerServiceDefinition(urls, params);
-  }
-]);
+angular.module('@namespace').constant('PlayerServiceEndpoints', {
+  queryParams: @{Html(play.api.libs.json.Json.stringify(queryParams))},
+  urls: @psEndpoints.toJsonString
+});
+

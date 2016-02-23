@@ -61,5 +61,7 @@ block after-main-script
   script(type="text/javascript").
 
     angular.module( 'corespring-player').config(['$provide', function($provide) {
-      $provide.constant('PlayerSession', !{sessionJson} || {});
+      $provide.factory('EmbeddedItemAndSession', function(){
+        return !{sessionJson} || {};
+      });
     }]);

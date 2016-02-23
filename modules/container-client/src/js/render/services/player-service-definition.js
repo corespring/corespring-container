@@ -1,27 +1,31 @@
 angular.module('corespring-player.services').factory('PlayerServiceDefinition', [
+  '$http',
   '$log',
-  function($log) {
+  'PlayerServiceEndpoints',
+  'EmbeddedItemAndSession',
+  function($http, $log, PlayerServiceEndpoints, EmbeddedItemAndSession) {
 
-    function PlayerServiceDefinition(urls, queryString) {
-      $log.log('PlayerServiceDefinition', urls, queryString);
+    function PlayerServiceDefinition() {
+      $log.log('PlayerServiceDefinition', PlayerServiceEndpoints);
 
       this.setQueryParams = function(p) {
         throw new Error('no longer supported');
       };
 
-      this.saveSession = callWithData(urls.saveSession);
-      this.reopenSession = callWithNoData(urls.reopenSession);
-      this.resetSession = callWithNoData(urls.resetSession);
-      this.getScore = callWithData(urls.getScore);
-      this.completeResponse = callWithNoData(urls.completeResponse);
-      this.loadItemAndSession = callWithNoData(urls.loadSession, true);
-      this.loadOutcome = callWithData(urls.loadOutcome);
-      this.loadInstructorData = callWithData(urls.loadInstructorData);
+      this.saveSession = callWithData(PlayerServiceEndpoints.urls.saveSession);
+      this.reopenSession = callWithNoData(PlayerServiceEndpoints.urls.reopenSession);
+      this.resetSession = callWithNoData(PlayerServiceEndpoints.urls.resetSession);
+      this.getScore = callWithData(PlayerServiceEndpoints.urls.getScore);
+      this.completeResponse = callWithNoData(PlayerServiceEndpoints.urls.completeResponse);
+      this.loadItemAndSession = callWithNoData(PlayerServiceEndpoints.urls.loadSession, true);
+      this.loadOutcome = callWithData(PlayerServiceEndpoints.urls.loadOutcome);
+      this.loadInstructorData = callWithData(PlayerServiceEndpoints.urls.loadInstructorData);
 
       //-----------------------------------------------------------------
 
       function addQueryParamsIfPresent(path) {
         var out = [];
+        var params = PlayerServiceEndpoints.queryParams;
         for (var x in params) {
           out.push(x + '=' + params[x]);
         }
@@ -33,12 +37,14 @@ angular.module('corespring-player.services').factory('PlayerServiceDefinition', 
       function _call(call, data, isCallToLoadItemAndSession) {
 
         return function(onSuccess, onFailure) {
-
           if(isCallToLoadItemAndSession){
-            isItemAndSessionLoaded = false;
-          } else if(!isItemAndSessionLoaded){
+            onSuccess(EmbeddedItemAndSession);
+            isItemAndSessionLoaded = true;
+            return;
+          }
+          if(!isItemAndSessionLoaded){
             if(onFailure){
-              var e = '[PlayerService] Error: Not ready to make call to ' + call.method + '.'
+              var e = '[PlayerService] Error: Not ready to make call to ' + call.method + '.';
               $log.error(e);
               onFailure(e);
             }
@@ -52,9 +58,6 @@ angular.module('corespring-player.services').factory('PlayerServiceDefinition', 
             .success(
             function(data, status, headers, config) {
               onSuccess(data);
-              if(isCallToLoadItemAndSession){
-                isItemAndSessionLoaded = true;
-              }
             })
             .error(
             function(data, status, headers, config) {
@@ -65,7 +68,7 @@ angular.module('corespring-player.services').factory('PlayerServiceDefinition', 
             }
           );
         };
-      };
+      }
 
       function callWithData(call, isCallToLoadItemAndSession) {
         return function(data, onSuccess, onFailure, id) {
