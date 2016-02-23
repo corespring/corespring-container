@@ -49,7 +49,7 @@ trait DefaultIntegration
 
   def versionInfo: JsObject
 
-  val mode = Play.current.mode
+  def mode: Mode
 
   def containerContext: ContainerExecutionContext
 
