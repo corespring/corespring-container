@@ -197,7 +197,13 @@ function Item(element, options, errorCallback) {
 
     done = done || function(){};
 
-    helper.jsonXhr(call, {}, function(err, result){
+    var params = {};
+
+    if(options.collectionId){
+      params.collectionId = options.collectionId;
+    }
+
+    helper.jsonXhr(call, params, function(err, result){
       if(err){
         done(err);
       } else {
