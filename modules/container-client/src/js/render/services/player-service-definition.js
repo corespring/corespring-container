@@ -14,7 +14,10 @@ angular.module('corespring-player.services').factory('PlayerServiceDefinition', 
         throw new Error('no longer supported');
       };
 
-      this.loadItemAndSession = loadItemAndSession;
+      this.loadItemAndSession = function loadItemAndSession(onSuccess, onFailure){
+        onSuccess(EmbeddedItemAndSession);
+        isItemAndSessionLoaded = true;
+      };
 
       this.completeResponse = callWithNoData(PlayerServiceEndpoints.urls.completeResponse);
       this.getScore = callWithData(PlayerServiceEndpoints.urls.getScore);
@@ -35,11 +38,6 @@ angular.module('corespring-player.services').factory('PlayerServiceDefinition', 
 
         var qs = out.join('&');
         return path + (path.indexOf('?') == -1 ? '?' : '&') + qs;
-      }
-
-      function loadItemAndSession(onSuccess, onFailure){
-        onSuccess(EmbeddedItemAndSession);
-        isItemAndSessionLoaded = true;
       }
 
       function _call(call, data) {
