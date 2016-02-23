@@ -1,5 +1,5 @@
 @(namespace : String,
-psEndpoints: org.corespring.container.client.views.models.PlayerServicesEndpoints,
+psEndpoints: org.corespring.container.client.views.models.PlayerServiceEndpoints,
 queryParams : play.api.libs.json.JsValue)
 
 angular.module('@namespace', []);
