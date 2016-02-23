@@ -6,21 +6,21 @@ import org.corespring.container.client.component._
 import org.corespring.container.client.hooks.EditorHooks
 import org.corespring.container.client.pages.ComponentEditorRenderer
 import org.corespring.container.client.pages.processing.AssetPathProcessor
-import org.corespring.container.components.model.{ Widget, Client, Component }
+import org.corespring.container.components.model.Component
 import org.corespring.test.TestContext
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
 import play.api.Mode
 import play.api.Mode.Mode
-import play.api.libs.json.{ JsValue, Json, JsObject, JsArray }
+import play.api.libs.json.{ JsArray, JsObject, Json }
 import play.api.mvc.RequestHeader
 import play.api.templates.Html
 import play.api.test.FakeRequest
+import play.api.test.Helpers._
 
 import scala.concurrent.duration.Duration
-import scala.concurrent.{ Await, Future, ExecutionContext }
-import play.api.test.Helpers._
+import scala.concurrent.{ Await, Future }
 
 class CoreEditorTest extends Specification with Mockito {
 
@@ -61,8 +61,6 @@ class CoreEditorTest extends Specification with Mockito {
       templateParams = params
       Html("hi")
     }
-
-    override def findComponentType(json: JsValue): Option[String] = None
 
     override def renderer: ComponentEditorRenderer = mock[ComponentEditorRenderer]
 

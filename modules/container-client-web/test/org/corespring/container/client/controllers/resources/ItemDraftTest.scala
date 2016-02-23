@@ -85,14 +85,14 @@ class ItemDraftTest extends Specification with Mockito with NoTimeConversions wi
       trait createWithSingleComponent extends scope {
         val defaultData = Json.obj("defaultData" -> true)
         override def components = Seq(uiComp("type", Nil).copy(defaultData = defaultData))
-        hooks.createSingleComponentItemDraft(any[String], any[String], any[JsObject])(any[RequestHeader]).returns {
+        hooks.createSingleComponentItemDraft(any[Option[String]], any[String], any[String], any[JsObject])(any[RequestHeader]).returns {
           Future.successful(Right("itemId" -> "draftName"))
         }
       }
 
       "call hooks.createWithSingleComponent" in new createWithSingleComponent {
         Await.result(draft.createWithSingleComponent("org-type")(req), 1.second)
-        there was one(hooks).createSingleComponentItemDraft("org-type", SingleComponent.Key, defaultData)(req)
+        there was one(hooks).createSingleComponentItemDraft(None, "org-type", SingleComponent.Key, defaultData)(req)
       }
 
       s"returns $CREATED" in new createWithSingleComponent {
@@ -111,14 +111,14 @@ class ItemDraftTest extends Specification with Mockito with NoTimeConversions wi
     "createItemAndDraft" should {
 
       trait createItemAndDraft extends scope {
-        hooks.createItemAndDraft()(any[RequestHeader]).returns {
+        hooks.createItemAndDraft(any[Option[String]])(any[RequestHeader]).returns {
           Future.successful(Right("itemId" -> "draftName"))
         }
       }
 
       "call hooks.createItemAndDraft" in new createItemAndDraft {
         Await.result(draft.createItemAndDraft(req), 1.second)
-        there was one(hooks).createItemAndDraft()(req)
+        there was one(hooks).createItemAndDraft(None)(req)
       }
 
       s"returns $OK" in new createItemAndDraft {

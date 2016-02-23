@@ -59,11 +59,9 @@ class DefaultIntegrationTest extends Specification with Mockito with PlaySpecifi
 
       override def itemSupportingMaterialHooks: ItemSupportingMaterialHooks = mock[ItemSupportingMaterialHooks]
 
-      override def pageSourceServiceConfig: PageSourceServiceConfig = mock[PageSourceServiceConfig]
-
       override def jadeEngineConfig: JadeEngineConfig = mock[JadeEngineConfig]
 
-      override def loadResource: (String) => Option[URL] = _ => None
+      override val loadResource: (String) => Option[URL] = _ => None
     }
   }
 
