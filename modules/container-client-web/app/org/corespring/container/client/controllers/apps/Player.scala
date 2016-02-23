@@ -8,6 +8,7 @@ import org.corespring.container.client.controllers.GetAsset
 import org.corespring.container.client.controllers.helpers.PlayerXhtml
 import org.corespring.container.client.controllers.jade.Jade
 import org.corespring.container.client.hooks.PlayerHooks
+import org.corespring.container.client.views.models.PlayerServicesEndpoints
 import org.corespring.container.client.views.txt.js.PlayerServices
 import org.corespring.container.components.processing.PlayerItemPreProcessor
 import play.api.http.{ ContentTypes }
@@ -69,8 +70,7 @@ trait Player
           versionInfo,
           newRelicRumConf != None,
           newRelicRumConf.getOrElse(Json.obj()),
-          if (hasBeenArchived(itemJson)) Seq(s"Warning: This item has been deleted.") else Seq.empty)
-      )
+          if (hasBeenArchived(itemJson)) Seq(s"Warning: This item has been deleted.") else Seq.empty))
 
     }
   }
@@ -177,14 +177,15 @@ trait Player
     import org.corespring.container.client.controllers.resources.routes._
     PlayerServices(
       "player.services",
-      Session.loadItemAndSession(sessionId),
-      Session.reopenSession(sessionId),
-      Session.resetSession(sessionId),
-      Session.saveSession(sessionId),
-      Session.getScore(sessionId),
-      Session.completeSession(sessionId),
-      Session.loadOutcome(sessionId),
-      Session.loadInstructorData(sessionId),
+      PlayerServicesEndpoints(
+        Session.completeSession(sessionId),
+        Session.getScore(sessionId),
+        Session.loadInstructorData(sessionId),
+        Session.loadItemAndSession(sessionId),
+        Session.loadOutcome(sessionId),
+        Session.reopenSession(sessionId),
+        Session.resetSession(sessionId),
+        Session.saveSession(sessionId)),
       queryParams).toString
   }
 }

@@ -1,16 +1,22 @@
 angular.module('corespring-player.controllers')
   .controller(
     'Main', [
+      '$document',
       '$location',
       '$log',
       '$scope',
       '$timeout',
-      '$document',
       'ComponentRegister',
       'PlayerService',
-      function($location, $log, $scope, $timeout, $document, ComponentRegister, PlayerServiceDef) {
-
-        var PlayerService = new PlayerServiceDef();
+      function(
+        $document,
+        $location,
+        $log,
+        $scope,
+        $timeout,
+        ComponentRegister,
+        PlayerService
+      ) {
 
         var currentMode = null;
 
