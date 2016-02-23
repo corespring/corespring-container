@@ -5,7 +5,7 @@ import play.api.libs.json.Json.JsValueWrapper
 import play.api.mvc.Call
 
 
-case class PlayerServicesEndpoints(
+case class PlayerServiceEndpoints(
     completeResponse: Call,
     getScore: Call,
     loadInstructorData: Call,

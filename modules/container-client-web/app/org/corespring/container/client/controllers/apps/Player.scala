@@ -8,7 +8,7 @@ import org.corespring.container.client.controllers.GetAsset
 import org.corespring.container.client.controllers.helpers.PlayerXhtml
 import org.corespring.container.client.controllers.jade.Jade
 import org.corespring.container.client.hooks.PlayerHooks
-import org.corespring.container.client.views.models.PlayerServicesEndpoints
+import org.corespring.container.client.views.models.PlayerServiceEndpoints
 import org.corespring.container.client.views.txt.js.PlayerServices
 import org.corespring.container.components.processing.PlayerItemPreProcessor
 import play.api.http.{ ContentTypes }
@@ -177,7 +177,7 @@ trait Player
     import org.corespring.container.client.controllers.resources.routes._
     PlayerServices(
       "player.services",
-      PlayerServicesEndpoints(
+      PlayerServiceEndpoints(
         Session.completeSession(sessionId),
         Session.getScore(sessionId),
         Session.loadInstructorData(sessionId),

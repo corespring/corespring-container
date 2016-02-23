@@ -8,7 +8,7 @@ describe('player-service-definition', function () {
     $provide.value('EmbeddedItemAndSession', {session:{}, item:{}});
     $provide.value('PlayerServiceEndpoints', {
       queryParams: {},
-      urls: {
+      endpoints: {
         completeResponse: {method: 'put', url: '/client/session/complete/56cc6d6660b2985b7cb27552.json'},
         getScore: {method: 'put', url: '/client/session/56cc6d6660b2985b7cb27552/score.json'},
         loadInstructorData: {method: 'get', url: '/client/session/load-instructor-data/56cc6d6660b2985b7cb27552.json'},

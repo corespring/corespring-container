@@ -24,13 +24,17 @@ angular.module('corespring-player.services').factory('PlayerServiceDefinition', 
         isItemAndSessionLoaded = true;
       };
 
-      this.completeResponse = callWithNoData(PlayerServiceEndpoints.urls.completeResponse);
-      this.getScore = callWithData(PlayerServiceEndpoints.urls.getScore);
-      this.loadInstructorData = callWithData(PlayerServiceEndpoints.urls.loadInstructorData);
-      this.loadOutcome = callWithData(PlayerServiceEndpoints.urls.loadOutcome);
-      this.reopenSession = callWithNoData(PlayerServiceEndpoints.urls.reopenSession);
-      this.resetSession = callWithNoData(PlayerServiceEndpoints.urls.resetSession);
-      this.saveSession = callWithData(PlayerServiceEndpoints.urls.saveSession);
+      this.initCalls = function(endpoints){
+        this.completeResponse = callWithNoData(endpoints.completeResponse);
+        this.getScore = callWithData(endpoints.getScore);
+        this.loadInstructorData = callWithData(endpoints.loadInstructorData);
+        this.loadOutcome = callWithData(endpoints.loadOutcome);
+        this.reopenSession = callWithNoData(endpoints.reopenSession);
+        this.resetSession = callWithNoData(endpoints.resetSession);
+        this.saveSession = callWithData(endpoints.saveSession);
+      };
+
+      this.initCalls(PlayerServiceEndpoints.endpoints);
 
       //-----------------------------------------------------------------
 
