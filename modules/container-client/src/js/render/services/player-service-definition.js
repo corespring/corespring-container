@@ -8,6 +8,8 @@ angular.module('corespring-player.services').factory('PlayerServiceDefinition', 
     function PlayerServiceDefinition() {
       $log.log('PlayerServiceDefinition', PlayerServiceEndpoints);
 
+      var isItemAndSessionLoaded = false;
+
       this.setQueryParams = function(p) {
         throw new Error('no longer supported');
       };
