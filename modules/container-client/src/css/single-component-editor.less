@@ -58,37 +58,39 @@ body {
 @profile-summary-feedback-panel-bg: @darker-blue;
 
 .btn{
-  &:focus, &:active:focus, &:active{
+  &:focus, &:active:focus, &:active {
     outline:none;
   }
 }
 
-.config-panel-container{
+.config-panel-container {
   padding-top: 10px;
 }
 
-.navbar-text.error{
+.navbar-text.error {
   color: @brand-danger;
 }
 
-.save-button{
+.save-button {
   float: left;
 }
 
-.alert-holder{
+.alert-holder {
   float: left;
-  .alert-danger{
+
+  .alert-danger {
     width: 300px;
     padding: 6px;
     margin-left: 10px;
   }
+
 }
 
-.bar{
+.bar {
   padding-left: 10px;
 }
   
-.pane-header{
+.pane-header {
   text-transform: uppercase;
   font-size: 16px;
   font-weight: 600;
@@ -100,7 +102,7 @@ body {
   -font-smoothing: antialiased;
 }
 
-.pane-sub-header{
+.pane-sub-header {
   font-size: 14px;
 } 
 
@@ -114,25 +116,36 @@ body {
   position: relative;
 }
 
-.config-pane{
+.config-pane {
   width: 670px;
   max-width: 670px;
   min-width: 670px;
 }
 
-.preview-right{
+.preview-right {
   display: flex;
   display: -webkit-flex;
   display: -ms-flex;
 
-  .preview-pane{
+  .preview-pane {
     flex-shrink: 0;
+
     .player-btn-holder {
-      float: right;
+      width: 100%;
       margin-bottom: 20px;
+
+      .score {
+        float: left;
+        display: block;
+      }
+
+      .btn {
+        float: right;
+      }
+
     }
 
-    ul.preview-nav {
+    .preview-nav {
       li {
         display: inline;
       }

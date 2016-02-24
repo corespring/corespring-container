@@ -20,13 +20,26 @@ angular.module('corespring-singleComponentEditor.directives')
         $scope.$emit('playerControlPanel.reset');
       }
     };
+
+    $scope.isNumber= function (n) {
+      return !isNaN(parseFloat(n)) && isFinite(n);
+    };
+
   }
 
   var template = [
-    '<button ng-click="onClick()"',
-    ' class="btn btn-xs" ', 
-    ' ng-class="{gather: \'btn-success\', view: \'btn-info\', evaluate: \'btn-info\'}[mode]">',
-    '{{label}}</button>'].join('\n');
+    '<div>',
+    '  <button ng-click="onClick()"',
+    '      class="btn btn-xs"',
+    '      ng-class="{gather: \'btn-success\', view: \'btn-info\', evaluate: \'btn-info\'}[mode]">',
+    '    {{label}}',
+    '  </button>',
+    '  <span class="score">',
+    '    <label ng-show="isNumber(score.summary.percentage)">',
+    '      Score: {{score.summary.percentage}}%',
+    '    </label>',
+    '  </span>',
+    '</div>'].join('\n');
 
   return {
     restrict: 'A',
@@ -34,6 +47,7 @@ angular.module('corespring-singleComponentEditor.directives')
     template: template,
     replace: true,
     scope: {
+      score: '=',
       mode: '=' 
     }
   };
