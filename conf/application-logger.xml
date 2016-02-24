@@ -14,11 +14,14 @@
 
     <logger name="tests" level="TRACE" />
     <logger name="js" level="TRACE" />
+    <logger name="org.corespring.container.client.controllers.apps.CoreEditor" level="TRACE" />
+    <logger name="org.corespring.shell.controllers.editor.ItemDraftHooks" level="TRACE" />
     <logger name="org.corespring.container.client.controllers.jade.Jade" level="TRACE" />
     <logger name="org.corespring.container.client.controllers.apps.CoreEditor" level="TRACE"/>
+    <logger name="org.corespring.container.client.controllers.apps.JsonPageSourceService" level="TRACE"/>
     <logger name="org.corespring.shell.controllers" level="TRACE"/>
 
-    <root level="DEBUG">
+    <root level="INFO">
         <appender-ref ref="STDOUT" />
     </root>
 </configuration>

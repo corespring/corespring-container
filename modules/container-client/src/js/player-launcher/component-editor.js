@@ -128,7 +128,7 @@ function Standalone(element, options, errorCallback) {
 function CorespringBound(bindType, options, errorCallback){
     
   function addId(u){
-    return u.replace(':' + bindType + 'Id', options[bindType + 'Id']);
+    return u.replace(':' + bindType + 'Id', options[bindType + 'Id'].toString());
   }
 
   this.launchComponentEditorInstance = function(item, launcher, done){
@@ -197,7 +197,13 @@ function Item(element, options, errorCallback) {
 
     done = done || function(){};
 
-    helper.jsonXhr(call, {}, function(err, result){
+    var params = {};
+
+    if(options.collectionId){
+      params.collectionId = options.collectionId;
+    }
+
+    helper.jsonXhr(call, params, function(err, result){
       if(err){
         done(err);
       } else {

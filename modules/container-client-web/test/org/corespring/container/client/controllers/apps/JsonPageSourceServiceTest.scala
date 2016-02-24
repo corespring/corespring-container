@@ -44,7 +44,7 @@ class JsonPageSourceServiceTest extends Specification {
     }
 
     "load NgSourcePaths" in new js {
-      service.loadJs("test") must_== SourcePaths.js("prefix", jsJson).get
+      service.loadJs("test") must_== SourcePaths.js("prefix", jsJson)
     }
   }
 
@@ -60,7 +60,7 @@ class JsonPageSourceServiceTest extends Specification {
     }
 
     "load CssSourcePaths" in new css {
-      service.loadCss("test") must_== SourcePaths.css("prefix", cssJson).get
+      service.loadCss("test") must_== SourcePaths.css("prefix", cssJson)
     }
   }
 }
