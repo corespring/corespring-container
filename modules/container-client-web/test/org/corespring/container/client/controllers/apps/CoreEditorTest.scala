@@ -14,7 +14,7 @@ import org.specs2.specification.Scope
 import play.api.Mode
 import play.api.Mode.Mode
 import play.api.libs.json.{ JsArray, JsObject, Json }
-import play.api.mvc.RequestHeader
+import play.api.mvc.{Request, AnyContent, RequestHeader}
 import play.api.templates.Html
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -91,6 +91,59 @@ class CoreEditorTest extends Specification with Mockito {
       override def debounceInMillis = 5001
       Await.result(load("id")(r), Duration(1, TimeUnit.SECONDS))
       templateParams.asInstanceOf[EditorTemplateParams].options.debounceInMillis === 5001
+    }
+  }
+
+
+  "componentEditor" should {
+
+    trait componentEditor extends scope {
+
+      override def componentEditorResult(componentType:String, request:Request[AnyContent]) = {
+        Future.successful(Ok("<html></html>"))
+      }
+
+      hooks.load(any[String])(any[RequestHeader]) returns {
+        Future.successful(Right(Json.obj("components" -> Json.obj(
+          "singleComponent" -> Json.obj("componentType" -> "type")
+        ))))
+      }
+    }
+
+    s"return $BAD_REQUEST if the component type can't be read from the json model" in new componentEditor{
+      hooks.load(any[String])(any[RequestHeader]) returns {
+        Future.successful(Right(Json.obj("components" -> Json.obj(
+          "singleComponent" -> Json.obj()
+        ))))
+      }
+      val result = componentEditor("id")(r)
+      status(result) must_== BAD_REQUEST
+    }
+
+    trait withError extends componentEditor{
+      hooks.load(any[String])(any[RequestHeader]) returns {
+        Future.successful(Left(402 -> "err"))
+      }
+    }
+
+    s"return the error status code" in new withError{
+      val result = componentEditor("id")(r)
+      status(result) must_== 402
+    }
+
+    s"return the error body" in new withError{
+      val result = componentEditor("id")(r)
+      contentAsString(result) must_== org.corespring.container.client.views.html.error.main(402, "err", true).toString()
+    }
+
+    s"return $OK" in new componentEditor{
+      val result = componentEditor("id")(r)
+      status(result) must_== OK
+    }
+
+    s"return the html" in new componentEditor{
+      val result = componentEditor("id")(r)
+      contentAsString(result) must_== "<html></html>"
     }
   }
 }
