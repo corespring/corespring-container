@@ -18,14 +18,14 @@ trait BaseDraftEditor extends CoreEditor {
       deleteAsset = resourceRoutes.ItemDraft.deleteAssetFromSupportingMaterial(id, ":name", ":filename"),
       getAsset = resourceRoutes.ItemDraft.getAssetFromSupportingMaterial(id, ":name", ":filename"),
       updateContent = resourceRoutes.ItemDraft.updateSupportingMaterialContent(id, ":name", ":filename"))
-
-    EditorServices(
-      s"$context.services",
-      resourceRoutes.ItemDraft.load(id),
-      resourceRoutes.ItemDraft.saveSubset(id, ":subset"),
-      Some(resourceRoutes.ItemDraft.save(id)),
-      smEndpoints,
-      components, widgets).toString
+    "??"
+//    EditorServices(
+//      s"$context.services",
+//      resourceRoutes.ItemDraft.load(id),
+//      resourceRoutes.ItemDraft.saveSubset(id, ":subset"),
+//      Some(resourceRoutes.ItemDraft.save(id)),
+//      smEndpoints,
+//      components, widgets).toString
   }
 
 }

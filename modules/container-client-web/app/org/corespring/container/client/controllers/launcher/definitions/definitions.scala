@@ -103,7 +103,7 @@ private[launcher] object ItemEditors extends LaunchCompanionUtils {
 }
 
 private[launcher] case class ItemEditors(builder: JsBuilder, queryParams: Map[String, String]) extends CorespringJsClient {
-  import org.corespring.container.client.controllers.apps.routes.{ DraftDevEditor => DraftDevEditorRoutes, DraftEditor => DraftEditorRoutes, ItemDevEditor => ItemDevEditorRoutes, ItemEditor => ItemEditorRoutes }
+  import org.corespring.container.client.controllers.apps.routes.{ NewDraftDevEditor => DraftDevEditorRoutes, NewDraftEditor => DraftEditorRoutes, NewItemDevEditor => ItemDevEditorRoutes, NewItemEditor => ItemEditorRoutes }
   import org.corespring.container.client.controllers.resources.routes.{ Item => ItemRoutes, ItemDraft => ItemDraftRoutes }
 
   val paths: JsObject = obj(
@@ -160,8 +160,8 @@ private[launcher] case class ComponentEditor(builder: JsBuilder, queryParams: Ma
     import org.corespring.container.client.controllers.{ apps, resources }
 
     val componentEditor = apps.routes.ComponentEditor
-    val itemEditor = apps.routes.ItemEditor
-    val draftEditor = apps.routes.DraftEditor
+    val itemEditor = apps.routes.NewItemEditor
+    val draftEditor = apps.routes.NewDraftEditor
     val item = resources.routes.Item
     val draft = resources.routes.ItemDraft
   }

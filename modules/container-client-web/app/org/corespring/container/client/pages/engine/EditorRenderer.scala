@@ -1,5 +1,6 @@
 package org.corespring.container.client.pages.engine
 
+import org.corespring.container.client.VersionInfo
 import org.corespring.container.client.component.{ComponentJson, ComponentsScriptBundle}
 import org.corespring.container.client.controllers.apps.{EditorClientOptions, PageSourceService}
 import org.corespring.container.client.integration.ContainerExecutionContext
@@ -18,7 +19,7 @@ trait EditorRenderer{
                                def pageSourceService: PageSourceService
                                def assetPathProcessor: AssetPathProcessor
                                def componentJson: ComponentJson
-                               def versionInfo: JsValue
+                               def versionInfo: VersionInfo
 
   def name:String
 
@@ -52,7 +53,7 @@ trait EditorRenderer{
       "css" -> processedCss.toArray,
       "ngModules" -> (sources.js.ngModules ++ bundle.ngModules).map(s => s"'$s'").mkString(","),
       "ngServiceLogic" -> servicesJs,
-      "versionInfo" -> Json.stringify(versionInfo),
+      "versionInfo" -> Json.stringify(versionInfo.json),
       "options" -> clientOptions)
     jade.renderJade("editor", params)
   }
@@ -63,7 +64,7 @@ class MainEditorRenderer(val containerExecutionContext: ContainerExecutionContex
                          val pageSourceService: PageSourceService,
                          val assetPathProcessor: AssetPathProcessor,
                          val componentJson: ComponentJson,
-                         val versionInfo: JsValue) extends EditorRenderer{
+                         val versionInfo: VersionInfo) extends EditorRenderer{
   override def name: String = "editor"
 }
 
@@ -72,7 +73,7 @@ class DevEditorRenderer(val containerExecutionContext: ContainerExecutionContext
                         val pageSourceService: PageSourceService,
                         val assetPathProcessor: AssetPathProcessor,
                         val componentJson: ComponentJson,
-                        val versionInfo: JsValue) extends EditorRenderer{
+                        val versionInfo: VersionInfo) extends EditorRenderer{
   override def name: String = "devEditor"
 }
 

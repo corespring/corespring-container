@@ -1,13 +1,14 @@
 package org.corespring.container.client.pages
 
-import org.corespring.container.client.component.{ SingleComponentScriptBundle, ComponentJson }
-import org.corespring.container.client.controllers.apps.{ PreviewRightComponentEditorOptions, ComponentEditorOptions, PageSourceService }
+import org.corespring.container.client.VersionInfo
+import org.corespring.container.client.component.{ComponentJson, SingleComponentScriptBundle}
+import org.corespring.container.client.controllers.apps.{ComponentEditorOptions, PageSourceService, PreviewRightComponentEditorOptions}
 import org.corespring.container.client.integration.ContainerExecutionContext
 import org.corespring.container.client.pages.engine.JadeEngine
 import org.corespring.container.client.pages.processing.AssetPathProcessor
 import org.corespring.container.client.views.txt.js.ComponentEditorServices
 import play.api.Logger
-import play.api.libs.json.{ JsArray, JsValue, Json }
+import play.api.libs.json.{JsArray, JsValue, Json}
 import play.api.templates.Html
 
 import scala.concurrent.Future
@@ -18,7 +19,7 @@ class ComponentEditorRenderer(
   pageSourceService: PageSourceService,
   componentJson: ComponentJson,
   assetPathProcessor: AssetPathProcessor,
-  versionInfo: JsValue) {
+  versionInfo: VersionInfo) {
 
   private val logger = Logger(classOf[ComponentEditorRenderer])
 
@@ -63,7 +64,7 @@ class ComponentEditorRenderer(
       "ngServiceLogic" -> inlineJs,
       "componentNgModules" -> "",
       "options" -> Json.stringify(clientOptions.toJson),
-      "versionInfo" -> Json.stringify(versionInfo))
+      "versionInfo" -> Json.stringify(versionInfo.json))
 
     logger.info(s"function=render, params=$params")
 

@@ -64,15 +64,15 @@ trait BaseItemEditor extends CoreEditor {
       deleteAsset = resourceRoutes.Item.deleteAssetFromSupportingMaterial(itemId, ":name", ":filename"),
       getAsset = resourceRoutes.Item.getAssetFromSupportingMaterial(itemId, ":name", ":filename"),
       updateContent = resourceRoutes.Item.updateSupportingMaterialContent(itemId, ":name", ":filename"))
-
-    EditorServices(
-      s"$context.services",
-      resourceRoutes.Item.load(itemId),
-      resourceRoutes.Item.saveSubset(itemId, ":subset"),
-      None,
-      smEndpoints,
-      components,
-      widgets).toString
+    "??"
+//    EditorServices(
+//      s"$context.services",
+//      resourceRoutes.Item.load(itemId),
+//      resourceRoutes.Item.saveSubset(itemId, ":subset"),
+//      None,
+//      smEndpoints,
+//      components,
+//      widgets).toString
   }
 }
 

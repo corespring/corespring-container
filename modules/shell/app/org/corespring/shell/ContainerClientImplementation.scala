@@ -354,7 +354,7 @@ class ContainerClientImplementation(
 
   override def dataQueryHooks: DataQueryHooks = new ShellDataQueryHooks with withContext
 
-  override def versionInfo: JsObject = VersionInfo(Play.current.configuration)
+  override def versionInfo: VersionInfo = VersionInfo(Play.current.configuration)
 
   override def collectionHooks: CollectionHooks = new shellEditor.CollectionHooks {
     override def containerContext: ContainerExecutionContext = ContainerClientImplementation.this.containerContext

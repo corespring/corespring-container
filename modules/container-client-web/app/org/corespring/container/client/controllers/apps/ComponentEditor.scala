@@ -9,7 +9,7 @@ import play.api.mvc._
 
 class ComponentEditor(
   val containerContext: ContainerExecutionContext,
-  val renderer: ComponentEditorRenderer,
+  val componentEditorRenderer: ComponentEditorRenderer,
   val bundler: ComponentBundler,
   val mode: Mode) extends Controller with ComponentEditorLaunchingController {
 

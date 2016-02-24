@@ -4,8 +4,8 @@ import java.net.URL
 
 import com.softwaremill.macwire.MacwireMacros.wire
 import grizzled.slf4j.Logger
-import org.corespring.container.client.V2PlayerConfig
-import org.corespring.container.client.component.{ ComponentUrls, _ }
+import org.corespring.container.client.{V2PlayerConfig, VersionInfo}
+import org.corespring.container.client.component.{ComponentUrls, _}
 import org.corespring.container.client.controllers._
 import org.corespring.container.client.controllers.apps._
 import org.corespring.container.client.controllers.helpers.LoadClientSideDependencies
@@ -18,40 +18,45 @@ import org.corespring.container.client.hooks._
 import org.corespring.container.client.integration.validation.Validator
 import org.corespring.container.client.io.ResourcePath
 import org.corespring.container.client.pages.ComponentEditorRenderer
-import org.corespring.container.client.pages.engine.{ JadeEngine, JadeEngineConfig }
+import org.corespring.container.client.pages.engine.{JadeEngine, JadeEngineConfig}
 import org.corespring.container.client.pages.processing.AssetPathProcessor
 import org.corespring.container.components.model.Component
-import org.corespring.container.components.model.dependencies.{ ComponentSplitter, DependencyResolver }
-import org.corespring.container.components.outcome.{ DefaultScoreProcessor, ScoreProcessor, ScoreProcessorSequence }
+import org.corespring.container.components.model.dependencies.{ComponentSplitter, DependencyResolver}
+import org.corespring.container.components.outcome.{DefaultScoreProcessor, ScoreProcessor, ScoreProcessorSequence}
 import org.corespring.container.components.processing.PlayerItemPreProcessor
 import org.corespring.container.components.response.OutcomeProcessor
 import org.corespring.container.js.rhino.score.CustomScoreProcessor
-import org.corespring.container.js.rhino.{ RhinoOutcomeProcessor, RhinoPlayerItemPreProcessor, RhinoScopeBuilder, RhinoServerLogic }
+import org.corespring.container.js.rhino.{RhinoOutcomeProcessor, RhinoPlayerItemPreProcessor, RhinoScopeBuilder, RhinoServerLogic}
 import org.corespring.container.logging.ContainerLogger
 import play.api.Mode.Mode
-import play.api.libs.json.{ JsObject, JsValue }
-import play.api.{ Mode, Play }
+import play.api.libs.json.{JsObject, JsValue}
+import play.api.{Mode, Play}
 
 import scala.concurrent.ExecutionContext
 
 case class ContainerExecutionContext(context: ExecutionContext)
 
+
 trait DefaultIntegration
   extends ContainerControllers
+  with NewControllersModule
   with ComponentSplitter
   with HasHooks
   with HasConfig
   with HasProcessors {
 
+
+  override def controllers = super.controllers ++ newEditorControllers
+
   private[DefaultIntegration] val debounceInMillis: Long = configuration.getLong("editor.autosave.debounceInMillis").getOrElse(5000)
 
   def jadeEngineConfig: JadeEngineConfig = JadeEngineConfig("container-client/jade", mode, resourceLoader.loadPath(_), resourceLoader.lastModified(_))
 
-  def versionInfo: JsObject
-
   def mode: Mode
 
   def containerContext: ContainerExecutionContext
+
+  override lazy val componentService: ComponentService = new DefaultComponentService(mode, components)
 
   val loadResource: String => Option[URL]
 
@@ -178,110 +183,106 @@ trait DefaultIntegration
 
   lazy val jadeEngine = wire[JadeEngine]
 
-  lazy val componentEditorRenderer: ComponentEditorRenderer = wire[ComponentEditorRenderer]
-
-  lazy val componentEditor = wire[ComponentEditor]
-
   lazy val jsBuilder = new JsBuilder(resourceLoader.loadPath(_))
 
   /** TODO: Use macwire for the dependencies below.*/
-  lazy val itemEditor = new ItemEditor {
+//  lazy val itemEditor = new ItemEditor {
+//
+//    override def componentJson = DefaultIntegration.this.componentJson
+//
+//    override def pageSourceService: PageSourceService = DefaultIntegration.this.pageSourceService
+//
+//    override def renderer: ComponentEditorRenderer = DefaultIntegration.this.componentEditorRenderer
+//
+//    override def bundler: ComponentBundler = DefaultIntegration.this.componentBundler
+//
+//    override val debounceInMillis = DefaultIntegration.this.debounceInMillis
+//    override def assetPathProcessor: AssetPathProcessor = DefaultIntegration.this.assetPathProcessor
+//
+//    override def versionInfo: JsObject = DefaultIntegration.this.versionInfo.json
+//
+//    override def mode: Mode = DefaultIntegration.this.mode
+//
+//    override def containerContext = DefaultIntegration.this.containerContext
+//
+//    override def urls: ComponentUrls = componentSets
+//
+//    override def components: Seq[Component] = DefaultIntegration.this.components
+//
+//    override def resolveDomain(path: String): String = DefaultIntegration.this.resolveDomain(path)
+//
+//    override def hooks: EditorHooks = itemEditorHooks
+//  }
 
-    override def componentJson = DefaultIntegration.this.componentJson
+//  lazy val itemDevEditor = new ItemDevEditor {
+//    override def componentJson = DefaultIntegration.this.componentJson
+//    override def assetPathProcessor: AssetPathProcessor = DefaultIntegration.this.assetPathProcessor
+//    override def pageSourceService: PageSourceService = DefaultIntegration.this.pageSourceService
+//
+//    override def renderer: ComponentEditorRenderer = DefaultIntegration.this.componentEditorRenderer
+//
+//    override def bundler: ComponentBundler = DefaultIntegration.this.componentBundler
+//    override def versionInfo: JsObject = DefaultIntegration.this.versionInfo
+//
+//    override def mode: Mode = DefaultIntegration.this.mode
+//
+//    override def containerContext = DefaultIntegration.this.containerContext
+//
+//    override def urls: ComponentUrls = componentSets
+//
+//    override def components: Seq[Component] = DefaultIntegration.this.components
+//
+//    override def resolveDomain(path: String): String = DefaultIntegration.this.resolveDomain(path)
+//
+//    override def hooks: EditorHooks = itemEditorHooks
+//  }
 
-    override def pageSourceService: PageSourceService = DefaultIntegration.this.pageSourceService
+//  lazy val draftEditor = new DraftEditor {
+//    override def componentJson = DefaultIntegration.this.componentJson
+//    override def assetPathProcessor: AssetPathProcessor = DefaultIntegration.this.assetPathProcessor
+//    override def pageSourceService: PageSourceService = DefaultIntegration.this.pageSourceService
+//    override def renderer: ComponentEditorRenderer = DefaultIntegration.this.componentEditorRenderer
+//
+//    override def bundler: ComponentBundler = DefaultIntegration.this.componentBundler
+//
+//    override val debounceInMillis = DefaultIntegration.this.debounceInMillis
+//
+//    override def versionInfo: JsObject = DefaultIntegration.this.versionInfo
+//
+//    override def mode: Mode = DefaultIntegration.this.mode
+//
+//    override def containerContext = DefaultIntegration.this.containerContext
+//
+//    override def urls: ComponentUrls = componentSets
+//
+//    override def components: Seq[Component] = DefaultIntegration.this.components
+//
+//    override def hooks = draftEditorHooks
+//
+//    override def resolveDomain(path: String): String = DefaultIntegration.this.resolveDomain(path)
+//  }
 
-    override def renderer: ComponentEditorRenderer = DefaultIntegration.this.componentEditorRenderer
-
-    override def bundler: ComponentBundler = DefaultIntegration.this.componentBundler
-
-    override val debounceInMillis = DefaultIntegration.this.debounceInMillis
-    override def assetPathProcessor: AssetPathProcessor = DefaultIntegration.this.assetPathProcessor
-
-    override def versionInfo: JsObject = DefaultIntegration.this.versionInfo
-
-    override def mode: Mode = DefaultIntegration.this.mode
-
-    override def containerContext = DefaultIntegration.this.containerContext
-
-    override def urls: ComponentUrls = componentSets
-
-    override def components: Seq[Component] = DefaultIntegration.this.components
-
-    override def resolveDomain(path: String): String = DefaultIntegration.this.resolveDomain(path)
-
-    override def hooks: EditorHooks = itemEditorHooks
-  }
-
-  lazy val itemDevEditor = new ItemDevEditor {
-    override def componentJson = DefaultIntegration.this.componentJson
-    override def assetPathProcessor: AssetPathProcessor = DefaultIntegration.this.assetPathProcessor
-    override def pageSourceService: PageSourceService = DefaultIntegration.this.pageSourceService
-
-    override def renderer: ComponentEditorRenderer = DefaultIntegration.this.componentEditorRenderer
-
-    override def bundler: ComponentBundler = DefaultIntegration.this.componentBundler
-    override def versionInfo: JsObject = DefaultIntegration.this.versionInfo
-
-    override def mode: Mode = DefaultIntegration.this.mode
-
-    override def containerContext = DefaultIntegration.this.containerContext
-
-    override def urls: ComponentUrls = componentSets
-
-    override def components: Seq[Component] = DefaultIntegration.this.components
-
-    override def resolveDomain(path: String): String = DefaultIntegration.this.resolveDomain(path)
-
-    override def hooks: EditorHooks = itemEditorHooks
-  }
-
-  lazy val draftEditor = new DraftEditor {
-    override def componentJson = DefaultIntegration.this.componentJson
-    override def assetPathProcessor: AssetPathProcessor = DefaultIntegration.this.assetPathProcessor
-    override def pageSourceService: PageSourceService = DefaultIntegration.this.pageSourceService
-    override def renderer: ComponentEditorRenderer = DefaultIntegration.this.componentEditorRenderer
-
-    override def bundler: ComponentBundler = DefaultIntegration.this.componentBundler
-
-    override val debounceInMillis = DefaultIntegration.this.debounceInMillis
-
-    override def versionInfo: JsObject = DefaultIntegration.this.versionInfo
-
-    override def mode: Mode = DefaultIntegration.this.mode
-
-    override def containerContext = DefaultIntegration.this.containerContext
-
-    override def urls: ComponentUrls = componentSets
-
-    override def components: Seq[Component] = DefaultIntegration.this.components
-
-    override def hooks = draftEditorHooks
-
-    override def resolveDomain(path: String): String = DefaultIntegration.this.resolveDomain(path)
-  }
-
-  lazy val draftDevEditor = new DraftDevEditor {
-    override def componentJson = DefaultIntegration.this.componentJson
-    override def assetPathProcessor: AssetPathProcessor = DefaultIntegration.this.assetPathProcessor
-    override def pageSourceService: PageSourceService = DefaultIntegration.this.pageSourceService
-    override def renderer: ComponentEditorRenderer = DefaultIntegration.this.componentEditorRenderer
-
-    override def bundler: ComponentBundler = DefaultIntegration.this.componentBundler
-    override def mode: Mode = DefaultIntegration.this.mode
-
-    override def containerContext = DefaultIntegration.this.containerContext
-
-    override def urls: ComponentUrls = componentSets
-
-    override def components: Seq[Component] = DefaultIntegration.this.components
-
-    override def hooks = draftEditorHooks
-
-    override def resolveDomain(path: String): String = DefaultIntegration.this.resolveDomain(path)
-
-    override def versionInfo: JsObject = DefaultIntegration.this.versionInfo
-  }
+//  lazy val draftDevEditor = new DraftDevEditor {
+//    override def componentJson = DefaultIntegration.this.componentJson
+//    override def assetPathProcessor: AssetPathProcessor = DefaultIntegration.this.assetPathProcessor
+//    override def pageSourceService: PageSourceService = DefaultIntegration.this.pageSourceService
+//    override def renderer: ComponentEditorRenderer = DefaultIntegration.this.componentEditorRenderer
+//
+//    override def bundler: ComponentBundler = DefaultIntegration.this.componentBundler
+//    override def mode: Mode = DefaultIntegration.this.mode
+//
+//    override def containerContext = DefaultIntegration.this.containerContext
+//
+//    override def urls: ComponentUrls = componentSets
+//
+//    override def components: Seq[Component] = DefaultIntegration.this.components
+//
+//    override def hooks = draftEditorHooks
+//
+//    override def resolveDomain(path: String): String = DefaultIntegration.this.resolveDomain(path)
+//
+//    override def versionInfo: JsObject = DefaultIntegration.this.versionInfo
+//  }
 
   lazy val catalog = new Catalog {
     override def assetPathProcessor: AssetPathProcessor = DefaultIntegration.this.assetPathProcessor
@@ -301,7 +302,7 @@ trait DefaultIntegration
     override def assetPathProcessor: AssetPathProcessor = DefaultIntegration.this.assetPathProcessor
     override def pageSourceService: PageSourceService = DefaultIntegration.this.pageSourceService
 
-    override def versionInfo: JsObject = DefaultIntegration.this.versionInfo
+    override def versionInfo: JsObject = DefaultIntegration.this.versionInfo.json
 
     override def mode: Mode = DefaultIntegration.this.mode
 

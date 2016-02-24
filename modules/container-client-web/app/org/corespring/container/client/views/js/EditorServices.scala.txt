@@ -15,8 +15,8 @@ compAndWidgets: org.corespring.container.client.views.models.ComponentsAndWidget
   angular.module('@namespace').factory('ItemUrls', [ function($http){
     return {
       load: @toMethodAndUrl(mainEndpoints.load),
-      @save.map { save =>
-        save: @toMethodAndUrl(mainEndpoints.save),
+      @mainEndpoints.save.map { save =>
+        save: @toMethodAndUrl(save),
       }
       saveSubset: @toMethodAndUrl(mainEndpoints.saveSubset)
     }

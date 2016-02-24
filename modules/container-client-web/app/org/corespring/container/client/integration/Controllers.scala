@@ -50,20 +50,6 @@ trait PlayerControllers extends CommonControllers with ResourceControllers {
 }
 
 trait EditorControllers extends CommonControllers with ResourceControllers {
-  /** The editor */
-  def draftEditor: DraftEditor
-
-  /** The dev editor */
-  def draftDevEditor: DraftDevEditor
-
-  /** The editor */
-  def itemEditor: ItemEditor
-
-  /** The dev editor */
-  def itemDevEditor: ItemDevEditor
-
-  def componentEditor: ComponentEditor
-
   /** icons are only used in the editor */
   def icons: Icons
 }
@@ -80,8 +66,8 @@ trait ProfileControllers {
 trait ContainerControllers
   extends RigControllers
   with PlayerControllers
-  with EditorControllers
   with ProfileControllers
+  with EditorControllers
   with CatalogControllers {
   def controllers: Seq[Controller] = Seq(
     componentSets,
@@ -95,11 +81,6 @@ trait ContainerControllers
     session,
     rig,
     prodHtmlPlayer,
-    draftEditor,
-    draftDevEditor,
-    itemEditor,
-    itemDevEditor,
-    componentEditor,
     catalog,
     icons,
     dataQuery)
