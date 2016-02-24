@@ -7,6 +7,8 @@ import org.corespring.container.components.model.dependencies.DependencyResolver
 
 trait ComponentBundler {
   def singleBundle(componentType: String, context: String, expandPaths: Boolean): Option[SingleComponentScriptBundle]
+
+  def bundleAll() : Option[ComponentsScriptBundle]
 }
 
 class DefaultComponentBundler(
@@ -29,4 +31,6 @@ class DefaultComponentBundler(
         ngModules)
     }
   }
+
+  override def bundleAll(): Option[ComponentsScriptBundle] = None
 }
