@@ -1,1 +1,1 @@
-version in ThisBuild := "0.65.2-JAVA8"
+version in ThisBuild := "0.65.3-JAVA8"
