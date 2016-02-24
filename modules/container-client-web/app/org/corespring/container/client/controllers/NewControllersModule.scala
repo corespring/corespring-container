@@ -6,8 +6,8 @@ import org.corespring.container.client.component.{ComponentBundler, ComponentJso
 import org.corespring.container.client.controllers.apps._
 import org.corespring.container.client.hooks.{DraftEditorHooks, ItemEditorHooks}
 import org.corespring.container.client.integration.ContainerExecutionContext
-import org.corespring.container.client.pages.ComponentEditorRenderer
-import org.corespring.container.client.pages.engine.{DevEditorRenderer, JadeEngine, MainEditorRenderer}
+import org.corespring.container.client.pages.{DevEditorRenderer, MainEditorRenderer, ComponentEditorRenderer}
+import org.corespring.container.client.pages.engine.JadeEngine
 import org.corespring.container.client.pages.processing.AssetPathProcessor
 import play.api.Mode.Mode
 import play.api.mvc.Controller

@@ -6,8 +6,8 @@ import org.corespring.container.client.controllers.apps.componentEditor.Componen
 import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.client.hooks.{AssetHooks, DraftEditorHooks, EditorHooks, ItemEditorHooks}
 import org.corespring.container.client.integration.ContainerExecutionContext
-import org.corespring.container.client.pages.ComponentEditorRenderer
-import org.corespring.container.client.pages.engine.{DevEditorRenderer, EditorRenderer, MainEditorRenderer}
+import org.corespring.container.client.pages.{DevEditorRenderer, MainEditorRenderer, EditorRenderer, ComponentEditorRenderer}
+import org.corespring.container.client.pages.engine.DevEditorRenderer
 import org.corespring.container.client.views.models.ComponentsAndWidgets
 import org.corespring.container.components.model.dependencies.ComponentSplitter
 import org.corespring.container.components.model.{Component, Interaction, Widget}
