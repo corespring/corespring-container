@@ -1,6 +1,7 @@
 package org.corespring.container.client.component
 
 import org.corespring.container.client.controllers.angular.AngularModules
+import org.corespring.container.client.controllers.apps.ComponentService
 import org.corespring.container.client.controllers.helpers.LoadClientSideDependencies
 import org.corespring.container.components.model.ComponentInfo
 import org.corespring.container.components.model.dependencies.DependencyResolver
@@ -8,13 +9,14 @@ import org.corespring.container.components.model.dependencies.DependencyResolver
 trait ComponentBundler {
   def singleBundle(componentType: String, context: String, expandPaths: Boolean): Option[SingleComponentScriptBundle]
 
-  def bundleAll() : Option[ComponentsScriptBundle]
+  def bundleAll(context:String, scope:Option[String], expandPaths:Boolean) : Option[ComponentsScriptBundle]
 }
 
 class DefaultComponentBundler(
   dependencyResolver: DependencyResolver,
   clientSideDependencies: LoadClientSideDependencies,
-  urls: ComponentUrls)
+  urls: ComponentUrls,
+  componentService:ComponentService)
   extends ComponentBundler {
 
   override def singleBundle(componentType: String, context: String, expandPaths: Boolean = false): Option[SingleComponentScriptBundle] = {
@@ -32,5 +34,14 @@ class DefaultComponentBundler(
     }
   }
 
-  override def bundleAll(): Option[ComponentsScriptBundle] = None
+  override def bundleAll(context:String, scope:Option[String], expandPaths:Boolean): Option[ComponentsScriptBundle] = {
+    val resolved = dependencyResolver.resolveComponents(componentService.components.map(_.id), scope)
+    val cd = clientSideDependencies.getClientSideDependencies(resolved)
+    val ngModules = new AngularModules().createAngularModules(resolved, cd)
+    Some(ComponentsScriptBundle(
+      components = resolved,
+      urls.jsUrl(context, resolved, expandPaths),
+      urls.cssUrl(context, resolved, expandPaths),
+      ngModules))
+  }
 }

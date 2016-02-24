@@ -179,7 +179,8 @@ trait DefaultIntegration
 
   lazy val clientSideDependencies: LoadClientSideDependencies = new LoadClientSideDependencies {}
 
-  lazy val componentBundler: ComponentBundler = new DefaultComponentBundler(dependencyResolver, clientSideDependencies, componentSets)
+  //TODO: wire when we've cleaned up
+  lazy val componentBundler: ComponentBundler = new DefaultComponentBundler(dependencyResolver, clientSideDependencies, componentSets, componentService)
 
   lazy val jadeEngine = wire[JadeEngine]
 

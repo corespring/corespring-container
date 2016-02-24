@@ -45,16 +45,19 @@ trait EditorRenderer{
     val js = if (prodMode) Seq(sources.js.dest) else sources.js.src
     val processedCss = (css ++ bundle.css).map(assetPathProcessor.process)
     val processedJs = (sources.js.otherLibs ++ js ++ bundle.js).map(assetPathProcessor.process)
-    val servicesJs = EditorServices(name, mainEndpoints, supportingMaterialsEndpoints, componentsAndWidgets)
+
+    val serverNgModuleName = s"$name.serverInjectedServices"
+
+    val servicesJs = EditorServices(serverNgModuleName, mainEndpoints, supportingMaterialsEndpoints, componentsAndWidgets)
 
     val params : Map[String,Any] = Map(
       "appName" -> name,
       "js" -> processedJs.toArray,
       "css" -> processedCss.toArray,
-      "ngModules" -> (sources.js.ngModules ++ bundle.ngModules).map(s => s"'$s'").mkString(","),
+      "ngModules" -> (Seq(serverNgModuleName) ++ sources.js.ngModules ++ bundle.ngModules).map(s => s"'$s'").mkString(","),
       "ngServiceLogic" -> servicesJs,
       "versionInfo" -> Json.stringify(versionInfo.json),
-      "options" -> clientOptions)
+      "options" -> Json.stringify(clientOptions.toJson))
     jade.renderJade("editor", params)
   }
 }

@@ -1,6 +1,6 @@
 package org.corespring.container.client.component
 
-import org.corespring.container.components.model.ComponentInfo
+import org.corespring.container.components.model.{Component, ComponentInfo}
 
 case class SingleComponentScriptBundle(component: ComponentInfo,
   js: Seq[String],
@@ -9,7 +9,7 @@ case class SingleComponentScriptBundle(component: ComponentInfo,
   def componentType: String = component.componentType
 }
 
-case class ComponentsScriptBundle(components: Seq[ComponentInfo],
+case class ComponentsScriptBundle(components: Seq[Component],
                                        js: Seq[String],
                                        css: Seq[String],
                                        ngModules: Seq[String]) {

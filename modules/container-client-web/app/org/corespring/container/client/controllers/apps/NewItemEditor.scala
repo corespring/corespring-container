@@ -85,7 +85,7 @@ trait NewBaseEditor[H<:EditorHooks]
           .getOrElse(mode == Mode.Prod)
 
         val clientOptions = EditorClientOptions(debounceInMillis, StaticPaths.staticPaths)
-        val bundle = bundler.bundleAll().get
+        val bundle = bundler.bundleAll("editor", Some("editor"), !prodMode).get
         val mainEndpoints = endpoints.main(id)
         val supportingMaterialsEndpoints = endpoints.supportingMaterials(id)
         renderer.render(mainEndpoints, supportingMaterialsEndpoints, componentsAndWidgets, clientOptions, bundle, prodMode).map { h =>
