@@ -31,7 +31,7 @@ class ItemTest extends Specification with Mockito with ComponentMaker with NoTim
 
     val hooks: ItemHooks = {
       val m = mock[ItemHooks]
-      m.createItem(any[Option[JsValue]])(any[RequestHeader]).returns {
+      m.createItem(any[Option[String]])(any[RequestHeader]).returns {
         Future.successful {
           createError.map {
             e =>
@@ -39,7 +39,7 @@ class ItemTest extends Specification with Mockito with ComponentMaker with NoTim
           }.getOrElse(Right("new_id"))
         }
       }
-      m.createSingleComponentItem(any[String], any[String], any[JsObject])(any[RequestHeader]).returns {
+      m.createSingleComponentItem(any[Option[String]], any[String], any[String], any[JsObject])(any[RequestHeader]).returns {
         Future.successful {
           createError.map {
             e =>
@@ -119,7 +119,7 @@ class ItemTest extends Specification with Mockito with ComponentMaker with NoTim
 
       s"calls hooks.createSingleComponentItem" in new createWithSingleComponent {
         Await.result(result, 1.second)
-        there was one(hooks).createSingleComponentItem("org-type", "singleComponent", Json.obj("defaultData" -> true))(request)
+        there was one(hooks).createSingleComponentItem(None, "org-type", "singleComponent", Json.obj("defaultData" -> true))(request)
       }
 
     }

@@ -235,14 +235,21 @@ describe('component-editor', function () {
 
     beforeEach(function(){
 
-      launcher.loadCall.and.returnValue({
-        method: 'GET', url: 'item'
-      }); 
+      launcher.loadCall.and.callFake(function(key){
+        return {method: 'GET', url: key};
+      });
 
       Def = modules.Item;
       
       $.ajax = jasmine.createSpy('ajax').and.callFake(function(opts){
-        opts.success({components: {singleComponent: {}}});
+
+        if(opts.url === 'itemEditor.singleComponent.createWithSingleComponent'){
+          opts.success({itemId: 'itemId'});
+        } else if(opts.url === 'itemEditor.singleComponent.loadData'){
+          opts.success({components: {singleComponent: {}}});
+        } else {
+          opts.error('error for key: ' + key);
+        }
       });
     });
 
@@ -277,18 +284,32 @@ describe('component-editor', function () {
       expect(errorCallback).toHaveBeenCalledWith(errorCodes.ONLY_ONE_COMPONENT_ALLOWED);
     });
 
+    it('calls create with collectionId if present', function(){
+
+      item = new Def('element', {collectionId: 'collectionId'}, errorCallback);
+      expect($.ajax).toHaveBeenCalledWith({
+        type: 'GET',
+        url: 'itemEditor.singleComponent.createWithSingleComponent', 
+        contentType: 'application/json',
+        data: JSON.stringify({collectionId: 'collectionId'}),
+        success: jasmine.any(Function),
+        error: jasmine.any(Function),
+        dataType: 'json'
+      });
+    });
+
     it('calls launcher.loadInstance', function(){
       item = new Def('element', {itemId: 'itemId'}, errorCallback);
 
       expect(launcher.loadInstance).toHaveBeenCalledWith(
-        {method: 'GET', url: 'item'},
+        {method: 'GET', url: 'itemEditor.singleComponent.loadEditor'},
         jasmine.any(Object),
         {
           previewMode: 'tabs',
           previewWidth: undefined,
           activePane: 'config', 
           showNavigation: false, 
-          uploadUrl: 'item',
+          uploadUrl: 'itemEditor.singleComponent.upload',
           uploadMethod: 'GET', 
           xhtml: undefined, 
           componentModel: {}

@@ -67,7 +67,8 @@ block content
           span(
             simple-player-button="", 
             class="player-btn-holder", 
-            mode="playerMode") 
+            mode="playerMode",
+            score="score")
           .player-container-holder
             .player-container
               preview-player(
@@ -82,8 +83,6 @@ block content
                 ng-model='item.summaryFeedback', 
                 session-complete='session.isComplete')
                 hr/
-
-          //+preview
 
     else
       .tabbed(ng-controller="Tabbed")

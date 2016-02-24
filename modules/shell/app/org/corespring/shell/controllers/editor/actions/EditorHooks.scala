@@ -100,14 +100,17 @@ trait DraftEditorHooks extends ContainerDraftEditorHooks {
   import play.api.http.Status._
 
   override def load(id: String)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] = Future {
+
     draftItemService.load(id).map { json =>
-      Right(json)
+      logger.trace(s"function=load, id=$id, json=${Json.prettyPrint(json)}")
+      Right(json \ "item")
     }.getOrElse {
       val draftId: ContainerDraftId = DraftId.fromString[ObjectId, ContainerDraftId](id, (itemId, name) => ContainerDraftId(new ObjectId(itemId), name))
       val item = itemService.load(draftId.itemId.toString).get
       draftItemService.createDraft(draftId.itemId, Some(draftId.name), item)
       assets.copyItemToDraft(draftId.itemId.toString, draftId.name)
-      Right(Json.obj("item" -> item))
+      logger.trace(s"function=load, id=$id, json=${Json.prettyPrint(item)} - created item")
+      Right(item)
     }
   }
 

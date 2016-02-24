@@ -34,6 +34,7 @@ class JsonPageSourceService(config: PageSourceServiceConfig) extends PageSourceS
       case (Some(sp), false) => sp.asInstanceOf[A]
       case _ => {
         val path = reportName(contextAndSuffix)
+        logger.debug(s"function=load, path=$path - load report")
         val report = load(path)
         reports.put(contextAndSuffix, report)
         report
@@ -54,14 +55,16 @@ class JsonPageSourceService(config: PageSourceServiceConfig) extends PageSourceS
   override def loadJs(key: String): NgSourcePaths = {
     load[NgSourcePaths](ContextAndSuffix(key, "js"), path => {
       val json = pathToJson(path).getOrElse(throw new IllegalArgumentException(s"Can't load path $path"))
-      SourcePaths.js(config.prefix, json).getOrElse(throw new IllegalStateException("Can't load report"))
+      logger.trace(s"function=loadJs, json=${Json.prettyPrint(json)}")
+      SourcePaths.js(config.prefix, json)
     })
   }
 
   override def loadCss(key: String): CssSourcePaths = {
     load(ContextAndSuffix(key, "css"), path => {
       val json = pathToJson(path).getOrElse(throw new IllegalArgumentException(s"Can't load path $path"))
-      SourcePaths.css(config.prefix, json).getOrElse(throw new IllegalStateException("Can't load report"))
+      logger.trace(s"function=loadCss, json=${Json.prettyPrint(json)}")
+      SourcePaths.css(config.prefix, json)
     })
   }
 }

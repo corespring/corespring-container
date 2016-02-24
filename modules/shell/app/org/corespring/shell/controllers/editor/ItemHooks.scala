@@ -4,7 +4,8 @@ import com.mongodb.casbah.Imports._
 import org.bson.types.ObjectId
 import org.corespring.container.client.controllers.resources.CoreItem
 import org.corespring.container.client.hooks._
-import org.corespring.container.client.hooks.Hooks.{ StatusMessage, R }
+import org.corespring.container.client.hooks.Hooks.{ R, StatusMessage }
+import org.corespring.container.client.integration.ContainerExecutionContext
 import org.corespring.container.client.{ hooks => containerHooks }
 import org.corespring.mongo.json.services.MongoService
 import play.api.http.Status._
@@ -157,7 +158,7 @@ trait ItemHooks
     itemFineGrainedSave(id, Json.obj("profile" -> json))
   }
 
-  override def createItem(json: Option[JsValue])(implicit header: RequestHeader): R[String] = Future {
+  override def createItem(collectionId: Option[String])(implicit header: RequestHeader): R[String] = Future {
     val newItem = Json.obj(
       "components" -> Json.obj(),
       "profile" -> Json.obj("taskInfo" -> Json.obj("title" -> "Untitled")),
@@ -170,7 +171,7 @@ trait ItemHooks
     }.getOrElse(Left(BAD_REQUEST -> "Error creating item"))
   }
 
-  override def createSingleComponentItem(componentType: String, key:String, defaultData: JsObject)(implicit h: RequestHeader): R[String] = Future {
+  override def createSingleComponentItem(collectionId: Option[String], componentType: String, key: String, defaultData: JsObject)(implicit h: RequestHeader): R[String] = Future {
 
     val newItem = Json.obj(
       "components" -> Json.obj(key -> Json.obj("componentType" -> componentType).deepMerge(defaultData)),
