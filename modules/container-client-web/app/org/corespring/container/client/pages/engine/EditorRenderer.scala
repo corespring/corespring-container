@@ -4,19 +4,23 @@ import org.corespring.container.client.component.{ComponentJson, ComponentsScrip
 import org.corespring.container.client.controllers.apps.{EditorClientOptions, PageSourceService}
 import org.corespring.container.client.integration.ContainerExecutionContext
 import org.corespring.container.client.pages.processing.AssetPathProcessor
-import play.api.libs.json.{Json, JsArray, JsValue}
+import org.corespring.container.client.views.models.{ComponentsAndWidgets, MainEndpoints, SupportingMaterialsEndpoints}
+import org.corespring.container.client.views.txt.js.EditorServices
+import play.api.libs.json.{JsArray, JsValue, Json}
 import play.api.templates.Html
 
 import scala.concurrent.Future
 
-class EditorRenderer(containerExecutionContext: ContainerExecutionContext,
-                               jade: JadeEngine,
-                               pageSourceService: PageSourceService,
-                               assetPathProcessor: AssetPathProcessor,
-                               componentJson: ComponentJson,
-                               versionInfo: JsValue) {
+trait EditorRenderer{
 
-  val name = "editor"
+  def containerExecutionContext: ContainerExecutionContext
+     def jade: JadeEngine
+                               def pageSourceService: PageSourceService
+                               def assetPathProcessor: AssetPathProcessor
+                               def componentJson: ComponentJson
+                               def versionInfo: JsValue
+
+  def name:String
 
   implicit def ec = containerExecutionContext.context
 
@@ -30,11 +34,17 @@ class EditorRenderer(containerExecutionContext: ContainerExecutionContext,
     }
   }
 
-  def render(servicesJs:String, clientOptions : EditorClientOptions, bundle:ComponentsScriptBundle, prodMode : Boolean) : Future[Html] = Future{
+  def render( mainEndpoints: MainEndpoints,
+              supportingMaterialsEndpoints: SupportingMaterialsEndpoints,
+              componentsAndWidgets: ComponentsAndWidgets,
+              clientOptions : EditorClientOptions,
+              bundle:ComponentsScriptBundle,
+              prodMode : Boolean) : Future[Html] = Future{
     val css = if (prodMode) Seq(sources.css.dest) else sources.css.src
     val js = if (prodMode) Seq(sources.js.dest) else sources.js.src
     val processedCss = (css ++ bundle.css).map(assetPathProcessor.process)
     val processedJs = (sources.js.otherLibs ++ js ++ bundle.js).map(assetPathProcessor.process)
+    val servicesJs = EditorServices(name, mainEndpoints, supportingMaterialsEndpoints, componentsAndWidgets)
 
     val params : Map[String,Any] = Map(
       "appName" -> name,
@@ -43,11 +53,27 @@ class EditorRenderer(containerExecutionContext: ContainerExecutionContext,
       "ngModules" -> (sources.js.ngModules ++ bundle.ngModules).map(s => s"'$s'").mkString(","),
       "ngServiceLogic" -> servicesJs,
       "versionInfo" -> Json.stringify(versionInfo),
-      "options" -> clientOptions
-    )
+      "options" -> clientOptions)
     jade.renderJade("editor", params)
   }
+}
 
+class MainEditorRenderer(val containerExecutionContext: ContainerExecutionContext,
+                         val jade: JadeEngine,
+                         val pageSourceService: PageSourceService,
+                         val assetPathProcessor: AssetPathProcessor,
+                         val componentJson: ComponentJson,
+                         val versionInfo: JsValue) extends EditorRenderer{
+  override def name: String = "editor"
+}
+
+class DevEditorRenderer(val containerExecutionContext: ContainerExecutionContext,
+                        val jade: JadeEngine,
+                        val pageSourceService: PageSourceService,
+                        val assetPathProcessor: AssetPathProcessor,
+                        val componentJson: ComponentJson,
+                        val versionInfo: JsValue) extends EditorRenderer{
+  override def name: String = "devEditor"
 }
 
 

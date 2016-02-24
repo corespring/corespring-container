@@ -1,8 +1,12 @@
 package org.corespring.container.client.views.models
 
 import play.api.libs.json.Json.JsValueWrapper
-import play.api.libs.json.{ Json }
+import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.Call
+
+case class MainEndpoints(load: Call, saveSubset:Call, save:Option[Call])
+
+case class ComponentsAndWidgets(components:JsValue, widgets:JsValue)
 
 case class SupportingMaterialsEndpoints(
   create: Call,
