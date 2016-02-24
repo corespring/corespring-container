@@ -26,8 +26,11 @@ trait Item extends CoreItem with ComponentSplitter {
       .map { _.defaultData }
       .flatMap { case o: JsObject => Some(o); case _ => None }
 
+    val collectionId = request.body.asJson.flatMap { j =>
+      (j \ "collectionId").asOpt[String]
+    }
     defaultData.map { d =>
-      hooks.createSingleComponentItem(componentType, SingleComponent.Key, d).map { either =>
+      hooks.createSingleComponentItem(collectionId, componentType, SingleComponent.Key, d).map { either =>
         either match {
           case Left(sm) => toResult(sm)
           case Right(id) => Created(Json.obj("itemId" -> id))
@@ -37,11 +40,15 @@ trait Item extends CoreItem with ComponentSplitter {
   }
 
   def create = Action.async { implicit request =>
-    createItem(request.body.asJson)
+    val collectionId = request.body.asJson.flatMap { j =>
+      (j \ "collectionId").asOpt[String]
+    }
+    createItem(collectionId)
   }
 
-  private def createItem(json: Option[JsValue])(implicit rh: RequestHeader): Future[SimpleResult] = {
-    hooks.createItem(json).map {
+  private def createItem(collectionId: Option[String])(implicit rh: RequestHeader): Future[SimpleResult] = {
+
+    hooks.createItem(collectionId).map {
       either =>
         either match {
           case Left(sm) => sm

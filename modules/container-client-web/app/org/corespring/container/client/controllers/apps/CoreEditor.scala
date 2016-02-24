@@ -94,10 +94,13 @@ trait CoreEditor
       servicesJs(id, componentsArray, widgetsArray))(id)
   }
 
-  def findComponentType(json: JsValue): Option[String]
+  final def findComponentType(json: JsValue): Option[String] = {
+    (json \ "components" \\ "componentType").map(_.as[String]).headOption
+  }
 
   def componentEditor(id: String): Action[AnyContent] = Action.async { implicit request =>
     def loadEditor(json: JsValue): Future[SimpleResult] = {
+      logger.trace(s"function=loadEditor, json=${Json.prettyPrint(json)}")
       findComponentType(json) match {
         case Some(ct) => componentEditorResult(ct, request)
         case _ => Future.successful(BadRequest("Can't find a component type"))
@@ -106,7 +109,9 @@ trait CoreEditor
 
     for {
       e <- hooks.load(id)
-      result <- e.fold(e => Future.successful(onError(e)), (json) => loadEditor(json))
+      result <- e.fold(e => Future.successful(onError(e)), (json) => {
+        loadEditor(json)
+      })
     } yield result
   }
 }

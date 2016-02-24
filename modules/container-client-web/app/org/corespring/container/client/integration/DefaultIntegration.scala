@@ -45,13 +45,16 @@ trait DefaultIntegration
 
   private[DefaultIntegration] val debounceInMillis: Long = configuration.getLong("editor.autosave.debounceInMillis").getOrElse(5000)
 
+  def jadeEngineConfig: JadeEngineConfig = JadeEngineConfig("container-client/jade", mode, resourceLoader.loadPath(_), resourceLoader.lastModified(_))
+
   def versionInfo: JsObject
 
-  val mode = Play.current.mode
+  def mode: Mode
 
   def containerContext: ContainerExecutionContext
 
-  def loadResource: String => Option[URL]
+  val loadResource: String => Option[URL]
+
   lazy val resourceLoader = new ResourcePath(loadResource)
   /**
    * For a given resource path return a resolved path.
@@ -142,8 +145,6 @@ trait DefaultIntegration
     override def containerContext: ContainerExecutionContext = DefaultIntegration.this.containerContext
   }
 
-  def pageSourceServiceConfig: PageSourceServiceConfig
-
   lazy val assetPathProcessor = new AssetPathProcessor {
 
     val needsResolution = Seq(
@@ -158,9 +159,12 @@ trait DefaultIntegration
     }
   }
 
-  lazy val pageSourceService: PageSourceService = wire[JsonPageSourceService]
+  lazy val pageSourceServiceConfig: PageSourceServiceConfig = PageSourceServiceConfig(
+    v2Player.Routes.prefix,
+    mode == Mode.Dev,
+    resourceLoader.loadPath(_))
 
-  def jadeEngineConfig: JadeEngineConfig
+  lazy val pageSourceService: PageSourceService = wire[JsonPageSourceService]
 
   lazy val componentJson: ComponentJson = new ComponentInfoJson(v2Player.Routes.prefix)
 
@@ -177,7 +181,6 @@ trait DefaultIntegration
   lazy val componentEditorRenderer: ComponentEditorRenderer = wire[ComponentEditorRenderer]
 
   lazy val componentEditor = wire[ComponentEditor]
-
 
   lazy val jsBuilder = new JsBuilder(resourceLoader.loadPath(_))
 
@@ -375,7 +378,6 @@ trait DefaultIntegration
   }
 
   lazy val playerLauncher = new PlayerLauncher {
-
 
     override def builder: JsBuilder = DefaultIntegration.this.jsBuilder
 

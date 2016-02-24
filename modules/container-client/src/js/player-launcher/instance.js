@@ -32,7 +32,7 @@ var Instance = function(launchOpts, element, errorCallback, log, autosizeEnabled
             d = JSON.stringify(d);
           } 
 
-          var p = '<input type="hidden" name="'+x+'" value="'+d+'"></input>';
+          var p = "<input type='hidden' name=\'"+x+"\' value=\'"+d+"\'></input>";
           formParams.push(p);
         }
       }

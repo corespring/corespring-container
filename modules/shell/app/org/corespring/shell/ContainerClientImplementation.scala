@@ -18,12 +18,13 @@ import org.corespring.container.components.model.Component
 import org.corespring.container.components.model.dependencies.DependencyResolver
 import org.corespring.mongo.json.services.MongoService
 import org.corespring.shell.controllers.catalog.actions.{ CatalogHooks => ShellCatalogHooks }
-import org.corespring.shell.controllers.editor.actions.{ DraftEditorHooks => ShellDraftEditorHooks, DraftId, ItemEditorHooks => ShellItemEditorHooks }
-import org.corespring.shell.controllers.editor.{ CollectionHooks => ShellCollectionHooks, ContainerSupportingMaterialAssets, ItemAssets, ItemDraftAssets, ItemDraftHooks => ShellItemDraftHooks, ItemHooks => ShellItemHooks, SupportingMaterialAssets }
+import org.corespring.shell.controllers.editor.actions.{ DraftId, DraftEditorHooks => ShellDraftEditorHooks, ItemEditorHooks => ShellItemEditorHooks }
+import org.corespring.shell.controllers.editor.{ ContainerSupportingMaterialAssets, ItemAssets, ItemDraftAssets, SupportingMaterialAssets, CollectionHooks => ShellCollectionHooks, ItemDraftHooks => ShellItemDraftHooks, ItemHooks => ShellItemHooks }
 import org.corespring.shell.controllers.player.actions.{ PlayerHooks => ShellPlayerHooks }
 import org.corespring.shell.controllers.player.{ SessionHooks => ShellSessionHooks }
 import org.corespring.shell.controllers.{ ShellDataQueryHooks, editor => shellEditor }
 import org.corespring.shell.services.ItemDraftService
+import play.api.Mode.Mode
 import play.api.Play.current
 import play.api.libs.MimeTypes
 import play.api.libs.json.Reads._
@@ -76,16 +77,7 @@ class ContainerClientImplementation(
 
     override def containerContext: ContainerExecutionContext = ContainerClientImplementation.this.containerContext
 
-    override def componentEditorJs(implicit header: RequestHeader): Future[Option[String]] = {
-      loader.loadJs(header).map { pj =>
-        //TODO: what are the restrictions on loading a standalone component editor?
-        if (pj.errors.length > 0) {
-          Some(pj.errors.mkString(","))
-        } else {
-          None
-        }
-      }
-    }
+    override def componentEditorJs(implicit header: RequestHeader): Future[PlayerJs] = loader.loadJs(header)
   }
 
   object s3 {
@@ -376,12 +368,7 @@ class ContainerClientImplementation(
     Play.resource(_)
   }
 
-  override lazy val pageSourceServiceConfig: PageSourceServiceConfig = PageSourceServiceConfig(
-    v2Player.Routes.prefix,
-    Play.mode == Mode.Dev,
-    resourceLoader.loadPath(_))
-
-  override lazy val jadeEngineConfig: JadeEngineConfig = JadeEngineConfig("container-client/jade", Play.current.mode, resourceLoader.loadPath(_), resourceLoader.lastModified(_))
+  override def mode: Mode = Play.current.mode
 }
 
 /**

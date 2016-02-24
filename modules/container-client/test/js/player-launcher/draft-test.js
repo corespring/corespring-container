@@ -42,6 +42,30 @@ describe('draft', function() {
         expect(done).toHaveBeenCalledWith(null, createResult);
       });
 
+      it('adds collectionId if present', function(){
+        draft.createItemAndDraft({url: 'url', method: 'POST'}, {collectionId: 'collectionId'}, done);
+        expect($.ajax).toHaveBeenCalledWith({
+          type:'POST',
+          url: 'url',
+          data: {draftName: undefined, collectionId: 'collectionId'},
+          success: jasmine.any(Function),
+          error: jasmine.any(Function),
+          dataType: 'json'
+        });
+      });
+      
+      it('adds draftName if present', function(){
+        draft.createItemAndDraft({url: 'url', method: 'POST'}, {draftName: 'draftName'}, done);
+        expect($.ajax).toHaveBeenCalledWith({
+          type:'POST',
+          url: 'url',
+          data: {draftName: 'draftName'},
+          success: jasmine.any(Function),
+          error: jasmine.any(Function),
+          dataType: 'json'
+        });
+      });
+
       it('calls onItemCreated', function(){
         expect(onItemCreated).toHaveBeenCalledWith(createResult.itemId);
       });

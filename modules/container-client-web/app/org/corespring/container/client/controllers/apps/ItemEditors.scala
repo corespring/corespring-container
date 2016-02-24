@@ -9,10 +9,6 @@ trait BaseItemEditor extends CoreEditor {
 
   import resources.{ routes => resourceRoutes }
 
-  override def findComponentType(json: JsValue): Option[String] = {
-    (json \ "components" \\ "componentType").map(_.as[String]).headOption
-  }
-
   override def servicesJs(itemId: String, components: JsArray, widgets: JsArray) = {
 
     val smEndpoints = SupportingMaterialsEndpoints(

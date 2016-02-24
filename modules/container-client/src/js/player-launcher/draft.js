@@ -14,12 +14,18 @@ exports.createItemAndDraft = function(call, options, callback) {
 
   callback = callback || function() {};
 
+  var params = {
+    draftName : options.draftName
+  };
+
+  if(options.collectionId){
+    params.collectionId = options.collectionId;
+  }
+
   $.ajax({
     type: call.method,
     url: call.url,
-    data: {
-      draftName: options.draftName
-    },
+    data: params,
     success: onSuccess,
     error: onError.bind(null, callback, errorCodes.CREATE_ITEM_AND_DRAFT_FAILED),
     dataType: 'json'

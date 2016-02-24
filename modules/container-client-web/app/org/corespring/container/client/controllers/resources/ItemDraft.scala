@@ -4,10 +4,10 @@ import org.corespring.container.client.hooks._
 import org.corespring.container.components.model.Component
 import org.corespring.container.components.model.dependencies.ComponentSplitter
 import play.api.Logger
-import play.api.libs.json.{JsObject}
+import play.api.libs.json.{ JsObject }
 import play.api.libs.json.Json._
 import play.api.mvc._
-import scala.concurrent.{Future}
+import scala.concurrent.{ Future }
 
 object ItemDraft {
   object Errors {
@@ -18,15 +18,16 @@ object ItemDraft {
   }
 }
 
-trait ItemDraft extends CoreItem with ComponentSplitter{
+trait ItemDraft extends CoreItem with ComponentSplitter {
 
   override lazy val logger = Logger(classOf[ItemDraft])
 
-  def components : Seq[Component]
+  def components: Seq[Component]
 
   def createItemAndDraft = Action.async {
     implicit request =>
-      hooks.createItemAndDraft.map { either =>
+      val collectionId = request.body.asJson.flatMap(json => (json \ "collectionId").asOpt[String])
+      hooks.createItemAndDraft(collectionId).map { either =>
         either match {
           case Left(sm) => sm
           case Right((itemId, draftName)) => Ok(obj("itemId" -> itemId, "draftName" -> draftName))
@@ -34,15 +35,17 @@ trait ItemDraft extends CoreItem with ComponentSplitter{
       }
   }
 
-  def createWithSingleComponent(componentType:String) = Action.async { implicit request =>
+  def createWithSingleComponent(componentType: String) = Action.async { implicit request =>
 
     val defaultData = interactions
       .find(_.componentType == componentType)
       .map { _.defaultData }
-      .flatMap{ case o : JsObject => Some(o); case _ => None }
+      .flatMap { case o: JsObject => Some(o); case _ => None }
 
-    defaultData.map{ d =>
-      hooks.createSingleComponentItemDraft(componentType, SingleComponent.Key, d).map { either =>
+    val collectionId = request.body.asJson.flatMap(json => (json \ "collectionId").asOpt[String])
+
+    defaultData.map { d =>
+      hooks.createSingleComponentItemDraft(collectionId, componentType, SingleComponent.Key, d).map { either =>
         either match {
           case Left(sm) => toResult(sm)
           case Right((itemId, draftName)) => Created(obj("itemId" -> itemId, "draftName" -> draftName))
@@ -55,10 +58,12 @@ trait ItemDraft extends CoreItem with ComponentSplitter{
 
   def save(draftId: String) = Action.async { implicit request: Request[AnyContent] =>
     request.body.asJson match {
-      case Some(json) => hooks.save(draftId, json).map { _ match {
-        case Left(sm) => sm
-        case Right(json) => Ok(json)
-      }}
+      case Some(json) => hooks.save(draftId, json).map {
+        _ match {
+          case Left(sm) => sm
+          case Right(json) => Ok(json)
+        }
+      }
       case _ => Future { BadRequest(obj("error" -> ItemDraft.Errors.noJson)) }
     }
   }
@@ -72,6 +77,5 @@ trait ItemDraft extends CoreItem with ComponentSplitter{
       }
     }
   }
-
 
 }

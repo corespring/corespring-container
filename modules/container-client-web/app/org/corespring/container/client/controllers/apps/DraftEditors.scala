@@ -28,9 +28,6 @@ trait BaseDraftEditor extends CoreEditor {
       components, widgets).toString
   }
 
-  override def findComponentType(json: JsValue): Option[String] = {
-    (json \ "item" \ "components" \\ "componentType").map(_.as[String]).headOption
-  }
 }
 
 trait DraftEditor extends BaseDraftEditor {
