@@ -125,7 +125,7 @@ trait Main
 
       result.map {
         oid =>
-          val call = org.corespring.container.client.controllers.apps.routes.Player.load(oid.toString)
+          val call = org.corespring.container.client.controllers.apps.routes.NewPlayer.load(oid.toString)
           logger.debug(s"url ${call.url}")
           val url = s"${call.url}?${request.rawQueryString}"
           Ok(Json.obj("url" -> url))

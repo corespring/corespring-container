@@ -1,19 +1,19 @@
 package org.corespring.container.client.controllers.apps
 
-import org.corespring.container.client.component.{ ComponentBundler, ComponentJson }
+import org.corespring.container.client.component.{ComponentBundler, ComponentJson, ItemComponentTypes}
 import org.corespring.container.client.controllers.AssetsController
 import org.corespring.container.client.controllers.apps.componentEditor.ComponentEditorLaunchingController
 import org.corespring.container.client.hooks.Hooks.StatusMessage
-import org.corespring.container.client.hooks.{ DraftEditorHooks, EditorHooks, ItemEditorHooks }
+import org.corespring.container.client.hooks.{DraftEditorHooks, EditorHooks, ItemEditorHooks}
 import org.corespring.container.client.integration.ContainerExecutionContext
-import org.corespring.container.client.pages.{ ComponentEditorRenderer, DevEditorRenderer, EditorRenderer, MainEditorRenderer }
+import org.corespring.container.client.pages.{ComponentEditorRenderer, DevEditorRenderer, EditorRenderer, MainEditorRenderer}
 import org.corespring.container.client.views.models.ComponentsAndWidgets
 import org.corespring.container.components.model.dependencies.ComponentSplitter
-import org.corespring.container.components.model.{ Component, Interaction, Widget }
+import org.corespring.container.components.model.{Component, Id, Interaction, Widget}
 import play.api.Mode.Mode
-import play.api.libs.json.{ JsArray, JsValue, Json }
-import play.api.mvc.{ Action, Controller, RequestHeader, SimpleResult }
-import play.api.{ Logger, Mode }
+import play.api.libs.json.{JsArray, JsValue, Json}
+import play.api.mvc.{Action, Controller, RequestHeader, SimpleResult}
+import play.api.{Logger, Mode}
 
 import scala.concurrent.Future
 
@@ -23,9 +23,11 @@ trait ComponentService {
   def interactions: Seq[Interaction]
 
   def widgets: Seq[Widget]
+
+  def idsInItem(json:JsValue) : Seq[Id]
 }
 
-class DefaultComponentService(mode: Mode, loadComps: => Seq[Component]) extends ComponentSplitter with ComponentService {
+class DefaultComponentService(mode: Mode, loadComps: => Seq[Component]) extends ComponentSplitter with ComponentService{
 
   private var loadedComponents: Seq[Component] = Seq.empty
 
@@ -36,6 +38,11 @@ class DefaultComponentService(mode: Mode, loadComps: => Seq[Component]) extends 
     }
     case (Mode.Prod, x :: _) => loadedComponents
     case _ => loadComps
+  }
+
+  //superceding [[PlayerItemTypeReader]]
+  override def idsInItem(json: JsValue): Seq[Id] = {
+    ItemComponentTypes(interactions, widgets, layoutComponents, json).map(_.id)
   }
 }
 

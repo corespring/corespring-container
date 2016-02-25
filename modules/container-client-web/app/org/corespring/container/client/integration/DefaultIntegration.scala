@@ -8,7 +8,7 @@ import org.corespring.container.client.{V2PlayerConfig, VersionInfo}
 import org.corespring.container.client.component.{ComponentUrls, _}
 import org.corespring.container.client.controllers._
 import org.corespring.container.client.controllers.apps._
-import org.corespring.container.client.controllers.helpers.LoadClientSideDependencies
+import org.corespring.container.client.controllers.helpers.{DefaultPlayerXhtml, LoadClientSideDependencies, PlayerXhtml}
 import org.corespring.container.client.controllers.launcher.JsBuilder
 import org.corespring.container.client.controllers.launcher.editor.EditorLauncher
 import org.corespring.container.client.controllers.launcher.player.PlayerLauncher
@@ -168,6 +168,7 @@ trait DefaultIntegration
     v2Player.Routes.prefix,
     mode == Mode.Dev,
     resourceLoader.loadPath(_))
+
 
   lazy val pageSourceService: PageSourceService = wire[JsonPageSourceService]
 
@@ -345,9 +346,13 @@ trait DefaultIntegration
     override def containerContext = DefaultIntegration.this.containerContext
 
     override def materialHooks: SupportingMaterialHooks = DefaultIntegration.this.itemSupportingMaterialHooks
+
+    override def playerXhtml: PlayerXhtml = DefaultIntegration.this.playerXhtml
   }
 
   lazy val itemDraft = new ItemDraft {
+
+    override def playerXhtml: PlayerXhtml = DefaultIntegration.this.playerXhtml
 
     override def components: Seq[Component] = DefaultIntegration.this.components
 

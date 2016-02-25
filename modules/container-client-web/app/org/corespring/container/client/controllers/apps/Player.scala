@@ -37,7 +37,7 @@ trait Player
      */
     private def processXhtml(maybeXhtml: Option[String]) = maybeXhtml.map {
       xhtml =>
-        PlayerXhtml.mkXhtml(components.map(_.componentType), xhtml)
+        xhtml //PlayerXhtml.mkXhtml(components.map(_.componentType), xhtml)
     }.getOrElse("<div><h1>New Item</h1></div>")
 
     def createPlayerHtml(sessionId: String, session: JsValue, itemJson: JsValue, serviceParams: JsObject)(implicit rh: RequestHeader): Html = {
@@ -152,7 +152,7 @@ trait Player
       handleSuccess { (tuple) =>
         val (session, item) = tuple
         require((session \ "id").asOpt[String].isDefined, "The session model must specify an 'id'")
-        val call = org.corespring.container.client.controllers.apps.routes.Player.load((session \ "id").as[String])
+        val call = org.corespring.container.client.controllers.apps.routes.NewPlayer.load((session \ "id").as[String])
         val location = {
           val params = queryParams[String]()
           s"${call.url}${if (params.isEmpty) "" else s"?$params"}"
@@ -172,18 +172,19 @@ trait Player
   }
 
   private def servicesJs(sessionId: String, queryParams: JsObject) = {
-    import org.corespring.container.client.controllers.resources.routes._
-    PlayerServices(
-      "player.services",
-      PlayerServiceEndpoints(
-        Session.completeSession(sessionId),
-        Session.getScore(sessionId),
-        Session.loadInstructorData(sessionId),
-        Session.loadItemAndSession(sessionId),
-        Session.loadOutcome(sessionId),
-        Session.reopenSession(sessionId),
-        Session.resetSession(sessionId),
-        Session.saveSession(sessionId)),
-      queryParams).toString
+    "?"
+//    import org.corespring.container.client.controllers.resources.routes._
+//    PlayerServices(
+//      "player.services",
+//      PlayerServiceEndpoints(
+//        Session.completeSession(sessionId),
+//        Session.getScore(sessionId),
+//        Session.loadInstructorData(sessionId),
+//        Session.loadItemAndSession(sessionId),
+//        Session.loadOutcome(sessionId),
+//        Session.reopenSession(sessionId),
+//        Session.resetSession(sessionId),
+//        Session.saveSession(sessionId)),
+//      queryParams).toString
   }
 }

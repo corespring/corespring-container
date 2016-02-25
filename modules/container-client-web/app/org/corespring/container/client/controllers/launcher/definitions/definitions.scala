@@ -74,7 +74,7 @@ private[launcher] case class Player(builder: JsBuilder, queryParams: Map[String,
 
     val errorsAndWarnings = obj("errors" -> playerJs.errors, "warnings" -> playerJs.warnings)
 
-    import org.corespring.container.client.controllers.apps.routes.{ Player => Routes }
+    import org.corespring.container.client.controllers.apps.routes.{ NewPlayer => Routes }
 
     val loadSession = Routes.load(":sessionId")
     val paths = obj("paths" -> obj(

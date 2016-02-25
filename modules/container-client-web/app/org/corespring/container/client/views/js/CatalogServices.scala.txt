@@ -17,7 +17,7 @@
   }]);
 
   angular.module('@namespace').factory('SupportingMaterialUrls', [function(){
-    return @smEndpoints.toJsonString;
+    return @smEndpoints.jsonString;
   }]);
 
   angular.module('@namespace').factory('ItemService', ['BaseService', function(BaseService){

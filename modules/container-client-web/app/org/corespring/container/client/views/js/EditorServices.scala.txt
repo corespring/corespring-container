@@ -23,7 +23,7 @@ compAndWidgets: org.corespring.container.client.views.models.ComponentsAndWidget
   }]);
 
   angular.module('@namespace').factory('SupportingMaterialUrls', [function(){
-    return @smEndpoints.toJsonString;
+    return @smEndpoints.jsonString;
   }]);
 
   angular.module('@namespace').factory('ComponentService', [function(){

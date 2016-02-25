@@ -3,18 +3,19 @@ package org.corespring.container.client.pages
 import java.lang.Boolean
 
 import org.corespring.container.client.VersionInfo
-import org.corespring.container.client.component.{ ComponentJson, ComponentsScriptBundle }
-import org.corespring.container.client.controllers.apps.{ PageSourceService, PlayerEndpoints, SourcePaths }
+import org.corespring.container.client.component.{ComponentJson, ComponentsScriptBundle}
+import org.corespring.container.client.controllers.apps.{PageSourceService, PlayerEndpoints, SourcePaths}
 import org.corespring.container.client.controllers.helpers.PlayerXhtml
 import org.corespring.container.client.integration.ContainerExecutionContext
 import org.corespring.container.client.pages.engine.JadeEngine
 import org.corespring.container.client.pages.processing.AssetPathProcessor
 import org.corespring.container.client.views.txt.js.PlayerServices
+import org.corespring.container.components.processing.PlayerItemPreProcessor
 import play.api.Logger
-import play.api.libs.json.{ JsValue, Json }
+import play.api.libs.json.{JsObject, JsValue, Json}
 import play.api.templates.Html
 
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.{ExecutionContext, Future}
 
 class PlayerRenderer(
   containerContext: ContainerExecutionContext,
@@ -23,6 +24,7 @@ class PlayerRenderer(
   assetPathProcessor: AssetPathProcessor,
   componentJson: ComponentJson,
   playerXhtml: PlayerXhtml,
+  itemPreProcessor: PlayerItemPreProcessor,
   versionInfo: VersionInfo) {
 
   implicit def ec: ExecutionContext = containerContext.context
@@ -71,7 +73,7 @@ class PlayerRenderer(
       case (_, _) => Nil
     }
 
-    val inlineJs = PlayerServices("name", endpoints, queryParams).toString
+    val inlineJs = PlayerServices("player-injected", endpoints, queryParams).toString
     val processedCss = (css ++ bundle.css).map(assetPathProcessor.process)
     val processedJs = (sources.js.otherLibs ++ js ++ controlsJs ++ bundle.js).map(assetPathProcessor.process)
     val useNewRelicRumConfig = true
@@ -84,10 +86,8 @@ class PlayerRenderer(
     }
 
     val session: JsValue = Json.obj()
-    val processedXhtml = processXhtml((itemJson \ "xhtml").asOpt[String])
-    val preprocessedItem = itemPreProcessor.preProcessItemForPlayer(itemJson).as[JsObject] ++ Json.obj("xhtml" -> processedXhtml)
-    val preprocessedItem = Json.obj()
-
+    val processedXhtml = processXhtml((item \ "xhtml").asOpt[String])
+    val preprocessedItem = itemPreProcessor.preProcessItemForPlayer(item).as[JsObject] ++ Json.obj("xhtml" -> processedXhtml)
     val sessionJson = Json.obj("session" -> session, "item" -> preprocessedItem)
 
     val params: Map[String, Any] = Map(
@@ -98,7 +98,7 @@ class PlayerRenderer(
       "useNewRelicRumConfig" -> javaBoolean(useNewRelicRumConfig),
       "newRelicRumConfig" -> Json.stringify(newRelicRumConfig),
       "warnings" -> Json.stringify(Json.arr(warnings)),
-      "ngModules" -> (sources.js.ngModules ++ bundle.ngModules).map(s => s"'$s'").mkString(","),
+      "ngModules" -> (Some("player-injected") ++ sources.js.ngModules ++ bundle.ngModules).map(s => s"'$s'").mkString(","),
       "ngServiceLogic" -> inlineJs,
       "sessionJson" -> Json.stringify(sessionJson),
       "options" -> "{}",
