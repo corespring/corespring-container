@@ -8,7 +8,6 @@ import org.corespring.container.client.controllers.GetAsset
 import org.corespring.container.client.controllers.helpers.PlayerXhtml
 import org.corespring.container.client.controllers.jade.Jade
 import org.corespring.container.client.hooks.PlayerHooks
-import org.corespring.container.client.views.models.PlayerServiceEndpoints
 import org.corespring.container.client.views.txt.js.PlayerServices
 import org.corespring.container.components.processing.PlayerItemPreProcessor
 import play.api.Logger
