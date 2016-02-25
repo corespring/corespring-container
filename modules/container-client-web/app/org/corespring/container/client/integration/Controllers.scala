@@ -42,7 +42,7 @@ trait ResourceControllers {
 
 trait RigControllers extends CommonControllers {
   /** the rig app */
-  def rig: Rig
+  //  def rig: Rig
 }
 
 trait PlayerControllers extends CommonControllers with ResourceControllers {
@@ -79,7 +79,7 @@ trait ContainerControllers
     item,
     itemDraft,
     session,
-    rig,
+    //    rig,
     //prodHtmlPlayer,
     catalog,
     icons,
