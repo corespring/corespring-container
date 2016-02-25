@@ -49,7 +49,7 @@ trait Rig
     }
   }
 
-  override def ngModules: AngularModules = new AngularModules()
+  override def ngModules(context: String): AngularModules = new AngularModules()
 
   def load(componentType: String): Action[AnyContent] = Action.async { implicit request =>
 
@@ -57,7 +57,7 @@ trait Rig
 
     def onItem(i: JsValue) = {
       val comps = (componentTypes(i) :+ componentType).distinct
-      val scriptInfo = componentScriptInfo(comps, jsMode == "dev")
+      val scriptInfo = componentScriptInfo(context, comps, jsMode == "dev")
       val js = buildJs(scriptInfo)
       val css = buildCss(scriptInfo)
       val itemJson = Json.prettyPrint(i)
@@ -67,7 +67,7 @@ trait Rig
           context,
           js,
           css,
-          jsSrc.ngModules ++ scriptInfo.ngDependencies,
+          jsSrc(context).ngModules ++ scriptInfo.ngDependencies,
           itemJson)))
     }
 

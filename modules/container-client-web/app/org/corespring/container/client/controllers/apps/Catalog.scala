@@ -7,6 +7,7 @@ import org.corespring.container.client.hooks.{ LoadHook, CatalogHooks }
 import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.client.views.models.SupportingMaterialsEndpoints
 import org.corespring.container.client.views.txt.js.CatalogServices
+import play.api.Logger
 import play.api.libs.json.{ JsArray, JsString, JsValue, Json }
 import play.api.mvc.{ Action, AnyContent }
 
@@ -17,6 +18,8 @@ trait Catalog
   with App[CatalogHooks]
   with Jade
   with GetAsset[CatalogHooks] {
+
+  private lazy val logger = Logger(classOf[Catalog])
 
   override def context: String = "catalog"
 
@@ -56,7 +59,7 @@ trait Catalog
         def ifEmpty = {
           logger.trace(s"[showCatalog]: $id")
 
-          val scriptInfo = componentScriptInfo(componentTypes(Json.obj()), jsMode == "dev")
+          val scriptInfo = componentScriptInfo(context, componentTypes(Json.obj()), jsMode == "dev")
           val domainResolvedJs = buildJs(scriptInfo)
           val domainResolvedCss = buildCss(scriptInfo)
           Ok(
@@ -65,7 +68,7 @@ trait Catalog
                 context,
                 domainResolvedJs,
                 domainResolvedCss,
-                jsSrc.ngModules ++ scriptInfo.ngDependencies,
+                jsSrc(context).ngModules ++ scriptInfo.ngDependencies,
                 servicesJs(id),
                 StaticPaths.staticPaths)))
         }

@@ -10,7 +10,8 @@ import org.corespring.container.client.controllers.jade.Jade
 import org.corespring.container.client.hooks.PlayerHooks
 import org.corespring.container.client.views.txt.js.PlayerServices
 import org.corespring.container.components.processing.PlayerItemPreProcessor
-import play.api.http.{ ContentTypes }
+import play.api.Logger
+import play.api.http.ContentTypes
 import play.api.libs.json._
 import play.api.mvc.{ Action, AnyContent, RequestHeader }
 import play.api.templates.Html
@@ -23,9 +24,9 @@ trait Player
   with Jade
   with GetAsset[PlayerHooks] {
 
-  private object SessionRenderer {
+  private lazy val logger = Logger(classOf[Player])
 
-    private val archiveCollId = "500ecfc1036471f538f24bdc"
+  private object SessionRenderer {
 
     /**
      * Preprocess the xml so that it'll work in all browsers
@@ -39,12 +40,10 @@ trait Player
         PlayerXhtml.mkXhtml(components.map(_.componentType), xhtml)
     }.getOrElse("<div><h1>New Item</h1></div>")
 
-    def hasBeenArchived(itemJson: JsValue) =
-      (itemJson \ "collectionId").asOpt[String].map(_ == archiveCollId).getOrElse(false)
-
     def createPlayerHtml(sessionId: String, session: JsValue, itemJson: JsValue, serviceParams: JsObject)(implicit rh: RequestHeader): Html = {
 
-      val scriptInfo = componentScriptInfo(componentTypes(itemJson), jsMode == "dev")
+      val hasBeenArchived = (session \ "collectionId").asOpt[String].exists(_ == hooks.archiveCollectionId)
+      val scriptInfo = componentScriptInfo(context, componentTypes(itemJson), jsMode == "dev")
       val controlsJs = if (showControls) paths(controlsJsSrc) else Seq.empty
       val domainResolvedJs = buildJs(scriptInfo, controlsJs)
       val domainResolvedCss = buildCss(scriptInfo)
@@ -62,20 +61,19 @@ trait Player
           context,
           domainResolvedJs,
           domainResolvedCss,
-          jsSrc.ngModules ++ scriptInfo.ngDependencies,
+          jsSrc(context).ngModules ++ scriptInfo.ngDependencies,
           servicesJs(sessionId, serviceParams),
           showControls,
           Json.obj("session" -> session, "item" -> preprocessedItem),
           versionInfo,
           newRelicRumConf != None,
           newRelicRumConf.getOrElse(Json.obj()),
-          if (hasBeenArchived(itemJson)) Seq(s"Warning: This item has been deleted.") else Seq.empty)
-      )
+          if (hasBeenArchived) Seq(s"Warning: This item has been deleted.") else Seq.empty))
 
     }
   }
 
-  lazy val controlsJsSrc: SourcePaths = SourcePaths.fromJsonResource(modulePath, s"container-client/$context-controls-js-report.json")
+  lazy val controlsJsSrc: SourcePaths = pageSourceService.loadJs(s"player-controls")
 
   override def context: String = "player"
 

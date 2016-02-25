@@ -6,11 +6,11 @@ import org.corespring.container.components.model._
 
 class AngularModules(defaultModules: String*) extends NameHelper {
 
-  private def hasClientSideLogic(c: Component): Boolean = {
-    if (c.isInstanceOf[Library]) {
-      val has = c.asInstanceOf[Library].client.size > 0
-      has
-    } else true
+  private def hasClientSideLogic(c: Component): Boolean = c match {
+    case i: Interaction => true
+    case w: Widget => true
+    case l: Library => l.client.size > 0
+    case _ => false
   }
 
   def createAngularModules(components: Seq[Component], clientSideDependencies: Seq[ClientSideDependency]): Seq[String] = {

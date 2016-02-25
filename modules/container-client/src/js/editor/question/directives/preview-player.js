@@ -81,7 +81,7 @@
           template: [
             '<div>',
             '  <corespring-player',
-            '    player-mode="mode"',
+            '    player-mode="{{mode}}"',
             '    player-markup="slowXhtml"',
             '    player-item="item"',
             '    player-outcomes="outcome"',

@@ -2,20 +2,21 @@ package org.corespring.container.components.model.dependencies
 
 import com.ahum.deps._
 import org.corespring.container.components.model._
-import org.corespring.container.logging.ContainerLogger
+import play.api.Logger
+
 trait DependencyResolver extends ComponentSplitter {
 
   type IdRelation = (Id, Seq[Id])
 
-  lazy val logger = ContainerLogger.getLogger("dependencies.DependencyResolver")
+  private lazy val logger = Logger(classOf[DependencyResolver])
 
   lazy val relationships: Seq[(Id, Seq[Id])] = {
     components.map { c =>
       c match {
-        case i:Interaction => (Id(i.org, i.name) -> i.libraries)
-        case w:Widget => (Id(w.org, w.name) -> w.libraries)
-        case l:Library => (Id(l.org, l.name) -> l.libraries)
-        case lc:LayoutComponent => (Id(lc.org, lc.name) -> Seq.empty)
+        case i: Interaction => (Id(i.org, i.name) -> i.libraries)
+        case w: Widget => (Id(w.org, w.name) -> w.libraries)
+        case l: Library => (Id(l.org, l.name) -> l.libraries)
+        case lc: LayoutComponent => (Id(lc.org, lc.name) -> Seq.empty)
       }
     }
   }
@@ -34,6 +35,7 @@ trait DependencyResolver extends ComponentSplitter {
 
   /**
    * For a given set of ids, return a topologically sorted sequence of ids (plus their dependents).
+   *
    * @param ids
    * @return
    */
@@ -64,6 +66,7 @@ trait DependencyResolver extends ComponentSplitter {
 
     /**
      * For each id gather its relationship, and then do the same for any dependent ids that have been found
+     *
      * @param i
      * @param acc
      * @return

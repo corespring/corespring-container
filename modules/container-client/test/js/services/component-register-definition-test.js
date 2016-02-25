@@ -48,22 +48,49 @@ describe('ComponentRegisterDefinition', function() {
     var editable = true;
     var component = new MockComponent();
     var answerChangedHandler = function() {};
-
-    beforeEach(function() {
+  
+    beforeEach(function(){
       componentRegister.setEditable(editable);
       componentRegister.setAnswerChangedHandler(answerChangedHandler);
-      componentRegister.registerComponent('id', component);
-    });
+    }); 
 
-    it('should set editable on component', function() {
-      expect(mockComponentMethods.editable).toHaveBeenCalledWith(editable);
-    });
+    describe('when data is set before the component', function(){
 
-    it('should set answerChangedHandler on component', function() {
-      expect(mockComponentMethods.answerChangedHandler).toHaveBeenCalledWith(answerChangedHandler);
+      var dataAndSession;
+
+      beforeEach(function(){
+        dataAndSession = { 
+          data: {isData: true},
+          session: {isSession: true}
+        };
+
+        componentRegister.setDataAndSession({id: dataAndSession});
+        componentRegister.registerComponent('id', component);
+      });
+
+      it('sets the data on the component', function(){
+        expect(mockComponentMethods.setDataAndSession).toHaveBeenCalledWith(dataAndSession);
+      });
+
+    });
+    
+    describe('when the component is registered before the data', function(){
+      beforeEach(function() {
+        componentRegister.registerComponent('id', component);
+      });
+
+      it('should set editable on component', function() {
+        expect(mockComponentMethods.editable).toHaveBeenCalledWith(editable);
+      });
+
+      it('should set answerChangedHandler on component', function() {
+        expect(mockComponentMethods.answerChangedHandler).toHaveBeenCalledWith(answerChangedHandler);
+      });
+
     });
 
   });
+
 
   describe('setDataAndSessions', function() {
     var component = new MockComponent();

@@ -2,26 +2,27 @@ package org.corespring.container.client.controllers.apps
 
 import java.util.concurrent.TimeUnit
 
-import org.corespring.container.client.component.ComponentUrls
+import org.corespring.container.client.component._
 import org.corespring.container.client.hooks.EditorHooks
-import org.corespring.container.components.model.{ Widget, Client, Component }
+import org.corespring.container.client.pages.ComponentEditorRenderer
+import org.corespring.container.client.pages.processing.AssetPathProcessor
+import org.corespring.container.components.model.Component
 import org.corespring.test.TestContext
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
 import play.api.Mode
 import play.api.Mode.Mode
-import play.api.libs.json.{ Json, JsObject, JsArray }
-import play.api.mvc.RequestHeader
+import play.api.libs.json.{ JsArray, JsObject, Json }
+import play.api.mvc.{Request, AnyContent, RequestHeader}
 import play.api.templates.Html
 import play.api.test.FakeRequest
-
-import scala.concurrent.duration.Duration
-import scala.concurrent.{ Await, Future, ExecutionContext }
 import play.api.test.Helpers._
 
-class CoreEditorTest extends Specification with Mockito {
+import scala.concurrent.duration.Duration
+import scala.concurrent.{ Await, Future }
 
+class CoreEditorTest extends Specification with Mockito {
 
   class scope extends Scope with CoreEditor with TestContext {
 
@@ -29,8 +30,8 @@ class CoreEditorTest extends Specification with Mockito {
 
     override protected def buildCss(scriptInfo: ComponentScriptInfo)(implicit rh: RequestHeader): Seq[String] = Seq.empty
 
-    override def jsSrc: NgSourcePaths = NgSourcePaths(Seq.empty, "", Seq.empty, Seq.empty)
-    override def cssSrc: CssSourcePaths = CssSourcePaths(Seq.empty, "", Seq.empty)
+    override def jsSrc(context: String): NgSourcePaths = NgSourcePaths(Seq.empty, "", Seq.empty, Seq.empty)
+    override def cssSrc(context: String): CssSourcePaths = CssSourcePaths(Seq.empty, "", Seq.empty)
 
     implicit val r = FakeRequest("", "")
     override def versionInfo: JsObject = Json.obj()
@@ -52,7 +53,6 @@ class CoreEditorTest extends Specification with Mockito {
 
     override def hooks: EditorHooks = mockHooks
 
-
     override def mode: Mode = Mode.Dev
 
     protected var templateParams: TemplateParams = null
@@ -62,6 +62,15 @@ class CoreEditorTest extends Specification with Mockito {
       Html("hi")
     }
 
+    override def renderer: ComponentEditorRenderer = mock[ComponentEditorRenderer]
+
+    override def bundler: ComponentBundler = mock[ComponentBundler]
+
+    override def assetPathProcessor: AssetPathProcessor = mock[AssetPathProcessor]
+
+    override def pageSourceService: PageSourceService = mock[PageSourceService]
+
+    override def componentJson: ComponentJson = new ComponentInfoJson("path")
   }
 
   "load" should {
@@ -83,20 +92,58 @@ class CoreEditorTest extends Specification with Mockito {
       Await.result(load("id")(r), Duration(1, TimeUnit.SECONDS))
       templateParams.asInstanceOf[EditorTemplateParams].options.debounceInMillis === 5001
     }
-
   }
 
-  "toJson" should {
-    "convert ComponentInfo to json" in new scope {
-      val componentInfo = Widget("org", "widget", None, None, Client("render", "configure", None), false, true, Json.obj(
-        "external-configuration" -> Json.obj("config" -> "a")), Json.obj("data" -> "data"))
-      val json = toJson(componentInfo)
-      (json \ "name").as[String] === "widget"
-      (json \ "released").as[Boolean] === false
-      (json \ "insertInline").as[Boolean] === true
-      (json \ "componentType").as[String] === "org-widget"
-      (json \ "defaultData").as[JsObject] === componentInfo.defaultData
-      (json \ "configuration").as[JsObject] === componentInfo.packageInfo \ "external-configuration"
+
+  "componentEditor" should {
+
+    trait componentEditor extends scope {
+
+      override def componentEditorResult(componentType:String, request:Request[AnyContent]) = {
+        Future.successful(Ok("<html></html>"))
+      }
+
+      hooks.load(any[String])(any[RequestHeader]) returns {
+        Future.successful(Right(Json.obj("components" -> Json.obj(
+          "singleComponent" -> Json.obj("componentType" -> "type")
+        ))))
+      }
+    }
+
+    s"return $BAD_REQUEST if the component type can't be read from the json model" in new componentEditor{
+      hooks.load(any[String])(any[RequestHeader]) returns {
+        Future.successful(Right(Json.obj("components" -> Json.obj(
+          "singleComponent" -> Json.obj()
+        ))))
+      }
+      val result = componentEditor("id")(r)
+      status(result) must_== BAD_REQUEST
+    }
+
+    trait withError extends componentEditor{
+      hooks.load(any[String])(any[RequestHeader]) returns {
+        Future.successful(Left(402 -> "err"))
+      }
+    }
+
+    s"return the error status code" in new withError{
+      val result = componentEditor("id")(r)
+      status(result) must_== 402
+    }
+
+    s"return the error body" in new withError{
+      val result = componentEditor("id")(r)
+      contentAsString(result) must_== org.corespring.container.client.views.html.error.main(402, "err", true).toString()
+    }
+
+    s"return $OK" in new componentEditor{
+      val result = componentEditor("id")(r)
+      status(result) must_== OK
+    }
+
+    s"return the html" in new componentEditor{
+      val result = componentEditor("id")(r)
+      contentAsString(result) must_== "<html></html>"
     }
   }
 }

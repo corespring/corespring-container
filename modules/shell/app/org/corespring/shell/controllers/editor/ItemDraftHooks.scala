@@ -188,11 +188,32 @@ trait ItemDraftHooks
     out
   }
 
+  /**
+   * If the draft isn't found create it.
+   *
+   * @param draftId
+   * @param header
+   * @return
+   */
   override def load(draftId: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]] = {
     Future {
       draftItemService.load(draftId).map { json =>
-        Right(json \ "item")
-      }.getOrElse(Left(NOT_FOUND -> s"draftId: $draftId"))
+        logger.debug(s"function=load, draftId=$draftId, json=${Json.prettyPrint(json)}")
+        val result = (json \ "item")
+        logger.trace(s"function=load, draftId=$draftId, result=${Json.prettyPrint(result)}")
+        Right(result)
+      }.getOrElse {
+        val itemId = draftId.split("~")(0)
+        (for {
+          item <- itemService.load(itemId)
+          tuple <- draftItemService.createDraft(new ObjectId(itemId), None, item)
+          json <- draftItemService.load(s"${tuple._1}~${tuple._2}")
+        } yield {
+          val result = (json \ "item")
+          logger.trace(s"function=load, draftId=$draftId, result=${Json.prettyPrint(result)} - created new draft")
+          Right(result)
+        }).getOrElse(Left(BAD_REQUEST -> "Can't create draft"))
+      }
     }
   }
 
@@ -215,7 +236,7 @@ trait ItemDraftHooks
       _ <- Some(logger.debug(s"draft=$draft"))
       draftItem <- Some(draft.get("item").asInstanceOf[DBObject])
       _ <- Some(logger.debug(s"draftItem=$draftItem"))
-      draftDateModified <- Some(draftItem.get("dateModified").asInstanceOf[DateTime])
+      draftDateModified <- draftItem.expand[DateTime]("dateModified")
       _ <- Some(logger.debug(s"draftDateModified=$draftDateModified"))
       itemId <- Some(draftId.itemId)
       _ <- Some(logger.debug(s"itemId=$itemId"))
@@ -259,9 +280,19 @@ trait ItemDraftHooks
     }
   }
 
-  override def createItemAndDraft()(implicit h: RequestHeader): R[(String, String)] = Future {
+  override def createItemAndDraft(collectionId: Option[String])(implicit h: RequestHeader): R[(String, String)] = Future {
+    create("", Json.obj())
+  }
+
+  override def createSingleComponentItemDraft(collectionId: Option[String], componentType: String, key: String, defaultData: JsObject)(implicit r: RequestHeader): R[(String, String)] = Future {
+    val xhtml = s"<div><div $componentType='' id='$key'></div></div>"
+    val components = Json.obj(key -> defaultData)
+    create(xhtml, components)
+  }
+
+  private def create(xhtml: String, components: JsObject) = {
     val out = for {
-      item <- Some(Json.obj("dateModified" -> DateTime.now, "xhtml" -> "", "components" -> Json.obj()))
+      item <- Some(Json.obj("dateModified" -> Json.obj("$date" -> DateTime.now), "xhtml" -> xhtml, "components" -> components))
       itemId <- itemService.create(item)
       tuple <- draftItemService.createDraft(itemId, None, item)
       draftName <- Some(tuple._2)
@@ -273,6 +304,5 @@ trait ItemDraftHooks
       case Some(tuple) => Right(tuple)
     }
   }
-
 }
 

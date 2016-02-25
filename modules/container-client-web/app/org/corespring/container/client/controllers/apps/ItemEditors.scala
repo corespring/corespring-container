@@ -2,8 +2,8 @@ package org.corespring.container.client.controllers.apps
 
 import org.corespring.container.client.controllers.resources
 import org.corespring.container.client.views.models.SupportingMaterialsEndpoints
-import org.corespring.container.client.views.txt.js.EditorServices
-import play.api.libs.json.{ JsArray }
+import org.corespring.container.client.views.txt.js.{ ComponentEditorServices, EditorServices }
+import play.api.libs.json.{ JsValue, JsArray }
 
 trait BaseItemEditor extends CoreEditor {
 

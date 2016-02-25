@@ -3,46 +3,14 @@ function EditorDefinition(element, options, errorCallback) {
   var Launcher = require('client-launcher');
   var launcher = new Launcher(element, options, errorCallback, options.autosizeEnabled);
   var errorCodes = require('error-codes');
+  var DraftId = require('draft-id');
+  var draft = require('draft');
   var instance;
 
   function createItemAndDraft(callback) {
-
     var call = launcher.loadCall('draftEditor.createItemAndDraft');
-    if (!call) {
-      return;
-    }
-
-    callback = callback || function() {};
-
-    $.ajax({
-      type: call.method,
-      url: launcher.prepareUrl(call.url),
-      data: {
-        draftName: options.draftName
-      },
-      success: onSuccess,
-      error: onError.bind(this),
-      dataType: 'json'
-    });
-
-    function onSuccess(result) {
-      if (options.onItemCreated) {
-        options.onItemCreated(result.itemId);
-      }
-
-      if (options.onDraftCreated) {
-        options.onDraftCreated(result.itemId, result.draftName);
-      }
-
-      callback(null, result);
-    }
-
-    function onError(xhrErr) {
-      var msg = (xhrErr.responseJSON && xhrErr.responseJSON.error) ?
-        xhrErr.responseJSON.error : 'Failed to create item and draft: ' + options.draftId;
-      callback(msg);
-    }
-
+    call.url = launcher.prepareUrl(call.url) ;
+    draft.createItemAndDraft(call, options, callback);
   }
 
   function loadDraftItem(draftId, options) {
@@ -102,7 +70,6 @@ function EditorDefinition(element, options, errorCallback) {
         options.onDraftLoaded(options.itemId, options.draftName);
       }
     }
-
   }
 
   var ok = launcher.init();
@@ -111,33 +78,26 @@ function EditorDefinition(element, options, errorCallback) {
     options.draftName = options.draftName || msgr.utils.getUid(); //jshint ignore:line
 
     if (options.itemId) {
-      var draftId = new DraftId(options.itemId, options.draftName);
-      loadDraftItem(draftId.toString(), options);
+      options.draftId = new DraftId(options.itemId, options.draftName);
+
+      loadDraftItem(options.draftId.toString(), options);
     } else {
       createItemAndDraft(function(err, result) {
-
         if (err) {
-          errorCallback(errorCodes.CREATE_ITEM_AND_DRAFT_FAILED(err));
+          errorCallback(err);
         } else {
           options.itemId = result.itemId;
           options.draftName = result.draftName;
-          var draftId = new DraftId(options.itemId, options.draftName);
-          loadDraftItem(draftId.toString(), options);
+          options.draftId = new DraftId(options.itemId, options.draftName);
+          loadDraftItem(options.draftId.toString(), options);
         }
       });
     }
-
   } else {
     errorCallback(errorCodes.INITIALISATION_FAILED);
     return;
   }
-
-  function DraftId(itemId, name) {
-    this.toString = function() {
-      return itemId + '~' + name;
-    };
-  }
-
+  
   /** Public functions */
   this.forceSave = function(callback) {
     instance.send('saveAll', function(err, data) {
@@ -153,33 +113,14 @@ function EditorDefinition(element, options, errorCallback) {
         return;
       }
 
+      var draftId =  new DraftId(options.itemId, options.draftName);
       var call = launcher.loadCall('draftEditor.commitDraft', function(u) {
-        return u.replace(':draftId', new DraftId(options.itemId, options.draftName).toString());
+        return u.replace(':draftId', draftId.toString());
       });
 
-      function onSuccess(result) {
-        if (callback) {
-          callback(null);
-        }
-      }
+      var url = launcher.prepareUrl(call.url, {force: force});
 
-      function onError(err) {
-        var msg = (err.responseJSON && err.responseJSON.error) ? err.responseJSON.error : 'Failed to commit draft: ' + options.draftId;
-        if (callback) {
-          callback(errorCodes.COMMIT_DRAFT_FAILED(msg));
-        }
-      }
-
-      $.ajax({
-        type: call.method,
-        url: launcher.prepareUrl(call.url, {
-          force: force
-        }),
-        data: {},
-        success: onSuccess,
-        error: onError,
-        dataType: 'json'
-      });
+      draft.xhrCommitDraft(call.method, url, options.draftId, callback);
     });
   };
 
@@ -188,8 +129,6 @@ function EditorDefinition(element, options, errorCallback) {
       instance.remove();
     }
   };
-
-
 }
 
 module.exports = EditorDefinition;

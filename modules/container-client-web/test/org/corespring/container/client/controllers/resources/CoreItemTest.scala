@@ -15,7 +15,7 @@ import scala.concurrent.{ Future, ExecutionContext }
 
 class CoreItemTest extends Specification with Mockito {
 
-  class scope extends Scope with CoreItem with TestContext{
+  class scope extends Scope with CoreItem with TestContext {
 
     override protected def componentTypes: Seq[String] = Seq.empty
 

@@ -4,12 +4,12 @@ import com.mongodb.DBObject
 import com.mongodb.casbah.MongoCollection
 import com.mongodb.casbah.commons.MongoDBObject
 import org.bson.types.ObjectId
-import org.corespring.container.client.hooks.{CollectionHooks}
+import org.corespring.container.client.hooks.{ CollectionHooks }
 import org.corespring.container.logging.ContainerLogger
 import org.corespring.mongo.json.services.MongoService
 import org.corespring.shell.services.ItemDraftService
-import org.corespring.shell.{DraftLink, IndexLink, SessionKeys}
-import play.api.libs.json.{JsValue, Json}
+import org.corespring.shell.{ DraftLink, IndexLink, SessionKeys }
+import play.api.libs.json.{ JsValue, Json }
 import play.api.mvc._
 
 trait Main
@@ -25,7 +25,6 @@ trait Main
 
   def sessionService: MongoService
 
-
   def index = Action {
     request =>
 
@@ -34,46 +33,54 @@ trait Main
       val links: Seq[IndexLink] = items.find(
         MongoDBObject(),
         MongoDBObject("profile.taskInfo.title" -> 1)).toSeq.map {
-        dbo: DBObject =>
+          dbo: DBObject =>
 
-          val name = try {
-            dbo.get("profile").asInstanceOf[DBObject]
-              .get("taskInfo").asInstanceOf[DBObject]
-              .get("title").asInstanceOf[String]
-          } catch {
-            case _: Throwable => "No title"
-          }
+            val name = try {
+              dbo.get("profile").asInstanceOf[DBObject]
+                .get("taskInfo").asInstanceOf[DBObject]
+                .get("title").asInstanceOf[String]
+            } catch {
+              case _: Throwable => "No title"
+            }
 
-          val itemId = dbo.get("_id").asInstanceOf[ObjectId]
+            val itemId = dbo.get("_id").asInstanceOf[ObjectId]
 
-          import org.corespring.shell.controllers.routes.Launchers
+            import org.corespring.shell.controllers.routes.Launchers
 
-          val draftUrls = itemDrafts.collection.find(MongoDBObject("_id.itemId" -> itemId)).map{ draft =>
-            val id = draft.get("_id").asInstanceOf[DBObject]
-            val itemId = id.get("itemId").asInstanceOf[ObjectId]
-            val draftName = id.get("name").asInstanceOf[String]
-            val draftId = s"$itemId~$draftName"
-            val editDraftUrl = Launchers.draftEditor(draftId).url
-            DraftLink(draftName, editDraftUrl, routes.Main.deleteDraft(draftId).url)
-          }.toSeq
+            val draftUrls = itemDrafts.collection.find(MongoDBObject("_id.itemId" -> itemId)).map { draft =>
+              val id = draft.get("_id").asInstanceOf[DBObject]
+              val itemId = id.get("itemId").asInstanceOf[ObjectId]
+              val draftName = id.get("name").asInstanceOf[String]
+              val draftId = s"$itemId~$draftName"
+              val editDraftUrl = Launchers.draftEditor(draftId).url
+              val componentEditUrl = Launchers.draftComponentEditor(Some(itemId.toString), Some(draftName)).url
+              DraftLink(draftName, editDraftUrl, componentEditUrl, routes.Main.deleteDraft(draftId).url)
+            }.toSeq
 
-          import org.corespring.container.client.controllers.apps.{routes => appRoutes}
-          val id = itemId.toString
-          val playerUrl = Launchers.playerFromItem(id).url
-          val deleteUrl = routes.Main.deleteItem(id).url
-          val draftEditorUrl = Launchers.draftEditorFromItem(id).url
-          val itemEditorUrl = Launchers.itemEditor(id).url
-          val catalogUrl = Launchers.catalog(id).url
-          IndexLink(name,
-            playerUrl,
-            draftEditorUrl,
-            itemEditorUrl,
-            draftUrls,
-            deleteUrl,
-            catalogUrl)
-      }
+            import org.corespring.container.client.controllers.apps.{ routes => appRoutes }
+            val id = itemId.toString
+            val playerUrl = Launchers.playerFromItem(id).url
+            val deleteUrl = routes.Main.deleteItem(id).url
+            val draftEditorUrl = Launchers.draftEditorFromItem(id).url
+            val itemEditorUrl = Launchers.itemEditor(id).url
+            val catalogUrl = Launchers.catalog(id).url
 
-      logger.debug(items.mkString(","))
+            val itemComponentEditorUrl = Launchers.itemComponentEditor(Some(id)).url
+            val draftComponentEditorUrl = Launchers.draftComponentEditor(Some(id)).url
+
+            IndexLink(name,
+              playerUrl,
+              draftEditorUrl,
+              itemEditorUrl,
+              itemComponentEditorUrl,
+              draftComponentEditorUrl,
+              draftUrls,
+              deleteUrl,
+              catalogUrl)
+        }
+
+      logger.trace(items.mkString(","))
+
       val r: Result = Ok(html.index(links))
 
       if (failLoadPlayerForSession)

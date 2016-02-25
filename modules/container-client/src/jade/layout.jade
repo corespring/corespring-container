@@ -16,6 +16,8 @@ html(xmlns="http://www.w3.org/1999/html")
     for c in css
       link(rel='stylesheet',href='#{c}')
 
+    block extra-css
+      
   body(ng-app="corespring-#{appName}", class="corespring-#{appName}-body")
     .pre-loader
       #spinner
@@ -50,7 +52,9 @@ html(xmlns="http://www.w3.org/1999/html")
         }, 100);
       });
       
-      var allNgModules = ['corespring-templates'].concat([#{componentNgModules}]);
+      var allNgModules = ['corespring-templates']
+        .concat([#{ngModules}])
+        .concat([#{componentNgModules}]);
 
       function getParams(){
         var nameValueStrings = document.location.search.replace('?', '').split('&');

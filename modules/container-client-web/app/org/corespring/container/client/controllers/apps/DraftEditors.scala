@@ -27,6 +27,7 @@ trait BaseDraftEditor extends CoreEditor {
       smEndpoints,
       components, widgets).toString
   }
+
 }
 
 trait DraftEditor extends BaseDraftEditor {

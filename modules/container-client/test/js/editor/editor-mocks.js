@@ -22,6 +22,49 @@
     };
   };
 
+  e.Msgr = function(){ 
+    return {
+      on: jasmine.createSpy('on'),
+      send: jasmine.createSpy('send')
+    };
+  };
+
+  e.DesignerService = function(){ return { 
+    loadAvailableUiComponents: jasmine.createSpy('loadAvailableUiComponents')
+      .and.callFake(function(done){
+      done([]);
+    })};
+  };
+
+  e.ComponentDefaultData = function(){
+    return {
+      getDefaultData: jasmine.createSpy('getDefaultData').and.returnValue({})
+    };
+  };
+
+  e.ComponentData = function(){ 
+    return {
+      setModel: jasmine.createSpy('setModel'),
+      registerComponent: jasmine.createSpy('registerComponent'),
+      setEditable: jasmine.createSpy('setEditable')
+    };
+  };
+
+  e.iFrameService = function(){
+    return {
+      isInIFrame: jasmine.createSpy('isInIFrame'),
+      bypassIframeLaunchMechanism: jasmine.createSpy('bypassIframeLaunchMechanism')
+    };
+  };
+
+  e.$timeout =  function() {
+    var timeout = function(fn){
+      fn();
+    };
+    timeout.cancel = function(){};
+    timeout.flush = function(){};
+    return timeout; 
+  };
 
   e.Stash = function Stash(holder, name, mock){
 
@@ -35,8 +78,25 @@
     };
   };
 
+  e.$http = function(){
+    var constructor = jasmine.createSpy('$http');
+    var promise = new e.MockPromise();
+    constructor.and.callFake(function(opts){
+      return promise;
+    });
+    constructor.prototype.promise = promise;
+    return constructor;
+  };
+
   e.MockPromise = function(){
     var onSuccess,onError;
+
+    this.then = function(success, error){
+      onSuccess = success;
+      onError = error;
+      return this;
+    };
+    
     this.success = function(cb){
       onSuccess = cb;
       return this;
@@ -52,6 +112,14 @@
     };
     this.triggerError = function(){
       onError.apply(null, Array.prototype.slice.call(arguments));
+    };
+  };
+
+
+  e.$log = function(){ 
+    return {
+      debug: jasmine.createSpy('debug'),
+      error: jasmine.createSpy('error')
     };
   };
 
@@ -84,5 +152,86 @@
         }
       };
     });
+  };
+
+  /**
+   * Sets and unsets `window` global vars.
+   * Useful when you need to override globals.
+   * Usage: 
+   *     describe('...', e.withWindowMocks(function(){
+   *       return {FileReader: mockFileReader};
+   *     },
+   *     function(getMocks){
+   *       it('a', function(){ var m = getMocks(); ...}) 
+   *     }));
+   */
+  e.withWindowMocks = function(mocksFn, fn){
+      
+    function getTargetObject(root, key){
+
+      function _getTarget(root, steps){
+        if(steps.length === 1){
+          return { target: root, key: steps[0]};
+        } else {
+          var subKey = steps.shift();
+          root[subKey] = root[subKey] || {};
+          return _getTarget(root[subKey], steps.slice());
+        }
+      }
+      return _getTarget(root, key.split('.'));
+    }
+
+    return function(){
+
+      var stash = {};
+
+      var mocks;
+
+      beforeEach(function(){
+
+        mocks = mocksFn();
+
+        for(var x in mocks){
+          var targetAndKey = getTargetObject(window, x);
+          stash[x] = targetAndKey.target[targetAndKey.key];
+          targetAndKey.target[targetAndKey.key] = mocks[x];
+        }
+      });
+
+      fn(function(){
+        return mocks;
+      });
+
+      afterEach(function(){
+        for(var x in stash){
+          var tk = getTargetObject(window, x);
+          tk.target[tk.key] = stash[x];
+        }
+      });
+    };
+  };
+
+  e['com.ee.RawFileUploader'] = function(){
+    var instance = {};
+    instance.beginUpload = jasmine.createSpy('beginUpload').and.callFake(function(){
+      instance.uploadOpts.onUploadComplete({}, 200);
+    });
+
+    return function(file, result, url, name, opts){
+      instance.uploadOpts = opts;
+      return instance;
+    };
+  };
+
+  e.FileReader = function(){
+
+    var instance = {};
+    instance.readAsBinaryString =  jasmine.createSpy('readAsBinaryString').and.callFake(function(){
+      instance.onloadend();
+    });
+    
+    return function(){
+      return instance;
+    };
   };
 })();

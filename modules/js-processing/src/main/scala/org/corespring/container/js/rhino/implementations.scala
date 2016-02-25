@@ -6,6 +6,7 @@ import org.corespring.container.js.api.{ ComponentServerLogic => ApiComponentSer
 import org.corespring.container.js.processing.PlayerItemPreProcessor
 import org.corespring.container.js.response.OutcomeProcessor
 import org.mozilla.javascript.{ Function => RhinoFunction, UniqueTag, Context, Scriptable }
+import play.api.Logger
 import play.api.libs.json.{ JsObject, JsValue, Json }
 import org.corespring.container.logging.ContainerLogger
 
@@ -73,6 +74,8 @@ class RhinoServerLogic(componentType: String, scope: Scriptable)
   extends ApiComponentServerLogic
   with JsFunctionCalling {
 
+  private lazy val logger = Logger(classOf[RhinoServerLogic])
+
   private def serverLogic(ctx: Context, scope: Scriptable): Scriptable = {
     val corespring = scope.get("corespring", scope).asInstanceOf[Scriptable]
     val server = corespring.get("server", corespring).asInstanceOf[Scriptable]
@@ -134,6 +137,7 @@ class RhinoServerLogic(componentType: String, scope: Scriptable)
 
   /**
    * Is this component scoreable?
+   *
    * @param question
    * @param response
    * @param outcome
@@ -159,7 +163,7 @@ class RhinoScopeBuilder(val components: Seq[Component])
   extends CoreLibs
   with GlobalScope
   with DependencyResolver {
-  override lazy val logger = ContainerLogger.getLogger("RhinoScopeBuilder")
+  private lazy val logger = ContainerLogger.getLogger("RhinoScopeBuilder")
 
   lazy val files: Seq[String] = libs
 
@@ -180,8 +184,8 @@ class RhinoScopeBuilder(val components: Seq[Component])
 
   private def toWrappedJsSrcAndName(c: Component): Seq[(String, String)] = {
     c match {
-      case i:Interaction => Seq(s"${i.org}-${i.name}" -> wrap(s"${i.org}-${i.name}", i.server.definition))
-      case l:Library => toNameAndSource(l.server)
+      case i: Interaction => Seq(s"${i.org}-${i.name}" -> wrap(s"${i.org}-${i.name}", i.server.definition))
+      case l: Library => toNameAndSource(l.server)
       case _ => Seq.empty
     }
   }

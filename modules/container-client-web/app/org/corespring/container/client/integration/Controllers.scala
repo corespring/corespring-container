@@ -62,6 +62,8 @@ trait EditorControllers extends CommonControllers with ResourceControllers {
   /** The dev editor */
   def itemDevEditor: ItemDevEditor
 
+  def componentEditor: ComponentEditor
+
   /** icons are only used in the editor */
   def icons: Icons
 }
@@ -97,6 +99,7 @@ trait ContainerControllers
     draftDevEditor,
     itemEditor,
     itemDevEditor,
+    componentEditor,
     catalog,
     icons,
     dataQuery)

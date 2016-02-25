@@ -29,7 +29,7 @@ object ItemJson {
   }
 }
 
-trait CoreItem extends CoreSupportingMaterials with Controller with HasContainerContext{
+trait CoreItem extends CoreSupportingMaterials with Controller with HasContainerContext {
 
   lazy val logger = Logger(classOf[CoreItem])
 

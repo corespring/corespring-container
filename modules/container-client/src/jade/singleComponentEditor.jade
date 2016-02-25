@@ -1,0 +1,159 @@
+extends layout
+
+block extra-css
+
+
+  link(rel="stylesheet", type="text/css", href="//cloud.typography.com/6067912/767344/css/fonts.css")
+
+  // hi
+
+  if previewMode == "preview-right" && previewWidth
+    style(type="text/css")
+      .player-container {
+        max-width: !{previewWidth}px;
+        width: !{previewWidth}px;
+        min-width: !{previewWidth}px;
+      }
+
+block content
+
+  mixin preview
+    .item-preview-wrapper(ng-controller="ClientSidePreview")
+      .player-container
+        preview-player(
+          player-mode="playerMode",
+          data-jade-template='templates/question',
+          player-markup="item.xhtml",
+          player-item="item",
+          player-components="item.components",
+          player-outcomes="outcome")
+
+        summary-feedback(
+          ng-model='item.summaryFeedback', 
+          session-complete='session.isComplete')
+      .row
+        preview-player-control-panel(
+          data-mode='playerMode', 
+          data-settings='playerSettings', 
+          data-score="score")
+
+  | <!-- 
+  |  !{versionInfo}
+  | -->
+
+  .root(ng-controller="Root", dimension-propagator='')
+
+    if previewMode == "preview-right"
+
+      .preview-right(ng-controller="PreviewOnRight")
+        
+        .config-pane
+          span.pane-header Configuration
+          br/
+          span.pane-sub-header Use the configuration panel to set up the interaction
+          hr/
+          .configuration
+        
+        .vertical-divider
+
+        .preview-pane(
+          ng-show="showPreview", 
+          ng-controller="ClientSidePreview") 
+          ul.nav.preview-nav 
+            span.pane-header Preview
+            br/
+            span.pane-sub-header This is how the interaction will appear to students 
+          hr/
+          span(
+            simple-player-button="", 
+            class="player-btn-holder", 
+            mode="playerMode",
+            score="score")
+          .player-container-holder
+            .player-container
+              preview-player(
+                player-mode="playerMode",
+                data-jade-template='templates/question',
+                player-markup="item.xhtml",
+                player-item="item",
+                player-components="item.components",
+                player-outcomes="outcome")
+
+              summary-feedback(
+                ng-model='item.summaryFeedback', 
+                session-complete='session.isComplete')
+                hr/
+
+    else
+      .tabbed(ng-controller="Tabbed")
+
+        ul.nav.nav-tabs(ng-show="showNavigation")
+          li(role="presentation", 
+            ng-class="{active: activePane == 'config'}",
+            ng-click="showPane('config')")
+            a(href="") Configuration 
+          li(role="presentation", 
+            ng-class="{active: activePane == 'preview'}",
+            ng-click="showPane('preview')")
+            a(href="") Preview
+
+        .config(ng-show="activePane == 'config'")
+          .configuration
+          hr/
+          .bar
+            button.save-button(ng-show="showSaveButton", ng-disabled="saving").btn.btn-primary(ng-click="save()") Save
+            .alert-holder
+              alert.alert-danger(ng-show="saveError", ng-click="closeError()")
+                button.close(type="button", aria-label="Close")
+                  span(aria-hidden="true") &times;
+                | {{saveError}}
+
+
+        .preview(ng-show="activePane == 'preview'")
+          +preview
+
+
+   
+//After the angular module has been created.
+block after-main-script
+
+  script(type="text/javascript").
+
+    (function(){
+
+      var app = 'corespring-#{appName}';
+
+      var editorOptions = !{options}; 
+
+      console.log(editorOptions);
+      var uploadEndpoint = {
+        url: editorOptions.uploadUrl,
+        method: editorOptions.uploadMethod
+      };
+
+      function setUpWiggiWiz(wiggiWizConfigProvider, UPLOAD_ENDPOINT){
+        UPLOAD_ENDPOINT.method = UPLOAD_ENDPOINT.method || 'POST';
+        
+        var config = {
+          dialogLaunchMode: 'external',
+          defaultImageService: {
+            maxSize: 200
+          }
+        };
+
+        if(UPLOAD_ENDPOINT.url && UPLOAD_ENDPOINT.method){
+          config.imageService = 'ExternalEndpointsImageService';
+        }
+        
+        wiggiWizConfigProvider.add(config);
+      }
+
+      angular.module(app)
+        //TODO: STATIC_PATHS isnt relevent to the component editor
+        .constant('STATIC_PATHS', editorOptions.staticPaths || {}) 
+        //TODO:  DEBOUNCE_IN_MILLIS isnt relevent to the component editor
+        .constant('DEBOUNCE_IN_MILLIS', editorOptions.debounceInMillis || 0 ) 
+        .constant('UPLOAD_ENDPOINT', uploadEndpoint)
+        .constant('SINGLE_COMPONENT_KEY', editorOptions.singleComponentKey)
+        .config(['wiggiWizConfigProvider', 'UPLOAD_ENDPOINT', setUpWiggiWiz]);
+    })(this);

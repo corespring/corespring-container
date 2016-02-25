@@ -38,8 +38,12 @@ org.corespring.mocks.launcher.MockLauncher = function(mockInstance){
 
     this.init = jasmine.createSpy('init').and.returnValue(true);
 
-    this.loadInstance = jasmine.createSpy('loadInstance').and.returnValue(
-      mockInstance);
+    this.loadInstance = jasmine.createSpy('loadInstance').and.callFake(function(call, queryParams, initialData, onReady){
+      if(onReady){ 
+        onReady(mockInstance); 
+      }
+      return mockInstance;
+    });
 
     this.loadCall = jasmine.createSpy('loadCall').and.callFake(function(url,processor) {
       return {

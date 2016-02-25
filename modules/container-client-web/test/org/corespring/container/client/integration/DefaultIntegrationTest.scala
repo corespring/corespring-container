@@ -1,15 +1,21 @@
 package org.corespring.container.client.integration
 
+import java.net.URL
+
 import org.corespring.container.client.controllers.ComponentSets
+import org.corespring.container.client.controllers.apps.PageSourceServiceConfig
 import org.corespring.container.client.hooks._
+import org.corespring.container.client.pages.engine.JadeEngineConfig
 import org.corespring.container.components.model.Component
 import org.corespring.test.TestContext
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
+import play.api.Mode.Mode
+import play.api.Mode.Mode
 import play.api.libs.json.{ JsObject, Json }
 import play.api.mvc.{ AnyContent, Request }
 import play.api.test.{ FakeApplication, FakeRequest, PlaySpecification }
-import play.api.{ Configuration, GlobalSettings }
+import play.api.{Mode, Configuration, GlobalSettings}
 
 class DefaultIntegrationTest extends Specification with Mockito with PlaySpecification {
 
@@ -55,6 +61,11 @@ class DefaultIntegrationTest extends Specification with Mockito with PlaySpecifi
 
       override def itemSupportingMaterialHooks: ItemSupportingMaterialHooks = mock[ItemSupportingMaterialHooks]
 
+      override def jadeEngineConfig: JadeEngineConfig = mock[JadeEngineConfig]
+
+      override val loadResource: (String) => Option[URL] = _ => None
+
+      override def mode: Mode = Mode.Test
     }
   }
 

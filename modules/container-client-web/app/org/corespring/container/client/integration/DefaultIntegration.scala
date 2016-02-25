@@ -1,23 +1,32 @@
 package org.corespring.container.client.integration
 
+import java.net.URL
+
+import com.softwaremill.macwire.MacwireMacros.wire
 import grizzled.slf4j.Logger
 import org.corespring.container.client.V2PlayerConfig
-import org.corespring.container.client.component.ComponentUrls
+import org.corespring.container.client.component.{ ComponentUrls, _ }
+import org.corespring.container.client.controllers._
 import org.corespring.container.client.controllers.apps._
+import org.corespring.container.client.controllers.helpers.LoadClientSideDependencies
+import org.corespring.container.client.controllers.launcher.JsBuilder
 import org.corespring.container.client.controllers.launcher.editor.EditorLauncher
 import org.corespring.container.client.controllers.launcher.player.PlayerLauncher
-import org.corespring.container.client.controllers.resources.session.ItemPruner
 import org.corespring.container.client.controllers.resources._
-import org.corespring.container.client.controllers._
+import org.corespring.container.client.controllers.resources.session.ItemPruner
 import org.corespring.container.client.hooks._
 import org.corespring.container.client.integration.validation.Validator
+import org.corespring.container.client.io.ResourcePath
+import org.corespring.container.client.pages.ComponentEditorRenderer
+import org.corespring.container.client.pages.engine.{ JadeEngine, JadeEngineConfig }
+import org.corespring.container.client.pages.processing.AssetPathProcessor
 import org.corespring.container.components.model.Component
-import org.corespring.container.components.model.dependencies.ComponentSplitter
+import org.corespring.container.components.model.dependencies.{ ComponentSplitter, DependencyResolver }
 import org.corespring.container.components.outcome.{ DefaultScoreProcessor, ScoreProcessor, ScoreProcessorSequence }
 import org.corespring.container.components.processing.PlayerItemPreProcessor
 import org.corespring.container.components.response.OutcomeProcessor
 import org.corespring.container.js.rhino.score.CustomScoreProcessor
-import org.corespring.container.js.rhino.{ RhinoServerLogic, RhinoScopeBuilder, RhinoOutcomeProcessor, RhinoPlayerItemPreProcessor }
+import org.corespring.container.js.rhino.{ RhinoOutcomeProcessor, RhinoPlayerItemPreProcessor, RhinoScopeBuilder, RhinoServerLogic }
 import org.corespring.container.logging.ContainerLogger
 import play.api.Mode.Mode
 import play.api.libs.json.{ JsObject, JsValue }
@@ -36,10 +45,17 @@ trait DefaultIntegration
 
   private[DefaultIntegration] val debounceInMillis: Long = configuration.getLong("editor.autosave.debounceInMillis").getOrElse(5000)
 
+  def jadeEngineConfig: JadeEngineConfig = JadeEngineConfig("container-client/jade", mode, resourceLoader.loadPath(_), resourceLoader.lastModified(_))
+
   def versionInfo: JsObject
+
+  def mode: Mode
 
   def containerContext: ContainerExecutionContext
 
+  val loadResource: String => Option[URL]
+
+  lazy val resourceLoader = new ResourcePath(loadResource)
   /**
    * For a given resource path return a resolved path.
    * By default this just returns the path, so no domain is used.
@@ -84,7 +100,7 @@ trait DefaultIntegration
 
   private lazy val playerConfig: V2PlayerConfig = V2PlayerConfig(configuration)
 
-  def scopeBuilder = if (Play.current.mode == Mode.Prod) {
+  def scopeBuilder = if (mode == Mode.Prod) {
     logger.trace("Prod RhinoScopeBuilder")
     prodScopeBuilder
   } else {
@@ -101,8 +117,11 @@ trait DefaultIntegration
   }
 
   lazy val rig = new Rig {
+    override def assetPathProcessor: AssetPathProcessor = DefaultIntegration.this.assetPathProcessor
 
-    override def mode: Mode = Play.current.mode
+    override def pageSourceService: PageSourceService = DefaultIntegration.this.pageSourceService
+
+    override def mode: Mode = DefaultIntegration.this.mode
 
     override def containerContext = DefaultIntegration.this.containerContext
 
@@ -126,13 +145,62 @@ trait DefaultIntegration
     override def containerContext: ContainerExecutionContext = DefaultIntegration.this.containerContext
   }
 
+  lazy val assetPathProcessor = new AssetPathProcessor {
+
+    val needsResolution = Seq(
+      "components/",
+      "component-sets/",
+      "editor",
+      "-prod",
+      "player.min")
+
+    override def process(s: String): String = {
+      if (needsResolution.exists(s.contains(_))) resolveDomain(s) else s
+    }
+  }
+
+  lazy val pageSourceServiceConfig: PageSourceServiceConfig = PageSourceServiceConfig(
+    v2Player.Routes.prefix,
+    mode == Mode.Dev,
+    resourceLoader.loadPath(_))
+
+  lazy val pageSourceService: PageSourceService = wire[JsonPageSourceService]
+
+  lazy val componentJson: ComponentJson = new ComponentInfoJson(v2Player.Routes.prefix)
+
+  lazy val dependencyResolver: DependencyResolver = new DependencyResolver {
+    override def components: Seq[Component] = DefaultIntegration.this.components
+  }
+
+  lazy val clientSideDependencies: LoadClientSideDependencies = new LoadClientSideDependencies {}
+
+  lazy val componentBundler: ComponentBundler = new DefaultComponentBundler(dependencyResolver, clientSideDependencies, componentSets)
+
+  lazy val jadeEngine = wire[JadeEngine]
+
+  lazy val componentEditorRenderer: ComponentEditorRenderer = wire[ComponentEditorRenderer]
+
+  lazy val componentEditor = wire[ComponentEditor]
+
+  lazy val jsBuilder = new JsBuilder(resourceLoader.loadPath(_))
+
+  /** TODO: Use macwire for the dependencies below.*/
   lazy val itemEditor = new ItemEditor {
 
+    override def componentJson = DefaultIntegration.this.componentJson
+
+    override def pageSourceService: PageSourceService = DefaultIntegration.this.pageSourceService
+
+    override def renderer: ComponentEditorRenderer = DefaultIntegration.this.componentEditorRenderer
+
+    override def bundler: ComponentBundler = DefaultIntegration.this.componentBundler
+
     override val debounceInMillis = DefaultIntegration.this.debounceInMillis
+    override def assetPathProcessor: AssetPathProcessor = DefaultIntegration.this.assetPathProcessor
 
     override def versionInfo: JsObject = DefaultIntegration.this.versionInfo
 
-    override def mode: Mode = Play.current.mode
+    override def mode: Mode = DefaultIntegration.this.mode
 
     override def containerContext = DefaultIntegration.this.containerContext
 
@@ -146,9 +214,16 @@ trait DefaultIntegration
   }
 
   lazy val itemDevEditor = new ItemDevEditor {
+    override def componentJson = DefaultIntegration.this.componentJson
+    override def assetPathProcessor: AssetPathProcessor = DefaultIntegration.this.assetPathProcessor
+    override def pageSourceService: PageSourceService = DefaultIntegration.this.pageSourceService
+
+    override def renderer: ComponentEditorRenderer = DefaultIntegration.this.componentEditorRenderer
+
+    override def bundler: ComponentBundler = DefaultIntegration.this.componentBundler
     override def versionInfo: JsObject = DefaultIntegration.this.versionInfo
 
-    override def mode: Mode = Play.current.mode
+    override def mode: Mode = DefaultIntegration.this.mode
 
     override def containerContext = DefaultIntegration.this.containerContext
 
@@ -162,12 +237,18 @@ trait DefaultIntegration
   }
 
   lazy val draftEditor = new DraftEditor {
+    override def componentJson = DefaultIntegration.this.componentJson
+    override def assetPathProcessor: AssetPathProcessor = DefaultIntegration.this.assetPathProcessor
+    override def pageSourceService: PageSourceService = DefaultIntegration.this.pageSourceService
+    override def renderer: ComponentEditorRenderer = DefaultIntegration.this.componentEditorRenderer
+
+    override def bundler: ComponentBundler = DefaultIntegration.this.componentBundler
 
     override val debounceInMillis = DefaultIntegration.this.debounceInMillis
 
     override def versionInfo: JsObject = DefaultIntegration.this.versionInfo
 
-    override def mode: Mode = Play.current.mode
+    override def mode: Mode = DefaultIntegration.this.mode
 
     override def containerContext = DefaultIntegration.this.containerContext
 
@@ -181,7 +262,13 @@ trait DefaultIntegration
   }
 
   lazy val draftDevEditor = new DraftDevEditor {
-    override def mode: Mode = Play.current.mode
+    override def componentJson = DefaultIntegration.this.componentJson
+    override def assetPathProcessor: AssetPathProcessor = DefaultIntegration.this.assetPathProcessor
+    override def pageSourceService: PageSourceService = DefaultIntegration.this.pageSourceService
+    override def renderer: ComponentEditorRenderer = DefaultIntegration.this.componentEditorRenderer
+
+    override def bundler: ComponentBundler = DefaultIntegration.this.componentBundler
+    override def mode: Mode = DefaultIntegration.this.mode
 
     override def containerContext = DefaultIntegration.this.containerContext
 
@@ -197,8 +284,10 @@ trait DefaultIntegration
   }
 
   lazy val catalog = new Catalog {
-    override def mode: Mode = Play.current.mode
+    override def assetPathProcessor: AssetPathProcessor = DefaultIntegration.this.assetPathProcessor
+    override def pageSourceService: PageSourceService = DefaultIntegration.this.pageSourceService
 
+    override def mode: Mode = DefaultIntegration.this.mode
     override def containerContext = DefaultIntegration.this.containerContext
 
     override def urls: ComponentUrls = componentSets
@@ -209,10 +298,12 @@ trait DefaultIntegration
   }
 
   lazy val prodHtmlPlayer = new Player {
+    override def assetPathProcessor: AssetPathProcessor = DefaultIntegration.this.assetPathProcessor
+    override def pageSourceService: PageSourceService = DefaultIntegration.this.pageSourceService
 
     override def versionInfo: JsObject = DefaultIntegration.this.versionInfo
 
-    override def mode: Mode = Play.current.mode
+    override def mode: Mode = DefaultIntegration.this.mode
 
     override def containerContext = DefaultIntegration.this.containerContext
 
@@ -242,6 +333,9 @@ trait DefaultIntegration
   }
 
   lazy val item = new Item {
+
+    override def components: Seq[Component] = DefaultIntegration.this.components
+
     override def hooks: CoreItemHooks with CreateItemHook = itemHooks
 
     override def componentTypes: Seq[String] = DefaultIntegration.this.components.map(_.componentType)
@@ -252,6 +346,8 @@ trait DefaultIntegration
   }
 
   lazy val itemDraft = new ItemDraft {
+
+    override def components: Seq[Component] = DefaultIntegration.this.components
 
     override def materialHooks: SupportingMaterialHooks = DefaultIntegration.this.itemDraftSupportingMaterialHooks
 
@@ -282,6 +378,9 @@ trait DefaultIntegration
   }
 
   lazy val playerLauncher = new PlayerLauncher {
+
+    override def builder: JsBuilder = DefaultIntegration.this.jsBuilder
+
     override def containerContext = DefaultIntegration.this.containerContext
 
     def hooks = playerLauncherHooks
@@ -290,6 +389,7 @@ trait DefaultIntegration
   }
 
   lazy val editorLauncher = new EditorLauncher {
+    override def builder: JsBuilder = DefaultIntegration.this.jsBuilder
     override def containerContext = DefaultIntegration.this.containerContext
     def hooks = playerLauncherHooks
     override def playerConfig: V2PlayerConfig = DefaultIntegration.this.playerConfig

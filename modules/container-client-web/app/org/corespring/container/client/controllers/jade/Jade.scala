@@ -14,9 +14,10 @@ import play.api.templates.Html
 
 import scala.collection.mutable
 
+//TODO: @deprecated("use JadeEngine instead", "0.63.0")
 trait Jade {
 
-  def logger: Logger
+  private lazy val logger: Logger = Logger(classOf[Jade])
 
   def mode: Mode
 
@@ -71,7 +72,8 @@ trait Jade {
       out
     } catch {
       case jle: JadeLexerException => {
-        logger.error(s"jade error: ${jle.getFilename}, line no: ${jle.getLineNumber}")
+        val line = jle.getTemplateLines.get(jle.getLineNumber)
+        logger.error(s"jade error: ${jle.getFilename}, line no: ${jle.getLineNumber}\n> $line")
         throw jle
       }
       case t: Throwable => throw t

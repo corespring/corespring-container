@@ -9,7 +9,7 @@ import org.corespring.container.utils.string.hyphenatedToTitleCase
 import org.corespring.container.logging.ContainerLogger
 import play.api.libs.json.{ JsValue, Json }
 
-class FileComponentLoader(paths: Seq[String], showNonReleased: Boolean)
+class FileComponentLoader(paths: Seq[String])
   extends ComponentLoader
   with PackageJsonReading {
 
@@ -193,7 +193,7 @@ class FileComponentLoader(paths: Seq[String], showNonReleased: Boolean)
         name = ld.name,
         title = ld.title,
         titleGroup = ld.titleGroup,
-        released = showNonReleased || ld.released.getOrElse(false),
+        released = ld.released.getOrElse(false),
         insertInline = ld.insertInline.getOrElse(false),
         client = ld.client,
         server = loadServer(serverFolder),

@@ -35,7 +35,7 @@ RUN chmod +x /data/extras/fakes3-0.2.3.gem
 RUN gem install builder
 RUN gem install --backtrace -V --local /data/extras/fakes3-0.2.3.gem
 RUN mkdir /opt/fake-s3-root
-ENV ENV_AMAZON_ENDPOINT="http://localhost:4567"
+ENV CONTAINER_FAKE_S3_ENDPOINT="http://localhost:4567"
 
 EXPOSE 9000
 

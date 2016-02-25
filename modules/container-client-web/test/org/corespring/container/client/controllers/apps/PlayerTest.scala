@@ -3,8 +3,9 @@ package org.corespring.container.client.controllers.apps
 import java.util.concurrent.TimeUnit
 
 import org.corespring.container.client.V2PlayerConfig
-import org.corespring.container.client.component.ComponentUrls
+import org.corespring.container.client.component.{ ComponentScriptInfo, ComponentUrls }
 import org.corespring.container.client.hooks.PlayerHooks
+import org.corespring.container.client.pages.processing.AssetPathProcessor
 import org.corespring.container.components.model.Component
 import org.corespring.container.components.processing.PlayerItemPreProcessor
 import org.corespring.test.TestContext
@@ -30,7 +31,7 @@ class PlayerTest extends Specification with PlaySpecification with Mockito {
   class playerScope(sessionAndItem: Either[(Int, String), (JsValue, JsValue)] = Right(Json.obj("id" -> sessionId), Json.obj()))
     extends Scope
     with Player
-    with TestContext{
+    with TestContext {
     lazy val mockHooks = {
       val m = mock[PlayerHooks]
       m.loadSessionAndItem(any[String])(any[RequestHeader]) returns Future(sessionAndItem)
@@ -55,16 +56,21 @@ class PlayerTest extends Specification with PlaySpecification with Mockito {
 
     override def components: Seq[Component] = Seq.empty
 
-
     override def mode: Mode = Mode.Dev
 
     override def urls: ComponentUrls = {
       mock[ComponentUrls]
     }
 
-    override def jsSrc: NgSourcePaths = {
+    override def jsSrc(context: String): NgSourcePaths = {
       new NgSourcePaths(Seq.empty, "", Seq.empty, Seq.empty)
     }
+
+    override def assetPathProcessor: AssetPathProcessor = new AssetPathProcessor {
+      override def process(s: String): String = s
+    }
+
+    override def pageSourceService: PageSourceService = mock[PageSourceService]
   }
 
   "load" should {

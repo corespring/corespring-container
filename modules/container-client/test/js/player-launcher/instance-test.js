@@ -72,29 +72,29 @@ describe('instance', function() {
   });
 
   it('should not register handler for dimensionsUpdate', function(){
-    instance = new InstanceDef(call, '#' + ID, onError, {}, false);
+    instance = new InstanceDef({call: call}, '#' + ID, onError, {}, false);
     expect(mockChannel.on).not.toHaveBeenCalledWith('dimensionsUpdate', jasmine.any(Function));
   });
   
   it('should register handler for dimensionsUpdate', function(){
-    instance = new InstanceDef(call, '#' + ID, onError, {});
+    instance = new InstanceDef({call: call}, '#' + ID, onError, {});
     expect(mockChannel.on).toHaveBeenCalledWith('dimensionsUpdate', jasmine.any(Function));
   });
 
   it('should not enable iframe scrolling if iframeScrollingEnabled is false', function(){
-    instance = new InstanceDef(call, '#' + ID, onError, {}, false, false);
+    instance = new InstanceDef({call: call}, '#' + ID, onError, {}, false, false);
     expect($('#' + ID).html()).toMatch("scrolling=\"no\"");
   });
 
   it('should enable iframe scrolling if iframeScrollingEnabled is true', function(){
-    instance = new InstanceDef(call, '#' + ID, onError, {}, false, true);
+    instance = new InstanceDef({call: call}, '#' + ID, onError, {}, false, true);
     expect($('#' + ID).html()).not.toMatch("scrolling=\"no\"");
   });
 
   describe('send', function(){
 
     it('should call channel.send', function() {
-      var instance = new InstanceDef({url: '/url'}, '#' + ID, onError);
+      var instance = new InstanceDef({call: {url: '/url'}}, '#' + ID, onError);
       instance.send('isComplete', function(){});
       expect(mockChannel.send).toHaveBeenCalledWith('isComplete', jasmine.any(Function));
     });
@@ -103,7 +103,7 @@ describe('instance', function() {
   describe('width', function(){
     it('calls $(element).width', function(){
       var el = $('#' + ID);
-      instance = new InstanceDef({url: '/url'}, el, onError);
+      instance = new InstanceDef({call: {url: '/url'}}, el, onError);
       instance.width('100px');
       expect($('#' + ID + '').find('iframe').width()).toEqual(100);
     });
@@ -113,7 +113,7 @@ describe('instance', function() {
   describe('css', function(){
     it('calls $(element).css', function(){
       var el = $('#' + ID);
-      instance = new InstanceDef({url: '/url'}, el, onError);
+      instance = new InstanceDef({call: {url: '/url'}}, el, onError);
       instance.css('color', 'red');
       expect($('#' + ID + '').find('iframe').css('color')).toEqual('rgb(255, 0, 0)');
     });

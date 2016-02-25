@@ -1,33 +1,36 @@
 package org.corespring.shell
 
 import java.io.{ ByteArrayInputStream, File }
-import java.net.URLDecoder
+import java.net.{ URL, URLDecoder }
 
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.s3.model.ObjectMetadata
-import org.apache.commons.io.{ FileUtils, IOUtils }
+import org.apache.commons.io.FileUtils
 import org.bson.types.ObjectId
 import org.corespring.amazon.s3.{ ConcreteS3Service, S3Service }
 import org.corespring.container.client._
+import org.corespring.container.client.controllers.apps.PageSourceServiceConfig
 import org.corespring.container.client.controllers.{ AssetType, _ }
 import org.corespring.container.client.hooks._
 import org.corespring.container.client.integration.{ ContainerExecutionContext, DefaultIntegration }
+import org.corespring.container.client.pages.engine.JadeEngineConfig
 import org.corespring.container.components.model.Component
 import org.corespring.container.components.model.dependencies.DependencyResolver
 import org.corespring.mongo.json.services.MongoService
 import org.corespring.shell.controllers.catalog.actions.{ CatalogHooks => ShellCatalogHooks }
-import org.corespring.shell.controllers.editor.actions.{ DraftEditorHooks => ShellDraftEditorHooks, DraftId, ItemEditorHooks => ShellItemEditorHooks }
-import org.corespring.shell.controllers.editor.{ CollectionHooks => ShellCollectionHooks, ContainerSupportingMaterialAssets, ItemAssets, ItemDraftAssets, ItemDraftHooks => ShellItemDraftHooks, ItemHooks => ShellItemHooks, SupportingMaterialAssets }
+import org.corespring.shell.controllers.editor.actions.{ DraftId, DraftEditorHooks => ShellDraftEditorHooks, ItemEditorHooks => ShellItemEditorHooks }
+import org.corespring.shell.controllers.editor.{ ContainerSupportingMaterialAssets, ItemAssets, ItemDraftAssets, SupportingMaterialAssets, CollectionHooks => ShellCollectionHooks, ItemDraftHooks => ShellItemDraftHooks, ItemHooks => ShellItemHooks }
 import org.corespring.shell.controllers.player.actions.{ PlayerHooks => ShellPlayerHooks }
 import org.corespring.shell.controllers.player.{ SessionHooks => ShellSessionHooks }
 import org.corespring.shell.controllers.{ ShellDataQueryHooks, editor => shellEditor }
 import org.corespring.shell.services.ItemDraftService
+import play.api.Mode.Mode
+import play.api.Play.current
 import play.api.libs.MimeTypes
-import play.api.libs.json.JsObject
+import play.api.libs.json.Reads._
+import play.api.libs.json.{ JsObject, _ }
 import play.api.mvc._
 import play.api.{ Configuration, Logger, Mode, Play }
-import play.api.libs.json._
-import play.api.libs.json.Reads._
 
 import scala.concurrent.{ ExecutionContext, Future }
 import scalaz.{ Failure, Success, Validation }
@@ -62,6 +65,7 @@ class ContainerClientImplementation(
      * ?secure - a secure request
      * ?jsErrors  - throw errors when loading the player js
      * ?pageErrors - throw errors when loading the player page
+     *
      * @return
      */
 
@@ -72,6 +76,8 @@ class ContainerClientImplementation(
     override def catalogJs(implicit header: RequestHeader): Future[PlayerJs] = loader.loadJs(header)
 
     override def containerContext: ContainerExecutionContext = ContainerClientImplementation.this.containerContext
+
+    override def componentEditorJs(implicit header: RequestHeader): Future[PlayerJs] = loader.loadJs(header)
   }
 
   object s3 {
@@ -252,13 +258,7 @@ class ContainerClientImplementation(
       override def components: Seq[Component] = allComponents
     }
 
-    override def resource(path: String): Option[String] = Play.resource(s"container-client/bower_components/$path").map { url =>
-      logger.trace(s"load resource $path")
-      val input = url.openStream()
-      val content = IOUtils.toString(input, "UTF-8")
-      IOUtils.closeQuietly(input)
-      content
-    }
+    override def resource(path: String): Option[String] = resourceLoader.loadPath(s"container-client/bower_components/$path")
 
     override def loadLibrarySource(path: String): Option[String] = {
       val componentsPath = configuration.getString("path").getOrElse("?")
@@ -348,6 +348,8 @@ class ContainerClientImplementation(
     override def itemService: MongoService = ContainerClientImplementation.this.itemService
 
     override def containerContext: ContainerExecutionContext = ContainerClientImplementation.this.containerContext
+
+    override def archiveCollectionId: String = "archiveCollectionId"
   }
 
   override def dataQueryHooks: DataQueryHooks = new ShellDataQueryHooks with withContext
@@ -362,6 +364,11 @@ class ContainerClientImplementation(
     override def containerContext: ContainerExecutionContext = ContainerClientImplementation.this.containerContext
   }
 
+  override val loadResource: (String) => Option[URL] = {
+    Play.resource(_)
+  }
+
+  override def mode: Mode = Play.current.mode
 }
 
 /**
