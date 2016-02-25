@@ -56,7 +56,7 @@ trait EditorControllers extends CommonControllers with ResourceControllers {
 
 trait CatalogControllers extends CommonControllers with ResourceControllers {
   /** The catalog */
-  def catalog: Catalog
+//  def catalog: Catalog
 }
 
 trait ProfileControllers {
@@ -81,7 +81,7 @@ trait ContainerControllers
     session,
     //    rig,
     //prodHtmlPlayer,
-    catalog,
+//    catalog,
     icons,
     dataQuery)
 }

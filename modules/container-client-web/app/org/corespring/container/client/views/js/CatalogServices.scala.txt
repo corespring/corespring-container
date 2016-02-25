@@ -1,64 +1,39 @@
-@(namespace : String, load : Call, componentSet : JsValue, smEndpoints: org.corespring.container.client.views.models.SupportingMaterialsEndpoints)
+@(namespace : String,
+mainEndpoints: org.corespring.container.client.views.models.MainEndpoints,
+smEndpoints: org.corespring.container.client.views.models.SupportingMaterialsEndpoints)
+
+@toMethodAndUrl(c:Call) = @{
+  s"{ method: '${c.method.toLowerCase}', url: '${c.url}'}"
+}
 
 (function(){
   "use strict";
 
-  var loadedData = null;
-
   angular.module('@namespace', []);
-
-  angular.module('@namespace').factory('ComponentService', ['$http',function($http){
-    return {
-        loadAvailableComponents: function(onSuccess, onFailure){
-          var components = @{Json.stringify(componentSet)};
-          onSuccess(components);
-        }
-    };
-  }]);
 
   angular.module('@namespace').factory('SupportingMaterialUrls', [function(){
     return @smEndpoints.jsonString;
   }]);
 
-  angular.module('@namespace').factory('ItemService', ['BaseService', function(BaseService){
+  angular.module('@namespace').factory('ItemService', [function(){
     return {
       load: function(onSuccess, onFailure){
-        BaseService.load(onSuccess, onFailure);
+        if(onFailure){
+          onFailure('todo');
+        }
       }
     };
   }]);
 
-  angular.module('@namespace').factory('BaseService', ['$http' ,
-    function($http){
+  angular.module('@namespace').factory('ItemUrls', [ function($http){
+    return {
+      load: @toMethodAndUrl(mainEndpoints.load),
+      @mainEndpoints.save.map { save =>
+        save: @toMethodAndUrl(save),
+      }
+      saveSubset: @toMethodAndUrl(mainEndpoints.saveSubset)
+    }
+  }]);
 
-      var def = {
-        /**
-         * Load the item, check to see if its already loaded.
-         */
-        load: function(onSuccess, onFailure){
-          if(loadedData){
-            onSuccess(loadedData);
-          } else {
-            var finalUrl = '@load.url';
-
-            if (window && window.location && window.location.search){
-              finalUrl +=  window.location.search;
-            }
-
-            $http['@load.method.toLowerCase'](finalUrl)
-              .success(function(data, status, headers, config){
-                loadedData = data;
-                onSuccess(data);
-              })
-              .error(function(data, status, headers, config){
-                if(onFailure){
-                  onFailure(data);
-                }
-              });
-          }
-        }
-      };
-      return def;
-    }]);
 })();
 

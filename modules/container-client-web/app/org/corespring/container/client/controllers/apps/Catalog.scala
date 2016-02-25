@@ -24,32 +24,33 @@ trait Catalog
   override def context: String = "catalog"
 
   def servicesJs(itemId: String) = {
-    import org.corespring.container.client.controllers.resources.routes._
-
-    val componentJson: Seq[JsValue] = interactions.map {
-      c =>
-        val tag = tagName(c.id.org, c.id.name)
-        Json.obj(
-          "name" -> c.id.name,
-          "title" -> JsString(c.title.getOrElse("")),
-          "titleGroup" -> JsString(c.titleGroup.getOrElse("")),
-          "icon" -> s"$modulePath/icon/$tag",
-          "componentType" -> tag,
-          "defaultData" -> c.defaultData)
-    }
-
-    import org.corespring.container.client.controllers.resources.routes
-
-    val smEndpoints = SupportingMaterialsEndpoints(
-      create = routes.Item.createSupportingMaterial(itemId),
-      createFromFile = routes.Item.createSupportingMaterialFromFile(itemId),
-      delete = routes.Item.deleteSupportingMaterial(itemId, ":name"),
-      addAsset = routes.Item.addAssetToSupportingMaterial(itemId, ":name"),
-      deleteAsset = routes.Item.deleteAssetFromSupportingMaterial(itemId, ":name", ":filename"),
-      getAsset = routes.Item.getAssetFromSupportingMaterial(itemId, ":name", ":filename"),
-      updateContent = routes.Item.updateSupportingMaterialContent(itemId, ":name", ":filename"))
-
-    CatalogServices("catalog.services", Item.load(itemId), JsArray(componentJson), smEndpoints).toString
+    "??"
+//    import org.corespring.container.client.controllers.resources.routes._
+//
+//    val componentJson: Seq[JsValue] = interactions.map {
+//      c =>
+//        val tag = tagName(c.id.org, c.id.name)
+//        Json.obj(
+//          "name" -> c.id.name,
+//          "title" -> JsString(c.title.getOrElse("")),
+//          "titleGroup" -> JsString(c.titleGroup.getOrElse("")),
+//          "icon" -> s"$modulePath/icon/$tag",
+//          "componentType" -> tag,
+//          "defaultData" -> c.defaultData)
+//    }
+//
+//    import org.corespring.container.client.controllers.resources.routes
+//
+//    val smEndpoints = SupportingMaterialsEndpoints(
+//      create = routes.Item.createSupportingMaterial(itemId),
+//      createFromFile = routes.Item.createSupportingMaterialFromFile(itemId),
+//      delete = routes.Item.deleteSupportingMaterial(itemId, ":name"),
+//      addAsset = routes.Item.addAssetToSupportingMaterial(itemId, ":name"),
+//      deleteAsset = routes.Item.deleteAssetFromSupportingMaterial(itemId, ":name", ":filename"),
+//      getAsset = routes.Item.getAssetFromSupportingMaterial(itemId, ":name", ":filename"),
+//      updateContent = routes.Item.updateSupportingMaterialContent(itemId, ":name", ":filename"))
+//
+//    CatalogServices("catalog.services", Item.load(itemId), JsArray(componentJson), smEndpoints).toString
   }
 
   def load(id: String): Action[AnyContent] = Action.async {

@@ -4,11 +4,11 @@ import java.net.URL
 
 import com.softwaremill.macwire.MacwireMacros.wire
 import grizzled.slf4j.Logger
-import org.corespring.container.client.{ V2PlayerConfig, VersionInfo }
-import org.corespring.container.client.component.{ ComponentUrls, _ }
+import org.corespring.container.client.V2PlayerConfig
+import org.corespring.container.client.component._
 import org.corespring.container.client.controllers._
 import org.corespring.container.client.controllers.apps._
-import org.corespring.container.client.controllers.helpers.{ DefaultPlayerXhtml, LoadClientSideDependencies, PlayerXhtml }
+import org.corespring.container.client.controllers.helpers.{LoadClientSideDependencies, PlayerXhtml}
 import org.corespring.container.client.controllers.launcher.JsBuilder
 import org.corespring.container.client.controllers.launcher.editor.EditorLauncher
 import org.corespring.container.client.controllers.launcher.player.PlayerLauncher
@@ -17,20 +17,19 @@ import org.corespring.container.client.controllers.resources.session.ItemPruner
 import org.corespring.container.client.hooks._
 import org.corespring.container.client.integration.validation.Validator
 import org.corespring.container.client.io.ResourcePath
-import org.corespring.container.client.pages.ComponentEditorRenderer
-import org.corespring.container.client.pages.engine.{ JadeEngine, JadeEngineConfig }
+import org.corespring.container.client.pages.engine.{JadeEngine, JadeEngineConfig}
 import org.corespring.container.client.pages.processing.AssetPathProcessor
 import org.corespring.container.components.model.Component
-import org.corespring.container.components.model.dependencies.{ ComponentSplitter, DependencyResolver }
-import org.corespring.container.components.outcome.{ DefaultScoreProcessor, ScoreProcessor, ScoreProcessorSequence }
+import org.corespring.container.components.model.dependencies.{ComponentSplitter, DependencyResolver}
+import org.corespring.container.components.outcome.{DefaultScoreProcessor, ScoreProcessor, ScoreProcessorSequence}
 import org.corespring.container.components.processing.PlayerItemPreProcessor
 import org.corespring.container.components.response.OutcomeProcessor
 import org.corespring.container.js.rhino.score.CustomScoreProcessor
-import org.corespring.container.js.rhino.{ RhinoOutcomeProcessor, RhinoPlayerItemPreProcessor, RhinoScopeBuilder, RhinoServerLogic }
+import org.corespring.container.js.rhino.{RhinoOutcomeProcessor, RhinoPlayerItemPreProcessor, RhinoScopeBuilder, RhinoServerLogic}
 import org.corespring.container.logging.ContainerLogger
 import play.api.Mode.Mode
-import play.api.libs.json.{ JsObject, JsValue }
-import play.api.{ Mode, Play }
+import play.api.libs.json.JsValue
+import play.api.{Mode, Play}
 
 import scala.concurrent.ExecutionContext
 
@@ -119,20 +118,6 @@ trait DefaultIntegration
     new RhinoOutcomeProcessor(DefaultIntegration.this.components, scopeBuilder.scope)
   }
 
-  //  lazy val rig = new Rig {
-  //    override def assetPathProcessor: AssetPathProcessor = DefaultIntegration.this.assetPathProcessor
-  //
-  //    override def pageSourceService: PageSourceService = DefaultIntegration.this.pageSourceService
-  //
-  //    override def mode: Mode = DefaultIntegration.this.mode
-  //
-  //    override def containerContext = DefaultIntegration.this.containerContext
-  //
-  //    override def components = DefaultIntegration.this.components
-  //
-  //    override def urls: ComponentUrls = componentSets
-  //  }
-
   lazy val icons = new Icons {
     def components: Seq[Component] = DefaultIntegration.this.components
 
@@ -184,141 +169,6 @@ trait DefaultIntegration
 
   lazy val jsBuilder = new JsBuilder(resourceLoader.loadPath(_))
 
-  /** TODO: Use macwire for the dependencies below.*/
-  //  lazy val itemEditor = new ItemEditor {
-  //
-  //    override def componentJson = DefaultIntegration.this.componentJson
-  //
-  //    override def pageSourceService: PageSourceService = DefaultIntegration.this.pageSourceService
-  //
-  //    override def renderer: ComponentEditorRenderer = DefaultIntegration.this.componentEditorRenderer
-  //
-  //    override def bundler: ComponentBundler = DefaultIntegration.this.componentBundler
-  //
-  //    override val debounceInMillis = DefaultIntegration.this.debounceInMillis
-  //    override def assetPathProcessor: AssetPathProcessor = DefaultIntegration.this.assetPathProcessor
-  //
-  //    override def versionInfo: JsObject = DefaultIntegration.this.versionInfo.json
-  //
-  //    override def mode: Mode = DefaultIntegration.this.mode
-  //
-  //    override def containerContext = DefaultIntegration.this.containerContext
-  //
-  //    override def urls: ComponentUrls = componentSets
-  //
-  //    override def components: Seq[Component] = DefaultIntegration.this.components
-  //
-  //    override def resolveDomain(path: String): String = DefaultIntegration.this.resolveDomain(path)
-  //
-  //    override def hooks: EditorHooks = itemEditorHooks
-  //  }
-
-  //  lazy val itemDevEditor = new ItemDevEditor {
-  //    override def componentJson = DefaultIntegration.this.componentJson
-  //    override def assetPathProcessor: AssetPathProcessor = DefaultIntegration.this.assetPathProcessor
-  //    override def pageSourceService: PageSourceService = DefaultIntegration.this.pageSourceService
-  //
-  //    override def renderer: ComponentEditorRenderer = DefaultIntegration.this.componentEditorRenderer
-  //
-  //    override def bundler: ComponentBundler = DefaultIntegration.this.componentBundler
-  //    override def versionInfo: JsObject = DefaultIntegration.this.versionInfo
-  //
-  //    override def mode: Mode = DefaultIntegration.this.mode
-  //
-  //    override def containerContext = DefaultIntegration.this.containerContext
-  //
-  //    override def urls: ComponentUrls = componentSets
-  //
-  //    override def components: Seq[Component] = DefaultIntegration.this.components
-  //
-  //    override def resolveDomain(path: String): String = DefaultIntegration.this.resolveDomain(path)
-  //
-  //    override def hooks: EditorHooks = itemEditorHooks
-  //  }
-
-  //  lazy val draftEditor = new DraftEditor {
-  //    override def componentJson = DefaultIntegration.this.componentJson
-  //    override def assetPathProcessor: AssetPathProcessor = DefaultIntegration.this.assetPathProcessor
-  //    override def pageSourceService: PageSourceService = DefaultIntegration.this.pageSourceService
-  //    override def renderer: ComponentEditorRenderer = DefaultIntegration.this.componentEditorRenderer
-  //
-  //    override def bundler: ComponentBundler = DefaultIntegration.this.componentBundler
-  //
-  //    override val debounceInMillis = DefaultIntegration.this.debounceInMillis
-  //
-  //    override def versionInfo: JsObject = DefaultIntegration.this.versionInfo
-  //
-  //    override def mode: Mode = DefaultIntegration.this.mode
-  //
-  //    override def containerContext = DefaultIntegration.this.containerContext
-  //
-  //    override def urls: ComponentUrls = componentSets
-  //
-  //    override def components: Seq[Component] = DefaultIntegration.this.components
-  //
-  //    override def hooks = draftEditorHooks
-  //
-  //    override def resolveDomain(path: String): String = DefaultIntegration.this.resolveDomain(path)
-  //  }
-
-  //  lazy val draftDevEditor = new DraftDevEditor {
-  //    override def componentJson = DefaultIntegration.this.componentJson
-  //    override def assetPathProcessor: AssetPathProcessor = DefaultIntegration.this.assetPathProcessor
-  //    override def pageSourceService: PageSourceService = DefaultIntegration.this.pageSourceService
-  //    override def renderer: ComponentEditorRenderer = DefaultIntegration.this.componentEditorRenderer
-  //
-  //    override def bundler: ComponentBundler = DefaultIntegration.this.componentBundler
-  //    override def mode: Mode = DefaultIntegration.this.mode
-  //
-  //    override def containerContext = DefaultIntegration.this.containerContext
-  //
-  //    override def urls: ComponentUrls = componentSets
-  //
-  //    override def components: Seq[Component] = DefaultIntegration.this.components
-  //
-  //    override def hooks = draftEditorHooks
-  //
-  //    override def resolveDomain(path: String): String = DefaultIntegration.this.resolveDomain(path)
-  //
-  //    override def versionInfo: JsObject = DefaultIntegration.this.versionInfo
-  //  }
-
-  lazy val catalog = new Catalog {
-    override def assetPathProcessor: AssetPathProcessor = DefaultIntegration.this.assetPathProcessor
-    override def pageSourceService: PageSourceService = DefaultIntegration.this.pageSourceService
-
-    override def mode: Mode = DefaultIntegration.this.mode
-    override def containerContext = DefaultIntegration.this.containerContext
-
-    override def urls: ComponentUrls = componentSets
-    override def components = DefaultIntegration.this.components
-    override def hooks = catalogHooks
-
-    override def resolveDomain(path: String): String = DefaultIntegration.this.resolveDomain(path)
-  }
-
-  //  lazy val prodHtmlPlayer = new Player {
-  //    override def assetPathProcessor: AssetPathProcessor = DefaultIntegration.this.assetPathProcessor
-  //    override def pageSourceService: PageSourceService = DefaultIntegration.this.pageSourceService
-  //
-  //    override def versionInfo: JsObject = DefaultIntegration.this.versionInfo.json
-  //
-  //    override def mode: Mode = DefaultIntegration.this.mode
-  //
-  //    override def containerContext = DefaultIntegration.this.containerContext
-  //
-  //    override def urls: ComponentUrls = componentSets
-  //
-  //    override def playerConfig: V2PlayerConfig = DefaultIntegration.this.playerConfig
-  //
-  //    override def components: Seq[Component] = DefaultIntegration.this.components
-  //
-  //    override def hooks = playerHooks
-  //
-  //    override def resolveDomain(path: String): String = DefaultIntegration.this.resolveDomain(path)
-  //
-  //    override def itemPreProcessor: PlayerItemPreProcessor = DefaultIntegration.this.internalProcessor
-  //  }
 
   lazy val metadata = new ItemMetadata {
     override def hooks: ItemMetadataHooks = itemMetadataHooks

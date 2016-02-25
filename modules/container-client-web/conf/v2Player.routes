@@ -71,8 +71,8 @@ GET           /rig/:componentType/index.html                             @org.co
 GET           /rig/:componentType/*file                                  @org.corespring.container.client.controllers.apps.NewRig.asset(componentType, file)
 
 # Catalog
-GET           /catalog/:itemId/index.html                                @org.corespring.container.client.controllers.apps.Catalog.load(itemId)
-GET           /catalog/:itemId/*file                                     @org.corespring.container.client.controllers.apps.Catalog.getFile(itemId, file)
+GET           /catalog/:itemId/index.html                                @org.corespring.container.client.controllers.apps.NewCatalog.load(itemId)
+GET           /catalog/:itemId/*file                                     @org.corespring.container.client.controllers.apps.NewCatalog.getFile(itemId, file)
 
 # Draft Editor: config, components
 POST          /draft/editor/:draftId/component-editor.html               @org.corespring.container.client.controllers.apps.NewDraftEditor.componentEditor(draftId)

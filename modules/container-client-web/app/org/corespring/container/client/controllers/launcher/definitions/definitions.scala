@@ -49,7 +49,7 @@ private[launcher] case class Catalog(val builder: JsBuilder, queryParams: Map[St
       |org.corespring.players.ItemCatalog = corespring.require('catalog');
     """.stripMargin
 
-  import org.corespring.container.client.controllers.apps.routes.{ Catalog => Routes }
+  import org.corespring.container.client.controllers.apps.routes.{ NewCatalog => Routes }
 
   override def options: JsObject = obj(
     "paths" -> obj(
