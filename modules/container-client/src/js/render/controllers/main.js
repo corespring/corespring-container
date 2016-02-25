@@ -1,18 +1,25 @@
 angular.module('corespring-player.controllers')
   .controller(
     'Main', [
+      '$document',
       '$location',
       '$log',
       '$scope',
       '$timeout',
-      '$document',
       'ComponentRegister',
-      'PlayerService',
-      function($location, $log, $scope, $timeout, $document, ComponentRegister, PlayerServiceDef) {
-
-        var PlayerService = new PlayerServiceDef();
+      'PlayerServiceDefinition',
+      function(
+        $document,
+        $location,
+        $log,
+        $scope,
+        $timeout,
+        ComponentRegister,
+        PlayerServiceDefinition
+      ) {
 
         var currentMode = null;
+        var PlayerService = new PlayerServiceDefinition();
 
         $scope.evaluateOptions = {
           showFeedback: true,
