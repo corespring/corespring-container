@@ -2,15 +2,17 @@ package org.corespring.container.client.controllers.resources
 
 import org.corespring.container.client.HasContainerContext
 import org.corespring.container.client.hooks.CollectionHooks
+import org.corespring.container.client.integration.ContainerExecutionContext
 import play.api.libs.json.Json
 import play.api.mvc.{ Action, AnyContent, Controller }
 
 import scala.concurrent.ExecutionContext
 
 /** Query service for collection objects */
-trait Collection extends Controller with HasContainerContext {
-
-  def hooks: CollectionHooks
+class Collection(
+                val containerContext:ContainerExecutionContext,
+                val hooks : CollectionHooks
+                ) extends Controller with HasContainerContext {
 
   /**
    * List all collections i do have access to.

@@ -1,8 +1,9 @@
 package org.corespring.container.client.controllers.resources
 
+import org.corespring.container.client.controllers.apps.ComponentService
+import org.corespring.container.client.controllers.helpers.PlayerXhtml
 import org.corespring.container.client.hooks._
-import org.corespring.container.components.model.Component
-import org.corespring.container.components.model.dependencies.ComponentSplitter
+import org.corespring.container.client.integration.ContainerExecutionContext
 import play.api.Logger
 import play.api.libs.json.{ JsObject }
 import play.api.libs.json.Json._
@@ -18,11 +19,18 @@ object ItemDraft {
   }
 }
 
-trait ItemDraft extends CoreItem with ComponentSplitter {
+class ItemDraft(
+               val containerContext : ContainerExecutionContext,
+                 componentService:ComponentService,
+                val hooks : CoreItemHooks with DraftHooks,
+                val playerXhtml:PlayerXhtml,
+                val materialHooks : ItemDraftSupportingMaterialHooks
+               ) extends CoreItem {
 
   override lazy val logger = Logger(classOf[ItemDraft])
 
-  def components: Seq[Component]
+
+  override protected def componentTypes: Seq[String] = componentService.components.map(_.componentType)
 
   def createItemAndDraft = Action.async {
     implicit request =>
@@ -37,7 +45,7 @@ trait ItemDraft extends CoreItem with ComponentSplitter {
 
   def createWithSingleComponent(componentType: String) = Action.async { implicit request =>
 
-    val defaultData = interactions
+    val defaultData = componentService.interactions
       .find(_.componentType == componentType)
       .map { _.defaultData }
       .flatMap { case o: JsObject => Some(o); case _ => None }
@@ -53,8 +61,6 @@ trait ItemDraft extends CoreItem with ComponentSplitter {
       }
     }.getOrElse(Future.successful(NotFound(obj("error" -> s"unknown componentType: $componentType"))))
   }
-
-  override def hooks: CoreItemHooks with DraftHooks
 
   def save(draftId: String) = Action.async { implicit request: Request[AnyContent] =>
     request.body.asJson match {

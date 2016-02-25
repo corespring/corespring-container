@@ -1,7 +1,7 @@
 package org.corespring.container.client.pages
 
 import org.corespring.container.client.component.{ComponentJson, ComponentsScriptBundle}
-import org.corespring.container.client.controllers.apps.{PageSourceService, StaticPaths}
+import org.corespring.container.client.controllers.apps.{ComponentService, PageSourceService, StaticPaths}
 import org.corespring.container.client.integration.ContainerExecutionContext
 import org.corespring.container.client.pages.engine.JadeEngine
 import org.corespring.container.client.pages.processing.AssetPathProcessor
@@ -16,6 +16,7 @@ class CatalogRenderer(jadeEngine: JadeEngine,
                       containerContext:ContainerExecutionContext,
                       pageSourceService: PageSourceService,
                       componentJson : ComponentJson,
+                      componentService : ComponentService,
                       assetPathProcessor: AssetPathProcessor) {
 
 
@@ -38,11 +39,14 @@ class CatalogRenderer(jadeEngine: JadeEngine,
               supportingMaterialsEndpoints: SupportingMaterialsEndpoints,
               prodMode:Boolean) : Future[Html] = Future{
 
+
     val css = if (prodMode) Seq(sources.css.dest) else sources.css.src
     val js = if (prodMode) Seq(sources.js.dest) else sources.js.src
     val processedCss = (css ++ bundle.css).map(assetPathProcessor.process)
     val processedJs = (sources.js.otherLibs ++ js ++ bundle.js).map(assetPathProcessor.process)
-    val ngServiceLogic = CatalogServices(s"$name-injected", mainEndpoints, supportingMaterialsEndpoints).toString
+
+    val componentSet = Json.arr(componentService.interactions.map(componentJson.toJson))
+    val ngServiceLogic = CatalogServices(s"$name-injected", componentSet, mainEndpoints, supportingMaterialsEndpoints).toString
 
     val params : Map[String,Any] = Map(
       "appName" -> name,

@@ -36,7 +36,20 @@ class NewPlayer(mode : Mode,
   private def createPlayerHtml(sessionId:String, session:JsValue, item:JsValue, prodMode : Boolean) : Either[String,Future[Html]] = {
     val ids = componentService.idsInItem(item)
     bundler.bundle(ids,"player", Some("player"), !prodMode) match {
-      case Some(b) =>  Right(playerRenderer.render(sessionId, session, item, b, prodMode))
+      case Some(b) =>  {
+
+        val hasBeenArchived = hooks.archiveCollectionId == (session \ "collectionId")
+
+        val warnings: Seq[String] = if (hasBeenArchived) {
+          Seq("Warning: This item has been deleted")
+        } else {
+          Nil
+        }
+
+        Right(
+          playerRenderer.render(sessionId, session, item, b, warnings, prodMode)
+        )
+      }
       case _ => Left(s"Failed to create a bundle for: $sessionId")
     }
   }

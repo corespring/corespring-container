@@ -1,7 +1,7 @@
 package org.corespring.container.client.controllers
 
 import com.softwaremill.macwire.MacwireMacros.wire
-import org.corespring.container.client.VersionInfo
+import org.corespring.container.client.{V2PlayerConfig, VersionInfo}
 import org.corespring.container.client.component.{ComponentBundler, ComponentJson}
 import org.corespring.container.client.controllers.apps._
 import org.corespring.container.client.controllers.helpers.{DefaultPlayerXhtml, PlayerXhtml}
@@ -16,6 +16,7 @@ import play.api.mvc.Controller
 
 trait NewControllersModule {
   def mode: Mode
+  def playerConfig:V2PlayerConfig
   def itemEditorHooks: ItemEditorHooks
   def draftEditorHooks: DraftEditorHooks
   def catalogHooks : CatalogHooks

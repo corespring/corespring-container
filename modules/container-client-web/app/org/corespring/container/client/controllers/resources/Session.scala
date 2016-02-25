@@ -1,6 +1,5 @@
 package org.corespring.container.client.controllers.resources
 
-import org.corespring.container.client.HasContainerContext
 import org.corespring.container.client.controllers.resources.Session.Errors
 import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.client.hooks._
@@ -24,22 +23,17 @@ object Session {
 //case class to enable auto wiring
 case class SessionExecutionContext(default:ExecutionContext, heavyLoad: ExecutionContext)
 
-trait Session extends Controller {
+class Session(
+val outcomeProcessor: OutcomeProcessor,
+val itemPreProcessor: PlayerItemPreProcessor,
+val scoreProcessor: ScoreProcessor,
+val hooks: SessionHooks,
+val sessionContext: SessionExecutionContext )
+  extends Controller {
 
   val logger = ContainerLogger.getLogger("Session")
 
-  def outcomeProcessor: OutcomeProcessor
-
-  def itemPreProcessor: PlayerItemPreProcessor
-
-  def scoreProcessor: ScoreProcessor
-
-  def hooks: SessionHooks
-
-  def sessionContext: SessionExecutionContext
-
   implicit val ec: ExecutionContext = sessionContext.default
-
 
   implicit def toResult(m: StatusMessage): SimpleResult = play.api.mvc.Results.Status(m._1)(Json.obj("error" -> m._2))
 

@@ -1,8 +1,9 @@
 package org.corespring.container.client.controllers.resources
 
-import org.corespring.container.client.hooks.{ CoreItemHooks, CreateItemHook }
-import org.corespring.container.components.model.Component
-import org.corespring.container.components.model.dependencies.ComponentSplitter
+import org.corespring.container.client.controllers.apps.ComponentService
+import org.corespring.container.client.controllers.helpers.PlayerXhtml
+import org.corespring.container.client.hooks.{ItemSupportingMaterialHooks, SupportingMaterialHooks, CoreItemHooks, CreateItemHook}
+import org.corespring.container.client.integration.ContainerExecutionContext
 import play.api.libs.json.Json._
 import play.api.libs.json.{ JsObject, JsValue, Json }
 import play.api.mvc.{ Action, _ }
@@ -13,15 +14,18 @@ object SingleComponent {
   val Key = "singleComponent"
 }
 
-trait Item extends CoreItem with ComponentSplitter {
+class Item( val hooks:CoreItemHooks with CreateItemHook,
+            val materialHooks : ItemSupportingMaterialHooks,
+            componentService:ComponentService,
+            val containerContext:ContainerExecutionContext,
+            val playerXhtml:PlayerXhtml)
+  extends CoreItem  {
 
-  def hooks: CoreItemHooks with CreateItemHook
-
-  def components: Seq[Component]
+  def componentTypes = componentService.components.map(_.componentType)
 
   def createWithSingleComponent(componentType: String) = Action.async { implicit request =>
 
-    val defaultData = interactions
+    val defaultData = componentService.interactions
       .find(_.componentType == componentType)
       .map { _.defaultData }
       .flatMap { case o: JsObject => Some(o); case _ => None }

@@ -1,5 +1,6 @@
 package org.corespring.container.client.controllers.resources.session
 
+import org.corespring.container.components.processing.ItemPruner
 import org.corespring.test.utils.JsonCompare
 import org.specs2.mutable.Specification
 import play.api.libs.json.Json

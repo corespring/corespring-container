@@ -1,11 +1,11 @@
-package org.corespring.container.client.controllers.resources.session
+package org.corespring.container.components.processing
 
-import play.api.libs.json._
 import grizzled.slf4j.Logger
+import play.api.libs.json._
 
 trait ItemPruner {
 
-  def logger: Logger
+  private lazy val logger: Logger = Logger(classOf[ItemPruner])
 
   val pruneFeedback = (__ \ "feedback").json.prune
   val pruneCorrectResponse = (__ \ "correctResponse").json.prune

@@ -1,18 +1,14 @@
 package org.corespring.container.client.controllers.resources
 
-import java.io.{ FileInputStream }
-
-import org.apache.commons.io.IOUtils
 import org.corespring.container.client.HasContainerContext
 import org.corespring.container.client.controllers.helpers.{ PlayerXhtml, XhtmlProcessor }
 import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.client.hooks._
 import play.api.Logger
-import play.api.libs.{ Files, MimeTypes }
 import play.api.libs.json.{ JsString, JsObject, JsValue, Json }
 import play.api.mvc._
 
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.{ Future }
 import scalaz.{ Failure, Success, Validation }
 import scalaz.Scalaz._
 

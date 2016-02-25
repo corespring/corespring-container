@@ -26,9 +26,3 @@ trait HasConfig {
   def configuration: Configuration
 }
 
-trait HasProcessors {
-
-  def outcomeProcessor: OutcomeProcessor
-  def playerItemPreProcessor: PlayerItemPreProcessor
-  def scoreProcessor: ScoreProcessor
-}

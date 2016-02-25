@@ -184,7 +184,7 @@ object Build extends sbt.Build {
   lazy val jsProcessing = builder.playApp("js-processing")
     .settings(playAppToSbtLibSettings: _*)
     .settings(
-      libraryDependencies ++= Seq(rhinoJs, grizzledLog))
+      libraryDependencies ++= Seq(rhinoJs, grizzledLog, macWireMacro))
     .dependsOn(logging, containerClient, componentModel % "test->test;compile->compile")
 
   lazy val componentLoader = builder.lib("component-loader")

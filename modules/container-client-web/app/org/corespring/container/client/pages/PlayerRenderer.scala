@@ -2,7 +2,7 @@ package org.corespring.container.client.pages
 
 import java.lang.Boolean
 
-import org.corespring.container.client.VersionInfo
+import org.corespring.container.client.{V2PlayerConfig, VersionInfo}
 import org.corespring.container.client.component.{ComponentJson, ComponentsScriptBundle}
 import org.corespring.container.client.controllers.apps.{PageSourceService, PlayerEndpoints, SourcePaths}
 import org.corespring.container.client.controllers.helpers.PlayerXhtml
@@ -18,6 +18,7 @@ import play.api.templates.Html
 import scala.concurrent.{ExecutionContext, Future}
 
 class PlayerRenderer(
+                      playerConfig: V2PlayerConfig,
   containerContext: ContainerExecutionContext,
   jadeEngine: JadeEngine,
   pageSourceService: PageSourceService,
@@ -59,7 +60,7 @@ class PlayerRenderer(
       playerXhtml.processXhtml(xhtml)
   }.getOrElse("<div><h1>New Item</h1></div>")
 
-  def render(sessionId: String, session: JsValue, item: JsValue, bundle: ComponentsScriptBundle, prodMode: scala.Boolean): Future[Html] = Future {
+  def render(sessionId: String, session: JsValue, item: JsValue, bundle: ComponentsScriptBundle, warnings:Seq[String], prodMode: scala.Boolean): Future[Html] = Future {
     logger.info(s"function=render, bundle=$bundle")
     val css = if (prodMode) Seq(sources.css.dest) else sources.css.src
     val js = if (prodMode) Seq(sources.js.dest) else sources.js.src
@@ -76,14 +77,9 @@ class PlayerRenderer(
     val inlineJs = PlayerServices("player-injected", endpoints, queryParams).toString
     val processedCss = (css ++ bundle.css).map(assetPathProcessor.process)
     val processedJs = (sources.js.otherLibs ++ js ++ controlsJs ++ bundle.js).map(assetPathProcessor.process)
-    val useNewRelicRumConfig = true
-    val newRelicRumConfig = Json.obj()
-    val hasBeenArchived = false
-    val warnings: Seq[String] = if (hasBeenArchived) {
-      Seq("Warning: This item has been deleted")
-    } else {
-      Nil
-    }
+    val useNewRelicRumConfig = playerConfig.newRelicRumConfig.isDefined
+    val newRelicRumConfig = playerConfig.newRelicRumConfig.getOrElse(Json.obj())
+
 
     val session: JsValue = Json.obj()
     val processedXhtml = processXhtml((item \ "xhtml").asOpt[String])
