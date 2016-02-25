@@ -8,23 +8,22 @@ import org.corespring.container.client.pages.engine.JadeEngine
 import org.corespring.container.client.pages.processing.AssetPathProcessor
 import play.api.templates.Html
 
-import scala.concurrent.Future
+import scala.concurrent.{ ExecutionContext, Future }
 
 class PlayerRenderer(
-                    containerContext: ContainerExecutionContext,
-                    jadeEngine:JadeEngine,
-                    pageSourceService: PageSourceService,
-                    assetPathProcessor: AssetPathProcessor,
-                    componentJson:ComponentJson,
-                    versionInfo:VersionInfo
-                    ) {
+  containerContext: ContainerExecutionContext,
+  jadeEngine: JadeEngine,
+  pageSourceService: PageSourceService,
+  assetPathProcessor: AssetPathProcessor,
+  componentJson: ComponentJson,
+  versionInfo: VersionInfo) {
 
+  implicit def ec: ExecutionContext = containerContext.context
 
-  def render : Future[Html] = Future{
+  def render: Future[Html] = Future {
 
-    val params : Map[String,Any] = Map(
-      "appName" -> "player"
-    )
+    val params: Map[String, Any] = Map(
+      "appName" -> "player")
 
     jadeEngine.renderJade("player", params)
   }
