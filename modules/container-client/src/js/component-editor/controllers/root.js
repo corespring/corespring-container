@@ -11,7 +11,6 @@ angular.module('corespring-singleComponentEditor.controllers')
     'ComponentData',
     'WiggiDialogLauncher',
     'EditorDialogTemplate',
-    'EDITOR_EVENTS',
     'COMPONENT_EDITOR',
     'WIGGI_EVENTS',
     'SINGLE_COMPONENT_KEY',    
@@ -27,7 +26,6 @@ angular.module('corespring-singleComponentEditor.controllers')
       ComponentData,
       WiggiDialogLauncher,
       EditorDialogTemplate,
-      EDITOR_EVENTS,
       COMPONENT_EDITOR,
       WIGGI_EVENTS, 
       SINGLE_COMPONENT_KEY) {
