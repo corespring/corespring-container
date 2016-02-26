@@ -11,18 +11,18 @@ describe('component-editor Root', function(){
    
     iFrameService=  mocks.iFrameService();
     Msgr = mocks.Msgr();
-    $provide.value('ComponentData', mocks.ComponentData());
-    $provide.value('iFrameService', iFrameService);
-    $provide.value('DesignerService', mocks.DesignerService());
-    $provide.value('ComponentDefaultData', mocks.ComponentDefaultData());
-    $provide.value('WiggiDialogLauncher', {});
-    $provide.value('EditorDialogTemplate', {});
-    $provide.value('Msgr', Msgr);
-    $provide.value('LogFactory', new mocks.LogFactory());
     $provide.value('$log', mocks.$log());
     $provide.value('$timeout', mocks.$timeout());
-    $provide.value('SINGLE_COMPONENT_KEY', 'compKey');
     $provide.value('COMPONENT_EDITOR', {componentType: 'componentType'});
+    $provide.value('ComponentData', mocks.ComponentData());
+    $provide.value('ComponentDefaultData', mocks.ComponentDefaultData());
+    $provide.value('DesignerService', mocks.DesignerService());
+    $provide.value('EditorDialogTemplate', {});
+    $provide.value('iFrameService', iFrameService);
+    $provide.value('LogFactory', new mocks.LogFactory());
+    $provide.value('Msgr', Msgr);
+    $provide.value('SINGLE_COMPONENT_KEY', 'compKey');
+    $provide.value('WiggiDialogLauncher', {});
   }));
 
   beforeEach(inject(function($rootScope, $controller) {
@@ -94,7 +94,15 @@ describe('component-editor Root', function(){
           done();
         });
       });
-    }); 
+    });
+
+    it('broadcasts "client-side-preview.reset-player" when item changes', function(){
+      var handler = jasmine.createSpy('contentAddedHandler');
+      scope.$on('client-side-preview.reset-player', handler);
+      scope.item.test = "something";
+      scope.$digest();
+      expect(handler).toHaveBeenCalled();
+    });
   });
 
 });

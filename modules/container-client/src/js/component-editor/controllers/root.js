@@ -63,6 +63,11 @@ angular.module('corespring-singleComponentEditor.controllers')
         });
       });
 
+      $scope.$watch('item', function(){
+        $scope.$broadcast('client-side-preview.reset-player');
+      }, true);
+
+
       function onLaunchDialog($event, data, title, body, callback, scopeProps, options) {
         var dialog = new WiggiDialogLauncher($event.targetScope);
         var header = options.omitHeader ? '' : null;
