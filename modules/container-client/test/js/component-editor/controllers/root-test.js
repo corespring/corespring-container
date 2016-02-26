@@ -5,24 +5,27 @@ describe('component-editor Root', function(){
 
   var scope, rootScope, controller, Msgr, iFrameService;
 
+  var EDITOR_EVENTS = {CONTENT_ADDED_TO_EDITOR: 'content.added.to.editor'};
+
   beforeEach(module(function($provide) {
     
     var mocks = org.corespring.mocks.editor;
    
     iFrameService=  mocks.iFrameService();
     Msgr = mocks.Msgr();
-    $provide.value('ComponentData', mocks.ComponentData());
-    $provide.value('iFrameService', iFrameService);
-    $provide.value('DesignerService', mocks.DesignerService());
-    $provide.value('ComponentDefaultData', mocks.ComponentDefaultData());
-    $provide.value('WiggiDialogLauncher', {});
-    $provide.value('EditorDialogTemplate', {});
-    $provide.value('Msgr', Msgr);
-    $provide.value('LogFactory', new mocks.LogFactory());
     $provide.value('$log', mocks.$log());
     $provide.value('$timeout', mocks.$timeout());
-    $provide.value('SINGLE_COMPONENT_KEY', 'compKey');
     $provide.value('COMPONENT_EDITOR', {componentType: 'componentType'});
+    $provide.value('ComponentData', mocks.ComponentData());
+    $provide.value('ComponentDefaultData', mocks.ComponentDefaultData());
+    $provide.value('DesignerService', mocks.DesignerService());
+    $provide.value('EditorDialogTemplate', {});
+    $provide.constant('EDITOR_EVENTS', EDITOR_EVENTS);
+    $provide.value('iFrameService', iFrameService);
+    $provide.value('LogFactory', new mocks.LogFactory());
+    $provide.value('Msgr', Msgr);
+    $provide.value('SINGLE_COMPONENT_KEY', 'compKey');
+    $provide.value('WiggiDialogLauncher', {});
   }));
 
   beforeEach(inject(function($rootScope, $controller) {
@@ -94,7 +97,15 @@ describe('component-editor Root', function(){
           done();
         });
       });
-    }); 
+    });
+
+    it('broadcasts "component-editor.item-changed" when item changes', function(){
+      var handler = jasmine.createSpy('contentAddedHandler');
+      scope.$on('component-editor.item-changed', handler);
+      scope.item.test = "something";
+      scope.$digest();
+      expect(handler).toHaveBeenCalled();
+    });
   });
 
 });

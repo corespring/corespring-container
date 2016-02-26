@@ -8,7 +8,10 @@ describe('ClientSidePreview', function() {
     this.submitSession = mockSubmitSession;
   }
 
-  var componentSessions = {'these': 'are', 'some': 'sessions'};
+  var componentSessions = {
+    'these': 'are',
+    'some': 'sessions'
+  };
 
   var ComponentData = {
     getSessions: jasmine.createSpy('getSessions').and.returnValue(componentSessions),
@@ -30,8 +33,12 @@ describe('ClientSidePreview', function() {
   beforeEach(module(function($provide) {
     $provide.value('ComponentData', ComponentData);
     $provide.value('ClientSidePlayerService', ClientSidePlayerService);
-    $provide.constant('STATIC_PATHS', {assets: imagePath});
-    $provide.constant('EDITOR_EVENTS', {CONTENT_ADDED_TO_EDITOR: 'content.added.to.editor'});
+    $provide.constant('STATIC_PATHS', {
+      assets: imagePath
+    });
+    $provide.constant('EDITOR_EVENTS', {
+      CONTENT_ADDED_TO_EDITOR: 'content.added.to.editor'
+    });
   }));
 
   beforeEach(inject(function($rootScope, $compile) {
@@ -83,8 +90,9 @@ describe('ClientSidePreview', function() {
       });
 
       it('should submit session', function() {
-        expect(mockSubmitSession).toHaveBeenCalledWith(
-          {components: componentSessions}, jasmine.any(Function), jasmine.any(Function));
+        expect(mockSubmitSession).toHaveBeenCalledWith({
+          components: componentSessions
+        }, jasmine.any(Function), jasmine.any(Function));
       });
     });
 
@@ -118,7 +126,10 @@ describe('ClientSidePreview', function() {
       };
       scope.score = 1234;
       scope.outcome = {};
-      scope.responses = {'these': 'are', 'some': 'responses'};
+      scope.responses = {
+        'these': 'are',
+        'some': 'responses'
+      };
       scope.$broadcast('playerControlPanel.reset');
     });
 
@@ -177,6 +188,64 @@ describe('ClientSidePreview', function() {
       });
 
       it('should set session.isComplete to false', function() {
+        expect(scope.session.isComplete).toBe(false);
+      });
+
+      it('should set session.remainingAttempts to 1', function() {
+        expect(scope.session.remainingAttempts).toEqual(1);
+      });
+
+      it('should set score to be undefined', function() {
+        expect(scope.score).toBeUndefined();
+      });
+
+      it('should set outcome to be undefined', function() {
+        expect(scope.outcome).toBeUndefined();
+      });
+
+      it('should set responses to be empty object', function() {
+        expect(scope.responses).toEqual({});
+      });
+
+      it('should call ComponentData.reset', function() {
+        expect(ComponentData.reset).toHaveBeenCalled();
+      });
+
+      it('should set mode to gather', function() {
+        expect(scope.playerMode).toEqual('gather');
+        expect(ComponentData.setMode).toHaveBeenCalledWith('gather');
+      });
+
+      it('should set ComponentData to editable', function() {
+        expect(ComponentData.setEditable).toHaveBeenCalledWith(true);
+      });
+    });
+
+  });
+
+  describe('content.added.to.editor event', function() {
+
+    describe('gather mode', function() {
+      beforeEach(inject(function(EDITOR_EVENTS) {
+        scope.$broadcast(EDITOR_EVENTS.CONTENT_ADDED_TO_EDITOR);
+      }));
+      it('should set mode to gather', function() {
+        expect(scope.playerMode).toEqual('gather');
+        expect(ComponentData.setMode).toHaveBeenCalledWith('gather');
+      });
+    });
+  });
+
+  describe('component-editor.item-changed', function() {
+
+    beforeEach(function() {
+      scope.playerMode = 'not gather';
+      scope.responses = "responses";
+      scope.score = 100;
+      scope.$broadcast('component-editor.item-changed');
+    });
+
+    it('should set session.isComplete to false', function() {
       expect(scope.session.isComplete).toBe(false);
     });
 
@@ -208,20 +277,7 @@ describe('ClientSidePreview', function() {
     it('should set ComponentData to editable', function() {
       expect(ComponentData.setEditable).toHaveBeenCalledWith(true);
     });
-    });
 
   });
 
-  describe('content.added.to.editor event', function() {
-
-    describe('gather mode', function() {
-      beforeEach(inject(function(EDITOR_EVENTS) {
-         scope.$broadcast(EDITOR_EVENTS.CONTENT_ADDED_TO_EDITOR);
-      }));
-      it('should set mode to gather', function() {
-        expect(scope.playerMode).toEqual('gather');
-        expect(ComponentData.setMode).toHaveBeenCalledWith('gather');
-      });
-    });
-  });
 });

@@ -73,6 +73,10 @@ angular.module('corespring-editor.controllers')
         setMode('gather');
     });
 
+    $scope.$on('component-editor.item-changed', function(){
+      resetPlayer();
+    });
+
     $scope.$on('playerControlPanel.reset', function () {
       resetPlayer();      
     });

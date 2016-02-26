@@ -11,6 +11,7 @@ angular.module('corespring-singleComponentEditor.controllers')
     'ComponentData',
     'WiggiDialogLauncher',
     'EditorDialogTemplate',
+    'EDITOR_EVENTS',
     'COMPONENT_EDITOR',
     'WIGGI_EVENTS',
     'SINGLE_COMPONENT_KEY',    
@@ -26,6 +27,7 @@ angular.module('corespring-singleComponentEditor.controllers')
       ComponentData,
       WiggiDialogLauncher,
       EditorDialogTemplate,
+      EDITOR_EVENTS,
       COMPONENT_EDITOR,
       WIGGI_EVENTS, 
       SINGLE_COMPONENT_KEY) {
@@ -62,6 +64,11 @@ angular.module('corespring-singleComponentEditor.controllers')
           ComponentData.setModel($scope.item.components);
         });
       });
+
+      $scope.$watch('item', function(){
+        $scope.$broadcast('component-editor.item-changed');
+      }, true);
+
 
       function onLaunchDialog($event, data, title, body, callback, scopeProps, options) {
         var dialog = new WiggiDialogLauncher($event.targetScope);
