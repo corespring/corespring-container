@@ -5,8 +5,6 @@ describe('component-editor Root', function(){
 
   var scope, rootScope, controller, Msgr, iFrameService;
 
-  var EDITOR_EVENTS = {CONTENT_ADDED_TO_EDITOR: 'content.added.to.editor'};
-
   beforeEach(module(function($provide) {
     
     var mocks = org.corespring.mocks.editor;
@@ -20,7 +18,6 @@ describe('component-editor Root', function(){
     $provide.value('ComponentDefaultData', mocks.ComponentDefaultData());
     $provide.value('DesignerService', mocks.DesignerService());
     $provide.value('EditorDialogTemplate', {});
-    $provide.constant('EDITOR_EVENTS', EDITOR_EVENTS);
     $provide.value('iFrameService', iFrameService);
     $provide.value('LogFactory', new mocks.LogFactory());
     $provide.value('Msgr', Msgr);
@@ -99,9 +96,9 @@ describe('component-editor Root', function(){
       });
     });
 
-    it('broadcasts "component-editor.item-changed" when item changes', function(){
+    it('broadcasts "client-side-preview.reset-player" when item changes', function(){
       var handler = jasmine.createSpy('contentAddedHandler');
-      scope.$on('component-editor.item-changed', handler);
+      scope.$on('client-side-preview.reset-player', handler);
       scope.item.test = "something";
       scope.$digest();
       expect(handler).toHaveBeenCalled();

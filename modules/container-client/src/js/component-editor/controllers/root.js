@@ -64,7 +64,7 @@ angular.module('corespring-singleComponentEditor.controllers')
       });
 
       $scope.$watch('item', function(){
-        $scope.$broadcast('component-editor.item-changed');
+        $scope.$broadcast('client-side-preview.reset-player');
       }, true);
 
 

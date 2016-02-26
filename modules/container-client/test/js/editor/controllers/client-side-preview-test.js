@@ -236,13 +236,13 @@ describe('ClientSidePreview', function() {
     });
   });
 
-  describe('component-editor.item-changed', function() {
+  describe('client-side-preview.reset-player', function() {
 
     beforeEach(function() {
       scope.playerMode = 'not gather';
       scope.responses = "responses";
       scope.score = 100;
-      scope.$broadcast('component-editor.item-changed');
+      scope.$broadcast('client-side-preview.reset-player');
     });
 
     it('should set session.isComplete to false', function() {
