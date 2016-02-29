@@ -1,14 +1,14 @@
 package org.corespring.container.client.pages
 
 import org.corespring.container.client.VersionInfo
-import org.corespring.container.client.component.{ComponentJson, SingleComponentScriptBundle}
-import org.corespring.container.client.controllers.apps.{ComponentEditorOptions, PageSourceService, PreviewRightComponentEditorOptions}
+import org.corespring.container.client.component.{ ComponentJson, SingleComponentScriptBundle }
+import org.corespring.container.client.controllers.apps.{ ComponentEditorOptions, PageSourceService, PreviewRightComponentEditorOptions }
 import org.corespring.container.client.integration.ContainerExecutionContext
 import org.corespring.container.client.pages.engine.JadeEngine
 import org.corespring.container.client.pages.processing.AssetPathProcessor
 import org.corespring.container.client.views.txt.js.ComponentEditorServices
 import play.api.Logger
-import play.api.libs.json.{JsArray, JsValue, Json}
+import play.api.libs.json.{ JsArray, Json }
 import play.api.templates.Html
 
 import scala.concurrent.Future

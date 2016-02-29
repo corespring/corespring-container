@@ -84,9 +84,7 @@ trait ComponentSets extends Controller with ComponentUrls {
   }
 }
 
-class DefaultComponentSets(
-  val dependencyResolver: DependencyResolver
-                          ) extends ComponentSets
+trait DefaultComponentSets extends ComponentSets
   with ResourceLoading
   with LibrarySourceLoading {
 

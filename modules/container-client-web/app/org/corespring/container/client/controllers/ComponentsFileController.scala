@@ -1,7 +1,10 @@
 package org.corespring.container.client.controllers
 
 import java.io.File
-import org.corespring.container.client.HasContainerContext
+import java.nio.charset.StandardCharsets
+
+import org.corespring.container.client.integration.ContainerExecutionContext
+import org.corespring.container.client.{ ComponentsConfig, HasContainerContext }
 import org.corespring.container.client.integration.validation.Validator
 import org.joda.time.DateTimeZone
 import org.joda.time.format.{ DateTimeFormat, DateTimeFormatter }
@@ -13,12 +16,13 @@ import play.api.mvc._
 import scala.concurrent.Future
 
 /** A very simple file asset loader for now */
-trait ComponentsFileController extends Controller with HasContainerContext {
+class ComponentsFileController(
+  val containerContext: ContainerExecutionContext,
+  componentsConfig: ComponentsConfig) extends Controller with HasContainerContext {
 
   val log = ContainerLogger.getLogger("ComponentsFileController")
 
-  def componentsPath: String
-  def defaultCharSet: String
+  def componentsPath: String = componentsConfig.componentsPath
 
   private val timeZoneCode = "GMT"
 
@@ -62,9 +66,12 @@ trait ComponentsFileController extends Controller with HasContainerContext {
               }
             }
 
-            def addCharsetIfNeeded(mimeType: String): String = if (MimeTypes.isText(mimeType))
-              "; charset=" + defaultCharSet
-            else ""
+            def addCharsetIfNeeded(mimeType: String): String = {
+              if (MimeTypes.isText(mimeType))
+                s"; charset=${StandardCharsets.UTF_8.toString}"
+              else
+                ""
+            }
 
             val response = SimpleResult(
               header = ResponseHeader(OK, headers ++ Map(

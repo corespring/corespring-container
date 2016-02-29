@@ -2,7 +2,7 @@ package org.corespring.container.client.controllers.apps
 
 import java.net.URLEncoder
 
-import org.corespring.container.client.component.ComponentBundler
+import org.corespring.container.client.component.{ ComponentBundler, ComponentService }
 import org.corespring.container.client.controllers.GetAsset
 import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.client.hooks.PlayerHooks
@@ -11,32 +11,30 @@ import org.corespring.container.client.pages.PlayerRenderer
 import play.api.Mode
 import play.api.Mode.Mode
 import play.api.http.ContentTypes
-import play.api.libs.json.{JsObject, JsValue}
+import play.api.libs.json.{ JsObject, JsValue }
 import play.api.mvc._
 import play.api.templates.Html
 
 import scala.concurrent.Future
 
-
-class NewPlayer(mode : Mode,
-               bundler: ComponentBundler,
-               val containerContext : ContainerExecutionContext,
-               playerRenderer: PlayerRenderer,
-                componentService: ComponentService,
-               val hooks: PlayerHooks)
+class Player(mode: Mode,
+  bundler: ComponentBundler,
+  val containerContext: ContainerExecutionContext,
+  playerRenderer: PlayerRenderer,
+  componentService: ComponentService,
+  val hooks: PlayerHooks)
   extends Controller
-  with GetAsset[PlayerHooks]{
+  with GetAsset[PlayerHooks] {
 
   private def handleSuccess[D](fn: (D) => Future[SimpleResult])(e: Either[StatusMessage, D]): Future[SimpleResult] = e match {
     case Left((code, msg)) => Future { Status(code)(msg) }
     case Right(s) => fn(s)
   }
 
-
-  private def createPlayerHtml(sessionId:String, session:JsValue, item:JsValue, prodMode : Boolean) : Either[String,Future[Html]] = {
+  private def createPlayerHtml(sessionId: String, session: JsValue, item: JsValue, prodMode: Boolean): Either[String, Future[Html]] = {
     val ids = componentService.idsInItem(item)
-    bundler.bundle(ids,"player", Some("player"), !prodMode) match {
-      case Some(b) =>  {
+    bundler.bundle(ids, "player", Some("player"), !prodMode) match {
+      case Some(b) => {
 
         val hasBeenArchived = hooks.archiveCollectionId == (session \ "collectionId")
 
@@ -47,8 +45,7 @@ class NewPlayer(mode : Mode,
         }
 
         Right(
-          playerRenderer.render(sessionId, session, item, b, warnings, prodMode)
-        )
+          playerRenderer.render(sessionId, session, item, b, warnings, prodMode))
       }
       case _ => Left(s"Failed to create a bundle for: $sessionId")
     }
@@ -69,30 +66,30 @@ class NewPlayer(mode : Mode,
   }
 
   /**
-    * A set of player query string params, that should be set on the player, but can be removed therafter
-    */
+   * A set of player query string params, that should be set on the player, but can be removed therafter
+   */
   val playerQueryStringParams = Seq(
 
     /**
-      * show a simple submit button
-      * showControls=true|false (default: false)
-      * - show simple player controls (for devs)
-      */
+     * show a simple submit button
+     * showControls=true|false (default: false)
+     * - show simple player controls (for devs)
+     */
     "showControls",
 
     /**
-      * dev|prod - dev loads expanded js/css, prod loads minified
-      * mode=prod|dev (default: whichever way the app is run)
-      * - dev mode loads all the js as separate files
-      * - prod mode loads minified + concatenated js/css
-      */
+     * dev|prod - dev loads expanded js/css, prod loads minified
+     * mode=prod|dev (default: whichever way the app is run)
+     * - dev mode loads all the js as separate files
+     * - prod mode loads minified + concatenated js/css
+     */
     "mode",
 
     /**
-      * allow logging in the player
-      * loggingEnabled=true|false (default: false)
-      * - implemented in the jade - whether to allow ng logging.
-      */
+     * allow logging in the player
+     * loggingEnabled=true|false (default: false)
+     * - implemented in the jade - whether to allow ng logging.
+     */
     "loggingEnabled",
 
     /** if set log the category defined */
@@ -123,8 +120,8 @@ class NewPlayer(mode : Mode,
 
         createPlayerHtml((session \ "id").as[String], session, item, prodMode) match {
           case Left(e) => Future.successful(BadRequest(e))
-          case Right(f) => f.map{ html =>
-            lazy val call = org.corespring.container.client.controllers.apps.routes.NewPlayer.load((session \ "id").as[String])
+          case Right(f) => f.map { html =>
+            lazy val call = org.corespring.container.client.controllers.apps.routes.Player.load((session \ "id").as[String])
             lazy val location = {
               val params = queryParams[String]()
               s"${call.url}${if (params.isEmpty) "" else s"?$params"}"

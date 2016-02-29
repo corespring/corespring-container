@@ -1,52 +1,23 @@
 package org.corespring.container.client.controllers.apps
 
-import org.corespring.container.client.component.{ComponentBundler, ComponentJson, ItemComponentTypes}
+import org.corespring.container.client.component.{ ComponentBundler, ComponentJson, ComponentService, ItemComponentTypes }
 import org.corespring.container.client.controllers.AssetsController
 import org.corespring.container.client.controllers.apps.componentEditor.ComponentEditorLaunchingController
 import org.corespring.container.client.hooks.Hooks.StatusMessage
-import org.corespring.container.client.hooks.{DraftEditorHooks, EditorHooks, ItemEditorHooks}
+import org.corespring.container.client.hooks.{ DraftEditorHooks, EditorHooks, ItemEditorHooks }
 import org.corespring.container.client.integration.ContainerExecutionContext
-import org.corespring.container.client.pages.{ComponentEditorRenderer, DevEditorRenderer, EditorRenderer, MainEditorRenderer}
+import org.corespring.container.client.pages.{ ComponentEditorRenderer, DevEditorRenderer, EditorRenderer, MainEditorRenderer }
 import org.corespring.container.client.views.models.ComponentsAndWidgets
 import org.corespring.container.components.model.dependencies.ComponentSplitter
-import org.corespring.container.components.model.{Component, Id, Interaction, Widget}
+import org.corespring.container.components.model.{ Component, Id, Interaction, Widget }
 import play.api.Mode.Mode
-import play.api.libs.json.{JsArray, JsValue, Json}
-import play.api.mvc.{Action, Controller, RequestHeader, SimpleResult}
-import play.api.{Logger, Mode}
+import play.api.libs.json.{ JsArray, JsValue, Json }
+import play.api.mvc.{ Action, Controller, RequestHeader, SimpleResult }
+import play.api.{ Logger, Mode }
 
 import scala.concurrent.Future
 
-trait ComponentService {
-  def components: Seq[Component]
-
-  def interactions: Seq[Interaction]
-
-  def widgets: Seq[Widget]
-
-  def idsInItem(json:JsValue) : Seq[Id]
-}
-
-class DefaultComponentService(mode: Mode, loadComps: => Seq[Component]) extends ComponentSplitter with ComponentService{
-
-  private var loadedComponents: Seq[Component] = Seq.empty
-
-  override def components: Seq[Component] = (mode, loadedComponents) match {
-    case (Mode.Prod, Nil) => {
-      loadedComponents = loadComps
-      loadedComponents
-    }
-    case (Mode.Prod, x :: _) => loadedComponents
-    case _ => loadComps
-  }
-
-  //superceding [[PlayerItemTypeReader]]
-  override def idsInItem(json: JsValue): Seq[Id] = {
-    ItemComponentTypes(interactions, widgets, layoutComponents, json).map(_.id)
-  }
-}
-
-trait NewBaseEditor[H <: EditorHooks]
+trait BaseEditor[H <: EditorHooks]
   extends Controller
   with AssetsController[EditorHooks]
   with ComponentEditorLaunchingController {
@@ -75,7 +46,7 @@ trait NewBaseEditor[H <: EditorHooks]
     JsArray(componentService.interactions.map(componentJson.toJson)),
     JsArray(componentService.widgets.map(componentJson.toJson)))
 
-  private lazy val logger = Logger(classOf[NewBaseEditor[H]])
+  private lazy val logger = Logger(classOf[BaseEditor[H]])
 
   val debounceInMillis: Long = 5000
 
@@ -137,46 +108,46 @@ trait NewBaseEditor[H <: EditorHooks]
   }
 }
 
-trait NewBaseItemEditor extends NewBaseEditor[ItemEditorHooks] {
+trait BaseItemEditor extends BaseEditor[ItemEditorHooks] {
   override def endpoints: Endpoints = ItemEditorEndpoints
 }
 
-trait NewBaseDraftEditor extends NewBaseEditor[DraftEditorHooks] {
+trait BaseDraftEditor extends BaseEditor[DraftEditorHooks] {
   override def endpoints: Endpoints = DraftEditorEndpoints
 }
 
-class NewItemEditor(val mode: Mode,
+class ItemEditor(val mode: Mode,
   val hooks: ItemEditorHooks,
   val bundler: ComponentBundler,
   val renderer: MainEditorRenderer,
   val componentEditorRenderer: ComponentEditorRenderer,
   val componentJson: ComponentJson,
   val componentService: ComponentService,
-  val containerContext: ContainerExecutionContext) extends NewBaseItemEditor
+  val containerContext: ContainerExecutionContext) extends BaseItemEditor
 
-class NewItemDevEditor(val mode: Mode,
+class ItemDevEditor(val mode: Mode,
   val hooks: ItemEditorHooks,
   val bundler: ComponentBundler,
   val renderer: DevEditorRenderer,
   val componentEditorRenderer: ComponentEditorRenderer,
   val componentJson: ComponentJson,
   val componentService: ComponentService,
-  val containerContext: ContainerExecutionContext) extends NewBaseItemEditor
+  val containerContext: ContainerExecutionContext) extends BaseItemEditor
 
-class NewDraftEditor(val mode: Mode,
+class DraftEditor(val mode: Mode,
   val hooks: DraftEditorHooks,
   val bundler: ComponentBundler,
   val renderer: MainEditorRenderer,
   val componentEditorRenderer: ComponentEditorRenderer,
   val componentJson: ComponentJson,
   val componentService: ComponentService,
-  val containerContext: ContainerExecutionContext) extends NewBaseDraftEditor
+  val containerContext: ContainerExecutionContext) extends BaseDraftEditor
 
-class NewDraftDevEditor(val mode: Mode,
+class DraftDevEditor(val mode: Mode,
   val hooks: DraftEditorHooks,
   val bundler: ComponentBundler,
   val renderer: DevEditorRenderer,
   val componentEditorRenderer: ComponentEditorRenderer,
   val componentJson: ComponentJson,
   val componentService: ComponentService,
-  val containerContext: ContainerExecutionContext) extends NewBaseDraftEditor
+  val containerContext: ContainerExecutionContext) extends BaseDraftEditor

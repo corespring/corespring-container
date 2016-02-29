@@ -1,8 +1,8 @@
 package org.corespring.container.client.controllers.resources
 
-import org.corespring.container.client.controllers.apps.ComponentService
+import org.corespring.container.client.component.ComponentService
 import org.corespring.container.client.controllers.helpers.PlayerXhtml
-import org.corespring.container.client.hooks.{ItemSupportingMaterialHooks, SupportingMaterialHooks, CoreItemHooks, CreateItemHook}
+import org.corespring.container.client.hooks.{ CoreItemHooks, CreateItemHook, ItemSupportingMaterialHooks, SupportingMaterialHooks }
 import org.corespring.container.client.integration.ContainerExecutionContext
 import play.api.libs.json.Json._
 import play.api.libs.json.{ JsObject, JsValue, Json }
@@ -14,12 +14,12 @@ object SingleComponent {
   val Key = "singleComponent"
 }
 
-class Item( val hooks:CoreItemHooks with CreateItemHook,
-            val materialHooks : ItemSupportingMaterialHooks,
-            componentService:ComponentService,
-            val containerContext:ContainerExecutionContext,
-            val playerXhtml:PlayerXhtml)
-  extends CoreItem  {
+class Item(val hooks: CoreItemHooks with CreateItemHook,
+  val materialHooks: ItemSupportingMaterialHooks,
+  componentService: ComponentService,
+  val containerContext: ContainerExecutionContext,
+  val playerXhtml: PlayerXhtml)
+  extends CoreItem {
 
   def componentTypes = componentService.components.map(_.componentType)
 

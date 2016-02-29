@@ -35,6 +35,7 @@ import play.api.{ Configuration, Logger, Mode, Play }
 import scala.concurrent.{ ExecutionContext, Future }
 import scalaz.{ Failure, Success, Validation }
 
+//TODO: Use macwire here.
 class ContainerClientImplementation(
   val itemService: MongoService,
   val sessionService: MongoService,
@@ -237,41 +238,8 @@ class ContainerClientImplementation(
     override def containerContext: ContainerExecutionContext = ContainerClientImplementation.this.containerContext
   }
 
-  lazy val componentSets = new CompressedAndMinifiedComponentSets {
-
-    import play.api.Play.current
-
-    override def componentSetContext = ComponentSetExecutionContext(
-      ContainerClientImplementation.this.containerContext.context)
-
-    override def allComponents: Seq[Component] = ContainerClientImplementation.this.components
-
-    override def configuration = {
-      val rc = ContainerClientImplementation.this.configuration
-      Configuration.from(Map(
-        "minify" -> rc.getBoolean("components.minify").getOrElse(Play.mode == Mode.Prod),
-        "gzip" -> rc.getBoolean("components.gzip").getOrElse(Play.mode == Mode.Prod),
-        "path" -> rc.getString("components.path").getOrElse("?")))
-    }
-
-    override def dependencyResolver: DependencyResolver = new DependencyResolver {
-      override def components: Seq[Component] = allComponents
-    }
-
-    override def resource(path: String): Option[String] = resourceLoader.loadPath(s"container-client/bower_components/$path")
-
-    override def loadLibrarySource(path: String): Option[String] = {
-      val componentsPath = configuration.getString("path").getOrElse("?")
-      val fullPath = s"$componentsPath/$path"
-      val file = new File(fullPath)
-
-      if (file.exists()) {
-        logger.trace(s"load file: $path")
-        Some(FileUtils.readFileToString(file, "UTF-8"))
-      } else {
-        Some(s"console.warn('failed to log $fullPath');")
-      }
-    }
+  override lazy val componentSetExecutionContext = {
+    ComponentSetExecutionContext(ContainerClientImplementation.this.containerContext.context)
   }
 
   override def draftEditorHooks: DraftEditorHooks = new ShellDraftEditorHooks {
@@ -352,7 +320,7 @@ class ContainerClientImplementation(
     override def archiveCollectionId: String = "archiveCollectionId"
   }
 
-  override def dataQueryHooks: DataQueryHooks = new ShellDataQueryHooks with withContext
+  override lazy val dataQueryHooks: DataQueryHooks = new ShellDataQueryHooks with withContext
 
   override def versionInfo: VersionInfo = VersionInfo(Play.current.configuration)
 

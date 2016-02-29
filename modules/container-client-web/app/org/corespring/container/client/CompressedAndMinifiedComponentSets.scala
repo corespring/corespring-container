@@ -1,29 +1,41 @@
 package org.corespring.container.client
 
+import java.io.File
+
+import org.apache.commons.io.FileUtils
+import org.corespring.container.client.component.ComponentService
 import org.corespring.container.client.controllers.DefaultComponentSets
+import org.corespring.container.client.io.ResourcePath
 import org.corespring.container.client.processing.{ CssMinifier, Gzipper, JsMinifier }
-import org.corespring.container.logging.ContainerLogger
-import play.api.Configuration
+import org.corespring.container.components.model.Component
+import org.corespring.container.components.model.dependencies.DependencyResolver
+import play.api.Logger
 import play.api.http.ContentTypes
 import play.api.mvc._
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ ExecutionContext, Future }
 
 //case class to enable auto wiring
 case class ComponentSetExecutionContext(heavyLoad: ExecutionContext)
 
-trait CompressedAndMinifiedComponentSets extends DefaultComponentSets
-  with JsMinifier with CssMinifier with Gzipper  {
+case class ComponentsConfig(
+  componentsPath: String,
+  bowerComponentsPath: String,
+  minify: Boolean,
+  gzip: Boolean)
+class CompressedAndMinifiedComponentSets(componentSetExecutionContext: ComponentSetExecutionContext,
+  componentService: ComponentService,
+  resourceLoader: ResourcePath,
+  config: ComponentsConfig,
+  val dependencyResolver: DependencyResolver) extends DefaultComponentSets
 
-  lazy val logger = ContainerLogger.getLogger("CompressedComponentSets")
+  with JsMinifier with CssMinifier with Gzipper {
 
-  def configuration: Configuration
+  private lazy val logger = Logger(classOf[CompressedAndMinifiedComponentSets])
 
-  def componentSetContext: ComponentSetExecutionContext
+  private val minifyEnabled = config.minify
 
-  private val minifyEnabled = configuration.getBoolean("minify").getOrElse(false)
-
-  private val gzipEnabled = configuration.getBoolean("gzip").getOrElse(false)
+  private val gzipEnabled = config.gzip
 
   private def acceptsGzip(implicit rh: RequestHeader): Boolean = {
     rh.headers.get(ACCEPT_ENCODING).map(_.split(',').exists(_.trim == "gzip")).getOrElse(false)
@@ -57,7 +69,7 @@ trait CompressedAndMinifiedComponentSets extends DefaultComponentSets
       Future {
         val (body, ct) = generate(context, allComponents.find(_.matchesType(componentType)).toSeq, suffix)
         process(body, ct)
-      }(componentSetContext.heavyLoad)
+      }(componentSetExecutionContext.heavyLoad)
   }
 
   override def resource[A >: EssentialAction](context: String, directive: String, suffix: String) = Action.async {
@@ -65,8 +77,32 @@ trait CompressedAndMinifiedComponentSets extends DefaultComponentSets
       Future {
         val (body, ct) = generateBodyAndContentType(context, directive, suffix)
         process(body, ct)
-      }(componentSetContext.heavyLoad)
+      }(componentSetExecutionContext.heavyLoad)
   }
 
+  override def loadLibrarySource(path: String): Option[String] = {
+    val componentsPath = config.componentsPath
+    val fullPath = s"$componentsPath/$path"
+    val file = new File(fullPath)
+
+    if (file.exists()) {
+      logger.trace(s"load file: $path")
+      Some(FileUtils.readFileToString(file, "UTF-8"))
+    } else {
+      Some(s"console.warn('failed to log $fullPath');")
+    }
+  }
+
+  override def resource(path: String): Option[String] = {
+    val fullPath = s"${config.bowerComponentsPath}/$path"
+    val out = resourceLoader.loadPath(fullPath)
+
+    if (out.isEmpty) {
+      logger.warn(s"function=resource, fullPath=$fullPath - failed to load")
+    }
+    out
+  }
+
+  override def allComponents: Seq[Component] = componentService.components
 }
 

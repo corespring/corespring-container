@@ -1,6 +1,6 @@
 package org.corespring.container.client.controllers.apps
 
-import org.corespring.container.client.component.ComponentBundler
+import org.corespring.container.client.component.{ ComponentBundler, ComponentService }
 import org.corespring.container.client.integration.ContainerExecutionContext
 import org.corespring.container.client.pages.RigRenderer
 import org.corespring.container.components.model.ComponentInfo
@@ -9,7 +9,7 @@ import play.api.mvc.{ Action, AnyContent, Controller }
 
 import scala.concurrent.Future
 
-class NewRig(
+class Rig(
   rigRenderer: RigRenderer,
   bundler: ComponentBundler,
   componentService: ComponentService,

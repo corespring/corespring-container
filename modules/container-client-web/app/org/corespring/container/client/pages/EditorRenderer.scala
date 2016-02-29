@@ -1,28 +1,31 @@
 package org.corespring.container.client.pages
 
 import org.corespring.container.client.VersionInfo
-import org.corespring.container.client.component.{ComponentJson, ComponentsScriptBundle}
-import org.corespring.container.client.controllers.apps.{EditorClientOptions, PageSourceService}
+import org.corespring.container.client.component.{ ComponentJson, ComponentsScriptBundle }
+import org.corespring.container.client.controllers.apps.{ EditorClientOptions, PageSourceService }
 import org.corespring.container.client.integration.ContainerExecutionContext
 import org.corespring.container.client.pages.engine.JadeEngine
 import org.corespring.container.client.pages.processing.AssetPathProcessor
-import org.corespring.container.client.views.models.{ComponentsAndWidgets, MainEndpoints, SupportingMaterialsEndpoints}
+import org.corespring.container.client.views.models.{ ComponentsAndWidgets, MainEndpoints, SupportingMaterialsEndpoints }
 import org.corespring.container.client.views.txt.js.EditorServices
+import play.api.Logger
 import play.api.libs.json.Json
 import play.api.templates.Html
 
 import scala.concurrent.Future
 
-trait EditorRenderer{
+trait EditorRenderer {
+
+  private lazy val logger = Logger(classOf[EditorRenderer])
 
   def containerExecutionContext: ContainerExecutionContext
-     def jade: JadeEngine
-                               def pageSourceService: PageSourceService
-                               def assetPathProcessor: AssetPathProcessor
-                               def componentJson: ComponentJson
-                               def versionInfo: VersionInfo
+  def jade: JadeEngine
+  def pageSourceService: PageSourceService
+  def assetPathProcessor: AssetPathProcessor
+  def componentJson: ComponentJson
+  def versionInfo: VersionInfo
 
-  def name:String
+  def name: String
 
   implicit def ec = containerExecutionContext.context
 
@@ -36,12 +39,12 @@ trait EditorRenderer{
     }
   }
 
-  def render( mainEndpoints: MainEndpoints,
-              supportingMaterialsEndpoints: SupportingMaterialsEndpoints,
-              componentsAndWidgets: ComponentsAndWidgets,
-              clientOptions : EditorClientOptions,
-              bundle:ComponentsScriptBundle,
-              prodMode : Boolean) : Future[Html] = Future{
+  def render(mainEndpoints: MainEndpoints,
+    supportingMaterialsEndpoints: SupportingMaterialsEndpoints,
+    componentsAndWidgets: ComponentsAndWidgets,
+    clientOptions: EditorClientOptions,
+    bundle: ComponentsScriptBundle,
+    prodMode: Boolean): Future[Html] = Future {
     val css = if (prodMode) Seq(sources.css.dest) else sources.css.src
     val js = if (prodMode) Seq(sources.js.dest) else sources.js.src
     val processedCss = (css ++ bundle.css).map(assetPathProcessor.process)
@@ -51,7 +54,11 @@ trait EditorRenderer{
 
     val servicesJs = EditorServices(serverNgModuleName, mainEndpoints, supportingMaterialsEndpoints, componentsAndWidgets)
 
-    val params : Map[String,Any] = Map(
+    val ngModules = (Seq(serverNgModuleName) ++ sources.js.ngModules ++ bundle.ngModules).map(s => s"'$s'").mkString(",")
+
+    logger.debug(s"function=render, name=$name, ngModules=$ngModules")
+
+    val params: Map[String, Any] = Map(
       "appName" -> name,
       "js" -> processedJs.toArray,
       "css" -> processedCss.toArray,
@@ -64,21 +71,20 @@ trait EditorRenderer{
 }
 
 class MainEditorRenderer(val containerExecutionContext: ContainerExecutionContext,
-                         val jade: JadeEngine,
-                         val pageSourceService: PageSourceService,
-                         val assetPathProcessor: AssetPathProcessor,
-                         val componentJson: ComponentJson,
-                         val versionInfo: VersionInfo) extends EditorRenderer{
+  val jade: JadeEngine,
+  val pageSourceService: PageSourceService,
+  val assetPathProcessor: AssetPathProcessor,
+  val componentJson: ComponentJson,
+  val versionInfo: VersionInfo) extends EditorRenderer {
   override def name: String = "editor"
 }
 
 class DevEditorRenderer(val containerExecutionContext: ContainerExecutionContext,
-                        val jade: JadeEngine,
-                        val pageSourceService: PageSourceService,
-                        val assetPathProcessor: AssetPathProcessor,
-                        val componentJson: ComponentJson,
-                        val versionInfo: VersionInfo) extends EditorRenderer{
+  val jade: JadeEngine,
+  val pageSourceService: PageSourceService,
+  val assetPathProcessor: AssetPathProcessor,
+  val componentJson: ComponentJson,
+  val versionInfo: VersionInfo) extends EditorRenderer {
   override def name: String = "devEditor"
 }
-
 

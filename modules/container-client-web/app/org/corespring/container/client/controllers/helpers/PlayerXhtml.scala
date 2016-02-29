@@ -1,6 +1,6 @@
 package org.corespring.container.client.controllers.helpers
 
-import org.corespring.container.client.controllers.apps.ComponentService
+import org.corespring.container.client.component.ComponentService
 import org.htmlcleaner.{ TagNode, TagTransformation }
 
 trait PlayerXhtml {

@@ -1,14 +1,15 @@
 package org.corespring.container.client.controllers.resources
 
-import org.corespring.container.client.controllers.apps.ComponentService
+import org.corespring.container.client.component.ComponentService
 import org.corespring.container.client.controllers.helpers.PlayerXhtml
 import org.corespring.container.client.hooks._
 import org.corespring.container.client.integration.ContainerExecutionContext
 import play.api.Logger
-import play.api.libs.json.{ JsObject }
+import play.api.libs.json.JsObject
 import play.api.libs.json.Json._
 import play.api.mvc._
-import scala.concurrent.{ Future }
+
+import scala.concurrent.Future
 
 object ItemDraft {
   object Errors {
@@ -20,15 +21,13 @@ object ItemDraft {
 }
 
 class ItemDraft(
-               val containerContext : ContainerExecutionContext,
-                 componentService:ComponentService,
-                val hooks : CoreItemHooks with DraftHooks,
-                val playerXhtml:PlayerXhtml,
-                val materialHooks : ItemDraftSupportingMaterialHooks
-               ) extends CoreItem {
+  val containerContext: ContainerExecutionContext,
+  componentService: ComponentService,
+  val hooks: CoreItemHooks with DraftHooks,
+  val playerXhtml: PlayerXhtml,
+  val materialHooks: ItemDraftSupportingMaterialHooks) extends CoreItem {
 
   override lazy val logger = Logger(classOf[ItemDraft])
-
 
   override protected def componentTypes: Seq[String] = componentService.components.map(_.componentType)
 

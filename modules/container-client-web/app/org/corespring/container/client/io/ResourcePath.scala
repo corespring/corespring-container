@@ -5,6 +5,10 @@ import java.nio.charset.StandardCharsets
 
 import org.apache.commons.io.IOUtils
 
+trait FilePath {
+  def loadFromFile(path: String): Option[String]
+}
+
 class ResourcePath(loadURL: String => Option[URL]) {
 
   def lastModified(p: String): Option[Long] = {

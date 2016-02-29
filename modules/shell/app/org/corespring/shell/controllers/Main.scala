@@ -4,12 +4,11 @@ import com.mongodb.DBObject
 import com.mongodb.casbah.MongoCollection
 import com.mongodb.casbah.commons.MongoDBObject
 import org.bson.types.ObjectId
-import org.corespring.container.client.hooks.{ CollectionHooks }
 import org.corespring.container.logging.ContainerLogger
 import org.corespring.mongo.json.services.MongoService
 import org.corespring.shell.services.ItemDraftService
 import org.corespring.shell.{ DraftLink, IndexLink, SessionKeys }
-import play.api.libs.json.{ JsValue, Json }
+import play.api.libs.json.Json
 import play.api.mvc._
 
 trait Main
@@ -125,7 +124,7 @@ trait Main
 
       result.map {
         oid =>
-          val call = org.corespring.container.client.controllers.apps.routes.NewPlayer.load(oid.toString)
+          val call = org.corespring.container.client.controllers.apps.routes.Player.load(oid.toString)
           logger.debug(s"url ${call.url}")
           val url = s"${call.url}?${request.rawQueryString}"
           Ok(Json.obj("url" -> url))

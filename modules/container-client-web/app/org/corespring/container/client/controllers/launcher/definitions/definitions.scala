@@ -49,7 +49,7 @@ private[launcher] case class Catalog(val builder: JsBuilder, queryParams: Map[St
       |org.corespring.players.ItemCatalog = corespring.require('catalog');
     """.stripMargin
 
-  import org.corespring.container.client.controllers.apps.routes.{ NewCatalog => Routes }
+  import org.corespring.container.client.controllers.apps.routes.{ Catalog => Routes }
 
   override def options: JsObject = obj(
     "paths" -> obj(
@@ -74,7 +74,7 @@ private[launcher] case class Player(builder: JsBuilder, queryParams: Map[String,
 
     val errorsAndWarnings = obj("errors" -> playerJs.errors, "warnings" -> playerJs.warnings)
 
-    import org.corespring.container.client.controllers.apps.routes.{ NewPlayer => Routes }
+    import org.corespring.container.client.controllers.apps.routes.{ Player => Routes }
 
     val loadSession = Routes.load(":sessionId")
     val paths = obj("paths" -> obj(
@@ -103,7 +103,7 @@ private[launcher] object ItemEditors extends LaunchCompanionUtils {
 }
 
 private[launcher] case class ItemEditors(builder: JsBuilder, queryParams: Map[String, String]) extends CorespringJsClient {
-  import org.corespring.container.client.controllers.apps.routes.{ NewDraftDevEditor => DraftDevEditorRoutes, NewDraftEditor => DraftEditorRoutes, NewItemDevEditor => ItemDevEditorRoutes, NewItemEditor => ItemEditorRoutes }
+  import org.corespring.container.client.controllers.apps.routes.{ DraftDevEditor => DraftDevEditorRoutes, DraftEditor => DraftEditorRoutes, ItemDevEditor => ItemDevEditorRoutes, ItemEditor => ItemEditorRoutes }
   import org.corespring.container.client.controllers.resources.routes.{ Item => ItemRoutes, ItemDraft => ItemDraftRoutes }
 
   val paths: JsObject = obj(
@@ -160,8 +160,8 @@ private[launcher] case class ComponentEditor(builder: JsBuilder, queryParams: Ma
     import org.corespring.container.client.controllers.{ apps, resources }
 
     val componentEditor = apps.routes.ComponentEditor
-    val itemEditor = apps.routes.NewItemEditor
-    val draftEditor = apps.routes.NewDraftEditor
+    val itemEditor = apps.routes.ItemEditor
+    val draftEditor = apps.routes.DraftEditor
     val item = resources.routes.Item
     val draft = resources.routes.ItemDraft
   }

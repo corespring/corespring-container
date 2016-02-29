@@ -1,14 +1,18 @@
 package org.corespring.container.client.controllers
 
 import org.corespring.container.client.HasContainerContext
+import org.corespring.container.client.component.ComponentService
+import org.corespring.container.client.integration.ContainerExecutionContext
 import org.corespring.container.components.model.dependencies.ComponentSplitter
-import org.corespring.container.components.model.{ ComponentInfo, Widget, Interaction }
+import org.corespring.container.components.model.{ Component, ComponentInfo }
 import org.corespring.container.logging.ContainerLogger
 import play.api.mvc.{ Action, Controller }
 
 import scala.concurrent.Future
 
-trait Icons extends Controller with ComponentSplitter with HasContainerContext {
+class Icons(
+  val containerContext: ContainerExecutionContext,
+  componentService: ComponentService) extends Controller with ComponentSplitter with HasContainerContext {
 
   private lazy val logger = ContainerLogger.getLogger("Icons")
 
@@ -37,4 +41,6 @@ trait Icons extends Controller with ComponentSplitter with HasContainerContext {
         }.getOrElse(NotFound(""))
       }
   }
+
+  override def components: Seq[Component] = componentService.components
 }

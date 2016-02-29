@@ -1,7 +1,7 @@
 package org.corespring.container.client.controllers.resources
 
 import com.softwaremill.macwire.MacwireMacros.wire
-import org.corespring.container.client.controllers.apps.ComponentService
+import org.corespring.container.client.component.ComponentService
 import org.corespring.container.client.controllers.helpers.PlayerXhtml
 import org.corespring.container.client.hooks._
 import org.corespring.container.client.integration.ContainerExecutionContext
@@ -11,35 +11,34 @@ import org.corespring.container.components.response.OutcomeProcessor
 
 trait ResourcesModule {
 
-  def outcomeProcessor : OutcomeProcessor
-  def scoreProcessor : ScoreProcessor
-  def itemSupportingMaterialHooks : ItemSupportingMaterialHooks
-  def itemDraftSupportingMaterialHooks : ItemDraftSupportingMaterialHooks
+  def outcomeProcessor: OutcomeProcessor
+  def scoreProcessor: ScoreProcessor
+  def itemSupportingMaterialHooks: ItemSupportingMaterialHooks
+  def itemDraftSupportingMaterialHooks: ItemDraftSupportingMaterialHooks
 
-  def containerContext : ContainerExecutionContext
+  def containerContext: ContainerExecutionContext
 
   def sessionExecutionContext: SessionExecutionContext
-  def playerItemPreProcessor : PlayerItemPreProcessor
-  def componentService : ComponentService
-  def playerXhtml : PlayerXhtml
+  def playerItemPreProcessor: PlayerItemPreProcessor
+  def componentService: ComponentService
+  def playerXhtml: PlayerXhtml
 
-  def sessionHooks : SessionHooks
-  def itemHooks : CoreItemHooks with CreateItemHook
-  def itemDraftHooks : CoreItemHooks with DraftHooks
-  def itemMetadataHooks : ItemMetadataHooks
-  def collectionHooks : CollectionHooks
+  def sessionHooks: SessionHooks
+  def itemHooks: CoreItemHooks with CreateItemHook
+  def itemDraftHooks: CoreItemHooks with DraftHooks
+  def itemMetadataHooks: ItemMetadataHooks
+  def collectionHooks: CollectionHooks
 
-  lazy val session : Session = wire[Session]
-  lazy val item : Item = wire[Item]
-  lazy val itemDraft : ItemDraft = wire[ItemDraft]
-  lazy val itemMetdata : ItemMetadata = wire[ItemMetadata]
-  lazy val collection : Collection = wire[Collection]
+  lazy val session: Session = wire[Session]
+  lazy val item: Item = wire[Item]
+  lazy val itemDraft: ItemDraft = wire[ItemDraft]
+  lazy val itemMetdata: ItemMetadata = wire[ItemMetadata]
+  lazy val collection: Collection = wire[Collection]
 
   lazy val resourceControllers = Seq(
     session,
     item,
     itemDraft,
     itemMetdata,
-    collection
-  )
+    collection)
 }
