@@ -43,6 +43,7 @@ describe('QuestionController', function() {
   
   var wiggiLinkFeatureDef = {};
 
+  beforeEach(angular.mock.module('corespring-editing.controllers'));
   beforeEach(angular.mock.module('corespring-editor.controllers'));
 
   beforeEach(module(function($provide) {

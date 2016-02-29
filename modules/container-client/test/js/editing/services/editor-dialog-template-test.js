@@ -2,7 +2,7 @@ describe('editor dialog template', function() {
 
   var dialogTemplate;
 
-  beforeEach(angular.mock.module('corespring-editor.services'));
+  beforeEach(angular.mock.module('corespring-editing.services'));
 
   beforeEach(inject(function(EditorDialogTemplate) {
     dialogTemplate = EditorDialogTemplate;

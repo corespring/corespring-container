@@ -28,7 +28,7 @@ describe('ClientSidePreview', function() {
     ComponentData.reset.calls.reset();
   });
 
-  beforeEach(angular.mock.module('corespring-editor.controllers'));
+  beforeEach(angular.mock.module('corespring-editing.controllers'));
 
   beforeEach(module(function($provide) {
     $provide.value('ComponentData', ComponentData);

@@ -1,0 +1,7 @@
+.root(contenteditable='false')
+  .blocker
+    .bg
+    .edit-controls
+      .delete-icon-button(tooltip='delete', tooltip-append-to-body='true', tooltip-placement='bottom')
+        i.fa.fa-close(ng-click='deleteNode($event)')
+  .holder

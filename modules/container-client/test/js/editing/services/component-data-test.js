@@ -46,7 +46,7 @@ describe('component data', function() {
 
   beforeEach(angular.mock.module('corespring-player.services'));
   beforeEach(angular.mock.module('corespring-common.services'));
-  beforeEach(angular.mock.module('corespring-editor.services'));
+  beforeEach(angular.mock.module('corespring-editing.services'));
 
   beforeEach(module(function($provide){
     $provide.value('$timeout', function(fn){
