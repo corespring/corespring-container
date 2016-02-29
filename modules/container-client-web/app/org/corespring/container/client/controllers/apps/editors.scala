@@ -52,10 +52,10 @@ trait BaseEditor[H <: EditorHooks]
 
   def load(id: String) = Action.async { implicit request =>
     hooks.load(id).flatMap { e =>
-      e match {
-        case Left(_) => Future.successful(BadRequest("?"))
-        case Right(json) => {
 
+      e.fold(
+        err => Future.successful(onError(err)),
+        (json) => {
           val prodMode: Boolean = request.getQueryString("mode")
             .map(_ == "prod")
             .getOrElse(mode == Mode.Prod)
@@ -64,11 +64,14 @@ trait BaseEditor[H <: EditorHooks]
           val bundle = bundler.bundleAll("editor", Some("editor"), !prodMode).get
           val mainEndpoints = endpoints.main(id)
           val supportingMaterialsEndpoints = endpoints.supportingMaterials(id)
-          renderer.render(mainEndpoints, supportingMaterialsEndpoints, componentsAndWidgets, clientOptions, bundle, prodMode).map { h =>
-            Ok(h)
-          }
-        }
-      }
+          renderer.render(
+            mainEndpoints,
+            supportingMaterialsEndpoints,
+            componentsAndWidgets,
+            clientOptions,
+            bundle,
+            prodMode).map(Ok(_))
+        })
     }
   }
 

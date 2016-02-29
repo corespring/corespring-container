@@ -8,15 +8,15 @@ describe('player-service-definition', function () {
     $provide.value('EmbeddedItemAndSession', {session:{}, item:{}});
     $provide.value('PlayerServiceEndpoints', {
       queryParams: {},
-      endpoints: {
-        completeResponse: {method: 'put', url: '/client/session/complete/56cc6d6660b2985b7cb27552.json'},
+      session: {
+        complete: {method: 'put', url: '/client/session/complete/56cc6d6660b2985b7cb27552.json'},
         getScore: {method: 'put', url: '/client/session/56cc6d6660b2985b7cb27552/score.json'},
         loadInstructorData: {method: 'get', url: '/client/session/load-instructor-data/56cc6d6660b2985b7cb27552.json'},
         loadSession: {method: 'get', url: '/client/session/item-and-session/56cc6d6660b2985b7cb27552.json'},
         loadOutcome: {method: 'put', url: '/client/session/load-outcome/56cc6d6660b2985b7cb27552.json'},
-        reopenSession: {method: 'get', url: '/client/session/reopen/56cc6d6660b2985b7cb27552.json'},
-        resetSession: {method: 'get', url: '/client/session/reset/56cc6d6660b2985b7cb27552.json'},
-        saveSession: {method: 'put', url: '/client/session/save/56cc6d6660b2985b7cb27552.json'}
+        reopen: {method: 'get', url: '/client/session/reopen/56cc6d6660b2985b7cb27552.json'},
+        reset: {method: 'get', url: '/client/session/reset/56cc6d6660b2985b7cb27552.json'},
+        save: {method: 'put', url: '/client/session/save/56cc6d6660b2985b7cb27552.json'}
       }
     });
   }));

@@ -1,28 +1,26 @@
 package org.corespring.container.client.controllers.apps
 
-import java.util.concurrent.TimeUnit
-
-import org.corespring.container.client.V2PlayerConfig
-import org.corespring.container.client.component.{ ComponentScriptInfo, ComponentUrls }
+import org.corespring.container.client.component.{ ComponentBundler, ComponentService, ComponentsScriptBundle }
 import org.corespring.container.client.hooks.PlayerHooks
-import org.corespring.container.client.pages.processing.AssetPathProcessor
-import org.corespring.container.components.model.Component
-import org.corespring.container.components.processing.PlayerItemPreProcessor
+import org.corespring.container.client.pages.PlayerRenderer
+import org.corespring.container.components.model.Id
 import org.corespring.test.TestContext
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
-import play.api.Mode.Mode
-import play.api.http.{ HeaderNames, ContentTypes }
-import play.api.{ GlobalSettings, Mode, Configuration }
-import play.api.libs.json.{ Json, JsValue, JsObject }
-import play.api.mvc.{ RequestHeader }
-import play.api.test.{ FakeApplication, PlaySpecification, FakeRequest }
+import org.specs2.time.NoTimeConversions
+import play.api.http.{ ContentTypes, HeaderNames }
+import play.api.libs.json.{ JsValue, Json }
+import play.api.mvc.RequestHeader
+import play.api.templates.Html
+import play.api.test.{ FakeRequest, PlaySpecification }
+import play.api.{ GlobalSettings, Mode }
 
 import scala.concurrent._
-import scala.concurrent.duration.Duration
+import scala.concurrent.duration._
 
-class PlayerTest extends Specification with PlaySpecification with Mockito {
+class PlayerTest extends Specification with PlaySpecification with Mockito
+  with NoTimeConversions {
 
   val sessionId = "sessionId"
 
@@ -30,77 +28,69 @@ class PlayerTest extends Specification with PlaySpecification with Mockito {
 
   class playerScope(sessionAndItem: Either[(Int, String), (JsValue, JsValue)] = Right(Json.obj("id" -> sessionId), Json.obj()))
     extends Scope
-    with Player
     with TestContext {
-    lazy val mockHooks = {
+    lazy val hooks = {
       val m = mock[PlayerHooks]
       m.loadSessionAndItem(any[String])(any[RequestHeader]) returns Future(sessionAndItem)
       m.createSessionForItem(any[String])(any[RequestHeader]) returns Future(sessionAndItem)
       m
     }
 
-    override def hooks: PlayerHooks = mockHooks
-
-    override def versionInfo: JsObject = Json.obj()
-
-    override def itemPreProcessor: PlayerItemPreProcessor = {
-      val m = mock[PlayerItemPreProcessor]
-      m.preProcessItemForPlayer(any[JsValue]) returns Json.obj()
+    val bundler = {
+      val m = mock[ComponentBundler]
+      m.bundle(any[Seq[Id]], any[String], any[Option[String]], any[Boolean]) returns {
+        Some(ComponentsScriptBundle(Nil, Nil, Nil, Nil))
+      }
       m
     }
 
-    override protected def buildJs(scriptInfo: ComponentScriptInfo, extras: Seq[String])(implicit rh: RequestHeader) = Seq.empty
-    override protected def buildCss(scriptInfo: ComponentScriptInfo)(implicit rh: RequestHeader) = Seq.empty
-
-    override def playerConfig: V2PlayerConfig = V2PlayerConfig(Configuration.empty)
-
-    override def components: Seq[Component] = Seq.empty
-
-    override def mode: Mode = Mode.Dev
-
-    override def urls: ComponentUrls = {
-      mock[ComponentUrls]
+    val playerRenderer = {
+      val m = mock[PlayerRenderer]
+      m.render(any[String], any[JsValue], any[JsValue], any[ComponentsScriptBundle], any[Seq[String]], any[Boolean]) returns {
+        Future.successful(Html("<html></html>"))
+      }
+      m
     }
 
-    override def jsSrc(context: String): NgSourcePaths = {
-      new NgSourcePaths(Seq.empty, "", Seq.empty, Seq.empty)
+    val componentService = {
+      val m = mock[ComponentService]
+      m
     }
 
-    override def assetPathProcessor: AssetPathProcessor = new AssetPathProcessor {
-      override def process(s: String): String = s
-    }
+    val mode = Mode.Prod
 
-    override def pageSourceService: PageSourceService = mock[PageSourceService]
+    val player = new Player(
+      mode,
+      bundler,
+      containerContext,
+      playerRenderer,
+      componentService,
+      hooks)
+
+    def waitFor[A](f: Future[A]): A = Await.result(f, 1.second)
+    val req = FakeRequest("", "")
   }
 
   "load" should {
 
     "throw an error if the session id isn't defined" in new playerScope(Right(Json.obj(), Json.obj())) {
-      running(FakeApplication(withGlobal = Some(MockGlobal))) {
-        Await.result(load(sessionId)(FakeRequest("", "")), Duration(1, TimeUnit.SECONDS)) must throwA[IllegalArgumentException]
-      }
+      player.load(sessionId)(req) must throwA[IllegalArgumentException].await
     }
 
     "return 200" in new playerScope {
-      running(FakeApplication(withGlobal = Some(MockGlobal))) {
-        val result = load(sessionId)(FakeRequest("", ""))
-        status(result) must_== OK
-        there was one(mockHooks).loadSessionAndItem(sessionId)(FakeRequest("", ""))
-      }
+      val result = player.load(sessionId)(req)
+      status(result) must_== OK
+      there was one(hooks).loadSessionAndItem(sessionId)(req)
     }
 
     "call hooks.loadSessionAndItem" in new playerScope {
-      running(FakeApplication(withGlobal = Some(MockGlobal))) {
-        val result = load(sessionId)(FakeRequest("", ""))
-        there was one(mockHooks).loadSessionAndItem(sessionId)(FakeRequest("", ""))
-      }
+      val result = player.load(sessionId)(req)
+      there was one(hooks).loadSessionAndItem(sessionId)(req)
     }
 
     "return session as HTML" in new playerScope {
-      running(FakeApplication(withGlobal = Some(MockGlobal))) {
-        val result = load(sessionId)(FakeRequest("", ""))
-        header(HeaderNames.CONTENT_TYPE, result) must_== Some(ContentTypes.HTML)
-      }
+      val result = player.load(sessionId)(req)
+      header(HeaderNames.CONTENT_TYPE, result) must_== Some(ContentTypes.HTML)
     }
   }
 
@@ -108,35 +98,24 @@ class PlayerTest extends Specification with PlaySpecification with Mockito {
     val itemId = "12334"
 
     "call playerHooks.createSessionForItem" in new playerScope {
-      running(FakeApplication(withGlobal = Some(MockGlobal))) {
-        createSessionForItem(itemId)(FakeRequest("", ""))
-        there was one(mockHooks).createSessionForItem(itemId)(FakeRequest("", ""))
-      }
+      player.createSessionForItem(itemId)(req)
+      there was one(hooks).createSessionForItem(itemId)(req)
     }
 
     "return a 201" in new playerScope {
-      running(FakeApplication(withGlobal = Some(MockGlobal))) {
-        val request = FakeRequest("", "")
-        val result = createSessionForItem(itemId)(request)
-        status(result) must be equalTo (CREATED)
-      }
+      val result = player.createSessionForItem(itemId)(req)
+      status(result) must be equalTo (CREATED)
     }
 
     "return new session as HTML" in new playerScope {
-      running(FakeApplication(withGlobal = Some(MockGlobal))) {
-        val request = FakeRequest("", "")
-        val result = createSessionForItem(itemId)(request)
-        header(HeaderNames.CONTENT_TYPE, result) must be equalTo (Some(ContentTypes.HTML))
-      }
+      val result = player.createSessionForItem(itemId)(req)
+      header(HeaderNames.CONTENT_TYPE, result) must be equalTo (Some(ContentTypes.HTML))
     }
 
     "sets the Location header to Player.load(sessionId)" in new playerScope {
-      running(FakeApplication(withGlobal = Some(MockGlobal))) {
-        val request = FakeRequest("", "")
-        val result = createSessionForItem(itemId)(request)
-        import org.corespring.container.client.controllers.apps.routes.Player
-        header(HeaderNames.LOCATION, result) must be equalTo (Some(Player.load(sessionId).url))
-      }
+      val result = player.createSessionForItem(itemId)(req)
+      import org.corespring.container.client.controllers.apps.routes.Player
+      header(HeaderNames.LOCATION, result) must be equalTo (Some(Player.load(sessionId).url))
     }
   }
 }

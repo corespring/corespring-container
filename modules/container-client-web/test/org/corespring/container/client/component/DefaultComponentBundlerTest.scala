@@ -43,8 +43,16 @@ class DefaultComponentBundlerTest extends Specification with Mockito with Compon
       }
       m
     }
+    val componentService = {
+      val m = mock[ComponentService]
+      m
+    }
 
-    val bundler = new DefaultComponentBundler(dependencyResolver, clientSideDependencies, urls)
+    val bundler = new DefaultComponentBundler(
+      dependencyResolver,
+      clientSideDependencies,
+      urls,
+      componentService)
   }
 
   "singleBundle" should {

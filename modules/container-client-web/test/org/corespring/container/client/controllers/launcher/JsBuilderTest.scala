@@ -1,5 +1,6 @@
 package org.corespring.container.client.controllers.launcher
 
+import org.corespring.container.client.io.ResourcePath
 import org.corespring.container.client.views.txt.js.ServerLibraryWrapper
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
@@ -15,12 +16,12 @@ class JsBuilderTest extends Specification with Mockito {
   trait scope extends Scope {
 
     lazy val loader = {
-      val m = mock[Loader]
-      m.load(any[String]).answers { (key: Any) => Some(s"//${key.asInstanceOf[String]}") }
+      val m = mock[ResourcePath]
+      m.loadPath(any[String]).answers { (key: Any) => Some(s"//${key.asInstanceOf[String]}") }
       m
     }
 
-    val builder = new JsBuilder(loader.load)
+    val builder = new JsBuilder(loader)
     def path(s: String) = s"//container-client/js/player-launcher/$s.js"
     val jsString = builder.buildJs("url", Seq("file.js"), Json.obj("opts" -> "opts"), "bootstrap", Map("a" -> "apple"))
   }
@@ -63,7 +64,7 @@ class JsBuilderTest extends Specification with Mockito {
         "url-builder",
         "object-id",
         "draft-id")) { (k: String) =>
-        there was one(loader).load(s"container-client/js/player-launcher/$k.js")
+        there was one(loader).loadPath(s"container-client/js/player-launcher/$k.js")
       }
 
     }

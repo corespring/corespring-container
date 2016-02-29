@@ -1,22 +1,23 @@
 package org.corespring.container.client.controllers.resources
 
-import org.corespring.container.client.hooks.Hooks.{ R, StatusMessage }
-import org.corespring.container.client.hooks.{ ItemHooks, CoreItemHooks, CreateItemHook, SupportingMaterialHooks }
-import org.corespring.container.components.model.Component
+import org.corespring.container.client.component.ComponentService
+import org.corespring.container.client.controllers.helpers.PlayerXhtml
+import org.corespring.container.client.hooks.Hooks.StatusMessage
+import org.corespring.container.client.hooks._
+import org.corespring.container.components.model.{ Component, Interaction }
 import org.corespring.container.components.model.dependencies.ComponentMaker
 import org.corespring.test.TestContext
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
 import org.specs2.time.NoTimeConversions
-import play.api.libs.json.{ JsString, JsObject, JsValue, Json }
+import play.api.libs.json.{ JsObject, JsString, JsValue, Json }
 import play.api.mvc.RequestHeader
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import play.api.mvc.Results._
 
-import scala.concurrent.{ Await, Future }
 import scala.concurrent.duration._
+import scala.concurrent.{ Await, Future }
 
 class ItemTest extends Specification with Mockito with ComponentMaker with NoTimeConversions {
 
@@ -53,19 +54,32 @@ class ItemTest extends Specification with Mockito with ComponentMaker with NoTim
       m
     }
 
-    val item = new Item with TestContext {
-
-      override def hooks: ItemHooks = item.this.hooks
-
-      override protected def componentTypes: Seq[String] = Seq.empty
-
-      override def materialHooks: SupportingMaterialHooks = {
-        val m = mock[SupportingMaterialHooks]
-        m
-      }
-
-      override def components: Seq[Component] = item.this.components
+    val materialHooks = {
+      val m = mock[ItemSupportingMaterialHooks]
+      m
     }
+
+    val componentService = {
+      val m = mock[ComponentService]
+      m.interactions returns components.flatMap {
+        case i: Interaction => Some(i)
+        case _ => None
+      }
+      m
+    }
+
+    val playerXhtml = {
+      val m = mock[PlayerXhtml]
+      m.processXhtml(any[String]) answers (s => s.asInstanceOf[String])
+      m
+    }
+
+    val item = new Item(
+      hooks,
+      materialHooks,
+      componentService,
+      TestContext.containerContext,
+      playerXhtml)
 
   }
 
@@ -76,11 +90,16 @@ class ItemTest extends Specification with Mockito with ComponentMaker with NoTim
         status(item.load("x")(FakeRequest("", ""))) === OK
       }
 
+      "call playerXhtml.mkPlayerXhtml" in new item() {
+        item.load("x")(FakeRequest("", ""))
+        there was one(playerXhtml).processXhtml("<div></div>")
+      }
+
       "prep the json" in new item(loadResult = Json.obj("_id" ->
         Json.obj("$oid" -> "1"), "xhtml" -> "<p>a</p>")) {
         val json = contentAsJson(item.load("x")(FakeRequest("", "")))
         (json \ "itemId").as[String] === "1"
-        (json \ "xhtml").as[String] === """<div class="para">a</div>"""
+        (json \ "xhtml").as[String] === """<p>a</p>"""
       }
     }
 

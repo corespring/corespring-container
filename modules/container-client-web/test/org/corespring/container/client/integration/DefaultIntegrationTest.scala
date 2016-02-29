@@ -2,27 +2,27 @@ package org.corespring.container.client.integration
 
 import java.net.URL
 
-import org.corespring.container.client.controllers.ComponentSets
-import org.corespring.container.client.controllers.apps.PageSourceServiceConfig
 import org.corespring.container.client.hooks._
 import org.corespring.container.client.pages.engine.JadeEngineConfig
+import org.corespring.container.client.{ ComponentSetExecutionContext, VersionInfo }
 import org.corespring.container.components.model.Component
 import org.corespring.test.TestContext
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import play.api.Mode.Mode
-import play.api.Mode.Mode
 import play.api.libs.json.{ JsObject, Json }
 import play.api.mvc.{ AnyContent, Request }
 import play.api.test.{ FakeApplication, FakeRequest, PlaySpecification }
-import play.api.{ Mode, Configuration, GlobalSettings }
+import play.api.{ Configuration, GlobalSettings, Mode }
+
+import scala.concurrent.ExecutionContext
 
 class DefaultIntegrationTest extends Specification with Mockito with PlaySpecification {
 
   def mkDefaultIntegration(json: JsObject) = {
     new DefaultIntegration with TestContext {
 
-      override def versionInfo: JsObject = Json.obj()
+      override def versionInfo = VersionInfo("", "", "", "", Json.obj())
 
       override def playerHooks: PlayerHooks = mock[PlayerHooks]
 
@@ -52,9 +52,6 @@ class DefaultIntegrationTest extends Specification with Mockito with PlaySpecifi
 
       override def components: Seq[Component] = Seq.empty
 
-      /** urls for component sets eg one or more components */
-      override def componentSets: ComponentSets = mock[ComponentSets]
-
       override def itemHooks: CoreItemHooks with CreateItemHook = mock[CoreItemHooks with CreateItemHook]
 
       override def itemDraftSupportingMaterialHooks: ItemDraftSupportingMaterialHooks = mock[ItemDraftSupportingMaterialHooks]
@@ -66,6 +63,8 @@ class DefaultIntegrationTest extends Specification with Mockito with PlaySpecifi
       override val loadResource: (String) => Option[URL] = _ => None
 
       override def mode: Mode = Mode.Test
+
+      override def componentSetExecutionContext: ComponentSetExecutionContext = ComponentSetExecutionContext(ExecutionContext.global)
     }
   }
 

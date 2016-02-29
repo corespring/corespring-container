@@ -8,9 +8,9 @@ import org.corespring.container.components.processing.PlayerItemPreProcessor
 import org.corespring.container.components.response.OutcomeProcessor
 import org.corespring.container.logging.ContainerLogger
 import play.api.libs.json._
-import play.api.mvc.{Action, Controller, SimpleResult}
+import play.api.mvc.{ Action, Controller, SimpleResult }
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ ExecutionContext, Future }
 
 object Session {
   object Errors {
@@ -21,14 +21,14 @@ object Session {
 }
 
 //case class to enable auto wiring
-case class SessionExecutionContext(default:ExecutionContext, heavyLoad: ExecutionContext)
+case class SessionExecutionContext(default: ExecutionContext, heavyLoad: ExecutionContext)
 
 class Session(
-val outcomeProcessor: OutcomeProcessor,
-val itemPreProcessor: PlayerItemPreProcessor,
-val scoreProcessor: ScoreProcessor,
-val hooks: SessionHooks,
-val sessionContext: SessionExecutionContext )
+  val outcomeProcessor: OutcomeProcessor,
+  val itemPreProcessor: PlayerItemPreProcessor,
+  val scoreProcessor: ScoreProcessor,
+  val hooks: SessionHooks,
+  val sessionContext: SessionExecutionContext)
   extends Controller {
 
   val logger = ContainerLogger.getLogger("Session")
@@ -96,16 +96,17 @@ val sessionContext: SessionExecutionContext )
         response match {
           case Left(err) => err
           case Right(fs) => {
+            println("???" + Json.prettyPrint(fs.everything))
             val json = fs.everything
 
-          val itemJson = (json \ "item").as[JsObject]
-          val processedItem = itemPreProcessor.preProcessItemForPlayer(itemJson)
-          val sessionJson = (json \ "session").as[JsObject]
+            val itemJson = (json \ "item").as[JsObject]
+            val processedItem = itemPreProcessor.preProcessItemForPlayer(itemJson)
+            val sessionJson = (json \ "session").as[JsObject]
 
-          val base = Json.obj(
+            val base = Json.obj(
               "item" -> processedItem,
               "session" -> sessionJson)
-
+            println(s"???? ${Json.prettyPrint(base)}")
             Ok(base)
           }
         }
@@ -154,8 +155,9 @@ val sessionContext: SessionExecutionContext )
    * @return
    */
   def loadOutcome(id: String) = Action.async {
-    implicit request => Future {
-      val reponse = hooks.loadOutcome(id)
+    implicit request =>
+      Future {
+        val reponse = hooks.loadOutcome(id)
 
         reponse match {
           case Left(err) => InternalServerError(err._2)
@@ -180,7 +182,7 @@ val sessionContext: SessionExecutionContext )
             }
           }
         }
-      } (sessionContext.heavyLoad)
+      }(sessionContext.heavyLoad)
   }
   /**
    * Load instructor data for a session.
