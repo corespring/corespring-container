@@ -104,10 +104,11 @@
         }
 
         function reset() {
-          if ($scope.session) {
-            $scope.session.isComplete = false;
-            $scope.session.remainingAttempts = 1;
-          }
+          $scope.session = {
+            remainingAttempts: 1,
+            settings: _.cloneDeep($scope.playerSettings),
+            isComplete: false
+          };
           $scope.score = undefined;
           $scope.outcome = undefined;
           $scope.responses = {};
