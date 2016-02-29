@@ -73,6 +73,10 @@ angular.module('corespring-editor.controllers')
         setMode('gather');
     });
 
+    $scope.$on('client-side-preview.reset-player', function(){
+      resetPlayer();
+    });
+
     $scope.$on('playerControlPanel.reset', function () {
       resetPlayer();      
     });
