@@ -56,6 +56,7 @@ trait ControllersModule {
     itemDevEditor,
     draftEditor,
     draftDevEditor,
+    componentEditor,
     dataQuery)
 
 }
