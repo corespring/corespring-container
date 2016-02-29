@@ -1,18 +1,19 @@
-angular.module('corespring-editor.controllers')
+angular.module('corespring-editing.controllers')
     .controller('ClientSidePreview', [
     '$log',
     '$scope',
-    'ComponentData',
     'ClientSidePlayerService',
-    'STATIC_PATHS',
+    'ComponentData',
     'EDITOR_EVENTS',
+    'STATIC_PATHS',
     function ClientSidePreview(
       $log,
       $scope,
+      ClientSidePlayerServiceDef,
       ComponentData,
-      ClientSidePlayerServiceDef, 
-      STATIC_PATHS,
-      EDITOR_EVENTS) {
+      EDITOR_EVENTS,
+      STATIC_PATHS
+    ) {
 
     $scope.playerLabelImg = STATIC_PATHS.assets + '/item-player-label.png';
 
@@ -114,6 +115,3 @@ angular.module('corespring-editor.controllers')
 
 }]);
 
-angular.module('corespring-editor.controllers').constant('EDITOR_EVENTS', {
-    CONTENT_ADDED_TO_EDITOR: 'content.added.to.editor'
-});

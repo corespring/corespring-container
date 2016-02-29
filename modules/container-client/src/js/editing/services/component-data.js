@@ -1,4 +1,4 @@
-angular.module('corespring-editor.services')
+angular.module('corespring-editing.services')
   .service('ComponentData', [
     '$timeout',
     'LogFactory',

@@ -2,7 +2,7 @@
   /**
    * Non optimized preview player for the editor
    */
-  angular.module('corespring-editor.directives')
+  angular.module('corespring-editing.directives')
     .directive('previewPlayer', ['$log', 'ComponentRegister', 'ComponentData',
       function($log, ComponentRegister, ComponentData) {
 

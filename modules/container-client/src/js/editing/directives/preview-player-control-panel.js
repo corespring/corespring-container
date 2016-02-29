@@ -1,5 +1,6 @@
-angular.module('corespring-editor.directives')
-  .directive('previewPlayerControlPanel', ['$log',
+angular.module('corespring-editing.directives')
+  .directive('previewPlayerControlPanel', [
+    '$log',
     function($log){
       
       function link($scope, $element, $attrs){
@@ -29,7 +30,7 @@ angular.module('corespring-editor.directives')
         mode: '=',
         score: '='
       },
-      templateUrl: '/editor/question/directives/preview-player-control-panel.html'
+      templateUrl: '/editing/directives/preview-player-control-panel.html'
     };
   }
 ]);
