@@ -34,7 +34,7 @@ trait EditorRenderer extends CoreRenderer {
     prodMode: Boolean): Future[Html] = Future {
     val css = if (prodMode) Seq(sources.css.dest) else sources.css.src
     val js = if (prodMode) Seq(sources.js.dest) else sources.js.src
-    val processedCss = (css ++ bundle.css).map(assetPathProcessor.process)
+    val processedCss = (sources.css.otherLibs ++ css ++ bundle.css).map(assetPathProcessor.process)
     val processedJs = (sources.js.otherLibs ++ js ++ bundle.js).map(assetPathProcessor.process)
 
     val serverNgModuleName = s"$name.serverInjectedServices"
