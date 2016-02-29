@@ -13,7 +13,7 @@ import org.corespring.container.client.integration.validation.Validator
 import org.corespring.container.client.io.ResourcePath
 import org.corespring.container.client.pages.engine.{ JadeEngine, JadeEngineConfig }
 import org.corespring.container.client.pages.processing.AssetPathProcessor
-import org.corespring.container.client.{ ComponentsConfig, V2PlayerConfig }
+import org.corespring.container.client.V2PlayerConfig
 import org.corespring.container.components.model.Component
 import org.corespring.container.components.model.dependencies.DependencyResolver
 import org.corespring.container.js.{ JsProcessingConfig, JsProcessingModule }

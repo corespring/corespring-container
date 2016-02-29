@@ -9,6 +9,7 @@ import org.apache.commons.io.FileUtils
 import org.bson.types.ObjectId
 import org.corespring.amazon.s3.{ ConcreteS3Service, S3Service }
 import org.corespring.container.client._
+import org.corespring.container.client.component.ComponentSetExecutionContext
 import org.corespring.container.client.controllers.apps.PageSourceServiceConfig
 import org.corespring.container.client.controllers.{ AssetType, _ }
 import org.corespring.container.client.hooks._

@@ -1,6 +1,6 @@
 package org.corespring.container.client.controllers
 
-import org.corespring.container.client.ComponentsConfig
+import org.corespring.container.client.component.ComponentsConfig
 import org.corespring.test.TestContext
 import org.specs2.mutable.Specification
 import play.api.GlobalSettings

@@ -9,23 +9,13 @@ import play.api.templates.Html
 
 import scala.concurrent.Future
 
-class RigRenderer(pageSourceService: PageSourceService,
+class RigRenderer(val pageSourceService: PageSourceService,
   containerContext: ContainerExecutionContext,
-  jadeEngine: JadeEngine) {
+  jadeEngine: JadeEngine) extends CoreRenderer {
 
   implicit def ec = containerContext.context
 
-  def name = "rig"
-
-  private object sources {
-    lazy val js = {
-      pageSourceService.loadJs(name)
-    }
-
-    lazy val css = {
-      pageSourceService.loadCss(name)
-    }
-  }
+  override val name = "rig"
 
   def render(item: JsValue, bundle: SingleComponentScriptBundle): Future[Html] = Future {
 

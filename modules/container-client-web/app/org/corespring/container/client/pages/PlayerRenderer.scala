@@ -2,9 +2,9 @@ package org.corespring.container.client.pages
 
 import java.lang.Boolean
 
-import org.corespring.container.client.{V2PlayerConfig, VersionInfo}
-import org.corespring.container.client.component.{ComponentJson, ComponentsScriptBundle}
-import org.corespring.container.client.controllers.apps.{PageSourceService, PlayerEndpoints, SourcePaths}
+import org.corespring.container.client.{ V2PlayerConfig, VersionInfo }
+import org.corespring.container.client.component.{ ComponentJson, ComponentsScriptBundle }
+import org.corespring.container.client.controllers.apps.{ PageSourceService, PlayerEndpoints, SourcePaths }
 import org.corespring.container.client.controllers.helpers.PlayerXhtml
 import org.corespring.container.client.integration.ContainerExecutionContext
 import org.corespring.container.client.pages.engine.JadeEngine
@@ -12,37 +12,27 @@ import org.corespring.container.client.pages.processing.AssetPathProcessor
 import org.corespring.container.client.views.txt.js.PlayerServices
 import org.corespring.container.components.processing.PlayerItemPreProcessor
 import play.api.Logger
-import play.api.libs.json.{JsObject, JsValue, Json}
+import play.api.libs.json.{ JsObject, JsValue, Json }
 import play.api.templates.Html
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ ExecutionContext, Future }
 
 class PlayerRenderer(
-                      playerConfig: V2PlayerConfig,
+  playerConfig: V2PlayerConfig,
   containerContext: ContainerExecutionContext,
   jadeEngine: JadeEngine,
-  pageSourceService: PageSourceService,
+  val pageSourceService: PageSourceService,
   assetPathProcessor: AssetPathProcessor,
   componentJson: ComponentJson,
   playerXhtml: PlayerXhtml,
   itemPreProcessor: PlayerItemPreProcessor,
-  versionInfo: VersionInfo) {
+  versionInfo: VersionInfo) extends CoreRenderer {
 
   implicit def ec: ExecutionContext = containerContext.context
 
   private lazy val logger = Logger(classOf[PlayerRenderer])
 
-  def name = "player"
-
-  private object sources {
-    lazy val js = {
-      pageSourceService.loadJs(name)
-    }
-
-    lazy val css = {
-      pageSourceService.loadCss(name)
-    }
-  }
+  override val name = "player"
 
   private def javaBoolean(b: Boolean): java.lang.Boolean = new java.lang.Boolean(b)
 
@@ -60,7 +50,7 @@ class PlayerRenderer(
       playerXhtml.processXhtml(xhtml)
   }.getOrElse("<div><h1>New Item</h1></div>")
 
-  def render(sessionId: String, session: JsValue, item: JsValue, bundle: ComponentsScriptBundle, warnings:Seq[String], prodMode: scala.Boolean): Future[Html] = Future {
+  def render(sessionId: String, session: JsValue, item: JsValue, bundle: ComponentsScriptBundle, warnings: Seq[String], prodMode: scala.Boolean): Future[Html] = Future {
     logger.info(s"function=render, bundle=$bundle")
     val css = if (prodMode) Seq(sources.css.dest) else sources.css.src
     val js = if (prodMode) Seq(sources.js.dest) else sources.js.src
@@ -80,7 +70,6 @@ class PlayerRenderer(
     val useNewRelicRumConfig = playerConfig.newRelicRumConfig.isDefined
     val newRelicRumConfig = playerConfig.newRelicRumConfig.getOrElse(Json.obj())
 
-
     val session: JsValue = Json.obj()
     val processedXhtml = processXhtml((item \ "xhtml").asOpt[String])
     val preprocessedItem = itemPreProcessor.preProcessItemForPlayer(item).as[JsObject] ++ Json.obj("xhtml" -> processedXhtml)
@@ -94,7 +83,7 @@ class PlayerRenderer(
       "useNewRelicRumConfig" -> javaBoolean(useNewRelicRumConfig),
       "newRelicRumConfig" -> Json.stringify(newRelicRumConfig),
       "warnings" -> Json.stringify(Json.arr(warnings)),
-      "ngModules" -> (Some("player-injected") ++ sources.js.ngModules ++ bundle.ngModules).map(s => s"'$s'").mkString(","),
+      "ngModules" -> jsArrayString(Some("player-injected") ++ sources.js.ngModules ++ bundle.ngModules),
       "ngServiceLogic" -> inlineJs,
       "sessionJson" -> Json.stringify(sessionJson),
       "options" -> "{}",

@@ -1,10 +1,9 @@
-package org.corespring.container.client
+package org.corespring.container.client.controllers
 
 import java.io.File
 
 import org.apache.commons.io.FileUtils
-import org.corespring.container.client.component.ComponentService
-import org.corespring.container.client.controllers.DefaultComponentSets
+import org.corespring.container.client.component.{ ComponentService, ComponentSetExecutionContext, ComponentsConfig }
 import org.corespring.container.client.io.ResourcePath
 import org.corespring.container.client.processing.{ CssMinifier, Gzipper, JsMinifier }
 import org.corespring.container.components.model.Component
@@ -13,16 +12,8 @@ import play.api.Logger
 import play.api.http.ContentTypes
 import play.api.mvc._
 
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.Future
 
-//case class to enable auto wiring
-case class ComponentSetExecutionContext(heavyLoad: ExecutionContext)
-
-case class ComponentsConfig(
-  componentsPath: String,
-  bowerComponentsPath: String,
-  minify: Boolean,
-  gzip: Boolean)
 class CompressedAndMinifiedComponentSets(componentSetExecutionContext: ComponentSetExecutionContext,
   componentService: ComponentService,
   resourceLoader: ResourcePath,

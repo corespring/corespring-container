@@ -4,7 +4,8 @@ import java.io.File
 import java.nio.charset.StandardCharsets
 
 import org.corespring.container.client.integration.ContainerExecutionContext
-import org.corespring.container.client.{ ComponentsConfig, HasContainerContext }
+import org.corespring.container.client.HasContainerContext
+import org.corespring.container.client.component.ComponentsConfig
 import org.corespring.container.client.integration.validation.Validator
 import org.joda.time.DateTimeZone
 import org.joda.time.format.{ DateTimeFormat, DateTimeFormatter }

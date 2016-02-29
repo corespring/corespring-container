@@ -1,10 +1,9 @@
 package org.corespring.container.client.controllers
 
 import com.softwaremill.macwire.MacwireMacros.wire
-import org.corespring.container.client.component.ComponentService
+import org.corespring.container.client.component.{ ComponentService, ComponentSetExecutionContext, ComponentsConfig }
 import org.corespring.container.client.integration.ContainerExecutionContext
 import org.corespring.container.client.io.ResourcePath
-import org.corespring.container.client.{ ComponentSetExecutionContext, ComponentsConfig, CompressedAndMinifiedComponentSets }
 import org.corespring.container.components.model.dependencies.DependencyResolver
 
 trait ComponentControllersModule {

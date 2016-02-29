@@ -14,24 +14,14 @@ import scala.concurrent.Future
 
 class CatalogRenderer(jadeEngine: JadeEngine,
   containerContext: ContainerExecutionContext,
-  pageSourceService: PageSourceService,
+  val pageSourceService: PageSourceService,
   componentJson: ComponentJson,
   componentService: ComponentService,
-  assetPathProcessor: AssetPathProcessor) {
+  assetPathProcessor: AssetPathProcessor) extends CoreRenderer {
 
   implicit def ec = containerContext.context
 
-  private val name = "catalog"
-
-  private object sources {
-    lazy val js = {
-      pageSourceService.loadJs(name)
-    }
-
-    lazy val css = {
-      pageSourceService.loadCss(name)
-    }
-  }
+  override val name = "catalog"
 
   def render(bundle: ComponentsScriptBundle,
     mainEndpoints: MainEndpoints,
@@ -50,7 +40,7 @@ class CatalogRenderer(jadeEngine: JadeEngine,
       "appName" -> name,
       "js" -> processedJs.toArray,
       "css" -> processedCss.toArray,
-      "ngModules" -> (Some(s"$name-injected") ++ sources.js.ngModules ++ bundle.ngModules).map(s => s"'$s'").mkString(","),
+      "ngModules" -> jsArrayString(Some(s"$name-injected") ++ sources.js.ngModules ++ bundle.ngModules),
       "ngServiceLogic" -> ngServiceLogic,
       "staticPaths" -> Json.stringify(StaticPaths.staticPaths))
     jadeEngine.renderJade(name, params)

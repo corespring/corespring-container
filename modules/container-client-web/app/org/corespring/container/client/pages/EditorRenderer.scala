@@ -14,30 +14,17 @@ import play.api.templates.Html
 
 import scala.concurrent.Future
 
-trait EditorRenderer {
+trait EditorRenderer extends CoreRenderer {
 
   private lazy val logger = Logger(classOf[EditorRenderer])
 
   def containerExecutionContext: ContainerExecutionContext
   def jade: JadeEngine
-  def pageSourceService: PageSourceService
   def assetPathProcessor: AssetPathProcessor
   def componentJson: ComponentJson
   def versionInfo: VersionInfo
 
-  def name: String
-
   implicit def ec = containerExecutionContext.context
-
-  private object sources {
-    lazy val js = {
-      pageSourceService.loadJs(name)
-    }
-
-    lazy val css = {
-      pageSourceService.loadCss(name)
-    }
-  }
 
   def render(mainEndpoints: MainEndpoints,
     supportingMaterialsEndpoints: SupportingMaterialsEndpoints,
@@ -62,7 +49,7 @@ trait EditorRenderer {
       "appName" -> name,
       "js" -> processedJs.toArray,
       "css" -> processedCss.toArray,
-      "ngModules" -> (Seq(serverNgModuleName) ++ sources.js.ngModules ++ bundle.ngModules).map(s => s"'$s'").mkString(","),
+      "ngModules" -> jsArrayString(Seq(serverNgModuleName) ++ sources.js.ngModules ++ bundle.ngModules),
       "ngServiceLogic" -> servicesJs,
       "versionInfo" -> Json.stringify(versionInfo.json),
       "options" -> Json.stringify(clientOptions.toJson))

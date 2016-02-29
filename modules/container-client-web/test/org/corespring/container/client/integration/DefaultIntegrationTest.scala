@@ -4,7 +4,8 @@ import java.net.URL
 
 import org.corespring.container.client.hooks._
 import org.corespring.container.client.pages.engine.JadeEngineConfig
-import org.corespring.container.client.{ ComponentSetExecutionContext, VersionInfo }
+import org.corespring.container.client.VersionInfo
+import org.corespring.container.client.component.ComponentSetExecutionContext
 import org.corespring.container.components.model.Component
 import org.corespring.test.TestContext
 import org.specs2.mock.Mockito
