@@ -8,9 +8,7 @@ import org.corespring.container.client.component._
 import org.corespring.container.client.controllers._
 import org.corespring.container.client.controllers.apps._
 import org.corespring.container.client.controllers.helpers.{LoadClientSideDependencies}
-import org.corespring.container.client.controllers.launcher.JsBuilder
-import org.corespring.container.client.controllers.launcher.editor.EditorLauncher
-import org.corespring.container.client.controllers.launcher.player.PlayerLauncher
+import org.corespring.container.client.controllers.launcher.{LauncherModules, JsBuilder}
 import org.corespring.container.client.controllers.resources._
 import org.corespring.container.client.hooks._
 import org.corespring.container.client.integration.validation.Validator
@@ -35,9 +33,10 @@ trait DefaultIntegration
   with HasHooks
   with HasConfig
   with ResourcesModule
+  with LauncherModules
   with JsProcessingModule {
 
-  override lazy val controllers = super.controllers ++ newEditorControllers ++ resourceControllers
+  override lazy val controllers = super.controllers ++ newEditorControllers ++ resourceControllers ++ launcherControllers
 
   private[DefaultIntegration] val debounceInMillis: Long = configuration.getLong("editor.autosave.debounceInMillis").getOrElse(5000)
 
@@ -119,30 +118,13 @@ trait DefaultIntegration
 
   lazy val jadeEngine = wire[JadeEngine]
 
-  lazy val jsBuilder = new JsBuilder(resourceLoader.loadPath(_))
+  //lazy val jsBuilder = new JsBuilder(resourceLoader.loadPath(_))
 
   override def sessionExecutionContext = SessionExecutionContext(
     DefaultIntegration.this.containerContext.context,
     DefaultIntegration.this.containerContext.context)
 
 
-  lazy val playerLauncher = new PlayerLauncher {
-
-    override def builder: JsBuilder = DefaultIntegration.this.jsBuilder
-
-    override def containerContext = DefaultIntegration.this.containerContext
-
-    def hooks = playerLauncherHooks
-
-    override def playerConfig: V2PlayerConfig = DefaultIntegration.this.playerConfig
-  }
-
-  lazy val editorLauncher = new EditorLauncher {
-    override def builder: JsBuilder = DefaultIntegration.this.jsBuilder
-    override def containerContext = DefaultIntegration.this.containerContext
-    def hooks = playerLauncherHooks
-    override def playerConfig: V2PlayerConfig = DefaultIntegration.this.playerConfig
-  }
 
   override def dataQuery: DataQuery = new DataQuery {
     override def hooks: DataQueryHooks = dataQueryHooks

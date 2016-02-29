@@ -10,11 +10,6 @@ trait CommonControllers {
   /** urls for component sets eg one or more components */
   def componentSets: ComponentSets
 
-  /** the 3rd party js launch api */
-  def playerLauncher: PlayerLauncher
-
-  def editorLauncher: EditorLauncher
-
   /** load files from 3rd party dependency libs */
   def libs: ComponentsFileController
 }
@@ -34,8 +29,6 @@ trait ContainerControllers
 {
   def controllers: Seq[Controller] = Seq(
     componentSets,
-    playerLauncher,
-    editorLauncher,
     libs,
     icons,
     dataQuery)

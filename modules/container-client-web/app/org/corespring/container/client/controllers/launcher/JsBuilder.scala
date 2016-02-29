@@ -1,10 +1,13 @@
 package org.corespring.container.client.controllers.launcher
 
+import org.corespring.container.client.io.ResourcePath
 import org.corespring.container.client.views.txt.js.ServerLibraryWrapper
 import play.api.libs.json.{ JsObject, Json }
 import play.api.templates.TxtFormat
 
-private[corespring] class JsBuilder(val load: String => Option[String]) extends JsResource {
+private[corespring] class JsBuilder(val resourcePath : ResourcePath) extends JsResource {
+
+  override def load: (String) => Option[String] = resourcePath.loadPath(_)
 
   private def lib(n: String) = s"container-client/js/player-launcher/$n"
 
@@ -50,4 +53,5 @@ private[corespring] class JsBuilder(val load: String => Option[String]) extends 
        ${wrappedContents.mkString("\n")}
        $bootstrapLine"""
   }
+
 }
