@@ -4,6 +4,7 @@ import org.corespring.container.client.component.SingleComponentScriptBundle
 import org.corespring.container.client.controllers.apps.PageSourceService
 import org.corespring.container.client.integration.ContainerExecutionContext
 import org.corespring.container.client.pages.engine.JadeEngine
+import org.corespring.container.client.pages.processing.AssetPathProcessor
 import play.api.libs.json.{ JsValue, Json }
 import play.api.templates.Html
 
@@ -13,14 +14,17 @@ class RigRenderer(val pageSourceService: PageSourceService,
   containerContext: ContainerExecutionContext,
   jadeEngine: JadeEngine) extends CoreRenderer {
 
+  override def assetPathProcessor: AssetPathProcessor = new AssetPathProcessor {
+    override def process(s: String): String = s
+  }
+
   implicit def ec = containerContext.context
 
   override val name = "rig"
 
   def render(item: JsValue, bundle: SingleComponentScriptBundle): Future[Html] = Future {
 
-    val js = sources.js.src ++ sources.js.otherLibs ++ bundle.js
-    val css = sources.css.src ++ bundle.css
+    val (js, css) = prepareJsCss(false, bundle)
 
     val params: Map[String, Any] = Map(
       "appName" -> "rig",

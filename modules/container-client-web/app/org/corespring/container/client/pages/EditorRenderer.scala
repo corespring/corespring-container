@@ -32,10 +32,8 @@ trait EditorRenderer extends CoreRenderer {
     clientOptions: EditorClientOptions,
     bundle: ComponentsScriptBundle,
     prodMode: Boolean): Future[Html] = Future {
-    val css = if (prodMode) Seq(sources.css.dest) else sources.css.src
-    val js = if (prodMode) Seq(sources.js.dest) else sources.js.src
-    val processedCss = (sources.css.otherLibs ++ css ++ bundle.css).map(assetPathProcessor.process)
-    val processedJs = (sources.js.otherLibs ++ js ++ bundle.js).map(assetPathProcessor.process)
+
+    val (js, css) = prepareJsCss(prodMode, bundle)
 
     val serverNgModuleName = s"$name.serverInjectedServices"
 
@@ -47,8 +45,8 @@ trait EditorRenderer extends CoreRenderer {
 
     val params: Map[String, Any] = Map(
       "appName" -> name,
-      "js" -> processedJs.toArray,
-      "css" -> processedCss.toArray,
+      "js" -> js.toArray,
+      "css" -> css.toArray,
       "ngModules" -> jsArrayString(Seq(serverNgModuleName) ++ sources.js.ngModules ++ bundle.ngModules),
       "ngServiceLogic" -> servicesJs,
       "versionInfo" -> Json.stringify(versionInfo.json),

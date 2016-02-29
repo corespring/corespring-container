@@ -25,7 +25,7 @@ class ComponentEditorRenderer(
   jade: JadeEngine,
   val pageSourceService: PageSourceService,
   componentJson: ComponentJson,
-  assetPathProcessor: AssetPathProcessor,
+  val assetPathProcessor: AssetPathProcessor,
   versionInfo: VersionInfo) extends CoreRenderer {
 
   private val logger = Logger(classOf[ComponentEditorRenderer])
@@ -38,13 +38,9 @@ class ComponentEditorRenderer(
 
     logger.info(s"function=render, componentBundle=$componentBundle")
 
-    val css = if (prodMode) Seq(sources.css.dest) else sources.css.src
-    val js = if (prodMode) Seq(sources.js.dest) else sources.js.src
+    val (js, css) = prepareJsCss(prodMode, componentBundle)
     val arr: JsArray = JsArray(Seq(componentBundle.component).map(componentJson.toJson(_)))
     val inlineJs = ComponentEditorServices(s"corespring-$name.services", arr, componentBundle.componentType).toString
-
-    val processedCss = (css ++ componentBundle.css).map(assetPathProcessor.process)
-    val processedJs = (sources.js.otherLibs ++ js ++ componentBundle.js).map(assetPathProcessor.process)
 
     val previewWidth = if (clientOptions.isInstanceOf[PreviewRightComponentEditorOptions]) {
       clientOptions.asInstanceOf[PreviewRightComponentEditorOptions].previewWidth
@@ -55,8 +51,8 @@ class ComponentEditorRenderer(
       "previewMode" -> previewMode,
       //Note: calling down to a java api so null is ok
       "previewWidth" -> previewWidth.getOrElse(null),
-      "css" -> processedCss.toArray,
-      "js" -> processedJs.toArray,
+      "js" -> js.toArray,
+      "css" -> css.toArray,
       "ngModules" -> jsArrayString(sources.js.ngModules ++ componentBundle.ngModules),
       "ngServiceLogic" -> inlineJs,
       "componentNgModules" -> "",

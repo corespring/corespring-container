@@ -22,7 +22,7 @@ class PlayerRenderer(
   containerContext: ContainerExecutionContext,
   jadeEngine: JadeEngine,
   val pageSourceService: PageSourceService,
-  assetPathProcessor: AssetPathProcessor,
+  val assetPathProcessor: AssetPathProcessor,
   componentJson: ComponentJson,
   playerXhtml: PlayerXhtml,
   itemPreProcessor: PlayerItemPreProcessor,
@@ -52,8 +52,8 @@ class PlayerRenderer(
 
   def render(sessionId: String, session: JsValue, item: JsValue, bundle: ComponentsScriptBundle, warnings: Seq[String], prodMode: scala.Boolean): Future[Html] = Future {
     logger.info(s"function=render, bundle=$bundle")
-    val css = if (prodMode) Seq(sources.css.dest) else sources.css.src
-    val js = if (prodMode) Seq(sources.js.dest) else sources.js.src
+
+    val (js, css) = prepareJsCss(prodMode, bundle)
     val endpoints = PlayerEndpoints.session(sessionId)
     val queryParams = Json.obj()
     val showControls: scala.Boolean = true
@@ -65,8 +65,7 @@ class PlayerRenderer(
     }
 
     val inlineJs = PlayerServices("player-injected", endpoints, queryParams).toString
-    val processedCss = (css ++ bundle.css).map(assetPathProcessor.process)
-    val processedJs = (sources.js.otherLibs ++ js ++ controlsJs ++ bundle.js).map(assetPathProcessor.process)
+
     val useNewRelicRumConfig = playerConfig.newRelicRumConfig.isDefined
     val newRelicRumConfig = playerConfig.newRelicRumConfig.getOrElse(Json.obj())
 
@@ -77,8 +76,8 @@ class PlayerRenderer(
 
     val params: Map[String, Any] = Map(
       "appName" -> "player",
-      "js" -> processedJs.toArray,
-      "css" -> processedCss.toArray,
+      "js" -> js.toArray,
+      "css" -> css.toArray,
       "showControls" -> javaBoolean(showControls),
       "useNewRelicRumConfig" -> javaBoolean(useNewRelicRumConfig),
       "newRelicRumConfig" -> Json.stringify(newRelicRumConfig),
