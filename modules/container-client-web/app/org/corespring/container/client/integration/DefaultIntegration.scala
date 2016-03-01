@@ -26,6 +26,15 @@ import scala.concurrent.ExecutionContext
 
 case class ContainerExecutionContext(context: ExecutionContext)
 
+object DefaultIntegration {
+  val pathsThatNeedResolution = Seq(
+    "components/",
+    "component-sets/",
+    "editor",
+    "-prod",
+    "player.min")
+}
+
 trait DefaultIntegration
   extends ControllersModule
   with ComponentControllersModule
@@ -41,7 +50,10 @@ trait DefaultIntegration
       componentControllers
   }
 
-  private[DefaultIntegration] val debounceInMillis: Long = configuration.getLong("editor.autosave.debounceInMillis").getOrElse(5000)
+  override lazy val editorClientOptions = {
+    val debounceInMillis: Long = configuration.getLong("editor.autosave.debounceInMillis").getOrElse(5000)
+    EditorClientOptions(debounceInMillis, StaticPaths.staticPaths)
+  }
 
   def jadeEngineConfig: JadeEngineConfig = JadeEngineConfig("container-client/jade", mode, resourceLoader.loadPath(_), resourceLoader.lastModified(_))
 
@@ -69,7 +81,7 @@ trait DefaultIntegration
     Validator.absolutePathInProdMode(componentsPath)
   }
 
-  override def jsProcessingConfig: JsProcessingConfig = JsProcessingConfig(mode == Mode.Dev)
+  override lazy val jsProcessingConfig: JsProcessingConfig = JsProcessingConfig(mode == Mode.Dev)
 
   override lazy val playerConfig: V2PlayerConfig = V2PlayerConfig(configuration)
 
@@ -80,17 +92,12 @@ trait DefaultIntegration
     ComponentsConfig(componentsPath, "container-client/bower_components", minify, gzip)
   }
 
-  lazy val assetPathProcessor = new AssetPathProcessor {
-
-    val needsResolution = Seq(
-      "components/",
-      "component-sets/",
-      "editor",
-      "-prod",
-      "player.min")
+  override lazy val assetPathProcessor = new AssetPathProcessor {
 
     override def process(s: String): String = {
-      if (needsResolution.exists(s.contains(_))) resolveDomain(s) else s
+      if (DefaultIntegration.pathsThatNeedResolution.exists(s.contains(_))) {
+        resolveDomain(s)
+      } else s
     }
   }
 
@@ -99,11 +106,11 @@ trait DefaultIntegration
     mode == Mode.Dev,
     resourceLoader.loadPath(_))
 
-  lazy val pageSourceService: PageSourceService = wire[JsonPageSourceService]
+  override lazy val pageSourceService: PageSourceService = wire[JsonPageSourceService]
 
-  lazy val componentJson: ComponentJson = new ComponentInfoJson(v2Player.Routes.prefix)
+  override lazy val componentJson: ComponentJson = new ComponentInfoJson(v2Player.Routes.prefix)
 
-  lazy val dependencyResolver: DependencyResolver = new DependencyResolver {
+  override lazy val dependencyResolver: DependencyResolver = new DependencyResolver {
     override def components: Seq[Component] = DefaultIntegration.this.components
   }
 

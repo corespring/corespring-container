@@ -40,6 +40,8 @@ trait BaseEditor[H <: EditorHooks]
 
   def containerContext: ContainerExecutionContext
 
+  val editorClientOptions: EditorClientOptions
+
   implicit def ec = containerContext.context
 
   lazy val componentsAndWidgets = ComponentsAndWidgets(
@@ -47,8 +49,6 @@ trait BaseEditor[H <: EditorHooks]
     JsArray(componentService.widgets.map(componentJson.toJson)))
 
   private lazy val logger = Logger(classOf[BaseEditor[H]])
-
-  val debounceInMillis: Long = 5000
 
   def load(id: String) = Action.async { implicit request =>
     hooks.load(id).flatMap { e =>
@@ -60,7 +60,7 @@ trait BaseEditor[H <: EditorHooks]
             .map(_ == "prod")
             .getOrElse(mode == Mode.Prod)
 
-          val clientOptions = EditorClientOptions(debounceInMillis, StaticPaths.staticPaths)
+          //val clientOptions = EditorClientOptions(debounceInMillis, StaticPaths.staticPaths)
           val bundle = bundler.bundleAll("editor", Some("editor"), !prodMode).get
           val mainEndpoints = endpoints.main(id)
           val supportingMaterialsEndpoints = endpoints.supportingMaterials(id)
@@ -68,7 +68,7 @@ trait BaseEditor[H <: EditorHooks]
             mainEndpoints,
             supportingMaterialsEndpoints,
             componentsAndWidgets,
-            clientOptions,
+            editorClientOptions,
             bundle,
             prodMode).map(Ok(_))
         })
@@ -126,7 +126,8 @@ class ItemEditor(val mode: Mode,
   val componentEditorRenderer: ComponentEditorRenderer,
   val componentJson: ComponentJson,
   val componentService: ComponentService,
-  val containerContext: ContainerExecutionContext) extends BaseItemEditor
+  val containerContext: ContainerExecutionContext,
+  val editorClientOptions: EditorClientOptions) extends BaseItemEditor
 
 class ItemDevEditor(val mode: Mode,
   val hooks: ItemEditorHooks,
@@ -135,7 +136,11 @@ class ItemDevEditor(val mode: Mode,
   val componentEditorRenderer: ComponentEditorRenderer,
   val componentJson: ComponentJson,
   val componentService: ComponentService,
-  val containerContext: ContainerExecutionContext) extends BaseItemEditor
+  val containerContext: ContainerExecutionContext) extends BaseItemEditor {
+  override val editorClientOptions: EditorClientOptions = {
+    EditorClientOptions(0, StaticPaths.staticPaths)
+  }
+}
 
 class DraftEditor(val mode: Mode,
   val hooks: DraftEditorHooks,
@@ -144,7 +149,8 @@ class DraftEditor(val mode: Mode,
   val componentEditorRenderer: ComponentEditorRenderer,
   val componentJson: ComponentJson,
   val componentService: ComponentService,
-  val containerContext: ContainerExecutionContext) extends BaseDraftEditor
+  val containerContext: ContainerExecutionContext,
+  val editorClientOptions: EditorClientOptions) extends BaseDraftEditor
 
 class DraftDevEditor(val mode: Mode,
   val hooks: DraftEditorHooks,
@@ -153,4 +159,9 @@ class DraftDevEditor(val mode: Mode,
   val componentEditorRenderer: ComponentEditorRenderer,
   val componentJson: ComponentJson,
   val componentService: ComponentService,
-  val containerContext: ContainerExecutionContext) extends BaseDraftEditor
+  val containerContext: ContainerExecutionContext) extends BaseDraftEditor {
+  override val editorClientOptions: EditorClientOptions = {
+    EditorClientOptions(0, StaticPaths.staticPaths)
+  }
+
+}

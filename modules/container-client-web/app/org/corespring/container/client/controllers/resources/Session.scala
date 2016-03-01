@@ -96,7 +96,6 @@ class Session(
         response match {
           case Left(err) => err
           case Right(fs) => {
-            println("???" + Json.prettyPrint(fs.everything))
             val json = fs.everything
 
             val itemJson = (json \ "item").as[JsObject]
@@ -106,7 +105,6 @@ class Session(
             val base = Json.obj(
               "item" -> processedItem,
               "session" -> sessionJson)
-            println(s"???? ${Json.prettyPrint(base)}")
             Ok(base)
           }
         }

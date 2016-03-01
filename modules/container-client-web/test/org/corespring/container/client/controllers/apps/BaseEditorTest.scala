@@ -64,6 +64,8 @@ class BaseEditorTest extends Specification with Mockito {
     }
 
     override lazy val containerContext: ContainerExecutionContext = TestContext.containerContext
+
+    override lazy val editorClientOptions: EditorClientOptions = EditorClientOptions(0, StaticPaths.staticPaths)
   }
 
   "load" should {

@@ -10,6 +10,7 @@ import org.corespring.container.components.model.Component
 import org.corespring.test.TestContext
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
+import org.specs2.specification.Scope
 import play.api.Mode.Mode
 import play.api.libs.json.{ JsObject, Json }
 import play.api.mvc.{ AnyContent, Request }
@@ -17,6 +18,48 @@ import play.api.test.{ FakeApplication, FakeRequest, PlaySpecification }
 import play.api.{ Configuration, GlobalSettings, Mode }
 
 import scala.concurrent.ExecutionContext
+
+class TestDI extends DefaultIntegration {
+  override def mode: Mode = ???
+
+  override def containerContext: ContainerExecutionContext = ???
+
+  override val loadResource: (String) => Option[URL] = _ => None
+
+  override def configuration: Configuration = ???
+
+  override def collectionHooks: CollectionHooks = ???
+
+  override def itemDraftSupportingMaterialHooks: ItemDraftSupportingMaterialHooks = ???
+
+  override def sessionHooks: SessionHooks = ???
+
+  override def itemDraftHooks: CoreItemHooks with DraftHooks = ???
+
+  override def itemMetadataHooks: ItemMetadataHooks = ???
+
+  override def itemHooks: CoreItemHooks with CreateItemHook = ???
+
+  override def itemSupportingMaterialHooks: ItemSupportingMaterialHooks = ???
+
+  override def playerLauncherHooks: PlayerLauncherHooks = ???
+
+  override def componentSetExecutionContext: ComponentSetExecutionContext = ???
+
+  override def playerHooks: PlayerHooks = ???
+
+  override def catalogHooks: CatalogHooks = ???
+
+  override def versionInfo: VersionInfo = ???
+
+  override def dataQueryHooks: DataQueryHooks = ???
+
+  override def draftEditorHooks: DraftEditorHooks = ???
+
+  override def itemEditorHooks: ItemEditorHooks = ???
+
+  override def components: Seq[Component] = ???
+}
 
 class DefaultIntegrationTest extends Specification with Mockito with PlaySpecification {
 
@@ -45,6 +88,8 @@ class DefaultIntegrationTest extends Specification with Mockito with PlaySpecifi
         m
       }
 
+      override def resolveDomain(s: String) = s
+
       override def collectionHooks: CollectionHooks = mock[CollectionHooks]
 
       override def itemDraftHooks: CoreItemHooks with DraftHooks = mock[CoreItemHooks with DraftHooks]
@@ -69,30 +114,43 @@ class DefaultIntegrationTest extends Specification with Mockito with PlaySpecifi
     }
   }
 
-  "DefaultIntegration" should {
+  "assetPathProcessor" should {
+
+    trait scope extends Scope {
+      val spied = spy[DefaultIntegration](new TestDI())
+    }
+
+    "call revolveDomain" in new scope {
+
+      forall(DefaultIntegration.pathsThatNeedResolution) { k =>
+        spied.assetPathProcessor.process(k)
+        there was one(spied).resolveDomain(k)
+      }
+    }
+  }
+
+  "session.loadItemAndSession" should {
 
     "the loaded session has no correctResponse or feedback" in {
 
-      running(FakeApplication(withGlobal = Some(new GlobalSettings {}))) {
-        val mockJson = Json.obj(
-          "item" -> Json.obj(
-            "components" -> Json.obj(
-              "0" -> Json.obj(
-                "componentType" -> "type",
-                "correctResponse" -> Json.obj("a" -> "b"),
-                "feedback" -> Json.obj("fb" -> "A was right")))), "session" -> Json.obj())
+      val mockJson = Json.obj(
+        "item" -> Json.obj(
+          "components" -> Json.obj(
+            "0" -> Json.obj(
+              "componentType" -> "type",
+              "correctResponse" -> Json.obj("a" -> "b"),
+              "feedback" -> Json.obj("fb" -> "A was right")))), "session" -> Json.obj())
 
-        val di = mkDefaultIntegration(mockJson)
+      val di = mkDefaultIntegration(mockJson)
 
-        val result = di.session.loadItemAndSession("id")(FakeRequest("", ""))
+      val result = di.session.loadItemAndSession("id")(FakeRequest("", ""))
 
-        val json = contentAsJson(result)
+      val json = contentAsJson(result)
 
-        (json \ "item" \ "components" \ "0" \ "correctResponse").asOpt[JsObject] === None
-        (json \ "item" \ "components" \ "0" \ "feedback").asOpt[JsObject] === None
-        (json \ "item" \ "components" \ "0" \ "componentType").asOpt[String] === Some("type")
+      (json \ "item" \ "components" \ "0" \ "correctResponse").asOpt[JsObject] === None
+      (json \ "item" \ "components" \ "0" \ "feedback").asOpt[JsObject] === None
+      (json \ "item" \ "components" \ "0" \ "componentType").asOpt[String] === Some("type")
 
-      }
     }
   }
 }

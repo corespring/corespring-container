@@ -17,6 +17,7 @@ import play.api.mvc.Controller
 trait ControllersModule {
   def mode: Mode
   def playerConfig: V2PlayerConfig
+  def editorClientOptions: EditorClientOptions
   def itemEditorHooks: ItemEditorHooks
   def draftEditorHooks: DraftEditorHooks
   def catalogHooks: CatalogHooks
