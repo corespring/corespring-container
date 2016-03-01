@@ -3,7 +3,7 @@ describe('mathjax-holder', function(){
   var holder, formatUtils, EVENTS;
 
   beforeEach(angular.mock.module('corespring-templates'));
-  beforeEach(angular.mock.module('corespring.wiggi-wiz-features.mathjax'));
+  beforeEach(angular.mock.module('corespring-editing.wiggi-wiz-features.mathjax'));
 
    var MathJaxService = {
     parseDomForMath: jasmine
@@ -15,7 +15,7 @@ describe('mathjax-holder', function(){
 
   beforeEach(angular.mock.module('wiggi-wiz.constants'));
   beforeEach(angular.mock.module('corespring-templates'));
-  beforeEach(angular.mock.module('corespring.wiggi-wiz-features.mathjax'));
+  beforeEach(angular.mock.module('corespring-editing.wiggi-wiz-features.mathjax'));
   
   beforeEach(module(function($provide) {
     $provide.value('MathJaxService', MathJaxService);
