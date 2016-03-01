@@ -64,6 +64,8 @@ class PlayerRenderer(
       case (_, _) => Nil
     }
 
+    val jsWithControls = js ++ controlsJs
+
     val inlineJs = PlayerServices("player-injected", endpoints, queryParams).toString
 
     val useNewRelicRumConfig = playerConfig.newRelicRumConfig.isDefined
@@ -74,15 +76,19 @@ class PlayerRenderer(
     val preprocessedItem = itemPreProcessor.preProcessItemForPlayer(item).as[JsObject] ++ Json.obj("xhtml" -> processedXhtml)
     val sessionJson = Json.obj("session" -> session, "item" -> preprocessedItem)
 
+    val ngModules = Some("player-injected") ++ sources.js.ngModules ++ bundle.ngModules
+
+    logger.trace(s"function=render, ngModules=$ngModules")
+
     val params: Map[String, Any] = Map(
       "appName" -> "player",
-      "js" -> js.toArray,
+      "js" -> jsWithControls.toArray,
       "css" -> css.toArray,
       "showControls" -> javaBoolean(showControls),
       "useNewRelicRumConfig" -> javaBoolean(useNewRelicRumConfig),
       "newRelicRumConfig" -> Json.stringify(newRelicRumConfig),
       "warnings" -> Json.stringify(Json.arr(warnings)),
-      "ngModules" -> jsArrayString(Some("player-injected") ++ sources.js.ngModules ++ bundle.ngModules),
+      "ngModules" -> jsArrayString(ngModules),
       "ngServiceLogic" -> inlineJs,
       "sessionJson" -> Json.stringify(sessionJson),
       "options" -> "{}",

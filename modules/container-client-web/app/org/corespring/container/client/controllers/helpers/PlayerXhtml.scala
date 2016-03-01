@@ -1,7 +1,7 @@
 package org.corespring.container.client.controllers.helpers
 
-import org.corespring.container.client.component.ComponentService
-import org.htmlcleaner.{ TagNode, TagTransformation }
+import org.corespring.container.components.services.ComponentService
+import org.htmlcleaner.{TagNode, TagTransformation}
 
 trait PlayerXhtml {
   def processXhtml(xhtml: String): String

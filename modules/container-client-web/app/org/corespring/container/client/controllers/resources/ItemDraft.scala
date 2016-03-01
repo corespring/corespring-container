@@ -1,9 +1,9 @@
 package org.corespring.container.client.controllers.resources
 
-import org.corespring.container.client.component.ComponentService
 import org.corespring.container.client.controllers.helpers.PlayerXhtml
 import org.corespring.container.client.hooks._
 import org.corespring.container.client.integration.ContainerExecutionContext
+import org.corespring.container.components.services.ComponentService
 import play.api.Logger
 import play.api.libs.json.JsObject
 import play.api.libs.json.Json._

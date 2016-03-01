@@ -2,8 +2,8 @@ package org.corespring.container.client.component
 
 import org.corespring.container.client.controllers.angular.AngularModules
 import org.corespring.container.client.controllers.helpers.LoadClientSideDependencies
-import org.corespring.container.components.model.{ ComponentInfo, Id }
-import org.corespring.container.components.model.dependencies.DependencyResolver
+import org.corespring.container.components.model.{ComponentInfo, Id}
+import org.corespring.container.components.services.{ComponentService, DependencyResolver}
 
 trait ComponentBundler {
   def singleBundle(componentType: String, context: String, expandPaths: Boolean): Option[SingleComponentScriptBundle]
@@ -21,7 +21,7 @@ class DefaultComponentBundler(
 
   override def singleBundle(componentType: String, context: String, expandPaths: Boolean = false): Option[SingleComponentScriptBundle] = {
 
-    dependencyResolver.components.find(_.componentType == componentType).map { c =>
+    componentService.components.find(_.componentType == componentType).map { c =>
       val resolved = dependencyResolver.resolveComponents(Seq(c.id), Some(context))
 
       val cd = clientSideDependencies.getClientSideDependencies(resolved)

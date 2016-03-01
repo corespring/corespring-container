@@ -1,10 +1,20 @@
-package org.corespring.container.components.model.dependencies
+package org.corespring.container.components.services
 
 import org.corespring.container.components.model._
+import org.corespring.container.components.model.dependencies.ComponentMaker
 import org.specs2.mutable.Specification
-import org.specs2.specification.Before
+import org.specs2.specification.Scope
 
 class DependencyResolverTest extends Specification with ComponentMaker {
+
+  private def mkService(components:Seq[Component]) =  new ComponentService {
+    override def components: Seq[Component] = components
+  }
+
+
+  class withResolver(comps: Component*) extends Scope {
+    val resolver = new DependencyResolver(mkService(comps))
+  }
 
   "components for types" should {
 
@@ -27,9 +37,7 @@ class DependencyResolverTest extends Specification with ComponentMaker {
       val a = lib("a", Seq(id("b")))
       val b = lib("b")
 
-      val r = new DependencyResolver {
-        override def components: Seq[Component] = Seq(one, a, b)
-      }
+      val r = new DependencyResolver(mkService(Seq(one, a, b)))
 
       r.resolveComponents(Seq(id("one"))) === Seq(b, a, one)
       r.resolveComponents(Seq(id("a"))) === Seq(b, a)
@@ -40,9 +48,7 @@ class DependencyResolverTest extends Specification with ComponentMaker {
       val a = lib("a", Seq(id("b")))
       val b = lib("b", Seq(id("a")))
 
-      val r = new DependencyResolver {
-        override def components: Seq[Component] = Seq(one, a, b)
-      }
+      val r = new DependencyResolver(mkService(Seq(one, a, b)))
 
       r.resolveComponents(Seq(id("one"))) must throwA[RuntimeException]
     }
@@ -134,16 +140,4 @@ class DependencyResolverTest extends Specification with ComponentMaker {
     }
 
   }
-
-  class withResolver(comps: Component*) extends Before {
-
-    val resolver = new DependencyResolver {
-      override def components: Seq[Component] = comps
-    }
-
-    override def before: Any = {
-
-    }
-  }
-
 }

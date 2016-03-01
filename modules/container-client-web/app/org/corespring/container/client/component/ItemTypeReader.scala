@@ -1,19 +1,19 @@
 package org.corespring.container.client.component
 
-import org.corespring.container.client.controllers.helpers.{ NameHelper, XhtmlProcessor }
-import org.corespring.container.components.model.dependencies.ComponentSplitter
+import org.corespring.container.client.controllers.helpers.{NameHelper, XhtmlProcessor}
 import org.corespring.container.components.model._
+import org.corespring.container.components.services.ComponentService
 import play.api.Logger
 import play.api.libs.json.JsValue
 
-trait ItemTypeReader {
-  /** for an item - return all the components in use */
-  def componentTypes(json: JsValue): Seq[String]
-}
-
 object ItemComponentTypes extends NameHelper {
 
-  private lazy val logger = Logger(classOf[PlayerItemTypeReader])
+  private lazy val logger = Logger(ItemComponentTypes.getClass)
+
+
+  def apply(componentService:ComponentService, item: JsValue) :  Seq[Component] = {
+    apply(componentService.interactions, componentService.widgets, componentService.layoutComponents, item)
+  }
 
   def apply(interactions: Seq[Interaction], widgets: Seq[Widget], layoutComponents: Seq[LayoutComponent], item: JsValue): Seq[Component] = {
 
@@ -58,14 +58,3 @@ object ItemComponentTypes extends NameHelper {
   }
 }
 
-trait PlayerItemTypeReader
-  extends ItemTypeReader
-  with ComponentSplitter
-  with NameHelper {
-
-  /** List components used in the model */
-  override def componentTypes(json: JsValue): Seq[String] = {
-    ItemComponentTypes(interactions, widgets, layoutComponents, json).map(_.componentType)
-  }
-
-}

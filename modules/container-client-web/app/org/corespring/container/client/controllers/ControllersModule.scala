@@ -1,16 +1,17 @@
 package org.corespring.container.client.controllers
 
 import com.softwaremill.macwire.MacwireMacros.wire
-import org.corespring.container.client.{ V2PlayerConfig, VersionInfo }
-import org.corespring.container.client.component.{ ComponentBundler, ComponentJson, ComponentService }
+import org.corespring.container.client.{V2PlayerConfig, VersionInfo}
+import org.corespring.container.client.component.{ComponentBundler, ComponentJson}
 import org.corespring.container.client.controllers.apps._
-import org.corespring.container.client.controllers.helpers.{ DefaultPlayerXhtml, PlayerXhtml }
+import org.corespring.container.client.controllers.helpers.{DefaultPlayerXhtml, PlayerXhtml}
 import org.corespring.container.client.hooks._
 import org.corespring.container.client.integration.ContainerExecutionContext
 import org.corespring.container.client.pages._
 import org.corespring.container.client.pages.engine.JadeEngine
 import org.corespring.container.client.pages.processing.AssetPathProcessor
 import org.corespring.container.components.processing.PlayerItemPreProcessor
+import org.corespring.container.components.services.ComponentService
 import play.api.Mode.Mode
 import play.api.mvc.Controller
 

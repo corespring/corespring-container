@@ -338,7 +338,7 @@ function Draft(element, options, errorCallback) {
     if (options.itemId) {
       options.draftName = options.draftName || msgr.utils.getUid(); //jshint ignore:line
       options.draftId = new DraftId(options.itemId, options.draftName);
-      loadDraftData(options.draftId.toString(), onDraftLoaded);
+      loadDraftData(options.draftId.toString(), onDraftLoaded.bind(this));
     } else {
       createItemAndDraft(options.componentType, function(err, result){
         if(err){

@@ -3,9 +3,10 @@ package org.corespring.container.js
 import com.softwaremill.macwire.MacwireMacros.wire
 import org.corespring.container.components.model.Component
 import org.corespring.container.components.outcome.ScoreProcessorSequence
+import org.corespring.container.components.services.DependencyResolver
 import org.corespring.container.js.outcome.RhinoDefaultScoreProcessor
 import org.corespring.container.js.rhino.score.CustomScoreProcessor
-import org.corespring.container.js.rhino.{RhinoScopeBuilder, RhinoServerLogic, RhinoPlayerItemPreProcessor, RhinoOutcomeProcessor}
+import org.corespring.container.js.rhino.{RhinoOutcomeProcessor, RhinoPlayerItemPreProcessor, RhinoScopeBuilder, RhinoServerLogic}
 import org.corespring.container.{components => interface}
 import org.mozilla.javascript.Scriptable
 
@@ -17,15 +18,17 @@ case class JsProcessingConfig(reloadScope:Boolean)
 
 trait JsProcessingModule {
 
-  def jsProcessingConfig : JsProcessingConfig
+  val jsProcessingConfig : JsProcessingConfig
+
+  val dependencyResolver: DependencyResolver
 
   def components : Seq[Component]
 
-  private lazy val fixedScopeBuilder = new RhinoScopeBuilder(components)
+  private lazy val fixedScopeBuilder = new RhinoScopeBuilder(dependencyResolver, components)
 
   protected def scope : Scriptable = {
     if(jsProcessingConfig.reloadScope){
-      new RhinoScopeBuilder(components).scope
+      new RhinoScopeBuilder(dependencyResolver, components).scope
     } else {
       fixedScopeBuilder.scope
     }

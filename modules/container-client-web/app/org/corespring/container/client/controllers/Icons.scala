@@ -1,20 +1,19 @@
 package org.corespring.container.client.controllers
 
 import org.corespring.container.client.HasContainerContext
-import org.corespring.container.client.component.ComponentService
 import org.corespring.container.client.integration.ContainerExecutionContext
-import org.corespring.container.components.model.dependencies.ComponentSplitter
-import org.corespring.container.components.model.{ Component, ComponentInfo }
-import org.corespring.container.logging.ContainerLogger
-import play.api.mvc.{ Action, Controller }
+import org.corespring.container.components.model.ComponentInfo
+import org.corespring.container.components.services.ComponentService
+import play.api.Logger
+import play.api.mvc.{Action, Controller}
 
 import scala.concurrent.Future
 
 class Icons(
   val containerContext: ContainerExecutionContext,
-  componentService: ComponentService) extends Controller with ComponentSplitter with HasContainerContext {
+  componentService: ComponentService) extends Controller with HasContainerContext {
 
-  private lazy val logger = ContainerLogger.getLogger("Icons")
+  private lazy val logger = Logger(classOf[Icons])
 
   val Split = """(.*?)-(.*)""".r
 
@@ -30,9 +29,9 @@ class Icons(
         }
 
         val bytes: Option[Array[Byte]] =
-          interactions.find(matchingComponentInfo).map(_.icon) match {
+          componentService.interactions.find(matchingComponentInfo).map(_.icon) match {
             case Some(icon) => icon
-            case _ => widgets.find(matchingComponentInfo).map(_.icon).get
+            case _ => componentService.widgets.find(matchingComponentInfo).map(_.icon).get
           }
 
         bytes.map {
@@ -41,6 +40,4 @@ class Icons(
         }.getOrElse(NotFound(""))
       }
   }
-
-  override def components: Seq[Component] = componentService.components
 }

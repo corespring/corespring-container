@@ -3,6 +3,7 @@ package org.corespring.container.client.integration
 import java.net.URL
 
 import com.softwaremill.macwire.MacwireMacros.wire
+import org.corespring.container.client.V2PlayerConfig
 import org.corespring.container.client.component._
 import org.corespring.container.client.controllers._
 import org.corespring.container.client.controllers.apps._
@@ -11,13 +12,10 @@ import org.corespring.container.client.controllers.launcher.LauncherModules
 import org.corespring.container.client.controllers.resources._
 import org.corespring.container.client.integration.validation.Validator
 import org.corespring.container.client.io.ResourcePath
-import org.corespring.container.client.pages.engine.{ JadeEngine, JadeEngineConfig }
+import org.corespring.container.client.pages.engine.{JadeEngine, JadeEngineConfig}
 import org.corespring.container.client.pages.processing.AssetPathProcessor
-import org.corespring.container.client.V2PlayerConfig
-import org.corespring.container.components.model.Component
-import org.corespring.container.components.model.dependencies.DependencyResolver
-import org.corespring.container.js.{ JsProcessingConfig, JsProcessingModule }
-import org.corespring.container.logging.ContainerLogger
+import org.corespring.container.components.services.{ComponentService, DependencyResolver}
+import org.corespring.container.js.{JsProcessingConfig, JsProcessingModule}
 import play.api.Mode
 import play.api.Mode.Mode
 import play.api.mvc.Controller
@@ -45,9 +43,9 @@ trait DefaultIntegration
 
   lazy val controllers: Seq[Controller] = {
     containerMainControllers ++
-      resourceControllers ++
-      launcherControllers ++
-      componentControllers
+    resourceControllers ++
+    launcherControllers ++
+    componentControllers
   }
 
   override lazy val editorClientOptions = {
@@ -73,8 +71,6 @@ trait DefaultIntegration
    * Override it if you want to make use of it.
    */
   def resolveDomain(path: String): String = path
-
-  private lazy val logger = ContainerLogger.getLogger("DefaultIntegration")
 
   def validate: Either[String, Boolean] = {
     val componentsPath = configuration.getString("components.path").getOrElse("components")
@@ -110,16 +106,13 @@ trait DefaultIntegration
 
   override lazy val componentJson: ComponentJson = new ComponentInfoJson(v2Player.Routes.prefix)
 
-  override lazy val dependencyResolver: DependencyResolver = new DependencyResolver {
-    override def components: Seq[Component] = DefaultIntegration.this.components
-  }
+  override lazy val dependencyResolver: DependencyResolver = wire[DependencyResolver]
 
   lazy val clientSideDependencies: LoadClientSideDependencies = new LoadClientSideDependencies {}
 
-  //TODO: wire when we've cleaned up
-  lazy val componentBundler: ComponentBundler = new DefaultComponentBundler(dependencyResolver, clientSideDependencies, componentSets, componentService)
+  override lazy val componentBundler: ComponentBundler = wire[DefaultComponentBundler]
 
-  lazy val jadeEngine = wire[JadeEngine]
+  override lazy val jadeEngine = wire[JadeEngine]
 
   override def sessionExecutionContext = SessionExecutionContext(
     DefaultIntegration.this.containerContext.context,

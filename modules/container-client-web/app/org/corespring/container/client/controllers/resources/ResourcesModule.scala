@@ -1,13 +1,13 @@
 package org.corespring.container.client.controllers.resources
 
 import com.softwaremill.macwire.MacwireMacros.wire
-import org.corespring.container.client.component.ComponentService
 import org.corespring.container.client.controllers.helpers.PlayerXhtml
 import org.corespring.container.client.hooks._
 import org.corespring.container.client.integration.ContainerExecutionContext
 import org.corespring.container.components.outcome.ScoreProcessor
 import org.corespring.container.components.processing.PlayerItemPreProcessor
 import org.corespring.container.components.response.OutcomeProcessor
+import org.corespring.container.components.services.ComponentService
 
 trait ResourcesModule {
 

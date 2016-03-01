@@ -2,16 +2,17 @@ package org.corespring.container.client.controllers.apps
 
 import java.net.URLEncoder
 
-import org.corespring.container.client.component.{ ComponentBundler, ComponentService }
+import org.corespring.container.client.component.{ComponentBundler, ItemComponentTypes}
 import org.corespring.container.client.controllers.GetAsset
 import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.client.hooks.PlayerHooks
 import org.corespring.container.client.integration.ContainerExecutionContext
 import org.corespring.container.client.pages.PlayerRenderer
+import org.corespring.container.components.services.ComponentService
 import play.api.Mode
 import play.api.Mode.Mode
 import play.api.http.ContentTypes
-import play.api.libs.json.{ JsObject, JsValue }
+import play.api.libs.json.{JsObject, JsValue}
 import play.api.mvc._
 import play.api.templates.Html
 
@@ -32,10 +33,10 @@ class Player(mode: Mode,
   }
 
   private def createPlayerHtml(sessionId: String, session: JsValue, item: JsValue, prodMode: Boolean): Either[String, Future[Html]] = {
-    val ids = componentService.idsInItem(item)
+    val ids = ItemComponentTypes(componentService, item).map(_.id)
+
     bundler.bundle(ids, "player", Some("player"), !prodMode) match {
       case Some(b) => {
-
         val hasBeenArchived = hooks.archiveCollectionId == (session \ "collectionId")
 
         val warnings: Seq[String] = if (hasBeenArchived) {
@@ -45,7 +46,8 @@ class Player(mode: Mode,
         }
 
         Right(
-          playerRenderer.render(sessionId, session, item, b, warnings, prodMode))
+          playerRenderer.render(sessionId, session, item, b, warnings, prodMode)
+        )
       }
       case _ => Left(s"Failed to create a bundle for: $sessionId")
     }

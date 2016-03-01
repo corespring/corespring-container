@@ -1,19 +1,18 @@
 package org.corespring.container.client.controllers.apps
 
-import org.corespring.container.client.component.{ ComponentBundler, ComponentJson, ComponentService, ItemComponentTypes }
+import org.corespring.container.client.component.{ComponentBundler, ComponentJson}
 import org.corespring.container.client.controllers.AssetsController
 import org.corespring.container.client.controllers.apps.componentEditor.ComponentEditorLaunchingController
 import org.corespring.container.client.hooks.Hooks.StatusMessage
-import org.corespring.container.client.hooks.{ DraftEditorHooks, EditorHooks, ItemEditorHooks }
+import org.corespring.container.client.hooks.{DraftEditorHooks, EditorHooks, ItemEditorHooks}
 import org.corespring.container.client.integration.ContainerExecutionContext
-import org.corespring.container.client.pages.{ ComponentEditorRenderer, DevEditorRenderer, EditorRenderer, MainEditorRenderer }
+import org.corespring.container.client.pages.{ComponentEditorRenderer, DevEditorRenderer, EditorRenderer, MainEditorRenderer}
 import org.corespring.container.client.views.models.ComponentsAndWidgets
-import org.corespring.container.components.model.dependencies.ComponentSplitter
-import org.corespring.container.components.model.{ Component, Id, Interaction, Widget }
+import org.corespring.container.components.services.ComponentService
 import play.api.Mode.Mode
-import play.api.libs.json.{ JsArray, JsValue, Json }
-import play.api.mvc.{ Action, Controller, RequestHeader, SimpleResult }
-import play.api.{ Logger, Mode }
+import play.api.libs.json.{JsArray, JsValue, Json}
+import play.api.mvc.{Action, Controller, RequestHeader, SimpleResult}
+import play.api.{Logger, Mode}
 
 import scala.concurrent.Future
 

@@ -1,12 +1,11 @@
 package org.corespring.container.client.component
 
-import org.corespring.container.components.model.dependencies.ComponentSplitter
-import org.corespring.container.components.model.{ Component, Id }
+import org.corespring.container.components.model.Component
+import org.corespring.container.components.services.ComponentService
 import play.api.Mode
 import play.api.Mode._
-import play.api.libs.json.JsValue
 
-class DefaultComponentService(mode: Mode, loadComps: => Seq[Component]) extends ComponentSplitter with ComponentService {
+class DefaultComponentService(mode: Mode, loadComps: => Seq[Component]) extends ComponentService {
 
   private var loadedComponents: Seq[Component] = Seq.empty
 
@@ -17,10 +16,5 @@ class DefaultComponentService(mode: Mode, loadComps: => Seq[Component]) extends 
     }
     case (Mode.Prod, x :: _) => loadedComponents
     case _ => loadComps
-  }
-
-  //superceding [[PlayerItemTypeReader]]
-  override def idsInItem(json: JsValue): Seq[Id] = {
-    ItemComponentTypes(interactions, widgets, layoutComponents, json).map(_.id)
   }
 }

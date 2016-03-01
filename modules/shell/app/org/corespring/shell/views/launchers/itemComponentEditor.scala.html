@@ -24,7 +24,7 @@
 
       if(opts.itemId){
         opts.contentStorage = 'item';
-        editor = new org.corespring.editors.QuestionComponentEditor(holder, opts, function(err){
+        window.editor = new org.corespring.editors.QuestionComponentEditor(holder, opts, function(err){
           console.warn(err);
         });
 

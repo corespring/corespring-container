@@ -1,14 +1,16 @@
-package org.corespring.container.components.model.dependencies
+package org.corespring.container.components.services
 
 import com.ahum.deps._
 import org.corespring.container.components.model._
 import play.api.Logger
 
-trait DependencyResolver extends ComponentSplitter {
+class DependencyResolver(componentService: ComponentService) {
 
   type IdRelation = (Id, Seq[Id])
 
   private lazy val logger = Logger(classOf[DependencyResolver])
+
+  private def components = componentService.components
 
   lazy val relationships: Seq[(Id, Seq[Id])] = {
     components.map { c =>
@@ -21,6 +23,13 @@ trait DependencyResolver extends ComponentSplitter {
     }
   }
 
+  /**
+    * Returns a topologically sorted [[Seq[Component]]] such that loading the js/css in this order will
+    * not cause any issues.
+    * @param ids
+    * @param scope
+    * @return
+    */
   def resolveComponents(ids: Seq[Id], scope: Option[String] = None): Seq[Component] = {
     logger.debug(s"[resolveComponents] id: ${ids.map(_.name).mkString(",")}, scope: $scope")
     val sortedIds = resolveIds(ids, scope)
@@ -84,20 +93,21 @@ trait DependencyResolver extends ComponentSplitter {
       }
 
       i match {
-        case Nil => {
-          acc
-        }
-        case Seq(head) => {
+        case Nil => acc
+        case head +: Nil => {
           scopedRelationships
             .find(t => t._1.orgNameMatch(head))
             .map(addToAcc(Nil))
             .getOrElse(innerResolve(Nil, acc))
         }
-        case head :: rest => {
+        case head +: rest => {
           scopedRelationships
             .find(t => t._1.orgNameMatch(head))
             .map(addToAcc(rest))
             .getOrElse(innerResolve(rest, acc))
+        }
+        case _ => {
+          throw new IllegalStateException(s"Match failed for: $i - looking for 0, 1 or more [[Id]]")
         }
       }
     }

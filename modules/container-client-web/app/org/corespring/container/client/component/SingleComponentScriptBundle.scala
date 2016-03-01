@@ -19,4 +19,16 @@ case class ComponentsScriptBundle(components: Seq[Component],
                                        css: Seq[String],
                                        ngModules: Seq[String]) extends Bundle{
   def componentTypes: Seq[String] = components.map(_.componentType)
+
+  override def toString = {
+
+    s"""a
+      |ComponentScriptBundle(
+      |  components= ${components.map(_.componentType)},
+      |  js= $js,
+      |  css= $css,
+      |  ngModules= $ngModules
+      |)
+    """.stripMargin
+  }
 }

@@ -1,23 +1,23 @@
 package org.corespring.container.client.controllers.resources
 
-import org.corespring.container.client.component.ComponentService
 import org.corespring.container.client.controllers.helpers.PlayerXhtml
 import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.client.hooks._
-import org.corespring.container.components.model.{ Component, Interaction }
+import org.corespring.container.components.model.{Component, Interaction}
 import org.corespring.container.components.model.dependencies.ComponentMaker
+import org.corespring.container.components.services.ComponentService
 import org.corespring.test.TestContext
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
 import org.specs2.time.NoTimeConversions
-import play.api.libs.json.{ JsObject, JsString, JsValue, Json }
+import play.api.libs.json.{JsObject, JsString, JsValue, Json}
 import play.api.mvc.RequestHeader
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 
 import scala.concurrent.duration._
-import scala.concurrent.{ Await, Future }
+import scala.concurrent.{Await, Future}
 
 class ItemTest extends Specification with Mockito with ComponentMaker with NoTimeConversions {
 

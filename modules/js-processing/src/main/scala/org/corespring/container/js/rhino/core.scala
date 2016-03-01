@@ -112,6 +112,7 @@ trait GlobalScope extends LibLoading {
     } catch {
       case e: Throwable => {
         logger.error(e.getMessage)
+        e.printStackTrace()
         None
       }
     } finally {

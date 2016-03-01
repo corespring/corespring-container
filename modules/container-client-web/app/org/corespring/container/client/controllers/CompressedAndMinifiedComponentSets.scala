@@ -3,11 +3,11 @@ package org.corespring.container.client.controllers
 import java.io.File
 
 import org.apache.commons.io.FileUtils
-import org.corespring.container.client.component.{ ComponentService, ComponentSetExecutionContext, ComponentsConfig }
+import org.corespring.container.client.component.{ComponentSetExecutionContext, ComponentsConfig}
 import org.corespring.container.client.io.ResourcePath
-import org.corespring.container.client.processing.{ CssMinifier, Gzipper, JsMinifier }
+import org.corespring.container.client.processing.{CssMinifier, Gzipper, JsMinifier}
 import org.corespring.container.components.model.Component
-import org.corespring.container.components.model.dependencies.DependencyResolver
+import org.corespring.container.components.services.{ComponentService, DependencyResolver}
 import play.api.Logger
 import play.api.http.ContentTypes
 import play.api.mvc._
