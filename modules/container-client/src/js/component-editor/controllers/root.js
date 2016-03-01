@@ -40,6 +40,26 @@ angular.module('corespring-singleComponentEditor.controllers')
 
       $scope.playerMode = 'gather';
 
+      $scope.prompt = 'hi there';
+
+      $scope.$watch('prompt', function(newValue){
+        if($scope.item){
+          $scope.item.xhtml = getXhtml(newValue);
+        }
+      });
+
+      function getXhtml(prompt){
+
+        prompt =  prompt ? '<prompt>' +  prompt + '</prompt>' : '';
+
+        return [
+         '<div class="root">',
+            prompt,
+         '  <div '+ componentType + '="" id="' + $scope.componentKey +'"></div>',
+         '</div>'
+        ].join('\n');
+      }
+
       /**
        * A key for use in the item model.
        */
@@ -50,7 +70,53 @@ angular.module('corespring-singleComponentEditor.controllers')
       }; 
 
       $scope.getData = function(){
-        return angular.copy(configPanel.getModel());
+        var out = { 
+          components: {}
+        };
+
+        out.components[$scope.componentKey] = angular.copy(configPanel.getModel());
+        out.xhtml = $scope.item.xhtml;
+        return out;
+      };
+
+      function readPrompt(xhtml, done){
+        try {
+          var parser = new DOMParser();
+          var doc = parser.parseFromString(xhtml, 'text/html'); 
+          console.log(doc);
+          var promptNode = doc.querySelector('prompt');
+          var out = promptNode ? promptNode.innerHTML : undefined;
+          if(!out){
+            done('unable to read prompt in: ' + xhtml);
+          } else {
+            done(null, out);
+          }
+        } catch(e){
+          done(e);
+        }
+      }
+
+      $scope.setData = function(data, done){
+
+        if(!data || !data.components || !data.components[$scope.componentKey]){
+          done('Invalid data must be in the form: { components: { '+$scope.componentKey+': {...}}}');
+          return;
+        }
+
+        ComponentData.deleteComponent($scope.componentKey);
+        $scope.item.components[$scope.componentKey] = data.components[$scope.componentKey];
+        $scope.item.xhtml = data.xhtml;
+
+        readPrompt($scope.item.xhtml, function(err, prompt){
+          if(err){
+            done(err);
+          } else {
+            $scope.prompt = prompt;
+            configPanel.setModel($scope.item.components[$scope.componentKey]);
+            ComponentData.updateComponent($scope.componentKey, $scope.item.components[$scope.componentKey]);
+            done(null);
+          }
+        });
       };
 
       $scope.$on('registerConfigPanel', function(a, id, configPanelBridge) {
@@ -98,9 +164,8 @@ angular.module('corespring-singleComponentEditor.controllers')
           });
 
           Msgr.on('setData', function(data, done){
-            $scope.item.components[$scope.componentKey] = data;
-            configPanel.setModel($scope.item.components[$scope.componentKey]);
-            done(null);
+
+            $scope.setData(data, done);
           });
 
           Msgr.on('getComponentKey', function(err, done){
@@ -142,11 +207,11 @@ angular.module('corespring-singleComponentEditor.controllers')
           logger.log('on initialise', data);
           
           var initialData = { 
-            xhtml: '<div><div '+ componentType + '="" id="' + $scope.componentKey +'"></div></div>',
+            xhtml: getXhtml($scope.prompt), 
             components: {} 
           };
 
-          initialData.xhtml = data.xhtml ? data.xhtml : initialData.xhtml;
+          initialData.xhtml = data.xhtml ? data.xhtml : initialData.xhtml; 
           var defaultData = ComponentDefaultData.getDefaultData(COMPONENT_EDITOR.componentType);
           initialData.components[$scope.componentKey] = data.componentModel ? data.componentModel : defaultData;
           

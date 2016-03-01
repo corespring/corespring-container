@@ -48,6 +48,7 @@ angular.module('corespring-player.services')
         }
 
         if(pending[id]){
+          log('registerComponent - set pending data: ', pending[id]);
           bridges[id].setDataAndSession(pending[id]);
           pending[id] = null;
         }
@@ -59,30 +60,34 @@ angular.module('corespring-player.services')
 
       this.setDataAndSession = function(allData) {
         log("setDataAndSession", allData);
-        if(window.console && _.isFunction(window.console.warn)){
-          console.warn('@deprecated: use "setDataAndSessions(data, sessions)" instead');
-        }
+        // if(window.console && _.isFunction(window.console.warn)){
+        //   console.warn('@deprecated: use "setDataAndSessions(data, sessions)" instead');
+        // }
 
         _.forIn(allData, function(ds, id){
-          if(bridges[id]){
-            bridges[id].setDataAndSession(ds);
-          } else {
-            pending[id] = ds;
-          }
+          this.setSingleDataAndSession(id, ds.data, ds.session);
+          // if(bridges[id]){
+          //   bridges[id].setDataAndSession(ds);
+          // } else {
+          //   pending[id] = ds;
+          // }
         });
       };
 
-      this.setDataAndSessions = function (data, session){
-        log("setDataAndSessions", data, session);
-        _.forIn(bridges, function(b, key){
-          b.setDataAndSession({data: data[key], session: session[key]});
-        });
-      };
+      // this.setDataAndSessions = function (data, session){
+      //   log("setDataAndSessions", data, session);
+      //   _.forIn(bridges, function(b, key){
+      //     b.setDataAndSession({data: data[key], session: session[key]});
+      //   });
+      // };
 
       this.setSingleDataAndSession = function(id, data, session){
+        var combined = {data: data, session: session};
         if(bridges[id]){
           log("setSingleDataAndSession", id, data, session);
-          bridges[id].setDataAndSession({data: data, session: session});
+          bridges[id].setDataAndSession(combined);
+        } else {
+          pending[id] = combined;
         }
       };
 
@@ -99,6 +104,7 @@ angular.module('corespring-player.services')
       
       this.deregisterComponent = function(id) {
         bridges[id] = undefined;
+        pending[id] = undefined;
         delete bridges[id];
       };
 
@@ -138,6 +144,10 @@ angular.module('corespring-player.services')
 
       this.reset = function() {
         _.forIn(bridges, fn('reset'));
+      };
+
+      this.deregisterAllComponents = function(){
+        _(bridges).keys().forIn(this.deregisterComponent);
       };
 
       this.interactionCount = function() {
