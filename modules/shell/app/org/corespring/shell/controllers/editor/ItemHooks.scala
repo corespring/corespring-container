@@ -8,6 +8,7 @@ import org.corespring.container.client.hooks.Hooks.{ R, StatusMessage }
 import org.corespring.container.client.integration.ContainerExecutionContext
 import org.corespring.container.client.{ hooks => containerHooks }
 import org.corespring.mongo.json.services.MongoService
+import org.corespring.shell.services.ItemService
 import play.api.http.Status._
 import play.api.libs.json._
 import play.api.mvc._
@@ -15,14 +16,16 @@ import play.api.mvc._
 import scala.concurrent.Future
 import scala.util.Try
 
-trait ItemSupportingMaterialHooks
+class ItemSupportingMaterialHooks(
+assets: SupportingMaterialAssets[String],
+itemService: ItemService,
+                                   val containerContext: ContainerExecutionContext
+                                 )
   extends containerHooks.ItemSupportingMaterialHooks
   with SupportingMaterialHooksHelper {
 
   import scala.concurrent.ExecutionContext.Implicits.global
 
-  def assets: SupportingMaterialAssets[String]
-  def itemService: MongoService
 
   override def create[F <: File](id: String, sm: CreateNewMaterialRequest[F])(implicit h: RequestHeader): R[JsValue] = Future {
     {
@@ -108,13 +111,14 @@ trait ItemSupportingMaterialHooks
 
 }
 
-trait ItemHooks
+class ItemHooks(
+itemService: ItemService,
+assets: ItemAssets,
+                 val containerContext: ContainerExecutionContext
+               )
   extends containerHooks.ItemHooks
   //with CoreItemHooks
   with ItemHooksHelper {
-  def itemService: MongoService
-
-  def assets: ItemAssets
 
   override def load(itemId: String)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] = Future {
     itemService.load(itemId).map { i =>

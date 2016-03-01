@@ -1,26 +1,22 @@
 package org.corespring.container.client.controllers.resources
 
-import java.io.{ FileInputStream }
-
-import org.apache.commons.io.IOUtils
 import org.corespring.container.client.HasContainerContext
 import org.corespring.container.client.controllers.helpers.{ PlayerXhtml, XhtmlProcessor }
 import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.client.hooks._
 import play.api.Logger
-import play.api.libs.{ Files, MimeTypes }
 import play.api.libs.json.{ JsString, JsObject, JsValue, Json }
 import play.api.mvc._
 
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.{ Future }
 import scalaz.{ Failure, Success, Validation }
 import scalaz.Scalaz._
 
 object ItemJson {
 
-  def apply(components: Seq[String], rawJson: JsValue): JsObject = {
+  def apply(playerXhtml: PlayerXhtml, rawJson: JsValue): JsObject = {
 
-    val processedXhtml = (rawJson \ "xhtml").asOpt[String].map(s => PlayerXhtml.mkXhtml(components, s)).getOrElse {
+    val processedXhtml = (rawJson \ "xhtml").asOpt[String].map(s => playerXhtml.processXhtml(s)).getOrElse {
       throw new IllegalArgumentException(s"the Item json must contain 'xhtml'\n ${Json.stringify(rawJson)}")
     }
 
@@ -32,6 +28,9 @@ object ItemJson {
 trait CoreItem extends CoreSupportingMaterials with Controller with HasContainerContext {
 
   lazy val logger = Logger(classOf[CoreItem])
+
+
+  def playerXhtml : PlayerXhtml
 
   implicit def toResult(m: StatusMessage): SimpleResult = play.api.mvc.Results.Status(m._1)(Json.obj("error" -> m._2))
 
@@ -53,7 +52,7 @@ trait CoreItem extends CoreSupportingMaterials with Controller with HasContainer
         either match {
           case Left(sm) => sm
           case Right(rawItem) => {
-            Ok(ItemJson(componentTypes, rawItem))
+            Ok(ItemJson(playerXhtml, rawItem))
               .withHeaders(
                 "Cache-Control" -> noCacheHeader,
                 "Expires" -> "0")

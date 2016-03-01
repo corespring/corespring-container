@@ -1,11 +1,18 @@
 package org.corespring.container.client.controllers.launcher.player
 
+import org.corespring.container.client.V2PlayerConfig
 import org.corespring.container.client.controllers.launcher._
+import org.corespring.container.client.hooks.PlayerLauncherHooks
+import org.corespring.container.client.integration.ContainerExecutionContext
 import play.api.mvc._
 
-trait PlayerLauncher extends Launcher {
+class PlayerLauncher(
+   val playerConfig: V2PlayerConfig,
+                        val containerContext : ContainerExecutionContext,
+                        val hooks : PlayerLauncherHooks,
+                        builder:JsBuilder
+                      ) extends Launcher {
 
-  def builder: JsBuilder
 
   def componentEditorJs = Action.async { implicit request =>
     hooks.componentEditorJs.map { err =>

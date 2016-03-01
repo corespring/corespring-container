@@ -13,7 +13,7 @@ trait ComponentEditorLaunchingController extends HasContainerContext {
 
   import play.api.mvc.Results._
 
-  def renderer: ComponentEditorRenderer
+  def componentEditorRenderer: ComponentEditorRenderer
   def bundler: ComponentBundler
 
   def mode : Mode
@@ -30,7 +30,7 @@ trait ComponentEditorLaunchingController extends HasContainerContext {
     logger.info(s"function=load, componentType=$componentType, prodMode=$prodMode")
 
     bundler.singleBundle(componentType, "editor", !prodMode) match {
-      case Some(b) => renderer.render(b, previewMode, options, prodMode).map(Ok(_))
+      case Some(b) => componentEditorRenderer.render(b, previewMode, options, prodMode).map(Ok(_))
       case None => Future.successful(NotFound(""))
     }
   }

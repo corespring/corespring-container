@@ -46,7 +46,7 @@ class ComponentEditorLaunchingControllerTest extends Specification with Mockito 
     }
 
     val controller = new ComponentEditorLaunchingController {
-      override def renderer: ComponentEditorRenderer = scope.this.renderer
+      override def componentEditorRenderer: ComponentEditorRenderer = scope.this.renderer
 
       override def mode: Mode = scope.this.mode
 

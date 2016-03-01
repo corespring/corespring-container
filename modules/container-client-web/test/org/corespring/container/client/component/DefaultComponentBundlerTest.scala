@@ -1,8 +1,9 @@
 package org.corespring.container.client.component
 
 import org.corespring.container.client.controllers.helpers.LoadClientSideDependencies
-import org.corespring.container.components.model.{ Component, Id }
-import org.corespring.container.components.model.dependencies.{ ComponentMaker, DependencyResolver }
+import org.corespring.container.components.model.{Component, Id}
+import org.corespring.container.components.model.dependencies.ComponentMaker
+import org.corespring.container.components.services.{ComponentService, DependencyResolver}
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
@@ -15,9 +16,6 @@ class DefaultComponentBundlerTest extends Specification with Mockito with Compon
 
     val dependencyResolver = {
       val m = mock[DependencyResolver]
-      m.components.returns {
-        Seq(interaction)
-      }
 
       m.resolveComponents(any[Seq[Id]], any[Option[String]]).returns {
         Seq(interaction)
@@ -43,8 +41,19 @@ class DefaultComponentBundlerTest extends Specification with Mockito with Compon
       }
       m
     }
+    val componentService = {
+      val m = mock[ComponentService]
+      m.components.returns {
+        Seq(interaction)
+      }
+      m
+    }
 
-    val bundler = new DefaultComponentBundler(dependencyResolver, clientSideDependencies, urls)
+    val bundler = new DefaultComponentBundler(
+      dependencyResolver,
+      clientSideDependencies,
+      urls,
+      componentService)
   }
 
   "singleBundle" should {

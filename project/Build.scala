@@ -176,16 +176,20 @@ object Build extends sbt.Build {
   //Note: As above...
   lazy val componentModel = builder.playApp("component-model")
     .settings(playAppToSbtLibSettings: _*)
+    .dependsOn(logging, utils % "test->compile;compile->compile")
+
+  lazy val componentServices = builder.playApp("component-services")
+    .settings(playAppToSbtLibSettings: _*)
     .settings(
       libraryDependencies ++= Seq(dependencyUtils))
-    .dependsOn(logging, utils % "test->compile;compile->compile")
+    .dependsOn(componentModel % "compile->compile;test->test", logging, utils % "test->compile;compile->compile")
 
   //Note: this is a play app for now until we move to play 2.2.0
   lazy val jsProcessing = builder.playApp("js-processing")
     .settings(playAppToSbtLibSettings: _*)
     .settings(
-      libraryDependencies ++= Seq(rhinoJs, grizzledLog))
-    .dependsOn(logging, containerClient, componentModel % "test->test;compile->compile")
+      libraryDependencies ++= Seq(rhinoJs, grizzledLog, macWireMacro))
+    .dependsOn(logging, containerClient, componentServices, componentModel % "test->test;compile->compile")
 
   lazy val componentLoader = builder.lib("component-loader")
     .settings(
@@ -212,6 +216,7 @@ object Build extends sbt.Build {
       templatesImport ++= Seq("play.api.libs.json.JsValue", "play.api.libs.json.Json"))
     .dependsOn(
       componentModel % "compile->compile;test->test",
+      componentServices % "compile->compile;test->test",
       containerClient,
       utils,
       logging,
@@ -235,7 +240,7 @@ object Build extends sbt.Build {
 
   val shell = builder.playApp("shell")
     .settings(
-      libraryDependencies ++= Seq(logbackClassic, casbah, playS3, scalaz, play.Keys.cache, yuiCompressor, closureCompiler, commonsIo))
+      libraryDependencies ++= Seq(macWireMacro, logbackClassic, casbah, playS3, scalaz, play.Keys.cache, yuiCompressor, closureCompiler, commonsIo))
     .dependsOn(containerClientWeb, componentLoader, mongoJsonService, docs, logging)
     .aggregate(containerClientWeb, componentLoader, containerClient, componentModel, utils, jsProcessing, mongoJsonService, docs, logging)
 

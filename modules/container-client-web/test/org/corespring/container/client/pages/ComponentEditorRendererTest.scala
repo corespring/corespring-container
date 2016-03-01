@@ -1,5 +1,6 @@
 package org.corespring.container.client.pages
 
+import org.corespring.container.client.VersionInfo
 import org.corespring.container.client.component.{ ComponentJson, SingleComponentScriptBundle }
 import org.corespring.container.client.controllers.apps._
 import org.corespring.container.client.integration.ContainerExecutionContext
@@ -34,7 +35,7 @@ class ComponentEditorRendererTest
     val dest = "dest.js"
   }
 
-  val versionInfo = Json.obj("version" -> 1)
+  val versionInfo = VersionInfo("", "", "", "", Json.obj())
 
   trait scope extends Scope {
 
@@ -120,7 +121,7 @@ class ComponentEditorRendererTest
     devModeAssert("previewWidth", v => v === Some(null))
     devModeAssert("ngModules", v => v === Some((js.ngModule :+ "component-ng-module").map(s => s"'$s'").mkString(",")))
     devModeAssert("options", v => v === Some(Json.stringify(ComponentEditorOptions.default.toJson)))
-    devModeAssert("versionInfo", v => v === Some(Json.stringify(versionInfo)))
+    devModeAssert("versionInfo", v => v === Some(Json.stringify(versionInfo.json)))
     devModeAssert("css", v => v.map(_.asInstanceOf[Array[Any]].toSeq) === Some(css.src :+ "comp.css"))
     assertJadeParam(true)("css", v => v.map(_.asInstanceOf[Array[Any]].toSeq) must_== Some(Seq(css.dest, "comp.css")))
     devModeAssert("js", v => v.map(_.asInstanceOf[Array[Any]].toSeq) === Some(js.src :+ "comp.js"))

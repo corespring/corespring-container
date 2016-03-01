@@ -12,14 +12,17 @@
         <encoder><pattern>%coloredLevel [%logger{10}] %message%n%xException{5}</pattern></encoder>
     </appender>
 
-    <logger name="tests" level="TRACE" />
-    <logger name="js" level="TRACE" />
-    <logger name="org.corespring.container.client.controllers.apps.CoreEditor" level="TRACE" />
-    <logger name="org.corespring.shell.controllers.editor.ItemDraftHooks" level="TRACE" />
-    <logger name="org.corespring.container.client.controllers.jade.Jade" level="TRACE" />
-    <logger name="org.corespring.container.client.controllers.apps.CoreEditor" level="TRACE"/>
-    <logger name="org.corespring.container.client.controllers.apps.JsonPageSourceService" level="TRACE"/>
-    <logger name="org.corespring.shell.controllers" level="TRACE"/>
+    <logger name="tests" level="WARN" />
+    <logger name="js" level="WARN" />
+    <logger name="org.corespring.container.client.controllers.apps.CoreEditor" level="WARN" />
+    <logger name="org.corespring.shell.controllers.editor.ItemDraftHooks" level="WARN" />
+    <logger name="org.corespring.container.client.controllers.jade.Jade" level="WARN" />
+    <logger name="org.corespring.container.client.pages.EditorRenderer" level="WARN"/>
+    <logger name="org.corespring.container.client.pages.PlayerRenderer" level="TRACE"/>
+    <logger name="org.corespring.container.client.controllers.CompressedAndMinifiedComponentSets" level="DEBUG"/>
+    <logger name="org.corespring.container.client.controllers.apps.CoreEditor" level="WARN"/>
+    <logger name="org.corespring.container.client.controllers.apps.JsonPageSourceService" level="WARN"/>
+    <logger name="org.corespring.shell.controllers" level="WARN"/>
 
     <root level="INFO">
         <appender-ref ref="STDOUT" />

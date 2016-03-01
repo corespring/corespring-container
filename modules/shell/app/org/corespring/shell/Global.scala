@@ -8,7 +8,7 @@ import org.corespring.mongo.json.services.MongoService
 import org.corespring.play.utils.{ CallBlockOnHeaderFilter, ControllerInstanceResolver }
 import org.corespring.shell.controllers.{ Launchers, Main }
 import org.corespring.shell.filters.AccessControlFilter
-import org.corespring.shell.services.ItemDraftService
+import org.corespring.shell.services.{ItemService, SessionService, ItemDraftService}
 import play.api.mvc._
 import play.api.{ GlobalSettings, Mode, Play }
 
@@ -34,8 +34,8 @@ object Global extends WithFilters(AccessControlFilter, CallBlockOnHeaderFilter) 
   private lazy val showNonReleasedComponents = Play.current.configuration.getBoolean("components.showNonReleasedComponents").getOrElse(Play.current.mode == Mode.Dev)
 
   private lazy val containerClient = new ContainerClientImplementation(
-    new MongoService(db("items")),
-    new MongoService(db("sessions")),
+    new ItemService(db("items")),
+    new SessionService(db("sessions")),
     new ItemDraftService(db("itemDrafts")),
     {
       if (showNonReleasedComponents) {
@@ -52,18 +52,18 @@ object Global extends WithFilters(AccessControlFilter, CallBlockOnHeaderFilter) 
     },
     Play.current.configuration)
 
-  private lazy val launchers = new Launchers {
-    override def interactions: Seq[Interaction] = componentLoader.all.flatMap {
+  private lazy val launchers = new Launchers(
+    interactions = componentLoader.all.flatMap {
       case i: Interaction => Some(i)
       case _ => None
     }
-  }
+  )
 
-  private lazy val home = new Main {
-    override def sessionService: MongoService = new MongoService(db("sessions"))
-    override def items: MongoCollection = db("items")
-    override def itemDrafts = new ItemDraftService(db("itemDrafts"))
-  }
+  private lazy val home = new Main(
+    sessionService  = new SessionService(db("sessions")),
+    items = db("items"),
+    itemDrafts = new ItemDraftService(db("itemDrafts"))
+  )
 
   override def onStart(app: play.api.Application): Unit = {
     logger.trace("trace")

@@ -3,8 +3,8 @@ package org.corespring.container.client.component
 import org.corespring.container.client.controllers.helpers.{ LoadClientSideDependencies, NameHelper }
 import org.corespring.container.client.views.txt.js.{ ComponentServerWrapper, ComponentWrapper, ServerLibraryWrapper }
 import org.corespring.container.components.model._
-import org.corespring.container.components.model.dependencies.ComponentTypeFilter
 import org.corespring.container.components.model.packaging.ClientSideDependency
+import org.corespring.container.components.services.ComponentTypeFilter
 import play.api.libs.json.JsObject
 
 object SourceGenerator {

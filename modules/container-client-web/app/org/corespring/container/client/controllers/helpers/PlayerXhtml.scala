@@ -1,8 +1,19 @@
 package org.corespring.container.client.controllers.helpers
 
-import org.htmlcleaner.{ TagNode, TagTransformation }
+import org.corespring.container.components.services.ComponentService
+import org.htmlcleaner.{TagNode, TagTransformation}
 
-object PlayerXhtml {
+trait PlayerXhtml {
+  def processXhtml(xhtml: String): String
+}
+
+class DefaultPlayerXhtml(componentService: ComponentService) extends PlayerXhtml {
+  override def processXhtml(xhtml: String): String = {
+    PlayerXhtml.mkXhtml(componentService.components.map(_.componentType), xhtml)
+  }
+}
+
+private[helpers] object PlayerXhtml {
   def mkXhtml(components: Seq[String], xhtml: String): String = {
 
     /** <p> -> <div class="para"/> */

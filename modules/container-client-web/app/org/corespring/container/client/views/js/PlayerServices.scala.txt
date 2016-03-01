@@ -1,74 +1,13 @@
-@(namespace : String, loadSession : Call, reopenSession: Call, resetSession: Call, saveSession: Call, getScore: Call, completeResponse:Call, loadOutcome: Call, loadInstructorData: Call, queryParams : play.api.libs.json.JsValue)
+@(namespace : String,
+sessionEndpoints: org.corespring.container.client.views.models.SessionEndpoints,
+queryParams : play.api.libs.json.JsValue)
 
 angular.module('@namespace', []);
 
-angular.module('@namespace').factory('PlayerService', ['$http',
-  function($http) {
+angular.module('@namespace').factory('PlayerServiceEndpoints', function(){
+  return {
+    queryParams: @{Html(play.api.libs.json.Json.stringify(queryParams))},
+    session: @sessionEndpoints.jsonString
+    };
+});
 
-    function PlayerService() {
-
-      var params = @{Html(play.api.libs.json.Json.stringify(queryParams))};
-
-      function addQueryParamsIfPresent(path) {
-        var out = [];
-        for (var x in params) {
-          out.push(x + '=' + params[x]);
-        }
-
-        var qs = out.join('&');
-        return path + (path.indexOf('?') == -1 ? '?' : '&') + qs;
-      }
-
-      var _call = function(method, url, data) {
-
-        return function(onSuccess, onFailure) {
-
-          url = addQueryParamsIfPresent(url);
-
-          var args = data ? [url, data] : [url];
-          $http[method].apply(null, args)
-            .success(
-              function(data, status, headers, config) {
-                onSuccess(data)
-              })
-            .error(
-              function(data, status, headers, config) {
-                console.log("error");
-                if (onFailure) {
-                  onFailure(data);
-                }
-              }
-          );
-        };
-      };
-
-      var callWithData = function(method, url) {
-        return function(data, onSuccess, onFailure, id) {
-          _call(method, url, data)(onSuccess, onFailure);
-        };
-      };
-
-      var callWithNoData = function(method, url) {
-        return function(onSuccess, onFailure, id) {
-          _call(method, url, null)(onSuccess, onFailure);
-        };
-      };
-
-      this.setQueryParams = function(p) {
-        throw new Error('no longer supported');
-      }
-
-      this.saveSession = callWithData('@saveSession.method.toLowerCase', '@saveSession.url');
-      this.reopenSession = callWithNoData('@reopenSession.method.toLowerCase', '@reopenSession.url');
-      this.resetSession = callWithNoData('@resetSession.method.toLowerCase', '@resetSession.url');
-      this.getScore = callWithData('@getScore.method.toLowerCase', '@getScore.url');
-      this.completeResponse = callWithNoData('@completeResponse.method.toLowerCase', '@completeResponse.url');
-      this.loadItemAndSession = callWithNoData('@loadSession.method.toLowerCase', '@loadSession.url');
-      this.loadOutcome = callWithData('@loadOutcome.method.toLowerCase', '@loadOutcome.url');
-      this.loadInstructorData = callWithData('@loadInstructorData.method.toLowerCase', '@loadInstructorData.url');
-    }
-
-
-    return PlayerService;
-  }
-]);

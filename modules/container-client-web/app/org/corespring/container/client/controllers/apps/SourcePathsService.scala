@@ -43,7 +43,8 @@ class JsonPageSourceService(config: PageSourceServiceConfig) extends PageSourceS
   }
 
   private def pathToJson(path: String): Option[JsValue] = {
-    config.load(path).flatMap { jsonString => try {
+    config.load(path).flatMap { jsonString =>
+      try {
         Some(Json.parse(jsonString))
       } catch {
         case _: Throwable => None

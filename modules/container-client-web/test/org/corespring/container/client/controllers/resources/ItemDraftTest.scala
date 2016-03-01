@@ -1,36 +1,26 @@
 package org.corespring.container.client.controllers.resources
 
+import org.corespring.container.client.controllers.helpers.PlayerXhtml
 import org.corespring.container.client.controllers.resources.ItemDraft.Errors
 import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.client.hooks._
-import org.corespring.container.client.integration.ContainerExecutionContext
-import org.corespring.container.components.model.Component
+import org.corespring.container.components.model.{Component, Interaction}
 import org.corespring.container.components.model.dependencies.ComponentMaker
+import org.corespring.container.components.services.ComponentService
+import org.corespring.test.TestContext
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
 import org.specs2.time.NoTimeConversions
-import play.api.libs.json.{ JsObject, JsValue, Json }
+import play.api.libs.json.{JsObject, JsValue, Json}
 import play.api.mvc._
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 
-import scala.concurrent.{ Await, ExecutionContext, Future }
 import scala.concurrent.duration._
+import scala.concurrent.{Await, ExecutionContext, Future}
 
 class ItemDraftTest extends Specification with Mockito with NoTimeConversions with ComponentMaker {
-
-  trait BaseDraft extends ItemDraft {
-
-    override def containerContext: ContainerExecutionContext = new ContainerExecutionContext(ExecutionContext.global)
-
-    override protected def componentTypes: Seq[String] = Seq.empty
-
-    override def materialHooks: SupportingMaterialHooks = {
-      val m = mock[SupportingMaterialHooks]
-      m
-    }
-  }
 
   trait DH extends CoreItemHooks with DraftHooks
 
@@ -46,11 +36,33 @@ class ItemDraftTest extends Specification with Mockito with NoTimeConversions wi
 
     def components: Seq[Component] = Seq.empty
 
-    val draft = new BaseDraft {
-      override val hooks: CoreItemHooks with DraftHooks = scope.this.hooks
-
-      override def components: Seq[Component] = scope.this.components
+    lazy val componentService = {
+      val m = mock[ComponentService]
+      m.components returns components
+      m.interactions returns components.flatMap {
+        case i: Interaction => Some(i)
+        case _ => None
+      }
+      m
     }
+
+    lazy val playerXhtml = {
+      val m = mock[PlayerXhtml]
+      m.processXhtml(any[String]) answers (s => s.asInstanceOf[String])
+      m
+    }
+
+    lazy val materialHooks = {
+      val m = mock[ItemDraftSupportingMaterialHooks]
+      m
+    }
+
+    lazy val draft = new ItemDraft(
+      TestContext.containerContext,
+      componentService,
+      hooks,
+      playerXhtml,
+      materialHooks)
   }
 
   "ItemDraft" should {
@@ -69,6 +81,11 @@ class ItemDraftTest extends Specification with Mockito with NoTimeConversions wi
         status(draft.load("x")(FakeRequest("", ""))) === OK
       }
 
+      s"call playerXhtml.processXhtml" in new load {
+        draft.load("x")(FakeRequest("", ""))
+        there was one(playerXhtml).processXhtml("<div></div>")
+      }
+
       val badJson = Json.obj("_id" ->
         Json.obj("$oid" -> "1"),
         "xhtml" -> "<p>a</p>")
@@ -76,13 +93,14 @@ class ItemDraftTest extends Specification with Mockito with NoTimeConversions wi
       "prep the json" in new load(loadResult = badJson) {
         val json = contentAsJson(draft.load("x")(req))
         (json \ "itemId").as[String] === "1"
-        (json \ "xhtml").as[String] === """<div class="para">a</div>"""
+        (json \ "xhtml").as[String] === """<p>a</p>"""
       }
     }
 
     "createWithSingleComponent" should {
 
       trait createWithSingleComponent extends scope {
+
         val defaultData = Json.obj("defaultData" -> true)
         override def components = Seq(uiComp("type", Nil).copy(defaultData = defaultData))
         hooks.createSingleComponentItemDraft(any[Option[String]], any[String], any[String], any[JsObject])(any[RequestHeader]).returns {
