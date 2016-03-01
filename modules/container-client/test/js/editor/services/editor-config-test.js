@@ -3,6 +3,7 @@ describe('editor config', function() {
   var editorConfig, designerService,componentDefaultData;
 
   beforeEach(angular.mock.module('corespring-common.services'));
+  beforeEach(angular.mock.module('corespring-editing.services'));
   beforeEach(angular.mock.module('corespring-editor.services'));
   beforeEach(angular.mock.module('corespring-player.services'));
 
