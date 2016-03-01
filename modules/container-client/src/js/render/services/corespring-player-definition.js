@@ -79,7 +79,7 @@ angular.module('corespring-player.services').factory('CorespringPlayerDefinition
 
           console.log('$scope.mode: ', $scope.mode);
           
-          if (rendered && $scope.mode === 'player') {
+          if (rendered) {
             $log.debug("not re-rendering because we are in player mode");
             return;
           }
