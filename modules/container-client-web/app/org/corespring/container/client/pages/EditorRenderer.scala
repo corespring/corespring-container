@@ -39,7 +39,7 @@ trait EditorRenderer extends CoreRenderer {
 
     val servicesJs = EditorServices(serverNgModuleName, mainEndpoints, supportingMaterialsEndpoints, componentsAndWidgets)
 
-    val ngModules = (Seq(serverNgModuleName) ++ sources.js.ngModules ++ bundle.ngModules).map(s => s"'$s'").mkString(",")
+    val ngModules = jsArrayString(Seq(serverNgModuleName) ++ sources.js.ngModules ++ bundle.ngModules)
 
     logger.debug(s"function=render, name=$name, ngModules=$ngModules")
 
@@ -47,11 +47,11 @@ trait EditorRenderer extends CoreRenderer {
       "appName" -> name,
       "js" -> js.toArray,
       "css" -> css.toArray,
-      "ngModules" -> jsArrayString(Seq(serverNgModuleName) ++ sources.js.ngModules ++ bundle.ngModules),
+      "ngModules" -> ngModules,
       "ngServiceLogic" -> servicesJs,
       "versionInfo" -> Json.stringify(versionInfo.json),
       "options" -> Json.stringify(clientOptions.toJson))
-    jade.renderJade("editor", params)
+    jade.renderJade(name, params)
   }
 }
 
@@ -70,6 +70,6 @@ class DevEditorRenderer(val containerExecutionContext: ContainerExecutionContext
   val assetPathProcessor: AssetPathProcessor,
   val componentJson: ComponentJson,
   val versionInfo: VersionInfo) extends EditorRenderer {
-  override def name: String = "devEditor"
+  override def name: String = "dev-editor"
 }
 
