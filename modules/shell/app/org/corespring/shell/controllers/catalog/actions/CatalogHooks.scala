@@ -1,6 +1,8 @@
 package org.corespring.shell.controllers.catalog.actions
 
 import org.corespring.container.client.controllers.{ AssetType, Assets }
+import org.corespring.container.client.integration.ContainerExecutionContext
+import org.corespring.shell.services.ItemService
 
 import scala.concurrent.Future
 
@@ -12,13 +14,14 @@ import play.api.mvc._
 import scalaz.Validation
 import scalaz.Scalaz._
 
-trait CatalogHooks extends ContainerCatalogHooks {
+class CatalogHooks(
+itemService: ItemService,
+assets: Assets,
+                    val containerContext: ContainerExecutionContext
+                  ) extends ContainerCatalogHooks {
 
   lazy val logger = ContainerLogger.getLogger("CatalogHooks")
 
-  def itemService: MongoService
-
-  def assets: Assets
 
   override def load(id: String)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] = Future {
     val item: Validation[String, JsValue] = for {

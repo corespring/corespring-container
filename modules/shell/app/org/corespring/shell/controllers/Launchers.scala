@@ -6,9 +6,10 @@ import play.api.mvc.{ RequestHeader, Action, Controller }
 import org.corespring.container.client.controllers.launcher.player.routes.PlayerLauncher
 import org.corespring.shell.views.html._
 
-trait Launchers extends Controller {
+class Launchers(
+  interactions : Seq[Interaction]
+               ) extends Controller {
 
-  def interactions : Seq[Interaction]
 
   def draftEditorFromItem(itemId: String, devEditor: Boolean) = Action { request =>
 

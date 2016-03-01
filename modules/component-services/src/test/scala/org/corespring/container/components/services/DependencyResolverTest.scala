@@ -7,8 +7,8 @@ import org.specs2.specification.Scope
 
 class DependencyResolverTest extends Specification with ComponentMaker {
 
-  private def mkService(components:Seq[Component]) =  new ComponentService {
-    override def components: Seq[Component] = components
+  private def mkService(comps:Seq[Component]) =  new ComponentService {
+    override def components: Seq[Component] = comps
   }
 
 
