@@ -143,7 +143,7 @@ describe('corespringDemoPlayer', function() {
         scope.outcome = {};
         scope.responses = undefined;
         scope.playerMode = 'evaluate';
-        scope.session = {};
+        scope.session = {apple: 3};
         scope.submitOrReset();
       });
 
@@ -153,6 +153,10 @@ describe('corespringDemoPlayer', function() {
 
       it('should set session.remainingAttempts to 1', function() {
         expect(scope.session.remainingAttempts).toEqual(1);
+      });
+
+      it('session should be empty otherwise', function() {
+        expect(scope.session.apple).toBeUndefined();
       });
 
       it('should call reset on ComponentRegister', function() {
