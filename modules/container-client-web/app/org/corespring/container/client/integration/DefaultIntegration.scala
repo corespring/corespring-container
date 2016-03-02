@@ -45,7 +45,7 @@ trait DefaultIntegration
   with LauncherModules
   with JsProcessingModule {
 
-  lazy val controllers: Seq[Controller] = {
+  lazy val defaultIntegrationControllers: Seq[Controller] = {
     containerMainControllers ++
       resourceControllers ++
       launcherControllers ++
