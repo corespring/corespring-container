@@ -16,7 +16,7 @@ object Global extends WithFilters(AccessControlFilter, CallBlockOnHeaderFilter) 
 
   private lazy val logger = ContainerLogger.getLogger("Global")
 
-  lazy val controllers: Seq[Controller] = containerClient.controllers ++ Seq(home, launchers)
+  lazy val controllers: Seq[Controller] = containerClient.defaultIntegrationControllers ++ Seq(home, launchers)
 
   private lazy val mongoUri = {
     val uri = Play.current.configuration.getString("mongo.db").getOrElse("mongodb://localhost:27017/corespring-container")
