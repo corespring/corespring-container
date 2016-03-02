@@ -41,29 +41,17 @@ class ComponentEditorRendererTest
 
     val containerExecutionContext = ContainerExecutionContext(ExecutionContext.global)
 
-    val jade = {
-      val m = mock[JadeEngine]
-      m
-    }
+    val jade = RendererMocks.jadeEngine
 
     val pageSourceService = {
-      val m = mock[PageSourceService]
+      val m = RendererMocks.pageSourceService
       m.loadJs(any[String]) returns NgSourcePaths(js.src, js.dest, Nil, js.ngModule)
       m.loadCss(any[String]) returns CssSourcePaths(css.src, css.dest, Nil)
       m
     }
 
-    val componentJson = {
-      val m = mock[ComponentJson]
-      m.toJson(any[ComponentInfo]) returns Json.obj()
-      m
-    }
-
-    val assetPathProcessor = {
-      val m = mock[AssetPathProcessor]
-      m.process(any[String]) answers { (s: Any) => s.asInstanceOf[String] }
-      m
-    }
+    val componentJson = RendererMocks.componentJson
+    val assetPathProcessor = RendererMocks.assetPathProcessor
 
     val renderer = new ComponentEditorRenderer(
       containerExecutionContext,
@@ -99,9 +87,6 @@ class ComponentEditorRendererTest
 
     "call renderJade" in new renderJade {
       there was one(jade).renderJade(meq("singleComponentEditor"), captor)
-    }
-
-    trait jadeArgs extends renderJade {
     }
 
     def assertJadeParam(prodMode: Boolean = false)(key: String, assertFn: Option[Any] => Result): Fragments = {

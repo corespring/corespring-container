@@ -12,10 +12,10 @@ import org.corespring.container.client.controllers.launcher.LauncherModules
 import org.corespring.container.client.controllers.resources._
 import org.corespring.container.client.integration.validation.Validator
 import org.corespring.container.client.io.ResourcePath
-import org.corespring.container.client.pages.engine.{JadeEngine, JadeEngineConfig}
+import org.corespring.container.client.pages.engine.{ JadeEngine, JadeEngineConfig }
 import org.corespring.container.client.pages.processing.AssetPathProcessor
-import org.corespring.container.components.services.{ComponentService, DependencyResolver}
-import org.corespring.container.js.{JsProcessingConfig, JsProcessingModule}
+import org.corespring.container.components.services.{ ComponentService, DependencyResolver }
+import org.corespring.container.js.{ JsProcessingConfig, JsProcessingModule }
 import play.api.Mode
 import play.api.Mode.Mode
 import play.api.mvc.Controller
@@ -23,6 +23,10 @@ import play.api.mvc.Controller
 import scala.concurrent.ExecutionContext
 
 case class ContainerExecutionContext(context: ExecutionContext)
+
+object ContainerExecutionContext {
+  val TEST = ContainerExecutionContext(ExecutionContext.global)
+}
 
 object DefaultIntegration {
   val pathsThatNeedResolution = Seq(
@@ -41,11 +45,11 @@ trait DefaultIntegration
   with LauncherModules
   with JsProcessingModule {
 
-  lazy val controllers: Seq[Controller] = {
+  lazy val defaultIntegrationControllers: Seq[Controller] = {
     containerMainControllers ++
-    resourceControllers ++
-    launcherControllers ++
-    componentControllers
+      resourceControllers ++
+      launcherControllers ++
+      componentControllers
   }
 
   override lazy val editorClientOptions = {

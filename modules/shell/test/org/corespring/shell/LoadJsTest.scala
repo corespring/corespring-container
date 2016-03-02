@@ -1,12 +1,11 @@
 package org.corespring.shell
 
 import org.corespring.container.client.hooks.PlayerJs
+import org.corespring.shell.controllers.player.LoadJs
 import org.specs2.mutable.Specification
 import play.api.mvc._
 import play.api.test.Helpers._
 import play.api.test.{ FakeApplication, FakeRequest, WithApplication }
-
-import scala.concurrent.Future
 
 /**
  * LoadJs is a trait defined in ContainerClientImplementation

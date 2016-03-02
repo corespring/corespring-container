@@ -5,10 +5,11 @@ import com.mongodb.casbah.commons.MongoDBObject
 import org.bson.types.ObjectId
 import org.corespring.container.client.hooks._
 import org.corespring.container.client.hooks.Hooks.{ R, StatusMessage }
+import org.corespring.container.client.integration.ContainerExecutionContext
 import org.corespring.container.client.{ hooks => containerHooks }
 import org.corespring.mongo.json.services.MongoService
 import org.corespring.shell.controllers.editor.actions.{ DraftId, ContainerDraftId }
-import org.corespring.shell.services.ItemDraftService
+import org.corespring.shell.services.{ ItemService, ItemDraftService }
 import org.joda.time.DateTime
 import play.api.Logger
 import play.api.http.Status._
@@ -17,15 +18,14 @@ import play.api.mvc._
 
 import scala.concurrent.Future
 
-trait ItemDraftSupportingMaterialHooks
+class ItemDraftSupportingMaterialHooks(
+  assets: SupportingMaterialAssets[DraftId[ObjectId]],
+  draftItemService: ItemDraftService,
+  val containerContext: ContainerExecutionContext)
   extends containerHooks.ItemDraftSupportingMaterialHooks
   with SupportingMaterialHooksHelper {
 
   import scala.concurrent.ExecutionContext.Implicits.global
-
-  def assets: SupportingMaterialAssets[DraftId[ObjectId]]
-
-  def draftItemService: ItemDraftService
 
   override def prefix(s: String) = s"item.$s"
 
@@ -128,21 +128,19 @@ trait ItemDraftSupportingMaterialHooks
 
 }
 
-trait ItemDraftHooks
+class ItemDraftHooks(
+  assets: ItemDraftAssets,
+  itemService: ItemService,
+  draftItemService: ItemDraftService,
+  val containerContext: ContainerExecutionContext)
   extends containerHooks.DraftHooks
   with CoreItemHooks
   with ItemHooksHelper {
 
   val logger = Logger(classOf[ItemDraftHooks])
 
-  def assets: ItemDraftAssets
-
   import com.mongodb.casbah.commons.conversions.scala._
   RegisterJodaTimeConversionHelpers()
-
-  def draftItemService: ItemDraftService
-
-  def itemService: MongoService
 
   lazy val draftFineGrainedSave = fineGrainedSave(draftItemService, processResultJson) _
 

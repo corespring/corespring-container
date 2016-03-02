@@ -12,6 +12,8 @@ import play.api.mvc.RequestHeader
 import scala.concurrent.Future
 import scala.util.Random
 
+class ItemService(override val collection: MongoCollection) extends MongoService(collection)
+class SessionService(override val collection: MongoCollection) extends MongoService(collection)
 class ItemDraftService(override val collection: MongoCollection) extends MongoService(collection) {
 
   private def randomKey(length: Int = 8): String = {

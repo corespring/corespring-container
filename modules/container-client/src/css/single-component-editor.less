@@ -2,11 +2,9 @@
 @import "../bower_components/bootstrap/less/bootstrap";
 @import "../components/wiggi-wiz/dist/wiggi-wiz.css";
 @import "../components/components-font-awesome/css/font-awesome.css";
-
 @import "app";
 @import "bootstrap-override";
 @import "common/base";
-
 @import "editor/modal";
 @import "editor/nav";
 @import "editor/question";
@@ -29,12 +27,12 @@
 @import "editor/question-information";
 @import "editor/profile-preview";
 @import "editor/help";
-
 @import "player/player-core-mixin";
 
-.wiggi-wiz-editable{
+.wiggi-wiz-editable {
   .player-core-mixin();
 }
+
 @import "player/player-container";
 @import "player/corespring-player";
 
@@ -57,9 +55,9 @@ body {
 
 @profile-summary-feedback-panel-bg: @darker-blue;
 
-.btn{
+.btn {
   &:focus, &:active:focus, &:active {
-    outline:none;
+    outline: none;
   }
 }
 
@@ -89,7 +87,7 @@ body {
 .bar {
   padding-left: 10px;
 }
-  
+
 .pane-header {
   text-transform: uppercase;
   font-size: 16px;
@@ -97,17 +95,17 @@ body {
   color: #da1c5c;
   text-transform: uppercase;
   padding: 0.8em 0 0 0;
-  font-family: 'Whitney SSm A','Whitney SSm B', sans-serif;
+  font-family: 'Whitney SSm A', 'Whitney SSm B', sans-serif;
   -webkit-font-smoothing: antialiased;
   -font-smoothing: antialiased;
 }
 
 .pane-sub-header {
   font-size: 14px;
-} 
+}
 
 .vertical-divider {
-  border-left: 1px solid #eeeeee; 
+  border-left: 1px solid #eeeeee;
   width: 1px;
   font-size: 1px;
   margin-left: 15px;
@@ -117,18 +115,33 @@ body {
 }
 
 .config-pane {
-  width: 670px;
-  max-width: 670px;
-  min-width: 670px;
+  @config-pane-width: 550px;
+  width: @config-pane-width;
+  max-width: @config-pane-width;
+  min-width: @config-pane-width;
 }
 
 .preview-right {
-  display: flex;
-  display: -webkit-flex;
-  display: -ms-flex;
+  width: 1300px;
+
+  .vertical-divider {
+    border-left: 1px solid #eeeeee;
+    background-color: #fff;
+    width: 500px;
+    font-size: 1px;
+    padding: 0;
+    top: 0;
+    bottom: 0;
+    right: 100px;
+    position: fixed;
+  }
 
   .preview-pane {
     flex-shrink: 0;
+    position: fixed;
+    right: 0px;
+    top: 0px;
+    width: 600px;
 
     .player-btn-holder {
       width: 100%;

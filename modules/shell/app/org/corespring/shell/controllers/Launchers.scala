@@ -1,14 +1,13 @@
 package org.corespring.shell.controllers
 
-import org.corespring.container.components.model.{Interaction, Component}
+import org.corespring.container.components.model.{ Interaction, Component }
 import play.api.libs.json._
 import play.api.mvc.{ RequestHeader, Action, Controller }
 import org.corespring.container.client.controllers.launcher.player.routes.PlayerLauncher
 import org.corespring.shell.views.html._
 
-trait Launchers extends Controller {
-
-  def interactions : Seq[Interaction]
+class Launchers(
+  interactions: Seq[Interaction]) extends Controller {
 
   def draftEditorFromItem(itemId: String, devEditor: Boolean) = Action { request =>
 
@@ -37,8 +36,8 @@ trait Launchers extends Controller {
     val g = interactions.groupBy(_.released)
     val released = g.getOrElse(true, Seq.empty).sortBy(_.componentType)
     val notReleased = g.getOrElse(false, Seq.empty).sortBy(_.componentType)
-    (released ++ notReleased).map{ i =>
-      i.componentType-> i.released
+    (released ++ notReleased).map { i =>
+      i.componentType -> i.released
     }
   }
 
@@ -48,14 +47,14 @@ trait Launchers extends Controller {
   }
 
   def itemComponentEditor(itemId: Option[String] = None) = Action { request =>
-    val opts = itemId.map{ i => Json.obj("itemId" -> i)}.getOrElse(Json.obj())
+    val opts = itemId.map { i => Json.obj("itemId" -> i) }.getOrElse(Json.obj())
     val html = launchers.itemComponentEditor(componentEditorJsUrl, interactionInfo, opts)
     Ok(html)
   }
 
-  def draftComponentEditor(itemId : Option[String], draftName : Option[String] = None) = Action { request =>
-    val itemIdOpts = itemId.map{ i => Json.obj("itemId" -> i)}.getOrElse(Json.obj())
-    val draftNameOpts = itemId.map{ i => Json.obj("draftName" -> i)}.getOrElse(Json.obj())
+  def draftComponentEditor(itemId: Option[String], draftName: Option[String] = None) = Action { request =>
+    val itemIdOpts = itemId.map { i => Json.obj("itemId" -> i) }.getOrElse(Json.obj())
+    val draftNameOpts = itemId.map { i => Json.obj("draftName" -> i) }.getOrElse(Json.obj())
     val opts = itemIdOpts.deepMerge(draftNameOpts)
     val html = launchers.draftComponentEditor(componentEditorJsUrl, interactionInfo, opts)
     Ok(html)

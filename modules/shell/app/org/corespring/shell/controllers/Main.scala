@@ -4,25 +4,22 @@ import com.mongodb.DBObject
 import com.mongodb.casbah.MongoCollection
 import com.mongodb.casbah.commons.MongoDBObject
 import org.bson.types.ObjectId
-import org.corespring.container.logging.ContainerLogger
 import org.corespring.mongo.json.services.MongoService
 import org.corespring.shell.services.ItemDraftService
 import org.corespring.shell.{ DraftLink, IndexLink, SessionKeys }
+import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc._
 
-trait Main
+class Main(
+  items: MongoCollection,
+  itemDrafts: ItemDraftService,
+  sessionService: MongoService)
   extends Controller {
 
   import org.corespring.shell.views._
 
-  val logger = ContainerLogger.getLogger("Main")
-
-  def items: MongoCollection
-
-  def itemDrafts: ItemDraftService
-
-  def sessionService: MongoService
+  private lazy val logger = Logger(this.getClass)
 
   def index = Action {
     request =>

@@ -60,6 +60,8 @@ angular.module('corespring-singleComponentEditor.controllers')
         ].join('\n');
       }
 
+      $.lockfixed(".preview-pane", {});
+      
       /**
        * A key for use in the item model.
        */

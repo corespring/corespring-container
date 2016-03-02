@@ -1,45 +1,31 @@
 package org.corespring.shell
 
-import java.io.{ByteArrayInputStream, File}
-import java.net.{URL, URLDecoder}
+import java.net.URL
 
 import com.amazonaws.services.s3.AmazonS3
-import com.amazonaws.services.s3.model.ObjectMetadata
-import org.apache.commons.io.FileUtils
+import com.softwaremill.macwire.MacwireMacros.wire
 import org.bson.types.ObjectId
-import org.corespring.amazon.s3.{ConcreteS3Service, S3Service}
+import org.corespring.amazon.s3.{ ConcreteS3Service, S3Service }
 import org.corespring.container.client._
 import org.corespring.container.client.component.ComponentSetExecutionContext
-import org.corespring.container.client.controllers.apps.PageSourceServiceConfig
-import org.corespring.container.client.controllers.{AssetType, _}
 import org.corespring.container.client.hooks._
-import org.corespring.container.client.integration.{ContainerExecutionContext, DefaultIntegration}
-import org.corespring.container.client.pages.engine.JadeEngineConfig
+import org.corespring.container.client.integration.{ ContainerExecutionContext, DefaultIntegration }
 import org.corespring.container.components.model.Component
-import org.corespring.container.components.services.DependencyResolver
-import org.corespring.mongo.json.services.MongoService
-import org.corespring.shell.controllers.catalog.actions.{CatalogHooks => ShellCatalogHooks}
-import org.corespring.shell.controllers.editor.actions.{DraftId, DraftEditorHooks => ShellDraftEditorHooks, ItemEditorHooks => ShellItemEditorHooks}
-import org.corespring.shell.controllers.editor.{ContainerSupportingMaterialAssets, ItemAssets, ItemDraftAssets, SupportingMaterialAssets, CollectionHooks => ShellCollectionHooks, ItemDraftHooks => ShellItemDraftHooks, ItemHooks => ShellItemHooks}
-import org.corespring.shell.controllers.player.actions.{PlayerHooks => ShellPlayerHooks}
-import org.corespring.shell.controllers.player.{SessionHooks => ShellSessionHooks}
-import org.corespring.shell.controllers.{ShellDataQueryHooks, editor => shellEditor}
-import org.corespring.shell.services.ItemDraftService
+import org.corespring.shell.controllers.catalog.actions.{ CatalogHooks => ShellCatalogHooks }
+import org.corespring.shell.controllers.editor.actions.{ DraftEditorHooks => ShellDraftEditorHooks, DraftId, ItemEditorHooks => ShellItemEditorHooks }
+import org.corespring.shell.controllers.editor.{ ContainerSupportingMaterialAssets }
+import org.corespring.shell.controllers.player.actions.{ PlayerHooks => ShellPlayerHooks }
+import org.corespring.shell.controllers.player.{ SessionHooks => ShellSessionHooks }
+import org.corespring.shell.controllers.{ S3Config, ShellAssets, ShellDataQueryHooks, editor => shellEditor }
+import org.corespring.shell.services.{ ItemDraftService, ItemService, SessionService }
 import play.api.Mode.Mode
-import play.api.Play.current
-import play.api.libs.MimeTypes
-import play.api.libs.json.Reads._
-import play.api.libs.json.{JsObject, _}
-import play.api.mvc._
-import play.api.{Configuration, Logger, Mode, Play}
+import play.api.{ Configuration, Logger, Play }
 
-import scala.concurrent.{ExecutionContext, Future}
-import scalaz.{Failure, Success, Validation}
+import scala.concurrent.ExecutionContext
 
-//TODO: Use macwire here.
 class ContainerClientImplementation(
-  val itemService: MongoService,
-  val sessionService: MongoService,
+  val itemService: ItemService,
+  val sessionService: SessionService,
   val draftItemService: ItemDraftService,
   componentsIn: => Seq[Component],
   val configuration: Configuration) extends DefaultIntegration {
@@ -52,52 +38,26 @@ class ContainerClientImplementation(
     }.getOrElse(path)
   }
 
-  lazy val logger = Logger(classOf[ContainerClientImplementation])
+  lazy val logger = Logger(this.getClass)
 
   override def components: Seq[Component] = componentsIn
 
-  override def containerContext: ContainerExecutionContext = new ContainerExecutionContext(ExecutionContext.global)
+  override lazy val containerContext: ContainerExecutionContext = new ContainerExecutionContext(ExecutionContext.global)
 
-  override def playerLauncherHooks: PlayerLauncherHooks = new PlayerLauncherHooks {
+  import org.corespring.shell
 
-    val loader = new LoadJs {}
+  override lazy val playerLauncherHooks: PlayerLauncherHooks = wire[shell.controllers.player.PlayerLauncherHooks]
 
-    /**
-     * Provides a few hooks so that you can simulate scenarios when loading player:
-     * ?secure - a secure request
-     * ?jsErrors  - throw errors when loading the player js
-     * ?pageErrors - throw errors when loading the player page
-     *
-     * @return
-     */
-
-    override def playerJs(implicit header: RequestHeader): Future[PlayerJs] = loader.loadJs(header)
-
-    override def editorJs(implicit header: RequestHeader): Future[PlayerJs] = loader.loadJs(header)
-
-    override def catalogJs(implicit header: RequestHeader): Future[PlayerJs] = loader.loadJs(header)
-
-    override def containerContext: ContainerExecutionContext = ContainerClientImplementation.this.containerContext
-
-    override def componentEditorJs(implicit header: RequestHeader): Future[PlayerJs] = loader.loadJs(header)
-  }
-
-  object s3 {
-    lazy val key = configuration.getString("amazon.s3.key")
-    lazy val secret = configuration.getString("amazon.s3.secret")
-    lazy val bucket = configuration.getString("amazon.s3.bucket").getOrElse(throw new RuntimeException("No bucket specified"))
-  }
+  val s3 = S3Config(
+    key = configuration.getString("amazon.s3.key").getOrElse("?"),
+    secret = configuration.getString("amazon.s3.secret").getOrElse("?"),
+    bucket = configuration.getString("amazon.s3.bucket").getOrElse(throw new RuntimeException("No bucket specified")))
 
   lazy val s3Client: AmazonS3 = {
-    for {
-      k <- s3.key
-      s <- s3.secret
-    } yield {
-      val fakeEndpoint = configuration.getString("amazon.s3.fake-endpoint")
-      logger.trace(s"fakeEndpoint: $fakeEndpoint")
-      S3Service.mkClient(k, s, fakeEndpoint)
-    }
-  }.getOrElse(throw new RuntimeException("no s3 client "))
+    val fakeEndpoint = configuration.getString("amazon.s3.fake-endpoint")
+    logger.trace(s"fakeEndpoint: $fakeEndpoint")
+    S3Service.mkClient(s3.key, s3.secret, fakeEndpoint)
+  }
 
   lazy val (playS3, assetUtils) = {
     val s3Service = new ConcreteS3Service(s3Client)
@@ -117,250 +77,25 @@ class ContainerClientImplementation(
     playS3,
     (id: DraftId[ObjectId], rest: Seq[String]) => ("item-drafts" +: id.itemId +: id.name +: "materials" +: rest).mkString("/").replace("~", "/"))
 
-  lazy val assets = new Assets with ItemDraftAssets with ItemAssets {
-
-    import AssetType._
-
-    private def mkPath(t: AssetType, id: String, rest: String*) = {
-      (t.folderName +: id +: rest).mkString("/").replace("~", "/")
-    }
-
-    private def mkSupportingMaterialPath(t: AssetType, id: String, rest: String*) = {
-      mkPath(t, id, ("materials" +: rest): _*)
-    }
-
-    override def load(t: AssetType, id: String, path: String)(implicit h: RequestHeader): SimpleResult = {
-      val result = playS3.download(s3.bucket, URLDecoder.decode(mkPath(t, id, path), "utf-8"), Some(h.headers))
-
-      if (result.header.status == OK || result.header.status == NOT_MODIFIED) {
-        result
-      } else {
-        playS3.download(s3.bucket, mkPath(t, id, path), Some(h.headers))
-      }
-    }
-
-    override def delete(t: AssetType, id: String, path: String)(implicit h: RequestHeader): Future[Option[(Int, String)]] = Future {
-      val response = playS3.delete(s3.bucket, mkPath(t, id, path))
-      if (response.success) {
-        val fileName = path.substring(path.lastIndexOf('/') + 1)
-        itemService.load(id) match {
-          case Some(item) =>
-            val transformer = (__ \ "files").json.update(
-              of[JsArray].map { case JsArray(arr) => JsArray(arr.filterNot(_ \ "name" == JsString(fileName))) })
-            val fallback = __.json.update((__ \ "files").json.put(JsArray(Seq())))
-            item.transform(transformer).orElse(item.transform(fallback)) match {
-              case succ: JsSuccess[JsObject] =>
-                itemService.save(id, succ.get)
-              case _ =>
-            }
-          case _ =>
-        }
-        None
-      } else {
-        Some(BAD_REQUEST -> s"${response.key}: ${response.msg}")
-      }
-    }
-
-    override def upload(t: AssetType, id: String, path: String)(predicate: (RequestHeader) => Option[SimpleResult]): BodyParser[Future[UploadResult]] = {
-
-      def contentType(s: String) = {
-        val regexp = """\.(\w+?)$""".r
-        regexp.findFirstMatchIn(s.toLowerCase) match {
-          case Some(res) => MimeTypes.forExtension(res.group(0)).getOrElse("image/png")
-          case _ => "image/png"
-        }
-      }
-
-      playS3.s3ObjectAndData[Unit](s3.bucket, _ => mkPath(t, id, path))((rh) => {
-        predicate(rh).map { err =>
-          Left(err)
-        }.getOrElse(Right(Unit))
-      }).map { f =>
-        f.map { tuple =>
-          itemService.load(id) match {
-            case Some(item) =>
-              val fileObj = Json.obj(
-                "name" -> tuple._1.getKey.substring(tuple._1.getKey.lastIndexOf('/') + 1),
-                "contentType" -> contentType(tuple._1.getKey))
-              val transformer = (__ \ "files").json.update(
-                of[JsArray].map { case JsArray(arr) => JsArray(arr :+ fileObj) })
-              val fallback = __.json.update((__ \ "files").json.put(JsArray(Seq(fileObj))))
-              item.transform(transformer).orElse(item.transform(fallback)) match {
-                case succ: JsSuccess[JsObject] =>
-                  itemService.save(id, succ.get)
-                case _ =>
-              }
-            case _ =>
-          }
-          UploadResult(tuple._1.getKey)
-        }
-      }
-    }
-    override def copyItemToDraft(itemId: String, draftName: String): Unit = {
-      assetUtils.copyDir(mkPath(AssetType.Item, itemId), mkPath(AssetType.Draft, itemId, draftName))
-    }
-
-    override def deleteDraft(draftId: String): Unit = {
-      assetUtils.deleteDir(mkPath(AssetType.Draft, draftId))
-    }
-
-    override def copyDraftToItem(draftName: String, itemId: String): Unit = {
-      assetUtils.copyDir(mkPath(AssetType.Draft, itemId, draftName), mkPath(AssetType.Item, itemId))
-    }
-
-    override def deleteItem(id: String): Unit = assetUtils.deleteDir(mkPath(AssetType.Item, id))
-
-    private def uploadSupportingMaterialBinaryToPath(key: String, binary: Binary): Validation[String, String] = {
-      val is = new ByteArrayInputStream(binary.data)
-      val metadata = new ObjectMetadata()
-      metadata.setContentType(binary.mimeType)
-      metadata.setContentLength(binary.data.length)
-
-      logger.trace(s"[upload material] key: $key")
-      try {
-        s3Client.putObject(s3.bucket, key, is, metadata)
-        Success(key)
-      } catch {
-        case t: Throwable => {
-          if (logger.isDebugEnabled) {
-            t.printStackTrace()
-          }
-          Failure(t.getMessage)
-        }
-      }
-    }
-
-    override def uploadSupportingMaterialBinary(id: String, binary: Binary): Validation[String, String] = {
-      val key = mkSupportingMaterialPath(AssetType.Item, id, binary.name)
-      logger.trace(s"[upload material] key: $key")
-      uploadSupportingMaterialBinaryToPath(key, binary)
-    }
-
-    override def containerContext: ContainerExecutionContext = ContainerClientImplementation.this.containerContext
-  }
+  lazy val assets = wire[ShellAssets] //new Assets with ItemDraftAssets with ItemAssets {
 
   override lazy val componentSetExecutionContext = {
     ComponentSetExecutionContext(ContainerClientImplementation.this.containerContext.context)
   }
 
-  override def draftEditorHooks: DraftEditorHooks = new ShellDraftEditorHooks {
-    override def draftItemService = ContainerClientImplementation.this.draftItemService
-
-    override def assets: Assets with ItemDraftAssets = ContainerClientImplementation.this.assets
-
-    override def itemService: MongoService = ContainerClientImplementation.this.itemService
-
-    override def containerContext: ContainerExecutionContext = ContainerClientImplementation.this.containerContext
-  }
-
-  override def itemEditorHooks: ItemEditorHooks = new ShellItemEditorHooks {
-    override def assets: Assets = ContainerClientImplementation.this.assets
-
-    override def itemService: MongoService = ContainerClientImplementation.this.itemService
-
-    override def containerContext: ContainerExecutionContext = ContainerClientImplementation.this.containerContext
-  }
-
-  override def catalogHooks: CatalogHooks = new ShellCatalogHooks {
-    override def itemService: MongoService = ContainerClientImplementation.this.itemService
-    override def assets: Assets = ContainerClientImplementation.this.assets
-
-    override def containerContext: ContainerExecutionContext = ContainerClientImplementation.this.containerContext
-  }
-
-  private[ContainerClientImplementation] trait withContext extends HasContainerContext {
-    override def containerContext = ContainerClientImplementation.this.containerContext
-  }
-
-  override def sessionHooks: SessionHooks = new ShellSessionHooks with withContext {
-    override def itemService: MongoService = ContainerClientImplementation.this.itemService
-
-    override def sessionService: MongoService = ContainerClientImplementation.this.sessionService
-  }
-
-  override def itemDraftHooks: CoreItemHooks with DraftHooks = new shellEditor.ItemDraftHooks {
-    override def itemService: MongoService = ContainerClientImplementation.this.itemService
-
-    override def draftItemService = ContainerClientImplementation.this.draftItemService
-
-    override def assets: ItemDraftAssets = ContainerClientImplementation.this.assets
-
-    override def containerContext: ContainerExecutionContext = ContainerClientImplementation.this.containerContext
-  }
-
-  override def itemDraftSupportingMaterialHooks: ItemDraftSupportingMaterialHooks = new shellEditor.ItemDraftSupportingMaterialHooks {
-
-    override def draftItemService: ItemDraftService = ContainerClientImplementation.this.draftItemService
-
-    override def assets: SupportingMaterialAssets[DraftId[ObjectId]] = itemDraftSupportingMaterialAssets
-  }
-
-  override def itemHooks: CoreItemHooks with CreateItemHook = new shellEditor.ItemHooks {
-    override def itemService: MongoService = ContainerClientImplementation.this.itemService
-
-    override def assets: ItemAssets = ContainerClientImplementation.this.assets
-
-    override def containerContext: ContainerExecutionContext = ContainerClientImplementation.this.containerContext
-  }
-
-  override def itemSupportingMaterialHooks: ItemSupportingMaterialHooks = new shellEditor.ItemSupportingMaterialHooks {
-
-    override def itemService: MongoService = ContainerClientImplementation.this.itemService
-
-    override def assets: SupportingMaterialAssets[String] = itemSupportingMaterialAssets
-  }
-
-  override def playerHooks: PlayerHooks = new ShellPlayerHooks {
-    override def sessionService: MongoService = ContainerClientImplementation.this.sessionService
-    override def assets: Assets = ContainerClientImplementation.this.assets
-
-    override def itemService: MongoService = ContainerClientImplementation.this.itemService
-
-    override def containerContext: ContainerExecutionContext = ContainerClientImplementation.this.containerContext
-
-    override def archiveCollectionId: String = "archiveCollectionId"
-  }
-
-  override lazy val dataQueryHooks: DataQueryHooks = new ShellDataQueryHooks with withContext
-
-  override def versionInfo: VersionInfo = VersionInfo(Play.current.configuration)
-
-  override def collectionHooks: CollectionHooks = new shellEditor.CollectionHooks {
-    override def containerContext: ContainerExecutionContext = ContainerClientImplementation.this.containerContext
-  }
-
-  override def itemMetadataHooks: ItemMetadataHooks = new shellEditor.ItemMetadataHooks {
-    override def containerContext: ContainerExecutionContext = ContainerClientImplementation.this.containerContext
-  }
-
-  override val loadResource: (String) => Option[URL] = {
-    Play.resource(_)
-  }
-
-  override def mode: Mode = Play.current.mode
-}
-
-/**
- * A simple shell utility to allow a tester to simulate page and/or js errors when launching the player js
- */
-trait LoadJs {
-
-  import scala.concurrent.ExecutionContext.Implicits.global
-
-  //Implemented as trait so it can be tested without setup
-  def loadJs(implicit header: RequestHeader): Future[PlayerJs] = Future {
-    def isSecure = header.getQueryString("secure").exists(_ == "true")
-    def errors = header.getQueryString("jsErrors").map {
-      s => s.split(",").toSeq
-    }.getOrElse(Seq())
-
-    val updatedSession = header.getQueryString("pageErrors").map {
-      s =>
-        header.session + (SessionKeys.failLoadPlayer -> s)
-    }.getOrElse {
-      header.session - SessionKeys.failLoadPlayer
-    }
-
-    PlayerJs(isSecure, updatedSession, errors)
-  }
+  override lazy val draftEditorHooks: DraftEditorHooks = wire[ShellDraftEditorHooks]
+  override lazy val itemEditorHooks: ItemEditorHooks = wire[ShellItemEditorHooks]
+  override lazy val catalogHooks: CatalogHooks = wire[ShellCatalogHooks]
+  override lazy val sessionHooks = wire[ShellSessionHooks]
+  override lazy val itemDraftHooks: CoreItemHooks with DraftHooks = wire[shellEditor.ItemDraftHooks]
+  override lazy val itemDraftSupportingMaterialHooks: ItemDraftSupportingMaterialHooks = wire[shellEditor.ItemDraftSupportingMaterialHooks]
+  override lazy val itemHooks: CoreItemHooks with CreateItemHook = wire[shellEditor.ItemHooks]
+  override lazy val itemSupportingMaterialHooks: ItemSupportingMaterialHooks = wire[shellEditor.ItemSupportingMaterialHooks]
+  override lazy val playerHooks: PlayerHooks = wire[ShellPlayerHooks]
+  override lazy val dataQueryHooks: DataQueryHooks = wire[ShellDataQueryHooks] // with withContext
+  override lazy val versionInfo: VersionInfo = VersionInfo(Play.current.configuration)
+  override lazy val collectionHooks: CollectionHooks = wire[shellEditor.CollectionHooks]
+  override lazy val itemMetadataHooks: ItemMetadataHooks = wire[shellEditor.ItemMetadataHooks] //{
+  override val loadResource: (String) => Option[URL] = play.api.Play.current.resource(_)
+  override val mode: Mode = Play.current.mode
 }

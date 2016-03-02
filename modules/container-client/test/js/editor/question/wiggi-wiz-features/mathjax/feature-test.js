@@ -6,7 +6,7 @@ describe('mathjax feature', function() {
     parseDomForMath: function() {}
   };
 
-  beforeEach(angular.mock.module('corespring.wiggi-wiz-features.mathjax'));
+  beforeEach(angular.mock.module('corespring-editing.wiggi-wiz-features.mathjax'));
 
   beforeEach(module(function($provide) {
     $provide.value('MathJaxService', MathJaxService);

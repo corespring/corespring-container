@@ -24,7 +24,7 @@ describe('mathjax-dialog', function(){
   };
 
   beforeEach(angular.mock.module('corespring-templates'));
-  beforeEach(angular.mock.module('corespring.wiggi-wiz-features.mathjax'));
+  beforeEach(angular.mock.module('corespring-editing.wiggi-wiz-features.mathjax'));
   
   beforeEach(module(function($provide) {
     $provide.value('MathJaxService', MathJaxService);

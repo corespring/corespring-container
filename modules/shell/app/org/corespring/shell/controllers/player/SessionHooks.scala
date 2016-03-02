@@ -2,21 +2,22 @@ package org.corespring.shell.controllers.player
 
 import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.client.hooks.{ SessionHooks => ContainerSessionHooks, FullSession, SaveSession, SessionOutcome }
+import org.corespring.container.client.integration.ContainerExecutionContext
 import org.corespring.mongo.json.services.MongoService
-import org.corespring.container.logging.ContainerLogger
+import org.corespring.shell.services.{ ItemService, SessionService }
+import play.api.Logger
 import play.api.http.Status._
-import play.api.libs.json.{ JsObject, Json, JsValue }
+import play.api.libs.json.{ Json, JsValue }
 import play.api.mvc._
 
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.{ Future }
 
-trait SessionHooks extends ContainerSessionHooks {
+class SessionHooks(
+  sessionService: SessionService,
+  itemService: ItemService,
+  val containerContext: ContainerExecutionContext) extends ContainerSessionHooks {
 
-  val logger = ContainerLogger.getLogger("SessionHooks")
-
-  def sessionService: MongoService
-
-  def itemService: MongoService
+  val logger = Logger(this.getClass)
 
   private def isSecure(request: RequestHeader): Boolean = request.session.get("corespring.player.secure").map(_ == "true").getOrElse(false)
 

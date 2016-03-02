@@ -4,24 +4,21 @@ import com.mongodb.casbah.commons.MongoDBObject
 import org.bson.types.ObjectId
 import org.corespring.container.client.controllers.{ AssetType, Assets }
 
-import scala.concurrent.Future
-
 import org.corespring.container.client.hooks.{ PlayerHooks => ContainerPlayerHooks, LoadHook }
-import org.corespring.mongo.json.services.MongoService
+import org.corespring.container.client.integration.ContainerExecutionContext
+import org.corespring.shell.services.{ ItemService, SessionService }
 import play.api.libs.json._
 import play.api.mvc._
-import scalaz.Validation
 
-trait PlayerHooks extends ContainerPlayerHooks {
+import scala.concurrent.Future
+
+class PlayerHooks(
+  sessionService: SessionService,
+  assets: Assets,
+  itemService: ItemService,
+  val containerContext: ContainerExecutionContext) extends ContainerPlayerHooks {
 
   import play.api.http.Status._
-
-  import scalaz.Scalaz._
-
-  def sessionService: MongoService
-
-  def assets: Assets
-  def itemService: MongoService
 
   override def createSessionForItem(itemId: String)(implicit header: RequestHeader): Future[Either[(Int, String), (JsValue, JsValue)]] = Future {
 
@@ -32,7 +29,7 @@ trait PlayerHooks extends ContainerPlayerHooks {
       "highlightUserResponse" -> JsBoolean(true),
       "isFinished" -> JsBoolean(false))
 
-    val session = Json.obj("settings" -> settings, "itemId" -> JsString(itemId), "attempts" -> JsNumber(0))
+    val session = Json.obj("settings" -> settings, "itemId" -> itemId, "attempts" -> 0)
 
     sessionService.create(session).map {
       oid =>
@@ -69,4 +66,6 @@ trait PlayerHooks extends ContainerPlayerHooks {
   override def loadItemFile(itemId: String, file: String)(implicit header: RequestHeader): SimpleResult = {
     assets.load(AssetType.Item, itemId, file)(header)
   }
+
+  override def archiveCollectionId: String = "archiveId"
 }
