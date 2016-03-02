@@ -242,7 +242,7 @@ object Build extends sbt.Build {
     .settings(
       libraryDependencies ++= Seq(macWireMacro, logbackClassic, casbah, playS3, scalaz, play.Keys.cache, yuiCompressor, closureCompiler, commonsIo))
     .dependsOn(containerClientWeb, componentLoader, mongoJsonService, docs, logging)
-    .aggregate(containerClientWeb, componentLoader, containerClient, componentModel, utils, jsProcessing, mongoJsonService, docs, logging)
+    .aggregate(containerClientWeb, componentLoader, containerClient, componentModel, componentServices, utils, jsProcessing, mongoJsonService, docs, logging)
 
   val root = builder.playApp("root", Some("."))
     .settings(
