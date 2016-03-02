@@ -122,12 +122,26 @@ body {
 }
 
 .preview-right {
-  display: flex;
-  display: -webkit-flex;
-  display: -ms-flex;
+  width: 1300px;
+
+  .vertical-divider {
+    border-left: 1px solid #eeeeee;
+    background-color: #fff;
+    width: 500px;
+    font-size: 1px;
+    padding: 0;
+    top: 0;
+    bottom: 0;
+    right: 100px;
+    position: fixed;
+  }
 
   .preview-pane {
     flex-shrink: 0;
+    position: fixed;
+    right: 0px;
+    top: 0px;
+    width: 600px;
 
     .player-btn-holder {
       width: 100%;

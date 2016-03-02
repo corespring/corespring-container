@@ -40,6 +40,7 @@ angular.module('corespring-singleComponentEditor.controllers')
 
       $scope.playerMode = 'gather';
 
+      $.lockfixed(".preview-pane", {});
       /**
        * A key for use in the item model.
        */

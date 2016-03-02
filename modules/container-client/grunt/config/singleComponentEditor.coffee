@@ -12,6 +12,7 @@ editorSrcs = [
   'bower_components/angular-ui-ace/ui-ace(.min).js',
   'bower_components/angular-ui-select2/src/select2.js',
   'bower_components/angular-ui/build/angular-ui(.min).js',
+  'bower_components/jquery-lockfixed/jquery.lockfixed.js',
   'bower_components/corespring-checkbox/src/directive.js',
   'bower_components/corespring-radio/src/directive.js',
   'bower_components/jquery.browser/dist/jquery.browser(.min).js',
