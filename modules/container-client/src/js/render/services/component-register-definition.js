@@ -60,26 +60,10 @@ angular.module('corespring-player.services')
 
       this.setDataAndSession = function(allData) {
         log("setDataAndSession", allData);
-        // if(window.console && _.isFunction(window.console.warn)){
-        //   console.warn('@deprecated: use "setDataAndSessions(data, sessions)" instead');
-        // }
-
         _.forIn(allData, function(ds, id){
           this.setSingleDataAndSession(id, ds.data, ds.session);
-          // if(bridges[id]){
-          //   bridges[id].setDataAndSession(ds);
-          // } else {
-          //   pending[id] = ds;
-          // }
-        });
+        }, this);
       };
-
-      // this.setDataAndSessions = function (data, session){
-      //   log("setDataAndSessions", data, session);
-      //   _.forIn(bridges, function(b, key){
-      //     b.setDataAndSession({data: data[key], session: session[key]});
-      //   });
-      // };
 
       this.setSingleDataAndSession = function(id, data, session){
         var combined = {data: data, session: session};

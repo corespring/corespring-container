@@ -53,7 +53,8 @@ block content
           span.pane-sub-header Use the configuration panel to set up the interaction
           hr/
           span Prompt: 
-          .prompt(prompt-input="", ng-model="prompt")
+          .prompt(prompt-input="", prompt="data.prompt")
+          span {{prompt}}
           hr/ 
           .configuration
         

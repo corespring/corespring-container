@@ -40,13 +40,17 @@ angular.module('corespring-singleComponentEditor.controllers')
 
       $scope.playerMode = 'gather';
 
-      $scope.prompt = 'hi there';
+      $scope.data = {prompt: 'hi there'};
 
-      $scope.$watch('prompt', function(newValue){
+      $scope.$watch('data.prompt', function(newValue){
         if($scope.item){
           $scope.item.xhtml = getXhtml(newValue);
+
+          $timeout(function(){
+            ComponentData.updateComponent($scope.componentKey, $scope.item.components[$scope.componentKey]);
+          }, 1000);
         }
-      });
+      }, true);
 
       function getXhtml(prompt){
 
@@ -113,7 +117,7 @@ angular.module('corespring-singleComponentEditor.controllers')
           if(err){
             done(err);
           } else {
-            $scope.prompt = prompt;
+            $scope.data.prompt = prompt;
             configPanel.setModel($scope.item.components[$scope.componentKey]);
             ComponentData.updateComponent($scope.componentKey, $scope.item.components[$scope.componentKey]);
             done(null);
@@ -131,9 +135,9 @@ angular.module('corespring-singleComponentEditor.controllers')
         });
       });
 
-      $scope.$watch('item', function(){
-        $scope.$broadcast('client-side-preview.reset-player');
-      }, true);
+      // $scope.$watch('item', function(){
+      //   $scope.$broadcast('client-side-preview.reset-player');
+      // }, true);
 
 
       function onLaunchDialog($event, data, title, body, callback, scopeProps, options) {
@@ -209,7 +213,7 @@ angular.module('corespring-singleComponentEditor.controllers')
           logger.log('on initialise', data);
           
           var initialData = { 
-            xhtml: getXhtml($scope.prompt), 
+            xhtml: getXhtml($scope.data.prompt), 
             components: {} 
           };
 

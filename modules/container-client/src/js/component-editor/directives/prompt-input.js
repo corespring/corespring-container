@@ -1,9 +1,7 @@
 angular.module('corespring-singleComponentEditor.directives')
   .directive('promptInput', [function(){
 
-  function link($scope, $elem, $attrs){
-    console.log('prompt: ' + $scope.prompt);
-  }
+  function link($scope, $elem, $attrs){}
 
   var template = [
     '<div>',
@@ -13,10 +11,11 @@ angular.module('corespring-singleComponentEditor.directives')
   return {
     restrict: 'A',
     link: link,
+    transclude: true,
     template: template,
     replace: true,
     scope: {
-      prompt: '=ngModel',
+      prompt: '=',
     }
   };
 }]);
