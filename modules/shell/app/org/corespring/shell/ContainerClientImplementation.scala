@@ -79,10 +79,7 @@ class ContainerClientImplementation(
 
   lazy val assets = wire[ShellAssets] //new Assets with ItemDraftAssets with ItemAssets {
 
-  override lazy val componentSetExecutionContext = {
-    ComponentSetExecutionContext(ContainerClientImplementation.this.containerContext.context)
-  }
-
+  override lazy val componentSetExecutionContext = ComponentSetExecutionContext(ContainerClientImplementation.this.containerContext.context)
   override lazy val draftEditorHooks: DraftEditorHooks = wire[ShellDraftEditorHooks]
   override lazy val itemEditorHooks: ItemEditorHooks = wire[ShellItemEditorHooks]
   override lazy val catalogHooks: CatalogHooks = wire[ShellCatalogHooks]
@@ -92,10 +89,10 @@ class ContainerClientImplementation(
   override lazy val itemHooks: CoreItemHooks with CreateItemHook = wire[shellEditor.ItemHooks]
   override lazy val itemSupportingMaterialHooks: ItemSupportingMaterialHooks = wire[shellEditor.ItemSupportingMaterialHooks]
   override lazy val playerHooks: PlayerHooks = wire[ShellPlayerHooks]
-  override lazy val dataQueryHooks: DataQueryHooks = wire[ShellDataQueryHooks] // with withContext
+  override lazy val dataQueryHooks: DataQueryHooks = wire[ShellDataQueryHooks]
   override lazy val versionInfo: VersionInfo = VersionInfo(Play.current.configuration)
   override lazy val collectionHooks: CollectionHooks = wire[shellEditor.CollectionHooks]
-  override lazy val itemMetadataHooks: ItemMetadataHooks = wire[shellEditor.ItemMetadataHooks] //{
+  override lazy val itemMetadataHooks: ItemMetadataHooks = wire[shellEditor.ItemMetadataHooks]
   override val loadResource: (String) => Option[URL] = play.api.Play.current.resource(_)
   override val mode: Mode = Play.current.mode
 }
