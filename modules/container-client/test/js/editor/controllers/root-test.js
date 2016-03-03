@@ -103,8 +103,8 @@ describe('editor root', function() {
       expect(ConfigurationService.setConfig).toHaveBeenCalledWith({});
     });
 
-    it('should call ModalOpenDispatcher.setListener', function() {
-      expect(ModalOpenDispatcher.setListener).toHaveBeenCalledWith(scope.onModalOpened);
+    it('should call ModalOpenDispatcher.setListener(func)', function() {
+      expect(ModalOpenDispatcher.setListener).toHaveBeenCalledWith(jasmine.any(Function));
     });
 
     describe('when in iframe', function() {
@@ -284,12 +284,13 @@ describe('editor root', function() {
   });
 
   describe('onModalOpened', function(){
-    var jqueryModal, pos;
+    var onModalOpened, jqueryModal, pos;
 
     beforeEach(function(){
+      onModalOpened = ModalOpenDispatcher.setListener.calls.mostRecent().args[0];
       Msgr.send.calls.reset();
       jqueryModal = {offset: jasmine.createSpy('offset')};
-      scope.onModalOpened(jqueryModal);
+      onModalOpened(jqueryModal);
       var getScrollPositionCallback = Msgr.send.calls.mostRecent().args[1];
       pos = {top: 5};
       getScrollPositionCallback(null, pos);

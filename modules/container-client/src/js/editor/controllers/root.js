@@ -37,7 +37,6 @@ angular.module('corespring-editor.controllers')
 
       $scope.onItemLoadError = onItemLoadError;
       $scope.onItemLoadSuccess = onItemLoadSuccess;
-      $scope.onModalOpened = onModalOpened;
 
       $scope.$on(WIGGI_EVENTS.LAUNCH_DIALOG, onLaunchDialog);
       $scope.$on('itemChanged', onItemChanged);
