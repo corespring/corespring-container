@@ -42,9 +42,9 @@ angular.module('corespring-singleComponentEditor.controllers')
 
       $scope.playerMode = 'gather';
 
-      $scope.data = {prompt: 'hi there'};
+      $scope.data = {prompt: ''};
 
-      $scope.$watch('data.prompt', debounce(1000, function(newValue){
+      $scope.$watch('data.prompt', debounce(300, function(newValue){
         if($scope.item){
           $scope.item.xhtml = getXhtml(newValue);
 
@@ -57,7 +57,7 @@ angular.module('corespring-singleComponentEditor.controllers')
            */
           $timeout(function(){
             ComponentData.updateComponent($scope.componentKey, $scope.item.components[$scope.componentKey]);
-          }, 1000);
+          }, 300);
         }
       }, true));
 

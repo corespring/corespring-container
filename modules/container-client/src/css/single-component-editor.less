@@ -13,20 +13,13 @@
 @import "editor/menus";
 @import "editor/inputs";
 @import "editor/components";
-@import "editor/additional-copyright-information-for-profile";
-@import "editor/profile";
 @import "editor/config";
-@import "editor/catalog-preview";
 @import "editor/overview";
 @import "editor/wiggi-wiz-overrides";
 @import "editor/footnotes-wiggi-feature";
 @import "editor/image-wiggi-feature";
 @import "editor/mathjax-wiggi-feature";
 @import "editor/link-wiggi-feature";
-@import "editor/supporting-materials";
-@import "editor/question-information";
-@import "editor/profile-preview";
-@import "editor/help";
 @import "player/player-core-mixin";
 
 .wiggi-wiz-editable {
@@ -52,6 +45,7 @@ body {
 @cs-grey: #777777;
 @cs-pink: #DA1C5C;
 @feedback-bg: #533b91;
+@cs-public-pink: #da1c5c;
 
 @profile-summary-feedback-panel-bg: @darker-blue;
 
@@ -88,11 +82,20 @@ body {
   padding-left: 10px;
 }
 
+.prompt-panel{
+  @col: lighten(@cs-grey, 40%);
+  border: solid 2px @col;
+  background-color: @col;
+  .panel-body {
+    background-color: white;
+  }
+}
+
 .pane-header {
   text-transform: uppercase;
   font-size: 16px;
   font-weight: 600;
-  color: #da1c5c;
+  color: @cs-public-pink;
   text-transform: uppercase;
   padding: 0.8em 0 0 0;
   font-family: 'Whitney SSm A', 'Whitney SSm B', sans-serif;
