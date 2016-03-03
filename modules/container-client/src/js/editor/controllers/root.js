@@ -3,40 +3,43 @@ angular.module('corespring-editor.controllers')
     '$scope',
     '$timeout',
     'ConfigurationService',
+    'editorDebounce',
     'EditorDialogTemplate',
     'iFrameService',
     'ItemService',
     'LogFactory',
+    'MetadataService',
     'Msgr',
     'WIGGI_EVENTS',
     'WiggiDialogLauncher',
-    'editorDebounce',
-    'MetadataService',
     function(
       $scope,
       $timeout,
       ConfigurationService,
+      editorDebounce,
       EditorDialogTemplate,
       iFrameService,
       ItemService,
       LogFactory,
+      MetadataService,
       Msgr,
       WIGGI_EVENTS,
-      WiggiDialogLauncher,
-      editorDebounce,
-      MetadataService) {
+      WiggiDialogLauncher
+    ) {
 
       "use strict";
 
       var logger = LogFactory.getLogger('root-controller');
 
-      $scope.onItemLoadSuccess = onItemLoadSuccess;
       $scope.onItemLoadError = onItemLoadError;
+      $scope.onItemLoadSuccess = onItemLoadSuccess;
 
       $scope.$on(WIGGI_EVENTS.LAUNCH_DIALOG, onLaunchDialog);
       $scope.$on('itemChanged', onItemChanged);
 
       init();
+
+      //-------------------------------
 
       function saveAll(done){
         logger.debug('saveAll...');
