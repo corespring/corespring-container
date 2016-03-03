@@ -114,34 +114,34 @@ body {
   position: relative;
 }
 
+@config-pane-width: 610px;
+
 .config-pane {
-  @config-pane-width: 550px;
   width: @config-pane-width;
   max-width: @config-pane-width;
   min-width: @config-pane-width;
 }
 
 .preview-right {
-  width: 1300px;
-
+  
   .vertical-divider {
     border-left: 1px solid #eeeeee;
     background-color: #fff;
-    width: 500px;
+    width: 10px;
     font-size: 1px;
     padding: 0;
     top: 0;
     bottom: 0;
-    right: 100px;
+    left: @config-pane-width+10;
     position: fixed;
   }
 
   .preview-pane {
     flex-shrink: 0;
     position: fixed;
-    right: 0px;
+    left: @config-pane-width+40;
     top: 0px;
-    width: 600px;
+    overflow-x: hidden;
 
     .player-btn-holder {
       width: 100%;
