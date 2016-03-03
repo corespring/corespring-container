@@ -49,7 +49,7 @@ angular.module('corespring-singleComponentEditor.controllers')
           $scope.item.xhtml = getXhtml(newValue);
 
           /**
-           * the xhtml updated is going to trigger a $compile in the preview player. 
+           * the xhtml update is going to trigger a $compile in the preview player. 
            * the compile is going get the component to register with the ComponnentRegister.
            * Once this is done we can update the model.
            * For now just putting in an indeterminate timeout, but we'll probably want to allow 
@@ -96,7 +96,6 @@ angular.module('corespring-singleComponentEditor.controllers')
         try {
           var parser = new DOMParser();
           var doc = parser.parseFromString(xhtml, 'text/html'); 
-          console.log(doc);
           var promptNode = doc.querySelector('prompt');
           var out = promptNode ? promptNode.innerHTML : undefined;
           if(!out){

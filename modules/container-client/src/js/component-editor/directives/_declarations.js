@@ -1,1 +1,3 @@
-angular.module('corespring-singleComponentEditor.directives', []);
+angular.module('corespring-singleComponentEditor.directives', [
+  'corespring-singleComponentEditor.directives.input'
+  ]);

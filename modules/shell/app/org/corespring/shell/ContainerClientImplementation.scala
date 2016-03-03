@@ -38,7 +38,7 @@ class ContainerClientImplementation(
     }.getOrElse(path)
   }
 
-  lazy val logger = Logger(this.getClass)
+  private lazy val logger = Logger(this.getClass)
 
   override def components: Seq[Component] = componentsIn
 

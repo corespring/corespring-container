@@ -16,9 +16,9 @@ import org.corespring.container.client.pages.engine.{ JadeEngine, JadeEngineConf
 import org.corespring.container.client.pages.processing.AssetPathProcessor
 import org.corespring.container.components.services.{ ComponentService, DependencyResolver }
 import org.corespring.container.js.{ JsProcessingConfig, JsProcessingModule }
-import play.api.Mode
 import play.api.Mode.Mode
 import play.api.mvc.Controller
+import play.api.{ Logger, Mode }
 
 import scala.concurrent.ExecutionContext
 
@@ -44,6 +44,8 @@ trait DefaultIntegration
   with ResourcesModule
   with LauncherModules
   with JsProcessingModule {
+
+  private val logger = Logger(classOf[DefaultIntegration])
 
   lazy val defaultIntegrationControllers: Seq[Controller] = {
     containerMainControllers ++
@@ -94,10 +96,11 @@ trait DefaultIntegration
 
   override lazy val assetPathProcessor = new AssetPathProcessor {
 
-    override def process(s: String): String = {
-      if (DefaultIntegration.pathsThatNeedResolution.exists(s.contains(_))) {
-        resolveDomain(s)
-      } else s
+    override def process(path: String): String = {
+      if (DefaultIntegration.pathsThatNeedResolution.exists(path.contains(_))) {
+        logger.info(s"resolveDomain for path: $path")
+        resolveDomain(path)
+      } else path
     }
   }
 
