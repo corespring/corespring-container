@@ -3,32 +3,43 @@ angular.module('corespring-editor.controllers')
     '$scope',
     '$timeout',
     'ConfigurationService',
+    'editorDebounce',
     'EditorDialogTemplate',
     'iFrameService',
     'ItemService',
     'LogFactory',
+    'MetadataService',
+    'ModalOpenPropagator',
     'Msgr',
     'WIGGI_EVENTS',
     'WiggiDialogLauncher',
-    'editorDebounce',
-    'MetadataService',
     function(
       $scope,
       $timeout,
       ConfigurationService,
+      editorDebounce,
       EditorDialogTemplate,
       iFrameService,
       ItemService,
       LogFactory,
+      MetadataService,
+      ModalOpenPropagator,
       Msgr,
       WIGGI_EVENTS,
-      WiggiDialogLauncher,
-      editorDebounce,
-      MetadataService) {
+      WiggiDialogLauncher
+    ) {
 
       "use strict";
 
       var logger = LogFactory.getLogger('root-controller');
+
+      ModalOpenPropagator.addListener(function(jqModal){
+        console.log("root opening ", jqModal);
+        Msgr.send('getScrollPosition', function(err, pos){
+          console.log("getScrollPosition callback ", err, pos);
+          jqModal.offset({top: pos.top})
+        });
+      });
 
       $scope.onItemLoadSuccess = onItemLoadSuccess;
       $scope.onItemLoadError = onItemLoadError;
@@ -108,6 +119,7 @@ angular.module('corespring-editor.controllers')
 
 
       function onLaunchDialog($event, data, title, body, callback, scopeProps, options) {
+        console.log("root.onLaunchDialog", arguments);
         var dialog = new WiggiDialogLauncher($event.targetScope);
         var header = options.omitHeader ? '' : null;
         var footer = options.omitFooter ? '' : null;

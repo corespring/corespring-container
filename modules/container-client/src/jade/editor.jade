@@ -62,13 +62,57 @@ block after-main-script
           $stateProvider.state(x, appLoadConfig.states[x]);
         }
       }
-      
-      var editorOptions = !{options}; 
+
+      function ModalOpenPropagator(){
+        var listeners = [];
+
+        this.addListener = function(listener){
+          listeners.push(listener);
+        }
+
+        this.removeListener = function(listener){
+          var index = listeners.indexOf(listener);
+          if(index >= 0) {
+            listeners.splice(index, 1);
+          }
+        }
+
+        this.propagate = function(jqueryModal){
+          for(var i=0; i<listeners.length; i++){
+            try {
+              listeners[i](jqueryModal);
+            } catch (e) {
+              console.log("Error executing listener ", listeners[i], e);
+            }
+          }
+        }
+      }
+
+      var editorOptions = !{options};
       angular.module('corespring-#{appName}').constant('STATIC_PATHS', editorOptions.staticPaths); 
       angular.module('corespring-#{appName}').constant('DEBOUNCE_IN_MILLIS', editorOptions.debounceInMillis || 5000 ); 
       angular.module('corespring-#{appName}').config(uiRouterConfig);
       
       angular.module('corespring-#{appName}')
+        .config(['$provide', function($provide) {
+          var modalOpenPropagator = new ModalOpenPropagator();
+          $provide.value('ModalOpenPropagator', modalOpenPropagator);
+
+          $provide.decorator('$modal', function($delegate){
+            console.log("decorate $modal", $delegate);
+            $delegate._saveOpen_ = $delegate.open;
+            $delegate.open = function(b){
+              console.log("$modal.open", b);
+
+              setTimeout(function(){
+                var $modal = $('.modal');
+                modalOpenPropagator.propagate($modal);
+              }, 250);
+              return this._saveOpen_(b);
+            }
+            return $delegate;
+          });
+        }])
         .config(['$tooltipProvider', function($tooltipProvider) {
           //add ng-ui-tooltip-close as an event to close the tooltip
           //this enables you to hide the tooltip by calling elem.trigger('ng-ui-tooltip-close');
