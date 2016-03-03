@@ -91,6 +91,16 @@ describe('instance', function() {
     expect($('#' + ID).html()).not.toMatch("scrolling=\"no\"");
   });
 
+  it('should register a handler for autoScroll', function(){
+    var instance = new InstanceDef({call: {url: '/url'}}, '#' + ID, onError);
+    expect(mockChannel.on).toHaveBeenCalledWith('autoScroll', jasmine.any(Function));
+  });
+
+  it('should register a handler for getScrollPosition', function(){
+    var instance = new InstanceDef({call: {url: '/url'}}, '#' + ID, onError);
+    expect(mockChannel.on).toHaveBeenCalledWith('getScrollPosition', jasmine.any(Function));
+  });
+
   describe('send', function(){
 
     it('should call channel.send', function() {

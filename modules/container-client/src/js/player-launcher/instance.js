@@ -186,7 +186,6 @@ var Instance = function(launchOpts, element, errorCallback, log, autosizeEnabled
     });
 
     channel.on('getScrollPosition', function(err, callback){
-      console.log('getScrollPosition', arguments);
       var $scrollable = $('.item-iframe-container');
       if($scrollable.length === 0){
         $scrollable = $('body');
