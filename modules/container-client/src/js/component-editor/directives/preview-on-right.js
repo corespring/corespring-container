@@ -11,7 +11,7 @@ angular.module('corespring-singleComponentEditor.directives')
             $scope.showPreview = show;
           });
         }
-      }
+      };
     }
   ]
 );
