@@ -12,7 +12,7 @@ block content
   include templates/supporting-materials
   include templates/metadata
 
-  .root(ng-controller="Root", dimension-propagator='')
+  .root(ng-controller="Root", dimension-propagator='', modal-positioner='')
     .container-fluid
       include partials/nav
     .main-content(ui-view="main")
@@ -83,7 +83,7 @@ block after-main-script
         var modalOpenDispatcher = new ModalOpenDispatcher();
         $provide.value('ModalOpenDispatcher', modalOpenDispatcher);
 
-        $provide.decorator('$modal', function ($modalDelegate){
+        $provide.decorator('$modal', function ($delegate){
           return {open: newOpen};
 
           function newOpen(b){
@@ -91,7 +91,7 @@ block after-main-script
             var modalMarker = "modal-" + new Date().getTime();
             b.windowClass = b.windowClass + " " + modalMarker;
             setTimeout(findModalByMarker, 100);
-            return $modalDelegate.open(b);
+            return $delegate.open(b);
 
             function findModalByMarker(){
               var $modal = $('.' + modalMarker);

@@ -9,7 +9,6 @@ angular.module('corespring-editor.controllers')
     'ItemService',
     'LogFactory',
     'MetadataService',
-    'ModalOpenDispatcher',
     'Msgr',
     'WIGGI_EVENTS',
     'WiggiDialogLauncher',
@@ -23,7 +22,6 @@ angular.module('corespring-editor.controllers')
       ItemService,
       LogFactory,
       MetadataService,
-      ModalOpenDispatcher,
       Msgr,
       WIGGI_EVENTS,
       WiggiDialogLauncher
@@ -32,8 +30,6 @@ angular.module('corespring-editor.controllers')
       "use strict";
 
       var logger = LogFactory.getLogger('root-controller');
-
-      ModalOpenDispatcher.setListener(onModalOpened);
 
       $scope.onItemLoadError = onItemLoadError;
       $scope.onItemLoadSuccess = onItemLoadSuccess;
@@ -44,12 +40,6 @@ angular.module('corespring-editor.controllers')
       init();
 
       //-------------------------------
-
-      function onModalOpened(jqueryModal){
-        Msgr.send('getScrollPosition', function(err, pos){
-          jqueryModal.offset({top: pos.top});
-        });
-      }
 
       function saveAll(done){
         logger.debug('saveAll...');
