@@ -23,7 +23,6 @@ describe('component-editor Root', function(){
     $provide.value('Msgr', Msgr);
     $provide.value('SINGLE_COMPONENT_KEY', 'compKey');
     $provide.value('WiggiDialogLauncher', {});
-    $.extend({lockfixed: function() {}});
   }));
 
   beforeEach(inject(function($rootScope, $controller) {
