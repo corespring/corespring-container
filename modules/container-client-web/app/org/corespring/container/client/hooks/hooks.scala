@@ -76,6 +76,7 @@ trait ItemDraftSupportingMaterialHooks extends SupportingMaterialHooks
 
 trait CoreItemHooks extends HasContainerContext with LoadHook {
   def delete(id: String)(implicit h: RequestHeader): R[JsValue]
+  def saveXhtmlAndComponents(id: String, markup: String, components: JsValue)(implicit h: RequestHeader): R[JsValue]
   def saveCollectionId(id: String, collectionId: String)(implicit h: RequestHeader): R[JsValue]
   def saveComponents(id: String, json: JsValue)(implicit h: RequestHeader): R[JsValue]
   def saveCustomScoring(id: String, customScoring: String)(implicit header: RequestHeader): R[JsValue]

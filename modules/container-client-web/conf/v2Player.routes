@@ -47,6 +47,7 @@ POST          /item/:itemId/supporting-material/:name/upload             @org.co
 DELETE        /item/:itemId/supporting-material/:name/:filename          @org.corespring.container.client.controllers.resources.Item.deleteAssetFromSupportingMaterial(itemId, name, filename)
 PUT           /item/:itemId/supporting-material/:name/:filename          @org.corespring.container.client.controllers.resources.Item.updateSupportingMaterialContent(itemId, name, filename)
 GET           /item/:itemId/supporting-material/:name/:filename          @org.corespring.container.client.controllers.resources.Item.getAssetFromSupportingMaterial(itemId, name, filename)
+PUT           /item/update/xhtml-and-components/:itemId.json            @org.corespring.container.client.controllers.resources.Item.saveXhtmlAndComponents(itemId)
 PUT           /item/update/:subset/:itemId.json                          @org.corespring.container.client.controllers.resources.Item.saveSubset(itemId, subset)
 
 # ItemDraft
@@ -61,6 +62,7 @@ GET           /draft/:draftId/supporting-material/:name/:filename        @org.co
 PUT           /draft/:draftId/supporting-material/:name/:filename        @org.corespring.container.client.controllers.resources.ItemDraft.updateSupportingMaterialContent(draftId, name, filename)
 GET           /draft/:draftId.json                                       @org.corespring.container.client.controllers.resources.ItemDraft.load(draftId)
 PUT           /draft/update/:draftId                                     @org.corespring.container.client.controllers.resources.ItemDraft.save(draftId)
+PUT           /draft/update/xhtml-and-components/:draftId.json           @org.corespring.container.client.controllers.resources.ItemDraft.saveXhtmlAndComponents(draftId)
 PUT           /draft/update/:subset/:draftId.json                        @org.corespring.container.client.controllers.resources.ItemDraft.saveSubset(draftId, subset)
 PUT           /draft/:draftId/commit                                     @org.corespring.container.client.controllers.resources.ItemDraft.commit(draftId)
 

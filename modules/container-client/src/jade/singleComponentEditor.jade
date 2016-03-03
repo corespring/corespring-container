@@ -17,6 +17,15 @@ block extra-css
 
 block content
 
+  mixin prompt
+    .panel.prompt-panel
+      .panel-heading
+        h4.panel-title
+          a(ng-click="showPromptInput = !showPromptInput")
+            | Prompt
+      .panel-body(collapse="!showPromptInput")
+        .prompt(prompt-input="", prompt="data.prompt")
+
   mixin preview
     .item-preview-wrapper(ng-controller="ClientSidePreview")
       .player-container
@@ -52,15 +61,7 @@ block content
           br/
           span.pane-sub-header Use the configuration panel to set up the interaction
           hr/
-
-          .panel.prompt-panel
-            .panel-heading
-              h4.panel-title
-                a(ng-click="showPromptInput = !showPromptInput")
-                  | Prompt
-            .panel-body(collapse="!showPromptInput")
-              .prompt(prompt-input="", prompt="data.prompt")
-
+          +prompt
           hr/ 
           .configuration
         
@@ -109,6 +110,8 @@ block content
             a(href="") Preview
 
         .config(ng-show="activePane == 'config'")
+          +prompt
+          hr/
           .configuration
           hr/
           .bar

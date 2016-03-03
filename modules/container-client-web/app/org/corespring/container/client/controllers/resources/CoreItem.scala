@@ -29,8 +29,7 @@ trait CoreItem extends CoreSupportingMaterials with Controller with HasContainer
 
   lazy val logger = Logger(classOf[CoreItem])
 
-
-  def playerXhtml : PlayerXhtml
+  def playerXhtml: PlayerXhtml
 
   implicit def toResult(m: StatusMessage): SimpleResult = play.api.mvc.Results.Status(m._1)(Json.obj("error" -> m._2))
 
@@ -58,6 +57,27 @@ trait CoreItem extends CoreSupportingMaterials with Controller with HasContainer
                 "Expires" -> "0")
           }
         }
+    }
+  }
+
+  private def errorResult(err: String, status: Int = BAD_REQUEST) = Future.successful(Status(status)(Json.obj("error" -> err)))
+
+  def saveXhtmlAndComponents(id: String) = Action.async { implicit request: Request[AnyContent] =>
+
+    val validation = for {
+      json <- request.body.asJson.toSuccess(ItemDraft.Errors.noJson)
+      markup <- (json \ "xhtml").asOpt[String].toSuccess("Missing required field 'xhtml' of type 'string'.")
+      components <- (json \ "components").asOpt[JsObject].toSuccess("Missing required field 'components' of type 'object'")
+    } yield (markup -> components)
+
+    validation match {
+      case Failure(s) => errorResult(s)
+      case Success((markup, components)) => {
+        hooks.saveXhtmlAndComponents(id, markup, components).flatMap {
+          case Left((code, msg)) => errorResult(msg, code)
+          case Right(json) => Future.successful(Ok(json))
+        }
+      }
     }
   }
 
@@ -93,11 +113,11 @@ trait CoreItem extends CoreSupportingMaterials with Controller with HasContainer
     } yield result
 
     out match {
-      case Failure(msg) => Future(BadRequest(Json.obj("error" -> msg)))
+      case Failure(msg) => errorResult(msg)
       case Success(future) => {
-        future.map {
-          case Left(err) => Status(err._1)(Json.obj("error" -> err._2))
-          case Right(json) => Ok(json)
+        future.flatMap {
+          case Left((code, msg)) => errorResult(msg, code)
+          case Right(json) => Future.successful(Ok(json))
         }
       }
     }

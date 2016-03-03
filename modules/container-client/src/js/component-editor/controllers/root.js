@@ -49,6 +49,8 @@ angular.module('corespring-singleComponentEditor.controllers')
 
       $scope.data = {prompt: ''};
 
+      //Add a callback that updates the component after it's registered.
+      //This can happen if the entire preview gets recompiled.
       ComponentData.onComponentRegistered(componentKey, function(){
         if($scope.item && $scope.item.components){
           ComponentData.updateComponent(componentKey, $scope.item.components[componentKey]);
@@ -58,17 +60,6 @@ angular.module('corespring-singleComponentEditor.controllers')
       $scope.$watch('data.prompt', debounce(300, function(newValue){
         if($scope.item){
           $scope.item.xhtml = getXhtml(newValue);
-
-          /**
-           * the xhtml update is going to trigger a $compile in the preview player. 
-           * the compile is going get the component to register with the ComponnentRegister.
-           * Once this is done we can update the model.
-           * For now just putting in an indeterminate timeout, but we'll probably want to allow 
-           * a callback mechanism to allow us to hook in to the registration event.
-          $timeout(function(){
-            ComponentData.updateComponent(componentKey, $scope.item.components[componentKey]);
-          }, 300);
-          */
         }
       }, true));
 
@@ -100,6 +91,7 @@ angular.module('corespring-singleComponentEditor.controllers')
       };
 
       function readPrompt(xhtml, done){
+
         try {
           var parser = new DOMParser();
           var doc = parser.parseFromString(xhtml, 'text/html'); 
@@ -193,13 +185,13 @@ angular.module('corespring-singleComponentEditor.controllers')
 
           //Preview mode
           Msgr.on('showPreview', function(show){
-            $scope.item.components[componentKey] = $scope.getData();
+            $scope.item = $scope.getData();
             $scope.$broadcast('showPreview', show);
           });
           
           //Tabs mode 
           Msgr.on('showPane', function(pane){
-            $scope.item.components[componentKey] = $scope.getData();
+            $scope.item = $scope.getData();
             $scope.$broadcast('showPane', pane);
           });
           
@@ -224,14 +216,23 @@ angular.module('corespring-singleComponentEditor.controllers')
 
         function onInitialise(data) {
           logger.log('on initialise', data);
-          
+         
           var initialData = { 
             xhtml: getXhtml($scope.data.prompt), 
             components: {} 
           };
 
-          initialData.xhtml = data.xhtml ? data.xhtml : initialData.xhtml; 
+          if(data.xhtml){
+            readPrompt(data.xhtml, function(err, prompt){
+              $scope.data.prompt = prompt;
+            });
+            initialData.xhtml = data.xhtml;
+          } 
+
           var defaultData = ComponentDefaultData.getDefaultData(COMPONENT_EDITOR.componentType);
+
+          initialData.components = {};
+
           initialData.components[componentKey] = data.componentModel ? data.componentModel : defaultData;
           
           $scope.showNavigation = data.showNavigation === true ? true : false;

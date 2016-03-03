@@ -169,15 +169,15 @@ function CorespringBound(bindType, options, errorCallback){
     return instance;
   };
 
-  this.saveComponents = function(launcher, id, componentKey, data, done) {
-    var key = bindType + 'Editor.singleComponent.saveComponents';
+  this.saveXhtmlAndComponents = function(launcher, id, data, done) {
+    var key = bindType + 'Editor.singleComponent.saveXhtmlAndComponents';
     var call = launcher.loadCall(key, function(u){
       return u.replace(':' + bindType + 'Id', id);
     });
 
-    var componentData = {};
-    componentData[componentKey] = data;
-    helper.jsonXhr(call, componentData, done);
+    // var componentData = {};
+    // componentData[componentKey] = data;
+    helper.jsonXhr(call, data, done);
   };
 }
 
@@ -238,8 +238,8 @@ function Item(element, options, errorCallback) {
     helper.addCoreMethods.bind(this)(instance);
   }
 
-  function saveComponents(id, data, done){
-    itemBound.saveComponents(launcher, id, componentKey, data, done);
+  function saveXhtmlAndComponents(id, data, done){
+    itemBound.saveXhtmlAndComponents(launcher, id, data, done);
   }
 
   var ok = launcher.init();
@@ -272,7 +272,7 @@ function Item(element, options, errorCallback) {
 
   this.save = function(done){
     instance.send('getData', function(err, data){
-      saveComponents(options.itemId, data, function(err,saveResult){
+      saveXhtmlAndComponents(options.itemId, data, function(err,saveResult){
         done({error: err, result: saveResult});
       });
     });
@@ -320,8 +320,8 @@ function Draft(element, options, errorCallback) {
     helper.addCoreMethods.bind(this)(instance);
   }
 
-  function saveComponents(draftId, data, done){
-    draftBound.saveComponents(launcher, draftId, componentKey, data, done);
+  function saveXhtmlAndComponents(draftId, data, done){
+    draftBound.saveXhtmlAndComponents(launcher, draftId, data, done);
   }
 
   var ok = launcher.init();
@@ -358,7 +358,7 @@ function Draft(element, options, errorCallback) {
 
   this.save = function(done){
     instance.send('getData', function(err, data){
-      saveComponents(options.draftId, data, function(err,saveResult){
+      saveXhtmlAndComponents(options.draftId, data, function(err,saveResult){
         done({error: err, result: saveResult});
       });
     });
