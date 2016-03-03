@@ -9,6 +9,10 @@ describe('editor root', function() {
   var ConfigurationService = {
     setConfig: jasmine.createSpy('setConfig')
   };
+
+  var ModalOpenDispatcher = {
+    setListener: jasmine.createSpy('setListener')
+  };
   
   var ItemService, MetadataService, LogFactory, msgrOnHandlers, Msgr;
 
@@ -69,7 +73,7 @@ describe('editor root', function() {
     $provide.value('WiggiDialogLauncher',  WiggiDialogLauncher);
     $provide.value('EditorDialogTemplate', EditorDialogTemplate);
     $provide.value('editorDebounce', editorDebounce);
-
+    $provide.value('ModalOpenDispatcher', ModalOpenDispatcher);
   }));
 
   function render() {
@@ -97,6 +101,10 @@ describe('editor root', function() {
 
     it('should call ConfigurationService.setConfig with empty config', function() {
       expect(ConfigurationService.setConfig).toHaveBeenCalledWith({});
+    });
+
+    it('should call ModalOpenDispatcher.setListener', function() {
+      expect(ModalOpenDispatcher.setListener).toHaveBeenCalledWith(scope.onModalOpened);
     });
 
     describe('when in iframe', function() {
@@ -273,6 +281,27 @@ describe('editor root', function() {
     assertCallToLaunch({omitHeader: true}, ['title', 'content', '', null]);
     assertCallToLaunch({omitFooter: true}, ['title', 'content', null, '']);
     assertCallToLaunch({omitHeader: true, omitFooter: true }, ['title', 'content', '', '']);
+  });
+
+  describe('onModalOpened', function(){
+    var jqueryModal, pos;
+
+    beforeEach(function(){
+      Msgr.send.calls.reset();
+      jqueryModal = {offset: jasmine.createSpy('offset')};
+      scope.onModalOpened(jqueryModal);
+      var getScrollPositionCallback = Msgr.send.calls.mostRecent().args[1];
+      pos = {top: 5};
+      getScrollPositionCallback(null, pos);
+    });
+
+    it('should retrieve the scrollPosition', function(){
+      expect(Msgr.send).toHaveBeenCalledWith('getScrollPosition', jasmine.any(Function));
+    });
+
+    it('should set the position of the modal to the value of getScrollPosition', function(){
+      expect(jqueryModal.offset).toHaveBeenCalledWith({top: pos.top});
+    });
   });
 
 });

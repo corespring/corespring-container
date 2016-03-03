@@ -9,7 +9,7 @@ angular.module('corespring-editor.controllers')
     'ItemService',
     'LogFactory',
     'MetadataService',
-    'ModalOpenPropagator',
+    'ModalOpenDispatcher',
     'Msgr',
     'WIGGI_EVENTS',
     'WiggiDialogLauncher',
@@ -23,7 +23,7 @@ angular.module('corespring-editor.controllers')
       ItemService,
       LogFactory,
       MetadataService,
-      ModalOpenPropagator,
+      ModalOpenDispatcher,
       Msgr,
       WIGGI_EVENTS,
       WiggiDialogLauncher
@@ -33,21 +33,24 @@ angular.module('corespring-editor.controllers')
 
       var logger = LogFactory.getLogger('root-controller');
 
-      ModalOpenPropagator.addListener(function(jqModal){
-        console.log("root opening ", jqModal);
-        Msgr.send('getScrollPosition', function(err, pos){
-          console.log("getScrollPosition callback ", err, pos);
-          jqModal.offset({top: pos.top})
-        });
-      });
+      ModalOpenDispatcher.setListener(onModalOpened);
 
-      $scope.onItemLoadSuccess = onItemLoadSuccess;
       $scope.onItemLoadError = onItemLoadError;
+      $scope.onItemLoadSuccess = onItemLoadSuccess;
+      $scope.onModalOpened = onModalOpened;
 
       $scope.$on(WIGGI_EVENTS.LAUNCH_DIALOG, onLaunchDialog);
       $scope.$on('itemChanged', onItemChanged);
 
       init();
+
+      //-------------------------------
+
+      function onModalOpened(jqueryModal){
+        Msgr.send('getScrollPosition', function(err, pos){
+          jqueryModal.offset({top: pos.top});
+        });
+      }
 
       function saveAll(done){
         logger.debug('saveAll...');
@@ -119,7 +122,6 @@ angular.module('corespring-editor.controllers')
 
 
       function onLaunchDialog($event, data, title, body, callback, scopeProps, options) {
-        console.log("root.onLaunchDialog", arguments);
         var dialog = new WiggiDialogLauncher($event.targetScope);
         var header = options.omitHeader ? '' : null;
         var footer = options.omitFooter ? '' : null;

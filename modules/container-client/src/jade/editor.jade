@@ -63,56 +63,57 @@ block after-main-script
         }
       }
 
-      function ModalOpenPropagator(){
-        var listeners = [];
+      function ModalOpenDispatcher(){
+        var listener = null;
 
-        this.addListener = function(listener){
-          listeners.push(listener);
-        }
-
-        this.removeListener = function(listener){
-          var index = listeners.indexOf(listener);
-          if(index >= 0) {
-            listeners.splice(index, 1);
-          }
-        }
+        this.setListener = function(value){
+          listener = value;
+        };
 
         this.propagate = function(jqueryModal){
-          for(var i=0; i<listeners.length; i++){
-            try {
-              listeners[i](jqueryModal);
-            } catch (e) {
-              console.log("Error executing listener ", listeners[i], e);
+          try {
+            listener(jqueryModal);
+          } catch (e) {
+            console.warn("[ModalOpenDispatcher] Error executing listener", listener, e);
+          }
+        };
+      }
+
+      function modalConfig($provide){
+        var modalOpenDispatcher = new ModalOpenDispatcher();
+        $provide.value('ModalOpenDispatcher', modalOpenDispatcher);
+
+        $provide.decorator('$modal', function ($modalDelegate){
+          return {open: newOpen};
+
+          function newOpen(b){
+            var maxAttemptsToFindModal = 10;
+            var modalMarker = "modal-" + new Date().getTime();
+            b.windowClass = b.windowClass + " " + modalMarker;
+            setTimeout(findModalByMarker, 100);
+            return $modalDelegate.open(b);
+
+            function findModalByMarker(){
+              var $modal = $('.' + modalMarker);
+              if($modal.length > 0) {
+                modalOpenDispatcher.propagate($modal);
+              } else {
+                if(--maxAttemptsToFindModal > 0) {
+                  setTimeout(findModalByMarker, 100);
+                }
+              }
             }
           }
-        }
+        });
       }
 
       var editorOptions = !{options};
-      angular.module('corespring-#{appName}').constant('STATIC_PATHS', editorOptions.staticPaths); 
-      angular.module('corespring-#{appName}').constant('DEBOUNCE_IN_MILLIS', editorOptions.debounceInMillis || 5000 ); 
+      angular.module('corespring-#{appName}').constant('STATIC_PATHS', editorOptions.staticPaths);
+      angular.module('corespring-#{appName}').constant('DEBOUNCE_IN_MILLIS', editorOptions.debounceInMillis || 5000 );
       angular.module('corespring-#{appName}').config(uiRouterConfig);
-      
+      angular.module('corespring-#{appName}').config(modalConfig);
       angular.module('corespring-#{appName}')
-        .config(['$provide', function($provide) {
-          var modalOpenPropagator = new ModalOpenPropagator();
-          $provide.value('ModalOpenPropagator', modalOpenPropagator);
 
-          $provide.decorator('$modal', function($delegate){
-            console.log("decorate $modal", $delegate);
-            $delegate._saveOpen_ = $delegate.open;
-            $delegate.open = function(b){
-              console.log("$modal.open", b);
-
-              setTimeout(function(){
-                var $modal = $('.modal');
-                modalOpenPropagator.propagate($modal);
-              }, 250);
-              return this._saveOpen_(b);
-            }
-            return $delegate;
-          });
-        }])
         .config(['$tooltipProvider', function($tooltipProvider) {
           //add ng-ui-tooltip-close as an event to close the tooltip
           //this enables you to hide the tooltip by calling elem.trigger('ng-ui-tooltip-close');
@@ -123,7 +124,7 @@ block after-main-script
           });
         }])
         .config([
-          'wiggiWizConfigProvider', 
+          'wiggiWizConfigProvider',
           function(wiggiWizConfigProvider){
             //Set up the current 'ComponentImageService' - this will be removed soon.
             wiggiWizConfigProvider.add({
