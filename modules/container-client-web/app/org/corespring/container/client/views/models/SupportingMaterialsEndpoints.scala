@@ -8,7 +8,11 @@ private object Helpers {
   implicit def toMethodAndUrl(c: Call): JsValueWrapper = Json.obj("method" -> c.method.toLowerCase, "url" -> c.url)
 }
 
-case class MainEndpoints(load: Call, saveSubset: Call, save: Option[Call])
+case class MainEndpoints(
+                          load: Call,
+                          saveSubset: Call,
+                          saveXhtmlAndComponents: Call,
+                          save: Option[Call])
 
 case class ComponentsAndWidgets(components: JsValue, widgets: JsValue)
 

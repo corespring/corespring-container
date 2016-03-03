@@ -36,6 +36,7 @@ object ItemEditorEndpoints extends Endpoints {
   def main(itemId: String) = MainEndpoints(
     load = resourceRoutes.Item.load(itemId),
     saveSubset = resourceRoutes.Item.saveSubset(itemId, ":subset"),
+    saveXhtmlAndComponents = resourceRoutes.Item.saveXhtmlAndComponents(itemId),
     save = None)
 }
 
@@ -53,6 +54,7 @@ object DraftEditorEndpoints extends Endpoints {
   def main(id: String) = MainEndpoints(
     load = resourceRoutes.ItemDraft.load(id),
     saveSubset = resourceRoutes.ItemDraft.saveSubset(id, ":subset"),
+    saveXhtmlAndComponents = resourceRoutes.ItemDraft.saveXhtmlAndComponents(itemId),
     save = Some(resourceRoutes.ItemDraft.save(id)))
 }
 
