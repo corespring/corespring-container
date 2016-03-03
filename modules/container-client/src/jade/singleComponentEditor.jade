@@ -45,7 +45,7 @@ block content
 
     if previewMode == "preview-right"
 
-      .preview-right(ng-controller="PreviewOnRight")
+      .preview-right(preview-on-right="", preview-width="!{previewWidth}")
         
         .config-pane
           span.pane-header Configuration
@@ -54,7 +54,7 @@ block content
           hr/
           .configuration
         
-        .vertical-divider
+        .vertical-divider(lockfix)
 
         .preview-pane(
           lockfix,
