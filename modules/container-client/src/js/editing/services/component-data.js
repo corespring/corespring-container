@@ -44,6 +44,10 @@ angular.module('corespring-editing.services')
           }, 10);
         }
 
+        this.onComponentRegistered = function(id, handler){
+          ComponentRegister.addRegistrationHandler(id, handler);
+        };
+
         this.getSessions = function() {
           return ComponentRegister.getSessions();
         };

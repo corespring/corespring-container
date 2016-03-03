@@ -57,13 +57,14 @@ script(type="text/ng-template", id="/templates/question")
               a(ng-click="showSummaryFeedback = !showSummaryFeedback")
                 | Add Feedback (optional)
           .panel-body(collapse="!showSummaryFeedback")
-            div(mini-wiggi-wiz="", 
-              ng-model='item.summaryFeedback', 
-              placeholder='Type here',
-              feature-overrides="overrideFeatures",
-              image-service="imageService",
-              dialog-launcher="external",
-              features="extraFeaturesForFeedback")
+            .panel-body-inner
+              div(mini-wiggi-wiz="", 
+                ng-model='item.summaryFeedback', 
+                placeholder='Type here',
+                feature-overrides="overrideFeatures",
+                image-service="imageService",
+                dialog-launcher="external",
+                features="extraFeaturesForFeedback")
 
     .col-md-6
 

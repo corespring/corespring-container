@@ -12,7 +12,40 @@ angular.module('corespring-player.services')
 
       var answerChangedHandler = null;
 
+      var registrationHandlers = {};
+
       var isEditable = null;
+
+      this.addRegistrationHandler = function(id, handler){
+
+        if(!id){
+          throw new Error('invalid id: ', id);
+        }
+
+        if(!handler || !_.isFunction(handler)){
+          throw new Error('invalid handler: ', handler);
+        }
+
+        registrationHandlers[id] = registrationHandlers[id] || [];
+        registrationHandlers[id].push(handler);
+      };
+      
+      this.removeRegistrationHandler = function(id, handler){
+        
+        if(!id){
+          throw new Error('invalid id: ', id);
+        }
+        
+        if(!handler || !_.isFunction(handler)){
+          throw new Error('invalid handler: ', handler);
+        }
+        
+        registrationHandlers[id] = registrationHandlers[id] || [];
+        
+        _.remove(registrationHandlers, function(fn){
+          return fn === handler;
+        });
+      };
 
       this.registerComponent = function(id, bridge) {
         log("registerComponent", id, bridge);
@@ -51,6 +84,14 @@ angular.module('corespring-player.services')
           log('registerComponent - set pending data: ', pending[id]);
           bridges[id].setDataAndSession(pending[id]);
           pending[id] = null;
+        }
+
+        if(registrationHandlers[id]){
+          _.forIn(registrationHandlers[id], function(h){
+            if(_.isFunction(h)){
+              h();
+            }
+          });
         }
       };
 

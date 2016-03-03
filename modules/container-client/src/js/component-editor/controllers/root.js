@@ -39,10 +39,21 @@ angular.module('corespring-singleComponentEditor.controllers')
       var logger = LogFactory.getLogger('root-controller');
 
       var configPanel;
+      
+      /**
+       * A key for use in the item model.
+       */
+      var componentKey = SINGLE_COMPONENT_KEY;
 
       $scope.playerMode = 'gather';
 
       $scope.data = {prompt: ''};
+
+      ComponentData.onComponentRegistered(componentKey, function(){
+        if($scope.item && $scope.item.components){
+          ComponentData.updateComponent(componentKey, $scope.item.components[componentKey]);
+        }
+      });
 
       $scope.$watch('data.prompt', debounce(300, function(newValue){
         if($scope.item){
@@ -54,10 +65,10 @@ angular.module('corespring-singleComponentEditor.controllers')
            * Once this is done we can update the model.
            * For now just putting in an indeterminate timeout, but we'll probably want to allow 
            * a callback mechanism to allow us to hook in to the registration event.
-           */
           $timeout(function(){
-            ComponentData.updateComponent($scope.componentKey, $scope.item.components[$scope.componentKey]);
+            ComponentData.updateComponent(componentKey, $scope.item.components[componentKey]);
           }, 300);
+          */
         }
       }, true));
 
@@ -68,15 +79,11 @@ angular.module('corespring-singleComponentEditor.controllers')
         return [
          '<div class="root">',
             prompt,
-         '  <div '+ componentType + '="" id="' + $scope.componentKey +'"></div>',
+         '  <div '+ componentType + '="" id="' + componentKey +'"></div>',
          '</div>'
         ].join('\n');
       }
 
-      /**
-       * A key for use in the item model.
-       */
-      $scope.componentKey = SINGLE_COMPONENT_KEY;
 
       $scope.closeError = function(){
         $scope.saveError = null;
@@ -87,7 +94,7 @@ angular.module('corespring-singleComponentEditor.controllers')
           components: {}
         };
 
-        out.components[$scope.componentKey] = angular.copy(configPanel.getModel());
+        out.components[componentKey] = angular.copy(configPanel.getModel());
         out.xhtml = $scope.item.xhtml;
         return out;
       };
@@ -110,13 +117,13 @@ angular.module('corespring-singleComponentEditor.controllers')
 
       $scope.setData = function(data, done){
 
-        if(!data || !data.components || !data.components[$scope.componentKey]){
-          done('Invalid data must be in the form: { components: { '+$scope.componentKey+': {...}}}');
+        if(!data || !data.components || !data.components[componentKey]){
+          done('Invalid data must be in the form: { components: { '+componentKey+': {...}}}');
           return;
         }
 
-        ComponentData.deleteComponent($scope.componentKey);
-        $scope.item.components[$scope.componentKey] = data.components[$scope.componentKey];
+        ComponentData.deleteComponent(componentKey);
+        $scope.item.components[componentKey] = data.components[componentKey];
         $scope.item.xhtml = data.xhtml;
 
         readPrompt($scope.item.xhtml, function(err, prompt){
@@ -124,8 +131,8 @@ angular.module('corespring-singleComponentEditor.controllers')
             done(err);
           } else {
             $scope.data.prompt = prompt;
-            configPanel.setModel($scope.item.components[$scope.componentKey]);
-            ComponentData.updateComponent($scope.componentKey, $scope.item.components[$scope.componentKey]);
+            configPanel.setModel($scope.item.components[componentKey]);
+            ComponentData.updateComponent(componentKey, $scope.item.components[componentKey]);
             done(null);
           }
         });
@@ -134,7 +141,7 @@ angular.module('corespring-singleComponentEditor.controllers')
       $scope.$on('registerConfigPanel', function(a, id, configPanelBridge) {
         logger.debug('registerConfigPanel', id);
         configPanel = configPanelBridge;
-        configPanel.setModel($scope.item.components[$scope.componentKey]);
+        configPanel.setModel($scope.item.components[componentKey]);
         ComponentData.setModel($scope.item.components);
         $timeout(function(){ 
           ComponentData.setModel($scope.item.components);
@@ -181,18 +188,18 @@ angular.module('corespring-singleComponentEditor.controllers')
           });
 
           Msgr.on('getComponentKey', function(err, done){
-            done(null, $scope.componentKey);
+            done(null, componentKey);
           });
 
           //Preview mode
           Msgr.on('showPreview', function(show){
-            $scope.item.components[$scope.componentKey] = $scope.getData();
+            $scope.item.components[componentKey] = $scope.getData();
             $scope.$broadcast('showPreview', show);
           });
           
           //Tabs mode 
           Msgr.on('showPane', function(pane){
-            $scope.item.components[$scope.componentKey] = $scope.getData();
+            $scope.item.components[componentKey] = $scope.getData();
             $scope.$broadcast('showPane', pane);
           });
           
@@ -225,14 +232,14 @@ angular.module('corespring-singleComponentEditor.controllers')
 
           initialData.xhtml = data.xhtml ? data.xhtml : initialData.xhtml; 
           var defaultData = ComponentDefaultData.getDefaultData(COMPONENT_EDITOR.componentType);
-          initialData.components[$scope.componentKey] = data.componentModel ? data.componentModel : defaultData;
+          initialData.components[componentKey] = data.componentModel ? data.componentModel : defaultData;
           
           $scope.showNavigation = data.showNavigation === true ? true : false;
           $scope.item = angular.copy(initialData);
 
           var html = [
             '<div class="config-panel-container" navigator="">',
-              '<' + componentType + '-config id="' + $scope.componentKey +'"></' + componentType +'-config>',
+              '<' + componentType + '-config id="' + componentKey +'"></' + componentType +'-config>',
             '</div>'].join('\n');
 
           $('.configuration').html(html);
