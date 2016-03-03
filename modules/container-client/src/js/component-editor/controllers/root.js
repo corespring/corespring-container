@@ -3,6 +3,7 @@ angular.module('corespring-singleComponentEditor.controllers')
     '$scope',
     '$timeout',
     '$compile',
+    'debounce',
     'LogFactory',
     'iFrameService',
     'Msgr',
@@ -18,6 +19,7 @@ angular.module('corespring-singleComponentEditor.controllers')
       $scope,
       $timeout,
       $compile,
+      debounce,
       LogFactory,
       iFrameService,
       Msgr, 
@@ -42,15 +44,22 @@ angular.module('corespring-singleComponentEditor.controllers')
 
       $scope.data = {prompt: 'hi there'};
 
-      $scope.$watch('data.prompt', function(newValue){
+      $scope.$watch('data.prompt', debounce(1000, function(newValue){
         if($scope.item){
           $scope.item.xhtml = getXhtml(newValue);
 
+          /**
+           * the xhtml updated is going to trigger a $compile in the preview player. 
+           * the compile is going get the component to register with the ComponnentRegister.
+           * Once this is done we can update the model.
+           * For now just putting in an indeterminate timeout, but we'll probably want to allow 
+           * a callback mechanism to allow us to hook in to the registration event.
+           */
           $timeout(function(){
             ComponentData.updateComponent($scope.componentKey, $scope.item.components[$scope.componentKey]);
           }, 1000);
         }
-      }, true);
+      }, true));
 
       function getXhtml(prompt){
 

@@ -33,11 +33,6 @@ exports.js =
   src: _.union(coreLibs.js, core.src, editorSrcs)
   dest: 'js/single-component-editor-prod.js'
   libs: [
-    'bower_components/ace-builds/src-min-noconflict/ace.js',
-    'bower_components/ace-builds/src-min-noconflict/mode-json.js',
-    'bower_components/ace-builds/src-min-noconflict/mode-xml.js',
-    'bower_components/ace-builds/src-min-noconflict/theme-twilight.js',
-    'bower_components/ace-builds/src-min-noconflict/worker-json.js',
     'bower_components/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML'
   ]
   report: "#{baseName}-js-report.json"
@@ -63,7 +58,7 @@ exports.ngModules = _.union(player.ngModules, [
   'corespring-singleComponentEditor.directives'
   'corespring-singleComponentEditor.services',
   'corespring.wiggi-wiz',
-  'ui.ace',
+  'rt.debounce',
   'ui.bootstrap.tabs',
   'wiggi-wiz.features.core'
 ])
