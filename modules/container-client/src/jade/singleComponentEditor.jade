@@ -41,7 +41,7 @@ block content
   |  !{versionInfo}
   | -->
 
-  .root(ng-controller="Root", dimension-propagator='')
+  .root(ng-controller="Root", dimension-propagator='', modal-positioner='')
 
     if previewMode == "preview-right"
 
@@ -150,11 +150,12 @@ block after-main-script
       }
 
       angular.module(app)
-        //TODO: STATIC_PATHS isnt relevent to the component editor
+        //TODO: STATIC_PATHS isnt relevant to the component editor
         .constant('STATIC_PATHS', editorOptions.staticPaths || {}) 
-        //TODO:  DEBOUNCE_IN_MILLIS isnt relevent to the component editor
+        //TODO:  DEBOUNCE_IN_MILLIS isnt relevant to the component editor
         .constant('DEBOUNCE_IN_MILLIS', editorOptions.debounceInMillis || 0 ) 
         .constant('UPLOAD_ENDPOINT', uploadEndpoint)
         .constant('SINGLE_COMPONENT_KEY', editorOptions.singleComponentKey)
+        .config(configModals)
         .config(['wiggiWizConfigProvider', 'UPLOAD_ENDPOINT', setUpWiggiWiz]);
     })(this);
