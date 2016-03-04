@@ -9,7 +9,7 @@ describe('editor root', function() {
   var ConfigurationService = {
     setConfig: jasmine.createSpy('setConfig')
   };
-  
+
   var ItemService, MetadataService, LogFactory, msgrOnHandlers, Msgr;
 
   var iFrameService = {
@@ -69,7 +69,6 @@ describe('editor root', function() {
     $provide.value('WiggiDialogLauncher',  WiggiDialogLauncher);
     $provide.value('EditorDialogTemplate', EditorDialogTemplate);
     $provide.value('editorDebounce', editorDebounce);
-
   }));
 
   function render() {

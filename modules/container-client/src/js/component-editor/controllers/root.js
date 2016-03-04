@@ -4,6 +4,7 @@ angular.module('corespring-singleComponentEditor.controllers')
     '$timeout',
     '$compile',
     'debounce',
+    '$document',
     'LogFactory',
     'iFrameService',
     'Msgr',
@@ -20,6 +21,7 @@ angular.module('corespring-singleComponentEditor.controllers')
       $timeout,
       $compile,
       debounce,
+      $document,
       LogFactory,
       iFrameService,
       Msgr, 
@@ -40,6 +42,12 @@ angular.module('corespring-singleComponentEditor.controllers')
 
       var configPanel;
       
+      $scope.dimensionUpdate = function(a) {
+        $document.trigger('lockfixed:pageupdate');
+      };
+
+      $scope.playerMode = 'gather';
+
       /**
        * A key for use in the item model.
        */

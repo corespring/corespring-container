@@ -7,7 +7,7 @@ describe('component-editor Root', function(){
 
 
   beforeEach(module(function($provide) {
-    
+
     var mocks = org.corespring.mocks.editor;
     
     debounce = jasmine.createSpy('debounce').and.callFake(function(fn){
@@ -15,6 +15,7 @@ describe('component-editor Root', function(){
     });  
 
     iFrameService=  mocks.iFrameService();
+
     Msgr = mocks.Msgr();
     $provide.value('$log', mocks.$log());
     $provide.value('$timeout', mocks.$timeout());
@@ -43,10 +44,11 @@ describe('component-editor Root', function(){
     beforeEach(function(){
       controller('Root', {$scope: scope});
     });
+
   });
 
   describe('in iframe', function(){
-  
+
 
     var msgrHandlers = {};
 
@@ -65,24 +67,34 @@ describe('component-editor Root', function(){
       function assertMsgrOn(key, fnMatcher){
         fnMatcher = fnMatcher || jasmine.any(Function);
         it('calls Msgr.on(' + key +')', function(){
-           expect(Msgr.on).toHaveBeenCalledWith(key, fnMatcher);
-        });
+         expect(Msgr.on).toHaveBeenCalledWith(key, fnMatcher);
+       });
       }
 
       beforeEach(function(){
         controller('Root', {$scope: scope});
       });
-      
+
       assertMsgrOn('initialise');
       assertMsgrOn('getData');
       assertMsgrOn('showNavigation');
       assertMsgrOn('showPane');
       assertMsgrOn('getComponentKey');
       assertMsgrOn('setData');
-      
+
       it('calls Msgr.send(ready)', function(){
         expect(Msgr.send).toHaveBeenCalledWith('ready');
       });
+
+      describe('dimension update', function(){
+
+        it('triggers lockfixed:pageupdate', inject(function($document){
+          $document.trigger = jasmine.createSpy();
+          scope.dimensionUpdate({});
+          expect($document.trigger).toHaveBeenCalled();
+        }));
+      });
     });
+
   });
 });
