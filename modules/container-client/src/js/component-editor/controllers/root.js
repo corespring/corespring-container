@@ -3,6 +3,7 @@ angular.module('corespring-singleComponentEditor.controllers')
     '$scope',
     '$timeout',
     '$compile',
+    '$document',
     'LogFactory',
     'iFrameService',
     'Msgr',
@@ -18,6 +19,7 @@ angular.module('corespring-singleComponentEditor.controllers')
       $scope,
       $timeout,
       $compile,
+      $document,
       LogFactory,
       iFrameService,
       Msgr, 
@@ -37,6 +39,10 @@ angular.module('corespring-singleComponentEditor.controllers')
       var logger = LogFactory.getLogger('root-controller');
 
       var configPanel;
+
+      $scope.dimensionUpdate = function(a) {
+        $document.trigger('lockfixed:pageupdate');
+      };
 
       $scope.playerMode = 'gather';
 

@@ -249,6 +249,7 @@ module.exports = (grunt) ->
   grunt.registerTask('default', ['stage'])
   grunt.registerTask('directive-templates', ['jade:directives', 'ngtemplates'])
   grunt.registerTask('test', ['lcd', 'prepPlayerLauncher', 'directive-templates', 'jshint', 'jasmine:unit'])
+  grunt.registerTask('testNoHint', ['prepPlayerLauncher', 'directive-templates', 'jasmine:unit'])
   grunt.registerTask('stage', 'Work with the play stage task',
     ['mk-css',
     'component-version-info'
