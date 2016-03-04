@@ -8,11 +8,22 @@ private object Helpers {
   implicit def toMethodAndUrl(c: Call): JsValueWrapper = Json.obj("method" -> c.method.toLowerCase, "url" -> c.url)
 }
 
+import Helpers._
+
 case class MainEndpoints(
                           load: Call,
                           saveSubset: Call,
                           saveXhtmlAndComponents: Call,
                           save: Option[Call])
+{
+  val json = Json.obj(
+    "load" -> load,
+    "saveSubset" -> saveSubset,
+    "saveXhtmlAndComponents" -> saveXhtmlAndComponents
+  ) ++ save.map(s => Json.obj("save" -> s)).getOrElse(Json.obj())
+
+  val jsonString = Json.stringify(json)
+}
 
 case class ComponentsAndWidgets(components: JsValue, widgets: JsValue)
 

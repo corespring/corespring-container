@@ -54,7 +54,7 @@ object DraftEditorEndpoints extends Endpoints {
   def main(id: String) = MainEndpoints(
     load = resourceRoutes.ItemDraft.load(id),
     saveSubset = resourceRoutes.ItemDraft.saveSubset(id, ":subset"),
-    saveXhtmlAndComponents = resourceRoutes.ItemDraft.saveXhtmlAndComponents(itemId),
+    saveXhtmlAndComponents = resourceRoutes.ItemDraft.saveXhtmlAndComponents(id),
     save = Some(resourceRoutes.ItemDraft.save(id)))
 }
 

@@ -13,13 +13,7 @@ compAndWidgets: org.corespring.container.client.views.models.ComponentsAndWidget
   angular.module('@namespace', []);
 
   angular.module('@namespace').factory('ItemUrls', [ function($http){
-    return {
-      load: @toMethodAndUrl(mainEndpoints.load),
-      @mainEndpoints.save.map { save =>
-        save: @toMethodAndUrl(save),
-      }
-      saveSubset: @toMethodAndUrl(mainEndpoints.saveSubset)
-    }
+    return @mainEndpoints.jsonString;
   }]);
 
   angular.module('@namespace').factory('SupportingMaterialUrls', [function(){

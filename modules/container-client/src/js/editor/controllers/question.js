@@ -112,13 +112,13 @@ angular.module('corespring-editor.controllers')
 
       $scope.onItemSaved = function() {};
 
-      function saveXhtmlAndComponents(){
+      var saveXhtmlAndComponents = EditorChangeWatcher.debounce(function(){
         ItemService.saveXhtmlAndComponents(
           $scope.item.xhtml, 
           $scope.serialize($scope.item.components),
           $scope.onItemSaved,
           $scope.onItemSaveError);
-      }
+      }, 300);
 
       $scope.getWiggiWizElement = function() {
         return angular.element('.wiggi-wiz', $element);

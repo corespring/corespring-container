@@ -72,7 +72,7 @@ angular.module('corespring-editor.services').service('ItemService', [
 
         var data = {
           xhtml: xhtml,
-          compoents: components
+          components: components
         };
 
         _save(call, data, onSuccess, onFailure);
