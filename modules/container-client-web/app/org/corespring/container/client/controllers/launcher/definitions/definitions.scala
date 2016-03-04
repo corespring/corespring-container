@@ -1,6 +1,7 @@
 package org.corespring.container.client.controllers.launcher
 
 import org.corespring.container.client.V2PlayerConfig
+import org.corespring.container.client.controllers.resources.SingleComponent
 import org.corespring.container.client.hooks.PlayerJs
 import play.api.http.ContentTypes
 import play.api.libs.json.JsObject
@@ -167,6 +168,7 @@ private[launcher] case class ComponentEditor(builder: JsBuilder, queryParams: Ma
   }
 
   override lazy val options: JsObject = obj(
+    "singleComponentKey" -> SingleComponent.Key,
     "paths" -> obj(
       "standaloneEditor" -> r.componentEditor.load(":componentType"),
       "itemEditor" -> obj(

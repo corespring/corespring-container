@@ -1,6 +1,9 @@
 var UrlBuilder = require('url-builder');
 
 function Helper(){
+
+  this.singleComponentKey = require('launch-config').singleComponentKey;
+
   var instanceCallbackHandler = require('callback-utils').instanceCallbackHandler; 
   this.instanceCallbackHandler = instanceCallbackHandler;
 
@@ -131,16 +134,21 @@ function CorespringBound(bindType, options, errorCallback){
     return u.replace(':' + bindType + 'Id', options[bindType + 'Id'].toString());
   }
 
-  this.launchComponentEditorInstance = function(item, launcher, done){
-
+  this.launchComponentEditorInstance = function(item, componentKey, launcher, done){
+    
     var keys = Object.keys(item.components || {});
 
     if(keys.length > 1 || keys.length === 0){
       errorCallback(errorCodes.ONLY_ONE_COMPONENT_ALLOWED);
       return;
     }
+    
+    if(!item.components[componentKey]){
+      errorCallback(errorCodes.MISSING_SINGLE_COMPONENT_KEY(componentKey));
+      return;
+    }
 
-    var comp = item.components[keys[0]];
+    var comp = item.components[componentKey];
     var uploadCall = launcher.loadCall( bindType + 'Editor.singleComponent.upload', addId);
 
     if(!uploadCall.url){
@@ -156,16 +164,7 @@ function CorespringBound(bindType, options, errorCallback){
     }
 
     var initialData = helper.launchData(options, uploadCall, item.xhtml, comp);
-    
-    var instance = launcher.loadInstance(call, options.queryParams || {}, initialData, function(instance){
-      instance.send('getComponentKey', function(err, key){
-        if(err){
-          errorCallback(errorCodes.INTERNAL_ERROR('getComponentKey'));
-        } else {
-          done(null, {instance: instance, componentKey: key});
-        }
-      });
-    });
+    var instance = launcher.loadInstance(call, options.queryParams || {}, initialData);
     return instance;
   };
 
@@ -175,8 +174,6 @@ function CorespringBound(bindType, options, errorCallback){
       return u.replace(':' + bindType + 'Id', id);
     });
 
-    // var componentData = {};
-    // componentData[componentKey] = data;
     helper.jsonXhr(call, data, done);
   };
 }
@@ -185,7 +182,7 @@ function Item(element, options, errorCallback) {
   var Launcher = require('client-launcher');
   var launcher = new Launcher(element, options, errorCallback, options.autosizeEnabled);
   var itemBound = new CorespringBound('item', options, errorCallback);
-  var instance, componentKey;
+  var instance;
 
   function createItem(componentType, done){
 
@@ -232,9 +229,7 @@ function Item(element, options, errorCallback) {
   }
 
   function launchComponentEditorInstance(item){
-    instance = itemBound.launchComponentEditorInstance(item, launcher, function(err, data){
-      componentKey = data.componentKey;
-    });
+    instance = itemBound.launchComponentEditorInstance(item, helper.singleComponentKey, launcher);
     helper.addCoreMethods.bind(this)(instance);
   }
 
@@ -286,7 +281,7 @@ function Draft(element, options, errorCallback) {
   var DraftId = require('draft-id');
   var draftBound = new CorespringBound('draft', options, errorCallback);
   var draft = require('draft');
-  var instance, componentKey;
+  var instance;
   
   function createItemAndDraft(componentType, callback){
     var key = 'draftEditor.singleComponent.createWithSingleComponent';
@@ -314,9 +309,7 @@ function Draft(element, options, errorCallback) {
   }
 
   function launchComponentEditorInstance(item){
-    instance = draftBound.launchComponentEditorInstance(item, launcher, function(err, data){
-        componentKey = data.componentKey;
-    });
+    instance = draftBound.launchComponentEditorInstance(item, helper.singleComponentKey, launcher);
     helper.addCoreMethods.bind(this)(instance);
   }
 
