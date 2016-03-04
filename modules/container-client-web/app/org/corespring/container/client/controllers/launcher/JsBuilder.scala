@@ -15,7 +15,7 @@ private[corespring] class JsBuilder(val resourcePath : ResourcePath) extends JsR
 
     val corePaths = {
       Some("container-client/bower_components/msgr.js/dist/msgr.js") ++
-        Seq("logger", "callback-utils", "error-codes", "instance", "client-launcher", "url-builder", "object-id", "draft-id", "config-logging", "config-modals")
+        Seq("logger", "callback-utils", "error-codes", "instance", "client-launcher", "url-builder", "object-id", "draft-id")
         .map(s => s"$s.js")
         .map(lib)
     }
