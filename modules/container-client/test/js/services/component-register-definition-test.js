@@ -1,7 +1,8 @@
 describe('ComponentRegisterDefinition', function() {
 
   var componentRegister;
-
+  var id = 'id';
+  var unregisteredId = '_id';
   var mockSession = {this: 'is', a: 'mock'};
 
   var mockComponentMethods = {
@@ -44,9 +45,14 @@ describe('ComponentRegisterDefinition', function() {
 
   afterEach(resetMocks);
 
+  var component;
+
+  beforeEach(function(){
+    component = new MockComponent();
+  });
+
   describe('registerComponent', function() {
     var editable = true;
-    var component = new MockComponent();
     var answerChangedHandler = function() {};
   
     beforeEach(function(){
@@ -88,33 +94,9 @@ describe('ComponentRegisterDefinition', function() {
       });
 
     });
-
-  });
-
-
-  describe('setDataAndSessions', function() {
-    var component = new MockComponent();
-    var id = 'id';
-
-    var data = {}, datum = {this: 'is', the: 'data'};
-    data[id] = datum;
-    var sessions = {}, session = {this: 'is', a: 'session'};
-    sessions[id] = session;
-
-    beforeEach(function() {
-      componentRegister.registerComponent(id, component);
-      componentRegister.setDataAndSessions(data, sessions);
-    });
-
-    it('should set data and session on registered component', function() {
-      expect(mockComponentMethods.setDataAndSession).toHaveBeenCalledWith({data: datum, session: session});
-    });
-
   });
 
   describe('setSingleDataAndSession', function() {
-    var component = new MockComponent();
-    var id = 'id';
     var data = {this: 'is', the: 'data'};
     var session = {this: 'is', the: 'session'};
 
@@ -130,8 +112,6 @@ describe('ComponentRegisterDefinition', function() {
   });
 
   describe('getSessions', function() {
-    var id = 'id';
-    var component = new MockComponent();
     var expectedSessions = {};
     expectedSessions[id] = mockSession;
 
@@ -148,9 +128,6 @@ describe('ComponentRegisterDefinition', function() {
   });
 
   describe('deregisterComponent', function() {
-    var id = 'id';
-    var component = new MockComponent();
-
     beforeEach(function() {
       componentRegister.registerComponent(id, component);
       componentRegister.deregisterComponent(id);
@@ -163,10 +140,6 @@ describe('ComponentRegisterDefinition', function() {
   });
 
   describe('hasComponent', function() {
-    var id = 'id';
-    var unregisteredId = '_id';
-    var component = new MockComponent();
-
     beforeEach(function() {
       componentRegister.registerComponent(id, component);
     });
@@ -186,9 +159,6 @@ describe('ComponentRegisterDefinition', function() {
   });
 
   describe('resetStash', function() {
-    var id = 'id';
-    var component = new MockComponent();
-
     beforeEach(function() {
       componentRegister.registerComponent(id, component);
       componentRegister.resetStash();
@@ -201,10 +171,6 @@ describe('ComponentRegisterDefinition', function() {
   });
 
   describe('isAnswerEmpty', function() {
-    var id = 'id';
-    var unregisteredId = '_id';
-    var component = new MockComponent();
-
     beforeEach(function() {
       componentRegister.registerComponent(id, component);
     });
@@ -220,7 +186,6 @@ describe('ComponentRegisterDefinition', function() {
   });
 
   describe('setOutcomes', function() {
-    var id = 'id';
     var component = new MockComponent();
     var outcomes = {};
     outcomes[id] = {some: 'kind', of: 'outcome'};
@@ -237,7 +202,6 @@ describe('ComponentRegisterDefinition', function() {
   });
 
   describe('reset', function() {
-    var id = 'id';
     var component = new MockComponent();
 
     beforeEach(function() {
@@ -273,8 +237,6 @@ describe('ComponentRegisterDefinition', function() {
   });
 
   describe('setEditable', function() {
-    var id = 'id';
-    var component = new MockComponent();
     var editable = false;
 
     beforeEach(function() {
@@ -288,8 +250,6 @@ describe('ComponentRegisterDefinition', function() {
   });
 
   describe('setMode', function() {
-    var id = 'id';
-    var component = new MockComponent();
     var mode = 'evaluate';
 
     beforeEach(function() {

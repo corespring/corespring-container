@@ -3,16 +3,22 @@ describe('component-editor Root', function(){
   beforeEach(angular.mock.module('wiggi-wiz.constants'));
   beforeEach(angular.mock.module('corespring-singleComponentEditor.controllers'));
 
-  var scope, rootScope, controller, Msgr, iFrameService;
+  var scope, rootScope, controller, Msgr, iFrameService, debounce;
+
 
   beforeEach(module(function($provide) {
     
     var mocks = org.corespring.mocks.editor;
-   
+    
+    debounce = jasmine.createSpy('debounce').and.callFake(function(fn){
+      return fn;
+    });  
+
     iFrameService=  mocks.iFrameService();
     Msgr = mocks.Msgr();
     $provide.value('$log', mocks.$log());
     $provide.value('$timeout', mocks.$timeout());
+    $provide.value('debounce', debounce);
     $provide.value('COMPONENT_EDITOR', {componentType: 'componentType'});
     $provide.value('ComponentData', mocks.ComponentData());
     $provide.value('ComponentDefaultData', mocks.ComponentDefaultData());
@@ -37,11 +43,6 @@ describe('component-editor Root', function(){
     beforeEach(function(){
       controller('Root', {$scope: scope});
     });
-
-    it('sets componentKey', function(){
-      expect(scope.componentKey).toEqual('compKey');
-    });
-    
   });
 
   describe('in iframe', function(){
@@ -82,27 +83,6 @@ describe('component-editor Root', function(){
       it('calls Msgr.send(ready)', function(){
         expect(Msgr.send).toHaveBeenCalledWith('ready');
       });
-
-    });
-
-    describe('Msgr.on(getComponentKey)', function(){
-
-      it('calls the callback with the key', function(done){
-        controller('Root', {$scope: scope}); 
-        msgrHandlers.getComponentKey(null, function(err, key){
-          expect(key).toEqual(scope.componentKey);
-          done();
-        });
-      });
-    });
-
-    it('broadcasts "client-side-preview.reset-player" when item changes', function(){
-      var handler = jasmine.createSpy('contentAddedHandler');
-      scope.$on('client-side-preview.reset-player', handler);
-      scope.item.test = "something";
-      scope.$digest();
-      expect(handler).toHaveBeenCalled();
     });
   });
-
 });

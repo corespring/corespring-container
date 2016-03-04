@@ -1,7 +1,6 @@
 package org.corespring.container.client.controllers.resources
 
-import java.io.{ ByteArrayInputStream, BufferedInputStream, FileInputStream, File }
-import java.nio.charset.Charset
+import java.io.{ ByteArrayInputStream, File, FileInputStream }
 
 import org.apache.commons.io.{ Charsets, IOUtils }
 import org.corespring.container.client.controllers.resources.CoreSupportingMaterials.Errors
@@ -12,16 +11,21 @@ import org.specs2.matcher.{ Expectable, Matcher }
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
+import org.specs2.time.NoTimeConversions
 import play.api.libs.Files
 import play.api.libs.json.{ JsValue, Json }
 import play.api.mvc.MultipartFormData.FilePart
 import play.api.mvc._
-import play.api.test.{ FakeHeaders, PlaySpecification, FakeRequest }
+import play.api.test.{ FakeHeaders, FakeRequest, PlaySpecification }
 
-import scala.concurrent.{ Future, ExecutionContext }
-import scalaz.Success
+import scala.concurrent.{ Await, Future }
+import scala.concurrent.duration._
 
-class CoreSupportingMaterialsTest extends Specification with Mockito with PlaySpecification {
+class CoreSupportingMaterialsTest
+  extends Specification
+  with Mockito
+  with PlaySpecification
+  with NoTimeConversions {
 
   lazy val testFile = {
     val r = this.getClass.getResource("/image.png")
@@ -88,6 +92,8 @@ class CoreSupportingMaterialsTest extends Specification with Mockito with PlaySp
     FakeRequest("", "", FakeHeaders(), AnyContentAsMultipartFormData(form))
   }
 
+  def waitFor[A](f: Future[A]): A = Await.result(f, 1.second)
+
   "createSupportingMaterial" should {
 
     class createJson extends testScope {
@@ -114,7 +120,8 @@ class CoreSupportingMaterialsTest extends Specification with Mockito with PlaySp
 
     "call hooks.create" in new createJson {
       val request = req(Json.obj("name" -> "name", "materialType" -> "type", "html" -> "<div>hi</div>"))
-      createSupportingMaterial("id")(request)
+      val result = createSupportingMaterial("id")(request)
+      waitFor(result)
       val captor = capture[CreateHtmlMaterial]
       there was one(materialHooks).create(e("id"), captor)(any[RequestHeader])
       captor.value.name === "name"
@@ -159,7 +166,7 @@ class CoreSupportingMaterialsTest extends Specification with Mockito with PlaySp
     "uses the file name if there is no 'name' in the form" in new create {
       val data = mkFormWithFile(Map("materialType" -> "Rubric"))
       val request = req(data)
-      createSupportingMaterialFromFile("id")(request)
+      waitFor(createSupportingMaterialFromFile("id")(request))
       val captor = capture[CreateBinaryMaterial]
       there was one(materialHooks).create(e("id"), captor)(any[RequestHeader])
       captor.value.name === "image.png"
@@ -168,7 +175,7 @@ class CoreSupportingMaterialsTest extends Specification with Mockito with PlaySp
     "uses the 'name' parameter in the form" in new create {
       val data = mkFormWithFile(Map("materialType" -> "Rubric", "name" -> "my-material"))
       val request = req(data)
-      createSupportingMaterialFromFile("id")(request)
+      waitFor(createSupportingMaterialFromFile("id")(request))
       val captor = capture[CreateBinaryMaterial]
       there was one(materialHooks).create(e("id"), captor)(any[RequestHeader])
       captor.value.name === "my-material"
@@ -208,7 +215,7 @@ class CoreSupportingMaterialsTest extends Specification with Mockito with PlaySp
 
     "call hooks.updateContent" in new update {
       val request = FakeRequest("", "", FakeHeaders(), AnyContentAsText("hi"))
-      updateSupportingMaterialContent("id", "materialName", "filename")(request)
+      waitFor(updateSupportingMaterialContent("id", "materialName", "filename")(request))
       there was one(materialHooks).updateContent("id", "materialName", "filename", "hi")(request)
     }
 

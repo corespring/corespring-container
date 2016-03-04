@@ -46,7 +46,8 @@
     return {
       setModel: jasmine.createSpy('setModel'),
       registerComponent: jasmine.createSpy('registerComponent'),
-      setEditable: jasmine.createSpy('setEditable')
+      setEditable: jasmine.createSpy('setEditable'),
+      onComponentRegistered: jasmine.createSpy('onComponentRegistered')
     };
   };
 
@@ -145,6 +146,10 @@
   };
 
   e.EditorChangeWatcher = function(){ 
+    this.debounce = jasmine.createSpy('debounce').and.callFake(function(fn){
+      return fn;
+    });
+    
     this.makeWatcher = jasmine.createSpy('makeWatcher').and.callFake(function(part, fn, scope){
       return function(newValue, oldValue){
         if(newValue && newValue !== oldValue){

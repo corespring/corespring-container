@@ -2,7 +2,9 @@ var UrlBuilder = require('url-builder');
 
 function Helper(){
 
-  this.singleComponentKey = require('launch-config').singleComponentKey;
+  this.singleComponentKey = function() {
+    return require('launch-config').singleComponentKey;
+  };
 
   var instanceCallbackHandler = require('callback-utils').instanceCallbackHandler; 
   this.instanceCallbackHandler = instanceCallbackHandler;
@@ -229,7 +231,7 @@ function Item(element, options, errorCallback) {
   }
 
   function launchComponentEditorInstance(item){
-    instance = itemBound.launchComponentEditorInstance(item, helper.singleComponentKey, launcher);
+    instance = itemBound.launchComponentEditorInstance(item, helper.singleComponentKey(), launcher);
     helper.addCoreMethods.bind(this)(instance);
   }
 
@@ -309,7 +311,7 @@ function Draft(element, options, errorCallback) {
   }
 
   function launchComponentEditorInstance(item){
-    instance = draftBound.launchComponentEditorInstance(item, helper.singleComponentKey, launcher);
+    instance = draftBound.launchComponentEditorInstance(item, helper.singleComponentKey(), launcher);
     helper.addCoreMethods.bind(this)(instance);
   }
 

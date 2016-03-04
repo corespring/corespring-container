@@ -1,12 +1,10 @@
 describe('component-editor', function () {
     
-  var launcher, instance, Def, errorCodes, modules; 
+  var launcher, instance, Def, errorCodes, modules, sendResults = {}; 
 
   beforeEach(function () {
-    corespring.mock.modules['launch-config'] = {};
-
-    sendResults = {
-      getComponentKey: 'singleComponent'
+    corespring.mock.modules['launch-config'] = {
+      singleComponentKey: 'singleComponent'
     };
 
     instance = new org.corespring.mocks.launcher.MockInstance();
@@ -145,7 +143,7 @@ describe('component-editor', function () {
       var onSaved;
       
       var loadKey = name + 'Editor.singleComponent.loadData';
-      var saveKey = name + 'Editor.singleComponent.saveComponents'; 
+      var saveKey = name + 'Editor.singleComponent.saveXhtmlAndComponents'; 
       beforeEach(function(){
 
         launcher.loadCall.and.callFake(function(key){
@@ -153,14 +151,14 @@ describe('component-editor', function () {
         });
         
         data = {};
-        data[loadKey + '.success'] = { 
+        data[loadKey + '.success'] = {
             components: {
             singleComponent: {}
           }
         };
         
         data[saveKey + '.success'] = { 
-            components: {
+            components: { 
             singleComponent: {}
           }
         };
@@ -175,8 +173,11 @@ describe('component-editor', function () {
           }
         });
         
-        sendResults.getData = {
-          componentType: 'type'
+        sendResults.getData = { 
+          xhtml: '<h1>mocked-get-data</h1>', 
+          components: {
+            componentType: 'type'
+          }
         };
 
         onSaved = jasmine.createSpy('onSaved');
@@ -194,13 +195,15 @@ describe('component-editor', function () {
       
       it('calls $.ajax', function(){
         initAndSave();
-        var expected = {type: 'GET', 
-        url: saveKey, 
-        contentType: 'application/json', 
-        data: '{"singleComponent":{"componentType":"type"}}', 
-        success: jasmine.any(Function), 
-        error: jasmine.any(Function), 
-        dataType: 'json' };
+        var expected = {
+          type: 'GET', 
+          url: saveKey, 
+          contentType: 'application/json', 
+          data: JSON.stringify(sendResults.getData),
+          success: jasmine.any(Function), 
+          error: jasmine.any(Function), 
+          dataType: 'json'
+        };
         expect($.ajax).toHaveBeenCalledWith(expected);
       });
       
@@ -313,8 +316,7 @@ describe('component-editor', function () {
           uploadMethod: 'GET', 
           xhtml: undefined, 
           componentModel: {}
-        }, 
-        jasmine.any(Function));
+        });
     });
     
     assertSave('Item');
@@ -333,7 +335,7 @@ describe('component-editor', function () {
       Def = modules.Draft;
       
       $.ajax = jasmine.createSpy('$.ajax').and.callFake(function(opts){
-        opts.success({components: { 1: {}}});
+        opts.success({components: { singleComponent: {}}});
       });
     });
 
@@ -364,8 +366,7 @@ describe('component-editor', function () {
           uploadUrl: 'draft', 
           uploadMethod: 'GET',
           xhtml: undefined, 
-          componentModel: {}}, 
-          jasmine.any(Function));
+          componentModel: {}});
       });
 
     });

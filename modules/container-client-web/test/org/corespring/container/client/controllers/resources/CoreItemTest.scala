@@ -8,7 +8,7 @@ import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
 import play.api.http.HeaderNames
 import play.api.libs.json.{ JsObject, JsValue, Json }
-import play.api.mvc.{ AnyContent, AnyContentAsJson, Request }
+import play.api.mvc.{ RequestHeader, AnyContent, AnyContentAsJson, Request }
 import play.api.test.{ FakeHeaders, FakeRequest }
 import play.api.test.Helpers._
 
@@ -77,13 +77,13 @@ class CoreItemTest extends Specification with Mockito {
     }
 
     "return hooks.saveXhtmlAndComponents error" in new scope {
-      hooks.saveXhtmlAndComponents(any[String], any[String], any[JsValue]) returns Future.successful(Left(500, "Hook err"))
+      hooks.saveXhtmlAndComponents(any[String], any[String], any[JsValue])(any[RequestHeader]) returns Future.successful(Left(500, "Hook err"))
       val result = saveXhtmlAndComponents("id")(req(Json.obj("xhtml" -> "<div></div>", "components" -> Json.obj())))
       contentAsJson(result) must_== Json.obj("error" -> "Hook err")
     }
 
     "return hooks.saveXhtmlAndComponents result" in new scope {
-      hooks.saveXhtmlAndComponents(any[String], any[String], any[JsValue]) returns Future.successful(Right(Json.obj("success" -> true)))
+      hooks.saveXhtmlAndComponents(any[String], any[String], any[JsValue])(any[RequestHeader]) returns Future.successful(Right(Json.obj("success" -> true)))
       val result = saveXhtmlAndComponents("id")(req(Json.obj("xhtml" -> "<div></div>", "components" -> Json.obj())))
       contentAsJson(result) must_== Json.obj("success" -> true)
     }
