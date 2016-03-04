@@ -6,10 +6,11 @@ describe('component-editor Root', function(){
   var scope, rootScope, controller, Msgr, iFrameService;
 
   beforeEach(module(function($provide) {
-    
+
     var mocks = org.corespring.mocks.editor;
-   
+
     iFrameService=  mocks.iFrameService();
+
     Msgr = mocks.Msgr();
     $provide.value('$log', mocks.$log());
     $provide.value('$timeout', mocks.$timeout());
@@ -41,11 +42,11 @@ describe('component-editor Root', function(){
     it('sets componentKey', function(){
       expect(scope.componentKey).toEqual('compKey');
     });
-    
+
   });
 
   describe('in iframe', function(){
-  
+
 
     var msgrHandlers = {};
 
@@ -71,14 +72,14 @@ describe('component-editor Root', function(){
       beforeEach(function(){
         controller('Root', {$scope: scope});
       });
-      
+
       assertMsgrOn('initialise');
       assertMsgrOn('getData');
       assertMsgrOn('showNavigation');
       assertMsgrOn('showPane');
       assertMsgrOn('getComponentKey');
       assertMsgrOn('setData');
-      
+
       it('calls Msgr.send(ready)', function(){
         expect(Msgr.send).toHaveBeenCalledWith('ready');
       });
@@ -88,12 +89,21 @@ describe('component-editor Root', function(){
     describe('Msgr.on(getComponentKey)', function(){
 
       it('calls the callback with the key', function(done){
-        controller('Root', {$scope: scope}); 
+        controller('Root', {$scope: scope});
         msgrHandlers.getComponentKey(null, function(err, key){
           expect(key).toEqual(scope.componentKey);
           done();
         });
       });
+    });
+
+    describe('dimension update', function(){
+
+      it('triggers lockfixed:pageupdate', inject(function($document){
+        $document.trigger = jasmine.createSpy();
+        scope.dimensionUpdate({});
+        expect($document.trigger).toHaveBeenCalled();
+      }));
     });
 
     it('broadcasts "client-side-preview.reset-player" when item changes', function(){

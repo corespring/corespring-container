@@ -4,7 +4,10 @@ angular.module('corespring-player.directives')
 function DimensionPropagator($log, $timeout, DimensionCalculator, Msgr) {
 
   return {
-    link: link
+    link: link,
+    scope: {
+      "dimensionPropagatorOnUpdate": "="
+    }
   };
 
   function link(scope, $element) {
@@ -34,6 +37,9 @@ function DimensionPropagator($log, $timeout, DimensionCalculator, Msgr) {
         var updatedSize = calculator.calcUpdatedDimensions(calculateSize(b));
         if (updatedSize) {
           Msgr.send('dimensionsUpdate', updatedSize);
+          if (scope.dimensionPropagatorOnUpdate) {
+            scope.dimensionPropagatorOnUpdate(updatedSize);
+          }
           counter = 0;
         } else {
           counter++;
