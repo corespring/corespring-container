@@ -54,6 +54,7 @@ exports.css =
 
 exports.ngModules = _.union(player.ngModules, [
   'corespring-common.config',
+  'corespring-editing.config',
   'corespring-common.supporting-materials',
   'corespring-editing.controllers',
   'corespring-editing.directives',

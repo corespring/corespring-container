@@ -67,7 +67,7 @@ block after-main-script
       angular.module('corespring-#{appName}').constant('STATIC_PATHS', editorOptions.staticPaths);
       angular.module('corespring-#{appName}').constant('DEBOUNCE_IN_MILLIS', editorOptions.debounceInMillis || 5000 );
       angular.module('corespring-#{appName}').config(uiRouterConfig);
-      angular.module('corespring-#{appName}').config(configModals)
+      //angular.module('corespring-#{appName}').config(configModals)
       angular.module('corespring-#{appName}')
 
         .config(['$tooltipProvider', function($tooltipProvider) {
