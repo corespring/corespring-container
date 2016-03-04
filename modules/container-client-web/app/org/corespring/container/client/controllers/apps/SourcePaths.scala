@@ -12,7 +12,7 @@ trait SourcePaths {
 
 case class CssSourcePaths(src: Seq[String], dest: String, otherLibs: Seq[String]) extends SourcePaths
 
-case class NgSourcePaths(src: Seq[String], dest: String, otherLibs: Seq[String], ngModules: Seq[String]) extends SourcePaths
+case class NgSourcePaths(src: Seq[String], dest: String, otherLibs: Seq[String], ngModules: Seq[String], ngConfigModules: Seq[String]) extends SourcePaths
 
 private[apps] case class Core(src: Seq[String], dest: String, otherLibs: Seq[String])
 
@@ -29,7 +29,8 @@ object SourcePaths {
 
   def js(prefix: String, json: JsValue): NgSourcePaths = withCore[NgSourcePaths](prefix, json) { (core) =>
     val ngModules = (json \ "ngModules").asOpt[Seq[String]].getOrElse(Nil)
-    NgSourcePaths(core.src, core.dest, core.otherLibs, ngModules)
+    val ngConfigModules = (json \ "ngConfigModules").asOpt[Seq[String]].getOrElse(Nil)
+    NgSourcePaths(core.src, core.dest, core.otherLibs, ngModules, ngConfigModules)
   }
 
   def css(prefix: String, json: JsValue): CssSourcePaths = withCore[CssSourcePaths](prefix, json) { (core) =>

@@ -75,5 +75,10 @@ exports.ngModules = _.union(player.ngModules, [
   'ui.bootstrap',
   'ui.router',
   'ui.select2',
-  'ui.sortable'
+  'ui.sortable',
+  'corespring-editing.config'
+])
+
+exports.ngConfigModules = _.union(player.ngConfigModules, [
+  'corespring-editing.config'
 ])

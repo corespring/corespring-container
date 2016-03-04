@@ -11,9 +11,9 @@ buildCompress = (name, js, processFn) ->
     ext: '.js.gz'
   out
 
-buildPathReporterJs = (name, js, processFn, ngModules) ->
+buildPathReporterJs = (name, js, processFn, ngModules, ngConfigModules) ->
   out = {}
-  out["#{name}Js"] = _.extend(_.deepMapValues(_.cloneDeep(js), processFn), {ngModules: ngModules})
+  out["#{name}Js"] = _.extend(_.deepMapValues(_.cloneDeep(js), processFn), {ngModules: ngModules, ngConfigModules: ngConfigModules})
 
 buildPathReporterCss = (name, css, processFn) ->
   out = {}
@@ -37,15 +37,15 @@ outputs something like:
   }
 }
 ###
-exports.build = (name, grunt, js, css, ngModules, processFn) ->
+exports.build = (name, grunt, js, css, ngModules, ngConfigModules, processFn) ->
   out =
     uglify: buildUglifyOptions(grunt, name, js, processFn)
     compress: {}
     pathReporter: {}
 
   out.compress["#{name}"] = buildCompress(name, js, processFn)
-  out.pathReporter["#{name}Js"] = buildPathReporterJs('rig', js, processFn, ngModules)
+  out.pathReporter["#{name}Js"] = buildPathReporterJs('rig', js, processFn, ngModules, ngConfigModules)
   out.pathReporter["#{name}Css"] = buildPathReporterCss('rig', css, processFn) if css?
 
-  #grunt.log.debug(name + ' app config out: ', JSON.stringify(out, null, '  '))
+  grunt.log.debug(name + ' app config out: ', JSON.stringify(out, null, '  '))
   out

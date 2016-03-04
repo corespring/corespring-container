@@ -35,3 +35,7 @@ exports.ngModules = _.union( core.ngModules, [
     'corespring-player.directives',
     'corespring-player.services'
   ])
+
+exports.ngConfigModules = _.union(core.ngConfigModules, [
+
+])

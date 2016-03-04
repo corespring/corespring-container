@@ -30,7 +30,7 @@ class RigRenderer(val pageSourceService: PageSourceService,
       "appName" -> "rig",
       "js" -> js.toArray,
       "css" -> css.toArray,
-      "ngModules" -> (sources.js.ngModules ++ bundle.ngModules).map(s => s"'$s'").mkString(","),
+      "ngModules" -> (sources.js.ngModules ++ bundle.ngModules ++ sources.js.ngConfigModules).map(s => s"'$s'").mkString(","),
       "ngServiceLogic" -> "",
       "itemJson" -> Json.prettyPrint(item))
     jadeEngine.renderJade("rig", params)

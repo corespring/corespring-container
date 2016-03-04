@@ -39,7 +39,7 @@ trait EditorRenderer extends CoreRenderer {
 
     val servicesJs = EditorServices(serverNgModuleName, mainEndpoints, supportingMaterialsEndpoints, componentsAndWidgets)
 
-    val ngModules = jsArrayString(Seq(serverNgModuleName) ++ sources.js.ngModules ++ bundle.ngModules)
+    val ngModules = jsArrayString(Seq(serverNgModuleName) ++ sources.js.ngModules ++ bundle.ngModules ++ sources.js.ngConfigModules)
 
     logger.debug(s"function=render, name=$name, ngModules=$ngModules")
 

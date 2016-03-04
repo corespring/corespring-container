@@ -38,7 +38,7 @@ class CatalogRenderer(jadeEngine: JadeEngine,
       "appName" -> name,
       "js" -> js.toArray,
       "css" -> css.toArray,
-      "ngModules" -> jsArrayString(Some(s"$name-injected") ++ sources.js.ngModules ++ bundle.ngModules),
+      "ngModules" -> jsArrayString(Some(s"$name-injected") ++ sources.js.ngModules ++ bundle.ngModules ++ sources.js.ngConfigModules),
       "ngServiceLogic" -> ngServiceLogic,
       "staticPaths" -> Json.stringify(StaticPaths.staticPaths))
     jadeEngine.renderJade(name, params)

@@ -200,7 +200,7 @@ module.exports = (grunt) ->
       "<%= common.dist %>/#{p.replace('(.min)', '')}"
 
   mkConfig = (name, config) ->
-    appConfigBuilder.build(name, grunt, config.js, config.css, config.ngModules, toTargetPath)
+    appConfigBuilder.build(name, grunt, config.js, config.css, config.ngModules, config.ngConfigModules, toTargetPath)
 
   ###
   We merge in the app specific configs - run with --debug to see the final config.
@@ -215,7 +215,7 @@ module.exports = (grunt) ->
     mkConfig('playerControls', playerControls)
   )
 
-  #grunt.log.debug(JSON.stringify(fullConfig, null, "  "))
+  grunt.log.debug(JSON.stringify(fullConfig, null, "  "))
 
   grunt.initConfig(fullConfig)
 

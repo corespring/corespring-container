@@ -67,3 +67,7 @@ exports.ngModules = _.union(player.ngModules, [
   'ui.bootstrap.tabs',
   'wiggi-wiz.features.core'
 ])
+
+exports.ngConfigModules = _.union(player.ngConfigModules, [
+  'corespring-editing.config'
+])
