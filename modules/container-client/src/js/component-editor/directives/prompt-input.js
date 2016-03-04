@@ -16,8 +16,6 @@ angular.module('corespring-singleComponentEditor.directives.input', [
             new WiggiMathJaxFeatureDef()
           ]
         };
-      },
-      post: function($scope, $el, $attr){
       }
     };
   }

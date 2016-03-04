@@ -89,7 +89,7 @@ angular.module('corespring-player.services').factory('PlayerServiceDefinition', 
         }
 
         var qs = out.join('&');
-        return path + (path.indexOf('?') == -1 ? '?' : '&') + qs;
+        return path + (path.indexOf('?') === -1 ? '?' : '&') + qs;
       }
 
     }
