@@ -72,3 +72,7 @@ exports.ngModules = _.union(player.ngModules, [
   'ui.select2',
   'ui.sortable'
 ])
+
+exports.ngConfigModules = _.union(player.ngModules, [
+
+])

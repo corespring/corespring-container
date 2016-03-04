@@ -7,4 +7,11 @@ exports.src =   [
   'js/common/**/*.js'
 ]
 
-exports.ngModules = ['corespring-common.services', 'corespring-common.directives']
+exports.ngModules = [
+  'corespring-common.directives',
+  'corespring-common.services'
+]
+
+exports.ngConfigModules = [
+  'corespring-common.config'
+]

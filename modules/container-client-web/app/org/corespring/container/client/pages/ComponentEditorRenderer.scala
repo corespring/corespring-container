@@ -53,7 +53,7 @@ class ComponentEditorRenderer(
       "previewWidth" -> previewWidth.getOrElse(null),
       "js" -> js.toArray,
       "css" -> css.toArray,
-      "ngModules" -> jsArrayString(sources.js.ngModules ++ componentBundle.ngModules),
+      "ngModules" -> jsArrayString(sources.js.ngModules ++ componentBundle.ngModules ++ sources.js.ngConfigModules),
       "ngServiceLogic" -> inlineJs,
       "componentNgModules" -> "",
       "options" -> Json.stringify(clientOptions.toJson),

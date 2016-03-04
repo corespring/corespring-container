@@ -40,3 +40,8 @@ exports.ngModules = _.union( player.ngModules, [
   'ui.bootstrap',
   'ui.router'
 ])
+
+exports.ngConfigModules = _.union( player.ngConfigModules, [
+
+])
+

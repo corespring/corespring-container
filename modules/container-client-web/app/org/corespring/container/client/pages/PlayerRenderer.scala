@@ -76,7 +76,7 @@ class PlayerRenderer(
     val preprocessedItem = itemPreProcessor.preProcessItemForPlayer(item).as[JsObject] ++ Json.obj("xhtml" -> processedXhtml)
     val sessionJson = Json.obj("session" -> session, "item" -> preprocessedItem)
 
-    val ngModules = Some("player-injected") ++ sources.js.ngModules ++ bundle.ngModules
+    val ngModules = Some("player-injected") ++ sources.js.ngModules ++ bundle.ngModules ++ sources.js.ngConfigModules
 
     logger.trace(s"function=render, ngModules=$ngModules")
 

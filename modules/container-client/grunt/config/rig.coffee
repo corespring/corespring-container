@@ -40,3 +40,7 @@ exports.ngModules = _.union(core.ngModules, [
     'corespring-player.directives',
     'ui.ace'
   ])
+
+exports.ngConfigModules = _.union(core.ngConfigModules, [
+
+])
