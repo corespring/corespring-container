@@ -1,0 +1,1 @@
+angular.module('corespring-common.config', ['corespring-common.services']);

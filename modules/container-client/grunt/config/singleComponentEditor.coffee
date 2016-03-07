@@ -52,6 +52,7 @@ exports.css =
   report: "#{baseName}-css-report.json"
 
 exports.ngModules = _.union(player.ngModules, [
+  'corespring-editing.config',
   'corespring-editing.controllers',
   'corespring-editing.directives',
   'corespring-editing.services',
