@@ -12,7 +12,7 @@ function ModalPositioner($log, ModalOpenDispatcher, Msgr) {
 
     function onModalOpened(jqueryModal){
       Msgr.send('getScrollPosition', function(err, pos){
-        jqueryModal.offset({top: pos.top});
+        jqueryModal.offset({top: Math.abs(pos.top)});
       });
     }
   }
