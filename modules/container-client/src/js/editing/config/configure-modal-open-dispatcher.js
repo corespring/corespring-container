@@ -1,8 +1,8 @@
 (function(root) {
 
   angular.module('corespring-editing.config')
-    .value('configureModalOpenDispatcher', configureModalOpenDispatcher) //for testing
-    .config(['$provide', configureModalOpenDispatcher]);
+    .value('configureModalOpenDispatcher', configureModalOpenDispatcher); //for testing
+    //disable .config(['$provide', configureModalOpenDispatcher]);
 
   function configureModalOpenDispatcher($provide) {
 
