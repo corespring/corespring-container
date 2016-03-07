@@ -3,50 +3,87 @@ describe('component-editor Root', function(){
   beforeEach(angular.mock.module('wiggi-wiz.constants'));
   beforeEach(angular.mock.module('corespring-singleComponentEditor.controllers'));
 
-  var scope, rootScope, controller, Msgr, iFrameService, debounce, compKey;
+  var scope, 
+    rootScope, 
+    controller, 
+    Msgr, 
+    iFrameService, 
+    debounce, 
+    compKey, 
+    componentData,
+    wiggiEvents,
+    dialogLauncher;
 
   beforeEach(module(function($provide) {
 
     var mocks = org.corespring.mocks.editor;
     
-    debounce = jasmine.createSpy('debounce').and.callFake(function(fn){
+    debounce = jasmine.createSpy('debounce').and.callFake(function(wait, fn){
       return fn;
     });  
 
     iFrameService=  mocks.iFrameService();
+    componentData = mocks.ComponentData();
     compKey = 'compKey';
     Msgr = mocks.Msgr();
+    dialogLauncher = {
+      launch: jasmine.createSpy('launchDialog')
+    };
+
     $provide.value('$log', mocks.$log());
     $provide.value('$timeout', mocks.$timeout());
     $provide.value('debounce', debounce);
     $provide.value('COMPONENT_EDITOR', {componentType: 'componentType'});
-    $provide.value('ComponentData', mocks.ComponentData());
+    $provide.value('ComponentData', componentData);
     $provide.value('ComponentDefaultData', mocks.ComponentDefaultData());
     $provide.value('DesignerService', mocks.DesignerService());
-    $provide.value('EditorDialogTemplate', {});
+    $provide.value('EditorDialogTemplate', {
+      generate: jasmine.createSpy('generate').and.returnValue('generated')
+    });
     $provide.value('iFrameService', iFrameService);
     $provide.value('LogFactory', new mocks.LogFactory());
     $provide.value('Msgr', Msgr);
     $provide.value('SINGLE_COMPONENT_KEY', compKey);
-    $provide.value('WiggiDialogLauncher', {});
+    $provide.value('WiggiDialogLauncher', function(){ return dialogLauncher;});
   }));
 
-  beforeEach(inject(function($rootScope, $controller) {
+  beforeEach(inject(function($rootScope, $controller, WIGGI_EVENTS) {
+    wiggiEvents = WIGGI_EVENTS;
     rootScope = $rootScope;
     controller = $controller;
     scope = $rootScope.$new();
     controller('Root', {$scope: scope});
   }));
 
-  describe('initialization', function(){
+  describe('$on(WIGGI_EVENTS.LAUNCH_DIALOG', function(){
 
     beforeEach(function(){
       controller('Root', {$scope: scope});
+      scope.$broadcast(wiggiEvents.LAUNCH_DIALOG, {}, 'title', 'body', jasmine.createSpy('callback'), {}, {});
+    });
+
+    it('calls dialogLauncher.launch', function(){
+      expect(dialogLauncher.launch)
+        .toHaveBeenCalledWith(
+          {}, 
+          jasmine.any(String),
+          jasmine.any(Function),
+          {},
+          {});
     });
   });
 
   describe('$watch(data.prompt)', function(){
 
+    beforeEach(function(){
+      controller('Root', {$scope: scope});
+    });
+
+    it('updates item.xhtml', function(){
+      scope.data.prompt = 'update';
+      scope.$digest();
+      expect(scope.item.xhtml).toEqual(scope.getXhtml('update'));
+    });
   });
 
   describe('getData', function(){
@@ -76,41 +113,89 @@ describe('component-editor Root', function(){
   });
   
   describe('setData', function(){
-    
+   
     var done, data; 
-    beforeEach(function(){
-      
-      done = jasmine.createSpy('done');
-      data = {
-        xhtml: '<div><prompt>I\'m a prompt</prompt><div componentType="" id="'+ compKey + '"</div>',
-        components: {
-          compKey: {
-            componenType: 'componentType'  
-          }
-        }
-      };
 
+    beforeEach(function(){
+      done = jasmine.createSpy('done');
       configPanel = {
-        getModel: jasmine.createSpy('getModel').and.returnValue('hi'),
         setModel: jasmine.createSpy('setModel')
       };
-
-      controller('Root', {$scope: scope});
-      scope.$broadcast('registerConfigPanel', 'singleComponent', configPanel);
-      scope.setData(data, done);
     });
 
-    it('sets the prompt', function(){
-      expect(scope.data.prompt).toEqual('I\'m a prompt');
+    describe('with correct data', function(){
+      beforeEach(function(){
+        
+        data = {
+          xhtml: '<div><prompt>I\'m a prompt</prompt><div componentType="" id="'+ compKey + '"</div>',
+          components: {
+            compKey: {
+              componentType: 'componentType'  
+            }
+          }
+        };
+
+        controller('Root', {$scope: scope});
+        scope.$broadcast('registerConfigPanel', 'singleComponent', configPanel);
+        scope.setData(data, done);
+      });
+
+      it('sets the prompt', function(){
+        expect(scope.data.prompt).toEqual('I\'m a prompt');
+      });
+
+      it('calls configPanel.setModel', function(){
+        expect(configPanel.setModel).toHaveBeenCalledWith({componentType: 'componentType'});
+      });
+      
+      it('calls ComponentData.updateComponent', function(){
+        expect(componentData.updateComponent)
+          .toHaveBeenCalledWith(compKey, {componentType: 'componentType'});
+      });
+
+      it('calls done with no error', function(){
+        expect(done).toHaveBeenCalledWith(null);
+      });
+    }); 
+
+    describe('with incorrect data', function(){
+      
+      beforeEach(function(){
+        
+        data = {
+          xhtml: '<div><h1>I\'m a prompt</h1><div componentType="" id="'+ compKey + '"</div>',
+          components: {
+            compKey: {
+              componentType: 'componentType'  
+            }
+          }
+        };
+
+        controller('Root', {$scope: scope});
+        scope.$broadcast('registerConfigPanel', 'singleComponent', configPanel);
+        scope.setData(data, done);
+      });
+
+      it('does not set the prompt', function(){
+        expect(scope.data.prompt).toEqual('');
+      });
+
+      it('does not call configPanel.setModel', function(){
+        expect(configPanel.setModel).not.toHaveBeenCalledWith({componentType: 'componentType'});
+      });
+      
+      it('does not call ComponentData.updateComponent', function(){
+        expect(componentData.updateComponent)
+          .not.toHaveBeenCalledWith(compKey, {componentType: 'componentType'});
+      });
+
+      it('calls done with a prompt error', function(){
+        expect(done).toHaveBeenCalledWith(scope.promptError(data.xhtml));
+      });
     });
-
-    // it('sets the data', function(){
-
-    // });
   });
 
   describe('in iframe', function(){
-
 
     var msgrHandlers = {};
 

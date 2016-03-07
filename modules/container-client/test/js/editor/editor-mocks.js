@@ -48,7 +48,8 @@
       registerComponent: jasmine.createSpy('registerComponent'),
       setEditable: jasmine.createSpy('setEditable'),
       onComponentRegistered: jasmine.createSpy('onComponentRegistered'),
-      deleteComponent: jasmine.createSpy('deleteComponent')
+      deleteComponent: jasmine.createSpy('deleteComponent'),
+      updateComponent: jasmine.createSpy('updateComponent')
     };
   };
 

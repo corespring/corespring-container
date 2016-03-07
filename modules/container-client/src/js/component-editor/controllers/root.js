@@ -83,6 +83,7 @@ angular.module('corespring-singleComponentEditor.controllers')
         ].join('\n');
       }
 
+      $scope.getXhtml = getXhtml;
 
       $scope.closeError = function(){
         $scope.saveError = null;
@@ -98,6 +99,10 @@ angular.module('corespring-singleComponentEditor.controllers')
         return out;
       };
 
+      $scope.promptError = function(xhtml) {
+        return 'unable to read prompt in: ' + xhtml;
+      };
+
       function readPrompt(xhtml, done){
         try {
           var parser = new DOMParser();
@@ -105,7 +110,7 @@ angular.module('corespring-singleComponentEditor.controllers')
           var promptNode = doc.querySelector('prompt');
           var out = promptNode ? promptNode.innerHTML : undefined;
           if(!out){
-            done('unable to read prompt in: ' + xhtml);
+            done($scope.promptError(xhtml));
           } else {
             done(null, out);
           }
