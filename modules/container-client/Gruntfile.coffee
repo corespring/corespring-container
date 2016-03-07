@@ -146,6 +146,7 @@ module.exports = (grunt) ->
         options:
           summary: true
           keepRunner: true
+          polyfills: ['<%= common.test %>/js/polyfills/**/*.js'],
           vendor: _.map([
             'jquery/dist/jquery.js',
             'angular/angular.js',

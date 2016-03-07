@@ -3,8 +3,7 @@ describe('component-editor Root', function(){
   beforeEach(angular.mock.module('wiggi-wiz.constants'));
   beforeEach(angular.mock.module('corespring-singleComponentEditor.controllers'));
 
-  var scope, rootScope, controller, Msgr, iFrameService, debounce;
-
+  var scope, rootScope, controller, Msgr, iFrameService, debounce, compKey;
 
   beforeEach(module(function($provide) {
 
@@ -15,7 +14,7 @@ describe('component-editor Root', function(){
     });  
 
     iFrameService=  mocks.iFrameService();
-
+    compKey = 'compKey';
     Msgr = mocks.Msgr();
     $provide.value('$log', mocks.$log());
     $provide.value('$timeout', mocks.$timeout());
@@ -28,7 +27,7 @@ describe('component-editor Root', function(){
     $provide.value('iFrameService', iFrameService);
     $provide.value('LogFactory', new mocks.LogFactory());
     $provide.value('Msgr', Msgr);
-    $provide.value('SINGLE_COMPONENT_KEY', 'compKey');
+    $provide.value('SINGLE_COMPONENT_KEY', compKey);
     $provide.value('WiggiDialogLauncher', {});
   }));
 
@@ -44,7 +43,70 @@ describe('component-editor Root', function(){
     beforeEach(function(){
       controller('Root', {$scope: scope});
     });
+  });
 
+  describe('$watch(data.prompt)', function(){
+
+  });
+
+  describe('getData', function(){
+
+    var configPanel;
+
+    beforeEach(function(){
+      
+      configPanel = {
+        getModel: jasmine.createSpy('getModel').and.returnValue('hi'),
+        setModel: jasmine.createSpy('setModel')
+      };
+
+      controller('Root', {$scope: scope});
+      scope.$broadcast('registerConfigPanel', 'singleComponent', configPanel);
+    });
+
+    it('returns data', function(){
+      var data = scope.getData();
+      var expected = {
+        xhtml: jasmine.any(String),
+        components: {}
+      };
+      expected.components[compKey] = 'hi';
+      expect(data).toEqual(expected);
+    });
+  });
+  
+  describe('setData', function(){
+    
+    var done, data; 
+    beforeEach(function(){
+      
+      done = jasmine.createSpy('done');
+      data = {
+        xhtml: '<div><prompt>I\'m a prompt</prompt><div componentType="" id="'+ compKey + '"</div>',
+        components: {
+          compKey: {
+            componenType: 'componentType'  
+          }
+        }
+      };
+
+      configPanel = {
+        getModel: jasmine.createSpy('getModel').and.returnValue('hi'),
+        setModel: jasmine.createSpy('setModel')
+      };
+
+      controller('Root', {$scope: scope});
+      scope.$broadcast('registerConfigPanel', 'singleComponent', configPanel);
+      scope.setData(data, done);
+    });
+
+    it('sets the prompt', function(){
+      expect(scope.data.prompt).toEqual('I\'m a prompt');
+    });
+
+    // it('sets the data', function(){
+
+    // });
   });
 
   describe('in iframe', function(){

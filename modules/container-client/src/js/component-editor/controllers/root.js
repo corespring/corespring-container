@@ -99,7 +99,6 @@ angular.module('corespring-singleComponentEditor.controllers')
       };
 
       function readPrompt(xhtml, done){
-
         try {
           var parser = new DOMParser();
           var doc = parser.parseFromString(xhtml, 'text/html'); 
