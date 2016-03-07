@@ -23,7 +23,6 @@ describe('prompt-input', function(){
 
   describe('init', function(){
 
-
     it('adds extraFeatures to scope', function(){
       expect(scope.extraFeatures).toEqual({ definitions: [{name: 'mock-feature-def'}]});
     });

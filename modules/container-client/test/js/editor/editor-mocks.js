@@ -86,6 +86,10 @@
       return promise;
     });
     constructor.prototype.promise = promise;
+
+    constructor.PUT = jasmine.createSpy('PUT').and.returnValue(promise);
+    constructor.GET = jasmine.createSpy('GET').and.returnValue(promise);
+    constructor.POST = jasmine.createSpy('POST').and.returnValue(promise);
     return constructor;
   };
 

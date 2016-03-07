@@ -271,12 +271,20 @@ describe('component-editor', function () {
       });
     });
     
-    it('calls errorCallback if item has no compoents', function(){
+    it('calls errorCallback if item has no components', function(){
       $.ajax.and.callFake(function(opts){
         opts.success({components: {}});
       });
       item = new Def('element', {itemId: 'itemId'}, errorCallback);
       expect(errorCallback).toHaveBeenCalledWith(errorCodes.ONLY_ONE_COMPONENT_ALLOWED);
+    });
+
+    it('calls errorCallback if item components key isn\'t singleComponent', function(){
+      $.ajax.and.callFake(function(opts){
+        opts.success({components: { comp: {}}});
+      });
+      item = new Def('element', {itemId: 'itemId'}, errorCallback);
+      expect(errorCallback).toHaveBeenCalledWith(errorCodes.MISSING_SINGLE_COMPONENT_KEY('singleComponent'));
     });
 
     it('calls errorCallback if item has more than one component', function(){
@@ -345,7 +353,15 @@ describe('component-editor', function () {
         draft = new Def('element', {}, errorCallback);
         expect(errorCallback).toHaveBeenCalledWith(errorCodes.CREATE_ITEM_AND_DRAFT_FAILED('create failed'));
       });
-      
+
+      it('calls errorCallback if item components key isn\'t singleComponent', function(){
+        $.ajax.and.callFake(function(opts){
+          opts.success({components: { comp: {}}});
+        });
+        item = new Def('element', {itemId: 'itemId'}, errorCallback);
+        expect(errorCallback).toHaveBeenCalledWith(errorCodes.MISSING_SINGLE_COMPONENT_KEY('singleComponent'));
+      });
+
       it('calls errorCallback if loadDraft fails', function(){
         $.ajax.and.callFake(ajaxFail.bind(this, 'load draft failed'));
         draft = new Def('element', {itemId: 'itemId'}, errorCallback);

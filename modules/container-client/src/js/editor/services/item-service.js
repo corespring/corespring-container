@@ -142,7 +142,6 @@ angular.module('corespring-editor.services').service('ItemService', [
           }
         }
       };
-      
 
       function _save(call, data, onSuccess, onFailure) {
         var method = call.method;
