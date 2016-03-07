@@ -53,6 +53,7 @@ exports.css =
   report: 'editor-css-report.json'
 
 exports.ngModules = _.union(player.ngModules, [
+  'corespring-editing.config',
   'corespring-common.supporting-materials',
   'corespring-editing.controllers',
   'corespring-editing.directives',
