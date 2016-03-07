@@ -262,4 +262,35 @@ describe('ComponentRegisterDefinition', function() {
     });
   });
 
+
+  describe('addRegistrationHandler', function(){
+
+    var handler;
+    beforeEach(function(){
+      handler = jasmine.createSpy('handler');
+      componentRegister.addRegistrationHandler('1', handler);
+    });
+
+    it('handler is called on registerComponent', function(){
+      componentRegister.registerComponent('1', component);
+      expect(handler).toHaveBeenCalled();
+    });
+  });
+  
+  describe('removeRegistrationHandler', function(){
+
+    var handler;
+    beforeEach(function(){
+      handler = jasmine.createSpy('handler');
+      componentRegister.addRegistrationHandler('1', handler);
+      componentRegister.removeRegistrationHandler('1', handler);
+    });
+
+    it('handler isn\'t called on registerComponent',function(){
+      componentRegister.registerComponent('1', component);
+      console.log(handler.calls.count());
+      expect(handler).not.toHaveBeenCalled();
+    });
+  });
+
 });

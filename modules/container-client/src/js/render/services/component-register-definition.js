@@ -42,7 +42,7 @@ angular.module('corespring-player.services')
         
         registrationHandlers[id] = registrationHandlers[id] || [];
         
-        _.remove(registrationHandlers, function(fn){
+        _.remove(registrationHandlers[id], function(fn){
           return fn === handler;
         });
       };
