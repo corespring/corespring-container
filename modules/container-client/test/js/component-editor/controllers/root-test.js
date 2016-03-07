@@ -197,20 +197,55 @@ describe('component-editor Root', function(){
 
   describe('in iframe', function(){
 
-    var msgrHandlers = {};
-
     beforeEach(function(){
       iFrameService.isInIFrame.and.returnValue(true);
       iFrameService.bypassIframeLaunchMechanism.and.returnValue(false);
-      Msgr.on.and.callFake(function(key, handler){
-        msgrHandlers[key] = handler;
-        if(key === 'initialise'){
-          handler({});
-        }
+    });
+    
+    describe('custom initialisation', function(){
+
+      var data;
+      beforeEach(function(){
+        data = {
+          xhtml: '<div><prompt>custom</prompt><div componentType="" id="' + compKey + '"></div></div>',
+          components: {
+            compKey: { 
+              componentType: 'componentType'
+            }
+          }
+        };
+
+        Msgr.on.and.callFake(function(key, handler){
+          if(key === 'initialise'){
+            handler(data);
+          }
+        });
+
+        controller('Root', {$scope: scope});
+        scope.$digest();
+      }); 
+
+      it('sets the prompt', function(){
+        expect(scope.data.prompt).toEqual('custom');
+      });
+      
+      it('sets the xhtml', function(){
+        expect(scope.item.xhtml).toEqual(scope.getXhtml('custom'));
       });
     });
 
     describe('initialization', function(){
+      var msgrHandlers = {};
+
+      beforeEach(function(){
+        Msgr.on.and.callFake(function(key, handler){
+          msgrHandlers[key] = handler;
+          if(key === 'initialise'){
+            handler({});
+          }
+        });
+      });
+      
       function assertMsgrOn(key, fnMatcher){
         fnMatcher = fnMatcher || jasmine.any(Function);
         it('calls Msgr.on(' + key +')', function(){
