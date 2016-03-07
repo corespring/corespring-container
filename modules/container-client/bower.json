@@ -27,7 +27,7 @@
     "jquery": "1.11.0",
     "jquery-mockjax": "~1.6.2",
     "jquery-ui": "1.11.0",
-    "jquery-lockfixed": "https://github.com/corespring/jquery-lockfixed.git#0.8.5-corespring",
+    "jquery-lockfixed": "https://github.com/corespring/jquery-lockfixed.git#0.8.6-corespring",
     "jquery.browser": "~0.0.6",
     "lodash": "~2.4.1",
     "mathjax": "https://github.com/mathjax/MathJax.git#2.6",
