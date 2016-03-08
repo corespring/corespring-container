@@ -1,0 +1,1 @@
+angular.module('corespring-editor.config', ['ui.bootstrap']);
