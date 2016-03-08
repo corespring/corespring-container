@@ -2,7 +2,7 @@ describe('configure-modal-open-dispatcher', function() {
 
   var sut, provide;
 
-  beforeEach(angular.mock.module('corespring-editing.config'));
+  beforeEach(angular.mock.module('corespring-editor.config'));
 
   beforeEach(inject(function(configureModalOpenDispatcher){
     sut = configureModalOpenDispatcher;
