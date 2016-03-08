@@ -7,6 +7,7 @@ Configs...
 ###
 player = require './grunt/config/player'
 editor = require './grunt/config/editor'
+singleComponentEditor = require './grunt/config/singleComponentEditor'
 devEditor = require './grunt/config/devEditor'
 catalog = require './grunt/config/catalog'
 rig = require './grunt/config/rig'
@@ -32,7 +33,14 @@ lessConfig = (cleancss) ->
     cleancss: cleancss
   expand: true
   cwd: '<%= common.dist %>/css'
-  src: ['**/rig.less', '**/player.less', '**/editor.less', '**/dev-editor.less',  '**/homepage.less']
+  src: [
+    '**/rig.less', 
+    '**/player.less', 
+    '**/editor.less', 
+    '**/dev-editor.less',  
+    '**/homepage.less', 
+    '**/single-component-editor.less'
+  ]
   dest: '<%= common.dist %>/css/'
   ext: suffix
   flatten: false
@@ -118,6 +126,8 @@ module.exports = (grunt) ->
       files:
         src: [
           '<%= common.dist %>/bower_components/msgr.js/dist/msgr.js',
+          '<%= common.app %>/**/player-launcher/error-codes.js',
+          '<%= common.app %>/**/player-launcher/url-builder.js',
           '<%= common.app %>/**/player-launcher/*.js'
         ]
         dest: '<%= common.tmp %>/wrapped/player-launcher-wrapped.js'
@@ -198,6 +208,7 @@ module.exports = (grunt) ->
   fullConfig = _.merge(config,
     mkConfig('catalog', catalog),
     mkConfig('editor', editor),
+    mkConfig('singleComponentEditor', singleComponentEditor),
     mkConfig('devEditor', devEditor),
     mkConfig('rig', rig),
     mkConfig('player', player)
@@ -238,6 +249,7 @@ module.exports = (grunt) ->
   grunt.registerTask('default', ['stage'])
   grunt.registerTask('directive-templates', ['jade:directives', 'ngtemplates'])
   grunt.registerTask('test', ['lcd', 'prepPlayerLauncher', 'directive-templates', 'jshint', 'jasmine:unit'])
+  grunt.registerTask('testNoHint', ['prepPlayerLauncher', 'directive-templates', 'jasmine:unit'])
   grunt.registerTask('stage', 'Work with the play stage task',
     ['mk-css',
     'component-version-info'

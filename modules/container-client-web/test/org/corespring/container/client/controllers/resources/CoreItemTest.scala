@@ -1,23 +1,22 @@
 package org.corespring.container.client.controllers.resources
 
-import org.corespring.container.client.ItemAssetResolver
 import org.corespring.container.client.controllers.helpers.PlayerXhtml
-import org.corespring.container.client.hooks.{ SupportingMaterialHooks, CoreItemHooks }
+import org.corespring.container.client.hooks.{ CoreItemHooks, SupportingMaterialHooks }
 import org.corespring.test.TestContext
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
 import play.api.http.HeaderNames
 import play.api.libs.json.{ JsObject, JsValue, Json }
-import play.api.mvc.{ AnyContent, Request, AnyContentAsJson }
+import play.api.mvc.{ AnyContent, AnyContentAsJson, Request }
 import play.api.test.{ FakeHeaders, FakeRequest }
 import play.api.test.Helpers._
 
-import scala.concurrent.{ Future, ExecutionContext }
+import scala.concurrent.{ ExecutionContext, Future }
 
 class CoreItemTest extends Specification with Mockito {
 
-  class scope extends Scope with CoreItem with TestContext{
+  class scope extends Scope with CoreItem with TestContext {
 
     override protected def componentTypes: Seq[String] = Seq.empty
 
@@ -40,8 +39,10 @@ class CoreItemTest extends Specification with Mockito {
       m
     }
 
-    override def  playerXhtml = new PlayerXhtml {
-      override def itemAssetResolver = new ItemAssetResolver{}
+    override def playerXhtml: PlayerXhtml = {
+      val m = mock[PlayerXhtml]
+      m.processXhtml(any[String]) answers { s => s.asInstanceOf[String] }
+      m
     }
   }
 

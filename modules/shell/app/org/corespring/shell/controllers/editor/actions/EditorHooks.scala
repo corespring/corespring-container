@@ -4,10 +4,12 @@ import com.mongodb.casbah.commons.MongoDBObject
 import org.bson.types.ObjectId
 import org.corespring.container.client.controllers.{ AssetType, Assets }
 import org.corespring.container.client.hooks.{ DraftEditorHooks => ContainerDraftEditorHooks, ItemEditorHooks => ContainerItemEditorHooks, UploadResult }
+import org.corespring.container.client.integration.ContainerExecutionContext
 import org.corespring.container.logging.ContainerLogger
 import org.corespring.mongo.json.services.MongoService
 import org.corespring.shell.controllers.editor.ItemDraftAssets
-import org.corespring.shell.services.ItemDraftService
+import org.corespring.shell.services.{ItemService, ItemDraftService}
+import play.api.Logger
 import play.api.libs.json.{ Json, JsValue }
 import play.api.mvc._
 
@@ -44,13 +46,14 @@ object DraftId {
   }
 }
 
-trait ItemEditorHooks extends ContainerItemEditorHooks {
+class ItemEditorHooks(
+ itemService: ItemService,
+ assets: Assets,
+                       val containerContext: ContainerExecutionContext
+                     ) extends ContainerItemEditorHooks {
 
   lazy val logger = ContainerLogger.getLogger("EditorHooks")
 
-  def itemService: MongoService
-
-  def assets: Assets
 
   import play.api.http.Status._
 
@@ -87,27 +90,30 @@ trait ItemEditorHooks extends ContainerItemEditorHooks {
 
 }
 
-trait DraftEditorHooks extends ContainerDraftEditorHooks {
+class DraftEditorHooks(
+draftItemService: ItemDraftService,
+itemService: ItemService,
+assets: Assets with ItemDraftAssets,
+                        val containerContext: ContainerExecutionContext
+                      ) extends ContainerDraftEditorHooks {
 
-  lazy val logger = ContainerLogger.getLogger("EditorHooks")
+  lazy val logger = Logger(this.getClass)
 
-  def draftItemService: ItemDraftService
-
-  def itemService: MongoService
-
-  def assets: Assets with ItemDraftAssets
 
   import play.api.http.Status._
 
   override def load(id: String)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] = Future {
+
     draftItemService.load(id).map { json =>
-      Right(json)
+      logger.trace(s"function=load, id=$id, json=${Json.prettyPrint(json)}")
+      Right(json \ "item")
     }.getOrElse {
       val draftId: ContainerDraftId = DraftId.fromString[ObjectId, ContainerDraftId](id, (itemId, name) => ContainerDraftId(new ObjectId(itemId), name))
       val item = itemService.load(draftId.itemId.toString).get
       draftItemService.createDraft(draftId.itemId, Some(draftId.name), item)
       assets.copyItemToDraft(draftId.itemId.toString, draftId.name)
-      Right(Json.obj("item" -> item))
+      logger.trace(s"function=load, id=$id, json=${Json.prettyPrint(item)} - created item")
+      Right(item)
     }
   }
 

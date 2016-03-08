@@ -1,10 +1,15 @@
 package org.corespring.container.js.rhino
 
-import org.corespring.container.components.model.{ Interaction, Server, Client }
+import org.corespring.container.components.model.{Client, Component, Interaction, Server}
+import org.corespring.container.components.services.{ComponentService, DependencyResolver}
 import org.specs2.mutable.Specification
 import play.api.libs.json.Json
 
 class PlayerItemPreProcessorTest extends Specification {
+
+  private def mkService(comps:Component*) = new ComponentService {
+    override def components: Seq[Component] = comps
+  }
 
   val interactionProcessJs =
     """
@@ -42,8 +47,10 @@ class PlayerItemPreProcessorTest extends Specification {
             "correctResponse" -> Json.obj(
               "value" -> "1"))))
 
-      val builder = new RhinoScopeBuilder(Seq(interaction))
-      val processor = new RhinoPlayerItemPreProcessor(Seq(interaction), builder.scope)
+      val service = mkService(interaction)
+      val resolver = new DependencyResolver(service)
+      val builder = new RhinoScopeBuilder(resolver, service.components)
+      val processor = new RhinoPlayerItemPreProcessor(service.components, builder.scope)
       val result = processor.preProcessItemForPlayer(item)
       (result \ "components" \ "1" \ "dummy").as[String] === "something"
       (result \ "components" \ "1" \ "model").as[String] === "someModel"
@@ -76,8 +83,10 @@ class PlayerItemPreProcessorTest extends Specification {
             "correctResponse" -> Json.obj(
               "value" -> "1"))))
 
-      val builder = new RhinoScopeBuilder(Seq(interaction))
-      val processor = new RhinoPlayerItemPreProcessor(Seq(interaction), builder.scope)
+      val service = mkService(interaction)
+      val resolver = new DependencyResolver(service)
+      val builder = new RhinoScopeBuilder(resolver, service.components)
+      val processor = new RhinoPlayerItemPreProcessor(service.components, builder.scope)
 
       try {
         processor.preProcessItemForPlayer(item)

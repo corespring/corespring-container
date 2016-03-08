@@ -1,24 +1,25 @@
 package org.corespring.container.client.controllers.launcher
 
-import org.corespring.container.client.hooks.PlayerJs
+import org.corespring.container.client.io.ResourcePath
 import org.corespring.container.client.views.txt.js.ServerLibraryWrapper
-import play.api.libs.json.{ Json, JsString, JsObject }
-import play.api.mvc.{ AnyContent, Request, RequestHeader }
+import play.api.libs.json.{ JsObject, Json }
 import play.api.templates.TxtFormat
 
-class JsBuilder(corespringUrl: String) {
+private[corespring] class JsBuilder(val resourcePath : ResourcePath) extends JsResource {
 
-  import JsResource._
+  override def load: (String) => Option[String] = resourcePath.loadPath(_)
+
+  private def lib(n: String) = s"container-client/js/player-launcher/$n"
 
   lazy val coreJs: String = {
-    val corePaths = Seq(
-      "container-client/bower_components/msgr.js/dist/msgr.js",
-      "container-client/js/player-launcher/logger.js",
-      "container-client/js/player-launcher/error-codes.js",
-      "container-client/js/player-launcher/instance.js",
-      "container-client/js/player-launcher/client-launcher.js",
-      "container-client/js/player-launcher/url-builder.js",
-      "container-client/js/player-launcher/object-id.js")
+
+    val corePaths = {
+      Some("container-client/bower_components/msgr.js/dist/msgr.js") ++
+        Seq("logger", "callback-utils", "error-codes", "instance", "client-launcher", "url-builder", "object-id", "draft-id")
+        .map(s => s"$s.js")
+        .map(lib)
+    }
+
     val rawJs = pathToNameAndContents("container-client/js/corespring/core-library.js")._2
     val wrapped = corePaths.map(pathToNameAndContents).map(t => ServerLibraryWrapper(t._1, t._2))
     val bootstrap =
@@ -26,6 +27,7 @@ class JsBuilder(corespringUrl: String) {
          |window.org = window.org || {};
          |org.corespring = org.corespring || {};
          |org.corespring.players = org.corespring.players || {};
+         |org.corespring.editors = org.corespring.editors || {};
       """.stripMargin
     s"""$bootstrap
         $rawJs
@@ -33,17 +35,16 @@ class JsBuilder(corespringUrl: String) {
       """
   }
 
-  private def queryStringToJson(implicit rh: RequestHeader) = Json.toJson(rh.queryString.mapValues(_.mkString))
+  def buildJs(corespringUrl: String, files: Seq[String], options: JsObject, bootstrapLine: String, queryParams: Map[String, String]): String = {
 
-  def build(additionalJsNameAndSrc: Seq[(String, String)], options: JsObject, bootstrapLine: String)(implicit request: RequestHeader, js: PlayerJs): String = {
+    val additionalJsNameAndSrc = files.map(lib(_)).map(pathToNameAndContents)
+
     val fullConfig = Json.obj(
       "corespringUrl" -> corespringUrl,
-      "queryParams" -> queryStringToJson,
-      "errors" -> js.errors,
-      "warnings" -> js.warnings) ++ options
+      "queryParams" -> queryParams) ++ options
     val fullConfigJs = ("launch-config" -> s"module.exports = ${Json.stringify(fullConfig)}")
     val wrappedNameAndContents = fullConfigJs +: additionalJsNameAndSrc
-    val wrappedContents : Seq[TxtFormat.Appendable] = wrappedNameAndContents.map{
+    val wrappedContents: Seq[TxtFormat.Appendable] = wrappedNameAndContents.map {
       case (name, content) => ServerLibraryWrapper(name, content)
     }
 
@@ -53,8 +54,4 @@ class JsBuilder(corespringUrl: String) {
        $bootstrapLine"""
   }
 
-
-  def build(additionalJsNameAndSrc: (String, String), options: JsObject, bootstrapLine: String)(implicit request: RequestHeader, js: PlayerJs): String = {
-    build(Seq(additionalJsNameAndSrc), options, bootstrapLine)
-  }
 }

@@ -1,0 +1,56 @@
+
+@(componentEditorJs:String, types: Seq[(String,Boolean)], opts : play.api.libs.json.JsValue)
+
+@org.corespring.shell.views.html.launchers.coreComponentEditor(componentEditorJs, types, opts){
+
+<button class="btn btn-sm btn-success save">Save</button>
+<button class="btn btn-sm btn-success commit">Commit</button>
+<script type="text/javascript">
+    $('.save').click(function(){
+      editor.save(function(result){
+        console.log('>> save: ', result);
+      });
+    });
+
+    $('.commit').click(function(){
+      editor.commitDraft(false, function(err, result){
+        if(err){
+          console.error(err);
+        } else {
+          console.log('>> commit: ', result);
+        }
+      });
+    });
+
+  </script>
+}{
+<script type="text/javascript">
+
+    document.addEventListener('DOMContentLoaded', function(){
+
+      var holder = document.querySelector('.holder');
+
+      opts.onItemCreated = function(itemId){
+        console.log('item created: ' + itemId);
+      };
+
+      opts.onDraftCreated = function(itemId, draftName){
+        console.log('draft created: ', itemId, ' draftName: ', draftName);
+      };
+
+      if(opts.itemId){
+        opts.contentStorage = 'draft';
+        window.editor = new org.corespring.editors.QuestionComponentEditor(holder, opts, function(err){
+          console.warn(err);
+        });
+        window.updateControls("tabs");
+      } else {
+        $('.create').click(function(){
+          window.createEditor(this, 'draft');
+        });
+      }
+    });
+  </script>
+}
+
+

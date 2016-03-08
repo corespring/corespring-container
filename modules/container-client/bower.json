@@ -21,12 +21,13 @@
     "components-font-awesome": "4.3.0",
     "console-polyfill": "~0.1.0",
     "corespring-checkbox": "https://github.com/corespring/checkbox.git#v0.0.6",
-    "corespring-ng-components": "https://github.com/corespring/corespring-ng-components.git#v0.0.10",
+    "corespring-ng-components": "https://github.com/corespring/corespring-ng-components.git#v0.0.14",
     "corespring-radio": "https://github.com/corespring/radio.git#v0.0.6",
     "es5-shim": "~2.3.0",
     "jquery": "1.11.0",
     "jquery-mockjax": "~1.6.2",
     "jquery-ui": "1.11.0",
+    "jquery-lockfixed": "https://github.com/corespring/jquery-lockfixed.git#0.8.6-corespring",
     "jquery.browser": "~0.0.6",
     "lodash": "~2.4.1",
     "mathjax": "https://github.com/mathjax/MathJax.git#2.6",
@@ -36,7 +37,7 @@
     "select2": "~3.4.5",
     "spin.js": "~2.0.0",
     "undo.js": "git@github.com:jzaefferer/undo.git",
-    "wiggi-wiz": "git@github.com:corespring/wiggi-wiz.git#0.1.82"
+    "wiggi-wiz": "git@github.com:corespring/wiggi-wiz.git#0.1.85"
   },
   "devDependencies": {
     "angular-mocks": "~1.2.12",
@@ -84,7 +85,7 @@
     ]
   },
   "resolutions": {
-    "angular": "~1.2.12",
+    "angular": "~1.2.29",
     "bootstrap": "~3.2.0",
     "jquery": "1.11.0",
     "angular-bootstrap": "~0.12.0",

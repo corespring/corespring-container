@@ -1,0 +1,33 @@
+@(namespace: String, componentSet: JsValue, componentType:String)
+
+@toMethodAndUrl(c:Call) = @{
+  s"{ method: '${c.method.toLowerCase}', url: '${c.url}'}"  
+}
+
+(function(){
+  "use strict";
+
+  try {
+    angular.module('@namespace');
+  } catch (e) {
+    angular.module('@namespace', []);
+  }
+
+  angular.module('@namespace').constant('COMPONENT_EDITOR', {componentType: '@componentType'});
+
+  angular.module('@namespace').factory('ItemUrls', [ function($http){
+    return {}
+  }]);
+
+
+  //TODO: need to load this up - cos of the tangled dependencies...
+  angular.module('@namespace').factory('DesignerService', ['$http', function($http){
+    return {
+      loadAvailableUiComponents: function(onSuccess, onFailure){
+        var interactions = @{Json.stringify(componentSet)};
+        onSuccess({interactions: interactions, widgets: []});
+      }
+    };
+  }]);
+
+})(this);

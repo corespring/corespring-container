@@ -30,7 +30,7 @@ describe('Main', function() {
   var mockGetScore = jasmine.createSpy('getScore');
   var mockSetQueryParams = jasmine.createSpy('setQueryParams');
 
-  function MockPlayerService() {
+  function MockPlayerServiceDefinition() {
     this.saveSession = mockSaveSession;
     this.loadOutcome = mockLoadOutcome;
     this.loadItemAndSession = mockLoadItemAndSession;
@@ -78,7 +78,7 @@ describe('Main', function() {
     $provide.value('$log', new MockLog());
     $provide.value('$document', MockDocument);
     $provide.value('ComponentRegister', new MockComponentRegister());
-    $provide.value('PlayerService', MockPlayerService);
+    $provide.value('PlayerServiceDefinition', MockPlayerServiceDefinition);
   }));
 
   beforeEach(inject(function($rootScope, $compile, $timeout) {

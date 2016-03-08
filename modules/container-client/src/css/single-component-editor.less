@@ -1,0 +1,167 @@
+@import "../css/vendor/dmitryf/less-elements/elements";
+@import "../bower_components/bootstrap/less/bootstrap";
+@import "../components/wiggi-wiz/dist/wiggi-wiz.css";
+@import "../components/components-font-awesome/css/font-awesome.css";
+@import "app";
+@import "bootstrap-override";
+@import "common/base";
+@import "editor/modal";
+@import "editor/nav";
+@import "editor/question";
+@import "editor/metadata";
+@import "editor/buttons";
+@import "editor/menus";
+@import "editor/inputs";
+@import "editor/components";
+@import "editor/additional-copyright-information-for-profile";
+@import "editor/profile";
+@import "editor/config";
+@import "editor/catalog-preview";
+@import "editor/overview";
+@import "editor/wiggi-wiz-overrides";
+@import "editor/footnotes-wiggi-feature";
+@import "editor/image-wiggi-feature";
+@import "editor/mathjax-wiggi-feature";
+@import "editor/link-wiggi-feature";
+@import "editor/supporting-materials";
+@import "editor/question-information";
+@import "editor/profile-preview";
+@import "editor/help";
+@import "player/player-core-mixin";
+
+.wiggi-wiz-editable {
+  .player-core-mixin();
+}
+
+@import "player/player-container";
+@import "player/corespring-player";
+
+body {
+  //moved here from player shared
+  font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+  color: #333;
+}
+
+@roboto: "Roboto", sans-serif;
+@font-family-sans-serif: @roboto;
+@new-blue: #4da7c1;
+@darker-blue: #008BC9;
+@component-icon-bg: #707070;
+@help-text: @new-blue;
+@cs-green: @new-blue;
+@cs-grey: #777777;
+@cs-pink: #DA1C5C;
+@feedback-bg: #533b91;
+
+@profile-summary-feedback-panel-bg: @darker-blue;
+
+.btn {
+  &:focus, &:active:focus, &:active {
+    outline: none;
+  }
+}
+
+.config-panel-container {
+  padding-top: 10px;
+}
+
+.navbar-text.error {
+  color: @brand-danger;
+}
+
+.save-button {
+  float: left;
+}
+
+.alert-holder {
+  float: left;
+
+  .alert-danger {
+    width: 300px;
+    padding: 6px;
+    margin-left: 10px;
+  }
+
+}
+
+.bar {
+  padding-left: 10px;
+}
+
+.pane-header {
+  text-transform: uppercase;
+  font-size: 16px;
+  font-weight: 600;
+  color: #da1c5c;
+  text-transform: uppercase;
+  padding: 0.8em 0 0 0;
+  font-family: 'Whitney SSm A', 'Whitney SSm B', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -font-smoothing: antialiased;
+}
+
+.pane-sub-header {
+  font-size: 14px;
+}
+
+.vertical-divider {
+  border-left: 1px solid #eeeeee;
+  width: 1px;
+  font-size: 1px;
+  margin-left: 15px;
+  margin-right: 15px;
+  padding: 0;
+  position: relative;
+}
+
+@config-pane-width: 610px;
+
+.config-pane {
+  width: @config-pane-width;
+  max-width: @config-pane-width;
+  min-width: @config-pane-width;
+}
+
+.preview-right {
+  .vertical-divider {
+    border-left: 1px solid #eeeeee;
+    background-color: #fff;
+    width: 10px;
+    font-size: 1px;
+    padding: 0;
+    top: 0;
+    bottom: 0;
+    left: @config-pane-width+10;
+    position: fixed;
+  }
+
+  .preview-pane {
+    flex-shrink: 0;
+    position: fixed;
+    left: @config-pane-width+40;
+    top: 0px;
+
+    .player-btn-holder {
+      width: 100%;
+      margin-bottom: 20px;
+
+      .score {
+        float: left;
+        display: block;
+      }
+
+      .btn {
+        float: right;
+      }
+
+    }
+
+    .preview-nav {
+      li {
+        display: inline;
+      }
+    }
+  }
+}
+
+

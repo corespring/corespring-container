@@ -1,49 +1,22 @@
 package org.corespring.shell
 
-import com.amazonaws.services.s3.AmazonS3
-import com.mongodb.casbah.{ MongoCollection, MongoDB, MongoClientURI, MongoClient }
-import org.corespring.container.client.filters.{ BlockingFutureRunner, CheckS3CacheFilter }
+import com.mongodb.casbah.{ MongoClient, MongoClientURI, MongoCollection, MongoDB }
 import org.corespring.container.components.loader.FileComponentLoader
+import org.corespring.container.components.model.Interaction
+import org.corespring.container.logging.ContainerLogger
 import org.corespring.mongo.json.services.MongoService
 import org.corespring.play.utils.{ CallBlockOnHeaderFilter, ControllerInstanceResolver }
 import org.corespring.shell.controllers.{ Launchers, Main }
 import org.corespring.shell.filters.AccessControlFilter
-import org.corespring.shell.services.ItemDraftService
+import org.corespring.shell.services.{ItemService, SessionService, ItemDraftService}
 import play.api.mvc._
-import org.corespring.container.logging.ContainerLogger
-import play.api.{ Mode, GlobalSettings, Play }
-
-import scala.concurrent.ExecutionContext
+import play.api.{ GlobalSettings, Mode, Play }
 
 object Global extends WithFilters(AccessControlFilter, CallBlockOnHeaderFilter) with ControllerInstanceResolver with GlobalSettings {
 
-  lazy val componentSetFilter = new CheckS3CacheFilter {
-    override implicit def ec: ExecutionContext = ExecutionContext.global
-
-    override lazy val bucket: String = Play.current.configuration.getString("amazon.s3.bucket").getOrElse("bucket")
-
-    override def appVersion: String = (containerClient.versionInfo \ "commitHash").as[String]
-
-    override def s3: AmazonS3 = containerClient.s3Client
-
-    override def intercept(path: String): Boolean = {
-      val enabled: Boolean = Play.current.configuration.getBoolean("components.filter.enabled").getOrElse(false)
-      val out = path.contains("components-sets") && enabled
-
-      if (out) {
-        logger.debug(s"Intercept: $path")
-      }
-      out
-    }
-  }
-
-  override def doFilter(a: EssentialAction): EssentialAction = {
-    Filters(super.doFilter(a), Seq(componentSetFilter): _*)
-  }
-
   private lazy val logger = ContainerLogger.getLogger("Global")
 
-  lazy val controllers: Seq[Controller] = containerClient.controllers ++ Seq(home, launchers)
+  lazy val controllers: Seq[Controller] = containerClient.defaultIntegrationControllers ++ Seq(home, launchers)
 
   private lazy val mongoUri = {
     val uri = Play.current.configuration.getString("mongo.db").getOrElse("mongodb://localhost:27017/corespring-container")
@@ -58,20 +31,39 @@ object Global extends WithFilters(AccessControlFilter, CallBlockOnHeaderFilter) 
     mongoClient(mongoUri.database.getOrElse("corespring-container-devt"))
   }
 
+  private lazy val showNonReleasedComponents = Play.current.configuration.getBoolean("components.showNonReleasedComponents").getOrElse(Play.current.mode == Mode.Dev)
+
   private lazy val containerClient = new ContainerClientImplementation(
-    new MongoService(db("items")),
-    new MongoService(db("sessions")),
+    new ItemService(db("items")),
+    new SessionService(db("sessions")),
     new ItemDraftService(db("itemDrafts")),
-    componentLoader.all,
+    {
+      if (showNonReleasedComponents) {
+        componentLoader.all
+      } else {
+        componentLoader.all.filter { c =>
+          if (c.isInstanceOf[Interaction]) {
+            c.asInstanceOf[Interaction].released
+          } else {
+            true
+          }
+        }
+      }
+    },
     Play.current.configuration)
 
-  private lazy val launchers = new Launchers {}
+  private lazy val launchers = new Launchers(
+    interactions = componentLoader.all.flatMap {
+      case i: Interaction => Some(i)
+      case _ => None
+    }
+  )
 
-  private lazy val home = new Main {
-    override def sessionService: MongoService = new MongoService(db("sessions"))
-    override def items: MongoCollection = db("items")
-    override def itemDrafts = new ItemDraftService(db("itemDrafts"))
-  }
+  private lazy val home = new Main(
+    sessionService  = new SessionService(db("sessions")),
+    items = db("items"),
+    itemDrafts = new ItemDraftService(db("itemDrafts"))
+  )
 
   override def onStart(app: play.api.Application): Unit = {
     logger.trace("trace")
@@ -94,14 +86,11 @@ object Global extends WithFilters(AccessControlFilter, CallBlockOnHeaderFilter) 
   }
 
   private lazy val componentLoader = {
-    val showNonReleasedComponents = Play.current.configuration.getBoolean("components.showNonReleasedComponents").getOrElse(Play.current.mode == Mode.Dev)
-    val out = new FileComponentLoader(Play.current.configuration.getString("components.path").toSeq, showNonReleasedComponents)
+    val out = new FileComponentLoader(Play.current.configuration.getString("components.path").toSeq)
     out.reload
-
     if (out.all.length == 0) {
       throw new RuntimeException("Can't load any components - check the path!")
     }
-
     out
   }
 

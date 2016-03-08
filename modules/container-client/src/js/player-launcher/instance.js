@@ -2,7 +2,13 @@
  * @param call: { url: '', method: '', params: {}, hash: ''}
  */
 
-var Instance = function(call, element, errorCallback, log, autosizeEnabled, iframeScrollingEnabled) {
+var Instance = function(launchOpts, element, errorCallback, log, autosizeEnabled, iframeScrollingEnabled) {
+
+  launchOpts = launchOpts || {};
+
+  var call = launchOpts.call;
+  var queryParams = launchOpts.queryParams;
+  var data = launchOpts.data || {};
 
   autosizeEnabled = autosizeEnabled !== false;
 
@@ -13,6 +19,24 @@ var Instance = function(call, element, errorCallback, log, autosizeEnabled, ifra
     var formName = iframeUid + '-form';
 
     function addForm() {
+
+      var formParams = [];
+      
+      for(var x in data){
+
+        if(data[x] !== undefined){
+
+          var d = data[x];
+          
+          if(typeof(d) === 'object'){
+            d = JSON.stringify(d);
+          } 
+
+          var p = "<input type='hidden' name=\'"+x+"\' value=\'"+d+"\'></input>";
+          formParams.push(p);
+        }
+      }
+
       var form = [
         '<form ',
         '  target="', iframeUid, '"',
@@ -20,6 +44,7 @@ var Instance = function(call, element, errorCallback, log, autosizeEnabled, ifra
         '  name="', formName, '"',
         '  method="POST" ',
         '  action="', url, '">',
+        formParams.join(''),
         '</form>'
       ].join('');
 
@@ -70,7 +95,7 @@ var Instance = function(call, element, errorCallback, log, autosizeEnabled, ifra
 
     function makeUrl() {
       var Builder = require('url-builder');
-      return new Builder(call.url).params(call.params).build();
+      return new Builder(call.url).params(queryParams).build();
     }
 
     var url = makeUrl();
@@ -131,6 +156,10 @@ var Instance = function(call, element, errorCallback, log, autosizeEnabled, ifra
       $iframe().addClass("player-loaded");
     });
 
+    channel.on('ready', function(){
+      channel.send('initialise', data);
+    });
+
     /**
      * If you want the main window to scroll,
      * send message "autoScroll" with the clientX/Y position
@@ -154,6 +183,15 @@ var Instance = function(call, element, errorCallback, log, autosizeEnabled, ifra
       } else if (y > viewportBottom - sensitiveAreaHeight) {
         $scrollable.scrollTop(scrollTop + scrollAmount);
       }
+    });
+
+    channel.on('getScrollPosition', function(err, callback){
+      var $scrollable = $('.item-iframe-container');
+      if($scrollable.length === 0){
+        $scrollable = $('body');
+      }
+      var scrollTop = $scrollable.scrollTop();
+      callback(null, {top: scrollTop});
     });
 
   }

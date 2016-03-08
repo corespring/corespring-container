@@ -4,7 +4,7 @@ import java.io.InputStream
 
 import org.corespring.container.client.HasContainerContext
 import org.corespring.container.client.hooks.Hooks.{ R, StatusMessage }
-import play.api.libs.json.{ JsArray, JsValue }
+import play.api.libs.json.{ JsObject, JsArray, JsValue }
 import play.api.mvc._
 
 import scala.concurrent.Future
@@ -44,6 +44,7 @@ trait PlayerHooks extends GetAssetHook with HasContainerContext {
   def createSessionForItem(itemId: String)(implicit header: RequestHeader): Future[Either[StatusMessage, (JsValue, JsValue)]]
   def loadSessionAndItem(sessionId: String)(implicit header: RequestHeader): Future[Either[StatusMessage, (JsValue, JsValue)]]
   def loadItemFile(itemId: String, file: String)(implicit header: RequestHeader): SimpleResult
+  def archiveCollectionId: String
 }
 
 trait CatalogHooks extends LoadHook with GetAssetHook {
@@ -86,12 +87,14 @@ trait CoreItemHooks extends HasContainerContext with LoadHook {
 
 trait DraftHooks {
   def save(draftId: String, json: JsValue)(implicit request: RequestHeader): R[JsValue]
-  def createItemAndDraft()(implicit h: RequestHeader): R[(String, String)]
+  def createItemAndDraft(collectionId: Option[String])(implicit h: RequestHeader): R[(String, String)]
+  def createSingleComponentItemDraft(collectionId: Option[String], componentType: String, key: String, defaultData: JsObject)(implicit r: RequestHeader): R[(String, String)]
   def commit(id: String, force: Boolean)(implicit h: RequestHeader): R[JsValue]
 }
 
 trait CreateItemHook {
-  def createItem(json: Option[JsValue])(implicit h: RequestHeader): R[String]
+  def createItem(collectionId: Option[String])(implicit h: RequestHeader): R[String]
+  def createSingleComponentItem(collectionId: Option[String], componentType: String, key: String, defaultData: JsObject)(implicit h: RequestHeader): R[String]
 }
 
 trait ItemHooks extends CoreItemHooks with CreateItemHook
@@ -107,6 +110,7 @@ trait SessionHooks extends HasContainerContext {
 trait PlayerLauncherHooks extends HasContainerContext {
   def catalogJs(implicit header: RequestHeader): Future[PlayerJs]
   def editorJs(implicit header: RequestHeader): Future[PlayerJs]
+  def componentEditorJs(implicit header: RequestHeader): Future[PlayerJs]
   def playerJs(implicit header: RequestHeader): Future[PlayerJs]
 }
 

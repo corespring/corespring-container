@@ -2,98 +2,70 @@ package org.corespring.container.client.controllers.apps
 
 import java.net.URLEncoder
 
-import org.corespring.container.client.{ItemAssetResolver, V2PlayerConfig}
-import org.corespring.container.client.component.PlayerItemTypeReader
+import org.corespring.container.client.component.{ComponentBundler, ItemComponentTypes}
 import org.corespring.container.client.controllers.GetAsset
-import org.corespring.container.client.controllers.helpers.PlayerXhtml
-import org.corespring.container.client.controllers.jade.Jade
+import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.client.hooks.PlayerHooks
-import org.corespring.container.client.views.txt.js.PlayerServices
-import org.corespring.container.components.processing.PlayerItemPreProcessor
-import play.api.http.{ ContentTypes }
-import play.api.libs.json._
-import play.api.mvc.{ Action, AnyContent, RequestHeader }
+import org.corespring.container.client.integration.ContainerExecutionContext
+import org.corespring.container.client.pages.PlayerRenderer
+import org.corespring.container.components.services.ComponentService
+import play.api.Mode
+import play.api.Mode.Mode
+import play.api.http.ContentTypes
+import play.api.libs.json.{JsObject, JsValue}
+import play.api.mvc._
 import play.api.templates.Html
 
 import scala.concurrent.Future
 
-trait Player
-  extends App[PlayerHooks]
-  with PlayerItemTypeReader
-  with Jade
+class Player(mode: Mode,
+  bundler: ComponentBundler,
+  val containerContext: ContainerExecutionContext,
+  playerRenderer: PlayerRenderer,
+  componentService: ComponentService,
+  val hooks: PlayerHooks)
+  extends Controller
   with GetAsset[PlayerHooks] {
 
-  private object SessionRenderer {
+  private def handleSuccess[D](fn: (D) => Future[SimpleResult])(e: Either[StatusMessage, D]): Future[SimpleResult] = e match {
+    case Left((code, msg)) => Future { Status(code)(msg) }
+    case Right(s) => fn(s)
+  }
 
-    private val archiveCollId = "500ecfc1036471f538f24bdc"
+  private def createPlayerHtml(sessionId: String, session: JsValue, item: JsValue, prodMode: Boolean): Either[String, Future[Html]] = {
+    val ids = ItemComponentTypes(componentService, item).map(_.id)
 
-    /**
-     * Preprocess the xml so that it'll work in all browsers
-     * TODO: A layout component may have multiple elements
-     * So we need a way to get all potential component names from
-     * each component, not just assume its the top level.
-     */
-    private def processXhtml(itemId: Option[String], itemJson: JsValue) = {
-      val maybeXhtml = (itemJson \ "xhtml").asOpt[String]
-      maybeXhtml.map(xhtml => playerXhtml.mkXhtml(itemId, xhtml))
-        .getOrElse("<div><h1>New Item</h1></div>")
-    }
+    bundler.bundle(ids, "player", Some("player"), !prodMode) match {
+      case Some(b) => {
+        val hasBeenArchived = hooks.archiveCollectionId == (session \ "collectionId")
 
-    def hasBeenArchived(session: JsValue) =
-      (session \ "collectionId").asOpt[String].map(_ == archiveCollId).getOrElse(false)
+        val warnings: Seq[String] = if (hasBeenArchived) {
+          Seq("Warning: This item has been deleted")
+        } else {
+          Nil
+        }
 
-    def createPlayerHtml(sessionId: String, session: JsValue, itemJson: JsValue, serviceParams: JsObject)(implicit rh: RequestHeader): Html = {
-
-      val scriptInfo = componentScriptInfo(componentTypes(itemJson), jsMode == "dev")
-      val controlsJs = if (showControls) paths(controlsJsSrc) else Seq.empty
-      val domainResolvedJs = buildJs(scriptInfo, controlsJs)
-      val domainResolvedCss = buildCss(scriptInfo)
-      val itemId = (session \ "itemId").asOpt[String] //A session from ExternalLaunchApi does not not have an itemId
-      val processedXhtml = processXhtml(itemId, itemJson)
-      val preprocessedItem = itemPreProcessor.preProcessItemForPlayer(itemJson).as[JsObject] ++ Json.obj("xhtml" -> processedXhtml)
-
-      val newRelicRumConf: Option[JsValue] = playerConfig.newRelicRumConfig
-
-      logger.trace(s"function=load domainResolvedJs=$domainResolvedJs")
-      logger.trace(s"function=load domainResolvedCss=$domainResolvedCss")
-
-      renderJade(
-        PlayerTemplateParams(
-          context,
-          domainResolvedJs,
-          domainResolvedCss,
-          jsSrc.ngModules ++ scriptInfo.ngDependencies,
-          servicesJs(sessionId, serviceParams),
-          showControls,
-          Json.obj("session" -> session, "item" -> preprocessedItem),
-          versionInfo,
-          newRelicRumConf != None,
-          newRelicRumConf.getOrElse(Json.obj()),
-          if (hasBeenArchived(session)) Seq(s"Warning: This item has been deleted.") else Seq.empty)
-      )
-
+        Right(
+          playerRenderer.render(sessionId, session, item, b, warnings, prodMode)
+        )
+      }
+      case _ => Left(s"Failed to create a bundle for: $sessionId")
     }
   }
 
-  lazy val controlsJsSrc: SourcePaths = SourcePaths.fromJsonResource(modulePath, s"container-client/$context-controls-js-report.json")
-
-  override def context: String = "player"
-
-  def versionInfo: JsObject
-
-  def playerXhtml: PlayerXhtml
-
-  def itemPreProcessor: PlayerItemPreProcessor
-
-  private def showControls(implicit r: RequestHeader): Boolean = {
-    val show = r.getQueryString("showControls").map(_ == "true").getOrElse(false)
-    logger.debug(s"showControls=$show")
-    show
+  def load(sessionId: String) = Action.async { implicit request =>
+    hooks.loadSessionAndItem(sessionId).flatMap {
+      handleSuccess { (tuple) =>
+        val (session, item) = tuple
+        require((session \ "id").asOpt[String].isDefined, "The session model must specify an 'id'")
+        val prodMode = request.getQueryString("mode").map(_ == "prod").getOrElse(mode == Mode.Prod)
+        createPlayerHtml(sessionId, session, item, prodMode) match {
+          case Left(e) => Future.successful(BadRequest(e))
+          case Right(f) => f.map(Ok(_))
+        }
+      }
+    }
   }
-
-  def playerConfig: V2PlayerConfig
-
-  import SessionRenderer._
 
   /**
    * A set of player query string params, that should be set on the player, but can be removed therafter
@@ -125,16 +97,6 @@ trait Player
     /** if set log the category defined */
     "logCategory")
 
-  def load(sessionId: String) = Action.async { implicit request =>
-    hooks.loadSessionAndItem(sessionId).map {
-      handleSuccess { (tuple) =>
-        val (session, item) = tuple
-        require((session \ "id").asOpt[String].isDefined, "The session model must specify an 'id'")
-        Ok(createPlayerHtml((session \ "id").as[String], session, item, queryParams(mapToJson))).as(ContentTypes.HTML)
-      }
-    }
-  }
-
   def mapToParamString(m: Map[String, String]): String = m.toSeq.map { t =>
     val (key, value) = t
     val encodedValue = URLEncoder.encode(value, "utf-8")
@@ -152,18 +114,25 @@ trait Player
   }
 
   def createSessionForItem(itemId: String): Action[AnyContent] = Action.async { implicit request =>
-    hooks.createSessionForItem(itemId).map {
+    hooks.createSessionForItem(itemId).flatMap {
       handleSuccess { (tuple) =>
         val (session, item) = tuple
         require((session \ "id").asOpt[String].isDefined, "The session model must specify an 'id'")
-        val call = org.corespring.container.client.controllers.apps.routes.Player.load((session \ "id").as[String])
-        val location = {
-          val params = queryParams[String]()
-          s"${call.url}${if (params.isEmpty) "" else s"?$params"}"
+        val prodMode = request.getQueryString("mode").map(_ == "prod").getOrElse(mode == Mode.Prod)
+
+        createPlayerHtml((session \ "id").as[String], session, item, prodMode) match {
+          case Left(e) => Future.successful(BadRequest(e))
+          case Right(f) => f.map { html =>
+            lazy val call = org.corespring.container.client.controllers.apps.routes.Player.load((session \ "id").as[String])
+            lazy val location = {
+              val params = queryParams[String]()
+              s"${call.url}${if (params.isEmpty) "" else s"?$params"}"
+            }
+            Created(html)
+              .as(ContentTypes.HTML)
+              .withHeaders(LOCATION -> location)
+          }
         }
-        Created(createPlayerHtml((session \ "id").as[String], session, item, queryParams(mapToJson)))
-          .as(ContentTypes.HTML)
-          .withHeaders(LOCATION -> location)
       }
     }
   }
@@ -173,20 +142,5 @@ trait Player
       Future {
         hooks.loadItemFile(itemId, file)(request)
       }
-  }
-
-  private def servicesJs(sessionId: String, queryParams: JsObject) = {
-    import org.corespring.container.client.controllers.resources.routes._
-    PlayerServices(
-      "player.services",
-      Session.loadItemAndSession(sessionId),
-      Session.reopenSession(sessionId),
-      Session.resetSession(sessionId),
-      Session.saveSession(sessionId),
-      Session.getScore(sessionId),
-      Session.completeSession(sessionId),
-      Session.loadOutcome(sessionId),
-      Session.loadInstructorData(sessionId),
-      queryParams).toString
   }
 }

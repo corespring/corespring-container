@@ -7,6 +7,17 @@ import play.api.{ Configuration, Logger, Play }
 import play.api.Play.current
 import play.api.libs.json.{ JsObject, JsValue, Json }
 
+case class VersionInfo(version:String, commitHash:String, branch:String, date:String, comps: JsValue){
+  def json = {
+    Json.obj(
+      "version" -> version,
+      "commitHash" -> commitHash,
+      "branch" -> branch,
+      "date" -> date,
+      "corespring-components" -> comps)
+  }
+}
+
 object VersionInfo {
 
   private def logger = Logger("VersionInfo")
@@ -25,12 +36,12 @@ object VersionInfo {
     }.getOrElse(new Properties())
   }
 
-  private lazy val commitHashShort: String = properties.getProperty("commit.hash", "?")
-  private lazy val pushDate: String = properties.getProperty("date", "?")
+  private lazy val commitHash: String = properties.getProperty("commit.hash", "?")
+  private lazy val date: String = properties.getProperty("date", "?")
   private lazy val branch: String = properties.getProperty("branch", "?")
   private lazy val version: String = properties.getProperty("version", "?")
 
-  def apply(config: Configuration): JsObject = {
+  def apply(config: Configuration): VersionInfo = {
 
     val components: Option[JsValue] = {
 
@@ -63,13 +74,7 @@ object VersionInfo {
 
     val comps: JsValue = components.getOrElse(Json.obj())
 
-    Json.obj(
-      "version" -> version,
-      "commitHash" -> commitHashShort,
-      "branch" -> branch,
-      "date" -> pushDate,
-      "corespring-components" -> comps)
-
+    VersionInfo(version, commitHash, branch, date, comps)
   }
 
 }

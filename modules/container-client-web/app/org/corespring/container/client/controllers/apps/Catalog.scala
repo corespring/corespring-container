@@ -1,81 +1,52 @@
 package org.corespring.container.client.controllers.apps
 
-import org.corespring.container.client.component.AllItemTypesReader
+import org.corespring.container.client.component.ComponentBundler
 import org.corespring.container.client.controllers.GetAsset
-import org.corespring.container.client.controllers.jade.Jade
-import org.corespring.container.client.hooks.{ LoadHook, CatalogHooks }
-import org.corespring.container.client.hooks.Hooks.StatusMessage
-import org.corespring.container.client.views.models.SupportingMaterialsEndpoints
-import org.corespring.container.client.views.txt.js.CatalogServices
-import play.api.libs.json.{ JsArray, JsString, JsValue, Json }
-import play.api.mvc.{ Action, AnyContent }
+import org.corespring.container.client.hooks.CatalogHooks
+import org.corespring.container.client.integration.ContainerExecutionContext
+import org.corespring.container.client.pages.CatalogRenderer
+import play.api.Mode.Mode
+import play.api.mvc.{Action, AnyContent, Controller}
+import play.api.{Logger, Mode}
 
-import scala.concurrent.{ Future }
+import scala.concurrent.Future
 
-trait Catalog
-  extends AllItemTypesReader
-  with App[CatalogHooks]
-  with Jade
-  with GetAsset[CatalogHooks] {
+class Catalog(
+               mode: Mode,
+               val hooks: CatalogHooks,
+               catalogRenderer: CatalogRenderer,
+               bundler: ComponentBundler,
+               val containerContext: ContainerExecutionContext) extends Controller with GetAsset[CatalogHooks] {
 
-  override def context: String = "catalog"
+  private lazy val logger = Logger(classOf[Catalog])
 
-  def servicesJs(itemId: String) = {
-    import org.corespring.container.client.controllers.resources.routes._
-
-    val componentJson: Seq[JsValue] = interactions.map {
-      c =>
-        val tag = tagName(c.id.org, c.id.name)
-        Json.obj(
-          "name" -> c.id.name,
-          "title" -> JsString(c.title.getOrElse("")),
-          "titleGroup" -> JsString(c.titleGroup.getOrElse("")),
-          "icon" -> s"$modulePath/icon/$tag",
-          "componentType" -> tag,
-          "defaultData" -> c.defaultData)
-    }
-
-    import org.corespring.container.client.controllers.resources.routes
-
-    val smEndpoints = SupportingMaterialsEndpoints(
-      create = routes.Item.createSupportingMaterial(itemId),
-      createFromFile = routes.Item.createSupportingMaterialFromFile(itemId),
-      delete = routes.Item.deleteSupportingMaterial(itemId, ":name"),
-      addAsset = routes.Item.addAssetToSupportingMaterial(itemId, ":name"),
-      deleteAsset = routes.Item.deleteAssetFromSupportingMaterial(itemId, ":name", ":filename"),
-      getAsset = routes.Item.getAssetFromSupportingMaterial(itemId, ":name", ":filename"),
-      updateContent = routes.Item.updateSupportingMaterialContent(itemId, ":name", ":filename"))
-
-    CatalogServices("catalog.services", Item.load(itemId), JsArray(componentJson), smEndpoints).toString
-  }
+  private lazy val endpoints = ItemEditorEndpoints
 
   def load(id: String): Action[AnyContent] = Action.async {
     implicit request =>
-      hooks.showCatalog(id).flatMap { e =>
+      val prodMode = request.getQueryString("mode").map(_ == "prod").getOrElse(mode == Mode.Prod)
 
-        def ifEmpty = {
-          logger.trace(s"[showCatalog]: $id")
-
-          val scriptInfo = componentScriptInfo(componentTypes(Json.obj()), jsMode == "dev")
-          val domainResolvedJs = buildJs(scriptInfo)
-          val domainResolvedCss = buildCss(scriptInfo)
-          Ok(
-            renderJade(
-              CatalogTemplateParams(
-                context,
-                domainResolvedJs,
-                domainResolvedCss,
-                jsSrc.ngModules ++ scriptInfo.ngDependencies,
-                servicesJs(id),
-                StaticPaths.staticPaths)))
+      hooks.showCatalog(id).flatMap { err =>
+        err match {
+          case Some((code, msg)) => {
+            val showErrorInUi = !prodMode
+            Future.successful(
+              Status((code))(org.corespring.container.client.views.html.error.main(code, msg, showErrorInUi))
+            )
+          }
+          case _ => {
+            bundler.bundleAll("catalog", Some("editor"), !prodMode) match {
+              case Some(b) => {
+                val mainEndpoints = endpoints.main(id)
+                val supportingMaterialsEndpoints = endpoints.supportingMaterials(id)
+                catalogRenderer.render(b, mainEndpoints, supportingMaterialsEndpoints, prodMode).map { html =>
+                  Ok(html)
+                }
+              }
+              case _ => Future.successful(BadRequest("Failed to build bundle"))
+            }
+          }
         }
-
-        def onError(sm: StatusMessage) = {
-          val (code, msg) = sm
-          Status((code))(org.corespring.container.client.views.html.error.main(code, msg, showErrorInUi))
-        }
-        Future(e.fold(ifEmpty)(onError))
       }
   }
-
 }

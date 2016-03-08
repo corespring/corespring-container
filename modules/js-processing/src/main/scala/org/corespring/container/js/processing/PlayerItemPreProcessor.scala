@@ -1,10 +1,10 @@
 package org.corespring.container.js.processing
 
-import org.corespring.container.components.processing.{ PlayerItemPreProcessor => PreProcessor }
+import org.corespring.container.components.processing.{PlayerItemPreProcessor => PreProcessor, ItemPruner}
 import org.corespring.container.js.api.GetServerLogic
 import play.api.libs.json._
 
-trait PlayerItemPreProcessor extends PreProcessor with GetServerLogic {
+trait PlayerItemPreProcessor extends PreProcessor with GetServerLogic with ItemPruner{
 
   def preProcessItemForPlayer(item: JsValue): JsValue = {
 
@@ -27,7 +27,7 @@ trait PlayerItemPreProcessor extends PreProcessor with GetServerLogic {
       })
 
     item.transform(jsonTransformer) match {
-      case succ: JsSuccess[JsObject] => succ.get
+      case succ: JsSuccess[JsObject] => pruneItem(succ.get)
       case _ => item
     }
 

@@ -1,10 +1,7 @@
 @(namespace: String,
-load: Call,
-saveSubset: Call,
-save: Option[Call],
+mainEndpoints: org.corespring.container.client.views.models.MainEndpoints,
 smEndpoints: org.corespring.container.client.views.models.SupportingMaterialsEndpoints,
-componentSet: JsValue,
-widgets: JsValue)
+compAndWidgets: org.corespring.container.client.views.models.ComponentsAndWidgets)
 
 @toMethodAndUrl(c:Call) = @{
   s"{ method: '${c.method.toLowerCase}', url: '${c.url}'}"  
@@ -17,22 +14,22 @@ widgets: JsValue)
 
   angular.module('@namespace').factory('ItemUrls', [ function($http){
     return {
-      load: @toMethodAndUrl(load),
-      @save.map { save =>
+      load: @toMethodAndUrl(mainEndpoints.load),
+      @mainEndpoints.save.map { save =>
         save: @toMethodAndUrl(save),
       }
-      saveSubset: @toMethodAndUrl(saveSubset)
+      saveSubset: @toMethodAndUrl(mainEndpoints.saveSubset)
     }
   }]);
 
   angular.module('@namespace').factory('SupportingMaterialUrls', [function(){
-    return @smEndpoints.toJsonString;
+    return @smEndpoints.jsonString;
   }]);
 
   angular.module('@namespace').factory('ComponentService', [function(){
     return {
         loadAvailableComponents: function(onSuccess, onFailure){
-          var components = @{Json.stringify(componentSet)};
+          var components = @{Json.stringify(compAndWidgets.components)};
           onSuccess(components);
         }
     };
@@ -41,8 +38,8 @@ widgets: JsValue)
   angular.module('@namespace').factory('DesignerService', ['$http', function($http){
     return {
       loadAvailableUiComponents: function(onSuccess, onFailure){
-        var interactions = @{Json.stringify(componentSet)};
-        var widgets = @{Json.stringify(widgets)};
+        var interactions = @{Json.stringify(compAndWidgets.components)};
+        var widgets = @{Json.stringify(compAndWidgets.widgets)};
         onSuccess({ interactions: interactions, widgets: widgets });
       }
     };

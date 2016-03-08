@@ -1,11 +1,13 @@
 package org.corespring.container.js.rhino
 
-import org.corespring.container.components.model.Server
+import org.corespring.container.components.model.{Component, Server}
 import org.corespring.container.components.model.dependencies.ComponentMaker
-import org.mozilla.javascript.{ Function => RhinoFunction }
+import org.corespring.container.components.services.{ComponentService, DependencyResolver}
+import org.mozilla.javascript.{Function => RhinoFunction}
 import org.specs2.matcher.Matcher
 import org.specs2.mutable.Specification
-import play.api.libs.json.{ JsValue, Json, JsObject }
+import play.api.libs.json.{JsObject, JsValue, Json}
+
 import scala.language.dynamics
 
 class ResponseGeneratorTest extends Specification with ComponentMaker {
@@ -35,14 +37,23 @@ class ResponseGeneratorTest extends Specification with ComponentMaker {
       Json.obj("value" -> "1", "feedback" -> "super"),
       Json.obj("value" -> "2", "feedback" -> "not super")))
 
+  private def mkService(comps:Component*) = new ComponentService{
+    override def components: Seq[Component] = comps
+  }
+
   "ResponseGenerator" should {
 
     val beRightResponse: Matcher[(String, String, String)] = (set: (String, String, String)) => {
       val (value, expectedCorrectness, expectedFeedback) = set
       val answer = Json.obj("value" -> value)
 
-      val builder = new RhinoScopeBuilder(Seq(
-        uiComp("comp-type-tester", Seq.empty).copy(server = Server(respondJs))))
+      val comps = Seq(
+        uiComp("comp-type-tester", Seq.empty).copy(server = Server(respondJs)))
+      val service = mkService(comps : _*)
+      val resolver = new DependencyResolver(service)
+      val builder = new RhinoScopeBuilder(resolver, service.components)
+//      val builder = new RhinoScopeBuilder(Seq(
+//        uiComp("comp-type-tester", Seq.empty).copy(server = Server(respondJs))))
 
       val serverLogic = new RhinoServerLogic("org-comp-type-tester", builder.scope)
 

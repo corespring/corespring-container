@@ -1,5 +1,6 @@
 package org.corespring.container.client.controllers.apps
 
+import org.corespring.container.client.controllers.resources.SingleComponent
 import play.api.libs.json._
 
 trait TemplateParams {
@@ -23,52 +24,40 @@ trait TemplateParams {
   }
 }
 
-case class CatalogTemplateParams(appName: String,
-  js: Seq[String],
-  css: Seq[String],
-  componentNgModules: Seq[String],
-  ngServiceLogic: String,
-  staticPaths: JsValue) extends TemplateParams{
-  override def toJadeParams = {
-    super.toJadeParams ++ Map("staticPaths" -> staticPaths)
-  }
-}
 
-case class EditorClientOptions(debounceInMillis:Long, staticPaths:JsObject) {
+case class EditorClientOptions(debounceInMillis: Long, staticPaths: JsObject) {
   def toJson = Json.format[EditorClientOptions].writes(this)
 }
 
-case class EditorTemplateParams(appName: String,
-  js: Seq[String],
-  css: Seq[String],
-  componentNgModules: Seq[String],
-  ngServiceLogic: String,
-  versionInfo: JsValue,
-  options: EditorClientOptions) extends TemplateParams {
-  override def toJadeParams = {
-    super.toJadeParams ++ Map(
-      "versionInfo" -> Json.stringify(versionInfo),
-      "options" -> Json.stringify(options.toJson))
-  }
+trait ComponentEditorOptions {
+  def uploadUrl: Option[String]
+  def uploadMethod: Option[String]
+  def toJson: JsValue
 }
 
-case class DevEditorTemplateParams(appName: String,
-  js: Seq[String],
-  css: Seq[String],
-  componentNgModules: Seq[String],
-  ngServiceLogic: String) extends TemplateParams
-
-case class RigTemplateParams(appName: String,
-  js: Seq[String],
-  css: Seq[String],
-  componentNgModules: Seq[String],
-  itemJson: String) extends TemplateParams {
-  override def ngServiceLogic: String = ""
-  override def toJadeParams = {
-    super.toJadeParams ++ Map(
-      "itemJson" -> itemJson)
-  }
+case class PreviewRightComponentEditorOptions(
+  showPreview: Option[Boolean],
+  previewWidth: Option[Int],
+  uploadUrl: Option[String],
+  uploadMethod: Option[String],
+  singleComponentKey: String = SingleComponent.Key)
+  extends ComponentEditorOptions {
+  override def toJson = Json.format[PreviewRightComponentEditorOptions].writes(this)
 }
+
+case class TabComponentEditorOptions(activePane: Option[String],
+  showNavigation: Option[Boolean],
+  uploadUrl: Option[String],
+  uploadMethod: Option[String],
+  singleComponentKey: String = SingleComponent.Key)
+  extends ComponentEditorOptions {
+  override def toJson = Json.format[TabComponentEditorOptions].writes(this)
+}
+
+object ComponentEditorOptions {
+  def default = TabComponentEditorOptions(None, None, None, None)
+}
+
 
 case class PlayerTemplateParams(
   appName: String,
