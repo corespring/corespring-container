@@ -267,7 +267,11 @@ angular.module('corespring-player.controllers')
             callback(null, score);
           }
 
-          $scope.getScore(onScoreReceived, callback);
+          function onScoreError(){
+            callback(null, 0);
+          }
+
+          $scope.getScore(onScoreReceived, onScoreError);
         });
 
         $scope.$on('completeResponse', function(event, data, callback) {
