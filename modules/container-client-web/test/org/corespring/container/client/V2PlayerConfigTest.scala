@@ -5,36 +5,34 @@ import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import org.specs2.specification._
 import play.api.Configuration
-import play.api.libs.json.{ JsValue, Json }
 
 class V2PlayerConfigTest extends Specification with Mockito {
 
-  private class TestContext(configJson: String) extends Before {
+  def configString(enabled: Boolean) =
+    s"""{corespring:{v2player:{newrelic:{enabled:$enabled, license-key: key, application-id:id}}}}"""
 
-    def before {}
+  class scope(configJson: String) extends Scope {
+
     val config = ConfigFactory.parseString(configJson)
     val configuration = new Configuration(config)
     val playerConfig = V2PlayerConfig(configuration)
-    val newRelicRumConfig: Option[JsValue] = playerConfig.newRelicRumConfig
-    val validNewRelicConf = Json.obj(
-      "licenseKey" -> "key",
-      "applicationID" -> "id",
-      "sa" -> 1,
-      "beacon" -> "bam.nr-data.net",
-      "errorBeacon" -> "bam.nr-data.net",
-      "agent" -> "js-agent.newrelic.com/nr-476.min.js")
   }
 
-  "newRelicRumConfig" should {
-    "be returned from config if enabled is true" in new TestContext("{corespring:{v2player:{newrelic:{enabled:true, license-key: key, application-id:id}}}}") {
-      newRelicRumConfig === Some(validNewRelicConf)
+  "apply" should {
+    "return a new config" in new scope(configString(true)) {
+      playerConfig.newRelicRumConfig must_== Some(NewRelicRumConfig("key", "id"))
     }
-    "be not be returned from config if enabled is false" in new TestContext("{corespring:{v2player:{newrelic:{enabled:false, license-key: key, application-id:id}}}}") {
-      newRelicRumConfig === None
+
+    "not return a config if enabled is false" in new scope(configString(false)) {
+      playerConfig.newRelicRumConfig === None
     }
-    "be converted to proper json config object" in new TestContext("{corespring:{v2player:{newrelic:{enabled:true, license-key: key, application-id:id}}}}") {
-      import NewRelicRumConfig.writes
-      Json.toJson(newRelicRumConfig.get) === validNewRelicConf
+
+    "set useNewRelic to false, if enabled is false" in new scope(configString(false)) {
+      playerConfig.useNewRelic === false
+    }
+
+    "be converted to proper json config object" in new scope(configString(true)) {
+      playerConfig.newRelicRumConfig.map(_.json) === Some(NewRelicRumConfig("key", "id").json)
     }
   }
 }

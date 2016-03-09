@@ -78,8 +78,7 @@ class PlayerRenderer(
 
     val inlineJs = PlayerServices("player-injected", endpoints, queryParamsJson).toString
 
-    val useNewRelicRumConfig = playerConfig.newRelicRumConfig.isDefined
-    val newRelicRumConfig = playerConfig.newRelicRumConfig.getOrElse(Json.obj())
+    val newRelicRumConfig = playerConfig.newRelicRumConfig.map(c => c.json).getOrElse(Json.obj())
 
     val processedXhtml = processXhtml((item \ "xhtml").asOpt[String])
     val preprocessedItem = itemPreProcessor.preProcessItemForPlayer(item).as[JsObject] ++ Json.obj("xhtml" -> processedXhtml)
@@ -94,7 +93,7 @@ class PlayerRenderer(
       "js" -> jsWithControls.toArray,
       "css" -> css.toArray,
       "showControls" -> javaBoolean(showControls),
-      "useNewRelicRumConfig" -> javaBoolean(useNewRelicRumConfig),
+      "useNewRelicRumConfig" -> javaBoolean(playerConfig.useNewRelic),
       "newRelicRumConfig" -> Json.stringify(newRelicRumConfig),
       "warnings" -> Json.stringify(Json.arr(warnings: _*)),
       "ngModules" -> jsArrayString(ngModules),
