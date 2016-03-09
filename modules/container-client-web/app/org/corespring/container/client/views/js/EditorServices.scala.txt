@@ -1,7 +1,8 @@
 @(namespace: String,
 mainEndpoints: org.corespring.container.client.views.models.MainEndpoints,
 smEndpoints: org.corespring.container.client.views.models.SupportingMaterialsEndpoints,
-compAndWidgets: org.corespring.container.client.views.models.ComponentsAndWidgets)
+compAndWidgets: org.corespring.container.client.views.models.ComponentsAndWidgets,
+showNonReleasedComponents: Boolean)
 
 @toMethodAndUrl(c:Call) = @{
   s"{ method: '${c.method.toLowerCase}', url: '${c.url}'}"  
@@ -40,7 +41,7 @@ compAndWidgets: org.corespring.container.client.views.models.ComponentsAndWidget
       loadAvailableUiComponents: function(onSuccess, onFailure){
         var interactions = @{Json.stringify(compAndWidgets.components)};
         var widgets = @{Json.stringify(compAndWidgets.widgets)};
-        onSuccess({ interactions: interactions, widgets: widgets });
+        onSuccess({ interactions: interactions, widgets: widgets, showNonReleasedComponents: @{showNonReleasedComponents} });
       }
     };
   }]);

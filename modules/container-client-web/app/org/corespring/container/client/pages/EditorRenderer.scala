@@ -8,7 +8,7 @@ import org.corespring.container.client.pages.engine.JadeEngine
 import org.corespring.container.client.pages.processing.AssetPathProcessor
 import org.corespring.container.client.views.models.{ ComponentsAndWidgets, MainEndpoints, SupportingMaterialsEndpoints }
 import org.corespring.container.client.views.txt.js.EditorServices
-import play.api.Logger
+import play.api.{Mode, Play, Logger}
 import play.api.libs.json.Json
 import play.api.templates.Html
 
@@ -37,7 +37,9 @@ trait EditorRenderer extends CoreRenderer {
 
     val serverNgModuleName = s"$name.serverInjectedServices"
 
-    val servicesJs = EditorServices(serverNgModuleName, mainEndpoints, supportingMaterialsEndpoints, componentsAndWidgets)
+    val showNonReleasedComponents = Play.current.configuration.getBoolean("components.showNonReleasedComponents").getOrElse(Play.current.mode == Mode.Dev)
+
+    val servicesJs = EditorServices(serverNgModuleName, mainEndpoints, supportingMaterialsEndpoints, componentsAndWidgets, showNonReleasedComponents)
 
     val ngModules = jsArrayString(Seq(serverNgModuleName) ++ sources.js.ngModules ++ bundle.ngModules)
 

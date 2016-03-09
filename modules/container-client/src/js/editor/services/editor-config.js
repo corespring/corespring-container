@@ -27,6 +27,7 @@ angular.module('corespring-editor.services').service('EditorConfig', [
         var configPanels = {},
           interactions = null,
           widgets = null,
+          showNonReleasedComponents,
           logger = LogFactory.getLogger('editor-config');
 
         this.onFileSizeGreaterThanMax = function($event){
@@ -43,6 +44,7 @@ angular.module('corespring-editor.services').service('EditorConfig', [
         function onComponentsLoaded(uiComponents) {
           interactions = uiComponents.interactions;
           widgets = uiComponents.widgets;
+          showNonReleasedComponents = uiComponents.showNonReleasedComponents;
           initComponents.bind(this)();
         }
 
@@ -186,7 +188,7 @@ angular.module('corespring-editor.services').service('EditorConfig', [
           }
 
           function isReleased(component) {
-            return component.released;
+            return showNonReleasedComponents || component.released;
           }
 
           function mkGroup(){
