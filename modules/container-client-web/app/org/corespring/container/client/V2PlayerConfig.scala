@@ -1,36 +1,29 @@
 package org.corespring.container.client
 
 import play.api.Configuration
-import play.api.libs.json.{Json, JsValue, Writes}
+
+case class V2PlayerConfig(rootUrl: Option[String], newRelicRumConfig: Option[NewRelicRumConfig]) {
+  val useNewRelic = newRelicRumConfig.isDefined
+}
 
 object V2PlayerConfig {
-  def apply(rootConfig: Configuration) = {
-    new V2PlayerConfig(rootConfig.getConfig("corespring.v2player"))
+
+  def empty = V2PlayerConfig(None, None)
+
+  def apply(rootConfig: Configuration): V2PlayerConfig = {
+    rootConfig.getConfig("corespring.v2player").map { c =>
+      lazy val rootUrl: Option[String] = c.getString("rootUrl")
+      lazy val nrConfig = for {
+        enabled <- c.getBoolean("newrelic.enabled")
+        if enabled
+        licenseKey <- c.getString("newrelic.license-key")
+        applicationID <- c.getString("newrelic.application-id ")
+      } yield NewRelicRumConfig(licenseKey, applicationID)
+
+      V2PlayerConfig(rootUrl, nrConfig)
+
+    }.getOrElse(
+      V2PlayerConfig.empty)
   }
 }
-
-class V2PlayerConfig(val underlying: Option[Configuration]) {
-
-  lazy val rootUrl: Option[String] = underlying.map { c =>
-    c.getString("rootUrl")
-  }.flatten
-
-  lazy val newRelicRumConfig: Option[JsValue] = {
-    import NewRelicRumConfig.writes
-
-    for {
-      map <- underlying
-      enabled <- map.getBoolean("newrelic.enabled")
-      if enabled
-      licenseKey <- map.getString("newrelic.license-key")
-      applicationID <- map.getString("newrelic.application-id ")
-    } yield {
-      Json.toJson(NewRelicRumConfig(licenseKey, applicationID))
-    }
-  }
-}
-
-
-
-
 

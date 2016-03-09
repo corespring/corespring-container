@@ -1,6 +1,6 @@
 package org.corespring.container.client.component
 
-import org.corespring.container.client.controllers.helpers.{NameHelper, XhtmlProcessor}
+import org.corespring.container.client.controllers.helpers.{ NameHelper, XhtmlProcessor }
 import org.corespring.container.components.model._
 import org.corespring.container.components.services.ComponentService
 import play.api.Logger
@@ -10,8 +10,7 @@ object ItemComponentTypes extends NameHelper {
 
   private lazy val logger = Logger(ItemComponentTypes.getClass)
 
-
-  def apply(componentService:ComponentService, item: JsValue) :  Seq[Component] = {
+  def apply(componentService: ComponentService, item: JsValue): Seq[Component] = {
     apply(componentService.interactions, componentService.widgets, componentService.layoutComponents, item)
   }
 
