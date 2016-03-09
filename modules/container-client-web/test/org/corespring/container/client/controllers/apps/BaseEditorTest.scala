@@ -1,10 +1,11 @@
 package org.corespring.container.client.controllers.apps
 
 import org.corespring.container.client.component._
+import org.corespring.container.client.controllers.EditorConfig
 import org.corespring.container.client.hooks.EditorHooks
 import org.corespring.container.client.integration.ContainerExecutionContext
-import org.corespring.container.client.pages.{ComponentEditorRenderer, EditorRenderer}
-import org.corespring.container.client.views.models.{ComponentsAndWidgets, MainEndpoints, SupportingMaterialsEndpoints}
+import org.corespring.container.client.pages.{ ComponentEditorRenderer, EditorRenderer }
+import org.corespring.container.client.views.models.{ ComponentsAndWidgets, MainEndpoints, SupportingMaterialsEndpoints }
 import org.corespring.container.components.services.ComponentService
 import org.corespring.test.TestContext
 import org.specs2.mock.Mockito
@@ -31,7 +32,9 @@ class BaseEditorTest extends Specification with Mockito {
     }
 
     val r = FakeRequest("", "")
-    override def mode: Mode = Mode.Dev
+
+    override val config: EditorConfig = EditorConfig(Mode.Dev, true)
+
     override val componentEditorRenderer: ComponentEditorRenderer = mock[ComponentEditorRenderer]
 
     override val renderer: EditorRenderer = {

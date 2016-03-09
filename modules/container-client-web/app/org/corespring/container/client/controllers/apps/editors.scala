@@ -41,11 +41,11 @@ trait BaseEditor[H <: EditorHooks]
 
   implicit def ec = containerContext.context
 
-  val config: EditorConfig
+  def config: EditorConfig
 
-  val showNonReleased: Boolean = config.showNonReleased
+  lazy val showNonReleased: Boolean = config.showNonReleased
 
-  val mode: Mode = config.mode
+  lazy val mode: Mode = config.mode
 
   lazy val componentsAndWidgets = ComponentsAndWidgets(
     JsArray(componentService.interactions(showNonReleased).map(componentJson.toJson)),

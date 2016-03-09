@@ -6,6 +6,7 @@ import org.corespring.container.client.hooks._
 import org.corespring.container.client.pages.engine.JadeEngineConfig
 import org.corespring.container.client.VersionInfo
 import org.corespring.container.client.component.ComponentSetExecutionContext
+import org.corespring.container.client.controllers.EditorConfig
 import org.corespring.container.components.model.Component
 import org.corespring.test.TestContext
 import org.specs2.mock.Mockito
@@ -59,6 +60,8 @@ class TestDI extends DefaultIntegration {
   override def itemEditorHooks: ItemEditorHooks = ???
 
   override def components: Seq[Component] = ???
+
+  override def editorConfig: EditorConfig = ???
 }
 
 class DefaultIntegrationTest extends Specification with Mockito with PlaySpecification {
@@ -111,6 +114,8 @@ class DefaultIntegrationTest extends Specification with Mockito with PlaySpecifi
       override def mode: Mode = Mode.Test
 
       override def componentSetExecutionContext: ComponentSetExecutionContext = ComponentSetExecutionContext(ExecutionContext.global)
+
+      override def editorConfig: EditorConfig = EditorConfig(mode, true)
     }
   }
 
