@@ -230,7 +230,7 @@ exports.define = function(isSecure) {
     };
 
     this.getSessionStatus = function(callback) {
-      instance.send( 'getSessionStatus', messageResultHandler(callback));
+      instance.send('getSessionStatus', messageResultHandler(callback));
     };
 
     this.isComplete = _isComplete;
