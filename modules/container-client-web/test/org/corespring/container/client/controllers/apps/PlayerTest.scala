@@ -1,6 +1,6 @@
 package org.corespring.container.client.controllers.apps
 
-import org.corespring.container.client.component.{ComponentBundler, ComponentsScriptBundle}
+import org.corespring.container.client.component.{ ComponentBundler, ComponentsScriptBundle }
 import org.corespring.container.client.hooks.PlayerHooks
 import org.corespring.container.client.pages.PlayerRenderer
 import org.corespring.container.components.model.Id
@@ -10,12 +10,12 @@ import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
 import org.specs2.time.NoTimeConversions
-import play.api.http.{ContentTypes, HeaderNames}
-import play.api.libs.json.{JsValue, Json}
+import play.api.http.{ ContentTypes, HeaderNames }
+import play.api.libs.json.{ JsValue, Json }
 import play.api.mvc.RequestHeader
 import play.api.templates.Html
-import play.api.test.{FakeRequest, PlaySpecification}
-import play.api.{GlobalSettings, Mode}
+import play.api.test.{ FakeRequest, PlaySpecification }
+import play.api.{ GlobalSettings, Mode }
 
 import scala.concurrent._
 import scala.concurrent.duration._
@@ -47,7 +47,7 @@ class PlayerTest extends Specification with PlaySpecification with Mockito
 
     val playerRenderer = {
       val m = mock[PlayerRenderer]
-      m.render(any[String], any[JsValue], any[JsValue], any[ComponentsScriptBundle], any[Seq[String]], any[Boolean]) returns {
+      m.render(any[String], any[JsValue], any[JsValue], any[ComponentsScriptBundle], any[Seq[String]], any[Boolean], any[Boolean]) returns {
         Future.successful(Html("<html></html>"))
       }
       m

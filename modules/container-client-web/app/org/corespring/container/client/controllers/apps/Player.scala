@@ -2,7 +2,7 @@ package org.corespring.container.client.controllers.apps
 
 import java.net.URLEncoder
 
-import org.corespring.container.client.component.{ComponentBundler, ItemComponentTypes}
+import org.corespring.container.client.component.{ ComponentBundler, ItemComponentTypes }
 import org.corespring.container.client.controllers.GetAsset
 import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.client.hooks.PlayerHooks
@@ -12,7 +12,7 @@ import org.corespring.container.components.services.ComponentService
 import play.api.Mode
 import play.api.Mode.Mode
 import play.api.http.ContentTypes
-import play.api.libs.json.{JsObject, JsValue}
+import play.api.libs.json.{ JsObject, JsValue }
 import play.api.mvc._
 import play.api.templates.Html
 
@@ -32,7 +32,7 @@ class Player(mode: Mode,
     case Right(s) => fn(s)
   }
 
-  private def createPlayerHtml(sessionId: String, session: JsValue, item: JsValue, prodMode: Boolean): Either[String, Future[Html]] = {
+  private def createPlayerHtml(sessionId: String, session: JsValue, item: JsValue, prodMode: Boolean, showControls: Boolean): Either[String, Future[Html]] = {
     val ids = ItemComponentTypes(componentService, item).map(_.id)
 
     bundler.bundle(ids, "player", Some("player"), !prodMode) match {
@@ -46,8 +46,7 @@ class Player(mode: Mode,
         }
 
         Right(
-          playerRenderer.render(sessionId, session, item, b, warnings, prodMode)
-        )
+          playerRenderer.render(sessionId, session, item, b, warnings, prodMode, showControls))
       }
       case _ => Left(s"Failed to create a bundle for: $sessionId")
     }
@@ -59,7 +58,8 @@ class Player(mode: Mode,
         val (session, item) = tuple
         require((session \ "id").asOpt[String].isDefined, "The session model must specify an 'id'")
         val prodMode = request.getQueryString("mode").map(_ == "prod").getOrElse(mode == Mode.Prod)
-        createPlayerHtml(sessionId, session, item, prodMode) match {
+        val showControls = request.getQueryString("showControls").map(_ == "true").getOrElse(false)
+        createPlayerHtml(sessionId, session, item, prodMode, showControls) match {
           case Left(e) => Future.successful(BadRequest(e))
           case Right(f) => f.map(Ok(_))
         }
@@ -119,8 +119,9 @@ class Player(mode: Mode,
         val (session, item) = tuple
         require((session \ "id").asOpt[String].isDefined, "The session model must specify an 'id'")
         val prodMode = request.getQueryString("mode").map(_ == "prod").getOrElse(mode == Mode.Prod)
+        val showControls = request.getQueryString("showControls").map(_ == "true").getOrElse(false)
 
-        createPlayerHtml((session \ "id").as[String], session, item, prodMode) match {
+        createPlayerHtml((session \ "id").as[String], session, item, prodMode, showControls) match {
           case Left(e) => Future.successful(BadRequest(e))
           case Right(f) => f.map { html =>
             lazy val call = org.corespring.container.client.controllers.apps.routes.Player.load((session \ "id").as[String])

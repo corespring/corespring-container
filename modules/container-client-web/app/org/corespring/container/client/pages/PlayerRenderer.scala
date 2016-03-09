@@ -4,7 +4,7 @@ import java.lang.Boolean
 
 import org.corespring.container.client.{ V2PlayerConfig, VersionInfo }
 import org.corespring.container.client.component.{ ComponentJson, ComponentsScriptBundle }
-import org.corespring.container.client.controllers.apps.{ PageSourceService, PlayerEndpoints, SourcePaths }
+import org.corespring.container.client.controllers.apps.{ NgSourcePaths, PageSourceService, PlayerEndpoints, SourcePaths }
 import org.corespring.container.client.controllers.helpers.PlayerXhtml
 import org.corespring.container.client.integration.ContainerExecutionContext
 import org.corespring.container.client.pages.engine.JadeEngine
@@ -36,7 +36,7 @@ class PlayerRenderer(
 
   private def javaBoolean(b: Boolean): java.lang.Boolean = new java.lang.Boolean(b)
 
-  lazy val controlsJsSrc: SourcePaths = pageSourceService.loadJs(s"player-controls")
+  lazy val controlsJsSrc: NgSourcePaths = pageSourceService.loadJs(s"player-controls")
 
   /**
    * Preprocess the xml so that it'll work in all browsers
@@ -50,18 +50,24 @@ class PlayerRenderer(
       playerXhtml.processXhtml(xhtml)
   }.getOrElse("<div><h1>New Item</h1></div>")
 
-  def render(sessionId: String, session: JsValue, item: JsValue, bundle: ComponentsScriptBundle, warnings: Seq[String], prodMode: scala.Boolean): Future[Html] = Future {
+  def render(
+    sessionId: String,
+    session: JsValue,
+    item: JsValue,
+    bundle: ComponentsScriptBundle,
+    warnings: Seq[String],
+    prodMode: scala.Boolean,
+    showControls: scala.Boolean): Future[Html] = Future {
     logger.info(s"function=render, bundle=$bundle")
 
     val (js, css) = prepareJsCss(prodMode, bundle)
     val endpoints = PlayerEndpoints.session(sessionId)
     val queryParams = Json.obj()
-    val showControls: scala.Boolean = true
 
-    val controlsJs: Seq[String] = (showControls, prodMode) match {
-      case (true, true) => Seq(controlsJsSrc.dest)
-      case (true, false) => controlsJsSrc.src
-      case (_, _) => Nil
+    val (controlsJs, controlsNgModules): (Seq[String], Seq[String]) = (showControls, prodMode) match {
+      case (true, true) => Seq(controlsJsSrc.dest) -> controlsJsSrc.ngModules
+      case (true, false) => controlsJsSrc.src -> controlsJsSrc.ngModules
+      case (_, _) => Nil -> Nil
     }
 
     val jsWithControls = js ++ controlsJs
@@ -76,7 +82,7 @@ class PlayerRenderer(
     val preprocessedItem = itemPreProcessor.preProcessItemForPlayer(item).as[JsObject] ++ Json.obj("xhtml" -> processedXhtml)
     val sessionJson = Json.obj("session" -> session, "item" -> preprocessedItem)
 
-    val ngModules = Some("player-injected") ++ sources.js.ngModules ++ bundle.ngModules
+    val ngModules = Some("player-injected") ++ sources.js.ngModules ++ bundle.ngModules ++ controlsNgModules
 
     logger.trace(s"function=render, ngModules=$ngModules")
 
