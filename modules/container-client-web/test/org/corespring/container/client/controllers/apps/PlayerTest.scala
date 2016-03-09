@@ -47,7 +47,7 @@ class PlayerTest extends Specification with PlaySpecification with Mockito
 
     val playerRenderer = {
       val m = mock[PlayerRenderer]
-      m.render(any[String], any[JsValue], any[JsValue], any[ComponentsScriptBundle], any[Seq[String]], any[Boolean], any[Boolean]) returns {
+      m.render(any[String], any[JsValue], any[JsValue], any[ComponentsScriptBundle], any[Seq[String]], any[Map[String, String]], any[Boolean], any[Boolean]) returns {
         Future.successful(Html("<html></html>"))
       }
       m

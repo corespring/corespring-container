@@ -1,15 +1,16 @@
 package org.corespring.container.client.pages
 
 import org.corespring.container.client.component.ComponentsScriptBundle
-import org.corespring.container.client.controllers.apps.NgSourcePaths
+import org.corespring.container.client.controllers.apps.{ NgSourcePaths, PlayerEndpoints }
 import org.corespring.container.client.integration.ContainerExecutionContext
+import org.corespring.container.client.views.txt.js.PlayerServices
 import org.corespring.container.client.{ V2PlayerConfig, VersionInfo }
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
 import org.specs2.time.NoTimeConversions
 import play.api.Configuration
-import play.api.libs.json.Json
+import play.api.libs.json.Json._
 
 import scala.concurrent.{ Await, Future }
 import scala.concurrent.duration._
@@ -32,7 +33,7 @@ class PlayerRendererTest extends Specification with Mockito with NoTimeConversio
     lazy val componentJson = RendererMocks.componentJson
     lazy val playerXhtml = RendererMocks.playerXhtml
     lazy val itemPreProcessor = RendererMocks.itemPreProcessor
-    lazy val versionInfo = VersionInfo("", "", "", "", Json.obj())
+    lazy val versionInfo = VersionInfo("", "", "", "", obj())
 
     def waitFor[A](f: Future[A]): A = Await.result(f, 1.second)
 
@@ -47,7 +48,7 @@ class PlayerRendererTest extends Specification with Mockito with NoTimeConversio
       itemPreProcessor,
       versionInfo)
 
-    waitFor(renderer.render("sessionId", Json.obj(), Json.obj(), bundle, Nil, prodMode, showControls))
+    waitFor(renderer.render("sessionId", obj("session" -> true), obj("item" -> true, "xhtml" -> "<div/>"), bundle, Seq("warning"), Map("query" -> "param"), prodMode, showControls))
     lazy val captor = capture[Map[String, Any]]
     there was one(jadeEngine).renderJade(any[String], captor)
   }
@@ -86,6 +87,22 @@ class PlayerRendererTest extends Specification with Mockito with NoTimeConversio
         override lazy val showControls = true
         captor.value.get("ngModules") must_== Some("'player-injected','ng.controls'")
       }
+    }
+
+    "sets warning" in new scope {
+      captor.value.get("warnings") must_== Some("""["warning"]""")
+    }
+
+    "sets appName" in new scope {
+      captor.value.get("appName") must_== Some("player")
+    }
+
+    "set sessionJson" in new scope {
+      captor.value.get("sessionJson").get must_== stringify(obj("session" -> obj("session" -> true), "item" -> obj("item" -> true, "xhtml" -> "<div/>")))
+    }
+
+    "set queryParams" in new scope {
+      captor.value.get("ngServiceLogic").get must_== PlayerServices("player-injected", PlayerEndpoints.session("sessionId"), obj("query" -> "param")).toString
     }
   }
 }

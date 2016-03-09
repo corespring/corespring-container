@@ -12,7 +12,8 @@ import org.corespring.container.client.pages.processing.AssetPathProcessor
 import org.corespring.container.client.views.txt.js.PlayerServices
 import org.corespring.container.components.processing.PlayerItemPreProcessor
 import play.api.Logger
-import play.api.libs.json.{ JsObject, JsValue, Json }
+import play.api.libs.json.Json.JsValueWrapper
+import play.api.libs.json._
 import play.api.templates.Html
 
 import scala.concurrent.{ ExecutionContext, Future }
@@ -50,19 +51,22 @@ class PlayerRenderer(
       playerXhtml.processXhtml(xhtml)
   }.getOrElse("<div><h1>New Item</h1></div>")
 
+  private implicit def sToW(s: Seq[String]): Seq[JsValueWrapper] = s.map(Json.toJsFieldJsValueWrapper(_))
+
   def render(
     sessionId: String,
     session: JsValue,
     item: JsValue,
     bundle: ComponentsScriptBundle,
     warnings: Seq[String],
+    queryParams: Map[String, String],
     prodMode: scala.Boolean,
     showControls: scala.Boolean): Future[Html] = Future {
     logger.info(s"function=render, bundle=$bundle")
 
     val (js, css) = prepareJsCss(prodMode, bundle)
     val endpoints = PlayerEndpoints.session(sessionId)
-    val queryParams = Json.obj()
+    val queryParamsJson = Json.toJson(queryParams)
 
     val (controlsJs, controlsNgModules): (Seq[String], Seq[String]) = (showControls, prodMode) match {
       case (true, true) => Seq(controlsJsSrc.dest) -> controlsJsSrc.ngModules
@@ -72,12 +76,11 @@ class PlayerRenderer(
 
     val jsWithControls = js ++ controlsJs
 
-    val inlineJs = PlayerServices("player-injected", endpoints, queryParams).toString
+    val inlineJs = PlayerServices("player-injected", endpoints, queryParamsJson).toString
 
     val useNewRelicRumConfig = playerConfig.newRelicRumConfig.isDefined
     val newRelicRumConfig = playerConfig.newRelicRumConfig.getOrElse(Json.obj())
 
-    val session: JsValue = Json.obj()
     val processedXhtml = processXhtml((item \ "xhtml").asOpt[String])
     val preprocessedItem = itemPreProcessor.preProcessItemForPlayer(item).as[JsObject] ++ Json.obj("xhtml" -> processedXhtml)
     val sessionJson = Json.obj("session" -> session, "item" -> preprocessedItem)
@@ -93,11 +96,10 @@ class PlayerRenderer(
       "showControls" -> javaBoolean(showControls),
       "useNewRelicRumConfig" -> javaBoolean(useNewRelicRumConfig),
       "newRelicRumConfig" -> Json.stringify(newRelicRumConfig),
-      "warnings" -> Json.stringify(Json.arr(warnings)),
+      "warnings" -> Json.stringify(Json.arr(warnings: _*)),
       "ngModules" -> jsArrayString(ngModules),
       "ngServiceLogic" -> inlineJs,
       "sessionJson" -> Json.stringify(sessionJson),
-      "options" -> "{}",
       "versionInfo" -> Json.stringify(versionInfo.json))
 
     jadeEngine.renderJade("player", params)

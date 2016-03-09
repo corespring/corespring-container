@@ -32,12 +32,17 @@ class Player(mode: Mode,
     case Right(s) => fn(s)
   }
 
-  private def createPlayerHtml(sessionId: String, session: JsValue, item: JsValue, prodMode: Boolean, showControls: Boolean): Either[String, Future[Html]] = {
+  private def createPlayerHtml(sessionId: String, session: JsValue, item: JsValue)(implicit r: RequestHeader): Either[String, Future[Html]] = {
+
     val ids = ItemComponentTypes(componentService, item).map(_.id)
+
+    val prodMode = r.getQueryString("mode").map(_ == "prod").getOrElse(mode == Mode.Prod)
 
     bundler.bundle(ids, "player", Some("player"), !prodMode) match {
       case Some(b) => {
         val hasBeenArchived = hooks.archiveCollectionId == (session \ "collectionId")
+        val showControls = r.getQueryString("showControls").map(_ == "true").getOrElse(false)
+        val queryParams = mkQueryParams(m => m)
 
         val warnings: Seq[String] = if (hasBeenArchived) {
           Seq("Warning: This item has been deleted")
@@ -46,7 +51,7 @@ class Player(mode: Mode,
         }
 
         Right(
-          playerRenderer.render(sessionId, session, item, b, warnings, prodMode, showControls))
+          playerRenderer.render(sessionId, session, item, b, warnings, queryParams, prodMode, showControls))
       }
       case _ => Left(s"Failed to create a bundle for: $sessionId")
     }
@@ -57,9 +62,10 @@ class Player(mode: Mode,
       handleSuccess { (tuple) =>
         val (session, item) = tuple
         require((session \ "id").asOpt[String].isDefined, "The session model must specify an 'id'")
-        val prodMode = request.getQueryString("mode").map(_ == "prod").getOrElse(mode == Mode.Prod)
-        val showControls = request.getQueryString("showControls").map(_ == "true").getOrElse(false)
-        createPlayerHtml(sessionId, session, item, prodMode, showControls) match {
+        //        val prodMode = request.getQueryString("mode").map(_ == "prod").getOrElse(mode == Mode.Prod)
+        //        val showControls = request.getQueryString("showControls").map(_ == "true").getOrElse(false)
+        //        val qp = mkQueryParams(m => m)
+        createPlayerHtml(sessionId, session, item) match {
           case Left(e) => Future.successful(BadRequest(e))
           case Right(f) => f.map(Ok(_))
         }
@@ -108,8 +114,8 @@ class Player(mode: Mode,
     Json.toJson(m).asInstanceOf[JsObject]
   }
 
-  private def queryParams[A](build: (Map[String, String] => A) = mapToParamString _)(implicit rh: RequestHeader): A = {
-    val trimmed = (rh.queryString -- playerQueryStringParams).mapValues(s => s.mkString(""))
+  private def mkQueryParams[A](build: (Map[String, String] => A) = mapToParamString _)(implicit rh: RequestHeader): A = {
+    val trimmed: Map[String, String] = (rh.queryString -- playerQueryStringParams).mapValues(s => s.mkString(""))
     build(trimmed)
   }
 
@@ -118,15 +124,12 @@ class Player(mode: Mode,
       handleSuccess { (tuple) =>
         val (session, item) = tuple
         require((session \ "id").asOpt[String].isDefined, "The session model must specify an 'id'")
-        val prodMode = request.getQueryString("mode").map(_ == "prod").getOrElse(mode == Mode.Prod)
-        val showControls = request.getQueryString("showControls").map(_ == "true").getOrElse(false)
-
-        createPlayerHtml((session \ "id").as[String], session, item, prodMode, showControls) match {
+        createPlayerHtml((session \ "id").as[String], session, item) match {
           case Left(e) => Future.successful(BadRequest(e))
           case Right(f) => f.map { html =>
             lazy val call = org.corespring.container.client.controllers.apps.routes.Player.load((session \ "id").as[String])
             lazy val location = {
-              val params = queryParams[String]()
+              val params = mkQueryParams[String]()
               s"${call.url}${if (params.isEmpty) "" else s"?$params"}"
             }
             Created(html)
