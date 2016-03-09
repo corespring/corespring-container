@@ -5,21 +5,21 @@ import java.net.URL
 import com.amazonaws.services.s3.AmazonS3
 import com.softwaremill.macwire.MacwireMacros.wire
 import org.bson.types.ObjectId
-import org.corespring.amazon.s3.{ConcreteS3Service, S3Service}
+import org.corespring.amazon.s3.{ ConcreteS3Service, S3Service }
 import org.corespring.container.client._
 import org.corespring.container.client.component.ComponentSetExecutionContext
 import org.corespring.container.client.hooks._
-import org.corespring.container.client.integration.{ContainerExecutionContext, DefaultIntegration}
+import org.corespring.container.client.integration.{ ContainerExecutionContext, DefaultIntegration }
 import org.corespring.container.components.model.Component
-import org.corespring.shell.controllers.catalog.actions.{CatalogHooks => ShellCatalogHooks}
-import org.corespring.shell.controllers.editor.actions.{DraftEditorHooks => ShellDraftEditorHooks, DraftId, ItemEditorHooks => ShellItemEditorHooks}
-import org.corespring.shell.controllers.editor.{ContainerSupportingMaterialAssets}
-import org.corespring.shell.controllers.player.actions.{PlayerHooks => ShellPlayerHooks}
-import org.corespring.shell.controllers.player.{SessionHooks => ShellSessionHooks}
-import org.corespring.shell.controllers.{S3Config, ShellAssets, ShellDataQueryHooks, editor => shellEditor}
-import org.corespring.shell.services.{ItemDraftService, ItemService, SessionService}
+import org.corespring.shell.controllers.catalog.actions.{ CatalogHooks => ShellCatalogHooks }
+import org.corespring.shell.controllers.editor.ContainerSupportingMaterialAssets
+import org.corespring.shell.controllers.editor.actions.{ DraftId, DraftEditorHooks => ShellDraftEditorHooks, ItemEditorHooks => ShellItemEditorHooks }
+import org.corespring.shell.controllers.player.actions.{ PlayerHooks => ShellPlayerHooks }
+import org.corespring.shell.controllers.player.{ SessionHooks => ShellSessionHooks }
+import org.corespring.shell.controllers.{ S3Config, ShellAssets, ShellDataQueryHooks, editor => shellEditor }
+import org.corespring.shell.services.{ ItemDraftService, ItemService, SessionService }
 import play.api.Mode.Mode
-import play.api.{Configuration, Logger, Play}
+import play.api.{ Configuration, Logger, Play }
 
 import scala.concurrent.ExecutionContext
 
@@ -48,11 +48,10 @@ class ContainerClientImplementation(
 
   override lazy val playerLauncherHooks: PlayerLauncherHooks = wire[shell.controllers.player.PlayerLauncherHooks]
 
-  val s3  = S3Config(
+  val s3 = S3Config(
     key = configuration.getString("amazon.s3.key").getOrElse("?"),
     secret = configuration.getString("amazon.s3.secret").getOrElse("?"),
-    bucket = configuration.getString("amazon.s3.bucket").getOrElse(throw new RuntimeException("No bucket specified"))
-  )
+    bucket = configuration.getString("amazon.s3.bucket").getOrElse(throw new RuntimeException("No bucket specified")))
 
   lazy val s3Client: AmazonS3 = {
     val fakeEndpoint = configuration.getString("amazon.s3.fake-endpoint")
@@ -88,12 +87,12 @@ class ContainerClientImplementation(
   override lazy val itemEditorHooks: ItemEditorHooks = wire[ShellItemEditorHooks]
   override lazy val catalogHooks: CatalogHooks = wire[ShellCatalogHooks]
   override lazy val sessionHooks = wire[ShellSessionHooks]
-  override lazy val itemDraftHooks : CoreItemHooks with DraftHooks = wire[shellEditor.ItemDraftHooks]
-  override lazy val itemDraftSupportingMaterialHooks : ItemDraftSupportingMaterialHooks = wire[shellEditor.ItemDraftSupportingMaterialHooks]
-  override lazy val itemHooks : CoreItemHooks with CreateItemHook = wire[shellEditor.ItemHooks]
+  override lazy val itemDraftHooks: CoreItemHooks with DraftHooks = wire[shellEditor.ItemDraftHooks]
+  override lazy val itemDraftSupportingMaterialHooks: ItemDraftSupportingMaterialHooks = wire[shellEditor.ItemDraftSupportingMaterialHooks]
+  override lazy val itemHooks: CoreItemHooks with CreateItemHook = wire[shellEditor.ItemHooks]
   override lazy val itemSupportingMaterialHooks: ItemSupportingMaterialHooks = wire[shellEditor.ItemSupportingMaterialHooks]
   override lazy val playerHooks: PlayerHooks = wire[ShellPlayerHooks]
-  override lazy val dataQueryHooks: DataQueryHooks = wire[ShellDataQueryHooks]// with withContext
+  override lazy val dataQueryHooks: DataQueryHooks = wire[ShellDataQueryHooks] // with withContext
   override lazy val versionInfo: VersionInfo = VersionInfo(Play.current.configuration)
   override lazy val collectionHooks: CollectionHooks = wire[shellEditor.CollectionHooks]
   override lazy val itemMetadataHooks: ItemMetadataHooks = wire[shellEditor.ItemMetadataHooks] //{
