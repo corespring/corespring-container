@@ -8,7 +8,7 @@ import org.corespring.mongo.json.services.MongoService
 import org.corespring.play.utils.{ CallBlockOnHeaderFilter, ControllerInstanceResolver }
 import org.corespring.shell.controllers.{ Launchers, Main }
 import org.corespring.shell.filters.AccessControlFilter
-import org.corespring.shell.services.{ItemService, SessionService, ItemDraftService}
+import org.corespring.shell.services.{ ItemService, SessionService, ItemDraftService }
 import play.api.mvc._
 import play.api.{ GlobalSettings, Mode, Play }
 
@@ -31,39 +31,23 @@ object Global extends WithFilters(AccessControlFilter, CallBlockOnHeaderFilter) 
     mongoClient(mongoUri.database.getOrElse("corespring-container-devt"))
   }
 
-  private lazy val showNonReleasedComponents = Play.current.configuration.getBoolean("components.showNonReleasedComponents").getOrElse(Play.current.mode == Mode.Dev)
-
   private lazy val containerClient = new ContainerClientImplementation(
     new ItemService(db("items")),
     new SessionService(db("sessions")),
     new ItemDraftService(db("itemDrafts")),
-    {
-      if (showNonReleasedComponents) {
-        componentLoader.all
-      } else {
-        componentLoader.all.filter { c =>
-          if (c.isInstanceOf[Interaction]) {
-            c.asInstanceOf[Interaction].released
-          } else {
-            true
-          }
-        }
-      }
-    },
+    componentLoader.all,
     Play.current.configuration)
 
   private lazy val launchers = new Launchers(
     interactions = componentLoader.all.flatMap {
       case i: Interaction => Some(i)
       case _ => None
-    }
-  )
+    })
 
   private lazy val home = new Main(
-    sessionService  = new SessionService(db("sessions")),
+    sessionService = new SessionService(db("sessions")),
     items = db("items"),
-    itemDrafts = new ItemDraftService(db("itemDrafts"))
-  )
+    itemDrafts = new ItemDraftService(db("itemDrafts")))
 
   override def onStart(app: play.api.Application): Unit = {
     logger.trace("trace")

@@ -8,13 +8,12 @@ import org.bson.types.ObjectId
 import org.corespring.amazon.s3.{ ConcreteS3Service, S3Service }
 import org.corespring.container.client._
 import org.corespring.container.client.component.ComponentSetExecutionContext
-import org.corespring.container.client.controllers.EditorConfig
 import org.corespring.container.client.hooks._
 import org.corespring.container.client.integration.{ ContainerExecutionContext, DefaultIntegration }
 import org.corespring.container.components.model.Component
 import org.corespring.shell.controllers.catalog.actions.{ CatalogHooks => ShellCatalogHooks }
-import org.corespring.shell.controllers.editor.actions.{ DraftId, DraftEditorHooks => ShellDraftEditorHooks, ItemEditorHooks => ShellItemEditorHooks }
 import org.corespring.shell.controllers.editor.ContainerSupportingMaterialAssets
+import org.corespring.shell.controllers.editor.actions.{ DraftId, DraftEditorHooks => ShellDraftEditorHooks, ItemEditorHooks => ShellItemEditorHooks }
 import org.corespring.shell.controllers.player.actions.{ PlayerHooks => ShellPlayerHooks }
 import org.corespring.shell.controllers.player.{ SessionHooks => ShellSessionHooks }
 import org.corespring.shell.controllers.{ S3Config, ShellAssets, ShellDataQueryHooks, editor => shellEditor }
@@ -99,6 +98,4 @@ class ContainerClientImplementation(
   override lazy val itemMetadataHooks: ItemMetadataHooks = wire[shellEditor.ItemMetadataHooks] //{
   override val loadResource: (String) => Option[URL] = play.api.Play.current.resource(_)
   override val mode: Mode = Play.current.mode
-
-  override lazy val editorConfig: EditorConfig = EditorConfig(mode, true)
 }

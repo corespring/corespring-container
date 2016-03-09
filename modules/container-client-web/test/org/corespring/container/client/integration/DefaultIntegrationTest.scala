@@ -61,7 +61,6 @@ class TestDI extends DefaultIntegration {
 
   override def components: Seq[Component] = ???
 
-  override def editorConfig: EditorConfig = ???
 }
 
 class DefaultIntegrationTest extends Specification with Mockito with PlaySpecification {
@@ -114,8 +113,6 @@ class DefaultIntegrationTest extends Specification with Mockito with PlaySpecifi
       override def mode: Mode = Mode.Test
 
       override def componentSetExecutionContext: ComponentSetExecutionContext = ComponentSetExecutionContext(ExecutionContext.global)
-
-      override def editorConfig: EditorConfig = EditorConfig(mode, true)
     }
   }
 

@@ -17,16 +17,8 @@ class ComponentServiceTest extends Specification with ComponentMaker {
   }
 
   "interactions" should {
-    "return 2 interactions - if showNonReleased is true" in new scope {
-      service.interactions(true).length must_== 2
-    }
-
     "return 2 interactions - calling with no param" in new scope {
       service.interactions.length must_== 2
-    }
-
-    "return 1 interactions - is showNonReleased is false" in new scope {
-      service.interactions(false).length must_== 1
     }
   }
 }

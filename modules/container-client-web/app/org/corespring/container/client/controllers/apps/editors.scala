@@ -8,6 +8,7 @@ import org.corespring.container.client.hooks.{ DraftEditorHooks, EditorHooks, It
 import org.corespring.container.client.integration.ContainerExecutionContext
 import org.corespring.container.client.pages.{ ComponentEditorRenderer, DevEditorRenderer, EditorRenderer, MainEditorRenderer }
 import org.corespring.container.client.views.models.ComponentsAndWidgets
+import org.corespring.container.components.model.{ ComponentInfo, Interaction }
 import org.corespring.container.components.services.ComponentService
 import play.api.Mode.Mode
 import play.api.libs.json.{ JsArray, JsValue, Json }
@@ -47,9 +48,13 @@ trait BaseEditor[H <: EditorHooks]
 
   lazy val mode: Mode = config.mode
 
-  lazy val componentsAndWidgets = ComponentsAndWidgets(
-    JsArray(componentService.interactions(showNonReleased).map(componentJson.toJson)),
-    JsArray(componentService.widgets(showNonReleased).map(componentJson.toJson)))
+  lazy val componentsAndWidgets = {
+    def allow(c: ComponentInfo) = showNonReleased || c.released
+    val releasedInteractions = componentService.interactions.filter(allow)
+    ComponentsAndWidgets(
+      JsArray(releasedInteractions.map(componentJson.toJson)),
+      JsArray(componentService.widgets.map(componentJson.toJson)))
+  }
 
   private lazy val logger = Logger(classOf[BaseEditor[H]])
 
@@ -63,7 +68,6 @@ trait BaseEditor[H <: EditorHooks]
             .map(_ == "prod")
             .getOrElse(mode == Mode.Prod)
 
-          //val clientOptions = EditorClientOptions(debounceInMillis, StaticPaths.staticPaths)
           val bundle = bundler.bundleAll("editor", Some("editor"), !prodMode).get
           val mainEndpoints = endpoints.main(id)
           val supportingMaterialsEndpoints = endpoints.supportingMaterials(id)

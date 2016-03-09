@@ -6,22 +6,25 @@ import org.corespring.container.client.hooks.EditorHooks
 import org.corespring.container.client.integration.ContainerExecutionContext
 import org.corespring.container.client.pages.{ ComponentEditorRenderer, EditorRenderer }
 import org.corespring.container.client.views.models.{ ComponentsAndWidgets, MainEndpoints, SupportingMaterialsEndpoints }
+import org.corespring.container.components.model.dependencies.ComponentMaker
 import org.corespring.container.components.services.ComponentService
 import org.corespring.test.TestContext
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
+import org.specs2.time.NoTimeConversions
 import play.api.Mode
 import play.api.Mode.Mode
-import play.api.libs.json.Json
+import play.api.libs.json.{ JsValue, Json }
 import play.api.mvc._
 import play.api.templates.Html
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 
-import scala.concurrent.Future
+import scala.concurrent.{ Await, Future }
+import scala.concurrent.duration._
 
-class BaseEditorTest extends Specification with Mockito {
+class BaseEditorTest extends Specification with Mockito with ComponentMaker with NoTimeConversions {
 
   trait scope extends Scope with BaseEditor[EditorHooks] {
 
@@ -33,7 +36,7 @@ class BaseEditorTest extends Specification with Mockito {
 
     val r = FakeRequest("", "")
 
-    override val config: EditorConfig = EditorConfig(Mode.Dev, true)
+    override lazy val config: EditorConfig = EditorConfig(Mode.Dev, true)
 
     override val componentEditorRenderer: ComponentEditorRenderer = mock[ComponentEditorRenderer]
 
@@ -70,6 +73,8 @@ class BaseEditorTest extends Specification with Mockito {
     override lazy val containerContext: ContainerExecutionContext = TestContext.containerContext
 
     override lazy val editorClientOptions: EditorClientOptions = EditorClientOptions(0, StaticPaths.staticPaths)
+
+    def waitFor[A](f: Future[A]): A = Await.result(f, 1.second)
   }
 
   "load" should {
@@ -90,6 +95,41 @@ class BaseEditorTest extends Specification with Mockito {
       val result = load("itemId")(FakeRequest("", ""))
       status(result) === BAD_REQUEST
       contentAsString(result) === org.corespring.container.client.views.html.error.main(BAD_REQUEST, "bad", false).toString
+    }
+
+    trait componentsAndWidgets extends scope {
+
+      componentService.interactions returns Seq(
+        uiComp("released", Nil, released = true),
+        uiComp("not-released", Nil, released = false))
+
+      componentService.widgets returns Seq(
+        widget("w-released", Nil, released = true),
+        widget("w-not-released", Nil, released = false))
+
+      waitFor(load("id")(r))
+      lazy val captor = capture[ComponentsAndWidgets]
+      there was one(renderer).render(any[MainEndpoints], any[SupportingMaterialsEndpoints], captor, any[EditorClientOptions], any[ComponentsScriptBundle], any[Boolean])
+    }
+
+    "call renderer.renderJade with all components" in new componentsAndWidgets {
+      override lazy val showNonReleased = true
+      captor.value.components.as[Seq[JsValue]].length must_== 2
+    }
+
+    "call renderer.renderJade with only released components" in new componentsAndWidgets {
+      override lazy val showNonReleased = false
+      captor.value.components.as[Seq[JsValue]].length must_== 1
+    }
+
+    "call renderer.renderJade with all widgets if showNonReleased == false" in new componentsAndWidgets {
+      override lazy val showNonReleased = false
+      captor.value.widgets.as[Seq[JsValue]].length must_== 2
+    }
+
+    "call renderer.renderJade with all widgets if showNonReleased == true" in new componentsAndWidgets {
+      override lazy val showNonReleased = true
+      captor.value.widgets.as[Seq[JsValue]].length must_== 2
     }
   }
 
