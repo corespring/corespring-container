@@ -1,18 +1,18 @@
 package org.corespring.container.client.controllers.apps
 
-import org.corespring.container.client.component.{ComponentBundler, ComponentJson}
-import org.corespring.container.client.controllers.AssetsController
+import org.corespring.container.client.component.{ ComponentBundler, ComponentJson }
 import org.corespring.container.client.controllers.apps.componentEditor.ComponentEditorLaunchingController
+import org.corespring.container.client.controllers.{ AssetsController, EditorConfig }
 import org.corespring.container.client.hooks.Hooks.StatusMessage
-import org.corespring.container.client.hooks.{DraftEditorHooks, EditorHooks, ItemEditorHooks}
+import org.corespring.container.client.hooks.{ DraftEditorHooks, EditorHooks, ItemEditorHooks }
 import org.corespring.container.client.integration.ContainerExecutionContext
-import org.corespring.container.client.pages.{ComponentEditorRenderer, DevEditorRenderer, EditorRenderer, MainEditorRenderer}
+import org.corespring.container.client.pages.{ ComponentEditorRenderer, DevEditorRenderer, EditorRenderer, MainEditorRenderer }
 import org.corespring.container.client.views.models.ComponentsAndWidgets
 import org.corespring.container.components.services.ComponentService
 import play.api.Mode.Mode
-import play.api.libs.json.{JsArray, JsValue, Json}
-import play.api.mvc.{Action, Controller, RequestHeader, SimpleResult}
-import play.api.{Logger, Mode}
+import play.api.libs.json.{ JsArray, JsValue, Json }
+import play.api.mvc.{ Action, Controller, RequestHeader, SimpleResult }
+import play.api.{ Logger, Mode }
 
 import scala.concurrent.Future
 
@@ -20,8 +20,6 @@ trait BaseEditor[H <: EditorHooks]
   extends Controller
   with AssetsController[EditorHooks]
   with ComponentEditorLaunchingController {
-
-  def mode: Mode
 
   def hooks: H
 
@@ -43,9 +41,15 @@ trait BaseEditor[H <: EditorHooks]
 
   implicit def ec = containerContext.context
 
+  val config: EditorConfig
+
+  val showNonReleased: Boolean = config.showNonReleased
+
+  val mode: Mode = config.mode
+
   lazy val componentsAndWidgets = ComponentsAndWidgets(
-    JsArray(componentService.interactions.map(componentJson.toJson)),
-    JsArray(componentService.widgets.map(componentJson.toJson)))
+    JsArray(componentService.interactions(showNonReleased).map(componentJson.toJson)),
+    JsArray(componentService.widgets(showNonReleased).map(componentJson.toJson)))
 
   private lazy val logger = Logger(classOf[BaseEditor[H]])
 
@@ -118,7 +122,8 @@ trait BaseDraftEditor extends BaseEditor[DraftEditorHooks] {
   override def endpoints: Endpoints = DraftEditorEndpoints
 }
 
-class ItemEditor(val mode: Mode,
+class ItemEditor(
+  val config: EditorConfig,
   val hooks: ItemEditorHooks,
   val bundler: ComponentBundler,
   val renderer: MainEditorRenderer,
@@ -128,7 +133,8 @@ class ItemEditor(val mode: Mode,
   val containerContext: ContainerExecutionContext,
   val editorClientOptions: EditorClientOptions) extends BaseItemEditor
 
-class ItemDevEditor(val mode: Mode,
+class ItemDevEditor(
+  val config: EditorConfig,
   val hooks: ItemEditorHooks,
   val bundler: ComponentBundler,
   val renderer: DevEditorRenderer,
@@ -141,7 +147,8 @@ class ItemDevEditor(val mode: Mode,
   }
 }
 
-class DraftEditor(val mode: Mode,
+class DraftEditor(
+  val config: EditorConfig,
   val hooks: DraftEditorHooks,
   val bundler: ComponentBundler,
   val renderer: MainEditorRenderer,
@@ -151,7 +158,8 @@ class DraftEditor(val mode: Mode,
   val containerContext: ContainerExecutionContext,
   val editorClientOptions: EditorClientOptions) extends BaseDraftEditor
 
-class DraftDevEditor(val mode: Mode,
+class DraftDevEditor(
+  val config: EditorConfig,
   val hooks: DraftEditorHooks,
   val bundler: ComponentBundler,
   val renderer: DevEditorRenderer,

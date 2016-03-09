@@ -1,12 +1,12 @@
 package org.corespring.container.client.controllers.resources
 
 import org.corespring.container.client.controllers.helpers.PlayerXhtml
-import org.corespring.container.client.hooks.{CoreItemHooks, CreateItemHook, ItemSupportingMaterialHooks, SupportingMaterialHooks}
+import org.corespring.container.client.hooks.{ CoreItemHooks, CreateItemHook, ItemSupportingMaterialHooks }
 import org.corespring.container.client.integration.ContainerExecutionContext
 import org.corespring.container.components.services.ComponentService
 import play.api.libs.json.Json._
-import play.api.libs.json.{JsObject, JsValue, Json}
-import play.api.mvc.{Action, _}
+import play.api.libs.json.{ JsObject, Json }
+import play.api.mvc.{ Action, _ }
 
 import scala.concurrent.Future
 
