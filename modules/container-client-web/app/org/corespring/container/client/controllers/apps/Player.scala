@@ -62,9 +62,6 @@ class Player(mode: Mode,
       handleSuccess { (tuple) =>
         val (session, item) = tuple
         require((session \ "id").asOpt[String].isDefined, "The session model must specify an 'id'")
-        //        val prodMode = request.getQueryString("mode").map(_ == "prod").getOrElse(mode == Mode.Prod)
-        //        val showControls = request.getQueryString("showControls").map(_ == "true").getOrElse(false)
-        //        val qp = mkQueryParams(m => m)
         createPlayerHtml(sessionId, session, item) match {
           case Left(e) => Future.successful(BadRequest(e))
           case Right(f) => f.map(Ok(_))
