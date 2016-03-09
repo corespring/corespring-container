@@ -7,8 +7,13 @@ trait ComponentMaker {
 
   private lazy val defaultOrg = "org"
 
-  def uiComp(name: String, libs: Seq[Id], title: Option[String] = None, titleGroup: Option[String] = None,
-    org: String = defaultOrg, released: Boolean = false, insertInline: Boolean = false) = {
+  def uiComp(name: String,
+    libs: Seq[Id],
+    title: Option[String] = None,
+    titleGroup: Option[String] = None,
+    org: String = defaultOrg,
+    released: Boolean = false,
+    insertInline: Boolean = false) = {
     Interaction(
       org = org,
       name = name,
@@ -25,8 +30,14 @@ trait ComponentMaker {
       libraries = libs)
   }
 
-  def widget(name: String, libs: Seq[Id] = Seq.empty, title: Option[String] = None, titleGroup: Option[String] = None, org: String = defaultOrg) = {
-    Widget(org, name, title, titleGroup, Client("", "", None), true, false, Json.obj("name" -> name, "org" -> org),
+  def widget(
+    name: String,
+    libs: Seq[Id] = Seq.empty,
+    title: Option[String] = None,
+    titleGroup: Option[String] = None,
+    org: String = defaultOrg,
+    released: Boolean = false) = {
+    Widget(org, name, title, titleGroup, Client("", "", None), released, false, Json.obj("name" -> name, "org" -> org),
       Json.obj(), None, Map(), libs)
   }
 

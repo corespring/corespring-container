@@ -52,6 +52,9 @@ trait DefaultIntegration
       componentControllers
   }
 
+  override final lazy val editorConfig = EditorConfig(
+    mode, configuration.getBoolean("components.showNonReleasedComponents").getOrElse(mode == Mode.Dev))
+
   override lazy val editorClientOptions = {
     val debounceInMillis: Long = configuration.getLong("editor.autosave.debounceInMillis").getOrElse(5000)
     EditorClientOptions(debounceInMillis, StaticPaths.staticPaths)
