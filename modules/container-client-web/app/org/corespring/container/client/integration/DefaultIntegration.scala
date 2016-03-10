@@ -37,10 +37,15 @@ object DefaultIntegration {
     "player.min")
 }
 
+case class ContainerConfig(
+  mode: Mode,
+  showNonReleasedComponents: Boolean,
+  editorDebounceInMillis: Long,
+  components: ComponentsConfig,
+  player: V2PlayerConfig)
 trait DefaultIntegration
   extends ControllersModule
   with ComponentControllersModule
-  with HasConfig
   with ResourcesModule
   with LauncherModules
   with JsProcessingModule {
@@ -52,21 +57,19 @@ trait DefaultIntegration
       componentControllers
   }
 
-  override final lazy val editorConfig = EditorConfig(
-    mode, configuration.getBoolean("components.showNonReleasedComponents").getOrElse(mode == Mode.Dev))
+  def containerConfig: ContainerConfig
+
+  override final lazy val editorConfig = EditorConfig(containerConfig.mode, containerConfig.showNonReleasedComponents)
 
   override lazy val editorClientOptions = {
-    val debounceInMillis: Long = configuration.getLong("editor.autosave.debounceInMillis").getOrElse(5000)
-    EditorClientOptions(debounceInMillis, StaticPaths.staticPaths)
+    EditorClientOptions(containerConfig.editorDebounceInMillis, StaticPaths.staticPaths)
   }
 
-  def jadeEngineConfig: JadeEngineConfig = JadeEngineConfig("container-client/jade", mode, resourceLoader.loadPath(_), resourceLoader.lastModified(_))
-
-  def mode: Mode
+  def jadeEngineConfig: JadeEngineConfig = JadeEngineConfig("container-client/jade", containerConfig.mode, resourceLoader.loadPath(_), resourceLoader.lastModified(_))
 
   def containerContext: ContainerExecutionContext
 
-  override lazy val componentService: ComponentService = new DefaultComponentService(mode, components)
+  override lazy val componentService: ComponentService = new DefaultComponentService(containerConfig.mode, components)
 
   val loadResource: String => Option[URL]
 
@@ -80,21 +83,12 @@ trait DefaultIntegration
   def resolveDomain(path: String): String = path
 
   def validate: Either[String, Boolean] = {
-    val componentsPath = configuration.getString("components.path").getOrElse("components")
-    Validator.absolutePathInProdMode(componentsPath)
+    Validator.absolutePathInProdMode(containerConfig.components.componentsPath)
   }
 
-  override lazy val jsProcessingConfig: JsProcessingConfig = JsProcessingConfig(mode == Mode.Dev)
-
-  override lazy val playerConfig: V2PlayerConfig = V2PlayerConfig(configuration)
-
-  override lazy val componentsConfig: ComponentsConfig = {
-    val componentsPath: String = configuration.getString("components.path").getOrElse("components")
-    val minify = configuration.getBoolean("components.minify").getOrElse(mode == Mode.Prod)
-    val gzip = configuration.getBoolean("components.gzip").getOrElse(mode == Mode.Prod)
-    ComponentsConfig(componentsPath, "container-client/bower_components", minify, gzip)
-  }
-
+  override lazy val jsProcessingConfig: JsProcessingConfig = JsProcessingConfig(containerConfig.mode == Mode.Dev)
+  override lazy val playerConfig: V2PlayerConfig = containerConfig.player
+  override lazy val componentsConfig: ComponentsConfig = containerConfig.components
   override lazy val assetPathProcessor = new AssetPathProcessor {
 
     override def process(s: String): String = {
@@ -106,7 +100,7 @@ trait DefaultIntegration
 
   lazy val pageSourceServiceConfig: PageSourceServiceConfig = PageSourceServiceConfig(
     v2Player.Routes.prefix,
-    mode == Mode.Dev,
+    containerConfig.mode == Mode.Dev,
     resourceLoader.loadPath(_))
 
   override lazy val pageSourceService: PageSourceService = wire[JsonPageSourceService]

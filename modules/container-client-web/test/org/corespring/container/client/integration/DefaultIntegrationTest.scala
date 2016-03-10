@@ -21,13 +21,12 @@ import play.api.{ Configuration, GlobalSettings, Mode }
 import scala.concurrent.ExecutionContext
 
 class TestDI extends DefaultIntegration {
-  override def mode: Mode = ???
 
   override def containerContext: ContainerExecutionContext = ???
 
   override val loadResource: (String) => Option[URL] = _ => None
 
-  override def configuration: Configuration = ???
+  override def containerConfig: ContainerConfig = ???
 
   override def collectionHooks: CollectionHooks = ???
 
@@ -96,8 +95,6 @@ class DefaultIntegrationTest extends Specification with Mockito with PlaySpecifi
 
       override def itemDraftHooks: CoreItemHooks with DraftHooks = mock[CoreItemHooks with DraftHooks]
 
-      override def configuration: Configuration = Configuration.empty
-
       override def components: Seq[Component] = Seq.empty
 
       override def itemHooks: CoreItemHooks with CreateItemHook = mock[CoreItemHooks with CreateItemHook]
@@ -110,7 +107,7 @@ class DefaultIntegrationTest extends Specification with Mockito with PlaySpecifi
 
       override val loadResource: (String) => Option[URL] = _ => None
 
-      override def mode: Mode = Mode.Test
+      override def containerConfig: ContainerConfig = mock[ContainerConfig]
 
       override def componentSetExecutionContext: ComponentSetExecutionContext = ComponentSetExecutionContext(ExecutionContext.global)
     }
