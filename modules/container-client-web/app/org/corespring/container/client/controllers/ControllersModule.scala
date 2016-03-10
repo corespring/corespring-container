@@ -18,8 +18,10 @@ import play.api.mvc.Controller
 case class EditorConfig(mode: Mode, showNonReleased: Boolean)
 
 trait ControllersModule {
-  def mode: Mode
   def editorConfig: EditorConfig
+
+  private lazy val mode: Mode = editorConfig.mode
+
   def playerConfig: V2PlayerConfig
   def editorClientOptions: EditorClientOptions
   def itemEditorHooks: ItemEditorHooks
