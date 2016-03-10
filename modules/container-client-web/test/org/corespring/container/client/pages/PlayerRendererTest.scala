@@ -22,7 +22,7 @@ class PlayerRendererTest extends Specification with Mockito with NoTimeConversio
     lazy val showControls = false
     lazy val bundle = ComponentsScriptBundle(Nil, Nil, Nil, Nil)
 
-    lazy val playerConfig = V2PlayerConfig(Configuration.empty)
+    lazy val playerConfig = V2PlayerConfig(None, None)
     lazy val containerContext = ContainerExecutionContext.TEST
     lazy val jadeEngine = RendererMocks.jadeEngine
     lazy val pageSourceService = RendererMocks.pageSourceService
