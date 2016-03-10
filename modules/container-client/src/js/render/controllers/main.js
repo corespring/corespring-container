@@ -256,7 +256,7 @@ angular.module('corespring-player.controllers')
         });
 
         $scope.$on('countAttempts', function(event, data, callback) {
-          callback(null, $scope.session.attempts);
+          callback(null, $scope.session && $scope.session.attempts || 0);
         });
 
         $scope.$on('getScore', function(event, data, callback) {
@@ -267,7 +267,11 @@ angular.module('corespring-player.controllers')
             callback(null, score);
           }
 
-          $scope.getScore(onScoreReceived);
+          function onScoreError(){
+            callback(null, 0);
+          }
+
+          $scope.getScore(onScoreReceived, onScoreError);
         });
 
         $scope.$on('completeResponse', function(event, data, callback) {

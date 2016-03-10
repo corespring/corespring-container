@@ -61,6 +61,7 @@ exports.ngModules = _.union(player.ngModules, [
   'corespring-editing.wiggi-wiz-features.cs-image',
   'corespring-editing.wiggi-wiz-features.link',
   'corespring-editing.wiggi-wiz-features.mathjax',
+  'corespring-editor.config',
   'corespring-editor.controllers',
   'corespring-editor.directives',
   'corespring-editor.profile.controllers',

@@ -31,25 +31,11 @@ object Global extends WithFilters(AccessControlFilter, CallBlockOnHeaderFilter) 
     mongoClient(mongoUri.database.getOrElse("corespring-container-devt"))
   }
 
-  private lazy val showNonReleasedComponents = Play.current.configuration.getBoolean("components.showNonReleasedComponents").getOrElse(Play.current.mode == Mode.Dev)
-
   private lazy val containerClient = new ContainerClientImplementation(
     new ItemService(db("items")),
     new SessionService(db("sessions")),
     new ItemDraftService(db("itemDrafts")),
-    {
-      if (showNonReleasedComponents) {
-        componentLoader.all
-      } else {
-        componentLoader.all.filter { c =>
-          if (c.isInstanceOf[Interaction]) {
-            c.asInstanceOf[Interaction].released
-          } else {
-            true
-          }
-        }
-      }
-    },
+    componentLoader.all,
     Play.current.configuration)
 
   private lazy val launchers = new Launchers(

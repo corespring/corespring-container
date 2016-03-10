@@ -51,7 +51,8 @@ angular.module('corespring-singleComponentEditor.services')
 
           $http({
             method: 'DELETE',
-            url: url
+            url: url,
+            withCredentials: true
           })
           .then(function(){
             console.log(arguments); 

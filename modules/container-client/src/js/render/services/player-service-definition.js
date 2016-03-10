@@ -25,37 +25,37 @@ angular.module('corespring-player.services').factory('PlayerServiceDefinition', 
       };
 
       this.initCalls = function(endpoints){
-        this.completeResponse = callWithNoData(endpoints.complete);
-        this.getScore = callWithData(endpoints.getScore);
-        this.loadInstructorData = callWithData(endpoints.loadInstructorData);
-        this.loadOutcome = callWithData(endpoints.loadOutcome);
-        this.reopenSession = callWithNoData(endpoints.reopen);
-        this.resetSession = callWithNoData(endpoints.reset);
-        this.saveSession = callWithData(endpoints.save);
+        this.completeResponse = callWithNoData(endpoints.complete, 'completeResponse');
+        this.getScore = callWithData(endpoints.getScore, 'getScore');
+        this.loadInstructorData = callWithData(endpoints.loadInstructorData, 'loadInstructorData');
+        this.loadOutcome = callWithData(endpoints.loadOutcome, 'loadOutcome');
+        this.reopenSession = callWithNoData(endpoints.reopen, 'reopenSession');
+        this.resetSession = callWithNoData(endpoints.reset, 'resetSession');
+        this.saveSession = callWithData(endpoints.save, 'saveSession');
       };
 
       this.initCalls(PlayerServiceEndpoints.session);
 
       //-----------------------------------------------------------------
 
-      function callWithData(call) {
-        return function(data, onSuccess, onFailure, id) {
-          _call(call, data)(onSuccess, onFailure);
+      function callWithData(call, id) {
+        return function(data, onSuccess, onFailure) {
+          _call(call, data, id)(onSuccess, onFailure);
         };
       }
 
-      function callWithNoData(call) {
-        return function(onSuccess, onFailure, id) {
-          _call(call, null)(onSuccess, onFailure);
+      function callWithNoData(call, id) {
+        return function(onSuccess, onFailure) {
+          _call(call, null, id)(onSuccess, onFailure);
         };
       }
 
-      function _call(call, data) {
+      function _call(call, data, id) {
 
         return function(onSuccess, onFailure) {
           if (!isItemAndSessionLoaded) {
             if (onFailure) {
-              var e = '[PlayerService] Error: Not ready to make call to ' + call.method + '.';
+              var e = '[PlayerService] Error: Not ready to make call to ' + id + '.';
               $log.error(e);
               onFailure(e);
             }

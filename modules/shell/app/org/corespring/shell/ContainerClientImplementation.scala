@@ -7,19 +7,18 @@ import com.softwaremill.macwire.MacwireMacros.wire
 import org.bson.types.ObjectId
 import org.corespring.amazon.s3.{ ConcreteS3Service, S3Service }
 import org.corespring.container.client._
-import org.corespring.container.client.component.ComponentSetExecutionContext
+import org.corespring.container.client.component.{ ComponentSetExecutionContext, ComponentsConfig }
 import org.corespring.container.client.hooks._
-import org.corespring.container.client.integration.{ ContainerExecutionContext, DefaultIntegration }
+import org.corespring.container.client.integration.{ ContainerConfig, ContainerExecutionContext, DefaultIntegration }
 import org.corespring.container.components.model.Component
 import org.corespring.shell.controllers.catalog.actions.{ CatalogHooks => ShellCatalogHooks }
-import org.corespring.shell.controllers.editor.actions.{ DraftEditorHooks => ShellDraftEditorHooks, DraftId, ItemEditorHooks => ShellItemEditorHooks }
-import org.corespring.shell.controllers.editor.{ ContainerSupportingMaterialAssets }
+import org.corespring.shell.controllers.editor.ContainerSupportingMaterialAssets
+import org.corespring.shell.controllers.editor.actions.{ DraftId, DraftEditorHooks => ShellDraftEditorHooks, ItemEditorHooks => ShellItemEditorHooks }
 import org.corespring.shell.controllers.player.actions.{ PlayerHooks => ShellPlayerHooks }
 import org.corespring.shell.controllers.player.{ SessionHooks => ShellSessionHooks }
 import org.corespring.shell.controllers.{ S3Config, ShellAssets, ShellDataQueryHooks, editor => shellEditor }
 import org.corespring.shell.services.{ ItemDraftService, ItemService, SessionService }
-import play.api.Mode.Mode
-import play.api.{ Configuration, Logger, Play }
+import play.api.{ Configuration, Logger, Mode, Play }
 
 import scala.concurrent.ExecutionContext
 
@@ -28,7 +27,7 @@ class ContainerClientImplementation(
   val sessionService: SessionService,
   val draftItemService: ItemDraftService,
   componentsIn: => Seq[Component],
-  val configuration: Configuration) extends DefaultIntegration {
+  configuration: Configuration) extends DefaultIntegration {
 
   override def resolveDomain(path: String): String = {
     val separator = if (path.startsWith("/")) "" else "/"
@@ -94,5 +93,15 @@ class ContainerClientImplementation(
   override lazy val collectionHooks: CollectionHooks = wire[shellEditor.CollectionHooks]
   override lazy val itemMetadataHooks: ItemMetadataHooks = wire[shellEditor.ItemMetadataHooks]
   override val loadResource: (String) => Option[URL] = play.api.Play.current.resource(_)
-  override val mode: Mode = Play.current.mode
+
+  private val mode = Play.current.mode
+
+  override val containerConfig: ContainerConfig = ContainerConfig(
+    mode,
+    showNonReleasedComponents = configuration.getBoolean("components.showNonReleasedComponents").getOrElse(mode == Mode.Dev),
+    editorDebounceInMillis = configuration.getLong("editor.autosave.debounceInMillis").getOrElse(5000),
+    components = ComponentsConfig.fromConfig(mode, configuration.getConfig("components").getOrElse(Configuration.empty)),
+    player = V2PlayerConfig(
+      rootUrl = configuration.getString("rootUrl"),
+      newRelicRumConfig = configuration.getConfig("newrelic").flatMap { c => NewRelicRumConfig.fromConfig(c) }))
 }

@@ -98,7 +98,7 @@ function Standalone(element, options, errorCallback) {
       return;
     }
 
-    var initialData = helper.launchData(options, {url: options.uploadUrl, method: options.uploadMethod}, options.markup, options.data);
+    var initialData = helper.launchData(options, {url: options.uploadUrl, method: options.uploadMethod}, options.xhtml, options.componentModel);
     instance = launcher.loadInstance(call, options.queryParams, initialData);
     helper.addCoreMethods.bind(this)(instance);
   }
@@ -122,11 +122,26 @@ function Standalone(element, options, errorCallback) {
   }
 
   this.getData = function(done){
-    instance.send('getData', helper.instanceCallbackHandler(done));
+    instance.send('getData', function(err, data){
+      if(err){
+        done({error: err});
+      } else {
+        done({result: {
+          componentModel: data.components[helper.singleComponentKey()],
+          xhtml: data.xhtml
+        }});
+      }
+    });
   };
 
   this.setData = function(data, done){
-    instance.send('setData', data, helper.instanceCallbackHandler(done));
+    //convert external model to internal
+    var prepped = {
+      components: {},
+      xhtml: data.xhtml
+    };
+    prepped.components[helper.singleComponentKey()] = data.componentModel;
+    instance.send('setData', prepped, helper.instanceCallbackHandler(done));
   };
 }
 
