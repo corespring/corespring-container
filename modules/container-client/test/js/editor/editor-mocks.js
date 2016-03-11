@@ -211,6 +211,15 @@
     };
   };
 
+  e['com.ee.v2.RawFileUploader'] = function(){
+    var instance = {};
+
+    return function(file, url, name, opts){
+      instance.uploadOpts = opts;
+      return instance;
+    };
+  };
+
   e['com.ee.RawFileUploader'] = function(){
     var instance = {};
     instance.beginUpload = jasmine.createSpy('beginUpload').and.callFake(function(){
