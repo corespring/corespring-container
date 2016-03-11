@@ -36,15 +36,7 @@ angular.module('corespring-singleComponentEditor.services')
             }.bind(this)
           };
 
-          var reader = new FileReader();
-
-          
-          reader.onloadend = function() {
-            var uploader = new com.ee.RawFileUploader(file, reader.result, url, name, opts);
-            uploader.beginUpload();
-          };
-
-          reader.readAsArrayBuffer(file);
+          new com.ee.v2.RawFileUploader(file, url, name, opts);
         };
 
         this.deleteFile = function(url){
