@@ -63,8 +63,8 @@ describe('external-endpoint-image-service', function(){
           def.addFile({name: 'file'}, onComplete, jasmine.createSpy('onProgress'));
         });
 
-        it('calls reader.readAsBinaryString', function(){
-          expect(m.FileReader().readAsBinaryString).toHaveBeenCalled();
+        it('calls reader.readAsArrayBuffer', function(){
+          expect(m.FileReader().readAsArrayBuffer).toHaveBeenCalled();
         });
         
         it('calls fileUploader.beginUpload', function(){

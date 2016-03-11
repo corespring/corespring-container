@@ -43,7 +43,7 @@ angular.module('corespring-singleComponentEditor.services')
             uploader.beginUpload();
           };
 
-          reader.readAsBinaryString(file);
+          reader.readAsArrayBuffer(file);
         };
 
         this.deleteFile = function(url){
