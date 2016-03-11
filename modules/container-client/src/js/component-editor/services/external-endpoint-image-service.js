@@ -38,6 +38,7 @@ angular.module('corespring-singleComponentEditor.services')
 
           var reader = new FileReader();
 
+          
           reader.onloadend = function() {
             var uploader = new com.ee.RawFileUploader(file, reader.result, url, name, opts);
             uploader.beginUpload();
