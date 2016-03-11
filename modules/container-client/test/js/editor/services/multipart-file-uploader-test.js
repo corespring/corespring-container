@@ -16,7 +16,7 @@ describe('multipart-file-uploader', function(){
     uploader = MultipartFileUploader;
 
     mockFileReader = {
-      readAsBinaryString: jasmine.createSpy('readAsBinaryString')
+      readAsArrayBuffer: jasmine.createSpy('readAsArrayBuffer')
     };
 
     file = {
@@ -58,8 +58,8 @@ describe('multipart-file-uploader', function(){
       mockFileReader.onloadend();
     });
 
-    it('calls reader.readAsBinaryString', function(){
-      expect(mockFileReader.readAsBinaryString).toHaveBeenCalledWith(file);
+    it('calls reader.readAsArrayBuffer', function(){
+      expect(mockFileReader.readAsArrayBuffer).toHaveBeenCalledWith(file);
     });
 
     it('constructs new Uploader', function(){

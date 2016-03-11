@@ -226,7 +226,7 @@
   e.FileReader = function(){
 
     var instance = {};
-    instance.readAsBinaryString =  jasmine.createSpy('readAsBinaryString').and.callFake(function(){
+    instance.readAsArrayBuffer =  jasmine.createSpy('readAsArrayBuffer').and.callFake(function(){
       instance.onloadend();
     });
     

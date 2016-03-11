@@ -56,7 +56,7 @@ angular.module('corespring-editor.services')
             uploader.beginUpload();
           };
 
-          reader.readAsBinaryString(file);
+          reader.readAsArrayBuffer(file);
         };
       }
 
