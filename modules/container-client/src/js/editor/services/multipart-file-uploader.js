@@ -44,19 +44,12 @@ angular.module('corespring-editor.services')
             }
           };
 
-          var reader = new FileReader();
-
-          reader.onloadend = function() {
-            var uploader = new com.ee.MultipartFileUploader( //jshint ignore:line
+          new com.ee.v2.MultipartFileUploader( //jshint ignore:line
             file, 
-            reader.result, 
             url, 
             fileParamName, 
             opts); //jshint ignore:line
-            uploader.beginUpload();
-          };
 
-          reader.readAsBinaryString(file);
         };
       }
 

@@ -211,6 +211,15 @@
     };
   };
 
+  e['com.ee.v2.RawFileUploader'] = function(){
+    var instance = {};
+
+    return function(file, url, name, opts){
+      instance.uploadOpts = opts;
+      return instance;
+    };
+  };
+
   e['com.ee.RawFileUploader'] = function(){
     var instance = {};
     instance.beginUpload = jasmine.createSpy('beginUpload').and.callFake(function(){
@@ -226,7 +235,7 @@
   e.FileReader = function(){
 
     var instance = {};
-    instance.readAsBinaryString =  jasmine.createSpy('readAsBinaryString').and.callFake(function(){
+    instance.readAsArrayBuffer =  jasmine.createSpy('readAsArrayBuffer').and.callFake(function(){
       instance.onloadend();
     });
     
