@@ -13,7 +13,7 @@ describe('external-endpoint-image-service', function(){
 
   beforeAll(function(){
     fileReader = e.FileReader();
-    fileUploader = e['com.ee.RawFileUploader']();
+    fileUploader = e['com.ee.v2.RawFileUploader']();
   });
     
   beforeEach(inject(function(ExternalEndpointsImageService) {
@@ -43,7 +43,7 @@ describe('external-endpoint-image-service', function(){
   describe('addFile', e.withWindowMocks(
     function(){ 
       return { FileReader: fileReader,
-        'com.ee.RawFileUploader': fileUploader 
+        'com.ee.v2.RawFileUploader': fileUploader 
       };
     },
     function(getMocks){
@@ -54,23 +54,13 @@ describe('external-endpoint-image-service', function(){
         
         beforeEach(function(){
           m = getMocks();
-          var uploader = m['com.ee.RawFileUploader']();
-          uploader.beginUpload.and.callFake(function(){
-            uploader.uploadOpts.onUploadComplete('url', 200);
-          });
+          var uploader = m['com.ee.v2.RawFileUploader']();
           def = new Def();
           onComplete = jasmine.createSpy('onComplete');
           def.addFile({name: 'file'}, onComplete, jasmine.createSpy('onProgress'));
+          uploader.uploadOpts.onUploadComplete('url', 200);
         });
 
-        it('calls reader.readAsArrayBuffer', function(){
-          expect(m.FileReader().readAsArrayBuffer).toHaveBeenCalled();
-        });
-        
-        it('calls fileUploader.beginUpload', function(){
-          expect(m['com.ee.RawFileUploader']().beginUpload).toHaveBeenCalled();
-        });
-        
         it('calls onComplete', function(){
           expect(onComplete).toHaveBeenCalledWith(null, 'url');
         });
@@ -83,11 +73,9 @@ describe('external-endpoint-image-service', function(){
             m = getMocks();
             def = new Def();
             onComplete = jasmine.createSpy('onComplete');
-            var uploader = m['com.ee.RawFileUploader']();
-            uploader.beginUpload.and.callFake(function(){
-              uploader.uploadOpts.onUploadFailed('err');
-            });
+            var uploader = m['com.ee.v2.RawFileUploader']();
             def.addFile({name: 'file'}, onComplete, jasmine.createSpy('onProgress'));
+            uploader.uploadOpts.onUploadFailed('err');
           });
           
           it('calls onComplete with err', function(){

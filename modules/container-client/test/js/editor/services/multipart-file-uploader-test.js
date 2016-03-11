@@ -9,15 +9,11 @@ describe('multipart-file-uploader', function(){
   }));
 
   var uploader, file, onSuccess, onFailure, onLoadEnd, uploadOpts;
-  var mockFileReader, mockUploader, mockUploaderConstructor; 
-  var fileReaderStash, uploaderStash;
+  var mockUploader, mockUploaderConstructor; 
+  var uploaderStash;
 
   beforeEach(inject(function(MultipartFileUploader){
     uploader = MultipartFileUploader;
-
-    mockFileReader = {
-      readAsArrayBuffer: jasmine.createSpy('readAsArrayBuffer')
-    };
 
     file = {
       name: 'file.png',
@@ -27,46 +23,32 @@ describe('multipart-file-uploader', function(){
     onSuccess = jasmine.createSpy('onSuccess');
     onFailure = jasmine.createSpy('onFailure');
 
-    mockUploader = {
-      beginUpload: jasmine.createSpy('beginUpload')
-    };
-
-
     mockUploaderConstructor = jasmine.createSpy('uploader-constructor')
-      .and.callFake(function(file, result, url, name, opts){
+      .and.callFake(function(file, url, name, opts){
         uploadOpts = opts;
         return mockUploader;
       });
 
     window.com = {
       ee: {
-        MultipartFileUploader: mockUploaderConstructor
+        v2: {
+          MultipartFileUploader: mockUploaderConstructor
+        }
       }
     };
 
-    fileReaderStash = new mocks.Stash(window, 'FileReader', function(){return mockFileReader;});
   }));
-
-  afterEach(function(){
-    fileReaderStash.unstash();
-  });
 
   describe('upload', function(){
 
     beforeEach(function(){
       uploader.upload('url', file, {foo: 'bar'}, onSuccess, onFailure);
-      mockFileReader.onloadend();
-    });
-
-    it('calls reader.readAsArrayBuffer', function(){
-      expect(mockFileReader.readAsArrayBuffer).toHaveBeenCalledWith(file);
     });
 
     it('constructs new Uploader', function(){
       expect(mockUploaderConstructor)
         .toHaveBeenCalledWith(
           file, 
-          undefined, 
           'url', 
           'file', 
           { additionalData: { foo: 'bar'},  
