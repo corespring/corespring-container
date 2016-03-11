@@ -2,8 +2,8 @@
 angular.module('corespring-singleComponentEditor.services')
   .factory(
     'ExternalEndpointsImageService', 
-    ['$http','$log', 'UPLOAD_ENDPOINT', 
-    function($http, $log, UPLOAD_ENDPOINT){
+    ['$http','$log', 'MultipartFileUploader', 'UPLOAD_ENDPOINT', 
+    function($http, $log, MultipartFileUploader, UPLOAD_ENDPOINT){
 
       function ExternalEndpointsImageService(){
 
@@ -11,39 +11,25 @@ angular.module('corespring-singleComponentEditor.services')
 
           var url = UPLOAD_ENDPOINT.url.replace(':filename', encodeURIComponent(file.name)); 
 
-          var opts = {
-            onUploadComplete: function(body, status) {
-              $log.info('done: ', body, status);
-              var resultObject = {};
+          MultipartFileUploader.upload(url, file, {}, function(result){
 
-              if(_.isString(body)){
-                resultObject.url = body;
-              } 
-
-              if(_.isString(resultObject.url)){
-                onComplete(null, resultObject.url);
-              } else {
-                onComplete('No url provided in response: ' + JSON.stringify(body));
+            function tryParsing(s){
+              try { return JSON.parse(s); } 
+              catch(e){
+                return {url: s};
               }
-            },
-            onUploadProgress: function(progress) {
-              $log.info('progress', arguments);
-              onProgress(null, progress);
-            },
-            onUploadFailed: function(err) {
-              $log.info('failed', arguments);
-              onComplete('Upload failed for: ' + url + ': ' + err);
-            }.bind(this)
-          };
+            }
 
-          var reader = new FileReader();
+            var obj = _.isString(result) ? tryParsing(result) : _.isObject(result) ? result : {};
 
-          reader.onloadend = function() {
-            var uploader = new com.ee.RawFileUploader(file, reader.result, url, name, opts);
-            uploader.beginUpload();
-          };
-
-          reader.readAsBinaryString(file);
+            if(!obj.url){
+              onComplete(new Error('cant read a url from the result'));
+            } else {
+              onComplete(null, obj.url);
+            }
+          }, function(err){
+            onComplete(err);
+          });
         };
 
         this.deleteFile = function(url){

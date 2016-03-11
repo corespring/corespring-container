@@ -108,11 +108,6 @@ function Standalone(element, options, errorCallback) {
     return;
   }
 
-  if(options.uploadUrl && options.uploadUrl.indexOf(':filename') === -1){
-    errorCallback(errorCodes.UPLOAD_URL_MISSING_FILENAME);
-    return;
-  } 
-
   var ok = launcher.init();
 
   if(ok){
