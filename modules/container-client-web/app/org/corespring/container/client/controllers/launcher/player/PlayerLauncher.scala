@@ -2,20 +2,19 @@ package org.corespring.container.client.controllers.launcher.player
 
 import org.corespring.container.client.V2PlayerConfig
 import org.corespring.container.client.controllers.launcher._
+import org.corespring.container.client.controllers.launcher.definitions.{ Catalog, ComponentEditor, ItemEditors, Player }
 import org.corespring.container.client.hooks.PlayerLauncherHooks
 import org.corespring.container.client.integration.ContainerExecutionContext
 import play.api.mvc._
 
 class PlayerLauncher(
-   val playerConfig: V2PlayerConfig,
-                        val containerContext : ContainerExecutionContext,
-                        val hooks : PlayerLauncherHooks,
-                        builder:JsBuilder
-                      ) extends Launcher {
-
+  val playerConfig: V2PlayerConfig,
+  val containerContext: ContainerExecutionContext,
+  val hooks: PlayerLauncherHooks,
+  builder: JsBuilder) extends Launcher {
 
   def componentEditorJs = Action.async { implicit request =>
-    hooks.componentEditorJs.map { err =>
+    hooks.componentEditorJs.map { implicit js =>
       ComponentEditor(playerConfig, request, builder).result(corespringUrl(request))
     }
   }
@@ -35,7 +34,7 @@ class PlayerLauncher(
   def playerJs = Action.async { implicit request =>
     hooks.playerJs.map { implicit js =>
       logger.debug(s"playerJs - isSecure=${js.isSecure}, path=${request.path}, queryString=${request.rawQueryString}")
-      Player(playerConfig, request, js, builder).result(corespringUrl(request))
+      Player(playerConfig, request, builder).result(corespringUrl(request))
     }
   }
 

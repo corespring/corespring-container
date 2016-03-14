@@ -2,21 +2,18 @@ package org.corespring.container.client.integration
 
 import java.net.URL
 
-import org.corespring.container.client.hooks._
-import org.corespring.container.client.pages.engine.JadeEngineConfig
 import org.corespring.container.client.VersionInfo
 import org.corespring.container.client.component.ComponentSetExecutionContext
-import org.corespring.container.client.controllers.EditorConfig
+import org.corespring.container.client.hooks._
+import org.corespring.container.client.pages.engine.JadeEngineConfig
 import org.corespring.container.components.model.Component
 import org.corespring.test.TestContext
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
-import play.api.Mode.Mode
 import play.api.libs.json.{ JsObject, Json }
 import play.api.mvc.{ AnyContent, Request }
-import play.api.test.{ FakeApplication, FakeRequest, PlaySpecification }
-import play.api.{ Configuration, GlobalSettings, Mode }
+import play.api.test.{ FakeRequest, PlaySpecification }
 
 import scala.concurrent.ExecutionContext
 
@@ -116,10 +113,10 @@ class DefaultIntegrationTest extends Specification with Mockito with PlaySpecifi
   "assetPathProcessor" should {
 
     trait scope extends Scope {
-      val spied = spy[DefaultIntegration](new TestDI())
+      lazy val spied = spy[DefaultIntegration](new TestDI())
     }
 
-    "call revolveDomain" in new scope {
+    "call resolveDomain" in new scope {
 
       forall(DefaultIntegration.pathsThatNeedResolution) { k =>
         spied.assetPathProcessor.process(k)
