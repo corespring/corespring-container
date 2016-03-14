@@ -92,11 +92,6 @@ describe('component-editor', function () {
         standalone = new Def('element', {}, errorCallback);
         expect(errorCallback).toHaveBeenCalledWith(errorCodes.NO_COMPONENT_TYPE);
       });
-      
-      it('should call errorCallback if the uploadUrl is missing :filename', function(){
-        standalone = new Def('element', {componentType: 't', uploadUrl: 'url'}, errorCallback);
-        expect(errorCallback).toHaveBeenCalledWith(errorCodes.UPLOAD_URL_MISSING_FILENAME);
-      });
 
       it('should define core methods on successful construction', function(){
         standalone = new Def('element', {componentType: 't'}, errorCallback);
@@ -111,7 +106,14 @@ describe('component-editor', function () {
       var data; 
       
       beforeEach(function(){
-        data = {};
+        data = {
+          xhtml: '<div>set-data-xhtml</div>',
+          componentModel: { test: true }
+        };
+        sendResults.getData = {components: {
+          singleComponent: {}
+        }};
+        sendResults.setData = data;
         standalone = new Def('element', {componentType: 'componentType'}, jasmine.createSpy('errorCallback'));
         standalone.getData(jasmine.createSpy('onGetData'));
       });
@@ -123,7 +125,14 @@ describe('component-editor', function () {
 
       it('should call instance.send(setData, data)', function(){
         standalone.setData(data, jasmine.createSpy('onSetData'));
-        expect(instance.send).toHaveBeenCalledWith('setData', data, jasmine.any(Function));
+        expect(instance.send).toHaveBeenCalledWith('setData', {
+          components: {
+            singleComponent: {
+              test: true
+            }
+          },
+          xhtml: data.xhtml 
+        }, jasmine.any(Function));
       });
     });
   });

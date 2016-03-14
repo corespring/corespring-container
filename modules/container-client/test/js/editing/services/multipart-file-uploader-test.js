@@ -1,6 +1,6 @@
 describe('multipart-file-uploader', function(){
 
-  beforeEach(angular.mock.module('corespring-editor.services'));
+  beforeEach(angular.mock.module('corespring-editing.services'));
 
   var mocks = org.corespring.mocks.editor;
 

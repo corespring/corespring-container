@@ -1,25 +1,32 @@
 describe('external-endpoint-image-service', function(){
 
   var e = org.corespring.mocks.editor;
-  var def, Def, fileReader, fileUploader, $http;
+  var def, Def, multipartFileUploader, $http;
+
+  function MultiPartFileUploader(){
+    this.upload =  jasmine.createSpy('upload').and.callFake(function(url, file, opts, success, error){
+      this.success = success;
+      this.error = error;
+    }.bind(this));
+  }
 
   beforeEach(angular.mock.module('corespring-singleComponentEditor.services'));
 
   beforeEach(module(function($provide) {
     $http = e.$http();
+
+    multipartFileUploader = new MultiPartFileUploader();
+
     $provide.value('$http', $http);
+    $provide.value('MultipartFileUploader', multipartFileUploader);
     $provide.value('UPLOAD_ENDPOINT', {url: 'url/:filename'});
   }));
 
-  beforeAll(function(){
-    fileReader = e.FileReader();
-    fileUploader = e['com.ee.v2.RawFileUploader']();
-  });
-    
+
   beforeEach(inject(function(ExternalEndpointsImageService) {
     Def = ExternalEndpointsImageService;
   }));
-      
+
   describe('initialization', function(){
     it('inits', function(){
       expect(new Def()).not.toBe(undefined);
@@ -35,55 +42,44 @@ describe('external-endpoint-image-service', function(){
 
     it('calls $http', function(){
       expect($http).toHaveBeenCalledWith({
-        method: 'DELETE', url: 'url'
+        method: 'DELETE', url: 'url', withCredentials: true
       });
     });
   });
 
-  describe('addFile', e.withWindowMocks(
-    function(){ 
-      return { FileReader: fileReader,
-        'com.ee.v2.RawFileUploader': fileUploader 
-      };
-    },
-    function(getMocks){
-      
-      describe('successfully', function(){
+  describe('addFile', function(){
 
-        var m, onComplete;
-        
-        beforeEach(function(){
-          m = getMocks();
-          var uploader = m['com.ee.v2.RawFileUploader']();
-          def = new Def();
-          onComplete = jasmine.createSpy('onComplete');
-          def.addFile({name: 'file'}, onComplete, jasmine.createSpy('onProgress'));
-          uploader.uploadOpts.onUploadComplete('url', 200);
-        });
+    describe('successfully', function(){
 
-        it('calls onComplete', function(){
-          expect(onComplete).toHaveBeenCalledWith(null, 'url');
-        });
+      var m, onComplete;
+
+      beforeEach(function(){
+        def = new Def();
+        onComplete = jasmine.createSpy('onComplete');
+        def.addFile({name: 'file'}, onComplete, jasmine.createSpy('onProgress'));
+        multipartFileUploader.success({url: 'url'});
       });
-         
-      describe('with error', function(){
-          
-          var m; 
-          beforeEach(function(){
-            m = getMocks();
-            def = new Def();
-            onComplete = jasmine.createSpy('onComplete');
-            var uploader = m['com.ee.v2.RawFileUploader']();
-            def.addFile({name: 'file'}, onComplete, jasmine.createSpy('onProgress'));
-            uploader.uploadOpts.onUploadFailed('err');
-          });
-          
-          it('calls onComplete with err', function(){
-            expect(onComplete).toHaveBeenCalledWith('Upload failed for: url/file: err');
-          });
 
+      it('calls onComplete', function(){
+        expect(onComplete).toHaveBeenCalledWith(null, 'url');
       });
-  }));
+    });
+
+    describe('with error', function(){
+
+      beforeEach(function(){
+        def = new Def();
+        onComplete = jasmine.createSpy('onComplete');
+        def.addFile({name: 'file'}, onComplete, jasmine.createSpy('onProgress'));
+        multipartFileUploader.error('error');
+      });
+
+      it('calls onComplete with err', function(){
+        expect(onComplete).toHaveBeenCalledWith('error');
+      });
+
+    });
+  });
 
 
 });
