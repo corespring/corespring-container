@@ -50,7 +50,7 @@ trait DefaultIntegration
   with LauncherModules
   with JsProcessingModule {
 
-  private val logger = Logger(classOf[DefaultIntegration])
+  private final val logger = Logger(classOf[DefaultIntegration])
 
   lazy val defaultIntegrationControllers: Seq[Controller] = {
     containerMainControllers ++

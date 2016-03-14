@@ -11,6 +11,7 @@ import org.corespring.test.TestContext
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
+import play.api.Logger
 import play.api.libs.json.{ JsObject, Json }
 import play.api.mvc.{ AnyContent, Request }
 import play.api.test.{ FakeRequest, PlaySpecification }
