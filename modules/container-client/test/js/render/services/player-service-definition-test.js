@@ -1,10 +1,27 @@
 describe('player-service-definition', function () {
 
-  var sut, size;
+  var service, size, onSuccess, onFailure, http, promise;
 
   beforeEach(angular.mock.module('corespring-player.services'));
 
   beforeEach(module(function ($provide) {
+
+    promise = {
+      success: function(onSuccess){
+        onSuccess();
+        return promise;
+      },
+      error: function(){}
+    };
+
+    http = {
+      get: jasmine.createSpy().and.returnValue(promise),
+      put: jasmine.createSpy().and.returnValue(promise),
+      delete: jasmine.createSpy().and.returnValue(promise),
+      post: jasmine.createSpy().and.returnValue(promise)
+    };
+
+    $provide.value('$http', http);
     $provide.value('EmbeddedItemAndSession', {session:{}, item:{}});
     $provide.value('PlayerServiceEndpoints', {
       queryParams: {},
@@ -22,118 +39,66 @@ describe('player-service-definition', function () {
   }));
 
   beforeEach(inject(function ($rootScope, PlayerServiceDefinition) {
-    sut = new PlayerServiceDefinition();
+    service = new PlayerServiceDefinition();
+    onSuccess = jasmine.createSpy('success');
+    onFailure = jasmine.createSpy('failure');
   }));
 
   it('should exist', function () {
-    expect(sut).toBeDefined();
+    expect(service).toBeDefined();
   });
 
-  describe('before loadItemAndSession', function(){
-    var onSuccess, onFailure;
-
-    beforeEach(function(){
-      onSuccess = jasmine.createSpy('success');
-      onFailure = jasmine.createSpy('failure');
-    });
+  describe('queued calls before loadItemAndSession', function(){
 
     it('should allow to call loadItemAndSession', function(){
-      sut.loadItemAndSession(onSuccess, onFailure);
+      service.loadItemAndSession(onSuccess, onFailure);
       expect(onFailure).not.toHaveBeenCalled();
       expect(onSuccess).toHaveBeenCalled();
     });
 
-    it('should return error when completeResponse is called', function(){
-      sut.completeResponse(onSuccess, onFailure);
-      expect(onFailure).toHaveBeenCalled();
-      expect(onSuccess).not.toHaveBeenCalled();
-    });
-    it('should return error when getScore is called', function(){
-      sut.getScore({components:{}}, onSuccess, onFailure);
-      expect(onFailure).toHaveBeenCalled();
-      expect(onSuccess).not.toHaveBeenCalled();
-    });
-    it('should return error when loadInstructorData is called', function(){
-      sut.loadInstructorData({}, onSuccess, onFailure);
-      expect(onFailure).toHaveBeenCalled();
-      expect(onSuccess).not.toHaveBeenCalled();
-    });
-    it('should return error when loadOutcome is called', function(){
-      sut.loadOutcome({}, onSuccess, onFailure);
-      expect(onFailure).toHaveBeenCalled();
-      expect(onSuccess).not.toHaveBeenCalled();
-    });
-    it('should return error when reopenSession is called', function(){
-      sut.reopenSession(onSuccess, onFailure);
-      expect(onFailure).toHaveBeenCalled();
-      expect(onSuccess).not.toHaveBeenCalled();
-    });
-    it('should return error when resetSession is called', function(){
-      sut.resetSession(onSuccess, onFailure);
-      expect(onFailure).toHaveBeenCalled();
-      expect(onSuccess).not.toHaveBeenCalled();
-    });
-    it('should return error when saveSession is called', function(){
-      sut.saveSession({}, onSuccess, onFailure);
-      expect(onFailure).toHaveBeenCalled();
-      expect(onSuccess).not.toHaveBeenCalled();
-    });
 
-  });
+    function itOnlyCallsAfterLoadItemAndSession(name, fn){
+    
+      it('should only call  ' + name + ' callback after loadItemAndSession is complete', function(){
+        var localOnSuccess = jasmine.createSpy('localOnSuccess');
+        var localOnFailure = jasmine.createSpy('localOnFailure');
+        fn(localOnSuccess, localOnFailure);
+        expect(localOnSuccess).not.toHaveBeenCalled();
+        expect(localOnFailure).not.toHaveBeenCalled();
+        service.loadItemAndSession(onSuccess, onFailure);
+        expect(localOnFailure).not.toHaveBeenCalled();
+        expect(localOnSuccess).toHaveBeenCalled();
+      });
+    }
 
-  describe('after loadItemAndSession', function(){
-    var onSuccess, onFailure;
-
-    beforeEach(function(){
-      onSuccess = jasmine.createSpy('success');
-      onFailure = jasmine.createSpy('failure');
-      sut.loadItemAndSession(onSuccess, onFailure);
+    itOnlyCallsAfterLoadItemAndSession('completeResponse', function(onSuccess, onFailure){
+      service.completeResponse(onSuccess, onFailure);
     });
-
-    it('should allow to call loadItemAndSession again', function(){
-      sut.loadItemAndSession(onSuccess, onFailure);
-      expect(onFailure).not.toHaveBeenCalled();
-      expect(onSuccess).toHaveBeenCalled();
+    
+    itOnlyCallsAfterLoadItemAndSession('getScore', function(onSuccess, onFailure){
+      service.getScore({components:{}}, onSuccess, onFailure);
     });
-
-    it('should return success when completeResponse is called', function(){
-      sut.completeResponse(onSuccess, onFailure);
-      expect(onFailure).not.toHaveBeenCalled();
-      expect(onSuccess).toHaveBeenCalled();
+    
+    itOnlyCallsAfterLoadItemAndSession('loadInstructorData', function(onSuccess, onFailure){
+      service.loadInstructorData({}, onSuccess, onFailure);
     });
-    it('should return success when getScore is called', function(){
-      sut.getScore({components:{}}, onSuccess, onFailure);
-      expect(onFailure).not.toHaveBeenCalled();
-      expect(onSuccess).toHaveBeenCalled();
+    
+    itOnlyCallsAfterLoadItemAndSession('loadOutcome', function(onSuccess, onFailure){
+      service.loadOutcome({}, onSuccess, onFailure);
     });
-    it('should return success when loadInstructorData is called', function(){
-      sut.loadInstructorData({}, onSuccess, onFailure);
-      expect(onFailure).not.toHaveBeenCalled();
-      expect(onSuccess).toHaveBeenCalled();
+    
+    itOnlyCallsAfterLoadItemAndSession('reopenSession', function(onSuccess, onFailure){
+      service.reopenSession(onSuccess, onFailure);
     });
-    it('should return success when loadOutcome is called', function(){
-      sut.loadOutcome({}, onSuccess, onFailure);
-      expect(onFailure).not.toHaveBeenCalled();
-      expect(onSuccess).toHaveBeenCalled();
+    
+    itOnlyCallsAfterLoadItemAndSession('resetSession', function(onSuccess, onFailure){
+      service.resetSession(onSuccess, onFailure);
     });
-    it('should return success when reopenSession is called', function(){
-      sut.reopenSession(onSuccess, onFailure);
-      expect(onFailure).not.toHaveBeenCalled();
-      expect(onSuccess).toHaveBeenCalled();
-    });
-    it('should return success when resetSession is called', function(){
-      sut.resetSession(onSuccess, onFailure);
-      expect(onFailure).not.toHaveBeenCalled();
-      expect(onSuccess).toHaveBeenCalled();
-    });
-    it('should return success when saveSession is called', function(){
-      sut.saveSession({}, onSuccess, onFailure);
-      expect(onFailure).not.toHaveBeenCalled();
-      expect(onSuccess).toHaveBeenCalled();
+    
+    itOnlyCallsAfterLoadItemAndSession('saveSession', function(onSuccess, onFailure){
+      service.saveSession({}, onSuccess, onFailure);
     });
 
   });
-
-
 
 });
