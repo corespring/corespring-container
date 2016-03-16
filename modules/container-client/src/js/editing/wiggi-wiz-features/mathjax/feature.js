@@ -1,75 +1,66 @@
 angular.module('corespring-editing.wiggi-wiz-features.mathjax').factory('WiggiMathJaxFeatureDef', [
   'MathJaxService',
   'MathFormatUtils',
-  '$rootScope', 
+  '$rootScope',
   '$log',
 
   function(MathJaxService, MathFormatUtils, $rootScope, $log) {
-
-    function FeatureDef() {
-      var name = 'mathjax';
-
-      function dialog(editor, callback, $scope) {
-        editor.launchDialog({
-            originalMarkup: $scope ? ($scope.originalMarkup || '') : ''
-          },
-          'Mathematical Notation',
-          '<mathjax-dialog ng-model="data.originalMarkup"></mathjax-dialog>',
-          callback, {}, {
-            featureName: name
-          }
-        );
-      }
-
-      this.name = name;
+    function MathInputWiggiFeatureDef() {
+      this.name = 'mathjax';
       this.attributeName = 'mathjax';
-      this.insertInline = function($node){
-        var info = MathFormatUtils.getMathInfo($node.html());
-        return info && info.displayMode === 'inline'; 
-      };
-
-      this.draggable = true;
       this.iconclass = 'fa math-sum';
+      this.insertInline = true;
+      this.addToEditor = '<div mathinput-holder-init></div>';
       this.compile = true;
-
+      this.draggable = true;
       this.initialise = function($node, replaceWith) {
-        var content = $node.html();
-        var newNode = $('<div mathjax-holder contenteditable="false">');
-        newNode.html(content);
-        MathJaxService.parseDomForMath(100);
+        var content = $node.html() || '';
+        var isNew = $node[0].outerHTML.indexOf('mathinput-holder-init') >= 0;
+        content = content.replace(/\\\(/gi,'').replace(/\\\)/gi, '').replace(/\\/gi,'\\\\');
+        var newNode = $([
+          '<div mathinput-holder>',
+          '<math-input fix-backslash="false" editable="true" keypad-auto-open="' + isNew + '" keypad-type="\'basic\'" ng-model="expr" code-model="code" expression="\'' + content + '\'"></math-input>',
+          '</div>'].join(''));
         return replaceWith(newNode);
       };
 
-      this.addToEditor = function(editor, addContent) {
-        dialog(editor, function(update) {
-          var $node;
-          $node = $('<mathjax-holder></mathjax-holder>');
-          $node.html(update.originalMarkup);
-          addContent($node);
-          $rootScope.$emit('math-updated');
-        });
+      this.registerChangeNotifier = function(notifyEditorOfChange, node) {
+        var scope = node.scope() && node.scope().$$childHead;
+        if (scope) {
+          scope.$watch('ngModel', function(a, b) {
+            if (a && a !== b) {
+              notifyEditorOfChange();
+            }
+          });
+          scope.$watch('code', function(a, b) {
+            if (a && a !== b) {
+              notifyEditorOfChange();
+            }
+          });
+        }
       };
 
-      this.onClick = function($node, $scope, editor) {
-        dialog(editor, function(update) {
-          $scope.originalMarkup = update.originalMarkup;
-          $scope.$emit('save-data');
-          MathJaxService.parseDomForMath(100);
-          $scope.$emit('math-updated');
-        }, $scope);
+      this.onClick = function($node, $nodeScope, editor) {
+        $node.find('.mq').find('textarea').blur();
+        setTimeout(function() {
+          $node.find('.mq').find('textarea').focus();
+        }, 1);
       };
 
       this.getMarkUp = function($node, $scope) {
-        if (!$scope) {
-          $log.warn('[mathjax-feature].getMarkUp: Parameter $scope no set.');
+        MathJaxService.parseDomForMath(100)
+        var expr = $scope.code || $scope.expr || '';
+        var mathInfo = MathFormatUtils.getMathInfo(expr);
+        var res;
+        if (mathInfo.mathType === 'MathML') {
+          res = '<span mathjax>' + (expr) + '</span>';
+        } else {
+          res = '<span mathjax>\\(' + (expr) + '\\)</span>';
         }
-        if (!$scope.originalMarkup) {
-          $log.warn('[mathjax-feature].getMarkUp: $scope.originalMarkup not set.');
-        }
-        var markup = $scope ? $scope.originalMarkup : '';
-        return '<span mathjax>' + markup + '</span>';
+        console.log('cucu', res);
+        return res;
       };
     }
-    return FeatureDef;
+    return MathInputWiggiFeatureDef;
   }
 ]);

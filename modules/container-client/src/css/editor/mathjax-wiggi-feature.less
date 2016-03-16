@@ -1,5 +1,20 @@
 @import "../common/colors";
 
+
+.wiggi-wiz, .mini-wiggi-wiz {
+  .mathinput-holder {
+    display: inline-block;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    transition: background-color 200ms;
+    border-radius: 3px;
+  }
+}
+
 //The mathjax feature in wiggi adds 'mathjax' to the modal class
 //To allow us to use feature specific styles for the dialog.
 .modal.mathjax{
@@ -179,7 +194,7 @@
     }
   }
 
-  
+
   .mj-dialog-content {
     a {
       color: #0099cc;
