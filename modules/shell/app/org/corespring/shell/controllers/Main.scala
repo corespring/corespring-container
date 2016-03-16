@@ -6,7 +6,7 @@ import com.mongodb.casbah.commons.MongoDBObject
 import org.bson.types.ObjectId
 import org.corespring.mongo.json.services.MongoService
 import org.corespring.shell.services.ItemDraftService
-import org.corespring.shell.{ DraftLink, IndexLink, SessionKeys }
+import org.corespring.shell.{DraftLink, IndexLink, SessionKeys, SessionLink}
 import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc._
@@ -64,8 +64,21 @@ class Main(
             val itemComponentEditorUrl = Launchers.itemComponentEditor(Some(id)).url
             val draftComponentEditorUrl = Launchers.draftComponentEditor(Some(id)).url
 
+            val sessionLinks = sessionService.collection
+              .find(MongoDBObject("itemId" -> id))
+              .toSeq
+              .map{ dbo =>
+                val id = dbo.get("_id").toString()
+
+                SessionLink(
+                  id,
+                  Launchers.playerFromSession(id).url,
+                  routes.Main.deleteSession(id).url)
+              }
+
             IndexLink(name,
               playerUrl,
+              sessionLinks,
               draftEditorUrl,
               itemEditorUrl,
               itemComponentEditorUrl,
@@ -104,6 +117,12 @@ class Main(
   def deleteItem(itemId: String) = Action {
     request =>
       items.remove(MongoDBObject("_id" -> new ObjectId(itemId)))
+      Redirect("/")
+  }
+
+  def deleteSession(sessionId: String) = Action {
+    request =>
+      sessionService.delete(sessionId)
       Redirect("/")
   }
 
