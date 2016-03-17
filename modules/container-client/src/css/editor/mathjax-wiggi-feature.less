@@ -1,6 +1,5 @@
 @import "../common/colors";
 
-
 .wiggi-wiz, .mini-wiggi-wiz {
   .mathinput-holder {
     display: inline-block;
@@ -15,32 +14,6 @@
   }
 }
 
-//The mathjax feature in wiggi adds 'mathjax' to the modal class
-//To allow us to use feature specific styles for the dialog.
-.modal.mathjax{
-
-  .modal-content{
-    min-height: 530px;
-    min-width: 433px;
-  }
-
-  .modal-body{
-    position: absolute;
-    left: 0;
-    top: 54px;
-    bottom: 153px;
-    right: 0;
-    padding: 0;
-  }
-
-  .modal-footer{
-    position: absolute;
-    bottom: 0px;
-    left: 0;
-    right: 0;
-  }
-}
-
 .math-sum {
   font-family: serif;
   font-weight: bold;
@@ -49,9 +22,9 @@
     content: "∑";
   }
 }
-
 .mathinput-holder {
-  .remove-button {
+  .remove-math-button {
+    visibility: hidden;
     display: inline-block;
     font-size: smaller;
     position: absolute;
@@ -60,6 +33,11 @@
     color: #a9a9a9;
     &:hover {
       color: #EEEEEE;
+    }
+  }
+  &:hover {
+    .remove-math-button {
+      visibility: visible;
     }
   }
 }
