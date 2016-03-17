@@ -54,7 +54,7 @@ angular.module('corespring-common.supporting-materials.services')
           var call = Urls.addAsset;
           var url = addParams(call.url.replace(':name', materialName));
           MultipartFileUploader.upload(url, file, {}, function(update){
-            onComplete(null, file.name);
+            onComplete(null, update.path);
           }, function(err){
             onComplete(err);
           });
