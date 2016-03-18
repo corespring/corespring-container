@@ -152,7 +152,7 @@ describe('supporting materials service', function() {
     });
 
     it('calls back to success handler with the name from the result', function(){
-      uploadSuccess({name: 'uploaded-file'});
+      uploadSuccess({path: 'uploaded-file'});
       expect(onSuccess).toHaveBeenCalledWith(null, 'uploaded-file');
     });
   });
