@@ -17,15 +17,13 @@ import scala.concurrent.Future
 import scala.util.Try
 
 class ItemSupportingMaterialHooks(
-assets: SupportingMaterialAssets[String],
-itemService: ItemService,
-                                   val containerContext: ContainerExecutionContext
-                                 )
+  assets: SupportingMaterialAssets[String],
+  itemService: ItemService,
+  val containerContext: ContainerExecutionContext)
   extends containerHooks.ItemSupportingMaterialHooks
   with SupportingMaterialHooksHelper {
 
   import scala.concurrent.ExecutionContext.Implicits.global
-
 
   override def create[F <: File](id: String, sm: CreateNewMaterialRequest[F])(implicit h: RequestHeader): R[JsValue] = Future {
     {
@@ -64,7 +62,7 @@ itemService: ItemService,
 
     if (wr.getN == 1) {
       assets.uploadAssetToSupportingMaterial(id, name, binary)
-      Right(Json.parse(com.mongodb.util.JSON.serialize(binaryDbo)))
+      Right(Json.obj("path" -> binary.name))
     } else {
       Left((BAD_REQUEST, "Failed to remove the asset"))
     }
@@ -112,10 +110,9 @@ itemService: ItemService,
 }
 
 class ItemHooks(
-itemService: ItemService,
-assets: ItemAssets,
-                 val containerContext: ContainerExecutionContext
-               )
+  itemService: ItemService,
+  assets: ItemAssets,
+  val containerContext: ContainerExecutionContext)
   extends containerHooks.ItemHooks
   //with CoreItemHooks
   with ItemHooksHelper {
