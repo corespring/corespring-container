@@ -7,7 +7,7 @@ angular.module('corespring-editor.controllers')
     'ItemService',
     'EditorConfig',
     'LogFactory',
-    'ComponentImageService',
+    'EditingImageService',
     'ComponentData',
     'ComponentPopups',
     'AppState',
@@ -23,7 +23,7 @@ angular.module('corespring-editor.controllers')
       ItemService,
       EditorConfig,
       LogFactory,
-      ComponentImageService,
+      EditingImageService,
       ComponentData,
       ComponentPopups,
       AppState,
@@ -60,7 +60,7 @@ angular.module('corespring-editor.controllers')
         ComponentPopups.launch($scope, id, model, config);
       });
 
-      $scope.imageService = ComponentImageService;
+      $scope.imageService = EditingImageService;
       $scope.overrideFeatures = EditorConfig.overrideFeatures;
       $scope.extraFeatures = EditorConfig.extraFeatures;
       $scope.extraFeaturesForFeedback = {
