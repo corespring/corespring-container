@@ -9,7 +9,7 @@ import org.corespring.container.client.integration.ContainerExecutionContext
 import org.corespring.container.client.{ hooks => containerHooks }
 import org.corespring.mongo.json.services.MongoService
 import org.corespring.shell.controllers.editor.actions.{ DraftId, ContainerDraftId }
-import org.corespring.shell.services.{ItemService, ItemDraftService}
+import org.corespring.shell.services.{ ItemService, ItemDraftService }
 import org.joda.time.DateTime
 import play.api.Logger
 import play.api.http.Status._
@@ -19,15 +19,13 @@ import play.api.mvc._
 import scala.concurrent.Future
 
 class ItemDraftSupportingMaterialHooks(
-assets: SupportingMaterialAssets[DraftId[ObjectId]],
-draftItemService: ItemDraftService,
-                                        val containerContext: ContainerExecutionContext
-                                      )
+  assets: SupportingMaterialAssets[DraftId[ObjectId]],
+  draftItemService: ItemDraftService,
+  val containerContext: ContainerExecutionContext)
   extends containerHooks.ItemDraftSupportingMaterialHooks
   with SupportingMaterialHooksHelper {
 
   import scala.concurrent.ExecutionContext.Implicits.global
-
 
   override def prefix(s: String) = s"item.$s"
 
@@ -77,7 +75,7 @@ draftItemService: ItemDraftService,
 
         if (wr.getN == 1) {
           assets.uploadAssetToSupportingMaterial(draftId, name, binary)
-          Right(Json.obj())
+          Right(Json.obj("path" -> binary.name))
         } else {
           Left((BAD_REQUEST, "Failed to remove the asset"))
         }
@@ -131,22 +129,18 @@ draftItemService: ItemDraftService,
 }
 
 class ItemDraftHooks(
-assets: ItemDraftAssets,
-itemService: ItemService,
-draftItemService: ItemDraftService,
-                      val containerContext: ContainerExecutionContext
-                    )
+  assets: ItemDraftAssets,
+  itemService: ItemService,
+  draftItemService: ItemDraftService,
+  val containerContext: ContainerExecutionContext)
   extends containerHooks.DraftHooks
   with CoreItemHooks
   with ItemHooksHelper {
 
   val logger = Logger(classOf[ItemDraftHooks])
 
-
   import com.mongodb.casbah.commons.conversions.scala._
   RegisterJodaTimeConversionHelpers()
-
-
 
   lazy val draftFineGrainedSave = fineGrainedSave(draftItemService, processResultJson) _
 

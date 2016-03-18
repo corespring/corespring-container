@@ -44,6 +44,8 @@ class CoreSupportingMaterialsTest extends Specification with Mockito with PlaySp
 
   class testScope extends Scope with CoreSupportingMaterials with TestContext {
 
+    override def getTimestamp = "stamp"
+
     lazy val mockHooks = {
       val m = mock[SupportingMaterialHooks]
       m.create(anyString, any[CreateBinaryMaterial])(any[Request[AnyContent]]) returns Future { Right(Json.obj()) }
@@ -244,7 +246,7 @@ class CoreSupportingMaterialsTest extends Specification with Mockito with PlaySp
       val captor = capture[Binary]
       status(result) === OK
       there was one(materialHooks).addAsset(e("id"), e("name"), captor)(any[RequestHeader])
-      captor.value.name === "image.png"
+      captor.value.name === "stamp-image.png"
       captor.value.mimeType === "image/png"
     }
 

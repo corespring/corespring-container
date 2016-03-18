@@ -151,9 +151,9 @@ describe('supporting materials service', function() {
         jasmine.any(Function));
     });
 
-    it('calls back to success handler', function(){
-      uploadSuccess({});
-      expect(onSuccess).toHaveBeenCalledWith(null, 'file');
+    it('calls back to success handler with the name from the result', function(){
+      uploadSuccess({name: 'uploaded-file'});
+      expect(onSuccess).toHaveBeenCalledWith(null, 'uploaded-file');
     });
   });
     
