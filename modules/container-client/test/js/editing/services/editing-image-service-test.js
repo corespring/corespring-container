@@ -2,7 +2,7 @@
 describe('editing-image-service', function() {
 
   beforeEach(function() {
-    angular.mock.module('test-app');
+    angular.mock.module('corespring-editing.services');
   });
 
   var mockFileUploader;
