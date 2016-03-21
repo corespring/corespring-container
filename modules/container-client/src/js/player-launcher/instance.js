@@ -127,7 +127,7 @@ var Instance = function(launchOpts, element, errorCallback, log, autosizeEnabled
       ' style="border:none;' + (autosizeEnabled ? ' width:100%;' : '') + '" '
     ].join('');
 
-    if (call.method === 'GET') {
+    if (call.method.toUpperCase() === 'GET') {
       iframeOpen += 'src="' + url + '"';
     }
 
@@ -136,7 +136,7 @@ var Instance = function(launchOpts, element, errorCallback, log, autosizeEnabled
     $(e).html(iframeOpen + iframeClose);
 
 
-    if (call.method === 'POST') {
+    if (call.method.toUpperCase() === 'POST') {
       var post = new PostForm(url);
       post.load();
     }

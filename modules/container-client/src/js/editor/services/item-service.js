@@ -47,7 +47,7 @@ angular.module('corespring-editor.services').service('ItemService', [
         try {
           loadInProgress = true;
           var finalUrl = addQueryParamsIfPresent(ItemUrls.load.url);
-          $http[ItemUrls.load.method](finalUrl)
+          $http({method: ItemUrls.load.method, url: finalUrl})
             .success(loadItemSuccess)
             .error(loadItemError);
         } catch (e) {
@@ -111,7 +111,6 @@ angular.module('corespring-editor.services').service('ItemService', [
       };
 
       this.saveAll = function(data, onSuccess, onFailure) {
-        var method = ItemUrls.save.method;
         var url = ItemUrls.save.url;
         url = addQueryParamsIfPresent(url);
         logger.debug('saveAll', data);
@@ -119,7 +118,7 @@ angular.module('corespring-editor.services').service('ItemService', [
 
         notifyListeners('saving');
 
-        $http[method](url, data)
+        $http({method: ItemUrls.save.method, url: url, data: data})
           .success(saveSuccess)
           .error(saveError);
 
@@ -151,7 +150,7 @@ angular.module('corespring-editor.services').service('ItemService', [
 
         notifyListeners('saving');
 
-        $http[method](url, data)
+        $http({method: call.method, url: url},data)
           .success(saveSuccess)
           .error(saveError);
 
