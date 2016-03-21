@@ -105,7 +105,7 @@ class ShellAssets(
             }
           case _ =>
         }
-        UploadResult(tuple._1.getKey)
+        UploadResult(path)
       }
     }
   }

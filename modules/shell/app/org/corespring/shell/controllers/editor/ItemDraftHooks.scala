@@ -3,13 +3,12 @@ package org.corespring.shell.controllers.editor
 import com.mongodb.casbah.Imports._
 import com.mongodb.casbah.commons.MongoDBObject
 import org.bson.types.ObjectId
-import org.corespring.container.client.hooks._
 import org.corespring.container.client.hooks.Hooks.{ R, StatusMessage }
+import org.corespring.container.client.hooks._
 import org.corespring.container.client.integration.ContainerExecutionContext
 import org.corespring.container.client.{ hooks => containerHooks }
-import org.corespring.mongo.json.services.MongoService
-import org.corespring.shell.controllers.editor.actions.{ DraftId, ContainerDraftId }
-import org.corespring.shell.services.{ ItemService, ItemDraftService }
+import org.corespring.shell.controllers.editor.actions.{ ContainerDraftId, DraftId }
+import org.corespring.shell.services.{ ItemDraftService, ItemService }
 import org.joda.time.DateTime
 import play.api.Logger
 import play.api.http.Status._
@@ -64,7 +63,7 @@ class ItemDraftSupportingMaterialHooks(
 
   private def dm = MongoDBObject("$set" -> MongoDBObject("item.dateModified" -> DateTime.now))
 
-  override def addAsset(id: String, name: String, binary: Binary)(implicit h: RequestHeader): R[JsValue] = withDraftId(id) { (draftId) =>
+  override def addAsset(id: String, name: String, binary: Binary)(implicit h: RequestHeader): R[UploadResult] = withDraftId(id) { (draftId) =>
     Future {
       ContainerDraftId.fromString(id).map { draftId =>
         val query = MongoDBObject("_id" -> DraftId.dbo(draftId), "item.supportingMaterials.name" -> name)
@@ -75,7 +74,7 @@ class ItemDraftSupportingMaterialHooks(
 
         if (wr.getN == 1) {
           assets.uploadAssetToSupportingMaterial(draftId, name, binary)
-          Right(Json.obj())
+          Right(UploadResult(binary.name))
         } else {
           Left((BAD_REQUEST, "Failed to remove the asset"))
         }
@@ -89,8 +88,8 @@ class ItemDraftSupportingMaterialHooks(
     }.getOrElse(notOk)
   }
 
-  private def withDraftId(id: String)(fn: DraftId[ObjectId] => R[JsValue]): R[JsValue] = {
-    parseId[R[JsValue]](id)(fn, Future(Left(BAD_REQUEST -> "Can't parse draftId")))
+  private def withDraftId[A](id: String)(fn: DraftId[ObjectId] => R[A]): R[A] = {
+    parseId[R[A]](id)(fn, Future(Left(BAD_REQUEST -> "Can't parse draftId")))
   }
 
   override def delete(id: String, name: String)(implicit h: RequestHeader): R[JsValue] = withDraftId(id) { (draftId: DraftId[ObjectId]) =>

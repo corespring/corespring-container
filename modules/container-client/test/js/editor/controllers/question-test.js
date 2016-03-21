@@ -21,7 +21,7 @@ describe('QuestionController', function() {
     })
   };
   
-  var ComponentImageService = {};
+  var EditingImageService = {};
   
   var ComponentData = {
     registerComponent: jasmine.createSpy('registerComponent'),
@@ -55,7 +55,7 @@ describe('QuestionController', function() {
     $provide.value('ItemService', ItemService);
     $provide.value('EditorConfig', EditorConfig);
     $provide.value('LogFactory', LogFactory);
-    $provide.value('ComponentImageService', ComponentImageService);
+    $provide.value('EditingImageService', EditingImageService);
     $provide.value('ComponentData', ComponentData);
     $provide.value('ComponentPopups', ComponentPopups);
     $provide.value('AppState', AppState);
@@ -130,8 +130,8 @@ describe('QuestionController', function() {
     });
 
     describe('imageService', function() {
-      it('should be ComponentImageService', function() {
-        expect(scope.imageService).toBe(ComponentImageService);
+      it('should be EditingImageService', function() {
+        expect(scope.imageService).toBe(EditingImageService);
       });
     });
 
