@@ -150,7 +150,7 @@ angular.module('corespring-editor.services').service('ItemService', [
 
         notifyListeners('saving');
 
-        $http({method: call.method, url: url},data)
+        $http({method: call.method, url: url, data: data})
           .success(saveSuccess)
           .error(saveError);
 

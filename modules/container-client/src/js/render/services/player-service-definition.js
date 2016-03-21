@@ -61,7 +61,6 @@ angular.module('corespring-player.services').factory('PlayerServiceDefinition', 
 
       function _callHttp(call, data, onSuccess, onFailure){
         var url = addQueryParamsIfPresent(call.url);
-        var args = data ? [url, data] : [url];
 
         $http({method: call.method, url: url, data: data})
           .success(
