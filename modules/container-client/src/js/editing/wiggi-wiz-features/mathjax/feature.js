@@ -20,7 +20,8 @@ angular.module('corespring-editing.wiggi-wiz-features.mathjax').factory('WiggiMa
         var newNode = $([
           '<div mathinput-holder="" show-remove-button="true">',
           '<math-input parent-selector=".wiggi-wiz, .config-panel-body" show-code-button="true" fix-backslash="false" editable="true" keypad-auto-open="' + isNew + '" keypad-type="\'basic\'" ng-model="expr" code-model="code" expression="\'' + content + '\'"></math-input>',
-          '</div>'].join(''));
+          '</div>'
+        ].join(''));
         return replaceWith(newNode);
       };
 
@@ -28,7 +29,7 @@ angular.module('corespring-editing.wiggi-wiz-features.mathjax').factory('WiggiMa
         var scope = node.scope() && node.scope().$$childHead;
         if (scope) {
           var updateFn = function(a, b) {
-            if (a && a !== b) {
+            if (a && b && a !== b) {
               notifyEditorOfChange();
             }
           };
