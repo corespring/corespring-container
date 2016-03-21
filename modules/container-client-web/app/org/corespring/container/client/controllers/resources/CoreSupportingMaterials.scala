@@ -165,7 +165,11 @@ private[resources] trait CoreSupportingMaterials extends Controller with HasCont
     val v = for {
       form <- request.body.asMultipartFormData.toSuccess(notMultipartForm)
       binary <- formToBinary(form, acceptableTypes.filterNot(_ == "application/pdf"))
-    } yield materialHooks.addAsset(id, name, binary._2).toResult
+    } yield materialHooks.addAsset(id, name, binary._2).map { e =>
+      e.map { ur =>
+        Json.obj("path" -> ur.path)
+      }
+    }.toResult
 
     v match {
       case Failure(e) => Future(e.result)

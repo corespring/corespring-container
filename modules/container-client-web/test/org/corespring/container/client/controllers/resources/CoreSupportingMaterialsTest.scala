@@ -225,7 +225,7 @@ class CoreSupportingMaterialsTest extends Specification with Mockito with PlaySp
   "addAssetToSupportingMaterialContent" should {
 
     class addAsset extends testScope {
-      mockHooks.addAsset(any[String], any[String], any[Binary])(any[RequestHeader]) returns Future(Right(Json.obj()))
+      mockHooks.addAsset(any[String], any[String], any[Binary])(any[RequestHeader]) returns Future(Right(UploadResult("path.png")))
     }
 
     "fail if the body isn't multipart form data" in new addAsset {
