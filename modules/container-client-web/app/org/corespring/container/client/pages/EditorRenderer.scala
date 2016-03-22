@@ -40,7 +40,11 @@ trait EditorRenderer extends CoreRenderer {
 
     val queryParamsJson = Json.toJson(queryParams)
 
-    val servicesJs = EditorServices(serverNgModuleName, mainEndpoints, supportingMaterialsEndpoints, componentsAndWidgets, queryParamsJson)
+    val servicesJs = EditorServices(serverNgModuleName,
+      mainEndpoints,
+      supportingMaterialsEndpoints,
+      componentsAndWidgets,
+      queryParamsJson).toString
 
     val ngModules = jsArrayString(Seq(serverNgModuleName) ++ sources.js.ngModules ++ bundle.ngModules)
 
