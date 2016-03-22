@@ -1,13 +1,21 @@
 describe('sm-utils', function() {
 
-  var utils, mockDocument;
+  var utils, mockDocument, queryParamUtils;
 
   beforeEach(angular.mock.module('corespring-common.supporting-materials.services'));
 
   beforeEach(module(function($provide) {
-    mockDocument = {location: { href: 'unknown'}};
+
+    queryParamUtils = {
+      addQueryParams: jasmine.createSpy('addQueryParams').and.callFake(function(p){
+        return p;
+      })
+    };
+
+    mockDocument = {location: {href: 'unknown'}};
     $provide.value('SupportingMaterialUrls', {});
     $provide.value('$document', [mockDocument]);
+    $provide.value('QueryParamUtils', queryParamUtils);
   }));
 
   beforeEach(inject(function(SmUtils) {
@@ -86,24 +94,6 @@ describe('sm-utils', function() {
       expect(utils.formatKB(512)).toEqual('512kb');
     });
 
-  });
-
-  describe('addQueryParamsIfPresent', function(){
-
-    it('adds nothing', function(){
-      expect(utils.addQueryParamsIfPresent('?')).toEqual('?');
-    });
-    
-    it('adds 1 param', function(){
-      mockDocument.location.href = 'index.html?a=b';
-      expect(utils.addQueryParamsIfPresent('blah.html')).toEqual('blah.html?a=b');
-    });
-    
-    it('adds 2 params', function(){
-      mockDocument.location.href = 'index.html?a=b&c=d';
-      expect(utils.addQueryParamsIfPresent('blah.html')).toEqual('blah.html?a=b&c=d');
-    });
-    
   });
 
 });
