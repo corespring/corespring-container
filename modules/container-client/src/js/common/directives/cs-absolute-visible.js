@@ -4,6 +4,8 @@ angular.module('corespring-common.directives').directive('csAbsoluteVisible', ['
       $scope.$watch($attrs.csAbsoluteVisible, function(v) {
         $elem.css('visibility', v ? '' : 'hidden');
         $elem.css('position', v ? '' : 'absolute');
+        $elem.css('opacity', v ? '' : '0');
+        $elem.css('pointer-events', v ? '' : 'none');
       });
     }
   };
