@@ -60,7 +60,7 @@ angular.module('corespring-editing.wiggi-wiz-features.cs-image')
       if (imageSrc) {
         imageSrc = addQueryParamsIfPresent(imageSrc);
         var divStyle = $node.attr('style');
-        var imageStyle = $node.find('img').attr('style');
+        var imageStyle = $node.find('img').attr('style') || '';
         var clone = $('<div style="' + divStyle + '" image-holder image-src="' + imageSrc + '" image-style="' + imageStyle + '"></div>');
         return replaceWith(clone);
       } else {
