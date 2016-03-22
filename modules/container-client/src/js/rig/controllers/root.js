@@ -115,16 +115,18 @@ var controller = function($scope,$http, $location, $timeout, $log, ComponentRegi
   });
 
 
-  $scope.$watch('model', function(m) {
-    if (!m || !m.item) {
+  $scope.$watch('model', function(newValue, oldValue) {
+    if (!newValue || !newValue.item) {
       return;
     }
     var cleanJson = angular.copy($scope.model);
     $scope.componentJson = JSON.stringify(cleanJson, undefined, 2);
     var zipped = PlayerUtils.zipDataAndSession($scope.model.item, $scope.model.session);
-    $timeout(function(){
-      ComponentRegister.setDataAndSession(zipped);
-    }, 200);
+    if(!(_.isEqual(newValue.item, oldValue.item) && _.isEqual(newValue.session, oldValue.session))) {
+      $timeout(function () {
+        ComponentRegister.setDataAndSession(zipped);
+      }, 200);
+    }
   }, true);
 
   function getQueryVariable(variable) {
