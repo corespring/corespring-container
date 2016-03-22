@@ -27,12 +27,14 @@ class CatalogRenderer(jadeEngine: JadeEngine,
   def render(bundle: ComponentsScriptBundle,
     mainEndpoints: MainEndpoints,
     supportingMaterialsEndpoints: SupportingMaterialsEndpoints,
+    queryParams : Map[String,String],
     prodMode: Boolean): Future[Html] = Future {
 
     val (js, css) = prepareJsCss(prodMode, bundle)
 
     val componentSet = Json.arr(componentService.interactions.map(componentJson.toJson))
-    val ngServiceLogic = CatalogServices(s"$name-injected", componentSet, mainEndpoints, supportingMaterialsEndpoints).toString
+    val queryParamsJson = Json.toJson(queryParams)
+    val ngServiceLogic = CatalogServices(s"$name-injected", componentSet, mainEndpoints, supportingMaterialsEndpoints, queryParamsJson).toString
 
     val params: Map[String, Any] = Map(
       "appName" -> name,
