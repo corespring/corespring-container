@@ -38,9 +38,8 @@
     "spin.js": "~2.0.0",
     "undo.js": "git@github.com:jzaefferer/undo.git",
     "wiggi-wiz": "git@github.com:corespring/wiggi-wiz.git#0.1.86",
-
     "mathquill": "git@github.com:corespring/mathquill.git#master",
-    "corespring-math-input": "git@github.com:corespring/corespring-math-input.git#0.0.5"
+    "corespring-math-input": "git@github.com:corespring/corespring-math-input.git#0.0.6"
 
   },
   "devDependencies": {
