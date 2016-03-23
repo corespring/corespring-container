@@ -9,7 +9,7 @@ angular.module('corespring-common.services')
           path = path || '';
           path = path.indexOf('?') === -1 ? path : path.split('?')[0];
 
-          var params = _.reduce(QUERY_PARAMS, function(sum, key, value){
+          var params = _.reduce(QUERY_PARAMS, function(sum, value, key){
             return sum.concat(key + '=' + value);
           }, []).join('&');
 
