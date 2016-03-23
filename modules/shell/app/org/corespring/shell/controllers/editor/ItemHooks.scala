@@ -2,12 +2,10 @@ package org.corespring.shell.controllers.editor
 
 import com.mongodb.casbah.Imports._
 import org.bson.types.ObjectId
-import org.corespring.container.client.controllers.resources.CoreItem
-import org.corespring.container.client.hooks._
 import org.corespring.container.client.hooks.Hooks.{ R, StatusMessage }
+import org.corespring.container.client.hooks._
 import org.corespring.container.client.integration.ContainerExecutionContext
 import org.corespring.container.client.{ hooks => containerHooks }
-import org.corespring.mongo.json.services.MongoService
 import org.corespring.shell.services.ItemService
 import play.api.http.Status._
 import play.api.libs.json._
@@ -17,15 +15,13 @@ import scala.concurrent.Future
 import scala.util.Try
 
 class ItemSupportingMaterialHooks(
-assets: SupportingMaterialAssets[String],
-itemService: ItemService,
-                                   val containerContext: ContainerExecutionContext
-                                 )
+  assets: SupportingMaterialAssets[String],
+  itemService: ItemService,
+  val containerContext: ContainerExecutionContext)
   extends containerHooks.ItemSupportingMaterialHooks
   with SupportingMaterialHooksHelper {
 
   import scala.concurrent.ExecutionContext.Implicits.global
-
 
   override def create[F <: File](id: String, sm: CreateNewMaterialRequest[F])(implicit h: RequestHeader): R[JsValue] = Future {
     {
@@ -56,7 +52,7 @@ itemService: ItemService,
     }
   }
 
-  override def addAsset(id: String, name: String, binary: Binary)(implicit h: RequestHeader): R[JsValue] = Future {
+  override def addAsset(id: String, name: String, binary: Binary)(implicit h: RequestHeader): R[UploadResult] = Future {
     val query = MongoDBObject("_id" -> new ObjectId(id), "supportingMaterials.name" -> name)
     val binaryDbo = binaryToDbo(binary, false)
     val update = MongoDBObject("$push" -> MongoDBObject("supportingMaterials.$.files" -> binaryDbo))
@@ -64,7 +60,7 @@ itemService: ItemService,
 
     if (wr.getN == 1) {
       assets.uploadAssetToSupportingMaterial(id, name, binary)
-      Right(Json.parse(com.mongodb.util.JSON.serialize(binaryDbo)))
+      Right(UploadResult(binary.name))
     } else {
       Left((BAD_REQUEST, "Failed to remove the asset"))
     }
@@ -112,10 +108,9 @@ itemService: ItemService,
 }
 
 class ItemHooks(
-itemService: ItemService,
-assets: ItemAssets,
-                 val containerContext: ContainerExecutionContext
-               )
+  itemService: ItemService,
+  assets: ItemAssets,
+  val containerContext: ContainerExecutionContext)
   extends containerHooks.ItemHooks
   //with CoreItemHooks
   with ItemHooksHelper {

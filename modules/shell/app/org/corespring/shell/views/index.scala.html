@@ -24,6 +24,19 @@
   </div>
 }
 
+@mkSessionLinks(links: Seq[org.corespring.shell.SessionLink]) = {
+  <div>
+    <div>Sessions: </div>
+    @links.map{ s =>
+      <li>
+        <span>@s.id</span>
+        @link("run", s.run, "btn-xs")
+        @link("delete", s.delete, "btn-xs")
+      </li>
+    }
+  </div>
+}
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -84,6 +97,10 @@
         <td class="inner">
           @link("Run", s"${i.createSession}?mode=dev&showControls=true", "btn-success")
           @link("Prod", s"${i.createSession}?mode=prod", "btn-primary")
+
+          @if(!i.sessionLinks.isEmpty){
+            @mkSessionLinks(i.sessionLinks)
+          }
         </td>
         <td class="inner">
           @link("Catalog", i.catalog, "btn-info")

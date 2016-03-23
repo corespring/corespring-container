@@ -72,9 +72,8 @@ block after-main-script
         .config([
           'wiggiWizConfigProvider',
           function(wiggiWizConfigProvider){
-            //Set up the current 'ComponentImageService' - this will be removed soon.
             wiggiWizConfigProvider.add({
-              imageService: 'ComponentImageService'
+              imageService: 'EditingImageService'
             });
           }
         ]);
