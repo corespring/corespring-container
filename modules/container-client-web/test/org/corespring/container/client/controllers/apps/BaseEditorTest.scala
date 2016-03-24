@@ -47,6 +47,7 @@ class BaseEditorTest extends Specification with Mockito with ComponentMaker with
         any[ComponentsAndWidgets],
         any[EditorClientOptions],
         any[ComponentsScriptBundle],
+        any[Map[String,String]],
         any[Boolean]) returns Future.successful(Html("<html></html>"))
     }
 
@@ -109,7 +110,7 @@ class BaseEditorTest extends Specification with Mockito with ComponentMaker with
 
       waitFor(load("id")(r))
       lazy val captor = capture[ComponentsAndWidgets]
-      there was one(renderer).render(any[MainEndpoints], any[SupportingMaterialsEndpoints], captor, any[EditorClientOptions], any[ComponentsScriptBundle], any[Boolean])
+      there was one(renderer).render(any[MainEndpoints], any[SupportingMaterialsEndpoints], captor, any[EditorClientOptions], any[ComponentsScriptBundle], any[Map[String,String]],any[Boolean])
     }
 
     "call renderer.renderJade with all components" in new componentsAndWidgets {

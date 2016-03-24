@@ -28,6 +28,7 @@ describe('editor config', function() {
     $provide.value('DesignerService', designerService);
     $provide.value('ImageFeature', {});
     $provide.value('ItemUrls', {});
+    $provide.value('QueryParamUtils', org.corespring.mocks.editor.QueryParamUtils());
     $provide.value('WiggiFootnotesFeatureDef', function(){});
     $provide.value('WiggiLinkFeatureDef', function(){});
     $provide.value('WiggiMathJaxFeatureDef', function(){});

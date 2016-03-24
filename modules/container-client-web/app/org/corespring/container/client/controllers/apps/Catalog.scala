@@ -16,7 +16,10 @@ class Catalog(
                val hooks: CatalogHooks,
                catalogRenderer: CatalogRenderer,
                bundler: ComponentBundler,
-               val containerContext: ContainerExecutionContext) extends Controller with GetAsset[CatalogHooks] {
+               val containerContext: ContainerExecutionContext)
+  extends Controller
+  with GetAsset[CatalogHooks]
+  with QueryStringHelper {
 
   private lazy val logger = Logger(classOf[Catalog])
 
@@ -39,7 +42,8 @@ class Catalog(
               case Some(b) => {
                 val mainEndpoints = endpoints.main(id)
                 val supportingMaterialsEndpoints = endpoints.supportingMaterials(id)
-                catalogRenderer.render(b, mainEndpoints, supportingMaterialsEndpoints, prodMode).map { html =>
+                val queryParams = mkQueryParams(m => m)
+                catalogRenderer.render(b, mainEndpoints, supportingMaterialsEndpoints, queryParams, prodMode).map { html =>
                   Ok(html)
                 }
               }

@@ -1,6 +1,6 @@
 describe('player-service-definition', function () {
 
-  var service, size, onSuccess, onFailure, http, promise;
+  var service, size, onSuccess, onFailure, http, promise, queryParamUtils;
 
   beforeEach(angular.mock.module('corespring-player.services'));
 
@@ -21,19 +21,21 @@ describe('player-service-definition', function () {
       post: jasmine.createSpy().and.returnValue(promise)
     };
 
+    queryParamUtils = org.corespring.mocks.editor.QueryParamUtils();
+
     $provide.value('$http', http);
     $provide.value('EmbeddedItemAndSession', {session:{}, item:{}});
+    $provide.value('QueryParamUtils', queryParamUtils); 
     $provide.value('PlayerServiceEndpoints', {
-      queryParams: {},
       session: {
-        complete: {method: 'put', url: '/client/session/complete/56cc6d6660b2985b7cb27552.json'},
-        getScore: {method: 'put', url: '/client/session/56cc6d6660b2985b7cb27552/score.json'},
-        loadInstructorData: {method: 'get', url: '/client/session/load-instructor-data/56cc6d6660b2985b7cb27552.json'},
-        loadSession: {method: 'get', url: '/client/session/item-and-session/56cc6d6660b2985b7cb27552.json'},
-        loadOutcome: {method: 'put', url: '/client/session/load-outcome/56cc6d6660b2985b7cb27552.json'},
-        reopen: {method: 'get', url: '/client/session/reopen/56cc6d6660b2985b7cb27552.json'},
-        reset: {method: 'get', url: '/client/session/reset/56cc6d6660b2985b7cb27552.json'},
-        save: {method: 'put', url: '/client/session/save/56cc6d6660b2985b7cb27552.json'}
+        complete: {method: 'put', url: 'complete'},
+        getScore: {method: 'put', url: 'getScore'},
+        loadInstructorData: {method: 'get', url: 'loadInstructorData'},
+        loadSession: {method: 'get', url: 'loadSession'},
+        loadOutcome: {method: 'put', url: 'loadOutcome'},
+        reopen: {method: 'get', url: 'reopen'},
+        reset: {method: 'get', url: 'reset'},
+        save: {method: 'put', url: 'save'}
       }
     });
   }));

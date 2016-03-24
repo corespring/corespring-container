@@ -1,7 +1,8 @@
 @(namespace: String,
 mainEndpoints: org.corespring.container.client.views.models.MainEndpoints,
 smEndpoints: org.corespring.container.client.views.models.SupportingMaterialsEndpoints,
-compAndWidgets: org.corespring.container.client.views.models.ComponentsAndWidgets)
+compAndWidgets: org.corespring.container.client.views.models.ComponentsAndWidgets,
+queryParams: play.api.libs.json.JsValue)
 
 @toMethodAndUrl(c:Call) = @{
   s"{ method: '${c.method.toLowerCase}', url: '${c.url}'}"  
@@ -10,39 +11,36 @@ compAndWidgets: org.corespring.container.client.views.models.ComponentsAndWidget
 (function(){
   "use strict";
 
-  angular.module('@namespace', []);
-
-  angular.module('@namespace').factory('ItemUrls', [ function($http){
-    return {
-      load: @toMethodAndUrl(mainEndpoints.load),
-      @mainEndpoints.save.map { save =>
-        save: @toMethodAndUrl(save),
-      }
-      saveSubset: @toMethodAndUrl(mainEndpoints.saveSubset)
-    }
-  }]);
-
-  angular.module('@namespace').factory('SupportingMaterialUrls', [function(){
-    return @smEndpoints.jsonString;
-  }]);
-
-  angular.module('@namespace').factory('ComponentService', [function(){
-    return {
-        loadAvailableComponents: function(onSuccess, onFailure){
-          var components = @{Json.stringify(compAndWidgets.components)};
-          onSuccess(components);
+  angular.module('@namespace', [])
+    .constant('QUERY_PARAMS', @{Json.stringify(queryParams)})
+    .factory('ItemUrls', [ function($http){
+      return {
+        load: @toMethodAndUrl(mainEndpoints.load),
+        @mainEndpoints.save.map { save =>
+          save: @toMethodAndUrl(save),
         }
-    };
-  }]);
-
-  angular.module('@namespace').factory('DesignerService', ['$http', function($http){
-    return {
-      loadAvailableUiComponents: function(onSuccess, onFailure){
-        var interactions = @{Json.stringify(compAndWidgets.components)};
-        var widgets = @{Json.stringify(compAndWidgets.widgets)};
-        onSuccess({ interactions: interactions, widgets: widgets });
+        saveSubset: @toMethodAndUrl(mainEndpoints.saveSubset)
       }
-    };
-  }]);
+    }])
+    .factory('SupportingMaterialUrls', [function(){
+      return @smEndpoints.jsonString;
+    }])
+    .factory('ComponentService', [function(){
+      return {
+          loadAvailableComponents: function(onSuccess, onFailure){
+            var components = @{Json.stringify(compAndWidgets.components)};
+            onSuccess(components);
+          }
+      };
+    }])
+    .factory('DesignerService', ['$http', function($http){
+      return {
+        loadAvailableUiComponents: function(onSuccess, onFailure){
+          var interactions = @{Json.stringify(compAndWidgets.components)};
+          var widgets = @{Json.stringify(compAndWidgets.widgets)};
+          onSuccess({ interactions: interactions, widgets: widgets });
+        }
+      };
+    }]);
 
 })(this);
