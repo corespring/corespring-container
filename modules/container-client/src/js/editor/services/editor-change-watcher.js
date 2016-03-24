@@ -5,6 +5,9 @@ angular.module('corespring-editor.services')
 
     function EditorChangeWatcher(){
 
+
+       this.debounce = editorDebounce;
+
       /** 
        * create a $watch handler that debounces the save
        * and emits an 'itemChanged' event.

@@ -68,6 +68,17 @@ angular.module('corespring-editor.services').service('ItemService', [
         }
       };
 
+       this.saveXhtmlAndComponents = function(xhtml, components, onSuccess, onFailure){
+         var call = ItemUrls.saveXhtmlAndComponents;
+
+         var data = {
+           xhtml: xhtml,
+           components: components
+         };
+
+         _save(call, data, onSuccess, onFailure);
+       };
+
       this.saveComponents = function(data, onSuccess, onFailure) {
         save('components', data, onSuccess, onFailure);
       };
@@ -133,16 +144,15 @@ angular.module('corespring-editor.services').service('ItemService', [
         }
       };
 
-      function save(set, data, onSuccess, onFailure) {
-        var method = ItemUrls.saveSubset.method;
-        var url = ItemUrls.saveSubset.url.replace(':subset', set);
-        url = addQueryParamsIfPresent(url);
+      function _save(call, data, onSuccess, onFailure) {
+        var method = call.method;
+        var url = addQueryParamsIfPresent(call.url);
         logger.debug('save', data);
         logger.debug('save - url:', url);
 
         notifyListeners('saving');
 
-        $http[method](url, data)
+        $http({method: call.method, url: url, data: data})
           .success(saveSuccess)
           .error(saveError);
 
@@ -164,6 +174,13 @@ angular.module('corespring-editor.services').service('ItemService', [
             onFailure(data);
           }
         }
+      }
+
+      function save(set, data, onSuccess, onFailure) {
+        var call = {
+         method:ItemUrls.saveSubset.method,
+         url: ItemUrls.saveSubset.url.replace(':subset', set)};
+         _save(call, data, onSuccess, onFailure);
       }
 
       function notifyListeners(message) {

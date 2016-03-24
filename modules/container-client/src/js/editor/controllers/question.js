@@ -52,7 +52,7 @@ angular.module('corespring-editor.controllers')
       $scope.scoring = function() {
         ScoringHandler.scoring($scope.item.components, $scope.item.xhtml,
           function() {
-            saveComponents();
+            saveXhtmlAndComponents();
           });
       };
 
@@ -112,13 +112,13 @@ angular.module('corespring-editor.controllers')
 
       $scope.onItemSaved = function() {};
 
-      function saveComponents() {
-        logger.debug('[saveComponents]');
-        ItemService.saveComponents(
+      var saveXhtmlAndComponents = EditorChangeWatcher.debounce(function(){
+        ItemService.saveXhtmlAndComponents(
+          $scope.item.xhtml,
           $scope.serialize($scope.item.components),
           $scope.onItemSaved,
           $scope.onItemSaveError);
-      }
+      }, 300);
 
       $scope.getWiggiWizElement = function() {
         return angular.element('.wiggi-wiz', $element);
@@ -151,13 +151,13 @@ angular.module('corespring-editor.controllers')
 
       $scope.$watch(
         'item.components', 
-        makeWatcher('components', saveComponents, $scope),
+        makeWatcher('components', saveXhtmlAndComponents, $scope),
         true);
 
       $scope.$watch(
         'item.xhtml', 
         makeWatcher('xhtml', function(n,o){
-          ItemService.saveXhtml(n);
+          ItemService.saveXhtmlAndComponents(n);
         }, $scope)); 
 
       $scope.$watch(

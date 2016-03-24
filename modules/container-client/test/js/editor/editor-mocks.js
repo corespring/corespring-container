@@ -160,6 +160,9 @@
         }
       };
     });
+    this.debounce = jasmine.createSpy('debounce').and.callFake(function(fn){
+      return fn;
+    });
   };
 
   /**

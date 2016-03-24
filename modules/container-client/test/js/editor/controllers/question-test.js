@@ -5,6 +5,7 @@ describe('QuestionController', function() {
   var ItemService = {
     load: jasmine.createSpy('load'),
     saveComponents: jasmine.createSpy('saveComponents'),
+    saveXhtmlAndComponents: jasmine.createSpy('saveXhtmlAndComponents'),
     saveXhtml: jasmine.createSpy('saveXhtml'),
     saveSummaryFeedback: jasmine.createSpy('saveSummaryFeedback')
   };
@@ -42,6 +43,10 @@ describe('QuestionController', function() {
   var wiggiMathJaxFeatureDef = {};
   
   var wiggiLinkFeatureDef = {};
+
+  var editorChangeWatcher = {
+    debounce: jasmine.createSpy('debounce')
+  };
 
   beforeEach(angular.mock.module('corespring-editing.controllers'));
   beforeEach(angular.mock.module('corespring-editor.controllers'));
@@ -240,17 +245,17 @@ describe('QuestionController', function() {
     beforeEach(function(){
       scope.item = {xhtml:"abc"};
       scope.$digest();
-      ItemService.saveXhtml.calls.reset();
+      ItemService.saveXhtmlAndComponents.calls.reset();
     });
     it('should save a change to xhtml', function(){
       scope.item.xhtml = "def";
       scope.$digest();
-      expect(ItemService.saveXhtml).toHaveBeenCalled();
+      expect(ItemService.saveXhtmlAndComponents).toHaveBeenCalled();
     });
     it('should not save when there was no change', function(){
       scope.item.xhtml = "abc";
       scope.$digest();
-      expect(ItemService.saveXhtml).not.toHaveBeenCalled();
+      expect(ItemService.saveXhtmlAndComponents).not.toHaveBeenCalled();
     });
   });
 
@@ -277,17 +282,17 @@ describe('QuestionController', function() {
     beforeEach(function(){
       scope.item = {components:[{'a' : 'component'}]};
       scope.$digest();
-      ItemService.saveComponents.calls.reset();
+      ItemService.saveXhtmlAndComponents.calls.reset();
     });
     it('should save a change to components', function(){
       scope.item.components = [{'b' : 'component'}];
       scope.$digest();
-      expect(ItemService.saveComponents).toHaveBeenCalled();
+      expect(ItemService.saveXhtmlAndComponents).toHaveBeenCalled();
     });
     it('should not save when there was no change ', function(){
       scope.item.components = [{'a' : 'component'}];
       scope.$digest();
-      expect(ItemService.saveComponents).not.toHaveBeenCalled();
+      expect(ItemService.saveXhtmlAndComponents).not.toHaveBeenCalled();
     });
   });
 
