@@ -10,17 +10,14 @@ describe('editing-image-service', function() {
   var uploadOpts;
   var service;
   var fileUploader;
-  var mockDocument;
+  var queryParamsUtils;
 
   beforeEach(function() {
-    mockDocument = [{
-      location: {
-        href: '' 
-      }
-    }];
+
+    queryParamUtils = org.corespring.mocks.editor.QueryParamUtils();
 
     module(function($provide) {
-      $provide.value('$document', mockDocument);
+      $provide.value('QueryParamUtils', queryParamUtils);
     });
   });
 
@@ -58,14 +55,18 @@ describe('editing-image-service', function() {
 
       onSuccess = jasmine.createSpy('onSuccess');
 
-      mockDocument[0].location.href = 'path?a=b&c=d';
       service.addFile(file, onSuccess, jasmine.createSpy('onProgress'));
     });
     
-    it('adds queryParams and encodes', function(){
+    
+    it('calls QueryParamUtils.addQueryParams', function(){
+      expect(queryParamUtils.addQueryParams).toHaveBeenCalledWith('a%20b.jpg');
+    });
+
+    it('encodes the url', function(){
       expect(com.ee.v2.RawFileUploader).toHaveBeenCalledWith(
         file,
-        'a%20b.jpg?a=b&c=d',
+        'a%20b.jpg',
         file.name,
         jasmine.any(Object)
         );

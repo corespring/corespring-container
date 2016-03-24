@@ -1,6 +1,7 @@
   angular.module('corespring-common.supporting-materials.services')
-    .service('SmUtils', [ '$document', 'SupportingMaterialUrls',
-      function($document, SupportingMaterialUrls) {
+    .service('SmUtils', 
+      [ 'SupportingMaterialUrls', 'QueryParamUtils',
+      function(SupportingMaterialUrls, QueryParamUtils) {
 
         function SmUtils() {
           
@@ -22,8 +23,7 @@
           };
 
           this.addQueryParamsIfPresent = function(path) {
-            var href = $document[0].location.href;
-            return path + (href.indexOf('?') === -1 ? '' : '?' + href.split('?')[1]);
+            return QueryParamUtils.addQueryParams(path);
           };
 
 
