@@ -54,8 +54,10 @@ var controller = function($scope,$http, $location, $timeout, $log, ComponentRegi
     $scope.playerMode = mode;
     ComponentRegister.setMode(mode);
     ComponentRegister.setEditable(isGatherMode());
+    if(mode === 'instructor'){
+      ComponentRegister.setInstructorData($scope.model.item.components);
+    }
   }
-
 
   function onSessionSaved(data) {
     $scope.model.responses = data.responses;
@@ -74,6 +76,10 @@ var controller = function($scope,$http, $location, $timeout, $log, ComponentRegi
       $log.error('There was a problem saving the session');
     });
   }
+
+  $scope.$on('playerControlPanel.setMode', function(ev, data) {
+    setMode(data.mode);
+  });
 
   $scope.$on('playerControlPanel.submit', function() {
     submitSession();
