@@ -48,4 +48,12 @@ block after-main-script
       });
     };
 
+    window.setMode = function(mode) {
+      var scope = angular.element(document.getElementById('root')).scope();
+      var rootScope = scope.$root;
+      scope.$apply(function() {
+        rootScope.$broadcast('playerControlPanel.setMode', {mode: mode});
+      });
+    };
+
     window.itemJson = !{itemJson};
