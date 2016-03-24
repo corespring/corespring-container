@@ -23,7 +23,7 @@ angular.module('corespring-editor.controllers')
       var messageListener = new MsgrMessageListener($window.top);
       messageListener.add(function(msg) {
         var msgType = msg && msg.data && msg.data.type;
-        if (msgType == 'requestMetadata') {
+        if (msgType === 'requestMetadata') {
           $log.debug("requesting metadata");
           var extended = $scope.item.profile.taskInfo && $scope.item.profile.taskInfo.extended;
           var message = extended && extended[$scope.selectedMetadata.metadataKey];
@@ -34,7 +34,7 @@ angular.module('corespring-editor.controllers')
             }, target);
           }
         }
-        if (msgType == 'updateMetadata') {
+        if (msgType === 'updateMetadata') {
           var metadata = msg.data.message;
           $log.debug("updating metadata", metadata);
           $scope.item.profile.taskInfo.extended = $scope.item.profile.taskInfo.extended || {};

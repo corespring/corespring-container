@@ -1,28 +1,16 @@
 @import "../common/colors";
 
-//The mathjax feature in wiggi adds 'mathjax' to the modal class
-//To allow us to use feature specific styles for the dialog.
-.modal.mathjax{
-
-  .modal-content{
-    min-height: 530px;
-    min-width: 433px;
-  }
-
-  .modal-body{
-    position: absolute;
-    left: 0;
-    top: 54px;
-    bottom: 153px;
-    right: 0;
-    padding: 0;
-  }
-
-  .modal-footer{
-    position: absolute;
-    bottom: 0px;
-    left: 0;
-    right: 0;
+.wiggi-wiz, .mini-wiggi-wiz {
+  .mathinput-holder {
+    display: inline-block;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    transition: background-color 200ms;
+    border-radius: 3px;
   }
 }
 
@@ -34,212 +22,24 @@
     content: "∑";
   }
 }
-
-.mathjax-holder.inline {
-  display: inline-block;
-}
-
-.mathjax-holder.block {
-  display: block;
-}
-
-
-
-.mathjax-holder {
-  .user-select(none);
-  padding: 0;
-  transition: background-color 200ms;
-  
+.mathinput-holder {
+  .remove-math-button {
+    visibility: hidden;
+    display: inline-block;
+    font-size: smaller;
+    position: absolute;
+    margin-left: -10px;
+    margin-top: -7px;
+    color: #a9a9a9;
+    &:hover {
+      color: #EEEEEE;
+    }
+  }
   &:hover {
-    background-color: #ffffff;
-  }
-
-  .blocker .bg {
-    border-radius: 4px;
-  }
-  
-  .root {
-      
-      @min-width: 30px;
-
-      position: relative;
-      margin-left: 1px;
-      display: inline-block;
-      min-width: @min-width;
-      .border-radius(3px, 3px, 3px, 3px);
-      border: dotted 1px darken(@light-grey, 20%);
-
-      .blocker {
-
-        .content {
-          display: inline-flex;
-          align-items: center;
-          position: absolute;
-          left: 0;
-          right: 0;
-          top: 0;
-          bottom: 0;
-        }
-
-        .edit-controls { 
-          transition: opacity 200ms;
-          position: absolute;
-          z-index: 10;
-          padding: 1px;
-          top: 1px;
-          right: 1px;
-          left: 1px;
-          bottom: 0;
-          background: rgba(255, 255, 255, 0.7);
-          opacity: 0;
-          
-          &:hover{
-            opacity: 1.0;
-          }
-
-          .delete-icon-button 
-          {
-            display: inline-block;
-            margin-left: 0;
-            margin-right: 0;
-            float: right;
-            line-height: 0;
-            padding: 0;
-
-            &:hover {
-              cursor: pointer;
-            }
-
-            @close-icon-base-color: @component-icon-bg;
-     
-            i {
-              font-size: 14px;
-              color: darken(@close-icon-base-color, 10%);
-
-              &:hover {
-                color: darken(@close-icon-base-color, 16%);
-              }
-            }
-          }
-        }
-      }
-      
-      .holder{
-        .border-radius(3px);
-        position: inherit;
-        visibility: visible;
-        pointer-events: none;
-
-        &.nonvisible {
-          position: absolute;
-          visibility: hidden;
-        }
-      }
+    .remove-math-button {
+      visibility: visible;
+    }
   }
 }
 
-.mathjax-dialog-root {
-  display: -webkit-flex; /* Safari */
-  display: flex;
-  -webkit-flex-direction: column; /* Safari 6.1+ */
-  flex-direction: column;
-  position: absolute;
-  top: 0px;
-  bottom: 119px;
-  width: 100%;
 
-
-  .header {
-    padding: 10px;
-    background-color: white;
-    border-left: none;
-    border-bottom: solid 1px darken(@light-grey, 15%);
-    font-size: 14px;
-    padding-bottom: 25px;
-    display: table;
-    width: 100%;
-  }
-
-  .main{
-    display: inherit;
-    height: 100%;
-  }
-
-  .mj-math-type {
-    padding: 8px;
-    //Note: @state-warning are bootstrap variables
-    background-color: @state-warning-bg;
-    border-bottom: solid 1px darken(@light-grey, 15%);
-    color: @state-warning-text;
-    padding-bottom: 12px;
-    display: table;
-    width: 100%;
-    .display-type {
-      padding-left: 10px;
-    }
-  }
-
-  
-  .mj-dialog-content {
-    a {
-      color: #0099cc;
-      text-decoration: underline;
-      &:hover {
-        color: #00008b;
-      }
-    }
-    i.sample {
-      margin: 20px 0 0 0;
-      display: table;
-      .fraction {
-        display: inline-block;
-        vertical-align: middle;
-        margin: 0 0.2em 0.4ex;
-        text-align: center;
-        width: 15px;
-        font-size: 12px;
-        font-style: normal;
-      }
-      .fraction > span {
-        display: block;
-        padding-top: 0.15em;
-      }
-      .fraction span.fdn {border-top: thin solid black;}
-      .fraction span.bar {display: none;}
-    }
-  }
-
-  .math-preview {
-    @preview-min-width: 160px;
-    overflow-x: auto;
-    text-align: center;
-    padding: 8px;
-    min-width: @preview-min-width;
-    max-width: @preview-min-width * 2;
-
-    .preview-label {
-      line-height: 22px;
-    }
-    .preview-body {
-      border: 1px solid #bebebe;
-      height: 120px;
-      width: 240px;
-      border-radius: 4px;
-    }
-  }
-
-  .math-textarea {
-    border: solid 1px #bebebe;
-    border-radius: 4px;
-    background-color: #ffffff;
-    padding: 10px;
-    font-family: monospace;
-    overflow:auto;
-    outline:none;
-    resize:none;
-    width: 640px;
-    height: 120px;
-    margin: 30px 10px 10px 10px;
-  }
-
-}

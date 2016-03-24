@@ -39,6 +39,7 @@ describe('SupportingMaterials', function() {
     $provide.value('LogFactory', new org.corespring.mocks.editor.LogFactory());
     $provide.value('$modal', $modal);
     $provide.value('ItemService', itemService);
+    $provide.value('QueryParamUtils', org.corespring.mocks.editor.QueryParamUtils());
     $provide.value('SupportingMaterialsService', supportingMaterialsService);
     $provide.value('EditorConfig', editorConfig);
     $provide.value('EditorChangeWatcher', new org.corespring.mocks.editor.EditorChangeWatcher());

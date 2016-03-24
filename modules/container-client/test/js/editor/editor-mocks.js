@@ -53,6 +53,14 @@
     };
   };
 
+  e.QueryParamUtils = function(){
+    return {
+      addQueryParams: jasmine.createSpy('addQueryParams').and.callFake(function(p){
+        return p;
+      })
+    };
+  };
+
   e.iFrameService = function(){
     return {
       isInIFrame: jasmine.createSpy('isInIFrame'),

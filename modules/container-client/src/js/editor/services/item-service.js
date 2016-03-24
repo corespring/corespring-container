@@ -3,7 +3,8 @@ angular.module('corespring-editor.services').service('ItemService', [
   '$timeout', 
   'ItemUrls', 
   'LogFactory',
-  function($http, $timeout, ItemUrls, LogFactory) {
+  'QueryParamUtils',
+  function($http, $timeout, ItemUrls, LogFactory, QueryParamUtils) {
 
     /**
      * Service that contains xhr calls to the server.
@@ -193,8 +194,7 @@ angular.module('corespring-editor.services').service('ItemService', [
       }
 
       function addQueryParamsIfPresent(path) {
-        var href = document.location.href;
-        return path + (href.indexOf('?') === -1 ? '' : '?' + href.split('?')[1]);
+        return QueryParamUtils.addQueryParams(path);
       }
 
       function flushQueue(d, callbackName) {

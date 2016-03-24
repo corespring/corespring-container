@@ -1,7 +1,5 @@
 package org.corespring.container.client.controllers.apps
 
-import java.net.URLEncoder
-
 import org.corespring.container.client.component.{ ComponentBundler, ItemComponentTypes }
 import org.corespring.container.client.controllers.GetAsset
 import org.corespring.container.client.hooks.Hooks.StatusMessage
@@ -25,7 +23,8 @@ class Player(mode: Mode,
   componentService: ComponentService,
   val hooks: PlayerHooks)
   extends Controller
-  with GetAsset[PlayerHooks] {
+  with GetAsset[PlayerHooks]
+  with QueryStringHelper{
 
   private def handleSuccess[D](fn: (D) => Future[SimpleResult])(e: Either[StatusMessage, D]): Future[SimpleResult] = e match {
     case Left((code, msg)) => Future { Status(code)(msg) }
@@ -70,51 +69,19 @@ class Player(mode: Mode,
     }
   }
 
+
+
+  /**
+    * show a simple submit button
+    * showControls=true|false (default: false)
+    * - show simple player controls (for devs)
+    */
+  val showControls = "showControls"
+
   /**
    * A set of player query string params, that should be set on the player, but can be removed therafter
    */
-  val playerQueryStringParams = Seq(
-
-    /**
-     * show a simple submit button
-     * showControls=true|false (default: false)
-     * - show simple player controls (for devs)
-     */
-    "showControls",
-
-    /**
-     * dev|prod - dev loads expanded js/css, prod loads minified
-     * mode=prod|dev (default: whichever way the app is run)
-     * - dev mode loads all the js as separate files
-     * - prod mode loads minified + concatenated js/css
-     */
-    "mode",
-
-    /**
-     * allow logging in the player
-     * loggingEnabled=true|false (default: false)
-     * - implemented in the jade - whether to allow ng logging.
-     */
-    "loggingEnabled",
-
-    /** if set log the category defined */
-    "logCategory")
-
-  def mapToParamString(m: Map[String, String]): String = m.toSeq.map { t =>
-    val (key, value) = t
-    val encodedValue = URLEncoder.encode(value, "utf-8")
-    s"$key=$encodedValue"
-  }.mkString("&")
-
-  def mapToJson(m: Map[String, String]): JsObject = {
-    import play.api.libs.json._
-    Json.toJson(m).asInstanceOf[JsObject]
-  }
-
-  private def mkQueryParams[A](build: (Map[String, String] => A) = mapToParamString _)(implicit rh: RequestHeader): A = {
-    val trimmed: Map[String, String] = (rh.queryString -- playerQueryStringParams).mapValues(s => s.mkString(""))
-    build(trimmed)
-  }
+  override val paramsToStrip = showControls +: StrippableParams.params
 
   def createSessionForItem(itemId: String): Action[AnyContent] = Action.async { implicit request =>
     hooks.createSessionForItem(itemId).flatMap {

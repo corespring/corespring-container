@@ -1,7 +1,8 @@
 @(namespace : String,
 componentSet:JsValue,
 mainEndpoints: org.corespring.container.client.views.models.MainEndpoints,
-smEndpoints: org.corespring.container.client.views.models.SupportingMaterialsEndpoints)
+smEndpoints: org.corespring.container.client.views.models.SupportingMaterialsEndpoints,
+queryParams : play.api.libs.json.JsValue)
 
 @toMethodAndUrl(c:Call) = @{
   s"{ method: '${c.method.toLowerCase}', url: '${c.url}'}"
@@ -12,7 +13,8 @@ smEndpoints: org.corespring.container.client.views.models.SupportingMaterialsEnd
 
   var loadedData = null;
 
-  angular.module('@namespace', []);
+  angular.module('@namespace', [])
+    .constant('QUERY_PARAMS', @{Json.stringify(queryParams)})
 
   angular.module('@namespace').factory('ComponentService', ['$http',function($http){
     return {

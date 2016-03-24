@@ -20,7 +20,8 @@ import scala.concurrent.Future
 trait BaseEditor[H <: EditorHooks]
   extends Controller
   with AssetsController[EditorHooks]
-  with ComponentEditorLaunchingController {
+  with ComponentEditorLaunchingController
+  with QueryStringHelper{
 
   def hooks: H
 
@@ -68,6 +69,8 @@ trait BaseEditor[H <: EditorHooks]
             .map(_ == "prod")
             .getOrElse(mode == Mode.Prod)
 
+          val queryParams = mkQueryParams(m => m)(request)
+
           val bundle = bundler.bundleAll("editor", Some("editor"), !prodMode).get
           val mainEndpoints = endpoints.main(id)
           val supportingMaterialsEndpoints = endpoints.supportingMaterials(id)
@@ -77,6 +80,7 @@ trait BaseEditor[H <: EditorHooks]
             componentsAndWidgets,
             editorClientOptions,
             bundle,
+            queryParams,
             prodMode).map(Ok(_))
         })
     }

@@ -31,7 +31,7 @@ class CatalogTest extends Specification with Mockito {
 
     lazy val catalogRenderer = {
       val m = mock[CatalogRenderer]
-      m.render(any[ComponentsScriptBundle], any[MainEndpoints], any[SupportingMaterialsEndpoints], any[Boolean]) returns {
+      m.render(any[ComponentsScriptBundle], any[MainEndpoints], any[SupportingMaterialsEndpoints], any[Map[String,String]], any[Boolean]) returns {
         Future.successful(Html("<catalog/>"))
       }
       m

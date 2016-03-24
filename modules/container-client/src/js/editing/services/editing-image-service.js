@@ -1,10 +1,10 @@
 /* global com */
 angular.module('corespring-editing.services').service( 'EditingImageService', [
   '$log',
-  '$document',
   '$http',
   '$timeout',
-  function($log, $document, $http, $timeout) {
+  'QueryParamUtils',
+  function($log, $http, $timeout, QueryParamUtils) {
 
     //TODO - this is lifted from wiggi-wiz. Remove the duplication.
     var ImageUtils = function() {
@@ -53,22 +53,15 @@ angular.module('corespring-editing.services').service( 'EditingImageService', [
     var imageUtils = new ImageUtils();
 
     function EditingImageService() {
-
-      function addQueryParamsIfPresent(path) {
-        var doc = $document[0];
-        var href = doc.location.href;
-        path = path.indexOf('?') === -1 ? path : path.split('?')[0];
-        return path + (href.indexOf('?') === -1 ? '' :  '?' + href.split('?')[1]);
-      }
       
       this.errorMessage = '<strong>Upload error</strong><br/>Your image was not uploaded. Please try again.';
 
       this.deleteFile = function(url) {
-        $http({method: 'delete', url: addQueryParamsIfPresent(url)});
+        $http({method: 'delete', url: QueryParamUtils.addQueryParams(url)});
       };
 
       this.addFile = function(file, onComplete, onProgress) {
-        var url = addQueryParamsIfPresent('' + encodeURIComponent(file.name));
+        var url = QueryParamUtils.addQueryParams('' + encodeURIComponent(file.name));
 
        var typeError = imageUtils.acceptableType(file.type, imageUtils.imageTypes());
 
