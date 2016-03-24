@@ -47,7 +47,7 @@ angular.module('corespring-common.supporting-materials.services')
         this.deleteAsset = function(materialName, name) {
           var call = Urls.deleteAsset;
           var url = addParams(call.url.replace(':name', materialName).replace(':filename', name));
-          $http[call.method](url);
+          $http({method: call.method, url: url});
         };
 
         this.addAsset = function(materialName, file, onComplete, onProgress){
@@ -67,7 +67,7 @@ angular.module('corespring-common.supporting-materials.services')
             var c = Urls.create;
             var url = addParams(c.url);
             m.html = '<div>' + m.name + '</div>';
-            $http[c.method](url, m)
+            $http({method: c.method, url:url, data: m})
               .success(onSuccess)
               .error(onFailure || function() {
                 logger.error(arguments);
@@ -97,7 +97,7 @@ angular.module('corespring-common.supporting-materials.services')
 
           logger.debug('url: ', url);
           
-          $http[call.method](url)
+          $http({method: call.method, url: url})
             .success(onSuccess)
             .error(onFailure);
         };
