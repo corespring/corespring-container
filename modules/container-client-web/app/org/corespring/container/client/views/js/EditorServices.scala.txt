@@ -13,14 +13,8 @@ queryParams: play.api.libs.json.JsValue)
 
   angular.module('@namespace', [])
     .constant('QUERY_PARAMS', @{Json.stringify(queryParams)})
-    .factory('ItemUrls', [ function($http){
-      return {
-        load: @toMethodAndUrl(mainEndpoints.load),
-        @mainEndpoints.save.map { save =>
-          save: @toMethodAndUrl(save),
-        }
-        saveSubset: @toMethodAndUrl(mainEndpoints.saveSubset)
-      }
+    .factory('ItemUrls', [ function(){
+      return @mainEndpoints.jsonString;
     }])
     .factory('SupportingMaterialUrls', [function(){
       return @smEndpoints.jsonString;
@@ -33,7 +27,7 @@ queryParams: play.api.libs.json.JsValue)
           }
       };
     }])
-    .factory('DesignerService', ['$http', function($http){
+    .factory('DesignerService', [function(){
       return {
         loadAvailableUiComponents: function(onSuccess, onFailure){
           var interactions = @{Json.stringify(compAndWidgets.components)};

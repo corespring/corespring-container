@@ -156,9 +156,7 @@ angular.module('corespring-editor.controllers')
 
       $scope.$watch(
         'item.xhtml', 
-        makeWatcher('xhtml', function(n,o){
-          ItemService.saveXhtmlAndComponents(n);
-        }, $scope)); 
+        makeWatcher('xhtml', saveXhtmlAndComponents, $scope));
 
       $scope.$watch(
         'item.summaryFeedback', 

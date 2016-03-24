@@ -48,7 +48,7 @@ angular.module('corespring-editor.services').service('ItemService', [
         try {
           loadInProgress = true;
           var finalUrl = addQueryParamsIfPresent(ItemUrls.load.url);
-          $http[ItemUrls.load.method](finalUrl)
+          $http({method: ItemUrls.load.method, url: finalUrl})
             .success(loadItemSuccess)
             .error(loadItemError);
         } catch (e) {
@@ -120,7 +120,7 @@ angular.module('corespring-editor.services').service('ItemService', [
 
         notifyListeners('saving');
 
-        $http[method](url, data)
+        $http({method: method, url: url, data: data})
           .success(saveSuccess)
           .error(saveError);
 

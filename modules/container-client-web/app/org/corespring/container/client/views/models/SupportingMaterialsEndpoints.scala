@@ -1,14 +1,22 @@
 package org.corespring.container.client.views.models
 
 import play.api.libs.json.Json.JsValueWrapper
-import play.api.libs.json.{ JsValue, Json }
+import play.api.libs.json.{JsValue, Json, Writes}
 import play.api.mvc.Call
 
 private object Helpers {
   implicit def toMethodAndUrl(c: Call): JsValueWrapper = Json.obj("method" -> c.method.toLowerCase, "url" -> c.url)
+  implicit val CallWrites: Writes[Call] = Json.writes[Call]
 }
 
-case class MainEndpoints(load: Call, saveSubset: Call, saveXhtmlAndComponents: Call, save: Option[Call])
+case class MainEndpoints( load: Call, saveSubset: Call, saveXhtmlAndComponents: Call, save: Option[Call]) {
+
+  import Helpers._
+
+  val json = Json.writes[MainEndpoints].writes(this)
+  val jsonString = Json.stringify(json)
+}
+
 
 case class ComponentsAndWidgets(components: JsValue, widgets: JsValue)
 
@@ -22,8 +30,9 @@ case class SessionEndpoints(
   loadOutcome: Call,
   loadInstructorData: Call) {
 
+  import Helpers._
+
   protected val json = {
-    import Helpers._
     Json.obj(
       "complete" -> complete,
       "getScore" -> getScore,
@@ -47,19 +56,9 @@ case class SupportingMaterialsEndpoints(
   getAsset: Call,
   updateContent: Call) {
 
-  protected val json = {
+  import Helpers._
 
-    import Helpers._
-
-    Json.obj(
-      "create" -> create,
-      "createFromFile" -> createFromFile,
-      "delete" -> delete,
-      "addAsset" -> addAsset,
-      "deleteAsset" -> deleteAsset,
-      "getAsset" -> getAsset,
-      "updateContent" -> updateContent)
-  }
+  protected val json = Json.writes[SupportingMaterialsEndpoints].writes(this)
 
   val jsonString = Json.stringify(json)
 }
