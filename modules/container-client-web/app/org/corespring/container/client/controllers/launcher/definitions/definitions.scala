@@ -175,6 +175,7 @@ private[launcher] case class ComponentEditor(builder: JsBuilder, queryParams: Ma
           "loadData" -> r.item.load(":itemId"),
           "loadEditor" -> r.itemEditor.componentEditor(":itemId"),
           "upload" -> r.itemEditor.uploadFile(":itemId", ":filename"),
+          "saveComponents" -> r.item.saveSubset(":itemId", "components"),
           "saveXhtmlAndComponents" -> r.item.saveXhtmlAndComponents(":itemId"))),
       "draftEditor" -> obj(
         "singleComponent" -> obj(
@@ -183,6 +184,7 @@ private[launcher] case class ComponentEditor(builder: JsBuilder, queryParams: Ma
           "loadData" -> r.draft.load(":draftId"),
           "loadEditor" -> r.draftEditor.componentEditor(":draftId"),
           "upload" -> r.draftEditor.uploadFile(":draftId", ":filename"),
+          "saveComponents" -> r.draft.saveSubset(":draftId", "components"),
           "saveXhtmlAndComponents" -> r.draft.saveXhtmlAndComponents(":draftId")))))
 
 }
