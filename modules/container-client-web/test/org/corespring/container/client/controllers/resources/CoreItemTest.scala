@@ -8,11 +8,11 @@ import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
 import play.api.http.HeaderNames
 import play.api.libs.json.{ JsObject, JsValue, Json }
-import play.api.mvc.{ AnyContent, AnyContentAsJson, Request }
-import play.api.test.{ FakeHeaders, FakeRequest }
+import play.api.mvc.{ AnyContent, AnyContentAsJson, Request, RequestHeader }
 import play.api.test.Helpers._
+import play.api.test.{ FakeHeaders, FakeRequest }
 
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.Future
 
 class CoreItemTest extends Specification with Mockito {
 
