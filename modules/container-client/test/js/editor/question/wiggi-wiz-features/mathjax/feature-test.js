@@ -11,14 +11,10 @@ describe('mathjax feature', function() {
 
   beforeEach(module(function($provide, $compileProvider) {
     $provide.value('MathJaxService', MathJaxService);
-    $compileProvider.directive('testIsolate'
-      ,function() {
+    $compileProvider.directive('testIsolate',function() {
         return {
-          scope: {},
-          link: function() {
-            console.log("qqfasz");
-          }
-        }
+          scope: {}
+        };
       });
 
   }));
