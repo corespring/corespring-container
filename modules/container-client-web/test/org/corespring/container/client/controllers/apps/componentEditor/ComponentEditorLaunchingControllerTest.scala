@@ -39,7 +39,7 @@ class ComponentEditorLaunchingControllerTest extends Specification with Mockito 
 
     val renderer = {
       val m = mock[ComponentEditorRenderer]
-      m.render(any[SingleComponentScriptBundle], any[String], any[ComponentEditorOptions], any[Boolean]) returns {
+      m.render(any[SingleComponentScriptBundle], any[String], any[ComponentEditorOptions], any[Map[String,String]],any[Boolean]) returns {
         Future.successful(Html("<html></html>"))
       }
       m
@@ -66,7 +66,7 @@ class ComponentEditorLaunchingControllerTest extends Specification with Mockito 
 
       "call renderer.render" in new scope {
         wait(controller.componentEditorResult("type", req))
-        there was one(renderer).render(any[SingleComponentScriptBundle], m_eq("tabs"), any[ComponentEditorOptions], m_eq(false))
+        there was one(renderer).render(any[SingleComponentScriptBundle], m_eq("tabs"), any[ComponentEditorOptions], any[Map[String,String]],m_eq(false))
       }
     }
 
@@ -83,7 +83,7 @@ class ComponentEditorLaunchingControllerTest extends Specification with Mockito 
 
       "call renderer.render" in new prodScope {
         wait(controller.componentEditorResult("type", req))
-        there was one(renderer).render(any[SingleComponentScriptBundle], m_eq("tabs"), any[ComponentEditorOptions], m_eq(true))
+        there was one(renderer).render(any[SingleComponentScriptBundle], m_eq("tabs"), any[ComponentEditorOptions], any[Map[String,String]], m_eq(true))
       }
     }
 
@@ -95,7 +95,7 @@ class ComponentEditorLaunchingControllerTest extends Specification with Mockito 
 
     "call renderer.render - dev mode" in new scope {
       val result = wait(controller.componentEditorResult("type", req))
-      there was one(renderer).render(any[SingleComponentScriptBundle], m_eq("tabs"), any[ComponentEditorOptions], m_eq(false))
+      there was one(renderer).render(any[SingleComponentScriptBundle], m_eq("tabs"), any[ComponentEditorOptions], any[Map[String,String]], m_eq(false))
     }
 
   }
