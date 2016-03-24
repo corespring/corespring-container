@@ -3,8 +3,9 @@ angular.module('corespring-editing.wiggi-wiz-features.mathjax').factory('WiggiMa
   'MathFormatUtils',
   '$rootScope',
   '$log',
+  '$timeout',
 
-  function(MathJaxService, MathFormatUtils, $rootScope, $log) {
+  function(MathJaxService, MathFormatUtils, $rootScope, $log, $timeout) {
     function MathInputWiggiFeatureDef() {
       this.name = 'mathjax';
       this.attributeName = 'mathjax';
@@ -24,6 +25,8 @@ angular.module('corespring-editing.wiggi-wiz-features.mathjax').factory('WiggiMa
           '<math-input parent-selector=".wiggi-wiz, .config-panel-body" show-code-button="true" fix-backslash="false" editable="true" keypad-auto-open="' + isNew + '" keypad-type="\'basic\'" ng-model="expr" code-model="code" expression="\'' + content + '\'"></math-input>',
           '</div>'
         ].join(''));
+
+        MathJaxService.parseDomForMath(10);
         return replaceWith(newNode);
       };
 
@@ -42,7 +45,7 @@ angular.module('corespring-editing.wiggi-wiz-features.mathjax').factory('WiggiMa
 
       this.onClick = function($node, $nodeScope, editor) {
         $node.find('.mq').find('textarea').blur();
-        setTimeout(function() {
+        $timeout(function() {
           $node.find('.mq').find('textarea').focus();
         }, 1);
       };
