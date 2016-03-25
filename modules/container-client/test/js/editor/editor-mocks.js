@@ -93,6 +93,7 @@
       return promise;
     });
     constructor.prototype.promise = promise;
+    constructor.promise = promise;
     return constructor;
   };
 
