@@ -18,7 +18,7 @@ describe('instance', function() {
 
   var mockChannel;
   var ID = 'instance-test-element-id';
-  var call = { url: '/url'};
+  var call = {method: 'GET', url: '/url'};
 
   beforeEach(function() {
     onError.calls.reset();
@@ -92,19 +92,19 @@ describe('instance', function() {
   });
 
   it('should register a handler for autoScroll', function(){
-    var instance = new InstanceDef({call: {url: '/url'}}, '#' + ID, onError);
+    var instance = new InstanceDef({call: {method: 'GET', url: '/url'}}, '#' + ID, onError);
     expect(mockChannel.on).toHaveBeenCalledWith('autoScroll', jasmine.any(Function));
   });
 
   it('should register a handler for getScrollPosition', function(){
-    var instance = new InstanceDef({call: {url: '/url'}}, '#' + ID, onError);
+    var instance = new InstanceDef({call: {method: 'GET', url: '/url'}}, '#' + ID, onError);
     expect(mockChannel.on).toHaveBeenCalledWith('getScrollPosition', jasmine.any(Function));
   });
 
   describe('send', function(){
 
     it('should call channel.send', function() {
-      var instance = new InstanceDef({call: {url: '/url'}}, '#' + ID, onError);
+      var instance = new InstanceDef({call: {method: 'GET', url: '/url'}}, '#' + ID, onError);
       instance.send('isComplete', function(){});
       expect(mockChannel.send).toHaveBeenCalledWith('isComplete', jasmine.any(Function));
     });
@@ -113,7 +113,7 @@ describe('instance', function() {
   describe('width', function(){
     it('calls $(element).width', function(){
       var el = $('#' + ID);
-      instance = new InstanceDef({call: {url: '/url'}}, el, onError);
+      instance = new InstanceDef({call: {method: 'GET', url: '/url'}}, el, onError);
       instance.width('100px');
       expect($('#' + ID + '').find('iframe').width()).toEqual(100);
     });
@@ -123,7 +123,7 @@ describe('instance', function() {
   describe('css', function(){
     it('calls $(element).css', function(){
       var el = $('#' + ID);
-      instance = new InstanceDef({call: {url: '/url'}}, el, onError);
+      instance = new InstanceDef({call: {method: 'GET', url: '/url'}}, el, onError);
       instance.css('color', 'red');
       expect($('#' + ID + '').find('iframe').css('color')).toEqual('rgb(255, 0, 0)');
     });

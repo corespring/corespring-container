@@ -1,6 +1,7 @@
 package org.corespring.container.client.controllers.launcher
 
 import org.corespring.container.client.V2PlayerConfig
+import org.corespring.container.client.controllers.launcher.definitions.Implicits
 import org.corespring.container.client.hooks.PlayerJs
 import play.api.http.ContentTypes
 import play.api.libs.json.JsObject
@@ -11,11 +12,7 @@ private[launcher] trait LaunchCompanionUtils {
   def params(rh: RequestHeader) = rh.queryString.mapValues(_.mkString(""))
 }
 
-private object Implicits {
-  implicit def callToJsv(c: Call): JsValueWrapper = toJsFieldJsValueWrapper(obj("method" -> c.method, "url" -> c.url))
-}
-
-import org.corespring.container.client.controllers.launcher.Implicits._
+import Implicits._
 
 trait CorespringJsClient {
 

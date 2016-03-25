@@ -8,7 +8,8 @@ class ImplicitsTest extends Specification {
 
   "callToJsv" should {
     "return json object with method and url" in {
-      Implicits.callToJsv(Call("GET", "url")) must_== Json.obj("method" -> "GET", "url" -> "url")
+      import Implicits._
+      Json.obj("a" -> Call("GET", "url")) must_== Json.obj("a" -> Json.obj("method" -> "GET", "url" -> "url"))
     }
   }
 }
