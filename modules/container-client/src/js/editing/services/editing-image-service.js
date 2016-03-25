@@ -57,7 +57,7 @@ angular.module('corespring-editing.services').service( 'EditingImageService', [
       this.errorMessage = '<strong>Upload error</strong><br/>Your image was not uploaded. Please try again.';
 
       this.deleteFile = function(url) {
-        $http['delete'](QueryParamUtils.addQueryParams(url));
+        $http({method: 'delete', url: QueryParamUtils.addQueryParams(url)});
       };
 
       this.addFile = function(file, onComplete, onProgress) {

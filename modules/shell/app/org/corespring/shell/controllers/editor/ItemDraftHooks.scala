@@ -301,5 +301,22 @@ class ItemDraftHooks(
       case Some(tuple) => Right(tuple)
     }
   }
+
+  override def saveXhtmlAndComponents(id: String, markup: String, components: JsValue)(implicit h: RequestHeader): R[JsValue] = {
+    val xhtmlResult = saveXhtml(id, markup)(h)
+    val componentResult = saveComponents(id, components)(h)
+    for {
+      x <- xhtmlResult
+      c <- componentResult
+    } yield {
+      (x, c) match {
+        case (Left((xErr, xMsg)), Left((cErr, cMsg))) => Left(xErr, xMsg)
+        case (Left((err, msg)), _) => Left(err, msg)
+        case (_, Left((err, msg))) => Left(err, msg)
+        case (Right(xJson), Right(cJson)) => Right(xJson.as[JsObject].deepMerge(cJson.as[JsObject]))
+      }
+    }
+  }
+
 }
 
