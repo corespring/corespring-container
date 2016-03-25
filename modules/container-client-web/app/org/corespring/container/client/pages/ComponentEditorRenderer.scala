@@ -34,13 +34,14 @@ class ComponentEditorRenderer(
 
   implicit def ec = containerExecutionContext.context
 
-  def render(componentBundle: SingleComponentScriptBundle, previewMode: String, clientOptions: ComponentEditorOptions, prodMode: Boolean): Future[Html] = Future {
+  def render(componentBundle: SingleComponentScriptBundle, previewMode: String, clientOptions: ComponentEditorOptions, queryParams: Map[String,String], prodMode: Boolean): Future[Html] = Future {
 
     logger.info(s"function=render, componentBundle=$componentBundle")
 
     val (js, css) = prepareJsCss(prodMode, componentBundle)
     val arr: JsArray = JsArray(Seq(componentBundle.component).map(componentJson.toJson(_)))
-    val inlineJs = ComponentEditorServices(s"corespring-$name.services", arr, componentBundle.componentType).toString
+    val queryParamsJson = Json.toJson(queryParams)
+    val inlineJs = ComponentEditorServices(s"corespring-$name.services", arr, componentBundle.componentType, queryParamsJson).toString
 
     val previewWidth = if (clientOptions.isInstanceOf[PreviewRightComponentEditorOptions]) {
       clientOptions.asInstanceOf[PreviewRightComponentEditorOptions].previewWidth
