@@ -36,9 +36,14 @@ class Player(mode: Mode,
     val ids = ItemComponentTypes(componentService, item).map(_.id)
 
     val prodMode = r.getQueryString("mode").map(_ == "prod").getOrElse(mode == Mode.Prod)
+    val serviceParams = mkQueryParams(mapToJson)
+    val colors = (serviceParams \ "colors").asOpt[String]
 
-    bundler.bundle(ids, "player", Some("player"), !prodMode) match {
+
+    bundler.bundle(ids, "player", Some("player"), !prodMode, colors) match {
       case Some(b) => {
+        println("Bundle: " + b)
+
         val hasBeenArchived = hooks.archiveCollectionId == (session \ "collectionId")
         val showControls = r.getQueryString("showControls").map(_ == "true").getOrElse(false)
         val queryParams = mkQueryParams(m => m)

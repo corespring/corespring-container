@@ -24,6 +24,7 @@ case class Library(
   client: Seq[LibrarySource] = Seq.empty,
   server: Seq[LibrarySource] = Seq.empty,
   css: Option[String],
+  less: Option[String],
   libraries: Seq[Id])
   extends Component(Id(org, name), packageInfo)
 
@@ -78,6 +79,7 @@ case class LayoutComponent(org: String,
   name: String,
   client: Seq[LibrarySource],
   css: Option[String],
+  less: Option[String],
   released: Boolean,
   insertInline: Boolean,
   override val packageInfo: JsValue) extends Component(Id(org, name), packageInfo)
@@ -85,6 +87,7 @@ case class LayoutComponent(org: String,
 case class Client(render: String,
   configure: String,
   css: Option[String],
+  less: Option[String],
   renderLibs: Seq[LibrarySource] = Seq.empty,
   configureLibs: Seq[LibrarySource] = Seq.empty)
 

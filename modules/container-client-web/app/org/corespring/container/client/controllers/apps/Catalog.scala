@@ -28,6 +28,9 @@ class Catalog(
   def load(id: String): Action[AnyContent] = Action.async {
     implicit request =>
       val prodMode = request.getQueryString("mode").map(_ == "prod").getOrElse(mode == Mode.Prod)
+      val serviceParams = mkQueryParams(mapToJson)
+      val colors = (serviceParams \ "colors").asOpt[String]
+      println("Colors: " + colors)
 
       hooks.showCatalog(id).flatMap { err =>
         err match {
@@ -38,7 +41,7 @@ class Catalog(
             )
           }
           case _ => {
-            bundler.bundleAll("catalog", Some("editor"), !prodMode) match {
+            bundler.bundleAll("catalog", Some("editor"), !prodMode, colors) match {
               case Some(b) => {
                 val mainEndpoints = endpoints.main(id)
                 val supportingMaterialsEndpoints = endpoints.supportingMaterials(id)

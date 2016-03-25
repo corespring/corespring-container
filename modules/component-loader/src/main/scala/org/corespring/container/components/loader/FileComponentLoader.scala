@@ -88,13 +88,13 @@ class FileComponentLoader(paths: Seq[String])
     hyphenatedToTitleCase(name)
   }
 
-  private def loadCss(root: String): Option[String] = {
-    val maybeFiles = Seq("styles.less.min.css", "styles.less.css", "styles.css")
-
+  private def loadCssOrLess(root:String, maybeFiles: Seq[String]) = {
     maybeFiles
       .map(filename => readMaybeFile(new File(s"${if (root.endsWith("/")) root else s"$root/"}$filename")))
       .find(!_.isEmpty).flatten
   }
+  private def loadCss(root: String): Option[String] = loadCssOrLess(root, Seq("styles.css"))
+  private def loadLess(root: String): Option[String] = loadCssOrLess(root, Seq("styles.less"))
 
   private def loadLibrary(org: String, packageJson: JsValue)(compRoot: File): Option[Component] = {
 
@@ -108,6 +108,7 @@ class FileComponentLoader(paths: Seq[String])
         loadLibrarySources(compRoot.getPath, "client", createClientName(compRoot.getName)),
         loadLibrarySources(compRoot.getPath, "server", createServerName),
         loadCss(s"${compRoot.getPath}/src/client"),
+        loadLess(s"${compRoot.getPath}/src/client"),
         loadLibraries(packageJson)))
   }
 
@@ -122,6 +123,7 @@ class FileComponentLoader(paths: Seq[String])
         insertInline = false,
         client = loadLibrarySources(compRoot.getPath, "client", createClientName(compRoot.getPath)),
         css = loadCss(s"${compRoot.getPath}/src/client"),
+        less = loadLess(s"${compRoot.getPath}/src/client"),
         packageInfo = packageJson))
   }
 
@@ -144,16 +146,16 @@ class FileComponentLoader(paths: Seq[String])
 
   /** a interim model for building interaction */
   case class LoadedData(org: String,
-    name: String,
-    title: Option[String],
-    titleGroup: Option[String],
-    client: Client,
-    defaultData: JsValue,
-    insertInline: Option[Boolean],
-    released: Option[Boolean],
-    icon: Option[Array[Byte]],
-    sampleData: Map[String, JsValue],
-    libs: Seq[Id])
+                        name: String,
+                        title: Option[String],
+                        titleGroup: Option[String],
+                        client: Client,
+                        defaultData: JsValue,
+                        insertInline: Option[Boolean],
+                        released: Option[Boolean],
+                        icon: Option[Array[Byte]],
+                        sampleData: Map[String, JsValue],
+                        libs: Seq[Id])
 
   object LoadedData {
     def apply(org: String, packageJson: JsValue, compRoot: File): LoadedData = {
@@ -256,7 +258,8 @@ class FileComponentLoader(paths: Seq[String])
     val renderJs = getJsFromFile(client.getPath + "/render")
     val configureJs = getJsFromFile(client.getPath + "/configure")
     val styleCss = loadCss(client.getPath)
-    Client(renderJs, configureJs, styleCss, renderLibs, configureLibs)
+    val styleLess = loadLess(client.getPath)
+    Client(renderJs, configureJs, styleCss, styleLess, renderLibs, configureLibs)
   }
 
   private def loadServer(server: File): Server = if (!server.exists()) {

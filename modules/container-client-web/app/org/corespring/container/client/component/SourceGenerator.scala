@@ -5,7 +5,8 @@ import org.corespring.container.client.views.txt.js.{ ComponentServerWrapper, Co
 import org.corespring.container.components.model._
 import org.corespring.container.components.model.packaging.ClientSideDependency
 import org.corespring.container.components.services.ComponentTypeFilter
-import play.api.libs.json.JsObject
+import play.api.libs.json.{Json, JsValue, JsObject}
+import org.apache.commons.io.IOUtils
 
 object SourceGenerator {
   object Keys {
@@ -25,6 +26,8 @@ trait SourceGenerator
   def js(components: Seq[Component]): String
 
   def css(components: Seq[Component]): String
+
+  def less(components: Seq[Component], customColors: JsObject = Json.obj()): String
 
   protected def wrapComponent(moduleName: String, directiveName: String, src: String) = {
     ComponentWrapper(moduleName, directiveName, src).toString
@@ -108,6 +111,31 @@ abstract class BaseGenerator
     }.flatten.distinct
 
     allPaths.flatMap(loadLibrarySource)
+  }
+
+  override def less(components: Seq[Component], customColors: JsObject = Json.obj()): String = {
+    val inputStream = this.getClass().getResourceAsStream("/public/components-common.less")
+    val commonLessSource = IOUtils.toString(inputStream)
+    inputStream.close
+    val commonLess = commonLessSource.mkString
+    val (libraries, uiComps, layoutComps, widgets) = splitComponents(components)
+    val uiLess = uiComps.map(_.client.less.getOrElse("")).mkString("\n")
+    val widgetLess = widgets.map(_.client.less.getOrElse("")).mkString("\n")
+    val layoutLess = layoutComps.map(_.less.getOrElse("")).mkString("\n")
+    val libraryLess = libraries.map(_.less.getOrElse("")).mkString("\n")
+    val dynamicColors = customColors.asOpt[Map[String, String]] match {
+      case Some(cols) => cols.map { case (a, b) => s"@$a: $b;" }.mkString("\n")
+      case _ => ""
+    }
+    println(dynamicColors)
+    s"""
+       |$commonLess
+       |$dynamicColors
+       |$uiLess
+       |$widgetLess
+       |$layoutLess
+       |$libraryLess
+        """.stripMargin
   }
 
   override def css(components: Seq[Component]): String = {

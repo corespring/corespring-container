@@ -145,11 +145,15 @@ function ClientLauncher(element, options, errorCallback){
    * @param initialData an object that will be sent to the instance 'initialise' handler
    * @param onReady called when instance is ready - function(instance){};
    */
-  this.loadInstance = function(call, queryParams, initialData, onReady){
+  this.loadInstance = function(call, queryParams, initialData, onReady, customColors){
 
     call = (typeof(call) === 'string') ? {method: 'GET', url: call} : call;
     
     queryParams = this.buildParams(queryParams);
+    if (customColors) {
+      queryParams = queryParams || {};
+      queryParams.colors = window.btoa(JSON.stringify({colors: customColors}));
+    }
     
     var launchOpts = {call: call, queryParams: queryParams, data: initialData};
     
