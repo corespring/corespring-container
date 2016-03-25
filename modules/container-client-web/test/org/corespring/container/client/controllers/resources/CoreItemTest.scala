@@ -1,6 +1,6 @@
 package org.corespring.container.client.controllers.resources
 
-import org.corespring.container.client.controllers.helpers.PlayerXhtml
+import org.corespring.container.client.controllers.helpers.{ ItemCheck, PlayerXhtml }
 import org.corespring.container.client.hooks.{ CoreItemHooks, SupportingMaterialHooks }
 import org.corespring.test.TestContext
 import org.specs2.mock.Mockito
@@ -29,6 +29,12 @@ class CoreItemTest extends Specification with Mockito {
       m.saveSupportingMaterials(any[String], any[JsValue])(any[Request[AnyContent]]) returns Future(Right(Json.obj()))
       m.saveSummaryFeedback(any[String], any[String])(any[Request[AnyContent]]) returns Future(Right(Json.obj()))
       m.saveXhtml(any[String], any[String])(any[Request[AnyContent]]) returns Future(Right(Json.obj()))
+      m
+    }
+
+    override val itemCheck: ItemCheck = {
+      val m = mock[ItemCheck]
+      m.findComponentsNotInXhtml(any[String], any[JsObject]) returns Future.successful(Seq.empty)
       m
     }
 
