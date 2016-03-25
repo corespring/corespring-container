@@ -46,6 +46,8 @@ class CoreSupportingMaterialsTest extends Specification with Mockito with PlaySp
 
     override def getTimestamp = "stamp"
 
+    val rh = FakeRequest()
+
     lazy val mockHooks = {
       val m = mock[SupportingMaterialHooks]
       m.create(anyString, any[CreateBinaryMaterial])(any[Request[AnyContent]]) returns Future { Right(Json.obj()) }
@@ -99,7 +101,7 @@ class CoreSupportingMaterialsTest extends Specification with Mockito with PlaySp
     }
 
     "fail if request body is not json" in new createJson {
-      createSupportingMaterial("id")(FakeRequest("", "")) must beError(Errors.notJson)
+      createSupportingMaterial("id")(rh) must beError(Errors.notJson)
     }
 
     "fail if there is no name in the json" in new createJson {
@@ -193,8 +195,8 @@ class CoreSupportingMaterialsTest extends Specification with Mockito with PlaySp
     }
 
     "call hooks.delete" in new delete {
-      deleteSupportingMaterial("id", "name")(FakeRequest("", ""))
-      there was one(materialHooks).delete("id", "name")(FakeRequest("", ""))
+      deleteSupportingMaterial("id", "name")(rh)
+      there was one(materialHooks).delete("id", "name")(rh)
     }
   }
 
@@ -205,7 +207,7 @@ class CoreSupportingMaterialsTest extends Specification with Mockito with PlaySp
     }
 
     "fail if the body isn't text" in new update {
-      updateSupportingMaterialContent("id", "materialName", "filename")(FakeRequest("", "")) must beError(Errors.notText)
+      updateSupportingMaterialContent("id", "materialName", "filename")(rh) must beError(Errors.notText)
     }
 
     "call hooks.updateContent" in new update {
@@ -225,11 +227,11 @@ class CoreSupportingMaterialsTest extends Specification with Mockito with PlaySp
   "addAssetToSupportingMaterialContent" should {
 
     class addAsset extends testScope {
-      mockHooks.addAsset(any[String], any[String], any[Binary])(any[RequestHeader]) returns Future(Right(UploadResult("path.png")))
+      mockHooks.addAsset(any[String], any[String], any[Binary])(any[RequestHeader]) returns Future.successful(Right(UploadResult("path.png")))
     }
 
     "fail if the body isn't multipart form data" in new addAsset {
-      addAssetToSupportingMaterial("id", "name")(FakeRequest("", "")) must beError(Errors.notMultipartForm)
+      addAssetToSupportingMaterial("id", "name")(rh) must beError(Errors.notMultipartForm)
     }
 
     "fail if the mimeType is pdf" in new addAsset {
@@ -251,7 +253,7 @@ class CoreSupportingMaterialsTest extends Specification with Mockito with PlaySp
     }
 
     "return hooks errors" in new addAsset {
-      mockHooks.addAsset(any[String], any[String], any[Binary])(any[RequestHeader]) returns Future(Left(1 -> "error"))
+      mockHooks.addAsset(any[String], any[String], any[Binary])(any[RequestHeader]) returns Future.successful(Left(1 -> "error"))
       val form = mkFormWithFile(Map.empty)
       val request = req(form)
       val result = addAssetToSupportingMaterial("id", "name")(request)
@@ -262,44 +264,44 @@ class CoreSupportingMaterialsTest extends Specification with Mockito with PlaySp
 
   "deleteAssetFromSupportingMaterial" should {
     class deleteAsset extends testScope {
-      mockHooks.deleteAsset(any[String], any[String], any[String])(any[RequestHeader]) returns Future(Right(Json.obj()))
+      mockHooks.deleteAsset(any[String], any[String], any[String])(any[RequestHeader]) returns Future.successful(Right(Json.obj()))
     }
 
     "call hooks.deleteAsset" in new deleteAsset {
-      deleteAssetFromSupportingMaterial("id", "name", "filename")(FakeRequest("", ""))
-      there was one(materialHooks).deleteAsset("id", "name", "filename")(FakeRequest("", ""))
+      deleteAssetFromSupportingMaterial("id", "name", "filename")(rh)
+      there was one(materialHooks).deleteAsset("id", "name", "filename")(rh)
     }
   }
 
   "getAssetFromSupportingMaterial" should {
     class getAsset extends testScope {
       val fd = FileDataStream(new ByteArrayInputStream("".getBytes(Charsets.UTF_8)), 0, "none", Map.empty)
-      mockHooks.getAsset(any[String], any[String], any[String])(any[RequestHeader]) returns Future(Right(fd))
+      mockHooks.getAsset(any[String], any[String], any[String])(any[RequestHeader]) returns Future.successful(Right(fd))
     }
 
     class getAssetOctetStream extends testScope {
       val fd = FileDataStream(new ByteArrayInputStream("".getBytes(Charsets.UTF_8)), 0, "application/octet-stream", Map.empty)
-      mockHooks.getAsset(any[String], any[String], any[String])(any[RequestHeader]) returns Future(Right(fd))
+      mockHooks.getAsset(any[String], any[String], any[String])(any[RequestHeader]) returns Future.successful(Right(fd))
     }
 
     class getAssetImage extends testScope {
       val fd = FileDataStream(new ByteArrayInputStream("".getBytes(Charsets.UTF_8)), 0, "image/png", Map.empty)
-      mockHooks.getAsset(any[String], any[String], any[String])(any[RequestHeader]) returns Future(Right(fd))
+      mockHooks.getAsset(any[String], any[String], any[String])(any[RequestHeader]) returns Future.successful(Right(fd))
     }
 
     "call hooks.getAsset" in new getAsset {
-      val result = getAssetFromSupportingMaterial("id", "name", "filename")(FakeRequest("", ""))
+      val result = getAssetFromSupportingMaterial("id", "name", "filename")(rh)
       status(result) === OK
-      there was one(materialHooks).getAsset("id", "name", "filename")(FakeRequest("", ""))
+      there was one(materialHooks).getAsset("id", "name", "filename")(rh)
     }
 
     "octet stream content type will not be used in the header" in new getAssetOctetStream {
-      val result = getAssetFromSupportingMaterial("id", "name", "filename")(FakeRequest("", ""))
+      val result = getAssetFromSupportingMaterial("id", "name", "filename")(rh)
       contentType(result) === None
     }
 
     "image content type will be used in the header" in new getAssetImage {
-      val result = getAssetFromSupportingMaterial("id", "name", "filename")(FakeRequest("", ""))
+      val result = getAssetFromSupportingMaterial("id", "name", "filename")(rh)
       contentType(result) === Some("image/png")
     }
   }
