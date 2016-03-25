@@ -7,7 +7,7 @@ import org.specs2.specification.Scope
 import scala.concurrent.ExecutionContext
 import play.api.libs.json.Json._
 
-class XmlItemCheckTest extends Specification with Mockito {
+class XmlItemInspectorTest extends Specification with Mockito {
 
   trait scope extends Scope {
 
@@ -18,7 +18,7 @@ class XmlItemCheckTest extends Specification with Mockito {
       }
       m
     }
-    val check = new XmlItemCheck(processor, ExecutionContext.global)
+    val check = new XmlItemInspector(processor, ExecutionContext.global)
   }
 
   "findComponentsNotInXhtml" should {

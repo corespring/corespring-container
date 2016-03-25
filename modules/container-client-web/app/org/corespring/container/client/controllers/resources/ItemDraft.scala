@@ -1,6 +1,6 @@
 package org.corespring.container.client.controllers.resources
 
-import org.corespring.container.client.controllers.helpers.{ ItemCheck, PlayerXhtml }
+import org.corespring.container.client.controllers.helpers.{ ItemInspector, PlayerXhtml }
 import org.corespring.container.client.hooks._
 import org.corespring.container.client.integration.ContainerExecutionContext
 import org.corespring.container.components.services.ComponentService
@@ -25,7 +25,7 @@ class ItemDraft(
   componentService: ComponentService,
   val hooks: CoreItemHooks with DraftHooks,
   val playerXhtml: PlayerXhtml,
-  val itemCheck: ItemCheck,
+  val itemInspector: ItemInspector,
   val materialHooks: ItemDraftSupportingMaterialHooks) extends CoreItem {
 
   override lazy val logger = Logger(classOf[ItemDraft])

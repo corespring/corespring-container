@@ -1,7 +1,7 @@
 package org.corespring.container.client.controllers.resources
 
 import org.corespring.container.client.HasContainerContext
-import org.corespring.container.client.controllers.helpers.{ ItemCheck, PlayerXhtml, XhtmlProcessor }
+import org.corespring.container.client.controllers.helpers.{ ItemInspector, PlayerXhtml, XhtmlProcessor }
 import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.client.hooks._
 import play.api.Logger
@@ -31,12 +31,13 @@ trait CoreItem extends CoreSupportingMaterials with Controller with HasContainer
 
   def playerXhtml: PlayerXhtml
 
-  def itemCheck: ItemCheck
+  def itemInspector: ItemInspector
 
   implicit def toResult(m: StatusMessage): SimpleResult = play.api.mvc.Results.Status(m._1)(Json.obj("error" -> m._2))
 
   /**
    * A list of all the component types in the container
+   *
    * @return
    */
   protected def componentTypes: Seq[String]
@@ -52,7 +53,7 @@ trait CoreItem extends CoreSupportingMaterials with Controller with HasContainer
       xhtml <- (rawItem \ "xhtml").asOpt[String]
       components <- (rawItem \ "components").asOpt[JsObject]
     } yield {
-      itemCheck.findComponentsNotInXhtml(xhtml, components).map { notInXhtml =>
+      itemInspector.findComponentsNotInXhtml(xhtml, components).map { notInXhtml =>
         notInXhtml.foreach {
           case ((key, json)) =>
             logger.error(s"function=checkTheItemAndLog, id=$id, key=$key - [NOT_IN_XHTML] The component isn't defined in the xhtml")

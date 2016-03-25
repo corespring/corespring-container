@@ -6,9 +6,10 @@ import play.api.libs.json.{ JsObject, JsValue }
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.xml.Node
 
-trait ItemCheck {
+trait ItemInspector {
   /**
    * Return a list of components that are not declared in the xhtml
+   *
    * @param xhtml
    * @param components
    * @return
@@ -16,7 +17,7 @@ trait ItemCheck {
   def findComponentsNotInXhtml(xhtml: String, components: JsObject): Future[Seq[(String, JsValue)]]
 }
 
-class XmlItemCheck(processor: XhtmlProcessor, ec: ExecutionContext) extends ItemCheck {
+class XmlItemInspector(processor: XhtmlProcessor, ec: ExecutionContext) extends ItemInspector {
 
   private lazy val logger = Logger(this.getClass)
 

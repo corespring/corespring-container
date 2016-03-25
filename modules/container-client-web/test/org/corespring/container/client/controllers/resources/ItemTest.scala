@@ -1,6 +1,6 @@
 package org.corespring.container.client.controllers.resources
 
-import org.corespring.container.client.controllers.helpers.{ ItemCheck, PlayerXhtml }
+import org.corespring.container.client.controllers.helpers.{ ItemInspector, PlayerXhtml }
 import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.client.hooks._
 import org.corespring.container.components.model.{ Component, Interaction }
@@ -74,8 +74,8 @@ class ItemTest extends Specification with Mockito with ComponentMaker with NoTim
       m
     }
 
-    lazy val itemCheck = {
-      val m = mock[ItemCheck]
+    lazy val itemInspector = {
+      val m = mock[ItemInspector]
       m.findComponentsNotInXhtml(any[String], any[JsObject]) returns Future.successful(Seq.empty)
       m
     }
@@ -86,7 +86,7 @@ class ItemTest extends Specification with Mockito with ComponentMaker with NoTim
       componentService,
       TestContext.containerContext,
       playerXhtml,
-      itemCheck)
+      itemInspector)
 
   }
 

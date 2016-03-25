@@ -1,7 +1,7 @@
 package org.corespring.container.client.controllers.resources
 
 import com.softwaremill.macwire.MacwireMacros.wire
-import org.corespring.container.client.controllers.helpers.{ ItemCheck, PlayerXhtml, XhtmlProcessor, XmlItemCheck }
+import org.corespring.container.client.controllers.helpers.{ ItemInspector, PlayerXhtml, XhtmlProcessor, XmlItemInspector }
 import org.corespring.container.client.hooks._
 import org.corespring.container.client.integration.ContainerExecutionContext
 import org.corespring.container.components.outcome.ScoreProcessor
@@ -29,7 +29,7 @@ trait ResourcesModule {
   def itemMetadataHooks: ItemMetadataHooks
   def collectionHooks: CollectionHooks
 
-  lazy val itemCheck: ItemCheck = new XmlItemCheck(XhtmlProcessor, containerContext.context)
+  lazy val itemInspector: ItemInspector = new XmlItemInspector(XhtmlProcessor, containerContext.context)
 
   lazy val session: Session = wire[Session]
   lazy val item: Item = wire[Item]
