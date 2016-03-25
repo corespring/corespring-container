@@ -1,7 +1,5 @@
 package org.corespring.container.client.controllers.resources
 
-import org.corespring.container.client.controllers.helpers.PlayerXhtml
-import org.corespring.container.client.hooks.{ CoreItemHooks, SupportingMaterialHooks }
 import org.corespring.container.client.controllers.helpers.{ ItemInspector, PlayerXhtml }
 import org.corespring.container.client.hooks.{ CoreItemHooks, SupportingMaterialHooks }
 import org.corespring.test.TestContext
