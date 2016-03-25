@@ -1,6 +1,6 @@
 package org.corespring.container.client.controllers.resources
 
-import org.corespring.container.client.controllers.helpers.PlayerXhtml
+import org.corespring.container.client.controllers.helpers.{ ItemCheck, PlayerXhtml }
 import org.corespring.container.client.hooks.{ CoreItemHooks, CreateItemHook, ItemSupportingMaterialHooks }
 import org.corespring.container.client.integration.ContainerExecutionContext
 import org.corespring.container.components.services.ComponentService
@@ -18,7 +18,8 @@ class Item(val hooks: CoreItemHooks with CreateItemHook,
   val materialHooks: ItemSupportingMaterialHooks,
   componentService: ComponentService,
   val containerContext: ContainerExecutionContext,
-  val playerXhtml: PlayerXhtml)
+  val playerXhtml: PlayerXhtml,
+  val itemCheck: ItemCheck)
   extends CoreItem {
 
   def componentTypes = componentService.components.map(_.componentType)

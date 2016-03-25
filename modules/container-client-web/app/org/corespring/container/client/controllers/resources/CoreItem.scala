@@ -1,14 +1,14 @@
 package org.corespring.container.client.controllers.resources
 
 import org.corespring.container.client.HasContainerContext
-import org.corespring.container.client.controllers.helpers.{ PlayerXhtml, XhtmlProcessor }
+import org.corespring.container.client.controllers.helpers.{ ItemCheck, PlayerXhtml, XhtmlProcessor }
 import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.client.hooks._
 import play.api.Logger
-import play.api.libs.json.{ JsString, JsObject, JsValue, Json }
+import play.api.libs.json.{ JsObject, JsString, JsValue, Json }
 import play.api.mvc._
 
-import scala.concurrent.{ Future }
+import scala.concurrent.Future
 import scalaz.{ Failure, Success, Validation }
 import scalaz.Scalaz._
 
@@ -31,6 +31,8 @@ trait CoreItem extends CoreSupportingMaterials with Controller with HasContainer
 
   def playerXhtml: PlayerXhtml
 
+  def itemCheck: ItemCheck
+
   implicit def toResult(m: StatusMessage): SimpleResult = play.api.mvc.Results.Status(m._1)(Json.obj("error" -> m._2))
 
   /**
@@ -45,12 +47,28 @@ trait CoreItem extends CoreSupportingMaterials with Controller with HasContainer
 
   val noCacheHeader = "no-cache, no-store, must-revalidate"
 
+  private def checkTheItemAndLog(id: String, rawItem: JsValue): Unit = if (logger.isErrorEnabled) {
+    for {
+      xhtml <- (rawItem \ "xhtml").asOpt[String]
+      components <- (rawItem \ "components").asOpt[JsObject]
+    } yield {
+      itemCheck.findComponentsNotInXhtml(xhtml, components).map { notInXhtml =>
+        notInXhtml.foreach {
+          case ((key, json)) =>
+            logger.error(s"function=checkTheItemAndLog, id=$id, key=$key - [NOT_IN_XHTML] The component isn't defined in the xhtml")
+            logger.debug(s"function=checkTheItemAndLog, id=$id, key=$key, json=$json")
+        }
+      }
+    }
+  }
+
   def load(itemId: String) = Action.async { implicit request =>
     hooks.load(itemId).map {
       either =>
         either match {
           case Left(sm) => sm
           case Right(rawItem) => {
+            checkTheItemAndLog(itemId, rawItem)
             Ok(ItemJson(playerXhtml, rawItem))
               .withHeaders(
                 "Cache-Control" -> noCacheHeader,

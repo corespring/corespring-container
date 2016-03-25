@@ -21,7 +21,7 @@ trait BaseEditor[H <: EditorHooks]
   extends Controller
   with AssetsController[EditorHooks]
   with ComponentEditorLaunchingController
-  with QueryStringHelper{
+  with QueryStringHelper {
 
   def hooks: H
 
@@ -64,7 +64,7 @@ trait BaseEditor[H <: EditorHooks]
 
       e.fold(
         err => Future.successful(onError(err)),
-        (json) => {
+        _ => {
           val prodMode: Boolean = request.getQueryString("mode")
             .map(_ == "prod")
             .getOrElse(mode == Mode.Prod)
