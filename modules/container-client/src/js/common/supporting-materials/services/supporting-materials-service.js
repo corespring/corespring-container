@@ -67,7 +67,11 @@ angular.module('corespring-common.supporting-materials.services')
             var c = Urls.create;
             var url = addParams(c.url);
             m.html = '<div>' + m.name + '</div>';
+<<<<<<< HEAD
             $http({method: c.method, url: url, data: m})
+=======
+            $http({method: c.method, url:url, data: m})
+>>>>>>> develop
               .success(onSuccess)
               .error(onFailure || function() {
                 logger.error(arguments);

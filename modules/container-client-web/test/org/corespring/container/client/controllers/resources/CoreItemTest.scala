@@ -1,18 +1,18 @@
 package org.corespring.container.client.controllers.resources
 
 import org.corespring.container.client.controllers.helpers.PlayerXhtml
-import org.corespring.container.client.hooks.{ CoreItemHooks, SupportingMaterialHooks }
+import org.corespring.container.client.hooks.{CoreItemHooks, SupportingMaterialHooks}
 import org.corespring.test.TestContext
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
 import play.api.http.HeaderNames
-import play.api.libs.json.{ JsObject, JsValue, Json }
-import play.api.mvc.{ RequestHeader, AnyContent, AnyContentAsJson, Request }
-import play.api.test.{ FakeHeaders, FakeRequest }
+import play.api.libs.json.{JsObject, JsValue, Json}
+import play.api.mvc.{AnyContent, AnyContentAsJson, Request, RequestHeader}
 import play.api.test.Helpers._
+import play.api.test.{FakeHeaders, FakeRequest}
 
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.Future
 
 class CoreItemTest extends Specification with Mockito {
 

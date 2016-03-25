@@ -96,10 +96,7 @@
       return promise;
     });
     constructor.prototype.promise = promise;
-
-    constructor.PUT = jasmine.createSpy('PUT').and.returnValue(promise);
-    constructor.GET = jasmine.createSpy('GET').and.returnValue(promise);
-    constructor.POST = jasmine.createSpy('POST').and.returnValue(promise);
+    constructor.promise = promise;
     return constructor;
   };
 
@@ -170,6 +167,9 @@
           fn(newValue, oldValue);
         }
       };
+    });
+    this.debounce = jasmine.createSpy('debounce').and.callFake(function(fn){
+      return fn;
     });
   };
 

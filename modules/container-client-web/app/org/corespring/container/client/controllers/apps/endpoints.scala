@@ -1,8 +1,8 @@
 package org.corespring.container.client.controllers.apps
 
 import org.corespring.container.client.controllers.resources.routes._
-import org.corespring.container.client.controllers.resources.{routes => resourceRoutes}
-import org.corespring.container.client.views.models.{MainEndpoints, SessionEndpoints, SupportingMaterialsEndpoints}
+import org.corespring.container.client.controllers.resources.{ routes => resourceRoutes }
+import org.corespring.container.client.views.models.{ MainEndpoints, SessionEndpoints, SupportingMaterialsEndpoints }
 
 trait Endpoints {
   def main(id: String): MainEndpoints

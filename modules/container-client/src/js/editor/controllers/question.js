@@ -114,7 +114,7 @@ angular.module('corespring-editor.controllers')
 
       var saveXhtmlAndComponents = EditorChangeWatcher.debounce(function(){
         ItemService.saveXhtmlAndComponents(
-          $scope.item.xhtml, 
+          $scope.item.xhtml,
           $scope.serialize($scope.item.components),
           $scope.onItemSaved,
           $scope.onItemSaveError);

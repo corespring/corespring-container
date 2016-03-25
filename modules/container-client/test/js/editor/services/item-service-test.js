@@ -22,6 +22,7 @@ describe('ItemService', function(){
     $provide.value('$timeout', e.$timeout());
     $provide.value('ItemUrls', itemUrls);
     $provide.value('LogFactory', new e.LogFactory());
+    $provide.value('QueryParamUtils', new e.QueryParamUtils());
   }));
 
   beforeEach(inject(function(ItemService){
@@ -75,7 +76,7 @@ describe('ItemService', function(){
       });
 
       it('call $http saveSubset', function(){
-        expect(http.PUT).toHaveBeenCalledWith('saveSubset', expected);
+        expect(http).toHaveBeenCalledWith({ method: 'PUT', url: 'saveSubset', data: expected});
       });
       
       it('calls onSuccess', function(){
@@ -106,7 +107,7 @@ describe('ItemService', function(){
     });
 
     it('call $http', function(){
-      expect(http.PUT).toHaveBeenCalledWith('saveXhtmlAndComponents', {xhtml: '<div/>', components: {}});
+      expect(http).toHaveBeenCalledWith({ method: 'PUT', url: 'saveXhtmlAndComponents', data: {xhtml: '<div/>', components: {}}});
     });
     
     it('calls onSuccess', function(){

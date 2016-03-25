@@ -68,16 +68,16 @@ angular.module('corespring-editor.services').service('ItemService', [
         }
       };
 
-      this.saveXhtmlAndComponents = function(xhtml, components, onSuccess, onFailure){
-        var call = ItemUrls.saveXhtmlAndComponents;
+       this.saveXhtmlAndComponents = function(xhtml, components, onSuccess, onFailure){
+         var call = ItemUrls.saveXhtmlAndComponents;
 
-        var data = {
-          xhtml: xhtml,
-          components: components
-        };
+         var data = {
+           xhtml: xhtml,
+           components: components
+         };
 
-        _save(call, data, onSuccess, onFailure);
-      };
+         _save(call, data, onSuccess, onFailure);
+       };
 
       this.saveComponents = function(data, onSuccess, onFailure) {
         save('components', data, onSuccess, onFailure);
@@ -177,10 +177,9 @@ angular.module('corespring-editor.services').service('ItemService', [
 
       function save(set, data, onSuccess, onFailure) {
         var call = {
-          method:ItemUrls.saveSubset.method,
-          url: ItemUrls.saveSubset.url.replace(':subset', set)
-        };
-        _save(call, data, onSuccess, onFailure);
+         method:ItemUrls.saveSubset.method,
+         url: ItemUrls.saveSubset.url.replace(':subset', set)};
+         _save(call, data, onSuccess, onFailure);
       }
 
       function notifyListeners(message) {
