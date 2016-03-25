@@ -1,16 +1,18 @@
 package org.corespring.container.client.controllers.resources
 
 import org.corespring.container.client.controllers.helpers.PlayerXhtml
-import org.corespring.container.client.hooks.{CoreItemHooks, SupportingMaterialHooks}
+import org.corespring.container.client.hooks.{ CoreItemHooks, SupportingMaterialHooks }
+import org.corespring.container.client.controllers.helpers.{ ItemInspector, PlayerXhtml }
+import org.corespring.container.client.hooks.{ CoreItemHooks, SupportingMaterialHooks }
 import org.corespring.test.TestContext
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
 import play.api.http.HeaderNames
-import play.api.libs.json.{JsObject, JsValue, Json}
-import play.api.mvc.{AnyContent, AnyContentAsJson, Request, RequestHeader}
+import play.api.libs.json.{ JsObject, JsValue, Json }
+import play.api.mvc.{ AnyContent, AnyContentAsJson, Request, RequestHeader }
 import play.api.test.Helpers._
-import play.api.test.{FakeHeaders, FakeRequest}
+import play.api.test.{ FakeHeaders, FakeRequest }
 
 import scala.concurrent.Future
 
@@ -29,6 +31,12 @@ class CoreItemTest extends Specification with Mockito {
       m.saveSupportingMaterials(any[String], any[JsValue])(any[Request[AnyContent]]) returns Future(Right(Json.obj()))
       m.saveSummaryFeedback(any[String], any[String])(any[Request[AnyContent]]) returns Future(Right(Json.obj()))
       m.saveXhtml(any[String], any[String])(any[Request[AnyContent]]) returns Future(Right(Json.obj()))
+      m
+    }
+
+    override val itemInspector: ItemInspector = {
+      val m = mock[ItemInspector]
+      m.findComponentsNotInXhtml(any[String], any[JsObject]) returns Future.successful(Seq.empty)
       m
     }
 

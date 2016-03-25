@@ -210,7 +210,7 @@ class CoreSupportingMaterialsTest
   "updateSupportingMaterialContent" should {
 
     class update extends testScope {
-      mockHooks.updateContent(any[String], any[String], any[String], any[String])(any[RequestHeader]) returns Future(Right(Json.obj()))
+      mockHooks.updateContent(any[String], any[String], any[String], any[String])(any[RequestHeader]) returns Future.successful(Right(Json.obj()))
     }
 
     "fail if the body isn't text" in new update {
@@ -224,8 +224,9 @@ class CoreSupportingMaterialsTest
     }
 
     "returns hooks error" in new update {
-      mockHooks.updateContent(any[String], any[String], any[String], any[String])(any[RequestHeader]) returns Future(Left(1, "error"))
+      mockHooks.updateContent(any[String], any[String], any[String], any[String])(any[RequestHeader]) returns Future.successful(Left(1, "error"))
       val result = updateSupportingMaterialContent("id", "materialName", "filename")(FakeRequest("", "", FakeHeaders(), AnyContentAsText("hi"))) //must beError(Errors.notText)
+      println(contentAsString(result))
       status(result) === 1
       contentAsString(result) === "error"
     }
