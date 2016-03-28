@@ -6,17 +6,17 @@ import org.corespring.container.client.hooks.CatalogHooks
 import org.corespring.container.client.integration.ContainerExecutionContext
 import org.corespring.container.client.pages.CatalogRenderer
 import play.api.Mode.Mode
-import play.api.mvc.{Action, AnyContent, Controller}
-import play.api.{Logger, Mode}
+import play.api.mvc.{ Action, AnyContent, Controller }
+import play.api.{ Logger, Mode }
 
 import scala.concurrent.Future
 
 class Catalog(
-               mode: Mode,
-               val hooks: CatalogHooks,
-               catalogRenderer: CatalogRenderer,
-               bundler: ComponentBundler,
-               val containerContext: ContainerExecutionContext)
+  mode: Mode,
+  val hooks: CatalogHooks,
+  catalogRenderer: CatalogRenderer,
+  bundler: ComponentBundler,
+  val containerContext: ContainerExecutionContext)
   extends Controller
   with GetAsset[CatalogHooks]
   with QueryStringHelper {
@@ -30,15 +30,13 @@ class Catalog(
       val prodMode = request.getQueryString("mode").map(_ == "prod").getOrElse(mode == Mode.Prod)
       val serviceParams = mkQueryParams(mapToJson)
       val colors = (serviceParams \ "colors").asOpt[String]
-      println("Colors: " + colors)
 
       hooks.showCatalog(id).flatMap { err =>
         err match {
           case Some((code, msg)) => {
             val showErrorInUi = !prodMode
             Future.successful(
-              Status((code))(org.corespring.container.client.views.html.error.main(code, msg, showErrorInUi))
-            )
+              Status((code))(org.corespring.container.client.views.html.error.main(code, msg, showErrorInUi)))
           }
           case _ => {
             bundler.bundleAll("catalog", Some("editor"), !prodMode, colors) match {

@@ -5,7 +5,7 @@ import org.corespring.container.client.views.txt.js.{ ComponentServerWrapper, Co
 import org.corespring.container.components.model._
 import org.corespring.container.components.model.packaging.ClientSideDependency
 import org.corespring.container.components.services.ComponentTypeFilter
-import play.api.libs.json.{Json, JsValue, JsObject}
+import play.api.libs.json.{ Json, JsValue, JsObject }
 import org.apache.commons.io.IOUtils
 
 object SourceGenerator {
@@ -127,7 +127,6 @@ abstract class BaseGenerator
       case Some(cols) => cols.map { case (a, b) => s"@$a: $b;" }.mkString("\n")
       case _ => ""
     }
-    println(dynamicColors)
     s"""
        |$commonLess
        |$dynamicColors
