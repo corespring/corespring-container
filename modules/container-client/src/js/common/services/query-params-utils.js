@@ -5,6 +5,10 @@ angular.module('corespring-common.services')
     function(QUERY_PARAMS) {
 
       function QueryParamUtils() {
+        this.getQueryParams = function() {
+          return QUERY_PARAMS;
+        };
+
         this.addQueryParams = function(path) {
           path = path || '';
           path = path.indexOf('?') === -1 ? path : path.split('?')[0];

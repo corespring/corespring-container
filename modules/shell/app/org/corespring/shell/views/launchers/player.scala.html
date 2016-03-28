@@ -1,140 +1,146 @@
-@(js:String, opts : play.api.libs.json.JsValue)
+@(js: String, opts: play.api.libs.json.JsValue)
 <html>
-<head>
-  <meta http-equiv="X-UA-Compatible" content="IE=edge;" />
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge;" />
 
-  <style>
+    <style>
     .holder {
       border: 1px dashed grey;
       overflow: scroll;
     }
+
     .corespring-player-body {
       border: 1px dashed red;
     }
+
     .colors {
       display: none;
     }
-  </style>
-</head>
-<body>
+    </style>
+  </head>
+  <body>
 
-<!-- while we support ie8 we must use jquery 1.x -->
-<script type="text/javascript" src="/client/components/console-polyfill/index.js"></script>
-<!-- [if lte IE 9]> -->
-<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-<!-- [endif] -->
+      <!-- while we support ie8 we must use jquery 1.x -->
+    <script type="text/javascript" src="/client/components/console-polyfill/index.js"></script>
+      <!-- [if lte IE 9]> -->
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+      <!-- [endif] -->
 
-<script type="text/javascript" src="//code.jquery.com/jquery-1.11.3.min.js"></script>
-<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/lodash.js/3.5.0/lodash.min.js"></script>
+    <script type="text/javascript" src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/lodash.js/3.5.0/lodash.min.js"></script>
 
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectrum/1.7.1/spectrum.min.css">
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/spectrum/1.7.1/spectrum.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectrum/1.7.1/spectrum.min.css">
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/spectrum/1.7.1/spectrum.min.js"></script>
 
-  <script type="text/javascript" src="@js"></script>
-<script>
+    <script type="text/javascript" src="@js"></script>
+    <script>
 
-     $(document).ready(function(){
-       var playerHolderWidth = 600;
-       var holder = $('.holder');
-       var opts = @{Html(play.api.libs.json.Json.stringify(opts))};
+      $(document).ready(function() {
+        var playerHolderWidth = 600;
+        var holder = $('.holder');
+        var opts = @{Html(play.api.libs.json.Json.stringify(opts))};
 
-       console.log('opts: ', opts);
+        console.log('opts: ', opts);
 
-       opts.onPlayerRendered = function(){
-         console.log('onPlayerRendered', arguments);
-       };
+        opts.onPlayerRendered = function() {
+          console.log('onPlayerRendered', arguments);
+        };
 
-       var player;
+        var player;
 
-       function addPlayer() {
-         if (player) {
-           player.remove();
-         }
-         var playerWidth = $('#player-width-input').val();
-         opts.width = playerWidth.length > 0 ? playerWidth+'px' : undefined;
-         var colors = ['correct-color','incorrect-color','partial-color','warning-color','error-color','info-color'];
-         opts.customColors = {};
-         for (var i=0; i<colors.length; i++) {
-           var v = $('.'+colors[i]).val();
-           opts.customColors[colors[i]] = (v && v.length > 0) ? v : undefined;
-         }
-         player = new org.corespring.players.ItemPlayer(holder, opts, function(err){
+        function addPlayer() {
+          if (player) {
+            player.remove();
+          }
+          var playerWidth = $('#player-width-input').val();
+          opts.width = playerWidth.length > 0 ? playerWidth + 'px' : undefined;
+          var colors = ['correct-color', 'incorrect-color', 'partial-color', 'warning-color', 'error-color', 'info-color'];
+          opts.customVariables = {colors: {}, iconSet: 'check'};
+          for (var i = 0; i < colors.length; i++) {
+            var v = $('.' + colors[i]).val();
+            opts.customVariables.colors[colors[i]] = (v && v.length > 0) ? v : undefined;
+          }
+          opts.customVariables.iconSet = $('input[name=iconset]:checked').val() || 'check';
+          player = new org.corespring.players.ItemPlayer(holder, opts, function(err) {
             console.warn(err);
-         });
-       }
+          });
+        }
 
-       addPlayer();
+        addPlayer();
 
-       $('#colors-toggle').click(function(){
-         var div = $('.colors');
-         if (div.is(':visible')) {
-           div.hide();
-         } else {
-           div.show();
-         }
-       });
-
-
-       $('#set-mode-evaluate').click(function(){
-        player.setMode('evaluate', function(err){
-          console.log(err);
+        $('#colors-toggle').click(function() {
+          var div = $('.colors');
+          if (div.is(':visible')) {
+            div.hide();
+          } else {
+            div.show();
+          }
         });
-       });
 
-       $('#set-mode-instructor').click(function(){
-        player.setMode('instructor', function(err){
-          console.log(err);
+
+        $('#set-mode-evaluate').click(function() {
+          player.setMode('evaluate', function(err) {
+            console.log(err);
+          });
         });
-       });
 
-       $('#player-container-width-input').change(function(){
-         $('.holder').css('width', $('#player-container-width-input').val()+"px");
-       });
+        $('#set-mode-instructor').click(function() {
+          player.setMode('instructor', function(err) {
+            console.log(err);
+          });
+        });
 
-      $('.color-input').spectrum({
+        $('#player-container-width-input').change(function() {
+          $('.holder').css('width', $('#player-container-width-input').val() + "px");
+        });
+
+        $('.color-input').spectrum({
           allowEmpty: true,
           showInput: true
-       });
-       $('.color-input').change(function(){
-         addPlayer();
-       });
+        });
+        $('.color-input, #player-width-input, input[type=radio][name=iconset]').change(function() {
+          addPlayer();
+        });
 
-       $('#player-width-input').change(function(){
-         addPlayer();
-       });
+        $('#player-container-width-input').val(playerHolderWidth);
+        $('.holder').css('width', playerHolderWidth + "px");
 
-       $('#player-container-width-input').val(playerHolderWidth);
-       $('.holder').css('width', playerHolderWidth+"px");
-
-     });
+      });
     </script>
 
-  <button class="button" id="set-mode-evaluate">evaluate</button>
-  <button class="button" id="set-mode-instructor">instructor</button>
-  Container width: <input type="text" id="player-container-width-input" style="width:100px;"/>
-  Player width: <input type="text" id="player-width-input" style="width:100px;"/>
-  <button class="button" id="colors-toggle">colors</button>
-  <br/>
-  <table class="colors">
-    <tr>
-      <td>Correct</td>
-      <td>Incorrect</td>
-      <td>Partial</td>
-      <td>Warning</td>
-      <td>Error</td>
-      <td>Info</td>
-    </tr>
-    <tr>
-      <td><input placeholder="default" class="color-input correct-color"  type="text"></td>
-      <td><input placeholder="default" class="color-input incorrect-color" type="text"></td>
-      <td><input placeholder="default" class="color-input partial-color" type="text"></td>
-      <td><input placeholder="default" class="color-input warning-color" type="text"></td>
-      <td><input placeholder="default" class="color-input error-color" type="text"></td>
-      <td><input placeholder="default" class="color-input info-color" type="text"></td>
-    </tr>
-  </table>
+    <button class="button" id="set-mode-evaluate">evaluate</button>
+    <button class="button" id="set-mode-instructor">instructor</button>
+    Container width: <input type="text" id="player-container-width-input" style="width : 100px ;"/>
+    Player width: <input type="text" id="player-width-input" style="width : 100px ;"/>
+    <button class="button" id="colors-toggle">colors</button>
+    <label>
+      <input value="check" name="iconset" type="radio" checked>Check
+    </label>
+    <label>
+      <input value="emoji" name="iconset" type="radio">Emoji
+    </label>
+
+    <br/>
+    <table class="colors">
+      <tr>
+        <td>Correct</td>
+        <td>Incorrect</td>
+        <td>Partial</td>
+        <td>Warning</td>
+        <td>Error</td>
+        <td>Info</td>
+      </tr>
+      <tr>
+        <td><input placeholder="default" class="color-input correct-color" type="text"></td>
+        <td><input placeholder="default" class="color-input incorrect-color" type="text"></td>
+        <td><input placeholder="default" class="color-input partial-color" type="text"></td>
+        <td><input placeholder="default" class="color-input warning-color" type="text"></td>
+        <td><input placeholder="default" class="color-input error-color" type="text"></td>
+        <td><input placeholder="default" class="color-input info-color" type="text"></td>
+      </tr>
+    </table>
 
 
-  <div class="holder"></div>
-</body>
+    <div class="holder"></div>
+  </body>
 </html>

@@ -132,6 +132,14 @@ angular.module('corespring-player.services')
         _.forIn(bridges, fn('setResponse', outcomes));
       };
 
+      this.setPlayerSkin = function(playerSkin) {
+        _.forIn(bridges, function(b){
+          if(b.setPlayerSkin){
+            b.setPlayerSkin(playerSkin);
+          }
+        });
+      };
+
       this.setInstructorData = function(data) {
         _.forIn(bridges, fn('setInstructorData', data));
       };

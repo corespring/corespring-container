@@ -105,9 +105,6 @@ module.exports = (grunt) ->
       directives:
         files: ['<%= common.app %>/**/*.jade']
         tasks: ['directive-templates']
-      components:
-        files: ['<%= common.components %>/**/*.less']
-        tasks: ['component-less']
 
     copy:
       less: copyConfig('less')
