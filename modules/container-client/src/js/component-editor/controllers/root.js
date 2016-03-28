@@ -48,6 +48,7 @@ angular.module('corespring-singleComponentEditor.controllers')
 
       $scope.playerMode = 'gather';
 
+      $scope.showPromptInput = false; 
       /**
        * A key for use in the item model.
        */

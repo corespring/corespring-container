@@ -18,13 +18,9 @@ block extra-css
 block content
 
   mixin prompt
-    .panel.prompt-panel
-      .panel-heading
-        h4.panel-title
-          a(ng-click="showPromptInput = !showPromptInput")
-            | Prompt
-      .panel-body(collapse="!showPromptInput")
-        .prompt(prompt-input="", prompt="data.prompt")
+    span.prompt-holder
+      toggle-button(checked="showPromptInput")
+      .prompt(ng-show="showPromptInput", prompt-input="", prompt="data.prompt")
 
   mixin preview
     .item-preview-wrapper(ng-controller="ClientSidePreview")

@@ -16,6 +16,7 @@ editorSrcs = [
   'bower_components/corespring-checkbox/src/directive.js',
   'bower_components/corespring-radio/src/directive.js',
   'bower_components/jquery.browser/dist/jquery.browser(.min).js',
+  'bower_components/bootstrap-switch/dist/js/bootstrap-switch(.min).js',
   'bower_components/select2/select2(.min).js',
   'bower_components/undo.js/undo.js',
   'bower_components/wiggi-wiz/dist/wiggi-wiz.js',
@@ -47,6 +48,7 @@ exports.css =
     'bower_components/components-font-awesome/css/font-awesome.min.css',
     'bower_components/corespring-math-input/dist/corespring-math-input.css',
     'bower_components/mathquill/build/mathquill.css'
+    'bower_components/bootstrap-switch/dist/css/bootstrap3/bootstrap-switch(.min).css'
   ])
   report: "#{baseName}-css-report.json"
 
