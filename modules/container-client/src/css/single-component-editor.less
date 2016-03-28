@@ -87,16 +87,21 @@ body {
   padding-left: 10px;
 }
 
-.prompt-panel{
-  @col: lighten(@cs-grey, 40%);
-  border: solid 2px @col;
-  background-color: @col;
-  .panel-body {
-    background-color: white;
-    padding: 0;
-    .prompt{
-      padding: 10px;
-    }
+.prompt-holder{
+  width: 100%;
+
+  .stem{
+    font-size: 12px;
+    font-weight: normal;
+  }
+
+  .button-holder{
+    width: 60px;
+    vertical-align: top;
+    padding-left: 2px;
+  }
+  .input-holder{
+    vertical-align: top;
   }
 }
 

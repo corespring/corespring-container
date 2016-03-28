@@ -49,6 +49,22 @@ angular.module('corespring-singleComponentEditor.controllers')
       $scope.playerMode = 'gather';
 
       $scope.showPromptInput = false; 
+
+      var stashedPrompt;
+
+      $scope.$watch('showPromptInput', function(show){
+        if(show === undefined){
+          return;
+        }
+
+        if(!show){
+          stashedPrompt = $scope.data.prompt;
+          $scope.data.prompt = '';
+        } else {
+          $scope.data.prompt = stashedPrompt;
+          stashedPrompt = '';
+        }
+      });
       /**
        * A key for use in the item model.
        */
@@ -136,6 +152,7 @@ angular.module('corespring-singleComponentEditor.controllers')
             done(err);
           } else {
             $scope.data.prompt = prompt;
+            $scope.showPromptInput = true;
             configPanel.setModel($scope.item.components[componentKey]);
             ComponentData.updateComponent(componentKey, $scope.item.components[componentKey]);
             done(null);

@@ -18,9 +18,14 @@ block extra-css
 block content
 
   mixin prompt
-    span.prompt-holder
-      toggle-button(checked="showPromptInput")
-      .prompt(ng-show="showPromptInput", prompt-input="", prompt="data.prompt")
+    table.prompt-holder
+      tr
+        td.button-holder
+          toggle-button(ng-model="showPromptInput")
+          br/
+          label.stem Stem
+        td.input-holder
+          .prompt(prompt-input="", ng-show="showPromptInput", prompt="data.prompt")
 
   mixin preview
     .item-preview-wrapper(ng-controller="ClientSidePreview")
