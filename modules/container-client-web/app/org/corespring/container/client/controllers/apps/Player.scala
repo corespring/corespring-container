@@ -10,9 +10,10 @@ import org.corespring.container.components.services.ComponentService
 import play.api.Mode
 import play.api.Mode.Mode
 import play.api.http.ContentTypes
-import play.api.libs.json.{ JsObject, JsValue }
+import play.api.libs.json.{ JsObject, JsValue, Json }
 import play.api.mvc._
 import play.api.templates.Html
+import javax.xml.bind.DatatypeConverter
 
 import scala.concurrent.Future
 
@@ -24,23 +25,40 @@ class Player(mode: Mode,
   val hooks: PlayerHooks)
   extends Controller
   with GetAsset[PlayerHooks]
-  with QueryStringHelper{
+  with QueryStringHelper {
 
   private def handleSuccess[D](fn: (D) => Future[SimpleResult])(e: Either[StatusMessage, D]): Future[SimpleResult] = e match {
     case Left((code, msg)) => Future { Status(code)(msg) }
     case Right(s) => fn(s)
   }
 
-  private def createPlayerHtml(sessionId: String, session: JsValue, item: JsValue)(implicit r: RequestHeader): Either[String, Future[Html]] = {
+  private def calculateColorToken(queryParams: JsObject, defaults: JsValue) = {
+    val colorsParam = (queryParams \ "colors").asOpt[String]
+    val defaultColors = (defaults \ "colors").asOpt[JsObject].getOrElse(Json.obj())
+    val colorsJson = colorsParam match {
+      case Some(colorsString) => (Json.parse(DatatypeConverter.parseBase64Binary(colorsString)) \ "colors").asOpt[JsObject].getOrElse(Json.obj())
+      case None => Json.obj()
+    }
+    val computedColors = Json.obj("colors" -> (defaultColors ++ colorsJson))
+    DatatypeConverter.printBase64Binary(computedColors.toString.getBytes)
+  }
+
+  private def calculateIconSet(queryParams: JsObject, defaults: JsValue) = {
+    val iconsetParam = (queryParams \ "iconSet").asOpt[String]
+    val defaultIconSet = (defaults \ "iconSet").asOpt[String]
+    iconsetParam.orElse(defaultIconSet).getOrElse("check")
+  }
+
+  private def createPlayerHtml(sessionId: String, session: JsValue, item: JsValue, defaults: JsValue)(implicit r: RequestHeader): Either[String, Future[Html]] = {
 
     val ids = ItemComponentTypes(componentService, item).map(_.id)
 
     val prodMode = r.getQueryString("mode").map(_ == "prod").getOrElse(mode == Mode.Prod)
     val queryParams = mkQueryParams(mapToJson)
-    val colors = (queryParams \ "colors").asOpt[String]
-    val iconSet = (queryParams \ "iconSet").asOpt[String]
+    val encodedComputedColors = calculateColorToken(queryParams, defaults)
+    val computedIconSet = calculateIconSet(queryParams, defaults)
 
-    bundler.bundle(ids, "player", Some("player"), !prodMode, colors) match {
+    bundler.bundle(ids, "player", Some("player"), !prodMode, Some(encodedComputedColors)) match {
       case Some(b) => {
         val hasBeenArchived = hooks.archiveCollectionId == (session \ "collectionId")
         val showControls = r.getQueryString("showControls").map(_ == "true").getOrElse(false)
@@ -53,7 +71,7 @@ class Player(mode: Mode,
         }
 
         Right(
-          playerRenderer.render(sessionId, session, item, b, warnings, queryParams, prodMode, showControls))
+          playerRenderer.render(sessionId, session, item, b, warnings, queryParams, prodMode, showControls, computedIconSet))
       }
       case _ => Left(s"Failed to create a bundle for: $sessionId")
     }
@@ -62,9 +80,9 @@ class Player(mode: Mode,
   def load(sessionId: String) = Action.async { implicit request =>
     hooks.loadSessionAndItem(sessionId).flatMap {
       handleSuccess { (tuple) =>
-        val (session, item) = tuple
+        val (session, item, defaults) = tuple
         require((session \ "id").asOpt[String].isDefined, "The session model must specify an 'id'")
-        createPlayerHtml(sessionId, session, item) match {
+        createPlayerHtml(sessionId, session, item, defaults) match {
           case Left(e) => Future.successful(BadRequest(e))
           case Right(f) => f.map(Ok(_))
         }
@@ -72,13 +90,11 @@ class Player(mode: Mode,
     }
   }
 
-
-
   /**
-    * show a simple submit button
-    * showControls=true|false (default: false)
-    * - show simple player controls (for devs)
-    */
+   * show a simple submit button
+   * showControls=true|false (default: false)
+   * - show simple player controls (for devs)
+   */
   val showControls = "showControls"
 
   /**
@@ -89,9 +105,9 @@ class Player(mode: Mode,
   def createSessionForItem(itemId: String): Action[AnyContent] = Action.async { implicit request =>
     hooks.createSessionForItem(itemId).flatMap {
       handleSuccess { (tuple) =>
-        val (session, item) = tuple
+        val (session, item, defaults) = tuple
         require((session \ "id").asOpt[String].isDefined, "The session model must specify an 'id'")
-        createPlayerHtml((session \ "id").as[String], session, item) match {
+        createPlayerHtml((session \ "id").as[String], session, item, defaults) match {
           case Left(e) => Future.successful(BadRequest(e))
           case Right(f) => f.map { html =>
             lazy val call = org.corespring.container.client.controllers.apps.routes.Player.load((session \ "id").as[String])

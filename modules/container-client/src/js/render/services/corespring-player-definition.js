@@ -4,8 +4,8 @@ angular.module('corespring-player.services').factory('CorespringPlayerDefinition
   'MathJaxService',
   'PlayerUtils',
   'ComponentRegister',
-  'QueryParamUtils',
-  function($log, $compile, MathJaxService, PlayerUtils, ComponentRegister, QueryParamUtils) {
+  'PlayerSkin',
+  function($log, $compile, MathJaxService, PlayerUtils, ComponentRegister, PlayerSkin) {
 
     function CorespringPlayerDef(opts) {
 
@@ -88,9 +88,8 @@ angular.module('corespring-player.services').factory('CorespringPlayerDefinition
           var allData = PlayerUtils.zipDataAndSession($scope.item, $scope.session);
           ComponentRegister.setDataAndSession(allData);
 
-          var iconSet = QueryParamUtils.getQueryParams().iconSet;
-          if (iconSet) {
-            ComponentRegister.setPlayerSkin({iconSet: iconSet});
+          if (PlayerSkin.iconSet) {
+            ComponentRegister.setPlayerSkin({iconSet: PlayerSkin.iconSet});
           }
           rendered = true;
 

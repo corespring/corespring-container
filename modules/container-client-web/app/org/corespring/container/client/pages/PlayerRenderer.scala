@@ -61,7 +61,8 @@ class PlayerRenderer(
     warnings: Seq[String],
     queryParams: Map[String, String],
     prodMode: scala.Boolean,
-    showControls: scala.Boolean): Future[Html] = Future {
+    showControls: scala.Boolean,
+    iconSet: String): Future[Html] = Future {
     logger.info(s"function=render, bundle=$bundle")
 
     val (js, css) = prepareJsCss(prodMode, bundle)
@@ -93,6 +94,7 @@ class PlayerRenderer(
       "js" -> jsWithControls.toArray,
       "css" -> css.toArray,
       "showControls" -> javaBoolean(showControls),
+      "iconSet" -> iconSet,
       "useNewRelicRumConfig" -> javaBoolean(playerConfig.useNewRelic),
       "newRelicRumConfig" -> Json.stringify(newRelicRumConfig),
       "warnings" -> Json.stringify(Json.arr(warnings: _*)),
