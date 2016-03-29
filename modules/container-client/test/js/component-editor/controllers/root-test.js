@@ -73,24 +73,24 @@ describe('component-editor Root', function(){
     });
   });
 
-  describe('$watch(showPromptInput)', function(){
+  describe('$watch(state.showPromptInput)', function(){
 
     beforeEach(function(){
-      scope.showPromptInput = true;
+      scope.state.showPromptInput = true;
       scope.data.prompt = 'hi';
       scope.$digest();
     });
 
     it('sets the prompt to an empty string',function(){
-      scope.showPromptInput = false;
+      scope.state.showPromptInput = false;
       scope.$digest();
       expect(scope.data.prompt).toEqual('');
     });
 
     it('sets the prompt to an empty string',function(){
-      scope.showPromptInput = false;
+      scope.state.showPromptInput = false;
       scope.$digest();
-      scope.showPromptInput = true;
+      scope.state.showPromptInput = true;
       scope.$digest();
       expect(scope.data.prompt).toEqual('hi');
     });
@@ -131,6 +131,29 @@ describe('component-editor Root', function(){
         components: {}
       };
       expected.components[compKey] = 'hi';
+      expect(data).toEqual(expected);
+    });
+
+    it('does not include prompt if state.showPromptInput is false', function(){
+      scope.state.showPromptInput = false;
+      scope.$digest();
+      var data = scope.getData();
+      var expected = {
+        xhtml: scope.getXhtml(null),
+        components: jasmine.any(Object) 
+      };
+      expect(data).toEqual(expected);
+    });
+    
+    it('does not include prompt if state.showPromptInput is true', function(){
+      scope.state.showPromptInput = true;
+      scope.data.prompt = 'p';
+      scope.$digest();
+      var data = scope.getData();
+      var expected = {
+        xhtml: scope.getXhtml('p'),
+        components: jasmine.any(Object) 
+      };
       expect(data).toEqual(expected);
     });
   });

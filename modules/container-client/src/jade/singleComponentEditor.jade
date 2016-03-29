@@ -21,11 +21,11 @@ block content
     table.prompt-holder
       tr
         td.button-holder
-          toggle-button(ng-model="showPromptInput")
+          toggle-button(ng-model="state.showPromptInput")
           br/
           label.stem Stem
         td.input-holder
-          .prompt(prompt-input="", ng-show="showPromptInput", prompt="data.prompt")
+          .prompt(prompt-input="", ng-show="state.showPromptInput", prompt="data.prompt")
 
   mixin preview
     .item-preview-wrapper(ng-controller="ClientSidePreview")
@@ -39,15 +39,15 @@ block content
           player-outcomes="outcome")
 
         summary-feedback(
-          ng-model='item.summaryFeedback', 
+          ng-model='item.summaryFeedback',
           session-complete='session.isComplete')
       .row
         preview-player-control-panel(
-          data-mode='playerMode', 
-          data-settings='playerSettings', 
+          data-mode='playerMode',
+          data-settings='playerSettings',
           data-score="score")
 
-  | <!-- 
+  | <!--
   |  !{versionInfo}
   | -->
 
@@ -56,7 +56,7 @@ block content
     if previewMode == "preview-right"
 
       .preview-right(preview-on-right="", preview-width="!{previewWidth}")
-        
+
         .config-pane
           span.pane-header Configuration
           br/
@@ -64,21 +64,21 @@ block content
           hr/
           +prompt
           .configuration
-        
+
         .vertical-divider(lockfix)
 
         .preview-pane(
           lockfix,
-          ng-show="showPreview", 
-          ng-controller="ClientSidePreview") 
-          ul.nav.preview-nav 
+          ng-show="showPreview",
+          ng-controller="ClientSidePreview")
+          ul.nav.preview-nav
             span.pane-header Preview
             br/
-            span.pane-sub-header This is how the interaction will appear to students 
+            span.pane-sub-header This is how the interaction will appear to students
           hr/
           span(
-            simple-player-button="", 
-            class="player-btn-holder", 
+            simple-player-button="",
+            class="player-btn-holder",
             mode="playerMode",
             score="score")
           .player-container-holder
@@ -92,7 +92,7 @@ block content
                 player-outcomes="outcome")
 
               summary-feedback(
-                ng-model='item.summaryFeedback', 
+                ng-model='item.summaryFeedback',
                 session-complete='session.isComplete')
                 hr/
 
@@ -100,11 +100,11 @@ block content
       .tabbed(ng-controller="Tabbed")
 
         ul.nav.nav-tabs(ng-show="showNavigation")
-          li(role="presentation", 
+          li(role="presentation",
             ng-class="{active: activePane == 'config'}",
             ng-click="showPane('config')")
-            a(href="") Configuration 
-          li(role="presentation", 
+            a(href="") Configuration
+          li(role="presentation",
             ng-class="{active: activePane == 'preview'}",
             ng-click="showPane('preview')")
             a(href="") Preview
@@ -126,7 +126,7 @@ block content
           +preview
 
 
-   
+
 //After the angular module has been created.
 block after-main-script
 
@@ -136,7 +136,7 @@ block after-main-script
 
       var app = 'corespring-#{appName}';
 
-      var editorOptions = !{options}; 
+      var editorOptions = !{options};
 
       console.log(editorOptions);
       var uploadEndpoint = {
@@ -146,7 +146,7 @@ block after-main-script
 
       function setUpWiggiWiz(wiggiWizConfigProvider, UPLOAD_ENDPOINT){
         UPLOAD_ENDPOINT.method = UPLOAD_ENDPOINT.method || 'POST';
-        
+
         var config = {
           dialogLaunchMode: 'external',
           defaultImageService: {
@@ -157,15 +157,15 @@ block after-main-script
         if(UPLOAD_ENDPOINT.url && UPLOAD_ENDPOINT.method){
           config.imageService = 'ExternalEndpointsImageService';
         }
-        
+
         wiggiWizConfigProvider.add(config);
       }
 
       angular.module(app)
         //TODO: STATIC_PATHS isnt relevant to the component editor
-        .constant('STATIC_PATHS', editorOptions.staticPaths || {}) 
+        .constant('STATIC_PATHS', editorOptions.staticPaths || {})
         //TODO:  DEBOUNCE_IN_MILLIS isnt relevant to the component editor
-        .constant('DEBOUNCE_IN_MILLIS', editorOptions.debounceInMillis || 0 ) 
+        .constant('DEBOUNCE_IN_MILLIS', editorOptions.debounceInMillis || 0 )
         .constant('UPLOAD_ENDPOINT', uploadEndpoint)
         .constant('SINGLE_COMPONENT_KEY', editorOptions.singleComponentKey)
         .config(['wiggiWizConfigProvider', 'UPLOAD_ENDPOINT', setUpWiggiWiz]);

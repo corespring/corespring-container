@@ -48,11 +48,13 @@ angular.module('corespring-singleComponentEditor.controllers')
 
       $scope.playerMode = 'gather';
 
-      $scope.showPromptInput = false;
+      $scope.state = {
+        showPromptInput:  false
+      };
 
       var stashedPrompt;
 
-      $scope.$watch('showPromptInput', function(show){
+      $scope.$watch('state.showPromptInput', function(show){
         if(show === undefined){
           return;
         }
@@ -151,7 +153,7 @@ angular.module('corespring-singleComponentEditor.controllers')
           if(err){
             done(err);
           } else {
-            $scope.showPromptInput = true;
+            $scope.state.showPromptInput = true;
             $scope.data.prompt = prompt;
             configPanel.setModel($scope.item.components[componentKey]);
             ComponentData.updateComponent(componentKey, $scope.item.components[componentKey]);
@@ -249,8 +251,10 @@ angular.module('corespring-singleComponentEditor.controllers')
 
           if(data.xhtml){
             readPrompt(data.xhtml, function(err, prompt){
-              $scope.showPromptInput = true;
-              $scope.data.prompt = prompt;
+              if(!err){
+                $scope.state.showPromptInput = true;
+                $scope.data.prompt = prompt;
+              }
             });
             initialData.xhtml = data.xhtml;
           }
