@@ -15,7 +15,7 @@ angular.module('corespring-singleComponentEditor.controllers')
     'EditorDialogTemplate',
     'COMPONENT_EDITOR',
     'WIGGI_EVENTS',
-    'SINGLE_COMPONENT_KEY',    
+    'SINGLE_COMPONENT_KEY',
     function(
       $scope,
       $timeout,
@@ -24,14 +24,14 @@ angular.module('corespring-singleComponentEditor.controllers')
       $document,
       LogFactory,
       iFrameService,
-      Msgr, 
+      Msgr,
       DesignerService,
       ComponentDefaultData,
       ComponentData,
       WiggiDialogLauncher,
       EditorDialogTemplate,
       COMPONENT_EDITOR,
-      WIGGI_EVENTS, 
+      WIGGI_EVENTS,
       SINGLE_COMPONENT_KEY) {
 
       "use strict";
@@ -41,14 +41,14 @@ angular.module('corespring-singleComponentEditor.controllers')
       var logger = LogFactory.getLogger('root-controller');
 
       var configPanel;
-      
+
       $scope.dimensionUpdate = function(a) {
         $document.trigger('lockfixed:pageupdate');
       };
 
       $scope.playerMode = 'gather';
 
-      $scope.showPromptInput = false; 
+      $scope.showPromptInput = false;
 
       var stashedPrompt;
 
@@ -58,10 +58,10 @@ angular.module('corespring-singleComponentEditor.controllers')
         }
 
         if(!show){
-          stashedPrompt = $scope.data.prompt;
-          $scope.data.prompt = '';
+          stashedPrompt = $scope.data.prompt ? $scope.data.prompt : null;
+          $scope.data.prompt = $scope.data.prompt ? '' : $scope.data.prompt;
         } else {
-          $scope.data.prompt = stashedPrompt;
+          $scope.data.prompt = stashedPrompt ? stashedPrompt : $scope.data.prompt;
           stashedPrompt = '';
         }
       });
@@ -104,10 +104,10 @@ angular.module('corespring-singleComponentEditor.controllers')
 
       $scope.closeError = function(){
         $scope.saveError = null;
-      }; 
+      };
 
       $scope.getData = function(){
-        var out = { 
+        var out = {
           components: {}
         };
 
@@ -123,7 +123,7 @@ angular.module('corespring-singleComponentEditor.controllers')
       function readPrompt(xhtml, done){
         try {
           var parser = new DOMParser();
-          var doc = parser.parseFromString(xhtml, 'text/html'); 
+          var doc = parser.parseFromString(xhtml, 'text/html');
           var promptNode = doc.querySelector('prompt');
           var out = promptNode ? promptNode.innerHTML : undefined;
           if(!out){
@@ -151,8 +151,8 @@ angular.module('corespring-singleComponentEditor.controllers')
           if(err){
             done(err);
           } else {
-            $scope.data.prompt = prompt;
             $scope.showPromptInput = true;
+            $scope.data.prompt = prompt;
             configPanel.setModel($scope.item.components[componentKey]);
             ComponentData.updateComponent(componentKey, $scope.item.components[componentKey]);
             done(null);
@@ -165,7 +165,7 @@ angular.module('corespring-singleComponentEditor.controllers')
         configPanel = configPanelBridge;
         configPanel.setModel($scope.item.components[componentKey]);
         ComponentData.setModel($scope.item.components);
-        $timeout(function(){ 
+        $timeout(function(){
           ComponentData.setModel($scope.item.components);
         });
       });
@@ -192,7 +192,7 @@ angular.module('corespring-singleComponentEditor.controllers')
         DesignerService.loadAvailableUiComponents(function(data){
           _.forEach(data.interactions, storeDefaultData);
         });
-  
+
 
         function initMsgrListeners(){
           Msgr.on('getData', function(err, done){
@@ -213,19 +213,19 @@ angular.module('corespring-singleComponentEditor.controllers')
             $scope.item = $scope.getData();
             $scope.$broadcast('showPreview', show);
           });
-          
-          //Tabs mode 
+
+          //Tabs mode
           Msgr.on('showPane', function(pane){
             $scope.item = $scope.getData();
             $scope.$broadcast('showPane', pane);
           });
-          
+
           Msgr.on('showNavigation', function(show){
             $scope.$broadcast('showNavigation', show);
           });
 
           Msgr.send('rendered');
-        }        
+        }
 
         if (iFrameService.isInIFrame() && !iFrameService.bypassIframeLaunchMechanism()) {
           Msgr.on('initialise', function(data){
@@ -241,25 +241,26 @@ angular.module('corespring-singleComponentEditor.controllers')
 
         function onInitialise(data) {
           logger.log('on initialise', data);
-         
-          var initialData = { 
-            xhtml: getXhtml($scope.data.prompt), 
-            components: {} 
+
+          var initialData = {
+            xhtml: getXhtml($scope.data.prompt),
+            components: {}
           };
 
           if(data.xhtml){
             readPrompt(data.xhtml, function(err, prompt){
+              $scope.showPromptInput = true;
               $scope.data.prompt = prompt;
             });
             initialData.xhtml = data.xhtml;
-          } 
+          }
 
           var defaultData = ComponentDefaultData.getDefaultData(COMPONENT_EDITOR.componentType);
 
           initialData.components = {};
 
           initialData.components[componentKey] = data.componentModel ? data.componentModel : defaultData;
-          
+
           $scope.showNavigation = data.showNavigation === true ? true : false;
           $scope.item = angular.copy(initialData);
 
@@ -269,11 +270,11 @@ angular.module('corespring-singleComponentEditor.controllers')
             '</div>'].join('\n');
 
           $('.configuration').html(html);
-          
+
           $compile($('.configuration'))($scope.$new());
 
           $timeout(function() {
-            $scope.$digest(); 
+            $scope.$digest();
           });
         }
       }

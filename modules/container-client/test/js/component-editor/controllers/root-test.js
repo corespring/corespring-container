@@ -3,13 +3,13 @@ describe('component-editor Root', function(){
   beforeEach(angular.mock.module('wiggi-wiz.constants'));
   beforeEach(angular.mock.module('corespring-singleComponentEditor.controllers'));
 
-  var scope, 
-    rootScope, 
-    controller, 
-    Msgr, 
-    iFrameService, 
-    debounce, 
-    compKey, 
+  var scope,
+    rootScope,
+    controller,
+    Msgr,
+    iFrameService,
+    debounce,
+    compKey,
     componentData,
     wiggiEvents,
     dialogLauncher;
@@ -17,12 +17,12 @@ describe('component-editor Root', function(){
   beforeEach(module(function($provide) {
 
     var mocks = org.corespring.mocks.editor;
-    
+
     debounce = jasmine.createSpy('debounce').and.callFake(function(wait, fn){
       return fn;
-    });  
+    });
 
-    iFrameService=  mocks.iFrameService();
+    iFrameService =  mocks.iFrameService();
     componentData = mocks.ComponentData();
     compKey = 'compKey';
     Msgr = mocks.Msgr();
@@ -65,11 +65,34 @@ describe('component-editor Root', function(){
     it('calls dialogLauncher.launch', function(){
       expect(dialogLauncher.launch)
         .toHaveBeenCalledWith(
-          {}, 
+          {},
           jasmine.any(String),
           jasmine.any(Function),
           {},
           {});
+    });
+  });
+
+  describe('$watch(showPromptInput)', function(){
+
+    beforeEach(function(){
+      scope.showPromptInput = true;
+      scope.data.prompt = 'hi';
+      scope.$digest();
+    });
+
+    it('sets the prompt to an empty string',function(){
+      scope.showPromptInput = false;
+      scope.$digest();
+      expect(scope.data.prompt).toEqual('');
+    });
+
+    it('sets the prompt to an empty string',function(){
+      scope.showPromptInput = false;
+      scope.$digest();
+      scope.showPromptInput = true;
+      scope.$digest();
+      expect(scope.data.prompt).toEqual('hi');
     });
   });
 
@@ -91,7 +114,7 @@ describe('component-editor Root', function(){
     var configPanel;
 
     beforeEach(function(){
-      
+
       configPanel = {
         getModel: jasmine.createSpy('getModel').and.returnValue('hi'),
         setModel: jasmine.createSpy('setModel')
@@ -111,10 +134,10 @@ describe('component-editor Root', function(){
       expect(data).toEqual(expected);
     });
   });
-  
+
   describe('setData', function(){
-   
-    var done, data; 
+
+    var done, data;
 
     beforeEach(function(){
       done = jasmine.createSpy('done');
@@ -125,12 +148,12 @@ describe('component-editor Root', function(){
 
     describe('with correct data', function(){
       beforeEach(function(){
-        
+
         data = {
           xhtml: '<div><prompt>I\'m a prompt</prompt><div componentType="" id="'+ compKey + '"</div>',
           components: {
             compKey: {
-              componentType: 'componentType'  
+              componentType: 'componentType'
             }
           }
         };
@@ -147,7 +170,7 @@ describe('component-editor Root', function(){
       it('calls configPanel.setModel', function(){
         expect(configPanel.setModel).toHaveBeenCalledWith({componentType: 'componentType'});
       });
-      
+
       it('calls ComponentData.updateComponent', function(){
         expect(componentData.updateComponent)
           .toHaveBeenCalledWith(compKey, {componentType: 'componentType'});
@@ -156,17 +179,17 @@ describe('component-editor Root', function(){
       it('calls done with no error', function(){
         expect(done).toHaveBeenCalledWith(null);
       });
-    }); 
+    });
 
     describe('with incorrect data', function(){
-      
+
       beforeEach(function(){
-        
+
         data = {
           xhtml: '<div><h1>I\'m a prompt</h1><div componentType="" id="'+ compKey + '"</div>',
           components: {
             compKey: {
-              componentType: 'componentType'  
+              componentType: 'componentType'
             }
           }
         };
@@ -183,7 +206,7 @@ describe('component-editor Root', function(){
       it('does not call configPanel.setModel', function(){
         expect(configPanel.setModel).not.toHaveBeenCalledWith({componentType: 'componentType'});
       });
-      
+
       it('does not call ComponentData.updateComponent', function(){
         expect(componentData.updateComponent)
           .not.toHaveBeenCalledWith(compKey, {componentType: 'componentType'});
@@ -201,7 +224,7 @@ describe('component-editor Root', function(){
       iFrameService.isInIFrame.and.returnValue(true);
       iFrameService.bypassIframeLaunchMechanism.and.returnValue(false);
     });
-    
+
     describe('custom initialisation', function(){
 
       var data;
@@ -209,7 +232,7 @@ describe('component-editor Root', function(){
         data = {
           xhtml: '<div><prompt>custom</prompt><div componentType="" id="' + compKey + '"></div></div>',
           components: {
-            compKey: { 
+            compKey: {
               componentType: 'componentType'
             }
           }
@@ -223,12 +246,12 @@ describe('component-editor Root', function(){
 
         controller('Root', {$scope: scope});
         scope.$digest();
-      }); 
+      });
 
       it('sets the prompt', function(){
         expect(scope.data.prompt).toEqual('custom');
       });
-      
+
       it('sets the xhtml', function(){
         expect(scope.item.xhtml).toEqual(scope.getXhtml('custom'));
       });
@@ -245,7 +268,7 @@ describe('component-editor Root', function(){
           }
         });
       });
-      
+
       function assertMsgrOn(key, fnMatcher){
         fnMatcher = fnMatcher || jasmine.any(Function);
         it('calls Msgr.on(' + key +')', function(){
