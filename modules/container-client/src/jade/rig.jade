@@ -8,7 +8,7 @@ block content
       ul.nav.navbar-nav
         li
           a(ng-click='updatePreview()') Update Preview (Ctrl+S)
-      p.player-rendered(ng-show="isPlayerRendered") Player Rendered
+      p.player-rendered(ng-if="isPlayerRendered") Player Rendered
 
     .flex-box.main-pane
       div(ui-ace,
