@@ -5,11 +5,15 @@ import java.io.StringReader
 import org.htmlcleaner._
 import org.xml.sax.InputSource
 
-object XhtmlProcessor {
+trait XhtmlProcessor {
+  def toWellFormedXhtml(html: String, wrapperTag: String = "div"): String
+}
 
-  def process(transformations:Seq[TagTransformation],
-               postProcessors : Seq[TagNode => Unit],
-               xhtml:String) : String = {
+object XhtmlProcessor extends XhtmlProcessor {
+
+  def process(transformations: Seq[TagTransformation],
+    postProcessors: Seq[TagNode => Unit],
+    xhtml: String): String = {
 
     val cleaner: HtmlCleaner = getCleaner
     val transformationHolder: CleanerTransformations = new CleanerTransformations()
@@ -23,6 +27,7 @@ object XhtmlProcessor {
   /**
    * Returns wellformed xhtml aka it is parseable by an xml parser
    * Makes minimal changes and only wraps the content if it needs to
+   *
    * @param html
    * @param wrapperTag
    * @return
@@ -32,7 +37,7 @@ object XhtmlProcessor {
     val n: TagNode = cleaner.clean(html)
     val out = serialize(n, cleaner)
 
-    if(isValidXml(out)){
+    if (isValidXml(out)) {
       out
     } else {
       require(Seq("div", "span").contains(wrapperTag), s"You can only wrap in div or span - not: $wrapperTag")
@@ -40,11 +45,11 @@ object XhtmlProcessor {
     }
   }
 
-  def isValidXml(html:String) : Boolean = try{
+  def isValidXml(html: String): Boolean = try {
     scala.xml.XML.loadString(html)
     true
   } catch {
-    case e : Throwable => false
+    case e: Throwable => false
   }
 
   private def getCleaner = {
@@ -55,7 +60,7 @@ object XhtmlProcessor {
     cleaner
   }
 
-  private def serialize(n:TagNode, cleaner: HtmlCleaner) : String = {
+  private def serialize(n: TagNode, cleaner: HtmlCleaner): String = {
     val serializer = new SimpleHtmlSerializer(cleaner.getProperties)
     serializer.getAsString(n)
   }
@@ -367,7 +372,7 @@ object XhtmlProcessor {
       </tag>
       <tag name="script" content="all" section="all" deprecated="false" unique="false" ignore-permitted="false"/>
       <tag name="style" content="all" section="all" deprecated="false" unique="false" ignore-permitted="false"/>
-    <tag name="noscript" content="all" section="all" deprecated="false" unique="false" ignore-permitted="false"/>
+      <tag name="noscript" content="all" section="all" deprecated="false" unique="false" ignore-permitted="false"/>
       <tag name="b" content="all" section="body" deprecated="false" unique="false" ignore-permitted="false">
         <close-inside-copy-after-tags>u,i,tt,sub,sup,big,small,strike,blink,s</close-inside-copy-after-tags>
       </tag>
@@ -441,6 +446,4 @@ object XhtmlProcessor {
     </tags>.toString)))
 
 }
-
-
 

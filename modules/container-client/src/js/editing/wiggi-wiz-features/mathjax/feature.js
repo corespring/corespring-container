@@ -21,7 +21,7 @@ angular.module('corespring-editing.wiggi-wiz-features.mathjax').factory('WiggiMa
         content = content.replace(/=\\\\"(.*?)\\\\"/gi,'=\\\'$1\\\'');
 
         var newNode = $([
-          '<div mathinput-holder="" show-remove-button="true">',
+          '<div mathinput-holder="" show-remove-button="true" class="mathinput-holder">',
           '<math-input parent-selector=".wiggi-wiz, .config-panel-body" show-code-button="true" fix-backslash="false" editable="true" keypad-auto-open="' + isNew + '" keypad-type="\'basic\'" ng-model="expr" code-model="code" expression="\'' + content + '\'"></math-input>',
           '</div>'
         ].join(''));

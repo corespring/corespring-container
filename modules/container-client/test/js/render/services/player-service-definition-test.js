@@ -6,20 +6,13 @@ describe('player-service-definition', function () {
 
   beforeEach(module(function ($provide) {
 
-    promise = {
-      success: function(onSuccess){
-        onSuccess();
-        return promise;
-      },
-      error: function(){}
-    };
 
-    http = {
-      get: jasmine.createSpy().and.returnValue(promise),
-      put: jasmine.createSpy().and.returnValue(promise),
-      delete: jasmine.createSpy().and.returnValue(promise),
-      post: jasmine.createSpy().and.returnValue(promise)
-    };
+    http = org.corespring.mocks.editor.$http();
+    //automatically succeed.
+    http.promise.success = jasmine.createSpy('success').and.callFake(function(onSuccess){
+      onSuccess();
+      return http.promise;
+    });
 
     queryParamUtils = org.corespring.mocks.editor.QueryParamUtils();
 

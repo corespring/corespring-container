@@ -93,6 +93,7 @@
       return promise;
     });
     constructor.prototype.promise = promise;
+    constructor.promise = promise;
     return constructor;
   };
 
@@ -159,6 +160,9 @@
           fn(newValue, oldValue);
         }
       };
+    });
+    this.debounce = jasmine.createSpy('debounce').and.callFake(function(fn){
+      return fn;
     });
   };
 
