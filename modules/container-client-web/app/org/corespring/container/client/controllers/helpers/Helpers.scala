@@ -1,12 +1,11 @@
 package org.corespring.container.client.controllers.helpers
 
-import org.corespring.container.client.VersionInfo
 import org.corespring.container.client.views.txt.js.ComponentWrapper
-import org.corespring.container.components.model.packaging.{ ClientDependencies, ClientSideDependency }
-import org.corespring.container.components.model.{ Component, Interaction }
+import org.corespring.container.components.model.packaging.{ClientDependencies, ClientSideDependency}
+import org.corespring.container.components.model.{Component, Interaction}
 import org.corespring.container.utils.string
 import play.api.libs.json._
-import play.api.mvc.{ Results, Result }
+import play.api.mvc.{Result, Results}
 
 trait NameHelper {
 

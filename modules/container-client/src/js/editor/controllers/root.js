@@ -3,38 +3,43 @@ angular.module('corespring-editor.controllers')
     '$scope',
     '$timeout',
     'ConfigurationService',
+    'editorDebounce',
     'EditorDialogTemplate',
     'iFrameService',
     'ItemService',
     'LogFactory',
+    'MetadataService',
     'Msgr',
     'WIGGI_EVENTS',
     'WiggiDialogLauncher',
-    'editorDebounce',
     function(
       $scope,
       $timeout,
       ConfigurationService,
+      editorDebounce,
       EditorDialogTemplate,
       iFrameService,
       ItemService,
       LogFactory,
+      MetadataService,
       Msgr,
       WIGGI_EVENTS,
-      WiggiDialogLauncher,
-      editorDebounce) {
+      WiggiDialogLauncher
+    ) {
 
       "use strict";
 
       var logger = LogFactory.getLogger('root-controller');
 
-      $scope.onItemLoadSuccess = onItemLoadSuccess;
       $scope.onItemLoadError = onItemLoadError;
+      $scope.onItemLoadSuccess = onItemLoadSuccess;
 
       $scope.$on(WIGGI_EVENTS.LAUNCH_DIALOG, onLaunchDialog);
       $scope.$on('itemChanged', onItemChanged);
 
       init();
+
+      //-------------------------------
 
       function saveAll(done){
         logger.debug('saveAll...');
@@ -65,6 +70,7 @@ angular.module('corespring-editor.controllers')
           ConfigurationService.setConfig({});
           ItemService.load($scope.onItemLoadSuccess, $scope.onItemLoadError);
         }
+
 
         function onInitialise(data) {
           logger.log('on initialise', data);
@@ -117,6 +123,9 @@ angular.module('corespring-editor.controllers')
         preprocessComponents(item);
         $scope.lastId = findLastId(item);
         $scope.$broadcast('itemLoaded', item);
+        MetadataService.get($scope.item.itemId).then(function(result) {
+          $scope.metadataSets = result;
+        });
       }
 
       function onItemLoadError(err) {

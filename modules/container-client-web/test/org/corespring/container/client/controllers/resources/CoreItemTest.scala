@@ -1,21 +1,22 @@
 package org.corespring.container.client.controllers.resources
 
-import org.corespring.container.client.hooks.{ SupportingMaterialHooks, CoreItemHooks }
+import org.corespring.container.client.controllers.helpers.{ ItemInspector, PlayerXhtml }
+import org.corespring.container.client.hooks.{ CoreItemHooks, SupportingMaterialHooks }
 import org.corespring.test.TestContext
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
 import play.api.http.HeaderNames
 import play.api.libs.json.{ JsObject, JsValue, Json }
-import play.api.mvc.{ AnyContent, Request, AnyContentAsJson }
-import play.api.test.{ FakeHeaders, FakeRequest }
+import play.api.mvc.{ AnyContent, AnyContentAsJson, Request, RequestHeader }
 import play.api.test.Helpers._
+import play.api.test.{ FakeHeaders, FakeRequest }
 
-import scala.concurrent.{ Future, ExecutionContext }
+import scala.concurrent.Future
 
 class CoreItemTest extends Specification with Mockito {
 
-  class scope extends Scope with CoreItem with TestContext{
+  class scope extends Scope with CoreItem with TestContext {
 
     override protected def componentTypes: Seq[String] = Seq.empty
 
@@ -31,10 +32,22 @@ class CoreItemTest extends Specification with Mockito {
       m
     }
 
+    override val itemInspector: ItemInspector = {
+      val m = mock[ItemInspector]
+      m.findComponentsNotInXhtml(any[String], any[JsObject]) returns Future.successful(Seq.empty)
+      m
+    }
+
     override def hooks: CoreItemHooks = mockHooks
 
     override def materialHooks: SupportingMaterialHooks = {
       val m = mock[SupportingMaterialHooks]
+      m
+    }
+
+    override def playerXhtml: PlayerXhtml = {
+      val m = mock[PlayerXhtml]
+      m.processXhtml(any[String]) answers { s => s.asInstanceOf[String] }
       m
     }
   }
@@ -49,6 +62,36 @@ class CoreItemTest extends Specification with Mockito {
       val result = load("itemid")(r)
       header(HeaderNames.CACHE_CONTROL, result) === Some(noCacheHeader)
       header(HeaderNames.EXPIRES, result) === Some("0")
+    }
+  }
+
+  "saveXhtmlAndComponents" should {
+
+    "return an error if 'xhtml' is missing" in new scope {
+      val result = saveXhtmlAndComponents("id")(req(Json.obj()))
+      status(result) must_== BAD_REQUEST
+    }
+
+    "return an error if 'components' is missing" in new scope {
+      val result = saveXhtmlAndComponents("id")(req(Json.obj("xhtml" -> "<div></div>")))
+      status(result) must_== BAD_REQUEST
+    }
+
+    "return an error if 'components' isn't an object" in new scope {
+      val result = saveXhtmlAndComponents("id")(req(Json.obj("xhtml" -> "<div></div>", "components" -> "HI")))
+      status(result) must_== BAD_REQUEST
+    }
+
+    "return hooks.saveXhtmlAndComponents error" in new scope {
+      hooks.saveXhtmlAndComponents(any[String], any[String], any[JsValue])(any[RequestHeader]) returns Future.successful(Left(500, "Hook err"))
+      val result = saveXhtmlAndComponents("id")(req(Json.obj("xhtml" -> "<div></div>", "components" -> Json.obj())))
+      contentAsJson(result) must_== Json.obj("error" -> "Hook err")
+    }
+
+    "return hooks.saveXhtmlAndComponents result" in new scope {
+      hooks.saveXhtmlAndComponents(any[String], any[String], any[JsValue])(any[RequestHeader]) returns Future.successful(Right(Json.obj("success" -> true)))
+      val result = saveXhtmlAndComponents("id")(req(Json.obj("xhtml" -> "<div></div>", "components" -> Json.obj())))
+      contentAsJson(result) must_== Json.obj("success" -> true)
     }
   }
 

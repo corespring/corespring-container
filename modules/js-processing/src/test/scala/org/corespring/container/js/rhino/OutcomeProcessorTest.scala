@@ -2,9 +2,10 @@ package org.corespring.container.js.rhino
 
 import org.corespring.container.components.model._
 import org.corespring.container.components.model.dependencies.ComponentMaker
+import org.corespring.container.components.services.{ComponentService, DependencyResolver}
 import org.corespring.container.js.response.Target
 import org.specs2.mutable.Specification
-import play.api.libs.json.{ JsString, Json }
+import play.api.libs.json.{JsString, Json}
 
 class OutcomeProcessorTest extends Specification with ComponentMaker {
 
@@ -61,12 +62,18 @@ class OutcomeProcessorTest extends Specification with ComponentMaker {
     }
   }
 
+  def mkService(comps : Component*) = new ComponentService {
+    override def components: Seq[Component] = comps //Seq(comps : _*)
+  }
+
   "OutcomeProcessor" should {
     "respond" in {
 
       val component = interaction("name", interactionRespondJs)
       val feedback = interaction("feedback", feedbackRespondJs)
-      val builder = new RhinoScopeBuilder(Seq(component, feedback))
+      val service = mkService(component, feedback)
+      val resolver = new DependencyResolver(service)
+      val builder = new RhinoScopeBuilder(resolver, service.components)
       val processor = new RhinoOutcomeProcessor(Seq(component, feedback), builder.scope)
       val result = processor.createOutcome(item, session, Json.obj())
       (result \ "1" \ "correctness").as[String] === "incorrect"
@@ -76,7 +83,9 @@ class OutcomeProcessorTest extends Specification with ComponentMaker {
     "return an incorrect response if the answer is empty" in {
 
       val component = interaction("name", interactionRespondJs)
-      val builder = new RhinoScopeBuilder(Seq(component))
+      val service = mkService(component)
+      val resolver = new DependencyResolver(service)
+      val builder = new RhinoScopeBuilder(resolver, service.components)
       val processor = new RhinoOutcomeProcessor(Seq(component), builder.scope)
 
       val item = Json.obj(
@@ -138,8 +147,10 @@ class OutcomeProcessorTest extends Specification with ComponentMaker {
       val b = customLib("b", bJs, Seq(Id("org", "c", None)))
       val c = customLib("c", cJs, Seq.empty)
 
-      val builder = new RhinoScopeBuilder(Seq(one, a, b, c))
-      val p = new RhinoOutcomeProcessor(Seq(one, a, b, c), builder.scope)
+      val service = mkService(one, a, b, c)
+      val resolver = new DependencyResolver(service)
+      val builder = new RhinoScopeBuilder(resolver, service.components)
+      val p = new RhinoOutcomeProcessor(service.components, builder.scope)
 
       val item = Json.obj("components" -> Json.obj("1" -> Json.obj("componentType" -> "org-one")))
       val session = Json.obj("components" -> Json.obj("1" -> Json.obj("answers" -> Json.obj())))
@@ -151,7 +162,9 @@ class OutcomeProcessorTest extends Specification with ComponentMaker {
     "fail - if there is bad js" in {
       val component = interaction("name", "arst")
       val feedback = interaction("feedback", feedbackRespondJs)
-      val builder = new RhinoScopeBuilder(Seq(component, feedback))
+      val service = mkService(component, feedback)
+      val resolver = new DependencyResolver(service)
+      val builder = new RhinoScopeBuilder(resolver, service.components)
       builder.scope must throwA[RuntimeException]
     }
   }
@@ -171,9 +184,10 @@ class OutcomeProcessorTest extends Specification with ComponentMaker {
         |}
       """.stripMargin))
 
-    lazy val components = Seq(interaction, library)
-    lazy val builder = new RhinoScopeBuilder(components)
-    lazy val processor = new RhinoOutcomeProcessor(components, builder.scope)
+    lazy val service = mkService(interaction, library)
+    lazy val resolver = new DependencyResolver(service)
+    lazy val builder = new RhinoScopeBuilder(resolver, service.components)
+    lazy val processor = new RhinoOutcomeProcessor(service.components, builder.scope)
     "execute js" in {
       val item = Json.obj("components" -> Json.obj(
         "1" -> Json.obj(

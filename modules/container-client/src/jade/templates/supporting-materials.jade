@@ -47,6 +47,11 @@ script(type="text/ng-template", id="/templates/supporting-materials")
         div(supporting-material-info, ng-model="selectedMaterial") 
 
         .editor-container(ng-class="editorMode", ng-show="isHtml")
+
+          .alert.alert-danger(role="alert", ng-show="updateFailed", ng-click="updateFailed=false")
+            button.close(type="button", aria-label="Close")
+              span(aria-hidden="true") &times;
+            | Failed to update your content! 
           wiggi-wiz(
             formatting-display="dropdown",
             ng-model="mainFile.content",

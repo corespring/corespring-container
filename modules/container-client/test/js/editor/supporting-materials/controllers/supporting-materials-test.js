@@ -39,6 +39,7 @@ describe('SupportingMaterials', function() {
     $provide.value('LogFactory', new org.corespring.mocks.editor.LogFactory());
     $provide.value('$modal', $modal);
     $provide.value('ItemService', itemService);
+    $provide.value('QueryParamUtils', org.corespring.mocks.editor.QueryParamUtils());
     $provide.value('SupportingMaterialsService', supportingMaterialsService);
     $provide.value('EditorConfig', editorConfig);
     $provide.value('EditorChangeWatcher', new org.corespring.mocks.editor.EditorChangeWatcher());
@@ -283,6 +284,14 @@ describe('SupportingMaterials', function() {
       scope.$apply();
       onSuccess();
     }));
+
+    it('sets updateFailed to true on an error', function(){
+
+      scope.mainFile.content = 'Hi!';
+      scope.$apply();
+      onError('error');
+      expect(scope.updateFailed).toBe(true);
+    });
 
   });
 

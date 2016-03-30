@@ -1,0 +1,41 @@
+
+@(componentEditorJs:String, types: Seq[(String,Boolean)], opts : play.api.libs.json.JsValue)
+
+@org.corespring.shell.views.html.launchers.coreComponentEditor(componentEditorJs, types, opts){
+
+  <button class="btn btn-sm btn-success save">Save</button>
+  <script type="text/javascript">
+    $('.save').click(function(){
+      editor.save(function(result){
+        console.log('>> save: ', result);
+      });
+    });
+  </script>
+}{
+  <script type="text/javascript">
+
+    document.addEventListener('DOMContentLoaded', function(){
+
+      var holder = document.querySelector('.holder');
+
+      opts.onItemCreated = function(itemId){
+        console.log('item created: ' + itemId);
+      };
+
+      if(opts.itemId){
+        opts.contentStorage = 'item';
+        window.editor = new org.corespring.editors.QuestionComponentEditor(holder, opts, function(err){
+          console.warn(err);
+        });
+
+        window.updateControls("tabs");
+
+      } else {
+        $('.create').click(function(){
+          window.createEditor(this, 'item');
+        });
+      }
+    });
+  </script>
+}
+

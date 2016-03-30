@@ -20,6 +20,7 @@ block content
             label.btn.btn-default(btn-checkbox="true", ng-model="panes.html") html
             label.btn.btn-default(btn-checkbox="true", ng-model="panes.json") json
             label.btn.btn-default(btn-checkbox="true", ng-model="panes.scoring") scoring
+            label.btn.btn-default(btn-checkbox="true", ng-model="panes.files") files
             label.btn.btn-default(btn-checkbox="true", ng-model="panes.player") player
           .pull-right
             button.btn.btn-sm.btn-default(ng-click="save()", ng-hide="initialData.hideSaveButton") Save
@@ -33,6 +34,21 @@ block content
           .json-pane(
               ng-model="json",
               ui-ace="{mode: 'json', useWrapMode : true, onLoad: aceLoaded, onChange: aceJsonChanged }")
+        td.pane(ng-show="panes.files")
+          .files-pane(ng-controller="AssetsController")
+            table
+              tr
+                td
+                  div.file-item(ng-repeat="f in item.files",ng-class="{selected: $parent.selected == f.name}")
+                    a(ng-click="$parent.selected = f.name") {{f.name}}
+                    i.fa.fa-trash(ng-click="removeFile(f.name)")
+                  button.btn.btn-info.upload-button(file-uploader="", fu-url="calculateUrl()", fu-upload-completed="onFileUploadCompleted", fu-mode="raw")
+                    span
+                      i.fa.fa-upload
+                      | &nbsp;Upload Image
+                td
+                  img(ng-show="selected", ng-src="{{selected}}")
+
         td.pane(ng-show="panes.scoring")
           .custom-js-pane(
               ng-model="customScoringJs",
@@ -43,9 +59,10 @@ block content
               .player-label
                 img(ng-src='{{playerLabelImg}}')
               .player-container
-                optimized-preview-player(
+                preview-player(
                   data-jade-template='dev-editor',
-                  ng-model="xhtml",
+                  player-item="item",
+                  player-markup="xhtml",
                   player-components="components",
                   player-outcomes="outcome")
                 summary-feedback(ng-model="item.summaryFeedback", session-complete="session.isComplete")

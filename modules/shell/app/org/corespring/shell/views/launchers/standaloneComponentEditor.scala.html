@@ -1,0 +1,47 @@
+@(componentEditorJs:String, types: Seq[(String,Boolean)], opts : play.api.libs.json.JsValue)
+
+@org.corespring.shell.views.html.launchers.coreComponentEditor(componentEditorJs, types, opts){
+
+<button class="btn btn-sm btn-primary get-data">Get Data</button>
+<button class="btn btn-sm btn-success set-data">Set Data</button>
+<script type="text/javascript">
+
+(function(){
+  $('.get-data').click(function(){
+    editor.getData(function(result){
+      var data = result.result;
+      var jsonString = JSON.stringify(result.result, null, '  ');
+      $('.data-text-area').val(jsonString);
+    });
+ });
+
+ $('.set-data').click(function(){
+    var data;
+    try {
+      data = JSON.parse($('.data-text-area').val());
+    } catch (e){
+      console.error('bad json');
+      return;
+    }
+    if(editor){
+      editor.setData(data, function(result){
+        console.log('data set...');
+      });
+    } else {
+      opts.data = data;
+    }
+ });
+
+})(this);
+
+</script>
+}{
+<script type="text/javascript">
+
+   document.addEventListener('DOMContentLoaded', function(){
+     $('.create').click(function(){
+       window.createEditor(this, 'none');
+     });
+   });
+ </script>
+}

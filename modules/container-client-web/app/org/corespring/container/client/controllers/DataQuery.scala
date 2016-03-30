@@ -3,8 +3,8 @@ package org.corespring.container.client.controllers
 import org.corespring.container.client.HasContainerContext
 
 import scala.concurrent.{ ExecutionContext, Future }
-
 import org.corespring.container.client.hooks.DataQueryHooks
+import org.corespring.container.client.integration.ContainerExecutionContext
 import play.api.libs.json.Json
 import play.api.mvc.{ Action, AnyContent, Controller }
 
@@ -26,6 +26,7 @@ object DataQuery {
     "mediaType",
     "priorUses",
     "reviewsPassed",
+    "standardClusters",
     "standards",
     "standardsTree",
     "subjects.primary",
@@ -33,11 +34,11 @@ object DataQuery {
 }
 
 /** Query service for static data, eg: subject, gradelevel, etc */
-trait DataQuery extends Controller with HasContainerContext {
+class DataQuery(
+  hooks: DataQueryHooks,
+  val containerContext: ContainerExecutionContext) extends Controller with HasContainerContext {
 
   import org.corespring.container.client.controllers.DataQuery._
-
-  def hooks: DataQueryHooks
 
   /** list all that match the query - if there's no query list all */
   def list(topic: String, query: Option[String] = None): Action[AnyContent] = Action.async { implicit request =>

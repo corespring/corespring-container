@@ -10,8 +10,9 @@ block content
   include templates/question
   include templates/profile
   include templates/supporting-materials
+  include templates/metadata
 
-  .root(ng-controller="Root", dimension-propagator='')
+  .root(ng-controller="Root", dimension-propagator='', modal-positioner='')
     .container-fluid
       include partials/nav
     .main-content(ui-view="main")
@@ -40,7 +41,18 @@ block after-main-script
         states: {
           question : mkEditorState('question'),
           profile : mkEditorState('profile'),
-          'supporting-materials' : mkEditorState('supporting-materials')
+          'supporting-materials' : mkEditorState('supporting-materials'),
+          metadata : {
+            url: '/metadata',
+            params: {
+              key: 'key'
+            },
+            views: {
+              main: {
+                templateUrl: '/templates/metadata'
+              }
+            }
+          }
         }
       };
 
@@ -50,20 +62,19 @@ block after-main-script
           $stateProvider.state(x, appLoadConfig.states[x]);
         }
       }
-      
-      var editorOptions = !{options}; 
-      angular.module('corespring-#{appName}').constant('STATIC_PATHS', editorOptions.staticPaths); 
-      angular.module('corespring-#{appName}').constant('DEBOUNCE_IN_MILLIS', editorOptions.debounceInMillis || 5000 ); 
+
+      var editorOptions = !{options};
+      angular.module('corespring-#{appName}').constant('STATIC_PATHS', editorOptions.staticPaths);
+      angular.module('corespring-#{appName}').constant('DEBOUNCE_IN_MILLIS', editorOptions.debounceInMillis || 5000 );
       angular.module('corespring-#{appName}').config(uiRouterConfig);
-      
       angular.module('corespring-#{appName}')
-        .config(['$tooltipProvider', function($tooltipProvider) {
-          //add ng-ui-tooltip-close as an event to close the tooltip
-          //this enables you to hide the tooltip by calling elem.trigger('ng-ui-tooltip-close');
-          $tooltipProvider.setTriggers({
-            mouseenter: 'mouseleave ng-ui-tooltip-close',
-            click: 'click ng-ui-tooltip-close',
-            focus: 'blur ng-ui-tooltip-close'
-          });
-        }]);
+
+        .config([
+          'wiggiWizConfigProvider',
+          function(wiggiWizConfigProvider){
+            wiggiWizConfigProvider.add({
+              imageService: 'EditingImageService'
+            });
+          }
+        ]);
     })(this);

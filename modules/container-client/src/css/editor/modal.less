@@ -1,28 +1,38 @@
-.modal{
 
-  .modal-body{
+.modal {
+
+  .modal-body {
     height: 100%;
   }
 
   .modal-header {
-      background:@new-blue;
-      color: white;
-      border-radius: 4px 4px 0 0;
-      &:hover{
-        cursor: pointer;
-      }
+    background: @new-blue;
+    color: white;
+    border-radius: 4px 4px 0 0;
+    &:hover {
+      cursor: pointer;
+    }
   }
 
-  .modal-footer{
+  .modal-footer {
     text-align: left;
     border: none;
   }
 
-  .right{
+  .right {
     text-align: right;
   }
 
-  .modal-lg{
-    width:1000px;
+}
+
+.corespring-editor-body {
+  &.modal-open .modal {
+    overflow-y: hidden;
+  }
+
+  .modal {
+    .modal-lg {
+      width: 670px;
+    }
   }
 }

@@ -39,6 +39,8 @@ object Build extends sbt.Build {
     val jade4j = "de.neuland-bfi" % "jade4j" % "0.4.2"
     val logbackClassic = "ch.qos.logback" % "logback-classic" % "1.0.7"
     val logbackCore = "ch.qos.logback" % "logback-core" % "1.0.7"
+    val macWireMacro = "com.softwaremill.macwire" %% "macros" % "0.7.3"
+    val macWireRuntime = "com.softwaremill.macwire" %% "runtime" % "0.7.3"
     val mockito = "org.mockito" % "mockito-all" % "1.9.5" % "test"
     val rhinoJs = "org.mozilla" % "rhino" % "1.7.6"
     val playS3 = "org.corespring" %% "s3-play-plugin" % "1.2.0"
@@ -80,6 +82,28 @@ object Build extends sbt.Build {
     lessEntryPoints := Nil,
     javascriptEntryPoints := Nil)
 
+  val installComponents = TaskKey[Unit]("install-components", "install the corespring-components submodule and run `npm install`")
+
+  private def runCmd(log: Logger)(cmd: String, root: sbt.File) = {
+
+    log.info(s"[runCmd]: cmd: $cmd, root: ${root.getPath}")
+    val exitCode = Process(cmd, root).!
+
+    if (exitCode != 0) {
+      sys.error(s"The following process failed: $cmd, folder: ${root.getPath}")
+    }
+  }
+
+  val installComponentsTask = installComponents <<= (baseDirectory, streams).map {
+    (bd, s) =>
+      val root = bd / ".." / ".."
+      s.log.info("[install-components] running - install components...")
+      s.log.info("[install-components] running - git submodule update...")
+      runCmd(s.log)("git submodule update --init --recursive", root)
+      s.log.info("[install-components] running - npm install...")
+      runCmd(s.log)("npm install", root / "corespring-components")
+  }
+
   val buildClient = TaskKey[Unit]("build-client", "runs client installation commands")
 
   val buildClientTask = buildClient <<= (baseDirectory, streams) map {
@@ -99,16 +123,7 @@ object Build extends sbt.Build {
         (gruntCmd, "loadComponentDependencies"),
         (gruntCmd, "stage"))
 
-      commands.foreach {
-        c =>
-          s.log.info(s"[>> $c] on " + clientRoot)
-          val (cmd, args) = c
-          val exitCode = sbt.Process(s"$cmd $args", clientRoot).!
-          if (exitCode != 0) {
-            throw new RuntimeException(s"The following commands failed: $c")
-          }
-      }
-
+      commands.foreach { case (cmd, args) => runCmd(s.log)(s"$cmd $args", clientRoot) }
   }
 
   val buildInfo = TaskKey[Unit]("build-client", "runs client installation commands")
@@ -152,6 +167,8 @@ object Build extends sbt.Build {
     .settings(
       buildClientTask,
       runClientTestsTask,
+      installComponentsTask,
+      buildClient <<= (buildClient).dependsOn(installComponents),
       (test in Test) <<= (test in Test) dependsOn runClientTests,
       //This task is called by the play stage task
       (packagedArtifacts) <<= (packagedArtifacts) dependsOn buildClient)
@@ -159,16 +176,20 @@ object Build extends sbt.Build {
   //Note: As above...
   lazy val componentModel = builder.playApp("component-model")
     .settings(playAppToSbtLibSettings: _*)
+    .dependsOn(logging, utils % "test->compile;compile->compile")
+
+  lazy val componentServices = builder.playApp("component-services")
+    .settings(playAppToSbtLibSettings: _*)
     .settings(
       libraryDependencies ++= Seq(dependencyUtils))
-    .dependsOn(logging, utils % "test->compile;compile->compile")
+    .dependsOn(componentModel % "compile->compile;test->test", logging, utils % "test->compile;compile->compile")
 
   //Note: this is a play app for now until we move to play 2.2.0
   lazy val jsProcessing = builder.playApp("js-processing")
     .settings(playAppToSbtLibSettings: _*)
     .settings(
-      libraryDependencies ++= Seq(rhinoJs, grizzledLog))
-    .dependsOn(logging, containerClient, componentModel % "test->test;compile->compile")
+      libraryDependencies ++= Seq(rhinoJs, grizzledLog, macWireMacro))
+    .dependsOn(logging, containerClient, componentServices, componentModel % "test->test;compile->compile")
 
   lazy val componentLoader = builder.lib("component-loader")
     .settings(
@@ -190,10 +211,12 @@ object Build extends sbt.Build {
         closureCompiler,
         yuiCompressor,
         commonsIo,
-        aws),
+        aws,
+        macWireMacro),
       templatesImport ++= Seq("play.api.libs.json.JsValue", "play.api.libs.json.Json"))
     .dependsOn(
       componentModel % "compile->compile;test->test",
+      componentServices % "compile->compile;test->test",
       containerClient,
       utils,
       logging,
@@ -217,12 +240,13 @@ object Build extends sbt.Build {
 
   val shell = builder.playApp("shell")
     .settings(
-      libraryDependencies ++= Seq(logbackClassic, casbah, playS3, scalaz, play.Keys.cache, yuiCompressor, closureCompiler, commonsIo))
+      libraryDependencies ++= Seq(macWireMacro, logbackClassic, casbah, playS3, scalaz, play.Keys.cache, yuiCompressor, closureCompiler, commonsIo))
     .dependsOn(containerClientWeb, componentLoader, mongoJsonService, docs, logging)
-    .aggregate(containerClientWeb, componentLoader, containerClient, componentModel, utils, jsProcessing, mongoJsonService, docs, logging)
+    .aggregate(containerClientWeb, componentLoader, containerClient, componentModel, componentServices, utils, jsProcessing, mongoJsonService, docs, logging)
 
   val root = builder.playApp("root", Some("."))
     .settings(
+      shellPrompt := ShellPrompt.buildShellPrompt,
       (resolvers in ThisBuild) ++= Resolvers.all,
       sbt.Keys.fork in Test := false,
       //lock java and javac to 1.7
@@ -251,6 +275,8 @@ object Build extends sbt.Build {
             cmd("bower", "./node_modules/bower/bin/bower", s"$clientDir\\cmds\\bower.cmd", Seq(clientDir, componentsDir)),
             cmd("npm", "npm", "npm.cmd", Seq(clientDir, componentsDir)))
       })
+    .settings(CustomRelease.settings)
+    .settings(Tgz.settings)
     .dependsOn(shell)
     .aggregate(shell)
 

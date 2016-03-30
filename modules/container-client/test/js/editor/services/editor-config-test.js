@@ -3,6 +3,7 @@ describe('editor config', function() {
   var editorConfig, designerService,componentDefaultData;
 
   beforeEach(angular.mock.module('corespring-common.services'));
+  beforeEach(angular.mock.module('corespring-editing.services'));
   beforeEach(angular.mock.module('corespring-editor.services'));
   beforeEach(angular.mock.module('corespring-player.services'));
 
@@ -27,6 +28,7 @@ describe('editor config', function() {
     $provide.value('DesignerService', designerService);
     $provide.value('ImageFeature', {});
     $provide.value('ItemUrls', {});
+    $provide.value('QueryParamUtils', org.corespring.mocks.editor.QueryParamUtils());
     $provide.value('WiggiFootnotesFeatureDef', function(){});
     $provide.value('WiggiLinkFeatureDef', function(){});
     $provide.value('WiggiMathJaxFeatureDef', function(){});

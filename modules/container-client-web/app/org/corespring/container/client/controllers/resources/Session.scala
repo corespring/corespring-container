@@ -1,6 +1,5 @@
 package org.corespring.container.client.controllers.resources
 
-import org.corespring.container.client.HasContainerContext
 import org.corespring.container.client.controllers.resources.Session.Errors
 import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.client.hooks._
@@ -11,7 +10,7 @@ import org.corespring.container.logging.ContainerLogger
 import play.api.libs.json._
 import play.api.mvc.{ Action, Controller, SimpleResult }
 
-import scala.concurrent.Future
+import scala.concurrent.{ ExecutionContext, Future }
 
 object Session {
   object Errors {
@@ -21,17 +20,20 @@ object Session {
   }
 }
 
-trait Session extends Controller with HasContainerContext {
+//case class to enable auto wiring
+case class SessionExecutionContext(default: ExecutionContext, heavyLoad: ExecutionContext)
+
+class Session(
+  val outcomeProcessor: OutcomeProcessor,
+  val itemPreProcessor: PlayerItemPreProcessor,
+  val scoreProcessor: ScoreProcessor,
+  val hooks: SessionHooks,
+  val sessionContext: SessionExecutionContext)
+  extends Controller {
 
   val logger = ContainerLogger.getLogger("Session")
 
-  def outcomeProcessor: OutcomeProcessor
-
-  def itemPreProcessor: PlayerItemPreProcessor
-
-  def scoreProcessor: ScoreProcessor
-
-  def hooks: SessionHooks
+  implicit val ec: ExecutionContext = sessionContext.default
 
   implicit def toResult(m: StatusMessage): SimpleResult = play.api.mvc.Results.Status(m._1)(Json.obj("error" -> m._2))
 
@@ -96,14 +98,13 @@ trait Session extends Controller with HasContainerContext {
           case Right(fs) => {
             val json = fs.everything
 
-          val itemJson = (json \ "item").as[JsObject]
-          val processedItem = itemPreProcessor.preProcessItemForPlayer(itemJson)
-          val sessionJson = (json \ "session").as[JsObject]
+            val itemJson = (json \ "item").as[JsObject]
+            val processedItem = itemPreProcessor.preProcessItemForPlayer(itemJson)
+            val sessionJson = (json \ "session").as[JsObject]
 
-          val base = Json.obj(
+            val base = Json.obj(
               "item" -> processedItem,
               "session" -> sessionJson)
-
             Ok(base)
           }
         }
@@ -152,8 +153,9 @@ trait Session extends Controller with HasContainerContext {
    * @return
    */
   def loadOutcome(id: String) = Action.async {
-    implicit request => Future {
-      val reponse = hooks.loadOutcome(id)
+    implicit request =>
+      Future {
+        val reponse = hooks.loadOutcome(id)
 
         reponse match {
           case Left(err) => InternalServerError(err._2)
@@ -178,7 +180,7 @@ trait Session extends Controller with HasContainerContext {
             }
           }
         }
-      }
+      }(sessionContext.heavyLoad)
   }
   /**
    * Load instructor data for a session.
@@ -249,7 +251,7 @@ trait Session extends Controller with HasContainerContext {
             }
           }
         }
-      }
+      }(sessionContext.heavyLoad)
   }
 
   def completeSession(id: String) = Action.async { implicit request =>

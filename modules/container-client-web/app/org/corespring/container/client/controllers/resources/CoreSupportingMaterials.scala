@@ -6,14 +6,15 @@ import org.apache.commons.io.IOUtils
 import org.corespring.container.client.HasContainerContext
 import org.corespring.container.client.controllers.resources.CoreSupportingMaterials.Errors
 import org.corespring.container.client.hooks._
+import org.joda.time.DateTime
 import play.api.Logger
 import play.api.libs.iteratee.Enumerator
-import play.api.libs.{ MimeTypes, Files }
-import play.api.libs.json.{ Json, JsValue }
+import play.api.libs.{ Files, MimeTypes }
+import play.api.libs.json.{ JsValue, Json }
 import play.api.mvc._
 
-import scala.concurrent.{ Future, ExecutionContext }
-import scalaz.{ Validation, Failure, Success }
+import scala.concurrent.{ ExecutionContext, Future }
+import scalaz.{ Failure, Success, Validation }
 import scalaz.Scalaz._
 
 private[resources] object CoreSupportingMaterials {
@@ -62,8 +63,10 @@ private[resources] trait CoreSupportingMaterials extends Controller with HasCont
 
     def createFromMultipartForm(form: MultipartFormData[Files.TemporaryFile]): Validation[E, CreateBinaryMaterial] = {
       for {
-        binary <- formToBinary(form, acceptableTypes)
-        name <- Success(form.asFormUrlEncoded.get("name").map(_.mkString).getOrElse(binary.name))
+        fileAndBinary <- formToBinary(form, acceptableTypes)
+        filename <- Success(fileAndBinary._1)
+        binary <- Success(fileAndBinary._2)
+        name <- Success(form.asFormUrlEncoded.get("name").map(_.mkString).getOrElse(filename))
         materialType <- form.asFormUrlEncoded.get("materialType").map(_.mkString).toSuccess(cantFindParameter("materialType"))
       } yield {
         CreateBinaryMaterial(name, materialType, binary)
@@ -128,7 +131,9 @@ private[resources] trait CoreSupportingMaterials extends Controller with HasCont
     materialHooks.delete(id, name).toResult
   }
 
-  private def formToBinary(form: MultipartFormData[Files.TemporaryFile], types: Seq[String]): Validation[E, Binary] = {
+  def getTimestamp: String = DateTime.now.getMillis.toString
+
+  private def formToBinary(form: MultipartFormData[Files.TemporaryFile], types: Seq[String]): Validation[E, (String, Binary)] = {
     for {
       file <- form.file("file").toSuccess(cantFindParameter("file"))
       mimeType <- file.contentType.orElse(MimeTypes.forFileName(file.filename)).toSuccess(cantDetectMimeType(file.filename, file.contentType))
@@ -142,7 +147,11 @@ private[resources] trait CoreSupportingMaterials extends Controller with HasCont
     } yield {
       val bytes = IOUtils.toByteArray(stream)
       IOUtils.closeQuietly(stream)
-      Binary(file.filename, mimeType, bytes)
+      val filename = s"${getTimestamp}-${file.filename}"
+
+      logger.debug(s"function=formToBinary, filename=$filename, mimeType=$mimeType")
+
+      file.filename -> Binary(filename, mimeType, bytes)
     }
   }
 
@@ -156,7 +165,11 @@ private[resources] trait CoreSupportingMaterials extends Controller with HasCont
     val v = for {
       form <- request.body.asMultipartFormData.toSuccess(notMultipartForm)
       binary <- formToBinary(form, acceptableTypes.filterNot(_ == "application/pdf"))
-    } yield materialHooks.addAsset(id, name, binary).toResult
+    } yield materialHooks.addAsset(id, name, binary._2).map { e =>
+      e.map { ur =>
+        Json.obj("path" -> ur.path)
+      }
+    }.toResult
 
     v match {
       case Failure(e) => Future(e.result)
@@ -177,9 +190,15 @@ private[resources] trait CoreSupportingMaterials extends Controller with HasCont
           val objContent: Enumerator[Array[Byte]] = Enumerator.fromStream(fd.stream)
           val headers = {
             val main = Map(
-              CONTENT_TYPE -> (if (fd.contentType != null) fd.contentType else "application/octet-stream"),
-              CONTENT_LENGTH.toString -> fd.contentLength.toString)
-            main ++ fd.metadata.get(ETAG).map { ETAG -> _ }
+              CONTENT_LENGTH.toString -> fd.contentLength.toString,
+              CONTENT_DISPOSITION.toString -> "inline")
+
+            val contentType = fd.contentType match {
+              case null => Map()
+              case "application/octet-stream" => Map()
+              case _ => Map(CONTENT_TYPE -> fd.contentType)
+            }
+            main ++ contentType ++ fd.metadata.get(ETAG).map { ETAG -> _ }
           }
           SimpleResult(header = ResponseHeader(200, headers), body = objContent)
         }

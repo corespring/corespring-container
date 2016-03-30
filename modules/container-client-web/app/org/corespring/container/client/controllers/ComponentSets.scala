@@ -1,10 +1,8 @@
 package org.corespring.container.client.controllers
 
-import java.net.URL
-
 import org.corespring.container.client.component._
 import org.corespring.container.components.model.Component
-import org.corespring.container.components.model.dependencies.DependencyResolver
+import org.corespring.container.components.services.DependencyResolver
 import org.corespring.container.logging.ContainerLogger
 import play.api.http.ContentTypes
 import play.api.mvc._

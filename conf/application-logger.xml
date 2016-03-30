@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<configuration>
+    <!--
+        The logger in test mode doesn't work. This is a workaround:
+        Call play with:
+        play -Dlogger.file=conf/test-logger.xml
+        Warning - it may cause memory leaks
+    -->
+    <conversionRule conversionWord="coloredLevel" converterClass="play.api.Logger$ColoredLevel" />
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder><pattern>%coloredLevel [%logger{10}] %message%n%xException{5}</pattern></encoder>
+    </appender>
+
+    <logger name="tests" level="WARN" />
+    <logger name="js" level="WARN" />
+    <logger name="org.corespring.container.client.controllers.apps.CoreEditor" level="WARN" />
+    <logger name="org.corespring.shell.controllers.editor.ItemDraftHooks" level="WARN" />
+    <logger name="org.corespring.container.client.controllers.jade.Jade" level="WARN" />
+    <logger name="org.corespring.container.client.pages.EditorRenderer" level="WARN"/>
+    <logger name="org.corespring.container.client.pages.PlayerRenderer" level="TRACE"/>
+    <logger name="org.corespring.container.client.controllers.CompressedAndMinifiedComponentSets" level="DEBUG"/>
+    <logger name="org.corespring.container.client.controllers.apps.CoreEditor" level="WARN"/>
+    <logger name="org.corespring.container.client.controllers.apps.JsonPageSourceService" level="WARN"/>
+    <logger name="org.corespring.container.client.controllers.resources.CoreSupportingMaterials" level="DEBUG"/>
+    <logger name="org.corespring.container.client.controllers.AssetsController" level="DEBUG"/>
+    <logger name="org.corespring.shell.controllers" level="WARN"/>
+
+    <root level="INFO">
+        <appender-ref ref="STDOUT" />
+    </root>
+</configuration>

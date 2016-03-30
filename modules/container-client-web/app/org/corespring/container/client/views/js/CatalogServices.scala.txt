@@ -1,11 +1,20 @@
-@(namespace : String, load : Call, componentSet : JsValue, smEndpoints: org.corespring.container.client.views.models.SupportingMaterialsEndpoints)
+@(namespace : String,
+componentSet:JsValue,
+mainEndpoints: org.corespring.container.client.views.models.MainEndpoints,
+smEndpoints: org.corespring.container.client.views.models.SupportingMaterialsEndpoints,
+queryParams : play.api.libs.json.JsValue)
+
+@toMethodAndUrl(c:Call) = @{
+  s"{ method: '${c.method.toLowerCase}', url: '${c.url}'}"
+}
 
 (function(){
   "use strict";
 
   var loadedData = null;
 
-  angular.module('@namespace', []);
+  angular.module('@namespace', [])
+    .constant('QUERY_PARAMS', @{Json.stringify(queryParams)})
 
   angular.module('@namespace').factory('ComponentService', ['$http',function($http){
     return {
@@ -17,7 +26,7 @@
   }]);
 
   angular.module('@namespace').factory('SupportingMaterialUrls', [function(){
-    return @smEndpoints.toJsonString;
+    return @smEndpoints.jsonString;
   }]);
 
   angular.module('@namespace').factory('ItemService', ['BaseService', function(BaseService){
@@ -39,13 +48,13 @@
           if(loadedData){
             onSuccess(loadedData);
           } else {
-            var finalUrl = '@load.url';
+            var finalUrl = '@mainEndpoints.load.url';
 
             if (window && window.location && window.location.search){
               finalUrl +=  window.location.search;
             }
 
-            $http['@load.method.toLowerCase'](finalUrl)
+            $http['@mainEndpoints.load.method.toLowerCase'](finalUrl)
               .success(function(data, status, headers, config){
                 loadedData = data;
                 onSuccess(data);
@@ -61,4 +70,5 @@
       return def;
     }]);
 })();
+
 

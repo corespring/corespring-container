@@ -37,8 +37,9 @@
           settings: _.cloneDeep($scope.playerSettings)
         };
 
-        $scope.itemSession = undefined;
+        $scope.itemSession = {};
 
+        $scope.scoreToString = scoreToString;
         $scope.submitOrReset = submitOrReset;
         $scope.submitButtonLabel = submitButtonLabel;
 
@@ -103,10 +104,11 @@
         }
 
         function reset() {
-          if ($scope.session) {
-            $scope.session.isComplete = false;
-            $scope.session.remainingAttempts = 1;
-          }
+          $scope.session = {
+            remainingAttempts: 1,
+            settings: _.cloneDeep($scope.playerSettings),
+            isComplete: false
+          };
           $scope.score = undefined;
           $scope.outcome = undefined;
           $scope.responses = {};
@@ -120,6 +122,10 @@
           }[$scope.playerMode] || "reset";
         }
 
+        function scoreToString(score) {
+          var percentage = score && score.summary ? score.summary.percentage : NaN;
+          return isNaN(percentage) ? '' : 'Score: ' + percentage + '%';
+        }
       }
 
       return {
@@ -137,15 +143,18 @@
             '    player-markup="xhtml"',
             '    player-item="item"',
             '    player-outcomes="outcome"',
-            '    player-session="itemSession">',
+            '    player-session="session">',
             '  </corespring-isolate-player>',
-            '  <div class="btn-submit-holder">',
-            '    <span ng-hide="playerMode == \'instructor\'">',
-            '      <button class="btn btn-submit" ng-click="submitOrReset()">',
-            '        {{submitButtonLabel()}}',
-            '      </button>',
-            '    </span>',
-            '  </div>',
+            '    <div class="btn-submit-holder" ng-hide="playerMode == \'instructor\'">',
+            '      <div class="score">',
+            '        <span>{{scoreToString(score)}}</span>',
+            '      </div>',
+            '      <span>',
+            '        <button class="btn btn-submit" ng-click="submitOrReset()">',
+            '          {{submitButtonLabel()}}',
+            '        </button>',
+            '      </span>',
+            '    </div>',
             '</div>'
           ].join("\n")
       };

@@ -8,11 +8,13 @@
 .grunt
 .idea
 .idea_modules
+.test-scripts
 .tmp
 _SpecRunner.html
 atlassian-*
+aws.zip
 bower_components
 node_modules
+scratch
 target
 Thumbs.db
-aws.zip

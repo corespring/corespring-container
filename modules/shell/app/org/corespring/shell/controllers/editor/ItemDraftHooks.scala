@@ -3,12 +3,12 @@ package org.corespring.shell.controllers.editor
 import com.mongodb.casbah.Imports._
 import com.mongodb.casbah.commons.MongoDBObject
 import org.bson.types.ObjectId
-import org.corespring.container.client.hooks._
 import org.corespring.container.client.hooks.Hooks.{ R, StatusMessage }
+import org.corespring.container.client.hooks._
+import org.corespring.container.client.integration.ContainerExecutionContext
 import org.corespring.container.client.{ hooks => containerHooks }
-import org.corespring.mongo.json.services.MongoService
-import org.corespring.shell.controllers.editor.actions.{ DraftId, ContainerDraftId }
-import org.corespring.shell.services.ItemDraftService
+import org.corespring.shell.controllers.editor.actions.{ ContainerDraftId, DraftId }
+import org.corespring.shell.services.{ ItemDraftService, ItemService }
 import org.joda.time.DateTime
 import play.api.Logger
 import play.api.http.Status._
@@ -17,15 +17,14 @@ import play.api.mvc._
 
 import scala.concurrent.Future
 
-trait ItemDraftSupportingMaterialHooks
+class ItemDraftSupportingMaterialHooks(
+  assets: SupportingMaterialAssets[DraftId[ObjectId]],
+  draftItemService: ItemDraftService,
+  val containerContext: ContainerExecutionContext)
   extends containerHooks.ItemDraftSupportingMaterialHooks
   with SupportingMaterialHooksHelper {
 
   import scala.concurrent.ExecutionContext.Implicits.global
-
-  def assets: SupportingMaterialAssets[DraftId[ObjectId]]
-
-  def draftItemService: ItemDraftService
 
   override def prefix(s: String) = s"item.$s"
 
@@ -64,7 +63,7 @@ trait ItemDraftSupportingMaterialHooks
 
   private def dm = MongoDBObject("$set" -> MongoDBObject("item.dateModified" -> DateTime.now))
 
-  override def addAsset(id: String, name: String, binary: Binary)(implicit h: RequestHeader): R[JsValue] = withDraftId(id) { (draftId) =>
+  override def addAsset(id: String, name: String, binary: Binary)(implicit h: RequestHeader): R[UploadResult] = withDraftId(id) { (draftId) =>
     Future {
       ContainerDraftId.fromString(id).map { draftId =>
         val query = MongoDBObject("_id" -> DraftId.dbo(draftId), "item.supportingMaterials.name" -> name)
@@ -75,7 +74,7 @@ trait ItemDraftSupportingMaterialHooks
 
         if (wr.getN == 1) {
           assets.uploadAssetToSupportingMaterial(draftId, name, binary)
-          Right(Json.obj())
+          Right(UploadResult(binary.name))
         } else {
           Left((BAD_REQUEST, "Failed to remove the asset"))
         }
@@ -89,8 +88,8 @@ trait ItemDraftSupportingMaterialHooks
     }.getOrElse(notOk)
   }
 
-  private def withDraftId(id: String)(fn: DraftId[ObjectId] => R[JsValue]): R[JsValue] = {
-    parseId[R[JsValue]](id)(fn, Future(Left(BAD_REQUEST -> "Can't parse draftId")))
+  private def withDraftId[A](id: String)(fn: DraftId[ObjectId] => R[A]): R[A] = {
+    parseId[R[A]](id)(fn, Future(Left(BAD_REQUEST -> "Can't parse draftId")))
   }
 
   override def delete(id: String, name: String)(implicit h: RequestHeader): R[JsValue] = withDraftId(id) { (draftId: DraftId[ObjectId]) =>
@@ -128,21 +127,19 @@ trait ItemDraftSupportingMaterialHooks
 
 }
 
-trait ItemDraftHooks
+class ItemDraftHooks(
+  assets: ItemDraftAssets,
+  itemService: ItemService,
+  draftItemService: ItemDraftService,
+  val containerContext: ContainerExecutionContext)
   extends containerHooks.DraftHooks
   with CoreItemHooks
   with ItemHooksHelper {
 
   val logger = Logger(classOf[ItemDraftHooks])
 
-  def assets: ItemDraftAssets
-
   import com.mongodb.casbah.commons.conversions.scala._
   RegisterJodaTimeConversionHelpers()
-
-  def draftItemService: ItemDraftService
-
-  def itemService: MongoService
 
   lazy val draftFineGrainedSave = fineGrainedSave(draftItemService, processResultJson) _
 
@@ -188,11 +185,32 @@ trait ItemDraftHooks
     out
   }
 
+  /**
+   * If the draft isn't found create it.
+   *
+   * @param draftId
+   * @param header
+   * @return
+   */
   override def load(draftId: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]] = {
     Future {
       draftItemService.load(draftId).map { json =>
-        Right(json \ "item")
-      }.getOrElse(Left(NOT_FOUND -> s"draftId: $draftId"))
+        logger.debug(s"function=load, draftId=$draftId, json=${Json.prettyPrint(json)}")
+        val result = (json \ "item")
+        logger.trace(s"function=load, draftId=$draftId, result=${Json.prettyPrint(result)}")
+        Right(result)
+      }.getOrElse {
+        val itemId = draftId.split("~")(0)
+        (for {
+          item <- itemService.load(itemId)
+          tuple <- draftItemService.createDraft(new ObjectId(itemId), None, item)
+          json <- draftItemService.load(s"${tuple._1}~${tuple._2}")
+        } yield {
+          val result = (json \ "item")
+          logger.trace(s"function=load, draftId=$draftId, result=${Json.prettyPrint(result)} - created new draft")
+          Right(result)
+        }).getOrElse(Left(BAD_REQUEST -> "Can't create draft"))
+      }
     }
   }
 
@@ -215,7 +233,7 @@ trait ItemDraftHooks
       _ <- Some(logger.debug(s"draft=$draft"))
       draftItem <- Some(draft.get("item").asInstanceOf[DBObject])
       _ <- Some(logger.debug(s"draftItem=$draftItem"))
-      draftDateModified <- Some(draftItem.get("dateModified").asInstanceOf[DateTime])
+      draftDateModified <- draftItem.expand[DateTime]("dateModified")
       _ <- Some(logger.debug(s"draftDateModified=$draftDateModified"))
       itemId <- Some(draftId.itemId)
       _ <- Some(logger.debug(s"itemId=$itemId"))
@@ -259,9 +277,19 @@ trait ItemDraftHooks
     }
   }
 
-  override def createItemAndDraft()(implicit h: RequestHeader): R[(String, String)] = Future {
+  override def createItemAndDraft(collectionId: Option[String])(implicit h: RequestHeader): R[(String, String)] = Future {
+    create("", Json.obj())
+  }
+
+  override def createSingleComponentItemDraft(collectionId: Option[String], componentType: String, key: String, defaultData: JsObject)(implicit r: RequestHeader): R[(String, String)] = Future {
+    val xhtml = s"<div><div $componentType='' id='$key'></div></div>"
+    val components = Json.obj(key -> defaultData)
+    create(xhtml, components)
+  }
+
+  private def create(xhtml: String, components: JsObject) = {
     val out = for {
-      item <- Some(Json.obj("dateModified" -> DateTime.now, "xhtml" -> "", "components" -> Json.obj()))
+      item <- Some(Json.obj("dateModified" -> Json.obj("$date" -> DateTime.now), "xhtml" -> xhtml, "components" -> components))
       itemId <- itemService.create(item)
       tuple <- draftItemService.createDraft(itemId, None, item)
       draftName <- Some(tuple._2)
@@ -271,6 +299,22 @@ trait ItemDraftHooks
     out match {
       case None => Left(BAD_REQUEST, "Error creating item and draft")
       case Some(tuple) => Right(tuple)
+    }
+  }
+
+  override def saveXhtmlAndComponents(id: String, markup: String, components: JsValue)(implicit h: RequestHeader): R[JsValue] = {
+    val xhtmlResult = saveXhtml(id, markup)(h)
+    val componentResult = saveComponents(id, components)(h)
+    for {
+      x <- xhtmlResult
+      c <- componentResult
+    } yield {
+      (x, c) match {
+        case (Left((xErr, xMsg)), Left((cErr, cMsg))) => Left(xErr, xMsg)
+        case (Left((err, msg)), _) => Left(err, msg)
+        case (_, Left((err, msg))) => Left(err, msg)
+        case (Right(xJson), Right(cJson)) => Right(xJson.as[JsObject].deepMerge(cJson.as[JsObject]))
+      }
     }
   }
 

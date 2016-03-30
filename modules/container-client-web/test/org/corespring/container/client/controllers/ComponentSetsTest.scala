@@ -1,16 +1,19 @@
 package org.corespring.container.client.controllers
 
 import org.corespring.container.client.component.SourceGenerator
-import org.corespring.container.components.model.{ Library, Component }
-import org.corespring.container.components.model.dependencies.{ DependencyResolver, ComponentMaker }
+import org.corespring.container.components.model.{Component, Id, Library}
+import org.corespring.container.components.model.dependencies.ComponentMaker
+import org.corespring.container.components.services.DependencyResolver
+import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import play.api.GlobalSettings
-import play.api.mvc.{ Action, EssentialAction, SimpleResult }
+import play.api.mvc.{Action, EssentialAction, SimpleResult}
 import play.api.test.Helpers._
-import play.api.test.{ FakeApplication, FakeRequest }
+import play.api.test.{FakeApplication, FakeRequest}
+
 import scala.concurrent.Future
 
-class ComponentSetsTest extends Specification with ComponentMaker {
+class ComponentSetsTest extends Specification with ComponentMaker with Mockito{
 
   sequential
 
@@ -32,8 +35,10 @@ class ComponentSetsTest extends Specification with ComponentMaker {
 
     override def allComponents: Seq[Component] = Seq(uiComp("name", Seq.empty))
 
-    override def dependencyResolver: DependencyResolver = new DependencyResolver {
-      override def components: Seq[Component] = allComponents
+    override val dependencyResolver: DependencyResolver = {
+      val m = mock[DependencyResolver]
+      m.resolveComponents(any[Seq[Id]], any[Option[String]]) returns allComponents
+      m
     }
 
     override def resource[A >: EssentialAction](context: String, directive: String, suffix: String): A = Action {

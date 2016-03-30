@@ -29,7 +29,6 @@ block content
       player-session='session',
       player-outcomes='outcome')
       != xhtml
-    summary-feedback(ng-model='item.summaryFeedback', session-complete='session.isComplete')
 
   .root(ng-controller='Root', dimension-propagator='')
 
@@ -62,25 +61,7 @@ block after-main-script
   script(type="text/javascript").
 
     angular.module( 'corespring-player').config(['$provide', function($provide) {
-
-      $provide.decorator('PlayerService', ['$delegate', '$sniffer', '$log', function ($delegate, $sniffer, $log) {
-        function Wrapper() {
-          var inst = new $delegate();
-          for (var x in inst) {
-            if (typeof(inst[x]) === 'function') {
-              this[x] = inst[x];
-            }
-          }
-          if (typeof(this.loadItemAndSession) !== 'function') {
-            $log.error(' -----------> override loadItemAndSessionSession failed!!!');
-          } else {
-            this.loadItemAndSession = function (onSuccess, onFailure, id) {
-              $log.log(' -----------> override loadItemAndSessionSession!!!');
-              var sessionJson = !{sessionJson} || {};
-              onSuccess(sessionJson);
-            };
-          }
-        }
-        return Wrapper;
-      }]);
+      $provide.factory('EmbeddedItemAndSession', function(){
+        return !{sessionJson} || {};
+      });
     }]);

@@ -147,7 +147,8 @@ angular.module('corespring-editor.controllers')
               emitItemChanged(); 
             }, 
             function(){
-              console.error('update content not ok', arguments);
+              $scope.updateFailed = true;
+              console.error('Update failed: ', arguments);
             });
         }, 400, true);
 

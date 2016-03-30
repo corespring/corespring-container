@@ -14,12 +14,26 @@
       <li>
         <span>@d.name</span>
         @link("edit", d.edit, "btn-xs")
+        @link("component-edit", d.componentEdit, "btn-xs")
         @link("dev-edit", s"${d.edit}?devEditor=true", "btn-xs")
         @link("delete", d.delete, "btn-xs")
       </li>
       }
     </ul>
 
+  </div>
+}
+
+@mkSessionLinks(links: Seq[org.corespring.shell.SessionLink]) = {
+  <div>
+    <div>Sessions: </div>
+    @links.map{ s =>
+      <li>
+        <span>@s.id</span>
+        @link("run", s.run, "btn-xs")
+        @link("delete", s.delete, "btn-xs")
+      </li>
+    }
   </div>
 }
 
@@ -57,7 +71,14 @@
     </div>
 
     <br/>
-    <a href="/launch/item-editor/new-item">Create a new item</a>
+    Create:
+    <a href="/launch/item-editor/new-item">item</a>
+    |
+    <a href="/launch/component-editor/standalone">standalone component editor</a>
+    |
+    <a href="/launch/component-editor/item">item component editor</a>
+    |
+    <a href="/launch/component-editor/draft">draft component editor</a>
 
     <br/><br/>
 
@@ -76,6 +97,10 @@
         <td class="inner">
           @link("Run", s"${i.createSession}?mode=dev&showControls=true", "btn-success")
           @link("Prod", s"${i.createSession}?mode=prod", "btn-primary")
+
+          @if(!i.sessionLinks.isEmpty){
+            @mkSessionLinks(i.sessionLinks)
+          }
         </td>
         <td class="inner">
           @link("Catalog", i.catalog, "btn-info")
@@ -84,10 +109,12 @@
         <td class="inner">
           @link("Edit Item", i.itemEdit)
           @link("Edit Item DevEditor", s"${i.itemEdit}?devEditor=true")
+          @link("Component Item Editor", s"${i.itemComponentEdit}")
         </td>
         <td class="inner">
           @link("New Draft", i.draftEdit)
           @link("New Draft DevEditor", s"${i.draftEdit}?devEditor=true")
+          @link("New Component Draft Editor", s"${i.draftComponentEdit}")
           <br/>
           @if(!i.drafts.isEmpty){
             @mkDrafts(i.drafts)

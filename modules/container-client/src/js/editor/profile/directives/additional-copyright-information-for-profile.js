@@ -1,4 +1,4 @@
-angular.module('corespring-editor.directives')
+angular.module('corespring-editor.profile.directives')
   .directive('additionalCopyrightInformationForProfile', [
   'DataQueryService',
   function(DataQueryService) {
@@ -25,7 +25,9 @@ angular.module('corespring-editor.directives')
         };
 
         $scope.removeCopyrightItem = function(item) {
-          $scope.copyrights = _.remove($scope.copyrights, item);
+          $scope.copyrights = _.reject($scope.copyrights, function(i) {
+            return i === item;
+          });
           if (0 === $scope.copyrights.length) {
             $scope.required = 'no';
           }

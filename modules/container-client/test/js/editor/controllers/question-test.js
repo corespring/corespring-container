@@ -5,6 +5,7 @@ describe('QuestionController', function() {
   var ItemService = {
     load: jasmine.createSpy('load'),
     saveComponents: jasmine.createSpy('saveComponents'),
+    saveXhtmlAndComponents: jasmine.createSpy('saveXhtmlAndComponents'),
     saveXhtml: jasmine.createSpy('saveXhtml'),
     saveSummaryFeedback: jasmine.createSpy('saveSummaryFeedback')
   };
@@ -20,7 +21,7 @@ describe('QuestionController', function() {
     })
   };
   
-  var ComponentImageService = {};
+  var EditingImageService = {};
   
   var ComponentData = {
     registerComponent: jasmine.createSpy('registerComponent'),
@@ -43,13 +44,18 @@ describe('QuestionController', function() {
   
   var wiggiLinkFeatureDef = {};
 
+  var editorChangeWatcher = {
+    debounce: jasmine.createSpy('debounce')
+  };
+
+  beforeEach(angular.mock.module('corespring-editing.controllers'));
   beforeEach(angular.mock.module('corespring-editor.controllers'));
 
   beforeEach(module(function($provide) {
     $provide.value('ItemService', ItemService);
     $provide.value('EditorConfig', EditorConfig);
     $provide.value('LogFactory', LogFactory);
-    $provide.value('ComponentImageService', ComponentImageService);
+    $provide.value('EditingImageService', EditingImageService);
     $provide.value('ComponentData', ComponentData);
     $provide.value('ComponentPopups', ComponentPopups);
     $provide.value('AppState', AppState);
@@ -124,8 +130,8 @@ describe('QuestionController', function() {
     });
 
     describe('imageService', function() {
-      it('should be ComponentImageService', function() {
-        expect(scope.imageService).toBe(ComponentImageService);
+      it('should be EditingImageService', function() {
+        expect(scope.imageService).toBe(EditingImageService);
       });
     });
 
@@ -239,17 +245,17 @@ describe('QuestionController', function() {
     beforeEach(function(){
       scope.item = {xhtml:"abc"};
       scope.$digest();
-      ItemService.saveXhtml.calls.reset();
+      ItemService.saveXhtmlAndComponents.calls.reset();
     });
     it('should save a change to xhtml', function(){
       scope.item.xhtml = "def";
       scope.$digest();
-      expect(ItemService.saveXhtml).toHaveBeenCalled();
+      expect(ItemService.saveXhtmlAndComponents).toHaveBeenCalled();
     });
     it('should not save when there was no change', function(){
       scope.item.xhtml = "abc";
       scope.$digest();
-      expect(ItemService.saveXhtml).not.toHaveBeenCalled();
+      expect(ItemService.saveXhtmlAndComponents).not.toHaveBeenCalled();
     });
   });
 
@@ -276,17 +282,17 @@ describe('QuestionController', function() {
     beforeEach(function(){
       scope.item = {components:[{'a' : 'component'}]};
       scope.$digest();
-      ItemService.saveComponents.calls.reset();
+      ItemService.saveXhtmlAndComponents.calls.reset();
     });
     it('should save a change to components', function(){
       scope.item.components = [{'b' : 'component'}];
       scope.$digest();
-      expect(ItemService.saveComponents).toHaveBeenCalled();
+      expect(ItemService.saveXhtmlAndComponents).toHaveBeenCalled();
     });
     it('should not save when there was no change ', function(){
       scope.item.components = [{'a' : 'component'}];
       scope.$digest();
-      expect(ItemService.saveComponents).not.toHaveBeenCalled();
+      expect(ItemService.saveXhtmlAndComponents).not.toHaveBeenCalled();
     });
   });
 

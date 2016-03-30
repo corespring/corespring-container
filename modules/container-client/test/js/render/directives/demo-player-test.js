@@ -11,9 +11,13 @@ describe('corespringDemoPlayer', function() {
       bind: function() {
       }
     };
+    this.info = function(){};
   }
 
-  var mockSubmitSession = jasmine.createSpy('submitSession');
+  var mockSubmitSession = jasmine.createSpy('submitSession').and.callFake(function(){
+    var onSuccess = mockSubmitSession.calls.mostRecent().args[1];
+    onSuccess({score: {summary: {percentage: 75}}});
+  });
   var mockSetMode = jasmine.createSpy('setMode');
   var mockSetEditable = jasmine.createSpy('setEditable');
   var mockReset = jasmine.createSpy('reset');
@@ -126,6 +130,10 @@ describe('corespringDemoPlayer', function() {
           .toHaveBeenCalledWith({components: componentSessions}, jasmine.any(Function), jasmine.any(Function));
       });
 
+      it('should set the score', function() {
+        expect(scope.score).toEqual({summary:{percentage: 75}});
+      });
+
     });
 
     describe("mode !== 'gather'", function() {
@@ -135,7 +143,7 @@ describe('corespringDemoPlayer', function() {
         scope.outcome = {};
         scope.responses = undefined;
         scope.playerMode = 'evaluate';
-        scope.session = {};
+        scope.session = {apple: 3};
         scope.submitOrReset();
       });
 
@@ -145,6 +153,10 @@ describe('corespringDemoPlayer', function() {
 
       it('should set session.remainingAttempts to 1', function() {
         expect(scope.session.remainingAttempts).toEqual(1);
+      });
+
+      it('session should be empty otherwise', function() {
+        expect(scope.session.apple).toBeUndefined();
       });
 
       it('should call reset on ComponentRegister', function() {

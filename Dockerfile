@@ -22,19 +22,23 @@ RUN apt-get update && apt-get install -y mongodb-org
 # Create the MongoDB data directory
 RUN mkdir -p /var/lib/mongodb 
 
-
 # Ruby 
 RUN apt-get update && \
   apt-get install -y ruby ruby-dev ruby-bundler 
 
-# fakes3
-RUN gem install fakes3
+RUN mkdir /data
+RUN mkdir /data/extras
+ADD docker/extras/ /data/extras
+
+### fakes3
+RUN chmod +x /data/extras/fakes3-0.2.3.gem
+RUN gem install builder
+RUN gem install --backtrace -V --local /data/extras/fakes3-0.2.3.gem
 RUN mkdir /opt/fake-s3-root
 ENV CONTAINER_FAKE_S3_ENDPOINT="http://localhost:4567"
 
 EXPOSE 9000
 
-RUN mkdir /data
 ADD docker/scripts/main.sh /data/main.sh
 RUN chmod +x /data/main.sh
 

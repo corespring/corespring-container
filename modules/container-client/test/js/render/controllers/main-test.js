@@ -30,7 +30,7 @@ describe('Main', function() {
   var mockGetScore = jasmine.createSpy('getScore');
   var mockSetQueryParams = jasmine.createSpy('setQueryParams');
 
-  function MockPlayerService() {
+  function MockPlayerServiceDefinition() {
     this.saveSession = mockSaveSession;
     this.loadOutcome = mockLoadOutcome;
     this.loadItemAndSession = mockLoadItemAndSession;
@@ -78,7 +78,7 @@ describe('Main', function() {
     $provide.value('$log', new MockLog());
     $provide.value('$document', MockDocument);
     $provide.value('ComponentRegister', new MockComponentRegister());
-    $provide.value('PlayerService', MockPlayerService);
+    $provide.value('PlayerServiceDefinition', MockPlayerServiceDefinition);
   }));
 
   beforeEach(inject(function($rootScope, $compile, $timeout) {
@@ -477,20 +477,48 @@ describe('Main', function() {
       attempts: ['look', 'at', 'all', 'these', 'attempts!']
     };
 
-    beforeEach(function() {
+    it("should call callback with session's attempts", function() {
       scope.session = session;
       scope.$emit('countAttempts', {}, callback);
+      expect(callback).toHaveBeenCalledWith(null, scope.session.attempts);
     });
 
-    it("should call callback with session's attempts", function() {
-      expect(callback).toHaveBeenCalledWith(null, scope.session.attempts);
+    it("should return 0, when session is not defined", function() {
+      scope.session = undefined;
+      scope.$emit('countAttempts', {}, callback);
+
+      expect(callback).toHaveBeenCalledWith(null, 0);
+    });
+
+    it("should return 0, when session.attempts is undefined", function() {
+      scope.session = {};
+      scope.$emit('countAttempts', {}, callback);
+
+      expect(callback).toHaveBeenCalledWith(null, 0);
+    });
+
+    it("should return 0, when session.attempts is null", function() {
+      scope.session = {attempts: null};
+      scope.$emit('countAttempts', {}, callback);
+
+      expect(callback).toHaveBeenCalledWith(null, 0);
+    });
+
+    it("should return 0, when session.attempts is NaN", function() {
+      scope.session = {attempts: Number.NaN};
+      scope.$emit('countAttempts', {}, callback);
+
+      expect(callback).toHaveBeenCalledWith(null, 0);
     });
 
   });
 
   describe('getScore event', function() {
     var data = {};
-    var callback = function() {};
+    var score = -1;
+    var callback = function(err, result) {
+      score = result;
+    };
 
     beforeEach(function() {
       scope.$emit('getScore', data, callback);
@@ -498,6 +526,12 @@ describe('Main', function() {
 
     it('should call PlayerService.getScore', function() {
       expect(mockGetScore).toHaveBeenCalled();
+    });
+
+    it('should return 0 when PlayerService.getScore returns an error', function() {
+      expect(score).toBe(-1); //before the error callback has been called
+      mockGetScore.calls.mostRecent().args[2]("ERROR");
+      expect(score).toBe(0);
     });
 
   });

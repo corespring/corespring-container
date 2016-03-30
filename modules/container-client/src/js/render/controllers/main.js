@@ -1,18 +1,25 @@
 angular.module('corespring-player.controllers')
   .controller(
     'Main', [
+      '$document',
       '$location',
       '$log',
       '$scope',
       '$timeout',
-      '$document',
       'ComponentRegister',
-      'PlayerService',
-      function($location, $log, $scope, $timeout, $document, ComponentRegister, PlayerServiceDef) {
-
-        var PlayerService = new PlayerServiceDef();
+      'PlayerServiceDefinition',
+      function(
+        $document,
+        $location,
+        $log,
+        $scope,
+        $timeout,
+        ComponentRegister,
+        PlayerServiceDefinition
+      ) {
 
         var currentMode = null;
+        var PlayerService = new PlayerServiceDefinition();
 
         $scope.evaluateOptions = {
           showFeedback: true,
@@ -249,7 +256,7 @@ angular.module('corespring-player.controllers')
         });
 
         $scope.$on('countAttempts', function(event, data, callback) {
-          callback(null, $scope.session.attempts);
+          callback(null, $scope.session && $scope.session.attempts || 0);
         });
 
         $scope.$on('getScore', function(event, data, callback) {
@@ -260,7 +267,11 @@ angular.module('corespring-player.controllers')
             callback(null, score);
           }
 
-          $scope.getScore(onScoreReceived);
+          function onScoreError(){
+            callback(null, 0);
+          }
+
+          $scope.getScore(onScoreReceived, onScoreError);
         });
 
         $scope.$on('completeResponse', function(event, data, callback) {

@@ -16,30 +16,7 @@ describe('supporting materials service', function() {
 
   beforeEach(module(function($provide) {
 
-    mockHttp = jasmine.createSpy('http.constructor').and.callFake(function(){
-      mockHttp.promise = new org.corespring.mocks.editor.MockPromise();
-      return mockHttp.promise;
-    });
-
-
-    function spyWithPromise(name){
-      var spy = jasmine.createSpy(name);
-      spy.and.callFake(function(){
-        spy.promise = new org.corespring.mocks.editor.MockPromise();
-        return spy.promise; 
-      });
-      return spy;
-    } 
-
-    mockHttp.get = spyWithPromise('get');
-    mockHttp.post = spyWithPromise('post');
-    mockHttp['delete'] = spyWithPromise('delete'); 
-
-    jasmine.createSpy('delete').and.callFake(function(){
-      console.log('?', this);
-      this.promise = new org.corespring.mocks.editor.MockPromise();
-      return this.promise; 
-    });
+    mockHttp = org.corespring.mocks.editor.$http();
 
     mockSmUtils = {
       addQueryParamsIfPresent: jasmine.createSpy('addQueryParamsIfPresent').and.callFake(function(url){
@@ -119,7 +96,7 @@ describe('supporting materials service', function() {
 
     it('calls $http.delete', function(){
       service.deleteAsset('material', 'filename');
-      expect(mockHttp['delete']).toHaveBeenCalledWith('url/material/filename');
+      expect(mockHttp).toHaveBeenCalledWith({method: 'delete', url: 'url/material/filename'});
     });
   });
   
@@ -151,9 +128,9 @@ describe('supporting materials service', function() {
         jasmine.any(Function));
     });
 
-    it('calls back to success handler', function(){
-      uploadSuccess({});
-      expect(onSuccess).toHaveBeenCalledWith(null, 'file');
+    it('calls back to success handler with the name from the result', function(){
+      uploadSuccess({path: 'uploaded-file'});
+      expect(onSuccess).toHaveBeenCalledWith(null, 'uploaded-file');
     });
   });
     
@@ -165,30 +142,30 @@ describe('supporting materials service', function() {
 
   function successHandlerCalled(method){
     return function(){
-      mockHttp[method].promise.triggerSuccess('ok');
+      mockHttp.promise.triggerSuccess('ok');
       expect(onSuccess).toHaveBeenCalledWith('ok');
     };
   }
 
   function errorHandlerCalled(method){
     return function(){
-      mockHttp[method].promise.triggerError('not ok');
+      mockHttp.promise.triggerError('not ok');
       expect(onError).toHaveBeenCalledWith('not ok') ;
     };
   }
 
-  function httpCalled(){
-    var args = Array.prototype.slice.call(arguments);
-    var method = args.shift(); 
+  function httpCalled(method, url, data){
     return function(){
-      var spy = mockHttp[method];
-      var expectation = expect(spy);
-      expectation.toHaveBeenCalledWith.apply(expectation, args);
+
+      var expected = {method: method, url: url};
+      if(data){
+        expected.data = data;
+      }
+      expect(mockHttp).toHaveBeenCalledWith(expected);
     };
   }
   
   describe('create', function() {
-
 
     describe('create from file', function(){
 

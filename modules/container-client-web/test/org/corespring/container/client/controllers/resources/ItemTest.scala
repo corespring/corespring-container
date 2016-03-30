@@ -1,19 +1,25 @@
 package org.corespring.container.client.controllers.resources
 
-import org.corespring.container.client.hooks.Hooks.{R, StatusMessage}
-import org.corespring.container.client.hooks.{CoreItemHooks, CreateItemHook, SupportingMaterialHooks}
+import org.corespring.container.client.controllers.helpers.{ ItemInspector, PlayerXhtml }
+import org.corespring.container.client.hooks.Hooks.StatusMessage
+import org.corespring.container.client.hooks._
+import org.corespring.container.components.model.{ Component, Interaction }
+import org.corespring.container.components.model.dependencies.ComponentMaker
+import org.corespring.container.components.services.ComponentService
 import org.corespring.test.TestContext
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
-import play.api.libs.json.{JsValue, Json}
+import org.specs2.time.NoTimeConversions
+import play.api.libs.json.{ JsObject, JsString, JsValue, Json }
 import play.api.mvc.RequestHeader
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 
-import scala.concurrent.Future
+import scala.concurrent.duration._
+import scala.concurrent.{ Await, Future }
 
-class ItemTest extends Specification with Mockito {
+class ItemTest extends Specification with Mockito with ComponentMaker with NoTimeConversions {
 
   trait IH extends CoreItemHooks with CreateItemHook
 
@@ -21,52 +27,66 @@ class ItemTest extends Specification with Mockito {
     createError: Option[StatusMessage] = None,
     loadResult: JsValue = Json.obj("_id" -> Json.obj("$oid" -> "1"), "xhtml" -> "<div></div>"))
     extends Scope {
-    val item = new Item with TestContext{
 
-      override def hooks: IH = new IH with TestContext{
+    def components: Seq[Component] = Seq.empty
 
-        override def createItem(json: Option[JsValue])(implicit header: RequestHeader): Future[Either[StatusMessage, String]] = {
-          Future {
-            createError.map {
-              e =>
-                Left(e)
-            }.getOrElse(Right("new_id"))
-          }
+    val hooks: ItemHooks = {
+      val m = mock[ItemHooks]
+      m.createItem(any[Option[String]])(any[RequestHeader]).returns {
+        Future.successful {
+          createError.map {
+            e =>
+              Left(e)
+          }.getOrElse(Right("new_id"))
         }
-
-        override def load(itemId: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]] = {
-          Future {
-            Right(loadResult)
-          }
+      }
+      m.createSingleComponentItem(any[Option[String]], any[String], any[String], any[JsObject])(any[RequestHeader]).returns {
+        Future.successful {
+          createError.map {
+            e =>
+              Left(e)
+          }.getOrElse(Right("new_id"))
         }
-
-
-        override def delete(id: String)(implicit h: RequestHeader): R[JsValue] = ???
-
-        override def saveXhtml(id: String, xhtml: String)(implicit h: RequestHeader): R[JsValue] = ???
-
-        override def saveCustomScoring(id: String, customScoring: String)(implicit header: RequestHeader): R[JsValue] = ???
-
-        override def saveSupportingMaterials(id: String, json: JsValue)(implicit h: RequestHeader): R[JsValue] = ???
-
-        override def saveCollectionId(id: String, collectionId: String)(implicit h: RequestHeader): R[JsValue] = ???
-
-        override def saveComponents(id: String, json: JsValue)(implicit h: RequestHeader): R[JsValue] = ???
-
-        override def saveSummaryFeedback(id: String, feedback: String)(implicit h: RequestHeader): R[JsValue] = ???
-
-        override def saveProfile(id: String, json: JsValue)(implicit h: RequestHeader): R[JsValue] = ???
-
       }
-
-
-      override protected def componentTypes: Seq[String] = Seq.empty
-
-      override def materialHooks: SupportingMaterialHooks = {
-        val m = mock[SupportingMaterialHooks]
-        m
+      m.load(any[String])(any[RequestHeader]).returns {
+        Future.successful(Right(loadResult))
       }
+      m
     }
+
+    val materialHooks = {
+      val m = mock[ItemSupportingMaterialHooks]
+      m
+    }
+
+    val componentService = {
+      val m = mock[ComponentService]
+      m.interactions returns components.flatMap {
+        case i: Interaction => Some(i)
+        case _ => None
+      }
+      m
+    }
+
+    val playerXhtml = {
+      val m = mock[PlayerXhtml]
+      m.processXhtml(any[String]) answers (s => s.asInstanceOf[String])
+      m
+    }
+
+    lazy val itemInspector = {
+      val m = mock[ItemInspector]
+      m.findComponentsNotInXhtml(any[String], any[JsObject]) returns Future.successful(Seq.empty)
+      m
+    }
+
+    val item = new Item(
+      hooks,
+      materialHooks,
+      componentService,
+      TestContext.containerContext,
+      playerXhtml,
+      itemInspector)
 
   }
 
@@ -77,11 +97,16 @@ class ItemTest extends Specification with Mockito {
         status(item.load("x")(FakeRequest("", ""))) === OK
       }
 
+      "call playerXhtml.mkPlayerXhtml" in new item() {
+        item.load("x")(FakeRequest("", ""))
+        there was one(playerXhtml).processXhtml("<div></div>")
+      }
+
       "prep the json" in new item(loadResult = Json.obj("_id" ->
         Json.obj("$oid" -> "1"), "xhtml" -> "<p>a</p>")) {
         val json = contentAsJson(item.load("x")(FakeRequest("", "")))
         (json \ "itemId").as[String] === "1"
-        (json \ "xhtml").as[String] === """<div class="para">a</div>"""
+        (json \ "xhtml").as[String] === """<p>a</p>"""
       }
     }
 
@@ -95,6 +120,34 @@ class ItemTest extends Specification with Mockito {
       val result = item.create(FakeRequest("", ""))
       status(result) === OK
       contentAsJson(result) === Json.obj("itemId" -> "new_id")
+    }
+
+    trait createWithSingleComponent extends item {
+      override lazy val components = Seq(uiComp("type", Nil).copy(defaultData = Json.obj("defaultData" -> true)))
+      val request = FakeRequest("", "")
+      lazy val result = item.createWithSingleComponent("org-type")(request)
+    }
+
+    "createWithSingleComponent" should {
+      s"returns $CREATED when successful" in new createWithSingleComponent {
+        status(result) === CREATED
+      }
+
+      s"returns $NOT_FOUND when the interaction can't be found" in new createWithSingleComponent {
+        override lazy val components = Seq.empty
+        status(result) === NOT_FOUND
+      }
+
+      s"returns $NOT_FOUND when the interaction defaultData isn't a JsObject" in new createWithSingleComponent {
+        override lazy val components = Seq(uiComp("type", Nil).copy(defaultData = JsString("hi")))
+        status(result) === NOT_FOUND
+      }
+
+      s"calls hooks.createSingleComponentItem" in new createWithSingleComponent {
+        Await.result(result, 1.second)
+        there was one(hooks).createSingleComponentItem(None, "org-type", "singleComponent", Json.obj("defaultData" -> true))(request)
+      }
+
     }
   }
 }

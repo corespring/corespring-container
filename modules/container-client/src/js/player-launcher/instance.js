@@ -2,17 +2,41 @@
  * @param call: { url: '', method: '', params: {}, hash: ''}
  */
 
-var Instance = function(call,  element, errorCallback, log, autosizeEnabled) {
+var Instance = function(launchOpts, element, errorCallback, log, autosizeEnabled, iframeScrollingEnabled) {
+
+  launchOpts = launchOpts || {};
+
+  var call = launchOpts.call;
+  var queryParams = launchOpts.queryParams;
+  var data = launchOpts.data || {};
 
   autosizeEnabled = autosizeEnabled !== false;
 
   log = log || require('logger');
 
-  function PostForm(url){
+  function PostForm(url) {
 
     var formName = iframeUid + '-form';
 
-    function addForm(){
+    function addForm() {
+
+      var formParams = [];
+      
+      for(var x in data){
+
+        if(data[x] !== undefined){
+
+          var d = data[x];
+          
+          if(typeof(d) === 'object'){
+            d = JSON.stringify(d);
+          } 
+
+          var p = "<input type='hidden' name=\'"+x+"\' value=\'"+d+"\'></input>";
+          formParams.push(p);
+        }
+      }
+
       var form = [
         '<form ',
         '  target="', iframeUid, '"',
@@ -20,22 +44,23 @@ var Instance = function(call,  element, errorCallback, log, autosizeEnabled) {
         '  name="', formName, '"',
         '  method="POST" ',
         '  action="', url, '">',
+        formParams.join(''),
         '</form>'
       ].join('');
 
       $('body').append(form);
     }
 
-    function submitForm(){
+    function submitForm() {
       var form = document.forms[formName];
       form.submit();
     }
 
-    function removeForm(){
+    function removeForm() {
       $('#' + formName).remove();
     }
 
-    this.load = function(){
+    this.load = function() {
       addForm();
       submitForm();
       removeForm();
@@ -50,7 +75,7 @@ var Instance = function(call,  element, errorCallback, log, autosizeEnabled) {
 
   function $iframe() {
     var $node = $('#' + iframeUid);
-    if($node.size() !== 1){
+    if ($node.size() !== 1) {
       var err = errorCodes.CANT_FIND_IFRAME(iframeUid);
       errorCallback(err);
     }
@@ -70,12 +95,12 @@ var Instance = function(call,  element, errorCallback, log, autosizeEnabled) {
 
     function makeUrl() {
       var Builder = require('url-builder');
-      return new Builder(call.url).params(call.params).build();
+      return new Builder(call.url).params(queryParams).build();
     }
 
     var url = makeUrl();
 
-    if(call.hash){
+    if (call.hash) {
       url += '#' + call.hash;
     }
 
@@ -86,24 +111,24 @@ var Instance = function(call,  element, errorCallback, log, autosizeEnabled) {
     ].join('\n');
 
     // This is a workaround for IE* because $(iframe).css("absolute","initial") is not working
-    (function injectPlayerStyles(){
-      if ($('head #playerstyle').length === 0){
+    (function injectPlayerStyles() {
+      if ($('head #playerstyle').length === 0) {
         $('head').append('<style id="playerstyle" type="text/css">' + iframeStyles + '</style>');
       }
     })();
 
     var iframeOpen = [
       '<iframe',
-      ' id="', iframeUid , '"',
-      ' name="', iframeUid ,'"',
+      ' id="', iframeUid, '"',
+      ' name="', iframeUid, '"',
       ' frameborder="0"',
-      ' scrolling="no"',
+      iframeScrollingEnabled ? '' : ' scrolling="no"',
       ' class="player-loading"',
       ' style="border:none;' + (autosizeEnabled ? ' width:100%;' : '') + '" '
     ].join('');
 
-    if(call.method === 'GET'){
-      iframeOpen += 'src="'+url+'"';
+    if (call.method === 'GET') {
+      iframeOpen += 'src="' + url + '"';
     }
 
     var iframeClose = '></iframe>';
@@ -111,15 +136,17 @@ var Instance = function(call,  element, errorCallback, log, autosizeEnabled) {
     $(e).html(iframeOpen + iframeClose);
 
 
-    if(call.method === 'POST'){
+    if (call.method === 'POST') {
       var post = new PostForm(url);
       post.load();
     }
 
-    channel = new msgr.Channel(window, $iframe()[0].contentWindow, {enableLogging: false});
+    channel = new msgr.Channel(window, $iframe()[0].contentWindow, {
+      enableLogging: false
+    });
 
-    if(autosizeEnabled){
-      channel.on('dimensionsUpdate', function(data){
+    if (autosizeEnabled) {
+      channel.on('dimensionsUpdate', function(data) {
         $iframe().height(data.h);
       });
     }
@@ -128,6 +155,45 @@ var Instance = function(call,  element, errorCallback, log, autosizeEnabled) {
       $iframe().removeClass("player-loading");
       $iframe().addClass("player-loaded");
     });
+
+    channel.on('ready', function(){
+      channel.send('initialise', data);
+    });
+
+    /**
+     * If you want the main window to scroll,
+     * send message "autoScroll" with the clientX/Y position
+     * of the dragged element.
+     */
+    channel.on('autoScroll', function(clientPos) {
+      var scrollAmount = 5;
+      var sensitiveAreaHeight = 200;
+
+      var $scrollable = $('.item-iframe-container');
+      if($scrollable.length === 0){
+
+        $scrollable = $('body');
+      }
+      var scrollTop = $scrollable.scrollTop();
+      var viewportTop = 0;
+      var viewportBottom = $scrollable.height();
+      var y = clientPos.y - scrollTop;
+      if (y < viewportTop + sensitiveAreaHeight) {
+        $scrollable.scrollTop(scrollTop - scrollAmount);
+      } else if (y > viewportBottom - sensitiveAreaHeight) {
+        $scrollable.scrollTop(scrollTop + scrollAmount);
+      }
+    });
+
+    channel.on('getScrollPosition', function(err, callback){
+      var $scrollable = $('.item-iframe-container');
+      if($scrollable.length === 0){
+        $scrollable = $('body');
+      }
+      var scrollTop = $scrollable.scrollTop();
+      callback(null, {top: scrollTop});
+    });
+
   }
 
   initialize.bind(this)(element);
@@ -150,14 +216,14 @@ var Instance = function(call,  element, errorCallback, log, autosizeEnabled) {
     channel.remove();
   };
 
-  this.width = function(w){
+  this.width = function(w) {
     $('#' + iframeUid).width(w);
   };
 
-  this.css = function(key, value){
+  this.css = function(key, value) {
     $('#' + iframeUid).css(key, value);
   };
 
 };
 
- module.exports = Instance;
+module.exports = Instance;

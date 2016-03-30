@@ -11,10 +11,6 @@ import org.corespring.container.logging.ContainerLogger
 
 import scala.collection.mutable
 
-trait JsLogging {
-  lazy val logger = ContainerLogger.getLogger("JsProcessing")
-}
-
 case class RhinoJsError(
   val message: String,
   val lineNo: Int,
@@ -61,7 +57,7 @@ private[rhino] object Scopes {
 
 trait LibLoading {
 
-  def logger: Logger
+  private lazy val logger: Logger = Logger(classOf[LibLoading])
 
   def loadJsLib(path: String): Option[Reader] = {
     val stream = getClass.getResourceAsStream(path)
@@ -94,7 +90,7 @@ trait LibLoading {
  */
 trait GlobalScope extends LibLoading {
 
-  lazy val logger = ContainerLogger.getLogger("Scopes")
+  private lazy val logger = Logger(classOf[GlobalScope])
 
   def files: Seq[String]
 
@@ -116,6 +112,7 @@ trait GlobalScope extends LibLoading {
     } catch {
       case e: Throwable => {
         logger.error(e.getMessage)
+        e.printStackTrace()
         None
       }
     } finally {
@@ -124,7 +121,9 @@ trait GlobalScope extends LibLoading {
   }
 }
 
-trait JsContext extends JsLogging with LibLoading {
+trait JsContext extends LibLoading {
+
+  private lazy val logger = Logger(classOf[JsContext])
 
   private def loadScope(context: Context, libs: Seq[String], srcs: Seq[(String, String)]): ScriptableObject = {
 
@@ -160,7 +159,7 @@ trait JsContext extends JsLogging with LibLoading {
   }
 }
 
-trait JsFunctionCalling extends JsLogging {
+trait JsFunctionCalling {
 
   def jsObject(json: JsValue)(implicit ctx: Context, scope: Scriptable): AnyRef = {
     val jsonString = Json.stringify(json)

@@ -2,11 +2,11 @@ package org.corespring.shell.controllers.editor
 
 import com.mongodb.casbah.Imports._
 import org.bson.types.ObjectId
-import org.corespring.container.client.controllers.resources.CoreItem
+import org.corespring.container.client.hooks.Hooks.{ R, StatusMessage }
 import org.corespring.container.client.hooks._
-import org.corespring.container.client.hooks.Hooks.{ StatusMessage, R }
+import org.corespring.container.client.integration.ContainerExecutionContext
 import org.corespring.container.client.{ hooks => containerHooks }
-import org.corespring.mongo.json.services.MongoService
+import org.corespring.shell.services.ItemService
 import play.api.http.Status._
 import play.api.libs.json._
 import play.api.mvc._
@@ -14,14 +14,14 @@ import play.api.mvc._
 import scala.concurrent.Future
 import scala.util.Try
 
-trait ItemSupportingMaterialHooks
+class ItemSupportingMaterialHooks(
+  assets: SupportingMaterialAssets[String],
+  itemService: ItemService,
+  val containerContext: ContainerExecutionContext)
   extends containerHooks.ItemSupportingMaterialHooks
   with SupportingMaterialHooksHelper {
 
   import scala.concurrent.ExecutionContext.Implicits.global
-
-  def assets: SupportingMaterialAssets[String]
-  def itemService: MongoService
 
   override def create[F <: File](id: String, sm: CreateNewMaterialRequest[F])(implicit h: RequestHeader): R[JsValue] = Future {
     {
@@ -52,7 +52,7 @@ trait ItemSupportingMaterialHooks
     }
   }
 
-  override def addAsset(id: String, name: String, binary: Binary)(implicit h: RequestHeader): R[JsValue] = Future {
+  override def addAsset(id: String, name: String, binary: Binary)(implicit h: RequestHeader): R[UploadResult] = Future {
     val query = MongoDBObject("_id" -> new ObjectId(id), "supportingMaterials.name" -> name)
     val binaryDbo = binaryToDbo(binary, false)
     val update = MongoDBObject("$push" -> MongoDBObject("supportingMaterials.$.files" -> binaryDbo))
@@ -60,7 +60,7 @@ trait ItemSupportingMaterialHooks
 
     if (wr.getN == 1) {
       assets.uploadAssetToSupportingMaterial(id, name, binary)
-      Right(Json.parse(com.mongodb.util.JSON.serialize(binaryDbo)))
+      Right(UploadResult(binary.name))
     } else {
       Left((BAD_REQUEST, "Failed to remove the asset"))
     }
@@ -107,13 +107,13 @@ trait ItemSupportingMaterialHooks
 
 }
 
-trait ItemHooks
+class ItemHooks(
+  itemService: ItemService,
+  assets: ItemAssets,
+  val containerContext: ContainerExecutionContext)
   extends containerHooks.ItemHooks
   //with CoreItemHooks
   with ItemHooksHelper {
-  def itemService: MongoService
-
-  def assets: ItemAssets
 
   override def load(itemId: String)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] = Future {
     itemService.load(itemId).map { i =>
@@ -149,6 +149,22 @@ trait ItemHooks
     itemFineGrainedSave(id, Json.obj("components" -> json))
   }
 
+  override def saveXhtmlAndComponents(id: String, markup: String, components: JsValue)(implicit h: RequestHeader): R[JsValue] = {
+    val xhtmlResult = saveXhtml(id, markup)(h)
+    val componentResult = saveComponents(id, components)(h)
+    for {
+      x <- xhtmlResult
+      c <- componentResult
+    } yield {
+      (x, c) match {
+        case (Left((xErr, xMsg)), Left((cErr, cMsg))) => Left(xErr, xMsg)
+        case (Left((err, msg)), _) => Left(err, msg)
+        case (_, Left((err, msg))) => Left(err, msg)
+        case (Right(xJson), Right(cJson)) => Right(xJson.as[JsObject].deepMerge(cJson.as[JsObject]))
+      }
+    }
+  }
+
   override def saveSummaryFeedback(id: String, feedback: String)(implicit h: RequestHeader): R[JsValue] = {
     itemFineGrainedSave(id, Json.obj("summaryFeedback" -> feedback))
   }
@@ -157,7 +173,7 @@ trait ItemHooks
     itemFineGrainedSave(id, Json.obj("profile" -> json))
   }
 
-  override def createItem(json: Option[JsValue])(implicit header: RequestHeader): R[String] = Future {
+  override def createItem(collectionId: Option[String])(implicit header: RequestHeader): R[String] = Future {
     val newItem = Json.obj(
       "components" -> Json.obj(),
       "profile" -> Json.obj("taskInfo" -> Json.obj("title" -> "Untitled")),
@@ -170,4 +186,17 @@ trait ItemHooks
     }.getOrElse(Left(BAD_REQUEST -> "Error creating item"))
   }
 
+  override def createSingleComponentItem(collectionId: Option[String], componentType: String, key: String, defaultData: JsObject)(implicit h: RequestHeader): R[String] = Future {
+
+    val newItem = Json.obj(
+      "components" -> Json.obj(key -> Json.obj("componentType" -> componentType).deepMerge(defaultData)),
+      "profile" -> Json.obj("taskInfo" -> Json.obj("title" -> "Untitled")),
+      "metadata" -> Json.obj(),
+      "xhtml" -> s"<div><div $componentType='' id='$key'></div></div>")
+
+    itemService.create(newItem).map {
+      oid =>
+        Right(oid.toString)
+    }.getOrElse(Left(BAD_REQUEST -> "Error creating item"))
+  }
 }

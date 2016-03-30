@@ -3,7 +3,8 @@ angular.module('corespring-editor.services').service('ItemService', [
   '$timeout', 
   'ItemUrls', 
   'LogFactory',
-  function($http, $timeout, ItemUrls, LogFactory) {
+  'QueryParamUtils',
+  function($http, $timeout, ItemUrls, LogFactory, QueryParamUtils) {
 
     /**
      * Service that contains xhr calls to the server.
@@ -26,7 +27,7 @@ angular.module('corespring-editor.services').service('ItemService', [
         return url.indexOf('?' === -1) ? '?' : '&';
       }
 
-      this.load = function(onSuccess, onFailure) {
+      this.load = function(onSuccess, onFailure, force) {
         logger.debug('load, loaded?', loadedData !== null);
 
         loadQueue.push({
@@ -34,7 +35,7 @@ angular.module('corespring-editor.services').service('ItemService', [
           failure: onFailure
         });
 
-        if (loadedData) {
+        if (loadedData && !force) {
           flushQueue(loadedData, 'success');
           return;
         }
@@ -47,7 +48,7 @@ angular.module('corespring-editor.services').service('ItemService', [
         try {
           loadInProgress = true;
           var finalUrl = addQueryParamsIfPresent(ItemUrls.load.url);
-          $http[ItemUrls.load.method](finalUrl)
+          $http({method: ItemUrls.load.method, url: finalUrl})
             .success(loadItemSuccess)
             .error(loadItemError);
         } catch (e) {
@@ -66,6 +67,17 @@ angular.module('corespring-editor.services').service('ItemService', [
           flushQueue(data, 'failure');
         }
       };
+
+       this.saveXhtmlAndComponents = function(xhtml, components, onSuccess, onFailure){
+         var call = ItemUrls.saveXhtmlAndComponents;
+
+         var data = {
+           xhtml: xhtml,
+           components: components
+         };
+
+         _save(call, data, onSuccess, onFailure);
+       };
 
       this.saveComponents = function(data, onSuccess, onFailure) {
         save('components', data, onSuccess, onFailure);
@@ -108,7 +120,7 @@ angular.module('corespring-editor.services').service('ItemService', [
 
         notifyListeners('saving');
 
-        $http[method](url, data)
+        $http({method: method, url: url, data: data})
           .success(saveSuccess)
           .error(saveError);
 
@@ -132,16 +144,15 @@ angular.module('corespring-editor.services').service('ItemService', [
         }
       };
 
-      function save(set, data, onSuccess, onFailure) {
-        var method = ItemUrls.saveSubset.method;
-        var url = ItemUrls.saveSubset.url.replace(':subset', set);
-        url = addQueryParamsIfPresent(url);
+      function _save(call, data, onSuccess, onFailure) {
+        var method = call.method;
+        var url = addQueryParamsIfPresent(call.url);
         logger.debug('save', data);
         logger.debug('save - url:', url);
 
         notifyListeners('saving');
 
-        $http[method](url, data)
+        $http({method: call.method, url: url, data: data})
           .success(saveSuccess)
           .error(saveError);
 
@@ -165,6 +176,13 @@ angular.module('corespring-editor.services').service('ItemService', [
         }
       }
 
+      function save(set, data, onSuccess, onFailure) {
+        var call = {
+         method:ItemUrls.saveSubset.method,
+         url: ItemUrls.saveSubset.url.replace(':subset', set)};
+         _save(call, data, onSuccess, onFailure);
+      }
+
       function notifyListeners(message) {
         _.forIn(saveListeners, function(listener, key) {
           if (listener.handleSaveMessage) {
@@ -176,8 +194,7 @@ angular.module('corespring-editor.services').service('ItemService', [
       }
 
       function addQueryParamsIfPresent(path) {
-        var href = document.location.href;
-        return path + (href.indexOf('?') === -1 ? '' : '?' + href.split('?')[1]);
+        return QueryParamUtils.addQueryParams(path);
       }
 
       function flushQueue(d, callbackName) {

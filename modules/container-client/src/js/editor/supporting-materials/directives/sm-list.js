@@ -86,7 +86,7 @@
          ngModel: '='
        },
        template: ['<ul>',
-         '  <li class="sm-section-header">{{ngModel.name}}</li>',
+         '  <li class="sm-section-header">{{ngModel.name || \'Other\'}}</li>',
          '  <li class="sm-item" ng-repeat="i in ngModel.items"',
          '     sm-item ng-model="i"></li>',
          '</ul>'
