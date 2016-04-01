@@ -22,7 +22,22 @@ class PlayerHooks(
 
   val playerSkin = Json.obj(
     "colors" -> Json.obj(
-      "correct-color" -> "#ffff00"),
+      "correct-color" -> "#ff0",
+      "incorrect-color" -> "#0ff",
+      "feedback-correct-background" -> "#4AAF46",
+      "feedback-correct-foreground" -> "#F8FFE2",
+      "feedback-incorrect-background" -> "#FCB733",
+      "feedback-incorrect-foreground" -> "#FBF2E3",
+      "feedback-partially-correct-background" -> "#C1E1AC",
+      "feedback-partially-correct-foreground" -> "#52654F",
+      "choice-correct-border" -> "#C7E2C7",
+      "choice-correct-inner" -> "#86A785",
+      "choice-incorrect-border" -> "#FFCC99",
+      "choice-incorrect-inner" -> "#FBE7B7",
+      "choice-selected-border" -> "#A2D4F2",
+      "choice-selected-inner" -> "#404B9B",
+      "choice-disabled-border" -> "#A2D4F2",
+      "choice-disabled-inner" -> "#404B9B"),
     "iconSet" -> "emoji")
 
   override def createSessionForItem(itemId: String)(implicit header: RequestHeader): Future[Either[(Int, String), (JsValue, JsValue, JsValue)]] = Future {

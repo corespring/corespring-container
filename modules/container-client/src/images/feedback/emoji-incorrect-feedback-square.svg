@@ -5,14 +5,14 @@
 	<g>
 		<g>
 			<g>
-				<polygon class="incorrect-light" points="34.1,28.6 34.1,2.2 2,2.2 2,34.3 40.1,34.3"/>
+				<polygon class="incorrect-background" points="34.1,28.6 34.1,2.2 2,2.2 2,34.3 40.1,34.3"/>
 				<g>
 					<g>
 						<g>
 							<g>
-								<rect x="20.6" y="11.8" class="incorrect-dark" width="4" height="5"/>
-								<rect x="11.5" y="11.8" class="incorrect-dark" width="4" height="5"/>
-								<rect x="11.1" y="22.2" class="incorrect-dark" width="14" height="3.6"/>
+								<rect x="20.6" y="11.8" class="incorrect-foreground" width="4" height="5"/>
+								<rect x="11.5" y="11.8" class="incorrect-foreground" width="4" height="5"/>
+								<rect x="11.1" y="22.2" class="incorrect-foreground" width="14" height="3.6"/>
 							</g>
 						</g>
 					</g>

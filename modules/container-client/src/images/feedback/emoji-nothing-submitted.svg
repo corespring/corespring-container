@@ -5,16 +5,16 @@
 	<g>
 		<g>
 			<g>
-				<polygon class="nothing-submitted-dark" points="15.4,5.4 6.6,14.1 6.6,26.6 15.4,35.4 27.8,35.4 36.6,26.6 36.6,14.1 27.8,5.4"/>
+				<polygon class="nothing-submitted-background" points="15.4,5.4 6.6,14.1 6.6,26.6 15.4,35.4 27.8,35.4 36.6,26.6 36.6,14.1 27.8,5.4"/>
 			</g>
 		</g>
 	</g>
 	<g>
 		<g>
 			<g>
-				<rect x="23.8" y="15" class="nothing-submitted-light" width="3.5" height="4.4"/>
-				<rect x="16" y="15" class="nothing-submitted-light" width="3.5" height="4.4"/>
-				<path class="nothing-submitted-light" d="M24.2,27.1h-5.1c-0.8,0-1.5-0.7-1.5-1.5v0c0-0.8,0.7-1.5,1.5-1.5h5.1c0.8,0,1.5,0.7,1.5,1.5v0
+				<rect x="23.8" y="15" class="nothing-submitted-foreground" width="3.5" height="4.4"/>
+				<rect x="16" y="15" class="nothing-submitted-foreground" width="3.5" height="4.4"/>
+				<path class="nothing-submitted-foreground" d="M24.2,27.1h-5.1c-0.8,0-1.5-0.7-1.5-1.5v0c0-0.8,0.7-1.5,1.5-1.5h5.1c0.8,0,1.5,0.7,1.5,1.5v0
 					C25.7,26.4,25,27.1,24.2,27.1z"/>
 			</g>
 		</g>

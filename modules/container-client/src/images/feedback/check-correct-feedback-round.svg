@@ -6,14 +6,7 @@
 	s7.2,16.1,16.1,16.1h18.5L31.2,29.1z"/>
 <g>
 	<g>
-		<g>
-			<g>
-				<path class="correct-foreground" d="M24.7,22.1c-1.5,1.7-3.6,2.7-5.8,2.7s-4.5-1.1-5.8-2.7l-2.8,1.6c2,2.7,5.2,4.2,8.7,4.2
-					c3.4,0,6.6-1.6,8.7-4.2L24.7,22.1z"/>
-				<rect x="21.1" y="13.1" class="correct-foreground" width="3.7" height="4.7"/>
-				<rect x="12.7" y="13.1" class="correct-foreground" width="3.7" height="4.7"/>
-			</g>
-		</g>
+		<polygon class="correct-foreground" points="19.1,28.6 11.8,22.3 14.4,19.2 17.9,22.1 23.9,11.4 27.5,13.4 		"/>
 	</g>
 </g>
 </svg>
