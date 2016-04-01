@@ -40,7 +40,7 @@
     "wiggi-wiz": "git@github.com:corespring/wiggi-wiz.git#0.1.87",
     "mathquill": "git@github.com:corespring/mathquill.git#master",
     "corespring-math-input": "git@github.com:corespring/corespring-math-input.git#0.0.6",
-    "bootstrap-switch": "^3.3.2"
+    "bootstrap-switch": "~3.3.2"
   },
   "devDependencies": {
     "angular-mocks": "~1.2.12",
