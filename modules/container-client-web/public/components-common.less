@@ -21,27 +21,39 @@
 @warning-color-border: #ebccd1;
 @warning-color-background: #f2dede;
 
+@correct-background: #4aaf46;
+@correct-foreground: #f8ffe2;
+@partially-correct-background: #c1e1ac;
+@incorrect-background: #fcb733;
+@incorrect-foreground: #fbf2e3;
+@hide-show-background: #bce2ff;
+@hide-show-foreground: #1a9cff;
+@warning-background: #464146;
+@warning-foreground: #ffffff;
+@warning-block-background: #e0dee0;
+@warning-block-foreground: #f8f6f6;
+
 @warning-character: '\f071';
 @correct-character: '\f058';
 @incorrect-character: '\f057';
 @partial-character: '\f05c';
 
 .correct-input() {
-  border: 1px solid @correct-color;
-  -moz-box-shadow: 0px 0px 6px 0px #3C763D, inset 0px 1px 0px 0px #ECECEC;
-  box-shadow: 0px 0px 6px 0px #3C763D, inset 0px 1px 0px 0px #ECECEC;
+  border: 1px solid @feedback-correct-background;
+  -moz-box-shadow: 0px 0px 6px 0px @feedback-correct-background, inset 0px 1px 0px 0px #ECECEC;
+  box-shadow: 0px 0px 6px 0px @feedback-correct-background, inset 0px 1px 0px 0px #ECECEC;
 }
 
 .incorrect-input() {
-  border: 1px solid @incorrect-color;
+  border: 1px solid @feedback-incorrect-background;
   -moz-box-shadow: 0px 0px 6px 0px #979797, inset 0px 1px 0px 0px #ECECEC;
   box-shadow: 0px 0px 6px 0px #979797, inset 0px 1px 0px 0px #ECECEC;
 }
 
 .partial-input() {
-  border: 1px solid @partial-color;
-  -moz-box-shadow: 0px 0px 6px 0px #3A87AD, inset 0px 1px 0px 0px #ECECEC;
-  box-shadow: 0px 0px 6px 0px #3A87AD, inset 0px 1px 0px 0px #ECECEC;
+  border: 1px solid @partially-correct-background;
+  -moz-box-shadow: 0px 0px 6px 0px @partially-correct-background, inset 0px 1px 0px 0px #ECECEC;
+  box-shadow: 0px 0px 6px 0px @partially-correct-background, inset 0px 1px 0px 0px #ECECEC;
 }
 
 .warning-input() {
