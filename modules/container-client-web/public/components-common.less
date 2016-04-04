@@ -1,23 +1,5 @@
-@feedback-correct-background: #4AAF46;
-@feedback-correct-foreground: #F8FFE2;
-
-@feedback-incorrect-background: #eea236;
-@feedback-incorrect-foreground: #fbe7b7;
-
-@feedback-partially-correct-background: #C1E1AC;
-@feedback-partially-correct-foreground: #52654F;
-
-@feedback-nothing-submitted-background: #464146;
-@feedback-nothing-submitted-foreground: #ffffff;
-@feedback-nothing-submitted-accent: #e0dee0;
-
-@correct-color: #3c763d;
-@incorrect-color: #EC971F;
-@partial-color: #3a87ad;
-
 @warning-color: #a94442;
 @learn-more-color: #008bc9;
-
 @warning-color-border: #ebccd1;
 @warning-color-background: #f2dede;
 
@@ -39,13 +21,13 @@
 @partial-character: '\f05c';
 
 .correct-input() {
-  border: 1px solid @feedback-correct-background;
-  -moz-box-shadow: 0px 0px 6px 0px @feedback-correct-background, inset 0px 1px 0px 0px #ECECEC;
-  box-shadow: 0px 0px 6px 0px @feedback-correct-background, inset 0px 1px 0px 0px #ECECEC;
+  border: 1px solid @correct-background;
+  -moz-box-shadow: 0px 0px 6px 0px @correct-background, inset 0px 1px 0px 0px #ECECEC;
+  box-shadow: 0px 0px 6px 0px @correct-background, inset 0px 1px 0px 0px #ECECEC;
 }
 
 .incorrect-input() {
-  border: 1px solid @feedback-incorrect-background;
+  border: 1px solid @incorrect-background;
   -moz-box-shadow: 0px 0px 6px 0px #979797, inset 0px 1px 0px 0px #ECECEC;
   box-shadow: 0px 0px 6px 0px #979797, inset 0px 1px 0px 0px #ECECEC;
 }
