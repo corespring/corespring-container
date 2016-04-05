@@ -20,24 +20,19 @@ class PlayerHooks(
 
   import play.api.http.Status._
 
-  val playerSkin = Json.obj(
+  def playerSkin: JsObject = Json.obj(
     "colors" -> Json.obj(
-      "correct-color" -> "#ff0",
-      "incorrect-color" -> "#0ff",
-      "feedback-correct-background" -> "#4AAF46",
-      "feedback-correct-foreground" -> "#F8FFE2",
-      "feedback-incorrect-background" -> "#FCB733",
-      "feedback-incorrect-foreground" -> "#FBF2E3",
-      "feedback-partially-correct-background" -> "#C1E1AC",
-      "feedback-partially-correct-foreground" -> "#52654F",
-      "choice-correct-border" -> "#C7E2C7",
-      "choice-correct-inner" -> "#86A785",
-      "choice-incorrect-border" -> "#FFCC99",
-      "choice-incorrect-inner" -> "#FBE7B7",
-      "choice-selected-border" -> "#A2D4F2",
-      "choice-selected-inner" -> "#404B9B",
-      "choice-disabled-border" -> "#A2D4F2",
-      "choice-disabled-inner" -> "#404B9B"),
+      "correct-background" -> "#4aaf46",
+      "correct-foreground" -> "#f8ffe2",
+      "partially-correct-background" -> "#c1e1ac",
+      "incorrect-background" -> "#fcb733",
+      "incorrect-foreground" -> "#fbf2e3",
+      "hide-show-background" -> "#bce2ff",
+      "hide-show-foreground" -> "#1a9cff",
+      "warning-background" -> "#464146",
+      "warning-foreground" -> "#ffffff",
+      "warning-block-background" -> "#e0dee0",
+      "warning-block-foreground" -> "#f8f6f6"),
     "iconSet" -> "emoji")
 
   override def createSessionForItem(itemId: String)(implicit header: RequestHeader): Future[Either[(Int, String), (JsValue, JsValue, JsValue)]] = Future {
