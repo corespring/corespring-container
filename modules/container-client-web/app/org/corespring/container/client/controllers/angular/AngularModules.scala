@@ -10,6 +10,7 @@ class AngularModules(defaultModules: String*) extends NameHelper {
     case i: Interaction => true
     case w: Widget => true
     case l: Library => l.client.size > 0
+    case y: LayoutComponent => true
     case _ => false
   }
 
