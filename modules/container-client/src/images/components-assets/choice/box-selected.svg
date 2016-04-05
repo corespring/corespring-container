@@ -11,12 +11,12 @@
 <g>
 	<g>
 		<g>
-			<rect x="0.5" y="0.5" class="st0" width="30" height="30"/>
+			<rect x="0.5" y="0.5" class="choice-foreground" width="30" height="30"/>
 		</g>
 		<g>
-			<rect x="2.5" y="2.5" class="st1" width="26" height="26"/>
+			<rect x="2.5" y="2.5" class="choice-background" width="26" height="26"/>
 		</g>
 	</g>
-	<rect x="8.5" y="8.5" class="st2 inner-rect" width="14" height="14"/>
+	<rect x="8.5" y="8.5" class="choice-selection inner-rect" width="14" height="14"/>
 </g>
 </svg>

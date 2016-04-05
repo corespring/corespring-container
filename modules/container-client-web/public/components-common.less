@@ -1,15 +1,52 @@
-@feedback-correct-background: #4AAF46;
-@feedback-correct-foreground: #F8FFE2;
+// Customizable colors
+@correct-background: #4aaf46;
+@correct-foreground: #f8ffe2;
+@partially-correct-background: #c1e1ac;
+@incorrect-background: #fcb733;
+@incorrect-foreground: #fbf2e3;
+@hide-show-background: #bce2ff;
+@hide-show-foreground: #1a9cff;
+@warning-background: #464146;
+@warning-foreground: #ffffff;
+@warning-block-background: #e0dee0;
+@warning-block-foreground: #f8f6f6;
 
-@feedback-incorrect-background: #eea236;
-@feedback-incorrect-foreground: #fbe7b7;
+// Feedback colors
+@feedback-correct-background: @correct-background;
+@feedback-correct-foreground: @correct-foreground;
+@feedback-incorrect-background: @incorrect-background;
+@feedback-incorrect-foreground: @incorrect-foreground;
+@feedback-partially-correct-background: @partially-correct-background;
+@feedback-partially-correct-foreground: @correct-background;
+@feedback-nothing-submitted-background: @warning-background;
+@feedback-nothing-submitted-foreground: @warning-foreground;
+@feedback-nothing-submitted-accent: @warning-block-background;
 
-@feedback-partially-correct-background: #C1E1AC;
-@feedback-partially-correct-foreground: #52654F;
+// Choice colors
+@choice-background: #FFFFFF;
+@choice-foreground: #A2D4F2;
+@choice-selection: #404B9B;
+@choice-correct-border: @correct-foreground;
+@choice-correct-inner: @correct-background;
+@choice-incorrect-border: @incorrect-foreground;
+@choice-incorrect-inner: @incorrect-background;
+@choice-muted-background: #E0DEE0;
+@choice-muted-foreground: #F8F6F6;
 
-@feedback-nothing-submitted-background: #464146;
-@feedback-nothing-submitted-foreground: #ffffff;
-@feedback-nothing-submitted-accent: #e0dee0;
+// Icon colors
+@hide-icon-background: @hide-show-background;
+@hide-icon-foreground: @warning-foreground;
+@show-icon-background: @warning-foreground;
+@show-icon-foreground: @hide-show-foreground;
+@show-icon-border:  @hide-show-background;
+@hide-learn-background: @hide-show-background;
+@hide-learn-foreground: @warning-foreground;
+@show-learn-background: @hide-show-foreground;
+@show-learn-foreground: @warning-foreground;
+@hide-rationale-background: @hide-show-background;
+@hide-rationale-foreground: @hide-show-foreground;
+@show-rationale-background: @hide-show-background;
+@show-rationale-foreground: @hide-show-foreground;
 
 @correct-color: #3c763d;
 @incorrect-color: #EC971F;
