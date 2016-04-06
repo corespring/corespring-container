@@ -28,7 +28,8 @@ class CatalogRenderer(jadeEngine: JadeEngine,
     mainEndpoints: MainEndpoints,
     supportingMaterialsEndpoints: SupportingMaterialsEndpoints,
     queryParams : Map[String,String],
-    prodMode: Boolean): Future[Html] = Future {
+    prodMode: Boolean,
+    iconSet:String): Future[Html] = Future {
 
     val (js, css) = prepareJsCss(prodMode, bundle)
 
@@ -40,6 +41,7 @@ class CatalogRenderer(jadeEngine: JadeEngine,
       "appName" -> name,
       "js" -> js.toArray,
       "css" -> css.toArray,
+      "iconSet" -> iconSet,
       "ngModules" -> jsArrayString(Some(s"$name-injected") ++ sources.js.ngModules ++ bundle.ngModules),
       "ngServiceLogic" -> ngServiceLogic,
       "staticPaths" -> Json.stringify(StaticPaths.staticPaths))

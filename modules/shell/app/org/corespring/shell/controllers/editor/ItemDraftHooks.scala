@@ -3,12 +3,13 @@ package org.corespring.shell.controllers.editor
 import com.mongodb.casbah.Imports._
 import com.mongodb.casbah.commons.MongoDBObject
 import org.bson.types.ObjectId
-import org.corespring.container.client.hooks.Hooks.{ R, StatusMessage }
+import org.corespring.container.client.hooks.Hooks.{LoadResult, R, StatusMessage}
 import org.corespring.container.client.hooks._
 import org.corespring.container.client.integration.ContainerExecutionContext
-import org.corespring.container.client.{ hooks => containerHooks }
-import org.corespring.shell.controllers.editor.actions.{ ContainerDraftId, DraftId }
-import org.corespring.shell.services.{ ItemDraftService, ItemService }
+import org.corespring.container.client.{hooks => containerHooks}
+import org.corespring.shell.DefaultPlayerSkin
+import org.corespring.shell.controllers.editor.actions.{ContainerDraftId, DraftId}
+import org.corespring.shell.services.{ItemDraftService, ItemService}
 import org.joda.time.DateTime
 import play.api.Logger
 import play.api.http.Status._
@@ -192,13 +193,13 @@ class ItemDraftHooks(
    * @param header
    * @return
    */
-  override def load(draftId: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]] = {
+  override def load(draftId: String)(implicit header: RequestHeader): Future[Either[StatusMessage, LoadResult]] = {
     Future {
       draftItemService.load(draftId).map { json =>
         logger.debug(s"function=load, draftId=$draftId, json=${Json.prettyPrint(json)}")
         val result = (json \ "item")
         logger.trace(s"function=load, draftId=$draftId, result=${Json.prettyPrint(result)}")
-        Right(result)
+        Right((result, DefaultPlayerSkin.defaultPlayerSkin))
       }.getOrElse {
         val itemId = draftId.split("~")(0)
         (for {
@@ -208,7 +209,7 @@ class ItemDraftHooks(
         } yield {
           val result = (json \ "item")
           logger.trace(s"function=load, draftId=$draftId, result=${Json.prettyPrint(result)} - created new draft")
-          Right(result)
+          Right((result, DefaultPlayerSkin.defaultPlayerSkin))
         }).getOrElse(Left(BAD_REQUEST -> "Can't create draft"))
       }
     }

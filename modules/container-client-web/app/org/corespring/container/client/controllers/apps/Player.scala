@@ -25,29 +25,14 @@ class Player(mode: Mode,
   val hooks: PlayerHooks)
   extends Controller
   with GetAsset[PlayerHooks]
-  with QueryStringHelper {
+  with QueryStringHelper
+  with PlayerSkinHelper {
 
   private def handleSuccess[D](fn: (D) => Future[SimpleResult])(e: Either[StatusMessage, D]): Future[SimpleResult] = e match {
     case Left((code, msg)) => Future { Status(code)(msg) }
     case Right(s) => fn(s)
   }
 
-  private def calculateColorToken(queryParams: JsObject, defaults: JsValue) = {
-    val colorsParam = (queryParams \ "colors").asOpt[String]
-    val defaultColors = (defaults \ "colors").asOpt[JsObject].getOrElse(Json.obj())
-    val colorsJson = colorsParam match {
-      case Some(colorsString) => (Json.parse(DatatypeConverter.parseBase64Binary(colorsString)) \ "colors").asOpt[JsObject].getOrElse(Json.obj())
-      case None => Json.obj()
-    }
-    val computedColors = Json.obj("colors" -> (defaultColors ++ colorsJson))
-    DatatypeConverter.printBase64Binary(computedColors.toString.getBytes)
-  }
-
-  private def calculateIconSet(queryParams: JsObject, defaults: JsValue) = {
-    val iconsetParam = (queryParams \ "iconSet").asOpt[String]
-    val defaultIconSet = (defaults \ "iconSet").asOpt[String]
-    iconsetParam.orElse(defaultIconSet).getOrElse("check")
-  }
 
   private def createPlayerHtml(sessionId: String, session: JsValue, item: JsValue, defaults: JsValue)(implicit r: RequestHeader): Either[String, Future[Html]] = {
 

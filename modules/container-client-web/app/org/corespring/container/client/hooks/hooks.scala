@@ -3,14 +3,15 @@ package org.corespring.container.client.hooks
 import java.io.InputStream
 
 import org.corespring.container.client.HasContainerContext
-import org.corespring.container.client.hooks.Hooks.{ R, StatusMessage }
-import play.api.libs.json.{ JsObject, JsArray, JsValue }
+import org.corespring.container.client.hooks.Hooks.{LoadResult, R, StatusMessage}
+import play.api.libs.json.{JsArray, JsObject, JsValue}
 import play.api.mvc._
 
 import scala.concurrent.Future
 
 object Hooks {
   type StatusMessage = (Int, String)
+  type LoadResult = (JsValue, JsValue)
   type R[A] = Future[Either[StatusMessage, A]]
 }
 
@@ -37,7 +38,7 @@ trait LoadHook extends HasContainerContext {
    * @param header
    * @return
    */
-  def load(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]]
+  def load(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, LoadResult]]
 }
 
 trait PlayerHooks extends GetAssetHook with HasContainerContext {
@@ -48,9 +49,10 @@ trait PlayerHooks extends GetAssetHook with HasContainerContext {
 }
 
 trait CatalogHooks extends LoadHook with GetAssetHook {
-  def showCatalog(itemId: String)(implicit header: RequestHeader): Future[Option[StatusMessage]]
+  def showCatalog(itemId: String)(implicit header: RequestHeader): Future[Either[StatusMessage, JsValue]]
 }
 
+trait ComponentEditorHooks extends LoadHook
 trait EditorHooks extends LoadHook with AssetHooks
 trait DraftEditorHooks extends EditorHooks
 trait ItemEditorHooks extends EditorHooks

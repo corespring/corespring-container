@@ -13,7 +13,7 @@ import org.corespring.container.client.integration.{ ContainerConfig, ContainerE
 import org.corespring.container.components.model.Component
 import org.corespring.shell.controllers.catalog.actions.{ CatalogHooks => ShellCatalogHooks }
 import org.corespring.shell.controllers.editor.ContainerSupportingMaterialAssets
-import org.corespring.shell.controllers.editor.actions.{ DraftId, DraftEditorHooks => ShellDraftEditorHooks, ItemEditorHooks => ShellItemEditorHooks }
+import org.corespring.shell.controllers.editor.actions.{ DraftId, DraftEditorHooks => ShellDraftEditorHooks, ItemEditorHooks => ShellItemEditorHooks, ComponentEditorHooks => ShellComponentEditorHooks }
 import org.corespring.shell.controllers.player.actions.{ PlayerHooks => ShellPlayerHooks }
 import org.corespring.shell.controllers.player.{ SessionHooks => ShellSessionHooks }
 import org.corespring.shell.controllers.{ S3Config, ShellAssets, ShellDataQueryHooks, editor => shellEditor }
@@ -86,6 +86,7 @@ class ContainerClientImplementation(
   override lazy val draftEditorHooks: DraftEditorHooks = wire[ShellDraftEditorHooks]
   override lazy val itemEditorHooks: ItemEditorHooks = wire[ShellItemEditorHooks]
   override lazy val catalogHooks: CatalogHooks = wire[ShellCatalogHooks]
+  override lazy val componentEditorHooks: ComponentEditorHooks = wire[ShellComponentEditorHooks]
   override lazy val sessionHooks = wire[ShellSessionHooks]
   override lazy val itemDraftHooks: CoreItemHooks with DraftHooks = wire[shellEditor.ItemDraftHooks]
   override lazy val itemDraftSupportingMaterialHooks: ItemDraftSupportingMaterialHooks = wire[shellEditor.ItemDraftSupportingMaterialHooks]

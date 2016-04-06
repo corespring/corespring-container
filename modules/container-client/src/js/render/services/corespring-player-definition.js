@@ -82,15 +82,11 @@ angular.module('corespring-player.services').factory('CorespringPlayerDefinition
             $log.debug("not re-rendering");
             return;
           }
-
           $log.debug("corespring player definition setDataAndSession rendering");
 
           var allData = PlayerUtils.zipDataAndSession($scope.item, $scope.session);
           ComponentRegister.setDataAndSession(allData);
 
-          if (PlayerSkin.iconSet) {
-            ComponentRegister.setPlayerSkin({iconSet: PlayerSkin.iconSet});
-          }
           rendered = true;
 
           if(_.isFunction(opts.afterSetDataAndSession)){
@@ -100,6 +96,9 @@ angular.module('corespring-player.services').factory('CorespringPlayerDefinition
 
         $scope.$on('registerComponent', function(event, id, obj) {
           ComponentRegister.registerComponent(id, obj);
+          if (obj.setPlayerSkin) {
+            obj.setPlayerSkin(PlayerSkin);
+          }
         });
 
         $scope.$on('rerender-math', function(event, options) {

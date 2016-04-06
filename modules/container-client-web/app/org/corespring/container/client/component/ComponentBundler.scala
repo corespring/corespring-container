@@ -29,7 +29,7 @@ class DefaultComponentBundler(
       SingleComponentScriptBundle(
         component = c.asInstanceOf[ComponentInfo],
         urls.jsUrl(context, resolved, expandPaths),
-        urls.cssUrl(context, resolved, expandPaths) ++ urls.lessUrl(context, resolved, expandPaths, customColorsEncoded),
+        urls.lessUrl(context, resolved, expandPaths, customColorsEncoded),
         ngModules)
     }
   }
@@ -41,7 +41,7 @@ class DefaultComponentBundler(
     Some(ComponentsScriptBundle(
       components = resolved,
       urls.jsUrl(context, resolved, expandPaths),
-      urls.cssUrl(context, resolved, expandPaths) ++ urls.lessUrl(context, resolved, expandPaths, customColorsEncoded),
+      urls.lessUrl(context, resolved, expandPaths, customColorsEncoded),
       ngModules))
 
   }

@@ -50,7 +50,7 @@ trait CoreItem extends CoreSupportingMaterials with Controller with HasContainer
       either =>
         either match {
           case Left(sm) => sm
-          case Right(rawItem) => {
+          case Right((rawItem,defaults)) => {
             Ok(ItemJson(playerXhtml, rawItem))
               .withHeaders(
                 "Cache-Control" -> noCacheHeader,

@@ -19,7 +19,8 @@ class Catalog(
   val containerContext: ContainerExecutionContext)
   extends Controller
   with GetAsset[CatalogHooks]
-  with QueryStringHelper {
+  with QueryStringHelper
+  with PlayerSkinHelper {
 
   private lazy val logger = Logger(classOf[Catalog])
 
@@ -28,23 +29,26 @@ class Catalog(
   def load(id: String): Action[AnyContent] = Action.async {
     implicit request =>
       val prodMode = request.getQueryString("mode").map(_ == "prod").getOrElse(mode == Mode.Prod)
-      val serviceParams = mkQueryParams(mapToJson)
-      val colors = (serviceParams \ "colors").asOpt[String]
+      val queryParams = mkQueryParams(mapToJson)
+
 
       hooks.showCatalog(id).flatMap { err =>
         err match {
-          case Some((code, msg)) => {
+          case Left((code, msg)) => {
             val showErrorInUi = !prodMode
             Future.successful(
               Status((code))(org.corespring.container.client.views.html.error.main(code, msg, showErrorInUi)))
           }
-          case _ => {
-            bundler.bundleAll("catalog", Some("editor"), !prodMode, colors) match {
+          case Right(defaults) => {
+            val encodedComputedColors = calculateColorToken(queryParams, defaults)
+            val computedIconSet = calculateIconSet(queryParams, defaults)
+
+            bundler.bundleAll("catalog", Some("editor"), !prodMode, Some(encodedComputedColors)) match {
               case Some(b) => {
                 val mainEndpoints = endpoints.main(id)
                 val supportingMaterialsEndpoints = endpoints.supportingMaterials(id)
                 val queryParams = mkQueryParams(m => m)
-                catalogRenderer.render(b, mainEndpoints, supportingMaterialsEndpoints, queryParams, prodMode).map { html =>
+                catalogRenderer.render(b, mainEndpoints, supportingMaterialsEndpoints, queryParams, prodMode, computedIconSet).map { html =>
                   Ok(html)
                 }
               }

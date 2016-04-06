@@ -4,9 +4,18 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge;" />
 
     <style>
+    .colors-holder {
+      border: 1px dashed grey;
+      overflow: scroll;
+      display: inline-block;
+      vertical-align: top;
+    }
+
     .holder {
       border: 1px dashed grey;
       overflow: scroll;
+      display: inline-block;
+      vertical-align: top;
     }
 
     .corespring-player-body {
@@ -33,80 +42,12 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/spectrum/1.7.1/spectrum.min.js"></script>
 
     <script type="text/javascript" src="@js"></script>
+
     <script>
-
-      $(document).ready(function() {
-        var playerHolderWidth = 600;
-        var holder = $('.holder');
-        var opts = @{Html(play.api.libs.json.Json.stringify(opts))};
-
-        console.log('opts: ', opts);
-
-        opts.onPlayerRendered = function() {
-          console.log('onPlayerRendered', arguments);
-        };
-
-        var player;
-
-        function addPlayer() {
-          if (player) {
-            player.remove();
-          }
-          var playerWidth = $('#player-width-input').val();
-          opts.width = playerWidth.length > 0 ? playerWidth + 'px' : undefined;
-          var colors = ['correct-color', 'incorrect-color', 'partial-color', 'warning-color', 'error-color', 'info-color'];
-          opts.customVariables = {colors: {}, iconSet: 'check'};
-          for (var i = 0; i < colors.length; i++) {
-            var v = $('.' + colors[i]).val();
-            opts.customVariables.colors[colors[i]] = (v && v.length > 0) ? v : undefined;
-          }
-          opts.customVariables.iconSet = $('input[name=iconset]:checked').val() || 'check';
-          player = new org.corespring.players.ItemPlayer(holder, opts, function(err) {
-            console.warn(err);
-          });
-        }
-
-        addPlayer();
-
-        $('#colors-toggle').click(function() {
-          var div = $('.colors');
-          if (div.is(':visible')) {
-            div.hide();
-          } else {
-            div.show();
-          }
-        });
-
-
-        $('#set-mode-evaluate').click(function() {
-          player.setMode('evaluate', function(err) {
-            console.log(err);
-          });
-        });
-
-        $('#set-mode-instructor').click(function() {
-          player.setMode('instructor', function(err) {
-            console.log(err);
-          });
-        });
-
-        $('#player-container-width-input').change(function() {
-          $('.holder').css('width', $('#player-container-width-input').val() + "px");
-        });
-
-        $('.color-input').spectrum({
-          allowEmpty: true,
-          showInput: true
-        });
-        $('.color-input, #player-width-input, input[type=radio][name=iconset]').change(function() {
-          addPlayer();
-        });
-
-        $('#player-container-width-input').val(playerHolderWidth);
-        $('.holder').css('width', playerHolderWidth + "px");
-
-      });
+      var opts = @{Html(play.api.libs.json.Json.stringify(opts))};
     </script>
+    <script type="text/javascript" src="/assets/js/shell/PlayerRoot.js"></script>
+
 
     <button class="button" id="set-mode-evaluate">evaluate</button>
     <button class="button" id="set-mode-instructor">instructor</button>
@@ -119,26 +60,12 @@
     <label>
       <input value="emoji" name="iconset" type="radio">Emoji
     </label>
+    <button class="button reload">reload</button>
 
     <br/>
-    <table class="colors">
-      <tr>
-        <td>Correct</td>
-        <td>Incorrect</td>
-        <td>Partial</td>
-        <td>Warning</td>
-        <td>Error</td>
-        <td>Info</td>
-      </tr>
-      <tr>
-        <td><input placeholder="default" class="color-input correct-color" type="text"></td>
-        <td><input placeholder="default" class="color-input incorrect-color" type="text"></td>
-        <td><input placeholder="default" class="color-input partial-color" type="text"></td>
-        <td><input placeholder="default" class="color-input warning-color" type="text"></td>
-        <td><input placeholder="default" class="color-input error-color" type="text"></td>
-        <td><input placeholder="default" class="color-input info-color" type="text"></td>
-      </tr>
-    </table>
+    <div class="colors-holder">
+      <button class="button reload">reload</button>
+    </div>
 
 
     <div class="holder"></div>
