@@ -1,13 +1,16 @@
-angular.module('corespring-player.services').factory('PlayerServiceDefinition', [
+angular.module('corespring-player.services')
+  .factory('PlayerServiceDefinition', [
   '$http',
   '$log',
   'PlayerServiceEndpoints',
   'EmbeddedItemAndSession',
+  'QueryParamUtils',
   function(
     $http,
     $log,
     PlayerServiceEndpoints,
-    EmbeddedItemAndSession
+    EmbeddedItemAndSession,
+    QueryParamUtils
   ) {
 
     function PlayerServiceDefinition() {
@@ -19,9 +22,17 @@ angular.module('corespring-player.services').factory('PlayerServiceDefinition', 
 
       var isItemAndSessionLoaded = false;
 
+      var callQueue = [];
+
+      function invokeQueuedCall(opts){
+        _callHttp(opts.call, opts.data, opts.onSuccess, opts.onFailure);
+      }
+
       this.loadItemAndSession = function loadItemAndSession(onSuccess, onFailure) {
-        onSuccess(EmbeddedItemAndSession);
         isItemAndSessionLoaded = true;
+        onSuccess(EmbeddedItemAndSession);
+        _.forEach(callQueue, invokeQueuedCall);
+        callQueue = [];
       };
 
       this.initCalls = function(endpoints){
@@ -36,8 +47,6 @@ angular.module('corespring-player.services').factory('PlayerServiceDefinition', 
 
       this.initCalls(PlayerServiceEndpoints.session);
 
-      //-----------------------------------------------------------------
-
       function callWithData(call, id) {
         return function(data, onSuccess, onFailure) {
           _call(call, data, id)(onSuccess, onFailure);
@@ -50,46 +59,37 @@ angular.module('corespring-player.services').factory('PlayerServiceDefinition', 
         };
       }
 
-      function _call(call, data, id) {
 
+      function _callHttp(call, data, onSuccess, onFailure){
+        var url = addQueryParamsIfPresent(call.url);
+        var args = data ? [url, data] : [url];
+
+        $http({method: call.method, url: url, data: data})
+          .success(
+            function(data, status, headers, config) {
+              onSuccess(data);
+            })
+          .error(
+            function(data, status, headers, config) {
+              console.log("error");
+              if (onFailure) {
+                onFailure(data);
+              }
+            });
+      }
+
+      function _call(call, data, id) {
         return function(onSuccess, onFailure) {
           if (!isItemAndSessionLoaded) {
-            if (onFailure) {
-              var e = '[PlayerService] Error: Not ready to make call to ' + id + '.';
-              $log.error(e);
-              onFailure(e);
-            }
-            return;
+            callQueue.push({call: call, data: data, id: id, onSuccess: onSuccess, onFailure: onFailure});
+          } else {
+            _callHttp(call, data, onSuccess, onFailure);
           }
-
-          var url = addQueryParamsIfPresent(call.url);
-          var args = data ? [url, data] : [url];
-
-          $http[call.method].apply(null, args)
-            .success(
-              function(data, status, headers, config) {
-                onSuccess(data);
-              })
-            .error(
-              function(data, status, headers, config) {
-                console.log("error");
-                if (onFailure) {
-                  onFailure(data);
-                }
-              }
-            );
         };
       }
 
       function addQueryParamsIfPresent(path) {
-        var out = [];
-        var params = PlayerServiceEndpoints.queryParams;
-        for (var x in params) {
-          out.push(x + '=' + params[x]);
-        }
-
-        var qs = out.join('&');
-        return path + (path.indexOf('?') === -1 ? '?' : '&') + qs;
+        return QueryParamUtils.addQueryParams(path);
       }
 
     }

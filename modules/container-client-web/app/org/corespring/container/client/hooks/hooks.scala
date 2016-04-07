@@ -65,7 +65,7 @@ trait SupportingMaterialHooks {
    */
   def create[F <: File](id: String, sm: CreateNewMaterialRequest[F])(implicit h: RequestHeader): R[JsValue]
   def delete(id: String, name: String)(implicit h: RequestHeader): R[JsValue]
-  def addAsset(id: String, name: String, binary: Binary)(implicit h: RequestHeader): R[JsValue]
+  def addAsset(id: String, name: String, binary: Binary)(implicit h: RequestHeader): R[UploadResult]
   def deleteAsset(id: String, name: String, filename: String)(implicit h: RequestHeader): R[JsValue]
   def getAsset(id: String, name: String, filename: String)(implicit h: RequestHeader): Future[Either[StatusMessage, FileDataStream]]
   def updateContent(id: String, name: String, filename: String, content: String)(implicit h: RequestHeader): R[JsValue]
@@ -78,6 +78,7 @@ trait CoreItemHooks extends HasContainerContext with LoadHook {
   def delete(id: String)(implicit h: RequestHeader): R[JsValue]
   def saveCollectionId(id: String, collectionId: String)(implicit h: RequestHeader): R[JsValue]
   def saveComponents(id: String, json: JsValue)(implicit h: RequestHeader): R[JsValue]
+  def saveXhtmlAndComponents(id: String, markup: String, components: JsValue)(implicit h: RequestHeader): R[JsValue]
   def saveCustomScoring(id: String, customScoring: String)(implicit header: RequestHeader): R[JsValue]
   def saveProfile(id: String, json: JsValue)(implicit h: RequestHeader): R[JsValue]
   def saveSummaryFeedback(id: String, feedback: String)(implicit h: RequestHeader): R[JsValue]

@@ -19,6 +19,8 @@ editorSrcs = [
   'bower_components/select2/select2(.min).js',
   'bower_components/undo.js/undo.js',
   'bower_components/wiggi-wiz/dist/wiggi-wiz.js',
+  'bower_components/mathquill/build/mathquill.js'
+  'bower_components/corespring-math-input/dist/corespring-math-input.js',
   'js/common/**/*.js',
   'js/component-editor/**/*.js',
   'js/corespring/core-library.js',
@@ -47,7 +49,9 @@ exports.css =
   dest: 'css/single-component-editor.min.css'
   libs: _.union(coreLibs.css, [
     'bower_components/select2/select2.css',
-    'bower_components/components-font-awesome/css/font-awesome.min.css'
+    'bower_components/components-font-awesome/css/font-awesome.min.css',
+    'bower_components/corespring-math-input/dist/corespring-math-input.css',
+    'bower_components/mathquill/build/mathquill.css'
   ])
   report: "#{baseName}-css-report.json"
 
@@ -60,6 +64,7 @@ exports.ngModules = _.union(player.ngModules, [
   'corespring-editing.wiggi-wiz-features.cs-image',
   'corespring-editing.wiggi-wiz-features.link',
   'corespring-editing.wiggi-wiz-features.mathjax',
+  'corespring.math-input',
   'corespring-singleComponentEditor.controllers',
   'corespring-singleComponentEditor.directives'
   'corespring-singleComponentEditor.services',

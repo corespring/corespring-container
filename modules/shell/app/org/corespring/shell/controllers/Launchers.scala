@@ -67,6 +67,11 @@ class Launchers(
     Ok(loadPlayerPage(Json.obj("mode" -> "gather", "itemId" -> itemId, "queryParams" -> queryStringToJson(request)), jsCall.url))
   }
 
+  def playerFromSession(sessionId: String) = Action { request =>
+    val jsCall = PlayerLauncher.playerJs()
+    Ok(loadPlayerPage(Json.obj("mode" -> "gather", "sessionId" -> sessionId, "queryParams" -> queryStringToJson(request)), jsCall.url))
+  }
+
   def queryStringToJson(rh: RequestHeader, ignoreKeys: String*): JsObject = {
     val trimmed = rh.queryString -- ignoreKeys
     JsObject(trimmed.mapValues { v =>

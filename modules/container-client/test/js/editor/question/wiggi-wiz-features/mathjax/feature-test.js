@@ -3,14 +3,22 @@ describe('mathjax feature', function() {
   var feature, rootScope;
 
   var MathJaxService = {
-    parseDomForMath: function() {}
+    parseDomForMath: function() {
+    }
   };
 
   beforeEach(angular.mock.module('corespring-editing.wiggi-wiz-features.mathjax'));
 
-  beforeEach(module(function($provide) {
+  beforeEach(module(function($provide, $compileProvider) {
     $provide.value('MathJaxService', MathJaxService);
+    $compileProvider.directive('testIsolate',function() {
+        return {
+          scope: {}
+        };
+      });
+
   }));
+
 
   beforeEach(inject(function(WiggiMathJaxFeatureDef, $rootScope) {
     feature = new WiggiMathJaxFeatureDef();
@@ -31,7 +39,7 @@ describe('mathjax feature', function() {
     });
 
     it('should set insertInline to be true', function() {
-      expect(feature.insertInline).toEqual(jasmine.any(Function));
+      expect(feature.insertInline).toEqual(true);
     });
 
     it('should set icon class', function() {
@@ -61,149 +69,75 @@ describe('mathjax feature', function() {
 
     it("should call replaceWith with mathjax-holder node containing $node's contents", function() {
       expect(replaceWith.calls.mostRecent().args[0][0].outerHTML)
-        .toEqual($('<div mathjax-holder contenteditable="false"></div>' + math + '</div>')[0].outerHTML);
-    });
-
-  });
-
-  describe('addToEditor', function() {
-    var editor, addContent, callback;
-    var markup = "\\frac{1}{2}";
-
-    beforeEach(function() {
-      editor = {
-        launchDialog: jasmine.createSpy('launchDialog')
-      };
-      addContent = jasmine.createSpy('addContent');
-      spyOn(rootScope, '$emit').and.callThrough();
-      feature.addToEditor(editor, addContent);
-      callback = editor.launchDialog.calls.mostRecent().args[3];
-    });
-
-    it('should launch dialog', function() {
-      expect(editor.launchDialog).toHaveBeenCalled();
-    });
-
-    describe('callback', function() {
-
-      it('should add content when cancelled', function() {
-        callback({cancelled: true});
-        expect(addContent).toHaveBeenCalled();
-      });
-
-      it('should call addContent with a mathjax-holder containing markup', function() {
-        var calledWithNode;
-
-        callback({originalMarkup: markup});
-        calledWithNode = addContent.calls.mostRecent().args[0][0];
-
-        expect(calledWithNode.outerHTML).toEqual('<mathjax-holder>' + markup + '</mathjax-holder>');
-      });
-
-      it("should fire 'math-updated' event", function() {
-        callback({originalMarkup: markup});
-        expect(rootScope.$emit).toHaveBeenCalledWith('math-updated');
-      });
-
-    });
-
-  });
-
-  describe('onClick', function() {
-    var $node, $scope, $originalScope, editor, callback;
-    var markup = "\\frac{1}{2}";
-
-    beforeEach(function() {
-      $scope = {
-        $emit: jasmine.createSpy('$emit')
-      };
-      editor = {
-        launchDialog: jasmine.createSpy('launchDialog')
-      };
-      spyOn(MathJaxService, 'parseDomForMath');
-      feature.onClick($node, $scope, editor);
-      callback = editor.launchDialog.calls.mostRecent().args[3];
-    });
-
-    it('should launch dialog', function() {
-      expect(editor.launchDialog).toHaveBeenCalled();
-    });
-
-    describe('callback', function() {
-
-      describe('cancelled', function() {
-
-        beforeEach(function() {
-          callback({cancelled: true, originalMarkup: 'some markup'});
-        });
-
-        it('should change $scope.originalMarkup when cancelled', function() {
-          expect($scope.originalMarkup).toBe('some markup');
-        });
-
-        it('should $emit saveData', function() {
-          expect($scope.$emit).toHaveBeenCalledWith('save-data');
-        });
-
-        it('should call MathJaxService.parseDomForMath', function() {
-          expect(MathJaxService.parseDomForMath).toHaveBeenCalled();
-        });
-
-      });
-
-      describe('not cancelled, with markup', function() {
-
-        var originalMarkup = "\\frac{1}{2}";
-
-        beforeEach(function() {
-          callback({originalMarkup: originalMarkup});
-        });
-
-        it('should set $scope.originalMarkup to update.originalMarkup', function() {
-          expect($scope.originalMarkup).toEqual(originalMarkup);
-        });
-
-        it('should $emit saveData', function() {
-          expect($scope.$emit).toHaveBeenCalledWith('save-data');
-        });
-
-        it('should call MathJaxService.parseDomForMath', function() {
-          expect(MathJaxService.parseDomForMath).toHaveBeenCalled();
-        });
-
-        it("should fire 'math-updated' event", function() {
-          expect($scope.$emit).toHaveBeenCalledWith('math-updated');
-        });
-
-      });
-
+        .toMatch(/mathinput-holder/);
     });
 
   });
 
   describe('getMarkup', function() {
 
-    var $node, $scope = {
-      originalMarkup: "\\frac{1}{2}"
+    var $node;
+    var wrapped = function(s) {
+      return '\\(' + s + '\\)';
     };
 
-    it('should return $scope.originalMarkup wrapped in a <span mathjax/>', function() {
+    it('return wrapped latex for latex expression', function() {
+      var $scope = {
+        expr: "\\frac{1}{2}"
+      };
       expect(feature.getMarkUp($node, $scope))
-        .toEqual('<span mathjax>' + $scope.originalMarkup + '</span>');
+        .toEqual('<span mathjax>' + wrapped($scope.expr) + '</span>');
+    });
+
+    it('return wrapped latex for latex code', function() {
+      var $scope = {
+        "code": "\\frac{1}{2}"
+      };
+      expect(feature.getMarkUp($node, $scope))
+        .toEqual('<span mathjax>' + wrapped($scope.code) + '</span>');
+    });
+
+    it('return unwrapped mathml for mathml code', function() {
+      var $scope = {
+        "code": '<math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mn>1</mn><mn>2</mn></mfrac></math>'
+      };
+      expect(feature.getMarkUp($node, $scope))
+        .toEqual('<span mathjax>' + $scope.code + '</span>');
+    });
+
+  });
+
+  describe('registerChangeNotifier', function() {
+
+    var $node, $scope;
+
+    beforeEach(inject(function($compile, $rootScope) {
+      math = "\\frac{1}{2}";
+      $node = $compile('<div test-isolate=""></div>')($rootScope.$new());
+      $scope = $node.isolateScope();
+    }));
+
+    it('calls notifyEditorOfChange when ngModel changes', function() {
+      var notifyFn = jasmine.createSpy('notify');
+      feature.registerChangeNotifier(notifyFn, $node);
+      $scope.ngModel = 'old';
+      $scope.$digest();
+      $scope.ngModel = 'new';
+      $scope.$digest();
+      expect(notifyFn).toHaveBeenCalled();
+    });
+
+    it('calls notifyEditorOfChange when code changes', function() {
+      var notifyFn = jasmine.createSpy('notify');
+      feature.registerChangeNotifier(notifyFn, $node);
+      $scope.code = 'old';
+      $scope.$digest();
+      $scope.code = 'new';
+      $scope.$digest();
+      expect(notifyFn).toHaveBeenCalled();
     });
 
   });
 
 
-  describe('insertInline', function(){
-    it('should return true for inline latex', function(){
-      expect(feature.insertInline($('<div>\\(inline\\)</div>'))).toBe(true);
-    });
-    it('should return false for block latex', function(){
-      expect(feature.insertInline($('<div>\\[inline\\]</div>'))).toBe(false);
-    });
-    it('should return false for mathml', function(){
-      expect(feature.insertInline($('<div><math/></div>'))).toBe(false);
-    });
-  });
 });

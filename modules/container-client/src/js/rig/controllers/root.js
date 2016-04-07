@@ -1,5 +1,6 @@
 var controller = function($scope,$http, $location, $timeout, $log, ComponentRegister, PlayerUtils, PlayerServiceDef) {
 
+  $scope.isPlayerRendered = false;
   $scope.playerMode = 'gather';
 
   $scope.playerSettings = {
@@ -54,8 +55,10 @@ var controller = function($scope,$http, $location, $timeout, $log, ComponentRegi
     $scope.playerMode = mode;
     ComponentRegister.setMode(mode);
     ComponentRegister.setEditable(isGatherMode());
+    if(mode === 'instructor'){
+      ComponentRegister.setInstructorData($scope.model.item.components);
+    }
   }
-
 
   function onSessionSaved(data) {
     $scope.model.responses = data.responses;
@@ -74,6 +77,10 @@ var controller = function($scope,$http, $location, $timeout, $log, ComponentRegi
       $log.error('There was a problem saving the session');
     });
   }
+
+  $scope.$on('playerControlPanel.setMode', function(ev, data) {
+    setMode(data.mode);
+  });
 
   $scope.$on('playerControlPanel.submit', function() {
     submitSession();
@@ -114,17 +121,40 @@ var controller = function($scope,$http, $location, $timeout, $log, ComponentRegi
     ComponentRegister.registerComponent(id, obj);
   });
 
+  $scope.$on('rendered', function(){
+    $timeout(function(){
+      $scope.isPlayerRendered = true;
+    });
+  });
 
-  $scope.$watch('model', function(m) {
-    if (!m || !m.item) {
+
+  $scope.$watch('model', function(newValue, oldValue) {
+    if (!newValue || !newValue.item) {
       return;
     }
     var cleanJson = angular.copy($scope.model);
     $scope.componentJson = JSON.stringify(cleanJson, undefined, 2);
-    var zipped = PlayerUtils.zipDataAndSession($scope.model.item, $scope.model.session);
-    $timeout(function(){
-      ComponentRegister.setDataAndSession(zipped);
-    }, 200);
+    if(dataOrSessionHasChanged(newValue, oldValue)) {
+      var zipped = PlayerUtils.zipDataAndSession(newValue.item, newValue.session);
+      $timeout(function () {
+        ComponentRegister.setDataAndSession(zipped);
+      }, 200);
+    }
+
+    function dataOrSessionHasChanged(newValue, oldValue){
+      function isEqual(o1,o2){
+        return _.isEqual(o1,o2);
+      }
+      if(!isEqual(newValue.item, oldValue.item)){
+        console.log("item has changed: ", newValue.item, oldValue.item);
+        return true;
+      }
+      if(!isEqual(newValue.session, oldValue.session)){
+        console.log("session has changed: ", newValue.session, oldValue.session);
+        return true;
+      }
+      return false;
+    }
   }, true);
 
   function getQueryVariable(variable) {

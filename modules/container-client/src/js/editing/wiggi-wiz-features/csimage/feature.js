@@ -1,7 +1,10 @@
-angular.module('corespring-editing.wiggi-wiz-features.cs-image').factory('ImageFeature', [
+angular.module('corespring-editing.wiggi-wiz-features.cs-image')
+  .factory('ImageFeature', [
+    '$document',
   'Image',
   'TemplateUtils',
-  function(ImageDef, TemplateUtils) {
+  'QueryParamUtils',
+  function($document, ImageDef, TemplateUtils, QueryParamUtils) {
 
     var csImage = new ImageDef();
 
@@ -42,13 +45,13 @@ angular.module('corespring-editing.wiggi-wiz-features.cs-image').factory('ImageF
       editor.togglePopover($node, $nodeScope, buttons, $node.find('img'));
     };
 
-
     csImage.initialise = function($node, replaceWith) {
       var imageSrc = $node.find('img').attr('src');
 
       if (imageSrc) {
+        imageSrc = QueryParamUtils.addQueryParams(imageSrc);
         var divStyle = $node.attr('style');
-        var imageStyle = $node.find('img').attr('style');
+        var imageStyle = $node.find('img').attr('style') || '';
         var clone = $('<div style="' + divStyle + '" image-holder image-src="' + imageSrc + '" image-style="' + imageStyle + '"></div>');
         return replaceWith(clone);
       } else {
@@ -56,10 +59,16 @@ angular.module('corespring-editing.wiggi-wiz-features.cs-image').factory('ImageF
       }
     };
 
+    csImage.changeSrcPath = function(path){
+      return QueryParamUtils.addQueryParams(path);
+    };
+
     csImage.getMarkUp = function($node, $scope) {
       var imgNode = $node.find('img');
-      var divStyle = $node.attr('style');
-      return '<div style="' + divStyle + '">' + $(imgNode)[0].outerHTML + '</div>';
+      var divStyle = $node.attr('style') || '';
+      //strip the query params
+      var src = imgNode.attr('src').split('?')[0];
+      return '<div style="' + divStyle + '"><img src="'+ src + '"/></div>';
     };
 
     csImage.addToEditor = function(editor, addContent) {

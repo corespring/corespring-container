@@ -3,13 +3,12 @@ package org.corespring.shell.controllers.editor
 import com.mongodb.casbah.Imports._
 import com.mongodb.casbah.commons.MongoDBObject
 import org.bson.types.ObjectId
-import org.corespring.container.client.hooks._
 import org.corespring.container.client.hooks.Hooks.{ R, StatusMessage }
+import org.corespring.container.client.hooks._
 import org.corespring.container.client.integration.ContainerExecutionContext
 import org.corespring.container.client.{ hooks => containerHooks }
-import org.corespring.mongo.json.services.MongoService
-import org.corespring.shell.controllers.editor.actions.{ DraftId, ContainerDraftId }
-import org.corespring.shell.services.{ItemService, ItemDraftService}
+import org.corespring.shell.controllers.editor.actions.{ ContainerDraftId, DraftId }
+import org.corespring.shell.services.{ ItemDraftService, ItemService }
 import org.joda.time.DateTime
 import play.api.Logger
 import play.api.http.Status._
@@ -19,15 +18,13 @@ import play.api.mvc._
 import scala.concurrent.Future
 
 class ItemDraftSupportingMaterialHooks(
-assets: SupportingMaterialAssets[DraftId[ObjectId]],
-draftItemService: ItemDraftService,
-                                        val containerContext: ContainerExecutionContext
-                                      )
+  assets: SupportingMaterialAssets[DraftId[ObjectId]],
+  draftItemService: ItemDraftService,
+  val containerContext: ContainerExecutionContext)
   extends containerHooks.ItemDraftSupportingMaterialHooks
   with SupportingMaterialHooksHelper {
 
   import scala.concurrent.ExecutionContext.Implicits.global
-
 
   override def prefix(s: String) = s"item.$s"
 
@@ -66,7 +63,7 @@ draftItemService: ItemDraftService,
 
   private def dm = MongoDBObject("$set" -> MongoDBObject("item.dateModified" -> DateTime.now))
 
-  override def addAsset(id: String, name: String, binary: Binary)(implicit h: RequestHeader): R[JsValue] = withDraftId(id) { (draftId) =>
+  override def addAsset(id: String, name: String, binary: Binary)(implicit h: RequestHeader): R[UploadResult] = withDraftId(id) { (draftId) =>
     Future {
       ContainerDraftId.fromString(id).map { draftId =>
         val query = MongoDBObject("_id" -> DraftId.dbo(draftId), "item.supportingMaterials.name" -> name)
@@ -77,7 +74,7 @@ draftItemService: ItemDraftService,
 
         if (wr.getN == 1) {
           assets.uploadAssetToSupportingMaterial(draftId, name, binary)
-          Right(Json.obj())
+          Right(UploadResult(binary.name))
         } else {
           Left((BAD_REQUEST, "Failed to remove the asset"))
         }
@@ -91,8 +88,8 @@ draftItemService: ItemDraftService,
     }.getOrElse(notOk)
   }
 
-  private def withDraftId(id: String)(fn: DraftId[ObjectId] => R[JsValue]): R[JsValue] = {
-    parseId[R[JsValue]](id)(fn, Future(Left(BAD_REQUEST -> "Can't parse draftId")))
+  private def withDraftId[A](id: String)(fn: DraftId[ObjectId] => R[A]): R[A] = {
+    parseId[R[A]](id)(fn, Future(Left(BAD_REQUEST -> "Can't parse draftId")))
   }
 
   override def delete(id: String, name: String)(implicit h: RequestHeader): R[JsValue] = withDraftId(id) { (draftId: DraftId[ObjectId]) =>
@@ -131,22 +128,18 @@ draftItemService: ItemDraftService,
 }
 
 class ItemDraftHooks(
-assets: ItemDraftAssets,
-itemService: ItemService,
-draftItemService: ItemDraftService,
-                      val containerContext: ContainerExecutionContext
-                    )
+  assets: ItemDraftAssets,
+  itemService: ItemService,
+  draftItemService: ItemDraftService,
+  val containerContext: ContainerExecutionContext)
   extends containerHooks.DraftHooks
   with CoreItemHooks
   with ItemHooksHelper {
 
   val logger = Logger(classOf[ItemDraftHooks])
 
-
   import com.mongodb.casbah.commons.conversions.scala._
   RegisterJodaTimeConversionHelpers()
-
-
 
   lazy val draftFineGrainedSave = fineGrainedSave(draftItemService, processResultJson) _
 
@@ -308,5 +301,22 @@ draftItemService: ItemDraftService,
       case Some(tuple) => Right(tuple)
     }
   }
+
+  override def saveXhtmlAndComponents(id: String, markup: String, components: JsValue)(implicit h: RequestHeader): R[JsValue] = {
+    val xhtmlResult = saveXhtml(id, markup)(h)
+    val componentResult = saveComponents(id, components)(h)
+    for {
+      x <- xhtmlResult
+      c <- componentResult
+    } yield {
+      (x, c) match {
+        case (Left((xErr, xMsg)), Left((cErr, cMsg))) => Left(xErr, xMsg)
+        case (Left((err, msg)), _) => Left(err, msg)
+        case (_, Left((err, msg))) => Left(err, msg)
+        case (Right(xJson), Right(cJson)) => Right(xJson.as[JsObject].deepMerge(cJson.as[JsObject]))
+      }
+    }
+  }
+
 }
 
