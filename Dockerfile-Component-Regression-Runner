@@ -7,6 +7,7 @@ RUN apt-get update && \
  apt-get upgrade -y && \
  apt-get install -y \
   firefox \
+  git \
   nodejs \
   npm \
   openjdk-7-jdk \
@@ -44,36 +45,29 @@ ADD docker/extras/xvfb.init /etc/init.d/xvfb
 RUN chmod +x /etc/init.d/xvfb
 RUN update-rc.d xvfb defaults
 
+## main script
+RUN mkdir -p /opt/docker/scripts
+ADD docker/scripts/main.sh /opt/docker/scripts/main.sh
+RUN chmod +x /opt/docker/scripts/main.sh
+
 EXPOSE 9000
 
-ADD docker/scripts /data
-RUN chmod +x /data/*.sh
+RUN mkdir -p /opt/corespring-components/regression
+ADD corespring-components/regression /opt/corespring-components/regression
+ENV MAIN_SCRIPT /opt/corespring-components/regression/docker/scripts/run-component-regression.sh
+RUN chmod +x /opt/corespring-components/regression/docker/scripts/run-component-regression.sh
 
 RUN mkdir /opt/utils
 ADD bin /opt/utils/bin
 ADD mock-data /opt/utils/mock-data
 
-ADD target/universal/stage /opt/corespring-container
-
-ADD corespring-components /opt/corespring-components
-ENV CONTAINER_COMPONENTS_PATH="/opt/corespring-components/components"
-
-ADD corespring-components/package.json /tmp/package.json
-RUN cd /tmp && npm install && npm install grunt-cli
-RUN cp -a /tmp/node_modules /opt/corespring-components
-
-# Default to UTF-8 file.encoding
-ENV LANG C.UTF-8
-
-# by default run the component regression, launched by main.sh
-ENV MAIN_SCRIPT run-component-regression.sh
-
 # Vars for regression testing
-ENV REGRESSION_TIMEOUT 60000
-ENV REGRESSION_BASE_URL http://localhost:9000
-ENV REGRESSION_GREP ""
+ENV CONTAINER_SLUG_URI "https://s3-external-1.amazonaws.com/herokuslugs/heroku.com/v1/74f625e6-13af-4126-b83a-48521b6992fa?AWSAccessKeyId=AKIAJWLOWWHPBWQOPJZQ&Signature=HEiABr2jSEu%2BIuWyHo58DoPsAJ4%3D&Expires=1459941371"
+ENV TIMEOUT 60000
+ENV BASE_URL http://localhost:9000
+ENV GREP ""
 
-CMD ["/data/main.sh" ]
+CMD ["/opt/docker/scripts/main.sh"]
 
 # Clean up APT when done.
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
