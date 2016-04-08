@@ -1,24 +1,25 @@
 package org.corespring.container.client.controllers
 
 import org.corespring.container.client.component.SourceGenerator
-import org.corespring.container.components.model.{Component, Id, Library}
+import org.corespring.container.components.model.{ Component, Id, Library }
 import org.corespring.container.components.model.dependencies.ComponentMaker
 import org.corespring.container.components.services.DependencyResolver
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import play.api.GlobalSettings
-import play.api.mvc.{Action, EssentialAction, SimpleResult}
+import play.api.libs.json.{ JsObject, Json }
+import play.api.mvc.{ Action, EssentialAction, SimpleResult }
 import play.api.test.Helpers._
-import play.api.test.{FakeApplication, FakeRequest}
+import play.api.test.{ FakeApplication, FakeRequest }
 
 import scala.concurrent.Future
 
-class ComponentSetsTest extends Specification with ComponentMaker with Mockito{
+class ComponentSetsTest extends Specification with ComponentMaker with Mockito {
 
   sequential
 
   class MockSourceGenerator(name: String) extends SourceGenerator {
-    override def css(components: Seq[Component]): String = s"$name - css - ${components.map(_.componentType).mkString(",")}"
+    override def less(components: Seq[Component], customColors: JsObject = Json.obj()): String = s"$name - less - ${components.map(_.componentType).mkString(",")}"
 
     override def js(components: Seq[Component]): String = s"$name - js - ${components.map(_.componentType).mkString(",")}"
 

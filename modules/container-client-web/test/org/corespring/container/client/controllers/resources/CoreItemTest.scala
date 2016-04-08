@@ -52,7 +52,7 @@ class CoreItemTest extends Specification with Mockito {
 
   "load" should {
     "set cache control headers" in new scope {
-      mockHooks.load(any[String])(any[Request[AnyContent]]) returns Future(Right(Json.obj("xhtml" -> "")))
+      mockHooks.load(any[String])(any[Request[AnyContent]]) returns Future(Right((Json.obj("xhtml" -> ""), Json.obj())))
       val result = load("itemid")(r)
       header(HeaderNames.CACHE_CONTROL, result) === Some(noCacheHeader)
       header(HeaderNames.EXPIRES, result) === Some("0")

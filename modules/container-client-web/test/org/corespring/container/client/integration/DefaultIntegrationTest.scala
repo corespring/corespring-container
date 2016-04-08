@@ -50,6 +50,8 @@ class TestDI extends DefaultIntegration {
 
   override def catalogHooks: CatalogHooks = ???
 
+  override def componentEditorHooks: ComponentEditorHooks = ???
+
   override def versionInfo: VersionInfo = ???
 
   override def dataQueryHooks: DataQueryHooks = ???
@@ -74,6 +76,8 @@ class DefaultIntegrationTest extends Specification with Mockito with PlaySpecifi
       override def playerLauncherHooks: PlayerLauncherHooks = mock[PlayerLauncherHooks]
 
       override def catalogHooks: CatalogHooks = mock[CatalogHooks]
+
+      override def componentEditorHooks: ComponentEditorHooks = mock[ComponentEditorHooks]
 
       override def draftEditorHooks: DraftEditorHooks = mock[DraftEditorHooks]
 

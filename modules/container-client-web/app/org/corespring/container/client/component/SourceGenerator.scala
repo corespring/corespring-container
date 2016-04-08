@@ -25,8 +25,6 @@ trait SourceGenerator
 
   def js(components: Seq[Component]): String
 
-  def css(components: Seq[Component]): String
-
   def less(components: Seq[Component], customColors: JsObject = Json.obj()): String
 
   protected def wrapComponent(moduleName: String, directiveName: String, src: String) = {
@@ -135,23 +133,6 @@ abstract class BaseGenerator
        |$layoutLess
        |$libraryLess
         """.stripMargin
-  }
-
-  override def css(components: Seq[Component]): String = {
-    val (libraries, uiComps, layoutComps, widgets) = splitComponents(components)
-    val uiCss = uiComps.map(_.client.css.getOrElse("")).mkString("\n")
-    val widgetCss = widgets.map(_.client.css.getOrElse("")).mkString("\n")
-    val layoutCss = layoutComps.map(_.css.getOrElse("")).mkString("\n")
-    val libraryCss = libraries.map(_.css.getOrElse("")).mkString("\n")
-    val dependencies = getClientSideDependencies(components)
-    val styles = getStyles(dependencies).mkString("\n")
-    s"""
-    |$uiCss
-    |$widgetCss
-    |$layoutCss
-    |$libraryCss
-    |$styles
-    """.stripMargin
   }
 
   override def js(components: Seq[Component]): String = {

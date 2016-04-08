@@ -48,7 +48,7 @@ class PlayerRendererTest extends Specification with Mockito with NoTimeConversio
       itemPreProcessor,
       versionInfo)
 
-    waitFor(renderer.render("sessionId", obj("session" -> true), obj("item" -> true, "xhtml" -> "<div/>"), bundle, Seq("warning"), Map("query" -> "param"), prodMode, showControls))
+    waitFor(renderer.render("sessionId", obj("session" -> true), obj("item" -> true, "xhtml" -> "<div/>"), bundle, Seq("warning"), Map("query" -> "param"), prodMode, showControls, "check"))
     lazy val captor = capture[Map[String, Any]]
     there was one(jadeEngine).renderJade(any[String], captor)
   }

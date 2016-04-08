@@ -14,7 +14,6 @@ trait ComponentSets extends Controller with ComponentUrls {
   private lazy val logger = ContainerLogger.getLogger("ComponentSets")
   private val lessCompiler = new LessCompiler()
 
-
   def allComponents: Seq[Component]
 
   def playerGenerator: SourceGenerator
@@ -29,11 +28,9 @@ trait ComponentSets extends Controller with ComponentUrls {
 
   def singleResource[A >: EssentialAction](context: String, componentType: String, suffix: String): A
 
-
   protected final def generate(context: String, resolvedComponents: Seq[Component], suffix: String, parameters: JsObject = Json.obj()): (String, String) = {
     def gen(generator: SourceGenerator): String = suffix match {
       case "js" => generator.js(resolvedComponents)
-      case "css" => generator.css(resolvedComponents)
       case "less" =>
         val res = generator.less(resolvedComponents, (parameters \ "colors").asOpt[JsObject].getOrElse(Json.obj()))
         lessCompiler.compile(res)
@@ -50,7 +47,6 @@ trait ComponentSets extends Controller with ComponentUrls {
 
     val contentType = suffix match {
       case "js" => ContentTypes.JAVASCRIPT
-      case "css" => ContentTypes.CSS
       case "less" => ContentTypes.CSS
       case _ => throw new RuntimeException(s"Unknown suffix: $suffix")
     }

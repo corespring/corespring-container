@@ -4,7 +4,7 @@ import org.corespring.container.client.controllers.helpers.PlayerXhtml
 import org.corespring.container.client.controllers.resources.ItemDraft.Errors
 import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.client.hooks._
-import org.corespring.container.components.model.{Component, Interaction}
+import org.corespring.container.components.model.{ Component, Interaction }
 import org.corespring.container.components.model.dependencies.ComponentMaker
 import org.corespring.container.components.services.ComponentService
 import org.corespring.test.TestContext
@@ -12,13 +12,13 @@ import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
 import org.specs2.time.NoTimeConversions
-import play.api.libs.json.{JsObject, JsValue, Json}
+import play.api.libs.json.{ JsObject, JsValue, Json }
 import play.api.mvc._
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 
 import scala.concurrent.duration._
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{ Await, ExecutionContext, Future }
 
 class ItemDraftTest extends Specification with Mockito with NoTimeConversions with ComponentMaker {
 
@@ -73,7 +73,7 @@ class ItemDraftTest extends Specification with Mockito with NoTimeConversions wi
         "_id" -> Json.obj("$oid" -> "1"),
         "xhtml" -> "<div></div>")
 
-      class load(loadResult: JsValue = json) extends scope {
+      class load(loadResult: (JsValue, JsValue) = (json, Json.obj())) extends scope {
         hooks.load(any[String])(any[RequestHeader]).returns(Future.successful(Right(loadResult)))
       }
 
@@ -90,7 +90,7 @@ class ItemDraftTest extends Specification with Mockito with NoTimeConversions wi
         Json.obj("$oid" -> "1"),
         "xhtml" -> "<p>a</p>")
 
-      "prep the json" in new load(loadResult = badJson) {
+      "prep the json" in new load(loadResult = (badJson, Json.obj())) {
         val json = contentAsJson(draft.load("x")(req))
         (json \ "itemId").as[String] === "1"
         (json \ "xhtml").as[String] === """<p>a</p>"""
