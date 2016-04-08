@@ -62,7 +62,6 @@ trait ComponentSets extends Controller with ComponentUrls {
     generate(context, components, suffix, parameters)
   }
 
-  override def cssUrl(context: String, components: Seq[Component], separatePaths: Boolean): Seq[String] = url(context, components, "css", separatePaths)
   override def lessUrl(context: String, components: Seq[Component], separatePaths: Boolean, encodedCustomColors: Option[String]): Seq[String] = url(context, components, "less", separatePaths, encodedCustomColors)
   override def jsUrl(context: String, components: Seq[Component], separatePaths: Boolean): Seq[String] = url(context, components, "js", separatePaths)
 

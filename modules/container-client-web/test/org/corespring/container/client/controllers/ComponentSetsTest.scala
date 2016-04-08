@@ -85,8 +85,8 @@ class ComponentSetsTest extends Specification with ComponentMaker with Mockito {
       sets.jsUrl("editor", Seq(uiComp("name", Seq.empty)), false) === Seq(org.corespring.container.client.controllers.routes.ComponentSets.resource("editor", "org[all]", "js").url)
     }
 
-    "return css urls" in {
-      sets.cssUrl("player", Seq(uiComp("name", Seq.empty)), false) === Seq(org.corespring.container.client.controllers.routes.ComponentSets.resource("player", "org[all]", "css").url)
+    "return less urls" in {
+      sets.lessUrl("player", Seq(uiComp("name", Seq.empty)), false, Some("encodedColors")) === Seq(org.corespring.container.client.controllers.routes.ComponentSets.resource("player", "org[all]", "less").url + "?resourceToken=encodedColors")
     }
 
     "returns no url if no comps" in {
@@ -94,7 +94,7 @@ class ComponentSetsTest extends Specification with ComponentMaker with Mockito {
     }
 
     "returns no url if no comps" in {
-      sets.cssUrl("editor", Seq.empty, false) === Seq.empty
+      sets.lessUrl("editor", Seq.empty, false, None) === Seq.empty
     }
   }
 

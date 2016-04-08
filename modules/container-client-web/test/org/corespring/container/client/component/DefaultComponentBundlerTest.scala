@@ -37,9 +37,6 @@ class DefaultComponentBundlerTest extends Specification with Mockito with Compon
       m.jsUrl(any[String], any[Seq[Component]], any[Boolean]).returns {
         Seq("jsUrl")
       }
-      m.cssUrl(any[String], any[Seq[Component]], any[Boolean]).returns {
-        Seq("cssUrl")
-      }
       m.lessUrl(any[String], any[Seq[Component]], any[Boolean], any[Option[String]]).returns {
         Seq("lessUrl")
       }
@@ -63,7 +60,7 @@ class DefaultComponentBundlerTest extends Specification with Mockito with Compon
   "singleBundle" should {
 
     trait singleBundle extends scope {
-      val bundle = bundler.singleBundle(interaction.componentType, "editor", false)
+      val bundle = bundler.singleBundle(interaction.componentType, "editor", false, Some("encodedColors"))
     }
 
     "build a SingleScriptBundler" in new singleBundle {
@@ -79,8 +76,8 @@ class DefaultComponentBundlerTest extends Specification with Mockito with Compon
       there was one(urls).jsUrl("editor", Seq(interaction), false)
     }
 
-    "call urls.lessUrl" in new singleBundle {
-      there was one(urls).lessUrl(m_eq("editor"), m_eq(Seq(interaction)), m_eq(false), any[Option[String]])
+    "call urls.lessUrl with the encoded color token" in new singleBundle {
+      there was one(urls).lessUrl("editor", Seq(interaction), false, Some("encodedColors"))
     }
 
     "call dependencyResolver.resolveComponents" in new singleBundle {
