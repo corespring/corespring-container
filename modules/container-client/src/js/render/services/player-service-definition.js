@@ -1,13 +1,16 @@
-angular.module('corespring-player.services').factory('PlayerServiceDefinition', [
+angular.module('corespring-player.services')
+  .factory('PlayerServiceDefinition', [
   '$http',
   '$log',
   'PlayerServiceEndpoints',
   'EmbeddedItemAndSession',
+  'QueryParamUtils',
   function(
     $http,
     $log,
     PlayerServiceEndpoints,
-    EmbeddedItemAndSession
+    EmbeddedItemAndSession,
+    QueryParamUtils
   ) {
 
     function PlayerServiceDefinition() {
@@ -44,8 +47,6 @@ angular.module('corespring-player.services').factory('PlayerServiceDefinition', 
 
       this.initCalls(PlayerServiceEndpoints.session);
 
-      //-----------------------------------------------------------------
-
       function callWithData(call, id) {
         return function(data, onSuccess, onFailure) {
           _call(call, data, id)(onSuccess, onFailure);
@@ -63,7 +64,7 @@ angular.module('corespring-player.services').factory('PlayerServiceDefinition', 
         var url = addQueryParamsIfPresent(call.url);
         var args = data ? [url, data] : [url];
 
-        $http[call.method].apply(null, args)
+        $http({method: call.method, url: url, data: data})
           .success(
             function(data, status, headers, config) {
               onSuccess(data);
@@ -88,14 +89,7 @@ angular.module('corespring-player.services').factory('PlayerServiceDefinition', 
       }
 
       function addQueryParamsIfPresent(path) {
-        var out = [];
-        var params = PlayerServiceEndpoints.queryParams;
-        for (var x in params) {
-          out.push(x + '=' + params[x]);
-        }
-
-        var qs = out.join('&');
-        return path + (path.indexOf('?') === -1 ? '?' : '&') + qs;
+        return QueryParamUtils.addQueryParams(path);
       }
 
     }

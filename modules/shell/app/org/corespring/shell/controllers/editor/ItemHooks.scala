@@ -2,12 +2,10 @@ package org.corespring.shell.controllers.editor
 
 import com.mongodb.casbah.Imports._
 import org.bson.types.ObjectId
-import org.corespring.container.client.controllers.resources.CoreItem
-import org.corespring.container.client.hooks._
 import org.corespring.container.client.hooks.Hooks.{ R, StatusMessage }
+import org.corespring.container.client.hooks._
 import org.corespring.container.client.integration.ContainerExecutionContext
 import org.corespring.container.client.{ hooks => containerHooks }
-import org.corespring.mongo.json.services.MongoService
 import org.corespring.shell.services.ItemService
 import play.api.http.Status._
 import play.api.libs.json._
@@ -54,7 +52,7 @@ class ItemSupportingMaterialHooks(
     }
   }
 
-  override def addAsset(id: String, name: String, binary: Binary)(implicit h: RequestHeader): R[JsValue] = Future {
+  override def addAsset(id: String, name: String, binary: Binary)(implicit h: RequestHeader): R[UploadResult] = Future {
     val query = MongoDBObject("_id" -> new ObjectId(id), "supportingMaterials.name" -> name)
     val binaryDbo = binaryToDbo(binary, false)
     val update = MongoDBObject("$push" -> MongoDBObject("supportingMaterials.$.files" -> binaryDbo))
@@ -62,7 +60,7 @@ class ItemSupportingMaterialHooks(
 
     if (wr.getN == 1) {
       assets.uploadAssetToSupportingMaterial(id, name, binary)
-      Right(Json.obj("path" -> binary.name))
+      Right(UploadResult(binary.name))
     } else {
       Left((BAD_REQUEST, "Failed to remove the asset"))
     }
@@ -149,6 +147,22 @@ class ItemHooks(
 
   override def saveComponents(id: String, json: JsValue)(implicit h: RequestHeader): R[JsValue] = {
     itemFineGrainedSave(id, Json.obj("components" -> json))
+  }
+
+  override def saveXhtmlAndComponents(id: String, markup: String, components: JsValue)(implicit h: RequestHeader): R[JsValue] = {
+    val xhtmlResult = saveXhtml(id, markup)(h)
+    val componentResult = saveComponents(id, components)(h)
+    for {
+      x <- xhtmlResult
+      c <- componentResult
+    } yield {
+      (x, c) match {
+        case (Left((xErr, xMsg)), Left((cErr, cMsg))) => Left(xErr, xMsg)
+        case (Left((err, msg)), _) => Left(err, msg)
+        case (_, Left((err, msg))) => Left(err, msg)
+        case (Right(xJson), Right(cJson)) => Right(xJson.as[JsObject].deepMerge(cJson.as[JsObject]))
+      }
+    }
   }
 
   override def saveSummaryFeedback(id: String, feedback: String)(implicit h: RequestHeader): R[JsValue] = {

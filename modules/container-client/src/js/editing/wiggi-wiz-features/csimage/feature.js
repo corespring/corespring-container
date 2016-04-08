@@ -3,7 +3,8 @@ angular.module('corespring-editing.wiggi-wiz-features.cs-image')
     '$document',
   'Image',
   'TemplateUtils',
-  function($document, ImageDef, TemplateUtils) {
+  'QueryParamUtils',
+  function($document, ImageDef, TemplateUtils, QueryParamUtils) {
 
     var csImage = new ImageDef();
 
@@ -44,23 +45,13 @@ angular.module('corespring-editing.wiggi-wiz-features.cs-image')
       editor.togglePopover($node, $nodeScope, buttons, $node.find('img'));
     };
 
-    /**
-     * Note: this should be only used temporarily for a hotfix.
-     */
-    function addQueryParamsIfPresent(path) {
-      var doc = $document[0];
-      var href = doc.location.href;
-      path = path.indexOf('?') === -1 ? path : path.split('?')[0];
-      return path + (href.indexOf('?') === -1 ? '' :  '?' + href.split('?')[1]);
-    }
-
     csImage.initialise = function($node, replaceWith) {
       var imageSrc = $node.find('img').attr('src');
 
       if (imageSrc) {
-        imageSrc = addQueryParamsIfPresent(imageSrc);
+        imageSrc = QueryParamUtils.addQueryParams(imageSrc);
         var divStyle = $node.attr('style');
-        var imageStyle = $node.find('img').attr('style');
+        var imageStyle = $node.find('img').attr('style') || '';
         var clone = $('<div style="' + divStyle + '" image-holder image-src="' + imageSrc + '" image-style="' + imageStyle + '"></div>');
         return replaceWith(clone);
       } else {
@@ -69,7 +60,7 @@ angular.module('corespring-editing.wiggi-wiz-features.cs-image')
     };
 
     csImage.changeSrcPath = function(path){
-      return addQueryParamsIfPresent(path);
+      return QueryParamUtils.addQueryParams(path);
     };
 
     csImage.getMarkUp = function($node, $scope) {

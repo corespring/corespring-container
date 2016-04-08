@@ -31,13 +31,20 @@ trait EditorRenderer extends CoreRenderer {
     componentsAndWidgets: ComponentsAndWidgets,
     clientOptions: EditorClientOptions,
     bundle: ComponentsScriptBundle,
+    queryParams : Map[String,String],
     prodMode: Boolean): Future[Html] = Future {
 
     val (js, css) = prepareJsCss(prodMode, bundle)
 
     val serverNgModuleName = s"$name.serverInjectedServices"
 
-    val servicesJs = EditorServices(serverNgModuleName, mainEndpoints, supportingMaterialsEndpoints, componentsAndWidgets)
+    val queryParamsJson = Json.toJson(queryParams)
+
+    val servicesJs = EditorServices(serverNgModuleName,
+      mainEndpoints,
+      supportingMaterialsEndpoints,
+      componentsAndWidgets,
+      queryParamsJson).toString
 
     val ngModules = jsArrayString(Seq(serverNgModuleName) ++ sources.js.ngModules ++ bundle.ngModules)
 

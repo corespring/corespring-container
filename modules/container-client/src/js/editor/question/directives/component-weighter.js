@@ -1,6 +1,37 @@
-angular.module('corespring-editor.directives').directive('componentWeights', [
-  '$log',
-  function($log) {
+angular.module('corespring-editor.directives')
+.service('ComponentWeightUtils', [function(){
+
+
+  function ComponentWeightUtils(){
+
+    function addWeights(acc, comp) {
+      return acc + readWeight(comp.weight);
+    }
+
+    function readWeight(w) {
+      var out = parseInt(w, 10);
+      out = isNaN(out) ? 0 : out;
+      return out;
+    }
+
+    this.getPercentage = function(components, weight) {
+      var weightNumber = readWeight(weight);
+      var total = _.reduce(components, addWeights, 0);
+      var rawPercent = total === 0 ? 0 : (weight / total);
+      console.log(rawPercent);
+      var multiplied = Math.floor(rawPercent * 10000);
+      var normalized = multiplied / 100;
+      var out = +(normalized || 0).toFixed(2);
+      return out; 
+    };
+  }
+
+  return new ComponentWeightUtils();
+
+}])
+.directive('componentWeights', [
+  '$log', 'ComponentWeightUtils',
+  function($log, ComponentWeightUtils) {
 
     var log = $log.debug.bind($log, '[component-weights]');
 
@@ -46,11 +77,11 @@ angular.module('corespring-editor.directives').directive('componentWeights', [
         }
 
         var sorted = _(nodesOnly)
-          .filter(interactionsOnly)
-          .map(getId)
-          .map(toIdAndComp)
-          .filter(weightableOnly)
-          .value();
+        .filter(interactionsOnly)
+        .map(getId)
+        .map(toIdAndComp)
+        .filter(weightableOnly)
+        .value();
 
         $scope.sortedComponents = sorted;
 
@@ -74,21 +105,10 @@ angular.module('corespring-editor.directives').directive('componentWeights', [
       });
     }
 
-    function addWeights(acc, comp) {
-      return acc + readWeight(comp.weight);
-    }
-
-    function readWeight(w) {
-      var out = parseInt(w, 10);
-      out = isNaN(out) ? 0 : out;
-      return out;
-    }
 
     function controller($scope) {
       this.getPercentage = function(weight) {
-        var weightNumber = readWeight(weight);
-        var total = _.reduce(_.pluck($scope.sortedComponents, 'component'), addWeights, 0);
-        return Math.floor((weight / total) * 100) || 0;
+        return ComponentWeightUtils.getPercentage( _.pluck($scope.sortedComponents, 'component'), weight);
       };
 
       this.getTitle = function(componentType) {
@@ -109,9 +129,9 @@ angular.module('corespring-editor.directives').directive('componentWeights', [
       replace: true,
       controller: ['$scope', controller],
       template: [
-        '  <div> ',
-        '    <component-weight-input ng-disabled="disabled" component-id="idAndComp.id" ng-model="idAndComp.component" ng-repeat="idAndComp in sortedComponents"/>',
-        '  </div>'
+      '  <div> ',
+      '    <component-weight-input ng-disabled="disabled" component-id="idAndComp.id" ng-model="idAndComp.component" ng-repeat="idAndComp in sortedComponents"/>',
+      '  </div>'
       ].join('\n'),
       scope: {
         components: '=ngModel',
@@ -121,7 +141,7 @@ angular.module('corespring-editor.directives').directive('componentWeights', [
       }
     };
   }
-]);
+  ]);
 
 
 angular.module('corespring-editor.directives').directive('numberValidation', ['$log',
@@ -157,13 +177,11 @@ angular.module('corespring-editor.directives').directive('numberValidation', ['$
       }
     };
   }
-]);
+  ]);
 
 angular.module('corespring-editor.directives').directive('componentWeightInput', [
   '$log', '$timeout',
   function($log, $timeout) {
-
-    var randomId = Math.floor(Math.random() * 1000);
 
     function link($scope, $element, $attrs, ComponentWeights) {
 
@@ -206,4 +224,4 @@ angular.module('corespring-editor.directives').directive('componentWeightInput',
       }
     };
   }
-]);
+  ]);

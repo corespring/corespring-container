@@ -54,7 +54,11 @@ ADD target/universal/stage /opt/corespring-container
 # Default to UTF-8 file.encoding
 ENV LANG C.UTF-8
 
-CMD ["/data/main.sh" ] 
+# by default run the container, launched by main.sh
+ENV MAIN_SCRIPT "run-container.sh"
+
+
+CMD ["/data/main.sh" ]
 
 # Clean up APT when done.
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*

@@ -50,6 +50,14 @@
     };
   };
 
+  e.QueryParamUtils = function(){
+    return {
+      addQueryParams: jasmine.createSpy('addQueryParams').and.callFake(function(p){
+        return p;
+      })
+    };
+  };
+
   e.iFrameService = function(){
     return {
       isInIFrame: jasmine.createSpy('isInIFrame'),
@@ -85,6 +93,7 @@
       return promise;
     });
     constructor.prototype.promise = promise;
+    constructor.promise = promise;
     return constructor;
   };
 
@@ -151,6 +160,9 @@
           fn(newValue, oldValue);
         }
       };
+    });
+    this.debounce = jasmine.createSpy('debounce').and.callFake(function(fn){
+      return fn;
     });
   };
 

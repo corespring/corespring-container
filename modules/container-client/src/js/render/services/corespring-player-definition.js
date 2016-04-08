@@ -77,14 +77,12 @@ angular.module('corespring-player.services').factory('CorespringPlayerDefinition
             return;
           }
 
-          console.log('$scope.mode: ', $scope.mode);
-          
           if (rendered) {
             $log.debug("not re-rendering");
             return;
           }
 
-          $log.debug("corespring player definition setDataAndSession rendering");
+          //$log.debug("corespring player definition setDataAndSession rendering");
 
           var allData = PlayerUtils.zipDataAndSession($scope.item, $scope.session);
           ComponentRegister.setDataAndSession(allData);
