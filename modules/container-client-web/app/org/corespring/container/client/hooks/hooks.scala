@@ -3,15 +3,16 @@ package org.corespring.container.client.hooks
 import java.io.InputStream
 
 import org.corespring.container.client.HasContainerContext
-import org.corespring.container.client.hooks.Hooks.{LoadResult, R, StatusMessage}
-import play.api.libs.json.{JsArray, JsObject, JsValue}
+import org.corespring.container.client.hooks.Hooks.{ ItemAndDefaults, ItemAndSessionAndDefaults, R, StatusMessage }
+import play.api.libs.json.{ JsArray, JsObject, JsValue }
 import play.api.mvc._
 
 import scala.concurrent.Future
 
 object Hooks {
   type StatusMessage = (Int, String)
-  type LoadResult = (JsValue, JsValue)
+  type ItemAndDefaults = (JsValue, JsValue)
+  type ItemAndSessionAndDefaults = (JsValue, JsValue, JsValue)
   type R[A] = Future[Either[StatusMessage, A]]
 }
 
@@ -34,16 +35,17 @@ trait LoadHook extends HasContainerContext {
   /**
    * load the item with the id into the editor, aka it will be read+write access.
    * If returning a status message - you can optionally return a SEE_OTHER status and it will be handled correctly
+   *
    * @param id
    * @param header
    * @return
    */
-  def load(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, LoadResult]]
+  def load(id: String)(implicit header: RequestHeader): Future[Either[StatusMessage, ItemAndDefaults]]
 }
 
 trait PlayerHooks extends GetAssetHook with HasContainerContext {
-  def createSessionForItem(itemId: String)(implicit header: RequestHeader): Future[Either[StatusMessage, (JsValue, JsValue, JsValue)]]
-  def loadSessionAndItem(sessionId: String)(implicit header: RequestHeader): Future[Either[StatusMessage, (JsValue, JsValue, JsValue)]]
+  def createSessionForItem(itemId: String)(implicit header: RequestHeader): Future[Either[StatusMessage, ItemAndSessionAndDefaults]]
+  def loadSessionAndItem(sessionId: String)(implicit header: RequestHeader): Future[Either[StatusMessage, ItemAndSessionAndDefaults]]
   def loadItemFile(itemId: String, file: String)(implicit header: RequestHeader): SimpleResult
   def archiveCollectionId: String
 }

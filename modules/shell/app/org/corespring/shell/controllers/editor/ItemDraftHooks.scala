@@ -3,13 +3,13 @@ package org.corespring.shell.controllers.editor
 import com.mongodb.casbah.Imports._
 import com.mongodb.casbah.commons.MongoDBObject
 import org.bson.types.ObjectId
-import org.corespring.container.client.hooks.Hooks.{LoadResult, R, StatusMessage}
+import org.corespring.container.client.hooks.Hooks.{ ItemAndDefaults, R, StatusMessage }
 import org.corespring.container.client.hooks._
 import org.corespring.container.client.integration.ContainerExecutionContext
-import org.corespring.container.client.{hooks => containerHooks}
+import org.corespring.container.client.{ hooks => containerHooks }
 import org.corespring.shell.DefaultPlayerSkin
-import org.corespring.shell.controllers.editor.actions.{ContainerDraftId, DraftId}
-import org.corespring.shell.services.{ItemDraftService, ItemService}
+import org.corespring.shell.controllers.editor.actions.{ ContainerDraftId, DraftId }
+import org.corespring.shell.services.{ ItemDraftService, ItemService }
 import org.joda.time.DateTime
 import play.api.Logger
 import play.api.http.Status._
@@ -193,7 +193,7 @@ class ItemDraftHooks(
    * @param header
    * @return
    */
-  override def load(draftId: String)(implicit header: RequestHeader): Future[Either[StatusMessage, LoadResult]] = {
+  override def load(draftId: String)(implicit header: RequestHeader): Future[Either[StatusMessage, ItemAndDefaults]] = {
     Future {
       draftItemService.load(draftId).map { json =>
         logger.debug(s"function=load, draftId=$draftId, json=${Json.prettyPrint(json)}")

@@ -1,19 +1,19 @@
 package org.corespring.container.client.controllers.apps
 
-import org.corespring.container.client.component.{ComponentBundler, ComponentJson}
+import org.corespring.container.client.component.{ ComponentBundler, ComponentJson }
 import org.corespring.container.client.controllers.apps.componentEditor.ComponentEditorLaunchingController
-import org.corespring.container.client.controllers.{AssetsController, EditorConfig}
-import org.corespring.container.client.hooks.Hooks.{LoadResult, StatusMessage}
-import org.corespring.container.client.hooks.{DraftEditorHooks, EditorHooks, ItemEditorHooks}
+import org.corespring.container.client.controllers.{ AssetsController, EditorConfig }
+import org.corespring.container.client.hooks.Hooks.{ ItemAndDefaults, StatusMessage }
+import org.corespring.container.client.hooks.{ DraftEditorHooks, EditorHooks, ItemEditorHooks }
 import org.corespring.container.client.integration.ContainerExecutionContext
-import org.corespring.container.client.pages.{ComponentEditorRenderer, DevEditorRenderer, EditorRenderer, MainEditorRenderer}
+import org.corespring.container.client.pages.{ ComponentEditorRenderer, DevEditorRenderer, EditorRenderer, MainEditorRenderer }
 import org.corespring.container.client.views.models.ComponentsAndWidgets
-import org.corespring.container.components.model.{ComponentInfo, Interaction}
+import org.corespring.container.components.model.{ ComponentInfo, Interaction }
 import org.corespring.container.components.services.ComponentService
 import play.api.Mode.Mode
-import play.api.libs.json.{JsArray, JsValue, Json}
-import play.api.mvc.{Action, Controller, RequestHeader, SimpleResult}
-import play.api.{Logger, Mode}
+import play.api.libs.json.{ JsArray, JsValue, Json }
+import play.api.mvc.{ Action, Controller, RequestHeader, SimpleResult }
+import play.api.{ Logger, Mode }
 
 import scala.concurrent.Future
 
@@ -110,7 +110,7 @@ trait BaseEditor[H <: EditorHooks]
   }
 
   def componentEditor(id: String) = Action.async { implicit request =>
-    def loadEditor(data:LoadResult): Future[SimpleResult] = {
+    def loadEditor(data: ItemAndDefaults): Future[SimpleResult] = {
       logger.trace(s"function=loadEditor, json=${Json.prettyPrint(data._1)}")
       findComponentType(data._1) match {
         case Some(ct) => componentEditorResult(ct, request, data._2)
