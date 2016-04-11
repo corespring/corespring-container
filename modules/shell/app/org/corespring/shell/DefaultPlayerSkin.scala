@@ -5,7 +5,7 @@ import play.api.libs.json.{ JsObject, Json }
 object DefaultPlayerSkin {
   def defaultPlayerSkin: JsObject = Json.obj(
     "colors" -> Json.obj(
-      "correct-background" -> "#00ff00",
+      "correct-background" -> "#4aaf46",
       "correct-foreground" -> "#f8ffe2",
       "partially-correct-background" -> "#c1e1ac",
       "incorrect-background" -> "#fcb733",
