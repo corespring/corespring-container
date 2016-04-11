@@ -1,16 +1,6 @@
 package org.corespring.shell
 
-import com.mongodb.casbah.{MongoClient, MongoClientURI, MongoDB}
-import org.corespring.container.components.loader.FileComponentLoader
-import org.corespring.container.components.model.Interaction
-import org.corespring.container.logging.ContainerLogger
-import org.corespring.play.utils.{CallBlockOnHeaderFilter, ControllerInstanceResolver}
-import org.corespring.shell.controllers.{Launchers, Main}
-import org.corespring.shell.filters.AccessControlFilter
-import org.corespring.shell.services.{ItemDraftService, ItemService, SessionService}
-import play.api.libs.json.{JsObject, Json}
-import play.api.mvc._
-import play.api.{GlobalSettings, Play}
+import play.api.libs.json.{ JsObject, Json }
 
 object DefaultPlayerSkin {
   def defaultPlayerSkin: JsObject = Json.obj(
