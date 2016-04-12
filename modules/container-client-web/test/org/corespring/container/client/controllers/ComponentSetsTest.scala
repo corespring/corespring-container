@@ -19,7 +19,7 @@ class ComponentSetsTest extends Specification with ComponentMaker with Mockito {
   sequential
 
   class MockSourceGenerator(name: String) extends SourceGenerator {
-    override def less(components: Seq[Component], customColors: JsObject = Json.obj()): String = s"$name - less - ${components.map(_.componentType).mkString(",")}"
+    override def less(components: Seq[Component], customColors: JsObject = Json.obj()): String = s"@a:3; .something { color: @a; }"
 
     override def js(components: Seq[Component]): String = s"$name - js - ${components.map(_.componentType).mkString(",")}"
 
@@ -73,6 +73,11 @@ class ComponentSetsTest extends Specification with ComponentMaker with Mockito {
       contentAsString(result) === "player - js - org-name"
     }
 
+    "compile less resources" in running(FakeApplication(withGlobal = Some(mockGlobal))) {
+      val result: Future[SimpleResult] = sets.resource("player", "org[all]", "less")(FakeRequest("", "")).run
+      contentAsString(result) must contain("color: 3")
+    }
+
     "return js urls" in {
       sets.jsUrl("editor", Seq(uiComp("name", Seq.empty)), false) === Seq(org.corespring.container.client.controllers.routes.ComponentSets.resource("editor", "org[all]", "js").url)
     }
@@ -96,6 +101,7 @@ class ComponentSetsTest extends Specification with ComponentMaker with Mockito {
     "returns no url if no comps" in {
       sets.lessUrl("editor", Seq.empty, false, None) === Seq.empty
     }
+
   }
 
 }
