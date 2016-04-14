@@ -10,19 +10,19 @@ You can build different runners for CI and local dev
  
  1. RegrBase - It contains the infrastructure like mongo 
   
-     docker build -t regrbase -f docker/component-regression/dockerfiles/RegrBase
+     docker build -t regrbase -f docker/component-regression/dockerfiles/RegrBase .
       
  2. CurrCont - (Dev only) It embeds the current container into the docker.
   
-     docker build -t currcont -f docker/component-regression/dockerfiles/CurrCont 
+     docker build -t currcont -f docker/component-regression/dockerfiles/CurrCont .
      
  3. DevCompRegrRunner - (Dev only) It embeds the current component set and the grunt config for running the regression tests.
         
-     docker build -t dcrr -f docker/component-regression/dockerfiles/DevCompRegrRunner
+     docker build -t dcrr -f docker/component-regression/dockerfiles/DevCompRegrRunner .
         
  4. CiCompRegrRunner - It embeds the script to download a slug and run the tests that are inside of the slug
  
-     docker build -t cicrr -f docker/component-regression/dockerfiles/DevCompRegrRunner
+     docker build -t cicrr -f docker/component-regression/dockerfiles/CiCompRegrRunner .
  
  For dev you are building 1, 2 and 3. If you change something in the components, you have to rebuild the third part only  
  For ci you have to build 1 and 4. 
