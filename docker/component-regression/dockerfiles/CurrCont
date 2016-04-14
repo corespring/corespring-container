@@ -1,0 +1,15 @@
+# A dockerized regression test runner
+# It boots a corespring-container and a mongo
+# and runs the component regression tests against it
+#
+# This part adds the current container
+# Build it from a container directory
+# Run play stage before the docker build
+# This is a base image, not intended to run on its own
+
+FROM regrbase
+
+RUN mkdir -p /data/container
+ADD target/universal/stage /data/container
+ENV CONTAINER_COMPONENTS_PATH="/data/container/corespring-components/components"
+
