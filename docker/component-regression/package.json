@@ -3,8 +3,7 @@
   "name": "corespring-components-docker-regression-test-runner",
   "description": "A dockerized runner for the regression tests",
   "version": "0.1.0",
-  "dependencies": {
-  },
+  "dependencies": {},
   "engines": {
     "node": ">= 0.10.9"
   },
@@ -17,9 +16,13 @@
     "grunt-contrib-clean": "~0.5.0",
     "grunt-contrib-copy": "~0.4.1",
     "grunt-http-verify": "~0.1.2",
-    "grunt-webdriver": "~0.5.2",
+    "grunt-replace": "^0.11.0",
+    "grunt-webdriver": "*",
     "http-verify": "~0.1.0",
     "lodash": "~2.4.1",
-    "should": "~4.0.4"
+    "should": "~4.0.4",
+    "wdio-jasmine-framework": "*",
+    "wdio-mocha-framework": "*",
+    "webdriverio": "*"
   }
 }
