@@ -26,7 +26,31 @@ You can build different runners for CI and local dev
  
  For dev you are building 1, 2 and 3. If you change something in the components, you have to rebuild the third part only  
  For ci you have to build 1 and 4. 
+
+### Note: Docker registry and docker container for CI
+
+Our docker registry for the component-regression containers:
     
+    468517524622.dkr.ecr.us-east-1.amazonaws.com/corespring-components-regression
+
+The *RegrBase* container can be pulled from (and pushed to)
+
+    468517524622.dkr.ecr.us-east-1.amazonaws.com/corespring-components-regression:base
+
+The *CiCompRegrRunner* container can be pulled from (and pushed to)
+
+    468517524622.dkr.ecr.us-east-1.amazonaws.com/corespring-components-regression:runner
+
+CI automation will tag the above containers according to the steps in `Building the runner` in this documentation, so 
+`base` will be tagged as
+
+    docker tag corespring-components-regression:base regrbase:latest
+
+and runner will be tagged as
+
+    docker tag corespring-components-regression:runner cicrr:latest
+
+
 ### Problems
 + Sometimes npm install doesn't work. If possible, try running npm install in the regression directory of your source files before running the docker build.      
        
