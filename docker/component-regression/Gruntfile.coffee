@@ -141,8 +141,9 @@ module.exports = (grunt) ->
     copy:
       dev:
         files: [
-          {expand: true, src: ['../../components/**/regression/**'], dest: 'regression/components/', filter: 'isFile'}
-          {expand: true, src: ['../../components/**/regression-data/**'], dest: 'regression/components/', filter: 'isFile'}
+
+          {expand: true, cwd: '../../corespring-components/components', src: ['**/regression/**'], dest: 'components', filter: 'isFile'}
+          {expand: true, cwd: '../../corespring-components/components', src: ['**/regression-data/**'], dest: 'components', filter: 'isFile'}
         ]
 
     http_verify:
@@ -175,5 +176,5 @@ module.exports = (grunt) ->
   ]
 
   grunt.loadNpmTasks(t) for t in npmTasks
-  grunt.registerTask('regression', ['copy:dev', 'http_verify:regressionRigWarmup', 'webdriver:dev', 'clean:regression'])
+  grunt.registerTask('regression', ['clean:regression', 'copy:dev', 'http_verify:regressionRigWarmup', 'webdriver:dev'])
   grunt.registerTask('regression-from-docker', ['http_verify:regressionRigWarmup', 'webdriver:dev'])
