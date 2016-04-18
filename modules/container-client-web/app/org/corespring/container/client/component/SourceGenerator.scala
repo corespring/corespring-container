@@ -1,12 +1,13 @@
 package org.corespring.container.client.component
 
-import org.corespring.container.client.controllers.helpers.{ LoadClientSideDependencies, NameHelper }
-import org.corespring.container.client.views.txt.js.{ ComponentServerWrapper, ComponentWrapper, ServerLibraryWrapper }
+import org.corespring.container.client.controllers.helpers.{LoadClientSideDependencies, NameHelper}
+import org.corespring.container.client.views.txt.js.{ComponentServerWrapper, ComponentWrapper, ServerLibraryWrapper}
 import org.corespring.container.components.model._
 import org.corespring.container.components.model.packaging.ClientSideDependency
 import org.corespring.container.components.services.ComponentTypeFilter
-import play.api.libs.json.{ Json, JsValue, JsObject }
+import play.api.libs.json.{JsObject, JsValue, Json}
 import org.apache.commons.io.IOUtils
+import org.corespring.container.client.controllers.apps.StaticPaths
 
 object SourceGenerator {
   object Keys {
@@ -28,7 +29,7 @@ trait SourceGenerator
   def less(components: Seq[Component], customColors: JsObject = Json.obj()): String
 
   protected def wrapComponent(moduleName: String, directiveName: String, src: String) = {
-    ComponentWrapper(moduleName, directiveName, src).toString
+    ComponentWrapper(moduleName, directiveName, src, StaticPaths.assetUrl).toString
   }
 
   def layoutToJs(layout: LayoutComponent): String = {
@@ -59,7 +60,7 @@ trait SourceGenerator
   protected def wrapClientLibraryJs(moduleName: String)(src: LibrarySource) = {
     s"""
       // ----------------- ${src.name} ---------------------
-      ${ComponentWrapper(moduleName, src.name, src.source)}
+      ${ComponentWrapper(moduleName, src.name, src.source, StaticPaths.assetUrl)}
       """
   }
 
