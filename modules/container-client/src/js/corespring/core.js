@@ -8,7 +8,6 @@
       try {
         return angular.module(moduleName);
       } catch (e) {
-        console.log("***** ", moduleName, assetsPath);
         var module = angular.module(moduleName, []);
         module.constant("ASSETS_PATH", assetsPath);
         return module;
