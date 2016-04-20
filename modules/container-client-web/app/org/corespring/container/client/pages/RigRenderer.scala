@@ -28,6 +28,7 @@ class RigRenderer(val pageSourceService: PageSourceService,
 
     val params: Map[String, Any] = Map(
       "appName" -> "rig",
+      "title" -> "rig",
       "js" -> js.toArray,
       "css" -> css.toArray,
       "ngModules" -> (sources.js.ngModules ++ bundle.ngModules).map(s => s"'$s'").mkString(","),
