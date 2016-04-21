@@ -1,5 +1,4 @@
 _ = require 'lodash'
-expect = require('expect');
 
 module.exports = (grunt) ->
   runOnSauceLabs = grunt.option('sauceLabs') or false
@@ -156,4 +155,4 @@ module.exports = (grunt) ->
 
   grunt.loadNpmTasks(t) for t in npmTasks
   grunt.registerTask('regression', ['clean:regression', 'copy:dev', 'replace:wdioconf','http_verify:regressionRigWarmup', 'webdriver:dev'])
-  grunt.registerTask('regression-from-docker', ['http_verify:regressionRigWarmup', 'webdriver:dev'])
+  grunt.registerTask('regression-from-docker', ['replace:wdioconf', 'http_verify:regressionRigWarmup', 'webdriver:dev'])

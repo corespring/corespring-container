@@ -5,7 +5,7 @@
   "version": "0.1.0",
   "dependencies": {},
   "engines": {
-    "node": ">= 0.10.9"
+    "node": ">= 0.12.0"
   },
   "devDependencies": {
     "chai": "~1.9.1",
@@ -17,12 +17,12 @@
     "grunt-contrib-copy": "~0.4.1",
     "grunt-http-verify": "~0.1.2",
     "grunt-replace": "^0.11.0",
-    "grunt-webdriver": "*",
+    "grunt-webdriver": "1.0.0",
     "http-verify": "~0.1.0",
     "lodash": "~2.4.1",
     "should": "~4.0.4",
-    "wdio-jasmine-framework": "*",
-    "wdio-mocha-framework": "*",
-    "webdriverio": "*"
+    "wdio-jasmine-framework": "0.1.9",
+    "wdio-mocha-framework": "0.2.12",
+    "webdriverio": "4.0.5"
   }
 }
