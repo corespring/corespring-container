@@ -36,7 +36,7 @@ class CompressedAndMinifiedComponentSets(componentSetExecutionContext: Component
 
   def process(s: String, contentType: String)(implicit rh: RequestHeader): SimpleResult = {
 
-//    logger.warn(s"function=process - this is an expensive operation! use sparingly.")
+    logger.warn(s"function=process - this is an expensive operation! use sparingly.")
     logger.trace(s"process minify? $minifyEnabled, gzip? $gzipEnabled")
 
     val out: Either[String, String] = contentType match {

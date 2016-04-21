@@ -74,6 +74,7 @@ sessionService: MongoService)
                 SessionLink(
                   id,
                   Launchers.playerFromSession(id).url,
+                  Launchers.playerFromSessionView(id).url,
                   routes.Main.deleteSession(id).url)
               }
 
