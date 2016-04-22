@@ -4,8 +4,8 @@
 <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 viewBox="-384 385 31 31" enable-background="new -384 385 31 31" xml:space="preserve">
 <g>
-	<circle fill="#A2D4F2" cx="-368.5" cy="400.5" r="15"/>
-	<circle fill="#FFFFFF" cx="-368.5" cy="400.5" r="13"/>
-	<circle fill="#404B9B" class="inner-circle" cx="-368.5" cy="400.5" r="8"/>
+	<circle class="choice-foreground" cx="-368.5" cy="400.5" r="15"/>
+	<circle class="choice-background" cx="-368.5" cy="400.5" r="13"/>
+	<circle class="choice-selection inner-circle" cx="-368.5" cy="400.5" r="8"/>
 </g>
 </svg>
