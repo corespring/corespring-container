@@ -93,7 +93,7 @@ class PlayerRenderer(
       "js" -> jsWithControls.toArray,
       "css" -> css.toArray,
       "showControls" -> javaBoolean(showControls),
-      "useNewRelicRumConfig" -> javaBoolean(playerConfig.useNewRelic),
+      "useNewRelicRum" -> javaBoolean(playerConfig.useNewRelic),
       "newRelicRumConfig" -> Json.stringify(newRelicRumConfig),
       "warnings" -> Json.stringify(Json.arr(warnings: _*)),
       "ngModules" -> jsArrayString(ngModules),
