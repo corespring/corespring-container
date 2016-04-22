@@ -3,16 +3,17 @@ extends layout
 
 
 block header-scripts
+
   if useNewRelicRum
-
     script(type="text/javascript", src="../../js/libs/newrelic/newrelic-rum-js-agent.min.js")
-
     script(type="text/javascript").
 
-      NREUM.info!= newRelicRumConfig
+      NREUM.info = !{newRelicRumConfig}
+  else
+    <!-- new relic disabled -->
 
   if warnings
-    script(type="text/javascript")
+    script(type="text/javascript").
       var warnings = !{warnings};
       for (var i in warnings) {
         console.warn(warnings[i]);
