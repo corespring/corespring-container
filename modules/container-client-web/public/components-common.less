@@ -201,3 +201,15 @@
   }
 
 }
+
+.color-panel(@color) {
+  box-shadow: none;
+  .panel-heading {
+    background-color: @color;
+    border: 1px solid @color;
+  }
+
+  .panel-body {
+    border: 1px solid @color;
+  }
+}
