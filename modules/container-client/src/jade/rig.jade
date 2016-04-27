@@ -34,7 +34,7 @@ block content
 block after-main-script
   script.
 
-    function broadcast(message, params){
+    window.broadcast = function(message, params){
       var scope = angular.element(document.getElementById('rig-root')).scope();
       var rootScope = scope.$root;
       scope.$apply(function() {

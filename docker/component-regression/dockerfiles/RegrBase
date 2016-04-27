@@ -1,0 +1,98 @@
+# A dockerized regression test runner
+# It boots a corespring-container and a mongo
+# and runs the component regression tests against it
+#
+# This part adds linux, mongo, fakeS3, xfvb, firefox and chrome
+# Build it from a container directory
+# This is a base image, not intended to run on its own
+
+FROM phusion/baseimage:0.9.16
+
+# Default to UTF-8 file.encoding
+ENV LANG C.UTF-8
+
+RUN apt-get update && \
+ apt-get upgrade -y && \
+ apt-get install -y \
+  git \
+  nodejs \
+  npm \
+  openjdk-7-jdk \
+  unzip \
+  wget \
+  xvfb
+
+# link nodejs -> node
+RUN ln -s /usr/bin/nodejs /usr/bin/node
+
+# Mongo:
+# Import MongoDB public GPG key AND create a MongoDB list file
+RUN apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv 7F0CEB10
+RUN echo 'deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen' | tee /etc/apt/sources.list.d/10gen.list
+RUN apt-get update && apt-get install -y mongodb-org
+# Create the MongoDB data directory
+RUN mkdir -p /var/lib/mongodb 
+
+# Ruby 
+RUN apt-get update && \
+  apt-get install -y ruby ruby-dev ruby-bundler
+
+RUN mkdir -p /data/regression/extras
+ADD docker/component-regression/extras /data/regression/extras
+ADD docker/component-regression/package.json /data/regression/package.json
+RUN cd /data/regression && npm install && npm install -g grunt-cli
+
+### fakes3
+RUN chmod +x /data/regression/extras/fakes3-0.2.3.gem
+RUN gem install builder
+RUN gem install --backtrace -V --local /data/regression/extras/fakes3-0.2.3.gem
+RUN mkdir /opt/fake-s3-root
+ENV CONTAINER_FAKE_S3_ENDPOINT="http://localhost:4567"
+
+### xvfb
+ADD docker/component-regression/extras/xvfb.init /etc/init.d/xvfb
+RUN chmod +x /etc/init.d/xvfb
+RUN update-rc.d xvfb defaults
+
+#=========
+# Firefox
+#=========
+ENV FIREFOX_VERSION 35.0.1
+RUN echo $FIREFOX_VERSION
+RUN apt-get update -qqy \
+  && apt-get -qqy --no-install-recommends install firefox \
+  && rm -rf /var/lib/apt/lists/* \
+  && wget --no-verbose -O /tmp/firefox.tar.bz2 https://download-installer.cdn.mozilla.net/pub/firefox/releases/$FIREFOX_VERSION/linux-x86_64/en-US/firefox-$FIREFOX_VERSION.tar.bz2 \
+  && apt-get -y purge firefox \
+  && rm -rf /opt/firefox \
+  && tar -C /opt -xjf /tmp/firefox.tar.bz2 \
+  && rm /tmp/firefox.tar.bz2 \
+  && mv /opt/firefox /opt/firefox-$FIREFOX_VERSION \
+  && ln -fs /opt/firefox-$FIREFOX_VERSION/firefox /usr/bin/firefox
+
+
+#===============
+# Google Chrome
+#===============
+RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
+  && echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list \
+  && apt-get update -qqy \
+  && apt-get -qqy install \
+    google-chrome-stable \
+  && rm /etc/apt/sources.list.d/google-chrome.list \
+  && rm -rf /var/lib/apt/lists/*
+
+#==================
+# Chrome webdriver
+#==================
+ENV CHROME_DRIVER_VERSION 2.21
+RUN wget --no-verbose -O /tmp/chromedriver_linux64.zip http://chromedriver.storage.googleapis.com/$CHROME_DRIVER_VERSION/chromedriver_linux64.zip \
+  && rm -rf /opt/selenium/chromedriver \
+  && unzip /tmp/chromedriver_linux64.zip -d /opt/selenium \
+  && rm /tmp/chromedriver_linux64.zip \
+  && mv /opt/selenium/chromedriver /opt/selenium/chromedriver-$CHROME_DRIVER_VERSION \
+  && chmod 755 /opt/selenium/chromedriver-$CHROME_DRIVER_VERSION \
+  && ln -fs /opt/selenium/chromedriver-$CHROME_DRIVER_VERSION /usr/bin/chromedriver
+
+# Clean up APT when done.
+RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
