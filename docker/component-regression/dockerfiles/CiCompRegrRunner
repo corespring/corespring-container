@@ -1,0 +1,29 @@
+# A dockerized regression test runner
+# It boots a corespring-container and a mongo
+# and runs the component regression tests against it
+#
+# This part is supposed to run on ci
+# It downloads a container slug and runs it
+# Build it from a container directory
+# Run it using docker run
+
+FROM regrbase
+
+RUN mkdir -p /data/regression/scripts
+ADD docker/component-regression/scripts /data/regression/scripts
+RUN chmod +x /data/regression/scripts/*.sh
+
+ADD docker/component-regression/Gruntfile.coffee /data/regression/Gruntfile.coffee
+
+# Settings for the regression tests
+ENV BROWSER_NAME "firefox"
+ENV GREP ""
+ENV GRUNT_DEBUG "false"
+ENV INVERT_GREP "false"
+ENV SLUG ""
+ENV TIMEOUT 30000
+ENV WAIT_BEFORE_TEST 30
+ENV WEB_DRIVER_LOG_LEVEL "silent"
+
+CMD ["/data/regression/scripts/ci-regr-runner.sh"]
+
