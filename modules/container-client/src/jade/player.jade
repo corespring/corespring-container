@@ -4,6 +4,18 @@ extends layout
 
 block header-scripts
 
+  if newRelicRumEnabled
+    script(type="text/javascript", src="../../../js/libs/newrelic/newrelic-rum-js-agent.min.js")
+    script(type="text/javascript").
+
+      if(window.NREUM){
+        NREUM.info = !{newRelicRumConfig}
+      } else {
+        console.warn('newrelic agent not loaded!')
+      }
+  else
+    <!-- new relic disabled -->
+
   if warnings
     script(type="text/javascript").
       var warnings = !{warnings};

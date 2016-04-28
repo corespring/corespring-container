@@ -11,19 +11,7 @@ html(xmlns="http://www.w3.org/1999/html")
     |  !{versionInfo} 
     | -->
 
-    if newRelicRumEnabled
-
-      script(type="text/javascript", src="../../js/libs/newrelic/newrelic-rum-js-agent.min.js")
-      script(type="text/javascript").
-
-        if(window.NREUM){
-          NREUM.info = !{newRelicRumConfig}
-        } else {
-          console.warn('newrelic agent not loaded!')
-        }
-    else
-      <!-- new relic disabled -->
-    
+    //  header script should come first, before any other script
     block header-scripts
 
     for c in css
