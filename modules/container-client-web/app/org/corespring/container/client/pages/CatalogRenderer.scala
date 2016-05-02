@@ -41,6 +41,7 @@ class CatalogRenderer(
     val queryParamsJson = Json.toJson(queryParams)
     val ngServiceLogic = CatalogServices(s"$name-injected", componentSet, mainEndpoints, supportingMaterialsEndpoints, queryParamsJson).toString
     val newRelicRumConfig = playerConfig.newRelicRumConfig.map(c => c.json).getOrElse(Json.obj())
+    val newRelicRumScriptPath = playerConfig.newRelicRumConfig.map(c => c.scriptPath).getOrElse("")
 
 
     val params: Map[String, Any] = Map(
@@ -51,6 +52,7 @@ class CatalogRenderer(
       "ngServiceLogic" -> ngServiceLogic,
       "staticPaths" -> Json.stringify(StaticPaths.staticPaths),
       "newRelicRumEnabled" -> javaBoolean(playerConfig.useNewRelic),
+      "newRelicRumScriptPath" -> newRelicRumScriptPath,
       "newRelicRumConfig" -> Json.stringify(newRelicRumConfig))
     jadeEngine.renderJade(name, params)
   }

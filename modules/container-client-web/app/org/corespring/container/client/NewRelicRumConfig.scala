@@ -7,6 +7,7 @@ case class NewRelicRumConfig(
   licenseKey: String,
   applicationID: String,
   agent: String,
+  scriptPath: String,
   sa: Int = 1,
   beacon: String = "bam.nr-data.net",
   errorBeacon: String = "bam.nr-data.net") {
@@ -21,6 +22,7 @@ object NewRelicRumConfig {
       licenseKey <- c.getString("license-key")
       applicationID <- c.getString("application-id")
       agent <- c.getString("agent")
-    } yield NewRelicRumConfig(licenseKey, applicationID, agent)
+      scriptPath <- c.getString("script-path")
+    } yield NewRelicRumConfig(licenseKey, applicationID, agent, scriptPath)
   }
 }

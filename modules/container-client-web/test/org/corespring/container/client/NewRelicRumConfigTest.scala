@@ -8,7 +8,7 @@ import play.api.Configuration
 class NewRelicRumConfigTest extends Specification {
 
   def configString(enabled: Boolean) =
-    s"""{enabled:$enabled, license-key: key, application-id:id, agent: agent}"""
+    s"""{enabled:$enabled, license-key: key, application-id:id, agent: agent, script-path: "script"}"""
 
   class scope(configJson: String) extends Scope {
 
@@ -19,7 +19,7 @@ class NewRelicRumConfigTest extends Specification {
 
   "apply" should {
     "return a new config" in new scope(configString(true)) {
-      newRelicRumConfig must_== Some(NewRelicRumConfig("key", "id", "agent"))
+      newRelicRumConfig must_== Some(NewRelicRumConfig("key", "id", "agent", "script"))
     }
 
     "not return a config if enabled is false" in new scope(configString(false)) {
@@ -27,7 +27,7 @@ class NewRelicRumConfigTest extends Specification {
     }
 
     "be converted to proper json config object" in new scope(configString(true)) {
-      newRelicRumConfig.map(_.json) === Some(NewRelicRumConfig("key", "id", "agent").json)
+      newRelicRumConfig.map(_.json) === Some(NewRelicRumConfig("key", "id", "agent", "script").json)
     }
   }
 }
