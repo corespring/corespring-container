@@ -47,6 +47,7 @@ object Build extends sbt.Build {
     val scalaz = "org.scalaz" %% "scalaz-core" % "7.0.6"
     val specs2 = "org.specs2" %% "specs2" % "2.2.2" % "test"
     val yuiCompressor = "com.yahoo.platform.yui" % "yuicompressor" % "2.4.7"
+    val jsoup = "org.jsoup" % "jsoup" % "1.8.1"
   }
 
   object Resolvers {
@@ -212,6 +213,7 @@ object Build extends sbt.Build {
         yuiCompressor,
         commonsIo,
         aws,
+        jsoup,
         macWireMacro),
       templatesImport ++= Seq("play.api.libs.json.JsValue", "play.api.libs.json.Json"))
     .dependsOn(
