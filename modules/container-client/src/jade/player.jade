@@ -5,7 +5,7 @@ extends layout
 block header-scripts
 
   if newRelicRumEnabled
-    script(type="text/javascript", src="../../../js/libs/newrelic/newrelic-rum-js-agent.min.js")
+    script(type="text/javascript", src="!{newRelicRumScriptPath}")
     script(type="text/javascript").
 
       if(window.NREUM){
