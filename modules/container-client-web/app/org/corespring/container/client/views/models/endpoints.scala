@@ -9,7 +9,11 @@ private object Helpers {
 
 import Helpers._
 
-case class MainEndpoints(load: Call, saveSubset: Call, saveXhtmlAndComponents: Call, save: Option[Call]) {
+case class MainEndpoints(
+  load: Call,
+  save: Option[Call],
+  saveSubset: Call,
+  saveXhtmlAndComponents: Call) {
 
   val json = Json.writes[MainEndpoints].writes(this)
   val jsonString = Json.stringify(json)
@@ -18,14 +22,14 @@ case class MainEndpoints(load: Call, saveSubset: Call, saveXhtmlAndComponents: C
 case class ComponentsAndWidgets(components: JsValue, widgets: JsValue)
 
 case class SessionEndpoints(
+  complete: Call,
+  getScore: Call,
+  loadInstructorData: Call,
   loadItemAndSession: Call,
+  loadOutcome: Call,
   reopen: Call,
   reset: Call,
-  save: Call,
-  getScore: Call,
-  complete: Call,
-  loadOutcome: Call,
-  loadInstructorData: Call) {
+  save: Call) {
 
   protected val json = Json.writes[SessionEndpoints].writes(this)
 
@@ -33,10 +37,10 @@ case class SessionEndpoints(
 }
 
 case class SupportingMaterialsEndpoints(
+  addAsset: Call,
   create: Call,
   createFromFile: Call,
   delete: Call,
-  addAsset: Call,
   deleteAsset: Call,
   getAsset: Call,
   updateContent: Call) {
