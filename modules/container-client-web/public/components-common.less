@@ -117,39 +117,51 @@
 }
 
 
+.choice-template() {
+  border: 1px solid #f1f1f4;
+  box-shadow: 2px 2px 3px 0px rgba(0,0,0,0.18);
+  background: #ffffff;
+
+  &.correct {
+    .correct-input();
+    box-shadow: none;
+  }
+
+  &.incorrect {
+    .incorrect-input();
+    box-shadow: none;
+  }
+}
+
+.choice-area-template() {
+  background: #f8f6f6;
+  box-shadow: inset 3px 4px 2px 0px rgba(0,0,0,0.08);
+  border-width: 1px;
+  border-style: solid;
+  border-top-color: #c2c2c2;
+  border-right-color: #e9e9e9;
+  border-bottom-color: #e9e9e9;
+  border-left-color: #c2c2c2;
+}
+
+.input-border(@color) {
+  border: 1px solid @color;
+}
 
 .correct-input() {
-  border: 1px solid @correct-background;
-  -moz-box-shadow: 0px 0px 6px 0px @correct-background, inset 0px 1px 0px 0px #ECECEC;
-  box-shadow: 0px 0px 6px 0px @correct-background, inset 0px 1px 0px 0px #ECECEC;
+  .input-border(@correct-background);
 }
 
 .incorrect-input() {
-  border: 1px solid @incorrect-background;
-  -moz-box-shadow: 0px 0px 6px 0px #979797, inset 0px 1px 0px 0px #ECECEC;
-  box-shadow: 0px 0px 6px 0px #979797, inset 0px 1px 0px 0px #ECECEC;
+  .input-border(@incorrect-background);
 }
 
 .partial-input() {
-  border: 1px solid @partially-correct-background;
-  -moz-box-shadow: 0px 0px 6px 0px @partially-correct-background, inset 0px 1px 0px 0px #ECECEC;
-  box-shadow: 0px 0px 6px 0px @partially-correct-background, inset 0px 1px 0px 0px #ECECEC;
+  .input-border(@partially-correct-background);
 }
 
 .warning-input() {
-  .warning-border();
-}
-
-.warning-border() {
-  border: 2px solid @warning-color;
-}
-
-.warning-shadow(){
-  -moz-box-shadow: 0px 0px 6px 0px #CE8483, inset 0px 1px 0px 0px #ECECEC;
-  box-shadow: 0px 0px 6px 0px #CE8483, inset 0px 1px 0px 0px #ECECEC;
-}
-.warning-panel(){
-  box-shadow: none;
+  .input-border(@feedback-nothing-submitted-background);
 }
 
 .rounded-inputs {
