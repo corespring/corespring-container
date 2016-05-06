@@ -1,5 +1,6 @@
 package org.corespring.container.client.pages
 
+import org.corespring.container.client.V2PlayerConfig
 import org.corespring.container.client.component.ComponentsScriptBundle
 import org.corespring.container.client.controllers.apps.{ItemEditorEndpoints, StaticPaths}
 import org.corespring.container.client.integration.ContainerExecutionContext
@@ -22,6 +23,7 @@ class CatalogRendererTest extends Specification with Mockito with NoTimeConversi
 
   trait scope extends Scope {
 
+    lazy val playerConfig = V2PlayerConfig(None, None)
     lazy val jadeEngine = RendererMocks.jadeEngine
     lazy val pageSourceService = RendererMocks.pageSourceService
     lazy val componentJson = RendererMocks.componentJson
@@ -31,7 +33,7 @@ class CatalogRendererTest extends Specification with Mockito with NoTimeConversi
       override def components: Seq[Component] = Nil
     }
 
-    lazy val renderer = new CatalogRenderer(jadeEngine, containerContext, pageSourceService, componentJson, componentService, assetPathProcessor)
+    lazy val renderer = new CatalogRenderer(playerConfig, jadeEngine, containerContext, pageSourceService, componentJson, componentService, assetPathProcessor)
 
     protected def waitFor[A](f: Future[A]): A = Await.result(f, 1.second)
   }

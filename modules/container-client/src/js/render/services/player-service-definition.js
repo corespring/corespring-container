@@ -36,7 +36,7 @@ angular.module('corespring-player.services')
       };
 
       this.initCalls = function(endpoints){
-        this.completeResponse = callWithNoData(endpoints.complete, 'completeResponse');
+        this.completeResponse = callWithEmptyObjectAsData(endpoints.complete, 'completeResponse');
         this.getScore = callWithData(endpoints.getScore, 'getScore');
         this.loadInstructorData = callWithData(endpoints.loadInstructorData, 'loadInstructorData');
         this.loadOutcome = callWithData(endpoints.loadOutcome, 'loadOutcome');
@@ -56,6 +56,12 @@ angular.module('corespring-player.services')
       function callWithNoData(call, id) {
         return function(onSuccess, onFailure) {
           _call(call, null, id)(onSuccess, onFailure);
+        };
+      }
+
+      function callWithEmptyObjectAsData(call, id) {
+        return function(onSuccess, onFailure) {
+          _call(call, {}, id)(onSuccess, onFailure);
         };
       }
 

@@ -43,6 +43,23 @@ describe('player-service-definition', function () {
     expect(service).toBeDefined();
   });
 
+  describe('completeResponse', function(){
+
+    beforeEach(inject(function ($rootScope, PlayerServiceDefinition) {
+      service.loadItemAndSession(onSuccess, onFailure);
+    }));
+
+    it('should pass an empty object as the body', function() {
+      service.completeResponse(onSuccess, onFailure);
+      expect(http).toHaveBeenCalledWith({
+        method: "put",
+        url: "complete",
+        data: {}
+      });
+    });
+  });
+
+
   describe('queued calls before loadItemAndSession', function(){
 
     it('should allow to call loadItemAndSession', function(){
