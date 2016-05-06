@@ -44,7 +44,10 @@ class Session(
   }
 
   def load(id: String) = Action.async { implicit request =>
-    hooks.load(id).map(basicHandler(Ok(_)))
+    hooks.load(id).map(basicHandler { ss =>
+      logger.debug(s"load: $ss")
+      Ok(ss)
+    })
   }
 
   def resetSession(id: String) = Action.async { implicit request =>
@@ -61,7 +64,7 @@ class Session(
 
         ss.saveSession(id, resetSession(ss.existingSession)).map {
           savedSession =>
-            logger.trace(s"reset - session has been saved as: $savedSession")
+            logger.debug(s"reset - session has been saved as: $savedSession")
             Ok(savedSession)
         }.getOrElse(BadRequest("Error saving resetted session"))
       }
@@ -81,7 +84,7 @@ class Session(
 
         ss.saveSession(id, reopenSession(ss.existingSession)).map {
           savedSession =>
-            logger.trace(s"reopen - session has been saved as: $savedSession")
+            logger.debug(s"reopen - session has been saved as: $savedSession")
             Ok(savedSession)
         }.getOrElse(BadRequest("Error saving reopened session"))
       }
@@ -105,6 +108,7 @@ class Session(
             val base = Json.obj(
               "item" -> processedItem,
               "session" -> sessionJson)
+            logger.debug(s"loadItemAndSession: $base")
             Ok(base)
           }
         }
@@ -138,7 +142,7 @@ class Session(
 
             ss.saveSession(id, update).map {
               savedSession =>
-                logger.trace(s"session has been saved as: $savedSession")
+                logger.debug(s"session has been saved as: $savedSession")
                 Ok(savedSession)
             }.getOrElse(BadRequest("Error saving"))
         }.getOrElse(BadRequest("No session in the request body"))
@@ -148,7 +152,8 @@ class Session(
 
   /**
    * Load outcome for a session.
-   * @param id
+    *
+    * @param id
    * request body : json - a set of evaluation options to be passed in to the outcome processors
    * @return
    */
@@ -170,10 +175,12 @@ class Session(
               request.body.asJson.map { settings =>
                 val outcome = outcomeProcessor.createOutcome(so.item, so.itemSession, settings)
                 val score = scoreProcessor.score(so.item, so.itemSession, outcome)
-                Ok(Json.obj("outcome" -> outcome) ++ Json.obj("score" -> score) ++ (hasAnswers match {
+                val result = Json.obj("outcome" -> outcome) ++ Json.obj("score" -> score) ++ (hasAnswers match {
                   case false => Json.obj("warning" -> "this session contains no answers")
                   case true => Json.obj()
-                }))
+                })
+                logger.debug(s"[loadOutcome] $result ${Json.stringify(so.itemSession)}")
+                Ok(result)
               }.getOrElse {
                 BadRequest(Json.obj("error" -> "No settings in request body"))
               }
@@ -184,7 +191,8 @@ class Session(
   }
   /**
    * Load instructor data for a session.
-   * @param id
+    *
+    * @param id
    * @return
    */
   def loadInstructorData(id: String) = Action {
@@ -212,7 +220,8 @@ class Session(
    * The http route for it is a PUT which allows the user to pass in the answers.
    * When secure=false these answers are used to calculate the result
    * When secure=true the answers are ignored and the answers from the session are used instead.
-   * @param id
+    *
+    * @param id
    * @return
    */
   def getScore(id: String) = Action.async {
@@ -244,9 +253,9 @@ class Session(
             answers match {
               case Left(err) => BadRequest(Json.obj("error" -> err))
               case Right(a) =>
-                logger.trace(s"[getScore]: $id : ${Json.stringify(a)}")
                 val outcome = outcomeProcessor.createOutcome(so.item, a, Json.obj())
                 val score = scoreProcessor.score(so.item, a, outcome)
+                logger.debug(s"[getScore]: $id : ${Json.stringify(a)} : $score")
                 Ok(score)
             }
           }
@@ -258,8 +267,10 @@ class Session(
     hooks.save(id).map(basicHandler({ (ss: SaveSession) =>
       val sessionJson = ss.existingSession.as[JsObject] ++ Json.obj("isComplete" -> JsBoolean(true))
       ss.saveSession(id, sessionJson).map {
-        savedSession =>
+        savedSession => {
+          logger.debug(s"[completeSession]: $id : $savedSession")
           Ok(savedSession)
+        }
       }.getOrElse(BadRequest("Error completing"))
     }))
   }
