@@ -6,7 +6,8 @@ It configures a virtual framebuffer so that we can run firefox in headless mode.
 
 ## Building the runner
 The runner consists of different parts that you have to build in order.  
-You can build different runners for CI and local dev 
+You can build different runners for CI and local dev
+There is a faster option to run the tests locally, see 'Using selenium-docker' below  
  
  1. RegrBase - It contains the infrastructure like mongo 
   
@@ -14,6 +15,9 @@ You can build different runners for CI and local dev
       
  2. CurrCont - (Dev only) It embeds the current container into the docker.
   
+     # the current container is taken from the stage so you have to build it first
+     play stage 
+     # after you can add it to docker 
      docker build -t currcont -f docker/component-regression/dockerfiles/CurrCont .
      
  3. DevCompRegrRunner - (Dev only) It embeds the current component set and the grunt config for running the regression tests.
@@ -106,6 +110,22 @@ This url is what you pass to the docker container as
 Note: The quotes are important, don't leave them out     
      
       
-      
+## Using selenium-docker 
+For development it is faster to use an selenium docker image, which runs selenium 
+and a browser. 
+ 
+      #Start container
+      play run
+       
+      #Start selenium docker
+      docker run -d -p 4444:4444 selenium/standalone-firefox:2.53.0
+       
+      #Run your tests
+      grunt regression --timeout=30000 --baseUrl="http://[your computer's ip]:9000"
+ 
++ Note: Because selenium runs inside the docker container, it needs to know the ip address 
+ of your computer. Localhost or 127.0.0.1 doesn't work, you have to use the real address like 
+ 192.168.1.8 
+ 
 
         

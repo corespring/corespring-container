@@ -1,5 +1,4 @@
 _ = require 'lodash'
-expect = require('expect');
 
 module.exports = (grunt) ->
   runOnSauceLabs = grunt.option('sauceLabs') or false
@@ -34,82 +33,13 @@ module.exports = (grunt) ->
     capabilities.platform = platform if platform
     capabilities
 
-  extendBrowser = (browser) ->
-    browser.loadTest = (componentType, jsonFile) ->
-      url = "#{baseUrl}/client/rig/corespring-#{componentType}/index.html?data=regression_#{jsonFile}"
-      # console.log("Load Test:", url)
-
-      getUserAgent = ->
-        navigator.userAgent
-
-      logUserAgent = (err,res) ->
-        console.log("UserAgent:", if res then res.value else 'undefined')
-
-      browser
-        .url(url)
-        .waitFor('.player-rendered')
-        #.execute(getUserAgent, logUserAgent)
-
-      browser
-
-    browser.waitAndClick = (selector) ->
-        # console.log("click", selector)
-        browser.pause(500)
-        browser.waitFor(selector)
-        browser.click(selector)
-        browser.pause(500)
-        browser
-
-    browser.waitForRemoval = (selector) ->
-        # console.log("waitForRemoval", selector)
-        browser.waitForExist(selector, 2000, true, (err,res) ->
-          expect(res).toBe(true);
-        )
-        browser
-
-    browser.submitItem = () ->
-        # console.log("submitItem")
-        browser.execute('window.submit()')
-        browser.pause(500)
-        browser
-
-    browser.resetItem = () ->
-        # console.log("resetItem")
-        browser.execute('window.reset()')
-        browser.pause(500)
-        browser
-
-    browser.setInstructorMode = () ->
-        # console.log("setInstructorMode")
-        browser.execute('window.setMode("instructor")')
-        browser.pause(500)
-        browser
-
-    browser.dragAndDropWithOffset = (fromSelector, toSelector) ->
-        browser
-          .waitFor(fromSelector)
-          .waitFor(toSelector)
-          .moveToObject(fromSelector, 20, 4)
-          .buttonDown(0)
-          .pause(500)
-          .moveToObject(toSelector, 20, 10)
-          .pause(500)
-          .buttonUp()
-          .pause(500);
-        browser
-
-    browser
-
   getWebDriverOptions = ->
     basic =
-      getItemJson: (componentType, jsonFile) ->
-        require "./components/corespring/#{componentType}/regression-data/#{jsonFile}"
-
       bail: grunt.option('bail')
       baseUrl: baseUrl
+      configFile: './wdio.conf.js'
       defaultTimeout: getTimeout()
       desiredCapabilities: getDesiredCapabilities()
-      extendBrowser: extendBrowser
       grep: grunt.option('grep')
       invertGrep: grunt.option('invertGrep')
       # see: http://webdriver.io/guide/getstarted/configuration.html silent|verbose|command|data|result
@@ -141,7 +71,6 @@ module.exports = (grunt) ->
     copy:
       dev:
         files: [
-
           {expand: true, cwd: '../../corespring-components/components', src: ['**/regression/**'], dest: 'components', filter: 'isFile'}
           {expand: true, cwd: '../../corespring-components/components', src: ['**/regression-data/**'], dest: 'components', filter: 'isFile'}
         ]
@@ -160,6 +89,54 @@ module.exports = (grunt) ->
           else
             grunt.log.ok('Success checking: ' + baseUrl)
 
+    replace:
+      wdioconf:
+        options:
+          usePrefix: false
+          patterns: [
+            {
+              match: 'GRUNT_BASE_URL_STRING',
+              replacement: baseUrl
+            },
+            {
+              match: 'GRUNT_CAPABILITIES_ARRAY_OF_OBJECT',
+              replacement: [getDesiredCapabilities()]
+            },
+            {
+              match: 'GRUNT_GREP',
+              replacement: grunt.option('grep') || ''
+            },
+            {
+              match: 'GRUNT_INVERT_GREP',
+              replacement: grunt.option('invertGrep') || 'false'
+            },
+            {
+              match: 'GRUNT_LOG_LEVEL_STRING',
+              replacement: grunt.option('webDriverLogLevel') || 'silent'
+            },
+            {
+              match: 'GRUNT_SAUCE_USER_STRING',
+              replacement: if runOnSauceLabs then sauceUser else ''
+            },
+            {
+              match: 'GRUNT_SAUCE_KEY_STRING',
+              replacement: if runOnSauceLabs then sauceKey else ''
+            },
+            {
+              match: 'GRUNT_SPECS_ARRAY_OF_STRING',
+              replacement: ["components/#{ if (grunt.option('component')) then '**/' + grunt.option('component') + '/**' else '**' }/regression/*.js"]
+            },
+            {
+              match: 'GRUNT_WAIT_FOR_TIMEOUT',
+              replacement: getTimeout()
+            }
+          ]
+
+        files: [
+          {src: ['wdio.conf-template.js'], dest: 'wdio.conf.js'}
+        ]
+            
+
     webdriver:
       options: getWebDriverOptions()
 
@@ -172,9 +149,10 @@ module.exports = (grunt) ->
     'grunt-contrib-clean'
     'grunt-contrib-copy'
     'grunt-http-verify'
+    'grunt-replace'
     'grunt-webdriver'
   ]
 
   grunt.loadNpmTasks(t) for t in npmTasks
-  grunt.registerTask('regression', ['clean:regression', 'copy:dev', 'http_verify:regressionRigWarmup', 'webdriver:dev'])
-  grunt.registerTask('regression-from-docker', ['http_verify:regressionRigWarmup', 'webdriver:dev'])
+  grunt.registerTask('regression', ['clean:regression', 'copy:dev', 'replace:wdioconf','http_verify:regressionRigWarmup', 'webdriver:dev'])
+  grunt.registerTask('regression-from-docker', ['replace:wdioconf', 'http_verify:regressionRigWarmup', 'webdriver:dev'])
