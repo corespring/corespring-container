@@ -15,17 +15,15 @@ RUN apt-get update && \
  apt-get upgrade -y && \
  apt-get install -y \
   git \
-  nodejs \
-  npm \
   openjdk-7-jdk \
   unzip \
   wget \
   xvfb
 
-# link nodejs -> node
-RUN ln -s /usr/bin/nodejs /usr/bin/node
+# Node
+RUN curl -sL https://deb.nodesource.com/setup_4.x | sudo -E bash - && sudo apt-get install -y nodejs
 
-# Mongo:
+# Mongo
 # Import MongoDB public GPG key AND create a MongoDB list file
 RUN apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv 7F0CEB10
 RUN echo 'deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen' | tee /etc/apt/sources.list.d/10gen.list
@@ -54,10 +52,16 @@ ADD docker/component-regression/extras/xvfb.init /etc/init.d/xvfb
 RUN chmod +x /etc/init.d/xvfb
 RUN update-rc.d xvfb defaults
 
+#==========
+# Selenium
+#==========
+RUN  mkdir -p /opt/selenium \
+  && wget --no-verbose https://selenium-release.storage.googleapis.com/2.53/selenium-server-standalone-2.53.0.jar -O /opt/selenium/selenium-server-standalone.jar
+
 #=========
 # Firefox
 #=========
-ENV FIREFOX_VERSION 35.0.1
+ENV FIREFOX_VERSION 45.0.2
 RUN echo $FIREFOX_VERSION
 RUN apt-get update -qqy \
   && apt-get -qqy --no-install-recommends install firefox \
