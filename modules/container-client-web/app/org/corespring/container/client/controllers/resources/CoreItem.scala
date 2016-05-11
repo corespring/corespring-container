@@ -1,7 +1,7 @@
 package org.corespring.container.client.controllers.resources
 
 import org.corespring.container.client.HasContainerContext
-import org.corespring.container.client.controllers.helpers.{ ItemInspector, PlayerXhtml, XhtmlProcessor }
+import org.corespring.container.client.controllers.helpers.{ ItemCleaner, ItemInspector, PlayerXhtml, XhtmlProcessor }
 import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.client.hooks._
 import play.api.Logger
@@ -87,7 +87,8 @@ trait CoreItem extends CoreSupportingMaterials with Controller with HasContainer
       json <- request.body.asJson.toSuccess(ItemDraft.Errors.noJson)
       markup <- (json \ "xhtml").asOpt[String].toSuccess("Missing required field 'xhtml' of type 'string'.")
       components <- (json \ "components").asOpt[JsObject].toSuccess("Missing required field 'components' of type 'object'")
-    } yield (markup -> components)
+      cleanComponents <- Success(ItemCleaner.cleanComponents(markup, components))
+    } yield (markup -> Json.obj("components" -> cleanComponents))
 
     validation match {
       case Failure(s) => errorResult(s)
