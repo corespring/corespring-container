@@ -37,17 +37,17 @@ object Build extends sbt.Build {
     val grizzledLog = "org.clapper" %% "grizzled-slf4j" % "1.0.2"
     val htmlCleaner = "net.sourceforge.htmlcleaner" % "htmlcleaner" % "2.10"
     val jade4j = "de.neuland-bfi" % "jade4j" % "0.4.2"
+    val jsoup = "org.jsoup" % "jsoup" % "1.8.1"
     val logbackClassic = "ch.qos.logback" % "logback-classic" % "1.0.7"
     val logbackCore = "ch.qos.logback" % "logback-core" % "1.0.7"
     val macWireMacro = "com.softwaremill.macwire" %% "macros" % "0.7.3"
     val macWireRuntime = "com.softwaremill.macwire" %% "runtime" % "0.7.3"
     val mockito = "org.mockito" % "mockito-all" % "1.9.5" % "test"
-    val rhinoJs = "org.mozilla" % "rhino" % "1.7.6"
     val playS3 = "org.corespring" %% "s3-play-plugin" % "1.2.0"
+    val rhinoJs = "org.mozilla" % "rhino" % "1.7.6"
     val scalaz = "org.scalaz" %% "scalaz-core" % "7.0.6"
     val specs2 = "org.specs2" %% "specs2" % "2.2.2" % "test"
     val yuiCompressor = "com.yahoo.platform.yui" % "yuicompressor" % "2.4.7"
-    val jsoup = "org.jsoup" % "jsoup" % "1.8.1"
   }
 
   object Resolvers {
