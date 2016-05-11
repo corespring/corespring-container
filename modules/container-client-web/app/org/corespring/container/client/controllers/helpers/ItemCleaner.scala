@@ -4,19 +4,14 @@ import play.api.libs.json._
 import org.jsoup._
 
 /**
- * A helper utility to "clean"/validate item content before save.
+ * A helper utility to remove components that don't have a representation in the markup
  */
 object ItemCleaner {
 
-  def optionClean(markup: String, json: JsObject): Option[JsObject] = {
-    def hasComponent(id: String) = Option(Jsoup.parse(markup).select(s"#${id}").first()).nonEmpty
-    (json \ "components").asOpt[JsObject] match {
-      case Some(obj) =>
-        Some(json ++ Json.obj("components" -> JsObject(obj.fields.filter{ case (id, _) => hasComponent(id) })))
-      case _ => None
-    }
+  def cleanComponents(markup: String, components: JsObject) = {
+    val parsedMarkup = Jsoup.parse(markup)
+    def hasComponent(id: String) = Option(parsedMarkup.select(s"#${id}").first()).nonEmpty
+
+    JsObject(components.fields.filter { case (id, _) => hasComponent(id) })
   }
-
-  def clean(markup: String, json: JsObject): JsObject = optionClean(markup, json).getOrElse(json)
-
 }
