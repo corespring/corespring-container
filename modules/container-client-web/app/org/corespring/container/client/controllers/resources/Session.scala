@@ -33,13 +33,15 @@ class Session(
 
   val logger = ContainerLogger.getLogger("Session")
   val scoringLogger = ContainerLogger.getLogger("Session.scoring")
+  val updatesLogger = ContainerLogger.getLogger("Session.updates")
+  val loadLogger = ContainerLogger.getLogger("Session.load")
 
   private def logScore(caller: String, score: JsValue, answers: JsValue, item: JsValue) = {
     if(scoringLogger.isTraceEnabled){
       //log item too
       scoringLogger.trace(s"[$caller] score: ${Json.stringify(score)} answers: ${Json.stringify(answers)} item: ${Json.stringify(item)}")
     } else {
-      //log score and session only
+      //otherwise log score and session only
       scoringLogger.debug(s"[$caller] score: ${Json.stringify(score)} answers: ${Json.stringify(answers)}")
     }
   }
@@ -56,7 +58,7 @@ class Session(
 
   def load(id: String) = Action.async { implicit request =>
     hooks.load(id).map(basicHandler { ss =>
-      logger.trace(s"load: ${Json.stringify(ss)}")
+      loadLogger.trace(s"load: ${Json.stringify(ss)}")
       Ok(ss)
     })
   }
@@ -75,7 +77,7 @@ class Session(
 
         ss.saveSession(id, resetSession(ss.existingSession)).map {
           savedSession =>
-            logger.trace(s"reset - session has been saved as: $savedSession")
+            updatesLogger.trace(s"reset - session has been saved as: $savedSession")
             Ok(savedSession)
         }.getOrElse(BadRequest("Error saving resetted session"))
       }
@@ -95,7 +97,7 @@ class Session(
 
         ss.saveSession(id, reopenSession(ss.existingSession)).map {
           savedSession =>
-            logger.trace(s"reopen - session has been saved as: $savedSession")
+            updatesLogger.trace(s"reopen - session has been saved as: $savedSession")
             Ok(savedSession)
         }.getOrElse(BadRequest("Error saving reopened session"))
       }
@@ -119,7 +121,7 @@ class Session(
             val base = Json.obj(
               "item" -> processedItem,
               "session" -> sessionJson)
-            logger.trace(s"loadItemAndSession: $base")
+            loadLogger.trace(s"loadItemAndSession: $base")
             Ok(base)
           }
         }
@@ -153,7 +155,7 @@ class Session(
 
             ss.saveSession(id, update).map {
               savedSession =>
-                logger.trace(s"session has been saved as: $savedSession")
+                updatesLogger.trace(s"session has been saved as: $savedSession")
                 Ok(savedSession)
             }.getOrElse(BadRequest("Error saving"))
         }.getOrElse(BadRequest("No session in the request body"))
@@ -280,7 +282,7 @@ class Session(
       ss.saveSession(id, sessionJson).map {
         savedSession =>
           {
-            logger.trace(s"[completeSession]: $id : $savedSession")
+            updatesLogger.trace(s"[completeSession]: $id : $savedSession")
             Ok(savedSession)
           }
       }.getOrElse(BadRequest("Error completing"))
