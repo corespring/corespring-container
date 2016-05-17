@@ -88,7 +88,7 @@ trait CoreItem extends CoreSupportingMaterials with Controller with HasContainer
       markup <- (json \ "xhtml").asOpt[String].toSuccess("Missing required field 'xhtml' of type 'string'.")
       components <- (json \ "components").asOpt[JsObject].toSuccess("Missing required field 'components' of type 'object'")
       cleanComponents <- Success(ItemCleaner.cleanComponents(markup, components))
-    } yield (markup -> Json.obj("components" -> cleanComponents))
+    } yield (markup -> cleanComponents)
 
     validation match {
       case Failure(s) => errorResult(s)
