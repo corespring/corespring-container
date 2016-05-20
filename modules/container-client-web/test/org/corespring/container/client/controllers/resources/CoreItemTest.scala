@@ -101,7 +101,7 @@ class CoreItemTest extends Specification with Mockito {
       there was one(hooks).saveXhtmlAndComponents(
         "id",
         "<div id=\"1\"></div>",
-        Json.obj("components" -> Json.obj("1" -> Json.obj())))(request)
+        Json.obj("1" -> Json.obj()))(request)
     }
   }
 

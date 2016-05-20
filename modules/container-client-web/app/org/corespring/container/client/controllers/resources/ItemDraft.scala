@@ -1,11 +1,11 @@
 package org.corespring.container.client.controllers.resources
 
-import org.corespring.container.client.controllers.helpers.{ ItemInspector, PlayerXhtml }
+import org.corespring.container.client.controllers.helpers.{ ItemCleaner, ItemInspector, PlayerXhtml }
 import org.corespring.container.client.hooks._
 import org.corespring.container.client.integration.ContainerExecutionContext
 import org.corespring.container.components.services.ComponentService
 import play.api.Logger
-import play.api.libs.json.JsObject
+import play.api.libs.json.{ JsObject, JsValue, Json }
 import play.api.libs.json.Json._
 import play.api.mvc._
 
@@ -64,12 +64,22 @@ class ItemDraft(
 
   def save(draftId: String) = Action.async { implicit request: Request[AnyContent] =>
     request.body.asJson match {
-      case Some(json) => hooks.save(draftId, json).map {
-        _ match {
-          case Left(sm) => sm
-          case Right(json) => Ok(json)
+      case Some(json) =>
+        val xhtml = (json \ "xhtml").asOpt[String]
+        val components = (json \ "components").asOpt[JsObject]
+
+        val cleanedJson = if (!xhtml.isEmpty && !components.isEmpty) {
+          val cleanedComponents = ItemCleaner.cleanComponents(xhtml.get, components.get)
+          json.as[JsObject] ++ Json.obj("components" -> cleanedComponents)
+        } else {
+          json
         }
-      }
+        hooks.save(draftId, cleanedJson).map {
+          _ match {
+            case Left(sm) => sm
+            case Right(json) => Ok(cleanedJson)
+          }
+        }
       case _ => Future { BadRequest(obj("error" -> ItemDraft.Errors.noJson)) }
     }
   }
