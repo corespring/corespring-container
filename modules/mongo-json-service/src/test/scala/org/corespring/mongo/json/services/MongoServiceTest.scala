@@ -69,8 +69,8 @@ class MongoServiceTest extends Specification with Mockito {
         service.loadMultiple(sessionIds)
 
         there was one(mockCollection).find(
-          MongoDBObject("_id" -> MongoDBObject("$in" -> MongoDBList(
-            sessionIds.map(new ObjectId(_))))))
+          MongoDBObject("_id" -> MongoDBObject("$in" ->
+            sessionIds.map(new ObjectId(_)))))
       }
     }
   }
