@@ -192,6 +192,14 @@ class ItemDraftTest extends Specification with Mockito with NoTimeConversions wi
         contentAsJson(result) must be equalTo (json)
       }
 
+      val json2 = Json.obj("xhtml" -> "", "components" -> Json.obj("0" -> Json.obj("name" -> "component0")))
+
+      "clean out orhapned items from the json" in new save(json2) {
+        val result = draft.save("x")(FakeRequest().withJsonBody(json2))
+        val cleanedJson = json2 ++ Json.obj("components" -> Json.obj())
+        contentAsJson(result) must be equalTo (cleanedJson)
+      }
+
     }
 
     "commit" should {
