@@ -27,7 +27,7 @@ block content
 
       tr
         td.pane(ng-show="panes.html")
-          .xhtml-pane(
+          .tex2jax_ignore.xhtml-pane(
               ng-model="xhtml",
               ui-ace="{mode: 'html', useWrapMode : true, onLoad: aceLoaded, onChange: aceChanged }")
         td.pane(ng-show="panes.json")
