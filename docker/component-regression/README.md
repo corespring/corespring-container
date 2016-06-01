@@ -6,8 +6,13 @@ It configures a virtual framebuffer so that we can run firefox in headless mode.
 
 ## Using selenium-docker for development 
 For development it is much faster to use a selenium docker image, which runs selenium
- and a browser inside a docker container. The corespring-container and the db are running
+ and a browser inside a docker container.    
+ The corespring-container and the db are running
  outside of the docker-container  
+ 
+ Here you can find the available [selenium docker images](https://hub.docker.com/r/selenium/)      
+ I've tested selenium/standalone-firefox and selenium/standalone-chrome.      
+ Chrome seems to have problems with drag-and-drop though   
  
       #Start container
       play run
