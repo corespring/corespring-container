@@ -6,11 +6,7 @@ describe('MathJaxService', function() {
   function MockMathJax() {
     this.Hub = {
       Config: function() {},
-      Queue: function(params, callback) {
-        if (callback) {
-          callback();
-        }
-      },
+      Queue: function(params, callback) {},
       signal: {
         Interest: function(signal) {
           onHubSignal = signal;
@@ -19,19 +15,19 @@ describe('MathJaxService', function() {
     };
   }
 
+  beforeEach(angular.mock.module('corespring-common.services'));
+
   beforeEach(function() {
     realMathJax = MathJax;
     MathJax = new MockMathJax();
-    spyOn(MathJax.Hub, 'Config').and.callThrough();
-    spyOn(MathJax.Hub, 'Queue').and.callThrough();
+    spyOn(MathJax.Hub, 'Config');
+    spyOn(MathJax.Hub, 'Queue');
     spyOn(MathJax.Hub.signal, 'Interest').and.callThrough();
   });
 
   afterEach(function() {
     MathJax = realMathJax;
   });
-
-  beforeEach(angular.mock.module('corespring-common.services'));
 
   beforeEach(inject(function(MathJaxService, $timeout) {
     mathJaxService = MathJaxService;
@@ -45,7 +41,9 @@ describe('MathJaxService', function() {
     });
 
     it('should configure MathJax to not show processing messages', function() {
-      expect(MathJax.Hub.Config).toHaveBeenCalledWith({showProcessingMessages: false});
+      expect(MathJax.Hub.Config).toHaveBeenCalledWith({
+        showProcessingMessages: false
+      });
     });
 
   });
@@ -75,7 +73,7 @@ describe('MathJaxService', function() {
   });
 
   describe('onEndProcess', function() {
-    var args = [1,2,3];
+    var args = [1, 2, 3];
     var element = $("<div></div>");
     var callback = jasmine.createSpy('callback');
 
@@ -91,7 +89,7 @@ describe('MathJaxService', function() {
   });
 
   describe('off', function() {
-    var args = [1,2,3];
+    var args = [1, 2, 3];
     var element = $("<div></div>");
     var callback = jasmine.createSpy('callback');
 
@@ -106,5 +104,30 @@ describe('MathJaxService', function() {
     });
   });
 
+  describe('isRendering', function() {
+    function finishLastMathJaxCommand() {
+      var callback = MathJax.Hub.Queue.calls.mostRecent().args[1];
+      callback();
+    }
+
+    it('should enqueue a new command when called the first time', function() {
+      mathJaxService.parseDomForMath(0);
+      expect(MathJax.Hub.Queue).toHaveBeenCalledTimes(1);
+    });
+
+    it('should not enqueue a new command, when the previous one is not finished yet', function() {
+      mathJaxService.parseDomForMath(0);
+      mathJaxService.parseDomForMath(0);
+      expect(MathJax.Hub.Queue).toHaveBeenCalledTimes(1);
+    });
+
+    it('should enqueue a new command, when the previous one is finished', function() {
+      mathJaxService.parseDomForMath(0);
+      finishLastMathJaxCommand();
+      mathJaxService.parseDomForMath(0);
+      expect(MathJax.Hub.Queue).toHaveBeenCalledTimes(2);
+    });
+
+  });
 
 });
