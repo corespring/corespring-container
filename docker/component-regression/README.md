@@ -31,7 +31,7 @@ For development it is much faster to use a selenium docker image, which runs sel
  try the debug dockers, eg. selenium/standalone-firefox-debug. There is some documentation
  on the download page. They allow you to view the browser via VNC (Couldn't get that to work 
  though)   
- Another option is to launch the Selenium Standalone Server as a java process on your machine.    
+ Another option is to launch the [Selenium Standalone Server](http://docs.seleniumhq.org/download/) as a java process on your machine.    
  That would use the browser that is installed locally on your machine.   
   
         
