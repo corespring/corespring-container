@@ -108,5 +108,5 @@ class ContainerClientImplementation(
     components = ComponentsConfig.fromConfig(mode, configuration.getConfig("components").getOrElse(Configuration.empty)),
     player = V2PlayerConfig(
       rootUrl = configuration.getString("rootUrl"),
-      newRelicRumConfig = configuration.getConfig("newrelic").flatMap { c => NewRelicRumConfig.fromConfig(c) }))
+      newRelicRumConfig = configuration.getConfig("newrelic.rum.applications.player").flatMap { c => NewRelicRumConfig.fromConfig(c) }))
 }

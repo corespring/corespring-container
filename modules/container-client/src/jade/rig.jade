@@ -1,14 +1,16 @@
 extends layout
 
 block content
-  div#root(ng-controller="Root")
+  div#rig-root(ng-controller="Root")
     nav.navbar.navbar-inverse.navbar-static-top(role="navigation")
       .nav-bar-header
         a.navbar-brand Rig
       ul.nav.navbar-nav
         li
           a(ng-click='updatePreview()') Update Preview (Ctrl+S)
-    .flex-box.main-pane
+      p.player-rendered(ng-if="isPlayerRendered") Player Rendered
+
+    .main-pane
       div(ui-ace,
         ng-model="componentJson",
         ui-ace="{useWrapMode : true, onLoad: aceLoaded, onChange: aceChanged }")
@@ -33,35 +35,35 @@ block after-main-script
   script.
 
     angular.module('corespring-#{appName}')
-      .config([
-        '$provide',
-        function ($provide) {
-          $provide.value('PlayerSkin', {iconSet: "#{iconSet}"});
-        }
-      ]);
+            .config([
+              '$provide',
+              function ($provide) {
+                $provide.value('PlayerSkin', {iconSet: "#{iconSet}"});
+              }
+            ]);
 
-    window.submit = function() {
-      var scope = angular.element(document.getElementById('root')).scope();
+    window.broadcast = function(message, params){
+      var scope = angular.element(document.getElementById('rig-root')).scope();
       var rootScope = scope.$root;
       scope.$apply(function() {
-        rootScope.$broadcast('playerControlPanel.submit');
+        rootScope.$broadcast(message, params);
       });
+    }
+
+    window.submit = function() {
+      broadcast('playerControlPanel.submit');
     };
 
     window.reset = function() {
-      var scope = angular.element(document.getElementById('root')).scope();
-      var rootScope = scope.$root;
-      scope.$apply(function() {
-        rootScope.$broadcast('playerControlPanel.reset');
-      });
+      broadcast('playerControlPanel.reset');
     };
 
     window.setMode = function(mode) {
-      var scope = angular.element(document.getElementById('root')).scope();
-      var rootScope = scope.$root;
-      scope.$apply(function() {
-        rootScope.$broadcast('playerControlPanel.setMode', {mode: mode});
-      });
+      broadcast('playerControlPanel.setMode', {mode: mode});
+    };
+
+    window.rigIsLoaded = function(){
+      return true;
     };
 
     window.itemJson = !{itemJson};

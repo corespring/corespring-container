@@ -1,5 +1,6 @@
 var controller = function($scope,$http, $location, $timeout, $log, ComponentRegister, PlayerUtils, PlayerServiceDef) {
 
+  $scope.isPlayerRendered = false;
   $scope.playerMode = 'gather';
 
   $scope.playerSettings = {
@@ -118,6 +119,12 @@ var controller = function($scope,$http, $location, $timeout, $log, ComponentRegi
   $scope.$on('registerComponent', function(event, id, obj) {
     $log.info("registerComponent: ", id);
     ComponentRegister.registerComponent(id, obj);
+  });
+
+  $scope.$on('rendered', function(){
+    $timeout(function(){
+      $scope.isPlayerRendered = true;
+    });
   });
 
 

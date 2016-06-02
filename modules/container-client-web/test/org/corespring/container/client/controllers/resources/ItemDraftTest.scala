@@ -1,6 +1,6 @@
 package org.corespring.container.client.controllers.resources
 
-import org.corespring.container.client.controllers.helpers.PlayerXhtml
+import org.corespring.container.client.controllers.helpers.{ ItemInspector, PlayerXhtml }
 import org.corespring.container.client.controllers.resources.ItemDraft.Errors
 import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.client.hooks._
@@ -57,11 +57,18 @@ class ItemDraftTest extends Specification with Mockito with NoTimeConversions wi
       m
     }
 
+    lazy val itemInspector = {
+      val m = mock[ItemInspector]
+      m.findComponentsNotInXhtml(any[String], any[JsObject]) returns Future.successful(Seq.empty)
+      m
+    }
+
     lazy val draft = new ItemDraft(
       TestContext.containerContext,
       componentService,
       hooks,
       playerXhtml,
+      itemInspector,
       materialHooks)
   }
 
@@ -183,6 +190,14 @@ class ItemDraftTest extends Specification with Mockito with NoTimeConversions wi
       "return result from DraftHooks#save on success" in new save(json) {
         val result = draft.save("x")(FakeRequest().withJsonBody(json))
         contentAsJson(result) must be equalTo (json)
+      }
+
+      val json2 = Json.obj("xhtml" -> "", "components" -> Json.obj("0" -> Json.obj("name" -> "component0")))
+
+      "clean out orhapned items from the json" in new save(json2) {
+        val result = draft.save("x")(FakeRequest().withJsonBody(json2))
+        val cleanedJson = json2 ++ Json.obj("components" -> Json.obj())
+        contentAsJson(result) must be equalTo (cleanedJson)
       }
 
     }

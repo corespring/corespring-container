@@ -1,6 +1,6 @@
 package org.corespring.container.client.controllers.resources
 
-import org.corespring.container.client.controllers.helpers.PlayerXhtml
+import org.corespring.container.client.controllers.helpers.{ ItemInspector, PlayerXhtml }
 import org.corespring.container.client.hooks.{ CoreItemHooks, SupportingMaterialHooks }
 import org.corespring.test.TestContext
 import org.specs2.mock.Mockito
@@ -29,6 +29,12 @@ class CoreItemTest extends Specification with Mockito {
       m.saveSupportingMaterials(any[String], any[JsValue])(any[Request[AnyContent]]) returns Future(Right(Json.obj()))
       m.saveSummaryFeedback(any[String], any[String])(any[Request[AnyContent]]) returns Future(Right(Json.obj()))
       m.saveXhtml(any[String], any[String])(any[Request[AnyContent]]) returns Future(Right(Json.obj()))
+      m
+    }
+
+    override val itemInspector: ItemInspector = {
+      val m = mock[ItemInspector]
+      m.findComponentsNotInXhtml(any[String], any[JsObject]) returns Future.successful(Seq.empty)
       m
     }
 
@@ -86,6 +92,16 @@ class CoreItemTest extends Specification with Mockito {
       hooks.saveXhtmlAndComponents(any[String], any[String], any[JsValue])(any[RequestHeader]) returns Future.successful(Right(Json.obj("success" -> true)))
       val result = saveXhtmlAndComponents("id")(req(Json.obj("xhtml" -> "<div></div>", "components" -> Json.obj())))
       contentAsJson(result) must_== Json.obj("success" -> true)
+    }
+
+    "calls hook with superfluous component 2 removed" in new scope {
+      hooks.saveXhtmlAndComponents(any[String], any[String], any[JsValue])(any[RequestHeader]) returns Future.successful(Right(Json.obj("success" -> true)))
+      val request = req(Json.obj("xhtml" -> "<div id=\"1\"></div>", "components" -> Json.obj("1" -> Json.obj(), "2" -> Json.obj())))
+      saveXhtmlAndComponents("id")(request)
+      there was one(hooks).saveXhtmlAndComponents(
+        "id",
+        "<div id=\"1\"></div>",
+        Json.obj("1" -> Json.obj()))(request)
     }
   }
 
