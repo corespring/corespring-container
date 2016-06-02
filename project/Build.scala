@@ -37,6 +37,7 @@ object Build extends sbt.Build {
     val grizzledLog = "org.clapper" %% "grizzled-slf4j" % "1.0.2"
     val htmlCleaner = "net.sourceforge.htmlcleaner" % "htmlcleaner" % "2.10"
     val jade4j = "de.neuland-bfi" % "jade4j" % "0.4.2"
+    val jsoup = "org.jsoup" % "jsoup" % "1.8.1"
     val logbackClassic = "ch.qos.logback" % "logback-classic" % "1.0.7"
     val logbackCore = "ch.qos.logback" % "logback-core" % "1.0.7"
     val macWireMacro = "com.softwaremill.macwire" %% "macros" % "0.7.3"
@@ -214,6 +215,7 @@ object Build extends sbt.Build {
         yuiCompressor,
         commonsIo,
         aws,
+        jsoup,
         macWireMacro),
       templatesImport ++= Seq("play.api.libs.json.JsValue", "play.api.libs.json.Json"))
     .dependsOn(

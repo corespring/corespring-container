@@ -62,6 +62,7 @@ trait BaseEditor[H <: EditorHooks]
 
   def load(id: String) = Action.async { implicit request =>
     hooks.load(id).flatMap { e =>
+
       e.fold(
         err => Future.successful(onError(err)),
         jsonResult => {

@@ -1,14 +1,14 @@
 package org.corespring.container.client.controllers.resources
 
 import org.corespring.container.client.HasContainerContext
-import org.corespring.container.client.controllers.helpers.{ PlayerXhtml, XhtmlProcessor }
+import org.corespring.container.client.controllers.helpers.{ ItemCleaner, ItemInspector, PlayerXhtml, XhtmlProcessor }
 import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.client.hooks._
 import play.api.Logger
-import play.api.libs.json.{ JsString, JsObject, JsValue, Json }
+import play.api.libs.json.{ JsObject, JsString, JsValue, Json }
 import play.api.mvc._
 
-import scala.concurrent.{ Future }
+import scala.concurrent.Future
 import scalaz.{ Failure, Success, Validation }
 import scalaz.Scalaz._
 
@@ -31,10 +31,13 @@ trait CoreItem extends CoreSupportingMaterials with Controller with HasContainer
 
   def playerXhtml: PlayerXhtml
 
+  def itemInspector: ItemInspector
+
   implicit def toResult(m: StatusMessage): SimpleResult = play.api.mvc.Results.Status(m._1)(Json.obj("error" -> m._2))
 
   /**
    * A list of all the component types in the container
+   *
    * @return
    */
   protected def componentTypes: Seq[String]
@@ -45,13 +48,29 @@ trait CoreItem extends CoreSupportingMaterials with Controller with HasContainer
 
   val noCacheHeader = "no-cache, no-store, must-revalidate"
 
+  private def checkTheItemAndLog(id: String, rawItem: JsValue): Unit = if (logger.isErrorEnabled) {
+    for {
+      xhtml <- (rawItem \ "xhtml").asOpt[String]
+      components <- (rawItem \ "components").asOpt[JsObject]
+    } yield {
+      itemInspector.findComponentsNotInXhtml(xhtml, components).map { notInXhtml =>
+        notInXhtml.foreach {
+          case ((key, json)) =>
+            logger.error(s"function=checkTheItemAndLog, id=$id, key=$key - [NOT_IN_XHTML] The component isn't defined in the xhtml")
+            logger.debug(s"function=checkTheItemAndLog, id=$id, key=$key, json=$json")
+        }
+      }
+    }
+  }
+
   def load(itemId: String) = Action.async { implicit request =>
     hooks.load(itemId).map {
       either =>
         either match {
           case Left(sm) => sm
-          case Right((rawItem,defaults)) => {
-            Ok(ItemJson(playerXhtml, rawItem))
+          case Right(itemAndDefaults) => {
+            checkTheItemAndLog(itemId, itemAndDefaults._1)
+            Ok(ItemJson(playerXhtml, itemAndDefaults._1))
               .withHeaders(
                 "Cache-Control" -> noCacheHeader,
                 "Expires" -> "0")
@@ -68,7 +87,8 @@ trait CoreItem extends CoreSupportingMaterials with Controller with HasContainer
       json <- request.body.asJson.toSuccess(ItemDraft.Errors.noJson)
       markup <- (json \ "xhtml").asOpt[String].toSuccess("Missing required field 'xhtml' of type 'string'.")
       components <- (json \ "components").asOpt[JsObject].toSuccess("Missing required field 'components' of type 'object'")
-    } yield (markup -> components)
+      cleanComponents <- Success(ItemCleaner.cleanComponents(markup, components))
+    } yield (markup -> cleanComponents)
 
     validation match {
       case Failure(s) => errorResult(s)

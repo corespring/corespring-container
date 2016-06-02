@@ -55,6 +55,31 @@ class MongoService(val collection: MongoCollection) {
       }
   }
 
+  def loadMultiple(ids: Seq[String], fields: String*): Seq[JsValue] = {
+    logger.debug(s"[loadMultiple]: #ids: ${ids.length} first ids: [${ids.slice(0, 9)}, ..]")
+
+    def getCursor() = {
+      val queryDbo = MongoDBObject(
+        "_id" -> MongoDBObject(
+          "$in" -> MongoDBList(
+            ids.filter(ObjectId.isValid(_)).map(new ObjectId(_)): _*)))
+
+      logger.debug(s"[getCursor]: $queryDbo")
+
+      if (fields.length > 0) {
+        val fieldsDbo = MongoDBObject(fields.toList.map(s => (s, 1)))
+        collection.find(queryDbo, fieldsDbo)
+      } else {
+        collection.find(queryDbo)
+      }
+    }
+
+    getCursor().toSeq.map { dbo =>
+      val jsonString = MongoJson.serialize(dbo)
+      PlayJson.parse(jsonString)
+    }
+  }
+
   def create(data: JsValue): Option[ObjectId] = {
 
     logger.debug("[create]")

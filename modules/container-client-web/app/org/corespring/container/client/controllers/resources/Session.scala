@@ -32,6 +32,19 @@ class Session(
   extends Controller {
 
   val logger = ContainerLogger.getLogger("Session")
+  val scoringLogger = ContainerLogger.getLogger("Session.scoring")
+  val updatesLogger = ContainerLogger.getLogger("Session.updates")
+  val loadLogger = ContainerLogger.getLogger("Session.load")
+
+  private def logScore(caller: String, score: JsValue, answers: JsValue, item: JsValue) = {
+    if(scoringLogger.isTraceEnabled){
+      //log item too
+      scoringLogger.trace(s"[$caller] score: ${Json.stringify(score)} answers: ${Json.stringify(answers)} item: ${Json.stringify(item)}")
+    } else {
+      //otherwise log score and session only
+      scoringLogger.debug(s"[$caller] score: ${Json.stringify(score)} answers: ${Json.stringify(answers)}")
+    }
+  }
 
   implicit val ec: ExecutionContext = sessionContext.default
 
@@ -44,7 +57,10 @@ class Session(
   }
 
   def load(id: String) = Action.async { implicit request =>
-    hooks.load(id).map(basicHandler(Ok(_)))
+    hooks.load(id).map(basicHandler { ss =>
+      loadLogger.trace(s"load: ${Json.stringify(ss)}")
+      Ok(ss)
+    })
   }
 
   def resetSession(id: String) = Action.async { implicit request =>
@@ -61,7 +77,7 @@ class Session(
 
         ss.saveSession(id, resetSession(ss.existingSession)).map {
           savedSession =>
-            logger.trace(s"reset - session has been saved as: $savedSession")
+            updatesLogger.trace(s"reset - session has been saved as: $savedSession")
             Ok(savedSession)
         }.getOrElse(BadRequest("Error saving resetted session"))
       }
@@ -81,7 +97,7 @@ class Session(
 
         ss.saveSession(id, reopenSession(ss.existingSession)).map {
           savedSession =>
-            logger.trace(s"reopen - session has been saved as: $savedSession")
+            updatesLogger.trace(s"reopen - session has been saved as: $savedSession")
             Ok(savedSession)
         }.getOrElse(BadRequest("Error saving reopened session"))
       }
@@ -105,6 +121,7 @@ class Session(
             val base = Json.obj(
               "item" -> processedItem,
               "session" -> sessionJson)
+            loadLogger.trace(s"loadItemAndSession: $base")
             Ok(base)
           }
         }
@@ -138,7 +155,7 @@ class Session(
 
             ss.saveSession(id, update).map {
               savedSession =>
-                logger.trace(s"session has been saved as: $savedSession")
+                updatesLogger.trace(s"session has been saved as: $savedSession")
                 Ok(savedSession)
             }.getOrElse(BadRequest("Error saving"))
         }.getOrElse(BadRequest("No session in the request body"))
@@ -148,6 +165,7 @@ class Session(
 
   /**
    * Load outcome for a session.
+   *
    * @param id
    * request body : json - a set of evaluation options to be passed in to the outcome processors
    * @return
@@ -170,10 +188,12 @@ class Session(
               request.body.asJson.map { settings =>
                 val outcome = outcomeProcessor.createOutcome(so.item, so.itemSession, settings)
                 val score = scoreProcessor.score(so.item, so.itemSession, outcome)
-                Ok(Json.obj("outcome" -> outcome) ++ Json.obj("score" -> score) ++ (hasAnswers match {
+                val result = Json.obj("outcome" -> outcome) ++ Json.obj("score" -> score) ++ (hasAnswers match {
                   case false => Json.obj("warning" -> "this session contains no answers")
                   case true => Json.obj()
-                }))
+                })
+                logScore("loadOutcome", score, so.itemSession, so.item)
+                Ok(result)
               }.getOrElse {
                 BadRequest(Json.obj("error" -> "No settings in request body"))
               }
@@ -184,6 +204,7 @@ class Session(
   }
   /**
    * Load instructor data for a session.
+   *
    * @param id
    * @return
    */
@@ -212,6 +233,7 @@ class Session(
    * The http route for it is a PUT which allows the user to pass in the answers.
    * When secure=false these answers are used to calculate the result
    * When secure=true the answers are ignored and the answers from the session are used instead.
+   *
    * @param id
    * @return
    */
@@ -244,9 +266,9 @@ class Session(
             answers match {
               case Left(err) => BadRequest(Json.obj("error" -> err))
               case Right(a) =>
-                logger.trace(s"[getScore]: $id : ${Json.stringify(a)}")
                 val outcome = outcomeProcessor.createOutcome(so.item, a, Json.obj())
                 val score = scoreProcessor.score(so.item, a, outcome)
+                logScore("getScore", score, a, so.item)
                 Ok(score)
             }
           }
@@ -259,7 +281,10 @@ class Session(
       val sessionJson = ss.existingSession.as[JsObject] ++ Json.obj("isComplete" -> JsBoolean(true))
       ss.saveSession(id, sessionJson).map {
         savedSession =>
-          Ok(savedSession)
+          {
+            updatesLogger.trace(s"[completeSession]: $id : $savedSession")
+            Ok(savedSession)
+          }
       }.getOrElse(BadRequest("Error completing"))
     }))
   }

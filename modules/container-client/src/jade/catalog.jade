@@ -1,5 +1,19 @@
 extends layout
 
+block header-scripts
+
+  if newRelicRumEnabled
+    script(type="text/javascript", src="!{newRelicRumScriptPath}")
+    script(type="text/javascript").
+
+      if(window.NREUM){
+        NREUM.info = !{newRelicRumConfig}
+      } else {
+        console.warn('newrelic agent not loaded!')
+      }
+  else
+    <!-- new relic disabled -->
+
 block content
   .root(ng-controller="CatalogRoot", dimension-propagator='')
     div(question-information="", tabs="tabs", ng-model="item")
