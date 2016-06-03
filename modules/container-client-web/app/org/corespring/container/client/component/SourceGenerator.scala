@@ -1,11 +1,11 @@
 package org.corespring.container.client.component
 
-import org.corespring.container.client.controllers.helpers.{LoadClientSideDependencies, NameHelper}
-import org.corespring.container.client.views.txt.js.{ComponentServerWrapper, ComponentWrapper, ServerLibraryWrapper}
+import org.corespring.container.client.controllers.helpers.{ LoadClientSideDependencies, NameHelper }
+import org.corespring.container.client.views.txt.js.{ ComponentServerWrapper, ComponentWrapper, ServerLibraryWrapper }
 import org.corespring.container.components.model._
 import org.corespring.container.components.model.packaging.ClientSideDependency
 import org.corespring.container.components.services.ComponentTypeFilter
-import play.api.libs.json.{JsObject, JsValue, Json}
+import play.api.libs.json.{ JsObject, JsValue, Json }
 import org.apache.commons.io.IOUtils
 import org.corespring.container.client.controllers.apps.StaticPaths
 
@@ -122,6 +122,8 @@ abstract class BaseGenerator
     val widgetLess = widgets.map(_.client.less.getOrElse("")).mkString("\n")
     val layoutLess = layoutComps.map(_.less.getOrElse("")).mkString("\n")
     val libraryLess = libraries.map(_.less.getOrElse("")).mkString("\n")
+    val dependencies = getClientSideDependencies(components)
+    val styles = getStyles(dependencies).mkString("\n")
     val dynamicColors = customColors.asOpt[Map[String, String]] match {
       case Some(cols) => cols.map { case (a, b) => s"@$a: $b;" }.mkString("\n")
       case _ => ""
@@ -133,6 +135,7 @@ abstract class BaseGenerator
        |$widgetLess
        |$layoutLess
        |$libraryLess
+       |$styles
         """.stripMargin
   }
 
