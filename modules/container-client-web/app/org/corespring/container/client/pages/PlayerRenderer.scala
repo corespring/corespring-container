@@ -61,7 +61,8 @@ class PlayerRenderer(
     warnings: Seq[String],
     queryParams: Map[String, String],
     prodMode: scala.Boolean,
-    showControls: scala.Boolean): Future[Html] = Future {
+    showControls: scala.Boolean,
+    iconSet: String): Future[Html] = Future {
     logger.info(s"function=render, bundle=$bundle")
 
     val (js, css) = prepareJsCss(prodMode, bundle)
@@ -97,6 +98,7 @@ class PlayerRenderer(
       "newRelicRumEnabled" -> javaBoolean(playerConfig.useNewRelic),
       "newRelicRumScriptPath" -> newRelicRumScriptPath,
       "newRelicRumConfig" -> Json.stringify(newRelicRumConfig),
+      "iconSet" -> iconSet,
       "warnings" -> Json.stringify(Json.arr(warnings: _*)),
       "ngModules" -> jsArrayString(ngModules),
       "ngServiceLogic" -> inlineJs,

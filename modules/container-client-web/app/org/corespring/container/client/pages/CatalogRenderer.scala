@@ -32,8 +32,9 @@ class CatalogRenderer(
   def render(bundle: ComponentsScriptBundle,
     mainEndpoints: MainEndpoints,
     supportingMaterialsEndpoints: SupportingMaterialsEndpoints,
-    queryParams: Map[String, String],
-    prodMode: Boolean): Future[Html] = Future {
+    queryParams : Map[String,String],
+    prodMode: Boolean,
+    iconSet:String): Future[Html] = Future {
 
     val (js, css) = prepareJsCss(prodMode, bundle)
 
@@ -48,6 +49,7 @@ class CatalogRenderer(
       "appName" -> name,
       "js" -> js.toArray,
       "css" -> css.toArray,
+      "iconSet" -> iconSet,
       "ngModules" -> jsArrayString(Some(s"$name-injected") ++ sources.js.ngModules ++ bundle.ngModules),
       "ngServiceLogic" -> ngServiceLogic,
       "staticPaths" -> Json.stringify(StaticPaths.staticPaths),

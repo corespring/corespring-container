@@ -10,7 +10,9 @@ import org.corespring.container.components.model.Component
 import org.corespring.container.components.services.{ComponentService, DependencyResolver}
 import play.api.Logger
 import play.api.http.ContentTypes
+import play.api.libs.json.{JsObject, Json}
 import play.api.mvc._
+import javax.xml.bind.DatatypeConverter
 
 import scala.concurrent.Future
 
@@ -55,10 +57,24 @@ class CompressedAndMinifiedComponentSets(componentSetExecutionContext: Component
     }
   }
 
+  private def tokenToJson(token: String): JsObject = {
+    val decodedColorString = DatatypeConverter.parseBase64Binary(token).map(_.toChar).mkString
+    try {
+      Json.parse(decodedColorString).as[JsObject]
+    } catch {
+      case _ => Json.obj()
+    }
+  }
+
   override def singleResource[A >: EssentialAction](context: String, componentType: String, suffix: String): A = Action.async {
     implicit request =>
       Future {
-        val (body, ct) = generate(context, allComponents.find(_.matchesType(componentType)).toSeq, suffix)
+        val resourceToken = request.queryString.get("resourceToken")
+        val paramsJson = resourceToken match {
+          case Some(token) if (token.length > 0) => tokenToJson(token(0))
+          case _ => Json.obj()
+        }
+        val (body, ct) = generate(context, allComponents.find(_.matchesType(componentType)).toSeq, suffix, paramsJson)
         process(body, ct)
       }(componentSetExecutionContext.heavyLoad)
   }
@@ -66,7 +82,12 @@ class CompressedAndMinifiedComponentSets(componentSetExecutionContext: Component
   override def resource[A >: EssentialAction](context: String, directive: String, suffix: String) = Action.async {
     implicit request =>
       Future {
-        val (body, ct) = generateBodyAndContentType(context, directive, suffix)
+        val resourceToken = request.queryString.get("resourceToken")
+        val paramsJson = resourceToken match {
+          case Some(token) if (token.length > 0) => tokenToJson(token(0))
+          case _ => Json.obj()
+        }
+        val (body, ct) = generateBodyAndContentType(context, directive, suffix, paramsJson)
         process(body, ct)
       }(componentSetExecutionContext.heavyLoad)
   }

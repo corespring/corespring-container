@@ -25,33 +25,6 @@ trait LoadClientSideDependencies {
   }
 }
 
-trait Helpers extends NameHelper {
-
-  implicit def toSeqJsValue(s: Seq[String]): JsValue = JsArray(s.map(JsString(_)))
-
-  implicit def toJsString(s: String): JsValue = JsString(s)
-
-  def configJson(xhtml: String,
-    dependencies: Seq[String],
-    scriptPaths: Seq[String],
-    cssPaths: Seq[String]): JsValue =
-
-    Json.obj(
-      "xhtml" -> xhtml,
-      "angular" -> Json.obj("dependencies" -> dependencies),
-      "scripts" -> scriptPaths,
-      "css" -> cssPaths)
-
-  protected def componentsToResource(components: Seq[Interaction], componentToString: Interaction => String,
-    contentType: String): Result = {
-    Results.Ok(components.map(componentToString).mkString("\n")).as(contentType)
-  }
-
-  protected def wrapJs(org: String, name: String, src: String, directive: Option[String] = None) = {
-    ComponentWrapper(moduleName(org, name), directiveName(org, name), src).toString
-  }
-}
-
 trait JsonHelper {
 
   def partialObj(fields: (String, Option[JsValue])*): JsObject =

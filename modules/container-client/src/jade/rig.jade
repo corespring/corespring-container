@@ -34,6 +34,14 @@ block content
 block after-main-script
   script.
 
+    angular.module('corespring-#{appName}')
+            .config([
+              '$provide',
+              function ($provide) {
+                $provide.value('PlayerSkin', {iconSet: "#{iconSet}"});
+              }
+            ]);
+
     window.broadcast = function(message, params){
       var scope = angular.element(document.getElementById('rig-root')).scope();
       var rootScope = scope.$root;

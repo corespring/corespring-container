@@ -32,7 +32,8 @@ trait EditorRenderer extends CoreRenderer {
     clientOptions: EditorClientOptions,
     bundle: ComponentsScriptBundle,
     queryParams : Map[String,String],
-    prodMode: Boolean): Future[Html] = Future {
+    prodMode: Boolean,
+    iconSet: String): Future[Html] = Future {
 
     val (js, css) = prepareJsCss(prodMode, bundle)
 
@@ -54,6 +55,7 @@ trait EditorRenderer extends CoreRenderer {
       "appName" -> name,
       "js" -> js.toArray,
       "css" -> css.toArray,
+      "iconSet" -> iconSet,
       "ngModules" -> ngModules,
       "ngServiceLogic" -> servicesJs,
       "versionInfo" -> Json.stringify(versionInfo.json),

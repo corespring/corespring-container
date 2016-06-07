@@ -30,7 +30,7 @@ class BaseEditorTest extends Specification with Mockito with ComponentMaker with
 
     override val hooks = {
       val m = mock[EditorHooks]
-      m.load(any[String])(any[RequestHeader]) returns Future(Right(Json.obj()))
+      m.load(any[String])(any[RequestHeader]) returns Future(Right((Json.obj(), Json.obj())))
       m
     }
 
@@ -47,13 +47,14 @@ class BaseEditorTest extends Specification with Mockito with ComponentMaker with
         any[ComponentsAndWidgets],
         any[EditorClientOptions],
         any[ComponentsScriptBundle],
-        any[Map[String,String]],
-        any[Boolean]) returns Future.successful(Html("<html></html>"))
+        any[Map[String, String]],
+        any[Boolean],
+        any[String]) returns Future.successful(Html("<html></html>"))
     }
 
     override val bundler: ComponentBundler = {
       val m = mock[ComponentBundler]
-      m.bundleAll(any[String], any[Option[String]], any[Boolean]) returns Some(
+      m.bundleAll(any[String], any[Option[String]], any[Boolean], any[Option[String]]) returns Some(
         ComponentsScriptBundle(Nil, Nil, Nil, Nil))
       m
     }
@@ -110,7 +111,7 @@ class BaseEditorTest extends Specification with Mockito with ComponentMaker with
 
       waitFor(load("id")(r))
       lazy val captor = capture[ComponentsAndWidgets]
-      there was one(renderer).render(any[MainEndpoints], any[SupportingMaterialsEndpoints], captor, any[EditorClientOptions], any[ComponentsScriptBundle], any[Map[String,String]],any[Boolean])
+      there was one(renderer).render(any[MainEndpoints], any[SupportingMaterialsEndpoints], captor, any[EditorClientOptions], any[ComponentsScriptBundle], any[Map[String, String]], any[Boolean], any[String])
     }
 
     "call renderer.renderJade with all components" in new componentsAndWidgets {
@@ -138,20 +139,20 @@ class BaseEditorTest extends Specification with Mockito with ComponentMaker with
 
     trait componentEditor extends scope {
 
-      override def componentEditorResult(componentType: String, request: Request[AnyContent]) = {
+      override def componentEditorResult(componentType: String, request: Request[AnyContent], defaults: JsValue) = {
         Future.successful(Ok("<html></html>"))
       }
 
       hooks.load(any[String])(any[RequestHeader]) returns {
-        Future.successful(Right(Json.obj("components" -> Json.obj(
-          "singleComponent" -> Json.obj("componentType" -> "type")))))
+        Future.successful(Right((Json.obj("components" -> Json.obj(
+          "singleComponent" -> Json.obj("componentType" -> "type"))), Json.obj())))
       }
     }
 
     s"return $BAD_REQUEST if the component type can't be read from the json model" in new componentEditor {
       hooks.load(any[String])(any[RequestHeader]) returns {
-        Future.successful(Right(Json.obj("components" -> Json.obj(
-          "singleComponent" -> Json.obj()))))
+        Future.successful((Right(Json.obj("components" -> Json.obj(
+          "singleComponent" -> Json.obj())), Json.obj())))
       }
       val result = componentEditor("id")(r)
       status(result) must_== BAD_REQUEST

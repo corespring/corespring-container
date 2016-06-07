@@ -15,6 +15,7 @@ angular.module('corespring-editor.controllers')
     'MathJaxService',
     'WiggiLinkFeatureDef',
     'WiggiMathJaxFeatureDef',
+    'PlayerSkin',
     'EDITOR_EVENTS',
     function($scope,
       $element,
@@ -31,6 +32,7 @@ angular.module('corespring-editor.controllers')
       MathJaxService,
       WiggiLinkFeatureDef,
       WiggiMathJaxFeatureDef,
+      PlayerSkin,
       EDITOR_EVENTS) {
 
       var configPanels = {};
@@ -93,6 +95,9 @@ angular.module('corespring-editor.controllers')
         componentElement) {
         logger.debug('registerComponent ', id);
         ComponentData.registerComponent(id, componentBridge, componentElement);
+        if (componentBridge.setPlayerSkin) {
+          componentBridge.setPlayerSkin(PlayerSkin);
+        }
       });
 
       $scope.$on('registerPlaceholder', function(event, id, placeholder) {

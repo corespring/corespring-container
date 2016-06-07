@@ -4,7 +4,8 @@ angular.module('corespring-player.services').factory('CorespringPlayerDefinition
   'MathJaxService',
   'PlayerUtils',
   'ComponentRegister',
-  function($log, $compile, MathJaxService, PlayerUtils, ComponentRegister) {
+  'PlayerSkin',
+  function($log, $compile, MathJaxService, PlayerUtils, ComponentRegister, PlayerSkin) {
 
     function CorespringPlayerDef(opts) {
 
@@ -81,11 +82,11 @@ angular.module('corespring-player.services').factory('CorespringPlayerDefinition
             $log.debug("not re-rendering");
             return;
           }
-
-          //$log.debug("corespring player definition setDataAndSession rendering");
+          $log.debug("corespring player definition setDataAndSession rendering");
 
           var allData = PlayerUtils.zipDataAndSession($scope.item, $scope.session);
           ComponentRegister.setDataAndSession(allData);
+
           rendered = true;
 
           if(_.isFunction(opts.afterSetDataAndSession)){
@@ -95,6 +96,9 @@ angular.module('corespring-player.services').factory('CorespringPlayerDefinition
 
         $scope.$on('registerComponent', function(event, id, obj) {
           ComponentRegister.registerComponent(id, obj);
+          if (obj.setPlayerSkin) {
+            obj.setPlayerSkin(PlayerSkin);
+          }
         });
 
         $scope.$on('rerender-math', function(event, options) {

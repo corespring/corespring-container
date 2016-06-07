@@ -156,5 +156,10 @@ block after-main-script
         .constant('DEBOUNCE_IN_MILLIS', editorOptions.debounceInMillis || 0 ) 
         .constant('UPLOAD_ENDPOINT', uploadEndpoint)
         .constant('SINGLE_COMPONENT_KEY', editorOptions.singleComponentKey)
-        .config(['wiggiWizConfigProvider', 'UPLOAD_ENDPOINT', setUpWiggiWiz]);
+        .config(['wiggiWizConfigProvider', 'UPLOAD_ENDPOINT', setUpWiggiWiz])
+        .config(['$provide',
+                function($provide) {
+                  $provide.value('PlayerSkin', {iconSet: "!{iconSet}"});
+                }
+              ]);
     })(this);

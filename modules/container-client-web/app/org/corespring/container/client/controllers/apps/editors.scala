@@ -3,7 +3,7 @@ package org.corespring.container.client.controllers.apps
 import org.corespring.container.client.component.{ ComponentBundler, ComponentJson }
 import org.corespring.container.client.controllers.apps.componentEditor.ComponentEditorLaunchingController
 import org.corespring.container.client.controllers.{ AssetsController, EditorConfig }
-import org.corespring.container.client.hooks.Hooks.StatusMessage
+import org.corespring.container.client.hooks.Hooks.{ ItemAndDefaults, StatusMessage }
 import org.corespring.container.client.hooks.{ DraftEditorHooks, EditorHooks, ItemEditorHooks }
 import org.corespring.container.client.integration.ContainerExecutionContext
 import org.corespring.container.client.pages.{ ComponentEditorRenderer, DevEditorRenderer, EditorRenderer, MainEditorRenderer }
@@ -21,7 +21,8 @@ trait BaseEditor[H <: EditorHooks]
   extends Controller
   with AssetsController[EditorHooks]
   with ComponentEditorLaunchingController
-  with QueryStringHelper {
+  with QueryStringHelper
+  with PlayerSkinHelper {
 
   def hooks: H
 
@@ -64,14 +65,18 @@ trait BaseEditor[H <: EditorHooks]
 
       e.fold(
         err => Future.successful(onError(err)),
-        _ => {
+        jsonResult => {
+          val (json, defaults) = jsonResult
           val prodMode: Boolean = request.getQueryString("mode")
             .map(_ == "prod")
             .getOrElse(mode == Mode.Prod)
 
           val queryParams = mkQueryParams(m => m)(request)
+          val serviceParams = mkQueryParams(mapToJson)
+          val encodedComputedColors = calculateColorToken(serviceParams, defaults)
+          val computedIconSet = calculateIconSet(serviceParams, defaults)
 
-          val bundle = bundler.bundleAll("editor", Some("editor"), !prodMode).get
+          val bundle = bundler.bundleAll("editor", Some("editor"), !prodMode, Some(encodedComputedColors)).get
           val mainEndpoints = endpoints.main(id)
           val supportingMaterialsEndpoints = endpoints.supportingMaterials(id)
           renderer.render(
@@ -81,7 +86,8 @@ trait BaseEditor[H <: EditorHooks]
             editorClientOptions,
             bundle,
             queryParams,
-            prodMode).map(Ok(_))
+            prodMode,
+            computedIconSet).map(Ok(_))
         })
     }
   }
@@ -105,18 +111,18 @@ trait BaseEditor[H <: EditorHooks]
   }
 
   def componentEditor(id: String) = Action.async { implicit request =>
-    def loadEditor(json: JsValue): Future[SimpleResult] = {
-      logger.trace(s"function=loadEditor, json=${Json.prettyPrint(json)}")
-      findComponentType(json) match {
-        case Some(ct) => componentEditorResult(ct, request)
+    def loadEditor(data: ItemAndDefaults): Future[SimpleResult] = {
+      logger.trace(s"function=loadEditor, json=${Json.prettyPrint(data._1)}")
+      findComponentType(data._1) match {
+        case Some(ct) => componentEditorResult(ct, request, data._2)
         case _ => Future.successful(BadRequest("Can't find a component type"))
       }
     }
 
     for {
       e <- hooks.load(id)
-      result <- e.fold(e => Future.successful(onError(e)), (json) => {
-        loadEditor(json)
+      result <- e.fold(e => Future.successful(onError(e)), (data) => {
+        loadEditor(data)
       })
     } yield result
   }

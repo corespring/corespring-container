@@ -16,6 +16,7 @@ GET         /launch/component-editor/draft    @org.corespring.shell.controllers.
 GET         /launch-catalog/:id               @org.corespring.shell.controllers.Launchers.catalog(id)
 GET         /launch-player/item/:itemId       @org.corespring.shell.controllers.Launchers.playerFromItem(itemId)
 GET         /launch-player/session/:sessionId @org.corespring.shell.controllers.Launchers.playerFromSession(sessionId)
+GET         /launch-player/session/view/:sessionId @org.corespring.shell.controllers.Launchers.playerFromSessionView(sessionId)
 
 GET         /assets/*file        controllers.Assets.at(path="/container-client", file)
 

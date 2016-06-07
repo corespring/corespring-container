@@ -3,14 +3,16 @@ package org.corespring.shell.controllers.editor.actions
 import com.mongodb.casbah.commons.MongoDBObject
 import org.bson.types.ObjectId
 import org.corespring.container.client.controllers.{ AssetType, Assets }
-import org.corespring.container.client.hooks.{ DraftEditorHooks => ContainerDraftEditorHooks, ItemEditorHooks => ContainerItemEditorHooks, UploadResult }
+import org.corespring.container.client.hooks.Hooks.ItemAndDefaults
+import org.corespring.container.client.hooks.{ UploadResult, DraftEditorHooks => ContainerDraftEditorHooks, ItemEditorHooks => ContainerItemEditorHooks }
 import org.corespring.container.client.integration.ContainerExecutionContext
 import org.corespring.container.logging.ContainerLogger
 import org.corespring.mongo.json.services.MongoService
+import org.corespring.shell.DefaultPlayerSkin
 import org.corespring.shell.controllers.editor.ItemDraftAssets
-import org.corespring.shell.services.{ItemService, ItemDraftService}
+import org.corespring.shell.services.{ ItemDraftService, ItemService }
 import play.api.Logger
-import play.api.libs.json.{ Json, JsValue }
+import play.api.libs.json.{ JsValue, Json }
 import play.api.mvc._
 
 import scala.concurrent.Future
@@ -47,25 +49,23 @@ object DraftId {
 }
 
 class ItemEditorHooks(
- itemService: ItemService,
- assets: Assets,
-                       val containerContext: ContainerExecutionContext
-                     ) extends ContainerItemEditorHooks {
+  itemService: ItemService,
+  assets: Assets,
+  val containerContext: ContainerExecutionContext) extends ContainerItemEditorHooks {
 
   lazy val logger = ContainerLogger.getLogger("EditorHooks")
 
-
   import play.api.http.Status._
 
-  override def load(id: String)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] = Future {
+  override def load(id: String)(implicit header: RequestHeader): Future[Either[(Int, String), ItemAndDefaults]] = Future {
     itemService.load(id).map { json =>
-      Right(json)
+      Right((json, DefaultPlayerSkin.defaultPlayerSkin))
     }.getOrElse {
       val newId = ObjectId.get
       val data = Json.obj("_id" -> Json.obj("$oid" -> newId.toString))
       val oid = itemService.create(data).get
       require(newId == oid, "the created oid must match the new id")
-      Right(Json.obj("item" -> data))
+      Right((Json.obj("item" -> data), DefaultPlayerSkin.defaultPlayerSkin))
     }
   }
 
@@ -91,29 +91,27 @@ class ItemEditorHooks(
 }
 
 class DraftEditorHooks(
-draftItemService: ItemDraftService,
-itemService: ItemService,
-assets: Assets with ItemDraftAssets,
-                        val containerContext: ContainerExecutionContext
-                      ) extends ContainerDraftEditorHooks {
+  draftItemService: ItemDraftService,
+  itemService: ItemService,
+  assets: Assets with ItemDraftAssets,
+  val containerContext: ContainerExecutionContext) extends ContainerDraftEditorHooks {
 
   lazy val logger = Logger(this.getClass)
 
-
   import play.api.http.Status._
 
-  override def load(id: String)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] = Future {
+  override def load(id: String)(implicit header: RequestHeader): Future[Either[(Int, String), ItemAndDefaults]] = Future {
 
     draftItemService.load(id).map { json =>
       logger.trace(s"function=load, id=$id, json=${Json.prettyPrint(json)}")
-      Right(json \ "item")
+      Right((json \ "item"), DefaultPlayerSkin.defaultPlayerSkin)
     }.getOrElse {
       val draftId: ContainerDraftId = DraftId.fromString[ObjectId, ContainerDraftId](id, (itemId, name) => ContainerDraftId(new ObjectId(itemId), name))
       val item = itemService.load(draftId.itemId.toString).get
       draftItemService.createDraft(draftId.itemId, Some(draftId.name), item)
       assets.copyItemToDraft(draftId.itemId.toString, draftId.name)
       logger.trace(s"function=load, id=$id, json=${Json.prettyPrint(item)} - created item")
-      Right(item)
+      Right((item, DefaultPlayerSkin.defaultPlayerSkin))
     }
   }
 

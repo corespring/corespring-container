@@ -34,7 +34,7 @@ class ComponentEditorRenderer(
 
   implicit def ec = containerExecutionContext.context
 
-  def render(componentBundle: SingleComponentScriptBundle, previewMode: String, clientOptions: ComponentEditorOptions, queryParams: Map[String,String], prodMode: Boolean): Future[Html] = Future {
+  def render(componentBundle: SingleComponentScriptBundle, previewMode: String, clientOptions: ComponentEditorOptions, queryParams: Map[String,String], prodMode: Boolean, iconSet: String): Future[Html] = Future {
 
     logger.info(s"function=render, componentBundle=$componentBundle")
 
@@ -54,6 +54,7 @@ class ComponentEditorRenderer(
       "previewWidth" -> previewWidth.getOrElse(null),
       "js" -> js.toArray,
       "css" -> css.toArray,
+      "iconSet" -> iconSet,
       "ngModules" -> jsArrayString(sources.js.ngModules ++ componentBundle.ngModules),
       "ngServiceLogic" -> inlineJs,
       "componentNgModules" -> "",
