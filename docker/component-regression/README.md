@@ -2,12 +2,37 @@
 The purpose of this docker container is to run the component regression tests.  
 It boots up a corespring-container with a mongo and a fake-s3.   
 It configures a virtual framebuffer so that we can run firefox in headless mode.  
-    
 
-## Building the runner
+
+## Using selenium-docker for development 
+For development it is much faster to use a selenium docker image, which runs selenium
+ and a browser inside a docker container.    
+ The corespring-container and the db are running
+ outside of the docker-container  
+ 
+ Here you can find the available [selenium docker images](https://hub.docker.com/r/selenium/)      
+ I've tested selenium/standalone-firefox and selenium/standalone-chrome.      
+ Chrome seems to have problems with drag-and-drop though   
+ 
+      #Start container
+      play run
+       
+      #Start selenium docker
+      docker run -d -p 4444:4444 selenium/standalone-firefox:2.53.0
+       
+      #Run your tests
+      grunt regression --timeout=30000 --baseUrl="http://[your computer's ip]:9000"
+ 
++ Note: Because selenium runs inside the docker container, it needs to know the ip address 
+ of your computer. Localhost or 127.0.0.1 doesn't work, you have to use the real address like 
+ 192.168.1.8 
+        
+   
+
+## Building the runner for CI execution
++ Note: Normally it shouldn't be necessary for a dev to build and run these. However, if you want to debug some problem on CI, it might be useful to build and run it locally.   
+         
 The runner consists of different parts that you have to build in order.  
-You can build different runners for CI and local dev
-There is a faster option to run the tests locally, see 'Using selenium-docker' below  
  
  1. RegrBase - It contains the infrastructure like mongo 
   
@@ -28,8 +53,9 @@ There is a faster option to run the tests locally, see 'Using selenium-docker' b
  
      docker build -t cicrr -f docker/component-regression/dockerfiles/CiCompRegrRunner .
  
- For dev you are building 1, 2 and 3. If you change something in the components, you have to rebuild the third part only  
- For ci you have to build 1 and 4. 
+ For ci you have to build 1 and 4.    
+ For debugging & dev you are building 1, 2 and 3. If you change something in the components, you have to rebuild the third part only  
+  
 
 ### Note: Docker registry and docker container for CI
 
@@ -110,22 +136,3 @@ This url is what you pass to the docker container as
 Note: The quotes are important, don't leave them out     
      
       
-## Using selenium-docker 
-For development it is faster to use an selenium docker image, which runs selenium 
-and a browser. 
- 
-      #Start container
-      play run
-       
-      #Start selenium docker
-      docker run -d -p 4444:4444 selenium/standalone-firefox:2.53.0
-       
-      #Run your tests
-      grunt regression --timeout=30000 --baseUrl="http://[your computer's ip]:9000"
- 
-+ Note: Because selenium runs inside the docker container, it needs to know the ip address 
- of your computer. Localhost or 127.0.0.1 doesn't work, you have to use the real address like 
- 192.168.1.8 
- 
-
-        
