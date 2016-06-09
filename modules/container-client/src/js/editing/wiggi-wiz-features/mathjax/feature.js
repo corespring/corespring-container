@@ -21,7 +21,7 @@ angular.module('corespring-editing.wiggi-wiz-features.mathjax').factory('WiggiMa
           content = $node.text();
         }
         var isNew = $node[0].outerHTML.indexOf('mathinput-holder-init') >= 0;
-        content = content.replace(/\\\(/gi,'').replace(/\\\)/gi, '')
+        content = content.replace(/\\\(/gi,'').replace(/\\\)/gi, '');
         var encodedContent = btoa(content);
         var newNode = $([
           '<div mathinput-holder="" show-remove-button="true" class="mathinput-holder">',
