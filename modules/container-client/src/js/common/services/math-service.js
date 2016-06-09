@@ -7,14 +7,28 @@
 
   var MathJaxService = function($timeout) {
 
-    this.parseDomForMath = function(delay, element) {
+    /**
+     * isRendering is used to optimize the number of calls to MathJax processing.
+     * Since the parseDomForMath method processes the whole dom
+     * with every call, it doesn't make sense to enqueue a new command
+     * when there is an unfinished one in the queue.
+     */
+    var isRendering = false;
+
+    this.parseDomForMath = function(delay) {
 
       function renderMath() {
-        if (typeof MathJax !== 'undefined' && !_.isUndefined(MathJax)) {
-          MathJax.Hub.Queue(["Typeset", MathJax.Hub], function() {
-             $('span[mathjax]').addClass('rendered');
-          });
+        if (isRendering) {
+          return;
         }
+        if (typeof MathJax === 'undefined' || _.isUndefined(MathJax)) {
+          return;
+        }
+        isRendering = true;
+        MathJax.Hub.Queue(["Typeset", MathJax.Hub], function() {
+          isRendering = false;
+          $('span[mathjax]').addClass('rendered');
+        });
       }
 
       if (delay === 0) {
