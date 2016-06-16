@@ -66,9 +66,10 @@ angular.module('corespring-editing.wiggi-wiz-features.cs-image')
     csImage.getMarkUp = function($node, $scope) {
       var imgNode = $node.find('img');
       var divStyle = $node.attr('style') || '';
+      var imageStyle = imgNode.attr('style') || '';
       //strip the query params
-      var src = imgNode.attr('src').split('?')[0];
-      return '<div style="' + divStyle + '"><img src="'+ src + '"/></div>';
+      var src = (imgNode.attr('src') || '').split('?')[0];
+      return '<div style="' + divStyle + '"><img style="' + imageStyle + '" src="'+ src + '"></img></div>';
     };
 
     csImage.addToEditor = function(editor, addContent) {
