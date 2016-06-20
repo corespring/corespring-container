@@ -37,7 +37,7 @@ block after-main-script
             .config([
               '$provide',
               function ($provide) {
-                $provide.value('PlayerSkin', {iconSet: "#{iconSet}"});
+                $provide.value('PlayerSkin', {iconSet: "!{iconSet}", colors: !{colors}});
               }
             ]);
 

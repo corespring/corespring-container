@@ -30,6 +30,7 @@ trait ComponentEditorLaunchingController
     val queryParams = mkQueryParams(mapToJson)(request)
     val encodedComputedColors = calculateColorToken(queryParams, defaults)
     val computedIconSet = calculateIconSet(queryParams, defaults)
+    val computedColors = calculateColors(queryParams, defaults)
 
     val prodMode = request.getQueryString("mode").map { m =>
       m == "prod"
@@ -40,7 +41,7 @@ trait ComponentEditorLaunchingController
     bundler.singleBundle(componentType, "editor", !prodMode, Some(encodedComputedColors)) match {
       case Some(b) => {
         val queryParams = mkQueryParams(m => m)(request)
-        componentEditorRenderer.render(b, previewMode, options, queryParams, prodMode, computedIconSet).map(Ok(_))
+        componentEditorRenderer.render(b, previewMode, options, queryParams, prodMode, computedIconSet, computedColors).map(Ok(_))
       }
       case None => Future.successful(NotFound(""))
     }

@@ -34,6 +34,7 @@ class RigRenderer(val pageSourceService: PageSourceService,
       "ngModules" -> (sources.js.ngModules ++ bundle.ngModules).map(s => s"'$s'").mkString(","),
       "ngServiceLogic" -> "",
       "iconSet" -> "emoji",
+      "colors" -> Json.stringify(Json.obj()),
       "itemJson" -> Json.prettyPrint(item))
     jadeEngine.renderJade("rig", params)
   }

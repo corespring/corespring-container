@@ -75,7 +75,7 @@ block after-main-script
             wiggiWizConfigProvider.add({
               imageService: 'EditingImageService'
             });
-            $provide.value('PlayerSkin', {iconSet: "!{iconSet}"});
+            $provide.value('PlayerSkin', {iconSet: "!{iconSet}", colors: !{colors}});
           }
         ]);
     })(this);

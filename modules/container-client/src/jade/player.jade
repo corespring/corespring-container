@@ -69,5 +69,5 @@ block after-main-script
       $provide.factory('EmbeddedItemAndSession', function(){
         return !{sessionJson} || {};
       });
-      $provide.value('PlayerSkin', {iconSet: "!{iconSet}"});
+      $provide.value('PlayerSkin', {iconSet: "!{iconSet}", colors: !{colors}});
     }]);
