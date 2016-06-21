@@ -37,7 +37,7 @@ trait PlayerSkinHelper {
     "warning-block-foreground" -> "#f8f6f6",
     "muted-foreground" -> "#F8F6F6",
     "muted-background" -> "#E0DEE0"
-  )
+  ) ++ (defaults \ "colors").asOpt[JsObject].getOrElse(Json.obj())
 
 
 }
